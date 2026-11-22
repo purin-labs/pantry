@@ -1,7 +1,7 @@
 # Handoff: Plan 86 Costs & margins, 19 November 2026
 
 Target repository: `/Users/pta/Dev/purin-labs/pantry` (`purin-labs/pantry`)
-Owning plan: [Plan 86 — Bakery Costs & Margins](../plan-86-bakery-costs-and-margins.md)
+Owning plan: [Plan 86 — Bakery Costs & Margins](../history/plan-86-bakery-costs-and-margins.md)
 
 ## Current state
 

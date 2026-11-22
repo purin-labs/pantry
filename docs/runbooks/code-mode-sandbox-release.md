@@ -21,7 +21,7 @@ The command runs its builds and checks first. It then deploys in this order:
 
 1. `pantry-code-sandbox`, the sandbox Worker.
 2. `pantry-model-exit`, the model exit Worker
-   ([Plan 73](../plan-73-model-exit-worker.md)).
+   ([Plan 73](../history/plan-73-model-exit-worker.md)).
 3. `pantry`, the Platform Worker with its containers.
 4. `pantry-slack-ingress`, the Slack ingress Worker.
 

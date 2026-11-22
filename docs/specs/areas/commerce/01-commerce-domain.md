@@ -48,15 +48,15 @@ through the public API.
 
 ### Who owns each fact
 
-| Fact | Owner |
-| --- | --- |
-| The catalog, the stock ledger, carts, checkouts, orders, payments, preparation, fulfillment and shipments of Purin Checkout | The commerce engine (`services/commerce`). One `CommerceMerchantDO` holds each merchant |
-| The same facts of a Shopify shop | Shopify |
-| Payment, address, tax, duty, carrier rate, label and tracking effects of Purin Checkout | The provider that the engine calls. The engine keeps an attempt record for a payment, an address check, a shipping quote with its carrier rate, tax and duty parts, a label rate and a label purchase. It checks the signature of a tracking event |
-| The read copy (projections) and its queries | `OrganisationActor` in the Platform (COM-03) |
-| Cases, proposals, approvals, actions and their receipts | `CaseActor` and the action ledger in the Platform |
-| The selected system, the merchant binding and the capability activations | Regional D1 |
-| Buyer contact and address data of Purin Checkout | The engine only |
+| Fact                                                                                                                        | Owner                                                                                                                                                                                                                                              |
+| --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The catalog, the stock ledger, carts, checkouts, orders, payments, preparation, fulfillment and shipments of Purin Checkout | The commerce engine (`services/commerce`). One `CommerceMerchantDO` holds each merchant                                                                                                                                                            |
+| The same facts of a Shopify shop                                                                                            | Shopify                                                                                                                                                                                                                                            |
+| Payment, address, tax, duty, carrier rate, label and tracking effects of Purin Checkout                                     | The provider that the engine calls. The engine keeps an attempt record for a payment, an address check, a shipping quote with its carrier rate, tax and duty parts, a label rate and a label purchase. It checks the signature of a tracking event |
+| The read copy (projections) and its queries                                                                                 | `OrganisationActor` in the Platform (COM-03)                                                                                                                                                                                                       |
+| Cases, proposals, approvals, actions and their receipts                                                                     | `CaseActor` and the action ledger in the Platform                                                                                                                                                                                                  |
+| The selected system, the merchant binding and the capability activations                                                    | Regional D1                                                                                                                                                                                                                                        |
+| Buyer contact and address data of Purin Checkout                                                                            | The engine only                                                                                                                                                                                                                                    |
 
 Pantry does not become the system of record when it copies provider state. The engine
 imports no Platform package. The Platform reaches the engine only through the packages
@@ -83,35 +83,35 @@ balance `available_only`.
 - A provenance also has `occurredAt` and `observedAt`. The revision is not 0, and
   `observedAt` is not before `occurredAt`.
 
-| Group | Record | States and branches |
-| --- | --- | --- |
-| Catalog | `Location` | Kind `store`, `warehouse`, `fulfillment_center`, `pickup_point`. `active`, `inactive` |
-| Catalog | `Product`, `SellableVariant` | A product has a title and a description. A variant has a `sku`, options and media (`image`, `video`, `model3d`) |
-| Sales | `SalesChannel` | Kind `online`, `point_of_sale`, `marketplace`, `agent`. `active`, `inactive` |
-| Sales | `Storefront` | Fulfillment `pickup` (location, lead time) or `shipping` (origin, shipping profile). Tax `percentage` (`added` or `included`) or `provider_quoted`. `active`, `inactive` |
-| Sales | `Offer` | One variant, one sales channel and one price. Availability `available`, `unavailable`, `backordered`. `prepared`, `listed`, `archived` |
-| Sales | `Market` | Countries, one currency and storefronts. Pricing `price_list` (a price for each variant) or `converted` (a rate and a rounding increment). `active`, `inactive`. A record of the engine (`src/records/api-markets.ts`); it is not a projection kind |
-| Inventory | `InventoryItem` | Category `ingredient`, `packaging`, `finished_good`, `operating_supply`. `tracking` is `aggregate` or `lot_tracked` (expiry `required`, `optional`). `active`, `inactive` |
-| Inventory | `InventoryConsumptionPlan` | Scope `organisation` or `location`. Mode `untracked`, `direct` (components, `commitOn`) or `prepared` (recipe revision). `active`, `inactive` |
-| Inventory | `InventoryPosition` | Balance `accounted` (`onHand`, `allocated`, `available`) or `available_only` |
-| Inventory | `InventoryMovement` | `increase`: `receipt`, `production`, `stock_count`, `correction`. `decrease`: `sale`, `preparation`, `production`, `stock_count`, `correction`, `waste`, `damage` |
-| Inventory | `InventoryAllocation` | `held`, `allocated_to_order`, `committed`, `released`, `expired` |
-| Inventory | `InventoryLot` | Expiry `not_tracked` or `expires`. `available`, `depleted`, `quarantined`, `expired` |
-| Inventory | `StockPolicy` | Replenishment `none` or `threshold` (reorder point, target quantity). `active`, `inactive` |
-| Food service | `Menu` | Scope `location` or `location_group`. Validity `always`, `window`, `schedule`. `draft`, `published`, `archived`. An entry names an Offer revision and a plan revision |
-| Food service | `ModifierGroupRevision` | Options with a price change and requirement changes (`add`, `reduce`). `draft`, `active`, `retired` |
-| Food service | `RecipeRevision` | Output `immediate` or `stocked` (item, yield). `draft`, `active`, `retired` |
-| Food service | `PreparationStation`, `PreparationTicket` | Ticket: `queued`, `preparing`, `completed` (movement ids), `cancelled` |
-| Food service | `ProductionBatch` | Planned and actual yield, input movements, one output movement, one output lot. Demand `stock`, `request`, `shipment` |
-| Checkout | `Cart` | Lines `catalog` or `food_service`. `active`, `submitted` |
-| Checkout | `Checkout` | Source `online` or `point_of_sale`. `quoted`, `payment_pending`, `accepted`, `expired`. Each state holds the quote |
-| Checkout | `CheckoutPaymentAttempt` | `pending`, `processing`, `captured`, `declined`, `indeterminate` |
-| Orders | `CommerceOrder` | Origin `online`, `point_of_sale`, `marketplace`, `agent`. Buyer `guest` or `identified`. `pending_confirmation`, `confirmed`, `fulfillment_pending`, `partially_fulfilled`, `fulfilled`, `cancelled` |
-| Orders | `Payment` | `pending`, `authorized`, `captured`, `failed`, `partially_refunded`, `refunded` |
-| Fulfillment | `Fulfillment` | `shipping`: `requested`, `preparing`, `blocked`, `handed_to_carrier`, `cancelled`. `pickup`: `requested`, `preparing`, `blocked`, `ready_for_pickup`, `completed`, `cancelled`. Also `local_delivery`, `immediate_handoff`, `on_premise` |
-| Fulfillment | `Shipment` | `first_party`: `ready`, `label_purchased`, `in_transit`, `delivered`. `external`: `label_created`, `in_transit`, `delivery_exception`, `delivered`, `returned` |
-| Shipping | `ShippingProfile`, `VariantShippingSpecification` | Routes `domestic_japan`, `japan_to_singapore`, `international`. Eligibility `prohibited` or `physical` |
-| Shipping | `ShipmentLabelRateSnapshot`, `ShipmentLabelAttempt` | Attempt: `requested`, `purchased`, `rejected`, `indeterminate` |
+| Group        | Record                                              | States and branches                                                                                                                                                                                                                                 |
+| ------------ | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Catalog      | `Location`                                          | Kind `store`, `warehouse`, `fulfillment_center`, `pickup_point`. `active`, `inactive`                                                                                                                                                               |
+| Catalog      | `Product`, `SellableVariant`                        | A product has a title and a description. A variant has a `sku`, options and media (`image`, `video`, `model3d`)                                                                                                                                     |
+| Sales        | `SalesChannel`                                      | Kind `online`, `point_of_sale`, `marketplace`, `agent`. `active`, `inactive`                                                                                                                                                                        |
+| Sales        | `Storefront`                                        | Fulfillment `pickup` (location, lead time) or `shipping` (origin, shipping profile). Tax `percentage` (`added` or `included`) or `provider_quoted`. `active`, `inactive`                                                                            |
+| Sales        | `Offer`                                             | One variant, one sales channel and one price. Availability `available`, `unavailable`, `backordered`. `prepared`, `listed`, `archived`                                                                                                              |
+| Sales        | `Market`                                            | Countries, one currency and storefronts. Pricing `price_list` (a price for each variant) or `converted` (a rate and a rounding increment). `active`, `inactive`. A record of the engine (`src/records/api-markets.ts`); it is not a projection kind |
+| Inventory    | `InventoryItem`                                     | Category `ingredient`, `packaging`, `finished_good`, `operating_supply`. `tracking` is `aggregate` or `lot_tracked` (expiry `required`, `optional`). `active`, `inactive`                                                                           |
+| Inventory    | `InventoryConsumptionPlan`                          | Scope `organisation` or `location`. Mode `untracked`, `direct` (components, `commitOn`) or `prepared` (recipe revision). `active`, `inactive`                                                                                                       |
+| Inventory    | `InventoryPosition`                                 | Balance `accounted` (`onHand`, `allocated`, `available`) or `available_only`                                                                                                                                                                        |
+| Inventory    | `InventoryMovement`                                 | `increase`: `receipt`, `production`, `stock_count`, `correction`. `decrease`: `sale`, `preparation`, `production`, `stock_count`, `correction`, `waste`, `damage`                                                                                   |
+| Inventory    | `InventoryAllocation`                               | `held`, `allocated_to_order`, `committed`, `released`, `expired`                                                                                                                                                                                    |
+| Inventory    | `InventoryLot`                                      | Expiry `not_tracked` or `expires`. `available`, `depleted`, `quarantined`, `expired`                                                                                                                                                                |
+| Inventory    | `StockPolicy`                                       | Replenishment `none` or `threshold` (reorder point, target quantity). `active`, `inactive`                                                                                                                                                          |
+| Food service | `Menu`                                              | Scope `location` or `location_group`. Validity `always`, `window`, `schedule`. `draft`, `published`, `archived`. An entry names an Offer revision and a plan revision                                                                               |
+| Food service | `ModifierGroupRevision`                             | Options with a price change and requirement changes (`add`, `reduce`). `draft`, `active`, `retired`                                                                                                                                                 |
+| Food service | `RecipeRevision`                                    | Output `immediate` or `stocked` (item, yield). `draft`, `active`, `retired`                                                                                                                                                                         |
+| Food service | `PreparationStation`, `PreparationTicket`           | Ticket: `queued`, `preparing`, `completed` (movement ids), `cancelled`                                                                                                                                                                              |
+| Food service | `ProductionBatch`                                   | Planned and actual yield, input movements, one output movement, one output lot. Demand `stock`, `request`, `shipment`                                                                                                                               |
+| Checkout     | `Cart`                                              | Lines `catalog` or `food_service`. `active`, `submitted`                                                                                                                                                                                            |
+| Checkout     | `Checkout`                                          | Source `online` or `point_of_sale`. `quoted`, `payment_pending`, `accepted`, `expired`. Each state holds the quote                                                                                                                                  |
+| Checkout     | `CheckoutPaymentAttempt`                            | `pending`, `processing`, `captured`, `declined`, `indeterminate`                                                                                                                                                                                    |
+| Orders       | `CommerceOrder`                                     | Origin `online`, `point_of_sale`, `marketplace`, `agent`. Buyer `guest` or `identified`. `pending_confirmation`, `confirmed`, `fulfillment_pending`, `partially_fulfilled`, `fulfilled`, `cancelled`                                                |
+| Orders       | `Payment`                                           | `pending`, `authorized`, `captured`, `failed`, `partially_refunded`, `refunded`                                                                                                                                                                     |
+| Fulfillment  | `Fulfillment`                                       | `shipping`: `requested`, `preparing`, `blocked`, `handed_to_carrier`, `cancelled`. `pickup`: `requested`, `preparing`, `blocked`, `ready_for_pickup`, `completed`, `cancelled`. Also `local_delivery`, `immediate_handoff`, `on_premise`            |
+| Fulfillment  | `Shipment`                                          | `first_party`: `ready`, `label_purchased`, `in_transit`, `delivered`. `external`: `label_created`, `in_transit`, `delivery_exception`, `delivered`, `returned`                                                                                      |
+| Shipping     | `ShippingProfile`, `VariantShippingSpecification`   | Routes `domestic_japan`, `japan_to_singapore`, `international`. Eligibility `prohibited` or `physical`                                                                                                                                              |
+| Shipping     | `ShipmentLabelRateSnapshot`, `ShipmentLabelAttempt` | Attempt: `requested`, `purchased`, `rejected`, `indeterminate`                                                                                                                                                                                      |
 
 The contracts and the engine keep these rules:
 
@@ -227,14 +227,14 @@ kind. The action kinds are:
 
 ## Contracts
 
-| Package or folder | Content |
-| --- | --- |
+| Package or folder                                                | Content                                                                                                                                                                                                                                                                                                                                          |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `packages/commerce-contracts` (`@purin-labs/commerce-contracts`) | TypeBox schemas and parsers. `src/records/commerce-records.ts` has the records of this spec. `src/commerce-domain.ts` has their strict types. `src/commerce-canonical.ts` has the constructors with their checks. `src/records/api-markets.ts` has the Market. `src/shopify-normalizer.ts` and `src/lab-normalizer.ts` make canonical deliveries |
-| `packages/contracts/src/commerce-system.ts` | `CommerceSystemKind` and the source of each kind |
-| `packages/commerce-client` (`@purin-labs/commerce-client`) | `CommerceAdminClient`, `CommerceStorefrontClient` and `CommerceEntityPlaneClient` |
-| `services/commerce` | The engine Worker `pantry-commerce`. `docs/spec.md` is the contract of its API |
-| `apps/storefront`, `scripts/punter` | The buyer application and the buyer acceptance client |
-| `services/platform/src/commerce/contract/` | The public files of the area in the Platform: the provider port, the delivery intake, the engine client, the queue messages |
+| `packages/contracts/src/commerce-system.ts`                      | `CommerceSystemKind` and the source of each kind                                                                                                                                                                                                                                                                                                 |
+| `packages/commerce-client` (`@purin-labs/commerce-client`)       | `CommerceAdminClient`, `CommerceStorefrontClient` and `CommerceEntityPlaneClient`                                                                                                                                                                                                                                                                |
+| `services/commerce`                                              | The engine Worker `pantry-commerce`. `docs/spec.md` is the contract of its API                                                                                                                                                                                                                                                                   |
+| `apps/storefront`, `scripts/punter`                              | The buyer application and the buyer acceptance client                                                                                                                                                                                                                                                                                            |
+| `services/platform/src/commerce/contract/`                       | The public files of the area in the Platform: the provider port, the delivery intake, the engine client, the queue messages                                                                                                                                                                                                                      |
 
 - Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`):
   `organisation_commerce_system` has one row for each Organisation, with `system_kind`
@@ -271,15 +271,15 @@ kind. The action kinds are:
 The control routes (`services/platform/src/control/routes/commerce/system.ts`) are under
 `/v1/control/organisations/:id`:
 
-| Route | Role | Purpose |
-| --- | --- | --- |
-| `GET /commerce-system` | Viewer | The selected system and its sync state |
-| `PUT /commerce-system` | Admin | Select Purin Checkout (`select_builtin_commerce`, `commerce_binding_id`) or Shopify (`select_shopify`, `integration_account_id`), with `expected_revision` |
-| `POST /commerce-system/sync` | Admin | Queue a read of the engine feed. For Shopify, the answer is `commerce_system_sync_managed_by_shopify` |
-| `POST /commerce-system/builtin-commerce/demo` | Admin | Make and select the demonstration shop |
-| `GET /commerce-capabilities`, `GET /commerce-capabilities/:activationId` | Viewer | Read the activations |
-| `POST /commerce-capabilities` | Admin | Configure an activation |
-| `POST /commerce-capabilities/:activationId/activate`, `/inactivate` | Admin | Change the state, with `expectedRevision` |
+| Route                                                                    | Role   | Purpose                                                                                                                                                    |
+| ------------------------------------------------------------------------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /commerce-system`                                                   | Viewer | The selected system and its sync state                                                                                                                     |
+| `PUT /commerce-system`                                                   | Admin  | Select Purin Checkout (`select_builtin_commerce`, `commerce_binding_id`) or Shopify (`select_shopify`, `integration_account_id`), with `expected_revision` |
+| `POST /commerce-system/sync`                                             | Admin  | Queue a read of the engine feed. For Shopify, the answer is `commerce_system_sync_managed_by_shopify`                                                      |
+| `POST /commerce-system/builtin-commerce/demo`                            | Admin  | Make and select the demonstration shop                                                                                                                     |
+| `GET /commerce-capabilities`, `GET /commerce-capabilities/:activationId` | Viewer | Read the activations                                                                                                                                       |
+| `POST /commerce-capabilities`                                            | Admin  | Configure an activation                                                                                                                                    |
+| `POST /commerce-capabilities/:activationId/activate`, `/inactivate`      | Admin  | Change the state, with `expectedRevision`                                                                                                                  |
 
 - Each `PUT` and `POST` is a control mutation with an `Idempotency-Key`. The same key
   with the same body gives the first answer again. The same key with another body gives
@@ -303,28 +303,28 @@ The control routes (`services/platform/src/control/routes/commerce/system.ts`) a
 
 ## Rules and limits
 
-| Action | Viewer | Operator | Admin and owner | Agent |
-| --- | --- | --- | --- | --- |
-| Read the selected system and its sync state | Yes | Yes | Yes | `integration_list` shows the selected system. No tool gives the sync state |
-| Select the system, queue a sync, make the demonstration shop | No | No | Yes | No |
-| Read the capability activations | Yes | Yes | Yes | No tool |
-| Configure, activate or inactivate a capability | No | No | Yes | No |
-| Read one governed action in the Portal | Yes | Yes | Yes | — |
-| Propose a governed action through the Portal route | No | No | Yes | `commerce_propose_action`, proposal only |
-| Approve, reject or execute a governed action in the Portal | No | No | Yes. An approval also needs a step-up | No |
+| Action                                                       | Viewer | Operator | Admin and owner                       | Agent                                                                      |
+| ------------------------------------------------------------ | ------ | -------- | ------------------------------------- | -------------------------------------------------------------------------- |
+| Read the selected system and its sync state                  | Yes    | Yes      | Yes                                   | `integration_list` shows the selected system. No tool gives the sync state |
+| Select the system, queue a sync, make the demonstration shop | No     | No       | Yes                                   | No                                                                         |
+| Read the capability activations                              | Yes    | Yes      | Yes                                   | No tool                                                                    |
+| Configure, activate or inactivate a capability               | No     | No       | Yes                                   | No                                                                         |
+| Read one governed action in the Portal                       | Yes    | Yes      | Yes                                   | —                                                                          |
+| Propose a governed action through the Portal route           | No     | No       | Yes                                   | `commerce_propose_action`, proposal only                                   |
+| Approve, reject or execute a governed action in the Portal   | No     | No       | Yes. An approval also needs a step-up | No                                                                         |
 
-| Limit | Value | Constant |
-| --- | --- | --- |
-| Quantity scale and amount | 6 places, 9,007,199,254,740,991 | A literal and `MAX_QUANTITY` in `quantity` (`commerce-canonical.ts`) |
-| The read copy is `delayed` | 15 minutes with no sync | `COMMERCE_PROJECTION_STALE_AFTER_MS` |
-| Scheduled feed read | Every 5 minutes | The cron `*/5 * * * *`, `runScheduledCommerceOutboxReconciliation` |
-| Age of a webhook signature | 5 minutes | `SIGNATURE_TOLERANCE_MS` |
-| Size of a webhook body | 64 KiB | `MAXIMUM_BODY_BYTES` |
-| One queued read includes later posts | 60 s | `QUEUED_READ_MS` |
-| One feed read | 10 pages of 100 events | `FEED_PAGES_PER_RUN`, `FEED_PAGE` (`commerce/outbox-worker.ts`) |
-| Age of the session for an approval | 10 minutes | `APPROVAL_STEP_UP_MAX_AGE_MS` |
-| Quote of a demonstration storefront | 600 s (café), 900 s (shipping) | `quoteTtlSeconds` in `services/commerce/src/plugins/food-service/cafe-scenario.ts` and `services/commerce/scripts/configure-plan22-phase4-shipping.ts` |
-| Punter order poll | 30 times (pickup) or 60 times (shipping), each 2 s | `orderPolling` in `cli.ts` and `shipping-cli.ts` |
+| Limit                                | Value                                              | Constant                                                                                                                                               |
+| ------------------------------------ | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Quantity scale and amount            | 6 places, 9,007,199,254,740,991                    | A literal and `MAX_QUANTITY` in `quantity` (`commerce-canonical.ts`)                                                                                   |
+| The read copy is `delayed`           | 15 minutes with no sync                            | `COMMERCE_PROJECTION_STALE_AFTER_MS`                                                                                                                   |
+| Scheduled feed read                  | Every 5 minutes                                    | The cron `*/5 * * * *`, `runScheduledCommerceOutboxReconciliation`                                                                                     |
+| Age of a webhook signature           | 5 minutes                                          | `SIGNATURE_TOLERANCE_MS`                                                                                                                               |
+| Size of a webhook body               | 64 KiB                                             | `MAXIMUM_BODY_BYTES`                                                                                                                                   |
+| One queued read includes later posts | 60 s                                               | `QUEUED_READ_MS`                                                                                                                                       |
+| One feed read                        | 10 pages of 100 events                             | `FEED_PAGES_PER_RUN`, `FEED_PAGE` (`commerce/outbox-worker.ts`)                                                                                        |
+| Age of the session for an approval   | 10 minutes                                         | `APPROVAL_STEP_UP_MAX_AGE_MS`                                                                                                                          |
+| Quote of a demonstration storefront  | 600 s (café), 900 s (shipping)                     | `quoteTtlSeconds` in `services/commerce/src/plugins/food-service/cafe-scenario.ts` and `services/commerce/scripts/configure-plan22-phase4-shipping.ts` |
+| Punter order poll                    | 30 times (pickup) or 60 times (shipping), each 2 s | `orderPolling` in `cli.ts` and `shipping-cli.ts`                                                                                                       |
 
 The records of this spec have no retention limit. The selection, the binding and the
 activations stay until the purge of the Organisation erases them.
@@ -407,7 +407,7 @@ Neighbours:
 
 - [Commerce domain architecture](../../../commerce-domain-architecture.md),
   [Commerce module, authority and runtime boundaries](../../../commerce-monorepo.md) and
-  [Plan 22](../../../plan-22-commerce-capabilities-and-storefront-demos.md). Where they
+  [Plan 22](../../../history/plan-22-commerce-capabilities-and-storefront-demos.md). Where they
   differ from the code, this spec follows the code. The evidence of Plan 22 in the
   archive:
   [production acceptance](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-22-production-acceptance-2026-08-12.md).

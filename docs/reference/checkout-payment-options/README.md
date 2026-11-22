@@ -1,7 +1,7 @@
 # Reference: a checkout with several payment options
 
 This file is a design reference for the Purin Checkout pages.
-[Plan 77](../../plan-77-underclerk-modular-core.md) owns the payments module
+[Plan 77](../../history/plan-77-underclerk-modular-core.md) owns the payments module
 and the checkout pipeline. The operator supplied the file on 20 November 2026.
 
 Use the structure of this screen. Do not copy the names, the brand, the text

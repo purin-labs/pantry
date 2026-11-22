@@ -6,8 +6,8 @@ This document defines three separate concerns: the human-facing module
 vocabulary, code ownership, and runtime deployment. A named module can map to a
 package, an internal subsystem, an independent process, or an acceptance
 harness. Plans 9 and 16 own the active provider-backed product.
-[Plan 40](./plan-40-product-description-drafting.md) and
-[Plan 40B](./plan-40B-collaborative-menu-editor.md) own proposed
+[Plan 40](history/plan-40-product-description-drafting.md) and
+[Plan 40B](history/plan-40B-collaborative-menu-editor.md) own proposed
 collaborative authoring. General desktop filesystem synchronization is deferred.
 
 ## Module vocabulary

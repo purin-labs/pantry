@@ -1,6 +1,6 @@
 # Handoff: Kitchen appliances, 3D stations and appliance preview, 18 November 2026
 
-This file records the state of [Plan 60A](../plan-60A-bakery-equipment-models.md), the 24-appliance Portal inspector and the 3D station bindings in `~/Dev/purin-labs/pantry` after the [Plan 92](../plan-92-new-pantry-repository.md) cutover.
+This file records the state of [Plan 60A](../history/plan-60A-bakery-equipment-models.md), the 24-appliance Portal inspector and the 3D station bindings in `~/Dev/purin-labs/pantry` after the [Plan 92](../history/plan-92-new-pantry-repository.md) cutover.
 
 ## Result
 
@@ -24,5 +24,5 @@ All 24 Kitchen and Café appliances pass Blender 5.2 visual checks, MuJoCo 3.x a
 
 ## Remaining work
 
-1. **Physical hardware calibration and cobot load qualification (deferred).** Real-shop thermal, acoustic and cobot payload calibration under [Plan 60A](../plan-60A-bakery-equipment-models.md) and [Plan 24](../plan-24-cafeos-bakery-automation.md) wait until physical shop hardware is on site.
+1. **Physical hardware calibration and cobot load qualification (deferred).** Real-shop thermal, acoustic and cobot payload calibration under [Plan 60A](../history/plan-60A-bakery-equipment-models.md) and [Plan 24](../plan-24-cafeos-bakery-automation.md) wait until physical shop hardware is on site.
 2. **Keep pinned workcell files unchanged during future R2 cleanups.** If a future cleanup changes or removes files under `assets/bakery-mujoco/`, keep every path listed in `assets/bakery-mujoco/fr10-workcell/native/assets.json` byte-identical unless you regenerate and re-pin the workcell trajectories.

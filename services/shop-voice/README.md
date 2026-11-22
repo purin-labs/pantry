@@ -1,6 +1,6 @@
 # Purin Pantry shop voice
 
-The Mac end of Portal voice control ([Plan 82](../../docs/plan-82-portal-voice-control.md)).
+The Mac end of Portal voice control ([Plan 82](../../docs/history/plan-82-portal-voice-control.md)).
 It transcribes a spoken command with a speech engine in the shop: Whisper large-v3-turbo with MLX, or
 Qwen3-ASR 1.7B when a manager chooses it. The Portal sends the audio directly to this Mac. The Platform never calls the Mac and never receives the
 audio or the transcript from it.
@@ -47,7 +47,7 @@ curl -fsSL https://<origin>/shop-voice/install.sh | sh -s -- --update
 
 Each engine is one module in `shop_voice/engines/`, behind the `SpeechEngine` interface: its file
 pins, its load and unload, and `hear`, which returns the text after the engine's own noise rule
-([Plan 82C](../../docs/plan-82C-speech-engines.md)). The ids are those of the catalogue in
+([Plan 82C](../../docs/history/plan-82C-speech-engines.md)). The ids are those of the catalogue in
 `packages/control-api/src/voice-engines.ts`. Each engine keeps its files in `~/.pantry-voice/model/<id>/`.
 `ModelHost` (`model_host.py`) loads, unloads and queues the engine and the answer voice alike. The
 Portal's text check drops the rest of what an engine invents on noise, for every engine.

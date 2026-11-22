@@ -339,9 +339,9 @@ Neighbours:
 
 ## Sources
 
-- [Plan 33](../../../plan-33-merchant-configurable-production-checkout.md),
-  [Plan 33C](../../../plan-33C-POS-systems.md) and
-  [Plan 33D](../../../plan-33D-square-release-acceptance.md). Background:
+- [Plan 33](../../../history/plan-33-merchant-configurable-production-checkout.md),
+  [Plan 33C](../../../history/plan-33C-POS-systems.md) and
+  [Plan 33D](../../../history/plan-33D-square-release-acceptance.md). Background:
   [Plan 90](../../../plan-90-cafe-pos-checkout.md) and
   [its hardware runbook](../../../runbooks/plan-90-hardware-acceptance.md). Where they
   differ from the code, this spec follows the code.

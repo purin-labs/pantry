@@ -15,9 +15,9 @@ wait, except the steps in "Steps that do not need a shop".
 
 | Plan                                                         | State on 2026-11-18                                                                                                |
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| [82 — Portal voice control](plan-82-portal-voice-control.md) | Phases 0–3 and D9–D12 in production, with the wake model fault. Phase 4 (the owner's shift) and Phase 5 remain.    |
+| [82 — Portal voice control](history/plan-82-portal-voice-control.md) | Phases 0–3 and D9–D12 in production, with the wake model fault. Phase 4 (the owner's shift) and Phase 5 remain.    |
 | [82B — Ambient voice](plan-82B-ambient-voice.md)             | Draft. Nothing is built. Decisions D1–D9 need the owner.                                                           |
-| [82C — Speech engines](plan-82C-speech-engines.md)           | Phases 0–3 in production (service 0.5.1). D5, the week of use and Phase 4 are deferred until the owner has a shop. |
+| [82C — Speech engines](history/plan-82C-speech-engines.md)           | Phases 0–3 in production (service 0.5.1). D5, the week of use and Phase 4 are deferred until the owner has a shop. |
 
 ## What runs in production
 

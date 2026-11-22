@@ -16,22 +16,22 @@ schema upgrades. FND-03 gives what a Case and a Session do with them.
 The platform Worker `pantry` starts in `services/platform/src/integration-gateway.ts`
 and exports each Actor class. `services/platform/wrangler.jsonc` binds:
 
-| Binding | Resource | Responsibility |
-| --- | --- | --- |
-| `ORGANISATION` | `OrganisationDO` | Policy head, action ledger, cue claims, commerce projections, shared drafts |
-| `CONNECTOR` | `ConnectorDO` | Provider ingress, Case work, delivery and receipts |
-| `CASE` | `CaseDO` | Journal, bindings, assignments, proposals, output outbox |
-| `SESSION` | `SessionDO` | Private history, turn lease, checkpoints, budget |
-| `CONVERSATION_RESIDENCY` | `ConversationResidencyActor` | Keeps the Actors of an active conversation in memory |
-| `CODE_MODE_PLATFORM_GOVERNOR_ACTOR` | `CodeModePlatformGovernorActor` | Platform admission of Code Mode scripts |
-| `CODE_MODE_SANDBOX` | `CodeModeSandbox`, in the Worker `pantry-code-sandbox` | The QuickJS VM of a Code Mode script |
-| `DEVICE_FLEET`, `BAKE_RUN` | `DeviceFleetActor`, `BakeRunActor` | Shop gateways (DEV-01) and bake runs (Plan 24) |
-| `WORKSPACE_EXECUTOR`, `MESSAGE_LINK_FETCH`, `CUSTOM_CONNECTOR_FETCH` | Three container classes | Linux-heavy work, link reads, custom connector egress |
-| `DB` | D1, global | Identity, ingress directory, placement, relocation and restore journals |
-| `ORGANISATION_DB_<REGION>` | D1, one for each placement cell | The operational records of an Organisation, and the Actor registry |
-| `POLICY_KV` | KV | The compiled policy snapshot, the cue snapshot and the hourly counters of ignored cues |
-| `ARCHIVE` | R2 | Checkpoints, attachments, workspace revisions, Actor exports |
-| `EVENT_Q`, `CUE_Q` | Queues | `pantry-events` and `pantry-cues` |
+| Binding                                                              | Resource                                               | Responsibility                                                                         |
+| -------------------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| `ORGANISATION`                                                       | `OrganisationDO`                                       | Policy head, action ledger, cue claims, commerce projections, shared drafts            |
+| `CONNECTOR`                                                          | `ConnectorDO`                                          | Provider ingress, Case work, delivery and receipts                                     |
+| `CASE`                                                               | `CaseDO`                                               | Journal, bindings, assignments, proposals, output outbox                               |
+| `SESSION`                                                            | `SessionDO`                                            | Private history, turn lease, checkpoints, budget                                       |
+| `CONVERSATION_RESIDENCY`                                             | `ConversationResidencyActor`                           | Keeps the Actors of an active conversation in memory                                   |
+| `CODE_MODE_PLATFORM_GOVERNOR_ACTOR`                                  | `CodeModePlatformGovernorActor`                        | Platform admission of Code Mode scripts                                                |
+| `CODE_MODE_SANDBOX`                                                  | `CodeModeSandbox`, in the Worker `pantry-code-sandbox` | The QuickJS VM of a Code Mode script                                                   |
+| `DEVICE_FLEET`, `BAKE_RUN`                                           | `DeviceFleetActor`, `BakeRunActor`                     | Shop gateways (DEV-01) and bake runs (Plan 24)                                         |
+| `WORKSPACE_EXECUTOR`, `MESSAGE_LINK_FETCH`, `CUSTOM_CONNECTOR_FETCH` | Three container classes                                | Linux-heavy work, link reads, custom connector egress                                  |
+| `DB`                                                                 | D1, global                                             | Identity, ingress directory, placement, relocation and restore journals                |
+| `ORGANISATION_DB_<REGION>`                                           | D1, one for each placement cell                        | The operational records of an Organisation, and the Actor registry                     |
+| `POLICY_KV`                                                          | KV                                                     | The compiled policy snapshot, the cue snapshot and the hourly counters of ignored cues |
+| `ARCHIVE`                                                            | R2                                                     | Checkpoints, attachments, workspace revisions, Actor exports                           |
+| `EVENT_Q`, `CUE_Q`                                                   | Queues                                                 | `pantry-events` and `pantry-cues`                                                      |
 
 - Service bindings reach `pantry-commerce`, `pantry-model-exit`, `pantry-chatgpt-exit`
   and `pantry-vault-onepassword`. Secrets Store binds `DATA_ENCRYPTION_ROOT` and
@@ -55,12 +55,12 @@ and exports each Actor class. `services/platform/wrangler.jsonc` binds:
 ConnectorActor -> CaseActor -> AgentSessionActor -> executor
 ```
 
-| Actor | One for each | Owns |
-| --- | --- | --- |
-| `OrganisationActor` | Organisation | Policy head, action ledger, cue claims, commerce projections, Code Mode reservations, the sockets of shared drafts |
-| `ConnectorActor` | Connector: one provider account | Ingress identity, Case work, delivery attempts and receipts, channel state |
-| `CaseActor` | Case: one body of related work | Shared journal, bindings, assignments, proposals, output outbox |
-| `AgentSessionActor` | Session: one agent in one Case | Private history, delivery stream, turn lease, checkpoints, budget |
+| Actor               | One for each                    | Owns                                                                                                               |
+| ------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `OrganisationActor` | Organisation                    | Policy head, action ledger, cue claims, commerce projections, Code Mode reservations, the sockets of shared drafts |
+| `ConnectorActor`    | Connector: one provider account | Ingress identity, Case work, delivery attempts and receipts, channel state                                         |
+| `CaseActor`         | Case: one body of related work  | Shared journal, bindings, assignments, proposals, output outbox                                                    |
+| `AgentSessionActor` | Session: one agent in one Case  | Private history, delivery stream, turn lease, checkpoints, budget                                                  |
 
 - One fact has one durable owner. Only the code of an Actor holds its `ctx.storage`, so
   another component gets a fact through an RPC method of the owner.
@@ -127,11 +127,11 @@ Each placed Actor has one row in `durable_object_registry` for each placement ep
 Before an alarm or a recovered call does work, the Actor calls `admitActorRecovery`
 (`actors/actor-activation.ts`). The result is one of three:
 
-| Result | When | Effect |
-| --- | --- | --- |
+| Result     | When                                                                                       | Effect                             |
+| ---------- | ------------------------------------------------------------------------------------------ | ---------------------------------- |
 | `admitted` | The registry row is `active`, it matches the local activation, and the placement is active | The Actor gets its execution scope |
-| `deferred` | The placement is `reserved` or `frozen`, or the row is not published yet | The alarm moves 15 s later |
-| `inactive` | No activation, or the row or the placement is retired, quarantined or abandoned | The alarm is deleted |
+| `deferred` | The placement is `reserved` or `frozen`, or the row is not published yet                   | The alarm moves 15 s later         |
+| `inactive` | No activation, or the row or the placement is retired, quarantined or abandoned            | The alarm is deleted               |
 
 Case, Connector and Session also keep an execution barrier
 (`state_object_cleanup_export_barrier`). `OrganisationActor` keeps
@@ -161,12 +161,12 @@ earliest time, or deletes it when no reconciler has work. An alarm runs its work
 steps. A step that fails writes `actor.alarm_step_failed`, and the other steps still
 run.
 
-| Actor | Alarm work |
-| --- | --- |
-| `ConnectorActor` | Renews the leases of running Case work, stops a due Gmail watch (`beforeCaseWork` of the email channel), starts the Case work drain, then runs the alarm steps of the email and WhatsApp channels. The Slack channel has no alarm step |
-| `CaseActor` | `context_projections`, `conversation`, `undelivered_outputs`, `commerce_approval_wait`, `abandoned_assignments`, all at the same time |
-| `AgentSessionActor` | In order: `checkpoint_finalization`, `run_budget_deadline`, `code_mode_settlements`, `quarantine_end`, `ended_executions`, `bakery_surface_effects`, `goal_usage`, `pending_pi_turn`, `run_budget_deadline_arm` |
-| `OrganisationActor` | In order: `leases` (actions, Code Mode reservations, abandoned cue claims), `socket_sweep`, `typesafe_credentials`, `jev_usage`, `case_context_invalidations` |
+| Actor               | Alarm work                                                                                                                                                                                                                             |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ConnectorActor`    | Renews the leases of running Case work, stops a due Gmail watch (`beforeCaseWork` of the email channel), starts the Case work drain, then runs the alarm steps of the email and WhatsApp channels. The Slack channel has no alarm step |
+| `CaseActor`         | `context_projections`, `conversation`, `undelivered_outputs`, `commerce_approval_wait`, `abandoned_assignments`, all at the same time                                                                                                  |
+| `AgentSessionActor` | In order: `checkpoint_finalization`, `run_budget_deadline`, `code_mode_settlements`, `quarantine_end`, `ended_executions`, `bakery_surface_effects`, `goal_usage`, `pending_pi_turn`, `run_budget_deadline_arm`                        |
+| `OrganisationActor` | In order: `leases` (actions, Code Mode reservations, abandoned cue claims), `socket_sweep`, `typesafe_credentials`, `jev_usage`, `case_context_invalidations`                                                                          |
 
 - Connector, Session and Organisation arm the alarm again after a failed step: 15 s,
   then doubled, to at most 15 minutes. The Case sets its retry time before the steps
@@ -192,14 +192,14 @@ run.
 
 ### Leases
 
-| Lease | Held by | Stored in | Time |
-| --- | --- | --- | --- |
-| Harness turn lease | The one runtime that writes a turn | `session_harness_lease` | The caller sets the expiry. A Slack turn gives 10 minutes |
-| Case work | The Case work drain of a Connector | `connector_case_work` (`running`, `due_at`) | 120 s; the alarm renews it while the drain runs |
-| Delivery | A Connector send (`sending`) | `connector_delivery` | 30 s; a retry waits 5 s |
-| Action execution | An `OrganisationActor` action | `action_ledger` | 5 minutes |
-| Cue claim | A cue queue consumer | `cue_delivery` | 30 s; the alarm ends the claim 15 minutes after the lease |
-| Code Mode reservation | A Session script | `code_execution_reservation` | The `lease_expires_at` of the reservation |
+| Lease                 | Held by                            | Stored in                                   | Time                                                      |
+| --------------------- | ---------------------------------- | ------------------------------------------- | --------------------------------------------------------- |
+| Harness turn lease    | The one runtime that writes a turn | `session_harness_lease`                     | The caller sets the expiry. A Slack turn gives 10 minutes |
+| Case work             | The Case work drain of a Connector | `connector_case_work` (`running`, `due_at`) | 120 s; the alarm renews it while the drain runs           |
+| Delivery              | A Connector send (`sending`)       | `connector_delivery`                        | 30 s; a retry waits 5 s                                   |
+| Action execution      | An `OrganisationActor` action      | `action_ledger`                             | 5 minutes                                                 |
+| Cue claim             | A cue queue consumer               | `cue_delivery`                              | 30 s; the alarm ends the claim 15 minutes after the lease |
+| Code Mode reservation | A Session script                   | `code_execution_reservation`                | The `lease_expires_at` of the reservation                 |
 
 Case work has five attempts for the turn (`CASE_WORK_MAX_ATTEMPTS`). Then it has three
 attempts to post a notice in the thread (`CASE_WORK_NOTICE_ATTEMPTS`).
@@ -224,7 +224,7 @@ from a replaced runtime fails this check.
   `commerce_projection` (17), `commerce_query` (5), `connector_whatsapp_proposal` (2),
   `device_fleet` (5) and `bake_run` (1).
 - The other tables of the Connector and the Organisation use `CREATE TABLE IF NOT
-  EXISTS` in the constructor, with no plan.
+EXISTS` in the constructor, with no plan.
 - The registry and the activation row hold one schema version for each Actor kind
   (`actors/actor-schema-versions.ts`): Organisation 10, Case 2, Connector 2, Session 33.
   In the four-step path, a `reserved` row must have the current version. An `active`
@@ -273,15 +273,14 @@ of each script and of each executor allocation.
 
 ### Operator inspection and repair
 
-All routes need the bearer token `ORGANISATION_ADMIN_TOKEN`. Without it, the answer is
-404.
+All routes need the bearer token `ORGANISATION_ADMIN_TOKEN`. Without it, the answer is 404.
 
-| Route | Purpose |
-| --- | --- |
-| `GET /v1/admin/state-object-registry` | The registry rows of one Organisation |
-| `POST /v1/admin/state-object-registry` | `bootstrap_organisation`, `reconcile_reserved`, `advance_actor_schema`, `interrupt_session`, `recover_connector_case_work`, `discard_quarantined_case`, `erase_unregistered_actor` |
-| `GET /v1/admin/machine-census` | For each state machine in Actor SQLite: the rows in each open state, the oldest age and the rows past their exit. Counts and times only |
-| `/v1/admin/state-object-relocation`, `/v1/admin/state-object-restore` | A move or a restore of an Organisation (FND-01) |
+| Route                                                                 | Purpose                                                                                                                                                                            |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /v1/admin/state-object-registry`                                 | The registry rows of one Organisation                                                                                                                                              |
+| `POST /v1/admin/state-object-registry`                                | `bootstrap_organisation`, `reconcile_reserved`, `advance_actor_schema`, `interrupt_session`, `recover_connector_case_work`, `discard_quarantined_case`, `erase_unregistered_actor` |
+| `GET /v1/admin/machine-census`                                        | For each state machine in Actor SQLite: the rows in each open state, the oldest age and the rows past their exit. Counts and times only                                            |
+| `/v1/admin/state-object-relocation`, `/v1/admin/state-object-restore` | A move or a restore of an Organisation (FND-01)                                                                                                                                    |
 
 `erase_unregistered_actor` empties an Actor that no registry names. Its kinds are the
 four placed Actors, `conversation_residency`, `device_fleet` and
@@ -332,45 +331,45 @@ registry row.
 - Packages: `@purin-labs/std/state-machine` (machine definitions),
   `@purin-labs/contracts` (`CommandEnvelope`, `EventEnvelope`, `HarnessTurnLease`).
 
-| File in `services/platform/src/actors/` | Content |
-| --- | --- |
-| `actor-router.ts`, `actor-stubs.ts` | Resolve an Actor; the stub at its placement |
-| `actor-registry.ts`, `actor-activation.ts`, `actor-placement-admission.ts` | The registry row, the activation row, the placement fence |
-| `lifecycle/placed-actor.ts` | The lifecycle RPC of each placed Actor: activate, readiness, export, import, erase |
-| `actor-export.ts`, `actor-execution-quiescence.ts`, `unregistered-actor-erasure.ts` | The export and the import, the execution barrier, the erase of an unregistered Actor |
-| `lifecycle/actor-alarm.ts`, `connector-alarm.ts`, `case-alarm.ts`, `organisation-alarm.ts` | The alarm helpers and the reconcilers of each Actor |
-| `lifecycle/state-transition.ts`, `lifecycle/machine-census.ts`, `actor-machines.ts` | Compare-and-set moves of a machine, and the census |
-| `schema-migrations.ts`, `actor-schema-versions.ts` | The migration runner and the schema versions |
-| `connector/connector-actor-base.ts`, `case/case-actor.ts`, `session/session-actor.ts`, `organisation/organisation-actor-base.ts` | The four Actors |
-| `conversation-residency.ts`, `warm-actor-slots.ts`, `hibernatable-sockets.ts` | Residency, warm slots, the socket sweep |
+| File in `services/platform/src/actors/`                                                                                          | Content                                                                              |
+| -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `actor-router.ts`, `actor-stubs.ts`                                                                                              | Resolve an Actor; the stub at its placement                                          |
+| `actor-registry.ts`, `actor-activation.ts`, `actor-placement-admission.ts`                                                       | The registry row, the activation row, the placement fence                            |
+| `lifecycle/placed-actor.ts`                                                                                                      | The lifecycle RPC of each placed Actor: activate, readiness, export, import, erase   |
+| `actor-export.ts`, `actor-execution-quiescence.ts`, `unregistered-actor-erasure.ts`                                              | The export and the import, the execution barrier, the erase of an unregistered Actor |
+| `lifecycle/actor-alarm.ts`, `connector-alarm.ts`, `case-alarm.ts`, `organisation-alarm.ts`                                       | The alarm helpers and the reconcilers of each Actor                                  |
+| `lifecycle/state-transition.ts`, `lifecycle/machine-census.ts`, `actor-machines.ts`                                              | Compare-and-set moves of a machine, and the census                                   |
+| `schema-migrations.ts`, `actor-schema-versions.ts`                                                                               | The migration runner and the schema versions                                         |
+| `connector/connector-actor-base.ts`, `case/case-actor.ts`, `session/session-actor.ts`, `organisation/organisation-actor-base.ts` | The four Actors                                                                      |
+| `conversation-residency.ts`, `warm-actor-slots.ts`, `hibernatable-sockets.ts`                                                    | Residency, warm slots, the socket sweep                                              |
 
 ## Rules and limits
 
-| Action | Person, any role | Agent | Operator with the admin token |
-| --- | --- | --- | --- |
-| Call an Actor directly | No | No | No: only Worker code holds a namespace |
-| Read the registry or the census | No | No | Yes |
-| Repair the registry, advance a schema, erase an unregistered Actor | No | No | Yes |
+| Action                                                             | Person, any role | Agent | Operator with the admin token          |
+| ------------------------------------------------------------------ | ---------------- | ----- | -------------------------------------- |
+| Call an Actor directly                                             | No               | No    | No: only Worker code holds a namespace |
+| Read the registry or the census                                    | No               | No    | Yes                                    |
+| Repair the registry, advance a schema, erase an unregistered Actor | No               | No    | Yes                                    |
 
-| Limit | Value | Constant |
-| --- | --- | --- |
-| Stale reservation | 15 minutes | `ACTOR_RESERVATION_STALE_MS` |
-| Organisations in one sweep, for each database | 50 | `ORGANISATION_PAGE` |
-| Alarm retry after a failed step | 15 s to 15 minutes | `ALARM_RETRY_FIRST_MS`, `ALARM_RETRY_MAX_MS` |
-| Case retry of stored work | 15 s | `CASE_RECOVERY_INTERVAL_MS` |
-| Case read of a waiting approval | 60 s for 10 minutes, then 15 minutes | `APPROVAL_READ_FIRST_MS`, `APPROVAL_READ_LATER_MS` |
-| Undelivered Case output | Dropped after 24 hours | `UNDELIVERED_OUTPUT_TTL_MS` |
-| Assignment with no move | Abandoned after 30 minutes | `ASSIGNMENT_ABANDON_AFTER_MS` |
-| Organisation retry of stored work | 30 s | `ORGANISATION_RETRY_MS` |
-| Socket sweep; silent socket | 300 s; 90 s | `SOCKET_SWEEP_INTERVAL_MS`, `SOCKET_SILENCE_LIMIT_MS` |
-| Case work lease; delivery lease and retry | 120 s; 30 s and 5 s | `CASE_WORK_LEASE_MS`, `DELIVERY_LEASE_MS`, `DELIVERY_RETRY_MS` |
-| Action lease; cue claim lease | 5 minutes; 30 s | `ACTION_EXECUTION_LEASE_DURATION_MS`, `CUE_DELIVERY_LEASE_MS` |
-| Residency time and call interval | 15 minutes; 8 s | `CONVERSATION_RESIDENCY_MS`, `CONVERSATION_RESIDENCY_TICK_MS` |
-| Residency names; warm slots; names in one request | 65; 4; 8 | `MAX_RESIDENTS`, `MAX_WARM_SLOTS`, `MAX_NAMES_PER_REQUEST` |
-| Census size | 2,000 Actors | `CENSUS_ACTOR_LIMIT` |
-| Actor export manifest | 64 MiB | `MAX_EXPORT_MANIFEST_BYTES` |
-| Code Mode scripts and executor allocations at one time, for the whole platform | 8; 4 | `MAX_CONCURRENT_EXECUTIONS`, `MAX_CONCURRENT_WORKSPACE_ALLOCATIONS` |
-| Code Mode scripts of one Organisation at one time | 2 | `PILOT_ORGANISATION_MAX_CONCURRENT_EXECUTIONS` |
+| Limit                                                                          | Value                                | Constant                                                            |
+| ------------------------------------------------------------------------------ | ------------------------------------ | ------------------------------------------------------------------- |
+| Stale reservation                                                              | 15 minutes                           | `ACTOR_RESERVATION_STALE_MS`                                        |
+| Organisations in one sweep, for each database                                  | 50                                   | `ORGANISATION_PAGE`                                                 |
+| Alarm retry after a failed step                                                | 15 s to 15 minutes                   | `ALARM_RETRY_FIRST_MS`, `ALARM_RETRY_MAX_MS`                        |
+| Case retry of stored work                                                      | 15 s                                 | `CASE_RECOVERY_INTERVAL_MS`                                         |
+| Case read of a waiting approval                                                | 60 s for 10 minutes, then 15 minutes | `APPROVAL_READ_FIRST_MS`, `APPROVAL_READ_LATER_MS`                  |
+| Undelivered Case output                                                        | Dropped after 24 hours               | `UNDELIVERED_OUTPUT_TTL_MS`                                         |
+| Assignment with no move                                                        | Abandoned after 30 minutes           | `ASSIGNMENT_ABANDON_AFTER_MS`                                       |
+| Organisation retry of stored work                                              | 30 s                                 | `ORGANISATION_RETRY_MS`                                             |
+| Socket sweep; silent socket                                                    | 300 s; 90 s                          | `SOCKET_SWEEP_INTERVAL_MS`, `SOCKET_SILENCE_LIMIT_MS`               |
+| Case work lease; delivery lease and retry                                      | 120 s; 30 s and 5 s                  | `CASE_WORK_LEASE_MS`, `DELIVERY_LEASE_MS`, `DELIVERY_RETRY_MS`      |
+| Action lease; cue claim lease                                                  | 5 minutes; 30 s                      | `ACTION_EXECUTION_LEASE_DURATION_MS`, `CUE_DELIVERY_LEASE_MS`       |
+| Residency time and call interval                                               | 15 minutes; 8 s                      | `CONVERSATION_RESIDENCY_MS`, `CONVERSATION_RESIDENCY_TICK_MS`       |
+| Residency names; warm slots; names in one request                              | 65; 4; 8                             | `MAX_RESIDENTS`, `MAX_WARM_SLOTS`, `MAX_NAMES_PER_REQUEST`          |
+| Census size                                                                    | 2,000 Actors                         | `CENSUS_ACTOR_LIMIT`                                                |
+| Actor export manifest                                                          | 64 MiB                               | `MAX_EXPORT_MANIFEST_BYTES`                                         |
+| Code Mode scripts and executor allocations at one time, for the whole platform | 8; 4                                 | `MAX_CONCURRENT_EXECUTIONS`, `MAX_CONCURRENT_WORKSPACE_ALLOCATIONS` |
+| Code Mode scripts of one Organisation at one time                              | 2                                    | `PILOT_ORGANISATION_MAX_CONCURRENT_EXECUTIONS`                      |
 
 - **Isolation.** Each registry row, Actor name, activation and export key binds the
   Organisation. An Actor refuses an activation for another identity.
@@ -419,14 +418,14 @@ Boundaries:
 
 ## Sources
 
-- [Plan 14](../../plan-14-actor-runtime-architecture.md) and the
+- [Plan 14](../../history/plan-14-actor-runtime-architecture.md) and the
   [runtime architecture](../../architecture/runtime.md) (platform layout, Actors). Where
   they differ from the code, this spec follows the code. Their evidence in the archive:
   [Plan 14 closure](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-14-closure-2026-08-02.md),
   [the Actor-owned harness history design](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-14-nf9-actor-owned-history.md),
   [NF9 production closure](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-14-nf9-production-closure-2026-08-08.md).
-- Related: [security](../../architecture/security.md), [Plan 15](../../plan-15.md),
-  [Refactor 10](../../refactor-10.md), [Refactor 12](../../refactor-12.md), the
+- Related: [security](../../architecture/security.md), [Plan 15](../../history/plan-15.md),
+  [Refactor 10](../../history/refactor-10.md), [Refactor 12](../../history/refactor-12.md), the
   [deploy runbook](../../runbooks/platform-production-deploy.md) and the
   [E2E coverage guide](../../../test-coverage-e2e.md).
 - E2E journeys in `services/platform/tests/e2e/`: `actor-recovery.test.ts`,

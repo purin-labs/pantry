@@ -39,14 +39,14 @@ OpenRouter route of Purin AI goes direct.
 
 ### Model routes
 
-| `keySource` + `provider` | Inference source | Lease kind | Pi provider | Leaves through | Models |
-| --- | --- | --- | --- | --- | --- |
-| `platform` + `openai-compatible` | `pantry_platform` ("Purin AI") | `platform_api_key` | OpenRouter | The Worker itself | `google/gemini-4-hydrogen` (default), `moonshotai/kimi-k3`, `qwen/qwen3.7-flash` |
-| `organisation_byo` + `openai` | `organisation_openai_api_key` | `organisation_openai_api_key` | OpenAI | Model exit Worker | `gpt-5.6-luna` |
-| `organisation_byo` + `anthropic` | `organisation_anthropic_api_key` | `organisation_anthropic_api_key` | Anthropic | Model exit Worker | `claude-opus-5-5`, `claude-sonnet-5-5` (default), `claude-sonnet-4-6` |
-| `organisation_byo` + `google` | `organisation_google_api_key` | `organisation_google_api_key` | Google (Gemini API) | Model exit Worker | `gemini-4-hydrogen` (default), `gemini-4-carbon`, `gemini-4-argon`, `gemini-4-neon` |
-| `organisation_oauth` + `anthropic` | `claude_oauth` | `organisation_claude_oauth` | Anthropic | Model exit Worker | The three Claude models |
-| `organisation_subscription` + `openai` | `codex_subscription` | `organisation_chatgpt_subscription` | OpenAI, or the legacy `openai-codex` provider | Model exit Worker, or the ChatGPT exit | `gpt-6-astra`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna` (default) |
+| `keySource` + `provider`               | Inference source                 | Lease kind                          | Pi provider                                   | Leaves through                         | Models                                                                              |
+| -------------------------------------- | -------------------------------- | ----------------------------------- | --------------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------- |
+| `platform` + `openai-compatible`       | `pantry_platform` ("Purin AI")   | `platform_api_key`                  | OpenRouter                                    | The Worker itself                      | `google/gemini-4-hydrogen` (default), `moonshotai/kimi-k3`, `qwen/qwen3.7-flash`    |
+| `organisation_byo` + `openai`          | `organisation_openai_api_key`    | `organisation_openai_api_key`       | OpenAI                                        | Model exit Worker                      | `gpt-5.6-luna`                                                                      |
+| `organisation_byo` + `anthropic`       | `organisation_anthropic_api_key` | `organisation_anthropic_api_key`    | Anthropic                                     | Model exit Worker                      | `claude-opus-5-5`, `claude-sonnet-5-5` (default), `claude-sonnet-4-6`               |
+| `organisation_byo` + `google`          | `organisation_google_api_key`    | `organisation_google_api_key`       | Google (Gemini API)                           | Model exit Worker                      | `gemini-4-hydrogen` (default), `gemini-4-carbon`, `gemini-4-argon`, `gemini-4-neon` |
+| `organisation_oauth` + `anthropic`     | `claude_oauth`                   | `organisation_claude_oauth`         | Anthropic                                     | Model exit Worker                      | The three Claude models                                                             |
+| `organisation_subscription` + `openai` | `codex_subscription`             | `organisation_chatgpt_subscription` | OpenAI, or the legacy `openai-codex` provider | Model exit Worker, or the ChatGPT exit | `gpt-6-astra`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna` (default)             |
 
 - The Session contract pins the route. A subscription route also pins the connection
   revision and the profile generation. An OAuth route pins the connection id. A key
@@ -155,14 +155,14 @@ OpenRouter route of Purin AI goes direct.
 `chatgpt.com` request to the binding `CHATGPT_EXIT` and each other request to
 `MODEL_EXIT`. Sign-in, refresh and model requests all use it.
 
-| | Model exit Worker | ChatGPT exit Worker |
-| --- | --- | --- |
-| Name (production, local) | `pantry-model-exit`, `pantry-model-exit-local` | `pantry-chatgpt-exit`, `pantry-chatgpt-exit-local` |
-| Placement | `aws:ap-northeast-1` | `aws:ap-northeast-1` |
-| Bindings | The variable `PANTRY_DEPLOYMENT_PROFILE` only | That variable, and `CHATGPT_EXIT_CONTAINER` for the class `ChatGptExitContainer` |
-| Accepts | HTTPS on the default port to `auth.openai.com`, `api.openai.com`, `api.anthropic.com`, `platform.claude.com`, `generativelanguage.googleapis.com` | `chatgpt.com`; the container forwards only HTTPS paths under `/backend-api/` |
-| Refuses | Each other host: HTTP 403, `model_exit_host_refused` | Each other host: HTTP 403, `chatgpt_exit_host_refused` |
-| Script limit | 64 KiB, no Wasm | 96 KiB, no Wasm |
+|                          | Model exit Worker                                                                                                                                 | ChatGPT exit Worker                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Name (production, local) | `pantry-model-exit`, `pantry-model-exit-local`                                                                                                    | `pantry-chatgpt-exit`, `pantry-chatgpt-exit-local`                               |
+| Placement                | `aws:ap-northeast-1`                                                                                                                              | `aws:ap-northeast-1`                                                             |
+| Bindings                 | The variable `PANTRY_DEPLOYMENT_PROFILE` only                                                                                                     | That variable, and `CHATGPT_EXIT_CONTAINER` for the class `ChatGptExitContainer` |
+| Accepts                  | HTTPS on the default port to `auth.openai.com`, `api.openai.com`, `api.anthropic.com`, `platform.claude.com`, `generativelanguage.googleapis.com` | `chatgpt.com`; the container forwards only HTTPS paths under `/backend-api/`     |
+| Refuses                  | Each other host: HTTP 403, `model_exit_host_refused`                                                                                              | Each other host: HTTP 403, `chatgpt_exit_host_refused`                           |
+| Script limit             | 64 KiB, no Wasm                                                                                                                                   | 96 KiB, no Wasm                                                                  |
 
 - Each exit has no public route and no state, and its Wrangler profile has no
   credential binding. Invocation logs are off.
@@ -213,14 +213,14 @@ OpenRouter route of Purin AI goes direct.
   `model_route_digest_mismatch`. A fresh lineage starts from the accepted history.
 - So a new model, a new key, a reconnect or a new Pi build starts a fresh lineage.
 
-| Failure | Result |
-| --- | --- |
-| The key or the token cannot be read | No request; `embedded_harness_model_credential_unavailable` or the code of the connection |
-| The provider answers with an error status | The request counts as zero tokens |
-| The provider refuses for an exhausted allowance | `embedded_harness_model_usage_missing` with `refusal: "authority_exhausted"` |
-| Model usage is missing | `embedded_harness_model_usage_missing`; the Session marks the run budget as indeterminate (`model_receipt_missing`) |
-| The token allowance is used | `embedded_harness_token_budget_exhausted` |
-| A harness event is malformed, stale or out of order | The Actor sink refuses it (`harness_event_invalid`, `harness_event_stale`, `harness_event_gap`) |
+| Failure                                             | Result                                                                                                              |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| The key or the token cannot be read                 | No request; `embedded_harness_model_credential_unavailable` or the code of the connection                           |
+| The provider answers with an error status           | The request counts as zero tokens                                                                                   |
+| The provider refuses for an exhausted allowance     | `embedded_harness_model_usage_missing` with `refusal: "authority_exhausted"`                                        |
+| Model usage is missing                              | `embedded_harness_model_usage_missing`; the Session marks the run budget as indeterminate (`model_receipt_missing`) |
+| The token allowance is used                         | `embedded_harness_token_budget_exhausted`                                                                           |
+| A harness event is malformed, stale or out of order | The Actor sink refuses it (`harness_event_invalid`, `harness_event_stale`, `harness_event_gap`)                     |
 
 ## Contracts
 
@@ -258,15 +258,15 @@ OpenRouter route of Purin AI goes direct.
 
 Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`):
 
-| Table | Holds |
-| --- | --- |
-| `organisation_inference_selection` | The selection kind, the user and the time |
-| `organisation_slack_reasoning_effort` | The effort for Slack answers |
-| `organisation_codex_connection` | The lifecycle, the revision, the profile handle and generation, the plan type, the allowance and the refresh lease |
-| `organisation_codex_authorization_attempt` | An attempt: `awaiting_user`, `connected`, `cancelled`, `failed` or `expired` |
-| `organisation_claude_connection` | The connection: `connected`, `refreshing` or `action_required` |
-| `organisation_claude_authorization` | An attempt: `pending` or `exchanging` |
-| `credential_ref` | The model key of a provider, under the name `model` |
+| Table                                      | Holds                                                                                                              |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `organisation_inference_selection`         | The selection kind, the user and the time                                                                          |
+| `organisation_slack_reasoning_effort`      | The effort for Slack answers                                                                                       |
+| `organisation_codex_connection`            | The lifecycle, the revision, the profile handle and generation, the plan type, the allowance and the refresh lease |
+| `organisation_codex_authorization_attempt` | An attempt: `awaiting_user`, `connected`, `cancelled`, `failed` or `expired`                                       |
+| `organisation_claude_connection`           | The connection: `connected`, `refreshing` or `action_required`                                                     |
+| `organisation_claude_authorization`        | An attempt: `pending` or `exchanging`                                                                              |
+| `credential_ref`                           | The model key of a provider, under the name `model`                                                                |
 
 Session SQLite (`actors/agent-session-harness-authority.ts`): `session_harness_lease`,
 `session_harness_history`, `session_harness_checkpoint`,
@@ -279,44 +279,44 @@ Vault handle kinds: `vault:chatgpt_agent_profile:`, `vault:chatgpt_agent_sign_in
 The control routes are under `/v1/control/organisations/:id/inference`. The Role column
 gives the lowest role. The order is viewer, operator, admin, owner.
 
-| Route | Role | Purpose |
-| --- | --- | --- |
-| `GET`, `PUT` | Viewer, admin | Read or change the inference source. A key source also takes `apiKey` |
-| `GET`, `PUT` `/slack-reasoning-effort` | Viewer, admin | Read or change the effort for Slack answers |
-| `GET /codex` | Viewer | The ChatGPT connection, the open attempt and the allowance |
-| `POST /codex/authorizations`, `POST /codex/reconnect` | Owner | Start a sign-in, or fence the connection and start one |
-| `POST /codex/authorizations/:attemptId/complete` | Owner | Finish the sign-in with the pasted address (`callbackUrl`) |
-| `POST /codex/authorizations/:attemptId/cancel` | Owner | Cancel the open attempt |
-| `DELETE /codex` | Owner | Disconnect |
-| `GET /claude` | Viewer | The Claude connection and the open attempt |
-| `POST /claude` (`start`, `complete`), `DELETE /claude` | Admin | Connect or disconnect the Claude account |
+| Route                                                  | Role          | Purpose                                                               |
+| ------------------------------------------------------ | ------------- | --------------------------------------------------------------------- |
+| `GET`, `PUT`                                           | Viewer, admin | Read or change the inference source. A key source also takes `apiKey` |
+| `GET`, `PUT` `/slack-reasoning-effort`                 | Viewer, admin | Read or change the effort for Slack answers                           |
+| `GET /codex`                                           | Viewer        | The ChatGPT connection, the open attempt and the allowance            |
+| `POST /codex/authorizations`, `POST /codex/reconnect`  | Owner         | Start a sign-in, or fence the connection and start one                |
+| `POST /codex/authorizations/:attemptId/complete`       | Owner         | Finish the sign-in with the pasted address (`callbackUrl`)            |
+| `POST /codex/authorizations/:attemptId/cancel`         | Owner         | Cancel the open attempt                                               |
+| `DELETE /codex`                                        | Owner         | Disconnect                                                            |
+| `GET /claude`                                          | Viewer        | The Claude connection and the open attempt                            |
+| `POST /claude` (`start`, `complete`), `DELETE /claude` | Admin         | Connect or disconnect the Claude account                              |
 
 This subsystem has no event kind, no capability and no agent tool.
 
 ## Rules and limits
 
-| Action | Viewer | Operator | Admin | Owner | Agent |
-| --- | --- | --- | --- | --- | --- |
-| Read the source, the connections and the allowance | Yes | Yes | Yes | Yes | No |
-| Change the source, save an API key | No | No | Yes | Yes | No |
-| Set the effort for Slack answers | No | No | Yes | Yes | No |
-| Connect or disconnect the Claude account | No | No | Yes | Yes | No |
-| Connect, reconnect or disconnect ChatGPT | No | No | No | Yes | No |
+| Action                                             | Viewer | Operator | Admin | Owner | Agent |
+| -------------------------------------------------- | ------ | -------- | ----- | ----- | ----- |
+| Read the source, the connections and the allowance | Yes    | Yes      | Yes   | Yes   | No    |
+| Change the source, save an API key                 | No     | No       | Yes   | Yes   | No    |
+| Set the effort for Slack answers                   | No     | No       | Yes   | Yes   | No    |
+| Connect or disconnect the Claude account           | No     | No       | Yes   | Yes   | No    |
+| Connect, reconnect or disconnect ChatGPT           | No     | No       | No    | Yes   | No    |
 
-| Limit | Value | Constant |
-| --- | --- | --- |
-| ChatGPT sign-in attempt | 15 minutes | `AUTHORIZATION_TTL_MS` |
-| Refresh before the token ends | 5 minutes | `ACCESS_TOKEN_REFRESH_MARGIN_MS` |
-| ChatGPT refresh lease, wait for it | 60 s, 30 s | `REFRESH_LEASE_MS`, `REFRESH_WAIT_MS` |
-| Cron refresh age, batch | 7 days, 50 | `WEEKLY_REFRESH_AGE_MS`, `WEEKLY_REFRESH_BATCH` |
-| Claude attempt, refresh lease, wait | 10 minutes, 60 s, 30 s | Literals in `claude-connection.ts` |
-| API key length | 20 to 4,096 characters | `MODEL_API_KEY_MIN_LENGTH`, `MODEL_API_KEY_MAX_LENGTH` |
-| Context window, output limit (OpenRouter) | 256,000, 65,536 tokens | `PI_CONTEXT_WINDOW`, `PI_MAX_OUTPUT_TOKENS` |
-| Answer part | 256 characters or 250 ms | `ANSWER_DELTA_CHARS`, `ANSWER_DELTA_MS` |
-| Steering text | 8,000 characters | `MAX_STEERING_TEXT_CHARS` |
-| Checkpoint, upload chunk | 16 MiB, 1 MiB | `MAX_CHECKPOINT_PLAINTEXT_BYTES`, `CHECKPOINT_UPLOAD_CHUNK_BYTES` |
-| Container sleep | 1 hour | `sleepAfter` |
-| Exit script size | 64 KiB, 96 KiB | `MAXIMUM_SCRIPT_BYTES` in each script |
+| Limit                                     | Value                    | Constant                                                          |
+| ----------------------------------------- | ------------------------ | ----------------------------------------------------------------- |
+| ChatGPT sign-in attempt                   | 15 minutes               | `AUTHORIZATION_TTL_MS`                                            |
+| Refresh before the token ends             | 5 minutes                | `ACCESS_TOKEN_REFRESH_MARGIN_MS`                                  |
+| ChatGPT refresh lease, wait for it        | 60 s, 30 s               | `REFRESH_LEASE_MS`, `REFRESH_WAIT_MS`                             |
+| Cron refresh age, batch                   | 7 days, 50               | `WEEKLY_REFRESH_AGE_MS`, `WEEKLY_REFRESH_BATCH`                   |
+| Claude attempt, refresh lease, wait       | 10 minutes, 60 s, 30 s   | Literals in `claude-connection.ts`                                |
+| API key length                            | 20 to 4,096 characters   | `MODEL_API_KEY_MIN_LENGTH`, `MODEL_API_KEY_MAX_LENGTH`            |
+| Context window, output limit (OpenRouter) | 256,000, 65,536 tokens   | `PI_CONTEXT_WINDOW`, `PI_MAX_OUTPUT_TOKENS`                       |
+| Answer part                               | 256 characters or 250 ms | `ANSWER_DELTA_CHARS`, `ANSWER_DELTA_MS`                           |
+| Steering text                             | 8,000 characters         | `MAX_STEERING_TEXT_CHARS`                                         |
+| Checkpoint, upload chunk                  | 16 MiB, 1 MiB            | `MAX_CHECKPOINT_PLAINTEXT_BYTES`, `CHECKPOINT_UPLOAD_CHUNK_BYTES` |
+| Container sleep                           | 1 hour                   | `sleepAfter`                                                      |
+| Exit script size                          | 64 KiB, 96 KiB           | `MAXIMUM_SCRIPT_BYTES` in each script                             |
 
 - **No fallback.** A Session uses its pinned route for its lineage. Purin AI needs
   `OPENROUTER_API_KEY`. No failure selects another funding authority.
@@ -375,10 +375,10 @@ Boundaries:
 
 ## Sources
 
-- [Plan 28](../../plan-28-organisation-codex-oauth.md). The code has its connection
+- [Plan 28](../../history/plan-28-organisation-codex-oauth.md). The code has its connection
   records and control routes. It does not have the Codex App Server or its container.
-- [Plan 73](../../plan-73-model-exit-worker.md) and
-  [Plan 75](../../plan-75-chatgpt-exit-container.md). In the archive:
+- [Plan 73](../../history/plan-73-model-exit-worker.md) and
+  [Plan 75](../../history/plan-75-chatgpt-exit-container.md). In the archive:
   [Plan 74B](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-74B-sign-in-with-chatgpt.md)
   and
   [the Plan 75 probe result](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-75-chatgpt-exit-container/probe-result.json).
@@ -397,4 +397,4 @@ Boundaries:
     `checkpoint-restart.test.ts` and `checkpoint-atomic-acceptance.test.ts`.
   - The exits in the E2E runtime: `model-exit-network.ts` (`ChatGptExitNetwork`).
 - The live journey on real services: `pnpm --filter @purin-labs/platform
-  slack:live-reply` (`services/platform/scripts/slack-live-reply-journey.ts`).
+slack:live-reply` (`services/platform/scripts/slack-live-reply-journey.ts`).

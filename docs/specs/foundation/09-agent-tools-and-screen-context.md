@@ -21,21 +21,21 @@ answers with a receipt. An observation grants no authority and proves no saved r
 - The mailbox agent and the WhatsApp agent have their own registries (INB-01). A turn
   can also add tools from data: the operations of a custom connector (INT-01).
 
-| Selection | A turn offers the tool when | Tools in the list |
-| --- | --- | --- |
-| `capability` | The turn holds the capability. The call claims it | 72 |
-| `surface` | The turn is a Portal turn, and the role of the person may use the page command | 47: Kitchen workspace 38, Costs & margins 3, Pastry Bench 2, Register 4 |
-| `turn` | The origin of the turn sets a flag | `propose_memory`, `schedule_follow_up`, `propose_side_case` |
-| `host` | The turn runs in the named host | None. The two agent registries hold them |
+| Selection    | A turn offers the tool when                                                    | Tools in the list                                                       |
+| ------------ | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| `capability` | The turn holds the capability. The call claims it                              | 72                                                                      |
+| `surface`    | The turn is a Portal turn, and the role of the person may use the page command | 47: Kitchen workspace 38, Costs & margins 3, Pastry Bench 2, Register 4 |
+| `turn`       | The origin of the turn sets a flag                                             | `propose_memory`, `schedule_follow_up`, `propose_side_case`             |
+| `host`       | The turn runs in the named host                                                | None. The two agent registries hold them                                |
 
-| Effect | A successful call proves | Result to the harness |
-| --- | --- | --- |
-| `read` | The call changed nothing | `read` |
-| `receipt` | The call changed something. Its value names the receipt | `provider_effect` |
-| `proposal` | The call staged a proposal. A person confirms the change | `read` |
-| `draft` | The call changed a shared draft. The room keeps the history | `read` |
-| `scheduled` | The call scheduled a later turn for the same person | `read` |
-| `surface` | The call sent a command to a page. Its value names the page receipt | `surface_effect`, `succeeded` or `failed` |
+| Effect      | A successful call proves                                            | Result to the harness                     |
+| ----------- | ------------------------------------------------------------------- | ----------------------------------------- |
+| `read`      | The call changed nothing                                            | `read`                                    |
+| `receipt`   | The call changed something. Its value names the receipt             | `provider_effect`                         |
+| `proposal`  | The call staged a proposal. A person confirms the change            | `read`                                    |
+| `draft`     | The call changed a shared draft. The room keeps the history         | `read`                                    |
+| `scheduled` | The call scheduled a later turn for the same person                 | `read`                                    |
+| `surface`   | The call sent a command to a page. Its value names the page receipt | `surface_effect`, `succeeded` or `failed` |
 
 - A `draft`, `receipt` or `scheduled` tool has `prepare` in place of `handler`.
   `prepare` does the live checks and the reads. It returns the effect with its exit
@@ -111,13 +111,13 @@ answers with a receipt. An observation grants no authority and proves no saved r
 An agent does the work of a page in one of five ways. Each way keeps the checks, the
 approval and the receipt of the person's own action on that page.
 
-| Way | How it works | Tools |
-| --- | --- | --- |
-| A step of a staff page | The tool reads the role of the person at the call: operator or higher. It writes the receipt of the page, with the route, the operation and a key from the call. A repeated call gets the first receipt | `order_queue_advance`, `sold_out_mark`, `recipe_save`, `supplier_create`, `supply_cost_save`, `lot_cost_save`, `costs_plan_save` |
-| A read | The turn needs the capability and a read grant for the record type. With no grant, a direct call raises the Allow prompt | `order_queue_read`, `sold_out_read`, `counter_sale_read`, `payments_read`, `recipe_read`, `supplier_read`, `costs_read`, `commerce_entity_context`, `commerce_merchant_report` |
-| A proposal | The tool stages a governed action or a draft. A person approves or confirms it (FND-06) | `commerce_propose_action`, `commerce_propose_refund`, `commerce_propose_stock_action`, `commerce_propose_menu_publication`, `commerce_propose_plugin`, `commerce_propose_campaign_brief`, `configuration_propose` |
-| A shared draft | The tool edits the draft in the room that people edit (FND-10) | `menu_draft_edit`, `production_plan_edit`, `product_description_draft_edit`, `move_object`, `costs_sheet_edit` |
-| A page command | The command runs in the person's browser (see "Page commands") | The 47 surface tools |
+| Way                    | How it works                                                                                                                                                                                            | Tools                                                                                                                                                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A step of a staff page | The tool reads the role of the person at the call: operator or higher. It writes the receipt of the page, with the route, the operation and a key from the call. A repeated call gets the first receipt | `order_queue_advance`, `sold_out_mark`, `recipe_save`, `supplier_create`, `supply_cost_save`, `lot_cost_save`, `costs_plan_save`                                                                                  |
+| A read                 | The turn needs the capability and a read grant for the record type. With no grant, a direct call raises the Allow prompt                                                                                | `order_queue_read`, `sold_out_read`, `counter_sale_read`, `payments_read`, `recipe_read`, `supplier_read`, `costs_read`, `commerce_entity_context`, `commerce_merchant_report`                                    |
+| A proposal             | The tool stages a governed action or a draft. A person approves or confirms it (FND-06)                                                                                                                 | `commerce_propose_action`, `commerce_propose_refund`, `commerce_propose_stock_action`, `commerce_propose_menu_publication`, `commerce_propose_plugin`, `commerce_propose_campaign_brief`, `configuration_propose` |
+| A shared draft         | The tool edits the draft in the room that people edit (FND-10)                                                                                                                                          | `menu_draft_edit`, `production_plan_edit`, `product_description_draft_edit`, `move_object`, `costs_sheet_edit`                                                                                                    |
+| A page command         | The command runs in the person's browser (see "Page commands")                                                                                                                                          | The 47 surface tools                                                                                                                                                                                              |
 
 - A step of a staff page has no approval card, as the person has none. The turn must
   also hold the read grant of the records of the page. A turn with no person cannot use
@@ -184,12 +184,12 @@ approval and the receipt of the person's own action on that page.
 
 ### Page commands
 
-| Surface | Commands | Tools | Offered to |
-| --- | --- | --- | --- |
-| `workflow-simulator` (Kitchen) | The 38 commands of the Kitchen workspace, for example `run_shift`, `control_playback`, `select_item`, `rotate_equipment` | The 38 `bakery_surface_*` tools, one for each command | Owner, admin |
-| `costs` | `open_tab`, `filter_category`, `select_product` | `costs_view_open_tab`, `costs_view_filter_category`, `costs_view_select_product` | Owner, admin |
-| `workflow-simulator` (Pastry Bench) | `configure_pastry_bench`, `prepare_pastry_bench` | `pastry_bench_configure`, `pastry_bench_prepare` | Owner, admin |
-| `register` | `register_add_item`, `register_update_line`, `register_remove_line`, `register_clear_basket` | Four tools with the same names | Owner, admin, operator |
+| Surface                             | Commands                                                                                                                 | Tools                                                                            | Offered to             |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ---------------------- |
+| `workflow-simulator` (Kitchen)      | The 38 commands of the Kitchen workspace, for example `run_shift`, `control_playback`, `select_item`, `rotate_equipment` | The 38 `bakery_surface_*` tools, one for each command                            | Owner, admin           |
+| `costs`                             | `open_tab`, `filter_category`, `select_product`                                                                          | `costs_view_open_tab`, `costs_view_filter_category`, `costs_view_select_product` | Owner, admin           |
+| `workflow-simulator` (Pastry Bench) | `configure_pastry_bench`, `prepare_pastry_bench`                                                                         | `pastry_bench_configure`, `pastry_bench_prepare`                                 | Owner, admin           |
+| `register`                          | `register_add_item`, `register_update_line`, `register_remove_line`, `register_clear_basket`                             | Four tools with the same names                                                   | Owner, admin, operator |
 
 - A page command saves nothing and moves no money. It changes the page in the person's
   browser, as the person's own clicks do. A save stays a tool with its own receipt or
@@ -247,11 +247,11 @@ With the chip off, Jev can suggest the page. Only the person's click attaches a 
 - The check runs only when the Screen relevance switch is on and the Organisation has
   a Jev key (ORG-02). If not, the answer is `unavailable`, and the chip rule works alone.
 
-| `about_screen` | Band | Composer |
-| --- | --- | --- |
-| 0.65 or more | `ask` | On send, one question for this draft: **Send with this page** or **Send without**. If `fits_chat` is below 0.30, also **New chat from this page** |
-| 0.30 to 0.65 | `hint` | The off chip gets the tag "Looks related to your message" |
-| Below 0.30 | `quiet` | The plain off chip |
+| `about_screen` | Band    | Composer                                                                                                                                          |
+| -------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0.65 or more   | `ask`   | On send, one question for this draft: **Send with this page** or **Send without**. If `fits_chat` is below 0.30, also **New chat from this page** |
+| 0.30 to 0.65   | `hint`  | The off chip gets the tag "Looks related to your message"                                                                                         |
+| Below 0.30     | `quiet` | The plain off chip                                                                                                                                |
 
 - A hint or a question stores one record: the two scores, the band, the model and the
   choice (`attached`, `sent_without`, `new_chat`, `no_action`). It stores no text.
@@ -306,46 +306,46 @@ state or path. The list reads only the Portal chats of the Case that the reader 
 
 The routes are under `/v1/control/organisations/:id`:
 
-| Route | Role | Purpose |
-| --- | --- | --- |
-| `POST /chat` | Admin | A message, with an optional `surfaceObservation` |
-| `GET /chat/surface-effects` | Operator | The effects that wait for one browser and chat, at most 4 |
-| `POST /chat/surface-effects/:effectId/receipt` | Operator | The receipt of one effect. The Session settles it |
-| `POST /chat/conversations/:conversationId/screen-relevance` | Admin | One check: `{ draft, observation }` |
-| `POST …/screen-relevance/:checkId/choice` | Admin | The choice of the person |
-| `GET /case-context-discovery/screen-observations` | Admin | The On screen list: `case_ref`, `revision` |
+| Route                                                       | Role     | Purpose                                                   |
+| ----------------------------------------------------------- | -------- | --------------------------------------------------------- |
+| `POST /chat`                                                | Admin    | A message, with an optional `surfaceObservation`          |
+| `GET /chat/surface-effects`                                 | Operator | The effects that wait for one browser and chat, at most 4 |
+| `POST /chat/surface-effects/:effectId/receipt`              | Operator | The receipt of one effect. The Session settles it         |
+| `POST /chat/conversations/:conversationId/screen-relevance` | Admin    | One check: `{ draft, observation }`                       |
+| `POST …/screen-relevance/:checkId/choice`                   | Admin    | The choice of the person                                  |
+| `GET /case-context-discovery/screen-observations`           | Admin    | The On screen list: `case_ref`, `revision`                |
 
 ## Rules and limits
 
 The role is the role of the person who asked. The agent has no role of its own. A
 proposal tool only stages its proposal. A person approves or confirms it (FND-06).
 
-| What the agent or the person may do | Viewer | Operator | Admin and owner |
-| --- | --- | --- | --- |
-| Send a message in a Portal chat | No | In a workspace canvas chat only | Yes |
-| Give the agent the page on screen | No | No | Yes |
-| Agent: take a step of a staff page, with the capability | No | Yes, also from Slack | Yes |
-| Agent: get the Kitchen, Costs and Pastry Bench commands, in a Portal turn | No | No | Yes |
-| Agent: get the Register commands, in a Portal turn | No | Offered. See "Open work" | Yes |
-| Read the effects that wait, and post a receipt | No | Yes | Yes |
-| Get a relevance suggestion. Read On screen | No | No | Yes |
+| What the agent or the person may do                                       | Viewer | Operator                        | Admin and owner |
+| ------------------------------------------------------------------------- | ------ | ------------------------------- | --------------- |
+| Send a message in a Portal chat                                           | No     | In a workspace canvas chat only | Yes             |
+| Give the agent the page on screen                                         | No     | No                              | Yes             |
+| Agent: take a step of a staff page, with the capability                   | No     | Yes, also from Slack            | Yes             |
+| Agent: get the Kitchen, Costs and Pastry Bench commands, in a Portal turn | No     | No                              | Yes             |
+| Agent: get the Register commands, in a Portal turn                        | No     | Offered. See "Open work"        | Yes             |
+| Read the effects that wait, and post a receipt                            | No     | Yes                             | Yes             |
+| Get a relevance suggestion. Read On screen                                | No     | No                              | Yes             |
 
-| Limit | Value | Constant |
-| --- | --- | --- |
-| Screen observation; view sections; commands | 24 KiB; 12; 40 | `SURFACE_OBSERVATION_MAX_BYTES`, `surfaceObservationSchema` |
-| Table rows and columns; facts in a section | 200 and 24; 40 | `portalPageViewTableSchema`, `MAX_TABLE_ROWS` |
-| Sources: in the contract; from the Portal | 200; 60 | `surfaceObservationSchema`, `MAX_SOURCES` |
-| Kitchen state; effect; page receipt | 16, 20, 28 KiB | `MAX_CONTEXT_BYTES`, `MAX_EFFECT_BYTES`, `MAX_PAGE_RECEIPT_BYTES` |
-| Effect deadline, at most the end of the turn lease: a command; the command `simulate_workcell` | 20 s; 150 s | `SURFACE_EFFECT_TTL_MS`, `SURFACE_SIMULATION_TTL_MS` |
-| Bridge poll: an effect waits and no signal socket is live; an effect waits and a socket is live; no effect waits. Effects at one time | 150 ms; 1 s; 2 s, then up to 5 s. 4 | `ACTIVE_POLL_MS`, `SIGNALLED_POLL_MS`, `IDLE_POLL_INITIAL_MS`, `IDLE_POLL_MAX_MS`, `MAX_IN_FLIGHT` |
-| Repair of the chat record of an effect | 12 tries, 1 s to 15 minutes | `SURFACE_EFFECT_REPAIR_ATTEMPTS`, `SURFACE_EFFECT_MAX_BACKOFF_MS` |
-| Agent label | 5 s | `AGENT_LABEL_HOLD_MS`, `AGENT_ACTIVITY_HOLD_MS` |
-| The `output` field of a tool result; the text of a failure | 24 KiB | `MAX_CODE_MODE_OUTPUT_BYTES` |
-| Script: source, time, calls, calls at one time, output | 64 KiB, 30 s, 8, 2, 24 KiB | `CODE_MODE_PILOT_BUDGET`, `MAX_CODE_MODE_SOURCE_BYTES` |
-| Script: sandbox memory; interrupt polls | 32 MiB; 50,000 | `CODE_MODE_SANDBOX_MEMORY_BYTES`, `CODE_MODE_SANDBOX_INTERRUPT_BUDGET` |
-| Catalog with no search | 16 tools and 8 KiB | `WHOLE_CATALOG_TOOLS`, `WHOLE_CATALOG_BYTES` |
-| Relevance draft; pause; last answer | 12 to 4,000 characters; 500 ms; 1,000 | `SCREEN_RELEVANCE_MIN_DRAFT`, `SCREEN_RELEVANCE_MAX_DRAFT`, `SCREEN_RELEVANCE_PAUSE_MS`, `LAST_ANSWER_CHARACTERS` |
-| Relevance request; wait; one day | 8 KiB; 5 s; 500 checks and $0.20 | `SCREEN_RELEVANCE_MAX_REQUEST_BYTES`, `SCREEN_RELEVANCE_LIMITS` |
+| Limit                                                                                                                                 | Value                                 | Constant                                                                                                          |
+| ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Screen observation; view sections; commands                                                                                           | 24 KiB; 12; 40                        | `SURFACE_OBSERVATION_MAX_BYTES`, `surfaceObservationSchema`                                                       |
+| Table rows and columns; facts in a section                                                                                            | 200 and 24; 40                        | `portalPageViewTableSchema`, `MAX_TABLE_ROWS`                                                                     |
+| Sources: in the contract; from the Portal                                                                                             | 200; 60                               | `surfaceObservationSchema`, `MAX_SOURCES`                                                                         |
+| Kitchen state; effect; page receipt                                                                                                   | 16, 20, 28 KiB                        | `MAX_CONTEXT_BYTES`, `MAX_EFFECT_BYTES`, `MAX_PAGE_RECEIPT_BYTES`                                                 |
+| Effect deadline, at most the end of the turn lease: a command; the command `simulate_workcell`                                        | 20 s; 150 s                           | `SURFACE_EFFECT_TTL_MS`, `SURFACE_SIMULATION_TTL_MS`                                                              |
+| Bridge poll: an effect waits and no signal socket is live; an effect waits and a socket is live; no effect waits. Effects at one time | 150 ms; 1 s; 2 s, then up to 5 s. 4   | `ACTIVE_POLL_MS`, `SIGNALLED_POLL_MS`, `IDLE_POLL_INITIAL_MS`, `IDLE_POLL_MAX_MS`, `MAX_IN_FLIGHT`                |
+| Repair of the chat record of an effect                                                                                                | 12 tries, 1 s to 15 minutes           | `SURFACE_EFFECT_REPAIR_ATTEMPTS`, `SURFACE_EFFECT_MAX_BACKOFF_MS`                                                 |
+| Agent label                                                                                                                           | 5 s                                   | `AGENT_LABEL_HOLD_MS`, `AGENT_ACTIVITY_HOLD_MS`                                                                   |
+| The `output` field of a tool result; the text of a failure                                                                            | 24 KiB                                | `MAX_CODE_MODE_OUTPUT_BYTES`                                                                                      |
+| Script: source, time, calls, calls at one time, output                                                                                | 64 KiB, 30 s, 8, 2, 24 KiB            | `CODE_MODE_PILOT_BUDGET`, `MAX_CODE_MODE_SOURCE_BYTES`                                                            |
+| Script: sandbox memory; interrupt polls                                                                                               | 32 MiB; 50,000                        | `CODE_MODE_SANDBOX_MEMORY_BYTES`, `CODE_MODE_SANDBOX_INTERRUPT_BUDGET`                                            |
+| Catalog with no search                                                                                                                | 16 tools and 8 KiB                    | `WHOLE_CATALOG_TOOLS`, `WHOLE_CATALOG_BYTES`                                                                      |
+| Relevance draft; pause; last answer                                                                                                   | 12 to 4,000 characters; 500 ms; 1,000 | `SCREEN_RELEVANCE_MIN_DRAFT`, `SCREEN_RELEVANCE_MAX_DRAFT`, `SCREEN_RELEVANCE_PAUSE_MS`, `LAST_ANSWER_CHARACTERS` |
+| Relevance request; wait; one day                                                                                                      | 8 KiB; 5 s; 500 checks and $0.20      | `SCREEN_RELEVANCE_MAX_REQUEST_BYTES`, `SCREEN_RELEVANCE_LIMITS`                                                   |
 
 The effect rows and the relevance records have no retention limit. The purge of an
 Organisation erases the D1 rows. The poll of a browser reads only and writes no row.
@@ -408,13 +408,13 @@ Organisation erases the D1 rows. The poll of a browser reads only and writes no 
 
 ## Sources
 
-- [Plan 81](../../plan-81-agent-portal-control.md). Its evidence in the archive:
+- [Plan 81](../../history/plan-81-agent-portal-control.md). Its evidence in the archive:
   [Kitchen run controls](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-81-kitchen-run-controls.md),
   [menu controls](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-81-menu-controls.md),
   [order queue](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-81-order-queue.md) and
   [recipes and suppliers](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-81-recipes-suppliers.md).
   The plan also names `plan-81-stock-actions.md` and `plan-81-commerce-actions.md`.
-- [Plan 87](../../plan-87-screen-context.md). Its evidence in the archive:
+- [Plan 87](../../history/plan-87-screen-context.md). Its evidence in the archive:
   [Phase 1](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-87-phase-1.md),
   [Phase 1B](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-87-phase-1B.md),
   [Phase 2](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-87-phase-2.md),

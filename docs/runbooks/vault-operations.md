@@ -10,7 +10,7 @@ organisation, provider account, environment, generation, purpose, and current po
 authority.
 
 The security contract lives in
-[Security architecture: Vault and policy (was Spec 6)](../architecture/security.md#vault-policy-and-revocation). [Plan 12](../plan-12-policy-governed-harness-secrets-vault.md)
+[Security architecture: Vault and policy (was Spec 6)](../architecture/security.md#vault-policy-and-revocation). [Plan 12](../history/plan-12-policy-governed-harness-secrets-vault.md)
 records the implementation architecture and remaining lifecycle work. This
 runbook covers the operating procedures supported by the current platform.
 

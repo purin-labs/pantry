@@ -15,7 +15,7 @@
 // 3. Only foundation/tenancy/data/shared-rows/ writes the three tables that
 //    are in both baselines: no other source file may INSERT, UPDATE, DELETE or
 //    REPLACE a row of organisation, organisation_placement or
-//    control_mutation_receipt (docs/refactor-12.md, part 2).
+//    control_mutation_receipt (docs/history/refactor-12.md, part 2).
 //
 //   node scripts/check-database-handles.mjs            check
 //   node scripts/check-database-handles.mjs --update   lower entries, drop zero or deleted files

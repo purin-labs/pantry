@@ -406,7 +406,7 @@ These questions from the original log stay undecided:
 
 ## Sources
 
-- [Plan 3](../../plan-3-decisions.md). Where it differs from the code, this spec follows
+- [Plan 3](../../history/plan-3-decisions.md). Where it differs from the code, this spec follows
   the code.
 - Evidence in the archive:
   [Plan 32](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-32-whatsapp-customer-support.md),

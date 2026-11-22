@@ -194,10 +194,10 @@ installation with settings. It needs at least one function, handler or action.
 
 ## Sources
 
-- [Plan 76](../../../plan-76-standalone-underclerk.md),
-  [Plan 76A](../../../plan-76A-shopify-parity.md),
-  [Plan 77](../../../plan-77-underclerk-modular-core.md) and
-  [Plan 80](../../../plan-80-underclerk-multi-tenant-backend.md). Where they differ from
+- [Plan 76](../../../history/plan-76-standalone-underclerk.md),
+  [Plan 76A](../../../history/plan-76A-shopify-parity.md),
+  [Plan 77](../../../history/plan-77-underclerk-modular-core.md) and
+  [Plan 80](../../../history/plan-80-underclerk-multi-tenant-backend.md). Where they differ from
   the code, this spec follows the code. Plan 77 names `docs/evidence/plan-77-step-*` in
   the archive. Archive evidence of Plan 76:
   [standalone](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-76-phase-1/standalone-underclerk.json),

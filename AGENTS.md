@@ -125,8 +125,8 @@ and future machine actions use the same typed policy, authorization, approval,
 receipt, and replay boundaries.
 
 Collaborative authoring is scoped by
-[Plan 40](docs/plan-40-product-description-drafting.md) and
-[Plan 40B](docs/plan-40B-collaborative-menu-editor.md), the collaborative
+[Plan 40](docs/history/plan-40-product-description-drafting.md) and
+[Plan 40B](docs/history/plan-40B-collaborative-menu-editor.md), the collaborative
 menu editor: one live menu on every screen in the shop and on the QR order
 page. Purin builds no merchant websites; operators build their own sites with
 Claude or Codex on the commerce engine. They replace the retired file-native plans. General desktop filesystem synchronization
@@ -150,32 +150,32 @@ integrated file upload, fork and continuation journeys and the production smoke
 journey passed on 2026-10-28. The [status ledger](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42-release-readiness.md)
 separates completed work from deferred features, broader release acceptance and
 physical calibration. Brain is the product area for Memory, Evals and Case
-execution inspection: [Plan 42J](docs/plan-42J-brain.md) owns its records and
-[Plan 42K](docs/plan-42K-brain-ui.md) owns its interface.
-[Plan 79](docs/plan-79-agent-vault.md) owns the agent Vault: website logins,
+execution inspection: [Plan 42J](docs/history/plan-42J-brain.md) owns its records and
+[Plan 42K](docs/history/plan-42K-brain-ui.md) owns its interface.
+[Plan 79](docs/history/plan-79-agent-vault.md) owns the agent Vault: website logins,
 secure notes, contact profiles and payment cards that agents use without
 seeing a secret, an agent browser that fills them, and a store that each
 Organisation chooses: Purin Vault or 1Password. Cards stay off in production
 until the PCI DSS verification passes.
-[Plan 74](docs/plan-74-side-cases.md) owns side Cases: an agent proposes
+[Plan 74](docs/history/plan-74-side-cases.md) owns side Cases: an agent proposes
 separate work from a Portal chat or a Slack thread, and a person starts it as
 a new chat or a new thread in the same channel.
-[Plan 81](docs/plan-81-agent-portal-control.md) owns the Portal chat agent's
+[Plan 81](docs/history/plan-81-agent-portal-control.md) owns the Portal chat agent's
 control of the Portal apps: the Kitchen, Commerce and Café pages, through
 the person's own checks, approvals and receipts.
-[Plan 84](docs/plan-84-general-workflow-canvas.md) owns the editable recipe
+[Plan 84](docs/history/plan-84-general-workflow-canvas.md) owns the editable recipe
 workflow in Kitchen: one definition, a shared draft, immutable revisions,
 decision branches, and agent proposals that the person who asked approves.
-[Plan 83](docs/plan-83-one-inbox.md) owns the one Inbox: email and WhatsApp
+[Plan 83](docs/history/plan-83-one-inbox.md) owns the one Inbox: email and WhatsApp
 conversations in one Portal page, with an optional agent for each channel.
-[Plan 82](docs/plan-82-portal-voice-control.md) owns Portal voice control: a
+[Plan 82](docs/history/plan-82-portal-voice-control.md) owns Portal voice control: a
 wake phrase on the device, Whisper turbo with MLX on a Mac in the shop, Workers AI
 as the fallback when the Mac does not answer, English first, and spoken commands
 and approvals for the Portal chat agent.
 [Plan 82B](docs/plan-82B-ambient-voice.md) owns voice with no wake phrase: a
 follow-up window, opt-in ambient mode, a speaker check on the device and an
 addressee check.
-[Plan 82C](docs/plan-82C-speech-engines.md) owns speech engines: one engine
+[Plan 82C](docs/history/plan-82C-speech-engines.md) owns speech engines: one engine
 interface on the shop Mac and on Workers AI, one text check for every engine,
 the engine on every transcript, and Qwen3-ASR as a choice for each Mac.
 [The voice handover](docs/plan-82-voice-handover.md) gives the state and the remaining steps of
@@ -185,19 +185,19 @@ first café kitchen: two simulated cobots first, then governed dispatch and rece
 shop devices, with gateway enrollment, health, alerts and device access, and it
 gives Plan 24 its enrollment record. A shop gateway dials out from
 `crates/shop-gateway`; `DeviceFleetActor` holds its socket.
-[Plan 86](docs/plan-86-bakery-costs-and-margins.md) owns Costs & margins in
+[Plan 86](docs/history/plan-86-bakery-costs-and-margins.md) owns Costs & margins in
 Kitchen: one shared workbook (`@purin-labs/costs-sheet-crdt`) for supplier
 pack prices, 7-day volume tiers, lot costs from purchase invoices (`FIFO` and
 weighted average), weekday and weekend demand, fixed overhead, two-way `fx`
 formulas and product margins, with live multiplayer and chat agent tools.
 Workflow labor and energy costs remain a future Plan 86 feature.
-[Plan 87](docs/plan-87-screen-context.md) owns screen context: where a chat
+[Plan 87](docs/history/plan-87-screen-context.md) owns screen context: where a chat
 started, which page each message carries, and one surface protocol for what a
 person sees and what the agent does on it.
-[Plan 88](docs/plan-88-satyr-funded-jev.md) owns Jev from Purin: the TypeSafe key of
+[Plan 88](docs/history/plan-88-satyr-funded-jev.md) owns Jev from Purin: the TypeSafe key of
 Purin, an on/off switch for each Jev feature, and a monthly allowance in the
 subscription.
-[Plan 89](docs/plan-89-outside-written-content.md) owns the defence against
+[Plan 89](docs/history/plan-89-outside-written-content.md) owns the defence against
 prompt injection: a label says that a person outside the Organisation wrote
 the content, and an effect with a consequence then asks the person who asked,
 with the exact action. A mailbox agent sends a direct reply only to a
@@ -210,7 +210,7 @@ with change, Square Terminal Japan cashless (`CARD_PRESENT`, `FELICA_ALL`,
 [Plan 91](docs/plan-91-seams-atelier-rename.md) owns the Purin Pantry rename:
 the display names, the code names, the repository name and the provider
 registrations (names, icons and callback URLs at each provider).
-[Plan 92](docs/plan-92-new-pantry-repository.md) owns the new repository and
+[Plan 92](docs/history/plan-92-new-pantry-repository.md) owns the new repository and
 the cleanup of unused, duplicate and legacy code and weak tests.
 [Plan 93](docs/plan-93-clean-cutover.md) owns the clean cutover to the new
 `pantry-*` stack on `purin.io` domains, with no data move and no old name.
@@ -224,7 +224,7 @@ workflows and a combined café shift. Plans 61C–E are implemented and the comb
 shift is released; Plan 61A remains in progress and Plan 61B is on hold. Physical calibration
 remains a separate increment. Concurrent
 workflow authoring later reuses the
-[Plan 40C multiplayer module](docs/plan-40C-multiplayer-module.md).
+[Plan 40C multiplayer module](docs/history/plan-40C-multiplayer-module.md).
 
 ## Old and new names
 
@@ -283,7 +283,7 @@ gives the agent a way to do it:
   `agent-tools/catalog/`: it imports no product area. Or add a
   Code Mode capability. The agent acts through the person's own role checks,
   approvals and receipts, and it reads only what the person can read
-  ([Plan 81](docs/plan-81-agent-portal-control.md)).
+  ([Plan 81](docs/history/plan-81-agent-portal-control.md)).
 - If the tool needs a new capability, add it to
   `foundation/authority/authorization/capability-catalogue.ts`. Apply
   `node scripts/capability-policy-backfill-sql.mjs` before the release.
@@ -374,10 +374,10 @@ rewrite. [The commerce spec](services/commerce/docs/spec.md) is
 the contract for its behavior and API, with Shopify as the reference. A change
 to a route, a scope, an event kind or a rule updates the spec in the same
 commit; `pnpm lint:commerce-spec` refuses an API change that the spec does
-not list. [Plan 77](docs/plan-77-underclerk-modular-core.md) owns the commerce engine's
+not list. [Plan 77](docs/history/plan-77-underclerk-modular-core.md) owns the commerce engine's
 modular core and plugins: built-in plugins, merchant plugins that agents write
 at run time, the payments module and checkout pipeline, state machines and one
-type source. [Plan 80](docs/plan-80-underclerk-multi-tenant-backend.md)
+type source. [Plan 80](docs/history/plan-80-underclerk-multi-tenant-backend.md)
 owns the commerce engine as a multi-tenant headless backend that Pantry
 exposes to many operators: one request shape, tenant isolation, attribution,
 merchant-managed keys, and Square and Stripe inside the commerce engine with
@@ -396,7 +396,7 @@ Projects group Cases from every surface. General Project code lives in
 `/v1/control/organisations/:id/projects`; a member's sidebar ordering stays in
 `services/platform/src/chat/`. Every Case has one `case_project` row, and work
 with no named Project is filed in the Organisation's default Project. See
-[`docs/refactor-9.md`](docs/refactor-9.md). A change to a D1 baseline ships
+[`docs/history/refactor-9.md`](docs/history/refactor-9.md). A change to a D1 baseline ships
 with a patch script for deployed databases in `services/platform/scripts/`.
 The patch scripts there before Plan 93 are records of the old stack; the new
 databases loaded the baselines fresh.
@@ -406,7 +406,7 @@ A source file over 3,000 lines may not grow, and a new source file may not pass
 style sheet. Put new code in a new module
 beside the large file. When a listed file gets smaller, run
 `node scripts/check-file-size-ratchet.mjs --update`.
-[Refactor 10](docs/refactor-10.md) splits the large files.
+[Refactor 10](docs/history/refactor-10.md) splits the large files.
 [Refactor 17](docs/refactor-17.md) gives each source file a module in one of
 three layers: foundation, product areas and surfaces. `scripts/layers.json` is
 the map. An import goes only down the layers. One area imports no file of
@@ -475,7 +475,7 @@ drawer.
 Shared packages live in `packages/`. Browser applications live in `apps/`.
 Contracts are TypeBox 1.x schemas with `Value` checks (Plan 78); no contract
 remains in Rust. Add each new contract type or lifecycle to its owning
-TypeScript package. See `docs/plan-78-contracts-in-typescript.md`.
+TypeScript package. See `docs/history/plan-78-contracts-in-typescript.md`.
 See [`docs/commerce-monorepo.md`](docs/commerce-monorepo.md). Reach for the
 shared helpers before writing a local copy: `@purin-labs/std` for value guards,
 `assertNever`, encoding, SHA-256 and canonical JSON; `@purin-labs/type-utils`
@@ -504,7 +504,7 @@ Large files live in the R2 bucket `pantry-repo-binaries-apac`, not in git: the
 Kitchen models in `assets/`, the Kitchen physics bundles in
 `apps/portal/public/bakery-physics` that no pin names (git keeps the pinned
 runtime bundle and its execution bundles; `pnpm lint:physics-bundle` checks it),
-the equipment manuals in `docs/equipment` and other large files ([Plan 92](docs/plan-92-new-pantry-repository.md)).
+the equipment manuals in `docs/equipment` and other large files ([Plan 92](docs/history/plan-92-new-pantry-repository.md)).
 `repo-binaries.json` names each file, and each file of a folder, with its SHA-256.
 After a clone, and before a Portal build, a Kitchen build or the E2E suite, run
 `node scripts/repo-binaries.mjs fetch` with a Wrangler sign-in (or the R2 S3 keys,
@@ -515,7 +515,7 @@ upload <path>` instead of `git add`; `upload --dry-run <path>` lists what it
 would send. Run `upload` again for a folder after you change a file in it.
 
 This repository started on 18 November 2026 with one import commit
-([Plan 92](docs/plan-92-new-pantry-repository.md)). The older history, the
+([Plan 92](docs/history/plan-92-new-pantry-repository.md)). The older history, the
 evidence and the closed plans are in the archived `seams-tech/pantry-history`.
 A commit hash in a plan, in the evidence or in the memory resolves there.
 
@@ -667,8 +667,8 @@ without the shop gateway builds: before an upload of the Platform alone, run
 `bash services/shop-gateway/build.sh` (Docker), then `pnpm portal:build`. Read
 [the sandbox release runbook](docs/runbooks/code-mode-sandbox-release.md)
 before a release that changes the sandbox Worker or the pinned Pi packages.
-Read [Plan 73](docs/plan-73-model-exit-worker.md) and
-[Plan 75](docs/plan-75-chatgpt-exit-container.md) before a release that
+Read [Plan 73](docs/history/plan-73-model-exit-worker.md) and
+[Plan 75](docs/history/plan-75-chatgpt-exit-container.md) before a release that
 changes an exit Worker, its host list, its container or its placement.
 The release guard (Plan 93) refuses every deployment of a Worker that is not
 in `WORKER_NAMES` of `scripts/worker-environment.mjs`, a `workers.dev` or

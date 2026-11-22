@@ -1,8 +1,8 @@
 # Commerce Commerce Spec
 
 Status (2026-10-23): first version. This spec is the contract for what
-Commerce does and how its API behaves. [Plan 76](../../../docs/plan-76-standalone-underclerk.md)
-and [Plan 76A](../../../docs/plan-76A-shopify-parity.md) keep the history and
+Commerce does and how its API behaves. [Plan 76](../../../docs/history/plan-76-standalone-underclerk.md)
+and [Plan 76A](../../../docs/history/plan-76A-shopify-parity.md) keep the history and
 the reasons for each decision; this spec keeps the result.
 
 ## 1. How to use this spec
@@ -1161,7 +1161,7 @@ who paused the plugin ships nothing either.
 Proof: `checkout-persistence.test.ts`, `purchasing-replenishment.test.ts`,
 `plan33-core-acceptance.test.ts`.
 
-Plugins ([Plan 77](../../../docs/plan-77-underclerk-modular-core.md) step 3):
+Plugins ([Plan 77](../../../docs/history/plan-77-underclerk-modular-core.md) step 3):
 
 - The plugin contract is TypeScript data (`packages/commerce-contracts/src/plugin-definitions.ts`):
   identity, requirements (hook points, reads, commands, dependencies),

@@ -1,7 +1,7 @@
 # Reference: Hone "Engines" launch video
 
 These files are a design reference for
-[Plan 42K — Brain interface](../../plan-42K-brain-ui.md). The operator supplied
+[Plan 42K — Brain interface](../../history/plan-42K-brain-ui.md). The operator supplied
 them on 12 October 2026.
 
 Use the structure of these screens. Do not copy the names, the brand, the text

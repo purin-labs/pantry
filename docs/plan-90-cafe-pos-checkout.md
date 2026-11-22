@@ -66,17 +66,17 @@ Date: 16 November 2026
 Owners: Underclerk, Satyr platform, CafeOS Portal, and `shop-gateway`
 
 Follows:
-[Plan 33C — Payment Terminal Integrations (POS Systems)](./plan-33C-POS-systems.md),
-[Plan 33D — Square release acceptance](./plan-33D-square-release-acceptance.md),
-[Plan 40B — Collaborative Menu Editor](./plan-40B-collaborative-menu-editor.md),
-[Plan 80 — Underclerk as a Multi-Tenant Headless Backend](./plan-80-underclerk-multi-tenant-backend.md),
+[Plan 33C — Payment Terminal Integrations (POS Systems)](history/plan-33C-POS-systems.md),
+[Plan 33D — Square release acceptance](history/plan-33D-square-release-acceptance.md),
+[Plan 40B — Collaborative Menu Editor](history/plan-40B-collaborative-menu-editor.md),
+[Plan 80 — Underclerk as a Multi-Tenant Headless Backend](history/plan-80-underclerk-multi-tenant-backend.md),
 and [Plan 85 — Devices page for Satyr Kitchen](history/plan-85-device-fleet-page.md).
 
 Touches:
-[Plan 81 — Agent Portal control](./plan-81-agent-portal-control.md),
-[Plan 82 — Portal voice control](./plan-82-portal-voice-control.md),
-[Plan 87 — Screen context](./plan-87-screen-context.md),
-and [Plan 89 — Outside-written content](./plan-89-outside-written-content.md).
+[Plan 81 — Agent Portal control](history/plan-81-agent-portal-control.md),
+[Plan 82 — Portal voice control](history/plan-82-portal-voice-control.md),
+[Plan 87 — Screen context](history/plan-87-screen-context.md),
+and [Plan 89 — Outside-written content](history/plan-89-outside-written-content.md).
 
 ## Goal
 
@@ -347,7 +347,7 @@ nothing:
 | 2 | `CafeOS › Register` tablet UI (`/register`), domain extraction (`counter-register.ts`), and chat/voice basket staging | 1–1.5 weeks | Phase 1 |
 | 3A | Square Terminal Japan multi-tender (`CARD_PRESENT`, `FELICA_ALL`, `QR_CODE`) and FeliCa manual-cash refund accounting | 4–5 days | Phase 1; Sandbox test device IDs |
 | 3B | Optional Square POS iPad handoff (`square_pos_app` URL scheme + Payment readback) | 1 week | Only if an iPad + Square Reader shop needs it |
-| 3C | Physical Square Terminal live certification (restarts [Plan 33D](./plan-33D-square-release-acceptance.md) on Underclerk) | 2–3 days | Enabled Japan Square location + physical Square Terminal |
+| 3C | Physical Square Terminal live certification (restarts [Plan 33D](history/plan-33D-square-release-acceptance.md) on Underclerk) | 2–3 days | Enabled Japan Square location + physical Square Terminal |
 | 4A | `gmo_stera` `lan_gateway` binding, `DeviceFleetActor` exclusivity, `shop-gateway` `terminal_collect` protocol, and `--simulate` E2E | 1 week | Phase 1 + Plan 85 |
 | 4B | Physical GMO `stera terminal` LAN POS-link framing and hardware certification in `crates/shop-gateway` | 2 weeks | Official POS-link spec from SMBC / GMO-FG + `stera terminal` |
 | 5 | Optional Star `MCP31LB` receipt print and `mJ-Drawer` kick through `shop-gateway` | 1 week | Physical `MCP31LB` printer (+ optional `mJ-Drawer`) |
@@ -476,7 +476,7 @@ Phase 3B (`square_pos_app`) — built and released on 20 November 2026:
 - Agent access: none. The handoff and its answer move money, so they stay
   with the person at the counter (D9); `counter_sale_read` shows the result.
 
-Phase 3C (restarts [Plan 33D](./plan-33D-square-release-acceptance.md) on
+Phase 3C (restarts [Plan 33D](history/plan-33D-square-release-acceptance.md) on
 Underclerk): once the shop's Japan Square location is activated for live
 payments and one physical Square Terminal is purchased, run the Plan 33D
 distinct-seller check and physical pairing, card, FeliCa, QR, cancellation,

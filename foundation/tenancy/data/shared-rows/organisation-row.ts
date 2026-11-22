@@ -1,6 +1,6 @@
 /**
  * The `organisation` row (Refactor 12). It is in both baselines, and this
- * module holds every write of it. See docs/refactor-12.md.
+ * module holds every write of it. See docs/history/refactor-12.md.
  *
  * - Onboarding and a Slack install write both copies in the same request.
  * - The regional row is the record of name and status. A rename, an archive,

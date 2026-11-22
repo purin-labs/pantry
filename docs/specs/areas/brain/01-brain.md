@@ -382,8 +382,8 @@ last try named: `indeterminate`, `failed` or `unavailable`.
 
 ## Sources
 
-- [Plan 42J — Brain](../../../plan-42J-brain.md) and
-  [Plan 42K — Brain interface](../../../plan-42K-brain-ui.md). Where they differ from
+- [Plan 42J — Brain](../../../history/plan-42J-brain.md) and
+  [Plan 42K — Brain interface](../../../history/plan-42K-brain-ui.md). Where they differ from
   the code, this spec follows the code. Their evidence in the archive:
   [B1a](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42J-brain/README.md),
   [B1b](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42J-brain/b1b-evals.md),

@@ -395,9 +395,9 @@ selection and no capability.
 
 ## Sources
 
-- [Plan 42](../../../plan-42-bakery-workflow-simulator.md),
-  [Plan 42E](../../../plan-42E-chat-canvas-parity.md) and
-  [Plan 42F](../../../plan-42F-general-orchestration.md). Where they differ from the code,
+- [Plan 42](../../../history/plan-42-bakery-workflow-simulator.md),
+  [Plan 42E](../../../history/plan-42E-chat-canvas-parity.md) and
+  [Plan 42F](../../../history/plan-42F-general-orchestration.md). Where they differ from the code,
   this spec follows the code. Background:
   [Plan 24](../../../plan-24-cafeos-bakery-automation.md).
 - Evidence in the archive: the

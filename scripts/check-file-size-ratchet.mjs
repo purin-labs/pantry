@@ -100,7 +100,7 @@ for (const [file, lines] of current) {
     );
   else if (lines > allowed)
     errors.push(
-      `${file} grew from ${allowed} to ${lines} lines. Put the new code in a new module beside it (docs/refactor-10.md).`,
+      `${file} grew from ${allowed} to ${lines} lines. Put the new code in a new module beside it (docs/history/refactor-10.md).`,
     );
   else if (lines < allowed) lower.push(file);
 }

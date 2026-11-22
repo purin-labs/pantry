@@ -43,12 +43,12 @@ same run, with the planned and the observed times.
 ## Production, packaging and commerce
 
 - Counter orders come from the café's order paths: the counter, the QR order page and the order
-  queue ([Plan 40B](plan-40B-collaborative-menu-editor.md)). The commerce authority keeps the
+  queue ([Plan 40B](history/plan-40B-collaborative-menu-editor.md)). The commerce authority keeps the
   orders and the stock.
 - Satyr reads the stock of each fresh product. It never changes the stock from a cobot report.
   The stock rises only when a person checks the released pieces.
-- The first path bakes financiers ([Plan 61A](plan-61A-financier-workflow.md)). The recipe
-  revision comes from the recipe workflow ([Plan 84](plan-84-general-workflow-canvas.md)).
+- The first path bakes financiers ([Plan 61A](history/plan-61A-financier-workflow.md)). The recipe
+  revision comes from the recipe workflow ([Plan 84](history/plan-84-general-workflow-canvas.md)).
 - Packing of gift boxes, release from the mould, batter dispense and deliveries to other cafés are
   later steps. Each needs its own capability and its own acceptance.
 
@@ -58,7 +58,7 @@ same run, with the planned and the observed times.
 | --- | --- | --- |
 | Devices, gateway, readiness, one task for each device, pause, Slack alerts | [Plan 85](history/plan-85-device-fleet-page.md), live | Nothing. It calls `deviceReadiness` and `reserveDeviceWork` |
 | Scheduling, queues, resource reservations, occupancy, the execution adapter boundary | [Plan 70A](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-70A-production-engine.md) `packages/production-simulation` | A physical execution adapter, beside the MuJoCo one |
-| Oven, rack and robot models, MuJoCo cells | [Plan 60A](plan-60A-bakery-equipment-models.md), [Plan 42B](plan-42B-mujoco-workcell-simulation.md), `crates/bakery-native` | A controller simulator mode that answers like a cobot controller |
+| Oven, rack and robot models, MuJoCo cells | [Plan 60A](history/plan-60A-bakery-equipment-models.md), [Plan 42B](history/plan-42B-mujoco-workcell-simulation.md), `crates/bakery-native` | A controller simulator mode that answers like a cobot controller |
 | Recipe definitions and revisions | Plan 84 | Nothing |
 | Orders and stock | Underclerk and Plan 40B | A stock-level reader and a bake proposal |
 | Approvals, Cases, receipts | Platform: policy, ActionLedger, Case Actor | One bake run as a Case with its approval |
@@ -83,7 +83,7 @@ the same engine library, which has no browser dependency.
 - No Slack message moves a cobot. Slack shows the proposal and its approval, and the approval goes
   through the same policy check as in the Portal.
 - The Portal chat agent may read runs, propose a bake and request a pause. It cannot approve a bake,
-  dispatch a task or lift a restriction ([Plan 81](plan-81-agent-portal-control.md)).
+  dispatch a task or lift a restriction ([Plan 81](history/plan-81-agent-portal-control.md)).
 
 ## Steps of the simulation phase
 
@@ -304,7 +304,7 @@ The whole simulation phase is 17–25 agent days.
 ## Future NVIDIA Isaac Lab compatibility
 
 BakeryOS workflow simulation runs MuJoCo in the browser through the shared
-Rust/WebAssembly boundary defined in [Plan 42B](./plan-42B-mujoco-workcell-simulation.md).
+Rust/WebAssembly boundary defined in [Plan 42B](history/plan-42B-mujoco-workcell-simulation.md).
 NVIDIA and Google DeepMind provide MuJoCo Warp (Newton), which loads `MJCF`
 models directly into Isaac Lab. If we train camera-guided policies for physical
 robots under this plan later, we can reuse our existing MuJoCo assets in Isaac
@@ -337,7 +337,7 @@ and `mujoco_warp` (`3.16.0`):
 - Dough shaping, cream or decoration.
 - Autonomous approval of a bake, a payment, a price or a customer promise.
 - Export orders. The old Japan-to-Singapore path is closed with
-  [Plan 23](plan-23-flavored-export-catalog.md).
+  [Plan 23](history/plan-23-flavored-export-catalog.md).
 - More than one site, or fleet optimisation across sites.
 
 ## What changed from the August version

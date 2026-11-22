@@ -104,7 +104,7 @@ the reviewed harness paths. Confirm its actual reachability before using it as a
 baseline. The existing Code Mode result also includes nested-call outputs, so
 its model-context savings require measurement.
 
-Relevant boundaries are described in [Plan 14](plan-14-actor-runtime-architecture.md),
+Relevant boundaries are described in [Plan 14](history/plan-14-actor-runtime-architecture.md),
 [actor-owned history](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-14-nf9-actor-owned-history.md),
 and [Plan 35](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-35-access-and-data-flow-controls.md).
 

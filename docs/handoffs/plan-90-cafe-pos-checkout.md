@@ -3,7 +3,7 @@
 Date: 19 November 2026
 Target repository: `/Users/pta/Dev/purin-labs/pantry` (`purin-labs/pantry`)
 Owning plan: [`docs/plan-90-cafe-pos-checkout.md`](../plan-90-cafe-pos-checkout.md) (already committed in `pantry`)
-Related plans: [`docs/plan-33C-POS-systems.md`](../plan-33C-POS-systems.md), [`docs/plan-33D-square-release-acceptance.md`](../plan-33D-square-release-acceptance.md), [`docs/plan-40B-collaborative-menu-editor.md`](../plan-40B-collaborative-menu-editor.md), [`docs/plan-80-underclerk-multi-tenant-backend.md`](../plan-80-underclerk-multi-tenant-backend.md), [`docs/plan-85-device-fleet-page.md`](../history/plan-85-device-fleet-page.md), [`docs/plan-91-seams-atelier-rename.md`](../plan-91-seams-atelier-rename.md), and [`docs/plan-92-new-pantry-repository.md`](../plan-92-new-pantry-repository.md).
+Related plans: [`docs/plan-33C-POS-systems.md`](../history/plan-33C-POS-systems.md), [`docs/plan-33D-square-release-acceptance.md`](../history/plan-33D-square-release-acceptance.md), [`docs/plan-40B-collaborative-menu-editor.md`](../history/plan-40B-collaborative-menu-editor.md), [`docs/plan-80-underclerk-multi-tenant-backend.md`](../history/plan-80-underclerk-multi-tenant-backend.md), [`docs/plan-85-device-fleet-page.md`](../history/plan-85-device-fleet-page.md), [`docs/plan-91-seams-atelier-rename.md`](../plan-91-seams-atelier-rename.md), and [`docs/plan-92-new-pantry-repository.md`](../history/plan-92-new-pantry-repository.md).
 
 ## Current state
 
@@ -82,7 +82,7 @@ Related plans: [`docs/plan-33C-POS-systems.md`](../plan-33C-POS-systems.md), [`d
 
 ### Task 5 — Phases 3C, 4B, and 5 (hardware-gated)
 
-- **Phase 3C:** Live Japan Square Terminal pairing and certification ([Plan 33D](../plan-33D-square-release-acceptance.md)).
+- **Phase 3C:** Live Japan Square Terminal pairing and certification ([Plan 33D](../history/plan-33D-square-release-acceptance.md)).
 - **Phase 4B:** Physical `stera terminal` LAN driver and certification in `crates/shop-gateway` after GMO-FG spec delivery.
 - **Phase 5:** Optional Star `MCP31LB` (`StarPRNT` 80 mm receipt print) and `mJ-Drawer` (`DK-Port` kick) tasks in `crates/shop-gateway`.
 

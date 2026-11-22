@@ -11,21 +11,21 @@ records what a particular run proved.
 
 ## Active product map
 
-| Document                                                                                                   | Scope and status                                                                         |
-| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `docs/plan-21-cafeos-ux-foundation.md`                                                                     | Accepted product language and Portal foundation                                          |
-| `docs/plan-22-commerce-capabilities-and-storefront-demos.md` and `docs/plan-23-flavored-export-catalog.md` | Accepted café, pâtisserie, packaged-goods, and export commerce                           |
-| `docs/plan-31B-supplier-and-purchasing-operations.md` and `docs/plan-47-connected-inventory-views.md`      | Purchasing and inventory operations                                                      |
-| `docs/plan-33-merchant-configurable-production-checkout.md` and `docs/plan-33C-POS-systems.md`             | Checkout and Square counter sales; external release limits remain explicit               |
-| `docs/plan-39-urk-merchant-agent-parity.md`                                                                | Failed-payment and delayed-order attention brief; mock-order acceptance passed           |
-| `docs/plan-42-bakery-workflow-simulator.md` and `docs/plan-42B-mujoco-workcell-simulation.md`              | Accepted bounded orchestration, native cold-workcell simulation, and task-bound evidence |
-| `docs/plan-42E-chat-canvas-parity.md` and `docs/plan-42F-general-orchestration.md`                         | Completed selected local control and shared orchestration scope                          |
-| `docs/plan-42G-automatic-context-loading.md` and `docs/plan-42H-thread-forking.md`                         | Context loading accepted in production; fork file/release gates remain                   |
-| `docs/plan-60A-bakery-equipment-models.md`                                                                 | Equipment models in progress                                                             |
-| `docs/plan-61A-financier-workflow.md` through `docs/plan-61E-combined-cafe-shift.md`                       | Draft recipe preparation and combined service workflows                                  |
-| `docs/plan-24-cafeos-bakery-automation.md`                                                                 | Planned physical enrollment, dispatch, and reconciliation                                |
-| `docs/plan-40-product-description-drafting.md` and `docs/plan-40B-collaborative-menu-editor.md`            | Accepted product drafting and the proposed collaborative menu editor                     |
-| `docs/plan-91-seams-atelier-rename.md`                                                                     | The Purin Pantry rename: display names, code names, and the names that stay              |
+| Document                                                                                                                   | Scope and status                                                                         |
+| -------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `docs/history/plan-21-cafeos-ux-foundation.md`                                                                             | Accepted product language and Portal foundation                                          |
+| `docs/history/plan-22-commerce-capabilities-and-storefront-demos.md` and `docs/history/plan-23-flavored-export-catalog.md` | Accepted café, pâtisserie, packaged-goods, and export commerce                           |
+| `docs/history/plan-31B-supplier-and-purchasing-operations.md` and `docs/history/plan-47-connected-inventory-views.md`      | Purchasing and inventory operations                                                      |
+| `docs/history/plan-33-merchant-configurable-production-checkout.md` and `docs/history/plan-33C-POS-systems.md`             | Checkout and Square counter sales; external release limits remain explicit               |
+| `docs/history/plan-39-urk-merchant-agent-parity.md`                                                                        | Failed-payment and delayed-order attention brief; mock-order acceptance passed           |
+| `docs/history/plan-42-bakery-workflow-simulator.md` and `docs/history/plan-42B-mujoco-workcell-simulation.md`              | Accepted bounded orchestration, native cold-workcell simulation, and task-bound evidence |
+| `docs/history/plan-42E-chat-canvas-parity.md` and `docs/history/plan-42F-general-orchestration.md`                         | Completed selected local control and shared orchestration scope                          |
+| `docs/history/plan-42G-automatic-context-loading.md` and `docs/history/plan-42H-thread-forking.md`                         | Context loading accepted in production; fork file/release gates remain                   |
+| `docs/history/plan-60A-bakery-equipment-models.md`                                                                         | Equipment models in progress                                                             |
+| `docs/history/plan-61A-financier-workflow.md` through `docs/history/plan-61E-combined-cafe-shift.md`                       | Draft recipe preparation and combined service workflows                                  |
+| `docs/plan-24-cafeos-bakery-automation.md`                                                                                 | Planned physical enrollment, dispatch, and reconciliation                                |
+| `docs/history/plan-40-product-description-drafting.md` and `docs/history/plan-40B-collaborative-menu-editor.md`            | Accepted product drafting and the proposed collaborative menu editor                     |
+| `docs/plan-91-seams-atelier-rename.md`                                                                                     | The Purin Pantry rename: display names, code names, and the names that stay              |
 
 `docs/evidence/plan-42-release-readiness.md` separates accepted software,
 deferred conveniences, broader release checks, and physical calibration.
@@ -35,8 +35,8 @@ Simulation and provider Sandbox acceptance do not establish physical readiness.
 
 | Document                                                                                            | Owns                                                     |
 | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `docs/plan-3-decisions.md`                                                                          | Current authority map and architectural decisions        |
-| `docs/plan-14-actor-runtime-architecture.md` and `docs/plan-15.md`                                  | Actor ownership, recovery, and coordinated work          |
+| `docs/history/plan-3-decisions.md`                                                                  | Current authority map and architectural decisions        |
+| `docs/history/plan-14-actor-runtime-architecture.md` and `docs/history/plan-15.md`                  | Actor ownership, recovery, and coordinated work          |
 | `docs/architecture/runtime.md#harness-adapter`                                                      | Three pinned Codex/Pi inference authorities              |
 | `docs/architecture/security.md#vault-policy-and-revocation` and `docs/runbooks/vault-operations.md` | Credential lifecycle and purpose-bound resolution        |
 | `foundation/authority/policy/information-flow/README.md`                                            | Protected context, authorization, and output integration |

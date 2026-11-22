@@ -301,11 +301,11 @@ parser refuses, gives 422. Another refusal gives 409, and a failure of the Actor
 
 ## Sources
 
-- [Plan 88](../../../plan-88-satyr-funded-jev.md). Where it differs from the code, this
+- [Plan 88](../../../history/plan-88-satyr-funded-jev.md). Where it differs from the code, this
   spec follows the code. Its evidence in the archive:
   [Phase 3 journey](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-88-phase-3-journey.md).
   The change to paid use: [Plan 95](../../../plan-95-pantry-own-accounts.md) step 3.
-  The boundary: [Plan 87](../../../plan-87-screen-context.md) section 3A.
+  The boundary: [Plan 87](../../../history/plan-87-screen-context.md) section 3A.
 - E2E journeys in `services/platform/tests/e2e/`: `plan-88-jev-features.test.ts` (J1,
   J2, J3, J4, J6 and J7) and `plan-88-jev-agent.test.ts` (J5). Neighbour journeys:
   `chat-screen-relevance.test.ts`, `mail-inbox.test.ts` and

@@ -19,7 +19,7 @@ Keep the CL4 acceptance catalog to exactly these six scenarios:
 Returned-shipment behavior belongs in a focused transition journey until it
 becomes a separately approved acceptance scenario.
 
-Before changing a fixture, read `docs/plan-9-commerce-lifecycle-lab.md` and the
+Before changing a fixture, read `docs/history/plan-9-commerce-lifecycle-lab.md` and the
 repository-root `AGENTS.md` testing guidance, then inspect the canonical contract
 type or transition it exercises. Preserve these safety properties:
 

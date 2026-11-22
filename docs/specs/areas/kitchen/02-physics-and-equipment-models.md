@@ -354,8 +354,8 @@ needs new native requests and recordings; an old recording is never reinterprete
 
 ## Sources
 
-- [Plan 42B](../../../plan-42B-mujoco-workcell-simulation.md),
-  [Plan 60A](../../../plan-60A-bakery-equipment-models.md) and the
+- [Plan 42B](../../../history/plan-42B-mujoco-workcell-simulation.md),
+  [Plan 60A](../../../history/plan-60A-bakery-equipment-models.md) and the
   [calibration worksheet](../../../plan-42-calibration-worksheet.md). Where they differ
   from the code, this spec follows the code. Background:
   [Refactor 16](../../../refactor-16.md) and `crates/bakery-native/README.md`.

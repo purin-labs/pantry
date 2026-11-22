@@ -51,7 +51,7 @@ Limits that stay after this step:
 ## B. Square Terminal (Phase 3C)
 
 This restarts the physical acceptance of
-[Plan 33D](../plan-33D-square-release-acceptance.md) ("Deferred until resumed
+[Plan 33D](../history/plan-33D-square-release-acceptance.md) ("Deferred until resumed
 by the user", item 2) on the commerce engine.
 
 1. Activate the Japan Square location for live payments, with e-money and

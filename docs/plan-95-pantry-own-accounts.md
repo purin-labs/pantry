@@ -13,7 +13,7 @@ production (see their "results" sections). Step 6 is open.
   Console) waits for this plan.
 
 Owner: the Platform accounts, the Portal setup and Pantry billing.
-Touches: [Plan 88 — Jev](plan-88-satyr-funded-jev.md) (paid use),
+Touches: [Plan 88 — Jev](history/plan-88-satyr-funded-jev.md) (paid use),
 [Plan 93 — clean cutover](plan-93-clean-cutover.md) (the new stack),
 [onboarding architecture](architecture/onboarding.md),
 [organisation setup flow](organisation-setup-flow.md), and the AGENTS.md
@@ -305,7 +305,7 @@ This table replaces the first rows of "Authority and ownership" in
   own transaction, so no outside change can arrive.
 - The types `ServiceAdmissionActionV1` and `PlatformUserAuthorityV1` move from
   the vendored Console package into `@purin-labs/contracts`, as TypeBox
-  schemas ([Plan 78](plan-78-contracts-in-typescript.md)).
+  schemas ([Plan 78](history/plan-78-contracts-in-typescript.md)).
 - The module is in the layer `foundation/tenancy` (`scripts/layers.json`).
 
 ### Plans

@@ -322,8 +322,8 @@ acceptance before Stage B moves its files.
 
 ## Sources
 
-- [Code style](../../code-style.md), [Refactor 10](../../refactor-10.md) and
-  [Plan 92](../../plan-92-new-pantry-repository.md). Where they differ from the code,
+- [Code style](../../code-style.md), [Refactor 10](../../history/refactor-10.md) and
+  [Plan 92](../../history/plan-92-new-pantry-repository.md). Where they differ from the code,
   this spec follows the code.
 - Background: [Refactor 17](../../refactor-17.md), [the module list](../../layers.md),
   the [spec index](../README.md) and [`AGENTS.md`](../../../AGENTS.md).

@@ -411,10 +411,10 @@ Neighbours:
 
 ## Sources
 
-- [Plan 16](../../../plan-16-merchant-console-commerce-operations.md),
-  [Plan 23](../../../plan-23-flavored-export-catalog.md),
-  [Plan 31B](../../../plan-31B-supplier-and-purchasing-operations.md) and
-  [Plan 39](../../../plan-39-urk-merchant-agent-parity.md). Where they differ from the
+- [Plan 16](../../../history/plan-16-merchant-console-commerce-operations.md),
+  [Plan 23](../../../history/plan-23-flavored-export-catalog.md),
+  [Plan 31B](../../../history/plan-31B-supplier-and-purchasing-operations.md) and
+  [Plan 39](../../../history/plan-39-urk-merchant-agent-parity.md). Where they differ from the
   code, this spec follows the code. Their evidence in the archive:
   - Plan 16:
     [integrations browser](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-16-mc1-integrations-browser-acceptance-2026-08-18.md),

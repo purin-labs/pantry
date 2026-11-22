@@ -409,8 +409,8 @@ The talk key works only while the page is in front.
 
 ## Sources
 
-- [Plan 82](../../../plan-82-portal-voice-control.md), [Plan
-  82C](../../../plan-82C-speech-engines.md) and [the voice
+- [Plan 82](../../../history/plan-82-portal-voice-control.md), [Plan
+  82C](../../../history/plan-82C-speech-engines.md) and [the voice
   handover](../../../plan-82-voice-handover.md). Where they differ from the code, this
   spec follows the code. Background: [Plan 82B](../../../plan-82B-ambient-voice.md).
 - Evidence in the archive: [Plan 82 Phase 0](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-82-phase-0.md).

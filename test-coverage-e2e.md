@@ -109,8 +109,8 @@ physical production loop is implemented.
 Missing or exhausted inference authority fails the pinned route. A test that
 silently selects another funding route cannot prove recovery.
 
-[Plan 37](docs/plan-37-typed-messages-and-attachments.md) retains its attachment
-collection-audit gate. [Plan 33D](docs/plan-33D-square-release-acceptance.md)
+[Plan 37](docs/history/plan-37-typed-messages-and-attachments.md) retains its attachment
+collection-audit gate. [Plan 33D](docs/history/plan-33D-square-release-acceptance.md)
 retains deferred seller-isolation and physical/live certification.
 [The Kitchen release ledger](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42-release-readiness.md)
 retains integrated file, production release, calibration, and physical limits.

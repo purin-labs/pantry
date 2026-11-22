@@ -394,8 +394,8 @@ Neighbours:
 
 ## Sources
 
-- [Plan 9](../../../plan-9-commerce-lifecycle-lab.md),
-  [Plan 47](../../../plan-47-connected-inventory-views.md) and the
+- [Plan 9](../../../history/plan-9-commerce-lifecycle-lab.md),
+  [Plan 47](../../../history/plan-47-connected-inventory-views.md) and the
   [Shopify integration runbook](../../../integrations/shopify.md). Where they differ from
   the code, this spec follows the code. The Shopify failure codes are in
   [onboarding operations](../../../runbooks/onboarding-operations.md).

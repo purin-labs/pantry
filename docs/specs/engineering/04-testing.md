@@ -399,7 +399,7 @@ The boundaries to the neighbours:
   two guides are not plans and do not move.
 - [The decision for each test file](../../refactor-17-test-decisions.md),
   [Refactor 17](../../refactor-17.md), section "Prune with each step", and
-  [Plan 92](../../plan-92-new-pantry-repository.md), for the open test gaps.
+  [Plan 92](../../history/plan-92-new-pantry-repository.md), for the open test gaps.
 - Background: [`pantry.yml`](../../../.github/workflows/pantry.yml),
   [`commerce-components.yml`](../../../.github/workflows/commerce-components.yml) and
   [`journeys.json`](../../../scripts/production-simulation/journeys.json).

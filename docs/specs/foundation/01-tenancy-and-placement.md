@@ -18,17 +18,17 @@ that rule.
 One fact has one durable owner. A D1 projection has no authority because it is easy to
 query.
 
-| State | Authority |
-| --- | --- |
-| The directory copy of each Organisation, the published placement, people (`app_user`), control sessions, Slack installations and routing, the placement move journals | Global D1 (`DB`) |
-| The Organisation's name and status, the execution fence, members, integration accounts, policy, agents, cues, Projects, the Actor registry | Regional D1 of the cell |
-| Provider ingress identity, delivery attempts and receipts | `ConnectorActor` SQLite |
-| Case purpose, journal, bindings, assignments, proposals, output outbox | `CaseActor` SQLite |
-| Session contract, private history, budget, checkpoint, turn lease | `AgentSessionActor` SQLite |
-| The Organisation record of the Actor (`organisation_meta`), commerce projections, cue claims, the action ledger | `OrganisationActor` SQLite |
-| Checkpoints, attachments, workspace revisions, artifacts | R2 `ARCHIVE` |
-| Compiled policy and cue snapshots | `POLICY_KV`, a cache of D1 records |
-| The counts of ignored cues: one key for each Organisation, source, event type and hour, with at most 3 samples | `POLICY_KV`, for 30 days. No D1 record holds them (`cues/ignore-aggregate.ts`) |
+| State                                                                                                                                                                 | Authority                                                                      |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| The directory copy of each Organisation, the published placement, people (`app_user`), control sessions, Slack installations and routing, the placement move journals | Global D1 (`DB`)                                                               |
+| The Organisation's name and status, the execution fence, members, integration accounts, policy, agents, cues, Projects, the Actor registry                            | Regional D1 of the cell                                                        |
+| Provider ingress identity, delivery attempts and receipts                                                                                                             | `ConnectorActor` SQLite                                                        |
+| Case purpose, journal, bindings, assignments, proposals, output outbox                                                                                                | `CaseActor` SQLite                                                             |
+| Session contract, private history, budget, checkpoint, turn lease                                                                                                     | `AgentSessionActor` SQLite                                                     |
+| The Organisation record of the Actor (`organisation_meta`), commerce projections, cue claims, the action ledger                                                       | `OrganisationActor` SQLite                                                     |
+| Checkpoints, attachments, workspace revisions, artifacts                                                                                                              | R2 `ARCHIVE`                                                                   |
+| Compiled policy and cue snapshots                                                                                                                                     | `POLICY_KV`, a cache of D1 records                                             |
+| The counts of ignored cues: one key for each Organisation, source, event type and hour, with at most 3 samples                                                        | `POLICY_KV`, for 30 days. No D1 record holds them (`cues/ignore-aggregate.ts`) |
 
 Durable Object SQLite owns the hot state of its Actor. D1 owns control records,
 registries and projections that code can build again. R2 owns large immutable bytes. KV
@@ -63,14 +63,14 @@ handle: `GlobalDatabase`, `OrganisationDatabase`, `GlobalQuerySource` or
 `control_mutation_receipt` rows with SQL that it builds, by the rules of
 `shared-rows/regional-copy-rules.ts`.
 
-| Row | Source | Copy | How long the copies can differ |
-| --- | --- | --- | --- |
-| `organisation` at creation and at a Slack install | The request writes both | — | Until the request ends. If it stops after the regional commit, the next 15-minute onboarding run activates the global placement (`publishStoppedInitialPlacement`) |
-| `organisation` name and status | Regional row | Global directory row | Until the request ends (`copyOrganisationRowToDirectory`). If that copy fails, the request still succeeds, and the next 15-minute run copies the values (`publishOrganisationDirectoryRow`) |
-| `organisation` during a move | Source cell | Target cell | The move writes the target row before the copy of the other rows. Cleanup makes the old row blank. Routing reads the global placement |
-| `organisation_placement` at creation and at a Slack install | The request writes both | — | The order is the reverse of a move. The request reserves epoch 1 in the global database, activates the regional row, and activates the global row last. If it stops before the last step, the Organisation does not route until the next 15-minute onboarding run |
-| `organisation_placement` during a move | Global row: routing and publication | Regional row: the execution fence | The global row freezes first and publishes first. The regional row follows in the next step of the same move |
-| `control_mutation_receipt` | — | No copy between the global and the regional database | A receipt is in the database of the effect that it records, in the same batch. Its replay reads that database. A move copies the receipts of the Organisation from the source cell to the target cell with its other rows |
+| Row                                                         | Source                              | Copy                                                 | How long the copies can differ                                                                                                                                                                                                                                    |
+| ----------------------------------------------------------- | ----------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `organisation` at creation and at a Slack install           | The request writes both             | —                                                    | Until the request ends. If it stops after the regional commit, the next 15-minute onboarding run activates the global placement (`publishStoppedInitialPlacement`)                                                                                                |
+| `organisation` name and status                              | Regional row                        | Global directory row                                 | Until the request ends (`copyOrganisationRowToDirectory`). If that copy fails, the request still succeeds, and the next 15-minute run copies the values (`publishOrganisationDirectoryRow`)                                                                       |
+| `organisation` during a move                                | Source cell                         | Target cell                                          | The move writes the target row before the copy of the other rows. Cleanup makes the old row blank. Routing reads the global placement                                                                                                                             |
+| `organisation_placement` at creation and at a Slack install | The request writes both             | —                                                    | The order is the reverse of a move. The request reserves epoch 1 in the global database, activates the regional row, and activates the global row last. If it stops before the last step, the Organisation does not route until the next 15-minute onboarding run |
+| `organisation_placement` during a move                      | Global row: routing and publication | Regional row: the execution fence                    | The global row freezes first and publishes first. The regional row follows in the next step of the same move                                                                                                                                                      |
+| `control_mutation_receipt`                                  | —                                   | No copy between the global and the regional database | A receipt is in the database of the effect that it records, in the same batch. Its replay reads that database. A move copies the receipts of the Organisation from the source cell to the target cell with its other rows                                         |
 
 A rename, an archive, a restore, a deletion and a purge write the regional
 `organisation` row. The written status values are `active`, `deleted` and `purged`.
@@ -107,13 +107,13 @@ A rename, an archive, a restore, a deletion and a purge write the regional
 
 A placement row has one of five states. At most one row of an Organisation is `active`.
 
-| State | Meaning |
-| --- | --- |
-| `reserved` | The epoch has a cell and a fence token, and it admits no work |
-| `active` | The epoch admits work. Its row has `activated_at` |
-| `frozen` | A move stopped new work in this epoch |
-| `retired` | A publication replaced this epoch with the next one |
-| `abandoned` | A move released this target epoch before publication |
+| State       | Meaning                                                       |
+| ----------- | ------------------------------------------------------------- |
+| `reserved`  | The epoch has a cell and a fence token, and it admits no work |
+| `active`    | The epoch admits work. Its row has `activated_at`             |
+| `frozen`    | A move stopped new work in this epoch                         |
+| `retired`   | A publication replaced this epoch with the next one           |
+| `abandoned` | A move released this target epoch before publication          |
 
 Epoch 1 is the initial placement, and each move takes the next epoch. A row has a fence
 token. The token of a move target starts with `tpf_`.
@@ -157,18 +157,18 @@ A relocation copies the Actors and the regional rows of an Organisation to a new
 restore imports Actors from the exports of a retained relocation. Both are one machine
 (`data/placement-move.machine.ts`), and an Organisation has one open move at a time.
 
-| State | Meaning |
-| --- | --- |
-| `reserved` | The target epoch is reserved. The source still admits work |
-| `frozen` | The source admits no new work. The move waits until the source is quiet |
-| `copying` | A relocation exports the source Actors and copies the regional rows |
-| `importing` | A restore imports the Actors of its manifest |
-| `published` | The target is the active placement. The source Actors wait for retirement |
-| `retained` | A relocation keeps the source copy as a recovery point |
-| `cleaning` | A relocation erases the source copy and its exports |
-| `quarantined` | An import failed for good. The source stays frozen |
-| `complete` | The move ended |
-| `abandoned` | The move ended without publication |
+| State         | Meaning                                                                   |
+| ------------- | ------------------------------------------------------------------------- |
+| `reserved`    | The target epoch is reserved. The source still admits work                |
+| `frozen`      | The source admits no new work. The move waits until the source is quiet   |
+| `copying`     | A relocation exports the source Actors and copies the regional rows       |
+| `importing`   | A restore imports the Actors of its manifest                              |
+| `published`   | The target is the active placement. The source Actors wait for retirement |
+| `retained`    | A relocation keeps the source copy as a recovery point                    |
+| `cleaning`    | A relocation erases the source copy and its exports                       |
+| `quarantined` | An import failed for good. The source stays frozen                        |
+| `complete`    | The move ended                                                            |
+| `abandoned`   | The move ended without publication                                        |
 
 - If an earlier relocation of the Organisation is still `retained` or `cleaning`, a
   relocation start refuses its source cell as the target (`relocation_conflict`).
@@ -230,10 +230,10 @@ Durable Object and of D1, each queue message, each KV write and each R2 write.
 The production Worker has three cron triggers (`services/platform/wrangler.jsonc`,
 `integration-gateway.ts`):
 
-| Trigger | Work |
-| --- | --- |
-| `* * * * *` | Delivery of paid receipts |
-| `*/5 * * * *` | Reconciliation of the commerce outbox, the backstop for a lost event |
+| Trigger        | Work                                                                                                                                                             |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `* * * * *`    | Delivery of paid receipts                                                                                                                                        |
+| `*/5 * * * *`  | Reconciliation of the commerce outbox, the backstop for a lost event                                                                                             |
 | `*/15 * * * *` | Onboarding reconciliation, schedule dispatch, file context, attachment collection, payout reconciliation, the weekly ChatGPT sign-in refresh, the Actor registry |
 
 ## Contracts
@@ -271,26 +271,26 @@ The production Worker has three cron triggers (`services/platform/wrangler.jsonc
   `regional_capacity_insufficient` and `regional_capacity_unavailable`.
 - This module has no capability and no agent tool.
 
-| Route | Who | Purpose |
-| --- | --- | --- |
-| `GET /v1/control/home-regions` | A signed-in person | The deployed cells (`choices`) and the nearest one (`suggested`) |
+| Route                                           | Who                   | Purpose                                                                                                                        |
+| ----------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `GET /v1/control/home-regions`                  | A signed-in person    | The deployed cells (`choices`) and the nearest one (`suggested`)                                                               |
 | `GET`, `POST /v1/admin/state-object-relocation` | The platform operator | Inspect a relocation. Commands: `start`, `resume`, `abandon`, `reconcile_receipt`, `reconcile_mail_receipt`, `waive_retention` |
-| `GET`, `POST /v1/admin/state-object-restore` | The platform operator | Inspect a restore. Commands: `prepare`, `start`, `resume`, `abandon` |
+| `GET`, `POST /v1/admin/state-object-restore`    | The platform operator | Inspect a restore. Commands: `prepare`, `start`, `resume`, `abandon`                                                           |
 
 The contract of the home regions is `packages/control-api/src/home-region.ts`. The main
 files are in `services/platform/src/`:
 
-| File | Purpose |
-| --- | --- |
-| `placement.ts` | The placement types, the profile parser and the nearest cell |
-| `database-handles.ts` | The handle types and their makers |
-| `organisation-execution-scope.ts` | The scope, the fence and the database selection |
-| `data/organisation-placement.ts` | The placement record, its reads and its errors |
-| `data/shared-rows/` | The writes of the three shared tables, and the rules for the regional copier |
-| `data/placement-move.ts`, `data/placement-move.machine.ts` | The one writer of a move's state, and the machine |
-| `data/query-source.ts` | `GlobalQuerySource` and `OrganisationQuerySource` |
-| `control/home-region.ts` | The offered cells and the placement of a new Organisation |
-| `gateway/admin/actor-relocation.ts` | The two admin routes |
+| File                                                       | Purpose                                                                      |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `placement.ts`                                             | The placement types, the profile parser and the nearest cell                 |
+| `database-handles.ts`                                      | The handle types and their makers                                            |
+| `organisation-execution-scope.ts`                          | The scope, the fence and the database selection                              |
+| `data/organisation-placement.ts`                           | The placement record, its reads and its errors                               |
+| `data/shared-rows/`                                        | The writes of the three shared tables, and the rules for the regional copier |
+| `data/placement-move.ts`, `data/placement-move.machine.ts` | The one writer of a move's state, and the machine                            |
+| `data/query-source.ts`                                     | `GlobalQuerySource` and `OrganisationQuerySource`                            |
+| `control/home-region.ts`                                   | The offered cells and the placement of a new Organisation                    |
+| `gateway/admin/actor-relocation.ts`                        | The two admin routes                                                         |
 
 The lints: `pnpm lint:database-handles` (`scripts/check-database-handles.mjs`) refuses a
 cast to a handle type outside `database-handles.ts`. It refuses a new plain `D1Database`
@@ -303,25 +303,25 @@ table, a column, an index or a trigger of its baseline.
 
 ## Rules and limits
 
-| Action | Signed-in person | Sous Chef agent | Platform operator |
-| --- | --- | --- | --- |
-| Read the home regions | Yes | No | — |
-| Choose the cell of a new Organisation | No | No | Only through the profile: the root cell for an Organisation that a person makes, the nearest deployed cell for a Slack install |
-| Start, resume or abandon a relocation or a restore | No | No | Yes, with `ORGANISATION_ADMIN_TOKEN` as a bearer token |
-| Waive the retention of a relocation | No | No | Yes |
-| Read or write the records of an Organisation where the actor has no role | No | No | Yes, with the same token, through the admin routes of other specs for one named Organisation: for example `/v1/admin/person-roles`, `/v1/admin/integration-accounts`, `/v1/admin/external-records-read` and `/v1/admin/shopify-credential` |
+| Action                                                                   | Signed-in person | Sous Chef agent | Platform operator                                                                                                                                                                                                                          |
+| ------------------------------------------------------------------------ | ---------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Read the home regions                                                    | Yes              | No              | —                                                                                                                                                                                                                                          |
+| Choose the cell of a new Organisation                                    | No               | No              | Only through the profile: the root cell for an Organisation that a person makes, the nearest deployed cell for a Slack install                                                                                                             |
+| Start, resume or abandon a relocation or a restore                       | No               | No              | Yes, with `ORGANISATION_ADMIN_TOKEN` as a bearer token                                                                                                                                                                                     |
+| Waive the retention of a relocation                                      | No               | No              | Yes                                                                                                                                                                                                                                        |
+| Read or write the records of an Organisation where the actor has no role | No               | No              | Yes, with the same token, through the admin routes of other specs for one named Organisation: for example `/v1/admin/person-roles`, `/v1/admin/integration-accounts`, `/v1/admin/external-records-read` and `/v1/admin/shopify-credential` |
 
 An admin route answers 404 to a request without the token.
 
-| Limit | Value | Constant |
-| --- | --- | --- |
-| Time from freeze to publication of a relocation | Less than 5 minutes | `ORGANISATION_RELOCATION_PUBLICATION_BUDGET_MS` |
-| Retention of the source copy after a relocation | 7 days | `ACTOR_RELOCATION_RETENTION_MS` |
-| `expires_at` of a control mutation receipt | 24 hours after creation | `MUTATION_RECEIPT_TTL_MS` |
-| Size of the source and the target database together, at the start of a relocation | Below 10,000,000,000 bytes | `REGIONAL_DATABASE_CAPACITY_BYTES` |
-| Repair of a stopped publication or directory copy | The next 15-minute run | The `*/15 * * * *` trigger |
-| Writes of an idle Organisation | 12 Actor rows in one hour | `IDLE_HOUR_BUDGET` |
-| Active Organisations that one person owns. Only the creation by a signed-in person checks it; a Slack install does not | 5 | `ORGANISATION_OWNER_LIMIT` |
+| Limit                                                                                                                  | Value                      | Constant                                        |
+| ---------------------------------------------------------------------------------------------------------------------- | -------------------------- | ----------------------------------------------- |
+| Time from freeze to publication of a relocation                                                                        | Less than 5 minutes        | `ORGANISATION_RELOCATION_PUBLICATION_BUDGET_MS` |
+| Retention of the source copy after a relocation                                                                        | 7 days                     | `ACTOR_RELOCATION_RETENTION_MS`                 |
+| `expires_at` of a control mutation receipt                                                                             | 24 hours after creation    | `MUTATION_RECEIPT_TTL_MS`                       |
+| Size of the source and the target database together, at the start of a relocation                                      | Below 10,000,000,000 bytes | `REGIONAL_DATABASE_CAPACITY_BYTES`              |
+| Repair of a stopped publication or directory copy                                                                      | The next 15-minute run     | The `*/15 * * * *` trigger                      |
+| Writes of an idle Organisation                                                                                         | 12 Actor rows in one hour  | `IDLE_HOUR_BUDGET`                              |
+| Active Organisations that one person owns. Only the creation by a signed-in person checks it; a Slack install does not | 5                          | `ORGANISATION_OWNER_LIMIT`                      |
 
 - **Isolation.** A query for one Organisation binds its id, and so does an Actor
   identity, a registry lookup and an object key. A reference to another Organisation
@@ -392,7 +392,7 @@ The boundaries:
 
 - [Runtime architecture](../../architecture/runtime.md), the sections "Platform layout
   and conventions" and "Data model and Actor persistence".
-- [Refactor 12](../../refactor-12.md). Its evidence in the archive:
+- [Refactor 12](../../history/refactor-12.md). Its evidence in the archive:
   [the full E2E run](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-12/full-e2e-run.md),
   [the part 2 journeys](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-12/part-2-journeys.md),
   [the hand edits](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-12/hand-edits.md),

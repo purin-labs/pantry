@@ -26,11 +26,11 @@ stays beside the code. It tells a developer how to add a source or an output.
   Session (`admitChatForkInformationFlow`). A side Case admits the label of the turn
   that proposed it (`admitSideCaseObservation`).
 
-| Level | Rule (`policyLevel`) | Sources in the code |
-| --- | --- | --- |
-| `private` | The policy states it, or each reader is a person, a Portal chat or a Slack conversation | A Slack DM with the agent, a Slack group DM, a private Slack channel, a Portal chat |
-| `internal` | The policy states it, or one reader is of another kind | A public Slack channel, a Project, a cue or a schedule, an agent mailbox, a WhatsApp support line, the sources that every role reads |
-| Public | The label has no policy | No source adapter makes this label |
+| Level      | Rule (`policyLevel`)                                                                    | Sources in the code                                                                                                                  |
+| ---------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `private`  | The policy states it, or each reader is a person, a Portal chat or a Slack conversation | A Slack DM with the agent, a Slack group DM, a private Slack channel, a Portal chat                                                  |
+| `internal` | The policy states it, or one reader is of another kind                                  | A public Slack channel, a Project, a cue or a schedule, an agent mailbox, a WhatsApp support line, the sources that every role reads |
+| Public     | The label has no policy                                                                 | No source adapter makes this label                                                                                                   |
 
 - The label of a message names one reader (`sourceReaderForAuthority`). A Slack DM and
   a private Portal chat name the person. A Slack channel or group DM, a mailbox and a
@@ -56,10 +56,10 @@ stays beside the code. It tells a developer how to add a source or an output.
 Grants decide what a tool reads. `pac.ts` adds two rules. All other content enters, and
 the exit decides.
 
-| Rule | Applies to | Result |
-| --- | --- | --- |
-| `decideContextAdmission` | A tool read under the turn's grants | A Slack turn, a cue turn and a scheduled turn read each source. A Portal chat, a mailbox turn and a WhatsApp turn refuse `private` content that their readers may not see |
-| `decideAutomaticContextAdmission` | Case entries, Memory and Project context | `private` content stays out unless the turn's readers may see it. Content that is bound to one recipient enters only a turn that writes to that recipient |
+| Rule                              | Applies to                               | Result                                                                                                                                                                    |
+| --------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `decideContextAdmission`          | A tool read under the turn's grants      | A Slack turn, a cue turn and a scheduled turn read each source. A Portal chat, a mailbox turn and a WhatsApp turn refuse `private` content that their readers may not see |
+| `decideAutomaticContextAdmission` | Case entries, Memory and Project context | `private` content stays out unless the turn's readers may see it. Content that is bound to one recipient enters only a turn that writes to that recipient                 |
 
 - A Slack answer can wait for a person in the Case outbox. The answer of a Portal chat,
   a mailbox or WhatsApp cannot wait. A Portal chat turn does not run when its binding
@@ -76,12 +76,12 @@ the exit decides.
 
 ### The exit check
 
-| Sink | Exit | Audience |
-| --- | --- | --- |
-| `conversation_delivery` | An answer to a Slack DM or a Slack channel. Also the check of a Portal read for one member | The readers that the destination authority gives |
-| `native_chat` | An answer or an action of a Portal chat | The person, the role, and each Project and chat of the label that the person opens now |
-| `tool_effect` | A tool call that changes a record, sends a message or controls a device | The authority of the turn, or every role for a record that every member reads |
-| `typesafe_system_one` | A Jev model call | The authority of the call. It keeps a reader rule, not the level rule |
+| Sink                    | Exit                                                                                       | Audience                                                                               |
+| ----------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| `conversation_delivery` | An answer to a Slack DM or a Slack channel. Also the check of a Portal read for one member | The readers that the destination authority gives                                       |
+| `native_chat`           | An answer or an action of a Portal chat                                                    | The person, the role, and each Project and chat of the label that the person opens now |
+| `tool_effect`           | A tool call that changes a record, sends a message or controls a device                    | The authority of the turn, or every role for a record that every member reads          |
+| `typesafe_system_one`   | A Jev model call                                                                           | The authority of the call. It keeps a reader rule, not the level rule                  |
 
 `decideExit` in `sinks.ts` is the level rule. It reads each policy of the label:
 
@@ -93,12 +93,12 @@ the exit decides.
 4. Any other `internal` policy passes inside the Organisation. A sink that reaches
    outside returns `approval_required` (`aifc.outside_organisation`).
 
-| Class set in `sinks.ts` | Capabilities | Effect on the rule |
-| --- | --- | --- |
-| `INSIDE_CAPABILITIES` | The shared draft edits, the workflow canvas move, the order queue, sold out, recipes, supply costs, suppliers, device pause, bake run pause, custom connector draft and read, the link read, `commerce.action.propose` | Internal content passes |
-| `OUTSIDE_CAPABILITIES` | `whatsapp.support.reply.send`, `commerce.catalog.publish`, `commerce.catalog.update_description` | Internal content needs approval |
-| `OTHER_SERVICE_CAPABILITIES` | `airtable.api.write`, `custom_connector.write` | Internal content needs approval, also when the person's role reads it. Content of the target resource passes |
-| `RECIPIENT_CAPABILITIES` | `email.reply.propose`, `email.operational.propose`, `whatsapp.support.reply.send` | A label that is bound to a recipient passes only that recipient |
+| Class set in `sinks.ts`      | Capabilities                                                                                                                                                                                                           | Effect on the rule                                                                                           |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `INSIDE_CAPABILITIES`        | The shared draft edits, the workflow canvas move, the order queue, sold out, recipes, supply costs, suppliers, device pause, bake run pause, custom connector draft and read, the link read, `commerce.action.propose` | Internal content passes                                                                                      |
+| `OUTSIDE_CAPABILITIES`       | `whatsapp.support.reply.send`, `commerce.catalog.publish`, `commerce.catalog.update_description`                                                                                                                       | Internal content needs approval                                                                              |
+| `OTHER_SERVICE_CAPABILITIES` | `airtable.api.write`, `custom_connector.write`                                                                                                                                                                         | Internal content needs approval, also when the person's role reads it. Content of the target resource passes |
+| `RECIPIENT_CAPABILITIES`     | `email.reply.propose`, `email.operational.propose`, `whatsapp.support.reply.send`                                                                                                                                      | A label that is bound to a recipient passes only that recipient                                              |
 
 - A Slack Connect channel reaches outside. `slackConversationReachesOutside` reads
   `is_ext_shared` from Slack, only when the label holds internal content from another
@@ -129,12 +129,12 @@ the exit decides.
 - An effect passes when its capability is in `PASSES_AFTER_OUTSIDE_TEXT`, or when its
   approval is satisfied. A new capability asks until a person adds it to that set.
 
-| Effect in a Session with the writer `outside` | Result |
-| --- | --- |
-| The answer to the turn's own conversation | Passes. The rule reads tool effects only |
-| A custom connector read, the link read | Passes |
-| An email or Slack message proposal, a marketing email draft edit, a commerce proposal, a custom connector draft or write | Passes. A person reviews the exact content before it changes something |
-| Each other tool effect with an exit check: the order queue, sold out, recipes, costs, suppliers, device pause, bake run pause, an Airtable write, a shared draft edit, a canvas move | Asks the person who asked |
+| Effect in a Session with the writer `outside`                                                                                                                                        | Result                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| The answer to the turn's own conversation                                                                                                                                            | Passes. The rule reads tool effects only                               |
+| A custom connector read, the link read                                                                                                                                               | Passes                                                                 |
+| An email or Slack message proposal, a marketing email draft edit, a commerce proposal, a custom connector draft or write                                                             | Passes. A person reviews the exact content before it changes something |
+| Each other tool effect with an exit check: the order queue, sold out, recipes, costs, suppliers, device pause, bake run pause, an Airtable write, a shared draft edit, a canvas move | Asks the person who asked                                              |
 
 - The mailbox agent chooses a direct reply, and trusted code decides
   (`mailboxReplyDisposition`). A direct reply goes only when the sender is a verified
@@ -195,11 +195,11 @@ also covers another recipient.
 - An effect with two checks, such as a staff page action, asks for each missing approval
   before it uses a pass (`settleStaffPageEffect`).
 
-| Reason | Who sees and decides the request |
-| --- | --- |
-| `private_source` | A member who passes `memberMaySee` on the stored label |
+| Reason                 | Who sees and decides the request                                                      |
+| ---------------------- | ------------------------------------------------------------------------------------- |
+| `private_source`       | A member who passes `memberMaySee` on the stored label                                |
 | `outside_organisation` | The person who asked, an owner or an admin. That person must also pass `memberMaySee` |
-| `outside_written` | Only the person who asked, who must also pass `memberMaySee` |
+| `outside_written`      | Only the person who asked, who must also pass `memberMaySee`                          |
 
 To any other member the request does not exist (`held_output_not_found`).
 
@@ -231,16 +231,16 @@ To any other member the request does not exist (`held_output_not_found`).
 The kernel is `foundation/authority/policy/information-flow/`, in the module
 `foundation/authority`. `policy/index.ts` only exports it again.
 
-| File | Holds |
-| --- | --- |
-| `types.ts` | The closed unions: owner, level, writer, source, sink, decision and error |
-| `labels.ts` | `FlowLabel`, `joinFlowLabels`, `policyLevel`, the audiences of an authority, `outsideWrittenFlowLabel`, `acceptedByPersonFlowLabel` |
-| `source-labels.ts` | `createCurrentSourceFlowLabel`, `createCurrentObservedSourceFlowLabel`, `slackChannelIsPublic`, `OUTSIDE_WRITTEN_READ_CAPABILITIES` |
-| `pac.ts` | The two admission rules |
-| `oac.ts` | `ObservationEvidence`, `InformationFlowContext`, `FlowBinding`, `advanceInformationFlowContext` |
-| `sinks.ts` | `currentFlowSinkCheck`, `evaluateFlowLabelSink`, `decideFlowSink`, the class sets, `sinkRefusalAsksPerson` |
-| `organisation-authz.ts` | The Organisation's capability rules for a tool effect |
-| `native-audience.ts`, `readers.ts`, `source-readers.ts`, `digest.ts` | The Portal chat audience, the reader parser, the reader of an authority, the canonical digest |
+| File                                                                 | Holds                                                                                                                               |
+| -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `types.ts`                                                           | The closed unions: owner, level, writer, source, sink, decision and error                                                           |
+| `labels.ts`                                                          | `FlowLabel`, `joinFlowLabels`, `policyLevel`, the audiences of an authority, `outsideWrittenFlowLabel`, `acceptedByPersonFlowLabel` |
+| `source-labels.ts`                                                   | `createCurrentSourceFlowLabel`, `createCurrentObservedSourceFlowLabel`, `slackChannelIsPublic`, `OUTSIDE_WRITTEN_READ_CAPABILITIES` |
+| `pac.ts`                                                             | The two admission rules                                                                                                             |
+| `oac.ts`                                                             | `ObservationEvidence`, `InformationFlowContext`, `FlowBinding`, `advanceInformationFlowContext`                                     |
+| `sinks.ts`                                                           | `currentFlowSinkCheck`, `evaluateFlowLabelSink`, `decideFlowSink`, the class sets, `sinkRefusalAsksPerson`                          |
+| `organisation-authz.ts`                                              | The Organisation's capability rules for a tool effect                                                                               |
+| `native-audience.ts`, `readers.ts`, `source-readers.ts`, `digest.ts` | The Portal chat audience, the reader parser, the reader of an authority, the canonical digest                                       |
 
 - **Owners:** `platform`, `organisation`, `integration_resource` and
   `recipient_constraint`, which binds a label to one verified contact.
@@ -268,12 +268,12 @@ The kernel is `foundation/authority/policy/information-flow/`, in the module
 The Session Actor keeps the flow state in its SQLite
 (`foundation/agent/actors/agent-session-information-flow.ts`):
 
-| Table | Holds |
-| --- | --- |
-| `session_information_flow_observation` | One evidence row for each observation digest |
-| `session_information_flow_revision` | The context of each revision: the work label and the observation set |
-| `session_information_flow_turn_binding` | The `FlowBinding` of each turn |
-| `session_commerce_observation_entity` | The commerce records that an observation returned. A proposal targets only such a record |
+| Table                                   | Holds                                                                                    |
+| --------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `session_information_flow_observation`  | One evidence row for each observation digest                                             |
+| `session_information_flow_revision`     | The context of each revision: the work label and the observation set                     |
+| `session_information_flow_turn_binding` | The `FlowBinding` of each turn                                                           |
+| `session_commerce_observation_entity`   | The commerce records that an observation returned. A proposal targets only such a record |
 
 Other records hold a label or a binding as JSON: `case_journal` and the Case outputs
 (Case Actor), `memory_revision`, `eval_revision` and `eval_run_result` (Brain), and the
@@ -297,11 +297,11 @@ Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`):
 The control routes are under `/v1/control/organisations/:id/access-control`, in
 `control/routes/held-output-requests.ts` and `agent-permission-requests.ts`:
 
-| Route | Role | Purpose |
-| --- | --- | --- |
-| `GET /permission-requests` | Viewer | The pending list of FND-06. `heldOutputs` holds the held requests that the reader decides |
-| `GET /held-outputs/:requestId` | Viewer who decides it | The reason, the destination, the source, and the answer text or the action |
-| `POST /held-outputs/:requestId/decision` | Viewer who decides it | `allow` or `deny`. It releases the output or the step |
+| Route                                    | Role                  | Purpose                                                                                   |
+| ---------------------------------------- | --------------------- | ----------------------------------------------------------------------------------------- |
+| `GET /permission-requests`               | Viewer                | The pending list of FND-06. `heldOutputs` holds the held requests that the reader decides |
+| `GET /held-outputs/:requestId`           | Viewer who decides it | The reason, the destination, the source, and the answer text or the action                |
+| `POST /held-outputs/:requestId/decision` | Viewer who decides it | `allow` or `deny`. It releases the output or the step                                     |
 
 - The decision route returns `held_output_decision_invalid` (422) for another answer,
   `held_output_expired` (409) after the lifetime and `held_output_decided` (409) when
@@ -317,17 +317,17 @@ The control routes are under `/v1/control/organisations/:id/access-control`, in
   `pnpm lint:tool-effects` (`scripts/check-tool-effects.mjs`) refuses a `draft`,
   `receipt` or `scheduled` tool with no `prepare`.
 
-| Work | Entry point in `services/platform/src/` |
-| --- | --- |
-| Turn context | `context/turn-context.ts` (`prepareTurnContext`, `assembleTurnContext`) |
-| Session observations | `prepareSessionInformationFlow`, `admitSessionInformationFlowObservation` |
-| Slack delivery | `actors/case-conversation-sink.ts`, `slack/conversation-facts.ts` |
-| Portal chat | `chat/information-flow.ts` (`resolveNativeChatAudience`, `decideChatFlowSink`) |
-| Held answers and steps | `actors/case-output-hold.ts`, `actors/harness-follow-up.ts`, `slack/held-output-release.ts`, `slack/held-output-notice.ts` |
-| The action of a held step | `agent-tools/effect-action.ts` |
-| Commerce reads and effects | `agent-tools/commerce/read-support.ts` (`admitCommerceReadObservation`), `commerce/provider-execution.ts` |
-| Mail sends | `authorizeEmailReplyReview`, `authorizeEmailProposalFlow`, `mail-inbox/direct-reply.ts` |
-| Jev calls | `integrations/typesafe/disclosure.ts` |
+| Work                       | Entry point in `services/platform/src/`                                                                                    |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Turn context               | `context/turn-context.ts` (`prepareTurnContext`, `assembleTurnContext`)                                                    |
+| Session observations       | `prepareSessionInformationFlow`, `admitSessionInformationFlowObservation`                                                  |
+| Slack delivery             | `actors/case-conversation-sink.ts`, `slack/conversation-facts.ts`                                                          |
+| Portal chat                | `chat/information-flow.ts` (`resolveNativeChatAudience`, `decideChatFlowSink`)                                             |
+| Held answers and steps     | `actors/case-output-hold.ts`, `actors/harness-follow-up.ts`, `slack/held-output-release.ts`, `slack/held-output-notice.ts` |
+| The action of a held step  | `agent-tools/effect-action.ts`                                                                                             |
+| Commerce reads and effects | `agent-tools/commerce/read-support.ts` (`admitCommerceReadObservation`), `commerce/provider-execution.ts`                  |
+| Mail sends                 | `authorizeEmailReplyReview`, `authorizeEmailProposalFlow`, `mail-inbox/direct-reply.ts`                                    |
+| Jev calls                  | `integrations/typesafe/disclosure.ts`                                                                                      |
 
 `pnpm lint:ifc-boundaries` runs `scripts/check-ifc-destinations.mjs` and ESLint import
 rules. The script refuses a tool effect whose capability is not in the class part of
@@ -338,23 +338,23 @@ reader and the raw Memory, Eval and execution stores (`eslint.config.mjs`).
 
 ## Rules and limits
 
-| Action | Viewer | Operator | Admin and owner | Agent |
-| --- | --- | --- | --- | --- |
-| See a record of a private source in the Portal | Only its readers | Only its readers | Only its readers | No Portal view |
-| Decide a `private_source` request | If the member may see the content | The same | The same | No |
-| Decide an `outside_organisation` request | Only the person who asked | Only the person who asked | Yes | No |
-| Decide an `outside_written` request | Only the person who asked | Only the person who asked | Only the person who asked | No |
-| Share a conversation with a shared draft | No | No | Yes | No |
-| Make a label, change it or leave it out | No | No | No | No |
+| Action                                         | Viewer                            | Operator                  | Admin and owner           | Agent          |
+| ---------------------------------------------- | --------------------------------- | ------------------------- | ------------------------- | -------------- |
+| See a record of a private source in the Portal | Only its readers                  | Only its readers          | Only its readers          | No Portal view |
+| Decide a `private_source` request              | If the member may see the content | The same                  | The same                  | No             |
+| Decide an `outside_organisation` request       | Only the person who asked         | Only the person who asked | Yes                       | No             |
+| Decide an `outside_written` request            | Only the person who asked         | Only the person who asked | Only the person who asked | No             |
+| Share a conversation with a shared draft       | No                                | No                        | Yes                       | No             |
+| Make a label, change it or leave it out        | No                                | No                        | No                        | No             |
 
-| Limit | Value | Constant |
-| --- | --- | --- |
-| Lifetime of a request and of its pass | 7 days from the request | `HELD_OUTPUT_REQUEST_LIFETIME_MS` |
+| Limit                                           | Value                                 | Constant                                         |
+| ----------------------------------------------- | ------------------------------------- | ------------------------------------------------ |
+| Lifetime of a request and of its pass           | 7 days from the request               | `HELD_OUTPUT_REQUEST_LIFETIME_MS`                |
 | A stored decision that did not reach its output | Tried until 14 days after the request | Two lifetimes, in `listHeldOutputReconciliation` |
-| Pending list, reconciliation batch | 50 requests, 20 requests | Literals in `data/held-output-request.ts` |
-| Age of a stored Slack fact | 5 minutes | `FACT_MAX_AGE_MS` |
-| Member list of a private channel | 5 pages of 200 | `MEMBER_PAGES`, `MEMBER_PAGE_LIMIT` |
-| Values that a prompt shows | 12 | `DETAIL_LIMIT` |
+| Pending list, reconciliation batch              | 50 requests, 20 requests              | Literals in `data/held-output-request.ts`        |
+| Age of a stored Slack fact                      | 5 minutes                             | `FACT_MAX_AGE_MS`                                |
+| Member list of a private channel                | 5 pages of 200                        | `MEMBER_PAGES`, `MEMBER_PAGE_LIMIT`              |
+| Values that a prompt shows                      | 12                                    | `DETAIL_LIMIT`                                   |
 
 - The scheduled reconciliation (`onboarding-reconciliation-runner.ts`) expires a request
   after its lifetime. It also finishes a decision that did not reach its output.
@@ -429,13 +429,13 @@ planner and interpreter; a second policy engine.
 
 ## Sources
 
-- [Plan 27](../../plan-27-ifc.md), the history of the label model. In the archive:
+- [Plan 27](../../history/plan-27-ifc.md), the history of the label model. In the archive:
   [Plan 25](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-25-conversation-authority-and-organizational-context.md),
   [Plan 57](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-57-live-delivery.md).
-- [Plan 27C](../../plan-27C-simple-information-flow.md), the levels and the exit rule.
+- [Plan 27C](../../history/plan-27C-simple-information-flow.md), the levels and the exit rule.
   In the archive:
   [Plan 27B](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-27B-permission-requests-and-flow-release.md).
-- [Plan 89](../../plan-89-outside-written-content.md), the writer rule. In the archive:
+- [Plan 89](../../history/plan-89-outside-written-content.md), the writer rule. In the archive:
   [Plan 29](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-29-organisation-agent-email-mailboxes.md).
 - The sources name no evidence file in the archive. Where a source differs from the
   code, this spec follows the code.

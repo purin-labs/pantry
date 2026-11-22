@@ -417,7 +417,7 @@ drawer. It shares the theme tokens.
 
 ## Sources
 
-- [Plan 21](../../../plan-21-cafeos-ux-foundation.md),
+- [Plan 21](../../../history/plan-21-cafeos-ux-foundation.md),
   [the Portal UI inventory](../../../portal-ui-inventory.md) and
   [the style guide](../../../style-guide.md). Where they differ from the code, this spec
   follows the code.

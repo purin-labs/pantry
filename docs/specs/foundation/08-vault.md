@@ -41,15 +41,15 @@ read or use an item yet.
   not load or is not 32 bytes, the write or the read fails (`vault_root_unavailable` or
   `vault_root_invalid`), also for a row of the other version.
 
-| Secret kind | Content |
-| --- | --- |
-| `bearer` | One token, for example a model key or the 1Password service account token |
-| `expiring_bearer` | One token and its expiry time |
-| `header` | One header name and its value |
-| `oauth_tokens` | An access token, a refresh token and an expiry (`expires` or `provider_managed`) |
-| `oauth_client_credentials` | A client id and a client secret |
-| `opaque_profile` | One text in a named format: `codex_auth_json_v1`, `codex_device_authorization_v1`, `chatgpt_agent_profile_v1`, `chatgpt_agent_sign_in_v1` or `commerce_square_connection_v1` |
-| `website_login` | The username and the password of a Vault item |
+| Secret kind                | Content                                                                                                                                                                      |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bearer`                   | One token, for example a model key or the 1Password service account token                                                                                                    |
+| `expiring_bearer`          | One token and its expiry time                                                                                                                                                |
+| `header`                   | One header name and its value                                                                                                                                                |
+| `oauth_tokens`             | An access token, a refresh token and an expiry (`expires` or `provider_managed`)                                                                                             |
+| `oauth_client_credentials` | A client id and a client secret                                                                                                                                              |
+| `opaque_profile`           | One text in a named format: `codex_auth_json_v1`, `codex_device_authorization_v1`, `chatgpt_agent_profile_v1`, `chatgpt_agent_sign_in_v1` or `commerce_square_connection_v1` |
+| `website_login`            | The username and the password of a Vault item                                                                                                                                |
 
 ### Resolution by purpose
 
@@ -59,17 +59,17 @@ Organisation id and the handle, and they return `true`. A resolver returns the s
 only when the current rows agree. Each resolver reads those rows before the decrypt,
 apart from the Slack resolvers.
 
-| Purpose | Resolver | What must be true |
-| --- | --- | --- |
-| Provider action | `authorizeProviderActionResolution`, then `resolveProviderActionCredential` | An `executing` action ledger entry with a valid flow binding. The Organisation and its onboarding are active. The account, the provider, the environment and the active generation agree. The second function checks the generation again |
-| Provider webhook | `resolveProviderWebhookCredential` | A `live` webhook with the same signing secret handle and generation, on an active account, connection and generation |
-| Discord interaction | `resolveDiscordInteractionVerificationCredential` | An active installation that holds the same public key handle |
-| Provider connection | `resolveActiveProviderConnectionCredential`, `resolveProviderManifestCredential` | An active connection and generation that hold the handle. The manifest read also accepts a `degraded` account and an Organisation in `configuring` or `activating` |
-| Surface installation | `resolveSurfaceInstallationCredential` | An active installation of an active Organisation. Its bot token handle is the credential of an active account, connection and generation |
-| Slack bot token | `resolveActiveSlackThreadCredential`; `readSlackThreadCredentialRoute`, then `resolveRoutedSlackThreadCredential`; `resolveActiveSlackOrganisationCredential`; `resolveSlackHealthCheckCredential`; `resolveActiveSlackPhysicalInstallationCredential` | An active `slack_installation` in the global database. The thread resolvers and the Organisation resolvers also need an active `slack_organisation_connection` there, and an active `integration_account` of an active Organisation in the regional database. A thread also needs its `slack_thread_case_pin` row. The health check also accepts a `degraded` account. These resolvers read no `provider_connection` row and no generation |
-| Model key | `resolveOrganisationModelCredentialForRoute` | An `organisation_byo` route of the same provider. Its `byoKeyRef` is the live `credential_ref` handle for the host of that provider |
-| Account removal | `resolveAccountRemovalCredential` | A cleanup row in `pending_provider_cleanup`, `running_provider_cleanup` or `retry_scheduled` that lists the handle |
-| Revocation at the provider | `resolveCredentialRevocationSecret` | An account and a connection that are not `revoked`. The connection holds the handle |
+| Purpose                    | Resolver                                                                                                                                                                                                                                               | What must be true                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Provider action            | `authorizeProviderActionResolution`, then `resolveProviderActionCredential`                                                                                                                                                                            | An `executing` action ledger entry with a valid flow binding. The Organisation and its onboarding are active. The account, the provider, the environment and the active generation agree. The second function checks the generation again                                                                                                                                                                                                  |
+| Provider webhook           | `resolveProviderWebhookCredential`                                                                                                                                                                                                                     | A `live` webhook with the same signing secret handle and generation, on an active account, connection and generation                                                                                                                                                                                                                                                                                                                       |
+| Discord interaction        | `resolveDiscordInteractionVerificationCredential`                                                                                                                                                                                                      | An active installation that holds the same public key handle                                                                                                                                                                                                                                                                                                                                                                               |
+| Provider connection        | `resolveActiveProviderConnectionCredential`, `resolveProviderManifestCredential`                                                                                                                                                                       | An active connection and generation that hold the handle. The manifest read also accepts a `degraded` account and an Organisation in `configuring` or `activating`                                                                                                                                                                                                                                                                         |
+| Surface installation       | `resolveSurfaceInstallationCredential`                                                                                                                                                                                                                 | An active installation of an active Organisation. Its bot token handle is the credential of an active account, connection and generation                                                                                                                                                                                                                                                                                                   |
+| Slack bot token            | `resolveActiveSlackThreadCredential`; `readSlackThreadCredentialRoute`, then `resolveRoutedSlackThreadCredential`; `resolveActiveSlackOrganisationCredential`; `resolveSlackHealthCheckCredential`; `resolveActiveSlackPhysicalInstallationCredential` | An active `slack_installation` in the global database. The thread resolvers and the Organisation resolvers also need an active `slack_organisation_connection` there, and an active `integration_account` of an active Organisation in the regional database. A thread also needs its `slack_thread_case_pin` row. The health check also accepts a `degraded` account. These resolvers read no `provider_connection` row and no generation |
+| Model key                  | `resolveOrganisationModelCredentialForRoute`                                                                                                                                                                                                           | An `organisation_byo` route of the same provider. Its `byoKeyRef` is the live `credential_ref` handle for the host of that provider                                                                                                                                                                                                                                                                                                        |
+| Account removal            | `resolveAccountRemovalCredential`                                                                                                                                                                                                                      | A cleanup row in `pending_provider_cleanup`, `running_provider_cleanup` or `retry_scheduled` that lists the handle                                                                                                                                                                                                                                                                                                                         |
+| Revocation at the provider | `resolveCredentialRevocationSecret`                                                                                                                                                                                                                    | An account and a connection that are not `revoked`. The connection holds the handle                                                                                                                                                                                                                                                                                                                                                        |
 
 - One Organisation holds the Slack bot token for each Organisation that uses the
   workspace. `slack_installation.credential_organisation_id` names it, and the Slack
@@ -154,12 +154,12 @@ The scheduled reconciliation (cron `*/15 * * * *`) ends with the Vault alert swe
 (`sweepVaultAlertSignals`). The sweep reads each regional database and writes nothing.
 It sends a `traceWarn` for each signal that is not zero.
 
-| Trace | Condition | Constant |
-| --- | --- | --- |
-| `vault.alert.unknown_key_version_rows` | A live row has a key version that the keyring cannot read | — |
-| `vault.alert.stale_superseded_generations` | A superseded generation is older than 1 hour | `STALE_GENERATION_ALERT_MS` |
-| `vault.alert.stuck_credential_rotations` | A rotation is `pending_verification` or `verified` for more than 15 minutes | `STUCK_ROTATION_ALERT_MS` |
-| `vault.alert.delayed_restrictions` | A revocation is `committed`, with no policy activation, for more than 5 s | `RESTRICTION_LATENCY_ALERT_MS` |
+| Trace                                      | Condition                                                                            | Constant                                                        |
+| ------------------------------------------ | ------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| `vault.alert.unknown_key_version_rows`     | A live row has a key version that the keyring cannot read                            | —                                                               |
+| `vault.alert.stale_superseded_generations` | A superseded generation is older than 1 hour                                         | `STALE_GENERATION_ALERT_MS`                                     |
+| `vault.alert.stuck_credential_rotations`   | A rotation is `pending_verification` or `verified` for more than 15 minutes          | `STUCK_ROTATION_ALERT_MS`                                       |
+| `vault.alert.delayed_restrictions`         | A revocation is `committed`, with no policy activation, for more than 5 s            | `RESTRICTION_LATENCY_ALERT_MS`                                  |
 | `vault.alert.restriction_latency_breaches` | An activated revocation took more than 5 s. The trace also carries the target of 3 s | `RESTRICTION_LATENCY_ALERT_MS`, `RESTRICTION_LATENCY_TARGET_MS` |
 
 The sweep also counts failed rotations and the denials of the last 24 hours
@@ -245,17 +245,17 @@ The sweep also counts failed rotations and the denials of the last 24 hours
 
 ## Contracts
 
-| Table | Database | Content |
-| --- | --- | --- |
-| `vault_secret` | Regional | One encrypted secret: handle, key version, `AES-GCM-256`, nonce, ciphertext, `created_at`, `rotated_at`, `revoked_at` |
-| `credential_ref` | Regional | Provider, name, handle, host pattern, `inject_as`. The policy snapshot reads it |
-| `credential_revocation_operation` | Regional | The receipt of a revocation: `committed` or `policy_activated`, with counts |
-| `credential_access_denial` | Regional | A refused read: purpose, reason code, handle, time |
-| `external_vault_import` | Regional | The receipt of an import from an external source: `active` or `revoked` |
-| `vault_item` | Regional | One Purin Vault item: kind, label, origins, username, contact, handle, generation, revision |
-| `vault_store` | Regional | The connected 1Password vault and the handle of its token |
-| `vault_item_event` | Regional | The history: `item_added`, `item_edited`, `sign_in_replaced`, `item_removed`, `item_moved`, `store_connected`, `store_disconnected` |
-| `vault_root_rotation_job` | Global | One root rotation job: versions, state, cursor, counts, failure code |
+| Table                             | Database | Content                                                                                                                             |
+| --------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `vault_secret`                    | Regional | One encrypted secret: handle, key version, `AES-GCM-256`, nonce, ciphertext, `created_at`, `rotated_at`, `revoked_at`               |
+| `credential_ref`                  | Regional | Provider, name, handle, host pattern, `inject_as`. The policy snapshot reads it                                                     |
+| `credential_revocation_operation` | Regional | The receipt of a revocation: `committed` or `policy_activated`, with counts                                                         |
+| `credential_access_denial`        | Regional | A refused read: purpose, reason code, handle, time                                                                                  |
+| `external_vault_import`           | Regional | The receipt of an import from an external source: `active` or `revoked`                                                             |
+| `vault_item`                      | Regional | One Purin Vault item: kind, label, origins, username, contact, handle, generation, revision                                         |
+| `vault_store`                     | Regional | The connected 1Password vault and the handle of its token                                                                           |
+| `vault_item_event`                | Regional | The history: `item_added`, `item_edited`, `sign_in_replaced`, `item_removed`, `item_moved`, `store_connected`, `store_disconnected` |
+| `vault_root_rotation_job`         | Global   | One root rotation job: versions, state, cursor, counts, failure code                                                                |
 
 The Vault has no table in Actor SQLite. The baselines are
 `services/platform/migrations-regional/0001_current_schema.sql` and
@@ -264,36 +264,36 @@ The Vault has no table in Actor SQLite. The baselines are
 Routes under `/v1/control/organisations/:id` (`control/routes/vault.ts`,
 `control/routes/integrations/credentials.ts`):
 
-| Route | Role | Purpose |
-| --- | --- | --- |
-| `GET /vault/items` | Viewer | The items of both stores and the store view |
-| `POST /vault/items` | Admin | Add a login or a contact profile |
-| `POST /vault/items/:item/commands` | Admin | `edit_login`, `replace_sign_in`, `edit_contact`, `remove` |
-| `GET /vault/store` | Viewer | Where the items are, with no 1Password call |
-| `POST /vault/store` | Admin | `connect_onepassword`, `disconnect_onepassword`, `move_items` |
-| `GET /vault/events` | Viewer | The newest 50 events, for one item with `?itemId=` |
-| `GET /credentials` | Admin | The credential inventory (`pantry.credential-inventory.v1`) |
-| `POST /accounts/:account/credential-rotations` | Admin | Rotate with a replacement secret |
-| `POST /accounts/:account/revoke-credential` | Admin | Revoke the credential of an account |
+| Route                                          | Role   | Purpose                                                       |
+| ---------------------------------------------- | ------ | ------------------------------------------------------------- |
+| `GET /vault/items`                             | Viewer | The items of both stores and the store view                   |
+| `POST /vault/items`                            | Admin  | Add a login or a contact profile                              |
+| `POST /vault/items/:item/commands`             | Admin  | `edit_login`, `replace_sign_in`, `edit_contact`, `remove`     |
+| `GET /vault/store`                             | Viewer | Where the items are, with no 1Password call                   |
+| `POST /vault/store`                            | Admin  | `connect_onepassword`, `disconnect_onepassword`, `move_items` |
+| `GET /vault/events`                            | Viewer | The newest 50 events, for one item with `?itemId=`            |
+| `GET /credentials`                             | Admin  | The credential inventory (`pantry.credential-inventory.v1`)   |
+| `POST /accounts/:account/credential-rotations` | Admin  | Rotate with a replacement secret                              |
+| `POST /accounts/:account/revoke-credential`    | Admin  | Revoke the credential of an account                           |
 
 The `/vault` routes refuse a request with these codes:
 
-| Status | Codes |
-| --- | --- |
-| 404 | `vault_item_not_found` |
-| 409 | `vault_item_revision_conflict`, `vault_item_limit_reached`, `vault_store_not_connected`, `vault_store_auth_failed` |
-| 422 | `vault_item_invalid`, `vault_store_invalid`, `vault_store_vault_unknown` |
-| 429 | `vault_store_rate_limited` |
-| 503 | `vault_item_store_failed`, `vault_store_unavailable`, `vault_unavailable` |
+| Status | Codes                                                                                                              |
+| ------ | ------------------------------------------------------------------------------------------------------------------ |
+| 404    | `vault_item_not_found`                                                                                             |
+| 409    | `vault_item_revision_conflict`, `vault_item_limit_reached`, `vault_store_not_connected`, `vault_store_auth_failed` |
+| 422    | `vault_item_invalid`, `vault_store_invalid`, `vault_store_vault_unknown`                                           |
+| 429    | `vault_store_rate_limited`                                                                                         |
+| 503    | `vault_item_store_failed`, `vault_store_unavailable`, `vault_unavailable`                                          |
 
 Operator routes (`control/routes/operators.ts`, `gateway/admin/actor-registry.ts`):
 
-| Route | Authority | Purpose |
-| --- | --- | --- |
-| `POST /v1/control/operator/vault/root-rotations` | `support_admin` | Start a job: `{"sourceVersion":"v1"}` |
-| `GET /v1/control/operator/vault/root-rotations/:id` | `support_admin` | Read a job |
-| `POST …/root-rotations/:id/step`, `/pause`, `/resume` | `support_admin` | Run a step with `limit`, pause or resume |
-| `GET /v1/admin/vault-root-closure` | Bearer `ORGANISATION_ADMIN_TOKEN` | The retained-root check |
+| Route                                                 | Authority                         | Purpose                                  |
+| ----------------------------------------------------- | --------------------------------- | ---------------------------------------- |
+| `POST /v1/control/operator/vault/root-rotations`      | `support_admin`                   | Start a job: `{"sourceVersion":"v1"}`    |
+| `GET /v1/control/operator/vault/root-rotations/:id`   | `support_admin`                   | Read a job                               |
+| `POST …/root-rotations/:id/step`, `/pause`, `/resume` | `support_admin`                   | Run a step with `limit`, pause or resume |
+| `GET /v1/admin/vault-root-closure`                    | Bearer `ORGANISATION_ADMIN_TOKEN` | The retained-root check                  |
 
 - `foundation/authority/credential-vault/` is in the module `foundation/authority`
   (`scripts/layers.json`). Its files: `service.ts` (store, read, revoke), `crypto.ts`,
@@ -319,32 +319,32 @@ Operator routes (`control/routes/operators.ts`, `gateway/admin/actor-registry.ts
 
 ## Rules and limits
 
-| Action | Viewer, operator | Admin, owner | Agent |
-| --- | --- | --- | --- |
-| See the items, the store and the history | Yes | Yes | No |
-| See a saved password or the 1Password token | No | No | No |
-| Add, edit or remove an item; replace a sign-in | No | Yes | No |
-| Connect or disconnect 1Password; move items | No | Yes | No |
-| See the API keys tab and the credential inventory | No | Yes | No |
-| Rotate or revoke a provider credential | No | Yes | No |
+| Action                                            | Viewer, operator | Admin, owner | Agent |
+| ------------------------------------------------- | ---------------- | ------------ | ----- |
+| See the items, the store and the history          | Yes              | Yes          | No    |
+| See a saved password or the 1Password token       | No               | No           | No    |
+| Add, edit or remove an item; replace a sign-in    | No               | Yes          | No    |
+| Connect or disconnect 1Password; move items       | No               | Yes          | No    |
+| See the API keys tab and the credential inventory | No               | Yes          | No    |
+| Rotate or revoke a provider credential            | No               | Yes          | No    |
 
 A refused role on an Organisation route gets 404. A root rotation needs the
 `support_admin` role and gets 403 (`support_admin_role_required`) without it.
 
-| Limit | Value | Constant |
-| --- | --- | --- |
-| Items in Purin Vault for one Organisation | 200 | `VAULT_ITEM_LIMIT` |
-| Websites of a login | 1 to 5. A 1Password view shows 20 at most | `VAULT_ORIGIN_LIMIT` |
-| Label, username, password | 80, 254 and 1,024 characters | In `vault.ts` |
-| 1Password token | 8,192 characters | In `vault.ts` |
-| Request body of a Vault route | 16,384 bytes | `VAULT_ITEM_BODY_LIMIT` |
-| Items in one move request | 10 | `MOVE_BATCH` |
-| 1Password list in memory | 30 s | `LIST_LIFETIME_MS` |
-| Signed-in 1Password client in memory | 10 minutes | `CLIENT_LIFETIME_MS` |
-| Model key | 20 to 4,096 characters | `MODEL_API_KEY_MIN_LENGTH`, `MODEL_API_KEY_MAX_LENGTH` |
-| Rows in one rotation step | 1 to 100 | `MAX_ROTATION_BATCH_LIMIT` |
-| Retained-root check | 1,000 rows and 8 MiB in all databases | `MAX_RETAINED_VAULT_ROWS`, `MAX_RETAINED_VAULT_ENCODED_BYTES` |
-| 1Password Worker script | One Wasm module, 6 MiB compressed | `MAXIMUM_COMPRESSED_BYTES` |
+| Limit                                     | Value                                     | Constant                                                      |
+| ----------------------------------------- | ----------------------------------------- | ------------------------------------------------------------- |
+| Items in Purin Vault for one Organisation | 200                                       | `VAULT_ITEM_LIMIT`                                            |
+| Websites of a login                       | 1 to 5. A 1Password view shows 20 at most | `VAULT_ORIGIN_LIMIT`                                          |
+| Label, username, password                 | 80, 254 and 1,024 characters              | In `vault.ts`                                                 |
+| 1Password token                           | 8,192 characters                          | In `vault.ts`                                                 |
+| Request body of a Vault route             | 16,384 bytes                              | `VAULT_ITEM_BODY_LIMIT`                                       |
+| Items in one move request                 | 10                                        | `MOVE_BATCH`                                                  |
+| 1Password list in memory                  | 30 s                                      | `LIST_LIFETIME_MS`                                            |
+| Signed-in 1Password client in memory      | 10 minutes                                | `CLIENT_LIFETIME_MS`                                          |
+| Model key                                 | 20 to 4,096 characters                    | `MODEL_API_KEY_MIN_LENGTH`, `MODEL_API_KEY_MAX_LENGTH`        |
+| Rows in one rotation step                 | 1 to 100                                  | `MAX_ROTATION_BATCH_LIMIT`                                    |
+| Retained-root check                       | 1,000 rows and 8 MiB in all databases     | `MAX_RETAINED_VAULT_ROWS`, `MAX_RETAINED_VAULT_ENCODED_BYTES` |
+| 1Password Worker script                   | One Wasm module, 6 MiB compressed         | `MAXIMUM_COMPRESSED_BYTES`                                    |
 
 - **Retention.** A revoked `vault_secret` row stays, with its ciphertext. No scheduled
   work deletes `vault_secret` rows, history rows or receipts.
@@ -412,8 +412,8 @@ A refused role on an Organisation route gets 404. A root rotation needs the
 
 ## Sources
 
-- [Plan 12](../../plan-12-policy-governed-harness-secrets-vault.md) and
-  [Plan 79](../../plan-79-agent-vault.md). Where a plan differs from the code, this
+- [Plan 12](../../history/plan-12-policy-governed-harness-secrets-vault.md) and
+  [Plan 79](../../history/plan-79-agent-vault.md). Where a plan differs from the code, this
   spec follows the code.
 - In the archive:
   [Plan 13](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-13-cloudflare-cutover.md),

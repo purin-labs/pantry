@@ -203,7 +203,7 @@ provider deliveries.
 A Case may have several independent sessions. Each session has exactly one
 immutable parent Case and never changes a sibling or shared Case state
 directly. Every Case has one `case_project` row; work with no named Project
-is filed in the default Project ([Refactor 9](../refactor-9.md)).
+is filed in the default Project ([Refactor 9](../history/refactor-9.md)).
 
 ### Commerce projections
 

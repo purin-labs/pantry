@@ -406,7 +406,7 @@ retention: an archive deletes nothing, and no route deletes a board.
 
 ## Sources
 
-- [Plan 40B](../../../plan-40B-collaborative-menu-editor.md). Where it differs from the
+- [Plan 40B](../../../history/plan-40B-collaborative-menu-editor.md). Where it differs from the
   code, this spec follows the code. Its evidence in the archive:
   [Phase 1](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-40b-phase-1.md),
   [Phase 2](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-40b-phase-2.md),

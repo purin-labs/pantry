@@ -12,12 +12,12 @@ and schedules open Cases with no person.
 
 ### The ownership chain
 
-| Owner | Owns |
-| --- | --- |
-| Connector Actor (`ConnectorDO`) | The provider event identity, the Case work queue, delivery, retries and provider receipts |
-| Case Actor (`CaseDO`) | The Case purpose, the shared journal, the revision, bindings, assignments, accepted proposals, the goal and the output outbox |
-| Session Actor (`SessionDO`) | One agent in one Case: its private history, budget, checkpoint and turn |
-| Regional D1 | Projects, the Case to Project association, Portal conversations, forks and side Case proposals |
+| Owner                           | Owns                                                                                                                          |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Connector Actor (`ConnectorDO`) | The provider event identity, the Case work queue, delivery, retries and provider receipts                                     |
+| Case Actor (`CaseDO`)           | The Case purpose, the shared journal, the revision, bindings, assignments, accepted proposals, the goal and the output outbox |
+| Session Actor (`SessionDO`)     | One agent in one Case: its private history, budget, checkpoint and turn                                                       |
+| Regional D1                     | Projects, the Case to Project association, Portal conversations, forks and side Case proposals                                |
 
 - One Session belongs to one Case and never changes its Case. Only the Case appends
   shared history and addresses output.
@@ -86,11 +86,11 @@ signed Slack event -> Slack ingress Worker or Platform Worker: verify the signat
   rejected proposal again. The same proposal id with other content fails
   (`case_proposal_conflict`).
 
-| `SessionProposalDisposition` | Meaning |
-| --- | --- |
-| `accepted` | The Case appended the entries, made a new revision and addressed the outputs |
-| `rebase_required` | A `shared_change` named a revision that is not the current one |
-| `rejected` | `assignment_missing`, `assignment_mismatch`, `session_mismatch`, `empty_proposal`, `invalid_entry` or `case_not_open` |
+| `SessionProposalDisposition` | Meaning                                                                                                               |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `accepted`                   | The Case appended the entries, made a new revision and addressed the outputs                                          |
+| `rebase_required`            | A `shared_change` named a revision that is not the current one                                                        |
+| `rejected`                   | `assignment_missing`, `assignment_mismatch`, `session_mismatch`, `empty_proposal`, `invalid_entry` or `case_not_open` |
 
 A commerce proposal that a person must review moves the Case from `open` to `waiting`
 with an `approval` wait. The action nonce is the approval request identity. While the
@@ -119,13 +119,13 @@ then reports its usage (`actors/session-goal-usage.ts`).
 - `ConnectorDO.deliver` sends a `pending` output. The delivery receipt goes to
   `CaseDO.acceptDeliveryReceipt`, and it settles only the output that it names.
 
-| Output state | Meaning |
-| --- | --- |
-| `pending` | The answer waits for its delivery |
-| `held` | The exit check stopped the answer, and a person decides (FND-07) |
-| `settled` | The conversation received the answer |
-| `dropped` | A person denied it, nobody decided in time, or nothing delivered it in one day |
-| `rejected` | The provider refused the delivery permanently |
+| Output state | Meaning                                                                        |
+| ------------ | ------------------------------------------------------------------------------ |
+| `pending`    | The answer waits for its delivery                                              |
+| `held`       | The exit check stopped the answer, and a person decides (FND-07)               |
+| `settled`    | The conversation received the answer                                           |
+| `dropped`    | A person denied it, nobody decided in time, or nothing delivered it in one day |
+| `rejected`   | The provider refused the delivery permanently                                  |
 
 - A Connector delivery is `sending` (under a lease), `retryable`, `delivered` or
   `rejected`. For a streamed Slack answer, each part waits until the information-flow
@@ -253,10 +253,10 @@ Stripe or Shopify webhook, or OrganisationDO.applyCommerceDelivery
   -> assignment and proposal -> Case outbox -> Slack channel
 ```
 
-| Source | Event types |
-| --- | --- |
-| `stripe` | `charge.failed`, `invoice.payment_failed`, `refund.failed`, `customer.subscription.deleted` |
-| `shopify` | `orders/create`, `inventory_levels/update` |
+| Source     | Event types                                                                                                                                                                        |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `stripe`   | `charge.failed`, `invoice.payment_failed`, `refund.failed`, `customer.subscription.deleted`                                                                                        |
+| `shopify`  | `orders/create`, `inventory_levels/update`                                                                                                                                         |
 | `commerce` | `payment_failed`, `inventory_shortage`, `inventory_low_stock`, `order_unshipped`, `tracking_stalled`, `delivery_exception`, `cancellation_refund_proposed`, `entity_plane_changed` |
 
 - A `cue_subscription` row is one rule: a source and an event type, a Slack scope, a
@@ -337,19 +337,19 @@ Organisation role admin. Each change also checks the Project or chat role, with 
 exceptions: `POST /cases/commands` checks only the Organisation role, and
 `create_project` needs only an active member.
 
-| Route | Purpose |
-| --- | --- |
-| `GET`, `POST /projects` | The catalogue; `create_project`, `edit_project`, `delete_project`, `set_default_project` |
-| `GET /projects/references`, `GET /projects/:projectId/cases` | Search for a reference; the Cases of one Project (at most 200) |
-| `GET`, `POST /projects/:projectId/access` | Members; `share_project`, `set_project_member`, `remove_project_member` |
-| `GET`, `POST /cases/:caseId/project` | Read the association; `move_case` |
-| `POST /cases/commands` | Open a Case from one instruction |
-| `GET`, `POST /chat/projects` | The personal sidebar; `set_project_placement`, `move_chat` |
-| `POST /chat/projects/chats` | Start a new chat in a Project |
-| `PATCH /chat/conversations/:id` | The actions `fork`, `delete`, `rate_response`, `rename`, `archive`, `restore`, `pin` and `unpin` |
-| `GET`, `POST /chat/conversations/:id/goal` | Read the goal of the chat's Case; a goal command |
-| `GET`, `POST /chat/conversations/:id/access` | `share_conversation`, `move_shared_conversation` |
-| `POST /chat/conversations/:id/side-cases/:proposalId/start`, `…/dismiss` | Start or dismiss a side Case |
+| Route                                                                    | Purpose                                                                                          |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `GET`, `POST /projects`                                                  | The catalogue; `create_project`, `edit_project`, `delete_project`, `set_default_project`         |
+| `GET /projects/references`, `GET /projects/:projectId/cases`             | Search for a reference; the Cases of one Project (at most 200)                                   |
+| `GET`, `POST /projects/:projectId/access`                                | Members; `share_project`, `set_project_member`, `remove_project_member`                          |
+| `GET`, `POST /cases/:caseId/project`                                     | Read the association; `move_case`                                                                |
+| `POST /cases/commands`                                                   | Open a Case from one instruction                                                                 |
+| `GET`, `POST /chat/projects`                                             | The personal sidebar; `set_project_placement`, `move_chat`                                       |
+| `POST /chat/projects/chats`                                              | Start a new chat in a Project                                                                    |
+| `PATCH /chat/conversations/:id`                                          | The actions `fork`, `delete`, `rate_response`, `rename`, `archive`, `restore`, `pin` and `unpin` |
+| `GET`, `POST /chat/conversations/:id/goal`                               | Read the goal of the chat's Case; a goal command                                                 |
+| `GET`, `POST /chat/conversations/:id/access`                             | `share_conversation`, `move_shared_conversation`                                                 |
+| `POST /chat/conversations/:id/side-cases/:proposalId/start`, `…/dismiss` | Start or dismiss a side Case                                                                     |
 
 The main code: `services/platform/src/` with `actors/case/`, `actors/connector/`,
 `actors/case-direct-processing.ts`, `projects/`, `chat/store.ts`, `chat/forks.ts`,
@@ -358,34 +358,34 @@ The main code: `services/platform/src/` with `actors/case/`, `actors/connector/`
 
 ## Rules and limits
 
-| Action | Who can do it |
-| --- | --- |
-| Use the Portal chat, the Project routes and the Case command route | Organisation admin and owner; a canvas chat needs operator |
-| Edit the content of a Project | Its personal owner, or an owner or editor of a shared Project |
-| Move the Case of a chat | The owner of a private chat, while it is idle. A shared chat moves only through the share command (`case_move_requires_audience_review`) |
-| Move a Case that a source admitted | An Organisation admin, into a shared Project that they own or edit, or to the default |
-| Replace the default Project | An Organisation owner or admin, with a shared Project that they own |
-| Fork a chat | A member who can read the full inherited history |
-| Start or dismiss a Portal side Case | A person who can send messages in the parent; a viewer cannot |
-| Start a Slack side Case | A linked member with the role owner, admin or operator; in a DM only its person |
-| Propose a side Case | The agent only. No agent starts one or returns its result to the parent |
+| Action                                                             | Who can do it                                                                                                                            |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Use the Portal chat, the Project routes and the Case command route | Organisation admin and owner; a canvas chat needs operator                                                                               |
+| Edit the content of a Project                                      | Its personal owner, or an owner or editor of a shared Project                                                                            |
+| Move the Case of a chat                                            | The owner of a private chat, while it is idle. A shared chat moves only through the share command (`case_move_requires_audience_review`) |
+| Move a Case that a source admitted                                 | An Organisation admin, into a shared Project that they own or edit, or to the default                                                    |
+| Replace the default Project                                        | An Organisation owner or admin, with a shared Project that they own                                                                      |
+| Fork a chat                                                        | A member who can read the full inherited history                                                                                         |
+| Start or dismiss a Portal side Case                                | A person who can send messages in the parent; a viewer cannot                                                                            |
+| Start a Slack side Case                                            | A linked member with the role owner, admin or operator; in a DM only its person                                                          |
+| Propose a side Case                                                | The agent only. No agent starts one or returns its result to the parent                                                                  |
 
-| Limit | Value | Constant |
-| --- | --- | --- |
-| Assignment with no movement | 30 minutes | `ASSIGNMENT_ABANDON_AFTER_MS` |
-| Pending output with no delivery | 24 hours | `UNDELIVERED_OUTPUT_TTL_MS` |
-| Connector delivery lease, retry | 30 s, 5 s | `DELIVERY_LEASE_MS`, `DELIVERY_RETRY_MS` |
-| Case alarm retry of stored work | 15 s | `CASE_RECOVERY_INTERVAL_MS` |
-| Ledger read for an approval wait | Each minute for 10 minutes, then each 15 minutes; 10 approvals in one alarm | `APPROVAL_READ_FIRST_MS`, `APPROVAL_READ_FIRST_WINDOW_MS`, `APPROVAL_READ_LATER_MS`, `APPROVAL_READ_PAGE` |
-| Cases that one Connector runs at one time | 4 | `CASE_WORK_CONCURRENCY` |
-| Case work lease, attempts, notice claims | 120 s, 5, 3 | `CASE_WORK_LEASE_MS`, `CASE_WORK_MAX_ATTEMPTS`, `CASE_WORK_NOTICE_ATTEMPTS` |
-| Slack follow-ups that wait for one Case, latest time | 3, 10,080 minutes | `MAX_PENDING_FOLLOW_UPS`, `MAX_FOLLOW_UP_MINUTES` |
-| Chat turn lease, queued messages | 15 minutes, 8 | Literals in `chat/application.ts` and `chat/turn/admission.ts` |
-| Stored conversation | 960,000 bytes; 1,000,000 bytes while the work is `failed` | `CONVERSATION_PROJECTION_BYTES`, `CONVERSATION_STORAGE_BYTES` |
-| Wait for a permission in a chat | 24 hours | `PERMISSION_WAIT_MS` |
-| Fork history with its conversation | 1,800,000 bytes | A literal in `chat/forks.ts` |
-| Side Case: open proposals, lifetime, start lease | 3, 7 days, 10 minutes | `SIDE_CASE_OPEN_LIMIT`, `SIDE_CASE_LIFETIME_MS`, `SIDE_CASE_START_LEASE_MS` |
-| Cue claim lease, abandoned claim | 30 s, 15 minutes | `CUE_DELIVERY_LEASE_MS`, `CUE_CLAIM_ABANDONED_AFTER_MS` |
+| Limit                                                | Value                                                                       | Constant                                                                                                  |
+| ---------------------------------------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Assignment with no movement                          | 30 minutes                                                                  | `ASSIGNMENT_ABANDON_AFTER_MS`                                                                             |
+| Pending output with no delivery                      | 24 hours                                                                    | `UNDELIVERED_OUTPUT_TTL_MS`                                                                               |
+| Connector delivery lease, retry                      | 30 s, 5 s                                                                   | `DELIVERY_LEASE_MS`, `DELIVERY_RETRY_MS`                                                                  |
+| Case alarm retry of stored work                      | 15 s                                                                        | `CASE_RECOVERY_INTERVAL_MS`                                                                               |
+| Ledger read for an approval wait                     | Each minute for 10 minutes, then each 15 minutes; 10 approvals in one alarm | `APPROVAL_READ_FIRST_MS`, `APPROVAL_READ_FIRST_WINDOW_MS`, `APPROVAL_READ_LATER_MS`, `APPROVAL_READ_PAGE` |
+| Cases that one Connector runs at one time            | 4                                                                           | `CASE_WORK_CONCURRENCY`                                                                                   |
+| Case work lease, attempts, notice claims             | 120 s, 5, 3                                                                 | `CASE_WORK_LEASE_MS`, `CASE_WORK_MAX_ATTEMPTS`, `CASE_WORK_NOTICE_ATTEMPTS`                               |
+| Slack follow-ups that wait for one Case, latest time | 3, 10,080 minutes                                                           | `MAX_PENDING_FOLLOW_UPS`, `MAX_FOLLOW_UP_MINUTES`                                                         |
+| Chat turn lease, queued messages                     | 15 minutes, 8                                                               | Literals in `chat/application.ts` and `chat/turn/admission.ts`                                            |
+| Stored conversation                                  | 960,000 bytes; 1,000,000 bytes while the work is `failed`                   | `CONVERSATION_PROJECTION_BYTES`, `CONVERSATION_STORAGE_BYTES`                                             |
+| Wait for a permission in a chat                      | 24 hours                                                                    | `PERMISSION_WAIT_MS`                                                                                      |
+| Fork history with its conversation                   | 1,800,000 bytes                                                             | A literal in `chat/forks.ts`                                                                              |
+| Side Case: open proposals, lifetime, start lease     | 3, 7 days, 10 minutes                                                       | `SIDE_CASE_OPEN_LIMIT`, `SIDE_CASE_LIFETIME_MS`, `SIDE_CASE_START_LEASE_MS`                               |
+| Cue claim lease, abandoned claim                     | 30 s, 15 minutes                                                            | `CUE_DELIVERY_LEASE_MS`, `CUE_CLAIM_ABANDONED_AFTER_MS`                                                   |
 
 - **Information flow.** A side Case proposal stores the flow binding of its turn. Each
   turn of the side Case admits it as an observation (`organisation_record`
@@ -449,15 +449,15 @@ channel; side Cases for email, WhatsApp, canvas chats and scheduled turns.
 
 ## Sources
 
-- [Plan 15](../../plan-15.md), with its
+- [Plan 15](../../history/plan-15.md), with its
   [closure record](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-15-closure-2026-08-03.md).
-- [Plan 42H](../../plan-42H-thread-forking.md), with its
+- [Plan 42H](../../history/plan-42H-thread-forking.md), with its
   [acceptance record](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42H-thread-forking/README.md),
   [live Worker report](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42H-thread-forking/live-worker-acceptance-2026-10-03.md),
   [browser upload report](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42H-thread-forking/browser-upload-fork-codex-2026-10-28.md).
-- [Plan 74](../../plan-74-side-cases.md), with its
+- [Plan 74](../../history/plan-74-side-cases.md), with its
   [browser evidence](https://github.com/seams-tech/pantry-history/tree/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-74/browser/).
-- [Refactor 9](../../refactor-9.md), with its
+- [Refactor 9](../../history/refactor-9.md), with its
   [evidence report](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-9/README.md).
 - [Runtime architecture](../../architecture/runtime.md), sections "Case coordination
   and connector delivery" and "Cues and proactive work". Where a source differs from the

@@ -1,5 +1,5 @@
 // Plan 88 phase 1: Jev from Pantry. Journeys J1, J2 and J6 of
-// docs/plan-88-satyr-funded-jev.md. The fake TypeSafe only records the key and
+// docs/history/plan-88-satyr-funded-jev.md. The fake TypeSafe only records the key and
 // the purpose of each request and answers; product code chooses the key, writes
 // the switch records and refuses the requests that the journeys assert.
 import { env } from "cloudflare:workers";

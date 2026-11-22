@@ -408,10 +408,10 @@ in `registry.ts`. The capabilities are in
 
 ## Sources
 
-- [Plan 83](../../../plan-83-one-inbox.md). Where it differs from the code, this spec
+- [Plan 83](../../../history/plan-83-one-inbox.md). Where it differs from the code, this spec
   follows the code. Its evidence in the archive:
   [the evidence report](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-83/report.md).
-  Background: [Plan 89](../../../plan-89-outside-written-content.md) and
+  Background: [Plan 89](../../../history/plan-89-outside-written-content.md) and
   [FND-07](../../foundation/07-information-flow.md). Plans 29, 32 and 40D are in
   [the archive](https://github.com/seams-tech/pantry-history/tree/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs).
 - E2E journeys in `services/platform/tests/e2e/`: `inbox-whatsapp.test.ts`,

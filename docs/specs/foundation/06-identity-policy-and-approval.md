@@ -60,12 +60,12 @@ records each answer.
 
 ### Roles
 
-| Role | Rank | What it adds |
-| --- | ---: | --- |
-| `viewer` | 1 | Reads. The access check admits only `disclose` and `replay` |
-| `operator` | 2 | Starts work, and uses the daily pages of the shop (`roleMayOperate`) |
-| `admin` | 3 | Configuration (`roleMayConfigure`): members, invitations, Access, approvals |
-| `owner` | 4 | The rename and the delete of the Organisation. At least one owner stays |
+| Role       | Rank | What it adds                                                                |
+| ---------- | ---: | --------------------------------------------------------------------------- |
+| `viewer`   |    1 | Reads. The access check admits only `disclose` and `replay`                 |
+| `operator` |    2 | Starts work, and uses the daily pages of the shop (`roleMayOperate`)        |
+| `admin`    |    3 | Configuration (`roleMayConfigure`): members, invitations, Access, approvals |
+| `owner`    |    4 | The rename and the delete of the Organisation. At least one owner stays     |
 
 A route names its lowest role, and `authorizeOrganisationControl` compares the ranks of
 `CONTROL_ROLE_RANK`. Slack asks the same functions as the Portal. A person with no
@@ -79,16 +79,16 @@ person or automation take this action now? Each call reads the current records. 
 actions are `execute`, `disclose`, `restore` and `replay`. A control read asks for
 `disclose`. A mutation asks for `execute`, unless its route names another action.
 
-| Check | Rule | Refusal |
-| --- | --- | --- |
-| Organisation | The placement fence of the request is current | `authority_unavailable` |
-| Organisation | The status is `active` or `deleted`, and the lifecycle is not `purging` or `purged` | `instance_ineligible` |
-| Person | An active `service_role_grant`. An `authenticated_session` is the live session of that person | `membership_ineligible` |
-| Person | An `accepted_execution` is an accepted turn that acts for a person. It needs the active role and no live session | `membership_ineligible` |
-| Person | A `viewer` asks only for `disclose` or `replay` | `membership_ineligible` |
-| Person | A `disclosure_recipient` asks only for `disclose`. An `authenticated_provider_event` asks only for `execute` | `scope_forbidden` |
-| Workflow | An enabled `cue_subscription` or `schedule_binding` at the revision of the request | `membership_ineligible` |
-| Mailbox agent, WhatsApp support | The current revision of the binding, with an active integration account | `membership_ineligible` |
+| Check                           | Rule                                                                                                             | Refusal                 |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| Organisation                    | The placement fence of the request is current                                                                    | `authority_unavailable` |
+| Organisation                    | The status is `active` or `deleted`, and the lifecycle is not `purging` or `purged`                              | `instance_ineligible`   |
+| Person                          | An active `service_role_grant`. An `authenticated_session` is the live session of that person                    | `membership_ineligible` |
+| Person                          | An `accepted_execution` is an accepted turn that acts for a person. It needs the active role and no live session | `membership_ineligible` |
+| Person                          | A `viewer` asks only for `disclose` or `replay`                                                                  | `membership_ineligible` |
+| Person                          | A `disclosure_recipient` asks only for `disclose`. An `authenticated_provider_event` asks only for `execute`     | `scope_forbidden`       |
+| Workflow                        | An enabled `cue_subscription` or `schedule_binding` at the revision of the request                               | `membership_ineligible` |
+| Mailbox agent, WhatsApp support | The current revision of the binding, with an active integration account                                          | `membership_ineligible` |
 
 An archived Organisation (status `deleted`) stays eligible until its purge, so that its
 owner can read and restore it. A D1 fault answers `authority_unavailable`.
@@ -162,11 +162,11 @@ owner can read and restore it. A D1 fault answers `authority_unavailable`.
 The catalogue gives each capability one risk. The code has no other list of action
 classes.
 
-| Risk | Capabilities | Policy modes that the catalogue accepts |
-| --- | ---: | --- |
-| `read` | 21 | `enabled` or `disabled` |
-| `propose` | 9 | `enabled` or `disabled` |
-| `external_effect` | 41 | 16 accept `enabled` or `disabled`. 18 accept `approval_required` or `disabled`. 7 accept each mode |
+| Risk              | Capabilities | Policy modes that the catalogue accepts                                                            |
+| ----------------- | -----------: | -------------------------------------------------------------------------------------------------- |
+| `read`            |           21 | `enabled` or `disabled`                                                                            |
+| `propose`         |            9 | `enabled` or `disabled`                                                                            |
+| `external_effect` |           41 | 16 accept `enabled` or `disabled`. 18 accept `approval_required` or `disabled`. 7 accept each mode |
 
 The action ledger holds only commerce actions and custom connector writes. With the
 mode `enabled`, an `external_effect` capability such as `airtable.api.write` or
@@ -240,12 +240,12 @@ decision.
 
 ### The decisions that wait for a person
 
-| Kind | Store | Who decides | Life |
-| --- | --- | --- | --- |
-| `governed_action` | `action_ledger` in `OrganisationActor` SQLite | Owner or admin | 15 minutes, or less for a supplier payout |
-| `held_output` | `held_output_request` in regional D1 (FND-07) | A member who may see the content, by the reason of the hold | 7 days |
-| `permission_request` | `agent_permission_request` in regional D1 | Owner or admin | 7 days |
-| `email_review` | The Case. Its projections are `email_reply_proposal` and `email_operational_proposal_projection` (INB-01) | Owner or admin | 72 hours |
+| Kind                 | Store                                                                                                     | Who decides                                                 | Life                                      |
+| -------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ----------------------------------------- |
+| `governed_action`    | `action_ledger` in `OrganisationActor` SQLite                                                             | Owner or admin                                              | 15 minutes, or less for a supplier payout |
+| `held_output`        | `held_output_request` in regional D1 (FND-07)                                                             | A member who may see the content, by the reason of the hold | 7 days                                    |
+| `permission_request` | `agent_permission_request` in regional D1                                                                 | Owner or admin                                              | 7 days                                    |
+| `email_review`       | The Case. Its projections are `email_reply_proposal` and `email_operational_proposal_projection` (INB-01) | Owner or admin                                              | 72 hours                                  |
 
 - **Held output.** The decider must see the content and pass the access check for
   `execute`, so a viewer cannot decide. For the reason `private_source`, that member
@@ -295,35 +295,35 @@ decision.
 
 The control routes are under `/v1/control`. `…` is `/v1/control/organisations/:id`.
 
-| Route | Role | Purpose |
-| --- | --- | --- |
-| `GET /auth/google/start`, `GET /auth/google/callback` | None. Admin for `purpose=approval` | Sign-in and step-up sign-in |
-| `GET /session`, `POST /session/rotate`, `POST /logout` | A session | Read, rotate and end the session |
-| `GET`, `POST /organisations` | A session | The memberships of the person; make an Organisation |
-| `GET …/members` | Viewer | The members |
-| `PATCH`, `DELETE …/members/:userId` | Admin | Change a role, remove a member |
-| `GET`, `POST …/invitations` | Viewer, admin | List the open invitations, invite |
-| `POST …/invitations/:id/revoke` | Admin | Close an invitation |
-| `POST …/invitations/:id/accept` | A session, no role | Accept with the token |
-| `GET …/access-control`, `GET …/access-control/options`, `POST …/access-control/explain` | Viewer | The Access page and the reason of a decision |
-| `POST …/access-control/grants`, `…/grants/:id/revoke`, `…/capabilities/:id`, `…/defaults/apply` | Admin | Change grants and policy modes |
-| `GET`, `POST …/access-control/ai-budget` | Viewer, admin | Read or change the AI budget |
-| `GET …/access-control/permission-requests`, `GET …/access-control/permission-requests/:id` | Viewer | Permission requests and held outputs |
-| `POST …/access-control/permission-requests/:id/decision` | Admin | Allow or deny a permission request |
-| `GET …/decisions` | Viewer | The one read of the decisions |
-| `POST …/commerce/actions/:nonce/approval`, `/rejection`, `/execute` | Admin | Decide and run a commerce action |
-| `POST …/custom-connectors/:c/actions/:nonce/approval`, `/rejection` | Admin | Decide a custom connector write |
-| `GET`, `POST /v1/admin/person-roles` | The bearer `ORGANISATION_ADMIN_TOKEN` | Give or remove the `approve` role of a person |
+| Route                                                                                           | Role                                  | Purpose                                             |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------- |
+| `GET /auth/google/start`, `GET /auth/google/callback`                                           | None. Admin for `purpose=approval`    | Sign-in and step-up sign-in                         |
+| `GET /session`, `POST /session/rotate`, `POST /logout`                                          | A session                             | Read, rotate and end the session                    |
+| `GET`, `POST /organisations`                                                                    | A session                             | The memberships of the person; make an Organisation |
+| `GET …/members`                                                                                 | Viewer                                | The members                                         |
+| `PATCH`, `DELETE …/members/:userId`                                                             | Admin                                 | Change a role, remove a member                      |
+| `GET`, `POST …/invitations`                                                                     | Viewer, admin                         | List the open invitations, invite                   |
+| `POST …/invitations/:id/revoke`                                                                 | Admin                                 | Close an invitation                                 |
+| `POST …/invitations/:id/accept`                                                                 | A session, no role                    | Accept with the token                               |
+| `GET …/access-control`, `GET …/access-control/options`, `POST …/access-control/explain`         | Viewer                                | The Access page and the reason of a decision        |
+| `POST …/access-control/grants`, `…/grants/:id/revoke`, `…/capabilities/:id`, `…/defaults/apply` | Admin                                 | Change grants and policy modes                      |
+| `GET`, `POST …/access-control/ai-budget`                                                        | Viewer, admin                         | Read or change the AI budget                        |
+| `GET …/access-control/permission-requests`, `GET …/access-control/permission-requests/:id`      | Viewer                                | Permission requests and held outputs                |
+| `POST …/access-control/permission-requests/:id/decision`                                        | Admin                                 | Allow or deny a permission request                  |
+| `GET …/decisions`                                                                               | Viewer                                | The one read of the decisions                       |
+| `POST …/commerce/actions/:nonce/approval`, `/rejection`, `/execute`                             | Admin                                 | Decide and run a commerce action                    |
+| `POST …/custom-connectors/:c/actions/:nonce/approval`, `/rejection`                             | Admin                                 | Decide a custom connector write                     |
+| `GET`, `POST /v1/admin/person-roles`                                                            | The bearer `ORGANISATION_ADMIN_TOKEN` | Give or remove the `approve` role of a person       |
 
 The main files, under `services/platform/src/`:
 
-| Topic | Files |
-| --- | --- |
-| Sign-in, sessions | `control/oidc.ts`, `control/routes/sessions.ts`, `control/authorization.ts`, `data/control-plane.ts` |
-| Accounts | `organisation-access/access.ts`, `organisation-access/creation.ts`, `organisation-access/invitations.ts`, `control/routes/onboarding.ts` |
+| Topic                        | Files                                                                                                                                                                                                                                                                                                                                                                                    |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sign-in, sessions            | `control/oidc.ts`, `control/routes/sessions.ts`, `control/authorization.ts`, `data/control-plane.ts`                                                                                                                                                                                                                                                                                     |
+| Accounts                     | `organisation-access/access.ts`, `organisation-access/creation.ts`, `organisation-access/invitations.ts`, `control/routes/onboarding.ts`                                                                                                                                                                                                                                                 |
 | Capabilities, grants, policy | `authorization/capability-catalogue.ts`, `authorization/requestable-capabilities.ts`, `authorization/access-grants/compiler.ts`, `authorization/access-grants/turn-authority.ts`, `request-authority/index.ts`, `policy-snapshot.ts`, `actors/organisation/organisation-policy.ts`, `data/capability-policy.ts`, `access-control/capability-mutations.ts`, `data/workspace-ai-budget.ts` |
-| Ledger, approval | `actors/action-ledger.ts`, `approval-authentication.ts`, `control/routes/commerce/actions.ts`, `control/routes/custom-connectors/write-actions.ts`, `slack/commerce-approval.ts` |
-| Decisions | `control/pending-decisions.ts`, `control/decide-pending-decision.ts`, `control/pending-decision-parts.ts`, `control/routes/pending-decisions.ts`, `control/routes/agent-permission-requests.ts`, `control/routes/held-output-requests.ts`, `slack/decision-card.ts`, `slack/permission-request-deny.ts` |
+| Ledger, approval             | `actors/action-ledger.ts`, `approval-authentication.ts`, `control/routes/commerce/actions.ts`, `control/routes/custom-connectors/write-actions.ts`, `slack/commerce-approval.ts`                                                                                                                                                                                                         |
+| Decisions                    | `control/pending-decisions.ts`, `control/decide-pending-decision.ts`, `control/pending-decision-parts.ts`, `control/routes/pending-decisions.ts`, `control/routes/agent-permission-requests.ts`, `control/routes/held-output-requests.ts`, `slack/decision-card.ts`, `slack/permission-request-deny.ts`                                                                                  |
 
 The Portal files are `apps/portal/src/features/access/` (the Access page and the
 prompts), `features/integrations/workspace.tsx` (members and invitations),
@@ -331,47 +331,47 @@ prompts), `features/integrations/workspace.tsx` (members and invitations),
 
 `scripts/layers.json` gives the module of each file:
 
-| Module | Files |
-| --- | --- |
-| `foundation/tenancy` | `organisation-access/`, `data/control-plane.ts`, `data/workspace-ai-budget.ts` |
-| `foundation/authority` | `authorization/`, `access-control/`, `request-authority/`, `policy-snapshot.ts`, `data/capability-policy.ts`, `actors/action-ledger.ts`, `approval-authentication.ts` |
-| `foundation/control` | `control/oidc.ts`, `control/authorization.ts`, `control/pending-decisions.ts`, `control/decide-pending-decision.ts`, `control/routes/pending-decisions.ts` |
-| `foundation/agent` | `control/routes/sessions.ts`, `actors/organisation/organisation-policy.ts` |
-| `foundation/conversation` | `control/routes/agent-permission-requests.ts`, `control/routes/held-output-requests.ts` |
-| `areas/organisation` | `control/routes/onboarding.ts` |
-| `areas/commerce`, `areas/integrations` | `control/routes/commerce/actions.ts`, `control/routes/custom-connectors/write-actions.ts` |
-| `surfaces/slack` | `slack/commerce-approval.ts`, `slack/decision-card.ts`, `slack/permission-request-deny.ts` |
-| `workers/platform` | `control/pending-decision-parts.ts` |
+| Module                                 | Files                                                                                                                                                                 |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `foundation/tenancy`                   | `organisation-access/`, `data/control-plane.ts`, `data/workspace-ai-budget.ts`                                                                                        |
+| `foundation/authority`                 | `authorization/`, `access-control/`, `request-authority/`, `policy-snapshot.ts`, `data/capability-policy.ts`, `actors/action-ledger.ts`, `approval-authentication.ts` |
+| `foundation/control`                   | `control/oidc.ts`, `control/authorization.ts`, `control/pending-decisions.ts`, `control/decide-pending-decision.ts`, `control/routes/pending-decisions.ts`            |
+| `foundation/agent`                     | `control/routes/sessions.ts`, `actors/organisation/organisation-policy.ts`                                                                                            |
+| `foundation/conversation`              | `control/routes/agent-permission-requests.ts`, `control/routes/held-output-requests.ts`                                                                               |
+| `areas/organisation`                   | `control/routes/onboarding.ts`                                                                                                                                        |
+| `areas/commerce`, `areas/integrations` | `control/routes/commerce/actions.ts`, `control/routes/custom-connectors/write-actions.ts`                                                                             |
+| `surfaces/slack`                       | `slack/commerce-approval.ts`, `slack/decision-card.ts`, `slack/permission-request-deny.ts`                                                                            |
+| `workers/platform`                     | `control/pending-decision-parts.ts`                                                                                                                                   |
 
 ## Rules and limits
 
-| Action | Viewer | Operator | Admin | Owner | Agent |
-| --- | --- | --- | --- | --- | --- |
-| Read members, invitations, Access and the AI budget | Yes | Yes | Yes | Yes | No tool |
-| Pass the access check for `execute` | No | Yes | Yes | Yes | Under the authority of its turn |
-| Invite, revoke an invitation, change a role, remove a member | No | No | Yes | Yes | No |
-| Change a grant, a policy mode or the AI budget | No | No | Yes | Yes | Asks with `request_permission` |
-| Allow or deny a permission request | No | No | Yes | Yes | No |
-| Approve a governed action | No | No | With a step-up, or on a Slack card for six kinds | With a step-up, or on a Slack card for six kinds | No. It proposes |
-| Decide a held output | No | By the reason of the hold | By the reason of the hold | By the reason of the hold | No |
-| Reject a governed action | No | No | Yes | Yes | No |
-| Rename or delete the Organisation | No | No | No | Yes | No |
-| Make an Organisation | Each signed-in person with a verified Google email | | | | No |
+| Action                                                       | Viewer                                             | Operator                  | Admin                                            | Owner                                            | Agent                           |
+| ------------------------------------------------------------ | -------------------------------------------------- | ------------------------- | ------------------------------------------------ | ------------------------------------------------ | ------------------------------- |
+| Read members, invitations, Access and the AI budget          | Yes                                                | Yes                       | Yes                                              | Yes                                              | No tool                         |
+| Pass the access check for `execute`                          | No                                                 | Yes                       | Yes                                              | Yes                                              | Under the authority of its turn |
+| Invite, revoke an invitation, change a role, remove a member | No                                                 | No                        | Yes                                              | Yes                                              | No                              |
+| Change a grant, a policy mode or the AI budget               | No                                                 | No                        | Yes                                              | Yes                                              | Asks with `request_permission`  |
+| Allow or deny a permission request                           | No                                                 | No                        | Yes                                              | Yes                                              | No                              |
+| Approve a governed action                                    | No                                                 | No                        | With a step-up, or on a Slack card for six kinds | With a step-up, or on a Slack card for six kinds | No. It proposes                 |
+| Decide a held output                                         | No                                                 | By the reason of the hold | By the reason of the hold                        | By the reason of the hold                        | No                              |
+| Reject a governed action                                     | No                                                 | No                        | Yes                                              | Yes                                              | No                              |
+| Rename or delete the Organisation                            | No                                                 | No                        | No                                               | Yes                                              | No                              |
+| Make an Organisation                                         | Each signed-in person with a verified Google email |                           |                                                  |                                                  | No                              |
 
-| Limit | Value | Constant |
-| --- | --- | --- |
-| Session: from its last extension, from its sign-in, renewal step | 7 days, 30 days, 1 hour | `CONTROL_SESSION_TTL_MS`, `CONTROL_SESSION_MAX_AGE_MS`, `CONTROL_SESSION_RENEWAL_STEP_MS` |
-| OIDC state; clock difference of an ID token | 10 minutes; 60 s | `OIDC_STATE_TTL_MS`, `CLOCK_SKEW_SECONDS` |
-| Step-up sign-in and its challenge; Slack approval | 10 minutes; 60 s | `APPROVAL_STEP_UP_MAX_AGE_MS`, `SLACK_APPROVAL_WINDOW_MS` |
-| Action expiry | 15 minutes. A supplier payout: the earlier of 15 minutes and its execution deadline | No constant: each proposer writes `15 * 60_000`, and the payout proposer adds `Math.min` |
-| Execution lease | 5 minutes | `ACTION_EXECUTION_LEASE_DURATION_MS` |
-| Invitation | 7 days | `INVITATION_TTL_MS` |
-| Active Organisations of one owner; name length at creation; at a rename | 5; 1 to 120 characters; 2 to 80 characters | `ORGANISATION_OWNER_LIMIT`, `ORGANISATION_NAME_MAX`; no constant for the rename |
-| Answer that one read can use again | 5 s | `READ_ANSWER_MS` |
-| Permission request; held output | 7 days; 7 days | `AGENT_PERMISSION_REQUEST_LIFETIME_MS`, `HELD_OUTPUT_REQUEST_LIFETIME_MS` |
-| Mutation receipt | 24 hours | `MUTATION_RECEIPT_TTL_MS` |
-| AI budget, highest values | 1,000,000 tokens, 600 s, 200 calls | `WORKSPACE_AI_BUDGET_MAXIMUM` |
-| Entries that the one read looks at | 50 ledger entries, 100 email proposals | `ACTION_READ_LIMIT`, `EMAIL_REVIEW_READ_LIMIT` |
+| Limit                                                                   | Value                                                                               | Constant                                                                                  |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Session: from its last extension, from its sign-in, renewal step        | 7 days, 30 days, 1 hour                                                             | `CONTROL_SESSION_TTL_MS`, `CONTROL_SESSION_MAX_AGE_MS`, `CONTROL_SESSION_RENEWAL_STEP_MS` |
+| OIDC state; clock difference of an ID token                             | 10 minutes; 60 s                                                                    | `OIDC_STATE_TTL_MS`, `CLOCK_SKEW_SECONDS`                                                 |
+| Step-up sign-in and its challenge; Slack approval                       | 10 minutes; 60 s                                                                    | `APPROVAL_STEP_UP_MAX_AGE_MS`, `SLACK_APPROVAL_WINDOW_MS`                                 |
+| Action expiry                                                           | 15 minutes. A supplier payout: the earlier of 15 minutes and its execution deadline | No constant: each proposer writes `15 * 60_000`, and the payout proposer adds `Math.min`  |
+| Execution lease                                                         | 5 minutes                                                                           | `ACTION_EXECUTION_LEASE_DURATION_MS`                                                      |
+| Invitation                                                              | 7 days                                                                              | `INVITATION_TTL_MS`                                                                       |
+| Active Organisations of one owner; name length at creation; at a rename | 5; 1 to 120 characters; 2 to 80 characters                                          | `ORGANISATION_OWNER_LIMIT`, `ORGANISATION_NAME_MAX`; no constant for the rename           |
+| Answer that one read can use again                                      | 5 s                                                                                 | `READ_ANSWER_MS`                                                                          |
+| Permission request; held output                                         | 7 days; 7 days                                                                      | `AGENT_PERMISSION_REQUEST_LIFETIME_MS`, `HELD_OUTPUT_REQUEST_LIFETIME_MS`                 |
+| Mutation receipt                                                        | 24 hours                                                                            | `MUTATION_RECEIPT_TTL_MS`                                                                 |
+| AI budget, highest values                                               | 1,000,000 tokens, 600 s, 200 calls                                                  | `WORKSPACE_AI_BUDGET_MAXIMUM`                                                             |
+| Entries that the one read looks at                                      | 50 ledger entries, 100 email proposals                                              | `ACTION_READ_LIMIT`, `EMAIL_REVIEW_READ_LIMIT`                                            |
 
 - **Three legs.** An operation needs a principal that permits it, and a policy and
   grants that permit the capability. It also needs a state that permits this exact

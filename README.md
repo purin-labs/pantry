@@ -96,8 +96,8 @@ pantry/
 ```
 
 See [`docs/commerce-monorepo.md`](docs/commerce-monorepo.md) for ownership and
-extraction rules. [Plan 40](docs/plan-40-product-description-drafting.md) records accepted product
-drafting. [Plan 40B](docs/plan-40B-collaborative-menu-editor.md) owns
+extraction rules. [Plan 40](docs/history/plan-40-product-description-drafting.md) records accepted product
+drafting. [Plan 40B](docs/history/plan-40B-collaborative-menu-editor.md) owns
 the proposed collaborative menu editor: menu boards on the shop's screens and
 the QR order page.
 
@@ -223,7 +223,7 @@ fleet manifest. It then deploys the Code Mode sandbox Worker, the model exit
 Worker, the Platform Worker with its configured Cloudflare Containers, and the
 Slack ingress Worker, in that order. See
 [the sandbox release runbook](docs/runbooks/code-mode-sandbox-release.md) and
-[Plan 73](docs/plan-73-model-exit-worker.md).
+[Plan 73](docs/history/plan-73-model-exit-worker.md).
 
 ## Purin Vault
 
@@ -248,15 +248,15 @@ rotation, revocation, recovery, and compromise procedures.
   validate with `pnpm docs:check` and build with `pnpm docs:build`.
 - [Developer guide](AGENTS.md)
 - [Commerce service architecture and monorepo boundaries](docs/commerce-monorepo.md)
-- [Collaborative product-description drafting](docs/plan-40-product-description-drafting.md)
-- [Collaborative menu editor](docs/plan-40B-collaborative-menu-editor.md)
-- [Reusable multiplayer drafting module](docs/plan-40C-multiplayer-module.md)
-- [Commerce Kernel and provider integration](docs/plan-9-commerce-lifecycle-lab.md)
-- [Policy-governed harness secrets](docs/plan-12-policy-governed-harness-secrets-vault.md)
-- [Durable Actor runtime](docs/plan-14-actor-runtime-architecture.md)
-- [Connector, Case, and session architecture](docs/plan-15.md)
-- [Merchant console and commerce operations](docs/plan-16-merchant-console-commerce-operations.md)
-- [Café / patisserie commerce and storefront demos](docs/plan-22-commerce-capabilities-and-storefront-demos.md)
-- [Flavored export catalog](docs/plan-23-flavored-export-catalog.md)
+- [Collaborative product-description drafting](docs/history/plan-40-product-description-drafting.md)
+- [Collaborative menu editor](docs/history/plan-40B-collaborative-menu-editor.md)
+- [Reusable multiplayer drafting module](docs/history/plan-40C-multiplayer-module.md)
+- [Commerce Kernel and provider integration](docs/history/plan-9-commerce-lifecycle-lab.md)
+- [Policy-governed harness secrets](docs/history/plan-12-policy-governed-harness-secrets-vault.md)
+- [Durable Actor runtime](docs/history/plan-14-actor-runtime-architecture.md)
+- [Connector, Case, and session architecture](docs/history/plan-15.md)
+- [Merchant console and commerce operations](docs/history/plan-16-merchant-console-commerce-operations.md)
+- [Café / patisserie commerce and storefront demos](docs/history/plan-22-commerce-capabilities-and-storefront-demos.md)
+- [Flavored export catalog](docs/history/plan-23-flavored-export-catalog.md)
 - [Bakery production automation and robot-fleet access control](docs/plan-24-cafeos-bakery-automation.md)
-- [Organisation Codex subscription OAuth](docs/plan-28-organisation-codex-oauth.md)
+- [Organisation Codex subscription OAuth](docs/history/plan-28-organisation-codex-oauth.md)

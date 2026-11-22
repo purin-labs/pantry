@@ -4,7 +4,7 @@
  * the database of the effect that it records, and it is written in the same
  * batch as that effect. Its replay reads the same database. A receipt moves
  * and is restored with its Organisation's rows (organisation-row.ts holds the
- * rules of the regional copy). See docs/refactor-12.md.
+ * rules of the regional copy). See docs/history/refactor-12.md.
  */
 import { assertNever } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";

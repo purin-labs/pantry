@@ -1,6 +1,6 @@
 /**
  * The `organisation_placement` row (Refactor 12). It is in both baselines, and
- * this module holds every write of it. See docs/refactor-12.md.
+ * this module holds every write of it. See docs/history/refactor-12.md.
  *
  * The global row is the routing authority: a request finds its cell there. The
  * regional row is the execution fence: a write in the cell checks it in the

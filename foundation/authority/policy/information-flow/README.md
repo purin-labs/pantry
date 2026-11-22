@@ -1,8 +1,8 @@
 # Information-flow control
 
 This directory decides where an agent's work may go.
-[Plan 27C](../../../../docs/plan-27C-simple-information-flow.md) holds the
-rules, and [Plan 27](../../../../docs/plan-27-ifc.md) holds the history.
+[Plan 27C](../../../../docs/history/plan-27C-simple-information-flow.md) holds the
+rules, and [Plan 27](../../../../docs/history/plan-27-ifc.md) holds the history.
 Callers supply live authority, and the kernel decides. Grants decide what a tool
 may read. Labels decide where the result may go. Keep both at their boundaries.
 

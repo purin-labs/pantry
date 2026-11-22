@@ -90,7 +90,7 @@ including exact-binding certification. Resume these tasks only when requested:
   recovery, refunds, receipt agreement, and credential lifecycle. Record costs
   and certification for the exact production binding.
 
-Reference: [Plan 33D](plan-33D-square-release-acceptance.md).
+Reference: [Plan 33D](history/plan-33D-square-release-acceptance.md).
 Sandbox completion does not imply production readiness.
 
 ## Deferred product proposals

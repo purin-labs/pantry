@@ -234,33 +234,33 @@ to the spec of its area.
 - **Events.** None. The room writes the trace `collaboration.socket_refused` for a
   frame that it refuses.
 
-| Room kind | Package | Schema | Protocol | Owner |
-| --- | --- | --- | --- | --- |
-| `product_description` | `@purin-labs/product-description-crdt` | `product_description_crdt.v1` | `product_description_sync.v2` | This spec |
-| `email_draft` | `@purin-labs/email-draft-crdt` | `email_draft_crdt.v1` | `email_draft_sync.v2` | This spec |
-| `mail_reply_draft` | `@purin-labs/mail-reply-crdt` | `mail_reply_crdt.v1` | `mail_reply_sync.v1` | INB-01 |
-| `menu_draft` | `@purin-labs/menu-draft-crdt` | `menu_draft_crdt.v2` | `menu_draft_sync.v3` | CAFE-01 |
-| `menu_board` | `@purin-labs/menu-board-crdt` | `menu_board_crdt.v1` | `menu_board_sync.v1` | CAFE-01 |
-| `production_plan` | `@purin-labs/production-plan-crdt` | `production_plan_crdt.v1` | `production_plan_sync.v1` | Plan 40D, in the archive |
-| `costs_sheet` | `@purin-labs/costs-sheet-crdt` | `costs_sheet_crdt.v1` | `costs_sheet_sync.v1` | KIT-04 |
-| `workflow_canvas` | `@purin-labs/workflow-canvas-crdt` | `workflow_canvas_crdt.v1` | `workflow_canvas_sync.v2` | KIT-01 |
-| `workflow_draft` | `@purin-labs/workflow-canvas-crdt` | `workflow_canvas_crdt.v2` | `workflow_draft_sync.v1` | KIT-03 |
+| Room kind             | Package                                | Schema                        | Protocol                      | Owner                    |
+| --------------------- | -------------------------------------- | ----------------------------- | ----------------------------- | ------------------------ |
+| `product_description` | `@purin-labs/product-description-crdt` | `product_description_crdt.v1` | `product_description_sync.v2` | This spec                |
+| `email_draft`         | `@purin-labs/email-draft-crdt`         | `email_draft_crdt.v1`         | `email_draft_sync.v2`         | This spec                |
+| `mail_reply_draft`    | `@purin-labs/mail-reply-crdt`          | `mail_reply_crdt.v1`          | `mail_reply_sync.v1`          | INB-01                   |
+| `menu_draft`          | `@purin-labs/menu-draft-crdt`          | `menu_draft_crdt.v2`          | `menu_draft_sync.v3`          | CAFE-01                  |
+| `menu_board`          | `@purin-labs/menu-board-crdt`          | `menu_board_crdt.v1`          | `menu_board_sync.v1`          | CAFE-01                  |
+| `production_plan`     | `@purin-labs/production-plan-crdt`     | `production_plan_crdt.v1`     | `production_plan_sync.v1`     | Plan 40D, in the archive |
+| `costs_sheet`         | `@purin-labs/costs-sheet-crdt`         | `costs_sheet_crdt.v1`         | `costs_sheet_sync.v1`         | KIT-04                   |
+| `workflow_canvas`     | `@purin-labs/workflow-canvas-crdt`     | `workflow_canvas_crdt.v1`     | `workflow_canvas_sync.v2`     | KIT-01                   |
+| `workflow_draft`      | `@purin-labs/workflow-canvas-crdt`     | `workflow_canvas_crdt.v2`     | `workflow_draft_sync.v1`      | KIT-03                   |
 
 The sync protocol has nine message kinds by default. A frame is JSON with
 `protocolVersion`, `kind` and the exact fields of its kind. Bytes are base64url. Another
 field or another version fails with `invalid_message`.
 
-| From | Kind | Fields |
-| --- | --- | --- |
-| Client | `sync_request` | `stateVector` |
-| Client | `submit_update` | `updateId` (1 to 64 of `A-Z a-z 0-9 _ -`), `update` |
-| Client | `presence_update` | `state`, `selection` |
-| Client | `pointer_update` | `position` (`x`, `y`) or null |
-| Server | `sync_response` | `serverStateVector`, `missingUpdate`, the room fields, `access` (`read`, `edit`), `sessionId` |
-| Server | `update_accepted` | `updateId` |
-| Server | `update_broadcast` | `update` |
-| Server | `presence_changed` | `participants`, `agents` |
-| Server | `failure` | `code` |
+| From   | Kind               | Fields                                                                                        |
+| ------ | ------------------ | --------------------------------------------------------------------------------------------- |
+| Client | `sync_request`     | `stateVector`                                                                                 |
+| Client | `submit_update`    | `updateId` (1 to 64 of `A-Z a-z 0-9 _ -`), `update`                                           |
+| Client | `presence_update`  | `state`, `selection`                                                                          |
+| Client | `pointer_update`   | `position` (`x`, `y`) or null                                                                 |
+| Server | `sync_response`    | `serverStateVector`, `missingUpdate`, the room fields, `access` (`read`, `edit`), `sessionId` |
+| Server | `update_accepted`  | `updateId`                                                                                    |
+| Server | `update_broadcast` | `update`                                                                                      |
+| Server | `presence_changed` | `participants`, `agents`                                                                      |
+| Server | `failure`          | `code`                                                                                        |
 
 - The room fields of a `sync_response` are `documentRevision` by default. The product
   description room sends `initializedFromProductRevision` and `currentProductRevision`.
@@ -278,15 +278,15 @@ field or another version fails with `invalid_message`.
 The routes are under `/v1/control/organisations/:id`. A socket must come from the exact
 Portal origin (`PANTRY_PUBLIC_ORIGIN`). The role "Admin" includes the owner.
 
-| Route | Method | Role | Purpose |
-| --- | --- | --- | --- |
-| `/commerce/products/:productId/description-draft` | `GET` | Viewer | The product from the commerce engine, and the draft: `not_started` or `active` |
-| `/commerce/products/:productId/description-draft/socket` | `GET` | Viewer | The room socket |
-| `/commerce/products/:productId/description-draft/shared-thread` | `GET`, `PUT`, `DELETE` | Admin | Read, connect or disconnect one Slack thread |
-| `/collaboration/email-draft` | `GET` | Viewer | The email draft and its revision |
-| `/collaboration/email-draft/socket` | `GET` | Viewer | The room socket |
-| `/collaboration/email-draft/review` | `POST` | Operator | Freeze a review snapshot |
-| `/collaboration/email-draft/shared-thread` | `GET`, `PUT`, `DELETE` | Admin | Read, connect or disconnect one Slack thread |
+| Route                                                           | Method                 | Role     | Purpose                                                                        |
+| --------------------------------------------------------------- | ---------------------- | -------- | ------------------------------------------------------------------------------ |
+| `/commerce/products/:productId/description-draft`               | `GET`                  | Viewer   | The product from the commerce engine, and the draft: `not_started` or `active` |
+| `/commerce/products/:productId/description-draft/socket`        | `GET`                  | Viewer   | The room socket                                                                |
+| `/commerce/products/:productId/description-draft/shared-thread` | `GET`, `PUT`, `DELETE` | Admin    | Read, connect or disconnect one Slack thread                                   |
+| `/collaboration/email-draft`                                    | `GET`                  | Viewer   | The email draft and its revision                                               |
+| `/collaboration/email-draft/socket`                             | `GET`                  | Viewer   | The room socket                                                                |
+| `/collaboration/email-draft/review`                             | `POST`                 | Operator | Freeze a review snapshot                                                       |
+| `/collaboration/email-draft/shared-thread`                      | `GET`, `PUT`, `DELETE` | Admin    | Read, connect or disconnect one Slack thread                                   |
 
 - A `PUT` or a `DELETE` of a shared thread and the review `POST` are mutations. They
   need the Portal origin and the CSRF header (FND-06).
@@ -298,24 +298,24 @@ Portal origin (`PANTRY_PUBLIC_ORIGIN`). The role "Admin" includes the owner.
 - A draft `GET` answers 503 with the failure code if the draft cannot be read. For a
   description, this includes a product source that does not answer.
 
-| Actor SQLite table | Holds |
-| --- | --- |
-| `product_description_draft` | One row for each product: `schema_version`, `encoded_state`, `initialized_from_product_revision`, `updated_by_app_user` and the times |
-| `product_description_draft_operation` | The receipt of each agent edit: the request, the product at the edit and the draft text after it |
-| `product_description_draft_thread` | The connected Slack thread of a product: the Case, the Slack account, the channel, the link, `approved_by` and the state `shared` or `revoked` |
-| `email_draft` | The one row: `schema_version`, `encoded_state`, `revision`, `updated_by_app_user` and the times |
-| `email_draft_operation` | The receipt of each agent edit: the request, the revision and the result |
-| `email_draft_review` | Each frozen review: the revision, the three texts, the person and the time |
-| `email_draft_thread` | The connected Slack thread, as for a product |
+| Actor SQLite table                    | Holds                                                                                                                                          |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `product_description_draft`           | One row for each product: `schema_version`, `encoded_state`, `initialized_from_product_revision`, `updated_by_app_user` and the times          |
+| `product_description_draft_operation` | The receipt of each agent edit: the request, the product at the edit and the draft text after it                                               |
+| `product_description_draft_thread`    | The connected Slack thread of a product: the Case, the Slack account, the channel, the link, `approved_by` and the state `shared` or `revoked` |
+| `email_draft`                         | The one row: `schema_version`, `encoded_state`, `revision`, `updated_by_app_user` and the times                                                |
+| `email_draft_operation`               | The receipt of each agent edit: the request, the revision and the result                                                                       |
+| `email_draft_review`                  | Each frozen review: the revision, the three texts, the person and the time                                                                     |
+| `email_draft_thread`                  | The connected Slack thread, as for a product                                                                                                   |
 
 `hibernatable_socket_sweep` holds the time of the next sweep (FND-02).
 
-| Agent tool | A turn offers it with | Effect | What it does |
-| --- | --- | --- | --- |
-| `product_description_draft_read` | `commerce.entity_plane.context` | Read | Returns the product and the saved draft. It makes no draft. `productId: null` reads the draft that is connected to the Slack thread of the turn. It fails if the thread has no connected draft, or the drafts of more than one product |
-| `product_description_draft_edit` | `commerce.product_description_draft.edit` | Draft | Replaces one exact passage of the description. It starts the draft if none exists |
-| `email_draft_read` | `marketing.email_draft.edit` | Read | Returns the email draft and its revision |
-| `email_draft_edit` | `marketing.email_draft.edit` | Draft | Replaces one exact passage of one field, at `expectedRevision` |
+| Agent tool                       | A turn offers it with                     | Effect | What it does                                                                                                                                                                                                                           |
+| -------------------------------- | ----------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `product_description_draft_read` | `commerce.entity_plane.context`           | Read   | Returns the product and the saved draft. It makes no draft. `productId: null` reads the draft that is connected to the Slack thread of the turn. It fails if the thread has no connected draft, or the drafts of more than one product |
+| `product_description_draft_edit` | `commerce.product_description_draft.edit` | Draft  | Replaces one exact passage of the description. It starts the draft if none exists                                                                                                                                                      |
+| `email_draft_read`               | `marketing.email_draft.edit`              | Read   | Returns the email draft and its revision                                                                                                                                                                                               |
+| `email_draft_edit`               | `marketing.email_draft.edit`              | Draft  | Replaces one exact passage of one field, at `expectedRevision`                                                                                                                                                                         |
 
 The tools are in `services/platform/src/agent-tools/commerce/description-draft.ts` and
 `agent-tools/channels/email-draft.ts`, and Code Mode can call them. The two edit
@@ -325,32 +325,32 @@ prompt (`PERMISSION_REQUESTABLE`).
 
 ## Rules and limits
 
-| Action | Viewer | Operator | Admin and owner | Agent |
-| --- | --- | --- | --- | --- |
-| Read a draft and see presence | Yes | Yes | Yes | The read tool |
-| Change a draft | No | Yes | Yes | The edit tool, for a person who is an operator or higher |
-| Freeze an email review snapshot | No | Yes | Yes | No |
-| Send a description for approval, in the Portal | No | No | Yes | `commerce_propose_action` |
-| Connect or disconnect a Slack thread | No | No | Yes | No |
-| Change a product record with a draft change | No | No | No | No |
+| Action                                         | Viewer | Operator | Admin and owner | Agent                                                    |
+| ---------------------------------------------- | ------ | -------- | --------------- | -------------------------------------------------------- |
+| Read a draft and see presence                  | Yes    | Yes      | Yes             | The read tool                                            |
+| Change a draft                                 | No     | Yes      | Yes             | The edit tool, for a person who is an operator or higher |
+| Freeze an email review snapshot                | No     | Yes      | Yes             | No                                                       |
+| Send a description for approval, in the Portal | No     | No       | Yes             | `commerce_propose_action`                                |
+| Connect or disconnect a Slack thread           | No     | No       | Yes             | No                                                       |
+| Change a product record with a draft change    | No     | No       | No              | No                                                       |
 
-| Limit | Value | Constant |
-| --- | --- | --- |
-| Description text | 10,000 UTF-16 code units | `DESCRIPTION_LIMIT` |
-| Description update, state, state vector | 256 KiB, 256 KiB, 16 KiB | `UPDATE_LIMIT`, `STATE_LIMIT`, `STATE_VECTOR_LIMIT` |
-| Email subject, preview, body, all three | 200, 300, 50,000, 50,500 | `EMAIL_SUBJECT_LIMIT`, `EMAIL_PREVIEW_LIMIT`, `EMAIL_BODY_LIMIT`, `EMAIL_AGGREGATE_LIMIT` |
-| Email update, state, state vector | 256 KiB, 512 KiB, 64 KiB | `EMAIL_UPDATE_LIMIT`, `EMAIL_STATE_LIMIT`, `EMAIL_STATE_VECTOR_LIMIT` |
-| One socket frame | 384 KiB | `COLLABORATION_FRAME_LIMIT` |
-| Sockets in one room (`room_full`); agent operations in one room | 20; 20 | `COLLABORATION_SOCKET_LIMIT` |
-| Messages of one socket that wait in the queue | 8 | A number in `CollaborationRoom.receive` |
-| Socket attachment | 16,384 bytes | `ATTACHMENT_LIMIT_BYTES` |
-| Client ping; lost socket | 30 s; 75 s | `COLLABORATION_PING_INTERVAL_MS`, `COLLABORATION_PONG_TIMEOUT_MS` |
-| Silent socket; sweep | 90 s; 300 s | `SOCKET_SILENCE_LIMIT_MS`, `SOCKET_SWEEP_INTERVAL_MS` |
-| Pointer idle; caret label idle | 5 s; 5 s | `COLLABORATION_POINTER_IDLE_MS`, `IDLE_AFTER_MS` |
-| Agent label after an edit | 5 s | `AGENT_ACTIVITY_HOLD_MS` |
-| Preview of an agent edit: life, new admission | 6 s, 2 s | `AGENT_PREVIEW_LIFETIME_MS`, `AGENT_PREVIEW_ADMISSION_MS` |
-| Product projection as the draft source | 15 minutes | `COMMERCE_PROJECTION_STALE_AFTER_MS` |
-| Agent edit | The turn lease, or 30 s if that is sooner. In a Code Mode script: the deadline of the script | `CODE_MODE_PILOT_BUDGET.maxDurationMs` |
+| Limit                                                           | Value                                                                                        | Constant                                                                                  |
+| --------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Description text                                                | 10,000 UTF-16 code units                                                                     | `DESCRIPTION_LIMIT`                                                                       |
+| Description update, state, state vector                         | 256 KiB, 256 KiB, 16 KiB                                                                     | `UPDATE_LIMIT`, `STATE_LIMIT`, `STATE_VECTOR_LIMIT`                                       |
+| Email subject, preview, body, all three                         | 200, 300, 50,000, 50,500                                                                     | `EMAIL_SUBJECT_LIMIT`, `EMAIL_PREVIEW_LIMIT`, `EMAIL_BODY_LIMIT`, `EMAIL_AGGREGATE_LIMIT` |
+| Email update, state, state vector                               | 256 KiB, 512 KiB, 64 KiB                                                                     | `EMAIL_UPDATE_LIMIT`, `EMAIL_STATE_LIMIT`, `EMAIL_STATE_VECTOR_LIMIT`                     |
+| One socket frame                                                | 384 KiB                                                                                      | `COLLABORATION_FRAME_LIMIT`                                                               |
+| Sockets in one room (`room_full`); agent operations in one room | 20; 20                                                                                       | `COLLABORATION_SOCKET_LIMIT`                                                              |
+| Messages of one socket that wait in the queue                   | 8                                                                                            | A number in `CollaborationRoom.receive`                                                   |
+| Socket attachment                                               | 16,384 bytes                                                                                 | `ATTACHMENT_LIMIT_BYTES`                                                                  |
+| Client ping; lost socket                                        | 30 s; 75 s                                                                                   | `COLLABORATION_PING_INTERVAL_MS`, `COLLABORATION_PONG_TIMEOUT_MS`                         |
+| Silent socket; sweep                                            | 90 s; 300 s                                                                                  | `SOCKET_SILENCE_LIMIT_MS`, `SOCKET_SWEEP_INTERVAL_MS`                                     |
+| Pointer idle; caret label idle                                  | 5 s; 5 s                                                                                     | `COLLABORATION_POINTER_IDLE_MS`, `IDLE_AFTER_MS`                                          |
+| Agent label after an edit                                       | 5 s                                                                                          | `AGENT_ACTIVITY_HOLD_MS`                                                                  |
+| Preview of an agent edit: life, new admission                   | 6 s, 2 s                                                                                     | `AGENT_PREVIEW_LIFETIME_MS`, `AGENT_PREVIEW_ADMISSION_MS`                                 |
+| Product projection as the draft source                          | 15 minutes                                                                                   | `COMMERCE_PROJECTION_STALE_AFTER_MS`                                                      |
+| Agent edit                                                      | The turn lease, or 30 s if that is sooner. In a Code Mode script: the deadline of the script | `CODE_MODE_PILOT_BUDGET.maxDurationMs`                                                    |
 
 - The limits are constants, not Organisation settings. A document that reaches a limit
   fails with its code, for example `state_too_large`. No code resets or compacts a
@@ -430,10 +430,10 @@ Boundaries:
 
 ## Sources
 
-- [Plan 40](../../plan-40-product-description-drafting.md), the product description
+- [Plan 40](../../history/plan-40-product-description-drafting.md), the product description
   draft. Its evidence in the archive:
   [the implementation record](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-40-drafting-20260908.md).
-- [Plan 40C](../../plan-40C-multiplayer-module.md), the multiplayer module. Its
+- [Plan 40C](../../history/plan-40C-multiplayer-module.md), the multiplayer module. Its
   evidence in the archive:
   [the agent cursor record](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/agent-cursor-completion/README.md),
   [the live acceptance record](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-40C-live-acceptance-2026-10-01.md),

@@ -39,9 +39,9 @@ A release at 02:56 UTC restored the installer, and each served build matches its
 - A revoke of a gateway also revokes its devices, because no device can report without it.
 
 This plan builds on [Plan 24](../plan-24-cafeos-bakery-automation.md),
-[Plan 40B](../plan-40B-collaborative-menu-editor.md),
-[Plan 81](../plan-81-agent-portal-control.md) and
-[Plan 82](../plan-82-portal-voice-control.md). Plan 24 keeps physical dispatch and receipt
+[Plan 40B](plan-40B-collaborative-menu-editor.md),
+[Plan 81](plan-81-agent-portal-control.md) and
+[Plan 82](plan-82-portal-voice-control.md). Plan 24 keeps physical dispatch and receipt
 reconciliation. This plan owns the device list, enrollment, health and device access.
 The public name is Satyr Kitchen. Code identifiers keep `bakery`.
 

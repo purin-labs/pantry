@@ -46,7 +46,7 @@ does not prove automatic production posting, packaging release, shelf life, or
 physical fulfillment. The batch contract below records completed production.
 Planned and in-progress commerce batches remain a later measured extension.
 [Plan 24](plan-24-cafeos-bakery-automation.md) owns the physical boundary.
-[Plans 61A–E](plan-61A-financier-workflow.md) own draft recipe and shift integration.
+[Plans 61A–E](history/plan-61A-financier-workflow.md) own draft recipe and shift integration.
 
 ## Design principles
 

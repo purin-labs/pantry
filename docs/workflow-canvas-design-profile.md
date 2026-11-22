@@ -258,7 +258,7 @@ that a person moved in the shared draft stays where the person put it.
   them. No agent turn starts from the canvas. The composer shows only on a shared recipe with a
   chat.
 - **Split:** the surface switch and the pane width stay with the person, like the floor-plan
-  split in [Plan 81](plan-81-agent-portal-control.md). The agent composer and proposal review work
+  split in [Plan 81](history/plan-81-agent-portal-control.md). The agent composer and proposal review work
   in the Workflow pane as usual.
 - **Phone:** below 640px the graph becomes a list of the same steps, with the controls above it.
   The Select and Pan tools and the zoom controls do not show.

@@ -43,30 +43,30 @@ types, such as the Session reducer and the commerce query planner.
 `packages/contract-schema` exports these parts from `src/schema.ts` and
 `src/sorted-unions.ts`:
 
-| Export | What it does |
-| --- | --- |
-| `StrictObject`, `OpenObject`, `ReadonlyRecord` | Object schemas that refuse or accept other fields, and a record with a read-only index |
-| `SafeInteger`, `NonNegativeInteger`, `PositiveInteger` | Integer schemas inside the safe range of JavaScript |
-| `parseContract(schema, value, reject)` | Makes a JSON copy with the integer rules, checks it, and gives the first fault to `reject`, the mapper of the area |
-| `normalizeContractInput`, `jsonSafeInteger`, `UnsafeJsonIntegerError` | The JSON copy of `parseContract`, its `JSON.stringify` replacer and the error that the replacer throws for an integer outside the safe range |
-| `checkContract` | The same check with no JSON copy |
-| `recordParser(schema, name?)` | The parser of a stored record or a response. It fills defaults, makes its own JSON copy, checks, removes the unknown fields of open records and runs codecs |
-| `decodeRecord(parser, input)`, `ContractRefusalError` | Returns the value, or throws `ContractRefusalError` at a boundary that throws |
-| `parseContractArray`, `contractRefusal` | The first refusal of an array, and a refusal value |
-| `canonicalContractDigest` | SHA-256 of canonical JSON with the keys in code-point order |
-| `cleanValue`, `decodeValue`, `decodeChecked` | The TypeBox clean and decode passes. They keep the sorted unions of each schema, so the sort runs one time for each schema |
-| `organisationIdSchema`, `integrationAccountIdSchema` | The ids that Pantry records and commerce records both carry |
+| Export                                                                | What it does                                                                                                                                                |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `StrictObject`, `OpenObject`, `ReadonlyRecord`                        | Object schemas that refuse or accept other fields, and a record with a read-only index                                                                      |
+| `SafeInteger`, `NonNegativeInteger`, `PositiveInteger`                | Integer schemas inside the safe range of JavaScript                                                                                                         |
+| `parseContract(schema, value, reject)`                                | Makes a JSON copy with the integer rules, checks it, and gives the first fault to `reject`, the mapper of the area                                          |
+| `normalizeContractInput`, `jsonSafeInteger`, `UnsafeJsonIntegerError` | The JSON copy of `parseContract`, its `JSON.stringify` replacer and the error that the replacer throws for an integer outside the safe range                |
+| `checkContract`                                                       | The same check with no JSON copy                                                                                                                            |
+| `recordParser(schema, name?)`                                         | The parser of a stored record or a response. It fills defaults, makes its own JSON copy, checks, removes the unknown fields of open records and runs codecs |
+| `decodeRecord(parser, input)`, `ContractRefusalError`                 | Returns the value, or throws `ContractRefusalError` at a boundary that throws                                                                               |
+| `parseContractArray`, `contractRefusal`                               | The first refusal of an array, and a refusal value                                                                                                          |
+| `canonicalContractDigest`                                             | SHA-256 of canonical JSON with the keys in code-point order                                                                                                 |
+| `cleanValue`, `decodeValue`, `decodeChecked`                          | The TypeBox clean and decode passes. They keep the sorted unions of each schema, so the sort runs one time for each schema                                  |
+| `organisationIdSchema`, `integrationAccountIdSchema`                  | The ids that Pantry records and commerce records both carry                                                                                                 |
 
 ### Refusals
 
 `ContractDecodeResult<T>` is `{ ok: true, value }` or `{ ok: false, error }`. The error
 is a `ContractDecodeError`:
 
-| `kind` | `code` | When |
-| --- | --- | --- |
-| `input_invalid` | `invalid_json` | The value has no JSON form, or it has 128 levels of objects and arrays |
-| `input_invalid` | `invalid_json_integer` | An integer is outside the safe range, or a number with a fraction is where the schema has an integer |
-| `validation_rejected` | The code of the area | The value fails its schema, or a rule that runs after the schema |
+| `kind`                | `code`                 | When                                                                                                 |
+| --------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| `input_invalid`       | `invalid_json`         | The value has no JSON form, or it has 128 levels of objects and arrays                               |
+| `input_invalid`       | `invalid_json_integer` | An integer is outside the safe range, or a number with a fraction is where the schema has an integer |
+| `validation_rejected` | The code of the area   | The value fails its schema, or a rule that runs after the schema                                     |
 
 - `recordParser` gives the code `invalid_record` and `details.field`, the JSON pointer
   of the first field that fails (`/` for the root). With a name, the reason also names
@@ -180,15 +180,15 @@ This subsystem owns no D1 table, no Actor SQLite table, no route, no event, no
 capability and no agent tool. It owns packages. `scripts/layers.json` gives each its
 module.
 
-| Package | Module | Holds |
-| --- | --- | --- |
-| `packages/contract-schema` (`@purin-labs/contract-schema`) | `foundation/std` | The schema kit |
-| `packages/std`, `packages/type-utils` | `foundation/std` | Text rules, SHA-256, canonical JSON; `Variant`, `VariantBy`, `StrictUnion` |
-| `packages/contracts` (`@purin-labs/contracts`) | `foundation/contracts` | Pantry contracts: Sessions, checkpoints, model routes, messages, attachments, access control, goals, Case and Connector records, envelopes, onboarding views |
-| `packages/control-api` (`@purin-labs/control-api`) | `foundation/contracts` | The shapes of the control API and the Portal, the device gateway protocol and the surface protocol |
-| `packages/commerce-contracts` (`@purin-labs/commerce-contracts`) | `areas/commerce` | Commerce contracts, record schemas (`src/records/`), state machines, plugins and query logic |
-| `packages/commerce-client` (`@purin-labs/commerce-client`) | `areas/commerce` | The typed client of the commerce engine: the admin, storefront and entity-plane APIs |
-| `packages/commerce-control-api`, `cafe-control-api`, `kitchen-control-api`, `inbox-control-api` | The area | The control API shapes of one area |
+| Package                                                                                         | Module                 | Holds                                                                                                                                                        |
+| ----------------------------------------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `packages/contract-schema` (`@purin-labs/contract-schema`)                                      | `foundation/std`       | The schema kit                                                                                                                                               |
+| `packages/std`, `packages/type-utils`                                                           | `foundation/std`       | Text rules, SHA-256, canonical JSON; `Variant`, `VariantBy`, `StrictUnion`                                                                                   |
+| `packages/contracts` (`@purin-labs/contracts`)                                                  | `foundation/contracts` | Pantry contracts: Sessions, checkpoints, model routes, messages, attachments, access control, goals, Case and Connector records, envelopes, onboarding views |
+| `packages/control-api` (`@purin-labs/control-api`)                                              | `foundation/contracts` | The shapes of the control API and the Portal, the device gateway protocol and the surface protocol                                                           |
+| `packages/commerce-contracts` (`@purin-labs/commerce-contracts`)                                | `areas/commerce`       | Commerce contracts, record schemas (`src/records/`), state machines, plugins and query logic                                                                 |
+| `packages/commerce-client` (`@purin-labs/commerce-client`)                                      | `areas/commerce`       | The typed client of the commerce engine: the admin, storefront and entity-plane APIs                                                                         |
+| `packages/commerce-control-api`, `cafe-control-api`, `kitchen-control-api`, `inbox-control-api` | The area               | The control API shapes of one area                                                                                                                           |
 
 Main files of `packages/contracts/src/`:
 
@@ -216,14 +216,14 @@ parsers. The three run TypeScript only.
 `foundation/agent/actors/pi-tool-arguments.ts` holds the tool argument check.
 `packages/contracts/src/boundary.ts` reads plain request fields.
 
-| Check | Command | Where it runs |
-| --- | --- | --- |
-| Types of each package | `pnpm check:packages` | CI |
-| Machines and plugins | `pnpm --filter @purin-labs/commerce-contracts commerce-data:check` | CI |
-| Executor wire files are current | `pnpm --filter @purin-labs/contracts executor:check` | In `media:build`, before the Platform type check, the E2E suite and a deploy |
-| Media Wasm build | `pnpm --filter @purin-labs/platform contracts:media` | The same places |
-| Unicode tables are current | `pnpm --filter @purin-labs/commerce-contracts unicode:check` | By hand |
-| Machines against the commerce spec and the alarms | `pnpm lint:commerce-spec`, `pnpm lint:state-machines` | `pnpm lint` |
+| Check                                             | Command                                                            | Where it runs                                                                |
+| ------------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| Types of each package                             | `pnpm check:packages`                                              | CI                                                                           |
+| Machines and plugins                              | `pnpm --filter @purin-labs/commerce-contracts commerce-data:check` | CI                                                                           |
+| Executor wire files are current                   | `pnpm --filter @purin-labs/contracts executor:check`               | In `media:build`, before the Platform type check, the E2E suite and a deploy |
+| Media Wasm build                                  | `pnpm --filter @purin-labs/platform contracts:media`               | The same places                                                              |
+| Unicode tables are current                        | `pnpm --filter @purin-labs/commerce-contracts unicode:check`       | By hand                                                                      |
+| Machines against the commerce spec and the alarms | `pnpm lint:commerce-spec`, `pnpm lint:state-machines`              | `pnpm lint`                                                                  |
 
 ## Rules and limits
 
@@ -240,17 +240,17 @@ Rules for a contract writer:
 - Do not use `maxLength` as a size limit. Check the size with a `@purin-labs/std`
   helper.
 
-| Limit | Value | Where |
-| --- | --- | --- |
-| Depth of objects and arrays in `parseContract` | 127 levels pass; level 128 is `invalid_json` | `withinJsonNestingLimit` in `contract-schema/src/schema.ts` (no constant) |
-| Integer range | `Number.MIN_SAFE_INTEGER` to `Number.MAX_SAFE_INTEGER` | `SafeInteger` |
-| Commerce cursor | 16 KiB of UTF-8 | `MAX_COMMERCE_CURSOR_LENGTH` |
-| Query traversal | `maxDepth` 0 to 8, `resultLimit` 1 to 500, 64 seeds, 8 sorts | `query-limits.ts`, `graph-query-schema.ts` |
-| Message text, URL, object key | 65,536 code points; 2,048 bytes; 1,024 bytes | `NON_EMPTY_TEXT_MAX_CHARS`, `HTTP_URL_MAX_CHARS`, `OBJECT_KEY_MAX_CHARS` in `message.ts` |
-| Session identity, Session object key | 256 bytes; 1,024 bytes | `applyTextRule` in `session-reducer.ts` (no constant) |
-| Session backend id | `picocodex`, `pi` or `codex` | `normalize` in `session-reducer.ts` |
-| Goal counter, goal id, goal text | `0xffff_ffff`; 256 UTF-16 units; 4,000 UTF-16 units | `counter`, `identifier` and `text` in `goal.ts` (no constant) |
-| Commands from one plugin run | 5 | `PLUGIN_RUN_COMMANDS` |
+| Limit                                          | Value                                                        | Where                                                                                    |
+| ---------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| Depth of objects and arrays in `parseContract` | 127 levels pass; level 128 is `invalid_json`                 | `withinJsonNestingLimit` in `contract-schema/src/schema.ts` (no constant)                |
+| Integer range                                  | `Number.MIN_SAFE_INTEGER` to `Number.MAX_SAFE_INTEGER`       | `SafeInteger`                                                                            |
+| Commerce cursor                                | 16 KiB of UTF-8                                              | `MAX_COMMERCE_CURSOR_LENGTH`                                                             |
+| Query traversal                                | `maxDepth` 0 to 8, `resultLimit` 1 to 500, 64 seeds, 8 sorts | `query-limits.ts`, `graph-query-schema.ts`                                               |
+| Message text, URL, object key                  | 65,536 code points; 2,048 bytes; 1,024 bytes                 | `NON_EMPTY_TEXT_MAX_CHARS`, `HTTP_URL_MAX_CHARS`, `OBJECT_KEY_MAX_CHARS` in `message.ts` |
+| Session identity, Session object key           | 256 bytes; 1,024 bytes                                       | `applyTextRule` in `session-reducer.ts` (no constant)                                    |
+| Session backend id                             | `picocodex`, `pi` or `codex`                                 | `normalize` in `session-reducer.ts`                                                      |
+| Goal counter, goal id, goal text               | `0xffff_ffff`; 256 UTF-16 units; 4,000 UTF-16 units          | `counter`, `identifier` and `text` in `goal.ts` (no constant)                            |
+| Commands from one plugin run                   | 5                                                            | `PLUGIN_RUN_COMMANDS`                                                                    |
 
 - **Permissions.** A contract checks the shape of a value. It gives no permission to a
   person or an agent. Roles, capabilities and approvals are in FND-06.
@@ -333,10 +333,10 @@ Neighbours:
 
 ## Sources
 
-- [Plan 78](../../plan-78-contracts-in-typescript.md). Where it differs from the code,
+- [Plan 78](../../history/plan-78-contracts-in-typescript.md). Where it differs from the code,
   this spec follows the code. Its evidence in the archive:
   [the status ledger](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-78-foundations.md).
-- Plan 78 replaced step 7 of [Plan 77](../../plan-77-underclerk-modular-core.md)
+- Plan 78 replaced step 7 of [Plan 77](../../history/plan-77-underclerk-modular-core.md)
   (COM-02). [The layers page](../../layers.md) gives the module of each package.
 - E2E journeys in `services/platform/tests/e2e/`: `checkpoint-restart.test.ts` and
   `checkpoint-atomic-acceptance.test.ts` (Session restore and checkpoints),

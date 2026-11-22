@@ -229,7 +229,7 @@ make an import cycle at the start of the Worker.
 
 ## Rules for every step
 
-These rules continue the rules of [Refactor 10](refactor-10.md):
+These rules continue the rules of [Refactor 10](history/refactor-10.md):
 
 - **Classify first, fix the direction in place, move last.**
 - **An inversion is a code change.** Each one lands as a small commit with the E2E
@@ -408,7 +408,9 @@ that the code cannot prove and 119 omissions. The writers corrected 354 of these
 findings and refused 18, each with its reason. Each spec lists the places where its
 source plans differ from the code: 291 places in the 20 specs. The writers also
 reported 142 possible code faults. No one has checked them yet. A source plan moves to
-`docs/history/` when each spec that it feeds is written.
+`docs/history/` when each spec that it feeds is written: 56 plan and refactor files are
+there since 2026-11-23. Plan 91 stays in `docs/` until its phase 6 ends, and the 15
+other source documents stay where they are.
 
 The condition of step S2 was final brand names (D2: "The spec text waits for the
 brand names"). The Purin names are on `dev` since Plan 91 phase 4A, so S2 started on

@@ -11,8 +11,8 @@ Hydrogen passed in production, in the Plan 95 gate. No Gemini key turn has run
 in production.
 
 Owner: the model routes (spec FND-04, "Agent harness and model routes").
-Touches: [Plan 73 — model exit Worker](plan-73-model-exit-worker.md),
-[Plan 88 — Jev](plan-88-satyr-funded-jev.md) (the meter of each Organisation),
+Touches: [Plan 73 — model exit Worker](history/plan-73-model-exit-worker.md),
+[Plan 88 — Jev](history/plan-88-satyr-funded-jev.md) (the meter of each Organisation),
 [the sandbox release runbook](runbooks/code-mode-sandbox-release.md) (the Pi
 upgrade), [Refactor 17](refactor-17.md) (file paths), and the AGENTS.md sections
 "Active runtime" and "Execution contract".

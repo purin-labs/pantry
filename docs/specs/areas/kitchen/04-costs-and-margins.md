@@ -349,7 +349,7 @@ saved rows.
 
 ## Sources
 
-- [Plan 86](../../../plan-86-bakery-costs-and-margins.md). Where it differs from the
+- [Plan 86](../../../history/plan-86-bakery-costs-and-margins.md). Where it differs from the
   code, this spec follows the code. The plan gives no evidence links in the archive.
 - E2E journeys: `services/platform/tests/e2e/costs-and-margins.test.ts`, with its
   helper `costs-sheet-room-support.ts`, and

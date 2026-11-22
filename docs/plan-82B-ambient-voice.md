@@ -3,7 +3,7 @@
 Status (2026-11-18): draft. Nothing is built. Decisions D1–D9 need the owner. Phase 0 needs
 recordings of staff in a shop, and the owner has no shop yet (2026-11-17), so this plan waits.
 [The voice handover](plan-82-voice-handover.md) lists it with the other open voice steps. This plan changes
-[Plan 82](plan-82-portal-voice-control.md) D2 only for a member who turns on a new mode on one
+[Plan 82](history/plan-82-portal-voice-control.md) D2 only for a member who turns on a new mode on one
 device. The wake phrase and hold-to-talk (Plan 82 D10) stay as they are. Since
 [Plan 91](plan-91-seams-atelier-rename.md) the agent is "Sous Chef", so the addressee rules
 below accept the agent's name and the wake phrase's "Satyr".
@@ -28,7 +28,7 @@ pause better (Plan 82 D11). The held key needs a free hand, which a baker does n
 
 A wake phrase before every sentence is also not natural. After an answer, a person expects to
 reply at once: "And the oat milk?" or "No, the one from Tuesday." A public demo of Jev, the
-TypeSafe model that Satyr already uses ([Plan 88](plan-88-satyr-funded-jev.md)), decides in
+TypeSafe model that Satyr already uses ([Plan 88](history/plan-88-satyr-funded-jev.md)), decides in
 real time if a sentence is for the AI or for another person. It uses the topic of the earlier
 turns and the kind of request. This plan uses the same idea, with one more gate before it: who
 speaks.
@@ -46,7 +46,7 @@ give the signed-in member's commands. A speaker check closes that gap for every 
 | Spoken answers                          | Mac `POST /speech`, Kokoro `af_heart` (Plan 82 D9)                                | The follow-up window starts when an answer ends.                     |
 | Speaker model                           | seams-wallet VoiceID: ReDimNet B1, ONNX Runtime Web                               | The speaker check (D2).                                              |
 | Jev transport, allowance and switches   | `integrations/typesafe/system-one-client.ts`, Plan 88                             | One option for the addressee check (D5).                             |
-| Screen context                          | [Plan 87](plan-87-screen-context.md)                                              | The page on screen is one input to the addressee check.              |
+| Screen context                          | [Plan 87](history/plan-87-screen-context.md)                                      | The page on screen is one input to the addressee check.              |
 | Chat send, approvals, receipts          | `features/chat/api.ts`, `approval-authentication.ts`                              | An accepted sentence goes through the same send path as typed text.  |
 | Daily counts on the device              | Plan 82 D11                                                                       | New counts for each gate.                                            |
 

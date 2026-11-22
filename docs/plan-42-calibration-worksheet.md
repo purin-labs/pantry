@@ -4,7 +4,7 @@ Reviewed for recipe and six-hour shift scope: 2026-11-01. No new physical measur
 
 ## Current recipe target
 
-[Plan 61A](plan-61A-financier-workflow.md) defines the draft full financier
+[Plan 61A](history/plan-61A-financier-workflow.md) defines the draft full financier
 workflow using the [working recipe](recipes/financiers.md) and eight-cavity
 Matsunaga mould. Derive piece count from filled cavities and rejected pieces.
 The recipe has no fixed 90-minute rest requirement. Bake settings, duration,
@@ -334,7 +334,7 @@ reliable tail estimate. Leave F4 open until this evidence and its limits are rev
 
 ## Six-hour combined café shift reference assumptions — Plan 61E (1 November 2026)
 
-[Plan 61E](plan-61E-combined-cafe-shift.md) and its
+[Plan 61E](history/plan-61E-combined-cafe-shift.md) and its
 [six-hour evidence report](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-61E-six-hour-evidence.md) add the
 six-hour combined café shift (`21,600 s` execution limit), stock-driven
 replenishment wave dispatch (`close-arrivals`), and cross-shift refrigerated

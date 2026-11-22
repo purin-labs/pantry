@@ -48,12 +48,12 @@ gateway after one day and a revoked row after seven days, unless its result is u
 
 A row keeps four facts apart. A pause is a separate flag (`paused`, `pauseConfirmed`).
 
-| Fact | Values | Source |
-| --- | --- | --- |
-| Enrollment | `pending`, `active`, `restricted`, `revoked` | `device_enrollment.state` |
+| Fact       | Values                                                                                         | Source                                                              |
+| ---------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Enrollment | `pending`, `active`, `restricted`, `revoked`                                                   | `device_enrollment.state`                                           |
 | Connection | `connected`, `quiet`, `offline`, `unknown`, `closed`, `never_connected`, `managed_by_provider` | The receipt time of the gateway's last message, and its open socket |
-| Health | `ok`, `warning`, `fault`, `not_reported` | The device, through its gateway |
-| Work | `idle`, `reserved`, `running`, `result_unknown` | The Plan 24 reserve and the gateway's cobot reports |
+| Health     | `ok`, `warning`, `fault`, `not_reported`                                                       | The device, through its gateway                                     |
+| Work       | `idle`, `reserved`, `running`, `result_unknown`                                                | The Plan 24 reserve and the gateway's cobot reports                 |
 
 A gateway is `quiet` when its socket is closed or it is silent for more than 90 s, and
 `offline` after 180 s. A device has its gateway's connection. It is `unknown` behind a
@@ -77,21 +77,21 @@ a Square problem.
 
 ### Observability and alerts
 
-| Signal | From | Stored in | Kept for |
-| --- | --- | --- | --- |
-| Heartbeat | Gateway, every 30 s | The socket attachment, and `device_gateway.last_heard_at` at most every 5 minutes | Latest value |
-| Connection change | `DeviceFleetActor` | `gateway_presence` (Actor SQLite) and a `device_event` row | 90 days |
-| Health change, fault | Device, through its gateway | `device_enrollment` and a `device_event` row, only on a change | 90 days |
-| Samples | Gateway, every 60 s | `device_sample` (Actor SQLite), one value per measure per minute | 7 days |
-| Person and agent commands | Platform | A `device_event` row; its `event_id` is the receipt id | 90 days |
-| Snapshot images | Camera, through its gateway | R2 `ARCHIVE` and `device_snapshot` | 7 days |
+| Signal                    | From                        | Stored in                                                                         | Kept for     |
+| ------------------------- | --------------------------- | --------------------------------------------------------------------------------- | ------------ |
+| Heartbeat                 | Gateway, every 30 s         | The socket attachment, and `device_gateway.last_heard_at` at most every 5 minutes | Latest value |
+| Connection change         | `DeviceFleetActor`          | `gateway_presence` (Actor SQLite) and a `device_event` row                        | 90 days      |
+| Health change, fault      | Device, through its gateway | `device_enrollment` and a `device_event` row, only on a change                    | 90 days      |
+| Samples                   | Gateway, every 60 s         | `device_sample` (Actor SQLite), one value per measure per minute                  | 7 days       |
+| Person and agent commands | Platform                    | A `device_event` row; its `event_id` is the receipt id                            | 90 days      |
+| Snapshot images           | Camera, through its gateway | R2 `ARCHIVE` and `device_snapshot`                                                | 7 days       |
 
-| Alert kind | Opens when | Slack card |
-| --- | --- | --- |
-| `task_connection_lost` | A gateway is quiet or offline, and a device behind it has a reserved or running task | At once |
-| `task_device_fault` | A device with a reserved or running task reports a fault | At once |
-| `task_result_unknown` | A task result becomes unknown: an `indeterminate` report, a lost socket, or a revoke during a task | At once |
-| `gateway_offline` | A gateway is offline, in shop hours, and silent for the offline delay | After the delay: 5 minutes, or 1 to 120. The alert also needs `offline` (180 s), so a delay below 3 minutes acts as 3 minutes |
+| Alert kind             | Opens when                                                                                         | Slack card                                                                                                                    |
+| ---------------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `task_connection_lost` | A gateway is quiet or offline, and a device behind it has a reserved or running task               | At once                                                                                                                       |
+| `task_device_fault`    | A device with a reserved or running task reports a fault                                           | At once                                                                                                                       |
+| `task_result_unknown`  | A task result becomes unknown: an `indeterminate` report, a lost socket, or a revoke during a task | At once                                                                                                                       |
+| `gateway_offline`      | A gateway is offline, in shop hours, and silent for the offline delay                              | After the delay: 5 minutes, or 1 to 120. The alert also needs `offline` (180 s), so a delay below 3 minutes acts as 3 minutes |
 
 - One subject has at most one open alert of each kind. One incident makes one Slack card,
   and its end updates that card. The card has its text and an **Open Devices** link
@@ -122,12 +122,12 @@ a Square problem.
 The tools are in `services/platform/src/agent-tools/devices/`. A turn offers a tool when
 it holds the capability. No image reaches a model.
 
-| Tool | Capability | Effect | What it does |
-| --- | --- | --- | --- |
-| `device_read` | `device.read` | Read | Gateways, kitchen devices and shop Macs, as the page shows them. Fault text (`deviceSaid`) only when the person who asked is an operator or higher. No Mac network address |
-| `device_snapshot_read` | `device.camera.read` | Read | The time and reason of each snapshot, with no image. The person who asked must be an operator or higher |
-| `device_pause` | `device.pause` | Receipt | Stops new work on one device and asks its gateway to pause. The person who asked must be an operator or higher |
-| `device_propose` | `device.read` | Proposal | Stages a restriction or a resume as a `device_command` configuration draft. The person who asked must be an operator or higher, and confirms it on a card in the chat |
+| Tool                   | Capability           | Effect   | What it does                                                                                                                                                               |
+| ---------------------- | -------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `device_read`          | `device.read`        | Read     | Gateways, kitchen devices and shop Macs, as the page shows them. Fault text (`deviceSaid`) only when the person who asked is an operator or higher. No Mac network address |
+| `device_snapshot_read` | `device.camera.read` | Read     | The time and reason of each snapshot, with no image. The person who asked must be an operator or higher                                                                    |
+| `device_pause`         | `device.pause`       | Receipt  | Stops new work on one device and asks its gateway to pause. The person who asked must be an operator or higher                                                             |
+| `device_propose`       | `device.read`        | Proposal | Stages a restriction or a resume as a `device_command` configuration draft. The person who asked must be an operator or higher, and confirms it on a card in the chat      |
 
 ## Contracts
 
@@ -160,15 +160,15 @@ it holds the capability. No image reaches a model.
 The control routes (`services/platform/src/control/routes/devices.ts`) are under
 `/v1/control/organisations/:id/devices`:
 
-| Route | Role | Purpose |
-| --- | --- | --- |
-| `GET` | Viewer | The list of all kinds |
-| `GET`, `PUT` `/alert-settings` | Viewer, admin | Read or change shop hours and the offline delay |
-| `POST /gateways` | Admin | Start an enrollment: the code and the install command |
-| `PUT /camera-policy` | Admin | Turn snapshots on or off |
-| `POST /:id/snapshot`, `GET /:id/snapshots`, `GET /snapshots/:snapshotId` | Operator with snapshot access | Ask for, list and read images |
-| `GET /:id/activity` | Operator | The newest 50 events and 30 samples |
-| `POST /:id/:command` | The role of the command | `confirm`, `rename`, `move`, `restrict`, `lift`, `pause`, `resume`, `settle`, `revoke` |
+| Route                                                                    | Role                          | Purpose                                                                                |
+| ------------------------------------------------------------------------ | ----------------------------- | -------------------------------------------------------------------------------------- |
+| `GET`                                                                    | Viewer                        | The list of all kinds                                                                  |
+| `GET`, `PUT` `/alert-settings`                                           | Viewer, admin                 | Read or change shop hours and the offline delay                                        |
+| `POST /gateways`                                                         | Admin                         | Start an enrollment: the code and the install command                                  |
+| `PUT /camera-policy`                                                     | Admin                         | Turn snapshots on or off                                                               |
+| `POST /:id/snapshot`, `GET /:id/snapshots`, `GET /snapshots/:snapshotId` | Operator with snapshot access | Ask for, list and read images                                                          |
+| `GET /:id/activity`                                                      | Operator                      | The newest 50 events and 30 samples                                                    |
+| `POST /:id/:command`                                                     | The role of the command       | `confirm`, `rename`, `move`, `restrict`, `lift`, `pause`, `resume`, `settle`, `revoke` |
 
 `runDeviceCommand` (`devices/commands.ts`) is the one command path for the control
 routes, the agent tools, the configuration drafts (the `deviceCommands` port) and the
@@ -181,30 +181,30 @@ agent read enters the turn under the `device_fleet` information-flow source labe
 
 ## Rules and limits
 
-| Action | Viewer | Operator | Admin and owner | Agent |
-| --- | --- | --- | --- | --- |
-| See the list, readiness and last heard | Yes | Yes | Yes | `device_read` |
-| See activity and a device's fault text | No | Yes | Yes | Fault text if the person who asked is an operator |
-| See a Mac's private address | No | No | Yes | No |
-| Rename a gateway or a device | No | Yes | Yes | No |
-| Request a pause | No | Yes | Yes | `device_pause`, with a receipt |
-| Resume after a pause | No | Yes, with a confirmation | Yes, with a confirmation | Proposal only |
-| Restrict a device, with a reason | No | Yes | Yes | Proposal only |
-| Mark an unknown task result as checked (`settle`) | No | Yes | Yes | No |
-| Confirm or move a device, lift a restriction | No | No | Yes | No |
-| Start a gateway enrollment | No | No | Yes | No |
-| Revoke a gateway or a device | No | No | Yes, with a confirmation | No |
-| Set alert times, turn snapshots on or off | No | No | Yes | No |
-| Ask for and see a camera snapshot | No | With a `device.camera.read` grant | Yes | Time and reason only |
-| Raw motion, safety functions, emergency stop | No | No | No | No |
+| Action                                            | Viewer | Operator                          | Admin and owner          | Agent                                             |
+| ------------------------------------------------- | ------ | --------------------------------- | ------------------------ | ------------------------------------------------- |
+| See the list, readiness and last heard            | Yes    | Yes                               | Yes                      | `device_read`                                     |
+| See activity and a device's fault text            | No     | Yes                               | Yes                      | Fault text if the person who asked is an operator |
+| See a Mac's private address                       | No     | No                                | Yes                      | No                                                |
+| Rename a gateway or a device                      | No     | Yes                               | Yes                      | No                                                |
+| Request a pause                                   | No     | Yes                               | Yes                      | `device_pause`, with a receipt                    |
+| Resume after a pause                              | No     | Yes, with a confirmation          | Yes, with a confirmation | Proposal only                                     |
+| Restrict a device, with a reason                  | No     | Yes                               | Yes                      | Proposal only                                     |
+| Mark an unknown task result as checked (`settle`) | No     | Yes                               | Yes                      | No                                                |
+| Confirm or move a device, lift a restriction      | No     | No                                | Yes                      | No                                                |
+| Start a gateway enrollment                        | No     | No                                | Yes                      | No                                                |
+| Revoke a gateway or a device                      | No     | No                                | Yes, with a confirmation | No                                                |
+| Set alert times, turn snapshots on or off         | No     | No                                | Yes                      | No                                                |
+| Ask for and see a camera snapshot                 | No     | With a `device.camera.read` grant | Yes                      | Time and reason only                              |
+| Raw motion, safety functions, emergency stop      | No     | No                                | No                       | No                                                |
 
-| Time limit | Value | Constant |
-| --- | --- | --- |
-| One-time code | 15 minutes | `DEVICE_GATEWAY_CODE_TTL_MS` |
-| Quiet, offline | 90 s, 180 s | `DEVICE_CONNECTION_QUIET_MS`, `DEVICE_CONNECTION_OFFLINE_MS` |
-| D1 summary of the last heard time | 5 minutes | `SUMMARY_INTERVAL_MS` |
+| Time limit                        | Value         | Constant                                                                    |
+| --------------------------------- | ------------- | --------------------------------------------------------------------------- |
+| One-time code                     | 15 minutes    | `DEVICE_GATEWAY_CODE_TTL_MS`                                                |
+| Quiet, offline                    | 90 s, 180 s   | `DEVICE_CONNECTION_QUIET_MS`, `DEVICE_CONNECTION_OFFLINE_MS`                |
+| D1 summary of the last heard time | 5 minutes     | `SUMMARY_INTERVAL_MS`                                                       |
 | Event, sample, snapshot retention | 90, 7, 7 days | `DEVICE_EVENT_RETENTION_MS`, `SAMPLE_RETENTION_MS`, `SNAPSHOT_RETENTION_MS` |
-| Settled pause and resume commands | 7 days | `SETTLED_RETENTION_MS` |
+| Settled pause and resume commands | 7 days        | `SETTLED_RETENTION_MS`                                                      |
 
 The Actor deletes old rows one time a day. While it knows a gateway, its alarm wakes it
 at least one time a day for this work. A heartbeat writes only the 5-minute D1 summary.

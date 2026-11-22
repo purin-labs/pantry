@@ -7,7 +7,7 @@ assumptions, and break-even estimates have not been revalidated. Do not use them
 as current quotes, billing guarantees, or evidence for an infrastructure change.
 Refresh provider prices and measured workload before making a spending decision.
 
-[Plan 14](plan-14-actor-runtime-architecture.md) defines runtime ownership.
+[Plan 14](history/plan-14-actor-runtime-architecture.md) defines runtime ownership.
 [Plan 55](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-55.md) owns current regional placement and latency work. Its
 acceptance gates remain separate from this historical cost comparison.
 

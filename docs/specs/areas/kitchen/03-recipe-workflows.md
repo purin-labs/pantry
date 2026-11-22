@@ -363,9 +363,9 @@ Both capabilities are in `authorization/capability-catalogue.ts` and need
 
 ## Sources
 
-- [Plan 84](../../../plan-84-general-workflow-canvas.md),
-  [Plan 61A](../../../plan-61A-financier-workflow.md),
-  [Plan 61E](../../../plan-61E-combined-cafe-shift.md) and the
+- [Plan 84](../../../history/plan-84-general-workflow-canvas.md),
+  [Plan 61A](../../../history/plan-61A-financier-workflow.md),
+  [Plan 61E](../../../history/plan-61E-combined-cafe-shift.md) and the
   [workflow canvas design profile](../../../workflow-canvas-design-profile.md). Where they
   differ from the code, this spec follows the code. The recipes:
   [financiers](../../../recipes/financiers.md), [pies](../../../recipes/pies.md) and the

@@ -35,11 +35,11 @@ opens the Kitchen page in the person's browser only when a command needs that pa
 
 `userMessageViews` derives four views from one message, so the views cannot disagree:
 
-| View | Content |
-| --- | --- |
-| `modelPrompt` | One line for each part: the text, `[link] …`, or the manifest line of a file that ends "contents not read" |
-| `casePurpose` | The first text or link label. With files only: `Review attached file: <names>`. With links only: `Review link: <url>` |
-| `contextQuery` | The texts, the link labels and the file names, or null when there are none |
+| View            | Content                                                                                                                       |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `modelPrompt`   | One line for each part: the text, `[link] …`, or the manifest line of a file that ends "contents not read"                    |
+| `casePurpose`   | The first text or link label. With files only: `Review attached file: <names>`. With links only: `Review link: <url>`         |
+| `contextQuery`  | The texts, the link labels and the file names, or null when there are none                                                    |
 | `contentDigest` | SHA-256 of the ordered parts: each text, each link and label, and for each file its id, digest, media type, length and source |
 
 A Case entry holds the message as `user_message` content. A `record_message` is the same
@@ -74,8 +74,7 @@ resolved, or none.
 
 If one file of the event is `needs_info`, the adapter reads the exact message again
 with one `conversations.replies` call. The files of that read replace the whole file
-list. This second parser keeps each file that has an id, a name, a type and a size above
-0. It leaves out each other file, with no rejection and no notice, and it does not apply
+list. This second parser keeps each file that has an id, a name, a type and a size above 0. It leaves out each other file, with no rejection and no notice, and it does not apply
 the `remote_link` rule. If the read does not return the message, the message has no
 stored file.
 
@@ -126,14 +125,14 @@ The Session Actor prepares each file of the accepted message before it starts th
 in the inherited history of a fork, under the lease of the new turn. Each read first
 proves the Organisation prefix of the key, the object length and the SHA-256.
 
-| Class | Preparation | What the model gets |
-| --- | --- | --- |
-| Image with a verified signature | The verified bytes | A native image input |
-| Document: plain text, Markdown, CSV, TSV, JSON, XML | UTF-8 text in the Worker, at most 1 MiB. A larger file goes to the executor | The manifest line and at most 32,768 characters, with `[truncated]` when cut |
-| Document: PDF, DOCX, ODT | Extraction in the Worker, at most 1 MiB | The same, or the manifest with `preparation=handler_not_available` or `source_too_large` |
-| Audio | Container facts from the first 64 KiB | The manifest and one line: container, duration, codec, channels, sample rate, "contents not interpreted" |
-| Video | The same facts and at most 12 still frames | The manifest, the facts and the frames as native image inputs |
-| Opaque, an image with only a declared type, another document type | No interpretation of the bytes | The manifest with `preparation=handler_not_available` |
+| Class                                                             | Preparation                                                                 | What the model gets                                                                                      |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Image with a verified signature                                   | The verified bytes                                                          | A native image input                                                                                     |
+| Document: plain text, Markdown, CSV, TSV, JSON, XML               | UTF-8 text in the Worker, at most 1 MiB. A larger file goes to the executor | The manifest line and at most 32,768 characters, with `[truncated]` when cut                             |
+| Document: PDF, DOCX, ODT                                          | Extraction in the Worker, at most 1 MiB                                     | The same, or the manifest with `preparation=handler_not_available` or `source_too_large`                 |
+| Audio                                                             | Container facts from the first 64 KiB                                       | The manifest and one line: container, duration, codec, channels, sample rate, "contents not interpreted" |
+| Video                                                             | The same facts and at most 12 still frames                                  | The manifest, the facts and the frames as native image inputs                                            |
+| Opaque, an image with only a declared type, another document type | No interpretation of the bytes                                              | The manifest with `preparation=handler_not_available`                                                    |
 
 - The Worker takes the frames of an intra-frame video from the bytes of the file. For
   H.264, the `WorkspaceExecutorContainer` decodes the selected keyframes to JPEG. Each
@@ -161,10 +160,10 @@ proves the Organisation prefix of the key, the object length and the SHA-256.
 
 ### The message tools
 
-| Tool | Capability | What it does |
-| --- | --- | --- |
+| Tool                         | Capability                   | What it does                                                                                                                                                                                 |
+| ---------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `inspect_message_attachment` | `message.attachment.inspect` | Gives the prepared result of one file of the current message again: text, facts or the manifest. An image is named, with no data. An id of another message gives `attachment_not_in_message` |
-| `read_message_link` | `message.link.read` | Reads one link of the current message. A URL that the message does not hold gives `link_not_in_message` |
+| `read_message_link`          | `message.link.read`          | Reads one link of the current message. A URL that the message does not hold gives `link_not_in_message`                                                                                      |
 
 The link reader (`messages/link-reader.ts`) works as follows:
 
@@ -189,15 +188,15 @@ The link reader (`messages/link-reader.ts`) works as follows:
 
 ### Storage and collection
 
-| Object | R2 key in `ARCHIVE` |
-| --- | --- |
-| Slack file content | `attachments/<organisationId>/slack/<sha256>` |
-| Pointer of a Slack file revision | `attachments/<organisationId>/slackref/<digest>` |
-| Portal file content | `attachments/<organisationId>/portal/<sha256>` |
-| Pointer of a Portal upload | `attachments/<organisationId>/portalref/<attachmentId>` |
-| Decoded frames and their manifest | `attachments/<organisationId>/derived/<sha256>/<policy>/` |
-| Preparation result | `attachments/<organisationId>/derived/<sha256>/preparation/<preparationId>.json` |
-| Collection record | `attachment-collection/<organisationId>/<collectedAt>.json` and `…/latest.json` |
+| Object                            | R2 key in `ARCHIVE`                                                              |
+| --------------------------------- | -------------------------------------------------------------------------------- |
+| Slack file content                | `attachments/<organisationId>/slack/<sha256>`                                    |
+| Pointer of a Slack file revision  | `attachments/<organisationId>/slackref/<digest>`                                 |
+| Portal file content               | `attachments/<organisationId>/portal/<sha256>`                                   |
+| Pointer of a Portal upload        | `attachments/<organisationId>/portalref/<attachmentId>`                          |
+| Decoded frames and their manifest | `attachments/<organisationId>/derived/<sha256>/<policy>/`                        |
+| Preparation result                | `attachments/<organisationId>/derived/<sha256>/preparation/<preparationId>.json` |
+| Collection record                 | `attachment-collection/<organisationId>/<collectedAt>.json` and `…/latest.json`  |
 
 - A content object is reachable when a Case trigger, a Session turn, a Portal
   conversation or a retained fork names its key. A derived object is reachable when a
@@ -334,36 +333,36 @@ The agent loads more context with its tools, when the task needs it.
 
 ## Rules and limits
 
-| Action | Who |
-| --- | --- |
-| Send files in Slack | A person whose message the Connector admits (FND-03) |
-| Send files in the Portal chat | An owner or an admin. An operator, in a canvas chat only. A viewer of a shared chat cannot send |
-| Read a file or a link of the message | An agent turn with the capability. The baseline grant of a Slack channel gives both |
-| Read a saved Kitchen run | An agent turn with `workspace.query`, while the authority of the request is live |
-| Run a Kitchen page command | A Portal turn of an owner or an admin |
-| Answer a page effect | The same person. Only the browser tab that sent the message gets the effect from the list route |
+| Action                               | Who                                                                                             |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| Send files in Slack                  | A person whose message the Connector admits (FND-03)                                            |
+| Send files in the Portal chat        | An owner or an admin. An operator, in a canvas chat only. A viewer of a shared chat cannot send |
+| Read a file or a link of the message | An agent turn with the capability. The baseline grant of a Slack channel gives both             |
+| Read a saved Kitchen run             | An agent turn with `workspace.query`, while the authority of the request is live                |
+| Run a Kitchen page command           | A Portal turn of an owner or an admin                                                           |
+| Answer a page effect                 | The same person. Only the browser tab that sent the message gets the effect from the list route |
 
-| Limit | Value | Constant |
-| --- | --- | --- |
-| Files, file size, message size | 10, 25 MiB, 50 MiB | `MESSAGE_ATTACHMENT_POLICY` |
-| Slack download: redirects, time | 3, 15 s | `MESSAGE_ATTACHMENT_POLICY` |
-| Tries of one Slack message | 5 | `CASE_WORK_MAX_ATTEMPTS` |
-| Text, URL, file name of a message | 65,536 characters, 2,048 bytes, 255 characters | `NON_EMPTY_TEXT_MAX_CHARS`, `HTTP_URL_MAX_CHARS`, `DISPLAY_FILENAME_MAX_CHARS` |
-| Text of a Portal message, multipart body | 8,000 characters, 50 MiB and 64 KiB | Literals in `parseChatCommand` and `ChatUploadBodyLimit` |
-| Case purpose, context query | 160, 512 characters | `CASE_PURPOSE_MAX_CHARS`, `CONTEXT_QUERY_MAX_CHARS` |
-| Text of a document | 1 MiB source, 32,768 characters | `ATTACHMENT_TEXT_LIMITS` |
-| PDF, DOCX and ODT | 1 MiB source, 4 MiB decoded | `PDF_EXTRACTION_LIMITS`, `OFFICE_EXTRACTION_LIMITS` |
-| Media source, frames | 25 MiB, 12 | `MAX_MEDIA_SOURCE_BYTES`, `MAX_SAMPLED_FRAMES` |
-| Decoded frame: picture, all frames | 1920 × 1080, 640 KiB | `MAX_DECODE_PIXELS`, `MAX_FRAME_RESPONSE_BYTES` |
-| One preparation: input, result, time | 25 MiB, 36 MiB, 30 s | `MESSAGE_PREPARATION_LIMITS` |
-| Link read: transfer, text, time, redirects | 5 MiB, 32,768 characters, 10 s, 3 | `MESSAGE_LINK_POLICY` |
-| Link read: DNS lookup, fetches of one container, idle stop | 5 s, 4, 30 s | `DOH_TIMEOUT_MS`, `MAX_CONCURRENT_FETCHES`, `sleepAfter` |
-| Text of connector documentation (INT-01) | 65,536 characters | Literal in `readConnectorDocumentation` |
-| Collection: interval, grace, Organisations in one run | 24 h, 24 h, 4 | `ATTACHMENT_COLLECTION_INTERVAL_MS`, `ATTACHMENT_COLLECTION_GRACE_MS`, `ATTACHMENT_COLLECTION_ORGANISATIONS_PER_PASS` |
-| Context bundle: items, tokens, time, freshness | 12, 2,048, 250 ms, 24 h | Literals in `buildContextReadFields` |
-| Memory read: a person waits, no person waits | 250 ms, 5 s | `INTERACTIVE_MEMORY_DEADLINE_MS`, `BACKGROUND_MEMORY_DEADLINE_MS` |
-| Use of a captured state | 20 s | `SURFACE_EFFECT_TTL_MS` |
-| Deadline of a page effect | 20 s, or 150 s for `simulate_workcell`. Never after the end of the turn lease | `SURFACE_EFFECT_TTL_MS`, `SURFACE_SIMULATION_TTL_MS` |
+| Limit                                                      | Value                                                                         | Constant                                                                                                              |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Files, file size, message size                             | 10, 25 MiB, 50 MiB                                                            | `MESSAGE_ATTACHMENT_POLICY`                                                                                           |
+| Slack download: redirects, time                            | 3, 15 s                                                                       | `MESSAGE_ATTACHMENT_POLICY`                                                                                           |
+| Tries of one Slack message                                 | 5                                                                             | `CASE_WORK_MAX_ATTEMPTS`                                                                                              |
+| Text, URL, file name of a message                          | 65,536 characters, 2,048 bytes, 255 characters                                | `NON_EMPTY_TEXT_MAX_CHARS`, `HTTP_URL_MAX_CHARS`, `DISPLAY_FILENAME_MAX_CHARS`                                        |
+| Text of a Portal message, multipart body                   | 8,000 characters, 50 MiB and 64 KiB                                           | Literals in `parseChatCommand` and `ChatUploadBodyLimit`                                                              |
+| Case purpose, context query                                | 160, 512 characters                                                           | `CASE_PURPOSE_MAX_CHARS`, `CONTEXT_QUERY_MAX_CHARS`                                                                   |
+| Text of a document                                         | 1 MiB source, 32,768 characters                                               | `ATTACHMENT_TEXT_LIMITS`                                                                                              |
+| PDF, DOCX and ODT                                          | 1 MiB source, 4 MiB decoded                                                   | `PDF_EXTRACTION_LIMITS`, `OFFICE_EXTRACTION_LIMITS`                                                                   |
+| Media source, frames                                       | 25 MiB, 12                                                                    | `MAX_MEDIA_SOURCE_BYTES`, `MAX_SAMPLED_FRAMES`                                                                        |
+| Decoded frame: picture, all frames                         | 1920 × 1080, 640 KiB                                                          | `MAX_DECODE_PIXELS`, `MAX_FRAME_RESPONSE_BYTES`                                                                       |
+| One preparation: input, result, time                       | 25 MiB, 36 MiB, 30 s                                                          | `MESSAGE_PREPARATION_LIMITS`                                                                                          |
+| Link read: transfer, text, time, redirects                 | 5 MiB, 32,768 characters, 10 s, 3                                             | `MESSAGE_LINK_POLICY`                                                                                                 |
+| Link read: DNS lookup, fetches of one container, idle stop | 5 s, 4, 30 s                                                                  | `DOH_TIMEOUT_MS`, `MAX_CONCURRENT_FETCHES`, `sleepAfter`                                                              |
+| Text of connector documentation (INT-01)                   | 65,536 characters                                                             | Literal in `readConnectorDocumentation`                                                                               |
+| Collection: interval, grace, Organisations in one run      | 24 h, 24 h, 4                                                                 | `ATTACHMENT_COLLECTION_INTERVAL_MS`, `ATTACHMENT_COLLECTION_GRACE_MS`, `ATTACHMENT_COLLECTION_ORGANISATIONS_PER_PASS` |
+| Context bundle: items, tokens, time, freshness             | 12, 2,048, 250 ms, 24 h                                                       | Literals in `buildContextReadFields`                                                                                  |
+| Memory read: a person waits, no person waits               | 250 ms, 5 s                                                                   | `INTERACTIVE_MEMORY_DEADLINE_MS`, `BACKGROUND_MEMORY_DEADLINE_MS`                                                     |
+| Use of a captured state                                    | 20 s                                                                          | `SURFACE_EFFECT_TTL_MS`                                                                                               |
+| Deadline of a page effect                                  | 20 s, or 150 s for `simulate_workcell`. Never after the end of the turn lease | `SURFACE_EFFECT_TTL_MS`, `SURFACE_SIMULATION_TTL_MS`                                                                  |
 
 - **Retention.** A stored file has the class `session`. It stays while a retained
   record names it and goes at the next collection after that. No code deletes a
@@ -434,14 +433,14 @@ The agent loads more context with its tools, when the task needs it.
 
 ## Sources
 
-- [Plan 37](../../plan-37-typed-messages-and-attachments.md). It depends on three plans
+- [Plan 37](../../history/plan-37-typed-messages-and-attachments.md). It depends on three plans
   of the archive:
   [Plan 34](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-34-drive-dropbox-file-context.md),
   [Plan 35](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-35-access-and-data-flow-controls.md) and
   [Plan 36](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-36-async-control-primitives.md).
   Its journey on real Slack is `pnpm --filter @purin-labs/platform canary:plan37`
   (`services/platform/scripts/plan37-attachment-canary.ts`).
-- [Plan 42G](../../plan-42G-automatic-context-loading.md), with its
+- [Plan 42G](../../history/plan-42G-automatic-context-loading.md), with its
   [implementation evidence](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42G-automatic-context-2026-10-01.md)
   and the records in the same folder of the archive:
   [candidate](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42G-automatic-context-2026-10-01/live-pi-candidate.json),
