@@ -148,12 +148,6 @@ const planFiles = new Map(
 const oldPathOf = new Map([...planFiles].map(([from, to]) => [to, from]));
 const packageName = plan.package.name;
 
-if (posix.basename(plan.target) !== packageName.split("/").pop()) {
-  faults.push(
-    `${planArgument}: the folder ${plan.target} and the package ${packageName} need the same last name. scripts/check-layers.mjs finds the module of a package by that name.`,
-  );
-}
-
 /** new path -> old path, for each file that still waits for its move. */
 const waiting = new Map();
 for (const [from, to] of planFiles) {
@@ -177,6 +171,27 @@ const tree = git("ls-files", "-co", "--exclude-standard")
   .map((path) => stillOld.get(path) ?? path);
 const known = new Set(tree);
 const diskPath = (path) => waiting.get(path) ?? path;
+
+// The name of the package is its own. scripts/check-layers.mjs finds the
+// module of a package by the name in its package.json, so the last part of
+// the name can differ from the folder (`@purin-labs/area-devices` in
+// areas/devices).
+for (const path of tree) {
+  if (posix.basename(path) !== "package.json") continue;
+  if (path === `${plan.target}/package.json`) continue;
+  if (UNREAD.some((pattern) => pattern.test(path))) continue;
+  let name;
+  try {
+    name = JSON.parse(readFileSync(join(root, diskPath(path)), "utf8")).name;
+  } catch {
+    continue;
+  }
+  if (name === packageName) {
+    faults.push(
+      `${planArgument}: ${path} has the name ${packageName}. Give the package another name.`,
+    );
+  }
+}
 
 const originals = new Map();
 /** path -> the text that this run writes. */
@@ -543,6 +558,23 @@ function resolveIn(has, folder, specifier) {
   return null;
 }
 const inPlan = (path) => planFiles.has(path);
+/**
+ * True for a public file (`contracts` of scripts/layers.json) of an area
+ * other than the module of an area plan. The areas import each other's public
+ * files in a circle, so no order of the areas moves each public file before
+ * its importers.
+ */
+function publicOfAnotherArea(path) {
+  if (!plan.module.startsWith("areas/")) return false;
+  const module = moduleAtStart(path);
+  if (module === null || !module.startsWith("areas/")) return false;
+  if (module === plan.module) return false;
+  return (layerMapAtStart.contracts ?? []).some((entry) =>
+    entry.endsWith("/") ? path.startsWith(entry) : path === entry,
+  );
+}
+/** "moved file -> public file" for each import that stays relative. */
+const intoWorker = new Set();
 const inTree = (path) => known.has(path);
 
 function relativeSpecifier(fromFolder, target, style) {
@@ -603,6 +635,14 @@ function newSpecifier(path, specifier) {
       );
     }
     const left = resolveIn(inTree, posix.dirname(oldPath), bare);
+    if (left !== null && publicOfAnotherArea(left.file)) {
+      // A public file of another area that has not moved yet: the moved file
+      // names it by its relative path. The move of that area names it by its
+      // package, so no relative import into the Worker is left after the
+      // last area.
+      intoWorker.add(`${path} -> ${left.file}`);
+      return relativeSpecifier(folder, left.file, left.style) + query;
+    }
     if (left !== null) {
       faults.push(
         `${oldPath} imports ${left.file}, which does not move. A package cannot import a file of the Worker: move that file first, or give the module a port.`,
@@ -1184,6 +1224,12 @@ function printReport() {
     console.log(
       `${keptForm.length} files keep their form by the plan (keepForm): ${keptForm.join(", ")}`,
     );
+  }
+  if (intoWorker.size > 0) {
+    console.log(
+      `${intoWorker.size} imports of a public file of another area that has not moved keep a relative path:`,
+    );
+    for (const line of [...intoWorker].sort()) console.log(`  ${line}`);
   }
   for (const note of notes) console.log(note);
 }
