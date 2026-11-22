@@ -32,7 +32,8 @@ export function matchPendingDecisionsRoute(
  * `GET /v1/control/organisations/{org}/decisions`: the decisions that wait
  * for the signed-in member, over every store. A viewer may call it, as a
  * viewer may call the read of each store. Each store applies its own check,
- * so a member sees here what that member sees on the pages of today.
+ * so a member sees here what that member sees on the pages of today. A
+ * ledger that does not answer gives 503, as the Operations read does.
  */
 export async function handlePendingDecisionsRoute(
   request: Request,
@@ -49,5 +50,8 @@ export async function handlePendingDecisionsRoute(
     false,
   );
   if (!authorized.ok) return authorized.response;
-  return controlJson(await listPendingDecisions(sources, authorized));
+  const decisions = await listPendingDecisions(sources, authorized);
+  return decisions === null
+    ? controlError("pending_decisions_unavailable", 503)
+    : controlJson(decisions);
 }

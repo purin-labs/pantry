@@ -1,6 +1,9 @@
 import { readActiveCaseOperations } from "../actors/case-operations";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
-import type { ActionLedgerActivity } from "../actors/action-ledger";
+import {
+  isCommerceLedgerAction,
+  type ActionLedgerActivity,
+} from "../actors/action-ledger";
 import type { AgentOperationsSnapshot } from "../data/agent-operations";
 import type { Env, OrganisationActorStub } from "../env";
 import type { OrganisationId } from "../ids";
@@ -104,5 +107,5 @@ export async function readCommerceActionLedger(
 }
 
 function isCommerceActivity(item: ActionLedgerActivity): boolean {
-  return item.action.host === "pantry.commerce";
+  return isCommerceLedgerAction(item.action);
 }

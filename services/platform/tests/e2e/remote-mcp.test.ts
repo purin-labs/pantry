@@ -5,6 +5,10 @@ import {
 } from "../../src/control/routes/custom-connectors";
 import { fixtureDatabase } from "./organisation-database";
 import { pendingDecisionsOf } from "./access-route-support";
+import { commerceHeaders } from "./commerce-support";
+import { completeCommerceApprovalFixture } from "./commerce-approval-fixture";
+import { googleConfig } from "../../src/control/google-oidc-config";
+import { APPROVAL_GRANT_COOKIE } from "../../src/control/authorization";
 import { controlActionMutationExecution } from "../../src/actors/action-mutation-execution";
 import { newControlMutationIdentity } from "../../src/data/control-mutation";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
@@ -922,6 +926,130 @@ async function revokeControlWriteOrigin(
 }
 
 it(
+  "shows a waiting custom connector write only to an owner or admin, and the commerce decide routes refuse its nonce while the write keeps waiting",
+  { timeout: 60_000 },
+  commerceRoutesRefuseCustomWriteJourney,
+);
+
+/**
+ * Refactor 17 review: a write of a custom connector waits in the same ledger
+ * as a commerce action, but it has its own read and its own decide routes. A
+ * viewer's list of decisions does not hold it; an admin's list does. The
+ * commerce approval (with a valid step-up grant), rejection and execution
+ * routes answer 404 for its nonce, and the write still waits for a decision.
+ */
+async function commerceRoutesRefuseCustomWriteJourney({ task }: TestContext) {
+  await installSlackActorFixture();
+  const server = new RemoteFixture();
+  network.use(http.get("https://cloudflare-dns.com/dns-query", dnsResponse));
+  const fixture = await installRemoteConnector(server);
+  const prepared = await prepareConnectorWrite({
+    fixture,
+    server,
+    entry: fixture.restWrite,
+    grantId: REST_WRITE_GRANT_ID,
+    suffix: "commerce_route_refusal",
+    grantDisposition: "retain",
+    timeoutMs: fixture.restWrite.limits.invocationTimeoutMs,
+    approval: "requested",
+  });
+  const waiting = { kind: "governed_action", id: prepared.nonce };
+  const organisation = await requireActiveOrganisationActor({
+    env,
+    organisationId: ORGANISATION_ID,
+    now: Date.now(),
+  });
+  const ledgerState = async (): Promise<string> => {
+    const entry = await organisation.getAction({
+      organisationId: ORGANISATION_ID,
+      nonce: prepared.nonce,
+      now: Date.now(),
+    });
+    if (!entry.ok) throw new Error(entry.error.code);
+    return entry.value.state;
+  };
+  try {
+    // 1. Only a member who decides the write sees it in the list.
+    await setActorRole("viewer");
+    const viewerList = await pendingDecisionsOf(
+      ORGANISATION_ID,
+      prepared.session,
+    );
+    await setActorRole("admin");
+    const adminList = await pendingDecisionsOf(
+      ORGANISATION_ID,
+      prepared.session,
+    );
+    expect(viewerList).not.toContainEqual(waiting);
+    expect(adminList).toContainEqual(waiting);
+
+    // 2. The commerce decide routes refuse the nonce of the write.
+    const action = await organisation.getAction({
+      organisationId: ORGANISATION_ID,
+      nonce: prepared.nonce,
+      now: Date.now(),
+    });
+    if (!action.ok) throw new Error(action.error.code);
+    const config = googleConfig(env);
+    if (config === null) throw new Error("Missing approval configuration");
+    const grant = await completeCommerceApprovalFixture({
+      db: env.DB,
+      config,
+      action: action.value.action,
+      userId: prepared.session.session.userId,
+      subject: "e2e-slack-actor",
+      email: "e2e-slack-actor@example.invalid",
+      stepUpId: "custom-write-commerce-route",
+    });
+    const commerceDecision = async (
+      suffix: "approval" | "rejection" | "execute",
+      body: Readonly<Record<string, unknown>>,
+    ) => {
+      const headers = commerceHeaders(prepared.session);
+      headers.set("idempotency-key", `commerce-route-${suffix}`);
+      headers.set(
+        "cookie",
+        `${headers.get("cookie") ?? ""}; ${APPROVAL_GRANT_COOKIE}=${grant}`,
+      );
+      const response = await exports.default.fetch(
+        `https://localhost/v1/control/organisations/${ORGANISATION_ID}/commerce/actions/${prepared.nonce}/${suffix}`,
+        { method: "POST", headers, body: JSON.stringify(body) },
+      );
+      return { status: response.status, body: await response.json() };
+    };
+    const refused = {
+      status: 404,
+      body: { ok: false, error: "commerce_action_not_found" },
+    };
+    const approval = await commerceDecision("approval", {});
+    const rejection = await commerceDecision("rejection", {
+      reason: "merchant_declined",
+    });
+    const execution = await commerceDecision("execute", {});
+    expect({ approval, rejection, execution }).toEqual({
+      approval: refused,
+      rejection: refused,
+      execution: refused,
+    });
+    const state = await ledgerState();
+    expect(state).toBe("approval_requested");
+    expect(server.calls).not.toContain("rest_create");
+    Object.assign(task.meta, {
+      commerceRoutesRefuseCustomWrite: {
+        viewerSeesWrite: viewerList.some((item) => item.id === waiting.id),
+        adminSeesWrite: adminList.some((item) => item.id === waiting.id),
+        approvalStatus: approval.status,
+        rejectionStatus: rejection.status,
+        executionStatus: execution.status,
+        ledgerState: state,
+      },
+    });
+  } finally {
+    await setActorRole("owner");
+  }
+}
+
+it(
   "refuses a viewer's rejection of a custom connector write and a rejection with no reason, then the owner's rejection takes the write out of the decisions that wait, and the write never runs",
   { timeout: 60_000 },
   rejectedWriteJourney,
@@ -1032,7 +1160,9 @@ async function rejectedWriteJourney({ task }: TestContext) {
   }
 }
 
-async function setActorRole(role: "owner" | "viewer"): Promise<void> {
+async function setActorRole(
+  role: "owner" | "admin" | "viewer",
+): Promise<void> {
   await fixtureDatabase()
     .prepare(
       `UPDATE service_role_grant SET role = ?

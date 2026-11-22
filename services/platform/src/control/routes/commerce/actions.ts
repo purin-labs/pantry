@@ -4,6 +4,10 @@ import { controlActionMutationExecution } from "../../../actors/action-mutation-
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
 import type { Env, CaseActorStub, OrganisationActorStub } from "../../../env";
 import type { Result } from "../../../result";
+import {
+  isCommerceLedgerAction,
+  type ActionLedgerEntry,
+} from "../../../actors/action-ledger";
 import type { CaseBinding } from "@purin-labs/contracts";
 import type { CommerceSource } from "@purin-labs/commerce-contracts";
 import {
@@ -276,14 +280,14 @@ export async function handleCommerceActions(
   if (request.method === "GET") {
     if (actionNonceRaw === null || !isActionNonce(actionNonceRaw))
       return controlError("commerce_action_not_found", 404);
-    const action = await organisation.getAction({
+    const action = await readCommerceLedgerAction(organisation, {
       organisationId: authorized.organisationId,
       nonce: actionNonceRaw,
       now: Date.now(),
     });
     return action.ok
       ? controlJson({ ok: true, action: commerceActionRecord(action.value) })
-      : commerceActionLedgerError(action.error);
+      : action.error;
   }
   if (request.method !== "POST" || actionNonceRaw !== null)
     return controlError("method_not_allowed", 405);
@@ -1201,12 +1205,12 @@ export async function handleCommerceActionApproval(
     organisationId: authorized.organisationId,
     now,
   });
-  const existing = await organisation.getAction({
+  const existing = await readCommerceLedgerAction(organisation, {
     organisationId: authorized.organisationId,
     nonce: actionNonceRaw,
     now,
   });
-  if (!existing.ok) return commerceActionLedgerError(existing.error);
+  if (!existing.ok) return existing.error;
   const actionDigest = await digestApprovalAction(existing.value.action);
   const payoutPath = parseCommerceActionPath(existing.value.action);
   if (
@@ -1386,12 +1390,12 @@ export async function handleCommerceActionRejection(
     organisationId: authorized.organisationId,
     now,
   });
-  const existing = await organisation.getAction({
+  const existing = await readCommerceLedgerAction(organisation, {
     organisationId: authorized.organisationId,
     nonce: actionNonceRaw,
     now,
   });
-  if (!existing.ok) return commerceActionLedgerError(existing.error);
+  if (!existing.ok) return existing.error;
   const actionDigest = await digestApprovalAction(existing.value.action);
   const rejection: MerchantActionRejectionEvidence =
     existing.value.state === "rejected"
@@ -1498,6 +1502,30 @@ export async function handleCommerceActionRejection(
   return controlJson(responseBody);
 }
 
+/**
+ * Reads one commerce action of the ledger for a commerce route. The ledger
+ * also holds the writes of custom connectors, which have their own routes and
+ * checks, so another kind of entry answers 404 before any write.
+ */
+async function readCommerceLedgerAction(
+  organisation: OrganisationActorStub,
+  input: Parameters<OrganisationActorStub["getAction"]>[0],
+): Promise<Result<ActionLedgerEntry, Response>> {
+  const entry = await organisation.getAction(input);
+  if (!entry.ok)
+    return { ok: false, error: commerceActionLedgerError(entry.error) };
+  if (
+    entry.value.action.authority.kind === "custom_connector" ||
+    !isCommerceLedgerAction(entry.value.action)
+  ) {
+    return {
+      ok: false,
+      error: controlError("commerce_action_not_found", 404),
+    };
+  }
+  return { ok: true, value: entry.value };
+}
+
 function requireApprovalControlRole(
   role: ActiveOrganisationMembership["role"],
 ): "owner" | "admin" {
@@ -1541,12 +1569,12 @@ export async function handleCommerceActionPluginPreview(
     organisationId: authorized.organisationId,
     now: Date.now(),
   });
-  const action = await organisation.getAction({
+  const action = await readCommerceLedgerAction(organisation, {
     organisationId: authorized.organisationId,
     nonce: actionNonceRaw,
     now: Date.now(),
   });
-  if (!action.ok) return commerceActionLedgerError(action.error);
+  if (!action.ok) return action.error;
   if (
     action.value.state !== "proposed" &&
     action.value.state !== "approval_requested"
@@ -1600,12 +1628,12 @@ export async function handleCommerceActionExecution(
     organisationId: authorized.organisationId,
     now,
   });
-  const existing = await organisation.getAction({
+  const existing = await readCommerceLedgerAction(organisation, {
     organisationId: authorized.organisationId,
     nonce: actionNonceRaw,
     now,
   });
-  if (!existing.ok) return commerceActionLedgerError(existing.error);
+  if (!existing.ok) return existing.error;
   const preflightPath = parseCommerceActionPath(existing.value.action);
   if (
     preflightPath.ok &&

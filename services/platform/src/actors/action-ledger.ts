@@ -183,6 +183,19 @@ export type ReadActionActivityInput = {
   readonly limit: number;
 };
 
+/** The host of every commerce action in the ledger. */
+const COMMERCE_ACTION_HOST = "pantry.commerce";
+
+/**
+ * True for a commerce action. The ledger also holds the writes of custom
+ * connectors, which have the host of their own service.
+ */
+export function isCommerceLedgerAction(
+  action: Readonly<{ host: string }>,
+): boolean {
+  return action.host === COMMERCE_ACTION_HOST;
+}
+
 export type ActionLedgerActivity = {
   readonly action: LedgerCanonicalAction;
   readonly caseId: CaseId;

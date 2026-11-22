@@ -404,6 +404,7 @@ function configureConfirmedDescriptionAction() {
       organisationId: ORGANISATION_ID,
       integrationAccountId: COMMERCE_INTEGRATION_ACCOUNT_ID,
       nonce: { value: nonce },
+      host: "pantry.commerce",
       verb: "commerce.catalog.update_description",
       path: "/catalog/product_ginger_cookie/description?expected_revision=1&description=Reviewed",
       resourceKey: "product:product_ginger_cookie",

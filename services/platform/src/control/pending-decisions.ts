@@ -14,10 +14,10 @@ import type { AuthorizedOrganisationRequest } from "./authorization";
  * The Worker gives the readers, so this file names no area.
  */
 export type PendingDecisionSources = Readonly<{
-  /** The action ledger of the Organisation actor. */
+  /** The action ledger of the Organisation actor. Null when it does not answer. */
   governedActions(
     authorized: AuthorizedOrganisationRequest,
-  ): Promise<readonly PendingGovernedAction[]>;
+  ): Promise<readonly PendingGovernedAction[] | null>;
   /** The held outputs in regional D1. */
   heldOutputs(
     authorized: AuthorizedOrganisationRequest,
@@ -36,18 +36,20 @@ export type PendingDecisionSources = Readonly<{
  * The decisions that wait for one person in an Organisation: one read over
  * the stores (Refactor 17, step A2.1). It reads each store one time, copies
  * no record and writes nothing. A Case approval wait is the Case's view of a
- * ledger action, so that action is one entry and not two.
+ * ledger action, so that action is one entry and not two. Null when the
+ * ledger does not answer: an empty list would say that nothing waits.
  */
 export async function listPendingDecisions(
   sources: PendingDecisionSources,
   authorized: AuthorizedOrganisationRequest,
-): Promise<PendingDecisionList> {
+): Promise<PendingDecisionList | null> {
   const [actions, held, permissions, emails] = await Promise.all([
     sources.governedActions(authorized),
     sources.heldOutputs(authorized),
     sources.permissionRequests(authorized),
     sources.emailReviews(authorized),
   ]);
+  if (actions === null) return null;
   const decisions: PendingDecision[] = [
     ...actions,
     ...held,

@@ -1,4 +1,7 @@
-import type { ActionLedgerActivity } from "../../actors/action-ledger";
+import {
+  isCommerceLedgerAction,
+  type ActionLedgerActivity,
+} from "../../actors/action-ledger";
 import { requireActiveOrganisationActorAtScope } from "../../actors/actor-router";
 import type { ActiveOrganisationMembership } from "../../data/control-plane";
 import {
@@ -551,7 +554,7 @@ function latestActionUpdatedAt(
 }
 
 function actionLedgerIsCommerce(item: HomeActionActivity): boolean {
-  return item.action.host === "pantry.commerce";
+  return isCommerceLedgerAction(item.action);
 }
 
 async function handleHome(
