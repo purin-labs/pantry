@@ -1,0 +1,87 @@
+{"variant":"0","round":1,"step":"install","ms":3714,"code":0,"load":"7.63 6.80 6.15"}
+{"variant":"0","round":1,"step":"check:types cold","ms":3190,"code":0,"load":"7.66 6.82 6.16"}
+{"variant":"0","round":1,"step":"check:types warm","ms":2452,"code":0,"load":"7.92 6.89 6.19"}
+{"variant":"0","round":1,"step":"tsrs --noEmit (Worker only)","ms":683,"code":0,"load":"7.92 6.89 6.19"}
+{"variant":"0","round":1,"step":"check:test-types","ms":1332,"code":0,"load":"7.92 6.89 6.19"}
+{"variant":"0","round":1,"step":"portal:build","ms":3352,"code":0,"viteMs":2090,"load":"8.73 7.08 6.26"}
+{"variant":"0","round":1,"step":"wrangler dry-run","ms":7248,"code":0,"bundleMs":3345,"uploadKiB":10201.35,"gzipKiB":2416.01,"bytes":10394797,"load":"8.73 7.08 6.26"}
+{"variant":"0","round":1,"step":"e2e devices-page","ms":20496,"code":0,"passed":true,"durationMs":19000,"transformMs":6920,"setupMs":15710,"testsMs":273,"toFirstTestMs":20223,"load":"9.11 7.22 6.32"}
+{"variant":"0","round":1,"step":"lint:static","ms":32368,"code":0,"load":"7.66 7.01 6.26"}
+{"variant":"F","round":1,"step":"install","ms":2846,"code":0,"load":"7.36 7.01 6.29"}
+{"variant":"F","round":1,"step":"check:types cold","ms":2701,"code":0,"load":"7.01 6.94 6.27"}
+{"variant":"F","round":1,"step":"check:types warm","ms":2159,"code":0,"load":"8.85 7.32 6.41"}
+{"variant":"F","round":1,"step":"tsrs --noEmit (Worker only)","ms":934,"code":0,"load":"8.85 7.32 6.41"}
+{"variant":"F","round":1,"step":"check:test-types","ms":1404,"code":0,"load":"8.85 7.32 6.41"}
+{"variant":"F","round":1,"step":"portal:build","ms":3252,"code":0,"viteMs":2070,"load":"8.85 7.32 6.41"}
+{"variant":"F","round":1,"step":"wrangler dry-run","ms":7361,"code":0,"bundleMs":3321,"uploadKiB":10201.24,"gzipKiB":2415.64,"bytes":10394679,"load":"8.62 7.30 6.40"}
+{"variant":"F","round":1,"step":"e2e devices-page","ms":19548,"code":0,"passed":true,"durationMs":18080,"transformMs":6400,"setupMs":14910,"testsMs":288,"toFirstTestMs":19260,"load":"8.31 7.27 6.41"}
+{"variant":"F","round":1,"step":"lint:static","ms":24642,"code":1,"load":"7.52 7.15 6.38"}
+{"variant":"P","round":1,"step":"install","ms":3015,"code":0,"load":"6.98 7.05 6.36"}
+{"variant":"P","round":1,"step":"check:types cold","ms":2911,"code":0,"load":"6.90 7.03 6.36"}
+{"variant":"P","round":1,"step":"check:types warm","ms":2351,"code":0,"load":"7.07 7.07 6.38"}
+{"variant":"P","round":1,"step":"tsrs --noEmit (Worker only)","ms":753,"code":0,"load":"7.07 7.07 6.38"}
+{"variant":"P","round":1,"step":"check:test-types","ms":1821,"code":0,"load":"7.07 7.07 6.38"}
+{"variant":"P","round":1,"step":"package check kernel","ms":313,"code":2,"errors":5,"load":"9.38 7.55 6.55"}
+{"variant":"P","round":1,"step":"package check devices-server","ms":723,"code":2,"errors":159,"load":"9.38 7.55 6.55"}
+{"variant":"P","round":1,"step":"portal:build","ms":3448,"code":0,"viteMs":2040,"load":"9.38 7.55 6.55"}
+{"variant":"P","round":1,"step":"wrangler dry-run","ms":7702,"code":0,"bundleMs":3446,"uploadKiB":10201.33,"gzipKiB":2416.01,"bytes":10394780,"load":"9.11 7.52 6.55"}
+{"variant":"P","round":1,"step":"e2e devices-page","ms":21276,"code":0,"passed":true,"durationMs":19820,"transformMs":7200,"setupMs":16200,"testsMs":361,"toFirstTestMs":20915,"load":"9.82 7.69 6.61"}
+{"variant":"P","round":1,"step":"lint:static","ms":22735,"code":1,"load":"9.46 7.76 6.66"}
+{"variant":"0","round":2,"step":"install","ms":3481,"code":0,"load":"8.37 7.65 6.65"}
+{"variant":"0","round":2,"step":"check:types cold","ms":3615,"code":0,"load":"8.18 7.62 6.65"}
+{"variant":"0","round":2,"step":"check:types warm","ms":2556,"code":0,"load":"8.18 7.62 6.65"}
+{"variant":"0","round":2,"step":"tsrs --noEmit (Worker only)","ms":883,"code":0,"load":"8.40 7.67 6.67"}
+{"variant":"0","round":2,"step":"check:test-types","ms":1602,"code":0,"load":"8.40 7.67 6.67"}
+{"variant":"0","round":2,"step":"portal:build","ms":4263,"code":0,"viteMs":2810,"load":"8.40 7.67 6.67"}
+{"variant":"0","round":2,"step":"wrangler dry-run","ms":8171,"code":0,"bundleMs":3786,"uploadKiB":10201.35,"gzipKiB":2416.01,"bytes":10394797,"load":"10.53 8.13 6.84"}
+{"variant":"0","round":2,"step":"e2e devices-page","ms":20497,"code":0,"passed":true,"durationMs":18920,"transformMs":6870,"setupMs":15530,"testsMs":367,"toFirstTestMs":20130,"load":"12.07 8.55 7.00"}
+{"variant":"0","round":2,"step":"lint:static","ms":31977,"code":0,"load":"10.25 8.35 6.97"}
+{"variant":"F","round":2,"step":"install","ms":2767,"code":0,"load":"8.00 8.00 6.89"}
+{"variant":"F","round":2,"step":"check:types cold","ms":2719,"code":0,"load":"7.76 7.95 6.88"}
+{"variant":"F","round":2,"step":"check:types warm","ms":2227,"code":0,"load":"9.38 8.28 7.00"}
+{"variant":"F","round":2,"step":"tsrs --noEmit (Worker only)","ms":613,"code":0,"load":"9.38 8.28 7.00"}
+{"variant":"F","round":2,"step":"check:test-types","ms":1378,"code":0,"load":"9.38 8.28 7.00"}
+{"variant":"F","round":2,"step":"portal:build","ms":3688,"code":0,"viteMs":2370,"load":"9.38 8.28 7.00"}
+{"variant":"F","round":2,"step":"wrangler dry-run","ms":7165,"code":0,"bundleMs":3247,"uploadKiB":10201.24,"gzipKiB":2415.64,"bytes":10394679,"load":"9.03 8.22 6.99"}
+{"variant":"F","round":2,"step":"e2e devices-page","ms":19630,"code":0,"passed":true,"durationMs":18220,"transformMs":6510,"setupMs":15000,"testsMs":381,"toFirstTestMs":19249,"load":"8.47 8.13 6.97"}
+{"variant":"F","round":2,"step":"lint:static","ms":25266,"code":1,"load":"8.27 8.11 6.98"}
+{"variant":"P","round":2,"step":"install","ms":2923,"code":0,"load":"7.36 7.90 6.95"}
+{"variant":"P","round":2,"step":"check:types cold","ms":2993,"code":0,"load":"7.36 7.90 6.95"}
+{"variant":"P","round":2,"step":"check:types warm","ms":2152,"code":0,"load":"7.09 7.84 6.93"}
+{"variant":"P","round":2,"step":"tsrs --noEmit (Worker only)","ms":657,"code":0,"load":"7.09 7.84 6.93"}
+{"variant":"P","round":2,"step":"check:test-types","ms":1494,"code":0,"load":"7.09 7.84 6.93"}
+{"variant":"P","round":2,"step":"package check kernel","ms":314,"code":2,"errors":5,"load":"8.53 8.12 7.03"}
+{"variant":"P","round":2,"step":"package check devices-server","ms":665,"code":2,"errors":159,"load":"8.53 8.12 7.03"}
+{"variant":"P","round":2,"step":"portal:build","ms":3766,"code":0,"viteMs":2420,"load":"8.53 8.12 7.03"}
+{"variant":"P","round":2,"step":"wrangler dry-run","ms":7517,"code":0,"bundleMs":3546,"uploadKiB":10201.33,"gzipKiB":2416.01,"bytes":10394780,"load":"9.61 8.35 7.12"}
+{"variant":"P","round":2,"step":"e2e devices-page","ms":20513,"code":0,"passed":true,"durationMs":19070,"transformMs":6910,"setupMs":15750,"testsMs":384,"toFirstTestMs":20129,"load":"9.48 8.35 7.13"}
+{"variant":"P","round":2,"step":"lint:static","ms":22908,"code":1,"load":"9.06 8.33 7.15"}
+{"variant":"0","round":3,"step":"install","ms":2806,"code":0,"load":"8.88 8.35 7.19"}
+{"variant":"0","round":3,"step":"check:types cold","ms":2851,"code":0,"load":"8.88 8.35 7.19"}
+{"variant":"0","round":3,"step":"check:types warm","ms":2246,"code":0,"load":"8.73 8.32 7.18"}
+{"variant":"0","round":3,"step":"tsrs --noEmit (Worker only)","ms":789,"code":0,"load":"8.73 8.32 7.18"}
+{"variant":"0","round":3,"step":"check:test-types","ms":1436,"code":0,"load":"8.91 8.37 7.21"}
+{"variant":"0","round":3,"step":"portal:build","ms":4547,"code":0,"viteMs":3210,"load":"8.91 8.37 7.21"}
+{"variant":"0","round":3,"step":"wrangler dry-run","ms":8595,"code":0,"bundleMs":3860,"uploadKiB":10201.35,"gzipKiB":2416.01,"bytes":10394797,"load":"8.52 8.29 7.19"}
+{"variant":"0","round":3,"step":"e2e devices-page","ms":20483,"code":0,"passed":true,"durationMs":18970,"transformMs":6760,"setupMs":15410,"testsMs":324,"toFirstTestMs":20159,"load":"8.65 8.33 7.21"}
+{"variant":"0","round":3,"step":"lint:static","ms":31034,"code":0,"load":"8.00 8.21 7.20"}
+{"variant":"F","round":3,"step":"install","ms":2863,"code":0,"load":"7.92 8.19 7.22"}
+{"variant":"F","round":3,"step":"check:types cold","ms":2652,"code":0,"load":"7.77 8.15 7.22"}
+{"variant":"F","round":3,"step":"check:types warm","ms":2222,"code":0,"load":"7.77 8.15 7.22"}
+{"variant":"F","round":3,"step":"tsrs --noEmit (Worker only)","ms":652,"code":0,"load":"7.77 8.15 7.22"}
+{"variant":"F","round":3,"step":"check:test-types","ms":1384,"code":0,"load":"8.03 8.20 7.24"}
+{"variant":"F","round":3,"step":"portal:build","ms":3100,"code":0,"viteMs":1890,"load":"8.03 8.20 7.24"}
+{"variant":"F","round":3,"step":"wrangler dry-run","ms":9944,"code":0,"bundleMs":3340,"uploadKiB":10201.24,"gzipKiB":2415.64,"bytes":10394679,"load":"8.03 8.19 7.24"}
+{"variant":"F","round":3,"step":"e2e devices-page","ms":20174,"code":0,"passed":true,"durationMs":18580,"transformMs":6850,"setupMs":15420,"testsMs":301,"toFirstTestMs":19873,"load":"7.62 8.11 7.22"}
+{"variant":"F","round":3,"step":"lint:static","ms":30023,"code":1,"load":"7.50 8.05 7.22"}
+{"variant":"P","round":3,"step":"install","ms":3209,"code":0,"load":"8.84 8.34 7.36"}
+{"variant":"P","round":3,"step":"check:types cold","ms":3155,"code":0,"load":"8.84 8.34 7.36"}
+{"variant":"P","round":3,"step":"check:types warm","ms":2492,"code":0,"load":"8.54 8.28 7.34"}
+{"variant":"P","round":3,"step":"tsrs --noEmit (Worker only)","ms":797,"code":0,"load":"8.54 8.28 7.34"}
+{"variant":"P","round":3,"step":"check:test-types","ms":1636,"code":0,"load":"11.54 8.91 7.57"}
+{"variant":"P","round":3,"step":"package check kernel","ms":308,"code":2,"errors":5,"load":"11.54 8.91 7.57"}
+{"variant":"P","round":3,"step":"package check devices-server","ms":582,"code":2,"errors":159,"load":"11.54 8.91 7.57"}
+{"variant":"P","round":3,"step":"portal:build","ms":3439,"code":0,"viteMs":2060,"load":"11.54 8.91 7.57"}
+{"variant":"P","round":3,"step":"wrangler dry-run","ms":7192,"code":0,"bundleMs":3362,"uploadKiB":10201.33,"gzipKiB":2416.01,"bytes":10394780,"load":"10.93 8.83 7.55"}
+{"variant":"P","round":3,"step":"e2e devices-page","ms":20321,"code":0,"passed":true,"durationMs":18870,"transformMs":6870,"setupMs":15700,"testsMs":312,"toFirstTestMs":20009,"load":"10.54 8.78 7.54"}
+{"variant":"P","round":3,"step":"lint:static","ms":23883,"code":1,"load":"8.90 8.52 7.47"}

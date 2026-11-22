@@ -448,8 +448,12 @@ new count with a ratchet, or a written reason to accept it.
 [Plan 93](plan-93-clean-cutover.md) is done: `pantry.purin.io` serves production and
 the old stack is deleted. Stage B starts with step 1. In this order:
 
-1. The trial of D1: one foundation module and one area as packages, with the `tsrs`
-   time, the Worker start and the Portal build.
+1. Done: the trial of D1 ([report](evidence/refactor-17-d1-trial.md)) and its
+   decision, a mix ([D1](#decisions)). Done with it: the four Actor stub types left
+   `env.ts` for `actors/actor-stubs.ts`, so the kernel reads no key that an Actor
+   file merges into `Env`. Next: the kernel as the first package. That move changes
+   about 1,230 files by script (917 Worker files, 172 unit tests, 101 journeys), so
+   it needs a move date that the other sessions know.
 2. The journeys: a `testing` entry for each module, or an exception in the lint. 178
    journeys import the inside of the Worker.
 3. The move script and its dry run in a scratch worktree (`pnpm lint` with the guard of
@@ -2701,6 +2705,14 @@ General risks:
     The review found two costs that it did not count: the journeys import the inside
     of the Worker, and a large root entry can make an import cycle.
   - Default: no decision now.
+  - Decided by the owner on 2026-11-22, after the trial
+    ([report](evidence/refactor-17-d1-trial.md)): a mix. A foundation module becomes
+    a workspace package, from the bottom of the foundation order, the kernel first.
+    The server code of an area stays a folder with relative imports until each module
+    that it imports is a package. The times did not decide: each variant was inside
+    1 second of the baseline. The obstacles decided: an area package imports Worker
+    files (45 for `devices`), so the package and the Worker depend on each other, and
+    three lints fail.
 - **D2. Order against Plans 93 and 94.**
   - Recommendation: start Stage A and step S1 now, from `origin/dev`. They change no
     stored data and no deployed name. Stage B and each change of stored data wait for

@@ -1,0 +1,56 @@
+{
+  "moves": {
+    "services/platform/src/actors/device-command.machine.ts": "areas/devices/server/actors/device-command.machine.ts",
+    "services/platform/src/actors/device-command.ts": "areas/devices/server/actors/device-command.ts",
+    "services/platform/src/actors/device-fleet-cobot.ts": "areas/devices/server/actors/device-fleet-cobot.ts",
+    "services/platform/src/actors/device-fleet-printer.ts": "areas/devices/server/actors/device-fleet-printer.ts",
+    "services/platform/src/actors/device-fleet-schema.ts": "areas/devices/server/actors/device-fleet-schema.ts",
+    "services/platform/src/actors/device-fleet-terminal.ts": "areas/devices/server/actors/device-fleet-terminal.ts",
+    "services/platform/src/actors/device-fleet.ts": "areas/devices/server/actors/device-fleet.ts",
+    "services/platform/src/agent-tools/devices/devices.ts": "areas/devices/server/agent-tools/devices.ts",
+    "services/platform/src/agent-tools/devices/handlers.ts": "areas/devices/server/agent-tools/handlers.ts",
+    "services/platform/src/agent-tools/devices/services.ts": "areas/devices/server/agent-tools/services.ts",
+    "services/platform/src/agent-tools/devices/turn-services.ts": "areas/devices/server/agent-tools/turn-services.ts",
+    "services/platform/src/control/routes/devices.ts": "areas/devices/server/routes/devices.ts",
+    "services/platform/src/devices/alerts.ts": "areas/devices/server/alerts.ts",
+    "services/platform/src/devices/commands.ts": "areas/devices/server/commands.ts",
+    "services/platform/src/devices/contract/alert-delivery.ts": "areas/devices/server/contract/alert-delivery.ts",
+    "services/platform/src/devices/contract/device-commands.ts": "areas/devices/server/contract/device-commands.ts",
+    "services/platform/src/devices/contract/fleet-stub.ts": "areas/devices/server/contract/fleet-stub.ts",
+    "services/platform/src/devices/contract/shop-mac-devices.ts": "areas/devices/server/contract/shop-mac-devices.ts",
+    "services/platform/src/devices/gateway-routes.ts": "areas/devices/server/gateway-routes.ts",
+    "services/platform/src/devices/purge.ts": "areas/devices/server/purge.ts",
+    "services/platform/src/devices/readiness.ts": "areas/devices/server/readiness.ts",
+    "services/platform/src/devices/snapshots.ts": "areas/devices/server/snapshots.ts",
+    "services/platform/src/devices/store.ts": "areas/devices/server/store.ts",
+    "services/platform/src/devices/views.ts": "areas/devices/server/views.ts",
+    "services/platform/src/devices/work.ts": "areas/devices/server/work.ts",
+    "services/platform/src/case-identity.ts": "foundation/kernel/case-identity.ts",
+    "services/platform/src/database-handles.ts": "foundation/kernel/database-handles.ts",
+    "services/platform/src/env.ts": "foundation/kernel/env.ts",
+    "services/platform/src/fault-injection-auth.ts": "foundation/kernel/fault-injection-auth.ts",
+    "services/platform/src/http.ts": "foundation/kernel/http.ts",
+    "services/platform/src/ids.ts": "foundation/kernel/ids.ts",
+    "services/platform/src/isolate-location.ts": "foundation/kernel/isolate-location.ts",
+    "services/platform/src/lenient-base64.ts": "foundation/kernel/lenient-base64.ts",
+    "services/platform/src/observability.ts": "foundation/kernel/observability.ts",
+    "services/platform/src/public-origin.ts": "foundation/kernel/public-origin.ts",
+    "services/platform/src/queue-fields.ts": "foundation/kernel/queue-fields.ts",
+    "services/platform/src/request-deadline.ts": "foundation/kernel/request-deadline.ts",
+    "services/platform/src/result.ts": "foundation/kernel/result.ts",
+    "services/platform/src/runtime-fetch.ts": "foundation/kernel/runtime-fetch.ts",
+    "services/platform/src/port.ts": "foundation/kernel/port.ts",
+    "services/platform/src/commerce-type-parts.ts": "foundation/kernel/commerce-type-parts.ts"
+  },
+  "dirs": [
+    [
+      "services/platform/src/devices/contract/",
+      "areas/devices/server/contract/"
+    ],
+    [
+      "services/platform/src/agent-tools/devices/",
+      "areas/devices/server/agent-tools/"
+    ],
+    ["services/platform/src/devices/", "areas/devices/server/"]
+  ]
+}

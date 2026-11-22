@@ -1,0 +1,10 @@
+{
+  "moves": {},
+  "repackage": true,
+  "packages": [
+    {
+      "root": "foundation/kernel",
+      "name": "@purin-labs/kernel"
+    }
+  ]
+}

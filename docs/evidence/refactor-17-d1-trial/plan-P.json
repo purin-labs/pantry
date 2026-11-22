@@ -1,0 +1,18 @@
+{
+  "moves": {},
+  "repackage": true,
+  "packages": [
+    {
+      "root": "foundation/kernel",
+      "name": "@purin-labs/kernel"
+    },
+    {
+      "root": "areas/devices/server",
+      "name": "@purin-labs/devices-server"
+    }
+  ],
+  "worker": {
+    "root": "services/platform",
+    "name": "@purin-labs/platform"
+  }
+}
