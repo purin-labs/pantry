@@ -796,7 +796,10 @@ Phase 4 is done, on 22 November 2026. Open items, each outside the switch:
 - Meta keeps its old name and URLs until its business verification passes.
 - `satyr-gmail-dev` and `satyr-drive-pilot` go when local development moves
   to `purin-pantry` (Plan 93 follow-ups).
-- The Dropbox icons (the console needs a native file picker).
+- The Dropbox icons: the console opens only a native file picker, which
+  the browser tools cannot fill. The owner picks
+  `docs/brand/purin-logo/icon-pack/mark-64.png` and `mark-256.png` (the
+  exact sizes) on the Branding tab of the app "Purin Pantry" and saves.
 - The callback page now has the Portal's look (dev `29024dc0`, released in
   `pantry` `5e878705`).
 
