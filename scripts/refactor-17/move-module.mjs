@@ -832,6 +832,11 @@ const FOLDER_FROM_ROOT =
           .join("|")})(?=/|[^\\w./-]|$)`,
         "g",
       );
+/** The new path of a moved file or of a folder that moves whole, or null. */
+function movedPath(path) {
+  if (planFiles.has(path)) return planFiles.get(path);
+  return movedFolders.get(path.replace(/\/$/, "")) ?? null;
+}
 // A glob of the Worker source below its root that selects a moved file, in a
 // folder that does not move whole: the moved file leaves the glob.
 const GLOB =
@@ -881,16 +886,18 @@ for (const path of tree) {
       return movedFolders.get(from);
     });
   }
-  // A path from the folder of a config or of a document. The imports of a
-  // source file are done above.
+  // A path from the folder of a config or of a document, to a moved file or
+  // to a folder that moves whole. The imports of a source file are done above.
   if (!SOURCE.test(path) && !oldPathOf.has(path)) {
     next = next.replace(RELATIVE_PATH, (whole) => {
       const trimmed = whole.replace(/[.,;:]+$/, "");
       const target = posix.normalize(posix.join(posix.dirname(path), trimmed));
-      if (!planFiles.has(target)) return whole;
+      const moved = movedPath(target);
+      if (moved === null) return whole;
       changed += 1;
       return (
-        relativeSpecifier(posix.dirname(path), planFiles.get(target), "exact") +
+        relativeSpecifier(posix.dirname(path), moved, "exact") +
+        (target.endsWith("/") ? "/" : "") +
         whole.slice(trimmed.length)
       );
     });
@@ -931,12 +938,15 @@ for (const path of tree) {
     if (/^[a-z][a-z0-9+.-]*:/i.test(target) || target.startsWith("/")) {
       return whole;
     }
-    const moved = planFiles.get(
-      posix.normalize(posix.join(posix.dirname(path), target)),
-    );
-    if (moved === undefined) return whole;
+    const full = posix.normalize(posix.join(posix.dirname(path), target));
+    const moved = movedPath(full);
+    if (moved === null) return whole;
     changed += 1;
-    return lead + relativeSpecifier(posix.dirname(path), moved, "exact");
+    return (
+      lead +
+      relativeSpecifier(posix.dirname(path), moved, "exact") +
+      (full.endsWith("/") ? "/" : "")
+    );
   });
   if (changed === 0) continue;
   counts.paths += changed;
