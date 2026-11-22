@@ -738,8 +738,20 @@ State on 22 November 2026:
   registration faults: a production organisation takes only a Stripe
   account with active card payments and a live webhook, and only a Shopify
   store that is not a development store. A full connect needs live Stripe
-  and a real store, or an organisation in the development environment. That
-  choice is outside this plan.
+  and a real store, or an organisation in the development environment.
+- **Test organisation**, the same evening, on the owner's "set up a
+  development test organisation": Plan 95 now lets an owner on the Worker
+  secret `PANTRY_TEST_ORGANISATION_OWNERS` (`n6378056@gmail.com`) make an
+  organisation in the development environment (dev `549f5e50`, `pantry`
+  version `5e878705`). "Purin test shop" (`organisation_a911940a-…`,
+  handle `purin-test-shop`) reads `environment: "development"`. Shopify
+  connected there: the development store `nuki-ub5drbcx` shows as "Nuki".
+  Stripe still waits: Stripe's test sign-in asks the owner's Stripe user to
+  set up two-step authentication first, and Pantry takes only a test
+  account that has finished Stripe's sign-up form (`details_submitted`),
+  so the owner finishes that step. The test organisation stays in setup
+  (no AI account, commerce system or Slack yet); the connects do not need
+  it to be active.
 - **4D, after the Stripe move**: Pantry's two webhook endpoints in the shared
   Seams account are deleted (it now holds only the Seams Console's two
   endpoints). Its `pantry.purin.io` redirect stays there, because the
@@ -755,7 +767,10 @@ Phase 4 is done, on 22 November 2026. Open items, each outside the switch:
 - `satyr-gmail-dev` and `satyr-drive-pilot` go when local development moves
   to `purin-pantry` (Plan 93 follow-ups).
 - The Dropbox icons (the console needs a native file picker).
-- The owner's choice for full Stripe and Shopify connects (see 4C).
+- The full Stripe connect in "Purin test shop": the owner sets up Stripe
+  two-step authentication and finishes the test sign-up form (see 4C).
+- The callback page now has the Portal's look (dev `29024dc0`, released in
+  `pantry` `5e878705`).
 
 ## Built
 
