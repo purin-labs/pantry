@@ -23,8 +23,10 @@
 //       an `exports` map and no build step. With `package.typeCheck: false`
 //       in the plan, the package has no check:types script. With
 //       `package.existing: true`, the module joins a package that exists:
-//       its manifest gets the export entries and the dependencies of the
-//       plan, and it keeps the rest and its tsconfig.
+//       its manifest gets the export entries, the dependencies and the
+//       devDependencies of the plan, and it keeps the rest and its tsconfig.
+//       In a package under a cover of scripts/layers.json, each folder of the
+//       moved files gets a rule.
 //    3. The workspace entry, and the dependency in each package that imports
 //       the module by name.
 //    4. Each import of a moved file, in each source file of the tree: `from`,
@@ -419,6 +421,18 @@ if (plan.package.existing === true) {
       plan.package.dependencies ?? {},
     )) {
       next = withDependency(next, name, version);
+    }
+    for (const name of plan.package.devDependencies ?? []) {
+      if (
+        next.dependencies?.[name] !== undefined ||
+        next.devDependencies?.[name] !== undefined
+      ) {
+        continue;
+      }
+      next = {
+        ...next,
+        devDependencies: { ...next.devDependencies, [name]: versionOf(name) },
+      };
     }
     if (JSON.stringify(next) !== JSON.stringify(manifest)) {
       await putJson(manifestPath, next, "package");
@@ -871,6 +885,19 @@ for (const path of tree) {
         `${LAYER_MAP}: packages gives ${plan.target} to ${map.packages[plan.target] ?? "no module"}, and the plan moves ${plan.module} into it.`,
       );
     }
+    // A package under a cover has a rule for each of its folders: a moved
+    // file with no rule gets one for its first folder in the package.
+    if (map.covers.some((cover) => rule.startsWith(cover))) {
+      for (const to of planFiles.values()) {
+        const ruled = Object.keys(map.rules).some((key) => to.startsWith(key));
+        if (ruled) continue;
+        const inside = to.slice(rule.length);
+        const folder = inside.includes("/")
+          ? `${rule}${inside.split("/")[0]}/`
+          : rule;
+        map.rules[folder] = plan.module;
+      }
+    }
   } else {
     // A rule of a folder that moved whole is now inside the rule of the
     // target. A rule of another module can come with it: an earlier move
@@ -890,6 +917,12 @@ for (const path of tree) {
     if (!map.covers.some((cover) => rule.startsWith(cover))) {
       map.covers.push(`${plan.target.split("/")[0]}/`);
     }
+  }
+  // A rule of this module whose folder holds no file after the move: the
+  // move took the whole folder to a folder of another name.
+  for (const key of Object.keys(map.rules)) {
+    if (map.rules[key] !== plan.module || key.startsWith(rule)) continue;
+    if (!tree.some((path) => path.startsWith(key))) delete map.rules[key];
   }
   await putJson(LAYER_MAP, map, "layer map");
 }
