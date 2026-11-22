@@ -636,8 +636,50 @@ State on 22 November 2026:
     the deploy, the released config was equal to the repository file; after
     it, the released config lists the old, the new and the `localhost`
     callbacks, with the old `application_url`.
-  - The Google `gcloud` steps wait for the owner's new project. The console
-    steps wait for the owner.
+  - Google, on the owner's "Continue and finish phase 4": `gcloud` made the
+    project `purin-pantry` (number 136715459438), enabled the Gmail, Drive,
+    Picker and Pub/Sub APIs, made the topic `pantry-gmail-push` (publisher
+    role for `gmail-api-push@system.gserviceaccount.com`), the service
+    account `pantry-gmail-push` and the push subscription
+    `pantry-gmail-push-sub` to `https://pantry.purin.io/hook/email/google`
+    with that audience, and the Picker API key (Picker API only, referrer
+    `https://pantry.purin.io/*`). The new subscription never expires; the
+    old one expired after 31 idle days, so an idle shop could lose its Gmail
+    push. The Plan 93 session made the consent screen (External, "In
+    production", seven scopes, `purin.io`, the Portal privacy and terms
+    pages) and the Web client "Purin Pantry web" in the owner's Chrome, and
+    made the two Stripe endpoints through the API.
+- **Switch**, 22 November 2026, about 19:10 JST, with the owner's yes. Each
+  change was read back after it:
+  - Slack: the manifest API set the name "Purin Pantry", the bot "Sous
+    Chef", and the request URLs `https://slack.pantry.purin.io/slack/events`
+    and `/slack/interactions`. The icon is the Purin cat (console). The
+    Plan 93 session's test in #cafe-ops then got one reply in the thread on
+    the new stack.
+  - Shopify: the name "Purin Pantry" and `application_url`
+    `https://pantry.purin.io/portal`.
+  - Dropbox (console): the name "Purin Pantry", publisher, website and
+    privacy URL, the new redirect URI and the webhook
+    `https://pantry.purin.io/hook/dropbox`, which Dropbox shows as
+    "Enabled" after its challenge to the new stack. The Dropbox icons are
+    not changed: the console opens a native file picker.
+  - Square and Stripe Connect: the owner changes the redirect fields in the
+    console, because the Chrome sign-ins were not the accounts that own the
+    apps.
+  - Airtable, Notion and Meta keep their old names and URLs: Airtable and
+    Notion until the owner uses them on the new stack, Meta until its
+    business verification passes (its Graph API answers "API access
+    blocked").
+- **4D**, with the owner's yes, after Plan 93 step 5 deleted the old
+  Workers: the old Slack redirect, the old Shopify callback, the old
+  Dropbox redirect and webhook, and the two old Stripe endpoints (Connect
+  and commerce) are removed. Kept: the `localhost:3003` URLs for local
+  development. The Plan 93 session deletes the third old Stripe endpoint
+  (`/hook/stripe/tenant_T0BGQSSG45N`, made by the code for an old
+  organisation) under the owner's step 5 yes. Kept by the owner's decision:
+  `satyr-gmail-dev` and `satyr-drive-pilot`, because the local profile
+  still uses them. They go when local development moves to `purin-pantry`,
+  which is a separate task of its own (Plan 93 follow-ups).
 - **Secrets.** Decided by the owner on 22 November 2026: the new stack
   reuses the current provider client secrets, with no rotation. The owner
   first answered "rotate on the switch day", then chose reuse in the Plan 93
@@ -649,7 +691,9 @@ State on 22 November 2026:
 - **Live.** Since 22 November 2026, 12:30 JST, `pantry.purin.io` serves the
   Purin text (Plan 93 redeploy from dev `f6993814`); the privacy and terms
   pages show "Purin Pantry", so Google brand verification can read them.
-- **4C** and **4D** wait for Plan 93 steps 4 and 5.
+- **4C**: the Google sign-in, the Slack install and the Slack reply passed on
+  the new stack (Plan 93 checks). The Gmail, Drive, Square, Stripe and
+  Shopify connects wait for the owner.
 
 ## Built
 
