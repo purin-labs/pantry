@@ -81,13 +81,14 @@ renamed is still loaded by its old name.
 
 ## The wake phrase (Plan 91 phase 6)
 
-On 23 November 2026, three "Hey Sous Chef" models were trained with the same pipeline and data as
-"Hey Satyr", and none passes the rule in `scripts/plan-82-g04/compare.py`. The Portal keeps "Hey
-Satyr". The best model is better on every shared test (3 false wakes against 5 in 37.1 h, mean
-recall 90.7% against 86.2%), but it hears 50.4% of macOS voice clips against 66.5%. The gap is
-largest for accents that the training voices do not have. Plan 91, "Phase 6: the wake phrase", has
-the rule, the numbers of each round and the next training step (more English accents, which needs
-the owner's yes for a download).
+On 23 November 2026, four "Hey Sous Chef" models were trained with the same pipeline as "Hey
+Satyr", and none passes the rule in `scripts/plan-82-g04/compare.py`. The Portal keeps "Hey
+Satyr". The latest model (round 3, with VCTK accent clips) is better on every shared test (4 false
+wakes against 5 in 37.1 h, mean recall 91.0% against 86.2%). It hears 53.3% of macOS voice clips
+against 66.5%: better on three natural macOS voices, much worse on Rishi, Tessa and four old formant
+voices. Plan 91, "Phase 6: the wake phrase", has the rule and the numbers of each round. The next
+step is the owner's real-voice check with `scripts/plan-82-g04/real-voices.py` (about 3 minutes):
+`record`, then `score`.
 
 How to train and measure a phrase (Python from `~/.satyr-voice-test/wake/.venv`, torch through
 `uv`):
@@ -97,7 +98,8 @@ cd scripts/plan-82-g04
 ~/.satyr-voice-test/wake/.venv/bin/python wake.py phrase --phrase sous-chef
 ~/.satyr-voice-test/wake/.venv/bin/python wake.py more --phrase sous-chef --wake 7000 --near 30000
 ~/.satyr-voice-test/wake/.venv/bin/python wake.py kokoro --phrase sous-chef --wake 10000 --near 16000
-uv run --no-project --python 3.13 --with torch --with numpy python train.py --phrase sous-chef
+~/.satyr-voice-test/wake/.venv/bin/python wake.py accents --phrase sous-chef --wake 7000 --near 7000
+uv run --no-project --python 3.13 --with torch --with numpy python train.py --phrase sous-chef --near-weight 4
 uv run --no-project --python 3.13 --with torch --with numpy python export.py weights sous-chef
 ~/.satyr-voice-test/wake/.venv/bin/python export.py onnx sous-chef
 ~/.satyr-voice-test/wake/.venv/bin/python export.py voices sous-chef
@@ -135,7 +137,7 @@ These wait until the owner has a shop. Do not ask the owner for them before that
    one through real Workers AI, on the deployed Worker, from the Portal to an agent answer. Measure
    the fallback time from the end of a 3 s command: the limit is 6 s at p95. This needs a signed-in
    Portal in the owner's Chrome. It is about one hour of agent work.
-5. **The wake phrase rename.** The Purin rename kept the agent's name "Sous Chef". Three models
+5. **The wake phrase rename.** The Purin rename kept the agent's name "Sous Chef". Four models
    did not pass on 23 November 2026: see "The wake phrase (Plan 91 phase 6)". The Mac's lexicon
    already says "sous" correctly (shop voice 0.5.2). Until a model passes, the Portal says "Hey
    Satyr".
