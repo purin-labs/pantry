@@ -1,0 +1,83 @@
+{
+  "about": "Refactor 17, Stage B, decision D1: the foundation module agent-tools becomes the workspace package @purin-labs/agent-tools in foundation/agent-tools. scripts/refactor-17/move-module.mjs reads this plan. files: each source file that scripts/layers.json gives the module, with its place in the target folder. sourcePrefixes: where --sync-plan puts a file that the module gets later. package: the manifest and the tsconfig of the new package; the versions of devDependencies come from versionsFrom. edits: text edits of the files that name a root folder and cannot read scripts/lib/source-roots.mjs, and of a path that is no import; an edit is done when the file holds its replace text. keepForm: each file where an import stays on its line, because the wrap of Prettier would move a ratchet, with its reason. regenerate: the commands that write a generated file again. package.typeCheck false: the package has no check:types script of its own. Its own files read no merged Env key, but they import @purin-labs/authority, which imports @purin-labs/tenancy/organisation-execution-scope; that file reads env.ORGANISATION, a key that services/platform/src/actors/organisation.ts (workers/platform) merges with declare module of @purin-labs/kernel/env. The package alone gives 5 errors in that tenancy file. The Worker program checks its files.",
+  "module": "foundation/agent-tools",
+  "target": "foundation/agent-tools",
+  "workspaceEntry": "foundation/*",
+  "sourcePrefixes": {
+    "services/platform/src/agent-tools/": "",
+    "services/platform/src/": ""
+  },
+  "files": {
+    "services/platform/src/agent-tools/catalog/code-mode.ts": "catalog/code-mode.ts",
+    "services/platform/src/agent-tools/catalog/execute.ts": "catalog/execute.ts",
+    "services/platform/src/agent-tools/catalog/permission.ts": "catalog/permission.ts",
+    "services/platform/src/agent-tools/catalog/selection.ts": "catalog/selection.ts",
+    "services/platform/src/agent-tools/catalog/tool-registry.ts": "catalog/tool-registry.ts",
+    "services/platform/src/agent-tools/catalog/types.ts": "catalog/types.ts",
+    "services/platform/src/agent-tools/define-tool.ts": "define-tool.ts",
+    "services/platform/src/agent-tools/effect-action.ts": "effect-action.ts",
+    "services/platform/src/agent-tools/errors.ts": "errors.ts",
+    "services/platform/src/agent-tools/files/files.ts": "files/files.ts",
+    "services/platform/src/agent-tools/host-tools.ts": "host-tools.ts",
+    "services/platform/src/agent-tools/messages/messages.ts": "messages/messages.ts",
+    "services/platform/src/agent-tools/structured-result.ts": "structured-result.ts",
+    "services/platform/src/agent-tools/tool-effect.ts": "tool-effect.ts",
+    "services/platform/src/agent-tools/turn/turn.ts": "turn/turn.ts",
+    "services/platform/src/context/untrusted-commerce-text.ts": "context/untrusted-commerce-text.ts"
+  },
+  "package": {
+    "name": "@purin-labs/agent-tools",
+    "exports": {
+      "./*": {
+        "types": "./*.ts",
+        "default": "./*.ts"
+      }
+    },
+    "dependencies": {
+      "@earendil-works/pi-codemode": "1.6.0",
+      "@purin-labs/authority": "workspace:*",
+      "@purin-labs/contracts": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "typebox": "1.3.27"
+    },
+    "devDependencies": ["@cloudflare/workers-types", "tsrs"],
+    "versionsFrom": "services/platform/package.json",
+    "tsconfig": {
+      "extends": "../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": ["ESNext"],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": ["@cloudflare/workers-types"],
+        "allowImportingTsExtensions": true
+      },
+      "include": ["**/*.ts"]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "eslint.config.mjs",
+      "why": "the IFC import rule of the context files selects services/platform/src/context/**/*.ts; untrusted-commerce-text.ts leaves that folder",
+      "find": "    files: [\"services/platform/src/context/**/*.ts\"],\n    ignores: ifcBoundaryOwners,\n",
+      "replace": "    files: [\n      \"services/platform/src/context/**/*.ts\",\n      \"foundation/agent-tools/context/**/*.ts\",\n    ],\n    ignores: ifcBoundaryOwners,\n"
+    },
+    {
+      "file": "scripts/check-tool-effects.mjs",
+      "why": "the lint of the tool effects reads the tool definitions of the package: messages.ts, files.ts and turn.ts define tools",
+      "find": "  /^services\\/platform\\/src\\/(agent-tools|custom-connectors)\\/.+\\.ts$/;",
+      "replace": "  /^(services\\/platform\\/src\\/(agent-tools|custom-connectors)|foundation\\/agent-tools)\\/.+\\.ts$/;"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": ["node", "scripts/check-layers.mjs", "--areas", "--write"],
+      "writes": ["docs/layers.md"]
+    }
+  ]
+}
