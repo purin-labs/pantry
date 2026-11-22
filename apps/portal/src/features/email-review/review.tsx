@@ -1,8 +1,5 @@
-import {
-  DecisionButtons,
-  EMAIL_REPLY_DECISION,
-  SELF_TEST_SEND_LABEL,
-} from "../../ui";
+import { DecisionButtons } from "../../ui";
+import { EMAIL_REPLY_DECISION, SELF_TEST_SEND_LABEL } from "./decision-labels";
 import React from "react";
 import { Notice, StatusChip, formatRelativeTime } from "../../page-components";
 import { formatAbsoluteTime } from "../../formatting";

@@ -14,9 +14,11 @@ import {
   type DraftMessageField,
   type DraftMessageReview,
   type DraftMessageStatus,
+} from "../../ui";
+import {
   EMAIL_REPLY_DECISION,
   SELF_TEST_SEND_LABEL,
-} from "../../ui";
+} from "../email-review/decision-labels";
 import type { EmailReviewActions } from "../email-review/api";
 import type { EmailReviewQueue } from "@purin-labs/control-api/portal/email-review";
 import {

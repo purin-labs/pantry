@@ -14,11 +14,8 @@ import type {
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { formatCommerceActionAmount, formatOfferPrice, commerceActionStateLabel, commerceActionTitle } from "./commerce";
 import { runAsync } from "../../pages/agent-console-shared";
-import {
-  DecisionButtons,
-  GOVERNED_ACTION_ALLOW,
-  governedActionRefusal,
-} from "../../ui";
+import { DecisionButtons } from "../../ui";
+import { GOVERNED_ACTION_ALLOW, governedActionRefusal } from "./decision-labels";
 import {
   commerceSourceLabel,
   formatCommerceTimestamp,

@@ -271,8 +271,6 @@ jobs:
             output/bakery-ci/oven-financier-browser
             output/bakery-ci/oven-workspace-browser
             output/bakery-ci/oven-authoring-browser
-            output/bakery-ci/oven-authoring-storage
-            output/bakery-ci/oven-authoring-storage.log
             output/bakery-ci/oven-native
             output/bakery-ci/oven-wasm
             output/bakery-ci/oven-engine

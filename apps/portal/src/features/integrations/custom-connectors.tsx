@@ -1,8 +1,8 @@
+import { DecisionButtons } from "../../ui";
 import {
-  DecisionButtons,
   GOVERNED_ACTION_ALLOW,
   governedActionRefusal,
-} from "../../ui";
+} from "../governed-actions/decision-labels";
 import { signInForApproval } from "../../approval-sign-in-popup";
 import { ControlApiError } from "../../control-client";
 import { Select } from "../../ui/select";

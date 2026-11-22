@@ -1,4 +1,5 @@
-import { DecisionButtons, EMAIL_REPLY_DECISION } from "../../ui";
+import { DecisionButtons } from "../../ui";
+import { EMAIL_REPLY_DECISION } from "../email-review/decision-labels";
 import React from "react";
 import { assertNever } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";

@@ -249,7 +249,7 @@ import. A module with no line for one of these has none.
   - `services/platform/src/stripe/`
 - Packages: `packages/commerce-client`, `packages/commerce-contracts`, `packages/commerce-control-api`, `packages/commerce-query-sqlite`, `packages/product-description-crdt`, `services/commerce`
 - Tables (13): `campaign_brief`, `commerce_capability_activation`, `commerce_export_preset_publication`, `commerce_lab_organisation`, `commerce_lab_run`, `commerce_webhook_subscription`, `paid_receipt`, `supplier_destination_revision`, `supplier_payable`, `supplier_payout`, `supplier_payout_attempt`, `supplier_payout_certification`, `supplier_payout_event`
-- Public files: `apps/portal/src/features/commerce/entity-plane/api.ts`, `apps/portal/src/features/commerce/operations.ts`, `apps/portal/src/features/commerce/stock-status.ts`, `apps/portal/src/features/governed-actions/commerce.ts`, `packages/commerce-contracts`, `services/platform/src/commerce/contract/`
+- Public files: `apps/portal/src/features/commerce/entity-plane/api.ts`, `apps/portal/src/features/commerce/operations.ts`, `apps/portal/src/features/commerce/stock-status.ts`, `apps/portal/src/features/governed-actions/commerce.ts`, `apps/portal/src/features/governed-actions/decision-labels.ts`, `packages/commerce-contracts`, `services/platform/src/commerce/contract/`
 
 ## areas/devices
 
@@ -287,7 +287,7 @@ import. A module with no line for one of these has none.
   - `services/platform/src/whatsapp/`
 - Packages: `packages/email-draft-crdt`, `packages/inbox-control-api`, `packages/mail-reply-crdt`
 - Tables (26): `agent_mailbox_binding`, `agent_mailbox_binding_revision`, `contact_endpoint_verification`, `email_mailbox_account`, `email_message_receipt`, `email_operational_attestation`, `email_operational_contact`, `email_operational_proposal_projection`, `email_reply_proposal`, `email_self_test`, `email_sender_account`, `email_thread_case`, `gmail_inference_eligibility`, `mail_assistant_eligibility`, `mail_classification`, `mailbox_ingress_policy`, `mailbox_ingress_policy_revision`, `whatsapp_case_conversation_window`, `whatsapp_delivery_status`, `whatsapp_ingress_policy`, `whatsapp_ingress_policy_revision`, `whatsapp_message_receipt`, `whatsapp_phone_number_account`, `whatsapp_reply_proposal`, `whatsapp_support_binding`, `whatsapp_support_binding_revision`
-- Public files: `apps/portal/src/features/email-review/api.ts`, `apps/portal/src/features/email-review/review.tsx`, `apps/portal/src/features/mail-setup/`, `apps/portal/src/pages/agent-mailbox.ts`, `apps/portal/src/whatsapp.ts`, `services/platform/src/mail-inbox/contract/`
+- Public files: `apps/portal/src/features/email-review/api.ts`, `apps/portal/src/features/email-review/decision-labels.ts`, `apps/portal/src/features/email-review/review.tsx`, `apps/portal/src/features/mail-setup/`, `apps/portal/src/pages/agent-mailbox.ts`, `apps/portal/src/whatsapp.ts`, `services/platform/src/mail-inbox/contract/`
 
 ## areas/integrations
 

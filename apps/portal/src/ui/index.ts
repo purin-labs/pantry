@@ -184,10 +184,6 @@ export {
 } from "./use-mutation";
 export {
   DecisionButtons,
-  EMAIL_REPLY_DECISION,
-  GOVERNED_ACTION_ALLOW,
-  SELF_TEST_SEND_LABEL,
-  governedActionRefusal,
   type DecisionButton,
   type DecisionButtonsProps,
   type DecisionRefusalConfirm,

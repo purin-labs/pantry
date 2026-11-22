@@ -510,11 +510,14 @@ proves the toast path in a Portal chat; see
 allow, then refuse. Use it for every place that shows such a decision outside
 the `PermissionRequestDialog`: a governed action, a custom connector write and
 an email reply. One kind of decision has one set of labels in every place,
-and each place gives its own classes. A governed action (a commerce change or
-a custom connector write) takes `GOVERNED_ACTION_ALLOW` ("Approve and apply",
-then "Apply change") and `governedActionRefusal` ("Reject", then "Reject
-change" or "Keep proposal"). An email reply is "Approve and send", "Edit",
-"Reject". `refuse.confirm` asks one more time before a refusal; the question
+and each place gives its own classes. The component knows no label: the area
+that owns the decision keeps its labels in a public file. A governed action (a
+commerce change or a custom connector write) takes `GOVERNED_ACTION_ALLOW`
+("Approve and apply", then "Apply change") and `governedActionRefusal`
+("Reject", then "Reject change" or "Keep proposal") from
+`features/governed-actions/decision-labels.ts`. An email reply takes
+`EMAIL_REPLY_DECISION` ("Approve and send", "Edit", "Reject") and
+`SELF_TEST_SEND_LABEL` from `features/email-review/decision-labels.ts`. `refuse.confirm` asks one more time before a refusal; the question
 waits for the person, and `resetWhenDone` goes back when the refusal ends.
 `between` puts a control between the two answers, for example Edit. With `className` the buttons get a group element, and with
 `groupLabel` that element has the group role. Without `className` the buttons

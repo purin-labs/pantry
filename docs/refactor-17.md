@@ -386,7 +386,7 @@ the state of the branches and the way to continue.
    third case of `commerce-lab/queue-projection-recovery.test.ts` proves that a
    commerce cue names no provider account.
 6. **Checks.** CI runs again since the repository became public on 2026-11-21. Its
-   first run found six faults, and the branch `ci-green` fixes them; the CI file
+   first run found six faults, and the fixes are on `dev` since 2026-11-22; the CI file
    fetch also needs the read-only CI key to read the new bucket of Plan 93. Not run:
    a real Portal chat turn, mailbox turn and WhatsApp turn against the deployed
    Worker, and a browser check of the status band of a governed action, which needs
@@ -1626,8 +1626,9 @@ look in every place.
    review of a custom connector write show "Reject", then "Reject change" or "Keep
    proposal". The second question waits for the person: the 5-second reset of the
    status band is gone, and so is the `resetAfterMs` option.
-   `governedActionRefusal` and `GOVERNED_ACTION_ALLOW` in `ui/decision-buttons.tsx`
-   hold the labels.
+   `governedActionRefusal` and `GOVERNED_ACTION_ALLOW` hold the labels, in the
+   public file `features/governed-actions/decision-labels.ts` of the commerce area.
+   The custom connector review of the integrations area imports that file.
 2. **Approve a custom connector write.** It approves as a commerce action does:
    "Approve and apply" opens the step-up sign-in in a small window, approves and
    runs the write in one click. A browser that blocks the window signs in on the
@@ -1649,7 +1650,8 @@ look in every place.
    capabilities.
 5. **An email reply.** The mailbox page, the Inbox conversation and the chat draft
    card show "Approve and send", "Edit" and "Reject"
-   (`EMAIL_REPLY_DECISION` in `ui/decision-buttons.tsx`). The chat card said "Send" and
+   (`EMAIL_REPLY_DECISION` in the public file `features/email-review/decision-labels.ts`
+   of the inbox area). The chat card said "Send" and
    "Discard". `DraftMessageCard` puts Edit between the send and the discard for
    every draft, as `DecisionButtons` does. The mailbox page has no editor of its
    own: there the draft is in Gmail, and "Open in Gmail" edits it.
@@ -1663,6 +1665,12 @@ the preview pages showed the custom connector review ("Approve and apply", "Reje
 then the confirm; the reject request and the order sign-in, then approval), the
 chat drafts and the commerce chat card (the confirm still waits after 6 seconds).
 `scripts/plan21/browser-acceptance.mjs` selects "Reject", then "Reject change".
+
+The labels first lived in `ui/decision-buttons.tsx`, so the foundation held the
+words of two areas. Each set of labels now lives in the area that owns the
+decision, as a public file of that area, and `DecisionButtons` knows no label.
+A public file may import a public file of its own area, so the mailbox page
+(`email-review/review.tsx`, public) can import the email labels.
 
 **21 November 2026. The crossings that start in an area: 124 to 62,** on the branch
 `refactor-17-areas-rest`. The work list was each pair whose source is an area, a
