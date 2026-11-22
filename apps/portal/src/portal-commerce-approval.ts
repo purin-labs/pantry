@@ -1,4 +1,5 @@
 import { isRecord } from "@purin-labs/std";
+import { PENDING_APPROVAL_MAX_AGE_MS } from "./approval-sign-in-popup";
 
 /** An approval that waits for the person's step-up sign-in. */
 type PendingCommerceApproval = {
@@ -9,8 +10,6 @@ type PendingCommerceApproval = {
 };
 
 const PENDING_COMMERCE_APPROVAL_STORAGE_KEY = "pantry:commerce-approval";
-
-const PENDING_COMMERCE_APPROVAL_MAX_AGE_MS = 10 * 60 * 1000;
 
 export function currentPortalPath(): string {
   return `${window.location.pathname}${window.location.search}${window.location.hash}`;
@@ -28,7 +27,7 @@ export function readPendingCommerceApproval(): PendingCommerceApproval | null {
       typeof parsed.returnPath !== "string" ||
       typeof parsed.createdAt !== "number" ||
       !Number.isSafeInteger(parsed.createdAt) ||
-      Date.now() - parsed.createdAt > PENDING_COMMERCE_APPROVAL_MAX_AGE_MS
+      Date.now() - parsed.createdAt > PENDING_APPROVAL_MAX_AGE_MS
     ) {
       sessionStorage.removeItem(PENDING_COMMERCE_APPROVAL_STORAGE_KEY);
       return null;

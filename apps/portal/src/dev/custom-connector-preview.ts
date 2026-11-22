@@ -1,4 +1,8 @@
-import type { CustomConnectorAction, CustomConnectorRevisionView, CustomConnectorSetupAttempt } from "@purin-labs/control-api/portal/custom-connectors";
+import type {
+  CustomConnectorAction,
+  CustomConnectorRevisionView,
+  CustomConnectorSetupAttempt,
+} from "@purin-labs/control-api/portal/custom-connectors";
 import type { CustomConnectorDetail } from "../features/integrations/custom-connector-api";
 
 const NOW = Date.parse("2026-09-13T09:00:00Z");
@@ -199,24 +203,30 @@ function previewAction(scenario: string | null): CustomConnectorAction {
     proposedAt: NOW,
     updatedAt: NOW,
     providerResult: null,
-    preview: {
-      kind: "available",
-      accountDisplayName: "Kyoto bakery",
-      operationLabel: "Create a stock request",
-      origin: "https://inventory.example",
-      method: "POST",
-      path: "/requests",
-      fields: [
-        { path: "body.product", value: "Bread flour" },
-        { path: "body.quantity", value: 20 },
-        {
-          path: "body.delivery",
-          value: { date: "2026-09-15", note: "Before 8 am" },
-        },
-      ],
-    },
+    preview:
+      scenario === "no-preview"
+        ? { kind: "unavailable", reason: "definition_unavailable" }
+        : availablePreview,
   };
 }
+
+/** The review of a write; `connectorState=no-preview` shows a write with none. */
+const availablePreview: CustomConnectorAction["preview"] = {
+  kind: "available",
+  accountDisplayName: "Kyoto bakery",
+  operationLabel: "Create a stock request",
+  origin: "https://inventory.example",
+  method: "POST",
+  path: "/requests",
+  fields: [
+    { path: "body.product", value: "Bread flour" },
+    { path: "body.quantity", value: 20 },
+    {
+      path: "body.delivery",
+      value: { date: "2026-09-15", note: "Before 8 am" },
+    },
+  ],
+};
 
 function previewSetupLifecycle(
   scenario: string | null,

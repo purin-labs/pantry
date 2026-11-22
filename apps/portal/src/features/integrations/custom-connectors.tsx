@@ -3,7 +3,10 @@ import {
   GOVERNED_ACTION_ALLOW,
   governedActionRefusal,
 } from "../governed-actions/decision-labels";
-import { signInForApproval } from "../../approval-sign-in-popup";
+import {
+  PENDING_APPROVAL_MAX_AGE_MS,
+  signInForApproval,
+} from "../../approval-sign-in-popup";
 import { ControlApiError } from "../../control-client";
 import { Select } from "../../ui/select";
 import React from "react";
@@ -651,7 +654,7 @@ function CustomConnectorWriteReview(input: {
         <DecisionButtons
           className="custom-connector-actions"
           groupLabel="Decide on this write"
-          disabled={input.props.busy || action.preview.kind === "unavailable"}
+          disabled={input.props.busy}
           allow={
             action.state === "signed"
               ? {
@@ -661,6 +664,9 @@ function CustomConnectorWriteReview(input: {
                     input.props,
                     action,
                   ),
+                  // A write with no preview cannot be approved or applied,
+                  // but the refusal needs no preview.
+                  disabled: action.preview.kind === "unavailable",
                 }
               : {
                   label: GOVERNED_ACTION_ALLOW.approve,
@@ -669,6 +675,7 @@ function CustomConnectorWriteReview(input: {
                     input.props,
                     action,
                   ),
+                  disabled: action.preview.kind === "unavailable",
                 }
           }
           refuse={
@@ -1006,6 +1013,7 @@ function beginCustomApprovalStepUp(
       connectorId: action.connectorId,
       actionNonce: action.nonce,
       returnPath,
+      createdAt: Date.now(),
     }),
   );
   const query = new URLSearchParams({
@@ -1027,14 +1035,16 @@ async function approveAndApplyCustomWrite(
   props: Parameters<typeof CustomConnectorDetailView>[0],
   action: CustomConnectorAction,
 ): Promise<void> {
-  const signIn = await signInForApproval(props.organisationId, action.nonce);
-  if (signIn === "blocked") {
-    beginCustomApprovalStepUp(props, action);
-    return;
-  }
+  // Busy before the sign-in, so that a second click cannot start a second
+  // flow while the sign-in window is open.
   props.setBusy(true);
   props.setFeedback(null);
   try {
+    const signIn = await signInForApproval(props.organisationId, action.nonce);
+    if (signIn === "blocked") {
+      beginCustomApprovalStepUp(props, action);
+      return;
+    }
     const approved = await sendCustomWriteAction(props, action, "approval", {});
     props.setAction({ kind: "ready", value: approved });
     const applied = await sendCustomWriteAction(props, approved, "execute", {});
@@ -1232,22 +1242,30 @@ function readPendingCustomApproval(): {
   readonly actionNonce: string;
   readonly returnPath: string;
 } | null {
-  const raw = sessionStorage.getItem("pantry:custom-connector-approval");
-  if (raw === null) return null;
   try {
+    const raw = sessionStorage.getItem("pantry:custom-connector-approval");
+    if (raw === null) return null;
     const value: unknown = JSON.parse(raw);
-    return isRecord(value) &&
+    if (
+      isRecord(value) &&
       typeof value.organisationId === "string" &&
       typeof value.connectorId === "string" &&
       typeof value.actionNonce === "string" &&
-      typeof value.returnPath === "string"
-      ? {
-          organisationId: value.organisationId,
-          connectorId: value.connectorId,
-          actionNonce: value.actionNonce,
-          returnPath: value.returnPath,
-        }
-      : null;
+      typeof value.returnPath === "string" &&
+      typeof value.createdAt === "number" &&
+      Number.isSafeInteger(value.createdAt) &&
+      Date.now() - value.createdAt <= PENDING_APPROVAL_MAX_AGE_MS
+    ) {
+      return {
+        organisationId: value.organisationId,
+        connectorId: value.connectorId,
+        actionNonce: value.actionNonce,
+        returnPath: value.returnPath,
+      };
+    }
+    // An old or damaged entry never approves: remove it.
+    sessionStorage.removeItem("pantry:custom-connector-approval");
+    return null;
   } catch {
     return null;
   }

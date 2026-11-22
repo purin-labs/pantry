@@ -12,6 +12,13 @@ const RETURN_PAGE = "/approval-signed-in.html";
 /** A sign-in that takes longer than this ends as closed. */
 const MAX_WAIT_MS = 10 * 60 * 1000;
 
+/**
+ * An approval that waits for a sign-in on the page (a browser that blocks
+ * the window) is stored for the page that comes back. An older stored
+ * approval is ignored, so a later page load does not approve or apply it.
+ */
+export const PENDING_APPROVAL_MAX_AGE_MS = MAX_WAIT_MS;
+
 export function signInForApproval(
   organisationId: string,
   actionNonce: string,
