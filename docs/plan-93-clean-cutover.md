@@ -638,6 +638,39 @@ made and saved through a local file, and the first one was disabled and
 deleted before any Worker used it. Never read the page of a Google client
 secret dialog with a tool that returns element labels.
 
+**3.6 Sign-up and chat, and the first live OAuth connect** (22 November
+2026, 18:45 to 19:00 JST, `pantry` `03a1ad00` from dev `a50c4854`). At the
+owner's request I did them in the owner's Chrome:
+
+- Google sign-in on `https://pantry.purin.io` with the owner's account
+  (the consent asked only name, picture and email) opened the Portal with
+  "No organisations yet".
+- Sign-up made the organisation "Purin workspace" (owner: the owner's
+  account). Jev was skipped: `TYPESAFE_API_KEY` is still a placeholder.
+- Setup: Purin AI as the AI account, Purin Checkout as the commerce system
+  (it made the merchant `merchant_pantry_5d62fad5_d6cc_418d_98dc_957312a4a71e`
+  with the demo catalogue), Slack connected through the OAuth callback on
+  `pantry.purin.io` (workspace CafeOS), `#cafe-ops` as the update channel;
+  then "Activate workspace".
+- The first chat turn stopped at the session budget: "71114 used; 64000
+  allowed". A new organisation gets `workspace_ai_budget.max_tokens` 64,000
+  (the baseline default), and one turn with tool calls used more. The old
+  live organisation had 500,000, set by hand. With the budget at 500,000
+  (Access, AI budgets), a new chat answered: "I can help you manage your
+  shop's products, menus, recipes, orders, inventory, production plans,
+  kitchen bakes, devices, and connected apps." The 64,000 default is a fault
+  of every new sign-up, on the old stack too; it is reported as its own work.
+
+`purin-shop` (`e7c6df9b`) is deployed with that merchant on
+`https://shop.purin.io`. It reads the merchant ("Cafe / Patisserie") and
+shows "Today's selection is unavailable" while the demo menu is not open.
+A test order needs a card form on a production host, so the owner does it.
+
+The shop Mac voice service (`sh.seams.satyr.shop-voice`, names in
+`voice.seams.sh` of the Seams account) stays on the old stack. The owner
+chose: step 5 uninstalls it, and its enrollment on `pantry.purin.io` (zone
+`voice.purin.io`, a DNS token limited to `purin.io`) is separate work.
+
 ### 4. Switch the outside parties
 
 The owner does the provider consoles. I do the rest.
@@ -776,12 +809,13 @@ quarantined in a turn, its stream stays `running`, and the quarantine never
 ends by itself. Only the operator command `interrupt_session` clears it. The
 old quarantine journey hid this with a seed from an old release.
 
-## Open item
+## The full Worker list (closed on 22 November 2026)
 
-The full Worker list. Wrangler has no command for it, and the API listing
-was blocked in this session. To finish the stale list, either allow a
-read-only call to `GET /accounts/<id>/workers/scripts` with the Wrangler
-sign-in, or copy the list from the Cloudflare dashboard (Workers & Pages).
+`GET /accounts/<id>/workers/scripts` with the account token lists 35 Workers:
+the 9 of the new stack, the 9 of the old stack (step 5), and 17 of other
+projects: `seams-sdk-d1-*` (8) and `router-ab-*` (5) of the Seams wallet,
+`seams-voice-intents-x-refresh`, and `hadimar-web` and `hadimar-api`. No
+other Pantry Worker exists, so step 5 has the complete list.
 
 ## Cost
 
