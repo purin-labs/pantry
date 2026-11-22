@@ -4,6 +4,7 @@ import {
   matchCustomConnectorControlRoute,
 } from "../../src/control/routes/custom-connectors";
 import { fixtureDatabase } from "./organisation-database";
+import { pendingDecisionsOf } from "./access-route-support";
 import { controlActionMutationExecution } from "../../src/actors/action-mutation-execution";
 import { newControlMutationIdentity } from "../../src/data/control-mutation";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
@@ -920,12 +921,134 @@ async function revokeControlWriteOrigin(
     .run();
 }
 
+it(
+  "refuses a viewer's rejection of a custom connector write and a rejection with no reason, then the owner's rejection takes the write out of the decisions that wait, and the write never runs",
+  { timeout: 60_000 },
+  rejectedWriteJourney,
+);
+
+/**
+ * Refactor 17, step A2.1: a write of a custom connector has a refusal, as a
+ * commerce action has. The agent proposed the write, and it waits for an
+ * owner or admin. A viewer may not reject, and a rejection carries the one
+ * reason. The owner rejects: the write leaves the one read of the decisions,
+ * a later run is refused, and the remote service never sees the write.
+ */
+async function rejectedWriteJourney({ task }: TestContext) {
+  await installSlackActorFixture();
+  const server = new RemoteFixture();
+  network.use(http.get("https://cloudflare-dns.com/dns-query", dnsResponse));
+  const fixture = await installRemoteConnector(server);
+  const prepared = await prepareConnectorWrite({
+    fixture,
+    server,
+    entry: fixture.restWrite,
+    grantId: REST_WRITE_GRANT_ID,
+    suffix: "rejected_write",
+    grantDisposition: "retain",
+    timeoutMs: fixture.restWrite.limits.invocationTimeoutMs,
+    approval: "requested",
+  });
+  controlWriteProbe = {
+    boundary: null,
+    server,
+    session: prepared.session,
+    armed: false,
+  };
+  const connectorId = fixture.restWrite.connectorId;
+  const waiting = { kind: "governed_action", id: prepared.nonce };
+  try {
+    expect(
+      await pendingDecisionsOf(ORGANISATION_ID, prepared.session),
+    ).toContainEqual(waiting);
+
+    // 1. A viewer may not reject, and a rejection carries its one reason.
+    await setActorRole("viewer");
+    const byViewer = await dispatchControlWrite(
+      prepared.session,
+      connectorId,
+      prepared.nonce,
+      "reject_as_viewer",
+      "rejection",
+      { reason: "merchant_declined" },
+    );
+    await setActorRole("owner");
+    expect({
+      status: byViewer.status,
+      body: await byViewer.json(),
+    }).toEqual({
+      status: 404,
+      body: { ok: false, error: "organisation_role_insufficient" },
+    });
+    const noReason = await dispatchControlWrite(
+      prepared.session,
+      connectorId,
+      prepared.nonce,
+      "reject_without_reason",
+      "rejection",
+    );
+    expect(noReason.status).toBe(422);
+
+    // 2. The owner rejects. The write leaves the decisions that wait.
+    const rejected = await dispatchControlWrite(
+      prepared.session,
+      connectorId,
+      prepared.nonce,
+      "reject_as_owner",
+      "rejection",
+      { reason: "merchant_declined" },
+    );
+    expect({
+      status: rejected.status,
+      body: await rejected.json(),
+    }).toMatchObject({
+      status: 200,
+      body: { ok: true, action: { state: "rejected" } },
+    });
+    expect(
+      await pendingDecisionsOf(ORGANISATION_ID, prepared.session),
+    ).not.toContainEqual(waiting);
+
+    // 3. A later run is refused, and the service never sees the write.
+    const run = await dispatchControlWrite(
+      prepared.session,
+      connectorId,
+      prepared.nonce,
+      "run_after_rejection",
+    );
+    expect(run.status).toBe(409);
+    expect(server.calls).not.toContain("rest_create");
+    Object.assign(task.meta, {
+      rejectedWrite: {
+        viewerStatus: byViewer.status,
+        noReasonStatus: noReason.status,
+        ownerState: "rejected",
+        runAfterRejectionStatus: run.status,
+        providerCalls: server.calls,
+      },
+    });
+  } finally {
+    controlWriteProbe = null;
+  }
+}
+
+async function setActorRole(role: "owner" | "viewer"): Promise<void> {
+  await fixtureDatabase()
+    .prepare(
+      `UPDATE service_role_grant SET role = ?
+     WHERE organisation_id = ? AND person_id = 'person_e2e-slack-actor'`,
+    )
+    .bind(role, ORGANISATION_ID)
+    .run();
+}
+
 function dispatchControlWrite(
   session: IssuedControlSession,
   connectorId: string,
   nonce: string,
   key: string,
-  action: "execute" | "retry" = "execute",
+  action: "execute" | "retry" | "rejection" = "execute",
+  body: Readonly<Record<string, unknown>> = {},
 ): Promise<Response> {
   const request = new Request(
     `https://localhost/v1/control/organisations/${ORGANISATION_ID}/custom-connectors/${connectorId}/actions/${nonce}/${action}`,
@@ -938,7 +1061,7 @@ function dispatchControlWrite(
         cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
         "x-pantry-csrf": session.csrfToken,
       },
-      body: "{}",
+      body: JSON.stringify(body),
     },
   );
   const route = matchCustomConnectorControlRoute(new URL(request.url).pathname);
@@ -2119,6 +2242,8 @@ type ConnectorWriteInput = {
   readonly suffix: string;
   readonly grantDisposition: "retain" | "revoke";
   readonly timeoutMs: number;
+  /** "requested" stops before the approval: the write waits for a person. */
+  readonly approval?: "signed" | "requested";
 };
 
 async function prepareConnectorWrite(input: ConnectorWriteInput) {
@@ -2187,6 +2312,13 @@ async function prepareConnectorWrite(input: ConnectorWriteInput) {
     now: Date.now(),
   });
   if (!requested.ok) throw new Error(requested.error.code);
+  if (input.approval === "requested")
+    return {
+      organisation,
+      nonce,
+      authority: authority.value,
+      session: actionSession,
+    };
   const approval = parseApprovalEvidence({
     kind: "app_user",
     principal: {

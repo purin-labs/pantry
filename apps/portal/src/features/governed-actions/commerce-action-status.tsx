@@ -14,7 +14,11 @@ import type {
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { formatCommerceActionAmount, formatOfferPrice, commerceActionStateLabel, commerceActionTitle } from "./commerce";
 import { runAsync } from "../../pages/agent-console-shared";
-import { DecisionButtons } from "../../ui";
+import {
+  DecisionButtons,
+  GOVERNED_ACTION_ALLOW,
+  governedActionRefusal,
+} from "../../ui";
 import {
   commerceSourceLabel,
   formatCommerceTimestamp,
@@ -135,22 +139,13 @@ function ActionDecisionControls(props: {
       groupLabel="Action decision"
       disabled={props.disabled}
       allow={{
-        label: "Approve and apply",
+        label: GOVERNED_ACTION_ALLOW.approve,
         onSelect: runAsync.bind(null, props.approve),
       }}
-      refuse={{
-        label: "Reject change",
-        className: "secondary-button",
+      refuse={governedActionRefusal({
         onSelect: runAsync.bind(null, props.reject),
-        confirm: {
-          label: "Reject change",
-          className: "danger-button",
-          keepLabel: "Keep proposal",
-          keepClassName: "secondary-button",
-          groupLabel: "Confirm action rejection",
-          resetAfterMs: 5_000,
-        },
-      }}
+        className: "secondary-button",
+      })}
     />
   );
 }

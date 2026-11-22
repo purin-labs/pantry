@@ -1,4 +1,4 @@
-import { DecisionButtons } from "../../ui";
+import { DecisionButtons, EMAIL_REPLY_DECISION } from "../../ui";
 import React from "react";
 import { assertNever } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
@@ -953,7 +953,7 @@ export class MailConversation extends React.Component<Props, State> {
               <DecisionButtons
                 disabled={busy}
                 allow={{
-                  label: "Approve and send",
+                  label: EMAIL_REPLY_DECISION.sendLabel,
                   className: "connection-primary-action",
                   onSelect: this.approve,
                 }}
@@ -967,7 +967,10 @@ export class MailConversation extends React.Component<Props, State> {
                     Edit
                   </button>
                 }
-                refuse={{ label: "Reject", onSelect: this.reject }}
+                refuse={{
+                  label: EMAIL_REPLY_DECISION.discardLabel,
+                  onSelect: this.reject,
+                }}
               />
             )}
           </div>

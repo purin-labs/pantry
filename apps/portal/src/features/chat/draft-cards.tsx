@@ -14,6 +14,8 @@ import {
   type DraftMessageField,
   type DraftMessageReview,
   type DraftMessageStatus,
+  EMAIL_REPLY_DECISION,
+  SELF_TEST_SEND_LABEL,
 } from "../../ui";
 import type { EmailReviewActions } from "../email-review/api";
 import type { EmailReviewQueue } from "@purin-labs/control-api/portal/email-review";
@@ -316,6 +318,7 @@ function replyView(
       : null,
     decision: context.canManage
       ? {
+          ...EMAIL_REPLY_DECISION,
           onSend: async () => {
             await context.actions.approveEmailReply(proposal.proposalId, {
               version: proposal.version,
@@ -445,7 +448,8 @@ function operationalView(
         : null,
     decision: context.canManage
       ? {
-          sendLabel: selfTest ? "This is my address, send" : "Send",
+          ...EMAIL_REPLY_DECISION,
+          ...(selfTest ? { sendLabel: SELF_TEST_SEND_LABEL } : {}),
           onSend: async () => {
             await context.actions.approveEmailOperational(proposal.proposalId, {
               version: proposal.version,

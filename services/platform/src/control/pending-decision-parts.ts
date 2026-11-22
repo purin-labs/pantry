@@ -17,7 +17,10 @@ import {
   handleCommerceActionApproval,
   handleCommerceActionRejection,
 } from "./routes/commerce/actions";
-import { approveCustomConnectorWriteAction } from "./routes/custom-connectors/write-actions";
+import {
+  approveCustomConnectorWriteAction,
+  rejectCustomConnectorWriteAction,
+} from "./routes/custom-connectors/write-actions";
 import {
   agentPermissionRequestSummaries,
   decideAgentPermission,
@@ -127,12 +130,16 @@ function pendingDecisionDeciders(env: Env): PendingDecisionDeciders {
     heldOutput: (proof, call) => decideHeldOutput(env, proof, call),
     permissionRequest: (proof, call) => decideAgentPermission(env, proof, call),
     governedAction({ request, organisationIdRaw }, call) {
-      if (call.surface === "custom_connector")
-        return approveCustomConnectorWriteAction(request, env, {
+      if (call.surface === "custom_connector") {
+        const route = {
           organisationIdRaw,
           connectorIdRaw: call.connectorIdRaw,
           actionNonceRaw: call.id,
-        });
+        };
+        return call.answer === "allow"
+          ? approveCustomConnectorWriteAction(request, env, route)
+          : rejectCustomConnectorWriteAction(request, env, route);
+      }
       return call.answer === "allow"
         ? handleCommerceActionApproval(request, env, organisationIdRaw, call.id)
         : handleCommerceActionRejection(

@@ -1,4 +1,8 @@
-import { DecisionButtons } from "../../ui";
+import {
+  DecisionButtons,
+  EMAIL_REPLY_DECISION,
+  SELF_TEST_SEND_LABEL,
+} from "../../ui";
 import React from "react";
 import { Notice, StatusChip, formatRelativeTime } from "../../page-components";
 import { formatAbsoluteTime } from "../../formatting";
@@ -428,7 +432,7 @@ function renderLoadedReply(
                 <DecisionButtons
                   disabled={busy}
                   allow={{
-                    label: "Approve and send",
+                    label: EMAIL_REPLY_DECISION.sendLabel,
                     className: "connection-primary-action",
                     onSelect: approveReply.bind(
                       null,
@@ -440,7 +444,7 @@ function renderLoadedReply(
                     ),
                   }}
                   refuse={{
-                    label: "Reject",
+                    label: EMAIL_REPLY_DECISION.discardLabel,
                     onSelect: rejectReply.bind(
                       null,
                       props,
@@ -837,8 +841,8 @@ function renderLoadedOperational(
                   allow={{
                     label:
                       result.proposal.target.kind === "self_test"
-                        ? "Confirm this is my address and send self-test"
-                        : "Approve and send",
+                        ? SELF_TEST_SEND_LABEL
+                        : EMAIL_REPLY_DECISION.sendLabel,
                     className: "connection-primary-action",
                     onSelect: approveOperational.bind(
                       null,
@@ -850,7 +854,7 @@ function renderLoadedOperational(
                     ),
                   }}
                   refuse={{
-                    label: "Reject",
+                    label: EMAIL_REPLY_DECISION.discardLabel,
                     onSelect: rejectOperational.bind(
                       null,
                       props,

@@ -509,11 +509,14 @@ proves the toast path in a Portal chat; see
 `DecisionButtons` shows the buttons of one decision that waits for a person:
 allow, then refuse. Use it for every place that shows such a decision outside
 the `PermissionRequestDialog`: a governed action, a custom connector write and
-an email reply. Each place gives its own labels and classes, so each place
-keeps its look. `refuse.confirm` asks one more time before a refusal:
-`resetAfterMs` goes back with no answer, and `resetWhenDone` goes back when
-the refusal ends. `between` puts a control between the two answers, for
-example Edit. With `className` the buttons get a group element, and with
+an email reply. One kind of decision has one set of labels in every place,
+and each place gives its own classes. A governed action (a commerce change or
+a custom connector write) takes `GOVERNED_ACTION_ALLOW` ("Approve and apply",
+then "Apply change") and `governedActionRefusal` ("Reject", then "Reject
+change" or "Keep proposal"). An email reply is "Approve and send", "Edit",
+"Reject". `refuse.confirm` asks one more time before a refusal; the question
+waits for the person, and `resetWhenDone` goes back when the refusal ends.
+`between` puts a control between the two answers, for example Edit. With `className` the buttons get a group element, and with
 `groupLabel` that element has the group role. Without `className` the buttons
 join the row of the page. `refuse` is null where a decision has no refusal.
 
@@ -522,7 +525,9 @@ join the row of the page. `refuse` is null where a decision has no refusal.
 `DraftMessageCard` shows a message that the agent drafted for another app,
 such as a Slack message or an email. It has the provider mark and a status,
 the fields (Workspace, To, Subject), the message with Show more for long text,
-and Send, Discard and Edit. Nothing is sent until a person selects Send.
+and Send, Edit and Discard. An email reply names them "Approve and send",
+"Edit" and "Reject" (`sendLabel`, `discardLabel`), as in the Inbox and on the
+mailbox page. Nothing is sent until a person selects Send.
 `decision` is null for a viewer who cannot send and for a settled draft.
 `status` is `ready`, `waiting` (someone else must send it), `sent`,
 `discarded`, `expired`, `unavailable` or `unconfirmed`; the last three carry

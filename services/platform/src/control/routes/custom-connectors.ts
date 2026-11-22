@@ -55,7 +55,13 @@ export type CustomConnectorControlRoute =
   | (ConnectorRouteBase & {
       readonly kind: "customConnectorWriteAction";
       readonly actionNonceRaw: string;
-      readonly action: "read" | "approval" | "execute" | "retry" | "reconcile";
+      readonly action:
+        | "read"
+        | "approval"
+        | "rejection"
+        | "execute"
+        | "retry"
+        | "reconcile";
     });
 
 export function matchCustomConnectorControlRoute(
@@ -63,7 +69,7 @@ export function matchCustomConnectorControlRoute(
 ): CustomConnectorControlRoute | null {
   const writeAction = match(
     pathname,
-    /^\/v1\/control\/organisations\/([^/]+)\/custom-connectors\/([^/]+)\/actions\/([^/]+)(?:\/(approval|execute|retry|reconcile))?$/u,
+    /^\/v1\/control\/organisations\/([^/]+)\/custom-connectors\/([^/]+)\/actions\/([^/]+)(?:\/(approval|rejection|execute|retry|reconcile))?$/u,
   );
   if (writeAction !== null) {
     return {
@@ -244,9 +250,10 @@ function requireSetupAction(
 
 function requireWriteAction(
   value: string | null,
-): "read" | "approval" | "execute" | "retry" | "reconcile" {
+): "read" | "approval" | "rejection" | "execute" | "retry" | "reconcile" {
   if (
     value === "approval" ||
+    value === "rejection" ||
     value === "execute" ||
     value === "retry" ||
     value === "reconcile"

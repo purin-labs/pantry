@@ -10,6 +10,7 @@ import {
   approvalActionBindingMatches,
   digestApprovalAction,
   type ApprovalEvidence,
+  type MerchantActionRejectionEvidence,
 } from "../../../approval-authentication";
 import { authorizeCapabilityUse } from "../../../authorization/access-grants/turn-authority";
 import {
@@ -81,6 +82,18 @@ export async function handleCustomConnectorWriteAction(
         connectorIdRaw: route.connectorIdRaw,
         id: route.actionNonceRaw,
         answer: "allow",
+      },
+    );
+  }
+  if (route.action === "rejection") {
+    return decide(
+      { request, organisationIdRaw: route.organisationIdRaw },
+      {
+        kind: "governed_action",
+        surface: "custom_connector",
+        connectorIdRaw: route.connectorIdRaw,
+        id: route.actionNonceRaw,
+        answer: "refuse",
       },
     );
   }
@@ -267,6 +280,97 @@ export async function approveCustomConnectorWriteAction(
     action: await customConnectorActionRecord(
       context.executionScope.database,
       signed.value,
+      context.authorized.membership.role,
+    ),
+  };
+  return answerWriteAction(request, env, context, responseBody, now);
+}
+
+/**
+ * Records the refusal of one write of a custom connector (Refactor 17, step
+ * A2.1). An owner or admin refuses a proposed write with the reason
+ * `merchant_declined`, as for a commerce action; the ledger moves it to
+ * `rejected`, so it can never run. A refusal needs no step-up sign-in: it
+ * changes nothing outside Pantry. The caller checked the form of the nonce.
+ */
+export async function rejectCustomConnectorWriteAction(
+  request: Request,
+  env: Env,
+  route: Readonly<{
+    organisationIdRaw: string;
+    connectorIdRaw: string;
+    actionNonceRaw: string;
+  }>,
+): Promise<Response> {
+  if (request.method !== "POST") return controlError("method_not_allowed", 405);
+  const context = await prepareWriteMutation(
+    request,
+    env,
+    route,
+    "rejection",
+    true,
+  );
+  if (!context.ok) return context.response;
+  if (
+    !hasExactKeys(context.body, ["reason"]) ||
+    context.body.reason !== "merchant_declined"
+  )
+    return controlError("custom_connector_action_invalid", 422);
+  const now = Date.now();
+  const existing = await context.organisation.getAction({
+    organisationId: context.authorized.organisationId,
+    nonce: route.actionNonceRaw,
+    now,
+  });
+  if (
+    !existing.ok ||
+    !customActionMatchesConnector(existing.value, route.connectorIdRaw)
+  ) {
+    return controlError("custom_connector_action_not_found", 404);
+  }
+  const replayed = await replayWriteMutation(request, env, context);
+  if (replayed !== null) return replayed;
+  const rejection: MerchantActionRejectionEvidence =
+    existing.value.state === "rejected"
+      ? existing.value.rejection
+      : {
+          kind: "merchant_rejection",
+          principal: {
+            kind: "app_user",
+            userId: context.identity.userId,
+            personId: context.authorized.membership.personId,
+            role: requireAdminRole(context.authorized.membership.role),
+          },
+          authentication: {
+            kind: "control_session",
+            controlSessionId:
+              context.authorized.authenticated.session.controlSessionId,
+            authenticatedAt: now,
+          },
+          decision: {
+            kind: "rejected",
+            reason: "merchant_declined",
+            action: {
+              organisationId: context.authorized.organisationId,
+              actionNonce: route.actionNonceRaw,
+              actionDigest: await digestApprovalAction(existing.value.action),
+            },
+          },
+        };
+  if (!(await authorizeWriteMutation(request, env, context)))
+    return controlError("custom_connector_write_forbidden", 403);
+  const rejected = await context.organisation.rejectAction({
+    organisationId: context.authorized.organisationId,
+    nonce: route.actionNonceRaw,
+    rejection,
+    now,
+  });
+  if (!rejected.ok) return customActionLedgerError(rejected.error.code);
+  const responseBody = {
+    ok: true,
+    action: await customConnectorActionRecord(
+      context.executionScope.database,
+      rejected.value,
       context.authorized.membership.role,
     ),
   };
@@ -610,7 +714,7 @@ async function prepareWriteMutation(
     connectorIdRaw: string;
     actionNonceRaw: string;
   }>,
-  operation: "approval" | "execute" | "retry" | "reconcile",
+  operation: "approval" | "rejection" | "execute" | "retry" | "reconcile",
   retainBody = false,
 ): Promise<
   | ({ readonly ok: true } & WriteMutationContext)

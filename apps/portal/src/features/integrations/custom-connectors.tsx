@@ -1,4 +1,10 @@
-import { DecisionButtons } from "../../ui";
+import {
+  DecisionButtons,
+  GOVERNED_ACTION_ALLOW,
+  governedActionRefusal,
+} from "../../ui";
+import { signInForApproval } from "../../approval-sign-in-popup";
+import { ControlApiError } from "../../control-client";
 import { Select } from "../../ui/select";
 import React from "react";
 import { MessageCircle, FileCode2 } from "lucide-react";
@@ -639,27 +645,40 @@ function CustomConnectorWriteReview(input: {
         </section>
       )}
       {input.props.canManage &&
-      (action.state === "proposed" || action.state === "approval_requested") ? (
+      (action.state === "proposed" ||
+        action.state === "approval_requested" ||
+        action.state === "signed") ? (
         <DecisionButtons
           className="custom-connector-actions"
+          groupLabel="Decide on this write"
           disabled={input.props.busy || action.preview.kind === "unavailable"}
-          allow={{
-            label: "Verify and approve with Google",
-            onSelect: beginCustomApprovalStepUp.bind(null, input.props, action),
-          }}
-          refuse={null}
+          allow={
+            action.state === "signed"
+              ? {
+                  label: GOVERNED_ACTION_ALLOW.apply,
+                  onSelect: runCustomWriteExecution.bind(
+                    null,
+                    input.props,
+                    action,
+                  ),
+                }
+              : {
+                  label: GOVERNED_ACTION_ALLOW.approve,
+                  onSelect: approveAndApplyCustomWrite.bind(
+                    null,
+                    input.props,
+                    action,
+                  ),
+                }
+          }
+          refuse={
+            action.state === "signed"
+              ? null
+              : governedActionRefusal({
+                  onSelect: rejectCustomWrite.bind(null, input.props, action),
+                })
+          }
         />
-      ) : null}
-      {input.props.canManage && action.state === "signed" ? (
-        <div className="custom-connector-actions">
-          <button
-            type="button"
-            disabled={input.props.busy || action.preview.kind === "unavailable"}
-            onClick={runCustomWriteExecution.bind(null, input.props, action)}
-          >
-            Run approved action
-          </button>
-        </div>
       ) : null}
       {action.state === "indeterminate" ? (
         <div className="notice notice-warning">
@@ -998,6 +1017,50 @@ function beginCustomApprovalStepUp(
   window.location.assign(`/v1/control/auth/google/start?${query.toString()}`);
 }
 
+/**
+ * Approves a write and applies it in one click, as for a commerce action
+ * (Refactor 17, step A2.1). The step-up sign-in opens in a small window and
+ * this page stays. A browser that blocks the window signs in on the page
+ * instead, and the page applies the write when it comes back.
+ */
+async function approveAndApplyCustomWrite(
+  props: Parameters<typeof CustomConnectorDetailView>[0],
+  action: CustomConnectorAction,
+): Promise<void> {
+  const signIn = await signInForApproval(props.organisationId, action.nonce);
+  if (signIn === "blocked") {
+    beginCustomApprovalStepUp(props, action);
+    return;
+  }
+  props.setBusy(true);
+  props.setFeedback(null);
+  try {
+    const approved = await sendCustomWriteAction(props, action, "approval", {});
+    props.setAction({ kind: "ready", value: approved });
+    const applied = await sendCustomWriteAction(props, approved, "execute", {});
+    props.setAction({ kind: "ready", value: applied });
+    props.setFeedback(customWriteFeedback(applied));
+  } catch (error) {
+    props.setFeedback(
+      error instanceof ControlApiError &&
+        error.kind === "approval_step_up_required"
+        ? "The sign-in did not finish, so nothing changed. Try again."
+        : errorMessage(error, "The write could not be approved. Try again."),
+    );
+  } finally {
+    props.setBusy(false);
+  }
+}
+
+async function rejectCustomWrite(
+  props: Parameters<typeof CustomConnectorDetailView>[0],
+  action: CustomConnectorAction,
+): Promise<void> {
+  await updateCustomWriteAction(props, action, "rejection", {
+    reason: "merchant_declined",
+  });
+}
+
 async function runCustomWriteExecution(
   props: Parameters<typeof CustomConnectorDetailView>[0],
   action: CustomConnectorAction,
@@ -1040,35 +1103,54 @@ async function submitCustomWriteReconciliation(
   });
 }
 
+type CustomWriteOperation =
+  | "approval"
+  | "rejection"
+  | "execute"
+  | "retry"
+  | "reconcile";
+
+/** Sends one operation of a write, with one mutation key for each intent. */
+async function sendCustomWriteAction(
+  owner: Readonly<{ organisationId: string; mutationKeys: MutationKeys }>,
+  action: Readonly<{ connectorId: string; nonce: string }>,
+  operation: CustomWriteOperation,
+  body: Readonly<Record<string, unknown>>,
+): Promise<CustomConnectorAction> {
+  const intent = `custom-connector-action:${action.nonce}:${operation}`;
+  const key = mutationKey(owner.mutationKeys.current, intent);
+  const next = await mutateCustomConnectorAction(
+    `${customConnectorActionPath(
+      owner.organisationId,
+      action.connectorId,
+      action.nonce,
+    )}/${operation}`,
+    body,
+    key,
+  );
+  owner.mutationKeys.current.delete(intent);
+  return next;
+}
+
+function customWriteFeedback(next: CustomConnectorAction): string {
+  if (next.state !== "indeterminate") return "Action updated.";
+  return next.idempotencyHeader === null
+    ? "The provider outcome is uncertain. Reconcile it before any retry."
+    : "The provider outcome is uncertain. Retry with the same key, or reconcile it.";
+}
+
 async function updateCustomWriteAction(
   props: Parameters<typeof CustomConnectorDetailView>[0],
   action: CustomConnectorAction,
-  operation: "approval" | "execute" | "retry" | "reconcile",
+  operation: CustomWriteOperation,
   body: Readonly<Record<string, unknown>>,
 ): Promise<void> {
   props.setBusy(true);
   props.setFeedback(null);
-  const intent = `custom-connector-action:${action.nonce}:${operation}`;
-  const key = mutationKey(props.mutationKeys.current, intent);
   try {
-    const next = await mutateCustomConnectorAction(
-      `${customConnectorActionPath(
-        props.organisationId,
-        action.connectorId,
-        action.nonce,
-      )}/${operation}`,
-      body,
-      key,
-    );
-    props.mutationKeys.current.delete(intent);
+    const next = await sendCustomWriteAction(props, action, operation, body);
     props.setAction({ kind: "ready", value: next });
-    props.setFeedback(
-      next.state !== "indeterminate"
-        ? "Action updated."
-        : next.idempotencyHeader === null
-          ? "The provider outcome is uncertain. Reconcile it before any retry."
-          : "The provider outcome is uncertain. Retry with the same key, or reconcile it.",
-    );
+    props.setFeedback(customWriteFeedback(next));
   } catch (error) {
     props.setFeedback(
       errorMessage(error, "Unable to load custom connectors. Try again."),
@@ -1127,21 +1209,14 @@ async function resumeCustomApproval(input: {
   readonly setFeedback: React.Dispatch<React.SetStateAction<string | null>>;
 }): Promise<void> {
   input.setBusy(true);
-  const intent = `custom-connector-action:${input.actionNonce}:approval`;
-  const key = mutationKey(input.mutationKeys.current, intent);
   try {
-    const action = await mutateCustomConnectorAction(
-      `${customConnectorActionPath(
-        input.organisationId,
-        input.connectorId,
-        input.actionNonce,
-      )}/approval`,
-      {},
-      key,
-    );
-    input.mutationKeys.current.delete(intent);
-    input.setAction({ kind: "ready", value: action });
-    input.setFeedback("Write approved. Run it when you are ready.");
+    // The person chose "Approve and apply" before the sign-in page.
+    const write = { connectorId: input.connectorId, nonce: input.actionNonce };
+    const approved = await sendCustomWriteAction(input, write, "approval", {});
+    input.setAction({ kind: "ready", value: approved });
+    const applied = await sendCustomWriteAction(input, approved, "execute", {});
+    input.setAction({ kind: "ready", value: applied });
+    input.setFeedback(customWriteFeedback(applied));
   } catch (error) {
     input.setFeedback(
       errorMessage(error, "Unable to load custom connectors. Try again."),

@@ -4,10 +4,7 @@ import type { Variant } from "@purin-labs/type-utils";
 /** The answer of a person to a decision that waits. */
 export type PendingDecisionAnswer = "allow" | "refuse";
 
-/**
- * One decision that a person answers. The id is the id of the entry in the
- * one read. A write of a custom connector has no refusal: it expires.
- */
+/** One decision that a person answers. The id is the id of the entry in the one read. */
 export type PendingDecisionCall = Readonly<
   | { kind: "held_output"; id: string; answer: PendingDecisionAnswer }
   | { kind: "permission_request"; id: string; answer: PendingDecisionAnswer }
@@ -22,7 +19,7 @@ export type PendingDecisionCall = Readonly<
       surface: "custom_connector";
       connectorIdRaw: string;
       id: string;
-      answer: "allow";
+      answer: PendingDecisionAnswer;
     }
   | {
       kind: "email_review";

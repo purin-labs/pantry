@@ -16,7 +16,7 @@ import {
 import { commerceActionStateLabel, commerceActionTitle } from "./commerce";
 import { commerceActionDetailSummary, renderCommerceActionChange } from "./commerce-action-status";
 import { signInForApproval } from "../../approval-sign-in-popup";
-import { DecisionButtons } from "../../ui";
+import { DecisionButtons, GOVERNED_ACTION_ALLOW, governedActionRefusal } from "../../ui";
 import "./chat-commerce-action-card.css";
 
 /**
@@ -239,22 +239,11 @@ function ChatCommerceActionCard(props: Readonly<{
       groupLabel="Decide on this change"
       disabled={busy !== null}
       allow={{
-        label: busy === "approve" ? "Applying…" : signed ? "Apply change" : "Approve and apply",
+        label: busy === "approve" ? "Applying…" : signed ? GOVERNED_ACTION_ALLOW.apply : GOVERNED_ACTION_ALLOW.approve,
         className: "primary-button",
         onSelect: signed ? applyNow : approve,
       }}
-      refuse={waiting ? {
-        label: "Reject",
-        className: "secondary-button",
-        onSelect: reject,
-        confirm: {
-          label: "Reject change",
-          className: "danger-button",
-          keepLabel: "Keep proposal",
-          keepClassName: "secondary-button",
-          resetWhenDone: true,
-        },
-      } : null}
+      refuse={waiting ? governedActionRefusal({ onSelect: reject, className: "secondary-button" }) : null}
     /> : null}
     {error === null ? null : <p className="description-draft-error" role="alert">{error}</p>}
   </section>;

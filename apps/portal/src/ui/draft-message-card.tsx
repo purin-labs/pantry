@@ -35,6 +35,7 @@ export type DraftMessageEdit = {
 
 export type DraftMessageDecision = {
   readonly sendLabel?: string;
+  readonly discardLabel?: string;
   readonly onSend: () => Promise<string | null>;
   readonly onDiscard: () => Promise<string | null>;
 };
@@ -309,22 +310,6 @@ export function DraftMessageCard(
             ) : null}
             {decision.sendLabel ?? "Send"}
           </button>
-          <button
-            type="button"
-            className="draft-message-button"
-            data-tone="secondary"
-            aria-disabled={busy}
-            onClick={() => void run("discard", decision.onDiscard)}
-          >
-            {pending === "discard" ? (
-              <LoaderCircle
-                className="draft-message-spin"
-                size={14}
-                aria-hidden="true"
-              />
-            ) : null}
-            Discard
-          </button>
           {props.edit !== null && props.body !== null ? (
             <button
               type="button"
@@ -339,6 +324,22 @@ export function DraftMessageCard(
               Edit
             </button>
           ) : null}
+          <button
+            type="button"
+            className="draft-message-button"
+            data-tone="secondary"
+            aria-disabled={busy}
+            onClick={() => void run("discard", decision.onDiscard)}
+          >
+            {pending === "discard" ? (
+              <LoaderCircle
+                className="draft-message-spin"
+                size={14}
+                aria-hidden="true"
+              />
+            ) : null}
+            {decision.discardLabel ?? "Discard"}
+          </button>
           <span className="draft-message-approval">
             <ShieldCheck size={14} aria-hidden="true" />
             Needs your approval

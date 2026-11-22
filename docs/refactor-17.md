@@ -5,8 +5,10 @@ and after a second review with the owner's request to prune
 ([What the reviews changed](#what-the-reviews-changed)).
 Status: Stage A is done and on `dev` since 2026-11-21 (`6373495d`), with step S1. Stage
 S (steps S2 and S3) waits for Plan 91, and Stage B waits for the Plan 93 cutover: the
-owner decided both waits on 2026-11-21. [What is left](#what-is-left) lists the open
-work. The owner accepted the two stages, one decision API for approvals, specs by
+owner decided both waits on 2026-11-21. On 2026-11-22 the owner asked to finish the
+tail: the A2.1 decisions are made and built, and two sessions finish Plan 91 phase 4
+and Plan 93, so that Stage S and Stage B can start. [What is left](#what-is-left)
+lists the open work. The owner accepted the two stages, one decision API for approvals, specs by
 subsystem, and the prune of dead code, duplicate code and low-impact tests. The other
 decisions in [Decisions](#decisions) use their defaults.
 Owner: the whole repository.
@@ -339,7 +341,7 @@ physical bake. This refactor does not remove `schedule.ts`.
 
 ## What is left
 
-Updated on 2026-11-21, after Stage A landed on `dev` (`6373495d`). The handoff
+Updated on 2026-11-22, after the owner asked to finish the tail. The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
 the state of the branches and the way to continue.
 
@@ -362,32 +364,33 @@ the state of the branches and the way to continue.
    Kitchen, an activation module of `OrganisationDO`, and the shared ids
    (`OrganisationId`, `IntegrationAccountId`) in `@purin-labs/contract-schema`, below
    both contract packages. `packages/contracts` names no commerce package now.
-2. **Owner decisions of step A2.1** ([Appendix E](#appendix-e--the-decisions-that-wait-for-a-person-before-step-a21)):
-   one look for each kind of decision (the reject label and its confirm, the approval
-   flow of a custom connector write, the two texts of a permission request, the three
-   button sets of an email reply), and a refusal for a custom connector write, which
-   has none today. The one Portal card keeps both looks through props until then.
+2. **Done: the decisions of step A2.1** (2026-11-22; the owner: "finish them off").
+   Each kind of decision has one look, and a custom connector write has a refusal.
+   See [the entry](#a21-the-decisions-2026-11-22).
 3. **Done: the preview pages of `apps/portal/src/dev/` hold no copy of product code.**
    The clone check finds 4 pairs that touch `dev/`, and each pair joins two preview
    pages. Production serves none of the pages. The appliance viewer
    (`appliances-preview.tsx`, 1,545 lines) has no product user, so it stays a preview
    page. Stage B puts each preview page beside the `ui` folder of its area. See
    [the entry in Steps done](#the-preview-pages-and-the-browser-check-of-the-decision-buttons-2026-11-21).
-4. **Product code that the dead code step deleted** because no file used it: two
-   floor plan station helpers, a workspace run save helper, `verifyRevokedVaultSecret`,
-   three Code Mode workspace allocation wrappers and 14 commerce client resource
-   parsers. The owner may bring one back. `openCounterSale` and
-   `manualCashRefundCounterSale` stay, because Plan 90 names them.
-5. **Test follow-ups.** The search for a journey that has the outcome of a unit test
-   covered only the files with mock signals. Two candidates stay for a later pass:
-   `commerce-lab/scenario-catalog.test.ts` and the third case of
-   `commerce-lab/queue-projection-recovery.test.ts`.
-6. **Checks that did not run.** A real Portal chat turn, mailbox turn and WhatsApp turn
-   against the deployed Worker; a browser check of the decision buttons in the status
-   band of a governed action and on the mailbox page, which need a running Worker; CI for
-   any push of Stage A (GitHub did not start the jobs because of the account billing).
-   The browser check of the other three places and of the moved Portal parts ran (the
-   entry in Steps done).
+4. **Decided: the deleted product code stays deleted** (2026-11-22). No file used
+   it: two floor plan station helpers, a workspace run save helper,
+   `verifyRevokedVaultSecret`, three Code Mode workspace allocation wrappers and 14
+   commerce client resource parsers. A later change that needs one takes it from
+   the history. `openCounterSale` and `manualCashRefundCounterSale` stay, because
+   Plan 90 names them.
+5. **Decided: the two test follow-ups stay** (2026-11-22). No journey runs a lab
+   scenario two times with the same key, so only
+   `commerce-lab/scenario-catalog.test.ts` proves that a replay gives the same run
+   and event ids. The commerce lab journey does not read the cue log, so only the
+   third case of `commerce-lab/queue-projection-recovery.test.ts` proves that a
+   commerce cue names no provider account.
+6. **Checks.** CI runs again since the repository became public on 2026-11-21. Its
+   first run found six faults, and the branch `ci-green` fixes them; the CI file
+   fetch also needs the read-only CI key to read the new bucket of Plan 93. Not run:
+   a real Portal chat turn, mailbox turn and WhatsApp turn against the deployed
+   Worker, and a browser check of the status band of a governed action, which needs
+   a running Worker (the band uses the same refusal as the chat card).
 7. **Outside this refactor.** `counter-receipt-printer.test.ts` fails under the load of
    the machine: the device fleet waits 8 seconds for the printer (`PRINTER_ANSWER_MS`).
    It belongs to Plan 90. Decision D6 (capability claims of the mailbox and WhatsApp
@@ -395,15 +398,17 @@ the state of the branches and the way to continue.
 
 ### Stage S: waits for Plan 91
 
-Step S1 is done. Steps S2 (the 33 specs, one area at a time, each checked against the
+The session "Plan 91 phase 4" finishes the provider consoles and the callbacks
+(started 2026-11-22). Step S1 is done. Steps S2 (the 33 specs, one area at a time, each checked against the
 code before its plans move to `docs/history/`) and S3 (`AGENTS.md` under 250 lines, the
 plan index and the names table move out) start when Plan 91 phase 4 (the domain and
 the provider consoles) is done. The owner decided this on 2026-11-21.
 
 ### Stage B: waits for the Plan 93 cutover
 
-Stage B starts after the cutover of [Plan 93](plan-93-clean-cutover.md), which was a
-draft at step 2 on 2026-11-21. Then, in this order:
+Stage B starts after the cutover of [Plan 93](plan-93-clean-cutover.md). The session
+"Plan 93: clean cutover" landed its step 2 (the codemod) on `dev` on 2026-11-22 and
+builds the new stack next. Then, in this order:
 
 1. The trial of D1: one foundation module and one area as packages, with the `tsrs`
    time, the Worker start and the Portal build.
@@ -1598,12 +1603,8 @@ step; they are at the end of this entry.
   The Worker file `control/pending-decision-parts.ts` gives the readers and the
   stores. Layer crossings: 477, no change. Copies: 878 to 877. Unused exports: 807,
   no change.
-- **Open for the owner: two looks of one kind.** The items of "Two looks of one
-  kind, as found" in Appendix E did not change. `DecisionButtons` keeps each look
-  through props. A decision of the owner removes a prop value, not a component.
-- **Open for the owner: a custom connector write has no refusal.** The type of the
-  call permits only `allow` for it, no button refuses it, and it has no refused
-  journey. It can only expire.
+- **Decided on 2026-11-22: two looks of one kind** and **a custom connector write
+  has no refusal.** See [the decisions](#a21-the-decisions-2026-11-22).
 - **Open for a later step: Slack and a `Result` for each store.** The Deny of a
   permission request (`slack/permission-request-deny.ts`) and the buttons of a
   commerce action (`slack/commerce-approval.ts`) prove the person through a verified
@@ -1614,6 +1615,54 @@ step; they are at the end of this entry.
 - **Found, not changed.** An approval of a Gmail reply after its rejection answers
   with status 502 and `email_reply_edit_unavailable`. Nothing is sent. A status 409
   fits better, but the step changes no answer.
+
+### A2.1: the decisions (2026-11-22)
+
+The owner asked to finish the tail ("proceed and finish them off"), so these
+decisions use the recommendations of the proposal. Each kind of decision has one
+look in every place.
+
+1. **Reject a governed action.** The chat card, the status band of a page and the
+   review of a custom connector write show "Reject", then "Reject change" or "Keep
+   proposal". The second question waits for the person: the 5-second reset of the
+   status band is gone, and so is the `resetAfterMs` option.
+   `governedActionRefusal` and `GOVERNED_ACTION_ALLOW` in `ui/decision-buttons.tsx`
+   hold the labels.
+2. **Approve a custom connector write.** It approves as a commerce action does:
+   "Approve and apply" opens the step-up sign-in in a small window, approves and
+   runs the write in one click. A browser that blocks the window signs in on the
+   page, and the page applies the write when it comes back. A signed write shows
+   "Apply change". Before, the sign-in took the whole page, and "Run approved action"
+   was a second click.
+3. **Refuse a custom connector write.** `POST …/custom-connectors/{c}/actions/{nonce}/rejection`
+   with `{ "reason": "merchant_declined" }` goes through the one decide call
+   (`answer: "refuse"`) to the reject of the action ledger, as for a commerce action.
+   An owner or admin refuses, with no step-up sign-in, because a refusal changes
+   nothing outside Pantry. A viewer gets 404 `organisation_role_insufficient`. The
+   journey is in `remote-mcp.test.ts`: the write leaves the one read of the
+   decisions, a later run gets 409, and the remote service never sees the write.
+   The agent gets no tool for it: the agent proposed the write, and the person
+   decides on it.
+4. **A permission request in a chat.** Both prompts say "Sous Chef would like to …"
+   and "This will allow Sous Chef to:". The rename of Plan 91 made the two texts
+   one; a stored request lists its grants, and a missing capability lists the
+   capabilities.
+5. **An email reply.** The mailbox page, the Inbox conversation and the chat draft
+   card show "Approve and send", "Edit" and "Reject"
+   (`EMAIL_REPLY_DECISION` in `ui/decision-buttons.tsx`). The chat card said "Send" and
+   "Discard". `DraftMessageCard` puts Edit between the send and the discard for
+   every draft, as `DecisionButtons` does. The mailbox page has no editor of its
+   own: there the draft is in Gmail, and "Open in Gmail" edits it.
+6. **Slack.** Slack keeps its rule: a Slack button decides only where the verified
+   Slack link proves the person. A commerce action that moves no money has Approve
+   and Decline, a permission request has Deny, and the others link to the Portal.
+
+Checks: the refusal journey and the 21 other journeys of `remote-mcp`,
+`slack-commerce-approval` and `mail-reply-shared-draft` pass. A browser check on
+the preview pages showed the custom connector review ("Approve and apply", "Reject",
+then the confirm; the reject request and the order sign-in, then approval), the
+chat drafts and the commerce chat card (the confirm still waits after 6 seconds).
+`scripts/plan21/browser-acceptance.mjs` selects "Reject", then "Reject change".
 
 **21 November 2026. The crossings that start in an area: 124 to 62,** on the branch
 `refactor-17-areas-rest`. The work list was each pair whose source is an area, a
