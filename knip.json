@@ -71,7 +71,8 @@
       "project": ["src/.vitepress/**/*.{ts,vue}", "scripts/*.mjs"]
     },
     "foundation/*": {
-      "project": ["**/*.ts"]
+      "project": ["**/*.ts"],
+      "includeEntryExports": true
     },
     "packages/*": {
       "entry": [

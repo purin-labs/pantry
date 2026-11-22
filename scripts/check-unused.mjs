@@ -25,6 +25,10 @@
 // count may not grow: before you add an export to a package entry, import it
 // somewhere. When it falls, lower it with --update.
 //
+// A package in foundation/ is a module of the Worker, not an entry for others.
+// knip.json sets `includeEntryExports` for foundation/*, so an export there
+// with no importer is in the list above, by name, as before its move.
+//
 // An export that something outside the import graph reads at run time, such
 // as a browser check script or a lint that reads the source text, carries a
 // `@public` tag in its doc comment, with the reader.
