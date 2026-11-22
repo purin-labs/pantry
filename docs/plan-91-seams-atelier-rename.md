@@ -1,6 +1,6 @@
 # Plan 91 — Seams Atelier rename
 
-Status: phases 1, 2, 3 and 5 in production (satyr-edge `347178c4`, released from `peitalin/seams-atelier`; the repository is now `seams-tech/pantry`); phase 4 done on 22 November 2026 with the Plan 93 cutover (see "Phase 4 after Plan 93"); phase 6 open. See "Built". On 18 November 2026 the owner renamed Atelier to **Pantry** and Commis to **Gantry**: see "Pantry and Gantry". On 22 November 2026 the owner chose the Purin names, and phase 4 now follows [Plan 93](plan-93-clean-cutover.md): see "Purin names" and "Phase 4 after Plan 93".
+Status: phases 1, 2, 3 and 5 in production (satyr-edge `347178c4`, released from `peitalin/seams-atelier`; the repository is now `seams-tech/pantry`); phase 4 done on 22 November 2026 with the Plan 93 cutover (see "Phase 4 after Plan 93"); phase 6 open: three "Hey Sous Chef" models trained on 23 November 2026, none passes yet, and the Portal keeps "Hey Satyr" (see "Phase 6: the wake phrase"). See "Built". On 18 November 2026 the owner renamed Atelier to **Pantry** and Commis to **Gantry**: see "Pantry and Gantry". On 22 November 2026 the owner chose the Purin names, and phase 4 now follows [Plan 93](plan-93-clean-cutover.md): see "Purin names" and "Phase 4 after Plan 93".
 Date: 16 November 2026.
 Owner: Portal, Platform, commerce, docs and the seams-site.
 Replaces: the Antigravity draft `seams_product_rename_plan.md` (outside this
@@ -806,6 +806,94 @@ Phase 4 is done, on 22 November 2026. Open items, each outside the switch:
 - The callback page now has the Portal's look (dev `29024dc0`, released in
   `pantry` `5e878705`).
 
+### Phase 6: the wake phrase
+
+State on 23 November 2026: no "Hey Sous Chef" model passes yet, so the
+Portal keeps "Hey Satyr". The best model is better than the live "Hey Satyr"
+model on every shared test. But it hears fewer clips from macOS voices,
+which no model trains on, and the rule requires that check.
+
+**Pipeline.** The same pipeline as "Hey Satyr", in `scripts/plan-82-g04`.
+`phrases.py` holds each phrase: its wake forms, near phrases, near test and
+macOS bench lines. `wake.py phrase --phrase sous-chef` makes only the clips
+of the phrase, and every phrase shares the speech and noise sets. So both
+phrases count false wakes on the same files. `compare.py` holds the pass
+rule. It was written before the first number.
+
+**Training data, in each round.** 24,000 wake clips: 14,000 from Piper
+`en_US-libritts_r-medium` speakers 0–799 and 10,000 from Kokoro v1.0 voice
+blends. 53,500 near clips: near phrases, bakery talk and generated near
+phonemes. The shared 72.4 h of LibriSpeech and DEMAND kitchen, café and
+dishwasher noise. The test sets are held out: 400 clips in each of 7
+conditions from Piper speakers 800–903 and the last 30% of each noise,
+37.1 h of speech and noise for false wakes, and 120 macOS voice clips in
+each of 6 conditions. The data is on the shop Mac in
+`~/.satyr-voice-test/wake/hey-sous-chef` (round 2, with `round2` and
+`round2-nearweight4`) and `hey-sous-chef-round1`, 250 MB each. The
+comparisons are in `output/shop-voice/wake-phrase-compare-hey-sous-chef-*.json`.
+
+**The pass rule**, at the Portal's threshold 0.995:
+
+1. False wakes on all shared sets: not more than "Hey Satyr".
+2. Recall in each condition: not more than 2 points below "Hey Satyr". The
+   mean of the 7 conditions: not lower.
+3. macOS voices: the mean share heard is not more than 5 points lower, and
+   the mean share of near phrases accepted is not more than 5 points higher.
+
+| At 0.995                                 | Hey Satyr (live) | Round 1 | Round 2 | Round 2, near weight 4 |
+| ---------------------------------------- | ---------------- | ------- | ------- | ---------------------- |
+| False wakes, 37.1 h shared               | 5                | 7       | 5       | 3                      |
+| False wakes in 8 h, held-out speakers    | 1.17             | 1.76    | 1.46    | 0.88                   |
+| Heard, clean, 1 m                        | 94.5%            | 98.0%   | 96.2%   | 95.5%                  |
+| Heard, mixer at 0 dB, 1 m                | 93.8%            | 97.5%   | 97.2%   | 94.2%                  |
+| Heard, café at 5 dB, 1 m                 | 45.8%            | 75.5%   | 69.2%   | 68.5%                  |
+| Heard, mixer at 5 dB, 2 m                | 91.2%            | 95.8%   | 95.2%   | 94.8%                  |
+| Heard, mean of 7 conditions              | 86.2%            | 94.1%   | 91.8%   | 90.7%                  |
+| Near test accepted (each phrase its own) | 34.9%            | 43.8%   | 30.2%   | 27.0%                  |
+| macOS voices heard, mean of 6 conditions | 66.5%            | 56.0%   | 48.3%   | 50.4%                  |
+| macOS near phrases accepted, mean        | 6.2%             | 9.8%    | 6.6%    | 5.5%                   |
+| Checks that fail                         | —                | 1, 3    | 3       | 3                      |
+
+The rounds:
+
+- **Round 1.** Seven wake forms: "sue chef", "sous chef" (espeak says
+  /suːz/), the stress on either word, and /sʊ/. The near phrases include
+  "hey chef", "yes chef" and "the sous chef".
+- **Round 2.** Two causes from round 1. Five of the ten macOS voices say
+  "sous" with a final consonant, up to 190 ms longer than "sue". And the
+  model woke on "hey" + any word + "chef" ("hey see chef", "hey so chef").
+  Round 2 adds the form /suːs ʃɛf/, and 28% of the generated near phrases
+  keep "chef" and 14% keep "sous".
+- **Round 2, near weight 4.** The same data, trained with
+  `train.py --near-weight 4` (default 8), because the harder near phrases
+  made the model too strict.
+
+Why no model passes: on macOS voices, all three models are 10 to 18 points
+below "Hey Satyr", also at a threshold of 0.9. The gap is largest for the
+accents that the training voices do not have. In the best model, Rishi
+(Indian English) is heard 0% at the mixer at 5 dB, and Tessa (South
+African), Flo and Shelley (British) 33% to 50%. Piper `libritts_r` has US voices, and Kokoro has US
+and British voices only.
+
+The next training step: more English accents in the wake and near clips,
+for example the Piper voice `en_GB-vctk-medium` (109 speakers of the VCTK
+corpus, many accents, CC BY 4.0, under 100 MB). It needs the owner's yes for
+the download, and about one hour of the shop Mac. Then the same rule. The
+macOS voices are only a stand-in for people. One real check is cheap: the
+owner says each phrase 20 times at 1 m and 2 m, and both models score the
+recordings.
+
+Fixed during this work: the Plan 91 codemod had changed the training forms
+from "hey satyr" to "hey pantry", the data folder to `~/.pantry-voice-test`,
+and the Mac's lexicon so that it read "pantry" as "Satyr". The Mac now says
+"sous" without a final z (shop voice 0.5.2). The Portal reads the wake
+phrase and its model from `features/voice/wake-phrase.ts`, so the switch is
+a change of two names and one model file. The Chrome voice journey opens the
+fixture shop by its real handle and no longer reloads at the first voice
+start. Its closed-chat scene passes with "Hey Satyr".
+
+Not released: nothing of phase 6 is on `dev` or in production.
+
 ## Built
 
 State on 17 November 2026:
@@ -971,7 +1059,8 @@ State on 17 November 2026:
    with no 株式会社.
 6. **The switcher areas.** Default: Commerce, Café and Kitchen.
 7. **The wake phrase.** Default: keep "Hey Satyr" until a "Hey Sous Chef"
-   model passes.
+   model passes. On 23 November 2026 three models did not pass the macOS
+   voice check (see "Phase 6: the wake phrase").
 8. **The public domain.** Decided on 21 November 2026 in Plan 93
    (decision 2): `pantry.purin.io`, with no redirect from the old address.
    Earlier default: `pantry.seams.sh` (was `atelier.seams.sh`).

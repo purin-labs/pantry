@@ -109,6 +109,9 @@ asks for speaker enrollment first.
 4. **Addressee.** A check decides if the sentence is for the agent. The rules come first, and
    the model runs only when no rule decides:
    - The sentence names "Sous Chef", or "Satyr" while the wake phrase is "Hey Satyr": accept.
+     "Chef" alone does not count, because a kitchen says "yes chef", and "the sous chef" can be a
+     person on the staff. The first "Hey Sous Chef" wake models woke on "hey" + any word + "chef"
+     ([Plan 91](plan-91-seams-atelier-rename.md), phase 6), so G0.2 includes such sentences.
    - The sentence starts in the follow-up window: accept, with no model call.
    - The sentence is only a short thanks or a filler word: drop.
    - Else the model gets the sentence, the last two turns of the chat, the time since the last
@@ -229,8 +232,8 @@ existing noise sets. No customer audio is recorded.
   other voices. Limits: another voice accepted in at most 1% of pieces of 1.5 s or more; the
   member rejected in at most 10% of pieces of 1.5 s or more at 1 m.
 - **G0.2 Addressee check.** 300 scripted turns between two staff members and the agent: commands,
-  replies to the agent, talk to each other about the same products, and talk to a customer.
-  Limits: talk to a person sent to the agent in at most 2% of sentences; sentences for the agent
+  replies to the agent, talk to each other about the same products, talk to a customer, and
+  kitchen talk with "chef" and "the sous chef". Limits: talk to a person sent to the agent in at most 2% of sentences; sentences for the agent
   dropped in at most 15%; added latency at most 0.7 s at p95. Measure Jev and the Mac model.
 - **G0.3 Load.** Two bakers in ambient mode on one Mac for one hour of recordings. Limit: a
   wake command still gets its transcript within Plan 82 D1a.

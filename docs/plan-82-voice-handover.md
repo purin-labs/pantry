@@ -31,6 +31,9 @@ Checked on 2026-11-18:
   for new Macs (Plan 82C D5).
 - Spoken answers come from the Mac (`POST /speech`, Kokoro `af_heart`). Spoken approvals need an
   exact phrase match.
+- Changed on 22 November 2026: the Plan 93 cutover removed this Mac's service (its folder is in the
+  Trash), and no Mac is enrolled on `pantry.purin.io`. Enrollment waits for the owner's DNS token
+  for the new zone (Plan 93 follow-ups). The rest of this list is the state before the cutover.
 - One test Mac is enrolled: the owner's MacBook Pro (M4 Pro), name `dd8267f68371.voice.seams.sh`,
   private address `192.168.210.75`. It runs service 0.5.1 on Whisper as the launchd job
   `sh.seams.satyr.shop-voice`, from `~/.satyr-voice/app`. Its certificate lasts to 2027-01-31 and
@@ -63,7 +66,8 @@ worker, the test Mac's Whisper hears "Label the second tray", and the chat opens
 with a spoken answer. Not run: the whole journey, and a device that kept the page in its cache. On
 the first run in a fresh worktree, Vite found `onnxruntime-web/wasm` as a new dependency, reloaded
 the page during the scene, and the Knowledge page failed with two React copies. Run the journey a
-second time in a fresh worktree.
+second time in a fresh worktree. Fixed on 23 November 2026: the Portal's Vite config pre-bundles
+`onnxruntime-web/wasm`, and the scene passed on the first run with an empty Vite cache.
 
 Released on 2026-11-18 02:34 UTC as `satyr-edge` `b30cd3c3`, on the owner's words "Yes, release
 it". The release is narrow: the live source `41b4f4128` with the two code files of `6a3058272`, as
@@ -74,6 +78,38 @@ installer's files matched production, which shows that `41b4f4128` was the live 
 the live wake worker equals the build. A 65-second log tail had 6 events, all ok, with no
 exception. No signed-in check ran. No other file that the codemod
 renamed is still loaded by its old name.
+
+## The wake phrase (Plan 91 phase 6)
+
+On 23 November 2026, three "Hey Sous Chef" models were trained with the same pipeline and data as
+"Hey Satyr", and none passes the rule in `scripts/plan-82-g04/compare.py`. The Portal keeps "Hey
+Satyr". The best model is better on every shared test (3 false wakes against 5 in 37.1 h, mean
+recall 90.7% against 86.2%), but it hears 50.4% of macOS voice clips against 66.5%. The gap is
+largest for accents that the training voices do not have. Plan 91, "Phase 6: the wake phrase", has
+the rule, the numbers of each round and the next training step (more English accents, which needs
+the owner's yes for a download).
+
+How to train and measure a phrase (Python from `~/.satyr-voice-test/wake/.venv`, torch through
+`uv`):
+
+```bash
+cd scripts/plan-82-g04
+~/.satyr-voice-test/wake/.venv/bin/python wake.py phrase --phrase sous-chef
+~/.satyr-voice-test/wake/.venv/bin/python wake.py more --phrase sous-chef --wake 7000 --near 30000
+~/.satyr-voice-test/wake/.venv/bin/python wake.py kokoro --phrase sous-chef --wake 10000 --near 16000
+uv run --no-project --python 3.13 --with torch --with numpy python train.py --phrase sous-chef
+uv run --no-project --python 3.13 --with torch --with numpy python export.py weights sous-chef
+~/.satyr-voice-test/wake/.venv/bin/python export.py onnx sous-chef
+~/.satyr-voice-test/wake/.venv/bin/python export.py voices sous-chef
+~/.satyr-voice-test/wake/.venv/bin/python compare.py sous-chef
+```
+
+A round takes about 40 minutes on the M4 Pro. When a model passes, the switch is one release: set
+`WAKE_PHRASE` and `WAKE_MODEL` in `apps/portal/src/features/voice/wake-phrase.ts`, copy the model
+to `apps/portal/public/voice/`, set `scripts/shop-voice/wake-phrase.json` (the journeys read it),
+put "Sous Chef" first in `ASSISTANT_NAMES` in `services/platform/src/voice/vocabulary.ts`, and run
+the closed-chat Chrome journey. Keep `hey_satyr.onnx` until one production wake passes on the new
+model. The wake worker then drops the old file from each device's cache.
 
 ## Steps that need a shop
 
@@ -99,12 +135,10 @@ These wait until the owner has a shop. Do not ask the owner for them before that
    one through real Workers AI, on the deployed Worker, from the Portal to an agent answer. Measure
    the fallback time from the end of a 3 s command: the limit is 6 s at p95. This needs a signed-in
    Portal in the owner's Chrome. It is about one hour of agent work.
-5. **The wake phrase rename.** Plan 91 phase 6 planned "Hey Sous Chef". The Purin rename can change
-   the agent's name again, so train a wake model only for the final name. Train it with
-   `scripts/plan-82-g04/wake.py`, measure it with `phase-bench.py` against the G0.4 limits, and
-   add the phrase to the Mac's lexicon in `services/shop-voice/shop_voice/speech.py`. Switch the
-   model file, the wake phrase and the voice prompts in one release. Until then, the Portal says
-   "Hey Satyr".
+5. **The wake phrase rename.** The Purin rename kept the agent's name "Sous Chef". Three models
+   did not pass on 23 November 2026: see "The wake phrase (Plan 91 phase 6)". The Mac's lexicon
+   already says "sous" correctly (shop voice 0.5.2). Until a model passes, the Portal says "Hey
+   Satyr".
 6. **Plan 82B decisions.** The owner decides D1–D9. D9 needs counsel before any release, because a
    speaker template can be personal information.
 7. **Plan 82 Phase 5: Japanese.** Measure Whisper latency on the Japanese phrases, pass
@@ -194,14 +228,15 @@ These are outside the repositories, so the move does not change them:
 
 ## How to check voice work
 
-| Check                       | Command or file                                                                                                                                                           |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Platform journey            | `services/platform/tests/e2e/voice-control.test.ts` (needs `SATYR_ACCOUNT_WORKER_ARTIFACT`)                                                                               |
-| Mac journey                 | `scripts/shop-voice/run-journey.py` (run `pnpm portal:build` first: it reads the install script from `apps/portal/dist`; `SHOP_VOICE_BENCH` names the bench after a move) |
-| Chrome journey              | `scripts/shop-voice/run-portal-journey.py` (needs `PLAYWRIGHT_MODULE` and `SATYR_ACCOUNT_WORKER_ARTIFACT`)                                                                |
-| Safari on the iOS Simulator | `scripts/shop-voice/run-safari-journey.py`                                                                                                                                |
-| Noise bench                 | `scripts/shop-voice/confidence-bench.py`                                                                                                                                  |
-| Real voices and D5          | `scripts/shop-voice/phrase-bench.py human <session>`; recorder: `pnpm --filter @seams/portal exec vite --config ../../scripts/shop-voice/recorder.vite.config.ts`         |
+| Check                           | Command or file                                                                                                                                                                         |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Platform journey                | `services/platform/tests/e2e/voice-control.test.ts` (needs `SATYR_ACCOUNT_WORKER_ARTIFACT`)                                                                                             |
+| Mac journey                     | `scripts/shop-voice/run-journey.py` (run `pnpm portal:build` first: it reads the install script from `apps/portal/dist`; `SHOP_VOICE_BENCH` names the bench after a move)               |
+| Chrome journey                  | `scripts/shop-voice/run-portal-journey.py` (needs `PLAYWRIGHT_MODULE`; run `pnpm portal:build`, `pnpm async-control:build` and `pnpm --filter @purin-labs/contracts media:build` first) |
+| Safari on the iOS Simulator     | `scripts/shop-voice/run-safari-journey.py`                                                                                                                                              |
+| Wake phrase against "Hey Satyr" | `scripts/plan-82-g04/compare.py <phrase>` (after `train.py` and `export.py voices`)                                                                                                     |
+| Noise bench                     | `scripts/shop-voice/confidence-bench.py`                                                                                                                                                |
+| Real voices and D5              | `scripts/shop-voice/phrase-bench.py human <session>`; recorder: `pnpm --filter @seams/portal exec vite --config ../../scripts/shop-voice/recorder.vite.config.ts`                       |
 
 ## Rules to keep
 
