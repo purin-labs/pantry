@@ -13,7 +13,12 @@ on:
 
 concurrency:
   group: pantry-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # A push to dev does not cancel the run in progress of the draft pull request
+  # from dev to main. A full run takes about two hours and many sessions push
+  # to dev, so with a cancel no run finished (22 November 2026). The newest
+  # push waits, and it runs when the run in progress ends. Each other pull
+  # request still cancels its older run.
+  cancel-in-progress: ${{ github.head_ref != 'dev' }}
 
 permissions:
   contents: read
