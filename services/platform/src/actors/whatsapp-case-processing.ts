@@ -11,7 +11,8 @@ import {
   type WhatsAppReplyAuthor,
 } from "../data/whatsapp";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
-import type { Env, CaseActorStub, SessionActorStub } from "../env";
+import type { Env } from "../env";
+import type { CaseActorStub, SessionActorStub } from "./actor-stubs";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   newRequestId,

@@ -24,7 +24,8 @@ import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
 import { parseDelivery } from "../actors/connector/ingress-parsers";
 import type { OrganisationDatabase } from "../database-handles";
 import { readOperationsDestination } from "../data/operations-destination";
-import type { Env, ConnectorActorStub } from "../env";
+import type { Env } from "../env";
+import type { ConnectorActorStub } from "../actors/actor-stubs";
 import {
   newRequestId,
   parseConnectorId,

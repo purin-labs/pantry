@@ -1,4 +1,5 @@
-import type { Env, ConnectorActorStub } from "../env";
+import type { Env } from "../env";
+import type { ConnectorActorStub } from "../actors/actor-stubs";
 import type { Result } from "../result";
 import { resolveActiveConnectorActor } from "../actors/actor-router";
 import { type MailboxIngressPolicy } from "../data/email-mailbox";

@@ -1,3 +1,4 @@
+import type { Env } from "../env";
 import type { OrganisationPlacement } from "../placement";
 import type { PlacedActor } from "./lifecycle/placed-actor";
 
@@ -43,3 +44,15 @@ export function actorStub<TActor extends Rpc.DurableObjectBranded | undefined>(
     locationHint: placement.locationHint,
   });
 }
+
+/**
+ * The stub of each placed Actor, as its binding gives it (Refactor 17, step
+ * A1.1). Code outside the Actor's own file names these types and not the
+ * class. The Actor files add these bindings to `Env` with a declaration
+ * merge, so the types are here and not in `env.ts`: the kernel then reads no
+ * merged key, and it can be a package of its own (Stage B, decision D1).
+ */
+export type OrganisationActorStub = ReturnType<Env["ORGANISATION"]["get"]>;
+export type SessionActorStub = ReturnType<Env["SESSION"]["get"]>;
+export type CaseActorStub = ReturnType<Env["CASE"]["get"]>;
+export type ConnectorActorStub = ReturnType<Env["CONNECTOR"]["get"]>;

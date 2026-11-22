@@ -35,7 +35,8 @@ import {
 import { actorStub } from "../actors/actor-stubs";
 import type { AdmittedOrganisationArchiveCleanup } from "../actors/organisation-archive-cleanup";
 import { resolveActiveOrganisationPlacementRecord } from "./organisation-placement";
-import type { Env, SessionActorStub } from "../env";
+import type { Env } from "../env";
+import type { SessionActorStub } from "../actors/actor-stubs";
 import { closeOrganisationCommerceMerchants } from "../commerce/contract/merchant-closure";
 import { parseOrganisationPlacement } from "../placement";
 import type { Result } from "../result";

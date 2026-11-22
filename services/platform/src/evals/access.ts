@@ -22,7 +22,8 @@ import {
 import type { AuthorizedConversationScope as ConversationScope } from "../organisation-access/access";
 import { verifiedContacts } from "../mail-inbox/contract/verified-contacts";
 import { gmailConnectorId } from "../mail-inbox/contract/connector-ids";
-import type { Env, OrganisationActorStub } from "../env";
+import type { Env } from "../env";
+import type { OrganisationActorStub } from "../actors/actor-stubs";
 import { parseIntegrationAccountId, type OrganisationId } from "../ids";
 import {
   citedRecord,

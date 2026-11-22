@@ -1,4 +1,5 @@
-import type { Env, SessionActorStub } from "../../env";
+import type { Env } from "../../env";
+import type { SessionActorStub } from "../actor-stubs";
 import { newRequestId, parseSessionId } from "../../ids";
 import { traceLog } from "../../observability";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";

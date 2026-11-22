@@ -1,5 +1,6 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Env, OrganisationActorStub } from "../env";
+import type { Env } from "../env";
+import type { OrganisationActorStub } from "../actors/actor-stubs";
 import type { Result } from "../result";
 import { resolveActiveCaseActor, resolveActiveCaseActorAtPlacement } from "../actors/actor-router";
 import type { ActionLedgerEntry } from "../actors/action-ledger";

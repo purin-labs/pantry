@@ -18,7 +18,8 @@ import {
   type Conversation,
   type ChatCommand,
 } from "../conversation";
-import type { Env, SessionActorStub } from "../../env";
+import type { Env } from "../../env";
+import type { SessionActorStub } from "../../actors/actor-stubs";
 import { parseRequestId } from "../../ids";
 import { resolveActiveSessionActorAtPlacement } from "../../actors/actor-router";
 import type { OrganisationModelRoute } from "../../models/route";

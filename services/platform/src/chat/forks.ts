@@ -23,7 +23,8 @@ import {
 import type { Result } from "../result";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import { admitSessionInformationFlowObservation } from "../actors/agent-session-information-flow";
-import type { Env, SessionActorStub } from "../env";
+import type { Env } from "../env";
+import type { SessionActorStub } from "../actors/actor-stubs";
 import { parseSessionId, type OrganisationId } from "../ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import { FlowBinding, ObservationEvidence } from "../policy/information-flow";

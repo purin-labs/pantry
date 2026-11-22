@@ -28,11 +28,11 @@ import type {
   ActorActivationSchemaAdvanceError,
 } from "../../actors/actor-activation";
 import { currentActorSchemaVersion } from "../../actors/current-actor-schema-version";
+import type { Env } from "../../env";
 import type {
-  Env,
   OrganisationActorStub,
   SessionActorStub,
-} from "../../env";
+} from "../../actors/actor-stubs";
 import {
   inspectOrganisationActorRegistry,
   reconcileOrganisationActorRegistry,

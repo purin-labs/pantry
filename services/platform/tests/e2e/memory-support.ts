@@ -38,7 +38,7 @@ import {
   type OrganisationClient,
 } from "./organisation-fixture";
 import { openRouterText } from "./slack-journey-support";
-import type { OrganisationActorStub } from "../../src/env";
+import type { OrganisationActorStub } from "../../src/actors/actor-stubs";
 
 const CUTOFF_INSTRUCTION =
   "Remember that our primary supplier closes next-day orders at noon Sydney time.";

@@ -16,7 +16,8 @@ import {
 } from "@purin-labs/std";
 import type { CommerceOrderV1 } from "@purin-labs/commerce-client";
 import type { Variant } from "@purin-labs/type-utils";
-import type { Env, OrganisationActorStub } from "../env";
+import type { Env } from "../env";
+import type { OrganisationActorStub } from "./actor-stubs";
 import type { Result } from "../result";
 import {
   newRequestId,

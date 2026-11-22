@@ -3,7 +3,8 @@ import type {
   ConnectorDeliveryReceipt,
   ConnectorIdentity,
 } from "@purin-labs/contracts";
-import type { Env, SessionActorStub } from "../../env";
+import type { Env } from "../../env";
+import type { SessionActorStub } from "../actor-stubs";
 import type { SessionId } from "../../ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type { AlarmReconciler } from "../lifecycle/actor-alarm";

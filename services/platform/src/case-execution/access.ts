@@ -37,7 +37,8 @@ import {
   parseConversationActorIdentity,
 } from "../chat/conversation-actor-identity";
 import type { AuthorizedConversationScope as ConversationScope } from "../organisation-access/access";
-import type { Env, CaseActorStub, OrganisationActorStub } from "../env";
+import type { Env } from "../env";
+import type { CaseActorStub, OrganisationActorStub } from "../actors/actor-stubs";
 import { parseCaseId, parseSessionId, type CaseId } from "../ids";
 import {
   resolveMemoryViewer,

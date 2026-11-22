@@ -43,7 +43,8 @@ import {
   ensureOrganisationDefaultWorkspace,
   readOrganisationDefaultWorkspacePortalAddress,
 } from "../data/organisation-workspace";
-import type { Env, CaseActorStub, SessionActorStub } from "../env";
+import type { Env } from "../env";
+import type { CaseActorStub, SessionActorStub } from "../actors/actor-stubs";
 import type { SessionBudgetDimension } from "@purin-labs/contracts";
 import { budgetNoticeDeliveryId, budgetStopNoticeText } from "./budget-notice";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";

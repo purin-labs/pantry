@@ -11,7 +11,8 @@ import type {
   UserId,
 } from "@purin-labs/control-api";
 import { identifier } from "../../case-context-discovery/policy";
-import type { Env, OrganisationActorStub } from "../../env";
+import type { Env } from "../../env";
+import type { OrganisationActorStub } from "../../actors/actor-stubs";
 import { authorizeConfiguredBearer } from "../../fault-injection-auth";
 import {
   parseCaseId,

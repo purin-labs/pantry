@@ -4,7 +4,8 @@ import { OrganisationExecutionScope } from "../../../organisation-execution-scop
 import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
 import { decideCurrentAuthorityFlowSink } from "../../../chat/information-flow";
 import { customConnectorFetchOf } from "../../../custom-connectors/egress";
-import type { Env, OrganisationActorStub } from "../../../env";
+import type { Env } from "../../../env";
+import type { OrganisationActorStub } from "../../../actors/actor-stubs";
 import { requireActiveOrganisationActor } from "../../../actors/actor-router";
 import {
   approvalActionBindingMatches,

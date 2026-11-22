@@ -27,7 +27,8 @@ import {
   createCueQueueMessage,
   ensureCommerceLowStockCueSnapshot,
 } from "../cues/engine";
-import type { Env, OrganisationActorStub } from "../env";
+import type { Env } from "../env";
+import type { OrganisationActorStub } from "../actors/actor-stubs";
 import {
   createCommerceOutboxReconcileQueueMessage,
   type CommerceOutboxReconcileQueueMessage,

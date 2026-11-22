@@ -32,7 +32,8 @@ import {
   type SlackChannelOptions,
   type SlackMessageProposal,
 } from "../../data/slack-message-proposal";
-import type { Env, ConnectorActorStub } from "../../env";
+import type { Env } from "../../env";
+import type { ConnectorActorStub } from "../../actors/actor-stubs";
 import { parseConnectorId } from "../../ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { authorizeOrganisationRequest } from "../authorization";

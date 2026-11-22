@@ -270,7 +270,7 @@ import type { CaseAssignment } from "@purin-labs/contracts";
 import type { CaseGmailReplyProposal } from "../../src/actors/case-inbox/email-proposals";
 import { decodeRaw } from "./gmail-mailbox-support";
 import { controlFetch, modelToolResults } from "./chat-journey-support";
-import type { OrganisationActorStub } from "../../src/env";
+import type { OrganisationActorStub } from "../../src/actors/actor-stubs";
 import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 async function prepareMailBudgetJourney() {

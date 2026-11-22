@@ -6,7 +6,8 @@ import { registerEmailSelfTest } from "../../data/email-self-test";
 import { resolveEmailOperationalCapability } from "../../actors/email-operational-capability";
 import type { EmailProposalTarget } from "../../data/email-operational";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
-import type { Env, ConnectorActorStub } from "../../env";
+import type { Env } from "../../env";
+import type { ConnectorActorStub } from "../../actors/actor-stubs";
 import {
   parseCaseId,
   parseIntegrationAccountId,

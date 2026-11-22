@@ -22,7 +22,8 @@ import {
   normalizeConversationTimeline,
   type Conversation,
 } from "./conversation";
-import type { Env, CaseActorStub } from "../env";
+import type { Env } from "../env";
+import type { CaseActorStub } from "../actors/actor-stubs";
 import {
   deriveDirectCaseIdentities,
   type ConversationCaseActor,

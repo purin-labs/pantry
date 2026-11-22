@@ -5,7 +5,8 @@ import {
   type ActionLedgerActivity,
 } from "../actors/action-ledger";
 import type { AgentOperationsSnapshot } from "../data/agent-operations";
-import type { Env, OrganisationActorStub } from "../env";
+import type { Env } from "../env";
+import type { OrganisationActorStub } from "../actors/actor-stubs";
 import type { OrganisationId } from "../ids";
 import { definePort } from "../port";
 import type { CommerceExceptionInbox } from "@purin-labs/control-api";

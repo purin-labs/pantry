@@ -12,7 +12,8 @@ import {
 } from "@purin-labs/std";
 import { parseCaseId, parseOrganisationId, type RequestId } from "../ids";
 import type { Result } from "../result";
-import type { Env, CaseActorStub } from "../env";
+import type { Env } from "../env";
+import type { CaseActorStub } from "./actor-stubs";
 import {
   findActiveCaseActorAtScope,
   resolveActiveCaseActor,
