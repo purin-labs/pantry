@@ -238,7 +238,14 @@ async function putJson(path, value, kind) {
 // the text of an edit names: the plans beside this one give its place now.
 const laterMoves = new Map();
 /** Each plan of the folder, this one first: its module and its moves. */
-const plansHere = [{ module: plan.module, files: planFiles }];
+const plansHere = [
+  {
+    module: plan.module,
+    name: plan.package.name,
+    files: planFiles,
+    edits: plan.edits ?? [],
+  },
+];
 for (const name of readdirSync(dirname(planPath))) {
   const other = join(dirname(planPath), name);
   if (!name.endsWith(".json") || other === planPath) continue;
@@ -248,7 +255,12 @@ for (const name of readdirSync(dirname(planPath))) {
     files.set(from, `${otherPlan.target}/${inside}`);
     laterMoves.set(from, `${otherPlan.target}/${inside}`);
   }
-  plansHere.push({ module: otherPlan.module, files });
+  plansHere.push({
+    module: otherPlan.module,
+    name: otherPlan.package?.name,
+    files,
+    edits: otherPlan.edits ?? [],
+  });
 }
 function laterPath(path) {
   let current = path;
@@ -265,9 +277,12 @@ function laterFolder(folder) {
   let place = null;
   if (!tree.some((path) => path.startsWith(prefix))) {
     // The last plan in foundationOrder that moved a file of the folder moved
-    // the rest of it, and the name of the folder with it.
+    // the rest of it, and the name of the folder with it. The areas move
+    // after the foundation.
     const rank = (module) =>
-      layerMapAtStart.foundationOrder.indexOf(posix.basename(module));
+      module.startsWith("foundation/")
+        ? layerMapAtStart.foundationOrder.indexOf(posix.basename(module))
+        : layerMapAtStart.foundationOrder.length;
     const last = plansHere
       .filter(({ files }) =>
         [...files.keys()].some((from) => from.startsWith(prefix)),
@@ -296,7 +311,7 @@ function laterText(text) {
     const file = laterPath(path);
     if (file !== path) return file;
     const parts = path.split("/");
-    for (let end = parts.length - 1; end > 1; end -= 1) {
+    for (let end = parts.length; end > 1; end -= 1) {
       const folder = parts.slice(0, end).join("/");
       const place = laterFolder(folder);
       if (place !== null) return place + path.slice(folder.length);
@@ -461,6 +476,24 @@ if (plan.package.existing === true) {
     }
   }
 } else {
+  // A later move of another plan adds its package to the dependencies of
+  // this package when a file here imports it (the areas import each other).
+  // A second run keeps those dependencies.
+  const otherPackages = new Set(
+    plansHere.map(({ name }) => name).filter((name) => name !== packageName),
+  );
+  const kept =
+    original(manifestPath) === null
+      ? []
+      : Object.entries(readJson(manifestPath).dependencies ?? {}).filter(
+          ([name]) =>
+            otherPackages.has(name) &&
+            plan.package.dependencies?.[name] === undefined,
+        );
+  let dependencies = { dependencies: plan.package.dependencies };
+  for (const [name, version] of kept) {
+    dependencies = withDependency(dependencies, name, version);
+  }
   await putJson(
     manifestPath,
     {
@@ -475,7 +508,7 @@ if (plan.package.existing === true) {
         plan.package.typeCheck === false
           ? undefined
           : { "check:types": "tsrs --noEmit" },
-      dependencies: plan.package.dependencies,
+      dependencies: dependencies.dependencies,
       devDependencies: Object.fromEntries(
         plan.package.devDependencies.map((name) => [name, versionOf(name)]),
       ),
@@ -1040,16 +1073,35 @@ for (const path of [...pending.keys()]) {
 // 8. The text edits of the plan: the configs that find files by a root name
 // and that cannot read scripts/lib/source-roots.mjs.
 
+/**
+ * True when the file holds the replace text of an edit, also with each path
+ * in it that a later plan moved, or when an edit of another plan replaced
+ * that text in its turn and is done: a later plan can add a root folder to
+ * a list that an earlier plan wrote.
+ */
+function editDone(edit, text, seen = new Set()) {
+  if (text.includes(edit.replace) || text.includes(laterText(edit.replace))) {
+    return true;
+  }
+  seen.add(edit);
+  return plansHere.some(({ edits }) =>
+    edits.some(
+      (next) =>
+        !seen.has(next) &&
+        laterPath(next.file) === edit.file &&
+        next.find === edit.replace &&
+        editDone(next, text, seen),
+    ),
+  );
+}
 for (const plannedEdit of plan.edits ?? []) {
   const edit = { ...plannedEdit, file: laterPath(plannedEdit.file) };
   const text = textOf(edit.file);
   if (text === null) {
     faults.push(`${edit.file}: the plan edits it, and it does not exist`);
-  } else if (
-    text.includes(edit.replace) ||
-    text.includes(laterText(edit.replace))
-  ) {
-    // Done by an earlier run. A later move can have moved a path in it.
+  } else if (editDone(edit, text)) {
+    // Done by an earlier run. A later move can have moved a path in it, or
+    // a later plan can have changed the text again.
   } else if (text.includes(edit.find)) {
     put(edit.file, text.split(edit.find).join(edit.replace), "config");
   } else {
