@@ -1139,6 +1139,8 @@
     "services/platform/src/whatsapp/application.ts": "foundation/connections",
     "services/platform/src/whatsapp/graph.ts": "foundation/connections",
     "services/platform/src/whatsapp/identifiers.ts": "foundation/connections",
+    "services/platform/src/vault-onepassword/core-wasm.d.ts": "workers/platform",
+    "services/platform/src/vault-onepassword/worker.ts": "workers/platform",
     "services/platform/src/whatsapp/read-authorization.ts": "areas/inbox",
     "services/platform/src/workspace-executor-container.ts": "foundation/agent",
     "services/platform/src/workspace-revision-store.ts": "foundation/agent",
