@@ -13,12 +13,12 @@ import type {
   PortalPageViewV1,
 } from "@purin-labs/control-api";
 import type { CostsSheetTab } from "@purin-labs/costs-sheet-crdt";
-import { formatMoneyMinor } from "../../formatting";
+import { formatMoneyMinor } from "@purin-labs/ui/formatting";
 import {
   registerSurfaceView,
   type SurfaceCommandOutcome,
   type SurfaceViewSource,
-} from "../surface-observation";
+} from "@purin-labs/ui/features/surface-observation";
 import type { CostsViewCommand } from "@purin-labs/control-api";
 import { COSTS_COMMANDS } from "./costs-view-commands";
 import { formatCostQuantity } from "./api";

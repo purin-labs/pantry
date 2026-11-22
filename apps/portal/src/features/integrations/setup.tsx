@@ -1,7 +1,7 @@
 import type { FileContextProvider } from "@purin-labs/contracts";
 import React from "react";
 import { toast } from "sonner";
-import { EmptyState } from "../../page-components";
+import { EmptyState } from "@purin-labs/ui/page-components";
 import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import {
   LastAttemptNotice,

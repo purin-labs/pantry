@@ -17,8 +17,8 @@ import {
   Notice,
   RecoverableError,
   formatRelativeTime,
-} from "../page-components";
-import { workspacePagePath, workspaceResourcePath } from "../route";
+} from "@purin-labs/ui/page-components";
+import { workspacePagePath, workspaceResourcePath } from "@purin-labs/ui/route";
 import {
   readCommerceHomeAggregations,
   type CommerceHomeAggregation,

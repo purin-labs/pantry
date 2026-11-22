@@ -5,7 +5,7 @@ import {
   WORKSPACE_NAVIGATION_GROUPS,
   workspacePagePath,
   workspaceResourcePath,
-} from "../../../apps/portal/src/route";
+} from "@purin-labs/ui/route";
 
 const ORGANISATION_HANDLE = "pantry-cafes";
 const WORKSPACE_HANDLE = "cafe-central";

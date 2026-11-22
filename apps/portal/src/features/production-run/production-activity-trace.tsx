@@ -19,9 +19,9 @@ import {
   TraceTitle,
   TraceDescription,
   type TraceStatus,
-} from "../../ui/trace";
+} from "@purin-labs/ui/trace";
 import { blockerDescription, taskTime } from "./oven-logistics";
-import "../../ui/operations-trace.css";
+import "@purin-labs/ui/operations-trace.css";
 import "./production-activity-trace.css";
 
 type Props = Readonly<{

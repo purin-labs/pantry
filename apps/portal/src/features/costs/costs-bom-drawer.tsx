@@ -9,8 +9,8 @@ import type {
 import {
   formatMoneyMinor,
   formatSignedMoneyRounded as formatSignedMinor,
-} from "../../formatting";
-import { SideDrawer } from "../../ui";
+} from "@purin-labs/ui/formatting";
+import { SideDrawer } from "@purin-labs/ui/index";
 import { formatCostQuantity } from "./api";
 import { ProductOrb } from "./costs-ui";
 

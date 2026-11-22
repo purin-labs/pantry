@@ -1,4 +1,4 @@
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { PlaybackCursor } from "./playback-cursor";
 import type { StationId } from "@purin-labs/bakery-model/bakery";

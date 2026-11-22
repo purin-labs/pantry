@@ -25,7 +25,7 @@ async function verifyOneInbox(page) {
   async function actions() {
     return page.evaluate("window.mailFixtureWhatsAppState.actions");
   }
-  // The Portal Select (apps/portal/src/ui/select.tsx) is a button with role
+  // The Portal Select (foundation/ui/select.tsx) is a button with role
   // combobox that opens a listbox popup. Choose by { value }, { label } or
   // { index }. { values } sets the items of a multiple Select, then Escape
   // closes its popup.

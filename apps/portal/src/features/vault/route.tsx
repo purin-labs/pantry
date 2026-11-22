@@ -11,8 +11,8 @@ import type {
 import { assertNever } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 
-import { cancelDialog, syncDialog } from "../../dialog";
-import { EmptyState, SideDrawer } from "../../ui";
+import { cancelDialog, syncDialog } from "@purin-labs/ui/dialog";
+import { EmptyState, SideDrawer } from "@purin-labs/ui/index";
 import { VAULT_TRANSPORT, vaultErrorMessage, type VaultTransport } from "./api";
 import {
   checkContactDraft,

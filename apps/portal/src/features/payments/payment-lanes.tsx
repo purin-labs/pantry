@@ -11,7 +11,7 @@ import {
   type TimeLanesSection,
   type TimeLanesStatus,
   type TimeLanesStep,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 
 // A period of payments: each card payment that the provider answered, paid or
 // declined. A declined payment shows each later try by the same buyer, and a

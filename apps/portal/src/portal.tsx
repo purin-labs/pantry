@@ -8,7 +8,7 @@ import {
   AccountInvitationPage,
   readAccountInvitationRoute,
 } from "./pages/account-invitation";
-import { UserPreferencesProvider } from "./preferences/context";
+import { UserPreferencesProvider } from "@purin-labs/ui/preferences/context";
 import { BakeryWorkspaceReveal } from "./features/bakery-workspace-reveal";
 import { revealBakeryWorkspace } from "./features/bakery-surface-registry";
 import React from "react";
@@ -40,15 +40,15 @@ import {
   type PortalRoute,
   type WorkspaceDetailPage,
   type WorkspacePageDescriptor,
-} from "./route";
+} from "@purin-labs/ui/route";
 import {
   focusPortalPage,
   PortalFrame,
   WorkspaceLayout,
   useRoutePageFocus,
 } from "./shell";
-import { parseChatReturnPath } from "./page-address";
-import { PageSkeleton } from "./page-components";
+import { parseChatReturnPath } from "@purin-labs/ui/page-address";
+import { PageSkeleton } from "@purin-labs/ui/page-components";
 import {
   MutationLedger,
   type OrganisationMutation,

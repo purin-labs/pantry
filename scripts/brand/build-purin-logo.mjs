@@ -5,8 +5,8 @@
 // Reads   docs/brand/purin-logo/paths.json   (from scripts/brand/trace-purin-logo.py)
 // Writes  docs/brand/purin-logo/*.svg                  the mark and the app icon, static and animated
 //         docs/brand/purin-logo/icon-pack/*            favicons, app icons and PNG marks
-//         apps/portal/src/ui/purin-mark-paths.ts       the curves for the PurinMark component
-//         apps/portal/src/ui/purin-mark.css            the motion for the PurinMark component
+//         foundation/ui/purin-mark-paths.ts       the curves for the PurinMark component
+//         foundation/ui/purin-mark.css            the motion for the PurinMark component
 //         services/platform/src/control/routes/integrations/purin-icon.ts
 //                                                      the icon for the pages that the Worker serves
 //
@@ -26,7 +26,7 @@ const root = path.resolve(
 );
 const logoDir = path.join(root, "docs/brand/purin-logo");
 const packDir = path.join(logoDir, "icon-pack");
-const uiDir = path.join(root, "apps/portal/src/ui");
+const uiDir = path.join(root, "foundation/ui");
 const workerIconFile = path.join(
   root,
   "services/platform/src/control/routes/integrations/purin-icon.ts",

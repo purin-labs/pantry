@@ -8,7 +8,7 @@ import {
   showDialog,
   useDialogPresent,
   useHeldWhileClosed,
-} from "../../dialog";
+} from "@purin-labs/ui/dialog";
 
 type ConnectionDialogProps = Readonly<{
   open: boolean;

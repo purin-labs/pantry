@@ -4,7 +4,7 @@ import {
   TypeSafeConnectionPanel,
   type TypeSafeConnectionState,
 } from "./typesafe-connection";
-import { workspacePagePath } from "../../route";
+import { workspacePagePath } from "@purin-labs/ui/route";
 import { PROVIDER_PRESENTATION } from "../../integration-catalogue";
 import {
   onePasswordStatusLabel,

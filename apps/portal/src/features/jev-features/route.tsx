@@ -6,8 +6,8 @@ import type {
   JevFeaturesView,
   JevRelatedCasesMode,
 } from "@purin-labs/control-api/portal/jev-features";
-import { Select } from "../../ui";
-import { Switch } from "../../ui/toggle-switch";
+import { Select } from "@purin-labs/ui/index";
+import { Switch } from "@purin-labs/ui/toggle-switch";
 import { changeJevFeature, jevFeatureErrorMessage, readJevFeatures } from "./api";
 import {
   JEV_PAID_USE_ID,

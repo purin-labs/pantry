@@ -9,7 +9,7 @@ import {
   Notice,
   PageSkeleton,
   RecoverableError,
-} from "../../page-components";
+} from "@purin-labs/ui/page-components";
 import type { WhatsAppPolicyDraft, WhatsAppSurface } from "@purin-labs/control-api/portal/whatsapp";
 import type { WhatsAppPanelActions } from "../../pages/whatsapp";
 import { MutationLedger } from "@purin-labs/control/portal/mutation-state";

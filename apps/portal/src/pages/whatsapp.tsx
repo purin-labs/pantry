@@ -1,4 +1,4 @@
-import { Select } from "../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 
 import {
@@ -8,7 +8,7 @@ import {
   StatusChip,
   formatRelativeTime,
   type StatusChipStatus,
-} from "../page-components";
+} from "@purin-labs/ui/page-components";
 import { ConsentPoint } from "../features/integrations/connect-consent-dialog";
 import {
   LastAttemptNotice,

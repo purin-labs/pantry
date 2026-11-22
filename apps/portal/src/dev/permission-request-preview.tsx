@@ -9,9 +9,9 @@ import {
   type PermissionRequestCardProps,
   type PermissionRequestItem,
   type PermissionRequestScope,
-} from "../ui";
-import { AGENT_NAME } from "../agent-name";
-import { usePortalTheme } from "../use-portal-theme";
+} from "@purin-labs/ui/index";
+import { AGENT_NAME } from "@purin-labs/ui/agent-name";
+import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
 import "../styles.css";
 import "./agent-components-preview.css";
 import { ChatAgentPermissionSample } from "./chat-agent-permission-preview";

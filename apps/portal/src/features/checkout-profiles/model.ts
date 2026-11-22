@@ -4,7 +4,7 @@ import type { CheckoutProfileCollection, DraftCheckoutProfileSummary, PublishedC
 import type {
   CheckoutProfileSummary,
 } from "@purin-labs/commerce-control-api/portal/checkout-profiles";
-import { formatMoneyMinor } from "../../formatting";
+import { formatMoneyMinor } from "@purin-labs/ui/formatting";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 

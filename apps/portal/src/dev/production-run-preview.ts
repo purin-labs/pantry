@@ -2,7 +2,7 @@ import React from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { ProductionActivityTrace } from "../features/production-run/production-activity-trace";
 import "../styles.css";
-import { Select } from "../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import {
   parseExecutionBundle,
   parseHostView,

@@ -1,5 +1,5 @@
 import React from "react";
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import type { GrinderModel } from "@purin-labs/production-simulation/native/cell-adapter";
 import {
   morningShiftRecipeInput,

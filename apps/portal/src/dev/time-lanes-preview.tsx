@@ -10,7 +10,7 @@ import {
   PaymentLanes,
   type PaymentStep,
 } from "../features/payments/payment-lanes";
-import { nowIn, startOfDay, usePeriod, useWiderWhenEmpty } from "../ui";
+import { nowIn, startOfDay, usePeriod, useWiderWhenEmpty } from "@purin-labs/ui/index";
 import type { CaseTimelineCase, ScheduleRunsDay } from "@purin-labs/control-api";
 import { EMPTY_AGENT_OPERATIONS_SNAPSHOT, type AgentOperationsTransport } from "../agent-operations";
 import type {

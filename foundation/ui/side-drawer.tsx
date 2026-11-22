@@ -1,6 +1,6 @@
 import React from "react";
 import { X } from "lucide-react";
-import { cancelDialog, syncDialog } from "../dialog";
+import { cancelDialog, syncDialog } from "./dialog";
 import "./side-drawer.css";
 
 export type SideDrawerProps = {

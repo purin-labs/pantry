@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
-import { TaskList } from "../../apps/portal/src/ui/task-list.tsx";
+import { TaskList } from "../../foundation/ui/task-list.tsx";
 import { parsePendingInputs } from "../../packages/control-api/src/portal/chat.ts";
 import DescriptionEditor from "../../apps/portal/src/features/commerce/description-draft/editor.tsx";
 import { responseJson } from "../../foundation/control/portal/control-client.ts";

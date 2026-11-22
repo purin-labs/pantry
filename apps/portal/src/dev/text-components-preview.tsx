@@ -1,7 +1,12 @@
-import { Select } from "../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { MessageSquareText, Play, RotateCcw } from "lucide-react";
-import { EmptyState, StreamingText, TaskList, type TaskState } from "../ui";
+import {
+  EmptyState,
+  StreamingText,
+  TaskList,
+  type TaskState,
+} from "@purin-labs/ui/index";
 
 const sample =
   "## Tomorrow’s production\n\nPrepare **38 orders** using the accepted snapshot. The kitchen can review the quantities as they arrive, while the rest of the production sheet continues to take shape.\n\n- Start with the morning pickups, then group the remaining orders by product so the team can plan each batch at a glance.\n- Keep the customer notes beside the quantities, ready for the final review before handoff.\n\n- [x] Read the orders\n- [ ] Prepare the production sheet\n\n### Quantities\n\n| Product | Quantity |\n| --- | --- |\n| Plain financier | 24 |\n| Chocolate financier | 14 |\n\n```csv\nproduct,quantity\nplain,24\nchocolate,14\n```\n\nReference: https://example.com/orders\n\nThe sheet is ready for review.";

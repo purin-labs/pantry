@@ -12,7 +12,7 @@ import {
   controlRead,
   controlUpload,
 } from "@purin-labs/control/portal/control-client";
-import { formatMoneyMinor } from "../../../formatting";
+import { formatMoneyMinor } from "@purin-labs/ui/formatting";
 
 type SaleDetails = InventoryData["untrackedProducts"][number] | null;
 type PhotoWork = Readonly<

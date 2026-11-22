@@ -1,6 +1,6 @@
 import React from "react";
 
-import { formatMoneyMinorEnglish as money } from "../../formatting";
+import { formatMoneyMinorEnglish as money } from "@purin-labs/ui/formatting";
 
 import type { CommerceActionDetails } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import type { Variant } from "@purin-labs/type-utils";

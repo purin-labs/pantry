@@ -1,8 +1,12 @@
 import React from "react";
 import { ChevronDown, House, Plus, Search } from "lucide-react";
-import type { CanvasChrome } from "../../console-tools";
-import { ActionMenu, PantryMark, type ActionMenuSection } from "../../ui";
-import { OverflowToolbar } from "../../ui/overflow-toolbar";
+import type { CanvasChrome } from "@purin-labs/ui/console-tools";
+import {
+  ActionMenu,
+  PantryMark,
+  type ActionMenuSection,
+} from "@purin-labs/ui/index";
+import { OverflowToolbar } from "@purin-labs/ui/overflow-toolbar";
 import "./canvas-chrome.css";
 
 /**

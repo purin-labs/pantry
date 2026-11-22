@@ -1,9 +1,9 @@
 import { DEFAULT_CHAT_PREFERENCES } from "@purin-labs/control-api";
-import { useUserPreferences } from "../../preferences/context";
-import type { UserPreferenceOwner } from "../../preferences/owner";
+import { useUserPreferences } from "@purin-labs/ui/preferences/context";
+import type { UserPreferenceOwner } from "@purin-labs/ui/preferences/owner";
 import React from "react";
 import { Maximize2, Minimize2 } from "lucide-react";
-import { runLayoutMotion } from "../../layout-motion";
+import { runLayoutMotion } from "@purin-labs/ui/layout-motion";
 import "./underlay.css";
 
 

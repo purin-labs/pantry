@@ -6,9 +6,9 @@ import type {
   CommerceListEntry,
 } from "@purin-labs/commerce-contracts";
 
-import { Notice } from "../../../page-components";
-import { SideDrawer } from "../../../ui";
-import { cancelDialog, DialogHeading, syncDialog } from "../../../dialog";
+import { Notice } from "@purin-labs/ui/page-components";
+import { SideDrawer } from "@purin-labs/ui/index";
+import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 import {
   activatePurchasing,
   createSupplier,

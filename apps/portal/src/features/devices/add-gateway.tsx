@@ -5,9 +5,9 @@ import {
   type KitchenDeviceView,
 } from "@purin-labs/control-api";
 
-import { cancelDialog, syncDialog } from "../../dialog";
-import { Button, useMutation } from "../../ui";
-import { Select } from "../../ui/select";
+import { cancelDialog, syncDialog } from "@purin-labs/ui/dialog";
+import { Button, useMutation } from "@purin-labs/ui/index";
+import { Select } from "@purin-labs/ui/select";
 import {
   sendDeviceCommand,
   startGateway,

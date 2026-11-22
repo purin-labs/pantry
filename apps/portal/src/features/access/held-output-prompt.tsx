@@ -17,8 +17,8 @@ import {
   controlRead,
 } from "@purin-labs/control/portal/control-client";
 import { heldOutputPath } from "@purin-labs/control/portal/control-paths";
-import { AGENT_NAME } from "../../agent-name";
-import { PermissionRequestDialog, PantryMark } from "../../ui";
+import { AGENT_NAME } from "@purin-labs/ui/agent-name";
+import { PermissionRequestDialog, PantryMark } from "@purin-labs/ui/index";
 
 type Props = Readonly<{
   organisationId: string;

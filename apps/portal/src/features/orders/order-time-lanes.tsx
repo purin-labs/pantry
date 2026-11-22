@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router";
 import type { OrderTime } from "@purin-labs/control-api";
 
-import { formatMoneyMinor } from "../../formatting";
+import { formatMoneyMinor } from "@purin-labs/ui/formatting";
 import {
   duration,
   nowIn,
@@ -23,7 +23,7 @@ import {
   type TimeLanesStatus,
   type TimeLanesStep,
   type TimeLanesTone,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 import { readOrderTimes } from "./requests";
 
 // How long each order took: a bar from when it was placed to when its stage

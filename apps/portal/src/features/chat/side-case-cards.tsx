@@ -18,7 +18,7 @@ import type { ChatTimelineInsert } from "./activity";
 import type { ChatTimelineView } from "@purin-labs/control-api/portal/chat";
 import { sideCaseHereRequestId } from "@purin-labs/control-api";
 import type { SideCaseActions } from "./side-cases";
-import "../../ui/draft-message-card.css";
+import "@purin-labs/ui/draft-message-card.css";
 import "./side-case-card.css";
 
 type SideCaseContext = Readonly<{

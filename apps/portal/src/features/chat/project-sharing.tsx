@@ -1,4 +1,4 @@
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import { parseChatDisclosureFailure, chatDisclosureMessage } from "@purin-labs/control-api";
 import React from "react";
 import { LockKeyhole, Users } from "lucide-react";
@@ -16,7 +16,7 @@ import {
 } from "@purin-labs/control-api";
 import { errorMessage, isRecord } from "@purin-labs/std";
 import { controlRead, controlWrite, readCookie, refusedBody } from "@purin-labs/control/portal/control-client";
-import { DialogHeading, cancelDialog, syncDialog } from "../../dialog";
+import { DialogHeading, cancelDialog, syncDialog } from "@purin-labs/ui/dialog";
 import "./project-sharing.css";
 
 const MEMBER_ROLES: ReadonlyArray<{ value: ProjectRole; label: string }> = [

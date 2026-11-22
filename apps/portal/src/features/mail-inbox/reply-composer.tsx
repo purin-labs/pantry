@@ -38,9 +38,9 @@ import {
   type MailReplyColor,
   type MailReplyDocument,
 } from "@purin-labs/control-api";
-import { GlideHighlight } from "../../ui/glide-highlight";
-import { HoverLabel } from "../../ui/hover-label";
-import "../../ui/action-menu.css";
+import { GlideHighlight } from "@purin-labs/ui/glide-highlight";
+import { HoverLabel } from "@purin-labs/ui/hover-label";
+import "@purin-labs/ui/action-menu.css";
 import { readReplyDocument } from "./reply-document";
 
 type Props = Readonly<{

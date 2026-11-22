@@ -1,4 +1,4 @@
-import { Select } from "../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -12,13 +12,13 @@ import {
   type QuestionSubmitResult,
   type ReasoningStep,
   type QuestionAvailability,
-} from "../ui";
+} from "@purin-labs/ui/index";
 import { ActionMenuPreview } from "./action-menu-preview";
 import { ResponseActionsPreview } from "./response-actions-preview";
 import { TextComponentsPreview } from "./text-components-preview";
 import { CrmTablePreview } from "./crm-table-preview";
 import { SelectPreview } from "./select-preview";
-import { usePortalTheme } from "../use-portal-theme";
+import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
 import "../styles.css";
 import "./agent-components-preview.css";
 

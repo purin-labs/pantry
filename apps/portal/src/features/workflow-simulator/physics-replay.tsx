@@ -1,6 +1,6 @@
 import { ROBOTS } from "@purin-labs/bakery-model/bakery-robots";
 import type { ScheduleSpatialLayout } from "@purin-labs/production-simulation/recipes/bakery/schedule";
-import { BakeryAppearanceControl } from "../../preferences/appearance-controls";
+import { BakeryAppearanceControl } from "@purin-labs/ui/preferences/appearance-controls";
 import { SegmentedControl } from "./docks/shared";
 import { RobotComparison } from "./robot-comparison";
 import type { EngineJobs } from "../production-run/engine-jobs";
@@ -13,7 +13,7 @@ import type { PhysicsFrame } from "./spatial/physics-inspection";
 import { PhysicsSceneHost } from "./spatial/physics-scene-host";
 import React from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { GlideHighlight } from "../../ui/glide-highlight";
+import { GlideHighlight } from "@purin-labs/ui/glide-highlight";
 import { PlaybackToggle } from "./playback-toggle";
 import type { Settings } from "@purin-labs/bakery-model/bakery";
 import type { CompiledProcedure } from "@purin-labs/bakery-model/bakery-procedure";

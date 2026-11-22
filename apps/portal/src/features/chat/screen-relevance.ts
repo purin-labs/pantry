@@ -9,7 +9,7 @@ import {
   type ScreenRelevanceView,
 } from "@purin-labs/control-api";
 import { controlMutation } from "@purin-labs/control/portal/control-client";
-import { captureSurfaceObservation } from "../surface-observation";
+import { captureSurfaceObservation } from "@purin-labs/ui/features/surface-observation";
 import type { Variant } from "@purin-labs/type-utils";
 
 // The chat routes, without an import of `./api`, which imports this module.

@@ -1,5 +1,5 @@
 import React from "react";
-import { Select } from "../../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 
 import { batchTimeline, duration, machineSummary } from "@purin-labs/production-simulation/simulator/demo";
 import { finishLabel } from "../results";

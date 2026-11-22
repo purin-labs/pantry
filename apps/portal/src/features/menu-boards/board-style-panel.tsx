@@ -1,5 +1,5 @@
 import React from "react";
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import {
   MENU_BOARD_ITEM_ROWS,
   MENU_BOARD_STYLE_PRESETS,

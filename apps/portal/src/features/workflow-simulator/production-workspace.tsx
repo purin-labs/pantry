@@ -1,9 +1,9 @@
 import { jobStepLabel } from "../production-run/job-progress";
 import type { ScheduleSpatialLayout } from "@purin-labs/production-simulation/recipes/bakery/schedule";
 import * as Views from "./workspace-views";
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import { EspressoRecipeAuthor } from "../production-run/linea/espresso-recipe-author";
-import { BakeryAppearanceControl } from "../../preferences/appearance-controls";
+import { BakeryAppearanceControl } from "@purin-labs/ui/preferences/appearance-controls";
 import { SimulatorHistoryControls } from "./docks/history-controls";
 import { LocateFixed, Map as MapIcon } from "lucide-react";
 import { SegmentedControl } from "./docks/shared";

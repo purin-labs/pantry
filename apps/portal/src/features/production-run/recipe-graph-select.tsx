@@ -1,5 +1,5 @@
 import React from "react";
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 
 // The dropdowns of the recipe workflow graph. Each one renders its items as
 // its options, so the trigger label and the list cannot drift. It lives

@@ -3,7 +3,7 @@
 // (Refactor 17, step A2.2).
 //
 // A Portal component reads through `useLatestRead` and changes through
-// `useMutation` (apps/portal/src/ui). The request itself is a function in the
+// `useMutation` (foundation/ui). The request itself is a function in the
 // request module of the feature, for example `features/devices/requests.ts`.
 // The module calls `controlRead` or `controlMutation` and parses the answer.
 //
@@ -44,5 +44,5 @@ runCountRatchet({
       ? (read().match(CALL)?.length ?? 0)
       : 0,
   refusal: (file, calls, allowed) =>
-    `${file} has ${calls} direct control requests, ${allowed} allowed. Put the request in the request module of the feature, then read it with useLatestRead or change it with useMutation (apps/portal/src/ui/README.md).`,
+    `${file} has ${calls} direct control requests, ${allowed} allowed. Put the request in the request module of the feature, then read it with useLatestRead or change it with useMutation (foundation/ui/README.md).`,
 });

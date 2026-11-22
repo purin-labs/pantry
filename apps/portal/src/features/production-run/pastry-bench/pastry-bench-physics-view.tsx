@@ -9,7 +9,7 @@ import { errorMessage } from "@purin-labs/std";
 import {
   registerSurfaceView,
   type SurfaceCommandOutcome,
-} from "../../surface-observation";
+} from "@purin-labs/ui/features/surface-observation";
 import { RunIcon } from "../recipe-workflow";
 import {
   CRIMP_FORCE_ITEMS,

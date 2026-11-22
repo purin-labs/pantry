@@ -5,7 +5,7 @@ import type {
   BakeStockLevelView,
 } from "@purin-labs/kitchen-control-api";
 
-import { PageSkeleton, RecoverableError } from "../../page-components";
+import { PageSkeleton, RecoverableError } from "@purin-labs/ui/page-components";
 import {
   Button,
   CrmTable,
@@ -13,8 +13,8 @@ import {
   useLatestRead,
   useMutation,
   type CrmColumn,
-} from "../../ui";
-import { Select } from "../../ui/select";
+} from "@purin-labs/ui/index";
+import { Select } from "@purin-labs/ui/select";
 import { decideBake, readBakes, refusalText, saveBakeLevel } from "./requests";
 import { BakeAuthorityList } from "./authority";
 import { BakeRunPanel } from "./run-panel";

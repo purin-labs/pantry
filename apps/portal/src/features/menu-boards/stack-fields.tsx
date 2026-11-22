@@ -5,7 +5,7 @@ import {
   type MenuBoardElement,
   type MenuBoardStackPlacement,
 } from "@purin-labs/menu-board-crdt/board";
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import type { MenuBoardClient } from "./board-client";
 import { unstackPlacements } from "./canvas-editor";
 import { normalizeRect } from "./canvas-geometry";

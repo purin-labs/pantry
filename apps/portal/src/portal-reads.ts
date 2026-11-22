@@ -17,7 +17,7 @@ import type {
 import {
   initialFileAccessPath,
   workspacePagePath,
-} from "./route";
+} from "@purin-labs/ui/route";
 import type {
   OrganisationChoice,
   WorkspaceChoice,

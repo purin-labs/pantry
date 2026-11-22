@@ -32,7 +32,7 @@
   --pantry-space-12: 48px;
   --pantry-motion-fast: 150ms;
   /* Closed-form spring step responses, sampled from spring(duration, bounce)
-     in apps/portal/src/ui/spring.ts. Each easing spans the whole settle, so
+     in foundation/ui/spring.ts. Each easing spans the whole settle, so
      use it with its paired duration. Quick (150ms, bounce 0) is for icons and
      small controls; smooth (250ms, bounce 0) is for containers and layout;
      glide (300ms, bounce 0.2, 1.5% overshoot) is for shape morphs. */

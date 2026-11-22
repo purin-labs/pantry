@@ -1,6 +1,6 @@
 import qrcode from "qrcode-generator";
 import React from "react";
-import { formatMoneyMinorEnglish } from "../../formatting";
+import { formatMoneyMinorEnglish } from "@purin-labs/ui/formatting";
 import type {
   MenuBoardReleaseItem,
   MenuBoardReleaseSection,

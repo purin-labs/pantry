@@ -10,7 +10,7 @@ import { VoiceApprovalLine } from "../voice/approvals";
 import type { ChatTimelineInsert } from "./activity";
 import type { ConfigurationDraftActions } from "./configuration-drafts";
 import type { ConfigurationDraftView } from "@purin-labs/control-api/portal/configuration-drafts";
-import "../../ui/draft-message-card.css";
+import "@purin-labs/ui/draft-message-card.css";
 import "./side-case-card.css";
 
 type ConfigurationDraftContext = Readonly<{

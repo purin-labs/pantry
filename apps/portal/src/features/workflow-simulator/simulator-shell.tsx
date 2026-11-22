@@ -6,7 +6,7 @@ import type {
 import type { WorkspaceCameraView } from "./simulator-state";
 import React from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { GlideHighlight } from "../../ui/glide-highlight";
+import { GlideHighlight } from "@purin-labs/ui/glide-highlight";
 import {
   ChevronDown,
   Eye,

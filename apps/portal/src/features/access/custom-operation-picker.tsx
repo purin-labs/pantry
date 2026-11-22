@@ -1,4 +1,4 @@
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { readCustomConnectorCatalog, readCustomConnectorDetail, type CustomConnectorDetail } from "../integrations/custom-connector-api";
 import type { CustomConnectorSummary } from "@purin-labs/control-api/portal/custom-connectors";

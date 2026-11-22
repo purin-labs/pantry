@@ -1,5 +1,5 @@
 import { isUserId } from "@purin-labs/control-api";
-import { UserPreferencesProvider } from "../preferences/context";
+import { UserPreferencesProvider } from "@purin-labs/ui/preferences/context";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import {

@@ -12,7 +12,7 @@ import {
   type CalculatedRecipeCost,
 } from "@purin-labs/kitchen-control-api";
 import { controlRead } from "@purin-labs/control/portal/control-client";
-import { formatMoneyMinor } from "../../formatting";
+import { formatMoneyMinor } from "@purin-labs/ui/formatting";
 import { costsPath } from "../costs/api";
 import {
   recipesPath,
@@ -20,7 +20,7 @@ import {
   recipeError,
   type RecipeMutation,
 } from "./api";
-import { PageSkeleton, RecoverableError } from "../../page-components";
+import { PageSkeleton, RecoverableError } from "@purin-labs/ui/page-components";
 import { RecipeEditor } from "./editor";
 import "./styles.css";
 import type { Variant } from "@purin-labs/type-utils";

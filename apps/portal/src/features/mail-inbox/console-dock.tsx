@@ -1,8 +1,8 @@
 import React from "react";
 
-import { useConsoleDock } from "../../console-tools";
-import { OverflowToolbar } from "../../ui/overflow-toolbar";
-import "../../ui/resize-handle.css";
+import { useConsoleDock } from "@purin-labs/ui/console-tools";
+import { OverflowToolbar } from "@purin-labs/ui/overflow-toolbar";
+import "@purin-labs/ui/resize-handle.css";
 
 const WIDTH_KEY = "pantry:inbox-console-dock-width";
 /** The dock's least width before a measure. */

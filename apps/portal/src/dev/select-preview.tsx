@@ -1,5 +1,5 @@
 import React from "react";
-import { Select } from "../ui/select";
+import { Select } from "@purin-labs/ui/select";
 
 const PASTRIES = [
   { value: "financier", label: "Brown butter financier · Tokyo boutique" },

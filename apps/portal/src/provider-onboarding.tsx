@@ -1,6 +1,6 @@
 import React from "react";
 
-import { formatRelativeTime } from "./formatting";
+import { formatRelativeTime } from "@purin-labs/ui/formatting";
 import { assertNever } from "@purin-labs/std";
 
 /**

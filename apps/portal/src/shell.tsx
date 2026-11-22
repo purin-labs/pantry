@@ -1,10 +1,14 @@
-import { AccountAppearanceControl } from "./preferences/appearance-controls";
+import { AccountAppearanceControl } from "@purin-labs/ui/preferences/appearance-controls";
 import { createPortal } from "react-dom";
 import React, { useEffect } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { GlideHighlight } from "./ui/glide-highlight";
+import { GlideHighlight } from "@purin-labs/ui/glide-highlight";
 import { voiceControlIsOn } from "./features/voice/setting";
-import { chatRouteState, pageAddress, pageNavigation } from "./page-address";
+import {
+  chatRouteState,
+  pageAddress,
+  pageNavigation,
+} from "@purin-labs/ui/page-address";
 import {
   Activity,
   BookOpen,
@@ -50,7 +54,7 @@ import {
   type WorkspaceDetailPage,
   type WorkspaceNavigationGroup,
   type WorkspaceSystem,
-} from "./route";
+} from "@purin-labs/ui/route";
 import { useBrainItemsToReview } from "./brain-summary";
 import { useRequestsToDecide } from "./features/access/permission-requests-summary";
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
@@ -62,9 +66,9 @@ const PermissionRequestsDrawer = React.lazy(
   () => import("./features/access/permission-requests-drawer"),
 );
 import { ChatUnderlay, type WorkspaceChat } from "./features/chat/underlay";
-import { usePortalTheme } from "./use-portal-theme";
-import { useSurfaceOnScreen } from "./features/surface-observation";
-import { PageHeader } from "./page-components";
+import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
+import { useSurfaceOnScreen } from "@purin-labs/ui/features/surface-observation";
+import { PageHeader } from "@purin-labs/ui/page-components";
 import {
   ConsoleSidebarToggle,
   ConsoleSidebarTooltip,
@@ -72,8 +76,8 @@ import {
   type ConsoleSidebarControl,
   type ConsoleSidebarNavigationGroup,
   type ConsoleSidebarResolvedLink,
-} from "./console-sidebar";
-import { runLayoutMotion } from "./layout-motion";
+} from "@purin-labs/ui/console-sidebar";
+import { runLayoutMotion } from "@purin-labs/ui/layout-motion";
 import { DashboardNavigation } from "./dashboard-navigation";
 import {
   WorkspaceSwitcher,
@@ -86,9 +90,9 @@ import {
 export type { OrganisationChoice, WorkspaceChoice };
 import { useConsoleSidebarPreference } from "./use-console-sidebar-preference";
 import { assertNever } from "@purin-labs/std";
-import { ConsoleToolsProvider } from "./console-tools";
-import type { ToolbarItem } from "./ui/overflow-toolbar";
-import { HoverLabel } from "./ui/hover-label";
+import { ConsoleToolsProvider } from "@purin-labs/ui/console-tools";
+import type { ToolbarItem } from "@purin-labs/ui/overflow-toolbar";
+import { HoverLabel } from "@purin-labs/ui/hover-label";
 import type { Variant } from "@purin-labs/type-utils";
 
 const DOCS_ORIGIN = (

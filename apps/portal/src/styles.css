@@ -1,7 +1,7 @@
 @import "../../../packages/frontend-theme.css";
 @import "./features/integrations/styles.css";
 @import "./workspace-header.css";
-@import "./ui/resize-handle.css";
+@import "../../../foundation/ui/resize-handle.css";
 
 /* Transition shorthands: `transition: opacity var(--motion-quick)`. The
    component preview scales every duration through --agent-motion-factor. */

@@ -42,7 +42,7 @@ import {
   WorkQueue,
   type WorkItemData,
   type WorkItemState,
-} from "../page-components";
+} from "@purin-labs/ui/page-components";
 import {
   AgentsPage,
   AgentsPageHeading,
@@ -52,7 +52,7 @@ import {
   SkillsLibraryPage,
 } from "./agent-console";
 import { useLocation, useNavigate } from "react-router";
-import { pageAddress, pageLink } from "../page-address";
+import { pageAddress, pageLink } from "@purin-labs/ui/page-address";
 import { AgentSchedulesPanel } from "../features/agent-schedules/route";
 import type { BrainTransport } from "../features/brain/api";
 import {

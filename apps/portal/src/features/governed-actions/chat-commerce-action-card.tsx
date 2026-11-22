@@ -16,7 +16,7 @@ import {
 import { commerceActionStateLabel, commerceActionTitle } from "./commerce";
 import { commerceActionDetailSummary, renderCommerceActionChange } from "./commerce-action-status";
 import { signInForApproval } from "@purin-labs/control/portal/approval-sign-in-popup";
-import { DecisionButtons } from "../../ui";
+import { DecisionButtons } from "@purin-labs/ui/index";
 import { GOVERNED_ACTION_ALLOW, governedActionRefusal } from "./decision-labels";
 import "./chat-commerce-action-card.css";
 

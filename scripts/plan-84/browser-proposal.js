@@ -16,7 +16,7 @@ async (page) => {
     if (!passed) throw new Error(`${name}: ${JSON.stringify(detail ?? null)}`);
   };
   const entry = `${PORTAL}/workflow-draft-preview.html?organisation=${fixtures.organisationId}&chat=/chat-page`;
-  // The Portal Select (apps/portal/src/ui/select.tsx) is a button with role
+  // The Portal Select (foundation/ui/select.tsx) is a button with role
   // combobox that opens a listbox popup. Choose by { value }, { label } or
   // { index }. { values } sets the items of a multiple Select, then Escape
   // closes its popup.

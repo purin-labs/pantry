@@ -7,7 +7,7 @@ import {
 } from "@purin-labs/kitchen-control-api";
 
 import { controlRead } from "@purin-labs/control/portal/control-client";
-import { PageSkeleton, RecoverableError } from "../../page-components";
+import { PageSkeleton, RecoverableError } from "@purin-labs/ui/page-components";
 import {
   nowIn,
   periodWords,
@@ -21,7 +21,7 @@ import {
   type PeriodControl,
   type TimeLanesItem,
   type TimeLanesSection,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 import type { Variant } from "@purin-labs/type-utils";
 
 // What expires and what arrives: each lot on its expiry date and each open

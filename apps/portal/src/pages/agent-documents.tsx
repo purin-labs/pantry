@@ -5,7 +5,7 @@ import type {
   AgentOperationKind,
   AgentRevisionTarget,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
-import { Notice, RecoverableError } from "../page-components";
+import { Notice, RecoverableError } from "@purin-labs/ui/page-components";
 import {
   MutationFeedback,
   type AgentOperationMutationState,

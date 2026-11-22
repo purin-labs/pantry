@@ -14,9 +14,9 @@ import {
   mailProcessingView,
   type MailProcessingState,
 } from "./processing-state";
-import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
-import { GlideHighlight } from "../../ui/glide-highlight";
-import "../../ui/action-menu.css";
+import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
+import { GlideHighlight } from "@purin-labs/ui/glide-highlight";
+import "@purin-labs/ui/action-menu.css";
 
 type Props = Readonly<{
   processing: MailProcessingState;

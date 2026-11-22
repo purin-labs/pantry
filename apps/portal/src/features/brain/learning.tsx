@@ -1,8 +1,8 @@
 import React from "react";
 import { ChevronRight } from "lucide-react";
 
-import { isPrimaryNavigationClick } from "../../console-sidebar";
-import { formatAbsoluteTime } from "../../formatting";
+import { isPrimaryNavigationClick } from "@purin-labs/ui/console-sidebar";
+import { formatAbsoluteTime } from "@purin-labs/ui/formatting";
 import {
   learningEventLabel,
   type LearningEvent,

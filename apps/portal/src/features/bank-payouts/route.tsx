@@ -5,7 +5,7 @@ import type {
   BankPayoutsWindow,
 } from "@purin-labs/control-api";
 
-import { formatMoneyMinor } from "../../formatting";
+import { formatMoneyMinor } from "@purin-labs/ui/formatting";
 import {
   nowIn,
   periodWords,
@@ -23,7 +23,7 @@ import {
   type TimeLanesStatus,
   type TimeLanesStep,
   type TimeLanesTone,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 import { readBankPayouts } from "./requests";
 
 // The money from card sales that reaches the shop's bank: a bar from the first

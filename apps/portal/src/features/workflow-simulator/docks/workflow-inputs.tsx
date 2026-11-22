@@ -1,7 +1,7 @@
 import { scenarioAssumptionFields } from "@purin-labs/bakery-model/bakery-procedure";
 import { fields, financierOperations } from "@purin-labs/bakery-model/bakery";
 import React from "react";
-import { Select } from "../../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 
 import {
   CAFE_BEVERAGE_ROTATION,

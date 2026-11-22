@@ -15,7 +15,7 @@ import {
 } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
 
-import type { StatusChipStatus } from "../../status-chip";
+import type { StatusChipStatus } from "@purin-labs/ui/status-chip";
 
 /** The revision runs try, when a person accepted one that still stands. */
 export function acceptedEval(view: EvalView): EvalRevisionView | null {

@@ -1,9 +1,9 @@
 import { ChatApprovalTrace, ChatReceiptTrace } from "./operation-events";
 import { ChatGoalControl, DEFAULT_GOAL_TOKEN_BUDGET } from "./goal";
 import { ChatExecutionTrace } from "./execution-trace";
-import { effortLabel } from "./effort-labels";
-import { useUserPreferences } from "../../preferences/context";
-import type { UserPreferenceOwner } from "../../preferences/owner";
+import { effortLabel } from "@purin-labs/ui/features/chat/effort-labels";
+import { useUserPreferences } from "@purin-labs/ui/preferences/context";
+import type { UserPreferenceOwner } from "@purin-labs/ui/preferences/owner";
 import {
   newConversationId,
   isConversationId,
@@ -41,7 +41,7 @@ import {
   TraceLine,
   TraceIcon,
   TraceTitle,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 import React from "react";
 import { toast } from "sonner";
 import { ThreadTitle } from "./thread-title";
@@ -60,7 +60,7 @@ import {
   SquarePen,
 } from "lucide-react";
 import { ChatDisplayContext, ChatFullscreenButton } from "./underlay";
-import { DashboardSidebarToggleIcon } from "../../dashboard-sidebar-toggle-icon";
+import { DashboardSidebarToggleIcon } from "@purin-labs/ui/dashboard-sidebar-toggle-icon";
 import { ChatOrganizer } from "./organizer";
 import { ProjectCases } from "./project-cases";
 import { ChatSources, chatSourceParts } from "./sources";
@@ -90,7 +90,7 @@ import {
   Plug,
   ShieldCheck,
 } from "lucide-react";
-import { DialogHeading, syncDialog, cancelDialog } from "../../dialog";
+import { DialogHeading, syncDialog, cancelDialog } from "@purin-labs/ui/dialog";
 import { soundsLikeStop, type VoiceCommand } from "../voice/command";
 import {
   lastAssistantEvent,

@@ -1,5 +1,5 @@
 import React from "react";
-import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
+import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import type { CommerceMutationTransport } from "./entity-plane/api";
 

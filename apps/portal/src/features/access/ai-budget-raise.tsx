@@ -4,10 +4,10 @@ import {
   PantryMark,
   type PermissionRequestDecision,
   type PermissionRequestItem,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 import type { AiBudgetLimits, AiBudgetView } from "@purin-labs/control-api/portal/ai-budget";
 import { workspaceParty } from "./agent-permission-request";
-import { AGENT_NAME } from "../../agent-name";
+import { AGENT_NAME } from "@purin-labs/ui/agent-name";
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 
 type Props = Readonly<{

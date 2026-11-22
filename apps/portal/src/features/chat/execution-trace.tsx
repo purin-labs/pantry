@@ -39,7 +39,7 @@ import {
   TraceIcon,
   TraceDescription,
   type TraceStatus,
-} from "../../ui/trace";
+} from "@purin-labs/ui/trace";
 import type { ChatWork } from "@purin-labs/control-api/portal/chat";
 import "./execution-trace.css";
 

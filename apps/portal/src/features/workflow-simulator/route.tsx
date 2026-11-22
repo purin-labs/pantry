@@ -1,5 +1,5 @@
 import { floorPlanWorkspace } from "./floor-plan-workspace";
-import { UserPreferencesContext } from "../../preferences/context";
+import { UserPreferencesContext } from "@purin-labs/ui/preferences/context";
 import { downloadBakeryFile } from "./file-download";
 import { type BakeryExportFile } from "./production-files";
 import { MAX_EXPERIMENT_BYTES } from "@purin-labs/production-simulation/recipes/bakery/workcell-experiment";

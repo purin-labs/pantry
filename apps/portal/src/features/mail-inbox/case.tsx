@@ -10,13 +10,13 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { GlideHighlight } from "../../ui/glide-highlight";
+import { GlideHighlight } from "@purin-labs/ui/glide-highlight";
 import {
   OverflowToolbar,
   type ToolbarItem,
   type ToolbarMenuEntry,
-} from "../../ui/overflow-toolbar";
-import "../../ui/action-menu.css";
+} from "@purin-labs/ui/overflow-toolbar";
+import "@purin-labs/ui/action-menu.css";
 import { MailConversation, type MailDraftDecision } from "./conversation";
 import { conversationSender } from "./thread";
 

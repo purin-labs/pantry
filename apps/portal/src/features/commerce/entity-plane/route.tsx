@@ -1,5 +1,5 @@
 import { OrdersDisplay } from "../../orders/order-time-lanes";
-import { Select } from "../../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import { COMMERCE_CANCELLATION_REASONS, COMMERCE_CANCELLATION_REFUNDS, COMMERCE_TABLE_DENSITIES, commerceOptionItem, renderCommerceSelectParts, type CommerceSelectItem } from "./select-items";
 import React from "react";
 import { ArrowLeft, Package, Search, ShoppingCart } from "lucide-react";
@@ -43,14 +43,14 @@ import {
   PermissionRequiredPrompt,
   permissionRequiredOf,
 } from "../../access/permission-required-prompt";
-import { cancelDialog, DialogHeading, syncDialog } from "../../../dialog";
+import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 import {
   EmptyState,
   Notice,
   PageSkeleton,
   RecoverableError,
   StatusChip,
-} from "../../../page-components";
+} from "@purin-labs/ui/page-components";
 import {
   COMMERCE_VALUE_ABSENT,
   commerceAttributeLabel,
@@ -86,7 +86,7 @@ import { parseCommerceActionRecordResponse, type CommerceActionRecord } from "@p
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { useDossierSurface } from "./dossier-surface";
-import { CrmIdentity, CrmTable, type CrmColumn } from "../../../ui";
+import { CrmIdentity, CrmTable, type CrmColumn } from "@purin-labs/ui/index";
 import type { CommerceBoardDragPreview, CommerceBoardPresenceEntry, CommerceBoardPresenceSelection } from "@purin-labs/commerce-control-api";
 import type { PermissionRequired } from "@purin-labs/control-api";
 

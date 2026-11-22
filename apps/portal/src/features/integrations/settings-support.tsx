@@ -3,7 +3,7 @@ import React from "react";
 import {
   formatRelativeTime,
   type StatusChipStatus,
-} from "../../page-components";
+} from "@purin-labs/ui/page-components";
 import type { WhatsAppConnectionActionState } from "../../pages/whatsapp";
 import {
   MutationLedger,
@@ -12,7 +12,7 @@ import {
   type OrganisationMutation,
 } from "@purin-labs/control/portal/mutation-state";
 import type { ProviderConnectionState } from "../../provider-onboarding";
-import { formatLifecycle } from "../../formatting";
+import { formatLifecycle } from "@purin-labs/ui/formatting";
 import type { Provider } from "../../integration-catalogue";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";

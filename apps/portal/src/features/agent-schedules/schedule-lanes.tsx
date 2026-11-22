@@ -14,7 +14,7 @@ import {
   type TimeLanesStatus,
   type TimeLanesStep,
   type TimeLanesTone,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 
 // The day of each agent's scheduled runs: the runs that already went, the
 // one that runs now, and the ones still planned for the day. A run that

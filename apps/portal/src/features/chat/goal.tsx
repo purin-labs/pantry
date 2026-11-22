@@ -12,7 +12,7 @@ import {
   controlWrite,
   readCookie,
 } from "@purin-labs/control/portal/control-client";
-import { syncDialog, cancelDialog } from "../../dialog";
+import { syncDialog, cancelDialog } from "@purin-labs/ui/dialog";
 import "./goal.css";
 
 /** Token budget that `/goal <objective>` uses when the chat has no goal yet. */

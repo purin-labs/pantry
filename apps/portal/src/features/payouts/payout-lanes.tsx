@@ -1,6 +1,6 @@
 import React from "react";
 
-import { formatMoneyMinor } from "../../formatting";
+import { formatMoneyMinor } from "@purin-labs/ui/formatting";
 import {
   duration,
   nowIn,
@@ -19,7 +19,7 @@ import {
   type TimeLanesStatus,
   type TimeLanesStep,
   type TimeLanesTone,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 import {
   needsOperator,
   payoutGuidance,

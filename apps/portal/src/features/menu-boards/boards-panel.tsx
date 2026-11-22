@@ -26,7 +26,7 @@ import {
 } from "@purin-labs/menu-board-crdt/board";
 import type { MenuDraftSnapshot } from "@purin-labs/menu-draft-crdt";
 import { isPositiveInteger, isRecord } from "@purin-labs/std";
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import { MenuBoardClient, type MenuBoardView } from "./board-client";
 import { SAMPLE_PICKUP, ScaledBoard, draftBoardContent } from "./board-view";
 import { BoardStylePanel, ITEM_ROW_NAMES } from "./board-style-panel";
@@ -39,7 +39,7 @@ import { BoardViewport } from "./board-viewport";
 import { StartBoard } from "./start-board";
 import { ArchiveBoardButton, ArchivedBoards, parseArchivedBoards, type ArchivedBoard } from "./board-archive";
 import { CanvasConsole, CanvasMenu } from "./canvas-chrome";
-import { useCanvasChrome } from "../../console-tools";
+import { useCanvasChrome } from "@purin-labs/ui/console-tools";
 import { createPortal } from "react-dom";
 import { PRODUCT_DRAG_TYPE, ProductsPanel, useMenuDraftAdder, type BoardProduct } from "./products-panel";
 import { IMAGE_DRAG_TYPE, ImagesPanel, imageElement, parseShopImage, useShopImages, type ShopImage } from "./images-panel";

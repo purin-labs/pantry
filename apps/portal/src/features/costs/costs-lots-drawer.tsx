@@ -14,8 +14,11 @@ import {
   lotInvoiceFieldCellKey,
   supplyFieldCellKey,
 } from "@purin-labs/costs-sheet-crdt";
-import { formatMoneyMinor, formatSignedMoneyRounded } from "../../formatting";
-import { SideDrawer } from "../../ui";
+import {
+  formatMoneyMinor,
+  formatSignedMoneyRounded,
+} from "@purin-labs/ui/formatting";
+import { SideDrawer } from "@purin-labs/ui/index";
 import { formatCostQuantity } from "./api";
 import {
   currencyDigits,

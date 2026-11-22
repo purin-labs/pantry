@@ -1,6 +1,6 @@
 import { History } from "lucide-react";
 import { reportBakeryShift } from "@purin-labs/production-simulation/recipes/bakery/shift-report";
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import {
   EspressoPhysicsView,
   readEspressoObservation,

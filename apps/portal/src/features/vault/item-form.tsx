@@ -8,7 +8,7 @@ import {
 } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";
 
-import { Select } from "../../ui";
+import { Select } from "@purin-labs/ui/index";
 
 type LoginView = Variant<VaultItemView, "website_login">;
 type ContactView = Variant<VaultItemView, "contact_profile">;

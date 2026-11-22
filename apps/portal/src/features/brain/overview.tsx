@@ -2,9 +2,12 @@ import React from "react";
 
 import type { EvalView, MemoryView } from "@purin-labs/control-api";
 
-import { isPrimaryNavigationClick } from "../../console-sidebar";
-import { formatAbsoluteTime, formatRelativeTime } from "../../formatting";
-import { EmptyState } from "../../page-components";
+import { isPrimaryNavigationClick } from "@purin-labs/ui/console-sidebar";
+import {
+  formatAbsoluteTime,
+  formatRelativeTime,
+} from "@purin-labs/ui/formatting";
+import { EmptyState } from "@purin-labs/ui/page-components";
 import type { KnowledgeState } from "./address";
 import { openEvalCandidate } from "./evals-model";
 import { KnowledgeRows, type KnowledgeLinks } from "./knowledge";

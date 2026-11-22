@@ -7,7 +7,7 @@ import {
   type CustomConnectorAccessHandoff,
 } from "./custom-operation-picker";
 
-import { PageSkeleton } from "../../page-components";
+import { PageSkeleton } from "@purin-labs/ui/page-components";
 import { AccessCheckPanel } from "./access-check";
 import { CapabilityListView } from "./capability-policy";
 import {

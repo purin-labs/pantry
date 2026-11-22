@@ -14,13 +14,13 @@ import {
   workspacePageHeader,
   workspacePagePath,
   type PortalRoute,
-} from "./route";
+} from "@purin-labs/ui/route";
 import { signInPath } from "@purin-labs/control/portal/control-paths";
 import { PortalFrame } from "./shell";
 import {
   PageHeader,
   PageSkeleton,
-} from "./page-components";
+} from "@purin-labs/ui/page-components";
 import {
   OrganisationListLoading,
   type OrganisationListItem,

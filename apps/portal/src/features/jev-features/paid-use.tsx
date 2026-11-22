@@ -4,7 +4,7 @@ import type {
   JevAllowance,
   JevFeaturesView,
 } from "@purin-labs/control-api/portal/jev-features";
-import { Switch } from "../../ui/toggle-switch";
+import { Switch } from "@purin-labs/ui/toggle-switch";
 import { changeJevPaidUse, jevFeatureErrorMessage } from "./api";
 
 /**

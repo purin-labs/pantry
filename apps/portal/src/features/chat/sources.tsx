@@ -1,5 +1,9 @@
 import React from "react";
-import { Attachment, InlineCitations, type CitationSource } from "../../ui";
+import {
+  Attachment,
+  InlineCitations,
+  type CitationSource,
+} from "@purin-labs/ui/index";
 import type { ChatSource } from "@purin-labs/control-api";
 import { Globe, ArrowUpRight } from "lucide-react";
 import {
@@ -11,7 +15,7 @@ import {
   TraceIcon,
   TraceTitle,
   TraceDescription,
-} from "../../ui/trace";
+} from "@purin-labs/ui/trace";
 /** The citation chip goes inline with the text; file cards go under it. */
 export function chatSourceParts(sources: readonly ChatSource[]): {
   readonly citations: React.ReactNode;

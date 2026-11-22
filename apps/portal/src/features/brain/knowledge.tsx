@@ -17,9 +17,9 @@ import type {
   AgentDefinition,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import type { Skill } from "@purin-labs/control-api";
-import { isPrimaryNavigationClick } from "../../console-sidebar";
-import { formatAbsoluteTime, formatRelativeTime } from "../../formatting";
-import { EmptyState, StatusChip } from "../../page-components";
+import { isPrimaryNavigationClick } from "@purin-labs/ui/console-sidebar";
+import { formatAbsoluteTime, formatRelativeTime } from "@purin-labs/ui/formatting";
+import { EmptyState, StatusChip } from "@purin-labs/ui/page-components";
 import type { KnowledgeState } from "./address";
 import {
   agentRow,

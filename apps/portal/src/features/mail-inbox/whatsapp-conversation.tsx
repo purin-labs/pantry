@@ -8,7 +8,7 @@ import {
   controlMutation,
   controlRead,
 } from "@purin-labs/control/portal/control-client";
-import { formatFutureRelativeTime } from "../../formatting";
+import { formatFutureRelativeTime } from "@purin-labs/ui/formatting";
 import {
   parseWhatsAppCaseView,
   parseWhatsAppReplyPreview,
@@ -20,8 +20,8 @@ import {
   PermissionRequiredPrompt,
   permissionRequiredOf,
 } from "../access/permission-required-prompt";
-import { GlideHighlight } from "../../ui/glide-highlight";
-import "../../ui/action-menu.css";
+import { GlideHighlight } from "@purin-labs/ui/glide-highlight";
+import "@purin-labs/ui/action-menu.css";
 import {
   closeItem,
   navigationItems,
@@ -31,7 +31,7 @@ import {
 import {
   OverflowToolbar,
   type ToolbarMenuEntry,
-} from "../../ui/overflow-toolbar";
+} from "@purin-labs/ui/overflow-toolbar";
 import { formatMailDate } from "./thread";
 
 type Load =

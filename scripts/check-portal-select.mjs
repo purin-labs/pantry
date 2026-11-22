@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Fails when the Portal builds a dropdown without the shared Select.
 //
-// Every Portal dropdown is the Base UI Select in apps/portal/src/ui/select.tsx
+// Every Portal dropdown is the Base UI Select in foundation/ui/select.tsx
 // (Select.Root, Select.Trigger, Select.Value, Select.Popup, Select.Item, ...).
 // Its stylesheet, ui/select.css, owns the caret. This check refuses, in Portal
 // source:
@@ -25,9 +25,9 @@ import { PORTAL_SOURCE } from "./lib/source-roots.mjs";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = /\.(ts|tsx)$/;
 const STYLE = /\.css$/;
-const COMPONENT = "apps/portal/src/ui/select.tsx";
-const COMPONENT_STYLE = "apps/portal/src/ui/select.css";
-const USE = "Use Select from apps/portal/src/ui/select.tsx.";
+const COMPONENT = "foundation/ui/select.tsx";
+const COMPONENT_STYLE = "foundation/ui/select.css";
+const USE = "Use Select from foundation/ui/select.tsx.";
 
 const files = execFileSync(
   "git",
@@ -189,7 +189,7 @@ for (const file of files.filter(
     const line = `${file}:${lineAt(text, index)}`;
     if (/\.pantry-select-icon(?![\w-])/.test(prelude))
       errors.push(
-        `${line} styles .pantry-select-icon. apps/portal/src/ui/select.css owns the caret.`,
+        `${line} styles .pantry-select-icon. foundation/ui/select.css owns the caret.`,
       );
     if (
       subjects(prelude).some((subject) =>

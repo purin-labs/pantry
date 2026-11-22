@@ -9,7 +9,7 @@ import {
   StatusChip,
   type ProviderTileName,
   type StatusChipStatus,
-} from "../../page-components";
+} from "@purin-labs/ui/page-components";
 import { assertNever } from "@purin-labs/std";
 import { renderCodexConnection } from "./codex";
 import { parseInferenceSelection } from "@purin-labs/control-api/portal/inference";

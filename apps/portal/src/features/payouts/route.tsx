@@ -2,9 +2,9 @@ import React from "react";
 import { toast } from "sonner";
 
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
-import { formatMoneyMinor } from "../../formatting";
-import { RecoverableError } from "../../page-components";
-import { ViewSwitch } from "../../ui";
+import { formatMoneyMinor } from "@purin-labs/ui/formatting";
+import { RecoverableError } from "@purin-labs/ui/page-components";
+import { ViewSwitch } from "@purin-labs/ui/index";
 import {
   needsOperator,
   payoutGuidance,

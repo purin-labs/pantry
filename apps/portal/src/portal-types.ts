@@ -1,6 +1,6 @@
 import type { ControlMembershipAvailability } from "@purin-labs/control-api";
 import type { FirstOperationalTask, OnboardingActivation, OnboardingNextAction, OnboardingProvider, OnboardingStepProjection } from "@purin-labs/contracts";
-import type { WorkspaceDetailPage } from "./route";
+import type { WorkspaceDetailPage } from "@purin-labs/ui/route";
 import type { OrganisationChoice } from "./shell";
 import {
   MutationLedger,

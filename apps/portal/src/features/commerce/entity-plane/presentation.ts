@@ -15,8 +15,11 @@ import type {
   ListEntryAttributeDefinition,
 } from "@purin-labs/commerce-contracts";
 
-import { formatAbsoluteTime, humanizeIdentifier } from "../../../formatting";
-import type { StatusChipStatus } from "../../../status-chip";
+import {
+  formatAbsoluteTime,
+  humanizeIdentifier,
+} from "@purin-labs/ui/formatting";
+import type { StatusChipStatus } from "@purin-labs/ui/status-chip";
 import { assertNever } from "@purin-labs/std";
 
 /** Rendered when an attribute carries no value for this record. */

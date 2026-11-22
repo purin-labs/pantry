@@ -42,9 +42,14 @@ import {
   controlRead,
   forgetControlReads,
 } from "@purin-labs/control/portal/control-client";
-import { formatMoneyMinor } from "../../formatting";
-import { PageSkeleton, RecoverableError } from "../../page-components";
-import { CrmTable, Select, type CrmColumn, type CrmRowAction } from "../../ui";
+import { formatMoneyMinor } from "@purin-labs/ui/formatting";
+import { PageSkeleton, RecoverableError } from "@purin-labs/ui/page-components";
+import {
+  CrmTable,
+  Select,
+  type CrmColumn,
+  type CrmRowAction,
+} from "@purin-labs/ui/index";
 import { costsError, costsPath, type CostsMutation } from "./api";
 import {
   CostsActualsKpiStrip,
@@ -81,7 +86,7 @@ import {
 import { CostsPageViewSource } from "./costs-page-view";
 import { costsViewCommandState } from "./costs-view-commands";
 import type { CostsViewCommand } from "@purin-labs/control-api";
-import type { SurfaceCommandOutcome } from "../surface-observation";
+import type { SurfaceCommandOutcome } from "@purin-labs/ui/features/surface-observation";
 import {
   CostsSheetClient,
   INITIAL_COSTS_SHEET_VIEW,

@@ -7,15 +7,15 @@ import {
   type DeviceView,
 } from "@purin-labs/control-api";
 
-import { cancelDialog, syncDialog } from "../../dialog";
+import { cancelDialog, syncDialog } from "@purin-labs/ui/dialog";
 import {
   EmptyState,
   Notice,
   PageSkeleton,
   RecoverableError,
-} from "../../page-components";
-import { Button, useLatestRead, useMutation } from "../../ui";
-import { Select } from "../../ui/select";
+} from "@purin-labs/ui/page-components";
+import { Button, useLatestRead, useMutation } from "@purin-labs/ui/index";
+import { Select } from "@purin-labs/ui/select";
 import { AddGatewayDialog } from "./add-gateway";
 import { DeviceDrawer, StatusLine } from "./drawer";
 import { readAlertSetting, readDevices, writeAlertSetting } from "./requests";

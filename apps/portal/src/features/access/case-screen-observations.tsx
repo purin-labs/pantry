@@ -4,8 +4,8 @@ import type {
   AccessControlOption,
   AccessRouteTransport,
 } from "@purin-labs/control-api/portal/access-models";
-import { navigationGroupTitle } from "../../route";
-import { Select } from "../../ui/select";
+import { navigationGroupTitle } from "@purin-labs/ui/route";
+import { Select } from "@purin-labs/ui/select";
 import "./case-screen-observations.css";
 
 /**

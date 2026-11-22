@@ -1,7 +1,7 @@
 import React from "react";
 import type { Blocker } from "react-router";
 import type { VariantBy } from "@purin-labs/type-utils";
-import { syncDialog, cancelDialog } from "../../dialog";
+import { syncDialog, cancelDialog } from "@purin-labs/ui/dialog";
 
 export function DraftLeaveDialog(
   props: Readonly<{

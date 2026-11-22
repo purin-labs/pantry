@@ -4,7 +4,7 @@ import {
   pageSurfaceRecord,
   useSurfaceRecord,
   useSurfaceSources,
-} from "../../surface-observation";
+} from "@purin-labs/ui/features/surface-observation";
 import type { CommerceEntityDossierModel } from "./models";
 
 /**

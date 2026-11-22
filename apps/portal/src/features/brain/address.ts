@@ -1,6 +1,10 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router";
-import { pageAddress, pageLink, parseChatReturnPath } from "../../page-address";
+import {
+  pageAddress,
+  pageLink,
+  parseChatReturnPath,
+} from "@purin-labs/ui/page-address";
 
 export type BrainView =
   | "overview"

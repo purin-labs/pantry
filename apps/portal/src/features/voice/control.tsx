@@ -24,14 +24,14 @@ import {
 import React from "react";
 import { createPortal } from "react-dom";
 
-import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
+import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 import {
   ActionMenu,
   PermissionRequestDialog,
   PantryMark,
   Select,
   type PermissionRequestDecision,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 import {
   enableCapabilities,

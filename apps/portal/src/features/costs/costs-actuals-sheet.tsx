@@ -12,8 +12,13 @@ import type {
   PlanVsActualVarianceDriver,
   ProductPlanVsActualRow,
 } from "@purin-labs/kitchen-control-api";
-import { formatMoneyMinor } from "../../formatting";
-import { CrmTable, Select, type CrmColumn, type CrmRowAction } from "../../ui";
+import { formatMoneyMinor } from "@purin-labs/ui/formatting";
+import {
+  CrmTable,
+  Select,
+  type CrmColumn,
+  type CrmRowAction,
+} from "@purin-labs/ui/index";
 import { handleSheetKeyDown } from "./costs-sheet-grid";
 import {
   CellPeerOutline,

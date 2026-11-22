@@ -1,9 +1,9 @@
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 
 import type { EvalSenderChoice } from "@purin-labs/control-api";
 
-import { Notice } from "../../page-components";
+import { Notice } from "@purin-labs/ui/page-components";
 import {
   canAddCriterion,
   canAddScenario,

@@ -9,7 +9,7 @@ import {
   type BakerySurfaceReceiptV1,
   type PageCommandEffectV1,
 } from "@purin-labs/bakery-model/bakery-surface";
-import { runPageCommand } from "./surface-observation";
+import { runPageCommand } from "@purin-labs/ui/features/surface-observation";
 import {
   bakerySurfaceForOrganisation,
   notifySurfaceListeners,
@@ -20,7 +20,7 @@ import {
 import {
   subscribeSurfaceEffects,
   surfaceSignalsLive,
-} from "./surface-effect-signals";
+} from "@purin-labs/ui/features/surface-effect-signals";
 import type { Variant } from "@purin-labs/type-utils";
 import { errorMessage, isRecord } from "@purin-labs/std";
 import {

@@ -40,7 +40,7 @@ import { BrainRoute } from "../features/brain/route";
 import { ConnectedChatPage as ChatPage } from "../features/chat/route";
 import { UNAVAILABLE_ACCESS } from "../features/access/unavailable-access";
 import { installChatPreviewFetch } from "./chat-preview-data";
-import { PageHeader } from "../page-components";
+import { PageHeader } from "@purin-labs/ui/page-components";
 import { PortalFrame } from "../shell";
 
 const root = document.getElementById("root");

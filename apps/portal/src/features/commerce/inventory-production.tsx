@@ -1,4 +1,4 @@
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { Link } from "react-router";
 import {
@@ -12,10 +12,10 @@ import {
   type InventoryProductionRequest,
 } from "@purin-labs/kitchen-control-api";
 import { assertNever, isRecord } from "@purin-labs/std";
-import { StatusChip, type StatusChipStatus } from "../../page-components";
+import { StatusChip, type StatusChipStatus } from "@purin-labs/ui/page-components";
 import type { Quantity } from "@purin-labs/commerce-contracts";
 import { ControlApiError, controlRead } from "@purin-labs/control/portal/control-client";
-import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
+import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 import {
   readProductionSubmission,
   storeProductionSubmission,

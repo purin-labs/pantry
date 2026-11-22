@@ -6,7 +6,7 @@ import type {
 import React from "react";
 import { Link } from "react-router";
 import { toast } from "sonner";
-import { workspacePagePath } from "../../route";
+import { workspacePagePath } from "@purin-labs/ui/route";
 import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import type { Variant } from "@purin-labs/type-utils";
 import {

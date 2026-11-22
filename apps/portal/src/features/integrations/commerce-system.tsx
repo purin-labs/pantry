@@ -2,7 +2,7 @@ import React from "react";
 import {
   StatusChip,
   formatRelativeTime,
-} from "../../page-components";
+} from "@purin-labs/ui/page-components";
 import { assertNever } from "@purin-labs/std";
 import type {
   CommerceSystem,

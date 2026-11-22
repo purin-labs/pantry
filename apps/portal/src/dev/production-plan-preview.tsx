@@ -17,7 +17,7 @@ import {
 } from "@purin-labs/production-plan-crdt/protocol";
 import { isRecord } from "@purin-labs/std";
 import { ProductionPlanPanel } from "../features/commerce/production-plan";
-import { usePortalTheme } from "../use-portal-theme";
+import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
 import "../styles.css";
 
 /**

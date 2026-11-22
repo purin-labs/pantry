@@ -5,7 +5,7 @@ import { assertNever } from "@purin-labs/std";
 import {
   navigationGroupTitle,
   type WorkspaceNavigationGroupName,
-} from "../../route";
+} from "@purin-labs/ui/route";
 import type {
   Project,
   ProjectDirectory,

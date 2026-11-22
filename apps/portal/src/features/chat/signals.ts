@@ -7,7 +7,7 @@ import { SocketLiveness } from "../collaboration/socket-liveness";
 import {
   announceSurfaceEffect,
   setSurfaceSignalsLive,
-} from "../surface-effect-signals";
+} from "@purin-labs/ui/features/surface-effect-signals";
 
 const RECONNECT_BASE_MS = 1_000;
 const RECONNECT_LIMIT_MS = 30_000;

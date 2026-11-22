@@ -1,7 +1,10 @@
-import { Select } from "../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { assertNever } from "@purin-labs/std";
-import { ReasoningSteps, type ReasoningStep } from "../ui/reasoning-steps";
+import {
+  ReasoningSteps,
+  type ReasoningStep,
+} from "@purin-labs/ui/reasoning-steps";
 import "./chat-activity-preview.css";
 
 type Scenario = "working" | "queued" | "completed" | "failed" | "waiting";

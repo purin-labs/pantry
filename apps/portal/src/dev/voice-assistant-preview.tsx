@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import {
   VoiceAssistantCard,
   type VoiceAssistantState,
-} from "../ui/voice-assistant-card";
+} from "@purin-labs/ui/voice-assistant-card";
 import "../styles.css";
 import "./voice-assistant-preview.css";
 

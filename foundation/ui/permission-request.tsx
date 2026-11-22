@@ -21,7 +21,7 @@ import {
   showDialog,
   useDialogPresent,
   useHeldWhileClosed,
-} from "../dialog";
+} from "./dialog";
 import {
   holdLayoutMorph,
   prefersReducedMotion,

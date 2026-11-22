@@ -1,6 +1,6 @@
 import React from "react";
 import { REHEARSAL_PRESETS } from "@purin-labs/production-simulation/simulator/rehearsal-presets";
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 
 // The items of the production workspace selects. production-workspace.tsx is
 // at its line limit, so its Select item lists live here.

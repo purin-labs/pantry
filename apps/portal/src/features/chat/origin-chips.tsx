@@ -1,6 +1,6 @@
 import React from "react";
 import type { ChatOrigin } from "@purin-labs/control-api";
-import { navigationGroupTitle } from "../../route";
+import { navigationGroupTitle } from "@purin-labs/ui/route";
 import "./origin-chips.css";
 
 function originParts(origin: ChatOrigin): readonly string[] {

@@ -1,10 +1,10 @@
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import type {
   CheckoutProfileConfiguration,
 } from "@purin-labs/commerce-contracts";
 import React from "react";
 
-import { formatMoneyMinor } from "../../formatting";
+import { formatMoneyMinor } from "@purin-labs/ui/formatting";
 import type {
   CheckoutProfileSummary,
 } from "@purin-labs/commerce-control-api/portal/checkout-profiles";

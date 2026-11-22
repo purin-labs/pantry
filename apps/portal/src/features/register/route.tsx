@@ -7,7 +7,7 @@ import type {
   RegisterViewCommand,
 } from "@purin-labs/control-api";
 import type { CounterSale } from "@purin-labs/control-api/portal/counter-sale";
-import { EmptyState, useLatestRead } from "../../ui";
+import { EmptyState, useLatestRead } from "@purin-labs/ui/index";
 import {
   cancelCounterSaleCollection,
   collectCounterSale,

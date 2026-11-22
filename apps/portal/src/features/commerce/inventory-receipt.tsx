@@ -1,4 +1,4 @@
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import {
   parseInventoryReceiptContext,
@@ -11,7 +11,7 @@ import {
 } from "@purin-labs/commerce-client";
 import { errorMessage, isRecord } from "@purin-labs/std";
 import { controlRead } from "@purin-labs/control/portal/control-client";
-import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
+import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 import type { CommerceMutationTransport } from "./entity-plane/api";
 import {
   StockDialogCancel,

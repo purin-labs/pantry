@@ -4,8 +4,8 @@ import type {
   BakeAuthorityView,
 } from "@purin-labs/kitchen-control-api";
 
-import { useMutation } from "../../ui";
-import { Select } from "../../ui/select";
+import { useMutation } from "@purin-labs/ui/index";
+import { Select } from "@purin-labs/ui/select";
 import { refusalText, saveBakeAuthority } from "./requests";
 
 /**

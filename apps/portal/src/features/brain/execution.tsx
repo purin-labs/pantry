@@ -20,14 +20,14 @@ import type {
 } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
 
-import { formatAbsoluteTime } from "../../formatting";
+import { formatAbsoluteTime } from "@purin-labs/ui/formatting";
 import {
   EmptyState,
   Notice,
   PageSkeleton,
   RecoverableError,
   StatusChip,
-} from "../../page-components";
+} from "@purin-labs/ui/page-components";
 import {
   executionErrorMessage,
   readCaseExecution,
@@ -36,14 +36,18 @@ import {
   readExecutionNode,
   type BrainTransport,
 } from "./api";
-import { ViewSwitch } from "../../ui/time-lanes-frame";
+import { ViewSwitch } from "@purin-labs/ui/time-lanes-frame";
 import { CaseTimeline, type ActivityTimeline } from "./case-timeline";
 
 const CASE_VIEWS = [
   { view: "list", name: "List" },
   { view: "timeline", name: "Timeline" },
 ] as const;
-import { usePeriod, useWiderWhenEmpty, type PeriodControl } from "../../ui";
+import {
+  usePeriod,
+  useWiderWhenEmpty,
+  type PeriodControl,
+} from "@purin-labs/ui/index";
 import { ExecutionCanvas, ExecutionLegend } from "./execution-canvas";
 import {
   basisLabel,

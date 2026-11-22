@@ -1,4 +1,7 @@
-import type { DecisionButton, DecisionRefusalConfirm } from "../../ui";
+import type {
+  DecisionButton,
+  DecisionRefusalConfirm,
+} from "@purin-labs/ui/index";
 
 /**
  * The labels of a governed action decision, one look in every place: the

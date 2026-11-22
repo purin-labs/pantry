@@ -2,8 +2,8 @@ import { Mic, MicOff } from "lucide-react";
 import * as React from "react";
 import { useLocation, useNavigate } from "react-router";
 
-import { chatRouteState } from "../../page-address";
-import { workspacePagePath } from "../../route";
+import { chatRouteState } from "@purin-labs/ui/page-address";
+import { workspacePagePath } from "@purin-labs/ui/route";
 import {
   attachVoiceChatOpener,
   voiceConversation,

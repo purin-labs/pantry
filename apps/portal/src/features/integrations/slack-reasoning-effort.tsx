@@ -8,8 +8,8 @@ import {
 
 import { controlMutation, controlRead } from "@purin-labs/control/portal/control-client";
 import { inferencePath } from "@purin-labs/control/portal/control-paths";
-import { StatusChip } from "../../page-components";
-import { effortDescription, effortLabel } from "../chat/effort-labels";
+import { StatusChip } from "@purin-labs/ui/page-components";
+import { effortDescription, effortLabel } from "@purin-labs/ui/features/chat/effort-labels";
 import type { OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 
 /** The inference sources, as the settings page names them. */

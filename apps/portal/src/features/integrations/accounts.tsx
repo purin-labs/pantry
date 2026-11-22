@@ -1,8 +1,8 @@
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { credentialRotationSupported, findCredentialAccountRecord } from "../../credential-inventory";
 import type { CredentialAccountRecord, CredentialInventory, CredentialRotationReceipt, CredentialRevocationReceipt } from "@purin-labs/control-api/portal/credential-inventory";
-import { StatusChip } from "../../page-components";
+import { StatusChip } from "@purin-labs/ui/page-components";
 import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import {
   providerDisconnectedConsequence,

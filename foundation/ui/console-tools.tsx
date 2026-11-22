@@ -1,6 +1,6 @@
 import React from "react";
 
-import type { ToolbarItem } from "./ui/overflow-toolbar";
+import type { ToolbarItem } from "./overflow-toolbar";
 
 /**
  * The console's own tools: search, appearance, Ask and the account. A page

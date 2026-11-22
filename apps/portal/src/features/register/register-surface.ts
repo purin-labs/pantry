@@ -11,7 +11,7 @@ import {
   registerSurfaceView,
   type SurfaceCommandOutcome,
   type SurfaceViewSource,
-} from "../surface-observation";
+} from "@purin-labs/ui/features/surface-observation";
 import { formatMoney } from "./modifier-drawer";
 
 export type RegisterSurfaceState = Readonly<{

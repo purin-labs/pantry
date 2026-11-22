@@ -3,7 +3,7 @@ import {
   ResponseActions,
   type ResponseActionResult,
   type ResponseRating,
-} from "../ui";
+} from "@purin-labs/ui/index";
 
 type Request =
   | { readonly kind: "idle" }

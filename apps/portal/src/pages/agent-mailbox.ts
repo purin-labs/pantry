@@ -1,5 +1,5 @@
-import { formatLifecycle } from "../formatting";
-import type { StatusChipStatus } from "../status-chip";
+import { formatLifecycle } from "@purin-labs/ui/formatting";
+import type { StatusChipStatus } from "@purin-labs/ui/status-chip";
 import { assertNever } from "@purin-labs/std";
 import type { AgentMailboxView, MailboxPauseReasonView } from "@purin-labs/control-api/portal/agent-mailbox";
 

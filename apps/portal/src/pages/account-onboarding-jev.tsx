@@ -5,7 +5,7 @@ import {
   changeJevFeature,
   jevFeatureErrorMessage,
 } from "../features/jev-features/api";
-import { organisationPath, workspacePagePath } from "../route";
+import { organisationPath, workspacePagePath } from "@purin-labs/ui/route";
 
 /**
  * The optional Jev step of the setup (Plan 88 section 5). One choice turns on

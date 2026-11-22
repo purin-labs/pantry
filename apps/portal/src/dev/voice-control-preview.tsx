@@ -7,7 +7,7 @@ import type {
 } from "@purin-labs/control-api/portal/access-models";
 import { VoiceControl } from "../features/voice/control";
 import type { VoiceSession, VoiceStatus } from "../features/voice/session";
-import { usePortalTheme } from "../use-portal-theme";
+import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
 import "../styles.css";
 import "../features/chat/styles.css";
 import "./agent-components-preview.css";

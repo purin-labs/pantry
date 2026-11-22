@@ -98,12 +98,12 @@ import. A module with no line for one of these has none.
 
 ## foundation/ui
 
-- Folders: 5
-  - `apps/portal/src/`
-  - `apps/portal/src/features/`
-  - `apps/portal/src/features/chat/`
-  - `apps/portal/src/preferences/`
-  - `apps/portal/src/ui/`
+- Folders: 4
+  - `foundation/ui/`
+  - `foundation/ui/features/`
+  - `foundation/ui/features/chat/`
+  - `foundation/ui/preferences/`
+- Packages: `foundation/ui`
 
 ## foundation/agent-tools
 

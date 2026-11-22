@@ -1,6 +1,6 @@
 import React from "react";
 
-import { EmptyState, PageSkeleton, RecoverableError } from "../page-components";
+import { EmptyState, PageSkeleton, RecoverableError } from "./page-components";
 import { Button } from "./button";
 import {
   FitPeriod,

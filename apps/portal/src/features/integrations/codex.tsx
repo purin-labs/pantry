@@ -1,6 +1,6 @@
 import React from "react";
-import { formatRelativeTime } from "../../page-components";
-import { formatAbsoluteTime } from "../../formatting";
+import { formatRelativeTime } from "@purin-labs/ui/page-components";
+import { formatAbsoluteTime } from "@purin-labs/ui/formatting";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import type { CodexAllowance } from "@purin-labs/control-api";

@@ -7,7 +7,7 @@ import {
   type CommerceActionRecord,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
-import { usePortalTheme } from "../use-portal-theme";
+import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
 import "../styles.css";
 import "./operations-trace-preview.css";
 

@@ -1,6 +1,6 @@
 // The code of each Portal page, loaded when the page first renders.
 import React from "react";
-import type { WorkspaceDetailPage } from "./route";
+import type { WorkspaceDetailPage } from "@purin-labs/ui/route";
 
 export const WorkflowSimulatorRoute = React.lazy(loadWorkflowSimulator);
 export const ChatPage = React.lazy(loadChatPage);

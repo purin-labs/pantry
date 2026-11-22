@@ -6,7 +6,7 @@ import {
   surfaceOnScreenView,
   useSurfaceOnScreenView,
   type SurfaceOnScreenView,
-} from "../surface-observation";
+} from "@purin-labs/ui/features/surface-observation";
 import {
   currentSuggestion,
   holdForScreenQuestion,

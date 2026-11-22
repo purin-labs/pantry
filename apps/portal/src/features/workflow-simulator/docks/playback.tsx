@@ -1,4 +1,4 @@
-import { Select } from "../../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import {
   PlaybackCursor,
@@ -7,7 +7,7 @@ import {
 } from "../playback-cursor";
 import { Tooltip } from "@base-ui/react/tooltip";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { GlideHighlight } from "../../../ui/glide-highlight";
+import { GlideHighlight } from "@purin-labs/ui/glide-highlight";
 import { PlaybackToggle } from "../playback-toggle";
 import {
   StepForward,

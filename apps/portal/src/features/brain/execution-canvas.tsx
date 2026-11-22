@@ -15,7 +15,7 @@ import {
 import type { CaseExecutionNode } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
 
-import type { StatusChipStatus } from "../../status-chip";
+import type { StatusChipStatus } from "@purin-labs/ui/status-chip";
 import {
   EXECUTION_NODE_HEIGHT,
   EXECUTION_NODE_WIDTH,

@@ -17,8 +17,8 @@ import {
   Notice,
   RecoverableError,
   type StatusChipStatus,
-} from "../page-components";
-import { humanizeIdentifier } from "../formatting";
+} from "@purin-labs/ui/page-components";
+import { humanizeIdentifier } from "@purin-labs/ui/formatting";
 import { assertNever } from "@purin-labs/std";
 import type { AgentSkillRef } from "@purin-labs/control-api";
 
@@ -392,7 +392,7 @@ export function setMillisecondField(
   };
 }
 
-export { humanizeIdentifier } from "../formatting";
+export { humanizeIdentifier } from "@purin-labs/ui/formatting";
 
 export function runAsync(operation: () => Promise<void>): void {
   void operation();

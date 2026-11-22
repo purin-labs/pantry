@@ -1,6 +1,6 @@
 import { DraftLeaveDialog } from "../collaboration/draft-leave-dialog";
-import { Select } from "../../ui/select";
-import { SideDrawer } from "../../ui";
+import { Select } from "@purin-labs/ui/select";
+import { SideDrawer } from "@purin-labs/ui/index";
 import React from "react";
 import {
   MENU_HOUR_DAYS,
@@ -9,7 +9,7 @@ import {
   type MenuHours,
 } from "@purin-labs/control-api";
 import { useBlocker, useLocation, useNavigate } from "react-router";
-import { pageAddress, pageLink } from "../../page-address";
+import { pageAddress, pageLink } from "@purin-labs/ui/page-address";
 import { controlRead, controlRefusal, controlWrite } from "@purin-labs/control/portal/control-client";
 import {
   MENU_ITEM_LIMIT,

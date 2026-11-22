@@ -6,7 +6,7 @@ import {
   StatusChip,
   type ProviderTileName,
   type StatusChipStatus,
-} from "../../page-components";
+} from "@purin-labs/ui/page-components";
 
 type CustomConnectorCatalogState =
   | { readonly kind: "loading" }

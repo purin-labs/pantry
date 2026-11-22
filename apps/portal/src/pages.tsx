@@ -39,8 +39,8 @@ import {
   workspacePagePath,
   workspaceAccessSubviewPath,
   workspaceResourcePath,
-} from "./route";
-import { PageSkeleton } from "./page-components";
+} from "@purin-labs/ui/route";
+import { PageSkeleton } from "@purin-labs/ui/page-components";
 import {
   checkoutProfileControlMutation,
   commerceBoardPresenceTransport,
@@ -71,7 +71,7 @@ import type { Variant } from "@purin-labs/type-utils";
 import type { ControlPortalApp } from "./portal";
 import type { PortalState } from "./portal-types";
 import type { WorkspaceRouteSelection } from "./portal-routing";
-import type { WorkspaceDetailPage } from "./route";
+import type { WorkspaceDetailPage } from "@purin-labs/ui/route";
 
 /** What a page needs from the workspace shell. */
 type PageContext = Readonly<{

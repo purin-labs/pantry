@@ -564,7 +564,7 @@ tile, so it reads on a light surface and on a dark surface.
 
 `purin-mark-paths.ts` and `purin-mark.css` are generated. To change the
 curves, the colours or the motion, edit `scripts/brand/build-purin-logo.mjs`
-and run it. [The Purin logo folder](../../../../docs/brand/purin-logo/README.md)
+and run it. [The Purin logo folder](../../docs/brand/purin-logo/README.md)
 holds the SVG files and the icon pack. `PantryMark` still draws the goat mark
 on every Portal surface, until the brand switch.
 

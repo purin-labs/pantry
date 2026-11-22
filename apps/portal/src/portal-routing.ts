@@ -10,7 +10,7 @@ import {
   type AccessSubview,
   type PortalRoute,
   type WorkspaceDetailPage,
-} from "./route";
+} from "@purin-labs/ui/route";
 import {
   MutationLedger,
   type OrganisationMutation,

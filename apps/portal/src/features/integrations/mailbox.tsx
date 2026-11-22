@@ -1,5 +1,5 @@
 import React from "react";
-import { ProviderTile, formatRelativeTime } from "../../page-components";
+import { ProviderTile, formatRelativeTime } from "@purin-labs/ui/page-components";
 import { PROVIDER_PRESENTATION } from "../../integration-catalogue";
 import {
   LastAttemptNotice,

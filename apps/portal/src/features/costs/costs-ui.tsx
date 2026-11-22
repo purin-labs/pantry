@@ -19,8 +19,8 @@ import {
 import {
   formatMoneyMinor,
   formatSignedMoneyRounded as formatSignedMoney,
-} from "../../formatting";
-import { Popover, Select, Switch } from "../../ui";
+} from "@purin-labs/ui/formatting";
+import { Popover, Select, Switch } from "@purin-labs/ui/index";
 import {
   CellPeerOutline,
   peerCellStyle,

@@ -3,7 +3,7 @@ import type {
   CounterRegisterMenuEntry,
   CounterRegisterModifierGroup,
 } from "@purin-labs/control-api";
-import { SideDrawer } from "../../ui";
+import { SideDrawer } from "@purin-labs/ui/index";
 
 export type ModifierDrawerSelection = Readonly<{
   entry: CounterRegisterMenuEntry;

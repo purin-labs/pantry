@@ -34,8 +34,8 @@ import type {
 } from "@purin-labs/control-api";
 import { projectReferenceIdentity } from "@purin-labs/control-api";
 import { assertNever, errorMessage } from "@purin-labs/std";
-import { ActionMenu } from "../../ui/action-menu";
-import { DialogHeading, cancelDialog, syncDialog } from "../../dialog";
+import { ActionMenu } from "@purin-labs/ui/action-menu";
+import { DialogHeading, cancelDialog, syncDialog } from "@purin-labs/ui/dialog";
 import { mutateChatDirectory, mutateProject, permanentlyDeleteChat, updateChatConversation, readProjectReferences, readChat } from "./api";
 import type { Chat, ChatConversationSummary, ChatPageData, PendingChatDeletion } from "@purin-labs/control-api/portal/chat";
 import { ThreadTitle } from "./thread-title";

@@ -4,7 +4,7 @@ import { useBlocker, type Blocker } from "react-router";
 import { DESCRIPTION_LIMIT } from "@purin-labs/product-description-crdt";
 import { DescriptionDraftClient, type DescriptionDraftView } from "./client";
 import { DraftParticipants, DraftPresenceOverlay, DraftMousePointers } from "../../collaboration/draft-presence";
-import { cancelDialog, syncDialog } from "../../../dialog";
+import { cancelDialog, syncDialog } from "@purin-labs/ui/dialog";
 import type {
   CommerceActionRecord,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";

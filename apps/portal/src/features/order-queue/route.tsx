@@ -6,7 +6,7 @@ import type {
 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
-import { Button, useLatestRead, useMutation } from "../../ui";
+import { Button, useLatestRead, useMutation } from "@purin-labs/ui/index";
 import {
   advanceOrder,
   readOrderQueue,

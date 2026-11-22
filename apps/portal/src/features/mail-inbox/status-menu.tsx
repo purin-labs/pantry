@@ -4,8 +4,8 @@ import { Check, ChevronDown, RefreshCw, Settings } from "lucide-react";
 import type { MailInboxAccount } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
 import type { MailAgentState } from "@purin-labs/control-api/portal/mail-agent";
-import { GlideHighlight } from "../../ui/glide-highlight";
-import "../../ui/action-menu.css";
+import { GlideHighlight } from "@purin-labs/ui/glide-highlight";
+import "@purin-labs/ui/action-menu.css";
 
 type Props = Readonly<{
   accounts: readonly MailInboxAccount[];

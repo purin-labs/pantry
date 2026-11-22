@@ -1,6 +1,10 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { GrainField, GrainFieldSelect, type GrainFieldName } from "../ui";
+import {
+  GrainField,
+  GrainFieldSelect,
+  type GrainFieldName,
+} from "@purin-labs/ui/index";
 import "../styles.css";
 import "./gradients-preview.css";
 

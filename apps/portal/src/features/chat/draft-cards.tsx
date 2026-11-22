@@ -1,5 +1,5 @@
 import { VoiceApprovalLine } from "../voice/approvals";
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 /**
  * Messages the agent drafted in this conversation for another app. Each one
  * shows as a card in the timeline at the moment it was drafted, and nothing
@@ -7,14 +7,14 @@ import { Select } from "../../ui/select";
  */
 import React from "react";
 import { assertNever } from "@purin-labs/std";
-import { ProviderTile } from "../../page-components";
+import { ProviderTile } from "@purin-labs/ui/page-components";
 import type { EmailOperationalPreviewResult, EmailOperationalQueueItem, EmailReplyPreviewResult, EmailReplyQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import {
   DraftMessageCard,
   type DraftMessageField,
   type DraftMessageReview,
   type DraftMessageStatus,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 import {
   EMAIL_REPLY_DECISION,
   SELF_TEST_SEND_LABEL,

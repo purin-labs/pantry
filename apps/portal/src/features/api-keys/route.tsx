@@ -1,7 +1,7 @@
 import React from "react";
 import { Copy, KeySquare, Plus } from "lucide-react";
 
-import { EmptyState, SideDrawer } from "../../ui";
+import { EmptyState, SideDrawer } from "@purin-labs/ui/index";
 import { apiKeyErrorMessage, GRANTABLE_SCOPE_LABELS, GRANTABLE_SCOPES, issueCommerceApiKey, readCommerceApiKeys, revokeCommerceApiKey, type GrantableScope } from "./api";
 import type { CommerceApiKey } from "@purin-labs/control-api/portal/api-keys";
 import "../vault/styles.css";

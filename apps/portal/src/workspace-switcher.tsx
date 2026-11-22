@@ -2,8 +2,8 @@ import React from "react";
 import { Popover } from "@base-ui/react/popover";
 import { Check, ChevronDown, LayoutGrid, Search } from "lucide-react";
 import { Link } from "react-router";
-import { ConsoleSidebarTooltip } from "./console-sidebar";
-import { organisationPath, workspacePagePath } from "./route";
+import { ConsoleSidebarTooltip } from "@purin-labs/ui/console-sidebar";
+import { organisationPath, workspacePagePath } from "@purin-labs/ui/route";
 import "./workspace-switcher.css";
 
 export type OrganisationChoice = {

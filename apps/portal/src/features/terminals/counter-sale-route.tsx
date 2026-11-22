@@ -1,9 +1,9 @@
 import React from "react";
 import { toast } from "sonner";
 import { assertNever } from "@purin-labs/std";
-import { formatMoneyMinor } from "../../formatting";
-import { PageSkeleton, RecoverableError } from "../../page-components";
-import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
+import { formatMoneyMinor } from "@purin-labs/ui/formatting";
+import { PageSkeleton, RecoverableError } from "@purin-labs/ui/page-components";
+import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 
 import {
   collectCounterSale,

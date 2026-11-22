@@ -2,8 +2,8 @@ import React from "react";
 import { Check, Circle, CircleAlert } from "lucide-react";
 
 import { providerLabel, providerTile } from "../../integration-catalogue";
-import { ProviderTile } from "../../page-components";
-import { AuthorizationScreen } from "../../ui";
+import { ProviderTile } from "@purin-labs/ui/page-components";
+import { AuthorizationScreen } from "@purin-labs/ui/index";
 
 /**
  * Says what a provider sign-in does before it starts, on an authorization

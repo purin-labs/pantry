@@ -24,10 +24,10 @@ import {
   PermissionRequestDialog,
   PantryMark,
   type PermissionRequestDecision,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 import { createGrants, enableCapabilities } from "./permission-enable";
-import { AGENT_NAME } from "../../agent-name";
+import { AGENT_NAME } from "@purin-labs/ui/agent-name";
 
 type Props = Readonly<{
   organisationId: string;

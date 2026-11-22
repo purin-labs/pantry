@@ -1,7 +1,7 @@
 import React from "react";
 import type { PaymentStep as Payment } from "@purin-labs/control-api";
 
-import { formatMoneyMinor } from "../../formatting";
+import { formatMoneyMinor } from "@purin-labs/ui/formatting";
 import {
   nowIn,
   periodWords,
@@ -10,7 +10,7 @@ import {
   usePeriodRead,
   useWiderWhenEmpty,
   type PeriodWindow,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 import { PaymentLanes, type PaymentStep } from "./payment-lanes";
 import { readPayments } from "./requests";
 

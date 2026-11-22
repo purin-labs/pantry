@@ -1,8 +1,8 @@
-import { Select } from "../ui/select";
-import { SideDrawer } from "../ui";
+import { Select } from "@purin-labs/ui/select";
+import { SideDrawer } from "@purin-labs/ui/index";
 import React from "react";
 import { Link, useLocation } from "react-router";
-import { pageLink } from "../page-address";
+import { pageLink } from "@purin-labs/ui/page-address";
 import { brainAddress, brainAddressSearch } from "../features/brain/address";
 import {
   ArrowLeft,
@@ -30,7 +30,7 @@ import {
   StatusChip,
   TechnicalDetails,
   type StatusChipStatus,
-} from "../page-components";
+} from "@purin-labs/ui/page-components";
 import { AgentDetail } from "./agent-detail";
 import {
   activateAgentSteps,

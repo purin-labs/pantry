@@ -20,7 +20,7 @@ import {
   PermissionRequestDialog,
   PantryMark,
   type PermissionRequestDecision,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 import { createAccessRouteTransport } from "./api";
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 import {

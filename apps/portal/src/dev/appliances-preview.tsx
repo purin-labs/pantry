@@ -4,8 +4,8 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-import { Select } from "../ui";
-import { usePortalTheme } from "../use-portal-theme";
+import { Select } from "@purin-labs/ui/index";
+import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
 import "../styles.css";
 import "./appliances-preview.css";
 import {

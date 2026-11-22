@@ -6,8 +6,8 @@ import {
   controlRead,
   controlSecretMutation,
 } from "@purin-labs/control/portal/control-client";
-import { StatusChip } from "../../page-components";
-import type { StatusChipStatus } from "../../status-chip";
+import { StatusChip } from "@purin-labs/ui/page-components";
+import type { StatusChipStatus } from "@purin-labs/ui/status-chip";
 import { openAuthorizationPopup } from "./authorization-popup";
 import {
   parseClaudeAuthorization,

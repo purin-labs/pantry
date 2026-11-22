@@ -70,6 +70,10 @@
       ],
       "project": ["src/.vitepress/**/*.{ts,vue}", "scripts/*.mjs"]
     },
+    "foundation/ui": {
+      "entry": ["**/*.type-fixtures.ts"],
+      "project": ["**/*.{ts,tsx}"]
+    },
     "foundation/*": {
       "project": ["**/*.ts"],
       "includeEntryExports": true

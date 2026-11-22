@@ -1,4 +1,4 @@
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import { ArchiveConfirm } from "./archive-confirm";

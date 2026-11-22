@@ -1,5 +1,5 @@
 import React from "react";
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import { createPortal } from "react-dom";
 import {
   AlignCenterHorizontal,

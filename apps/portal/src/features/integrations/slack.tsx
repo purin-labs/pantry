@@ -1,5 +1,5 @@
 import { SLACK_APP_NAME } from "@purin-labs/control-api";
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import type {
   FirstOperationalTask,
   OnboardingActivation,
@@ -9,11 +9,11 @@ import { Link } from "react-router";
 import {
   Combobox,
   type ComboboxOption,
-} from "../../combobox";
-import { workspacePagePath } from "../../route";
+} from "@purin-labs/ui/combobox";
+import { workspacePagePath } from "@purin-labs/ui/route";
 import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import { ProviderConnectAction } from "../../provider-onboarding";
-import { formatLifecycle } from "../../formatting";
+import { formatLifecycle } from "@purin-labs/ui/formatting";
 import { assertNever } from "@purin-labs/std";
 import {
   mutationBlocked,

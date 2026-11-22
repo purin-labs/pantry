@@ -11,7 +11,7 @@ import type {
 } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
 
-import type { StatusChipStatus } from "../../status-chip";
+import type { StatusChipStatus } from "@purin-labs/ui/status-chip";
 
 /** A whole projection, as the page holds it after it read every page. */
 export type CaseExecution = Readonly<{

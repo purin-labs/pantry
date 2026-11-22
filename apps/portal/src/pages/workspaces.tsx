@@ -24,9 +24,9 @@ import {
   PageHeader,
   PageSkeleton,
   RecoverableError,
-} from "../page-components";
+} from "@purin-labs/ui/page-components";
 import type { PageContent } from "@purin-labs/control/portal/page-content";
-import { organisationPath, workspacePagePath } from "../route";
+import { organisationPath, workspacePagePath } from "@purin-labs/ui/route";
 import { AgentModal } from "./agent-modal";
 import { AccountSetup, type AccountSetupListing } from "./account-onboarding";
 import { assertNever } from "@purin-labs/std";

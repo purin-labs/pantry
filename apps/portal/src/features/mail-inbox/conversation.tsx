@@ -1,4 +1,4 @@
-import { DecisionButtons } from "../../ui";
+import { DecisionButtons } from "@purin-labs/ui/index";
 import { EMAIL_REPLY_DECISION } from "../email-review/decision-labels";
 import React from "react";
 import { assertNever } from "@purin-labs/std";
@@ -14,7 +14,7 @@ import {
   type MailWorkReply,
   type MailWorkReplyState,
 } from "@purin-labs/control-api";
-import { formatAbsoluteTime } from "../../formatting";
+import { formatAbsoluteTime } from "@purin-labs/ui/formatting";
 import { emailReplyIsOpenable, emailReplyLifecycleLabel } from "../../pages/agent-mailbox";
 import type { EmailReplyPreviewResult } from "@purin-labs/control-api/portal/agent-mailbox";
 import {

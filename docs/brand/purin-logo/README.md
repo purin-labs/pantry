@@ -77,7 +77,7 @@ Put these lines in the page head, with the files at the site root:
 
 ## Components
 
-The Portal has two React components in `apps/portal/src/ui`:
+The Portal has two React components in `foundation/ui`:
 
 ```tsx
 import { PurinIcon, PurinMark } from "../../ui";
@@ -128,7 +128,7 @@ node scripts/brand/build-purin-logo.mjs
 
 The first command writes `paths.json`. It needs Pillow, numpy, scipy and
 contourpy. The second command writes every other file in this folder,
-`purin-mark-paths.ts` and `purin-mark.css` in `apps/portal/src/ui`, and
+`purin-mark-paths.ts` and `purin-mark.css` in `foundation/ui`, and
 `purin-icon.ts` for the Worker pages in
 `services/platform/src/control/routes/integrations`. The Worker imports no
 Portal code, so it gets its own copy of the icon. The PNG and ICO files need

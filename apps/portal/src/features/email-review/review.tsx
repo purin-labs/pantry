@@ -1,8 +1,8 @@
-import { DecisionButtons } from "../../ui";
+import { DecisionButtons } from "@purin-labs/ui/index";
 import { EMAIL_REPLY_DECISION, SELF_TEST_SEND_LABEL } from "./decision-labels";
 import React from "react";
-import { Notice, StatusChip, formatRelativeTime } from "../../page-components";
-import { formatAbsoluteTime } from "../../formatting";
+import { Notice, StatusChip, formatRelativeTime } from "@purin-labs/ui/page-components";
+import { formatAbsoluteTime } from "@purin-labs/ui/formatting";
 import type { EmailReplyMemory } from "@purin-labs/control-api/portal/agent-mailbox";
 import { emailReplyIsOpenable, emailReplyLifecycleStatus } from "../../pages/agent-mailbox";
 import type { EmailOperationalPreviewResult, EmailOperationalQueueItem, EmailReplyPreviewResult, EmailReplyQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";

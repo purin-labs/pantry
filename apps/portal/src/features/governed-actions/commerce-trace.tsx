@@ -17,9 +17,9 @@ import {
   TraceTitle,
   TraceDescription,
   type TraceStatus,
-} from "../../ui/trace";
+} from "@purin-labs/ui/trace";
 import type { CommerceActionRecord } from "@purin-labs/commerce-control-api/portal/commerce-actions";
-import "../../ui/operations-trace.css";
+import "@purin-labs/ui/operations-trace.css";
 
 type Props = Readonly<{
   action: CommerceActionRecord;

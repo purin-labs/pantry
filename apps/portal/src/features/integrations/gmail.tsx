@@ -5,7 +5,7 @@ import {
   ProviderTile,
   StatusChip,
   type StatusChipStatus,
-} from "../../page-components";
+} from "@purin-labs/ui/page-components";
 import {
   MutationLedger,
   type OrganisationMutation,

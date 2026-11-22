@@ -14,8 +14,8 @@ import {
 import { encodeVoiceWav } from "../features/voice/command";
 import type { VoiceWorkerEvent } from "../features/voice/worker-protocol";
 import { WAKE_PHRASE } from "../features/voice/wake-phrase";
-import { Select } from "../ui";
-import { usePortalTheme } from "../use-portal-theme";
+import { Select } from "@purin-labs/ui/index";
+import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
 import "../styles.css";
 import "./voice-recorder.css";
 

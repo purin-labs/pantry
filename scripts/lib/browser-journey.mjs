@@ -7,7 +7,7 @@
 // script imports them, and a bundled journey bundles them. Keep each function
 // self-contained: it has no imports and calls no other helper.
 
-// The Portal Select (apps/portal/src/ui/select.tsx) is a button with role
+// The Portal Select (foundation/ui/select.tsx) is a button with role
 // combobox that opens a listbox popup. Choose by { value }, { label } or
 // { index }. { values } sets the items of a multiple Select, then Escape
 // closes its popup.

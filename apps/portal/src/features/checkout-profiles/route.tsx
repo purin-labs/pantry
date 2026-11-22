@@ -1,7 +1,7 @@
 import type { CheckoutProfile } from "@purin-labs/commerce-contracts";
 import React from "react";
 import { Link } from "react-router";
-import { PageSkeleton, RecoverableError } from "../../page-components";
+import { PageSkeleton, RecoverableError } from "@purin-labs/ui/page-components";
 
 import type { CheckoutProfileMutationTransport } from "./api";
 import type { CheckoutProfileSummary } from "@purin-labs/commerce-control-api/portal/checkout-profiles";

@@ -15,8 +15,8 @@ import {
   forecastReadonlySelectionKey,
   forecastWeekIndexCellKey,
 } from "@purin-labs/costs-sheet-crdt";
-import { formatMoneyMinor } from "../../formatting";
-import { CrmTable, Select, type CrmColumn } from "../../ui";
+import { formatMoneyMinor } from "@purin-labs/ui/formatting";
+import { CrmTable, Select, type CrmColumn } from "@purin-labs/ui/index";
 import { minorToMajorString } from "./costs-sheet-draft";
 import {
   handleCellBoxMouseDown,

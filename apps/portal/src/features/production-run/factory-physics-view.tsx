@@ -4,7 +4,7 @@ import {
   type ApplianceId,
 } from "@purin-labs/production-simulation/floor/appliance-catalogue";
 import React from "react";
-import { BakeryAppearanceControl } from "../../preferences/appearance-controls";
+import { BakeryAppearanceControl } from "@purin-labs/ui/preferences/appearance-controls";
 import { SegmentedControl } from "../workflow-simulator/docks/shared";
 import type { LogisticsView } from "@purin-labs/production-simulation";
 import type { PersistentPhysicsScene } from "@purin-labs/bakery-model/bakery-physics";

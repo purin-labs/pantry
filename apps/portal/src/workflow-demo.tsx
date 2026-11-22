@@ -1,5 +1,5 @@
 import { isUserId } from "@purin-labs/control-api";
-import { UserPreferencesProvider } from "./preferences/context";
+import { UserPreferencesProvider } from "@purin-labs/ui/preferences/context";
 import React from "react";
 import {
   MemoryRouter,
@@ -9,8 +9,8 @@ import {
 } from "react-router";
 import { CircleQuestionMark } from "lucide-react";
 import { PortalFrame } from "./shell";
-import { PageHeader } from "./page-components";
-import { readPortalRoute, workspacePageDescriptor } from "./route";
+import { PageHeader } from "@purin-labs/ui/page-components";
+import { readPortalRoute, workspacePageDescriptor } from "@purin-labs/ui/route";
 import WorkflowSimulatorRoute from "./features/workflow-simulator/route";
 import { ConnectedChatPage as ChatPage } from "./features/chat/route";
 import { UNAVAILABLE_ACCESS } from "./features/access/unavailable-access";

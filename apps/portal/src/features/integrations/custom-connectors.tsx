@@ -1,4 +1,4 @@
-import { DecisionButtons } from "../../ui";
+import { DecisionButtons } from "@purin-labs/ui/index";
 import {
   GOVERNED_ACTION_ALLOW,
   governedActionRefusal,
@@ -8,7 +8,7 @@ import {
   signInForApproval,
 } from "@purin-labs/control/portal/approval-sign-in-popup";
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { MessageCircle, FileCode2 } from "lucide-react";
 import { useNavigate, type NavigateFunction } from "react-router";

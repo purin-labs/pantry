@@ -1,5 +1,5 @@
 import type { PortalPageViewV1 } from "@purin-labs/control-api";
-import { registerSurfaceView, type SurfaceViewSource } from "../surface-observation";
+import { registerSurfaceView, type SurfaceViewSource } from "@purin-labs/ui/features/surface-observation";
 import { boardPageView, type BoardPageSnapshot } from "./board-page-view";
 
 /** Registers Menus › Boards with the chat while the board editor is open. */

@@ -1,7 +1,7 @@
-import { Select } from "../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { usePortalTheme } from "../use-portal-theme";
+import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
 import "../styles.css";
 import "./theme-preview.css";
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { errorMessage } from "@purin-labs/std";
-import { Select } from "../../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 
 type Choice<Value extends string> = Readonly<{ value: Value; label: string }>;
 

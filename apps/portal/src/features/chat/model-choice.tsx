@@ -3,7 +3,10 @@ import { Check } from "lucide-react";
 import type { ChatEffort } from "@purin-labs/control-api";
 import type { Chat } from "@purin-labs/control-api/portal/chat";
 import type { ChatPageData } from "@purin-labs/control-api/portal/chat";
-import { effortDescription, effortLabel } from "./effort-labels";
+import {
+  effortDescription,
+  effortLabel,
+} from "@purin-labs/ui/features/chat/effort-labels";
 
 export function selectedModelFromData(data: ChatPageData): string | null {
   if (data.conversation !== null) return data.conversation.model;

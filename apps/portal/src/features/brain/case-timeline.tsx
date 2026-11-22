@@ -6,7 +6,7 @@ import type {
   CaseTimelineOutcomeKind,
 } from "@purin-labs/control-api";
 
-import { TimeLanesFrame, TimeLanesNote } from "../../ui/time-lanes-frame";
+import { TimeLanesFrame, TimeLanesNote } from "@purin-labs/ui/time-lanes-frame";
 import {
   duration,
   nowIn,
@@ -20,7 +20,7 @@ import {
   type TimeLanesSection,
   type TimeLanesStep,
   type TimeLanesTone,
-} from "../../ui/time-lanes";
+} from "@purin-labs/ui/time-lanes";
 import { originLabel } from "./execution-model";
 
 export type ActivityTimeline =

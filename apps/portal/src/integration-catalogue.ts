@@ -1,5 +1,5 @@
 import type { OnboardingProvider } from "@purin-labs/contracts";
-import type { ProviderTileName } from "./page-components";
+import type { ProviderTileName } from "@purin-labs/ui/page-components";
 
 export type Provider = Extract<
   OnboardingProvider,

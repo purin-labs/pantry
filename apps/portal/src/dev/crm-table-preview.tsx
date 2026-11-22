@@ -7,7 +7,7 @@ import {
   CrmProgress,
   CrmSparkline,
   type CrmColumn,
-} from "../ui";
+} from "@purin-labs/ui/index";
 
 type Product = {
   readonly id: string;

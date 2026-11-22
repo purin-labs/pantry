@@ -12,8 +12,8 @@ import {
   TraceTitle,
   TraceDescription,
   type TraceStatus,
-} from "../../ui/trace";
-import "../../ui/operations-trace.css";
+} from "@purin-labs/ui/trace";
+import "@purin-labs/ui/operations-trace.css";
 
 export function ChatApprovalTrace({
   approval,

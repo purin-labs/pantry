@@ -1,4 +1,4 @@
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { X } from "lucide-react";
 
@@ -18,15 +18,15 @@ import {
 } from "@purin-labs/control-api";
 
 import { refreshBrainSummary } from "../../brain-summary";
-import { isPrimaryNavigationClick } from "../../console-sidebar";
-import { formatAbsoluteTime } from "../../formatting";
+import { isPrimaryNavigationClick } from "@purin-labs/ui/console-sidebar";
+import { formatAbsoluteTime } from "@purin-labs/ui/formatting";
 import {
   EmptyState,
   Notice,
   PageSkeleton,
   RecoverableError,
   StatusChip,
-} from "../../page-components";
+} from "@purin-labs/ui/page-components";
 import {
   evalErrorMessage,
   memoryErrorMessage,
@@ -66,7 +66,7 @@ import { knowledgeRowId, KnowledgeRows } from "./knowledge";
 import { evalRow, rowsForReview, type KnowledgeRow } from "./knowledge-model";
 import { openCandidate } from "./model";
 import type { SeenRecords } from "./seen";
-import { SideDrawer } from "../../ui";
+import { SideDrawer } from "@purin-labs/ui/index";
 
 type EvalsContent =
   | Readonly<{ kind: "loading" }>

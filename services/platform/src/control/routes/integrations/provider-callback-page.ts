@@ -198,7 +198,7 @@ const CALLBACK_TONE_ICONS: Readonly<Record<CallbackTone, string>> = {
 };
 
 /* The page looks like the result card of the Portal's authorization screen
-   (apps/portal/src/ui/permission-request.css, the compact layout) on the
+   (foundation/ui/permission-request.css, the compact layout) on the
    default Portal theme (packages/frontend-themes/slate-coral.css). The Worker
    imports no Portal code, so the values are a copy: the slate and coral
    steps of that theme, in light and dark. The brand row is the one of the

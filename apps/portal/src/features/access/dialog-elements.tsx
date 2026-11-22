@@ -1,9 +1,9 @@
 import React from "react";
 
 import type { AccessControlOption } from "@purin-labs/control-api/portal/access-models";
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 
-export { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
+export { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 
 export function findOption(
   options: readonly AccessControlOption[],

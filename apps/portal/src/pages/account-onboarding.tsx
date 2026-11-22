@@ -11,7 +11,7 @@ import { assertNever, errorMessage, isRecord } from "@purin-labs/std";
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import { signInPath } from "@purin-labs/control/portal/control-paths";
 import { createOrganisation } from "../features/access/organisation-requests";
-import { organisationPath } from "../route";
+import { organisationPath } from "@purin-labs/ui/route";
 import { AgentModal } from "./agent-modal";
 import {
   JevSetupBody,

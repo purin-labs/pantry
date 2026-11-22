@@ -1,8 +1,8 @@
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { toast } from "sonner";
-import { PageSkeleton, RecoverableError } from "../../page-components";
-import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
+import { PageSkeleton, RecoverableError } from "@purin-labs/ui/page-components";
+import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 
 import { SQUARE_POS_CALLBACK_PATH } from "../register/square-pos-handoff";
 import {

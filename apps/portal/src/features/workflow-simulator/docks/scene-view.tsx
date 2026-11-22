@@ -1,5 +1,5 @@
 import { floorPlanWorkspace } from "../floor-plan-workspace";
-import { BakeryAppearanceControl } from "../../../preferences/appearance-controls";
+import { BakeryAppearanceControl } from "@purin-labs/ui/preferences/appearance-controls";
 import React from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import {
@@ -12,7 +12,7 @@ import {
   RotateCw,
   Tags,
 } from "lucide-react";
-import { GlideHighlight } from "../../../ui/glide-highlight";
+import { GlideHighlight } from "@purin-labs/ui/glide-highlight";
 import type { SceneLabelMode } from "../simulator-state";
 import type { WorkflowSimulatorActions } from "../simulator-actions";
 import type { SceneControlsView } from "../simulator-state";

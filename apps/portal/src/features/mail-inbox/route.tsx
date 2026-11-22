@@ -39,7 +39,7 @@ import type { MailAgentState } from "@purin-labs/control-api/portal/mail-agent";
 import { InboxAgentSheet } from "./agent-sheet";
 import { WhatsAppConversation } from "./whatsapp-conversation";
 import { PermissionRequiredPrompt } from "../access/permission-required-prompt";
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import {
   formatWaited,
   handledMailDrafts,

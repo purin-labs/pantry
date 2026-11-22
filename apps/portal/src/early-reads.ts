@@ -11,7 +11,10 @@ import {
   memoriesPath,
   organisationRecordPath,
 } from "@purin-labs/control/portal/control-paths";
-import { readPortalRoute, type WorkspaceDetailPage } from "./route";
+import {
+  readPortalRoute,
+  type WorkspaceDetailPage,
+} from "@purin-labs/ui/route";
 
 const ORGANISATION_ID_STORAGE_PREFIX = "pantry:organisation-id:";
 

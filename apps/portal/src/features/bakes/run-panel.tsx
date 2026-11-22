@@ -18,8 +18,8 @@ import {
   type TimeLanesSection,
   type TimeLanesTone,
   type TimeRange,
-} from "../../ui";
-import { Select } from "../../ui/select";
+} from "@purin-labs/ui/index";
+import { Select } from "@purin-labs/ui/select";
 import { actOnBakeRun, readBakeRun, refusalText } from "./requests";
 import "./run-panel.css";
 

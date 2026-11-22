@@ -1,4 +1,4 @@
-import { Select } from "../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 
 import type {
@@ -11,8 +11,8 @@ import type {
   ScheduleBinding,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import type { Skill } from "@purin-labs/control-api";
-import { StatusChip, TechnicalDetails } from "../page-components";
-import { SideDrawer } from "../ui";
+import { StatusChip, TechnicalDetails } from "@purin-labs/ui/page-components";
+import { SideDrawer } from "@purin-labs/ui/index";
 import {
   DiffView,
   DocumentEditor,

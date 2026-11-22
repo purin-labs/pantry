@@ -7,7 +7,7 @@ import {
   Printer,
   Trash2,
 } from "lucide-react";
-import { ActionMenu, type ActionMenuSection } from "../ui";
+import { ActionMenu, type ActionMenuSection } from "@purin-labs/ui/index";
 
 type State = { readonly receipt: string };
 

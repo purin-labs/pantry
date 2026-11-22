@@ -3,7 +3,7 @@ import {
   ReasoningSteps,
   ResponseIndicator,
   type ReasoningStep,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 import type { ChatTimelineView, ChatWork } from "@purin-labs/control-api/portal/chat";
 import type { ChatStreamState } from "./delivery";
 import type { Variant } from "@purin-labs/type-utils";

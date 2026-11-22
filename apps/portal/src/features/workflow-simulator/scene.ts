@@ -21,7 +21,7 @@ import {
   LAYOUT_MOTION_ATTRIBUTE,
   layoutMotionActive,
   layoutMotionResizing,
-} from "../../layout-motion";
+} from "@purin-labs/ui/layout-motion";
 import { machineAttention, machineSummary } from "@purin-labs/production-simulation/simulator/demo";
 import { selectionContext, type Selection } from "@purin-labs/production-simulation/simulator/selection";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";

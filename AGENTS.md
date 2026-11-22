@@ -434,7 +434,7 @@ through `controlMutation` (`foundation/control/portal/control-client.ts`); `pnpm
 lint:portal-fetch` refuses a new raw `fetch`. When a file loses one, run
 `node scripts/check-portal-fetch-ratchet.mjs --update`.
 A Portal component reads through `useLatestRead` and changes through
-`useMutation` (`apps/portal/src/ui`). The request is a function in the request
+`useMutation` (`foundation/ui`). The request is a function in the request
 module of its feature, for example `features/devices/requests.ts`; `pnpm
 lint:portal-requests` refuses a new direct `controlRead` or `controlMutation`
 call in a component file. When a file loses one, run
@@ -442,18 +442,18 @@ call in a component file. When a file loses one, run
 Portal components use [Base UI](https://base-ui.com) (`@base-ui/react`) for
 behaviour and plain CSS with Portal tokens for styles. Do not add shadcn/ui,
 Tailwind or a second component library. Before you build a control, look in
-`apps/portal/src/ui/`: it holds the prebuilt Portal components, for example
+`foundation/ui/`: it holds the prebuilt Portal components, for example
 `Select`, `Popover`, `Switch`, `SideDrawer`, `ActionMenu`, `CrmTable`,
 `Button`, `EmptyState`, `TaskList`, `Trace`, `TimeLanes` and
 `PermissionRequestDialog`.
-Import them from `apps/portal/src/ui` (the `index.ts` entrypoint); `ui/README.md` describes
+Import them from `foundation/ui` (the `index.ts` entrypoint); `ui/README.md` describes
 each one. If no component fits, build the new one in `ui/` on a Base UI part,
 with its own CSS file, and export it from `ui/index.ts`. A new button with a
-label is the `Button` of `apps/portal/src/ui/button.tsx`, with a `variant`
+label is the `Button` of `foundation/ui/button.tsx`, with a `variant`
 (`primary`, `secondary`, `danger` or `link`); do not give a raw `<button>` the
 classes `primary-button`, `secondary` or `danger`. Every Portal dropdown
 is the [Base UI Select](https://base-ui.com/react/components/select) in
-`apps/portal/src/ui/select.tsx`, with the Base UI part names: `Select.Root`,
+`foundation/ui/select.tsx`, with the Base UI part names: `Select.Root`,
 `Select.Trigger`, `Select.Value`, `Select.Popup`, `Select.Item`,
 `Select.Group`, `Select.GroupLabel` and `Select.Separator`. Pass `items` to
 `Select.Root`, so that the trigger shows the label and not the value. Use

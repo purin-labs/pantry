@@ -1,4 +1,4 @@
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import {
   Bot,
@@ -18,8 +18,8 @@ import {
 import { Link } from "react-router";
 
 import { providerLabel, providerTile } from "../../integration-catalogue";
-import { ProviderTile } from "../../page-components";
-import { SideDrawer } from "../../ui";
+import { ProviderTile } from "@purin-labs/ui/page-components";
+import { SideDrawer } from "@purin-labs/ui/index";
 import type {
   AccessControlGrantView,
   AccessControlSubjectView,

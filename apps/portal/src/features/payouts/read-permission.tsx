@@ -17,7 +17,7 @@ import {
   createGrants,
   enableCapabilities,
 } from "../access/permission-enable";
-import { PermissionRequestDialog } from "../../ui";
+import { PermissionRequestDialog } from "@purin-labs/ui/index";
 
 export type PayoutReadRole = "owner" | "admin";
 

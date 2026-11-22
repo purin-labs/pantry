@@ -8,14 +8,14 @@ import {
 } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
 
-import { DialogHeading, cancelDialog, syncDialog } from "../../dialog";
+import { DialogHeading, cancelDialog, syncDialog } from "@purin-labs/ui/dialog";
 import {
   Button,
   useLatestRead,
   useMutation,
   type ButtonVariant,
-} from "../../ui";
-import { Select } from "../../ui/select";
+} from "@purin-labs/ui/index";
+import { Select } from "@purin-labs/ui/select";
 import {
   readDeviceActivity,
   readDeviceSnapshots,

@@ -16,7 +16,7 @@ import {
   PermissionRequestDialog,
   PantryMark,
   type PermissionRequestDecision,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 import {
   AgentPermissionRequestPrompt,
@@ -27,7 +27,7 @@ import {
   mayEnableEvery,
 } from "../access/permission-enable";
 import { decideChatPermission } from "./api";
-import { AGENT_NAME } from "../../agent-name";
+import { AGENT_NAME } from "@purin-labs/ui/agent-name";
 import type { Chat } from "@purin-labs/control-api/portal/chat";
 import type { Variant } from "@purin-labs/type-utils";
 

@@ -5,8 +5,8 @@ import type {
   SupplyCostItem,
 } from "@purin-labs/kitchen-control-api";
 import { supplyFieldCellKey } from "@purin-labs/costs-sheet-crdt";
-import { formatMoneyMinor } from "../../formatting";
-import { CrmTable, CrmTag, Select, type CrmColumn } from "../../ui";
+import { formatMoneyMinor } from "@purin-labs/ui/formatting";
+import { CrmTable, CrmTag, Select, type CrmColumn } from "@purin-labs/ui/index";
 import { compatibleUnitsForBase, formatCostQuantity } from "./api";
 import { renderSupplyLotCostCell } from "./costs-lots-drawer";
 import {

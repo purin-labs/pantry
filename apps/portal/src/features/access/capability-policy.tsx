@@ -1,4 +1,4 @@
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { CircleAlert } from "lucide-react";
 import { Link } from "react-router";

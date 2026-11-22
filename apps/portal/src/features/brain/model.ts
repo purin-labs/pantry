@@ -7,7 +7,7 @@ import type {
 } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
 
-import type { StatusChipStatus } from "../../status-chip";
+import type { StatusChipStatus } from "@purin-labs/ui/status-chip";
 
 /** The revision now in use, when a person accepted one that still stands. */
 export function acceptedRevision(

@@ -5,7 +5,7 @@ import {
 
 import { controlRead } from "@purin-labs/control/portal/control-client";
 import { periodPath } from "@purin-labs/control/portal/control-paths";
-import type { PeriodWindow } from "../../ui";
+import type { PeriodWindow } from "@purin-labs/ui/index";
 
 /** The Orders page's reads of the Platform. */
 

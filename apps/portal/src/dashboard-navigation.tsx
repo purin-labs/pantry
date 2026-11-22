@@ -7,7 +7,7 @@ import {
   type ConsoleSidebarNavigationGroup,
   type ConsoleSidebarResolvedLink,
   type ConsoleSidebarState,
-} from "./console-sidebar";
+} from "@purin-labs/ui/console-sidebar";
 
 type DashboardNavigationProps = {
   /** Null when the page draws the console tools in its own top row. */

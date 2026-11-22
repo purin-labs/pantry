@@ -1,4 +1,4 @@
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import {
   calculateBakeryCostsAndMargins,
   parseCostsOverview,
@@ -23,16 +23,16 @@ import {
   SideDrawer,
   type CrmColumn,
   type CrmRowAction,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 import { assertNever } from "@purin-labs/std";
-import { formatMoneyMinor } from "../../formatting";
+import { formatMoneyMinor } from "@purin-labs/ui/formatting";
 import "./inventory.css";
 import { needsReorder } from "./stock-status";
 import { InventoryProductionDialog } from "./inventory-production";
 import { InventoryReconciliationDialog } from "./inventory-reconciliation";
 import { InventoryReceiptDialog } from "./inventory-receipt";
 import { InventoryPurchases } from "./inventory-purchases";
-import { ViewSwitch } from "../../ui";
+import { ViewSwitch } from "@purin-labs/ui/index";
 import { StockTimeline } from "./stock-timeline";
 
 import {

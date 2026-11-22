@@ -1,4 +1,4 @@
-import { Select } from "../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -31,8 +31,8 @@ import {
   TraceLine,
   TraceTitle,
   type TraceStatus,
-} from "../ui/trace";
-import { usePortalTheme } from "../use-portal-theme";
+} from "@purin-labs/ui/trace";
+import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
 import { TraceReferenceReplay } from "./trace-reference-replay";
 import { ChatActivityPreview } from "./chat-activity-preview";
 import "../styles.css";

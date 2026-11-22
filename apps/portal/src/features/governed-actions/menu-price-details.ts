@@ -1,4 +1,4 @@
-import { formatMoneyMinorEnglish } from "../../formatting";
+import { formatMoneyMinorEnglish } from "@purin-labs/ui/formatting";
 import type { MenuPriceDetails } from "@purin-labs/control-api/portal/menu-price-details";
 
 /** Whether the change sets a deal, ends one, or changes only the price. */

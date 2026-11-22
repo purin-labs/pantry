@@ -16,7 +16,7 @@ import {
   usePeriodRead,
   useWiderWhenEmpty,
   type TimePeriod,
-} from "../../ui";
+} from "@purin-labs/ui/index";
 import {
   executionErrorMessage,
   readScheduleRuns,

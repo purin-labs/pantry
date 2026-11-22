@@ -14,7 +14,7 @@ import {
   controlRead,
   ControlApiError,
 } from "@purin-labs/control/portal/control-client";
-import { Select } from "../../ui/select";
+import { Select } from "@purin-labs/ui/select";
 import {
   recipesPath,
   recipeError,

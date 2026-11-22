@@ -5,7 +5,7 @@ import {
   acceptOrganisationInvitation,
   type OrganisationInvitation,
 } from "../features/access/organisation-requests";
-import { Button, useMutation, type Mutation } from "../ui";
+import { Button, useMutation, type Mutation } from "@purin-labs/ui/index";
 import type { AccountFrame } from "./workspaces";
 
 type AccountInvitationRoute =

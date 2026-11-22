@@ -18,8 +18,8 @@ import {
   RecoverableError,
   type ProviderTileName,
   type StatusChipStatus,
-} from "../../page-components";
-import { workspacePagePath } from "../../route";
+} from "@purin-labs/ui/page-components";
+import { workspacePagePath } from "@purin-labs/ui/route";
 import {
   providerLabel,
   providerSearchAliases,
