@@ -1,8 +1,8 @@
 # Plan 93 — Clean cutover to new Workers and infrastructure
 
-Status: 21 November 2026. Steps 0 and 1 are done. Step 2 is on branch
-`plan-93` (see "Step 2 results"); it lands after a short freeze of dev.
-Steps 3 to 7 are open.
+Status: 22 November 2026. Steps 0 to 2 are done; step 2 landed on dev after
+a short freeze. Step 3 is in progress (see "Step 3 results"). Steps 4 to 7
+are open.
 
 Change on 21 November 2026 ([Plan 95](plan-95-pantry-own-accounts.md) step
 4): Pantry no longer binds the Console. The new stack has no
@@ -468,6 +468,48 @@ worktree:
 6. Check: the Portal loads on `pantry.purin.io`, a sign-up makes a new
    organisation in Pantry, the chat answers, and the idle-tenant
    check writes close to nothing in one hour.
+
+#### Step 3 results (22 November 2026)
+
+The owner said "Freeze now" and "Yes, all of step 3" on 22 November 2026,
+and chose the OpenRouter key of the local `.env.local` for the new Worker.
+Dev had not moved since `79462c0f`, and the codemod run on it gave a tree
+equal to the tested one (the same 112 collisions), so the freeze run needed
+no new review.
+
+**3.1 Resources.** Made with Wrangler and the account token:
+
+| Resource | Name | Id or note |
+|---|---|---|
+| D1 (global) | `pantry-global-apac` | `ced3f859-6a2b-4e54-bc8e-92d2dae424fa`, served from NRT |
+| D1 (regional) | `pantry-organisation-apac` | `130a94eb-71a6-40a9-991d-b359f36a939a`, served from NRT |
+| R2 | `pantry-archive-apac`, `pantry-commerce-apac`, `pantry-repo-binaries-apac` | location hint `apac` |
+| KV | `pantry-policy` | `1b538734635b4da481ac9cf7c3315d36` |
+| Queues | `pantry-events`, `pantry-cues`, `pantry-event-dlq`, `pantry-cue-dlq` | |
+| Secrets Store | `pantry-data-encryption-root`, `pantry-vault-root` | 32 random bytes each, in store `41fe2fa0…` |
+
+The two baselines loaded with `d1 execute --file`, and
+`run-worker.mjs platform schema production` reports 50 and 375 objects that
+match. A database made with the hint `apac` was served from Singapore,
+Seoul or Hong Kong in six tries. A database made from this Mac with no hint
+was served from Tokyo or Osaka, so both databases were made again that way
+until each query answered from NRT. The profiles name the real ids, and the
+release guard's placeholder check went with the placeholder.
+
+The secrets that Pantry makes (session, admin, Slack state, commerce service
+token, WhatsApp verify token, buyer session, Ed25519 signing key, carrier
+key and the two roots) are new values in the git-ignored
+`.env.local.production`, with the prefix `PANTRY_STACK_`. The required
+`SQUARE_SANDBOX_DEFAULT_ACCESS_TOKEN` went from the profile: no code reads
+it, and a first deploy refuses a missing required secret.
+
+**3.2 Repo binaries.** All 3,574 objects (2.4 GB) of
+`satyr-repo-binaries-apac` are in `pantry-repo-binaries-apac`: 3,568 from
+the local cache and 6 from the old bucket, each checked against its
+`sha256/<hash>` name. A random sample of 20, read back from the new bucket,
+matched. The read-only R2 key of CI (`R2_READ_*`) reads only the old bucket
+(HEAD answers 403 on the new one). The owner chose to push anyway, so the CI
+fetch fails until that key can read `pantry-repo-binaries-apac`.
 
 ### 4. Switch the outside parties
 
