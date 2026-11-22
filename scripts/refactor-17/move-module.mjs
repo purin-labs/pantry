@@ -383,14 +383,21 @@ stopOnFaults();
 // ---------------------------------------------------------------------------
 // 2. The package files.
 
-const versions = JSON.parse(original(plan.package.versionsFrom));
+// One manifest, or a list: a package with Worker files and Portal files takes
+// the versions of the Worker and of the Portal. The first one that has the
+// name gives its version.
+const versionSources = [plan.package.versionsFrom].flat();
+const versions = versionSources.map((path) => JSON.parse(original(path)));
 function versionOf(name) {
-  const version = { ...versions.dependencies, ...versions.devDependencies }[
-    name
-  ];
+  const version = versions
+    .map((manifest) => ({
+      ...manifest.dependencies,
+      ...manifest.devDependencies,
+    }))
+    .find((all) => all[name] !== undefined)?.[name];
   if (version === undefined) {
     faults.push(
-      `${plan.package.versionsFrom} has no version of ${name}, which the plan gives the package.`,
+      `${versionSources.join(", ")} has no version of ${name}, which the plan gives the package.`,
     );
   }
   return version;
