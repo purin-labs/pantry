@@ -1,0 +1,90 @@
+{
+  "about": "Refactor 17, Stage B, decision D1: the foundation module control becomes the workspace package @purin-labs/control in foundation/control. scripts/refactor-17/move-module.mjs reads this plan. files: each source file that scripts/layers.json gives the module, with its place in the target folder. sourcePrefixes: where --sync-plan puts a file that the module gets later. package: the manifest and the tsconfig of the new package; the versions of devDependencies come from versionsFrom. edits: text edits of the files that name a root folder and cannot read scripts/lib/source-roots.mjs, and of a path that is no import; an edit is done when the file holds its replace text. keepForm: each file where an import stays on its line, because the wrap of Prettier would move a ratchet, with its reason. regenerate: the commands that write a generated file again. The package holds the two sides of the module apart: worker/ for the Worker files (services/platform/src/control/ and gateway/request-helpers.ts) and portal/ for the Portal files (apps/portal/src/). The tsconfig of the package reads worker/ only; the Portal type check checks each file of portal/ that the Portal imports, with the DOM types. package.typeCheck false: the package has no check:types script of its own. Its own files read the Env keys ORGANISATION (worker/credential-revocation-policy.ts, worker/routes/access-control-mutations.ts) and CASE (worker/routes/access-control.ts), which services/platform/src/actors/organisation.ts and actors/case.ts (workers/platform) merge with declare module of @purin-labs/kernel/env. Through @purin-labs/tenancy, @purin-labs/actor-runtime and @purin-labs/authority the program also lacks SESSION and CONNECTOR. The package alone gives 51 errors, 6 of them in its own files. The Worker program checks its files.",
+  "module": "foundation/control",
+  "target": "foundation/control",
+  "workspaceEntry": "foundation/*",
+  "sourcePrefixes": {
+    "services/platform/src/control/": "worker/",
+    "services/platform/src/gateway/": "worker/gateway/",
+    "apps/portal/src/": "portal/"
+  },
+  "files": {
+    "apps/portal/src/approval-sign-in-popup.ts": "portal/approval-sign-in-popup.ts",
+    "apps/portal/src/control-client.ts": "portal/control-client.ts",
+    "apps/portal/src/control-paths.ts": "portal/control-paths.ts",
+    "apps/portal/src/mutation-state.ts": "portal/mutation-state.ts",
+    "apps/portal/src/page-content.ts": "portal/page-content.ts",
+    "services/platform/src/control/admission/control-mutation.ts": "worker/admission/control-mutation.ts",
+    "services/platform/src/control/admission/organisation-socket.ts": "worker/admission/organisation-socket.ts",
+    "services/platform/src/control/authorization.ts": "worker/authorization.ts",
+    "services/platform/src/control/credential-revocation-policy.ts": "worker/credential-revocation-policy.ts",
+    "services/platform/src/control/decide-pending-decision.ts": "worker/decide-pending-decision.ts",
+    "services/platform/src/control/google-oidc-config.ts": "worker/google-oidc-config.ts",
+    "services/platform/src/control/home-region.ts": "worker/home-region.ts",
+    "services/platform/src/control/http.ts": "worker/http.ts",
+    "services/platform/src/control/installation-pins.ts": "worker/installation-pins.ts",
+    "services/platform/src/control/mutation-receipt.ts": "worker/mutation-receipt.ts",
+    "services/platform/src/control/mutation.ts": "worker/mutation.ts",
+    "services/platform/src/control/oidc.ts": "worker/oidc.ts",
+    "services/platform/src/control/path-match.ts": "worker/path-match.ts",
+    "services/platform/src/control/pending-decisions.ts": "worker/pending-decisions.ts",
+    "services/platform/src/control/permission-required.ts": "worker/permission-required.ts",
+    "services/platform/src/control/routes/access-control-explain.ts": "worker/routes/access-control-explain.ts",
+    "services/platform/src/control/routes/access-control-mutations.ts": "worker/routes/access-control-mutations.ts",
+    "services/platform/src/control/routes/access-control.ts": "worker/routes/access-control.ts",
+    "services/platform/src/control/routes/pending-decisions.ts": "worker/routes/pending-decisions.ts",
+    "services/platform/src/control/routes/vault.ts": "worker/routes/vault.ts",
+    "services/platform/src/gateway/request-helpers.ts": "worker/gateway/request-helpers.ts"
+  },
+  "package": {
+    "name": "@purin-labs/control",
+    "exports": {
+      "./*": {
+        "types": "./*.ts",
+        "default": "./*.ts"
+      }
+    },
+    "dependencies": {
+      "@purin-labs/actor-runtime": "workspace:*",
+      "@purin-labs/authority": "workspace:*",
+      "@purin-labs/connections": "workspace:*",
+      "@purin-labs/contracts": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/type-utils": "workspace:*"
+    },
+    "devDependencies": ["@cloudflare/workers-types", "tsrs"],
+    "versionsFrom": "services/platform/package.json",
+    "tsconfig": {
+      "extends": "../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": ["ESNext"],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": ["@cloudflare/workers-types"],
+        "allowImportingTsExtensions": true
+      },
+      "include": ["worker/**/*.ts"]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the Portal lints and the ESLint rules of the Portal source read the Portal side of the package",
+      "find": "export const PORTAL_SOURCE = [\"apps/portal/src\", \"foundation/ui\"];",
+      "replace": "export const PORTAL_SOURCE = [\n  \"apps/portal/src\",\n  \"foundation/control/portal\",\n  \"foundation/ui\",\n];"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": ["node", "scripts/check-layers.mjs", "--areas", "--write"],
+      "writes": ["docs/layers.md"]
+    }
+  ]
+}
