@@ -19,9 +19,7 @@ import {
   recordEmailThreadCase,
   registerEmailMailboxAccount,
 } from "../src/data/email-mailbox";
-import {
-  gmailConnectorIdValue,
-} from "../src/mail-inbox/contract/connector-ids";
+import { gmailConnectorIdValue } from "../src/mail-inbox/contract/connector-ids";
 import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,
@@ -187,10 +185,13 @@ function policyBoundaryTest(): void {
   expect(
     parseMailboxIngressPolicyPublishRequest(enabledPublishRequest()).ok,
   ).toBe(true);
+  // The Portal's Turn on names no limits; the mailbox takes the defaults.
+  expect(parseMailboxIngressPolicyPublishRequest({ kind: "enabled" }).ok).toBe(
+    true,
+  );
 
   const invalidCases: readonly unknown[] = [
     null,
-    { kind: "enabled" },
     { kind: "enabled_by_default" },
     { kind: "disabled_by_operator", maxActiveCases: 1 },
     { ...enabledPublishRequest(), maxActiveCases: 0 },
@@ -549,7 +550,8 @@ async function createOrganisationWithGmailAccount(
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE:
+        TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: `Mailbox ${slug}`,

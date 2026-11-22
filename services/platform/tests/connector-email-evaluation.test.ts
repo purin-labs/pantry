@@ -49,6 +49,7 @@ import {
   reserveEmailTokens,
   recordEmailAdmissions,
   recordEmailCaseContextDiscovery,
+  recordEmailReplyTurn,
   retryEmailCaseContextDiscovery,
   utcDayKey,
   createConnectorEmailSchema,
@@ -350,15 +351,26 @@ async function pauseFor(
     });
   }
   if (input.admitted !== undefined) {
+    // Earlier emails that are still in progress: each was admitted, and its
+    // reply turn waits, as the evaluation queues it.
+    const admitted = Array.from({ length: input.admitted }, (_, index) => ({
+      providerMessageId: `prior-${index}`,
+      threadId: `prior-thread-${index}`,
+      caseId: `case_prior_${index}`,
+    }));
     recordEmailAdmissions(storage.sql, {
-      admitted: Array.from({ length: input.admitted }, (_, index) => ({
-        providerMessageId: `prior-${index}`,
-        threadId: `prior-thread-${index}`,
-        caseId: `case_prior_${index}`,
-      })),
+      admitted,
       policyVersion: 1,
       now: NOW,
     });
+    for (const email of admitted) {
+      recordEmailReplyTurn(storage.sql, {
+        caseId: email.caseId,
+        threadId: email.threadId,
+        messageIds: [email.providerMessageId],
+        now: NOW,
+      });
+    }
   }
   acceptEmailHint(storage.sql, {
     notificationId: "n1",
@@ -741,7 +753,8 @@ async function createFixture(slug: string): Promise<Fixture> {
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE:
+        TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: `Evaluation ${slug}`,
@@ -797,7 +810,8 @@ async function createFixture(slug: string): Promise<Fixture> {
   return {
     env: platformEnv({
       DB: db,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE:
+        TEST_ORGANISATION_PLACEMENT_PROFILE,
     }),
     organisationId: organisation.organisationId,
     integrationAccountId: connected.account.integrationAccountId,
