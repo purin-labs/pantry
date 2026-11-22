@@ -170,7 +170,7 @@ import {
   handleDeviceControlRoute,
   matchDeviceControlRoute,
   type DeviceControlRoute,
-} from "./control/routes/devices";
+} from "@purin-labs/area-devices/server/control/routes/devices";
 import {
   handleBakeControlRoute,
   matchBakeControlRoute,

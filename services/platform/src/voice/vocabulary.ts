@@ -5,7 +5,7 @@ import {
   CAFE_STOREFRONT_ID,
 } from "../control/routes/commerce-menu-publication";
 import { resolveCafeBuyer } from "../control/routes/menu-screens";
-import { listDevices } from "../devices/store";
+import { listDevices } from "@purin-labs/area-devices/server/store";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";

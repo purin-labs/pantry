@@ -12,7 +12,7 @@ import {
 
 import { env } from "cloudflare:workers";
 
-import { deviceFleetStub } from "../../src/devices/contract/fleet-stub";
+import { deviceFleetStub } from "@purin-labs/area-devices/server/contract/fleet-stub";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";

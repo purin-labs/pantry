@@ -7,10 +7,10 @@ import { commerceProviderResourceId } from "../commerce/contract/resource-ids";
 import { createCommerceOutboxReconcileQueueMessage } from "../commerce/contract/queue-messages";
 import { executeStockOperation } from "../kitchen/contract/stock-action-execution";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
-import { runDeviceCommand } from "../devices/commands";
-import { listDevices, listGateways } from "../devices/store";
-import { readKitchenDeviceViews } from "../devices/views";
-import { changeDeviceWork, reserveDeviceWork } from "../devices/work";
+import { runDeviceCommand } from "@purin-labs/area-devices/server/commands";
+import { listDevices, listGateways } from "@purin-labs/area-devices/server/store";
+import { readKitchenDeviceViews } from "@purin-labs/area-devices/server/views";
+import { changeDeviceWork, reserveDeviceWork } from "@purin-labs/area-devices/server/work";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import type { BakeKitchenPorts } from "../kitchen/bakes/commands";
@@ -24,7 +24,7 @@ import {
   tellBakeRunOverBake,
 } from "../slack/bake-run-announce";
 import type { BakeRunActor } from "./bake-run";
-import { deviceFleetStub } from "../devices/contract/fleet-stub";
+import { deviceFleetStub } from "@purin-labs/area-devices/server/contract/fleet-stub";
 
 /**
  * The Worker's side of a bake run (Plan 24 S4). Kitchen owns the run and

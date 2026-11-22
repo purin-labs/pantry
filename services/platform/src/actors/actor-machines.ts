@@ -4,7 +4,7 @@ import { CASE_APPROVAL_WAIT_MACHINE } from "@purin-labs/conversation/actors/case
 import { CASE_ASSIGNMENT_MACHINE } from "@purin-labs/conversation/actors/case/assignment.machine";
 import { CASE_OUTPUT_MACHINE } from "@purin-labs/conversation/actors/case/output.machine";
 import { CUE_DELIVERY_MACHINE } from "@purin-labs/agent/actors/cue-delivery.machine";
-import { DEVICE_COMMAND_MACHINE } from "./device-command.machine";
+import { DEVICE_COMMAND_MACHINE } from "@purin-labs/area-devices/server/actors/device-command.machine";
 import { STEERING_INPUT_MACHINE } from "@purin-labs/agent/actors/steering-input.machine";
 import { WHATSAPP_REPLY_PROPOSAL_MACHINE } from "./whatsapp-reply-proposal.machine";
 import { EMAIL_REPLY_PROPOSAL_MACHINE } from "../data/email-reply-proposal.machine";

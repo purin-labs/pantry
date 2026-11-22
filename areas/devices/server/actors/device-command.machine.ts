@@ -10,7 +10,7 @@ import type { MachineDefinition } from "@purin-labs/std/state-machine";
  */
 export const DEVICE_COMMAND_MACHINE = {
   name: "device_command",
-  owner: "services/platform/src/actors/device-command.ts",
+  owner: "areas/devices/server/actors/device-command.ts",
   store: {
     table: "device_command",
     key: "command_id",

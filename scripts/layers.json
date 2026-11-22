@@ -5,7 +5,8 @@
     "services/platform/src/",
     "apps/portal/src/",
     "foundation/",
-    "packages/collaboration/"
+    "packages/collaboration/",
+    "areas/"
   ],
   "layers": ["foundation", "areas", "surfaces", "workers"],
   "foundationOrder": [
@@ -27,6 +28,7 @@
     "testing"
   ],
   "packages": {
+    "areas/devices": "areas/devices",
     "foundation/ui": "foundation/ui",
     "foundation/tool-handlers": "foundation/tool-handlers",
     "foundation/conversation": "foundation/conversation",
@@ -116,7 +118,7 @@
     "apps/portal/src/execution-client.ts",
     "apps/portal/src/features/brain/api.ts",
     "apps/portal/src/features/brain/address.ts",
-    "services/platform/src/devices/contract/"
+    "areas/devices/server/contract/"
   ],
   "mixed": {
     "services/platform/src/agent-tools/registry.ts": "The one list of the agent tools, in the order of the catalog digest. It imports the tool family of each area (Kitchen, commerce, Cafe, the Inbox, integrations and devices) and the Slack tools (agent-tools/slack/slack.ts), so it is a part of the Worker. agent-tools/session-wiring.ts gives it to the class SessionDO (step A1.7).",
@@ -405,6 +407,7 @@
     "workspace_revision_receipt": "foundation/agent"
   },
   "rules": {
+    "areas/devices/": "areas/devices",
     "foundation/tool-handlers/": "foundation/tool-handlers",
     "foundation/conversation/": "foundation/conversation",
     "foundation/agent/": "foundation/agent",
@@ -431,7 +434,6 @@
     "apps/portal/src/features/commerce/": "areas/commerce",
     "apps/portal/src/features/content-studio/": "areas/cafe",
     "apps/portal/src/features/costs/": "areas/kitchen",
-    "apps/portal/src/features/devices/": "areas/devices",
     "apps/portal/src/features/ecommerce/": "areas/commerce",
     "apps/portal/src/features/email-review/": "areas/inbox",
     "apps/portal/src/features/governed-actions/": "areas/commerce",
@@ -461,7 +463,6 @@
     "services/platform/src/agent-tools/channels/": "areas/inbox",
     "services/platform/src/agent-tools/commerce/": "areas/commerce",
     "services/platform/src/agent-tools/costs/": "areas/kitchen",
-    "services/platform/src/agent-tools/devices/": "areas/devices",
     "services/platform/src/agent-tools/integrations/": "areas/integrations",
     "services/platform/src/agent-tools/jev/": "areas/integrations",
     "services/platform/src/agent-tools/kitchen/": "areas/kitchen",
@@ -482,7 +483,6 @@
     "services/platform/src/control/routes/custom-connectors/": "areas/integrations",
     "services/platform/src/control/routes/integrations/": "areas/integrations",
     "services/platform/src/custom-connectors/": "areas/integrations",
-    "services/platform/src/devices/": "areas/devices",
     "services/platform/src/evals/": "areas/brain",
     "services/platform/src/external-records/": "areas/integrations",
     "services/platform/src/gateway-routing/": "surfaces/webhooks",
@@ -580,15 +580,8 @@
     "services/platform/src/actors/connector/slack-delivery.ts": "surfaces/slack",
     "services/platform/src/actors/connector/whatsapp-parsers.ts": "surfaces/whatsapp",
     "services/platform/src/actors/costs-sheet-draft.ts": "areas/kitchen",
-    "services/platform/src/actors/device-command.machine.ts": "areas/devices",
-    "services/platform/src/actors/device-command.ts": "areas/devices",
     "services/platform/src/actors/bake-run.ts": "workers/platform",
     "services/platform/src/actors/bake-run-ports.ts": "workers/platform",
-    "services/platform/src/actors/device-fleet-cobot.ts": "areas/devices",
-    "services/platform/src/actors/device-fleet-printer.ts": "areas/devices",
-    "services/platform/src/actors/device-fleet-schema.ts": "areas/devices",
-    "services/platform/src/actors/device-fleet-terminal.ts": "areas/devices",
-    "services/platform/src/actors/device-fleet.ts": "areas/devices",
     "services/platform/src/actors/email-active-content.ts": "areas/inbox",
     "services/platform/src/actors/email-case-admission.ts": "areas/inbox",
     "services/platform/src/actors/email-case-context-collection-evidence.ts": "areas/inbox",
@@ -729,7 +722,6 @@
     "services/platform/src/control/routes/counter-sale-support.ts": "areas/cafe",
     "services/platform/src/control/routes/counter-sale.ts": "areas/cafe",
     "services/platform/src/control/routes/custom-connectors.ts": "areas/integrations",
-    "services/platform/src/control/routes/devices.ts": "areas/devices",
     "services/platform/src/control/routes/email-draft.ts": "areas/inbox",
     "services/platform/src/control/routes/evals.ts": "areas/brain",
     "services/platform/src/control/routes/failed-payments.ts": "areas/commerce",

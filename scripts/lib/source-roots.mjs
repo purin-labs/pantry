@@ -9,12 +9,20 @@ import { readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 /** The top-level folders that hold product source. */
-export const SOURCE_ROOTS = ["apps", "foundation", "packages", "services"];
+export const SOURCE_ROOTS = [
+  "apps",
+  "areas",
+  "foundation",
+  "packages",
+  "services",
+];
 
 /** The folders that hold the source of the Platform Worker. */
 export const PLATFORM_SOURCE = ["services/platform/src", "foundation"];
 // The Worker side of packages/collaboration (Refactor 17, Stage B).
 PLATFORM_SOURCE.push("packages/collaboration/worker");
+// The Worker side of the area devices (Refactor 17, Stage B).
+PLATFORM_SOURCE.push("areas/devices/server");
 
 /**
  * The folders that hold the source of the Portal, in the browser. The package
@@ -29,6 +37,8 @@ export const PORTAL_SOURCE = [
 ];
 // The Portal side of packages/collaboration (Refactor 17, Stage B).
 PORTAL_SOURCE.push("packages/collaboration/portal");
+// The Portal side of the area devices (Refactor 17, Stage B).
+PORTAL_SOURCE.push("areas/devices/ui");
 
 /** True when a repository path is in one of `folders`. */
 export function inFolders(path, folders) {

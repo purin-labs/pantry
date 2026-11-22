@@ -30,7 +30,7 @@ import { runScheduledActorRegistryReconciliation } from "@purin-labs/actor-runti
 import { handleCommerceWebhook } from "./commerce/webhooks";
 import { handleMenuScreenRequest } from "./control/routes/menu-screens";
 import { handleVoiceMacRequest } from "./voice/mac-routes";
-import { handleDeviceGatewayRequest } from "./devices/gateway-routes";
+import { handleDeviceGatewayRequest } from "@purin-labs/area-devices/server/gateway-routes";
 import { assertNever } from "@purin-labs/std";
 import {
   handleAdministerActorRegistry,
@@ -112,7 +112,7 @@ export { CodeModePlatformGovernorActor } from "@purin-labs/agent/actors/code-mod
 
 export { ConversationResidencyActor } from "@purin-labs/actor-runtime/actors/conversation-residency";
 
-export { DeviceFleetActor } from "./actors/device-fleet";
+export { DeviceFleetActor } from "@purin-labs/area-devices/server/actors/device-fleet";
 export { BakeRunActor } from "./actors/bake-run";
 
 export { SessionDO } from "./actors/agent-session";

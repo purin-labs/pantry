@@ -41,7 +41,7 @@ import {
   deviceProposal,
   deviceRead,
   deviceSnapshotRead,
-} from "./devices/devices";
+} from "@purin-labs/area-devices/server/agent-tools/devices/devices";
 import {
   menuBoardArchive,
   menuBoardComment,

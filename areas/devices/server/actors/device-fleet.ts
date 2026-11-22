@@ -25,12 +25,9 @@ import {
   offlineDelayMs,
   syncDeviceFaultAlert,
   syncGatewayAlerts,
-} from "../devices/alerts";
-import { gatewayConnection, type GatewayPresence } from "../devices/readiness";
-import {
-  pruneDeviceSnapshots,
-  requestFaultSnapshots,
-} from "../devices/snapshots";
+} from "../alerts";
+import { gatewayConnection, type GatewayPresence } from "../readiness";
+import { pruneDeviceSnapshots, requestFaultSnapshots } from "../snapshots";
 import {
   applyGatewayHello,
   applyHealthReports,
@@ -41,8 +38,8 @@ import {
   readGateway,
   recordDeviceEvent,
   recordGatewayHeard,
-} from "../devices/store";
-import { changeDeviceWork, type DeviceWorkChange } from "../devices/work";
+} from "../store";
+import { changeDeviceWork, type DeviceWorkChange } from "../work";
 import type { Env } from "@purin-labs/kernel/env";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import {

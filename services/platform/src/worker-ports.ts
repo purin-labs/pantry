@@ -85,7 +85,7 @@ import { slackDmSelection } from "@purin-labs/authority/slack/installation-store
 import { permissionRequestNoticeText } from "./slack/permission-request-notice";
 import { releaseAgentPermissionDecision } from "./slack/permission-request-release";
 import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
-import { shopMacDevices } from "./devices/contract/shop-mac-devices";
+import { shopMacDevices } from "@purin-labs/area-devices/server/contract/shop-mac-devices";
 import { readShopMacDevices } from "./voice/mac-devices";
 import { commerceApprovalCardTexts } from "./commerce/contract/approval-card-texts";
 import {
@@ -113,8 +113,8 @@ import {
 } from "./data/operator-configuration-draft";
 import { workflowChanges } from "./kitchen/contract/workflow-changes";
 import { applyApprovedWorkflowChange } from "./commerce/bakery/workflow-proposals";
-import { deviceCommands } from "./devices/contract/device-commands";
-import { runDeviceCommand } from "./devices/commands";
+import { deviceCommands } from "@purin-labs/area-devices/server/contract/device-commands";
+import { runDeviceCommand } from "@purin-labs/area-devices/server/commands";
 import { connectionFlowParts } from "@purin-labs/connections/data/connection-flow-parts";
 import { prepareCredentialRefReplacement } from "@purin-labs/authority/credential-vault/service";
 import { prepareCommunicationDestinationAccount } from "./data/onboarding";

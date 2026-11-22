@@ -60,7 +60,7 @@ A gateway is `quiet` when its socket is closed or it is silent for more than 90 
 quiet or offline gateway, and `closed` when revoked. A Square terminal is
 `managed_by_provider`. When nothing blocks it, its row says "Managed by Square".
 
-`deviceReadiness` (`services/platform/src/devices/readiness.ts`) gives the one answer:
+`deviceReadiness` (`areas/devices/server/readiness.ts`) gives the one answer:
 
 1. Blocked, in this order: work `result_unknown`; enrollment `revoked`, `pending` or
    `restricted`; a connection that is not `connected` (`connection_lost`); health
@@ -119,7 +119,7 @@ a Square problem.
 
 ### Agents
 
-The tools are in `services/platform/src/agent-tools/devices/`. A turn offers a tool when
+The tools are in `areas/devices/server/agent-tools/devices/`. A turn offers a tool when
 it holds the capability. No image reaches a model.
 
 | Tool                   | Capability           | Effect   | What it does                                                                                                                                                               |
@@ -134,7 +134,7 @@ it holds the capability. No image reaches a model.
 - Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`):
   `device_gateway`, `device_enrollment`, `device_event`, `device_alert`,
   `device_alert_setting`, `device_camera_policy` and `device_snapshot`.
-- `DeviceFleetActor` (`services/platform/src/actors/device-fleet.ts`): one for each
+- `DeviceFleetActor` (`areas/devices/server/actors/device-fleet.ts`): one for each
   Organisation and location, named `device_fleet:<organisationId>:<locationId>` and
   placed with the Organisation (`devices/contract/fleet-stub.ts`). Its SQLite tables
   (`device-fleet-schema.ts`) are `device_fleet_scope`, `gateway_presence`,
@@ -157,7 +157,7 @@ it holds the capability. No image reaches a model.
   exchanges the code. The credential works only on `GET /v1/device-gateways/socket` and
   `POST /v1/device-gateways/snapshots/:id`.
 
-The control routes (`services/platform/src/control/routes/devices.ts`) are under
+The control routes (`areas/devices/server/control/routes/devices.ts`) are under
 `/v1/control/organisations/:id/devices`:
 
 | Route                                                                    | Role                          | Purpose                                                                                |

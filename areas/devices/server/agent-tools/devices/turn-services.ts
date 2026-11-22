@@ -4,7 +4,7 @@ import {
 } from "@purin-labs/agent/actors/session/proposal-staging";
 import type { ToolTurnContext } from "@purin-labs/agent/actors/session/tool-wiring";
 import { roleMayOperate } from "@purin-labs/tenancy/data/control-plane";
-import { readDevice } from "../../devices/store";
+import { readDevice } from "../../store";
 import {
   withToolContext,
   type SessionToolContext,

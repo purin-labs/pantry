@@ -1,4 +1,5 @@
 {
+  "areas/devices/server/alerts.ts": 1,
   "foundation/actor-runtime/actors/actor-placement-admission.ts": 2,
   "foundation/actor-runtime/actors/actor-relocation.ts": 1,
   "foundation/actor-runtime/actors/organisation-archive-cleanup.ts": 1,
@@ -25,7 +26,6 @@
   "services/platform/src/control/routes/bakery-runs.ts": 2,
   "services/platform/src/data/bakery-agent-run-save.ts": 1,
   "services/platform/src/data/screen-pairing.ts": 1,
-  "services/platform/src/devices/alerts.ts": 1,
   "services/platform/src/gateway/admin/actor-registry.ts": 1,
   "services/platform/src/slack/ingress-admission.ts": 1,
   "services/platform/src/slack/install-organisation.ts": 1

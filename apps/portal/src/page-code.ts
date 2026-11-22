@@ -140,7 +140,8 @@ async function loadPaymentsRoute() {
 }
 
 async function loadDevicesRoute() {
-  const { DevicesRoute } = await import("./features/devices/route");
+  const { DevicesRoute } =
+    await import("@purin-labs/area-devices/ui/features/devices/route");
   return { default: DevicesRoute };
 }
 

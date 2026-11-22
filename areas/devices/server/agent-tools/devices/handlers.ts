@@ -1,11 +1,8 @@
-import { runDeviceCommand } from "../../devices/commands";
-import {
-  listStoredSnapshots,
-  snapshotsAreEnabled,
-} from "../../devices/snapshots";
-import { listDevices } from "../../devices/store";
-import { readKitchenDeviceViews } from "../../devices/views";
-import { shopMacDevices } from "../../devices/contract/shop-mac-devices";
+import { runDeviceCommand } from "../../commands";
+import { listStoredSnapshots, snapshotsAreEnabled } from "../../snapshots";
+import { listDevices } from "../../store";
+import { readKitchenDeviceViews } from "../../views";
+import { shopMacDevices } from "../../contract/shop-mac-devices";
 import { normalizeUntrustedCommerceText } from "@purin-labs/agent-tools/context/untrusted-commerce-text";
 import {
   DeviceRequestError,

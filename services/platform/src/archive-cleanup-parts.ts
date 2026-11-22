@@ -1,7 +1,7 @@
 import type { ArchiveCleanupParts } from "./data/onboarding-reconciliation";
 import { purgeOrganisationWhatsAppConnectors } from "./data/whatsapp";
-import { purgeOrganisationDeviceFleets } from "./devices/purge";
-import { revokeOrganisationDevicesStatements } from "./devices/store";
+import { purgeOrganisationDeviceFleets } from "@purin-labs/area-devices/server/purge";
+import { revokeOrganisationDevicesStatements } from "@purin-labs/area-devices/server/store";
 import {
   listSlackInstallationCredentialHandles,
   revokeSlackOrganisationConnections,

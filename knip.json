@@ -76,6 +76,16 @@
       ],
       "project": ["src/.vitepress/**/*.{ts,vue}", "scripts/*.mjs"]
     },
+    "areas/*": {
+      "entry": [
+        "server/**/*.fixtures.ts",
+        "server/**/*.type-fixtures.ts",
+        "ui/**/*.type-fixtures.ts",
+        "ui/**/*.typecheck.ts"
+      ],
+      "project": ["**/*.{ts,tsx}"],
+      "includeEntryExports": true
+    },
     "foundation/ui": {
       "entry": ["**/*.type-fixtures.ts"],
       "project": ["**/*.{ts,tsx}"]

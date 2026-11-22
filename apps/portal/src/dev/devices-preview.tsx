@@ -8,7 +8,7 @@ import type {
   KitchenDeviceView,
 } from "@purin-labs/control-api";
 import "../styles.css";
-import { DevicesRoute } from "../features/devices/route";
+import { DevicesRoute } from "@purin-labs/area-devices/ui/features/devices/route";
 
 // The Devices page with a stand-in list. `?role=viewer` removes the network
 // facts, `?list=empty` shows no device, `?list=partial` leaves out a kind and

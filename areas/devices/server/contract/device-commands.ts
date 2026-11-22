@@ -1,4 +1,4 @@
-import type { runDeviceCommand } from "../../devices/commands";
+import type { runDeviceCommand } from "../commands";
 import { definePort } from "@purin-labs/kernel/port";
 
 /**

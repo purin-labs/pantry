@@ -10,7 +10,7 @@ import {
   bindAllowanceReference,
   commerceToolServices,
 } from "./commerce/turn-services";
-import { deviceToolServices } from "./devices/turn-services";
+import { deviceToolServices } from "@purin-labs/area-devices/server/agent-tools/devices/turn-services";
 import { createMenuBoardDraftPreview } from "./drafts/board-draft-preview";
 import { menuToolServices } from "./drafts/turn-services";
 import {

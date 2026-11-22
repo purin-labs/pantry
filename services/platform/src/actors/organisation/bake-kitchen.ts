@@ -9,7 +9,7 @@ import {
 import {
   findActiveDeviceWithCapability,
   listGateways,
-} from "../../devices/store";
+} from "@purin-labs/area-devices/server/store";
 import type { Env } from "@purin-labs/kernel/env";
 import type {
   BakeKitchenPorts,

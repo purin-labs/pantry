@@ -67,6 +67,9 @@ importers:
       '@base-ui/react':
         specifier: ^1.8.0
         version: 1.8.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@purin-labs/area-devices':
+        specifier: workspace:*
+        version: link:../../areas/devices
       '@purin-labs/bakery-model':
         specifier: workspace:*
         version: link:../../packages/bakery-model
@@ -219,6 +222,64 @@ importers:
       vitest:
         specifier: ^4.1.0
         version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@25.9.3)(msw@2.15.0(@types/node@25.9.3)(typescript@5.9.3))(vite@8.0.16(@types/node@25.9.3)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+
+  areas/devices:
+    dependencies:
+      '@purin-labs/actor-runtime':
+        specifier: workspace:*
+        version: link:../../foundation/actor-runtime
+      '@purin-labs/agent':
+        specifier: workspace:*
+        version: link:../../foundation/agent
+      '@purin-labs/agent-tools':
+        specifier: workspace:*
+        version: link:../../foundation/agent-tools
+      '@purin-labs/authority':
+        specifier: workspace:*
+        version: link:../../foundation/authority
+      '@purin-labs/cafe-control-api':
+        specifier: workspace:*
+        version: link:../../packages/cafe-control-api
+      '@purin-labs/control':
+        specifier: workspace:*
+        version: link:../../foundation/control
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../packages/control-api
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../../foundation/kernel
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../packages/std
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../../foundation/tenancy
+      '@purin-labs/tool-handlers':
+        specifier: workspace:*
+        version: link:../../foundation/tool-handlers
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../packages/type-utils
+      '@purin-labs/ui':
+        specifier: workspace:*
+        version: link:../../foundation/ui
+      react:
+        specifier: ^19.1.1
+        version: 19.2.7
+      react-router:
+        specifier: ^7.18.2
+        version: 7.18.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      '@types/react':
+        specifier: ^19.1.12
+        version: 19.2.17
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
 
   foundation/actor-runtime:
     dependencies:
@@ -1235,6 +1296,9 @@ importers:
       '@purin-labs/agent-tools':
         specifier: workspace:*
         version: link:../../foundation/agent-tools
+      '@purin-labs/area-devices':
+        specifier: workspace:*
+        version: link:../../areas/devices
       '@purin-labs/async-control':
         specifier: workspace:*
         version: link:../../packages/async-control

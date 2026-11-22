@@ -264,14 +264,15 @@ import. A module with no line for one of these has none.
 ## areas/devices
 
 - Folders: 6
-  - `apps/portal/src/features/devices/`
-  - `services/platform/src/actors/`
-  - `services/platform/src/agent-tools/devices/`
-  - `services/platform/src/control/routes/`
-  - `services/platform/src/devices/`
-  - `services/platform/src/devices/contract/`
+  - `areas/devices/server/`
+  - `areas/devices/server/actors/`
+  - `areas/devices/server/agent-tools/devices/`
+  - `areas/devices/server/contract/`
+  - `areas/devices/server/control/routes/`
+  - `areas/devices/ui/features/devices/`
+- Packages: `areas/devices`
 - Tables (7): `device_alert`, `device_alert_setting`, `device_camera_policy`, `device_enrollment`, `device_event`, `device_gateway`, `device_snapshot`
-- Public files: `services/platform/src/devices/contract/`
+- Public files: `areas/devices/server/contract/`
 
 ## areas/inbox
 

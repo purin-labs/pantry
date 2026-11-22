@@ -2,7 +2,7 @@ import { currentGrantedCapabilityIds } from "@purin-labs/authority/authorization
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   mailControlAuthority,
-} from "../../mail-inbox/contract/control-authority";
+} from "../../../../../services/platform/src/mail-inbox/contract/control-authority";
 import {
   parseDeviceAlertSetting,
   parseDeviceStationId,
@@ -19,21 +19,21 @@ import {
 import { type MenuScreenSummary } from "@purin-labs/cafe-control-api";
 
 import { type DeviceSample } from "../../actors/device-fleet";
-import { deviceFleetStub } from "../../devices/contract/fleet-stub";
+import { deviceFleetStub } from "../../contract/fleet-stub";
 import { roleMayConfigure, roleMayOperate } from "@purin-labs/tenancy/data/control-plane";
-import { cafeServices } from "../../cafe/contract/cafe-services";
+import { cafeServices } from "../../../../../services/platform/src/cafe/contract/cafe-services";
 import {
   DEVICE_COMMAND_ROLE,
   runDeviceCommand,
   type DeviceCommand,
-} from "../../devices/commands";
+} from "../../commands";
 import {
   listStoredSnapshots,
   readStoredSnapshot,
   requestSnapshotFromPage,
   setSnapshotsEnabled,
   snapshotsAreEnabled,
-} from "../../devices/snapshots";
+} from "../../snapshots";
 import {
   listDeviceEvents,
   readDevice,
@@ -41,16 +41,16 @@ import {
   readGateway,
   startGatewayEnrollment,
   writeDeviceAlertSetting,
-} from "../../devices/store";
+} from "../../store";
 import {
   describeDeviceEvent,
   readKitchenDeviceViews,
-} from "../../devices/views";
+} from "../../views";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import { requirePublicOrigin } from "@purin-labs/kernel/public-origin";
-import { shopMacDevices } from "../../devices/contract/shop-mac-devices";
+import { shopMacDevices } from "../../contract/shop-mac-devices";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,

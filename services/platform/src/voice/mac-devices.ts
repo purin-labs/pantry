@@ -1,6 +1,6 @@
 import type { DeviceConnection, DeviceView } from "@purin-labs/control-api";
 
-import type { ShopMacDevice } from "../devices/contract/shop-mac-devices";
+import type { ShopMacDevice } from "@purin-labs/area-devices/server/contract/shop-mac-devices";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";

@@ -10,6 +10,6 @@ export {
   ConnectorDO,
   CodeModePlatformGovernorActor,
 } from "../shop-voice/worker";
-export { DeviceFleetActor } from "../../services/platform/src/actors/device-fleet";
+export { DeviceFleetActor } from "../../areas/devices/server/actors/device-fleet";
 
 export default shopVoice;

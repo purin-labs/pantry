@@ -169,7 +169,7 @@ The Durable Object classes of the commerce engine are `CommerceMerchantDO` and
 | Session cookie                | `pantry_session`                                                                                                                                                    | `SESSION_COOKIE`, `foundation/control/worker/authorization.ts`                            |
 | CSRF cookie and header        | `pantry_csrf`, `x-pantry-csrf`                                                                                                                                      | `CSRF_COOKIE`, `CSRF_HEADER`, the same file                                               |
 | Configuration version         | `x-pantry-configuration-version`                                                                                                                                    | `foundation/tenancy/data/control-mutation.ts`                                             |
-| Gateway identity              | `x-pantry-device-gateway`, `-organisation`, `-location`                                                                                                             | `services/platform/src/devices/gateway-routes.ts`                                         |
+| Gateway identity              | `x-pantry-device-gateway`, `-organisation`, `-location`                                                                                                             | `areas/devices/server/gateway-routes.ts`                                                  |
 | Voice device                  | `x-pantry-voice-device`                                                                                                                                             | `VOICE_DEVICE_HEADER`, `packages/control-api/src/voice.ts`                                |
 | Exit Workers                  | `x-pantry-upstream-url`, `x-pantry-exit-colo`                                                                                                                       | `chatgpt-exit/forward.ts`, `model-exit/protocol.ts` in `services/platform/src/`           |
 | Commerce lab                  | `x-pantry-lab-timestamp`, `x-pantry-lab-signature`                                                                                                                  | `services/platform/src/commerce-lab/ingress.ts`                                           |
@@ -305,7 +305,7 @@ exported `PurinMark` and `PurinIcon`.
   `pantry.bakeryos.vitrineCustomOrders.v1`.
 - The root package name `seams-pantry`.
 - A comment in `surface-observation.ts` says that the wire values keep old names.
-- A comment in `services/platform/src/agent-tools/devices/handlers.ts` has an old name.
+- A comment in `areas/devices/server/agent-tools/devices/handlers.ts` has an old name.
 - The docstring of `scripts/shop-voice/phrase-bench.py` names Satyr.
 
 **The commerce engine in Portal text:** `apps/portal/src/pages/automation.tsx` and

@@ -8,7 +8,7 @@ import {
 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 
-import { deviceFleetStub } from "../../src/devices/contract/fleet-stub";
+import { deviceFleetStub } from "@purin-labs/area-devices/server/contract/fleet-stub";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

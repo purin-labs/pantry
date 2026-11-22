@@ -1,4 +1,4 @@
-import type { DeviceFleetActor } from "../../actors/device-fleet";
+import type { DeviceFleetActor } from "../actors/device-fleet";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
