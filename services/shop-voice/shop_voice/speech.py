@@ -127,6 +127,9 @@ class AnswerVoice:
             voice = np.fromfile(folder / "af_heart.bin", dtype="<f4").reshape(-1, 1, 256)
             vocabulary = json.loads((folder / "tokenizer.json").read_text())["model"]["vocab"]
             phonemes = en.G2P(trf=False, british=False, fallback=lambda token: (_sounds_of(token.text), 1))
+            # The agent's name, Sous Chef: misaki says "sous" with a final z.
+            phonemes.lexicon.golds["Sous"] = "sˈu"
+            phonemes.lexicon.golds["sous"] = "sˈu"
             phonemes.lexicon.golds["Satyr"] = "sˈATəɹ"
             phonemes.lexicon.golds["satyr"] = "sˈATəɹ"
             self._model = (session, voice, vocabulary, phonemes)

@@ -18,6 +18,7 @@ import {
   readCookie,
 } from "../../control-client";
 import { voiceIsListening, type VoiceSession } from "./session";
+import { WAKE_PHRASE } from "./wake-phrase";
 
 type VoiceApprovalScope = Readonly<{
   session: VoiceSession;
@@ -131,7 +132,7 @@ function ScopedLine(
     <p className="voice-approval-line">
       <Mic aria-hidden="true" size={14} />
       <span>
-        Or say "Hey Satyr", then <strong>{phrase}</strong>
+        Or say "{WAKE_PHRASE}", then <strong>{phrase}</strong>
       </span>
     </p>
   );

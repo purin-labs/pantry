@@ -20,9 +20,22 @@ export async function cachedBytes(url: string): Promise<ArrayBuffer> {
 }
 
 function isPortalPage(response: Response): boolean {
-  return (
-    response.headers.get("content-type")?.startsWith("text/html") === true
+  return response.headers.get("content-type")?.startsWith("text/html") === true;
+}
+
+/**
+ * Drops each kept file that the Portal no longer loads, for example the model
+ * of an earlier wake phrase or an earlier runtime build.
+ */
+export async function keepOnlyVoiceFiles(
+  urls: readonly string[],
+): Promise<void> {
+  const cache = await caches.open(CACHE_NAME);
+  const keep = new Set(urls.map((url) => new URL(url, location.href).href));
+  const stale = (await cache.keys()).filter(
+    (request) => !keep.has(request.url),
   );
+  await Promise.all(stale.map((request) => cache.delete(request)));
 }
 
 export async function deleteVoiceModels(): Promise<void> {

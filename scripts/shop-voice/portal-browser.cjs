@@ -12,6 +12,8 @@ const {
 } = require("./fake-microphone.cjs");
 const { sleep } = require("../../packages/std/src/index.ts");
 const { chooseOption } = require("../lib/browser-journey.mjs");
+/** The wake phrase that the Portal shows, its model file, and how a macOS voice says it. */
+const wakePhrase = require("./wake-phrase.json");
 
 const input = JSON.parse(process.argv[2]);
 const results = { steps: [] };
@@ -176,7 +178,7 @@ async function speakingPage(browser, input) {
   const page = await context.newPage();
   const spoken = () => page.evaluate(() => window.__spoken);
   const say = async (words) => {
-    await page.evaluate(window_play, speech("Tessa", "hey, sayter"));
+    await page.evaluate(window_play, speech(wakePhrase.voice, wakePhrase.said));
     await sleep(250);
     await page.evaluate(window_play, speech("Samantha", words));
   };
@@ -235,7 +237,7 @@ async function holdToTalk(browser, input, chatUrl) {
   const ready = () =>
     waitFor(
       "listening again",
-      async () => (await status()).includes("Hey Satyr"),
+      async () => (await status()).includes(wakePhrase.phrase),
       20_000,
     );
   try {
@@ -670,7 +672,7 @@ async function spokenApproval(browser, input, chatUrl) {
             .locator(".voice-status")
             .textContent()
             .catch(() => "")
-        ).includes("Hey Satyr"),
+        ).includes(wakePhrase.phrase),
       60_000,
     );
     await waitFor(
@@ -937,7 +939,7 @@ async function spokenDrafts(browser, input, chatUrl) {
             .locator(".voice-status")
             .textContent()
             .catch(() => "")
-        )?.includes("Hey Satyr") &&
+        )?.includes(wakePhrase.phrase) &&
         (await page.locator(".voice-cloud").count()) === 0,
       60_000,
     );
@@ -1499,11 +1501,11 @@ async function main() {
         .catch(() => "");
     await waitFor(
       "listening",
-      async () => (await statusText()).includes("Hey Satyr"),
+      async () => (await statusText()).includes(wakePhrase.phrase),
       60_000,
     );
     require_(
-      voiceFiles().some((request) => request.url.endsWith("hey_satyr.onnx")),
+      voiceFiles().some((request) => request.url.endsWith(wakePhrase.model)),
       "The wake model did not load.",
     );
     require_(
@@ -1713,7 +1715,7 @@ async function main() {
     await page.waitForSelector("#chat-message", { timeout: 60_000 });
     await waitFor(
       "the session to resume",
-      async () => (await statusText()).includes("Hey Satyr"),
+      async () => (await statusText()).includes(wakePhrase.phrase),
       30_000,
     );
     step("after a reload, voice control starts again with no new choice");

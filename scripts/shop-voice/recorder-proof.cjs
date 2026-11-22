@@ -12,7 +12,8 @@ const { sleep } = require("../../packages/std/src/index.ts");
 const PAGE = process.argv[2] ?? "http://127.0.0.1:3185/voice-recorder.html";
 const VOICE = process.env.SHOP_VOICE_VOICE ?? "Moira";
 // The wake phrase as the Portal journey says it to the wake model.
-const WAKE = speech("Tessa", "hey, sayter");
+const wakePhrase = require("./wake-phrase.json");
+const WAKE = speech(wakePhrase.voice, wakePhrase.said);
 
 async function main() {
   const browser = await chromium.launch({

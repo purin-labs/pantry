@@ -32,7 +32,9 @@ PLATFORM = journey.PLATFORM
 PORTAL = "http://127.0.0.1:3191"
 ARTIFACTS = journey.ARTIFACTS
 SAMPLE_RATE = 16_000
-WAKE = ("Tessa", "hey, sayter")
+# The wake phrase as a macOS voice says it, the same one in portal-browser.cjs.
+WAKE_PHRASE = json.loads((ROOT / "scripts/shop-voice/wake-phrase.json").read_text())
+WAKE = (WAKE_PHRASE["voice"], WAKE_PHRASE["said"])
 # Seconds from the start of the microphone stream, and the words after the wake phrase.
 SCENES = (
     (8, "Put two trays of kouign amann in the second oven."),

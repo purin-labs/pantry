@@ -6,7 +6,8 @@ import * as ort from "onnxruntime-web/wasm";
 import ortGlueUrl from "../../../node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.mjs?url";
 import ortWasmUrl from "../../../node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm?url";
 
-import { cachedBytes } from "./model-cache";
+import { cachedBytes, keepOnlyVoiceFiles } from "./model-cache";
+import { WAKE_MODEL } from "./wake-phrase";
 import type { VoiceWorkerEvent, VoiceWorkerRequest } from "./worker-protocol";
 
 const CHUNK = 1280;
@@ -333,14 +334,21 @@ async function start(): Promise<Listener> {
   ort.env.wasm.numThreads = 1;
   ort.env.wasm.wasmPaths = { mjs: ortGlueUrl, wasm: ortWasmUrl };
   ort.env.wasm.wasmBinary = await cachedBytes(ortWasmUrl);
+  const models = [
+    "silero_vad",
+    "melspectrogram",
+    "embedding_model",
+    WAKE_MODEL,
+  ].map((name) => `/voice/${name}.onnx`);
   const [vad, mel, embedding, classifier] = await Promise.all(
-    ["silero_vad", "melspectrogram", "embedding_model", "hey_satyr"].map(
-      async (name) =>
-        ort.InferenceSession.create(
-          new Uint8Array(await cachedBytes(`/voice/${name}.onnx`)),
-          { executionProviders: ["wasm"] },
-        ),
+    models.map(async (url) =>
+      ort.InferenceSession.create(new Uint8Array(await cachedBytes(url)), {
+        executionProviders: ["wasm"],
+      }),
     ),
+  );
+  keepOnlyVoiceFiles([ortWasmUrl, ...models]).catch((error: unknown) =>
+    console.warn("Old voice files stay in the cache", error),
   );
   return new Listener(
     new SpeechDetector(vad!),

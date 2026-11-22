@@ -34,6 +34,7 @@ import {
 } from "./setting";
 import { StartAttempt } from "./start-attempt";
 import { VoiceTransport } from "./transport";
+import { WAKE_PHRASE } from "./wake-phrase";
 import type { VoiceWorkerEvent } from "./worker-protocol";
 
 const LOCK_NAME = "pantry-voice-control";
@@ -233,7 +234,7 @@ export class VoiceSession {
   }
 
   announcePhrase(phrase: string): void {
-    const text = `To confirm, say Hey Satyr, ${phrase}.`;
+    const text = `To confirm, say ${WAKE_PHRASE}, ${phrase}.`;
     if (this.holdingAnnouncements) this.announcements.push(text);
     else this.utter(text);
   }

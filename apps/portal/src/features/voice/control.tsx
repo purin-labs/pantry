@@ -45,6 +45,7 @@ import {
   readCookie,
 } from "../../control-client";
 import { voiceCountsToday, voiceHeardLastDays } from "./counts";
+import { WAKE_PHRASE } from "./wake-phrase";
 import {
   chosenMicrophone,
   voiceControlIsOn,
@@ -83,8 +84,8 @@ function statusText(status: VoiceStatus): string | null {
     case "listening": {
       const key = voiceTalkKeyName();
       return key === null
-        ? 'Say "Hey Satyr"'
-        : `Say "Hey Satyr" or hold ${key}`;
+        ? `Say "${WAKE_PHRASE}"`
+        : `Say "${WAKE_PHRASE}" or hold ${key}`;
     }
     case "capturing":
       return status.hold ? "Listening. Release to send." : "Listening";
@@ -358,8 +359,8 @@ function VoiceDialog(
           <VoiceDialogStatus status={status} on={on} />
           <p className="voice-lead">
             {talkKey === null
-              ? 'Say "Hey Satyr", then your command.'
-              : `Say "Hey Satyr", then your command. Or hold ${talkKey}, speak and release. This works while this page is in front.`}{" "}
+              ? `Say "${WAKE_PHRASE}", then your command.`
+              : `Say "${WAKE_PHRASE}", then your command. Or hold ${talkKey}, speak and release. This works while this page is in front.`}{" "}
             Voice control takes English commands.
           </p>
           {on ? (

@@ -13,6 +13,7 @@ import {
 } from "../features/voice/capture";
 import { encodeVoiceWav } from "../features/voice/command";
 import type { VoiceWorkerEvent } from "../features/voice/worker-protocol";
+import { WAKE_PHRASE } from "../features/voice/wake-phrase";
 import { Select } from "../ui";
 import { usePortalTheme } from "../use-portal-theme";
 import "../styles.css";
@@ -45,7 +46,7 @@ const HOW: Readonly<Record<PromptSet, string>> = {
   phrase: "Hold Space and say the approval phrase. Then let go.",
   near: "Hold Space and say these words exactly. They must not approve anything.",
   stop: "Hold Space, say the word, and let go.",
-  far: "Stand about 2 m from the Mac. Say “Hey Satyr”. After the high tone, say the command.",
+  far: `Stand about 2 m from the Mac. Say “${WAKE_PHRASE}”. After the high tone, say the command.`,
   list: "Hold Space and say the names as a list. Then let go.",
   room: "Do not speak, and do not read this text aloud. Press Space one time, and step away. After 3 seconds, the page records 30 seconds of the shop's sound.",
 };
@@ -232,7 +233,7 @@ function VoiceRecorder(): React.ReactNode {
         setNote(
           event === "no_speech"
             ? "The device heard no speech, as in the shop. Say it again."
-            : "The device almost heard “Hey Satyr”. Say it again.",
+            : `The device almost heard “${WAKE_PHRASE}”. Say it again.`,
         );
     },
     [],
@@ -426,7 +427,7 @@ function VoiceRecorder(): React.ReactNode {
         {prompt.set === "room"
           ? `When ${prompt.kind}`
           : prompt.set === "far"
-            ? `Hey Satyr… ${prompt.spoken}`
+            ? `${WAKE_PHRASE}… ${prompt.spoken}`
             : prompt.spoken}
       </p>
       <p className="voice-recorder-step" aria-live="polite">
