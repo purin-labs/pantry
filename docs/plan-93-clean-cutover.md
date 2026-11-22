@@ -686,6 +686,36 @@ The owner does the provider consoles. I do the rest.
    card, one Square or Stripe connect, one order through `pantry-commerce`
    and `purin-shop`, one MCP call, one device heartbeat, the docs link.
 
+#### Step 4 results: the switch (22 November 2026)
+
+The owner said "Switch now" in this session and confirmed it in the Plan 91
+phase 4 session, which made the console changes at about 19:10 JST:
+
+- Slack app `A0BFVDZLFLM` (manifest API, read back): name "Purin Pantry",
+  bot "Sous Chef", events `https://slack.pantry.purin.io/slack/events`,
+  interactivity `https://slack.pantry.purin.io/slack/interactions`.
+- Shopify app (`shopify app deploy`, read back): name "Purin Pantry",
+  `application_url` `https://pantry.purin.io/portal`, old and new
+  callbacks.
+- Open with the Plan 91 phase 4 session: the Square OAuth redirect, the
+  Meta webhook (the Graph API answers "API access blocked"), and the
+  console names of Square, Stripe, Dropbox, Notion, Airtable, Discord and
+  Meta.
+
+Item by item: 1 as above, with no secret rotation (owner); 2 done; 3 not
+needed since Plan 95 step 4; 4 the new Gmail push subscription is in
+`purin-pantry`, and the Plan 91 phase 4 session updates the Shopify app
+file; 5 moved to its own task (owner's choice, see step 3).
+
+**4.6 Checks on the new stack.** Passed: one Google sign-in, one Slack
+install (OAuth through `pantry.purin.io`), one Slack card after the switch
+(in `#cafe-ops`, a mention of Sous Chef first got the one-time "Link your
+Slack identity" note of the new organisation; after the link, the same
+question got one reply in its thread: "I run in Purin Pantry."), and the
+docs link. Not done: a Square or Stripe connect, an order through
+`purin-shop` (a card form on a production host is the owner's), an MCP call
+and a device heartbeat (the shop Mac moved to its own task).
+
 ### 5. Delete the old stack
 
 Only after step 4 passes, and after the owner says yes again. No rollback is
