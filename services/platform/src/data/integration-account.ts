@@ -7,9 +7,12 @@ import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
 } from "../organisation-execution-scope";
-import type { OnboardingProvider, SurfaceKind } from "@purin-labs/contracts";
+import type {
+  InstallModel,
+  OnboardingProvider,
+  SurfaceKind,
+} from "@purin-labs/contracts";
 
-import type { InstallModel } from "../boundary";
 import type { OrganisationEnvironment } from "./control-plane";
 import {
   prepareControlMutationReceipt,

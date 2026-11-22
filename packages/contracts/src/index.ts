@@ -147,6 +147,7 @@ export type { OnboardingStepProjection } from "./types/OnboardingStepProjection"
 export type { OnboardingSupportReference } from "./types/OnboardingSupportReference";
 export type { Outcome } from "./types/Outcome";
 export type { SurfaceKind } from "./types/SurfaceKind";
+export type { InstallModel } from "./types/InstallModel";
 export type { SurfaceRef } from "./types/SurfaceRef";
 export type { OrganisationOnboardingLifecycle } from "./types/OrganisationOnboardingLifecycle";
 export type { Track } from "./types/Track";

@@ -8,9 +8,8 @@ import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
 } from "@purin-labs/kernel/database-handles";
-import type { SurfaceKind } from "@purin-labs/contracts";
+import type { InstallModel, SurfaceKind } from "@purin-labs/contracts";
 
-import type { InstallModel } from "../boundary";
 import {
   newIntegrationAccountId,
   newProviderConnectionId,

@@ -1,4 +1,4 @@
-import type { SurfaceKind } from "@purin-labs/contracts";
+import type { InstallModel, SurfaceKind } from "@purin-labs/contracts";
 import type { JsonObject } from "@purin-labs/kernel/http";
 import {
   parseChannelId,
@@ -12,8 +12,6 @@ import {
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import { exhaustiveList } from "@purin-labs/std";
-
-export type InstallModel = "unlisted" | "marketplace" | "custom";
 
 export type FieldError =
   | { code: "missing_field"; field: string }
