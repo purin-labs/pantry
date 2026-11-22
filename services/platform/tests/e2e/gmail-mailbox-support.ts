@@ -1,5 +1,5 @@
 import { env, exports } from "cloudflare:workers";
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse } from "msw";
 import { expect } from "vitest";
 import { decodeBase64, encodeBase64Url, isRecord } from "@purin-labs/std";
@@ -366,20 +366,23 @@ export async function acceptMailboxModel(
   });
 }
 
-/** Makes the Connector's held reply turns due now and runs one alarm. */
+/**
+ * Makes the Connector's held reply turns due now and runs one alarm of the
+ * Connector to its end. The alarm runs here, not through the alarm slot:
+ * the Connector's own work in the background can fire, move or delete a
+ * stored alarm first, and `runDurableObjectAlarm` then runs nothing.
+ */
 export async function runDueMailWork(
   connector: MailboxConnector,
 ): Promise<void> {
-  await runInDurableObject(
-    connector,
-    async (_actor: unknown, state: DurableObjectState) => {
-      state.storage.sql.exec(
-        "UPDATE connector_email_reply_turn SET available_at = 0",
-      );
-      await state.storage.setAlarm(Date.now());
-    },
-  );
-  await runDurableObjectAlarm(connector);
+  await runInDurableObject(connector, async (actor, state) => {
+    state.storage.sql.exec(
+      "UPDATE connector_email_reply_turn SET available_at = 0",
+    );
+    if (actor.alarm === undefined)
+      throw new Error("The Connector has no alarm handler");
+    await actor.alarm();
+  });
 }
 
 /** The one kind of mail that arrives in a fake Gmail mailbox. */
