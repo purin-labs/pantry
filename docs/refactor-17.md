@@ -406,8 +406,13 @@ readers found 3 to 8 false statements in each first version. For the other 20 sp
 (about 7,900 lines), the second readers found 143 false statements, 105 statements
 that the code cannot prove and 119 omissions. The writers corrected 354 of these
 findings and refused 18, each with its reason. Each spec lists the places where its
-source plans differ from the code: 291 places in the 20 specs. The writers also
-reported 142 possible code faults. No one has checked them yet. A source plan moves to
+source plans differ from the code: 291 places in the 20 specs. The writers of the 33
+specs also reported 229 possible code faults. On 2026-11-23 a second reader read the
+code for each one, and ran no code: the code confirms 216 (89 of behavior, of which 8
+are of high and 29 of medium severity; 62 of text; 51 of dead or duplicate code; 14 of
+tests), 12 are not faults and 1 is fixed. No fault is corrected yet. The list is with
+the owner and not in this repository: the repository is public, and some of the faults
+concern authorization and erasure. A source plan moves to
 `docs/history/` when each spec that it feeds is written: 56 plan and refactor files are
 there since 2026-11-23. Plan 91 stays in `docs/` until its phase 6 ends, and the 15
 other source documents stay where they are.
