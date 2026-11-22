@@ -675,8 +675,25 @@ State on 22 November 2026:
     `https://pantry.purin.io/v1/control/providers/stripe/callback` is added
     and is the default; the old `satyr-edge` redirect is removed; the two
     `localhost` redirects stay. The Seams wallet uses the same Stripe
-    account, so its name does not change. Moving Pantry to its own Purin
-    Stripe account is separate work (owner, 22 November 2026).
+    account, so its name does not change.
+  - Stripe move, the same evening, on the owner's "Do this task here": Pantry
+    left the shared account for the sandbox "Purin Heavy Industries
+    sandbox" (`acct_1UanmI9Z5LoDEq60`, test mode, Japan, login of the Purin
+    company). In its Connect settings OAuth is on, with the test client ID
+    `ca_VfwExHMjdL3DwGWEXrFyTTz9qKFSUgFr` and the redirects
+    `https://pantry.purin.io/v1/control/providers/stripe/callback`
+    (default) and the `localhost:3003` one. The API made the two webhook
+    endpoints with the events of the old ones: Connect
+    `we_1UeaeG9Z5LoDEq608kzPZsWC` and commerce
+    `we_1UeaeG9Z5LoDEq60FIbD36t3`. With the owner's yes, `wrangler secret
+    bulk` set the four `STRIPE_CONNECT_*` secrets of `pantry` and
+    `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY` and
+    `STRIPE_WEBHOOK_SECRET` of `pantry-commerce`. No Stripe account was
+    connected on the new stack before the move. A live key that the owner
+    first gave was not used: Pantry runs Stripe in test mode, and a live
+    platform needs an activated business. The old account keeps Pantry's
+    endpoints and redirects until the first Stripe connect on the new
+    account passes.
   - Airtable, Notion and Meta keep their old names and URLs: Airtable and
     Notion until the owner uses them on the new stack, Meta until its
     business verification passes (its Graph API answers "API access
