@@ -697,10 +697,12 @@ phase 4 session, which made the console changes at about 19:10 JST:
 - Shopify app (`shopify app deploy`, read back): name "Purin Pantry",
   `application_url` `https://pantry.purin.io/portal`, old and new
   callbacks.
+- Dropbox app `08go391f1qw6vbd`: name "Purin Pantry", the new OAuth
+  redirect, and the webhook `https://pantry.purin.io/hook/dropbox`, which
+  Dropbox shows as "Enabled", so the new stack answered its challenge.
 - Open with the Plan 91 phase 4 session: the Square OAuth redirect, the
   Meta webhook (the Graph API answers "API access blocked"), and the
-  console names of Square, Stripe, Dropbox, Notion, Airtable, Discord and
-  Meta.
+  console names of Square, Stripe, Notion, Airtable, Discord and Meta.
 
 Item by item: 1 as above, with no secret rotation (owner); 2 done; 3 not
 needed since Plan 95 step 4; 4 the new Gmail push subscription is in
