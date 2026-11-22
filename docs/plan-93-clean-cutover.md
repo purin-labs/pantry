@@ -438,6 +438,17 @@ worktree:
    `pantry-repo-binaries-apac`, because the code now reads that bucket. A
    file that is not in the local cache of a machine needs the new bucket.
 
+**The freeze run (22 November 2026).** The owner opened the freeze at
+10:55 JST. Dev was still `79462c0f`, so the rebase was empty, and the
+codemod run gave the tested tree again. On the final tree (the codemod run
+plus the step 3 id commits) these checks pass: the Platform E2E suite (239
+files; the 7 cobot files fail there for MuJoCo only, and pass in a checkout
+outside the clone with `MUJOCO_DIR`: 16 journeys; 3 files skip), the
+Platform type checks and test types, `pnpm check:packages`, the commerce
+engine type check, `pnpm lint:static`, `pnpm lint:d1-patch`,
+`pnpm test:units` (Platform: 301 files, 1,728 tests), `pnpm portal:build`,
+`cargo test --workspace` (47 tests) and `git diff --check`.
+
 **What keeps an old name on purpose** (the `git grep` exceptions):
 
 - The wake phrase "Hey Satyr", `hey_satyr.onnx` and the wake training
