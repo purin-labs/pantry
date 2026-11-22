@@ -39,7 +39,7 @@ import {
 import "./permission-request.css";
 import type { Variant } from "@purin-labs/type-utils";
 
-export type PermissionRequestParty = {
+type PermissionRequestParty = {
   readonly name: string;
   /** Decorative avatar content; the title names both parties. */
   readonly icon: React.ReactNode;
@@ -52,7 +52,7 @@ export type PermissionRequestItem = {
   readonly required: boolean;
 };
 
-export type PermissionRequestScopeOption = {
+type PermissionRequestScopeOption = {
   readonly id: string;
   readonly label: string;
   readonly icon?: React.ReactNode;
@@ -65,13 +65,13 @@ export type PermissionRequestScope = {
   readonly onChange: (id: string) => void;
 };
 
-export type PermissionRequestAction = {
+type PermissionRequestAction = {
   readonly label: string;
   readonly onSelect: () => void;
 };
 
 /** The person who decides, shown as a chip under the question. */
-export type PermissionRequestAccount = {
+type PermissionRequestAccount = {
   readonly name: string;
   /** Opens an account switcher; null shows the chip without a menu mark. */
   readonly action: PermissionRequestAction | null;
@@ -138,7 +138,7 @@ export type PermissionRequestCardProps = {
  * short request; `split` is a wide card with the permissions in their own
  * column.
  */
-export type AuthorizationLayout = "compact" | "split";
+type AuthorizationLayout = "compact" | "split";
 
 /** A decided request shows the short result card in either layout. */
 type DialogLayout = AuthorizationLayout | "result";

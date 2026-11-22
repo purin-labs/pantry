@@ -121,7 +121,7 @@ const SPAN_NAME: Record<TimeSpan, string> = {
   month: "Month",
 };
 
-export function hhmm(at: number): string {
+function hhmm(at: number): string {
   return new Date(at).toLocaleTimeString(undefined, {
     hour: "2-digit",
     minute: "2-digit",
@@ -175,7 +175,7 @@ export type PeriodControl = Readonly<{
 }>;
 
 /** The period of a length that holds a time. A week starts on Monday. */
-export function periodOf(span: TimeSpan, at: number): TimePeriod {
+function periodOf(span: TimeSpan, at: number): TimePeriod {
   const day = startOfDay(at);
   const date = new Date(day);
   switch (span) {
@@ -355,7 +355,7 @@ function shiftDay(day: number, by: number): number {
 }
 
 /** The next local midnight, which a day of daylight saving keeps right. */
-export function nextDay(day: number): number {
+function nextDay(day: number): number {
   return shiftDay(day, 1);
 }
 
@@ -492,7 +492,7 @@ function measure(text: string, font: string): number {
  * The hours the items span, at least eight, inside a day's bounds. A week or a
  * month shows all of its days, so that the view reads as a calendar.
  */
-export function fitRange(
+function fitRange(
   items: readonly TimeLanesItem[],
   bounds: TimeRange,
   now: number | null,

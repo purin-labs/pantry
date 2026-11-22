@@ -3,7 +3,7 @@ import { Check, Command, CornerDownLeft, LoaderCircle } from "lucide-react";
 import "./agent-components.css";
 import { assertNever } from "@purin-labs/std";
 
-export type QuestionOption = {
+type QuestionOption = {
   readonly id: string;
   readonly label: string;
   readonly description?: string;

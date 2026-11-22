@@ -21,7 +21,7 @@ export type DraftMessageStatus =
   | { readonly kind: "unavailable"; readonly message: string }
   | { readonly kind: "unconfirmed"; readonly message: string };
 
-export type DraftMessageEdit = {
+type DraftMessageEdit = {
   readonly maxLength: number;
   /**
    * The version of the body on the card. The editor starts from one version;
@@ -33,7 +33,7 @@ export type DraftMessageEdit = {
   readonly onSave: (body: string) => Promise<string | null>;
 };
 
-export type DraftMessageDecision = {
+type DraftMessageDecision = {
   readonly sendLabel?: string;
   readonly discardLabel?: string;
   readonly onSend: () => Promise<string | null>;
@@ -41,7 +41,7 @@ export type DraftMessageDecision = {
 };
 
 /** The body as a person reviews it, in the editor or on the card. */
-export type DraftMessageReviewDraft = Readonly<{
+type DraftMessageReviewDraft = Readonly<{
   /** The text in the editor while the person edits, else the draft body. */
   body: string;
   editing: boolean;

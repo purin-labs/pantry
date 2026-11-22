@@ -25,8 +25,7 @@ import { toast } from "sonner";
 import { assertNever } from "@purin-labs/std";
 import "./prompt-toast.css";
 
-export type PromptToastTone =
-  "waiting" | "loading" | "success" | "denied" | "failure";
+type PromptToastTone = "waiting" | "loading" | "success" | "denied" | "failure";
 
 export type PromptToastView = Readonly<{
   tone: PromptToastTone;

@@ -13,8 +13,8 @@ import { ActionMenu, type ActionMenuItem } from "./action-menu";
 import { EmptyState } from "./empty-state";
 import "./crm-table.css";
 
-export type CrmCalculation = "none" | "count" | "unique" | "sum" | "average";
-export type CrmCellProps = {
+type CrmCalculation = "none" | "count" | "unique" | "sum" | "average";
+type CrmCellProps = {
   readonly className?: string;
   readonly style?: React.CSSProperties;
   readonly cellKey?: string;
@@ -40,7 +40,7 @@ export type CrmColumn<Row> = ColumnBase<Row> &
       }
     | { readonly kind: "display"; readonly value?: never }
   );
-export type CrmSelection = {
+type CrmSelection = {
   readonly selectedIds: ReadonlySet<string>;
   readonly onChange: (ids: ReadonlySet<string>) => void;
 };
