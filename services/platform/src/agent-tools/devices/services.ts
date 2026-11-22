@@ -1,6 +1,6 @@
-import { defineToolFamily } from "../define-tool";
-import { ToolRequestError } from "../errors";
-import type { PreparedEffect } from "../tool-effect";
+import { defineToolFamily } from "@purin-labs/agent-tools/define-tool";
+import { ToolRequestError } from "@purin-labs/agent-tools/errors";
+import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
 
 type DeviceReadTool = () => Promise<DeviceToolRead>;
 

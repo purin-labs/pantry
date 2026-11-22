@@ -15,7 +15,7 @@ import {
 } from "../bakery/handlers";
 import { withToolContext } from "../context";
 import { executeCostsViewForHarness } from "../costs/view-handler";
-import { ToolRequestError } from "../errors";
+import { ToolRequestError } from "@purin-labs/agent-tools/errors";
 import { liveDeviceMember } from "../session-support";
 import type { BakeStockLevelInput } from "@purin-labs/kitchen-control-api";
 import {

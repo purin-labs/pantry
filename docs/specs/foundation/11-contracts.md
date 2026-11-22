@@ -140,7 +140,7 @@ The helpers follow the Rust and serde rules that their comments name. For exampl
 ### Agent tool inputs
 
 - The `input` of a tool is a TypeBox schema, or a JSON Schema in `jsonSchema(...)`
-  (`services/platform/src/agent-tools/define-tool.ts`). `Value.Check` checks a call.
+  (`foundation/agent-tools/define-tool.ts`). `Value.Check` checks a call.
   Then `decode` runs the rules that a schema cannot state.
 - A tool with `decodeOnly: true` has no `Value.Check`. Its `decode` is the only check,
   and its schema is only what the model sees. 101 of the 121 `jsonSchema` tools in

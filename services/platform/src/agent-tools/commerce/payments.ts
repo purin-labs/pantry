@@ -2,7 +2,7 @@ import { Type } from "typebox";
 import { isPaymentWindow } from "../../commerce/payments-read";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { defineCommerceTool } from "./services";
-import { ProposalArgumentError } from "../errors";
+import { ProposalArgumentError } from "@purin-labs/agent-tools/errors";
 
 export const paymentsRead = defineCommerceTool({
   name: "payments_read",

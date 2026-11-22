@@ -8,7 +8,7 @@ import type {
   CommercePaymentV1,
 } from "@purin-labs/commerce-client";
 
-import { ToolRequestError } from "../agent-tools/errors";
+import { ToolRequestError } from "@purin-labs/agent-tools/errors";
 import type { Result } from "@purin-labs/kernel/result";
 
 export const ORDER_REFUND_VERB = "commerce.order.refund";

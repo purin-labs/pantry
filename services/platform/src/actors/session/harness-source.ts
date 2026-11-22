@@ -29,14 +29,14 @@ import { harnessToolCatalogDigest } from "../embedded-harness-tool-host";
 import type {
   ToolRegistry,
   TurnTool,
-} from "../../agent-tools/catalog/tool-registry";
+} from "@purin-labs/agent-tools/catalog/tool-registry";
 import type { SessionToolWiring } from "./tool-wiring";
 import type {
   EmbeddedHarnessAdapter,
   EmbeddedHarnessSource,
 } from "../embedded-harness";
 import { selectEmbeddedHarnessAdapterForModelRoute } from "../embedded-harness-adapter";
-import { harnessCapabilitiesFromCapabilityKeys } from "../../agent-tools/catalog/code-mode";
+import { harnessCapabilitiesFromCapabilityKeys } from "@purin-labs/agent-tools/catalog/code-mode";
 import {
   type CurrentEffectiveGrantAuthority,
   resolveEffectiveGrantSetForAuthorityPartition,
@@ -63,7 +63,7 @@ import type { SessionToolContext } from "../../agent-tools/context";
 import type {
   HarnessSideCaseProposalRequest,
   HarnessSideCaseProposalResult,
-} from "../../agent-tools/catalog/types";
+} from "@purin-labs/agent-tools/catalog/types";
 
 /**
  * The tools that a turn adds to the tool list, with the live authority that

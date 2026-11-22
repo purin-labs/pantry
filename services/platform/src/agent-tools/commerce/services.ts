@@ -15,12 +15,12 @@ import type {
   DraftAgentReadArgs,
   DraftAgentSnapshot,
 } from "../../actors/product-description-draft";
-import type { CatalogExecutionContext } from "../catalog/execute";
-import type { CommerceActionProposalOrigin } from "../catalog/types";
-import { ToolRequestError } from "../errors";
-import { defineToolFamily } from "../define-tool";
+import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
+import type { CommerceActionProposalOrigin } from "@purin-labs/agent-tools/catalog/types";
+import { ToolRequestError } from "@purin-labs/agent-tools/errors";
+import { defineToolFamily } from "@purin-labs/agent-tools/define-tool";
 import type { StockActionProposal } from "./proposals";
-import type { PreparedEffect } from "../../agent-tools/tool-effect";
+import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
 
 type CommerceActionProposal = (
   request: CommerceActionRequest,

@@ -28,8 +28,8 @@ import {
 } from "../../services/platform/src/actors/agent-session-budget.ts";
 import { preflightHarnessTurnLease } from "../../services/platform/src/actors/agent-session-harness-authority.ts";
 import { validateCanonicalSessionAdvance } from "../../services/platform/src/actor-wasm.ts";
-import { catalogHarnessToolCatalogDigest } from "../../services/platform/src/agent-tools/catalog/selection.ts";
-import { createCatalogHarnessCodeMode } from "../../services/platform/src/agent-tools/catalog/code-mode.ts";
+import { catalogHarnessToolCatalogDigest } from "../../foundation/agent-tools/catalog/selection.ts";
+import { createCatalogHarnessCodeMode } from "../../foundation/agent-tools/catalog/code-mode.ts";
 import { TOOL_REGISTRY } from "../../services/platform/src/agent-tools/registry.ts";
 import { CAPABILITY_KEYS } from "../../foundation/authority/authorization/capability-catalogue.ts";
 import { renderHarnessHistoryContent } from "../../services/platform/src/actors/harness-history.ts";

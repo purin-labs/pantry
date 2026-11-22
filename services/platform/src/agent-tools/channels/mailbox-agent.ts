@@ -1,6 +1,12 @@
 import type { AuthorizedHarnessToolResult } from "@purin-labs/contracts";
-import { defineToolFamily, jsonSchema } from "../define-tool";
-import { CAPABILITY_FREE_RERUN, hostTool } from "../host-tools";
+import {
+  defineToolFamily,
+  jsonSchema,
+} from "@purin-labs/agent-tools/define-tool";
+import {
+  CAPABILITY_FREE_RERUN,
+  hostTool,
+} from "@purin-labs/agent-tools/host-tools";
 
 /**
  * The tools of the mailbox agent: purpose-bound email tools for one admitted

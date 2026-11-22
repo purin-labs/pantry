@@ -3,9 +3,9 @@ import {
   readFileForEmbeddedHarness,
   searchFilesForEmbeddedHarness,
 } from "../../agent-tools/files/handlers";
-import type { FileToolServices } from "../../agent-tools/files/files";
-import type { MessageToolServices } from "../../agent-tools/messages/messages";
-import type { TurnToolServices } from "../../agent-tools/turn/turn";
+import type { FileToolServices } from "@purin-labs/agent-tools/files/files";
+import type { MessageToolServices } from "@purin-labs/agent-tools/messages/messages";
+import type { TurnToolServices } from "@purin-labs/agent-tools/turn/turn";
 import { withToolContext } from "../../agent-tools/context";
 import { scheduleFollowUpForHarness } from "../harness-follow-up";
 import { proposeMemoryForHarness } from "../harness-memory-proposal";

@@ -50,7 +50,7 @@ import {
 } from "./code-mode-recovery";
 import { PI_DURABLE_BUILD } from "./pi-durable-checkpoint";
 import { mayRerunToolCall, type ToolCaller } from "./pi-tool-replay";
-import type { ToolRegistry } from "../agent-tools/catalog/tool-registry";
+import type { ToolRegistry } from "@purin-labs/agent-tools/catalog/tool-registry";
 import type { SessionPageEffects } from "./session/tool-wiring";
 import type { Result } from "@purin-labs/kernel/result";
 

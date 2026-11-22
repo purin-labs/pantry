@@ -277,7 +277,10 @@ export default [
     },
   },
   {
-    files: ["services/platform/src/context/**/*.ts"],
+    files: [
+      "services/platform/src/context/**/*.ts",
+      "foundation/agent-tools/context/**/*.ts",
+    ],
     ignores: ifcBoundaryOwners,
     rules: {
       "no-restricted-imports": [

@@ -439,8 +439,8 @@ async function sourceEvidence() {
       "packages/contracts/src/session-reducer.ts",
       "packages/contracts/src/session-schemas.ts",
       "packages/contracts/src/session-recovery.ts",
-      "services/platform/src/agent-tools/catalog/selection.ts",
-      "services/platform/src/agent-tools/catalog/code-mode.ts",
+      "foundation/agent-tools/catalog/selection.ts",
+      "foundation/agent-tools/catalog/code-mode.ts",
       "services/platform/src/actors/airtable-tool-input.ts",
       "foundation/authority/authorization/capability-catalogue.ts",
     );

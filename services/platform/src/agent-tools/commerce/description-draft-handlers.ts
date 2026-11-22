@@ -13,7 +13,7 @@ import {
   requireSessionExecution,
 } from "../../actors/session-execution-admission";
 import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
-import type { CatalogExecutionContext } from "../catalog/execute";
+import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
 import { DescriptionDraftRequestError } from "./services";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";

@@ -24,9 +24,9 @@ import type { HarnessToolHost } from "./embedded-harness";
 import {
   type CatalogToolAuthority,
   executeCatalogTool,
-} from "../agent-tools/catalog/execute";
-import { createToolRegistry } from "../agent-tools/catalog/tool-registry";
-import type { HarnessCapabilityClaim } from "../agent-tools/catalog/types";
+} from "@purin-labs/agent-tools/catalog/execute";
+import { createToolRegistry } from "@purin-labs/agent-tools/catalog/tool-registry";
+import type { HarnessCapabilityClaim } from "@purin-labs/agent-tools/catalog/types";
 import {
   mailboxAttachmentRead,
   mailboxCaseRead,
@@ -44,7 +44,7 @@ import {
 import {
   modelToolDefinition,
   type AnyRegisteredTool,
-} from "../agent-tools/define-tool";
+} from "@purin-labs/agent-tools/define-tool";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, isRecord } from "@purin-labs/std";
 import {

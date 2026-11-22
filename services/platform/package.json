@@ -72,6 +72,7 @@
     "@purin-labs/actor-runtime": "workspace:*",
     "@purin-labs/connections": "workspace:*",
     "@purin-labs/authority": "workspace:*",
+    "@purin-labs/agent-tools": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

@@ -3,20 +3,20 @@ import type { CodemodeRemote } from "@earendil-works/pi-codemode/portable";
 import type { HarnessCodeModeSandbox } from "./embedded-harness";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { RequestableCapability } from "@purin-labs/authority/authorization/requestable-capabilities";
-import { createCatalogHarnessCodeMode, harnessCapabilitiesFromCapabilityKeys } from "../agent-tools/catalog/code-mode";
-import { catalogHarnessToolCatalogDigest, harnessBaseCapabilities } from "../agent-tools/catalog/selection";
+import { createCatalogHarnessCodeMode, harnessCapabilitiesFromCapabilityKeys } from "@purin-labs/agent-tools/catalog/code-mode";
+import { catalogHarnessToolCatalogDigest, harnessBaseCapabilities } from "@purin-labs/agent-tools/catalog/selection";
 import type {
   HarnessCapabilityClaim,
   HarnessCapabilityName,
   HarnessSourceAuthorization,
-} from "../agent-tools/catalog/types";
-import { type HarnessPermissionRequest, type HarnessPermissionRequestResult, type HarnessPermissionRequestTool, missingRequestableCapabilities } from "../agent-tools/catalog/permission";
+} from "@purin-labs/agent-tools/catalog/types";
+import { type HarnessPermissionRequest, type HarnessPermissionRequestResult, type HarnessPermissionRequestTool, missingRequestableCapabilities } from "@purin-labs/agent-tools/catalog/permission";
 import type {
   ToolRegistry,
   ToolServiceSet,
   TurnTool,
-} from "../agent-tools/catalog/tool-registry";
-import type { EffectSettle } from "../agent-tools/tool-effect";
+} from "@purin-labs/agent-tools/catalog/tool-registry";
+import type { EffectSettle } from "@purin-labs/agent-tools/tool-effect";
 import { createHarnessCodeModeAdmission } from "./code-mode-admission";
 import type {
   HarnessToolArgumentObserver,

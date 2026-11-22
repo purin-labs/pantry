@@ -9,7 +9,7 @@ import type {
   CanonicalFileReference,
   FileReadToolResult,
   FileSearchToolResult,
-} from "../../agent-tools/catalog/types";
+} from "@purin-labs/agent-tools/catalog/types";
 import { encodeContextVisibility } from "@purin-labs/authority/authorization/access-grants/visibility";
 import type {
   AccessGrantTarget,

@@ -28,7 +28,7 @@ import {
   admittedSessionOperation,
 } from "../../actors/session-execution-admission";
 import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
-import type { CatalogExecutionContext } from "../catalog/execute";
+import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
 import { EmailReplyDraftRequestError } from "./services";
 import { readChatReplyProvenance } from "../../actors/email-chat-reply-sources";
 import type {

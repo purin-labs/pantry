@@ -12,7 +12,7 @@ import type {
   CodeModeExecutionRelease,
   markCodeModeExecutionReleased,
 } from "../src/actors/code-mode-execution-release";
-import type { HarnessCodeModeAdmittedExecution } from "../src/agent-tools/catalog/types";
+import type { HarnessCodeModeAdmittedExecution } from "@purin-labs/agent-tools/catalog/types";
 import type { CodeModeReceipt } from "../src/actors/pi-durable-code-receipt";
 import type { PiRecoveryLeaseRebind } from "../src/actors/pi-durable-recovery";
 

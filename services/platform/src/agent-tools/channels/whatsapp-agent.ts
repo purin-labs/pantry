@@ -1,6 +1,12 @@
-import { CAPABILITY_FREE_RERUN, hostTool } from "../host-tools";
-import { createToolRegistry } from "../catalog/tool-registry";
-import { defineToolFamily, jsonSchema } from "../define-tool";
+import {
+  CAPABILITY_FREE_RERUN,
+  hostTool,
+} from "@purin-labs/agent-tools/host-tools";
+import { createToolRegistry } from "@purin-labs/agent-tools/catalog/tool-registry";
+import {
+  defineToolFamily,
+  jsonSchema,
+} from "@purin-labs/agent-tools/define-tool";
 
 /**
  * The tools of the WhatsApp agent: read the exact admitted Case, return one

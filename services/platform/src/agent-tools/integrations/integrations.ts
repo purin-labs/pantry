@@ -5,7 +5,7 @@ import {
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { isRecord } from "@purin-labs/std";
 import type { HarnessIntegrationListRequest } from "./services";
-import { jsonSchema } from "../define-tool";
+import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { defineIntegrationTool } from "./services";
 
 export const airtableApiRead = defineIntegrationTool({

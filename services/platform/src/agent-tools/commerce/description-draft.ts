@@ -4,7 +4,7 @@ import type {
 } from "../../actors/product-description-draft";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import { jsonSchema } from "../define-tool";
+import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { defineCommerceTool } from "./services";
 
 const PRODUCT_ID_PATTERN = /^[A-Za-z0-9_:-]{1,256}$/;

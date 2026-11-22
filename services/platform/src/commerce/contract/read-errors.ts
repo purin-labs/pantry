@@ -1,4 +1,4 @@
-import { ToolRequestError } from "../../agent-tools/errors";
+import { ToolRequestError } from "@purin-labs/agent-tools/errors";
 import type { RequestableEntityTypeRead } from "@purin-labs/authority/authorization/requestable-capabilities";
 import type { CommerceGraphReaderError } from "../entity-plane/graph-reader";
 

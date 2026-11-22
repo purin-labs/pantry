@@ -14,10 +14,10 @@ import type {
   HarnessCampaignBriefRequest,
   HarnessConfigurationProposalRequest,
 } from "./services";
-import { jsonSchema } from "../define-tool";
+import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { defineCommerceTool } from "./services";
-import type { CommerceActionProposalOrigin } from "../catalog/types";
-import { ProposalArgumentError } from "../errors";
+import type { CommerceActionProposalOrigin } from "@purin-labs/agent-tools/catalog/types";
+import { ProposalArgumentError } from "@purin-labs/agent-tools/errors";
 
 export type StockActionProposal = (
   request: StockProposalRequest,

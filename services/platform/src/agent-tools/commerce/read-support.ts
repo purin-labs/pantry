@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { StaffPageRequestError } from "../errors";
+import { StaffPageRequestError } from "@purin-labs/agent-tools/errors";
 import { SUPPLIER_DIRECTORY_LIST_ID } from "@purin-labs/commerce-client";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";

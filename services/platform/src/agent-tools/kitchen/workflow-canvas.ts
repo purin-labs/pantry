@@ -4,7 +4,7 @@ import {
 } from "../../actors/workflow-canvas-tools";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { CANVAS_BOUNDS } from "@purin-labs/workflow-canvas-crdt";
-import { jsonSchema } from "../define-tool";
+import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { defineKitchenTool } from "./services";
 
 export const workflowCanvasRead = defineKitchenTool({

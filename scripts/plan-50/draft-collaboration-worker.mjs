@@ -10,7 +10,7 @@ import {
   editProductDescriptionDraftForEmbeddedHarness,
 } from "../../services/platform/src/agent-tools/commerce/description-draft-handlers.ts";
 import { settleToolEffect } from "../../services/platform/src/agent-tools/session-support.ts";
-import { uncheckedEffect } from "../../services/platform/src/agent-tools/tool-effect.ts";
+import { uncheckedEffect } from "../../foundation/agent-tools/tool-effect.ts";
 import { createCommerceClient } from "../../services/platform/src/commerce/contract/client.ts";
 import { commerceCanonicalResourceId } from "../../services/platform/src/commerce/contract/resource-ids.ts";
 import { createAccessGrant } from "../../foundation/authority/data/access-grants.ts";

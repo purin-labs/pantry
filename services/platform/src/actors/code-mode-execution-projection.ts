@@ -3,7 +3,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import type { HarnessCodeModeExecutionLease } from "../agent-tools/catalog/types";
+import type { HarnessCodeModeExecutionLease } from "@purin-labs/agent-tools/catalog/types";
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 /**

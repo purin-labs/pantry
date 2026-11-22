@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { normalizeUntrustedCommerceText } from "../context/untrusted-commerce-text";
+import { normalizeUntrustedCommerceText } from "@purin-labs/agent-tools/context/untrusted-commerce-text";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { evaluateChatFlowLabelSink } from "../chat/information-flow";
 import { isConversationId, isProjectId } from "@purin-labs/control-api";
@@ -9,13 +9,13 @@ import {
   passOrAskForExitApproval,
 } from "../actors/harness-follow-up";
 import type { HeldOutputReason } from "@purin-labs/authority/data/held-output-request";
-import type { EffectAction } from "./effect-action";
+import type { EffectAction } from "@purin-labs/agent-tools/effect-action";
 import type {
   HarnessCapabilityName,
   StaffPageToolReceipt,
-} from "./catalog/types";
-import { StaffPageRequestError } from "./errors";
-import type { UncheckedEffect } from "./tool-effect";
+} from "@purin-labs/agent-tools/catalog/types";
+import { StaffPageRequestError } from "@purin-labs/agent-tools/errors";
+import type { UncheckedEffect } from "@purin-labs/agent-tools/tool-effect";
 import {
   currentFlowSinkCheck,
   evaluateFlowLabelSink,
@@ -39,7 +39,7 @@ import {
 import { preflightHarnessTurnLease } from "../actors/agent-session-harness-authority";
 import { CODE_MODE_PILOT_BUDGET } from "../actors/code-mode-budget";
 import { admittedExecutionDeadline } from "../actors/code-mode-admission";
-import type { CatalogExecutionContext } from "./catalog/execute";
+import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
 import {
   readControlMutationReplay,
   recordOrganisationCommerceMutationReceipt,

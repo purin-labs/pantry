@@ -1,7 +1,7 @@
 import type { HeldEffectAction } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 
-import { normalizeUntrustedCommerceText } from "../context/untrusted-commerce-text";
+import { normalizeUntrustedCommerceText } from "./context/untrusted-commerce-text";
 import { digestCanonical } from "@purin-labs/authority/policy/information-flow/index";
 
 /**

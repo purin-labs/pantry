@@ -22,7 +22,7 @@ import type {
   EmbeddedHarnessTurnResult,
   HarnessToolHost,
 } from "../../src/actors/embedded-harness";
-import type { HarnessCodeModeAdmission, HarnessCodeModeAdmittedExecution, HarnessCodeModeExecutionLease } from "../../src/agent-tools/catalog/types";
+import type { HarnessCodeModeAdmission, HarnessCodeModeAdmittedExecution, HarnessCodeModeExecutionLease } from "@purin-labs/agent-tools/catalog/types";
 import type { CodemodeRemote } from "@earendil-works/pi-codemode/portable";
 import { createPiDurableAdapter } from "../../src/actors/pi-durable-runtime";
 import { piToolRules } from "../../src/actors/pi-tool-replay";

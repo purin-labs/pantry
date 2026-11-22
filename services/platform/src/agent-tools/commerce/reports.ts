@@ -2,7 +2,7 @@ import { isMerchantReportName } from "../../commerce/entity-plane/merchant-repor
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type { HarnessMerchantReportRequest } from "./services";
-import { jsonSchema } from "../define-tool";
+import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { defineCommerceTool } from "./services";
 
 export const merchantReport = defineCommerceTool({

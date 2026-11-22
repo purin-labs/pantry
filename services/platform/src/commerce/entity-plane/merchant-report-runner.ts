@@ -9,7 +9,7 @@ import {
   readNamedCommerceQuery,
   type CommerceContextAssemblyError,
 } from "./context-read";
-import { normalizeUntrustedCommerceText } from "../../context/untrusted-commerce-text";
+import { normalizeUntrustedCommerceText } from "@purin-labs/agent-tools/context/untrusted-commerce-text";
 import type { Result } from "@purin-labs/kernel/result";
 import type { CommerceGraphReader } from "./graph-reader";
 import {

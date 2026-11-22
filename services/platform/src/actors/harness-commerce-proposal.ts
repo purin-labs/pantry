@@ -32,7 +32,7 @@ import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { CommerceActionProposalOrigin } from "../agent-tools/catalog/types";
+import type { CommerceActionProposalOrigin } from "@purin-labs/agent-tools/catalog/types";
 import {
   readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding,
   sessionObservedCommerceEntity,

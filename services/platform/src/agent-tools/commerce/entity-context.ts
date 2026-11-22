@@ -10,8 +10,8 @@ import {
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import { COMMERCE_SENSITIVITIES } from "../../commerce/contract/sensitivity";
-import { jsonSchema } from "../define-tool";
-import { ToolRequestError } from "../errors";
+import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
+import { ToolRequestError } from "@purin-labs/agent-tools/errors";
 import { defineCommerceTool } from "./services";
 
 /** A context request that the model can correct. Its message reaches the model. */

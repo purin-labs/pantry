@@ -12,7 +12,7 @@ import {
   readWorkflowFindings,
 } from "../../commerce/bakery/workflow-revisions";
 import { supplierIdFromName } from "@purin-labs/control-api";
-import { StaffPageRequestError } from "../errors";
+import { StaffPageRequestError } from "@purin-labs/agent-tools/errors";
 import {
   RecipeWorkflowRequestError,
   type RecipeWorkflowReadRequest,
@@ -21,7 +21,7 @@ import {
   type SupplierCreateRequest,
   type SupplierToolRead,
 } from "./services";
-import type { StaffPageToolReceipt } from "../catalog/types";
+import type { StaffPageToolReceipt } from "@purin-labs/agent-tools/catalog/types";
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import {
   requireSessionExecution,

@@ -4,9 +4,9 @@ import type {
   DeviceProposeRequest,
 } from "./services";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import { jsonSchema } from "../define-tool";
+import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { defineDeviceTool } from "./services";
-import { ProposalArgumentError } from "../errors";
+import { ProposalArgumentError } from "@purin-labs/agent-tools/errors";
 
 export const deviceRead = defineDeviceTool({
   name: "device_read",

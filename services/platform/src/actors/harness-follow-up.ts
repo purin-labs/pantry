@@ -10,12 +10,12 @@ import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtim
 import type {
   HarnessFollowUpRequest,
   HarnessFollowUpResult,
-} from "../agent-tools/catalog/types";
-import { ExitApprovalRequestedError } from "../agent-tools/errors";
+} from "@purin-labs/agent-tools/catalog/types";
+import { ExitApprovalRequestedError } from "@purin-labs/agent-tools/errors";
 import type {
   HarnessPermissionRequest,
   HarnessPermissionRequestResult,
-} from "../agent-tools/catalog/permission";
+} from "@purin-labs/agent-tools/catalog/permission";
 import {
   consumeHeldEffectPass,
   hasHeldEffectPass,
@@ -26,7 +26,7 @@ import {
 import {
   heldEffectActionRecord,
   type EffectAction,
-} from "../agent-tools/effect-action";
+} from "@purin-labs/agent-tools/effect-action";
 import {
   FlowLabel,
   joinFlowLabels,

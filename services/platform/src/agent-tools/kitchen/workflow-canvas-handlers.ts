@@ -19,7 +19,7 @@ import {
   requireSessionExecution,
 } from "../../actors/session-execution-admission";
 import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
-import type { CatalogExecutionContext } from "../catalog/execute";
+import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
 import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { admitSessionInformationFlowObservation } from "../../actors/agent-session-information-flow";
 import {

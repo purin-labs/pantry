@@ -1,6 +1,6 @@
 import { assertNever } from "@purin-labs/std";
 import type { TSchema } from "typebox";
-import type { ToolRegistry } from "../agent-tools/catalog/tool-registry";
+import type { ToolRegistry } from "@purin-labs/agent-tools/catalog/tool-registry";
 
 /**
  * Who may run a tool call again after a lost process left it in flight.

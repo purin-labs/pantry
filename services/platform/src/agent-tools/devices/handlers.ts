@@ -6,13 +6,13 @@ import {
 import { listDevices } from "../../devices/store";
 import { readKitchenDeviceViews } from "../../devices/views";
 import { shopMacDevices } from "../../devices/contract/shop-mac-devices";
-import { normalizeUntrustedCommerceText } from "../../context/untrusted-commerce-text";
+import { normalizeUntrustedCommerceText } from "@purin-labs/agent-tools/context/untrusted-commerce-text";
 import {
   DeviceRequestError,
   type DevicePauseRequest,
   type DeviceToolRead,
 } from "./services";
-import type { StaffPageToolReceipt } from "../catalog/types";
+import type { StaffPageToolReceipt } from "@purin-labs/agent-tools/catalog/types";
 import { requireSessionExecution } from "../../actors/session-execution-admission";
 import { digestCanonical } from "@purin-labs/authority/policy/index";
 import { roleMayOperate } from "@purin-labs/tenancy/data/control-plane";

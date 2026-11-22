@@ -109,12 +109,13 @@ import. A module with no line for one of these has none.
 ## foundation/agent-tools
 
 - Folders: 6
-  - `services/platform/src/agent-tools/`
-  - `services/platform/src/agent-tools/catalog/`
-  - `services/platform/src/agent-tools/files/`
-  - `services/platform/src/agent-tools/messages/`
-  - `services/platform/src/agent-tools/turn/`
-  - `services/platform/src/context/`
+  - `foundation/agent-tools/`
+  - `foundation/agent-tools/catalog/`
+  - `foundation/agent-tools/context/`
+  - `foundation/agent-tools/files/`
+  - `foundation/agent-tools/messages/`
+  - `foundation/agent-tools/turn/`
+- Packages: `foundation/agent-tools`
 
 ## foundation/agent
 

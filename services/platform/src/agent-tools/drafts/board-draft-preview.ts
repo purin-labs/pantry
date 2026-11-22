@@ -14,7 +14,7 @@ import {
   collaborationMember,
   passSharedDraftExit,
 } from "../session-support";
-import { harnessCapabilitiesFromCapabilityKeys } from "../catalog/code-mode";
+import { harnessCapabilitiesFromCapabilityKeys } from "@purin-labs/agent-tools/catalog/code-mode";
 import { requireLiveMenuDraftAuthority } from "./handlers";
 import { draftBoardId, draftEdit } from "./board-draft-edit";
 

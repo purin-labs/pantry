@@ -1,5 +1,5 @@
 import { Type, type Static } from "typebox";
-import { StructuredToolResult } from "../agent-tools/structured-result";
+import { StructuredToolResult } from "@purin-labs/agent-tools/structured-result";
 import { isSystemCommerceEntity } from "@purin-labs/commerce-contracts";
 import type { HarnessToolOutput } from "@purin-labs/contracts";
 import type { CommerceGraphQueryResult } from "@purin-labs/commerce-contracts";

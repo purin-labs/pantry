@@ -7,8 +7,8 @@ import type {
   CustomConnectorReadCatalogEntry,
   CustomConnectorWriteCatalogEntry,
 } from "../../custom-connectors";
-import { defineToolFamily } from "../define-tool";
-import type { PreparedEffect } from "../tool-effect";
+import { defineToolFamily } from "@purin-labs/agent-tools/define-tool";
+import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
 
 type HarnessCustomConnectorRead = (
   entry: CustomConnectorReadCatalogEntry,

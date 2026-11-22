@@ -1,8 +1,8 @@
 import { parseBakeStockLevelInput } from "@purin-labs/kitchen-control-api";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import { jsonSchema } from "../define-tool";
-import { ProposalArgumentError } from "../errors";
+import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
+import { ProposalArgumentError } from "@purin-labs/agent-tools/errors";
 import {
   defineKitchenTool,
   type BakeProposeRequest,

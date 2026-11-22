@@ -6,13 +6,13 @@ import {
   parseCommerceGraphResponse,
 } from "@purin-labs/commerce-client";
 
-import { catalogHarnessToolCatalogDigest } from "../src/agent-tools/catalog/selection";
-import { createCatalogHarnessCodeMode, harnessCapabilitiesFromCapabilityKeys } from "../src/agent-tools/catalog/code-mode";
+import { catalogHarnessToolCatalogDigest } from "@purin-labs/agent-tools/catalog/selection";
+import { createCatalogHarnessCodeMode, harnessCapabilitiesFromCapabilityKeys } from "@purin-labs/agent-tools/catalog/code-mode";
 import {
   TOOL_REGISTRY,
   type PartialToolServices,
 } from "../src/agent-tools/registry";
-import { uncheckedEffect } from "../src/agent-tools/tool-effect";
+import { uncheckedEffect } from "@purin-labs/agent-tools/tool-effect";
 import { requireIntegrationAccountId } from "./test-ids";
 
 /**
@@ -998,9 +998,9 @@ function recordWhatsAppSupportReplySend(
 }
 
 function queryWorkspace(
-  input: import("../src/agent-tools/catalog/types").HarnessWorkspaceQuery,
+  input: import("@purin-labs/agent-tools/catalog/types").HarnessWorkspaceQuery,
 ): Promise<
-  import("../src/agent-tools/catalog/types").HarnessWorkspaceQueryResult
+  import("@purin-labs/agent-tools/catalog/types").HarnessWorkspaceQueryResult
 > {
   const path = input.kind === "read" ? input.path : "search";
   return Promise.resolve({
@@ -1025,7 +1025,7 @@ function authorizedJson(result: AuthorizedHarnessToolResult): unknown {
   return JSON.parse(result.output.content[0].text);
 }
 
-function permissiveAdmission(): import("../src/agent-tools/catalog/types").HarnessCodeModeAdmission {
+function permissiveAdmission(): import("@purin-labs/agent-tools/catalog/types").HarnessCodeModeAdmission {
   return {
     begin: beginFixtureExecution,
     claim: acceptFixtureCapability,
@@ -1036,7 +1036,7 @@ function permissiveAdmission(): import("../src/agent-tools/catalog/types").Harne
 }
 
 function beginFixtureExecution(): Promise<
-  import("../src/agent-tools/catalog/types").HarnessCodeModeAdmittedExecution
+  import("@purin-labs/agent-tools/catalog/types").HarnessCodeModeAdmittedExecution
 > {
   return Promise.resolve({
     executionId: "cmx-fixture",
@@ -1063,14 +1063,14 @@ function acceptFixtureCapabilityClaim(): Promise<{
 
 function recordAcceptedCapabilityClaim(
   claims: string[],
-  input: import("../src/agent-tools/catalog/types").HarnessCapabilityClaimInput,
+  input: import("@purin-labs/agent-tools/catalog/types").HarnessCapabilityClaimInput,
 ): Promise<{ readonly ok: true; readonly value: null }> {
   claims.push(`${input.boundary}:${input.capability}`);
   return Promise.resolve({ ok: true, value: null });
 }
 
 function readToolName(
-  definition: import("../src/agent-tools/catalog/types").HarnessToolDefinition,
+  definition: import("@purin-labs/agent-tools/catalog/types").HarnessToolDefinition,
 ): string {
   return definition.name;
 }

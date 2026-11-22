@@ -1,4 +1,4 @@
-import { ToolRequestError } from "../../agent-tools/errors";
+import { ToolRequestError } from "@purin-labs/agent-tools/errors";
 
 /** A menu request that the model can correct. Its message reaches the model. */
 export class MenuDraftRequestError extends ToolRequestError {}

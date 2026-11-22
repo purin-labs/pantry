@@ -11,7 +11,7 @@ import {
   SessionExecutionAdmission,
   requireSessionExecution,
 } from "../../actors/session-execution-admission";
-import type { CatalogExecutionContext } from "../catalog/execute";
+import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
 import { readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";
 import {
   listOrganisationMembers,

@@ -2,7 +2,7 @@ import { http, type HttpResponseResolver } from "msw";
 import { expect, it } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import type { AuthorizedHarnessToolResult } from "@purin-labs/contracts";
-import type { HarnessCodeModeAdmittedExecution, HarnessCodeModeExecutionLease } from "../../src/agent-tools/catalog/types";
+import type { HarnessCodeModeAdmittedExecution, HarnessCodeModeExecutionLease } from "@purin-labs/agent-tools/catalog/types";
 import { network } from "./network";
 import {
   RecordingBoundary,

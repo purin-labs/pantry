@@ -16,7 +16,7 @@ import {
 import { KITCHEN_SURFACE } from "@purin-labs/control-api";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type { HarnessBakerySurfaceToolRequest } from "../kitchen/services";
-import { jsonSchema } from "../define-tool";
+import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import {
   bakerySurfaceToolSucceeded,
   readBakerySurfaceReceiptId,

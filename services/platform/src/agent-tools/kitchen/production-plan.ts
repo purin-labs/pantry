@@ -5,7 +5,7 @@ import type {
   HarnessProductionPlanRead,
 } from "./services";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import { jsonSchema } from "../define-tool";
+import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { defineKitchenTool } from "./services";
 
 export const productionPlanRead = defineKitchenTool({

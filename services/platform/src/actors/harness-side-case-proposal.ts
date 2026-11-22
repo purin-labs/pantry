@@ -12,7 +12,7 @@ import { readSessionTurnFlowBinding } from "./agent-session-information-flow";
 import type {
   HarnessSideCaseProposalRequest,
   HarnessSideCaseProposalResult,
-} from "../agent-tools/catalog/types";
+} from "@purin-labs/agent-tools/catalog/types";
 import {
   requireSessionExecution,
 } from "./session-execution-admission";

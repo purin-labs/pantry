@@ -4,9 +4,9 @@ import {
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { IntegrationAccountReference } from "@purin-labs/authority/access-control/integration-discovery";
-import { defineToolFamily, jsonSchema } from "../define-tool";
-import { ToolRequestError } from "../errors";
-import type { PreparedEffect } from "../tool-effect";
+import { defineToolFamily, jsonSchema } from "@purin-labs/agent-tools/define-tool";
+import { ToolRequestError } from "@purin-labs/agent-tools/errors";
+import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
 
 /**
  * A Slack draft the model can correct, such as one for a channel that is not

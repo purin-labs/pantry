@@ -1,7 +1,7 @@
 import type { EmailDraftEditRequest } from "../../actors/email-draft";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import { jsonSchema } from "../define-tool";
+import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { defineChannelTool } from "./services";
 
 export const emailDraftRead = defineChannelTool({

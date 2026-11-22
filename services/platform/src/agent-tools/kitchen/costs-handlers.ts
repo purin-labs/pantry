@@ -36,9 +36,9 @@ import type {
   CommerceAdminClient,
   CommerceEntityPlaneClient,
 } from "@purin-labs/commerce-client";
-import type { CatalogExecutionContext } from "../catalog/execute";
-import type { StaffPageToolReceipt } from "../catalog/types";
-import { StaffPageRequestError } from "../errors";
+import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
+import type { StaffPageToolReceipt } from "@purin-labs/agent-tools/catalog/types";
+import { StaffPageRequestError } from "@purin-labs/agent-tools/errors";
 import type {
   CostsPlanSaveRequest,
   CostsPlanSaveTool,

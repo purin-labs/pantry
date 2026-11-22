@@ -31,7 +31,7 @@ import type { HarnessHistoryRead } from "./harness-history";
 import type {
   HarnessCodeModeSandbox,
   HarnessNativeCodeMode,
-} from "../agent-tools/catalog/types";
+} from "@purin-labs/agent-tools/catalog/types";
 /** `picocodex` and `codex` name retired backends; their checkpoints restart fresh. */
 export type ActiveEmbeddedHarnessBackendId = Exclude<
   EmbeddedHarnessBackendId,

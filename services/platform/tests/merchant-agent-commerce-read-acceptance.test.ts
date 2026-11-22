@@ -13,12 +13,12 @@ import {
   CommerceEntityPlaneClient,
 } from "@purin-labs/commerce-client";
 
-import { catalogHarnessToolCatalogDigest } from "../src/agent-tools/catalog/selection";
-import { createCatalogHarnessCodeMode } from "../src/agent-tools/catalog/code-mode";
+import { catalogHarnessToolCatalogDigest } from "@purin-labs/agent-tools/catalog/selection";
+import { createCatalogHarnessCodeMode } from "@purin-labs/agent-tools/catalog/code-mode";
 import { TOOL_REGISTRY } from "../src/agent-tools/registry";
 import type {
   HarnessCodeModeAuthority,
-} from "../src/agent-tools/catalog/types";
+} from "@purin-labs/agent-tools/catalog/types";
 import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 import { CommerceGraphReader } from "../src/commerce/entity-plane/graph-reader";
 import { runMerchantReport } from "../src/commerce/entity-plane/merchant-report-runner";

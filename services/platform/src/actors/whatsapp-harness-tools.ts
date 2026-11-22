@@ -7,14 +7,14 @@ import { digestCanonical } from "@purin-labs/authority/policy/index";
 import {
   type CatalogToolAuthority,
   executeCatalogTool,
-} from "../agent-tools/catalog/execute";
-import type { HarnessCapabilityClaim } from "../agent-tools/catalog/types";
+} from "@purin-labs/agent-tools/catalog/execute";
+import type { HarnessCapabilityClaim } from "@purin-labs/agent-tools/catalog/types";
 import {
   WHATSAPP_AGENT_TOOL_REGISTRY,
   type WhatsAppAgentToolServices,
 } from "../agent-tools/channels/whatsapp-agent";
-import { modelToolDefinition } from "../agent-tools/define-tool";
-import { ToolRequestError } from "../agent-tools/errors";
+import { modelToolDefinition } from "@purin-labs/agent-tools/define-tool";
+import { ToolRequestError } from "@purin-labs/agent-tools/errors";
 import type { HarnessToolHost } from "./embedded-harness";
 import type { Variant } from "@purin-labs/type-utils";
 

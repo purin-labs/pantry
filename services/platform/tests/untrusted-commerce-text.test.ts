@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { normalizeUntrustedCommerceText } from "../src/context/untrusted-commerce-text";
+import { normalizeUntrustedCommerceText } from "@purin-labs/agent-tools/context/untrusted-commerce-text";
 
 const BIDI_OVERRIDE = String.fromCodePoint(0x202e);
 const ZERO_WIDTH = String.fromCodePoint(0x200b);

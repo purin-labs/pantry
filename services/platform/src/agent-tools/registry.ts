@@ -1,5 +1,5 @@
-import { createToolRegistry } from "./catalog/tool-registry";
-import type { RegisteredTool } from "./define-tool";
+import { createToolRegistry } from "@purin-labs/agent-tools/catalog/tool-registry";
+import type { RegisteredTool } from "@purin-labs/agent-tools/define-tool";
 import { SURFACE_TOOL_LIST } from "./bakery/surface";
 import {
   emailMailboxSearch,
@@ -54,7 +54,11 @@ import {
   menuDraftRead,
   menuPriceProposal,
 } from "./drafts/drafts";
-import { fileRead, fileSearch, workspaceQuery } from "./files/files";
+import {
+  fileRead,
+  fileSearch,
+  workspaceQuery,
+} from "@purin-labs/agent-tools/files/files";
 import {
   airtableApiRead,
   airtableApiWrite,
@@ -85,9 +89,16 @@ import {
   workflowCanvasMove,
   workflowCanvasRead,
 } from "./kitchen/tools";
-import { messageAttachmentInspect, messageLinkRead } from "./messages/messages";
+import {
+  messageAttachmentInspect,
+  messageLinkRead,
+} from "@purin-labs/agent-tools/messages/messages";
 import { slackMessageProposal } from "./slack/slack";
-import { followUp, memoryProposal, sideCaseProposal } from "./turn/turn";
+import {
+  followUp,
+  memoryProposal,
+  sideCaseProposal,
+} from "@purin-labs/agent-tools/turn/turn";
 
 /**
  * The one list of the agent tools: each family gives its tools, and this list

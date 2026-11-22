@@ -5,7 +5,7 @@ import type {
 } from "./services";
 import type {
   StaffPageToolReceipt,
-} from "../catalog/types";
+} from "@purin-labs/agent-tools/catalog/types";
 import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";

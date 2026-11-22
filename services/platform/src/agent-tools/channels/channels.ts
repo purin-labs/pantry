@@ -19,8 +19,8 @@ import type {
   HarnessWhatsAppSupportReplySend,
 } from "./services";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import { jsonSchema } from "../define-tool";
-import { uncheckedEffect } from "../tool-effect";
+import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
+import { uncheckedEffect } from "@purin-labs/agent-tools/tool-effect";
 import { defineChannelTool } from "./services";
 
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;

@@ -2,8 +2,8 @@ import type {
   JevFeatureCommand,
   JevFeaturesView,
 } from "@purin-labs/control-api/portal/jev-features";
-import { defineToolFamily } from "../define-tool";
-import { ToolRequestError } from "../errors";
+import { defineToolFamily } from "@purin-labs/agent-tools/define-tool";
+import { ToolRequestError } from "@purin-labs/agent-tools/errors";
 
 /** The Jev settings, as Settings › Jev shows them (Plan 88). */
 type JevFeaturesReadTool = () => Promise<JevFeaturesView>;

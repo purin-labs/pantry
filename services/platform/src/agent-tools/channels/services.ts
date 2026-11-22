@@ -7,10 +7,10 @@ import type {
 } from "../../actors/email-draft";
 import type { EmailSelfTestRequest } from "../../data/email-self-test";
 import type { EmailReplyCitation } from "../../mail-inbox/reply-sources";
-import type { CatalogExecutionContext } from "../catalog/execute";
-import { defineToolFamily } from "../define-tool";
-import { ToolRequestError } from "../errors";
-import type { PreparedEffect } from "../tool-effect";
+import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
+import { defineToolFamily } from "@purin-labs/agent-tools/define-tool";
+import { ToolRequestError } from "@purin-labs/agent-tools/errors";
+import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
 
 /**
  * Plan 40D: a reply draft request the model can correct, such as a read from

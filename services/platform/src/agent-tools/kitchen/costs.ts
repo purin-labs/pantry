@@ -28,11 +28,11 @@ import {
   type SupplyLotCost,
   type WeekUnits,
 } from "@purin-labs/kitchen-control-api";
-import type { CatalogExecutionContext } from "../catalog/execute";
+import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import { jsonSchema } from "../define-tool";
+import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { defineKitchenTool } from "./services";
-import type { PreparedEffect } from "../../agent-tools/tool-effect";
+import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
 
 const COST_UNITS: ReadonlySet<string> = new Set([
   "each",

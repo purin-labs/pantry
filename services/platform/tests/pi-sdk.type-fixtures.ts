@@ -2,7 +2,7 @@ import type {
   HarnessCodeModeSandbox,
   HarnessNativeCodeMode,
 } from "../src/actors/embedded-harness";
-import type { HarnessCodeModeAdmission } from "../src/agent-tools/catalog/types";
+import type { HarnessCodeModeAdmission } from "@purin-labs/agent-tools/catalog/types";
 
 type Enabled = Extract<HarnessNativeCodeMode, { kind: "enabled" }>;
 

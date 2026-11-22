@@ -7,7 +7,7 @@ import type {
   ToolRegistry,
   ToolServiceSet,
   TurnTool,
-} from "../../agent-tools/catalog/tool-registry";
+} from "@purin-labs/agent-tools/catalog/tool-registry";
 import type { SessionToolContext } from "../../agent-tools/context";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationId, RequestId } from "@purin-labs/kernel/ids";
@@ -17,11 +17,11 @@ import type { SlackThreadSideCase } from "./harness-source";
 import type { SessionConversation } from "./conversation-port";
 import type { StoredMessageAttachment } from "@purin-labs/contracts";
 import type { AgentSessionPersistence } from "../agent-session-schema";
-import type { PreparedEffect } from "../../agent-tools/tool-effect";
+import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
 import type {
   HarnessPermissionRequest,
   HarnessPermissionRequestResult,
-} from "../../agent-tools/catalog/permission";
+} from "@purin-labs/agent-tools/catalog/permission";
 import type { FlowLabel } from "@purin-labs/authority/policy/information-flow/index";
 import type { Env } from "@purin-labs/kernel/env";
 

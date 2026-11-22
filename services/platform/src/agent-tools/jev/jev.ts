@@ -3,9 +3,9 @@ import {
   type JevFeatureCommand,
 } from "@purin-labs/control-api/portal/jev-features";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import { jsonSchema } from "../define-tool";
+import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { defineJevTool } from "./services";
-import { ProposalArgumentError } from "../errors";
+import { ProposalArgumentError } from "@purin-labs/agent-tools/errors";
 
 /** Settings › Jev for the Portal chat agent (Plan 88 section 6). */
 export const jevFeaturesRead = defineJevTool({

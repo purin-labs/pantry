@@ -33,7 +33,7 @@ import {
 import { createCodemodeTool } from "@earendil-works/pi-durable/codemode";
 import { RemoteCodemodeSandbox } from "@earendil-works/pi-codemode/portable";
 import type { JsonValue } from "@earendil-works/chord/json";
-import type { HarnessCodeModeExecutionLease } from "../agent-tools/catalog/types";
+import type { HarnessCodeModeExecutionLease } from "@purin-labs/agent-tools/catalog/types";
 import { Type } from "typebox";
 import { refuseChangedToolArguments } from "./pi-tool-arguments";
 import {
@@ -45,10 +45,10 @@ import {
   sha256Hex,
 } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
-import { CodeModeAdmissionFrozenError } from "../agent-tools/catalog/types";
-import { PERMISSION_REQUEST_TOOL_NAME } from "../agent-tools/catalog/permission";
-import { MAX_CODE_MODE_SOURCE_BYTES } from "../agent-tools/catalog/code-mode";
-import { StructuredToolResult } from "../agent-tools/structured-result";
+import { CodeModeAdmissionFrozenError } from "@purin-labs/agent-tools/catalog/types";
+import { PERMISSION_REQUEST_TOOL_NAME } from "@purin-labs/agent-tools/catalog/permission";
+import { MAX_CODE_MODE_SOURCE_BYTES } from "@purin-labs/agent-tools/catalog/code-mode";
+import { StructuredToolResult } from "@purin-labs/agent-tools/structured-result";
 import type { PiToolRules } from "./pi-tool-replay";
 import { renderHarnessHistoryContent } from "./harness-history";
 import {

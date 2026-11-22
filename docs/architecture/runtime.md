@@ -489,7 +489,7 @@ keep their order with the emissions
 
 Pi gets model-visible tools from the accepted catalog
 ([`agent-tools/`](../../services/platform/src/agent-tools/registry.ts), selected by
-[`catalog/selection.ts`](../../services/platform/src/agent-tools/catalog/selection.ts)).
+[`catalog/selection.ts`](../../foundation/agent-tools/catalog/selection.ts)).
 The Tool Host
 ([`embedded-harness-tool-host.ts`](../../services/platform/src/actors/embedded-harness-tool-host.ts))
 authorizes each call against the exact capability. Code Mode is one bounded

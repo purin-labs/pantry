@@ -1,0 +1,25 @@
+{
+  "name": "@purin-labs/agent-tools",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": {
+      "types": "./*.ts",
+      "default": "./*.ts"
+    }
+  },
+  "dependencies": {
+    "@earendil-works/pi-codemode": "1.6.0",
+    "@purin-labs/authority": "workspace:*",
+    "@purin-labs/contracts": "workspace:*",
+    "@purin-labs/control-api": "workspace:*",
+    "@purin-labs/kernel": "workspace:*",
+    "@purin-labs/std": "workspace:*",
+    "typebox": "1.3.27"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260707.1",
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

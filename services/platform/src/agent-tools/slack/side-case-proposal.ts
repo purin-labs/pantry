@@ -22,7 +22,7 @@ import { storeSlackSideCaseProposal } from "../../slack/side-cases";
 import type {
   HarnessSideCaseProposalRequest,
   HarnessSideCaseProposalResult,
-} from "../catalog/types";
+} from "@purin-labs/agent-tools/catalog/types";
 
 /**
  * The agent's proposal in a Slack thread. The thread's Connector keeps this

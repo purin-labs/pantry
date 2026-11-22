@@ -21,7 +21,7 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE =
-  /^services\/platform\/src\/(agent-tools|custom-connectors)\/.+\.ts$/;
+  /^(services\/platform\/src\/(agent-tools|custom-connectors)|foundation\/agent-tools)\/.+\.ts$/;
 const DEFINITION = /define\w+Tool\(\{\n([\s\S]*?)\n\}\);/g;
 const EFFECTS_WITH_PREPARE = new Set(["draft", "receipt", "scheduled"]);
 

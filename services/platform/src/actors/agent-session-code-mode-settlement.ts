@@ -71,7 +71,7 @@ import { canonicalJson, isRecord, nonNegativeIntegerOrNull } from "@purin-labs/s
 import type {
   HarnessCodeModeExecutionLease,
   HarnessCodeModeExecutionOutcome,
-} from "../agent-tools/catalog/types";
+} from "@purin-labs/agent-tools/catalog/types";
 import { armAlarmBy } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 
 const SETTLEMENT_KIND = "code_mode_execution_settlement.v1";

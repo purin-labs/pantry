@@ -23,8 +23,8 @@ import {
 } from "./account-authority.mjs";
 import { acceptedExecutionAuthority } from "../../foundation/tenancy/organisation-access/access.ts";
 import { CAPABILITY_KEYS } from "../../foundation/authority/authorization/capability-catalogue.ts";
-import { catalogHarnessToolCatalogDigest } from "../../services/platform/src/agent-tools/catalog/selection.ts";
-import { createCatalogHarnessCodeMode } from "../../services/platform/src/agent-tools/catalog/code-mode.ts";
+import { catalogHarnessToolCatalogDigest } from "../../foundation/agent-tools/catalog/selection.ts";
+import { createCatalogHarnessCodeMode } from "../../foundation/agent-tools/catalog/code-mode.ts";
 import { TOOL_REGISTRY } from "../../services/platform/src/agent-tools/registry.ts";
 import {
   createAccessGrant,

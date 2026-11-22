@@ -4,7 +4,7 @@ import type { CapabilityDefinition } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 
 import { ACTION_REGISTRY } from "../action-registry/registry";
-import { harnessBaseCapabilities } from "../src/agent-tools/catalog/selection";
+import { harnessBaseCapabilities } from "@purin-labs/agent-tools/catalog/selection";
 import { TOOL_REGISTRY } from "../src/agent-tools/registry";
 import {
   CONTEXT_CASE_READ_CAPABILITY,

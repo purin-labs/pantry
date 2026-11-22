@@ -5,8 +5,8 @@ import {
 import { CanvasMove } from "@purin-labs/workflow-canvas-crdt";
 import { hasExactKeys, isPositiveInteger, isRecord } from "@purin-labs/std";
 import type { WorkflowCanvasRead } from "./workflow-canvas";
-import type { CatalogExecutionContext } from "../agent-tools/catalog/execute";
-import type { PreparedEffect } from "../agent-tools/tool-effect";
+import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
+import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
 
 export type WorkflowCanvasReadRequest = Readonly<{
   reference: WorkflowCanvasSource;

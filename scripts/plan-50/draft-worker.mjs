@@ -12,7 +12,7 @@ import { organisationId, userId } from "./proposal-worker.mjs";
 import { humanUser } from "./draft-seed.mjs";
 import { editProductDescriptionDraftForEmbeddedHarness } from "../../services/platform/src/agent-tools/commerce/description-draft-handlers.ts";
 import { settleToolEffect } from "../../services/platform/src/agent-tools/session-support.ts";
-import { uncheckedEffect } from "../../services/platform/src/agent-tools/tool-effect.ts";
+import { uncheckedEffect } from "../../foundation/agent-tools/tool-effect.ts";
 import { SessionExecutionAdmission } from "../../services/platform/src/actors/session-execution-admission.ts";
 import { issueControlSession } from "../../foundation/tenancy/data/control-plane.ts";
 import { matchProductDescriptionDraftRoute } from "../../services/platform/src/control/admission/product-description-draft.ts";

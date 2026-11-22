@@ -3,7 +3,7 @@ import {
   REGISTER_SURFACE,
   type RegisterViewCommand,
 } from "@purin-labs/control-api";
-import { noArguments } from "../define-tool";
+import { noArguments } from "@purin-labs/agent-tools/define-tool";
 import { defineCafeTool, type CafeToolServices } from "./order-queue";
 import {
   bakerySurfaceToolSucceeded,

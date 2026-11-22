@@ -5,7 +5,7 @@ import {
   readBakerySurfaceReceiptId,
 } from "../bakery/surface-result";
 import { defineKitchenTool, type KitchenToolServices } from "./services";
-import { ProposalArgumentError } from "../errors";
+import { ProposalArgumentError } from "@purin-labs/agent-tools/errors";
 
 const RERUN = {
   kind: "any_caller",

@@ -11,7 +11,7 @@ import { SessionExecutionAdmission } from "../session-execution-admission";
 import { readCaseSessionAssignment } from "../actor-journal/transactions";
 import { preflightHarnessTurnLease } from "../agent-session-harness-authority";
 import { claimRunCapability } from "../agent-session-budget";
-import type { HarnessCapabilityClaimInput } from "../../agent-tools/catalog/types";
+import type { HarnessCapabilityClaimInput } from "@purin-labs/agent-tools/catalog/types";
 import {
   authorizeCapabilityUse,
   type CapabilityAuthorizationError,

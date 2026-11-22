@@ -22,7 +22,7 @@ import {
   requireSessionExecution,
 } from "../../actors/session-execution-admission";
 import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
-import type { CatalogExecutionContext } from "../catalog/execute";
+import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
 import type { MenuBoardArchiveRequest, MenuBoardCreateRequest } from "./drafts";
 import { readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";

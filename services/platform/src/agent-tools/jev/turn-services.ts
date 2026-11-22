@@ -6,7 +6,7 @@ import {
 import type { ToolTurnContext } from "../../actors/session/tool-wiring";
 import { roleMayConfigure } from "@purin-labs/tenancy/data/control-plane";
 import { withToolContext, type SessionToolContext } from "../context";
-import { ToolRequestError } from "../errors";
+import { ToolRequestError } from "@purin-labs/agent-tools/errors";
 import { liveDeviceMember } from "../session-support";
 import { readJevFeaturesForEmbeddedHarness } from "./handlers";
 import type { JevToolServices } from "./services";

@@ -25,7 +25,7 @@ import type {
   HarnessFileSearch,
   HarnessWorkspaceQuery,
   HarnessWorkspaceQueryResult,
-} from "../catalog/types";
+} from "@purin-labs/agent-tools/catalog/types";
 import {
   readGrantedFile,
   searchGrantedFiles,
