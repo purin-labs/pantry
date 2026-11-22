@@ -182,6 +182,12 @@ Rules for the text:
 
 ## Four layers of a name
 
+**Ended on 22 November 2026 by [Plan 93](plan-93-clean-cutover.md).** Plan
+93 moved Pantry to a new stack with Purin-era names and no data move, and
+deleted the old stack. So the "Keep it" rules of the deployed and wire layers
+below no longer apply: every layer uses the new names. The table stays as the
+record of phases 1 to 3.
+
 A name lives in four layers. Each layer has its own rule.
 
 | Layer | Examples | Rule |
