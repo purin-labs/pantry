@@ -6,12 +6,15 @@ const membershipMocks = vi.hoisted(() => ({
   readActiveOrganisationMembershipRevision: vi.fn(),
 }));
 
-vi.mock("../src/actors/case-direct-processing", async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import("../src/actors/case-direct-processing")
-  >()),
-  processDirectCaseCommand: caseMocks.processDirectCaseCommand,
-}));
+vi.mock(
+  "@purin-labs/conversation/actors/case-direct-processing",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/conversation/actors/case-direct-processing")
+    >()),
+    processDirectCaseCommand: caseMocks.processDirectCaseCommand,
+  }),
+);
 vi.mock("@purin-labs/tenancy/data/control-plane", async (importOriginal) => ({
   ...(await importOriginal<
     typeof import("@purin-labs/tenancy/data/control-plane")
@@ -20,7 +23,7 @@ vi.mock("@purin-labs/tenancy/data/control-plane", async (importOriginal) => ({
     membershipMocks.readActiveOrganisationMembershipRevision,
 }));
 
-import { runAgentOperation } from "../src/data/agent-operation-runner";
+import { runAgentOperation } from "@purin-labs/conversation/data/agent-operation-runner";
 import { createOperatorConfigurationDraft } from "../src/data/operator-configuration-draft";
 import {
   installMerchantAgent,

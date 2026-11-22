@@ -15,8 +15,8 @@ import { type OrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import type { OrganisationAccess } from "@purin-labs/tenancy/organisation-access/access";
 import { dispatchBakerySurfaceEffect } from "../../actors/bakery-surface-effect";
-import { timelineVisibleMessages } from "../../chat/conversation";
-import { readConversation } from "../../chat/store";
+import { timelineVisibleMessages } from "@purin-labs/conversation/chat/conversation";
+import { readConversation } from "@purin-labs/conversation/chat/store";
 import { BakeryContextRequestError } from "../kitchen/services";
 import { requireLiveBakeryAuthority } from "../bakery/handlers";
 

@@ -1,6 +1,6 @@
 import { gmailConnectorIdValue } from "../../mail-inbox/contract/connector-ids";
 import { whatsappConnectorIdValue } from "../../data/whatsapp";
-import type { CaseInboxPart } from "../case/parts";
+import type { CaseInboxPart } from "@purin-labs/conversation/actors/case/parts";
 
 /** The Inbox part of the Case: the Connector of a mailbox or a WhatsApp number. */
 export const caseInboxPart: CaseInboxPart = {

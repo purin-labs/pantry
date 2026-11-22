@@ -2,14 +2,14 @@ import { OrganisationExecutionScope } from "../../foundation/tenancy/organisatio
 import {
   saveConversation,
   readConversation,
-} from "../../services/platform/src/chat/store.ts";
+} from "../../foundation/conversation/chat/store.ts";
 import {
   canProjectAgentEvent,
   projectAcceptedTurnReplay,
   createPortalChatStreamResponse,
 } from "../../services/platform/src/chat/portal-stream.ts";
 import { createSessionReplayResponse } from "../../foundation/agent/actors/session/replay.ts";
-import { readChatControlAuthority } from "../../services/platform/src/chat/information-flow.ts";
+import { readChatControlAuthority } from "../../foundation/conversation/chat/information-flow.ts";
 import {
   createAccessGrant,
   readAccessGrant,
@@ -23,15 +23,15 @@ import {
   parseChatModelAction,
   isChatId,
   normalizeConversationTimeline,
-} from "../../services/platform/src/chat/conversation.ts";
-import { buildAssistantTimelineEvent } from "../../services/platform/src/chat/timeline.ts";
+} from "../../foundation/conversation/chat/conversation.ts";
+import { buildAssistantTimelineEvent } from "../../foundation/conversation/chat/timeline.ts";
 import { organisationId, userId } from "./proposal-worker.mjs";
-import { authorizeConversation } from "../../services/platform/src/chat/conversation-access.ts";
+import { authorizeConversation } from "../../foundation/conversation/chat/conversation-access.ts";
 import { parseUserId } from "../../packages/control-api/src/ids.ts";
-import { mutateProject } from "../../services/platform/src/projects/commands.ts";
-import { mutateProjectAccess } from "../../services/platform/src/projects/membership.ts";
-import { shareConversation } from "../../services/platform/src/chat/conversation-sharing.ts";
-import { listProjectMembers } from "../../services/platform/src/projects/access.ts";
+import { mutateProject } from "../../foundation/conversation/projects/commands.ts";
+import { mutateProjectAccess } from "../../foundation/conversation/projects/membership.ts";
+import { shareConversation } from "../../foundation/conversation/chat/conversation-sharing.ts";
+import { listProjectMembers } from "../../foundation/conversation/projects/access.ts";
 import { issueControlSession } from "../../foundation/tenancy/data/control-plane.ts";
 
 export const conversationId = "conv_aaaaaaaa-1111-4111-8111-111111111111";

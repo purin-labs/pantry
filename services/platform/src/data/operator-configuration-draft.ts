@@ -13,7 +13,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import { roleMayConfigure, type ControlRole } from "@purin-labs/tenancy/data/control-plane";
 import type { ControlSessionId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
-import { runAgentOperation } from "./agent-operation-runner";
+import { runAgentOperation } from "@purin-labs/conversation/data/agent-operation-runner";
 import { parseProposalChangeSummary } from "@purin-labs/bakery-workflow/changes";
 import { parseRunFindings } from "@purin-labs/bakery-workflow/findings";
 import {

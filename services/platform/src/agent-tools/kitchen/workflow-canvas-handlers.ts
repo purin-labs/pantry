@@ -8,7 +8,7 @@ import type {
 import {
   authorizeCanvasTurnDocument,
   sessionTurnExecution,
-} from "../../chat/turn-access";
+} from "@purin-labs/conversation/chat/turn-access";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId } from "@purin-labs/kernel/ids";

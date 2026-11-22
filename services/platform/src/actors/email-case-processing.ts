@@ -42,7 +42,7 @@ import {
   fetchSessionConnectorMail,
   isSessionMailExecutionActive,
 } from "../mail-inbox/execution";
-import type { SessionTurnExecution } from "../chat/turn-access";
+import type { SessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import { assertNever } from "@purin-labs/std";
 import {
   prepareEmailCaseContextCollectionDependency,
@@ -117,7 +117,7 @@ import {
 import {
   prepareTransientEmailAssignment,
   settleTransientEmailAssignment,
-} from "./case-walking-path";
+} from "@purin-labs/conversation/actors/case-walking-path";
 import {
   emailTokenWindowTotals,
   latestEmailDraftOperation,
@@ -153,8 +153,8 @@ import { digestCanonical } from "@purin-labs/authority/policy/information-flow/d
 import {
   recoverAbandonedAssignments,
   sessionQuiescenceProver,
-} from "./case/abandoned-assignments";
-import { ABANDONED_START_PREFIX } from "./case/lifecycle";
+} from "@purin-labs/conversation/actors/case/abandoned-assignments";
+import { ABANDONED_START_PREFIX } from "@purin-labs/conversation/actors/case/lifecycle";
 import {
   dispatchEmailReply,
   disposeEmailProposal,

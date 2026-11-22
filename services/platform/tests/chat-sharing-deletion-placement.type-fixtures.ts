@@ -2,20 +2,23 @@ import type { UnitTestEnv } from "./worker-fakes";
 import {
   shareConversation,
   type ConversationSharingCommand,
-} from "../src/chat/conversation-sharing";
-import { mutateProjectAccess } from "../src/projects/membership";
+} from "@purin-labs/conversation/chat/conversation-sharing";
+import { mutateProjectAccess } from "@purin-labs/conversation/projects/membership";
 import {
   deleteArchivedChat,
   type ChatDeletionCommand,
-} from "../src/chat/deletion";
+} from "@purin-labs/conversation/chat/deletion";
 import type {
   ProjectAccessCommand,
   ProjectId,
   ConversationId,
 } from "@purin-labs/control-api";
-import type { ConversationScope } from "../src/chat/store";
+import type { ConversationScope } from "@purin-labs/conversation/chat/store";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { forkChat, type ChatForkCommand } from "../src/chat/forks";
+import {
+  forkChat,
+  type ChatForkCommand,
+} from "@purin-labs/conversation/chat/forks";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
 

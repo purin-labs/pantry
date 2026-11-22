@@ -1,5 +1,5 @@
 import { lifecycleFenceOf } from "@purin-labs/tenancy/data/organisation-lifecycle-moves";
-import { signalChat } from "../../chat/signals";
+import { signalChat } from "@purin-labs/conversation/chat/signals";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import type { Env } from "@purin-labs/kernel/env";
 import { createOwnedOrganisation } from "@purin-labs/tenancy/organisation-access/creation";

@@ -1,8 +1,8 @@
 import type { MachineDefinition } from "@purin-labs/std/state-machine";
 
-import { CASE_APPROVAL_WAIT_MACHINE } from "./case/approval-wait.machine";
-import { CASE_ASSIGNMENT_MACHINE } from "./case/assignment.machine";
-import { CASE_OUTPUT_MACHINE } from "./case/output.machine";
+import { CASE_APPROVAL_WAIT_MACHINE } from "@purin-labs/conversation/actors/case/approval-wait.machine";
+import { CASE_ASSIGNMENT_MACHINE } from "@purin-labs/conversation/actors/case/assignment.machine";
+import { CASE_OUTPUT_MACHINE } from "@purin-labs/conversation/actors/case/output.machine";
 import { CUE_DELIVERY_MACHINE } from "@purin-labs/agent/actors/cue-delivery.machine";
 import { DEVICE_COMMAND_MACHINE } from "./device-command.machine";
 import { STEERING_INPUT_MACHINE } from "@purin-labs/agent/actors/steering-input.machine";

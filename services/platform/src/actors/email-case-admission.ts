@@ -1,4 +1,4 @@
-import { ensureCaseProject } from "../projects/case-project";
+import { ensureCaseProject } from "@purin-labs/conversation/projects/case-project";
 import { gmailConnectorIdValue } from "../mail-inbox/contract/connector-ids";
 import type { Env } from "@purin-labs/kernel/env";
 import {

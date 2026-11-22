@@ -1,7 +1,7 @@
 import type { MailInboxWork } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";
 import type { CaseId, OrganisationId } from "@purin-labs/kernel/ids";
-import type { CaseResult } from "../case/types";
+import type { CaseResult } from "@purin-labs/conversation/actors/case/types";
 import type { CaseEmailProposal } from "./email-proposals";
 
 /**

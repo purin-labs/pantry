@@ -1,5 +1,5 @@
 import { resolveCollaborationAgent } from "../../actors/collaboration-agent";
-import { sessionTurnExecution } from "../../chat/turn-access";
+import { sessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseCaseId, parseIntegrationAccountId } from "@purin-labs/kernel/ids";

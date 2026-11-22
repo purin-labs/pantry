@@ -13,14 +13,14 @@ import {
   normalizeConversationTimeline,
   type ChatMessage,
   type Conversation,
-} from "../conversation";
-import type { ChatTimelineEvent } from "../timeline";
+} from "@purin-labs/conversation/chat/conversation";
+import type { ChatTimelineEvent } from "@purin-labs/conversation/chat/timeline";
 import {
   readConversation,
   saveConversation,
   type ConversationScope,
   type StoredConversation,
-} from "../store";
+} from "@purin-labs/conversation/chat/store";
 import type { BakerySurfaceTimelineEvent } from "../../actors/bakery-surface-effect";
 import type { Variant } from "@purin-labs/type-utils";
 import { timelineEventHasId } from "./admission";

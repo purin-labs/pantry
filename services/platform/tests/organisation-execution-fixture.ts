@@ -33,7 +33,7 @@ import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   bindOperatorTurnAccess,
   type SessionTurnExecution,
-} from "../src/chat/turn-access";
+} from "@purin-labs/conversation/chat/turn-access";
 import "./provide-organisation-lifecycle-parts";
 
 export async function requireOrganisationExecutionScope(

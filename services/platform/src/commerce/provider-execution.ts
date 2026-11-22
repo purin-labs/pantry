@@ -3,7 +3,7 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationAccess } from "@purin-labs/tenancy/organisation-access/access";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { decideCurrentAuthorityFlowSink } from "../chat/information-flow";
+import { decideCurrentAuthorityFlowSink } from "@purin-labs/conversation/chat/information-flow";
 import type { CommerceProjection } from "@purin-labs/commerce-contracts";
 
 import {

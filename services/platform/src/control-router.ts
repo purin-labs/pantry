@@ -7,7 +7,7 @@ import {
   handleChatGoalRoute,
   matchChatGoalRoute,
   type ChatGoalRoute,
-} from "./control/routes/chat-goal";
+} from "@purin-labs/conversation/control/routes/chat-goal";
 import { handleWorkflowCanvasRoute } from "./control/routes/workflow-canvas";
 import {
   matchWorkflowCanvasRoute,
@@ -17,12 +17,12 @@ import {
   handleChatSharingRoute,
   matchChatSharingRoute,
   type ChatSharingRoute,
-} from "./control/routes/chat-sharing";
+} from "@purin-labs/conversation/control/routes/chat-sharing";
 import {
   handleProjectAccessRoute,
   matchProjectAccessRoute,
   type ProjectAccessRoute,
-} from "./control/routes/project-access";
+} from "@purin-labs/conversation/control/routes/project-access";
 import {
   handleUserPreferencesRoute,
   matchUserPreferencesRoute,
@@ -43,12 +43,12 @@ import {
   handleProjectsRoute,
   matchProjectsRoute,
   type ProjectsRoute,
-} from "./control/routes/projects";
+} from "@purin-labs/conversation/control/routes/projects";
 import {
   handleChatDirectoryRoute,
   matchChatDirectoryRoute,
   type ChatDirectoryRoute,
-} from "./control/routes/chat-directory";
+} from "@purin-labs/conversation/control/routes/chat-directory";
 import {
   handleMailInboxRoute,
   matchMailInboxRoute,
@@ -93,7 +93,7 @@ import {
   handleCaseContextDiscoveryRoute,
   matchCaseContextDiscoveryRoute,
   type CaseContextDiscoveryRoute,
-} from "./control/routes/case-context-discovery";
+} from "@purin-labs/conversation/control/routes/case-context-discovery";
 import { resolveCaseContextCollectionSelectionVerification } from "./case-context-discovery/source";
 import { handleCaseScreenObservationsRoute } from "./control/routes/case-screen-observations";
 import {
@@ -176,11 +176,11 @@ import {
   matchBakeControlRoute,
   type BakeControlRoute,
 } from "./control/routes/bakes";
-import { handleChatSignalRoute } from "./control/routes/chat-signals";
+import { handleChatSignalRoute } from "@purin-labs/conversation/control/routes/chat-signals";
 import {
   matchChatSignalRoute,
   type ChatSignalRoute,
-} from "./control/admission/chat-signals";
+} from "@purin-labs/conversation/control/admission/chat-signals";
 import { controlError } from "@purin-labs/control/worker/http";
 import {
   handleAccessControlRoute,
@@ -191,12 +191,12 @@ import {
   handleHeldOutputRequestRoute,
   matchHeldOutputRequestRoute,
   type HeldOutputRequestRoute,
-} from "./control/routes/held-output-requests";
+} from "@purin-labs/conversation/control/routes/held-output-requests";
 import {
   handleAgentPermissionRequestRoute,
   matchAgentPermissionRequestRoute,
   type AgentPermissionRequestRoute,
-} from "./control/routes/agent-permission-requests";
+} from "@purin-labs/conversation/control/routes/agent-permission-requests";
 import {
   handleAgentControlRoute,
   matchAgentControlRoute,

@@ -1,9 +1,9 @@
 {
   "conversation_work": {
-    "services/platform/src/chat/workspace-canvas.ts": 1
+    "foundation/conversation/chat/workspace-canvas.ts": 1
   },
   "side_case_proposal": {
-    "services/platform/src/chat/side-cases.ts": 1,
+    "foundation/conversation/chat/side-cases.ts": 1,
     "services/platform/src/slack/side-cases.ts": 1
   },
   "organisation_lifecycle": {

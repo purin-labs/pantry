@@ -2,7 +2,7 @@ import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   turnMemoryReaderWithoutSubjects,
 } from "../memory/contract/turn-memory";
-import { ensureCaseProject } from "../projects/case-project";
+import { ensureCaseProject } from "@purin-labs/conversation/projects/case-project";
 import type { MailConnectorContext } from "./execution";
 import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import type {
@@ -35,7 +35,7 @@ import {
 import {
   prepareTransientEmailAssignment,
   settleTransientEmailAssignment,
-} from "../actors/case-walking-path";
+} from "@purin-labs/conversation/actors/case-walking-path";
 import {
   prepareTurnContext,
   prepareTurnAuthority,
@@ -59,7 +59,7 @@ import {
 } from "./assistant-eligibility";
 import { readDecision } from "./reads";
 import { mailClassificationEvidence } from "./evidence";
-import { bindOperatorTurnAccess } from "../chat/turn-access";
+import { bindOperatorTurnAccess } from "@purin-labs/conversation/chat/turn-access";
 import type { Variant } from "@purin-labs/type-utils";
 
 export type MailAssistantActorInput = MailOrganizationActorInput &

@@ -17,16 +17,16 @@ import {
   openChatSignalSocket,
   sendChatSignal,
   sweepChatSignalSockets,
-} from "./chat-signal-sockets";
-import type { ChatSignalTarget } from "../chat/signals";
+} from "@purin-labs/conversation/actors/chat-signal-sockets";
+import type { ChatSignalTarget } from "@purin-labs/conversation/chat/signals";
 import {
   authorizeChatSignalRequest,
   matchChatSignalRoute,
-} from "../control/admission/chat-signals";
+} from "@purin-labs/conversation/control/admission/chat-signals";
 import {
   ensureWorkspaceCanvasChat,
   continueWorkspaceCanvasChat,
-} from "../chat/workspace-canvas";
+} from "@purin-labs/conversation/chat/workspace-canvas";
 import { readWorkspaceCanvasChat } from "../chat/workspace-canvas-read";
 import {
   CHAT_SIGNAL,
@@ -42,14 +42,14 @@ import {
   type RelocationReceiptRequest,
 } from "./organisation-relocation-receipt";
 import { workspaceRevisionArchiveKeys } from "@purin-labs/agent/workspace-revision-store";
-import { readPortalChatAttachmentKeys } from "../chat/attachments";
+import { readPortalChatAttachmentKeys } from "@purin-labs/conversation/chat/attachments";
 import { readChatForkAttachmentKeys } from "@purin-labs/agent/chat/fork-history";
 import {
   captureOrganisationDataArchive,
   deleteOrganisationDataArchivePages,
   restoreOrganisationDataArchive,
 } from "@purin-labs/actor-runtime/data/organisation-regional-copy";
-import type { SessionTurnExecution } from "../chat/turn-access";
+import type { SessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import { type MailEvaluationInput } from "../mail-inbox/evaluation";
 import {
   canAdmitOrganisationArchiveCleanup,

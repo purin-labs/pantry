@@ -23,7 +23,7 @@ import {
   handleCampaignBriefDecision,
   handleCampaignBriefQueue,
 } from "./agents/campaign-briefs";
-import { handleCaseCommand } from "./agents/case-command";
+import { handleCaseCommand } from "@purin-labs/conversation/control/routes/agents/case-command";
 import {
   handleCancelOrganisationCodexAuthorization,
   handleCompleteOrganisationChatGptSignIn,
@@ -45,7 +45,7 @@ import {
 import {
   handleAgentOperationRevisions,
   handleAgentOperations,
-} from "./agents/operations";
+} from "@purin-labs/conversation/control/routes/agents/operations";
 import { handleMerchantAgentInstallation } from "./agents/merchant-agent";
 
 export type AgentControlRoute =

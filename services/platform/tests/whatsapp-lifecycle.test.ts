@@ -49,7 +49,7 @@ import {
   type WhatsAppRpcDeps,
 } from "../src/actors/connector-whatsapp-rpc";
 import { dispatchWhatsAppReply } from "../src/actors/connector-whatsapp-proposal";
-import { armConnectorAlarm } from "../src/actors/connector/alarm";
+import { armConnectorAlarm } from "@purin-labs/conversation/actors/connector/alarm";
 import { emailAlarmDue } from "../src/actors/connector/email";
 import { whatsAppAlarmDue } from "../src/actors/connector-whatsapp";
 import {

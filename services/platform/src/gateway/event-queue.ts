@@ -9,7 +9,7 @@ import {
 import { recordCaseAssignmentPin } from "@purin-labs/agent/data/agent-operations/case-assignment-pins";
 import { resolveScheduleAutomation } from "@purin-labs/agent/data/agent-operations/automation";
 import type { ScheduleBinding } from "@purin-labs/agent/data/agent-operations";
-import { processDirectCaseCommand } from "../actors/case-direct-processing";
+import { processDirectCaseCommand } from "@purin-labs/conversation/actors/case-direct-processing";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   findActiveCaseActorAtScope,

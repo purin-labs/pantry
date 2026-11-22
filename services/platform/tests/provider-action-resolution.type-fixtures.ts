@@ -63,7 +63,7 @@ void directResolution;
 void spreadResolution;
 void resolveVaultHandle;
 
-declare const mutationExecution: import("../src/actors/action-mutation-execution").ActionMutationExecution;
+declare const mutationExecution: import("@purin-labs/conversation/actors/action-mutation-execution").ActionMutationExecution;
 declare const actionOrganisation: import("../src/actors/organisation").OrganisationDO;
 declare const actionProposal: import("@purin-labs/authority/actors/action-ledger").ProposeActionInput;
 // @ts-expect-error An Organisation proposal RPC requires captured execution authority.

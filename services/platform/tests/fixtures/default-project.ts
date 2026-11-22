@@ -1,11 +1,11 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { ProjectId } from "@purin-labs/control-api";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { readDefaultProjectId } from "../../src/projects/case-project";
+import { readDefaultProjectId } from "@purin-labs/conversation/projects/case-project";
 import {
   baseProjectId,
   prepareBaseProject,
-} from "../../src/projects/default-project";
+} from "@purin-labs/conversation/projects/default-project";
 
 // An Organisation the product provisions has a default Project. A fixture that
 // inserts the organisation row itself adds one here before admitting a Case.

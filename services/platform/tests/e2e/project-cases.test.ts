@@ -7,11 +7,14 @@ import {
   type ProjectId,
   type UserId,
 } from "@purin-labs/control-api";
-import { conversationCaseId } from "../../src/chat/conversation-actor-identity";
+import { conversationCaseId } from "@purin-labs/conversation/chat/conversation-actor-identity";
 import { parseSessionId } from "@purin-labs/kernel/ids";
-import { readConversation, saveConversation } from "../../src/chat/store";
+import {
+  readConversation,
+  saveConversation,
+} from "@purin-labs/conversation/chat/store";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
-import { ensureCaseProject } from "../../src/projects/case-project";
+import { ensureCaseProject } from "@purin-labs/conversation/projects/case-project";
 import { requireDefaultProjectId } from "../fixtures/default-project";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { requireCaseId } from "../test-ids";

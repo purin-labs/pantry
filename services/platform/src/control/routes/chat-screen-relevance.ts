@@ -13,12 +13,15 @@ import {
   screenRelevanceObservation,
 } from "@purin-labs/control-api";
 import { hasExactKeys } from "@purin-labs/std";
-import { authorizeConversation } from "../../chat/conversation-access";
+import { authorizeConversation } from "@purin-labs/conversation/chat/conversation-access";
 import {
   checkScreenRelevance,
   recordScreenRelevanceChoice,
 } from "../../chat/screen-relevance";
-import { readConversation, type ConversationScope } from "../../chat/store";
+import {
+  readConversation,
+  type ConversationScope,
+} from "@purin-labs/conversation/chat/store";
 import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";

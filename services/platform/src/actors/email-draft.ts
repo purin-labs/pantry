@@ -1,6 +1,6 @@
 import { sha256Hex } from "@purin-labs/std";
 import type { CollaborationAgent } from "@purin-labs/collaboration";
-import type { SessionTurnExecution } from "../chat/turn-access";
+import type { SessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import {
   EMAIL_DRAFT_SCHEMA,
   EmailDraftDoc,

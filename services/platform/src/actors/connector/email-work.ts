@@ -35,8 +35,8 @@ import {
 } from "../connector-email-operational";
 import type { Result } from "@purin-labs/kernel/result";
 import { assertNever } from "@purin-labs/std";
-import { invalid } from "./support";
-import type { ConnectorResult } from "./types";
+import { invalid } from "@purin-labs/conversation/actors/connector/support";
+import type { ConnectorResult } from "@purin-labs/conversation/actors/connector/types";
 
 type EmailCaseContextCollectionAccess =
   | Readonly<{ kind: "ready"; accessToken: string }>

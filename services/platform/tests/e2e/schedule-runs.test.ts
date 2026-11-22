@@ -8,7 +8,7 @@ import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors
 import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
-import { runAgentOperation } from "../../src/data/agent-operation-runner";
+import { runAgentOperation } from "@purin-labs/conversation/data/agent-operation-runner";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import type { AgentOperationInput } from "@purin-labs/agent/data/agent-operations";
 import { parseUserId } from "@purin-labs/control-api/ids";

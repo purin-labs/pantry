@@ -7,13 +7,13 @@ import {
   conversationTimeline,
   normalizeConversationTimeline,
   type Conversation,
-} from "../conversation";
+} from "@purin-labs/conversation/chat/conversation";
 import {
   readConversation,
   saveConversation,
   type ConversationScope,
   type StoredConversation,
-} from "../store";
+} from "@purin-labs/conversation/chat/store";
 import { assertNever } from "@purin-labs/std";
 import { nextTimelineSequence } from "./timeline";
 import type { Variant } from "@purin-labs/type-utils";

@@ -3,7 +3,7 @@ import type { CommerceCommandAuthorityContext } from "@purin-labs/commerce-contr
 import { pantryCommerceAccess } from "../contract/client";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { decideCurrentAuthorityFlowSink } from "../../chat/information-flow";
+import { decideCurrentAuthorityFlowSink } from "@purin-labs/conversation/chat/information-flow";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   CommerceAuthorityScope,
@@ -35,7 +35,7 @@ import type {
 import type {
   CaseResult,
   CommerceEntityPlaneCaseProposal,
-} from "../../actors/case/types";
+} from "@purin-labs/conversation/actors/case/types";
 import type { OrganisationCommerce } from "../../actors/organisation/organisation-commerce";
 import {
   authorizeCapabilityUse,

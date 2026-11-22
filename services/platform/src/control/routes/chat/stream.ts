@@ -4,12 +4,12 @@ import { buildControlAuthority } from "@purin-labs/authority/request-authority/i
 import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import { controlError } from "@purin-labs/control/worker/http";
-import { isChatId } from "../../../chat/conversation";
+import { isChatId } from "@purin-labs/conversation/chat/conversation";
 import {
   readConversation,
   reconcileRevokedConversationRun,
   type ConversationScope,
-} from "../../../chat/store";
+} from "@purin-labs/conversation/chat/store";
 import { createPortalChatStreamResponse } from "../../../chat/portal-stream";
 import { type PortalChatExecution, authorizeStoredFork } from "../chat";
 

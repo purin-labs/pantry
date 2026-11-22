@@ -1,4 +1,4 @@
-import { controlActionMutationExecution } from "../../src/actors/action-mutation-execution";
+import { controlActionMutationExecution } from "@purin-labs/conversation/actors/action-mutation-execution";
 import { fixtureDatabase } from "./organisation-database";
 import { env } from "cloudflare:workers";
 import { evictDurableObject, runInDurableObject } from "cloudflare:test";

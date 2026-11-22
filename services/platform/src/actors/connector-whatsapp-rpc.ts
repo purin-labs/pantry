@@ -4,7 +4,7 @@ import {
   authorizeSessionTurnExecution,
   parseSessionTurnExecution,
   type SessionTurnExecution,
-} from "../chat/turn-access";
+} from "@purin-labs/conversation/chat/turn-access";
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
 
 import {

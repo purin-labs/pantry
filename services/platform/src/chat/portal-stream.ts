@@ -1,7 +1,7 @@
-import { workspaceCanvasLabelAllowsReaders } from "./conversation-disclosure";
+import { workspaceCanvasLabelAllowsReaders } from "@purin-labs/conversation/chat/conversation-disclosure";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { decideChatFlowDelivery } from "./information-flow";
-import { authorizeConversation } from "./conversation-access";
+import { decideChatFlowDelivery } from "@purin-labs/conversation/chat/information-flow";
+import { authorizeConversation } from "@purin-labs/conversation/chat/conversation-access";
 import type { ConversationId } from "@purin-labs/control-api";
 import { applyAgentMessageAssemblyEvent } from "@purin-labs/agent/actors/agent-message-assembly";
 import { resolveActiveSessionActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
@@ -13,13 +13,16 @@ import {
 import type { Env } from "@purin-labs/kernel/env";
 import type { AgentEvent, RequestAuthority } from "@purin-labs/contracts";
 import { FlowBinding } from "@purin-labs/authority/policy/information-flow/index";
-import { conversationTimeline, type ConversationStream } from "./conversation";
-import type { ConversationScope } from "./store";
+import {
+  conversationTimeline,
+  type ConversationStream,
+} from "@purin-labs/conversation/chat/conversation";
+import type { ConversationScope } from "@purin-labs/conversation/chat/store";
 import {
   readConversation,
   readConversationStatus,
   reconcileRevokedConversationRun,
-} from "./store";
+} from "@purin-labs/conversation/chat/store";
 import { projectReplyStreamText } from "./reply-stream-projector";
 
 import type { PortalChatStreamRecord } from "@purin-labs/contracts";
@@ -32,7 +35,7 @@ import {
 } from "@purin-labs/std";
 import { parseRequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import { authorizeSessionTurnOrigin } from "./turn-access";
+import { authorizeSessionTurnOrigin } from "@purin-labs/conversation/chat/turn-access";
 
 type StreamInput = {
   readonly env: Env;

@@ -29,7 +29,7 @@ import {
   compileTurnAuthority,
   CONTEXT_CASE_READ_CAPABILITY,
 } from "@purin-labs/authority/authorization/access-grants/turn-authority";
-import { readChatControlAuthority } from "../chat/information-flow";
+import { readChatControlAuthority } from "@purin-labs/conversation/chat/information-flow";
 import type {
   TurnMemoryCandidate,
   TurnMemoryRead,
@@ -55,7 +55,7 @@ import {
   joinFlowLabels,
 } from "@purin-labs/authority/policy/information-flow/index";
 import type { Result } from "@purin-labs/kernel/result";
-import { memberMaySee } from "../chat/member-view";
+import { memberMaySee } from "@purin-labs/conversation/chat/member-view";
 import {
   readNoTurnMemory,
   type ShownMemoryRevision,

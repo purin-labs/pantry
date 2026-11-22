@@ -1,7 +1,7 @@
 import {
   parseSessionTurnExecution,
   type SessionTurnExecution,
-} from "../../chat/turn-access";
+} from "@purin-labs/conversation/chat/turn-access";
 import type { ConnectorIdentity } from "@purin-labs/contracts";
 import {
   parseIntegrationAccountId,

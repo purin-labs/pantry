@@ -9,12 +9,15 @@ import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/sha
 import { parseOrganisationPlacementProfile } from "@purin-labs/tenancy/placement";
 import { newConversationId } from "@purin-labs/control-api";
 import { parseSessionId } from "@purin-labs/kernel/ids";
-import type { Conversation } from "../../src/chat/conversation";
-import { readConversation, saveConversation } from "../../src/chat/store";
-import { readProjectDirectory } from "../../src/chat/projects";
-import { conversationCaseIdentity } from "../../src/chat/conversation-access";
-import { prepareProjectSnapshot } from "../../src/projects/context";
-import { storedProjectPlacement } from "../../src/chat/project-context-binding";
+import type { Conversation } from "@purin-labs/conversation/chat/conversation";
+import {
+  readConversation,
+  saveConversation,
+} from "@purin-labs/conversation/chat/store";
+import { readProjectDirectory } from "@purin-labs/conversation/chat/projects";
+import { conversationCaseIdentity } from "@purin-labs/conversation/chat/conversation-access";
+import { prepareProjectSnapshot } from "@purin-labs/conversation/projects/context";
+import { storedProjectPlacement } from "@purin-labs/conversation/chat/project-context-binding";
 import {
   insertDefaultProject,
   requireDefaultProjectId,
@@ -22,7 +25,7 @@ import {
 import {
   bindConversationTurnAccess,
   authorizeChatTurnAccess,
-} from "../../src/chat/turn-access";
+} from "@purin-labs/conversation/chat/turn-access";
 import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
 import { newProjectId, type UserId } from "@purin-labs/control-api";

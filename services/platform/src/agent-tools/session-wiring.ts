@@ -25,7 +25,7 @@ import {
 import { stageConfigurationDraft } from "./organisation/configuration-draft";
 import { TOOL_REGISTRY, type ToolServices } from "./registry";
 import { slackThreadSideCase } from "../slack/side-cases";
-import { sessionConversation } from "../chat/session-conversation";
+import { sessionConversation } from "@purin-labs/conversation/chat/session-conversation";
 import { proposeSlackSideCaseForHarness } from "./slack/side-case-proposal";
 import { proposeMemoryFromInstruction } from "../memory/access";
 import { slackToolServices } from "./slack/turn-services";

@@ -12,7 +12,7 @@ export const ASSIGNMENT_ABANDON_AFTER_MS = 30 * 60_000;
  */
 export const CASE_ASSIGNMENT_MACHINE = {
   name: "case_assignment",
-  owner: "services/platform/src/actors/case/lifecycle.ts",
+  owner: "foundation/conversation/actors/case/lifecycle.ts",
   store: {
     table: "case_assignment",
     key: "assignment_id",

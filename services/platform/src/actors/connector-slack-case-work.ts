@@ -22,9 +22,9 @@ import {
   type ConnectorCaseWorkAcceptance,
   type ConnectorCaseWorkError,
   type ConnectorCaseWorkRequest,
-} from "./connector-case-work";
-import { ensureConnectorIdentity } from "./connector/ingress-parsers";
-import type { ConnectorResult } from "./connector/types";
+} from "@purin-labs/conversation/actors/connector-case-work";
+import { ensureConnectorIdentity } from "@purin-labs/conversation/actors/connector/ingress-parsers";
+import type { ConnectorResult } from "@purin-labs/conversation/actors/connector/types";
 import {
   isNonBlankString,
   isPositiveInteger,

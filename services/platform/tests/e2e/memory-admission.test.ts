@@ -27,14 +27,14 @@ import {
   canonicalFlowLabel,
   FlowLabel,
 } from "@purin-labs/authority/policy/information-flow/index";
-import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
+import { deriveDirectCaseIdentities } from "@purin-labs/conversation/actors/case-direct-processing";
 import {
   MEMORY_LIMITATION_NOTICE,
   renderModelContext,
 } from "@purin-labs/agent/actors/model-context-prompt";
-import { initialConversationCaseIdentity } from "../../src/chat/conversation-actor-identity";
-import { conversationAudienceMayReceive } from "../../src/chat/conversation-disclosure";
-import { readChatControlAuthority } from "../../src/chat/information-flow";
+import { initialConversationCaseIdentity } from "@purin-labs/conversation/chat/conversation-actor-identity";
+import { conversationAudienceMayReceive } from "@purin-labs/conversation/chat/conversation-disclosure";
+import { readChatControlAuthority } from "@purin-labs/conversation/chat/information-flow";
 import {
   digestHistoricalContextBundle,
   type TurnMemoryReader,

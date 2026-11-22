@@ -26,11 +26,11 @@ import {
   agentPermissionRequestSummaries,
   decideAgentPermission,
   mayDecideAgentPermissionRequests,
-} from "./routes/agent-permission-requests";
+} from "@purin-labs/conversation/control/routes/agent-permission-requests";
 import {
   decideHeldOutput,
   heldOutputSummaries,
-} from "./routes/held-output-requests";
+} from "@purin-labs/conversation/control/routes/held-output-requests";
 
 /** The most ledger entries and email proposals that one read looks at. */
 const ACTION_READ_LIMIT = 50;

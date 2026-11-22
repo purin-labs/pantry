@@ -76,9 +76,9 @@ Plan 50's Durable adoption must preserve that contract.
 
 | Existing boundary                                                                        | Required addition                                                                                            |
 | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| [Chat timeline](../services/platform/src/chat/timeline.ts)                               | Bind each eligible displayed response to its exact completed Actor-history cutoff.                           |
-| [Conversation and lifecycle](../services/platform/src/chat/conversation.ts)              | Required ancestry variants and explicit fork preparation outcomes.                                           |
-| [Chat storage](../services/platform/src/chat/store.ts)                                   | Persist fork identity, immutable prefix binding, directory visibility, and idempotent creation.              |
+| [Chat timeline](../foundation/conversation/chat/timeline.ts)                             | Bind each eligible displayed response to its exact completed Actor-history cutoff.                           |
+| [Conversation and lifecycle](../foundation/conversation/chat/conversation.ts)            | Required ancestry variants and explicit fork preparation outcomes.                                           |
+| [Chat storage](../foundation/conversation/chat/store.ts)                                 | Persist fork identity, immutable prefix binding, directory visibility, and idempotent creation.              |
 | [Chat application](../services/platform/src/chat/application.ts)                         | Authorize source reads and destination creation; initialize a fresh Case/session through existing admission. |
 | [Actor history authority](../foundation/agent/actors/agent-session-harness-authority.ts) | Validate and initialize accepted inherited context without replaying execution events.                       |
 | [Portal chat](../apps/portal/src/features/chat/route.tsx)                                | Fork action, preparation state, branch navigation, and independent composer.                                 |

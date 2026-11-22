@@ -36,7 +36,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
-import { readDefaultProjectId } from "../../src/projects/case-project";
+import { readDefaultProjectId } from "@purin-labs/conversation/projects/case-project";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {
   grantOrderRead,

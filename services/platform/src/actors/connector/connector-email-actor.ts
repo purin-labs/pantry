@@ -1,5 +1,5 @@
-import { admitNamedConnector } from "./module-admission";
-import type { ConnectorModuleHost } from "./channel-adapter";
+import { admitNamedConnector } from "@purin-labs/conversation/actors/connector/module-admission";
+import type { ConnectorModuleHost } from "@purin-labs/conversation/actors/connector/channel-adapter";
 import type { ConnectorEvals } from "./connector-evals";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
@@ -178,10 +178,13 @@ import {
   type EmailMailboxRevocation,
   type EmailRuntimeStatus,
 } from "./email";
-import type { ChannelAdapter, ChannelAlarmSteps } from "./channel-adapter";
-import { ensureConnectorIdentity } from "./ingress-parsers";
-import { invalid } from "./support";
-import type { ConnectorResult } from "./types";
+import type {
+  ChannelAdapter,
+  ChannelAlarmSteps,
+} from "@purin-labs/conversation/actors/connector/channel-adapter";
+import { ensureConnectorIdentity } from "@purin-labs/conversation/actors/connector/ingress-parsers";
+import { invalid } from "@purin-labs/conversation/actors/connector/support";
+import type { ConnectorResult } from "@purin-labs/conversation/actors/connector/types";
 import {
   type ConnectorEmailIdentityRequest,
   type EmailReplyProvenance,

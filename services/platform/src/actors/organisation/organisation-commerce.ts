@@ -2,7 +2,7 @@ import type { OrganisationModuleHost } from "@purin-labs/tenancy/actors/organisa
 import {
   authorizeActionMutationExecution,
   type ActionMutationExecution,
-} from "../action-mutation-execution";
+} from "@purin-labs/conversation/actors/action-mutation-execution";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import type { CommerceProjection } from "@purin-labs/commerce-contracts";

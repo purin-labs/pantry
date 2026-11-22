@@ -35,7 +35,7 @@ import {
   type SlackCall,
 } from "./slack-side-case-support";
 import { runInDurableObject } from "cloudflare:test";
-import { SIDE_CASE_START_LEASE_MS } from "../../src/chat/side-case-transition";
+import { SIDE_CASE_START_LEASE_MS } from "@purin-labs/conversation/chat/side-case-transition";
 
 /**
  * Journey 7 of Plan 74: a side Case in a Slack channel.

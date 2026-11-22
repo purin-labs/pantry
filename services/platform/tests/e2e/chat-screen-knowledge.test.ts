@@ -14,7 +14,7 @@ import { env } from "cloudflare:workers";
 
 import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { opaqueCaseReference } from "@purin-labs/authority/access-control/references";
-import { conversationCaseId } from "../../src/chat/conversation-actor-identity";
+import { conversationCaseId } from "@purin-labs/conversation/chat/conversation-actor-identity";
 import { parseCaseId } from "@purin-labs/kernel/ids";
 import {
   createConversation,

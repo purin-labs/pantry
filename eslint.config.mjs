@@ -122,14 +122,14 @@ const rawExecutionRecordsImport = {
   allowTypeImports: true,
 };
 const ifcBoundaryOwners = [
-  "services/platform/src/chat/information-flow.ts",
+  "foundation/conversation/chat/information-flow.ts",
   "foundation/agent/context/turn-context.ts",
   "foundation/agent/context/assembly/internal.ts",
   "foundation/agent/context/assembly/index.ts",
   "foundation/agent/context/files/tools.ts",
-  "services/platform/src/projects/context.ts",
-  "services/platform/src/chat/input-admission.ts",
-  "services/platform/src/chat/conversation-disclosure.ts",
+  "foundation/conversation/projects/context.ts",
+  "foundation/conversation/chat/input-admission.ts",
+  "foundation/conversation/chat/conversation-disclosure.ts",
   "foundation/agent/actors/actor-journal.ts",
   "foundation/agent/actors/actor-journal/**/*.ts",
   "services/platform/src/actors/agent-session.ts",
@@ -328,8 +328,8 @@ export default [
     files: [
       "foundation/agent/context/assembly/internal.ts",
       "foundation/agent/context/assembly/index.ts",
-      "services/platform/src/projects/context.ts",
-      "services/platform/src/chat/input-admission.ts",
+      "foundation/conversation/projects/context.ts",
+      "foundation/conversation/chat/input-admission.ts",
       "foundation/agent/actors/actor-journal.ts",
       "foundation/agent/actors/actor-journal/**/*.ts",
       "services/platform/src/actors/agent-session.ts",
@@ -354,7 +354,7 @@ export default [
     },
   },
   {
-    files: ["services/platform/src/chat/conversation-disclosure.ts"],
+    files: ["foundation/conversation/chat/conversation-disclosure.ts"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -485,7 +485,7 @@ export default [
     },
   },
   {
-    files: ["services/platform/src/chat/information-flow.ts"],
+    files: ["foundation/conversation/chat/information-flow.ts"],
     rules: {
       "no-restricted-imports": [
         "error",

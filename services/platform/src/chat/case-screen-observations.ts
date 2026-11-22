@@ -1,8 +1,8 @@
 import type { CaseScreenObservationView } from "@purin-labs/control-api";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { VISIBLE_CONVERSATIONS_SQL } from "./conversation-access";
-import { parseConversation } from "./conversation";
-import type { ConversationScope } from "./store";
+import { VISIBLE_CONVERSATIONS_SQL } from "@purin-labs/conversation/chat/conversation-access";
+import { parseConversation } from "@purin-labs/conversation/chat/conversation";
+import type { ConversationScope } from "@purin-labs/conversation/chat/store";
 
 const MAX_OBSERVATIONS = 200;
 

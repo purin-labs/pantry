@@ -10,7 +10,7 @@ import {
   resolveActiveCaseActor,
   resolveActiveSessionActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
-import { processTwoSessionDirectCaseCommand } from "../../src/actors/case-direct-processing";
+import { processTwoSessionDirectCaseCommand } from "@purin-labs/conversation/actors/case-direct-processing";
 import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   newRequestId,

@@ -3,7 +3,7 @@ import {
   holdsAdmittedWork,
   type ConversationStream,
   type ConversationWork,
-} from "../src/chat/conversation";
+} from "@purin-labs/conversation/chat/conversation";
 import { parseSessionId } from "@purin-labs/kernel/ids";
 
 it("keeps a chat in its Project while a retryable turn or a queued message remains", function admittedWork() {

@@ -21,8 +21,8 @@ import {
   type IssuedControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
-import { processDirectCaseCommand } from "../../src/actors/case-direct-processing";
-import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
+import { processDirectCaseCommand } from "@purin-labs/conversation/actors/case-direct-processing";
+import { deriveDirectCaseIdentities } from "@purin-labs/conversation/actors/case-direct-processing";
 import { deriveUserMessageViews } from "@purin-labs/agent/messages/message-wasm";
 import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

@@ -2,13 +2,13 @@ import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisatio
 import type { HarnessToolHost } from "@purin-labs/agent/actors/embedded-harness";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import type { SessionId } from "@purin-labs/kernel/ids";
-import { bindConversationTurnAccess } from "../src/chat/turn-access";
+import { bindConversationTurnAccess } from "@purin-labs/conversation/chat/turn-access";
 import type {
   OperatorExecutionOrigin,
   SessionTurnExecution,
-} from "../src/chat/turn-access";
+} from "@purin-labs/conversation/chat/turn-access";
 import type { MailDraftOrigin } from "../src/actors/email-case-processing";
-import { processDirectCaseCommand } from "../src/actors/case-direct-processing";
+import { processDirectCaseCommand } from "@purin-labs/conversation/actors/case-direct-processing";
 import {
   SessionExecutionAdmission,
   admittedSessionToolHost,

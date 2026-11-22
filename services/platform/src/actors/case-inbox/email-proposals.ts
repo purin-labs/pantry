@@ -29,14 +29,14 @@ import {
   mailWorkCaseState,
   mailWorkReply,
 } from "../../mail-inbox/work-projection";
-import { readMeta } from "../case/context-source";
+import { readMeta } from "@purin-labs/conversation/actors/case/context-source";
 import {
   invalid,
   parseAssignmentLifecycleJson,
   parseLifecycle,
-} from "../case/record-parsers";
-import { readCaseMetaId } from "../case/request-parsers";
-import type { CaseResult, JsonRow, LifecycleRow } from "../case/types";
+} from "@purin-labs/conversation/actors/case/record-parsers";
+import { readCaseMetaId } from "@purin-labs/conversation/actors/case/request-parsers";
+import type { CaseResult, JsonRow, LifecycleRow } from "@purin-labs/conversation/actors/case/types";
 
 /*
  * The Inbox part of the Case (Refactor 17, steps A1.6 and A1.9): the email

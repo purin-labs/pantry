@@ -24,7 +24,7 @@ import { traceWarn } from "@purin-labs/kernel/observability";
 import { runScheduledCommerceOutboxReconciliation } from "./commerce/outbox-worker";
 import { runScheduledPaidReceiptDelivery } from "./commerce/paid-receipt";
 import { runFileContextReconciliation } from "@purin-labs/agent/context/files/index";
-import { runAttachmentCollection } from "./messages/attachment-collection";
+import { runAttachmentCollection } from "@purin-labs/conversation/messages/attachment-collection";
 import { runWeeklyChatGptLoginRefresh } from "@purin-labs/agent/models/codex-connection";
 import { runScheduledActorRegistryReconciliation } from "@purin-labs/actor-runtime/actors/actor-registry-sweep";
 import { handleCommerceWebhook } from "./commerce/webhooks";

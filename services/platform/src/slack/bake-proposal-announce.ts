@@ -12,7 +12,7 @@ import {
 } from "../kitchen/bakes/records";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { ensureCaseProject } from "../projects/case-project";
+import { ensureCaseProject } from "@purin-labs/conversation/projects/case-project";
 import { BAKE_PROPOSAL_CARD, bakeProposalCardText } from "./bake-proposal-card";
 import { parseSlackUserId } from "./events";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";

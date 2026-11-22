@@ -21,11 +21,11 @@ import {
   resolveActiveSessionActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { SessionDO } from "../../src/actors/agent-session";
-import type { Conversation } from "../../src/chat/conversation";
+import type { Conversation } from "@purin-labs/conversation/chat/conversation";
 import {
   conversationCaseId,
   initialConversationCaseIdentity,
-} from "../../src/chat/conversation-actor-identity";
+} from "@purin-labs/conversation/chat/conversation-actor-identity";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { ask } from "./chat-permission-support";

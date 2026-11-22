@@ -25,7 +25,7 @@ import {
   attachmentCollectionRecordKey,
   collectOrganisationAttachments,
   runAttachmentCollection,
-} from "../src/messages/attachment-collection";
+} from "@purin-labs/conversation/messages/attachment-collection";
 import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import {
   d1Database,

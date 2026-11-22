@@ -2,10 +2,10 @@ import { assertNever } from "@purin-labs/std";
 
 
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
-import { authorizeConversation } from "../chat/conversation-access";
-import { storeSideCaseProposal } from "../chat/side-cases";
-import { signalChat } from "../chat/signals";
-import { readAdmittedChatInput } from "../chat/turn-access";
+import { authorizeConversation } from "@purin-labs/conversation/chat/conversation-access";
+import { storeSideCaseProposal } from "@purin-labs/conversation/chat/side-cases";
+import { signalChat } from "@purin-labs/conversation/chat/signals";
+import { readAdmittedChatInput } from "@purin-labs/conversation/chat/turn-access";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { validateLiveRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import { readSessionTurnFlowBinding } from "@purin-labs/agent/actors/agent-session-information-flow";

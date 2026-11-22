@@ -1,4 +1,4 @@
-import { isChatId } from "../../services/platform/src/chat/conversation.ts";
+import { isChatId } from "../../foundation/conversation/chat/conversation.ts";
 import { parseUserId } from "../../packages/control-api/src/ids.ts";
 
 // The native deduplication key retains admission metadata. Pi's inbox remains

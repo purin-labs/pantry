@@ -21,14 +21,14 @@ import {
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import { isNonNegativeInteger, isString } from "@purin-labs/std";
 
-import { decideStoredFlowConversationSink } from "../actors/case-conversation-sink";
+import { decideStoredFlowConversationSink } from "@purin-labs/conversation/actors/case-conversation-sink";
 import {
   continuesOwnClaim,
   prepareSlackSideCaseDestination,
   prepareSlackSideCaseProposal,
   sideCasePhase,
   writeSideCaseTransition,
-} from "../chat/side-case-transition";
+} from "@purin-labs/conversation/chat/side-case-transition";
 import {
   admitSideCaseObservation,
   isValidSideCaseContent,
@@ -36,7 +36,7 @@ import {
   SIDE_CASE_OPEN_LIMIT,
   sideCaseContentDigest,
   sideCaseProposalId,
-} from "../chat/side-cases";
+} from "@purin-labs/conversation/chat/side-cases";
 import { parsePersonId, type PersonId } from "@purin-labs/authority/data/person-authz";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { FlowBinding } from "@purin-labs/authority/policy/information-flow/index";

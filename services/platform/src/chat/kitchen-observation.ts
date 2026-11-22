@@ -12,7 +12,10 @@ import {
   type BakerySurfaceAttachmentV1,
   type BakerySurfaceContextV1,
 } from "@purin-labs/bakery-model/bakery-surface";
-import type { ChatSurfaceState, ChatSurfaces } from "./surface-registry";
+import type {
+  ChatSurfaceState,
+  ChatSurfaces,
+} from "@purin-labs/conversation/chat/surface-registry";
 
 /**
  * The Kitchen behind the v2 screen observation (Plan 87 phase 2). The

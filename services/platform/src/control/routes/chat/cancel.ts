@@ -12,13 +12,13 @@ import {
   isChatId,
   conversationTimeline,
   type Conversation,
-} from "../../../chat/conversation";
+} from "@purin-labs/conversation/chat/conversation";
 import {
   readConversation,
   reconcileRevokedConversationRun,
   saveConversation,
   type ConversationScope,
-} from "../../../chat/store";
+} from "@purin-labs/conversation/chat/store";
 import {
   type CancellingConversationExecution,
   scheduleConversationExecution,
@@ -28,7 +28,7 @@ import {
   timelineEventIsCancellation,
   timelineEventHasId,
 } from "../../../chat/turn/admission";
-import { selectStoredConversationModel } from "../../../chat/turn/model";
+import { selectStoredConversationModel } from "@purin-labs/conversation/chat/turn/model";
 import { publicConversation } from "../../../chat/public-conversation";
 import { chatError, chatSaveError } from "./errors";
 

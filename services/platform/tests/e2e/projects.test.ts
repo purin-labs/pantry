@@ -5,10 +5,10 @@ import type {
 import {
   shareConversation,
   type ConversationSharingCommand,
-} from "../../src/chat/conversation-sharing";
+} from "@purin-labs/conversation/chat/conversation-sharing";
 import { fixtureDatabase } from "./organisation-database";
-import { mutateProjectAccess } from "../../src/projects/membership";
-import { deleteArchivedChat } from "../../src/chat/deletion";
+import { mutateProjectAccess } from "@purin-labs/conversation/projects/membership";
+import { deleteArchivedChat } from "@purin-labs/conversation/chat/deletion";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
@@ -20,23 +20,23 @@ import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/o
 import { admitTurn } from "../../src/chat/turn/admission";
 import { resumeConversationExecution } from "../../src/chat/application";
 import * as modelRoutes from "@purin-labs/agent/models/route";
-import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
+import { deriveDirectCaseIdentities } from "@purin-labs/conversation/actors/case-direct-processing";
 import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { parseChatCommand } from "../../src/chat/conversation";
+import { parseChatCommand } from "@purin-labs/conversation/chat/conversation";
 import {
   bindConversationProjectSnapshot,
   projectSnapshotFromParts,
   storedProjectPlacement,
-} from "../../src/chat/project-context-binding";
+} from "@purin-labs/conversation/chat/project-context-binding";
 import { requireDefaultProjectId } from "../fixtures/default-project";
-import { prepareProjectSnapshot } from "../../src/projects/context";
+import { prepareProjectSnapshot } from "@purin-labs/conversation/projects/context";
 import { env, exports } from "cloudflare:workers";
 import { expect, it, vi, type TestContext } from "vitest";
 import {
   mutateChatDirectory,
   readProjectDirectory,
-} from "../../src/chat/projects";
-import { mutateProject } from "../../src/projects/commands";
+} from "@purin-labs/conversation/chat/projects";
+import { mutateProject } from "@purin-labs/conversation/projects/commands";
 import { isRecord } from "@purin-labs/std";
 import {
   parseChatPlacement,
@@ -68,7 +68,7 @@ import {
   saveConversation,
   updateConversationMetadata,
   type ConversationScope,
-} from "../../src/chat/store";
+} from "@purin-labs/conversation/chat/store";
 import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 it(

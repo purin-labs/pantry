@@ -1,14 +1,14 @@
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ConversationId } from "@purin-labs/control-api";
-import { isChatId } from "./conversation";
+import { isChatId } from "@purin-labs/conversation/chat/conversation";
 import {
   readConversation,
   reconcileRevokedConversationRun,
   saveConversation,
   type ConversationScope,
-} from "./store";
-import type { ChatTimelineEvent } from "./timeline";
+} from "@purin-labs/conversation/chat/store";
+import type { ChatTimelineEvent } from "@purin-labs/conversation/chat/timeline";
 
 type ResponseFeedback = {
   readonly eventId: string;

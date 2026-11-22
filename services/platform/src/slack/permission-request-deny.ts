@@ -1,7 +1,7 @@
 import { tellClicker } from "./interaction-reply";
 import { errorMessage } from "@purin-labs/std";
 
-import { resolveSlackApprover } from "../actors/action-mutation-execution";
+import { resolveSlackApprover } from "@purin-labs/conversation/actors/action-mutation-execution";
 import {
   AGENT_PERMISSION_REQUEST_LIFETIME_MS,
   decideAgentPermissionRequest,

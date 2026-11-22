@@ -10,7 +10,7 @@ import {
 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 
-import { saveConversation } from "../../src/chat/store";
+import { saveConversation } from "@purin-labs/conversation/chat/store";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {
   answers,

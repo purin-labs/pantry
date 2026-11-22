@@ -27,7 +27,7 @@ import {
 import {
   prepareChatDirectoryRevisionBump,
   prepareReturnPrivateChatsToDefault,
-} from "./projects/case-project";
+} from "@purin-labs/conversation/projects/case-project";
 import {
   baseProjectId,
   prepareBaseProject,
@@ -35,7 +35,7 @@ import {
   prepareBaseProjectRoleChange,
   prepareOrganisationProjectMembersDeletion,
   prepareProjectMembershipRevocation,
-} from "./projects/default-project";
+} from "@purin-labs/conversation/projects/default-project";
 
 /**
  * The Worker gives the lifecycle batches of tenancy the statements of the

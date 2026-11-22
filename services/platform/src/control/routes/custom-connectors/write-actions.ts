@@ -1,8 +1,8 @@
 import type { DecidePendingDecision } from "@purin-labs/control/worker/decide-pending-decision";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
-import { decideCurrentAuthorityFlowSink } from "../../../chat/information-flow";
+import { controlActionMutationExecution } from "@purin-labs/conversation/actors/action-mutation-execution";
+import { decideCurrentAuthorityFlowSink } from "@purin-labs/conversation/chat/information-flow";
 import { customConnectorFetchOf } from "../../../custom-connectors/egress";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";

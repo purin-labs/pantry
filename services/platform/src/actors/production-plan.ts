@@ -17,7 +17,7 @@ import {
 } from "@purin-labs/production-plan-crdt/protocol";
 import type { CollaborationAgent } from "@purin-labs/collaboration";
 import { assertNever, sha256Hex } from "@purin-labs/std";
-import type { SessionTurnExecution } from "../chat/turn-access";
+import type { SessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import { controlError } from "@purin-labs/control/worker/http";
 import {
@@ -29,7 +29,7 @@ import { hasExactKeys } from "@purin-labs/std";
 import {
   authorizeConversation,
   readConversationCaseId,
-} from "../chat/conversation-access";
+} from "@purin-labs/conversation/chat/conversation-access";
 import { readJsonRecord } from "@purin-labs/control/worker/http";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { resolveCollaborationSlackThread } from "./collaboration-slack-thread";

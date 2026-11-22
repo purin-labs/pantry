@@ -37,9 +37,9 @@ import {
   type EmailReplyProposalCreateRequest,
   parseEmailChangeRequest,
 } from "./email-parsers";
-import { ensureConnectorIdentity } from "./ingress-parsers";
-import { invalid } from "./support";
-import type { ConnectorResult } from "./types";
+import { ensureConnectorIdentity } from "@purin-labs/conversation/actors/connector/ingress-parsers";
+import { invalid } from "@purin-labs/conversation/actors/connector/support";
+import type { ConnectorResult } from "@purin-labs/conversation/actors/connector/types";
 import type { EmailMailboxRevocationRequest } from "./whatsapp-parsers";
 
 export type EmailMailboxDisposal = {

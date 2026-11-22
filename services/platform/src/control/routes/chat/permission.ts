@@ -9,8 +9,8 @@ import {
   controlJson,
   readJsonRecord,
 } from "@purin-labs/control/worker/http";
-import { isChatId } from "../../../chat/conversation";
-import type { ConversationScope } from "../../../chat/store";
+import { isChatId } from "@purin-labs/conversation/chat/conversation";
+import type { ConversationScope } from "@purin-labs/conversation/chat/store";
 import { scheduleConversationExecution } from "../../../chat/application";
 import { decideConversationPermission } from "../../../chat/turn/permission";
 import { assertNever } from "@purin-labs/std";

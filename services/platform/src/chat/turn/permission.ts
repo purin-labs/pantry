@@ -29,13 +29,13 @@ import {
   normalizeConversationTimeline,
   type ChatModelAction,
   type Conversation,
-} from "../conversation";
+} from "@purin-labs/conversation/chat/conversation";
 import {
   readConversation,
   saveConversation,
   type ConversationScope,
   type StoredConversation,
-} from "../store";
+} from "@purin-labs/conversation/chat/store";
 import { conversationStreamIdentity } from "./run";
 import { nextTimelineSequence } from "./timeline";
 

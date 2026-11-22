@@ -18,12 +18,12 @@ import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { Conversation } from "../../src/chat/conversation";
+import type { Conversation } from "@purin-labs/conversation/chat/conversation";
 import {
   conversationCaseId,
   initialConversationCaseIdentity,
-} from "../../src/chat/conversation-actor-identity";
-import { readConversation, saveConversation } from "../../src/chat/store";
+} from "@purin-labs/conversation/chat/conversation-actor-identity";
+import { readConversation, saveConversation } from "@purin-labs/conversation/chat/store";
 import { readActiveOrganisationMembership } from "@purin-labs/tenancy/data/control-plane";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { entityRefOrNull } from "../../src/memory/store";

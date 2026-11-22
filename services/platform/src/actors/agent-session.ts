@@ -1,5 +1,5 @@
 import { SESSION_TOOL_WIRING } from "../agent-tools/session-wiring";
-import { authorizeChatHarnessLease } from "../chat/turn-access";
+import { authorizeChatHarnessLease } from "@purin-labs/conversation/chat/turn-access";
 import type {
   SessionInboxTurnsRpc,
   TransientEmailTurnRequest,

@@ -641,11 +641,11 @@ vi.mock(
   },
 );
 vi.mock(
-  "../src/actors/action-mutation-execution",
+  "@purin-labs/conversation/actors/action-mutation-execution",
   async function caseAuthorityMock(importOriginal) {
     const original =
       await importOriginal<
-        typeof import("../src/actors/action-mutation-execution")
+        typeof import("@purin-labs/conversation/actors/action-mutation-execution")
       >();
     return {
       ...original,

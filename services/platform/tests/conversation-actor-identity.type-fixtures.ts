@@ -1,4 +1,4 @@
-import type { StoredConversation } from "../src/chat/store";
+import type { StoredConversation } from "@purin-labs/conversation/chat/store";
 
 declare const stored: StoredConversation;
 

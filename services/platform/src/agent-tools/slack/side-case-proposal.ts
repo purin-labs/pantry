@@ -3,7 +3,7 @@ import { assertNever } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { readSessionTurnFlowBinding } from "@purin-labs/agent/actors/agent-session-information-flow";
-import { decideCaseConversationSink } from "../../actors/case-conversation-sink";
+import { decideCaseConversationSink } from "@purin-labs/conversation/actors/case-conversation-sink";
 import {
   SLACK_TURN_PREFIX,
   turnMayScheduleFollowUp,
@@ -12,7 +12,7 @@ import {
   requireSessionExecution,
   type SessionExecutionAdmission,
 } from "@purin-labs/agent/actors/session-execution-admission";
-import { sideCaseProposalId } from "../../chat/side-cases";
+import { sideCaseProposalId } from "@purin-labs/conversation/chat/side-cases";
 import { parsePersonId } from "@purin-labs/authority/data/person-authz";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseConnectorId } from "@purin-labs/kernel/ids";

@@ -2,7 +2,7 @@ import { assertNever } from "@purin-labs/std";
 import {
   authorizeSessionTurnExecution,
   type SessionTurnExecution,
-} from "../chat/turn-access";
+} from "@purin-labs/conversation/chat/turn-access";
 import { createContinueSerialQueue } from "@purin-labs/async-control/serial-queue";
 import {
   COLLABORATION_SOCKET_LIMIT,

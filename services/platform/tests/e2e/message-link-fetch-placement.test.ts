@@ -12,7 +12,7 @@ import {
 import {
   deriveDirectCaseIdentities,
   processDirectCaseCommand,
-} from "../../src/actors/case-direct-processing";
+} from "@purin-labs/conversation/actors/case-direct-processing";
 import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
 import {

@@ -12,7 +12,7 @@ export const PERMISSION_WAIT_MS = 24 * 60 * 60_000;
  */
 export const CONVERSATION_WORK_MACHINE = {
   name: "conversation_work",
-  owner: "services/platform/src/chat/store.ts",
+  owner: "foundation/conversation/chat/store.ts",
   store: {
     table: "portal_conversation",
     key: "conversation_id",

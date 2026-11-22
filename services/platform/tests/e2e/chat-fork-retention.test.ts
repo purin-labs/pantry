@@ -12,13 +12,13 @@ import { parseSlackEnvelope } from "../../src/slack/events";
 import {
   collectOrganisationAttachments,
   ATTACHMENT_COLLECTION_GRACE_MS,
-} from "../../src/messages/attachment-collection";
+} from "@purin-labs/conversation/messages/attachment-collection";
 import {
   chatForkHistoryDigest,
   type ChatForkHistory,
   parseChatForkHistory,
 } from "@purin-labs/agent/chat/fork-history";
-import { readChatForkHistoryForCase } from "../../src/chat/forks";
+import { readChatForkHistoryForCase } from "@purin-labs/conversation/chat/forks";
 import {
   RecordingBoundary,
   sdkInput,

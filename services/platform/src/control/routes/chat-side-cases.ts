@@ -12,8 +12,8 @@ import {
   sideCaseHereRequestId,
 } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
-import { authorizeConversation } from "../../chat/conversation-access";
-import { decideChatFlowDelivery } from "../../chat/information-flow";
+import { authorizeConversation } from "@purin-labs/conversation/chat/conversation-access";
+import { decideChatFlowDelivery } from "@purin-labs/conversation/chat/information-flow";
 import {
   startSideCase,
   type SideCaseStartRefusal,
@@ -23,10 +23,13 @@ import {
   readSideCaseProposal,
   sideCaseView,
   type SideCaseProposal,
-} from "../../chat/side-cases";
-import type { ChatTimelineEvent } from "../../chat/timeline";
-import { signalChat } from "../../chat/signals";
-import { readConversation, type ConversationScope } from "../../chat/store";
+} from "@purin-labs/conversation/chat/side-cases";
+import type { ChatTimelineEvent } from "@purin-labs/conversation/chat/timeline";
+import { signalChat } from "@purin-labs/conversation/chat/signals";
+import {
+  readConversation,
+  type ConversationScope,
+} from "@purin-labs/conversation/chat/store";
 import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";

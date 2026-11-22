@@ -64,7 +64,7 @@ import {
   readActiveOrganisationMembershipRevision,
 } from "@purin-labs/tenancy/data/control-plane";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
-import type { SessionTurnExecution } from "../../src/chat/turn-access";
+import type { SessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import { selfTestCount } from "./gmail-mailbox-support";
 import {
   exportedItemCount,

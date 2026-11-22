@@ -14,19 +14,24 @@ import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/sha
 import { parseOrganisationPlacementProfile } from "@purin-labs/tenancy/placement";
 import { requireConversationId } from "./test-ids";
 import { defaultProjectSql } from "./fixtures/default-project";
-vi.mock("../src/chat/forks", async function forkModule(importOriginal) {
-  return {
-    ...(await importOriginal<typeof import("../src/chat/forks")>()),
-    bindCompletedChatHistory: async function bindMockHistory(
-      _env: unknown,
-      _scope: unknown,
-      conversation: import("../src/chat/conversation").Conversation,
-    ) {
-      return conversation;
-    },
-  };
-});
-import { timelineVisibleMessages } from "../src/chat/conversation";
+vi.mock(
+  "@purin-labs/conversation/chat/forks",
+  async function forkModule(importOriginal) {
+    return {
+      ...(await importOriginal<
+        typeof import("@purin-labs/conversation/chat/forks")
+      >()),
+      bindCompletedChatHistory: async function bindMockHistory(
+        _env: unknown,
+        _scope: unknown,
+        conversation: import("@purin-labs/conversation/chat/conversation").Conversation,
+      ) {
+        return conversation;
+      },
+    };
+  },
+);
+import { timelineVisibleMessages } from "@purin-labs/conversation/chat/conversation";
 import { chatActionFlowSink } from "../src/chat/turn/timeline";
 import { resumeConversationExecution } from "../src/chat/application";
 import {
@@ -48,7 +53,7 @@ import {
 import { defaultDenyPolicy } from "@purin-labs/authority/policy-snapshot";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
-import { deriveDirectCaseIdentities } from "../src/actors/case-direct-processing";
+import { deriveDirectCaseIdentities } from "@purin-labs/conversation/actors/case-direct-processing";
 import { projectEmailOperationalProposal } from "../src/data/email-operational";
 import {
   bakeryEffectDeliveryTarget,
@@ -129,11 +134,11 @@ vi.mock(
   },
 );
 vi.mock(
-  "../src/actors/case-direct-processing",
+  "@purin-labs/conversation/actors/case-direct-processing",
   async function runtimeModule(importOriginal) {
     return {
       ...(await importOriginal<
-        typeof import("../src/actors/case-direct-processing")
+        typeof import("@purin-labs/conversation/actors/case-direct-processing")
       >()),
       processConversationCaseCommand: mocks.generate,
     };
@@ -188,13 +193,13 @@ vi.mock(
 import { handlePortalChat as nativeAdmitPortalChat } from "../src/control/routes/chat";
 import { handlePortalChatConversation as nativeHandlePortalChatConversation } from "../src/control/routes/chat/conversation";
 import { handlePortalChatCancel as nativeHandlePortalChatCancel } from "../src/control/routes/chat/cancel";
-import type { ConversationExecution } from "../src/chat/execution";
+import type { ConversationExecution } from "@purin-labs/conversation/chat/execution";
 import {
   conversationTimeline,
   parseConversation,
   parseChatCommand,
   parseChatModelAction,
-} from "../src/chat/conversation";
+} from "@purin-labs/conversation/chat/conversation";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,
@@ -206,7 +211,7 @@ import {
   readConversation,
   saveConversation,
   updateConversationDraft,
-} from "../src/chat/store";
+} from "@purin-labs/conversation/chat/store";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 
 const organisation = parseOrganisationId("organisation_chat_test");

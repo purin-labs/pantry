@@ -3,7 +3,7 @@ import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
+import { deriveDirectCaseIdentities } from "@purin-labs/conversation/actors/case-direct-processing";
 import {
   preparePortalChatJourney,
   assignmentStates,

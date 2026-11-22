@@ -1,11 +1,11 @@
 import type { ChatInputMode, SurfaceObservationV2 } from "@purin-labs/control-api";
 import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
-import { surfaceStateOf, type ChatSurfaceState } from "./surface-registry";
+import { surfaceStateOf, type ChatSurfaceState } from "@purin-labs/conversation/chat/surface-registry";
 import type {
   ChatAttachmentPart,
   ChatInputPart,
   PendingChatInput,
-} from "./timeline";
+} from "@purin-labs/conversation/chat/timeline";
 
 /**
  * The content of one user message, from a command or a stored message. The

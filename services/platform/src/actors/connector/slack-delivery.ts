@@ -25,7 +25,7 @@ import {
   commerceApprovalNoticeDeliveryId,
   commerceApprovalNoticeNonce,
   commerceOutcomeNonce,
-} from "../case/commerce-delivery-ids";
+} from "@purin-labs/conversation/actors/case/commerce-delivery-ids";
 import { readOrganisationDefaultWorkspacePortalAddress } from "@purin-labs/agent/data/organisation-workspace";
 import {
   permissionCardBlocks,
@@ -78,12 +78,12 @@ import {
 } from "../../slack/messages";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, isNonBlankString, isRecord } from "@purin-labs/std";
-import { parseDeliveryState } from "./ingress-parsers";
+import { parseDeliveryState } from "@purin-labs/conversation/actors/connector/ingress-parsers";
 import {
   type ConnectorDeliveryRequest,
   type ConnectorDeliveryResult,
   DELIVERY_RETRY_MS,
-} from "./types";
+} from "@purin-labs/conversation/actors/connector/types";
 
 type SlackDeliveryResponse =
   | { readonly kind: "delivered"; readonly timestamp: string }

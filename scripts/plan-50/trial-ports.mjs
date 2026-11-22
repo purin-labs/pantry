@@ -4,7 +4,7 @@
 // loads neither, so it registers both here, with the production
 // implementations, before it serves a request.
 import "../../services/platform/src/worker-ports.ts";
-import { authorizeChatHarnessLease } from "../../services/platform/src/chat/turn-access.ts";
+import { authorizeChatHarnessLease } from "../../foundation/conversation/chat/turn-access.ts";
 import { registerSessionTurnAccess } from "../../foundation/agent/actors/session-turn-access.ts";
 
 registerSessionTurnAccess(authorizeChatHarnessLease);

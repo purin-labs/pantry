@@ -23,7 +23,7 @@ import { authorityPartitionKey } from "@purin-labs/authority/authorization/acces
 import { fixtureFlowBinding } from "../fixtures/plan25-turn";
 import { FlowLabel } from "@purin-labs/authority/policy/information-flow/index";
 import type { ProposeActionInput } from "@purin-labs/authority/actors/action-ledger";
-import type { ActionMutationExecution } from "../../src/actors/action-mutation-execution";
+import type { ActionMutationExecution } from "@purin-labs/conversation/actors/action-mutation-execution";
 
 type Pause = {
   phase: "armed" | "paused" | "released";

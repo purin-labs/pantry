@@ -1,5 +1,5 @@
 import { evaluateMail } from "../src/mail-inbox/evaluation";
-import { prepareTransientEmailAssignment } from "../src/actors/case-walking-path";
+import { prepareTransientEmailAssignment } from "@purin-labs/conversation/actors/case-walking-path";
 import type { EmailThreadTurnOutcome } from "../src/actors/email-case-processing";
 declare const completedReply: Extract<
   EmailThreadTurnOutcome,

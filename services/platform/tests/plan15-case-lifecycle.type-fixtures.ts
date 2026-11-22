@@ -5,7 +5,7 @@ import type {
   CaseOutput,
   CaseOutputLifecycle,
 } from "@purin-labs/contracts";
-import type { CaseContributionSource } from "../src/actors/case/types";
+import type { CaseContributionSource } from "@purin-labs/conversation/actors/case/types";
 
 declare const assignment: CaseAssignment;
 declare const start: CaseAssignmentStart;

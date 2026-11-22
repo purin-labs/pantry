@@ -11,7 +11,7 @@ import {
   evaluateFlowLabelSink,
 } from "@purin-labs/authority/policy/index";
 import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
-import { authorizeProject } from "../projects/access";
+import { authorizeProject } from "@purin-labs/conversation/projects/access";
 import { validateLiveRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import type { Result } from "@purin-labs/kernel/result";
 import type { EmailChatContext, EmailChatSource } from "./reply-sources";

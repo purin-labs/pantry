@@ -27,13 +27,13 @@ import { setSlackThreadStatus } from "../../slack/messages";
 import { buildSlackUserMessage } from "../../slack/user-message";
 import { actorExecutionAdmissionOpen } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
-import type { OngoingCaseWalkingConnector } from "../case-walking-path";
+import type { OngoingCaseWalkingConnector } from "@purin-labs/conversation/actors/case-walking-path";
 import {
   CASE_WORK_ATTEMPTS_EXHAUSTED,
   CASE_WORK_EXHAUSTED_NOTICE_UNDELIVERED,
   type CaseWorkOutcome,
   type ConnectorCaseWorkClaim,
-} from "../connector-case-work";
+} from "@purin-labs/conversation/actors/connector-case-work";
 import {
   createSlackCaseWorkSchema,
   SLACK_CASE_WORK,
@@ -55,7 +55,7 @@ import {
   slackCaseTurnId,
   type ConnectorCaseStreamRelease,
   type ConnectorCaseTurnStreamError,
-} from "../case-turn-stream";
+} from "@purin-labs/conversation/actors/case-turn-stream";
 import { connectorWarmActorSlots } from "@purin-labs/actor-runtime/actors/warm-actor-slots";
 import type {
   CaseWorkChannel,
@@ -64,17 +64,17 @@ import type {
   ConnectorChannelHost,
   DeliveryChannel,
   LiveCaseTurn,
-} from "./channel-adapter";
-import { ensureConnectorIdentity } from "./ingress-parsers";
+} from "@purin-labs/conversation/actors/connector/channel-adapter";
+import { ensureConnectorIdentity } from "@purin-labs/conversation/actors/connector/ingress-parsers";
 import {
   deliverSlackOutput,
   startSlackThreadCredentialRoute,
 } from "./slack-delivery";
-import type { ConnectorAdmission } from "./support";
+import type { ConnectorAdmission } from "@purin-labs/conversation/actors/connector/support";
 import type {
   ConnectorDeliveryRequest,
   ConnectorDeliveryResult,
-} from "./types";
+} from "@purin-labs/conversation/actors/connector/types";
 
 type SlackThreadCredentialRoute = Awaited<
   ReturnType<typeof readSlackThreadCredentialRoute>

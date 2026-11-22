@@ -12,41 +12,44 @@ import {
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { canonicalJson, sha256Hex } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
-import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
+import { deriveDirectCaseIdentities } from "@purin-labs/conversation/actors/case-direct-processing";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ControlSessionId } from "@purin-labs/kernel/ids";
 import { resolveOrganisationModelRoute } from "@purin-labs/agent/models/route";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { prepareProjectSnapshot } from "../projects/context";
+import { prepareProjectSnapshot } from "@purin-labs/conversation/projects/context";
 import { admitTurn } from "./turn/admission";
 import { scheduleConversationExecution } from "./application";
-import { selectStoredConversationModel } from "./turn/model";
-import type { ChatCommand, Conversation } from "./conversation";
-import { initialConversationCaseIdentity } from "./conversation-actor-identity";
-import { ForkHistoryAccessError } from "./forks";
+import { selectStoredConversationModel } from "@purin-labs/conversation/chat/turn/model";
+import type {
+  ChatCommand,
+  Conversation,
+} from "@purin-labs/conversation/chat/conversation";
+import { initialConversationCaseIdentity } from "@purin-labs/conversation/chat/conversation-actor-identity";
+import { ForkHistoryAccessError } from "@purin-labs/conversation/chat/forks";
 import {
   bindAdmittedProjectContext,
   bindConversationProjectSnapshot,
   projectSnapshotFromParts,
   storedProjectPlacement,
-} from "./project-context-binding";
+} from "@purin-labs/conversation/chat/project-context-binding";
 import {
   continuesOwnClaim,
   sideCasePhase,
   writeSideCaseTransition,
-} from "./side-case-transition";
+} from "@purin-labs/conversation/chat/side-case-transition";
 import {
   authorizeSideCaseAccess,
   readSideCaseProposal,
   type SideCaseProposal,
-} from "./side-cases";
-import { signalChat } from "./signals";
+} from "@purin-labs/conversation/chat/side-cases";
+import { signalChat } from "@purin-labs/conversation/chat/signals";
 import {
   readConversation,
   saveConversation,
   type ConversationScope,
   type StoredConversation,
-} from "./store";
+} from "@purin-labs/conversation/chat/store";
 
 type SideCaseStartResult =
   | Readonly<{

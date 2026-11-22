@@ -2,8 +2,8 @@ import {
   runOngoingCaseTurn,
   type AdmittedCaseTurn,
   type OngoingCaseTurnInput,
-} from "../src/actors/case-walking-path";
-import type { CaseSnapshot } from "../src/actors/case/types";
+} from "@purin-labs/conversation/actors/case-walking-path";
+import type { CaseSnapshot } from "@purin-labs/conversation/actors/case/types";
 
 declare const snapshot: CaseSnapshot;
 declare const input: OngoingCaseTurnInput;

@@ -629,7 +629,7 @@ output it names. A delivery is `sending` (under a lease), `retryable`,
 `delivered` or `rejected`. For a streamed Slack answer, each part waits
 until the turn's current information-flow binding passes the destination
 check, and the final binding must pass before the stream ends
-([`case-conversation-sink.ts`](../../services/platform/src/actors/case-conversation-sink.ts),
+([`case-conversation-sink.ts`](../../foundation/conversation/actors/case-conversation-sink.ts),
 [IFC guide](../../foundation/authority/policy/information-flow/README.md)).
 
 ### Recovery

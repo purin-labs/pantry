@@ -21,7 +21,7 @@ import {
   type DraftFailureCode,
   type MailReplyRoomMetadata,
 } from "@purin-labs/mail-reply-crdt/protocol";
-import type { SessionTurnExecution } from "../chat/turn-access";
+import type { SessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import { controlError } from "@purin-labs/control/worker/http";
 import {

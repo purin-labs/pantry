@@ -7,7 +7,7 @@ import type { MachineDefinition } from "@purin-labs/std/state-machine";
  */
 export const CASE_OUTPUT_MACHINE = {
   name: "case_output",
-  owner: "services/platform/src/actors/case/outputs.ts",
+  owner: "foundation/conversation/actors/case/outputs.ts",
   store: {
     table: "case_output",
     key: "output_id",

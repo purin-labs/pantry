@@ -1,7 +1,7 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { normalizeUntrustedCommerceText } from "@purin-labs/agent-tools/context/untrusted-commerce-text";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
-import { evaluateChatFlowLabelSink } from "../chat/information-flow";
+import { evaluateChatFlowLabelSink } from "@purin-labs/conversation/chat/information-flow";
 import { isConversationId, isProjectId } from "@purin-labs/control-api";
 import { validateLiveRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import {

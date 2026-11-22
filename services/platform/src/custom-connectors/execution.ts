@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationAccess } from "@purin-labs/tenancy/organisation-access/access";
-import { decideCurrentAuthorityFlowSink } from "../chat/information-flow";
+import { decideCurrentAuthorityFlowSink } from "@purin-labs/conversation/chat/information-flow";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { CommerceSensitivity } from "@purin-labs/commerce-contracts";
 

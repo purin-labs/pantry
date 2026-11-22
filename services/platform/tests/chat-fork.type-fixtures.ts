@@ -1,7 +1,7 @@
 import type { ConversationId } from "@purin-labs/control-api";
 declare const fixtureConversation: ConversationId;
 import type { ChatThreadLineage } from "@purin-labs/control-api";
-import type { ChatForkResult } from "../src/chat/forks";
+import type { ChatForkResult } from "@purin-labs/conversation/chat/forks";
 
 // @ts-expect-error A fork requires its exact source, cutoff, and receipt.
 const missingCutoff: ChatThreadLineage = { kind: "fork" };

@@ -24,7 +24,7 @@ import { fixtureFlowBinding } from "../fixtures/plan25-turn";
 import {
   controlActionMutationExecution,
   type ActionMutationExecution,
-} from "../../src/actors/action-mutation-execution";
+} from "@purin-labs/conversation/actors/action-mutation-execution";
 import {
   startActorRelocation,
   resumeActorRelocation,

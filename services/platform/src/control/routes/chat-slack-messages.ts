@@ -7,7 +7,7 @@
  */
 import { SLACK_APP_NAME, SLACK_BOT_NAME } from "@purin-labs/control-api";
 import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
-import { signalChat } from "../../chat/signals";
+import { signalChat } from "@purin-labs/conversation/chat/signals";
 import { isConversationId } from "@purin-labs/control-api";
 import { assertNever, hasExactKeys } from "@purin-labs/std";
 import {
@@ -15,9 +15,9 @@ import {
   type ActorResolutionError,
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Result } from "@purin-labs/kernel/result";
-import { deriveDirectCaseIdentities } from "../../actors/case-direct-processing";
-import { conversationCaseIdentity } from "../../chat/conversation-access";
-import type { ConversationScope } from "../../chat/store";
+import { deriveDirectCaseIdentities } from "@purin-labs/conversation/actors/case-direct-processing";
+import { conversationCaseIdentity } from "@purin-labs/conversation/chat/conversation-access";
+import type { ConversationScope } from "@purin-labs/conversation/chat/store";
 import {
   claimSlackMessageSend,
   editSlackMessageProposal,

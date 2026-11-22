@@ -392,7 +392,7 @@ Runtime boundaries use versioned APIs and signed events; they do not import
 another runtime's database or private source.
 
 Projects group Cases from every surface. General Project code lives in
-`services/platform/src/projects/` and its routes under
+`foundation/conversation/projects/` and its routes under
 `/v1/control/organisations/:id/projects`; a member's sidebar ordering stays in
 `services/platform/src/chat/`. Every Case has one `case_project` row, and work
 with no named Project is filed in the Organisation's default Project. See

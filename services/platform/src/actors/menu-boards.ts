@@ -62,7 +62,7 @@ import {
 import type { MenuDraftSnapshot } from "@purin-labs/menu-draft-crdt";
 import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 
-import type { SessionTurnExecution } from "../chat/turn-access";
+import type { SessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 
 import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import { controlError } from "@purin-labs/control/worker/http";

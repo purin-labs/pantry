@@ -10,7 +10,7 @@ import { isRecord } from "@purin-labs/std";
 import {
   conversationCaseId,
   initialConversationCaseIdentity,
-} from "../../src/chat/conversation-actor-identity";
+} from "@purin-labs/conversation/chat/conversation-actor-identity";
 import { openNodes, readCaseExecution } from "./case-execution-support";
 import {
   brainSummary,

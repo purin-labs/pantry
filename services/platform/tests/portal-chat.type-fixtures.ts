@@ -6,7 +6,7 @@ import type {
   Conversation,
   ConversationWork,
   ConnectorCardTarget,
-} from "../src/chat/conversation";
+} from "@purin-labs/conversation/chat/conversation";
 import type { SessionId } from "@purin-labs/kernel/ids";
 
 declare const sessionId: SessionId;
@@ -102,7 +102,7 @@ void [
   partialConversation,
 ];
 
-import type { DirectCasePathResult } from "../src/actors/case-walking-path";
+import type { DirectCasePathResult } from "@purin-labs/conversation/actors/case-walking-path";
 declare const completion: Variant<DirectCasePathResult, "completed">;
 const missingFlow: Variant<DirectCasePathResult, "completed"> = {
   ...completion,
@@ -111,7 +111,7 @@ const missingFlow: Variant<DirectCasePathResult, "completed"> = {
 };
 void missingFlow;
 
-import type { ChatModelAction } from "../src/chat/conversation";
+import type { ChatModelAction } from "@purin-labs/conversation/chat/conversation";
 import type { Variant } from "@purin-labs/type-utils";
 declare const questionAction: Variant<ChatModelAction, "question">;
 // @ts-expect-error Question actions cannot carry an alternative plain-text reply through a spread.

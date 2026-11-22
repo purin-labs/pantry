@@ -7,7 +7,7 @@ import type { MachineDefinition } from "@purin-labs/std/state-machine";
  */
 export const CASE_APPROVAL_WAIT_MACHINE = {
   name: "case_approval_wait",
-  owner: "services/platform/src/actors/case/proposals.ts",
+  owner: "foundation/conversation/actors/case/proposals.ts",
   store: {
     table: "case_commerce_approval",
     key: "action_nonce",

@@ -11,7 +11,7 @@ import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisatio
 import {
   authorizeSessionTurnExecution,
   type SessionTurnExecution,
-} from "../chat/turn-access";
+} from "@purin-labs/conversation/chat/turn-access";
 import {
   resolveOperationalEmailContact,
   type EmailProposalTarget,

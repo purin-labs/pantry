@@ -1,4 +1,4 @@
-import type { ConnectorModuleHost } from "./channel-adapter";
+import type { ConnectorModuleHost } from "@purin-labs/conversation/actors/connector/channel-adapter";
 import type { ConnectorIdentity } from "@purin-labs/contracts";
 import {
   admitEvalRun,
@@ -25,8 +25,8 @@ import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
-import { invalid } from "./support";
-import { type ConnectorResult } from "./types";
+import { invalid } from "@purin-labs/conversation/actors/connector/support";
+import { type ConnectorResult } from "@purin-labs/conversation/actors/connector/types";
 
 /** The parts of an eval run that the agent turn of a task uses. */
 const EVAL_TASK_SERVICES: EvalTaskServices = {

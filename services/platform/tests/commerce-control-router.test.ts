@@ -65,7 +65,7 @@ vi.mock("@purin-labs/connections/data/integration-account", async (importOrigina
   ...(await importOriginal<typeof import("@purin-labs/connections/data/integration-account")>()),
   listIntegrationAccounts: accountMocks.listIntegrationAccounts,
 }));
-vi.mock("../src/projects/case-project", () => ({
+vi.mock("@purin-labs/conversation/projects/case-project", () => ({
   ensureCaseProject: vi.fn(async () => ({
     ok: true,
     value: {

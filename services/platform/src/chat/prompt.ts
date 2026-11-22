@@ -1,10 +1,13 @@
-import { currentProjectSnapshot } from "./project-context-binding";
+import { currentProjectSnapshot } from "@purin-labs/conversation/chat/project-context-binding";
 import { connectorDefinitionInstructions } from "../custom-connectors/authoring";
-import { timelineVisibleMessages, type Conversation } from "./conversation";
+import {
+  timelineVisibleMessages,
+  type Conversation,
+} from "@purin-labs/conversation/chat/conversation";
 import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
 import type { SurfaceObservationV2 } from "@purin-labs/control-api";
 import { promptObservation, screenContextLine } from "./screen-prompt";
-import { conversationOrigin } from "./origin";
+import { conversationOrigin } from "@purin-labs/conversation/chat/origin";
 
 const CONNECTOR_STATUS_PROMPT_BYTES = 768;
 const CURRENT_REQUEST_PROMPT_BYTES = 1_280;

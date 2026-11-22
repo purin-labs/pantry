@@ -39,7 +39,7 @@ import {
   type ActorRegistryInventoryEntry,
   type ActorRegistryReconciliationError,
 } from "@purin-labs/actor-runtime/actors/actor-registry-reconciliation";
-import type { CaseSnapshot } from "../../actors/case/types";
+import type { CaseSnapshot } from "@purin-labs/conversation/actors/case/types";
 import {
   requireActiveOrganisationActorAtPlacement,
   resolveActiveConnectorActor,

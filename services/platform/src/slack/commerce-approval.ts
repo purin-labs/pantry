@@ -6,7 +6,7 @@ import {
   resolveActiveCaseActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { ActionLedgerEntry } from "@purin-labs/authority/actors/action-ledger";
-import { resolveSlackApprover } from "../actors/action-mutation-execution";
+import { resolveSlackApprover } from "@purin-labs/conversation/actors/action-mutation-execution";
 import {
   digestApprovalAction,
   type ApprovalEvidence,

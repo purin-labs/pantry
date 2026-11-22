@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { ensureCaseProject } from "../../../projects/case-project";
-import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
+import { ensureCaseProject } from "@purin-labs/conversation/projects/case-project";
+import { controlActionMutationExecution } from "@purin-labs/conversation/actors/action-mutation-execution";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
 import type { CaseActorStub, OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";

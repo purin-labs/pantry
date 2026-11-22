@@ -10,7 +10,7 @@ import {
   inspectConnectorCaseWorkEfficiency,
   nextConnectorCaseWorkAlarm,
   renewRunningConnectorCaseWorkLeases,
-} from "../src/actors/connector-case-work";
+} from "@purin-labs/conversation/actors/connector-case-work";
 import {
   SLACK_CASE_WORK,
   type SlackCaseWorkRequest,

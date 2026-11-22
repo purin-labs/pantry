@@ -1,7 +1,7 @@
-import { signalChat } from "../../../chat/signals";
+import { signalChat } from "@purin-labs/conversation/chat/signals";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isConversationId, isProjectIdentifier } from "@purin-labs/control-api";
-import { forkChat } from "../../../chat/forks";
+import { forkChat } from "@purin-labs/conversation/chat/forks";
 import {
   parseResponseFeedback,
   saveResponseFeedback,
@@ -15,7 +15,7 @@ import {
   controlJson,
   readJsonRecord,
 } from "@purin-labs/control/worker/http";
-import { isChatId } from "../../../chat/conversation";
+import { isChatId } from "@purin-labs/conversation/chat/conversation";
 import {
   updateConversationMetadata,
   updateConversationDraft,
@@ -23,8 +23,8 @@ import {
   renameConversation,
   type ConversationMetadataAction,
   type ConversationScope,
-} from "../../../chat/store";
-import { deleteArchivedChat } from "../../../chat/deletion";
+} from "@purin-labs/conversation/chat/store";
+import { deleteArchivedChat } from "@purin-labs/conversation/chat/deletion";
 import { chatError } from "./errors";
 
 export async function handlePortalChatConversation(

@@ -1,5 +1,8 @@
 import { newConversationId } from "@purin-labs/control-api";
-import { readConversation, saveConversation } from "../../src/chat/store";
+import {
+  readConversation,
+  saveConversation,
+} from "@purin-labs/conversation/chat/store";
 import { env, exports } from "cloudflare:workers";
 import { expect } from "vitest";
 import { http, type HttpResponseResolver } from "msw";

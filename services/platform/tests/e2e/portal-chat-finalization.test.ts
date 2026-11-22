@@ -17,12 +17,12 @@ import {
   parseProjectReference,
   type ProjectSnapshot,
 } from "@purin-labs/control-api";
-import { currentProjectSnapshot } from "../../src/chat/project-context-binding";
-import { conversationCaseId } from "../../src/chat/conversation-actor-identity";
+import { currentProjectSnapshot } from "@purin-labs/conversation/chat/project-context-binding";
+import { conversationCaseId } from "@purin-labs/conversation/chat/conversation-actor-identity";
 import { requireDefaultProjectId } from "../fixtures/default-project";
 import { parseContinuation } from "@purin-labs/agent/actors/agent-session-continuation";
 import { parsePersistedHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
-import { readProjectDirectory } from "../../src/chat/projects";
+import { readProjectDirectory } from "@purin-labs/conversation/chat/projects";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
 import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
 import { connectCommerceFixture } from "./commerce-support";
@@ -36,7 +36,7 @@ import {
 import { isRecord, sha256Hex } from "@purin-labs/std";
 import { prepareRehearsalRunWorkspace } from "../../../../apps/portal/src/features/workflow-simulator/workspace-runs-api";
 import { responseJson } from "@purin-labs/control/portal/control-client";
-import { timelineVisibleMessages } from "../../src/chat/conversation";
+import { timelineVisibleMessages } from "@purin-labs/conversation/chat/conversation";
 import {
   captureBakerySurface,
   prepareBakerySurfaceCommand,
@@ -98,13 +98,13 @@ import {
   readConversation,
   saveConversation,
   type ConversationScope,
-} from "../../src/chat/store";
+} from "@purin-labs/conversation/chat/store";
 import {
   resolveActiveCaseActor,
   resolveActiveSessionActor,
   requireActiveOrganisationActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
-import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
+import { deriveDirectCaseIdentities } from "@purin-labs/conversation/actors/case-direct-processing";
 import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
@@ -118,7 +118,7 @@ import {
   merchantAgentDefaultSkills,
   merchantAgentInstallationId,
 } from "../../src/data/merchant-agent-preset";
-import { runAgentOperation } from "../../src/data/agent-operation-runner";
+import { runAgentOperation } from "@purin-labs/conversation/data/agent-operation-runner";
 import { readPortalOutput } from "./full-worker";
 import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
@@ -4734,7 +4734,7 @@ function readForkCheckpoint(
 async function proveUnavailableForkPrefix(
   session: IssuedControlSession,
   scope: ConversationScope,
-  source: import("../../src/chat/conversation").Conversation,
+  source: import("@purin-labs/conversation/chat/conversation").Conversation,
   evidence: ProjectProviderEvidence,
 ): Promise<void> {
   const first = source.historyBindings[0];
@@ -4843,7 +4843,7 @@ function hasPendingNested(prompt: string): boolean {
   return prompt.includes("NESTED_UNFINISHED_FORK");
 }
 function isForkCancellation(
-  event: import("../../src/chat/timeline").ChatTimelineEvent,
+  event: import("@purin-labs/conversation/chat/timeline").ChatTimelineEvent,
 ): boolean {
   return (
     event.kind === "run_cancelled" && event.eventId === "cancel_fork_source"

@@ -3,7 +3,7 @@ import type { RequestAuthority } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
 
 import type { OrganisationUserAuthority } from "@purin-labs/tenancy/organisation-access/access";
-import { decideCaseConversationSink } from "../actors/case-conversation-sink";
+import { decideCaseConversationSink } from "@purin-labs/conversation/actors/case-conversation-sink";
 import {
   compileTurnAuthority,
   type CompiledTurnAuthority,

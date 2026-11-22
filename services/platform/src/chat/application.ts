@@ -4,36 +4,36 @@ import {
   attachmentParts,
   surfaceObservationFromParts,
   type PendingChatInput,
-} from "./timeline";
+} from "@purin-labs/conversation/chat/timeline";
 import { pendingInputSurfaceContext } from "./input-parts";
 import {
   authorizeConversation,
   conversationCaseIdentity,
-} from "./conversation-access";
+} from "@purin-labs/conversation/chat/conversation-access";
 import type { ConversationId } from "@purin-labs/control-api";
 import {
   projectSnapshotFromParts,
   bindConversationProjectSnapshot,
-} from "./project-context-binding";
+} from "@purin-labs/conversation/chat/project-context-binding";
 import {
   browserContextFromParts,
   removePendingChatInput,
   conversationTimeline,
   normalizeConversationTimeline,
   type Conversation,
-} from "./conversation";
+} from "@purin-labs/conversation/chat/conversation";
 import type { Env } from "@purin-labs/kernel/env";
 import type { CaseActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   deriveDirectCaseIdentities,
   type ConversationCaseActor,
-} from "../actors/case-direct-processing";
+} from "@purin-labs/conversation/actors/case-direct-processing";
 import {
   resolveActiveCaseActorAtScope,
   resolveActiveSessionActorAtPlacement,
   resolveActiveSessionActorAtScope,
 } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { ConversationExecution } from "./execution";
+import type { ConversationExecution } from "@purin-labs/conversation/chat/execution";
 import {
   resolveControlSessionById,
   readActiveOrganisationMembership,
@@ -48,7 +48,7 @@ import {
   readConversationForExecution,
   saveConversation,
   type ConversationScope,
-} from "./store";
+} from "@purin-labs/conversation/chat/store";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import {
@@ -60,14 +60,14 @@ import { failedConversation, settleConversationFailure } from "./turn/failure";
 import {
   conversationUsesInferenceSource,
   selectStoredConversationModel,
-} from "./turn/model";
+} from "@purin-labs/conversation/chat/turn/model";
 import { conversationStreamIdentity, runConversation } from "./turn/run";
 import {
   MODEL_ROUTE_UNAVAILABLE_MESSAGE,
   conversationTransition,
   conversationWorkAtRest,
   failConversationWork,
-} from "./conversation-machine";
+} from "@purin-labs/conversation/chat/conversation-machine";
 import { nextTimelineSequence } from "./turn/timeline";
 
 

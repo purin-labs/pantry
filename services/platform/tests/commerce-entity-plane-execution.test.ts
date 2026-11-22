@@ -5,7 +5,7 @@ import "../src/worker-ports";
 import { describe, expect, it, vi } from "vitest";
 import { parseEntityPlaneCommandResult } from "@purin-labs/commerce-client";
 import type { CommerceMutationReceiptV1 } from "@purin-labs/commerce-contracts";
-import type { CommerceEntityPlaneCaseProposal } from "../src/actors/case/types";
+import type { CommerceEntityPlaneCaseProposal } from "@purin-labs/conversation/actors/case/types";
 import type { ActionLedgerEntry } from "@purin-labs/authority/actors/action-ledger";
 import { parseApprovalEvidence } from "@purin-labs/authority/approval-authentication";
 import {

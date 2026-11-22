@@ -32,8 +32,8 @@ vi.mock("@purin-labs/actor-runtime/actors/actor-router", async (importOriginal) 
   resolveActiveCaseActorAtPlacement: orchestratorMocks.resolveActiveCaseActorAtPlacement,
   resolveActiveSessionActorAtPlacement: orchestratorMocks.resolveActiveSessionActorAtPlacement,
 }));
-vi.mock("../src/actors/case-walking-path", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/actors/case-walking-path")>()),
+vi.mock("@purin-labs/conversation/actors/case-walking-path", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/conversation/actors/case-walking-path")>()),
   prepareTransientEmailAssignment:
     orchestratorMocks.prepareTransientEmailAssignment,
   settleTransientEmailAssignment:

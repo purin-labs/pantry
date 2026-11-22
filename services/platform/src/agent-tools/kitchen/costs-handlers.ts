@@ -60,7 +60,7 @@ import {
   type ToolEffect,
 } from "../session-support";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import { sessionTurnExecution } from "../../chat/turn-access";
+import { sessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import {
   readCostsOverview,
   saveSupplyCostTerms,

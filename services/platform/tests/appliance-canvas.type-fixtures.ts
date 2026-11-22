@@ -36,7 +36,7 @@ export const spreadWorkspaceChat: ChatConversationAccess = {
   documentId: "run:test",
 };
 
-import type { CanvasChatSelection } from "../src/chat/workspace-canvas";
+import type { CanvasChatSelection } from "@purin-labs/conversation/chat/workspace-canvas";
 declare const conversationId: import("@purin-labs/control-api").ConversationId;
 // @ts-expect-error Historical reads require an exact conversation identity.
 export const missingHistoryIdentity: CanvasChatSelection = { kind: "history" };

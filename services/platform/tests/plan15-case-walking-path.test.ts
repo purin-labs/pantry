@@ -52,14 +52,14 @@ vi.mock(
 );
 
 import { CaseDO } from "../src/actors/case";
-import type { CaseSnapshot } from "../src/actors/case/types";
+import type { CaseSnapshot } from "@purin-labs/conversation/actors/case/types";
 import {
   parseMessageCaseContent,
   caseContentAttachments,
   caseContentInstruction,
-} from "../src/actors/case-content";
+} from "@purin-labs/conversation/actors/case-content";
 import { actorPhysicalName } from "@purin-labs/actor-runtime/actors/actor-registry";
-import { slackCaseTurnId } from "../src/actors/case-turn-stream";
+import { slackCaseTurnId } from "@purin-labs/conversation/actors/case-turn-stream";
 import {
   authorizeCaseConversationOutput,
   runDirectCasePath,
@@ -70,7 +70,7 @@ import {
   type OngoingCaseTurnInput as AdmittedOngoingCaseTurnInput,
   type OngoingCaseWalkingConnector,
   type OngoingCaseWalkingSession,
-} from "../src/actors/case-walking-path";
+} from "@purin-labs/conversation/actors/case-walking-path";
 type OngoingCaseTurnInput = Omit<AdmittedOngoingCaseTurnInput, "admittedCase">;
 
 async function runOngoingCaseTurn(input: OngoingCaseTurnInput) {
@@ -2366,11 +2366,11 @@ vi.mock(
   },
 );
 vi.mock(
-  "../src/actors/action-mutation-execution",
+  "@purin-labs/conversation/actors/action-mutation-execution",
   async function caseAuthorityMock(importOriginal) {
     const original =
       await importOriginal<
-        typeof import("../src/actors/action-mutation-execution")
+        typeof import("@purin-labs/conversation/actors/action-mutation-execution")
       >();
     return {
       ...original,

@@ -12,7 +12,7 @@ import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorizatio
 import { encodeContextVisibility } from "@purin-labs/authority/authorization/access-grants/visibility";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { CaseSnapshot } from "../../src/actors/case/types";
+import type { CaseSnapshot } from "@purin-labs/conversation/actors/case/types";
 import {
   applyFileProjectionCommand,
   createFileProjectionCommand,

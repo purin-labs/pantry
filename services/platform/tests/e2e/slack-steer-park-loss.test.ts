@@ -6,7 +6,7 @@ import { isRecord } from "@purin-labs/std";
 
 import { listPlacementActorRegistryEntries } from "@purin-labs/actor-runtime/actors/actor-registry";
 import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
-import { STEER_ANSWER_LOST_FAULT_KEY } from "../../src/actors/connector/steer-fault";
+import { STEER_ANSWER_LOST_FAULT_KEY } from "@purin-labs/conversation/actors/connector/steer-fault";
 import { fixtureDatabase } from "./organisation-database";
 import { network } from "./network";
 import { readSteeredReplies } from "./slack-follow-up-support";

@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { SURFACE_EFFECT_SIGNAL } from "@purin-labs/control-api";
-import { signalChat } from "../../chat/signals";
+import { signalChat } from "@purin-labs/conversation/chat/signals";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { validateLiveRequestAuthority } from "@purin-labs/authority/request-authority/index";

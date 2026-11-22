@@ -3,27 +3,27 @@ import { canonicalJson, sha256Hex } from "@purin-labs/std";
 import type { Env } from "@purin-labs/kernel/env";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { authorizeConversation } from "./conversation-access";
-import { checkConversationDisclosure } from "./conversation-disclosure";
-import { readDisclosureState } from "./disclosure-evidence";
+import { authorizeConversation } from "@purin-labs/conversation/chat/conversation-access";
+import { checkConversationDisclosure } from "@purin-labs/conversation/chat/conversation-disclosure";
+import { readDisclosureState } from "@purin-labs/conversation/chat/disclosure-evidence";
 import { publicConversation } from "./public-conversation";
 import {
   readConversation,
   readConversationStatus,
   reconcileRevokedConversationRun,
-} from "./store";
+} from "@purin-labs/conversation/chat/store";
 import { reconcileFailedConversationTurn } from "./turn/failure";
 import {
   canvasConversationMatches,
   listCanvasConversations,
   type CanvasChatSelection,
   type CanvasConversation,
-} from "./workspace-canvas";
+} from "@purin-labs/conversation/chat/workspace-canvas";
 
 /**
  * The chat panel of a workflow canvas page: the Portal shape of the chat
  * that the page selected. The canvas chat records stay in
- * `./workspace-canvas.ts`.
+ * `@purin-labs/conversation/chat/workspace-canvas.ts`.
  */
 export async function readWorkspaceCanvasChat(
   env: Env,

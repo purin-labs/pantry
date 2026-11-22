@@ -3,24 +3,24 @@ import {
   readActiveOrganisationMembershipRevision,
 } from "@purin-labs/tenancy/data/control-plane";
 import { readPendingSessionPermissionRequest } from "@purin-labs/authority/data/agent-permission-request";
-import { decideChatFlowSink } from "../information-flow";
+import { decideChatFlowSink } from "@purin-labs/conversation/chat/information-flow";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { chatUserMessage } from "../attachments";
+import { chatUserMessage } from "@purin-labs/conversation/chat/attachments";
 import { screenObservationReachesModel } from "../screen-observation-admission";
 import {
   checkConversationDisclosure,
   conversationAudienceMayReceive,
-} from "../conversation-disclosure";
+} from "@purin-labs/conversation/chat/conversation-disclosure";
 import { createTurnMemoryReader } from "../../memory/access";
-import { listProjectMembers } from "../../projects/access";
-import { bindConversationTurnAccess } from "../turn-access";
-import { authorizeConversation } from "../conversation-access";
+import { listProjectMembers } from "@purin-labs/conversation/projects/access";
+import { bindConversationTurnAccess } from "@purin-labs/conversation/chat/turn-access";
+import { authorizeConversation } from "@purin-labs/conversation/chat/conversation-access";
 import type {
   ChatPermissionRequest,
   ChatReceiptReference,
 } from "@purin-labs/control-api";
-import { bindCompletedChatHistory } from "../forks";
-import { currentProjectSnapshot } from "../project-context-binding";
+import { bindCompletedChatHistory } from "@purin-labs/conversation/chat/forks";
+import { currentProjectSnapshot } from "@purin-labs/conversation/chat/project-context-binding";
 import { resolveCustomConnectorDetail } from "../../custom-connectors/projection";
 import { FlowBinding } from "@purin-labs/authority/policy/information-flow/index";
 import type { Env } from "@purin-labs/kernel/env";
@@ -30,7 +30,7 @@ import {
   deriveConversationTurnStream,
   processConversationCaseCommand,
   type ConversationCaseActor,
-} from "../../actors/case-direct-processing";
+} from "@purin-labs/conversation/actors/case-direct-processing";
 import {
   parseRequestId,
   type ControlSessionId,
@@ -56,13 +56,13 @@ import {
   normalizeConversationTimeline,
   type Conversation,
   type ConnectorCardTarget,
-} from "../conversation";
-import { buildAssistantTimelineEvent } from "../timeline";
+} from "@purin-labs/conversation/chat/conversation";
+import { buildAssistantTimelineEvent } from "@purin-labs/conversation/chat/timeline";
 import {
   readConversation,
   saveConversation,
   type ConversationScope,
-} from "../store";
+} from "@purin-labs/conversation/chat/store";
 import { conversationPrompt, workspaceCanvasPrompt } from "../prompt";
 import { readLatestBakerySurfaceOfRequests } from "../../actors/bakery-surface-effect";
 import type { Variant } from "@purin-labs/type-utils";
@@ -84,7 +84,7 @@ import {
   sharedMemberUserId,
 } from "./context";
 import { interruptConversation, settleConversationFailure } from "./failure";
-import { defaultChatEffort } from "./model";
+import { defaultChatEffort } from "@purin-labs/conversation/chat/turn/model";
 import {
   agentChatPermission,
   chatFlowDenialMessage,

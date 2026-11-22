@@ -11,7 +11,7 @@ import { assertCommerceGraphQueryWithLexicon } from "../commerce-wasm";
 import type {
   CaseCommerceApprovalRecord,
   CaseSnapshot,
-} from "../../actors/case/types";
+} from "@purin-labs/conversation/actors/case/types";
 import type { ActionLedgerActivity as OrganisationActionLedgerActivity } from "@purin-labs/authority/actors/action-ledger";
 import type { OrganisationCommerce } from "../../actors/organisation/organisation-commerce";
 import type { OrganisationId } from "@purin-labs/kernel/ids";

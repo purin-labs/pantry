@@ -1,4 +1,4 @@
-import { signalChat } from "../../../chat/signals";
+import { signalChat } from "@purin-labs/conversation/chat/signals";
 import { isConversationId } from "@purin-labs/control-api";
 import { parseBakeryBrowserBinding } from "@purin-labs/bakery-model/bakery-context";
 import type { Env } from "@purin-labs/kernel/env";

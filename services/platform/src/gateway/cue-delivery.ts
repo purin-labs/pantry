@@ -29,7 +29,7 @@ import {
   processDirectCaseCommand,
   processTwoSessionDirectCaseCommand,
   type DirectCaseCommandDelivery,
-} from "../actors/case-direct-processing";
+} from "@purin-labs/conversation/actors/case-direct-processing";
 import type { Env } from "@purin-labs/kernel/env";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import {

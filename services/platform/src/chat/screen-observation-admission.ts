@@ -6,8 +6,8 @@ import {
   timelineVisibleMessages,
   type ChatCommand,
   type Conversation,
-} from "./conversation";
-import type { StoredConversation } from "./store";
+} from "@purin-labs/conversation/chat/conversation";
+import type { StoredConversation } from "@purin-labs/conversation/chat/store";
 
 /**
  * Who reads the answer of a chat turn, for the page that its message carries

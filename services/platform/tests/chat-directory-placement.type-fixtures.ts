@@ -1,6 +1,6 @@
-import { mutateChatDirectory } from "../src/chat/projects";
+import { mutateChatDirectory } from "@purin-labs/conversation/chat/projects";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import type { ConversationScope } from "../src/chat/store";
+import type { ConversationScope } from "@purin-labs/conversation/chat/store";
 import type { ChatDirectoryCommand } from "@purin-labs/control-api";
 
 declare const placement: OrganisationExecutionScope;

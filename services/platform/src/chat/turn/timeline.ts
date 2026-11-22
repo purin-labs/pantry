@@ -25,19 +25,19 @@ import {
   type ChatModelAction,
   type ChatMessage,
   type Conversation,
-} from "../conversation";
+} from "@purin-labs/conversation/chat/conversation";
 import {
   type ChatTimelineEvent,
   buildAssistantTimelineEvent,
   buildTextTimelineEvent,
   buildUserTimelineEvent,
-} from "../timeline";
+} from "@purin-labs/conversation/chat/timeline";
 import {
   readConversation,
   saveConversation,
   type ConversationScope,
   type StoredConversation,
-} from "../store";
+} from "@purin-labs/conversation/chat/store";
 import {
   listBakerySurfaceTimelineEvents,
   type BakerySurfaceTimelineEvent,

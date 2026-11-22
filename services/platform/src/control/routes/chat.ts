@@ -8,20 +8,20 @@ import {
   readChatSubmission,
   retainChatFiles,
   withChatAttachments,
-} from "../../chat/attachments";
+} from "@purin-labs/conversation/chat/attachments";
 import { withAdmittedScreenObservation } from "../../chat/screen-observation-admission";
-import { checkConversationDisclosure } from "../../chat/conversation-disclosure";
+import { checkConversationDisclosure } from "@purin-labs/conversation/chat/conversation-disclosure";
 import {
   authorizeConversation,
   currentCanvasConversation,
-} from "../../chat/conversation-access";
-import { authorizeChatForkRead } from "../../chat/forks";
-import { bindAdmittedProjectContext } from "../../chat/project-context-binding";
+} from "@purin-labs/conversation/chat/conversation-access";
+import { authorizeChatForkRead } from "@purin-labs/conversation/chat/forks";
+import { bindAdmittedProjectContext } from "@purin-labs/conversation/chat/project-context-binding";
 import { reconcileStoredContextObservations } from "../../chat/turn/context";
 import { timeThreadRead } from "../../chat/thread-read-timing";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { Env } from "@purin-labs/kernel/env";
-import { setAdmittedConversationGoal } from "./chat-goal";
+import { setAdmittedConversationGoal } from "@purin-labs/conversation/control/routes/chat-goal";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import {
@@ -35,7 +35,10 @@ import {
   type AuthorizedOrganisationRequest,
 } from "@purin-labs/control/worker/authorization";
 import { controlError, controlJson } from "@purin-labs/control/worker/http";
-import { isChatId, type Conversation } from "../../chat/conversation";
+import {
+  isChatId,
+  type Conversation,
+} from "@purin-labs/conversation/chat/conversation";
 import {
   listConversationDirectory,
   conversationSummary,
@@ -48,10 +51,10 @@ import {
   saveConversation,
   clearSubmittedConversationDraft,
   type ConversationScope,
-} from "../../chat/store";
+} from "@purin-labs/conversation/chat/store";
 import { readConversationSlackDrafts } from "./chat-slack-messages";
 import { readConversationConfigurationDrafts } from "./chat-configuration-drafts";
-import { authorizeSideCaseChatRead } from "../../chat/side-cases";
+import { authorizeSideCaseChatRead } from "@purin-labs/conversation/chat/side-cases";
 import {
   type AdmittedConversationExecution,
   scheduleConversationExecution,
@@ -70,9 +73,9 @@ import {
   modelOptionHasId,
   selectStoredConversationModel,
   conversationUsesInferenceSource,
-} from "../../chat/turn/model";
-import { listPendingChatDeletions } from "../../chat/deletion";
-import { readAuthorizedProjectDirectory } from "../../chat/projects";
+} from "@purin-labs/conversation/chat/turn/model";
+import { listPendingChatDeletions } from "@purin-labs/conversation/chat/deletion";
+import { readAuthorizedProjectDirectory } from "@purin-labs/conversation/chat/projects";
 import {
   publicConversation,
   publicConversationWork,
@@ -81,7 +84,7 @@ import { readOnboardingRow } from "@purin-labs/tenancy/data/organisation-onboard
 import {
   readConversationLinks,
   unreadConversationCount,
-} from "../../chat/conversation-links";
+} from "@purin-labs/conversation/chat/conversation-links";
 import { readConversationEmailReviews } from "../../mail-inbox/conversation-email-reviews";
 import { chatError, chatSaveError } from "./chat/errors";
 
@@ -889,7 +892,7 @@ function validateChatEffort(
 
 function chatDirectoryCursors(
   url: URL,
-): import("../../chat/store").ChatDirectoryCursors | null {
+): import("@purin-labs/conversation/chat/store").ChatDirectoryCursors | null {
   const activeRaw = url.searchParams.get("activeAfter");
   const archivedRaw = url.searchParams.get("archivedAfter");
   const active = activeRaw === null ? null : timedCursor(activeRaw);

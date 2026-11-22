@@ -1,4 +1,4 @@
-import type { ConversationMetadata } from "../src/chat/store";
+import type { ConversationMetadata } from "@purin-labs/conversation/chat/store";
 
 const active: ConversationMetadata = {
   lifecycle: "active",

@@ -58,7 +58,7 @@ import type {
   ConnectorCaseTurnStreamError,
   ConnectorCaseTurnStreamInput,
   ConnectorCaseTurnStreamResult,
-} from "./case-turn-stream";
+} from "@purin-labs/conversation/actors/case-turn-stream";
 import type { StrictUnion, Variant, VariantBy } from "@purin-labs/type-utils";
 import {
   assertNever,

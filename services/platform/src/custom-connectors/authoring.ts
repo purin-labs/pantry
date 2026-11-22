@@ -6,7 +6,7 @@ import {
 import { parseCustomConnectorDefinition } from "./definition";
 import type { Result } from "@purin-labs/kernel/result";
 import { isRecord } from "@purin-labs/std";
-import type { ConversationDocument } from "../chat/conversation";
+import type { ConversationDocument } from "@purin-labs/conversation/chat/conversation";
 
 /** The chat record stores the pages that it read. */
 export type ConnectorDocumentation = ConversationDocument;

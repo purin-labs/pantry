@@ -15,7 +15,7 @@ import {
 import { assertNever, parseJsonOrNull } from "@purin-labs/std";
 
 import type { AuthorizedConversationScope as ConversationScope } from "@purin-labs/tenancy/organisation-access/access";
-import { listVisibleChatTitles } from "../chat/store";
+import { listVisibleChatTitles } from "@purin-labs/conversation/chat/store";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   resolveMemoryViewer,

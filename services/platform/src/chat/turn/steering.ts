@@ -1,11 +1,11 @@
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { chatUserMessage } from "../attachments";
+import { chatUserMessage } from "@purin-labs/conversation/chat/attachments";
 import {
   attachmentParts,
   surfaceObservationField,
   surfaceObservationFromParts,
   type PendingChatInput,
-} from "../timeline";
+} from "@purin-labs/conversation/chat/timeline";
 import { chatInputParts, pendingInputSurfaceContext } from "../input-parts";
 import {
   browserContextFromParts,
@@ -17,7 +17,7 @@ import {
   type ChatMessage,
   type Conversation,
   type ChatCommand,
-} from "../conversation";
+} from "@purin-labs/conversation/chat/conversation";
 import type { Env } from "@purin-labs/kernel/env";
 import type { SessionActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { parseRequestId } from "@purin-labs/kernel/ids";
@@ -28,7 +28,7 @@ import {
   saveConversation,
   type ConversationScope,
   type StoredConversation,
-} from "../store";
+} from "@purin-labs/conversation/chat/store";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   type Admission,

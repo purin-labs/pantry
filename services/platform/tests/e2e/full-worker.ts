@@ -11,7 +11,7 @@ import { CaseDO } from "../../src/actors/case";
 import { SessionDO } from "../../src/actors/agent-session";
 import { OrganisationDO } from "../../src/actors/organisation";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
+import { deriveDirectCaseIdentities } from "@purin-labs/conversation/actors/case-direct-processing";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
@@ -21,8 +21,8 @@ import {
   issueControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
-import { readConversation } from "../../src/chat/store";
-import { conversationTimeline } from "../../src/chat/conversation";
+import { readConversation } from "@purin-labs/conversation/chat/store";
+import { conversationTimeline } from "@purin-labs/conversation/chat/conversation";
 import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";

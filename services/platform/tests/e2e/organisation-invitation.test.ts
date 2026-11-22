@@ -4,7 +4,7 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord, sha256Hex } from "@purin-labs/std";
 import { newConversationId } from "@purin-labs/control-api";
 
-import { saveConversation } from "../../src/chat/store";
+import { saveConversation } from "@purin-labs/conversation/chat/store";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { platformConversation } from "./chat-journey-support";

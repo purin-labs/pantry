@@ -154,19 +154,20 @@ import. A module with no line for one of these has none.
 ## foundation/conversation
 
 - Folders: 13
-  - `services/platform/src/actors/`
-  - `services/platform/src/actors/case/`
-  - `services/platform/src/actors/connector/`
-  - `services/platform/src/case-context-discovery/`
-  - `services/platform/src/chat/`
-  - `services/platform/src/chat/turn/`
-  - `services/platform/src/control/admission/`
-  - `services/platform/src/control/routes/`
-  - `services/platform/src/control/routes/agents/`
-  - `services/platform/src/data/`
-  - `services/platform/src/messages/`
-  - `services/platform/src/projects/`
-  - `services/platform/src/slack/`
+  - `foundation/conversation/actors/`
+  - `foundation/conversation/actors/case/`
+  - `foundation/conversation/actors/connector/`
+  - `foundation/conversation/case-context-discovery/`
+  - `foundation/conversation/chat/`
+  - `foundation/conversation/chat/turn/`
+  - `foundation/conversation/control/admission/`
+  - `foundation/conversation/control/routes/`
+  - `foundation/conversation/control/routes/agents/`
+  - `foundation/conversation/data/`
+  - `foundation/conversation/messages/`
+  - `foundation/conversation/projects/`
+  - `foundation/conversation/slack/`
+- Packages: `foundation/conversation`
 - Tables (16): `case_project`, `organisation_default_project`, `portal_chat_conversation_access_operation`, `portal_chat_deletion`, `portal_chat_directory`, `portal_chat_directory_operation`, `portal_chat_directory_project`, `portal_chat_fork`, `portal_conversation`, `portal_conversation_user`, `project`, `project_access_operation`, `project_member`, `project_operation`, `session_turn_access`, `side_case_proposal`
 
 ## foundation/tool-handlers

@@ -8,7 +8,7 @@ import {
 } from "./slack-journey-support";
 import { issueControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { authorizeSessionTurnExecution } from "../../src/chat/turn-access";
+import { authorizeSessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import { proposeCampaignBrief } from "../../src/data/campaign-brief";
 import { createOperatorConfigurationDraft } from "../../src/data/operator-configuration-draft";
 import {

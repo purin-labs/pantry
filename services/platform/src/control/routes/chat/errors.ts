@@ -1,5 +1,5 @@
 import { controlJson } from "@purin-labs/control/worker/http";
-import { saveConversation } from "../../../chat/store";
+import { saveConversation } from "@purin-labs/conversation/chat/store";
 
 export function chatError(
   code: string,

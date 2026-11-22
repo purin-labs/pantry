@@ -10,9 +10,9 @@ import { checked } from "@purin-labs/contracts/connector-rpc";
 import type { SourceProvenance } from "@purin-labs/commerce-contracts";
 import type { Variant } from "@purin-labs/type-utils";
 import { isRecord } from "@purin-labs/std";
-import type { CaseCommercePart } from "../actors/case/parts";
-import { parseSourceProvenance } from "../actors/case/source-provenance";
-import type { CaseCommerceProposal } from "../actors/case/types";
+import type { CaseCommercePart } from "@purin-labs/conversation/actors/case/parts";
+import { parseSourceProvenance } from "@purin-labs/conversation/actors/case/source-provenance";
+import type { CaseCommerceProposal } from "@purin-labs/conversation/actors/case/types";
 import { parseIntegrationAccountId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
 import {
   parseCommerceSystemRevision,

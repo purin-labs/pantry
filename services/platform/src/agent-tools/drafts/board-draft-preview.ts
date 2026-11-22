@@ -4,7 +4,7 @@ import type { HarnessToolArgumentObserver } from "@purin-labs/agent/actors/embed
 import type { MenuBoardDraftEdit } from "../../actors/menu-board-agent-action";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { readSessionTurnFlowBinding } from "@purin-labs/agent/actors/agent-session-information-flow";
-import { sessionTurnExecution } from "../../chat/turn-access";
+import { sessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import { newRequestId } from "@purin-labs/kernel/ids";

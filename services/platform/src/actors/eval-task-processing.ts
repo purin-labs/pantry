@@ -59,7 +59,7 @@ import {
   digestCanonical,
   FlowBinding,
 } from "@purin-labs/authority/policy/information-flow/index";
-import { ensureCaseProject } from "../projects/case-project";
+import { ensureCaseProject } from "@purin-labs/conversation/projects/case-project";
 import { buildAgentMailboxAuthority } from "@purin-labs/authority/request-authority/index";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { serializeContextBundle } from "@purin-labs/agent/actors/actor-journal/parsers";
@@ -70,7 +70,7 @@ import {
 import {
   prepareTransientEmailAssignment,
   settleTransientEmailAssignment,
-} from "./case-walking-path";
+} from "@purin-labs/conversation/actors/case-walking-path";
 import {
   emailTokenWindowTotals,
   readEmailRuntime,

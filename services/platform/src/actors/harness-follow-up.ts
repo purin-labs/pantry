@@ -37,7 +37,7 @@ import {
 } from "@purin-labs/authority/data/agent-permission-request";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import { isConversationSession } from "../chat/turn-access";
+import { isConversationSession } from "@purin-labs/conversation/chat/turn-access";
 import {
   missingEntityTypeReads,
   type MissingEntityTypeRead,

@@ -5,7 +5,7 @@ import {
   isConversationId,
   type ConversationId,
 } from "@purin-labs/control-api";
-import { readConversationCaseId } from "../../chat/conversation-access";
+import { readConversationCaseId } from "@purin-labs/conversation/chat/conversation-access";
 import { assertNever } from "@purin-labs/std";
 
 import {

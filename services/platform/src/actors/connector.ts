@@ -30,7 +30,7 @@ import { readEmailRuntime } from "./connector-email";
 import {
   parseConnectorCaseWorkRecoveryRequest,
   parseConnectorCaseWorkRequest,
-} from "./connector-case-work";
+} from "@purin-labs/conversation/actors/connector-case-work";
 import {
   acceptCaseWorkTransaction,
   acceptSlackFollowUpTransaction,
@@ -68,24 +68,27 @@ import { deliverSlackPermissionNotice } from "../slack/case-processing";
 import type { Result } from "@purin-labs/kernel/result";
 import { type PlacedActorExportSource } from "@purin-labs/actor-runtime/actors/lifecycle/placed-actor";
 import { armAlarmBy } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
-import { inspectConnector } from "./connector/delivery";
-import type { ConnectorChannels } from "./connector/channel-adapter";
+import { inspectConnector } from "@purin-labs/conversation/actors/connector/delivery";
+import type { ConnectorChannels } from "@purin-labs/conversation/actors/connector/channel-adapter";
 import { SlackConnectorChannel } from "./connector/slack-channel";
 import {
   ensureConnectorIdentity,
   parseDeliveryRequest,
-} from "./connector/ingress-parsers";
-import { invalid, scheduleAcceptedCaseWorkAlarm } from "./connector/support";
+} from "@purin-labs/conversation/actors/connector/ingress-parsers";
+import {
+  invalid,
+  scheduleAcceptedCaseWorkAlarm,
+} from "@purin-labs/conversation/actors/connector/support";
 import {
   type ConnectorDeliveryResult,
   type ConnectorResult,
   type ConnectorSnapshot,
-} from "./connector/types";
+} from "@purin-labs/conversation/actors/connector/types";
 import {
   ConnectorEmail,
   type ConnectorEmailRpc,
 } from "./connector/connector-email-actor";
-import { ConnectorActorBase } from "./connector/connector-actor-base";
+import { ConnectorActorBase } from "@purin-labs/conversation/actors/connector/connector-actor-base";
 import {
   ConnectorWhatsApp,
   type ConnectorWhatsAppRpc,

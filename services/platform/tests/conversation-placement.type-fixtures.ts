@@ -3,9 +3,9 @@ import type { AdmittedConversationExecution } from "../src/chat/application";
 import {
   saveConversation,
   reconcileRevokedConversationRun,
-} from "../src/chat/store";
-import type { Conversation } from "../src/chat/conversation";
-import type { ConversationScope } from "../src/chat/store";
+} from "@purin-labs/conversation/chat/store";
+import type { Conversation } from "@purin-labs/conversation/chat/conversation";
+import type { ConversationScope } from "@purin-labs/conversation/chat/store";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 declare const identity: ConversationScope;

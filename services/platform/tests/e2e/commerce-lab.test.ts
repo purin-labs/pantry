@@ -15,7 +15,7 @@ import {
   type CommerceCueEventType,
 } from "@purin-labs/agent/cues/engine";
 import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { CaseSnapshot } from "../../src/actors/case/types";
+import type { CaseSnapshot } from "@purin-labs/conversation/actors/case/types";
 import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import { issueControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {

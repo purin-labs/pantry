@@ -6,15 +6,15 @@ import { requireOrganisationExecutionScope } from "../organisation-execution-fix
 import { fixtureDatabase } from "./organisation-database";
 import { readControlMutationReplay } from "@purin-labs/tenancy/data/control-mutation";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { forkChat } from "../../src/chat/forks";
-import { readChatControlAuthority } from "../../src/chat/information-flow";
+import { forkChat } from "@purin-labs/conversation/chat/forks";
+import { readChatControlAuthority } from "@purin-labs/conversation/chat/information-flow";
 import {
   changeWorkspaceAiBudget,
   settleWorkspaceAiBudget,
   type WorkspaceAiBudget,
   readWorkspaceAiBudget,
 } from "@purin-labs/tenancy/data/workspace-ai-budget";
-import { readPortalChatAttachmentKeys } from "../../src/chat/attachments";
+import { readPortalChatAttachmentKeys } from "@purin-labs/conversation/chat/attachments";
 import { parseChat, type ChatTimelineView, type ChatAttachmentView } from "@purin-labs/control-api/portal/chat";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import {
@@ -59,7 +59,7 @@ import {
   requireActiveOrganisationActor,
   resolveActiveSessionActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
-import { readConversation, type ConversationScope } from "../../src/chat/store";
+import { readConversation, type ConversationScope } from "@purin-labs/conversation/chat/store";
 import {
   chatForkAttachments,
   parseChatForkHistory,

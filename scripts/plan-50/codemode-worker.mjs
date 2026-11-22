@@ -88,7 +88,7 @@ import {
   createTaskHistoryFixture,
   exerciseTaskOwnership,
 } from "./ownership-fixture.mjs";
-import { parseChatCommand } from "../../services/platform/src/chat/conversation.ts";
+import { parseChatCommand } from "../../foundation/conversation/chat/conversation.ts";
 import {
   admitSteeringInput,
   markSteeringInputPlaced,

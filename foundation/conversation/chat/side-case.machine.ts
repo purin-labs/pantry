@@ -10,7 +10,7 @@ import type { MachineDefinition } from "@purin-labs/std/state-machine";
  */
 export const SIDE_CASE_MACHINE = {
   name: "side_case_proposal",
-  owner: "services/platform/src/chat/side-case-transition.ts",
+  owner: "foundation/conversation/chat/side-case-transition.ts",
   store: { table: "side_case_proposal", key: "proposal_id", column: "status" },
   states: {
     open: {

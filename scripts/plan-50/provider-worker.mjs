@@ -38,7 +38,7 @@ import { compileTrialTurnAuthority } from "./account-authority.mjs";
 import { registerSession } from "./draft-seed.mjs";
 import { createSessionGoalExecution } from "../../foundation/agent/actors/session-goal-usage.ts";
 import { newRequestId } from "../../foundation/kernel/ids.ts";
-import { bindOperatorTurnAccess } from "../../services/platform/src/chat/turn-access.ts";
+import { bindOperatorTurnAccess } from "../../foundation/conversation/chat/turn-access.ts";
 import { OrganisationExecutionScope } from "../../foundation/tenancy/organisation-execution-scope.ts";
 
 import {

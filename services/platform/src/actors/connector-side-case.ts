@@ -13,7 +13,7 @@ import {
 import type { SlackCaseCommand } from "../slack/case-command-message";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { refreshSlackRequestAuthority } from "@purin-labs/authority/request-authority/index";
-import { resolveSlackLinkedMember } from "./action-mutation-execution";
+import { resolveSlackLinkedMember } from "@purin-labs/conversation/actors/action-mutation-execution";
 import { deriveSlackCaseRouteIdentities } from "../slack/case-routing";
 import {
   deriveSlackSessionId,
@@ -39,8 +39,8 @@ import {
   type SlackSideCaseProposal,
 } from "../slack/side-cases";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
-import { decideStoredFlowConversationSink } from "./case-conversation-sink";
-import { parseIdentityRecord } from "./connector-case-work";
+import { decideStoredFlowConversationSink } from "@purin-labs/conversation/actors/case-conversation-sink";
+import { parseIdentityRecord } from "@purin-labs/conversation/actors/connector-case-work";
 import {
   acceptSlackSideCaseWork,
   readParkedSlackSideCase,

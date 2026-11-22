@@ -37,7 +37,7 @@ import {
   requireActiveOrganisationActor,
   resolveActiveSessionActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
-import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
+import { deriveDirectCaseIdentities } from "@purin-labs/conversation/actors/case-direct-processing";
 import { readSessionInformationFlow } from "@purin-labs/agent/actors/agent-session-information-flow";
 import { audiencesForAdmission } from "@purin-labs/authority/policy/information-flow/index";
 import {
@@ -53,8 +53,11 @@ import {
   type CanonicalFileReference,
 } from "@purin-labs/agent/context/files/tools";
 import { parseSessionId, type OrganisationId } from "@purin-labs/kernel/ids";
-import { readConversation, saveConversation } from "../../src/chat/store";
-import { observeProjectReference } from "../../src/projects/references";
+import {
+  readConversation,
+  saveConversation,
+} from "@purin-labs/conversation/chat/store";
+import { observeProjectReference } from "@purin-labs/conversation/projects/references";
 import { platformConversation } from "./chat-journey-support";
 import { commerceClient } from "./commerce-support";
 import {

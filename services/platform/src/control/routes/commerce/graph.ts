@@ -1,7 +1,7 @@
 import { pantryCommerceAccess } from "../../../commerce/contract/client";
-import { ensureCaseProject } from "../../../projects/case-project";
+import { ensureCaseProject } from "@purin-labs/conversation/projects/case-project";
 import type { OrganisationPlacementBindings } from "@purin-labs/tenancy/organisation-execution-scope";
-import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
+import { controlActionMutationExecution } from "@purin-labs/conversation/actors/action-mutation-execution";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
@@ -18,7 +18,7 @@ import {
   requireActiveOrganisationActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { ActionLedgerEntry } from "@purin-labs/authority/actors/action-ledger";
-import type { CaseSnapshot } from "../../../actors/case/types";
+import type { CaseSnapshot } from "@purin-labs/conversation/actors/case/types";
 import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { authorizeCommerceEntityPlaneCommand } from "../../../commerce/entity-plane/execution";
 import { readCommerceActivity } from "../../../commerce/entity-plane/activity";

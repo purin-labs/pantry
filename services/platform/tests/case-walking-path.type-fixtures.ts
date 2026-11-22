@@ -1,5 +1,5 @@
-import type { CaseWalkingPathError } from "../src/actors/case-walking-path";
-import type { ConnectorCaseTurnStreamError } from "../src/actors/case-turn-stream";
+import type { CaseWalkingPathError } from "@purin-labs/conversation/actors/case-walking-path";
+import type { ConnectorCaseTurnStreamError } from "@purin-labs/conversation/actors/case-turn-stream";
 
 export function checkFailureTypes(): void {
   // @ts-expect-error A diagnostic string alone cannot determine retry behavior.

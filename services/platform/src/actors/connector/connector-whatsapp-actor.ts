@@ -1,5 +1,5 @@
-import { admitNamedConnector } from "./module-admission";
-import type { ConnectorModuleHost } from "./channel-adapter";
+import { admitNamedConnector } from "@purin-labs/conversation/actors/connector/module-admission";
+import type { ConnectorModuleHost } from "@purin-labs/conversation/actors/connector/channel-adapter";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { admitActorRecovery } from "@purin-labs/actor-runtime/actors/actor-activation";
@@ -34,7 +34,10 @@ import {
 import { processWhatsAppCaseTurn } from "../whatsapp-case-processing";
 import { createWhatsAppContentCipher } from "../whatsapp-active-content";
 import { fenceAbandonedWhatsAppSends } from "../connector-whatsapp-proposal";
-import type { ChannelAdapter, ChannelAlarmSteps } from "./channel-adapter";
+import type {
+  ChannelAdapter,
+  ChannelAlarmSteps,
+} from "@purin-labs/conversation/actors/connector/channel-adapter";
 import {
   acceptWhatsAppEvent,
   closeWhatsAppSupportCase,
@@ -66,9 +69,9 @@ import type {
   WhatsAppDispatchOutcome,
   WhatsAppProposalPreviewOutcome,
 } from "../connector-whatsapp-proposal";
-import { ensureConnectorIdentity } from "./ingress-parsers";
-import { invalid } from "./support";
-import { type ConnectorResult } from "./types";
+import { ensureConnectorIdentity } from "@purin-labs/conversation/actors/connector/ingress-parsers";
+import { invalid } from "@purin-labs/conversation/actors/connector/support";
+import { type ConnectorResult } from "@purin-labs/conversation/actors/connector/types";
 import {
   parseWhatsAppActivationRequest,
   parseWhatsAppCaseRequest,

@@ -48,11 +48,11 @@ import {
   prepareTransientEmailAssignment,
   settleTransientEmailAssignment,
   type TransientEmailAssignmentInput,
-} from "./case-walking-path";
+} from "@purin-labs/conversation/actors/case-walking-path";
 import {
   recoverAbandonedAssignments,
   sessionQuiescenceProver,
-} from "./case/abandoned-assignments";
+} from "@purin-labs/conversation/actors/case/abandoned-assignments";
 import {
   pauseWhatsAppRuntime,
   readWhatsAppEnvelope,

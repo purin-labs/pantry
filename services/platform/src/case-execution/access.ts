@@ -31,11 +31,11 @@ import {
 import {
   authorizeConversation,
   VISIBLE_CONVERSATIONS_SQL,
-} from "../chat/conversation-access";
+} from "@purin-labs/conversation/chat/conversation-access";
 import {
   conversationCaseId,
   parseConversationActorIdentity,
-} from "../chat/conversation-actor-identity";
+} from "@purin-labs/conversation/chat/conversation-actor-identity";
 import type { AuthorizedConversationScope as ConversationScope } from "@purin-labs/tenancy/organisation-access/access";
 import type { Env } from "@purin-labs/kernel/env";
 import type { CaseActorStub, OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";

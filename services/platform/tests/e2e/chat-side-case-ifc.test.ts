@@ -10,7 +10,7 @@ import {
 import { isRecord } from "@purin-labs/std";
 import type { CaseTimelineCase } from "@purin-labs/control-api";
 
-import { saveConversation } from "../../src/chat/store";
+import { saveConversation } from "@purin-labs/conversation/chat/store";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { answers, cardId, currentRequest } from "./chat-permission-support";
 import { finished } from "./chat-journey-support";

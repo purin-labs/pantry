@@ -62,7 +62,7 @@ import { readLatestAgentRunSave } from "../../src/commerce/bakery/agent-run-save
 import { listBakerySurfaceTimelineEvents } from "../../src/actors/bakery-surface-effect";
 import { admitTurn } from "../../src/chat/turn/admission";
 import { reconcileStoredBakerySurfaceTimeline } from "../../src/chat/turn/timeline";
-import { readConversation, saveConversation } from "../../src/chat/store";
+import { readConversation, saveConversation } from "@purin-labs/conversation/chat/store";
 import { resolvePantryPlatformModelRoute } from "@purin-labs/agent/models/route";
 import { readLatestAgentScenarioSave } from "../../src/commerce/bakery/agent-scenario-save";
 import {

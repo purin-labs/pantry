@@ -4,7 +4,7 @@ import {
   fetchConnectorMail,
   isSessionMailExecutionActive,
 } from "../mail-inbox/execution";
-import type { SessionTurnExecution } from "../chat/turn-access";
+import type { SessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { gmailMailAdapter } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import type { SqlStorage, SqlStorageValue } from "@cloudflare/workers-types";

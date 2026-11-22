@@ -41,7 +41,7 @@ import {
   bakeryRunSnapshotPrefix,
   bakeryRunSnapshotSummary,
 } from "./commerce/bakery/saved-runs";
-import { bakeryRunSnapshots } from "./projects/references";
+import { bakeryRunSnapshots } from "@purin-labs/conversation/projects/references";
 import {
   readNamedCommerceQuery,
   selectNamedCommerceQuerySourceGrant,
@@ -132,12 +132,12 @@ import {
 } from "@purin-labs/agent/context/files/persistence";
 import { validateFileGrantTarget } from "@purin-labs/agent/context/files/grant-validation";
 import { nativeChatAudience } from "@purin-labs/agent/context/assembly/native-chat-audience";
-import { resolveNativeChatAudience } from "./chat/information-flow";
+import { resolveNativeChatAudience } from "@purin-labs/conversation/chat/information-flow";
 import {
   prepareRevokedDmSelectionRelease,
   selectSlackDmOrganisation,
 } from "./slack/organisation-routing";
-import { chatSurfaces } from "./chat/surface-registry";
+import { chatSurfaces } from "@purin-labs/conversation/chat/surface-registry";
 import { KITCHEN_CHAT_SURFACES } from "./chat/kitchen-observation";
 
 memoryService.register({

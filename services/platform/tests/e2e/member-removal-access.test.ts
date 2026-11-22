@@ -4,7 +4,7 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
 import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
-import { saveConversation } from "../../src/chat/store";
+import { saveConversation } from "@purin-labs/conversation/chat/store";
 import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { newConversationId, newProjectId } from "@purin-labs/control-api";

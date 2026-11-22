@@ -1,6 +1,6 @@
 import { resolveCaseReference } from "@purin-labs/authority/access-control/references";
 import { readCaseScreenObservations } from "../../chat/case-screen-observations";
-import type { ConversationScope } from "../../chat/store";
+import type { ConversationScope } from "@purin-labs/conversation/chat/store";
 import type { Env } from "@purin-labs/kernel/env";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { controlError, controlJson } from "@purin-labs/control/worker/http";

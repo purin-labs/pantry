@@ -1,7 +1,7 @@
-import type { Conversation } from "../chat/conversation";
-import { conversationCaseIdentity } from "../chat/conversation-access";
-import type { ConversationScope } from "../chat/store";
-import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
+import type { Conversation } from "@purin-labs/conversation/chat/conversation";
+import { conversationCaseIdentity } from "@purin-labs/conversation/chat/conversation-access";
+import type { ConversationScope } from "@purin-labs/conversation/chat/store";
+import { deriveDirectCaseIdentities } from "@purin-labs/conversation/actors/case-direct-processing";
 import { emailReviewQueueWire } from "../control/email-review";
 import { listEmailReviewProjectionsForCase } from "../data/email-review";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";

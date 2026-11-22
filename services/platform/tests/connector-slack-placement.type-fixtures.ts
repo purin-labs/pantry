@@ -3,7 +3,7 @@ import {
   checkPreparedConnectorDelivery,
   streamConnectorCaseTurn,
 } from "../src/actors/connector-slack-stream";
-import type { ConnectorCaseTurnStreamInput } from "../src/actors/case-turn-stream";
+import type { ConnectorCaseTurnStreamInput } from "@purin-labs/conversation/actors/case-turn-stream";
 
 declare const streamInput: Parameters<typeof streamConnectorCaseTurn>[0];
 declare const deliveryInput: Parameters<

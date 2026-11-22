@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
 import { handleControlRequest } from "../src/control-router";
 import { newPersonId } from "@purin-labs/kernel/ids";
-import { baseProjectId } from "../src/projects/default-project";
+import { baseProjectId } from "@purin-labs/conversation/projects/default-project";
 import {
   createSplitTopology,
   onboardSplitOrganisation,

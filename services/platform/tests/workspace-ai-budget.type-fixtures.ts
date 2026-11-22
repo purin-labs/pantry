@@ -1,4 +1,4 @@
-import type { DirectCaseCommandError } from "../src/actors/case-direct-processing";
+import type { DirectCaseCommandError } from "@purin-labs/conversation/actors/case-direct-processing";
 
 // @ts-expect-error Exhaustion requires the pinned budget and measured usage.
 const missingBudget: DirectCaseCommandError = { kind: "budget_exhausted", code: "session_turn:budget_exhausted" };

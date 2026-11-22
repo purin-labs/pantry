@@ -1,8 +1,8 @@
 import { assertNever } from "@purin-labs/std";
-import type { DirectCaseCommandError } from "../actors/case-direct-processing";
+import type { DirectCaseCommandError } from "@purin-labs/conversation/actors/case-direct-processing";
 import type { RequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import type { ConversationScope } from "./store";
+import type { ConversationScope } from "@purin-labs/conversation/chat/store";
 
 /**
  * A turn that settles as a failure the person sees. `code` is the internal

@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { conversationPrompt } from "../src/chat/prompt";
-import { parseConversation, type Conversation } from "../src/chat/conversation";
+import {
+  parseConversation,
+  type Conversation,
+} from "@purin-labs/conversation/chat/conversation";
 
 describe("portal chat prompt", function portalChatPromptSuite() {
   it("bounds dynamic context below the harness history entry limit", function boundsDynamicContext() {

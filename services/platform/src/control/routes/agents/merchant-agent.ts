@@ -15,7 +15,7 @@ import {
   readJsonRecord,
 } from "@purin-labs/control/worker/http";
 import type { AgentSkillRef } from "@purin-labs/control-api";
-import { agentOperationsErrorResponse } from "./operations";
+import { agentOperationsErrorResponse } from "@purin-labs/conversation/control/routes/agents/operations";
 
 /**
  * Installs the merchant operating agent for one organisation.

@@ -6,7 +6,7 @@
  */
 import { isConversationId } from "@purin-labs/control-api";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { ConversationScope } from "../../chat/store";
+import type { ConversationScope } from "@purin-labs/conversation/chat/store";
 import {
   cancelOperatorConfigurationDraft,
   confirmOperatorConfigurationDraft,

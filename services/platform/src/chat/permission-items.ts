@@ -5,7 +5,7 @@ import type {
 import { readAgentPermissionRequest } from "@purin-labs/authority/data/agent-permission-request";
 import { readOrganisationCapabilityPolicies } from "@purin-labs/authority/data/capability-policy";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import type { ConversationScope } from "./store";
+import type { ConversationScope } from "@purin-labs/conversation/chat/store";
 
 /**
  * The items of a paused run that nobody has allowed yet. A chat action's

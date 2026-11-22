@@ -69,17 +69,17 @@ import {
   resolveActiveCaseActor,
   resolveActiveSessionActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
-import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
-import { readConversation, saveConversation } from "../../src/chat/store";
-import { readProjectDirectory } from "../../src/chat/projects";
+import { deriveDirectCaseIdentities } from "@purin-labs/conversation/actors/case-direct-processing";
+import { readConversation, saveConversation } from "@purin-labs/conversation/chat/store";
+import { readProjectDirectory } from "@purin-labs/conversation/chat/projects";
 import { requireDefaultProjectId } from "../fixtures/default-project";
-import { conversationCaseIdentity } from "../../src/chat/conversation-access";
+import { conversationCaseIdentity } from "@purin-labs/conversation/chat/conversation-access";
 import {
   authorizeChatTurnAccess,
   readAdmittedChatInput,
-} from "../../src/chat/turn-access";
-import { readChatControlAuthority } from "../../src/chat/information-flow";
-import { observeProjectReference } from "../../src/projects/references";
+} from "@purin-labs/conversation/chat/turn-access";
+import { readChatControlAuthority } from "@purin-labs/conversation/chat/information-flow";
+import { observeProjectReference } from "@purin-labs/conversation/projects/references";
 import { platformConversation } from "./chat-journey-support";
 import { commerceClient } from "./commerce-support";
 import {

@@ -5,7 +5,7 @@ import { expect, it, type TestContext } from "vitest";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
 
-import { decideStoredFlowConversationSink } from "../../src/actors/case-conversation-sink";
+import { decideStoredFlowConversationSink } from "@purin-labs/conversation/actors/case-conversation-sink";
 import {
   advanceInformationFlowContext,
   FlowLabel,

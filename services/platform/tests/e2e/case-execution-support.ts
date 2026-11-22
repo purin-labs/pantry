@@ -15,7 +15,7 @@ import {
 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 import { expect } from "vitest";
-import type { CaseSnapshot } from "../../src/actors/case/types";
+import type { CaseSnapshot } from "@purin-labs/conversation/actors/case/types";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 
 /** A whole projection, read page by page through the control route. */

@@ -9,7 +9,7 @@ import { commerceHeaders } from "./commerce-support";
 import { completeCommerceApprovalFixture } from "./commerce-approval-fixture";
 import { googleConfig } from "@purin-labs/control/worker/google-oidc-config";
 import { APPROVAL_GRANT_COOKIE } from "@purin-labs/control/worker/authorization";
-import { controlActionMutationExecution } from "../../src/actors/action-mutation-execution";
+import { controlActionMutationExecution } from "@purin-labs/conversation/actors/action-mutation-execution";
 import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { setTimeout as delay } from "node:timers/promises";

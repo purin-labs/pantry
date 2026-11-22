@@ -13,12 +13,18 @@ import type { ScreenRelevanceState } from "../jev-features/screen-relevance-jev"
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { createCurrentSourceFlowLabel } from "@purin-labs/authority/policy/information-flow/source-labels";
 import type { Result } from "@purin-labs/kernel/result";
-import { timelineVisibleMessages, type Conversation } from "./conversation";
-import type { AuthorizedConversation } from "./conversation-access";
-import { checkConversationDisclosure } from "./conversation-disclosure";
-import { conversationOrigin } from "./origin";
+import {
+  timelineVisibleMessages,
+  type Conversation,
+} from "@purin-labs/conversation/chat/conversation";
+import type { AuthorizedConversation } from "@purin-labs/conversation/chat/conversation-access";
+import { checkConversationDisclosure } from "@purin-labs/conversation/chat/conversation-disclosure";
+import { conversationOrigin } from "@purin-labs/conversation/chat/origin";
 import { admitScreenObservation } from "./screen-observation-admission";
-import type { ConversationScope, StoredConversation } from "./store";
+import type {
+  ConversationScope,
+  StoredConversation,
+} from "@purin-labs/conversation/chat/store";
 
 /** The last answer of the chat that Jev reads, in characters. */
 const LAST_ANSWER_CHARACTERS = 1_000;

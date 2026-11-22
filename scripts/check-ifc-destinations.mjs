@@ -34,21 +34,21 @@ const EFFECTS_WITH_A_NAMED_CALLER = new Set([
 // `actors/case-conversation-sink.ts`, which reads `reachesOutside`.
 const CONVERSATION_DELIVERIES = new Set([
   "foundation/authority/access-control/decision-explanation.ts",
-  "services/platform/src/actors/case-conversation-sink.ts",
-  "services/platform/src/case-context-discovery/metadata.ts",
+  "foundation/conversation/actors/case-conversation-sink.ts",
+  "foundation/conversation/case-context-discovery/metadata.ts",
   "services/platform/src/chat/application.ts",
   // Refactor 13 moved the timeline effects out of application.ts unchanged.
   "services/platform/src/chat/turn/timeline.ts",
-  "services/platform/src/chat/conversation-disclosure.ts",
-  "services/platform/src/chat/information-flow.ts",
+  "foundation/conversation/chat/conversation-disclosure.ts",
+  "foundation/conversation/chat/information-flow.ts",
   "foundation/control/worker/routes/access-control-explain.ts",
   "services/platform/src/control/routes/supplier-payouts.ts",
   "services/platform/src/mail-inbox/contract/mail-source-authorization.ts",
   "services/platform/src/mail-inbox/chat-source-access.ts",
   "services/platform/src/mail-inbox/supplier-context.ts",
   "services/platform/src/whatsapp/read-authorization.ts",
-  "services/platform/src/projects/context.ts",
-  "services/platform/src/projects/references.ts",
+  "foundation/conversation/projects/context.ts",
+  "foundation/conversation/projects/references.ts",
 ]);
 
 const sinks = readFileSync(resolve(root, SINKS), "utf8");

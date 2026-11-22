@@ -3,9 +3,9 @@ import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-acc
 import {
   turnMemoryReaderWithoutSubjects,
 } from "../memory/contract/turn-memory";
-import { ensureCaseProject } from "../projects/case-project";
-import { isSlackGoalMessage } from "./goal-command";
-import { deliverAndSettleCaseOutput } from "../actors/case-walking-path";
+import { ensureCaseProject } from "@purin-labs/conversation/projects/case-project";
+import { isSlackGoalMessage } from "@purin-labs/conversation/slack/goal-command";
+import { deliverAndSettleCaseOutput } from "@purin-labs/conversation/actors/case-walking-path";
 import type {
   CaseBinding,
   ConnectorIdentity,
@@ -37,7 +37,7 @@ import {
   admitOngoingCaseTurn,
   admittedCaseHoldsAssignment,
   type OngoingCaseWalkingConnector,
-} from "../actors/case-walking-path";
+} from "@purin-labs/conversation/actors/case-walking-path";
 import { resolveActiveSlackThreadCredential } from "@purin-labs/authority/credential-vault/index";
 import {
   ensureOrganisationDefaultWorkspace,

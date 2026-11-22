@@ -3,9 +3,9 @@ import {
   type ChatTimelineEvent,
   surfaceObservationField,
   type PendingChatInput,
-} from "../timeline";
+} from "@purin-labs/conversation/chat/timeline";
 import { chatInputParts, pendingInputSurfaceContext } from "../input-parts";
-import { initialConversationCaseIdentity } from "../conversation-actor-identity";
+import { initialConversationCaseIdentity } from "@purin-labs/conversation/chat/conversation-actor-identity";
 import { canonicalJson } from "@purin-labs/std";
 import {
   browserContextFromParts,
@@ -17,11 +17,14 @@ import {
   type ChatMessage,
   type Conversation,
   type ChatCommand,
-} from "../conversation";
+} from "@purin-labs/conversation/chat/conversation";
 import type { OrganisationModelRoute } from "@purin-labs/agent/models/route";
-import type { ConversationScope, StoredConversation } from "../store";
+import type {
+  ConversationScope,
+  StoredConversation,
+} from "@purin-labs/conversation/chat/store";
 import type { Variant } from "@purin-labs/type-utils";
-import { defaultChatEffort } from "./model";
+import { defaultChatEffort } from "@purin-labs/conversation/chat/turn/model";
 import { conversationStreamIdentity } from "./run";
 import { pendingInputHasRequestId } from "./steering";
 import { appendMessageTimelineEvents } from "./timeline";

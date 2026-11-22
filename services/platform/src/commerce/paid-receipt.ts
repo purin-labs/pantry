@@ -21,7 +21,7 @@ import type { CanonicalCommerceDelivery } from "@purin-labs/commerce-contracts";
 import { assertNever } from "@purin-labs/std";
 
 import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
-import { parseDelivery } from "../actors/connector/ingress-parsers";
+import { parseDelivery } from "@purin-labs/conversation/actors/connector/ingress-parsers";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { readOperationsDestination } from "@purin-labs/tenancy/data/operations-destination";
 import type { Env } from "@purin-labs/kernel/env";

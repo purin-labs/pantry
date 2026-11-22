@@ -17,7 +17,7 @@ import {
   issueControlSession,
   revokeControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
-import { runAgentOperation } from "../../src/data/agent-operation-runner";
+import { runAgentOperation } from "@purin-labs/conversation/data/agent-operation-runner";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   parseVaultHandle,

@@ -2,7 +2,7 @@ import {
   resolveActiveCaseActorAtPlacement,
   resolveActiveConnectorActorAtPlacement,
 } from "@purin-labs/actor-runtime/actors/actor-router";
-import { restoreFlowBinding } from "../actors/case-walking-path";
+import { restoreFlowBinding } from "@purin-labs/conversation/actors/case-walking-path";
 import {
   decideHeldOutputRequest,
   HELD_OUTPUT_REQUEST_LIFETIME_MS,

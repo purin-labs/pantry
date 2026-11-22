@@ -1,19 +1,19 @@
-import { currentProjectSnapshot } from "./project-context-binding";
+import { currentProjectSnapshot } from "@purin-labs/conversation/chat/project-context-binding";
 import {
   latestPublicTimelineSequence,
   conversationTimeline,
   timelineVisibleMessages,
   type ChatMessage,
   type Conversation,
-} from "./conversation";
+} from "@purin-labs/conversation/chat/conversation";
 import {
   attachmentParts,
   type ChatInputPart,
   type ChatTimelineEvent,
-} from "./timeline";
-import type { ConversationMetadata } from "./store";
+} from "@purin-labs/conversation/chat/timeline";
+import type { ConversationMetadata } from "@purin-labs/conversation/chat/store";
 import { assertNever } from "@purin-labs/std";
-import { conversationOrigin } from "./origin";
+import { conversationOrigin } from "@purin-labs/conversation/chat/origin";
 
 function visibleMessage(message: ChatMessage): boolean {
   return message.kind !== "context";

@@ -17,8 +17,8 @@ import {
 import { caseInboxPart } from "./case-inbox/part";
 import type { CaseInboxRpc } from "./case-inbox/rpc";
 import { ACTOR_MACHINES } from "./actor-machines";
-import { CaseActor } from "./case/case-actor";
-import type { CaseParts } from "./case/parts";
+import { CaseActor } from "@purin-labs/conversation/actors/case/case-actor";
+import type { CaseParts } from "@purin-labs/conversation/actors/case/parts";
 
 const CASE_PARTS: CaseParts = {
   commerce: caseCommercePart,
