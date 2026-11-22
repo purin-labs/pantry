@@ -381,7 +381,8 @@ The boundaries:
 - The stream of audit and billing events from Queues to R2 is not built. The two queues
   carry events and cues only.
 - The write meter is test code (`tests/e2e/write-meter.ts`). For production, an operator
-  reads `rowsWritten` in the Cloudflare GraphQL Analytics datasets.
+  reads `rowsWritten` in the Cloudflare GraphQL Analytics datasets
+  `durableObjectsPeriodicGroups` and `d1AnalyticsAdaptiveGroups`.
 - No scheduled job deletes expired rows of `control_mutation_receipt`. A replay does
   not read `expires_at`.
 - The idle-cost journey does not count the D1, queue, KV and R2 writes that a Durable

@@ -412,6 +412,13 @@ reported 142 possible code faults. No one has checked them yet. A source plan mo
 there since 2026-11-23. Plan 91 stays in `docs/` until its phase 6 ends, and the 15
 other source documents stay where they are.
 
+Step S3 is done on 2026-11-23: `AGENTS.md` has 249 lines (749 before). It keeps the
+owner's rules for the work, for reports and for subagents word for word, the code
+rules with the name of each lint, and one line for each layer and area with its
+specs. The plan index is in `docs/specs/README.md`, the names table is in `ENG-03`,
+and the long form of each rule is in `ENG-02`, `ENG-04`, `PRT-01` and the foundation
+specs. The short `AGENTS.md` of each area comes with the area folders of Stage B.
+
 The condition of step S2 was final brand names (D2: "The spec text waits for the
 brand names"). The Purin names are on `dev` since Plan 91 phase 4A, so S2 started on
 2026-11-22 with one pilot spec, `DEV-01` (Devices, from Plan 85):

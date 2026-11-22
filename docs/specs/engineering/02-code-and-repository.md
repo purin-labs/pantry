@@ -150,7 +150,8 @@ revision. These lints guard the repository:
   names its tables in SQL.
 - In `services/commerce/src`, only `CLOUDFLARE_ADAPTERS` files name a Cloudflare API.
 - Platform files in `actors/`, `slack/` and `chat/` import no file in `control/routes/`.
-  A route file calls no `.prepare(`.
+  A route file calls no `.prepare(`. The code that a route and an Actor share is in a
+  domain module, or in `control/admission/` for a request check.
 
 Other lints guard one subsystem. The spec of that subsystem describes these:
 `lint:state-machines` (FND-02), `lint:database-handles` and `lint:d1-patch` (FND-01),
