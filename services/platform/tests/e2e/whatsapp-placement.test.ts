@@ -388,12 +388,6 @@ async function installSupportReadAuthority(fixture: Fixture) {
       },
     }),
   );
-  await fixtureDatabase()
-    .prepare(
-      "UPDATE workspace_ai_budget SET max_tokens = 128000, previous_limits_json = json_set(previous_limits_json, '$.maxTokens', 128000) WHERE organisation_id = ?",
-    )
-    .bind(ORGANISATION_ID)
-    .run();
   const organisation = await requireActiveOrganisationActor({
     env,
     organisationId: ORGANISATION_ID,

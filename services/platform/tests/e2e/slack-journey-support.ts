@@ -1260,7 +1260,40 @@ export async function inspectSlackActors(connectorId: string) {
   };
 }
 
-export function openRouterText(text: string, id: string): Response {
+/**
+ * The token usage that OpenRouter reports in the last chunk of a stream.
+ * `prompt_tokens` includes the cached tokens.
+ */
+export type OpenRouterUsage = Readonly<{
+  prompt_tokens: number;
+  completion_tokens: number;
+  total_tokens: number;
+  prompt_tokens_details?: Readonly<{ cached_tokens: number }>;
+}>;
+
+/** The usage of one model call: `prompt` input tokens, `cached` of them from the cache. */
+export function openRouterUsage(
+  prompt: number,
+  cached: number,
+  completion: number,
+): OpenRouterUsage {
+  return {
+    prompt_tokens: prompt,
+    completion_tokens: completion,
+    total_tokens: prompt + completion,
+    prompt_tokens_details: { cached_tokens: cached },
+  };
+}
+
+export function openRouterText(
+  text: string,
+  id: string,
+  usage: OpenRouterUsage = {
+    prompt_tokens: 20,
+    completion_tokens: 5,
+    total_tokens: 25,
+  },
+): Response {
   return openRouterStream([
     {
       id,
@@ -1281,7 +1314,7 @@ export function openRouterText(text: string, id: string): Response {
       created: 1_787_500_000,
       model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
-      usage: { prompt_tokens: 20, completion_tokens: 5, total_tokens: 25 },
+      usage,
     },
   ]);
 }
@@ -1290,6 +1323,7 @@ export function openRouterToolCall(
   name: string,
   args: Readonly<Record<string, unknown>>,
   callId: string,
+  usage?: OpenRouterUsage,
 ): Response {
   return openRouterStream([
     {
@@ -1321,6 +1355,7 @@ export function openRouterToolCall(
       created: 1_787_500_000,
       model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [{ index: 0, delta: {}, finish_reason: "tool_calls" }],
+      ...(usage === undefined ? {} : { usage }),
     },
   ]);
 }

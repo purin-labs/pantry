@@ -1141,7 +1141,7 @@ function buildTransport(scenario: Scenario): AccessRouteTransport {
     maxToolCalls: 200,
   };
   const budget: AiBudgetView = {
-    limits: { maxTokens: 64_000, maxWallMs: 180_000, maxToolCalls: 20 },
+    limits: { maxTokens: 500_000, maxWallMs: 180_000, maxToolCalls: 20 },
     maximum: budgetMaximum,
     revision: 1,
     activation: "active",

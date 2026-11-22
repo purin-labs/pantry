@@ -33,12 +33,6 @@ it(
 
 async function goalDispatchJourney(context: TestContext): Promise<void> {
   await installSlackActorFixture();
-  await fixtureDatabase()
-    .prepare(
-      "UPDATE workspace_ai_budget SET max_tokens = 500000 WHERE organisation_id = ?",
-    )
-    .bind(ORGANISATION_ID)
-    .run();
   const organisation = await requireActiveOrganisationActor({
     env,
     organisationId: ORGANISATION_ID,

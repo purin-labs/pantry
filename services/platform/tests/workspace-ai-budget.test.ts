@@ -28,7 +28,7 @@ it("provisions finite defaults and fences changes, recovery and organisation iso
   expect(initial).toMatchObject({
     ok: true,
     value: {
-      limits: { maxTokens: 64000, maxWallMs: 180000, maxToolCalls: 20 },
+      limits: { maxTokens: 500000, maxWallMs: 180000, maxToolCalls: 20 },
       revision: 1,
       activation: "active",
     },
@@ -82,7 +82,7 @@ it("provisions finite defaults and fences changes, recovery and organisation iso
   ).toEqual({ ok: false, error: "workspace_ai_budget_conflict" });
   expect(await readWorkspaceAiBudget(db, other.value)).toMatchObject({
     ok: true,
-    value: { revision: 1, limits: { maxTokens: 64000 } },
+    value: { revision: 1, limits: { maxTokens: 500000 } },
   });
   sqlite.close();
 });

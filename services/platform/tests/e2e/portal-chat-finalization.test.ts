@@ -3379,7 +3379,8 @@ function send(
   );
 }
 
-async function fixture(maxTokens = 64_000): Promise<{
+/** The Organisation keeps its default AI budget unless `maxTokens` is given. */
+async function fixture(maxTokens?: number): Promise<{
   scope: ConversationScope;
   session: IssuedControlSession;
 }> {
@@ -3388,9 +3389,15 @@ async function fixture(maxTokens = 64_000): Promise<{
   if (!identity.ok) throw new Error(identity.error.code);
   const now = Date.now();
   await fixtureDatabase().batch([
-    fixtureDatabase().prepare(
-      "UPDATE workspace_ai_budget SET max_tokens = ?, previous_limits_json = json_set(previous_limits_json, '$.maxTokens', ?) WHERE organisation_id = ?",
-    ).bind(maxTokens, maxTokens, ORGANISATION_ID),
+    ...(maxTokens === undefined
+      ? []
+      : [
+          fixtureDatabase()
+            .prepare(
+              "UPDATE workspace_ai_budget SET max_tokens = ?, previous_limits_json = json_set(previous_limits_json, '$.maxTokens', ?) WHERE organisation_id = ?",
+            )
+            .bind(maxTokens, maxTokens, ORGANISATION_ID),
+        ]),
     fixtureDatabase().prepare(
       "UPDATE service_role_grant SET role = 'admin' WHERE organisation_id = ? AND user_id = ?",
     ).bind(ORGANISATION_ID, SLACK_ACTOR_USER_ID),

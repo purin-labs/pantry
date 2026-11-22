@@ -37,6 +37,11 @@ test and any fixture that exists only for the obsolete behavior.
   running it. It fails when one statement names tables of both databases, and
   when a function names a global-only table on a database nobody has traced to
   `env.DB`.
+- `e2e/new-organisation-first-chat.test.ts` is the guard of the default AI
+  budget: a new Organisation's first Portal chat turn with two tool calls
+  reports the 71,114 tokens of the production turn of 22 November 2026, and
+  it must answer under the budget that the Organisation gets at creation.
+  Do not raise the budget in this journey.
 - `e2e/idle-tenant-cost.test.ts` is the cost guard for a shop where nothing
   changes. It runs every cron trigger of the production Worker for one hour,
   stops each Durable Object before each five minutes, and fails when the shop

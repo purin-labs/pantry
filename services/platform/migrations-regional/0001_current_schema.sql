@@ -12,13 +12,13 @@ CREATE TABLE organisation (
 , organisation_handle TEXT, status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'suspended', 'deleted', 'purged')));
 CREATE TABLE workspace_ai_budget (
   organisation_id TEXT PRIMARY KEY REFERENCES organisation(organisation_id),
-  max_tokens INTEGER NOT NULL DEFAULT 64000 CHECK (max_tokens BETWEEN 1 AND 1000000),
+  max_tokens INTEGER NOT NULL DEFAULT 500000 CHECK (max_tokens BETWEEN 1 AND 1000000),
   max_wall_ms INTEGER NOT NULL DEFAULT 180000 CHECK (max_wall_ms BETWEEN 1000 AND 600000 AND max_wall_ms % 1000 = 0),
   max_tool_calls INTEGER NOT NULL DEFAULT 20 CHECK (max_tool_calls BETWEEN 1 AND 200),
   revision INTEGER NOT NULL DEFAULT 1 CHECK (revision > 0),
   applied_revision INTEGER NOT NULL DEFAULT 1 CHECK (applied_revision >= 0 AND applied_revision <= revision),
   mutation_receipt_id TEXT NOT NULL DEFAULT 'initial',
-  previous_limits_json TEXT NOT NULL DEFAULT '{"maxTokens":64000,"maxWallMs":180000,"maxToolCalls":20}' CHECK (json_valid(previous_limits_json)),
+  previous_limits_json TEXT NOT NULL DEFAULT '{"maxTokens":500000,"maxWallMs":180000,"maxToolCalls":20}' CHECK (json_valid(previous_limits_json)),
   updated_at INTEGER NOT NULL
 );
 CREATE TRIGGER provision_workspace_ai_budget AFTER INSERT ON organisation

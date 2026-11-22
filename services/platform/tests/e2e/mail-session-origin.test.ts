@@ -652,11 +652,6 @@ async function fixture() {
         "UPDATE organisation_onboarding SET lifecycle = 'active', activation_receipt_id = 'receipt_mail_origin', activated_at = ? WHERE organisation_id = ?",
       )
       .bind(now, ORGANISATION_ID),
-    fixtureDatabase()
-      .prepare(
-        "UPDATE workspace_ai_budget SET max_tokens = 128000, previous_limits_json = json_set(previous_limits_json, '$.maxTokens', 128000) WHERE organisation_id = ?",
-      )
-      .bind(ORGANISATION_ID),
   ]);
   const handle = required(parseVaultHandle("vault:gmail:p55-session-origin"));
   required(

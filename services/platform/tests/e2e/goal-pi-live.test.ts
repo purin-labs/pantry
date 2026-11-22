@@ -29,12 +29,6 @@ it.skipIf(env.OPENROUTER_API_KEY === "openrouter-e2e-key")(
 
 async function nativeGoalJourney(context: TestContext): Promise<void> {
   await installSlackActorFixture();
-  await fixtureDatabase()
-    .prepare(
-      "UPDATE workspace_ai_budget SET max_tokens = 500000 WHERE organisation_id = ?",
-    )
-    .bind(ORGANISATION_ID)
-    .run();
   const organisation = await requireActiveOrganisationActor({
     env,
     organisationId: ORGANISATION_ID,

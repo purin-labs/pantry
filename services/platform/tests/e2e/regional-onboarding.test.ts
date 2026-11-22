@@ -899,7 +899,7 @@ async function regionalOnboardingJourney({ task }: TestContext): Promise<void> {
       )
       .bind(east.organisationId)
       .first(),
-  ).toEqual({ max_tokens: 64000 });
+  ).toEqual({ max_tokens: 500000 });
   expect(
     await env.DB.prepare(
       "SELECT source_quiesced_at, data_verified_at FROM state_object_relocation WHERE relocation_id = ?",

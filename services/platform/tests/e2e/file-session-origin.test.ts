@@ -1047,11 +1047,6 @@ async function fixture() {
         "UPDATE organisation_onboarding SET lifecycle = 'active', activation_attempt_id = NULL, readiness_version = NULL, activation_receipt_id = 'receipt_p55_file', activated_at = ? WHERE organisation_id = ?",
       )
       .bind(now, ORGANISATION_ID),
-    fixtureDatabase()
-      .prepare(
-        "UPDATE workspace_ai_budget SET max_tokens = 128000, previous_limits_json = json_set(previous_limits_json, '$.maxTokens', 128000) WHERE organisation_id = ?",
-      )
-      .bind(ORGANISATION_ID),
   ]);
   const secret = await storeVaultSecret({
     db: fixtureDatabase(),

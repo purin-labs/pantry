@@ -264,7 +264,7 @@ export function prepareExportCoordinatorInstallation(
         `INSERT INTO agent_installation_governance (
          installation_id, organisation_id, max_session_budget_tokens, revision,
          updated_by_user_id, updated_at
-       ) SELECT ?, ?, 64000, 1, ?, ? WHERE ${input.guard.condition}`,
+       ) SELECT ?, ?, 500000, 1, ?, ? WHERE ${input.guard.condition}`,
       )
       .bind(
         input.installationId,
