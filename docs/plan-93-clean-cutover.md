@@ -1,8 +1,9 @@
 # Plan 93 — Clean cutover to new Workers and infrastructure
 
-Status: 22 November 2026. Steps 0 to 2 are done; step 2 landed on dev after
-a short freeze. Step 3 is in progress (see "Step 3 results"). Steps 4 to 7
-are open.
+Status: 22 November 2026. Steps 0 to 6 are done. The new stack serves
+production on `pantry.purin.io`, the providers use the new callbacks, and the
+old stack is deleted. Step 7 (other projects) and the separate work in "Step
+6 results" are open.
 
 Change on 21 November 2026 ([Plan 95](plan-95-pantry-own-accounts.md) step
 4): Pantry no longer binds the Console. The new stack has no
@@ -771,8 +772,22 @@ with no Wrangler profile, so `--name` is the only target.
 - The four container applications and the two databases.
 - The buckets `satyr-archive-apac` (441 objects) and `underclerk-apac`
   (24), emptied through the R2 API and deleted. The API throttles at about
-  1,200 requests in five minutes, so the 3,574 objects of
-  `satyr-repo-binaries-apac` go at about three a second.
+  1,200 requests in five minutes, so the objects of
+  `satyr-repo-binaries-apac` went at about one and a half a second (21:09
+  to 21:47 JST), then the bucket.
+- `POLICY_KV`, the queues `satyr-events`, `satyr-cues`, `satyr-event-dlq`
+  and `satyr-cue-dlq`, the Secrets Store secrets `data-encryption-root-v1`,
+  `vault-root-v1`, `vault-root-v2`, `satyr-staging-data-encryption-root-v1`
+  and `satyr-staging-vault-root-v1`, and the Stripe test webhook of the old
+  organisation (`/hook/stripe/tenant_T0BGQSSG45N`). The Plan 91 phase 4
+  session had deleted the other two old Stripe webhooks and the old Slack,
+  Shopify and Dropbox entries, each read back.
+
+Check after the last stage: the inventory of the script finds no old Worker,
+container, database, bucket, KV namespace, queue, store secret or Stripe
+webhook, and `pantry.purin.io` (Portal and `/health`),
+`commerce.pantry.purin.io/health`, `docs.pantry.purin.io` and
+`shop.purin.io` answer 200.
 
 Kept on purpose: the Google projects `satyr-gmail-dev` and
 `satyr-drive-pilot`, which local development still uses; the old R2 token of
@@ -792,6 +807,26 @@ name an old bundle now.
   the deploy runbook, the release scripts and their guards, the
   observability scripts that filter by Worker name, and the memory notes.
 - Mark Plan 91's deployed-layer and wire-layer rules as ended by this plan.
+
+#### Step 6 results (22 November 2026)
+
+The codemod of step 2 already named the new stack in AGENTS.md, the deploy
+runbook, the release scripts and the observability scripts; the release
+guard (`WORKER_NAMES`) refuses every other Worker name. Step 4 changed the
+Google values in AGENTS.md, `docs/integrations/google-oauth.md` and the two
+Gmail runbooks. Plan 91's "Four layers of a name" now says that its
+deployed and wire rules ended with this plan. The memory notes name the new
+stack.
+
+**Left as separate work** (briefs in the notes file
+`plan-93-follow-ups.md` of the session group): the old Kitchen physics
+bundles; the 64,000-token default budget of a new organisation; the shop
+Mac voice service and local development on `purin-pantry`, after which the
+old Google projects can go. With the owner: the read-only R2 key of CI
+(add `pantry-repo-binaries-apac`), Google verification of the Gmail scopes,
+`TYPESAFE_API_KEY`, and the checks not run yet (a Square or Stripe connect,
+a test order, an MCP call). With the Plan 91 phase 4 session: the Square and
+Stripe Connect redirects, the Meta webhook and the remaining console names.
 
 ### 7. Other projects (separate)
 
