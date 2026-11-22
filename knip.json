@@ -5,7 +5,8 @@
   "ignoreIssues": {
     "areas/*/**/*.fixtures.ts": ["exports", "types"],
     "areas/*/**/*.type-fixtures.ts": ["exports", "types"],
-    "areas/*/**/*.typecheck.ts": ["exports", "types"]
+    "areas/*/**/*.typecheck.ts": ["exports", "types"],
+    "areas/*/**/*.d.ts": ["exports", "types"]
   },
   "workspaces": {
     ".": {
