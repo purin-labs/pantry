@@ -517,6 +517,7 @@
     "apps/portal/src/dashboard-sidebar-toggle-icon.tsx": "foundation/ui",
     "apps/portal/src/dialog.tsx": "foundation/ui",
     "apps/portal/src/execution-client.ts": "areas/brain",
+    "apps/portal/src/features/agent-surface-label.css": "foundation/ui",
     "apps/portal/src/features/agent-surface-label.ts": "foundation/ui",
     "apps/portal/src/features/bakery-browser-context.ts": "areas/kitchen",
     "apps/portal/src/features/bakery-surface-effect-bridge.tsx": "areas/kitchen",
