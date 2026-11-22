@@ -235,14 +235,16 @@ for (const [folder, from] of Object.entries(targets.packages)) {
     const named = workspaceImport(dependency);
     if (named === null) continue;
     const to = named.entry.module;
-    // An area package under `covers` holds the public files of its area and
-    // its inside. The import rule above reads each of its imports, so
-    // another area package under `covers` may depend on it.
+    // The files of an area package under `covers` have their own modules,
+    // and the import rule above reads each of their imports, as it read them
+    // before the move. So such a package may depend on the package of
+    // another area: an area package under `covers` gives only its public
+    // files, and an import of another area package is counted by
+    // check-layer-debts.mjs (area-package).
     if (
       layerOf(from) === "areas" &&
       layerOf(to) === "areas" &&
-      (contractPackages.has(named.entry.folder) ||
-        (coveredPackage(folder) && coveredPackage(named.entry.folder)))
+      (contractPackages.has(named.entry.folder) || coveredPackage(folder))
     )
       continue;
     const kind = crossing(from, to);
