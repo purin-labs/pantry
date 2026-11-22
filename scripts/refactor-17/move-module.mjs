@@ -873,15 +873,11 @@ for (const path of tree) {
     }
   } else {
     // A rule of a folder that moved whole is now inside the rule of the
-    // target.
+    // target. A rule of another module can come with it: an earlier move
+    // took the files of that module from the folder and left the rule, and
+    // each file that the rule selects now is a file of this plan.
     for (const key of Object.keys(map.rules)) {
-      if (
-        key !== rule &&
-        key.startsWith(rule) &&
-        map.rules[key] === plan.module
-      ) {
-        delete map.rules[key];
-      }
+      if (key !== rule && key.startsWith(rule)) delete map.rules[key];
     }
     if (map.rules[rule] === undefined) {
       map.rules = { [rule]: plan.module, ...map.rules };
