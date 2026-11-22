@@ -735,10 +735,13 @@ State on 22 November 2026:
   | Shopify | Registration works: the token exchange and the shop read (last phase `discovering_identity`). Pantry then refused the shop (`provider_environment_mismatch`): `nuki-ub5drbcx.myshopify.com` is a partner development store, and "Purin workspace" is a production organisation |
 
   The Stripe and Shopify refusals are Pantry's own account rules, not
-  registration faults: a production organisation takes only a Stripe
-  account with active card payments and a live webhook, and only a Shopify
-  store that is not a development store. A full connect needs live Stripe
-  and a real store, or an organisation in the development environment.
+  registration faults. Shopify: a production organisation takes only a
+  store that is not a development store. Stripe (corrected by the audit
+  below): the account rule follows the mode of the platform key, not the
+  organisation (`connectStripe` in `provider-workflows/stripe-connection.ts`),
+  so with the test key every organisation takes a test account whose
+  Stripe sign-up is finished (`details_submitted`); a blank test account
+  has not finished it.
 - **Test organisation**, the same evening, on the owner's "set up a
   development test organisation": Plan 95 now lets an owner on the Worker
   secret `PANTRY_TEST_ORGANISATION_OWNERS` (`n6378056@gmail.com`) make an
@@ -746,12 +749,23 @@ State on 22 November 2026:
   version `5e878705`). "Purin test shop" (`organisation_a911940a-…`,
   handle `purin-test-shop`) reads `environment: "development"`. Shopify
   connected there: the development store `nuki-ub5drbcx` shows as "Nuki".
-  Stripe still waits: Stripe's test sign-in asks the owner's Stripe user to
-  set up two-step authentication first, and Pantry takes only a test
-  account that has finished Stripe's sign-up form (`details_submitted`),
-  so the owner finishes that step. The test organisation stays in setup
-  (no AI account, commerce system or Slack yet); the connects do not need
-  it to be active.
+  The test organisation stays in setup (no AI account, commerce system or
+  Slack yet); the connects do not need it to be active.
+- **Stripe, closed by audit** (22 November 2026, on the owner's "test it
+  yourself or audit the code and declare it done"). A live run needs
+  Stripe's test sign-up form, which first asks the owner's Stripe user to
+  set up two-step authentication, a security setting that stays the
+  owner's. `connectStripe` runs these steps: the platform key and its mode,
+  the platform webhook check, the code exchange, the account read and its
+  rule, then the token store and the connection. Proven live on the new
+  stack: the new client ID and redirect (Stripe accepted them), the webhook
+  check of `we_1UeaeG9Z5LoDEq608kzPZsWC` (it runs before the exchange,
+  and the attempt went past it), the code exchange with the Purin platform
+  key (last phase `discovering_identity`), and the account read (Pantry
+  read the blank account and applied its rule). Proven by the journey
+  `tests/e2e/stripe-in-commerce.test.ts` on dev, which passes: the
+  remaining step, a finished account accepted, its token stored and the
+  connection made. The only part not run live is Stripe's own sign-up form.
 - **4D, after the Stripe move**: Pantry's two webhook endpoints in the shared
   Seams account are deleted (it now holds only the Seams Console's two
   endpoints). Its `pantry.purin.io` redirect stays there, because the
@@ -767,8 +781,6 @@ Phase 4 is done, on 22 November 2026. Open items, each outside the switch:
 - `satyr-gmail-dev` and `satyr-drive-pilot` go when local development moves
   to `purin-pantry` (Plan 93 follow-ups).
 - The Dropbox icons (the console needs a native file picker).
-- The full Stripe connect in "Purin test shop": the owner sets up Stripe
-  two-step authentication and finishes the test sign-up form (see 4C).
 - The callback page now has the Portal's look (dev `29024dc0`, released in
   `pantry` `5e878705`).
 
