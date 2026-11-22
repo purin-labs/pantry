@@ -30,7 +30,9 @@
 //    4. Each import of a moved file, in each source file of the tree: `from`,
 //       `import()`, `declare module`, `require`, `vi.mock`, `new URL`. A file
 //       of a workspace package imports the module by name. A file with no
-//       package of its own (scripts/) keeps a relative path.
+//       package of its own (scripts/) keeps a relative path. A moved file
+//       that imports a file that git ignores and a build writes (a Wasm
+//       module) names it by its new relative path.
 //    5. Each path of a moved file in a lint, a ratchet, a config, a Dockerfile,
 //       a CI file and a document, and the path of each folder that moves
 //       whole. Plans and evidence keep the old paths in their text; only
@@ -589,8 +591,19 @@ function newSpecifier(path, specifier) {
       faults.push(
         `${oldPath} imports ${left.file}, which does not move. A package cannot import a file of the Worker: move that file first, or give the module a port.`,
       );
+      return null;
     }
-    return null;
+    // A file that git ignores and a build writes, such as the Wasm module of
+    // packages/contracts: the moved file names it by its new relative path.
+    const built = resolveIn(onDisk, posix.dirname(oldPath), bare);
+    if (built === null || built.file.startsWith("../")) return null;
+    if (built.file.startsWith("services/platform/")) {
+      faults.push(
+        `${oldPath} imports ${built.file}, a file that the Worker package builds. A package cannot import a file of the Worker.`,
+      );
+      return null;
+    }
+    return relativeSpecifier(folder, built.file, built.style) + query;
   }
   const target = resolveIn(inPlan, folder, bare);
   if (target === null) return null;
