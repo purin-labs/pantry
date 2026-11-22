@@ -135,7 +135,8 @@ SATYR = Phrase(
 
 # "Hey Sous Chef" (Plan 91 phase 6). English says /ˈsuː ʃɛf/. espeak reads "sous" as /suːz/, so
 # the text form "hey sue chef" gives the usual sound, and "hey sous chef" gives the /z/ form that
-# some people say. The stress falls on either word.
+# some people say. Some people also say /suːs/, as five of the ten macOS bench voices do. The
+# stress falls on either word.
 SOUS_ONSETS = ("s", "ʃ", "z", "θ", "t", "d", "k", "ɡ", "p", "b", "f", "v", "m", "n", "l", "ɹ", "w", "j", "h", "st", "sp", "sk", "sl", "sw", "sn", "sm", "")
 SOUS_VOWELS = ("uː", "ʊ", "oʊ", "iː", "ɪ", "eɪ", "ɛ", "æ", "ʌ", "ɑː", "ɔː", "aɪ", "aʊ")
 SOUS_MIDDLES = ("ʃ", "tʃ", "s", "z", "dʒ", "ʒ", "f", "θ", "t", "k", "p", "l", "n", "m", "h", "w")
@@ -151,11 +152,24 @@ def sous_chef_wake_like(onset: str, vowel: str, middle: str, second: str, end: s
     return onset in ("s", "z") and vowel in ("uː", "ʊ") and middle in ("ʃ", "ʒ") and second in ("ɛ", "eɪ", "æ") and end in ("f", "v", "θ", "ft")
 
 
+def sous_chef_near_phrase(rng: np.random.Generator) -> tuple[str, str, str, str, str]:
+    """One near phrase. Some keep "chef" and change the first word ("hey see chef"), and some keep
+    "sous" and change the second ("hey sue shell"): the first model woke on "hey" + any word +
+    "chef", because the free form almost never makes one."""
+    parts = [str(rng.choice(part)) for part in (SOUS_ONSETS, SOUS_VOWELS, SOUS_MIDDLES, SOUS_SECOND_VOWELS, SOUS_ENDS)]
+    kept = rng.random()
+    if kept < 0.25:
+        parts[2:] = ["ʃ", "ɛ", "f"]
+    elif kept < 0.4:
+        parts[:2] = ["s", "uː"]
+    return tuple(parts)
+
+
 def sous_chef_near_phonemes(rng: np.random.Generator, count: int) -> list[str]:
     """Every near phrase in the form "hey" + onset + vowel + middle + second vowel + end."""
     out = []
     while len(out) < count:
-        parts = tuple(str(rng.choice(part)) for part in (SOUS_ONSETS, SOUS_VOWELS, SOUS_MIDDLES, SOUS_SECOND_VOWELS, SOUS_ENDS))
+        parts = sous_chef_near_phrase(rng)
         onset, vowel, middle, second, end = parts
         if parts[:4] in SOUS_HELD_OUT or sous_chef_wake_like(*parts):
             continue
@@ -173,7 +187,7 @@ SOUS_CHEF = Phrase(
     stem="hey_sous_chef",
     title="Hey Sous Chef",
     wake=("hey sue chef", "hey, sue chef", "hey sous chef", "[[ heɪ sˈuː ʃɛf ]]", "[[ heɪ suː ʃˈɛf ]]",
-          "[[ heɪ sˈuːʃˌɛf ]]", "[[ heɪ sʊ ʃˈɛf ]]"),
+          "[[ heɪ sˈuːʃˌɛf ]]", "[[ heɪ sʊ ʃˈɛf ]]", "[[ heɪ sˈuːs ʃˈɛf ]]"),
     near_train=(
         "hey chef", "yes chef", "yes, chef", "sous chef", "sue chef", "the sous chef", "hey sue", "hey shoe",
         "hey soup", "hey super", "hey sushi chef", "hey head chef", "hey pastry chef", "hey new chef",

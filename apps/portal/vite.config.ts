@@ -32,6 +32,11 @@ export default defineConfig({
     // Modular sources keep WebGL renderers out of the 2D workspace.
     alias: [{ find: /^three$/, replacement: "three/src/Three.js" }],
   },
+  optimizeDeps: {
+    // The scan does not read the voice wake worker. Without this, the first
+    // voice start finds the dependency late, and Vite reloads the page.
+    include: ["onnxruntime-web/wasm"],
+  },
   server: {
     port: 3103,
     strictPort: true,
