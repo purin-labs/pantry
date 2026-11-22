@@ -16,7 +16,14 @@ import { schemaDatabase } from "./split-topology";
 // its substitutions. A fragment that a statement interpolates by name is
 // checked on its own.
 
-const SOURCE_ROOT = fileURLToPath(new URL("../src/", import.meta.url).href);
+// The Worker source and the foundation packages that the Worker bundles
+// (Refactor 17). A file is named by its path from the repository root.
+const REPOSITORY_ROOT = fileURLToPath(
+  new URL("../../../", import.meta.url).href,
+);
+const SOURCE_ROOTS = ["services/platform/src", "foundation"].map((root) =>
+  join(REPOSITORY_ROOT, root),
+);
 
 // Receivers whose name says which database they are. A local `const` is
 // followed to its initialiser, so `env.DB.withSession(…)` kept in `session`
@@ -31,27 +38,27 @@ const REGIONAL_RECEIVER = /(?:scope|execution)(?:\.value)?\.database$/iu;
 // function that names a global-only table prepares it on a receiver matching
 // GLOBAL_RECEIVER, or is traced the same way and listed here.
 const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
-  "actors/actor-placement-admission.ts": [
+  "services/platform/src/actors/actor-placement-admission.ts": [
     "actorPlacementDirectoryAdmissionPredicate",
   ],
-  "actors/actor-relocation.ts": [
+  "services/platform/src/actors/actor-relocation.ts": [
     "ensureItemExported",
     "markRelocationItemImported",
     "readRelocationItems",
     "relocationSelect",
   ],
-  "actors/actor-restore.ts": [
+  "services/platform/src/actors/actor-restore.ts": [
     "markRestoreItemImported",
     "prepareRestoreItemInsert",
     "readRestoreItems",
     "restoreSelect",
   ],
-  "control/oidc.ts": [
+  "services/platform/src/control/oidc.ts": [
     "beginGoogleOidc",
     "completeGoogleOidc",
     "consumeGoogleApprovalCeremony",
   ],
-  "credential-vault/root-rotation.ts": [
+  "services/platform/src/credential-vault/root-rotation.ts": [
     "failVaultRootRotation",
     "hasActiveRotation",
     "pauseVaultRootRotation",
@@ -61,7 +68,7 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "startPendingRotation",
     "startVaultRootRotation",
   ],
-  "data/control-plane.ts": [
+  "services/platform/src/data/control-plane.ts": [
     "issueControlSession",
     "renewControlSession",
     "resolveControlSession",
@@ -72,17 +79,23 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "upsertUser",
     "validateControlCsrf",
   ],
-  "data/onboarding-support-audit.ts": ["operatorSupportAccessStatement"],
-  "data/onboarding-support.ts": ["resolveControlSupportRole"],
-  "data/organisation.ts": ["ensureSystemUserId"],
-  "data/placement-move.ts": [
+  "services/platform/src/data/onboarding-support-audit.ts": [
+    "operatorSupportAccessStatement",
+  ],
+  "services/platform/src/data/onboarding-support.ts": [
+    "resolveControlSupportRole",
+  ],
+  "services/platform/src/data/organisation.ts": ["ensureSystemUserId"],
+  "services/platform/src/data/placement-move.ts": [
     "abandonedMoveRecoversSql",
     "openMoveOf",
     "preparePlacementMovePublication",
     "prepareRecoveryRelocationStart",
   ],
-  "data/provider-attempt.ts": ["readCurrentProviderManifestVersion"],
-  "data/screen-pairing.ts": [
+  "services/platform/src/data/provider-attempt.ts": [
+    "readCurrentProviderManifestVersion",
+  ],
+  "services/platform/src/data/screen-pairing.ts": [
     "claimScreenPairing",
     "countOpenScreenPairings",
     "deleteExpiredScreenPairings",
@@ -90,15 +103,22 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "readOpenScreenPairing",
     "readScreenPairingState",
   ],
-  "data/shared-rows/placement-row.ts": ["publishOrganisationPlacementMove"],
-  "data/slack-installation-records.ts": [
+  "services/platform/src/data/shared-rows/placement-row.ts": [
+    "publishOrganisationPlacementMove",
+  ],
+  "services/platform/src/data/slack-installation-records.ts": [
     "prepareSlackDmSelectionAuditEvent",
     "prepareSlackInstallationDisconnectAuditEvent",
     "readSlackConnectionIntegrationAccountId",
   ],
-  "data/user-preferences.ts": ["readUserPreferences", "updateUserPreferences"],
-  "slack/install-organisation.ts": ["resolveSlackInstallOrganisation"],
-  "slack/installation-store.ts": [
+  "services/platform/src/data/user-preferences.ts": [
+    "readUserPreferences",
+    "updateUserPreferences",
+  ],
+  "services/platform/src/slack/install-organisation.ts": [
+    "resolveSlackInstallOrganisation",
+  ],
+  "services/platform/src/slack/installation-store.ts": [
     "activateSlackInstallation",
     "createSlackInstallation",
     "diagnoseChannelBindingFailure",
@@ -110,7 +130,7 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "readSlackChannelDefault",
     "resolveSlackInstallation",
   ],
-  "slack/organisation-routing.ts": [
+  "services/platform/src/slack/organisation-routing.ts": [
     "diagnoseRouteFailure",
     "prepareSlackChannelThreadClaim",
     "prepareSlackDmThreadClaim",
@@ -226,14 +246,14 @@ function sourceStatements(
   schema: ReturnType<typeof deployedTables>,
 ): readonly Statement[] {
   const statements: Statement[] = [];
-  for (const path of sourceFiles(SOURCE_ROOT)) {
+  for (const path of SOURCE_ROOTS.flatMap(sourceFiles)) {
     const source = ts.createSourceFile(
       path,
       readFileSync(path, "utf8"),
       ts.ScriptTarget.Latest,
       true,
     );
-    const file = relative(SOURCE_ROOT, path);
+    const file = relative(REPOSITORY_ROOT, path);
     const visit = (node: ts.Node): void => {
       if (!isTextLiteral(node)) return ts.forEachChild(node, visit);
       const named = namedTables(literalText(node));
@@ -262,6 +282,7 @@ function sourceFiles(directory: string): readonly string[] {
   const files: string[] = [];
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const path = join(directory, entry.name);
+    if (entry.name === "node_modules") continue;
     if (entry.isDirectory()) files.push(...sourceFiles(path));
     else if (entry.name.endsWith(".ts")) files.push(path);
   }
