@@ -37,6 +37,90 @@ export function moduleOrPackageOf(path) {
   );
 }
 
+/**
+ * The workspace packages of `packages`, by the name in their package.json:
+ * name -> { folder, module, name, exports, contract }. The last part of a
+ * name can differ from the folder: `@purin-labs/area-devices` is in
+ * areas/devices.
+ */
+const workspacePackages = new Map();
+/** The last part of the folder -> the package, for a name that is not found. */
+const packagesByFolderName = new Map();
+for (const [folder, module] of Object.entries(targets.packages)) {
+  const manifestPath = join(root, folder, "package.json");
+  if (!existsSync(manifestPath)) continue;
+  const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+  const entry = {
+    folder,
+    module,
+    name: manifest.name ?? folder,
+    exports: manifest.exports ?? null,
+    contract: (targets.contracts ?? []).includes(folder),
+  };
+  workspacePackages.set(entry.name, entry);
+  packagesByFolderName.set(posix.basename(folder), entry);
+}
+
+const WORKSPACE = /^(@[a-z0-9-]+\/([a-z0-9-]+))(\/.*)?$/;
+
+/**
+ * The workspace package that a bare specifier names, and the subpath in it
+ * (`.` or `./x/y`), or null.
+ */
+export function workspaceImport(specifier) {
+  const match = WORKSPACE.exec(specifier);
+  if (match === null) return null;
+  const entry =
+    workspacePackages.get(match[1]) ?? packagesByFolderName.get(match[2]);
+  if (entry === undefined) return null;
+  return { entry, subpath: `.${match[3] ?? ""}` };
+}
+
+/** The file of a package that a subpath names, from its `exports` map, in a set of paths. */
+export function packageFile(entry, subpath, known) {
+  const candidates = [];
+  const exportsMap =
+    entry.exports !== null && typeof entry.exports === "object"
+      ? entry.exports
+      : typeof entry.exports === "string"
+        ? { ".": entry.exports }
+        : {};
+  for (const [key, value] of Object.entries(exportsMap)) {
+    const target =
+      typeof value === "string"
+        ? value
+        : (value?.default ?? value?.import ?? value?.types);
+    if (typeof target !== "string") continue;
+    if (key === subpath) candidates.push(target);
+    else if (key.includes("*")) {
+      const [head, tail] = key.split("*");
+      if (
+        subpath.startsWith(head) &&
+        subpath.endsWith(tail) &&
+        subpath.length >= head.length + tail.length
+      ) {
+        const middle = subpath.slice(head.length, subpath.length - tail.length);
+        candidates.push(target.replace("*", middle));
+      }
+    }
+  }
+  // A package with no `exports` map: the subpath is a path in its folder.
+  candidates.push(subpath, `./src/${subpath.slice(2)}`);
+  for (const candidate of candidates) {
+    const base = posix.normalize(posix.join(entry.folder, candidate));
+    for (const path of [
+      base,
+      `${base}.ts`,
+      `${base}.tsx`,
+      `${base}/index.ts`,
+      `${base}/index.tsx`,
+    ]) {
+      if (known.has(path)) return path;
+    }
+  }
+  return null;
+}
+
 const layerRank = new Map(targets.layers.map((layer, index) => [layer, index]));
 const orderRank = new Map(
   targets.foundationOrder.map((name, index) => [`foundation/${name}`, index]),

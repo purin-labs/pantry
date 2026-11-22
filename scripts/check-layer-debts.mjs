@@ -56,7 +56,7 @@
 //   node scripts/check-layer-debts.mjs --report          print the totals and each key
 //   node scripts/check-layer-debts.mjs --report <kind>   print the instances of one kind
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join, posix } from "node:path";
+import { join } from "node:path";
 import {
   coveredSourceFiles,
   crossingKind,
@@ -66,9 +66,11 @@ import {
   layerOf,
   linkCounter,
   moduleOf,
+  packageFile,
   relativeResolver,
   root,
   targets,
+  workspaceImport,
 } from "./lib/layers.mjs";
 
 const BASELINE = "scripts/layer-debts-ratchet.json";
@@ -109,74 +111,6 @@ const texts = new Map(
   tracked.map((path) => [path, readFileSync(join(root, path), "utf8")]),
 );
 
-// --- The workspace packages -------------------------------------------
-
-/** name -> { folder, module, name, exports, contract } */
-const packagesByName = new Map();
-/** The last part of the folder -> the package, as check-layers.mjs reads it. */
-const packagesByFolderName = new Map();
-for (const [folder, module] of Object.entries(targets.packages)) {
-  const manifestPath = join(root, folder, "package.json");
-  if (!existsSync(manifestPath)) continue;
-  const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-  const entry = {
-    folder,
-    module,
-    name: manifest.name ?? folder,
-    exports: manifest.exports ?? null,
-    contract: (targets.contracts ?? []).includes(folder),
-  };
-  packagesByName.set(entry.name, entry);
-  packagesByFolderName.set(posix.basename(folder), entry);
-}
-
-const WORKSPACE = /^(@[a-z0-9-]+\/([a-z0-9-]+))(\/.*)?$/;
-
-/** The file of a package that a subpath names, from its `exports` map. */
-function packageFile(entry, subpath) {
-  const candidates = [];
-  const exportsMap =
-    entry.exports !== null && typeof entry.exports === "object"
-      ? entry.exports
-      : typeof entry.exports === "string"
-        ? { ".": entry.exports }
-        : {};
-  for (const [key, value] of Object.entries(exportsMap)) {
-    const target =
-      typeof value === "string"
-        ? value
-        : (value?.default ?? value?.import ?? value?.types);
-    if (typeof target !== "string") continue;
-    if (key === subpath) candidates.push(target);
-    else if (key.includes("*")) {
-      const [head, tail] = key.split("*");
-      if (
-        subpath.startsWith(head) &&
-        subpath.endsWith(tail) &&
-        subpath.length >= head.length + tail.length
-      ) {
-        const middle = subpath.slice(head.length, subpath.length - tail.length);
-        candidates.push(target.replace("*", middle));
-      }
-    }
-  }
-  // A package with no `exports` map: the subpath is a path in its folder.
-  candidates.push(subpath, `./src/${subpath.slice(2)}`);
-  for (const candidate of candidates) {
-    const base = posix.normalize(posix.join(entry.folder, candidate));
-    for (const path of [
-      base,
-      `${base}.ts`,
-      `${base}.tsx`,
-      `${base}/index.ts`,
-      `${base}/index.tsx`,
-    ]) {
-      if (known.has(path)) return path;
-    }
-  }
-  return null;
-}
-
 /**
  * The target of an import: `file` when it is a file under `covers`, `package`
  * when the specifier names a workspace package, and its module. Null for an
@@ -188,12 +122,10 @@ function resolveImport(path, specifier) {
     const module = file === null ? null : moduleOf(file);
     return module === null ? null : { file, module, package: null };
   }
-  const match = WORKSPACE.exec(specifier);
-  if (match === null) return null;
-  const entry =
-    packagesByName.get(match[1]) ?? packagesByFolderName.get(match[2]);
-  if (entry === undefined) return null;
-  const file = packageFile(entry, `.${match[3] ?? ""}`);
+  const named = workspaceImport(specifier);
+  if (named === null) return null;
+  const { entry, subpath } = named;
+  const file = packageFile(entry, subpath, known);
   return {
     file,
     module: (file === null ? null : moduleOf(file)) ?? entry.module,

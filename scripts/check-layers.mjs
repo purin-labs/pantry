@@ -69,12 +69,14 @@ import {
   layerOf,
   linkCounter,
   moduleOf,
+  packageFile,
   publicPaths,
   relativeResolver,
   root,
   targets,
   TARGETS,
   trackedFiles,
+  workspaceImport,
 } from "./lib/layers.mjs";
 
 const BASELINE = "scripts/layers-ratchet.json";
@@ -99,16 +101,13 @@ if (
 // The workspace packages that are the contract of their area. A package of
 // another area may depend on them.
 const contractPackages = new Set(
-  (targets.contracts ?? [])
-    .filter((path) => targets.packages[path] !== undefined)
-    .map((folder) => posix.basename(folder)),
+  (targets.contracts ?? []).filter(
+    (path) => targets.packages[path] !== undefined,
+  ),
 );
-const packageByName = new Map(
-  Object.entries(targets.packages).map(([folder, module]) => [
-    posix.basename(folder),
-    module,
-  ]),
-);
+/** A package folder under `covers`: its files have modules of their own. */
+const coveredPackage = (folder) =>
+  targets.covers.some((cover) => `${folder}/`.startsWith(cover));
 
 const faults = [];
 
@@ -130,7 +129,8 @@ for (const module of [
 }
 
 const tracked = coveredSourceFiles();
-const resolveRelative = relativeResolver(new Set(tracked));
+const trackedSet = new Set(tracked);
+const resolveRelative = relativeResolver(trackedSet);
 
 for (const entry of publicPaths) {
   if (!targets.covers.some((folder) => entry.startsWith(folder))) {
@@ -147,8 +147,6 @@ for (const entry of publicPaths) {
     );
   }
 }
-
-const WORKSPACE = /^@[a-z0-9-]+\/([a-z0-9-]+)/;
 
 /** pair -> { kind, count, sites } */
 const found = new Map();
@@ -177,8 +175,15 @@ for (const path of tracked) {
   for (const { specifier, typeOnly } of importStatementsOf(
     readFileSync(join(root, path), "utf8"),
   )) {
-    if (specifier.startsWith(".")) {
-      const target = resolveRelative(path, specifier);
+    const named = specifier.startsWith(".") ? null : workspaceImport(specifier);
+    // A file of a package under `covers` has a module of its own: an import
+    // of it by package name counts as the same import by a relative path.
+    const coveredFile =
+      named !== null && coveredPackage(named.entry.folder)
+        ? packageFile(named.entry, named.subpath, trackedSet)
+        : null;
+    if (specifier.startsWith(".") || coveredFile !== null) {
+      const target = coveredFile ?? resolveRelative(path, specifier);
       if (target === null) continue;
       const to = moduleOf(target);
       if (to === null) continue;
@@ -204,11 +209,10 @@ for (const path of tracked) {
       }
       continue;
     }
-    const workspace = WORKSPACE.exec(specifier);
-    const to = workspace === null ? undefined : packageByName.get(workspace[1]);
-    if (to === undefined) continue;
-    // A workspace package of an area is the contract of that area: its
-    // schemas, its model and its client. Another area may import it.
+    if (named === null) continue;
+    const to = named.entry.module;
+    // A workspace package of an area outside `covers` is the contract of that
+    // area: its schemas, its model and its client. Another area may import it.
     if (layerOf(from) === "areas" && layerOf(to) === "areas") {
       if (from !== to) throughContracts.packages += 1;
       continue;
@@ -228,13 +232,17 @@ for (const [folder, from] of Object.entries(targets.packages)) {
     ...json.dependencies,
     ...json.devDependencies,
   })) {
-    const workspace = WORKSPACE.exec(dependency);
-    const to = workspace === null ? undefined : packageByName.get(workspace[1]);
-    if (to === undefined) continue;
+    const named = workspaceImport(dependency);
+    if (named === null) continue;
+    const to = named.entry.module;
+    // An area package under `covers` holds the public files of its area and
+    // its inside. The import rule above reads each of its imports, so
+    // another area package under `covers` may depend on it.
     if (
       layerOf(from) === "areas" &&
       layerOf(to) === "areas" &&
-      contractPackages.has(workspace[1])
+      (contractPackages.has(named.entry.folder) ||
+        (coveredPackage(folder) && coveredPackage(named.entry.folder)))
     )
       continue;
     const kind = crossing(from, to);
