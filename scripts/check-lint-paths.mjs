@@ -26,6 +26,9 @@ import { readFileSync } from "node:fs";
 import { dirname, join, posix } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { targets } from "./lib/layers.mjs";
+import { SOURCE_ROOTS } from "./lib/source-roots.mjs";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 const tracked = execFileSync("git", ["ls-files"], {
@@ -42,7 +45,8 @@ const SOURCES = tracked.filter(
     path === "eslint.config.mjs" ||
     /^scripts\/check-[^/]+\.mjs$/.test(path) ||
     /^scripts\/[^/]+-ratchet\.json$/.test(path) ||
-    path === "scripts/layers.json",
+    path === "scripts/layers.json" ||
+    path === "scripts/lib/source-roots.mjs",
 );
 
 // Paths that are absent on purpose. Give each one its reason.
@@ -53,7 +57,17 @@ const ABSENT = new Map([
   ["scripts/brand/", "on main since 2026-11-20, not on dev yet"],
 ]);
 
-const ROOTS = "(?:apps|crates|docs|packages|scripts|services)";
+// scripts/layers.json names each module as "<layer>/<module>", and a layer is
+// also a root folder since Stage B of Refactor 17. A module name is not a
+// path: `foundation/std` is a module whose files are in packages/std.
+const MODULE_NAMES = new Set([
+  ...["packages", "placement", "tables", "rules", "files"].flatMap((key) =>
+    Object.values(targets[key] ?? {}),
+  ),
+  ...targets.foundationOrder.map((name) => `foundation/${name}`),
+]);
+
+const ROOTS = `(?:${[...SOURCE_ROOTS, "crates", "docs", "scripts"].join("|")})`;
 const QUOTED = new RegExp(`["'\`](${ROOTS}/[^"'\`\\s$\\\\]+)["'\`]`, "g");
 
 function matcher(pattern) {
@@ -95,7 +109,7 @@ for (const source of SOURCES) {
     const pattern = match[1].replace(/#.*$/, "");
     if (seen.has(pattern)) continue;
     seen.add(pattern);
-    if (ABSENT.has(pattern)) continue;
+    if (ABSENT.has(pattern) || MODULE_NAMES.has(pattern)) continue;
     checked += 1;
     if (!tracked.some(matcher(pattern))) {
       const line = text.slice(0, match.index).split("\n").length;

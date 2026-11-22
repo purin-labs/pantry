@@ -2,30 +2,18 @@
 // the table rules of `machineProblems`, an exit on every state that is not
 // terminal, an owner module that exists, and an alarm reconciler with the
 // name that each `due` exit gives.
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 
 import { machineProblems } from "../packages/std/src/state-machine.ts";
 import { COMMERCE_MACHINES } from "../packages/commerce-contracts/src/commerce-machines.ts";
+import { filesIn, SOURCE_ROOTS } from "./lib/source-roots.mjs";
 
 const root = new URL("..", import.meta.url).pathname;
-const searched = ["services", "packages", "apps"];
-const skipped = new Set(["node_modules", "dist", ".wrangler", "target"]);
 
-function filesUnder(directory, test) {
-  const found = [];
-  for (const name of readdirSync(directory)) {
-    if (skipped.has(name) || name.startsWith(".")) continue;
-    const path = join(directory, name);
-    if (statSync(path).isDirectory()) found.push(...filesUnder(path, test));
-    else if (test(name)) found.push(path);
-  }
-  return found;
-}
-
-const sources = searched.flatMap((folder) =>
-  filesUnder(join(root, folder), (name) => /\.(ts|tsx)$/u.test(name)),
+const sources = filesIn(root, SOURCE_ROOTS, (name) =>
+  /\.(ts|tsx)$/u.test(name),
 );
 const machineFiles = sources.filter((path) => path.endsWith(".machine.ts"));
 const reconcilerNames = new Set();

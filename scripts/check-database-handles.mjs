@@ -19,12 +19,13 @@
 //
 //   node scripts/check-database-handles.mjs            check
 //   node scripts/check-database-handles.mjs --update   lower entries, drop zero or deleted files
-import { readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { filesIn, PLATFORM_SOURCE } from "./lib/source-roots.mjs";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const source = join(root, "services/platform/src");
 const BASELINE = "scripts/database-handles-ratchet.json";
 const HANDLES = "services/platform/src/database-handles.ts";
 const MAKER_ALLOWED = new Set([
@@ -38,16 +39,6 @@ if (!["check", "--update"].includes(mode)) {
   process.exit(2);
 }
 
-function files(directory) {
-  const out = [];
-  for (const name of readdirSync(directory)) {
-    const path = join(directory, name);
-    if (statSync(path).isDirectory()) out.push(...files(path));
-    else if (path.endsWith(".ts")) out.push(path);
-  }
-  return out;
-}
-
 const CAST =
   /\bas\s+(?:unknown\s+as\s+)?(?:Global|Organisation|Single)Database(?:Session)?\b/g;
 const MAKER = /\b(?:globalDatabase|organisationDatabase|singleDatabase)\(/g;
@@ -58,7 +49,9 @@ const SHARED_WRITE =
 
 const failures = [];
 const counts = {};
-for (const path of files(source)) {
+for (const path of filesIn(root, PLATFORM_SOURCE, (name) =>
+  name.endsWith(".ts"),
+)) {
   const name = relative(root, path);
   if (name === HANDLES) continue;
   const text = readFileSync(path, "utf8");

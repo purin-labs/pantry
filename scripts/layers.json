@@ -151,6 +151,7 @@
     "scripts/plan21/": "areas/commerce",
     "scripts/plan40/": "areas/commerce",
     "scripts/production-simulation/": "areas/kitchen",
+    "scripts/refactor-17/": "scripts",
     "scripts/rename/": "scripts",
     "scripts/shop-gateway/": "surfaces/shop",
     "scripts/shop-voice/": "surfaces/voice",

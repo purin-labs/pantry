@@ -80,7 +80,7 @@ async function settlesWithin(
   try {
     return await Promise.race([work.then(() => true as const), limit]);
   } finally {
-    clearTimeout(timer);
+    if (timer !== undefined) clearTimeout(timer);
   }
 }
 

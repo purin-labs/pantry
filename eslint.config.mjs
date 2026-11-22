@@ -1,6 +1,8 @@
 import parser from "@typescript-eslint/parser";
 import stylistic from "@stylistic/eslint-plugin";
 
+import { PLATFORM_SOURCE } from "./scripts/lib/source-roots.mjs";
+
 const definitions = [
   "function",
   "class",
@@ -169,6 +171,12 @@ const fetchValueSelectors = [
   'TSSatisfiesExpression > Identifier[name="fetch"]',
 ];
 
+// The source of the Platform Worker and of the Portal.
+const workerAndPortalSource = [
+  ...PLATFORM_SOURCE.map((folder) => `${folder}/**/*.ts`),
+  "apps/portal/src/**/*.{ts,tsx}",
+];
+
 export default [
   {
     ignores: [
@@ -206,7 +214,7 @@ export default [
     },
   },
   {
-    files: ["services/platform/src/**/*.ts", "apps/portal/src/**/*.{ts,tsx}"],
+    files: workerAndPortalSource,
     rules: {
       "no-restricted-syntax": [
         "error",
@@ -231,7 +239,7 @@ export default [
     },
   },
   {
-    files: ["services/platform/src/**/*.ts", "apps/portal/src/**/*.{ts,tsx}"],
+    files: workerAndPortalSource,
     ignores: ifcBoundaryOwners,
     rules: {
       "no-restricted-imports": [

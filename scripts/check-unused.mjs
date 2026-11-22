@@ -46,6 +46,8 @@ import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { format } from "prettier";
 
+import { SOURCE_ROOTS } from "./lib/source-roots.mjs";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const baselinePath = join(root, "scripts/unused-ratchet.json");
 const mode = process.argv[2] ?? "check";
@@ -215,7 +217,7 @@ function exportEntries(issue) {
 // A target with `*` names each file of its folder that matches.
 function packageEntryFiles() {
   const entries = new Set();
-  for (const folder of ["packages", "services", "apps"]) {
+  for (const folder of SOURCE_ROOTS) {
     const base = join(root, folder);
     if (!existsSync(base)) continue;
     for (const name of readdirSync(base)) {

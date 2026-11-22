@@ -14,6 +14,8 @@ import { readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 
+import { PLATFORM_SOURCE } from "./lib/source-roots.mjs";
+
 const root = resolve(import.meta.dirname, "..");
 const SINKS = "services/platform/src/policy/information-flow/sinks.ts";
 
@@ -64,7 +66,7 @@ const files = execFileSync(
     "--cached",
     "--others",
     "--exclude-standard",
-    "services/platform/src",
+    ...PLATFORM_SOURCE,
   ],
   { cwd: root, encoding: "utf8" },
 )

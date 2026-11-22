@@ -43,6 +43,8 @@ import { tmpdir } from "node:os";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { clonePairKey, clonesBaselineText } from "./lib/clones-ratchet.mjs";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BASELINE = "scripts/clones-ratchet.json";
 const baselinePath = join(root, BASELINE);
@@ -168,7 +170,7 @@ function reportGrown() {
 }
 
 function pairOf(clone) {
-  return [clone.firstFile.name, clone.secondFile.name].sort().join(" = ");
+  return clonePairKey(clone.firstFile.name, clone.secondFile.name);
 }
 
 // One jscpd run with the JSON report.
@@ -207,21 +209,11 @@ function scanTree() {
 }
 
 function writeBaseline(pairs) {
-  const sorted = Object.fromEntries(
-    Object.entries(pairs).sort(([a], [b]) => (a < b ? -1 : 1)),
-  );
   const total = {
     copies: scan.total.clones,
     lines: scan.total.duplicatedLines,
   };
-  // One line for each pair, so that a change of one pair is one line.
-  const lines = Object.entries(sorted).map(
-    ([pair, entry]) => `    ${JSON.stringify(pair)}: ${JSON.stringify(entry)}`,
-  );
-  writeFileSync(
-    baselinePath,
-    `{\n  "total": ${JSON.stringify(total)},\n  "pairs": {\n${lines.join(",\n")}\n  }\n}\n`,
-  );
+  writeFileSync(baselinePath, clonesBaselineText(total, pairs));
 }
 
 function printReport({ total, duplicates }) {

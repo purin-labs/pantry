@@ -27,6 +27,7 @@ import {
   root,
   trackedFiles,
 } from "./lib/layers.mjs";
+import { SOURCE_ROOTS } from "./lib/source-roots.mjs";
 
 const mode = process.argv[2] ?? "totals";
 if (!["totals", "--list", "--of"].includes(mode)) {
@@ -34,7 +35,7 @@ if (!["totals", "--list", "--of"].includes(mode)) {
   process.exit(2);
 }
 
-const all = trackedFiles("apps", "packages", "services").filter((path) =>
+const all = trackedFiles(...SOURCE_ROOTS).filter((path) =>
   /\.(ts|tsx)$/.test(path),
 );
 const resolve = relativeResolver(new Set(all));

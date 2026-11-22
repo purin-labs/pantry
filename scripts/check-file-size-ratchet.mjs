@@ -15,6 +15,8 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { SOURCE_ROOTS } from "./lib/source-roots.mjs";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BASELINE = "scripts/file-size-ratchet.json";
 const LIMIT = 3000;
@@ -24,7 +26,7 @@ const LIMIT = 3000;
 // scripts (journeys, builders and tools). Since Refactor 17 step A2.3 it
 // covers the style sheets.
 const SOURCE = [
-  /^(apps|packages|services)\/.+\.(ts|tsx|mjs|js|css)$/,
+  new RegExp(`^(${SOURCE_ROOTS.join("|")})/.+\\.(ts|tsx|mjs|js|css)$`),
   /^crates\/.+\.rs$/,
   /^scripts\/.+\.(mjs|js|py)$/,
 ];

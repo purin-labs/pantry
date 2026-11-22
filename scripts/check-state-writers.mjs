@@ -6,29 +6,18 @@
 // UPDATE`. A writer outside the owner must be listed in
 // `scripts/state-writers-ratchet.json`, and its count may only fall. Run
 // `node scripts/check-state-writers.mjs --update` when a writer moves.
-import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { filesIn, SOURCE_ROOTS } from "./lib/source-roots.mjs";
+
 const root = new URL("..", import.meta.url).pathname;
 const ratchetPath = join(root, "scripts/state-writers-ratchet.json");
-const searched = ["services", "packages", "apps"];
-const skipped = new Set(["node_modules", "dist", ".wrangler", "target"]);
 const update = process.argv.includes("--update");
 
-function filesUnder(directory, test) {
-  const found = [];
-  for (const name of readdirSync(directory)) {
-    if (skipped.has(name) || name.startsWith(".")) continue;
-    const path = join(directory, name);
-    if (statSync(path).isDirectory()) found.push(...filesUnder(path, test));
-    else if (test(name)) found.push(path);
-  }
-  return found;
-}
-
-const sources = searched.flatMap((folder) =>
-  filesUnder(join(root, folder), (name) => /\.(ts|tsx|mjs)$/u.test(name)),
+const sources = filesIn(root, SOURCE_ROOTS, (name) =>
+  /\.(ts|tsx|mjs)$/u.test(name),
 );
 const productSources = sources.filter(
   (path) =>
