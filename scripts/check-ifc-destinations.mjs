@@ -27,7 +27,7 @@ const EFFECTS_WITH_A_NAMED_CALLER = new Set([
   "services/platform/src/actors/agent-session.ts",
   // Refactor 10 moved these effects out of agent-session.ts unchanged.
   "services/platform/src/agent-tools/channels/handlers.ts",
-  "services/platform/src/agent-tools/session-support.ts",
+  "foundation/tool-handlers/agent-tools/session-support.ts",
 ]);
 
 // These files check a read for a member, or deliver through the one Slack sink

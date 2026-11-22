@@ -22,7 +22,7 @@ import {
   type DraftThreadLink,
   collaborationEditDeadline,
   type ToolEffect,
-} from "../session-support";
+} from "@purin-labs/tool-handlers/agent-tools/session-support";
 import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 
 export async function readEmailDraftForEmbeddedHarness(

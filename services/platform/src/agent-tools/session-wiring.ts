@@ -1,4 +1,4 @@
-import type { SessionOwnToolServices } from "../actors/session/own-tool-services";
+import type { SessionOwnToolServices } from "@purin-labs/tool-handlers/actors/session/own-tool-services";
 import type { SessionToolWiring } from "@purin-labs/agent/actors/session/tool-wiring";
 import {
   presentConfigurationCommand,
@@ -29,12 +29,15 @@ import { sessionConversation } from "@purin-labs/conversation/chat/session-conve
 import { proposeSlackSideCaseForHarness } from "./slack/side-case-proposal";
 import { proposeMemoryFromInstruction } from "../memory/access";
 import { slackToolServices } from "./slack/turn-services";
-import { sessionOwnToolServices } from "../actors/session/own-tool-services";
+import { sessionOwnToolServices } from "@purin-labs/tool-handlers/actors/session/own-tool-services";
 import {
   requestPermissionForHarness,
   turnMayRequestPermission,
-} from "../actors/harness-follow-up";
-import { settleToolEffect, type ToolEffect } from "./session-support";
+} from "@purin-labs/tool-handlers/actors/harness-follow-up";
+import {
+  settleToolEffect,
+  type ToolEffect,
+} from "@purin-labs/tool-handlers/agent-tools/session-support";
 
 /**
  * The services of the families that an area owns. With the families of the

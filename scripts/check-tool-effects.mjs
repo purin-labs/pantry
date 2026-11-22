@@ -5,7 +5,7 @@
 // A `draft`, `receipt` or `scheduled` tool has two parts. `prepare` does the
 // live checks and the reads, and it returns the effect with its exit checks.
 // The executor's host, `settleToolEffect` in
-// services/platform/src/agent-tools/session-support.ts, reads the label, runs
+// foundation/tool-handlers/agent-tools/session-support.ts, reads the label, runs
 // the checks and calls `run`. So the exit check of every effect tool runs at
 // one place. A tool of this kind that defines `handler` runs its effect with
 // no such check, and this lint refuses it.

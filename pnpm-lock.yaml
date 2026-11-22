@@ -523,6 +523,52 @@ importers:
         specifier: 0.18.0-ts7.1.0-dev.20260929
         version: 0.18.0-ts7.1.0-dev.20260929
 
+  foundation/tool-handlers:
+    dependencies:
+      '@purin-labs/actor-runtime':
+        specifier: workspace:*
+        version: link:../actor-runtime
+      '@purin-labs/agent':
+        specifier: workspace:*
+        version: link:../agent
+      '@purin-labs/agent-tools':
+        specifier: workspace:*
+        version: link:../agent-tools
+      '@purin-labs/authority':
+        specifier: workspace:*
+        version: link:../authority
+      '@purin-labs/connections':
+        specifier: workspace:*
+        version: link:../connections
+      '@purin-labs/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../packages/control-api
+      '@purin-labs/conversation':
+        specifier: workspace:*
+        version: link:../conversation
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../packages/std
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../tenancy
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../packages/type-utils
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
+
   packages/async-control:
     devDependencies:
       tsrs:
@@ -1170,6 +1216,9 @@ importers:
       '@purin-labs/tenancy':
         specifier: workspace:*
         version: link:../../foundation/tenancy
+      '@purin-labs/tool-handlers':
+        specifier: workspace:*
+        version: link:../../foundation/tool-handlers
       '@purin-labs/type-utils':
         specifier: workspace:*
         version: link:../../packages/type-utils

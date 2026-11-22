@@ -45,7 +45,7 @@ import {
 } from "@purin-labs/authority/policy/index";
 import { digestCanonical } from "@purin-labs/authority/policy/index";
 import { assertNever } from "@purin-labs/std";
-import { requireLiveBakeryReadAuthority } from "../session-support";
+import { requireLiveBakeryReadAuthority } from "@purin-labs/tool-handlers/agent-tools/session-support";
 
 // The composer chip was off on the Kitchen page when the person sent the
 // request (Plan 87 phase 2).

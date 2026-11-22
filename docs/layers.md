@@ -173,11 +173,12 @@ import. A module with no line for one of these has none.
 ## foundation/tool-handlers
 
 - Folders: 5
-  - `services/platform/src/actors/`
-  - `services/platform/src/actors/session/`
-  - `services/platform/src/agent-tools/`
-  - `services/platform/src/agent-tools/files/`
-  - `services/platform/src/slack/`
+  - `foundation/tool-handlers/actors/`
+  - `foundation/tool-handlers/actors/session/`
+  - `foundation/tool-handlers/agent-tools/`
+  - `foundation/tool-handlers/agent-tools/files/`
+  - `foundation/tool-handlers/slack/`
+- Packages: `foundation/tool-handlers`
 
 ## foundation/collaboration
 

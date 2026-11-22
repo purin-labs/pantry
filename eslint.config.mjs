@@ -133,7 +133,7 @@ const ifcBoundaryOwners = [
   "foundation/agent/actors/actor-journal.ts",
   "foundation/agent/actors/actor-journal/**/*.ts",
   "services/platform/src/actors/agent-session.ts",
-  "services/platform/src/actors/session/**/*.ts",
+  "foundation/tool-handlers/actors/session/**/*.ts",
   "foundation/agent/actors/session/**/*.ts",
 ];
 const localContextProjectionImport = {
@@ -333,7 +333,7 @@ export default [
       "foundation/agent/actors/actor-journal.ts",
       "foundation/agent/actors/actor-journal/**/*.ts",
       "services/platform/src/actors/agent-session.ts",
-      "services/platform/src/actors/session/**/*.ts",
+      "foundation/tool-handlers/actors/session/**/*.ts",
       "foundation/agent/actors/session/**/*.ts",
     ],
     rules: {
@@ -465,7 +465,7 @@ export default [
   {
     files: [
       "services/platform/src/actors/agent-session.ts",
-      "services/platform/src/actors/session/**/*.ts",
+      "foundation/tool-handlers/actors/session/**/*.ts",
       "foundation/agent/actors/session/**/*.ts",
     ],
     rules: {

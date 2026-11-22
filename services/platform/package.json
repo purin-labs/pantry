@@ -76,6 +76,7 @@
     "@purin-labs/control": "workspace:*",
     "@purin-labs/agent": "workspace:*",
     "@purin-labs/conversation": "workspace:*",
+    "@purin-labs/tool-handlers": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

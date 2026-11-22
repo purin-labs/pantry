@@ -10,7 +10,7 @@ import {
   type SessionToolContext,
 } from "@purin-labs/agent/agent-tools/context";
 import { ToolRequestError } from "@purin-labs/agent-tools/errors";
-import { liveDeviceMember } from "../session-support";
+import { liveDeviceMember } from "@purin-labs/tool-handlers/agent-tools/session-support";
 import {
   pauseDeviceForEmbeddedHarness,
   readDeviceSnapshotsForEmbeddedHarness,

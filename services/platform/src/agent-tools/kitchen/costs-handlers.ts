@@ -58,7 +58,7 @@ import {
   collaborationMember,
   liveDeviceMember,
   type ToolEffect,
-} from "../session-support";
+} from "@purin-labs/tool-handlers/agent-tools/session-support";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { sessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import {

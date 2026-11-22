@@ -16,7 +16,7 @@ import {
 import { withToolContext } from "@purin-labs/agent/agent-tools/context";
 import { executeCostsViewForHarness } from "../costs/view-handler";
 import { ToolRequestError } from "@purin-labs/agent-tools/errors";
-import { liveDeviceMember } from "../session-support";
+import { liveDeviceMember } from "@purin-labs/tool-handlers/agent-tools/session-support";
 import type { BakeStockLevelInput } from "@purin-labs/kitchen-control-api";
 import {
   pauseBakeRunForEmbeddedHarness,

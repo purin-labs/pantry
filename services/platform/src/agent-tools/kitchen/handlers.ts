@@ -42,9 +42,12 @@ import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-
 import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
 import type { CommerceToolReads } from "../../commerce/contract/tool-reads";
 import { assertNever } from "@purin-labs/std";
-import { untrustedDeviceText, type ToolEffect } from "../session-support";
+import {
+  untrustedDeviceText,
+  type ToolEffect,
+} from "@purin-labs/tool-handlers/agent-tools/session-support";
 import type { KitchenToolContext } from "./services";
-import { readMemberRecord } from "../member-record-read";
+import { readMemberRecord } from "@purin-labs/tool-handlers/agent-tools/member-record-read";
 
 function stepFacts(document: BakeryWorkflowDocument) {
   const steps = [];

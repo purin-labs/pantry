@@ -100,7 +100,7 @@ import {
   commerceApprovalCardTexts,
   type CommerceChangeFacts,
 } from "../commerce/contract/approval-card-texts";
-import { CARD_ONLY_REPLY_INSTRUCTION } from "../slack/card-only-reply";
+import { CARD_ONLY_REPLY_INSTRUCTION } from "@purin-labs/tool-handlers/slack/card-only-reply";
 import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 import type { MenuPriceProposalRequest } from "../commerce/contract/types";
 

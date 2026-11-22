@@ -26,7 +26,7 @@ import {
   collaborationEditDeadline,
   collaborationMember,
   type ToolEffect,
-} from "../session-support";
+} from "@purin-labs/tool-handlers/agent-tools/session-support";
 import type {
   CommerceToolReads,
   PreparedCommerceRead,

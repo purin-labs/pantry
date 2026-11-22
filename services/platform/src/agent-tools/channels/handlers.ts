@@ -93,7 +93,7 @@ import {
   readAccessGrantId,
   requireCurrentEmailToolLease,
   selectProviderResourceGrants,
-} from "../session-support";
+} from "@purin-labs/tool-handlers/agent-tools/session-support";
 import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 
 export async function searchEmailMailboxForEmbeddedHarness(

@@ -13,7 +13,7 @@ import {
   collaborationEditDeadline,
   collaborationMember,
   passSharedDraftExit,
-} from "../session-support";
+} from "@purin-labs/tool-handlers/agent-tools/session-support";
 import { harnessCapabilitiesFromCapabilityKeys } from "@purin-labs/agent-tools/catalog/code-mode";
 import { requireLiveMenuDraftAuthority } from "./handlers";
 import { draftBoardId, draftEdit } from "./board-draft-edit";

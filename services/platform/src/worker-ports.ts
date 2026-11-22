@@ -71,7 +71,7 @@ import {
   readShownMemoryStanding,
 } from "./memory/access";
 import { memoryService } from "./memory/contract/memory-service";
-import { CARD_ONLY_REPLY_INSTRUCTION } from "./slack/card-only-reply";
+import { CARD_ONLY_REPLY_INSTRUCTION } from "@purin-labs/tool-handlers/slack/card-only-reply";
 import {
   readSlackConversationFact,
   slackConversationReachesOutside,

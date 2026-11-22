@@ -21,9 +21,9 @@ import {
   liveDeviceMember,
   type ToolEffect,
   untrustedDeviceText,
-} from "../session-support";
+} from "@purin-labs/tool-handlers/agent-tools/session-support";
 import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
-import { readMemberRecord } from "../member-record-read";
+import { readMemberRecord } from "@purin-labs/tool-handlers/agent-tools/member-record-read";
 
 /**
  * The Devices page's list for the agent. A device's own words stay in fields
