@@ -1,13 +1,13 @@
-import type { CommerceSystem } from "../src/data/organisation-commerce-system";
+import type { CommerceSystem } from "@purin-labs/connections/data/organisation-commerce-system";
 import type { ActionAuthority } from "../src/actors/action-ledger";
 import {
   parseCommerceSystemRevision,
   parseShopifyShopDomain,
-} from "../src/data/organisation-commerce-system";
+} from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   parseCommerceBindingId,
   parseCommerceEngineMerchantId,
-} from "../src/data/commerce-merchant-binding";
+} from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,

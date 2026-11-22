@@ -19,7 +19,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import {
   issueControlSession,
   type IssuedControlSession,

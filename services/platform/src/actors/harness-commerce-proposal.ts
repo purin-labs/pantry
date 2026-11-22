@@ -62,8 +62,8 @@ import { commerceProjectionRevision } from "../commerce/contract/commerce-provid
 import {
   resolveOrganisationCommerceSystemAuthority,
   type CommerceSystemProviderAuthority,
-} from "../data/organisation-commerce-system";
-import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-binding";
+} from "@purin-labs/connections/data/organisation-commerce-system";
+import { resolveCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
   createCommerceClient,
   createCommerceEntityPlaneClient,

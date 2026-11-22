@@ -1,9 +1,9 @@
-import { createConnectedIntegration } from "../data/integration-account";
-import type { ProvisioningProviderConnectionAttempt } from "../data/provider-attempt";
+import { createConnectedIntegration } from "@purin-labs/connections/data/integration-account";
+import type { ProvisioningProviderConnectionAttempt } from "@purin-labs/connections/data/provider-attempt";
 import {
   validateExternalProviderToken,
   type ExternalRecordsProvider,
-} from "../external-records/records";
+} from "@purin-labs/connections/external-records/records";
 import { exchangeExternalRecordsOAuthCode } from "../external-records/oauth";
 import { airtableOnboardingAdapter } from "../provider-adapters/airtable";
 import { notionOnboardingAdapter } from "../provider-adapters/notion";
@@ -23,7 +23,7 @@ import {
   verifyExistingAccountIdentity,
 } from "../integrations/contract/provisioning";
 import { finishProviderManagedConnection } from "./provider-managed-connection";
-import { scopesAreComplete } from "../provider-adapters/authorization";
+import { scopesAreComplete } from "@purin-labs/connections/provider-adapters/authorization";
 import type { Result } from "@purin-labs/kernel/result";
 
 export async function connectExternalRecordsOAuth(

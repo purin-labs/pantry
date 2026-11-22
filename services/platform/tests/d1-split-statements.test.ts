@@ -92,7 +92,7 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "preparePlacementMovePublication",
     "prepareRecoveryRelocationStart",
   ],
-  "services/platform/src/data/provider-attempt.ts": [
+  "foundation/connections/data/provider-attempt.ts": [
     "readCurrentProviderManifestVersion",
   ],
   "services/platform/src/data/screen-pairing.ts": [

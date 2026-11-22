@@ -5,12 +5,12 @@ import {
   createConnectedIntegration,
   finalizeConnectedIntegrationAccount,
   requireConnectionCredentialAuthority,
-} from "../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type {
   ProvisioningProviderConnectionAttempt,
   ProviderManifestEvidence,
-} from "../data/provider-attempt";
-import { persistProviderResourceSnapshot } from "../data/provider-resource";
+} from "@purin-labs/connections/data/provider-attempt";
+import { persistProviderResourceSnapshot } from "@purin-labs/connections/data/provider-resource";
 import { connectionParts } from "../integrations/contract/connection-parts";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import { whatsappOnboardingAdapter } from "../provider-adapters/whatsapp";
@@ -30,9 +30,9 @@ import {
   providerCredentialHandle,
   verifyExistingAccountIdentity,
 } from "../integrations/contract/provisioning";
-import { scopesAreComplete } from "../provider-adapters/authorization";
+import { scopesAreComplete } from "@purin-labs/connections/provider-adapters/authorization";
 import type { Result } from "@purin-labs/kernel/result";
-import { resolveWhatsAppEmbeddedSignupCredential } from "../whatsapp/application";
+import { resolveWhatsAppEmbeddedSignupCredential } from "@purin-labs/connections/whatsapp/application";
 import {
   exchangeWhatsAppSignupCode,
   listWhatsAppPhoneNumbers,
@@ -40,8 +40,8 @@ import {
   subscribeWhatsAppApp,
   type WhatsAppGraphError,
   type WhatsAppSignupExchange,
-} from "../whatsapp/graph";
-import type { WhatsAppBusinessAccountId } from "../whatsapp/identifiers";
+} from "@purin-labs/connections/whatsapp/graph";
+import type { WhatsAppBusinessAccountId } from "@purin-labs/connections/whatsapp/identifiers";
 
 /**
  * A signup that comes back without a Business Portfolio or WhatsApp Business

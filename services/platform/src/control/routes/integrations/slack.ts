@@ -14,7 +14,7 @@ import {
   parseWorkspaceId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { configuredValue } from "../../../provider-adapters/authorization";
+import { configuredValue } from "@purin-labs/connections/provider-adapters/authorization";
 import { uninstallSlackApplication } from "../../../provider-adapters/slack";
 import {
   admitControlMutation,
@@ -41,7 +41,7 @@ import {
   slackDmSelection,
   type SlackChannelDefaultChange,
 } from "../../../slack/installation-store";
-import { resolveConfiguredSlackInstallationIdentity } from "../../../slack/installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { isPositiveInteger, isRecord } from "@purin-labs/std";
 import {
   prepareSlackDmSelectionAuditEvent,

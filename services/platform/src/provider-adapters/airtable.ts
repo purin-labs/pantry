@@ -4,7 +4,7 @@ import {
   parseProviderOnlyStartContext,
   pkceChallenge,
   SHORT_PROVIDER_STATE_TTL_MS,
-} from "./authorization";
+} from "@purin-labs/connections/provider-adapters/authorization";
 import type {
   ProviderCleanupAdapter,
   ProviderCleanupResult,

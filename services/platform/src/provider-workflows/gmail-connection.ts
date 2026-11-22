@@ -6,15 +6,15 @@ import { connectionParts } from "../integrations/contract/connection-parts";
 import {
   createConnectedIntegration,
   requireConnectionCredentialAuthority,
-} from "../data/integration-account";
-import type { ProvisioningProviderConnectionAttempt } from "../data/provider-attempt";
-import { persistProviderResourceSnapshot } from "../data/provider-resource";
+} from "@purin-labs/connections/data/integration-account";
+import type { ProvisioningProviderConnectionAttempt } from "@purin-labs/connections/data/provider-attempt";
+import { persistProviderResourceSnapshot } from "@purin-labs/connections/data/provider-resource";
 import { exchangeGmailOAuthCode } from "../mail/gmail-oauth";
 import { gmailRequiredScopesForProduct } from "../provider-adapters/gmail";
 import {
   gmailProductFromScopes,
   type GmailAuthorizationProduct,
-} from "../mail/gmail-authorization";
+} from "@purin-labs/connections/mail/gmail-authorization";
 import { providerCallbackUri } from "../provider-lifecycle/authorization";
 import type {
   CompleteProviderInput,

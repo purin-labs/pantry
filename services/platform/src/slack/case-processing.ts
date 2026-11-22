@@ -85,7 +85,7 @@ import {
   type ControlRole,
 } from "@purin-labs/tenancy/data/control-plane";
 import { parseAssignmentId, parseSessionId, type CaseId } from "@purin-labs/kernel/ids";
-import { resolveConfiguredSlackInstallationIdentity } from "./installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import {
   readLatestEmailReviewProjectionForCase,
   type EmailReviewProjection,

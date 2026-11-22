@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
-import type { IntegrationProvider } from "../data/integration-account";
+import type { IntegrationProvider } from "@purin-labs/connections/data/integration-account";
 import type { IntegrationAccountId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import type { VaultHandle, VaultResolveError, VaultSecret } from "./domain";

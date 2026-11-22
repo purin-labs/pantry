@@ -12,7 +12,7 @@ import {
   requireConnectionCredentialAuthority,
   resolveActiveProviderAccountContext,
   upsertProviderWebhook,
-} from "../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   errorResponse,

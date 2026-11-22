@@ -23,7 +23,7 @@ import {
   parseCommerceSystemRevision,
   type CommerceSystem,
   type CommerceSystemRevision,
-} from "../data/organisation-commerce-system";
+} from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   parseApprovalEvidence,
   parseMerchantActionRejectionEvidence,

@@ -15,7 +15,7 @@ import {
   setIntegrationAccountLifecycle,
   upsertSurfaceInstallation,
   type ConnectedIntegrationSeed,
-} from "../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import { storeVaultSecret, type VaultHandle } from "../src/credential-vault";
 import type {
   IntegrationAccountId,

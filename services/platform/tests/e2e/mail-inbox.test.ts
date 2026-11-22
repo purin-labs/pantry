@@ -135,7 +135,7 @@ import { buildAgentMailboxAuthority } from "../../src/request-authority";
 import { acceptMailboxModelTerms } from "../mailbox-model-consent-fixture";
 import { admitControlTurnFixture } from "../organisation-execution-fixture";
 import type { SessionTurnExecution } from "../../src/chat/turn-access";
-import { gmailGetMessageContent } from "../../src/mail/gmail-adapter";
+import { gmailGetMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
 import {
   emailTurnSessionId,
   processEmailThreadTurn,
@@ -184,7 +184,7 @@ import {
   type IssuedControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
 import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import {
   createAccessGrant,
   revokeAccessGrant,
@@ -199,7 +199,7 @@ import {
 import {
   GMAIL_FULL_MAILBOX_SCOPES,
   GMAIL_SEND_ONLY_SCOPES,
-} from "../../src/mail/gmail-authorization";
+} from "@purin-labs/connections/mail/gmail-authorization";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
 import {
   parseIntegrationAccountId,
@@ -212,7 +212,7 @@ import {
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";
 import { gmailConnectorId } from "../../src/mail-inbox/contract/connector-ids";
-import { resolveActiveProviderAccountContext } from "../../src/data/integration-account";
+import { resolveActiveProviderAccountContext } from "@purin-labs/connections/data/integration-account";
 import { digestCanonical } from "../../src/policy/information-flow/digest";
 import {
   readMailHead,
@@ -266,7 +266,7 @@ import {
   digestGmailReplyTarget,
   digestEmailBody,
   digestEmailSnapshot,
-} from "../../src/mail/reply-target";
+} from "@purin-labs/connections/mail/reply-target";
 import type { CaseAssignment } from "@purin-labs/contracts";
 import type { CaseGmailReplyProposal } from "../../src/actors/case-inbox/email-proposals";
 import { decodeRaw } from "./gmail-mailbox-support";

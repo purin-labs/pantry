@@ -1,13 +1,13 @@
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
-import { parseGmailAuthorizationProduct } from "../../../mail/gmail-authorization";
+import { parseGmailAuthorizationProduct } from "@purin-labs/connections/mail/gmail-authorization";
 import { hashPortalSubject } from "@purin-labs/tenancy/data/control-mutation";
 import {
   integrationAccountAllowsCredentialMutation,
   providerConnectionAllowsCredentialMutation,
   resolveIntegrationAccount,
   resolveProviderConnection,
-} from "../../../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import {
   recordProviderStartFailure,
 } from "../../../organisation/contract/provider-support-references";
@@ -16,7 +16,7 @@ import {
   expireProviderAttemptIfDue,
   providerAttemptWire,
   readProviderAttempt,
-} from "../../../data/provider-attempt";
+} from "@purin-labs/connections/data/provider-attempt";
 import {
   parseProviderConnectionAttemptId,
   type IntegrationAccountId,

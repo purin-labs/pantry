@@ -3,7 +3,7 @@ import {
   exactScopeIsGranted,
   pkceChallenge,
   SHORT_PROVIDER_STATE_TTL_MS,
-} from "./authorization";
+} from "@purin-labs/connections/provider-adapters/authorization";
 import {
   type ProviderCleanupAdapter,
   type ProviderCleanupResult,
@@ -13,7 +13,7 @@ import {
   gmailScopesForProduct,
   parseGmailAuthorizationProduct,
   type GmailAuthorizationProduct,
-} from "../mail/gmail-authorization";
+} from "@purin-labs/connections/mail/gmail-authorization";
 import {
   GMAIL_MANUAL_INSTRUCTION as MANUAL_INSTRUCTION,
   revokeGoogleOAuthToken,

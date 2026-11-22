@@ -6,7 +6,7 @@ import { readWorkflowDocument } from "../commerce/bakery/workflow-revisions";
 import { commerceProviderResourceId } from "../commerce/contract/resource-ids";
 import { createCommerceOutboxReconcileQueueMessage } from "../commerce/contract/queue-messages";
 import { executeStockOperation } from "../kitchen/contract/stock-action-execution";
-import { resolveCurrentOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";
+import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import { runDeviceCommand } from "../devices/commands";
 import { listDevices, listGateways } from "../devices/store";
 import { readKitchenDeviceViews } from "../devices/views";

@@ -1,5 +1,5 @@
 import type { OnboardingActivationInput } from "../src/data/activation";
-import type { ProviderConnectionAttempt } from "../src/data/provider-attempt";
+import type { ProviderConnectionAttempt } from "@purin-labs/connections/data/provider-attempt";
 import {
   parseProviderConnectionAttemptId,
   parseProviderStateId,

@@ -30,14 +30,14 @@ import {
   type IntegrationAccount,
   type IntegrationAccountMutation,
   type ProviderConnection,
-} from "../../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import { prepareConfigurationVersionBump } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 import {
   prepareActiveCredentialGeneration,
   prepareCredentialGenerationSupersession,
-} from "../../data/provider-credential-generation";
-import { prepareDefaultAccountReplacement } from "../../data/integration-account-writes";
-import { prepareConnectionCredentialRotation } from "../../data/provider-connection-writes";
+} from "@purin-labs/connections/data/provider-credential-generation";
+import { prepareDefaultAccountReplacement } from "@purin-labs/connections/data/integration-account-writes";
+import { prepareConnectionCredentialRotation } from "@purin-labs/connections/data/provider-connection-writes";
 import { prepareCredentialRefRotation } from "../../credential-vault/secret-revocation";
 
 const CREDENTIAL_ROTATION_FAILURE_CODES = [

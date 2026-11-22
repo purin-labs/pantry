@@ -217,7 +217,7 @@ Commerce reads use Platform's commerce projections (the Commerce Read Layer),
 which Commerce and Shopify feed. Results are bounded and
 sensitivity-classified. Raw payloads, SDK clients, SQL and credentials are not
 available to the harness. Commerce tools resolve the selected `CommerceSystem`
-([`organisation-commerce-system.ts`](../../services/platform/src/data/organisation-commerce-system.ts)):
+([`organisation-commerce-system.ts`](../../foundation/connections/data/organisation-commerce-system.ts)):
 `builtin_commerce` (a Commerce merchant binding) or `shopify`. Each read and
 action binds that system and its revision.
 
@@ -307,7 +307,7 @@ This section covers the built-in providers. Model route sign-ins and the
 Commerce merchant binding have their own flows.
 [`provider-lifecycle/`](../../services/platform/src/provider-lifecycle/)
 owns attempts, provisioning and observation.
-[`data/integration-account.ts`](../../services/platform/src/data/integration-account.ts)
+[`data/integration-account.ts`](../../foundation/connections/data/integration-account.ts)
 owns the connected identity. The Vault owns credential values.
 [`provider-workflows/`](../../services/platform/src/provider-workflows/) own
 provider sequencing, and
@@ -389,7 +389,7 @@ consumed once, with the hash of the callback code, and is invalidated by
 cancellation and completion. It lives 10 minutes
 (`SHORT_PROVIDER_STATE_TTL_MS`), or 2 hours for Stripe Connect account
 selection (`STRIPE_PROVIDER_STATE_TTL_MS`,
-[`authorization.ts`](../../services/platform/src/provider-adapters/authorization.ts)).
+[`authorization.ts`](../../foundation/connections/provider-adapters/authorization.ts)).
 A repeated callback returns the terminal attempt. A different code after
 consumption fails with `provider_state_replayed`. A valid callback after the
 portal session expired can still finish provisioning.
@@ -469,7 +469,7 @@ Provider notes:
 ### Discovery and the default account
 
 A discovery query creates a `provider_resource_snapshot`
-([`provider-resource.ts`](../../services/platform/src/data/provider-resource.ts)).
+([`provider-resource.ts`](../../foundation/connections/data/provider-resource.ts)).
 Each `provider_discovered_resource` has a canonical ID, provider IDs, a label,
 an access state, a provider revision and a kind. A `provider_resource_cursor`
 is stored as a hash, bound to the Organisation, account, snapshot and query,

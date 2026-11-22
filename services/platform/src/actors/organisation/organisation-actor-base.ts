@@ -43,7 +43,7 @@ import {
   type ShopifyLocationObservationInput,
   type ShopifyLocationObservationResult,
 } from "../../shopify/location-observation";
-import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   applyEvalCommand,
   checkEvalReviewLabel,

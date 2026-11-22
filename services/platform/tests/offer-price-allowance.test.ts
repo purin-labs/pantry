@@ -13,9 +13,9 @@ vi.mock("../src/commerce/contract/client", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../src/commerce/contract/client")>()),
   createCommerceClient: clientMocks.createCommerceClient,
 }));
-vi.mock("../src/data/commerce-merchant-binding", async (importOriginal) => ({
+vi.mock("@purin-labs/connections/data/commerce-merchant-binding", async (importOriginal) => ({
   ...(await importOriginal<
-    typeof import("../src/data/commerce-merchant-binding")
+    typeof import("@purin-labs/connections/data/commerce-merchant-binding")
   >()),
   resolveOrganisationCommerceMerchantBinding:
     bindingMocks.resolveOrganisationCommerceMerchantBinding,

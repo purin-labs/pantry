@@ -11,8 +11,8 @@ import {
   resolveOperationalEmailContact,
   type OperationalEmailTarget,
 } from "./email-operational";
-import { resolveActiveProviderAccountContext } from "./integration-account";
-import { resolveCurrentOrganisationCommerceMerchantBinding } from "./commerce-merchant-binding";
+import { resolveActiveProviderAccountContext } from "@purin-labs/connections/data/integration-account";
+import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 
 export type ContactEndpoint =

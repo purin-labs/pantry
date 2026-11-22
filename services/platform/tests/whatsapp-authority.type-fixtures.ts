@@ -1,14 +1,14 @@
 import type {
   ConnectedIntegrationSeed,
   ProviderConnectionAuthority,
-} from "../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type {
   WhatsAppConversationOwnership,
   WhatsAppIngressPolicy,
   WhatsAppIngressPolicyPublishRequest,
   WhatsAppReplyProposalLifecycle,
 } from "../src/data/whatsapp";
-import type { WhatsAppSendOutcome } from "../src/whatsapp/graph";
+import type { WhatsAppSendOutcome } from "@purin-labs/connections/whatsapp/graph";
 import type { WhatsAppWebhookEvent } from "../src/whatsapp/webhook";
 import { parseVaultHandle } from "../src/credential-vault";
 import { parseUserId } from "@purin-labs/control-api/ids";
@@ -17,7 +17,7 @@ import {
   parseWhatsAppMessageId,
   parseWhatsAppPhoneNumberId,
   parseWhatsAppBusinessAccountId,
-} from "../src/whatsapp/identifiers";
+} from "@purin-labs/connections/whatsapp/identifiers";
 
 /**
  * Compile-time evidence that the WhatsApp domain cannot express the states

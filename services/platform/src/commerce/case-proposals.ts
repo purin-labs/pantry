@@ -17,7 +17,7 @@ import { parseIntegrationAccountId, type IntegrationAccountId } from "@purin-lab
 import {
   parseCommerceSystemRevision,
   type CommerceSystemRevision,
-} from "../data/organisation-commerce-system";
+} from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   parseCommerceActionRequest,
   parseCommerceProviderReceipt,

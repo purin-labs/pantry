@@ -6,7 +6,7 @@ import type {
 import {
   listIntegrationAccounts,
   resolveActiveProviderAccountContext,
-} from "../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import { mailSourcePin } from "../mail-inbox/contract/mail-source-authorization";
 import { mailInferenceEligible } from "../mail-inbox/contract/mail-inference-eligibility";
 import {

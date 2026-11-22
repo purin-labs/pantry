@@ -3,20 +3,20 @@ import { prepareReadAndProposeAccessDefaults } from "./data/capability-policy";
 import {
   prepareSurfaceInstallConnectionRows,
   prepareSurfaceReinstallConnectionRows,
-} from "./data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import {
   prepareArchivedOrganisationAccountsDisable,
   prepareArchivedOrganisationWebhooksDisable,
   prepareOrganisationPurgeAccounts,
-} from "./data/integration-account-writes";
+} from "@purin-labs/connections/data/integration-account-writes";
 import type { OrganisationLifecycleParts } from "@purin-labs/tenancy/data/organisation-lifecycle-port";
 import { prepareInitialOrganisationWorkspace } from "./data/organisation-workspace";
 import { prepareReadinessAssessmentDeletion } from "./data/onboarding";
 import {
   prepareArchivedOrganisationConnectionsDisable,
   prepareOrganisationPurgeConnections,
-} from "./data/provider-connection-writes";
-import { prepareOrganisationPurgeCredentialGenerations } from "./data/provider-credential-generation";
+} from "@purin-labs/connections/data/provider-connection-writes";
+import { prepareOrganisationPurgeCredentialGenerations } from "@purin-labs/connections/data/provider-credential-generation";
 import {
   prepareSlackInstallationCredentialMove,
   prepareSlackInstallationRevocation,

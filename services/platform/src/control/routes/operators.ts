@@ -13,7 +13,7 @@ import {
   type VaultRootRotationError,
 } from "../../credential-vault";
 import type { ActivationMutation } from "../../data/activation";
-import { disableIntegrationAccount } from "../../data/integration-account";
+import { disableIntegrationAccount } from "@purin-labs/connections/data/integration-account";
 import { inboxServices } from "../../mail-inbox/contract/inbox-services";
 import {
   hashOpaqueSecret,
@@ -38,7 +38,7 @@ import {
 import {
   cancelProviderAttempt,
   providerAttemptWire,
-} from "../../data/provider-attempt";
+} from "@purin-labs/connections/data/provider-attempt";
 import { archiveOrganisation } from "@purin-labs/tenancy/data/organisation-lifecycle";
 import {
   parseIntegrationAccountId,

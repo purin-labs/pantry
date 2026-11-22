@@ -51,14 +51,14 @@ import {
   type ControlMutationIdentity,
   type ControlMutationReceiptScope,
 } from "@purin-labs/tenancy/data/control-mutation";
-import { resolveIntegrationAccount } from "../../data/integration-account";
-import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
+import { resolveIntegrationAccount } from "@purin-labs/connections/data/integration-account";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import type { AccessControlParts } from "./access-control-explain";
 import {
   parseCustomConnectorDefinitionDigest,
   parseCustomConnectorId,
   parseCustomConnectorRevision,
-} from "../../custom-connectors/identity";
+} from "@purin-labs/connections/custom-connectors/identity";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   settleWorkspaceAiBudget,

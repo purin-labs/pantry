@@ -3,7 +3,7 @@ import {
   exactScopeIsGranted,
   parseProviderOnlyStartContext,
   SHORT_PROVIDER_STATE_TTL_MS,
-} from "./authorization";
+} from "@purin-labs/connections/provider-adapters/authorization";
 import {
   providerHttpFailure,
   type ProviderCleanupAdapter,
@@ -19,7 +19,7 @@ import {
   type WorkspaceId,
 } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import type { DiscoveredProviderResource } from "../data/provider-resource";
+import type { DiscoveredProviderResource } from "@purin-labs/connections/data/provider-resource";
 import type { Result } from "@purin-labs/kernel/result";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { isRecord } from "@purin-labs/std";

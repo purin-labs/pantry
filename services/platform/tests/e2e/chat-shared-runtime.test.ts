@@ -19,10 +19,10 @@ import {
   parseSlackInstallationId,
 } from "@purin-labs/kernel/ids";
 import { createOrganisationInstall } from "@purin-labs/tenancy/data/organisation";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import { parseVaultHandle } from "../../src/credential-vault/domain";
 import { resolveActiveSlackOrganisationCredential } from "../../src/credential-vault/surface-installation-resolution";
-import { resolveConfiguredSlackInstallationIdentity } from "../../src/slack/installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { createSlackOrganisationConnection } from "../../src/slack/installation-store";
 import { env, exports } from "cloudflare:workers";
 import { evictDurableObject, runInDurableObject } from "cloudflare:test";

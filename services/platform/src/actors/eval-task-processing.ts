@@ -34,7 +34,7 @@ import type {
   SettledEvalTask,
 } from "../evals/contract/eval-task";
 import { scoreEvalScenario } from "../evals/scorer";
-import type { GmailMessageContent } from "../mail/gmail-adapter";
+import type { GmailMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
 import {
   newRequestId,
   parseAssignmentId,

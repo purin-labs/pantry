@@ -11,7 +11,7 @@ import {
   parseCustomConnectorRevision,
   type CustomConnectorId,
   type CustomConnectorRevision,
-} from "./identity";
+} from "@purin-labs/connections/custom-connectors/identity";
 import {
   resolveCustomConnectorRevision,
   type CustomConnectorRevisionRecord,

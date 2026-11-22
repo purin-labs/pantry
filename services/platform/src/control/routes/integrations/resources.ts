@@ -9,12 +9,12 @@ import { resolveActiveSlackOrganisationCredential } from "../../../credential-va
 import {
   resolveActiveProviderAccountContext,
   resolveIntegrationAccount,
-} from "../../../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import {
   listProviderResourcePage,
   refreshProviderResourceSnapshot,
   type DiscoveredProviderResource,
-} from "../../../data/provider-resource";
+} from "@purin-labs/connections/data/provider-resource";
 import { discoverFileResources } from "../../../context/files";
 import {
   parseIntegrationAccountId,
@@ -24,7 +24,7 @@ import {
   resolveFileProviderAccess,
   storeFilePlacementCredential,
 } from "../../../provider-workflows/file-context-credential";
-import { configuredValue } from "../../../provider-adapters/authorization";
+import { configuredValue } from "@purin-labs/connections/provider-adapters/authorization";
 import { discoverSlackChannels } from "../../../provider-adapters/slack";
 import { discoverSquareTerminalResources } from "../../../provider-adapters/square";
 import {
@@ -35,7 +35,7 @@ import {
 } from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
-import { resolveConfiguredSlackInstallationIdentity } from "../../../slack/installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { assertNever } from "@purin-labs/std";
 import { account } from "../integrations";
 import { authorizeAccountRequest } from "./account-request";

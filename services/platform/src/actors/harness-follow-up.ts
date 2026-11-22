@@ -32,7 +32,7 @@ import {
   insertAgentPermissionRequest,
   isRequesterRole,
 } from "../data/agent-permission-request";
-import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
 import { isConversationSession } from "../chat/turn-access";
 import {

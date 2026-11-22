@@ -97,11 +97,16 @@ vi.mock("../src/data/pinned-agent-profile", async (importOriginal) => ({
   >()),
   resolveCaseTurnAgentProfile: orchestratorMocks.resolveCaseTurnAgentProfile,
 }));
-vi.mock("../src/mail/gmail-adapter", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/mail/gmail-adapter")>()),
-  gmailGetMessageContent: orchestratorMocks.gmailGetMessageContent,
-  gmailCreateDraft: orchestratorMocks.gmailCreateDraft,
-}));
+vi.mock(
+  "@purin-labs/connections/mail/gmail-adapter",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/connections/mail/gmail-adapter")
+    >()),
+    gmailGetMessageContent: orchestratorMocks.gmailGetMessageContent,
+    gmailCreateDraft: orchestratorMocks.gmailCreateDraft,
+  }),
+);
 vi.mock("../src/actors/connector-email-proposal", async (importOriginal) => ({
   ...(await importOriginal<
     typeof import("../src/actors/connector-email-proposal")

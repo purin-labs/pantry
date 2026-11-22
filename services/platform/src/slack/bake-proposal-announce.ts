@@ -15,7 +15,7 @@ import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisatio
 import { ensureCaseProject } from "../projects/case-project";
 import { BAKE_PROPOSAL_CARD, bakeProposalCardText } from "./bake-proposal-card";
 import { parseSlackUserId } from "./events";
-import { resolveConfiguredSlackInstallationIdentity } from "./installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { resolveOrClaimSlackThreadRoute } from "./organisation-routing";
 
 /**

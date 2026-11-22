@@ -11,12 +11,12 @@ import {
   createConnectedIntegration,
   finalizeConnectedIntegrationAccount,
   requireConnectionCredentialAuthority,
-} from "../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type {
   ProvisioningProviderConnectionAttempt,
   ProviderManifestEvidence,
-} from "../data/provider-attempt";
-import { persistProviderResourceSnapshot } from "../data/provider-resource";
+} from "@purin-labs/connections/data/provider-attempt";
+import { persistProviderResourceSnapshot } from "@purin-labs/connections/data/provider-resource";
 import {
   resolveProviderManifestCredential,
   type VaultHandle,

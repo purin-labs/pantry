@@ -22,7 +22,7 @@ import {
   slackCaseIngressId,
 } from "../../slack/case-processing";
 import { slackAuthoredText } from "../../slack/events";
-import { resolveConfiguredSlackInstallationIdentity } from "../../slack/installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { setSlackThreadStatus } from "../../slack/messages";
 import { buildSlackUserMessage } from "../../slack/user-message";
 import { actorExecutionAdmissionOpen } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";

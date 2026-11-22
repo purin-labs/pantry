@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 
 import type { CredentialVaultBindings } from "../src/credential-vault/keyring";
 import { resolveVaultHandle } from "../src/credential-vault/service";
-import { listIntegrationAccounts } from "../src/data/integration-account";
+import { listIntegrationAccounts } from "@purin-labs/connections/data/integration-account";
 import { compileEffectiveGrantSet } from "../src/authorization/access-grants";
 import {
   buildCustomConnectorWriteAuthority,

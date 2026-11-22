@@ -13,13 +13,13 @@ import {
 import {
   createConnectedIntegration,
   finalizeConnectedIntegrationAccount,
-} from "../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import {
   listProviderResourcePage,
   persistProviderResourceSnapshot,
   refreshProviderResourceSnapshot,
   type DiscoveredProviderResource,
-} from "../src/data/provider-resource";
+} from "@purin-labs/connections/data/provider-resource";
 import { parseVaultHandle } from "../src/credential-vault";
 import type { IntegrationAccountId, OrganisationId } from "@purin-labs/kernel/ids";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";

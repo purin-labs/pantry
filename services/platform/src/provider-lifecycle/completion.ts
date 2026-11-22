@@ -11,13 +11,13 @@ import {
   providerAttemptWire,
   type ProviderAuthorizationContext,
   type ProviderFailureEvidence,
-} from "../data/provider-attempt";
+} from "@purin-labs/connections/data/provider-attempt";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   completeProviderConnection,
   parseProviderStartContext,
 } from "../provider-adapters/catalogue";
-import { parseActiveIntegrationProvider } from "../data/integration-provider-directory";
+import { parseActiveIntegrationProvider } from "@purin-labs/connections/data/integration-provider-directory";
 import type { ProviderStartContext } from "../integrations/contract/provider-adapter";
 import type { Result } from "@purin-labs/kernel/result";
 import type {

@@ -3,16 +3,16 @@ import {
   resolveProviderManifestCredential,
   type VaultOAuthTokens,
 } from "../credential-vault";
-import type { ProviderManifestEvidence } from "../data/provider-attempt";
-import { createConnectedIntegration } from "../data/integration-account";
-import type { ProvisioningProviderConnectionAttempt } from "../data/provider-attempt";
+import type { ProviderManifestEvidence } from "@purin-labs/connections/data/provider-attempt";
+import { createConnectedIntegration } from "@purin-labs/connections/data/integration-account";
+import type { ProvisioningProviderConnectionAttempt } from "@purin-labs/connections/data/provider-attempt";
 import {
   configuredValue,
   exactScopeIsGranted,
   parseProviderOnlyStartContext,
   pkceChallenge,
   SHORT_PROVIDER_STATE_TTL_MS,
-} from "../provider-adapters/authorization";
+} from "@purin-labs/connections/provider-adapters/authorization";
 import {
   createGoogleDriveAuthorizationUrl,
   exchangeGoogleDriveAuthorizationCode,

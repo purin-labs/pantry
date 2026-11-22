@@ -21,7 +21,7 @@ import {
   readActiveOrganisationMembershipRevision,
   type IssuedControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
 import {
   compileTurnAuthority,

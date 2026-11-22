@@ -1,6 +1,6 @@
 import { isShopifyAdminDomain } from "./auth";
 import type { Result } from "@purin-labs/kernel/result";
-import { configuredValue, SHORT_PROVIDER_STATE_TTL_MS } from "../provider-adapters/authorization";
+import { configuredValue, SHORT_PROVIDER_STATE_TTL_MS } from "@purin-labs/connections/provider-adapters/authorization";
 import {
   providerHttpFailure,
   type ProviderCleanupAdapter,

@@ -17,8 +17,8 @@ import {
   admitCommerceCapability,
   type CommerceCapability,
 } from "../data/commerce-capability-activation";
-import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-binding";
-import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
+import { resolveCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import type {
   ActionLedgerEntry,
   ExecutingActionLedgerEntry,

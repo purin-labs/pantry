@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 
-import { readAccountMutationState } from "../data/integration-account";
+import { readAccountMutationState } from "@purin-labs/connections/data/integration-account";
 import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
 import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import {
@@ -22,7 +22,7 @@ import {
   type CustomConnectorDefinitionDigest,
   type CustomConnectorId,
   type CustomConnectorRevision,
-} from "./identity";
+} from "@purin-labs/connections/custom-connectors/identity";
 import type { AuthorizedCustomConnectorSetupCommit } from "./setup";
 import {
   customConnectorSetupLifecycleAllows,
@@ -35,15 +35,15 @@ import { prepareVaultSecretRevocation } from "../credential-vault/secret-revocat
 import {
   prepareActiveCredentialGeneration,
   prepareCredentialGenerationSupersession,
-} from "../data/provider-credential-generation";
+} from "@purin-labs/connections/data/provider-credential-generation";
 import {
   prepareCustomConnectorConnectionInsert,
   prepareCustomConnectorConnectionRotation,
-} from "../data/provider-connection-writes";
+} from "@purin-labs/connections/data/provider-connection-writes";
 import {
   prepareCustomConnectorAccountInsert,
   prepareCustomConnectorAccountRotation,
-} from "../data/integration-account-writes";
+} from "@purin-labs/connections/data/integration-account-writes";
 
 export type ActiveCustomConnectorAccount = {
   readonly source: {

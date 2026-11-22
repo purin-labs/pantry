@@ -43,7 +43,7 @@ import {
   type SlackMessageError,
 } from "../slack/messages";
 import { CARD_ONLY_REPLY } from "../slack/card-only-reply";
-import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { heldNoticeOfDecision } from "../slack/held-output-notice";
 import { permissionDecisionRequestId } from "../slack/permission-request-notice";
 import { applyAgentMessageAssemblyEvent } from "./agent-message-assembly";

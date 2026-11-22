@@ -22,8 +22,8 @@ import type {
   SavedSelectorCueResolverError,
   SavedSelectorCueResolverInput,
 } from "../data/agent-operations";
-import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
-import { resolveOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
+import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import type { CueClaimResult } from "../actors/cue-delivery";
 import {
   processDirectCaseCommand,
@@ -40,7 +40,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { Result } from "@purin-labs/kernel/result";
-import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { resolveActiveSlackDestinationConnection } from "../slack/installation-store";
 import { buildWorkflowAuthority } from "../request-authority";
 import { buildSavedSelectorCommerceReadAuthority } from "../commerce/entity-plane/authority";

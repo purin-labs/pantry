@@ -16,7 +16,7 @@ import {
   resolvePinnedAgentProfile,
   type PinnedAgentProfile,
 } from "../data/pinned-agent-profile";
-import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import type {
   ActorIdentity,
   ActorRegistryEntry,
@@ -56,7 +56,7 @@ import type {
   SlackEnvelope,
   SlackPayloadError,
 } from "../slack/events";
-import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import {
   disconnectSlackInstallation,
   resolveSlackInstallation,

@@ -11,7 +11,7 @@ import type {
 import { isRecord } from "@purin-labs/std";
 
 import type { VaultSecret } from "../../credential-vault/domain";
-import { resolveOrganisationCommerceSystem } from "../../data/organisation-commerce-system";
+import { resolveOrganisationCommerceSystem } from "@purin-labs/connections/data/organisation-commerce-system";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";

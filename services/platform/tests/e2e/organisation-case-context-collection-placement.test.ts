@@ -30,7 +30,7 @@ import {
 } from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import { publishContactVerification } from "../../src/data/contact-verification";
 import { registerOperationalEmailContact } from "../../src/data/email-operational";
 import {
@@ -52,7 +52,7 @@ import {
 } from "../../src/credential-vault";
 import { parseCaseId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { GMAIL_FULL_MAILBOX_SCOPES } from "../../src/mail/gmail-authorization";
+import { GMAIL_FULL_MAILBOX_SCOPES } from "@purin-labs/connections/mail/gmail-authorization";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
 import type { OperationalCaseContextDiscoverySourceRequest } from "../../src/case-context-discovery/operational-evaluation";
 import { readDailyTypeSafeUsage } from "../../src/integrations/typesafe/usage-store";

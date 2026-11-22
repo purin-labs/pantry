@@ -1,6 +1,6 @@
 // The `CommerceProvider` of the built-in commerce engine (Purin Checkout and
 // the commerce engine Worker). Its records have the source `commerce`.
-import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-binding";
+import { resolveCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import type { CommerceProvider } from "./contract/commerce-provider";
 import {
   executeBuiltInCommerceAction,

@@ -20,8 +20,8 @@ import { commerceGraphResponseBody } from "../../commerce/entity-plane/routes";
 import { merchantReportDefinition } from "../../commerce/entity-plane/merchant-reports";
 import type { CommerceObservationEntity } from "../../actors/agent-session-information-flow";
 import { runMerchantReport } from "../../commerce/entity-plane/merchant-report-runner";
-import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
-import { resolveCurrentOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
+import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import { createCommerceClient } from "../../commerce/contract/client";
 import {
   advanceOrderQueueEntry,

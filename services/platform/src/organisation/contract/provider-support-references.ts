@@ -5,7 +5,7 @@ import type {
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
-import type { ProviderAttemptSupportReference } from "../../data/connection-flow-parts";
+import type { ProviderAttemptSupportReference } from "@purin-labs/connections/data/connection-flow-parts";
 import { prepareProjectionRevisionBump } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 /**

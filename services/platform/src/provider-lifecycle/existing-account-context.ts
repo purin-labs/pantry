@@ -1,7 +1,7 @@
-import { parseGmailAuthorizationProduct } from "../mail/gmail-authorization";
+import { parseGmailAuthorizationProduct } from "@purin-labs/connections/mail/gmail-authorization";
 import type { OnboardingProvider } from "../integrations/contract/provider-lifecycle";
 import type { ProviderStartContext } from "../integrations/contract/provider-adapter";
-import { parseActiveIntegrationProvider } from "../data/integration-provider-directory";
+import { parseActiveIntegrationProvider } from "@purin-labs/connections/data/integration-provider-directory";
 
 export function providerContextForExistingAccount(
   provider: string,

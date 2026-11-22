@@ -19,24 +19,24 @@ import {
   resolveIntegrationAccount,
   resolveProviderConnection,
   type IntegrationAccountMutation,
-} from "./integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import {
   prepareControlMutationReceipt,
   prepareOnboardingAuditEvent,
   prepareOnboardingEvent,
 } from "@purin-labs/tenancy/data/control-mutation";
 import { providerServices } from "../integrations/contract/provider-services";
-import { parseActiveIntegrationProvider } from "./integration-provider-directory";
+import { parseActiveIntegrationProvider } from "@purin-labs/connections/data/integration-provider-directory";
 import { fileAccountErasureStatements } from "../context/files";
 import { sha256Hex } from "@purin-labs/std";
 import {
   prepareRemovedAccountPseudonymization,
   prepareRemovedAccountWebhooksDelete,
-} from "./integration-account-writes";
-import { prepareRemovedAccountResourcesErasure } from "./provider-resource";
+} from "@purin-labs/connections/data/integration-account-writes";
+import { prepareRemovedAccountResourcesErasure } from "@purin-labs/connections/data/provider-resource";
 import { prepareRemovedAccountInstallationDelete } from "@purin-labs/tenancy/data/surface-installation-writes";
-import { prepareRemovedConnectionRevocation } from "./provider-connection-writes";
-import { prepareRemovedConnectionGenerationsRevocation } from "./provider-credential-generation";
+import { prepareRemovedConnectionRevocation } from "@purin-labs/connections/data/provider-connection-writes";
+import { prepareRemovedConnectionGenerationsRevocation } from "@purin-labs/connections/data/provider-credential-generation";
 import {
   hasSlackOrganisationConnection,
   revokeDisabledSlackOrganisationConnection,

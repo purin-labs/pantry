@@ -23,7 +23,7 @@ import {
   type CustomConnectorDefinitionDigest,
   type CustomConnectorId,
   type CustomConnectorRevision,
-} from "./identity";
+} from "@purin-labs/connections/custom-connectors/identity";
 import { CUSTOM_CONNECTOR_LIMITS } from "./limits";
 
 const CUSTOM_CONNECTOR_VALIDATOR_VERSION = "definition-v1";

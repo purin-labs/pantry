@@ -10,7 +10,7 @@ import {
   resolveIntegrationAccount,
   resolveProviderConnection,
   type IntegrationProvider,
-} from "../../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";

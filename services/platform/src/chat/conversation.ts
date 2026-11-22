@@ -36,7 +36,7 @@ import type { JsonRecord } from "../control/http";
 import {
   parseCustomConnectorId,
   type CustomConnectorId,
-} from "../custom-connectors/identity";
+} from "@purin-labs/connections/custom-connectors/identity";
 import type { Result } from "@purin-labs/kernel/result";
 import { parseSessionId, type SessionId } from "@purin-labs/kernel/ids";
 import {

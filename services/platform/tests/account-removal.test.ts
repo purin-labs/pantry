@@ -14,7 +14,7 @@ import {
   disableIntegrationAccount,
   resolveIntegrationAccount,
   resolveProviderConnection,
-} from "../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import { parseVaultHandle, type VaultHandle } from "../src/credential-vault";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";

@@ -15,7 +15,7 @@ import {
 import {
   createActiveConnectedIntegration,
   type ConnectedIntegrationSeed,
-} from "../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type { IntegrationAccountId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import {
@@ -28,7 +28,7 @@ import {
   readProviderAttempt,
   readResumableProviderAuthorization,
   type ConnectionProvider,
-} from "../src/data/provider-attempt";
+} from "@purin-labs/connections/data/provider-attempt";
 import {
   beginProviderOAuth,
   providerAuthorizationUrlForMutation,

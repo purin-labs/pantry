@@ -8,7 +8,7 @@ import {
   createActiveConnectedIntegration,
   type ActiveProviderAccountContext,
   type ConnectedIntegrationSeed,
-} from "../../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 

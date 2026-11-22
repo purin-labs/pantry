@@ -39,7 +39,7 @@ import {
   type AgentPermissionRequest,
 } from "../../data/agent-permission-request";
 import { readOrganisationCapabilityPolicies } from "../../data/capability-policy";
-import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { slackSurfaceParts } from "../../slack/surface-parts";

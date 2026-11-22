@@ -5,7 +5,7 @@ import {
   GMAIL_SEND_ONLY_SCOPES,
   gmailProductFromScopes,
   parseGmailAuthorizationProduct,
-} from "../src/mail/gmail-authorization";
+} from "@purin-labs/connections/mail/gmail-authorization";
 
 describe("Gmail authorization products", () => {
   it("rejects additional, missing, or mixed Gmail scopes", () => {

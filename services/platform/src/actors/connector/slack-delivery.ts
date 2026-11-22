@@ -16,7 +16,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { traceLog } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { resolveConfiguredSlackInstallationIdentity } from "../../slack/installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import {
   commerceActionPortalUrl,
   commerceCardBlocks,

@@ -22,7 +22,7 @@ import {
 } from "./commerce-menu-publication";
 import { controlError, controlJson } from "../http";
 import { readOrganisationEnvironment } from "../organisation-runtime";
-import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
+import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import { readCafeImageContent } from "../../cafe/contract/media";
 import type { Env } from "@purin-labs/kernel/env";
 import {

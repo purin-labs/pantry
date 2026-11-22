@@ -130,7 +130,7 @@ import {
   reconcileCommerceProviderReceipt,
   type CommerceProviderReceiptReconciliationError,
 } from "../../commerce/action-model";
-import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   digestFlowBinding,
   flowBindingMatchesIdentity,

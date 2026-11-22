@@ -1,6 +1,6 @@
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
-import { listLiveProviderWebhookContexts } from "../data/integration-account";
+import { listLiveProviderWebhookContexts } from "@purin-labs/connections/data/integration-account";
 import type {
   IntegrationAccountId,
   OrganisationId,

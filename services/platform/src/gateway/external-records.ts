@@ -8,7 +8,7 @@ import {
 import {
   requireConnectionCredentialAuthority,
   resolveActiveProviderAccountContext,
-} from "../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import { resolveOrganisationProvisioningActor } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import {
@@ -24,7 +24,7 @@ import {
   parseExternalRecordsRead,
   readExternalRecords,
   type ExternalRecordsProvider,
-} from "../external-records/records";
+} from "@purin-labs/connections/external-records/records";
 import { resolveActiveProviderConnectionCredential } from "../credential-vault/provider-connection-resolution";
 import { connectExternalRecordsIntegration } from "../external-records/connection";
 import { resolveExternalRecordsAccessToken } from "../external-records/oauth";

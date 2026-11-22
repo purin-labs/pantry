@@ -16,7 +16,7 @@ import {
   resolveActiveProviderAccountContext,
   resolveIntegrationAccount,
   resolveProviderConnection,
-} from "../../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { validateNativeRequestAuthority } from "../../request-authority";
 import { readCurrentOrganisationPolicySnapshot } from "../../policy-snapshot";

@@ -18,7 +18,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import { parseSlackUserId, type SlackUserId } from "./events";
-import { resolveConfiguredSlackInstallationIdentity } from "./installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { resolveOrClaimSlackThreadRoute } from "./organisation-routing";
 import { SLACK_SIDE_CASE_START_ACTION } from "./side-cases";
 import {

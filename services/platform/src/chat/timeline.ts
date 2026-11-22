@@ -21,7 +21,7 @@ import {
 import type { JsonRecord } from "../control/http";
 import type { Result } from "@purin-labs/kernel/result";
 import type { ConnectorCardTarget as ConversationCardTarget } from "./conversation";
-import { parseCustomConnectorId } from "../custom-connectors/identity";
+import { parseCustomConnectorId } from "@purin-labs/connections/custom-connectors/identity";
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import {
   type ChatApproval,

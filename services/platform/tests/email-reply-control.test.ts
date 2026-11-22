@@ -15,7 +15,7 @@ import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,
   type ConnectedIntegrationSeed,
-} from "../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type { IntegrationAccountId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
@@ -29,7 +29,7 @@ import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 import { defaultDenyPolicy } from "../src/policy-snapshot";
 import { createAccessGrant } from "../src/data/access-grants";
 import { CAPABILITY_KEYS } from "../src/authorization/capability-catalogue";
-import { GMAIL_FULL_MAILBOX_SCOPES } from "../src/mail/gmail-authorization";
+import { GMAIL_FULL_MAILBOX_SCOPES } from "@purin-labs/connections/mail/gmail-authorization";
 
 const NOW = 1_784_016_325_277;
 const ORIGIN = "https://pantry.example";

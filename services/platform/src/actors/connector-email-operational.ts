@@ -6,7 +6,7 @@ import {
 } from "../mail-inbox/execution";
 import type { SessionTurnExecution } from "../chat/turn-access";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { gmailMailAdapter } from "../mail/gmail-mail-adapter";
+import { gmailMailAdapter } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import type { SqlStorage, SqlStorageValue } from "@cloudflare/workers-types";
 
 import {
@@ -16,7 +16,7 @@ import {
 import {
   connectionCredentialAuthority,
   resolveActiveProviderAccountContext,
-} from "../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import {
   resolveEmailSenderAccount,
   parseEmailProposalTarget,
@@ -26,13 +26,13 @@ import {
   resolveEmailProposalRecipient,
   validEmailSelfTestContent,
 } from "../data/email-self-test";
-import { dispatchRfcMessageId } from "../mail/reply-target";
+import { dispatchRfcMessageId } from "@purin-labs/connections/mail/reply-target";
 import {
   buildOperationalEmailRaw,
   normalizeOperationalBody,
   normalizeOperationalSubject,
-} from "../mail/operational-message";
-import type { GmailApiError } from "../mail/gmail-adapter";
+} from "@purin-labs/connections/mail/operational-message";
+import type { GmailApiError } from "@purin-labs/connections/mail/gmail-adapter";
 import { resolveGmailAccessToken } from "../mail/gmail-oauth";
 import type { Env } from "@purin-labs/kernel/env";
 import {

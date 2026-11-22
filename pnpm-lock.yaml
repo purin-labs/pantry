@@ -242,6 +242,34 @@ importers:
         specifier: 0.18.0-ts7.1.0-dev.20260929
         version: 0.18.0-ts7.1.0-dev.20260929
 
+  foundation/connections:
+    dependencies:
+      '@purin-labs/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../packages/control-api
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../packages/std
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../tenancy
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../packages/type-utils
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
+
   foundation/kernel:
     dependencies:
       '@purin-labs/std':
@@ -858,6 +886,9 @@ importers:
       '@purin-labs/commerce-query-sqlite':
         specifier: workspace:*
         version: link:../../packages/commerce-query-sqlite
+      '@purin-labs/connections':
+        specifier: workspace:*
+        version: link:../../foundation/connections
       '@purin-labs/contract-schema':
         specifier: workspace:*
         version: link:../../packages/contract-schema

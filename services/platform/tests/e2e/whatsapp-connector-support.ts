@@ -17,7 +17,7 @@ import {
 import { createWhatsAppContentCipher } from "../../src/actors/whatsapp-active-content";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import {
   assignWhatsAppSupportAgent,
   openWhatsAppCaseConversationWindow,
@@ -38,7 +38,7 @@ import {
   parseWhatsAppBusinessAccountId,
   parseWhatsAppCustomerId,
   parseWhatsAppPhoneNumberId,
-} from "../../src/whatsapp/identifiers";
+} from "@purin-labs/connections/whatsapp/identifiers";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { fixtureDatabase } from "./organisation-database";
 import {

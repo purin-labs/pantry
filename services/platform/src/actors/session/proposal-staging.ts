@@ -1,5 +1,5 @@
 import type { SessionToolContext } from "../../agent-tools/context";
-import { resolveCurrentOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
+import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
   listOrganisationMembers,
   parseControlRole,

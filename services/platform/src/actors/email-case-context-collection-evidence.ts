@@ -38,11 +38,11 @@ import {
 } from "../policy/information-flow";
 import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
-import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
+import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import {
   extractMailbox,
   type GmailMessageContent,
-} from "../mail/gmail-adapter";
+} from "@purin-labs/connections/mail/gmail-adapter";
 import { resolveConnectorGmailAccess } from "./connector-email-evaluation";
 import type { Variant } from "@purin-labs/type-utils";
 

@@ -115,7 +115,7 @@ import { workflowChanges } from "./kitchen/contract/workflow-changes";
 import { applyApprovedWorkflowChange } from "./commerce/bakery/workflow-proposals";
 import { deviceCommands } from "./devices/contract/device-commands";
 import { runDeviceCommand } from "./devices/commands";
-import { connectionFlowParts } from "./data/connection-flow-parts";
+import { connectionFlowParts } from "@purin-labs/connections/data/connection-flow-parts";
 import { prepareCredentialRefReplacement } from "./credential-vault/service";
 import { prepareCommunicationDestinationAccount } from "./data/onboarding";
 import {

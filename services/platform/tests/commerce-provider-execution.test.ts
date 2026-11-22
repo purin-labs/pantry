@@ -27,11 +27,16 @@ const commerceSystemMocks = vi.hoisted(() => ({
   resolveOrganisationCommerceSystemAuthority: vi.fn(),
 }));
 
-vi.mock("../src/data/integration-account", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/integration-account")>()),
-  resolveActiveProviderAccountContext:
-    accountMocks.resolveActiveProviderAccountContext,
-}));
+vi.mock(
+  "@purin-labs/connections/data/integration-account",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/connections/data/integration-account")
+    >()),
+    resolveActiveProviderAccountContext:
+      accountMocks.resolveActiveProviderAccountContext,
+  }),
+);
 vi.mock("../src/shopify/action-execution", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../src/shopify/action-execution")>()),
   reconcileShopifyOrderCancellation:
@@ -41,7 +46,7 @@ vi.mock("../src/shopify/action-execution", async (importOriginal) => ({
     shopifyMocks.resolveShopifyWriteCredentialForAction,
   executeShopifyAction: shopifyMocks.executeShopifyAction,
 }));
-vi.mock("../src/data/commerce-merchant-binding", () => ({
+vi.mock("@purin-labs/connections/data/commerce-merchant-binding", () => ({
   resolveCommerceMerchantBinding:
     commerceEngineMocks.resolveCommerceMerchantBinding,
 }));
@@ -58,13 +63,16 @@ vi.mock("../src/commerce/provider", async (importOriginal) => ({
   adjustOfferPriceThroughCommerce:
     commerceEngineMocks.adjustOfferPriceThroughCommerce,
 }));
-vi.mock("../src/data/organisation-commerce-system", async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import("../src/data/organisation-commerce-system")
-  >()),
-  resolveOrganisationCommerceSystemAuthority:
-    commerceSystemMocks.resolveOrganisationCommerceSystemAuthority,
-}));
+vi.mock(
+  "@purin-labs/connections/data/organisation-commerce-system",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/connections/data/organisation-commerce-system")
+    >()),
+    resolveOrganisationCommerceSystemAuthority:
+      commerceSystemMocks.resolveOrganisationCommerceSystemAuthority,
+  }),
+);
 
 import {
   executeCommerceProviderAction,
@@ -78,7 +86,7 @@ import {
   parseApprovalProofDigest,
   type ApprovalEvidence,
 } from "../src/approval-authentication";
-import { parseCommerceSystemRevision } from "../src/data/organisation-commerce-system";
+import { parseCommerceSystemRevision } from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   parseCaseId,
   parseControlSessionId,

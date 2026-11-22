@@ -16,15 +16,15 @@ import { resolveUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   listIntegrationAccounts,
   type IntegrationAccount,
-} from "../../data/integration-account";
-import { listProviderResourcePage } from "../../data/provider-resource";
+} from "@purin-labs/connections/data/integration-account";
+import { listProviderResourcePage } from "@purin-labs/connections/data/provider-resource";
 import {
   activateTerminalAssignment,
   readActiveTerminalAssignment,
   retireTerminalAssignment,
 } from "../../data/terminal-assignment-store";
 import { readTerminalOperations } from "../../data/terminal-operations-readback";
-import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
+import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
   parseIntegrationAccountId,
   type OrganisationId,

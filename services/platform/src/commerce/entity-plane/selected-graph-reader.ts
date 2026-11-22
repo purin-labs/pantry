@@ -1,6 +1,6 @@
 // The commerce graph reader of the selected commerce system. The provider of
 // the system says which sources the reader uses (Refactor 17, step A2.5).
-import type { CommerceSystem } from "../../data/organisation-commerce-system";
+import type { CommerceSystem } from "@purin-labs/connections/data/organisation-commerce-system";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { commerceProvider } from "../commerce-providers";
 import {

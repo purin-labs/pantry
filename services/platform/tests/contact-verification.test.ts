@@ -33,10 +33,10 @@ import {
 import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,
-} from "../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import { removeIntegrationAccount } from "../src/data/account-removal";
 import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
-import { bindCommerceMerchant } from "../src/data/commerce-merchant-binding";
+import { bindCommerceMerchant } from "@purin-labs/connections/data/commerce-merchant-binding";
 import { handleContactVerification } from "../src/control/routes/contact-verification";
 import {
   recordCaseContextCollectionSuggestion,

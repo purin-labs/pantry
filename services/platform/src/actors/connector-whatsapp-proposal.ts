@@ -16,7 +16,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { resolveWhatsAppOrganisationCredential } from "../whatsapp/credential";
-import { sendWhatsAppText } from "../whatsapp/graph";
+import { sendWhatsAppText } from "@purin-labs/connections/whatsapp/graph";
 import {
   appendWhatsAppEnvelopeEntry,
   claimWhatsAppProposalForSend,

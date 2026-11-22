@@ -28,7 +28,7 @@ import { prepareActivationProjectionBump } from "@purin-labs/tenancy/data/organi
 import {
   prepareFirstActiveAccountDefaults,
   preparePendingAccountsActivation,
-} from "./integration-account-writes";
+} from "@purin-labs/connections/data/integration-account-writes";
 import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import {
   prepareControlMutationReceipt,

@@ -19,7 +19,7 @@ import {
   type ProductDescriptionRoomMetadata,
 } from "@purin-labs/product-description-crdt/protocol";
 import { listOrganisationMembers, resolveUser } from "@purin-labs/tenancy/data/control-plane";
-import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import { controlError } from "../control/http";
 import type { Env } from "@purin-labs/kernel/env";

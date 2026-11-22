@@ -1,5 +1,5 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { GMAIL_MAILBOX } from "../../mail/gmail-mail-adapter";
+import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import {
   authorizeMailSource,
   mailboxAwaitsReconnect,
@@ -14,7 +14,7 @@ import {
   type MailOrganizationView,
   parseMailOrganizationView,
 } from "@purin-labs/control-api";
-import { listIntegrationAccounts } from "../../data/integration-account";
+import { listIntegrationAccounts } from "@purin-labs/connections/data/integration-account";
 import { resolveConnectorGmailAccess } from "../../actors/connector-email-evaluation";
 import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";

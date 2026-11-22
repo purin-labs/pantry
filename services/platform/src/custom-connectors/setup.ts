@@ -38,7 +38,7 @@ import {
   type CustomConnectorId,
   type CustomConnectorRevision,
   type CustomConnectorSetupAttemptId,
-} from "./identity";
+} from "@purin-labs/connections/custom-connectors/identity";
 import { resolveCustomConnectorRevision } from "./revisions";
 import {
   customConnectorSetupLifecycleAllows,

@@ -22,7 +22,7 @@ import {
 } from "../../src/context/files";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
 import { createAccessGrant } from "../../src/data/access-grants";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import { createOrganisationInstall } from "@purin-labs/tenancy/data/organisation";
 import {
   issueControlSession,

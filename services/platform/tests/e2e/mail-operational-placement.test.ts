@@ -24,7 +24,7 @@ import {
 import { resumeActorRelocation } from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { reconcileActorRelocationMailReceipt } from "../../src/actors/actor-relocation-mail";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import {
   registerEmailSenderAccount,
   registerOperationalEmailContact,
@@ -36,7 +36,7 @@ import {
   EMAIL_SELF_TEST_BODY,
   registerEmailSelfTest,
 } from "../../src/data/email-self-test";
-import { GMAIL_SEND_ONLY_SCOPES } from "../../src/mail/gmail-authorization";
+import { GMAIL_SEND_ONLY_SCOPES } from "@purin-labs/connections/mail/gmail-authorization";
 import {
   CAPABILITY_KEYS,
   capabilityDefinitionById,

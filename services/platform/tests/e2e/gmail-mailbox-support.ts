@@ -19,9 +19,9 @@ import { storeVaultSecret } from "../../src/credential-vault";
 import { parseVaultHandle } from "../../src/credential-vault/domain";
 import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";
 import { gmailConnectorId } from "../../src/mail-inbox/contract/connector-ids";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
-import { persistProviderResourceSnapshot } from "../../src/data/provider-resource";
-import { GMAIL_FULL_MAILBOX_SCOPES } from "../../src/mail/gmail-authorization";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
+import { persistProviderResourceSnapshot } from "@purin-labs/connections/data/provider-resource";
+import { GMAIL_FULL_MAILBOX_SCOPES } from "@purin-labs/connections/mail/gmail-authorization";
 import {
   parseIntegrationAccountId,
   type IntegrationAccountId,

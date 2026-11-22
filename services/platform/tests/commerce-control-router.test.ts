@@ -61,8 +61,8 @@ vi.mock("@purin-labs/tenancy/data/control-plane", async (importOriginal) => ({
   readActiveOrganisationMembershipRevision:
     controlMocks.readActiveOrganisationMembershipRevision,
 }));
-vi.mock("../src/data/integration-account", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/integration-account")>()),
+vi.mock("@purin-labs/connections/data/integration-account", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/connections/data/integration-account")>()),
   listIntegrationAccounts: accountMocks.listIntegrationAccounts,
 }));
 vi.mock("../src/projects/case-project", () => ({
@@ -85,9 +85,9 @@ vi.mock("@purin-labs/actor-runtime/actors/actor-router", async (importOriginal) 
   resolveActiveCaseActor: actorMocks.resolveActiveCaseActorAtPlacement,
   resolveActiveConnectorActorAtPlacement: actorMocks.resolveActiveConnectorActorAtPlacement,
 }));
-vi.mock("../src/data/organisation-commerce-system", async (importOriginal) => ({
+vi.mock("@purin-labs/connections/data/organisation-commerce-system", async (importOriginal) => ({
   ...(await importOriginal<
-    typeof import("../src/data/organisation-commerce-system")
+    typeof import("@purin-labs/connections/data/organisation-commerce-system")
   >()),
   resolveOrganisationCommerceSystem: commerceSystemMocks.resolveOrganisationCommerceSystem,
   resolveOrganisationCommerceSystemAuthority:

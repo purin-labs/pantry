@@ -9,7 +9,7 @@ import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   createConnectedIntegration,
   finalizeConnectedIntegrationAccount,
-} from "../../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import {
   assignWhatsAppSupportAgent,
   openWhatsAppCaseConversationWindow,
@@ -31,7 +31,7 @@ import {
   parseWhatsAppBusinessAccountId,
   parseWhatsAppCustomerId,
   parseWhatsAppPhoneNumberId,
-} from "../../src/whatsapp/identifiers";
+} from "@purin-labs/connections/whatsapp/identifiers";
 import { organisationBootstrapMutation } from "../control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "../fixtures/organisation-placement";
 import { d1Database } from "../sqlite-d1";

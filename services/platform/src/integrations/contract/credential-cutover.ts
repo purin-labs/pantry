@@ -11,7 +11,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../policy-snapshot";
 import type { Result } from "@purin-labs/kernel/result";
-import { prepareSupersededGenerationsRevocation } from "../../data/provider-credential-generation";
+import { prepareSupersededGenerationsRevocation } from "@purin-labs/connections/data/provider-credential-generation";
 import { prepareSupersededGenerationSecretsRevocation } from "../../credential-vault/secret-revocation";
 
 export type ProviderCredentialCutoverError = {

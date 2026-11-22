@@ -11,7 +11,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import {
   resolveOrganisationCommerceSystemAuthority,
   type CommerceSystemRevision,
-} from "./organisation-commerce-system";
+} from "@purin-labs/connections/data/organisation-commerce-system";
 import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
 

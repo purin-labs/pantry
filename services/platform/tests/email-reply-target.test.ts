@@ -9,8 +9,8 @@ import {
   dispatchRfcMessageId,
   proposalRfcMessageId,
   type GmailReplyTarget,
-} from "../src/mail/reply-target";
-import type { GmailMessageHeaders } from "../src/mail/gmail-adapter";
+} from "@purin-labs/connections/mail/reply-target";
+import type { GmailMessageHeaders } from "@purin-labs/connections/mail/gmail-adapter";
 
 const NOW = 1_784_016_325_277;
 

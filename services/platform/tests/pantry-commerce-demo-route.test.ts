@@ -50,22 +50,22 @@ vi.mock("@purin-labs/tenancy/data/control-mutation", async (importOriginal) => (
   prepareControlMutationReceipt: mutationMocks.prepareControlMutationReceipt,
   readControlMutationReplay: mutationMocks.readControlMutationReplay,
 }));
-vi.mock("../src/data/commerce-merchant-binding", async (importOriginal) => ({
+vi.mock("@purin-labs/connections/data/commerce-merchant-binding", async (importOriginal) => ({
   ...(await importOriginal<
-    typeof import("../src/data/commerce-merchant-binding")
+    typeof import("@purin-labs/connections/data/commerce-merchant-binding")
   >()),
   resolveOrganisationCommerceMerchantBinding:
     bindingMocks.resolveOrganisationCommerceMerchantBinding,
 }));
-vi.mock("../src/data/organisation-commerce-system", async (importOriginal) => ({
+vi.mock("@purin-labs/connections/data/organisation-commerce-system", async (importOriginal) => ({
   ...(await importOriginal<
-    typeof import("../src/data/organisation-commerce-system")
+    typeof import("@purin-labs/connections/data/organisation-commerce-system")
   >()),
   resolveOrganisationCommerceSystem: commerceSystemMocks.resolveOrganisationCommerceSystem,
   selectOrganisationCommerceSystem: commerceSystemMocks.selectOrganisationCommerceSystem,
 }));
-vi.mock("../src/data/integration-account", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/integration-account")>()),
+vi.mock("@purin-labs/connections/data/integration-account", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/connections/data/integration-account")>()),
   listIntegrationAccounts: integrationAccountMocks.listIntegrationAccounts,
 }));
 

@@ -1,5 +1,5 @@
 import { resolveProviderManifestCredential } from "../../credential-vault";
-import type { ProviderManifestEvidence } from "../../data/provider-attempt";
+import type { ProviderManifestEvidence } from "@purin-labs/connections/data/provider-attempt";
 import type { ProviderObservationRequest } from "./provider-adapter";
 
 /**

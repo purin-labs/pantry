@@ -10,11 +10,11 @@ import type {
   IntegrationAccountId,
   OrganisationId,
 } from "@purin-labs/kernel/ids";
-import type { ActiveIntegrationProvider } from "../../data/integration-provider-directory";
+import type { ActiveIntegrationProvider } from "@purin-labs/connections/data/integration-provider-directory";
 import type {
   ProvisioningProviderConnectionAttempt,
   ProviderManifestEvidence,
-} from "../../data/provider-attempt";
+} from "@purin-labs/connections/data/provider-attempt";
 import type {
   CompleteProviderInput,
   ProviderCompletion,
@@ -24,13 +24,13 @@ import type {
 import type { Result } from "@purin-labs/kernel/result";
 import type { ActiveCapabilityId } from "../../authorization/capability-catalogue";
 import type { IntegrationDiscoveryDataClass } from "@purin-labs/contracts";
-import type { GmailAuthorizationProduct } from "../../mail/gmail-authorization";
+import type { GmailAuthorizationProduct } from "@purin-labs/connections/mail/gmail-authorization";
 import type { Variant } from "@purin-labs/type-utils";
 import type { SquareApplication } from "../../provider-adapters/square";
 import type {
   MailIntegrationProvider,
   MailProviderAdapter,
-} from "../../mail/provider-adapter";
+} from "@purin-labs/connections/mail/provider-adapter";
 
 type ProviderCleanupBase<P extends ActiveIntegrationProvider> = {
   readonly cleanupId: string;

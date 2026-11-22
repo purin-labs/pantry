@@ -13,7 +13,7 @@ import {
   reconcileFrozenMailReceipt,
   type RelocationMailReceiptRequest,
 } from "../actor-relocation-mail";
-import { GMAIL_MAILBOX } from "../../mail/gmail-mail-adapter";
+import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import {
   fetchSessionConnectorMail,
   isSessionMailExecutionActive,
@@ -49,7 +49,7 @@ import { readAgentMailboxBinding } from "../../data/email-mailbox";
 import {
   connectionCredentialAuthority,
   resolveActiveProviderAccountContext,
-} from "../../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   actorExecutionAdmissionOpen,

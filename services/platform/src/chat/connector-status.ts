@@ -1,5 +1,5 @@
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { parseCustomConnectorSetupAttemptId } from "../custom-connectors/identity";
+import { parseCustomConnectorSetupAttemptId } from "@purin-labs/connections/custom-connectors/identity";
 import { resolveCustomConnectorSetupAttempt } from "../custom-connectors/setup";
 import { listCustomConnectorSummaries } from "../custom-connectors/projection";
 import type { ConversationScope } from "./store";

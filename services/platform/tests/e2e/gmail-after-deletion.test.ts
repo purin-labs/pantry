@@ -6,7 +6,7 @@ import { isRecord } from "@purin-labs/std";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
 import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";
 import { registerEmailSenderAccount } from "../../src/data/email-operational";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceClient, commerceWorkspace } from "./commerce-support";
 import { network } from "./network";

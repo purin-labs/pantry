@@ -10,7 +10,7 @@ import {
   caseContextDiscoveryRoute,
   type CaseContextDiscoveryPolicy,
 } from "../case-context-discovery/policy";
-import { listIntegrationAccounts } from "../data/integration-account";
+import { listIntegrationAccounts } from "@purin-labs/connections/data/integration-account";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {

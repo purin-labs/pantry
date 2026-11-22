@@ -18,7 +18,7 @@ import {
   resolveInstallOrganisation,
   type OrganisationInstallSeed,
 } from "@purin-labs/tenancy/data/organisation";
-import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import {

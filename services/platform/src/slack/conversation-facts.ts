@@ -16,7 +16,7 @@ import {
 } from "../policy/information-flow";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { resolveActiveSlackPhysicalInstallationCredential } from "../credential-vault/surface-installation-resolution";
-import { resolveConfiguredSlackInstallationIdentity } from "./installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import type { SlackConversationFact } from "./surface-parts";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { isRecord } from "@purin-labs/std";

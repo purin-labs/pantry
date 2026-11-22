@@ -8,7 +8,7 @@ import {
 import {
   parseCommerceSystemRevision,
   type CommerceSystemRevision,
-} from "./organisation-commerce-system";
+} from "@purin-labs/connections/data/organisation-commerce-system";
 import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 
 type FirstTaskSourceRow = {

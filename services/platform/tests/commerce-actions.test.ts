@@ -42,7 +42,7 @@ import {
   parseOrganisationId,
 } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { parseCommerceSystemRevision } from "../src/data/organisation-commerce-system";
+import { parseCommerceSystemRevision } from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   fixtureFlowBinding,
   fixtureProviderActionAuthority,

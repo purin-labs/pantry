@@ -23,8 +23,8 @@ import { sameCommerceRelationshipRef } from "@purin-labs/commerce-contracts/comm
 import type { AccessGrantTarget } from "../../authorization/access-grants/types";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import type { AgentResponsibilityScope } from "../../data/agent-operations";
-import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
-import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
+import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import { readOrganisationEnvironment } from "../../control/organisation-runtime";
 import type { Env } from "@purin-labs/kernel/env";
 import type { IntegrationAccountId, OrganisationId } from "@purin-labs/kernel/ids";

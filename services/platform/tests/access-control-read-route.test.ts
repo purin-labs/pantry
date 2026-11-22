@@ -45,19 +45,27 @@ vi.mock("../src/data/capability-policy", async (importOriginal) => ({
   readOrganisationCapabilityPolicies:
     policyMocks.readOrganisationCapabilityPolicies,
 }));
-vi.mock("../src/data/integration-account", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/integration-account")>()),
-  listIntegrationAccounts: integrationMocks.listIntegrationAccounts,
-}));
-vi.mock("../src/data/organisation-commerce-system", async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import("../src/data/organisation-commerce-system")
-  >()),
-  resolveOrganisationCommerceSystem:
-    commerceMocks.resolveOrganisationCommerceSystem,
-  resolveOrganisationCommerceSystemAuthority:
-    commerceMocks.resolveOrganisationCommerceSystemAuthority,
-}));
+vi.mock(
+  "@purin-labs/connections/data/integration-account",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/connections/data/integration-account")
+    >()),
+    listIntegrationAccounts: integrationMocks.listIntegrationAccounts,
+  }),
+);
+vi.mock(
+  "@purin-labs/connections/data/organisation-commerce-system",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/connections/data/organisation-commerce-system")
+    >()),
+    resolveOrganisationCommerceSystem:
+      commerceMocks.resolveOrganisationCommerceSystem,
+    resolveOrganisationCommerceSystemAuthority:
+      commerceMocks.resolveOrganisationCommerceSystemAuthority,
+  }),
+);
 vi.mock("../src/policy/information-flow", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../src/policy/information-flow")>()),
   createCurrentSourceFlowLabel: flowMocks.createCurrentSourceFlowLabel,

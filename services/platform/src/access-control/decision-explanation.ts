@@ -25,9 +25,9 @@ import type { ActiveOrganisationMembership } from "@purin-labs/tenancy/data/cont
 import {
   resolveActiveProviderAccountContext,
   resolveIntegrationAccount,
-} from "../data/integration-account";
-import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
-import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-binding";
+} from "@purin-labs/connections/data/integration-account";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
+import { resolveCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseConnectorId,
@@ -70,7 +70,7 @@ import { assertNever, isPositiveInteger } from "@purin-labs/std";
 import type {
   CustomConnectorId,
   CustomConnectorRevision,
-} from "../custom-connectors/identity";
+} from "@purin-labs/connections/custom-connectors/identity";
 
 const SUBJECT_RESOLUTION_LIMIT = 1_000;
 

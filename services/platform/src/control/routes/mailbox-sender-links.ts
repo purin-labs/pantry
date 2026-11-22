@@ -10,7 +10,7 @@ import {
 
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { readEmailMailboxAccount } from "../../data/email-mailbox";
-import { resolveActiveProviderAccountContext } from "../../data/integration-account";
+import { resolveActiveProviderAccountContext } from "@purin-labs/connections/data/integration-account";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseIntegrationAccountId,

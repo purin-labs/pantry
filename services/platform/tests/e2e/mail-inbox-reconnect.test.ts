@@ -2,7 +2,7 @@ import { exports } from "cloudflare:workers";
 import { HttpResponse, http } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
-import { GMAIL_FULL_MAILBOX_SCOPES } from "../../src/mail/gmail-authorization";
+import { GMAIL_FULL_MAILBOX_SCOPES } from "@purin-labs/connections/mail/gmail-authorization";
 import type {
   IntegrationAccountId,
   OrganisationId,

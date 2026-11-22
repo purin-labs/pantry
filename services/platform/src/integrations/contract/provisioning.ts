@@ -10,7 +10,7 @@ import {
   type ProvisioningProviderConnectionAttempt,
   type ProviderFailureEvidence,
   type ProviderManifestEvidence,
-} from "../../data/provider-attempt";
+} from "@purin-labs/connections/data/provider-attempt";
 import {
   finalizeConnectedIntegrationAccount,
   integrationAccountAllowsCredentialMutation,
@@ -19,7 +19,7 @@ import {
   resolveIntegrationAccount,
   resolveProviderConnection,
   type createConnectedIntegration,
-} from "../../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type { Env } from "@purin-labs/kernel/env";
 import type {
   ProviderConnectionId,

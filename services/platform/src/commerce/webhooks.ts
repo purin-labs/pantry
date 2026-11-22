@@ -9,7 +9,7 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { CommerceAdminClient } from "@purin-labs/commerce-client";
 import { decodeBase64, encodeBase64, isRecord } from "@purin-labs/std";
 
-import type { CommerceMerchantBinding } from "../data/commerce-merchant-binding";
+import type { CommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   errorResponse,

@@ -36,7 +36,7 @@ import {
   type ActiveProviderAccountContext,
   type IntegrationProvider,
   type LiveProviderWebhookContext,
-} from "../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type { OrganisationInstallRecord } from "@purin-labs/tenancy/data/organisation";
 import {
   parseCaseId,

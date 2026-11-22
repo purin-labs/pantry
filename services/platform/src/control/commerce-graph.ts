@@ -13,8 +13,8 @@ import { CommerceEngineSource } from "../commerce/entity-plane/commerce-source";
 import {
   resolveOrganisationCommerceSystem,
   type CommerceSystemError,
-} from "../data/organisation-commerce-system";
-import { resolveOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";
+} from "@purin-labs/connections/data/organisation-commerce-system";
+import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";

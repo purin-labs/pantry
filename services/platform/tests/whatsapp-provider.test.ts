@@ -7,7 +7,7 @@ import {
 import {
   resolveWhatsAppApplicationConfiguration,
   resolveWhatsAppEmbeddedSignupCredential,
-} from "../src/whatsapp/application";
+} from "@purin-labs/connections/whatsapp/application";
 import {
   exchangeWhatsAppSignupCode,
   listWhatsAppPhoneNumbers,
@@ -15,8 +15,8 @@ import {
   subscribeWhatsAppApp,
   unsubscribeWhatsAppApp,
   WHATSAPP_GRAPH_API_VERSION,
-} from "../src/whatsapp/graph";
-import { parseWhatsAppBusinessAccountId } from "../src/whatsapp/identifiers";
+} from "@purin-labs/connections/whatsapp/graph";
+import { parseWhatsAppBusinessAccountId } from "@purin-labs/connections/whatsapp/identifiers";
 import { createFakeGraph } from "./whatsapp/fake-graph";
 import {
   FIXTURE_CUSTOMER_WA_ID,

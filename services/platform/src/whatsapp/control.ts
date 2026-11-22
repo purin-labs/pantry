@@ -48,9 +48,9 @@ import {
   whatsappSupportReadPermission,
 } from "./read-authorization";
 import { parseIntegrationAccountId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
-import { resolveWhatsAppApplicationConfiguration } from "./application";
+import { resolveWhatsAppApplicationConfiguration } from "@purin-labs/connections/whatsapp/application";
 import { resolveWhatsAppOrganisationCredential } from "./credential";
-import { unsubscribeWhatsAppApp } from "./graph";
+import { unsubscribeWhatsAppApp } from "@purin-labs/connections/whatsapp/graph";
 import type { Variant } from "@purin-labs/type-utils";
 import { hasExactKeys, isPositiveInteger, isRecord } from "@purin-labs/std";
 

@@ -9,7 +9,7 @@ import {
   requireConnectionCredentialAuthority,
   upsertProviderWebhook,
   type ActiveIntegrationAccount,
-} from "../../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import {
   newControlMutationIdentity,
   type ControlMutationReceiptScope,

@@ -19,8 +19,8 @@ import type { Env } from "@purin-labs/kernel/env";
 import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { listAccessGrants } from "../data/access-grants";
 import { selectActiveGrants } from "../authorization/access-grants/compiler";
-import { resolveCurrentOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";
-import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
+import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import { commerceGraphReads } from "../commerce/contract/graph-reads";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
@@ -28,7 +28,7 @@ import {
   validateLiveAutomationAuthority,
   validateNativeRequestAuthority,
 } from "../request-authority";
-import { extractMailbox, type GmailMessageContent } from "../mail/gmail-adapter";
+import { extractMailbox, type GmailMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,

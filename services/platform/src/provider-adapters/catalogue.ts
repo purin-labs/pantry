@@ -7,7 +7,7 @@ import {
   gmailConfigurationIsValidForProduct,
   gmailOnboardingAdapter,
 } from "./gmail";
-import { gmailMailAdapter } from "../mail/gmail-mail-adapter";
+import { gmailMailAdapter } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import { notionCleanupAdapter, notionOnboardingAdapter } from "./notion";
 import { slackCleanupAdapter, slackOnboardingAdapter } from "./slack";
 import {
@@ -30,7 +30,7 @@ import {
   readWhatsAppCleanupContext,
   type ProviderCleanupBaseInput,
 } from "../provider-workflows/cleanup-context";
-import type { ProviderManifestEvidence } from "../data/provider-attempt";
+import type { ProviderManifestEvidence } from "@purin-labs/connections/data/provider-attempt";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import type { VaultHandle } from "../credential-vault";
 import { connectExternalRecordsOAuth } from "../provider-workflows/external-records-connection";
@@ -54,7 +54,7 @@ import {
 } from "../provider-workflows/square-connection";
 import { connectStripe } from "../provider-workflows/stripe-connection";
 import { connectWhatsApp } from "../provider-workflows/whatsapp-connection";
-import type { ProvisioningProviderConnectionAttempt } from "../data/provider-attempt";
+import type { ProvisioningProviderConnectionAttempt } from "@purin-labs/connections/data/provider-attempt";
 import type {
   CompleteProviderInput,
   ProviderCompletion,
@@ -80,7 +80,7 @@ import { providerModules } from "../integrations/contract/provider-modules";
 import {
   PROVIDER_DATA_CLASSES,
   type ActiveIntegrationProvider,
-} from "../data/integration-provider-directory";
+} from "@purin-labs/connections/data/integration-provider-directory";
 import type { VariantBy } from "@purin-labs/type-utils";
 
 export const PROVIDER_ADAPTERS = {

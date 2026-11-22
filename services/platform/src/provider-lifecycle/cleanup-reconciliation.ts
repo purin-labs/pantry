@@ -30,7 +30,7 @@ import {
   parseProviderCleanup,
   removeProviderConnection,
 } from "../provider-adapters/catalogue";
-import { parseActiveIntegrationProvider } from "../data/integration-provider-directory";
+import { parseActiveIntegrationProvider } from "@purin-labs/connections/data/integration-provider-directory";
 import type {
   ProviderCleanupBindings,
   ProviderCleanup,
@@ -44,8 +44,8 @@ import {
   prepareCredentialRefRevocation,
   prepareVaultSecretRevocation,
 } from "../credential-vault/secret-revocation";
-import { prepareCleanedConnectionGenerationsRevocation } from "../data/provider-credential-generation";
-import { prepareCleanedConnectionRevocation } from "../data/provider-connection-writes";
+import { prepareCleanedConnectionGenerationsRevocation } from "@purin-labs/connections/data/provider-credential-generation";
+import { prepareCleanedConnectionRevocation } from "@purin-labs/connections/data/provider-connection-writes";
 
 type ProviderCleanupEnvironment = ProviderCleanupBindings &
   CredentialVaultBindings &

@@ -4,7 +4,7 @@ import {
   type MailMatch,
 } from "@purin-labs/control-api";
 import { assertNever, isRecord } from "@purin-labs/std";
-import { compareGmailHistoryIds } from "../mail/gmail-adapter";
+import { compareGmailHistoryIds } from "@purin-labs/connections/mail/gmail-adapter";
 import type { MailOrganizationHead } from "./types";
 import type { Variant } from "@purin-labs/type-utils";
 

@@ -7,7 +7,7 @@ import { buildControlAuthority } from "../request-authority";
 import { parseRequestId } from "@purin-labs/kernel/ids";
 import { processDirectCaseCommand } from "../actors/case-direct-processing";
 import { readOrganisationEnvironment } from "../control/organisation-runtime";
-import { resolveOrganisationCommerceMerchantBinding } from "./commerce-merchant-binding";
+import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
   responsibilityScopeCommerce,
   type PublishedResourceBoundaryError,

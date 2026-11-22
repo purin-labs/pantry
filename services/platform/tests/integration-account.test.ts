@@ -24,7 +24,7 @@ import {
   upsertProviderWebhook,
   type ConnectedIntegrationSeed,
   type IntegrationAccountMutation,
-} from "../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import {
   recordProviderStartFailure,
 } from "../src/organisation/contract/provider-support-references";

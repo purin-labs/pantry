@@ -28,7 +28,7 @@ import { hasExactKeys, isPositiveInteger, isRecord } from "@purin-labs/std";
 import type {
   CustomConnectorId,
   CustomConnectorRevision,
-} from "../../custom-connectors/identity";
+} from "@purin-labs/connections/custom-connectors/identity";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   IntegrationAccountId,

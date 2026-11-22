@@ -4,7 +4,7 @@ import {
   disableIntegrationAccount,
   listIntegrationAccounts,
   switchDefaultIntegrationAccount,
-} from "../../../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import {
   admitUserMutation,
   controlMutationIdentity,

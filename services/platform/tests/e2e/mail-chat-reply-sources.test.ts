@@ -29,7 +29,7 @@ import {
   readOrganisationCapabilityPolicies,
   writeOrganisationCapabilityPolicy,
 } from "../../src/data/capability-policy";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import {
   parseIntegrationAccountId,
   type IntegrationAccountId,

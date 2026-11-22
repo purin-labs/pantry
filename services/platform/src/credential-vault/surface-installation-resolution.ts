@@ -13,7 +13,7 @@ import {
   type WorkspaceId,
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import type { SlackInstallationIdentity } from "../slack/installation-identity";
+import type { SlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import type { VaultResolveError, VaultSecret } from "./domain";
 import { parseVaultHandle, type VaultHandle } from "./domain";
 import type { CredentialVaultBindings } from "./keyring";

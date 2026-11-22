@@ -17,7 +17,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import {
   parseWhatsAppCustomerId,
   parseWhatsAppPhoneNumberId,
-} from "../src/whatsapp/identifiers";
+} from "@purin-labs/connections/whatsapp/identifiers";
 
 /**
  * Typed identifiers for test fixtures. A fixture with an invalid identifier is

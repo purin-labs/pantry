@@ -3,9 +3,9 @@ import {
   finalizeConnectedIntegrationAccount,
   requireConnectionCredentialAuthority,
   upsertProviderWebhook,
-} from "../data/integration-account";
-import type { ProvisioningProviderConnectionAttempt } from "../data/provider-attempt";
-import { persistProviderResourceSnapshot } from "../data/provider-resource";
+} from "@purin-labs/connections/data/integration-account";
+import type { ProvisioningProviderConnectionAttempt } from "@purin-labs/connections/data/provider-attempt";
+import { persistProviderResourceSnapshot } from "@purin-labs/connections/data/provider-resource";
 import {
   discoverStripeAccount,
   exchangeStripeAuthorizationCode,
@@ -31,7 +31,7 @@ import {
   storeHeaderCredential,
   verifyExistingAccountIdentity,
 } from "../integrations/contract/provisioning";
-import { scopesAreComplete } from "../provider-adapters/authorization";
+import { scopesAreComplete } from "@purin-labs/connections/provider-adapters/authorization";
 import type { Result } from "@purin-labs/kernel/result";
 import { linkStripePaymentAccount } from "../commerce/contract/stripe-link";
 import { resolveCommerceMerchant } from "../commerce/contract/square-link";

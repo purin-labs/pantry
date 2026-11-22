@@ -4,7 +4,7 @@ import { expect } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
 import { storeVaultSecret } from "../../src/credential-vault";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {

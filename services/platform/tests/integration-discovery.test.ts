@@ -4,7 +4,7 @@ import type { IntegrationDiscoveryView } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 import { parseIntegrationDiscoveryView } from "../src/access-control/integration-discovery";
 import { PROVIDER_ADAPTERS } from "../src/provider-adapters/catalogue";
-import type { ActiveIntegrationProvider } from "../src/data/integration-provider-directory";
+import type { ActiveIntegrationProvider } from "@purin-labs/connections/data/integration-provider-directory";
 
 describe("agent integration discovery", function integrationDiscoverySuite() {
   it("accepts only the bounded redacted model projection", function parsesProjection() {

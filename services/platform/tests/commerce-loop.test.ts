@@ -29,7 +29,7 @@ import {
   buildCommerceLabDelivery,
 } from "../src/commerce/action-model";
 import { normalizeLabCommerceDelivery } from "../src/commerce/commerce-wasm";
-import { parseCommerceSystemRevision } from "../src/data/organisation-commerce-system";
+import { parseCommerceSystemRevision } from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   parseApprovalProofDigest,
   type ApprovalEvidence,

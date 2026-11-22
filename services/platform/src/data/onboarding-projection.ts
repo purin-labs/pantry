@@ -31,12 +31,12 @@ import {
   listIntegrationAccounts,
   type IntegrationAccount,
   type IntegrationAccountLifecycle,
-} from "./integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import { readFirstOperationalTask } from "./first-operational-task";
 import {
   parseConnectionProvider,
   type ConnectionProvider,
-} from "./provider-attempt";
+} from "@purin-labs/connections/data/provider-attempt";
 import {
   loadSetupSelection,
   parsePersistedCapabilityProfile,

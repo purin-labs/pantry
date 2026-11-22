@@ -33,7 +33,7 @@ import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-e
 import {
   parseWhatsAppCustomerId,
   parseWhatsAppMessageId,
-} from "../whatsapp/identifiers";
+} from "@purin-labs/connections/whatsapp/identifiers";
 import { admitWhatsAppSupportCase } from "./whatsapp-case-admission";
 import {
   composeWhatsAppHumanReply,

@@ -21,7 +21,7 @@ import {
   parseSlackUserId,
   type SlackUserId,
 } from "../slack/events";
-import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import {
   postSlackSideCaseMessage,
   readSlackPermalink,

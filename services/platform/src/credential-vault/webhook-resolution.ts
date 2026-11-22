@@ -2,7 +2,7 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   IntegrationProvider,
   LiveProviderWebhookContext,
-} from "../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import { recordCredentialAccessDenial } from "./alerts";

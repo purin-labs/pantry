@@ -45,7 +45,7 @@ import type { HarnessHistoryErasure } from "../src/actors/agent-session-harness-
 import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { ActorRegistryEntry } from "@purin-labs/actor-runtime/actors/actor-registry";
-import { createAuthorizingProviderAttempt } from "../src/data/provider-attempt";
+import { createAuthorizingProviderAttempt } from "@purin-labs/connections/data/provider-attempt";
 import {
   archiveOrganisation,
   type ArchivedOrganisation,

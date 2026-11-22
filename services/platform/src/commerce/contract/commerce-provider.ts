@@ -21,9 +21,9 @@ import type {
   ExecutingActionLedgerEntry,
 } from "../../actors/action-ledger";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import type { CommerceMerchantBinding } from "../../data/commerce-merchant-binding";
-import type { ActiveProviderAccountContext } from "../../data/integration-account";
-import type { CommerceSystem } from "../../data/organisation-commerce-system";
+import type { CommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
+import type { ActiveProviderAccountContext } from "@purin-labs/connections/data/integration-account";
+import type { CommerceSystem } from "@purin-labs/connections/data/organisation-commerce-system";
 import type { Env } from "@purin-labs/kernel/env";
 import type {
   IntegrationAccountId,

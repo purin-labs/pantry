@@ -74,7 +74,7 @@ import {
   parseMetaBusinessPortfolioId,
   parseWhatsAppBusinessAccountId,
   parseWhatsAppPhoneNumberId,
-} from "../src/whatsapp/identifiers";
+} from "@purin-labs/connections/whatsapp/identifiers";
 import { createFakeGraph } from "./whatsapp/fake-graph";
 import {
   WHATSAPP_TEST_NOW,

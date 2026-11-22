@@ -16,12 +16,12 @@ import type {
 
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { PendingCommerceCue } from "../actors/commerce-projection";
-import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-binding";
+import { resolveCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
   ensureCommerceWebhookSubscription,
   startCommerceWebhookRead,
 } from "./webhooks";
-import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   createCommerceEntityPlaneCueEvents,
   createCueQueueMessage,

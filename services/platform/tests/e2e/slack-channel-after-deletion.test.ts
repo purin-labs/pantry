@@ -11,7 +11,7 @@ import {
 } from "../../src/credential-vault";
 import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import { listAccessGrants } from "../../src/data/access-grants";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import {
   archiveOrganisation,
   deleteArchivedOrganisation,

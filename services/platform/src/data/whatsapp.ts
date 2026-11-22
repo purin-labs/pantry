@@ -35,7 +35,7 @@ import {
   type WhatsAppBusinessAccountId,
   type WhatsAppCustomerId,
   type WhatsAppPhoneNumberId,
-} from "../whatsapp/identifiers";
+} from "@purin-labs/connections/whatsapp/identifiers";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
 import { prepareSupportBindingContextGrant } from "./access-grants";
 import { parseVaultHandle, revokeCredential } from "../credential-vault";

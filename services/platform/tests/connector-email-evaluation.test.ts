@@ -21,11 +21,16 @@ vi.mock("../src/actors/email-case-admission", async (importOriginal) => ({
   admitEmailThreadCase: admissionMocks.admitEmailThreadCase,
 }));
 
-vi.mock("../src/data/integration-account", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/integration-account")>()),
-  resolveActiveProviderAccountContext:
-    credentialMocks.resolveActiveProviderAccountContext,
-}));
+vi.mock(
+  "@purin-labs/connections/data/integration-account",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/connections/data/integration-account")
+    >()),
+    resolveActiveProviderAccountContext:
+      credentialMocks.resolveActiveProviderAccountContext,
+  }),
+);
 vi.mock(
   "../src/credential-vault/provider-connection-resolution",
   async (importOriginal) => ({
@@ -69,7 +74,7 @@ import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,
   type ConnectedIntegrationSeed,
-} from "../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import {
   parseIntegrationAccountId,
   type IntegrationAccountId,

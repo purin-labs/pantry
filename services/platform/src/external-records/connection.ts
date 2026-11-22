@@ -3,7 +3,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import {
   createActiveConnectedIntegration,
   type ActiveIntegrationAccount,
-} from "../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
@@ -14,7 +14,7 @@ import {
   validateExternalProviderToken,
   type ExternalRecordsError,
   type ExternalRecordsProvider,
-} from "./records";
+} from "@purin-labs/connections/external-records/records";
 import type { Result } from "@purin-labs/kernel/result";
 
 type ExternalRecordsConnectionInput = Readonly<{

@@ -15,7 +15,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import type { Result } from "@purin-labs/kernel/result";
 import { readPlacementByEpoch } from "@purin-labs/tenancy/data/organisation-placement";
 import { selectOrganisationPlacementDatabase } from "@purin-labs/tenancy/organisation-execution-scope";
-import { dispatchRfcMessageId } from "../mail/reply-target";
+import { dispatchRfcMessageId } from "@purin-labs/connections/mail/reply-target";
 import {
   resolveFrozenReceiptActors,
   type ActorRelocationError,

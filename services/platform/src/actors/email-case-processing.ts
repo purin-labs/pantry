@@ -6,7 +6,7 @@ import {
   createMailboxTurnMemoryReader,
   readMailboxSupplierScope,
 } from "../mail-inbox/mailbox-turn-memory";
-import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
+import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import type { SqlStorage } from "@cloudflare/workers-types";
 
 import {
@@ -33,7 +33,7 @@ import {
   digestGmailReplyTarget,
   buildGmailReplyRaw,
   proposalRfcMessageId,
-} from "../mail/reply-target";
+} from "@purin-labs/connections/mail/reply-target";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";

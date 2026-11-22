@@ -3,7 +3,7 @@ import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { fetchConnectorMail, type MailConnectorContext } from "./execution";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
-import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
+import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import type {
   MailOrganizationView,
   MailClassification,
@@ -16,7 +16,7 @@ import {
   resolveConnectorGmailAccess,
   establishConnectorEmailWatch,
 } from "../actors/connector-email-evaluation";
-import type { GmailHistoryMessage } from "../mail/gmail-adapter";
+import type { GmailHistoryMessage } from "@purin-labs/connections/mail/gmail-adapter";
 import type { Env } from "@purin-labs/kernel/env";
 import { digestCanonical } from "../policy/information-flow/digest";
 import { authorizeMailSource } from "./contract/mail-source-authorization";

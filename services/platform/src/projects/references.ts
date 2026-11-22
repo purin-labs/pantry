@@ -1,7 +1,7 @@
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { listAccessGrants } from "../data/access-grants";
-import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
-import { resolveCurrentOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
+import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import { commerceGrantSelection } from "../authorization/access-grants/commerce-grant-selection";
 import { integrationResourceScopeForGrant } from "../policy/information-flow/source-labels";
 import {

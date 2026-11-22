@@ -3,7 +3,7 @@ import {
   exactScopeIsGranted,
   parseProviderOnlyStartContext,
   SHORT_PROVIDER_STATE_TTL_MS,
-} from "./authorization";
+} from "@purin-labs/connections/provider-adapters/authorization";
 import {
   providerHttpFailure,
   type ProviderCleanupAdapter,

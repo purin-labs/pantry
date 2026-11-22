@@ -13,7 +13,7 @@ import {
   issueControlSession,
   type IssuedControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import {
   newControlMutationIdentity,
   readControlMutationReplay,
@@ -39,7 +39,7 @@ import {
   parseMetaBusinessPortfolioId,
   parseWhatsAppBusinessAccountId,
   parseWhatsAppPhoneNumberId,
-} from "../../src/whatsapp/identifiers";
+} from "@purin-labs/connections/whatsapp/identifiers";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { resumeActorRelocation } from "@purin-labs/actor-runtime/actors/actor-relocation";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";

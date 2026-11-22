@@ -10,7 +10,7 @@ import {
   type WhatsAppCustomerId,
   type WhatsAppMessageId,
   type WhatsAppPhoneNumberId,
-} from "./identifiers";
+} from "@purin-labs/connections/whatsapp/identifiers";
 import { bytesToHex, isRecord } from "@purin-labs/std";
 
 /**

@@ -4,7 +4,7 @@ import {
   buildOperationalEmailRaw,
   normalizeOperationalBody,
   normalizeOperationalSubject,
-} from "../src/mail/operational-message";
+} from "@purin-labs/connections/mail/operational-message";
 
 describe("operational email message", () => {
   it("builds a deterministic single-recipient plain-text MIME message", () => {

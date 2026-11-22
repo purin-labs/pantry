@@ -8,7 +8,7 @@ import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { accessControlPath, enableCapability } from "./access-route-support";

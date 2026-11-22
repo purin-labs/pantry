@@ -12,7 +12,7 @@ import type {
   IntegrationAccountId,
   OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { configuredValue } from "../provider-adapters/authorization";
+import { configuredValue } from "@purin-labs/connections/provider-adapters/authorization";
 import {
   readDropboxAccount,
   refreshDropboxAccessToken,

@@ -13,10 +13,10 @@ import {
   createConnectedIntegration,
   finalizeConnectedIntegrationAccount,
   upsertSurfaceInstallation,
-} from "../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import { buildOnboardingProjection } from "../src/data/onboarding-projection";
-import { createAuthorizingProviderAttempt } from "../src/data/provider-attempt";
-import { persistProviderResourceSnapshot } from "../src/data/provider-resource";
+import { createAuthorizingProviderAttempt } from "@purin-labs/connections/data/provider-attempt";
+import { persistProviderResourceSnapshot } from "@purin-labs/connections/data/provider-resource";
 import { parseVaultHandle } from "../src/credential-vault";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";

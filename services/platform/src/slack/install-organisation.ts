@@ -27,7 +27,7 @@ import {
   type WorkspaceId,
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import type { SlackInstallationIdentity } from "./installation-identity";
+import type { SlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 
 type SlackInstallOrganisationResolution =
   | { readonly kind: "existing" }

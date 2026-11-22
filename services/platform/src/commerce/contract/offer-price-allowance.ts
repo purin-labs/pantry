@@ -5,7 +5,7 @@ import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import { createCommerceClient } from "./client";
 import { readOrganisationEnvironment } from "../../control/organisation-runtime";
-import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
+import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import { commerceProviderResourceId } from "./resource-ids";
 
 /**

@@ -1,6 +1,6 @@
 import { encodeBase64Url, isRecord, parseJsonOrNull } from "@purin-labs/std";
 import { jwtClaims } from "@purin-labs/kernel/lenient-base64";
-import { pkceChallenge } from "../provider-adapters/authorization";
+import { pkceChallenge } from "@purin-labs/connections/provider-adapters/authorization";
 import type { Result } from "@purin-labs/kernel/result";
 import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
 

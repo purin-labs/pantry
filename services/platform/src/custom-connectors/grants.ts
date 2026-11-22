@@ -25,7 +25,7 @@ import {
   type CustomConnectorDefinitionDigest,
   type CustomConnectorId,
   type CustomConnectorRevision,
-} from "./identity";
+} from "@purin-labs/connections/custom-connectors/identity";
 import { CUSTOM_CONNECTOR_LIMITS } from "./limits";
 import { resolveActiveCustomConnectorAccount } from "./accounts";
 import { resolveCustomConnectorRevision } from "./revisions";

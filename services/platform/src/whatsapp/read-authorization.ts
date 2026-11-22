@@ -8,7 +8,7 @@ import {
 } from "../authorization/capability-catalogue";
 import { personPermission } from "../control/permission-required";
 import { listAccessGrants } from "../data/access-grants";
-import { resolveActiveProviderAccountContext } from "../data/integration-account";
+import { resolveActiveProviderAccountContext } from "@purin-labs/connections/data/integration-account";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { createCurrentSourceFlowLabel, evaluateFlowLabelSink } from "../policy";

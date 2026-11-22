@@ -8,8 +8,8 @@ import type {
 import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 
 import { assertCommerceGraphQueryWithLexicon } from "./commerce-wasm";
-import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-binding";
-import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
+import { resolveCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";

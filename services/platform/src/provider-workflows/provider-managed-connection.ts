@@ -1,5 +1,5 @@
-import { createConnectedIntegration } from "../data/integration-account";
-import type { ProvisioningProviderConnectionAttempt } from "../data/provider-attempt";
+import { createConnectedIntegration } from "@purin-labs/connections/data/integration-account";
+import type { ProvisioningProviderConnectionAttempt } from "@purin-labs/connections/data/provider-attempt";
 import type {
   CompleteProviderInput,
   ProviderCompletion,

@@ -4,11 +4,11 @@ import { DatabaseSync } from "node:sqlite";
 
 import { describe, expect, it } from "vitest";
 
-import { bindCommerceMerchant } from "../src/data/commerce-merchant-binding";
+import { bindCommerceMerchant } from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
   resolveOrganisationCommerceSystem,
   selectOrganisationCommerceSystem,
-} from "../src/data/organisation-commerce-system";
+} from "@purin-labs/connections/data/organisation-commerce-system";
 import { d1Database } from "./sqlite-d1";
 import {
   requireUserId,

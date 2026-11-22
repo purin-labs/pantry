@@ -25,7 +25,7 @@ import {
   parseCustomConnectorDefinitionDigest,
   parseCustomConnectorId,
   parseCustomConnectorRevision,
-} from "../custom-connectors/identity";
+} from "@purin-labs/connections/custom-connectors/identity";
 import {
   hasExactKeys,
   isNonNegativeInteger,

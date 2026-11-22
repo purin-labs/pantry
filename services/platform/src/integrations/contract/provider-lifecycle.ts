@@ -6,12 +6,12 @@ import type {
 import type {
   ProviderAttemptWire,
   ProviderAuthorizationContext,
-} from "../../data/provider-attempt";
+} from "@purin-labs/connections/data/provider-attempt";
 import type { Env } from "@purin-labs/kernel/env";
 import type { WorkspaceId } from "@purin-labs/kernel/ids";
 import type { ProviderCredentialCutoverError } from "./credential-cutover";
 import type { ProviderStartContext } from "./provider-adapter";
-import type { ActiveIntegrationProvider } from "../../data/integration-provider-directory";
+import type { ActiveIntegrationProvider } from "@purin-labs/connections/data/integration-provider-directory";
 
 export type OnboardingProvider = ActiveIntegrationProvider;
 

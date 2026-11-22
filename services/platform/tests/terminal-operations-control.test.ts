@@ -38,9 +38,9 @@ vi.mock("../src/control/mutation-receipt", () => ({
   recordCommerceMutationReceipt:
     terminalControlMocks.recordCommerceMutationReceipt,
 }));
-vi.mock("../src/data/commerce-merchant-binding", async (importOriginal) => ({
+vi.mock("@purin-labs/connections/data/commerce-merchant-binding", async (importOriginal) => ({
   ...(await importOriginal<
-    typeof import("../src/data/commerce-merchant-binding")
+    typeof import("@purin-labs/connections/data/commerce-merchant-binding")
   >()),
   resolveOrganisationCommerceMerchantBinding:
     terminalControlMocks.resolveOrganisationCommerceMerchantBinding,

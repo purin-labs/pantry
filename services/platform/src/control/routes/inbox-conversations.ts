@@ -11,9 +11,9 @@ import {
   readMailboxIngressPolicy,
 } from "../../data/email-mailbox";
 import { listEmailReviewProjections } from "../../data/email-review";
-import { listIntegrationAccounts } from "../../data/integration-account";
-import { extractMailbox } from "../../mail/gmail-adapter";
-import { GMAIL_MAILBOX } from "../../mail/gmail-mail-adapter";
+import { listIntegrationAccounts } from "@purin-labs/connections/data/integration-account";
+import { extractMailbox } from "@purin-labs/connections/mail/gmail-adapter";
+import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   listWhatsAppCaseConversationWindows,

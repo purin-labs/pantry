@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 
 import { storeVaultSecret } from "../src/credential-vault";
 import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
-import { createConnectedIntegration } from "../src/data/integration-account";
+import { createConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import type {
@@ -36,7 +36,7 @@ import {
   whatsappConnectorIdValue,
   whatsappConversationWindowCaseId,
 } from "../src/data/whatsapp";
-import { setIntegrationAccountLifecycle } from "../src/data/integration-account";
+import { setIntegrationAccountLifecycle } from "@purin-labs/connections/data/integration-account";
 import { providerCredentialHandle } from "../src/integrations/contract/provisioning";
 import {
   validateNativeRequestAuthority,
@@ -47,7 +47,7 @@ import {
   parseE164PhoneNumber,
   parseMetaBusinessPortfolioId,
   parseWhatsAppBusinessAccountId,
-} from "../src/whatsapp/identifiers";
+} from "@purin-labs/connections/whatsapp/identifiers";
 import {
   WHATSAPP_TEST_NOW,
   createWhatsAppWorld,

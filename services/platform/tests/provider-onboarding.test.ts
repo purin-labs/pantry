@@ -7,8 +7,8 @@ import { describe, expect, it } from "vitest";
 
 import { hashOpaqueSecret, upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
-import { createAuthorizingProviderAttempt } from "../src/data/provider-attempt";
-import { gmailProductFromScopes } from "../src/mail/gmail-authorization";
+import { createAuthorizingProviderAttempt } from "@purin-labs/connections/data/provider-attempt";
+import { gmailProductFromScopes } from "@purin-labs/connections/mail/gmail-authorization";
 import { parseWorkspaceId, type WorkspaceId } from "@purin-labs/kernel/ids";
 import type { ProviderStartContext } from "../src/integrations/contract/provider-adapter";
 import {

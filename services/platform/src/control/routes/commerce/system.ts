@@ -31,7 +31,7 @@ import {
   ensureEntityPlaneCommerceMerchantBinding,
   parseCommerceBindingId,
   resolveOrganisationCommerceMerchantBinding,
-} from "../../../data/commerce-merchant-binding";
+} from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
   parseExpectedCommerceSystemRevision,
   resolveOrganisationCommerceSystem,
@@ -39,7 +39,7 @@ import {
   selectOrganisationCommerceSystem,
   type CommerceSystem,
   type CommerceSystemSelection,
-} from "../../../data/organisation-commerce-system";
+} from "@purin-labs/connections/data/organisation-commerce-system";
 import { createCommerceOutboxReconcileQueueMessage } from "../../../commerce/contract/queue-messages";
 import { commerceProvider } from "../../../commerce/commerce-providers";
 import {

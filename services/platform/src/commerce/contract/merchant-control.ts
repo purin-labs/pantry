@@ -3,7 +3,7 @@ import { createCommerceClient } from "./client";
 import {
   resolveOrganisationCommerceMerchantBinding,
   type CommerceMerchantBinding,
-} from "../../data/commerce-merchant-binding";
+} from "@purin-labs/connections/data/commerce-merchant-binding";
 import type { Env } from "@purin-labs/kernel/env";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import {

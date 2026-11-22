@@ -12,7 +12,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { admitSlackInstallOrganisation } from "../src/slack/install-organisation";
-import type { SlackInstallationIdentity } from "../src/slack/installation-identity";
+import type { SlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { createSlackInstallation } from "../src/slack/installation-store";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { requireOrganisationId, requireWorkspaceId } from "./test-ids";

@@ -8,7 +8,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import {
   parseCustomConnectorDefinitionDigest,
   type CustomConnectorDefinitionDigest,
-} from "./identity";
+} from "@purin-labs/connections/custom-connectors/identity";
 import { CUSTOM_CONNECTOR_LIMITS } from "./limits";
 import {
   assertNever,

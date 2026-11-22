@@ -50,7 +50,7 @@ import { flowBindingMatchesIdentity, FlowBinding } from "../../policy";
 import {
   resolveCommerceMerchantBinding,
   type CommerceMerchantBinding,
-} from "../../data/commerce-merchant-binding";
+} from "@purin-labs/connections/data/commerce-merchant-binding";
 import { assertCommerceEntityPlaneCommandAuthorityWithLexicon } from "../commerce-wasm";
 import {
   buildCommerceEntityPlaneEffect,

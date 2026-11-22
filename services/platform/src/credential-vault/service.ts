@@ -36,9 +36,9 @@ import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-sou
 import {
   prepareCredentialHandleAccountsRevocation,
   prepareCredentialHandleWebhooksRevocation,
-} from "../data/integration-account-writes";
-import { prepareCredentialHandleConnectionsRevocation } from "../data/provider-connection-writes";
-import { prepareCredentialHandleGenerationsRevocation } from "../data/provider-credential-generation";
+} from "@purin-labs/connections/data/integration-account-writes";
+import { prepareCredentialHandleConnectionsRevocation } from "@purin-labs/connections/data/provider-connection-writes";
+import { prepareCredentialHandleGenerationsRevocation } from "@purin-labs/connections/data/provider-credential-generation";
 import { assertNever, isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 /**

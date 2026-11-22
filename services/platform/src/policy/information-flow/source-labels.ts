@@ -21,7 +21,7 @@ import type {
   GrantSubject,
 } from "../../authorization/access-grants/types";
 import { listAccessGrants } from "../../data/access-grants";
-import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,

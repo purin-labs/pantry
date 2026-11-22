@@ -5,7 +5,7 @@ import {
   ensureEntityPlaneCommerceMerchantBinding,
   resolveCurrentOrganisationCommerceMerchantBinding,
   resolveCommerceMerchantBinding,
-} from "../src/data/commerce-merchant-binding";
+} from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,

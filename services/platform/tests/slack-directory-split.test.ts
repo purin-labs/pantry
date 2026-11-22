@@ -5,7 +5,7 @@ import { expect, it } from "vitest";
 import {
   createConnectedIntegration,
   finalizeConnectedIntegrationAccount,
-} from "../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import { parseVaultHandle } from "../src/credential-vault";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";

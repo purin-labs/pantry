@@ -3,7 +3,7 @@ import { resolveActiveProviderConnectionCredential } from "../credential-vault";
 import {
   connectionCredentialAuthority,
   resolveActiveProviderAccountContext,
-} from "../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type { Env } from "@purin-labs/kernel/env";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";

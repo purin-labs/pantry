@@ -17,7 +17,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import type {
   CommerceSystemError,
   CommerceSystemProviderAuthority,
-} from "../data/organisation-commerce-system";
+} from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   commerceDeliveryIntake,
   type AppliedCommerceDeliveryResult,

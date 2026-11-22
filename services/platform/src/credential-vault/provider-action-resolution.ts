@@ -6,7 +6,7 @@ import {
   type ConnectionCredentialAuthority,
   type IntegrationProvider,
   type ProviderAccountContextError,
-} from "../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import type { ExecutingActionLedgerEntry } from "../actors/action-ledger";
 import type {

@@ -54,14 +54,14 @@ import {
   ensureCurrentReadiness,
   prepareReadinessAssessmentDeletion,
 } from "./onboarding";
-import { expireProviderAttemptIfDue } from "./provider-attempt";
+import { expireProviderAttemptIfDue } from "@purin-labs/connections/data/provider-attempt";
 import { assertNever, isNonNegativeInteger } from "@purin-labs/std";
 import {
   prepareInvalidAccountsDegradation,
   prepareMissingAccountDefaults,
-} from "./integration-account-writes";
-import { prepareArchivedOrganisationConnectionsRevocation } from "./provider-connection-writes";
-import { prepareArchivedOrganisationGenerationsRevocation } from "./provider-credential-generation";
+} from "@purin-labs/connections/data/integration-account-writes";
+import { prepareArchivedOrganisationConnectionsRevocation } from "@purin-labs/connections/data/provider-connection-writes";
+import { prepareArchivedOrganisationGenerationsRevocation } from "@purin-labs/connections/data/provider-credential-generation";
 import {
   prepareArchivedOrganisationCredentialRefsRevocation,
   prepareArchivedOrganisationSecretsRevocation,

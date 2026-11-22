@@ -3,8 +3,8 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { CredentialVaultBindings } from "../credential-vault/keyring";
 import { parseVaultHandle } from "../credential-vault/domain";
 import { revokeVaultSecret } from "../credential-vault/service";
-import { prepareCustomConnectorAccountsDisable } from "../data/integration-account-writes";
-import { prepareCustomConnectorConnectionsDisable } from "../data/provider-connection-writes";
+import { prepareCustomConnectorAccountsDisable } from "@purin-labs/connections/data/integration-account-writes";
+import { prepareCustomConnectorConnectionsDisable } from "@purin-labs/connections/data/provider-connection-writes";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "@purin-labs/kernel/result";
@@ -12,7 +12,7 @@ import type {
   CustomConnectorDefinitionDigest,
   CustomConnectorId,
   CustomConnectorRevision,
-} from "./identity";
+} from "@purin-labs/connections/custom-connectors/identity";
 import {
   resolveCustomConnectorRevision,
   type CustomConnectorRevisionError,

@@ -7,8 +7,8 @@ import {
   providerAttemptWire,
   readResumableProviderAuthorization,
   type ProviderAttemptMutation,
-} from "../data/provider-attempt";
-import type { IntegrationAccount } from "../data/integration-account";
+} from "@purin-labs/connections/data/provider-attempt";
+import type { IntegrationAccount } from "@purin-labs/connections/data/integration-account";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   providerAuthorizationSecret,

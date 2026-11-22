@@ -12,9 +12,9 @@ import {
   requireConnectionCredentialAuthority,
   upsertProviderWebhook,
   type IntegrationAccount,
-} from "../data/integration-account";
-import type { ProvisioningProviderConnectionAttempt } from "../data/provider-attempt";
-import { persistProviderResourceSnapshot } from "../data/provider-resource";
+} from "@purin-labs/connections/data/integration-account";
+import type { ProvisioningProviderConnectionAttempt } from "@purin-labs/connections/data/provider-attempt";
+import { persistProviderResourceSnapshot } from "@purin-labs/connections/data/provider-resource";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   newRequestId,

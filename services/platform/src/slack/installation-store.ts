@@ -31,9 +31,9 @@ import type { D1PreparedStatement } from "@cloudflare/workers-types";
 import { definePort } from "@purin-labs/kernel/port";
 import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
 import { prepareVaultSecretRevocation } from "../credential-vault/secret-revocation";
-import { prepareDisconnectedAccountRevocation } from "../data/integration-account-writes";
-import { prepareDisconnectedAccountConnectionRevocation } from "../data/provider-connection-writes";
-import { prepareDisconnectedAccountGenerationsRevocation } from "../data/provider-credential-generation";
+import { prepareDisconnectedAccountRevocation } from "@purin-labs/connections/data/integration-account-writes";
+import { prepareDisconnectedAccountConnectionRevocation } from "@purin-labs/connections/data/provider-connection-writes";
+import { prepareDisconnectedAccountGenerationsRevocation } from "@purin-labs/connections/data/provider-credential-generation";
 
 /**
  * The Slack installation store (Refactor 17): the workspace installations,

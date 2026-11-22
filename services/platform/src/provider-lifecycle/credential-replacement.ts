@@ -4,7 +4,7 @@ import type {
   BegunCredentialRotation,
   CredentialRotationFailureCode,
 } from "../integrations/contract/credential-lifecycle";
-import { validateExternalProviderToken } from "../external-records/records";
+import { validateExternalProviderToken } from "@purin-labs/connections/external-records/records";
 import { providerModules } from "../integrations/contract/provider-modules";
 import {
   discoverStripeAccount,

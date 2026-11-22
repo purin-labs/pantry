@@ -34,7 +34,7 @@ import {
   type CommerceProviderOperation,
   type CommerceProviderReconciliation,
 } from "../commerce/contract/commerce-provider";
-import { resolveActiveProviderAccountContext } from "../data/integration-account";
+import { resolveActiveProviderAccountContext } from "@purin-labs/connections/data/integration-account";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 
 async function reconcileShopifyCommerceAction(

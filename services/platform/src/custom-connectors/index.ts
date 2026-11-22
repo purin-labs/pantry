@@ -4,7 +4,7 @@ export * from "./catalog-tools";
 export * from "./definition";
 export * from "./execution";
 export * from "./grants";
-export * from "./identity";
+export * from "@purin-labs/connections/custom-connectors/identity";
 export * from "./lifecycle";
 export * from "./projection";
 export * from "./revisions";

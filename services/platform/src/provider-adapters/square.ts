@@ -3,13 +3,13 @@ import {
   exactScopeIsGranted,
   parseProviderOnlyStartContext,
   SHORT_PROVIDER_STATE_TTL_MS,
-} from "./authorization";
+} from "@purin-labs/connections/provider-adapters/authorization";
 import {
   type ProviderCleanupAdapter,
   type ProviderCleanupResult,
   type ProviderOnboardingAdapter,
 } from "../integrations/contract/provider-adapter";
-import type { DiscoveredProviderResource } from "../data/provider-resource";
+import type { DiscoveredProviderResource } from "@purin-labs/connections/data/provider-resource";
 import type {
   SquareDelegation,
   CommerceMerchant,

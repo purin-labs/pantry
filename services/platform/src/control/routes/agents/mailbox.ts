@@ -13,7 +13,7 @@ import {
   readEmailMailboxAccount,
   readMailboxIngressPolicy,
 } from "../../../data/email-mailbox";
-import { setIntegrationAccountLifecycle } from "../../../data/integration-account";
+import { setIntegrationAccountLifecycle } from "@purin-labs/connections/data/integration-account";
 import { revokeCredential } from "../../../credential-vault";
 import { resolveCredentialRevocationSecret } from "../../../credential-vault/credential-revocation-resolution";
 import { revokeGoogleOAuthToken } from "../../../integrations/contract/google-oauth-revocation";
@@ -37,7 +37,7 @@ import {
 import { readInstallationPins } from "../../installation-pins";
 import { recordCommerceMutationReceipt } from "../../mutation-receipt";
 import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
-import { readIntegrationAccountReasonCode } from "../../../data/integration-account-reads";
+import { readIntegrationAccountReasonCode } from "@purin-labs/connections/data/integration-account-reads";
 import {
   agentMailboxConnector,
   emailLimitsFromPolicy,

@@ -24,7 +24,7 @@ import {
 } from "../slack/events";
 import { setSlackThreadStatus } from "../slack/messages";
 import { isSlackStopCommand } from "../slack/stop-command";
-import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import {
   parseSupplierPayoutQuery,
   type SupplierPayoutQuery,

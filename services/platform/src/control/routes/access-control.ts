@@ -1,14 +1,14 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import type { OrganisationPlacementBindings } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { listProviderResourcePage } from "../../data/provider-resource";
+import { listProviderResourcePage } from "@purin-labs/connections/data/provider-resource";
 import {
   EMAIL_OPERATIONAL_RESOURCE_SCOPE,
   SLACK_MESSAGE_RESOURCE_SCOPE,
 } from "../../authorization/capability-catalogue";
-import { discoverAirtableBases } from "../../external-records/records";
+import { discoverAirtableBases } from "@purin-labs/connections/external-records/records";
 import { readActiveCaseOperations } from "../../actors/case-operations";
-import { resolveIntegrationAccount } from "../../data/integration-account";
+import { resolveIntegrationAccount } from "@purin-labs/connections/data/integration-account";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseCaseId,

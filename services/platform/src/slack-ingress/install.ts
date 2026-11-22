@@ -32,7 +32,7 @@ import {
   admitSlackInstallOrganisation,
   type SlackInstallOrganisationAdmissionError,
 } from "../slack/install-organisation";
-import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import {
   createSlackInstallation,
   createSlackOrganisationConnection,

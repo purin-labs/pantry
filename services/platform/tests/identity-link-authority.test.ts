@@ -11,7 +11,7 @@ import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,
   upsertSurfaceInstallation,
-} from "../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import { parseVaultHandle } from "../src/credential-vault";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";

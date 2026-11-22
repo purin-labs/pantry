@@ -21,7 +21,7 @@ import {
   createActiveConnectedIntegration,
   requireConnectionCredentialAuthority,
   upsertProviderWebhook,
-} from "../../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { requireOrganisationBootstrap } from "../organisation-execution-fixture";

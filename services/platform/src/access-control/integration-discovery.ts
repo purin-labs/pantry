@@ -27,12 +27,12 @@ import {
   listIntegrationAccounts,
   type IntegrationAccount,
   type IntegrationAccountLifecycle,
-} from "../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import {
   resolveOrganisationCommerceSystem,
   type CommerceSystem,
-} from "../data/organisation-commerce-system";
-import { resolveCommerceMerchantBindingById } from "../data/commerce-merchant-binding";
+} from "@purin-labs/connections/data/organisation-commerce-system";
+import { resolveCommerceMerchantBindingById } from "@purin-labs/connections/data/commerce-merchant-binding";
 import type {
   CaseId,
   IntegrationAccountId,
@@ -49,7 +49,7 @@ import {
   parseActiveIntegrationProvider,
   PROVIDER_DATA_CLASSES,
   type ActiveIntegrationProvider,
-} from "../data/integration-provider-directory";
+} from "@purin-labs/connections/data/integration-provider-directory";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   assertNever,

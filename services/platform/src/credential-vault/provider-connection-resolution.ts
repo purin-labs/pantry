@@ -4,7 +4,7 @@ import {
   type ActiveProviderAccountContext,
   type ConnectionCredentialAuthority,
   type IntegrationProvider,
-} from "../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import type {
   IntegrationAccountId,

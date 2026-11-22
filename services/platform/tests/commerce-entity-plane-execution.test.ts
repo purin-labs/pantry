@@ -13,7 +13,7 @@ import {
   type CommerceEntityPlaneExecutionEnv,
 } from "../src/commerce/entity-plane/execution";
 import { parseCommerceEntityPlaneProposal } from "../src/commerce/entity-plane/proposals";
-import { parseCommerceSystemRevision } from "../src/data/organisation-commerce-system";
+import { parseCommerceSystemRevision } from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   realProviderActionAuthority,
   realProviderExecutionFixture,
@@ -38,7 +38,7 @@ import {
   requireOrganisationId,
 } from "./test-ids";
 
-vi.mock("../src/data/commerce-merchant-binding", () => ({
+vi.mock("@purin-labs/connections/data/commerce-merchant-binding", () => ({
   resolveCommerceMerchantBinding: async () => ({
     ok: true,
     value: { merchantId: "merchant_execution" },

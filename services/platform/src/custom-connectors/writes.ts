@@ -31,7 +31,7 @@ import {
   parseCustomConnectorDefinitionDigest,
   parseCustomConnectorId,
   parseCustomConnectorRevision,
-} from "./identity";
+} from "@purin-labs/connections/custom-connectors/identity";
 import { resolveCustomConnectorRevision } from "./revisions";
 import { assertNever, isRecord, sha256Hex } from "@purin-labs/std";
 import { executeReviewedConnectorOperation } from "./mcp";

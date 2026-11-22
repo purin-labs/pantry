@@ -57,13 +57,14 @@ import. A module with no line for one of these has none.
 ## foundation/connections
 
 - Folders: 7
-  - `services/platform/src/custom-connectors/`
-  - `services/platform/src/data/`
-  - `services/platform/src/external-records/`
-  - `services/platform/src/mail/`
-  - `services/platform/src/provider-adapters/`
-  - `services/platform/src/slack/`
-  - `services/platform/src/whatsapp/`
+  - `foundation/connections/custom-connectors/`
+  - `foundation/connections/data/`
+  - `foundation/connections/external-records/`
+  - `foundation/connections/mail/`
+  - `foundation/connections/provider-adapters/`
+  - `foundation/connections/slack/`
+  - `foundation/connections/whatsapp/`
+- Packages: `foundation/connections`
 - Tables (15): `commerce_merchant_binding`, `integration_account`, `organisation_commerce_system`, `provider_authorization_state`, `provider_connection`, `provider_connection_attempt`, `provider_credential_generation`, `provider_default_account_history`, `provider_discovered_resource`, `provider_manifest_observation`, `provider_provisioning_attempt`, `provider_provisioning_receipt`, `provider_resource_cursor`, `provider_resource_snapshot`, `provider_webhook`
 
 ## foundation/authority

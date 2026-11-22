@@ -1,17 +1,17 @@
 import {
   resolveWhatsAppApplicationConfiguration,
   resolveWhatsAppEmbeddedSignupCredential,
-} from "../whatsapp/application";
+} from "@purin-labs/connections/whatsapp/application";
 import {
   unsubscribeWhatsAppApp,
   WHATSAPP_GRAPH_API_VERSION,
-} from "../whatsapp/graph";
-import { parseWhatsAppBusinessAccountId } from "../whatsapp/identifiers";
+} from "@purin-labs/connections/whatsapp/graph";
+import { parseWhatsAppBusinessAccountId } from "@purin-labs/connections/whatsapp/identifiers";
 import {
   exactScopeIsGranted,
   parseProviderOnlyStartContext,
   SHORT_PROVIDER_STATE_TTL_MS,
-} from "./authorization";
+} from "@purin-labs/connections/provider-adapters/authorization";
 import type {
   ProviderCleanupAdapter,
   ProviderCleanupResult,

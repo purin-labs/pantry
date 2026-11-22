@@ -8,7 +8,7 @@ import { resolveActiveSlackOrganisationCredential } from "../credential-vault";
 import type { Env } from "@purin-labs/kernel/env";
 import { readOperationsDestination } from "@purin-labs/tenancy/data/operations-destination";
 import type { Result } from "@purin-labs/kernel/result";
-import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { resolveActiveSlackDestinationConnection } from "../slack/installation-store";
 import {
   markWhatsAppNoticeDelivered,

@@ -6,7 +6,7 @@ import { parseVaultHandle, type VaultHandle } from "../credential-vault";
 import {
   recordProviderManifestObservation,
   type ProviderManifestEvidence,
-} from "../data/provider-attempt";
+} from "@purin-labs/connections/data/provider-attempt";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseIntegrationAccountId,
@@ -14,9 +14,9 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { observeProviderConnection } from "../provider-adapters/catalogue";
-import { parseActiveIntegrationProvider } from "../data/integration-provider-directory";
-import { prepareObservedAccountLifecycle } from "../data/integration-account-writes";
-import type { ActiveIntegrationProvider } from "../data/integration-provider-directory";
+import { parseActiveIntegrationProvider } from "@purin-labs/connections/data/integration-provider-directory";
+import { prepareObservedAccountLifecycle } from "@purin-labs/connections/data/integration-account-writes";
+import type { ActiveIntegrationProvider } from "@purin-labs/connections/data/integration-provider-directory";
 import {
   prepareConfigurationVersionBump,
 } from "@purin-labs/tenancy/data/organisation-onboarding-row";

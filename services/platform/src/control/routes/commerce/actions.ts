@@ -59,14 +59,14 @@ import {
 import {
   resolveOrganisationCommerceMerchantBinding,
   resolveCommerceMerchantBinding,
-} from "../../../data/commerce-merchant-binding";
-import { resolveConfiguredSlackInstallationIdentity } from "../../../slack/installation-identity";
+} from "@purin-labs/connections/data/commerce-merchant-binding";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import {
   bindUnboundSetupChannel,
   prepareSlackRoutingAuditEvent,
   resolveActiveSlackDestinationConnection,
 } from "../../../slack/installation-store";
-import { resolveOrganisationCommerceSystemAuthority } from "../../../data/organisation-commerce-system";
+import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import { previewMerchantPluginAction } from "../../../commerce/provider-execution";
 import type { CommerceProviderExecutionError } from "../../../commerce/contract/commerce-provider";
 import { prepareTurnAuthority } from "../../../context/turn-context";

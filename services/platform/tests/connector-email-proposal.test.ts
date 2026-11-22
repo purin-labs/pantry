@@ -26,8 +26,8 @@ import {
   digestEmailSnapshot,
   digestGmailReplyTarget,
   deriveGmailReplyTarget,
-} from "../src/mail/reply-target";
-import type { GmailMessageHeaders } from "../src/mail/gmail-adapter";
+} from "@purin-labs/connections/mail/reply-target";
+import type { GmailMessageHeaders } from "@purin-labs/connections/mail/gmail-adapter";
 import {
   activateEmailRuntime,
   createConnectorEmailSchema,

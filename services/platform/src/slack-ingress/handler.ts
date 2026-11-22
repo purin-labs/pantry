@@ -22,7 +22,7 @@ import {
 import {
   resolveConfiguredSlackInstallationIdentity,
   type SlackInstallationIdentity,
-} from "../slack/installation-identity";
+} from "@purin-labs/connections/slack/installation-identity";
 import type { ResolvedSlackThreadRoute } from "../slack/organisation-routing";
 import { verifySlackSignature } from "../slack/signature";
 import { isSlackStopCommand } from "../slack/stop-command";

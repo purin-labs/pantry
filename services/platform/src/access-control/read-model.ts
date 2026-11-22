@@ -17,12 +17,12 @@ import {
   listIntegrationAccounts,
   type IntegrationAccount,
   type IntegrationAccountLifecycle,
-} from "../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import {
   resolveOrganisationCommerceSystem,
   resolveOrganisationCommerceSystemAuthority,
-} from "../data/organisation-commerce-system";
-import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-binding";
+} from "@purin-labs/connections/data/organisation-commerce-system";
+import { resolveCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
   parseIntegrationAccountId,
   type IntegrationAccountId,

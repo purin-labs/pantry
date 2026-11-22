@@ -10,7 +10,7 @@ import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,
   type ConnectedIntegrationSeed,
-} from "../src/data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import {
   parseIntegrationAccountId,
   type IntegrationAccountId,

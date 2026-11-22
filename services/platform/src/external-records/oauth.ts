@@ -1,13 +1,13 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
-import type { ExternalRecordsProvider } from "./records";
+import type { ExternalRecordsProvider } from "@purin-labs/connections/external-records/records";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import {
   resolveActiveProviderAccountContext,
   requireConnectionCredentialAuthority,
-} from "../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import { resolveActiveProviderConnectionCredential } from "../credential-vault/provider-connection-resolution";
 import type { Result } from "@purin-labs/kernel/result";
 import {

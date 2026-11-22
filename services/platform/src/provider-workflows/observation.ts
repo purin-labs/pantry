@@ -1,5 +1,5 @@
 import { resolveSlackHealthCheckCredential } from "../credential-vault";
-import type { ProviderManifestEvidence } from "../data/provider-attempt";
+import type { ProviderManifestEvidence } from "@purin-labs/connections/data/provider-attempt";
 import { newRequestId, parseWorkspaceId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import {
@@ -13,7 +13,7 @@ import {
 } from "../provider-adapters/stripe";
 import type { ProviderObservationRequest } from "../integrations/contract/provider-adapter";
 import { blockedEvidence } from "../integrations/contract/observation-evidence";
-import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
+import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { linkStripePaymentAccount } from "../commerce/contract/stripe-link";
 import { resolveCommerceMerchant } from "../commerce/contract/square-link";
 

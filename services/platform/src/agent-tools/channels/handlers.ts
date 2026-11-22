@@ -168,7 +168,7 @@ export async function searchEmailMailboxForEmbeddedHarness(
 }
 
 function emailMailboxMessageForHarness(
-  message: import("../../mail/gmail-adapter").GmailMessageContent,
+  message: import("@purin-labs/connections/mail/gmail-adapter").GmailMessageContent,
 ): HarnessEmailMailboxSearchResult["messages"][number] {
   return {
     messageId: message.messageId,
@@ -1762,7 +1762,7 @@ function latestWhatsAppSupportSourceRevision(
 }
 
 function emailAttachmentForHarness(
-  attachment: import("../../mail/gmail-adapter").GmailAttachmentRef,
+  attachment: import("@purin-labs/connections/mail/gmail-adapter").GmailAttachmentRef,
 ): HarnessEmailMailboxSearchResult["messages"][number]["attachments"][number] {
   return {
     filename: attachment.filename,

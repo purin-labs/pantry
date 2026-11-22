@@ -20,7 +20,7 @@ import {
 import { runAgentOperation } from "../../src/data/agent-operation-runner";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import {
   registerWhatsAppPhoneNumberAccount,
   selectWhatsAppPhoneNumberAccount,
@@ -30,7 +30,7 @@ import {
   parseMetaBusinessPortfolioId,
   parseWhatsAppBusinessAccountId,
   parseWhatsAppPhoneNumberId,
-} from "../../src/whatsapp/identifiers";
+} from "@purin-labs/connections/whatsapp/identifiers";
 import { resolveWhatsAppOrganisationCredential } from "../../src/whatsapp/credential";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";

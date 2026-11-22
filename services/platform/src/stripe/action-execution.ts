@@ -5,7 +5,7 @@ import {
 import {
   resolveActiveProviderAccountContext,
   type ProviderAccountContextError,
-} from "../data/integration-account";
+} from "@purin-labs/connections/data/integration-account";
 import type { Env } from "@purin-labs/kernel/env";
 import type {
   IntegrationAccountId,
