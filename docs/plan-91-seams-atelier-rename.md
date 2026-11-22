@@ -380,6 +380,7 @@ Each URL change has one of four times:
 | | A new Connect webhook endpoint (events of connected accounts) `https://pantry.purin.io/hook/stripe/connect`; its id and signing secret go to `STRIPE_CONNECT_WEBHOOK_ID` and `STRIPE_CONNECT_WEBHOOK_SECRET`. If the commerce engine has `STRIPE_WEBHOOK_SECRET`, a second endpoint `https://commerce.pantry.purin.io/v1/providers/stripe/webhooks` | Live | The owner |
 | Shopify, app "Nuki" (`integrations/shopify/shopify.app.toml`) | `redirect_urls` gets `https://pantry.purin.io/v1/control/providers/shopify/callback` beside the old URL | Early | I, with `shopify app deploy`, after the owner's yes |
 | | `application_url` `https://pantry.purin.io/portal` (one value) | Switch | I, as above |
+| | The "Order creation" webhook in the development store's admin (Settings › Notifications › Webhooks, API version `2026-07`) to `https://pantry.purin.io/hook/shopify/<new organisation id>`, when Shopify's protected-customer-data gate refuses the app's own `orders/create` subscription (`integrations/shopify/README.md`). Its signing secret goes in with `pnpm shopify:m8:credentials` | Switch | The owner, after the Shopify connect in the new organisation |
 | Discord, the owner's application | Interactions endpoint `https://pantry.purin.io/hook/discord/<new organisation id>`. The id exists only after the owner makes the new organisation, and Discord sends a ping when the URL is saved | Switch | The owner, after the Discord install in the new organisation |
 | Meta (WhatsApp), app `316717…` | Valid OAuth redirect URI `https://pantry.purin.io/v1/control/providers/whatsapp/callback` | Early | The owner |
 | | Webhook callback `https://pantry.purin.io/hook/whatsapp` with the new `WHATSAPP_VERIFY_TOKEN`; Meta checks it with a challenge | Switch | The owner |
@@ -617,8 +618,24 @@ State on 22 November 2026:
   the pass changed. In the batch run of the 20 files,
   `counter-receipt-printer` failed one time, because the drawer task was
   still `sent`; it passed alone. The receipt text is not in that check.
-- **4B**: the Early items wait for the owner (the console steps) and for
-  the owner's yes to the API changes.
+- **4B**, with the owner's yes of 22 November 2026 to the API changes:
+  - Slack app `A0BFVDZLFLM`: the manifest API added
+    `https://pantry.purin.io/slack/install` and
+    `https://pantry.purin.io/v1/control/providers/slack/callback`. The
+    export after the update lists them beside the old callback and the two
+    `localhost:3003` URLs. The app is still "Seams Pantry" with the bot
+    "Sous Chef", and its request URLs are still on the old ingress.
+  - Shopify app "Nuki": version `nuki-12` adds
+    `https://pantry.purin.io/v1/control/providers/shopify/callback`. Before
+    the deploy, the released config was equal to the repository file; after
+    it, the released config lists the old, the new and the `localhost`
+    callbacks, with the old `application_url`.
+  - The Google `gcloud` steps wait for the owner's new project. The console
+    steps wait for the owner.
+- **Secrets.** Decided by the owner on 22 November 2026: each provider
+  client secret is rotated on the switch day. At most providers the old
+  secret then stops at once, so the old stack loses its provider connects,
+  and a rollback needs another rotation.
 - **4C** and **4D** wait for Plan 93 steps 4 and 5.
 
 ## Built
