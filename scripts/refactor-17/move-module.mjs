@@ -270,7 +270,9 @@ for (const path of outside) {
     `${path}: ${LAYER_MAP} gives it to ${plan.module}, and the plan does not name it. Run this script with --sync-plan.`,
   );
 }
-for (const from of planFiles.keys()) {
+// A file that moved has no line of its own in the map any more: a rule of
+// its old folder can name another module.
+for (const from of stillOld.keys()) {
   const module = moduleAtStart(from);
   if (module !== null && module !== plan.module) {
     faults.push(
