@@ -6,8 +6,9 @@ and after a second review with the owner's request to prune
 Status: Stage A is done and on `dev` since 2026-11-21 (`6373495d`), with step S1. Step
 S2 started on 2026-11-22 with the pilot spec `DEV-01`, after the brand names became
 final; each of the 33 specs is written since 2026-11-23. The Plan 93
-cutover ended on 2026-11-22, so Stage B is open: decision D1 is a mix, and each
-foundation module is a package since 2026-11-23. On 2026-11-22 the owner asked to finish the
+cutover ended on 2026-11-22, so Stage B is open: decision D1 is a mix, and since
+2026-11-23 each foundation module is a package in `foundation/` and each product area
+is a package in `areas/`. On 2026-11-22 the owner asked to finish the
 tail: the A2.1 decisions are made and built, and two sessions finish Plan 91 phase 4
 and Plan 93, so that Stage S and Stage B can start. [What is left](#what-is-left)
 lists the open work. The owner accepted the two stages, one decision API for approvals, specs by
@@ -518,13 +519,34 @@ the old stack is deleted. Stage B starts with step 1. In this order:
    Durable Object files and the React files of `collaboration` joined
    `@purin-labs/collaboration` (tags `refactor-17-foundation-2-before` and
    `refactor-17-foundation-2-after`). 461 files moved. Each foundation module is now a
-   package. Next: the server code of each area goes into a folder of its own
-   (decision D1).
-2. The journeys: a `testing` entry for each module, or an exception in the lint. 178
-   journeys import the inside of the Worker.
-3. The move script and its dry run in a scratch worktree (`pnpm lint` with the guard of
-   step A0.7, the type checks, a container build, one E2E shard).
-4. A move date for each module, told to the other sessions before.
+   package.
+2. Done on 2026-11-23, as one group in one freeze: the code of each product area is
+   one package in `areas/<area>/`, with `server/` for the Worker files and `ui/` for
+   the Portal files (`@purin-labs/area-devices`, `-brain`, `-organisation`, `-cafe`,
+   `-inbox`, `-integrations`, `-commerce` and `-kitchen`; tags
+   `refactor-17-areas-1-before` and `refactor-17-areas-1-after`). 1,137 files moved:
+   546 to `server/` and 591 to `ui/`. Each foundation module that an area imports was
+   a package by then, so D1 lets an area be a package. A Worker file loses its first
+   folder when that folder is the name of the area or `commerce/`
+   (`src/devices/store.ts` is `areas/devices/server/store.ts`). The Worker bundle
+   differs only in the `owner` paths of five state machine files, and the Portal build
+   has the same 5 pages and 563 files. 203 TypeScript files stay in
+   `services/platform/src` (the Worker module and the surfaces Slack, chat, voice and
+   Shopify), and 166 files stay in `apps/portal/src`.
+3. The journeys stay in `services/platform/tests` and import a module by its package
+   name. No module needed a `testing` entry.
+4. Not done, each with its own decision:
+   - The surfaces (`slack`, `chat`, `voice`, `whatsapp`, the Portal shell) stay where
+     they are. The same script can move them to `surfaces/`.
+   - `services/platform` stays the folder of the Platform Worker. A move to
+     `workers/platform` changes the Wrangler files, the deploy scripts and the CI
+     paths, so it needs a release of its own.
+   - The eight area packages import each other in a circle (`pnpm` reports three
+     cycles). A `contract` package for each area (`areas/<area>/contract`) removes
+     it: the public files of `contracts` in `scripts/layers.json` move there.
+   - The area packages of `packages/` (the CRDT packages, the control API packages,
+     `bakery-model`), the crates and the area scripts stay where they are.
+   - A short `AGENTS.md` for each area.
 5. After the cutover, with its own decision each: one outbox table shape for the 5
    outboxes, new names for classes and tables, and the deletion of each old-row adapter.
 

@@ -18,7 +18,8 @@ was cut before the move, the limits, and the plan of the next module.
 The move changes paths and import specifiers only. In the dry run of the
 kernel, the Worker bundle had the same bytes before and after the move.
 
-Each foundation module is a package since 2026-11-23. The kernel moved first.
+Each foundation module and each product area is a package since 2026-11-23
+([The area group](#the-area-group-of-2026-11-23)). The kernel moved first.
 `tenancy`, `actor-runtime`, `connections` and `authority` moved as one group
 ([The group of 2026-11-23](#the-group-of-2026-11-23)). `agent-tools`,
 `contracts`, `control`, `agent`, `conversation`, `tool-handlers`, `ui` and
@@ -150,8 +151,11 @@ pnpm --filter @purin-labs/platform check:types
   second group has the tags `refactor-17-foundation-2-before` and
   `refactor-17-foundation-2-after` and the plans `agent-tools`, `contracts`,
   `control`, `agent`, `conversation`, `tool-handlers`, `ui` and
-  `collaboration`. A branch that was cut before both groups does the steps for
-  the first group, then for the second.
+  `collaboration`. The area group has the tags `refactor-17-areas-1-before` and
+  `refactor-17-areas-1-after` and the plans `area-devices`, `area-brain`,
+  `area-organisation`, `area-cafe`, `area-inbox`, `area-integrations`,
+  `area-commerce` and `area-kitchen`. A branch that was cut before the groups
+  does the steps for the first group, then for the second, then for the areas.
 - Between the two tags of the second group there are four small commits that
   are not moves: the Portal lints read `PORTAL_SOURCE`, 17 `ui` names lose
   `export`, the layer check reads `packages/collaboration`, and one script
@@ -242,8 +246,8 @@ Copy `scripts/refactor-17/plans/kernel.json` and change:
 - `package.typeCheck`: `false` if the module reads a key that another module
   merges into `Env`. Give the keys in `about`.
 
-No foundation module is left. The same script moves a module of another layer;
-these plan options exist for the cases that the foundation had:
+No foundation module and no area is left. The same script moves a module of
+another layer; these plan options exist for the cases so far:
 
 - `package.existing: true` moves the files into a package that exists
   (`contracts`, `collaboration`). The script changes no manifest field but the
@@ -291,6 +295,62 @@ the four plans.
   `placement-move.machine.ts` are the whole difference: with the new paths in
   the bundle of before, the bytes are the same.
 - Not run: the full E2E suite, the Kitchen journeys and a release.
+
+## The area group of 2026-11-23
+
+Branch `refactor-17-areas-group-1`, on `origin/dev` at `316429ba`. Tags
+`refactor-17-areas-1-before` and `refactor-17-areas-1-after`. Each area is one
+package `@purin-labs/area-<name>` in `areas/<name>/`.
+
+| Area           | Files to `server/` | Files to `ui/` | Files changed | Imports changed (by name / relative) |
+| -------------- | ------------------ | -------------- | ------------- | ------------------------------------ |
+| `devices`      | 25                 | 6              | 42            | 50 (28 / 22)                         |
+| `brain`        | 21                 | 23             | 53            | 64 (61 / 3)                          |
+| `organisation` | 22                 | 53             | 108           | 139 (109 / 30)                       |
+| `cafe`         | 43                 | 58             | 70            | 106 (68 / 38)                        |
+| `inbox`        | 115                | 37             | 144           | 347 (331 / 16)                       |
+| `integrations` | 105                | 56             | 167           | 254 (177 / 77)                       |
+| `commerce`     | 137                | 83             | 291           | 585 (415 / 170)                      |
+| `kitchen`      | 78                 | 275            | 128           | 204 (143 / 61)                       |
+
+- **The layout.** A Worker file keeps its sub-path below
+  `services/platform/src/`, without its first folder when that folder is the
+  name of the area or `commerce/`. The `sourcePrefixes` of each plan hold this
+  rule, so `--sync-plan` gives a later file the same place. A Portal file keeps
+  its sub-path below `apps/portal/src/` (`ui/features/<feature>/`). No two
+  files collide.
+- **The order.** The eight areas import each other's public files in a circle,
+  and a public file imports types of its own area. So no order moves each
+  public file before its importers. The script lets a moved file import a
+  public file of an area that has not moved yet: the import stays a relative
+  path into the Worker until that area moves, and the script then names it by
+  package. 75 imports took this way, and none is left after the last area.
+- **Package cycles.** `pnpm` reports three cycles between the area packages.
+  The layer check still refuses an import of a file that is not public. A
+  `contract` package for each area removes the cycles; it is open work.
+- **Type checks.** No area package has a type check of its own
+  (`typeCheck: false`): each reads a binding that an Actor file merges into
+  `Env`. The Worker programs read `areas/*/server` and the Portal program
+  reads `areas/*/ui`, so each area file is checked.
+- **Lints.** The layer check finds a package by its manifest name and reads an
+  area package file by file. The runtime boundary lint and the tool effects
+  lint read `areas/*/server`. Each plan adds its folders to `PLATFORM_SOURCE`
+  and `PORTAL_SOURCE`. knip judges the exports of an area package, without its
+  fixture files and its declaration files. For each of these, a temporary fault
+  in an area folder was refused.
+- **The clone baseline** changed one time after the last move: from 791 copies
+  (14,202 lines) to 795 copies (14,331 lines), in 32 pairs. This is above the
+  limit of the rule, and the proof took its place: of the 35 files of those
+  pairs, 22 have the same content as before the group and 13 changed only
+  import lines, and no changed line is inside a copied range.
+- **The result.** Each move commit is the output of the script, and `--check`
+  prints "Nothing to change." for each of the 21 plans. Each quick check of the
+  table passes. The Worker bundle has 10,411,723 bytes before and 10,411,698
+  bytes after; the `owner` paths of five state machine files are the whole
+  difference. The Portal build has the same 5 pages and 563 files. The script
+  corrected 59 paths of area files in the specs.
+- Not run: the full E2E suite, the Kitchen journeys that need `MUJOCO_DIR` and
+  a release.
 
 ## The second group of 2026-11-23
 

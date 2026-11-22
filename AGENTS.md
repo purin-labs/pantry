@@ -102,23 +102,22 @@ A spec describes what is built. A plan describes work that is not built.
 [The spec index](docs/specs/README.md) lists the 33 specs and maps each old
 plan number to its spec. Read the spec of a subsystem before you change it,
 and correct it in the same commit when one of its statements changes. Open
-plans are in `docs/`, closed plans in `docs/history/`.
+plans are in `docs/`, closed plans in `docs/history/`. `services/platform` is
+the Worker `pantry`, and `scripts/layers.json` gives each file its module.
 
-| Layer        | Code                                                            | Specs                                                                                                      |
-| ------------ | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Foundation   | `foundation/*`, `packages/contracts`, `packages/collaboration`  | [FND-01](docs/specs/foundation/01-tenancy-and-placement.md) to FND-11                                      |
-| Commerce     | `services/commerce` (the engine) and the Platform commerce code | [COM-01](docs/specs/areas/commerce/01-commerce-domain.md) to COM-05                                        |
-| Café         | Menus, boards, the order queue, the Register                    | [CAFE-01](docs/specs/areas/cafe/01-menus-boards-and-the-order-queue.md)                                    |
-| Kitchen      | Orchestration views, physics, recipe workflows, costs           | [KIT-01](docs/specs/areas/kitchen/01-orchestration-views.md) to KIT-04                                     |
-| Inbox        | Email and WhatsApp conversations                                | [INB-01](docs/specs/areas/inbox/01-one-inbox.md)                                                           |
-| Brain        | Memory, Evals, Case execution                                   | [BRN-01](docs/specs/areas/brain/01-brain.md)                                                               |
-| Integrations | Providers and custom connectors                                 | [INT-01](docs/specs/areas/integrations/01-integrations-and-connectors.md)                                  |
-| Devices      | The device fleet and the shop gateway                           | [DEV-01](docs/specs/areas/devices/01-devices.md)                                                           |
-| Organisation | Onboarding, access, billing, Jev from Purin                     | [ORG-01](docs/specs/areas/organisation/01-onboarding-and-lifecycle.md), ORG-02                             |
-| Surfaces     | The Portal (`apps/portal`), Slack, email, WhatsApp, voice       | [PRT-01](docs/specs/surfaces/portal/01-portal.md), [VOX-01](docs/specs/surfaces/voice/01-voice-control.md) |
-| Engineering  | Decisions, code and repository, names, testing                  | [ENG-01](docs/specs/engineering/01-decision-log.md) to ENG-04                                              |
-
-`services/platform` is the Worker `pantry` on `pantry.purin.io`. `scripts/layers.json` gives each source file its module.
+| Layer        | Code                                                           | Specs                                                                                                      |
+| ------------ | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Foundation   | `foundation/*`, `packages/contracts`, `packages/collaboration` | [FND-01](docs/specs/foundation/01-tenancy-and-placement.md) to FND-11                                      |
+| Commerce     | `areas/commerce`, `services/commerce` (the engine)             | [COM-01](docs/specs/areas/commerce/01-commerce-domain.md) to COM-05                                        |
+| Café         | `areas/cafe`: menus, boards, the order queue, the Register     | [CAFE-01](docs/specs/areas/cafe/01-menus-boards-and-the-order-queue.md)                                    |
+| Kitchen      | `areas/kitchen`: views, physics, recipe workflows, costs       | [KIT-01](docs/specs/areas/kitchen/01-orchestration-views.md) to KIT-04                                     |
+| Inbox        | `areas/inbox`: email and WhatsApp conversations                | [INB-01](docs/specs/areas/inbox/01-one-inbox.md)                                                           |
+| Brain        | `areas/brain`: Memory, Evals, Case execution                   | [BRN-01](docs/specs/areas/brain/01-brain.md)                                                               |
+| Integrations | `areas/integrations`: providers, custom connectors             | [INT-01](docs/specs/areas/integrations/01-integrations-and-connectors.md)                                  |
+| Devices      | `areas/devices`: the device fleet, the shop gateway            | [DEV-01](docs/specs/areas/devices/01-devices.md)                                                           |
+| Organisation | `areas/organisation`: onboarding, access, billing, Jev         | [ORG-01](docs/specs/areas/organisation/01-onboarding-and-lifecycle.md), ORG-02                             |
+| Surfaces     | The Portal (`apps/portal`), Slack, email, WhatsApp, voice      | [PRT-01](docs/specs/surfaces/portal/01-portal.md), [VOX-01](docs/specs/surfaces/voice/01-voice-control.md) |
+| Engineering  | Decisions, code and repository, names, testing                 | [ENG-01](docs/specs/engineering/01-decision-log.md) to ENG-04                                              |
 
 ## Code rules
 
@@ -130,9 +129,10 @@ full. Do not raise a ratchet count. When one falls, run its lint with `--update`
   package or a public file that `contracts` in `scripts/layers.json` lists.
   Only the owner module of a D1 table writes it. Remove a crossing with a
   port. After a new file, run `node scripts/check-layers.mjs --areas --write`.
-- **Foundation packages.** Import a foundation module by name, for example
-  `@purin-labs/kernel/ids`. A package imports no file of the Worker.
-  [The move runbook](docs/runbooks/refactor-17-module-move.md) moves a module.
+- **Packages.** A foundation module is a package in `foundation/`. An area is
+  a package in `areas/<area>/`, with `server/` for the Worker and `ui/` for the
+  Portal. Import another module by its package name. A package imports no file
+  of the Worker ([the move runbook](docs/runbooks/refactor-17-module-move.md)).
 - **Routes** (`pnpm lint:runtime-boundary`). A route file parses the request,
   checks authorization, calls one domain function and maps its result. It runs
   no D1 query. Actor, Slack and chat code imports no route file. A domain
@@ -177,10 +177,10 @@ Each Pantry feature is also a feature of the Portal chat agent
 ([FND-09](docs/specs/foundation/09-agent-tools-and-screen-context.md)). A change
 that lets a person do something new gives the agent a way to do it:
 
-- Add a tool with the definer of its family under
-  `services/platform/src/agent-tools/`, and one line in `registry.ts` at the
-  end of its group. Or add a Code Mode capability. The agent acts through the
-  person's own role checks, approvals and receipts.
+- Add a tool with the definer of its family in
+  `areas/<area>/server/agent-tools/`, and one line at the end of its group in
+  `services/platform/src/agent-tools/registry.ts`. Or add a Code Mode
+  capability. The agent acts through the person's own checks and approvals.
 - A new capability goes into `capability-catalogue.ts` of
   `foundation/authority`. Apply `node scripts/capability-policy-backfill-sql.mjs`
   before the release. Prove the tool with a chat journey: the agent does the
