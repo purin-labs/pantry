@@ -2,7 +2,7 @@ import { isRecord, isSha256Hex, parseJsonOrNull } from "@purin-labs/std";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { SchemaTransaction } from "../actors/schema-migrations";
 import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { digestCanonical } from "../policy/information-flow/digest";
 import { parseFlowRecipient } from "../policy/information-flow/labels";
 import type { FlowRecipient } from "../policy/information-flow/types";

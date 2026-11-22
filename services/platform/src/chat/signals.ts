@@ -11,7 +11,7 @@ import { actorPhysicalName } from "../actors/actor-registry";
 import { actorStub } from "../actors/actor-stubs";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 /**
  * Whom a chat signal reaches. The Organisation Actor sends a conversation's

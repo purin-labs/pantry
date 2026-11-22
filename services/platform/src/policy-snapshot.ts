@@ -3,7 +3,7 @@ import {
   isOrganisationPolicyPlacementActive,
   resolveActiveOrganisationPlacementRecord,
   type OrganisationPolicyPlacement,
-} from "./data/organisation-placement";
+} from "@purin-labs/tenancy/data/organisation-placement";
 
 export {
   isOrganisationPolicyPlacementActive,
@@ -22,7 +22,7 @@ import { traceWarn } from "@purin-labs/kernel/observability";
 import { credentialPolicyRuleId } from "./policy-rule-id";
 import type { Result } from "@purin-labs/kernel/result";
 import { readOrganisationCapabilityPolicies } from "./data/capability-policy";
-import { readWorkspaceAiBudget } from "./data/workspace-ai-budget";
+import { readWorkspaceAiBudget } from "@purin-labs/tenancy/data/workspace-ai-budget";
 import {
   errorMessage,
   hasExactKeys,

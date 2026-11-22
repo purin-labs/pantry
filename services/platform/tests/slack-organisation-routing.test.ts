@@ -2,7 +2,7 @@ import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
 import { describe, expect, it } from "vitest";
 
-import { createOrganisationInstall } from "../src/data/organisation";
+import { createOrganisationInstall } from "@purin-labs/tenancy/data/organisation";
 import { parseVaultHandle } from "../src/credential-vault/domain";
 import {
   parseCaseId,
@@ -24,7 +24,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { parseSlackUserId } from "../src/slack/events";
-import { parseInitialOrganisationPlacement } from "../src/placement";
+import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import {
   resolveOrClaimSlackThreadRoute,
   selectSlackDmOrganisation,

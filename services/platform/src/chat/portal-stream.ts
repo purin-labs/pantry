@@ -1,5 +1,5 @@
 import { workspaceCanvasLabelAllowsReaders } from "./conversation-disclosure";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { decideChatFlowDelivery } from "./information-flow";
 import { authorizeConversation } from "./conversation-access";
 import type { ConversationId } from "@purin-labs/control-api";

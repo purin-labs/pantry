@@ -159,7 +159,7 @@ const PLACEMENT_MOVE_TRANSITIONS = [
 /** The relocation journal, `state_object_relocation`. */
 export const PLACEMENT_MOVE_MACHINE = {
   name: "placement_move",
-  owner: "services/platform/src/data/placement-move.ts",
+  owner: "foundation/tenancy/data/placement-move.ts",
   store: {
     table: "state_object_relocation",
     key: "relocation_id",

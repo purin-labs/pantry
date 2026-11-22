@@ -12,17 +12,17 @@ import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   issueControlSession,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
-import { newControlMutationIdentity } from "../../src/data/control-mutation";
+} from "@purin-labs/tenancy/data/control-plane";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import {
   archiveOrganisation,
   deleteArchivedOrganisation,
   renameOrganisation,
   restoreOrganisation,
   type ArchiveOrganisationMutation,
-} from "../../src/data/organisation-lifecycle";
-import { createOrganisationInstall } from "../../src/data/organisation";
-import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+} from "@purin-labs/tenancy/data/organisation-lifecycle";
+import { createOrganisationInstall } from "@purin-labs/tenancy/data/organisation";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import {
   ORGANISATION_ID,

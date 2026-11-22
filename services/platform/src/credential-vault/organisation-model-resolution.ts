@@ -11,7 +11,7 @@ import {
 } from "./domain";
 import type { CredentialVaultBindings } from "./keyring";
 import { resolveVaultHandle, storeVaultSecret } from "./service";
-import type { OrganisationQuerySource } from "../data/query-source";
+import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import { prepareVaultSecretRevocation } from "./secret-revocation";
 
 /** The model providers whose API key an Organisation stores (spec FND-08). */

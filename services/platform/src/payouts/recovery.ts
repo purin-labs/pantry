@@ -2,7 +2,7 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   PayoutIndeterminateOperation,
   SupplierPayoutExecutionPlan,

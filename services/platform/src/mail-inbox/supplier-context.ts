@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { pantryCommerceAccess } from "../commerce/contract/client";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   CommerceGraphQuery,

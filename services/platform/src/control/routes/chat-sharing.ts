@@ -1,5 +1,5 @@
 import { signalChat } from "../../chat/signals";
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   readConversationStatus,
   reconcileRevokedConversationRun,

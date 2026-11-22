@@ -10,7 +10,7 @@ import {
   issueControlSession,
   upsertUser,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 
 it(
   "restores account preferences in a new session, fences competing edits, and keeps each user to their own preferences",

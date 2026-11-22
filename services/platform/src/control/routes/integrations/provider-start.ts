@@ -1,7 +1,7 @@
-import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseGmailAuthorizationProduct } from "../../../mail/gmail-authorization";
-import { hashPortalSubject } from "../../../data/control-mutation";
+import { hashPortalSubject } from "@purin-labs/tenancy/data/control-mutation";
 import {
   integrationAccountAllowsCredentialMutation,
   providerConnectionAllowsCredentialMutation,
@@ -45,7 +45,7 @@ import {
   type JsonRecord,
 } from "../../http";
 import { isRecord } from "@purin-labs/std";
-import { readOnboardingRow } from "../../../data/organisation-onboarding-row";
+import { readOnboardingRow } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 import { account } from "../integrations";
 import { providerContextForExistingAccount } from "../../../provider-lifecycle/existing-account-context";
 import { authorizeAccountRequest } from "./account-request";

@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { D1PreparedStatement } from "@cloudflare/workers-types";
 import type {
   CommerceEntityTypeId,
@@ -30,8 +30,8 @@ import {
   type ControlMutationBoundary,
   type ControlMutationIdentity,
   type ControlMutationReceiptScope,
-} from "./control-mutation";
-import type { OrganisationEnvironment } from "./control-plane";
+} from "@purin-labs/tenancy/data/control-mutation";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
@@ -50,7 +50,7 @@ import { prepareGuardedFirstGrant } from "./access-grants";
 import {
   prepareGuardedConfigurationVersionFence,
   preparePublicationRevision,
-} from "./organisation-onboarding-row";
+} from "@purin-labs/tenancy/data/organisation-onboarding-row";
 import {
   assertNever,
   isRecord,

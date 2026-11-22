@@ -4,7 +4,7 @@ import type {
   SessionSideCaseSource,
 } from "../actors/session/conversation-port";
 import { decideCaseConversationSink } from "../actors/case-conversation-sink";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   admitChatForkInformationFlow,
   authorizeForkHistoryAccess,

@@ -22,7 +22,7 @@ import {
 } from "@purin-labs/email-draft-crdt/protocol";
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import { controlError, readJsonRecord } from "../control/http";
-import { listOrganisationMembers, resolveUser } from "../data/control-plane";
+import { listOrganisationMembers, resolveUser } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseCaseId,
@@ -43,7 +43,7 @@ import {
 import { resolveCollaborationSlackThread } from "./collaboration-slack-thread";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
 
 const EMAIL_DRAFT_ID = "active";

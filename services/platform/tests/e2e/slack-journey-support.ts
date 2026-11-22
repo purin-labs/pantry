@@ -23,12 +23,12 @@ import {
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
 import { createAccessGrant } from "../../src/data/access-grants";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
-import { createOrganisationInstall } from "../../src/data/organisation";
+import { createOrganisationInstall } from "@purin-labs/tenancy/data/organisation";
 import {
   issueControlSession,
   upsertUser,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import {
   parseSessionId,
   parseOrganisationId,
@@ -36,7 +36,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { parseInitialOrganisationPlacement } from "../../src/placement";
+import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { isRecord } from "@purin-labs/std";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

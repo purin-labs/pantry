@@ -1,5 +1,5 @@
-import { authenticatedConversationScope } from "../../../organisation-access/access";
-import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
+import { authenticatedConversationScope } from "@purin-labs/tenancy/organisation-access/access";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   mailControlAuthority,

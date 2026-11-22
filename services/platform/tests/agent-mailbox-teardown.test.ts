@@ -4,7 +4,7 @@ import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { describe, expect, it } from "vitest";
 
 import { tearDownAgentMailboxForRemoval } from "../src/mail-inbox/agent-mailbox-teardown";
-import { upsertUser } from "../src/data/control-plane";
+import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import { registerEmailMailboxAccount } from "../src/data/email-mailbox";
 import {
   createConnectedIntegration,

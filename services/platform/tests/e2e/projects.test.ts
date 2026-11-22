@@ -10,13 +10,13 @@ import { fixtureDatabase } from "./organisation-database";
 import { mutateProjectAccess } from "../../src/projects/membership";
 import { deleteArchivedChat } from "../../src/chat/deletion";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
-import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   startActorRelocation,
   resumeActorRelocation,
   type ActorRelocationId,
 } from "../../src/actors/actor-relocation";
-import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
+import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import { admitTurn } from "../../src/chat/turn/admission";
 import { resumeConversationExecution } from "../../src/chat/application";
 import * as modelRoutes from "../../src/models/route";
@@ -58,7 +58,7 @@ import {
 import {
   issueControlSession,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { resolveOrganisationModelRoute } from "../../src/models/route";
 import {

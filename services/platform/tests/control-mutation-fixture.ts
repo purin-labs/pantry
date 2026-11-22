@@ -1,9 +1,9 @@
-import type { User } from "../src/data/control-plane";
+import type { User } from "@purin-labs/tenancy/data/control-plane";
 import {
   newControlMutationIdentity,
   type ControlMutationReceiptScope,
-} from "../src/data/control-mutation";
-import type { OrganisationBootstrapMutation } from "../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-mutation";
+import type { OrganisationBootstrapMutation } from "@purin-labs/tenancy/data/control-plane";
 
 export function organisationBootstrapMutation(
   owner: User,

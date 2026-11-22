@@ -1,4 +1,4 @@
-import type { OrganisationEnvironment } from "../data/control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import { parseSlackAppId, type SlackAppId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 

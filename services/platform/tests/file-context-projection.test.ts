@@ -15,9 +15,9 @@ import { defaultDenyPolicy } from "../src/policy-snapshot";
 import { searchContextProjections } from "../src/context/projection";
 import { d1Database } from "./sqlite-d1";
 import { requireIntegrationAccountId, requireOrganisationId } from "./test-ids";
-import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
-import { parseInitialOrganisationPlacement } from "../src/placement";
-import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
+import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
+import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 
 const migration = singleDatabaseSchema();

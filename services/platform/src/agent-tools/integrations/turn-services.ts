@@ -1,5 +1,5 @@
 import { sha256Hex } from "@purin-labs/std";
-import { acceptedExecutionAuthority } from "../../organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { sessionActionMutationExecution } from "../../actors/action-mutation-execution";
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import { readSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";

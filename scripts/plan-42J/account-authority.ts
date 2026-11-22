@@ -1,7 +1,7 @@
 // The people and Organisations of a journey's fixture Worker (the Brain, side
 // Case and Kitchen journeys). Pantry keeps its own members (Plan 95), so the
 // fixture needs no outside account authority.
-import { newControlMutationIdentity } from "../../services/platform/src/data/control-mutation";
+import { newControlMutationIdentity } from "../../foundation/tenancy/data/control-mutation";
 import {
   bootstrapOrganisation,
   issueControlSession,
@@ -9,10 +9,10 @@ import {
   type ActiveControlSession,
   type ControlRole,
   type User,
-} from "../../services/platform/src/data/control-plane";
+} from "../../foundation/tenancy/data/control-plane";
 import type { Env } from "../../foundation/kernel/env";
 import type { OrganisationId } from "../../foundation/kernel/ids";
-import { parseInitialOrganisationPlacement } from "../../services/platform/src/placement";
+import { parseInitialOrganisationPlacement } from "../../foundation/tenancy/placement";
 
 /** A person with a role in one Organisation and a control session. */
 export type AccountPerson = Readonly<{

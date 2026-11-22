@@ -1,6 +1,6 @@
 import type { DecidePendingDecision } from "../../decide-pending-decision";
-import { acceptedExecutionAuthority } from "../../../organisation-access/access";
-import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
 import { decideCurrentAuthorityFlowSink } from "../../../chat/information-flow";
 import { customConnectorFetchOf } from "../../../custom-connectors/egress";
@@ -26,11 +26,11 @@ import {
 import {
   authorizeOrganisationControl,
   type User,
-} from "../../../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import type {
   UnversionedControlMutationBoundary,
   ControlMutationReceiptScope,
-} from "../../../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import { FlowBinding } from "../../../policy/information-flow";
 import {
   controlMutationScope,

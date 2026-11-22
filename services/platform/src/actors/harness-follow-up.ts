@@ -2,7 +2,7 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 
-import { acceptedExecutionAuthority } from "../organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseConnectorId } from "@purin-labs/kernel/ids";
 import { validateLiveRequestAuthority } from "../request-authority";

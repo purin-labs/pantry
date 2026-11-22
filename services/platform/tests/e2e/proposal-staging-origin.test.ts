@@ -6,7 +6,7 @@ import {
   ORGANISATION_ID,
   SLACK_ACTOR_USER_ID,
 } from "./slack-journey-support";
-import { issueControlSession } from "../../src/data/control-plane";
+import { issueControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { authorizeSessionTurnExecution } from "../../src/chat/turn-access";
 import { proposeCampaignBrief } from "../../src/data/campaign-brief";
@@ -15,7 +15,7 @@ import {
   admitOperatorControlTurnFixture,
   requireOrganisationExecutionScope,
 } from "../organisation-execution-fixture";
-import type { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 type Proposal = "campaign" | "configuration";
 type Boundary = "origin" | "placement" | "release";

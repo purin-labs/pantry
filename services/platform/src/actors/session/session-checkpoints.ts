@@ -1,5 +1,5 @@
 import type { SessionShared } from "./session-shared";
-import { acceptedExecutionAuthority } from "../../organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { armAlarmBy } from "../lifecycle/actor-alarm";
 import type { Outcome } from "@purin-labs/contracts";
 import { validateLiveRequestAuthority } from "../../request-authority";

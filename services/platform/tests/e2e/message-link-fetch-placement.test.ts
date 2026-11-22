@@ -18,7 +18,7 @@ import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-pol
 import {
   readActiveOrganisationMembership,
   readActiveOrganisationMembershipRevision,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { parseRequestId } from "@purin-labs/kernel/ids";
 import { deriveUserMessageViews } from "../../src/messages/message-wasm";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";

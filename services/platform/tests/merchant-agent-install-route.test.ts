@@ -20,14 +20,14 @@ const policyMocks = vi.hoisted(() => ({
 }));
 const presetMocks = vi.hoisted(() => ({ installMerchantAgent: vi.fn() }));
 
-vi.mock("../src/data/control-plane", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/control-plane")>()),
+vi.mock("@purin-labs/tenancy/data/control-plane", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/tenancy/data/control-plane")>()),
   authorizeOrganisationControl: controlMocks.authorizeOrganisationControl,
   resolveControlSession: controlMocks.resolveControlSession,
   validateControlCsrf: controlMocks.validateControlCsrf,
 }));
-vi.mock("../src/data/control-mutation", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/control-mutation")>()),
+vi.mock("@purin-labs/tenancy/data/control-mutation", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/tenancy/data/control-mutation")>()),
   readControlMutationReplay: mutationMocks.readControlMutationReplay,
   prepareControlMutationReceipt: mutationMocks.prepareControlMutationReceipt,
 }));

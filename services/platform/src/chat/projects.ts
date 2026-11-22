@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { moveChatDirectoryEntry } from "./directory-move";
 import type { Env } from "@purin-labs/kernel/env";

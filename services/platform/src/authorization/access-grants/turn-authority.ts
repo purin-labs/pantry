@@ -3,7 +3,7 @@ import type {
   OrganisationAccess,
   OrganisationAdmissionAction,
   OrganisationUserAuthority,
-} from "../../organisation-access/access";
+} from "@purin-labs/tenancy/organisation-access/access";
 import type {
   AuthorityPartition,
   AuthorityPartitionKey,

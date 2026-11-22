@@ -4,7 +4,7 @@ import {
   prepareRecoveryTargetReservation,
   prepareRegionalTargetAbandon,
   prepareSourceAdmissionRestore,
-} from "../data/shared-rows/placement-row";
+} from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   abandonedMoveRecoversSql,
   markRelocationCleaning,
@@ -23,7 +23,7 @@ import {
   prepareRelocationStart,
   unresolvedProviderWorkQuery,
   type PlacementMoveOpenError,
-} from "../data/placement-move";
+} from "@purin-labs/tenancy/data/placement-move";
 import {
   isMovedRegistryEntry,
   prepareRelocationExclusions,
@@ -48,12 +48,12 @@ import {
 import {
   provisionRegionalMoveTarget,
   resumeRegionalPlacement,
-} from "../data/shared-rows/regional-move";
+} from "@purin-labs/tenancy/data/shared-rows/regional-move";
 import {
   selectOrganisationPlacementDatabase,
   type OrganisationPlacementBindings,
   type OrganisationExecutionScopeError,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import { actorRelocationAdmission } from "./actor-placement-admission";
 import {
   beginActorExport,
@@ -77,13 +77,13 @@ import {
   type OrganisationPlacementError,
   type OrganisationPlacementMoveTarget,
   type ActorRelocationId,
-} from "../data/organisation-placement";
+} from "@purin-labs/tenancy/data/organisation-placement";
 import {
   freezeOrganisationPlacementMove,
   freezeRegionalOrganisationPlacement,
   publishOrganisationPlacementMove,
   reserveOrganisationPlacementMove,
-} from "../data/shared-rows/placement-row";
+} from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   loadActorExport,
   newActorExportId,

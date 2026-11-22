@@ -1,7 +1,7 @@
 import {
   organisationAccessOfOneRead,
   type AuthorizedConversationScope,
-} from "../organisation-access/access";
+} from "@purin-labs/tenancy/organisation-access/access";
 import { parseMemoryCommand } from "@purin-labs/control-api";
 import type {
   MemoryApplicability,
@@ -44,7 +44,7 @@ import {
   parseIntegrationAccountId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
 import {
   canonicalFlowLabel,

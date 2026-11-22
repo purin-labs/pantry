@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { upsertUser } from "../src/data/control-plane";
+import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   newControlMutationIdentity,
   parseControlMutationBoundary,
   prepareControlMutationReceipt,
   readControlMutationReplay,
-} from "../src/data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import { createMigratedDatabase } from "./sqlite-d1";
 
 describe("control mutation receipts", () => {

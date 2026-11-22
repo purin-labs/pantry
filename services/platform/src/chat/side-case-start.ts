@@ -16,7 +16,7 @@ import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ControlSessionId } from "@purin-labs/kernel/ids";
 import { resolveOrganisationModelRoute } from "../models/route";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { prepareProjectSnapshot } from "../projects/context";
 import { admitTurn } from "./turn/admission";
 import { scheduleConversationExecution } from "./application";

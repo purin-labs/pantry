@@ -1,4 +1,4 @@
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { SessionSideCase } from "./conversation-port";
 import { turnMayProposeSideCase } from "./turn-tool-offers";
 import type {
@@ -81,7 +81,7 @@ export async function resolveAcceptedTurnTools(input: {
   readonly scope: OrganisationExecutionScope;
   readonly organisationId: OrganisationId;
   readonly authority: RequestAuthority;
-  readonly userAuthority: import("../../organisation-access/access").OrganisationUserAuthority;
+  readonly userAuthority: import("@purin-labs/tenancy/organisation-access/access").OrganisationUserAuthority;
   readonly assignment: CaseAssignment;
 }): Promise<Result<AcceptedTurnTools, CanonicalEmbeddedHarnessRunError>> {
   const authority = await resolveEffectiveGrantSetForAuthorityPartition({

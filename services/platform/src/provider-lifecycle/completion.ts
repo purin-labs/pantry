@@ -1,9 +1,9 @@
 import {
   OrganisationExecutionScope,
   dispatchWithOrganisationPlacement,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
-import { hashOpaqueSecret } from "../data/control-plane";
+import { hashOpaqueSecret } from "@purin-labs/tenancy/data/control-plane";
 import {
   beginProviderProvisioning,
   consumeProviderAuthorizationState,

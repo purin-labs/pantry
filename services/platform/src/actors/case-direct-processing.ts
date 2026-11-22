@@ -2,7 +2,7 @@ import type {
   GlobalDatabase,
   OrganisationDatabase,
 } from "@purin-labs/kernel/database-handles";
-import { acceptedExecutionAuthority } from "../organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import {
   turnMemoryReaderWithoutSubjects,
   type TurnMemoryReader,
@@ -55,7 +55,7 @@ import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspa
 import { deriveStableCaseId } from "@purin-labs/kernel/case-identity";
 import { ensureCaseProject } from "../projects/case-project";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   resolveActiveCaseActorAtPlacement,
   resolveActiveConnectorActor,
@@ -1172,7 +1172,7 @@ async function authorizeDirectTurnExecution(
   input: Readonly<{
     globalDatabase: GlobalDatabase;
     db: OrganisationDatabase;
-    accountAccess: import("../organisation-access/access").OrganisationAccess;
+    accountAccess: import("@purin-labs/tenancy/organisation-access/access").OrganisationAccess;
     organisationId: OrganisationId;
     requestAuthority: RequestAuthority;
     sessionId: SessionId;

@@ -1,5 +1,5 @@
 import { resolveCaseContextCollectionSelectionVerification } from "../../case-context-discovery/source";
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../actor-execution-quiescence";
 import { parseCaseId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { readCaseContextDiscoveryPolicy } from "../../case-context-discovery/evaluation-store";
@@ -39,9 +39,9 @@ import {
 } from "./case-context-collection";
 import type { Env } from "@purin-labs/kernel/env";
 import type { SchemaTransaction } from "../schema-migrations";
-import type { OrganisationStateError } from "./types";
+import type { OrganisationStateError } from "@purin-labs/tenancy/actors/organisation/types";
 import type { Result } from "@purin-labs/kernel/result";
-import { organisationPlacementConflict } from "./organisation-record";
+import { organisationPlacementConflict } from "@purin-labs/tenancy/actors/organisation/organisation-record";
 
 /**
  * Policy activation, credentials, TypeSafe and Case context discovery for the Organisation.

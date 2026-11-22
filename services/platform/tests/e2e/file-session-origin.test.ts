@@ -1,6 +1,6 @@
 import { runFileContextReconciliation } from "../../src/context/files/reconciliation";
 import { fixtureDatabase } from "./organisation-database";
-import type { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { env, exports } from "cloudflare:workers";
 import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
@@ -25,7 +25,7 @@ import { createActiveConnectedIntegration } from "../../src/data/integration-acc
 import {
   issueControlSession,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-policy";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";

@@ -24,7 +24,7 @@ import {
   prepareControlMutationReceipt,
   prepareOnboardingAuditEvent,
   prepareOnboardingEvent,
-} from "./control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import { providerServices } from "../integrations/contract/provider-services";
 import { parseActiveIntegrationProvider } from "./integration-provider-directory";
 import { fileAccountErasureStatements } from "../context/files";
@@ -34,14 +34,14 @@ import {
   prepareRemovedAccountWebhooksDelete,
 } from "./integration-account-writes";
 import { prepareRemovedAccountResourcesErasure } from "./provider-resource";
-import { prepareRemovedAccountInstallationDelete } from "./surface-installation-writes";
+import { prepareRemovedAccountInstallationDelete } from "@purin-labs/tenancy/data/surface-installation-writes";
 import { prepareRemovedConnectionRevocation } from "./provider-connection-writes";
 import { prepareRemovedConnectionGenerationsRevocation } from "./provider-credential-generation";
 import {
   hasSlackOrganisationConnection,
   revokeDisabledSlackOrganisationConnection,
 } from "../slack/installation-store";
-import { prepareConfigurationVersionBump } from "./organisation-onboarding-row";
+import { prepareConfigurationVersionBump } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 type RemoveIntegrationAccountError =
   | { readonly code: "integration_account_not_found" }

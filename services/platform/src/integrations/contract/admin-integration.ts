@@ -3,14 +3,14 @@ import { readOrganisationEnvironment } from "../../control/organisation-runtime"
 import {
   resolveOrganisationProvisioningActor,
   type OrganisationEnvironment,
-} from "../../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import {
   createActiveConnectedIntegration,
   type ActiveProviderAccountContext,
   type ConnectedIntegrationSeed,
 } from "../../data/integration-account";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 type AdminConnectedIntegrationSeed = Omit<
   ConnectedIntegrationSeed,

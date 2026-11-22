@@ -1,5 +1,5 @@
-import { acceptedExecutionAuthority } from "../../organisation-access/access";
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import {
   parseIntegrationAccountId,

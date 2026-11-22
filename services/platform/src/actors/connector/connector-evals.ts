@@ -23,7 +23,7 @@ import { publishEvalRunResult, readEvalRunFixture } from "../../evals/access";
 import { createEvalTurnMemoryReader } from "../../memory/access";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isActorExecutionActive } from "../actor-execution-quiescence";
 import { invalid } from "./support";
 import { type ConnectorResult } from "./types";

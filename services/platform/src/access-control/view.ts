@@ -17,7 +17,7 @@ import type { IntegrationAccountId, PersonId, OrganisationId } from "@purin-labs
 import type { UserId } from "@purin-labs/control-api/ids";
 import { FlowLabel } from "../policy";
 import type { Result } from "@purin-labs/kernel/result";
-import type { ControlRole } from "../data/control-plane";
+import type { ControlRole } from "@purin-labs/tenancy/data/control-plane";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,

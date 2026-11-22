@@ -254,7 +254,7 @@ type LifecycleFixture = {
   readonly world: WhatsAppTestWorld;
   readonly deps: WhatsAppRpcDeps & {
     readonly origin: { readonly kind: "operator" };
-    readonly scope: import("../src/organisation-execution-scope").OrganisationExecutionScope;
+    readonly scope: import("@purin-labs/tenancy/organisation-execution-scope").OrganisationExecutionScope;
     readonly armAlarm: () => Promise<unknown>;
   };
   readonly sql: ReturnType<typeof sqlStorage>;

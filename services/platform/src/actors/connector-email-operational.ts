@@ -5,7 +5,7 @@ import {
   isSessionMailExecutionActive,
 } from "../mail-inbox/execution";
 import type { SessionTurnExecution } from "../chat/turn-access";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { gmailMailAdapter } from "../mail/gmail-mail-adapter";
 import type { SqlStorage, SqlStorageValue } from "@cloudflare/workers-types";
 

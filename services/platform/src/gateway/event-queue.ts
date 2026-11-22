@@ -1,7 +1,7 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { fetchWithOrganisationPlacement } from "../organisation-execution-scope";
+import { fetchWithOrganisationPlacement } from "@purin-labs/tenancy/organisation-execution-scope";
 import { storeFilePlacementCredential } from "../provider-workflows/file-context-credential";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   readScheduleDispatchReceipt,
   recordScheduleDispatchReceipt,

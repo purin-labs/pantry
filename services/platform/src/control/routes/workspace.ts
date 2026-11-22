@@ -3,13 +3,13 @@ import {
   type ActionLedgerActivity,
 } from "../../actors/action-ledger";
 import { requireActiveOrganisationActorAtScope } from "../../actors/actor-router";
-import type { ActiveOrganisationMembership } from "../../data/control-plane";
+import type { ActiveOrganisationMembership } from "@purin-labs/tenancy/data/control-plane";
 import {
   buildOnboardingProjection,
   type OnboardingProjection,
 } from "../../data/onboarding-projection";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { readCommerceActionLedger } from "../agent-operation-activity";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson } from "../http";

@@ -12,7 +12,7 @@ import type { MenuDraftSnapshot } from "@purin-labs/menu-draft-crdt";
 
 import type { ControlSessionId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 import type { ArchivedMenuBoard } from "./menu-board-archive";
 import type {

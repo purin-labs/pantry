@@ -2,7 +2,7 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   prepareOrganisationLifecycleMove,
   type LifecycleFence,
-} from "./organisation-lifecycle-moves";
+} from "@purin-labs/tenancy/data/organisation-lifecycle-moves";
 import type {
   FirstOperationalTask,
   OnboardingActivationPhase,
@@ -24,12 +24,12 @@ import {
   type WorkspaceId,
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import { prepareActivationProjectionBump } from "./organisation-onboarding-row";
+import { prepareActivationProjectionBump } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 import {
   prepareFirstActiveAccountDefaults,
   preparePendingAccountsActivation,
 } from "./integration-account-writes";
-import type { OrganisationEnvironment } from "./control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import {
   prepareControlMutationReceipt,
   prepareOnboardingAuditEvent,
@@ -38,7 +38,7 @@ import {
   type ControlMutationBoundary,
   type ControlMutationIdentity,
   type ControlMutationReceiptScope,
-} from "./control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import type { CapabilityProfile } from "./onboarding";
 import {
   prepareResolveOpenSupportReferences,

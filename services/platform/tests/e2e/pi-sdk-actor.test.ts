@@ -20,7 +20,7 @@ import {
   startActorRelocation,
   resumeActorRelocation,
 } from "../../src/actors/actor-relocation";
-import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
+import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import { revokeAccessGrant } from "../../src/data/access-grants";
 import { network } from "./network";
 import {

@@ -15,7 +15,7 @@ import { resolveOrganisationCommerceSystem } from "../../data/organisation-comme
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { createCommerceClient } from "./client";
 
 /** The organisation's Commerce merchant, reached with Pantry's app token. */

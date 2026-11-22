@@ -7,10 +7,10 @@ import {
   issueControlSession,
   upsertUser,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { parseIntegrationAccountId, parseOrganisationId } from "@purin-labs/kernel/ids";
-import { parseInitialOrganisationPlacement } from "../../src/placement";
-import { newControlMutationIdentity } from "../../src/data/control-mutation";
+import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import { expect } from "vitest";
 
 export async function connectCommerceFixture(

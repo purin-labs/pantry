@@ -9,7 +9,7 @@ import {
 } from "../../src/actors/actor-relocation";
 import { listPlacementActorRegistryEntries } from "../../src/actors/actor-registry";
 import type { ConnectorDO } from "../../src/actors/connector";
-import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
+import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import { fixtureDatabase } from "./organisation-database";
 import { ORGANISATION_ID } from "./slack-journey-support";
 

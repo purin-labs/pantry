@@ -16,11 +16,11 @@ import {
 } from "../../src/actors/actor-relocation";
 import { SessionDO } from "../../src/actors/agent-session";
 import { listHarnessCheckpointObjectKeys } from "../../src/actors/agent-session-harness-authority";
-import { freezeOrganisationPlacementMove } from "../../src/data/shared-rows/placement-row";
+import { freezeOrganisationPlacementMove } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   parseOrganisationPlacementMoveTarget,
   readOrganisationPlacementMove,
-} from "../../src/data/organisation-placement";
+} from "@purin-labs/tenancy/data/organisation-placement";
 import { network } from "./network";
 import {
   ORGANISATION_ID,

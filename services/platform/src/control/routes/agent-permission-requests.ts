@@ -41,7 +41,7 @@ import {
 import { readOrganisationCapabilityPolicies } from "../../data/capability-policy";
 import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { slackSurfaceParts } from "../../slack/surface-parts";
 import {
   authorizeOrganisationRequest,

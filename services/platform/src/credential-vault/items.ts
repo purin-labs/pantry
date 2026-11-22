@@ -11,7 +11,7 @@ import { assertNever } from "@purin-labs/std";
 import {
   organisationPlacementPredicate,
   type OrganisationExecutionScope,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 import { parseVaultHandle, type VaultHandle } from "./domain";
 import type { CredentialVaultBindings } from "./keyring";

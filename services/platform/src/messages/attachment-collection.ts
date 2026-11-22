@@ -1,4 +1,4 @@
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { readPortalChatAttachmentKeys } from "../chat/attachments";
 import { readChatForkAttachmentKeys } from "../chat/fork-history";
 import { actorStub } from "../actors/actor-stubs";

@@ -2,7 +2,7 @@ import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
-} from "../../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import { parseOrganisationId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
 import type { FlowLabel } from "../../policy/information-flow/labels";
 import { digestCanonical } from "../../policy/information-flow/digest";

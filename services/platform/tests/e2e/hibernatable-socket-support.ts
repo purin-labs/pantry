@@ -10,7 +10,7 @@ import {
   upsertUser,
   type IssuedControlSession,
   type User,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 
 export const PUBLIC_ORIGIN = "https://localhost";
 /** The close code of a socket whose Actor no longer serves the Organisation. */

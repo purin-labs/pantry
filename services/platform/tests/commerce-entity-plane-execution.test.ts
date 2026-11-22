@@ -24,12 +24,12 @@ import {
 } from "../src/authorization/access-grants/turn-authority";
 import { createAccessGrant } from "../src/data/access-grants";
 import { defaultDenyPolicy } from "../src/policy-snapshot";
-import { acceptedExecutionAuthority } from "../src/organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import {
   FlowBinding,
   InformationFlowContext,
 } from "../src/policy/information-flow";
-import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { VariantBy } from "@purin-labs/type-utils";
 import {
   requireCaseId,

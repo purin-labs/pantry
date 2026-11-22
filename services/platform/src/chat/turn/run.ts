@@ -1,10 +1,10 @@
 import {
   listOrganisationMembers,
   readActiveOrganisationMembershipRevision,
-} from "../../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { readPendingSessionPermissionRequest } from "../../data/agent-permission-request";
 import { decideChatFlowSink } from "../information-flow";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { chatUserMessage } from "../attachments";
 import { screenObservationReachesModel } from "../screen-observation-admission";
 import {

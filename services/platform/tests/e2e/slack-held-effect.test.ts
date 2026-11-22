@@ -9,7 +9,7 @@ import {
   CAPABILITY_KEYS,
   SLACK_MESSAGE_RESOURCE_SCOPE,
 } from "../../src/authorization/capability-catalogue";
-import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { FlowPolicyInput } from "../../src/policy/information-flow";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { CARD_ONLY_REPLY } from "../../src/slack/card-only-reply";

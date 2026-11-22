@@ -21,7 +21,7 @@ import {
   compileTrialTurnAuthority,
   trialAccountAccess,
 } from "./account-authority.mjs";
-import { acceptedExecutionAuthority } from "../../services/platform/src/organisation-access/access.ts";
+import { acceptedExecutionAuthority } from "../../foundation/tenancy/organisation-access/access.ts";
 import { CAPABILITY_KEYS } from "../../services/platform/src/authorization/capability-catalogue.ts";
 import { catalogHarnessToolCatalogDigest } from "../../services/platform/src/agent-tools/catalog/selection.ts";
 import { createCatalogHarnessCodeMode } from "../../services/platform/src/agent-tools/catalog/code-mode.ts";

@@ -453,7 +453,7 @@ async function sourceEvidence() {
       "services/platform/src/actors/commerce-projection.ts",
       "services/platform/src/actors/session-execution-admission.ts",
       "services/platform/src/actors/actor-activation.ts",
-      "services/platform/src/organisation-execution-scope.ts",
+      "foundation/tenancy/organisation-execution-scope.ts",
       "services/platform/migrations-global/0001_current_schema.sql",
       "services/platform/migrations-regional/0001_current_schema.sql",
       "services/platform/scripts/single-database-schema.mjs",

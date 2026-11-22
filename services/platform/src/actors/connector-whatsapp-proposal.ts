@@ -13,7 +13,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { Result } from "@purin-labs/kernel/result";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isActorExecutionActive } from "./actor-execution-quiescence";
 import { resolveWhatsAppOrganisationCredential } from "../whatsapp/credential";
 import { sendWhatsAppText } from "../whatsapp/graph";

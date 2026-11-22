@@ -4,7 +4,7 @@ import {
   type ChatDirectoryResult,
   type ConversationId,
 } from "@purin-labs/control-api";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { prepareChatDirectoryInitialization } from "./projects";
 import type { ConversationScope } from "./store";

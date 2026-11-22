@@ -8,7 +8,7 @@ import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it, vi } from "vitest";
 
 import { ConnectorDO } from "../src/actors/connector";
-import { upsertUser } from "../src/data/control-plane";
+import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   connectionCredentialAuthority,
   createConnectedIntegration,

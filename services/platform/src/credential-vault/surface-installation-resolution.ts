@@ -2,8 +2,8 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
-} from "../organisation-execution-scope";
-import type { OrganisationInstallRecord } from "../data/organisation";
+} from "@purin-labs/tenancy/organisation-execution-scope";
+import type { OrganisationInstallRecord } from "@purin-labs/tenancy/data/organisation";
 import {
   parseOrganisationId,
   parseIntegrationAccountId,

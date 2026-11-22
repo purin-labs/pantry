@@ -11,11 +11,11 @@ import {
   failOnboardingActivation,
   type ActivationContext,
 } from "../src/data/activation";
-import { upsertUser } from "../src/data/control-plane";
+import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   newControlMutationIdentity,
   readControlMutationReplay,
-} from "../src/data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import {
   armOnboardingActivationAcceptanceFault,
   consumeOnboardingActivationAcceptanceFault,
@@ -41,8 +41,8 @@ import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-pla
 import { isRecord } from "@purin-labs/std";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { requireWorkspaceId, requireChannelId } from "./test-ids";
-import { resolveActiveOrganisationPlacementRecord } from "../src/data/organisation-placement";
-import type { LifecycleFence } from "../src/data/organisation-lifecycle-moves";
+import { resolveActiveOrganisationPlacementRecord } from "@purin-labs/tenancy/data/organisation-placement";
+import type { LifecycleFence } from "@purin-labs/tenancy/data/organisation-lifecycle-moves";
 
 /** The placement that the Organisation Actor admits an activation under. */
 async function activationFence(

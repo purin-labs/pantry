@@ -5,8 +5,8 @@ import type {
 import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
-} from "../organisation-execution-scope";
-import type { OrganisationEnvironment } from "../data/control-plane";
+} from "@purin-labs/tenancy/organisation-execution-scope";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
 import {
   parseCaseId,
@@ -28,7 +28,7 @@ import { type UserId } from "@purin-labs/control-api/ids";
 import {
   parseOrganisationPlacement,
   type OrganisationPlacement,
-} from "../placement";
+} from "@purin-labs/tenancy/placement";
 import type { Result } from "@purin-labs/kernel/result";
 import { parseSlackUserId, type SlackUserId } from "./events";
 import type { Variant } from "@purin-labs/type-utils";

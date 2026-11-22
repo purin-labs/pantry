@@ -7,7 +7,7 @@ import {
 } from "@purin-labs/control-api";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseCaseId } from "@purin-labs/kernel/ids";
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   listProjectCases,
   moveCase,

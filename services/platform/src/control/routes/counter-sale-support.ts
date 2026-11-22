@@ -5,7 +5,7 @@ import type {
 import type {
   ControlMutationReceiptScope,
   UnversionedControlMutationBoundary,
-} from "../../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import type { Env } from "@purin-labs/kernel/env";
 import { admitUserMutation } from "../admission/control-mutation";
 import {

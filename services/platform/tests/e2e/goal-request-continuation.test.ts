@@ -3,7 +3,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { evictDurableObject } from "cloudflare:test";
 import { http } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   readOrganisationInferenceSelection,

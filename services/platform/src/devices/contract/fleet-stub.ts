@@ -1,7 +1,7 @@
 import type { DeviceFleetActor } from "../../actors/device-fleet";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 /** The Actor of one shop location, placed where the Organisation is. */
 export function deviceFleetStub(

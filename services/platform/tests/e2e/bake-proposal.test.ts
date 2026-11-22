@@ -11,7 +11,7 @@ import { http, HttpResponse } from "msw";
 import { expect, it } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {
   buttonsOf,
   cardOf,

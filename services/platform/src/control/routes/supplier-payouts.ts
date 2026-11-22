@@ -18,7 +18,7 @@ import {
 import {
   type UnversionedControlMutationBoundary,
   type ControlMutationReceiptScope,
-} from "../../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import {
   listSupplierPayoutsForSupplier,
   listSupplierPayoutsInWindow,

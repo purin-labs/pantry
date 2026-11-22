@@ -3,7 +3,7 @@ import type {
   OrganisationAccess,
   OrganisationUserAuthority,
   OrganisationAdmissionAction,
-} from "../organisation-access/access";
+} from "@purin-labs/tenancy/organisation-access/access";
 import type { RequestAuthority } from "@purin-labs/contracts";
 
 import {

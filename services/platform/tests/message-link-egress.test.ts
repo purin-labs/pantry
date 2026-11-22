@@ -14,7 +14,7 @@ import {
 import {
   parseOrganisationPlacement,
   type OrganisationPlacement,
-} from "../src/placement";
+} from "@purin-labs/tenancy/placement";
 import { isRecord } from "@purin-labs/std";
 
 describe("worker message link egress", function egressSuite() {

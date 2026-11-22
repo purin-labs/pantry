@@ -6,7 +6,7 @@ import {
   type SingleDatabase,
 } from "@purin-labs/kernel/database-handles";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import type { OrganisationPlacement } from "../src/placement";
+import type { OrganisationPlacement } from "@purin-labs/tenancy/placement";
 import type { ActorRegistryId } from "../src/actors/actor-registry";
 import { readRegistryEntryById } from "../src/actors/actor-registry";
 import { resolveActorExecutionAdmission } from "../src/actors/actor-placement-admission";

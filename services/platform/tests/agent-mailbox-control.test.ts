@@ -4,7 +4,7 @@ import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-pla
 import { describe, expect, it } from "vitest";
 
 import { handleControlRequest } from "../src/control-router";
-import { issueControlSession, upsertUser } from "../src/data/control-plane";
+import { issueControlSession, upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import { registerEmailMailboxAccount } from "../src/data/email-mailbox";
 import {
   createConnectedIntegration,

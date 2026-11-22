@@ -30,7 +30,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { parseSlackEnvelope } from "../src/slack/events";
-import { parseOrganisationPlacement } from "../src/placement";
+import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 describe("Connector-owned interactive Case work", connectorCaseWorkSuite);

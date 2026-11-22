@@ -1,7 +1,7 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import type { OrganisationAccess } from "../organisation-access/access";
+import type { OrganisationAccess } from "@purin-labs/tenancy/organisation-access/access";
 import { decideChatFlowDelivery } from "./information-flow";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   VISIBLE_CONVERSATIONS_SQL,
   conversationCaseIdentity,

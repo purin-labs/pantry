@@ -3,7 +3,7 @@ import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
   type OrganisationExecutionScopeError,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   activateActorRegistryEntries,
   activateActorRegistryEntry,
@@ -30,7 +30,7 @@ import type {
   SessionId,
   OrganisationId,
 } from "@purin-labs/kernel/ids";
-import type { OrganisationPlacement } from "../placement";
+import type { OrganisationPlacement } from "@purin-labs/tenancy/placement";
 import type { Result } from "@purin-labs/kernel/result";
 import { assertNever } from "@purin-labs/std";
 import {

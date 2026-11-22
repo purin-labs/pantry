@@ -15,13 +15,13 @@ import { createCommerceClient } from "../../services/platform/src/commerce/contr
 import { commerceCanonicalResourceId } from "../../services/platform/src/commerce/contract/resource-ids.ts";
 import { createAccessGrant } from "../../services/platform/src/data/access-grants.ts";
 import { SessionExecutionAdmission } from "../../services/platform/src/actors/session-execution-admission.ts";
-import { createOrganisationInstall } from "../../services/platform/src/data/organisation.ts";
+import { createOrganisationInstall } from "../../foundation/tenancy/data/organisation.ts";
 import {
   parseVaultHandle,
   storeVaultSecret,
 } from "../../services/platform/src/credential-vault/index.ts";
 import { parseWorkspaceId } from "../../foundation/kernel/ids.ts";
-import { parseInitialOrganisationPlacement } from "../../services/platform/src/placement.ts";
+import { parseInitialOrganisationPlacement } from "../../foundation/tenancy/placement.ts";
 import { browserFixture } from "./browser-fixture.mjs";
 import { authorizeOrganisationRequest } from "../../services/platform/src/control/authorization.ts";
 import { matchProductDescriptionDraftRoute } from "../../services/platform/src/control/admission/product-description-draft.ts";

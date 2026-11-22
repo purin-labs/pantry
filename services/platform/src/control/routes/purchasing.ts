@@ -9,7 +9,7 @@ import {
 import type {
   UnversionedControlMutationBoundary,
   ControlMutationReceiptScope,
-} from "../../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import type { Env } from "@purin-labs/kernel/env";
 import { createCommerceOutboxReconcileQueueMessage } from "../../commerce/contract/queue-messages";
 import {

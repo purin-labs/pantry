@@ -11,7 +11,7 @@ import {
   parseWorkspaceId,
 } from "@purin-labs/kernel/ids";
 import type { SlackCaseCommand } from "../slack/case-command-message";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { refreshSlackRequestAuthority } from "../request-authority";
 import { resolveSlackLinkedMember } from "./action-mutation-execution";
 import { deriveSlackCaseRouteIdentities } from "../slack/case-routing";

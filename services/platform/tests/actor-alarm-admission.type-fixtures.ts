@@ -1,5 +1,5 @@
 import type { ActorRecoveryAdmission } from "../src/actors/actor-activation";
-import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 declare const scope: OrganisationExecutionScope;
 declare const admitted: Extract<ActorRecoveryAdmission, { kind: "admitted" }>;

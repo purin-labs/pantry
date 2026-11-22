@@ -7,7 +7,7 @@ import { readGmailInferenceEligibility } from "../../mail-inbox/contract/gmail-i
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { authorizeMailAssistant } from "../../mail-inbox/assistant-eligibility";
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { digestCanonical } from "../../policy";
 import type { Result } from "@purin-labs/kernel/result";
 import type { TransientSessionExecution } from "../session/support";

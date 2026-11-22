@@ -21,7 +21,7 @@ import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import type { CollaborationAgent } from "@purin-labs/collaboration";
 import type { SessionTurnExecution } from "../chat/turn-access";
 import { controlError } from "../control/http";
-import { resolveUser } from "../data/control-plane";
+import { resolveUser } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
@@ -34,7 +34,7 @@ import {
   type CollaborationSocketRoom,
 } from "./collaboration-room";
 import { assertNever, sha256Hex } from "@purin-labs/std";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
 
 const MENU_DRAFT_ID = "cafe-menu";

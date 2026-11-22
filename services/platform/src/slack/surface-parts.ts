@@ -11,7 +11,7 @@ import type {
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { FlowLabel } from "../policy/information-flow";
 import { definePort } from "@purin-labs/kernel/port";
 

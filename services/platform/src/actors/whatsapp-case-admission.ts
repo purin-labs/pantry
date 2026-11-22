@@ -2,7 +2,7 @@ import { ensureCaseProject } from "../projects/case-project";
 import { whatsappConnectorIdValue } from "../data/whatsapp";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   parseCaseId,
   parseIntegrationAccountId,

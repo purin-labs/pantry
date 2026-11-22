@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import type { OrganisationAccess } from "../organisation-access/access";
+import type { OrganisationAccess } from "@purin-labs/tenancy/organisation-access/access";
 import type { DisclosureDestination } from "./disclosure-evidence";
 import {
   ConversationAudienceProposal,
@@ -12,7 +12,7 @@ import { isUserId } from "@purin-labs/control-api";
 import {
   listOrganisationMembers,
   readActiveOrganisationMembershipRevision,
-} from "../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import {
   buildControlAuthority,
   validateLiveRequestAuthority,

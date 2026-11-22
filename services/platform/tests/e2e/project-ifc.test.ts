@@ -20,7 +20,7 @@ import {
   issueControlSession,
   readActiveOrganisationMembershipRevision,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
 import {

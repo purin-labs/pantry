@@ -16,7 +16,7 @@ import { traceWarn } from "@purin-labs/kernel/observability";
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import { reconcileOrganisationActorRegistry } from "./actor-registry-reconciliation";
 
 /** A reservation is stale after one scheduled period with no activation. */

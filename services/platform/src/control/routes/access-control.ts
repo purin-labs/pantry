@@ -1,6 +1,6 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import type { OrganisationPlacementBindings } from "../../organisation-execution-scope";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationPlacementBindings } from "@purin-labs/tenancy/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { listProviderResourcePage } from "../../data/provider-resource";
 import {
   EMAIL_OPERATIONAL_RESOURCE_SCOPE,

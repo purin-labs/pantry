@@ -68,6 +68,7 @@
     "@purin-labs/commerce-contracts": "workspace:*",
     "@purin-labs/contract-schema": "workspace:*",
     "@purin-labs/kernel": "workspace:*",
+    "@purin-labs/tenancy": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

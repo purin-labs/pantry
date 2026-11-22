@@ -4,7 +4,7 @@ import { requireOrganisationExecutionScope } from "./organisation-execution-fixt
 import { describe, expect, it } from "vitest";
 
 import { handleControlRequest } from "../src/control-router";
-import { issueControlSession, upsertUser } from "../src/data/control-plane";
+import { issueControlSession, upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   projectEmailReplyProposal,
   readEmailReplyProposalProjection,

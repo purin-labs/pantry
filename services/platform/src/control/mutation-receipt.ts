@@ -3,7 +3,7 @@ import {
   recordOrganisationCommerceMutationReceipt,
   type UnversionedControlMutationBoundary,
   type ControlMutationReceiptScope,
-} from "../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import type { AuthorizedOrganisationRequest } from "./authorization";
 import { controlCausationId } from "./mutation";
 

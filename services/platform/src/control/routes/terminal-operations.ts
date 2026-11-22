@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   parseTerminalAssignment,
   type PointOfSaleConfiguration,
@@ -10,9 +10,9 @@ import type { Env } from "@purin-labs/kernel/env";
 import { admitUserMutation } from "../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
-import type { ControlMutationReceiptScope } from "../../data/control-mutation";
+import type { ControlMutationReceiptScope } from "@purin-labs/tenancy/data/control-mutation";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import { resolveUser } from "../../data/control-plane";
+import { resolveUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   listIntegrationAccounts,
   type IntegrationAccount,

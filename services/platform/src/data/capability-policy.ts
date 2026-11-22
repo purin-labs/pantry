@@ -18,10 +18,10 @@ import type {
   OrganisationId,
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { InitialOrganisationPlacement } from "../placement";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
+import type { InitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import type { StrictUnion } from "@purin-labs/type-utils";
-import type { OrganisationQuerySource } from "./query-source";
+import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import {
   assertNever,
   hasExactKeys,

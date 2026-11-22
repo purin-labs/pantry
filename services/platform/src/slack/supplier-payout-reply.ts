@@ -2,7 +2,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
 
-import type { OrganisationUserAuthority } from "../organisation-access/access";
+import type { OrganisationUserAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { decideCaseConversationSink } from "../actors/case-conversation-sink";
 import {
   compileTurnAuthority,
@@ -14,7 +14,7 @@ import {
   type SupplierPayoutRow,
 } from "../data/supplier-payout-store";
 import type { OrganisationId, SessionId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   advanceInformationFlowContext,
   digestCanonical,

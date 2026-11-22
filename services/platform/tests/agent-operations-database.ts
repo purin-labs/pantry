@@ -1,7 +1,7 @@
 import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { DatabaseSync } from "node:sqlite";
 
 import { d1Database } from "./sqlite-d1";

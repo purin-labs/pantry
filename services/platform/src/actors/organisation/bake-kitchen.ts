@@ -28,7 +28,7 @@ import {
   readBakeRun,
 } from "../../kitchen/bakes/run-records";
 import { bakeRunKitchenPorts, bakeRunStub } from "../bake-run-ports";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { announceBakeProposal } from "../../slack/bake-proposal-announce";
 import {
   listCountedProducts,

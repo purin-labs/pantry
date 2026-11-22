@@ -16,7 +16,7 @@ import {
 } from "../../src/actors/connector-whatsapp";
 import { createWhatsAppContentCipher } from "../../src/actors/whatsapp-active-content";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import {
   assignWhatsAppSupportAgent,

@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { acceptedExecutionAuthority } from "../organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { sessionActionMutationExecution } from "./action-mutation-execution";
 import {
   requireSessionExecution,

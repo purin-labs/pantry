@@ -1,7 +1,7 @@
 import { CanvasLayout } from "@purin-labs/workflow-canvas-crdt";
 import type { Env } from "@purin-labs/kernel/env";
 import type { Result } from "@purin-labs/kernel/result";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
 import type { WorkflowCanvasSource } from "@purin-labs/bakery-model/bakery-canvas-source";
 import {

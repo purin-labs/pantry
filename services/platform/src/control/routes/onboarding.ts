@@ -1,16 +1,16 @@
-import { lifecycleFenceOf } from "../../data/organisation-lifecycle-moves";
+import { lifecycleFenceOf } from "@purin-labs/tenancy/data/organisation-lifecycle-moves";
 import { signalChat } from "../../chat/signals";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import type { Env } from "@purin-labs/kernel/env";
-import { createOwnedOrganisation } from "../../organisation-access/creation";
+import { createOwnedOrganisation } from "@purin-labs/tenancy/organisation-access/creation";
 import { readOrganisationCreationRequest } from "@purin-labs/control-api";
 import {
   acceptInvitation,
   issueInvitation,
   listPendingInvitations,
   revokeInvitation,
-} from "../../organisation-access/invitations";
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-access/invitations";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import { commerceSystemReadiness } from "../../commerce/contract/system-readiness";
 import {
@@ -32,17 +32,17 @@ import {
   parseControlRole,
   parseOrganisationInvitationEmail,
   revokeOrganisationMembership,
-} from "../../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import {
   prepareOnboardingEvent,
   type StoredControlMutationReceipt,
-} from "../../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import {
   archiveOrganisation,
   deleteArchivedOrganisation,
   renameOrganisation,
   restoreOrganisation,
-} from "../../data/organisation-lifecycle";
+} from "@purin-labs/tenancy/data/organisation-lifecycle";
 import {
   parseOrganisationId,
   type OrganisationId,
@@ -85,7 +85,7 @@ import {
   isPositiveInteger,
   isRecord,
 } from "@purin-labs/std";
-import { readOnboardingRow } from "../../data/organisation-onboarding-row";
+import { readOnboardingRow } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 export type OnboardingControlRoute =
   | Readonly<{ kind: "organisations" }>

@@ -1,4 +1,4 @@
-import { authenticatedConversationScope } from "../../organisation-access/access";
+import { authenticatedConversationScope } from "@purin-labs/tenancy/organisation-access/access";
 import {
   MAX_CASE_EXECUTION_PAGE,
   MAX_CASE_TIMELINE_WINDOW,

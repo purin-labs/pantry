@@ -4,7 +4,7 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   accessControlPath,

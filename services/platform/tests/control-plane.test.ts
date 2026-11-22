@@ -11,8 +11,8 @@ import {
   rotateControlSession,
   upsertUser,
   validateControlCsrf,
-} from "../src/data/control-plane";
-import { newControlMutationIdentity } from "../src/data/control-mutation";
+} from "@purin-labs/tenancy/data/control-plane";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import { type OrganisationId } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";

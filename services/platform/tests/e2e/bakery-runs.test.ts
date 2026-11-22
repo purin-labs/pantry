@@ -57,7 +57,7 @@ import { expect, it, vi } from "vitest";
 import { responseJson } from "../../../../apps/portal/src/control-client";
 import { savePreparedScenarioCopy } from "../../../../apps/portal/src/features/workflow-simulator/workspace-commands";
 import { savePreparedProductionScenario } from "../../../../apps/portal/src/features/workflow-simulator/production-scenario-api";
-import { type IssuedControlSession } from "../../src/data/control-plane";
+import { type IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { readLatestAgentRunSave } from "../../src/commerce/bakery/agent-run-save";
 import { listBakerySurfaceTimelineEvents } from "../../src/actors/bakery-surface-effect";
 import { admitTurn } from "../../src/chat/turn/admission";

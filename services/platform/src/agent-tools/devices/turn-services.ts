@@ -3,7 +3,7 @@ import {
   type StageConfigurationDraft,
 } from "../../actors/session/proposal-staging";
 import type { ToolTurnContext } from "../../actors/session/tool-wiring";
-import { roleMayOperate } from "../../data/control-plane";
+import { roleMayOperate } from "@purin-labs/tenancy/data/control-plane";
 import { readDevice } from "../../devices/store";
 import { withToolContext, type SessionToolContext } from "../context";
 import { ToolRequestError } from "../errors";

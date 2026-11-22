@@ -5,9 +5,9 @@ import type {
 import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import type { InstallModel } from "@purin-labs/contracts";
-import type { OrganisationEnvironment } from "../data/control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
 import {
   parseChannelId,

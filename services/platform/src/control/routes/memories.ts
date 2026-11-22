@@ -1,4 +1,4 @@
-import { authenticatedConversationScope } from "../../organisation-access/access";
+import { authenticatedConversationScope } from "@purin-labs/tenancy/organisation-access/access";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,

@@ -3,7 +3,7 @@ import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";
 import type { ConversationExecution } from "../../chat/execution";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { ConversationCaseActor } from "../case-direct-processing";
 import type { CaseCommerceProposalBody, CaseEntityPlaneCommand } from "./types";
 

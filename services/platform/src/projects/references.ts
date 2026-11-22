@@ -1,4 +1,4 @@
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { listAccessGrants } from "../data/access-grants";
 import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";

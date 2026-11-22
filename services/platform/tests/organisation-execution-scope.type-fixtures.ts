@@ -1,4 +1,4 @@
-import { OrganisationExecutionScope } from "../src/organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 declare const scope: OrganisationExecutionScope;
 

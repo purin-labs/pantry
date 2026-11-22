@@ -14,14 +14,14 @@ import {
 } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import type { OrganisationEnvironment } from "./control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import {
   parseCommerceBindingId,
   parseCommerceEngineMerchantId,
   type CommerceBindingId,
   type CommerceEngineMerchantId,
 } from "./commerce-merchant-binding";
-import type { OrganisationQuerySource } from "./query-source";
+import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 
 declare const commerceSystemRevisionBrand: unique symbol;
 declare const shopifyShopDomainBrand: unique symbol;

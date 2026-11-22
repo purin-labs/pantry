@@ -1,9 +1,9 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { readPlacementByEpoch } from "../../data/organisation-placement";
+import { readPlacementByEpoch } from "@purin-labs/tenancy/data/organisation-placement";
 import {
   OrganisationExecutionScope,
   selectOrganisationPlacementDatabase,
-} from "../../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../actor-execution-quiescence";
 import { collaborationSocketRoute } from "../collaboration-room";
 import {
@@ -35,11 +35,11 @@ import {
 import { expireAbandonedCueClaims } from "../cue-delivery";
 import { errorMessage } from "@purin-labs/std";
 import type { CommerceBoardPresenceEntry } from "@purin-labs/commerce-control-api";
-import type { OrganisationMeta, OrganisationMetaRow } from "./types";
+import type { OrganisationMeta, OrganisationMetaRow } from "@purin-labs/tenancy/actors/organisation/types";
 import {
   organisationPlacementConflict,
   readOrganisationMetaRow,
-} from "./organisation-record";
+} from "@purin-labs/tenancy/actors/organisation/organisation-record";
 
 const COMMERCE_BOARD_PRESENCE_TTL_MS = 30_000;
 

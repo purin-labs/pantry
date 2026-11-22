@@ -1,5 +1,5 @@
 import type { UserId } from "@purin-labs/control-api";
-import type { GlobalQuerySource } from "../../data/query-source";
+import type { GlobalQuerySource } from "@purin-labs/tenancy/data/query-source";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import type { ApprovalActionBinding } from "../../approval-authentication";
 import {
@@ -22,7 +22,7 @@ import {
   upsertUser,
   validateControlCsrf,
   type ActiveControlSession,
-} from "../../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import { requirePublicOrigin } from "@purin-labs/kernel/public-origin";
 import {

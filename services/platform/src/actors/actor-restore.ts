@@ -5,11 +5,11 @@ import type {
 import {
   provisionRegionalMoveTarget,
   resumeRegionalPlacement,
-} from "../data/shared-rows/regional-move";
+} from "@purin-labs/tenancy/data/shared-rows/regional-move";
 import {
   selectOrganisationPlacementDatabase,
   type OrganisationPlacementBindings,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import { actorRestoreAdmission } from "./actor-placement-admission";
 import {
   listOrganisationActorRegistryEntries,
@@ -30,7 +30,7 @@ import {
   prepareRegionalTargetAbandon,
   publishOrganisationPlacementMove,
   reserveOrganisationPlacementMove,
-} from "../data/shared-rows/placement-row";
+} from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   markRestoreComplete,
   markRestoreFrozen,
@@ -40,7 +40,7 @@ import {
   prepareRecoveryRelocationStart,
   prepareRestoreAbandon,
   prepareRestoreStart,
-} from "../data/placement-move";
+} from "@purin-labs/tenancy/data/placement-move";
 import {
   parseActorRelocationId,
   resumeActorRelocation,
@@ -57,7 +57,7 @@ import {
   type OrganisationPlacementError,
   type OrganisationPlacementMoveTarget,
   type ActorRestoreId,
-} from "../data/organisation-placement";
+} from "@purin-labs/tenancy/data/organisation-placement";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,

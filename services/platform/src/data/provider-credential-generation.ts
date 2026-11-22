@@ -8,8 +8,8 @@ import type {
 import {
   purgeGuarded,
   type OrganisationPurgeContext,
-} from "./organisation-lifecycle-port";
-import type { RowGuard } from "./shared-rows/organisation-row";
+} from "@purin-labs/tenancy/data/organisation-lifecycle-port";
+import type { RowGuard } from "@purin-labs/tenancy/data/shared-rows/organisation-row";
 
 type Database = OrganisationDatabase | OrganisationDatabaseSession;
 

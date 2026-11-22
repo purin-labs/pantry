@@ -2,7 +2,7 @@
 // approved or rejected action, and the notice that an agent's proposal waits
 // for approval. Each delivery checks the action's request authority again,
 // as it stands now, before the connector posts.
-import { acceptedExecutionAuthority } from "../organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import type { CaseActor } from "../actors/case/case-actor";
 import type { CaseOutput } from "../actors/case/types";
 import { sinkRefusalAsksPerson } from "../policy";
@@ -13,7 +13,7 @@ import { prepareTurnAuthority } from "../context/turn-context";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseConnectorId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { resolveOrganisationModelRoute } from "../models/route";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { loadOrganisationPolicyOrDefaultDeny } from "../policy-snapshot";
 import type { RequestAuthority } from "@purin-labs/contracts";
 

@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { resolveCollaborationAgent } from "../../actors/collaboration-agent";
-import { acceptedExecutionAuthority } from "../../organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { sessionTurnExecution } from "../../chat/turn-access";
 import { registerEmailSelfTest } from "../../data/email-self-test";
 import { resolveEmailOperationalCapability } from "../../actors/email-operational-capability";
@@ -65,7 +65,7 @@ import {
 import { digestCanonical } from "../../policy";
 import { listAccessGrants } from "../../data/access-grants";
 import { selectActiveGrants } from "../../authorization/access-grants/compiler";
-import { listOrganisationMembers } from "../../data/control-plane";
+import { listOrganisationMembers } from "@purin-labs/tenancy/data/control-plane";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,

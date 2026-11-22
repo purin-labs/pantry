@@ -6,7 +6,7 @@ import type { CaseTimelineCase } from "@purin-labs/control-api";
 
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
 import { createAccessGrant } from "../../src/data/access-grants";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import {

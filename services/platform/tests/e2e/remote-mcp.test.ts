@@ -10,7 +10,7 @@ import { completeCommerceApprovalFixture } from "./commerce-approval-fixture";
 import { googleConfig } from "../../src/control/google-oidc-config";
 import { APPROVAL_GRANT_COOKIE } from "../../src/control/authorization";
 import { controlActionMutationExecution } from "../../src/actors/action-mutation-execution";
-import { newControlMutationIdentity } from "../../src/data/control-mutation";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { setTimeout as delay } from "node:timers/promises";
 import { env, exports } from "cloudflare:workers";
@@ -37,7 +37,7 @@ import { parseUserId, newUserId } from "@purin-labs/control-api/ids";
 import {
   issueControlSession,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import {
   applyAgentOperation,
   type AgentOperationCommand,
@@ -1205,7 +1205,7 @@ function dispatchControlWrite(
 }
 
 type RemoteConnectorFixture = {
-  readonly accountAccess: import("../../src/organisation-access/access").OrganisationAccess;
+  readonly accountAccess: import("@purin-labs/tenancy/organisation-access/access").OrganisationAccess;
   readonly nativeSessionId: string;
   readonly entry: CustomConnectorReadCatalogEntry;
   readonly effective: Extract<

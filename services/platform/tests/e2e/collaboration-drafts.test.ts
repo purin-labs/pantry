@@ -36,7 +36,7 @@ import { ensureCreatedOrganisationActor } from "../../src/control/organisation-r
 import {
   issueControlSession,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { organisationBootstrapMutation } from "../control-mutation-fixture";
 import {

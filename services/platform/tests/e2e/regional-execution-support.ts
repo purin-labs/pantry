@@ -16,7 +16,7 @@ import gateway from "../../src/integration-gateway";
 import {
   issueControlSession,
   revokeControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { runAgentOperation } from "../../src/data/agent-operation-runner";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
@@ -32,7 +32,7 @@ import {
   parseWhatsAppPhoneNumberId,
 } from "../../src/whatsapp/identifiers";
 import { resolveWhatsAppOrganisationCredential } from "../../src/whatsapp/credential";
-import type { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 
 const PHONE = "510000000000055";

@@ -1,4 +1,4 @@
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   readStringField,
   readOrganisationIdField,
@@ -15,7 +15,7 @@ import {
 import {
   resolveControlSession,
   validateControlCsrf,
-} from "../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   errorResponse,

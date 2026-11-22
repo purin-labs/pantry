@@ -5,12 +5,12 @@ import {
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
-} from "../../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   readStringField,
   readOrganisationIdField,
 } from "../../boundary";
-import type { OrganisationMetaInput } from "../../actors/organisation/types";
+import type { OrganisationMetaInput } from "@purin-labs/tenancy/actors/organisation/types";
 import {
   advanceActiveActorRegistrySchema,
   discardQuarantinedActorRegistryEntry,

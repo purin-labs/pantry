@@ -1,5 +1,5 @@
 import { mailboxReplyDisposition } from "../mail-inbox/direct-reply";
-import { acceptedExecutionAuthority } from "../organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { memoryService } from "../memory/contract/memory-service";
 import {
@@ -35,7 +35,7 @@ import {
   proposalRfcMessageId,
 } from "../mail/reply-target";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isActorExecutionActive } from "./actor-execution-quiescence";
 import {
   fetchConnectorMail,

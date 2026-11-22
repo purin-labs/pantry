@@ -5,11 +5,11 @@ import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-pla
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { describe, expect, it } from "vitest";
 
-import { upsertUser, type User } from "../src/data/control-plane";
+import { upsertUser, type User } from "@purin-labs/tenancy/data/control-plane";
 import {
   newControlMutationIdentity,
   type ControlMutationReceiptScope,
-} from "../src/data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import {
   createConnectedIntegration,
   finalizeConnectedIntegrationAccount,

@@ -11,7 +11,7 @@ import {
   readOrganisationCapabilityPolicies,
   writeOrganisationCapabilityPolicy,
 } from "../../src/data/capability-policy";
-import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 export async function seedMerchantFixture(
   env: Env,

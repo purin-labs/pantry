@@ -7,7 +7,7 @@ import {
 import type { ToolTurnContext } from "../../actors/session/tool-wiring";
 import { requireSessionExecution } from "../../actors/session-execution-admission";
 import { prepareWorkflowProposal } from "../../commerce/bakery/workflow-proposals";
-import { roleMayConfigure } from "../../data/control-plane";
+import { roleMayConfigure } from "@purin-labs/tenancy/data/control-plane";
 import {
   announceSurfaceEffect,
   executeBakerySurfaceForHarness,

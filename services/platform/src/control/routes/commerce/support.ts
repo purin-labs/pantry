@@ -1,4 +1,4 @@
-import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { CAPABILITY_KEYS } from "../../../authorization/capability-catalogue";
 import {
   permissionRequiredResponse,

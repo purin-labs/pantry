@@ -5,7 +5,7 @@
 // /fixture/setup builds the Organisation and signs in its two people, which a
 // browser cannot do alone.
 import gateway from "../../services/platform/src/integration-gateway";
-import { issueControlSession } from "../../services/platform/src/data/control-plane";
+import { issueControlSession } from "../../foundation/tenancy/data/control-plane";
 import type { Env } from "../../foundation/kernel/env";
 import type { OrganisationId } from "../../foundation/kernel/ids";
 import { fixturePeople } from "../plan-42J/account-authority";

@@ -6,7 +6,7 @@ import {
 } from "../src/chat/store";
 import type { Conversation } from "../src/chat/conversation";
 import type { ConversationScope } from "../src/chat/store";
-import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 declare const identity: ConversationScope;
 declare const placement: OrganisationExecutionScope;

@@ -1,16 +1,16 @@
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { DatabaseSync } from "node:sqlite";
 import { expect, it } from "vitest";
-import { OrganisationExecutionScope } from "../src/organisation-execution-scope";
-import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
-import { parseInitialOrganisationPlacement } from "../src/placement";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
+import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
+import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { d1Database } from "./sqlite-d1";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import {
   changeWorkspaceAiBudget,
   parseWorkspaceAiBudgetLimits,
   readWorkspaceAiBudget,
-} from "../src/data/workspace-ai-budget";
+} from "@purin-labs/tenancy/data/workspace-ai-budget";
 
 const baseline = singleDatabaseSchema();
 

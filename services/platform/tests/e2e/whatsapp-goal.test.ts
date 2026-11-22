@@ -20,11 +20,11 @@ import {
 import {
   readOrganisationPlacementMove,
   parseOrganisationPlacementMoveTarget,
-} from "../../src/data/organisation-placement";
+} from "@purin-labs/tenancy/data/organisation-placement";
 import {
   freezeOrganisationPlacementMove,
   freezeRegionalOrganisationPlacement,
-} from "../../src/data/shared-rows/placement-row";
+} from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { network } from "./network";
 import {

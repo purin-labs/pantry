@@ -1,6 +1,6 @@
-import type { OrganisationModuleHost } from "./module-host";
+import type { OrganisationModuleHost } from "@purin-labs/tenancy/actors/organisation/module-host";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   activatePendingIntegrationAccounts,

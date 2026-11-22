@@ -2,7 +2,7 @@ import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
 } from "@purin-labs/kernel/database-handles";
-import { samePlacement } from "../data/organisation-placement";
+import { samePlacement } from "@purin-labs/tenancy/data/organisation-placement";
 import {
   parseCaseId,
   parseConnectorId,
@@ -16,7 +16,7 @@ import {
 import {
   parseOrganisationPlacement,
   type OrganisationPlacement,
-} from "../placement";
+} from "@purin-labs/tenancy/placement";
 import type { Result } from "@purin-labs/kernel/result";
 import type { VariantBy } from "@purin-labs/type-utils";
 import {

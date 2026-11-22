@@ -3,7 +3,7 @@ import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 
 import {
   parseCaseId,

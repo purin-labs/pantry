@@ -1,6 +1,6 @@
 import type { TypeSafeEvaluationReceipt } from "../integrations/typesafe/evaluation-ledger";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
 import type { TypeSafeCredential } from "../integrations/typesafe/credential";
 import { digestCanonical } from "../policy/information-flow/digest";

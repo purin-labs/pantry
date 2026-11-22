@@ -1,6 +1,6 @@
 import type { GlobalDatabase, OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { connectionFlowParts } from "./connection-flow-parts";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   newProviderConnectionAttemptId,
   newProviderProvisioningAttemptId,
@@ -28,13 +28,13 @@ import {
   type ControlMutationBoundary,
   type ControlMutationIdentity,
   type ControlMutationReceiptScope,
-} from "./control-mutation";
-import type { OrganisationEnvironment } from "./control-plane";
+} from "@purin-labs/tenancy/data/control-mutation";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import type { Variant } from "@purin-labs/type-utils";
-import type { OrganisationQuerySource } from "./query-source";
+import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import {
   prepareProjectionRevisionBump,
-} from "./organisation-onboarding-row";
+} from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 export type ConnectionProvider =
   | "airtable"

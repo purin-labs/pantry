@@ -4,7 +4,7 @@ import type {
   AssignableControlRole,
   OrganisationInvitationEmail,
   OrganisationOnboardingLifecycle,
-} from "../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import {
   parseControlSessionId,
   parsePersonId,

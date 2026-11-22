@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import type { OrganisationAccess } from "../organisation-access/access";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationAccess } from "@purin-labs/tenancy/organisation-access/access";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { canonicalJson, sha256Hex } from "@purin-labs/std";

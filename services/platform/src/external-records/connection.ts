@@ -1,10 +1,10 @@
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   createActiveConnectedIntegration,
   type ActiveIntegrationAccount,
 } from "../data/integration-account";
-import type { OrganisationEnvironment } from "../data/control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { parseVaultHandle } from "../credential-vault";

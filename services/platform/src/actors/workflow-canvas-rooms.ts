@@ -22,12 +22,15 @@ import {
 } from "@purin-labs/workflow-canvas-crdt/protocol";
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import { controlError } from "../control/http";
-import { listOrganisationMembers, resolveUser } from "../data/control-plane";
+import {
+  listOrganisationMembers,
+  resolveUser,
+} from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { admitActorRecovery } from "./actor-activation";
 import {
   CollaborationRoom,

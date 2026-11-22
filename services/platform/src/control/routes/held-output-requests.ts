@@ -9,7 +9,7 @@ import {
   type HeldOutputView,
 } from "@purin-labs/control-api";
 
-import { authenticatedConversationScope } from "../../organisation-access/access";
+import { authenticatedConversationScope } from "@purin-labs/tenancy/organisation-access/access";
 import { resolveActiveCaseActorAtPlacement } from "../../actors/actor-router";
 import { capabilityDefinitionById } from "../../authorization/capability-catalogue";
 import { readChatControlAuthority } from "../../chat/information-flow";

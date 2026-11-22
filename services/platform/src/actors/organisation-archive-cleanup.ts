@@ -1,19 +1,19 @@
 import {
   selectOrganisationPlacementDatabase,
   type OrganisationPlacementBindings,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import {
   parseOrganisationId,
   type SessionId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { parseOrganisationPlacement } from "../placement";
+import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import {
   isOrganisationPolicyPlacementActive,
   parseOrganisationPlacementFenceToken,
   type OrganisationPolicyPlacement,
-} from "../data/organisation-placement";
+} from "@purin-labs/tenancy/data/organisation-placement";
 import type { ActorFenceToken } from "./actor-registry";
 import type { ActorExportError } from "./actor-export";
 import type { Result } from "@purin-labs/kernel/result";

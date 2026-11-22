@@ -1,4 +1,4 @@
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationActorStub } from "../actors/actor-stubs";
 import type { Result } from "@purin-labs/kernel/result";

@@ -11,14 +11,14 @@ import {
   type MailboxSetupPlan,
 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
-import { acceptedExecutionAuthority } from "../../src/organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { compileTurnAuthority } from "../../src/authorization/access-grants/turn-authority";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
 import { readAgentMailboxBinding } from "../../src/data/email-mailbox";
 import {
   readActiveOrganisationMembership,
   readActiveOrganisationMembershipRevision,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import {
   type IntegrationAccountId,
   type OrganisationId,

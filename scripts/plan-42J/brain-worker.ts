@@ -50,7 +50,7 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "../../foundation/kernel/ids";
-import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope";
+import { OrganisationExecutionScope } from "../../foundation/tenancy/organisation-execution-scope";
 import { acceptMailboxModelTerms } from "../../services/platform/tests/mailbox-model-consent-fixture";
 import { defaultDenyPolicy } from "../../services/platform/src/policy-snapshot";
 import { fixturePeople } from "./account-authority";

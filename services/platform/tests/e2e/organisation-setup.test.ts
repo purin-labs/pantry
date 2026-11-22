@@ -6,7 +6,7 @@ import {
   issueControlSession,
   upsertUser,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { commerceClient, commerceHeaders } from "./commerce-support";
 
 declare module "vitest" {

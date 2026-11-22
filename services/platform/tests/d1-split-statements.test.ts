@@ -68,7 +68,7 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "startPendingRotation",
     "startVaultRootRotation",
   ],
-  "services/platform/src/data/control-plane.ts": [
+  "foundation/tenancy/data/control-plane.ts": [
     "issueControlSession",
     "renewControlSession",
     "resolveControlSession",
@@ -85,8 +85,8 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
   "services/platform/src/data/onboarding-support.ts": [
     "resolveControlSupportRole",
   ],
-  "services/platform/src/data/organisation.ts": ["ensureSystemUserId"],
-  "services/platform/src/data/placement-move.ts": [
+  "foundation/tenancy/data/organisation.ts": ["ensureSystemUserId"],
+  "foundation/tenancy/data/placement-move.ts": [
     "abandonedMoveRecoversSql",
     "openMoveOf",
     "preparePlacementMovePublication",
@@ -103,7 +103,7 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "readOpenScreenPairing",
     "readScreenPairingState",
   ],
-  "services/platform/src/data/shared-rows/placement-row.ts": [
+  "foundation/tenancy/data/shared-rows/placement-row.ts": [
     "publishOrganisationPlacementMove",
   ],
   "services/platform/src/data/slack-installation-records.ts": [

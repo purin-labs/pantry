@@ -7,7 +7,7 @@ import {
   type ChatGoalCommand,
 } from "@purin-labs/control-api";
 import { expect, it, type TestContext } from "vitest";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { ORGANISATION_ID } from "./slack-journey-support";
 import { commerceClient } from "./commerce-support";
 import {

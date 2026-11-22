@@ -1,6 +1,6 @@
 import { createMigratedDatabase } from "../sqlite-d1";
 import { platformEnv, type UnitTestEnv } from "../worker-fakes";
-import { prepareInitialOrganisationPlacementInsert } from "../../src/data/shared-rows/placement-row";
+import { prepareInitialOrganisationPlacementInsert } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,
   TEST_ORGANISATION_PLACEMENT_PROFILE,
@@ -13,7 +13,7 @@ import {
 } from "../../src/actors/actor-registry";
 import { ORGANISATION_ACTOR_SCHEMA_VERSION } from "../../src/actors/actor-schema-versions";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { requireActorExecutionAdmission } from "../sqlite-d1";
 
 export async function activateOrganisationFixture(

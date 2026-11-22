@@ -14,7 +14,7 @@ import {
   policyLevel,
   type FlowLabel,
 } from "../policy/information-flow";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { resolveActiveSlackPhysicalInstallationCredential } from "../credential-vault/surface-installation-resolution";
 import { resolveConfiguredSlackInstallationIdentity } from "./installation-identity";
 import type { SlackConversationFact } from "./surface-parts";

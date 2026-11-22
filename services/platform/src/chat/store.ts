@@ -5,7 +5,7 @@ import {
   chatThreadActivity,
   type ChatThreadActivity,
 } from "@purin-labs/control-api";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isProjectRole, type ProjectRole } from "@purin-labs/control-api";
 import { VISIBLE_CONVERSATIONS_SQL } from "./conversation-access";
 import {

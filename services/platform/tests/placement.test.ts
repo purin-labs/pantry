@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseInitialOrganisationPlacement,
   parseOrganisationPlacement,
-} from "../src/placement";
+} from "@purin-labs/tenancy/placement";
 
 describe("organisation placement boundary", () => {
   it("parses an admitted hard-residency placement", () => {

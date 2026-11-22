@@ -15,7 +15,7 @@ import {
 import {
   issueControlSession,
   type ActiveControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { parseCaseId, parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";

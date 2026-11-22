@@ -1,7 +1,7 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isActorExecutionActive } from "./actor-execution-quiescence";
 import { fetchConnectorMail } from "../mail-inbox/execution";
 import { extractMailbox } from "../mail/gmail-adapter";

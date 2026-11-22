@@ -1,8 +1,8 @@
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import type { CodeModeOrganisationActorError } from "./code-mode-types";
-import { readOrganisationMetaRow } from "./organisation-record";
-import type { OrganisationMetaRow } from "./types";
+import { readOrganisationMetaRow } from "@purin-labs/tenancy/actors/organisation/organisation-record";
+import type { OrganisationMetaRow } from "@purin-labs/tenancy/actors/organisation/types";
 
 /** Checks the Organisation record for a Code Mode command. */
 export function validateCodeModeOrganisation(

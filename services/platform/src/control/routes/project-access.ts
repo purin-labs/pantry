@@ -1,5 +1,5 @@
 import { signalChat } from "../../chat/signals";
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isProjectId, parseProjectAccessCommand } from "@purin-labs/control-api";
 import type { Env } from "@purin-labs/kernel/env";
 import {

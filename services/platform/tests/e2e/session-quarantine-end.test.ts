@@ -5,7 +5,7 @@ import { expect, it, type TestContext } from "vitest";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
 import { deriveCodeModeLeaseBinding } from "../../src/actors/code-mode-execution-record";
 import { OrganisationDO } from "../../src/actors/organisation";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import {
   preparePortalChatJourney,

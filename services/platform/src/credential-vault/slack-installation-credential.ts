@@ -19,14 +19,14 @@ import type {
 import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   parseOrganisationId,
   parseSlackInstallationId,
   type OrganisationId,
   type SlackInstallationId,
 } from "@purin-labs/kernel/ids";
-import { organisationLifecycleParts } from "../data/organisation-lifecycle-port";
+import { organisationLifecycleParts } from "@purin-labs/tenancy/data/organisation-lifecycle-port";
 import { parseVaultHandle } from "./domain";
 import type { CredentialVaultBindings } from "./keyring";
 import {

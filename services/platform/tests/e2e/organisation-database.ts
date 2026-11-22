@@ -7,14 +7,14 @@ import {
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { upsertUser, type User } from "../../src/data/control-plane";
+import { upsertUser, type User } from "@purin-labs/tenancy/data/control-plane";
 import { organisationBootstrapMutation } from "../control-mutation-fixture";
 import { requireOrganisationBootstrap } from "../organisation-execution-fixture";
-import { selectOrganisationPlacementDatabase } from "../../src/organisation-execution-scope";
+import { selectOrganisationPlacementDatabase } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   parseInitialOrganisationPlacement,
   parseOrganisationPlacementCells,
-} from "../../src/placement";
+} from "@purin-labs/tenancy/placement";
 
 /**
  * The database that holds an Organisation's own records, as production picks

@@ -5,19 +5,19 @@ import {
   bootstrapOrganisation,
   upsertUser,
   type User,
-} from "../../src/data/control-plane";
-import { newControlMutationIdentity } from "../../src/data/control-mutation";
+} from "@purin-labs/tenancy/data/control-plane";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import {
   archiveOrganisation,
   deleteArchivedOrganisation,
   renameOrganisation,
   restoreOrganisation,
   type ArchiveOrganisationMutation,
-} from "../../src/data/organisation-lifecycle";
+} from "@purin-labs/tenancy/data/organisation-lifecycle";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
-import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
-import { parseInitialOrganisationPlacement } from "../../src/placement";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
+import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import {
   commerceClient,
   commerceHeaders,

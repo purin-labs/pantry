@@ -26,7 +26,7 @@ import {
   collectOrganisationAttachments,
   runAttachmentCollection,
 } from "../src/messages/attachment-collection";
-import { parseOrganisationPlacement } from "../src/placement";
+import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import {
   d1Database,
   requireActorExecutionAdmission,

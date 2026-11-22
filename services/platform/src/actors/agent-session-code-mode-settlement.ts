@@ -59,8 +59,8 @@ import {
   type ActorFenceToken,
   type ActorRegistryEntry,
 } from "./actor-registry";
-import { readPlacementByEpoch } from "../data/organisation-placement";
-import { selectOrganisationPlacementDatabase } from "../organisation-execution-scope";
+import { readPlacementByEpoch } from "@purin-labs/tenancy/data/organisation-placement";
+import { selectOrganisationPlacementDatabase } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { ActorRelocationId } from "./actor-relocation";
 import {
   frozenRelocationReceiptGate,

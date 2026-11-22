@@ -11,7 +11,7 @@ import {
 import { parseEnvelope as parseCounterSaleEnvelope } from "@purin-labs/control-api/portal/counter-sale";
 import { isRecord } from "@purin-labs/std";
 
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {
   COOKIE_ENTRY,
   DRINK_ENTRY,

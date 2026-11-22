@@ -11,7 +11,7 @@ import { resolveVaultHandle } from "../../src/credential-vault/service";
 import {
   issueControlSession,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { parseSessionId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { resolveOrganisationModelRouteAtScope } from "../../src/models/route";

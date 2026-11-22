@@ -8,10 +8,10 @@ import { deliverOperationsCard } from "../actors/operations-channel";
 import {
   readOperationsDestination,
   type OperationsDestination,
-} from "../data/operations-destination";
+} from "@purin-labs/tenancy/data/operations-destination";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   deviceAlertNoticeDeliveryId,
   deviceAlertUpdateDeliveryId,

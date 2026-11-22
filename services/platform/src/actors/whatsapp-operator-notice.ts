@@ -1,12 +1,12 @@
 import { SLACK_NO_LINK_PREVIEW } from "../slack/messages";
 import { isRecord } from "@purin-labs/std";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isActorExecutionActive } from "./actor-execution-quiescence";
 import type { SqlStorage } from "@cloudflare/workers-types";
 
 import { resolveActiveSlackOrganisationCredential } from "../credential-vault";
 import type { Env } from "@purin-labs/kernel/env";
-import { readOperationsDestination } from "../data/operations-destination";
+import { readOperationsDestination } from "@purin-labs/tenancy/data/operations-destination";
 import type { Result } from "@purin-labs/kernel/result";
 import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
 import { resolveActiveSlackDestinationConnection } from "../slack/installation-store";

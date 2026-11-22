@@ -19,7 +19,7 @@ import {
   commerceWorkspace,
   commerceHeaders,
 } from "./commerce-support";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 
 it(
   "saves an appliance run and shares its canvas positions with organisation-scoped access",

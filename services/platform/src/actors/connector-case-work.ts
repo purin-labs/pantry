@@ -7,7 +7,7 @@ import {
   type OrganisationId,
   type RequestId,
 } from "@purin-labs/kernel/ids";
-import { parseOrganisationPlacement } from "../placement";
+import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import type { Result } from "@purin-labs/kernel/result";
 import type { SessionActorRoute } from "./actor-router";
 import type { CountRow } from "./sql-rows";

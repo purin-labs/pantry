@@ -6,16 +6,16 @@ import {
   storeVaultSecret,
   type VaultHandle,
 } from "../../src/credential-vault";
-import { newControlMutationIdentity } from "../../src/data/control-mutation";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import {
   archiveOrganisation,
   deleteArchivedOrganisation,
   type ArchiveOrganisationMutation,
-} from "../../src/data/organisation-lifecycle";
+} from "@purin-labs/tenancy/data/organisation-lifecycle";
 import {
   eraseEntryWhere,
   PURGE_CATALOGUE,
-} from "../../src/data/purge-catalogue";
+} from "@purin-labs/tenancy/data/purge-catalogue";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";

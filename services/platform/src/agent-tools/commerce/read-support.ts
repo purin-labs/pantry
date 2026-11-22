@@ -34,7 +34,7 @@ import {
   listOrganisationMembers,
   roleMayOperate,
   type OrganisationMember,
-} from "../../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { CommerceGraphReader } from "../../commerce/entity-plane/graph-reader";
 import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
 import { selectNamedCommerceQuerySourceGrant } from "../../commerce/entity-plane/context-read";

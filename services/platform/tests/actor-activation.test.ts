@@ -15,7 +15,7 @@ import {
   inspectActorActivation,
 } from "../src/actors/actor-activation";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
-import { parseOrganisationPlacement } from "../src/placement";
+import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { emptySqliteFixture } from "./sqlite-storage";
 
 describe("actor activation", function actorActivationSuite() {

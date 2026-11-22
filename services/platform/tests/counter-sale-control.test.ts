@@ -43,12 +43,12 @@ vi.mock("../src/data/commerce-merchant-binding", async (importOriginal) => ({
   resolveOrganisationCommerceMerchantBinding:
     counterSaleMocks.resolveOrganisationCommerceMerchantBinding,
 }));
-vi.mock("../src/data/control-plane", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/control-plane")>()),
+vi.mock("@purin-labs/tenancy/data/control-plane", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/tenancy/data/control-plane")>()),
   resolveUser: counterSaleMocks.resolveUser,
 }));
-vi.mock("../src/data/control-mutation", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/control-mutation")>()),
+vi.mock("@purin-labs/tenancy/data/control-mutation", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/tenancy/data/control-mutation")>()),
   readControlMutationReplay: counterSaleMocks.readControlMutationReplay,
 }));
 vi.mock("../src/control/mutation-receipt", () => ({

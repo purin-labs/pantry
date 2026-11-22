@@ -37,7 +37,7 @@ import {
   type IntegrationProvider,
   type LiveProviderWebhookContext,
 } from "../src/data/integration-account";
-import type { OrganisationInstallRecord } from "../src/data/organisation";
+import type { OrganisationInstallRecord } from "@purin-labs/tenancy/data/organisation";
 import {
   parseCaseId,
   parseControlSessionId,
@@ -54,7 +54,7 @@ import {
   type WorkspaceId,
 } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { parseOrganisationPlacement } from "../src/placement";
+import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import type { Result } from "@purin-labs/kernel/result";
 import { d1Database } from "./sqlite-d1";
 import {

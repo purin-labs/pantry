@@ -1,5 +1,5 @@
 import { seedNativeProviderAccount } from "./real-provider-execution-fixture";
-import { upsertUser } from "../src/data/control-plane";
+import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   registerEmailMailboxAccount,
   assignAgentMailbox,
@@ -10,7 +10,7 @@ import { createActorExecutionBarrierSchema } from "../src/actors/actor-execution
 import { CAPABILITY_KEYS } from "../src/authorization/capability-catalogue";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { defaultDenyPolicy } from "../src/policy-snapshot";
-import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
+import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import { createMigratedDatabase } from "./sqlite-d1";
 import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,

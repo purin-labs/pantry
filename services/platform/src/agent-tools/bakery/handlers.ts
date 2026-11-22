@@ -1,8 +1,8 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { SURFACE_EFFECT_SIGNAL } from "@purin-labs/control-api";
 import { signalChat } from "../../chat/signals";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import { acceptedExecutionAuthority } from "../../organisation-access/access";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { validateLiveRequestAuthority } from "../../request-authority";
 import {
   readSavedBakeryRun,
@@ -68,7 +68,7 @@ type BakerySurfaceReadiness =
 export async function executeBakerySurfaceForHarness(
   authority: {
     readonly db: OrganisationDatabase;
-    readonly accountAccess: import("../../organisation-access/access").OrganisationAccess;
+    readonly accountAccess: import("@purin-labs/tenancy/organisation-access/access").OrganisationAccess;
     readonly archive: R2Bucket;
     readonly storage: DurableObjectStorage;
     readonly organisationId: OrganisationId;
@@ -787,7 +787,7 @@ export async function requireLiveBakeryAuthority(
   storage: DurableObjectStorage,
   organisationId: OrganisationId,
   lease: HarnessTurnLease,
-  accountAccess: import("../../organisation-access/access").OrganisationAccess,
+  accountAccess: import("@purin-labs/tenancy/organisation-access/access").OrganisationAccess,
   options?: Readonly<{ allowOperator?: boolean }>,
 ): Promise<void> {
   const current = preflightHarnessTurnLease(storage, lease, Date.now());

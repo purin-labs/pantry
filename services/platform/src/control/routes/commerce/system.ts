@@ -25,7 +25,7 @@ import {
   type CommerceCapability,
   type CommerceCapabilityActivation,
 } from "../../../data/commerce-capability-activation";
-import { type OrganisationEnvironment } from "../../../data/control-plane";
+import { type OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import {
   bindCommerceMerchant,
   ensureEntityPlaneCommerceMerchantBinding,

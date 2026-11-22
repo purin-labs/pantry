@@ -5,8 +5,8 @@ import type {
 import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
-} from "../organisation-execution-scope";
-import type { OrganisationUserAuthority } from "../organisation-access/access";
+} from "@purin-labs/tenancy/organisation-execution-scope";
+import type { OrganisationUserAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { CONNECTOR_ACTOR_SCHEMA_VERSION } from "../actors/actor-schema-versions";
 import { actorPhysicalName } from "../actors/actor-registry";
 import type { CredentialVaultBindings } from "../credential-vault/keyring";
@@ -31,7 +31,7 @@ import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   parseOrganisationPlacement,
   type OrganisationPlacement,
-} from "../placement";
+} from "@purin-labs/tenancy/placement";
 import { parsePersonId, type PersonId } from "../data/person-authz";
 import type { SlackMessageEvent } from "./events";
 import {
@@ -46,7 +46,7 @@ import {
 import {
   parseControlRole,
   type OrganisationEnvironment,
-} from "../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import type { Variant } from "@purin-labs/type-utils";
 import { isPositiveInteger } from "@purin-labs/std";
 

@@ -6,12 +6,12 @@ import {
   resolveUser,
   upsertUser,
   issueControlSession,
-} from "../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 import { kitchenObservation } from "./kitchen-observation-fixture";
-import { OrganisationExecutionScope } from "../src/organisation-execution-scope";
-import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
-import { parseOrganisationPlacementProfile } from "../src/placement";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
+import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
+import { parseOrganisationPlacementProfile } from "@purin-labs/tenancy/placement";
 import { requireConversationId } from "./test-ids";
 import { defaultProjectSql } from "./fixtures/default-project";
 vi.mock("../src/chat/forks", async function forkModule(importOriginal) {
@@ -102,10 +102,12 @@ vi.mock("../src/models/route", async function modelModule(importOriginal) {
   };
 });
 vi.mock(
-  "../src/data/control-plane",
+  "@purin-labs/tenancy/data/control-plane",
   async function membershipModule(importOriginal) {
     return {
-      ...(await importOriginal<typeof import("../src/data/control-plane")>()),
+      ...(await importOriginal<
+        typeof import("@purin-labs/tenancy/data/control-plane")
+      >()),
       readActiveOrganisationMembershipRevision: mocks.membership,
       resolveControlSessionById: async function resolveSession() {
         return {

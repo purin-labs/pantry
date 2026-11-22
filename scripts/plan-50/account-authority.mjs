@@ -1,10 +1,10 @@
 // The trial Organisation's owner and the access helpers of the trial
 // Workers. Pantry keeps its own members (Plan 95), so the trial needs no
 // outside account authority.
-import { acceptedExecutionAuthority } from "../../services/platform/src/organisation-access/access.ts";
+import { acceptedExecutionAuthority } from "../../foundation/tenancy/organisation-access/access.ts";
 import { compileTurnAuthority } from "../../services/platform/src/authorization/access-grants/turn-authority.ts";
 import { parseUserId } from "../../packages/control-api/src/ids.ts";
-import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope.ts";
+import { OrganisationExecutionScope } from "../../foundation/tenancy/organisation-execution-scope.ts";
 
 // The trial Organisation has one Pantry owner. The trial people keep their
 // operator roles, so a trial can demote or revoke them. It lives here, not in

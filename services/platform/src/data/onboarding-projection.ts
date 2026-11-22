@@ -26,7 +26,7 @@ import {
 import type {
   ActiveOrganisationMembership,
   OrganisationOnboardingLifecycle,
-} from "./control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import {
   listIntegrationAccounts,
   type IntegrationAccount,
@@ -46,7 +46,7 @@ import {
   type SetupSelection,
 } from "./onboarding";
 import type { Variant } from "@purin-labs/type-utils";
-import type { OrganisationQuerySource } from "./query-source";
+import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import { assertNever } from "@purin-labs/std";
 
 type OnboardingProjectionRow = {

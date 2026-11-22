@@ -1,4 +1,4 @@
-import type { ControlRole } from "../../data/control-plane";
+import type { ControlRole } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { requirePublicOrigin } from "@purin-labs/kernel/public-origin";

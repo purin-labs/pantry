@@ -13,8 +13,8 @@ import {
   hashOpaqueSecret,
   upsertUser,
   type OrganisationBootstrap,
-} from "../src/data/control-plane";
-import { newControlMutationIdentity } from "../src/data/control-mutation";
+} from "@purin-labs/tenancy/data/control-plane";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import {
   inspectOrganisationHarnessHistory,
   listOnboardingReconciliationOrganisationIds,
@@ -49,15 +49,15 @@ import { createAuthorizingProviderAttempt } from "../src/data/provider-attempt";
 import {
   archiveOrganisation,
   type ArchivedOrganisation,
-} from "../src/data/organisation-lifecycle";
+} from "@purin-labs/tenancy/data/organisation-lifecycle";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,
   TEST_ORGANISATION_PLACEMENT_PROFILE,
 } from "./fixtures/organisation-placement";
 import type { VariantBy } from "@purin-labs/type-utils";
-import type { OrganisationPlacementBindings } from "../src/organisation-execution-scope";
-import type { OrganisationPlacement } from "../src/placement";
+import type { OrganisationPlacementBindings } from "@purin-labs/tenancy/organisation-execution-scope";
+import type { OrganisationPlacement } from "@purin-labs/tenancy/placement";
 import {
   createMigratedDatabase,
   requireActorExecutionAdmission,

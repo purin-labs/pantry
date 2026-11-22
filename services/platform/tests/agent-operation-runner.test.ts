@@ -12,8 +12,10 @@ vi.mock("../src/actors/case-direct-processing", async (importOriginal) => ({
   >()),
   processDirectCaseCommand: caseMocks.processDirectCaseCommand,
 }));
-vi.mock("../src/data/control-plane", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/control-plane")>()),
+vi.mock("@purin-labs/tenancy/data/control-plane", async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import("@purin-labs/tenancy/data/control-plane")
+  >()),
   readActiveOrganisationMembershipRevision:
     membershipMocks.readActiveOrganisationMembershipRevision,
 }));

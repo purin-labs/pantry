@@ -15,14 +15,14 @@ import {
   type OperatorConfigurationDraft,
 } from "../../data/operator-configuration-draft";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   presentConfigurationCommand,
   previewCode,
 } from "../../slack/configuration-presentation";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson } from "../http";
-import { roleMayConfigure } from "../../data/control-plane";
+import { roleMayConfigure } from "@purin-labs/tenancy/data/control-plane";
 import { conversationCase } from "./chat-slack-messages";
 
 export type ConfigurationDraftAction = "confirm" | "cancel";

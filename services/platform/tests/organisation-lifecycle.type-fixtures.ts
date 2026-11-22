@@ -1,11 +1,11 @@
-import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   archiveOrganisation,
   deleteArchivedOrganisation,
   renameOrganisation,
   restoreOrganisation,
   type ArchiveAuthority,
-} from "../src/data/organisation-lifecycle";
+} from "@purin-labs/tenancy/data/organisation-lifecycle";
 
 declare const archive: Parameters<typeof archiveOrganisation>[0];
 declare const rename: Parameters<typeof renameOrganisation>[0];

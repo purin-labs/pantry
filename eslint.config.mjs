@@ -413,6 +413,7 @@ export default [
     files: [
       "services/platform/src/actors/organisation.ts",
       "services/platform/src/actors/organisation/organisation-*.ts",
+      "foundation/tenancy/actors/organisation/organisation-record.ts",
       "services/platform/src/memory/access.ts",
       "services/platform/src/evals/access.ts",
     ],

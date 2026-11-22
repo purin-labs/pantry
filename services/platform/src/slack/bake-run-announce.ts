@@ -1,6 +1,6 @@
 import type { BakeRunRecord } from "@purin-labs/kitchen-control-api";
 import { deliverOperationsCard } from "../actors/operations-channel";
-import { readOperationsDestination } from "../data/operations-destination";
+import { readOperationsDestination } from "@purin-labs/tenancy/data/operations-destination";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import {
@@ -8,7 +8,7 @@ import {
   readBakeProposalCardTs,
 } from "../kitchen/bakes/records";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   bakeRunCardNotice,
   bakeRunCardText,

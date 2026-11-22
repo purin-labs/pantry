@@ -1,8 +1,8 @@
-import type { ControlRole, User } from "../../data/control-plane";
+import type { ControlRole, User } from "@purin-labs/tenancy/data/control-plane";
 import type {
   UnversionedControlMutationBoundary,
   ControlMutationReceiptScope,
-} from "../../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import type { Env } from "@purin-labs/kernel/env";
 import { createCommerceOutboxReconcileQueueMessage } from "../../commerce/contract/queue-messages";
 import {

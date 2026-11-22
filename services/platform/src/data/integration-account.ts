@@ -6,14 +6,14 @@ import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   InstallModel,
   OnboardingProvider,
   SurfaceKind,
 } from "@purin-labs/contracts";
 
-import type { OrganisationEnvironment } from "./control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import {
   prepareControlMutationReceipt,
   prepareOnboardingAuditEvent,
@@ -21,7 +21,7 @@ import {
   type ControlMutationBoundary,
   type ControlMutationIdentity,
   type ControlMutationReceiptScope,
-} from "./control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import {
   newIntegrationAccountId,
   newProviderConnectionId,
@@ -48,7 +48,7 @@ import {
   type ProviderAuthorizationProduct,
 } from "../mail/gmail-authorization";
 import type { Variant } from "@purin-labs/type-utils";
-import type { OrganisationQuerySource } from "./query-source";
+import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import {
   assertNever,
   isPositiveInteger,
@@ -58,12 +58,12 @@ import {
 import {
   prepareDisabledAccountInstallationDelete,
   prepareSurfaceInstallationUpsert,
-} from "./surface-installation-writes";
+} from "@purin-labs/tenancy/data/surface-installation-writes";
 import {
   prepareProjectionRevisionBump,
   prepareReauthProjectionBump,
   prepareUnfencedConfigurationBump,
-} from "./organisation-onboarding-row";
+} from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 export type IntegrationProvider = OnboardingProvider;
 

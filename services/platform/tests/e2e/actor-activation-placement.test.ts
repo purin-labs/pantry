@@ -47,7 +47,7 @@ import {
   parseConnectorId,
   parseSessionId,
 } from "@purin-labs/kernel/ids";
-import { readOrganisationPlacementMove } from "../../src/data/organisation-placement";
+import { readOrganisationPlacementMove } from "@purin-labs/tenancy/data/organisation-placement";
 import {
   installDiscoveryActorFixture,
   ORGANISATION_ID,

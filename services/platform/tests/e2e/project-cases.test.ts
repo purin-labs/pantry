@@ -10,7 +10,7 @@ import {
 import { conversationCaseId } from "../../src/chat/conversation-actor-identity";
 import { parseSessionId } from "@purin-labs/kernel/ids";
 import { readConversation, saveConversation } from "../../src/chat/store";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { ensureCaseProject } from "../../src/projects/case-project";
 import { requireDefaultProjectId } from "../fixtures/default-project";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

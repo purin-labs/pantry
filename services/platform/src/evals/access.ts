@@ -19,7 +19,7 @@ import {
   requireActiveOrganisationActorAtPlacement,
   resolveActiveConnectorActorAtPlacement,
 } from "../actors/actor-router";
-import type { AuthorizedConversationScope as ConversationScope } from "../organisation-access/access";
+import type { AuthorizedConversationScope as ConversationScope } from "@purin-labs/tenancy/organisation-access/access";
 import { verifiedContacts } from "../mail-inbox/contract/verified-contacts";
 import { gmailConnectorId } from "../mail-inbox/contract/connector-ids";
 import type { Env } from "@purin-labs/kernel/env";
@@ -42,7 +42,7 @@ import {
   type MemoryAccessError,
   type MemoryViewer,
 } from "../memory/access";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   canonicalFlowLabel,
   digestCanonical,

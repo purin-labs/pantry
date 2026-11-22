@@ -7,7 +7,7 @@ import {
   type IntegrationProvider,
   type ProviderAccountContextError,
 } from "../data/integration-account";
-import type { OrganisationEnvironment } from "../data/control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import type { ExecutingActionLedgerEntry } from "../actors/action-ledger";
 import type {
   IntegrationAccountId,

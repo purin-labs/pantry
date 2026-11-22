@@ -1,7 +1,7 @@
 import { controlError } from "../control/http";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
 import type {

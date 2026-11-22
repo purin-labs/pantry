@@ -8,7 +8,7 @@ import {
   type ActiveCapabilityId,
 } from "../authorization/capability-catalogue";
 import { readOrganisationCapabilityPolicies } from "../data/capability-policy";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { controlJson } from "./http";
 
 /**

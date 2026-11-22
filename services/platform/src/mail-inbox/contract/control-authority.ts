@@ -1,7 +1,7 @@
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
 import type { AuthorizedOrganisationRequest } from "../../control/authorization";
-import { readActiveOrganisationMembershipRevision } from "../../data/control-plane";
+import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import { buildControlAuthority } from "../../request-authority";
 
 /**

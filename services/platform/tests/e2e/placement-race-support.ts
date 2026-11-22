@@ -5,7 +5,7 @@ import type {
 import { env } from "cloudflare:workers";
 import { expect, vi } from "vitest";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
+import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import {
   startActorRelocation,
   resumeActorRelocation,

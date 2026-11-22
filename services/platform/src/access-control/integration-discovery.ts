@@ -2,7 +2,7 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   OrganisationAccess,
   OrganisationUserAuthority,
-} from "../organisation-access/access";
+} from "@purin-labs/tenancy/organisation-access/access";
 import type {
   AuthorityPartition,
   CapabilityDefinition,

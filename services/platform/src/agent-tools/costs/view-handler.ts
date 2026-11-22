@@ -13,7 +13,7 @@ import type { HarnessTurnLease } from "@purin-labs/contracts";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { type OrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import type { OrganisationAccess } from "../../organisation-access/access";
+import type { OrganisationAccess } from "@purin-labs/tenancy/organisation-access/access";
 import { dispatchBakerySurfaceEffect } from "../../actors/bakery-surface-effect";
 import { timelineVisibleMessages } from "../../chat/conversation";
 import { readConversation } from "../../chat/store";

@@ -1,10 +1,10 @@
-import { purgeArchivedOrganisation } from "./organisation-purge";
+import { purgeArchivedOrganisation } from "@purin-labs/tenancy/data/organisation-purge";
 import {
   prepareArchiveCleanupAwaitsPurge,
   prepareOrganisationLifecycleMove,
   ARCHIVE_CLEANUP_PLACEMENT_STATUSES,
   type LifecycleFence,
-} from "./organisation-lifecycle-moves";
+} from "@purin-labs/tenancy/data/organisation-lifecycle-moves";
 import { releaseSlackInstallationCredentials } from "../credential-vault/slack-installation-credential";
 import type {
   GlobalDatabase,
@@ -14,7 +14,7 @@ import type {
 import type {
   OrganisationExecutionScope,
   OrganisationPlacementBindings,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   newRequestId,
   parseProviderConnectionAttemptId,
@@ -34,22 +34,22 @@ import {
 } from "../actors/actor-router";
 import { actorStub } from "../actors/actor-stubs";
 import type { AdmittedOrganisationArchiveCleanup } from "../actors/organisation-archive-cleanup";
-import { resolveActiveOrganisationPlacementRecord } from "./organisation-placement";
+import { resolveActiveOrganisationPlacementRecord } from "@purin-labs/tenancy/data/organisation-placement";
 import type { Env } from "@purin-labs/kernel/env";
 import type { SessionActorStub } from "../actors/actor-stubs";
 import { closeOrganisationCommerceMerchants } from "../commerce/contract/merchant-closure";
-import { parseOrganisationPlacement } from "../placement";
+import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import type { Result } from "@purin-labs/kernel/result";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import {
   hashOpaqueSecret,
   type OrganisationEnvironment,
-} from "./control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import {
   newControlMutationIdentity,
   prepareOnboardingEvent,
   type ControlMutationIdentity,
-} from "./control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import {
   ensureCurrentReadiness,
   prepareReadinessAssessmentDeletion,
@@ -69,7 +69,7 @@ import {
 import {
   prepareProjectionRevisionBump,
   prepareRepairConfigurationBump,
-} from "./organisation-onboarding-row";
+} from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 type OnboardingReconciliationSubject =
   | "open_attempts"

@@ -28,7 +28,7 @@ import {
   type ActorActivationIdentity,
 } from "../src/actors/actor-registry";
 import { parseCaseId, parseOrganisationId } from "@purin-labs/kernel/ids";
-import { parseOrganisationPlacement } from "../src/placement";
+import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 describe("quarantined Case discard", function quarantinedCaseDiscardSuite() {

@@ -1,14 +1,14 @@
-import type { OrganisationAdmissionAction } from "../organisation-access/access";
+import type { OrganisationAdmissionAction } from "@purin-labs/tenancy/organisation-access/access";
 import {
   authorizeOrganisationControl,
   resolveControlSessionById,
   type ActiveOrganisationMembership,
   type ControlRole,
-} from "../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ControlSessionId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 /**
  * The membership behind a socket's control session, read again now. A check

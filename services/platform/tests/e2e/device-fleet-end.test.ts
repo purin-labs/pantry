@@ -5,11 +5,11 @@ import { expect, it } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
 import { deviceFleetStub } from "../../src/devices/contract/fleet-stub";
-import { newControlMutationIdentity } from "../../src/data/control-mutation";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import {
   archiveOrganisation,
   deleteArchivedOrganisation,
-} from "../../src/data/organisation-lifecycle";
+} from "@purin-labs/tenancy/data/organisation-lifecycle";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {

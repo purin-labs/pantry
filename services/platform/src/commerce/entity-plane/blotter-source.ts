@@ -42,7 +42,7 @@ import {
   parseSystemSchemaRevision,
 } from "@purin-labs/commerce-client";
 import type { CommerceQueryPlanReadError } from "../../actors/organisation/commerce-types";
-import type { OrganisationStateError } from "../../actors/organisation/types";
+import type { OrganisationStateError } from "@purin-labs/tenancy/actors/organisation/types";
 import type { OrganisationCommerce } from "../../actors/organisation/organisation-commerce";
 import {
   COMMERCE_PROJECTION_STALE_AFTER_MS,

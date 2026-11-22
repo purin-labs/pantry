@@ -35,7 +35,7 @@ import {
 import type { Env } from "@purin-labs/kernel/env";
 import type { ConnectorActorStub } from "../../actors/actor-stubs";
 import { parseConnectorId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
 

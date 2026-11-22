@@ -18,7 +18,7 @@ import {
   resolveTypeSafeCredential,
   sameTypeSafeAuthority,
 } from "../integrations/typesafe/authority";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 import type { PolicyJevPort } from "../actors/organisation/organisation-policy";
 import {
@@ -41,7 +41,7 @@ import {
   readJevScreenRelevance,
   writeJevScreenRelevance,
 } from "./screen-relevance";
-import { organisationPlacementConflict } from "../actors/organisation/organisation-record";
+import { organisationPlacementConflict } from "@purin-labs/tenancy/actors/organisation/organisation-record";
 
 type JevCommandInput = Readonly<{
   organisationId: OrganisationId;

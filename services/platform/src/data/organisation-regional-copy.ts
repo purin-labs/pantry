@@ -4,27 +4,27 @@ import {
   RECEIPT_OWNER_COLUMN,
   RECEIPT_TABLE,
   sharedRowOwnerColumn,
-} from "./shared-rows/regional-copy-rules";
-import { prepareRetiredCellOrganisationRow } from "./shared-rows/organisation-row";
+} from "@purin-labs/tenancy/data/shared-rows/regional-copy-rules";
+import { prepareRetiredCellOrganisationRow } from "@purin-labs/tenancy/data/shared-rows/organisation-row";
 import type {
   GlobalDatabase,
   OrganisationDatabase,
 } from "@purin-labs/kernel/database-handles";
 import type { Result } from "@purin-labs/kernel/result";
 import { encodeBase64, isRecord } from "@purin-labs/std";
-import type { ActorRelocationId } from "./organisation-placement";
+import type { ActorRelocationId } from "@purin-labs/tenancy/data/organisation-placement";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type {
   ActorExportEnvelopeV1,
   ActorExportId,
   ActorExportR2Object,
 } from "../actors/actor-export";
-import { readPlacementByEpoch } from "./organisation-placement";
+import { readPlacementByEpoch } from "@purin-labs/tenancy/data/organisation-placement";
 import {
   ORGANISATION_RELOCATION_PUBLICATION_BUDGET_MS,
   type OrganisationPlacementFenceToken,
-} from "./organisation-placement";
-import type { FrozenOrganisationPlacementMove } from "./organisation-placement";
+} from "@purin-labs/tenancy/data/organisation-placement";
+import type { FrozenOrganisationPlacementMove } from "@purin-labs/tenancy/data/organisation-placement";
 
 type Cell = string | number | null;
 type CopyTable = {

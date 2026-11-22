@@ -9,7 +9,7 @@ import {
   revokeVaultSecret,
   storeOrganisationExecutionVaultSecret,
 } from "../../credential-vault/service";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../../actors/actor-execution-quiescence";
 import type { CredentialVaultBindings } from "../../credential-vault/keyring";
 import type { OrganisationId } from "@purin-labs/kernel/ids";

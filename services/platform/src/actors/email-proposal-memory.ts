@@ -2,7 +2,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { memoryService } from "../memory/contract/memory-service";
 import { type ShownMemoryRevision } from "../memory/contract/turn-memory";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 /**
  * The Memory revisions the model of a reply turn was shown, kept with the

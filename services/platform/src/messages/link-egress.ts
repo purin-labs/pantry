@@ -5,7 +5,7 @@ import {
   MESSAGE_LINK_POLICY,
   type MessageLinkEgress,
 } from "./link-reader";
-import type { OrganisationPlacement } from "../placement";
+import type { OrganisationPlacement } from "@purin-labs/tenancy/placement";
 import type { Result } from "@purin-labs/kernel/result";
 import { decodeCanonicalBase64, hasExactKeys, isRecord } from "@purin-labs/std";
 

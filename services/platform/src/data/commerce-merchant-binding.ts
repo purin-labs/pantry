@@ -6,7 +6,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import type { OrganisationEnvironment } from "./control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import { decodeBase64Url, encodeBase64Url } from "@purin-labs/std";
 
 declare const commerceBindingIdBrand: unique symbol;

@@ -9,7 +9,7 @@ import {
 } from "../credential-vault/service";
 import type { VaultHandle, VaultSecret } from "../credential-vault/domain";
 import { parseVaultHandle } from "../credential-vault/domain";
-import type { OrganisationEnvironment } from "../data/control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,

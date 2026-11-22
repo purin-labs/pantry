@@ -1,5 +1,5 @@
 import { createMigratedDatabase } from "./sqlite-d1";
-import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
+import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,
   TEST_ORGANISATION_PLACEMENT_PROFILE,
@@ -160,7 +160,7 @@ type Harness = {
   readonly sql: ReturnType<typeof sqlStorage>;
   readonly cipher: WhatsAppContentCipher;
   readonly env: UnitTestEnv;
-  readonly scope: import("../src/organisation-execution-scope").OrganisationExecutionScope;
+  readonly scope: import("@purin-labs/tenancy/organisation-execution-scope").OrganisationExecutionScope;
   readonly caseActor: {
     inspect: ReturnType<typeof vi.fn>;
     beginAssignment: ReturnType<typeof vi.fn>;

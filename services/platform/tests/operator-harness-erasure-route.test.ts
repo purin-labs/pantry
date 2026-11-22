@@ -5,9 +5,9 @@ import { requireOrganisationExecutionScope } from "./organisation-execution-fixt
 import { describe, expect, it } from "vitest";
 
 import { handleControlRequest } from "../src/control-router";
-import { issueControlSession, upsertUser } from "../src/data/control-plane";
-import { newControlMutationIdentity } from "../src/data/control-mutation";
-import { archiveOrganisation } from "../src/data/organisation-lifecycle";
+import { issueControlSession, upsertUser } from "@purin-labs/tenancy/data/control-plane";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
+import { archiveOrganisation } from "@purin-labs/tenancy/data/organisation-lifecycle";
 import type { SessionDO } from "../src/actors/agent-session";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";

@@ -2,9 +2,9 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import type { OrganisationQuerySource } from "./query-source";
+import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import { isRecord } from "@purin-labs/std";
-import { prepareInferenceSelectionRevision } from "./organisation-onboarding-row";
+import { prepareInferenceSelectionRevision } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 import { isChatEffort, type ChatEffort } from "@purin-labs/control-api";
 
 export type OrganisationInferenceSelection =

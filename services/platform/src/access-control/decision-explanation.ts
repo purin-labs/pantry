@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   AccessDecisionExplanation,
   AccessDecisionQuestion,
@@ -21,7 +21,7 @@ import { selectActiveGrants } from "../authorization/access-grants";
 import { CAPABILITY_CATALOGUE } from "../authorization/capability-catalogue";
 import { listAccessGrants } from "../data/access-grants";
 import { readOrganisationCapabilityPolicies } from "../data/capability-policy";
-import type { ActiveOrganisationMembership } from "../data/control-plane";
+import type { ActiveOrganisationMembership } from "@purin-labs/tenancy/data/control-plane";
 import {
   resolveActiveProviderAccountContext,
   resolveIntegrationAccount,

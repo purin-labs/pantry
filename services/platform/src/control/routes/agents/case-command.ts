@@ -1,7 +1,7 @@
 import type { Env } from "@purin-labs/kernel/env";
 import { processDirectCaseCommand } from "../../../actors/case-direct-processing";
-import { readActiveOrganisationMembershipRevision } from "../../../data/control-plane";
-import { prepareControlMutationReceipt } from "../../../data/control-mutation";
+import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
+import { prepareControlMutationReceipt } from "@purin-labs/tenancy/data/control-mutation";
 import { parseRequestId } from "@purin-labs/kernel/ids";
 import { buildControlAuthority } from "../../../request-authority";
 import {

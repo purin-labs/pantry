@@ -36,7 +36,7 @@ import {
   conversationCaseId,
   parseConversationActorIdentity,
 } from "../chat/conversation-actor-identity";
-import type { AuthorizedConversationScope as ConversationScope } from "../organisation-access/access";
+import type { AuthorizedConversationScope as ConversationScope } from "@purin-labs/tenancy/organisation-access/access";
 import type { Env } from "@purin-labs/kernel/env";
 import type { CaseActorStub, OrganisationActorStub } from "../actors/actor-stubs";
 import { parseCaseId, parseSessionId, type CaseId } from "@purin-labs/kernel/ids";

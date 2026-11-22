@@ -23,7 +23,7 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { Env } from "@purin-labs/kernel/env";
 import { setAdmittedConversationGoal } from "./chat-goal";
 import { buildControlAuthority } from "../../request-authority";
-import { readActiveOrganisationMembershipRevision } from "../../data/control-plane";
+import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import {
   resolveOrganisationModelRoute,
   selectOrganisationChatModel,
@@ -77,7 +77,7 @@ import {
   publicConversation,
   publicConversationWork,
 } from "../../chat/public-conversation";
-import { readOnboardingRow } from "../../data/organisation-onboarding-row";
+import { readOnboardingRow } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 import {
   readConversationLinks,
   unreadConversationCount,

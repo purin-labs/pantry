@@ -26,7 +26,7 @@ import {
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import { createCommerceOutboxReconcileQueueMessage } from "./contract/queue-messages";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 /** Pantry's subscription id on every merchant. */
 const SUBSCRIPTION_ID = "pantry";

@@ -7,11 +7,11 @@ import {
   hashOpaqueSecret,
   issueControlSession,
   upsertUser,
-} from "../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import {
   newControlMutationIdentity,
   readControlMutationReplay,
-} from "../src/data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import {
   createActiveConnectedIntegration,
   type ConnectedIntegrationSeed,

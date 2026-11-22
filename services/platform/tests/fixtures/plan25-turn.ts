@@ -23,7 +23,7 @@ import type { Variant } from "@purin-labs/type-utils";
 import {
   createOrganisationAccess,
   acceptedExecutionAuthority,
-} from "../../src/organisation-access/access";
+} from "@purin-labs/tenancy/organisation-access/access";
 import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { createMigratedDatabase } from "../sqlite-d1";
 

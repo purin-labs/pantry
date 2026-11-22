@@ -58,7 +58,7 @@ import {
   type OrganisationArchiveCleanupRequest,
 } from "./organisation-archive-cleanup";
 import type { ActorFenceToken } from "./actor-registry";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
 import {
   CostsSheetRooms,
@@ -216,7 +216,7 @@ import type {
   OrganisationMetaRequest,
   OrganisationPing,
   OrganisationStateError,
-} from "./organisation/types";
+} from "@purin-labs/tenancy/actors/organisation/types";
 import {
   OrganisationCommerce,
   type OrganisationCommerceRpc,
@@ -262,7 +262,7 @@ import {
   organisationPlacementConflict,
   readOrganisationMetaRow,
   validateActionOrganisation,
-} from "./organisation/organisation-record";
+} from "@purin-labs/tenancy/actors/organisation/organisation-record";
 
 import {
   bakeKitchenPorts,

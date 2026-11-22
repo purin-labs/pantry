@@ -1,8 +1,8 @@
 import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
 import { assertNever } from "@purin-labs/std";
-import type { OrganisationPlacementBindings } from "../organisation-execution-scope";
+import type { OrganisationPlacementBindings } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { SessionId, OrganisationId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { resolveActorRecoveryAdmission } from "./actor-activation";
 import type {
   EmbeddedHarnessModelRouteLease,

@@ -12,18 +12,18 @@ import { expect, it } from "vitest";
 import { bytesToHex, encodeBase64 } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { storeVaultSecret, type VaultHandle } from "../../src/credential-vault";
-import { upsertUser, type User } from "../../src/data/control-plane";
+import { upsertUser, type User } from "@purin-labs/tenancy/data/control-plane";
 import {
   newControlMutationIdentity,
   type ControlMutationReceiptScope,
-} from "../../src/data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import {
   createActiveConnectedIntegration,
   requireConnectionCredentialAuthority,
   upsertProviderWebhook,
 } from "../../src/data/integration-account";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { parseInitialOrganisationPlacement } from "../../src/placement";
+import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { requireOrganisationBootstrap } from "../organisation-execution-fixture";
 import { requireVaultHandle } from "../test-ids";
 import { fixtureDatabase } from "./organisation-database";

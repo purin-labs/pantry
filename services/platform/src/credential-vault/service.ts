@@ -7,7 +7,7 @@ import { isOrganisationExecutionActive } from "../actors/actor-execution-quiesce
 import {
   organisationPlacementPredicate,
   type OrganisationExecutionScope,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import type { Result } from "@purin-labs/kernel/result";
 import {
@@ -32,7 +32,7 @@ import {
   encryptVaultPayload,
   type VaultCiphertext,
 } from "./crypto";
-import type { OrganisationQuerySource } from "../data/query-source";
+import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import {
   prepareCredentialHandleAccountsRevocation,
   prepareCredentialHandleWebhooksRevocation,

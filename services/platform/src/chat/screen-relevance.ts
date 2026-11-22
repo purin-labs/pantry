@@ -10,7 +10,7 @@ import type { Variant } from "@purin-labs/type-utils";
 import { requireActiveOrganisationActorAtScope } from "../actors/actor-router";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ScreenRelevanceState } from "../jev-features/screen-relevance-jev";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { createCurrentSourceFlowLabel } from "../policy/information-flow/source-labels";
 import type { Result } from "@purin-labs/kernel/result";
 import { timelineVisibleMessages, type Conversation } from "./conversation";

@@ -1,4 +1,4 @@
-import { parseInitialOrganisationPlacement } from "../../src/placement";
+import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 
 const parsedPlacement = parseInitialOrganisationPlacement({
   kind: "affinity",

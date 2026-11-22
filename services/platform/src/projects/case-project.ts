@@ -1,9 +1,9 @@
 import { isProjectId, type ProjectId } from "@purin-labs/control-api";
 import { isPositiveInteger } from "@purin-labs/std";
-import type { OrganisationQuerySource } from "../data/query-source";
+import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import type { CaseId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 
 type CaseProjectPlacement = Readonly<{

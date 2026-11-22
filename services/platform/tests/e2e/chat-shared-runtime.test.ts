@@ -18,7 +18,7 @@ import {
   parseSessionId,
   parseSlackInstallationId,
 } from "@purin-labs/kernel/ids";
-import { createOrganisationInstall } from "../../src/data/organisation";
+import { createOrganisationInstall } from "@purin-labs/tenancy/data/organisation";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import { parseVaultHandle } from "../../src/credential-vault/domain";
 import { resolveActiveSlackOrganisationCredential } from "../../src/credential-vault/surface-installation-resolution";
@@ -31,8 +31,8 @@ import type { SessionDO } from "../../src/actors/agent-session";
 import {
   archiveOrganisation,
   restoreOrganisation,
-} from "../../src/data/organisation-lifecycle";
-import { newControlMutationIdentity } from "../../src/data/control-mutation";
+} from "@purin-labs/tenancy/data/organisation-lifecycle";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import {
   listOrganisationActorRegistryEntries,
   type ActorRegistryEntry,
@@ -46,7 +46,7 @@ import {
 } from "../../src/actors/organisation-archive-cleanup";
 import type { SessionId } from "@purin-labs/kernel/ids";
 import { readPortalChatErasure } from "../../src/actors/portal-chat-cleanup";
-import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
+import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import {
   startActorRelocation,
   resumeActorRelocation,
@@ -60,7 +60,7 @@ import {
   type ConversationId,
   type UserId,
 } from "@purin-labs/control-api";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { createAccessGrant } from "../../src/data/access-grants";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";

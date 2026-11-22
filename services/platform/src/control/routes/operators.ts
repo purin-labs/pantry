@@ -1,5 +1,5 @@
-import { configuredOrganisationDatabases } from "../../organisation-execution-scope";
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { configuredOrganisationDatabases } from "@purin-labs/tenancy/organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import {
@@ -18,12 +18,12 @@ import { inboxServices } from "../../mail-inbox/contract/inbox-services";
 import {
   hashOpaqueSecret,
   type ActiveControlSession,
-} from "../../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import {
   prepareControlMutationReceipt,
   prepareOnboardingAuditEvent,
   type ControlMutationReceiptScope,
-} from "../../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import {
   lookupOperatorOnboardingCases,
   readMerchantSupportDiagnostics,
@@ -39,7 +39,7 @@ import {
   cancelProviderAttempt,
   providerAttemptWire,
 } from "../../data/provider-attempt";
-import { archiveOrganisation } from "../../data/organisation-lifecycle";
+import { archiveOrganisation } from "@purin-labs/tenancy/data/organisation-lifecycle";
 import {
   parseIntegrationAccountId,
   parseProviderConnectionAttemptId,
@@ -71,7 +71,7 @@ import {
 } from "../onboarding-runtime";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, isPositiveInteger } from "@purin-labs/std";
-import { readOnboardingRow } from "../../data/organisation-onboarding-row";
+import { readOnboardingRow } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 import { operatorSupportAccessStatement } from "../../data/onboarding-support-audit";
 
 type OperatorOnboardingAction =

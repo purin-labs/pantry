@@ -17,15 +17,15 @@ import { createAccessGrant } from "../../src/data/access-grants";
 import {
   bootstrapOrganisation,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
-import { newControlMutationIdentity } from "../../src/data/control-mutation";
+} from "@purin-labs/tenancy/data/control-plane";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import { storeVaultSecret } from "../../src/credential-vault";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { GMAIL_FULL_MAILBOX_SCOPES } from "../../src/mail/gmail-authorization";
-import { parseInitialOrganisationPlacement } from "../../src/placement";
+import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { defaultDenyPolicy } from "../../src/policy-snapshot";
 import { requireVaultHandle } from "../test-ids";
 import { commerceClient } from "./commerce-support";

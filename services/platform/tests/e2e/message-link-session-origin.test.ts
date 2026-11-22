@@ -19,7 +19,7 @@ import {
   issueControlSession,
   readActiveOrganisationMembershipRevision,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { buildControlAuthority } from "../../src/request-authority";
 import { processDirectCaseCommand } from "../../src/actors/case-direct-processing";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";

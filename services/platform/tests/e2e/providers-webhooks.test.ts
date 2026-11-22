@@ -3,7 +3,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { env, exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
 
-import { upsertUser, type User } from "../../src/data/control-plane";
+import { upsertUser, type User } from "@purin-labs/tenancy/data/control-plane";
 import {
   createActiveConnectedIntegration,
   requireConnectionCredentialAuthority,
@@ -13,7 +13,7 @@ import {
 import {
   newControlMutationIdentity,
   type ControlMutationReceiptScope,
-} from "../../src/data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import { storeVaultSecret, type VaultHandle } from "../../src/credential-vault";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { VariantBy } from "@purin-labs/type-utils";

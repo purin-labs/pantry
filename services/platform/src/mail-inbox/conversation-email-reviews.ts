@@ -4,7 +4,7 @@ import type { ConversationScope } from "../chat/store";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import { emailReviewQueueWire } from "../control/email-review";
 import { listEmailReviewProjectionsForCase } from "../data/email-review";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 const CONVERSATION_EMAIL_REVIEW_LIMIT = 20;
 

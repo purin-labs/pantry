@@ -7,7 +7,7 @@ import {
   entityTypeReadLabel,
   permissionLabels,
 } from "../../authorization/requestable-capabilities";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   ChatPermissionDecision,
   ChatPermissionItem,

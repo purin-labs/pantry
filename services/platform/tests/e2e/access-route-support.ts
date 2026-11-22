@@ -2,7 +2,7 @@ import { exports } from "cloudflare:workers";
 import { expect } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { commerceHeaders } from "./commerce-support";
 
 /** The Access routes as the Portal calls them, for an owner's session. */

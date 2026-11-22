@@ -23,7 +23,7 @@ import {
 } from "../../src/actors/actor-relocation";
 import { startActorRestore } from "../../src/actors/actor-restore";
 import { prepareActorRestoreManifest } from "../../src/actors/actor-restore-manifest";
-import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { requireActiveSessionActor } from "../../src/actors/actor-router";
 import {
   quarantineActorRegistryEntry,

@@ -3,7 +3,7 @@ import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   fetchWithOrganisationPlacement,
   OrganisationExecutionScope,
-} from "../../../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
 import { resolveActiveSlackOrganisationCredential } from "../../../credential-vault";
 import {

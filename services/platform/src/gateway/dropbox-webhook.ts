@@ -1,7 +1,7 @@
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   errorResponse,

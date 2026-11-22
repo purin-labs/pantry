@@ -9,7 +9,7 @@ import {
   parseCommerceSystemRevision,
   type CommerceSystemRevision,
 } from "./organisation-commerce-system";
-import type { OrganisationQuerySource } from "./query-source";
+import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 
 type FirstTaskSourceRow = {
   readonly organisationId: unknown;

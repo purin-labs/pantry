@@ -1,5 +1,5 @@
 import { mutateChatDirectory } from "../src/chat/projects";
-import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { ConversationScope } from "../src/chat/store";
 import type { ChatDirectoryCommand } from "@purin-labs/control-api";
 

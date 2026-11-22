@@ -5,10 +5,10 @@ import {
   samePlacement,
   type FrozenOrganisationPlacementMove,
   type OrganisationPlacementFenceToken,
-} from "../data/organisation-placement";
+} from "@purin-labs/tenancy/data/organisation-placement";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { OrganisationPlacement } from "../placement";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
+import type { OrganisationPlacement } from "@purin-labs/tenancy/placement";
 import type { Result } from "@purin-labs/kernel/result";
 import type { ActorRelocationId } from "./actor-relocation";
 import type { ActorRestoreId } from "./actor-restore";

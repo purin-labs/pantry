@@ -7,7 +7,7 @@ import { requireOrganisationExecutionScope } from "./organisation-execution-fixt
 import { describe, expect, it } from "vitest";
 
 import { storeVaultSecret } from "../src/credential-vault";
-import { upsertUser } from "../src/data/control-plane";
+import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import { createConnectedIntegration } from "../src/data/integration-account";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";

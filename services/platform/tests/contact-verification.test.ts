@@ -19,7 +19,7 @@ import { activateOrganisationFixture } from "./fixtures/organisation-activation"
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
 import { parseVaultHandle } from "../src/credential-vault";
-import { issueControlSession, upsertUser } from "../src/data/control-plane";
+import { issueControlSession, upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   parseContactVerificationCommand,
   publishContactVerification,
@@ -35,7 +35,7 @@ import {
   setIntegrationAccountLifecycle,
 } from "../src/data/integration-account";
 import { removeIntegrationAccount } from "../src/data/account-removal";
-import { newControlMutationIdentity } from "../src/data/control-mutation";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import { bindCommerceMerchant } from "../src/data/commerce-merchant-binding";
 import { handleContactVerification } from "../src/control/routes/contact-verification";
 import {

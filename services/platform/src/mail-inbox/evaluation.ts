@@ -1,4 +1,4 @@
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
 import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type { RequestAuthority } from "@purin-labs/contracts";

@@ -51,7 +51,7 @@ No outside account takes part.
 2. `POST /v1/control/organisations` with `{ operationId, name }` makes the
    Organisation. The person must sign in with a verified Google email, and
    becomes the owner. `createOwnedOrganisation` in
-   [`creation.ts`](../../services/platform/src/organisation-access/creation.ts)
+   [`creation.ts`](../../foundation/tenancy/organisation-access/creation.ts)
    places it in the root cell of `PANTRY_ORGANISATION_PLACEMENT_PROFILE`, or
    in the cell that the request names, and calls `bootstrapOrganisation`.
 3. A person owns at most five active Organisations
@@ -138,7 +138,7 @@ delete, member changes, setup, activate, archive and restore also need an
 
 `control_mutation_receipt` keeps the request hash and the response for at
 least 24 hours, keyed by user, Organisation, route, operation and key
-([`control-mutation.ts`](../../services/platform/src/data/control-mutation.ts)).
+([`control-mutation.ts`](../../foundation/tenancy/data/control-mutation.ts)).
 The same key and body return the stored response. The same key with another
 body returns `409 idempotency_key_conflict`. A stale version returns
 `409 configuration_version_conflict` and changes nothing.
@@ -206,7 +206,7 @@ admits its role and every higher role.
   enforce it (`organisation_final_owner_required`).
 - An invitation assigns `admin`, `operator` or `viewer`, never `owner`.
 - Pantry issues, stores and expires invitations
-  ([`invitations.ts`](../../services/platform/src/organisation-access/invitations.ts),
+  ([`invitations.ts`](../../foundation/tenancy/organisation-access/invitations.ts),
   `organisation_invitation`). An invitation keeps the SHA-256 of a random
   32-byte token, and expires after 7 days. A new invitation for the same email
   replaces the open one. Pantry sends no e-mail: the inviter copies the link.

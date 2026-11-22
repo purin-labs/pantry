@@ -10,8 +10,8 @@ import type {
   ActorActivationRequest,
   ActorActivationResult,
 } from "../src/actors/actor-registry";
-import { issueControlSession, upsertUser } from "../src/data/control-plane";
-import { createOrganisationInstall } from "../src/data/organisation";
+import { issueControlSession, upsertUser } from "@purin-labs/tenancy/data/control-plane";
+import { createOrganisationInstall } from "@purin-labs/tenancy/data/organisation";
 import { parseSlackAppId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { parseSlackEnvelope } from "../src/slack/events";
 import {

@@ -1,5 +1,5 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../actor-execution-quiescence";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
@@ -53,8 +53,8 @@ import {
   organisationPlacementConflict,
   readOrganisationMetaRow,
   validateActionOrganisation,
-} from "./organisation-record";
-import type { OrganisationStateError } from "./types";
+} from "@purin-labs/tenancy/actors/organisation/organisation-record";
+import type { OrganisationStateError } from "@purin-labs/tenancy/actors/organisation/types";
 
 /**
  * Policy activation, credentials, TypeSafe and Case context discovery for the Organisation.

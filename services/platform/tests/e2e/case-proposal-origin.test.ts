@@ -15,7 +15,7 @@ import {
 import {
   issueControlSession,
   type ActiveControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { parseCaseId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { resolveActiveCaseActor } from "../../src/actors/actor-router";
@@ -29,7 +29,7 @@ import {
   startActorRelocation,
   resumeActorRelocation,
 } from "../../src/actors/actor-relocation";
-import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
+import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 
 type Boundary = "session_origin" | "placement" | "approval_wait";
 type Pause = {

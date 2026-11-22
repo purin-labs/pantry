@@ -1,5 +1,5 @@
 import type { ConnectorIdentity } from "@purin-labs/contracts";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { ConnectorModuleHost } from "./channel-adapter";
 import { ensureConnectorIdentity } from "./ingress-parsers";
 import { invalid } from "./support";

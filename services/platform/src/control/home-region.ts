@@ -1,7 +1,7 @@
 import type { OrganisationHomeRegions } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 
-import type { OrganisationPlacementBindings } from "../organisation-execution-scope";
+import type { OrganisationPlacementBindings } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   nearestOrganisationPlacementCell,
   parseOrganisationPlacementCells,
@@ -9,7 +9,7 @@ import {
   type InitialOrganisationPlacement,
   type OrganisationPlacementCell,
   type RequestLocation,
-} from "../placement";
+} from "@purin-labs/tenancy/placement";
 import type { Result } from "@purin-labs/kernel/result";
 
 type OrganisationHomeRegionError =

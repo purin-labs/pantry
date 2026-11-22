@@ -1,8 +1,8 @@
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
-} from "../organisation-execution-scope";
-import { resolveActiveOrganisationPlacement } from "../data/organisation-placement";
+} from "@purin-labs/tenancy/organisation-execution-scope";
+import { resolveActiveOrganisationPlacement } from "@purin-labs/tenancy/data/organisation-placement";
 import {
   routeWhatsAppWebhookAccount,
   whatsappConnectorIdValue,

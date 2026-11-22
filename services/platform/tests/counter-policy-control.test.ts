@@ -31,12 +31,12 @@ vi.mock("../src/data/commerce-merchant-binding", async (importOriginal) => ({
   resolveOrganisationCommerceMerchantBinding:
     counterPolicyMocks.resolveOrganisationCommerceMerchantBinding,
 }));
-vi.mock("../src/data/control-plane", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/control-plane")>()),
+vi.mock("@purin-labs/tenancy/data/control-plane", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/tenancy/data/control-plane")>()),
   resolveUser: counterPolicyMocks.resolveUser,
 }));
-vi.mock("../src/data/control-mutation", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/control-mutation")>()),
+vi.mock("@purin-labs/tenancy/data/control-mutation", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/tenancy/data/control-mutation")>()),
   readControlMutationReplay: counterPolicyMocks.readControlMutationReplay,
 }));
 vi.mock("../src/control/mutation-receipt", () => ({

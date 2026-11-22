@@ -4,7 +4,7 @@ import { requireOrganisationExecutionScope } from "./organisation-execution-fixt
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
 import { describe, expect, it } from "vitest";
 
-import { upsertUser } from "../src/data/control-plane";
+import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   assignAgentMailbox,
   bindEmailMessageReceiptContact,

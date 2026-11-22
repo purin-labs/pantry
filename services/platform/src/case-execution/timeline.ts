@@ -14,7 +14,7 @@ import {
 
 import { assertNever, parseJsonOrNull } from "@purin-labs/std";
 
-import type { AuthorizedConversationScope as ConversationScope } from "../organisation-access/access";
+import type { AuthorizedConversationScope as ConversationScope } from "@purin-labs/tenancy/organisation-access/access";
 import { listVisibleChatTitles } from "../chat/store";
 import type { Env } from "@purin-labs/kernel/env";
 import {

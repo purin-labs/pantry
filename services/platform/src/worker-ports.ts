@@ -2,7 +2,7 @@
 // entry module loads (Refactor 17). A port reads its implementation at the
 // call, so each part names its function when it runs.
 import { listVerifiedContactEndpoints } from "./data/contact-verification";
-import { provideOrganisationLifecycleParts } from "./data/organisation-lifecycle-port";
+import { provideOrganisationLifecycleParts } from "@purin-labs/tenancy/data/organisation-lifecycle-port";
 import { ORGANISATION_LIFECYCLE_PARTS } from "./organisation-lifecycle-parts";
 import {
   readEmailMailboxIdentityClaimant,

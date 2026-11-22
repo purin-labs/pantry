@@ -8,7 +8,7 @@ import type {
   WorkspaceId,
 } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { SlackUserId } from "./events";
 import { resolveConfiguredSlackInstallationIdentity } from "./installation-identity";
 import { tellClicker } from "./interaction-reply";

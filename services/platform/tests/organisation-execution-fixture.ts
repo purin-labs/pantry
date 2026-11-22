@@ -8,7 +8,7 @@ import {
   type ActorActivationResult,
 } from "../src/actors/actor-registry";
 import { requireActorExecutionAdmission } from "./sqlite-d1";
-import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
+import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,
   TEST_ORGANISATION_PLACEMENT_PROFILE,
@@ -16,8 +16,8 @@ import {
 import {
   bootstrapOrganisation,
   type OrganisationBootstrap,
-} from "../src/data/control-plane";
-import { readActiveOrganisationMembershipRevision } from "../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
+import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import { buildControlAuthority } from "../src/request-authority";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { Env } from "@purin-labs/kernel/env";
@@ -28,7 +28,7 @@ import {
   type ControlSessionId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { OrganisationExecutionScope } from "../src/organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   bindOperatorTurnAccess,

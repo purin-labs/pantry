@@ -7,7 +7,7 @@
  */
 import type { Variant } from "@purin-labs/type-utils";
 import { isRecord } from "@purin-labs/std";
-import { resolveUser, type User } from "../../data/control-plane";
+import { resolveUser, type User } from "@purin-labs/tenancy/data/control-plane";
 import {
   hashPortalSubject,
   newControlMutationIdentity,
@@ -18,11 +18,11 @@ import {
   type ControlMutationIdentity,
   type ControlMutationReceiptScope,
   type StoredControlMutationReceipt,
-} from "../../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import type { OnboardingProjectionV1 } from "@purin-labs/contracts";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { definePort } from "@purin-labs/kernel/port";
-import type { QuerySource } from "../../data/query-source";
+import type { QuerySource } from "@purin-labs/tenancy/data/query-source";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";

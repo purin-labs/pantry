@@ -10,7 +10,7 @@ import { personPermission } from "../control/permission-required";
 import { listAccessGrants } from "../data/access-grants";
 import { resolveActiveProviderAccountContext } from "../data/integration-account";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { createCurrentSourceFlowLabel, evaluateFlowLabelSink } from "../policy";
 import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
 import { validateNativeRequestAuthority } from "../request-authority";

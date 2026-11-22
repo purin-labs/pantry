@@ -6,7 +6,7 @@ import { isRecord } from "@purin-labs/std";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
 import { saveConversation } from "../../src/chat/store";
 import { createAccessGrant } from "../../src/data/access-grants";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { newConversationId, newProjectId } from "@purin-labs/control-api";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { requireDefaultProjectId } from "../fixtures/default-project";

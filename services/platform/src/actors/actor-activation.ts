@@ -11,7 +11,7 @@ import {
 import {
   readPlacementByEpoch,
   samePlacement,
-} from "../data/organisation-placement";
+} from "@purin-labs/tenancy/data/organisation-placement";
 import {
   actorPlacementAdmissionPredicate,
   actorPlacementDirectoryAdmits,
@@ -21,8 +21,8 @@ import {
   OrganisationExecutionScope,
   selectOrganisationPlacementDatabase,
   type OrganisationPlacementBindings,
-} from "../organisation-execution-scope";
-import { parseOrganisationPlacement } from "../placement";
+} from "@purin-labs/tenancy/organisation-execution-scope";
+import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { assertNever } from "@purin-labs/std";
 import type { StrictUnion, VariantBy } from "@purin-labs/type-utils";

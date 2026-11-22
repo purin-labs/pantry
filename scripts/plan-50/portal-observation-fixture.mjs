@@ -1,4 +1,4 @@
-import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope.ts";
+import { OrganisationExecutionScope } from "../../foundation/tenancy/organisation-execution-scope.ts";
 import {
   saveConversation,
   readConversation,
@@ -32,7 +32,7 @@ import { mutateProject } from "../../services/platform/src/projects/commands.ts"
 import { mutateProjectAccess } from "../../services/platform/src/projects/membership.ts";
 import { shareConversation } from "../../services/platform/src/chat/conversation-sharing.ts";
 import { listProjectMembers } from "../../services/platform/src/projects/access.ts";
-import { issueControlSession } from "../../services/platform/src/data/control-plane.ts";
+import { issueControlSession } from "../../foundation/tenancy/data/control-plane.ts";
 
 export const conversationId = "conv_aaaaaaaa-1111-4111-8111-111111111111";
 export const contributorId = "user_22222222-2222-5222-8222-222222222222";

@@ -7,7 +7,7 @@ import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import { parseStoredRequestAuthority } from "../request-authority";
 import type { Variant } from "@purin-labs/type-utils";
 import type { Result } from "@purin-labs/kernel/result";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   isRequestableCapability,
   isRequestableEntityTypeRead,

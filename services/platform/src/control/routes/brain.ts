@@ -1,7 +1,7 @@
-import { authenticatedConversationScope } from "../../organisation-access/access";
+import { authenticatedConversationScope } from "@purin-labs/tenancy/organisation-access/access";
 import { EMPTY_BRAIN_SUMMARY, type BrainSummary } from "@purin-labs/control-api";
 
-import { roleMayConfigure } from "../../data/control-plane";
+import { roleMayConfigure } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import { countEvalsToReview } from "../../evals/access";
 import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";

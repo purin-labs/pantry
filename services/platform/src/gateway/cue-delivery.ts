@@ -1,7 +1,7 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { prepareCueLogEntry } from "../cues/cue-log";
 import { pantryCommerceAccess } from "../commerce/contract/client";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   CommerceEntityRef,
   CommerceGraphQueryResult,

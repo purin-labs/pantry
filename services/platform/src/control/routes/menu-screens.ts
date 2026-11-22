@@ -29,7 +29,7 @@ import {
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { createCommerceClient } from "../../commerce/contract/client";
 import {
   countOpenScreenPairings,

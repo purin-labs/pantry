@@ -29,7 +29,7 @@ import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   parseOrganisationPlacement,
   type OrganisationPlacement,
-} from "../placement";
+} from "@purin-labs/tenancy/placement";
 import {
   readIntegrationAccountId,
   readOrganisationId,

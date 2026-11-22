@@ -3,7 +3,7 @@ import { deliverOperationsCard } from "../actors/operations-channel";
 import {
   readOperationsDestination,
   type OperationsDestination,
-} from "../data/operations-destination";
+} from "@purin-labs/tenancy/data/operations-destination";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, parseCaseId, type CaseId } from "@purin-labs/kernel/ids";
 import {
@@ -11,7 +11,7 @@ import {
   type BakeProposal,
 } from "../kitchen/bakes/records";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { ensureCaseProject } from "../projects/case-project";
 import { BAKE_PROPOSAL_CARD, bakeProposalCardText } from "./bake-proposal-card";
 import { parseSlackUserId } from "./events";

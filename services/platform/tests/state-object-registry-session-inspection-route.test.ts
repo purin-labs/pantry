@@ -29,7 +29,7 @@ import {
 import {
   parseOrganisationPlacement,
   type OrganisationPlacement,
-} from "../src/placement";
+} from "@purin-labs/tenancy/placement";
 import type { SessionDO } from "../src/actors/agent-session";
 import type { CaseDO } from "../src/actors/case";
 import type { ConnectorDO } from "../src/actors/connector";

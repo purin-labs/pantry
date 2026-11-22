@@ -19,12 +19,12 @@ vi.mock("../src/control/authorization", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../src/control/authorization")>()),
   authorizeOrganisationRequest: payoutControlMocks.authorizeOrganisationRequest,
 }));
-vi.mock("../src/data/control-plane", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/control-plane")>()),
+vi.mock("@purin-labs/tenancy/data/control-plane", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/tenancy/data/control-plane")>()),
   resolveUser: payoutControlMocks.resolveUser,
 }));
-vi.mock("../src/data/control-mutation", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/control-mutation")>()),
+vi.mock("@purin-labs/tenancy/data/control-mutation", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/tenancy/data/control-mutation")>()),
   readControlMutationReplay: payoutControlMocks.readControlMutationReplay,
 }));
 vi.mock("../src/control/mutation-receipt", () => ({

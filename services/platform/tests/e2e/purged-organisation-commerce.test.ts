@@ -4,12 +4,12 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import { commerceAppInstallationToken } from "@purin-labs/commerce-client";
 
-import { newControlMutationIdentity } from "../../src/data/control-mutation";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import type { UserId } from "@purin-labs/control-api/ids";
 import {
   archiveOrganisation,
   deleteArchivedOrganisation,
-} from "../../src/data/organisation-lifecycle";
+} from "@purin-labs/tenancy/data/organisation-lifecycle";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {

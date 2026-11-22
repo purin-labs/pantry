@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { D1PreparedStatement } from "@cloudflare/workers-types";
 import {
   hashPortalSubject,
@@ -7,10 +7,10 @@ import {
   prepareControlMutationReceipt,
   readControlMutationReplay,
   type ControlMutationReceiptScope,
-} from "./control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 
 import type { Env } from "@purin-labs/kernel/env";
-import { roleMayConfigure, type ControlRole } from "./control-plane";
+import { roleMayConfigure, type ControlRole } from "@purin-labs/tenancy/data/control-plane";
 import type { ControlSessionId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { runAgentOperation } from "./agent-operation-runner";

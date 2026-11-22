@@ -1,4 +1,4 @@
-import type { ControlRole } from "../../../data/control-plane";
+import type { ControlRole } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseIntegrationAccountId,

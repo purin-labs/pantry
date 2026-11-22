@@ -11,7 +11,7 @@ import {
   parseInventoryReceiptContext,
   type InventoryReceiptContext,
 } from "@purin-labs/kitchen-control-api";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {
   commerceClient,
   commerceHeaders,

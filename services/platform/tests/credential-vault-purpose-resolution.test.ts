@@ -26,7 +26,7 @@ import {
   type IntegrationProvider,
   type LiveProviderWebhookContext,
 } from "../src/data/integration-account";
-import type { OrganisationInstallRecord } from "../src/data/organisation";
+import type { OrganisationInstallRecord } from "@purin-labs/tenancy/data/organisation";
 import {
   parseProviderConnectionId,
   type IntegrationAccountId,
@@ -34,7 +34,7 @@ import {
   type OrganisationId,
   type WorkspaceId,
 } from "@purin-labs/kernel/ids";
-import { parseOrganisationPlacement } from "../src/placement";
+import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { createMigratedDatabase } from "./sqlite-d1";
 import {
   requireIntegrationAccountId,

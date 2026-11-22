@@ -1,5 +1,5 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   readIntegrationAccountIdField,
   readStringField,
@@ -9,7 +9,7 @@ import {
   requireConnectionCredentialAuthority,
   resolveActiveProviderAccountContext,
 } from "../data/integration-account";
-import { resolveOrganisationProvisioningActor } from "../data/control-plane";
+import { resolveOrganisationProvisioningActor } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   errorResponse,

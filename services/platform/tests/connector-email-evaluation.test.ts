@@ -59,7 +59,7 @@ import {
 } from "../src/actors/connector-email";
 import { createConnectorEvalSchema } from "../src/actors/connector-eval";
 import { runConnectorEmailEvaluation } from "../src/actors/connector-email-evaluation";
-import { upsertUser } from "../src/data/control-plane";
+import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   assignAgentMailbox,
   readEmailThreadCase,

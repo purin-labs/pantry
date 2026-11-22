@@ -1,4 +1,4 @@
-import type { OrganisationModuleHost } from "./module-host";
+import type { OrganisationModuleHost } from "@purin-labs/tenancy/actors/organisation/module-host";
 import {
   runScreenRelevanceCheck,
   type ScreenRelevanceCheckInput,
@@ -22,7 +22,7 @@ import {
 import {
   OrganisationExecutionScope,
   selectOrganisationPlacementDatabase,
-} from "../../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   settleActorExecution,
   isOrganisationExecutionActive,
@@ -84,11 +84,11 @@ import type {
   OrganisationMeta,
   OrganisationMetaInput,
   OrganisationStateError,
-} from "./types";
+} from "@purin-labs/tenancy/actors/organisation/types";
 import {
   organisationPlacementConflict,
   validateActionOrganisation,
-} from "./organisation-record";
+} from "@purin-labs/tenancy/actors/organisation/organisation-record";
 
 /**
  * The Organisation actor's state, its command admission and its shared helpers (Refactor 10, step 2.6). The layers above add policy and credentials, then commerce, Code Mode and activation; `OrganisationDO` keeps the members that use its private rooms and drafts.

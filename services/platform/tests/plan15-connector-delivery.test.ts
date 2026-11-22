@@ -2,7 +2,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../src/data/organisation", organisationModuleMock);
+vi.mock("@purin-labs/tenancy/data/organisation", organisationModuleMock);
 vi.mock("../src/credential-vault", credentialVaultMock);
 vi.mock("../src/slack/installation-store", slackRoutingMock);
 

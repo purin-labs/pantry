@@ -59,7 +59,7 @@ import {
 import {
   issueControlSession,
   readActiveOrganisationMembershipRevision,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { buildControlAuthority } from "../../src/request-authority";
 import type { SessionTurnExecution } from "../../src/chat/turn-access";
 import { selfTestCount } from "./gmail-mailbox-support";

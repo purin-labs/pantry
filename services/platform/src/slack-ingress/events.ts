@@ -1,4 +1,4 @@
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { issueIdentityLink } from "../data/identity-link";
 import type { Env } from "@purin-labs/kernel/env";
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";

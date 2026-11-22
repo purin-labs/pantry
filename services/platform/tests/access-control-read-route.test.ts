@@ -28,8 +28,10 @@ const commerceMocks = vi.hoisted(() => ({
 const flowMocks = vi.hoisted(() => ({ createCurrentSourceFlowLabel: vi.fn() }));
 const caseMocks = vi.hoisted(() => ({ readActiveCaseOperations: vi.fn() }));
 
-vi.mock("../src/data/control-plane", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/control-plane")>()),
+vi.mock("@purin-labs/tenancy/data/control-plane", async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import("@purin-labs/tenancy/data/control-plane")
+  >()),
   authorizeOrganisationControl: controlMocks.authorizeOrganisationControl,
   listOrganisationMembers: controlMocks.listOrganisationMembers,
   resolveControlSession: controlMocks.resolveControlSession,

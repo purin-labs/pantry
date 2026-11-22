@@ -1,4 +1,4 @@
-import { acceptedExecutionAuthority } from "../organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import {
   MAX_EVAL_REPLY_LENGTH,
   type EvalObservation,
@@ -49,7 +49,7 @@ import {
   resolveOrganisationModelRouteForSelection,
 } from "../models/route";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   loadOrganisationPolicyOrDefaultDeny,
   type PinnedSessionPolicy,

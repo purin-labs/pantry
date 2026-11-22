@@ -4,8 +4,8 @@ import type {
 } from "@purin-labs/kernel/database-handles";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { fixtureDatabase } from "./organisation-database";
-import { readControlMutationReplay } from "../../src/data/control-mutation";
-import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import { readControlMutationReplay } from "@purin-labs/tenancy/data/control-mutation";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { forkChat } from "../../src/chat/forks";
 import { readChatControlAuthority } from "../../src/chat/information-flow";
 import {
@@ -13,10 +13,10 @@ import {
   settleWorkspaceAiBudget,
   type WorkspaceAiBudget,
   readWorkspaceAiBudget,
-} from "../../src/data/workspace-ai-budget";
+} from "@purin-labs/tenancy/data/workspace-ai-budget";
 import { readPortalChatAttachmentKeys } from "../../src/chat/attachments";
 import { parseChat, type ChatTimelineView, type ChatAttachmentView } from "@purin-labs/control-api/portal/chat";
-import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
+import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import {
   type ActorRelocationId,
   startActorRelocation,
@@ -46,7 +46,7 @@ import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   issueControlSession,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import {
   createAccessGrant,
   revokeAccessGrant,

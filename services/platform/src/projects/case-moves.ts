@@ -18,7 +18,7 @@ import {
 } from "../chat/store";
 import type { CaseId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { authorizeProject, type ProjectAccessScope } from "./access";
 import { readDefaultProjectId } from "./case-project";
 import type { Variant } from "@purin-labs/type-utils";

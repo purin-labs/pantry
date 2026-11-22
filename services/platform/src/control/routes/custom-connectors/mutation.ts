@@ -4,7 +4,7 @@ import {
   type ControlMutationBoundary,
   type ControlMutationIdentity,
   type ControlMutationReceiptScope,
-} from "../../../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import {
   admitUserMutation,
   controlMutationIdentity,
@@ -19,7 +19,7 @@ import {
   prepareConfigurationVersionAdvance,
   prepareConfigurationVersionFence,
   readOnboardingRow,
-} from "../../../data/organisation-onboarding-row";
+} from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 export type MutationContext = Readonly<{
   authorized: AuthorizedOrganisationRequest;

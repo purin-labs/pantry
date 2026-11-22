@@ -17,7 +17,7 @@ import {
 import { resolveActiveCaseActor } from "../../src/actors/actor-router";
 import type { CaseSnapshot } from "../../src/actors/case/types";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
-import { issueControlSession } from "../../src/data/control-plane";
+import { issueControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {
   parseCaseId,
   parseChannelId,

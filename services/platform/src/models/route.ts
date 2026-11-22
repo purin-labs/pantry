@@ -1,5 +1,5 @@
 import { readClaudeConnection } from "./claude-connection";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { ModelRoute } from "@purin-labs/contracts";
 import type { ChatEffort, ChatModelCapabilities } from "@purin-labs/control-api";
 

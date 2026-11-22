@@ -10,13 +10,13 @@ import { commerceHeaders } from "./commerce-support";
 import {
   issueControlSession,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { createAccessGrant } from "../../src/data/access-grants";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
-import type { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 export type RegionalCanvas = Readonly<{

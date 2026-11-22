@@ -142,7 +142,7 @@ async function concurrentApprovalTest(): Promise<void> {
 
 type SendFixture = {
   readonly world: WhatsAppTestWorld;
-  readonly scope: import("../src/organisation-execution-scope").OrganisationExecutionScope;
+  readonly scope: import("@purin-labs/tenancy/organisation-execution-scope").OrganisationExecutionScope;
   readonly sql: ReturnType<typeof sqlStorage>;
   readonly cipher: WhatsAppContentCipher;
   readonly env: UnitTestEnv;

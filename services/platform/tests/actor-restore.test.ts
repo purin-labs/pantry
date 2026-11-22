@@ -18,7 +18,7 @@ import {
 import {
   resolveActiveOrganisationPlacement,
   parseOrganisationPlacementMoveTarget,
-} from "../src/data/organisation-placement";
+} from "@purin-labs/tenancy/data/organisation-placement";
 import {
   activateActor,
   createActorActivationSchema,
@@ -33,7 +33,7 @@ import {
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { parseOrganisationPlacement } from "../src/placement";
+import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { prepareActorRestoreManifest } from "../src/actors/actor-restore-manifest";
 import {
   inspectActorRestore,

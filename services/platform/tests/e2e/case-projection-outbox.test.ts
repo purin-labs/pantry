@@ -15,11 +15,11 @@ import {
   startActorRelocation,
   resumeActorRelocation,
 } from "../../src/actors/actor-relocation";
-import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
+import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import { CaseDO } from "../../src/actors/case";
 import { parseCaseId } from "@purin-labs/kernel/ids";
 import { buildControlAuthority } from "../../src/request-authority";
-import { readActiveOrganisationMembershipRevision } from "../../src/data/control-plane";
+import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import {
   installDiscoveryActorFixture,
   ORGANISATION_ID,

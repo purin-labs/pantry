@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { resolveCaseContextCollectionSelectionVerification } from "../../case-context-discovery/source";
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../actor-execution-quiescence";
 import type { Env } from "@purin-labs/kernel/env";
 import {
@@ -40,7 +40,7 @@ import { identifier } from "../../case-context-discovery/policy";
 import { assertNever, isRecord } from "@purin-labs/std";
 import type { CaseContextCollectionReviewCommand } from "@purin-labs/control-api";
 import type { PolicyCaseContextSourcePort } from "./organisation-policy";
-import { organisationPlacementConflict } from "./organisation-record";
+import { organisationPlacementConflict } from "@purin-labs/tenancy/actors/organisation/organisation-record";
 
 function parseOperationalCaseContextDiscoverySourceRequest(
   raw: unknown,

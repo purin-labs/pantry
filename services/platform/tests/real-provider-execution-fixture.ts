@@ -4,9 +4,9 @@ import type {
   AuthorityPartition,
   RequestAuthority,
 } from "@purin-labs/contracts";
-import { upsertUser } from "../src/data/control-plane";
+import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import { createAccessGrant } from "../src/data/access-grants";
-import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
+import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import { defaultDenyPolicy } from "../src/policy-snapshot";
 import type {
   IntegrationAccountId,

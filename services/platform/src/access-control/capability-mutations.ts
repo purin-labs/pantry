@@ -16,23 +16,23 @@ import {
   READ_AND_PROPOSE_ORGANISATION_GRANT_IDS,
   readOrganisationCapabilityPolicies,
 } from "../data/capability-policy";
-import type { OrganisationEnvironment } from "../data/control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { OrganisationQuerySource } from "../data/query-source";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
+import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import {
   prepareControlMutationReceiptAfterWrite,
   prepareOnboardingAuditEventAfterWrite,
   type ControlMutationIdentity,
   type UnversionedControlMutationBoundary,
-} from "../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import { assertNever, errorMessage, isPositiveInteger } from "@purin-labs/std";
 import {
   prepareAccessChangeRevision,
   prepareAccessDefaultsRevision,
-} from "../data/organisation-onboarding-row";
+} from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 type AccessControlMutationStateRow = Readonly<{
   environment: unknown;

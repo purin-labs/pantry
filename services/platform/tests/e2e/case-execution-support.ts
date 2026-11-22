@@ -16,7 +16,7 @@ import {
 import { isRecord } from "@purin-labs/std";
 import { expect } from "vitest";
 import type { CaseSnapshot } from "../../src/actors/case/types";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 
 /** A whole projection, read page by page through the control route. */
 export type ReadCaseExecution = Readonly<{

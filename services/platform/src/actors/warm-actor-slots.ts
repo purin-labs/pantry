@@ -1,11 +1,11 @@
 import type { Env } from "@purin-labs/kernel/env";
-import { samePlacement } from "../data/organisation-placement";
+import { samePlacement } from "@purin-labs/tenancy/data/organisation-placement";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import {
   parseOrganisationPlacement,
   type OrganisationPlacement,
-} from "../placement";
+} from "@purin-labs/tenancy/placement";
 import { newWarmActorSlotName, type WarmActorKind } from "./actor-registry";
 import { CASE_ACTOR_SCHEMA_VERSION } from "./actor-schema-versions";
 import { actorStub } from "./actor-stubs";

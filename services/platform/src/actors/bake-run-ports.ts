@@ -18,7 +18,7 @@ import type { BakeProposal } from "../kitchen/bakes/records";
 import type { BakeRunDevicePorts, BakeRunNotices } from "../kitchen/bakes/run";
 import type { BakeRunLaunchPorts } from "../kitchen/bakes/run-start";
 import type { BakeRunDevice } from "../kitchen/bakes/run-store";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   announceBakeRun,
   tellBakeRunOverBake,

@@ -8,7 +8,7 @@ import { isRecord } from "@purin-labs/std";
 import { admitSessionInformationFlowObservation } from "../../src/actors/agent-session-information-flow";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
 import { createAccessGrant } from "../../src/data/access-grants";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { FlowLabel, ObservationEvidence } from "../../src/policy";
 import type {
   FlowPolicyInput,

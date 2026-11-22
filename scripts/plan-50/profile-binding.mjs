@@ -4,7 +4,7 @@ import {
   composeAgentInstructions,
   resolveCaseTurnAgentProfile,
 } from "../../services/platform/src/data/pinned-agent-profile.ts";
-import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope.ts";
+import { OrganisationExecutionScope } from "../../foundation/tenancy/organisation-execution-scope.ts";
 
 const installationId = "installation_plan50_native";
 const definitionId = "definition_plan50_native";

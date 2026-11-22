@@ -8,7 +8,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import { resolveActiveCaseActor } from "./actor-router";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 type CollaborationSlackThread = Readonly<{
   caseId: CaseId;

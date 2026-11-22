@@ -4,7 +4,7 @@ import {
   OrganisationExecutionScope,
   organisationPlacementPredicate,
   type OrganisationExecutionScopeError,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   newCodexAuthorizationAttemptId,
   newRequestId,

@@ -1,7 +1,7 @@
 import { assertNever } from "@purin-labs/std";
 
 
-import { acceptedExecutionAuthority } from "../organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { authorizeConversation } from "../chat/conversation-access";
 import { storeSideCaseProposal } from "../chat/side-cases";
 import { signalChat } from "../chat/signals";

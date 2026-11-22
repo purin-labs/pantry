@@ -5,7 +5,7 @@ import type {
   OrganisationDatabase,
 } from "@purin-labs/kernel/database-handles";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import type { OrganisationAccess } from "../organisation-access/access";
+import type { OrganisationAccess } from "@purin-labs/tenancy/organisation-access/access";
 import { definePort } from "@purin-labs/kernel/port";
 
 /**

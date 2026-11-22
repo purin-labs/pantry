@@ -12,7 +12,7 @@
 //    control_mutation_receipt) or that copies rows between them. Run
 //    `node scripts/refactor-12/database-roles.mjs --write` to name the
 //    database of a new handle.
-// 3. Only services/platform/src/data/shared-rows/ writes the three tables that
+// 3. Only foundation/tenancy/data/shared-rows/ writes the three tables that
 //    are in both baselines: no other source file may INSERT, UPDATE, DELETE or
 //    REPLACE a row of organisation, organisation_placement or
 //    control_mutation_receipt (docs/refactor-12.md, part 2).
@@ -30,7 +30,7 @@ const BASELINE = "scripts/database-handles-ratchet.json";
 const HANDLES = "foundation/kernel/database-handles.ts";
 const MAKER_ALLOWED = new Set([
   HANDLES,
-  "services/platform/src/organisation-execution-scope.ts",
+  "foundation/tenancy/organisation-execution-scope.ts",
 ]);
 
 const mode = process.argv[2] ?? "check";
@@ -43,7 +43,7 @@ const CAST =
   /\bas\s+(?:unknown\s+as\s+)?(?:Global|Organisation|Single)Database(?:Session)?\b/g;
 const MAKER = /\b(?:globalDatabase|organisationDatabase|singleDatabase)\(/g;
 const PLAIN = /\bD1Database(?:Session)?\b/g;
-const SHARED_ROWS = "services/platform/src/data/shared-rows/";
+const SHARED_ROWS = "foundation/tenancy/data/shared-rows/";
 const SHARED_WRITE =
   /\b(?:INSERT(?:\s+OR\s+\w+)?\s+INTO|UPDATE|DELETE\s+FROM|REPLACE\s+INTO)\s+"?(?:organisation|organisation_placement|control_mutation_receipt)\b(?!_)/g;
 

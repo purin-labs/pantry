@@ -20,7 +20,10 @@ import { assertNever, sha256Hex } from "@purin-labs/std";
 import type { SessionTurnExecution } from "../chat/turn-access";
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import { controlError } from "../control/http";
-import { listOrganisationMembers, resolveUser } from "../data/control-plane";
+import {
+  listOrganisationMembers,
+  resolveUser,
+} from "@purin-labs/tenancy/data/control-plane";
 import { isConversationId } from "@purin-labs/control-api";
 import { hasExactKeys } from "@purin-labs/std";
 import {
@@ -32,7 +35,7 @@ import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { resolveCollaborationSlackThread } from "./collaboration-slack-thread";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ControlSessionId, OrganisationId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
 import {

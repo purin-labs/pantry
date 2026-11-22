@@ -21,7 +21,7 @@ import type { OrganisationDO } from "../../src/actors/organisation";
 import { saveConversation } from "../../src/chat/store";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { parseActorFenceToken } from "../../src/actors/actor-registry";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { newActorExportId } from "../../src/actors/actor-export";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { organisationBootstrapMutation } from "../control-mutation-fixture";

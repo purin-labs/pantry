@@ -1,13 +1,13 @@
 import { mailboxModelConsentRequest } from "@purin-labs/control-api";
 import type { UserId } from "@purin-labs/control-api/ids";
 
-import { newControlMutationIdentity } from "../src/data/control-mutation";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   consentToGmailModel,
   readGmailModelState,
 } from "../src/mail-inbox/gmail-model-consent";
-import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 /**
  * An owner's acceptance of the data terms of the workspace's model for new

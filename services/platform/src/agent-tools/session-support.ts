@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { normalizeUntrustedCommerceText } from "../context/untrusted-commerce-text";
-import { acceptedExecutionAuthority } from "../organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { evaluateChatFlowLabelSink } from "../chat/information-flow";
 import { isConversationId, isProjectId } from "@purin-labs/control-api";
 import { validateLiveRequestAuthority } from "../request-authority";
@@ -43,7 +43,7 @@ import type { CatalogExecutionContext } from "./catalog/execute";
 import {
   readControlMutationReplay,
   recordOrganisationCommerceMutationReceipt,
-} from "../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import type { CapabilityDefinition } from "../authorization/access-grants/capability-key";
 import {
   readSessionInformationFlow,
@@ -57,7 +57,7 @@ import {
   readActiveOrganisationMembershipRevision,
   resolveUser,
   type OrganisationMember,
-} from "../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
 import { heldEffectCoversRequest } from "../data/held-output-request";
 import type { Variant } from "@purin-labs/type-utils";
@@ -592,8 +592,8 @@ async function toolEffectPassesExit(
 
 async function evaluateHarnessFlowSink(
   db: OrganisationDatabase,
-  accountAccess: import("../organisation-access/access").OrganisationAccess,
-  userAuthority: import("../organisation-access/access").OrganisationUserAuthority,
+  accountAccess: import("@purin-labs/tenancy/organisation-access/access").OrganisationAccess,
+  userAuthority: import("@purin-labs/tenancy/organisation-access/access").OrganisationUserAuthority,
   input: {
     flowLabel: import("../policy/information-flow").FlowLabel;
     sink: import("../policy/information-flow").ToolEffectSink;

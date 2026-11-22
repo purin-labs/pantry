@@ -4,7 +4,7 @@ import {
   methodNotAllowed,
   notFound,
 } from "@purin-labs/kernel/http";
-import { configuredOrganisationDatabases } from "../../organisation-execution-scope";
+import { configuredOrganisationDatabases } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   MachineCensus,
   MachineStateAge,

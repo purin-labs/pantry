@@ -23,7 +23,7 @@ import { parsePersonId } from "../data/person-authz";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId, RequestId } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   commerceActionCardText,
   commerceActionPortalUrl,

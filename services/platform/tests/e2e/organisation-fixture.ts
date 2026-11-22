@@ -12,7 +12,7 @@ import {
 import {
   issueControlSession,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import {
   readOrganisationInferenceSelection,
   selectOrganisationInferenceSelection,

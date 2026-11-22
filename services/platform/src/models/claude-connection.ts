@@ -4,7 +4,7 @@ import type { VariantBy } from "@purin-labs/type-utils";
 import {
   organisationPlacementPredicate,
   type OrganisationExecutionScope,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import type { CredentialVaultBindings } from "../credential-vault/keyring";

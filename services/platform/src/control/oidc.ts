@@ -2,7 +2,7 @@ import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
 import {
   hashOpaqueSecret,
   type VerifiedOidcIdentity,
-} from "../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {

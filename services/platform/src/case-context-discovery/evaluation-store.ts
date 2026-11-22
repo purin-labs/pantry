@@ -1,5 +1,5 @@
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
 import { queueAllCaseContextCollectionInvalidations } from "./relationships";
 import type { Result } from "@purin-labs/kernel/result";

@@ -1,21 +1,21 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { IntegrationAccountId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import { hashOpaqueSecret } from "./control-plane";
+import { hashOpaqueSecret } from "@purin-labs/tenancy/data/control-plane";
 import {
   prepareControlMutationReceipt,
   prepareOnboardingAuditEvent,
   type ControlMutationBoundary,
   type ControlMutationIdentity,
   type ControlMutationReceiptScope,
-} from "./control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import type { ConnectionProvider } from "./provider-attempt";
 import type { Variant } from "@purin-labs/type-utils";
-import type { OrganisationQuerySource } from "./query-source";
+import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import { isPositiveInteger } from "@purin-labs/std";
 import {
   prepareProjectionRevisionBump,
-} from "./organisation-onboarding-row";
+} from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 export type DiscoveredProviderResource = {
   readonly canonicalResourceId: string;

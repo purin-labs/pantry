@@ -12,13 +12,13 @@ import { parseVaultHandle } from "../../src/credential-vault";
 import {
   issueControlSession,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import {
   newControlMutationIdentity,
   readControlMutationReplay,
   type ControlMutationIdentity,
-} from "../../src/data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
 import {
   applyVersionedAccessDefaults,
@@ -42,7 +42,7 @@ import {
 } from "../../src/whatsapp/identifiers";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { resumeActorRelocation } from "../../src/actors/actor-relocation";
-import type { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {
   interceptPlacementSession,

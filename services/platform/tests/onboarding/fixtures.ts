@@ -3,8 +3,8 @@ import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "../fixtures/organisation-pl
 import { requireOrganisationBootstrap } from "../organisation-execution-fixture";
 import { DatabaseSync } from "node:sqlite";
 
-import { upsertUser } from "../../src/data/control-plane";
-import type { User } from "../../src/data/control-plane";
+import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
+import type { User } from "@purin-labs/tenancy/data/control-plane";
 import { organisationBootstrapMutation } from "../control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "../fixtures/organisation-placement";
 import { d1Database } from "../sqlite-d1";

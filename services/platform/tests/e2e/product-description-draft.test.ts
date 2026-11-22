@@ -19,11 +19,11 @@ import {
   upsertUser,
   type User,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import {
   newControlMutationIdentity,
   type ControlMutationReceiptScope,
-} from "../../src/data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";

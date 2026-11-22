@@ -65,7 +65,7 @@ const missingRecovery: ActorRelocation = {
   abandonedAt: 3,
   status: "abandoned",
 };
-import type { OrganisationPlacementRecord } from "../src/data/organisation-placement";
+import type { OrganisationPlacementRecord } from "@purin-labs/tenancy/data/organisation-placement";
 declare const abandonedPlacement: Extract<
   OrganisationPlacementRecord,
   { status: "abandoned" }

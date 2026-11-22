@@ -2,7 +2,7 @@ import {
   isAgentPermissionListRead,
   type AgentPermissionListRead,
 } from "@purin-labs/control-api";
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   AccessSubjectRef,
   AccessTargetRef,
@@ -50,7 +50,7 @@ import {
   type UnversionedControlMutationBoundary,
   type ControlMutationIdentity,
   type ControlMutationReceiptScope,
-} from "../../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import { resolveIntegrationAccount } from "../../data/integration-account";
 import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
 import type { AccessControlParts } from "./access-control-explain";
@@ -66,7 +66,7 @@ import {
   parseWorkspaceAiBudgetLimits,
   readWorkspaceAiBudget,
   WORKSPACE_AI_BUDGET_MAXIMUM,
-} from "../../data/workspace-ai-budget";
+} from "@purin-labs/tenancy/data/workspace-ai-budget";
 import { readAccessControlOrganisationProjection } from "../../access-control/read-model";
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { digestCanonical } from "../../policy";
@@ -95,7 +95,7 @@ import {
   isPositiveInteger,
   isRecord,
 } from "@purin-labs/std";
-import { readOnboardingRow } from "../../data/organisation-onboarding-row";
+import { readOnboardingRow } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 export type AccessControlMutationRoute =
   | Readonly<{ kind: "accessControlBudget"; organisationIdRaw: string }>

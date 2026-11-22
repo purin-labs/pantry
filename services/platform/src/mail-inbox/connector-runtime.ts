@@ -1,6 +1,6 @@
 import { typeSafeMonth } from "../integrations/typesafe/usage-store";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { fetchConnectorMail, type MailConnectorContext } from "./execution";
 import { isActorExecutionActive } from "../actors/actor-execution-quiescence";
 import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";

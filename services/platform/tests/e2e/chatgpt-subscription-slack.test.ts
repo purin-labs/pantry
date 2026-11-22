@@ -7,7 +7,7 @@ import {
   readOrganisationCodexConnection,
   runWeeklyChatGptLoginRefresh,
 } from "../../src/models/codex-connection";
-import { issueControlSession } from "../../src/data/control-plane";
+import { issueControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {
   FakeOpenAiApi,
   FakeOpenAiSignIn,

@@ -13,8 +13,8 @@ import {
 } from "@purin-labs/kernel/ids";
 import type { Env } from "@purin-labs/kernel/env";
 import type { Result } from "@purin-labs/kernel/result";
-import { readPlacementByEpoch } from "../data/organisation-placement";
-import { selectOrganisationPlacementDatabase } from "../organisation-execution-scope";
+import { readPlacementByEpoch } from "@purin-labs/tenancy/data/organisation-placement";
+import { selectOrganisationPlacementDatabase } from "@purin-labs/tenancy/organisation-execution-scope";
 import { dispatchRfcMessageId } from "../mail/reply-target";
 import {
   resolveFrozenReceiptActors,

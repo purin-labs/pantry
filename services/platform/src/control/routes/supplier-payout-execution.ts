@@ -4,7 +4,7 @@ import { controlError, controlJson } from "../http";
 import type {
   UnversionedControlMutationBoundary,
   ControlMutationReceiptScope,
-} from "../../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
 import { readSupplierPayout } from "../../data/supplier-payout-store";
 import { payoutIsCertified } from "../../data/supplier-payout-certification";

@@ -1,4 +1,4 @@
-import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
+import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import { env } from "cloudflare:workers";
 import { expect } from "vitest";
 import {
@@ -9,7 +9,7 @@ import {
 import { reconcileProviderAccountCleanup } from "../../src/provider-lifecycle/cleanup-reconciliation";
 import { readProviderCleanupContext } from "../../src/provider-adapters/catalogue";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 export async function beginRegionalProviderRetry(
   scope: OrganisationExecutionScope,

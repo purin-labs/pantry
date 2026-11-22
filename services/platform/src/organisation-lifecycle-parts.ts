@@ -9,7 +9,7 @@ import {
   prepareArchivedOrganisationWebhooksDisable,
   prepareOrganisationPurgeAccounts,
 } from "./data/integration-account-writes";
-import type { OrganisationLifecycleParts } from "./data/organisation-lifecycle-port";
+import type { OrganisationLifecycleParts } from "@purin-labs/tenancy/data/organisation-lifecycle-port";
 import { prepareInitialOrganisationWorkspace } from "./data/organisation-workspace";
 import { prepareReadinessAssessmentDeletion } from "./data/onboarding";
 import {

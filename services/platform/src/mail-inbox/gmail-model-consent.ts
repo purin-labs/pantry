@@ -8,8 +8,8 @@ import type {
   ControlMutationBoundary,
   ControlMutationIdentity,
   ControlMutationReceiptScope,
-} from "../data/control-mutation";
-import { prepareOrganisationControlMutationReceipt } from "../data/shared-rows/mutation-receipt";
+} from "@purin-labs/tenancy/data/control-mutation";
+import { prepareOrganisationControlMutationReceipt } from "@purin-labs/tenancy/data/shared-rows/mutation-receipt";
 import type { Env } from "@purin-labs/kernel/env";
 import type { UserId } from "@purin-labs/control-api/ids";
 import {
@@ -17,7 +17,7 @@ import {
   resolveOrganisationModelRouteAtScope,
   type OrganisationModelRoute,
 } from "../models/route";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   prepareGmailModelConsentAfterReceipt,

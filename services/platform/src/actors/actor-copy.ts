@@ -2,7 +2,7 @@ import {
   selectOrganisationPlacementDatabase,
   type OrganisationPlacementBindings,
   type OrganisationExecutionScopeError,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   activateActorRegistryEntry,
   quarantineActorRegistryEntry,

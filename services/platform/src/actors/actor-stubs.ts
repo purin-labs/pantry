@@ -1,5 +1,5 @@
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationPlacement } from "../placement";
+import type { OrganisationPlacement } from "@purin-labs/tenancy/placement";
 import type { PlacedActor } from "./lifecycle/placed-actor";
 
 /**

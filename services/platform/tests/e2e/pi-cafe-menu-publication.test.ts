@@ -17,7 +17,7 @@ import {
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { googleConfig } from "../../src/control/google-oidc-config";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { enableCapability, mutationHeaders } from "./access-route-support";
 import { completeCommerceApprovalFixture } from "./commerce-approval-fixture";
 import { network } from "./network";

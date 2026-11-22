@@ -149,7 +149,7 @@ An Organisation has a placement: an epoch, a kind (`affinity` or
 `residency`), a cell and a location hint (`organisation_placement`). The
 global database publishes the epochs. The regional row is the execution
 fence. `OrganisationExecutionScope.resolve`
-([`organisation-execution-scope.ts`](../../services/platform/src/organisation-execution-scope.ts))
+([`organisation-execution-scope.ts`](../../foundation/tenancy/organisation-execution-scope.ts))
 gives the regional database and placement of an Organisation.
 
 A regional `durable_object_registry` row

@@ -51,8 +51,8 @@ import { expect, it, type TestContext } from "vitest";
 import {
   bootstrapOrganisation,
   upsertUser,
-} from "../../src/data/control-plane";
-import { newControlMutationIdentity } from "../../src/data/control-mutation";
+} from "@purin-labs/tenancy/data/control-plane";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import {
   startActorRelocation,
   abandonActorRelocation,
@@ -67,14 +67,14 @@ import {
   restoreReferencedR2Objects,
   type ActorExportR2Object,
 } from "../../src/actors/actor-export";
-import { publishOrganisationPlacementMove } from "../../src/data/shared-rows/placement-row";
+import { publishOrganisationPlacementMove } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   readOrganisationPlacementMove,
   readPlacementByEpoch,
   parseOrganisationPlacementMoveTarget,
-} from "../../src/data/organisation-placement";
-import { parseInitialOrganisationPlacement } from "../../src/placement";
-import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+} from "@purin-labs/tenancy/data/organisation-placement";
+import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import {
   actorStubForRegistryEntry,

@@ -1,5 +1,5 @@
 import { signalChat } from "../../../chat/signals";
-import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isConversationId, isProjectIdentifier } from "@purin-labs/control-api";
 import { forkChat } from "../../../chat/forks";
 import {
@@ -8,7 +8,7 @@ import {
 } from "../../../chat/feedback";
 import type { Env } from "@purin-labs/kernel/env";
 import { buildControlAuthority } from "../../../request-authority";
-import { readActiveOrganisationMembershipRevision } from "../../../data/control-plane";
+import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
 import { isChatId } from "../../../chat/conversation";

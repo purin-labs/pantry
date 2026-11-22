@@ -30,7 +30,7 @@ import {
   type ThreadKey,
   type WorkspaceId,
 } from "@purin-labs/kernel/ids";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 
 /**

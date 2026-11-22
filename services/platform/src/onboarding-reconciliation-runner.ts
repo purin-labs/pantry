@@ -5,20 +5,20 @@ import { reconcileHeldPermissionDecisions } from "./slack/permission-request-rel
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
-} from "./organisation-execution-scope";
-import { hashOpaqueSecret, resolveUser } from "./data/control-plane";
+} from "@purin-labs/tenancy/organisation-execution-scope";
+import { hashOpaqueSecret, resolveUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   hashPortalSubject,
   newControlMutationIdentity,
-} from "./data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import {
   listOnboardingReconciliationOrganisationIds,
   reconcileOrganisationOnboarding,
 } from "./data/onboarding-reconciliation";
 import { reconcileProviderAccountCleanup } from "./provider-lifecycle/cleanup-reconciliation";
-import { archiveOrganisation } from "./data/organisation-lifecycle";
-import { publishOrganisationDirectoryRow } from "./data/shared-rows/organisation-row";
-import { publishStoppedInitialPlacement } from "./data/shared-rows/placement-row";
+import { archiveOrganisation } from "@purin-labs/tenancy/data/organisation-lifecycle";
+import { publishOrganisationDirectoryRow } from "@purin-labs/tenancy/data/shared-rows/organisation-row";
+import { publishStoppedInitialPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";

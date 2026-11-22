@@ -12,7 +12,7 @@ import {
 import {
   parseOrganisationPlacementMoveTarget,
   type OrganisationPlacementMoveTarget,
-} from "../../data/organisation-placement";
+} from "@purin-labs/tenancy/data/organisation-placement";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   inspectActorRelocation,

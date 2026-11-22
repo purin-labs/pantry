@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { parseControlRole } from "../../data/control-plane";
+import { parseControlRole } from "@purin-labs/tenancy/data/control-plane";
 import {
   isUserId,
   type ConversationId,

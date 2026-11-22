@@ -7,8 +7,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import { removeIntegrationAccount } from "../src/data/account-removal";
 import { reconcileProviderAccountCleanup } from "../src/provider-lifecycle/cleanup-reconciliation";
-import { upsertUser } from "../src/data/control-plane";
-import { newControlMutationIdentity } from "../src/data/control-mutation";
+import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import {
   createConnectedIntegration,
   disableIntegrationAccount,

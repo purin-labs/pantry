@@ -1,7 +1,7 @@
 import { isConversationId } from "@purin-labs/control-api";
 import type { Env } from "@purin-labs/kernel/env";
 import { buildControlAuthority } from "../../../request-authority";
-import { readActiveOrganisationMembershipRevision } from "../../../data/control-plane";
+import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError } from "../../http";
 import { isChatId } from "../../../chat/conversation";

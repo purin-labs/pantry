@@ -1,5 +1,5 @@
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { ConversationId } from "@purin-labs/control-api";
 import type { Env } from "@purin-labs/kernel/env";
 import { resolveActiveSessionActorAtPlacement } from "../../actors/actor-router";

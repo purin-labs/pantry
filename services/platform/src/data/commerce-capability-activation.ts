@@ -12,7 +12,7 @@ import {
   resolveOrganisationCommerceSystemAuthority,
   type CommerceSystemRevision,
 } from "./organisation-commerce-system";
-import type { OrganisationQuerySource } from "./query-source";
+import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
 
 declare const capabilityActivationIdBrand: unique symbol;

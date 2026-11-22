@@ -9,14 +9,14 @@ import {
   storeVaultSecret,
   type VaultHandle,
 } from "../../src/credential-vault";
-import { newControlMutationIdentity } from "../../src/data/control-mutation";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import { listAccessGrants } from "../../src/data/access-grants";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import {
   archiveOrganisation,
   deleteArchivedOrganisation,
   type ArchiveOrganisationMutation,
-} from "../../src/data/organisation-lifecycle";
+} from "@purin-labs/tenancy/data/organisation-lifecycle";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

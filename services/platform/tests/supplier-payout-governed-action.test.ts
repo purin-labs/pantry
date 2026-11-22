@@ -1,7 +1,7 @@
 import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { createOrganisationExecutionFixture } from "./organisation-execution-fixture";
-import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 /// <reference types="@cloudflare/workers-types" />
 
 import { DatabaseSync } from "node:sqlite";

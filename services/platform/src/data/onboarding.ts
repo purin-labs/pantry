@@ -6,8 +6,8 @@ import {
   prepareOrganisationLifecycleMove,
   type LifecycleFence,
   type OrganisationLifecycleState,
-} from "./organisation-lifecycle-moves";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/data/organisation-lifecycle-moves";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { ApprovalAuthenticationReadiness } from "@purin-labs/contracts";
 import {
   newSetupSnapshotId,
@@ -23,7 +23,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import type { OrganisationEnvironment } from "./control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import {
   prepareControlMutationReceiptAfterWrite,
   prepareOnboardingAuditEventAfterWrite,
@@ -32,7 +32,7 @@ import {
   type ControlMutationBoundary,
   type ControlMutationIdentity,
   type ControlMutationReceiptScope,
-} from "./control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import {
   capabilityPolicyAdmission,
   prepareReadAndProposeAccessDefaults,
@@ -40,7 +40,7 @@ import {
   type CapabilityPolicyAdmission,
 } from "./capability-policy";
 import type { Variant } from "@purin-labs/type-utils";
-import type { OrganisationQuerySource } from "./query-source";
+import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import { isRecord, sha256Hex } from "@purin-labs/std";
 import type { CuePresetId } from "@purin-labs/control-api";
 

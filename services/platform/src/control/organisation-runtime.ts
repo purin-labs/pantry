@@ -1,8 +1,8 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { requireActiveOrganisationActorAtPlacement } from "../actors/actor-router";
-import type { OrganisationEnvironment } from "../data/control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 

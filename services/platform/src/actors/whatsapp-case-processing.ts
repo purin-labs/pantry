@@ -1,4 +1,4 @@
-import { acceptedExecutionAuthority } from "../organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import {
   turnMemoryReaderWithoutSubjects,
 } from "../memory/contract/turn-memory";
@@ -13,7 +13,7 @@ import {
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
 import type { Env } from "@purin-labs/kernel/env";
 import type { CaseActorStub, SessionActorStub } from "./actor-stubs";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   newRequestId,
   parseAssignmentId,

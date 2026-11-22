@@ -31,10 +31,10 @@ import {
   sha256Hex,
 } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
-import type { OrganisationAccess } from "../organisation-access/access";
+import type { OrganisationAccess } from "@purin-labs/tenancy/organisation-access/access";
 import { admitSessionInformationFlowObservation } from "../actors/agent-session-information-flow";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { FlowBinding, ObservationEvidence } from "../policy/information-flow";
 import type { Conversation } from "./conversation";
 import { conversationCaseIdentity } from "./conversation-access";

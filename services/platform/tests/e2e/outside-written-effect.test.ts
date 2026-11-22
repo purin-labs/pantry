@@ -7,7 +7,7 @@ import { isRecord } from "@purin-labs/std";
 import {
   issueControlSession,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { accessControlPath } from "./access-route-support";
 import {

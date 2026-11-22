@@ -1,7 +1,7 @@
 import {
   OrganisationExecutionScope,
   fetchWithOrganisationPlacement,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import { parseVaultHandle, type VaultHandle } from "../credential-vault";
 import {
   recordProviderManifestObservation,
@@ -19,7 +19,7 @@ import { prepareObservedAccountLifecycle } from "../data/integration-account-wri
 import type { ActiveIntegrationProvider } from "../data/integration-provider-directory";
 import {
   prepareConfigurationVersionBump,
-} from "../data/organisation-onboarding-row";
+} from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 export async function reconcileProviderManifestObservations(input: {
   readonly env: Env;

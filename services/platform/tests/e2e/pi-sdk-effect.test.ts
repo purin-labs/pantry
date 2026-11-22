@@ -13,7 +13,7 @@ import type { OrganisationDO } from "../../src/actors/organisation";
 import type { ActionLedgerEntry } from "../../src/actors/action-ledger";
 import { completeCommerceApprovalFixture } from "./commerce-approval-fixture";
 import { googleConfig } from "../../src/control/google-oidc-config";
-import { type IssuedControlSession } from "../../src/data/control-plane";
+import { type IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {
   ORGANISATION_ID,
   ROOT_TS,

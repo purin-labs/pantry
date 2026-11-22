@@ -1,5 +1,5 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { readInstallationPins } from "../control/installation-pins";
 import { recordCommerceMutationReceipt } from "../control/mutation-receipt";
 import {
@@ -19,8 +19,8 @@ import {
   readControlMutationReplay,
   type UnversionedControlMutationBoundary,
   type ControlMutationReceiptScope,
-} from "../data/control-mutation";
-import { resolveUser } from "../data/control-plane";
+} from "@purin-labs/tenancy/data/control-mutation";
+import { resolveUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   assignWhatsAppSupportAgent,
   ensureWhatsAppSupportContextGrant,

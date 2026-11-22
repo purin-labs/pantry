@@ -4,7 +4,7 @@ import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import worker from "../src/integration-gateway";
-import { upsertUser } from "../src/data/control-plane";
+import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import { registerEmailMailboxAccount } from "../src/data/email-mailbox";
 import {
   createConnectedIntegration,

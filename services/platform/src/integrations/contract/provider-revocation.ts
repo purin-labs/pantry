@@ -14,11 +14,11 @@ import {
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   prepareConfigurationVersionBump,
-} from "../../data/organisation-onboarding-row";
+} from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 type ProviderRevocationReason =
   "shopify_app_uninstalled" | "stripe_application_deauthorized";

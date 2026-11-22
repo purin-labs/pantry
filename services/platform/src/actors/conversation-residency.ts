@@ -9,11 +9,11 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import { selectOrganisationPlacementDatabase } from "../organisation-execution-scope";
+import { selectOrganisationPlacementDatabase } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   parseOrganisationPlacement,
   type OrganisationPlacement,
-} from "../placement";
+} from "@purin-labs/tenancy/placement";
 import {
   actorPhysicalName,
   isWarmActorSlotNameOf,

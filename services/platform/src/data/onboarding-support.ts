@@ -2,7 +2,7 @@ import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "@purin-labs/kernel/result";
@@ -10,7 +10,7 @@ import type {
   QuerySource,
   OrganisationQuerySource,
   GlobalQuerySource,
-} from "./query-source";
+} from "@purin-labs/tenancy/data/query-source";
 
 type ControlSupportRole =
   | {

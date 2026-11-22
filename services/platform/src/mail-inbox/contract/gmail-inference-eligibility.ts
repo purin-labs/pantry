@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import type { OrganisationQuerySource } from "../../data/query-source";
+import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import type { ModelRoute } from "@purin-labs/contracts";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationId } from "@purin-labs/kernel/ids";

@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 import {
   readDisclosureState,
@@ -25,7 +25,7 @@ import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import {
   listOrganisationMembers,
   readActiveOrganisationMembershipRevision,
-} from "../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import { buildControlAuthority } from "../request-authority";
 import { authorizeProjectContextDisclosure } from "../projects/context";
@@ -59,7 +59,7 @@ import type { Variant } from "@purin-labs/type-utils";
  */
 export async function conversationAudienceMayReceive(
   db: OrganisationDatabase,
-  accountAccess: import("../organisation-access/access").OrganisationAccess,
+  accountAccess: import("@purin-labs/tenancy/organisation-access/access").OrganisationAccess,
   scope: ConversationScope,
   conversationId: ConversationId,
   label: FlowLabel,

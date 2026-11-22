@@ -1,7 +1,7 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { prepareSlackInstallationLifecycleEvent } from "../data/slack-installation-records";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Track } from "@purin-labs/contracts";
 import type {
   CanonicalCommerceDelivery,
@@ -11,7 +11,7 @@ import {
   createCueQueueMessage,
   type NormalizedCueEvent,
 } from "../cues/engine";
-import type { OrganisationInstallRecord } from "../data/organisation";
+import type { OrganisationInstallRecord } from "@purin-labs/tenancy/data/organisation";
 import {
   resolvePinnedAgentProfile,
   type PinnedAgentProfile,

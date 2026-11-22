@@ -1,7 +1,7 @@
 import { insertDefaultProject } from "./fixtures/default-project";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 import { createMigratedDatabase } from "./sqlite-d1";
-import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
+import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,
   TEST_ORGANISATION_PLACEMENT_PROFILE,

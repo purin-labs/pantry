@@ -50,7 +50,7 @@ import {
   connectionCredentialAuthority,
   resolveActiveProviderAccountContext,
 } from "../../data/integration-account";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   actorExecutionAdmissionOpen,
   isActorExecutionActive,

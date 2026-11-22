@@ -21,7 +21,7 @@ import {
   setIntegrationAccountLifecycle,
 } from "../data/integration-account";
 import type { Env } from "@purin-labs/kernel/env";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { readEndpointVerificationStanding } from "../data/contact-verification";
 import {
   extractMailbox,

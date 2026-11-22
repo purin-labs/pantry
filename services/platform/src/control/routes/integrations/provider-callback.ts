@@ -1,7 +1,7 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
-import { hashOpaqueSecret } from "../../../data/control-plane";
+import { hashOpaqueSecret } from "@purin-labs/tenancy/data/control-plane";
 import type { ProviderAttemptStateWire } from "../../../data/provider-attempt";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import {

@@ -1,5 +1,5 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { fetchWithOrganisationPlacement } from "../../organisation-execution-scope";
+import { fetchWithOrganisationPlacement } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   FileContextProvider,
   FileGrantAdmission,
@@ -38,7 +38,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
-} from "../../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   FILE_GRANT_MAX_FILES,
   createFileProjectionCommand,

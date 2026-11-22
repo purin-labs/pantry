@@ -20,7 +20,7 @@ import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import {
   listOrganisationMembers,
   type ActiveOrganisationMembership,
-} from "../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseControlSessionId,
@@ -31,7 +31,7 @@ import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { Result } from "@purin-labs/kernel/result";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { admitActorRecovery } from "./actor-activation";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
 import {

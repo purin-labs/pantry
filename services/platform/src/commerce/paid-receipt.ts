@@ -1,7 +1,7 @@
 import {
   d1TransitionApplied,
   prepareD1Transition,
-} from "../data/d1-transition";
+} from "@purin-labs/tenancy/data/d1-transition";
 /**
  * The one writer of `paid_receipt` (Refactor 15, refactor 12). The shop's
  * feed records the Slack receipt of each paid online order here and moves on
@@ -23,7 +23,7 @@ import { assertNever } from "@purin-labs/std";
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
 import { parseDelivery } from "../actors/connector/ingress-parsers";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { readOperationsDestination } from "../data/operations-destination";
+import { readOperationsDestination } from "@purin-labs/tenancy/data/operations-destination";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ConnectorActorStub } from "../actors/actor-stubs";
 import {
@@ -37,7 +37,7 @@ import { traceWarn } from "@purin-labs/kernel/observability";
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 import { PAID_RECEIPT_MACHINE } from "./paid-receipt.machine";
 import {

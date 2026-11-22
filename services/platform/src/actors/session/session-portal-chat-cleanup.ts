@@ -1,4 +1,4 @@
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { type SessionId, type OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import { readCanonicalSessionForPersistence } from "../agent-session-canonical";

@@ -1,4 +1,4 @@
-import type { OrganisationUserAuthority } from "../src/organisation-access/access";
+import type { OrganisationUserAuthority } from "@purin-labs/tenancy/organisation-access/access";
 
 declare const nativeSession: Extract<
   OrganisationUserAuthority,

@@ -1,4 +1,4 @@
-import type { OrganisationPlacementBindings } from "../organisation-execution-scope";
+import type { OrganisationPlacementBindings } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { ActorIdentity, RetiredActorRecord } from "./actor-registry";
 import {
   loadActorExport,

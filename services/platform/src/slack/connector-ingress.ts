@@ -3,7 +3,7 @@ import { actorStub } from "../actors/actor-stubs";
 import type { ConnectorSlackIngressOutcome } from "../actors/connector-slack-ingress";
 import type { CredentialVaultBindings } from "../credential-vault/keyring";
 import type { RequestId } from "@purin-labs/kernel/ids";
-import type { OrganisationPlacementBindings } from "../organisation-execution-scope";
+import type { OrganisationPlacementBindings } from "@purin-labs/tenancy/organisation-execution-scope";
 import { deriveSlackCaseRouteIdentities } from "./case-routing";
 import type { SlackMessageEvent } from "./events";
 import {

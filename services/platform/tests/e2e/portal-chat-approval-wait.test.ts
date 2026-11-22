@@ -14,7 +14,7 @@ import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {
   readOrganisationInferenceSelection,
   selectOrganisationInferenceSelection,

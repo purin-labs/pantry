@@ -13,7 +13,7 @@ import { APPROVAL_GRANT_COOKIE } from "../../src/control/authorization";
 import {
   issueControlSession,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-policy";
 import { commerceCanonicalResourceId } from "../../src/commerce/contract/resource-ids";

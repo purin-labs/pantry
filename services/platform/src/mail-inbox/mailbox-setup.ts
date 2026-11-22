@@ -24,7 +24,7 @@ import {
   type AgentOperationInput,
   type AgentOperationsSnapshot,
 } from "../data/agent-operations";
-import type { ControlRole } from "../data/control-plane";
+import type { ControlRole } from "@purin-labs/tenancy/data/control-plane";
 import {
   readAgentMailboxBinding,
   readEmailMailboxAccount,
@@ -32,7 +32,7 @@ import {
 import { readGmailModelState } from "./gmail-model-consent";
 import type { Env } from "@purin-labs/kernel/env";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 
 /**

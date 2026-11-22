@@ -1,4 +1,4 @@
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { readAdmittedChatInput } from "../../chat/turn-access";
 import { parseGoalIdentity } from "../case-goals";
 import { parseSourceProvenance } from "./source-provenance";

@@ -16,7 +16,7 @@ import { readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding } fro
 import {
   listOrganisationMembers,
   type OrganisationMember,
-} from "../../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import {
   type DraftThreadLink,

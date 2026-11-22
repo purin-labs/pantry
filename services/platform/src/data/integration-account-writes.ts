@@ -8,7 +8,7 @@ import type {
 import {
   purgeGuarded,
   type OrganisationPurgeContext,
-} from "./organisation-lifecycle-port";
+} from "@purin-labs/tenancy/data/organisation-lifecycle-port";
 
 type Database = OrganisationDatabase | OrganisationDatabaseSession;
 

@@ -1,6 +1,6 @@
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { ActiveControlSession } from "../data/control-plane";
-import { hashOpaqueSecret } from "../data/control-plane";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
+import type { ActiveControlSession } from "@purin-labs/tenancy/data/control-plane";
+import { hashOpaqueSecret } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   createAuthorizingProviderAttempt,

@@ -1,9 +1,9 @@
-import { prepareSlackInstallOrganisationRow } from "../data/shared-rows/organisation-row";
+import { prepareSlackInstallOrganisationRow } from "@purin-labs/tenancy/data/shared-rows/organisation-row";
 import {
   prepareInitialPlacementActivation,
   prepareSlackInstallPlacementReservation,
   prepareSlackInstallRegionalPlacement,
-} from "../data/shared-rows/placement-row";
+} from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   type GlobalDatabase,
   type OrganisationDatabase,
@@ -12,15 +12,15 @@ import {
 import {
   selectOrganisationPlacementDatabase,
   type OrganisationPlacementBindings,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   readPlacementByEpoch,
   type OrganisationPlacementFenceToken,
-} from "../data/organisation-placement";
+} from "@purin-labs/tenancy/data/organisation-placement";
 import {
   parseInitialOrganisationPlacement,
   type InitialOrganisationPlacement,
-} from "../placement";
+} from "@purin-labs/tenancy/placement";
 import {
   parseOrganisationId,
   type OrganisationId,

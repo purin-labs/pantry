@@ -1,5 +1,5 @@
-import { OrganisationExecutionScope } from "../src/organisation-execution-scope";
-import { prepareInitialOrganisationPlacementInsert } from "../src/data/shared-rows/placement-row";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
+import { prepareInitialOrganisationPlacementInsert } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 import {

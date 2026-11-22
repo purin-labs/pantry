@@ -6,7 +6,7 @@ import type {
 import type { Env } from "@purin-labs/kernel/env";
 import type { SessionActorStub } from "../actor-stubs";
 import type { SessionId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { AlarmReconciler } from "../lifecycle/actor-alarm";
 import type { SessionActorRoute } from "../actor-router";
 import type {

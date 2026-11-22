@@ -8,13 +8,13 @@ import {
   upsertUser,
   type User,
   type IssuedControlSession,
-} from "../../services/platform/src/data/control-plane";
-import { newControlMutationIdentity, type ControlMutationReceiptScope } from "../../services/platform/src/data/control-mutation";
+} from "../../foundation/tenancy/data/control-plane";
+import { newControlMutationIdentity, type ControlMutationReceiptScope } from "../../foundation/tenancy/data/control-mutation";
 import { CaseDO } from "../../services/platform/src/actors/case";
 import { ConnectorDO } from "../../services/platform/src/actors/connector";
 import { SessionDO } from "../../services/platform/src/actors/agent-session";
 import { OrganisationDO } from "../../services/platform/src/actors/organisation";
-import { parseInitialOrganisationPlacement } from "../../services/platform/src/placement";
+import { parseInitialOrganisationPlacement } from "../../foundation/tenancy/placement";
 import type { Env } from "../../foundation/kernel/env";
 import {
   CommerceAdminClient,

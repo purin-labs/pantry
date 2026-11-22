@@ -2,9 +2,9 @@
 import "../src/worker-ports";
 import { type SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
-import { OrganisationExecutionScope } from "../src/organisation-execution-scope";
-import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
-import { parseInitialOrganisationPlacement } from "../src/placement";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
+import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
+import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { DatabaseSync } from "node:sqlite";
 
 import { describe, expect, it } from "vitest";

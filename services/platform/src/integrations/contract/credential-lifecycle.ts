@@ -16,7 +16,7 @@ import {
   prepareControlMutationReceipt,
   prepareOnboardingAuditEvent,
   prepareOnboardingEvent,
-} from "../../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import {
   connectionCredentialAuthority,
   integrationAccountAllowsCredentialMutation,
@@ -31,7 +31,7 @@ import {
   type IntegrationAccountMutation,
   type ProviderConnection,
 } from "../../data/integration-account";
-import { prepareConfigurationVersionBump } from "../../data/organisation-onboarding-row";
+import { prepareConfigurationVersionBump } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 import {
   prepareActiveCredentialGeneration,
   prepareCredentialGenerationSupersession,

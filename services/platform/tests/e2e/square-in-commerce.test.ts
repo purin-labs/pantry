@@ -5,13 +5,13 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { resolveProviderManifestCredential } from "../../src/credential-vault";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { reconcileProviderAccountCleanup } from "../../src/provider-lifecycle/cleanup-reconciliation";
 import { createCommerceClient } from "../../src/commerce/contract/client";
 import {

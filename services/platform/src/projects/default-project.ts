@@ -5,7 +5,7 @@ import {
 } from "@purin-labs/control-api";
 import type { OnboardingControlRole } from "@purin-labs/contracts";
 import { assertNever, sha256Hex } from "@purin-labs/std";
-import type { OrganisationQuerySource } from "../data/query-source";
+import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 

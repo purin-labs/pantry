@@ -8,7 +8,7 @@ import { isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
 import { storeVaultSecret } from "../../src/credential-vault";
 import { createAccessGrant } from "../../src/data/access-grants";
-import { createOrganisationInstall } from "../../src/data/organisation";
+import { createOrganisationInstall } from "@purin-labs/tenancy/data/organisation";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceHeaders } from "./commerce-support";
 import {

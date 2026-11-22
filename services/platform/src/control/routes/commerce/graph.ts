@@ -1,8 +1,8 @@
 import { pantryCommerceAccess } from "../../../commerce/contract/client";
 import { ensureCaseProject } from "../../../projects/case-project";
-import type { OrganisationPlacementBindings } from "../../../organisation-execution-scope";
+import type { OrganisationPlacementBindings } from "@purin-labs/tenancy/organisation-execution-scope";
 import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
-import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationActorStub } from "../../../actors/actor-stubs";
 import type { Result } from "@purin-labs/kernel/result";
@@ -53,8 +53,8 @@ import {
   type ActiveControlSession,
   type ActiveOrganisationMembership,
   type User,
-} from "../../../data/control-plane";
-import { type UnversionedControlMutationBoundary } from "../../../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-plane";
+import { type UnversionedControlMutationBoundary } from "@purin-labs/tenancy/data/control-mutation";
 import {
   parseCommerceExportPresetPublishRequest,
   publishCommerceExportPreset,

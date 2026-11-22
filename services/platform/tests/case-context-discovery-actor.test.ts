@@ -12,7 +12,7 @@ import { OrganisationDO } from "../src/actors/organisation";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { platformEnv } from "./worker-fakes";
 import { createMigratedDatabase } from "./sqlite-d1";
-import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
+import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,
   TEST_ORGANISATION_PLACEMENT_PROFILE,

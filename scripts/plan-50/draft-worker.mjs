@@ -14,7 +14,7 @@ import { editProductDescriptionDraftForEmbeddedHarness } from "../../services/pl
 import { settleToolEffect } from "../../services/platform/src/agent-tools/session-support.ts";
 import { uncheckedEffect } from "../../services/platform/src/agent-tools/tool-effect.ts";
 import { SessionExecutionAdmission } from "../../services/platform/src/actors/session-execution-admission.ts";
-import { issueControlSession } from "../../services/platform/src/data/control-plane.ts";
+import { issueControlSession } from "../../foundation/tenancy/data/control-plane.ts";
 import { matchProductDescriptionDraftRoute } from "../../services/platform/src/control/admission/product-description-draft.ts";
 import { handleProductDescriptionDraftRoute } from "../../services/platform/src/control/routes/product-description-draft.ts";
 import {

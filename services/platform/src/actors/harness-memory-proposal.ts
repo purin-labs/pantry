@@ -1,6 +1,6 @@
 import { assertNever } from "@purin-labs/std";
 
-import { acceptedExecutionAuthority } from "../organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { readAdmittedChatInput } from "../chat/turn-access";
 import { validateLiveRequestAuthority } from "../request-authority";
 import { readSessionTurnFlowBinding } from "./agent-session-information-flow";

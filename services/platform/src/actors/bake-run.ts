@@ -26,7 +26,7 @@ import {
   loadBakeRun,
   runBakeRunSchemaMigrations,
 } from "../kitchen/bakes/run-store";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 import { requireActiveOrganisationActorAtScope } from "./actor-router";
 import { bakeRunDevicePorts, bakeRunNotices } from "./bake-run-ports";

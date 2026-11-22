@@ -4,7 +4,7 @@ import { readAcceptedCheckpointFinalization } from "../agent-session-finalizatio
 import {
   acceptedExecutionAuthority,
   organisationAccessOfOneRead,
-} from "../../organisation-access/access";
+} from "@purin-labs/tenancy/organisation-access/access";
 import { armAlarmBy } from "../lifecycle/actor-alarm";
 import {
   createSessionGoalExecution,

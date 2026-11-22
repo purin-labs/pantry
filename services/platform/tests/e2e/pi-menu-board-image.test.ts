@@ -10,7 +10,7 @@
 import { exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
 import type { MenuBoardElement } from "@purin-labs/menu-board-crdt";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { isRecord } from "@purin-labs/std";
 import { closeSocket } from "./hibernatable-socket-support";
 import {

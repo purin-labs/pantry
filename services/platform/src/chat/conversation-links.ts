@@ -1,4 +1,4 @@
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { listDerivedChats } from "./forks";
 import type { Env } from "@purin-labs/kernel/env";
 import { buildControlAuthority } from "../request-authority";

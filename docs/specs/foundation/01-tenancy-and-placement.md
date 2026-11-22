@@ -54,7 +54,7 @@ domain state.
   file reaches Organisation records through `organisationDatabase(id)` or
   `fixtureDatabase()` (`tests/e2e/organisation-database.ts`).
 
-Three tables are in both baselines. `services/platform/src/data/shared-rows/` holds each
+Three tables are in both baselines. `foundation/tenancy/data/shared-rows/` holds each
 write of them that has fixed SQL text. A statement for one database takes a typed
 handle: `GlobalDatabase`, `OrganisationDatabase`, `GlobalQuerySource` or
 `OrganisationQuerySource`. A statement that both databases get takes a plain
@@ -78,7 +78,7 @@ A rename, an archive, a restore, a deletion and a purge write the regional
 ### Placement
 
 - A placement has an epoch, a kind, a cell id and a location hint
-  (`services/platform/src/placement.ts`). The kind is `affinity` or `residency`. A
+  (`foundation/tenancy/placement.ts`). The kind is `affinity` or `residency`. A
   `residency` placement also has a jurisdiction: `eu` or `fedramp`.
 - A cell id matches `^[a-z][a-z0-9-]{0,62}$`. A location hint is one of `wnam`, `enam`,
   `sam`, `weur`, `eeur`, `apac`, `oc`, `afr` and `me`.
@@ -120,7 +120,7 @@ token. The token of a move target starts with `tpf_`.
 
 ### The execution scope and the fence
 
-`OrganisationExecutionScope` (`services/platform/src/organisation-execution-scope.ts`)
+`OrganisationExecutionScope` (`foundation/tenancy/organisation-execution-scope.ts`)
 takes a request from an Organisation id to its regional database and its fence. The
 same file has two more ways to a regional database, without a scope.
 

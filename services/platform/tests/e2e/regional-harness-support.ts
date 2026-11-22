@@ -8,12 +8,12 @@ import { openRouterText, openRouterToolCall } from "./slack-journey-support";
 import {
   issueControlSession,
   revokeControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { createAccessGrant } from "../../src/data/access-grants";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { requireActiveOrganisationActorAtPlacement } from "../../src/actors/actor-router";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
-import type { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 const CONVERSATION = "conv_c55af3e2-19c2-446a-9f44-e00000000055";

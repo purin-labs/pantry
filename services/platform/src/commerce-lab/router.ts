@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { prepareCommerceCueLogDelete } from "../cues/cue-log";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   LabCatalogOptionV1,
   LabEventEnvelopeV1,

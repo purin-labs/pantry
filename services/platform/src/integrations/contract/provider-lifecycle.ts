@@ -2,7 +2,7 @@ import type {
   OrganisationExecutionScope,
   OrganisationExecutionScopeError,
   OrganisationPlacementBindings,
-} from "../../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   ProviderAttemptWire,
   ProviderAuthorizationContext,

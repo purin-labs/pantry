@@ -16,7 +16,7 @@ import type { MachineDefinition } from "@purin-labs/std/state-machine";
  */
 export const ORGANISATION_LIFECYCLE_MACHINE = {
   name: "organisation_lifecycle",
-  owner: "services/platform/src/data/organisation-lifecycle-moves.ts",
+  owner: "foundation/tenancy/data/organisation-lifecycle-moves.ts",
   store: {
     table: "organisation_onboarding",
     key: "organisation_id",

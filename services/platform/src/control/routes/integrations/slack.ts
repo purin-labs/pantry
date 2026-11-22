@@ -5,7 +5,7 @@ import {
   prepareControlMutationReceipt,
   readControlMutationReplay,
   prepareControlMutationReceiptCompletion,
-} from "../../../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import {
   parseChannelId,
   parseSlackInstallationId,

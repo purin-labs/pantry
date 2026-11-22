@@ -12,7 +12,7 @@ import proposalTrial, {
 } from "./proposal-worker.mjs";
 export { ProposalCase } from "./proposal-worker.mjs";
 import { CommerceAdminClient } from "../../packages/commerce-client/src/index.ts";
-import { issueControlSession } from "../../services/platform/src/data/control-plane.ts";
+import { issueControlSession } from "../../foundation/tenancy/data/control-plane.ts";
 import { googleConfig } from "../../services/platform/src/control/google-oidc-config.ts";
 import { completeCommerceApprovalFixture } from "../../services/platform/tests/e2e/commerce-approval-fixture.ts";
 import {
@@ -39,7 +39,7 @@ import { registerSession } from "./draft-seed.mjs";
 import { createSessionGoalExecution } from "../../services/platform/src/actors/session-goal-usage.ts";
 import { newRequestId } from "../../foundation/kernel/ids.ts";
 import { bindOperatorTurnAccess } from "../../services/platform/src/chat/turn-access.ts";
-import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope.ts";
+import { OrganisationExecutionScope } from "../../foundation/tenancy/organisation-execution-scope.ts";
 
 import {
   installProfile,

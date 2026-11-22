@@ -5,7 +5,7 @@ import {
   type ConnectionCredentialAuthority,
   type IntegrationProvider,
 } from "../data/integration-account";
-import type { OrganisationEnvironment } from "../data/control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import type {
   IntegrationAccountId,
   OrganisationId,

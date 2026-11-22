@@ -2,7 +2,7 @@ import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
 import { isActorExecutionActive } from "../actors/actor-execution-quiescence";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   authorizeSessionTurnExecution,
   type SessionTurnExecution,

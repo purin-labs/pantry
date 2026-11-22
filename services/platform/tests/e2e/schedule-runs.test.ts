@@ -9,12 +9,12 @@ import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-gra
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
 import { createAccessGrant } from "../../src/data/access-grants";
 import { runAgentOperation } from "../../src/data/agent-operation-runner";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import type { AgentOperationInput } from "../../src/data/agent-operations";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import type { IngressQueueMessage } from "../../src/ingress-queue";
 import gateway from "../../src/integration-gateway";
-import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { runScheduleDispatch } from "../../src/schedules/dispatch";
 import { executionRequest, readCaseTimeline } from "./case-execution-support";

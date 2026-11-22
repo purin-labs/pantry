@@ -14,7 +14,7 @@ import type {
   ConversationId,
 } from "@purin-labs/control-api";
 import type { ConversationScope } from "../src/chat/store";
-import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { forkChat, type ChatForkCommand } from "../src/chat/forks";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";

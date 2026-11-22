@@ -5,8 +5,8 @@ import {
   onboardFixtureOrganisation,
   publishGlobalOrganisation,
 } from "./organisation-database";
-import { ensureInitialOrganisationPlacement } from "../../src/data/shared-rows/placement-row";
-import { parseOrganisationPlacementProfile } from "../../src/placement";
+import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
+import { parseOrganisationPlacementProfile } from "@purin-labs/tenancy/placement";
 import { newConversationId } from "@purin-labs/control-api";
 import { parseSessionId } from "@purin-labs/kernel/ids";
 import type { Conversation } from "../../src/chat/conversation";
@@ -26,7 +26,7 @@ import {
 import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
 import { newProjectId, type UserId } from "@purin-labs/control-api";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { platformConversation } from "./chat-journey-support";
 import { commerceClient } from "./commerce-support";
 import { type OrganisationClient } from "./organisation-fixture";

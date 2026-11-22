@@ -24,7 +24,7 @@ import {
   initialConversationCaseIdentity,
 } from "../../src/chat/conversation-actor-identity";
 import { readConversation, saveConversation } from "../../src/chat/store";
-import { readActiveOrganisationMembership } from "../../src/data/control-plane";
+import { readActiveOrganisationMembership } from "@purin-labs/tenancy/data/control-plane";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { entityRefOrNull } from "../../src/memory/store";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

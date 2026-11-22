@@ -8,7 +8,7 @@ import {
   parseActionMutationExecution,
   type ActionMutationExecution,
 } from "../action-mutation-execution";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { parseSlackGoalCommand } from "../../slack/goal-command";
 import {
   type GoalAdmission,

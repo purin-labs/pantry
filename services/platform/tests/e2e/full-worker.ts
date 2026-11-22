@@ -14,18 +14,18 @@ import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
-import { parseInitialOrganisationPlacement } from "../../src/placement";
+import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import {
   bootstrapOrganisation,
   upsertUser,
   issueControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { readConversation } from "../../src/chat/store";
 import { conversationTimeline } from "../../src/chat/conversation";
-import { newControlMutationIdentity } from "../../src/data/control-mutation";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
-import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 export { CodeModePlatformGovernorActor } from "../../src/actors/code-mode-platform-governor";

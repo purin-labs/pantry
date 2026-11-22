@@ -4,7 +4,7 @@ import type {
   OrganisationPolicyPlacement,
   OrganisationPolicySnapshot,
 } from "../../policy-snapshot";
-import type { OrganisationStateError } from "./types";
+import type { OrganisationStateError } from "@purin-labs/tenancy/actors/organisation/types";
 
 export type OrganisationPolicyHead = {
   activeVersion: number;

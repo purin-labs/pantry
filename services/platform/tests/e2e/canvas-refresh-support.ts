@@ -15,7 +15,7 @@ import { parseSessionId } from "@purin-labs/kernel/ids";
 import {
   issueControlSession,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 

@@ -5,7 +5,7 @@ import {
 import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
 import type { AccessGrant } from "../../src/authorization/access-grants/types";
-import type { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
 import {
   commerceClient,
@@ -20,7 +20,7 @@ import { listAccessGrants } from "../../src/data/access-grants";
 import {
   readActiveOrganisationMembershipRevision,
   readActiveOrganisationMembership,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { buildControlAuthority } from "../../src/request-authority";
 import { readNamedCommerceQuery } from "../../src/commerce/entity-plane/context-read";
 import { CommerceGraphReader } from "../../src/commerce/entity-plane/graph-reader";
@@ -241,7 +241,7 @@ function isProcedureGrant(grant: AccessGrant): boolean {
 
 async function verifyEmptyRoleAudience(
   scope: OrganisationExecutionScope,
-  session: import("../../src/data/control-plane").IssuedControlSession,
+  session: import("@purin-labs/tenancy/data/control-plane").IssuedControlSession,
   base: string,
   integrationAccountId: string,
   grant: AccessGrant,

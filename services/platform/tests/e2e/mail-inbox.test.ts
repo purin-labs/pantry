@@ -36,7 +36,7 @@ import {
   joinFlowLabels,
 } from "../../src/policy/information-flow";
 import { createCurrentSourceFlowLabel } from "../../src/policy/information-flow";
-import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   prepareWorkspaceRevisionMutation,
   commitWorkspaceRevision,
@@ -45,7 +45,7 @@ import {
   startActorRelocation,
   resumeActorRelocation,
 } from "../../src/actors/actor-relocation";
-import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
+import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import type { OrganisationDO } from "../../src/actors/organisation";
 import type { MailEvaluationInput } from "../../src/mail-inbox/evaluation";
 import { createTransientGoalExecution } from "../../src/actors/session-goal-usage";
@@ -144,7 +144,7 @@ import {
 import { resolveCaseTurnAgentProfile } from "../../src/data/pinned-agent-profile";
 import { authorizeMailSource } from "../../src/mail-inbox/contract/mail-source-authorization";
 import { buildControlAuthority } from "../../src/request-authority";
-import { readActiveOrganisationMembershipRevision } from "../../src/data/control-plane";
+import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import {
   digestModelRoute,
   resolveOrganisationModelRoute,
@@ -182,8 +182,8 @@ import {
   revokeControlSession,
   upsertUser,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
-import { newControlMutationIdentity } from "../../src/data/control-mutation";
+} from "@purin-labs/tenancy/data/control-plane";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import {
   createAccessGrant,
@@ -191,7 +191,7 @@ import {
 } from "../../src/data/access-grants";
 import { requireVaultHandle } from "../test-ids";
 import { storeVaultSecret } from "../../src/credential-vault";
-import { parseInitialOrganisationPlacement } from "../../src/placement";
+import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import {
   defaultDenyPolicy,
   readCurrentOrganisationPolicySnapshot,

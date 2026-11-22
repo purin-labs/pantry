@@ -1,4 +1,4 @@
-import { acceptedExecutionAuthority } from "../../organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { resolveSlackMessageCapability } from "../../actors/email-operational-capability";
 import {
   insertSlackMessageProposal,

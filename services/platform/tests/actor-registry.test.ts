@@ -29,7 +29,7 @@ import {
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { parseOrganisationPlacement } from "../src/placement";
+import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { CASE_ACTOR_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
 import { reconcileOrganisationActorRegistry } from "../src/actors/actor-registry-reconciliation";
 import {

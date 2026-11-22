@@ -6,17 +6,17 @@ import {
   installSlackActorFixture,
   ORGANISATION_ID,
 } from "./slack-journey-support";
-import { issueControlSession } from "../../src/data/control-plane";
+import { issueControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { authorizeOrganisationRequest } from "../../src/control/authorization";
 import { recordCommerceMutationReceipt } from "../../src/control/mutation-receipt";
-import { readControlMutationReplay } from "../../src/data/control-mutation";
+import { readControlMutationReplay } from "@purin-labs/tenancy/data/control-mutation";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import {
   startActorRelocation,
   resumeActorRelocation,
 } from "../../src/actors/actor-relocation";
-import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
+import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 
 type DigestPause = {
   phase: "armed" | "paused" | "released";

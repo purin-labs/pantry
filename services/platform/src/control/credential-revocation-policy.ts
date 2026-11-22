@@ -4,7 +4,7 @@ import {
   type CredentialRevocationCommit,
 } from "../credential-vault";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { compilePublishAndActivateOrganisationPolicy } from "../policy-snapshot";
 
 export async function activateRevocationPolicy(

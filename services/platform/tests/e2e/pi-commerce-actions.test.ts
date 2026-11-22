@@ -14,7 +14,7 @@ import {
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { googleConfig } from "../../src/control/google-oidc-config";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { commerceCanonicalResourceId } from "../../src/commerce/contract/resource-ids";
 import {
   chat,

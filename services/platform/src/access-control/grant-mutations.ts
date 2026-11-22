@@ -5,7 +5,7 @@ import type {
   GrantSubject,
 } from "../authorization/access-grants/types";
 import { readAccessGrant } from "../data/access-grants";
-import type { OrganisationEnvironment } from "../data/control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import type {
   IntegrationAccountId,
   OrganisationId,
@@ -14,15 +14,15 @@ import type { UserId } from "@purin-labs/control-api/ids";
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import { fileGrantParts } from "../authorization/access-grants/file-grant-parts";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   prepareControlMutationReceiptAfterWrite,
   prepareOnboardingAuditEventAfterWrite,
   type ControlMutationIdentity,
   type UnversionedControlMutationBoundary,
-} from "../data/control-mutation";
+} from "@purin-labs/tenancy/data/control-mutation";
 import { errorMessage, isPositiveInteger } from "@purin-labs/std";
-import { prepareAccessChangeRevision } from "../data/organisation-onboarding-row";
+import { prepareAccessChangeRevision } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 type AccessControlMutationStateRow = Readonly<{
   environment: unknown;

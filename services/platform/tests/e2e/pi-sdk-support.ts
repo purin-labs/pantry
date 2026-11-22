@@ -1,8 +1,8 @@
 import { runInDurableObject } from "cloudflare:test";
 import { organisationDatabase, publishGlobalOrganisation } from "./organisation-database";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
-import { parseOrganisationPlacementProfile } from "../../src/placement";
-import { ensureInitialOrganisationPlacement } from "../../src/data/shared-rows/placement-row";
+import { parseOrganisationPlacementProfile } from "@purin-labs/tenancy/placement";
+import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { env } from "cloudflare:workers";
 import { expect } from "vitest";

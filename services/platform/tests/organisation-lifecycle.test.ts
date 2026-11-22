@@ -3,16 +3,16 @@ import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 import { describe, expect, it } from "vitest";
 
-import { upsertUser } from "../src/data/control-plane";
-import { newControlMutationIdentity } from "../src/data/control-mutation";
-import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
+import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
+import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   archiveOrganisation,
   deleteArchivedOrganisation,
   renameOrganisation,
   restoreOrganisation,
   type ArchiveOrganisationMutation,
-} from "../src/data/organisation-lifecycle";
+} from "@purin-labs/tenancy/data/organisation-lifecycle";
 import {
   parseOrganisationId,
   type OrganisationId,

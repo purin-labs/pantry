@@ -44,7 +44,7 @@ import type { ModelRoute } from "@purin-labs/contracts";
 import { readEmailProposalChatContext } from "../../src/actors/email-proposal-sources";
 import { CollaborationRoom } from "../../src/actors/collaboration-room";
 import { ConnectorEmail } from "../../src/actors/connector/connector-email-actor";
-import { issueControlSession } from "../../src/data/control-plane";
+import { issueControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { network } from "./network";
 import { pendingDecisionsOf } from "./access-route-support";
 import {

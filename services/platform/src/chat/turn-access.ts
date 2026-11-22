@@ -2,7 +2,7 @@ import type { GlobalDatabase, OrganisationDatabase } from "@purin-labs/kernel/da
 import {
   acceptedExecutionAuthority,
   type OrganisationAccess,
-} from "../organisation-access/access";
+} from "@purin-labs/tenancy/organisation-access/access";
 import type { HarnessTurnLease, RequestAuthority } from "@purin-labs/contracts";
 import {
   isProjectId,
@@ -20,7 +20,7 @@ import {
   isNonNegativeInteger,
 } from "@purin-labs/std";
 import type { ControlSessionId, SessionId, OrganisationId } from "@purin-labs/kernel/ids";
-import { resolveControlSessionById } from "../data/control-plane";
+import { resolveControlSessionById } from "@purin-labs/tenancy/data/control-plane";
 import type { ConversationScope } from "./store";
 import {
   authorizeConversation,
@@ -35,7 +35,7 @@ import {
   parseOrganisationId,
 } from "@purin-labs/kernel/ids";
 import type { Variant } from "@purin-labs/type-utils";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   parseStoredRequestAuthority,
   validateLiveRequestAuthority,

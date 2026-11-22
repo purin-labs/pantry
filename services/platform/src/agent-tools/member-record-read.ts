@@ -1,6 +1,6 @@
 import { admitSessionInformationFlowObservation } from "../actors/agent-session-information-flow";
 import { requireSessionExecution } from "../actors/session-execution-admission";
-import type { OrganisationMember } from "../data/control-plane";
+import type { OrganisationMember } from "@purin-labs/tenancy/data/control-plane";
 import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,

@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { parseOrganisationPlacement } from "../placement";
-import { parseOrganisationPlacementFenceToken } from "../data/organisation-placement";
+import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
+import { parseOrganisationPlacementFenceToken } from "@purin-labs/tenancy/data/organisation-placement";
 import {
   parseOrganisationId,
   parseControlSessionId,
@@ -23,11 +23,11 @@ import {
   authorizeOrganisationControl,
   resolveControlSessionById,
   type ActiveControlSession,
-} from "../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ControlSessionId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
-import { OrganisationExecutionScope } from "../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Variant } from "@purin-labs/type-utils";
 
 type CapturedActionPlacement = Readonly<{

@@ -4,7 +4,7 @@ import { runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse } from "msw";
 import { expect, it } from "vitest";
 import { parseInboxConversations } from "@purin-labs/control-api";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { readWhatsAppIngressPolicy } from "../../src/data/whatsapp";
 import { createGrant, enableCapability } from "./access-route-support";
 import { network } from "./network";

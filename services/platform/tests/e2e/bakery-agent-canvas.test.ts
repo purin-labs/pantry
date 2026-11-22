@@ -20,7 +20,7 @@ import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import {
   issueControlSession,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";

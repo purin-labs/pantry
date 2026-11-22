@@ -22,7 +22,7 @@ import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,
   TEST_ORGANISATION_PLACEMENT_PROFILE,
 } from "./fixtures/organisation-placement";
-import { prepareInitialOrganisationPlacementInsert } from "../src/data/shared-rows/placement-row";
+import { prepareInitialOrganisationPlacementInsert } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   reserveActor,
   actorActivationRequest,

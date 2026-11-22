@@ -21,7 +21,7 @@ import {
   readEstablishedDefaultWorkspaceReceipt,
   type WorkspaceRevisionStoreError,
 } from "../workspace-revision-store";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 type OrganisationWorkspaceRow = {
   readonly workspace_id: unknown;

@@ -5,7 +5,7 @@ import { isRecord, sha256Hex } from "@purin-labs/std";
 import { newConversationId } from "@purin-labs/control-api";
 
 import { saveConversation } from "../../src/chat/store";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { platformConversation } from "./chat-journey-support";
 import { commerceClient, commerceHeaders } from "./commerce-support";

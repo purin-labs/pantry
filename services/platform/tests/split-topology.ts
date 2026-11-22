@@ -7,10 +7,10 @@ import {
   issueControlSession,
   upsertUser,
   type User,
-} from "../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { OrganisationExecutionScope } from "../src/organisation-execution-scope";
-import { parseInitialOrganisationPlacement } from "../src/placement";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
+import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { d1Database } from "./sqlite-d1";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";

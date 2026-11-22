@@ -12,11 +12,11 @@ import { encodeBase64Url, isRecord } from "@purin-labs/std";
 import { CommerceAdminClient } from "@purin-labs/commerce-client";
 
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
-import { newControlMutationIdentity } from "../../src/data/control-mutation";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import {
   archiveOrganisation,
   deleteArchivedOrganisation,
-} from "../../src/data/organisation-lifecycle";
+} from "@purin-labs/tenancy/data/organisation-lifecycle";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";

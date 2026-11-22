@@ -1,5 +1,5 @@
 import { workspacePortalUrl } from "./portal-links";
-import { acceptedExecutionAuthority } from "../organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import {
   turnMemoryReaderWithoutSubjects,
 } from "../memory/contract/turn-memory";
@@ -47,8 +47,8 @@ import type { Env } from "@purin-labs/kernel/env";
 import type { CaseActorStub, SessionActorStub } from "../actors/actor-stubs";
 import type { SessionBudgetDimension } from "@purin-labs/contracts";
 import { budgetNoticeDeliveryId, budgetStopNoticeText } from "./budget-notice";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { samePlacement } from "../data/organisation-placement";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
+import { samePlacement } from "@purin-labs/tenancy/data/organisation-placement";
 import type { SlackCaseCommand } from "./case-command-message";
 import { buildSlackUserMessage } from "./user-message";
 import { slackAuthoredText } from "./events";
@@ -83,7 +83,7 @@ import {
   parseControlRole,
   roleMayConfigure,
   type ControlRole,
-} from "../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { parseAssignmentId, parseSessionId, type CaseId } from "@purin-labs/kernel/ids";
 import { resolveConfiguredSlackInstallationIdentity } from "./installation-identity";
 import {

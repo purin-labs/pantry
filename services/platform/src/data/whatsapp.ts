@@ -8,7 +8,7 @@ import {
 } from "@purin-labs/control-api";
 import { listOrganisationActorRegistryEntries } from "../actors/actor-registry";
 import { actorStub } from "../actors/actor-stubs";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   D1PreparedStatement,
 } from "@cloudflare/workers-types";
@@ -39,7 +39,7 @@ import {
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
 import { prepareSupportBindingContextGrant } from "./access-grants";
 import { parseVaultHandle, revokeCredential } from "../credential-vault";
-import type { OrganisationEnvironment } from "./control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import {
   exhaustiveList,
   isRecord,

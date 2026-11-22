@@ -5,7 +5,7 @@ import type {
 } from "@purin-labs/kernel/database-handles";
 import { isNonNegativeInteger, sha256Hex } from "@purin-labs/std";
 import type { Result } from "@purin-labs/kernel/result";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 /**
  * A plain-text Slack message that a Portal chat agent drafted. It is never

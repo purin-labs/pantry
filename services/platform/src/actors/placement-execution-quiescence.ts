@@ -1,7 +1,7 @@
 // What a placement move needs of each placed Actor before it copies state:
 // each Actor stops its own work, and an Actor can empty its content tables.
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import type { FrozenOrganisationPlacementMove } from "../data/organisation-placement";
+import type { FrozenOrganisationPlacementMove } from "@purin-labs/tenancy/data/organisation-placement";
 import type { Env } from "@purin-labs/kernel/env";
 import type { Result } from "@purin-labs/kernel/result";
 import type { ActorExportError } from "./actor-export";

@@ -1,8 +1,8 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { fetchWithOrganisationPlacement } from "../../organisation-execution-scope";
+import { fetchWithOrganisationPlacement } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { FileResourceAccessGrantTarget } from "../../authorization/access-grants/types";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import {
   readDropboxMetadata,

@@ -6,7 +6,7 @@ import { isRecord } from "@purin-labs/std";
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { SLACK_PERMISSION_RESUME_TEXT } from "../../src/actors/connector-slack-case-work";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { lastCalledTool } from "./chat-permission-support";
 import { commerceHeaders, connectCommerceFixture } from "./commerce-support";
 import { network } from "./network";

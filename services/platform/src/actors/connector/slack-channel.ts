@@ -10,7 +10,7 @@ import {
   type readSlackThreadCredentialRoute,
 } from "../../credential-vault";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   createSlackCaseCommand,

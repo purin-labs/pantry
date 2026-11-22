@@ -1,8 +1,8 @@
 import { commerceSystemKindOfSource } from "@purin-labs/contracts";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import type { OrganisationAccess } from "../organisation-access/access";
-import { acceptedExecutionAuthority } from "../organisation-access/access";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationAccess } from "@purin-labs/tenancy/organisation-access/access";
+import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { decideCurrentAuthorityFlowSink } from "../chat/information-flow";
 import type { CommerceProjection } from "@purin-labs/commerce-contracts";
 

@@ -2,7 +2,7 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 
 import { readAccountMutationState } from "../data/integration-account";
 import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
-import type { OrganisationEnvironment } from "../data/control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import {
   newIntegrationAccountId,
   newProviderConnectionId,
@@ -30,7 +30,7 @@ import {
   type ExistingCustomConnectorSetupKind,
 } from "./setup-target";
 import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
-import { prepareConfigurationVersionBump } from "../data/organisation-onboarding-row";
+import { prepareConfigurationVersionBump } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 import { prepareVaultSecretRevocation } from "../credential-vault/secret-revocation";
 import {
   prepareActiveCredentialGeneration,

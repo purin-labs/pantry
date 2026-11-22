@@ -1,6 +1,6 @@
 // The error of the Code Mode budget methods of the Organisation actor.
 import type { CodeModeBudgetError } from "../code-mode-budget";
-import type { OrganisationStatus } from "./types";
+import type { OrganisationStatus } from "@purin-labs/tenancy/actors/organisation/types";
 
 export type CodeModeOrganisationActorError =
   | CodeModeBudgetError

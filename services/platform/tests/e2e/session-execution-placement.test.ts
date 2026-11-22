@@ -19,18 +19,18 @@ import {
 import {
   freezeOrganisationPlacementMove,
   freezeRegionalOrganisationPlacement,
-} from "../../src/data/shared-rows/placement-row";
+} from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   readOrganisationPlacementMove,
   parseOrganisationPlacementMoveTarget,
-} from "../../src/data/organisation-placement";
+} from "@purin-labs/tenancy/data/organisation-placement";
 import {
   issueControlSession,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
-import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { network } from "./network";
 import {
   ORGANISATION_ID,

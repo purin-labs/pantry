@@ -15,7 +15,7 @@ import {
 } from "../../kitchen/bakes/commands";
 import { setBakeAuthority } from "../../kitchen/bakes/authority";
 import { setBakeStockLevel } from "../../kitchen/bakes/levels";
-import { roleMayConfigure } from "../../data/control-plane";
+import { roleMayConfigure } from "@purin-labs/tenancy/data/control-plane";
 import {
   admitControlMutation,
   recordSessionMutationReceipt,

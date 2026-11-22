@@ -1,9 +1,9 @@
-import type { OrganisationModuleHost } from "./module-host";
+import type { OrganisationModuleHost } from "@purin-labs/tenancy/actors/organisation/module-host";
 import {
   authorizeActionMutationExecution,
   type ActionMutationExecution,
 } from "../action-mutation-execution";
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../actor-execution-quiescence";
 import type { CommerceProjection } from "@purin-labs/commerce-contracts";
 import {
@@ -125,7 +125,7 @@ import {
   inspectOrganisationCutoverQuiescence,
   type OrganisationCutoverInspectionError,
   type OrganisationCutoverQuiescence,
-} from "../organisation-cutover-quiescence";
+} from "@purin-labs/tenancy/actors/organisation-cutover-quiescence";
 import {
   reconcileCommerceProviderReceipt,
   type CommerceProviderReceiptReconciliationError,
@@ -159,12 +159,12 @@ import type {
   OrganisationCutoverCueSettlementError,
   OrganisationCutoverCueSettlementInput,
   OrganisationStateError,
-} from "./types";
+} from "@purin-labs/tenancy/actors/organisation/types";
 import { armActionExecutionAlarm } from "../action-ledger";
 import {
   organisationPlacementConflict,
   validateActionOrganisation,
-} from "./organisation-record";
+} from "@purin-labs/tenancy/actors/organisation/organisation-record";
 import { validateCodeModeOrganisation } from "./code-mode-organisation";
 
 const CAFE_COMMERCE_ACCEPTANCE_FAULT_KEY = "acceptance:cafe-commerce-fault:v1";

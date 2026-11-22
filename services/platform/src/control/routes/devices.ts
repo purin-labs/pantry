@@ -20,7 +20,7 @@ import { type MenuScreenSummary } from "@purin-labs/cafe-control-api";
 
 import { type DeviceSample } from "../../actors/device-fleet";
 import { deviceFleetStub } from "../../devices/contract/fleet-stub";
-import { roleMayConfigure, roleMayOperate } from "../../data/control-plane";
+import { roleMayConfigure, roleMayOperate } from "@purin-labs/tenancy/data/control-plane";
 import { cafeServices } from "../../cafe/contract/cafe-services";
 import {
   DEVICE_COMMAND_ROLE,

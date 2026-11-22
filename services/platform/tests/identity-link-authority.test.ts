@@ -6,7 +6,7 @@ import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { describe, expect, it, vi } from "vitest";
 
 import gateway from "../src/integration-gateway";
-import { issueControlSession, upsertUser } from "../src/data/control-plane";
+import { issueControlSession, upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,

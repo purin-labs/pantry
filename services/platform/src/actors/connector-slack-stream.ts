@@ -16,7 +16,7 @@ import {
   type ChannelId,
 } from "@purin-labs/kernel/ids";
 import { traceLog } from "@purin-labs/kernel/observability";
-import { parseOrganisationPlacement } from "../placement";
+import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { screenTextForSurface } from "../redaction";
 import {
   initialIncrementalScreenState,
@@ -30,7 +30,7 @@ import {
   stopSlackStream,
   type SlackStreamError,
 } from "../slack/stream";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   actorExecutionAdmissionOpen,
   isActorExecutionActive,

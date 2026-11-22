@@ -1,4 +1,4 @@
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
 import type { CanonicalCommerceDelivery } from "@purin-labs/commerce-contracts";
 import { listLiveProviderWebhookContexts } from "../../data/integration-account";

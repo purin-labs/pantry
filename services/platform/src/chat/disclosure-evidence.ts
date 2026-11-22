@@ -14,7 +14,7 @@ import {
 import { isConversationId, isUserId } from "@purin-labs/control-api";
 import type { ConversationScope } from "./store";
 import { authorizeProject, listProjectMembers } from "../projects/access";
-import { listOrganisationMembers } from "../data/control-plane";
+import { listOrganisationMembers } from "@purin-labs/tenancy/data/control-plane";
 import { readProject } from "../projects/records";
 import { listAccessGrants } from "../data/access-grants";
 import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";

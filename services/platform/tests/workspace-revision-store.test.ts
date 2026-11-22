@@ -1,7 +1,7 @@
 import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
-import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
-import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
+import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,
   TEST_ORGANISATION_PLACEMENT_PROFILE,

@@ -4,8 +4,11 @@ import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-pla
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { describe, expect, it } from "vitest";
 
-import { hashOpaqueSecret, upsertUser } from "../src/data/control-plane";
-import { newControlMutationIdentity } from "../src/data/control-mutation";
+import {
+  hashOpaqueSecret,
+  upsertUser,
+} from "@purin-labs/tenancy/data/control-plane";
+import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import {
   createConnectedIntegration,
   finalizeConnectedIntegrationAccount,

@@ -1,6 +1,6 @@
 import type { Env } from "@purin-labs/kernel/env";
 import type { Result } from "@purin-labs/kernel/result";
-import { prepareControlMutationReceipt } from "../../../data/control-mutation";
+import { prepareControlMutationReceipt } from "@purin-labs/tenancy/data/control-mutation";
 import {
   parseOrganisationInferenceSelection,
   readOrganisationInferenceSelection,
@@ -30,7 +30,7 @@ import {
   type JsonRecord,
 } from "../../http";
 import { assertNever, hasExactKeys } from "@purin-labs/std";
-import { readOnboardingRow } from "../../../data/organisation-onboarding-row";
+import { readOnboardingRow } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 export async function handleOrganisationInference(
   request: Request,

@@ -4,7 +4,7 @@ import { isRecord } from "@purin-labs/std";
 import { commercePickupCode } from "@purin-labs/commerce-client";
 import { expect, it, type TestContext } from "vitest";
 
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {
   parseIntegrationAccountId,
   parseRequestId,

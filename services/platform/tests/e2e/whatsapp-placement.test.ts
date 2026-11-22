@@ -41,7 +41,7 @@ import { network } from "./network";
 import {
   issueControlSession,
   type IssuedControlSession,
-} from "../../src/data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-policy";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import {

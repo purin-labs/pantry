@@ -7,7 +7,7 @@ import {
   readGmailPilotBudget,
   registerEmailMailboxAccount,
 } from "../src/data/email-mailbox";
-import { upsertUser } from "../src/data/control-plane";
+import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,

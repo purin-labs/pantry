@@ -5,7 +5,7 @@ import { isRecord } from "@purin-labs/std";
 
 import { restoreSessionTurnContext } from "../../src/actors/actor-journal";
 import { SessionDO } from "../../src/actors/agent-session";
-import { selectOrganisationPlacementDatabase } from "../../src/organisation-execution-scope";
+import { selectOrganisationPlacementDatabase } from "@purin-labs/tenancy/organisation-execution-scope";
 import { FlowLabel } from "../../src/policy/information-flow";
 import { network } from "./network";
 import {

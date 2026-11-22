@@ -3,7 +3,7 @@ import { resolveCurrentOrganisationCommerceMerchantBinding } from "../../data/co
 import {
   listOrganisationMembers,
   parseControlRole,
-} from "../../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { requireSessionExecution } from "../session-execution-admission";
 
 /**

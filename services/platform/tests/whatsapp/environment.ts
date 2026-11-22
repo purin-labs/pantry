@@ -5,7 +5,7 @@ import { requireOrganisationExecutionScope } from "../organisation-execution-fix
 import { DatabaseSync } from "node:sqlite";
 
 import { storeVaultSecret } from "../../src/credential-vault";
-import { upsertUser } from "../../src/data/control-plane";
+import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   createConnectedIntegration,
   finalizeConnectedIntegrationAccount,

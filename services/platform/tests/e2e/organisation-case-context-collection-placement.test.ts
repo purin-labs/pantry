@@ -28,8 +28,8 @@ import {
   resumeActorRelocation,
   type ActorRelocationId,
 } from "../../src/actors/actor-relocation";
-import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
-import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import { publishContactVerification } from "../../src/data/contact-verification";
 import { registerOperationalEmailContact } from "../../src/data/email-operational";

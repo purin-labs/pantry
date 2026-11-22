@@ -18,7 +18,7 @@ import {
   type DraftFailureCode,
   type ProductDescriptionRoomMetadata,
 } from "@purin-labs/product-description-crdt/protocol";
-import { listOrganisationMembers, resolveUser } from "../data/control-plane";
+import { listOrganisationMembers, resolveUser } from "@purin-labs/tenancy/data/control-plane";
 import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import { controlError } from "../control/http";
@@ -49,7 +49,7 @@ import {
 } from "./collaboration-room";
 import { resolveCollaborationSlackThread } from "./collaboration-slack-thread";
 import { assertNever, hasExactKeys } from "@purin-labs/std";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
 
 export type DraftSharedThread = Readonly<{

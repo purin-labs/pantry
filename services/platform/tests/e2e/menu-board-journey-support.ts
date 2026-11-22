@@ -35,7 +35,7 @@ import { commerceClient } from "./commerce-support";
 import { network } from "./network";
 import { givePortalHandles } from "./permission-request-support";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { closeSocket, openSocket } from "./hibernatable-socket-support";
 import {
   MERCHANT,

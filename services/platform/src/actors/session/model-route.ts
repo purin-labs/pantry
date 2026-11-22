@@ -1,5 +1,5 @@
 import { resolveClaudeAccessToken } from "../../models/claude-connection";
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   HarnessTurnLease,
   StoredMessageAttachment,

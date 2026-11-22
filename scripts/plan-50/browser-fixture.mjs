@@ -1,6 +1,6 @@
 // The pages that the draft browser trial opens: one signed-in page for each
 // trial person, and the bundled entry that evaluate-pi-durable.mjs builds.
-import { issueControlSession } from "../../services/platform/src/data/control-plane.ts";
+import { issueControlSession } from "../../foundation/tenancy/data/control-plane.ts";
 import { agentUser, humanUser } from "./draft-seed.mjs";
 
 export async function browserFixture(request, env, pathname) {

@@ -12,7 +12,7 @@ import {
 } from "../authorization/capability-catalogue";
 import { listAccessGrants } from "../data/access-grants";
 import { readOrganisationCapabilityPolicies } from "../data/capability-policy";
-import { listOrganisationMembers } from "../data/control-plane";
+import { listOrganisationMembers } from "@purin-labs/tenancy/data/control-plane";
 import {
   listIntegrationAccounts,
   type IntegrationAccount,

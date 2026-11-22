@@ -1,5 +1,5 @@
 import { type SessionId, parseRequestId, type ControlSessionId } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   attachmentParts,
   surfaceObservationFromParts,
@@ -38,7 +38,7 @@ import {
   resolveControlSessionById,
   readActiveOrganisationMembership,
   roleMayConfigure,
-} from "../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import {
   resolveOrganisationModelRouteAtScope,
   type OrganisationModelRoute,

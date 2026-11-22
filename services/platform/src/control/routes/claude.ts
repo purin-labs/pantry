@@ -14,7 +14,7 @@ import {
 import { parseClaudeAuthorizationCode } from "../../models/claude-oauth";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
-import { readOnboardingRow } from "../../data/organisation-onboarding-row";
+import { readOnboardingRow } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 export type ClaudeConnectionRoute = Readonly<{
   kind: "claudeConnection";

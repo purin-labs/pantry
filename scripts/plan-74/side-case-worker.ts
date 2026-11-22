@@ -10,7 +10,7 @@ import { parseWorkflowChanges } from "../../packages/bakery-workflow/src/changes
 import { prepareWorkflowProposal } from "../../services/platform/src/commerce/bakery/workflow-proposals";
 import { readCurrentWorkflow } from "../../services/platform/src/commerce/bakery/workflow-revisions";
 import { createOperatorConfigurationDraft } from "../../services/platform/src/data/operator-configuration-draft";
-import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope";
+import { OrganisationExecutionScope } from "../../foundation/tenancy/organisation-execution-scope";
 import type { Env } from "../../foundation/kernel/env";
 import type { OrganisationId } from "../../foundation/kernel/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../services/platform/src/policy-snapshot";

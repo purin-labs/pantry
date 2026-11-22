@@ -54,8 +54,8 @@ import {
   parseMenuPriceActionPath,
   type ChangeMenuPriceAction,
 } from "./menu-price-action";
-import { hashOpaqueSecret } from "../data/control-plane";
-import type { UnversionedControlMutationBoundary } from "../data/control-mutation";
+import { hashOpaqueSecret } from "@purin-labs/tenancy/data/control-plane";
+import type { UnversionedControlMutationBoundary } from "@purin-labs/tenancy/data/control-mutation";
 import {
   reconcileActionExecution,
   type ActionLedgerEntry,

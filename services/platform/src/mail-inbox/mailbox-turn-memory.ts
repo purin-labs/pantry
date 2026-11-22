@@ -16,7 +16,7 @@ import type {
   IntegrationAccountId,
   OrganisationId,
 } from "@purin-labs/kernel/ids";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   memoryService,
   type TurnMemoryDestination,

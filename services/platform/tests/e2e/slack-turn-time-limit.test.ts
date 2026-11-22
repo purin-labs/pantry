@@ -3,7 +3,7 @@ import { delay, http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { accessControlPath, mutationHeaders } from "./access-route-support";
 import { commerceHeaders } from "./commerce-support";
 import { network } from "./network";

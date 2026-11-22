@@ -8,7 +8,7 @@ import {
 } from "../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
-import { prepareControlMutationReceipt } from "../../data/control-mutation";
+import { prepareControlMutationReceipt } from "@purin-labs/tenancy/data/control-mutation";
 import {
   prepareOrganisationSlackReasoningEffortWrite,
   readOrganisationInferenceSelection,

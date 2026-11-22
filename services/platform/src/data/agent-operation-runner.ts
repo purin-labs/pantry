@@ -1,4 +1,4 @@
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { D1PreparedStatement } from "@cloudflare/workers-types";
 
 import type { Env } from "@purin-labs/kernel/env";
@@ -28,7 +28,7 @@ import {
   resolveControlSessionById,
   readActiveOrganisationMembershipRevision,
   type ControlRole,
-} from "./control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import type { Variant } from "@purin-labs/type-utils";
 import type { OperatorExecutionOrigin } from "../chat/turn-access";
 

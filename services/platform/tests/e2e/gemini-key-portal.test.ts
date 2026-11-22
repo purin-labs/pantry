@@ -3,7 +3,7 @@ import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { readConversation } from "../../src/chat/store";
 import { preparePortalChatJourney } from "./chat-journey-support";
 import { connectModelApiKey } from "./chatgpt-subscription-support";

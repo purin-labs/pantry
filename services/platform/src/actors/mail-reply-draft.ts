@@ -27,7 +27,7 @@ import { controlError } from "../control/http";
 import {
   readActiveOrganisationMembershipRevision,
   resolveUser,
-} from "../data/control-plane";
+} from "@purin-labs/tenancy/data/control-plane";
 import { readEmailReplyProposalProjection } from "../data/email-mailbox";
 import { gmailConnectorId } from "../mail-inbox/contract/connector-ids";
 import type { Env } from "@purin-labs/kernel/env";
@@ -39,7 +39,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import { authorizeMailSource } from "../mail-inbox/contract/mail-source-authorization";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { buildControlAuthority } from "../request-authority";
 import type { Result } from "@purin-labs/kernel/result";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";

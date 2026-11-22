@@ -4,7 +4,7 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
 import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { controlFetch, preparePortalChatJourney } from "./chat-journey-support";
 import { network } from "./network";
 import { ORGANISATION_ID, openRouterText } from "./slack-journey-support";

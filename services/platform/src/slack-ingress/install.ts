@@ -1,15 +1,15 @@
-import { prepareInitialPlacementActivation } from "../data/shared-rows/placement-row";
+import { prepareInitialPlacementActivation } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
-} from "../organisation-execution-scope";
+} from "@purin-labs/tenancy/organisation-execution-scope";
 import { selectOrganisationHomePlacement } from "../control/home-region";
 import { SLACK_INSTALL_REDIRECT_PATH } from "../gateway-routing/slack";
 import {
   createOrganisationInstallPreservingExistingInstallModel,
   listInstallLiveness,
   type InstallLivenessRecord,
-} from "../data/organisation";
+} from "@purin-labs/tenancy/data/organisation";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   errorResponse,

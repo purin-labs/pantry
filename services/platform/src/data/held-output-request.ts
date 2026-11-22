@@ -9,7 +9,7 @@ import {
 } from "@purin-labs/control-api";
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { parseStoredRequestAuthority } from "../request-authority";
 import type { Result } from "@purin-labs/kernel/result";
 

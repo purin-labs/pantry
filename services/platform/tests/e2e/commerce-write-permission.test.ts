@@ -7,7 +7,7 @@ import {
   productionRequestAttributes,
 } from "@purin-labs/commerce-client";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {
   accessControlPath,
   mutationHeaders,

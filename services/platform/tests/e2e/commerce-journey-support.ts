@@ -3,7 +3,7 @@
 // configuration change.
 import { env } from "cloudflare:workers";
 import { isRecord } from "@purin-labs/std";
-import type { IssuedControlSession } from "../../src/data/control-plane";
+import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { fixtureDatabase } from "./organisation-database";
 
 const OPERATOR = "Bearer commerce-e2e-token";

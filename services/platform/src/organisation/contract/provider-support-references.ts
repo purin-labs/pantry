@@ -4,9 +4,9 @@ import type {
 } from "@purin-labs/kernel/database-handles";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { OrganisationEnvironment } from "../../data/control-plane";
+import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import type { ProviderAttemptSupportReference } from "../../data/connection-flow-parts";
-import { prepareProjectionRevisionBump } from "../../data/organisation-onboarding-row";
+import { prepareProjectionRevisionBump } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 /**
  * The support references of a provider: a failed provider start becomes a
