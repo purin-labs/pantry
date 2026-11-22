@@ -1,4 +1,5 @@
 {
+  "packageEntryExports": 993,
   "files": [],
   "exports": [
     "apps/portal/src/features/terminals/counter-sale-api.ts#manualCashRefundCounterSale",

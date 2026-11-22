@@ -16,8 +16,11 @@ import "../provide-organisation-lifecycle-parts";
 // the suite loads the module that the OpenRouter route uses here, once.
 import "@earendil-works/pi-ai/api/openai-completions";
 // A test that calls a Platform module before the Worker loads still finds
-// the ports that the Worker registers.
-import "../../src/worker-ports";
+// the ports that the Worker registers. The setup loads the production entry
+// and not `worker-ports.ts`, so the suite fails when the entry loses its
+// import of the ports (the layer lint does not read an import with no
+// `from`).
+import "../../src/integration-gateway";
 
 const DATA_ROOT = "ERERERERERERERERERERERERERERERERERERERERERE=";
 const VAULT_ROOT_V1 = "IiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiI=";

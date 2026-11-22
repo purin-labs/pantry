@@ -3,22 +3,31 @@
 //
 // jscpd finds blocks of product code that are copies of each other. The
 // baseline scripts/clones-ratchet.json holds, for each pair of files, the
-// count of the copies between them (a file can be a pair with itself).
+// count of the copies between them and their copied lines (a file can be a
+// pair with itself), and the totals of the tree.
 //
-//   A pair may not get one more copy, and a new pair is refused. Put the
-//   shared code in one module and import it.
-//   When a pair loses a copy, lower its entry with --update, so that the copy
-//   cannot come back.
+//   A pair may not get one more copy or one more copied line, and a new pair
+//   is refused. Put the shared code in one module and import it.
+//   When a pair loses a copy or a line, lower its entry with --update, so
+//   that the copy cannot come back.
 //
-// The count of a pair does not change when code near a copy changes or when a
-// formatter runs. It changes with the path of a file: after a move, write the
-// new path into the baseline.
+// jscpd reports a copy in three files as pairs of the first file with each
+// other file. When the first file loses its copy, jscpd reports a new pair
+// of the other two. Such a new pair passes, and --update records it, when
+// both of its files are in the baseline and the totals of copies and copied
+// lines do not grow.
+//
+// A copy that grows near its edges adds lines, so the check fails. A
+// formatter can change the line count of a copy: lower the entry with
+// --update when it falls. After a move, write the new path into the
+// baseline. The baseline holds counts only; the reason to keep a copy is in
+// docs/refactor-17.md.
 //
 // The scan settings are in .jscpd.json: product code of apps, packages,
 // services and crates, without tests, scripts, bundles and generated code.
 //
 //   node scripts/check-clones.mjs            check
-//   node scripts/check-clones.mjs --update   lower entries, drop pairs that are gone
+//   node scripts/check-clones.mjs --update   lower entries, drop pairs that are gone, record moved pairs
 //   node scripts/check-clones.mjs --init     write the baseline from the tree
 //   node scripts/check-clones.mjs --report   print the totals for each folder
 
@@ -54,7 +63,7 @@ if (mode === "--report") {
 if (mode === "--init") {
   writeBaseline(scan.pairs);
   console.log(
-    `Wrote ${scan.total.clones} copies in ${Object.keys(scan.pairs).length} file pairs to ${BASELINE}.`,
+    `Wrote ${scan.total.clones} copies (${scan.total.duplicatedLines} lines) in ${Object.keys(scan.pairs).length} file pairs to ${BASELINE}.`,
   );
   process.exit(0);
 }
@@ -66,13 +75,49 @@ if (!existsSync(baselinePath)) {
   process.exit(1);
 }
 
-const baseline = JSON.parse(readFileSync(baselinePath, "utf8")).pairs;
-const grown = Object.entries(scan.pairs).filter(
-  ([pair, count]) => count > (baseline[pair] ?? 0),
+const baselineFile = JSON.parse(readFileSync(baselinePath, "utf8"));
+const baseline = baselineFile.pairs;
+const baselineTotal = baselineFile.total;
+if (
+  baselineTotal === undefined ||
+  Object.values(baseline).some((entry) => typeof entry !== "object")
+) {
+  console.error(
+    `${BASELINE} has the old form (copies only). Run node scripts/check-clones.mjs --init.`,
+  );
+  process.exit(1);
+}
+const knownFiles = new Set(
+  Object.keys(baseline).flatMap((pair) => pair.split(" = ")),
 );
-const lower = Object.entries(baseline).filter(
-  ([pair, count]) => (scan.pairs[pair] ?? 0) < count,
+const totalsHold =
+  scan.total.clones <= baselineTotal.copies &&
+  scan.total.duplicatedLines <= baselineTotal.lines;
+// A new pair of two known files, while the totals do not grow, is a copy
+// that jscpd now reports between other files of the same group.
+const moved = Object.keys(scan.pairs).filter(
+  (pair) =>
+    baseline[pair] === undefined &&
+    totalsHold &&
+    pair.split(" = ").every((file) => knownFiles.has(file)),
 );
+const grown = Object.entries(scan.pairs).filter(([pair, entry]) => {
+  if (moved.includes(pair)) return false;
+  const known = baseline[pair];
+  return (
+    known === undefined ||
+    entry.copies > known.copies ||
+    entry.lines > known.lines
+  );
+});
+const lower = Object.entries(baseline).filter(([pair, known]) => {
+  const entry = scan.pairs[pair];
+  return (
+    entry === undefined ||
+    entry.copies < known.copies ||
+    entry.lines < known.lines
+  );
+});
 
 if (mode === "--update") {
   if (grown.length > 0) {
@@ -82,7 +127,7 @@ if (mode === "--update") {
   }
   writeBaseline(scan.pairs);
   console.log(
-    `Lowered ${lower.length} pairs. The baseline holds ${scan.total.clones} copies.`,
+    `Lowered ${lower.length} pairs and recorded ${moved.length} moved pairs. The baseline holds ${scan.total.clones} copies (${scan.total.duplicatedLines} lines).`,
   );
   process.exit(0);
 }
@@ -95,21 +140,22 @@ if (grown.length > 0) {
     "Put the shared code in one module and import it from both places. See docs/refactor-17.md, Prune with each step.",
   );
 }
-if (lower.length > 0) {
+if (lower.length > 0 || moved.length > 0) {
   failed = true;
   console.error(
-    `${lower.length} file pairs have fewer copies than the baseline. Run node scripts/check-clones.mjs --update.`,
+    `${lower.length} file pairs have fewer copies or lines than the baseline, and ${moved.length} pairs moved. Run node scripts/check-clones.mjs --update.`,
   );
 }
 if (failed) process.exit(1);
 console.log(
-  `${scan.total.clones} known copies (${scan.total.duplicatedLines} lines, ${scan.total.percentage.toFixed(2)} %) in ${scan.total.sources} files. No new copy.`,
+  `${scan.total.clones} known copies (${scan.total.duplicatedLines} lines, ${scan.total.percentage.toFixed(2)} %) in ${scan.total.sources} files. No new copy and no new copied line.`,
 );
 
 function reportGrown() {
-  for (const [pair, count] of grown) {
+  for (const [pair, entry] of grown) {
+    const known = baseline[pair];
     console.error(
-      `${pair}: ${count} copies, the baseline allows ${baseline[pair] ?? 0}.`,
+      `${pair}: ${entry.copies} copies of ${entry.lines} lines, the baseline allows ${known?.copies ?? 0} copies of ${known?.lines ?? 0} lines.`,
     );
     for (const clone of scan.duplicates.filter(
       (candidate) => pairOf(candidate) === pair,
@@ -147,7 +193,8 @@ function scanTree() {
       clone.firstFile.name = relative(root, clone.firstFile.name);
       clone.secondFile.name = relative(root, clone.secondFile.name);
       const pair = pairOf(clone);
-      pairs[pair] = (pairs[pair] ?? 0) + 1;
+      const entry = pairs[pair] ?? { copies: 0, lines: 0 };
+      pairs[pair] = { copies: entry.copies + 1, lines: entry.lines + clone.lines };
     }
     return {
       pairs,
@@ -163,9 +210,17 @@ function writeBaseline(pairs) {
   const sorted = Object.fromEntries(
     Object.entries(pairs).sort(([a], [b]) => (a < b ? -1 : 1)),
   );
+  const total = {
+    copies: scan.total.clones,
+    lines: scan.total.duplicatedLines,
+  };
+  // One line for each pair, so that a change of one pair is one line.
+  const lines = Object.entries(sorted).map(
+    ([pair, entry]) => `    ${JSON.stringify(pair)}: ${JSON.stringify(entry)}`,
+  );
   writeFileSync(
     baselinePath,
-    `${JSON.stringify({ pairs: sorted }, null, 2)}\n`,
+    `{\n  "total": ${JSON.stringify(total)},\n  "pairs": {\n${lines.join(",\n")}\n  }\n}\n`,
   );
 }
 

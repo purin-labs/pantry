@@ -15,6 +15,12 @@ on:
       - "services/commerce/**"
       - "apps/storefront/**"
       - "scripts/check-runtime-boundary.mjs"
+      # services/commerce/tests/punter-acceptance.test.ts runs Punter.
+      - "scripts/punter/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "patches/**"
+      - "tsconfig.base.json"
       - ".github/workflows/commerce-components.yml"
   merge_group:
 
