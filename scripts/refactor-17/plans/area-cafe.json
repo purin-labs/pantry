@@ -1,0 +1,225 @@
+{
+  "about": "Refactor 17, Stage B, decision D1: the files of the area cafe join one workspace package @purin-labs/area-cafe in areas/cafe. scripts/refactor-17/move-module.mjs reads this plan. files: each source file that scripts/layers.json gives the module, with its place in the target folder: a Worker file goes to server/ with its sub-path below services/platform/src/, less its first folder when that folder is cafe/ or commerce/ (the longer lines of sourcePrefixes give this rule, one time for each file, and no two files then share a place), a Portal file goes to ui/ and keeps its sub-path below apps/portal/src/. sourcePrefixes: where --sync-plan puts a file that the module gets later. package: the manifest and the tsconfig of the new package; the versions of devDependencies come from the Worker and the Portal manifests. The exports map gives each .ts file of server/ and of ui/ and each style sheet of ui/ as an entry; a .tsx file that another module imports has an entry of its own. The tsconfig of the package reads server/ only. The Worker tsconfigs include areas/*/server and the Portal tsconfig includes areas/*/ui (the preparation commit \"Type checks: the Worker and the Portal programs read the area packages\"), so each file stays in the program that checked it before the move. edits: text edits of the files that name a root folder or a source folder and cannot read scripts/lib/source-roots.mjs; an edit is done when the file holds its replace text. keepForm: each file where an import stays on its line, because the wrap of Prettier would move a ratchet, with its reason. regenerate: the commands that write a generated file again. package.typeCheck false: the package has no check:types script of its own. Through the foundation packages that it imports the program also lacks BAKE_RUN, CASE, CODE_MODE_SANDBOX, CONNECTOR, EVENT_Q, MESSAGE_LINK_FETCH, ORGANISATION, SESSION. The package alone gives 188 errors, 52 of them in its own files. The Worker program checks each file of server/. ",
+  "module": "areas/cafe",
+  "target": "areas/cafe",
+  "workspaceEntry": "areas/*",
+  "sourcePrefixes": {
+    "services/platform/src/cafe/": "server/",
+    "services/platform/src/commerce/": "server/",
+    "services/platform/src/": "server/",
+    "apps/portal/src/": "ui/"
+  },
+  "package": {
+    "name": "@purin-labs/area-cafe",
+    "exports": {
+      "./server/*": {
+        "types": "./server/*.ts",
+        "default": "./server/*.ts"
+      },
+      "./ui/*.css": "./ui/*.css",
+      "./ui/*": {
+        "types": "./ui/*.ts",
+        "default": "./ui/*.ts"
+      },
+      "./ui/features/content-studio/route": "./ui/features/content-studio/route.tsx",
+      "./ui/features/menu-boards/board-view": "./ui/features/menu-boards/board-view.tsx",
+      "./ui/features/order-queue/route": "./ui/features/order-queue/route.tsx",
+      "./ui/features/register/route": "./ui/features/register/route.tsx",
+      "./ui/features/terminals/counter-sale-route": "./ui/features/terminals/counter-sale-route.tsx",
+      "./ui/features/terminals/route": "./ui/features/terminals/route.tsx"
+    },
+    "dependencies": {
+      "@purin-labs/actor-runtime": "workspace:*",
+      "@purin-labs/agent": "workspace:*",
+      "@purin-labs/agent-tools": "workspace:*",
+      "@purin-labs/area-devices": "workspace:*",
+      "@purin-labs/authority": "workspace:*",
+      "@purin-labs/bakery-model": "workspace:*",
+      "@purin-labs/cafe-control-api": "workspace:*",
+      "@purin-labs/collaboration": "workspace:*",
+      "@purin-labs/commerce-client": "workspace:*",
+      "@purin-labs/commerce-contracts": "workspace:*",
+      "@purin-labs/connections": "workspace:*",
+      "@purin-labs/contracts": "workspace:*",
+      "@purin-labs/control": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/conversation": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/menu-board-crdt": "workspace:*",
+      "@purin-labs/menu-draft-crdt": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/tool-handlers": "workspace:*",
+      "@purin-labs/type-utils": "workspace:*",
+      "@purin-labs/ui": "workspace:*",
+      "lucide-react": "^0.542.0",
+      "qrcode-generator": "^2.0.4",
+      "react": "^19.1.1",
+      "react-dom": "^19.1.1",
+      "react-router": "^7.18.2",
+      "sonner": "^2.0.7",
+      "typebox": "1.3.27"
+    },
+    "devDependencies": [
+      "@cloudflare/workers-types",
+      "@types/react",
+      "@types/react-dom",
+      "tsrs"
+    ],
+    "versionsFrom": [
+      "services/platform/package.json",
+      "apps/portal/package.json"
+    ],
+    "tsconfig": {
+      "extends": "../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": [
+          "ESNext"
+        ],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": [
+          "@cloudflare/workers-types"
+        ],
+        "allowImportingTsExtensions": true
+      },
+      "include": [
+        "server/**/*.ts"
+      ]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Worker files of the package",
+      "find": "PLATFORM_SOURCE.push(\"areas/organisation/server\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"areas/organisation/server\");\n// The Worker side of the area cafe (Refactor 17, Stage B).\nPLATFORM_SOURCE.push(\"areas/cafe/server\");\n"
+    },
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the Portal lints and the ESLint rules of the Portal source read the Portal files of the package",
+      "find": "PORTAL_SOURCE.push(\"areas/organisation/ui\");\n",
+      "replace": "PORTAL_SOURCE.push(\"areas/organisation/ui\");\n// The Portal side of the area cafe (Refactor 17, Stage B).\nPORTAL_SOURCE.push(\"areas/cafe/ui\");\n"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": [
+        "node",
+        "scripts/check-layers.mjs",
+        "--areas",
+        "--write"
+      ],
+      "writes": [
+        "docs/layers.md"
+      ]
+    }
+  ],
+  "files": {
+    "apps/portal/src/features/content-studio/menu-client.ts": "ui/features/content-studio/menu-client.ts",
+    "apps/portal/src/features/content-studio/route.tsx": "ui/features/content-studio/route.tsx",
+    "apps/portal/src/features/content-studio/styles.css": "ui/features/content-studio/styles.css",
+    "apps/portal/src/features/menu-boards/board-archive.css": "ui/features/menu-boards/board-archive.css",
+    "apps/portal/src/features/menu-boards/board-archive.tsx": "ui/features/menu-boards/board-archive.tsx",
+    "apps/portal/src/features/menu-boards/board-chat.ts": "ui/features/menu-boards/board-chat.ts",
+    "apps/portal/src/features/menu-boards/board-client.ts": "ui/features/menu-boards/board-client.ts",
+    "apps/portal/src/features/menu-boards/board-comments.css": "ui/features/menu-boards/board-comments.css",
+    "apps/portal/src/features/menu-boards/board-comments.tsx": "ui/features/menu-boards/board-comments.tsx",
+    "apps/portal/src/features/menu-boards/board-history.css": "ui/features/menu-boards/board-history.css",
+    "apps/portal/src/features/menu-boards/board-history.tsx": "ui/features/menu-boards/board-history.tsx",
+    "apps/portal/src/features/menu-boards/board-page-view-source.ts": "ui/features/menu-boards/board-page-view-source.ts",
+    "apps/portal/src/features/menu-boards/board-page-view.ts": "ui/features/menu-boards/board-page-view.ts",
+    "apps/portal/src/features/menu-boards/board-style-panel.css": "ui/features/menu-boards/board-style-panel.css",
+    "apps/portal/src/features/menu-boards/board-style-panel.tsx": "ui/features/menu-boards/board-style-panel.tsx",
+    "apps/portal/src/features/menu-boards/board-view.css": "ui/features/menu-boards/board-view.css",
+    "apps/portal/src/features/menu-boards/board-view.tsx": "ui/features/menu-boards/board-view.tsx",
+    "apps/portal/src/features/menu-boards/board-viewport.tsx": "ui/features/menu-boards/board-viewport.tsx",
+    "apps/portal/src/features/menu-boards/board-workspace.css": "ui/features/menu-boards/board-workspace.css",
+    "apps/portal/src/features/menu-boards/boards-panel.tsx": "ui/features/menu-boards/boards-panel.tsx",
+    "apps/portal/src/features/menu-boards/canvas-agents.css": "ui/features/menu-boards/canvas-agents.css",
+    "apps/portal/src/features/menu-boards/canvas-agents.tsx": "ui/features/menu-boards/canvas-agents.tsx",
+    "apps/portal/src/features/menu-boards/canvas-chrome.css": "ui/features/menu-boards/canvas-chrome.css",
+    "apps/portal/src/features/menu-boards/canvas-chrome.tsx": "ui/features/menu-boards/canvas-chrome.tsx",
+    "apps/portal/src/features/menu-boards/canvas-editor.css": "ui/features/menu-boards/canvas-editor.css",
+    "apps/portal/src/features/menu-boards/canvas-editor.tsx": "ui/features/menu-boards/canvas-editor.tsx",
+    "apps/portal/src/features/menu-boards/canvas-geometry.ts": "ui/features/menu-boards/canvas-geometry.ts",
+    "apps/portal/src/features/menu-boards/canvas-presence-bar.css": "ui/features/menu-boards/canvas-presence-bar.css",
+    "apps/portal/src/features/menu-boards/canvas-presence-bar.tsx": "ui/features/menu-boards/canvas-presence-bar.tsx",
+    "apps/portal/src/features/menu-boards/canvas-rulers.css": "ui/features/menu-boards/canvas-rulers.css",
+    "apps/portal/src/features/menu-boards/canvas-rulers.tsx": "ui/features/menu-boards/canvas-rulers.tsx",
+    "apps/portal/src/features/menu-boards/images-panel.css": "ui/features/menu-boards/images-panel.css",
+    "apps/portal/src/features/menu-boards/images-panel.tsx": "ui/features/menu-boards/images-panel.tsx",
+    "apps/portal/src/features/menu-boards/menu-board-requests.ts": "ui/features/menu-boards/menu-board-requests.ts",
+    "apps/portal/src/features/menu-boards/menu-boards.css": "ui/features/menu-boards/menu-boards.css",
+    "apps/portal/src/features/menu-boards/products-panel.css": "ui/features/menu-boards/products-panel.css",
+    "apps/portal/src/features/menu-boards/products-panel.tsx": "ui/features/menu-boards/products-panel.tsx",
+    "apps/portal/src/features/menu-boards/prompt-edit.css": "ui/features/menu-boards/prompt-edit.css",
+    "apps/portal/src/features/menu-boards/prompt-edit.tsx": "ui/features/menu-boards/prompt-edit.tsx",
+    "apps/portal/src/features/menu-boards/screens-panel.tsx": "ui/features/menu-boards/screens-panel.tsx",
+    "apps/portal/src/features/menu-boards/stack-fields.tsx": "ui/features/menu-boards/stack-fields.tsx",
+    "apps/portal/src/features/menu-boards/start-board.css": "ui/features/menu-boards/start-board.css",
+    "apps/portal/src/features/menu-boards/start-board.tsx": "ui/features/menu-boards/start-board.tsx",
+    "apps/portal/src/features/order-queue/order-queue.css": "ui/features/order-queue/order-queue.css",
+    "apps/portal/src/features/order-queue/requests.ts": "ui/features/order-queue/requests.ts",
+    "apps/portal/src/features/order-queue/route.tsx": "ui/features/order-queue/route.tsx",
+    "apps/portal/src/features/register/modifier-drawer.tsx": "ui/features/register/modifier-drawer.tsx",
+    "apps/portal/src/features/register/receipt-print.tsx": "ui/features/register/receipt-print.tsx",
+    "apps/portal/src/features/register/receipt-requests.ts": "ui/features/register/receipt-requests.ts",
+    "apps/portal/src/features/register/register-surface.ts": "ui/features/register/register-surface.ts",
+    "apps/portal/src/features/register/register.css": "ui/features/register/register.css",
+    "apps/portal/src/features/register/route.tsx": "ui/features/register/route.tsx",
+    "apps/portal/src/features/register/square-pos-handoff.ts": "ui/features/register/square-pos-handoff.ts",
+    "apps/portal/src/features/terminals/api.ts": "ui/features/terminals/api.ts",
+    "apps/portal/src/features/terminals/counter-sale-api.ts": "ui/features/terminals/counter-sale-api.ts",
+    "apps/portal/src/features/terminals/counter-sale-route.tsx": "ui/features/terminals/counter-sale-route.tsx",
+    "apps/portal/src/features/terminals/route.tsx": "ui/features/terminals/route.tsx",
+    "apps/portal/src/features/terminals/styles.css": "ui/features/terminals/styles.css",
+    "services/platform/src/actors/cafe-collaboration-rooms.ts": "server/actors/cafe-collaboration-rooms.ts",
+    "services/platform/src/actors/menu-board-agent-action.ts": "server/actors/menu-board-agent-action.ts",
+    "services/platform/src/actors/menu-board-archive.ts": "server/actors/menu-board-archive.ts",
+    "services/platform/src/actors/menu-board-commands.ts": "server/actors/menu-board-commands.ts",
+    "services/platform/src/actors/menu-board-comments.ts": "server/actors/menu-board-comments.ts",
+    "services/platform/src/actors/menu-board-templates.ts": "server/actors/menu-board-templates.ts",
+    "services/platform/src/actors/menu-board-versions.ts": "server/actors/menu-board-versions.ts",
+    "services/platform/src/actors/menu-boards.ts": "server/actors/menu-boards.ts",
+    "services/platform/src/actors/menu-draft.ts": "server/actors/menu-draft.ts",
+    "services/platform/src/actors/menu-screens.ts": "server/actors/menu-screens.ts",
+    "services/platform/src/agent-tools/commerce/order-queue.ts": "server/agent-tools/commerce/order-queue.ts",
+    "services/platform/src/agent-tools/commerce/register-view.ts": "server/agent-tools/commerce/register-view.ts",
+    "services/platform/src/agent-tools/drafts/board-draft-edit.ts": "server/agent-tools/drafts/board-draft-edit.ts",
+    "services/platform/src/agent-tools/drafts/board-draft-preview.ts": "server/agent-tools/drafts/board-draft-preview.ts",
+    "services/platform/src/agent-tools/drafts/drafts.ts": "server/agent-tools/drafts/drafts.ts",
+    "services/platform/src/agent-tools/drafts/handlers.ts": "server/agent-tools/drafts/handlers.ts",
+    "services/platform/src/agent-tools/drafts/turn-services.ts": "server/agent-tools/drafts/turn-services.ts",
+    "services/platform/src/cafe/contract/cafe-services.ts": "server/contract/cafe-services.ts",
+    "services/platform/src/cafe/contract/media.ts": "server/contract/media.ts",
+    "services/platform/src/cafe/contract/menu-publication.ts": "server/contract/menu-publication.ts",
+    "services/platform/src/cafe/contract/order-queue-commands.ts": "server/contract/order-queue-commands.ts",
+    "services/platform/src/cafe/contract/request-errors.ts": "server/contract/request-errors.ts",
+    "services/platform/src/commerce/counter-printing.ts": "server/counter-printing.ts",
+    "services/platform/src/commerce/counter-receipt.ts": "server/counter-receipt.ts",
+    "services/platform/src/commerce/counter-register.ts": "server/counter-register.ts",
+    "services/platform/src/control/admission/menu-boards.ts": "server/control/admission/menu-boards.ts",
+    "services/platform/src/control/admission/menu-draft.ts": "server/control/admission/menu-draft.ts",
+    "services/platform/src/control/routes/commerce-menu-publication.ts": "server/control/routes/commerce-menu-publication.ts",
+    "services/platform/src/control/routes/counter-policy.ts": "server/control/routes/counter-policy.ts",
+    "services/platform/src/control/routes/counter-receipt.ts": "server/control/routes/counter-receipt.ts",
+    "services/platform/src/control/routes/counter-sale-support.ts": "server/control/routes/counter-sale-support.ts",
+    "services/platform/src/control/routes/counter-sale.ts": "server/control/routes/counter-sale.ts",
+    "services/platform/src/control/routes/menu-boards.ts": "server/control/routes/menu-boards.ts",
+    "services/platform/src/control/routes/menu-draft.ts": "server/control/routes/menu-draft.ts",
+    "services/platform/src/control/routes/menu-screens.ts": "server/control/routes/menu-screens.ts",
+    "services/platform/src/control/routes/order-queue.ts": "server/control/routes/order-queue.ts",
+    "services/platform/src/control/routes/order-times.ts": "server/control/routes/order-times.ts",
+    "services/platform/src/control/routes/sold-out.ts": "server/control/routes/sold-out.ts",
+    "services/platform/src/control/routes/terminal-operations.ts": "server/control/routes/terminal-operations.ts",
+    "services/platform/src/data/counter-sale-readback.ts": "server/data/counter-sale-readback.ts",
+    "services/platform/src/data/screen-pairing.ts": "server/data/screen-pairing.ts",
+    "services/platform/src/data/terminal-assignment-store.ts": "server/data/terminal-assignment-store.ts",
+    "services/platform/src/data/terminal-operations-readback.ts": "server/data/terminal-operations-readback.ts"
+  }
+}
