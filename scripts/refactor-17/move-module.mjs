@@ -568,6 +568,8 @@ const counts = {
   declareModule: 0,
   paths: 0,
 };
+/** The source files that are read again for a quoted path after the edits. */
+const quotedCandidates = [];
 /** package folder -> true, for each package that imports the module by name. */
 const consumers = new Set();
 
@@ -641,17 +643,7 @@ for (const path of tree) {
     return `${lead}${quote}${replacement}${quote}`;
   });
   if (changed > 0) put(path, next, "import");
-  // A quoted path of a moved file that is no import: a person must read it.
-  if (!oldPathOf.has(path)) {
-    for (const match of next.matchAll(QUOTED_RELATIVE)) {
-      const bare = match[2].split(/(?=[?#])/, 2)[0];
-      if (resolveIn(inPlan, posix.dirname(path), bare) === null) continue;
-      const line = next.slice(0, match.index).split("\n").length;
-      faults.push(
-        `${path}:${line}: ${match[0]} names a moved file, and it is not an import that this script knows. Change it by hand, or add an edit to the plan.`,
-      );
-    }
-  }
+  if (!oldPathOf.has(path)) quotedCandidates.push(path);
   if (next.includes(`${packageName}/`) || next.includes(`"${packageName}"`)) {
     const owner = packageFolderOf(path);
     if (owner !== "" && owner !== plan.target) consumers.add(owner);
@@ -987,6 +979,20 @@ for (const plannedEdit of plan.edits ?? []) {
   } else {
     faults.push(
       `${edit.file}: the plan looks for this text, and the file does not have it:\n    ${edit.find}\n  Correct the edit in the plan (${edit.why}).`,
+    );
+  }
+}
+
+// A quoted path of a moved file that is no import, after the edits: a person
+// must read it, and an edit of the plan can change it.
+for (const path of quotedCandidates) {
+  const text = textOf(path);
+  for (const match of text.matchAll(QUOTED_RELATIVE)) {
+    const bare = match[2].split(/(?=[?#])/, 2)[0];
+    if (resolveIn(inPlan, posix.dirname(path), bare) === null) continue;
+    const line = text.slice(0, match.index).split("\n").length;
+    faults.push(
+      `${path}:${line}: ${match[0]} names a moved file, and it is not an import that this script knows. Change it by hand, or add an edit to the plan.`,
     );
   }
 }
