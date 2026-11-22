@@ -1,6 +1,6 @@
 # Plan 91 — Seams Atelier rename
 
-Status: phases 1, 2, 3 and 5 in production (satyr-edge `347178c4`, released from `peitalin/seams-atelier`; the repository is now `seams-tech/pantry`); phases 4 and 6 open. See "Built". On 18 November 2026 the owner renamed Atelier to **Pantry** and Commis to **Gantry**: see "Pantry and Gantry". On 22 November 2026 the owner chose the Purin names, and phase 4 now follows [Plan 93](plan-93-clean-cutover.md): see "Purin names" and "Phase 4 after Plan 93".
+Status: phases 1, 2, 3 and 5 in production (satyr-edge `347178c4`, released from `peitalin/seams-atelier`; the repository is now `seams-tech/pantry`); phase 4 done on 22 November 2026 with the Plan 93 cutover (see "Phase 4 after Plan 93"); phase 6 open. See "Built". On 18 November 2026 the owner renamed Atelier to **Pantry** and Commis to **Gantry**: see "Pantry and Gantry". On 22 November 2026 the owner chose the Purin names, and phase 4 now follows [Plan 93](plan-93-clean-cutover.md): see "Purin names" and "Phase 4 after Plan 93".
 Date: 16 November 2026.
 Owner: Portal, Platform, commerce, docs and the seams-site.
 Replaces: the Antigravity draft `seams_product_rename_plan.md` (outside this
@@ -719,9 +719,43 @@ State on 22 November 2026:
 - **Live.** Since 22 November 2026, 12:30 JST, `pantry.purin.io` serves the
   Purin text (Plan 93 redeploy from dev `f6993814`); the privacy and terms
   pages show "Purin Pantry", so Google brand verification can read them.
-- **4C**: the Google sign-in, the Slack install and the Slack reply passed on
-  the new stack (Plan 93 checks). The Gmail, Drive, Square, Stripe and
-  Shopify connects wait for the owner.
+- **4C, live checks** on `pantry.purin.io`, organisation "Purin workspace",
+  22 November 2026 (in the owner's Chrome, on the owner's request; the
+  owner typed the Square and Shopify passwords). Each provider accepted the
+  new client ID and the new redirect and returned to the new callback:
+
+  | Provider | Result |
+  |---|---|
+  | Google sign-in | Passed (Plan 93 check) |
+  | Slack | Passed: install in CafeOS, and one reply in a #cafe-ops thread (Plan 93 check) |
+  | Gmail | Connected, `purinindustries@gmail.com` |
+  | Google Drive | Connected, `purinindustries@gmail.com`, with the `purin-pantry` client. Google names the app "purin.io" until brand verification passes |
+  | Square | Connected, the Japanese business "Purin Heavy Industries" |
+  | Stripe | Registration works: the new client ID and redirect, and the token exchange (last phase `discovering_identity`). Pantry then refused the account (`provider_account_ineligible`): a blank Stripe test account has no details and no card payments |
+  | Shopify | Registration works: the token exchange and the shop read (last phase `discovering_identity`). Pantry then refused the shop (`provider_environment_mismatch`): `nuki-ub5drbcx.myshopify.com` is a partner development store, and "Purin workspace" is a production organisation |
+
+  The Stripe and Shopify refusals are Pantry's own account rules, not
+  registration faults: a production organisation takes only a Stripe
+  account with active card payments and a live webhook, and only a Shopify
+  store that is not a development store. A full connect needs live Stripe
+  and a real store, or an organisation in the development environment. That
+  choice is outside this plan.
+- **4D, after the Stripe move**: Pantry's two webhook endpoints in the shared
+  Seams account are deleted (it now holds only the Seams Console's two
+  endpoints). Its `pantry.purin.io` redirect stays there, because the
+  Chrome session could not open that account; it is unused, because Pantry
+  no longer sends that client ID. Its `localhost` redirects stay for local
+  development, which still uses that account's keys.
+
+Phase 4 is done, on 22 November 2026. Open items, each outside the switch:
+
+- Airtable, Notion and Meta keep their old names and URLs: Airtable and
+  Notion until they are used on the new stack, Meta until its business
+  verification passes.
+- `satyr-gmail-dev` and `satyr-drive-pilot` go when local development moves
+  to `purin-pantry` (Plan 93 follow-ups).
+- The Dropbox icons (the console needs a native file picker).
+- The owner's choice for full Stripe and Shopify connects (see 4C).
 
 ## Built
 
@@ -815,7 +849,9 @@ State on 17 November 2026:
 - **Not done:** phase 4 (the domain and the provider consoles), phase 6 (a
   new wake model is a research task), a new mark, the seams.sh site release
   (pull request 74 waits for the owner), and the archive of
-  `seams-tech/satyr`.
+  `seams-tech/satyr`. Changed on 22 November 2026: phase 4 is done (see
+  "Phase 4 after Plan 93"), the mark is the Purin cat, and the company site
+  is `purin.io`.
 
 ## Acceptance
 
