@@ -59,17 +59,18 @@ from the dry run of the kernel on an Apple M4 Pro, with other sessions at work.
 
 The quick checks of step 6:
 
-| Check                                                                                                                                                                                      | Time     |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
-| `pnpm lint:static`                                                                                                                                                                         | 1 minute |
-| `pnpm --filter <package> check:types`, the new package alone                                                                                                                               | 1 s      |
-| `pnpm --filter @purin-labs/platform check:types`                                                                                                                                           | 7 s      |
-| `pnpm --filter @purin-labs/platform check:test-types`                                                                                                                                      | 3 s      |
-| `pnpm --filter @purin-labs/portal exec tsc --noEmit -p .`                                                                                                                                  | 34 s     |
-| `pnpm check:packages`                                                                                                                                                                      | 7 s      |
-| `pnpm portal:build`                                                                                                                                                                        | 4 s      |
-| `pnpm exec wrangler deploy --dry-run --env production --outdir <folder>` in `services/platform`. With Docker, it also builds the three container images                                    | 9 s      |
-| The five other Workers: `pnpm --filter @purin-labs/platform` with `code-mode-sandbox:check`, `model-exit:check`, `chatgpt-exit:check`, `vault-onepassword:check` and `slack-ingress:check` | 30 s     |
+| Check                                                                                                                                                                                                                                         | Time     |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `pnpm lint:static`                                                                                                                                                                                                                            | 1 minute |
+| `pnpm --filter <package> check:types`, the new package alone                                                                                                                                                                                  | 1 s      |
+| `pnpm --filter @purin-labs/platform check:types`                                                                                                                                                                                              | 7 s      |
+| `pnpm --filter @purin-labs/platform check:test-types`                                                                                                                                                                                         | 3 s      |
+| `pnpm --filter @purin-labs/portal exec tsc --noEmit -p .`                                                                                                                                                                                     | 34 s     |
+| `pnpm check:packages`                                                                                                                                                                                                                         | 7 s      |
+| `pnpm portal:build`                                                                                                                                                                                                                           | 4 s      |
+| `pnpm exec wrangler deploy --dry-run --env production --outdir <folder>` in `services/platform`. With Docker, it also builds the three container images                                                                                       | 9 s      |
+| The five other Workers: `pnpm --filter @purin-labs/platform` with `code-mode-sandbox:check`, `model-exit:check`, `chatgpt-exit:check`, `vault-onepassword:check` and `slack-ingress:check`                                                    | 30 s     |
+| When the move takes Portal files, one browser journey: start the Portal dev server of the checkout on a free port, then `node scripts/production-simulation/run-journeys.mjs --id persistent-chat-browser --base-url http://127.0.0.1:<port>` | 1 minute |
 
 Rules for the day:
 
@@ -227,6 +228,14 @@ lint:layer-debts` counts these merges.
 - knip judges each export of a foundation package (`includeEntryExports` for
   `foundation/*` in `knip.json`), so a known unused export keeps its line in
   `scripts/unused-ratchet.json` under its new path.
+- A browser journey mounts a page from source files of the Portal dev server.
+  It names a file by its path in the repository: `sourceUrl("<path>")` in the
+  page (`/source-url.js`, which `apps/portal/vite.config.ts` serves) and
+  `checkoutUrl("<path>")` in Node (`scripts/bakery-robots/simulator-navigation.js`).
+  The script changes such a path as it changes each path from the root. It
+  does not read an address below the Portal folder (`/src/styles.css`);
+  `pnpm lint:lint-paths` refuses a journey path of either kind that matches no
+  file.
 
 ## The plan of the next module
 
@@ -351,6 +360,16 @@ package `@purin-labs/area-<name>` in `areas/<name>/`.
   corrected 59 paths of area files in the specs.
 - Not run: the full E2E suite, the Kitchen journeys that need `MUJOCO_DIR` and
   a release.
+- **Found by CI after the group** (run 45071075553 on `e67faac0`): the E2E
+  suite passed, and five browser journeys of the Kitchen failed. A journey
+  imported a Portal file by its address on the dev server
+  (`/src/features/workflow-simulator/route.tsx`), which the script did not
+  read; a file of `areas/` has the address `/@fs/<checkout>/areas/...`. 60
+  imports in 20 journey files were wrong, two of them since the second
+  foundation group. The correction is the last item of "Limits": the dev
+  server gives the address of a file from its path in the repository, the
+  journeys name each file by that path, and `pnpm lint:lint-paths` checks the
+  paths. The check table has a browser journey now.
 
 ## The second group of 2026-11-23
 
