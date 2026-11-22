@@ -41,7 +41,8 @@
 //       cover. The rule of a folder that moved whole goes. A package that
 //       exists keeps its line, which gives the module each file in it.
 //    7. The ratchet files in their own order. No count changes.
-//    8. The text edits of the plan.
+//    8. The text edits of the plan. An edit is done when the file holds its
+//       replace text, also with each path in it that a later plan moved.
 //    9. Prettier, only for a file that this run changed and that was clean
 //       before the change. A file of `keepForm` in the plan keeps each import
 //       on its line, where the wrap of Prettier would move a ratchet.
@@ -214,16 +215,21 @@ async function putJson(path, value, kind) {
 }
 
 // A plan names each file at its place on the day of its move. A later move of
-// another module can take a file of keepForm or of an edit: the plans beside
-// this one give its place now.
+// another module can take a file of keepForm or of an edit, or a folder that
+// the text of an edit names: the plans beside this one give its place now.
 const laterMoves = new Map();
+/** Each plan of the folder, this one first: its module and its moves. */
+const plansHere = [{ module: plan.module, files: planFiles }];
 for (const name of readdirSync(dirname(planPath))) {
   const other = join(dirname(planPath), name);
   if (!name.endsWith(".json") || other === planPath) continue;
   const otherPlan = JSON.parse(readFileSync(other, "utf8"));
+  const files = new Map();
   for (const [from, inside] of Object.entries(otherPlan.files ?? {})) {
+    files.set(from, `${otherPlan.target}/${inside}`);
     laterMoves.set(from, `${otherPlan.target}/${inside}`);
   }
+  plansHere.push({ module: otherPlan.module, files });
 }
 function laterPath(path) {
   let current = path;
@@ -231,6 +237,53 @@ function laterPath(path) {
     current = laterMoves.get(current);
   }
   return known.has(current) ? current : path;
+}
+/** The place now of a folder that a later plan moved whole, or null. */
+const laterFolders = new Map();
+function laterFolder(folder) {
+  if (laterFolders.has(folder)) return laterFolders.get(folder);
+  const prefix = `${folder}/`;
+  let place = null;
+  if (!tree.some((path) => path.startsWith(prefix))) {
+    // The last plan in foundationOrder that moved a file of the folder moved
+    // the rest of it, and the name of the folder with it.
+    const rank = (module) =>
+      layerMapAtStart.foundationOrder.indexOf(posix.basename(module));
+    const last = plansHere
+      .filter(({ files }) =>
+        [...files.keys()].some((from) => from.startsWith(prefix)),
+      )
+      .sort((a, b) => rank(b.module) - rank(a.module))[0];
+    if (last !== undefined && last.files !== planFiles) {
+      const places = new Set(
+        [...last.files]
+          .filter(([from]) => from.startsWith(prefix))
+          .map(([from, to]) => {
+            const tail = from.slice(folder.length);
+            return to.endsWith(tail) ? to.slice(0, -tail.length) : null;
+          }),
+      );
+      if (places.size === 1 && !places.has(null)) place = [...places][0];
+    }
+  }
+  laterFolders.set(folder, place);
+  return place;
+}
+const PATH_IN_TEXT =
+  /(?<![\w./@-])((?:apps|packages|services)\/[\w@.*/{},-]+)/g;
+/** A text of the plan, with each path that a later plan moved at its place. */
+function laterText(text) {
+  return text.replace(PATH_IN_TEXT, (path) => {
+    const file = laterPath(path);
+    if (file !== path) return file;
+    const parts = path.split("/");
+    for (let end = parts.length - 1; end > 1; end -= 1) {
+      const folder = parts.slice(0, end).join("/");
+      const place = laterFolder(folder);
+      if (place !== null) return place + path.slice(folder.length);
+    }
+    return path;
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -911,8 +964,11 @@ for (const plannedEdit of plan.edits ?? []) {
   const text = textOf(edit.file);
   if (text === null) {
     faults.push(`${edit.file}: the plan edits it, and it does not exist`);
-  } else if (text.includes(edit.replace)) {
-    // Done by an earlier run.
+  } else if (
+    text.includes(edit.replace) ||
+    text.includes(laterText(edit.replace))
+  ) {
+    // Done by an earlier run. A later move can have moved a path in it.
   } else if (text.includes(edit.find)) {
     put(edit.file, text.split(edit.find).join(edit.replace), "config");
   } else {
