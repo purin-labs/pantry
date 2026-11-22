@@ -998,10 +998,17 @@ for (const path of tree) {
       map.covers.push(`${plan.target.split("/")[0]}/`);
     }
   }
-  // A rule of this module whose folder holds no file after the move: the
-  // move took the whole folder to a folder of another name.
+  // A rule whose folder holds no file after the move: the move took the
+  // whole folder to a folder of another name, or it took the last files of
+  // a folder whose rule names another module (services/platform/src/commerce/
+  // of areas/commerce, whose last files are kitchen files that leave it with
+  // the kitchen move).
   for (const key of Object.keys(map.rules)) {
-    if (map.rules[key] !== plan.module || key.startsWith(rule)) continue;
+    if (key.startsWith(rule)) continue;
+    const ours =
+      map.rules[key] === plan.module ||
+      [...planFiles.keys()].some((from) => from.startsWith(key));
+    if (!ours) continue;
     if (!tree.some((path) => path.startsWith(key))) delete map.rules[key];
   }
   await putJson(LAYER_MAP, map, "layer map");
