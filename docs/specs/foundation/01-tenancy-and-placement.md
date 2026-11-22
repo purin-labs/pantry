@@ -43,7 +43,7 @@ domain state.
   `ORGANISATION_DB_APAC` or `ORGANISATION_DB_EU`. A profile can also bind a cell to
   `DB` itself. The baseline is `migrations-regional/0001_current_schema.sql`, with 193
   tables.
-- Each handle has a type (`services/platform/src/database-handles.ts`). `GlobalDatabase`
+- Each handle has a type (`foundation/kernel/database-handles.ts`). `GlobalDatabase`
   is `env.DB`. `OrganisationDatabase` is the regional database that the placement
   selected. A call that passes the wrong database is a type error.
 - A brand is a type-only property. At run time, a handle is the binding itself.
