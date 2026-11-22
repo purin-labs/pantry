@@ -407,7 +407,9 @@ const LEADS = [
   String.raw`\bimport\s*(?:\(\s*)?`,
   String.raw`\bdeclare\s+module\s+`,
   String.raw`\brequire\s*\(\s*`,
-  String.raw`\bvi\.(?:mock|doMock|unmock|doUnmock|importActual|importMock)\s*\(\s*`,
+  // `vi.importActual<Record<string, unknown>>(…)`: a type argument with one
+  // level of nesting.
+  String.raw`\bvi\.(?:mock|doMock|unmock|doUnmock|importActual|importMock)\s*(?:<(?:[^<>()]|<[^<>()]*>)*>)?\s*\(\s*`,
   String.raw`\bnew\s+(?:Node)?U(?:RL|rl)\s*\(\s*`,
   String.raw`\bimport\.meta\.(?:glob|resolve)\s*\(\s*`,
 ];
