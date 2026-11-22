@@ -637,8 +637,8 @@ records. An E2E file writes and reads Organisation records through
 `tests/e2e/organisation-database.ts`. A fixture that writes an Organisation
 row itself calls `publishGlobalOrganisation(id)` before it writes global rows
 that name the Organisation, as onboarding does.
-`check:test-types` stops before the E2E files while the baseline has type errors;
-run `pnpm exec tsrs -p tsconfig.e2e.json` in `services/platform`.
+`check:test-types` checks the unit test files (`tsconfig.tests.json`) and then
+the E2E files (`tsconfig.e2e.json`).
 The Plan 24 cobot journeys build the controller simulator: set `MUJOCO_DIR`
 to an SDK from `node scripts/bakery-robots/install-native-sdk.mjs <dir>`, or
 `PANTRY_COBOT_CONTROLLER_BINARY` to a built `cobot-controller`. CI does the same.

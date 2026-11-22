@@ -7,7 +7,7 @@ plan.
 
 ## Scope
 
-- Each Platform unit test file: 300 files under `services/platform/tests`, without the
+- Each Platform unit test file: 301 files under `services/platform/tests`, without the
   journeys in `tests/e2e`.
 - Each commerce test file that imports a source file that Refactor 17 changed: 17 files
   under `services/commerce/tests`. The first Refactor 17 commit is `0ad79a20`.
@@ -16,7 +16,7 @@ plan.
 
 | Decision                                                           | Files |
 | ------------------------------------------------------------------ | ----: |
-| Keep: the only check of an authorization, money or data outcome    |   249 |
+| Keep: the only check of an authorization, money or data outcome    |   250 |
 | Keep: it asserts an outcome of product code, and no journey has it |    56 |
 | Keep: one case for each distinct outcome of a fault                |    11 |
 | Keep the file, delete one case                                     |     1 |
@@ -201,7 +201,7 @@ tests became 302 files and 1,732 tests. This pass looked for what that sweep lef
 | `whatsapp-send.test.ts`                                 |    11 | WhatsApp replies send once, refuse on handoff, revoked connection or stale proposal, and quarantine uncertain sends.                      | Keep: the only check of an authorization, money or data outcome                                                                                                                                                              |
 | `workspace-ai-budget.test.ts`                           |     2 | Workspace AI budget limits have finite defaults, fenced changes, organisation isolation and boundary validation.                          | Keep: the only check of an authorization, money or data outcome                                                                                                                                                              |
 
-### Stored data, idempotency and replay (74 files, 404 cases)
+### Stored data, idempotency and replay (75 files, 411 cases)
 
 | File                                             | Cases | The outcome that it checks                                                                                                                                                                     | Decision                                                           |
 | ------------------------------------------------ | ----: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
@@ -223,6 +223,7 @@ tests became 302 files and 1,732 tests. This pass looked for what that sweep lef
 | `agent-session-harness-checkpoint.test.ts`       |     7 | Session checkpoints are immutable, bound to organisation and budget, and restore across turns.                                                                                                 | Keep: the only check of an authorization, money or data outcome    |
 | `bakery-runs.test.ts`                            |     1 | A storage failure in saved bakery runs gives a retryable error and never reports a saved run.                                                                                                  | Keep: the only check of an authorization, money or data outcome    |
 | `bakery-surface-effect.test.ts`                  |    11 | Kitchen effects settle once, reject bad or late receipts and recover after faults.                                                                                                             | Keep: one case for each distinct outcome of a fault                |
+| `bakery-workspace-runs-panel.test.mjs`           |     7 | A Kitchen run save keeps its exact bytes and recovery id after the panel unmounts or a response is lost, and a stale page or late message never replaces the current run.                      | Keep: the only check of an authorization, money or data outcome    |
 | `case-context-discovery-operational.test.ts`     |     7 | Discovery settles evaluations, rolls back on failure and keeps shadow results out of the store.                                                                                                | Keep: one case for each distinct outcome of a fault                |
 | `case-quarantined-discard.test.ts`               |     2 | A quarantined Case is cleared only when its durable identity matches; any other conflict keeps state.                                                                                          | Keep: the only check of an authorization, money or data outcome    |
 | `commerce-entity-plane-activity.test.ts`         |     4 | Entity activity and receipts are read by the exact entity reference.                                                                                                                           | Keep: it asserts an outcome of product code, and no journey has it |
@@ -365,7 +366,7 @@ tests became 302 files and 1,732 tests. This pass looked for what that sweep lef
 | `typesafe-connection-probe.test.ts`               |     2 | The TypeSafe connection probe reports success and failure of the provider call.                                                                                                      | Keep: it asserts an outcome of product code, and no journey has it |
 | `whatsapp-provider.test.ts`                       |    13 | WhatsApp signup, phone discovery, subscription, send timeouts and token handling against the Meta provider, including no token leaks.                                                | Keep: the only check of an authorization, money or data outcome    |
 
-### Agent turns, tools and harness (19 files, 133 cases)
+### Agent turns, tools and harness (19 files, 132 cases)
 
 | File                                              | Cases | The outcome that it checks                                                                                                                                                 | Decision                                                           |
 | ------------------------------------------------- | ----: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
@@ -381,7 +382,7 @@ tests became 302 files and 1,732 tests. This pass looked for what that sweep lef
 | `nf9-checkpoint-classification.test.ts`           |     6 | Checkpoints are classified so unfinished work replays or blocks correctly                                                                                                  | Keep: it asserts an outcome of product code, and no journey has it |
 | `pinned-agent-profile.test.ts`                    |     6 | Pinned agent profile stays the same through a session                                                                                                                      | Keep: it asserts an outcome of product code, and no journey has it |
 | `plan15-case-walking-path.test.ts`                |    15 | Case walking path from Slack ingress to delivery, with recovery                                                                                                            | Keep: it asserts an outcome of product code, and no journey has it |
-| `portal-chat.test.ts`                             |    19 | Persistent chat keeps private history, idempotent commands, retry fences and credential boundaries against D1.                                                             | Keep: the only check of an authorization, money or data outcome    |
+| `portal-chat.test.ts`                             |    18 | Persistent chat keeps private history, idempotent commands, retry fences and credential boundaries against D1.                                                             | Keep: the only check of an authorization, money or data outcome    |
 | `session-turn-stream.test.ts`                     |    10 | Session turn stream keeps ordered, resumable, non-duplicated output.                                                                                                       | Keep: it asserts an outcome of product code, and no journey has it |
 | `slack-stop-command.test.ts`                      |     3 | The Slack stop command is recognised only when meant and stops the running work.                                                                                           | Keep: it asserts an outcome of product code, and no journey has it |
 | `transient-email-turn.test.ts`                    |     9 | A transient email turn returns a reply, keeps nothing, validates bodies, tears down on failure and deadline.                                                               | Keep: it asserts an outcome of product code, and no journey has it |
