@@ -175,7 +175,9 @@ OpenRouter route of Purin AI goes direct.
   `max_instances` 1, Actor name `chatgpt-exit`, location hint `apac-ne`. It sleeps after
   one idle hour. Node 24 runs `server.mjs` and the shared `forward.ts`.
 - The container answers HTTP 503 `chatgpt_exit_location_refused` when its trace
-  location is `CN`, `HK` or `MO`.
+  location is `CN`, `HK` or `MO`, and `chatgpt_exit_location_unknown` when the trace
+  read fails or names no country. It keeps only a location that names a country, so
+  the next request reads an unknown location again.
 - Each exit names its data centre in the response header `x-pantry-exit-colo`
   (`unknown` when it is not known). A refused ChatGPT model request adds it to the trace
   `session.chatgpt_model_request_refused` as `exit_colo`.

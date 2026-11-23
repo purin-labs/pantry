@@ -29,9 +29,17 @@ async function serve(incoming, outgoing) {
     return;
   }
   const { colo, loc } = await readLocation();
-  const response = REFUSED_LOCATIONS.has(loc)
-    ? exitRefusal(503, "chatgpt_exit_location_refused", colo)
-    : await forwardChatGptRequest(await toRequest(incoming), { fetch, colo });
+  // An unknown location is refused too: the refusal must not depend on a
+  // trace read that worked. The next request reads the location again.
+  const response =
+    loc === null
+      ? exitRefusal(503, "chatgpt_exit_location_unknown", colo)
+      : REFUSED_LOCATIONS.has(loc)
+        ? exitRefusal(503, "chatgpt_exit_location_refused", colo)
+        : await forwardChatGptRequest(await toRequest(incoming), {
+            fetch,
+            colo,
+          });
   outgoing.writeHead(response.status, Object.fromEntries(response.headers));
   if (response.body === null) outgoing.end();
   else Readable.fromWeb(response.body).pipe(outgoing);
@@ -52,7 +60,11 @@ async function toRequest(incoming) {
   });
 }
 
-/** The data centre and country that the provider sees; read once. */
+/**
+ * The data centre and country that the provider sees. A read that names a
+ * country is kept; a failed read or a trace with no country is tried again
+ * with the next request.
+ */
 async function readLocation() {
   if (location !== null) return location;
   try {
@@ -65,7 +77,12 @@ async function readLocation() {
         .split("\n")
         .map((line) => line.split("=")),
     );
-    location = { colo: fields.colo ?? null, loc: fields.loc ?? null };
+    const read = {
+      colo: fields.colo || null,
+      loc: /^[A-Z]{2}$/u.test(fields.loc ?? "") ? fields.loc : null,
+    };
+    if (read.loc === null) return read;
+    location = read;
     console.log(
       JSON.stringify({
         event: "chatgpt_exit.location",
@@ -75,7 +92,6 @@ async function readLocation() {
     );
     return location;
   } catch {
-    // A failed read is tried again with the next request.
     return { colo: null, loc: null };
   }
 }
