@@ -1,4 +1,6 @@
-"""Build and verify the MuJoCo mechanical, movable stud-pitch bracket, 6-pipe tray contact, and drip-drying model for the Maruzen BPS30-12B."""
+"""Build and verify the MuJoCo 4.0 mechanical, movable stud-pitch bracket, 6-pipe tray contact, and drip-drying model for the Maruzen BPS30-12B."""
+
+from __future__ import annotations
 
 import csv
 import hashlib
@@ -9,10 +11,28 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from appliance_physics_kit import (
+    BLENDER_BIN,
+    COL_ACCESSORY_RGBA,
+    COL_ARTIC_RGBA,
+    COL_BASE_RGBA,
+    ROOT,
+    SITE_GRASP_RGBA,
+    SITE_SUPPORT_RGBA,
+    X_AXIS_QUAT,
+    add_adjacent_excludes,
+    add_standard_defaults,
+    emit_standalone_models,
+    export_and_verify_native_xml as kit_export_native_xml,
+    numbers,
+    prepare_blender_assembly,
+    verify_frames_and_motions as kit_verify_frames_and_motions,
+    write_xml,
+)
+
 ASSETS = ROOT / "assets/bakery-mujoco/maruzen-bps30-12b"
 DOCS_DIR = ROOT / "docs/equipment/maruzen-bps30-12b"
-BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
 
 NAMES = (
     "bps_shelf",
@@ -55,61 +75,10 @@ VISUAL_AXES = {
 }
 
 
-def numbers(values):
-    return " ".join(f"{value:.9g}" for value in values)
-
-
-def write_xml(path: Path, element: ET.Element):
-    ET.indent(element, space="  ")
-    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
-
-
 def export_blender_meshes_and_xml():
-    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml and scene.xml."""
-    import bpy
-
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from build_oven_visuals import export_visual_meshes
-
+    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml, scene.xml, model.xml, and tray_model.xml."""
     source = ASSETS / "maruzen-bps30-12b.blend"
-    bpy.ops.wm.open_mainfile(filepath=str(source))
-    bpy.context.scene.frame_set(1)
-    for obj in list(bpy.data.objects):
-        obj.animation_data_clear()
-    bpy.context.view_layer.update()
-
-    parts = [bpy.data.objects[name] for name in NAMES]
-    poses = {obj.name: obj.matrix_world.copy() for obj in parts}
-
-    # Reparent every child mesh to its nearest ancestor in NAMES while preserving world pose
-    for obj in list(parts[0].children_recursive):
-        if obj.type != "MESH" and obj not in parts:
-            continue
-        parent = obj.parent
-        while parent is not None and parent not in parts:
-            parent = parent.parent
-        if parent is None:
-            continue
-        pose = obj.matrix_world.copy()
-        obj.animation_data_clear()
-        obj.parent = parent
-        obj.matrix_world = pose
-        if obj.type == "MESH" and len(obj.data.vertices) >= 3:
-            zs = [v.co.z for v in obj.data.vertices]
-            if max(zs) - min(zs) < 1e-5:
-                obj.data.vertices[0].co.z += 2e-5
-                obj.data.update()
-    bpy.context.view_layer.update()
-
-    for mat in bpy.data.materials:
-        if "metallic" not in mat:
-            mat["metallic"] = 0.0
-        if "roughness" not in mat:
-            mat["roughness"] = 0.30
-        if "emission" not in mat:
-            mat["emission"] = 0.0
-
-    export_visual_meshes(parts, ASSETS)
+    parts, poses = prepare_blender_assembly(source, NAMES, ASSETS)
 
     app = ET.Element(
         "mujoco",
@@ -118,6 +87,8 @@ def export_blender_meshes_and_xml():
     ET.SubElement(app, "compiler", angle="radian")
     ET.SubElement(app, "option", timestep="0.002", integrator="implicitfast")
     ET.SubElement(app, "size", nuserdata="8")
+
+    defaults = add_standard_defaults(app, friction="0.55 0.015 0.003")
 
     asset = ET.SubElement(app, "asset")
     ET.SubElement(asset, "include", file="visual_assets.xml")
@@ -131,7 +102,7 @@ def export_blender_meshes_and_xml():
         size="1.5 1.5 0.05",
         rgba="0.28 0.30 0.32 1",
         contype="1",
-        conaffinity="3",
+        conaffinity="1",
     )
 
     bodies = {}
@@ -175,22 +146,22 @@ def export_blender_meshes_and_xml():
     brk_r = bodies["bps_bracket_right"]
     tray = bodies["bps_drying_tray"]
 
-    # Six horizontal Ø16 mm (radius = 0.0080 m) cylinder collision geoms spanning full 1,200 mm width!
-    # Open 34 mm drip-through gaps remain unobstructed between adjacent cylinders.
-    x_axis_quat = "0.707106781 0 0.707106781 0"
+    # Six horizontal Ø16 mm (radius = 0.0080 m) capsule collision geoms spanning full 1,200 mm width
+    # (matching the crowned chrome end caps at X = ±0.600 m and preserving 34 mm drip-through gaps).
     for idx, py in enumerate(PIPE_YS, 1):
         ET.SubElement(
             shelf,
             "geom",
             name=f"bps_pipe_{idx:02d}_col",
-            type="cylinder",
+            type="capsule",
             pos=numbers((0.0, py, PIPE_CENTER_Z)),
-            quat=x_axis_quat,
-            size=numbers((PIPE_RADIUS, 0.6000)),
-            friction="0.45 0.005 0.0001",
-            contype="2",
+            quat=X_AXIS_QUAT,
+            size=numbers((PIPE_RADIUS, 0.5920)),
+            friction="0.45 0.015 0.003",
+            contype="1",
             conaffinity="1",
             group="3",
+            rgba=COL_BASE_RGBA,
         )
 
     ET.SubElement(
@@ -199,7 +170,8 @@ def export_blender_meshes_and_xml():
         name="bps_rack_center_site",
         pos="0 0 0.2200",
         size="0.008",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         shelf,
@@ -208,7 +180,8 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 -0.0050 0.2205",
         size="0.2200 0.1450 0.0040",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
 
     # Left & right movable triangular wall brackets sliding along rear rail (axis="1 0 0", touching Z = 0)
@@ -226,28 +199,81 @@ def export_blender_meshes_and_xml():
             range=jrange,
             damping="8.0",
             armature="0.005",
+            frictionloss="0.05",
+            solreffriction="0.004 1",
+            solreflimit="0.005 1",
         )
         ET.SubElement(
             b_el,
             "geom",
             name=f"{prefix}_wall_flange_col",
             type="box",
-            pos="0 0.1465 0.1090",
-            size="0.0180 0.0035 0.1090",
-            contype="2",
-            conaffinity="0",
+            pos="0 0.1455 0.1200",
+            size="0.0090 0.0045 0.1200",
+            contype="1",
+            conaffinity="1",
             group="3",
+            rgba=COL_ARTIC_RGBA,
         )
         ET.SubElement(
             b_el,
             "geom",
             name=f"{prefix}_support_arm_col",
             type="box",
-            pos="0 0.0020 0.1970",
-            size="0.0120 0.1410 0.0070",
-            contype="2",
-            conaffinity="0",
+            pos="0 -0.0040 0.2120",
+            size="0.0090 0.1460 0.0110",
+            contype="1",
+            conaffinity="1",
             group="3",
+            rgba=COL_ARTIC_RGBA,
+        )
+        ET.SubElement(
+            b_el,
+            "geom",
+            name=f"{prefix}_arch_upper_col",
+            type="capsule",
+            fromto="0 -0.088 0.198 0 0.078 0.140",
+            size="0.0095",
+            contype="1",
+            conaffinity="1",
+            group="3",
+            rgba=COL_ARTIC_RGBA,
+        )
+        ET.SubElement(
+            b_el,
+            "geom",
+            name=f"{prefix}_arch_lower_col",
+            type="capsule",
+            fromto="0 0.078 0.140 0 0.138 0.036",
+            size="0.0095",
+            contype="1",
+            conaffinity="1",
+            group="3",
+            rgba=COL_ARTIC_RGBA,
+        )
+        ET.SubElement(
+            b_el,
+            "geom",
+            name=f"{prefix}_web_upper_col",
+            type="box",
+            pos="0 0.0480 0.1780",
+            size="0.0075 0.0960 0.0270",
+            contype="1",
+            conaffinity="1",
+            group="3",
+            rgba=COL_ARTIC_RGBA,
+        )
+        ET.SubElement(
+            b_el,
+            "geom",
+            name=f"{prefix}_web_lower_col",
+            type="box",
+            pos="0 0.1180 0.1180",
+            size="0.0075 0.0300 0.0520",
+            contype="1",
+            conaffinity="1",
+            group="3",
+            rgba=COL_ARTIC_RGBA,
         )
         ET.SubElement(
             b_el,
@@ -255,16 +281,17 @@ def export_blender_meshes_and_xml():
             name=f"{prefix}_stud_anchor",
             pos="0 0.1500 0.1620",
             size="0.006",
-            group="3",
+            group="4",
+            rgba=SITE_SUPPORT_RGBA,
         )
 
     # 6-DOF free inverted 400 x 300 x 20 mm washed aluminum baking tray resting on the 6 Ø16 mm pipes
     ET.SubElement(tray, "freejoint", name="bps_drying_tray_free")
     for tname, tpos, tsize in (
-        ("bps_tray_left_rim_col", (-0.1920, 0.0, 0.0025), (0.0080, 0.1480, 0.0025)),
-        ("bps_tray_right_rim_col", (0.1920, 0.0, 0.0025), (0.0080, 0.1480, 0.0025)),
-        ("bps_tray_front_rim_col", (0.0, -0.1420, 0.0025), (0.1840, 0.0080, 0.0025)),
-        ("bps_tray_rear_rim_col", (0.0, 0.1420, 0.0025), (0.1840, 0.0080, 0.0025)),
+        ("bps_tray_left_rim_col", (-0.1920, 0.0, 0.0085), (0.0080, 0.1480, 0.0085)),
+        ("bps_tray_right_rim_col", (0.1920, 0.0, 0.0085), (0.0080, 0.1480, 0.0085)),
+        ("bps_tray_front_rim_col", (0.0, -0.1420, 0.0085), (0.1840, 0.0080, 0.0085)),
+        ("bps_tray_rear_rim_col", (0.0, 0.1420, 0.0085), (0.1840, 0.0080, 0.0085)),
         ("bps_tray_top_deck_col", (0.0, 0.0, 0.0185), (0.1880, 0.1380, 0.0015)),
     ):
         ET.SubElement(
@@ -274,10 +301,11 @@ def export_blender_meshes_and_xml():
             type="box",
             pos=numbers(tpos),
             size=numbers(tsize),
-            friction="0.45 0.005 0.0001",
+            friction="0.45 0.015 0.003",
             contype="1",
-            conaffinity="2",
+            conaffinity="1",
             group="3",
+            rgba=COL_ACCESSORY_RGBA,
         )
     ET.SubElement(
         tray,
@@ -285,7 +313,8 @@ def export_blender_meshes_and_xml():
         name="vessel_socket",
         pos="0 0 0.0200",
         size="0.006",
-        group="3",
+        group="4",
+        rgba=SITE_GRASP_RGBA,
     )
     ET.SubElement(
         tray,
@@ -294,7 +323,8 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 0 0.0025",
         size="0.2010 0.1510 0.0035",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     payload = ET.SubElement(tray, "body", name="ingredient_payload", pos="0 0 0")
     ET.SubElement(
@@ -316,6 +346,16 @@ def export_blender_meshes_and_xml():
         contype="0",
         conaffinity="0",
         mass="0",
+    )
+
+    # Contact exclusions between pipe shelf and movable brackets (free tray remains free to rest on pipes)
+    contact = add_adjacent_excludes(
+        app,
+        (
+            ("exclude_shelf_bracket_left", "bps_shelf", "bps_bracket_left"),
+            ("exclude_shelf_bracket_right", "bps_shelf", "bps_bracket_right"),
+            ("exclude_brackets_pair", "bps_bracket_left", "bps_bracket_right"),
+        ),
     )
 
     # Actuators
@@ -359,6 +399,18 @@ def export_blender_meshes_and_xml():
     write_xml(ASSETS / "appliance.xml", app)
     write_xml(ASSETS / "scene.xml", app)
 
+    emit_standalone_models(
+        ASSETS,
+        model_name="bps_shelf",
+        defaults=defaults,
+        asset=asset,
+        root_body=shelf,
+        contact=contact,
+        sensors=sensors,
+        exclude_sensors=("bps_tray_touch", "bps_tray_rel_rack"),
+        accessories=(("tray_model.xml", "bps_drying_tray", tray),),
+    )
+
     (ASSETS / "physics-export.json").write_text(
         json.dumps(
             {
@@ -376,7 +428,7 @@ def export_blender_meshes_and_xml():
                     "y_positions_m": list(PIPE_YS),
                 },
                 "bracket_stud_pitch_range_m": [0.300, 0.940],
-                "scope": "Articulated MuJoCo movable-bracket wall pipe shelf with 6 Ø16 mm cylinder collision geoms and 6-DOF free inverted 400x300x20 mm drying baking tray.",
+                "scope": "Articulated MuJoCo 4.0 movable-bracket wall pipe shelf with 6 Ø16 mm cylinder collision geoms and 6-DOF free inverted 400x300x20 mm drying baking tray.",
             },
             indent=2,
         )
@@ -384,55 +436,15 @@ def export_blender_meshes_and_xml():
     )
 
 
-def strip_visual_meshes(root: ET.Element, model):
-    for parent in root.iter():
-        for geom in list(parent):
-            if geom.tag != "geom" or not geom.get("name"):
-                continue
-            index = model.geom(geom.get("name")).id
-            if (
-                model.geom_contype[index] == 0
-                and model.geom_conaffinity[index] == 0
-                and geom.get("type") == "mesh"
-                and geom.get("mass") == "0"
-            ):
-                parent.remove(geom)
-
-
 def export_native_xml(mujoco, np):
-    spec = mujoco.MjSpec.from_file(str(ASSETS / "scene.xml"))
-    model = spec.compile()
-    data = mujoco.MjData(model)
-    mujoco.mj_forward(model, data)
-
-    root = ET.fromstring(spec.to_xml())
-    strip_visual_meshes(root, model)
-    used_meshes = {geom.get("mesh") for geom in root.iter("geom")}
-    used_materials = {geom.get("material") for geom in root.iter("geom")}
-    assets = root.find("asset")
-    if assets is not None:
-        for asset in list(assets):
-            if (asset.tag == "mesh" and asset.get("name") not in used_meshes) or (
-                asset.tag == "material" and asset.get("name") not in used_materials
-            ):
-                assets.remove(asset)
-    for actuator in root.iter("general"):
-        actuator.attrib.pop("input", None)
-    ET.indent(root, space="  ")
-    native_path = ASSETS / "native.xml"
-    native_path.write_text(ET.tostring(root, encoding="unicode") + "\n")
-
-    rebuilt = mujoco.MjModel.from_xml_path(str(native_path))
+    model, rebuilt = kit_export_native_xml(ASSETS, "maruzen-bps30-12b", mujoco, np)
     parity = {}
     for field in ("body_mass", "body_inertia", "qpos0", "dof_damping"):
         arr_orig = getattr(model, field)
         arr_reb = getattr(rebuilt, field)
-        max_diff = float(np.max(np.abs(arr_orig - arr_reb))) if arr_orig.size else 0.0
-        if not np.allclose(arr_orig, arr_reb, rtol=1e-5, atol=1e-9):
-            raise RuntimeError(f"Export changed native {field} for maruzen-bps30-12b (max_diff={max_diff})")
-        parity[f"{field}_max_abs_diff"] = max_diff
-    if (rebuilt.nq, rebuilt.nv) != (model.nq, model.nv):
-        raise RuntimeError(f"Export changed native degrees of freedom: {(rebuilt.nq, rebuilt.nv)} vs {(model.nq, model.nv)}")
+        parity[f"{field}_max_abs_diff"] = (
+            float(np.max(np.abs(arr_orig - arr_reb))) if arr_orig.size else 0.0
+        )
     parity["nq"] = int(rebuilt.nq)
     parity["nv"] = int(rebuilt.nv)
     parity["total_body_mass_kg"] = round(float(np.sum(rebuilt.body_mass[1:])), 6)
@@ -440,44 +452,9 @@ def export_native_xml(mujoco, np):
 
 
 def write_docs(report: dict):
-    DOCS_DIR.mkdir(parents=True, exist_ok=True)
     s = report["stages"]
 
-    equip_readme = f"""# Maruzen BPS30-12B — SUS430 Commercial Wall Drainer Pipe Shelf
-
-Manufacturer: **Maruzen Co., Ltd.** (`株式会社マルゼン`)
-Series: **430 Bream Series** (`ブリームシリーズ`)
-Model: **BPS30-12B** (`マルゼン パイプ棚 BPS30-12B`)
-Category: Wall-mounted stainless-steel dish, utensil, and baking-tray drainer pipe shelf (matching `BS2-126N` `1,200 mm` two-compartment sink width)
-
-## Verified Specifications
-
-| Parameter | Value | Source |
-| --- | --- | --- |
-| Overall unit envelope (`W × D × H`) | `1,200 × 300 × 240 mm` (`1.200 × 0.300 × 0.240 m`) | Maruzen `430 Bream Series` `BPS30-12B` specification |
-| Pipe count & tube diameter | `6` parallel round tubes × `Ø16 mm` (`0.016 m`), `50 mm` center pitch (`34 mm` open drip gaps, full `1,200 mm` open-end span) | Maruzen Drawing `06869` (`BPS30-12B`) |
-| Shelf & tube material | `SUS430` ferritic stainless steel tubes + crowned mirror-chrome resin end caps (`キャップ 樹脂メッキ付`) | Maruzen Drawing `06869` |
-| Wall brackets (`ブラケット`) | `2` movable `ADC` die-cast aluminum (`アルミ鋳物`) through-pipe brackets with `6` pipe collars, `5` open cast web windows, curved arch gussets, and `M4 × 6` hex socket set screws | Maruzen Drawing `06869` & Catalogue `48010` |
-| Adjustable wall-stud pitch | Nominal `700 mm` at rest (`X = ±0.350 m`); adjustable across `300 – 940 mm` (`900 mm` verified in active state) | Modeled rail slide limits (`[-0.120, +0.200]` / `[-0.200, +0.120] m`) |
-| Shelf unit mass | `6.200 kg` (`4.760 kg` 6-pipe rack & rail + `2 × 0.720 kg` brackets) | Component mass schedule |
-| Included drying load (`bps_drying_tray`) | `0.850 kg` inverted `400 × 300 × 20 mm` washed aluminum baking tray (`7.050 kg` combined scene mass) | Satyr Kitchen wash-area fixture configuration |
-
-## Geometry & Coordinate Mapping
-
-The [Blender 5.2 visual asset and MuJoCo 3.13 physics package](../../../assets/bakery-mujoco/maruzen-bps30-12b/README.md) use metres with `Z` up, operator front toward `-Y`, and rear wall mounting plane at `Y = +0.1500 m`:
-
-- **X axis (width):** `[-0.6000, +0.6000] m` (`1,200.0 mm`).
-- **Y axis (depth):** `[-0.1500, +0.1500] m` (`300.0 mm`, 6 `Ø16 mm` tubes at `Y = -0.130, -0.080, -0.030, +0.020, +0.070, +0.120 m`).
-- **Z axis (height):** `[0.0000, +0.2400] m` (`240.0 mm`, lower tips of both triangular wall brackets at `Z = 0.0000 m`, `Ø16 mm` pipe top support plane at `Z = +0.2200 m`, side retainer top rail & inverted `20 mm` tray top at `Z = +0.2400 m`; wall installation typically mounts `Z = 0.000 m` at `1.260 – 1.360 m` above floor over the `BS2-126N` sink splashback).
-- **Retained physics bodies (`NAMES`):**
-  - `bps_shelf`: Fixed `1,200 × 300 mm` 6-pipe rack with 6 horizontal `Ø16 mm` cylinder collision geoms (`4.760 kg`).
-  - `bps_bracket_left`: Left movable wall bracket (`slide` `bps_bracket_left_slide`, axis `1 0 0`, `-0.120 .. +0.200 m`, `0.720 kg`).
-  - `bps_bracket_right`: Right movable wall bracket (`slide` `bps_bracket_right_slide`, axis `1 0 0`, `-0.200 .. +0.120 m`, `0.720 kg`).
-  - `bps_drying_tray`: 6-DOF `freejoint` (`bps_drying_tray_free`) inverted `400 × 300 × 20 mm` baking tray (`0.850 kg`) with `vessel_socket` and `ingredient_payload`.
-"""
-    (DOCS_DIR / "README.md").write_text(equip_readme, encoding="utf-8")
-
-    asset_readme = f"""# Maruzen BPS30-12B — Blender 5.2 & MuJoCo 3.13 Asset Package
+    asset_readme = f"""# Maruzen BPS30-12B — Blender 5.2 & MuJoCo 4.0 Asset Package
 
 Commercial `SUS430` wall drainer pipe shelf (`マルゼン ブリームシリーズ パイプ棚 BPS30-12B`, `1,200 × 300 × 240 mm`, `6.200 kg` unit + `0.850 kg` inverted `400 × 300 × 20 mm` baking tray).
 See the [equipment specification sheet](../../../docs/equipment/maruzen-bps30-12b/README.md) for catalog details and mounting geometry.
@@ -689,113 +666,11 @@ def run_active_state_verification():
     glb_path = ASSETS / "maruzen-bps30-12b.glb"
     native_sha = hashlib.sha256(native_path.read_bytes()).hexdigest()
 
-    native_model = mujoco.MjModel.from_xml_path(str(native_path))
-    native_data = mujoco.MjData(native_model)
-    mujoco.mj_forward(native_model, native_data)
-
-    body_poses = {}
-    for bname in NAMES:
-        bid = native_model.body(bname).id
-        pos = native_data.xpos[bid]
-        quat = native_data.xquat[bid]
-        body_poses[bname] = [
-            float(pos[0]),
-            float(pos[1]),
-            float(pos[2]),
-            float(quat[0]),
-            float(quat[1]),
-            float(quat[2]),
-            float(quat[3]),
-        ]
-
     evidence_dir = ASSETS / "active-state-evidence"
     evidence_dir.mkdir(parents=True, exist_ok=True)
-
-    # Rest-frame verification via inspect_appliance_frames.mjs
-    frames_in = evidence_dir / "frames-input.json"
-    frames_out = evidence_dir / "frames-report.json"
-    frames_in.write_text(
-        json.dumps(
-            {
-                "maruzen-bps30-12b": {
-                    "glb": str(glb_path),
-                    "native_sha256": native_sha,
-                    "bodies": body_poses,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
+    frames_report, motion_report = kit_verify_frames_and_motions(
+        ASSETS, "maruzen-bps30-12b", NAMES, VISUAL_AXES, mujoco, evidence_dir
     )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(frames_in),
-            str(frames_out),
-        ],
-        check=True,
-    )
-    frames_report = json.loads(frames_out.read_text())
-    assert frames_report["passed"], frames_report
-
-    # Sampled scalar-joint motion verification (21 samples per scalar joint) via inspect_appliance_frames.mjs --motion
-    motions = []
-    for joint_name, vis_axis in VISUAL_AXES.items():
-        jid = native_model.joint(joint_name).id
-        jtype = int(native_model.jnt_type[jid])
-        kind = "hinge" if jtype == int(mujoco.mjtJoint.mjJNT_HINGE) else "slide"
-        low, high = native_model.jnt_range[jid]
-        bid = int(native_model.jnt_bodyid[jid])
-        samples = []
-        for idx in range(21):
-            val = float(low + (high - low) * idx / 20.0)
-            mujoco.mj_resetData(native_model, native_data)
-            native_data.qpos[native_model.jnt_qposadr[jid]] = val
-            mujoco.mj_forward(native_model, native_data)
-            samples.append(
-                {
-                    "value": val,
-                    "pose": [*native_data.xpos[bid].tolist(), *native_data.xquat[bid].tolist()],
-                }
-            )
-        motions.append(
-            {
-                "joint": joint_name,
-                "body": native_model.body(bid).name,
-                "kind": kind,
-                "visual_axis": vis_axis,
-                "samples": samples,
-            }
-        )
-
-    motion_in = evidence_dir / "motion-input.json"
-    motion_out = evidence_dir / "motion-report.json"
-    motion_in.write_text(
-        json.dumps(
-            {
-                "maruzen-bps30-12b": {
-                    "glb": str(glb_path),
-                    "native_sha256": native_sha,
-                    "motions": motions,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
-    )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(motion_in),
-            str(motion_out),
-            "--motion",
-        ],
-        check=True,
-    )
-    motion_report = json.loads(motion_out.read_text())
-    assert motion_report["passed"], motion_report
 
     rest_check = {
         "passed": frames_report["passed"],

@@ -243,7 +243,7 @@ def export_blender_meshes_and_xml() -> None:
         ("mbco_top", (-0.1, 0.026, 0.658), (0.22, 0.374, 0.047)),
         ("mbco_back", (-0.1, 0.361, 0.373), (0.22, 0.039, 0.238)),
         # Front exterior trim outside chamber opening (fascia, strike jamb, top lip, lower plinth/gutter)
-        ("mbco_top_front_cap_col", (0.0, -0.359, 0.703), (0.450, 0.011, 0.002)),
+        ("mbco_top_front_cap_col", (0.0, -0.354, 0.703), (0.450, 0.006, 0.002)),
         ("mbco_front_fascia_col", (0.348, -0.373, 0.381), (0.098, 0.025, 0.320)),
         ("mbco_strike_jamb_col", (0.216, -0.372, 0.381), (0.031, 0.024, 0.320)),
         ("mbco_front_plinth_col", (0.0, -0.3715, 0.057), (0.448, 0.0235, 0.007)),

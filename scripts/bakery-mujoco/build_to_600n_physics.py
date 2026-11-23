@@ -1,4 +1,6 @@
-"""Build and verify the MuJoCo mechanical, hot/cold mixing valve, recoil spring, and pre-rinse spray jet model for the Sugico Sangyo TO-600N."""
+"""Build and verify the MuJoCo 4.0 mechanical, hot/cold mixing valve, recoil spring, and pre-rinse spray jet model for the Sugico Sangyo TO-600N."""
+
+from __future__ import annotations
 
 import csv
 import hashlib
@@ -9,9 +11,26 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from appliance_physics_kit import (
+    BLENDER_BIN,
+    COL_ARTIC_RGBA,
+    COL_BASE_RGBA,
+    COL_WALL_RGBA,
+    ROOT,
+    SITE_GRASP_RGBA,
+    SITE_SUPPORT_RGBA,
+    add_adjacent_excludes,
+    add_standard_defaults,
+    emit_standalone_models,
+    export_and_verify_native_xml as kit_export_native_xml,
+    numbers,
+    prepare_blender_assembly,
+    verify_frames_and_motions as kit_verify_frames_and_motions,
+    write_xml,
+)
+
 ASSETS = ROOT / "assets/bakery-mujoco/sugico-to-600n"
-BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
 
 NAMES = (
     "to600_base",
@@ -59,62 +78,10 @@ SCALAR_VISUAL_MOTIONS = {
 }
 
 
-def numbers(values):
-    return " ".join(f"{value:.9g}" for value in values)
-
-
-def write_xml(path: Path, element: ET.Element):
-    ET.indent(element, space="  ")
-    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
-
-
 def export_blender_meshes_and_xml():
-    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml and scene.xml."""
-    import bpy
-
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from build_oven_visuals import export_visual_meshes
-
+    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml, scene.xml, and model.xml."""
     source = ASSETS / "sugico-to-600n.blend"
-    bpy.ops.wm.open_mainfile(filepath=str(source))
-    bpy.context.scene.frame_set(1)
-    for obj in list(bpy.data.objects):
-        obj.animation_data_clear()
-    bpy.context.view_layer.update()
-
-    parts = [bpy.data.objects[name] for name in NAMES]
-    poses = {obj.name: obj.matrix_world.copy() for obj in parts}
-
-    # Reparent every mesh under to600_base to its nearest ancestor in NAMES while preserving world pose
-    for obj in list(parts[0].children_recursive):
-        if obj.type != "MESH" and obj not in parts:
-            continue
-        parent = obj.parent
-        while parent is not None and parent not in parts:
-            parent = parent.parent
-        if parent is None:
-            continue
-        pose = obj.matrix_world.copy()
-        obj.animation_data_clear()
-        obj.parent = parent
-        obj.matrix_world = pose
-        if obj.type == "MESH" and len(obj.data.vertices) >= 3:
-            for axis_idx in range(3):
-                coords = [v.co[axis_idx] for v in obj.data.vertices]
-                if max(coords) - min(coords) < 1e-5:
-                    obj.data.vertices[0].co[axis_idx] += 2e-5
-                    obj.data.update()
-    bpy.context.view_layer.update()
-
-    for mat in bpy.data.materials:
-        if "metallic" not in mat:
-            mat["metallic"] = 0.0
-        if "roughness" not in mat:
-            mat["roughness"] = 0.25
-        if "emission" not in mat:
-            mat["emission"] = 0.0
-
-    export_visual_meshes(parts, ASSETS)
+    parts, poses = prepare_blender_assembly(source, NAMES, ASSETS, default_roughness=0.25)
 
     app = ET.Element(
         "mujoco",
@@ -123,6 +90,8 @@ def export_blender_meshes_and_xml():
     ET.SubElement(app, "compiler", angle="radian")
     ET.SubElement(app, "option", timestep="0.002", integrator="implicitfast")
     ET.SubElement(app, "size", nuserdata="8")
+
+    defaults = add_standard_defaults(app, friction="0.60 0.015 0.003")
 
     asset = ET.SubElement(app, "asset")
     ET.SubElement(asset, "include", file="visual_assets.xml")
@@ -136,7 +105,7 @@ def export_blender_meshes_and_xml():
         size="1.0 1.0 0.05",
         rgba="0.32 0.34 0.37 1",
         contype="1",
-        conaffinity="3",
+        conaffinity="1",
     )
 
     bodies = {}
@@ -186,9 +155,10 @@ def export_blender_meshes_and_xml():
             type="cylinder",
             pos=numbers((fx, 0.0320, 0.0120)),
             size="0.0220 0.0120",
-            contype="2",
+            contype="1",
             conaffinity="1",
             group="3",
+            rgba=COL_BASE_RGBA,
         )
     ET.SubElement(
         base,
@@ -197,39 +167,69 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 0.0320 0.0450",
         size="0.1315 0.0235 0.0190",
-        contype="2",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_BASE_RGBA,
     )
+    for bname, bx in (("to600_bonnet_hot_col", -0.1016), ("to600_bonnet_cold_col", 0.1016)):
+        ET.SubElement(
+            base,
+            "geom",
+            name=bname,
+            type="cylinder",
+            pos=numbers((bx, 0.0320, 0.0750)),
+            size="0.0185 0.0130",
+            contype="1",
+            conaffinity="1",
+            group="3",
+            rgba=COL_BASE_RGBA,
+        )
     ET.SubElement(
         base,
         "geom",
         name="to600_riser_col",
         type="cylinder",
         pos="0 0.0320 0.3330",
-        size="0.0100 0.3070",
-        contype="2",
+        size="0.0110 0.3070",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_WALL_RGBA,
     )
     ET.SubElement(
         base,
         "geom",
         name="to600_wall_bracket_col",
         type="box",
-        pos="0 0.0540 0.4950",
-        size="0.0220 0.0225 0.0180",
-        contype="2",
+        pos="0 0.0545 0.4950",
+        size="0.0220 0.0225 0.0220",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_WALL_RGBA,
     )
+    for hname, hx in (("to600_hook_left_col", -0.0169), ("to600_hook_right_col", 0.0169)):
+        ET.SubElement(
+            base,
+            "geom",
+            name=hname,
+            type="box",
+            pos=numbers((hx, -0.0072, 0.3230)),
+            size="0.0092 0.0357 0.0087",
+            contype="1",
+            conaffinity="1",
+            group="3",
+            rgba=COL_WALL_RGBA,
+        )
     ET.SubElement(
         base,
         "site",
         name="to600_deck_mount_site",
         pos="0 0.0320 0",
         size="0.006",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         base,
@@ -237,7 +237,8 @@ def export_blender_meshes_and_xml():
         name="to600_rest_hook_site",
         pos="0 -0.0240 0.3200",
         size="0.006",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
 
     # Left red-indexed hot water quarter-turn lever handle (axis 0 0 1, range 0 .. 1.5708 rad)
@@ -251,17 +252,21 @@ def export_blender_meshes_and_xml():
         range="0 1.5708",
         damping="0.35",
         armature="0.002",
+        frictionloss="0.05",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         hot,
         "geom",
         name="to600_hot_handle_col",
         type="box",
-        pos="-0.05945 0 0.0040",
-        size="0.05145 0.0075 0.0040",
-        contype="2",
+        pos="-0.0490 0 0.0055",
+        size="0.0620 0.0125 0.0095",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
     )
 
     # Right blue-indexed cold water quarter-turn lever handle (axis 0 0 -1, range 0 .. 1.5708 rad)
@@ -275,17 +280,21 @@ def export_blender_meshes_and_xml():
         range="0 1.5708",
         damping="0.35",
         armature="0.002",
+        frictionloss="0.05",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         cold,
         "geom",
         name="to600_cold_handle_col",
         type="box",
-        pos="0.05945 0 0.0040",
-        size="0.05145 0.0075 0.0040",
-        contype="2",
+        pos="0.0490 0 0.0055",
+        size="0.0620 0.0125 0.0095",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
     )
 
     # Overhead spring-loaded hose arm (axis 1 0 0, range -0.15 .. 0.55 rad with spring stiffness)
@@ -300,18 +309,42 @@ def export_blender_meshes_and_xml():
         stiffness="14.0",
         damping="1.20",
         armature="0.008",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         arm,
         "geom",
         name="to600_spring_col",
-        type="cylinder",
-        pos="0 -0.0120 0.1200",
-        size="0.0170 0.1050",
-        contype="2",
+        type="capsule",
+        fromto="0 -0.0020 0.0080 0.0080 -0.0160 0.2320",
+        size="0.0230",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
     )
+    for hname, hfromto in (
+        ("to600_hose_crest_col", "0.004 -0.022 0.244 0.055 -0.022 0.220"),
+        ("to600_hose_top_arch_col", "0.055 -0.022 0.220 0.092 -0.015 0.145"),
+        ("to600_hose_outer_upper_col", "0.092 -0.015 0.145 0.111 -0.009 0.020"),
+        ("to600_hose_outer_lower_col", "0.111 -0.009 0.020 0.105 -0.011 -0.145"),
+        ("to600_hose_bottom_bend_col", "0.105 -0.011 -0.145 0.075 -0.018 -0.218"),
+        ("to600_hose_bottom_return_col", "0.075 -0.018 -0.218 0.036 -0.029 -0.165"),
+        ("to600_hose_return_lower_col", "0.036 -0.029 -0.165 0.012 -0.038 -0.065"),
+        ("to600_hose_return_upper_col", "0.012 -0.038 -0.065 0.000 -0.044 0.020"),
+    ):
+        ET.SubElement(
+            arm,
+            "geom",
+            name=hname,
+            type="capsule",
+            fromto=hfromto,
+            size="0.0125",
+            contype="1",
+            conaffinity="1",
+            group="3",
+            rgba=COL_ARTIC_RGBA,
+        )
 
     # Spray head & 140 mm grip swiveling at hose end (child of to600_spring_arm, axis 1 0 0, range -0.45 .. 0.45 rad)
     ET.SubElement(
@@ -325,17 +358,31 @@ def export_blender_meshes_and_xml():
         stiffness="2.5",
         damping="0.30",
         armature="0.003",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         head,
         "geom",
         name="to600_grip_col",
         type="cylinder",
-        pos="0 0 -0.0740",
-        size="0.0145 0.0660",
-        contype="2",
+        pos="0 -0.0010 -0.0700",
+        size="0.0165 0.0720",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
+    )
+    ET.SubElement(
+        head,
+        "geom",
+        name="to600_valve_neck_col",
+        type="capsule",
+        fromto="0 0 -0.1350 0 -0.0225 -0.1980",
+        size="0.0170",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         head,
@@ -343,10 +390,11 @@ def export_blender_meshes_and_xml():
         name="to600_bumper_col",
         type="cylinder",
         pos="0 -0.0225 -0.2035",
-        size="0.0300 0.0075",
-        contype="2",
+        size="0.0305 0.0085",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         head,
@@ -354,7 +402,8 @@ def export_blender_meshes_and_xml():
         name="to600_spray_nozzle_site",
         pos="0 -0.0225 -0.2110",
         size="0.006",
-        group="3",
+        group="4",
+        rgba=SITE_GRASP_RGBA,
     )
 
     # Hand-squeeze trigger lever (child of to600_spray_head, axis 1 0 0, range 0 .. 0.42 rad)
@@ -369,17 +418,35 @@ def export_blender_meshes_and_xml():
         stiffness="3.2",
         damping="0.18",
         armature="0.001",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         trig,
         "geom",
         name="to600_trigger_col",
         type="box",
-        pos="0 -0.0060 -0.0540",
-        size="0.0075 0.0035 0.0540",
-        contype="2",
+        pos="0 -0.0075 -0.0520",
+        size="0.0085 0.0095 0.0540",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
+    )
+
+    # Contact exclusions across articulated serial chain and valve handles
+    contact = add_adjacent_excludes(
+        app,
+        (
+            ("exclude_base_hot_handle", "to600_base", "to600_hot_handle"),
+            ("exclude_base_cold_handle", "to600_base", "to600_cold_handle"),
+            ("exclude_base_spring_arm", "to600_base", "to600_spring_arm"),
+            ("exclude_base_spray_head", "to600_base", "to600_spray_head"),
+            ("exclude_base_trigger", "to600_base", "to600_trigger"),
+            ("exclude_arm_spray_head", "to600_spring_arm", "to600_spray_head"),
+            ("exclude_arm_trigger", "to600_spring_arm", "to600_trigger"),
+            ("exclude_head_trigger", "to600_spray_head", "to600_trigger"),
+            ("exclude_hot_cold_handles", "to600_hot_handle", "to600_cold_handle"),
+        ),
     )
 
     # Actuators
@@ -457,6 +524,16 @@ def export_blender_meshes_and_xml():
     write_xml(ASSETS / "appliance.xml", app)
     write_xml(ASSETS / "scene.xml", app)
 
+    emit_standalone_models(
+        ASSETS,
+        model_name="to600_base",
+        defaults=defaults,
+        asset=asset,
+        root_body=base,
+        contact=contact,
+        sensors=sensors,
+    )
+
     (ASSETS / "physics-export.json").write_text(
         json.dumps(
             {
@@ -472,7 +549,7 @@ def export_blender_meshes_and_xml():
                     "rated_prerinse_spray_l_min_at_0_35mpa": 4.80,
                 },
                 "scope": (
-                    "Articulated MuJoCo mechanical, hot/cold dual-lever header mixing, overhead "
+                    "Articulated MuJoCo 4.0 mechanical, hot/cold dual-lever header mixing, overhead "
                     "recoil-spring arm pitch, swiveling 211 mm spray valve, and 140 mm grip squeeze-trigger "
                     "pre-rinse jet model."
                 ),
@@ -483,162 +560,15 @@ def export_blender_meshes_and_xml():
     )
 
 
-def strip_visual_meshes(root: ET.Element, model):
-    for parent in root.iter():
-        for geom in list(parent):
-            if geom.tag != "geom" or not geom.get("name"):
-                continue
-            index = model.geom(geom.get("name")).id
-            if (
-                model.geom_contype[index] == 0
-                and model.geom_conaffinity[index] == 0
-                and geom.get("type") == "mesh"
-                and geom.get("mass") == "0"
-            ):
-                parent.remove(geom)
-
-
 def export_native_xml(mujoco, np):
-    spec = mujoco.MjSpec.from_file(str(ASSETS / "scene.xml"))
-    model = spec.compile()
-    data = mujoco.MjData(model)
-    mujoco.mj_forward(model, data)
-
-    root = ET.fromstring(spec.to_xml())
-    strip_visual_meshes(root, model)
-    used_meshes = {geom.get("mesh") for geom in root.iter("geom")}
-    used_materials = {geom.get("material") for geom in root.iter("geom")}
-    assets = root.find("asset")
-    if assets is not None:
-        for asset in list(assets):
-            if (asset.tag == "mesh" and asset.get("name") not in used_meshes) or (
-                asset.tag == "material" and asset.get("name") not in used_materials
-            ):
-                assets.remove(asset)
-    ET.indent(root, space="  ")
-    native_path = ASSETS / "native.xml"
-    native_path.write_text(ET.tostring(root, encoding="unicode") + "\n")
-
-    rebuilt = mujoco.MjModel.from_xml_path(str(native_path))
-    for field in ("body_mass", "body_inertia", "qpos0", "dof_damping"):
-        if not np.allclose(
-            getattr(model, field), getattr(rebuilt, field), rtol=1e-5, atol=1e-9
-        ):
-            raise RuntimeError(f"Export changed native {field} for sugico-to-600n")
-    if (rebuilt.nq, rebuilt.nv) != (model.nq, model.nv):
-        raise RuntimeError("Export changed native degrees of freedom for sugico-to-600n")
+    _, rebuilt = kit_export_native_xml(ASSETS, "sugico-to-600n", mujoco, np)
     return rebuilt
 
 
 def verify_frame_and_motion_alignment(mujoco, native_model, evidence_dir: Path):
-    native_data = mujoco.MjData(native_model)
-    mujoco.mj_forward(native_model, native_data)
-    native_sha = hashlib.sha256((ASSETS / "native.xml").read_bytes()).hexdigest()
-    glb_str = str(ASSETS / "sugico-to-600n.glb")
-
-    # 1. Rest-frame alignment across all 6 retained bodies in NAMES
-    body_poses = {}
-    for bname in NAMES:
-        bid = native_model.body(bname).id
-        pos = native_data.xpos[bid]
-        quat = native_data.xquat[bid]
-        body_poses[bname] = [
-            float(pos[0]),
-            float(pos[1]),
-            float(pos[2]),
-            float(quat[0]),
-            float(quat[1]),
-            float(quat[2]),
-            float(quat[3]),
-        ]
-    frames_in = evidence_dir / "frames-input.json"
-    frames_out = evidence_dir / "frames-report.json"
-    frames_in.write_text(
-        json.dumps(
-            {
-                "sugico-to-600n": {
-                    "glb": glb_str,
-                    "native_sha256": native_sha,
-                    "bodies": body_poses,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
+    return kit_verify_frames_and_motions(
+        ASSETS, "sugico-to-600n", NAMES, SCALAR_VISUAL_MOTIONS, mujoco, evidence_dir
     )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(frames_in),
-            str(frames_out),
-        ],
-        check=True,
-    )
-    frames_report = json.loads(frames_out.read_text())
-    assert frames_report["passed"] is True, frames_report
-
-    # 2. Sampled scalar-joint motion alignment (21 samples per scalar joint across all 5 joints)
-    motions = []
-    for joint_name, axis in SCALAR_VISUAL_MOTIONS.items():
-        jid = native_model.joint(joint_name).id
-        jtype = int(native_model.jnt_type[jid])
-        kind = "hinge" if jtype == int(mujoco.mjtJoint.mjJNT_HINGE) else "slide"
-        low, high = native_model.jnt_range[jid]
-        bid = int(native_model.jnt_bodyid[jid])
-        samples = []
-        for idx in range(21):
-            val = float(low + (high - low) * idx / 20.0)
-            mujoco.mj_resetData(native_model, native_data)
-            native_data.qpos[native_model.jnt_qposadr[jid]] = val
-            mujoco.mj_forward(native_model, native_data)
-            samples.append(
-                {
-                    "value": val,
-                    "pose": [
-                        *native_data.xpos[bid].tolist(),
-                        *native_data.xquat[bid].tolist(),
-                    ],
-                }
-            )
-        motions.append(
-            {
-                "joint": joint_name,
-                "body": native_model.body(bid).name,
-                "kind": kind,
-                "visual_axis": axis,
-                "samples": samples,
-            }
-        )
-
-    motion_in = evidence_dir / "motion-input.json"
-    motion_out = evidence_dir / "motion-report.json"
-    motion_in.write_text(
-        json.dumps(
-            {
-                "sugico-to-600n": {
-                    "glb": glb_str,
-                    "native_sha256": native_sha,
-                    "motions": motions,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
-    )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(motion_in),
-            str(motion_out),
-            "--motion",
-        ],
-        check=True,
-    )
-    motion_report = json.loads(motion_out.read_text())
-    assert motion_report["passed"] is True, motion_report
-    return frames_report, motion_report
 
 
 def write_asset_docs(report: dict):

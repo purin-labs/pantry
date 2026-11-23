@@ -181,7 +181,7 @@ def export_blender_meshes_and_xml() -> None:
         model="winterhalter-uc-l — commercial undercounter dishwasher",
     )
     ET.SubElement(app, "compiler", angle="radian")
-    ET.SubElement(app, "option", timestep="0.002", integrator="implicitfast")
+    ET.SubElement(app, "option", timestep="0.001", integrator="implicitfast")
 
     defaults = add_standard_defaults(app)
 

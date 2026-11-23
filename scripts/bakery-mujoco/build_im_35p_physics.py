@@ -1,4 +1,6 @@
-"""Build and verify the MuJoCo mechanical, harvest-cycle, and bin-control model for the Hoshizaki IM-35P."""
+"""Build and verify the MuJoCo 4.0 mechanical, harvest-cycle, and bin-control model for the Hoshizaki IM-35P."""
+
+from __future__ import annotations
 
 import csv
 import hashlib
@@ -9,9 +11,27 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from appliance_physics_kit import (
+    BLENDER_BIN,
+    COL_ACCESSORY_RGBA,
+    COL_ARTIC_RGBA,
+    COL_BASE_RGBA,
+    COL_WALL_RGBA,
+    ROOT,
+    SITE_GRASP_RGBA,
+    SITE_SUPPORT_RGBA,
+    add_adjacent_excludes,
+    add_standard_defaults,
+    emit_standalone_models,
+    export_and_verify_native_xml as kit_export_native_xml,
+    numbers,
+    prepare_blender_assembly,
+    verify_frames_and_motions as kit_verify_frames_and_motions,
+    write_xml,
+)
+
 ASSETS = ROOT / "assets/bakery-mujoco/hoshizaki-im-35p"
-BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
 
 NAMES = (
     "im_cabinet",
@@ -55,61 +75,23 @@ INERTIAS = {
 }
 
 
-def numbers(values):
-    return " ".join(f"{value:.9g}" for value in values)
-
-
-def write_xml(path: Path, element: ET.Element):
-    ET.indent(element, space="  ")
-    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
+VISUAL_MOTIONS = {
+    "im_door_hinge": (1, 0, 0),
+    "im_filter_slide": (0, -1, 0),
+    "im_water_plate_hinge": (-1, 0, 0),
+    "im_bin_switch_hinge": (1, 0, 0),
+    "im_power_switch_hinge": (1, 0, 0),
+}
 
 
 def export_blender_meshes_and_xml():
-    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml and scene.xml."""
-    import bpy
-
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from build_oven_visuals import export_visual_meshes
-
+    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml, scene.xml, model.xml, and scoop_model.xml."""
     source = ASSETS / "hoshizaki-im-35p.blend"
-    bpy.ops.wm.open_mainfile(filepath=str(source))
-    bpy.context.scene.frame_set(1)
-    bpy.context.view_layer.update()
+    parts, poses = prepare_blender_assembly(
+        source, NAMES, ASSETS, clear_all_animations=False
+    )
 
-    parts = [bpy.data.objects[name] for name in NAMES]
-    poses = {obj.name: obj.matrix_world.copy() for obj in parts}
-
-    # Reparent every mesh under im_cabinet to its nearest articulated ancestor in NAMES while preserving world pose
-    for obj in list(parts[0].children_recursive):
-        if obj.type != "MESH" and obj not in parts:
-            continue
-        parent = obj.parent
-        while parent is not None and parent not in parts:
-            parent = parent.parent
-        if parent is None:
-            continue
-        pose = obj.matrix_world.copy()
-        obj.animation_data_clear()
-        obj.parent = parent
-        obj.matrix_world = pose
-        if obj.type == "MESH" and len(obj.data.vertices) >= 3:
-            zs = [v.co.z for v in obj.data.vertices]
-            if max(zs) - min(zs) < 1e-5:
-                obj.data.vertices[0].co.z += 2e-5
-                obj.data.update()
-    bpy.context.view_layer.update()
-
-    for mat in bpy.data.materials:
-        if "metallic" not in mat:
-            mat["metallic"] = 0.0
-        if "roughness" not in mat:
-            mat["roughness"] = 0.30
-        if "emission" not in mat:
-            mat["emission"] = 0.0
-
-    export_visual_meshes(parts, ASSETS)
-
-    # Build appliance.xml / scene.xml
+    # Build appliance.xml / scene.xml (timestep MUST stay 0.002 to match assets/bakery-mujoco/appliances.json)
     app = ET.Element(
         "mujoco",
         model="hoshizaki-im-35p — commercial undercounter closed-cell cube ice maker",
@@ -117,6 +99,8 @@ def export_blender_meshes_and_xml():
     ET.SubElement(app, "compiler", angle="radian")
     ET.SubElement(app, "option", timestep="0.002", integrator="implicitfast")
     ET.SubElement(app, "size", nuserdata="8")
+
+    defaults = add_standard_defaults(app, friction="0.65 0.015 0.003")
 
     asset = ET.SubElement(app, "asset")
     ET.SubElement(asset, "include", file="visual_assets.xml")
@@ -130,7 +114,7 @@ def export_blender_meshes_and_xml():
         size="1.5 1.5 0.05",
         rgba="0.28 0.30 0.32 1",
         contype="1",
-        conaffinity="3",
+        conaffinity="1",
     )
 
     bodies = {}
@@ -191,22 +175,26 @@ def export_blender_meshes_and_xml():
             type="cylinder",
             pos=numbers((fx, fy, 0.0085)),
             size="0.0160 0.0085",
-            contype="2",
+            contype="1",
             conaffinity="1",
             group="3",
+            rgba=COL_BASE_RGBA,
         )
 
-    # Cabinet, bin walls, stored ice bed, scoop hanger ledge, and worktop collision boxes
-    for cname, cpos, csize in (
-        ("im_lower_chassis_col", (0.0, -0.0150, 0.1750), (0.2480, 0.1950, 0.1580)),
-        ("im_bin_floor_col", (0.0, 0.0100, 0.3500), (0.2150, 0.1800, 0.0120)),
-        ("im_ice_bed_col", (0.0, 0.0150, 0.3900), (0.1980, 0.1550, 0.0300)),
-        ("im_bin_left_wall_col", (-0.2300, 0.0050, 0.5600), (0.0200, 0.2150, 0.2100)),
-        ("im_bin_right_wall_col", (0.2300, 0.0050, 0.5600), (0.0200, 0.2150, 0.2100)),
-        ("im_bin_rear_wall_col", (0.0, 0.2000, 0.5600), (0.2100, 0.0250, 0.2100)),
-        ("im_worktop_col", (0.0, 0.0, 0.7890), (0.2500, 0.2250, 0.0110)),
+    # Cabinet, bin walls, evaporator shroud/cell, stored ice bed, scoop hanger ledge, and worktop collision boxes
+    for cname, cpos, csize, crgba in (
+        ("im_lower_chassis_col", (0.0, 0.0050, 0.1840), (0.2500, 0.2150, 0.1670), COL_BASE_RGBA),
+        ("im_bin_floor_col", (0.0, 0.0100, 0.3500), (0.2150, 0.1800, 0.0120), COL_BASE_RGBA),
+        ("im_ice_bed_col", (0.0, 0.0150, 0.3900), (0.1980, 0.1550, 0.0300), COL_WALL_RGBA),
+        ("im_bin_left_wall_col", (-0.2300, 0.0050, 0.5640), (0.0200, 0.2180, 0.2140), COL_WALL_RGBA),
+        ("im_bin_right_wall_col", (0.2300, 0.0050, 0.5640), (0.0200, 0.2180, 0.2140), COL_WALL_RGBA),
+        ("im_bin_rear_wall_col", (0.0, 0.2000, 0.5640), (0.2100, 0.0250, 0.2140), COL_WALL_RGBA),
+        ("im_evap_housing_col", (-0.0600, 0.0250, 0.6960), (0.1250, 0.1250, 0.0490), COL_WALL_RGBA),
+        ("im_evap_cell_col", (-0.0600, 0.0300, 0.6720), (0.0940, 0.0790, 0.0160), COL_WALL_RGBA),
+        ("im_evap_front_col", (-0.0600, -0.1060, 0.6865), (0.0280, 0.0140, 0.0185), COL_WALL_RGBA),
+        ("im_worktop_col", (0.0, 0.0, 0.7890), (0.2500, 0.2250, 0.0110), COL_BASE_RGBA),
         # Sanitary scoop hanger bracket support shelf at Z = 0.4660 m (supports im_scoop_bowl bottom at Z = 0.560 - 0.094 = 0.466 m)
-        ("im_scoop_hanger_shelf_col", (-0.0600, -0.1150, 0.4620), (0.0450, 0.0320, 0.0040)),
+        ("im_scoop_hanger_shelf_col", (-0.0600, -0.1150, 0.4620), (0.0450, 0.0320, 0.0040), COL_WALL_RGBA),
     ):
         ET.SubElement(
             base,
@@ -215,19 +203,21 @@ def export_blender_meshes_and_xml():
             type="box",
             pos=numbers(cpos),
             size=numbers(csize),
-            contype="2",
+            contype="1",
             conaffinity="1",
             group="3",
+            rgba=crgba,
         )
 
-    # Named operational sites on im_cabinet
+    # Named operational sites on im_cabinet (group 4)
     ET.SubElement(
         base,
         "site",
         name="im_bin_storage",
         pos="0 0.0100 0.4200",
         size="0.008",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         base,
@@ -235,7 +225,8 @@ def export_blender_meshes_and_xml():
         name="im_worktop_site",
         pos="0 0 0.8000",
         size="0.008",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         base,
@@ -243,7 +234,8 @@ def export_blender_meshes_and_xml():
         name="im_scoop_hanger_site",
         pos="-0.0600 -0.1150 0.5600",
         size="0.006",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         base,
@@ -252,7 +244,8 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 0.0100 0.4220",
         size="0.1800 0.1400 0.0060",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
 
     # Bottom-hinged bin door joint (`im_door_hinge`, axis="1 0 0", range 0 .. 0.9076 rad / 52 deg)
@@ -266,6 +259,9 @@ def export_blender_meshes_and_xml():
         range=numbers((0.0, math.radians(52.0))),
         damping="1.8",
         armature="0.015",
+        frictionloss="3.2",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         door,
@@ -274,9 +270,10 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 0.0060 0.1950",
         size="0.2450 0.0180 0.1950",
-        contype="2",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
     )
 
     # Pull-out Raku-Eco condenser air filter slide joint (`im_filter_slide`, axis="0 -1 0", range 0 .. 0.140 m)
@@ -290,6 +287,9 @@ def export_blender_meshes_and_xml():
         range="0 0.140",
         damping="2.5",
         armature="0.002",
+        frictionloss="0.4",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         air_filter,
@@ -298,9 +298,10 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 0.0050 -0.0950",
         size="0.1000 0.0060 0.1000",
-        contype="2",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
     )
 
     # Actuator-motor driven water plate hinge joint (`im_water_plate_hinge`, axis="-1 0 0", range 0 .. 0.480 rad / 27.5 deg)
@@ -314,6 +315,9 @@ def export_blender_meshes_and_xml():
         range="0 0.480",
         damping="0.8",
         armature="0.005",
+        frictionloss="0.6",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         wplate,
@@ -322,9 +326,10 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 -0.1050 0",
         size="0.1050 0.1050 0.0070",
-        contype="2",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
     )
 
     # Double-lever bin level switch hinge joint (`im_bin_switch_hinge`, axis="1 0 0", range 0 .. 0.550 rad)
@@ -339,6 +344,9 @@ def export_blender_meshes_and_xml():
         stiffness="0.8",
         damping="0.15",
         armature="0.001",
+        frictionloss="0.08",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         bswitch,
@@ -347,9 +355,10 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 0 -0.0550",
         size="0.0080 0.0380 0.0520",
-        contype="2",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
     )
 
     # Recessed power/service rocker switch hinge joint (`im_power_switch_hinge`, axis="1 0 0", range 0 .. 0.280 rad)
@@ -363,6 +372,9 @@ def export_blender_meshes_and_xml():
         range="0 0.280",
         damping="0.05",
         armature="0.0005",
+        frictionloss="0.05",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
 
     # 6-DOF free sanitary ice scoop (`im_scoop` with `im_scoop_free` and `vessel_socket`)
@@ -375,8 +387,9 @@ def export_blender_meshes_and_xml():
         pos="0 0 -0.0480",
         size="0.0360 0.0240 0.0460",
         contype="1",
-        conaffinity="2",
+        conaffinity="1",
         group="3",
+        rgba=COL_ACCESSORY_RGBA,
     )
     ET.SubElement(
         scoop,
@@ -386,8 +399,9 @@ def export_blender_meshes_and_xml():
         pos="0 0 0.0560",
         size="0.0135 0.0500",
         contype="1",
-        conaffinity="2",
+        conaffinity="1",
         group="3",
+        rgba=COL_ACCESSORY_RGBA,
     )
     ET.SubElement(
         scoop,
@@ -395,7 +409,8 @@ def export_blender_meshes_and_xml():
         name="vessel_socket",
         pos="0 0 0.0560",
         size="0.006",
-        group="3",
+        group="4",
+        rgba=SITE_GRASP_RGBA,
     )
     payload = ET.SubElement(scoop, "body", name="ingredient_payload", pos="0 0 0")
     ET.SubElement(
@@ -412,9 +427,27 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0 0 -0.0480",
         size="0.0320 0.0015",
+        contype="0",
+        conaffinity="0",
         group="2",
         rgba="0.80 0.92 0.99 0",
         mass="0",
+    )
+
+    # Contact exclusions between cabinet and articulated children (scoop remains free to contact cabinet/bin/shelf)
+    contact = add_adjacent_excludes(
+        app,
+        (
+            ("exclude_cabinet_door", "im_cabinet", "im_door"),
+            ("exclude_cabinet_air_filter", "im_cabinet", "im_air_filter"),
+            ("exclude_cabinet_water_plate", "im_cabinet", "im_water_plate"),
+            ("exclude_cabinet_bin_switch", "im_cabinet", "im_bin_switch"),
+            ("exclude_cabinet_power_switch", "im_cabinet", "im_power_switch"),
+            ("exclude_door_air_filter", "im_door", "im_air_filter"),
+            ("exclude_door_water_plate", "im_door", "im_water_plate"),
+            ("exclude_door_bin_switch", "im_door", "im_bin_switch"),
+            ("exclude_water_plate_bin_switch", "im_water_plate", "im_bin_switch"),
+        ),
     )
 
     # Actuators
@@ -424,10 +457,10 @@ def export_blender_meshes_and_xml():
         "position",
         name="im_door_actuator",
         joint="im_door_hinge",
-        kp="140",
-        kv="8.0",
+        kp="320",
+        kv="14.0",
         ctrlrange=numbers((0.0, math.radians(52.0))),
-        forcerange="-55 55",
+        forcerange="-80 80",
     )
     ET.SubElement(
         actuators,
@@ -444,10 +477,10 @@ def export_blender_meshes_and_xml():
         "position",
         name="im_water_plate_actuator",
         joint="im_water_plate_hinge",
-        kp="35",
-        kv="3.0",
+        kp="120",
+        kv="4.5",
         ctrlrange="0 0.480",
-        forcerange="-20 20",
+        forcerange="-35 35",
     )
     ET.SubElement(
         actuators,
@@ -497,6 +530,18 @@ def export_blender_meshes_and_xml():
     write_xml(ASSETS / "appliance.xml", app)
     write_xml(ASSETS / "scene.xml", app)
 
+    emit_standalone_models(
+        ASSETS,
+        model_name="im_cabinet",
+        defaults=defaults,
+        asset=asset,
+        root_body=base,
+        contact=contact,
+        sensors=sensors,
+        exclude_sensors=("im_scoop_sense",),
+        accessories=(("scoop_model.xml", "im_scoop", scoop),),
+    )
+
     (ASSETS / "physics-export.json").write_text(
         json.dumps(
             {
@@ -511,7 +556,7 @@ def export_blender_meshes_and_xml():
                 "cube_dimensions_m": [0.028, 0.028, 0.032],
                 "bin_max_stock_kg": 18.0,
                 "bin_natural_fall_kg": 10.5,
-                "scope": "Articulated MuJoCo mechanical, closed-cell jet-spray freeze/harvest cycle, double-lever bin switch, Raku-Eco filter, and free ice-scoop model in appliance.xml and scene.xml.",
+                "scope": "Articulated MuJoCo 4.0 mechanical, closed-cell jet-spray freeze/harvest cycle, double-lever bin switch, Raku-Eco filter, and free ice-scoop model in appliance.xml, scene.xml, model.xml, scoop_model.xml, and native.xml.",
             },
             indent=2,
         )
@@ -519,49 +564,15 @@ def export_blender_meshes_and_xml():
     )
 
 
-def strip_visual_meshes(root: ET.Element, model):
-    for parent in root.iter():
-        for geom in list(parent):
-            if geom.tag != "geom" or not geom.get("name"):
-                continue
-            index = model.geom(geom.get("name")).id
-            if (
-                model.geom_contype[index] == 0
-                and model.geom_conaffinity[index] == 0
-                and geom.get("type") == "mesh"
-                and geom.get("mass") == "0"
-            ):
-                parent.remove(geom)
-
-
-def export_native_xml(mujoco):
-    spec = mujoco.MjSpec.from_file(str(ASSETS / "scene.xml"))
-    model = spec.compile()
-    data = mujoco.MjData(model)
-    mujoco.mj_forward(model, data)
-
-    root = ET.fromstring(spec.to_xml())
-    strip_visual_meshes(root, model)
-    used_meshes = {geom.get("mesh") for geom in root.iter("geom")}
-    used_materials = {geom.get("material") for geom in root.iter("geom")}
-    assets = root.find("asset")
-    if assets is not None:
-        for asset in list(assets):
-            if (asset.tag == "mesh" and asset.get("name") not in used_meshes) or (
-                asset.tag == "material" and asset.get("name") not in used_materials
-            ):
-                assets.remove(asset)
-    for actuator in root.iter("general"):
-        actuator.attrib.pop("input", None)
-    ET.indent(root, space="  ")
-    native_path = ASSETS / "native.xml"
-    native_path.write_text(ET.tostring(root, encoding="unicode") + "\n")
+def export_native_xml(mujoco, np):
+    kit_export_native_xml(ASSETS, "hoshizaki-im-35p", mujoco, np)
 
 
 def run_active_state_verification():
     import mujoco
+    import numpy as np
 
-    export_native_xml(mujoco)
+    export_native_xml(mujoco, np)
 
     model = mujoco.MjModel.from_xml_path(str(ASSETS / "scene.xml"))
     data = mujoco.MjData(model)
@@ -749,55 +760,21 @@ def run_active_state_verification():
         pin_scoop_pose=((-0.0600, -0.1150, 0.5600), (1.0, 0.0, 0.0, 0.0)),
     )
 
-    native_model = mujoco.MjModel.from_xml_path(str(ASSETS / "native.xml"))
-    native_data = mujoco.MjData(native_model)
-    mujoco.mj_forward(native_model, native_data)
-    body_poses = {}
-    for bname in NAMES:
-        bid = native_model.body(bname).id
-        pos = native_data.xpos[bid]
-        quat = native_data.xquat[bid]
-        body_poses[bname] = [float(pos[0]), float(pos[1]), float(pos[2]), float(quat[0]), float(quat[1]), float(quat[2]), float(quat[3])]
-
     evidence_dir = ASSETS / "active-state-evidence"
     evidence_dir.mkdir(parents=True, exist_ok=True)
-    frames_in = evidence_dir / "frames-input.json"
-    frames_out = evidence_dir / "frames-report.json"
-    frames_in.write_text(
-        json.dumps(
-            {
-                "hoshizaki-im-35p": {
-                    "glb": str(ASSETS / "hoshizaki-im-35p.glb"),
-                    "native_sha256": hashlib.sha256((ASSETS / "native.xml").read_bytes()).hexdigest(),
-                    "bodies": body_poses,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
+    frames_report, motion_report = kit_verify_frames_and_motions(
+        ASSETS, "hoshizaki-im-35p", NAMES, VISUAL_MOTIONS, mujoco, evidence_dir
     )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(frames_in),
-            str(frames_out),
-        ],
-        check=True,
-    )
-    frames_report = json.loads(frames_out.read_text())
-    assert frames_report["passed"], frames_report
+    app_frames = frames_report["appliances"]["hoshizaki-im-35p"]["frames"]
+    app_motions = motion_report["appliances"]["hoshizaki-im-35p"]["motions"]
     stage_summaries["rest_frame_alignment_verified"] = {
         "rest_snap": snap7,
-        "frames_aligned": len(frames_report["appliances"]["hoshizaki-im-35p"]["frames"]),
-        "max_position_error_m": max(
-            f["position_error_m"]
-            for f in frames_report["appliances"]["hoshizaki-im-35p"]["frames"]
-        ),
-        "max_orientation_error_rad": max(
-            f["orientation_error_rad"]
-            for f in frames_report["appliances"]["hoshizaki-im-35p"]["frames"]
-        ),
+        "frames_aligned": len(app_frames),
+        "max_position_error_m": max(f["position_error_m"] for f in app_frames),
+        "max_orientation_error_rad": max(f["orientation_error_rad"] for f in app_frames),
+        "scalar_joints_motion_verified": len(app_motions),
+        "motion_max_position_error_m": max(m["position_error_m"] for m in app_motions),
+        "motion_max_orientation_error_rad": max(m["orientation_error_rad"] for m in app_motions),
     }
 
     trace_path = evidence_dir / "trace.csv"
