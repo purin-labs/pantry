@@ -17,45 +17,16 @@ const GENERATED_TS = resolve(
   EDGE_DIR,
   "../../foundation/authority/generated/action-registry.ts",
 );
-const GENERATED_TOOL_MANIFEST = resolve(
-  EDGE_DIR,
-  "action-registry/generated-tools.json",
-);
-
-type GeneratedOutput = { path: string; content: string };
-
 async function main(): Promise<void> {
   validateRegistry(ACTION_REGISTRY);
-  const outputs: GeneratedOutput[] = [
-    { path: GENERATED_TS, content: renderTypeScript(ACTION_REGISTRY) },
-    {
-      path: GENERATED_TOOL_MANIFEST,
-      content: `${JSON.stringify({ tools: ACTION_REGISTRY.map(actionManifestEntry) }, null, 2)}\n`,
-    },
-  ];
+  const content = renderTypeScript(ACTION_REGISTRY);
 
-  const check = process.argv.includes("--check");
-
-  for (const output of outputs) {
-    if (check) {
-      await assertGeneratedFile(output.path, output.content);
-    } else {
-      await mkdir(dirname(output.path), { recursive: true });
-      await writeFile(output.path, output.content, "utf8");
-    }
+  if (process.argv.includes("--check")) {
+    await assertGeneratedFile(GENERATED_TS, content);
+  } else {
+    await mkdir(dirname(GENERATED_TS), { recursive: true });
+    await writeFile(GENERATED_TS, content, "utf8");
   }
-}
-
-function actionManifestEntry(action: ActionSource): {
-  provider: string;
-  command: string;
-  capabilityId: string;
-} {
-  return {
-    provider: action.provider,
-    command: action.command,
-    capabilityId: action.capabilityId,
-  };
 }
 
 function validateRegistry(actions: readonly ActionSource[]): void {
