@@ -122,8 +122,17 @@ function scripts(journey: Journey): Readonly<Record<string, Script>> {
     },
     PROPOSEFIRST: {
       tool: "recipe_workflow_propose",
-      args: () => propose(warm("warm-cup", "Warm the cup"), [LATE.id]),
+      // The model names the same finding twice.
+      args: () => propose(warm("warm-cup", "Warm the cup"), [LATE.id, LATE.id]),
       ask: ["commerce.recipe_workflow.propose"],
+    },
+    PROPOSEMANY: {
+      tool: "recipe_workflow_propose",
+      args: () =>
+        propose(
+          warm("many-findings", "Many findings"),
+          Array.from({ length: 17 }, () => LATE.id),
+        ),
     },
     PROPOSECYCLE: {
       tool: "recipe_workflow_propose",
@@ -318,7 +327,11 @@ it(
     }
     expect(await openProposals(author, base)).toHaveLength(1);
 
-    // 5. The engine refuses a cycle and an old digest. Each stores nothing.
+    // 5. The engine refuses a cycle and an old digest, and the tool refuses
+    //    more than 16 finding ids. Each stores nothing.
+    await chatThrough(fixture, author, "PROPOSEMANY");
+    expect(lastOutput(journey, "PROPOSEMANY")).toContain("at most 16");
+    expect(await openProposals(author, base)).toHaveLength(1);
     await chatThrough(fixture, author, "PROPOSECYCLE");
     expect(lastOutput(journey, "PROPOSECYCLE")).toContain("Nothing was stored");
     await chatThrough(fixture, author, "PROPOSESTALE");

@@ -9,6 +9,10 @@ import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { defineKitchenTool } from "./services";
 
+/** The finding ids of one proposal, and the length of its reason and of each id. */
+const MAX_PROPOSAL_FINDINGS = 16;
+const MAX_PROPOSAL_TEXT = 300;
+
 export const recipeWorkflowRead = defineKitchenTool({
   name: "recipe_workflow_read",
   description:
@@ -50,11 +54,11 @@ export const recipeWorkflowProposal = defineKitchenTool({
     properties: {
       workflowId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]{0,127}$" },
       baseDigest: { type: "string", pattern: "^[a-f0-9]{64}$" },
-      reason: { type: "string", maxLength: 300 },
+      reason: { type: "string", maxLength: MAX_PROPOSAL_TEXT },
       findingIds: {
         type: "array",
-        maxItems: 16,
-        items: { type: "string", maxLength: 300 },
+        maxItems: MAX_PROPOSAL_FINDINGS,
+        items: { type: "string", maxLength: MAX_PROPOSAL_TEXT },
       },
       changes: {
         type: "array",
@@ -171,16 +175,25 @@ function parseRecipeWorkflowProposeArgs(
     );
   }
   const reason = input.reason.trim();
-  if (reason.length === 0) {
+  if (reason.length === 0 || input.reason.length > MAX_PROPOSAL_TEXT) {
     throw new ProposalArgumentError(
-      "recipe_workflow_propose needs one short reason.",
+      `recipe_workflow_propose needs one short reason of at most ${MAX_PROPOSAL_TEXT} characters.`,
+    );
+  }
+  if (
+    input.findingIds.length > MAX_PROPOSAL_FINDINGS ||
+    input.findingIds.some((id) => id.length > MAX_PROPOSAL_TEXT)
+  ) {
+    throw new ProposalArgumentError(
+      `recipe_workflow_propose takes at most ${MAX_PROPOSAL_FINDINGS} finding ids, each from recipe_workflow_read.`,
     );
   }
   return {
     workflowId: input.workflowId,
     baseDigest: input.baseDigest,
     reason,
-    findingIds: input.findingIds,
+    // A repeated id names its finding once.
+    findingIds: [...new Set(input.findingIds)],
     changes,
   };
 }
