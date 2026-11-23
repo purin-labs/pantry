@@ -317,12 +317,6 @@ function commands(copy: ProductionScenario): readonly CommandStep[] {
       taskType,
       "many_to_many",
     ),
-    ...relationshipDefinition(
-      "bakery_production_task_after",
-      taskType,
-      taskType,
-      "many_to_many",
-    ),
   ];
   const values = fields.map((field) =>
     value(scenarioType, field.key, "integer", copy.settings[field.key], 5),

@@ -445,7 +445,6 @@ export function productionScenarioFromGraph(
     dependsOn: string[];
     earliestStartSeconds: number;
   }[] = [];
-  const ids = new Map<string, string>();
   for (const member of members) {
     const ref = member.target;
     if (ref.origin !== "custom" || ref.typeId !== "bakery_production_task")
@@ -478,24 +477,7 @@ export function productionScenarioFromGraph(
           ? attributes.earliest_start_seconds
           : 0,
     };
-    ids.set(ref.entityId, productionAssignmentId(assignment));
     assignments.push(assignment);
-  }
-  for (const member of members) {
-    const ref = member.target;
-    if (ref.origin !== "custom") return null;
-    const id = ids.get(ref.entityId);
-    const assignment = assignments.find(matchesAssignmentId.bind(null, id));
-    if (assignment === undefined) return null;
-    const dependencies = graph.relationships.filter(
-      isTaskDependency.bind(null, ref.entityId),
-    );
-    for (const dependency of dependencies) {
-      if (dependency.target.origin !== "custom") return null;
-      const predecessor = ids.get(dependency.target.entityId);
-      if (predecessor === undefined) return null;
-      assignment.dependsOn.push(predecessor);
-    }
   }
   const parentAttributes = attributesOf(parent);
   let route: unknown = { route: "cold-racking" };
@@ -553,12 +535,6 @@ export function productionScenarioFromGraph(
   });
 }
 
-function matchesAssignmentId(
-  id: string | undefined,
-  assignment: ProductionAssignment,
-): boolean {
-  return id !== undefined && productionAssignmentId(assignment) === id;
-}
 function matchesScenarioEntity(
   id: string,
   entity: CommerceGraphQueryResult["entities"][number],
@@ -601,17 +577,6 @@ function isScenarioTask(
   return (
     edge.origin === "custom" &&
     edge.definition.definitionId === "bakery_production_task_member" &&
-    edge.source.origin === "custom" &&
-    edge.source.entityId === id
-  );
-}
-function isTaskDependency(
-  id: string,
-  edge: CommerceGraphQueryResult["relationships"][number],
-): boolean {
-  return (
-    edge.origin === "custom" &&
-    edge.definition.definitionId === "bakery_production_task_after" &&
     edge.source.origin === "custom" &&
     edge.source.entityId === id
   );

@@ -445,20 +445,6 @@ async function verifyProductionScenario(): Promise<void> {
       )
         taskRefs.push(entity.reference);
     expect(taskRefs).toHaveLength(3);
-    const frontierQuery = parseCommerceGraphQuery({
-      kind: "relationship_traversal",
-      seeds: taskRefs,
-      relationshipDefinition: {
-        origin: "custom",
-        definitionId: "bakery_production_task_after",
-        revision: 1,
-      },
-      traversal: { maxDepth: 1, resultLimit: 100 },
-      filter: null,
-    });
-    const frontier = await client.query(MERCHANT, frontierQuery);
-    if (!frontier.ok) throw new Error(frontier.error.message);
-    expect(frontier.value.nextCursor).toBeNull();
     const parentQuery = parseCommerceGraphQuery({
       kind: "entity_by_ref",
       reference: savedQuery.reference,
@@ -467,16 +453,14 @@ async function verifyProductionScenario(): Promise<void> {
     });
     const parent = await client.query(MERCHANT, parentQuery);
     if (!parent.ok) throw new Error(parent.error.message);
-    expect(parent.value.merchantRevision).toBe(frontier.value.merchantRevision);
+    expect(parent.value.merchantRevision).toBe(
+      membership.value.merchantRevision,
+    );
     expect(
       productionScenarioFromGraph(
         {
           ...parent.value,
-          entities: [...parent.value.entities, ...frontier.value.entities],
-          relationships: [
-            ...parent.value.relationships,
-            ...frontier.value.relationships,
-          ],
+          entities: [...parent.value.entities, ...membership.value.entities],
         },
         copy.id,
       ),

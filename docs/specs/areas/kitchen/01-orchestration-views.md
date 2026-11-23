@@ -270,8 +270,9 @@ The `workflow_canvas` room (FND-10) holds the card positions of one saved run of
   `bakery_equipment` (`station`, `capacity_trays`), `bakery_scenario` (type revisions 1
   and 2), `bakery_production_scenario` (1 to 5) and `bakery_production_task` (1 and 2).
   The relationships are `bakery_procedure_operation`, `bakery_operation_equipment`,
-  `bakery_operation_next`, `bakery_scenario_procedure`, `bakery_production_procedure`,
-  `bakery_production_task_member` and `bakery_production_task_after`.
+  `bakery_operation_next`, `bakery_scenario_procedure`, `bakery_production_procedure`
+  and `bakery_production_task_member`. A production scenario keeps the dependencies of
+  its tasks in its `task_dependencies` attribute.
 - **Procedure reader:** two graph reads at depth 1 with a limit of 100. It needs seven
   operations and five equipment records, and it refuses a cursor, a full page or a
   changed merchant revision between the reads.
@@ -390,8 +391,6 @@ selection and no capability.
 - Two-member editing of a scenario and the cross-member walkthrough are deferred. A
   standalone shift-scenario JSON file is not built. Old scenarios do not replay against
   an older procedure revision.
-- `bakery_production_task_after` is defined, but no relationship of it is made:
-  dependencies stay in the `task_dependencies` attribute.
 - Only the Organisation purge deletes the R2 runs, staged runs and artifacts. A staged
   run that is never published stays until then.
 

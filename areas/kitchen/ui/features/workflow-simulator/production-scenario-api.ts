@@ -58,36 +58,17 @@ export async function readProductionScenario(
       filter: null,
     }),
   );
-  const dependencies =
-    tasks.length === 0
-      ? membership
-      : await readCommerceGraph(
-          organisationId,
-          parseCommerceGraphQuery({
-            kind: "relationship_traversal",
-            seeds: tasks.map(taskReference),
-            relationshipDefinition: {
-              origin: "custom",
-              definitionId: "bakery_production_task_after",
-              revision: 1,
-            },
-            traversal: { maxDepth: 1, resultLimit: 100 },
-            filter: null,
-          }),
-        );
-  if (
-    parent.merchantRevision !== membership.merchantRevision ||
-    dependencies.merchantRevision !== membership.merchantRevision
-  )
+  if (parent.merchantRevision !== membership.merchantRevision)
     return invalid(
       "The workspace changed while reading this production scenario. Reload and try again.",
     );
-  if (parent.nextCursor !== null || dependencies.nextCursor !== null)
+  if (parent.nextCursor !== null)
     return invalid("The saved production definition is incomplete.");
+  // The parent read holds the scenario's links, and the membership read holds
+  // its tasks. Task dependencies are in the task_dependencies attribute.
   const graph = {
     ...parent,
-    entities: [...parent.entities, ...dependencies.entities],
-    relationships: [...parent.relationships, ...dependencies.relationships],
+    entities: [...parent.entities, ...membership.entities],
   };
   const definition = productionScenarioFromGraph(graph, scenarioId);
   if (definition === null)
@@ -276,9 +257,6 @@ function isProductionTask(
     entity.reference.origin === "custom" &&
     entity.reference.typeId === "bakery_production_task"
   );
-}
-function taskReference(entity: CustomCommerceEntity) {
-  return entity.reference;
 }
 export function sameDefinition(
   left: ProductionScenario,
