@@ -110,17 +110,14 @@ function phaseCampaign(directory, expected, mode, prefix = "phase") {
   return phases.length - 1;
 }
 
-function verifyCase(task, scenario, timestep, cell = "separate") {
-  const label = cell === "separate" ? task : `${cell}-${task}`;
-  const directory = join(output, `${label}-${scenario}-${timestep}`);
+function verifyCase(task, scenario, timestep) {
+  const directory = join(output, `${task}-${scenario}-${timestep}`);
   mkdirSync(directory);
-  console.log(`Verifying ${label} ${scenario} at ${timestep}s`);
+  console.log(`Verifying ${task} ${scenario} at ${timestep}s`);
   const request = run(directory, "request", [
     "prepare",
     "--task",
     task,
-    "--cell",
-    cell,
     "--case",
     scenario,
     "--timestep",
@@ -213,7 +210,6 @@ function verifyCase(task, scenario, timestep, cell = "separate") {
     reject(directory, "failed-as-handoff", native, "unload");
   }
   return {
-    cell,
     task,
     case: scenario,
     timestep,
@@ -378,9 +374,6 @@ for (const task of ["table-to-rack", "table-to-oven"]) {
   if (task === "table-to-oven")
     results.push(verifyCase(task, "closed-door", 0.002));
 }
-for (const scenario of ["nominal", "blocked", "slip", "closed-door"])
-  results.push(verifyCase("table-to-oven", scenario, 0.002, "spanner-oven"));
-results.push(verifyCase("table-to-oven", "nominal", 0.001, "spanner-oven"));
 const combined = [
   verifyCombined("combined", "nominal", 0.002),
   verifyCombined("combined", "nominal", 0.001),

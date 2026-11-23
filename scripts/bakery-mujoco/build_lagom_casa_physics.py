@@ -1,6 +1,5 @@
-"""Build and verify the MuJoCo 4.0 mechanical and active-state model for the OPTION-O LAGOM casa."""
+"""Build and verify the native MuJoCo mechanical and active-state model for the OPTION-O LAGOM casa."""
 
-import copy
 import csv
 import hashlib
 import json
@@ -10,29 +9,10 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from appliance_physics_kit import (
-    BLENDER_BIN,
-    COL_ACCESSORY_RGBA,
-    COL_ARTIC_RGBA,
-    COL_BASE_RGBA,
-    COL_WALL_RGBA,
-    ROOT,
-    SITE_GRASP_RGBA,
-    SITE_SUPPORT_RGBA,
-    X_AXIS_QUAT,
-    Y_AXIS_QUAT,
-    add_adjacent_excludes,
-    add_standard_defaults,
-    emit_standalone_models,
-    export_and_verify_native_xml as kit_export_native_xml,
-    numbers,
-    verify_frames_and_motions as kit_verify_frames_and_motions,
-    write_xml,
-)
-
-NAME = "option-o-lagom-casa"
-ASSETS = ROOT / "assets/bakery-mujoco" / NAME
+ROOT = Path(__file__).resolve().parents[2]
+ASSETS = ROOT / "assets/bakery-mujoco/option-o-lagom-casa"
+BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
+VENV_PYTHON = ROOT / "scripts/bakery-mujoco/.venv/bin/python"
 
 NAMES = (
     "casa_grinder",
@@ -43,15 +23,6 @@ NAMES = (
     "casa_power_button",
     "casa_dosing_cup",
 )
-
-SCALAR_VISUAL_AXES = {
-    "casa_hopper_dial": [0.0, 0.0, 1.0],
-    "casa_hopper_lift": [0.0, 0.0, 1.0],
-    "casa_carrier_lift": [0.0, 0.0, 1.0],
-    "casa_burr_spin": [0.0, 0.0, 1.0],
-    "casa_clicker_snap": [0.0, 0.0, -1.0],
-    "casa_power_press": [1.0, 0.0, 0.0],
-}
 
 # Published total mass = 3.500 kg across the 7 articulated bodies
 MASSES = {
@@ -85,8 +56,17 @@ INERTIAS = {
 }
 
 
+def numbers(values):
+    return " ".join(f"{value:.9g}" for value in values)
+
+
+def write_xml(path: Path, element: ET.Element):
+    ET.indent(element, space="  ")
+    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
+
+
 def export_blender_meshes_and_xml():
-    """Run inside Blender to export body-local UV OBJ meshes and construct appliance.xml + scene.xml + model.xml."""
+    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml + scene.xml."""
     import bpy
 
     sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -95,96 +75,53 @@ def export_blender_meshes_and_xml():
     source = ASSETS / "option-o-lagom-casa.blend"
     bpy.ops.wm.open_mainfile(filepath=str(source))
     bpy.context.scene.frame_set(1)
-    for obj in list(bpy.data.objects):
-        obj.animation_data_clear()
-    bpy.context.view_layer.update()
-
-    # Remove detached illustrative stowed AC plug meshes (whose cable is a non-mesh CURVE).
-    plug_root = bpy.data.objects.get("casa_ac_plug")
-    if plug_root is not None:
-        for child in list(plug_root.children_recursive):
-            bpy.data.objects.remove(child, do_unlink=True)
-        bpy.data.objects.remove(plug_root, do_unlink=True)
     bpy.context.view_layer.update()
 
     parts = [bpy.data.objects[name] for name in NAMES]
     poses = {obj.name: obj.matrix_world.copy() for obj in parts}
 
-    # Reparent nested MESH objects directly to their owning articulated body in NAMES while preserving world pose.
-    visited = set()
-    for root in parts:
-        for obj in list(root.children_recursive):
-            if obj in visited or obj.type != "MESH":
-                continue
-            visited.add(obj)
-            parent = obj.parent
-            while parent is not None and parent not in parts:
-                parent = parent.parent
-            if parent is None:
-                continue
-            pose = obj.matrix_world.copy()
-            obj.animation_data_clear()
-            obj.parent = parent
-            obj.matrix_world = pose
-            if len(obj.data.vertices) >= 3:
-                xs = [v.co.x for v in obj.data.vertices]
-                ys = [v.co.y for v in obj.data.vertices]
-                zs = [v.co.z for v in obj.data.vertices]
-                changed = False
-                if max(xs) - min(xs) < 1e-5:
-                    obj.data.vertices[0].co.x += 2e-5
-                    changed = True
-                if max(ys) - min(ys) < 1e-5:
-                    obj.data.vertices[0].co.y += 2e-5
-                    changed = True
-                if max(zs) - min(zs) < 1e-5:
-                    obj.data.vertices[0].co.z += 2e-5
-                    changed = True
-                if changed:
-                    obj.data.update()
+    # Reparent nested MESH objects (such as silicone feet and power cord meshes)
+    # directly to their owning articulated body in NAMES while preserving world pose.
+    for obj in list(parts[0].children_recursive):
+        if obj.type != "MESH" and obj not in parts:
+            continue
+        parent = obj.parent
+        while parent is not None and parent not in parts:
+            parent = parent.parent
+        if parent is None:
+            continue
+        pose = obj.matrix_world.copy()
+        obj.animation_data_clear()
+        obj.parent = parent
+        obj.matrix_world = pose
     bpy.context.view_layer.update()
 
+    # Ensure every material has custom properties required by export_visual_meshes
     for mat in bpy.data.materials:
-        bsdf = (
-            mat.node_tree.nodes.get("Principled BSDF")
-            if (mat.use_nodes and mat.node_tree)
-            else None
-        )
         if "metallic" not in mat:
-            mat["metallic"] = (
-                float(bsdf.inputs["Metallic"].default_value)
-                if bsdf and "Metallic" in bsdf.inputs
-                else 0.0
-            )
+            mat["metallic"] = 0.0
         if "roughness" not in mat:
-            mat["roughness"] = (
-                float(bsdf.inputs["Roughness"].default_value)
-                if bsdf and "Roughness" in bsdf.inputs
-                else 0.35
-            )
+            mat["roughness"] = 0.35
         if "emission" not in mat:
-            mat["emission"] = (
-                float(bsdf.inputs["Emission Strength"].default_value)
-                if bsdf and "Emission Strength" in bsdf.inputs
-                else 0.0
-            )
+            mat["emission"] = 0.0
 
-    mesh_dir = ASSETS / "meshes"
-    if mesh_dir.is_dir():
-        for stale_obj in mesh_dir.glob("*.obj"):
-            stale_obj.unlink()
     export_visual_meshes(parts, ASSETS)
 
     model = ET.Element("mujoco", model="option-o-lagom-casa — assumed native dynamics")
     ET.SubElement(model, "compiler", angle="radian")
     ET.SubElement(model, "option", timestep="0.001", integrator="implicitfast")
-    defaults = add_standard_defaults(
-        model,
-        friction="0.65 0.015 0.003",
-        solref="0.004 1",
-        solimp="0.95 0.99 0.001",
-        condim="4",
+    defaults = ET.SubElement(model, "default")
+    ET.SubElement(
+        defaults,
+        "geom",
+        group="3",
+        contype="0",
+        conaffinity="0",
+        friction="0.65 0.005 0.0001",
+        solref="0.002 1",
+        solimp="0.99 0.999 0.001",
     )
+    ET.SubElement(defaults, "pair", solref="0.002 1", solimp="0.99 0.999 0.001")
 
     asset = ET.SubElement(model, "asset")
     ET.SubElement(asset, "include", file="visual_assets.xml")
@@ -236,32 +173,28 @@ def export_blender_meshes_and_xml():
     for foot_name, fx, fy in (
         ("casa_foot_fl_col", -0.026, -0.068),
         ("casa_foot_fr_col", 0.026, -0.068),
-        ("casa_foot_rl_col", -0.026, 0.036),
-        ("casa_foot_rr_col", 0.026, 0.036),
+        ("casa_foot_rl_col", -0.026, 0.068),
+        ("casa_foot_rr_col", 0.026, 0.068),
     ):
         ET.SubElement(
             base,
             "geom",
             name=foot_name,
             type="cylinder",
-            pos=numbers((fx, fy, 0.0010)),
-            size="0.0085 0.0010",
-            group="3",
+            pos=numbers((fx, fy, 0.0015)),
+            size="0.009 0.0015",
             contype="1",
             conaffinity="1",
-            rgba=COL_BASE_RGBA,
         )
     ET.SubElement(
         base,
         "geom",
         name="casa_base_deck",
         type="box",
-        pos="0 -0.0165 0.0197",
-        size="0.045 0.091 0.0177",
-        group="3",
+        pos="0 0 0.0195",
+        size="0.043 0.095 0.0165",
         contype="1",
         conaffinity="1",
-        rgba=COL_BASE_RGBA,
     )
     # Magnetic cup landing pad at Z = 0.038 m top surface
     ET.SubElement(
@@ -271,10 +204,8 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0 -0.0545 0.036",
         size="0.035 0.002",
-        group="3",
         contype="1",
         conaffinity="1",
-        rgba=COL_WALL_RGBA,
     )
     ET.SubElement(
         base,
@@ -282,8 +213,7 @@ def export_blender_meshes_and_xml():
         name="vessel_socket",
         pos="0 -0.0545 0.038",
         size="0.002",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
+        group="3",
     )
     ET.SubElement(
         base,
@@ -292,8 +222,7 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0 -0.0545 0.038",
         size="0.034 0.0025",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
+        group="3",
     )
     ET.SubElement(
         base,
@@ -301,8 +230,7 @@ def export_blender_meshes_and_xml():
         name="casa_chute_exit",
         pos="0 -0.0545 0.119",
         size="0.004",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
+        group="3",
     )
 
     # Vertical support pillar & horizontal motor housing collision proxies
@@ -311,49 +239,31 @@ def export_blender_meshes_and_xml():
         "geom",
         name="casa_pillar_col",
         type="cylinder",
-        pos="0 0.0455 0.0868",
-        size="0.015 0.0493",
-        group="3",
+        pos="0 0.0455 0.0825",
+        size="0.017 0.044",
         contype="1",
         conaffinity="1",
-        rgba=COL_BASE_RGBA,
     )
     ET.SubElement(
         base,
         "geom",
         name="casa_motor_col",
         type="cylinder",
-        pos="0 0.0312 0.152",
-        quat=Y_AXIS_QUAT,
-        size="0.025 0.0762",
-        group="3",
+        pos="0 0.033 0.152",
+        quat="0.70710678 0.70710678 0 0",
+        size="0.027 0.065",
         contype="1",
         conaffinity="1",
-        rgba=COL_BASE_RGBA,
     )
     ET.SubElement(
         base,
         "geom",
         name="casa_dome_col",
-        type="cylinder",
-        pos="0 -0.0545 0.216",
-        size="0.0185 0.026",
-        group="3",
+        type="sphere",
+        pos="0 -0.0545 0.219",
+        size="0.0145",
         contype="1",
         conaffinity="1",
-        rgba=COL_BASE_RGBA,
-    )
-    ET.SubElement(
-        base,
-        "geom",
-        name="casa_chamber_bottom_col",
-        type="cylinder",
-        pos="0 -0.0545 0.1335",
-        size="0.042 0.0110",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_BASE_RGBA,
     )
     # 12-segment hollow grind chamber bore
     for i in range(12):
@@ -367,18 +277,16 @@ def export_blender_meshes_and_xml():
                 (
                     0.0405 * math.cos(angle),
                     -0.0545 + 0.0405 * math.sin(angle),
-                    0.1740,
+                    0.1765,
                 )
             ),
-            size="0.0025 0.011 0.0515",
+            size="0.0025 0.011 0.054",
             euler=numbers((0, 0, angle)),
-            group="3",
             contype="1",
             conaffinity="1",
-            rgba=COL_WALL_RGBA,
         )
 
-    # Articulated joints and colliders on hopper, burr carrier, conical burr, chute clicker, and power button
+    # Articulated joints on hopper, burr carrier, conical burr, chute clicker, and power button
     ET.SubElement(
         hopper,
         "joint",
@@ -388,10 +296,6 @@ def export_blender_meshes_and_xml():
         limited="true",
         range="-6.2831853 6.2831853",
         damping="0.18",
-        armature="0.003",
-        frictionloss="0.02",
-        solreffriction="0.004 1",
-        solreflimit="0.005 1",
     )
     ET.SubElement(
         hopper,
@@ -402,22 +306,6 @@ def export_blender_meshes_and_xml():
         limited="true",
         range="0 0.100",
         damping="2.5",
-        armature="0.003",
-        frictionloss="3.40",
-        solreffriction="0.004 1",
-        solreflimit="0.005 1",
-    )
-    ET.SubElement(
-        hopper,
-        "geom",
-        name="casa_hopper_col",
-        type="cylinder",
-        pos="0 0 0.0207",
-        size="0.0402 0.0288",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         carrier,
@@ -428,22 +316,6 @@ def export_blender_meshes_and_xml():
         limited="true",
         range="0 0.080",
         damping="2.0",
-        armature="0.002",
-        frictionloss="2.50",
-        solreffriction="0.004 1",
-        solreflimit="0.005 1",
-    )
-    ET.SubElement(
-        carrier,
-        "geom",
-        name="casa_burr_carrier_col",
-        type="cylinder",
-        pos="0 0 0.0102",
-        size="0.0355 0.0102",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         cone,
@@ -454,20 +326,15 @@ def export_blender_meshes_and_xml():
         limited="false",
         damping="0.0015",
         armature="0.0004",
-        frictionloss="0.01",
-        solreffriction="0.004 1",
+        solreffriction="0.002 1",
     )
     ET.SubElement(
         cone,
         "geom",
         name="casa_burr_cone_proxy",
         type="cylinder",
-        pos="0 0 0.003",
-        size="0.0215 0.017",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_ARTIC_RGBA,
+        pos="0 0 0.008",
+        size="0.022 0.008",
     )
     ET.SubElement(
         clicker,
@@ -480,21 +347,6 @@ def export_blender_meshes_and_xml():
         springref="-0.001",
         stiffness="240",
         damping="0.03",
-        armature="0.0005",
-        solreflimit="0.005 1",
-    )
-    ET.SubElement(
-        clicker,
-        "geom",
-        name="casa_clicker_col",
-        type="cylinder",
-        pos="0 -0.005 0",
-        quat=Y_AXIS_QUAT,
-        size="0.009 0.005",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         button,
@@ -506,21 +358,6 @@ def export_blender_meshes_and_xml():
         range="0 0.0012",
         stiffness="65",
         damping="0.25",
-        armature="0.001",
-        solreflimit="0.005 1",
-    )
-    ET.SubElement(
-        button,
-        "geom",
-        name="casa_power_button_col",
-        type="cylinder",
-        pos="0 0 0",
-        quat=X_AXIS_QUAT,
-        size="0.0054 0.0008",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_ARTIC_RGBA,
     )
 
     # Dosing cup collision geometry (base foot, interior floor, 12-segment cylindrical wall, payload marker)
@@ -531,10 +368,8 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0 0 0.002",
         size="0.033 0.002",
-        group="3",
         contype="1",
         conaffinity="1",
-        rgba=COL_ACCESSORY_RGBA,
     )
     ET.SubElement(
         cup,
@@ -543,10 +378,8 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0 0 0.0195",
         size="0.031 0.0015",
-        group="3",
         contype="1",
         conaffinity="1",
-        rgba=COL_ACCESSORY_RGBA,
     )
     for i in range(12):
         angle = i * math.tau / 12
@@ -555,13 +388,11 @@ def export_blender_meshes_and_xml():
             "geom",
             name=f"casa_cup_wall_{i}",
             type="box",
-            pos=numbers((0.033 * math.cos(angle), 0.033 * math.sin(angle), 0.0505)),
-            size="0.002 0.009 0.0305",
+            pos=numbers((0.033 * math.cos(angle), 0.033 * math.sin(angle), 0.049)),
+            size="0.002 0.009 0.030",
             euler=numbers((0, 0, angle)),
-            group="3",
             contype="1",
             conaffinity="1",
-            rgba=COL_ACCESSORY_RGBA,
         )
     ET.SubElement(
         cup,
@@ -569,8 +400,7 @@ def export_blender_meshes_and_xml():
         name="casa_cup_base_site",
         pos="0 0 0",
         size="0.002",
-        group="4",
-        rgba=SITE_GRASP_RGBA,
+        group="3",
     )
     payload = ET.SubElement(cup, "body", name="ingredient_payload", pos="0 0 0")
     ET.SubElement(
@@ -587,8 +417,6 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0 0 0.022",
         size="0.028 0.0015",
-        contype="0",
-        conaffinity="0",
         group="2",
         rgba="0.36 0.23 0.14 0",
         mass="0",
@@ -608,21 +436,8 @@ def export_blender_meshes_and_xml():
         conaffinity="1",
     )
 
-    # Adjacent articulated-body contact exclusions + explicit cup contact pairs
-    contact = add_adjacent_excludes(
-        model,
-        (
-            ("exclude_grinder_hopper", "casa_grinder", "casa_hopper"),
-            ("exclude_grinder_carrier", "casa_grinder", "casa_burr_carrier"),
-            ("exclude_grinder_cone", "casa_grinder", "casa_burr_cone"),
-            ("exclude_grinder_clicker", "casa_grinder", "casa_clicker"),
-            ("exclude_grinder_button", "casa_grinder", "casa_power_button"),
-            ("exclude_hopper_carrier", "casa_hopper", "casa_burr_carrier"),
-            ("exclude_hopper_clicker", "casa_hopper", "casa_clicker"),
-            ("exclude_carrier_cone", "casa_burr_carrier", "casa_burr_cone"),
-        ),
-    )
-    model_contact = copy.deepcopy(contact)
+    # Explicit contact pairs
+    contact = ET.SubElement(model, "contact")
     ET.SubElement(
         contact,
         "pair",
@@ -760,18 +575,6 @@ def export_blender_meshes_and_xml():
     )
     write_xml(ASSETS / "scene.xml", scene)
 
-    emit_standalone_models(
-        ASSETS,
-        model_name="casa_grinder",
-        defaults=defaults,
-        asset=asset,
-        root_body=base,
-        contact=model_contact,
-        sensors=sensors,
-        exclude_sensors=("casa_cup_relpos", "casa_burr_torque"),
-        accessories=(("dosing_cup_model.xml", "casa_dosing_cup", cup),),
-    )
-
     (ASSETS / "physics-export.json").write_text(
         json.dumps(
             {
@@ -792,9 +595,53 @@ def export_blender_meshes_and_xml():
     )
 
 
+def strip_visual_meshes(root: ET.Element, model):
+    """Remove zero-mass non-contact visual meshes for the compact native.xml collision package."""
+    for parent in root.iter():
+        for geom in list(parent):
+            if geom.tag != "geom" or not geom.get("name"):
+                continue
+            index = model.geom(geom.get("name")).id
+            if (
+                model.geom_contype[index] == 0
+                and model.geom_conaffinity[index] == 0
+                and geom.get("type") == "mesh"
+                and geom.get("mass") == "0"
+            ):
+                parent.remove(geom)
+
+
 def export_native_xml(mujoco, np):
     """Compile scene.xml, strip decorative visual meshes, and write verified native.xml."""
-    return kit_export_native_xml(ASSETS, NAME, mujoco, np)
+    spec = mujoco.MjSpec.from_file(str(ASSETS / "scene.xml"))
+    model = spec.compile()
+    data = mujoco.MjData(model)
+    mujoco.mj_forward(model, data)
+
+    root = ET.fromstring(spec.to_xml())
+    strip_visual_meshes(root, model)
+    used_meshes = {geom.get("mesh") for geom in root.iter("geom")}
+    used_materials = {geom.get("material") for geom in root.iter("geom")}
+    assets = root.find("asset")
+    if assets is not None:
+        for asset in list(assets):
+            if (asset.tag == "mesh" and asset.get("name") not in used_meshes) or (
+                asset.tag == "material" and asset.get("name") not in used_materials
+            ):
+                assets.remove(asset)
+    ET.indent(root, space="  ")
+    destination = ASSETS / "native.xml"
+    destination.write_text(ET.tostring(root, encoding="unicode") + "\n")
+
+    rebuilt = mujoco.MjModel.from_xml_path(str(destination))
+    for field in ("body_mass", "body_inertia", "qpos0", "dof_damping"):
+        if not np.allclose(
+            getattr(model, field), getattr(rebuilt, field), rtol=1e-5, atol=1e-9
+        ):
+            raise RuntimeError(f"Export changed native {field} for option-o-lagom-casa")
+    if (rebuilt.nq, rebuilt.nv) != (model.nq, model.nv):
+        raise RuntimeError("Export changed native degrees of freedom.")
+    return model, rebuilt
 
 
 def run_active_state_journey():
@@ -1274,28 +1121,6 @@ def run_active_state_journey():
     # Write trace.csv and report.json
     evidence_dir = ASSETS / "active-state-evidence"
     evidence_dir.mkdir(parents=True, exist_ok=True)
-    frames_report, motion_report = kit_verify_frames_and_motions(
-        ASSETS,
-        NAME,
-        NAMES,
-        SCALAR_VISUAL_AXES,
-        mujoco,
-        evidence_dir,
-        cleanup_inputs=True,
-    )
-    rest_frames = frames_report["appliances"][NAME]["frames"]
-    motion_items = motion_report["appliances"][NAME]["motions"]
-    alignment_summary = {
-        "rest_passed": True,
-        "rest_frames_checked": len(rest_frames),
-        "rest_max_position_error_m": max(f["position_error_m"] for f in rest_frames),
-        "rest_max_orientation_error_rad": max(f["orientation_error_rad"] for f in rest_frames),
-        "motion_passed": True,
-        "motion_joints_checked": len(motion_items),
-        "motion_samples_per_joint": 21,
-        "motion_max_position_error_m": max(m["position_error_m"] for m in motion_items),
-        "motion_max_orientation_error_rad": max(m["orientation_error_rad"] for m in motion_items),
-    }
     trace_path = evidence_dir / "trace.csv"
     with trace_path.open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(trace_rows[0].keys()), lineterminator="\n")
@@ -1305,8 +1130,6 @@ def run_active_state_journey():
     tracked_files = sorted(
         [
             ASSETS / "appliance.xml",
-            ASSETS / "model.xml",
-            ASSETS / "dosing_cup_model.xml",
             ASSETS / "scene.xml",
             ASSETS / "native.xml",
             ASSETS / "visual_assets.xml",
@@ -1328,7 +1151,6 @@ def run_active_state_journey():
         "mujoco_version": mujoco.__version__,
         "rendered": False,
         "input_sha256": input_sha256,
-        "frame_alignment": alignment_summary,
         "journey": {
             "published_duty_cutoff_s": 90,
             "published_duty_rest_s": 90,
@@ -1412,6 +1234,10 @@ def main():
     # If invoked from Blender without flags, export in-process then invoke venv python for MuJoCo
     if "bpy" in sys.modules:
         export_blender_meshes_and_xml()
+        subprocess.run(
+            [str(VENV_PYTHON), str(Path(__file__).resolve()), "--verify-mujoco"],
+            check=True,
+        )
         return
 
     # Invoked from Python (e.g. scripts/bakery-mujoco/.venv/bin/python):

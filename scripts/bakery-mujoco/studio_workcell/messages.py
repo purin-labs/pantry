@@ -28,24 +28,24 @@ class RenderLightingConfig(messages.Snapshot):
 
 @dataclasses.dataclass(frozen=True)
 class WorkcellControl(messages.Snapshot):
-  """UI -> sim: live oven actuators, real-contact FR10 cycle mode, and ghost preview."""
+  """UI -> sim: live oven actuators, robot demo mode, and ghost preview."""
 
-  door_deg: float = 108.0
+  door_deg: float = 82.0
   handle_deg: float = 0.0
-  fan_rad_s: float = 0.0
-  damper_deg: float = 0.0
-  robot_mode: str = 'contact_cycle'
-  manual_joints_deg: tuple[float, ...] = (-22.0, -96.0, 124.0, -28.0, 68.0, 90.0)
-  gripper_open_mm: float = 45.0
+  fan_rad_s: float = 95.0
+  damper_deg: float = 18.0
+  robot_mode: str = 'auto_demo'
+  manual_joints_deg: tuple[float, ...] = (10.0, -78.0, 96.0, -108.0, -90.0, 0.0)
+  clamp_open_mm: float = 28.0
   show_ghost_path: bool = True
   ghost_progress: float = 0.55
 
 
 @dataclasses.dataclass(frozen=True)
 class StageTrayEvent(messages.Event):
-  """UI -> sim: reset tray on prep table (or Rail #2) and restart contact cycle if active."""
+  """UI -> sim: place the baking tray cleanly on oven rail #2 or prep table."""
 
-  target: str = 'prep_table'  # 'prep_table' or 'oven_rail2'
+  target: str = 'oven_rail2'  # 'oven_rail2' or 'prep_table'
 
 
 @dataclasses.dataclass(frozen=True)
@@ -62,7 +62,7 @@ class BakeSceneEvent(messages.Event):
 
 @dataclasses.dataclass(frozen=True)
 class WorkcellTelemetry(messages.Snapshot):
-  """sim -> UI: live workcell state, real-contact safety forces & planned trajectory."""
+  """sim -> UI: live workcell state + planned trajectory for extra_geoms."""
 
   sim_time: float = 0.0
   phase_label: str = 'Initializing'
@@ -70,14 +70,13 @@ class WorkcellTelemetry(messages.Snapshot):
   handle_deg: float = 0.0
   fan_rpm: float = 0.0
   damper_deg: float = 0.0
-  grasp_force_n: float = 0.0
-  env_force_n: float = 0.0
   rail2_touch_n: float = 0.0
-  tray_on_rail2: bool = False
-  safety_ok: bool = True
   arm_joints_deg: tuple[float, ...] = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
   ee_pos: tuple[float, float, float] = (0.0, 0.0, 0.0)
+  # Planned 3D trajectory points (N x 3) for translucent ghost path overlay.
   path_points: tuple[tuple[float, float, float], ...] = ()
-  ghost_ee_pos: tuple[float, float, float] = (-0.49, -0.48, 1.15)
+  # Ghost target pose along the planned path (pos_xyz, forward_xyz).
+  ghost_ee_pos: tuple[float, float, float] = (0.49, -0.35, 1.13)
   ghost_ee_mat: tuple[float, ...] = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+  # Ghost robot joint positions (base -> shoulder -> elbow -> wrist -> ee) for translucent ghost arm.
   ghost_arm_joints: tuple[tuple[float, float, float], ...] = ()

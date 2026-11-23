@@ -98,12 +98,12 @@ pub struct Physics {
 }
 
 impl Physics {
-    pub fn run(assets: &Assets, cell: Cell) -> Result<Self> {
-        let cycle = run_case(assets, cell, Case::Nominal, true)?;
+    pub fn run(assets: &Assets) -> Result<Self> {
+        let cycle = run_case(assets, Case::Nominal, true)?;
         let cycle_digest = digest(&cycle);
         let cycle: Value = serde_json::from_slice(&cycle)?;
-        let slip = run_case(assets, cell, Case::Slip, false)?;
-        let closed = run_case(assets, cell, Case::ClosedDoor, false)?;
+        let slip = run_case(assets, Case::Slip, false)?;
+        let closed = run_case(assets, Case::ClosedDoor, false)?;
         Ok(Self {
             load: timeline(
                 "table-to-oven-nominal",
@@ -142,7 +142,7 @@ impl Physics {
 
 /// One engine run of the FR10 oven cell. `cycle` loads the oven and then
 /// retrieves the tray in the same world.
-fn run_case(assets: &Assets, cell: Cell, case: Case, cycle: bool) -> Result<Vec<u8>> {
+fn run_case(assets: &Assets, case: Case, cycle: bool) -> Result<Vec<u8>> {
     let request = program::prepare(
         assets,
         &Preparation {
@@ -152,7 +152,7 @@ fn run_case(assets: &Assets, cell: Cell, case: Case, cycle: bool) -> Result<Vec<
             ingredient_lateral_mm: 0,
             clamp_force_n: 100.,
             task: BakeryTask::Oven,
-            cell,
+            cell: Cell::Separate,
             case,
             timestep: 0.002,
             rack_x_mm: 0,

@@ -1,6 +1,5 @@
-"""Build and verify the MuJoCo 4.0 mechanical and active-state model for the MiiCoffee DF64 II (Gen 2, V2.6)."""
+"""Build and verify the native MuJoCo mechanical and active-state model for the MiiCoffee DF64 II (Gen 2, V2.6)."""
 
-import copy
 import csv
 import hashlib
 import json
@@ -10,28 +9,10 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from appliance_physics_kit import (
-    BLENDER_BIN,
-    COL_ACCESSORY_RGBA,
-    COL_ARTIC_RGBA,
-    COL_BASE_RGBA,
-    COL_WALL_RGBA,
-    ROOT,
-    SITE_GRASP_RGBA,
-    SITE_SUPPORT_RGBA,
-    X_AXIS_QUAT,
-    add_adjacent_excludes,
-    add_standard_defaults,
-    emit_standalone_models,
-    export_and_verify_native_xml as kit_export_native_xml,
-    numbers,
-    verify_frames_and_motions as kit_verify_frames_and_motions,
-    write_xml,
-)
-
-NAME = "miicoffee-df64-gen2"
-ASSETS = ROOT / "assets/bakery-mujoco" / NAME
+ROOT = Path(__file__).resolve().parents[2]
+ASSETS = ROOT / "assets/bakery-mujoco/miicoffee-df64-gen2"
+BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
+VENV_PYTHON = ROOT / "scripts/bakery-mujoco/.venv/bin/python"
 
 NAMES = (
     "df64_grinder",
@@ -43,15 +24,6 @@ NAMES = (
     "df64_power_button",
     "df64_dosing_cup",
 )
-
-SCALAR_VISUAL_AXES = {
-    "df64_dial_turn": [0.0, 0.0, 1.0],
-    "df64_upper_carrier_lift": [0.0, 0.0, 1.0],
-    "df64_burr_spin": [0.0, 0.0, 1.0],
-    "df64_bellows_stroke": [0.0, 0.0, 1.0],
-    "df64_lid_stroke": [0.0, 0.0, 1.0],
-    "df64_power_press": [-1.0, 0.0, 0.0],
-}
 
 # Published total mass = 6.800 kg (15.0 lbs catalog weight; manual lists 7.2 kg N.W.)
 MASSES = {
@@ -88,8 +60,17 @@ INERTIAS = {
 }
 
 
+def numbers(values):
+    return " ".join(f"{value:.9g}" for value in values)
+
+
+def write_xml(path: Path, element: ET.Element):
+    ET.indent(element, space="  ")
+    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
+
+
 def export_blender_meshes_and_xml():
-    """Run inside Blender to export body-local UV OBJ meshes and construct appliance.xml + scene.xml + model.xml."""
+    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml + scene.xml."""
     import bpy
 
     sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -98,96 +79,51 @@ def export_blender_meshes_and_xml():
     source = ASSETS / "miicoffee-df64-gen2.blend"
     bpy.ops.wm.open_mainfile(filepath=str(source))
     bpy.context.scene.frame_set(1)
-    for obj in list(bpy.data.objects):
-        obj.animation_data_clear()
-    bpy.context.view_layer.update()
-
-    # Remove detached illustrative stowed AC plug meshes (whose cable is a non-mesh CURVE).
-    plug_root = bpy.data.objects.get("df64_power_plug")
-    if plug_root is not None:
-        for child in list(plug_root.children_recursive):
-            bpy.data.objects.remove(child, do_unlink=True)
-        bpy.data.objects.remove(plug_root, do_unlink=True)
     bpy.context.view_layer.update()
 
     parts = [bpy.data.objects[name] for name in NAMES]
     poses = {obj.name: obj.matrix_world.copy() for obj in parts}
 
     # Reparent nested MESH objects directly to their owning articulated body in NAMES while preserving world pose.
-    visited = set()
-    for root in parts:
-        for obj in list(root.children_recursive):
-            if obj in visited or obj.type != "MESH":
-                continue
-            visited.add(obj)
-            parent = obj.parent
-            while parent is not None and parent not in parts:
-                parent = parent.parent
-            if parent is None:
-                continue
-            pose = obj.matrix_world.copy()
-            obj.animation_data_clear()
-            obj.parent = parent
-            obj.matrix_world = pose
-            if len(obj.data.vertices) >= 3:
-                xs = [v.co.x for v in obj.data.vertices]
-                ys = [v.co.y for v in obj.data.vertices]
-                zs = [v.co.z for v in obj.data.vertices]
-                changed = False
-                if max(xs) - min(xs) < 1e-5:
-                    obj.data.vertices[0].co.x += 2e-5
-                    changed = True
-                if max(ys) - min(ys) < 1e-5:
-                    obj.data.vertices[0].co.y += 2e-5
-                    changed = True
-                if max(zs) - min(zs) < 1e-5:
-                    obj.data.vertices[0].co.z += 2e-5
-                    changed = True
-                if changed:
-                    obj.data.update()
+    for obj in list(parts[0].children_recursive):
+        if obj.type != "MESH" and obj not in parts:
+            continue
+        parent = obj.parent
+        while parent is not None and parent not in parts:
+            parent = parent.parent
+        if parent is None:
+            continue
+        pose = obj.matrix_world.copy()
+        obj.animation_data_clear()
+        obj.parent = parent
+        obj.matrix_world = pose
     bpy.context.view_layer.update()
 
     for mat in bpy.data.materials:
-        bsdf = (
-            mat.node_tree.nodes.get("Principled BSDF")
-            if (mat.use_nodes and mat.node_tree)
-            else None
-        )
         if "metallic" not in mat:
-            mat["metallic"] = (
-                float(bsdf.inputs["Metallic"].default_value)
-                if bsdf and "Metallic" in bsdf.inputs
-                else 0.0
-            )
+            mat["metallic"] = 0.0
         if "roughness" not in mat:
-            mat["roughness"] = (
-                float(bsdf.inputs["Roughness"].default_value)
-                if bsdf and "Roughness" in bsdf.inputs
-                else 0.35
-            )
+            mat["roughness"] = 0.35
         if "emission" not in mat:
-            mat["emission"] = (
-                float(bsdf.inputs["Emission Strength"].default_value)
-                if bsdf and "Emission Strength" in bsdf.inputs
-                else 0.0
-            )
+            mat["emission"] = 0.0
 
-    mesh_dir = ASSETS / "meshes"
-    if mesh_dir.is_dir():
-        for stale_obj in mesh_dir.glob("*.obj"):
-            stale_obj.unlink()
     export_visual_meshes(parts, ASSETS)
 
     model = ET.Element("mujoco", model="miicoffee-df64-gen2 — assumed native dynamics")
     ET.SubElement(model, "compiler", angle="radian")
     ET.SubElement(model, "option", timestep="0.001", integrator="implicitfast")
-    defaults = add_standard_defaults(
-        model,
-        friction="0.65 0.015 0.003",
-        solref="0.004 1",
-        solimp="0.95 0.99 0.001",
-        condim="4",
+    defaults = ET.SubElement(model, "default")
+    ET.SubElement(
+        defaults,
+        "geom",
+        group="3",
+        contype="0",
+        conaffinity="0",
+        friction="0.65 0.005 0.0001",
+        solref="0.002 1",
+        solimp="0.99 0.999 0.001",
     )
+    ET.SubElement(defaults, "pair", solref="0.002 1", solimp="0.99 0.999 0.001")
 
     asset = ET.SubElement(model, "asset")
     ET.SubElement(asset, "include", file="visual_assets.xml")
@@ -250,25 +186,21 @@ def export_blender_meshes_and_xml():
             type="cylinder",
             pos=numbers((fx, fy, 0.002)),
             size="0.013 0.002",
-            group="3",
             contype="1",
             conaffinity="1",
-            rgba=COL_BASE_RGBA,
         )
     ET.SubElement(
         base,
         "geom",
         name="df64_base_plinth_col",
         type="box",
-        pos="0 0 0.01175",
-        size="0.065 0.1125 0.00875",
-        group="3",
+        pos="0 0 0.011",
+        size="0.065 0.1125 0.008",
         contype="1",
         conaffinity="1",
-        rgba=COL_BASE_RGBA,
     )
 
-    # Holder fork support shelf, fork bracket/prongs, chute, throat & socket site for the 58 mm dosing cup
+    # Holder fork support shelf & socket site for the 58 mm dosing cup at (0.0, -0.0770, 0.0440)
     ET.SubElement(
         base,
         "geom",
@@ -276,106 +208,8 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0.0 -0.0770 0.0420",
         size="0.030 0.002",
-        group="3",
         contype="1",
         conaffinity="1",
-        rgba=COL_WALL_RGBA,
-    )
-    ET.SubElement(
-        base,
-        "geom",
-        name="df64_base_collar_col",
-        type="cylinder",
-        pos="0.0 0.0240 0.0235",
-        size="0.0595 0.0060",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_BASE_RGBA,
-    )
-    ET.SubElement(
-        base,
-        "geom",
-        name="df64_fork_mount_col",
-        type="box",
-        pos="0.0 -0.0390 0.0900",
-        size="0.018 0.005 0.016",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_WALL_RGBA,
-    )
-    ET.SubElement(
-        base,
-        "geom",
-        name="df64_fork_bar_col",
-        type="box",
-        pos="0.0 -0.0430 0.0965",
-        size="0.036 0.0025 0.003",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_WALL_RGBA,
-    )
-    ET.SubElement(
-        base,
-        "geom",
-        name="df64_fork_arm_l_col",
-        type="box",
-        pos="-0.0375 -0.0740 0.0965",
-        size="0.0022 0.019 0.003",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_WALL_RGBA,
-    )
-    ET.SubElement(
-        base,
-        "geom",
-        name="df64_fork_arm_r_col",
-        type="box",
-        pos="0.0375 -0.0740 0.0965",
-        size="0.0022 0.019 0.003",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_WALL_RGBA,
-    )
-    ET.SubElement(
-        base,
-        "geom",
-        name="df64_chute_col",
-        type="box",
-        pos="0.0 -0.0660 0.1550",
-        size="0.0135 0.0255 0.0245",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_BASE_RGBA,
-    )
-    ET.SubElement(
-        base,
-        "geom",
-        name="df64_upper_bezel_col",
-        type="cylinder",
-        pos="0.0 -0.0020 0.1965",
-        size="0.0595 0.0040",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_WALL_RGBA,
-    )
-    ET.SubElement(
-        base,
-        "geom",
-        name="df64_throat_col",
-        type="cylinder",
-        pos="0.0 -0.0020 0.2140",
-        size="0.044 0.024",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_WALL_RGBA,
     )
     ET.SubElement(
         base,
@@ -383,8 +217,7 @@ def export_blender_meshes_and_xml():
         name="vessel_socket",
         pos="0.0 -0.0770 0.0440",
         size="0.002",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
+        group="3",
     )
     ET.SubElement(
         base,
@@ -393,8 +226,7 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0.0 -0.0770 0.0440",
         size="0.032 0.0030",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
+        group="3",
     )
     ET.SubElement(
         base,
@@ -402,26 +234,31 @@ def export_blender_meshes_and_xml():
         name="df64_plasma_chute_exit",
         pos="0.0 -0.0815 0.1415",
         size="0.004",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
-    )
-
-    # Forward-tilted solid cylinder motor housing collision proxy (matches 8.4 deg forward tilt)
-    ET.SubElement(
-        base,
-        "geom",
-        name="df64_motor_body_col",
-        type="cylinder",
-        pos="0.0 0.0110 0.1110",
-        euler="0.147 0 0",
-        size="0.0540 0.0880",
         group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_BASE_RGBA,
     )
 
-    # Articulated joints and colliders on dial collar, upper burr carrier, lower 64 mm flat burr rotor, bellows, wood lid, and power switch
+    # Forward-tilted cylinder housing collision proxies
+    for i in range(12):
+        angle = i * math.tau / 12
+        ET.SubElement(
+            base,
+            "geom",
+            name=f"df64_cylinder_wall_{i}",
+            type="box",
+            pos=numbers(
+                (
+                    0.0 + 0.0500 * math.cos(angle),
+                    0.0100 + 0.0500 * math.sin(angle),
+                    0.1100,
+                )
+            ),
+            size="0.0025 0.013 0.085",
+            euler=numbers((0, 0, angle)),
+            contype="1",
+            conaffinity="1",
+        )
+
+    # Articulated joints on dial collar, upper burr carrier, lower 64 mm flat burr rotor, bellows, wood lid, and power switch
     ET.SubElement(
         dial,
         "joint",
@@ -431,22 +268,6 @@ def export_blender_meshes_and_xml():
         limited="true",
         range="-2.356194 2.356194",
         damping="0.22",
-        armature="0.003",
-        frictionloss="0.10",
-        solreffriction="0.004 1",
-        solreflimit="0.005 1",
-    )
-    ET.SubElement(
-        dial,
-        "geom",
-        name="df64_dial_collar_col",
-        type="cylinder",
-        pos="0 0 0.0141",
-        size="0.060 0.0141",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         upper_burr,
@@ -457,22 +278,6 @@ def export_blender_meshes_and_xml():
         limited="true",
         range="0 0.080",
         damping="1.8",
-        armature="0.002",
-        frictionloss="2.80",
-        solreffriction="0.004 1",
-        solreflimit="0.005 1",
-    )
-    ET.SubElement(
-        upper_burr,
-        "geom",
-        name="df64_upper_carrier_col",
-        type="cylinder",
-        pos="0 0 0.0068",
-        size="0.041 0.0102",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         lower_burr,
@@ -483,20 +288,15 @@ def export_blender_meshes_and_xml():
         limited="false",
         damping="0.0018",
         armature="0.0018",
-        frictionloss="0.01",
-        solreffriction="0.004 1",
+        solreffriction="0.002 1",
     )
     ET.SubElement(
         lower_burr,
         "geom",
         name="df64_lower_burr_proxy",
         type="cylinder",
-        pos="0 0 0.0004",
-        size="0.040 0.0039",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_ARTIC_RGBA,
+        pos="0 0 0.002",
+        size="0.032 0.002",
     )
     ET.SubElement(
         bellows,
@@ -507,22 +307,6 @@ def export_blender_meshes_and_xml():
         limited="true",
         range="-0.015 0.100",
         damping="1.8",
-        armature="0.002",
-        frictionloss="0.90",
-        solreffriction="0.004 1",
-        solreflimit="0.005 1",
-    )
-    ET.SubElement(
-        bellows,
-        "geom",
-        name="df64_bellows_col",
-        type="cylinder",
-        pos="0 0 0.0243",
-        size="0.0445 0.0243",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         lid,
@@ -533,22 +317,6 @@ def export_blender_meshes_and_xml():
         limited="true",
         range="-0.015 0.130",
         damping="1.4",
-        armature="0.001",
-        frictionloss="0.75",
-        solreffriction="0.004 1",
-        solreflimit="0.005 1",
-    )
-    ET.SubElement(
-        lid,
-        "geom",
-        name="df64_wood_lid_col",
-        type="cylinder",
-        pos="0 0 0.0038",
-        size="0.045 0.0082",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         button,
@@ -560,21 +328,6 @@ def export_blender_meshes_and_xml():
         range="0 0.0025",
         stiffness="75",
         damping="0.30",
-        armature="0.001",
-        solreflimit="0.005 1",
-    )
-    ET.SubElement(
-        button,
-        "geom",
-        name="df64_power_button_col",
-        type="cylinder",
-        pos="0.0015 0 0",
-        quat=X_AXIS_QUAT,
-        size="0.0072 0.0025",
-        group="3",
-        contype="1",
-        conaffinity="1",
-        rgba=COL_ARTIC_RGBA,
     )
 
     # Dosing cup collision geometry (base foot, interior floor, 12-segment cylindrical wall, payload marker)
@@ -585,10 +338,8 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0 0 0.002",
         size="0.028 0.002",
-        group="3",
         contype="1",
         conaffinity="1",
-        rgba=COL_ACCESSORY_RGBA,
     )
     ET.SubElement(
         cup,
@@ -597,10 +348,8 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0 0 0.005",
         size="0.026 0.0015",
-        group="3",
         contype="1",
         conaffinity="1",
-        rgba=COL_ACCESSORY_RGBA,
     )
     for i in range(12):
         angle = i * math.tau / 12
@@ -609,13 +358,11 @@ def export_blender_meshes_and_xml():
             "geom",
             name=f"df64_cup_wall_{i}",
             type="box",
-            pos=numbers((0.029 * math.cos(angle), 0.029 * math.sin(angle), 0.039)),
-            size="0.0018 0.0078 0.037",
+            pos=numbers((0.029 * math.cos(angle), 0.029 * math.sin(angle), 0.038)),
+            size="0.0018 0.0078 0.034",
             euler=numbers((0, 0, angle)),
-            group="3",
             contype="1",
             conaffinity="1",
-            rgba=COL_ACCESSORY_RGBA,
         )
     ET.SubElement(
         cup,
@@ -623,8 +370,7 @@ def export_blender_meshes_and_xml():
         name="df64_cup_base_site",
         pos="0 0 0",
         size="0.002",
-        group="4",
-        rgba=SITE_GRASP_RGBA,
+        group="3",
     )
     payload = ET.SubElement(cup, "body", name="ingredient_payload", pos="0 0 0")
     ET.SubElement(
@@ -641,8 +387,6 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0 0 0.014",
         size="0.026 0.0015",
-        contype="0",
-        conaffinity="0",
         group="2",
         rgba="0.36 0.23 0.14 0",
         mass="0",
@@ -662,26 +406,8 @@ def export_blender_meshes_and_xml():
         conaffinity="1",
     )
 
-    # Adjacent articulated-body contact exclusions + explicit cup contact pairs
-    contact = add_adjacent_excludes(
-        model,
-        (
-            ("exclude_grinder_dial", "df64_grinder", "df64_dial_collar"),
-            ("exclude_grinder_upper", "df64_grinder", "df64_upper_burr_carrier"),
-            ("exclude_grinder_lower", "df64_grinder", "df64_lower_burr_rotor"),
-            ("exclude_grinder_bellows", "df64_grinder", "df64_bellows"),
-            ("exclude_grinder_lid", "df64_grinder", "df64_wood_lid"),
-            ("exclude_grinder_button", "df64_grinder", "df64_power_button"),
-            ("exclude_dial_upper", "df64_dial_collar", "df64_upper_burr_carrier"),
-            ("exclude_dial_bellows", "df64_dial_collar", "df64_bellows"),
-            ("exclude_dial_lid", "df64_dial_collar", "df64_wood_lid"),
-            ("exclude_upper_lower", "df64_upper_burr_carrier", "df64_lower_burr_rotor"),
-            ("exclude_upper_bellows", "df64_upper_burr_carrier", "df64_bellows"),
-            ("exclude_upper_lid", "df64_upper_burr_carrier", "df64_wood_lid"),
-            ("exclude_bellows_lid", "df64_bellows", "df64_wood_lid"),
-        ),
-    )
-    model_contact = copy.deepcopy(contact)
+    # Explicit contact pairs
+    contact = ET.SubElement(model, "contact")
     ET.SubElement(
         contact,
         "pair",
@@ -816,18 +542,6 @@ def export_blender_meshes_and_xml():
     )
     write_xml(ASSETS / "scene.xml", scene)
 
-    emit_standalone_models(
-        ASSETS,
-        model_name="df64_grinder",
-        defaults=defaults,
-        asset=asset,
-        root_body=base,
-        contact=model_contact,
-        sensors=sensors,
-        exclude_sensors=("df64_cup_relpos", "df64_burr_torque"),
-        accessories=(("dosing_cup_model.xml", "df64_dosing_cup", cup),),
-    )
-
     (ASSETS / "physics-export.json").write_text(
         json.dumps(
             {
@@ -849,9 +563,53 @@ def export_blender_meshes_and_xml():
     )
 
 
+def strip_visual_meshes(root: ET.Element, model):
+    """Remove zero-mass non-contact visual meshes for the compact native.xml collision package."""
+    for parent in root.iter():
+        for geom in list(parent):
+            if geom.tag != "geom" or not geom.get("name"):
+                continue
+            index = model.geom(geom.get("name")).id
+            if (
+                model.geom_contype[index] == 0
+                and model.geom_conaffinity[index] == 0
+                and geom.get("type") == "mesh"
+                and geom.get("mass") == "0"
+            ):
+                parent.remove(geom)
+
+
 def export_native_xml(mujoco, np):
     """Compile scene.xml, strip decorative visual meshes, and write verified native.xml."""
-    return kit_export_native_xml(ASSETS, NAME, mujoco, np)
+    spec = mujoco.MjSpec.from_file(str(ASSETS / "scene.xml"))
+    model = spec.compile()
+    data = mujoco.MjData(model)
+    mujoco.mj_forward(model, data)
+
+    root = ET.fromstring(spec.to_xml())
+    strip_visual_meshes(root, model)
+    used_meshes = {geom.get("mesh") for geom in root.iter("geom")}
+    used_materials = {geom.get("material") for geom in root.iter("geom")}
+    assets = root.find("asset")
+    if assets is not None:
+        for asset in list(assets):
+            if (asset.tag == "mesh" and asset.get("name") not in used_meshes) or (
+                asset.tag == "material" and asset.get("name") not in used_materials
+            ):
+                assets.remove(asset)
+    ET.indent(root, space="  ")
+    destination = ASSETS / "native.xml"
+    destination.write_text(ET.tostring(root, encoding="unicode") + "\n")
+
+    rebuilt = mujoco.MjModel.from_xml_path(str(destination))
+    for field in ("body_mass", "body_inertia", "qpos0", "dof_damping"):
+        if not np.allclose(
+            getattr(model, field), getattr(rebuilt, field), rtol=1e-5, atol=1e-9
+        ):
+            raise RuntimeError(f"Export changed native {field} for miicoffee-df64-gen2")
+    if (rebuilt.nq, rebuilt.nv) != (model.nq, model.nv):
+        raise RuntimeError("Export changed native degrees of freedom.")
+    return model, rebuilt
 
 
 def run_active_state_journey():
@@ -1345,28 +1103,6 @@ def run_active_state_journey():
 
     evidence_dir = ASSETS / "active-state-evidence"
     evidence_dir.mkdir(parents=True, exist_ok=True)
-    frames_report, motion_report = kit_verify_frames_and_motions(
-        ASSETS,
-        NAME,
-        NAMES,
-        SCALAR_VISUAL_AXES,
-        mujoco,
-        evidence_dir,
-        cleanup_inputs=True,
-    )
-    rest_frames = frames_report["appliances"][NAME]["frames"]
-    motion_items = motion_report["appliances"][NAME]["motions"]
-    alignment_summary = {
-        "rest_passed": True,
-        "rest_frames_checked": len(rest_frames),
-        "rest_max_position_error_m": max(f["position_error_m"] for f in rest_frames),
-        "rest_max_orientation_error_rad": max(f["orientation_error_rad"] for f in rest_frames),
-        "motion_passed": True,
-        "motion_joints_checked": len(motion_items),
-        "motion_samples_per_joint": 21,
-        "motion_max_position_error_m": max(m["position_error_m"] for m in motion_items),
-        "motion_max_orientation_error_rad": max(m["orientation_error_rad"] for m in motion_items),
-    }
     trace_path = evidence_dir / "trace.csv"
     with trace_path.open("w", newline="") as handle:
         writer = csv.DictWriter(
@@ -1378,8 +1114,6 @@ def run_active_state_journey():
     tracked_files = sorted(
         [
             ASSETS / "appliance.xml",
-            ASSETS / "model.xml",
-            ASSETS / "dosing_cup_model.xml",
             ASSETS / "scene.xml",
             ASSETS / "native.xml",
             ASSETS / "visual_assets.xml",
@@ -1401,7 +1135,6 @@ def run_active_state_journey():
         "mujoco_version": mujoco.__version__,
         "rendered": False,
         "input_sha256": input_sha256,
-        "frame_alignment": alignment_summary,
         "journey": {
             "published_no_load_rpm": 1400,
             "published_motor_power_w": 250,
@@ -1490,6 +1223,10 @@ def main():
 
     if "bpy" in sys.modules:
         export_blender_meshes_and_xml()
+        subprocess.run(
+            [str(VENV_PYTHON), str(Path(__file__).resolve()), "--verify-mujoco"],
+            check=True,
+        )
         return
 
     subprocess.run(

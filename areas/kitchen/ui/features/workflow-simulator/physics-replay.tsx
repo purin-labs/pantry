@@ -66,10 +66,7 @@ import type {
   SimulatorState,
   SimulatorConnection,
 } from "./simulator-state";
-import {
-  SAVED_RUN_MESSAGE,
-  parseRehearsalFile,
-} from "@purin-labs/production-simulation/simulator/rehearsal-file";
+import { SAVED_RUN_MESSAGE, parseRehearsalFile } from "@purin-labs/production-simulation/simulator/rehearsal-file";
 import { readExample } from "./rehearsal-examples";
 import "./physics-replay.css";
 import {
@@ -304,79 +301,6 @@ export class PhysicsReplay extends React.Component<Props, State> {
 
   private async loadExample(task: Example): Promise<void> {
     await this.readFile(readExample(task));
-  }
-
-  private async runSpanner(mode: "transfer" | "oven-cycle"): Promise<void> {
-    if (this.props.robotRunner.running) return;
-    this.props.actions.pause();
-    const generation = ++this.importGeneration;
-    this.setState({
-      importing: { kind: "reading" },
-      rehearsing: { kind: "idle" },
-      notice:
-        mode === "oven-cycle"
-          ? "Running FR10 spanner oven cycle in browser MuJoCo…"
-          : "Running FR10 spanner oven load in browser MuJoCo…",
-    });
-    try {
-      const result = await this.props.robotRunner.execute(
-        {
-          kind: "selection",
-          robot: "fairino-fr10",
-          cell: "spanner-oven",
-          task: "table-to-oven",
-          scenario: "nominal",
-          mode,
-          ingredients: { massKg: 1, forwardMm: 0, lateralMm: 0 },
-        },
-        () => Promise.resolve(true),
-        (progress) => {
-          if (
-            !this.mounted ||
-            generation !== this.importGeneration ||
-            progress.stage !== "running"
-          )
-            return;
-          const percent =
-            progress.planned > 0
-              ? Math.min(
-                  100,
-                  Math.round((progress.step / progress.planned) * 100),
-                )
-              : 0;
-          this.setState({
-            notice: `Running FR10 spanner oven in browser MuJoCo… ${percent}%`,
-          });
-        },
-      );
-      if (
-        !this.mounted ||
-        !this.props.view.open ||
-        generation !== this.importGeneration
-      )
-        return;
-      this.props.actions.loaded(result.recording);
-      this.setState({
-        importing: { kind: "idle" },
-        notice:
-          "FR10 spanner oven simulation finished. Watch its motion here, or rehearse it on the production scheduler.",
-      });
-    } catch (error) {
-      if (
-        !this.mounted ||
-        !this.props.view.open ||
-        generation !== this.importGeneration
-      )
-        return;
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Unable to run the spanner oven simulation.";
-      this.setState({
-        importing: { kind: "rejected", message },
-        notice: "",
-      });
-    }
   }
 
   private async readFile(text: Promise<string>): Promise<void> {
@@ -656,11 +580,7 @@ export class PhysicsReplay extends React.Component<Props, State> {
             >
               Setup &amp; files
             </button>
-            <div
-              className="physics-camera-group"
-              role="group"
-              aria-label="3D camera"
-            >
+            <div className="physics-camera-group" role="group" aria-label="3D camera">
               <BakeryAppearanceControl />
               <button
                 aria-label="Show entire bakery"
@@ -829,43 +749,7 @@ export class PhysicsReplay extends React.Component<Props, State> {
                 </span>
                 <ArrowRight size={16} aria-hidden="true" />
               </button>
-              <button
-                className="physics-example"
-                disabled={busy || this.props.robotRunner.running}
-                onClick={this.runSpanner.bind(this, "transfer")}
-              >
-                <Box size={20} aria-hidden="true" />
-                <span>
-                  <strong>Spanner oven (MBCO-4ME)</strong>
-                  <small>
-                    FR10 · Overhead spanner to Rail #2 · 26.5 sec · Browser
-                    MuJoCo
-                  </small>
-                </span>
-                <ArrowRight size={16} aria-hidden="true" />
-              </button>
-              <button
-                className="physics-example"
-                disabled={busy || this.props.robotRunner.running}
-                onClick={this.runSpanner.bind(this, "oven-cycle")}
-              >
-                <Box size={20} aria-hidden="true" />
-                <span>
-                  <strong>Spanner oven cycle (MBCO-4ME)</strong>
-                  <small>
-                    FR10 · Load and retrieve on MBCO-4ME · 52.3 sec · Browser
-                    MuJoCo
-                  </small>
-                </span>
-                <ArrowRight size={16} aria-hidden="true" />
-              </button>
             </div>
-            {this.state.importing.kind === "reading" &&
-              this.state.notice !== "" && (
-                <p className="physics-import-notice" role="status">
-                  {this.state.notice}
-                </p>
-              )}
           </section>
           {document.kind === "ready" && (
             <p className="physics-loaded">{replayLabel(document.recording)}</p>
@@ -1070,10 +954,7 @@ export class PhysicsReplay extends React.Component<Props, State> {
           end,
           recording.request.timestep,
         )}
-        <section
-          aria-label="Recorded transfers"
-          className="physics-transfers-row"
-        >
+        <section aria-label="Recorded transfers" className="physics-transfers-row">
           <div className="physics-toolbar">
             {physicsTasks(replay).map(
               this.renderRecordedTransfer.bind(this, document),
@@ -1082,10 +963,7 @@ export class PhysicsReplay extends React.Component<Props, State> {
           <p className="physics-phase-summary">
             Current phase: <strong>{leg.label}</strong> · {leg.time.toFixed(2)}{" "}
             / {physicsDuration(recording).toFixed(2)} s · Recorded phase result:{" "}
-            <span
-              className="physics-outcome-badge"
-              data-outcome={recording.outcome.kind}
-            >
+            <span className="physics-outcome-badge" data-outcome={recording.outcome.kind}>
               {outcomeLabel(recording.outcome)}
             </span>
           </p>
@@ -1095,8 +973,8 @@ export class PhysicsReplay extends React.Component<Props, State> {
             <summary>Events, poses and provenance</summary>
             <p className="physics-recording-status">
               <strong>Recording preview</strong> · {replayLabel(replay)} ·
-              Recording result: {outcomeLabel(physicsOutcome(replay))} ·
-              Recorded motion: {recordingSampleTime(document).toFixed(2)} /{" "}
+              Recording result: {outcomeLabel(physicsOutcome(replay))} · Recorded
+              motion: {recordingSampleTime(document).toFixed(2)} /{" "}
               {duration(replay).toFixed(2)} s
             </p>
             <div className="physics-details">
@@ -1128,13 +1006,10 @@ export class PhysicsReplay extends React.Component<Props, State> {
                     Model: <code>{recording.provenance.modelHash}</code>
                   </p>
                 </div>
-                <ul>
-                  {recording.provenance.assumptions.map(renderAssumption)}
-                </ul>
+                <ul>{recording.provenance.assumptions.map(renderAssumption)}</ul>
                 <p className="physics-telemetry-note">
-                  Structural validation checks file consistency. Imported
-                  evidence is unauthenticated and is never a physical production
-                  receipt.
+                  Structural validation checks file consistency. Imported evidence
+                  is unauthenticated and is never a physical production receipt.
                 </p>
                 {replay.kind === "bakery-physics-sequence" && (
                   <p className="physics-telemetry-note">
@@ -1232,21 +1107,11 @@ function taskLabel(task: PhysicsRequest["bakeryTaskId"]): string {
   }
 }
 
-function isSpannerReplay(replay: PhysicsReplayData): boolean {
-  const first =
-    replay.kind === "bakery-physics-recording" ? replay : replay.loading;
-  return first.geometry.some((item) => item.name === "clamp_spanner_beam_col");
-}
-
 function replayLabel(replay: PhysicsReplayData): string {
   if (replay.kind === "bakery-physics-rack-sequence")
     return `${ROBOTS[replay.loading.request.robot].label} · Cold oven → table → cooling rack`;
   if (replay.kind === "bakery-physics-sequence")
-    return isSpannerReplay(replay)
-      ? `${ROBOTS[replay.loading.request.robot].label} · Spanner oven (MBCO-4ME) load–unload cycle`
-      : `${ROBOTS[replay.loading.request.robot].label} · Cold oven load–unload cycle`;
-  if (isSpannerReplay(replay))
-    return `${ROBOTS[replay.request.robot].label} · Spanner oven (MBCO-4ME) · ${replay.request.case}`;
+    return `${ROBOTS[replay.loading.request.robot].label} · Cold oven load–unload cycle`;
   return `${ROBOTS[replay.request.robot].label} · ${taskLabel(replay.request.bakeryTaskId)} · ${replay.request.case}`;
 }
 

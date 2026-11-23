@@ -424,9 +424,7 @@ def view_pose(pose: str, collision: bool) -> None:
         camera_setup(viewer.cam)
         viewer.opt.geomgroup[3] = int(collision)
         viewer.opt.geomgroup[1] = int(not collision)
-        viewer.opt.geomgroup[2] = int(not collision)
         viewer.opt.sitegroup[3] = 0
-        viewer.opt.sitegroup[4] = 0
         while viewer.is_running():
             started = time.monotonic()
             with viewer.lock():
@@ -443,7 +441,6 @@ def render_views(directory: Path) -> None:
     options = mujoco.MjvOption()
     options.geomgroup[3] = 0
     options.sitegroup[3] = 0
-    options.sitegroup[4] = 0
     directory.mkdir(parents=True, exist_ok=True)
     with mujoco.Renderer(model, height=1080, width=1440) as renderer:
         for pose in INSPECTION_POSES:

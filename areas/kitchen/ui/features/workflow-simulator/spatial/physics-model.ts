@@ -32,7 +32,6 @@ import {
   doorSweepBounds,
   type DoorSweep,
 } from "./door-sweep.ts";
-import { buildSpannerGroup } from "./physics-spanner-visuals.ts";
 
 // The Robot cell's instances, by their role in its two skills.
 const RACK = COLD_CELL.skills["table-to-rack"];
@@ -258,9 +257,8 @@ export class PhysicsModel {
       let parent: THREE.Group;
       if (item.body !== "world") parent = this[item.body];
       else if (
-        (item.name.startsWith("mbco_") &&
-          !item.name.startsWith("mbco_tray_")) ||
-        (item.name.startsWith("mbco4_") && !item.name.startsWith("mbco4_tray_"))
+        item.name.startsWith("mbco_") &&
+        !item.name.startsWith("mbco_tray_")
       )
         parent = this.ovenContacts;
       else parent = this.root;
@@ -296,14 +294,6 @@ export class PhysicsModel {
 
   usesUr5eTooling(): boolean {
     return this.contactGeometry.has("clamp_mount_spacer");
-  }
-
-  usesSpannerTooling(): boolean {
-    return this.contactGeometry.has("clamp_spanner_beam_col");
-  }
-
-  usesMbco4Oven(): boolean {
-    return this.contactGeometry.has("mbco4_door_col");
   }
 
   setFitCheckActive(active: boolean): boolean {
@@ -350,14 +340,8 @@ export class PhysicsModel {
     const fixture = sceneLegAt(this.recording, 0).recording.fixture;
     if (fixture.kind === "rack")
       throw new Error("Recording has no oven fixture.");
-    const door =
-      scene.getObjectByName("mbco_door") ?? scene.getObjectByName("mbco4_door");
+    const door = scene.getObjectByName("mbco_door");
     if (!door) throw new Error("Maruzen visual is missing its door pivot.");
-    const staticTray = scene.getObjectByName("mbco4_tray");
-    if (staticTray !== undefined) {
-      staticTray.removeFromParent();
-      staticTray.traverse(disposePhysicsObject);
-    }
     enableModelShadows(scene);
     scene.rotation.x = Math.PI / 2;
     door.rotation.y = -fixture.doorAngle;
@@ -365,11 +349,7 @@ export class PhysicsModel {
     this.root.updateMatrixWorld(true);
     const solids = [];
     for (const mesh of this.floorGeometry.get(OVEN.destination) ?? []) {
-      if (
-        mesh.name.startsWith("mbco_door_") ||
-        mesh.name.startsWith("mbco4_door_") ||
-        mesh.name.startsWith("mbco4_handle_")
-      )
+      if (mesh.name.startsWith("mbco_door_"))
         solids.push({
           mesh,
           position: mesh.position.clone(),
@@ -422,77 +402,6 @@ export class PhysicsModel {
 
   attachWorkcellVisuals(bundle: WorkcellVisualBundle): void {
     const recording = sceneLegAt(this.recording, 0).recording;
-    if (this.usesSpannerTooling()) {
-      this.tool.add(
-        buildSpannerGroup(
-          recording.geometry,
-          (item) => item.body === "tool",
-          "spanner_gripper_visual",
-          setPhysicsPose,
-        ),
-      );
-      this.jaw.add(
-        buildSpannerGroup(
-          recording.geometry,
-          (item) => item.body === "jaw",
-          "spanner_jaw_visual",
-          setPhysicsPose,
-        ),
-      );
-      this.tray.add(
-        buildSpannerGroup(
-          recording.geometry,
-          (item) => item.body === "tray",
-          "spanner_tray_visual",
-          setPhysicsPose,
-        ),
-      );
-      const pedestalGroup = buildSpannerGroup(
-        recording.geometry,
-        (item) => item.body === "world" && item.name.startsWith("pedestal_"),
-        "pedestal_visual",
-        setPhysicsPose,
-      );
-      pedestalGroup.visible = this.robot.visible;
-      this.resourceByObject.set(pedestalGroup, RACK.arm);
-      this.root.add(pedestalGroup);
-      const tableGroup = buildSpannerGroup(
-        recording.geometry,
-        (item) => item.body === "world" && item.name.startsWith("table_"),
-        "source_table_visual",
-        setPhysicsPose,
-      );
-      this.resourceByObject.set(tableGroup, RACK.source);
-      this.root.add(tableGroup);
-      const standGroup = buildSpannerGroup(
-        recording.geometry,
-        (item) => item.body === "world" && item.name === "oven_stand",
-        "oven_stand_visual",
-        setPhysicsPose,
-      );
-      this.resourceByObject.set(standGroup, OVEN.destination);
-      this.root.add(standGroup);
-      const obstruction = recording.geometry.find(
-        (item) => item.name === "destination_obstruction",
-      );
-      if (obstruction !== undefined) {
-        const group = new THREE.Group();
-        group.name = "destination_obstruction_visual";
-        setPhysicsPose(group, obstruction.pose);
-        mountVisualNode(
-          group,
-          takeRequiredNode(bundle.fixtures, "obstruction_oven_pan"),
-        );
-        this.resourceByObject.set(group, RACK.cell);
-        this.root.add(group);
-      }
-      this.root.updateMatrixWorld(true);
-      disposeUnusedVisualNodes(this.root, [
-        bundle.fixtures,
-        bundle.ur5eTooling,
-      ]);
-      return;
-    }
     if (this.usesUr5eTooling()) {
       if (bundle.ur5eTooling === null)
         throw new Error("UR5e recording is missing its tooling visual.");

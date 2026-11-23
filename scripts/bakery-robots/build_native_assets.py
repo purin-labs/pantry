@@ -21,15 +21,6 @@ from pour_over_station import (
     station_frames,
     station_geometry,
 )
-from spanner_workcell import (
-    FR10_SPEC,
-    MBCO4_DIR,
-    MBCO4_GLB,
-    SPANNER_HOME_Q,
-    SPANNER_OPEN_M,
-    SPANNER_TRAY_QUAT,
-    compose_spanner_oven_cell,
-)
 from workcell import (
     ASSETS,
     TRAY,
@@ -101,7 +92,7 @@ def export_pour_over(destination: Path, dependencies: set) -> None:
         source = mesh.get("file")
         if source is None:
             continue
-        path = Path(os.path.normpath(ASSETS / "fairino-fr10" / source))
+        path = (ASSETS / "fairino-fr10" / source).resolve()
         dependencies.add(path)
         mesh.set("file", os.path.relpath(path, destination))
         mesh.set(
@@ -146,84 +137,6 @@ def export_pour_over(destination: Path, dependencies: set) -> None:
             STATION / "gripper.xml",
         )
     )
-
-
-def export_spanner_oven(destination: Path, dependencies: set) -> None:
-    """Serialize the Plan 24 FR10 + Maruzen MBCO-4ME spanner-gripper workcell fixtures."""
-    for case, blocked, door_closed in (
-        ("nominal", False, False),
-        ("closed-door", False, True),
-        ("blocked", True, False),
-    ):
-        spec = compose_spanner_oven_cell(blocked=blocked, door_closed=door_closed)
-        original = spec.compile()
-        xml = ET.fromstring(spec.to_xml())
-        strip_visual_meshes(xml, original)
-        used_meshes = {geom.get("mesh") for geom in xml.iter("geom")}
-        asset = xml.find("asset")
-        if asset is not None:
-            for item in list(asset):
-                if item.tag == "mesh" and item.get("name") not in used_meshes:
-                    asset.remove(item)
-                elif item.tag in ("material", "texture"):
-                    asset.remove(item)
-        for geom in xml.iter("geom"):
-            geom.attrib.pop("material", None)
-        for mesh in xml.findall("./asset/mesh"):
-            source = mesh.get("file")
-            if source is None:
-                continue
-            base = (
-                ASSETS / FR10_SPEC.slug
-                if mesh.get("name", "").startswith(FR10_SPEC.slug + "__")
-                else MBCO4_DIR
-            )
-            path = Path(os.path.normpath(base / source))
-            dependencies.add(path)
-            mesh.set("file", os.path.relpath(path, destination))
-            mesh.set(
-                "content_type",
-                "model/stl" if path.suffix.lower() == ".stl" else "model/obj",
-            )
-        for element in xml.iter():
-            attributes = sorted(element.attrib.items())
-            element.attrib.clear()
-            element.attrib.update(attributes)
-        stem = f"spanner-oven-{case}"
-        xml_path = destination / f"{stem}.xml"
-        ET.indent(xml)
-        xml_path.write_text(ET.tostring(xml, encoding="unicode") + "\n")
-        model = mujoco.MjModel.from_xml_path(str(xml_path))
-        for field in ("body_mass", "body_inertia", "qpos0", "dof_damping"):
-            if not np.allclose(
-                getattr(original, field), getattr(model, field), rtol=1e-10, atol=1e-12
-            ):
-                raise RuntimeError(f"Spanner oven export changed {field}: {case}")
-        data = mujoco.MjData(model)
-        mujoco.mj_resetData(model, data)
-        data.qpos[arm_addresses(model)[0]] = SPANNER_HOME_Q
-        data.joint("clamp_opening").qpos[0] = SPANNER_OPEN_M
-        mujoco.mj_forward(model, data)
-        center = data.site("source_tray_center").xpos
-        data.joint("mbco_tray_free").qpos[:] = (*center, *SPANNER_TRAY_QUAT)
-        mujoco.mj_forward(model, data)
-        signature = mujoco.mjtState.mjSTATE_INTEGRATION
-        state = np.empty(mujoco.mj_stateSize(model, signature))
-        mujoco.mj_getState(model, data, state, signature)
-        base = data.body("fairino-fr10__base_link")
-        setup_path = destination / f"{stem}.json"
-        write_json(
-            setup_path,
-            {
-                "initialState": state.tolist(),
-                "robotBase": pose(base.xpos, base.xquat),
-                "fixture": fixture_snapshot(
-                    {"bakeryTaskId": BakeryTask.OVEN, "spanner": True}, model, data
-                ),
-                "geometry": geometry_snapshot(model, data),
-            },
-        )
-        dependencies.update((xml_path, setup_path))
 
 
 def build() -> None:
@@ -295,7 +208,7 @@ def build() -> None:
                         if mesh.get("name", "").startswith(robot_spec.slug + "__")
                         else TRAY.parent
                     )
-                    path = Path(os.path.normpath(base / source))
+                    path = (base / source).resolve()
                     dependencies.add(path)
                     mesh.set("file", os.path.relpath(path, destination))
                     mesh.set(
@@ -355,9 +268,7 @@ def build() -> None:
                 )
                 dependencies.update((xml_path, setup_path))
     export_pour_over(OUTPUT / "fairino-fr10", dependencies)
-    export_spanner_oven(OUTPUT / "fairino-fr10", dependencies)
     dependencies.add(TRAY.parent / "maruzen-mbco-5e.glb")
-    dependencies.add(MBCO4_GLB)
     linea_glb = (
         ROOT
         / "assets/bakery-mujoco/la-marzocco-linea-classic-s-2g/la-marzocco-linea-classic-s-2g.glb"

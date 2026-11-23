@@ -21,7 +21,6 @@ pub enum Cell {
     BlockedRack,
     UnreachableRack,
     PanStaging,
-    SpannerOven,
 }
 
 impl Cell {
@@ -32,7 +31,6 @@ impl Cell {
             Self::BlockedRack => "combined-blocked-rack",
             Self::UnreachableRack => "combined-unreachable-rack",
             Self::PanStaging => "pan-staging",
-            Self::SpannerOven => "spanner-oven",
         }
     }
 }
@@ -228,7 +226,6 @@ impl Assets {
             Cell::BlockedRack,
             Cell::UnreachableRack,
             Cell::PanStaging,
-            Cell::SpannerOven,
         ] {
             if request.model_hash == self.model_hash(request.robot, cell) {
                 return Ok(cell);
@@ -255,20 +252,6 @@ impl Assets {
                     && request.ingredients.forward_mm == 0
                     && request.ingredients.lateral_mm == 0,
                 "Pan staging requires the FR10 empty-pan carrier fixture"
-            );
-        }
-        if cell == Cell::SpannerOven {
-            ensure!(
-                request.robot == Robot::FairinoFr10
-                    && matches!(
-                        request.bakery_task_id,
-                        BakeryTask::Oven | BakeryTask::Unload
-                    )
-                    && matches!(
-                        request.case,
-                        Case::Nominal | Case::Slip | Case::ClosedDoor | Case::Blocked
-                    ),
-                "Spanner oven requires the FR10 MBCO-4ME spanner-gripper fixture"
             );
         }
         ensure!(

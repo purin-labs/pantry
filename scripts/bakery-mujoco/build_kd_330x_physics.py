@@ -1,38 +1,20 @@
-"""Build and verify the MuJoCo 4.0 mechanical and active-state model for the WPM KD-330X."""
+"""Build and verify the MuJoCo mechanical and active-state model for the WPM KD-330X."""
 
 from __future__ import annotations
 
 import csv
 import hashlib
 import json
+import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from appliance_physics_kit import (
-    BLENDER_BIN,
-    COL_ACCESSORY_RGBA,
-    COL_ARTIC_RGBA,
-    COL_BASE_RGBA,
-    COL_WALL_RGBA,
-    ROOT,
-    SITE_GRASP_RGBA,
-    SITE_SUPPORT_RGBA,
-    Y_AXIS_QUAT,
-    add_adjacent_excludes,
-    add_standard_defaults,
-    emit_standalone_models,
-    export_and_verify_native_xml as kit_export_native_xml,
-    numbers,
-    prepare_blender_assembly,
-    verify_frames_and_motions as kit_verify_frames_and_motions,
-    write_xml,
-)
-
+ROOT = Path(__file__).resolve().parents[2]
 NAME = "wpm-kd-330x"
 ASSETS = ROOT / "assets/bakery-mujoco" / NAME
+BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
 
 NAMES = (
     "kd330_body",
@@ -94,15 +76,68 @@ SCALAR_VISUAL_AXES = {
 }
 
 
+def numbers(values):
+    return " ".join(f"{value:.9g}" for value in values)
+
+
+def write_xml(path: Path, element: ET.Element):
+    ET.indent(element, space="  ")
+    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
+
+
 def export_blender_meshes_and_xml():
-    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml + scene.xml + model.xml."""
+    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml + scene.xml."""
+    import bpy
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from build_oven_visuals import export_visual_meshes
+
     source = ASSETS / f"{NAME}.blend"
-    parts, poses = prepare_blender_assembly(
-        source,
-        NAMES,
-        ASSETS,
-        default_roughness=0.35,
-    )
+    bpy.ops.wm.open_mainfile(filepath=str(source))
+    bpy.context.scene.frame_set(1)
+    bpy.context.view_layer.update()
+
+    parts = [bpy.data.objects[name] for name in NAMES]
+    poses = {obj.name: obj.matrix_world.copy() for obj in parts}
+
+    # Reparent every child mesh under the root to its nearest articulated ancestor in NAMES (preserving matrix_world)
+    for obj in list(parts[0].children_recursive):
+        if obj.type != "MESH" and obj not in parts:
+            continue
+        parent = obj.parent
+        while parent is not None and parent not in parts:
+            parent = parent.parent
+        if parent is None:
+            continue
+        pose = obj.matrix_world.copy()
+        obj.animation_data_clear()
+        obj.parent = parent
+        obj.matrix_world = pose
+        if obj.type == "MESH" and len(obj.data.vertices) >= 3:
+            xs = [v.co.x for v in obj.data.vertices]
+            ys = [v.co.y for v in obj.data.vertices]
+            zs = [v.co.z for v in obj.data.vertices]
+            if max(zs) - min(zs) < 1e-5:
+                obj.data.vertices[0].co.z += 2e-5
+                obj.data.update()
+            if max(ys) - min(ys) < 1e-5:
+                obj.data.vertices[0].co.y += 2e-5
+                obj.data.update()
+            if max(xs) - min(xs) < 1e-5:
+                obj.data.vertices[0].co.x += 2e-5
+                obj.data.update()
+    bpy.context.view_layer.update()
+
+    for mat in bpy.data.materials:
+        if "metallic" not in mat:
+            mat["metallic"] = 0.0
+        if "roughness" not in mat:
+            mat["roughness"] = 0.35
+        if "emission" not in mat:
+            mat["emission"] = 0.0
+
+    shutil.rmtree(ASSETS / "meshes", ignore_errors=True)
+    export_visual_meshes(parts, ASSETS)
 
     machine_mass_sum = round(sum(MASSES[k] for k in MACHINE_BODY_NAMES), 6)
     assert machine_mass_sum == 22.800, f"Expected 22.800 kg machine mass, got {machine_mass_sum}"
@@ -115,12 +150,13 @@ def export_blender_meshes_and_xml():
     ET.SubElement(app, "option", timestep="0.002", integrator="implicitfast")
     ET.SubElement(app, "size", nuserdata="10")
 
-    defaults = add_standard_defaults(
-        app,
-        friction="0.65 0.015 0.003",
-        solref="0.004 1",
-        solimp="0.95 0.99 0.001",
-        condim="4",
+    defaults = ET.SubElement(app, "default")
+    ET.SubElement(
+        defaults,
+        "geom",
+        friction="0.65 0.005 0.0001",
+        solref="0.003 1",
+        solimp="0.96 0.995 0.001",
     )
 
     asset = ET.SubElement(app, "asset")
@@ -135,7 +171,7 @@ def export_blender_meshes_and_xml():
         size="1.5 1.5 0.05",
         rgba="0.28 0.30 0.33 1",
         contype="1",
-        conaffinity="1",
+        conaffinity="3",
         group="2",
     )
 
@@ -195,32 +231,22 @@ def export_blender_meshes_and_xml():
             name=foot_name,
             type="cylinder",
             pos=numbers((fx, fy, 0.0260)),
-            size="0.0240 0.0260",
-            contype="1",
+            size="0.0235 0.0260",
+            contype="2",
             conaffinity="1",
             group="3",
-            rgba=COL_BASE_RGBA,
+            mass="0",
         )
 
-    # Chassis, underbody sump, side cheeks, front drip-tray support rails, group upper turret,
-    # cup-warmer deck & hoops, and locking bayonet shelves (top Z = 0.2300 m, inner span |X| >= 0.0290 m)
-    for cname, cpos, csize, crgba in (
-        ("kd330_underbody_col", (0.0, 0.0200, 0.0340), (0.0620, 0.1100, 0.0190), COL_BASE_RGBA),
-        ("kd330_rear_core_col", (0.0, 0.0610, 0.2490), (0.1515, 0.1690, 0.1970), COL_BASE_RGBA),
-        ("kd330_side_left_col", (-0.1550, 0.0625, 0.2420), (0.0050, 0.1675, 0.1900), COL_BASE_RGBA),
-        ("kd330_side_right_col", (0.1550, 0.0625, 0.2420), (0.0050, 0.1675, 0.1900), COL_BASE_RGBA),
-        ("kd330_front_rail_left_col", (-0.0880, -0.1440, 0.0500), (0.0280, 0.0700, 0.0035), COL_BASE_RGBA),
-        ("kd330_front_rail_right_col", (0.0880, -0.1440, 0.0500), (0.0280, 0.0700, 0.0035), COL_BASE_RGBA),
-        ("kd330_group_neck_col", (0.0, -0.1368, 0.3465), (0.0404, 0.0338, 0.0385), COL_BASE_RGBA),
-        ("kd330_cup_deck_col", (0.0, -0.0100, 0.4460), (0.1575, 0.0970, 0.0040), COL_WALL_RGBA),
-        ("kd330_top_rim_rear_col", (0.0, 0.2190, 0.4400), (0.1575, 0.0110, 0.0080), COL_WALL_RGBA),
-        ("kd330_top_rim_left_col", (-0.1435, 0.0600, 0.4400), (0.0140, 0.1520, 0.0080), COL_WALL_RGBA),
-        ("kd330_top_rim_right_col", (0.1435, 0.0600, 0.4400), (0.0140, 0.1520, 0.0080), COL_WALL_RGBA),
-        ("kd330_cup_rail_left_col", (-0.1435, 0.0560, 0.4640), (0.0040, 0.1460, 0.0160), COL_WALL_RGBA),
-        ("kd330_cup_rail_right_col", (0.1435, 0.0560, 0.4640), (0.0040, 0.1460, 0.0160), COL_WALL_RGBA),
-        ("kd330_cup_rail_rear_col", (0.0, 0.2180, 0.4640), (0.1180, 0.0040, 0.0160), COL_WALL_RGBA),
-        ("kd330_bayonet_left_shelf_col", (-0.0335, -0.1600, 0.2265), (0.0045, 0.0320, 0.0035), COL_WALL_RGBA),
-        ("kd330_bayonet_right_shelf_col", (0.0335, -0.1600, 0.2265), (0.0045, 0.0320, 0.0035), COL_WALL_RGBA),
+    # Chassis, side cheeks, E61 group head, cup-warmer deck, and locking bayonet shelves (top Z = 0.2300 m)
+    for cname, cpos, csize in (
+        ("kd330_rear_core_col", (0.0, 0.0640, 0.2420), (0.1510, 0.1630, 0.1900)),
+        ("kd330_side_left_col", (-0.1545, 0.0625, 0.2420), (0.0030, 0.1675, 0.1900)),
+        ("kd330_side_right_col", (0.1545, 0.0625, 0.2420), (0.0030, 0.1675, 0.1900)),
+        ("kd330_group_bell_col", (0.0, -0.1600, 0.2840), (0.0480, 0.0460, 0.0240)),
+        ("kd330_cup_deck_col", (0.0, -0.0100, 0.4470), (0.1280, 0.0820, 0.0030)),
+        ("kd330_bayonet_left_shelf_col", (-0.0325, -0.1600, 0.2265), (0.0065, 0.0320, 0.0035)),
+        ("kd330_bayonet_right_shelf_col", (0.0325, -0.1600, 0.2265), (0.0065, 0.0320, 0.0035)),
     ):
         ET.SubElement(
             base,
@@ -229,90 +255,20 @@ def export_blender_meshes_and_xml():
             type="box",
             pos=numbers(cpos),
             size=numbers(csize),
-            contype="1",
+            contype="2",
             conaffinity="1",
             group="3",
-            rgba=crgba,
+            mass="0",
         )
 
-    # E61 cylindrical group head bell (bottom Z = 0.2585 m, cleanly above seated portafilter top Z = 0.2580 m)
-    ET.SubElement(
-        base,
-        "geom",
-        name="kd330_group_bell_col",
-        type="cylinder",
-        pos="0 -0.1600 0.2835",
-        size="0.0508 0.0250",
-        contype="1",
-        conaffinity="1",
-        group="3",
-        rgba=COL_BASE_RGBA,
-    )
-    # Left & right scalloped rotary control knobs on front fascia
-    for kname, kx in (("kd330_steam_knob_col", -0.1040), ("kd330_hw_knob_col", 0.1040)):
-        ET.SubElement(
-            base,
-            "geom",
-            name=kname,
-            type="cylinder",
-            pos=numbers((kx, -0.1500, 0.3380)),
-            quat=Y_AXIS_QUAT,
-            size="0.0285 0.0110",
-            contype="1",
-            conaffinity="1",
-            group="3",
-            rgba=COL_BASE_RGBA,
-        )
-    # Front manometer bezel & upper-left round LCD bezel
-    ET.SubElement(
-        base,
-        "geom",
-        name="kd330_gauge_bezel_col",
-        type="cylinder",
-        pos="0.0420 -0.1080 0.1680",
-        quat=Y_AXIS_QUAT,
-        size="0.0290 0.0045",
-        contype="1",
-        conaffinity="1",
-        group="3",
-        rgba=COL_BASE_RGBA,
-    )
-    ET.SubElement(
-        base,
-        "geom",
-        name="kd330_lcd_bezel_col",
-        type="cylinder",
-        pos="-0.0520 -0.1080 0.3450",
-        quat=Y_AXIS_QUAT,
-        size="0.0270 0.0040",
-        contype="1",
-        conaffinity="1",
-        group="3",
-        rgba=COL_BASE_RGBA,
-    )
-    # Fixed right-side hot-water diffuser wand
-    ET.SubElement(
-        base,
-        "geom",
-        name="kd330_hot_water_wand_col",
-        type="capsule",
-        fromto="0.1040 -0.1280 0.3120 0.0980 -0.1500 0.2115",
-        size="0.0086",
-        contype="1",
-        conaffinity="1",
-        group="3",
-        rgba=COL_BASE_RGBA,
-    )
-
-    # Operational sites on kd330_body (group 4, visible semi-transparent rgba)
+    # Operational sites on kd330_body
     ET.SubElement(
         base,
         "site",
         name="kd330_group_seat_site",
         pos="0 -0.1600 0.2440",
         size="0.004",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
+        group="3",
     )
     ET.SubElement(
         base,
@@ -320,8 +276,7 @@ def export_blender_meshes_and_xml():
         name="kd330_hot_water_outlet_site",
         pos="0.0980 -0.1500 0.2030",
         size="0.004",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
+        group="3",
     )
     ET.SubElement(
         base,
@@ -330,8 +285,7 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 -0.1600 0.2300",
         size="0.0420 0.0340 0.0025",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
+        group="3",
     )
 
     # 1. kd330_steam_wand: left-side 360-deg stainless steam wand (#5, axis 1 0 0, -0.35 .. 0.55 rad)
@@ -345,9 +299,6 @@ def export_blender_meshes_and_xml():
         range="-0.35 0.55",
         damping="0.45",
         armature="0.003",
-        frictionloss="0.25",
-        solreffriction="0.004 1",
-        solreflimit="0.005 1",
     )
     ET.SubElement(
         wand,
@@ -355,23 +306,11 @@ def export_blender_meshes_and_xml():
         name="kd330_steam_wand_col",
         type="capsule",
         fromto="0 0 0 0.0100 -0.0245 -0.1500",
-        size="0.0065",
-        contype="1",
+        size="0.0060",
+        contype="2",
         conaffinity="1",
         group="3",
-        rgba=COL_ARTIC_RGBA,
-    )
-    ET.SubElement(
-        wand,
-        "geom",
-        name="kd330_steam_wand_grip_col",
-        type="capsule",
-        fromto="0.0050 -0.0151 -0.0430 0.0050 -0.0151 -0.0550",
-        size="0.0110",
-        contype="1",
-        conaffinity="1",
-        group="3",
-        rgba=COL_ARTIC_RGBA,
+        mass="0",
     )
     ET.SubElement(
         wand,
@@ -379,8 +318,7 @@ def export_blender_meshes_and_xml():
         name="kd330_steam_tip_site",
         pos="0.0100 -0.0245 -0.1560",
         size="0.004",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
+        group="3",
     )
 
     # 2. kd330_steam_lever: E61-style manual brew lever on right of group head (#10, axis -1 0 0, 0 .. 0.85 rad)
@@ -394,21 +332,18 @@ def export_blender_meshes_and_xml():
         range="0 0.85",
         damping="0.28",
         armature="0.002",
-        frictionloss="0.12",
-        solreffriction="0.004 1",
-        solreflimit="0.005 1",
     )
     ET.SubElement(
         lever,
         "geom",
         name="kd330_steam_lever_col",
         type="capsule",
-        fromto="0 0 0 0.0095 -0.0245 -0.0860",
-        size="0.0115",
-        contype="1",
-        conaffinity="1",
+        fromto="0 0 0 0.0095 -0.0240 -0.0960",
+        size="0.0080",
+        contype="0",
+        conaffinity="0",
         group="3",
-        rgba=COL_ARTIC_RGBA,
+        mass="0",
     )
 
     # 3. kd330_tank_lid: top 2.5 L water reservoir cover panel (#1, axis -1 0 0, 0 .. 1.05 rad)
@@ -422,9 +357,6 @@ def export_blender_meshes_and_xml():
         range="0 1.05",
         damping="0.55",
         armature="0.004",
-        frictionloss="0.35",
-        solreffriction="0.004 1",
-        solreflimit="0.005 1",
     )
     ET.SubElement(
         tank_lid,
@@ -433,10 +365,10 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 -0.0620 -0.0020",
         size="0.1280 0.0620 0.0025",
-        contype="1",
+        contype="2",
         conaffinity="1",
         group="3",
-        rgba=COL_ARTIC_RGBA,
+        mass="0",
     )
 
     # 4. kd330_drip_tray: pull-out stainless drip tray & wire grate (#6, slide axis 0 -1 0, 0 .. 0.160 m)
@@ -451,9 +383,6 @@ def export_blender_meshes_and_xml():
         range="0 0.160",
         damping="4.20",
         armature="0.008",
-        frictionloss="0.30",
-        solreffriction="0.004 1",
-        solreflimit="0.005 1",
     )
     ET.SubElement(
         drip_tray,
@@ -462,22 +391,10 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 -0.0140 0.0260",
         size="0.1360 0.0520 0.0020",
-        contype="1",
+        contype="2",
         conaffinity="1",
         group="3",
-        rgba=COL_ARTIC_RGBA,
-    )
-    ET.SubElement(
-        drip_tray,
-        "geom",
-        name="kd330_drip_pan_col",
-        type="box",
-        pos="0 -0.0010 -0.0020",
-        size="0.1570 0.0850 0.0280",
-        contype="1",
-        conaffinity="1",
-        group="3",
-        rgba=COL_ARTIC_RGBA,
+        mass="0",
     )
     ET.SubElement(
         drip_tray,
@@ -486,8 +403,7 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 -0.0140 0.0280",
         size="0.1380 0.0540 0.0025",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
+        group="3",
     )
 
     # 5. kd330_gauge_needle: lower-right 0-16 bar pressure gauge pointer (#13, axis 0 1 0, 0 .. 3.80 rad)
@@ -501,21 +417,18 @@ def export_blender_meshes_and_xml():
         range="0 3.80",
         damping="0.015",
         armature="0.0002",
-        frictionloss="0.002",
-        solreffriction="0.004 1",
-        solreflimit="0.005 1",
     )
     ET.SubElement(
         gauge,
         "geom",
         name="kd330_gauge_needle_col",
-        type="box",
-        pos="-0.0054 -0.0005 -0.0035",
-        size="0.0085 0.0010 0.0067",
-        contype="1",
-        conaffinity="1",
+        type="sphere",
+        pos="0 0 0",
+        size="0.0030",
+        contype="0",
+        conaffinity="0",
         group="3",
-        rgba=COL_ARTIC_RGBA,
+        mass="0",
     )
 
     # 6. kd330_portafilter: detachable 58 mm stainless portafilter (freejoint kd330_portafilter_free)
@@ -524,110 +437,26 @@ def export_blender_meshes_and_xml():
         pf,
         "geom",
         name="kd330_pf_head_col",
+        type="box",
+        pos="0 0 -0.0110",
+        size="0.0355 0.0310 0.0030",
+        contype="1",
+        conaffinity="2",
+        group="3",
+        mass="0",
+    )
+    ET.SubElement(
+        pf,
+        "geom",
+        name="kd330_pf_handle_col",
         type="cylinder",
-        pos="0 0 0",
-        size="0.0355 0.0140",
+        pos="0 -0.1040 -0.0130",
+        quat="0.70441603 0.70978806 0 0",
+        size="0.0145 0.0520",
         contype="1",
-        conaffinity="1",
+        conaffinity="2",
         group="3",
-        rgba=COL_ACCESSORY_RGBA,
-    )
-    ET.SubElement(
-        pf,
-        "geom",
-        name="kd330_pf_bayonet_ears_col",
-        type="box",
-        pos="0 0 0.0105",
-        size="0.0402 0.0095 0.0025",
-        contype="1",
-        conaffinity="1",
-        group="3",
-        rgba=COL_ACCESSORY_RGBA,
-    )
-    ET.SubElement(
-        pf,
-        "geom",
-        name="kd330_pf_spout_manifold_col",
-        type="box",
-        pos="0 0 -0.0185",
-        size="0.0130 0.0080 0.0045",
-        contype="1",
-        conaffinity="1",
-        group="3",
-        rgba=COL_ACCESSORY_RGBA,
-    )
-    ET.SubElement(
-        pf,
-        "geom",
-        name="kd330_pf_spout_left_col",
-        type="capsule",
-        fromto="-0.0100 0 -0.0195 -0.0235 0 -0.0300",
-        size="0.0042",
-        contype="1",
-        conaffinity="1",
-        group="3",
-        rgba=COL_ACCESSORY_RGBA,
-    )
-    ET.SubElement(
-        pf,
-        "geom",
-        name="kd330_pf_spout_right_col",
-        type="capsule",
-        fromto="0.0100 0 -0.0195 0.0235 0 -0.0300",
-        size="0.0042",
-        contype="1",
-        conaffinity="1",
-        group="3",
-        rgba=COL_ACCESSORY_RGBA,
-    )
-    ET.SubElement(
-        pf,
-        "geom",
-        name="kd330_pf_neck_col",
-        type="box",
-        pos="0 -0.0440 -0.0025",
-        size="0.0092 0.0143 0.0112",
-        contype="1",
-        conaffinity="1",
-        group="3",
-        rgba=COL_ACCESSORY_RGBA,
-    )
-    ET.SubElement(
-        pf,
-        "geom",
-        name="kd330_pf_handle_front_col",
-        type="capsule",
-        fromto="0 -0.0620 -0.0210 0 -0.1020 -0.0140",
-        size="0.0128",
-        contype="1",
-        conaffinity="1",
-        group="3",
-        rgba=COL_ACCESSORY_RGBA,
-    )
-    ET.SubElement(
-        pf,
-        "geom",
-        name="kd330_pf_handle_rear_col",
-        type="capsule",
-        fromto="0 -0.1020 -0.0140 0 -0.1420 -0.0060",
-        size="0.0168",
-        contype="1",
-        conaffinity="1",
-        group="3",
-        rgba=COL_ACCESSORY_RGBA,
-    )
-    ET.SubElement(
-        pf,
-        "geom",
-        name="kd330_pf_pommel_col",
-        type="cylinder",
-        pos="0 -0.1628 -0.0236",
-        quat=Y_AXIS_QUAT,
-        size="0.0172 0.0136",
-        contype="1",
-        conaffinity="1",
-        group="3",
-        rgba=COL_ACCESSORY_RGBA,
+        mass="0",
     )
     ET.SubElement(
         pf,
@@ -635,8 +464,7 @@ def export_blender_meshes_and_xml():
         name="vessel_socket",
         pos="0 -0.1080 -0.0135",
         size="0.005",
-        group="4",
-        rgba=SITE_GRASP_RGBA,
+        group="3",
     )
     ET.SubElement(
         pf,
@@ -644,8 +472,7 @@ def export_blender_meshes_and_xml():
         name="kd330_pf_basket_center",
         pos="0 0 0",
         size="0.004",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
+        group="3",
     )
     payload = ET.SubElement(pf, "body", name="ingredient_payload", pos="0 0 0")
     ET.SubElement(
@@ -667,20 +494,6 @@ def export_blender_meshes_and_xml():
         group="2",
         rgba="0.28 0.16 0.09 0",
         mass="0",
-    )
-
-    # Adjacent articulated-body contact exclusions (kd330_portafilter stays UN-excluded for bayonet & drip-grate contact)
-    contact = add_adjacent_excludes(
-        app,
-        (
-            ("exclude_body_steam_wand", "kd330_body", "kd330_steam_wand"),
-            ("exclude_body_steam_lever", "kd330_body", "kd330_steam_lever"),
-            ("exclude_body_tank_lid", "kd330_body", "kd330_tank_lid"),
-            ("exclude_body_drip_tray", "kd330_body", "kd330_drip_tray"),
-            ("exclude_body_gauge_needle", "kd330_body", "kd330_gauge_needle"),
-            ("exclude_steam_wand_drip_tray", "kd330_steam_wand", "kd330_drip_tray"),
-            ("exclude_steam_lever_gauge_needle", "kd330_steam_lever", "kd330_gauge_needle"),
-        ),
     )
 
     # Actuators
@@ -766,18 +579,6 @@ def export_blender_meshes_and_xml():
     ET.SubElement(scene_world, "light", pos="-1.0 -1.6 1.9", dir="0.35 0.6 -0.8")
     write_xml(ASSETS / "scene.xml", scene)
 
-    emit_standalone_models(
-        ASSETS,
-        model_name="kd330_body",
-        defaults=defaults,
-        asset=asset,
-        root_body=base,
-        contact=contact,
-        sensors=sensors,
-        exclude_sensors=("kd330_pf_relpos",),
-        accessories=(("portafilter_model.xml", "kd330_portafilter", pf),),
-    )
-
     (ASSETS / "physics-export.json").write_text(
         json.dumps(
             {
@@ -790,7 +591,7 @@ def export_blender_meshes_and_xml():
                 "pump_architecture": "7-stage variable-pressure commercial gear pump (0-16 bar gauge)",
                 "heating_architecture": "0.8 L brew boiler + 86-98 C PID brew thermoblock + 7-level super-steam thermoblock",
                 "water_reservoir_l": 2.5,
-                "scope": "Articulated MuJoCo 4.0 Filament PBR 1-group commercial espresso machine with left 360-deg steam wand, E61 manual brew lever, top tank lid, pull-out wire-grate drip tray, 0-16 bar gauge needle, and 6-DOF 58 mm portafilter.",
+                "scope": "Articulated MuJoCo 3.13 1-group commercial espresso machine with left 360-deg steam wand, E61 manual brew lever, top tank lid, pull-out wire-grate drip tray, 0-16 bar gauge needle, and 6-DOF 58 mm portafilter.",
             },
             indent=2,
         )
@@ -798,8 +599,49 @@ def export_blender_meshes_and_xml():
     )
 
 
+def strip_visual_meshes(root: ET.Element, model):
+    for parent in root.iter():
+        for geom in list(parent):
+            if geom.tag != "geom" or not geom.get("name"):
+                continue
+            index = model.geom(geom.get("name")).id
+            if (
+                model.geom_contype[index] == 0
+                and model.geom_conaffinity[index] == 0
+                and geom.get("type") == "mesh"
+                and geom.get("mass") == "0"
+            ):
+                parent.remove(geom)
+
+
 def export_native_xml(mujoco, np):
-    model, rebuilt = kit_export_native_xml(ASSETS, NAME, mujoco, np)
+    spec = mujoco.MjSpec.from_file(str(ASSETS / "scene.xml"))
+    model = spec.compile()
+    data = mujoco.MjData(model)
+    mujoco.mj_forward(model, data)
+
+    root = ET.fromstring(spec.to_xml())
+    strip_visual_meshes(root, model)
+    used_meshes = {geom.get("mesh") for geom in root.iter("geom")}
+    used_materials = {geom.get("material") for geom in root.iter("geom")}
+    assets = root.find("asset")
+    if assets is not None:
+        for asset in list(assets):
+            if (asset.tag == "mesh" and asset.get("name") not in used_meshes) or (
+                asset.tag == "material" and asset.get("name") not in used_materials
+            ):
+                assets.remove(asset)
+    ET.indent(root, space="  ")
+    native_path = ASSETS / "native.xml"
+    native_path.write_text(ET.tostring(root, encoding="unicode") + "\n")
+
+    rebuilt = mujoco.MjModel.from_xml_path(str(native_path))
+    for field in ("body_mass", "body_inertia", "qpos0", "dof_damping"):
+        if not np.allclose(getattr(model, field), getattr(rebuilt, field), rtol=1e-5, atol=1e-9):
+            raise RuntimeError(f"Export changed native {field} for {NAME}")
+    if (rebuilt.nq, rebuilt.nv) != (model.nq, model.nv):
+        raise RuntimeError(f"Export changed native (nq, nv) for {NAME}")
+
     machine_sum = sum(float(rebuilt.body(b).mass[0]) for b in MACHINE_BODY_NAMES)
     pf_mass = float(rebuilt.body("kd330_portafilter").mass[0])
     assert abs(machine_sum - 22.800) < 1e-6, machine_sum
@@ -809,7 +651,7 @@ def export_native_xml(mujoco, np):
 
 def write_package_docs(report: dict):
     s = report["stages"]
-    readme = f"""# WPM KD-330X — Blender 5.2 Visual & MuJoCo 4.0.0 Physics Package
+    readme = f"""# WPM KD-330X — Blender 5.2 Visual & MuJoCo 3.13 Physics Package
 
 1-group commercial espresso machine (`WPM KD-330X`, Japan `200 V AC`, `50/60 Hz`, `1,850 W` SKU) modeled directly from `instruction-manual-2023.pdf` (parts `1–14`) and WPM studio photography: `7-stage` variable-pressure gear pump (`P1–P7`), hybrid heating (`0.8 L` brew boiler + `86–98 °C` PID brew thermoblock + `7-level` super-steam thermoblock), E61-style mirror-chrome `58 mm` group head with right-side manual brew lever, `4 + 3` top button pods (`Power`, `-`, `Program`, `+` and `1-Cup`, `2-Cup`, `Clean`), upper-left round segmented LCD, left `10`-lobe scalloped steam knob & `360°` `3`-hole steam wand, right scalloped hot-water knob & diffuser wand, lower-right `0–16 bar` black-dial manometer, `2.5 L` top-load internal water tank, tubular cup-warmer guard hoops, and pull-out stainless drip tray with welded wire grate and `WPM WELHOME PRO` badge.
 See the [equipment reference specification](../../../docs/equipment/wpm-kd-330x/README.md).
@@ -822,7 +664,7 @@ See the [equipment reference specification](../../../docs/equipment/wpm-kd-330x/
 - [Editable Blender 5.2 source](wpm-kd-330x.blend), [articulated GLB](wpm-kd-330x.glb), and standalone [58 mm portafilter GLB](wpm-kd-330x-portafilter.glb).
 - Metal GPU Cycles renders (`1400 × 1200`, `64` samples + OIDN): [studio-main.png](studio-main.png), [studio-front.png](studio-front.png), [studio-right.png](studio-right.png), [studio-open.png](studio-open.png), and [studio-active.png](studio-active.png).
 - Verification manifests: [build-report.json](build-report.json), [inspection-report.json](inspection-report.json), and [physics-export.json](physics-export.json).
-- MuJoCo 4.0 MJCF models: [appliance.xml](appliance.xml), [scene.xml](scene.xml), standalone [model.xml](model.xml) and [portafilter_model.xml](portafilter_model.xml), and collision-only [native.xml](native.xml).
+- MuJoCo 3.13 MJCF models: [appliance.xml](appliance.xml), [scene.xml](scene.xml), and collision-only [native.xml](native.xml).
 - Active-state simulation & frame alignment: [active-states.md](active-states.md), [active-states.json](active-states.json), [report.json](active-state-evidence/report.json), [frames-report.json](active-state-evidence/frames-report.json), [motion-report.json](active-state-evidence/motion-report.json), and [trace.csv](active-state-evidence/trace.csv).
 
 ## Retained Bodies & Joints (`NAMES`)
@@ -847,9 +689,9 @@ scripts/bakery-mujoco/.venv/bin/python scripts/bakery-mujoco/build_kd_330x_physi
 """
     (ASSETS / "README.md").write_text(readme, encoding="utf-8")
 
-    active_md = f"""# WPM KD-330X — MuJoCo 4.0.0 Active-State & Frame Alignment Verification
+    active_md = f"""# WPM KD-330X — MuJoCo 3.13 Active-State & Frame Alignment Verification
 
-Verified in MuJoCo `{report['mujoco_version']}` at `dt = 0.002 s` across `{report['trace_samples']}` recorded telemetry samples (`active-state-evidence/trace.csv`, SHA-256 `{report['trace_csv_sha256'][:16]}…`).
+Verified at `dt = 0.002 s` across `{report['trace_samples']}` recorded telemetry samples (`active-state-evidence/trace.csv`, SHA-256 `{report['trace_csv_sha256'][:16]}…`).
 
 ## Verified Stages
 
@@ -1064,7 +906,7 @@ def run_active_state_verification():
         if step == 0:
             state["mode"] = "portafilter_on_drip_grate"
             model.body_mass[payload_bid] = 1e-9
-            data.qpos[pf_qpos_adr : pf_qpos_adr + 3] = [0.0, -0.1580, 0.1485]
+            data.qpos[pf_qpos_adr : pf_qpos_adr + 3] = [0.0, -0.1580, 0.1265]
             data.qpos[pf_qpos_adr + 3 : pf_qpos_adr + 7] = [1.0, 0.0, 0.0, 0.0]
             data.qvel[pf_dof_adr : pf_dof_adr + 6] = 0.0
         elif step == 180:
@@ -1093,16 +935,115 @@ def run_active_state_verification():
 
     # Stage 6: Verify BOTH rest frames AND --motion sampled scalar-joint trajectories via inspect_appliance_frames.mjs
     evidence_dir = ASSETS / "active-state-evidence"
+    evidence_dir.mkdir(parents=True, exist_ok=True)
     native_sha = hashlib.sha256((ASSETS / "native.xml").read_bytes()).hexdigest()
-    frames_report, motion_report = kit_verify_frames_and_motions(
-        ASSETS,
-        NAME,
-        NAMES,
-        SCALAR_VISUAL_AXES,
-        mujoco,
-        evidence_dir,
-        cleanup_inputs=True,
+    glb_str = str(ASSETS / f"{NAME}.glb")
+
+    native_data = mujoco.MjData(native_model)
+    mujoco.mj_resetData(native_model, native_data)
+    mujoco.mj_forward(native_model, native_data)
+    body_poses = {}
+    for bname in NAMES:
+        bid = native_model.body(bname).id
+        pos = native_data.xpos[bid]
+        quat = native_data.xquat[bid]
+        body_poses[bname] = [
+            float(pos[0]),
+            float(pos[1]),
+            float(pos[2]),
+            float(quat[0]),
+            float(quat[1]),
+            float(quat[2]),
+            float(quat[3]),
+        ]
+
+    frames_in = evidence_dir / "frames-input.json"
+    frames_out = evidence_dir / "frames-report.json"
+    frames_in.write_text(
+        json.dumps(
+            {
+                NAME: {
+                    "glb": glb_str,
+                    "native_sha256": native_sha,
+                    "bodies": body_poses,
+                }
+            },
+            indent=2,
+        )
+        + "\n"
     )
+    subprocess.run(
+        [
+            "node",
+            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
+            str(frames_in),
+            str(frames_out),
+        ],
+        check=True,
+    )
+    frames_report = json.loads(frames_out.read_text())
+    assert frames_report["passed"] is True, frames_report
+
+    # Sample 21 points across each scalar joint's full range for --motion check
+    motions = []
+    for jname, vaxis in SCALAR_VISUAL_AXES.items():
+        jid = native_model.joint(jname).id
+        jtype = int(native_model.jnt_type[jid])
+        kind = "hinge" if jtype == int(mujoco.mjtJoint.mjJNT_HINGE) else "slide"
+        low, high = native_model.jnt_range[jid]
+        bid = int(native_model.jnt_bodyid[jid])
+        samples = []
+        for idx in range(21):
+            val = float(low + (high - low) * idx / 20.0)
+            mujoco.mj_resetData(native_model, native_data)
+            native_data.qpos[native_model.jnt_qposadr[jid]] = val
+            mujoco.mj_forward(native_model, native_data)
+            samples.append(
+                {
+                    "value": val,
+                    "pose": [
+                        *native_data.xpos[bid].tolist(),
+                        *native_data.xquat[bid].tolist(),
+                    ],
+                }
+            )
+        motions.append(
+            {
+                "joint": jname,
+                "body": native_model.body(bid).name,
+                "kind": kind,
+                "visual_axis": vaxis,
+                "samples": samples,
+            }
+        )
+
+    motion_in = evidence_dir / "motion-input.json"
+    motion_out = evidence_dir / "motion-report.json"
+    motion_in.write_text(
+        json.dumps(
+            {
+                NAME: {
+                    "glb": glb_str,
+                    "native_sha256": native_sha,
+                    "motions": motions,
+                }
+            },
+            indent=2,
+        )
+        + "\n"
+    )
+    subprocess.run(
+        [
+            "node",
+            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
+            str(motion_in),
+            str(motion_out),
+            "--motion",
+        ],
+        check=True,
+    )
+    motion_report = json.loads(motion_out.read_text())
+    assert motion_report["passed"] is True, motion_report
 
     rest_frames = frames_report["appliances"][NAME]["frames"]
     motion_items = motion_report["appliances"][NAME]["motions"]

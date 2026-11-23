@@ -16,10 +16,9 @@ export type BrowserPhysicsTask =
       ingredients: IngredientLoad;
       robot: RobotModel;
       task: "table-to-rack" | "table-to-oven";
-      cell?: "separate" | "spanner-oven";
-      scenario: "nominal" | "blocked" | "unreachable" | "closed-door" | "slip";
-      mode?: "transfer" | "oven-cycle";
+      scenario: "nominal" | "blocked" | "unreachable";
       request?: never;
+      mode?: never;
       handoff?: never;
       rackCase?: never;
     }>

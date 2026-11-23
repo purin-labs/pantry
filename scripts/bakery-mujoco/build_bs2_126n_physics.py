@@ -1,6 +1,4 @@
-"""Build and verify the MuJoCo 4.0 mechanical, dual-bowl wash/rinse hydraulic, and 50A King drain model for the Maruzen BS2-126N."""
-
-from __future__ import annotations
+"""Build and verify the MuJoCo mechanical, dual-bowl wash/rinse hydraulic, and 50A King drain model for the Maruzen BS2-126N."""
 
 import csv
 import hashlib
@@ -11,27 +9,9 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from appliance_physics_kit import (
-    BLENDER_BIN,
-    COL_ACCESSORY_RGBA,
-    COL_ARTIC_RGBA,
-    COL_BASE_RGBA,
-    COL_WALL_RGBA,
-    ROOT,
-    SITE_GRASP_RGBA,
-    SITE_SUPPORT_RGBA,
-    add_adjacent_excludes,
-    add_standard_defaults,
-    emit_standalone_models,
-    export_and_verify_native_xml as kit_export_native_xml,
-    numbers,
-    prepare_blender_assembly,
-    verify_frames_and_motions as kit_verify_frames_and_motions,
-    write_xml,
-)
-
+ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / "assets/bakery-mujoco/maruzen-bs2-126n"
+BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
 
 NAMES = (
     "bs2_sink",
@@ -74,10 +54,62 @@ SCALAR_VISUAL_MOTIONS = {
 }
 
 
+def numbers(values):
+    return " ".join(f"{value:.9g}" for value in values)
+
+
+def write_xml(path: Path, element: ET.Element):
+    ET.indent(element, space="  ")
+    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
+
+
 def export_blender_meshes_and_xml():
-    """Run inside Blender to export body-local OBJ meshes and write appliance.xml, scene.xml, model.xml, and tray_model.xml."""
+    """Run inside Blender to export body-local OBJ meshes and write appliance.xml and scene.xml."""
+    import bpy
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from build_oven_visuals import export_visual_meshes
+
     source = ASSETS / "maruzen-bs2-126n.blend"
-    parts, poses = prepare_blender_assembly(source, NAMES, ASSETS)
+    bpy.ops.wm.open_mainfile(filepath=str(source))
+    bpy.context.scene.frame_set(1)
+    for obj in list(bpy.data.objects):
+        obj.animation_data_clear()
+    bpy.context.view_layer.update()
+
+    parts = [bpy.data.objects[name] for name in NAMES]
+    poses = {obj.name: obj.matrix_world.copy() for obj in parts}
+
+    # Reparent every mesh under bs2_sink to its nearest ancestor in NAMES while preserving world pose
+    for obj in list(parts[0].children_recursive):
+        if obj.type != "MESH" and obj not in parts:
+            continue
+        parent = obj.parent
+        while parent is not None and parent not in parts:
+            parent = parent.parent
+        if parent is None:
+            continue
+        pose = obj.matrix_world.copy()
+        obj.animation_data_clear()
+        obj.parent = parent
+        obj.matrix_world = pose
+        if obj.type == "MESH" and len(obj.data.vertices) >= 3:
+            for axis_idx in range(3):
+                coords = [v.co[axis_idx] for v in obj.data.vertices]
+                if max(coords) - min(coords) < 1e-5:
+                    obj.data.vertices[0].co[axis_idx] += 2e-5
+                    obj.data.update()
+    bpy.context.view_layer.update()
+
+    for mat in bpy.data.materials:
+        if "metallic" not in mat:
+            mat["metallic"] = 0.0
+        if "roughness" not in mat:
+            mat["roughness"] = 0.30
+        if "emission" not in mat:
+            mat["emission"] = 0.0
+
+    export_visual_meshes(parts, ASSETS)
 
     app = ET.Element(
         "mujoco",
@@ -86,8 +118,6 @@ def export_blender_meshes_and_xml():
     ET.SubElement(app, "compiler", angle="radian")
     ET.SubElement(app, "option", timestep="0.002", integrator="implicitfast")
     ET.SubElement(app, "size", nuserdata="8")
-
-    defaults = add_standard_defaults(app, friction="0.60 0.015 0.003")
 
     asset = ET.SubElement(app, "asset")
     ET.SubElement(asset, "include", file="visual_assets.xml")
@@ -101,7 +131,7 @@ def export_blender_meshes_and_xml():
         size="2.0 2.0 0.05",
         rgba="0.28 0.30 0.33 1",
         contype="1",
-        conaffinity="1",
+        conaffinity="3",
     )
 
     bodies = {}
@@ -145,7 +175,7 @@ def export_blender_meshes_and_xml():
     strainer_l = bodies["bs2_strainer_left"]
     tray = bodies["bs2_wash_tray"]
 
-    # Four Ø38 mm stainless legs + adjustable bullet feet touching Z = 0.000 m up to bowl underside Z = 0.550 m
+    # Four Ø38 mm leg bullet-foot collision cylinders touching Z = 0.000 m (CAD 07276: ±0.5670 m, -0.2700 / +0.2150 m)
     for foot_name, fx, fy in (
         ("bs2_foot_fl_col", -0.5670, -0.2700),
         ("bs2_foot_fr_col", 0.5670, -0.2700),
@@ -157,80 +187,28 @@ def export_blender_meshes_and_xml():
             "geom",
             name=foot_name,
             type="cylinder",
-            pos=numbers((fx, fy, 0.2750)),
-            size="0.0190 0.2750",
-            friction="0.80 0.015 0.003",
-            contype="1",
+            pos=numbers((fx, fy, 0.0190)),
+            size="0.0190 0.0190",
+            friction="0.80 0.005 0.0001",
+            contype="2",
             conaffinity="1",
             group="3",
-            rgba=COL_BASE_RGBA,
-        )
-
-    # Under-bowl 50A King drain wells, elbows, and 50A corrugated PVC drain hoses
-    for side, sx in (("left", -0.2900), ("right", 0.2900)):
-        ET.SubElement(
-            sink,
-            "geom",
-            name=f"bs2_king_drain_{side}_col",
-            type="cylinder",
-            pos=numbers((sx, 0.1200, 0.4820)),
-            size="0.0600 0.0640",
-            contype="1",
-            conaffinity="1",
-            group="3",
-            rgba=COL_WALL_RGBA,
-        )
-        ET.SubElement(
-            sink,
-            "geom",
-            name=f"bs2_drain_elbow_{side}_col",
-            type="box",
-            pos=numbers((sx, 0.0875, 0.4180)),
-            size="0.0320 0.0475 0.0160",
-            contype="1",
-            conaffinity="1",
-            group="3",
-            rgba=COL_WALL_RGBA,
-        )
-        ET.SubElement(
-            sink,
-            "geom",
-            name=f"bs2_drain_hose_{side}_col",
-            type="cylinder",
-            pos=numbers((sx, 0.0550, 0.2220)),
-            size="0.0290 0.1820",
-            contype="1",
-            conaffinity="1",
-            group="3",
-            rgba=COL_WALL_RGBA,
-        )
-        ET.SubElement(
-            sink,
-            "geom",
-            name=f"bs2_overflow_pipe_{side}_col",
-            type="cylinder",
-            pos=numbers((sx, 0.2050, 0.5600)),
-            size="0.0210 0.1500",
-            contype="1",
-            conaffinity="1",
-            group="3",
-            rgba=COL_WALL_RGBA,
         )
 
     # Non-overlapping concave dual-bowl wall + floor collision boxes + all-flat SUS430 undershelf box (CAD 07276)
     # Left bowl cavity: X in [-0.5600, -0.0150] (545 mm), Y in [-0.2600, +0.2000] (460 mm), floor top Z = 0.5500 m (250 mm deep)
     # Right bowl cavity: X in [+0.0150, +0.5600] (545 mm), Y in [-0.2600, +0.2000] (460 mm), floor top Z = 0.5500 m (250 mm deep)
     collision_boxes = (
-        ("bs2_undershelf_col", (0.0, -0.0275, 0.1860), (0.5900, 0.2560, 0.0140), COL_BASE_RGBA),
-        ("bs2_left_bowl_floor_col", (-0.2875, -0.0300, 0.5400), (0.2725, 0.2300, 0.0100), COL_BASE_RGBA),
-        ("bs2_right_bowl_floor_col", (0.2875, -0.0300, 0.5400), (0.2725, 0.2300, 0.0100), COL_BASE_RGBA),
-        ("bs2_left_outer_wall_col", (-0.5800, 0.0, 0.6650), (0.0200, 0.3000, 0.1350), COL_WALL_RGBA),
-        ("bs2_center_divider_col", (0.0, -0.0300, 0.6650), (0.0150, 0.2300, 0.1350), COL_WALL_RGBA),
-        ("bs2_right_outer_wall_col", (0.5800, 0.0, 0.6650), (0.0200, 0.3000, 0.1350), COL_WALL_RGBA),
-        ("bs2_front_wall_col", (0.0, -0.2800, 0.6650), (0.5600, 0.0200, 0.1350), COL_WALL_RGBA),
-        ("bs2_rear_deck_wall_col", (0.0, 0.2500, 0.6650), (0.5600, 0.0500, 0.1350), COL_WALL_RGBA),
+        ("bs2_undershelf_col", (0.0, -0.0275, 0.1860), (0.5670, 0.2425, 0.0140)),
+        ("bs2_left_bowl_floor_col", (-0.2875, -0.0300, 0.5400), (0.2725, 0.2300, 0.0100)),
+        ("bs2_right_bowl_floor_col", (0.2875, -0.0300, 0.5400), (0.2725, 0.2300, 0.0100)),
+        ("bs2_left_outer_wall_col", (-0.5800, 0.0, 0.6650), (0.0200, 0.3000, 0.1350)),
+        ("bs2_center_divider_col", (0.0, -0.0300, 0.6650), (0.0150, 0.2300, 0.1350)),
+        ("bs2_right_outer_wall_col", (0.5800, 0.0, 0.6650), (0.0200, 0.3000, 0.1350)),
+        ("bs2_front_wall_col", (0.0, -0.2800, 0.6650), (0.5600, 0.0200, 0.1350)),
+        ("bs2_rear_deck_wall_col", (0.0, 0.2500, 0.6650), (0.5600, 0.0500, 0.1350)),
     )
-    for cname, cpos, csize, crgba in collision_boxes:
+    for cname, cpos, csize in collision_boxes:
         ET.SubElement(
             sink,
             "geom",
@@ -238,22 +216,20 @@ def export_blender_meshes_and_xml():
             type="box",
             pos=numbers(cpos),
             size=numbers(csize),
-            friction="0.45 0.015 0.003",
-            contype="1",
+            friction="0.45 0.005 0.0001",
+            contype="2",
             conaffinity="1",
             group="3",
-            rgba=crgba,
         )
 
-    # Named operational sites on bs2_sink (group 4)
+    # Named operational sites on bs2_sink
     ET.SubElement(
         sink,
         "site",
         name="bs2_left_bowl_site",
         pos="-0.2875 -0.0920 0.5500",
         size="0.008",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
+        group="3",
     )
     ET.SubElement(
         sink,
@@ -261,8 +237,7 @@ def export_blender_meshes_and_xml():
         name="bs2_right_bowl_site",
         pos="0.2875 -0.0920 0.5500",
         size="0.008",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
+        group="3",
     )
     ET.SubElement(
         sink,
@@ -270,8 +245,7 @@ def export_blender_meshes_and_xml():
         name="bs2_faucet_deck_site",
         pos="0 0.2500 0.7960",
         size="0.008",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
+        group="3",
     )
     ET.SubElement(
         sink,
@@ -280,8 +254,7 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="-0.2875 -0.0920 0.5515",
         size="0.2200 0.1650 0.0030",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
+        group="3",
     )
     ET.SubElement(
         sink,
@@ -290,8 +263,7 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0.2875 -0.0920 0.5515",
         size="0.2200 0.1650 0.0030",
-        group="4",
-        rgba=SITE_SUPPORT_RGBA,
+        group="3",
     )
 
     # Left 50A drain cover & stopper joint (0 .. 0.080 m)
@@ -305,9 +277,6 @@ def export_blender_meshes_and_xml():
         range="0 0.080",
         damping="3.5",
         armature="0.005",
-        frictionloss="2.0",
-        solreffriction="0.004 1",
-        solreflimit="0.005 1",
     )
     ET.SubElement(
         plug_l,
@@ -316,10 +285,9 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0 0 0.0060",
         size="0.0460 0.0050",
-        contype="1",
+        contype="2",
         conaffinity="1",
         group="3",
-        rgba=COL_ARTIC_RGBA,
     )
 
     # Right 50A drain cover & stopper joint (0 .. 0.080 m)
@@ -333,9 +301,6 @@ def export_blender_meshes_and_xml():
         range="0 0.080",
         damping="3.5",
         armature="0.005",
-        frictionloss="2.0",
-        solreffriction="0.004 1",
-        solreflimit="0.005 1",
     )
     ET.SubElement(
         plug_r,
@@ -344,10 +309,9 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0 0 0.0060",
         size="0.0460 0.0050",
-        contype="1",
+        contype="2",
         conaffinity="1",
         group="3",
-        rgba=COL_ARTIC_RGBA,
     )
 
     # Removable crumb strainer basket in left 50A King drain well (0 .. 0.120 m)
@@ -361,9 +325,6 @@ def export_blender_meshes_and_xml():
         range="0 0.120",
         damping="4.0",
         armature="0.006",
-        frictionloss="2.5",
-        solreffriction="0.004 1",
-        solreflimit="0.005 1",
     )
     ET.SubElement(
         strainer_l,
@@ -372,10 +333,9 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0 0 0.0410",
         size="0.0410 0.0380",
-        contype="1",
+        contype="2",
         conaffinity="1",
         group="3",
-        rgba=COL_ARTIC_RGBA,
     )
 
     # Removable 400 x 300 x 20 mm MBCO-4ME baking tray (6-DOF freejoint, vessel_socket, ingredient_payload)
@@ -387,11 +347,10 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 0 0.0100",
         size="0.2000 0.1500 0.0100",
-        friction="0.48 0.015 0.003",
+        friction="0.48 0.005 0.0001",
         contype="1",
-        conaffinity="1",
+        conaffinity="2",
         group="3",
-        rgba=COL_ACCESSORY_RGBA,
     )
     ET.SubElement(
         tray,
@@ -399,8 +358,7 @@ def export_blender_meshes_and_xml():
         name="vessel_socket",
         pos="0 0 0.0200",
         size="0.008",
-        group="4",
-        rgba=SITE_GRASP_RGBA,
+        group="3",
     )
     payload = ET.SubElement(tray, "body", name="ingredient_payload", pos="0 0 0")
     ET.SubElement(
@@ -424,17 +382,6 @@ def export_blender_meshes_and_xml():
         mass="0",
     )
 
-    # Contact exclusions between sink body and drain plugs / strainer (free tray remains free to contact bowls)
-    contact = add_adjacent_excludes(
-        app,
-        (
-            ("exclude_sink_plug_left", "bs2_sink", "bs2_drain_plug_left"),
-            ("exclude_sink_plug_right", "bs2_sink", "bs2_drain_plug_right"),
-            ("exclude_sink_strainer_left", "bs2_sink", "bs2_strainer_left"),
-            ("exclude_plug_strainer_left", "bs2_drain_plug_left", "bs2_strainer_left"),
-        ),
-    )
-
     # Actuators
     actuators = ET.SubElement(app, "actuator")
     ET.SubElement(
@@ -442,8 +389,8 @@ def export_blender_meshes_and_xml():
         "position",
         name="bs2_plug_left_actuator",
         joint="bs2_plug_left_lift",
-        kp="1400",
-        kv="30.0",
+        kp="900",
+        kv="24.0",
         ctrlrange="0 0.080",
         forcerange="-50 50",
     )
@@ -452,8 +399,8 @@ def export_blender_meshes_and_xml():
         "position",
         name="bs2_plug_right_actuator",
         joint="bs2_plug_right_lift",
-        kp="1400",
-        kv="30.0",
+        kp="900",
+        kv="24.0",
         ctrlrange="0 0.080",
         forcerange="-50 50",
     )
@@ -462,8 +409,8 @@ def export_blender_meshes_and_xml():
         "position",
         name="bs2_strainer_left_actuator",
         joint="bs2_strainer_left_lift",
-        kp="1600",
-        kv="34.0",
+        kp="950",
+        kv="26.0",
         ctrlrange="0 0.120",
         forcerange="-55 55",
     )
@@ -501,18 +448,6 @@ def export_blender_meshes_and_xml():
     write_xml(ASSETS / "appliance.xml", app)
     write_xml(ASSETS / "scene.xml", app)
 
-    emit_standalone_models(
-        ASSETS,
-        model_name="bs2_sink",
-        defaults=defaults,
-        asset=asset,
-        root_body=sink,
-        contact=contact,
-        sensors=sensors,
-        exclude_sensors=("bs2_tray_left_sense", "bs2_tray_right_sense"),
-        accessories=(("tray_model.xml", "bs2_wash_tray", tray),),
-    )
-
     (ASSETS / "physics-export.json").write_text(
         json.dumps(
             {
@@ -527,7 +462,7 @@ def export_blender_meshes_and_xml():
                 "overflow_intake_z_m": 0.752,
                 "drain_specification": "50A polypropylene King drain x 2 with cream PP crumb baskets, rear-wall oval overflows, and 50A corrugated hoses through rubber-grommeted all-flat undershelf",
                 "scope": (
-                    "Articulated MuJoCo 4.0 mechanical, concave dual-bowl collision, 45 L wash / 40 L rinse "
+                    "Articulated MuJoCo mechanical, concave dual-bowl collision, 45 L wash / 40 L rinse "
                     "water balance, 50A gravity drain flow, and 400 x 300 mm MBCO-4ME baking tray fit model."
                 ),
             },
@@ -537,15 +472,162 @@ def export_blender_meshes_and_xml():
     )
 
 
+def strip_visual_meshes(root: ET.Element, model):
+    for parent in root.iter():
+        for geom in list(parent):
+            if geom.tag != "geom" or not geom.get("name"):
+                continue
+            index = model.geom(geom.get("name")).id
+            if (
+                model.geom_contype[index] == 0
+                and model.geom_conaffinity[index] == 0
+                and geom.get("type") == "mesh"
+                and geom.get("mass") == "0"
+            ):
+                parent.remove(geom)
+
+
 def export_native_xml(mujoco, np):
-    _, rebuilt = kit_export_native_xml(ASSETS, "maruzen-bs2-126n", mujoco, np)
+    spec = mujoco.MjSpec.from_file(str(ASSETS / "scene.xml"))
+    model = spec.compile()
+    data = mujoco.MjData(model)
+    mujoco.mj_forward(model, data)
+
+    root = ET.fromstring(spec.to_xml())
+    strip_visual_meshes(root, model)
+    used_meshes = {geom.get("mesh") for geom in root.iter("geom")}
+    used_materials = {geom.get("material") for geom in root.iter("geom")}
+    assets = root.find("asset")
+    if assets is not None:
+        for asset in list(assets):
+            if (asset.tag == "mesh" and asset.get("name") not in used_meshes) or (
+                asset.tag == "material" and asset.get("name") not in used_materials
+            ):
+                assets.remove(asset)
+    ET.indent(root, space="  ")
+    native_path = ASSETS / "native.xml"
+    native_path.write_text(ET.tostring(root, encoding="unicode") + "\n")
+
+    rebuilt = mujoco.MjModel.from_xml_path(str(native_path))
+    for field in ("body_mass", "body_inertia", "qpos0", "dof_damping"):
+        if not np.allclose(
+            getattr(model, field), getattr(rebuilt, field), rtol=1e-5, atol=1e-9
+        ):
+            raise RuntimeError(f"Export changed native {field} for maruzen-bs2-126n")
+    if (rebuilt.nq, rebuilt.nv) != (model.nq, model.nv):
+        raise RuntimeError("Export changed native degrees of freedom for maruzen-bs2-126n")
     return rebuilt
 
 
 def verify_frame_and_motion_alignment(mujoco, native_model, evidence_dir: Path):
-    return kit_verify_frames_and_motions(
-        ASSETS, "maruzen-bs2-126n", NAMES, SCALAR_VISUAL_MOTIONS, mujoco, evidence_dir
+    native_data = mujoco.MjData(native_model)
+    mujoco.mj_forward(native_model, native_data)
+    native_sha = hashlib.sha256((ASSETS / "native.xml").read_bytes()).hexdigest()
+    glb_str = str(ASSETS / "maruzen-bs2-126n.glb")
+
+    # 1. Rest-frame alignment across all retained bodies in NAMES
+    body_poses = {}
+    for bname in NAMES:
+        bid = native_model.body(bname).id
+        pos = native_data.xpos[bid]
+        quat = native_data.xquat[bid]
+        body_poses[bname] = [
+            float(pos[0]),
+            float(pos[1]),
+            float(pos[2]),
+            float(quat[0]),
+            float(quat[1]),
+            float(quat[2]),
+            float(quat[3]),
+        ]
+    frames_in = evidence_dir / "frames-input.json"
+    frames_out = evidence_dir / "frames-report.json"
+    frames_in.write_text(
+        json.dumps(
+            {
+                "maruzen-bs2-126n": {
+                    "glb": glb_str,
+                    "native_sha256": native_sha,
+                    "bodies": body_poses,
+                }
+            },
+            indent=2,
+        )
+        + "\n"
     )
+    subprocess.run(
+        [
+            "node",
+            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
+            str(frames_in),
+            str(frames_out),
+        ],
+        check=True,
+    )
+    frames_report = json.loads(frames_out.read_text())
+    assert frames_report["passed"] is True, frames_report
+
+    # 2. Sampled scalar-joint motion alignment (21 samples per scalar joint)
+    motions = []
+    for joint_name, axis in SCALAR_VISUAL_MOTIONS.items():
+        jid = native_model.joint(joint_name).id
+        jtype = int(native_model.jnt_type[jid])
+        kind = "hinge" if jtype == int(mujoco.mjtJoint.mjJNT_HINGE) else "slide"
+        low, high = native_model.jnt_range[jid]
+        bid = int(native_model.jnt_bodyid[jid])
+        samples = []
+        for idx in range(21):
+            val = float(low + (high - low) * idx / 20.0)
+            mujoco.mj_resetData(native_model, native_data)
+            native_data.qpos[native_model.jnt_qposadr[jid]] = val
+            mujoco.mj_forward(native_model, native_data)
+            samples.append(
+                {
+                    "value": val,
+                    "pose": [
+                        *native_data.xpos[bid].tolist(),
+                        *native_data.xquat[bid].tolist(),
+                    ],
+                }
+            )
+        motions.append(
+            {
+                "joint": joint_name,
+                "body": native_model.body(bid).name,
+                "kind": kind,
+                "visual_axis": axis,
+                "samples": samples,
+            }
+        )
+
+    motion_in = evidence_dir / "motion-input.json"
+    motion_out = evidence_dir / "motion-report.json"
+    motion_in.write_text(
+        json.dumps(
+            {
+                "maruzen-bs2-126n": {
+                    "glb": glb_str,
+                    "native_sha256": native_sha,
+                    "motions": motions,
+                }
+            },
+            indent=2,
+        )
+        + "\n"
+    )
+    subprocess.run(
+        [
+            "node",
+            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
+            str(motion_in),
+            str(motion_out),
+            "--motion",
+        ],
+        check=True,
+    )
+    motion_report = json.loads(motion_out.read_text())
+    assert motion_report["passed"] is True, motion_report
+    return frames_report, motion_report
 
 
 def write_asset_docs(report: dict):

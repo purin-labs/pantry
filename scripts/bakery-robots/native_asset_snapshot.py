@@ -16,16 +16,6 @@ def pose(position: np.ndarray, quaternion: np.ndarray) -> list[float]:
 def fixture_snapshot(request: dict, model: mujoco.MjModel, data: mujoco.MjData) -> dict:
     if request["bakeryTaskId"] == BakeryTask.RACK:
         return {"kind": "rack"}
-    if request.get("spanner", False):
-        oven = data.body("mbco4_oven")
-        door = model.body("mbco4_door").quat
-        glb_path = TRAY.parent.parent / "maruzen-mbco-4me" / "maruzen-mbco-4me.glb"
-        return {
-            "kind": "maruzen-oven",
-            "pose": pose(oven.xpos, oven.xquat),
-            "doorAngle": 2 * float(np.arctan2(-door[3], door[0])),
-            "glbSha256": hashlib.sha256(glb_path.read_bytes()).hexdigest(),
-        }
     oven = data.body("mbco_oven")
     door = model.body("mbco_door").quat
     return {
