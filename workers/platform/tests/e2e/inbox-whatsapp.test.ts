@@ -2,7 +2,7 @@ import { exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse } from "msw";
-import { expect, it } from "vitest";
+import { expect, it, type TestContext } from "vitest";
 import { parseInboxConversations } from "@purin-labs/control-api";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { readWhatsAppIngressPolicy } from "@purin-labs/area-inbox/server/data/whatsapp";
@@ -18,9 +18,16 @@ import {
   type Fixture,
 } from "./whatsapp-connector-support";
 
+declare module "vitest" {
+  interface TaskMeta {
+    inboxWhatsAppUnanswered?: Record<string, unknown>;
+  }
+}
+
 const CUSTOMER_TEXT = "Can I move my Saturday pickup?";
 const REPLY = "Yes, we moved your pickup to 4 pm.";
 const PERSON_REPLY = "A person says hello.";
+const SECOND_TEXT = "Can I change my bakery order to Sunday instead?";
 const BASE = `https://localhost/v1/control/organisations/${ORGANISATION_ID}`;
 
 it(
@@ -190,6 +197,62 @@ async function inboxWhatsAppJourney(): Promise<void> {
     state: "closed",
   });
   expect(JSON.stringify(closed)).not.toContain(CUSTOMER_TEXT);
+}
+
+// A person rejects the agent's draft, and the customer writes again in the
+// same conversation. The new message joins the Case, and the Inbox shows it.
+it(
+  "admits a customer's new message into an open Case and lists it in the Inbox",
+  newMessageJourney,
+  120_000,
+);
+
+async function newMessageJourney({ task }: TestContext): Promise<void> {
+  const fixture = await customerWritesAgain();
+  const listed = await readList(fixture.owner);
+  expect(conversationOf(listed)).toMatchObject({
+    caseId: fixture.caseId,
+    preview: SECOND_TEXT,
+    proposalId: null,
+  });
+  task.meta.inboxWhatsAppUnanswered = { listed: conversationOf(listed) };
+}
+
+/**
+ * The fixture's conversation after its owner can read the number, rejects
+ * the agent's draft, and the customer sends a second message.
+ */
+async function customerWritesAgain(): Promise<Fixture> {
+  const fixture = await installFixture({
+    customerText: CUSTOMER_TEXT,
+    reply: REPLY,
+    inbox: true,
+  });
+  const refused = await readList(fixture.owner);
+  await allow(
+    fixture.owner,
+    refused.whatsapp.kind === "read" ? refused.whatsapp.refused : null,
+  );
+  const rejected = await control(
+    fixture.owner,
+    "POST",
+    `whatsapp-replies/${PROPOSAL_ID}/reject`,
+    {},
+  );
+  expect(rejected.status, await rejected.clone().text()).toBe(200);
+  const accepted = await fixture.connector.acceptWhatsAppEvent({
+    identity: fixture.identity,
+    event: {
+      kind: "text_message",
+      customerWaId: CUSTOMER_ID,
+      providerMessageId: "wamid.P83_SECOND",
+      providerTimestamp: Date.now(),
+      body: SECOND_TEXT,
+    },
+    now: Date.now(),
+  });
+  expect(accepted, JSON.stringify(accepted)).toMatchObject({ ok: true });
+  return fixture;
 }
 
 async function closeWindow(

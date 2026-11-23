@@ -53,6 +53,11 @@ export const connectorAddressSchema = Type.Union([
     integrationAccountId: nonBlankTextSchema,
     gmailThreadId: nonBlankTextSchema,
   }),
+  Type.Object({
+    kind: Type.Literal("whatsapp_conversation"),
+    integrationAccountId: nonBlankTextSchema,
+    waId: nonBlankTextSchema,
+  }),
 ]);
 
 export const connectorDeliverySchema = Type.Object({
@@ -405,6 +410,12 @@ export function parseConnectorAddressWire(
         kind: "email_thread",
         integrationAccountId: address.integrationAccountId,
         gmailThreadId: address.gmailThreadId,
+      };
+    case "whatsapp_conversation":
+      return {
+        kind: "whatsapp_conversation",
+        integrationAccountId: address.integrationAccountId,
+        waId: address.waId,
       };
   }
 }
