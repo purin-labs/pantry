@@ -130,8 +130,6 @@ class AnswerVoice:
             # The agent's name, Sous Chef: misaki says "sous" with a final z.
             phonemes.lexicon.golds["Sous"] = "sˈu"
             phonemes.lexicon.golds["sous"] = "sˈu"
-            phonemes.lexicon.golds["Satyr"] = "sˈATəɹ"
-            phonemes.lexicon.golds["satyr"] = "sˈATəɹ"
             self._model = (session, voice, vocabulary, phonemes)
             self.read("Ready.")
         except Exception:  # A failed load leaves the browser's voice in use, and the next check retries.

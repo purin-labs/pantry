@@ -82,13 +82,13 @@ renamed is still loaded by its old name.
 ## The wake phrase (Plan 91 phase 6)
 
 On 23 November 2026, four "Hey Sous Chef" models were trained with the same pipeline as "Hey
-Satyr", and none passes the rule in `scripts/plan-82-g04/compare.py`. The Portal keeps "Hey
-Satyr". The latest model (round 3, with VCTK accent clips) is better on every shared test (4 false
-wakes against 5 in 37.1 h, mean recall 91.0% against 86.2%). It hears 53.3% of macOS voice clips
-against 66.5%: better on three natural macOS voices, much worse on Rishi, Tessa and four old formant
-voices. Plan 91, "Phase 6: the wake phrase", has the rule and the numbers of each round. The next
-step is the owner's real-voice check with `scripts/plan-82-g04/real-voices.py` (about 3 minutes):
-`record`, then `score`.
+Satyr", and none passes the rule in `scripts/plan-82-g04/compare.py`. The owner then chose the
+switch to "Hey Sous Chef" with round 3 (VCTK accent clips). It is better on every shared test (4
+false wakes against 5 in 37.1 h, mean recall 91.0% against 86.2%). It hears 53.3% of macOS voice
+clips against 66.5%: better on three natural macOS voices, much worse on Rishi, Tessa and four old
+formant voices. Plan 91, "Phase 6: the wake phrase", has the rule, the numbers of each round and the
+switch. The owner's real-voice check with `scripts/plan-82-g04/real-voices.py` (about 3 minutes,
+`record`, then `score`) has not run.
 
 How to train and measure a phrase (Python from `~/.satyr-voice-test/wake/.venv`, torch through
 `uv`):
@@ -106,12 +106,13 @@ uv run --no-project --python 3.13 --with torch --with numpy python export.py wei
 ~/.satyr-voice-test/wake/.venv/bin/python compare.py sous-chef
 ```
 
-A round takes about 40 minutes on the M4 Pro. When a model passes, the switch is one release: set
+A round takes about 40 minutes on the M4 Pro. A switch of phrase is one release: set
 `WAKE_PHRASE` and `WAKE_MODEL` in `surfaces/voice/ui/features/voice/wake-phrase.ts`, copy the model
 to `apps/portal/public/voice/`, set `scripts/shop-voice/wake-phrase.json` (the journeys read it),
-put "Sous Chef" first in `ASSISTANT_NAMES` in `surfaces/voice/server/vocabulary.ts`, and run
-the closed-chat Chrome journey. Keep `hey_satyr.onnx` until one production wake passes on the new
-model. The wake worker then drops the old file from each device's cache.
+put the name first in `ASSISTANT_NAMES` in `surfaces/voice/server/vocabulary.ts`, and run
+the closed-chat Chrome journey. The wake worker drops the old model from each device's cache.
+`hey_satyr.onnx` stays in `apps/portal/public/voice` until one production wake passes on
+`hey_sous_chef.onnx`; then delete it.
 
 ## Steps that need a shop
 
@@ -137,10 +138,9 @@ These wait until the owner has a shop. Do not ask the owner for them before that
    one through real Workers AI, on the deployed Worker, from the Portal to an agent answer. Measure
    the fallback time from the end of a 3 s command: the limit is 6 s at p95. This needs a signed-in
    Portal in the owner's Chrome. It is about one hour of agent work.
-5. **The wake phrase rename.** The Purin rename kept the agent's name "Sous Chef". Four models
-   did not pass on 23 November 2026: see "The wake phrase (Plan 91 phase 6)". The Mac's lexicon
-   already says "sous" correctly (shop voice 0.5.2). Until a model passes, the Portal says "Hey
-   Satyr".
+5. **The wake phrase rename.** The code says "Hey Sous Chef" since 23 November 2026, by the
+   owner's decision: see "The wake phrase (Plan 91 phase 6)". Open: the release, one production wake
+   on the new model and then the removal of `hey_satyr.onnx`, and the owner's real-voice check.
 6. **Plan 82B decisions.** The owner decides D1–D9. D9 needs counsel before any release, because a
    speaker template can be personal information.
 7. **Plan 82 Phase 5: Japanese.** Measure Whisper latency on the Japanese phrases, pass

@@ -101,20 +101,20 @@ value. The binding `POLICY_KV` has the name of the old namespace, but it points 
 | Cookies `satyr_control_session`, `satyr_control_csrf`     | `pantry_session`, `pantry_csrf`                                           |
 | Browser storage keys `satyr:*`                            | `pantry:*`                                                                |
 | launchd label `sh.seams.satyr.*`, folder `~/.satyr-voice` | `io.purin.pantry.*`, `~/.pantry-voice`                                    |
+| Wake phrase "Hey Satyr", model `hey_satyr.onnx`           | "Hey Sous Chef", `hey_sous_chef.onnx`                                     |
 
 ### Values that keep an old name on purpose
 
-| Value                                                             | Where                                                                                                                                                                         | Why                                                                             |
-| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| The wake phrase "Hey Satyr" and the model `hey_satyr`             | `surfaces/voice/ui/features/voice/wake-phrase.ts`, `scripts/shop-voice/wake-phrase.json`, `apps/portal/public/voice/hey_satyr.onnx`                                           | The model hears only this phrase. It stays until a "Hey Sous Chef" model passes |
-| The speech term "Satyr"                                           | `ASSISTANT_NAMES` in `surfaces/voice/server/vocabulary.ts`, the lexicon in `services/shop-voice/shop_voice/speech.py`, the prompt in `scripts/shop-voice/confidence-bench.py` | Speech engines must hear and say the wake word                                  |
-| The wake training scripts                                         | `scripts/plan-82-g04/`                                                                                                                                                        | They train and compare the two phrases                                          |
-| The pinned Kitchen physics bundles                                | `apps/portal/public/bakery-physics`                                                                                                                                           | A saved run names its bundle by hash                                            |
-| The native source of the bundles                                  | `crates/bakery-native`                                                                                                                                                        | The bundles hash this source                                                    |
-| The browser folder `satyr-physics-results`                        | `opfs-result-files.ts` and `physics-result-directory.ts` in `areas/kitchen/ui/features/production-run/`                                                                       | The pinned execution bundle holds this name                                     |
-| R2 file names and model text                                      | `repo-binaries.json`, `scripts/bakery-mujoco`                                                                                                                                 | These names are inputs of the pinned builds                                     |
-| Plan file names and the applied D1 patch scripts of the old stack | `docs/`, `workers/platform/scripts/`                                                                                                                                          | They are records                                                                |
-| The rename script                                                 | `scripts/rename/plan-93-cutover.mjs`                                                                                                                                          | Its search patterns must match the old names                                    |
+| Value                                                             | Where                                                                                                   | Why                                                                             |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| The old wake model `hey_satyr.onnx`                               | `apps/portal/public/voice/hey_satyr.onnx`                                                               | The rollback model. Delete it after one production wake on `hey_sous_chef.onnx` |
+| The wake training scripts                                         | `scripts/plan-82-g04/`                                                                                  | They train and compare the two phrases                                          |
+| The pinned Kitchen physics bundles                                | `apps/portal/public/bakery-physics`                                                                     | A saved run names its bundle by hash                                            |
+| The native source of the bundles                                  | `crates/bakery-native`                                                                                  | The bundles hash this source                                                    |
+| The browser folder `satyr-physics-results`                        | `opfs-result-files.ts` and `physics-result-directory.ts` in `areas/kitchen/ui/features/production-run/` | The pinned execution bundle holds this name                                     |
+| R2 file names and model text                                      | `repo-binaries.json`, `scripts/bakery-mujoco`                                                           | These names are inputs of the pinned builds                                     |
+| Plan file names and the applied D1 patch scripts of the old stack | `docs/`, `workers/platform/scripts/`                                                                    | They are records                                                                |
+| The rename script                                                 | `scripts/rename/plan-93-cutover.mjs`                                                                    | Its search patterns must match the old names                                    |
 
 The plain French words "atelier" and "commis" appear in recipe, lighting and test data.
 
@@ -284,12 +284,10 @@ cannot prove them.
   local profile still uses the old Airtable integration.
 - A full Stripe connect through the sign-up form of Stripe has not run on the live stack.
 
-**The wake phrase (Plan 91 phase 6):** Plan 91 records four "Hey Sous Chef" models, and
-each fails the macOS voice check. `scripts/plan-82-g04/compare.py` holds the pass rule. No
-such model is in git or in `repo-binaries.json`. The next step is a recording of real
-voices with `real-voices.py`. A switch changes `WAKE_PHRASE`, `WAKE_MODEL`, the model file,
-`scripts/shop-voice/wake-phrase.json`, `ASSISTANT_NAMES`, the speech lexicon and the prompt
-in `scripts/shop-voice/confidence-bench.py`.
+**The wake phrase (Plan 91 phase 6):** the phrase is "Hey Sous Chef" since 23 November 2026,
+by the owner's decision. Its model fails the macOS voice check of
+`scripts/plan-82-g04/compare.py`, mostly on Indian English and older macOS voices. No
+recording of a real voice has scored it yet (`real-voices.py`).
 
 **The mark:** the Portal and the docs still show the goat mark (`pantry-mark-*`,
 `PantryMark`). Only the provider callback page shows the Purin cat. No feature uses the
@@ -306,7 +304,6 @@ exported `PurinMark` and `PurinIcon`.
 - The root package name `seams-pantry`.
 - A comment in `surface-observation.ts` says that the wire values keep old names.
 - A comment in `areas/devices/server/agent-tools/devices/handlers.ts` has an old name.
-- The docstring of `scripts/shop-voice/phrase-bench.py` names Satyr.
 
 **The commerce engine in Portal text:** `areas/organisation/ui/pages/automation.tsx` and
 `areas/commerce/ui/features/commerce/production-plan.tsx` show these words to people.

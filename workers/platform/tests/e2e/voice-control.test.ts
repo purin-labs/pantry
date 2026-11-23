@@ -1107,7 +1107,7 @@ async function vocabularyJourney(): Promise<void> {
   const { terms } = await json(read);
   if (!Array.isArray(terms)) throw new Error("No terms");
   expect(terms.length).toBeLessThanOrEqual(60);
-  expect(terms[0]).toBe("Satyr");
+  expect(terms[0]).toBe("Sous Chef");
   // A menu item, a recipe, a stock item and the confirmed device.
   expect(terms).toEqual(
     expect.arrayContaining([

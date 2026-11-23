@@ -79,7 +79,7 @@ The voice dialog gets one choice for each member on each device:
 
 | Mode                | How speech reaches the agent                                   |
 | ------------------- | -------------------------------------------------------------- |
-| Wake phrase (today) | "Hey Satyr" or the held key                                    |
+| Wake phrase (today) | "Hey Sous Chef" or the held key                                |
 | Follow-up           | As above, and 8 s after each spoken answer with no wake phrase |
 | Ambient             | As above, and any sentence that passes the four gates          |
 
@@ -108,7 +108,7 @@ asks for speaker enrollment first.
    does. The Mac applies the noise rule. If the Mac does not answer, the piece is dropped (D6).
 4. **Addressee.** A check decides if the sentence is for the agent. The rules come first, and
    the model runs only when no rule decides:
-   - The sentence names "Sous Chef", or "Satyr" while the wake phrase is "Hey Satyr": accept.
+   - The sentence names "Sous Chef": accept.
      "Chef" alone does not count, because a kitchen says "yes chef", and "the sous chef" can be a
      person on the staff. The first "Hey Sous Chef" wake models woke on "hey" + any word + "chef"
      ([Plan 91](plan-91-seams-atelier-rename.md), phase 6), so G0.2 includes such sentences.
@@ -242,7 +242,7 @@ existing noise sets. No customer audio is recorded.
 
 Enrollment, the speaker check on the device and the follow-up window (D8), with no addressee
 model. Rules: speaker match, the Mac noise rule and the drop of thanks and filler words. The
-speaker check also guards the wake phrase and the key, so a customer's "Hey Satyr" does
+speaker check also guards the wake phrase and the key, so a customer's "Hey Sous Chef" does
 nothing on a device in Follow-up mode.
 
 ### Phase 2 — Ambient mode

@@ -51,8 +51,8 @@ reads all audio. The wake model runs only within 2 s of speech. Audio stays in t
 The worker holds at most 50 chunks (4 s). If the device cannot keep up, the worker drops
 the oldest chunk, so a capture can lose audio with no message to the person.
 
-- **Wake phrase.** The phrase in the code is "Hey Satyr" (`WAKE_PHRASE`), with the model
-  `hey_satyr.onnx` (`WAKE_MODEL`). A score of at least 0.995 wakes the Portal. The worker
+- **Wake phrase.** The phrase in the code is "Hey Sous Chef" (`WAKE_PHRASE`), with the model
+  `hey_sous_chef.onnx` (`WAKE_MODEL`). A score of at least 0.995 wakes the Portal. The worker
   scores only a full window of 16 embeddings.
 - **Held key.** While the page has focus, a person holds Right Option (Right Alt on other
   systems), speaks and releases. The code also accepts Fn on a browser that reports it.
@@ -196,7 +196,7 @@ Mac's private IPv4 address, and the Platform refuses a public address.
 ### The shop vocabulary
 
 `readVoiceVocabulary` builds one list for the Mac, the fallback and the text check. The
-agent's names come first: "Satyr", "Sous Chef" and "Pantry". Then each source gives one
+agent's names come first: "Sous Chef" and "Pantry". Then each source gives one
 name in turn. The sources are published products (the menu first), active recipes, active
 stock items, and devices with the enrollment `active` or `restricted`. The list holds at
 most 60 terms and 600 characters. Whisper takes it as `initial_prompt`, and Qwen3-ASR as
@@ -363,7 +363,8 @@ commands.
 - **FND-07** owns information flow, and **FND-09** owns the agent tools and page context.
 - **DEV-01** owns the Devices page, which only reads the Mac rows. **PRT-01** owns the
   Portal.
-- **ENG-03** owns names. "Hey Satyr" and `hey_satyr.onnx` keep the old name on purpose.
+- **ENG-03** owns names. The old model `hey_satyr.onnx` stays in `apps/portal/public/voice`
+  until one production wake on `hey_sous_chef.onnx`. The Portal does not load it.
 - **[Plan 82B](../../../plan-82B-ambient-voice.md)** stays a plan. It owns commands with
   no wake phrase or key: the follow-up window, ambient mode and the speaker check.
 
@@ -381,9 +382,10 @@ The talk key works only while the page is in front.
   limits are also open: 95% heard at 1 m, and at most one false wake in 8 hours.
 - **Live checks.** The 6 s fallback limit at p95 and a live command on each host are open.
 - **Mac enrollment.** The handover records no Mac on this stack and no token for its zone.
-- **Wake phrase.** "Hey Sous Chef" waits for a model that passes
-  `scripts/plan-82-g04/compare.py`. Four models did not pass. The next step is the owner's
-  check with `scripts/plan-82-g04/real-voices.py`.
+- **Wake phrase.** The "Hey Sous Chef" model fails the macOS voice check of
+  `scripts/plan-82-g04/compare.py` (53.3% heard against 66.5% for "Hey Satyr"), and no
+  real voice has scored it (`scripts/plan-82-g04/real-voices.py`). One production wake on
+  the new model is open.
 - **Qwen3-ASR as the default.** It needs a room-sound recording in a shop and a week of
   use. If it passes, the Platform writes Qwen3-ASR as the choice of each new Mac.
 - **Japanese.** Not built. It needs a latency measure, `language: "ja"` and a phrase bank.

@@ -16,11 +16,11 @@ const CACHE_MS = 5 * 60_000;
 const PROMPT_CHARACTER_LIMIT = 600;
 const TERM_CHARACTER_LIMIT = 80;
 /**
- * The names that a person says to the agent, first in the list. "Satyr" is
- * the wake phrase's name: Whisper once wrote it as "Seder" (Plan 82 Phase 4).
- * "Sous Chef" is the agent and "Pantry" the short name of Purin Pantry.
+ * The names that a person says to the agent, first in the list. "Sous Chef" is
+ * the agent and the wake phrase's name (Plan 91 phase 6), and "Pantry" the
+ * short name of Purin Pantry.
  */
-const ASSISTANT_NAMES = ["Satyr", "Sous Chef", "Pantry"] as const;
+const ASSISTANT_NAMES = ["Sous Chef", "Pantry"] as const;
 
 const cache = new Map<
   string,

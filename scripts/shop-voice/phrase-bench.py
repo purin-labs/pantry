@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Satyr's approval phrases and the words "stop" and "cancel" on one speech engine (Plan 82C Phase 0).
+"""Sous Chef's approval phrases and the words "stop" and "cancel" on one speech engine (Plan 82C Phase 0).
 
 The same macOS voices say each approval phrase ("confirm change", "send message", "send email" and three
 digits), near misses of a phrase, and "Stop." and "Cancel.", in quiet and over recorded kitchen noise. The
