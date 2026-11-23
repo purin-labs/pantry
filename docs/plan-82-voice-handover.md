@@ -24,9 +24,9 @@ wait, except the steps in "Steps that do not need a shop".
 Checked on 2026-11-18, and after the wake phrase release of 2026-11-23 (`pantry` `9cc4dc3b`):
 
 - Since 2026-11-23 09:20 UTC (`pantry` `f47416c5`, before `9cc4dc3b`), the composer's edge
-  and the mic-button wave show the voice state. The release is the 05:51 release plus the
-  three voice-look commits (`refs/backup/released-2026-11-23-voice-look`), so the rest of
-  `dev` is still not in production.
+  and the mic-button wave show the voice state. That release was the 05:51 release plus the
+  three voice-look commits (`refs/backup/released-2026-11-23-voice-look`). The release of
+  `dev` `0ff7a2c4` at 10:29 UTC (`pantry` `2573c620`) keeps them and adds the rest of `dev`.
 
 - The Portal and the Platform hold all the voice work of Plans 82 and 82C. The live install script
   (`/shop-voice/install.sh`) gives service 0.5.2.
