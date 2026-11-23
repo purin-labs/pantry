@@ -1,0 +1,80 @@
+{
+  "about": "Refactor 17, Stage B, decision D1: the files of the surface email join one workspace package @purin-labs/surface-email in surfaces/email. scripts/refactor-17/move-module.mjs reads this plan. files: each source file that scripts/layers.json gives the module, with its place in the target folder: a Worker file goes to server/ with its sub-path below services/platform/src/. No folder of the module has the name email/, so each file keeps its first folder (mail/ stays mail/), and no two files share a place. sourcePrefixes: where --sync-plan puts a file that the module gets later. package: the manifest and the tsconfig of the new package; the versions of devDependencies come from the Worker manifest. The exports map gives each .ts file of server/ as an entry. The tsconfig of the package reads server/ only. The Worker tsconfigs include surfaces/*/server, so each file stays in the program that checked it before the move. edits: text edits of the files that name a source folder and cannot read scripts/lib/source-roots.mjs; an edit is done when the file holds its replace text. keepForm: each file where an import stays on its line, because the wrap of Prettier would move a ratchet, with its reason. regenerate: the commands that write a generated file again. package.typeCheck false: the package has no check:types script of its own. Its own files read the Env keys CONNECTOR, which services/platform/src/actors/connector.ts (workers/platform) merges, ORGANISATION, which services/platform/src/actors/organisation.ts (workers/platform) merges, and EVENT_Q, which services/platform/src/ingress-queue.ts of the surface webhooks merges, each with declare module of @purin-labs/kernel/env. Through the foundation packages that it imports the program also lacks CASE, CODE_MODE_SANDBOX, MESSAGE_LINK_FETCH and SESSION. The package alone gives 238 errors, 11 of them in its own files. The Worker program checks each file of server/.",
+  "module": "surfaces/email",
+  "target": "surfaces/email",
+  "workspaceEntry": "surfaces/*",
+  "sourcePrefixes": {
+    "services/platform/src/": "server/"
+  },
+  "files": {
+    "services/platform/src/actors/actor-relocation-mail.ts": "server/actors/actor-relocation-mail.ts",
+    "services/platform/src/actors/connector-email-case-context-discovery.ts": "server/actors/connector-email-case-context-discovery.ts",
+    "services/platform/src/actors/connector-email-operational.ts": "server/actors/connector-email-operational.ts",
+    "services/platform/src/actors/connector/connector-email-actor.ts": "server/actors/connector/connector-email-actor.ts",
+    "services/platform/src/actors/connector/email-parsers.ts": "server/actors/connector/email-parsers.ts",
+    "services/platform/src/actors/connector/email-work.ts": "server/actors/connector/email-work.ts",
+    "services/platform/src/actors/connector/email.ts": "server/actors/connector/email.ts",
+    "services/platform/src/gateway/mail-webhooks.ts": "server/gateway/mail-webhooks.ts",
+    "services/platform/src/mail/queue-messages.ts": "server/mail/queue-messages.ts",
+    "services/platform/src/mail/watch-reconciliation.ts": "server/mail/watch-reconciliation.ts"
+  },
+  "package": {
+    "name": "@purin-labs/surface-email",
+    "exports": {
+      "./server/*": {
+        "types": "./server/*.ts",
+        "default": "./server/*.ts"
+      }
+    },
+    "dependencies": {
+      "@purin-labs/actor-runtime": "workspace:*",
+      "@purin-labs/agent": "workspace:*",
+      "@purin-labs/area-brain": "workspace:*",
+      "@purin-labs/area-inbox": "workspace:*",
+      "@purin-labs/area-integrations": "workspace:*",
+      "@purin-labs/area-organisation": "workspace:*",
+      "@purin-labs/async-control": "workspace:*",
+      "@purin-labs/authority": "workspace:*",
+      "@purin-labs/connections": "workspace:*",
+      "@purin-labs/contracts": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/conversation": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/surface-whatsapp": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/type-utils": "workspace:*"
+    },
+    "devDependencies": ["@cloudflare/workers-types", "tsrs"],
+    "versionsFrom": "services/platform/package.json",
+    "tsconfig": {
+      "extends": "../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": ["ESNext"],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": ["@cloudflare/workers-types"],
+        "allowImportingTsExtensions": true
+      },
+      "include": ["server/**/*.ts"]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Worker files of the package",
+      "find": "PLATFORM_SOURCE.push(\"surfaces/whatsapp/server\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"surfaces/whatsapp/server\");\n// The Worker side of the surface email (Refactor 17, Stage B).\nPLATFORM_SOURCE.push(\"surfaces/email/server\");\n"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": ["node", "scripts/check-layers.mjs", "--areas", "--write"],
+      "writes": ["docs/layers.md"]
+    }
+  ]
+}
