@@ -326,7 +326,7 @@ export type KitchenToolServices = {
   ) => Promise<SavedBakeryRunResult>;
   readonly executeBakerySurface: HarnessBakerySurfaceExecute;
   /** Runs the view commands of Costs & margins and of the Pastry Bench. */
-  readonly executeCostsViewCommand?: PageViewExecute;
+  readonly executePageViewCommand?: PageViewExecute;
   readonly readRecipes: RecipeReadTool;
   readonly saveRecipe: RecipeSaveTool;
   readonly readCosts: CostsReadTool;

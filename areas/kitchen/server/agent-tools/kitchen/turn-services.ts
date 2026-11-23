@@ -14,7 +14,7 @@ import {
   readSavedBakeryRunForHarness,
 } from "../bakery/handlers";
 import { withToolContext } from "@purin-labs/agent/agent-tools/context";
-import { executeCostsViewForHarness } from "../costs/view-handler";
+import { executePageViewForHarness } from "../bakery/page-view-handler";
 import { ToolRequestError } from "@purin-labs/agent-tools/errors";
 import { liveDeviceMember } from "@purin-labs/tool-handlers/agent-tools/session-support";
 import type { BakeStockLevelInput } from "@purin-labs/kitchen-control-api";
@@ -54,7 +54,7 @@ type RecipeWorkflowProposalRequest = Parameters<
  * Bench and Café › Register.
  */
 export function pageViewCommandExecutor(turn: ToolTurnContext) {
-  return executeCostsViewForHarness.bind(null, {
+  return executePageViewForHarness.bind(null, {
     db: turn.execution.scope.database,
     accountAccess: turn.execution.scope.accountAccess,
     storage: turn.storage,
@@ -80,7 +80,7 @@ export function pageViewCommandExecutor(turn: ToolTurnContext) {
 export function kitchenToolServices(
   turn: ToolTurnContext,
   stageConfigurationDraft: StageConfigurationDraft,
-  executeCostsViewCommand: ReturnType<typeof pageViewCommandExecutor>,
+  executePageViewCommand: ReturnType<typeof pageViewCommandExecutor>,
   costsCommerce: CostsCommerce,
 ): KitchenToolServices {
   const tool = withToolContext({ ...turn, commerce: costsCommerce });
@@ -115,7 +115,7 @@ export function kitchenToolServices(
       ),
       surfaceReadiness: { kind: "unprepared" },
     }),
-    executeCostsViewCommand,
+    executePageViewCommand,
     readRecipes: tool(readRecipesForEmbeddedHarness),
     saveRecipe: tool(saveRecipeForEmbeddedHarness),
     ...embeddedHarnessCostsTools(

@@ -289,7 +289,7 @@ state or path. The list reads only the Portal chats of the Case that the reader 
 - **Server modules** in `surfaces/portal/server/chat/`: `screen-observation-admission.ts`,
   `surface-registry.ts`, `kitchen-observation.ts`, `origin.ts`, `screen-prompt.ts`,
   `screen-relevance.ts` and `case-screen-observations.ts`. The effect path is
-  `actors/bakery-surface-effect.ts` and `agent-tools/costs/view-handler.ts`.
+  `actors/bakery-surface-effect.ts` and `agent-tools/bakery/page-view-handler.ts`.
 - **Portal modules**: `surface-observation.ts` and `agent-surface-label.ts` in
   `foundation/ui/features/`, `bakery-surface-effect-bridge.tsx` and
   `bakery-surface-registry.ts` in `areas/kitchen/ui/features/`, and

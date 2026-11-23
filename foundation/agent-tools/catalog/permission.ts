@@ -58,9 +58,10 @@ function isMissingFrom(
 }
 
 /**
- * The permission tool of a Slack thread turn. Like the follow-up, it is
- * selected by the turn's origin. Its list holds only what this turn lacks, so
- * the agent learns what it may ask for instead of answering that it cannot.
+ * The permission tool of a Slack thread or Portal chat turn. Like the
+ * follow-up, it is selected by the turn's origin. Its list holds only what
+ * this turn lacks, so the agent learns what it may ask for instead of
+ * answering that it cannot.
  */
 export function permissionRequestDefinition(
   missing: readonly RequestableCapability[],

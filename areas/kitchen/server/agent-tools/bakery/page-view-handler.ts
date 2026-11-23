@@ -18,17 +18,17 @@ import { dispatchBakerySurfaceEffect } from "../../actors/bakery-surface-effect"
 import { timelineVisibleMessages } from "@purin-labs/conversation/chat/conversation";
 import { readConversation } from "@purin-labs/conversation/chat/store";
 import { BakeryContextRequestError } from "../kitchen/services";
-import { requireLiveBakeryAuthority } from "../bakery/handlers";
+import { requireLiveBakeryAuthority } from "./handlers";
 
 /**
- * Runs one Portal page view command in the person's browser (Plan 87 phase 4,
- * shared across Costs & margins and the Kitchen Pie Pastry Bench). The
+ * Runs one Portal page view command in the person's browser (Plan 87 phase 4):
+ * Costs & margins, the Kitchen Pie Pastry Bench and Café › Register. The
  * command goes only to a page that the person's current message carried, as
  * it was admitted: a chip that was off keeps the page out, and the command
  * names that page instance. It travels through the Kitchen outbox, with
  * its receipt, recovery and push signal.
  */
-export async function executeCostsViewForHarness(
+export async function executePageViewForHarness(
   authority: {
     readonly db: OrganisationDatabase;
     readonly accountAccess: OrganisationAccess;

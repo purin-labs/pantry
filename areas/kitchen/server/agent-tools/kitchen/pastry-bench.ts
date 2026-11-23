@@ -115,10 +115,10 @@ export const PASTRY_BENCH_VIEW_TOOLS = [
 ] as const;
 
 function pastryBenchViewHandler({
-  executeCostsViewCommand,
+  executePageViewCommand,
 }: Partial<KitchenToolServices>) {
-  return executeCostsViewCommand === undefined
+  return executePageViewCommand === undefined
     ? undefined
     : (command: PastryBenchViewCommand, call: { readonly callId: string }) =>
-        executeCostsViewCommand(command, call.callId);
+        executePageViewCommand(command, call.callId);
 }

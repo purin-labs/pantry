@@ -102,10 +102,10 @@ export const COSTS_VIEW_TOOLS = [
 ] as const;
 
 function costsViewHandler({
-  executeCostsViewCommand,
+  executePageViewCommand,
 }: Partial<KitchenToolServices>) {
-  return executeCostsViewCommand === undefined
+  return executePageViewCommand === undefined
     ? undefined
     : (command: CostsViewCommand, call: { readonly callId: string }) =>
-        executeCostsViewCommand(command, call.callId);
+        executePageViewCommand(command, call.callId);
 }
