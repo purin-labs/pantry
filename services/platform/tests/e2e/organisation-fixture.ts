@@ -185,10 +185,10 @@ export async function selectModelRoute(
   return route.value;
 }
 
-/** A role change (PATCH) or a removal (DELETE) of a member by the owner. */
+/** A role change (PATCH) or a removal (DELETE) of a member by a manager. */
 export async function memberMutation(
   organisationId: OrganisationId,
-  owner: OrganisationClient,
+  manager: OrganisationClient,
   target: OrganisationClient,
   method: "PATCH" | "DELETE",
   body: unknown,
@@ -201,7 +201,7 @@ export async function memberMutation(
     .bind(organisationId)
     .first<{ configurationVersion: number }>();
   if (current === null) throw new Error("The organisation has no onboarding");
-  const headers = commerceHeaders(owner.session);
+  const headers = commerceHeaders(manager.session);
   headers.set("idempotency-key", crypto.randomUUID());
   headers.set(
     "x-pantry-configuration-version",

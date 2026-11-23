@@ -12,15 +12,24 @@ import {
   mutationBlocked,
   renderMutationFeedback,
 } from "./settings-support";
-import type { OrganisationInvitation, OrganisationMember } from "@purin-labs/control-api/portal/settings";
-import type { SettingsMouseHandler, SettingsMutationFeedback, SettingsSelectHandler, WorkspaceSettingsPageProps } from "./settings-types";
+import type {
+  OrganisationInvitation,
+  OrganisationMember,
+} from "@purin-labs/control-api/portal/settings";
+import type {
+  SettingsMouseHandler,
+  SettingsMutationFeedback,
+  SettingsSelectHandler,
+  WorkspaceSettingsPageProps,
+} from "./settings-types";
 
 const INVITE_ROLES = [
   { value: "admin", label: "Admin" },
   { value: "operator", label: "Operator" },
   { value: "viewer", label: "Viewer" },
 ];
-const MEMBER_ROLES = [{ value: "owner", label: "Owner" }, ...INVITE_ROLES];
+/** Only an owner gives the role Owner. */
+const OWNER_ROLES = [{ value: "owner", label: "Owner" }, ...INVITE_ROLES];
 
 export function WorkspaceSettingsPage(
   props: WorkspaceSettingsPageProps,
@@ -81,6 +90,7 @@ export function WorkspaceSettingsPage(
             props.pendingConfirm,
             props.requestConfirm,
             props.canManage,
+            props.organisation.role === "owner",
             props.feedback,
           )}
         </div>
@@ -101,13 +111,15 @@ export function WorkspaceSettingsPage(
             </label>
             <label>
               <span>Role</span>
-              <Select.Root name="role" items={INVITE_ROLES} defaultValue="operator">
+              <Select.Root
+                name="role"
+                items={INVITE_ROLES}
+                defaultValue="operator"
+              >
                 <Select.Trigger>
                   <Select.Value />
                 </Select.Trigger>
-                <Select.Popup>
-                  {INVITE_ROLES.map(renderRoleItem)}
-                </Select.Popup>
+                <Select.Popup>{INVITE_ROLES.map(renderRoleItem)}</Select.Popup>
               </Select.Root>
             </label>
             <button
@@ -142,6 +154,7 @@ function renderOrganisationMembers(
   pendingConfirm: string | null,
   requestConfirm: (key: string) => void,
   canManage: boolean,
+  viewerIsOwner: boolean,
   feedback: SettingsMutationFeedback,
 ): React.ReactNode {
   const ownerCount = members.filter(isOwnerMember).length;
@@ -153,6 +166,7 @@ function renderOrganisationMembers(
       remove,
       controls,
       canManage,
+      viewerIsOwner,
       ownerCount,
     ),
   );
@@ -168,24 +182,31 @@ function renderOrganisationMember(
     readonly feedback: SettingsMutationFeedback;
   },
   canManage: boolean,
+  viewerIsOwner: boolean,
   ownerCount: number,
   member: OrganisationMember,
 ): React.ReactNode {
   const isFinalOwner = member.role === "owner" && ownerCount === 1;
+  // An admin manages the roles below owner. Only an owner changes an owner.
+  const editable = canManage && (viewerIsOwner || member.role !== "owner");
+  const roles = viewerIsOwner ? OWNER_ROLES : INVITE_ROLES;
   const rowBusy = isMemberMutation(controls.mutations, member.userId);
   return (
     <div className="account-row" key={member.userId}>
       <span>
         <strong>{member.displayName}</strong>
         <small>{member.email}</small>
-        {canManage && isFinalOwner ? (
+        {editable && isFinalOwner ? (
           <small>Keep at least one owner in this workspace.</small>
         ) : null}
+        {canManage && !editable ? (
+          <small>Only an owner can change an owner.</small>
+        ) : null}
       </span>
-      {canManage ? (
+      {editable ? (
         <div className="account-actions">
           <Select.Root
-            items={MEMBER_ROLES}
+            items={roles}
             value={member.role}
             onValueChange={changeMemberRole.bind(
               null,
@@ -200,7 +221,7 @@ function renderOrganisationMember(
             >
               <Select.Value />
             </Select.Trigger>
-            <Select.Popup>{MEMBER_ROLES.map(renderRoleItem)}</Select.Popup>
+            <Select.Popup>{roles.map(renderRoleItem)}</Select.Popup>
           </Select.Root>
           <ConfirmButton
             confirmKey={`member-remove:${member.userId}`}

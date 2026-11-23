@@ -12,9 +12,15 @@ import type { UserId } from "@purin-labs/control-api/ids";
 import { requireDefaultProjectId } from "../fixtures/default-project";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { platformConversation } from "./chat-journey-support";
-import { commerceClient } from "./commerce-support";
+import { commerceClient, commerceWorkspace } from "./commerce-support";
 import { network } from "./network";
 import { fixtureDatabase } from "./organisation-database";
+import {
+  addOrganisationMember,
+  controlRequest,
+  memberMutation,
+  type OrganisationClient,
+} from "./organisation-fixture";
 import {
   ORGANISATION_ID,
   installSlackActorFixture,
@@ -25,6 +31,7 @@ import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-tra
 declare module "vitest" {
   interface TaskMeta {
     memberRemovalAccess?: Record<string, unknown>;
+    ownerRoleAccess?: Record<string, unknown>;
   }
 }
 
@@ -37,6 +44,14 @@ const MODEL = PLATFORM_DEFAULT_PI_MODEL;
 it(
   "refuses the next message of a removed member and returns the member's private chats to the default Project",
   memberRemovalJourney,
+  60_000,
+);
+
+// Only an owner gives the role owner, takes it away, or removes an owner.
+// An admin keeps the roles below owner.
+it(
+  "refuses an admin who makes itself owner or changes an owner, and lets an owner do both",
+  ownerRoleJourney,
   60_000,
 );
 
@@ -144,6 +159,110 @@ async function memberRemovalJourney(context: TestContext): Promise<void> {
     privateChatProject:
       filed?.projectId === defaultProjectId ? "default" : filed?.projectId,
     projectMemberships: projects?.count,
+  };
+}
+
+async function ownerRoleJourney(context: TestContext): Promise<void> {
+  const run = crypto.randomUUID();
+  const owner = await commerceClient(`owner-role-owner-${run}`);
+  const admin = await commerceClient(`owner-role-admin-${run}`);
+  const secondAdmin = await commerceClient(`owner-role-second-${run}`);
+  const viewer = await commerceClient(`owner-role-viewer-${run}`);
+  const organisationId = await commerceWorkspace(owner, "Owner role bakery");
+  await addOrganisationMember(organisationId, admin, "admin");
+  await addOrganisationMember(organisationId, secondAdmin, "admin");
+  await addOrganisationMember(organisationId, viewer, "viewer");
+  const roles = async (): Promise<Record<string, unknown>> => {
+    const read = await controlRequest(
+      owner,
+      `/v1/control/organisations/${organisationId}/members`,
+      null,
+    );
+    const body: unknown = await read.json();
+    if (!isRecord(body) || !Array.isArray(body.members))
+      throw new Error(`Members read failed: ${read.status}`);
+    const named = new Map<unknown, string>([
+      [owner.identity.userId, "owner"],
+      [admin.identity.userId, "admin"],
+      [secondAdmin.identity.userId, "secondAdmin"],
+      [viewer.identity.userId, "viewer"],
+    ]);
+    return Object.fromEntries(
+      body.members
+        .filter(isRecord)
+        .map((member) => [named.get(member.userId), member.role]),
+    );
+  };
+  const change = async (
+    manager: OrganisationClient,
+    target: OrganisationClient,
+    role: string,
+  ) => {
+    const response = await memberMutation(
+      organisationId,
+      manager,
+      target,
+      "PATCH",
+      { role },
+    );
+    return { status: response.status, body: await response.json() };
+  };
+  const refusal = {
+    status: 403,
+    body: { error: "organisation_owner_required" },
+  };
+
+  // Denied: the admin gives itself the role owner.
+  const selfPromotion = await change(admin, admin, "owner");
+  expect(selfPromotion).toMatchObject(refusal);
+
+  // Allowed: the admin changes a viewer to operator.
+  const viewerToOperator = await change(admin, viewer, "operator");
+  expect(viewerToOperator.status).toBe(200);
+
+  // Allowed: the owner gives the admin the role owner.
+  const ownerPromotion = await change(owner, admin, "owner");
+  expect(ownerPromotion.status).toBe(200);
+  expect(await roles()).toEqual({
+    owner: "owner",
+    admin: "owner",
+    secondAdmin: "admin",
+    viewer: "operator",
+  });
+
+  // Denied: the second admin demotes or removes an owner.
+  const adminDemotion = await change(secondAdmin, admin, "admin");
+  expect(adminDemotion).toMatchObject(refusal);
+  const adminRemoval = await memberMutation(
+    organisationId,
+    secondAdmin,
+    admin,
+    "DELETE",
+    {},
+  );
+  expect({
+    status: adminRemoval.status,
+    body: await adminRemoval.json(),
+  }).toMatchObject(refusal);
+  expect((await roles()).admin).toBe("owner");
+
+  // Allowed: an owner demotes the other owner.
+  const ownerDemotion = await change(owner, admin, "admin");
+  expect(ownerDemotion.status).toBe(200);
+  expect(await roles()).toEqual({
+    owner: "owner",
+    admin: "admin",
+    secondAdmin: "admin",
+    viewer: "operator",
+  });
+
+  context.task.meta.ownerRoleAccess = {
+    adminMakesItselfOwner: selfPromotion,
+    adminChangesViewerToOperator: viewerToOperator.status,
+    ownerMakesAdminOwner: ownerPromotion.status,
+    adminDemotesOwner: adminDemotion,
+    adminRemovesOwner: adminRemoval.status,
+    ownerDemotesOwner: ownerDemotion.status,
   };
 }
 

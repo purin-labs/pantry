@@ -608,9 +608,7 @@ async function handleMember(
         })
       : controlError(
           changed.error.code,
-          changed.error.code === "organisation_membership_not_found"
-            ? 404
-            : 409,
+          membershipErrorStatus(changed.error.code),
         );
   }
   const revoked = await revokeOrganisationMembership({
@@ -633,8 +631,20 @@ async function handleMember(
       })
     : controlError(
         revoked.error.code,
-        revoked.error.code === "organisation_membership_not_found" ? 404 : 409,
+        membershipErrorStatus(revoked.error.code),
       );
+}
+
+/** A missing member is 404, a change that needs an owner 403, others 409. */
+function membershipErrorStatus(code: string): number {
+  switch (code) {
+    case "organisation_membership_not_found":
+      return 404;
+    case "organisation_owner_required":
+      return 403;
+    default:
+      return 409;
+  }
 }
 
 async function handleInvitations(

@@ -39,7 +39,9 @@ records each answer.
   Organisations (`organisation_limit_reached`). A new Organisation has the plan `beta`
   and goes to the root cell of the placement profile.
 - **Members.** Each member has one `service_role_grant` row and one `person` row. An
-  admin changes a role or removes a member. A removal revokes the grant, returns the
+  admin changes a role below `owner` or removes a member who is not an owner. Only an
+  owner gives the role `owner`, takes it away, or removes an owner. An admin who tries
+  gets `organisation_owner_required` (403). A removal revokes the grant, returns the
   private chats of the member to the default Project and removes the Project
   memberships, in one batch. Each change raises the configuration version of the
   Organisation, so a turn with the old version stops at its next authority check. The
@@ -69,8 +71,9 @@ records each answer.
 
 A route names its lowest role, and `authorizeOrganisationControl` compares the ranks of
 `CONTROL_ROLE_RANK`. Slack asks the same functions as the Portal. A person with no
-membership, or with a role that is too low, gets 404. An admin can give each role, also
-`owner`.
+membership, or with a role that is too low, gets 404. An admin gives the roles `admin`,
+`operator` and `viewer`. Only an owner gives `owner` or changes an owner
+(`changeOrganisationServiceRole`, `revokeOrganisationMembership`).
 
 ### Request eligibility
 
