@@ -241,19 +241,20 @@ has no Actor SQLite table and no event kind. Its patch scripts are
 
 The routes (`surfaces/voice/server/routes.ts`) are under
 `/v1/control/organisations/:id/voice`. A write needs the control session and the CSRF
-header. A role refusal is a 404.
+header. Each route needs the admin role, as the chat does, because a spoken command and
+a spoken approval go into the chat. A role refusal is a 404.
 
-| Route                                | Role     | `voice.transcription` | Purpose                                                           |
-| ------------------------------------ | -------- | --------------------- | ----------------------------------------------------------------- |
-| `POST /grants`                       | Operator | Required              | The Mac's origin and a grant, or `mac: null`                      |
-| `POST /transcriptions`               | Operator | Required              | The fallback. The header `x-pantry-voice-device` names the device |
-| `GET /vocabulary`                    | Operator | Required              | The names for the text check                                      |
-| `GET /confirmations?conversationId=` | Operator | Not read              | The member's receipts in one chat                                 |
-| `POST /confirmations`                | Operator | Required              | The phrase of one card                                            |
-| `POST /confirmations/check`          | Operator | Required              | Check a transcript: `matched` or `refused`                        |
-| `GET /macs`, `POST /macs`            | Admin    | Not read              | List the Macs, or start an enrollment                             |
-| `POST /macs/:macId/revoke`           | Admin    | Not read              | Revoke a Mac and remove its DNS names                             |
-| `POST /macs/:macId/engine`           | Admin    | Not read              | Choose the engine of a Mac                                        |
+| Route                                | Role  | `voice.transcription` | Purpose                                                           |
+| ------------------------------------ | ----- | --------------------- | ----------------------------------------------------------------- |
+| `POST /grants`                       | Admin | Required              | The Mac's origin and a grant, or `mac: null`                      |
+| `POST /transcriptions`               | Admin | Required              | The fallback. The header `x-pantry-voice-device` names the device |
+| `GET /vocabulary`                    | Admin | Required              | The names for the text check                                      |
+| `GET /confirmations?conversationId=` | Admin | Not read              | The member's receipts in one chat                                 |
+| `POST /confirmations`                | Admin | Required              | The phrase of one card                                            |
+| `POST /confirmations/check`          | Admin | Required              | Check a transcript: `matched` or `refused`                        |
+| `GET /macs`, `POST /macs`            | Admin | Not read              | List the Macs, or start an enrollment                             |
+| `POST /macs/:macId/revoke`           | Admin | Not read              | Revoke a Mac and remove its DNS names                             |
+| `POST /macs/:macId/engine`           | Admin | Not read              | Choose the engine of a Mac                                        |
 
 The refusals are `voice_disabled` (403); `voice_device_invalid`, `voice_audio_invalid`,
 `voice_confirmation_invalid` and `voice_engine_invalid` (400); `voice_mac_not_found`
@@ -313,13 +314,13 @@ to the Platform. A grant has no authority at the Platform.
 
 ### Permissions
 
-| Action                                                                    | Viewer | Operator                 | Admin and owner               | Agent                          |
-| ------------------------------------------------------------------------- | ------ | ------------------------ | ----------------------------- | ------------------------------ |
-| Get a grant, use the fallback, read the vocabulary, get or check a phrase | No     | Yes                      | Yes                           | No                             |
-| Put a spoken command in the chat, or stop a turn                          | No     | No                       | Yes                           | No                             |
-| Confirm a card with a phrase                                              | No     | The card's route decides | The card's route decides      | No                             |
-| List, enroll or revoke a Mac, choose its engine                           | No     | No                       | Yes                           | No                             |
-| Read the Macs on the Devices page                                         | Yes    | Yes                      | Yes, with the network address | `device_read`, with no address |
+| Action                                                                    | Viewer | Operator | Admin and owner               | Agent                          |
+| ------------------------------------------------------------------------- | ------ | -------- | ----------------------------- | ------------------------------ |
+| Get a grant, use the fallback, read the vocabulary, get or check a phrase | No     | No       | Yes                           | No                             |
+| Put a spoken command in the chat, or stop a turn                          | No     | No       | Yes                           | No                             |
+| Confirm a card with a phrase                                              | No     | No       | The card's route decides      | No                             |
+| List, enroll or revoke a Mac, choose its engine                           | No     | No       | Yes                           | No                             |
+| Read the Macs on the Devices page                                         | Yes    | Yes      | Yes, with the network address | `device_read`, with no address |
 
 A shared device acts as its signed-in member: each voice near it can give that member's
 commands.
@@ -404,7 +405,6 @@ The talk key works only while the page is in front.
 - **Smaller Macs.** Plan 82C measured the engines on an M4 Pro. A Mac with less memory is
   not measured.
 - **Known faults in the code:**
-  - The chat routes need the admin role, but the voice routes admit an operator.
   - A failed DNS removal at a revoke is not tried again before the end of the
     Organisation.
   - Each Mac heartbeat writes one D1 row, also when nothing changed.

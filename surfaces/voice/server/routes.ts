@@ -111,60 +111,52 @@ export function matchVoiceRoute(pathname: string): VoiceRoute | null {
   };
 }
 
+/**
+ * Every voice route needs the admin role, as the chat does: a spoken command
+ * and a spoken approval go into the chat, and the chat refuses an operator.
+ */
+function authorizeVoiceRequest(
+  request: Request,
+  env: Env,
+  route: VoiceRoute,
+  mutation: boolean,
+): ReturnType<typeof authorizeOrganisationRequest> {
+  return authorizeOrganisationRequest(
+    request,
+    env,
+    route.organisationId,
+    "admin",
+    mutation,
+  );
+}
+
 export async function handleVoiceRoute(
   request: Request,
   env: Env,
   route: VoiceRoute,
 ): Promise<Response> {
   const { target } = route;
-  if (target.kind === "macs" && request.method === "GET") {
-    const authorized = await authorizeOrganisationRequest(
-      request,
-      env,
-      route.organisationId,
-      "admin",
-      false,
-    );
-    return authorized.ok ? listMacs(env, authorized) : authorized.response;
-  }
-  if (target.kind === "vocabulary") {
-    if (request.method !== "GET")
+  if (request.method === "GET") {
+    if (
+      target.kind !== "macs" &&
+      target.kind !== "vocabulary" &&
+      target.kind !== "confirmations"
+    )
       return controlError("method_not_allowed", 405);
-    const authorized = await authorizeOrganisationRequest(
-      request,
-      env,
-      route.organisationId,
-      "operator",
-      false,
-    );
-    return authorized.ok
-      ? readVocabulary(env, authorized)
-      : authorized.response;
+    const authorized = await authorizeVoiceRequest(request, env, route, false);
+    if (!authorized.ok) return authorized.response;
+    switch (target.kind) {
+      case "macs":
+        return listMacs(env, authorized);
+      case "vocabulary":
+        return readVocabulary(env, authorized);
+      case "confirmations":
+        return listReceipts(request, authorized);
+    }
   }
-  if (target.kind === "confirmations" && request.method === "GET") {
-    const authorized = await authorizeOrganisationRequest(
-      request,
-      env,
-      route.organisationId,
-      "operator",
-      false,
-    );
-    return authorized.ok
-      ? listReceipts(request, authorized)
-      : authorized.response;
-  }
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const manages =
-    target.kind === "macs" ||
-    target.kind === "macRevoke" ||
-    target.kind === "macEngine";
-  const authorized = await authorizeOrganisationRequest(
-    request,
-    env,
-    route.organisationId,
-    manages ? "admin" : "operator",
-    true,
-  );
+  if (request.method !== "POST" || target.kind === "vocabulary")
+    return controlError("method_not_allowed", 405);
+  const authorized = await authorizeVoiceRequest(request, env, route, true);
   if (!authorized.ok) return authorized.response;
   switch (target.kind) {
     case "grants":

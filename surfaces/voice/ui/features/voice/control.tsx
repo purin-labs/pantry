@@ -1129,7 +1129,8 @@ function VoiceAccessPrompt(
         {
           id: VOICE_CAPABILITY.capabilityId,
           label: VOICE_CAPABILITY.label,
-          description: "Members can give the chat agent commands by voice.",
+          description:
+            "Owners and admins can give the chat agent commands by voice.",
           required: true,
         },
       ]}

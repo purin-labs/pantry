@@ -54,7 +54,10 @@ import {
 } from "./device-fleet-support";
 import { network } from "./network";
 import { voiceMacRequest } from "./voice-mac-support";
-import { activateOrganisation } from "./organisation-fixture";
+import {
+  activateOrganisation,
+  addOrganisationMember,
+} from "./organisation-fixture";
 import { openRouterText } from "./slack-journey-support";
 
 /**
@@ -645,6 +648,43 @@ async function voiceControlJourney(_test: TestContext): Promise<void> {
     404,
     "organisation_role_insufficient",
   );
+  // An operator has no chat, so voice gives an operator no grant, no
+  // fallback, no names and no phrase: nothing reaches Workers AI.
+  const operatorClient = await commerceClient(
+    `voice-operator-${crypto.randomUUID()}`,
+  );
+  await addOrganisationMember(owner.organisationId, operatorClient, "operator");
+  const operator = {
+    ...operatorClient,
+    organisationId: owner.organisationId,
+  } as unknown as Member;
+  await expectError(
+    post(operator, voicePath(operator, "grants"), { deviceId: DEVICE }),
+    404,
+    "organisation_role_insufficient",
+  );
+  await expectError(
+    sendAudio(operator, wav(1)),
+    404,
+    "organisation_role_insufficient",
+  );
+  await expectError(
+    exports.default.fetch(
+      `https://localhost${voicePath(operator, "vocabulary")}`,
+      { headers: mutationHeaders(operator.session) },
+    ),
+    404,
+    "organisation_role_insufficient",
+  );
+  await expectError(
+    post(operator, voicePath(operator, "confirmations"), {
+      conversationId: newConversationId(),
+      target: { kind: "configuration_draft", id: "draft_operator" },
+    }),
+    404,
+    "organisation_role_insufficient",
+  );
+  expect(ai.calls).toHaveLength(0);
   // The names of the Portal's text check go to members who may use voice.
   await expectError(
     exports.default.fetch(
