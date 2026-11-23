@@ -34,7 +34,7 @@ def export():
             for asset in list(assets):
                 filename = asset.get("file")
                 if filename:
-                    source = (directory / filename).resolve()
+                    source = Path(os.path.normpath(directory / filename))
                     asset.set("file", os.path.relpath(source, directory))
                     files[str(source.relative_to(ROOT))] = hashlib.sha256(
                         source.read_bytes()

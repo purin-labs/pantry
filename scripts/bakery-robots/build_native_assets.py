@@ -92,7 +92,7 @@ def export_pour_over(destination: Path, dependencies: set) -> None:
         source = mesh.get("file")
         if source is None:
             continue
-        path = (ASSETS / "fairino-fr10" / source).resolve()
+        path = Path(os.path.normpath(ASSETS / "fairino-fr10" / source))
         dependencies.add(path)
         mesh.set("file", os.path.relpath(path, destination))
         mesh.set(
@@ -208,7 +208,7 @@ def build() -> None:
                         if mesh.get("name", "").startswith(robot_spec.slug + "__")
                         else TRAY.parent
                     )
-                    path = (base / source).resolve()
+                    path = Path(os.path.normpath(base / source))
                     dependencies.add(path)
                     mesh.set("file", os.path.relpath(path, destination))
                     mesh.set(
