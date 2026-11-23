@@ -299,8 +299,8 @@ export class CommerceMerchantDO extends DurableObject<Env> {
   }
 
   // Pantry learns of new events from the merchant's webhook posts and reads
-  // the feed every minute as a backstop (Plan 77 step 8), so the alarm only
-  // runs the merchant's own queued work.
+  // the feed every five minutes as a backstop (Plan 77 step 8), so the alarm
+  // only runs the merchant's own queued work.
   async alarm(): Promise<void> {
     await this.#deliverQueuedWork();
   }
