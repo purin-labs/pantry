@@ -19,8 +19,10 @@
 // --check, about 0.3 s). A TypeScript edit after the build leaves a stale pin,
 // and before this check only the bakery CI job saw it.
 //
-// It also keeps in git each bundle that a Platform test fixture names, because
-// CI cannot fetch the bundles that repo-binaries.json keeps in R2.
+// It also keeps in git each bundle that a Platform test fixture names. Both CI
+// jobs fetch the R2 files of repo-binaries.json first, so the rule is not a CI
+// need: it keeps those bundles in the clone, so that a Platform journey that
+// reads one needs no R2 fetch.
 //
 //   node scripts/check-physics-bundle.mjs
 import { execFileSync } from "node:child_process";
@@ -236,8 +238,8 @@ if (errors.length === 0)
   }
 
 // 6. A bundle that a Platform test fixture names stays in git. The edge
-// journeys read it from the Portal build, and CI has no copy of the bundles
-// that repo-binaries.json keeps in R2.
+// journeys read it from the Portal build. CI fetches the R2 files of
+// repo-binaries.json before the journeys; a bundle in git needs no fetch.
 const FIXTURES = "workers/platform/tests/fixtures";
 const inR2 = new Set(
   Object.keys(
