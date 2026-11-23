@@ -2321,10 +2321,8 @@ export class MailInboxRoute extends React.Component<InboxProps, InboxState> {
   };
 }
 
-/** The address names a conversation by its draft, or by its Gmail thread. */
-/** A source that could not load names itself and can read again. */
 /**
- * Google refused the mailbox's sign-in, so Café reads none of its mail. A
+ * Google refused the mailbox's sign-in, so Pantry reads none of its mail. A
  * person who manages the workspace gets the way to reconnect it.
  */
 function MailboxReconnect(
@@ -2373,6 +2371,7 @@ function awaitingReconnect(
     : account;
 }
 
+/** A source that could not load names itself and can read again. */
 function SourceFailed(
   props: Readonly<{ text: string; onRetry: () => Promise<void> | void }>,
 ): React.ReactNode {
@@ -2393,6 +2392,7 @@ function hasCaseId(
   return conversation.caseId === caseId;
 }
 
+/** The address names a conversation by its Case, its draft or its Gmail thread. */
 function readSelection(): Selection | null {
   const params = new URLSearchParams(window.location.search);
   const caseId = params.get("case");
