@@ -1,4 +1,4 @@
-# Commerce Commerce Spec
+# Commerce Spec
 
 Status (2026-10-23): first version. This spec is the contract for what
 Commerce does and how its API behaves. [Plan 76](../../../docs/history/plan-76-standalone-underclerk.md)
