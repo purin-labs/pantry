@@ -2158,6 +2158,9 @@ importers:
       '@purin-labs/surface-slack':
         specifier: workspace:*
         version: link:../../surfaces/slack
+      '@purin-labs/surface-webhooks':
+        specifier: workspace:*
+        version: link:../../surfaces/webhooks
       '@purin-labs/surface-whatsapp':
         specifier: workspace:*
         version: link:../../surfaces/whatsapp
@@ -2340,12 +2343,82 @@ importers:
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../../packages/std
+      '@purin-labs/surface-webhooks':
+        specifier: workspace:*
+        version: link:../webhooks
       '@purin-labs/tenancy':
         specifier: workspace:*
         version: link:../../foundation/tenancy
       '@purin-labs/tool-handlers':
         specifier: workspace:*
         version: link:../../foundation/tool-handlers
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../packages/type-utils
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
+
+  surfaces/webhooks:
+    dependencies:
+      '@purin-labs/actor-runtime':
+        specifier: workspace:*
+        version: link:../../foundation/actor-runtime
+      '@purin-labs/agent':
+        specifier: workspace:*
+        version: link:../../foundation/agent
+      '@purin-labs/area-commerce':
+        specifier: workspace:*
+        version: link:../../areas/commerce
+      '@purin-labs/area-inbox':
+        specifier: workspace:*
+        version: link:../../areas/inbox
+      '@purin-labs/area-integrations':
+        specifier: workspace:*
+        version: link:../../areas/integrations
+      '@purin-labs/authority':
+        specifier: workspace:*
+        version: link:../../foundation/authority
+      '@purin-labs/commerce-client':
+        specifier: workspace:*
+        version: link:../../packages/commerce-client
+      '@purin-labs/commerce-contracts':
+        specifier: workspace:*
+        version: link:../../packages/commerce-contracts
+      '@purin-labs/connections':
+        specifier: workspace:*
+        version: link:../../foundation/connections
+      '@purin-labs/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@purin-labs/control':
+        specifier: workspace:*
+        version: link:../../foundation/control
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../packages/control-api
+      '@purin-labs/conversation':
+        specifier: workspace:*
+        version: link:../../foundation/conversation
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../../foundation/kernel
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../packages/std
+      '@purin-labs/surface-email':
+        specifier: workspace:*
+        version: link:../email
+      '@purin-labs/surface-slack':
+        specifier: workspace:*
+        version: link:../slack
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../../foundation/tenancy
       '@purin-labs/type-utils':
         specifier: workspace:*
         version: link:../../packages/type-utils

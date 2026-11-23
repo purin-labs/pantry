@@ -1,0 +1,37 @@
+{
+  "name": "@purin-labs/surface-webhooks",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./server/*": {
+      "types": "./server/*.ts",
+      "default": "./server/*.ts"
+    }
+  },
+  "dependencies": {
+    "@purin-labs/actor-runtime": "workspace:*",
+    "@purin-labs/agent": "workspace:*",
+    "@purin-labs/area-commerce": "workspace:*",
+    "@purin-labs/area-inbox": "workspace:*",
+    "@purin-labs/area-integrations": "workspace:*",
+    "@purin-labs/authority": "workspace:*",
+    "@purin-labs/commerce-client": "workspace:*",
+    "@purin-labs/commerce-contracts": "workspace:*",
+    "@purin-labs/connections": "workspace:*",
+    "@purin-labs/contracts": "workspace:*",
+    "@purin-labs/control": "workspace:*",
+    "@purin-labs/control-api": "workspace:*",
+    "@purin-labs/conversation": "workspace:*",
+    "@purin-labs/kernel": "workspace:*",
+    "@purin-labs/std": "workspace:*",
+    "@purin-labs/surface-email": "workspace:*",
+    "@purin-labs/surface-slack": "workspace:*",
+    "@purin-labs/tenancy": "workspace:*",
+    "@purin-labs/type-utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260707.1",
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

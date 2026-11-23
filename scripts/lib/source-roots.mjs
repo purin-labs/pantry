@@ -47,6 +47,8 @@ PLATFORM_SOURCE.push("surfaces/email/server");
 PLATFORM_SOURCE.push("areas/integrations/shopify");
 // The Worker side of the surface slack (Refactor 17, Stage B).
 PLATFORM_SOURCE.push("surfaces/slack/server");
+// The Worker side of the surface webhooks (Refactor 17, Stage B).
+PLATFORM_SOURCE.push("surfaces/webhooks/server");
 
 /**
  * The folders that hold the source of the Portal, in the browser. The package

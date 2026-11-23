@@ -450,10 +450,11 @@ import. A module with no line for one of these has none.
 ## surfaces/webhooks
 
 - Folders: 4
-  - `services/platform/src/`
-  - `services/platform/src/gateway-routing/`
-  - `services/platform/src/gateway/`
-  - `services/platform/src/gateway/admin/`
+  - `surfaces/webhooks/server/`
+  - `surfaces/webhooks/server/gateway-routing/`
+  - `surfaces/webhooks/server/gateway/`
+  - `surfaces/webhooks/server/gateway/admin/`
+- Packages: `surfaces/webhooks`
 
 ## surfaces/whatsapp
 

@@ -1,8 +1,8 @@
 import { runScheduledPayoutReconciliation } from "@purin-labs/area-commerce/server/payouts/recovery";
 import type { Track } from "@purin-labs/contracts";
 import { handleControlRequest } from "./control-router";
-import type { GatewayRoute } from "./gateway-routing/domain";
-import { matchGatewayRoute } from "./gateway-routing/match";
+import type { GatewayRoute } from "@purin-labs/surface-webhooks/server/gateway-routing/domain";
+import { matchGatewayRoute } from "@purin-labs/surface-webhooks/server/gateway-routing/match";
 import { handleSlackInteractions } from "@purin-labs/surface-slack/server/interactions";
 import { runScheduledOnboardingReconciliation } from "./onboarding-reconciliation-runner";
 import {
@@ -35,33 +35,33 @@ import { assertNever } from "@purin-labs/std";
 import {
   handleAdministerActorRegistry,
   handleInspectRetainedVaultRootClosure,
-} from "./gateway/admin/actor-registry";
+} from "@purin-labs/surface-webhooks/server/gateway/admin/actor-registry";
 import {
   handleAdministerActorRelocation,
   handleAdministerActorRestore,
-} from "./gateway/admin/actor-relocation";
-import { handleAdministerCodeModePlatformCutover } from "./gateway/admin/code-mode-cutover";
-import { handleMachineCensus } from "./gateway/admin/machine-census";
+} from "@purin-labs/surface-webhooks/server/gateway/admin/actor-relocation";
+import { handleAdministerCodeModePlatformCutover } from "@purin-labs/surface-webhooks/server/gateway/admin/code-mode-cutover";
+import { handleMachineCensus } from "@purin-labs/surface-webhooks/server/gateway/admin/machine-census";
 import {
   handleCafeCommerceAcceptance,
   handleCreateOrganisationInstall,
   handleOnboardingActivationAcceptance,
   handleOrganisationPing,
   handleResolveInstall,
-} from "./gateway/admin/organisation-install";
-import { handleAdministerPersonRoles } from "./gateway/admin/person-roles";
+} from "@purin-labs/surface-webhooks/server/gateway/admin/organisation-install";
+import { handleAdministerPersonRoles } from "@purin-labs/surface-webhooks/server/gateway/admin/person-roles";
 import {
   authorizeQueuedCueDelivery,
   deliverMatchedCueSubscriptions,
   settleQueuedCue,
-} from "./gateway/cue-delivery";
-import { handleCueStatus } from "./gateway/cue-status";
+} from "@purin-labs/surface-webhooks/server/gateway/cue-delivery";
+import { handleCueStatus } from "@purin-labs/surface-webhooks/server/gateway/cue-status";
 import {
   handleConfigureDiscordInteraction,
   handleDiscordInteraction,
 } from "@purin-labs/area-integrations/server/gateway/discord";
 import { handleDropboxWebhook } from "@purin-labs/area-integrations/server/gateway/dropbox-webhook";
-import { handleEventQueueMessage } from "./gateway/event-queue";
+import { handleEventQueueMessage } from "@purin-labs/surface-webhooks/server/gateway/event-queue";
 import {
   handleConfigureExternalRecordsCredential,
   handleReadExternalRecords,
@@ -71,13 +71,13 @@ import {
   handleIdentityLinkChallenge,
   handleIdentityUiConfig,
   handleIssueIdentityLink,
-} from "./gateway/identity-link";
+} from "@purin-labs/surface-webhooks/server/gateway/identity-link";
 import { handleListIntegrationAccounts } from "@purin-labs/area-integrations/server/gateway/integration-accounts";
 import { handleEmailGoogleWebhook } from "@purin-labs/surface-email/server/gateway/mail-webhooks";
 import {
   EVENT_QUEUE_RETRY_DELAY_SECONDS,
   type HealthBody,
-} from "./gateway/support";
+} from "@purin-labs/surface-webhooks/server/gateway/support";
 import {
   handleConfigureShopifyConnector,
   handleConfigureShopifyCredential,

@@ -20,7 +20,7 @@ import {
   recordScheduleDispatchReceipt,
 } from "@purin-labs/agent/data/agent-operations/schedule-dispatch";
 import { resolveManualDispatchAutomation } from "@purin-labs/agent/data/agent-operations/automation";
-import type { IngressQueueMessage } from "../src/ingress-queue";
+import type { IngressQueueMessage } from "@purin-labs/surface-webhooks/server/ingress-queue";
 import { runScheduleDispatch } from "@purin-labs/agent/schedules/dispatch";
 import {
   createAgentOperationsDatabase,

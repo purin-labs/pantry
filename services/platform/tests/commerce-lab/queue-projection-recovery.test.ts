@@ -34,8 +34,8 @@ const labMetadataMocks = vi.hoisted(function createLabMetadataMocks() {
   };
 });
 
-import { cueLogIntegrationAccountId } from "../../src/gateway/cue-delivery";
-import { handleCommerceDeliveryQueueMessage } from "../../src/gateway/support";
+import { cueLogIntegrationAccountId } from "@purin-labs/surface-webhooks/server/gateway/cue-delivery";
+import { handleCommerceDeliveryQueueMessage } from "@purin-labs/surface-webhooks/server/gateway/support";
 import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "@purin-labs/area-commerce/server/commerce-lab/lab-metadata";
 import type { NormalizedCueEvent } from "@purin-labs/agent/cues/engine";
 import { createCommerceDeliveryQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";

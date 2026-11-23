@@ -55,7 +55,7 @@ import {
   assertNever,
   isRecord,
 } from "@purin-labs/std";
-import { handleSlackInstallationRevoked, identityLinkBrowserUrl, slackPayloadErrorResponse } from "../../../../services/platform/src/gateway/support";
+import { handleSlackInstallationRevoked, identityLinkBrowserUrl, slackPayloadErrorResponse } from "@purin-labs/surface-webhooks/server/gateway/support";
 import { readRuntimeSecret } from "@purin-labs/control/worker/gateway/request-helpers";
 
 type SlackDurableAccept =

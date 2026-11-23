@@ -29,6 +29,7 @@
     "testing"
   ],
   "packages": {
+    "surfaces/webhooks": "surfaces/webhooks",
     "surfaces/slack": "surfaces/slack",
     "surfaces/email": "surfaces/email",
     "surfaces/whatsapp": "surfaces/whatsapp",
@@ -418,6 +419,7 @@
     "workspace_revision_receipt": "foundation/agent"
   },
   "rules": {
+    "surfaces/webhooks/": "surfaces/webhooks",
     "surfaces/slack/": "surfaces/slack",
     "surfaces/email/": "surfaces/email",
     "surfaces/whatsapp/": "surfaces/whatsapp",
@@ -451,8 +453,6 @@
     "services/platform/src/chatgpt-exit/": "foundation/agent",
     "services/platform/src/code-mode-sandbox/": "foundation/agent",
     "services/platform/src/control/routes/chat/": "surfaces/portal",
-    "services/platform/src/gateway-routing/": "surfaces/webhooks",
-    "services/platform/src/gateway/admin/": "surfaces/webhooks",
     "services/platform/src/model-exit/": "foundation/agent",
     "areas/integrations/shopify/": "areas/shopify",
     "services/platform/src/slack-ingress/": "surfaces/slack",
@@ -508,12 +508,6 @@
     "services/platform/src/control/routes/chat-side-cases.ts": "surfaces/portal",
     "services/platform/src/control/routes/chat.ts": "surfaces/portal",
     "services/platform/src/control/routes/commerce.ts": "workers/platform",
-    "services/platform/src/gateway/cue-delivery.ts": "surfaces/webhooks",
-    "services/platform/src/gateway/cue-status.ts": "surfaces/webhooks",
-    "services/platform/src/gateway/event-queue.ts": "surfaces/webhooks",
-    "services/platform/src/gateway/identity-link.ts": "surfaces/webhooks",
-    "services/platform/src/gateway/support.ts": "surfaces/webhooks",
-    "services/platform/src/ingress-queue.ts": "surfaces/webhooks",
     "services/platform/src/integration-gateway.ts": "workers/platform",
     "services/platform/src/onboarding-reconciliation-runner.ts": "workers/platform",
     "services/platform/src/organisation-lifecycle-parts.ts": "workers/platform",

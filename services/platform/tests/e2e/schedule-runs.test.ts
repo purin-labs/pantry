@@ -12,7 +12,7 @@ import { runAgentOperation } from "@purin-labs/conversation/data/agent-operation
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import type { AgentOperationInput } from "@purin-labs/agent/data/agent-operations";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import type { IngressQueueMessage } from "../../src/ingress-queue";
+import type { IngressQueueMessage } from "@purin-labs/surface-webhooks/server/ingress-queue";
 import gateway from "../../src/integration-gateway";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";

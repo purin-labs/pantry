@@ -48,7 +48,7 @@ import {
   errorMessage,
   isRecord,
 } from "@purin-labs/std";
-import { ensureOrganisationObject } from "../../../../services/platform/src/gateway/support";
+import { ensureOrganisationObject } from "@purin-labs/surface-webhooks/server/gateway/support";
 import {
   isLocalDebugRequest,
   parsePublicServiceUrl,

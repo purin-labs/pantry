@@ -30,7 +30,7 @@ are `ConnectorDO`, `CaseDO`, `SessionDO` (`AgentSessionActor`) and
 
 The Integration Gateway is the public provider boundary of the Platform Worker
 ([`integration-gateway.ts`](../../services/platform/src/integration-gateway.ts),
-[`gateway-routing/`](../../services/platform/src/gateway-routing/)). It
+[`gateway-routing/`](../../surfaces/webhooks/server/gateway-routing/)). It
 verifies a provider request, parses it once into a typed record, resolves the
 Organisation and the integration account, and hands durable work to an Actor
 or a Queue. Raw bodies and provider SDK objects stop at that parser.
@@ -88,7 +88,7 @@ Work that needs no answer in the request goes to `EVENT_Q` (`pantry-events`) or
 `CUE_Q` (`pantry-cues`). Each module owns its message types (`queue-messages.ts`
 in `commerce/`, `shopify/`, `schedules/` and `mail/`, and
 `slack/case-command-message.ts`).
-[`ingress-queue.ts`](../../services/platform/src/ingress-queue.ts) holds the
+[`ingress-queue.ts`](../../surfaces/webhooks/server/ingress-queue.ts) holds the
 union of the `EVENT_Q` messages and picks the parser. The types are
 `slack.case_command.v1`, `commerce.delivery.v1`,
 `shopify.commerce_refresh.v1`, `commerce.outbox_reconcile.v1`,
