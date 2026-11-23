@@ -116,9 +116,10 @@ export async function executeCatalogTool(
     authority.turnTools.find((turnTool) => turnTool.name === name) ??
     authority.registry.find(name);
   // A tool with its own envelope keeps it for each result, also for a call
-  // that this turn's catalog did not select.
+  // that this turn's catalog did not select. The tool that runs gives the
+  // envelope and the effect: a turn tool goes before a registered tool.
   const { profile } = authority;
-  const envelope = profile?.envelope ?? authority.registry.find(name)?.result;
+  const envelope = profile?.envelope ?? tool?.result;
   const failed = (detail: string): Promise<AuthorizedHarnessToolResult> =>
     envelope === undefined
       ? authorizedRead(failedToolOutput(detail), "failed")
@@ -164,7 +165,7 @@ export async function executeCatalogTool(
     if (error instanceof ToolRequestError) {
       failure = error.message;
     } else {
-      failure = authority.registry.find(name)?.unconfirmedFailure ?? failure;
+      failure = tool?.unconfirmedFailure ?? failure;
     }
     if (error instanceof ToolRequestError && error.requestableRead !== null) {
       failure = await requestDeniedRead(
@@ -183,19 +184,15 @@ export async function executeCatalogTool(
     metadata: null,
     process_trace: null,
   });
-  const registered = authority.registry.find(name);
-  if (registered?.effect === "surface") {
+  if (tool?.effect === "surface") {
     return authorizedSurfaceEffect(
       output,
-      registered.readReceipt(codeModeValue),
-      registered.succeeded?.(codeModeValue) === true ? "succeeded" : "failed",
+      tool.readReceipt(codeModeValue),
+      tool.succeeded?.(codeModeValue) === true ? "succeeded" : "failed",
     );
   }
-  if (registered?.effect === "receipt") {
-    return authorizedProviderEffect(
-      output,
-      registered.readReceipt(codeModeValue),
-    );
+  if (tool?.effect === "receipt") {
+    return authorizedProviderEffect(output, tool.readReceipt(codeModeValue));
   }
   return authorizedRead(output);
 }
