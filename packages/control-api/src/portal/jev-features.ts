@@ -6,6 +6,21 @@ export type JevFeature =
 
 export type JevRelatedCasesMode = "shadow" | "metadata_only" | "party_context";
 
+/**
+ * What each feature sends to TypeSafe. Settings › Jev, the onboarding step
+ * and the agent's change card say it in these words.
+ */
+export const JEV_FEATURE_SENDS: Readonly<Record<JevFeature, string>> = {
+  mail_classification: "The subject, sender and text of each new email",
+  related_cases: "Parts of the email and the Case summaries",
+  screen_relevance: "The page title and the visible labels",
+};
+
+/** "… go to TypeSafe.", the sentence form of `JEV_FEATURE_SENDS`. */
+export function jevFeatureSendsSentence(feature: JevFeature): string {
+  return `${JEV_FEATURE_SENDS[feature]} go to TypeSafe.`;
+}
+
 export type JevMailbox = Readonly<{
   integrationAccountId: string;
   displayName: string;

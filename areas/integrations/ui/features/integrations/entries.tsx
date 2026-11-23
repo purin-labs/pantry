@@ -137,8 +137,8 @@ function integrationEntries(
     {
       id: "typesafe",
       label: "TypeSafe AI",
-      description:
-        "Optional. Helps agents find records that belong together.",
+      description: "Helps agents find records that belong together.",
+      optional: true,
       tile: "typesafe",
       accounts: [],
       connected:

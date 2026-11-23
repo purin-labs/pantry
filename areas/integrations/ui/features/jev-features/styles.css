@@ -16,8 +16,46 @@
   margin: 0;
 }
 
-.jev-funding-line a {
-  margin-inline-start: 4px;
+/* Money and data facts: a label and a value on each row. */
+.jev-facts {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.jev-facts > div {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  gap: var(--pantry-space-3);
+  line-height: 1.5;
+}
+
+.jev-facts dt {
+  color: var(--ink-2);
+}
+
+.jev-facts dd {
+  margin: 0;
+}
+
+.jev-facts a {
+  margin-inline-start: 8px;
+}
+
+.jev-paid-use .jev-facts {
+  margin-block: var(--pantry-space-2);
+}
+
+.jev-row-sends span {
+  margin-inline-end: 6px;
+  color: var(--ink-2);
+}
+
+@media (max-width: 560px) {
+  .jev-facts > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
 }
 
 .jev-muted {

@@ -1,4 +1,5 @@
 import {
+  jevFeatureSendsSentence,
   parseJevFeatureCommand,
   type JevFeatureCommand,
 } from "@purin-labs/control-api/portal/jev-features";
@@ -30,13 +31,6 @@ const FEATURE_NAME: Readonly<Record<JevFeatureCommand["feature"], string>> = {
   screen_relevance: "Screen relevance",
 };
 
-const SENT_DATA: Readonly<Record<JevFeatureCommand["feature"], string>> = {
-  mail_classification:
-    "The subject, sender and text of each new email go to TypeSafe.",
-  related_cases: "Parts of the email and Case summaries go to TypeSafe.",
-  screen_relevance: "The page title and visible labels go to TypeSafe.",
-};
-
 /** The words of the card. Each field names the change, never "Confirm". */
 export function presentJevDraftCommand(command: JevDraftCommand): Readonly<{
   summary: string;
@@ -54,7 +48,7 @@ export function presentJevDraftCommand(command: JevDraftCommand): Readonly<{
     ? {
         summary: `Turn on ${name}${mode} in Settings › Jev.`,
         actionLabel: `Turn on ${name}`,
-        consequence: `${SENT_DATA[command.feature]} The use counts toward the Jev allowance. An admin can turn it off at any time.`,
+        consequence: `${jevFeatureSendsSentence(command.feature)} The use counts toward the Jev allowance. An admin can turn it off at any time.`,
       }
     : {
         summary: `Turn off ${name} in Settings › Jev.`,

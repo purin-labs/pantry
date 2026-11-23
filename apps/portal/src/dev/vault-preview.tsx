@@ -22,7 +22,8 @@ const root = document.getElementById("root");
 if (root === null || !import.meta.env.DEV)
   throw new Error("Vault preview is development-only.");
 
-// ?scenario=populated|empty|viewer|failing|onepassword, ?theme=dark
+// ?scenario=populated|empty|viewer|failing|onepassword|onepassword-down,
+// ?theme=dark. "onepassword-down" is a 1Password store that does not answer.
 // The token "ops_preview" connects; "ops_two" reaches two vaults.
 const params = new URL(window.location.href).searchParams;
 const scenario = params.get("scenario") ?? "populated";
@@ -123,18 +124,17 @@ function previewTransport(): VaultTransport {
   let items: VaultItemView[] =
     scenario === "populated" ||
     scenario === "viewer" ||
-    scenario === "onepassword"
+    scenario.startsWith("onepassword")
       ? [...SAMPLE]
       : [];
-  let store: VaultStoreView =
-    scenario === "onepassword"
-      ? {
-          kind: "onepassword",
-          vaultTitle: "Purin",
-          connectedAt: NOW - 2 * DAY,
-          reachable: true,
-        }
-      : { kind: "pantry" };
+  let store: VaultStoreView = scenario.startsWith("onepassword")
+    ? {
+        kind: "onepassword",
+        vaultTitle: "Purin",
+        connectedAt: NOW - 2 * DAY,
+        reachable: scenario !== "onepassword-down",
+      }
+    : { kind: "pantry" };
   const events: VaultEvent[] = [];
   const record = (
     kind: VaultEvent["kind"],

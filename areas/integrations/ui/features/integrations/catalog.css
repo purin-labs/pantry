@@ -1,0 +1,126 @@
+/* Each group is one list: plain rows in two columns, with the state and the
+   action at the end of the row. */
+.integration-catalog {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr));
+  column-gap: 40px;
+  margin: 0;
+  padding: 0 18px;
+  overflow: hidden;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+.integration-catalog > li {
+  min-width: 0;
+  border-top: 1px solid var(--border);
+  margin-top: -1px;
+}
+
+.integration-catalog-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.integration-catalog-card:hover strong {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.integration-catalog-card .provider-tile {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+}
+
+.integration-catalog-text {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.integration-catalog-text > strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.integration-catalog-description {
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.integration-catalog-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.integration-catalog-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-2);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.integration-catalog-status > span {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--ink-3);
+}
+
+.integration-catalog-card[data-status="connected"]
+  .integration-catalog-status
+  > span {
+  background: var(--ok-text);
+}
+
+.integration-catalog-card[data-status="attention"] .integration-catalog-status {
+  color: var(--warn-text);
+  font-weight: 500;
+}
+
+.integration-catalog-card[data-status="attention"]
+  .integration-catalog-status
+  > span {
+  background: var(--warn-text);
+}
+
+/* On a narrow screen the state goes under the text, so that the name and its
+   job keep the width. */
+@media (max-width: 560px) {
+  .integration-catalog-card {
+    flex-wrap: wrap;
+    row-gap: 2px;
+  }
+
+  .integration-catalog-text {
+    flex-basis: calc(100% - 140px);
+  }
+
+  .integration-catalog-action {
+    order: 2;
+  }
+
+  .integration-catalog-status {
+    order: 3;
+    flex-basis: 100%;
+    padding-inline-start: 44px;
+  }
+}

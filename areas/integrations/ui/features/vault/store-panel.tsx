@@ -18,7 +18,7 @@ export type OnePasswordVaultChoice = Readonly<{
   itemCount: number;
 }>;
 
-/** One quiet line above the list: where items live, and a way to change it. */
+/** One quiet line: where items live, and a way to change it. */
 export function StoreLine(props: {
   readonly store: VaultStoreView;
   readonly canManage: boolean;
@@ -29,10 +29,10 @@ export function StoreLine(props: {
     <div className="vault-store-line">
       <p>
         {store.kind === "pantry" ? (
-          <>Storage: Purin Vault</>
+          <>Stored in Purin Vault</>
         ) : (
           <>
-            Storage: 1Password · <strong>{store.vaultTitle}</strong>
+            Stored in 1Password · <strong>{store.vaultTitle}</strong>
             {store.reachable ? null : (
               <span className="vault-store-warning">
                 {" "}

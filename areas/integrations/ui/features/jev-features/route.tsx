@@ -1,14 +1,19 @@
 import React from "react";
 import { useLocation } from "react-router";
-import type {
-  JevFeature,
-  JevFeatureCommand,
-  JevFeaturesView,
-  JevRelatedCasesMode,
+import {
+  JEV_FEATURE_SENDS,
+  type JevFeature,
+  type JevFeatureCommand,
+  type JevFeaturesView,
+  type JevRelatedCasesMode,
 } from "@purin-labs/control-api/portal/jev-features";
 import { Select } from "@purin-labs/ui/index";
 import { Switch } from "@purin-labs/ui/toggle-switch";
-import { changeJevFeature, jevFeatureErrorMessage, readJevFeatures } from "./api";
+import {
+  changeJevFeature,
+  jevFeatureErrorMessage,
+  readJevFeatures,
+} from "./api";
 import {
   JEV_PAID_USE_ID,
   JevUsePrompt,
@@ -16,6 +21,7 @@ import {
   microDollars,
   resetDate,
 } from "./paid-use";
+import { JevFacts, type JevFact } from "./facts";
 import "./styles.css";
 
 /**
@@ -123,10 +129,6 @@ export function JevFeaturesRoute(props: {
     );
 
   const { view } = load;
-  const allowance =
-    view.funding === "pantry_platform"
-      ? "The use counts toward the monthly Jev allowance in your subscription."
-      : "TypeSafe bills the use to your own key.";
   const locked = !canManage;
   const rowProps = (feature: JevFeature) => ({
     busy: pending === feature,
@@ -165,11 +167,8 @@ export function JevFeaturesRoute(props: {
             void change({ feature: "mail_classification", enabled })
           }
           {...rowProps("mail_classification")}
-          description={[
-            "Jev sorts each new email against your mail rules.",
-            "The subject, sender and text of each new email go to TypeSafe.",
-            allowance,
-          ]}
+          does="Sorts each new email against your mail rules."
+          sends={JEV_FEATURE_SENDS.mail_classification}
         >
           <MailboxList
             enabled={view.mailClassification.enabled}
@@ -184,11 +183,8 @@ export function JevFeaturesRoute(props: {
             void change({ feature: "related_cases", enabled })
           }
           {...rowProps("related_cases")}
-          description={[
-            "Jev compares new email with open Cases to suggest related work.",
-            "Parts of the email and Case summaries go to TypeSafe.",
-            allowance,
-          ]}
+          does="Suggests open Cases that relate to new email."
+          sends={JEV_FEATURE_SENDS.related_cases}
         >
           {view.relatedCases.enabled ? (
             <ModeChoice
@@ -208,11 +204,8 @@ export function JevFeaturesRoute(props: {
             void change({ feature: "screen_relevance", enabled })
           }
           {...rowProps("screen_relevance")}
-          description={[
-            "Jev checks which part of the screen matters for your question in chat.",
-            "The page title and visible labels go to TypeSafe.",
-            allowance,
-          ]}
+          does="Finds the part of the screen that your chat question is about."
+          sends={JEV_FEATURE_SENDS.screen_relevance}
         />
       </ul>
     </div>
@@ -228,30 +221,51 @@ function FundingLine(props: {
     props.integrationsHref === null
       ? null
       : `${props.integrationsHref}?${new URLSearchParams({ integration: "typesafe" }).toString()}`;
-  if (view.funding === "pantry_platform")
+  if (view.funding === "pantry_platform") {
+    const { allowance } = view;
     return (
       <>
-        <p className="jev-funding-line">
-          <strong>The Purin TypeSafe key</strong> pays for Jev calls.
-        </p>
+        <JevFacts
+          label="Who pays for Jev"
+          rows={[
+            ["Paid by", "The Purin TypeSafe key"],
+            ...(allowance === null ? [] : [allowanceFact(allowance)]),
+            [
+              "Feature use",
+              "Counts toward the monthly Jev allowance in your subscription",
+            ],
+          ]}
+        />
         {view.keyAvailable ? null : (
           <p className="jev-warning" role="status">
             The Purin key is not set. Jev calls stop until the key is set.
           </p>
         )}
-        {view.allowance === null ? null : (
-          <AllowanceLine allowance={view.allowance} />
-        )}
+        {allowance?.reached === true ? (
+          <p className="jev-warning" role="status">
+            The free use of this month is used. Jev features pause until{" "}
+            {resetDate(allowance)}.
+          </p>
+        ) : null}
       </>
     );
+  }
   return (
     <>
-      <p className="jev-funding-line">
-        <strong>Your own TypeSafe key</strong> pays for Jev calls.{" "}
-        {typesafeHref === null ? null : (
-          <a href={typesafeHref}>Integrations › TypeSafe</a>
-        )}
-      </p>
+      <JevFacts
+        label="Who pays for Jev"
+        rows={[
+          [
+            "Paid by",
+            <>
+              Your own TypeSafe key
+              {typesafeHref === null ? null : (
+                <a href={typesafeHref}>Integrations › TypeSafe</a>
+              )}
+            </>,
+          ],
+        ]}
+      />
       {view.keyAvailable ? null : (
         <p className="jev-warning" role="status">
           Your key is not set. Jev calls stop until you set the key.
@@ -262,33 +276,25 @@ function FundingLine(props: {
 }
 
 /** The free use of the month (Plan 88 section 3). */
-function AllowanceLine(props: {
-  readonly allowance: NonNullable<JevFeaturesView["allowance"]>;
-}): React.ReactNode {
-  const { allowance } = props;
-  const reset = resetDate(allowance);
+function allowanceFact(
+  allowance: NonNullable<JevFeaturesView["allowance"]>,
+): JevFact {
   const used = microDollars(
     Math.min(allowance.usedMicrousd, allowance.limitMicrousd),
   );
-  return (
-    <>
-      <p className="jev-funding-line">
-        Free use this month: {used} of {microDollars(allowance.limitMicrousd)}. It
-        starts again on {reset}.
-      </p>
-      {allowance.reached ? (
-        <p className="jev-warning" role="status">
-          The free use of this month is used. Jev features pause until {reset}.
-        </p>
-      ) : null}
-    </>
-  );
+  return [
+    "Free use this month",
+    `${used} of ${microDollars(allowance.limitMicrousd)} · starts again on ${resetDate(allowance)}`,
+  ];
 }
 
 function FeatureRow(props: {
   readonly id: string;
   readonly title: string;
-  readonly description: readonly string[];
+  /** What the feature does, in one line. */
+  readonly does: string;
+  /** What the feature sends to TypeSafe. */
+  readonly sends: string;
   readonly checked: boolean;
   readonly onChange: (enabled: boolean) => void;
   readonly busy: boolean;
@@ -311,11 +317,14 @@ function FeatureRow(props: {
           busy={props.busy}
           disabled={props.disabled}
           aria-labelledby={`${props.id}-title`}
-          aria-describedby={`${props.id}-description`}
+          aria-describedby={`${props.id}-description ${props.id}-sends`}
         />
       </div>
       <p id={`${props.id}-description`} className="jev-row-description">
-        {props.description.join(" ")}
+        {props.does}
+      </p>
+      <p id={`${props.id}-sends`} className="jev-row-sends">
+        <span>Sends</span> {props.sends}
       </p>
       {props.error === null ? null : (
         <p className="jev-error" role="alert">
@@ -346,7 +355,7 @@ function MailboxList(props: {
           </span>
           {props.enabled && !mailbox.covered ? (
             <span className="jev-mailbox-hint">
-              Turn the switch off and on to include it.
+              To include it, turn the switch off and on.
             </span>
           ) : null}
         </li>

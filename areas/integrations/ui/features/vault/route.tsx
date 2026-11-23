@@ -367,28 +367,36 @@ export function VaultRoute(props: {
       ? null
       : (items.find((item) => item.itemId === drawer.itemId) ?? null);
 
+  // Where items live is a quiet line under the lists.
+  const storeLine =
+    load.kind === "ready" ? (
+      <StoreLine
+        store={load.store}
+        canManage={props.canManage}
+        openStore={() => {
+          setNotice(null);
+          open(
+            load.store.kind === "pantry"
+              ? {
+                  kind: "connect",
+                  itemId: null,
+                  token: "",
+                  vaults: null,
+                  vaultId: null,
+                }
+              : { kind: "store", itemId: null, confirmingDisconnect: false },
+          );
+        }}
+      />
+    ) : null;
+  const storeLineAbove =
+    load.kind === "ready" &&
+    load.store.kind === "onepassword" &&
+    !load.store.reachable;
   return (
     <div className="vault-page">
-      {load.kind === "ready" ? (
-        <StoreLine
-          store={load.store}
-          canManage={props.canManage}
-          openStore={() => {
-            setNotice(null);
-            open(
-              load.store.kind === "pantry"
-                ? {
-                    kind: "connect",
-                    itemId: null,
-                    token: "",
-                    vaults: null,
-                    vaultId: null,
-                  }
-                : { kind: "store", itemId: null, confirmingDisconnect: false },
-            );
-          }}
-        />
-      ) : null}
+      {/* A store that does not answer is a warning, so it stays above. */}
+      {storeLineAbove ? storeLine : null}
       <div className="vault-toolbar">
         <div className="vault-tabs" role="group" aria-label="Show items">
           {TABS.map(({ tab: value, label }) => (
@@ -553,7 +561,9 @@ export function VaultRoute(props: {
                 <span className="vault-row-text">
                   <span className="vault-row-title">{key.name}</span>
                   <span className="vault-row-detail">
-                    {key.service} · {key.kindLabel}
+                    {key.kindLabel === "API key"
+                      ? key.service
+                      : `${key.service} · ${key.kindLabel}`}
                   </span>
                 </span>
                 {key.status === "stored" ? null : (
@@ -566,6 +576,7 @@ export function VaultRoute(props: {
           ))}
         </ul>
       )}
+      {storeLineAbove ? null : storeLine}
       <SideDrawer
         open={drawer !== null}
         title={

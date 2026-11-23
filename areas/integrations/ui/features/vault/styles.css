@@ -312,7 +312,8 @@
   background: var(--paper);
 }
 
-.vault-field[data-invalid="true"] :is(input, button:where(.pantry-select-trigger)) {
+.vault-field[data-invalid="true"]
+  :is(input, button:where(.pantry-select-trigger)) {
   border-color: var(--danger-text);
 }
 
@@ -390,13 +391,12 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--pantry-space-2);
+  gap: var(--pantry-space-3);
   padding: 0;
   border-radius: 12px;
   color: var(--ink-2);
   background: transparent;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .vault-store-line p {

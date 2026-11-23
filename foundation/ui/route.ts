@@ -321,7 +321,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     navigationLabel: "Vault",
     title: "Vault",
     description:
-      "Save logins and contact info for agents. Agents never see a saved password.",
+      "Logins and contact info for agents. Agents never see a saved password.",
     group: "Settings",
     resource: { kind: "none" },
   },

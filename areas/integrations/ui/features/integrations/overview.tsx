@@ -7,6 +7,7 @@ import {
   type ProviderTileName,
   type StatusChipStatus,
 } from "@purin-labs/ui/page-components";
+import "./catalog.css";
 
 type CustomConnectorCatalogState =
   | { readonly kind: "loading" }
@@ -27,6 +28,7 @@ export type IntegrationCatalogItem = {
   readonly id: string;
   readonly label: string;
   readonly description: string;
+  readonly optional: boolean;
   readonly searchAliases: readonly string[];
   readonly tile: ProviderTileName;
   readonly status: {
@@ -55,7 +57,10 @@ const APP_GROUPS: readonly Readonly<{
   ids: readonly string[];
 }>[] = [
   { title: "Sell and take payments", ids: ["shopify", "stripe", "square"] },
-  { title: "Talk to customers and your team", ids: ["gmail", "whatsapp", "slack"] },
+  {
+    title: "Talk to customers and your team",
+    ids: ["gmail", "whatsapp", "slack"],
+  },
   {
     title: "Files, records and passwords",
     ids: ["google_drive", "dropbox", "notion", "airtable", "onepassword"],
@@ -203,7 +208,9 @@ type AppGroup = Readonly<{
   items: readonly IntegrationCatalogItem[];
 }>;
 
-function appGroups(items: readonly IntegrationCatalogItem[]): readonly AppGroup[] {
+function appGroups(
+  items: readonly IntegrationCatalogItem[],
+): readonly AppGroup[] {
   const grouped = new Set(APP_GROUPS.flatMap(appGroupIds));
   const groups: AppGroup[] = APP_GROUPS.map((group) => ({
     title: group.title,
@@ -232,9 +239,9 @@ function renderAppGroup(group: AppGroup): React.ReactNode {
       aria-label={group.title}
     >
       <h4>{group.title}</h4>
-      <div className="integration-catalog">
+      <ul className="integration-catalog">
         {group.items.map(renderCatalogItem)}
-      </div>
+      </ul>
     </section>
   );
 }
@@ -260,10 +267,7 @@ function matchesCustomDirectory(
   );
 }
 
-function connectorSearchMatches(
-  searchText: string,
-  query: string,
-): boolean {
+function connectorSearchMatches(searchText: string, query: string): boolean {
   const text = searchText.toLocaleLowerCase();
   const terms = query.trim().toLocaleLowerCase().split(/\s+/u);
   return terms.every(searchTermAppearsIn.bind(null, text));
@@ -317,10 +321,7 @@ function CustomConnectorMark(): React.ReactNode {
   );
 }
 
-function connectorDirectoryHref(
-  basePath: string,
-  connectorId: string,
-): string {
+function connectorDirectoryHref(basePath: string, connectorId: string): string {
   const url = new URL(basePath, "https://portal.invalid");
   url.searchParams.set("customConnector", connectorId);
   return `${url.pathname}${url.search}`;
@@ -375,10 +376,7 @@ function ConnectedApps(props: {
   );
 }
 
-function hasSameProvider(
-  provider: string,
-  item: ConnectedAppItem,
-): boolean {
+function hasSameProvider(provider: string, item: ConnectedAppItem): boolean {
   return item.providerLabel === provider;
 }
 
@@ -403,7 +401,9 @@ function renderConnectedApp(
         <strong>{item.providerLabel}</strong>
         <span title={item.displayName}>{item.displayName}</span>
       </span>
-      {showDefault ? <span className="connection-default-tag">Default</span> : null}
+      {showDefault ? (
+        <span className="connection-default-tag">Default</span>
+      ) : null}
       {item.status.kind === "success" ? null : (
         <StatusChip status={item.status} />
       )}
@@ -429,41 +429,50 @@ function CatalogSection(props: {
       <div className="integration-overview-section-heading">
         <h3 id={props.id}>{props.title}</h3>
       </div>
-      <div className="integration-catalog">
+      <ul className="integration-catalog">
         {props.items.map(renderCatalogItem)}
-      </div>
+      </ul>
     </section>
   );
 }
 
+/** One row: the app, what it does for the shop, its state and its action. */
 function renderCatalogItem(item: IntegrationCatalogItem): React.ReactNode {
   const action = catalogAction(item);
+  const status =
+    item.status.kind !== "idle"
+      ? item.status.label
+      : item.optional
+        ? "Optional"
+        : null;
   return (
-    <a
-      className="integration-catalog-card"
-      id={`integration-overview-app-${item.id}`}
-      data-status={item.status.kind}
-      href={item.href}
-      key={item.id}
-      aria-label={`${action} ${item.label}`}
-    >
-      <ProviderTile provider={item.tile} label={item.label} />
-      <span className="integration-catalog-text">
-        <strong>{item.label}</strong>
-        <span className="integration-catalog-description">
-          {item.description}
+    <li key={item.id}>
+      <a
+        className="integration-catalog-card"
+        id={`integration-overview-app-${item.id}`}
+        data-status={item.status.kind}
+        href={item.href}
+        aria-label={`${action} ${item.label}`}
+      >
+        <ProviderTile provider={item.tile} label={item.label} />
+        <span className="integration-catalog-text">
+          <strong>{item.label}</strong>
+          <span className="integration-catalog-description">
+            {item.description}
+          </span>
         </span>
-        <span className="integration-catalog-foot">
-          <span className="integration-catalog-action">{action}</span>
-          {item.status.kind === "idle" ? null : (
-            <span className="integration-catalog-status">
-              <span aria-hidden="true" />
-              {item.status.label}
-            </span>
-          )}
+        {status === null ? null : (
+          <span className="integration-catalog-status">
+            {item.status.kind === "idle" ? null : <span aria-hidden="true" />}
+            {status}
+          </span>
+        )}
+        <span className="integration-catalog-action">
+          {action}
+          <ChevronRight size={14} aria-hidden="true" />
         </span>
-      </span>
-    </a>
+      </a>
+    </li>
   );
 }
 

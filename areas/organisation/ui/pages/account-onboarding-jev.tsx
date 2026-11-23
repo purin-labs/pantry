@@ -1,6 +1,9 @@
 import React from "react";
 import { Link } from "react-router";
-import type { JevFeature } from "@purin-labs/control-api/portal/jev-features";
+import {
+  jevFeatureSendsSentence,
+  type JevFeature,
+} from "@purin-labs/control-api/portal/jev-features";
 import {
   changeJevFeature,
   jevFeatureErrorMessage,
@@ -32,17 +35,17 @@ const FEATURES: readonly Readonly<{
   {
     feature: "mail_classification",
     label: "Mail sorting",
-    sent: "The subject, sender and text of each new email go to TypeSafe.",
+    sent: jevFeatureSendsSentence("mail_classification"),
   },
   {
     feature: "related_cases",
     label: "Related Cases",
-    sent: "Parts of the email and Case summaries go to TypeSafe.",
+    sent: jevFeatureSendsSentence("related_cases"),
   },
   {
     feature: "screen_relevance",
     label: "Screen suggestions",
-    sent: "The page title and visible labels go to TypeSafe.",
+    sent: jevFeatureSendsSentence("screen_relevance"),
   },
 ];
 

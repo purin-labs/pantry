@@ -6,6 +6,7 @@ import type {
 } from "@purin-labs/control-api/portal/jev-features";
 import { Switch } from "@purin-labs/ui/toggle-switch";
 import { changeJevPaidUse, jevFeatureErrorMessage } from "./api";
+import { JevFacts } from "./facts";
 
 /**
  * Paid Jev use above the free use, and the prompt at 80 % and 100 % of the
@@ -104,28 +105,21 @@ export function pricedNote(priced: boolean): string | null {
     : "Paid Jev use is not open yet. It opens when Purin Pantry billing starts.";
 }
 
-/** "This month: $1.20 of $5.00", and the stop at the spending limit. */
-function PaidUseMonth(props: {
+/** The stop at the spending limit, while paid use is on. */
+function SpendingLimitReached(props: {
   readonly view: JevFeaturesView;
 }): React.ReactNode {
   const { paidUse, allowance } = props.view;
-  if (!paidUse.enabled) return null;
+  if (!paidUse.enabled || paidUse.spentMinor < paidUse.spendingLimitMinor)
+    return null;
   return (
-    <>
-      <p className="jev-funding-line">
-        This month: {cents(paidUse.spentMinor)} of{" "}
-        {cents(paidUse.spendingLimitMinor)}.
-      </p>
-      {paidUse.spentMinor >= paidUse.spendingLimitMinor ? (
-        <p className="jev-warning" role="status">
-          Jev reached the spending limit.{" "}
-          {allowance === null
-            ? "Jev features pause until the next month."
-            : `Jev features pause until ${resetDate(allowance)}.`}{" "}
-          A higher limit starts them again.
-        </p>
-      ) : null}
-    </>
+    <p className="jev-warning" role="status">
+      Jev reached the spending limit.{" "}
+      {allowance === null
+        ? "Jev features pause until the next month."
+        : `Jev features pause until ${resetDate(allowance)}.`}{" "}
+      A higher limit starts them again.
+    </p>
   );
 }
 
@@ -208,17 +202,40 @@ export function PaidUseSection(props: {
         </div>
       </div>
       <p id="jev-paid-use-description" className="jev-row-description">
-        Above the free use, Jev can keep running, and the use is billed. Pay
-        with prepaid credit, or after use on the monthly invoice, up to a $10
-        credit limit. Both are in the Seams account. The price is $0.084 for
-        each million input tokens.
+        Jev keeps running above the free use, and the use is billed.
       </p>
+      <JevFacts
+        label="Paid use"
+        rows={[
+          ["Price", "$0.084 for each million input tokens"],
+          [
+            "How you pay",
+            "Prepaid credit, or the monthly invoice up to a $10 credit limit. Both are in the Seams account.",
+          ],
+          ...(paidUse.enabled
+            ? [
+                [
+                  "Spent this month",
+                  `${cents(paidUse.spentMinor)} of ${cents(paidUse.spendingLimitMinor)}`,
+                ] as const,
+              ]
+            : []),
+          ...(isOwner
+            ? []
+            : [
+                [
+                  "Monthly spending limit",
+                  cents(paidUse.spendingLimitMinor),
+                ] as const,
+              ]),
+        ]}
+      />
       {note === null ? null : (
         <p className="jev-warning" role="status">
           {note}
         </p>
       )}
-      <PaidUseMonth view={view} />
+      <SpendingLimitReached view={view} />
       {isOwner ? (
         <form
           className="jev-limit"
@@ -254,11 +271,7 @@ export function PaidUseSection(props: {
             At the limit, Jev stops until the next month.
           </span>
         </form>
-      ) : (
-        <p className="jev-funding-line">
-          Monthly spending limit: {cents(paidUse.spendingLimitMinor)}.
-        </p>
-      )}
+      ) : null}
       {isOwner ? null : (
         <p className="jev-muted">Only the owner can turn on paid use.</p>
       )}

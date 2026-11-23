@@ -62,6 +62,8 @@ export type IntegrationEntry = {
   readonly id: string;
   readonly label: string;
   readonly description: string;
+  /** The shop works without it; the catalog says so in the place of the state. */
+  readonly optional?: true;
   readonly tile: ProviderTileName;
   readonly accounts: readonly IntegrationAccount[];
   readonly connected: boolean;
@@ -559,6 +561,7 @@ function buildIntegrationCatalogItem(
     id: entry.id,
     label: entry.label,
     description: entry.description,
+    optional: entry.optional === true,
     searchAliases: integrationSearchAliases(entry.id),
     tile: entry.tile,
     status: integrationEntryStatus(entry),
