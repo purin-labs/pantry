@@ -88,7 +88,7 @@ describe("checkout profile control routes", () => {
     expect(response.status).toBe(409);
     await expect(response.json()).resolves.toEqual({
       ok: false,
-      error: "checkout_payment_binding_uncertified",
+      error: "checkout_payment_account_inactive",
     });
     expect(checkoutControlMocks.activateCheckoutProfile).not.toHaveBeenCalled();
   });

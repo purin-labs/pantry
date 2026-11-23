@@ -329,7 +329,7 @@ async function handleProfilePublication(
       draft.value.configuration,
     ))
   ) {
-    return controlError("checkout_payment_binding_uncertified", 409);
+    return controlError("checkout_payment_account_inactive", 409);
   }
   const published = await started.context.client.publishCheckoutProfile({
     schemaVersion: "commerce.publish-checkout-profile.v1",
@@ -413,7 +413,7 @@ async function handleProfileActivation(
       profile.value.configuration,
     ))
   ) {
-    return controlError("checkout_payment_binding_uncertified", 409);
+    return controlError("checkout_payment_account_inactive", 409);
   }
   const activated = await started.context.client.activateCheckoutProfile({
     schemaVersion: "commerce.activate-checkout-profile.v1",

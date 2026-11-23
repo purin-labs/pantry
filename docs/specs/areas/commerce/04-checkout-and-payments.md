@@ -43,7 +43,7 @@ outside the engine. A `gmo_stera` collection runs through the Platform `DeviceFl
   the settings of a published revision, edits it, and publishes and activates it after
   a review panel. Pantry publishes or activates a profile only when its payment binding
   is an `active` payment account of the merchant. Otherwise the answer is
-  `checkout_payment_binding_uncertified` (409).
+  `checkout_payment_account_inactive` (409).
 
 ### Online checkout and payment
 
@@ -340,9 +340,6 @@ Neighbours:
 - Pantry has no route or page for the engine's unplaced captures. The alarm does not
   read a refund attempt that stays `requested` again. Only the counter refund
   reconciliation reads it, on request.
-- The certification of a payment binding was removed. The publish check now asks only
-  for an `active` account, but its error keeps the name
-  `checkout_payment_binding_uncertified`.
 - Live certification is not done: Stripe live payments, the distinct-seller Square check
   and the physical Terminal (Plan 33D, Plan 90 Phase 3C). The carriers are test
   fixtures.
