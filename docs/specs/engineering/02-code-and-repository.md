@@ -99,7 +99,8 @@ module gives the implementation. `definePort` is in `foundation/kernel/port.ts`.
 
 The lint reads the `.ts` and `.tsx` files under `covers`: `workers/platform/src/`,
 `apps/portal/src/` and `foundation/`. For other packages, it reads only the workspace
-dependencies in `package.json`. It finds a D1 write by a literal table name. Its list of
+dependencies in `package.json`. It finds a package by the name in its `package.json`,
+so `@purin-labs/commerce-worker` is `services/commerce` (`scripts/lib/layers.mjs`). It finds a D1 write by a literal table name. Its list of
 known crossings is empty. A new entry needs a `reason` and a `fix`.
 
 `docs/layers.md` lists each module. After a new folder, a new table or a map change, run
@@ -311,9 +312,6 @@ acceptance before Stage B moves its files.
 
 **Gaps in the lints.**
 
-- `lint:layers` finds a package by its folder name, so it does not see an import of
-  `@purin-labs/commerce-worker`. `lint:runtime-boundary` refuses that import outside
-  the commerce code.
 - CI does not run Prettier, and the ESLint style rules apply only to
   `areas/integrations/server/provider-workflows`. The pre-push hook is off in a new clone.
 - `lint:runtime-boundary` looks only for `.prepare(` in a route file. Route files still
