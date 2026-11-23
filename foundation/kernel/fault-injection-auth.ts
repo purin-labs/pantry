@@ -16,6 +16,17 @@ export function authorizeFaultInjectionBearer(input: BearerAuthInput): boolean {
   return authorizeConfiguredBearer(input);
 }
 
+/**
+ * Whether a fault point may act: the Worker has a fault injection token that
+ * the fault routes would accept. Each fault point and each route uses this
+ * one rule.
+ */
+export function faultInjectionEnabled(
+  configuredToken: string | undefined,
+): boolean {
+  return parseFaultInjectionConfig(configuredToken).kind === "enabled";
+}
+
 export function authorizeConfiguredBearer(input: BearerAuthInput): boolean {
   const config = parseFaultInjectionConfig(input.configuredToken);
   const credential = parseFaultInjectionCredential(input.authorization);

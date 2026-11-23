@@ -2,6 +2,7 @@ import type { OrganisationModuleHost } from "@purin-labs/tenancy/actors/organisa
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
+import { faultInjectionEnabled } from "@purin-labs/kernel/fault-injection-auth";
 import {
   activatePendingIntegrationAccounts,
   beginOnboardingActivation,
@@ -403,13 +404,6 @@ function activationExecutionFailure(
   };
 }
 
-function hasOnboardingActivationAcceptanceFaultsEnabled(env: Env): boolean {
-  return (
-    typeof env.PANTRY_FAULT_INJECTION_TOKEN === "string" &&
-    env.PANTRY_FAULT_INJECTION_TOKEN.length > 0
-  );
-}
-
 /** What an onboarding activation needs from the rest of the Organisation. */
 type OnboardingActivationParts = Parameters<
   typeof ensureActivationPlacementStep
@@ -571,7 +565,7 @@ export class OrganisationActivation {
     context: ActivationContext,
     now: number,
   ): Promise<ActivationExecutionFailure | null> {
-    if (!hasOnboardingActivationAcceptanceFaultsEnabled(this.host.env)) {
+    if (!faultInjectionEnabled(this.host.env.PANTRY_FAULT_INJECTION_TOKEN)) {
       return null;
     }
     const consumed = await consumeOnboardingActivationAcceptanceFault(

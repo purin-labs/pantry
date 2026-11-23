@@ -11,6 +11,7 @@ import { decodeBase64, encodeBase64, isRecord } from "@purin-labs/std";
 
 import type { CommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import type { Env } from "@purin-labs/kernel/env";
+import { faultInjectionEnabled } from "@purin-labs/kernel/fault-injection-auth";
 import {
   errorResponse,
   jsonResponse,
@@ -231,7 +232,7 @@ async function consumeAcceptanceFault(
   secret: KeptSecret,
   now: number,
 ): Promise<boolean> {
-  if (env.PANTRY_FAULT_INJECTION_TOKEN === undefined) return false;
+  if (!faultInjectionEnabled(env.PANTRY_FAULT_INJECTION_TOKEN)) return false;
   const organisation = await requireActiveOrganisationActor({
     env,
     organisationId,

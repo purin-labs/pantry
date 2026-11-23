@@ -185,7 +185,8 @@ That schema hides a statement sent to the wrong database, so two guards exist:
 
 A fault journey injects an eviction, a relocation, a delayed admission or a revoked
 access. It keeps one case for each distinct outcome. Three fault points are in product
-code, and each one acts only when the Worker has `PANTRY_FAULT_INJECTION_TOKEN`:
+code. Each one acts only when the Worker has a `PANTRY_FAULT_INJECTION_TOKEN` of at least
+32 characters, the rule of the routes (`faultInjectionEnabled`):
 
 | Fault                              | Storage key                                 | Route                                                    | Test that arms it                                     |
 | ---------------------------------- | ------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------- |
@@ -381,8 +382,6 @@ The boundaries to the neighbours:
 - **CI does not run some suites.** It does not run `cargo test --workspace` or 89 of the
   128 Kitchen journeys. It also does not run the browser scripts outside the index, the
   journeys on real services or the commerce lab commands.
-- **The fault checks differ.** The routes need a token of 32 characters. The three fault
-  points act on a shorter token.
 - **The large cuts in money-path test files are not done** (Batch E of Plan 92).
 - **Some product code has no test.** A search by name finds no test for
   `connectionAttentionMessage`, `renderOperatorNotice`, `readOrganisationHomeRegions` or
