@@ -1,7 +1,10 @@
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { sha256Hex, assertNever } from "@purin-labs/std";
-import type { ChatContextDetails } from "@purin-labs/control-api";
+import {
+  surfaceAreaTitle,
+  type ChatContextDetails,
+} from "@purin-labs/control-api";
 import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
 import type { Env } from "@purin-labs/kernel/env";
@@ -231,7 +234,7 @@ export async function appendConfirmedSourceContexts(
         sequence: nextTimelineSequence(timeline),
         requestId: work.requestId,
         createdAt: contextDetails.source.observedAt,
-        text: `Read ${contextDetails.area} context.`,
+        text: `Read ${surfaceAreaTitle(contextDetails.area)} context.`,
         contextDetails,
       },
     ];

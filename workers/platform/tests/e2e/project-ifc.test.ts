@@ -462,6 +462,30 @@ async function projectInformationFlowJourney(
   );
   expect(subscription.status).toBe(200);
   const pendingContent = subscription.text();
+  // While the turn runs, the chat shows the read of the connected file as a
+  // file of the Workspace, not as Commerce.
+  const running = await get(
+    owner,
+    `${BASE}?conversation=${conversationId}&observe=true`,
+  );
+  expect(running).toMatchObject({
+    conversation: {
+      timeline: expect.arrayContaining([
+        expect.objectContaining({
+          kind: "context",
+          text: "Read Workspace context.",
+          contextDetails: expect.objectContaining({
+            kind: "observed",
+            area: "Workspace",
+            source: expect.objectContaining({
+              id: `${reference.integrationAccountId}:dropbox_file:${SOURCE_ID}`,
+              origin: "file",
+            }),
+          }),
+        }),
+      ]),
+    },
+  });
   let revokedReplayStatus = 0;
   try {
     const revoked = await revokeAccessGrant({

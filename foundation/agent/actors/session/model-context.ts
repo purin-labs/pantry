@@ -93,11 +93,13 @@ export function confirmedContextObservation(
         },
       };
     case "integration_resource":
+      // A commerce record belongs to the Commerce pages (products, orders).
+      // A connected file or another resource is context of the Workspace.
       return {
         kind: "observed",
         area: source.resourceScope.startsWith("commerce")
-          ? "cafe"
-          : "commerce",
+          ? "commerce"
+          : "Workspace",
         source: {
           id: `${source.integrationAccountId}:${source.resourceScope}`,
           revision: String(evidence.sourceRevision),

@@ -260,7 +260,8 @@ The agent loads more context with its tools, when the task needs it.
   page and starts no physics. Commerce and file reads use their own tools.
 - **Observations.** A read records an observation with its source, its revision, its
   digest and its time in the information-flow record of the Session. The chat shows the
-  newest 12 as `observed` context events.
+  newest 12 as `observed` context events. The area of a saved Kitchen run is Kitchen, of
+  a commerce record Commerce, and of a connected file or another resource Workspace.
 - **The Kitchen page.** A Portal turn of an owner or an admin offers the Kitchen page
   commands before the page is open. The first command sends a `prepare_context` effect
   to the browser tab that sent the message. The Portal shows the Kitchen view, captures

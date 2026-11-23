@@ -60,7 +60,8 @@ export type ChatContextDetails =
     }>
   | Readonly<{
       kind: "observed";
-      area: "commerce" | "cafe" | "kitchen";
+      /** Workspace: a connected file or another resource of no product area. */
+      area: "commerce" | "cafe" | "kitchen" | "Workspace";
       source: Readonly<{
         id: string;
         revision: string;
@@ -90,7 +91,8 @@ export function parseChatContextDetails(
     if (
       (raw.area !== "commerce" &&
         raw.area !== "cafe" &&
-        raw.area !== "kitchen") ||
+        raw.area !== "kitchen" &&
+        raw.area !== "Workspace") ||
       !hasExactKeys(raw, ["kind", "area", "source"]) ||
       !isRecord(raw.source)
     )
