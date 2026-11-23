@@ -198,7 +198,8 @@ The Durable Object classes of the commerce engine are `CommerceMerchantDO` and
   in `SLACK_APP_ID`. The command keeps these names, unless it gets `--app-name` and
   `--bot-name` (see Open work).
 - `scripts/slack/pantry-public-manifest.json` holds the app "Purin Pantry Local" and the
-  bot `sous-chef`. `pnpm slack:public-app:update` sends it to the local app.
+  bot `sous-chef`. `pnpm slack:public-app:update` sends it to the local app, with the
+  events and the interactions URL of the local tunnel.
 - `integrations/shopify/shopify.app.toml` names the Shopify app "Purin Pantry".
 
 ### Provider registrations

@@ -175,7 +175,10 @@ async function forwardProviderRequest(platformOrigin, request, response) {
 
 export function providerRoute(request) {
   if (request.method !== "POST") return null;
-  if (request.url === "/slack/events") {
+  if (
+    request.url === "/slack/events" ||
+    request.url === "/slack/interactions"
+  ) {
     return { kind: "slack", path: request.url };
   }
   if (

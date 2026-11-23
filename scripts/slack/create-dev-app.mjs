@@ -201,6 +201,13 @@ function prepareManifest(manifest, args) {
   } else if (args.requestUrl !== null) {
     assertHttpsUrl(args.requestUrl, "--request-url");
     prepared.settings.event_subscriptions.request_url = args.requestUrl;
+    // The button clicks of a side Case go to the same ingress as the events.
+    if (prepared.settings.interactivity?.is_enabled === true) {
+      prepared.settings.interactivity.request_url = new URL(
+        "/slack/interactions",
+        args.requestUrl,
+      ).href;
+    }
   }
 
   ensureOAuthShape(prepared);
