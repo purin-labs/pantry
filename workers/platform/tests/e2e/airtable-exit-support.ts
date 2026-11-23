@@ -42,9 +42,14 @@ export async function pending(
   return body.heldOutputs.filter(isRecord);
 }
 
+/**
+ * Connects the order base. Each role in `roles` and the Slack channel may read
+ * and write it.
+ */
 export async function connectAirtable(
   owner: IssuedControlSession,
   slackAccountId: string,
+  roles: readonly ("operator" | "owner" | "admin")[] = ["operator", "owner"],
 ): Promise<string> {
   const user = parseUserId(SLACK_ACTOR_USER_ID);
   const handle = parseVaultHandle("vault:airtable:exit-approval");
@@ -89,14 +94,13 @@ export async function connectAirtable(
   const accountId = connected.account.integrationAccountId;
   // A channel turn acts for the channel and for the person, so each holds them.
   const subjects = [
-    { kind: "organisation_role", role: "operator" },
-    { kind: "organisation_role", role: "owner" },
+    ...roles.map((role) => ({ kind: "organisation_role", role }) as const),
     {
       kind: "conversation",
       integrationAccountId: slackAccountId,
       conversationId: CHANNEL_ID,
-    },
-  ] as const;
+    } as const,
+  ];
   for (const capabilityId of [
     CAPABILITY_KEYS.airtableApiRead,
     CAPABILITY_KEYS.airtableApiWrite,

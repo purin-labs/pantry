@@ -83,7 +83,10 @@ free text that a person outside the Organisation wrote. `source-labels.ts`
 names the read capabilities of such sources. The link read of a public page
 records the page text with the message's ingress label and the writer `outside`
 (`recordMessageLinkObservation` in `agent/actors/session/message-observations.ts`),
-before the model reads it. A join keeps the writer, and only
+before the model reads it. A Portal chat's documentation read does the same for
+each page that a later step's prompt carries: the step's Case command names the
+pages, and `admitChatInput` (`conversation/chat/input-admission.ts`) adds each one
+to the turn's context with the chat input's label and the writer `outside`. A join keeps the writer, and only
 `acceptedByPersonFlowLabel` removes it, for a record that a person accepted.
 
 After the exit rule and the Organisation's rules, a tool effect of such a

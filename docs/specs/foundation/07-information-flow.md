@@ -123,8 +123,12 @@ the exit decides.
   the Organisation. `OUTSIDE_WRITTEN_READ_CAPABILITIES` names `email.mailbox.read` and
   `whatsapp.support.read`. The link read (`read_message_link`) records the text of a
   public page with the message's ingress label and the writer `outside`
-  (`recordMessageLinkObservation`), before the model reads it. No other source sets
-  the writer.
+  (`recordMessageLinkObservation`), before the model reads it. A Portal chat's
+  documentation read (`read_documentation`) does the same for each page that a later
+  step's prompt carries: the step's Case command names each page by its address and
+  digest, and `admitChatInput` adds an item with the chat input's label and the writer
+  `outside` to the turn's context, so the Session records it before inference. No
+  other source sets the writer.
 - A join keeps the writer. Only `acceptedByPersonFlowLabel` removes it, when a turn
   reads an accepted Memory. The stored label keeps it. A model summary removes nothing.
 - The rule runs after the level rule and the Organisation's rules. A tool effect of
@@ -402,9 +406,10 @@ planner and interpreter; a second policy engine.
   exit check. The proposal tools and the surface tools also run none
   ([Refactor 17](../../refactor-17.md), Appendix C). Plan 89 says that a follow-up asks.
 - No source adapter makes a public label for a published menu, a fetched page or
-  documentation. The link read gives a page the message's ingress label.
-- Only a label of `email.mailbox.read`, `whatsapp.support.read` or the link read states
-  the writer. A mailbox, WhatsApp or scheduled turn is not marked by its own ingress.
+  documentation. The link read gives a page the message's ingress label, and a
+  documentation read gives a page the chat input's label.
+- Only a label of `email.mailbox.read`, `whatsapp.support.read`, the link read or a
+  documentation read states the writer. A mailbox, WhatsApp or scheduled turn is not marked by its own ingress.
 - A turn of no person cannot ask, so its blocked effect stays refused. Commerce
   execution after a signed approval and a custom connector read are also refused, with
   no question.
@@ -423,8 +428,9 @@ planner and interpreter; a second policy engine.
   level at each read, so no background conversion runs.
 - `outside-written-effect.test.ts` adds the outside read to the running turn directly
   (`raiseLabel` in `tests/e2e/held-exit-support.ts`). `outside-written-link.test.ts`
-  reads a fake public page through the link read of a Slack thread. Both use fake
-  services, and they read no mailbox. No file in `workers/platform/tests/` holds the
+  reads a fake public page through the link read of a Slack thread.
+  `outside-written-documentation.test.ts` reads one through the documentation read of a
+  Portal chat. All three use fake services, and they read no mailbox. No file in `workers/platform/tests/` holds the
   reason code `aifc.other_recipient`.
 - The Slack stream calls and `chat.update` send no preview flag. Their link preview
   was not checked on real Slack.
@@ -444,7 +450,7 @@ planner and interpreter; a second policy engine.
 - E2E journeys in `workers/platform/tests/e2e/`: `slack-held-output.test.ts`,
   `slack-held-effect.test.ts`, `slack-exit-levels.test.ts`,
   `outside-written-effect.test.ts`, `outside-written-link.test.ts`,
-  `airtable-exit-approval.test.ts`,
+  `outside-written-documentation.test.ts`, `airtable-exit-approval.test.ts`,
   `slack-streamed-answer-withheld.test.ts`, `slack-context-search-labels.test.ts`,
   `slack-email-draft-label.test.ts`, `project-ifc.test.ts`,
   `chat-side-case-ifc.test.ts`, `pi-menu-board-one-allow.test.ts`,

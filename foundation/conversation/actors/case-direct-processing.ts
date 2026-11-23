@@ -10,7 +10,7 @@ import {
 import type { CompiledTurnAuthority } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { ContextAssemblyResult } from "@purin-labs/agent/context/assembly/index";
 import { admitProjectContext } from "../projects/context";
-import { admitChatInput } from "../chat/input-admission";
+import { admitChatInput, type ChatDocumentRead } from "../chat/input-admission";
 import {
   authorizeSessionTurnExecution,
   bindOperatorTurnAccess,
@@ -138,6 +138,11 @@ type DirectCaseCommand = {
   readonly thinkingLevel?: EmbeddedHarnessThinkingLevel;
   readonly browserContext: PageBrowserContext;
   readonly surfaceContext: TurnPageState;
+  /**
+   * The public pages that a Portal chat read and that its objective carries.
+   * The turn records each one before inference, with the writer `outside`.
+   */
+  readonly documents?: readonly ChatDocumentRead[];
   /** The installed agent this run was resolved for, when an automation owns it. */
   readonly pinnedAgent?: PinnedAgentProfile | null;
   /**
@@ -623,6 +628,7 @@ async function prepareDirectCaseContext(
     `turn_trigger_${identities.digest}`,
     command.content,
     command.receivedAt,
+    command.documents ?? [],
   );
   traceDirectCasePreparation(command, "authorized_context", contextStartedAt);
   if (!preparedContext.ok) return failure(preparedContext.error.code);

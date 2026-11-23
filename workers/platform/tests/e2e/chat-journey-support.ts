@@ -1,7 +1,10 @@
 import { env, exports } from "cloudflare:workers";
 import { expect } from "vitest";
 import { fixtureDatabase } from "./organisation-database";
-import { newConversationId, type ConversationId } from "@purin-labs/control-api";
+import {
+  newConversationId,
+  type ConversationId,
+} from "@purin-labs/control-api";
 import type { CaseGoalCommand } from "@purin-labs/contracts";
 import { isRecord } from "@purin-labs/std";
 import {
@@ -27,6 +30,10 @@ import {
   initialConversationCaseIdentity,
 } from "@purin-labs/conversation/chat/conversation-actor-identity";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
+import {
+  readOrganisationInferenceSelection,
+  selectOrganisationInferenceSelection,
+} from "@purin-labs/agent/data/organisation-inference-selection";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { ask } from "./chat-permission-support";
 import { commerceHeaders } from "./commerce-support";
@@ -119,6 +126,26 @@ export async function preparePortalChatJourney(
   });
 
   return { session, fixture };
+}
+
+/** The journey's Organisation answers on Pantry's own model route. */
+export async function choosePantryPlatform(): Promise<void> {
+  const selection = await readOrganisationInferenceSelection({
+    db: fixtureDatabase(),
+    organisationId: ORGANISATION_ID,
+  });
+  const userId = parseUserId(SLACK_ACTOR_USER_ID);
+  if (selection === null || !userId.ok)
+    throw new Error("Missing inference authority");
+  const selected = await selectOrganisationInferenceSelection({
+    db: fixtureDatabase(),
+    organisationId: ORGANISATION_ID,
+    selection: { kind: "pantry_platform" },
+    expectedConfigurationVersion: selection.configurationVersion,
+    selectedByUserId: userId.value,
+    now: Date.now(),
+  });
+  if (!selected.ok) throw new Error(selected.error.code);
 }
 
 export async function readWork(session: IssuedControlSession): Promise<string> {
@@ -364,7 +391,7 @@ export function control(
 
 /** The Case Actor of one person's Portal chat. */
 export async function conversationCase(
-  person: Member,
+  person: Pick<Member, "organisationId" | "userId">,
   conversationId: ConversationId,
 ) {
   const caseId = await conversationCaseId(

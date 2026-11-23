@@ -7,7 +7,6 @@
 // for the owner. Production saw the missing half on 2026-11-05: after
 // an unanswered price card expired, every message in that chat failed with
 // "The selected AI could not finish this response".
-import { fixtureDatabase } from "./organisation-database";
 import { env, exports } from "cloudflare:workers";
 import { runInDurableObject } from "cloudflare:test";
 import { http, type HttpResponseResolver } from "msw";
@@ -16,22 +15,18 @@ import { isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {
-  readOrganisationInferenceSelection,
-  selectOrganisationInferenceSelection,
-} from "@purin-labs/agent/data/organisation-inference-selection";
-import {
   placeCafeOrder,
   publishCafeMenu,
   required,
 } from "./cafe-order-support";
 import {
+  choosePantryPlatform,
   CONVERSATION_ID,
   preparePortalChatJourney,
 } from "./chat-journey-support";
 import { network } from "./network";
 import {
   MERCHANT,
-  OWNER,
   installEffectAuthority,
   listingNonce,
   postControl,
@@ -292,23 +287,6 @@ async function settledWork(
     )
     .toMatch(/^(ready|failed)$/u);
   return work;
-}
-
-async function choosePantryPlatform(): Promise<void> {
-  const selection = await readOrganisationInferenceSelection({
-    db: fixtureDatabase(),
-    organisationId: ORGANISATION_ID,
-  });
-  if (selection === null) throw new Error("Missing inference authority");
-  const selected = await selectOrganisationInferenceSelection({
-    db: fixtureDatabase(),
-    organisationId: ORGANISATION_ID,
-    selection: { kind: "pantry_platform" },
-    expectedConfigurationVersion: selection.configurationVersion,
-    selectedByUserId: OWNER,
-    now: Date.now(),
-  });
-  if (!selected.ok) throw new Error(selected.error.code);
 }
 
 function sendMessage(

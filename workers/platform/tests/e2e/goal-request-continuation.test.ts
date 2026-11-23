@@ -4,12 +4,8 @@ import { evictDurableObject } from "cloudflare:test";
 import { http } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
-import { parseUserId } from "@purin-labs/control-api/ids";
 import {
-  readOrganisationInferenceSelection,
-  selectOrganisationInferenceSelection,
-} from "@purin-labs/agent/data/organisation-inference-selection";
-import {
+  choosePantryPlatform,
   preparePortalChatJourney,
   chat,
   readWork,
@@ -27,7 +23,7 @@ it(
 
 async function continuationJourney(context: TestContext): Promise<void> {
   const { session } = await preparePortalChatJourney();
-  await choosePi();
+  await choosePantryPlatform();
   const provider = new ReplacingProvider();
   network.use(
     http.post(
@@ -188,25 +184,6 @@ function measuredResponse(call: number): Response {
       usage: { prompt_tokens: 20, completion_tokens: 5, total_tokens: 25 },
     },
   ]);
-}
-
-async function choosePi(): Promise<void> {
-  const selection = await readOrganisationInferenceSelection({
-    db: fixtureDatabase(),
-    organisationId: ORGANISATION_ID,
-  });
-  const userId = parseUserId("user_ddea8ec2-b424-5505-a2f4-8f66b89b13ab");
-  if (selection === null || !userId.ok)
-    throw new Error("Missing inference authority");
-  const selected = await selectOrganisationInferenceSelection({
-    db: fixtureDatabase(),
-    organisationId: ORGANISATION_ID,
-    selection: { kind: "pantry_platform" },
-    expectedConfigurationVersion: selection.configurationVersion,
-    selectedByUserId: userId.value,
-    now: Date.now(),
-  });
-  if (!selected.ok) throw new Error(selected.error.code);
 }
 
 function sendPiMessage(

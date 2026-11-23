@@ -55,15 +55,21 @@ import {
   timelineVisibleMessages,
   normalizeConversationTimeline,
   type Conversation,
+  type ConversationDocument,
   type ConnectorCardTarget,
 } from "@purin-labs/conversation/chat/conversation";
+import type { ChatDocumentRead } from "@purin-labs/conversation/chat/input-admission";
 import { buildAssistantTimelineEvent } from "@purin-labs/conversation/chat/timeline";
 import {
   readConversation,
   saveConversation,
   type ConversationScope,
 } from "@purin-labs/conversation/chat/store";
-import { conversationPrompt, workspaceCanvasPrompt } from "../prompt";
+import {
+  conversationPrompt,
+  promptDocuments,
+  workspaceCanvasPrompt,
+} from "../prompt";
 import { readLatestBakerySurfaceOfRequests } from "@purin-labs/area-kitchen/server/actors/bakery-surface-effect";
 import type { Variant } from "@purin-labs/type-utils";
 import {
@@ -234,6 +240,12 @@ export async function runConversation(
                 conversation,
               ),
             });
+      // A person outside the Organisation wrote each page that the prompt
+      // carries. The Session records each one before inference (Plan 89).
+      const promptPages =
+        current.access.access.kind === "workspace_canvas"
+          ? []
+          : promptDocuments(conversation).map(documentRead);
       if (
         !(await bindConversationTurnAccess(
           placement.database,
@@ -275,6 +287,7 @@ export async function runConversation(
           receivedAt: Date.now(),
           role: "coordinator",
           objective: prompt,
+          documents: promptPages,
           projectContext: currentProjectSnapshot(conversation),
           delivery: { kind: "none" },
           requiredModelRoute: model,
@@ -881,4 +894,9 @@ function conversationStepIdentity(
   step: number,
 ): string {
   return `${actorIdentity}:${lease}:${step}`;
+}
+
+/** A page of the prompt as the turn's command names it, with no text. */
+function documentRead(document: ConversationDocument): ChatDocumentRead {
+  return { url: document.url, sha256: document.sha256 };
 }
