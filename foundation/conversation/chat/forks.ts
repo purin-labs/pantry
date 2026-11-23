@@ -275,6 +275,9 @@ export async function bindCompletedChatHistory(
   };
 }
 
+/** The largest prepared fork: its history and its conversation, in bytes. */
+const FORK_HISTORY_BYTES = 1_800_000;
+
 export async function forkChat(
   env: Env,
   placement: OrganisationExecutionScope,
@@ -423,7 +426,7 @@ export async function forkChat(
       const conversationJson = JSON.stringify(conversation);
       if (
         new TextEncoder().encode(historyJson + conversationJson).byteLength >
-        1_800_000
+        FORK_HISTORY_BYTES
       )
         throw new Error("chat_fork_history_capacity");
       await db
