@@ -385,6 +385,9 @@ in `registry.ts`. The capabilities are in
   pauses the number, and a person states if the message went (`resolve`).
 - **When the daily WhatsApp budget ends,** the number pauses with `daily_token_budget`,
   and the operator gets one notice. A `resume` or a new policy starts it again.
+- **When the agent's turns fail,** the Case tries again after 60 s. After 3 attempts it
+  stops, and the operator gets one notice, `turn_attempts_exhausted`, that says the
+  agent could not answer. The next customer message starts new attempts.
 - **Gmail sign-in refused.** On `invalid_grant`, the first read marks the account
   `reauth_required` (`provider_grant_refused`, `markIntegrationAccountReauthRequired`).
   The write changes only an `active` account with the `updated_at` that the read saw.

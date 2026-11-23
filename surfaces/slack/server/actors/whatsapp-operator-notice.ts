@@ -170,6 +170,8 @@ function renderOperatorNotice(
       return `${head} A customer sent a ${reason.messageType} message, which this integration does not handle. Reply in WhatsApp yourself, then skip that message. ${tail}`;
     case "service_window_expired":
       return `WhatsApp support on ${displayPhoneNumber}: a proposed reply passed WhatsApp's 24-hour service window before it was approved. Purin Pantry deleted the draft and did not contact the customer. Reply in WhatsApp yourself if the customer still needs an answer.`;
+    case "turn_attempts_exhausted":
+      return `WhatsApp support on ${displayPhoneNumber}: the agent could not answer a customer after ${reason.attempts} attempts, and it stopped trying. Purin Pantry sent nothing. Reply in WhatsApp yourself, or wait for the customer's next message, which the agent tries again.`;
     case "send_indeterminate":
       return `${head} WhatsApp did not confirm whether an approved reply was delivered. Purin Pantry will not retry it: check WhatsApp and record what you find. ${tail}`;
   }

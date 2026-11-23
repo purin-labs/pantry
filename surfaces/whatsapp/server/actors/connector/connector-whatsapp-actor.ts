@@ -816,9 +816,9 @@ export class ConnectorWhatsApp {
     const noticeKey = this.host.ctx.storage.transactionSync(() =>
       recordWhatsAppOperatorNotice(this.host.ctx.storage.sql, {
         reason: {
-          kind: "service_window_expired",
+          kind: "turn_attempts_exhausted",
           caseId,
-          expiredAt: Date.now(),
+          attempts: rearmed.attempts,
         },
         policyVersion: runtime.policyVersion,
         now: Date.now(),

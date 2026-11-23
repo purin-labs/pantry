@@ -71,6 +71,12 @@ export type WhatsAppPauseReason =
       readonly expiredAt: number;
     }
   | {
+      /** The agent's turns for the Case failed until no attempt was left. */
+      readonly kind: "turn_attempts_exhausted";
+      readonly caseId: string;
+      readonly attempts: number;
+    }
+  | {
       readonly kind: "send_indeterminate";
       readonly proposalId: string;
       readonly caseId: string;
@@ -510,6 +516,7 @@ function whatsAppNoticeKey(
     case "unsupported_message_type":
       return `notice_${policyVersion}_${reason.kind}_${reason.providerMessageId}`;
     case "service_window_expired":
+    case "turn_attempts_exhausted":
       return `notice_${policyVersion}_${reason.kind}_${reason.caseId}`;
     case "send_indeterminate":
       return `notice_${policyVersion}_${reason.kind}_${reason.proposalId}`;
@@ -2126,6 +2133,14 @@ function parsePauseReason(raw: unknown): WhatsAppPauseReason | null {
             kind: raw.kind,
             caseId: raw.caseId,
             expiredAt: Number(raw.expiredAt),
+          }
+        : null;
+    case "turn_attempts_exhausted":
+      return typeof raw.caseId === "string" && numbers(raw, ["attempts"])
+        ? {
+            kind: raw.kind,
+            caseId: raw.caseId,
+            attempts: Number(raw.attempts),
           }
         : null;
     case "send_indeterminate":

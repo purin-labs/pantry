@@ -1,6 +1,6 @@
 import { exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
-import { runInDurableObject } from "cloudflare:test";
+import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { parseInboxConversations } from "@purin-labs/control-api";
@@ -218,6 +218,55 @@ async function newMessageJourney({ task }: TestContext): Promise<void> {
   task.meta.inboxWhatsAppUnanswered = { listed: conversationOf(listed) };
 }
 
+// The model provider fails, so the agent cannot answer the customer's new
+// message. After the bounded turn attempts the operator is told what
+// happened, in the operations channel.
+it(
+  "tells the operator that the agent could not answer when its turn attempts run out",
+  unansweredJourney,
+  120_000,
+);
+
+async function unansweredJourney({ task }: TestContext): Promise<void> {
+  const notices: string[] = [];
+  let modelCalls = 0;
+  network.use(
+    http.post("https://openrouter.ai/api/v1/chat/completions", () => {
+      modelCalls += 1;
+      return HttpResponse.json(
+        { error: { message: "provider unavailable", code: 400 } },
+        { status: 400 },
+      );
+    }),
+    http.post("https://slack.com/api/chat.postMessage", async ({ request }) => {
+      const body: unknown = await request.json();
+      notices.push(String(record(body).text));
+      return HttpResponse.json({ ok: true, channel: "C0E2EACTOR", ts: "1" });
+    }),
+  );
+  const fixture = await customerWritesAgain();
+
+  // Each turn fails; the Case waits for its next attempt.
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    await runInDurableObject(
+      fixture.connector,
+      makeTurnDue.bind(null, fixture.caseId),
+    );
+    await runDurableObjectAlarm(fixture.connector);
+  }
+  expect(modelCalls).toBeGreaterThanOrEqual(3);
+
+  // One notice tells the operator that the agent could not answer, not that
+  // a draft passed the 24-hour window. It quotes no customer text.
+  expect(notices).toHaveLength(1);
+  const notice = notices[0] ?? "";
+  expect(notice).toContain("could not answer");
+  expect(notice).not.toContain("24-hour service window");
+  expect(notice).not.toContain(SECOND_TEXT);
+
+  task.meta.inboxWhatsAppUnanswered = { modelCalls, notice };
+}
+
 /**
  * The fixture's conversation after its owner can read the number, rejects
  * the agent's draft, and the customer sends a second message.
@@ -253,6 +302,19 @@ async function customerWritesAgain(): Promise<Fixture> {
   });
   expect(accepted, JSON.stringify(accepted)).toMatchObject({ ok: true });
   return fixture;
+}
+
+/** Moves the Case's next agent turn to now, as its wait would. */
+function makeTurnDue(
+  caseId: string,
+  _actor: unknown,
+  state: DurableObjectState,
+): void {
+  state.storage.sql.exec(
+    "UPDATE connector_whatsapp_case SET debounce_due_at = ? WHERE case_id = ? AND debounce_due_at IS NOT NULL",
+    Date.now() - 1,
+    caseId,
+  );
 }
 
 async function closeWindow(
