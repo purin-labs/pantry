@@ -16,8 +16,9 @@
 // itself do not count. Test files do not count.
 //
 // No file names one today (2026-11-21), so the check has no ratchet: one use
-// fails. Put browser code in the Portal (apps/portal/src/features/
-// workflow-simulator or production-run), and give the package a port.
+// fails. Put browser code in the Portal files of the Kitchen area
+// (areas/kitchen/ui/features/workflow-simulator or production-run), and give
+// the package a port.
 //
 //   node scripts/check-kitchen-dom.mjs
 import { execFileSync } from "node:child_process";
