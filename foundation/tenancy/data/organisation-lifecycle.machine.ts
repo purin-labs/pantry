@@ -41,13 +41,13 @@ export const ORGANISATION_LIFECYCLE_MACHINE = {
     active: {
       kind: "intermediate",
       meaning:
-        "The Organisation is in use. An owner can archive it in the Portal.",
+        "The Organisation is in use. An owner or an admin can archive it in the Portal.",
       exit: { kind: "person", surface: "Portal Organisation settings" },
     },
     archived: {
       kind: "intermediate",
       meaning:
-        "The owner archived the Organisation. Its cleanup revokes the provider credentials (pending_provider_cleanup), and then it waits for its purge (pending_purge). Until purge_after, an owner can restore it.",
+        "An owner or an admin archived the Organisation, or the scheduled run archived an idle one. Its cleanup revokes the provider credentials (pending_provider_cleanup), and then it waits for its purge (pending_purge). Until purge_after, an owner or an admin can restore it.",
       exit: {
         kind: "due",
         reconciler: "archived_organisation",
@@ -82,7 +82,7 @@ export const ORGANISATION_LIFECYCLE_MACHINE = {
       event: "save_setup",
       from: ["configuring", "active"],
       to: "configuring",
-      by: ["owner"],
+      by: ["owner", "admin"],
       guards: [],
     },
     {
@@ -110,14 +110,14 @@ export const ORGANISATION_LIFECYCLE_MACHINE = {
       event: "archive",
       from: ["configuring", "active"],
       to: "archived",
-      by: ["owner", "support_admin"],
+      by: ["owner", "admin", "support_admin", "scheduled_run"],
       guards: [],
     },
     {
       event: "restore",
       from: ["archived"],
       to: "configuring",
-      by: ["owner"],
+      by: ["owner", "admin"],
       guards: ["purge_not_due"],
     },
     {

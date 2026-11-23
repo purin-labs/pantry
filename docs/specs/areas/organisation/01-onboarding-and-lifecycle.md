@@ -423,8 +423,7 @@ The routes are in `control/routes/onboarding.ts` and `control/routes/operators.t
 - **Invitation events.** The `onboarding_event` CHECK allows three invitation types,
   and no code emits them.
 - **Labels that differ.** The tombstone names the first active owner, also when an admin
-  archives. The lifecycle machine names `owner` for archive, restore and setup, but the
-  routes admit an admin. `OrganisationOnboardingLifecycle` has no `purging` or `purged`.
+  archives. `OrganisationOnboardingLifecycle` has no `purging` or `purged`.
 - **Billing** (Plan 95 step 6) is not built, and the plan is always `beta`.
 
 ## Sources
