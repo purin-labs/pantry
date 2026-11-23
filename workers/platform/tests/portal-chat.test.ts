@@ -11,7 +11,7 @@ import { requireOrganisationExecutionScope } from "./organisation-execution-fixt
 import { kitchenObservation } from "./kitchen-observation-fixture";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
-import { parseOrganisationPlacementProfile } from "@purin-labs/tenancy/placement";
+import { parseOrganisationPlacementCells } from "@purin-labs/tenancy/placement";
 import { requireConversationId } from "./test-ids";
 import { defaultProjectSql } from "./fixtures/default-project";
 vi.mock(
@@ -278,14 +278,15 @@ beforeEach(async function setup() {
       locationHint: "wnam",
     }),
   });
-  const placement = parseOrganisationPlacementProfile(
+  const cells = parseOrganisationPlacementCells(
     env.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
   );
-  if (!placement.ok) throw new Error(placement.error.code);
+  const root = cells.ok ? cells.value[0] : undefined;
+  if (root === undefined) throw new Error("placement profile invalid");
   await ensureInitialOrganisationPlacement({
     db: env.DB,
     organisationId: scope.organisationId,
-    placement: placement.value,
+    placement: root.placement,
     environment: "development",
     now: 1,
   });

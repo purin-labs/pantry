@@ -77,31 +77,6 @@ export function parseInitialOrganisationPlacement(
   return { ok: true, value: parsed.value as InitialOrganisationPlacement };
 }
 
-export function parseOrganisationPlacementProfile(
-  raw: string,
-  path = "PANTRY_ORGANISATION_PLACEMENT_PROFILE",
-): Result<InitialOrganisationPlacement, PlacementBoundaryError> {
-  let value: unknown;
-
-  try {
-    value = JSON.parse(raw);
-  } catch {
-    return invalidPlacement(path);
-  }
-
-  if (!isRecord(value)) {
-    return invalidPlacement(path);
-  }
-
-  return parseInitialOrganisationPlacement(
-    {
-      ...value,
-      placementEpoch: 1,
-    },
-    path,
-  );
-}
-
 export function parseOrganisationPlacement(
   raw: unknown,
   path = "placement",

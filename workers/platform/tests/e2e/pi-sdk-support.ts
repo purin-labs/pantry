@@ -1,7 +1,10 @@
 import { runInDurableObject } from "cloudflare:test";
-import { organisationDatabase, publishGlobalOrganisation } from "./organisation-database";
+import {
+  organisationDatabase,
+  publishGlobalOrganisation,
+  rootPlacement,
+} from "./organisation-database";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
-import { parseOrganisationPlacementProfile } from "@purin-labs/tenancy/placement";
 import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { env } from "cloudflare:workers";
@@ -383,13 +386,10 @@ export function freshForkInput(
 export async function prepareSdkOrganisation() {
   const organisation = parseOrganisationId("organisation_compaction");
   if (!organisation.ok) throw new Error(organisation.error.code);
-  const placement = parseOrganisationPlacementProfile(
-    env.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
-  );
-  if (!placement.ok) throw new Error(placement.error.code);
+  const placement = rootPlacement();
   const database = organisationDatabase(
     organisation.value,
-    placement.value.placementCellId,
+    placement.placementCellId,
   );
   await database
     .prepare(
@@ -401,13 +401,13 @@ export async function prepareSdkOrganisation() {
     db: database,
     organisationId: organisation.value,
     environment: "development",
-    placement: placement.value,
+    placement,
     now: 1,
   });
   if (!initialized.ok) throw new Error(initialized.error.code);
   await publishGlobalOrganisation(
     organisation.value,
-    placement.value.placementCellId,
+    placement.placementCellId,
   );
   return requireOrganisationExecutionScope(env, organisation.value);
 }

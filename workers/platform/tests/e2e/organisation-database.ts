@@ -14,6 +14,7 @@ import { selectOrganisationPlacementDatabase } from "@purin-labs/tenancy/organis
 import {
   parseInitialOrganisationPlacement,
   parseOrganisationPlacementCells,
+  type InitialOrganisationPlacement,
 } from "@purin-labs/tenancy/placement";
 
 /**
@@ -41,6 +42,20 @@ export function organisationDatabase(
   );
   if (!database.ok) throw new Error(database.error.code);
   return database.value;
+}
+
+/**
+ * The root cell of the placement profile, where onboarding places a new
+ * Organisation.
+ */
+export function rootPlacement(): InitialOrganisationPlacement {
+  const cells = parseOrganisationPlacementCells(
+    env.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
+  );
+  if (!cells.ok) throw new Error(cells.error.path);
+  const root = cells.value[0];
+  if (root === undefined) throw new Error("placement profile has no cell");
+  return root.placement;
 }
 
 /**

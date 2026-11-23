@@ -4,9 +4,9 @@ import {
   organisationDatabase,
   onboardFixtureOrganisation,
   publishGlobalOrganisation,
+  rootPlacement,
 } from "./organisation-database";
 import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
-import { parseOrganisationPlacementProfile } from "@purin-labs/tenancy/placement";
 import { newConversationId } from "@purin-labs/control-api";
 import { parseSessionId } from "@purin-labs/kernel/ids";
 import type { Conversation } from "@purin-labs/conversation/chat/conversation";
@@ -1027,20 +1027,14 @@ async function insertOrganisation(
       )
       .bind(organisationId, name, now)
       .run();
-  const placement = parseOrganisationPlacementProfile(
-    env.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
-  );
-  if (!placement.ok) throw new Error(placement.error.code);
+  const placement = rootPlacement();
   const installed = await ensureInitialOrganisationPlacement({
-    db: organisationDatabase(organisationId, placement.value.placementCellId),
+    db: organisationDatabase(organisationId, placement.placementCellId),
     organisationId,
-    placement: placement.value,
+    placement,
     environment: "development",
     now,
   });
   if (!installed.ok) throw new Error(installed.error.code);
-  await publishGlobalOrganisation(
-    organisationId,
-    placement.value.placementCellId,
-  );
+  await publishGlobalOrganisation(organisationId, placement.placementCellId);
 }
