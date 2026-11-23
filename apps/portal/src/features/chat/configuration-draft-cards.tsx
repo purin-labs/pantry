@@ -6,7 +6,7 @@
 import React from "react";
 import { SlidersHorizontal } from "lucide-react";
 import { assertNever } from "@purin-labs/std";
-import { VoiceApprovalLine } from "../voice/approvals";
+import { VoiceApprovalLine } from "@purin-labs/surface-voice/ui/features/voice/approvals";
 import type { ChatTimelineInsert } from "./activity";
 import type { ConfigurationDraftActions } from "./configuration-drafts";
 import type { ConfigurationDraftView } from "@purin-labs/control-api/portal/configuration-drafts";

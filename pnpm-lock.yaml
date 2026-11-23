@@ -151,6 +151,9 @@ importers:
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../../packages/std
+      '@purin-labs/surface-voice':
+        specifier: workspace:*
+        version: link:../../surfaces/voice
       '@purin-labs/type-utils':
         specifier: workspace:*
         version: link:../../packages/type-utils
@@ -2158,6 +2161,9 @@ importers:
       '@purin-labs/surface-slack':
         specifier: workspace:*
         version: link:../../surfaces/slack
+      '@purin-labs/surface-voice':
+        specifier: workspace:*
+        version: link:../../surfaces/voice
       '@purin-labs/surface-webhooks':
         specifier: workspace:*
         version: link:../../surfaces/webhooks
@@ -2359,6 +2365,73 @@ importers:
       '@cloudflare/workers-types':
         specifier: 5.20260707.1
         version: 5.20260707.1
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
+
+  surfaces/voice:
+    dependencies:
+      '@purin-labs/area-cafe':
+        specifier: workspace:*
+        version: link:../../areas/cafe
+      '@purin-labs/area-commerce':
+        specifier: workspace:*
+        version: link:../../areas/commerce
+      '@purin-labs/area-devices':
+        specifier: workspace:*
+        version: link:../../areas/devices
+      '@purin-labs/area-organisation':
+        specifier: workspace:*
+        version: link:../../areas/organisation
+      '@purin-labs/authority':
+        specifier: workspace:*
+        version: link:../../foundation/authority
+      '@purin-labs/control':
+        specifier: workspace:*
+        version: link:../../foundation/control
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../packages/control-api
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../../foundation/kernel
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../packages/std
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../../foundation/tenancy
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../packages/type-utils
+      '@purin-labs/ui':
+        specifier: workspace:*
+        version: link:../../foundation/ui
+      lucide-react:
+        specifier: ^0.542.0
+        version: 0.542.0(react@19.2.7)
+      onnxruntime-web:
+        specifier: 1.22.0
+        version: 1.22.0
+      react:
+        specifier: ^19.1.1
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.1.1
+        version: 19.2.7(react@19.2.7)
+      react-router:
+        specifier: ^7.18.2
+        version: 7.18.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      '@types/react':
+        specifier: ^19.1.12
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.1.9
+        version: 19.2.3(@types/react@19.2.17)
       tsrs:
         specifier: 0.18.0-ts7.1.0-dev.20260929
         version: 0.18.0-ts7.1.0-dev.20260929

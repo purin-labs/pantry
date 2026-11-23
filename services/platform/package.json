@@ -90,6 +90,7 @@
     "@purin-labs/surface-email": "workspace:*",
     "@purin-labs/surface-slack": "workspace:*",
     "@purin-labs/surface-webhooks": "workspace:*",
+    "@purin-labs/surface-voice": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

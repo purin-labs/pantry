@@ -150,7 +150,7 @@ import {
   handleVoiceRoute,
   matchVoiceRoute,
   type VoiceRoute,
-} from "./voice/routes";
+} from "@purin-labs/surface-voice/server/routes";
 import { handleMenuDraftRoute } from "@purin-labs/area-cafe/server/control/routes/menu-draft";
 import {
   matchMenuDraftRoute,

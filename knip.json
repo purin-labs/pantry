@@ -62,8 +62,6 @@
         "src/bootstrap.tsx",
         "src/tv/main.tsx",
         "src/dev/*.{ts,tsx}",
-        "src/ui/index.ts",
-        "src/features/voice/wake-worker.ts",
         "src/**/*.typecheck.ts",
         "src/**/*.type-fixtures.ts",
         "vite.config.ts"
@@ -87,7 +85,8 @@
         "server/**/*.fixtures.ts",
         "server/**/*.type-fixtures.ts",
         "ui/**/*.type-fixtures.ts",
-        "ui/**/*.typecheck.ts"
+        "ui/**/*.typecheck.ts",
+        "ui/features/voice/wake-worker.ts"
       ],
       "project": ["**/*.{ts,tsx}"],
       "includeEntryExports": true

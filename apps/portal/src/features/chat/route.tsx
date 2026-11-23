@@ -91,22 +91,22 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { DialogHeading, syncDialog, cancelDialog } from "@purin-labs/ui/dialog";
-import { soundsLikeStop, type VoiceCommand } from "../voice/command";
+import { soundsLikeStop, type VoiceCommand } from "@purin-labs/surface-voice/ui/features/voice/command";
 import {
   lastAssistantEvent,
   speakVoiceAnswer,
   type VoiceAnswerWait,
-} from "../voice/answer";
-import { VoiceControl, VoiceHeaderMark } from "../voice/control";
+} from "@purin-labs/surface-voice/ui/features/voice/answer";
+import { VoiceControl, VoiceHeaderMark } from "@purin-labs/surface-voice/ui/features/voice/control";
 import { UserMessageMarks } from "./message-marks";
 import { holdSendForScreenQuestion, ScreenChip } from "./screen-chip";
 import { mergeDirectoryResult, updateSavedDraft, type PageState } from "./page-state";
-import { VoiceApprovalContext } from "../voice/approvals";
+import { VoiceApprovalContext } from "@purin-labs/surface-voice/ui/features/voice/approvals";
 import {
   attachVoiceChat,
   noteVoiceConversation,
   voiceSessionFor,
-} from "../voice/host";
+} from "@purin-labs/surface-voice/ui/features/voice/host";
 import { CustomConnectorsWorkspace } from "@purin-labs/area-integrations/ui/features/integrations/custom-connectors";
 import {
   customConnectorCollectionPath,

@@ -3,8 +3,8 @@
  * phrase model runs only near speech. Nothing leaves this worker before a wake.
  */
 import * as ort from "onnxruntime-web/wasm";
-import ortGlueUrl from "../../../node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.mjs?url";
-import ortWasmUrl from "../../../node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm?url";
+import ortGlueUrl from "../../../../../apps/portal/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.mjs?url";
+import ortWasmUrl from "../../../../../apps/portal/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm?url";
 
 import { cachedBytes, keepOnlyVoiceFiles } from "./model-cache";
 import { WAKE_MODEL } from "./wake-phrase";

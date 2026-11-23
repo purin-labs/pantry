@@ -442,9 +442,10 @@ import. A module with no line for one of these has none.
 ## surfaces/voice
 
 - Folders: 3
-  - `apps/portal/src/features/voice/`
-  - `services/platform/src/voice/`
-  - `services/platform/src/voice/engines/`
+  - `surfaces/voice/server/`
+  - `surfaces/voice/server/engines/`
+  - `surfaces/voice/ui/features/voice/`
+- Packages: `surfaces/voice`
 - Tables (3): `voice_confirmation`, `voice_mac`, `voice_transcription_use`
 
 ## surfaces/webhooks

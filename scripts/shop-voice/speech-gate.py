@@ -2,7 +2,7 @@
 """Which of the noise bench's clips the Portal would send to a speech model at all (Plan 82).
 
 `confidence-bench.py` sends every noise clip to the model, as a worst case. The Portal sends a capture
-only when its speech detector (Silero VAD, `apps/portal/src/features/voice/wake-worker.ts`) reads at least
+only when its speech detector (Silero VAD, `surfaces/voice/ui/features/voice/wake-worker.ts`) reads at least
 0.5 in one 80 ms chunk. After a wake, the first 320 ms do not count, and the capture ends after 4 s with
 no speech. A held key counts every chunk until the release. This script runs the Portal's own ONNX file
 through the same stream on the same 6 s clips, in the same order, and writes the gate for each clip.

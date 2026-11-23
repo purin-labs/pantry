@@ -1,6 +1,6 @@
 import React from "react";
 import type { ChatTimelineView } from "@purin-labs/control-api/portal/chat";
-import { VoiceMessageMark } from "../voice/control";
+import { VoiceMessageMark } from "@purin-labs/surface-voice/ui/features/voice/control";
 import "./screen-chip.css";
 import type { Variant } from "@purin-labs/type-utils";
 

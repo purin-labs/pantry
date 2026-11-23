@@ -1,6 +1,6 @@
 """The check of a voice grant, with no call to the Platform.
 
-The Platform's services/platform/src/voice/grant.ts signs `vg1.<payload>.<signature>`.
+The Platform's surfaces/voice/server/grant.ts signs `vg1.<payload>.<signature>`.
 """
 import base64
 import hashlib

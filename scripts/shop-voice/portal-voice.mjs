@@ -14,7 +14,7 @@ import { fileURLToPath } from "node:url";
 const repository = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const portal = join(repository, "apps/portal");
 // The voice command code, by its path in the repository.
-const command = join(repository, "apps/portal/src/features/voice/command.ts");
+const command = join(repository, "surfaces/voice/ui/features/voice/command.ts");
 
 export async function loadPortalVoice() {
   // esbuild comes with the Portal's Vite.

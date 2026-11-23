@@ -1,7 +1,7 @@
 """Plan 91 phase 6: compare a new wake phrase model with the "Hey Satyr" model, and say if it passes.
 
 The rule was fixed before the first "Hey Sous Chef" model was measured. Everything is at the
-Portal's threshold, 0.995 (WAKE_THRESHOLD in apps/portal/src/features/voice/wake-worker.ts).
+Portal's threshold, 0.995 (WAKE_THRESHOLD in surfaces/voice/ui/features/voice/wake-worker.ts).
 
 1. False wakes. The sum of events on every shared false-wake set (held-out LibriSpeech speakers,
    LibriSpeech test-clean with and without noise, and DEMAND noise) is not more than for

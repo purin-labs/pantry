@@ -29,6 +29,7 @@
     "testing"
   ],
   "packages": {
+    "surfaces/voice": "surfaces/voice",
     "surfaces/webhooks": "surfaces/webhooks",
     "surfaces/slack": "surfaces/slack",
     "surfaces/email": "surfaces/email",
@@ -419,6 +420,7 @@
     "workspace_revision_receipt": "foundation/agent"
   },
   "rules": {
+    "surfaces/voice/": "surfaces/voice",
     "surfaces/webhooks/": "surfaces/webhooks",
     "surfaces/slack/": "surfaces/slack",
     "surfaces/email/": "surfaces/email",
@@ -447,7 +449,6 @@
     "packages/collaboration/src/": "foundation/collaboration",
     "packages/collaboration/tests/": "foundation/collaboration",
     "apps/portal/src/features/integrations/": "areas/integrations",
-    "apps/portal/src/features/voice/": "surfaces/voice",
     "foundation/ui/": "foundation/ui",
     "services/platform/src/chat/turn/": "surfaces/portal",
     "services/platform/src/chatgpt-exit/": "foundation/agent",
@@ -457,7 +458,6 @@
     "areas/integrations/shopify/": "areas/shopify",
     "services/platform/src/slack-ingress/": "surfaces/slack",
     "services/platform/src/vault-onepassword/": "foundation/authority",
-    "services/platform/src/voice/": "surfaces/voice",
     "packages/collaboration/portal/": "foundation/collaboration",
     "packages/collaboration/worker/": "foundation/collaboration"
   },

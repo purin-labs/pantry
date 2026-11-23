@@ -86,7 +86,7 @@ import { permissionRequestNoticeText } from "@purin-labs/surface-slack/server/pe
 import { releaseAgentPermissionDecision } from "@purin-labs/surface-slack/server/permission-request-release";
 import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
 import { shopMacDevices } from "@purin-labs/area-devices/server/contract/shop-mac-devices";
-import { readShopMacDevices } from "./voice/mac-devices";
+import { readShopMacDevices } from "@purin-labs/surface-voice/server/mac-devices";
 import { commerceApprovalCardTexts } from "@purin-labs/area-commerce/server/contract/approval-card-texts";
 import {
   commerceActionCardText,

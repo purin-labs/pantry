@@ -6,11 +6,11 @@ import {
   listSlackInstallationCredentialHandles,
   revokeSlackOrganisationConnections,
 } from "@purin-labs/authority/slack/installation-store";
-import { removeVoiceMacNames } from "./voice/dns";
+import { removeVoiceMacNames } from "@purin-labs/surface-voice/server/dns";
 import {
   listVoiceMacNameIds,
   prepareArchivedOrganisationVoiceMacsRevocation,
-} from "./voice/store";
+} from "@purin-labs/surface-voice/server/store";
 
 /**
  * The Worker gives the archive cleanup of an Organisation the steps of the

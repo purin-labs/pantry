@@ -75,7 +75,7 @@ STOP_VOICES = PHRASE_VOICES + (
     "Fred", "Kathy", "Ralph", "Albert", "Eddy (English (US))", "Eddy (English (UK))", "Flo (English (US))",
     "Flo (English (UK))", "Reed (English (US))", "Reed (English (UK))", "Sandy (English (US))",
     "Shelley (English (UK))", "Rocko (English (US))", "Grandma (English (UK))", "Grandpa (English (US))")
-# `services/platform/src/voice/confirmation.ts`
+# `surfaces/voice/server/confirmation.ts`
 HEADS = ("confirm change", "send message", "send email")
 DIGITS = ("three", "five", "six", "seven", "nine")
 PHRASES_PER_HEAD = 3

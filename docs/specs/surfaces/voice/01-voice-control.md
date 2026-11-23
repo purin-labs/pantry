@@ -229,7 +229,7 @@ has no Actor SQLite table and no event kind. Its patch scripts are
 
 ### Control routes
 
-The routes (`services/platform/src/voice/routes.ts`) are under
+The routes (`surfaces/voice/server/routes.ts`) are under
 `/v1/control/organisations/:id/voice`. A write needs the control session and the CSRF
 header. A role refusal is a 404.
 
@@ -267,7 +267,7 @@ put a command in the chat.
 | `POST /transcriptions` on the Mac                    | Portal             | A WAV file, answered with `{ text, audioSeconds, engine }`            |
 | `POST /speech` on the Mac                            | Portal             | `{ text }`, answered with a WAV file                                  |
 
-The Platform routes are in `services/platform/src/voice/mac-routes.ts`. The Mac serves
+The Platform routes are in `surfaces/voice/server/mac-routes.ts`. The Mac serves
 HTTPS on port 443 (`shop_voice/server.py`) and admits only a listed Portal origin and a
 valid grant. Its refusal codes are `origin_refused`, `grant_refused`, `rate_limited`,
 `too_long`, `audio_invalid`, `speech_invalid`, `busy`, `model_not_ready` and `not_found`.
@@ -289,15 +289,15 @@ to the Platform. A grant has no authority at the Platform.
 
 ### Code
 
-| Part                                          | Path                                                                                     |
-| --------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Shapes, engine catalogue, text check          | `packages/control-api/src/voice.ts`, `voice-engines.ts`, `voice-text-check.ts`           |
-| Platform routes, records, engine, Mac rows    | `services/platform/src/voice/`                                                           |
-| Portal session, path choice, commands, dialog | `apps/portal/src/features/voice/session.ts`, `transport.ts`, `command.ts`, `control.tsx` |
-| Listening worker and its files                | `apps/portal/src/features/voice/wake-worker.ts`, `apps/portal/public/voice/`             |
-| Chat send of a spoken command                 | `acceptVoiceCommand` in `apps/portal/src/features/chat/route.tsx`                        |
-| Mac service and engines                       | `services/shop-voice/shop_voice/`, `shop_voice/engines/`                                 |
-| Journeys, benches, wake model tools           | `scripts/shop-voice/`, `scripts/plan-82-g04/`                                            |
+| Part                                          | Path                                                                                       |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Shapes, engine catalogue, text check          | `packages/control-api/src/voice.ts`, `voice-engines.ts`, `voice-text-check.ts`             |
+| Platform routes, records, engine, Mac rows    | `services/platform/src/voice/`                                                             |
+| Portal session, path choice, commands, dialog | `surfaces/voice/ui/features/voice/session.ts`, `transport.ts`, `command.ts`, `control.tsx` |
+| Listening worker and its files                | `surfaces/voice/ui/features/voice/wake-worker.ts`, `apps/portal/public/voice/`             |
+| Chat send of a spoken command                 | `acceptVoiceCommand` in `apps/portal/src/features/chat/route.tsx`                          |
+| Mac service and engines                       | `services/shop-voice/shop_voice/`, `shop_voice/engines/`                                   |
+| Journeys, benches, wake model tools           | `scripts/shop-voice/`, `scripts/plan-82-g04/`                                              |
 
 ## Rules and limits
 

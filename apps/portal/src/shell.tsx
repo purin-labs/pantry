@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import React, { useEffect } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { GlideHighlight } from "@purin-labs/ui/glide-highlight";
-import { voiceControlIsOn } from "./features/voice/setting";
+import { voiceControlIsOn } from "@purin-labs/surface-voice/ui/features/voice/setting";
 import {
   chatRouteState,
   pageAddress,
@@ -61,7 +61,9 @@ import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access
 import "@purin-labs/area-organisation/ui/features/access/permission-requests-drawer.css";
 import "./portal-brand.css";
 
-const VoicePageMark = React.lazy(() => import("./features/voice/page-mark"));
+const VoicePageMark = React.lazy(
+  () => import("@purin-labs/surface-voice/ui/features/voice/page-mark"),
+);
 const PermissionRequestsDrawer = React.lazy(
   () =>
     import("@purin-labs/area-organisation/ui/features/access/permission-requests-drawer"),

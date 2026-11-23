@@ -1,4 +1,4 @@
-import { VoiceApprovalLine } from "../voice/approvals";
+import { VoiceApprovalLine } from "@purin-labs/surface-voice/ui/features/voice/approvals";
 import { Select } from "@purin-labs/ui/select";
 /**
  * Messages the agent drafted in this conversation for another app. Each one

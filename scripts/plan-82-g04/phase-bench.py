@@ -1,6 +1,6 @@
 """Plan 82 D11: how much the wake score depends on where the phrase falls in an 80 ms chunk.
 
-The wake worker (apps/portal/src/features/voice/wake-worker.ts) makes one embedding for each 80 ms
+The wake worker (surfaces/voice/ui/features/voice/wake-worker.ts) makes one embedding for each 80 ms
 chunk, so the model sees the phrase on an 80 ms grid. This bench runs the Portal's own ONNX files
 through the same stream, moves the phrase in 5 ms steps, and scores it on 1, 2, 4 and 8 grids
 (phases) that start 80/phases ms apart. A wake on any phase counts. It reports, for each count of

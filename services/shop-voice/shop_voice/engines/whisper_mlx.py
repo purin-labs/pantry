@@ -16,7 +16,7 @@ FILES = FileSet(
 # Whisper invents words on room noise when its prompt holds the shop's vocabulary. On noise and voices
 # that did not choose these numbers, dropping such segments stopped 76 of the 77 noise clips that passed
 # the Portal's own check, and no good command of 375 (scripts/shop-voice/confidence-bench.py). The
-# fallback on Workers AI uses the same two numbers (services/platform/src/voice/engines/).
+# fallback on Workers AI uses the same two numbers (surfaces/voice/server/engines/).
 LOW_CONFIDENCE_LOGPROB = -1.4
 REPEATED_TEXT_COMPRESSION = 2.4
 

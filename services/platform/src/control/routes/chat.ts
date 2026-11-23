@@ -1,4 +1,4 @@
-import { isVoiceTranscriptionEnabled } from "../../voice/store";
+import { isVoiceTranscriptionEnabled } from "@purin-labs/surface-voice/server/store";
 import {
   MESSAGE_ATTACHMENT_POLICY,
   isConversationId,

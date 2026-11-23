@@ -27,11 +27,11 @@ const NOT_CONTROL = new Set([
   "areas/kitchen/ui/features/production-run/execution-client.ts",
   "areas/kitchen/ui/features/production-run/execution-worker.ts",
   "areas/kitchen/ui/features/production-run/retained-appliance-worker.ts",
-  "apps/portal/src/features/voice/model-cache.ts",
+  "surfaces/voice/ui/features/voice/model-cache.ts",
   "areas/kitchen/ui/features/workflow-simulator/rehearsal-examples.ts",
   "areas/kitchen/ui/features/workflow-simulator/spatial/physics-asset-loader.ts",
   // The voice transport's other calls go to the shop Mac's own origin.
-  "apps/portal/src/features/voice/transport.ts",
+  "surfaces/voice/ui/features/voice/transport.ts",
   // The identity link page calls /v1/identity-links, outside the control API.
   "apps/portal/src/main.tsx",
   // A paired screen reads the screens API with its own device credential.

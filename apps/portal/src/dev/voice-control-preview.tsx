@@ -5,8 +5,11 @@ import type {
   AccessControlView,
   AccessRouteTransport,
 } from "@purin-labs/control-api/portal/access-models";
-import { VoiceControl } from "../features/voice/control";
-import type { VoiceSession, VoiceStatus } from "../features/voice/session";
+import { VoiceControl } from "@purin-labs/surface-voice/ui/features/voice/control";
+import type {
+  VoiceSession,
+  VoiceStatus,
+} from "@purin-labs/surface-voice/ui/features/voice/session";
 import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
 import "../styles.css";
 import "../features/chat/styles.css";

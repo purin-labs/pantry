@@ -10,10 +10,10 @@ import {
   startVoiceWorker,
   stopVoiceMicrophone,
   VOICE_SAMPLE_RATE,
-} from "../features/voice/capture";
-import { encodeVoiceWav } from "../features/voice/command";
-import type { VoiceWorkerEvent } from "../features/voice/worker-protocol";
-import { WAKE_PHRASE } from "../features/voice/wake-phrase";
+} from "@purin-labs/surface-voice/ui/features/voice/capture";
+import { encodeVoiceWav } from "@purin-labs/surface-voice/ui/features/voice/command";
+import type { VoiceWorkerEvent } from "@purin-labs/surface-voice/ui/features/voice/worker-protocol";
+import { WAKE_PHRASE } from "@purin-labs/surface-voice/ui/features/voice/wake-phrase";
 import { Select } from "@purin-labs/ui/index";
 import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
 import "../styles.css";
