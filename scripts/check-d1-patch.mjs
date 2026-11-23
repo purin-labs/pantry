@@ -19,6 +19,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { snapshotOfBaseline } from "./d1-schema-snapshot.mjs";
+import { formerPath } from "./refactor-17/folder-renames.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const BASELINES = [
@@ -43,7 +44,11 @@ if (!base)
 
 const changes = [];
 for (const path of BASELINES) {
-  const before = git(["show", `${base}:${path}`], true);
+  // A base from before the rename of the Worker folder holds the baseline
+  // at its old path (scripts/refactor-17/folder-renames.mjs).
+  const before =
+    git(["show", `${base}:${path}`], true) ??
+    git(["show", `${base}:${formerPath(path)}`], true);
   const after = readFileSync(resolve(root, path), "utf8");
   if (before === null || before === after) continue;
   const oldSnapshot = snapshotOfBaseline(before);

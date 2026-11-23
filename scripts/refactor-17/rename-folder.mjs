@@ -61,7 +61,12 @@ import {
   RELATIVE_PATH,
   UNREAD,
 } from "../lib/tree-rewrite.mjs";
-import { FOLDER_RENAMES, inFolder, renamedPath } from "./folder-renames.mjs";
+import {
+  FOLDER_RENAMES,
+  formerPath,
+  inFolder,
+  renamedPath,
+} from "./folder-renames.mjs";
 
 const started = Date.now();
 const args = process.argv.slice(2);
@@ -92,13 +97,6 @@ function git(...parameters) {
 const escaped = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const inAnyFrom = (path) =>
   FOLDER_RENAMES.some(({ from }) => inFolder(path, from));
-/** The old place of a path: the inverse of renamedPath. */
-function formerPath(path) {
-  for (const { from, to } of FOLDER_RENAMES) {
-    if (inFolder(path, to)) return from + path.slice(to.length);
-  }
-  return path;
-}
 
 // ---------------------------------------------------------------------------
 // The tree. Each path below is a path after the rename; a file that still

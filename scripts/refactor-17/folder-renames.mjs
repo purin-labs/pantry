@@ -41,6 +41,14 @@ export function inFolder(path, folder) {
   return path === folder || path.startsWith(`${folder}/`);
 }
 
+/** The old place of a path: `path` with the old folder of its rename. */
+export function formerPath(path) {
+  for (const { from, to } of FOLDER_RENAMES) {
+    if (inFolder(path, to)) return from + path.slice(to.length);
+  }
+  return path;
+}
+
 /** `path` with the new folder of each rename of the list, or `path`. */
 export function renamedPath(path) {
   for (const { from, to } of FOLDER_RENAMES) {
