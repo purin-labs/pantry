@@ -108,7 +108,9 @@ export function RegisterRoute(
       modifierOptionIds: readonly string[],
       quantity: number,
     ) => {
-      const menuId = snapshotRef.current?.menu?.menuId ?? "menu_cafe_main";
+      // An entry comes from the menu of the page; with no menu, no line.
+      const menuId = snapshotRef.current?.menu?.menuId;
+      if (menuId === undefined) return;
       const sortedIds = [...modifierOptionIds].sort();
       const lineKey = `${entry.menuEntryId}:${sortedIds.join(",")}`;
       const chosenOptions = entry.modifierGroups.flatMap((group) =>

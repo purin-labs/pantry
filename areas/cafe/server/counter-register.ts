@@ -36,9 +36,9 @@ import {
 import { readActiveTerminalAssignment } from "./data/terminal-assignment-store";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
+import { CAFE_MENU_ID } from "./contract/menu-publication";
 import { presentOrderQueueEntry } from "./contract/order-queue-commands";
 
-const DEFAULT_CAFE_MENU_ID = "menu_cafe_main";
 const ALL_JAPAN_METHODS: readonly CounterRegisterPaymentMethod[] = [
   "card",
   "felica",
@@ -174,7 +174,7 @@ export async function loadCounterRegisterSnapshot(
   const targetMenuId =
     policy?.catalogScope.kind === "published_menu"
       ? policy.catalogScope.menuId
-      : DEFAULT_CAFE_MENU_ID;
+      : CAFE_MENU_ID;
   const menu = buildRegisterMenu(
     stock.value,
     marks.value,
@@ -954,7 +954,7 @@ function resolveRegisterLocationId(
     return requestedLocationId;
   }
   const cafeMenu = stock.foodService.resources.menus.find(
-    (m) => m.menuId === DEFAULT_CAFE_MENU_ID,
+    (m) => m.menuId === CAFE_MENU_ID,
   );
   if (cafeMenu?.scope.kind === "location") {
     return cafeMenu.scope.locationId;

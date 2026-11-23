@@ -11,6 +11,8 @@ import type {
   CommerceSoldOutMarksV1,
 } from "@purin-labs/commerce-client";
 
+import { CAFE_MENU_ID } from "./menu-publication";
+
 /**
  * The commands of the staff order queue and "sold out today" (Plan 40B phase
  * 3). A person's page and the Portal chat agent (Plan 81) run these, so the two
@@ -71,7 +73,6 @@ type CafeSoldOutMenu = Readonly<{
 const DEFAULT_STATION_ID = "station_counter";
 /** Create, start, complete, ready, and a repeat for each sale that interrupts. */
 const STEP_LIMIT = 10;
-const CAFE_MENU_ID = "menu_cafe_main";
 /** One try, and a repeat for each sale that moves the merchant's revision. */
 const MARK_ATTEMPT_LIMIT = 4;
 
