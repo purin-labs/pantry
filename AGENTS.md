@@ -98,12 +98,12 @@ keep the names of their time: do not rewrite them.
 
 ## Where things are
 
-A spec describes what is built. A plan describes work that is not built.
-[The spec index](docs/specs/README.md) lists the 33 specs and maps each old
-plan number to its spec. Read the spec of a subsystem before you change it,
-and correct it in the same commit when one of its statements changes. Open
-plans are in `docs/`, closed plans in `docs/history/`. `workers/platform` is
-the Worker `pantry`, and `scripts/layers.json` gives each file its module.
+A spec describes what is built; a plan describes work that is not built. [The
+spec index](docs/specs/README.md) lists the 33 specs and maps each old plan
+number to its spec. Read the spec of a subsystem before you change it, and
+correct it in the same commit when a statement changes. Open plans are in
+`docs/`, closed plans in `docs/history/`. `workers/platform` is the Worker
+`pantry` (`services/platform` in old plans); `scripts/layers.json` maps each file.
 
 | Layer        | Code                                                                              | Specs                                                                                                      |
 | ------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |

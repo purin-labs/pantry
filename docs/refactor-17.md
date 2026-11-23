@@ -354,19 +354,20 @@ E2E job and the Kitchen job, the first run with no failure.
 - Stage B: each foundation module is a package in `foundation/`. Each product area
   is a package in `areas/<area>/` and each surface is a package in
   `surfaces/<surface>/`, with `server/` and `ui/`.
+  The Platform Worker is the folder `workers/platform`; `apps/portal` stays the
+  Portal build (decision of the owner, 2026-11-23).
 
 The open work, each item with its own decision:
 
-| Item                                                                                                              | Cost                                                                                                                                                              | Default                          |
-| ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
-| `services/platform` becomes `workers/platform`, and `apps/portal` (the Portal build) goes to `surfaces/portal`    | The Wrangler files, the deploy scripts, the CI paths and the paths of the R2 files change; a release of its own                                                   | The two folders keep their names |
-| A `contract` package for each area                                                                                | The public files of `contracts` in `scripts/layers.json` move; it ends the 3 package cycles between the areas. The 2 cycles between the surfaces need a port each | One package for each area        |
-| The nine kinds of layer debt that `pnpm lint:layer-debts` counts                                                  | Each kind is its own change; the largest are 249 imports of files that are not public                                                                             | The counts may not grow          |
-| The 216 code faults that the second read of the specs confirmed, 8 of high severity                               | One change for each fault, with a journey; the list is with the owner                                                                                             | No fault is corrected            |
-| One outbox table shape for the 5 outboxes, new names for classes and tables, the deletion of each old-row adapter | Each needs a D1 patch or an Actor schema step                                                                                                                     | Nothing changes                  |
-| Plan 91 moves to `docs/history/`; the 15 other source documents of the specs                                      | One run of `scripts/move-plan-to-history.mjs` after phase 6 of Plan 91                                                                                            | They stay in `docs/`             |
-| A short `AGENTS.md` for each area                                                                                 | 8 short files                                                                                                                                                     | The root `AGENTS.md` only        |
-| 42 test files call `runDurableObjectAlarm` and most ignore its result                                             | The same race as in the mail journeys can fail them on a slow runner                                                                                              | Correct a file when it fails     |
+| Item                                                                                                              | Cost                                                                                                                                                                          | Default                      |
+| ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| A `contract` package for each area                                                                                | The public files of `contracts` in `scripts/layers.json` move; it ends the 3 package cycles between the areas. The 2 cycles between the surfaces need a port each             | One package for each area    |
+| The nine kinds of layer debt that `pnpm lint:layer-debts` counts                                                  | Each kind is its own change; the largest are 249 imports of files that are not public                                                                                         | The counts may not grow      |
+| The 208 code faults of lower severity that the second read of the specs confirmed                                 | One change for each fault, with a journey; the list is with the owner. The high-severity faults are corrected on `dev` since 2026-11-23, and one of the eight was not a fault | No other fault is corrected  |
+| One outbox table shape for the 5 outboxes, new names for classes and tables, the deletion of each old-row adapter | Each needs a D1 patch or an Actor schema step                                                                                                                                 | Nothing changes              |
+| Plan 91 moves to `docs/history/`; the 15 other source documents of the specs                                      | One run of `scripts/move-plan-to-history.mjs` after phase 6 of Plan 91                                                                                                        | They stay in `docs/`         |
+| A short `AGENTS.md` for each area                                                                                 | 8 short files                                                                                                                                                                 | The root `AGENTS.md` only    |
+| 42 test files call `runDurableObjectAlarm` and most ignore its result                                             | The same race as in the mail journeys can fail them on a slow runner                                                                                                          | Correct a file when it fails |
 
 The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
@@ -571,10 +572,13 @@ the old stack is deleted. Stage B starts with step 1. In this order:
 3. The journeys stay in `services/platform/tests` and import a module by its package
    name. No module needed a `testing` entry.
 4. Not done, each with its own decision:
-   - `services/platform` stays the folder of the Platform Worker, and `apps/portal`
-     stays the folder of the Portal build. A move to `workers/platform` and to
-     `surfaces/portal` changes the Wrangler files, the deploy scripts, the CI paths
-     and the paths of the R2 files, so it needs a release of its own.
+   - Done on 2026-11-23: the folder of the Platform Worker is `workers/platform`
+     (it was `services/platform`), by one run of
+     `scripts/refactor-17/rename-folder.mjs`. 890 files moved. No deployed name
+     changed, and the bundle of each Worker has the same bytes, so the rename
+     needed no release. The side Workers stay as Wrangler files of that folder.
+     The owner decided that `apps/portal` stays the folder of the Portal build,
+     and the other folders of `services/` stay too.
    - The surface packages import each other in two circles (`email`, `whatsapp`,
      `slack` and `webhooks`; `portal` and `voice`). A port for each removes it.
    - The eight area packages import each other in a circle (`pnpm` reports three

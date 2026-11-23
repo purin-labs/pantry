@@ -319,6 +319,46 @@ the four plans.
   the bundle of before, the bytes are the same.
 - Not run: the full E2E suite, the Kitchen journeys and a release.
 
+## The folder of the Worker (2026-11-23)
+
+`services/platform` is `workers/platform` since 2026-11-23, by one run of
+`scripts/refactor-17/rename-folder.mjs`. The table of renamed folders is
+`scripts/refactor-17/folder-renames.mjs`; the move script reads it, so each
+plan still finds its files. Tags `refactor-17-workers-platform-before` and
+`refactor-17-workers-platform-after`.
+
+- **What changed.** 890 files moved, and 134 other files name the new path:
+  documents, scripts, lints, ratchets, `scripts/layers.json` and the configs.
+  Paths from the folder to a sibling got one more step
+  (`../../services/shop-gateway/build.sh`, the Dockerfiles of the three
+  containers and of the ChatGPT exit). Plans, evidence and history keep the old
+  path in their text.
+- **What did not change.** No Worker name, Durable Object class, binding,
+  route or R2 key. The package is still `@purin-labs/platform`, and CI finds it
+  by that name. The bundle of the Platform Worker and of the Slack ingress
+  Worker has the same bytes before and after, and the four other Worker checks
+  pass. So the rename needed no release.
+- **Another checkout, after the pull.** Git leaves the ignored files in the
+  old folder. Run `node scripts/refactor-17/rename-folder.mjs --local-files`
+  to list them and `--move-local` to move them: `.dev.vars` and its variants
+  (the local secrets), `.wrangler/` (the local D1 and Actor state) and
+  `output/`. Then run `pnpm install`, and start each `wrangler dev` again.
+- **An open branch.** `git rebase refactor-17-workers-platform-before`, then
+  `git -c merge.directoryRenames=true rebase -X theirs
+refactor-17-workers-platform-after`, then the script with `--stage` and one
+  commit, then `git rebase origin/dev`, `pnpm install` and the type check.
+  Without the config, git stops at each new file of the old folder: `git add`
+  it and continue.
+- **Checked before the landing:** `--check` of the script and of the 28 move
+  plans, each lint with the same counts, the type checks, `pnpm test:units`,
+  the Portal build, nine E2E files and two browser journeys, one of them on
+  the built Portal. The dry run also built the four container images and ran
+  the deploy command as a dry run.
+- **A limit of the script.** It reads a relative path from the folder of its
+  file or of its package. It does not find a path that is relative to another
+  working folder; the type checks, the bundles and the journeys guard that
+  case.
+
 ## The surfaces group of 2026-11-23
 
 Branch `refactor-17-surfaces-1`, on `origin/dev` at `c5cabc48`. Tags
