@@ -210,7 +210,7 @@ export function PaidUseSection(props: {
           ["Price", "$0.084 for each million input tokens"],
           [
             "How you pay",
-            "Prepaid credit, or the monthly invoice up to a $10 credit limit. Both are in the Seams account.",
+            "Through Purin Pantry billing, which has not started yet.",
           ],
           ...(paidUse.enabled
             ? [

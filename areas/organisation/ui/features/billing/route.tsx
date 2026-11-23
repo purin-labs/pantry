@@ -18,8 +18,8 @@ import "@purin-labs/area-integrations/ui/features/jev-features/styles.css";
 /**
  * Settings › Billing (Plan 88 section 4): the Jev use of the month against
  * the free use, paid use, the month's paid charge and the spending limit. It
- * reads the jev-features view and keeps no copy of a balance. The payment
- * method, credit and invoices stay in the shared Seams Console.
+ * reads the jev-features view and keeps no copy of a balance. Pantry has no
+ * billing of its own yet, so no payment method, credit or invoice exists.
  */
 type LoadState =
   | Readonly<{ kind: "loading" }>
@@ -83,8 +83,8 @@ export function BillingRoute(props: {
         <div className="billing-value">
           <dt>Payment method, credit and invoices</dt>
           <dd>
-            The Seams account keeps them, on the billing page of the Seams
-            Console.
+            Purin Pantry billing has not started, so Pantry keeps none of them
+            yet.
           </dd>
         </div>
       </dl>

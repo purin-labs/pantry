@@ -281,10 +281,8 @@ parser refuses, gives 422. Another refusal gives 409, and a failure of the Actor
   No hold, no admission above the free use and no meter delivery exist.
   `spending_limit_reached` and `paid_use_unfunded` are not built.
 - Settings › Billing shows no subscription, payment model, credit, card or invoice. Its
-  line "Payment method, credit and invoices" names a Console that Pantry no longer uses.
-- The Paid use section on Settings › Jev still describes billed use: prepaid credit, a
-  monthly invoice, a $10 credit limit and "the Seams account". Paid use is closed, and
-  Pantry no longer bills through the Console.
+  line "Payment method, credit and invoices" says that Purin Pantry billing has not
+  started. The Paid use section on Settings › Jev says the same under "How you pay".
 - Pantry has no Portal notification at 80 % or 100 % of the free use. No chat sentence
   tells a person that a Jev feature stopped.
 - A TypeSafe HTTP 429 gives `jev_unavailable`, and the mail work ends `blocked`. Pantry

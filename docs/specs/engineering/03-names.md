@@ -305,11 +305,8 @@ exported `PurinMark` and `PurinIcon`.
 **The commerce engine in Portal text:** `areas/organisation/ui/pages/automation.tsx` and
 `areas/commerce/ui/features/commerce/production-plan.tsx` show these words to people.
 
-**Seams text in the Portal:**
-
-- Settings › Billing names a Seams account and the Seams Console, and the Jev paid use
-  panel names a Seams account. Pantry has no Console service.
-- The public `/ecommerce` page uses the Seams name, wordmark and `seams.sh` links.
+**Seams text in the Portal:** the public `/ecommerce` page uses the Seams name, wordmark
+and `seams.sh` links.
 
 **Domains:** `MENU_HOST_SUFFIX` of the shop is still `menu.seams.tokyo`, with no route.
 Plan 93 records that the domain of the QR order page is not chosen.
