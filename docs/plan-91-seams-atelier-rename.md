@@ -661,8 +661,8 @@ State on 22 November 2026:
   - Dropbox (console): the name "Purin Pantry", publisher, website and
     privacy URL, the new redirect URI and the webhook
     `https://pantry.purin.io/hook/dropbox`, which Dropbox shows as
-    "Enabled" after its challenge to the new stack. The Dropbox icons are
-    not changed: the console opens a native file picker.
+    "Enabled" after its challenge to the new stack. The Dropbox icons
+    came later (see the open items below).
   - Square (console, the Japanese business login): the application
     (`sq0idp-fSopNCB…`, before "Satyr") is now "Purin Pantry"; its
     Production OAuth redirect URL is
@@ -807,8 +807,12 @@ Phase 4 is done, on 22 November 2026. Open items, each outside the switch:
   the popup. On 23 November 2026 the two files went into the owner's Dropbox,
   folder `Purin Pantry icons` (`purin-pantry-icon-64.png` and
   `purin-pantry-icon-256.png`, copies of `docs/brand/purin-logo/icon-pack/mark-64.png`
-  and `mark-256.png`). The owner picks them on the Branding tab of the app
-  "Purin Pantry" and saves.
+  and `mark-256.png`). Done on 23 November 2026: the owner picked the two
+  icons, and the Branding tab shows the Purin mark at 64 × 64 and 256 × 256
+  after a fresh load. A first try failed because the Chooser lost its link
+  to the console page ("Could not communicate with https://www.dropbox.com")
+  after that page reloaded; the console also needs "Save changes" after the
+  pick.
 - The callback page now has the Portal's look (dev `29024dc0`, released in
   `pantry` `5e878705`).
 
