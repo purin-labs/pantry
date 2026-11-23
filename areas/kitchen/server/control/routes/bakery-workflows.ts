@@ -8,12 +8,11 @@ import {
   readCurrentWorkflow,
   readWorkflowDocument,
   readWorkflowFindings,
+  signalBakeryWorkflowApplied,
   writeWorkflowFindings,
 } from "../../bakery/workflow-revisions";
 import { organisationServices } from "@purin-labs/area-organisation/server/contract/organisation-services";
 import type { Env } from "@purin-labs/kernel/env";
-import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
-import { traceWarn } from "@purin-labs/kernel/observability";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   controlError,
@@ -335,7 +334,11 @@ async function apply(
     );
     switch (outcome.kind) {
       case "applied":
-        await signalApplied(env, authorized.organisationId, route.workflowId);
+        await signalBakeryWorkflowApplied(
+          env,
+          authorized.organisationId,
+          route.workflowId,
+        );
         return controlJson({ receipt: outcome.receipt });
       case "stale":
         return controlJson(
@@ -358,28 +361,5 @@ async function apply(
     }
   } catch {
     return controlError("bakery_workflow_unavailable", 503);
-  }
-}
-
-/** Open pages read the new revision. A lost signal leaves the revision applied. */
-async function signalApplied(
-  env: Env,
-  organisationId: OrganisationId,
-  workflowId: string,
-): Promise<void> {
-  try {
-    const organisation = await requireActiveOrganisationActor({
-      env,
-      organisationId,
-      now: Date.now(),
-    });
-    await organisation.bakeryWorkflowApplied(workflowId);
-  } catch (error) {
-    traceWarn("bakery_workflow.applied_signal_failed", {
-      requestId: newRequestId(),
-      organisationId,
-      workflowId,
-      error: error instanceof Error ? error.name : "unknown",
-    });
   }
 }

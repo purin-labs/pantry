@@ -19,6 +19,7 @@ import {
   readCurrentWorkflow,
   readWorkflowDocument,
   readWorkflowFindings,
+  signalBakeryWorkflowApplied,
   storeWorkflowDocument,
   type WorkflowRevisionReceipt,
 } from "./workflow-revisions";
@@ -240,7 +241,7 @@ export async function applyApprovedWorkflowChange(
     controlSessionId: approver.controlSessionId,
   });
   if (!merged.ok) return { kind: "draft_unavailable" };
-  organisation.bakeryWorkflowApplied(command.workflowId);
+  await signalBakeryWorkflowApplied(env, organisationId, command.workflowId);
   return { kind: "applied", receipt };
 }
 

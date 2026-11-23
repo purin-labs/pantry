@@ -1,4 +1,3 @@
-import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { collaborationAgentLabel } from "@purin-labs/collaboration/worker/collaboration-agent";
 import {
   beginProposalStaging,
@@ -7,6 +6,7 @@ import {
 import type { ToolTurnContext } from "@purin-labs/agent/actors/session/tool-wiring";
 import { requireSessionExecution } from "@purin-labs/agent/actors/session-execution-admission";
 import { prepareWorkflowProposal } from "../../bakery/workflow-proposals";
+import { signalBakeryWorkflowApplied } from "../../bakery/workflow-revisions";
 import { roleMayConfigure } from "@purin-labs/tenancy/data/control-plane";
 import {
   announceSurfaceEffect,
@@ -224,11 +224,10 @@ async function proposeRecipeWorkflowForEmbeddedHarness(
     },
   );
   // An open page reads the proposal. A lost signal waits for the next read.
-  const organisation = await requireActiveOrganisationActor({
-    env: turn.env,
-    organisationId: scope.organisationId,
-    now: Date.now(),
-  });
-  organisation.bakeryWorkflowApplied(request.workflowId);
+  await signalBakeryWorkflowApplied(
+    turn.env,
+    scope.organisationId,
+    request.workflowId,
+  );
   return staged;
 }

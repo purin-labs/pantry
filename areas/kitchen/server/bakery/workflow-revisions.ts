@@ -11,7 +11,9 @@ import {
 import { admitScenario } from "@purin-labs/production-simulation";
 import { canonicalJson, isRecord, sha256Hex } from "@purin-labs/std";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationId } from "@purin-labs/kernel/ids";
+import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { UserId } from "@purin-labs/control-api/ids";
 
 /**
@@ -361,4 +363,32 @@ function problemSummary(
   problem: Readonly<{ code: string; where: string }>,
 ): Readonly<{ code: string; where: string }> {
   return { code: problem.code, where: problem.where };
+}
+
+/**
+ * Tells the open Workflow pages of a recipe to read it again, after a new
+ * revision or a new proposal is stored. The stored change does not depend on
+ * the signal: a lost signal waits for the page's next read, and a failure is
+ * traced, not thrown.
+ */
+export async function signalBakeryWorkflowApplied(
+  env: Env,
+  organisationId: OrganisationId,
+  workflowId: string,
+): Promise<void> {
+  try {
+    const organisation = await requireActiveOrganisationActor({
+      env,
+      organisationId,
+      now: Date.now(),
+    });
+    await organisation.bakeryWorkflowApplied(workflowId);
+  } catch (error) {
+    traceWarn("bakery_workflow.applied_signal_failed", {
+      requestId: newRequestId(),
+      organisationId,
+      workflowId,
+      error: error instanceof Error ? error.name : "unknown",
+    });
+  }
 }
