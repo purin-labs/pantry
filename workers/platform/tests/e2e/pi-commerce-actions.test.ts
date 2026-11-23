@@ -1,9 +1,10 @@
 // Plan 81 slice 5: the agent proposes the commerce actions that a person can
 // take, through the same approvals and receipts. A refund freezes its exact
 // money in the proposal, moves nothing before an owner approves it with a
-// step-up sign-in, and goes back one time. A price allowance staged in a
-// Portal chat changes nothing until the person who asked confirms it on the
-// card.
+// step-up sign-in, and goes back one time. Of two refunds of one order that
+// an owner approved before either ran, the first approved runs first. A price
+// allowance staged in a Portal chat changes nothing until the person who
+// asked confirms it on the card.
 import { env, exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import { http, type HttpResponseResolver } from "msw";
@@ -172,6 +173,128 @@ it("refunds an order only after an owner approves the exact money", async () => 
       .poll(delivered.bind(null, slack), { timeout: 20_000 })
       .toContain("PI_REFUND_REFUSED");
     expect(await readPayment(placed)).toEqual(refunded);
+  });
+}, 120_000);
+
+it("runs two approved refunds of one order in the order of their approvals", async () => {
+  await installSlackActorFixture().then(async (fixture) => {
+    const slack = slackSimulator();
+    const requests: Record<string, unknown>[] = [];
+    const lines = { orderId: "", orderRevision: 0, cookie: "", taro: "" };
+    network.use(
+      slack.handler,
+      http.post(
+        "https://openrouter.ai/api/v1/chat/completions",
+        respondTwoRefunds.bind(null, requests, lines),
+      ),
+    );
+    const session = await installEffectAuthority(
+      fixture.selectedIntegrationAccountId,
+      "plugin",
+    );
+    await givePortalHandles(ORGANISATION_ID);
+    await discoverSlackChannel("public_channel", Date.now() - 60_000);
+    await provisionShop();
+    await publishCafeMenu(MERCHANT);
+    const placed = await placeCafeOrder(MERCHANT);
+    const order = await readOrder(placed);
+    const lineId = (title: string): string => {
+      const line = order.lineItems.find((item) => item.title === title);
+      if (line === undefined) throw new Error(`No ${title} line`);
+      return line.id;
+    };
+    Object.assign(lines, {
+      orderId: order.id,
+      orderRevision: order.revision,
+      cookie: lineId("Taro Cookie"),
+      taro: lineId("Taro Milk Tea"),
+    });
+
+    // The agent proposes one refund in each of two threads.
+    await sendListingMessage(
+      "app_mention",
+      "EvPiRefundCookieLine",
+      ROOT_TS,
+      "<@U0PANTRY> Refund the cookie.",
+    );
+    await expect
+      .poll(delivered.bind(null, slack), { timeout: 20_000 })
+      .toContain("PI_COOKIE_WAITING");
+    const cookieNonce = listingNonce(requests);
+    await sendListingMessage(
+      "app_mention",
+      "EvPiRefundTaroLine",
+      LATER_THREAD,
+      "<@U0PANTRY> Refund the milk tea too.",
+      LATER_THREAD,
+    );
+    await expect
+      .poll(delivered.bind(null, slack), { timeout: 20_000 })
+      .toContain("PI_TARO_WAITING");
+    const taroNonce = listingNonce(requests);
+    expect(taroNonce).not.toBe(cookieNonce);
+
+    // The owner approves both before either runs.
+    await approve(session, cookieNonce, "cookie-line");
+    await approve(session, taroNonce, "taro-line");
+    expect((await readPayment(placed)).lifecycle.state).toBe("captured");
+
+    // The later approval waits while the earlier one has not run.
+    const waiting = await postControl(
+      session,
+      `/${taroNonce}/execute`,
+      {},
+      "pi-taro-line-early",
+    );
+    expect(waiting.status).toBe(409);
+    expect(await waiting.json()).toEqual({
+      ok: false,
+      error: "resource_busy",
+    });
+
+    // The earlier approval runs, and its money goes back.
+    const cookie = await postControl(
+      session,
+      `/${cookieNonce}/execute`,
+      {},
+      "pi-cookie-line-execute",
+    );
+    expect(cookie.status, await cookie.clone().text()).toBe(200);
+    expect(await cookie.json()).toMatchObject({
+      ok: true,
+      action: { state: "confirmed" },
+      receipt: { projectionKind: "order_refund" },
+    });
+    const afterCookie = await readPayment(placed);
+    expect(afterCookie.lifecycle.state).toBe("partially_refunded");
+
+    // Then the later approval runs. It names the order revision from before
+    // the first refund, so Commerce refuses it and no more money moves.
+    const taro = await postControl(
+      session,
+      `/${taroNonce}/execute`,
+      {},
+      "pi-taro-line-execute",
+    );
+    expect(taro.status).toBe(502);
+    expect(await taro.json()).toEqual({
+      ok: false,
+      error: "commerce_action_provider_execution_failed",
+    });
+    expect(await readPayment(placed)).toEqual(afterCookie);
+    const artifact = await env.JOURNEY_ARTIFACTS.fetch(
+      "http://artifacts/plan-81/two-approved-refunds.json",
+      {
+        method: "PUT",
+        body: JSON.stringify({
+          laterBeforeEarlier: waiting.status,
+          earlier: cookie.status,
+          later: taro.status,
+          payment: afterCookie.lifecycle.state,
+        }),
+      },
+    );
+    expect(artifact.status).toBe(200);
   });
 }, 120_000);
 
@@ -395,6 +518,23 @@ async function approveAndExecute(
   nonce: string,
   name: string,
 ): Promise<unknown> {
+  await approve(session, nonce, name);
+  const executed = await postControl(
+    session,
+    `/${nonce}/execute`,
+    {},
+    `pi-${name}-execute`,
+  );
+  expect(executed.status, await executed.clone().text()).toBe(200);
+  return executed.json();
+}
+
+/** The owner's step-up approval of one waiting action. */
+async function approve(
+  session: IssuedControlSession,
+  nonce: string,
+  name: string,
+): Promise<void> {
   const organisation = await requireActiveOrganisationActor({
     env,
     organisationId: ORGANISATION_ID,
@@ -425,14 +565,6 @@ async function approveAndExecute(
     grant,
   );
   expect(approved.status, await approved.clone().text()).toBe(200);
-  const executed = await postControl(
-    session,
-    `/${nonce}/execute`,
-    {},
-    `pi-${name}-execute`,
-  );
-  expect(executed.status, await executed.clone().text()).toBe(200);
-  return executed.json();
 }
 
 function readEntities(
@@ -542,6 +674,60 @@ async function respond(
     case 12:
       expect(last).toContain("cannot take a whole refund");
       return openRouterText("PI_REFUND_REFUSED", "pi_rest_refused");
+    default:
+      throw new Error(`Unexpected model request ${requests.length}`);
+  }
+}
+
+/** The model of the two-refund journey: one refund in each thread. */
+async function respondTwoRefunds(
+  requests: Record<string, unknown>[],
+  lines: Readonly<{
+    orderId: string;
+    orderRevision: number;
+    cookie: string;
+    taro: string;
+  }>,
+  { request }: Parameters<HttpResponseResolver>[0],
+): Promise<Response> {
+  const body: unknown = await request.json();
+  if (!isRecord(body)) throw new Error("Invalid refund model request");
+  requests.push(body);
+  const last = toolOutput(body);
+  const thread = requests.length <= 5 ? "cookie" : "taro";
+  switch ((requests.length - 1) % 5) {
+    case 0:
+      return openRouterToolCall(
+        "tool_search",
+        { query: "commerce_entity_context", limit: 1 },
+        `pi_${thread}_discover_read`,
+      );
+    case 1:
+      return openRouterToolCall(
+        "tool_search",
+        { query: TOOLS, limit: 3 },
+        `pi_${thread}_discover`,
+      );
+    case 2:
+      return readEntities([["order", lines.orderId]], `pi_${thread}_read`);
+    case 3:
+      expect(last).toContain("entities=1");
+      return openRouterToolCall(
+        "commerce_propose_refund",
+        {
+          orderId: lines.orderId,
+          expectedRevision: lines.orderRevision,
+          reason: `The ${thread} was spoilt.`,
+          refundLines: [{ orderLineId: lines[thread], amountMinor: null }],
+        },
+        `pi_${thread}_refund`,
+      );
+    case 4:
+      expect(last).toContain("commerce_action_proposed");
+      return openRouterText(
+        thread === "cookie" ? "PI_COOKIE_WAITING" : "PI_TARO_WAITING",
+        `pi_${thread}_waiting`,
+      );
     default:
       throw new Error(`Unexpected model request ${requests.length}`);
   }

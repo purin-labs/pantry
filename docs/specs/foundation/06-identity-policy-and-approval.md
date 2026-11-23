@@ -196,8 +196,10 @@ proposed -> approval_requested -> signed -> executing
   and the execution deadline of the payout plan.
 - Execution starts only from `signed`, under a lease of 5 minutes. The Actor alarm, or
   the next ledger call, moves an entry with an ended lease to `indeterminate`.
-- A second action on the same account and resource key waits while the first is
-  `signed`, `executing` or `indeterminate` (`resource_busy`).
+- A second action on the same account and resource key waits while another entry is
+  `executing` or `indeterminate`, or was `signed` before it (`resource_busy`). Approvals
+  of one resource run in the order of their signs, so two `signed` entries never block
+  each other.
 - The same receipt settles an entry again with no change. A different receipt fails
   with `action_receipt_conflict`.
 - A retry from `indeterminate` needs evidence: `provider_idempotency_absent`,

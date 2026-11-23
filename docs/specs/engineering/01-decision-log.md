@@ -156,13 +156,12 @@ reason. A later note in the same entry describes the code today.
   refunds of one order. `action_ledger` in `OrganisationActor` SQLite tracks `proposed`,
   `approval_requested`, `signed`, `executing`, `confirmed`, `failed`, `rejected`,
   `indeterminate` and `expired`. An action enters `executing` only if no other entry of
-  its account and resource key is `signed`, `executing` or `indeterminate`. Otherwise it
-  gets `resource_busy`. The sign step has no such check, so two `signed` entries can
-  block each other until one expires. Expiry applies only to `proposed`,
-  `approval_requested` and `signed`. An `indeterminate` entry never expires, so it holds
-  its resource key until a retry or a reconciliation settles it. A commerce key includes
-  the action kind, so the ledger does not serialize a refund and a cancellation of one
-  order.
+  its account and resource key is `executing` or `indeterminate`, or was `signed`
+  before it. Otherwise it gets `resource_busy`. So approvals of one resource run in the
+  order of their signs. Expiry applies only to `proposed`, `approval_requested` and
+  `signed`. An `indeterminate` entry never expires, so it holds its resource key until a
+  retry or a reconciliation settles it. A commerce key includes the action kind, so the
+  ledger does not serialize a refund and a cancellation of one order.
 - **AD-019, 2026-07-07, Superseded: split read and write credentials.** The split
   protected the raw path, and that path is removed. A connection holds one provider API
   credential (`credential_ref`). A Stripe or Shopify webhook signing secret is a separate
@@ -386,8 +385,8 @@ text, with its status and milestones, stays in the source document.
 - **Not built from a decision:** the predicate AST (AD-014), TikTok Shop (AD-032) and
   the Meta catalog link (AD-031). Also not built: suspicion escalation and redaction at
   rest (AD-021), an applied retention period (AD-034), and policy as code (AD-010).
-- **Action ledger.** Two `signed` entries on one key can block each other until one
-  expires. A refund and a cancellation of one order are not serialized (AD-018).
+- **Action ledger.** A refund and a cancellation of one order are not serialized
+  (AD-018).
 - **Approval branches.** WebAuthn and the wallet branch have no working ceremony. A
   versioned policy binding must exist before an Organisation can select one (AD-033).
 - **Residency.** No residency cell is deployed. EU and FedRAMP cells stay closed until

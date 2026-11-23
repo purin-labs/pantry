@@ -738,15 +738,7 @@ export function beginActionExecution(
     return invalidTransition(entry.state);
   }
 
-  if (
-    hasBusyResource(
-      sql,
-      input.organisationId,
-      entry.action.integrationAccountId,
-      entry.action.resourceKey,
-      input.nonce,
-    )
-  ) {
+  if (hasBusyResource(sql, input.organisationId, entry, entry.updatedAt)) {
     return {
       ok: false,
       error: { code: "resource_busy", resourceKey: entry.action.resourceKey },
@@ -805,15 +797,7 @@ export function retryIndeterminateActionExecution(
       error: { code: "invalid_action", field: "retryEvidence" },
     };
   }
-  if (
-    hasBusyResource(
-      sql,
-      input.organisationId,
-      entry.action.integrationAccountId,
-      entry.action.resourceKey,
-      input.nonce,
-    )
-  ) {
+  if (hasBusyResource(sql, input.organisationId, entry, null)) {
     return {
       ok: false,
       error: { code: "resource_busy", resourceKey: entry.action.resourceKey },
@@ -1631,23 +1615,36 @@ function isAmount(raw: unknown): raw is CanonicalAction["amount"] {
   );
 }
 
+/**
+ * Whether another entry of the same account and resource key holds the
+ * resource: one that is executing or indeterminate, or one signed before
+ * this entry's sign time `signedAt` (the nonce orders two signs of the same
+ * millisecond). Approvals run in the order in which they were signed, so two
+ * signed entries never block each other. A retry of an indeterminate entry
+ * passes null: it held the resource before any entry that is signed now.
+ */
 function hasBusyResource(
   sql: SqlStorage,
   organisationId: OrganisationId,
-  integrationAccountId: IntegrationAccountId,
-  resourceKey: string,
-  nonce: string,
+  entry: ActionLedgerEntry,
+  signedAt: number | null,
 ): boolean {
+  const before = signedAt ?? -1;
   const row = sql
     .exec<{ count: number }>(
       `SELECT COUNT(*) AS count FROM action_ledger
      WHERE organisation_id = ? AND integration_account_id = ?
        AND resource_key = ? AND nonce <> ?
-       AND state IN ('signed', 'executing', 'indeterminate')`,
+       AND (state IN ('executing', 'indeterminate')
+         OR (state = 'signed'
+           AND (updated_at < ? OR (updated_at = ? AND nonce < ?))))`,
       organisationId,
-      integrationAccountId,
-      resourceKey,
-      nonce,
+      entry.action.integrationAccountId,
+      entry.action.resourceKey,
+      entry.action.nonce.value,
+      before,
+      before,
+      entry.action.nonce.value,
     )
     .toArray()[0];
   return (row?.count ?? 0) > 0;
