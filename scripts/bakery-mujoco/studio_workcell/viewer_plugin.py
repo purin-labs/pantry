@@ -22,12 +22,11 @@ imgui = app_plugins.imgui
 
 WORKSPACE_DIR = pathlib.Path(os.path.abspath(__file__)).parent
 ROBOT_MODES = (
-    ('auto_demo', 'Auto Demo (Prep <-> Oven)'),
+    ('contact_cycle', 'Real-Contact Cycle (Prep -> Rail #2)'),
     ('home', 'Home Standby'),
-    ('prep_table', 'Prep Table Staging'),
-    ('transit', 'Transit Lift'),
+    ('prep_hover', 'Prep Table Hover'),
     ('oven_mouth', 'Oven Mouth Approach'),
-    ('oven_insert', 'Oven Rail #2 Insert'),
+    ('oven_rail2', 'Oven Rail #2 Insert'),
     ('manual', 'Manual Joints'),
 )
 TONE_MAPPINGS = ('aces', 'pbr_neutral', 'filmic')
@@ -118,18 +117,18 @@ class ViewerPlugin(plugin.ViewerPlugin):
   pastry_load: bool = True
 
   # Oven & robot live control settings
-  door_deg: float = 82.0
+  door_deg: float = 108.0
   handle_deg: float = 0.0
-  fan_rad_s: float = 95.0
-  damper_deg: float = 18.0
+  fan_rad_s: float = 0.0
+  damper_deg: float = 0.0
   robot_mode_idx: int = 0
-  manual_j1: float = 10.0
-  manual_j2: float = -78.0
-  manual_j3: float = 96.0
-  manual_j4: float = -108.0
-  manual_j5: float = -90.0
-  manual_j6: float = 0.0
-  clamp_open_mm: float = 28.0
+  manual_j1: float = -22.0
+  manual_j2: float = -96.0
+  manual_j3: float = 124.0
+  manual_j4: float = -28.0
+  manual_j5: float = 68.0
+  manual_j6: float = 90.0
+  gripper_open_mm: float = 45.0
 
   # Ghost planned-path overlay settings
   show_ghost_path: bool = True
@@ -172,7 +171,7 @@ class ViewerPlugin(plugin.ViewerPlugin):
                 self.manual_j5,
                 self.manual_j6,
             ),
-            clamp_open_mm=self.clamp_open_mm,
+            gripper_open_mm=self.gripper_open_mm,
             show_ghost_path=self.show_ghost_path,
             ghost_progress=self.ghost_progress,
         )
@@ -311,9 +310,9 @@ class ViewerPlugin(plugin.ViewerPlugin):
           )
           ctrl_changed |= c
 
-          self._row_label('Fork Clamp (mm):')
-          c, self.clamp_open_mm = imgui.SliderFloat(
-              '##clamp_mm', self.clamp_open_mm, 0.0, 40.0, '%.1f'
+          self._row_label('Spanner Jaw (mm):')
+          c, self.gripper_open_mm = imgui.SliderFloat(
+              '##grip_mm', self.gripper_open_mm, -15.0, 45.0, '%.1f'
           )
           ctrl_changed |= c
 
@@ -328,7 +327,7 @@ class ViewerPlugin(plugin.ViewerPlugin):
               '##ghost_alpha', self.ghost_opacity, 0.10, 0.85, '%.2f'
           )
 
-          if ROBOT_MODES[self.robot_mode_idx][0] != 'auto_demo':
+          if ROBOT_MODES[self.robot_mode_idx][0] != 'contact_cycle':
             self._row_label('Ghost Scrub:')
             c, self.ghost_progress = imgui.SliderFloat(
                 '##ghost_prog', self.ghost_progress, 0.0, 1.0, '%.2f'
@@ -391,11 +390,11 @@ class ViewerPlugin(plugin.ViewerPlugin):
         if oven_changed:
           self._send_control()
 
-        if imgui.Button('Open & Load##preset_open'):
-          self.door_deg = 102.0
+        if imgui.Button('Run Contact Load##preset_open'):
+          self.door_deg = 108.0
           self.fan_rad_s = 0.0
           self.damper_deg = 0.0
-          self.robot_mode_idx = 4
+          self.robot_mode_idx = 0
           self.viewer.send_to_sim(user_messages.OvenPresetEvent(preset='open_load'))
         imgui.SameLine()
         if imgui.Button('Close & Bake##preset_bake'):
@@ -459,16 +458,21 @@ class ViewerPlugin(plugin.ViewerPlugin):
         if light_changed:
           self._send_lighting()
 
-      # --- Section 4: Live Telemetry ---
+      # --- Section 4: Live Gauntlet Safety & Oven Telemetry ---
       imgui.Separator()
       t = self.telemetry
+      safety_tag = 'SAFE' if t.safety_ok else 'FORCE WARN'
+      rail_tag = 'SEATED' if t.tray_on_rail2 else 'TRANSIT'
       imgui.TextUnformatted(f'Time: {t.sim_time:6.2f} s  |  {t.phase_label}')
       imgui.TextUnformatted(
-          f'Oven: Door {t.door_deg:5.1f} deg | Damper {t.damper_deg:4.1f} deg | '
-          f'Fan {t.fan_rpm:6.0f} RPM'
+          f'Gauntlet: [{safety_tag}] Grasp {t.grasp_force_n:4.1f}/35N | '
+          f'Env {t.env_force_n:4.1f}/60N'
       )
       imgui.TextUnformatted(
-          f'Rail #2 Touch: {t.rail2_touch_n:5.2f} N  |  '
+          f'Rail #2: [{rail_tag}] Touch {t.rail2_touch_n:5.2f} N | '
+          f'Door {t.door_deg:5.1f} deg | Fan {t.fan_rpm:5.0f} RPM'
+      )
+      imgui.TextUnformatted(
           f'EE: ({t.ee_pos[0]:+.2f}, {t.ee_pos[1]:+.2f}, {t.ee_pos[2]:+.2f}) m'
       )
 
