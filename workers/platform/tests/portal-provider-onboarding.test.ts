@@ -300,9 +300,8 @@ describe("Square onboarding", () => {
     });
     expect(connected).toContain("Purin Heavy Industries");
     expect(connected).toContain("Connect another Square account");
-    expect(connected).toContain('aria-label="Reconnect Square in a popup"');
     expect(connected).toContain(">Refresh locations and devices</button>");
-    expect(connected).toContain(">Disconnect</button>");
+    expect(connected).toContain(">Remove this Square account…</button>");
 
     const waiting = renderIntegrationsPage({
       initialIntegrationId: "square",

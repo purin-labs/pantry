@@ -39,6 +39,7 @@ import {
   renderMutationFeedback,
 } from "./settings-support";
 import type { IntegrationsPageActions } from "./settings-types";
+import { RemoveConfirm } from "./remove-confirm";
 
 /**
  * The email onboarding card, built like the consent sheet: three short points
@@ -525,7 +526,7 @@ function gmailRefuses(lifecycle: string): boolean {
  * The one action that cuts a mailbox off. It is destructive, so it confirms
  * in place and names every consequence before it runs. Turn off already
  * pauses a mailbox, so no second, softer remove action exists. A send-only
- * connection keeps the connection's own disconnect.
+ * connection has no mailbox: it shows the account's own remove action.
  */
 function GmailRemoveSection(props: {
   readonly address: string;
@@ -534,65 +535,27 @@ function GmailRemoveSection(props: {
   readonly busy: boolean;
   readonly actions: IntegrationsPageActions;
 }): React.ReactNode {
-  const [confirming, setConfirming] = React.useState(false);
   const mailbox = props.mailbox;
   if (mailbox === null) {
     const disconnect = props.commands === null ? [] : props.commands.danger;
     if (disconnect.length === 0) return null;
     return (
       <section className="mailbox-section mailbox-danger" aria-label="Remove">
-        <div className="connection-actions mailbox-danger-actions">
-          {disconnect}
-        </div>
+        {disconnect}
       </section>
     );
   }
   return (
     <section className="mailbox-section mailbox-danger" aria-label="Remove">
-      {confirming ? (
-        <div
-          className="connection-actions"
-          role="group"
-          aria-label={`Confirm removing ${props.address}`}
-        >
-          <p className="notice-text connection-confirm-copy">
-            <strong>Remove {props.address}?</strong> Purin Pantry stops reading
-            mail, cancels emails waiting to send, deletes the drafts it made
-            and its Google sign-in. To use this mailbox again, connect it again.
-          </p>
-          <button
-            type="button"
-            className="danger-button"
-            data-account-id={mailbox.integrationAccountId}
-            onClick={props.actions.revokeMailbox}
-            disabled={props.busy}
-          >
-            Remove {props.address}
-          </button>
-          <button
-            type="button"
-            onClick={setFlag.bind(null, setConfirming, false)}
-            disabled={props.busy}
-          >
-            Cancel
-          </button>
-        </div>
-      ) : (
-        <div className="connection-actions mailbox-danger-actions">
-          <button
-            type="button"
-            className="danger-button"
-            onClick={setFlag.bind(null, setConfirming, true)}
-            disabled={props.busy}
-          >
-            Remove {props.address}…
-          </button>
-        </div>
-      )}
+      <RemoveConfirm
+        label={`Remove ${props.address}…`}
+        question={`Remove ${props.address}?`}
+        consequence="Purin Pantry stops reading mail, cancels emails waiting to send, deletes the drafts it made and its Google sign-in. To use this mailbox again, connect it again."
+        confirmLabel={`Remove ${props.address}`}
+        busy={props.busy}
+        onConfirm={props.actions.revokeMailbox}
+        data={{ "account-id": mailbox.integrationAccountId }}
+      />
     </section>
   );
-}
-
-function setFlag(set: (value: boolean) => void, value: boolean): void {
-  set(value);
 }

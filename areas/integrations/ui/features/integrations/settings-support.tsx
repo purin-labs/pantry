@@ -1,9 +1,6 @@
 import type { OnboardingSelectedResource } from "@purin-labs/contracts";
 import React from "react";
-import {
-  formatRelativeTime,
-  type StatusChipStatus,
-} from "@purin-labs/ui/page-components";
+import { type StatusChipStatus } from "@purin-labs/ui/page-components";
 import type { WhatsAppConnectionActionState } from "../../pages/whatsapp";
 import {
   MutationLedger,
@@ -102,14 +99,6 @@ function renderSelectedResource(resource: OnboardingSelectedResource): string {
 
 export function formatSelectedResource(resource: OnboardingSelectedResource): string {
   return renderSelectedResource(resource);
-}
-
-export function renderConnectionRecency(account: IntegrationAccount): React.ReactNode {
-  return account.eventRecency.kind === "available" ? (
-    <p className="connection-meta">
-      Last update {formatRelativeTime(account.eventRecency.at)}
-    </p>
-  ) : null;
 }
 
 export function integrationLifecycleStatus(

@@ -624,7 +624,7 @@ describe("Café settings page ownership", () => {
     expect(markup).toContain('id="setup-form-error"');
     expect(markup).toContain('aria-describedby="setup-form-error"');
     expect(markup).toMatch(
-      /<button(?=[^>]*data-account-id="slack_account")(?![^>]*disabled)[^>]*>Remove this Slack workspace<\/button>/u,
+      /<button(?![^>]*disabled)[^>]*>Remove this Slack workspace…<\/button>/u,
     );
   });
 

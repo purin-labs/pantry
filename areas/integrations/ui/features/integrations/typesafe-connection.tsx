@@ -9,6 +9,7 @@ import {
   type Configuration,
   parseConfiguration,
 } from "@purin-labs/control-api/portal/typesafe-connection";
+import { RemoveConfirm } from "./remove-confirm";
 
 export type TypeSafeConnectionState =
   | Readonly<{ kind: "loading" }>
@@ -154,24 +155,27 @@ export function TypeSafeConnectionPanel(props: {
                   >
                     Test connection
                   </button>
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={runMutation.bind(
-                      null,
-                      props.organisationId,
-                      {
-                        operation: "disconnect",
-                        expectedRevision: connection.revision,
-                      },
-                      setState,
-                      setBusy,
-                      setMessage,
-                    )}
-                  >
-                    Disconnect
-                  </button>
                 </div>
+              )}
+              {connection.kind === "connected" && (
+                <RemoveConfirm
+                  label="Disconnect TypeSafe…"
+                  question="Disconnect TypeSafe?"
+                  consequence="Every feature that uses TypeSafe turns off at once, and Purin Pantry deletes the key. To use them again, save a key again."
+                  confirmLabel="Disconnect TypeSafe"
+                  busy={busy}
+                  onConfirm={runMutation.bind(
+                    null,
+                    props.organisationId,
+                    {
+                      operation: "disconnect",
+                      expectedRevision: connection.revision,
+                    },
+                    setState,
+                    setBusy,
+                    setMessage,
+                  )}
+                />
               )}
             </>
           )}

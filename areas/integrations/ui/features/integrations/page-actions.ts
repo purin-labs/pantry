@@ -139,7 +139,6 @@ export function createIntegrationsPageActions(
     selectSlackDmOrganisation: selectSlackDmOrganisation.bind(null, context),
     saveSetup: saveIntegrationsSetup.bind(null, context),
     rotateCredential: rotateAccountCredential.bind(null, context),
-    revokeCredential: revokeAccountCredential.bind(null, context),
     readMailboxSetup: context.props.transport.readMailboxSetup.bind(
       null,
       context.props.organisationId,
@@ -634,30 +633,10 @@ async function rotateAccountCredential(
   return outcome;
 }
 
-async function revokeAccountCredential(
-  context: IntegrationsRouteMutationContext,
-  integrationAccountId: string,
-  replacementIntegrationAccountId: string | null,
-): Promise<CredentialActionOutcome> {
-  return runCredentialCommand(
-    context,
-    integrationAccountId,
-    {
-      kind: "revoke_credential",
-      integrationAccountId,
-      replacementIntegrationAccountId,
-    },
-    "Credential revoked.",
-  );
-}
-
 async function runCredentialCommand(
   context: IntegrationsRouteMutationContext,
   integrationAccountId: string,
-  command: Variant<
-    IntegrationsCommand,
-    "rotate_credential" | "revoke_credential"
-  >,
+  command: Variant<IntegrationsCommand, "rotate_credential">,
   successMessage: string,
 ): Promise<CredentialActionOutcome> {
   const data = readyIntegrationsData(context.content);
@@ -683,10 +662,7 @@ async function runCredentialCommand(
       data.configurationVersion,
       command,
     );
-    if (
-      result.kind !== "credential_rotation" &&
-      result.kind !== "credential_revocation"
-    ) {
+    if (result.kind !== "credential_rotation") {
       throw new Error("Credential command did not complete.");
     }
     await loadIntegrationsRoute(
@@ -697,9 +673,7 @@ async function runCredentialCommand(
     completeSettingsMutation(context.setMutations, mutation);
     context.setFeedback(null);
     toast.success(successMessage);
-    return result.kind === "credential_rotation"
-      ? { kind: "rotated", receipt: result.receipt }
-      : { kind: "revoked", receipt: result.receipt };
+    return { kind: "rotated", receipt: result.receipt };
   } catch (error) {
     completeSettingsMutation(context.setMutations, mutation);
     return {

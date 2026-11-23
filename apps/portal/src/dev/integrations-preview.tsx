@@ -144,11 +144,6 @@ const ACTIONS: IntegrationsPageActions = {
     errorKind: "unknown",
     message: "Preview only.",
   }),
-  revokeCredential: async () => ({
-    kind: "failed",
-    errorKind: "unknown",
-    message: "Preview only.",
-  }),
   readMailboxSetup: previewMailboxSetup,
   setUpMailbox: (request) => {
     console.log("[preview] set up mailbox", request);
