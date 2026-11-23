@@ -299,7 +299,7 @@ class FactoryWorkerProbe {
 async function twoCellStyles(route) {
   await route.fulfill({
     contentType: "application/javascript",
-    body: 'import "/src/styles.css";',
+    body: `import "${checkoutUrl("apps/portal/src/styles.css")}";`,
   });
 }
 

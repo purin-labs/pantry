@@ -149,7 +149,7 @@ async function verifyOvenAuthoringBrowser(page) {
 async function serveAuthorStyles(route) {
   await route.fulfill({
     contentType: "application/javascript",
-    body: 'import "/src/styles.css";',
+    body: `import "${checkoutUrl("apps/portal/src/styles.css")}";`,
   });
 }
 async function forwardAuthorRequest(route) {

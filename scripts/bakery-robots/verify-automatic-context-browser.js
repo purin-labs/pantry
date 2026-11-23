@@ -106,9 +106,10 @@ async function mountAutomaticContext() {
   // imports react and react-router.
   const source = (
     await Promise.all(
-      ["/src/dev/workflow-preview.tsx", "/src/workflow-demo.tsx"].map(
-        async (path) => (await fetch(path)).text(),
-      ),
+      [
+        "/src/dev/workflow-preview.tsx",
+        sourceUrl("apps/portal/src/workflow-demo.tsx"),
+      ].map(async (path) => (await fetch(path)).text()),
     )
   ).join("\n");
   const reactUrl = source.match(/from "([^"\n]*\/react\.js[^"\n]*)"/u)?.[1];
@@ -423,7 +424,9 @@ async function mountAutomaticContext() {
   ReactDOM.createRoot(host).render(React.createElement(Journey));
   const stylesheet = document.createElement("style");
   stylesheet.textContent = await (
-    await fetch(`/src/styles.css?direct&t=${Date.now()}`)
+    await fetch(
+      `${sourceUrl("apps/portal/src/styles.css")}?direct&t=${Date.now()}`,
+    )
   ).text();
   document.head.append(stylesheet);
 }

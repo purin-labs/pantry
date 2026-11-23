@@ -11,10 +11,10 @@ import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const portal = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "../../apps/portal",
-);
+const repository = join(dirname(fileURLToPath(import.meta.url)), "../..");
+const portal = join(repository, "apps/portal");
+// The voice command code, by its path in the repository.
+const command = join(repository, "apps/portal/src/features/voice/command.ts");
 
 export async function loadPortalVoice() {
   // esbuild comes with the Portal's Vite.
@@ -22,7 +22,7 @@ export async function loadPortalVoice() {
   const { build } = createRequire(fromPortal.resolve("vite"))("esbuild");
   const bundle = await build({
     stdin: {
-      contents: `export * from "./src/features/voice/command.ts";
+      contents: `export * from ${JSON.stringify(command)};
 export { keptVoiceText, normalizeVoicePhrase, voiceMacDeadlineMs } from "@purin-labs/control-api";`,
       resolveDir: portal,
       loader: "ts",

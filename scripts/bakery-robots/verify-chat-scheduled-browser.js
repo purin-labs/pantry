@@ -878,7 +878,7 @@ function readSaveInspectionReceipt(id) {
 async function serveWorkspaceStyles(route) {
   await route.fulfill({
     contentType: "application/javascript",
-    body: 'import "/src/styles.css"; import "/src/workflow-demo.css";',
+    body: `import "${checkoutUrl("apps/portal/src/styles.css")}"; import "${checkoutUrl("apps/portal/src/workflow-demo.css")}";`,
   });
 }
 
