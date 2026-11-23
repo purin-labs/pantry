@@ -137,8 +137,9 @@ apart from the Slack resolvers.
    `target_root_unavailable`, `ciphertext_invalid`, `verification_failed` or
    `persistence_conflict`. The operator starts a new job.
 
-- The retained-root check decrypts each `vault_secret` row, revoked rows also. It gives
-  the row count for each key version and the status `passed` or `failed`. A finding is
+- The retained-root check decrypts each `vault_secret` row, revoked rows also. It reads
+  each database in pages in key order and keeps only counts, so it has no row limit. It
+  gives the row count for each key version and the status `passed` or `failed`. A finding is
   `referenced_vault_root_unavailable`, `retained_vault_ciphertext_invalid` or
   `retained_vault_plaintext_invalid`. The runbook requires this check before an
   operator removes a root.
@@ -337,20 +338,20 @@ Operator routes (`control/routes/operators.ts`, `gateway/admin/actor-registry.ts
 A refused role on an Organisation route gets 404. A root rotation needs the
 `support_admin` role and gets 403 (`support_admin_role_required`) without it.
 
-| Limit                                     | Value                                     | Constant                                                      |
-| ----------------------------------------- | ----------------------------------------- | ------------------------------------------------------------- |
-| Items in Purin Vault for one Organisation | 200                                       | `VAULT_ITEM_LIMIT`                                            |
-| Websites of a login                       | 1 to 5. A 1Password view shows 20 at most | `VAULT_ORIGIN_LIMIT`                                          |
-| Label, username, password                 | 80, 254 and 1,024 characters              | In `vault.ts`                                                 |
-| 1Password token                           | 8,192 characters                          | In `vault.ts`                                                 |
-| Request body of a Vault route             | 16,384 bytes                              | `VAULT_ITEM_BODY_LIMIT`                                       |
-| Items in one move request                 | 10                                        | `MOVE_BATCH`                                                  |
-| 1Password list in memory                  | 30 s                                      | `LIST_LIFETIME_MS`                                            |
-| Signed-in 1Password client in memory      | 10 minutes                                | `CLIENT_LIFETIME_MS`                                          |
-| Model key                                 | 20 to 4,096 characters                    | `MODEL_API_KEY_MIN_LENGTH`, `MODEL_API_KEY_MAX_LENGTH`        |
-| Rows in one rotation step                 | 1 to 100                                  | `MAX_ROTATION_BATCH_LIMIT`                                    |
-| Retained-root check                       | 1,000 rows and 8 MiB in all databases     | `MAX_RETAINED_VAULT_ROWS`, `MAX_RETAINED_VAULT_ENCODED_BYTES` |
-| 1Password Worker script                   | One Wasm module, 6 MiB compressed         | `MAXIMUM_COMPRESSED_BYTES`                                    |
+| Limit                                               | Value                                     | Constant                                               |
+| --------------------------------------------------- | ----------------------------------------- | ------------------------------------------------------ |
+| Items in Purin Vault for one Organisation           | 200                                       | `VAULT_ITEM_LIMIT`                                     |
+| Websites of a login                                 | 1 to 5. A 1Password view shows 20 at most | `VAULT_ORIGIN_LIMIT`                                   |
+| Label, username, password                           | 80, 254 and 1,024 characters              | In `vault.ts`                                          |
+| 1Password token                                     | 8,192 characters                          | In `vault.ts`                                          |
+| Request body of a Vault route                       | 16,384 bytes                              | `VAULT_ITEM_BODY_LIMIT`                                |
+| Items in one move request                           | 10                                        | `MOVE_BATCH`                                           |
+| 1Password list in memory                            | 30 s                                      | `LIST_LIFETIME_MS`                                     |
+| Signed-in 1Password client in memory                | 10 minutes                                | `CLIENT_LIFETIME_MS`                                   |
+| Model key                                           | 20 to 4,096 characters                    | `MODEL_API_KEY_MIN_LENGTH`, `MODEL_API_KEY_MAX_LENGTH` |
+| Rows in one rotation step                           | 1 to 100                                  | `MAX_ROTATION_BATCH_LIMIT`                             |
+| Rows that the retained-root check reads at one time | 500, then the next page                   | `RETAINED_VAULT_PAGE_ROWS`                             |
+| 1Password Worker script                             | One Wasm module, 6 MiB compressed         | `MAXIMUM_COMPRESSED_BYTES`                             |
 
 - **Retention.** A revoked `vault_secret` row stays, with its ciphertext. No scheduled
   work deletes `vault_secret` rows, history rows or receipts.
@@ -406,13 +407,10 @@ A refused role on an Organisation route gets 404. A root rotation needs the
 - No route and no script calls the backup export, the backup import, the external
   import (`importExternalVaultSecret`, the 1Password Connect adapter) or
   `vaultRootVersionRemovalStatus`. Tests call them.
-- The retained-root check refuses more than 1,000 rows in total, and rows leave only at
-  a purge.
 - The keyring knows `v1` and `v2`. A third root needs a code change.
 - Only provider actions and provider webhooks write a denial receipt. The purpose
   `harness` has no writer.
-- No E2E journey calls the root rotation routes, the retained-root route or the two
-  credential commands.
+- No E2E journey calls the root rotation routes or the two credential commands.
 - Plan 12 requires one rehearsal of the runbook in a separate Cloudflare environment
   before the first live root rewrap or restore.
 
@@ -429,6 +427,8 @@ A refused role on an Organisation route gets 404. A root rotation needs the
 - E2E journeys in `workers/platform/tests/e2e/`:
   - Items and stores: `vault-items.test.ts` and `vault-onepassword.test.ts`, with
     `vault-support.ts` and the fake 1Password client in `onepassword-network.ts`.
+  - The retained-root check over more than 1,000 rows in two regional databases:
+    `vault-root-closure.test.ts`.
   - Root rotation in two regional databases: `regional-onboarding.test.ts`
     (`regional-execution-support.ts`).
   - Vault rows in provider journeys: `providers-connection.test.ts`,

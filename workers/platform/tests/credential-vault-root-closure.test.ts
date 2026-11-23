@@ -46,10 +46,6 @@ describe("retained Vault root closure", function retainedVaultRootClosureSuite()
   );
   it("rejects an unknown retained key version", rejectsUnknownKeyVersion);
   it(
-    "fails closed when the bounded inventory is exceeded",
-    rejectsOversizedInventory,
-  );
-  it(
     "exposes a metadata-only authenticated inspection route",
     exposesProtectedRoute,
   );
@@ -223,29 +219,6 @@ async function reportsCorruptCiphertext(): Promise<void> {
   expect(JSON.stringify(result)).not.toContain("sensitive-corrupt-ciphertext");
   expect(JSON.stringify(result)).not.toContain("organisation_root_closure");
   expect(JSON.stringify(result)).not.toContain("vault:test:root-corrupt");
-}
-
-async function rejectsOversizedInventory(): Promise<void> {
-  const fixture = rootClosureFixture();
-  const insert = fixture.sqlite.prepare(
-    `INSERT INTO vault_secret (
-       organisation_id, vault_handle, key_version, algorithm, nonce_b64,
-       ciphertext_b64, created_at, rotated_at, revoked_at
-     ) VALUES (?, ?, 'v1', 'AES-GCM-256', 'AA==', 'AA==', 1, NULL, NULL)`,
-  );
-  for (let index = 0; index < 1_001; index += 1) {
-    insert.run(fixture.organisationId, `vault:test:root-limit-${index}`);
-  }
-
-  await expect(
-    inspectRetainedVaultRootClosure({
-      databases: [fixture.db],
-      keys: credentialVaultKeys(false),
-    }),
-  ).resolves.toEqual({
-    ok: false,
-    error: { code: "retained_vault_root_inventory_exceeded" },
-  });
 }
 
 async function reportsInvalidPlaintext(): Promise<void> {

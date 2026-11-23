@@ -12,9 +12,9 @@ import { organisationBootstrapMutation } from "../control-mutation-fixture";
 import { requireOrganisationBootstrap } from "../organisation-execution-fixture";
 import { selectOrganisationPlacementDatabase } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
-  parseInitialOrganisationPlacement,
   parseOrganisationPlacementCells,
   type InitialOrganisationPlacement,
+  type OrganisationPlacementCell,
 } from "@purin-labs/tenancy/placement";
 
 /**
@@ -28,17 +28,10 @@ export function organisationDatabase(
 ): OrganisationDatabase {
   const organisationId = parseOrganisationId(rawOrganisationId);
   if (!organisationId.ok) throw new Error("invalid organisation id");
-  const placement = parseInitialOrganisationPlacement({
-    kind: "affinity",
-    placementEpoch: 1,
-    placementCellId,
-    locationHint: "wnam",
-  });
-  if (!placement.ok) throw new Error(placement.error.path);
   const database = selectOrganisationPlacementDatabase(
     env,
     organisationId.value,
-    placement.value,
+    profileCell(placementCellId).placement,
   );
   if (!database.ok) throw new Error(database.error.code);
   return database.value;
@@ -49,13 +42,27 @@ export function organisationDatabase(
  * Organisation.
  */
 export function rootPlacement(): InitialOrganisationPlacement {
+  const root = profileCells()[0];
+  if (root === undefined) throw new Error("placement profile has no cell");
+  return root.placement;
+}
+
+function profileCells(): readonly OrganisationPlacementCell[] {
   const cells = parseOrganisationPlacementCells(
     env.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
   );
   if (!cells.ok) throw new Error(cells.error.path);
-  const root = cells.value[0];
-  if (root === undefined) throw new Error("placement profile has no cell");
-  return root.placement;
+  return cells.value;
+}
+
+/** The cell of the placement profile with this id, as production reads it. */
+function profileCell(placementCellId: string): OrganisationPlacementCell {
+  const cell = profileCells().find(
+    (candidate) => candidate.placement.placementCellId === placementCellId,
+  );
+  if (cell === undefined)
+    throw new Error(`placement cell ${placementCellId} is not in the profile`);
+  return cell;
 }
 
 /**
@@ -63,14 +70,7 @@ export function rootPlacement(): InitialOrganisationPlacement {
  * their Organisations.
  */
 export function fixtureDatabase(placementCellId = "e2e"): OrganisationDatabase {
-  const cells = parseOrganisationPlacementCells(
-    env.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
-  );
-  if (!cells.ok) throw new Error(cells.error.path);
-  const cell = cells.value.find(
-    (candidate) => candidate.placement.placementCellId === placementCellId,
-  );
-  const database = cell === undefined ? undefined : env[cell.databaseBinding];
+  const database = env[profileCell(placementCellId).databaseBinding];
   if (database === undefined)
     throw new Error(`placement cell ${placementCellId} has no database`);
   return organisationHandle(database);
@@ -105,19 +105,12 @@ export async function onboardFixtureOrganisation(
     },
     now,
   });
-  const placement = parseInitialOrganisationPlacement({
-    kind: "affinity",
-    placementEpoch: 1,
-    placementCellId,
-    locationHint: "wnam",
-  });
-  if (!placement.ok) throw new Error(placement.error.path);
   const created = await requireOrganisationBootstrap({
     env,
     owner,
     organisationName: name,
     environment: "development",
-    placement: placement.value,
+    placement: profileCell(placementCellId).placement,
     mutation: organisationBootstrapMutation(owner, now),
     now,
   });

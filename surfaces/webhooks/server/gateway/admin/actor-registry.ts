@@ -1653,12 +1653,6 @@ function retainedVaultRootClosureErrorResponse(
   error: RetainedVaultRootClosureError,
 ): Response {
   switch (error.code) {
-    case "retained_vault_root_inventory_exceeded":
-      return errorResponse(
-        error.code,
-        "Retained Vault inventory exceeds the bounded audit.",
-        409,
-      );
     case "vault_active_key_version_invalid":
     case "vault_root_key_version_invalid":
     case "vault_root_binding_invalid":

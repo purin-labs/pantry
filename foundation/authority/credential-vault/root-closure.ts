@@ -10,18 +10,18 @@ import {
   loadCredentialVaultKeyRing,
   vaultRootForVersion,
   type CredentialVaultBindings,
+  type VaultKeyRing,
   type VaultKeyRingError,
   type VaultKeyVersion,
 } from "./keyring";
 import { validateVaultPlaintext } from "./service";
 
-const MAX_RETAINED_VAULT_ROWS = 1_000;
-const MAX_RETAINED_VAULT_ENCODED_BYTES = 8 * 1024 * 1024;
-
-type RetainedVaultInventoryRow = {
-  readonly rowCount: unknown;
-  readonly encodedBytes: unknown;
-};
+/**
+ * The check reads the rows of each database in pages of this size, in the
+ * order of their key, and keeps only counts. So the whole Vault fits in one
+ * check, however many rows it has.
+ */
+const RETAINED_VAULT_PAGE_ROWS = 500;
 
 type RetainedVaultCiphertextRow = {
   readonly organisationId: unknown;
@@ -88,8 +88,15 @@ export type RetainedVaultRootClosure =
 export type RetainedVaultRootClosureError =
   | VaultKeyRingError
   | { readonly code: "retained_vault_root_data_invalid" }
-  | { readonly code: "retained_vault_root_inventory_exceeded" }
   | { readonly code: "retained_vault_root_persistence_failed" };
+
+type VersionCounts = {
+  rowCount: number;
+  decryptedCount: number;
+  unavailableCount: number;
+  invalidCiphertextCount: number;
+  invalidPlaintextCount: number;
+};
 
 export async function inspectRetainedVaultRootClosure(input: {
   readonly databases: readonly OrganisationDatabase[];
@@ -98,89 +105,35 @@ export async function inspectRetainedVaultRootClosure(input: {
   const keyRing = await loadCredentialVaultKeyRing(input.keys);
   if (!keyRing.ok) return keyRing;
 
-  const rows: ParsedRetainedVaultCiphertextRow[] = [];
-  let encodedBytes = 0;
-  for (const database of new Set(input.databases)) {
-    const queried = await readRetainedVaultCiphertextRows(database);
-    if (!queried.ok) return queried;
-    for (const raw of queried.value) {
-      const parsed = parseRetainedVaultCiphertextRow(raw);
-      if (!parsed.ok) return parsed;
-      encodedBytes +=
-        parsed.value.nonceB64.length + parsed.value.ciphertextB64.length;
-      if (
-        rows.length >= MAX_RETAINED_VAULT_ROWS ||
-        encodedBytes > MAX_RETAINED_VAULT_ENCODED_BYTES
-      ) {
-        return {
-          ok: false,
-          error: { code: "retained_vault_root_inventory_exceeded" },
-        };
-      }
-      rows.push(parsed.value);
-    }
-  }
-
-  const versionCounts = new Map<
-    VaultKeyVersion,
-    {
-      rowCount: number;
-      decryptedCount: number;
-      unavailableCount: number;
-      invalidCiphertextCount: number;
-      invalidPlaintextCount: number;
-    }
-  >();
+  const versionCounts = new Map<VaultKeyVersion, VersionCounts>();
+  let auditedRowCount = 0;
   let revokedRowCount = 0;
-
-  for (const row of rows) {
-    if (row.revokedAt !== null) revokedRowCount += 1;
-    const counts = versionCounts.get(row.keyVersion) ?? {
-      rowCount: 0,
-      decryptedCount: 0,
-      unavailableCount: 0,
-      invalidCiphertextCount: 0,
-      invalidPlaintextCount: 0,
-    };
-    counts.rowCount += 1;
-    versionCounts.set(row.keyVersion, counts);
-
-    const root = vaultRootForVersion(keyRing.value, row.keyVersion);
-    if (!root.ok) {
-      if (root.error.code === "vault_key_version_invalid") {
-        return {
-          ok: false,
-          error: { code: "retained_vault_root_data_invalid" },
-        };
+  for (const database of new Set(input.databases)) {
+    let after: RetainedVaultRowKey | null = null;
+    for (;;) {
+      const page = await readRetainedVaultCiphertextPage(database, after);
+      if (!page.ok) return page;
+      for (const raw of page.value) {
+        const row = parseRetainedVaultCiphertextRow(raw);
+        if (!row.ok) return row;
+        auditedRowCount += 1;
+        if (row.value.revokedAt !== null) revokedRowCount += 1;
+        const checked = await checkRetainedVaultRow(
+          keyRing.value,
+          row.value,
+          versionCounts,
+        );
+        if (!checked.ok) return checked;
+        after = row.value;
       }
-      counts.unavailableCount += 1;
-      continue;
+      if (page.value.length < RETAINED_VAULT_PAGE_ROWS) break;
     }
-
-    const decrypted = await decryptVaultPayload({
-      key: root.value.key,
-      organisationId: row.organisationId,
-      handle: row.vaultHandle,
-      keyVersion: row.keyVersion,
-      nonceB64: row.nonceB64,
-      ciphertextB64: row.ciphertextB64,
-    });
-    if (!decrypted.ok) {
-      counts.invalidCiphertextCount += 1;
-      continue;
-    }
-    const plaintext = validateVaultPlaintext(decrypted.value, row.vaultHandle);
-    if (!plaintext.ok) {
-      counts.invalidPlaintextCount += 1;
-      continue;
-    }
-    counts.decryptedCount += 1;
   }
 
   const findings = rootClosureFindings(versionCounts);
   const versions = rootVersionSummaries(versionCounts);
   const counts: RetainedVaultRootClosureCounts = {
-    auditedRowCount: rows.length,
+    auditedRowCount,
     revokedRowCount,
     versions,
   };
@@ -194,46 +147,69 @@ export async function inspectRetainedVaultRootClosure(input: {
   };
 }
 
-async function readRetainedVaultCiphertextRows(
+type RetainedVaultRowKey = Readonly<{
+  organisationId: string;
+  vaultHandle: string;
+}>;
+
+/** Decrypts one row with the root of its version and counts the outcome. */
+async function checkRetainedVaultRow(
+  keyRing: VaultKeyRing,
+  row: ParsedRetainedVaultCiphertextRow,
+  versionCounts: Map<VaultKeyVersion, VersionCounts>,
+): Promise<
+  Result<null, { readonly code: "retained_vault_root_data_invalid" }>
+> {
+  const counts = versionCounts.get(row.keyVersion) ?? {
+    rowCount: 0,
+    decryptedCount: 0,
+    unavailableCount: 0,
+    invalidCiphertextCount: 0,
+    invalidPlaintextCount: 0,
+  };
+  counts.rowCount += 1;
+  versionCounts.set(row.keyVersion, counts);
+
+  const root = vaultRootForVersion(keyRing, row.keyVersion);
+  if (!root.ok) {
+    if (root.error.code === "vault_key_version_invalid")
+      return { ok: false, error: { code: "retained_vault_root_data_invalid" } };
+    counts.unavailableCount += 1;
+    return { ok: true, value: null };
+  }
+  const decrypted = await decryptVaultPayload({
+    key: root.value.key,
+    organisationId: row.organisationId,
+    handle: row.vaultHandle,
+    keyVersion: row.keyVersion,
+    nonceB64: row.nonceB64,
+    ciphertextB64: row.ciphertextB64,
+  });
+  if (!decrypted.ok) {
+    counts.invalidCiphertextCount += 1;
+    return { ok: true, value: null };
+  }
+  const plaintext = validateVaultPlaintext(decrypted.value, row.vaultHandle);
+  if (!plaintext.ok) {
+    counts.invalidPlaintextCount += 1;
+    return { ok: true, value: null };
+  }
+  counts.decryptedCount += 1;
+  return { ok: true, value: null };
+}
+
+/** One page of rows, in key order, after the key of the last row read. */
+async function readRetainedVaultCiphertextPage(
   db: OrganisationDatabase,
+  after: RetainedVaultRowKey | null,
 ): Promise<
   Result<
     readonly RetainedVaultCiphertextRow[],
     | { readonly code: "retained_vault_root_persistence_failed" }
     | { readonly code: "retained_vault_root_data_invalid" }
-    | { readonly code: "retained_vault_root_inventory_exceeded" }
   >
 > {
   try {
-    const inventory = await db
-      .prepare(
-        `SELECT COUNT(*) AS rowCount,
-              COALESCE(SUM(LENGTH(nonce_b64) + LENGTH(ciphertext_b64)), 0)
-                AS encodedBytes
-       FROM vault_secret`,
-      )
-      .first<RetainedVaultInventoryRow>();
-    if (
-      inventory === null ||
-      typeof inventory.rowCount !== "number" ||
-      !Number.isSafeInteger(inventory.rowCount) ||
-      inventory.rowCount < 0 ||
-      typeof inventory.encodedBytes !== "number" ||
-      !Number.isSafeInteger(inventory.encodedBytes) ||
-      inventory.encodedBytes < 0
-    ) {
-      return { ok: false, error: { code: "retained_vault_root_data_invalid" } };
-    }
-    if (
-      inventory.rowCount > MAX_RETAINED_VAULT_ROWS ||
-      inventory.encodedBytes > MAX_RETAINED_VAULT_ENCODED_BYTES
-    ) {
-      return {
-        ok: false,
-        error: { code: "retained_vault_root_inventory_exceeded" },
-      };
-    }
-
     const result = await db
       .prepare(
         `SELECT organisation_id AS organisationId,
@@ -244,13 +220,20 @@ async function readRetainedVaultCiphertextRows(
               ciphertext_b64 AS ciphertextB64,
               revoked_at AS revokedAt
        FROM vault_secret
+       WHERE ? IS NULL OR organisation_id > ?
+         OR (organisation_id = ? AND vault_handle > ?)
        ORDER BY organisation_id, vault_handle
        LIMIT ?`,
       )
-      .bind(MAX_RETAINED_VAULT_ROWS)
+      .bind(
+        after?.organisationId ?? null,
+        after?.organisationId ?? null,
+        after?.organisationId ?? null,
+        after?.vaultHandle ?? null,
+        RETAINED_VAULT_PAGE_ROWS,
+      )
       .all<RetainedVaultCiphertextRow>();
-    return Array.isArray(result.results) &&
-      result.results.length === inventory.rowCount
+    return Array.isArray(result.results)
       ? { ok: true, value: result.results }
       : { ok: false, error: { code: "retained_vault_root_data_invalid" } };
   } catch {
