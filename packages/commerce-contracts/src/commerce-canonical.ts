@@ -186,14 +186,24 @@ function outOfRange(): never {
   });
 }
 
-const MAX_QUANTITY = 9007199254740991;
-
+/**
+ * A counted or measured quantity: a safe integer of zero or more, with a
+ * scale of 0 to 6 decimal places, and no scale for `each`. An available
+ * quantity, which can be below zero, is `availableQuantity`.
+ */
 export function quantity(
   amount: number,
   scale: number,
   unit: QuantityUnit,
 ): Quantity {
-  if (scale > 6 || (unit === "each" && scale !== 0) || amount > MAX_QUANTITY)
+  if (!Number.isSafeInteger(amount) || amount < 0)
+    rejectCommerce({ code: "invalid_quantity", field: "quantity.amount" });
+  if (
+    !Number.isInteger(scale) ||
+    scale < 0 ||
+    scale > 6 ||
+    (unit === "each" && scale !== 0)
+  )
     rejectCommerce({ code: "invalid_quantity", field: "quantity.scale" });
   return { amount, scale, unit };
 }
@@ -213,9 +223,11 @@ export function availableQuantity(
   unit: QuantityUnit,
 ): Quantity {
   if (
+    !Number.isSafeInteger(amount) ||
+    !Number.isInteger(scale) ||
+    scale < 0 ||
     scale > 6 ||
-    (unit === "each" && scale !== 0) ||
-    Math.abs(amount) > MAX_QUANTITY
+    (unit === "each" && scale !== 0)
   )
     rejectCommerce({ code: "invalid_quantity", field: "availableQuantity" });
   return { amount, scale, unit };
