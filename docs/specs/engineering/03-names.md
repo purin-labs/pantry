@@ -302,7 +302,6 @@ exported `PurinMark` and `PurinIcon`.
 - The browser storage keys `pantry:cafeos:sidebar-expanded` and
   `pantry.bakeryos.vitrineCustomOrders.v1`.
 - The root package name `seams-pantry`.
-- A comment in `surface-observation.ts` says that the wire values keep old names.
 
 **The commerce engine in Portal text:** `areas/organisation/ui/pages/automation.tsx` and
 `areas/commerce/ui/features/commerce/production-plan.tsx` show these words to people.

@@ -106,8 +106,8 @@ export const chatOriginSchema = Type.Object({
 export type SurfaceArea = Static<typeof surfaceAreaSchema>;
 
 /**
- * The names that people and the model see for each area. The wire values
- * keep their old names (Plan 91), so a label never comes from the value.
+ * The names that people and the model see for each area. A wire value is a
+ * code name, such as `cafe`, so a label never comes from the value.
  */
 const SURFACE_AREA_TITLES: Readonly<Record<SurfaceArea, string>> = {
   Workspace: "Workspace",
