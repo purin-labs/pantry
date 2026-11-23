@@ -99,7 +99,8 @@ export async function readTerminalAssignmentRevision(
  * location was selling through.
  *
  * Retirement and activation happen together so the location is never briefly
- * bound to two terminals, and never to none.
+ * bound to two terminals, and never to none. The caller first asks
+ * `counterCollectionRefusal` whether the active assignment may end.
  */
 export async function activateTerminalAssignment(
   input: Readonly<{

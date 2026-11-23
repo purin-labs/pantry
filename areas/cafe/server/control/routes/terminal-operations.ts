@@ -26,7 +26,10 @@ import {
   activateTerminalAssignment,
   readActiveTerminalAssignment,
 } from "../../data/terminal-assignment-store";
-import { retireCounterTerminal } from "../../terminal-retirement";
+import {
+  counterCollectionRefusal,
+  retireCounterTerminal,
+} from "../../terminal-retirement";
 import { readTerminalOperations } from "../../data/terminal-operations-readback";
 import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
@@ -539,6 +542,19 @@ async function handleTerminalSandboxConfiguration(
       return controlError(recordedMutationReceipt.error.code, 409);
     return controlJson(responseBody);
   }
+  const refusal = current.ok
+    ? await counterCollectionRefusal(
+        {
+          env,
+          scope: authorized.executionScope,
+          organisationId: authorized.organisationId,
+          pantryLocationId: selection.pantryLocationId,
+        },
+        current.value,
+      )
+    : null;
+  if (refusal !== null)
+    return controlError(refusal, RETIREMENT_ERROR_STATUS[refusal]);
   const now = Date.now();
   const assignment = buildSandboxAssignment({
     organisationId: authorized.organisationId,
@@ -1036,6 +1052,22 @@ async function assignCounterTarget(
     current.value.adapterVersion === next.adapterVersion &&
     JSON.stringify(current.value.target) === JSON.stringify(next.target) &&
     JSON.stringify(current.value.account) === JSON.stringify(account);
+  // A new target replaces the active assignment, which ends only when its
+  // last collection is resolved.
+  const refusal =
+    current.ok && !unchanged
+      ? await counterCollectionRefusal(
+          {
+            env: change.env,
+            scope: authorized.executionScope,
+            organisationId: authorized.organisationId,
+            pantryLocationId: selection.pantryLocationId,
+          },
+          current.value,
+        )
+      : null;
+  if (refusal !== null)
+    return controlError(refusal, RETIREMENT_ERROR_STATUS[refusal]);
   const now = Date.now();
   if (!unchanged) {
     const assignment = parseTerminalAssignment({

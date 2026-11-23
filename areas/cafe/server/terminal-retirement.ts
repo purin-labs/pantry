@@ -1,5 +1,6 @@
 import { resolveCommerceMerchant } from "@purin-labs/area-commerce/server/contract/square-link";
 import { deviceFleetStub } from "@purin-labs/area-devices/server/contract/fleet-stub";
+import type { TerminalAssignment } from "@purin-labs/commerce-contracts";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
@@ -16,21 +17,50 @@ type CounterRetirementError = Readonly<{
     | "terminal_assignment_not_found"
     | "terminal_assignment_corrupt"
     | "terminal_assignment_conflict"
-    | "terminal_collection_unresolved"
-    | "terminal_collection_unverifiable";
+    | CounterCollectionRefusal;
+}>;
+
+/** Why the active assignment of a counter cannot end now. */
+export type CounterCollectionRefusal =
+  "terminal_collection_unresolved" | "terminal_collection_unverifiable";
+
+type CounterScope = Readonly<{
+  env: Env;
+  scope: OrganisationExecutionScope;
+  organisationId: OrganisationId;
+  pantryLocationId: string;
 }>;
 
 /**
- * Retires the assignment of a counter: the counter stops taking card
- * payments, and the provider connection stays.
+ * Whether the active assignment of a counter may end, by a retirement or by
+ * a new assignment that replaces it. Null: it may.
  *
  * A LAN terminal (`lan_gateway_device`, GMO stera) with an unresolved
- * collection cannot be retired. The only code that records its capture or
- * its decline on the sale reads the active assignment of the counter, so a
- * retirement would leave a captured card payment unrecorded on the sale. The
- * operator finishes or cancels the collection first. A Square payment
- * attempt keeps its own binding, and the commerce engine reconciles it
- * without the assignment, so a Square counter retires at once.
+ * collection may not. The only code that records its capture or its decline
+ * on the sale reads the active assignment of the counter, so an end would
+ * leave a captured card payment unrecorded on the sale. The operator finishes
+ * or cancels the collection first. A Square payment attempt keeps its own
+ * binding, and the commerce engine reconciles it without the assignment, so
+ * a Square assignment ends at once.
+ */
+export async function counterCollectionRefusal(
+  input: CounterScope,
+  assignment: TerminalAssignment,
+): Promise<CounterCollectionRefusal | null> {
+  const target = assignment.target;
+  if (target.kind !== "lan_gateway_device") return null;
+  const state = await gatewayCollectionState(
+    input,
+    target.gatewayId,
+    target.deviceSourceKey,
+  );
+  return state === "resolved" ? null : state;
+}
+
+/**
+ * Retires the assignment of a counter: the counter stops taking card
+ * payments, and the provider connection stays. `counterCollectionRefusal`
+ * holds the rule for an open collection.
  */
 export async function retireCounterTerminal(
   input: Readonly<{
@@ -57,15 +87,8 @@ export async function retireCounterTerminal(
             : "terminal_assignment_not_found",
       },
     };
-  const target = assignment.value.target;
-  if (target.kind === "lan_gateway_device") {
-    const open = await gatewayCollectionState(
-      input,
-      target.gatewayId,
-      target.deviceSourceKey,
-    );
-    if (open !== "resolved") return { ok: false, error: { code: open } };
-  }
+  const refusal = await counterCollectionRefusal(input, assignment.value);
+  if (refusal !== null) return { ok: false, error: { code: refusal } };
   const retired = await retireTerminalAssignment({
     db,
     organisationId: input.organisationId,
@@ -87,19 +110,10 @@ export async function retireCounterTerminal(
  * for a decline or a cancel.
  */
 async function gatewayCollectionState(
-  input: Readonly<{
-    env: Env;
-    scope: OrganisationExecutionScope;
-    organisationId: OrganisationId;
-    pantryLocationId: string;
-  }>,
+  input: CounterScope,
   gatewayId: string,
   sourceKey: string,
-): Promise<
-  | "resolved"
-  | "terminal_collection_unresolved"
-  | "terminal_collection_unverifiable"
-> {
+): Promise<"resolved" | CounterCollectionRefusal> {
   const fleet = deviceFleetStub(input.env, input.scope, input.pantryLocationId);
   if (fleet === null) return "terminal_collection_unverifiable";
   const record = await fleet.readTerminalCollection(gatewayId, sourceKey);

@@ -8,6 +8,11 @@ import type { CounterRegisterSnapshot } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 
 import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/index";
+import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
+import { persistProviderResourceSnapshot } from "@purin-labs/connections/data/provider-resource";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import {
   commerceClient,
   commerceWorkspace,
@@ -253,4 +258,67 @@ async function required<T>(
     throw new Error(`Commerce call failed: ${JSON.stringify(result.error)}`);
   }
   return result.value;
+}
+
+/** Square's sandbox device that approves each payment. */
+export const SQUARE_SANDBOX_APPROVING_DEVICE =
+  "9fa747a2-25ff-48ee-b078-04381f7c828f";
+
+/**
+ * The café's Square sandbox account with one location that takes yen, as a
+ * connection and a refresh of its resources leave them.
+ */
+export async function connectSquareSandbox(
+  organisationId: OrganisationId,
+  userId: UserId,
+): Promise<
+  Readonly<{ integrationAccountId: string; providerLocationId: string }>
+> {
+  const handle = parseVaultHandle("vault:square:register-sandbox");
+  if (!handle.ok) throw new Error("Invalid vault handle");
+  const db = organisationDatabase(organisationId);
+  const now = Date.now();
+  const providerLocationId = "LSANDBOXCAFE01";
+  const connected = await createActiveConnectedIntegration(db, {
+    organisationId,
+    provider: "square",
+    providerSubjectId: "MLSANDBOXCAFE01",
+    environment: "development",
+    authMode: "shared_pantry_app",
+    authority: { kind: "connection_credential", credentialRef: handle.value },
+    grantedScopes: [
+      "PAYMENTS_READ",
+      "PAYMENTS_WRITE",
+      "DEVICE_CREDENTIAL_MANAGEMENT",
+    ],
+    createdByUserId: userId,
+    providerAccountId: "MLSANDBOXCAFE01",
+    accountKind: "merchant_account",
+    displayName: "Square sandbox café",
+    capabilities: ["payments.read", "payments.collect_in_person"],
+    audiencePolicy: { kind: "operator" },
+    retentionPolicy: { kind: "organisation_default" },
+    now,
+  });
+  const integrationAccountId = connected.account.integrationAccountId;
+  await persistProviderResourceSnapshot({
+    db,
+    organisationId,
+    integrationAccountId,
+    provider: "square",
+    environment: "development",
+    resources: [
+      {
+        canonicalResourceId: `square:location:${providerLocationId}`,
+        providerResourceId: providerLocationId,
+        providerAccountId: "MLSANDBOXCAFE01",
+        displayLabel: "Sandbox café",
+        accessState: "accessible",
+        providerRevision: `square-location:${providerLocationId}:JP:JPY:payments-enabled`,
+        resourceKind: "payment_location",
+      },
+    ],
+    now,
+  });
+  return { integrationAccountId, providerLocationId };
 }

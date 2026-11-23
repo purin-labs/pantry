@@ -17,6 +17,8 @@ import {
   DRINK_ENTRY,
   MENU_ID,
   OAT_MILK_MOD,
+  SQUARE_SANDBOX_APPROVING_DEVICE,
+  connectSquareSandbox,
   extractRegister,
   menuLine,
   setupRegisterShop,
@@ -38,7 +40,7 @@ it(
 );
 
 it(
-  "collects FeliCa over GMO stera LAN gateway via DeviceFleetActor, enforces terminal exclusivity and result_unknown lock across socket drop/reconnect, refuses to retire the counter until the sale records the payment, and settles manual cash refund",
+  "collects FeliCa over GMO stera LAN gateway via DeviceFleetActor, enforces terminal exclusivity and result_unknown lock across socket drop/reconnect, refuses to retire or replace the counter until the sale records the payment, and settles manual cash refund",
   { timeout: 180_000 },
   gmoSteraLanGatewayEndToEndJourney,
 );
@@ -340,6 +342,11 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
     now: Date.now(),
   });
   expect(saved.ok).toBe(true);
+  // Input: the café also connected a Square sandbox account.
+  const square = await connectSquareSandbox(
+    parsedOrgId.value,
+    owner.identity.userId,
+  );
 
   // Verify Register snapshot exposes the gmo_stera LAN terminal.
   const register = extractRegister(
@@ -422,6 +429,32 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
   expect(retiredWhileCollecting.body).toMatchObject({
     error: "terminal_collection_unresolved",
   });
+
+  // Nor can the owner replace it with a Square sandbox terminal: the new
+  // assignment would retire the stera one, and the capture would never
+  // reach the sale. The Register keeps the stera terminal.
+  const squareTerminal = {
+    pantryLocationId: locationId,
+    integrationAccountId: square.integrationAccountId,
+    providerLocationId: square.providerLocationId,
+    testDeviceId: SQUARE_SANDBOX_APPROVING_DEVICE,
+  };
+  const replacedWhileCollecting = await send(
+    `${base}/commerce/terminal-operations`,
+    owner.session,
+    "POST",
+    squareTerminal,
+  );
+  expect(replacedWhileCollecting.status).toBe(409);
+  expect(replacedWhileCollecting.body).toMatchObject({
+    error: "terminal_collection_unresolved",
+  });
+  expect(
+    extractRegister(
+      (await send(`${base}/commerce/counter-register`, staff.session, "GET"))
+        .body,
+    ).terminal,
+  ).toMatchObject({ assigned: true, targetKind: "lan_gateway_device" });
 
   // 4. Exclusivity: second concurrent sale on the same terminal is refused with 409 terminal_busy!
   const checkout2 = `chk_stera_2_${crypto.randomUUID().slice(0, 8)}`;
@@ -586,8 +619,22 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
   const refundedSale = parseCounterSaleEnvelope(ownerManualRefund.body);
   expect(refundedSale.afterSale?.refundState).toBe("completed");
 
-  // 8. The sale records the payment, so the operator retires the counter, and
-  // the Register shows no terminal.
+  // 8. The sale records the payment, so the owner moves the counter to the
+  // Square sandbox terminal. The operator then retires the counter, and the
+  // Register shows no terminal.
+  const replaced = await send(
+    `${base}/commerce/terminal-operations`,
+    owner.session,
+    "POST",
+    squareTerminal,
+  );
+  expect(replaced.status, JSON.stringify(replaced.body)).toBe(200);
+  expect(
+    extractRegister(
+      (await send(`${base}/commerce/counter-register`, staff.session, "GET"))
+        .body,
+    ).terminal,
+  ).toMatchObject({ assigned: true, targetKind: "sandbox_simulated" });
   const retired = await send(retirement, staff.session, "POST", {});
   expect(retired.status, JSON.stringify(retired.body)).toBe(200);
   const afterRetirement = extractRegister(

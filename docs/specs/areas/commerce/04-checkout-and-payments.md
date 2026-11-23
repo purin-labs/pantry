@@ -146,9 +146,12 @@ outside the engine. A `gmo_stera` collection runs through the Platform `DeviceFl
   recoverable after a retirement. The record of a `gmo_stera` capture or decline on the
   sale reads the active assignment, so an operator cannot retire a `lan_gateway_device`
   counter while its last collection is unresolved: the terminal still collects, its
-  result is unknown, or the sale does not record the result yet. The refusal
-  (`terminal_collection_unresolved`, 409) tells the operator to finish or cancel the
-  collection first. When Pantry cannot read the collection, the refusal is
+  result is unknown, or the sale does not record the result yet. An admin cannot
+  replace it with a Square target either (the Sandbox, pairing and Point of Sale app
+  paths): the new assignment would retire it. `counterCollectionRefusal`
+  (`areas/cafe/server/terminal-retirement.ts`) holds the rule for each path. The
+  refusal (`terminal_collection_unresolved`, 409) tells the operator to finish or
+  cancel the collection first. When Pantry cannot read the collection, the refusal is
   `terminal_collection_unverifiable` (503).
 
 | Target               | Environment   | How Pantry makes it                                                                                                                                                                                                                                      |
