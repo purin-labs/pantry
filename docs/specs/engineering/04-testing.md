@@ -71,9 +71,10 @@ not run. `pnpm test:units` does not run the commerce suite. In a new worktree, i
 the R2 files, `pnpm async-control:build` and
 `pnpm --filter @purin-labs/platform contracts:media`.
 
-The Portal `test` script names its five files. A new Portal test file does not run until
-the script names it. `crates/bakery-native` is outside the Cargo workspace, so
-`cargo test --workspace` does not run it.
+The Portal `test` script runs each `*.test.mjs` file of the Portal: under
+`apps/portal/src/`, `foundation/ui/` and the `ui/` folder of each area and surface. A
+new Portal test file runs with no change to the script. `crates/bakery-native` is outside
+the Cargo workspace, so `cargo test --workspace` does not run it.
 
 ### Run the checks
 
