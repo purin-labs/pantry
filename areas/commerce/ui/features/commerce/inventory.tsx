@@ -14,7 +14,7 @@ import {
 } from "@purin-labs/commerce-contracts";
 import React from "react";
 import { Link } from "react-router";
-import { controlRead } from "@purin-labs/control/portal/control-client";
+import { readCommerceCosts, readInventory } from "./requests";
 import { ArrowUpRight, Package, Search } from "lucide-react";
 import {
   CrmIdentity,
@@ -390,13 +390,10 @@ export class InventoryPage extends React.Component<Props, State> {
     const controller = new AbortController();
     this.controller = controller;
     try {
-      const orgSegment = encodeURIComponent(this.props.organisationId);
       const [inventory, costs] = await Promise.all([
-        controlRead(`/v1/control/organisations/${orgSegment}/commerce/inventory`),
+        readInventory(this.props.organisationId),
         this.props.view === "products"
-          ? controlRead(
-              `/v1/control/organisations/${orgSegment}/commerce/costs`,
-            ).catch(() => null)
+          ? readCommerceCosts(this.props.organisationId).catch(() => null)
           : Promise.resolve(null),
       ]);
       const data = parseInventory(inventory);

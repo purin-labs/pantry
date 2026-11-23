@@ -1,7 +1,6 @@
 import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import {
-  parseInventoryReceiptContext,
   parseInventoryQuantityText,
   type InventoryReceiptContext,
 } from "@purin-labs/kitchen-control-api";
@@ -10,7 +9,7 @@ import {
   type CommerceInventoryLotInputV1,
 } from "@purin-labs/commerce-client";
 import { errorMessage, isRecord } from "@purin-labs/std";
-import { controlRead } from "@purin-labs/control/portal/control-client";
+import { readReceiptContext, receiptPath } from "./requests";
 import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 import type { CommerceMutationTransport } from "./entity-plane/api";
 import {
@@ -117,10 +116,9 @@ export class InventoryReceiptDialog extends React.Component<Props, State> {
       this.setState({ ...preserved, kind: "refreshing", message: null });
     }
     try {
-      const context = parseInventoryReceiptContext(
-        await controlRead(
-          `${receiptPath(this.props.organisationId)}?position=${encodeURIComponent(this.props.positionId)}`,
-        ),
+      const context = await readReceiptContext(
+        this.props.organisationId,
+        this.props.positionId,
       );
       if (this.active) {
         this.setState({
@@ -441,10 +439,6 @@ function formText(form: FormData, name: string): string {
     throw new Error("Complete the required receipt fields.");
   }
   return value.trim();
-}
-
-function receiptPath(organisationId: string): string {
-  return `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/inventory/receipts`;
 }
 
 function purchaseFields(

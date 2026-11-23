@@ -1,10 +1,7 @@
 import React from "react";
 import { Link } from "react-router";
-import { controlRead } from "@purin-labs/control/portal/control-client";
-import {
-  parseInventoryReceiptContext,
-  type InventoryReceiptContext,
-} from "@purin-labs/kitchen-control-api";
+import { readReceiptContext } from "./requests";
+import type { InventoryReceiptContext } from "@purin-labs/kitchen-control-api";
 import type { Variant } from "@purin-labs/type-utils";
 
 type Props = Readonly<{
@@ -30,10 +27,9 @@ export class InventoryPurchases extends React.Component<Props, State> {
   }
   async load() {
     try {
-      const context = parseInventoryReceiptContext(
-        await controlRead(
-          `/v1/control/organisations/${encodeURIComponent(this.props.organisationId)}/commerce/inventory/receipts?position=${encodeURIComponent(this.props.positionId)}`,
-        ),
+      const context = await readReceiptContext(
+        this.props.organisationId,
+        this.props.positionId,
       );
       if (!this.controller.signal.aborted)
         this.setState({ kind: "ready", purchases: context.purchases });

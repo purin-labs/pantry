@@ -1,7 +1,7 @@
 import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import {
-  parseInventoryReceiptContext,
+  parseInventoryQuantityText as inventoryQuantityInput,
   type InventoryReceiptContext,
 } from "@purin-labs/kitchen-control-api";
 import {
@@ -9,9 +9,8 @@ import {
   type ReconcileCommerceInventoryV1,
 } from "@purin-labs/commerce-client";
 import { isRecord } from "@purin-labs/std";
-import { controlRead } from "@purin-labs/control/portal/control-client";
+import { readReconciliationContext, reconciliationPath } from "./requests";
 import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
-import { parseInventoryQuantityText as inventoryQuantityInput } from "@purin-labs/kitchen-control-api";
 import type { CommerceMutationTransport } from "./entity-plane/api";
 import {
   StockDialogCancel,
@@ -104,10 +103,9 @@ export class InventoryReconciliationDialog extends React.Component<
     try {
       const submission =
         preserved === null ? readReconciliationSubmission(this.scope()) : null;
-      const context = parseInventoryReceiptContext(
-        await controlRead(
-          `${reconciliationPath(this.props.organisationId)}?position=${encodeURIComponent(this.props.positionId)}`,
-        ),
+      const context = await readReconciliationContext(
+        this.props.organisationId,
+        this.props.positionId,
       );
       if (context.onHandQuantity === null) {
         throw new Error(
@@ -696,10 +694,6 @@ function reconciliationPreview(
   } catch {
     return "Enter a supported quantity to review the change.";
   }
-}
-
-function reconciliationPath(organisationId: string): string {
-  return `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/inventory/reconciliations`;
 }
 
 function reconciliationError(error: unknown): string {

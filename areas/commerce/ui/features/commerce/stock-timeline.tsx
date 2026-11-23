@@ -6,7 +6,7 @@ import {
   type InventoryDelivery,
 } from "@purin-labs/kitchen-control-api";
 
-import { controlRead } from "@purin-labs/control/portal/control-client";
+import { readInventoryDeliveries } from "./requests";
 import { PageSkeleton, RecoverableError } from "@purin-labs/ui/page-components";
 import {
   nowIn,
@@ -281,9 +281,7 @@ export function StockTimeline(props: {
     const current = ++request.current;
     setLoaded({ kind: "loading" });
     try {
-      const raw = await controlRead(
-        `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/inventory/deliveries`,
-      );
+      const raw = await readInventoryDeliveries(organisationId);
       const deliveries = parseInventoryDeliveries(
         (raw as { deliveries?: unknown }).deliveries,
       );

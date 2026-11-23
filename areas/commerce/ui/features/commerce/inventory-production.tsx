@@ -2,7 +2,6 @@ import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { Link } from "react-router";
 import {
-  parseInventoryProductionContext,
   parseInventoryQuantityText,
   parseProductionDemand,
   type InventoryProductionCreation,
@@ -14,7 +13,14 @@ import {
 import { assertNever, isRecord } from "@purin-labs/std";
 import { StatusChip, type StatusChipStatus } from "@purin-labs/ui/page-components";
 import type { Quantity } from "@purin-labs/commerce-contracts";
-import { ControlApiError, controlRead } from "@purin-labs/control/portal/control-client";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
+import {
+  productionPath,
+  readAllProductionRequests,
+  readProductionContext,
+  readProductionRequest,
+  readProductionRequests,
+} from "./requests";
 import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 import {
   readProductionSubmission,
@@ -134,10 +140,9 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
       });
     }
     try {
-      const context = parseInventoryProductionContext(
-        await controlRead(
-          `${productionPath(this.props.organisationId)}?position=${encodeURIComponent(this.props.positionId)}`,
-        ),
+      const context = await readProductionContext(
+        this.props.organisationId,
+        this.props.positionId,
       );
       const recipe = context.recipes[0] ?? context.linkableRecipes[0];
       if (this.active) {
@@ -779,8 +784,9 @@ export class InventoryProductionRequestsPage extends React.Component<
       });
     }
     try {
-      const raw = await controlRead(
-        productionRequestsPath(this.props.organisationId, cursor),
+      const raw = await readProductionRequests(
+        this.props.organisationId,
+        cursor,
       );
       if (!isRecord(raw) || raw.ok !== true) {
         throw new Error("Production requests are unavailable.");
@@ -888,7 +894,7 @@ export class InventoryProductionRequestsPage extends React.Component<
         { kind: "setup" },
         `production:setup:${crypto.randomUUID()}`,
       );
-      const raw = await controlRead(productionPath(this.props.organisationId));
+      const raw = await readAllProductionRequests(this.props.organisationId);
       if (!isRecord(raw) || raw.ok !== true) {
         throw new Error("Production requests are unavailable.");
       }
@@ -1050,9 +1056,7 @@ export class InventoryProductionRequestsPage extends React.Component<
   private async readRequest(
     id: string,
   ): Promise<Variant<InventoryProductionContext["demand"], "ready">> {
-    const raw = await controlRead(
-      `${productionPath(this.props.organisationId)}?request=${encodeURIComponent(id)}`,
-    );
+    const raw = await readProductionRequest(this.props.organisationId, id);
     if (!isRecord(raw) || raw.ok !== true) {
       throw new Error("The updated request could not be loaded.");
     }
@@ -1303,10 +1307,6 @@ function productionRequestStatus(
   }
 }
 
-function productionPath(organisationId: string): string {
-  return `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/inventory/production-requests`;
-}
-
 function productionError(error: unknown): string {
   return error instanceof Error
     ? error.message
@@ -1399,24 +1399,6 @@ function formatProductionQuantity(
     liter: "L",
   };
   return `${amount.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${labels[unit]}`;
-}
-
-function productionRequestsPath(
-  organisationId: string,
-  cursor: string | null,
-): string {
-  const selected = new URLSearchParams(window.location.search);
-  const query = new URLSearchParams();
-  for (const name of ["inventoryItem", "location"]) {
-    const value = selected.get(name);
-    if (value !== null) {
-      query.set(name, value);
-    }
-  }
-  if (cursor !== null) {
-    query.set("cursor", cursor);
-  }
-  return `${productionPath(organisationId)}${query.size === 0 ? "" : `?${query}`}`;
 }
 
 function selectedLocation(): string | null {
