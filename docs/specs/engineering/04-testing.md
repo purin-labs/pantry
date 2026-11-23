@@ -190,13 +190,14 @@ code, and each one acts only when the Worker has `PANTRY_FAULT_INJECTION_TOKEN`:
 | Fault                              | Storage key                                 | Route                                                    | Test that arms it                                     |
 | ---------------------------------- | ------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------- |
 | Onboarding activation stops        | `acceptance:onboarding-activation-fault:v1` | `/v1/organisations/:id/onboarding/activation-acceptance` | `onboarding-activation.test.ts`, in storage           |
-| The Café commerce queue step fails | `acceptance:cafe-commerce-fault:v1`         | `/v1/acceptance/organisations/:id/cafe-commerce-fault`   | `e2e/commerce-webhook-catch-up.test.ts`, on the Actor |
+| The Café commerce queue step fails | `acceptance:cafe-commerce-fault:v1`         | `/v1/acceptance/organisations/:id/cafe-commerce-fault`   | `e2e/commerce-webhook-catch-up.test.ts`, by the route |
 | A steer answer is lost             | `fault:steer_answer_lost`                   | None                                                     | `e2e/slack-steer-park-loss.test.ts`, in storage       |
 
 The two routes accept `POST`, `GET` and `DELETE`. Any other method gets 405 from every
 caller. An accepted method needs a localhost request or the bearer token, and an
 Organisation in the `development` environment. If one of these is missing, the caller
-gets 404. `pnpm cloudflare:fault-injection-secret` sets the token on production, and
+gets 404. `e2e/commerce-webhook-catch-up.test.ts` calls both routes from a public host,
+with no bearer, a wrong bearer and the bearer. `pnpm cloudflare:fault-injection-secret` sets the token on production, and
 `pnpm cloudflare:fault-injection-secret:delete` removes it.
 
 ### Guard journeys
@@ -380,8 +381,6 @@ The boundaries to the neighbours:
 - **CI does not run some suites.** It does not run `cargo test --workspace` or 89 of the
   128 Kitchen journeys. It also does not run the browser scripts outside the index, the
   journeys on real services or the commerce lab commands.
-- **No test calls the two fault routes.** The tests arm each fault directly. The E2E fault
-  token has 25 characters, so the bearer check of the routes refuses it.
 - **The fault checks differ.** The routes need a token of 32 characters. The three fault
   points act on a shorter token.
 - **The large cuts in money-path test files are not done** (Batch E of Plan 92).

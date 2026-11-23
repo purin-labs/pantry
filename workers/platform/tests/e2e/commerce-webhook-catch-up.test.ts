@@ -2,9 +2,7 @@ import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
-import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
-import { newRequestId } from "@purin-labs/kernel/ids";
 import { runScheduledCommerceOutboxReconciliation } from "@purin-labs/area-commerce/server/outbox-worker";
 import {
   commerceClient,
@@ -35,9 +33,11 @@ it(
  * Pantry's feed cursor reaches the newest event from the posts alone. A post
  * that a stranger signs is refused. When Pantry loses its secret, the posts
  * it cannot verify start no read; the next one-minute run takes a new
- * secret, and the next change arrives by post again. With the Café
- * acceptance fault armed, the next post fails at its queue step and starts
- * no read; the one-minute read still brings Pantry up to date.
+ * secret, and the next change arrives by post again. An operator arms the
+ * Café acceptance fault through its route with the fault injection bearer;
+ * a call from a public host with no bearer or a wrong one is not found. The
+ * next post fails at its queue step and starts no read; the one-minute read
+ * still brings Pantry up to date.
  */
 async function webhookCatchUpJourney({ task }: TestContext): Promise<void> {
   const owner = await commerceClient(`webhook-owner-${crypto.randomUUID()}`);
@@ -162,25 +162,30 @@ async function webhookCatchUpJourney({ task }: TestContext): Promise<void> {
     .poll(() => consumer(merchantId), { timeout: 30_000 })
     .toBe(last[0]);
 
-  // 6. The acceptance fault fails the next post's queue step: the post
-  //    starts no read, and the one-minute read catches up.
-  const organisation = await requireActiveOrganisationActor({
-    env,
-    organisationId,
-    now: Date.now(),
-  });
-  await organisation.armCafeCommerceAcceptanceFault({
-    requestId: newRequestId(),
-    merchantId,
-    armedAt: Date.now(),
+  // 6. The fault route arms nothing for a public call without the fault
+  //    injection bearer, or with a wrong one. With the bearer it arms the
+  //    acceptance fault for the shop's merchant, which fails the next post's
+  //    queue step: the post starts no read, and the one-minute read catches
+  //    up.
+  const bearer = `Bearer ${env.PANTRY_FAULT_INJECTION_TOKEN ?? ""}`;
+  const unarmed = await faultRoute(organisationId, "POST", null);
+  expect(unarmed.status).toBe(404);
+  const forgedBearer = await faultRoute(organisationId, "POST", `${bearer}0`);
+  expect(forgedBearer.status).toBe(404);
+  expect((await readFault(organisationId, bearer)).fault).toBeNull();
+  const armed = await faultRoute(organisationId, "POST", bearer);
+  expect(armed.status, await armed.clone().text()).toBe(200);
+  expect(await armed.json()).toMatchObject({
+    ok: true,
+    fault: { merchantId, queueConsumedAt: null },
   });
   const beforeFault = await consumer(merchantId);
   await shop.describeProduct("ginger_cookie");
   await expect
     .poll(
       async () =>
-        (await organisation.inspectCafeCommerceAcceptanceFault())
-          ?.queueConsumedAt ?? null,
+        (await readFault(organisationId, bearer)).fault?.queueConsumedAt ??
+        null,
       { timeout: 30_000 },
     )
     .not.toBeNull();
@@ -191,6 +196,17 @@ async function webhookCatchUpJourney({ task }: TestContext): Promise<void> {
   await expect
     .poll(() => consumer(merchantId), { timeout: 30_000 })
     .toBe(faulted[0]);
+
+  // 7. The onboarding activation fault route has the same guard: a public
+  //    read with no bearer is not found, and the bearer reads no fault.
+  const activationPath = `/v1/organisations/${organisationId}/onboarding/activation-acceptance`;
+  const activationUnread = await publicCall(activationPath, "GET", null);
+  expect(activationUnread.status).toBe(404);
+  const activationRead = await publicCall(activationPath, "GET", bearer);
+  expect(await activationRead.json()).toEqual({
+    ok: true,
+    inspection: { kind: "absent" },
+  });
 
   task.meta.commerceWebhookCatchUp = {
     subscription: {
@@ -204,8 +220,56 @@ async function webhookCatchUpJourney({ task }: TestContext): Promise<void> {
     lostSecret: { pending: 1, cursorMoved: false },
     rotatedRevisionStep: rotated.revision - subscribed.revision,
     changeAfterRotationByPost: last.length,
+    faultRoute: {
+      withoutBearer: unarmed.status,
+      wrongBearer: forgedBearer.status,
+      withBearer: armed.status,
+      activationWithoutBearer: activationUnread.status,
+      activationWithBearer: activationRead.status,
+    },
     faultedPostCaughtUpByRead: faulted.length,
   };
+}
+
+/** The Café acceptance fault route, called from a public host. */
+function faultRoute(
+  organisationId: string,
+  method: "POST" | "GET",
+  authorization: string | null,
+): Promise<Response> {
+  return publicCall(
+    `/v1/acceptance/organisations/${organisationId}/cafe-commerce-fault`,
+    method,
+    authorization,
+  );
+}
+
+/**
+ * A call from a public host, not localhost, so that a fault route needs the
+ * fault injection bearer.
+ */
+function publicCall(
+  path: string,
+  method: "POST" | "GET",
+  authorization: string | null,
+): Promise<Response> {
+  return exports.default.fetch(
+    new Request(`https://pantry.example${path}`, {
+      method,
+      headers: authorization === null ? {} : { authorization },
+    }),
+  );
+}
+
+async function readFault(
+  organisationId: string,
+  authorization: string,
+): Promise<{ fault: { queueConsumedAt: number | null } | null }> {
+  const response = await faultRoute(organisationId, "GET", authorization);
+  const body: unknown = await response.json();
+  if (!response.ok || !isRecord(body) || !("fault" in body))
+    throw new Error(`Fault read failed: ${JSON.stringify(body)}`);
+  return body as { fault: { queueConsumedAt: number | null } | null };
 }
 
 /** A post to Pantry's receiver, signed with `secret`. */
