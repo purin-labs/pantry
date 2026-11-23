@@ -29,6 +29,7 @@ import {
 } from "./file-resource-picker";
 import type {
   AccessControlCapabilityView,
+  AccessControlGrantView,
   AccessControlOption,
   FileResourceAccount,
   FileResourceSelection,
@@ -118,6 +119,16 @@ type GrantFormProps = Readonly<{
   ) => void;
   chooseIntegration: (integration: AccessControlOption | null) => void;
   submit: (draft: GrantDraft) => void;
+  /**
+   * A system's drawer offers two levels beside its single actions: every
+   * read action, or every read and prepare action, in one press. An action
+   * that changes data stays one grant at a time. `held` are the system's
+   * active grants, so a level leaves out what the person already has.
+   */
+  levels: Readonly<{
+    held: readonly AccessControlGrantView[];
+    submit: (drafts: readonly GrantDraft[]) => void;
+  }> | null;
 }>;
 
 /**
@@ -125,7 +136,10 @@ type GrantFormProps = Readonly<{
  * drawer shows the same form in place, with the system's account fixed.
  */
 export function GrantAccessDialog(
-  props: Omit<GrantFormProps, "active" | "cancel" | "fixedIntegration"> &
+  props: Omit<
+    GrantFormProps,
+    "active" | "cancel" | "fixedIntegration" | "levels"
+  > &
     Readonly<{ open: boolean; close: () => void }>,
 ): React.ReactNode {
   const dialog = React.useRef<HTMLDialogElement>(null);
@@ -154,6 +168,7 @@ export function GrantAccessDialog(
           active={props.open}
           cancel={props.close}
           fixedIntegration={null}
+          levels={null}
         />
       </div>
     </dialog>
@@ -233,21 +248,38 @@ export function GrantForm(props: GrantFormProps): React.ReactNode {
   const chosenResourceRef =
     resourceRef !== "" ? resourceRef : (onlyResource?.refId ?? "");
   const chosenIntegrationRef = props.fixedIntegration?.refId ?? integrationRef;
+  const level = parseLevel(capabilityId);
+  const levelPlan =
+    level === null || props.levels === null
+      ? null
+      : planLevel(
+          level,
+          props.capabilities,
+          props.levels.held,
+          subject,
+          props.fixedIntegration,
+          props.resources,
+          resourceRef,
+        );
   return (
     <form
       className="access35-grant-form"
-      onSubmit={submitGrant.bind(
-        null,
-        props,
-        subjectRef,
-        capabilityId,
-        chosenIntegrationRef,
-        chosenResourceRef,
-        customEntityType,
-        fileSelection,
-        customSelection,
-        setFormProblem,
-      )}
+      onSubmit={
+        levelPlan === null
+          ? submitGrant.bind(
+              null,
+              props,
+              subjectRef,
+              capabilityId,
+              chosenIntegrationRef,
+              chosenResourceRef,
+              customEntityType,
+              fileSelection,
+              customSelection,
+              setFormProblem,
+            )
+          : submitLevel.bind(null, props.levels, levelPlan.drafts)
+      }
     >
       <div className="access35-dialog-steps">
         {fileFlow ? (
@@ -301,7 +333,10 @@ export function GrantForm(props: GrantFormProps): React.ReactNode {
               <label htmlFor="access35-grant-capability">What they can do</label>
               <Select.Root
                 required
-                items={props.capabilities.map(capabilityItem)}
+                items={[
+                  ...(props.levels === null ? [] : LEVELS.map(levelItem)),
+                  ...props.capabilities.map(capabilityItem),
+                ]}
                 value={capabilityId === "" ? null : capabilityId}
                 onValueChange={changeCapability.bind(
                   null,
@@ -311,14 +346,27 @@ export function GrantForm(props: GrantFormProps): React.ReactNode {
                   props.capabilities,
                   props.fixedIntegration,
                   props.chooseCapability,
+                  props.chooseIntegration,
                   setFileSelection,
                   setFormProblem,
                 )}
               >
                 <Select.Trigger id="access35-grant-capability">
-                  <Select.Value placeholder="Select an action" />
+                  <Select.Value placeholder="Select a level or an action" />
                 </Select.Trigger>
                 <Select.Popup>
+                  {props.levels === null ? null : (
+                    <Select.Group>
+                      <Select.GroupLabel>Levels</Select.GroupLabel>
+                      {LEVELS.map(
+                        renderLevelOption.bind(
+                          null,
+                          props.capabilities,
+                          props.fixedIntegration,
+                        ),
+                      )}
+                    </Select.Group>
+                  )}
                   {groupCapabilityOptions(props.capabilities).map(
                     renderCapabilityGroup,
                   )}
@@ -333,8 +381,16 @@ export function GrantForm(props: GrantFormProps): React.ReactNode {
                 </p>
               ) : null}
             </div>
-            {props.active &&
-            capability?.definition.target === "custom_connector_operation" &&
+            {level !== null && levelPlan !== null ? (
+              renderLevelFields(
+                level,
+                levelPlan,
+                subject,
+                resourceRef,
+                setResourceRef,
+              )
+            ) : props.active &&
+              capability?.definition.target === "custom_connector_operation" &&
             (capabilityId === "custom_connector.read" ||
               capabilityId === "custom_connector.write") ? (
               <div>
@@ -510,6 +566,7 @@ export function GrantForm(props: GrantFormProps): React.ReactNode {
           disabled={
             props.busy ||
             accountMissing ||
+            (levelPlan !== null && levelPlan.drafts.length === 0) ||
             ((fileFlow || capability?.definition.target === "file_resource") &&
               fileSelection === null) ||
             (capability?.definition.target === "custom_connector_operation" &&
@@ -528,6 +585,218 @@ export function GrantForm(props: GrantFormProps): React.ReactNode {
       </div>
     </form>
   );
+}
+
+type GrantLevel = "view" | "prepare";
+
+const LEVELS: readonly GrantLevel[] = ["view", "prepare"];
+
+const LEVEL_PREFIX = "level:";
+
+type LevelPlan = Readonly<{
+  /** The grants that one press makes for the chosen person. */
+  drafts: readonly GrantDraft[];
+  /** The actions of the level, when no person is chosen yet. */
+  candidates: readonly AccessControlCapabilityView[];
+  /** The resources that the level's actions share. */
+  shared: readonly AccessControlOption[];
+  /** An action of the level has more than one resource to choose from. */
+  asksResource: boolean;
+  /** The person's actions of the level that wait for a resource. */
+  unresolved: number;
+}>;
+
+function parseLevel(value: string): GrantLevel | null {
+  if (!value.startsWith(LEVEL_PREFIX)) return null;
+  const level = value.slice(LEVEL_PREFIX.length);
+  return level === "view" || level === "prepare" ? level : null;
+}
+
+/**
+ * The actions of a level: those that read (and, for `prepare`, those that
+ * prepare a change) and need no choice beyond one resource of the drawer's
+ * account. An action that is off for the workspace is left out.
+ */
+function inLevel(
+  level: GrantLevel,
+  fixedIntegration: AccessControlOption | null,
+  capability: AccessControlCapabilityView,
+): boolean {
+  const definition = capability.definition;
+  if (capability.availability !== "available" || capability.mode === "disabled")
+    return false;
+  if (
+    definition.risk !== "read" &&
+    !(level === "prepare" && definition.risk === "propose")
+  )
+    return false;
+  return (
+    definition.target === "platform" ||
+    (definition.target === "provider_resource" && fixedIntegration !== null)
+  );
+}
+
+function planLevel(
+  level: GrantLevel,
+  capabilities: readonly AccessControlCapabilityView[],
+  held: readonly AccessControlGrantView[],
+  subject: AccessControlOption | null,
+  fixedIntegration: AccessControlOption | null,
+  resources: readonly AccessControlOption[],
+  resourceRef: string,
+): LevelPlan {
+  const candidates = capabilities.filter(
+    inLevel.bind(null, level, fixedIntegration),
+  );
+  const shared = resources.filter(isResourceFor.bind(null, ""));
+  const sharedRef =
+    resourceRef !== ""
+      ? resourceRef
+      : shared.length === 1
+        ? (shared[0]?.refId ?? "")
+        : "";
+  const drafts: GrantDraft[] = [];
+  let asksResource = false;
+  let unresolved = 0;
+  for (const capability of candidates) {
+    if (
+      subject !== null &&
+      held.some(holdsCapability.bind(null, subject.refId, capability))
+    )
+      continue;
+    if (capability.definition.target === "platform") {
+      if (subject !== null) drafts.push({ kind: "platform", subject, capability });
+      continue;
+    }
+    const own = resources.filter(
+      isResourceFor.bind(null, capability.definition.capabilityId),
+    );
+    if (own.length > 1) asksResource = true;
+    const resource =
+      own.length === 1 ? own[0] : own.find(hasRefId.bind(null, sharedRef));
+    if (subject === null || fixedIntegration === null) continue;
+    if (resource === undefined) unresolved += 1;
+    else
+      drafts.push({
+        kind: "provider_resource",
+        subject,
+        capability,
+        integration: fixedIntegration,
+        resource,
+      });
+  }
+  return { drafts, candidates, shared, asksResource, unresolved };
+}
+
+function isResourceFor(
+  capabilityId: string,
+  option: AccessControlOption,
+): boolean {
+  return (
+    option.availability === "available" &&
+    matchesCapabilityResource(capabilityId, option)
+  );
+}
+
+function hasRefId(refId: string, option: AccessControlOption): boolean {
+  return option.refId === refId;
+}
+
+function holdsCapability(
+  subjectRefId: string,
+  capability: AccessControlCapabilityView,
+  grant: AccessControlGrantView,
+): boolean {
+  return (
+    grant.lifecycle.kind === "active" &&
+    grant.subject.subjectRefId === subjectRefId &&
+    grant.capability.capabilityId === capability.definition.capabilityId &&
+    grant.capability.capabilityVersion ===
+      capability.definition.capabilityVersion
+  );
+}
+
+function levelLabel(level: GrantLevel): string {
+  return level === "view"
+    ? "Can view: every read action"
+    : "Can prepare changes: every read and prepare action";
+}
+
+function levelItem(level: GrantLevel): Readonly<{ value: string; label: string }> {
+  return { value: `${LEVEL_PREFIX}${level}`, label: levelLabel(level) };
+}
+
+function renderLevelOption(
+  capabilities: readonly AccessControlCapabilityView[],
+  fixedIntegration: AccessControlOption | null,
+  level: GrantLevel,
+): React.ReactNode {
+  return (
+    <Select.Item
+      key={level}
+      value={`${LEVEL_PREFIX}${level}`}
+      disabled={
+        !capabilities.some(inLevel.bind(null, level, fixedIntegration))
+      }
+    >
+      {levelLabel(level)}
+    </Select.Item>
+  );
+}
+
+/** What one press of a level gives, and the resource that it shares. */
+function renderLevelFields(
+  level: GrantLevel,
+  plan: LevelPlan,
+  subject: AccessControlOption | null,
+  resourceRef: string,
+  setResourceRef: React.Dispatch<React.SetStateAction<string>>,
+): React.ReactNode {
+  const needsChoice = plan.asksResource && plan.shared.length > 1;
+  const actions =
+    subject === null
+      ? plan.candidates.map(capabilityLabel)
+      : plan.drafts.map(draftLabel);
+  return (
+    <>
+      {needsChoice
+        ? renderResourceField(
+            "Resource",
+            "Select a resource",
+            plan.shared,
+            null,
+            resourceRef,
+            setResourceRef,
+          )
+        : null}
+      <p className="access35-grant-note">
+        {actions.length > 0
+          ? `Gives ${actions.length === 1 ? "1 action" : `${actions.length} actions`}: ${actions.join(", ")}. Actions that change data stay one at a time.`
+          : plan.unresolved === 0
+            ? `${subject?.label ?? "This person"} already has every ${level === "view" ? "read" : "read and prepare"} action of this system.`
+            : needsChoice
+              ? "Choose the resource that these actions use."
+              : "No resource of this account is ready for these actions yet."}
+      </p>
+    </>
+  );
+}
+
+function capabilityLabel(capability: AccessControlCapabilityView): string {
+  return capability.definition.label;
+}
+
+function draftLabel(draft: GrantDraft): string {
+  return draft.capability.definition.label;
+}
+
+function submitLevel(
+  levels: GrantFormProps["levels"],
+  drafts: readonly GrantDraft[],
+  event: React.FormEvent<HTMLFormElement>,
+): void {
+  event.preventDefault();
+  if (levels !== null && drafts.length > 0) levels.submit(drafts);
 }
 
 /**
@@ -803,6 +1072,7 @@ function changeCapability(
     capability: AccessControlCapabilityView | null,
     integration: AccessControlOption | null,
   ) => void,
+  chooseIntegration: (integration: AccessControlOption | null) => void,
   setFileSelection: React.Dispatch<
     React.SetStateAction<FileResourceSelection | null>
   >,
@@ -815,7 +1085,16 @@ function changeCapability(
   setResource("");
   setFileSelection(null);
   setFormProblem("");
-  chooseCapability(findCapability(capabilities, capabilityId), fixedIntegration);
+  if (parseLevel(capabilityId) === null) {
+    chooseCapability(
+      findCapability(capabilities, capabilityId),
+      fixedIntegration,
+    );
+    return;
+  }
+  // A level lists the account's resources: its actions share one of them.
+  chooseCapability(null, null);
+  if (fixedIntegration !== null) chooseIntegration(fixedIntegration);
 }
 
 function changeIntegration(

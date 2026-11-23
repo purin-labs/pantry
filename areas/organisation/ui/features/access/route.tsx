@@ -895,7 +895,88 @@ function renderSystemGrantForm(
         setMutation,
         view,
       )}
+      levels={
+        view.capabilities.some(capabilityBelongsToSystem.bind(null, system))
+          ? {
+              held: system.recipients.flatMap(recipientGrants),
+              submit: createGrants.bind(
+                null,
+                props,
+                revision,
+                setContent,
+                setMutation,
+                view,
+              ),
+            }
+          : null
+      }
     />
+  );
+}
+
+function recipientGrants(
+  recipient: AccessSystem["recipients"][number],
+): readonly AccessControlGrantView[] {
+  return recipient.grants;
+}
+
+/**
+ * Grants a level: its actions one at a time, as the mailbox setup does. Each
+ * grant names the revision that the view had after the grant before it. A
+ * refusal stops the run; the grants before it stay, and the message says
+ * how many there are.
+ */
+async function createGrants(
+  props: AccessRouteProps,
+  revision: React.MutableRefObject<number>,
+  setContent: React.Dispatch<React.SetStateAction<AccessContent>>,
+  setMutation: React.Dispatch<React.SetStateAction<MutationState>>,
+  view: AccessControlView,
+  drafts: readonly GrantDraft[],
+): Promise<void> {
+  setMutation({ kind: "busy" });
+  let expectedRevision = view.revision;
+  let granted = 0;
+  const stop = async (problem: string): Promise<void> => {
+    await beginLoad(props, revision, setContent);
+    setMutation({
+      kind: "failed",
+      message: `${problem} ${granted} of ${drafts.length} actions were granted.`,
+    });
+  };
+  for (const draft of drafts) {
+    const target = grantTarget(draft);
+    if (!target.ok) return stop(target.message);
+    if (draft.subject.revision === null)
+      return stop("Choose a current subject and try again.");
+    const result = await props.transport.mutate(props.organisationId, {
+      kind: "create_grant",
+      expectedRevision,
+      subjectRef: {
+        subjectRefId: draft.subject.refId,
+        revision: draft.subject.revision,
+      },
+      target: target.value,
+    });
+    if (!result.ok)
+      return stop(
+        accessProblem(result.error, "Refresh the controls and try again."),
+      );
+    granted += 1;
+    if (granted === drafts.length) break;
+    const next = await props.transport.read(props.organisationId, null, null);
+    if (!next.ok)
+      return stop(
+        accessProblem(next.error, "Refresh the controls and try again."),
+      );
+    expectedRevision = next.value.revision;
+  }
+  await refreshAfterMutation(
+    props,
+    revision,
+    setContent,
+    setMutation,
+    granted === 1 ? "Access granted." : `Access granted: ${granted} actions.`,
   );
 }
 
