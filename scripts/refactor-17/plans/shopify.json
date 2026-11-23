@@ -1,0 +1,76 @@
+{
+  "about": "Refactor 17, Stage B, decision D1 and the Shopify module (docs/refactor-17.md, \"The Shopify module\"): the files of the module areas/shopify join the workspace package @purin-labs/area-integrations in areas/integrations, in the one folder shopify/ that a person can delete later. scripts/refactor-17/move-module.mjs reads this plan. files: each file that scripts/layers.json gives the module, REMOVE.md with them, with its place in the target folder: a file keeps its sub-path below services/platform/src/shopify/ in shopify/. sourcePrefixes: where --sync-plan puts a file that the module gets later. package.existing true: the package exists; its manifest gets the export entry and the dependencies of this plan and keeps its tsconfig, its scripts and its line in scripts/layers.json. The module keeps its name and its rules: the layer check reads an area package under covers file by file, so the script gives areas/integrations/shopify/ a rule of its own for areas/shopify, and pnpm lint:layer-debts (shopify-rule) still counts each import of the module from outside it. A Shopify file that imports a public file of the area integrations by the package name keeps that import: the package names itself, as packages/collaboration does. The Worker tsconfigs include areas/integrations/shopify (the preparation commit \"Type checks: the Worker and the Portal programs read the surface packages and the Shopify folder\"), so each file stays in the program that checked it before the move. The package has no type check of its own. edits: text edits of the files that name a source folder and cannot read scripts/lib/source-roots.mjs; an edit is done when the file holds its replace text. keepForm: each file where an import stays on its line, because the wrap of Prettier would move a ratchet, with its reason. regenerate: the commands that write a generated file again.",
+  "module": "areas/shopify",
+  "target": "areas/integrations",
+  "workspaceEntry": "areas/*",
+  "sourcePrefixes": {
+    "services/platform/src/shopify/": "shopify/"
+  },
+  "files": {
+    "services/platform/src/shopify/REMOVE.md": "shopify/REMOVE.md",
+    "services/platform/src/shopify/acceptance.ts": "shopify/acceptance.ts",
+    "services/platform/src/shopify/action-execution.ts": "shopify/action-execution.ts",
+    "services/platform/src/shopify/admin.ts": "shopify/admin.ts",
+    "services/platform/src/shopify/auth.ts": "shopify/auth.ts",
+    "services/platform/src/shopify/commerce-provider.ts": "shopify/commerce-provider.ts",
+    "services/platform/src/shopify/connection-observation.ts": "shopify/connection-observation.ts",
+    "services/platform/src/shopify/connection-workflow.ts": "shopify/connection-workflow.ts",
+    "services/platform/src/shopify/connector.ts": "shopify/connector.ts",
+    "services/platform/src/shopify/connector/admin-graphql.ts": "shopify/connector/admin-graphql.ts",
+    "services/platform/src/shopify/connector/catalog-snapshot.ts": "shopify/connector/catalog-snapshot.ts",
+    "services/platform/src/shopify/connector/initial-sync.ts": "shopify/connector/initial-sync.ts",
+    "services/platform/src/shopify/connector/order-snapshot.ts": "shopify/connector/order-snapshot.ts",
+    "services/platform/src/shopify/connector/values.ts": "shopify/connector/values.ts",
+    "services/platform/src/shopify/connector/webhook-ingress.ts": "shopify/connector/webhook-ingress.ts",
+    "services/platform/src/shopify/connector/webhook-registration.ts": "shopify/connector/webhook-registration.ts",
+    "services/platform/src/shopify/credential-replacement.ts": "shopify/credential-replacement.ts",
+    "services/platform/src/shopify/delivery-normalizers.ts": "shopify/delivery-normalizers.ts",
+    "services/platform/src/shopify/location-observation.ts": "shopify/location-observation.ts",
+    "services/platform/src/shopify/provider-adapter.ts": "shopify/provider-adapter.ts",
+    "services/platform/src/shopify/provider-module.ts": "shopify/provider-module.ts",
+    "services/platform/src/shopify/queue-messages.ts": "shopify/queue-messages.ts",
+    "services/platform/src/shopify/webhooks.ts": "shopify/webhooks.ts"
+  },
+  "package": {
+    "name": "@purin-labs/area-integrations",
+    "existing": true,
+    "exports": {
+      "./shopify/*": {
+        "types": "./shopify/*.ts",
+        "default": "./shopify/*.ts"
+      }
+    },
+    "dependencies": {
+      "@purin-labs/actor-runtime": "workspace:*",
+      "@purin-labs/agent": "workspace:*",
+      "@purin-labs/area-commerce": "workspace:*",
+      "@purin-labs/authority": "workspace:*",
+      "@purin-labs/commerce-contracts": "workspace:*",
+      "@purin-labs/connections": "workspace:*",
+      "@purin-labs/contracts": "workspace:*",
+      "@purin-labs/control": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/type-utils": "workspace:*"
+    },
+    "devDependencies": [],
+    "versionsFrom": "services/platform/package.json"
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Shopify folder of the package, which is outside its server/ folder",
+      "find": "PLATFORM_SOURCE.push(\"surfaces/email/server\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"surfaces/email/server\");\n// The Shopify module in the package of the area integrations (Refactor 17,\n// Stage B).\nPLATFORM_SOURCE.push(\"areas/integrations/shopify\");\n"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": ["node", "scripts/check-layers.mjs", "--areas", "--write"],
+      "writes": ["docs/layers.md"]
+    }
+  ]
+}
