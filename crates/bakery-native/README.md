@@ -45,11 +45,11 @@ for oven loading, and `--timestep 0.001|0.002`. Retrieval requires nominal loadi
 A failed operation produces failed evidence; malformed inputs exit unsuccessfully
 without creating an output. A terminal recording cannot resume as a checkpoint.
 
-Requests (v2) pin separate asset, controller and runtime hashes. Portable
-recordings (v3) contain those identities, observed geometry, samples and a
-completed/failed/execution-error outcome. Pending native checkpoints (v1) contain
+Requests (v7) pin separate asset, controller and runtime hashes. Portable
+recordings (v4) contain those identities, observed geometry, samples and a
+completed/failed/execution-error outcome. Pending native checkpoints (v2) contain
 full integration state, controller progress, contact mutations and the recording
-prefix. Completed loading handoffs (v2) include the exact native result and its
+prefix. Completed loading handoffs (v3) include the exact native result and its
 portable recording, protected by a corruption digest. These local files do not
 provide authenticity or physical dispatch authority. The portal migrates old
 recordings only at import; Rust accepts its current native contracts exclusively.
