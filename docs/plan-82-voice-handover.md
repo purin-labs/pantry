@@ -13,15 +13,20 @@ Voice control works in production on every Portal page again. The Plan 91 rename
 work that remains needs a real shop, and the owner has no shop for a while. So the voice plans
 wait, except the steps in "Steps that do not need a shop".
 
-| Plan                                                         | State on 2026-11-18                                                                                                |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| Plan                                                                 | State on 2026-11-18                                                                                                |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | [82 — Portal voice control](history/plan-82-portal-voice-control.md) | Phases 0–3 and D9–D12 in production, with the wake model fault. Phase 4 (the owner's shift) and Phase 5 remain.    |
-| [82B — Ambient voice](plan-82B-ambient-voice.md)             | Draft. Nothing is built. Decisions D1–D9 need the owner.                                                           |
+| [82B — Ambient voice](plan-82B-ambient-voice.md)                     | Draft. Nothing is built. Decisions D1–D9 need the owner.                                                           |
 | [82C — Speech engines](history/plan-82C-speech-engines.md)           | Phases 0–3 in production (service 0.5.1). D5, the week of use and Phase 4 are deferred until the owner has a shop. |
 
 ## What runs in production
 
 Checked on 2026-11-18, and after the wake phrase release of 2026-11-23 (`pantry` `9cc4dc3b`):
+
+- Since 2026-11-23 09:20 UTC (`pantry` `f47416c5`, before `9cc4dc3b`), the composer's edge
+  and the mic-button wave show the voice state. The release is the 05:51 release plus the
+  three voice-look commits (`refs/backup/released-2026-11-23-voice-look`), so the rest of
+  `dev` is still not in production.
 
 - The Portal and the Platform hold all the voice work of Plans 82 and 82C. The live install script
   (`/shop-voice/install.sh`) gives service 0.5.2.
@@ -182,11 +187,11 @@ No voice file names the GitHub organisation, so step 1 changes nothing for voice
 
 Git ignores these files. A moved folder keeps them, but a new clone does not have them:
 
-| Item                                         | Size   | What to do                                                                                                            |
-| -------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------- |
+| Item                                         | Size   | What to do                                                                                                        |
+| -------------------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------- |
 | `.cache/human/2026-11-16-1912/`              | 9.6 MB | The owner's voice. The D5 run needs it. Never commit it. In the clone `~/Dev/purin-labs/pantry` since 2026-11-18. |
 | `output/shop-voice/`                         | 25 MB  | Journey and bench results that the plans cite. In the clone `~/Dev/purin-labs/pantry` since 2026-11-18.           |
-| `.claude/launch.json`, `voice-recorder-p82c` | —      | The new clone has no `.claude/launch.json`. Add the entry with the new path if you use the recorder.                  |
+| `.claude/launch.json`, `voice-recorder-p82c` | —      | The new clone has no `.claude/launch.json`. Add the entry with the new path if you use the recorder.              |
 
 ### What stays where it is
 
@@ -234,7 +239,7 @@ These are outside the repositories, so the move does not change them:
 
 | Check                           | Command or file                                                                                                                                                                         |
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Platform journey                | `workers/platform/tests/e2e/voice-control.test.ts`                                                                                             |
+| Platform journey                | `workers/platform/tests/e2e/voice-control.test.ts`                                                                                                                                      |
 | Mac journey                     | `scripts/shop-voice/run-journey.py` (run `pnpm portal:build` first: it reads the install script from `apps/portal/dist`; `SHOP_VOICE_BENCH` names the bench after a move)               |
 | Chrome journey                  | `scripts/shop-voice/run-portal-journey.py` (needs `PLAYWRIGHT_MODULE`; run `pnpm portal:build`, `pnpm async-control:build` and `pnpm --filter @purin-labs/contracts media:build` first) |
 | Safari on the iOS Simulator     | `scripts/shop-voice/run-safari-journey.py`                                                                                                                                              |

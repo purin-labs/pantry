@@ -29,6 +29,12 @@ short token that lets one member's device call one Mac.
 - One session for each Organisation works on every Portal page (`features/voice/host.ts`).
   A page mark shows that voice listens, needs a tap or stopped. Leaving the workspace
   closes the microphone, and the setting stays.
+- In the chat, the composer's edge shows the state in the theme accent
+  (`features/chat/composer-glow.tsx`): a thin ring breathes while voice listens for the
+  wake phrase, a halo pulses while a person speaks, and one light crosses the edge while
+  the command is transcribed and while the agent works. The mic button shows five bars
+  (`features/voice/wave.tsx`). While a person speaks, the bars follow the loudness of the
+  microphone stream that is already open. With reduced motion, the states only fade.
 - One device listens in one tab (the Web Lock `pantry-voice-control`). While voice is on,
   the Portal asks the browser to keep the screen awake.
 - The Portal counts wakes, near wakes, key holds, wakes with no command, and the texts
