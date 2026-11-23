@@ -369,9 +369,10 @@ export async function reconcileCommerceOutbox(
           code: "commerce_system_mismatch",
         };
       }
-      console.error("commerce_outbox.delivery_rejected", {
-        organisationId: input.message.organisationId,
-        deliveryId: delivery.deliveryId,
+      traceWarn("commerce_outbox.delivery_rejected", {
+        requestId: input.message.requestId,
+        organisation_id: input.message.organisationId,
+        delivery_id: delivery.deliveryId,
         code: normalized.error,
       });
       const retired = await retireCommerceDelivery({
@@ -480,23 +481,25 @@ export async function reconcileCommerceOutbox(
     });
     if (!applied.ok) {
       if (applied.error.code === "commerce_revision_conflict") {
-        console.error("commerce_outbox.commerce_revision_conflict", {
-          organisationId: input.message.organisationId,
-          deliveryId: delivery.deliveryId,
-          projectionKind: applied.error.projectionKind,
-          canonicalId: applied.error.canonicalId,
-          currentIntegrationAccountId:
+        traceWarn("commerce_outbox.commerce_revision_conflict", {
+          requestId: input.message.requestId,
+          organisation_id: input.message.organisationId,
+          delivery_id: delivery.deliveryId,
+          projection_kind: applied.error.projectionKind,
+          canonical_id: applied.error.canonicalId,
+          current_integration_account_id:
             applied.error.currentIntegrationAccountId,
-          receivedIntegrationAccountId:
+          received_integration_account_id:
             applied.error.receivedIntegrationAccountId,
-          currentRevision: applied.error.currentRevision,
-          receivedRevision: applied.error.receivedRevision,
+          current_revision: applied.error.currentRevision,
+          received_revision: applied.error.receivedRevision,
         });
       }
       if (applied.error.code === "commerce_event_invalid") {
-        console.error("commerce_outbox.commerce_event_invalid", {
-          organisationId: input.message.organisationId,
-          deliveryId: delivery.deliveryId,
+        traceWarn("commerce_outbox.commerce_event_invalid", {
+          requestId: input.message.requestId,
+          organisation_id: input.message.organisationId,
+          delivery_id: delivery.deliveryId,
           field: applied.error.field,
         });
       }
