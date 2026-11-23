@@ -86,7 +86,8 @@ type MerchantReportDefinition = Readonly<{
   queries: MerchantReportQueries | MerchantReportUnsupported;
 }>;
 
-const POPULATION_LIMIT = 25;
+/** The most records that one merchant report names. */
+export const POPULATION_LIMIT = 25;
 
 export function merchantReportDefinition(
   name: MerchantReportName,

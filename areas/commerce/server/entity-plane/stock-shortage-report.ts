@@ -4,6 +4,7 @@ import { normalizeUntrustedCommerceText } from "@purin-labs/agent-tools/context/
 import { connectedStockOverview } from "@purin-labs/area-kitchen/server/contract/inventory-overview";
 import {
   merchantReportDefinition,
+  POPULATION_LIMIT,
   type MerchantReportRecord,
   type MerchantReportResult,
 } from "./merchant-reports";
@@ -11,8 +12,6 @@ import type { Variant } from "@purin-labs/type-utils";
 
 /** The record type whose read grant covers the stock shortage report. */
 export const STOCK_SHORTAGE_SOURCE_TYPE = "inventory_position";
-
-const POPULATION_LIMIT = 25;
 
 /**
  * Counts the stock rows that are low or out, from the same snapshot and the
