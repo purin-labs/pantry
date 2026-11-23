@@ -44,13 +44,12 @@ type ScreenAttachment = Readonly<{
   openedAt: number;
 }>;
 
-/** A screen's socket sends only pings, which the runtime answers. */
-export const MENU_SCREEN_SOCKET_HANDLER = {
-  receive(socket: WebSocket): void {
-    closeSocket(socket, 1003, "unexpected_message");
-  },
-  closed(): void {},
-};
+/**
+ * An open socket shows a screen's last ping, so its stored time only has to
+ * be within this of the socket's. A socket that ends with no close event,
+ * as at a deploy, then leaves the time at most this early.
+ */
+const SEEN_STORED_WITHIN_MS = 60 * 60_000;
 
 export function isMenuScreenSocket(socket: WebSocket): boolean {
   return screenAttachment(socket) !== null;
@@ -241,11 +240,37 @@ export class MenuScreens {
     return { screenId, name: row.name, boardId: row.board_id };
   }
 
+  /**
+   * Keeps the time of a feed read. A screen with an open socket shows the
+   * socket's time instead, so its reads write nothing.
+   */
   seen(screenId: string, now: number): void {
+    if (this.#screenSockets(screenId).length > 0) return;
+    this.#keepSeen(screenId, now, now);
+  }
+
+  /** A screen's socket sends only pings, which the runtime answers. */
+  readonly socketHandler = {
+    receive(socket: WebSocket): void {
+      closeSocket(socket, 1003, "unexpected_message");
+    },
+    closed: (socket: WebSocket): void => {
+      const attachment = screenAttachment(socket);
+      if (attachment === null) return;
+      const seen = socketLastSeenAt(this.#ctx, socket, attachment.openedAt);
+      this.#keepSeen(attachment.screenId, seen, seen);
+    },
+  };
+
+  /** Stores `seen` when the stored time is older than `staleBefore`. */
+  #keepSeen(screenId: string, seen: number, staleBefore: number): void {
     this.#sql.exec(
-      "UPDATE menu_screen SET last_seen_at = ? WHERE screen_id = ?",
-      now,
+      `UPDATE menu_screen SET last_seen_at = ?
+       WHERE screen_id = ? AND removed_at IS NULL
+         AND (last_seen_at IS NULL OR last_seen_at < ?)`,
+      seen,
       screenId,
+      staleBefore,
     );
   }
 
@@ -264,7 +289,7 @@ export class MenuScreens {
       attachment,
     );
     if (accepted === null) return controlError("menu_screen_unavailable", 503);
-    this.seen(screen.screenId, now);
+    this.#keepSeen(screen.screenId, now, now - SEEN_STORED_WITHIN_MS);
     accepted.headers.set("Sec-WebSocket-Protocol", MENU_SCREEN_SOCKET_PROTOCOL);
     return accepted;
   }
@@ -315,8 +340,9 @@ export class MenuScreens {
   }
 
   /**
-   * Closes each screen socket that stopped pinging, and each socket of a
-   * removed screen, and keeps the last time each open screen answered.
+   * Closes each screen socket that stopped pinging, with the time of its
+   * last ping, and each socket of a removed screen. An open screen's stored
+   * time moves only when it is more than an hour behind its socket.
    */
   sweep(now: number): void {
     for (const socket of openSockets(this.#ctx, MENU_SCREENS)) {
@@ -328,6 +354,7 @@ export class MenuScreens {
       const seen = socketLastSeenAt(this.#ctx, socket, attachment.openedAt);
       if (now - seen > SOCKET_SILENCE_LIMIT_MS) {
         closeSocket(socket, 1001, "silent");
+        this.#keepSeen(attachment.screenId, seen, seen);
         continue;
       }
       const active = this.#sql
@@ -340,12 +367,7 @@ export class MenuScreens {
         closeSocket(socket, SCREEN_REMOVED_CODE, "screen_removed");
         continue;
       }
-      this.#sql.exec(
-        `UPDATE menu_screen SET last_seen_at = max(coalesce(last_seen_at, 0), ?)
-         WHERE screen_id = ?`,
-        seen,
-        attachment.screenId,
-      );
+      this.#keepSeen(attachment.screenId, seen, seen - SEEN_STORED_WITHIN_MS);
     }
   }
 

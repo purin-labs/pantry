@@ -98,7 +98,6 @@ import {
   type MenuBoardAgentPreview,
 } from "@purin-labs/area-cafe/server/actors/menu-boards";
 import {
-  MENU_SCREEN_SOCKET_HANDLER,
   MenuScreens,
   isMenuScreenSocket,
   isMenuScreenSocketPath,
@@ -1037,7 +1036,7 @@ export class OrganisationDO
     socket: WebSocket,
   ): Promise<Pick<CollaborationSocketRoom, "receive" | "closed"> | null> {
     if (isChatSignalSocket(socket)) return CHAT_SIGNAL_SOCKET_HANDLER;
-    if (isMenuScreenSocket(socket)) return MENU_SCREEN_SOCKET_HANDLER;
+    if (isMenuScreenSocket(socket)) return this.#menuScreens.socketHandler;
     return this.#socketRoom(socket);
   }
 

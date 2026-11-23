@@ -9,6 +9,7 @@ import {
   parseMenuScreenPairingState,
   parseMenuScreenSummaries,
   type MenuScreenFeed,
+  type MenuScreenSummary,
 } from "@purin-labs/cafe-control-api";
 import { parseInventoryReceiptContext } from "@purin-labs/kitchen-control-api";
 import { MenuBoardDoc, type MenuBoardUpdate } from "@purin-labs/menu-board-crdt";
@@ -45,6 +46,7 @@ import {
   openSocket,
 } from "./hibernatable-socket-support";
 import { applied, boardIdOf, nextSignal } from "./menu-board-journey-support";
+import { WriteMeter } from "./write-meter";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -428,15 +430,20 @@ async function menuBoardScreenJourney({ task }: TestContext): Promise<void> {
   });
 
   // 7. The TV keeps its signal socket open; the Screens list shows it live.
+  //    While the socket is open, the TV's reads of its feed write nothing:
+  //    an idle TV reads every minute all day.
   const screenSocket = await openScreenSocket(token);
   await expectPong(screenSocket);
-  const screens = await send(`${base}/menu-screens`, owner.session, "GET");
-  const listed = parseMenuScreenSummaries(
-    isRecord(screens.body) ? screens.body.screens : null,
-  );
+  const listed = await screenList(base, owner.session);
   expect(listed).toEqual([
     expect.objectContaining({ name: "Counter TV", boardId, connected: true }),
   ]);
+  const meter = new WriteMeter();
+  const liveReads = await meter.during(async () => {
+    for (let read = 0; read < 3; read += 1)
+      expect((await screenFeed(token)).status).toBe(200);
+  });
+  expect(liveReads, "rows written by three reads of a live TV").toEqual({});
   const boards = await send(`${base}/menu-boards`, viewer.session, "GET");
   expect(
     parseMenuBoardSummaries(isRecord(boards.body) ? boards.body.boards : null),
@@ -478,10 +485,27 @@ async function menuBoardScreenJourney({ task }: TestContext): Promise<void> {
   expect(refusal).toMatchObject({ error: { field: "cart.lines.menu" } });
   expect(await cartRefusal(merchantId, itemId("Ginger Milk Tea"))).toBeNull();
 
+  //    The TV goes off: its socket ends after its last ping, and the
+  //    Screens list says that it is offline since that ping.
+  const lastPingAt = Date.now();
+  await expectPong(screenSocket);
+  await closeSocket(screenSocket);
+  await expect
+    .poll(
+      async () => (await screenList(base, owner.session))?.[0]?.connected,
+      { timeout: 5_000, interval: 200 },
+    )
+    .toBe(false);
+  const offlineSince =
+    (await screenList(base, owner.session))?.[0]?.lastSeenAt ?? 0;
+  expect(offlineSince).toBeGreaterThanOrEqual(lastPingAt);
+
   // 10. Staff remove the TV: its socket closes as removed, and its token
   //     stops, so the player goes back to pairing.
   const screenId = listed?.[0]?.screenId ?? "";
-  const closed = nextCloseCode(screenSocket);
+  const reopened = await openScreenSocket(token);
+  await expectPong(reopened);
+  const closed = nextCloseCode(reopened);
   const removed = await send(
     `${base}/menu-screens/${screenId}`,
     staff.session,
@@ -523,6 +547,11 @@ async function menuBoardScreenJourney({ task }: TestContext): Promise<void> {
       signalAfterMs,
       soldOutOnScreenAfterMs: soldOutAfterMs,
       cartRefusal: refusal,
+    },
+    liveScreen: {
+      writesOfThreeReads: liveReads,
+      offlineSince,
+      lastPingAt,
     },
     removal: { closeCode: 4403, feedStatus: 401, socketStatus: 401 },
   };
@@ -612,6 +641,16 @@ function pairingResponse(pairingId: string, secret: string): Promise<Response> {
   return exports.default.fetch(
     `${PUBLIC_ORIGIN}/v1/screens/pairings/${pairingId}`,
     { headers: { Authorization: `Bearer ${secret}` } },
+  );
+}
+
+async function screenList(
+  base: string,
+  session: IssuedControlSession,
+): Promise<readonly MenuScreenSummary[] | null> {
+  const screens = await send(`${base}/menu-screens`, session, "GET");
+  return parseMenuScreenSummaries(
+    isRecord(screens.body) ? screens.body.screens : null,
   );
 }
 

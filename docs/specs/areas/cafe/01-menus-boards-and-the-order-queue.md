@@ -155,8 +155,11 @@ orders through the order queue and mark items "sold out today" on one Portal pag
    back to a new code.
 
 The Screens sheet lists each screen with its board, the last time that it was seen and an
-open socket. It reads the list every 15 s. Staff show another board on a screen or end
-the pairing. The Devices page (DEV-01) only reads this list.
+open socket. It reads the list every 15 s. While a screen's socket is open, the list shows
+the socket's last ping, and the screen's feed reads write nothing. The Actor stores the
+time when the socket ends or a sweep closes it as silent. A sweep also stores it when the
+stored time is more than an hour behind the socket (`SEEN_STORED_WITHIN_MS`). Staff show
+another board on a screen or end the pairing. The Devices page (DEV-01) only reads this list.
 
 ### Live facts
 
