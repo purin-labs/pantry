@@ -316,12 +316,12 @@ function HomeReady(props: {
   const snapshot = props.content.data;
   const lifecycle = snapshot.workspace.lifecycle;
   const active = lifecycle === "active";
-  /* During draft/configuring the setup checklist above this brief owns the
+  /* While configuring, the setup checklist above this brief owns the
    * whole story; attention, blockers, freshness, and today-facts are
    * operational concepts that cannot be true yet, so announcing them ("nothing
    * needs your attention", "data is delayed") only contradicts the checklist.
    * Bands with real content always render; it is the empty states that gate. */
-  const settingUp = lifecycle === "draft" || lifecycle === "configuring";
+  const settingUp = lifecycle === "configuring";
   const attention = snapshot.attention.filter(isPantryHomeAttention);
   const blockers = snapshot.blockers.filter(isPantryHomeBlocker);
   /* The documented order is fixed: needs-attention leads, today's counts

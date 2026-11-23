@@ -12,7 +12,10 @@ import type {
   HomeSourceObservation,
   HomeTodayFact,
 } from "../index.ts";
-import type { OnboardingControlRole } from "@purin-labs/contracts";
+import type {
+  OnboardingControlRole,
+  OrganisationOnboardingLifecycle,
+} from "@purin-labs/contracts";
 
 export type HomeSnapshot = {
   readonly schemaVersion: "pantry.cafeos.home.v1";
@@ -20,13 +23,7 @@ export type HomeSnapshot = {
   readonly workspace: {
     readonly organisationId: string;
     readonly name: string;
-    readonly lifecycle:
-      | "draft"
-      | "configuring"
-      | "activating"
-      | "active"
-      | "suspended"
-      | "archived";
+    readonly lifecycle: OrganisationOnboardingLifecycle["kind"];
     readonly environment: "development" | "production";
   };
   readonly attention: readonly HomeAttentionItem[];
@@ -376,11 +373,9 @@ function isWorkspaceLifecycle(
   value: unknown,
 ): value is HomeSnapshot["workspace"]["lifecycle"] {
   return (
-    value === "draft" ||
     value === "configuring" ||
     value === "activating" ||
     value === "active" ||
-    value === "suspended" ||
     value === "archived"
   );
 }

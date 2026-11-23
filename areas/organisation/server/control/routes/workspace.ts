@@ -14,6 +14,7 @@ import { readCommerceActionLedger } from "@purin-labs/agent/control/agent-operat
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import type { Variant } from "@purin-labs/type-utils";
+import type { OrganisationOnboardingLifecycle } from "@purin-labs/contracts";
 import { assertNever } from "@purin-labs/std";
 import type {
   HomeAttentionItem,
@@ -70,7 +71,7 @@ type HomeView = {
     readonly workspace: {
       readonly organisationId: string;
       readonly name: string;
-      readonly lifecycle: "configuring" | "activating" | "active" | "archived";
+      readonly lifecycle: OrganisationOnboardingLifecycle["kind"];
       readonly environment: "development" | "production";
     };
     readonly attention: readonly HomeAttentionItem[];
