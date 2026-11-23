@@ -88,7 +88,10 @@ type VaultMoveOutcome = Readonly<{
   remaining: number;
 }>;
 
-/** One move request copies at most this many items, to stay inside rate limits. */
+/**
+ * One move request tries at most this many items, to stay inside rate limits.
+ * An item that cannot move is passed over, so the items after it still move.
+ */
 const MOVE_BATCH = 10;
 /** A 1Password list costs one read for each item; reuse it for a while. */
 const LIST_LIFETIME_MS = 30_000;
@@ -351,11 +354,16 @@ export async function moveVaultItems(
   if (store === null)
     return { ok: false, error: { code: "vault_store_not_connected" } };
   let moved = 0;
+  let tried = 0;
   if (input.to === "onepassword") {
     const ids = await pantryVaultItemIds(input.scope);
-    for (const itemId of ids.slice(0, MOVE_BATCH)) {
+    for (const itemId of ids) {
+      if (tried === MOVE_BATCH) break;
+      // An item whose sign-in Pantry cannot read stays in Pantry. Reading it
+      // costs no 1Password call, so it does not count against the batch.
       const source = await vaultItemForMove(input.scope, input.env, itemId);
       if (source === null) continue;
+      tried += 1;
       const copied = await callOnePassword(input, store, {
         op: "create_item",
         vaultId: store.vaultId,
@@ -396,9 +404,12 @@ export async function moveVaultItems(
   }
   const items = await listOnePasswordItems(input.env, input.scope, store);
   if (items === null) return unavailable();
-  for (const item of items.slice(0, MOVE_BATCH)) {
+  for (const item of items.filter(movableToPantry)) {
+    if (tried === MOVE_BATCH) break;
+    tried += 1;
+    // A login whose secret 1Password does not give stays there.
     const create = await onePasswordItemForMove(input, store, item);
-    if (create === null) break;
+    if (create === null) continue;
     const copied = await createVaultItem({
       scope: input.scope,
       keys: input.env,
@@ -438,9 +449,19 @@ export async function moveVaultItems(
     value: {
       store: storeView(store, after !== null),
       moved,
-      remaining: after?.length ?? items.length - moved,
+      remaining:
+        (after ?? items).filter(movableToPantry).length -
+        (after === null ? moved : 0),
     },
   };
+}
+
+/**
+ * A Pantry login needs a website, so a 1Password login without one stays in
+ * 1Password, and the remaining count of a move leaves it out.
+ */
+function movableToPantry(item: VaultItemView): boolean {
+  return item.kind === "contact_profile" || item.origins.length > 0;
 }
 
 async function onePasswordItemForMove(
@@ -454,8 +475,6 @@ async function onePasswordItemForMove(
       label: item.label,
       contact: item.contact,
     };
-  // A Pantry login needs a website; a 1Password login without one stays there.
-  if (item.origins.length === 0) return null;
   const answer = await callOnePassword(input, store, {
     op: "read_secret",
     vaultId: store.vaultId,

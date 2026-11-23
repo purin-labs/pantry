@@ -23,6 +23,7 @@ import {
 const PANTRY_PASSWORD = "pantry-held-pass-4K";
 const APP_PASSWORD = "added-in-1password-8M";
 const NEW_PASSWORD = "created-through-pantry-2P";
+const WIFI_PASSWORD = "guest-network-7W";
 const [PANTRY_VAULT, PRIVATE_VAULT] = E2E_ONEPASSWORD_VAULTS;
 
 it(
@@ -199,9 +200,34 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
     ],
     tags: [],
   });
+  // A login with no website, such as the shop's Wi-Fi, stays in 1Password:
+  // a Pantry login needs a website.
+  await onePassword("/__e2e/add", {
+    category: "Login",
+    vaultId: PANTRY_VAULT.id,
+    title: "Shop Wi-Fi",
+    fields: [
+      {
+        id: "username",
+        title: "username",
+        fieldType: "Text",
+        value: "nini-guest",
+      },
+      {
+        id: "password",
+        title: "password",
+        fieldType: "Concealed",
+        value: WIFI_PASSWORD,
+      },
+    ],
+    sections: [],
+    websites: [],
+    tags: [],
+  });
   const mixed = await list();
   expect(mixed.items.map((entry) => [entry.label, entry.store])).toEqual([
     ["Wholesale flour", "onepassword"],
+    ["Shop Wi-Fi", "onepassword"],
     ["Supplier portal", "pantry"],
     ["Shop", "pantry"],
   ]);
@@ -303,8 +329,10 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
     archived: true,
   });
 
-  // The owner moves everything back. The sign-ins resolve in Pantry again, and
-  // the 1Password copies are archived, not deleted.
+  // The owner moves everything back. The Wi-Fi login has no website, so it
+  // stays in 1Password, and the items after it still move. The sign-ins
+  // resolve in Pantry again, and the 1Password copies are archived, not
+  // deleted. Nothing is left that a second move could take.
   expect(
     parseVaultStoreResult(
       (await send(owner, `${base}/store`, { kind: "move_items", to: "pantry" }))
@@ -313,6 +341,7 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
   ).toMatchObject({ kind: "moved", moved: 3, remaining: 0 });
   const back = await list();
   expect(back.items.map((entry) => [entry.label, entry.store])).toEqual([
+    ["Shop Wi-Fi", "onepassword"],
     ["Flour mill", "pantry"],
     ["Supplier portal", "pantry"],
     ["Shop", "pantry"],
@@ -332,8 +361,10 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
     contact,
   });
   expect(
-    (await onePasswordState()).items.every((stored) => stored.archived),
-  ).toBe(true);
+    (await onePasswordState()).items
+      .filter((stored) => !stored.archived)
+      .map((stored) => stored.item.title),
+  ).toEqual(["Shop Wi-Fi"]);
 
   // Disconnecting keeps the 1Password items in 1Password and stops the token.
   expect(
@@ -342,7 +373,7 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
   expect(await resolvedSecret(organisationId, tokenHandle)).toEqual({
     error: "vault_secret_revoked",
   });
-  expect((await onePasswordState()).items).toHaveLength(4);
+  expect((await onePasswordState()).items).toHaveLength(5);
   expect((await list()).store).toEqual({ kind: "pantry" });
 
   // The audit log tells the story, and a member can read it.
@@ -370,6 +401,7 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
     PANTRY_PASSWORD,
     APP_PASSWORD,
     NEW_PASSWORD,
+    WIFI_PASSWORD,
     E2E_ONEPASSWORD_TOKEN,
   ])
     expect(everything).not.toContain(secret);
@@ -388,6 +420,7 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
         "stale 1Password edit refused; current edit lands",
         "removal archives in 1Password",
         "move back restores sign-ins in Pantry and archives copies",
+        "a login with no website stays in 1Password and the items after it move",
         "disconnect keeps 1Password items and revokes the token",
         "audit log records every step",
         "no response carried a password or the token",
@@ -400,6 +433,7 @@ type FakeState = {
   items: {
     item: {
       id: string;
+      title: string;
       fields: { id: string; value: string }[];
       websites: { url: string }[];
     };

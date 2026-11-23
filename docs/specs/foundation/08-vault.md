@@ -201,10 +201,14 @@ The sweep also counts failed rotations and the denials of the last 24 hours
 - **Remove** archives the item in 1Password, where a person can restore it.
 - The revision of a 1Password item is its 1Password `version`. A remove reads a fresh
   list for the revision check.
-- **Move** copies at most 10 items in one request. The source goes only after the target
+- **Move** tries at most 10 items in one request. The source goes only after the target
   accepts the copy: Pantry revokes its sign-in, or archives the 1Password item. The
   answer gives the moved count and the remaining count, and the person moves again.
-- A move to Purin Vault stops at the first 1Password login that has no `https` website.
+- An item that cannot move stays where it is, and the move goes on with the next item.
+  A move to Purin Vault leaves a 1Password login that has no `https` website, and the
+  remaining count leaves it out. It also leaves a login whose secret 1Password does not
+  give. A move to 1Password leaves a Pantry item whose sign-in Pantry cannot read, and
+  that item does not count against the 10.
 - **Disconnect** revokes the token and deletes the `vault_store` row. The items stay in
   1Password.
 - The Platform Worker keeps the 1Password list for 30 s in memory. Each write clears it.
