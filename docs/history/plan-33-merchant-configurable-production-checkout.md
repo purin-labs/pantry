@@ -279,7 +279,7 @@ publishes/activates its checkout profile. The authenticated operational
 readback reports the candidate binding, certification state, payment lifecycle
 counts, overdue indeterminate attempts, and expired collection sessions without
 exposing credentials or capabilities. Follow
-[`runbooks/cafe-payment-certification.md`](../runbooks/cafe-payment-certification.md).
+[`runbooks/cafe-payment-certification.md`](https://github.com/purin-labs/pantry/blob/e4a7faff0de21ece7a8f889ec9e7170d82d41405/docs/runbooks/cafe-payment-certification.md).
 Credentialed Stripe sandbox and production packets remain the external GA
 release gate. They require deployed organisation access and merchant-scoped provider
 credentials; they are operational evidence rather than unfinished code.
