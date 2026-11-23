@@ -14,9 +14,9 @@
 // workspace in knip.json. Do not add it to the baseline.
 //
 // knip does not judge a file that a generator writes, such as
-// services/platform/src/generated/ (scripts/generate-actions.ts): the
-// generator decides its exports, and a hand edit is lost at the next run. Its
-// folder is in the ignore list of its workspace in knip.json.
+// foundation/authority/generated/ (generate-actions.ts of services/platform):
+// the generator decides its exports, and a hand edit is lost at the next run.
+// Its folder is in the ignore list of knip.json.
 //
 // knip does not judge the exports of an entry file. Each file in the
 // `exports` map of a workspace package is such an entry, so an export there

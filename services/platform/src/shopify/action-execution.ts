@@ -15,7 +15,7 @@ import {
   type GeneratedActionDraft,
   type GeneratedShopifyActionCall,
   type ShopifyOrderCancelReason,
-} from "../generated/action-registry";
+} from "@purin-labs/authority/generated/action-registry";
 import type {
   IntegrationAccountId,
   OrganisationId,

@@ -15,7 +15,7 @@ import {
   buildShopifyOrderCancelDraft,
   parseShopifyOrderCancelArgs,
   SHOPIFY_ORDER_CANCEL_TOOL,
-} from "../generated/action-registry";
+} from "@purin-labs/authority/generated/action-registry";
 import {
   executeShopifyAction,
   reconcileShopifyOrderCancellation,

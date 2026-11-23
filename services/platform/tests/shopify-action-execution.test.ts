@@ -9,7 +9,7 @@ import {
   matchGeneratedActionRoute,
   parseGeneratedActionCall,
   type GeneratedShopifyActionCall,
-} from "../src/generated/action-registry";
+} from "@purin-labs/authority/generated/action-registry";
 import { parseSessionId, parseOrganisationId } from "@purin-labs/kernel/ids";
 import {
   executeShopifyAction,

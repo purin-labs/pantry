@@ -1,7 +1,12 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "include": ["files", "exports", "types"],
-  "ignore": ["**/public/**", "**/dist/**", "**/*.d.mts"],
+  "ignore": [
+    "**/public/**",
+    "**/dist/**",
+    "**/*.d.mts",
+    "foundation/authority/generated/**"
+  ],
   "ignoreIssues": {
     "areas/*/**/*.fixtures.ts": ["exports", "types"],
     "areas/*/**/*.type-fixtures.ts": ["exports", "types"],
@@ -19,7 +24,6 @@
     },
     "services/platform": {
       "vitest": false,
-      "ignore": ["src/generated/**"],
       "entry": [
         "src/integration-gateway.ts",
         "src/{chatgpt-exit,code-mode-sandbox,model-exit,slack-ingress,vault-onepassword}/worker.ts",

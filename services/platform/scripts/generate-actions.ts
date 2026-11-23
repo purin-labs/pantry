@@ -11,7 +11,12 @@ import { assertNever } from "@purin-labs/std";
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const EDGE_DIR = resolve(SCRIPT_DIR, "..");
-const GENERATED_TS = resolve(EDGE_DIR, "src/generated/action-registry.ts");
+// The action ledger of foundation/authority owns the registry; a Shopify file
+// of areas/integrations reads it by the package name.
+const GENERATED_TS = resolve(
+  EDGE_DIR,
+  "../../foundation/authority/generated/action-registry.ts",
+);
 const GENERATED_TOOL_MANIFEST = resolve(
   EDGE_DIR,
   "action-registry/generated-tools.json",
