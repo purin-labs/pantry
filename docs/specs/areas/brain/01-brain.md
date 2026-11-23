@@ -61,12 +61,11 @@ A Memory states one reusable `fact`, `preference` or `lesson`. Each revision hol
 statement (at most 2,000 characters), where it applies, when it holds, the evidence and
 the Case that it came from.
 
-| Applicability (`kind`)    | A turn is offered it when                                                    |
-| ------------------------- | ---------------------------------------------------------------------------- |
-| `portal_chat`             | A person started the turn in a Portal conversation                           |
-| `skill`                   | The turn loaded that skill                                                   |
-| `commerce_resource_class` | The turn reads that commerce resource class                                  |
-| `commerce_entity`         | The turn is about that exact entity of that merchant, for example a supplier |
+| Applicability (`kind`) | A turn is offered it when                                                    |
+| ---------------------- | ---------------------------------------------------------------------------- |
+| `portal_chat`          | A person started the turn in a Portal conversation                           |
+| `skill`                | The turn loaded that skill                                                   |
+| `commerce_entity`      | The turn is about that exact entity of that merchant, for example a supplier |
 
 | Evidence (`kind`)         | Names                                                                          |
 | ------------------------- | ------------------------------------------------------------------------------ |
@@ -370,8 +369,6 @@ last try named: `indeterminate`, `failed` or `unavailable`.
   that releases a person's words to a mailbox at acceptance.
 - CaseContextCollections are refused as evidence until each revision records its
   complete provenance.
-- No turn reader supplies a `commerce_resource_class` subject, so a Memory of that
-  scope is never offered.
 - A Memory that cites a mailbox Case entry, and no reviewed reply, has no review
   surface in the Portal.
 - An Eval tries only `mailbox_reply`. A person cannot open an Eval.

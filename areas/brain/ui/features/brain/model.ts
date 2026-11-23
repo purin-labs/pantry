@@ -96,8 +96,6 @@ export function applicabilityLabel(
       return "Chats in the Portal";
     case "skill":
       return "Work that uses one skill";
-    case "commerce_resource_class":
-      return "Every record of one kind";
     case "commerce_entity":
       return applicability.entity.typeId === "trade_partner"
         ? "One supplier"

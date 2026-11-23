@@ -63,10 +63,9 @@ export const mixedApplicability: MemoryApplicability = {
 };
 
 // @ts-expect-error An entity scope requires the exact entity reference.
-export const classAsEntity: MemoryApplicability = {
+export const entityWithoutReference: MemoryApplicability = {
   kind: "commerce_entity",
   merchantId: "merchant_a",
-  entityType: "trade_partner",
 };
 
 // @ts-expect-error A decision names an exact revision and carries no content.

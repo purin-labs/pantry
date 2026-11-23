@@ -27,31 +27,21 @@ type MemoryEntityRef = Readonly<{
 /**
  * Where a Memory applies.
  *
- * A skill scope admits it only when that skill is loaded, a resource class only
- * when the turn reads that class, and an entity scope only for that exact
- * commerce entity. A Portal chat scope admits it only to a turn that a person
- * started in a Portal conversation. Project placement supplies neither
- * applicability nor access.
+ * A skill scope admits it only when that skill is loaded, and an entity scope
+ * only for that exact commerce entity. A Portal chat scope admits it only to a
+ * turn that a person started in a Portal conversation. Project placement
+ * supplies neither applicability nor access.
  */
 export type MemoryApplicability =
   | Readonly<{
       kind: "portal_chat";
       skillId?: never;
-      entityType?: never;
       merchantId?: never;
       entity?: never;
     }>
   | Readonly<{
       kind: "skill";
       skillId: string;
-      entityType?: never;
-      merchantId?: never;
-      entity?: never;
-    }>
-  | Readonly<{
-      kind: "commerce_resource_class";
-      entityType: string;
-      skillId?: never;
       merchantId?: never;
       entity?: never;
     }>
@@ -60,7 +50,6 @@ export type MemoryApplicability =
       merchantId: string;
       entity: MemoryEntityRef;
       skillId?: never;
-      entityType?: never;
     }>;
 
 /**
@@ -602,11 +591,6 @@ function parseApplicability(
     case "skill":
       return hasExactKeys(raw, ["kind", "skillId"]) && identifier(raw.skillId)
         ? { kind: "skill", skillId: raw.skillId }
-        : null;
-    case "commerce_resource_class":
-      return hasExactKeys(raw, ["kind", "entityType"]) &&
-        identifier(raw.entityType)
-        ? { kind: "commerce_resource_class", entityType: raw.entityType }
         : null;
     case "commerce_entity": {
       if (
