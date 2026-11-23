@@ -1163,7 +1163,7 @@ function renderAttachmentManifest(attachment: StoredMessageAttachment): string {
       : descriptor.media.kind === "signature_verified"
         ? "verified from bytes"
         : "provider-declared";
-  return `[attachment ${attachment.id}] ${attachment.displayName} class=${descriptor.kind} mediaType=${descriptor.media.mediaType} (${identification})          bytes=${attachment.byteLength} sha256=${attachment.sha256} contents not read`;
+  return `[attachment ${attachment.id}] ${attachment.displayName} class=${descriptor.kind} mediaType=${descriptor.media.mediaType} (${identification}) bytes=${attachment.byteLength} sha256=${attachment.sha256} contents not read`;
 }
 
 function attachmentNames(message: UserMessage): string[] {
