@@ -185,4 +185,9 @@ async function idleTenantCostJourney({ task }: TestContext): Promise<void> {
     alarmWrites,
     sync: stillSynced.ok ? stillSynced.value.kind : stillSynced,
   };
+  const artifact = await env.JOURNEY_ARTIFACTS.fetch(
+    "http://artifacts/idle-tenant-cost.json",
+    { method: "PUT", body: JSON.stringify(task.meta.idleTenantCost) },
+  );
+  expect(artifact.status).toBe(200);
 }

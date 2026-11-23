@@ -1,8 +1,9 @@
 // Counts what a run writes, because Cloudflare bills each write: the rows of
 // every Durable Object of the test Worker, the rows of one Commerce merchant
-// object, and the D1 rows, queue messages, KV writes and R2 writes that code
-// sends through `WriteMeter.env`. A Durable Object's own D1, queue, KV and R2
-// writes are not counted; its rows are.
+// object, and the D1 rows, queue messages, KV writes and R2 writes of every
+// binding of the test Worker. A Durable Object gets the same binding objects
+// as the test, so the meter counts on those objects, and a write that a
+// Durable Object sends itself counts too.
 import { env } from "cloudflare:workers";
 import {
   createExecutionContext,
@@ -44,32 +45,24 @@ type Reading = Readonly<{
   sends: Readonly<Record<string, number>>;
 }>;
 
+/** The meter that the binding counters report to: the newest one. */
+let reporting: WriteMeter | null = null;
+const COUNTED = Symbol("the write meter counts this binding");
+
 export class WriteMeter {
-  /** The Worker's bindings; its D1 databases, queues, KV and R2 count each write. */
-  readonly env: Env;
+  /** The Worker's bindings, which the Durable Objects share; each write counts. */
+  readonly env: Env = env;
   readonly #sends: Record<string, number> = {};
   readonly #statements = new Map<string, number>();
   readonly #merchantId: string | null;
 
   constructor(options: Readonly<{ commerceMerchantId?: string }> = {}) {
     this.#merchantId = options.commerceMerchantId ?? null;
-    const metered: Record<string, unknown> = { ...env };
-    for (const [name, binding] of Object.entries(env)) {
-      const unit = sendUnit(binding);
-      if (unit !== null)
-        metered[name] = this.#counting(binding as object, `${unit} ${name}`);
-      if (isDatabase(binding))
-        metered[name] = countingDatabase(binding, (rows, query) => {
-          this.#count(`rows ${name}`, rows);
-          if (rows === 0) return;
-          const statement = `${name}: ${query.replace(/\s+/gu, " ").trim().slice(0, 160)}`;
-          this.#statements.set(
-            statement,
-            (this.#statements.get(statement) ?? 0) + rows,
-          );
-        });
-    }
-    this.env = metered as unknown as Env;
+    reporting = this;
+    for (const [name, binding] of Object.entries(env))
+      countWrites(name, binding, (line, amount, query) => {
+        if (reporting !== null) reporting.#record(line, amount, query);
+      });
   }
 
   /** What `run` wrote. */
@@ -149,26 +142,67 @@ export class WriteMeter {
     };
   }
 
-  #count(line: string, amount: number): void {
+  #record(line: string, amount: number, query: string | null): void {
     this.#sends[line] = (this.#sends[line] ?? 0) + amount;
+    if (query === null || amount === 0) return;
+    const statement = `${line.slice("rows ".length)}: ${query.replace(/\s+/gu, " ").trim().slice(0, 160)}`;
+    this.#statements.set(
+      statement,
+      (this.#statements.get(statement) ?? 0) + amount,
+    );
   }
+}
 
-  #counting<T extends object>(binding: T, line: string): T {
-    const count = (amount: number): void => this.#count(line, amount);
-    return new Proxy(binding, {
-      get(target, key) {
-        const value: unknown = Reflect.get(target, key);
-        if (typeof value !== "function") return value;
-        return (...args: unknown[]): unknown => {
-          if (key === "sendBatch")
-            count(Array.isArray(args[0]) ? args[0].length : 1);
-          else if (key === "send" || key === "put" || key === "delete")
-            count(1);
-          return Reflect.apply(value, target, args);
-        };
-      },
-    });
-  }
+/**
+ * Makes one binding count its writes. The counters replace the write methods
+ * on the binding object itself, one time, so the test and every Durable
+ * Object that holds the binding count through them.
+ */
+function countWrites(
+  name: string,
+  binding: unknown,
+  report: (line: string, amount: number, query: string | null) => void,
+): void {
+  if (typeof binding !== "object" || binding === null || COUNTED in binding)
+    return;
+  const unit = sendUnit(binding);
+  if (unit !== null) {
+    const line = `${unit} ${name}`;
+    for (const key of ["send", "sendBatch", "put", "delete"] as const) {
+      const original: unknown = Reflect.get(binding, key);
+      if (typeof original !== "function") continue;
+      Object.defineProperty(binding, key, {
+        configurable: true,
+        writable: true,
+        value: (...args: unknown[]): unknown => {
+          report(
+            line,
+            key === "sendBatch" && Array.isArray(args[0]) ? args[0].length : 1,
+            null,
+          );
+          return Reflect.apply(original, binding, args);
+        },
+      });
+    }
+  } else if (isDatabase(binding)) {
+    // The counting proxy calls the real methods through a copy, because the
+    // binding's own methods are about to be the counting ones.
+    const real = {
+      prepare: binding.prepare.bind(binding),
+      batch: binding.batch.bind(binding),
+      withSession: binding.withSession.bind(binding),
+    } as unknown as D1Database;
+    const counting = countingDatabase(real, (rows, query) =>
+      report(`rows ${name}`, rows, query),
+    );
+    for (const key of ["prepare", "batch", "withSession"] as const)
+      Object.defineProperty(binding, key, {
+        configurable: true,
+        writable: true,
+        value: counting[key],
+      });
+  } else return;
+  Object.defineProperty(binding, COUNTED, { value: true });
 }
 
 /** One idle shop's cost for 30 days in USD, from what it wrote in one hour. */

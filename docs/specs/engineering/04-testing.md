@@ -210,7 +210,10 @@ with no bearer, a wrong bearer and the bearer. `pnpm cloudflare:fault-injection-
   itself again. The journey reads the triggers from the production Wrangler file, so it
   measures a new trigger with no test change. It throws on a trigger whose minute field
   is not `*` or a step, or whose other fields are not `*`.
-  `e2e/write-meter.ts` counts the writes and names the D1 statements.
+  `e2e/write-meter.ts` counts the writes and names the D1 statements. It counts on the
+  binding objects, which the Durable Objects share with the test, so a D1, queue, KV or
+  R2 write that a Durable Object sends itself counts too. The journey writes
+  `output/idle-tenant-cost.json`.
   `IDLE_HOUR_BUDGET` allows only 12 rows on `ORGANISATION` in the hour. To raise a line,
   write its reason and its cost for 30 days beside it.
 - **First chat budget** (`tests/e2e/new-organisation-first-chat.test.ts`). A new
@@ -315,7 +318,7 @@ This subsystem has no D1 table, Actor table, event, capability or agent tool of 
 | --------------------------------------------------- | ----------------------------------------------------------------------- |
 | `workers/platform/vitest.config.ts`                 | The Platform unit suite. It builds the commerce fixture Worker one time |
 | `workers/platform/vitest.e2e.config.ts`             | The E2E runtime, bindings, fake secrets and placement cells             |
-| `workers/platform/tests/e2e/write-meter.ts`         | The write counter and the cost for 30 days                              |
+| `workers/platform/tests/e2e/write-meter.ts`         | The write counter of every binding and the cost for 30 days             |
 | `workers/platform/tests/journey-artifacts.ts`       | The artifact writer. A path is one `.json` file under `output/`         |
 | `workers/platform/tests/commerce-fixture-worker.ts` | The build and the start of the commerce fixture Worker                  |
 | `workers/platform/tests/shop-gateway-adapters.ts`   | The runs of the real gateway binary and the controller simulator        |
@@ -376,9 +379,6 @@ The boundaries to the neighbours:
 - **The `foundation/testing` module has no file.** Of the 251 Platform journeys, 185
   import product source directly. Refactor 17 plans a `testing` entry for each module
   and a ratchet on those imports.
-- **The write meter has a gap.** It does not count the D1, queue, KV and R2 writes that a
-  Durable Object sends itself. It counts only the rows of the object, so the idle tenant
-  guard cannot see those writes.
 - **CI does not run some suites.** It does not run `cargo test --workspace` or 89 of the
   128 Kitchen journeys. It also does not run the browser scripts outside the index, the
   journeys on real services or the commerce lab commands.
