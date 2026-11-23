@@ -962,15 +962,13 @@ async function executeOperatorActivationResume(input: {
     return "supportReference" in activated.error
       ? controlJson(
           {
-            kind: activated.error.retryable
-              ? "retryable_failure"
-              : "terminal_failure",
+            kind: "retryable_failure",
             action: input.action.kind,
             reason_code: activated.error.code,
             correlation_id: activated.error.correlationId,
             support_reference: activated.error.supportReference,
           },
-          activated.error.retryable ? 503 : 422,
+          503,
         )
       : controlError(
           activated.error.code,

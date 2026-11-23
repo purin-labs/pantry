@@ -292,8 +292,8 @@ emits `activation_phase_completed`. A retry skips completed steps.
   `activation_succeeded` and `first_task_presented`.
 - Failure marks the attempt `failed`, returns the lifecycle to `configuring`
   and creates a support reference. The response is `retryable_failure`
-  (`503`) or `terminal_failure` (`422`). The receipt stores it, so a replay
-  returns the same failure.
+  (`503`), because a person can always start the activation again. The
+  receipt stores it, so a replay returns the same failure.
 
 ### First operational task
 

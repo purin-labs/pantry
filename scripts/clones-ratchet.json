@@ -1,5 +1,5 @@
 {
-  "total": {"copies":783,"lines":14012},
+  "total": {"copies":783,"lines":14011},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -209,7 +209,7 @@
     "areas/kitchen/ui/features/workflow-simulator/spatial/physics-factory-scene.ts = areas/kitchen/ui/features/workflow-simulator/spatial/physics-factory-scene.ts": {"copies":4,"lines":44},
     "areas/organisation/server/control/routes/onboarding.ts = areas/organisation/server/control/routes/onboarding.ts": {"copies":3,"lines":57},
     "areas/organisation/server/control/routes/operators.ts = areas/organisation/server/control/routes/operators.ts": {"copies":3,"lines":50},
-    "areas/organisation/server/data/activation.ts = areas/organisation/server/data/activation.ts": {"copies":1,"lines":20},
+    "areas/organisation/server/data/activation.ts = areas/organisation/server/data/activation.ts": {"copies":1,"lines":19},
     "areas/organisation/server/data/onboarding-reconciliation.ts = areas/organisation/server/data/onboarding-reconciliation.ts": {"copies":1,"lines":28},
     "areas/organisation/server/data/onboarding-support.ts = packages/control-api/src/portal/settings.ts": {"copies":1,"lines":17},
     "areas/organisation/server/data/onboarding.ts = areas/organisation/server/data/onboarding.ts": {"copies":1,"lines":21},

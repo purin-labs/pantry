@@ -387,7 +387,6 @@ async function recordActivationFailure(
     db,
     context,
     failureCode,
-    retryable: true,
     now,
   });
 }
@@ -398,7 +397,6 @@ function activationExecutionFailure(
 ): ActivationExecutionFailure {
   return {
     code,
-    retryable: receipt.retryable,
     correlationId: receipt.correlationId,
     supportReference: receipt.supportReference,
   };

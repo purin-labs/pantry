@@ -529,7 +529,6 @@ describe("onboarding activation", () => {
       db,
       context: initialContext,
       failureCode: "activation_interrupted",
-      retryable: true,
       now: NOW + 3,
     });
     await expect(
@@ -1058,7 +1057,6 @@ async function interruptedActivationRecoveryAcceptanceTest(): Promise<void> {
     db,
     context: initialContext,
     failureCode: "activation_interrupted",
-    retryable: true,
     now: NOW + 6,
   });
 

@@ -418,8 +418,7 @@ The routes are in `control/routes/onboarding.ts` and `control/routes/operators.t
   deletes the assessments and writes a run row each 15 minutes. `readiness` then writes
   a new assessment.
 - **The stage route.** `POST …/onboarding/stage-viewed` has no Origin or CSRF check.
-- **No terminal failure.** Each activation failure is 503. The 422 answer has no
-  producer. No code writes `organisation_archive_cleanup.status = 'failed'`.
+- **No failed cleanup.** No code writes `organisation_archive_cleanup.status = 'failed'`.
 - **Labels that differ.** The tombstone names the first active owner, also when an admin
   archives. `OrganisationOnboardingLifecycle` has no `purging` or `purged`.
 - **Billing** (Plan 95 step 6) is not built, and the plan is always `beta`.

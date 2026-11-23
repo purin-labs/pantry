@@ -128,9 +128,9 @@ type ActivationStaleDetail =
   | "assessment_environment_mismatch"
   | "organisation_lifecycle_incompatible";
 
+/** An activation failure. A person can always start the activation again. */
 export type ActivationFailureReceipt = {
   readonly reasonCode: string;
-  readonly retryable: boolean;
   readonly correlationId: string;
   readonly supportReference: string;
   readonly mutationReceiptId: string;
@@ -557,10 +557,8 @@ export async function failOnboardingActivation(input: {
   readonly db: OrganisationDatabase;
   readonly context: ActivationContext;
   readonly failureCode: string;
-  readonly retryable: boolean;
   readonly now: number;
 }): Promise<ActivationFailureReceipt> {
-  const retryable = input.retryable ? 1 : 0;
   const session = input.db.withSession("first-primary");
   const current = await session
     .prepare(
@@ -597,7 +595,7 @@ export async function failOnboardingActivation(input: {
     "support",
   );
   const responseBody = {
-    kind: input.retryable ? "retryable_failure" : "terminal_failure",
+    kind: "retryable_failure",
     reason_code: input.failureCode,
     correlation_id: correlationId,
     support_reference: supportReference,
@@ -607,11 +605,11 @@ export async function failOnboardingActivation(input: {
   await session.batch([
     session
       .prepare(
-        `UPDATE organisation_activation_attempt SET status = 'failed', failure_code = ?, retryable = ?,
+        `UPDATE organisation_activation_attempt SET status = 'failed', failure_code = ?, retryable = 1,
          updated_at = ?, completed_at = NULL,
          lease_owner = NULL, lease_expires_at = NULL WHERE activation_attempt_id = ?`,
       )
-      .bind(input.failureCode, retryable, input.now, input.context.attemptId),
+      .bind(input.failureCode, input.now, input.context.attemptId),
     prepareOrganisationLifecycleMove(session, {
       organisationId: input.context.organisationId,
       event: "fail_activation",
@@ -632,7 +630,7 @@ export async function failOnboardingActivation(input: {
       scope: input.context.mutation.scope,
       boundary: input.context.mutation.boundary,
       identity: input.context.mutation.identity,
-      responseStatus: input.retryable ? 503 : 422,
+      responseStatus: 503,
       responseBody,
     }),
     prepareOnboardingAuditEvent(session, failedIdentity, {
@@ -672,7 +670,7 @@ export async function failOnboardingActivation(input: {
         input.context.mutation.scope.route,
         input.context.mutation.scope.operation,
         input.failureCode,
-        input.retryable ? "retryable" : "terminal",
+        "retryable",
         input.now,
         input.now,
         JSON.stringify({
@@ -690,7 +688,7 @@ export async function failOnboardingActivation(input: {
       attributes: {
         activation_attempt_id: input.context.attemptId,
         reason_code: input.failureCode,
-        retryable: input.retryable,
+        retryable: true,
         support_reference: supportReference,
       },
     }),
@@ -709,7 +707,6 @@ export async function failOnboardingActivation(input: {
   ]);
   return {
     reasonCode: input.failureCode,
-    retryable: input.retryable,
     correlationId,
     supportReference,
     mutationReceiptId: input.context.mutation.identity.receiptId,

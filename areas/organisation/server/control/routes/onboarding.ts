@@ -1075,15 +1075,13 @@ async function handleActivate(
       );
       return controlJson(
         {
-          kind: activated.error.retryable
-            ? "retryable_failure"
-            : "terminal_failure",
+          kind: "retryable_failure",
           reason_code: activated.error.code,
           correlation_id: activated.error.correlationId,
           support_reference: activated.error.supportReference,
           projection,
         },
-        activated.error.retryable ? 503 : 422,
+        503,
       );
     }
     if (activated.error.code === "activation_readiness_stale") {
@@ -1125,8 +1123,7 @@ async function activationMutationReplayResponse(
   if (
     !isRecord(receipt.responseBody) ||
     receipt.responseBody.organisation_id !== authorized.organisationId ||
-    (receipt.responseBody.kind !== "retryable_failure" &&
-      receipt.responseBody.kind !== "terminal_failure") ||
+    receipt.responseBody.kind !== "retryable_failure" ||
     typeof receipt.responseBody.reason_code !== "string" ||
     typeof receipt.responseBody.correlation_id !== "string" ||
     typeof receipt.responseBody.support_reference !== "string"

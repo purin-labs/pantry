@@ -13,7 +13,6 @@ export type ActivationExecutionFailure = {
     | "activation_policy_failed"
     | "activation_cues_failed"
     | "activation_publish_failed";
-  readonly retryable: boolean;
   readonly correlationId: string;
   readonly supportReference: string;
 };
