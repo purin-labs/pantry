@@ -1382,14 +1382,11 @@ Proof: `plugin-journey.test.ts`, `merchant-plugin-journey.test.ts`,
 `plugin-handlers-journey.test.ts`, `plugin-limited-edition-journey.test.ts`,
 `plugin-loyalty-journey.test.ts`.
 
-Planned: the code of each built-in plugin in `src/plugins/<plugin>/` behind
-its `index.ts`; the route table, command union and spec appendices built
-from the plugins; plugin settings for built-in plugins; Japan export
-shipping as a plugin; guards on more moves; a delivery hook that changes the
-carrier rate; line prices above the catalog's; a plugin's fields on orders
-and other records; customer fields at checkout functions; more commands for
-handlers and actions;
-one receipt for the whole run of an action; the handler queue of step 8. A plugin returns operations; only the core changes data.
+Planned: a plugin's fields on orders and on records other than products,
+variants and customers; more commands for handlers and actions; the handler
+queue of step 8. Not planned: a delivery hook that changes the carrier rate
+(the shipping quote is stored with its tax and duty), and line prices above
+the catalog's. A plugin returns operations; only the core changes data.
 
 ### Recipe revisions
 
