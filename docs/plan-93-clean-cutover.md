@@ -981,9 +981,9 @@ Stripe Connect redirects, the Meta webhook and the remaining console names.
   Pages projects in the seamsadmin account) and its Google verification
   record are deleted, and the domain serves no website. Cloudflare refuses
   to remove the zone while this account holds the Registrar registration,
-  which ends on 11 August 2027 with auto renew off. Email Routing still
-  forwards one address of the domain to the owner's mailbox. The rule to
-  the deleted Worker `w3a-relay-prod` is deleted.
+  which ends on 11 August 2027 with auto renew off. The owner also stopped
+  the mail: Email Routing for the domain, its forwarding rules and its mail
+  records are deleted, and the zone has no DNS records.
 
 ### 7. Other projects (separate)
 
