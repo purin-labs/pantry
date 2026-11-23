@@ -1,5 +1,5 @@
 {
-  "total": {"copies":786,"lines":14074},
+  "total": {"copies":784,"lines":14033},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -34,10 +34,8 @@
     "areas/commerce/server/action-model.ts = areas/commerce/server/action-model.ts": {"copies":1,"lines":13},
     "areas/commerce/server/action-model.ts = packages/commerce-control-api/src/portal/commerce-actions.ts": {"copies":1,"lines":27},
     "areas/commerce/server/actions.ts = areas/commerce/server/actions.ts": {"copies":3,"lines":33},
-    "areas/commerce/server/actions.ts = areas/commerce/server/actors/harness-commerce-proposal.ts": {"copies":1,"lines":24},
     "areas/commerce/server/actors/commerce-projection/cues.ts = foundation/agent/cues/engine.ts": {"copies":1,"lines":8},
     "areas/commerce/server/actors/harness-commerce-proposal.ts = areas/commerce/server/actors/harness-commerce-proposal.ts": {"copies":5,"lines":83},
-    "areas/commerce/server/actors/harness-commerce-proposal.ts = areas/commerce/server/control/routes/commerce/actions.ts": {"copies":1,"lines":17},
     "areas/commerce/server/actors/harness-commerce-proposal.ts = areas/inbox/server/agent-tools/channels/handlers.ts": {"copies":1,"lines":12},
     "areas/commerce/server/actors/organisation/organisation-commerce.ts = areas/commerce/server/actors/organisation/organisation-commerce.ts": {"copies":6,"lines":120},
     "areas/commerce/server/actors/product-description-draft.ts = areas/inbox/server/actors/email-draft.ts": {"copies":1,"lines":41},

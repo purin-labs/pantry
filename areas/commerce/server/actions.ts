@@ -6,7 +6,7 @@ import { resolveActiveCaseActor, resolveActiveCaseActorAtPlacement } from "@puri
 import type { ActionLedgerEntry } from "@purin-labs/authority/actors/action-ledger";
 import type { OrganisationCommerce } from "./actors/organisation/organisation-commerce";
 import type { MerchantActionRejectionEvidence } from "@purin-labs/authority/approval-authentication";
-import { parseCommerceActionPath, parseCommerceEntityPlaneActionPath, parseCommerceProviderReceipt, type CommerceActionError, type CommerceEntityPlaneActionPath, type CommerceActionPath, type CommerceActionRequest } from "./action-model";
+import { commerceActionProjectionTarget, parseCommerceActionPath, parseCommerceEntityPlaneActionPath, parseCommerceProviderReceipt, type CommerceActionError, type CommerceEntityPlaneActionPath, type CommerceActionPath } from "./action-model";
 import { executeCommerceEntityPlaneAction, type CommerceEntityPlaneExecutionOutcome } from "./entity-plane/execution";
 import { admitCommerceCapability } from "./data/commerce-capability-activation";
 import { admitCommerceActionCapability, executeCommerceProviderAction, reconcileCommerceProviderAction, validateCommerceActionAuthorityBeforeExecution } from "./provider-execution";
@@ -21,42 +21,6 @@ import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import type { CommerceActionFollowUp } from "@purin-labs/commerce-control-api";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
-
-export function commerceActionProjectionTarget(
-  action: CommerceActionRequest | CommerceActionPath,
-): {
-  readonly kind: "product" | "offer" | "commerce_order" | "fulfillment";
-  readonly resourceId: string;
-} | null {
-  switch (action.kind) {
-    case "update_product_description":
-      return { kind: "product", resourceId: action.productId };
-    case "publish_catalog_listing":
-    case "adjust_offer_price":
-      return { kind: "offer", resourceId: action.offerId };
-    case "cancel_order":
-      return { kind: "commerce_order", resourceId: action.resourceId };
-    case "attach_tracking":
-      return { kind: "fulfillment", resourceId: action.fulfillmentId };
-    case "install_merchant_plugin":
-    case "publish_cafe_menu":
-    case "change_menu_price":
-    case "refund_order":
-    case "stock_operation":
-      // A plugin or a menu is configuration in Commerce, not a projection.
-      // A refund binds the order revision that Commerce checks at commit,
-      // a stock action the revisions that its approval signed, and a menu
-      // price the offer revision.
-      return null;
-    case "submit_supplier_payout":
-    case "resume_supplier_payout_funding":
-      // A payout is not a commerce projection. Its subject is its own row, and
-      // what an approval binds is the economics digest, not an Order revision.
-      return null;
-    default:
-      return assertNever(action);
-  }
-}
 
 /** The finished outcome of a commerce action: the body that the caller records. */
 type CommerceActionDone = Readonly<{ body: Record<string, unknown> }>;

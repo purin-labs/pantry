@@ -11,7 +11,6 @@ import {
   type ActionLedgerEntry,
 } from "@purin-labs/authority/actors/action-ledger";
 import type { CaseBinding } from "@purin-labs/contracts";
-import type { CommerceSource } from "@purin-labs/commerce-contracts";
 import {
   resolveActiveCaseActor,
   requireActiveOrganisationActor,
@@ -32,6 +31,8 @@ import {
   buildCommerceCancellationActionDraft,
   commerceActionExpectedRevision,
   commerceActionMutationDigest,
+  commerceActionProjectionTarget,
+  commerceActionProviderSupported,
   commerceTrackingAttachmentTargetMatches,
   parseCommerceActionPath,
   parseCommerceActionRequest,
@@ -121,29 +122,10 @@ import { assertNever } from "@purin-labs/std";
 import {
   type CommerceActionFailure,
   acceptAndDeliverCommerceOutcome,
-  commerceActionProjectionTarget,
   commerceActionRecord,
   executeCommerceAction,
 } from "../../../actions";
 import { commerceActionLedgerError } from "./support";
-
-function commerceActionProviderSupported(
-  source: CommerceSource,
-  kind: CommerceActionRequest["kind"],
-): boolean {
-  if (source === "lab") return true;
-  if (source === "shopify") return kind === "cancel_order";
-  if (source === "commerce") {
-    return (
-      kind === "update_product_description" ||
-      kind === "publish_catalog_listing" ||
-      kind === "cancel_order" ||
-      kind === "attach_tracking" ||
-      kind === "adjust_offer_price"
-    );
-  }
-  return false;
-}
 
 function controlCommerceActionCapability(
   integrationAccountId: IntegrationAccountId,

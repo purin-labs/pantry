@@ -2,6 +2,7 @@ import type {
   CanonicalCommerceDelivery,
   CommerceProjection,
   CommerceOrder,
+  CommerceSource,
   Fulfillment,
   Offer,
 } from "@purin-labs/commerce-contracts";
@@ -63,6 +64,7 @@ import {
 } from "@purin-labs/authority/actors/action-ledger";
 import type { Variant } from "@purin-labs/type-utils";
 import {
+  assertNever,
   hasExactKeys,
   isPositiveInteger,
   isRecord,
@@ -172,6 +174,65 @@ export type CommerceActionRequest =
       readonly attemptId: string;
       readonly providerTransferId: string;
     };
+
+/**
+ * Whether the provider of a projection runs an action of this kind. Shopify
+ * runs only `cancel_order`; Commerce runs its five kinds; the lab runs each.
+ */
+export function commerceActionProviderSupported(
+  source: CommerceSource,
+  kind: CommerceActionRequest["kind"],
+): boolean {
+  if (source === "lab") return true;
+  if (source === "shopify") return kind === "cancel_order";
+  if (source === "commerce") {
+    return (
+      kind === "update_product_description" ||
+      kind === "publish_catalog_listing" ||
+      kind === "cancel_order" ||
+      kind === "attach_tracking" ||
+      kind === "adjust_offer_price"
+    );
+  }
+  return false;
+}
+
+/** The projection whose revision a commerce action binds, or null. */
+export function commerceActionProjectionTarget(
+  action: CommerceActionRequest | CommerceActionPath,
+): {
+  readonly kind: "product" | "offer" | "commerce_order" | "fulfillment";
+  readonly resourceId: string;
+} | null {
+  switch (action.kind) {
+    case "update_product_description":
+      return { kind: "product", resourceId: action.productId };
+    case "publish_catalog_listing":
+    case "adjust_offer_price":
+      return { kind: "offer", resourceId: action.offerId };
+    case "cancel_order":
+      return { kind: "commerce_order", resourceId: action.resourceId };
+    case "attach_tracking":
+      return { kind: "fulfillment", resourceId: action.fulfillmentId };
+    case "install_merchant_plugin":
+    case "publish_cafe_menu":
+    case "change_menu_price":
+    case "refund_order":
+    case "stock_operation":
+      // A plugin or a menu is configuration in Commerce, not a projection.
+      // A refund binds the order revision that Commerce checks at commit,
+      // a stock action the revisions that its approval signed, and a menu
+      // price the offer revision.
+      return null;
+    case "submit_supplier_payout":
+    case "resume_supplier_payout_funding":
+      // A payout is not a commerce projection. Its subject is its own row, and
+      // what an approval binds is the economics digest, not an Order revision.
+      return null;
+    default:
+      return assertNever(action);
+  }
+}
 
 type CommerceCancellationRequest = Variant<
   CommerceActionRequest,

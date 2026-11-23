@@ -7,13 +7,9 @@ import {
 } from "@purin-labs/agent/actors/session-execution-admission";
 import type {
   CommerceProjection,
-  CommerceSource,
   SourceProvenance,
 } from "@purin-labs/commerce-contracts";
-import {
-  assertNever,
-  sha256Hex,
-} from "@purin-labs/std";
+import { sha256Hex } from "@purin-labs/std";
 import type { CommerceOrderV1 } from "@purin-labs/commerce-client";
 import type { Variant } from "@purin-labs/type-utils";
 import type { Env } from "@purin-labs/kernel/env";
@@ -56,6 +52,8 @@ import {
   buildMerchantPluginActionDraft,
   buildCommerceCancellationActionDraft,
   commerceActionExpectedRevision,
+  commerceActionProjectionTarget,
+  commerceActionProviderSupported,
   commerceTrackingAttachmentTargetMatches,
   type CommerceActionError,
   type CommerceActionRequest,
@@ -106,57 +104,6 @@ import {
 import { CARD_ONLY_REPLY_INSTRUCTION } from "@purin-labs/tool-handlers/slack/card-only-reply";
 import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 import type { MenuPriceProposalRequest } from "../contract/types";
-
-function commerceActionProjectionTarget(action: CommerceActionRequest): {
-  readonly kind: "product" | "offer" | "commerce_order" | "fulfillment";
-  readonly resourceId: string;
-} | null {
-  switch (action.kind) {
-    case "publish_catalog_listing":
-    case "adjust_offer_price":
-      return { kind: "offer", resourceId: action.offerId };
-    case "update_product_description":
-      return { kind: "product", resourceId: action.productId };
-    case "cancel_order":
-      return { kind: "commerce_order", resourceId: action.resourceId };
-    case "attach_tracking":
-      return { kind: "fulfillment", resourceId: action.fulfillmentId };
-    case "install_merchant_plugin":
-    case "publish_cafe_menu":
-    case "change_menu_price":
-    case "refund_order":
-    case "stock_operation":
-      // A plugin or a menu is configuration in Commerce, not a projection.
-      // A refund binds the order revision that Commerce checks at commit,
-      // and a menu price the offer revision.
-      return null;
-    case "submit_supplier_payout":
-    case "resume_supplier_payout_funding":
-      // A payout is not a commerce projection. Its subject is its own row, and
-      // what an approval binds is the economics digest, not an Order revision.
-      return null;
-    default:
-      return assertNever(action);
-  }
-}
-
-function commerceActionProviderSupported(
-  source: CommerceSource,
-  kind: CommerceActionRequest["kind"],
-): boolean {
-  if (source === "lab") return true;
-  if (source === "shopify") return kind === "cancel_order";
-  if (source === "commerce") {
-    return (
-      kind === "update_product_description" ||
-      kind === "publish_catalog_listing" ||
-      kind === "cancel_order" ||
-      kind === "attach_tracking" ||
-      kind === "adjust_offer_price"
-    );
-  }
-  return false;
-}
 
 type CommerceCancellationDraftError =
   | { readonly code: "commerce_projection_mismatch" }
