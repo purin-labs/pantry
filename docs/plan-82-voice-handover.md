@@ -111,8 +111,9 @@ A round takes about 40 minutes on the M4 Pro. A switch of phrase is one release:
 to `apps/portal/public/voice/`, set `scripts/shop-voice/wake-phrase.json` (the journeys read it),
 put the name first in `ASSISTANT_NAMES` in `surfaces/voice/server/vocabulary.ts`, and run
 the closed-chat Chrome journey. The wake worker drops the old model from each device's cache.
-`hey_satyr.onnx` stays in `apps/portal/public/voice` until one production wake passes on
-`hey_sous_chef.onnx`; then delete it.
+Keep the old model file until one production wake works on the new one, then delete it.
+`hey_satyr.onnx` went that way on 23 November 2026; its copy for the benches is
+`~/.satyr-voice-test/wake/models/hey_satyr.onnx`.
 
 ## Steps that need a shop
 
@@ -140,8 +141,8 @@ These wait until the owner has a shop. Do not ask the owner for them before that
    Portal in the owner's Chrome. It is about one hour of agent work.
 5. **The wake phrase rename.** The code says "Hey Sous Chef" since 23 November 2026, by the
    owner's decision, in production since 05:51 UTC (`pantry` `9cc4dc3b`): see "The wake phrase
-   (Plan 91 phase 6)". Open: one production wake on the new model and then the removal of
-   `hey_satyr.onnx`, and the owner's real-voice check.
+   (Plan 91 phase 6)". The owner's first production wake worked on the same day, and
+   `hey_satyr.onnx` left the Portal on `dev`. Open: the owner's real-voice check.
 6. **Plan 82B decisions.** The owner decides D1–D9. D9 needs counsel before any release, because a
    speaker template can be personal information.
 7. **Plan 82 Phase 5: Japanese.** Measure Whisper latency on the Japanese phrases, pass

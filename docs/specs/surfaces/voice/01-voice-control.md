@@ -363,8 +363,7 @@ commands.
 - **FND-07** owns information flow, and **FND-09** owns the agent tools and page context.
 - **DEV-01** owns the Devices page, which only reads the Mac rows. **PRT-01** owns the
   Portal.
-- **ENG-03** owns names. The old model `hey_satyr.onnx` stays in `apps/portal/public/voice`
-  until one production wake on `hey_sous_chef.onnx`. The Portal does not load it.
+- **ENG-03** owns names.
 - **[Plan 82B](../../../plan-82B-ambient-voice.md)** stays a plan. It owns commands with
   no wake phrase or key: the follow-up window, ambient mode and the speaker check.
 
@@ -384,8 +383,8 @@ The talk key works only while the page is in front.
 - **Mac enrollment.** The handover records no Mac on this stack and no token for its zone.
 - **Wake phrase.** The "Hey Sous Chef" model fails the macOS voice check of
   `scripts/plan-82-g04/compare.py` (53.3% heard against 66.5% for "Hey Satyr"), and no
-  real voice has scored it (`scripts/plan-82-g04/real-voices.py`). One production wake on
-  the new model is open.
+  recording of real voices has scored it (`scripts/plan-82-g04/real-voices.py`). The
+  owner's first wake in production worked.
 - **Qwen3-ASR as the default.** It needs a room-sound recording in a shop and a week of
   use. If it passes, the Platform writes Qwen3-ASR as the choice of each new Mac.
 - **Japanese.** Not built. It needs a latency measure, `language: "ja"` and a phrase bank.

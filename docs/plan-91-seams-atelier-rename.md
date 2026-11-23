@@ -916,10 +916,9 @@ Chef" is the first speech term, and "Satyr" left the speech terms, the Mac's
 lexicon and the confidence bench prompt. The journeys say "hey, sous chef"
 with the macOS voice Samantha (`scripts/shop-voice/wake-phrase.json`); the
 model scores it 1.0, and five natural macOS voices score at least 0.997.
-`hey_satyr.onnx` stays in `apps/portal/public/voice` until one production
-wake on the new model; the Portal no longer loads it, and the wake worker
-removes it from each device's cache. To roll back, set the two names and
-`wake-phrase.json` to "Hey Satyr" again.
+The Portal no longer loads `hey_satyr.onnx`, and the wake worker removes it
+from each device's cache. The file stayed in `apps/portal/public/voice` as
+the rollback until the first production wake (see "Released").
 
 Proof on the branch, 23 November 2026:
 
@@ -949,8 +948,20 @@ Portal build, the type checks, both voice journeys and the D1 schema check.
 After it: `/health` and `/portal` answer 200, `/voice/hey_sous_chef.onnx`
 has the model's SHA-256, the Portal file with the new phrase is served,
 `/shop-voice/install.sh` gives shop voice 0.5.2, and 114 tail events were
-`ok` with no exception. Rollback target: `fc7b7dcd`. Open: one wake in
-production on a real device, then the removal of `hey_satyr.onnx`.
+`ok` with no exception. Rollback target: `fc7b7dcd`.
+
+**First wake in production**, 23 November 2026 at about 06:37 UTC: the owner
+said "Hey Sous Chef" to the production Portal in Chrome on the Mac, and the
+spoken question "What's your name?" reached the chat, and Sous Chef
+answered. A first try failed because the owner spoke while voice control
+still said "Starting voice control…" (the first start downloads about 15 MB).
+After that wake, `hey_satyr.onnx` left `apps/portal/public/voice` on `dev`
+(owner's yes). It leaves production with the next release; until then the
+live Portal serves it but does not load it. A rollback to "Hey Satyr" now
+needs the earlier version `fc7b7dcd`, or the file again from
+`~/.satyr-voice-test/wake/models/hey_satyr.onnx` (SHA-256 `6d1b58d9…`).
+Open: the owner's real-voice check (`real-voices.py`), which measures how
+often the model hears a person.
 
 ## Built
 
