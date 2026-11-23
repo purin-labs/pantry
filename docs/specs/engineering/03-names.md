@@ -187,7 +187,7 @@ The Durable Object classes of the commerce engine are `CommerceMerchantDO` and
 ### Code and packages
 
 - Each pnpm workspace package has the scope `@purin-labs/`. The root package is
-  `seams-pantry` (see Open work).
+  `@purin-labs/pantry`.
 - `SLACK_APP_NAME` ("Purin Pantry") and `SLACK_BOT_NAME` ("Sous Chef") are in
   `packages/control-api/src/slack-names.ts`.
 - `MERCHANT_AGENT_DISPLAY_NAME` ("Sous Chef") is in
@@ -301,7 +301,6 @@ exported `PurinMark` and `PurinIcon`.
   `areas/organisation/server/control/routes/workspace.ts`).
 - The browser storage keys `pantry:cafeos:sidebar-expanded` and
   `pantry.bakeryos.vitrineCustomOrders.v1`.
-- The root package name `seams-pantry`.
 
 **The commerce engine in Portal text:** `areas/organisation/ui/pages/automation.tsx` and
 `areas/commerce/ui/features/commerce/production-plan.tsx` show these words to people.
