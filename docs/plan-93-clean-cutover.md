@@ -960,13 +960,8 @@ Stripe Connect redirects, the Meta webhook and the remaining console names.
 - **Still open:** a test order on `shop.purin.io` (the café menu was
   closed at midnight); the owner's first Turn on of the Gmail mailbox with
   the consent checkbox; the OpenRouter "Input & Output Logging" setting of
-  the Purin account, which the API cannot read; the zone `seams.tech`,
-  which Cloudflare refuses to remove because this account holds its
-  Cloudflare Registrar registration, expired on 11 October 2026 and now in
-  the redemption period (restore: $66.00 plus $49.20 for one year); and
-  the `speak-to-sign` project (Pages, KV `speak-to-sign-faucet-limits`)
-  with the domain `tatchi.xyz`, which still serves visitors from this
-  account. The stale zone record `seams.sh` (its name servers point to the
+  the Purin account, which the API cannot read.
+- **Closed:** the stale zone record `seams.sh` (its name servers point to the
   other account) and the token "Cloudflare Tunnel API Token for seams.sh"
   (no tunnel exists) are deleted. The token "seams-monorepo GitHub
   Actions" (Pages, D1 and Workers scripts in the whole account) was the
@@ -977,6 +972,18 @@ Stripe Connect redirects, the Meta webhook and the remaining console names.
   Cloudflare secrets to the seamsadmin account on 20 November. Of step 7 only `hadimar` (the owner keeps
   it) and the Pages project `outlayer-email-recovery-example` remain; the
   other groups are gone.
+- **Decided on 23 November 2026:** the owner deleted the domain
+  `seams.tech` and does not restore it. Its lapse costs nothing. Cloudflare
+  keeps the zone while this account holds the expired Registrar
+  registration. The owner keeps the `speak-to-sign` project (Pages, KV
+  `speak-to-sign-faucet-limits`). The owner deleted `tatchi.xyz`: its
+  website records (`tatchi.xyz` and `wallet.tatchi.xyz`, which pointed to
+  Pages projects in the seamsadmin account) and its Google verification
+  record are deleted, and the domain serves no website. Cloudflare refuses
+  to remove the zone while this account holds the Registrar registration,
+  which ends on 11 August 2027 with auto renew off. Email Routing still
+  forwards one address of the domain to the owner's mailbox. The rule to
+  the deleted Worker `w3a-relay-prod` is deleted.
 
 ### 7. Other projects (separate)
 
