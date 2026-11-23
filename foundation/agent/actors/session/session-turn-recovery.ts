@@ -161,7 +161,7 @@ export class SessionTurnRecovery {
       sessionId: sessionId.value,
       inspectedAt: now,
       alarmAt: null,
-      runtime: { persistence: "v28_canonical", lifecycleKind: "quarantined" },
+      runtime: { lifecycleKind: "quarantined" },
     });
     if (!work.ok) return kept(`inspection:${work.error.code}`);
     const others = work.value.blockers.filter(

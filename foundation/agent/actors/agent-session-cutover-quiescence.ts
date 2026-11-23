@@ -3,7 +3,6 @@ import type { Result } from "@purin-labs/kernel/result";
 import { assertNever, isNonNegativeInteger } from "@purin-labs/std";
 
 type SessionCutoverRuntime = {
-  readonly persistence: "v28_canonical";
   readonly lifecycleKind:
     | "sleeping"
     | "activating"

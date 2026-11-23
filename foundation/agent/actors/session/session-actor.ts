@@ -627,10 +627,7 @@ export abstract class SessionActor
       sessionId: input.sessionId,
       inspectedAt: Date.now(),
       alarmAt,
-      runtime: {
-        persistence: "v28_canonical",
-        lifecycleKind: header.value.lifecycleKind,
-      },
+      runtime: { lifecycleKind: header.value.lifecycleKind },
     });
     if (!quiescence.ok) return quiescence;
 
@@ -1499,10 +1496,7 @@ export abstract class SessionActor
       sessionId: input.sessionId,
       inspectedAt: Date.now(),
       alarmAt,
-      runtime: {
-        persistence: "v28_canonical",
-        lifecycleKind: record.value.lifecycle.kind,
-      },
+      runtime: { lifecycleKind: record.value.lifecycle.kind },
     });
   }
 
