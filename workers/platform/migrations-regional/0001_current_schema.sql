@@ -232,7 +232,7 @@ CREATE TABLE person_authz_audit (
   audit_id TEXT NOT NULL,
   person_id TEXT NOT NULL,
   operation TEXT NOT NULL CHECK (operation IN ('grant', 'revoke')),
-  role TEXT NOT NULL CHECK (role IN ('command', 'approve')),
+  role TEXT NOT NULL CHECK (role IN ('approve')),
   actor_kind TEXT NOT NULL CHECK (actor_kind = 'organisation_admin_token'),
   request_id TEXT NOT NULL,
   recorded_at INTEGER NOT NULL,
