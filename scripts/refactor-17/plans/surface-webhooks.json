@@ -1,0 +1,90 @@
+{
+  "about": "Refactor 17, Stage B, decision D1: the files of the surface webhooks join one workspace package @purin-labs/surface-webhooks in surfaces/webhooks. scripts/refactor-17/move-module.mjs reads this plan. files: each source file that scripts/layers.json gives the module, with its place in the target folder: a Worker file goes to server/ with its sub-path below services/platform/src/. No folder of the module has the name webhooks/, so each file keeps its first folder (gateway/ and gateway-routing/), and no two files share a place. sourcePrefixes: where --sync-plan puts a file that the module gets later. package: the manifest and the tsconfig of the new package; the versions of devDependencies come from the Worker manifest. The exports map gives each .ts file of server/ as an entry. The tsconfig of the package reads server/ only. The Worker tsconfigs include surfaces/*/server, so each file stays in the program that checked it before the move. edits: text edits of the files that name a source folder and cannot read scripts/lib/source-roots.mjs; an edit is done when the file holds its replace text. keepForm: each file where an import stays on its line, because the wrap of Prettier would move a ratchet, with its reason. regenerate: the commands that write a generated file again. package.typeCheck false: the package has no check:types script of its own. Its own files read the Env keys CASE, CONNECTOR, ORGANISATION and SESSION, which the Actor files of the Worker (workers/platform) merge, CUSTOM_CONNECTOR_FETCH, which the area integrations merges, and DEVICE_FLEET, which the area devices merges, each with declare module of @purin-labs/kernel/env. Through the foundation packages that it imports the program also lacks CODE_MODE_SANDBOX and MESSAGE_LINK_FETCH. The package alone gives 268 errors, 83 of them in its own files. The Worker program checks each file of server/.",
+  "module": "surfaces/webhooks",
+  "target": "surfaces/webhooks",
+  "workspaceEntry": "surfaces/*",
+  "sourcePrefixes": {
+    "services/platform/src/": "server/"
+  },
+  "files": {
+    "services/platform/src/gateway-routing/acceptance.ts": "server/gateway-routing/acceptance.ts",
+    "services/platform/src/gateway-routing/admin.ts": "server/gateway-routing/admin.ts",
+    "services/platform/src/gateway-routing/domain.ts": "server/gateway-routing/domain.ts",
+    "services/platform/src/gateway-routing/identity-and-installs.ts": "server/gateway-routing/identity-and-installs.ts",
+    "services/platform/src/gateway-routing/match.ts": "server/gateway-routing/match.ts",
+    "services/platform/src/gateway-routing/webhooks.ts": "server/gateway-routing/webhooks.ts",
+    "services/platform/src/gateway/admin/actor-registry.ts": "server/gateway/admin/actor-registry.ts",
+    "services/platform/src/gateway/admin/actor-relocation.ts": "server/gateway/admin/actor-relocation.ts",
+    "services/platform/src/gateway/admin/code-mode-cutover.ts": "server/gateway/admin/code-mode-cutover.ts",
+    "services/platform/src/gateway/admin/machine-census.ts": "server/gateway/admin/machine-census.ts",
+    "services/platform/src/gateway/admin/organisation-install.ts": "server/gateway/admin/organisation-install.ts",
+    "services/platform/src/gateway/admin/person-roles.ts": "server/gateway/admin/person-roles.ts",
+    "services/platform/src/gateway/cue-delivery.ts": "server/gateway/cue-delivery.ts",
+    "services/platform/src/gateway/cue-status.ts": "server/gateway/cue-status.ts",
+    "services/platform/src/gateway/event-queue.ts": "server/gateway/event-queue.ts",
+    "services/platform/src/gateway/identity-link.ts": "server/gateway/identity-link.ts",
+    "services/platform/src/gateway/support.ts": "server/gateway/support.ts",
+    "services/platform/src/ingress-queue.ts": "server/ingress-queue.ts"
+  },
+  "package": {
+    "name": "@purin-labs/surface-webhooks",
+    "exports": {
+      "./server/*": {
+        "types": "./server/*.ts",
+        "default": "./server/*.ts"
+      }
+    },
+    "dependencies": {
+      "@purin-labs/actor-runtime": "workspace:*",
+      "@purin-labs/agent": "workspace:*",
+      "@purin-labs/area-commerce": "workspace:*",
+      "@purin-labs/area-inbox": "workspace:*",
+      "@purin-labs/area-integrations": "workspace:*",
+      "@purin-labs/authority": "workspace:*",
+      "@purin-labs/commerce-client": "workspace:*",
+      "@purin-labs/commerce-contracts": "workspace:*",
+      "@purin-labs/connections": "workspace:*",
+      "@purin-labs/contracts": "workspace:*",
+      "@purin-labs/control": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/conversation": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/surface-email": "workspace:*",
+      "@purin-labs/surface-slack": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/type-utils": "workspace:*"
+    },
+    "devDependencies": ["@cloudflare/workers-types", "tsrs"],
+    "versionsFrom": "services/platform/package.json",
+    "tsconfig": {
+      "extends": "../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": ["ESNext"],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": ["@cloudflare/workers-types"],
+        "allowImportingTsExtensions": true
+      },
+      "include": ["server/**/*.ts"]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Worker files of the package",
+      "find": "PLATFORM_SOURCE.push(\"surfaces/slack/server\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"surfaces/slack/server\");\n// The Worker side of the surface webhooks (Refactor 17, Stage B).\nPLATFORM_SOURCE.push(\"surfaces/webhooks/server\");\n"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": ["node", "scripts/check-layers.mjs", "--areas", "--write"],
+      "writes": ["docs/layers.md"]
+    }
+  ]
+}
