@@ -1499,8 +1499,8 @@ export class MailInboxRoute extends React.Component<InboxProps, InboxState> {
                 <Mails size={28} aria-hidden="true" />
                 <p>
                   {this.state.whatsapp.kind === "read"
-                    ? "Choose a conversation to read it and its suggested reply here."
-                    : "Choose an email to read it and its suggested reply here."}
+                    ? "Choose a conversation."
+                    : "Choose an email."}
                 </p>
               </div>
             )}

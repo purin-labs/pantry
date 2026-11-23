@@ -29,15 +29,17 @@ but only a person can accept it.
 - **Overview**: one status line with the number of items that wait, the items that
   wait (most recent change first) and four counts as filters.
 - **Learning**: a flow of boxes for the stages of the loop, each with its count, and a
-  log below it, newest event first. The page derives both from the Memory histories
-  and the Eval runs that it already reads.
-- **Knowledge**: a rail with four kinds (Memory, Evals, Playbooks, Agents) and their
-  counts. Each record is a wide row with its scope in words and the time of its last
-  change. The browser keeps the rows that the person opened (at most 600, `MAX_OPENED`
+  log below it, newest event first: each line is the event in a sentence, its time
+  and its source. The page derives both from the Memory histories and the Eval runs
+  that it already reads.
+- **Knowledge**: one column. A row of links names the four kinds (Memory, Evals,
+  Skills, Agents) with their counts, and each kind is one framed list of rows. Each
+  record is a wide row with its scope in words and the time of its last change. The browser keeps the rows that the person opened (at most 600, `MAX_OPENED`
   in `seen.ts`), and a changed row that was not opened shows "New". A Memory row opens
   the record in place of the list: applicability, validity, evidence, history, and the
-  controls to accept, edit, decline, replace and revoke. Playbooks and Agents are
-  read-only rows that link to their owner. A filter by state (`review`, `in_use`,
+  controls to accept, edit, decline, replace and revoke. A record has one way back:
+  its close button. Skills (the playbooks of COM-05) and Agents are read-only rows
+  that link to their owner. A filter by state (`review`, `in_use`,
   `not_in_use`) and a search limit the rows.
 - **Teach a fact**: an entry in the Knowledge view for a person who may decide. It
   explains the steps and opens the chat. The page has no form for a new Memory.

@@ -1021,8 +1021,8 @@ export class MailConversation extends React.Component<Props, State> {
       return null;
     const proposal = draft.result.proposal;
     return (
+      // The facts of the suggested reply below: it has one name.
       <section className="mail-details-section">
-        <h4>Draft reply</h4>
         <dl className="mail-details-facts">
           <div>
             <dt>Subject</dt>
@@ -1132,7 +1132,8 @@ export class MailConversation extends React.Component<Props, State> {
     const sources = this.renderSources();
     const correction = this.renderCorrection(linked);
     const activity = linked === null ? null : this.renderActivity(linked);
-    const reply = this.renderDraft() ?? this.renderPersonReply();
+    const draft = this.renderDraft();
+    const reply = draft ?? this.renderPersonReply();
     const bar = this.renderBar();
     return (
       <div
@@ -1169,7 +1170,9 @@ export class MailConversation extends React.Component<Props, State> {
           >
             {this.renderDraftFacts()}
             {this.renderSender()}
-            {linked === null ? null : (
+            {/* A suggested reply with its actions says that it waits. */}
+            {linked === null ||
+            (draft !== null && waitsForApproval(linked.state)) ? null : (
               <div className="mail-details-section mail-details-case">
                 <p className="mail-details-state">{caseLabel(linked.state)}</p>
               </div>
@@ -1188,7 +1191,7 @@ export class MailConversation extends React.Component<Props, State> {
           <div
             className="mail-composer"
             ref={this.observeComposer}
-            data-kind={this.renderDraft() === null ? "person" : "draft"}
+            data-kind={draft === null ? "person" : "draft"}
           >
             {reply}
             {bar}
@@ -1333,6 +1336,10 @@ function assignmentLabel(assignment: MailWorkAssignment): string {
     default:
       return assertNever(assignment);
   }
+}
+
+function waitsForApproval(state: MailWorkCaseState): boolean {
+  return state.kind === "waiting" && state.reason === "approval";
 }
 
 function caseLabel(state: MailWorkCaseState): string {

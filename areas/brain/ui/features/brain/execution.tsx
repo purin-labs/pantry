@@ -339,13 +339,6 @@ function ActivityPanelView(props: ActivityPanelViewProps): React.ReactNode {
         Activity
       </h2>
       {props.execution.kind === "none" ? (
-        <p className="brain-muted brain-evals-intro">
-          Each Case is one piece of work. Open one to see every step the agents
-          took, what they proposed, and what was delivered. This view changes
-          nothing.
-        </p>
-      ) : null}
-      {props.execution.kind === "none" ? (
         <>
           <ViewSwitch
             className="case-timeline-switch"

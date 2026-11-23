@@ -111,10 +111,11 @@ and the Portal opens that action on Home. A Portal chat shows it as a card.
 ### Agents and their configuration
 
 The Agents page (`/portal/<org>/<workspace>/agents`, `pages/agent-console.tsx`) lists
-the agents and their recent work. An agent detail has Overview, Instructions, Skills,
-Tools and access, Triggers, **Run now** and Limits. `?view=schedules` shows the runs of
-each scheduled agent. Workspace settings holds **Operational areas**, and Knowledge
-shows the skills as "Playbooks".
+the agents and their recent work. An agent detail shows the name, the state, the role
+and the job at the top, then Suggested changes, Instructions, Skills, Tools and access,
+Triggers, **Run now** and Limits as sections of one column. `?view=schedules` shows the
+runs of each scheduled agent. Workspace settings holds **Operational areas**, and the
+Skills tab of Knowledge lists the skills.
 
 | Record                        | Meaning                                                                                          |
 | ----------------------------- | ------------------------------------------------------------------------------------------------ |

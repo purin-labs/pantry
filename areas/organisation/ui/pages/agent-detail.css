@@ -1,0 +1,79 @@
+/* One agent: its name and state on one line, then its role and its job. */
+.agent-detail-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  min-width: 0;
+}
+
+.agent-detail-heading {
+  margin-bottom: 20px;
+}
+
+.agent-detail-heading > p {
+  max-width: 72ch;
+}
+
+.agent-detail-activate {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+/* A form's button has the width of its label, not of the form. */
+.agent-detail .stacked-form > button:not(:where(.pantry-select-trigger)) {
+  justify-self: start;
+}
+
+/* Plain label and value rows, as the versions of an agent. */
+.agent-facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 6px 24px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.agent-facts dt {
+  color: var(--ink-2);
+}
+
+.agent-facts dd {
+  margin: 0;
+  color: var(--ink-strong);
+}
+
+.agent-activation-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+
+.agent-activation-row form {
+  margin: 0;
+}
+
+/* The skills, the assignments and the triggers of an agent are rows. */
+.agent-detail .agent-row {
+  padding: 14px 0;
+}
+
+.agent-detail .agent-row-main h5 {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.agent-detail .agent-row form {
+  margin: 0;
+}
+
+.agent-section > h3 {
+  margin: 0;
+}
+
+.agent-section > .commerce-list {
+  margin-top: 0;
+}

@@ -1,4 +1,5 @@
 import { Select } from "@purin-labs/ui/select";
+import { ArrowLeft } from "lucide-react";
 import React from "react";
 
 import type {
@@ -46,6 +47,8 @@ import {
   type AgentOperationSubmitter,
 } from "./agent-console-shared";
 import type { AgentSkillRef, ScheduleWeekday } from "@purin-labs/control-api";
+import "./agent-detail.css";
+import "./agent-rows.css";
 
 type AgentDetailProps = {
   readonly snapshot: AgentOperationsSnapshot;
@@ -55,19 +58,28 @@ type AgentDetailProps = {
   readonly mutation: AgentOperationMutationState;
   readonly canConfigure: boolean;
   readonly loadRevisions: AgentRevisionLoader;
+  /** Back to the list of agents. */
+  readonly onBack: () => void;
 };
 
+/**
+ * One agent: its name, state and job at the top, then each part of its
+ * setup as a section of one column.
+ */
 export function AgentDetail(props: AgentDetailProps): React.ReactNode {
   const busy = props.mutation.kind === "submitting";
   return (
-    <div className="agent-detail">
-      <OverviewSection {...props} busy={busy} />
-      <InstructionsSection {...props} busy={busy} />
+    <>
+      <AgentDetailHeading {...props} busy={busy} />
+      <div className="agent-detail">
+        <ProposalsSection {...props} busy={busy} />
+        <InstructionsSection {...props} busy={busy} />
       <ToolsSection {...props} busy={busy} />
       <TriggersSection {...props} busy={busy} />
       <RunNowSection {...props} busy={busy} />
-      <LimitsSection {...props} busy={busy} />
-    </div>
+        <LimitsSection {...props} busy={busy} />
+      </div>
+    </>
   );
 }
 
@@ -83,20 +95,23 @@ function activateDetailAgent(props: SectionProps): void {
   );
 }
 
-function OverviewSection(props: SectionProps): React.ReactNode {
+function AgentDetailHeading(props: SectionProps): React.ReactNode {
   const installations = installationsForDefinition(
     props.snapshot,
     props.definition.agentDefinitionId,
   );
-  const proposals = openProposalsForDefinition(
-    props.snapshot,
-    props.definition,
-  );
   return (
-    <section className="agent-section" aria-labelledby="agent-overview-title">
-      <h3 id="agent-overview-title">Overview</h3>
-      <div className="agent-overview-facts">
-        <p>{props.definition.purpose}</p>
+    <div className="agent-detail-heading">
+      <button
+        type="button"
+        className="agent-text-action"
+        onClick={props.onBack}
+      >
+        <ArrowLeft aria-hidden="true" size={16} />
+        All agents
+      </button>
+      <div className="agent-detail-title">
+        <h2>{props.definition.displayName}</h2>
         <div className="chip-list">
           {/* An agent with no activation is "Not active", whatever the
               lifecycle of its definition, so the two chips never disagree. */}
@@ -110,42 +125,43 @@ function OverviewSection(props: SectionProps): React.ReactNode {
             installations.map(renderInstallationChip.bind(null, props.snapshot))
           )}
         </div>
-        {installations.length === 0 ? (
-          <div className="empty-state">
-            <p>
-              This agent is not active yet. Activate it to let it work. To
-              choose its area and tools yourself, use Tools and access below.
-            </p>
-            {props.canConfigure ? (
-              <>
-                <button
-                  type="button"
-                  disabled={props.busy}
-                  onClick={activateDetailAgent.bind(null, props)}
-                >
-                  Activate {props.definition.displayName}
-                </button>
-                <MutationFeedback
-                  mutation={props.mutation}
-                  formKey={`activate:${props.definition.agentDefinitionId}`}
-                />
-              </>
-            ) : null}
-          </div>
-        ) : null}
       </div>
-      {proposals.length === 0 ? null : (
-        <div className="agent-proposals">
-          <h4>Suggested changes</h4>
-          <p>
-            This agent suggested better instructions. Nothing changes until you
-            accept a suggestion.
-          </p>
-          <div className="commerce-list">
-            {proposals.map((proposal) => renderProposal(proposal, props))}
-          </div>
+      <p>
+        {humanizeIdentifier(props.definition.role)} ·{" "}
+        {props.definition.purpose}
+      </p>
+      {installations.length === 0 && props.canConfigure ? (
+        <div className="agent-detail-activate">
+          <button
+            type="button"
+            disabled={props.busy}
+            onClick={activateDetailAgent.bind(null, props)}
+          >
+            Activate {props.definition.displayName}
+          </button>
+          <MutationFeedback
+            mutation={props.mutation}
+            formKey={`activate:${props.definition.agentDefinitionId}`}
+          />
         </div>
-      )}
+      ) : null}
+    </div>
+  );
+}
+
+/** The changes that the agent suggested. Nothing changes until one is accepted. */
+function ProposalsSection(props: SectionProps): React.ReactNode {
+  const proposals = openProposalsForDefinition(
+    props.snapshot,
+    props.definition,
+  );
+  if (proposals.length === 0) return null;
+  return (
+    <section className="agent-section" aria-labelledby="agent-proposals-title">
+      <h3 id="agent-proposals-title">Suggested changes</h3>
+      <div className="commerce-list">
+        {proposals.map((proposal) => renderProposal(proposal, props))}
+      </div>
     </section>
   );
 }
@@ -263,10 +279,6 @@ function InstructionsSection(props: SectionProps): React.ReactNode {
       aria-labelledby="agent-instructions-title"
     >
       <h3 id="agent-instructions-title">Instructions</h3>
-      <p>
-        What this agent is told at the start of every session. Markdown is
-        supported.
-      </p>
       {props.canConfigure ? (
         <DocumentEditor
           formKey={formKey}
@@ -282,6 +294,7 @@ function InstructionsSection(props: SectionProps): React.ReactNode {
           ]}
           fieldName="instructions"
           label="Instructions"
+          labelHidden
           submitLabel="Publish instructions"
           currentBody={revision.instructions}
           currentRevision={revision.revision}
@@ -321,17 +334,17 @@ function PendingActivations(props: SectionProps): React.ReactNode {
   return (
     <div className="agent-activation">
       <h4>Versions</h4>
-      <p>
-        Published version {published}. Publishing does not change a running
-        agent.
-      </p>
-      {installations.map((installation) => (
-        <ActivationRow
-          key={installation.installationId}
-          {...props}
-          installation={installation}
-        />
-      ))}
+      <dl className="agent-facts">
+        <dt>Published</dt>
+        <dd>Version {published}</dd>
+        {installations.map((installation) => (
+          <ActivationRow
+            key={installation.installationId}
+            {...props}
+            installation={installation}
+          />
+        ))}
+      </dl>
     </div>
   );
 }
@@ -346,23 +359,21 @@ function ActivationRow(
   const areas = installationAreaNames(props.snapshot, props.installation);
   const scope = areas === "no area" ? "This assignment" : areas;
   const updateAvailable = active !== published;
+  // Publishing does not change a running agent: an assignment keeps its
+  // version until someone activates the update.
   return (
-    <div className="agent-activation-row">
-      <p>
-        {scope}:{" "}
-        <StatusChip
-          status={
-            updateAvailable
-              ? {
-                  kind: "warning",
-                  label: `Update available · active ${active}`,
-                }
-              : { kind: "success", label: `Active ${active}` }
-          }
-        />
-      </p>
-      {updateAvailable ? <ActivateUpdateForm {...props} /> : null}
-    </div>
+    <>
+      <dt>{scope}</dt>
+      <dd className="agent-activation-row">
+        Version {active}
+        {updateAvailable ? (
+          <>
+            <StatusChip status={{ kind: "warning", label: "Update available" }} />
+            <ActivateUpdateForm {...props} />
+          </>
+        ) : null}
+      </dd>
+    </>
   );
 }
 
@@ -464,25 +475,26 @@ function AttachedSkills(props: SectionProps): React.ReactNode {
   return (
     <div className="agent-skills">
       <h4>Skills</h4>
-      <p>Reusable instructions this agent follows alongside its own.</p>
       {attached.length === 0 ? (
         <p className="empty-state">No skills attached yet.</p>
       ) : (
-        <div className="commerce-list">
+        <ul className="agent-rows">
           {attached.map((skill) => (
-            <article className="commerce-card" key={skill.skillId}>
-              <h4>{skill.title}</h4>
-              <TechnicalDetails summary="Skill contents">
-                <pre className="agent-document-preview">
-                  {skill.currentRevision.markdownBody}
-                </pre>
-              </TechnicalDetails>
+            <li className="agent-row" key={skill.skillId}>
+              <div className="agent-row-main">
+                <h5>{skill.title}</h5>
+                <TechnicalDetails summary="Show contents">
+                  <pre className="agent-document-preview">
+                    {skill.currentRevision.markdownBody}
+                  </pre>
+                </TechnicalDetails>
+              </div>
               {props.canConfigure ? (
                 <DetachSkillForm {...props} refs={refs} skill={skill} />
               ) : null}
-            </article>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
       {props.canConfigure && available.length > 0 ? (
         <AttachSkillForm {...props} refs={refs} available={available} />
@@ -602,8 +614,8 @@ function DetachSkillForm(
         />
       ))}
       {skillRefFields(remaining)}
-      <button type="submit" disabled={props.busy}>
-        Remove {props.skill.title}
+      <button type="submit" className="secondary-button" disabled={props.busy}>
+        Remove<span className="visually-hidden"> {props.skill.title}</span>
       </button>
       <MutationFeedback mutation={props.mutation} formKey={formKey} />
     </form>
@@ -627,9 +639,6 @@ function ToolsSection(props: SectionProps): React.ReactNode {
   return (
     <section className="agent-section" aria-labelledby="agent-tools-title">
       <h3 id="agent-tools-title">Tools and access</h3>
-      <p>
-        What this agent asks to do, and what each assignment is allowed to do.
-      </p>
       {props.canConfigure ? (
         <form
           className="stacked-form"
@@ -684,12 +693,9 @@ function ToolsSection(props: SectionProps): React.ReactNode {
       <div className="agent-access">
         <h4>Assignments</h4>
         {installations.length === 0 ? (
-          <p className="empty-state">
-            Not active yet. Activate it above, or choose its operational area
-            and tools here.
-          </p>
+          <p className="empty-state">No assignments yet.</p>
         ) : (
-          <div className="commerce-list">
+          <ul className="agent-rows">
             {installations.map(
               renderInstallationAccess.bind(
                 null,
@@ -697,7 +703,7 @@ function ToolsSection(props: SectionProps): React.ReactNode {
                 revision.requestedCapabilities,
               ),
             )}
-          </div>
+          </ul>
         )}
         {props.canConfigure ? <AssignAgentForm {...props} /> : null}
       </div>
@@ -714,8 +720,9 @@ function renderInstallationAccess(
     (capability) => !installation.grantedCapabilities.includes(capability),
   );
   return (
-    <article className="commerce-card" key={installation.installationId}>
-      <h4>{installationAreaNames(snapshot, installation)}</h4>
+    <li className="agent-row" key={installation.installationId}>
+      <div className="agent-row-main">
+      <h5>{installationAreaNames(snapshot, installation)}</h5>
       <p>
         {installation.areaAssignments
           .map((assignment) => assignment.responsibility)
@@ -738,7 +745,8 @@ function renderInstallationAccess(
           />
         ))}
       </div>
-    </article>
+      </div>
+    </li>
   );
 }
 
@@ -793,10 +801,6 @@ function AssignAgentForm(props: SectionProps): React.ReactNode {
             ))}
           </Select.Popup>
         </Select.Root>
-        <small>
-          Scopes describe the business records. Explicit capabilities control
-          read and command authority.
-        </small>
       </label>
       <label>
         <span>Responsibility</span>
@@ -910,20 +914,13 @@ function TriggersSection(props: SectionProps): React.ReactNode {
           </button>
         ) : null}
       </div>
-      <p>
-        What starts this agent's work: signals from your commerce data and
-        recurring schedules.
-      </p>
       {cues.length === 0 && schedules.length === 0 ? (
-        <p className="empty-state">
-          No automatic triggers configured. Assign this agent to an active area
-          to run it manually, or add an event or schedule to automate its work.
-        </p>
+        <p className="empty-state">No automatic triggers.</p>
       ) : (
-        <div className="trigger-list">
+        <ul className="agent-rows">
           {cues.map(renderCueTrigger.bind(null, props))}
           {schedules.map(renderScheduleTrigger.bind(null, props))}
-        </div>
+        </ul>
       )}
       {!props.canConfigure ? null : installations.length === 0 ? (
         <p className="empty-state">Assign this agent before adding triggers.</p>
@@ -1020,10 +1017,9 @@ function RunNowForm(
       onSubmit={props.submit.bind(null, formKey, "dispatch_manual_run")}
     >
       <p>
-        Start one run of this agent right away with the instruction below.
         {budgets.length > 0
-          ? ` The session budget of ${budgets[0]?.maxSessionBudgetTokens.toLocaleString()} tokens applies.`
-          : " The workspace policy budget applies."}
+          ? `The session budget of ${budgets[0]?.maxSessionBudgetTokens.toLocaleString()} tokens applies.`
+          : "The workspace policy budget applies."}
       </p>
       <AssignmentTargetFields
         snapshot={props.snapshot}
@@ -1047,8 +1043,7 @@ function renderCueTrigger(
 ): React.ReactNode {
   return renderTriggerRow(props, {
     bindingId: binding.bindingId,
-    title: `On ${cueEventLabel(binding.cueEventType).toLowerCase()}`,
-    detail: `Signal from ${humanizeIdentifier(binding.cueSource).toLowerCase()}`,
+    title: `On ${cueEventLabel(binding.cueEventType).toLowerCase()} · from ${humanizeIdentifier(binding.cueSource).toLowerCase()}`,
     enabled: binding.enabled,
     revision: binding.revision,
     instructionBody: binding.instructionBody,
@@ -1062,11 +1057,10 @@ function renderScheduleTrigger(
 ): React.ReactNode {
   return renderTriggerRow(props, {
     bindingId: binding.bindingId,
-    title: scheduleSpecLabel(binding.spec),
-    detail:
+    title:
       binding.spec.cadence === "hourly"
-        ? "Recurring schedule"
-        : `Recurring schedule · ${binding.spec.timezone}`,
+        ? scheduleSpecLabel(binding.spec)
+        : `${scheduleSpecLabel(binding.spec)} · ${binding.spec.timezone}`,
     enabled: binding.enabled,
     revision: binding.revision,
     instructionBody: binding.instructionBody,
@@ -1108,7 +1102,6 @@ function renderTriggerRow(
   row: {
     readonly bindingId: string;
     readonly title: string;
-    readonly detail: string;
     readonly enabled: boolean;
     readonly revision: number;
     readonly instructionBody: string | null;
@@ -1117,23 +1110,15 @@ function renderTriggerRow(
 ): React.ReactNode {
   const formKey = `trigger:${row.bindingId}`;
   return (
-    <div className="trigger-row" key={row.bindingId}>
-      <div>
-        <h4>{row.title}</h4>
-        <p>{row.detail}</p>
-        {row.instructionBody === null ? null : (
-          <p className="trigger-instruction">
-            When it fires: {row.instructionBody}
-          </p>
-        )}
+    <li className="agent-row" key={row.bindingId}>
+      <div className="agent-row-main">
+        <h5>{row.title}</h5>
+        {row.instructionBody === null ? null : <p>{row.instructionBody}</p>}
       </div>
-      <StatusChip
-        status={
-          row.enabled
-            ? { kind: "success", label: "On" }
-            : { kind: "neutral", label: "Off" }
-        }
-      />
+      {/* "Turn off" says that a trigger is on: only "Off" needs a mark. */}
+      {row.enabled ? null : (
+        <StatusChip status={{ kind: "neutral", label: "Off" }} />
+      )}
       {props.canConfigure ? (
         <form
           className="inline-form"
@@ -1159,7 +1144,7 @@ function renderTriggerRow(
         </form>
       ) : null}
       <MutationFeedback mutation={props.mutation} formKey={formKey} />
-    </div>
+    </li>
   );
 }
 
@@ -1411,10 +1396,6 @@ function LimitsSection(props: SectionProps): React.ReactNode {
   return (
     <section className="agent-section" aria-labelledby="agent-limits-title">
       <h3 id="agent-limits-title">Limits</h3>
-      <p>
-        How much a session may spend, and when waiting work is raised to the
-        owner.
-      </p>
       {installations.length === 0 ? (
         <p className="empty-state">Assign this agent to configure limits.</p>
       ) : (

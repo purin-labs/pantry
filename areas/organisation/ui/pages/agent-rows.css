@@ -27,7 +27,7 @@
   min-width: 0;
 }
 
-.agent-row-main h3 {
+.agent-row-main :is(h3, h5) {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -70,4 +70,9 @@
 /* The action sits on the line of the subtitle, below the fixed top bar. */
 .agents-page-heading {
   align-items: flex-end;
+}
+
+/* The Skills view has no visible heading: its one action sits at the end. */
+.agent-library-heading {
+  justify-content: flex-end;
 }

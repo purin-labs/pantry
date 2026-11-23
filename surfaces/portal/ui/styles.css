@@ -8817,16 +8817,15 @@ a.agent-work-row:hover .agent-work-title {
 .agent-detail {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 20px;
 }
 
+/* The sections of an agent are one column, with a rule between them. */
 .agent-section {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 14px;
-  padding: 22px;
-  border-radius: 16px;
-  background: var(--surface);
+  padding: 24px 0;
+  border-top: 1px solid var(--border);
 }
 
 .agent-section > h3,
@@ -8860,10 +8859,8 @@ a.agent-work-row:hover .agent-work-title {
   color: var(--ink-strong);
 }
 
-.agent-overview-facts,
 .agent-skills,
-.agent-access,
-.agent-proposals {
+.agent-access {
   display: grid;
   gap: 10px;
 }
@@ -8886,38 +8883,6 @@ a.agent-work-row:hover .agent-work-title {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   font-family: inherit;
-}
-
-.trigger-list {
-  display: grid;
-  gap: 10px;
-}
-
-.trigger-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--paper);
-}
-
-.trigger-row > div:first-child {
-  flex: 1 1 200px;
-  display: grid;
-  gap: 2px;
-}
-
-.trigger-row p {
-  margin: 0;
-  color: var(--ink-3);
-  font-size: 12px;
-}
-
-.trigger-row form {
-  margin: 0;
 }
 
 .operational-areas-actions {
@@ -8995,7 +8960,7 @@ a.agent-work-row:hover .agent-work-title {
 }
 
 .agent-detail button:not(:where(.pantry-select-trigger)).secondary-button,
-.trigger-row button:not(:where(.pantry-select-trigger)).secondary-button {
+.agent-rows button:not(:where(.pantry-select-trigger)).secondary-button {
   min-block-size: 32px;
   padding-inline: 14px;
   border: 1px solid var(--border);
@@ -9007,16 +8972,9 @@ a.agent-work-row:hover .agent-work-title {
 }
 
 .agent-detail button:not(:where(.pantry-select-trigger)).secondary-button:hover,
-.trigger-row button:not(:where(.pantry-select-trigger)).secondary-button:hover {
+.agent-rows button:not(:where(.pantry-select-trigger)).secondary-button:hover {
   border-color: var(--hairline);
   color: var(--ink-strong);
-}
-
-.trigger-instruction {
-  color: var(--ink-2);
-  font-size: 12px;
-  max-width: 48ch;
-  overflow-wrap: anywhere;
 }
 
 /* Agent documents: editor, diffs, revision history (plan 30 phase 2) */

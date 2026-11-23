@@ -39,8 +39,9 @@ export function knowledgeKindLabel(kind: KnowledgeKind): string {
       return "Memory";
     case "evals":
       return "Evals";
+    // Playbooks are the skills of the agents: one name, as on the Skills tab.
     case "playbooks":
-      return "Playbooks";
+      return "Skills";
     case "agents":
       return "Agents";
     default:
@@ -125,14 +126,11 @@ export function playbookRow(skill: Skill): KnowledgeRow {
     title: skill.title,
     scope:
       skill.sensitivity === "sensitive"
-        ? "A playbook for sensitive work"
-        : "A playbook that agents load",
+        ? "A skill for sensitive work"
+        : "A skill that agents load",
     changedAt: null,
-    statuses: [
-      published
-        ? { kind: "success", label: "Published" }
-        : { kind: "neutral", label: "Archived" },
-    ],
+    // A published skill is the normal state, as on the Skills tab.
+    statuses: published ? [] : [{ kind: "neutral", label: "Archived" }],
     states: [published ? "in_use" : "not_in_use"],
   };
 }
@@ -145,11 +143,8 @@ export function agentRow(agent: AgentDefinition): KnowledgeRow {
     title: agent.displayName,
     scope: agent.purpose.length > 0 ? agent.purpose : "An agent",
     changedAt: null,
-    statuses: [
-      active
-        ? { kind: "success", label: "Active" }
-        : { kind: "neutral", label: "Archived" },
-    ],
+    // An active agent is the normal state, as on the Agents page.
+    statuses: active ? [] : [{ kind: "neutral", label: "Archived" }],
     states: [active ? "in_use" : "not_in_use"],
   };
 }

@@ -35,7 +35,7 @@ export type LearningFlow = Readonly<{
   evalsInUse: number;
 }>;
 
-export type LearningEventKind =
+type LearningEventKind =
   "memory_proposed" | "eval_proposed" | "decision" | "eval_run";
 
 /** One line of the learning log. */
@@ -51,21 +51,6 @@ export type LearningEvent = Readonly<{
     { kind: "memory"; memoryId: string } | { kind: "eval"; evalId: string }
   >;
 }>;
-
-export function learningEventLabel(kind: LearningEventKind): string {
-  switch (kind) {
-    case "memory_proposed":
-      return "Memory proposed";
-    case "eval_proposed":
-      return "Eval proposed";
-    case "decision":
-      return "Decision";
-    case "eval_run":
-      return "Eval run";
-    default:
-      return assertNever(kind, "Unexpected value");
-  }
-}
 
 const SOURCE_KINDS: readonly MemoryEvidence["kind"][] = [
   "proposal_correction",
@@ -260,7 +245,7 @@ export function learningLog(
           key: `memory:${memory.memoryId}:${String(revision.revision)}:${decision.step}`,
           at: decision.at,
           kind: "decision",
-          source: "The Brain page",
+          source: "The Knowledge page",
           sentence: decision.sentence,
           target,
         });
@@ -283,7 +268,7 @@ export function learningLog(
           key: `eval:${entry.evalId}:${String(revision.revision)}:${decision.step}`,
           at: decision.at,
           kind: "decision",
-          source: "The Brain page",
+          source: "The Knowledge page",
           sentence: decision.sentence,
           target,
         });

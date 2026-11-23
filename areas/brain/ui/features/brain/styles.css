@@ -49,30 +49,6 @@
   gap: var(--pantry-space-6);
 }
 
-.brain-learning-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--pantry-space-2) var(--pantry-space-6);
-  margin: 0;
-}
-
-.brain-learning-stats div {
-  display: flex;
-  align-items: baseline;
-  gap: var(--pantry-space-2);
-}
-
-.brain-learning-stats dt {
-  color: var(--ink-2);
-}
-
-.brain-learning-stats dd {
-  margin: 0;
-  color: var(--ink-strong);
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-}
-
 .brain-flow {
   position: relative;
 }
@@ -167,37 +143,36 @@ a.brain-flow-card:hover {
   padding-top: var(--pantry-space-6);
 }
 
+/* The log is one framed list: the sentence, then its time and source. */
 .brain-log {
   display: grid;
   margin: 0;
-  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0 var(--pantry-space-4);
+  background: var(--paper);
   list-style: none;
+}
+
+.brain-log > li + li {
+  border-top: 1px solid var(--border);
 }
 
 .brain-log-row {
   display: grid;
-  grid-template-columns: 11rem 9rem minmax(8rem, 14rem) minmax(0, 1fr);
-  gap: var(--pantry-space-1) var(--pantry-space-4);
-  align-items: baseline;
-  border-radius: 6px;
-  padding: var(--pantry-space-2);
+  gap: 2px;
+  padding: var(--pantry-space-3) 0;
   color: var(--ink);
   text-decoration: none;
 }
 
-.brain-log-row:hover {
-  background: var(--pantry-sidebar-hover);
+.brain-log-row:hover .brain-log-sentence {
+  text-decoration: underline;
 }
 
-.brain-log-time {
-  color: var(--ink-3);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.8125rem;
-}
-
-.brain-log-kind,
-.brain-log-source {
+.brain-log-meta {
   color: var(--ink-2);
+  font-size: 0.875rem;
   overflow-wrap: anywhere;
 }
 
@@ -206,68 +181,29 @@ a.brain-flow-card:hover {
   overflow-wrap: anywhere;
 }
 
-@container brain (max-width: 900px) {
-  .brain-log-row {
-    grid-template-columns: 11rem minmax(0, 1fr);
-  }
-
-  .brain-log-source,
-  .brain-log-sentence {
-    grid-column: 1 / -1;
-  }
-}
-
 .brain-list {
   display: grid;
   gap: var(--pantry-space-4);
 }
 
-/* Knowledge: a rail of kinds, and each kind as a list of wide rows. A row
-   opens its record in place of the lists. */
+/* Knowledge: one column. The kinds are a row of links with their counts,
+   and each kind is a list of wide rows. A row opens its record in place of
+   the lists. */
 
 .brain-workbench {
   display: grid;
-  grid-template-columns: 200px minmax(0, 1fr);
-  gap: var(--pantry-space-8);
-  align-items: start;
-}
-
-.brain-rail {
-  position: sticky;
-  top: var(--pantry-space-4);
-  display: grid;
-  gap: 2px;
-}
-
-.brain-rail-item {
-  display: flex;
-  align-items: center;
-  gap: var(--pantry-space-3);
-  min-height: 36px;
-  border-radius: 8px;
-  padding: var(--pantry-space-1) var(--pantry-space-3);
-  color: var(--ink-2);
-  text-decoration: none;
-}
-
-.brain-rail-item:hover {
-  background: var(--pantry-sidebar-hover);
-  color: var(--ink);
-}
-
-.brain-rail-item[aria-current="true"] {
-  background: var(--pantry-sidebar-selected);
-  color: var(--ink-strong);
-  font-weight: 500;
-}
-
-.brain-rail-label {
-  flex: 1 1 auto;
+  gap: var(--pantry-space-4);
   min-width: 0;
 }
 
-.brain-rail-count,
-/* Overview: the counts are one row of filters. */
+.brain-rail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pantry-space-2);
+}
+
+/* Overview: the counts are one row of filters. The kinds of Knowledge are
+   a row of the same links. */
 .brain-counts {
   display: flex;
   flex-wrap: wrap;
@@ -276,7 +212,8 @@ a.brain-flow-card:hover {
   padding: 0;
   list-style: none;
 }
-.brain-count {
+.brain-count,
+.brain-rail-item {
   display: inline-flex;
   align-items: center;
   gap: var(--pantry-space-2);
@@ -288,17 +225,20 @@ a.brain-flow-card:hover {
   font-size: 0.875rem;
   text-decoration: none;
 }
-.brain-count:hover {
+.brain-count:hover,
+.brain-rail-item:hover {
   border-color: var(--ink-3);
 }
 .brain-count:focus-visible {
   outline: 2px solid var(--pantry-focus);
   outline-offset: 2px;
 }
-.brain-count-label {
+.brain-count-label,
+.brain-rail-label {
   color: var(--ink-2);
 }
-.brain-count-value {
+.brain-count-value,
+.brain-rail-count {
   color: var(--ink-strong);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -428,30 +368,34 @@ a.brain-flow-card:hover {
   color: var(--ink-3);
 }
 
+/* A group of records is one framed list of rows. */
 .brain-rows {
   display: grid;
-  gap: var(--pantry-space-2);
   margin: 0;
-  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0 var(--pantry-space-4);
+  background: var(--paper);
   list-style: none;
+}
+
+.brain-rows > li + li {
+  border-top: 1px solid var(--border);
 }
 
 .brain-row {
   display: flex;
   align-items: center;
   gap: var(--pantry-space-4);
-  min-height: 72px;
+  min-height: 64px;
   box-sizing: border-box;
-  background: var(--paper);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: var(--pantry-space-3) var(--pantry-space-4);
+  padding: var(--pantry-space-3) 0;
   color: var(--ink);
   text-decoration: none;
 }
 
-a.brain-row:hover {
-  border-color: var(--ink-3);
+a.brain-row:hover .brain-row-title {
+  text-decoration: underline;
 }
 
 a.brain-row:hover .brain-row-chevron {
@@ -514,33 +458,25 @@ a.brain-row:hover .brain-row-chevron {
   background: var(--paper);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: var(--pantry-space-4) var(--pantry-space-6) var(--pantry-space-6);
+  padding: var(--pantry-space-6);
+  position: relative;
 }
 
-.brain-record-path {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--pantry-space-3);
-  color: var(--ink-2);
-  font-size: 0.875rem;
+/* The title of a record leaves room for the close button. */
+.brain-record .brain-memory-head {
+  padding-right: var(--pantry-space-8);
 }
 
-/* A link that stands alone is 24 pixels tall or more, for a finger. */
-.brain-record-step {
-  display: inline-block;
-  padding-block: var(--pantry-space-1);
-  color: var(--ink-2);
-  text-decoration: none;
-}
-
-.brain-record-step:hover {
-  color: var(--ink);
-  text-decoration: underline;
+/* The record has one way back: the close button at its top right. */
+.brain-record-close {
+  position: absolute;
+  top: var(--pantry-space-4);
+  right: var(--pantry-space-4);
 }
 
 .brain-record-close {
   display: inline-flex;
+  flex: none;
   align-items: center;
   justify-content: center;
   width: 32px;
@@ -555,10 +491,18 @@ a.brain-row:hover .brain-row-chevron {
   color: var(--ink);
 }
 
-/* Each fact gets the width that its value needs, at each page width. */
+/* The facts of a record are plain label and value rows. */
 .brain-record .commerce-facts {
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  gap: var(--pantry-space-3) var(--pantry-space-4);
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--pantry-space-2) var(--pantry-space-6);
+}
+
+.brain-record .commerce-facts > div {
+  display: contents;
+}
+
+.brain-record .commerce-facts dd {
+  margin: 0;
 }
 
 .brain-link {
@@ -574,7 +518,6 @@ a.brain-flow-card:focus-visible,
 .brain-rail-item:focus-visible,
 .brain-filter-item:focus-visible,
 a.brain-row:focus-visible,
-.brain-record-step:focus-visible,
 .brain-record-close:focus-visible,
 .brain-link:focus-visible,
 .brain-kind-heading:focus-visible,
@@ -583,25 +526,7 @@ a.brain-row:focus-visible,
   outline-offset: 2px;
 }
 
-/* A narrow page has no room beside the lists: the rail goes above them. The
-   page measures itself, because the navigation beside it can be open or
-   closed. */
 @container brain (max-width: 760px) {
-  .brain-workbench {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--pantry-space-4);
-  }
-
-  .brain-rail {
-    position: static;
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  .brain-rail-label {
-    flex: 0 1 auto;
-  }
-
   .brain-record {
     padding: var(--pantry-space-4);
   }
@@ -761,16 +686,11 @@ a.brain-row:focus-visible,
   outline-offset: 1px;
 }
 
-.brain-evals-intro {
-  margin-bottom: var(--pantry-space-4);
-}
-
 .brain-context {
   display: grid;
   gap: var(--pantry-space-4);
 }
 
-.brain-context .brain-evals-intro,
 .brain-context > .brain-muted {
   margin: 0;
   max-width: 72ch;
@@ -1070,12 +990,6 @@ a.brain-row:focus-visible,
   gap: var(--pantry-space-4);
 }
 
-.brain-activity .brain-evals-intro {
-  max-width: 72ch;
-  margin-bottom: var(--pantry-space-4);
-}
-
-.brain-cases,
 .brain-execution-list,
 .brain-node-links {
   display: grid;
@@ -1104,7 +1018,6 @@ a.brain-row:focus-visible,
   cursor: pointer;
 }
 
-.brain-case:hover,
 .brain-node:hover {
   border-color: var(--ink-2);
 }
@@ -1137,6 +1050,21 @@ a.brain-row:focus-visible,
   gap: var(--pantry-space-2);
 }
 
+/* The Cases of one day are one framed list. */
+.brain-cases {
+  display: grid;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0 var(--pantry-space-4);
+  background: var(--paper);
+  list-style: none;
+}
+
+.brain-cases > li + li {
+  border-top: 1px solid var(--border);
+}
+
 .brain-case-day {
   margin: 0;
   color: var(--ink-2);
@@ -1149,11 +1077,13 @@ a.brain-row:focus-visible,
   align-items: center;
   justify-items: stretch;
   gap: var(--pantry-space-3);
-  padding: var(--pantry-space-3);
+  border: 0;
+  border-radius: 0;
+  padding: var(--pantry-space-3) 0;
 }
 
-.brain-case:hover {
-  background: var(--pantry-sidebar-hover);
+.brain-case:hover .brain-case-title {
+  text-decoration: underline;
 }
 
 .brain-case-icon,

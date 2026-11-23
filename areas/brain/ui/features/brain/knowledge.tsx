@@ -1,14 +1,5 @@
 import React from "react";
-import {
-  BookOpen,
-  Bot,
-  ChevronRight,
-  FileText,
-  ListChecks,
-  Search,
-  X,
-  type LucideIcon,
-} from "lucide-react";
+import { ChevronRight, Search } from "lucide-react";
 
 import type { EvalView, MemoryView } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
@@ -47,6 +38,7 @@ import {
   openCandidate,
   revisionStateLabel,
 } from "./model";
+import { RecordClose } from "./record-close";
 import { isNewRecord, type SeenRecords } from "./seen";
 
 /** An edit a reviewer is writing. Saving it makes a new version to review. */
@@ -174,21 +166,6 @@ function kindHeadingId(kind: KnowledgeKind): string {
   return `brain-kind-${kind}`;
 }
 
-function kindIcon(kind: KnowledgeKind): LucideIcon {
-  switch (kind) {
-    case "memory":
-      return FileText;
-    case "evals":
-      return ListChecks;
-    case "playbooks":
-      return BookOpen;
-    case "agents":
-      return Bot;
-    default:
-      return assertNever(kind, "Unexpected value");
-  }
-}
-
 function kindEmptyLine(kind: KnowledgeKind, filtered: boolean): string {
   if (filtered) return "Nothing here matches.";
   switch (kind) {
@@ -197,7 +174,7 @@ function kindEmptyLine(kind: KnowledgeKind, filtered: boolean): string {
     case "evals":
       return "No evals yet.";
     case "playbooks":
-      return "No playbooks to show.";
+      return "No skills to show.";
     case "agents":
       return "No agents to show.";
     default:
@@ -246,41 +223,9 @@ function goToKind(kind: KnowledgeKind): void {
   heading.focus({ preventScroll: true });
 }
 
-/** Which kind is at the top of the list now, for the mark on the rail. */
-function useKindInView(enabled: boolean): KnowledgeKind {
-  const [inView, setInView] = React.useState<KnowledgeKind>("memory");
-  React.useEffect(() => {
-    if (!enabled || typeof IntersectionObserver === "undefined") return;
-    const visible = new Set<KnowledgeKind>();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const kind = KNOWLEDGE_KINDS.find(
-            (candidate) =>
-              entry.target.id === `${kindHeadingId(candidate)}-list`,
-          );
-          if (kind === undefined) continue;
-          if (entry.isIntersecting) visible.add(kind);
-          else visible.delete(kind);
-        }
-        const first = KNOWLEDGE_KINDS.find((kind) => visible.has(kind));
-        if (first !== undefined) setInView(first);
-      },
-      // A kind counts as in view while it crosses the upper part of the page.
-      { rootMargin: "-15% 0px -55% 0px" },
-    );
-    for (const kind of KNOWLEDGE_KINDS) {
-      const section = document.getElementById(`${kindHeadingId(kind)}-list`);
-      if (section !== null) observer.observe(section);
-    }
-    return () => observer.disconnect();
-  }, [enabled]);
-  return inView;
-}
-
 /**
- * What the agents know. A rail of kinds, and each kind as a list of rows.
- * A row opens its record in place of the lists, with a path back.
+ * What the agents know. A row of the kinds with their counts, and each kind
+ * as a list of rows. A row opens its record in place of the lists.
  */
 export function KnowledgeView(props: KnowledgeViewProps): React.ReactNode {
   const [search, setSearch] = React.useState("");
@@ -302,7 +247,6 @@ export function KnowledgeView(props: KnowledgeViewProps): React.ReactNode {
       : (props.memories.find(
           (memory) => memory.memoryId === props.selectedMemoryId,
         ) ?? null);
-  const inView = useKindInView(!recordOpen);
 
   // The record on screen is no longer new to this browser.
   const { onSeen } = props;
@@ -315,8 +259,8 @@ export function KnowledgeView(props: KnowledgeViewProps): React.ReactNode {
       );
   }, [onSeen, props.selectedMemoryId, selectedChangedAt]);
 
-  // The rail leads to a kind of the lists. When a record is open, the lists
-  // come back first, and the page then goes to the kind.
+  // A kind link leads to a kind of the lists. When a record is open, the
+  // lists come back first, and the page then goes to the kind.
   const goNext = React.useRef<KnowledgeKind | null>(null);
   React.useLayoutEffect(() => {
     if (goNext.current === null || recordOpen) return;
@@ -332,16 +276,12 @@ export function KnowledgeView(props: KnowledgeViewProps): React.ReactNode {
       <div className="brain-workbench">
         <nav className="brain-rail" aria-label="Kinds of knowledge">
           {KNOWLEDGE_KINDS.map((kind) => {
-            const Icon = kindIcon(kind);
             const label = knowledgeKindLabel(kind);
             return (
               <a
                 key={kind}
                 className="brain-rail-item"
                 href={`#${kindHeadingId(kind)}`}
-                aria-current={
-                  (recordOpen ? "memory" : inView) === kind ? "true" : undefined
-                }
                 aria-label={`${label}, ${recordCount(shown[kind].length)}`}
                 onClick={(event) => {
                   if (!isPrimaryNavigationClick(event)) return;
@@ -351,7 +291,6 @@ export function KnowledgeView(props: KnowledgeViewProps): React.ReactNode {
                   props.onSelectMemory(null);
                 }}
               >
-                <Icon size={16} strokeWidth={1.6} aria-hidden="true" />
                 <span className="brain-rail-label">{label}</span>
                 <span className="brain-rail-count" aria-hidden="true">
                   {shown[kind].length}
@@ -363,35 +302,11 @@ export function KnowledgeView(props: KnowledgeViewProps): React.ReactNode {
         <div className="brain-workbench-main">
           {recordOpen ? (
             <section className="brain-record" aria-label="Memory details">
-              <div className="brain-record-path">
-                <nav aria-label="Path">
-                  <a
-                    className="brain-record-step"
-                    href={props.memoryHref(null)}
-                    onClick={(event) => {
-                      if (!isPrimaryNavigationClick(event)) return;
-                      event.preventDefault();
-                      props.onSelectMemory(null);
-                    }}
-                  >
-                    Knowledge
-                  </a>
-                  <span aria-hidden="true"> / </span>
-                  <span>Memory</span>
-                </nav>
-                <a
-                  className="brain-record-close"
-                  href={props.memoryHref(null)}
-                  aria-label="Close this memory"
-                  onClick={(event) => {
-                    if (!isPrimaryNavigationClick(event)) return;
-                    event.preventDefault();
-                    props.onSelectMemory(null);
-                  }}
-                >
-                  <X size={16} strokeWidth={1.6} aria-hidden="true" />
-                </a>
-              </div>
+              <RecordClose
+                href={props.memoryHref(null)}
+                label="Close this memory"
+                onClose={() => props.onSelectMemory(null)}
+              />
               {selected === null ? (
                 <p
                   className="brain-muted"
@@ -448,7 +363,6 @@ export function KnowledgeView(props: KnowledgeViewProps): React.ReactNode {
               </div>
               {teach !== null && teaching ? <TeachPanel teach={teach} /> : null}
               {KNOWLEDGE_KINDS.map((kind) => {
-                const Icon = kindIcon(kind);
                 const rows = shown[kind];
                 const firstUse =
                   kind === "memory" && !filtered && all.memory.length === 0;
@@ -459,14 +373,13 @@ export function KnowledgeView(props: KnowledgeViewProps): React.ReactNode {
                     id={`${kindHeadingId(kind)}-list`}
                     aria-labelledby={kindHeadingId(kind)}
                   >
+                    {/* The row of kinds above the lists holds the count. */}
                     <h3
                       className="brain-kind-heading"
                       id={kindHeadingId(kind)}
                       tabIndex={-1}
                     >
-                      <Icon size={16} strokeWidth={1.6} aria-hidden="true" />
                       {knowledgeKindLabel(kind)}
-                      <span className="brain-kind-count">{rows.length}</span>
                     </h3>
                     {firstUse ? (
                       <EmptyState
@@ -710,8 +623,7 @@ function MemoryDetail(
           <p className="brain-memory-statement">{candidate.statement}</p>
           <p className="brain-muted">
             {effectiveLabel(candidate.validity)}. Proposed by{" "}
-            {authorLabel(candidate).toLowerCase()}. The version in use stays in
-            force until someone accepts this one.
+            {authorLabel(candidate).toLowerCase()}.
           </p>
         </section>
       ) : null}

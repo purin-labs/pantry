@@ -232,7 +232,8 @@ export function sourceKindLabel(record: MailReplySourceRecord): string {
     case "purchase_request":
       return "Purchase request";
     case "memory":
-      return "Brain memory";
+      // The Portal names the page of memories "Knowledge".
+      return "Memory";
     default:
       return assertNever(record);
   }
@@ -261,7 +262,7 @@ export function recordLinkLabel(record: MailReplySourceRecord): string {
     case "purchase_request":
       return "Open supplier";
     case "memory":
-      return "Open in Brain";
+      return "Open in Knowledge";
     default:
       return assertNever(record);
   }

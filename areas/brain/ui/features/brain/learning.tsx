@@ -3,11 +3,7 @@ import { ChevronRight } from "lucide-react";
 
 import { isPrimaryNavigationClick } from "@purin-labs/ui/console-sidebar";
 import { formatAbsoluteTime } from "@purin-labs/ui/formatting";
-import {
-  learningEventLabel,
-  type LearningEvent,
-  type LearningFlow,
-} from "./learning-model";
+import type { LearningEvent, LearningFlow } from "./learning-model";
 
 /** Where the parts of the Learning view lead. */
 type LearningLinks = Readonly<{
@@ -154,10 +150,6 @@ export function LearningView(
       onOpen: props.onOpenEvals,
     },
   ];
-  const sourceCount = flow.sources.reduce(
-    (sum, source) => sum + source.count,
-    0,
-  );
   const { ref, width } = useElementWidth();
   const asList = width !== null && width < FLOW_MIN_WIDTH;
   return (
@@ -165,16 +157,6 @@ export function LearningView(
       <h2 className="visually-hidden" id="brain-learning" tabIndex={-1}>
         Learning
       </h2>
-      <dl className="brain-learning-stats">
-        <div>
-          <dt>Kinds of source</dt>
-          <dd>{flow.sources.length}</dd>
-        </div>
-        <div>
-          <dt>Records learned from</dt>
-          <dd>{sourceCount}</dd>
-        </div>
-      </dl>
       <div ref={ref}>
         {asList ? (
           <div className="brain-flow-list">
@@ -214,17 +196,14 @@ export function LearningView(
                     props.onOpenEvent(event);
                   }}
                 >
-                  <time
-                    className="brain-log-time"
-                    dateTime={new Date(event.at).toISOString()}
-                  >
-                    {formatAbsoluteTime(event.at)}
-                  </time>
-                  <span className="brain-log-kind">
-                    {learningEventLabel(event.kind)}
-                  </span>
-                  <span className="brain-log-source">{event.source}</span>
+                  {/* The sentence names the kind of event. */}
                   <span className="brain-log-sentence">{event.sentence}</span>
+                  <span className="brain-log-meta">
+                    <time dateTime={new Date(event.at).toISOString()}>
+                      {formatAbsoluteTime(event.at)}
+                    </time>
+                    {` · ${event.source}`}
+                  </span>
                 </a>
               </li>
             ))}

@@ -5,7 +5,6 @@ import { Link, useLocation } from "react-router";
 import { pageLink } from "@purin-labs/ui/page-address";
 import { brainAddress, brainAddressSearch } from "@purin-labs/area-brain/ui/features/brain/address";
 import {
-  ArrowLeft,
   ArrowRight,
   CircleAlert,
   ShieldCheck,
@@ -278,29 +277,16 @@ function renderConsoleView(
       const definition = definitionById(props.snapshot, view.agentDefinitionId);
       if (definition === null) return null;
       return (
-        <>
-          <div className="agent-detail-heading">
-            <button
-              type="button"
-              className="agent-text-action"
-              onClick={showView.bind(null, setView, LIST_VIEW)}
-            >
-              <ArrowLeft aria-hidden="true" size={16} />
-              Back to overview
-            </button>
-            <h2>{definition.displayName}</h2>
-            <p>{humanizeIdentifier(definition.role)}</p>
-          </div>
-          <AgentDetail
-            snapshot={props.snapshot}
-            definition={definition}
-            submit={props.submit}
-            run={props.run}
-            mutation={props.mutation}
-            canConfigure={props.canConfigure}
-            loadRevisions={props.loadRevisions}
-          />
-        </>
+        <AgentDetail
+          snapshot={props.snapshot}
+          definition={definition}
+          submit={props.submit}
+          run={props.run}
+          mutation={props.mutation}
+          canConfigure={props.canConfigure}
+          loadRevisions={props.loadRevisions}
+          onBack={showView.bind(null, setView, LIST_VIEW)}
+        />
       );
     }
     default:
@@ -1695,11 +1681,9 @@ function SkillsLibraryView(
   const closeEditor = (): void => setEditingId(null);
   return (
     <div className="agent-console">
+      {/* The Skills tab names the view: the heading is for a screen reader. */}
+      <h2 className="visually-hidden">Skills</h2>
       <div className="agent-library-heading">
-        <div>
-          <h2>Skills library</h2>
-          <p>Reusable instructions you can attach to an agent.</p>
-        </div>
         {props.canConfigure ? (
           <button
             type="button"
@@ -1718,11 +1702,11 @@ function SkillsLibraryView(
           action={null}
         />
       ) : (
-        <div className="commerce-list">
+        <ul className="agent-rows">
           {props.snapshot.skills.map(
             renderSkill.bind(null, props, editing, setEditingId),
           )}
-        </div>
+        </ul>
       )}
       <SideDrawer
         open={editing !== null}
@@ -1799,23 +1783,35 @@ function renderSkill(
     )
     .map((definition) => definition.displayName);
   return (
-    <article className="commerce-card" key={skill.skillId}>
-      <div className="agent-card-heading">
-        <h3>{skill.title}</h3>
-        <StatusChip status={lifecycleChip(skill.lifecycle)} />
+    <li className="agent-row" key={skill.skillId}>
+      <div className="agent-row-main">
+        <h3>
+          {skill.title}
+          {/* A published skill is the normal state: only another one is marked. */}
+          {skill.lifecycle === "published" ? null : (
+            <StatusChip status={lifecycleChip(skill.lifecycle)} />
+          )}
+        </h3>
+        <p>
+          {humanizeIdentifier(skill.sensitivity)}
+          {usedBy.length === 0
+            ? " · not attached to any agent"
+            : ` · used by ${usedBy.join(", ")}`}
+          {` · version ${skill.currentRevision.revision}`}
+        </p>
+        {props.canConfigure ? null : (
+          <TechnicalDetails summary="Show contents">
+            <pre className="agent-document-preview">
+              {skill.currentRevision.markdownBody}
+            </pre>
+          </TechnicalDetails>
+        )}
       </div>
-      <p>
-        {humanizeIdentifier(skill.sensitivity)}
-        {usedBy.length === 0
-          ? " · not attached to any agent"
-          : ` · used by ${usedBy.join(", ")}`}
-        {` · version ${skill.currentRevision.revision}`}
-      </p>
       {props.canConfigure ? (
-        <>
+        <span className="agent-card-actions">
           <button
             type="button"
-            className="agent-text-action"
+            className="secondary-button"
             onClick={() => setEditingId(skill.skillId)}
           >
             Edit
@@ -1827,14 +1823,8 @@ function renderSkill(
               formKey={skillFormKey(skill)}
             />
           )}
-        </>
-      ) : (
-        <TechnicalDetails summary="Skill contents">
-          <pre className="agent-document-preview">
-            {skill.currentRevision.markdownBody}
-          </pre>
-        </TechnicalDetails>
-      )}
-    </article>
+        </span>
+      ) : null}
+    </li>
   );
 }

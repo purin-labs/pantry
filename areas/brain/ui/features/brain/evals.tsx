@@ -1,6 +1,5 @@
 import { Select } from "@purin-labs/ui/select";
 import React from "react";
-import { X } from "lucide-react";
 
 import {
   evalConfigurationVerdict,
@@ -65,6 +64,7 @@ import {
 import { knowledgeRowId, KnowledgeRows } from "./knowledge";
 import { evalRow, rowsForReview, type KnowledgeRow } from "./knowledge-model";
 import { openCandidate } from "./model";
+import { RecordClose } from "./record-close";
 import type { SeenRecords } from "./seen";
 import { SideDrawer } from "@purin-labs/ui/index";
 
@@ -540,35 +540,11 @@ function EvalsPanelView(props: EvalsPanelViewProps): React.ReactNode {
       )}
       {props.selectedEvalId !== null ? (
         <section className="brain-record" aria-label="Eval details">
-          <div className="brain-record-path">
-            <nav aria-label="Path">
-              <a
-                className="brain-record-step"
-                href={props.evalHref(null)}
-                onClick={(event) => {
-                  if (!isPrimaryNavigationClick(event)) return;
-                  event.preventDefault();
-                  props.onSelectEval(null);
-                }}
-              >
-                Evals
-              </a>
-              <span aria-hidden="true"> / </span>
-              <span>Eval</span>
-            </nav>
-            <a
-              className="brain-record-close"
-              href={props.evalHref(null)}
-              aria-label="Close this eval"
-              onClick={(event) => {
-                if (!isPrimaryNavigationClick(event)) return;
-                event.preventDefault();
-                props.onSelectEval(null);
-              }}
-            >
-              <X size={16} strokeWidth={1.6} aria-hidden="true" />
-            </a>
-          </div>
+          <RecordClose
+            href={props.evalHref(null)}
+            label="Close this eval"
+            onClose={() => props.onSelectEval(null)}
+          />
           {selected === null ? (
             <p className="brain-muted" id={EVAL_DETAIL_TITLE_ID} tabIndex={-1}>
               This eval is not available to you.
@@ -577,45 +553,31 @@ function EvalsPanelView(props: EvalsPanelViewProps): React.ReactNode {
             <EvalRecord {...props} target={selected} />
           )}
         </section>
+      ) : // The tab names the list, so it has no heading of its own.
+      rows.length === 0 ? (
+        <EmptyState
+          title="No evals yet"
+          detail="When you correct an email reply, the agent may propose an eval with the memory it learned. It appears here for review."
+        />
       ) : (
-        <>
-          <p className="brain-muted brain-evals-intro">
-            An eval is a small set of situations with the result you expect in
-            each. Run it to see what the agent does with the memory in use, and
-            with a proposed memory before you accept it.
-          </p>
-          <section className="brain-kind" aria-labelledby="brain-evals-list">
-            <h3 className="brain-kind-heading" id="brain-evals-list">
-              Evals
-              <span className="brain-kind-count">{rows.length}</span>
-            </h3>
-            {rows.length === 0 ? (
-              <EmptyState
-                title="No evals yet"
-                detail="When you correct an email reply, the agent may propose an eval with the memory it learned. It appears here for review."
-              />
-            ) : (
-              <KnowledgeRows
-                label="Evals"
-                rows={rows}
-                seen={props.seen}
-                showKind={false}
-                onSeen={props.onSeen}
-                links={{
-                  // This list holds Evals only.
-                  memoryHref: () => props.evalHref(null),
-                  onSelectMemory: () => undefined,
-                  evalHref: props.evalHref,
-                  onOpenEval: props.onSelectEval,
-                  agentsHref: null,
-                  onOpenAgents: () => undefined,
-                  skillsHref: props.evalHref(null),
-                  onOpenSkills: () => undefined,
-                }}
-              />
-            )}
-          </section>
-        </>
+        <KnowledgeRows
+          label="Evals"
+          rows={rows}
+          seen={props.seen}
+          showKind={false}
+          onSeen={props.onSeen}
+          links={{
+            // This list holds Evals only.
+            memoryHref: () => props.evalHref(null),
+            onSelectMemory: () => undefined,
+            evalHref: props.evalHref,
+            onOpenEval: props.onSelectEval,
+            agentsHref: null,
+            onOpenAgents: () => undefined,
+            skillsHref: props.evalHref(null),
+            onOpenSkills: () => undefined,
+          }}
+        />
       )}
     </section>
   );
@@ -687,20 +649,17 @@ function EvalRecord(
           )}
         </>
       )}
-      <p className="brain-muted">
-        This eval comes from a Case.{" "}
-        <a
-          className="brain-link"
-          href={props.caseHref(lead.sourceCaseId)}
-          onClick={(event) => {
-            if (!isPrimaryNavigationClick(event)) return;
-            event.preventDefault();
-            props.onOpenCase(lead.sourceCaseId);
-          }}
-        >
-          Open its execution
-        </a>
-      </p>
+      <a
+        className="brain-link brain-record-case"
+        href={props.caseHref(lead.sourceCaseId)}
+        onClick={(event) => {
+          if (!isPrimaryNavigationClick(event)) return;
+          event.preventDefault();
+          props.onOpenCase(lead.sourceCaseId);
+        }}
+      >
+        Open the Case
+      </a>
     </div>
   );
 }

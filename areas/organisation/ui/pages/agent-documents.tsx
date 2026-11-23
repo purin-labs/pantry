@@ -162,6 +162,8 @@ export function DocumentEditor(props: {
   readonly hidden: readonly { readonly name: string; readonly value: string }[];
   readonly fieldName: "instructions" | "markdownBody";
   readonly label: string;
+  /** The heading above the editor already says the label. */
+  readonly labelHidden?: boolean;
   readonly submitLabel: string;
   readonly currentBody: string;
   readonly currentRevision: number;
@@ -204,7 +206,9 @@ export function DocumentEditor(props: {
       >
         {props.hidden.map(renderHiddenField)}
         <label>
-          <span>{props.label}</span>
+          <span className={props.labelHidden ? "visually-hidden" : undefined}>
+            {props.label}
+          </span>
           <textarea
             ref={editor}
             name={props.fieldName}
