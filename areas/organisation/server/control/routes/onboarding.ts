@@ -20,6 +20,7 @@ import {
   ensureCurrentReadiness,
   ensureCurrentReadinessFromSignals,
   parseSetupSelection,
+  recordOnboardingStageViewed,
   selectSetupTemplates,
   setupCatalog,
 } from "../../data/onboarding";
@@ -36,10 +37,7 @@ import {
   parseOrganisationInvitationEmail,
   revokeOrganisationMembership,
 } from "@purin-labs/tenancy/data/control-plane";
-import {
-  prepareOnboardingEvent,
-  type StoredControlMutationReceipt,
-} from "@purin-labs/tenancy/data/control-mutation";
+import type { StoredControlMutationReceipt } from "@purin-labs/tenancy/data/control-mutation";
 import {
   archiveOrganisation,
   deleteArchivedOrganisation,
@@ -88,7 +86,6 @@ import {
   isPositiveInteger,
   isRecord,
 } from "@purin-labs/std";
-import { readOnboardingRow } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 export type OnboardingControlRoute =
   | Readonly<{ kind: "organisations" }>
@@ -960,32 +957,15 @@ async function handleStageViewed(
     authorized.authenticated.session.userId,
   );
   if (identity instanceof Response) return identity;
-  const row = await readOnboardingRow(
-    authorized.executionScope.database,
-    authorized.organisationId,
-  );
-  if (
-    row === null ||
-    (row.environment !== "development" && row.environment !== "production") ||
-    typeof row.projectionRevision !== "number"
-  ) {
-    return controlError("organisation_not_found", 404);
-  }
-  const now = Date.now();
-  const eventIdentity = await controlMutationIdentity(request, identity, now);
-  const session =
-    authorized.executionScope.database.withSession("first-primary");
-  await session.batch([
-    prepareOnboardingEvent(session, eventIdentity, {
-      eventId: eventIdentity.auditEventId,
-      eventType: "onboarding_stage_viewed",
-      organisationId: authorized.organisationId,
-      environment: row.environment,
-      projectionRevision: row.projectionRevision,
-      attributes: { stage: body.value.stage },
-    }),
-  ]);
-  return controlJson({ kind: "success" });
+  const recorded = await recordOnboardingStageViewed({
+    db: authorized.executionScope.database,
+    organisationId: authorized.organisationId,
+    identity: await controlMutationIdentity(request, identity, Date.now()),
+    stage: body.value.stage,
+  });
+  return recorded.ok
+    ? controlJson({ kind: "success" })
+    : controlError(recorded.error.code, 404);
 }
 
 async function handleActivate(

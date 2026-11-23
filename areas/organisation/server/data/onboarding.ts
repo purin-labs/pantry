@@ -43,6 +43,7 @@ import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import { isRecord, sha256Hex } from "@purin-labs/std";
 import type { CuePresetId } from "@purin-labs/control-api";
+import { readOnboardingRow } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 export type CapabilityProfile = "read_and_propose" | "approved_provider_writes";
 export type PolicyTemplateId = "commerce_operator";
@@ -1588,6 +1589,39 @@ async function nextReadinessVersion(
     .bind(organisationId)
     .first<{ version: unknown }>();
   return typeof row?.version === "number" ? row.version + 1 : 1;
+}
+
+/**
+ * Records that a person opened a setup stage in the Portal: one
+ * `onboarding_stage_viewed` event, at the current projection revision. It
+ * changes no state.
+ */
+export async function recordOnboardingStageViewed(input: {
+  readonly db: OrganisationDatabase;
+  readonly organisationId: OrganisationId;
+  readonly identity: ControlMutationIdentity;
+  readonly stage: string;
+}): Promise<Result<null, { readonly code: "organisation_not_found" }>> {
+  const row = await readOnboardingRow(input.db, input.organisationId);
+  if (
+    row === null ||
+    (row.environment !== "development" && row.environment !== "production") ||
+    typeof row.projectionRevision !== "number"
+  ) {
+    return { ok: false, error: { code: "organisation_not_found" } };
+  }
+  const session = input.db.withSession("first-primary");
+  await session.batch([
+    prepareOnboardingEvent(session, input.identity, {
+      eventId: input.identity.auditEventId,
+      eventType: "onboarding_stage_viewed",
+      organisationId: input.organisationId,
+      environment: row.environment,
+      projectionRevision: row.projectionRevision,
+      attributes: { stage: input.stage },
+    }),
+  ]);
+  return { ok: true, value: null };
 }
 
 /**
