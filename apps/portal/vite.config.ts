@@ -15,8 +15,8 @@ export default defineConfig({
       },
     },
     // A browser journey mounts a page from its source files. A file of
-    // areas/, foundation/ or packages/ has no fixed address on the dev
-    // server: Vite serves it below /@fs/ and the folder of the checkout.
+    // areas/, surfaces/, foundation/ or packages/ has no fixed address on the
+    // dev server: Vite serves it below /@fs/ and the folder of the checkout.
     // /source-url.js gives the address of a source file from its path in the
     // repository. It is the address that the imports of the Portal get, so
     // the journey and the Portal share one instance of the module.
