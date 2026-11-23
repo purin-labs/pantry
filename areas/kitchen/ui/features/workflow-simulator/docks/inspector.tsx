@@ -632,7 +632,7 @@ function VitrineDetails(props: Props): React.ReactNode {
                 <th scope="col">Order</th>
                 <th scope="col">Channel</th>
                 <th scope="col">Items</th>
-                <th scope="col">Beverage (61B–E)</th>
+                <th scope="col">Beverage</th>
                 <th scope="col">Time</th>
                 <th scope="col">Status</th>
               </tr>
@@ -835,7 +835,7 @@ function renderCustomerOrderRow(
           >
             <Select.Trigger
               aria-label={`Beverage recipe for ${ord.id}`}
-              title={`Select Plan 61B–E beverage recipe for ${ord.id}`}
+              title={`Select the beverage recipe for ${ord.id}`}
               style={{ maxWidth: "10.5rem" }}
             >
               <Select.Value />
@@ -978,7 +978,7 @@ function Inspection(props: Props): React.ReactNode {
               </dd>
               {context.task.kind === "process" && (
                 <>
-                  <dt>Plan 61A phase</dt>
+                  <dt>Financier phase</dt>
                   <dd>
                     {plan61ASubstepAt(context.task, props.state.time).label}
                   </dd>
@@ -1053,7 +1053,7 @@ function Inspection(props: Props): React.ReactNode {
               {vitrine.soldBallotinBoxes} sold, +
               {vitrine.restockedBallotinBoxes} restocked)
             </dd>
-            <dt>Café bar drinks (Plan 61E)</dt>
+            <dt>Café bar drinks</dt>
             <dd>{vitrine.barStatusLabel}</dd>
             <dt>Order arrival schedule</dt>
             <dd>{vitrine.customArrivalSummary}</dd>
@@ -1155,7 +1155,7 @@ function Inspection(props: Props): React.ReactNode {
         ) : null}
         {current.kind === "process" && (
           <>
-            <dt>Plan 61A phase</dt>
+            <dt>Financier phase</dt>
             <dd>{plan61ASubstepAt(current, props.state.time).label}</dd>
             <dt>Mass / mould detail</dt>
             <dd>{plan61ASubstepAt(current, props.state.time).massNote}</dd>
@@ -1246,7 +1246,7 @@ function TaskInspection(
         <>
           <dt>Kitchen zone</dt>
           <dd>{stationZoneLabel(task.station)}</dd>
-          <dt>Plan 61A phase</dt>
+          <dt>Financier phase</dt>
           <dd>{plan61ASubstepAt(task, props.state.time).label}</dd>
           <dt>Mass / mould detail</dt>
           <dd>{plan61ASubstepAt(task, props.state.time).massNote}</dd>

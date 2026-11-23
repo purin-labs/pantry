@@ -233,7 +233,7 @@ function financierBakeContent(
     ),
     results: (
       <>
-        <h4>Plan 61A Financier Dosing &amp; Maruzen MBCO-5E Bake Ledger</h4>
+        <h4>Financier Dosing &amp; Maruzen MBCO-5E Bake Ledger</h4>
         <dl>
           <dt>Matsunaga 8P cavities filled</dt>
           <LiveText

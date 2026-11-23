@@ -16,12 +16,11 @@ type Props = Readonly<{
 const MODES = [
   {
     value: "two-pan-milk-tea",
-    label:
-      "Plan 61D Two-Pan Ginger Milk Tea (pan-a simmer → pan-b milk finish)",
+    label: "Two-Pan Ginger Milk Tea (pan-a simmer → pan-b milk finish)",
   },
   {
     value: "black-tea",
-    label: "Plan 61C Ginger Black Tea (heat-off steeping on heatproof rest)",
+    label: "Ginger Black Tea (heat-off steeping on heatproof rest)",
   },
 ];
 const HOBS = [
@@ -122,13 +121,13 @@ export class GingerTeaCobotRecipeAuthor extends React.Component<Props, State> {
           FAIRINO FR10 Cobot stages the clean 200 mm receiving saucepan in its
           rigid 600 × 400 mm tray insert (`persistent-pan-staging/1`), weighs 15
           g sliced ginger on the Ohaus Ranger 3000 scale, simmers ginger on the
-          Maruzen MIH-02C or Vollrath 59500P induction hob, executes either Plan
-          61C heat-off steeping on the heatproof rest or Plan 61D two-pan
-          straining into `pan-b` with 180 g milk + 25 g sugar finishing to 78 °C
-          (75–80 °C), and washes used utensils at the sink.
+          Maruzen MIH-02C or Vollrath 59500P induction hob, executes either
+          heat-off steeping on the heatproof rest or two-pan straining into
+          `pan-b` with 180 g milk + 25 g sugar finishing to 78 °C (75–80 °C),
+          and washes used utensils at the sink.
         </p>
         <RecipeChoice
-          label="Workflow mode (Plan 61C vs Plan 61D)"
+          label="Workflow mode"
           items={MODES}
           value={this.state.mode}
           choose={(value) => {

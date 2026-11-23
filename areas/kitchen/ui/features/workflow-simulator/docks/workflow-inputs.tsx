@@ -204,9 +204,7 @@ export function WorkflowDock(props: WorkflowProps): React.ReactNode {
                     onClick={props.onSubviewChange.bind(null, "steps")}
                   >
                     <div className="production-catalog-card-body">
-                      <strong>
-                        Financier morning · Full Plan 61A 3D workflow
-                      </strong>
+                      <strong>Financier morning · Full 3D workflow</strong>
                       <small>
                         Ohaus scale, Maruzen brown butter, Hobart HL200 mix,
                         Matsunaga 8P bake, sink mould wash &amp; vitrine refill
@@ -251,8 +249,7 @@ export function WorkflowDock(props: WorkflowProps): React.ReactNode {
                   >
                     <div className="production-catalog-card-body">
                       <strong>
-                        Combined Café Shift · Financiers &amp; Espresso (Plan
-                        61E)
+                        Combined Café Shift · Financiers &amp; Espresso
                       </strong>
                       <small>
                         Baker FR10 #1 + Barista FR10 #2 · Matsunaga 8P loads
@@ -327,7 +324,7 @@ export function WorkflowDock(props: WorkflowProps): React.ReactNode {
             <VitrineStockSummary {...props} />
             <details className="workflow-plan61a-summary">
               <summary>
-                Plan 61A recipe mass &amp; mould balance (
+                Recipe mass &amp; mould balance (
                 {PLAN_61A_MASS_BALANCE.inputGrams} g batch)
               </summary>
               <dl className="workflow-plan61a-dl">
@@ -870,7 +867,7 @@ function VitrineStockSummary(props: WorkflowProps): React.ReactNode {
           {vitrine.waitingOrders.length} waiting ·{" "}
           {vitrine.upcomingOrders.length} upcoming
         </dd>
-        <dt>Café bar drinks (Plan 61E)</dt>
+        <dt>Café bar drinks</dt>
         <dd>{vitrine.barStatusLabel}</dd>
         <dt>Order arrival schedule</dt>
         <dd>{vitrine.customArrivalSummary}</dd>

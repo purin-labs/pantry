@@ -24,8 +24,7 @@ type State = Readonly<{
 const LOAD_PRESET_ITEMS = [
   {
     value: "two-accepted-16",
-    label:
-      "Plan 61A 3-load campaign (24 baked − 8 rejected = 16 accepted · 376.0 g)",
+    label: "3-load campaign (24 baked − 8 rejected = 16 accepted · 376.0 g)",
   },
   {
     value: "single-load-8",
@@ -127,7 +126,7 @@ export class FinancierPackRecipeAuthor extends React.Component<Props, State> {
           gift box.
         </p>
         <RecipeChoice
-          label="Accepted baked financier load (Plan 61A mass balance)"
+          label="Accepted baked financier load (mass balance)"
           items={LOAD_PRESET_ITEMS}
           value={this.state.loadPreset}
           choose={(value) => {

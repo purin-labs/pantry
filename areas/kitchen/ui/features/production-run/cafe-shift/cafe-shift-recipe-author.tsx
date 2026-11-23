@@ -80,7 +80,7 @@ const CHECK_ITEMS = [
   {
     value: "reject-second-load",
     label:
-      "Plan 61E fault journey · 2 loads, reject Load 2 (7 packed, 8 rejected, 72.0 g espresso)",
+      "Fault journey · 2 loads, reject Load 2 (7 packed, 8 rejected, 72.0 g espresso)",
   },
   {
     value: "interrupted-extraction",
@@ -134,7 +134,7 @@ export class CafeShiftRecipeAuthor extends React.Component<Props, State> {
           Combined Café Shift · Financier Patisserie &amp; Espresso Service
         </h3>
         <p>
-          Plan 61E composes Financier production (152 °C beurre noisette on
+          The shift composes Financier production (152 °C beurre noisette on
           Maruzen MIH-02C, Hobart HL200 726.0 g batter, Matsunaga 8P mould
           dosing, Maruzen MBCO-5E 170 °C bake, 16-rack cooling, 23.5 g Ohaus
           crumb sample, and gold-ribbon ballotin packing) with preheated
@@ -198,7 +198,7 @@ export class CafeShiftRecipeAuthor extends React.Component<Props, State> {
           }}
         />
         <RecipeChoice
-          label="Shift staffing (Plan 61E controlled comparison)"
+          label="Shift staffing (controlled comparison)"
           items={STAFFING_ITEMS}
           value={this.state.staffing}
           choose={(value) => {

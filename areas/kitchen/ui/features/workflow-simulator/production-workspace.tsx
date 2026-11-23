@@ -1166,7 +1166,7 @@ export class ProductionWorkspace extends React.Component<
       void this.prepareDefinition(
         parsed.settings,
         defaultAssignments(parsed.settings),
-        `Applied Plan 61E Combined Café Shift (${outcome.servedEspressoG.toFixed(1)} g espresso · ${outcome.packedFinanciers} packed financiers · ${bakers} worker${bakers > 1 ? "s" : ""}).`,
+        `Applied the Combined Café Shift (${outcome.servedEspressoG.toFixed(1)} g espresso · ${outcome.packedFinanciers} packed financiers · ${bakers} worker${bakers > 1 ? "s" : ""}).`,
       );
     }
   }
@@ -3433,7 +3433,7 @@ export class ProductionWorkspace extends React.Component<
               >
                 <div className="production-catalog-card-body">
                   <strong>
-                    Combined Café Shift · Financiers &amp; Espresso (Plan 61E)
+                    Combined Café Shift · Financiers &amp; Espresso
                   </strong>
                   <small>
                     Baker FR10 #1 + Barista FR10 #2 · Matsunaga 8P loads &amp;

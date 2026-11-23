@@ -225,7 +225,7 @@ function financierPackContent(
     ),
     results: (
       <>
-        <h4>Plan 61A Financier Demoulding, Crumb Check &amp; Pack Ledger</h4>
+        <h4>Financier Demoulding, Crumb Check &amp; Pack Ledger</h4>
         <dl>
           <dt>Demoulded onto wire grid</dt>
           <LiveText
@@ -285,7 +285,7 @@ function financierPackContent(
 const LOAD_PRESET_ITEMS = [
   {
     value: "two-accepted-16",
-    label: "Plan 61A campaign (16 accepted · 376.0 g → 15 packed · 352.5 g)",
+    label: "3-load campaign (16 accepted · 376.0 g → 15 packed · 352.5 g)",
   },
   {
     value: "single-load-8",

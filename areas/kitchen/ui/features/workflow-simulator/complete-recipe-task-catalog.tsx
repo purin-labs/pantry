@@ -38,7 +38,7 @@ const COMPLETE_RECIPE_TASK_CARDS: readonly CompleteRecipeTaskCard[] = [
     section: "ginger-tea",
     title: "Ginger Black Tea & Two-Pan Milk Tea · FR10 Pan Staging",
     subtitle:
-      "Plan 61C heat-off steeping & Plan 61D rigid-insert pan-b staging to 78 °C milk finish",
+      "Heat-off steeping & rigid-insert pan-b staging to 78 °C milk finish",
   },
   {
     section: "financier-batter",

@@ -200,8 +200,8 @@ function gingerTeaContent(
   return {
     title:
       recipe.mode === "two-pan-milk-tea"
-        ? "Plan 61D Two-Pan Ginger Milk Tea · FR10 Pan-B Staging & 78 °C Milk Finishing"
-        : "Plan 61C Ginger Black Tea · FR10 Clean-Pan Staging & Heat-Off Extraction",
+        ? "Two-Pan Ginger Milk Tea · FR10 Pan-B Staging & 78 °C Milk Finishing"
+        : "Ginger Black Tea · FR10 Clean-Pan Staging & Heat-Off Extraction",
     scene: <GingerTeaPhysicsView hob={recipe.hob} frames={frames} />,
     summary:
       outcome?.kind === "completed" ? (
@@ -227,8 +227,8 @@ function gingerTeaContent(
           <dt>Workflow procedure</dt>
           <dd>
             {recipe.mode === "two-pan-milk-tea"
-              ? "Plan 61D Two-Pan Ginger Milk Tea (pan-a simmer → pan-b strain & 75–80 °C milk finish)"
-              : "Plan 61C Ginger Black Tea (heat-off steeping on heatproof rest)"}
+              ? "Two-Pan Ginger Milk Tea (pan-a simmer → pan-b strain & 75–80 °C milk finish)"
+              : "Ginger Black Tea (heat-off steeping on heatproof rest)"}
           </dd>
           <dt>FR10 MuJoCo pan staging (`persistent-pan-staging/1`)</dt>
           <LiveText
@@ -272,12 +272,11 @@ function gingerTeaContent(
 const MODES = [
   {
     value: "two-pan-milk-tea",
-    label:
-      "Plan 61D Two-Pan Ginger Milk Tea (pan-a simmer → pan-b milk finish)",
+    label: "Two-Pan Ginger Milk Tea (pan-a simmer → pan-b milk finish)",
   },
   {
     value: "black-tea",
-    label: "Plan 61C Ginger Black Tea (heat-off steeping on heatproof rest)",
+    label: "Ginger Black Tea (heat-off steeping on heatproof rest)",
   },
 ];
 const TEAS = [
@@ -317,10 +316,10 @@ function GingerTeaScenarioForm(props: {
       apply={() => props.apply({ ...props.recipe, mode, hob, tea, check })}
     >
       <p>
-        FAIRINO FR10 Cobot operating the Plan 61C Ginger Black Tea and Plan 61D
-        Two-Pan Ginger Milk Tea bench: wash sink, rigid pan-staging insert,
-        Ohaus Ranger 3000 scale, Maruzen / Vollrath induction hob, heatproof
-        rest, and fine mesh strainer.
+        FAIRINO FR10 Cobot operating the Ginger Black Tea and Two-Pan Ginger
+        Milk Tea bench: wash sink, rigid pan-staging insert, Ohaus Ranger 3000
+        scale, Maruzen / Vollrath induction hob, heatproof rest, and fine mesh
+        strainer.
       </p>
       <RecipeChoice
         label="Tea workflow mode"

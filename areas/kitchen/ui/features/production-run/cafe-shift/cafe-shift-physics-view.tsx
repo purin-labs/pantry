@@ -407,7 +407,7 @@ export class CafeShiftWorkspace extends React.Component<
         seek={this.scrubToTime.bind(this)}
         animation={this.animation}
         scene={<CafeShiftPhysicsView frames={frames} />}
-        kicker="Tier 3 · Plan 61E Combined Café Shift"
+        kicker="Tier 3 · Combined Café Shift"
         title={
           <>
             Financiers ({config.financierLoads} load
@@ -436,7 +436,7 @@ export class CafeShiftWorkspace extends React.Component<
         }
         headings={{
           scenario: "Scenario and staffing controls",
-          results: "Plan 61E café shift results",
+          results: "Café shift results",
         }}
         scenario={
           <CafeShiftScenarioForm
@@ -447,7 +447,7 @@ export class CafeShiftWorkspace extends React.Component<
         }
         results={
           <>
-            <h4>Plan 61E Combined Café Shift Ledger</h4>
+            <h4>Combined Café Shift Ledger</h4>
             <dl>
               <dt>Served espresso</dt>
               <LiveText

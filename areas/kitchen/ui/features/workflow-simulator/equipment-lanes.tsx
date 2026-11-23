@@ -69,7 +69,7 @@ export function EquipmentLanes(props: Props): React.ReactNode {
           <Select.Popup>
             {lanes.map(renderOptions)}
             <Select.Group>
-              <Select.GroupLabel>Café bar (Plan 61E)</Select.GroupLabel>
+              <Select.GroupLabel>Café bar</Select.GroupLabel>
               {vitrine.orders.map((ord) => (
                 <Select.Item key={ord.id} value={barValue(ord)}>
                   {barLabel(ord)}

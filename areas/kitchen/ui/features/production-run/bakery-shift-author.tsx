@@ -72,16 +72,15 @@ function shiftFields(
 }
 
 const SHIFT_SCOPE_ITEMS = [
-  { value: "bounded", label: "Financiers and milk tea (MVP)" },
+  { value: "bounded", label: "Financiers and milk tea" },
   {
     value: "morning-shift",
-    label:
-      "Full morning shift: four financiers, two pies and drinks (Plan 61E)",
+    label: "Full morning shift: four financiers, two pies and drinks",
   },
   {
     value: "six-hour-shift",
     label:
-      "6-hour shift: multi-wave financiers, two pies, three tea waves and relief breaks (Plan 61E)",
+      "6-hour shift: multi-wave financiers, two pies, three tea waves and relief breaks",
   },
 ];
 
@@ -464,7 +463,7 @@ export class BakeryShiftAuthor extends React.Component<Props, State> {
         ? "6 h horizon (21,600 s)"
         : this.state.scope === "morning-shift"
           ? "8 h horizon (28,800 s)"
-          : "Bounded MVP";
+          : "Bounded run";
     const financierPlanLabel = isExtended
       ? `${this.state.financierWaves} wave${this.state.financierWaves === "1" ? "" : "s"} · ${this.state.loads} tray${this.state.loads === "1" ? "" : "s"}/flavour · reorder < ${this.state.reorderThresholdUnits}`
       : `${this.state.loads} hazelnut tray${this.state.loads === "1" ? "" : "s"}`;
