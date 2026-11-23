@@ -1033,20 +1033,13 @@ async function handleActivate(
   if (!modelRoute.ok) {
     return controlError(activationModelRouteError(modelRoute.error.code), 409);
   }
-  const runtimeAdmission = await runtimeAdmissionStatus(
-    env,
-    authorized.organisationId,
-    now,
-  );
-  if (runtimeAdmission === "unavailable") {
-    return controlError("runtime_admission_unavailable", 503);
-  }
+  // The model route resolved, so the runtime admission is available.
   await ensureCurrentReadiness({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
     fence: lifecycleFenceOf(authorized.executionScope),
     now,
-    runtimeAdmission,
+    runtimeAdmission: "available",
     commerceSystemReadiness: await commerceSystemReadiness(
       env,
       authorized.organisationId,

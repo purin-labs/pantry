@@ -125,8 +125,8 @@ and the `configuration_version` that it used. Each new assessment writes one
 
 `POST …/activate` sends `readinessVersion` and `readinessHash`. The route resolves the
 model route first. If no route resolves, it answers 409 with a code such as
-`codex_subscription_required`. If the runtime admission is `unavailable`, it answers 503
-`runtime_admission_unavailable`. The route then refreshes readiness. Then
+`codex_subscription_required`. The route then refreshes readiness, with the runtime
+admission `available`. Then
 `OrganisationActor.activateOnboarding` (`actors/organisation/activation.ts`) runs one
 serialized command of the Organisation.
 
