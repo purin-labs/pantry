@@ -115,8 +115,11 @@ jobs:
           node scripts/bakery-robots/install-native-sdk.mjs "$MUJOCO_DIR"
           pnpm --filter @purin-labs/platform contracts:media
           edge_failed=0
+          # A shard that prints nothing for 10 minutes is stopped, with a list
+          # of the runner's processes (scripts/ci-stall-guard.sh). A shard takes
+          # about 30 minutes and prints a line each few seconds.
           for edge_shard in 1 2 3 4; do
-            if ! pnpm --filter @purin-labs/platform exec vitest run --config vitest.e2e.config.ts --shard="$edge_shard/4"; then
+            if ! bash scripts/ci-stall-guard.sh 600 pnpm --filter @purin-labs/platform exec vitest run --config vitest.e2e.config.ts --shard="$edge_shard/4"; then
               edge_failed=1
             fi
           done
