@@ -350,7 +350,7 @@ The capabilities are in `foundation/authority/authorization/capability-catalogue
 | Open sockets in a room (a 21st person or tab gets `room_full`); active agent operations and draft previews together | 20; 20                    | `COLLABORATION_SOCKET_LIMIT`                                 |
 | Agent action presence                                                                                               | 900 bytes                 | `COLLABORATION_AGENT_ACTION_BYTES`                           |
 | Silent screen socket                                                                                                | Closed after 90 s         | `SOCKET_SILENCE_LIMIT_MS`                                    |
-| Agent proposal                                                                                                      | Lapses after 15 minutes   | An inline value in `actors/harness-commerce-proposal.ts`     |
+| Agent proposal                                                                                                      | Lapses after 15 minutes   | `ACTION_PROPOSAL_EXPIRY_MS`                                  |
 
 When a board keeps 40 versions, the oldest automatic versions go first, then the oldest
 others. The newest named version always stays. A board and its releases have no other

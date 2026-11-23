@@ -6,6 +6,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import type { CaseActorStub, OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type { Result } from "@purin-labs/kernel/result";
 import {
+  ACTION_PROPOSAL_EXPIRY_MS,
   isCommerceLedgerAction,
   type ActionLedgerEntry,
 } from "@purin-labs/authority/actors/action-ledger";
@@ -556,7 +557,7 @@ export async function handleCommerceActions(
       threadId: caseId.value,
       request: parsed.value,
       current: current.value,
-      exp: now + 15 * 60_000,
+      exp: now + ACTION_PROPOSAL_EXPIRY_MS,
       now,
     });
   }
@@ -717,7 +718,7 @@ export async function handleCommerceActions(
     threadId: caseId.value,
     draft: draft.value,
     flowBinding: caseProposal.value.flowBinding,
-    exp: now + 15 * 60_000,
+    exp: now + ACTION_PROPOSAL_EXPIRY_MS,
     now,
   });
   if (!proposed.ok) return commerceActionLedgerError(proposed.error);
@@ -983,7 +984,10 @@ async function proposePayoutAction(
     threadId: caseId.value,
     draft: draft.value,
     flowBinding: accepted.value.flowBinding,
-    exp: Math.min(now + 15 * 60_000, Date.parse(plan.seal.executionDeadline)),
+    exp: Math.min(
+      now + ACTION_PROPOSAL_EXPIRY_MS,
+      Date.parse(plan.seal.executionDeadline),
+    ),
     now,
   });
   if (!proposed.ok) return commerceActionLedgerError(proposed.error);

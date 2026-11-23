@@ -118,6 +118,12 @@ type ActionExecutionLease = Readonly<{
 
 const ACTION_EXECUTION_LEASE_DURATION_MS = 5 * 60_000;
 
+/**
+ * How long a proposed action stays open (its `exp`). An entry that is still
+ * proposed, waiting for approval or signed after this time expires.
+ */
+export const ACTION_PROPOSAL_EXPIRY_MS = 15 * 60_000;
+
 type UnsignedAction = ActionIdentity & {
   approval?: never;
   rejection?: never;

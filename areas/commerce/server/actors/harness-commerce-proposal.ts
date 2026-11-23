@@ -27,7 +27,10 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import type { CanonicalActionDraft } from "@purin-labs/authority/actors/action-ledger";
+import {
+  ACTION_PROPOSAL_EXPIRY_MS,
+  type CanonicalActionDraft,
+} from "@purin-labs/authority/actors/action-ledger";
 import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,
@@ -496,7 +499,7 @@ export async function proposeCommerceActionForHarness(
           threadId: String(input.assignment.caseId),
           request,
           current: currentProjection,
-          exp: actionNow + 15 * 60_000,
+          exp: actionNow + ACTION_PROPOSAL_EXPIRY_MS,
           now: actionNow,
         });
       }
@@ -1342,7 +1345,7 @@ async function recordCommerceProposal(
     threadId: String(input.assignment.caseId),
     draft: draft.value,
     flowBinding: accepted.value.flowBinding,
-    exp: actionNow + 15 * 60_000,
+    exp: actionNow + ACTION_PROPOSAL_EXPIRY_MS,
     now: actionNow,
   });
   if (!ledger.ok)

@@ -340,7 +340,7 @@ and has the effect `proposal`. `supplier_create` needs `commerce.supplier.create
 
 | Limit                               | Value                                       | Constant                                                                            |
 | ----------------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Action expiry                       | 15 minutes                                  | No constant: `15 * 60_000` in each proposer                                         |
+| Action expiry                       | 15 minutes                                  | `ACTION_PROPOSAL_EXPIRY_MS`                                                         |
 | Step-up sign-in, Slack approval     | 10 minutes, 60 s                            | `APPROVAL_STEP_UP_MAX_AGE_MS`, `SLACK_APPROVAL_WINDOW_MS`                           |
 | Execution lease                     | 5 minutes                                   | `ACTION_EXECUTION_LEASE_DURATION_MS`                                                |
 | Case wait check                     | 1 minute for 10 minutes, then 15 minutes    | `APPROVAL_READ_FIRST_MS`, `APPROVAL_READ_FIRST_WINDOW_MS`, `APPROVAL_READ_LATER_MS` |

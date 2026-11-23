@@ -1,4 +1,5 @@
 import { sha256Hex } from "@purin-labs/std";
+import { ACTION_PROPOSAL_EXPIRY_MS } from "@purin-labs/authority/actors/action-ledger";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { sessionActionMutationExecution } from "@purin-labs/conversation/actors/action-mutation-execution";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
@@ -187,7 +188,7 @@ async function proposeCustomConnectorWriteForEmbeddedHarness(
       resourceKey,
     },
     flowBinding: informationFlow.value.binding.toJSON(),
-    exp: now + 15 * 60_000,
+    exp: now + ACTION_PROPOSAL_EXPIRY_MS,
     now,
   });
   if (!proposed.ok) {

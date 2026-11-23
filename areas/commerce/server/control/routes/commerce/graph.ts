@@ -17,7 +17,10 @@ import {
   resolveActiveCaseActorAtPlacement,
   requireActiveOrganisationActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { ActionLedgerEntry } from "@purin-labs/authority/actors/action-ledger";
+import {
+  ACTION_PROPOSAL_EXPIRY_MS,
+  type ActionLedgerEntry,
+} from "@purin-labs/authority/actors/action-ledger";
 import type { CaseSnapshot } from "@purin-labs/conversation/actors/case/types";
 import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { authorizeCommerceEntityPlaneCommand } from "../../../entity-plane/execution";
@@ -845,7 +848,7 @@ async function requestCommerceListEntryPatchApproval(
       resourceKey,
     },
     flowBinding: accepted.value.flowBinding,
-    exp: input.now + 15 * 60_000,
+    exp: input.now + ACTION_PROPOSAL_EXPIRY_MS,
     now: input.now,
   });
   if (!proposed.ok) {
