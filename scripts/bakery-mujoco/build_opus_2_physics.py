@@ -1,5 +1,6 @@
-"""Build and verify the native MuJoCo mechanical and active-state model for the Fellow Opus 2."""
+"""Build and verify the MuJoCo 4.0 mechanical and active-state model for the Fellow Opus 2."""
 
+import copy
 import csv
 import hashlib
 import json
@@ -9,10 +10,29 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "assets/bakery-mujoco/fellow-opus-2"
-BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
-VENV_PYTHON = ROOT / "scripts/bakery-mujoco/.venv/bin/python"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from appliance_physics_kit import (
+    BLENDER_BIN,
+    COL_ACCESSORY_RGBA,
+    COL_ARTIC_RGBA,
+    COL_BASE_RGBA,
+    COL_WALL_RGBA,
+    ROOT,
+    SITE_GRASP_RGBA,
+    SITE_SUPPORT_RGBA,
+    X_AXIS_QUAT,
+    Y_AXIS_QUAT,
+    add_adjacent_excludes,
+    add_standard_defaults,
+    emit_standalone_models,
+    export_and_verify_native_xml as kit_export_native_xml,
+    numbers,
+    verify_frames_and_motions as kit_verify_frames_and_motions,
+    write_xml,
+)
+
+NAME = "fellow-opus-2"
+ASSETS = ROOT / "assets/bakery-mujoco" / NAME
 
 NAMES = (
     "opus_grinder",
@@ -25,6 +45,16 @@ NAMES = (
     "opus_power_button",
     "opus_catch_cup",
 )
+
+SCALAR_VISUAL_AXES = {
+    "opus_knob_turn": [1.0, 0.0, 0.0],
+    "opus_scale_turn": [0.0, 0.0, 1.0],
+    "opus_hopper_lift": [0.0, 0.0, 1.0],
+    "opus_lid_lift": [0.0, 0.0, 1.0],
+    "opus_carrier_lift": [0.0, 0.0, 1.0],
+    "opus_burr_spin": [0.0, 0.0, 1.0],
+    "opus_power_press": [0.0, 1.0, 0.0],
+}
 
 # Published total mass = 2.300 kg (2,300 g) across the 9 articulated bodies
 MASSES = {
@@ -64,17 +94,8 @@ INERTIAS = {
 }
 
 
-def numbers(values):
-    return " ".join(f"{value:.9g}" for value in values)
-
-
-def write_xml(path: Path, element: ET.Element):
-    ET.indent(element, space="  ")
-    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
-
-
 def export_blender_meshes_and_xml():
-    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml + scene.xml."""
+    """Run inside Blender to export body-local UV OBJ meshes and construct appliance.xml + scene.xml + model.xml."""
     import bpy
 
     sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -83,52 +104,96 @@ def export_blender_meshes_and_xml():
     source = ASSETS / "fellow-opus-2.blend"
     bpy.ops.wm.open_mainfile(filepath=str(source))
     bpy.context.scene.frame_set(1)
+    for obj in list(bpy.data.objects):
+        obj.animation_data_clear()
+    bpy.context.view_layer.update()
+
+    # Remove detached illustrative stowed AC plug meshes (whose cable is a non-mesh CURVE).
+    plug_root = bpy.data.objects.get("opus_ac_plug")
+    if plug_root is not None:
+        for child in list(plug_root.children_recursive):
+            bpy.data.objects.remove(child, do_unlink=True)
+        bpy.data.objects.remove(plug_root, do_unlink=True)
     bpy.context.view_layer.update()
 
     parts = [bpy.data.objects[name] for name in NAMES]
     poses = {obj.name: obj.matrix_world.copy() for obj in parts}
 
-    # Reparent nested MESH objects (silicone feet and power cord meshes)
-    # directly to their owning articulated body in NAMES while preserving world pose.
-    for obj in list(parts[0].children_recursive):
-        if obj.type != "MESH" and obj not in parts:
-            continue
-        parent = obj.parent
-        while parent is not None and parent not in parts:
-            parent = parent.parent
-        if parent is None:
-            continue
-        pose = obj.matrix_world.copy()
-        obj.animation_data_clear()
-        obj.parent = parent
-        obj.matrix_world = pose
+    # Reparent nested MESH objects directly to their owning articulated body in NAMES while preserving world pose.
+    visited = set()
+    for root in parts:
+        for obj in list(root.children_recursive):
+            if obj in visited or obj.type != "MESH":
+                continue
+            visited.add(obj)
+            parent = obj.parent
+            while parent is not None and parent not in parts:
+                parent = parent.parent
+            if parent is None:
+                continue
+            pose = obj.matrix_world.copy()
+            obj.animation_data_clear()
+            obj.parent = parent
+            obj.matrix_world = pose
+            if len(obj.data.vertices) >= 3:
+                xs = [v.co.x for v in obj.data.vertices]
+                ys = [v.co.y for v in obj.data.vertices]
+                zs = [v.co.z for v in obj.data.vertices]
+                changed = False
+                if max(xs) - min(xs) < 1e-5:
+                    obj.data.vertices[0].co.x += 2e-5
+                    changed = True
+                if max(ys) - min(ys) < 1e-5:
+                    obj.data.vertices[0].co.y += 2e-5
+                    changed = True
+                if max(zs) - min(zs) < 1e-5:
+                    obj.data.vertices[0].co.z += 2e-5
+                    changed = True
+                if changed:
+                    obj.data.update()
     bpy.context.view_layer.update()
 
     for mat in bpy.data.materials:
+        bsdf = (
+            mat.node_tree.nodes.get("Principled BSDF")
+            if (mat.use_nodes and mat.node_tree)
+            else None
+        )
         if "metallic" not in mat:
-            mat["metallic"] = 0.0
+            mat["metallic"] = (
+                float(bsdf.inputs["Metallic"].default_value)
+                if bsdf and "Metallic" in bsdf.inputs
+                else 0.0
+            )
         if "roughness" not in mat:
-            mat["roughness"] = 0.35
+            mat["roughness"] = (
+                float(bsdf.inputs["Roughness"].default_value)
+                if bsdf and "Roughness" in bsdf.inputs
+                else 0.35
+            )
         if "emission" not in mat:
-            mat["emission"] = 0.0
+            mat["emission"] = (
+                float(bsdf.inputs["Emission Strength"].default_value)
+                if bsdf and "Emission Strength" in bsdf.inputs
+                else 0.0
+            )
 
+    mesh_dir = ASSETS / "meshes"
+    if mesh_dir.is_dir():
+        for stale_obj in mesh_dir.glob("*.obj"):
+            stale_obj.unlink()
     export_visual_meshes(parts, ASSETS)
 
     model = ET.Element("mujoco", model="fellow-opus-2 — assumed native dynamics")
     ET.SubElement(model, "compiler", angle="radian")
     ET.SubElement(model, "option", timestep="0.001", integrator="implicitfast")
-    defaults = ET.SubElement(model, "default")
-    ET.SubElement(
-        defaults,
-        "geom",
-        group="3",
-        contype="0",
-        conaffinity="0",
-        friction="0.65 0.005 0.0001",
-        solref="0.002 1",
-        solimp="0.99 0.999 0.001",
+    defaults = add_standard_defaults(
+        model,
+        friction="0.65 0.015 0.003",
+        solref="0.004 1",
+        solimp="0.95 0.99 0.001",
+        condim="4",
     )
-    ET.SubElement(defaults, "pair", solref="0.002 1", solimp="0.99 0.999 0.001")
 
     asset = ET.SubElement(model, "asset")
     ET.SubElement(asset, "include", file="visual_assets.xml")
@@ -192,18 +257,22 @@ def export_blender_meshes_and_xml():
             type="cylinder",
             pos=numbers((fx, fy, 0.0010)),
             size="0.0095 0.0010",
+            group="3",
             contype="1",
             conaffinity="1",
+            rgba=COL_BASE_RGBA,
         )
     ET.SubElement(
         base,
         "geom",
         name="opus_base_plate",
         type="box",
-        pos="0 0 0.010",
-        size="0.065 0.103 0.008",
+        pos="0 0 0.01075",
+        size="0.065 0.103 0.00875",
+        group="3",
         contype="1",
         conaffinity="1",
+        rgba=COL_BASE_RGBA,
     )
     # Magnetic catch-cup landing pad at (-0.0110, -0.0360, 0.0200) top surface
     ET.SubElement(
@@ -213,8 +282,10 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="-0.0110 -0.0360 0.0180",
         size="0.038 0.002",
+        group="3",
         contype="1",
         conaffinity="1",
+        rgba=COL_WALL_RGBA,
     )
     ET.SubElement(
         base,
@@ -222,7 +293,8 @@ def export_blender_meshes_and_xml():
         name="vessel_socket",
         pos="-0.0110 -0.0360 0.0200",
         size="0.002",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         base,
@@ -231,7 +303,8 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="-0.0110 -0.0360 0.0200",
         size="0.039 0.0030",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         base,
@@ -239,19 +312,46 @@ def export_blender_meshes_and_xml():
         name="opus_chute_exit",
         pos="-0.0110 -0.0360 0.1040",
         size="0.004",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
 
-    # Rear vertical motor column & suspended barrel collision proxies
+    # Rear vertical motor column, bridge neck & suspended barrel collision proxies
     ET.SubElement(
         base,
         "geom",
         name="opus_column_col",
         type="box",
         pos="-0.0110 0.0560 0.1330",
-        size="0.041 0.036 0.113",
+        size="0.042 0.036 0.113",
+        group="3",
         contype="1",
         conaffinity="1",
+        rgba=COL_BASE_RGBA,
+    )
+    ET.SubElement(
+        base,
+        "geom",
+        name="opus_column_bridge_col",
+        type="box",
+        pos="-0.0110 0.0190 0.1685",
+        size="0.023 0.006 0.0465",
+        group="3",
+        contype="1",
+        conaffinity="1",
+        rgba=COL_BASE_RGBA,
+    )
+    ET.SubElement(
+        base,
+        "geom",
+        name="opus_barrel_bottom_col",
+        type="cylinder",
+        pos="-0.0110 -0.0360 0.1220",
+        size="0.0525 0.0180",
+        group="3",
+        contype="1",
+        conaffinity="1",
+        rgba=COL_BASE_RGBA,
     )
     for i in range(12):
         angle = i * math.tau / 12
@@ -262,18 +362,20 @@ def export_blender_meshes_and_xml():
             type="box",
             pos=numbers(
                 (
-                    -0.0110 + 0.0500 * math.cos(angle),
-                    -0.0360 + 0.0500 * math.sin(angle),
+                    -0.0110 + 0.0512 * math.cos(angle),
+                    -0.0360 + 0.0512 * math.sin(angle),
                     0.1610,
                 )
             ),
-            size="0.0025 0.013 0.056",
+            size="0.0025 0.014 0.057",
             euler=numbers((0, 0, angle)),
+            group="3",
             contype="1",
             conaffinity="1",
+            rgba=COL_WALL_RGBA,
         )
 
-    # Articulated joints on side grind knob, upper scale ring, hopper, lid, burr carrier, conical burr, and timer button
+    # Articulated joints and colliders on side grind knob, upper scale ring, hopper, lid, burr carrier, conical burr, and timer button
     ET.SubElement(
         knob,
         "joint",
@@ -283,6 +385,23 @@ def export_blender_meshes_and_xml():
         limited="true",
         range="-9.424778 9.424778",
         damping="0.12",
+        armature="0.001",
+        frictionloss="0.04",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
+    )
+    ET.SubElement(
+        knob,
+        "geom",
+        name="opus_grind_knob_col",
+        type="cylinder",
+        pos="0.0112 0 0",
+        quat=X_AXIS_QUAT,
+        size="0.022 0.0108",
+        group="3",
+        contype="1",
+        conaffinity="1",
+        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         scale_ring,
@@ -293,6 +412,22 @@ def export_blender_meshes_and_xml():
         limited="true",
         range="-1.570796 1.570796",
         damping="0.18",
+        armature="0.002",
+        frictionloss="0.01",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
+    )
+    ET.SubElement(
+        scale_ring,
+        "geom",
+        name="opus_scale_ring_col",
+        type="cylinder",
+        pos="0 0 0.0045",
+        size="0.0536 0.0045",
+        group="3",
+        contype="1",
+        conaffinity="1",
+        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         hopper,
@@ -303,6 +438,22 @@ def export_blender_meshes_and_xml():
         limited="true",
         range="0 0.100",
         damping="2.2",
+        armature="0.002",
+        frictionloss="1.85",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
+    )
+    ET.SubElement(
+        hopper,
+        "geom",
+        name="opus_hopper_col",
+        type="cylinder",
+        pos="0 0 0.0162",
+        size="0.054 0.0162",
+        group="3",
+        contype="1",
+        conaffinity="1",
+        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         lid,
@@ -313,6 +464,22 @@ def export_blender_meshes_and_xml():
         limited="true",
         range="0 0.130",
         damping="1.5",
+        armature="0.001",
+        frictionloss="0.75",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
+    )
+    ET.SubElement(
+        lid,
+        "geom",
+        name="opus_hopper_lid_col",
+        type="cylinder",
+        pos="0 0 0.0015",
+        size="0.054 0.0045",
+        group="3",
+        contype="1",
+        conaffinity="1",
+        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         carrier,
@@ -323,6 +490,22 @@ def export_blender_meshes_and_xml():
         limited="true",
         range="0 0.080",
         damping="1.8",
+        armature="0.002",
+        frictionloss="1.55",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
+    )
+    ET.SubElement(
+        carrier,
+        "geom",
+        name="opus_burr_carrier_col",
+        type="cylinder",
+        pos="0 0 0.014",
+        size="0.031 0.014",
+        group="3",
+        contype="1",
+        conaffinity="1",
+        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         cone,
@@ -333,15 +516,20 @@ def export_blender_meshes_and_xml():
         limited="false",
         damping="0.0012",
         armature="0.0012",
-        solreffriction="0.002 1",
+        frictionloss="0.01",
+        solreffriction="0.004 1",
     )
     ET.SubElement(
         cone,
         "geom",
         name="opus_burr_cone_proxy",
         type="cylinder",
-        pos="0 0 0.008",
-        size="0.020 0.008",
+        pos="0 0 0.0053",
+        size="0.0205 0.0172",
+        group="3",
+        contype="1",
+        conaffinity="1",
+        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         button,
@@ -353,6 +541,21 @@ def export_blender_meshes_and_xml():
         range="0 0.0012",
         stiffness="65",
         damping="0.25",
+        armature="0.001",
+        solreflimit="0.005 1",
+    )
+    ET.SubElement(
+        button,
+        "geom",
+        name="opus_power_button_col",
+        type="cylinder",
+        pos="0 -0.0004 0",
+        quat=Y_AXIS_QUAT,
+        size="0.0056 0.0008",
+        group="3",
+        contype="1",
+        conaffinity="1",
+        rgba=COL_ARTIC_RGBA,
     )
 
     # Catch cup collision geometry (base foot, interior floor, 12-segment cylindrical wall, payload marker)
@@ -363,8 +566,10 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0 0 0.002",
         size="0.036 0.002",
+        group="3",
         contype="1",
         conaffinity="1",
+        rgba=COL_ACCESSORY_RGBA,
     )
     ET.SubElement(
         cup,
@@ -373,8 +578,10 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0 0 0.018",
         size="0.034 0.0015",
+        group="3",
         contype="1",
         conaffinity="1",
+        rgba=COL_ACCESSORY_RGBA,
     )
     for i in range(12):
         angle = i * math.tau / 12
@@ -383,11 +590,13 @@ def export_blender_meshes_and_xml():
             "geom",
             name=f"opus_cup_wall_{i}",
             type="box",
-            pos=numbers((0.036 * math.cos(angle), 0.036 * math.sin(angle), 0.048)),
-            size="0.002 0.0095 0.030",
+            pos=numbers((0.036 * math.cos(angle), 0.036 * math.sin(angle), 0.0495)),
+            size="0.002 0.0095 0.0315",
             euler=numbers((0, 0, angle)),
+            group="3",
             contype="1",
             conaffinity="1",
+            rgba=COL_ACCESSORY_RGBA,
         )
     ET.SubElement(
         cup,
@@ -395,7 +604,8 @@ def export_blender_meshes_and_xml():
         name="opus_cup_base_site",
         pos="0 0 0",
         size="0.002",
-        group="3",
+        group="4",
+        rgba=SITE_GRASP_RGBA,
     )
     payload = ET.SubElement(cup, "body", name="ingredient_payload", pos="0 0 0")
     ET.SubElement(
@@ -412,6 +622,8 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0 0 0.021",
         size="0.031 0.0015",
+        contype="0",
+        conaffinity="0",
         group="2",
         rgba="0.36 0.23 0.14 0",
         mass="0",
@@ -431,8 +643,28 @@ def export_blender_meshes_and_xml():
         conaffinity="1",
     )
 
-    # Explicit contact pairs
-    contact = ET.SubElement(model, "contact")
+    # Adjacent articulated-body contact exclusions + explicit cup contact pairs
+    contact = add_adjacent_excludes(
+        model,
+        (
+            ("exclude_grinder_knob", "opus_grinder", "opus_grind_knob"),
+            ("exclude_grinder_scale", "opus_grinder", "opus_scale_ring"),
+            ("exclude_grinder_hopper", "opus_grinder", "opus_hopper"),
+            ("exclude_grinder_lid", "opus_grinder", "opus_hopper_lid"),
+            ("exclude_grinder_carrier", "opus_grinder", "opus_burr_carrier"),
+            ("exclude_grinder_cone", "opus_grinder", "opus_burr_cone"),
+            ("exclude_grinder_button", "opus_grinder", "opus_power_button"),
+            ("exclude_scale_hopper", "opus_scale_ring", "opus_hopper"),
+            ("exclude_scale_lid", "opus_scale_ring", "opus_hopper_lid"),
+            ("exclude_scale_carrier", "opus_scale_ring", "opus_burr_carrier"),
+            ("exclude_hopper_lid", "opus_hopper", "opus_hopper_lid"),
+            ("exclude_hopper_carrier", "opus_hopper", "opus_burr_carrier"),
+            ("exclude_lid_carrier", "opus_hopper_lid", "opus_burr_carrier"),
+            ("exclude_carrier_cone", "opus_burr_carrier", "opus_burr_cone"),
+            ("exclude_knob_scale", "opus_grind_knob", "opus_scale_ring"),
+        ),
+    )
+    model_contact = copy.deepcopy(contact)
     ET.SubElement(
         contact,
         "pair",
@@ -575,6 +807,18 @@ def export_blender_meshes_and_xml():
     )
     write_xml(ASSETS / "scene.xml", scene)
 
+    emit_standalone_models(
+        ASSETS,
+        model_name="opus_grinder",
+        defaults=defaults,
+        asset=asset,
+        root_body=base,
+        contact=model_contact,
+        sensors=sensors,
+        exclude_sensors=("opus_cup_relpos", "opus_burr_torque"),
+        accessories=(("catch_cup_model.xml", "opus_catch_cup", cup),),
+    )
+
     (ASSETS / "physics-export.json").write_text(
         json.dumps(
             {
@@ -595,53 +839,9 @@ def export_blender_meshes_and_xml():
     )
 
 
-def strip_visual_meshes(root: ET.Element, model):
-    """Remove zero-mass non-contact visual meshes for the compact native.xml collision package."""
-    for parent in root.iter():
-        for geom in list(parent):
-            if geom.tag != "geom" or not geom.get("name"):
-                continue
-            index = model.geom(geom.get("name")).id
-            if (
-                model.geom_contype[index] == 0
-                and model.geom_conaffinity[index] == 0
-                and geom.get("type") == "mesh"
-                and geom.get("mass") == "0"
-            ):
-                parent.remove(geom)
-
-
 def export_native_xml(mujoco, np):
     """Compile scene.xml, strip decorative visual meshes, and write verified native.xml."""
-    spec = mujoco.MjSpec.from_file(str(ASSETS / "scene.xml"))
-    model = spec.compile()
-    data = mujoco.MjData(model)
-    mujoco.mj_forward(model, data)
-
-    root = ET.fromstring(spec.to_xml())
-    strip_visual_meshes(root, model)
-    used_meshes = {geom.get("mesh") for geom in root.iter("geom")}
-    used_materials = {geom.get("material") for geom in root.iter("geom")}
-    assets = root.find("asset")
-    if assets is not None:
-        for asset in list(assets):
-            if (asset.tag == "mesh" and asset.get("name") not in used_meshes) or (
-                asset.tag == "material" and asset.get("name") not in used_materials
-            ):
-                assets.remove(asset)
-    ET.indent(root, space="  ")
-    destination = ASSETS / "native.xml"
-    destination.write_text(ET.tostring(root, encoding="unicode") + "\n")
-
-    rebuilt = mujoco.MjModel.from_xml_path(str(destination))
-    for field in ("body_mass", "body_inertia", "qpos0", "dof_damping"):
-        if not np.allclose(
-            getattr(model, field), getattr(rebuilt, field), rtol=1e-5, atol=1e-9
-        ):
-            raise RuntimeError(f"Export changed native {field} for fellow-opus-2")
-    if (rebuilt.nq, rebuilt.nv) != (model.nq, model.nv):
-        raise RuntimeError("Export changed native degrees of freedom.")
-    return model, rebuilt
+    return kit_export_native_xml(ASSETS, NAME, mujoco, np)
 
 
 def run_active_state_journey():
@@ -1110,6 +1310,28 @@ def run_active_state_journey():
 
     evidence_dir = ASSETS / "active-state-evidence"
     evidence_dir.mkdir(parents=True, exist_ok=True)
+    frames_report, motion_report = kit_verify_frames_and_motions(
+        ASSETS,
+        NAME,
+        NAMES,
+        SCALAR_VISUAL_AXES,
+        mujoco,
+        evidence_dir,
+        cleanup_inputs=True,
+    )
+    rest_frames = frames_report["appliances"][NAME]["frames"]
+    motion_items = motion_report["appliances"][NAME]["motions"]
+    alignment_summary = {
+        "rest_passed": True,
+        "rest_frames_checked": len(rest_frames),
+        "rest_max_position_error_m": max(f["position_error_m"] for f in rest_frames),
+        "rest_max_orientation_error_rad": max(f["orientation_error_rad"] for f in rest_frames),
+        "motion_passed": True,
+        "motion_joints_checked": len(motion_items),
+        "motion_samples_per_joint": 21,
+        "motion_max_position_error_m": max(m["position_error_m"] for m in motion_items),
+        "motion_max_orientation_error_rad": max(m["orientation_error_rad"] for m in motion_items),
+    }
     trace_path = evidence_dir / "trace.csv"
     with trace_path.open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(trace_rows[0].keys()), lineterminator="\n")
@@ -1119,6 +1341,8 @@ def run_active_state_journey():
     tracked_files = sorted(
         [
             ASSETS / "appliance.xml",
+            ASSETS / "model.xml",
+            ASSETS / "catch_cup_model.xml",
             ASSETS / "scene.xml",
             ASSETS / "native.xml",
             ASSETS / "visual_assets.xml",
@@ -1140,6 +1364,7 @@ def run_active_state_journey():
         "mujoco_version": mujoco.__version__,
         "rendered": False,
         "input_sha256": input_sha256,
+        "frame_alignment": alignment_summary,
         "journey": {
             "published_no_load_rpm": 400,
             "published_timer_modes_s": [30, 60, 90, 120],
@@ -1224,10 +1449,6 @@ def main():
 
     if "bpy" in sys.modules:
         export_blender_meshes_and_xml()
-        subprocess.run(
-            [str(VENV_PYTHON), str(Path(__file__).resolve()), "--verify-mujoco"],
-            check=True,
-        )
         return
 
     subprocess.run(

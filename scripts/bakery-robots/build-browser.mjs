@@ -128,6 +128,8 @@ try {
       "build",
       "--locked",
       "--release",
+      "--bin",
+      "bakery-native",
       "--target",
       "wasm32-unknown-emscripten",
       "--manifest-path",

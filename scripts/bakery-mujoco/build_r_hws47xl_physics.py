@@ -1,5 +1,7 @@
 """Build and verify the MuJoCo mechanical, 5-zone PAM inverter, and chilled-vessel model for the Hitachi R-HWS47XL."""
 
+from __future__ import annotations
+
 import csv
 import hashlib
 import json
@@ -9,9 +11,27 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from appliance_physics_kit import (
+    BLENDER_BIN,
+    COL_ACCESSORY_RGBA,
+    COL_ARTIC_RGBA,
+    COL_BASE_RGBA,
+    COL_WALL_RGBA,
+    ROOT,
+    SITE_GRASP_RGBA,
+    SITE_SUPPORT_RGBA,
+    add_adjacent_excludes,
+    add_standard_defaults,
+    emit_standalone_models,
+    export_and_verify_native_xml as kit_export_native_xml,
+    numbers,
+    prepare_blender_assembly,
+    verify_frames_and_motions as kit_verify_frames_and_motions,
+    write_xml,
+)
+
 ASSETS = ROOT / "assets/bakery-mujoco/hitachi-r-hws47xl"
-BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
 
 NAMES = (
     "hws_cabinet",
@@ -71,69 +91,12 @@ MILK_CARTON_REST_POSE = (-0.0850, -0.0350, 1.2400)
 FRIDGE_DOOR_MAX_RAD = math.radians(110.0)
 
 
-def numbers(values):
-    return " ".join(f"{value:.9g}" for value in values)
-
-
-def write_xml(path: Path, element: ET.Element):
-    ET.indent(element, space="  ")
-    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
-
-
 def export_blender_meshes_and_xml():
-    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml and scene.xml."""
-    import bpy
-
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from build_oven_visuals import export_visual_meshes
-
+    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml, scene.xml, model.xml, and carton_model.xml."""
     source = ASSETS / "hitachi-r-hws47xl.blend"
-    bpy.ops.wm.open_mainfile(filepath=str(source))
-    bpy.context.scene.frame_set(1)
-    bpy.context.view_layer.update()
-
-    parts = [bpy.data.objects[name] for name in NAMES]
-    for obj in (parts[0], *parts[0].children_recursive):
-        obj.animation_data_clear()
-    bpy.context.scene.frame_set(1)
-    bpy.context.view_layer.update()
-    poses = {obj.name: obj.matrix_world.copy() for obj in parts}
-
-    # Reparent every mesh under hws_cabinet to its nearest articulated ancestor in NAMES while preserving world pose
-    for obj in list(parts[0].children_recursive):
-        if obj.type != "MESH" and obj not in parts:
-            continue
-        parent = obj.parent
-        while parent is not None and parent not in parts:
-            parent = parent.parent
-        if parent is None:
-            continue
-        pose = obj.matrix_world.copy()
-        obj.animation_data_clear()
-        obj.parent = parent
-        obj.matrix_world = pose
-        if obj.type == "MESH" and len(obj.data.vertices) >= 3:
-            xs = [v.co.x for v in obj.data.vertices]
-            ys = [v.co.y for v in obj.data.vertices]
-            zs = [v.co.z for v in obj.data.vertices]
-            if max(xs) - min(xs) < 1e-5:
-                obj.data.vertices[0].co.x += 2e-5
-            if max(ys) - min(ys) < 1e-5:
-                obj.data.vertices[0].co.y += 2e-5
-            if max(zs) - min(zs) < 1e-5:
-                obj.data.vertices[0].co.z += 2e-5
-            obj.data.update()
-    bpy.context.view_layer.update()
-
-    for mat in bpy.data.materials:
-        if "metallic" not in mat:
-            mat["metallic"] = 0.0
-        if "roughness" not in mat:
-            mat["roughness"] = 0.30
-        if "emission" not in mat:
-            mat["emission"] = 0.0
-
-    export_visual_meshes(parts, ASSETS)
+    parts, poses = prepare_blender_assembly(
+        source, NAMES, ASSETS, clear_all_animations=False
+    )
 
     app = ET.Element(
         "mujoco",
@@ -142,6 +105,8 @@ def export_blender_meshes_and_xml():
     ET.SubElement(app, "compiler", angle="radian")
     ET.SubElement(app, "option", timestep="0.002", integrator="implicitfast")
     ET.SubElement(app, "size", nuserdata="10")
+
+    defaults = add_standard_defaults(app, friction="0.65 0.015 0.003")
 
     asset = ET.SubElement(app, "asset")
     ET.SubElement(asset, "include", file="visual_assets.xml")
@@ -155,7 +120,7 @@ def export_blender_meshes_and_xml():
         size="2.0 2.0 0.05",
         rgba="0.28 0.30 0.32 1",
         contype="1",
-        conaffinity="3",
+        conaffinity="1",
     )
 
     bodies = {}
@@ -215,25 +180,40 @@ def export_blender_meshes_and_xml():
             type="cylinder",
             pos=numbers((fx, fy, 0.0090)),
             size="0.0175 0.0090",
-            contype="2",
+            contype="1",
             conaffinity="1",
             group="3",
+            rgba=COL_BASE_RGBA,
         )
 
-    # VIP cabinet walls, mullions, and three Marugoto Chilled tempered-glass shelves (Shelf 1 top = Z = 1.1400 m)
-    for cname, cpos, csize in (
-        ("hws_left_wall_col", (-0.2890, 0.0180, 0.9130), (0.0110, 0.3325, 0.8950)),
-        ("hws_right_wall_col", (0.2890, 0.0180, 0.9130), (0.0110, 0.3325, 0.8950)),
-        ("hws_rear_wall_col", (0.0, 0.3345, 0.9250), (0.2780, 0.0160, 0.8830)),
-        ("hws_roof_col", (0.0, -0.0300, 1.8150), (0.2990, 0.3120, 0.0180)),
-        ("hws_base_pan_col", (0.0, 0.0050, 0.0270), (0.2780, 0.3150, 0.0090)),
-        ("hws_upper_mullion_col", (0.0, 0.0050, 0.9020), (0.2780, 0.3150, 0.0120)),
-        ("hws_mid_mullion_col", (0.0, 0.0050, 0.6725), (0.2780, 0.3150, 0.0075)),
-        ("hws_lower_mullion_col", (0.0, 0.0050, 0.3425), (0.2780, 0.3150, 0.0090)),
-        ("hws_chilled_shelf_1_col", (0.0, 0.0550, 1.1360), (0.2560, 0.2200, 0.0040)),
-        ("hws_chilled_shelf_2_col", (0.0, 0.0550, 1.3410), (0.2560, 0.2200, 0.0040)),
-        ("hws_chilled_shelf_3_col", (0.0, 0.0550, 1.5410), (0.2560, 0.2100, 0.0040)),
-    ):
+    # VIP cabinet shell, roof canopy, toe-kick, mullions, interior cases, and three Marugoto Chilled tempered-glass shelves (Shelf 1 top = Z = 1.1400 m)
+    cabinet_colliders = (
+        ("hws_left_wall_col", (-0.2890, 0.0160, 0.9190), (0.0110, 0.3345, 0.9010), COL_BASE_RGBA),
+        ("hws_right_wall_col", (0.2890, 0.0160, 0.9190), (0.0110, 0.3345, 0.9010), COL_BASE_RGBA),
+        ("hws_rear_wall_col", (0.0, 0.3345, 1.0220), (0.2780, 0.0160, 0.7820), COL_BASE_RGBA),
+        ("hws_rear_compressor_bulkhead_col", (0.0, 0.2820, 0.1290), (0.2780, 0.0140, 0.1110), COL_BASE_RGBA),
+        ("hws_roof_col", (0.0, 0.0160, 1.8120), (0.2790, 0.3345, 0.0085), COL_BASE_RGBA),
+        ("hws_top_canopy_col", (0.0, 0.0150, 1.8265), (0.2980, 0.2600, 0.0065), COL_BASE_RGBA),
+        ("hws_left_hinge_cover_col", (-0.2440, -0.2920, 1.8240), (0.0540, 0.0560, 0.0070), COL_BASE_RGBA),
+        ("hws_base_pan_col", (0.0, 0.0050, 0.0270), (0.2790, 0.3150, 0.0090), COL_BASE_RGBA),
+        ("hws_toe_kick_col", (0.0, -0.3410, 0.0185), (0.2990, 0.0070, 0.0105), COL_BASE_RGBA),
+        ("hws_air_tower_col", (0.0, 0.2960, 1.4500), (0.1120, 0.0210, 0.2950), COL_WALL_RGBA),
+        ("hws_upper_mullion_col", (0.0, 0.0050, 0.9020), (0.2780, 0.3175, 0.0120), COL_WALL_RGBA),
+        ("hws_mid_vertical_mullion_col", (-0.0200, -0.1050, 0.7825), (0.0090, 0.2125, 0.1075), COL_WALL_RGBA),
+        ("hws_mid_mullion_col", (0.0, 0.0050, 0.6725), (0.2780, 0.3175, 0.0090), COL_WALL_RGBA),
+        ("hws_lower_mullion_col", (0.0, 0.0050, 0.3425), (0.2780, 0.3175, 0.0090), COL_WALL_RGBA),
+        ("hws_chilled_shelf_1_col", (0.0, 0.0550, 1.1360), (0.2560, 0.2200, 0.0040), COL_WALL_RGBA),
+        # Keep top surface at Z = 1.3450 m while clearing the 200 mm chilled carton cap (Z_top = 1.3400 m) on Shelf 1
+        ("hws_chilled_shelf_2_col", (0.0, 0.0550, 1.3430), (0.2560, 0.2200, 0.0020), COL_WALL_RGBA),
+        ("hws_chilled_shelf_3_col", (0.0, 0.0550, 1.5410), (0.2560, 0.2100, 0.0040), COL_WALL_RGBA),
+        ("hws_fixed_lower_shelf_col", (0.0, 0.0600, 1.0910), (0.2560, 0.2100, 0.0035), COL_WALL_RGBA),
+        ("hws_hyoon_case_floor_col", (0.0680, 0.0650, 0.9265), (0.1830, 0.2030, 0.0055), COL_WALL_RGBA),
+        ("hws_hyoon_case_front_col", (0.0680, -0.1415, 1.0020), (0.1840, 0.0045, 0.0790), COL_WALL_RGBA),
+        ("hws_lower_bay_divider_col", (-0.1220, 0.0600, 1.0010), (0.0040, 0.2050, 0.0860), COL_WALL_RGBA),
+        ("hws_water_tank_col", (-0.1900, 0.0550, 0.9600), (0.0600, 0.1950, 0.0400), COL_WALL_RGBA),
+        ("hws_egg_case_col", (-0.1900, 0.0550, 1.0440), (0.0600, 0.1910, 0.0340), COL_WALL_RGBA),
+    )
+    for cname, cpos, csize, crgba in cabinet_colliders:
         ET.SubElement(
             base,
             "geom",
@@ -241,13 +221,13 @@ def export_blender_meshes_and_xml():
             type="box",
             pos=numbers(cpos),
             size=numbers(csize),
-            friction="0.80 0.005 0.0001",
-            contype="2",
+            contype="1",
             conaffinity="1",
             group="3",
+            rgba=crgba,
         )
 
-    # Compartment thermal & contact sensing sites on hws_cabinet
+    # Compartment thermal & contact sensing sites on hws_cabinet (group 4, visible semi-transparent rgba)
     for sname, spos in (
         ("hws_marugoto_chilled_site", (-0.0850, -0.0350, 1.1400)),
         ("hws_tokusen_hyoon_site", (-0.0680, 0.0650, 0.9850)),
@@ -262,7 +242,8 @@ def export_blender_meshes_and_xml():
             name=sname,
             pos=numbers(spos),
             size="0.008",
-            group="3",
+            group="4",
+            rgba=SITE_SUPPORT_RGBA,
         )
 
     ET.SubElement(
@@ -272,7 +253,8 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="-0.0850 -0.0350 1.1415",
         size="0.0600 0.0600 0.0040",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
 
     # 1. Left-hinged upper refrigerator door (`hws_fridge_door`, `243 L`, `0 .. 110 deg` around `0 0 -1`)
@@ -286,59 +268,58 @@ def export_blender_meshes_and_xml():
         range=numbers((0.0, FRIDGE_DOOR_MAX_RAD)),
         damping="2.8",
         armature="0.045",
+        frictionloss="0.5",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
-    ET.SubElement(
-        door,
-        "geom",
-        name="hws_fridge_door_col",
-        type="box",
-        pos="0.2920 0.0120 -0.0095",
-        size="0.2980 0.0180 0.4540",
-        contype="2",
-        conaffinity="1",
-        group="3",
-    )
+    door_colliders = [
+        ("hws_fridge_door_col", (0.2920, 0.0130, 0.0025), (0.2990, 0.0210, 0.4590)),
+        ("hws_fridge_door_dike_left_col", (0.0680, 0.0500, 0.0020), (0.0080, 0.0160, 0.4080)),
+        ("hws_fridge_door_dike_right_col", (0.5160, 0.0500, 0.0020), (0.0080, 0.0160, 0.4080)),
+    ]
+    for p_idx, (pz_local, ph, pdepth) in enumerate(
+        ((-0.3280, 0.1420, 0.0840), (-0.0380, 0.0960, 0.0760), (0.2320, 0.0840, 0.0720)),
+        1,
+    ):
+        door_colliders.append(
+            (
+                f"hws_fridge_door_pocket_{p_idx}_floor_col",
+                (0.2920, 0.0400 + pdepth * 0.5, pz_local - ph * 0.5 + 0.0025),
+                (0.2100, pdepth * 0.5, 0.0025),
+            )
+        )
+        door_colliders.append(
+            (
+                f"hws_fridge_door_pocket_{p_idx}_rail_col",
+                (0.2920, 0.0400 + pdepth - 0.0025, pz_local),
+                (0.2100, 0.0025, ph * 0.5),
+            )
+        )
+    for dname, dpos, dsize in door_colliders:
+        ET.SubElement(
+            door,
+            "geom",
+            name=dname,
+            type="box",
+            pos=numbers(dpos),
+            size=numbers(dsize),
+            contype="1",
+            conaffinity="1",
+            group="3",
+            rgba=COL_ARTIC_RGBA,
+        )
 
-    # 2..5. Four pull-out drawer slide joints (`axis="0 -1 0"`) + front & tub-floor collision boxes
+    # 2..5. Four pull-out drawer slide joints (`axis="0 -1 0"`) + front plate & open-top tub (floor + left/right/rear walls)
     drawer_specs = (
-        (
-            ice_drw,
-            "hws_ice_drawer_slide",
-            0.360,
-            (0.0, 0.0100, 0.0),
-            (0.1380, 0.0180, 0.1060),
-            (0.0, 0.2220, -0.0835),
-            (0.1140, 0.1900, 0.0050),
-        ),
-        (
-            up_frz,
-            "hws_upper_freezer_slide",
-            0.360,
-            (0.0, 0.0100, 0.0),
-            (0.1580, 0.0180, 0.1060),
-            (0.0, 0.2220, -0.0835),
-            (0.1320, 0.1900, 0.0050),
-        ),
-        (
-            low_frz,
-            "hws_lower_freezer_slide",
-            0.420,
-            (0.0, 0.0100, 0.0),
-            (0.2980, 0.0180, 0.1610),
-            (0.0, 0.2670, -0.1385),
-            (0.2530, 0.2350, 0.0050),
-        ),
-        (
-            veg_drw,
-            "hws_veg_drawer_slide",
-            0.420,
-            (0.0, 0.0100, 0.0),
-            (0.2980, 0.0180, 0.1580),
-            (0.0, 0.2670, -0.1360),
-            (0.2530, 0.2350, 0.0050),
-        ),
+        (ice_drw, "hws_ice_drawer_slide", 0.360, -0.0008, 0.2776, 0.2120, 0.2280, 0.3800, 0.1550),
+        (up_frz, "hws_upper_freezer_slide", 0.360, 0.0008, 0.3176, 0.2120, 0.2640, 0.3800, 0.1550),
+        (low_frz, "hws_lower_freezer_slide", 0.420, 0.0, 0.5992, 0.3220, 0.5060, 0.4700, 0.2550),
+        (veg_drw, "hws_veg_drawer_slide", 0.420, 0.0, 0.5992, 0.3120, 0.5060, 0.4700, 0.2500),
     )
-    for drw_body, jname, travel_m, fpos, fsize, bpos, bsize in drawer_specs:
+    for drw_body, jname, travel_m, cx, fw, fh, tw, td, th in drawer_specs:
+        drw_name = drw_body.get("name")
+        tub_y_center = 0.0320 + td * 0.5
+        tub_z_floor = -fh * 0.5 + 0.0240
         ET.SubElement(
             drw_body,
             "joint",
@@ -349,29 +330,60 @@ def export_blender_meshes_and_xml():
             range=numbers((0.0, travel_m)),
             damping="16.0",
             armature="0.025",
+            frictionloss="0.6",
+            solreffriction="0.004 1",
+            solreflimit="0.005 1",
         )
+        for suffix, gpos, gsize in (
+            ("front_col", (cx, 0.01025, 0.0), (fw * 0.5, 0.01875, fh * 0.5)),
+            ("floor_col", (cx, tub_y_center, tub_z_floor), (tw * 0.5, td * 0.5, 0.0050)),
+            (
+                "left_wall_col",
+                (cx - tw * 0.5 + 0.0060, tub_y_center, tub_z_floor + th * 0.5),
+                (0.0060, td * 0.5, th * 0.5),
+            ),
+            (
+                "right_wall_col",
+                (cx + tw * 0.5 - 0.0060, tub_y_center, tub_z_floor + th * 0.5),
+                (0.0060, td * 0.5, th * 0.5),
+            ),
+            (
+                "rear_wall_col",
+                (cx, 0.0320 + td - 0.0060, tub_z_floor + th * 0.5),
+                (tw * 0.5, 0.0060, th * 0.5),
+            ),
+        ):
+            ET.SubElement(
+                drw_body,
+                "geom",
+                name=f"{drw_name}_{suffix}",
+                type="box",
+                pos=numbers(gpos),
+                size=numbers(gsize),
+                contype="1",
+                conaffinity="1",
+                group="3",
+                rgba=COL_ARTIC_RGBA,
+            )
+
+    # Inner multi-tier slide trays & Freshness Sleep Ru catalyst cover inside lower freezer & vegetable drawers
+    for parent_drw, tname, tpos, tsize in (
+        (low_frz, "hws_lower_freezer_upper_tray_col", (0.0, 0.2120, 0.0815), (0.2390, 0.1175, 0.0050)),
+        (low_frz, "hws_lower_freezer_mid_tray_col", (0.0, 0.2770, -0.0250), (0.2390, 0.1457, 0.0050)),
+        (veg_drw, "hws_veg_drawer_ru_cover_col", (0.0, 0.2420, 0.1080), (0.2390, 0.1504, 0.0040)),
+        (veg_drw, "hws_veg_drawer_upper_tray_col", (0.0, 0.2890, 0.0480), (0.2380, 0.1316, 0.0050)),
+    ):
         ET.SubElement(
-            drw_body,
+            parent_drw,
             "geom",
-            name=f"{drw_body.get('name')}_front_col",
+            name=tname,
             type="box",
-            pos=numbers(fpos),
-            size=numbers(fsize),
-            contype="2",
+            pos=numbers(tpos),
+            size=numbers(tsize),
+            contype="1",
             conaffinity="1",
             group="3",
-        )
-        ET.SubElement(
-            drw_body,
-            "geom",
-            name=f"{drw_body.get('name')}_floor_col",
-            type="box",
-            pos=numbers(bpos),
-            size=numbers(bsize),
-            friction="0.80 0.005 0.0001",
-            contype="2",
-            conaffinity="1",
-            group="3",
+            rgba=COL_ARTIC_RGBA,
         )
 
     # 6. Chilled patisserie milk/cream carton (`hws_milk_carton`, 6-DOF `freejoint` with `vessel_socket` & `ingredient_payload`)
@@ -383,10 +395,34 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 0 -0.0200",
         size="0.0360 0.0360 0.0800",
-        friction="0.80 0.005 0.0001",
         contype="1",
-        conaffinity="2",
+        conaffinity="1",
         group="3",
+        rgba=COL_ACCESSORY_RGBA,
+    )
+    ET.SubElement(
+        carton,
+        "geom",
+        name="hws_milk_carton_gable_col",
+        type="box",
+        pos="0 0 0.0740",
+        size="0.0340 0.0260 0.0140",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ACCESSORY_RGBA,
+    )
+    ET.SubElement(
+        carton,
+        "geom",
+        name="hws_milk_carton_cap_col",
+        type="cylinder",
+        pos="0 -0.0100 0.0940",
+        size="0.0145 0.0060",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ACCESSORY_RGBA,
     )
     ET.SubElement(
         carton,
@@ -394,7 +430,8 @@ def export_blender_meshes_and_xml():
         name="vessel_socket",
         pos="0 0 0.0100",
         size="0.006",
-        group="3",
+        group="4",
+        rgba=SITE_GRASP_RGBA,
     )
     payload = ET.SubElement(carton, "body", name="ingredient_payload", pos="0 0 0")
     ET.SubElement(
@@ -416,6 +453,24 @@ def export_blender_meshes_and_xml():
         group="2",
         rgba="0.97 0.96 0.92 0",
         mass="0",
+    )
+
+    # Contact exclusions between cabinet & articulated children, and between adjacent drawers/door
+    contact = add_adjacent_excludes(
+        app,
+        (
+            ("exclude_cabinet_fridge_door", "hws_cabinet", "hws_fridge_door"),
+            ("exclude_cabinet_ice_drawer", "hws_cabinet", "hws_ice_drawer"),
+            ("exclude_cabinet_upper_freezer", "hws_cabinet", "hws_upper_freezer"),
+            ("exclude_cabinet_lower_freezer", "hws_cabinet", "hws_lower_freezer"),
+            ("exclude_cabinet_veg_drawer", "hws_cabinet", "hws_veg_drawer"),
+            ("exclude_ice_upper_freezer", "hws_ice_drawer", "hws_upper_freezer"),
+            ("exclude_ice_lower_freezer", "hws_ice_drawer", "hws_lower_freezer"),
+            ("exclude_upper_lower_freezer", "hws_upper_freezer", "hws_lower_freezer"),
+            ("exclude_lower_freezer_veg", "hws_lower_freezer", "hws_veg_drawer"),
+            ("exclude_door_ice_drawer", "hws_fridge_door", "hws_ice_drawer"),
+            ("exclude_door_upper_freezer", "hws_fridge_door", "hws_upper_freezer"),
+        ),
     )
 
     # Actuators
@@ -513,6 +568,18 @@ def export_blender_meshes_and_xml():
     write_xml(ASSETS / "appliance.xml", app)
     write_xml(ASSETS / "scene.xml", app)
 
+    emit_standalone_models(
+        ASSETS,
+        model_name="hws_cabinet",
+        defaults=defaults,
+        asset=asset,
+        root_body=base,
+        contact=contact,
+        sensors=sensors,
+        exclude_sensors=("hws_milk_carton_sense",),
+        accessories=(("carton_model.xml", "hws_milk_carton", carton),),
+    )
+
     (ASSETS / "physics-export.json").write_text(
         json.dumps(
             {
@@ -534,7 +601,7 @@ def export_blender_meshes_and_xml():
                     "bottom_vegetable_drawer": 87,
                 },
                 "electrical_supply": "Single-phase 100 V AC, 50/60 Hz, compressor 95 W, defrost heater 155 W, 269 kWh/year, R600a",
-                "scope": "Articulated MuJoCo 3.13 mechanical, 5-compartment multi-zone PAM inverter & 155 W defrost thermal model, left-hinged upper door, 4 pull-out drawers, and 6-DOF chilled milk/cream carton in appliance.xml, scene.xml, and native.xml.",
+                "scope": "Articulated MuJoCo 4.0 Filament PBR, mechanical, 5-compartment multi-zone PAM inverter & 155 W defrost thermal model, left-hinged upper door, 4 pull-out drawers, and 6-DOF chilled milk/cream carton in appliance.xml, scene.xml, model.xml, carton_model.xml, and native.xml.",
             },
             indent=2,
         )
@@ -542,54 +609,8 @@ def export_blender_meshes_and_xml():
     )
 
 
-def strip_visual_meshes(root: ET.Element, model):
-    for parent in root.iter():
-        for geom in list(parent):
-            if geom.tag != "geom" or not geom.get("name"):
-                continue
-            index = model.geom(geom.get("name")).id
-            if (
-                model.geom_contype[index] == 0
-                and model.geom_conaffinity[index] == 0
-                and geom.get("type") == "mesh"
-                and geom.get("mass") == "0"
-            ):
-                parent.remove(geom)
-
-
 def export_native_xml(mujoco, np):
-    spec = mujoco.MjSpec.from_file(str(ASSETS / "scene.xml"))
-    model = spec.compile()
-    data = mujoco.MjData(model)
-    mujoco.mj_forward(model, data)
-
-    root = ET.fromstring(spec.to_xml())
-    strip_visual_meshes(root, model)
-    used_meshes = {geom.get("mesh") for geom in root.iter("geom")}
-    used_materials = {geom.get("material") for geom in root.iter("geom")}
-    assets = root.find("asset")
-    if assets is not None:
-        for asset in list(assets):
-            if (asset.tag == "mesh" and asset.get("name") not in used_meshes) or (
-                asset.tag == "material" and asset.get("name") not in used_materials
-            ):
-                assets.remove(asset)
-    for actuator in root.iter("general"):
-        actuator.attrib.pop("input", None)
-    ET.indent(root, space="  ")
-    native_path = ASSETS / "native.xml"
-    native_path.write_text(ET.tostring(root, encoding="unicode") + "\n")
-
-    rebuilt = mujoco.MjModel.from_xml_path(str(native_path))
-    for field in ("body_mass", "body_inertia", "qpos0", "dof_damping"):
-        if not np.allclose(
-            getattr(model, field), getattr(rebuilt, field), rtol=1e-5, atol=1e-9
-        ):
-            raise RuntimeError(f"Export changed native {field} for hitachi-r-hws47xl")
-    if (rebuilt.nq, rebuilt.nv) != (model.nq, model.nv):
-        raise RuntimeError(
-            "Export changed native degrees of freedom for hitachi-r-hws47xl"
-        )
+    _, rebuilt = kit_export_native_xml(ASSETS, "hitachi-r-hws47xl", mujoco, np)
     return {
         "nq": int(rebuilt.nq),
         "nv": int(rebuilt.nv),
@@ -607,119 +628,9 @@ def export_native_xml(mujoco, np):
 
 
 def verify_rest_and_motion_frames(mujoco, evidence_dir: Path):
-    native_path = ASSETS / "native.xml"
-    glb_path = ASSETS / "hitachi-r-hws47xl.glb"
-    native_sha = hashlib.sha256(native_path.read_bytes()).hexdigest()
-
-    native_model = mujoco.MjModel.from_xml_path(str(native_path))
-    native_data = mujoco.MjData(native_model)
-    mujoco.mj_forward(native_model, native_data)
-
-    # 1. Rest-frame alignment across all 7 retained bodies
-    body_poses = {}
-    for bname in NAMES:
-        bid = native_model.body(bname).id
-        pos = native_data.xpos[bid]
-        quat = native_data.xquat[bid]
-        body_poses[bname] = [
-            float(pos[0]),
-            float(pos[1]),
-            float(pos[2]),
-            float(quat[0]),
-            float(quat[1]),
-            float(quat[2]),
-            float(quat[3]),
-        ]
-
-    frames_in = evidence_dir / "frames-input.json"
-    frames_out = evidence_dir / "frames-report.json"
-    frames_in.write_text(
-        json.dumps(
-            {
-                "hitachi-r-hws47xl": {
-                    "glb": str(glb_path),
-                    "native_sha256": native_sha,
-                    "bodies": body_poses,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
+    return kit_verify_frames_and_motions(
+        ASSETS, "hitachi-r-hws47xl", NAMES, VISUAL_MOTIONS, mujoco, evidence_dir
     )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(frames_in),
-            str(frames_out),
-        ],
-        check=True,
-    )
-    frames_report = json.loads(frames_out.read_text())
-    assert frames_report["passed"], frames_report
-
-    # 2. Sampled scalar-joint motion trajectories (21 samples per scalar joint)
-    motions = []
-    for joint_name, axis in VISUAL_MOTIONS.items():
-        jid = native_model.joint(joint_name).id
-        jtype = int(native_model.jnt_type[jid])
-        kind = "hinge" if jtype == int(mujoco.mjtJoint.mjJNT_HINGE) else "slide"
-        low, high = native_model.jnt_range[jid]
-        bid = int(native_model.jnt_bodyid[jid])
-        samples = []
-        for idx in range(21):
-            val = float(low + (high - low) * idx / 20.0)
-            mujoco.mj_resetData(native_model, native_data)
-            native_data.qpos[native_model.jnt_qposadr[jid]] = val
-            mujoco.mj_forward(native_model, native_data)
-            samples.append(
-                {
-                    "value": val,
-                    "pose": [
-                        *native_data.xpos[bid].tolist(),
-                        *native_data.xquat[bid].tolist(),
-                    ],
-                }
-            )
-        motions.append(
-            {
-                "joint": joint_name,
-                "body": native_model.body(bid).name,
-                "kind": kind,
-                "visual_axis": list(axis),
-                "samples": samples,
-            }
-        )
-
-    motion_in = evidence_dir / "motion-input.json"
-    motion_out = evidence_dir / "motion-report.json"
-    motion_in.write_text(
-        json.dumps(
-            {
-                "hitachi-r-hws47xl": {
-                    "glb": str(glb_path),
-                    "native_sha256": native_sha,
-                    "motions": motions,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
-    )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(motion_in),
-            str(motion_out),
-            "--motion",
-        ],
-        check=True,
-    )
-    motion_report = json.loads(motion_out.read_text())
-    assert motion_report["passed"], motion_report
-
-    return frames_report, motion_report
 
 
 def write_asset_docs(report: dict):
@@ -738,7 +649,7 @@ See the [manufacturer equipment documentation](../../../docs/equipment/hitachi-r
 - [Rest-pose GLB assembly](hitachi-r-hws47xl.glb) and standalone [chilled milk/cream carton GLB](hitachi-r-hws47xl-milk-carton.glb).
 - Review renders (`1400 × 1200`, Cycles Metal GPU, `64` samples + denoiser): [closed](studio-closed.png), [open](studio-open.png), [front](studio-front.png), [interior](studio-interior.png), and [right](studio-right.png).
 - [Build report](build-report.json) and [export inspection](inspection-report.json).
-- MuJoCo 3.13 MJCF packages: [appliance.xml](appliance.xml), [scene.xml](scene.xml), [native.xml](native.xml), and [physics-export.json](physics-export.json).
+- MuJoCo 4.0 MJCF packages: [appliance.xml](appliance.xml), [scene.xml](scene.xml), [model.xml](model.xml), [carton_model.xml](carton_model.xml), [native.xml](native.xml), and [physics-export.json](physics-export.json).
 - Active-state verification: [active-states.md](active-states.md), [active-states.json](active-states.json), [report.json](active-state-evidence/report.json), [frames-report.json](active-state-evidence/frames-report.json), [motion-report.json](active-state-evidence/motion-report.json), and [trace.csv](active-state-evidence/trace.csv).
 
 ## Assembly (`93.000 kg` unit + `0.650 kg` chilled dairy carton = `93.650 kg` scene)
@@ -766,7 +677,7 @@ scripts/bakery-mujoco/.venv/bin/python scripts/bakery-mujoco/build_r_hws47xl_phy
     rf = s["rest_and_motion_frame_alignment"]
     active_md = f"""# Hitachi R-HWS47XL — MuJoCo Active-State Verification
 
-This document summarizes the 6-stage MuJoCo 3.13 (`dt = 0.002 s`) mechanical, 5-zone PAM inverter & `155 W` defrost thermal regulation, left-hinged door swing, 4-drawer slide actuation, and 6-DOF chilled milk/cream vessel verification for the **Hitachi R-HWS47XL** (`470 L`, `単相100V`, `50/60 Hz`, compressor `95 W`, defrost heater `155 W`, `R600a`, `600 × 701 × 1,833 mm`, `93.000 kg` unit + `0.650 kg` chilled vessel) generated by [`scripts/bakery-mujoco/build_r_hws47xl_physics.py`](../../../scripts/bakery-mujoco/build_r_hws47xl_physics.py).
+This document summarizes the 6-stage MuJoCo 4.0 (`dt = 0.002 s`) mechanical, 5-zone PAM inverter & `155 W` defrost thermal regulation, left-hinged door swing, 4-drawer slide actuation, and 6-DOF chilled milk/cream vessel verification for the **Hitachi R-HWS47XL** (`470 L`, `単相100V`, `50/60 Hz`, compressor `95 W`, defrost heater `155 W`, `R600a`, `600 × 701 × 1,833 mm`, `93.000 kg` unit + `0.650 kg` chilled vessel) generated by [`scripts/bakery-mujoco/build_r_hws47xl_physics.py`](../../../scripts/bakery-mujoco/build_r_hws47xl_physics.py).
 
 ## Verified Stages (`{report['trace_samples']}` samples)
 
@@ -915,12 +826,13 @@ def run_active_state_verification():
     assert 5.8 <= snap1["shelf_touch_force_n"] <= 7.0, snap1
     stage_summaries["pam_steady_state_all_closed"] = snap1
 
-    # Stage 2: Open left-hinged upper refrigerator door 102 deg around (0,0,-1) & retrieve chilled milk carton out -Y
+    # Stage 2: Open left-hinged upper refrigerator door 102 deg around (0,0,-1), then retrieve chilled milk carton out -Y
     chilled_before = snap1["marugoto_chilled_c"]
     data.ctrl[model.actuator("hws_fridge_door_actuator").id] = math.radians(102.0)
     state["mode"] = "door_open_recovery"
+    step_and_sample(0.40, pin_carton_pose=None)
     snap2 = step_and_sample(
-        0.64,
+        0.24,
         pin_carton_pose=((0.0600, -0.5200, 1.2500), (1.0, 0.0, 0.0, 0.0)),
     )
     assert snap2["fridge_door_deg"] > 96.0, snap2

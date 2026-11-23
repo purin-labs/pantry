@@ -1,27 +1,65 @@
 """Generate articulated Blender/glTF and MuJoCo assets from local vendor CAD."""
 
+from __future__ import annotations
+
 import argparse
 import json
 import math
 import xml.etree.ElementTree as ET
 from operator import attrgetter
+from pathlib import Path
 
-import bpy
+try:
+    import bpy
+    from mathutils import Euler, Quaternion, Vector
+except ImportError:  # Allow --upgrade-xml-only outside Blender
+    bpy = None  # type: ignore[assignment]
+    Euler = Quaternion = Vector = None  # type: ignore[assignment]
 import numpy as np
-from mathutils import Euler, Quaternion, Vector
-from prepare import (
-    ASSETS,
-    FAIRINO_DH,
-    FANUC_NOTICE,
-    ROBOTS,
-    SERVO_KP,
-    SERVO_KV,
-    RobotSpec,
-    prepare,
-    source_exclusions,
-    source_robot,
-    write_xml,
+
+ROBOT_ASSETS = Path(__file__).resolve().parents[2] / "assets/bakery-robots"
+ROBOT_SLUGS = (
+    "dobot-cr10",
+    "fairino-fr10",
+    "fairino-fr5",
+    "fanuc-crx10ial",
+    "ufactory-xarm6",
+    "universal-robots-ur5e",
 )
+
+try:
+    from prepare import (
+        ASSETS,
+        FAIRINO_DH,
+        FANUC_NOTICE,
+        ROBOTS,
+        SERVO_KP,
+        SERVO_KV,
+        RobotSpec,
+        prepare,
+        source_exclusions,
+        source_robot,
+        write_xml,
+    )
+except ImportError:  # Allow --upgrade-xml-only without xacro installed
+    ASSETS = ROBOT_ASSETS
+    FAIRINO_DH = FANUC_NOTICE = ROBOTS = SERVO_KP = SERVO_KV = None  # type: ignore[assignment]
+    RobotSpec = object  # type: ignore[assignment,misc]
+    prepare = source_exclusions = source_robot = None  # type: ignore[assignment]
+
+    def write_xml(root: ET.Element, path: Path) -> None:
+        ET.indent(root, space="  ")
+        ET.ElementTree(root).write(path, encoding="utf-8", xml_declaration=True)
+
+ROBOT_JOINT_DAMPING = "1"
+ROBOT_JOINT_ARMATURE = "0.02"
+ROBOT_JOINT_SOLREFLIMIT = "0.005 1"
+ROBOT_COL_RGBA = "0.30 0.60 0.90 0.45"
+ROBOT_COL_FRICTION = "0.70 0.015 0.003"
+ROBOT_COL_SOLREF = "0.004 1"
+ROBOT_COL_SOLIMP = "0.95 0.99 0.001"
+ROBOT_END_LINK_SITE_RGBA = "0.95 0.40 0.15 0.45"
+ROBOT_FLANGE_SITE_RGBA = "0.95 0.65 0.10 0.45"
 
 
 def numbers(value: str) -> tuple[float, ...]:
@@ -315,6 +353,9 @@ def make_mujoco(spec: RobotSpec, robot: ET.Element) -> None:
                 type="hinge",
                 axis=joint.find("axis").attrib["xyz"],
                 range=f"{limits['lower']} {limits['upper']}",
+                damping=ROBOT_JOINT_DAMPING,
+                armature=ROBOT_JOINT_ARMATURE,
+                solreflimit=ROBOT_JOINT_SOLREFLIMIT,
             )
         for kind in ("visual", "collision"):
             element = link.find(kind)
@@ -331,6 +372,7 @@ def make_mujoco(spec: RobotSpec, robot: ET.Element) -> None:
                         "mesh",
                         name=mesh_name,
                         file=f"meshes/{label}__{index}.obj",
+                        inertia="shell",
                     )
                     ET.SubElement(
                         body,
@@ -342,19 +384,20 @@ def make_mujoco(spec: RobotSpec, robot: ET.Element) -> None:
                         quat=vector_text(rotation),
                         contype="0",
                         conaffinity="0",
-                        group="1",
+                        group="2",
                         mass="0",
                         rgba=vector_text(mat.diffuse_color),
                     )
                 continue
             mesh_name = name(spec, label + "__" + kind)
-            ET.SubElement(
-                assets,
-                "mesh",
-                name=mesh_name,
-                file=mesh.attrib["filename"],
-                scale=mesh.get("scale", "1 1 1"),
-            )
+            mesh_attrs = {
+                "name": mesh_name,
+                "file": mesh.attrib["filename"],
+                "scale": mesh.get("scale", "1 1 1"),
+            }
+            if kind == "visual":
+                mesh_attrs["inertia"] = "shell"
+            ET.SubElement(assets, "mesh", **mesh_attrs)
             position, rotation = origin(element)
             attributes = {
                 "name": mesh_name,
@@ -367,15 +410,20 @@ def make_mujoco(spec: RobotSpec, robot: ET.Element) -> None:
                 attributes.update(
                     contype="0",
                     conaffinity="0",
-                    group="1",
+                    group="2",
                     rgba=vector_text(visual_color(element, robot)),
                     mass="0",
                 )
             else:
                 attributes.update(
+                    contype="1",
+                    conaffinity="1",
+                    condim="4",
                     group="3",
-                    rgba="0.3 0.6 0.9 0",
-                    friction="0.7 0.005 0.0001",
+                    rgba=ROBOT_COL_RGBA,
+                    friction=ROBOT_COL_FRICTION,
+                    solref=ROBOT_COL_SOLREF,
+                    solimp=ROBOT_COL_SOLIMP,
                     mass="0",
                 )
             ET.SubElement(body, "geom", **attributes)
@@ -386,7 +434,8 @@ def make_mujoco(spec: RobotSpec, robot: ET.Element) -> None:
         "site",
         name=name(spec, "end_link_frame"),
         size="0.008",
-        rgba="0.9 0.4 0.1 0",
+        group="4",
+        rgba=ROBOT_END_LINK_SITE_RGBA,
     )
     contacts = ET.SubElement(root, "contact")
     for frame in ("flange", "fanuc_flange", "tool0"):
@@ -396,7 +445,8 @@ def make_mujoco(spec: RobotSpec, robot: ET.Element) -> None:
                 "site",
                 name=name(spec, frame),
                 size="0.006",
-                rgba="1 0.5 0 0",
+                group="4",
+                rgba=ROBOT_FLANGE_SITE_RGBA,
             )
     for first, second in sorted(set(source_exclusions(spec))):
         if first in bodies and second in bodies:
@@ -717,12 +767,70 @@ def generate(spec: RobotSpec, render: bool) -> None:
     print(f"{spec.title}: {triangles:,} CAD triangles")
 
 
+def upgrade_robot_xml(slug: str) -> None:
+    """Apply MuJoCo 4.0 group, collider, site, and joint hygiene to an existing robot.xml."""
+    path = ASSETS / slug / "robot.xml"
+    parser = ET.XMLParser(target=ET.TreeBuilder(insert_comments=True))
+    root = ET.parse(path, parser=parser).getroot()
+
+    visual_meshes: set[str] = set()
+    for geom in root.iter("geom"):
+        gname = geom.get("name", "")
+        if "__visual" in gname or (
+            geom.get("contype") == "0" and geom.get("conaffinity") == "0"
+        ):
+            geom.set("group", "2")
+            if geom.get("mesh"):
+                visual_meshes.add(geom.attrib["mesh"])
+        elif "__collision" in gname or geom.get("group") == "3":
+            geom.set("contype", "1")
+            geom.set("conaffinity", "1")
+            geom.set("condim", "4")
+            geom.set("group", "3")
+            geom.set("rgba", ROBOT_COL_RGBA)
+            geom.set("friction", ROBOT_COL_FRICTION)
+            geom.set("solref", ROBOT_COL_SOLREF)
+            geom.set("solimp", ROBOT_COL_SOLIMP)
+
+    for mesh in root.findall("asset/mesh"):
+        if mesh.get("name") in visual_meshes:
+            mesh.set("inertia", "shell")
+
+    for joint in root.iter("joint"):
+        joint.set("damping", ROBOT_JOINT_DAMPING)
+        joint.set("armature", ROBOT_JOINT_ARMATURE)
+        joint.set("solreflimit", ROBOT_JOINT_SOLREFLIMIT)
+
+    for site in root.iter("site"):
+        site.set("group", "4")
+        sname = site.get("name", "")
+        site.set(
+            "rgba",
+            ROBOT_END_LINK_SITE_RGBA
+            if sname.endswith("__end_link_frame")
+            else ROBOT_FLANGE_SITE_RGBA,
+        )
+
+    write_xml(root, path)
+    print(f"Upgraded {path.relative_to(ASSETS.parents[1])}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--render", action="store_true")
-    parser.add_argument("--model", choices=[spec.slug for spec in ROBOTS])
+    parser.add_argument("--model", choices=ROBOT_SLUGS)
+    parser.add_argument(
+        "--upgrade-xml-only",
+        action="store_true",
+        help="Upgrade existing robot.xml hygiene without re-running Blender CAD export.",
+    )
     args = parser.parse_args()
-    if bpy.app.version[:3] != (4, 5, 3):
+    if args.upgrade_xml_only:
+        for slug in ROBOT_SLUGS:
+            if args.model is None or args.model == slug:
+                upgrade_robot_xml(slug)
+        return
+    if bpy is None or bpy.app.version[:3] != (4, 5, 3):
         raise RuntimeError("Use the pinned Blender 4.5.3 runtime.")
     for spec in ROBOTS:
         if args.model is None or args.model == spec.slug:

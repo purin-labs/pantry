@@ -80,9 +80,9 @@ export async function assessRobotLoad(
     return { kind: "unassessed", reason: "unsupported-robot" };
   if (PHYSICS_ASSETS_SHA256 !== ASSESSED_ASSETS_SHA256)
     return { kind: "unassessed", reason: "unverified-model" };
-  // The engine runs the pan staging fixture with the FR10 only.
+  // The engine runs pan staging and spanner oven fixtures with the FR10 only.
   const cell = await physicsCellOf(request);
-  if (cell === null || cell === "pan-staging")
+  if (cell === null || cell === "pan-staging" || cell === "spanner-oven")
     return { kind: "unassessed", reason: "unverified-model" };
   const properties = ur5eCarriedLoad(request.ingredients);
   const limit = chartLimit(properties.centerOfMassDistanceMm);
