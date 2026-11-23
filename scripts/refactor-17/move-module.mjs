@@ -46,7 +46,9 @@
 //       exists keeps its line, which gives the module each file in it.
 //    7. The ratchet files in their own order. No count changes.
 //    8. The text edits of the plan. An edit is done when the file holds its
-//       replace text, also with each path in it that a later plan moved.
+//       replace text, also with each path in it that a later plan moved. An
+//       edit with an empty replace text removes its find text, and it is
+//       done when the file does not hold that text.
 //    9. Prettier, only for a file that this run changed and that was clean
 //       before the change. A file of `keepForm` in the plan keeps each import
 //       on its line, where the wrap of Prettier would move a ratchet.
@@ -1166,9 +1168,12 @@ for (const path of [...pending.keys()]) {
  * True when the file holds the replace text of an edit, also with each path
  * in it that a later plan moved, or when an edit of another plan replaced
  * that text in its turn and is done: a later plan can add a root folder to
- * a list that an earlier plan wrote.
+ * a list that an earlier plan wrote. An edit with an empty replace text
+ * removes its find text, so it is done when the file does not hold that text:
+ * a later plan can remove a line that an earlier plan wrote.
  */
 function editDone(edit, text, seen = new Set()) {
+  if (edit.replace === "") return !text.includes(edit.find);
   if (text.includes(edit.replace) || text.includes(laterText(edit.replace))) {
     return true;
   }
