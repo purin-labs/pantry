@@ -350,8 +350,12 @@
   background: var(--pantry-primary-hover);
 }
 .custom-connector-editor .connector-primary-action,
-.custom-connector-editor .connector-step-footer > button:not(:where(.pantry-select-trigger)),
-.custom-connector-editor .custom-connector-credential-form > button:not(:where(.pantry-select-trigger)),
+.custom-connector-editor
+  .connector-step-footer
+  > button:not(:where(.pantry-select-trigger)),
+.custom-connector-editor
+  .custom-connector-credential-form
+  > button:not(:where(.pantry-select-trigger)),
 .custom-connector-editor
   .custom-connector-setup
   > button:not(:where(.pantry-select-trigger)):not(.button-secondary),
@@ -363,7 +367,9 @@
   color: var(--pantry-on-primary);
   box-shadow: var(--pantry-primary-ring);
 }
-.custom-connector-editor .custom-connector-setup > button:not(:where(.pantry-select-trigger)) {
+.custom-connector-editor
+  .custom-connector-setup
+  > button:not(:where(.pantry-select-trigger)) {
   justify-self: start;
 }
 /* A connection opens as a sheet like the consent sheet: compact, as tall as
@@ -684,6 +690,12 @@ label.mailbox-model-consent input[type="checkbox"] {
 .connection-fine-print p {
   margin: 0;
 }
+.connection-fine-print ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-inline-start: 18px;
+}
 /* Everything in a sheet sits on the sheet: no panel inside a panel. A step is
    set apart by space, and a live account by one hairline box. */
 .connection-dialog .integration-setup,
@@ -715,7 +727,9 @@ label.mailbox-model-consent input[type="checkbox"] {
   background: none;
   box-shadow: 0 0 0 1px var(--border) inset;
 }
-.connection-dialog .connection-card button:not(:where(.pantry-select-trigger)):not(.connection-primary-action) {
+.connection-dialog
+  .connection-card
+  button:not(:where(.pantry-select-trigger)):not(.connection-primary-action) {
   min-height: 36px;
   padding-inline: 14px;
   font-size: 13px;
@@ -774,7 +788,9 @@ label.mailbox-model-consent input[type="checkbox"] {
   align-items: stretch;
   gap: 12px;
 }
-.connection-dialog .provider-connect > :is(button:not(:where(.pantry-select-trigger)), label) {
+.connection-dialog
+  .provider-connect
+  > :is(button:not(:where(.pantry-select-trigger)), label) {
   flex: none;
   width: 100%;
 }
@@ -816,7 +832,8 @@ label.mailbox-model-consent input[type="checkbox"] {
   box-shadow: none;
   color: var(--ink-2);
 }
-.connector-method-tabs button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+.connector-method-tabs
+  button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
   color: var(--ink);
   background: var(--paper);
   box-shadow: var(--shadow-card);
@@ -868,7 +885,10 @@ label.mailbox-model-consent input[type="checkbox"] {
   text-decoration: none;
 }
 .custom-connector-editor:has(.connector-method-tabs)
-  :is(.connector-primary-action, .connector-step-footer > button:not(:where(.pantry-select-trigger))) {
+  :is(
+    .connector-primary-action,
+    .connector-step-footer > button:not(:where(.pantry-select-trigger))
+  ) {
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -879,9 +899,10 @@ label.mailbox-model-consent input[type="checkbox"] {
   padding: 10px 16px;
 }
 .custom-connector-editor:has(.connector-method-tabs)
-  :is(.connector-primary-action, .connector-step-footer > button:not(:where(.pantry-select-trigger))):hover:not(
-    :disabled
-  ) {
+  :is(
+    .connector-primary-action,
+    .connector-step-footer > button:not(:where(.pantry-select-trigger))
+  ):hover:not(:disabled) {
   background: var(--pantry-primary-hover);
 }
 .custom-connector-editor:has(.connector-method-tabs)
