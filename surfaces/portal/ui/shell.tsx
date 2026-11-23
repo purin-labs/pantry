@@ -26,10 +26,10 @@ import {
   Factory,
   Landmark,
   FlaskConical,
-  House,
   KeyRound,
   KeySquare,
   LayoutDashboard,
+  LayoutGrid,
   LogOut,
   Mail,
   Package,
@@ -1426,13 +1426,14 @@ function WorkspaceSystemSwitcher(props: {
             collisionPadding={12}
           >
             <GlideHighlight target="[data-highlighted]" />
+            {/* The Organisation list. "Home" names the workspace's Home page. */}
             <DropdownMenu.Item asChild onSelect={props.onNavigate}>
               <Link className="console-switcher-menu-item" to="/portal">
                 <span className="portal-system-icon">
-                  <House aria-hidden="true" size={20} strokeWidth={1.7} />
+                  <LayoutGrid aria-hidden="true" size={20} strokeWidth={1.7} />
                 </span>
                 <span className="console-switcher-menu-copy">
-                  <strong>Home</strong>
+                  <strong>All organisations</strong>
                 </span>
               </Link>
             </DropdownMenu.Item>

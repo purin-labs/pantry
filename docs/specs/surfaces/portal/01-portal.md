@@ -82,8 +82,9 @@ type check refuses a page without one. Page code loads on demand.
   key stays with the browser. The drawer does not change the stored rail choice.
 - **Sidebar head.** It holds the Purin Pantry brand, the Organisation and workspace
   switcher, and the product switcher.
-- **Product switcher.** It offers Home (the Organisation list), Commerce (opens Orders),
-  Café (opens Home) and Kitchen (opens Production).
+- **Product switcher.** It offers All organisations (the Organisation list), Commerce
+  (opens Orders), Café (opens Home) and Kitchen (opens Production). "Home" names only the
+  workspace's Home page.
 - **Groups.** The sidebar shows Workspace, the active product, Agents and Settings. The
   active product follows the current page. On a page outside the three products, it
   stays the last product that the person used. It starts as Commerce.
