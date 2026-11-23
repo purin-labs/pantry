@@ -53,6 +53,10 @@
 //   10. `git add` of the new package files, `pnpm install`, then the
 //       commands of `regenerate` in the plan.
 //
+// `stays` in the plan names the files of the module that do not move: a path,
+// or a folder with a final /. They keep their module in scripts/layers.json,
+// and --sync-plan does not add them.
+//
 // A second run on a moved tree changes nothing. On a branch that was cut
 // before the move, run it after the rebase: it changes each import that the
 // branch added. It reads the old paths from the plan, so it needs no old file.
@@ -334,13 +338,34 @@ function moduleAtStart(path) {
     null
   );
 }
+// The files of the module that stay where they are: a path, or a folder with
+// a final /. The Portal module keeps its HTML entries in apps/portal/src.
+const stays = plan.stays ?? [];
+const staysAt = (entry, path) =>
+  entry.endsWith("/") ? path.startsWith(entry) : path === entry;
+const staysHere = (path) => stays.some((entry) => staysAt(entry, path));
+for (const entry of stays) {
+  if (!tree.some((path) => staysAt(entry, path))) {
+    faults.push(
+      `${planArgument}: stays names ${entry}, which matches no file. Remove it from the plan.`,
+    );
+  }
+}
+for (const from of planFiles.keys()) {
+  if (staysHere(from)) {
+    faults.push(
+      `${planArgument}: ${from} is in files and in stays. Remove it from one of them.`,
+    );
+  }
+}
 const outside = tree
   .map(diskPath)
   .filter(
     (path) =>
       moduleAtStart(path) === plan.module &&
       !path.startsWith(`${plan.target}/`) &&
-      !planFiles.has(path),
+      !planFiles.has(path) &&
+      !staysHere(path),
   );
 
 if (flag("--sync-plan")) {
