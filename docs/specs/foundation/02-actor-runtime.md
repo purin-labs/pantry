@@ -102,9 +102,10 @@ Each placed Actor has one row in `durable_object_registry` for each placement ep
 - A read that must create nothing uses `findActiveCaseActorAtScope`,
   `findActiveSessionActorAtScope`, `findActiveOrganisationActorAtScope` or
   `resolveImportedCanonicalSessionActor`. They address an Actor only from an `active`
-  row with the exact schema version, and they reserve and activate nothing. The first
-  three return `null` for each other row. The last returns the error, for example
-  `registry_schema_mismatch`.
+  row of the exact identity and placement, and they reserve and activate nothing. As on
+  the create path, the row may have an older schema version, and not a newer one
+  (`registry_schema_mismatch`). The first three return `null` for each other row. The
+  last returns the error.
 - `actorStub` (`actors/actor-stubs.ts`) gets the object by its physical name, with the
   `locationHint` of the placement. For a `residency` placement, it uses
   `namespace.jurisdiction(...)`. The registry table keeps each physical name and each

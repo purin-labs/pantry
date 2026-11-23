@@ -663,6 +663,12 @@ export async function listRecentActiveCaseRegistryEntries(input: {
   return { ok: true, value: entries };
 }
 
+/**
+ * The active registry row of one Actor at one placement, for a read that
+ * creates nothing. The row must name this identity and placement exactly.
+ * Its schema version may be older than `schemaVersion`, as on the create
+ * path, and never newer.
+ */
 export async function readExactActiveActorRegistryEntry(input: {
   readonly db: OrganisationDatabase;
   readonly identity: ActorIdentity;
@@ -687,7 +693,10 @@ export async function readExactActiveActorRegistryEntry(input: {
   ) {
     return { ok: false, error: { code: "registry_entry_corrupt" } };
   }
-  if (current.value.schemaVersion !== input.schemaVersion) {
+  // The rule of the create path: an active Actor upgrades its own tables
+  // when it wakes, so an older row is the same Actor. Only a row newer than
+  // this Worker is refused.
+  if (!registrySchemaVersionMatches(current.value, input.schemaVersion)) {
     return {
       ok: false,
       error: {

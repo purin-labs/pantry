@@ -8,6 +8,7 @@ import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorizatio
 import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import { CASE_ACTOR_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import {
   executionRequest,
@@ -47,9 +48,11 @@ declare module "vitest" {
  * for the other member, whose trace read is refused. The message's first line
  * appears nowhere in what that member gets. Then a new discovery lists the
  * channel as public, as after a workspace admin opens it. Both now read the
- * same Case, titled with the message's first line, with its trigger open. Last,
- * the author writes to Pantry in a direct message. That Case shows to the
- * author and to nobody else.
+ * same Case, titled with the message's first line, with its trigger open. The
+ * Case still shows when the registry lists it at the Case schema before the
+ * current one, as a Case registered before a schema step stays: its Actor
+ * moves its own schema when it wakes. Last, the author writes to Pantry in a
+ * direct message. That Case shows to the author and to nobody else.
  */
 it(
   "shows a private Slack Case to its members and a public one to each member",
@@ -174,6 +177,23 @@ async function slackCaseTitle({ task }: TestContext): Promise<void> {
     expect(openNodes(trace, "trigger")).toHaveLength(1);
     shown.push(event);
   }
+
+  // No command advances the registry row of a Case, so a Case registered
+  // before a Case schema step keeps the older version. A read that creates
+  // nothing still finds it, as the next message of its thread does.
+  const older = await fixtureDatabase()
+    .prepare(
+      "UPDATE durable_object_registry SET schema_version = ? WHERE organisation_id = ? AND object_kind = 'case' AND logical_object_id = ? AND lifecycle_status = 'active'",
+    )
+    .bind(CASE_ACTOR_SCHEMA_VERSION - 1, ORGANISATION_ID, caseId)
+    .run();
+  expect(older.meta.changes).toBe(1);
+  expect(
+    openNodes(
+      await readCaseExecution(ORGANISATION_ID, author.session, caseId, 100),
+      "trigger",
+    ),
+  ).toHaveLength(1);
 
   // A direct message with the agent stays with its person.
   const direct = await exports.default.fetch(

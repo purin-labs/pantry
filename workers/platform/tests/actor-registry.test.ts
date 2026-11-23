@@ -127,7 +127,7 @@ describe("actor registry", function actorRegistrySuite() {
     expect(resolved).toEqual(active);
   });
 
-  it("reads only an existing active Actor at the exact schema", async function readsExactActive() {
+  it("reads only an existing active Actor at its schema or an older one", async function readsExactActive() {
     const fixture = await registryFixture();
     const missing = await readExactActiveActorRegistryEntry({
       db: fixture.db,
@@ -172,19 +172,28 @@ describe("actor registry", function actorRegistrySuite() {
       placement: fixture.reservation.admission.placement,
       schemaVersion: fixture.reservation.schemaVersion,
     });
-    const wrongSchema = await readExactActiveActorRegistryEntry({
+    // A Worker one schema step ahead reads the older row: the Actor upgrades
+    // its own tables when it wakes. A Worker one step behind does not.
+    const olderRow = await readExactActiveActorRegistryEntry({
       db: fixture.db,
       identity: fixture.reservation.identity,
       placement: fixture.reservation.admission.placement,
       schemaVersion: fixture.reservation.schemaVersion + 1,
     });
+    const newerRow = await readExactActiveActorRegistryEntry({
+      db: fixture.db,
+      identity: fixture.reservation.identity,
+      placement: fixture.reservation.admission.placement,
+      schemaVersion: fixture.reservation.schemaVersion - 1,
+    });
 
     expect(exact).toEqual(activated);
-    expect(wrongSchema).toEqual({
+    expect(olderRow).toEqual(activated);
+    expect(newerRow).toEqual({
       ok: false,
       error: {
         code: "registry_schema_mismatch",
-        expected: fixture.reservation.schemaVersion + 1,
+        expected: fixture.reservation.schemaVersion - 1,
         received: fixture.reservation.schemaVersion,
       },
     });
