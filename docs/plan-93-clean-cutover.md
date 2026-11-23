@@ -958,12 +958,18 @@ Stripe Connect redirects, the Meta webhook and the remaining console names.
   and the new provider rules. After it, all hosts answer, the schema check
   passes and the live Portal has the consent text. No signed-in journey
   ran.
-- **Still open:** a test order on `shop.purin.io` (the café menu was
-  closed at midnight); the owner's first Turn on of the Gmail mailbox with
-  the consent checkbox; the OpenRouter "Input & Output Logging" setting of
-  the Purin account, which the API cannot read (on 23 November 2026 the
-  owner's Chrome had no OpenRouter sign-in, so the setting is still not
-  read).
+- **Still open:** a test order on `shop.purin.io`. The shop takes a real
+  card payment through Square on production, so the owner does it.
+- **Closed on 24 November 2026 (the owner's request):** in the owner's
+  Chrome, the mailbox `purinindustries@gmail.com` of "Purin workspace" is on,
+  with the consent checkbox for Gemini 4 Hydrogen through OpenRouter and
+  Google Vertex AI ("Mail assistant now reads new mail"). Before that, the
+  OpenRouter account that holds the production key (the key ending in `577`)
+  showed "Input & output logging" off in its workspace (Observability), and
+  its privacy settings showed no "ZDR only" for Google, no training and no
+  data discount, as `docs/runbooks/gmail-mailboxes.md` asks. One Slack
+  message to Sous Chef in `#cafe-ops` got its reply in the thread within 20
+  seconds of the release of 23 November.
 - **Closed on 23 November 2026 (owner's yes):** the Pages project
   `outlayer-email-recovery-example` (no custom domain, last deployment about
   four months earlier) is deleted. Of step 7 only `hadimar` remains, which
