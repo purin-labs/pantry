@@ -22,11 +22,13 @@ import { sha256Hex } from "@purin-labs/std";
  * digest before bytes leave the archive boundary, so a rewritten or
  * cross-organisation object cannot reach the model.
  *
- * Formats whose bytes are already text are extracted here. Anything needing a
- * decoder — PDF, DOCX, ODT, video, audio — returns an explicit, model-visible
- * limitation rather than a guess. Those handlers arrive with the executor's
- * binary streaming operation; until then the agent is told plainly that the
- * file was stored and verified but not read.
+ * The Worker extracts the text of a plain text document, a PDF, a DOCX and an
+ * ODT of at most 1 MiB. It reads the container facts of audio and video, and
+ * the intra-frame stills of video. A larger document and the keyframes of an inter-frame
+ * video go to the executor when the caller holds an allocation; the executor
+ * reads only plain text and H.264. Each other file returns a model-visible
+ * limitation rather than a guess: the agent is told plainly that the file was
+ * stored and verified but not read.
  */
 
 const MEDIA_HEADER_BYTES = 64 * 1024;
