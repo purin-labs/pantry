@@ -1779,7 +1779,10 @@ a record through `commerceTransition(machine, from, event)`. An event that a
 machine does not allow in the record's state is refused with
 `invalid_transition`, which names the machine, the state and the event. A
 guard is a check that the planner makes before the move; a refused guard
-keeps its own error. An external state comes only from records read from
+keeps its own error. The By column names who usually causes a move;
+`commerceTransition` does not check it, so the guards decide. A staff list
+patch can make a `system` move of a purchase request only when the receipts
+and the expected delivery prove it. An external state comes only from records read from
 another platform, or from older rows that no command writes now; its meaning
 says which. A diagram leaves out the events that keep the state; the
 table lists them. `pnpm lint:commerce-spec` checks that this appendix
