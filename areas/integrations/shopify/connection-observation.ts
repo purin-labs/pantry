@@ -30,10 +30,20 @@ export async function observeShopifyConnection(
       "repair_provider_webhook",
     ]);
   }
-  return registration.value.ordersCreate.kind === "unavailable"
+  // Shopify refuses an order topic when the shop does not share protected
+  // customer data. Either refusal stops those order changes by webhook.
+  const missing = [
+    ...(registration.value.ordersCreate.kind === "unavailable"
+      ? ["orders/create"]
+      : []),
+    ...(registration.value.ordersUpdated.kind === "unavailable"
+      ? ["orders/updated"]
+      : []),
+  ];
+  return missing.length > 0
     ? {
         kind: "degraded",
-        missingOptionalCapabilities: ["orders/create"],
+        missingOptionalCapabilities: missing,
         repairActions: ["repair_provider_webhook"],
       }
     : { kind: "healthy", evidenceCode: "provider_webhook_verified" };

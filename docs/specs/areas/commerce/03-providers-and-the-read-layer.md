@@ -224,9 +224,9 @@ Actions and health:
 - Shopify executes only `cancel_order` (GraphQL `orderCancel`). Each other action kind
   is `commerce_action_provider_unsupported`. Its reconciliation is `settled` only when
   the order is cancelled with the same reason.
-- A health check registers the webhooks again. It is degraded when `orders/create` is
-  unavailable. The health view reads only the webhooks of the current credential
-  generation.
+- A health check registers the webhooks again. It is degraded when `orders/create` or
+  `orders/updated` is unavailable, and names each one that is. The health view reads only
+  the webhooks of the current credential generation.
 
 ### The commerce lab
 

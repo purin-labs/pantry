@@ -16,6 +16,7 @@ import { network } from "./network";
 import { commerceWorkspace } from "./commerce-support";
 import { controlReadHeaders } from "./hibernatable-socket-support";
 import { assertNever, bytesToHex, isRecord } from "@purin-labs/std";
+import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
 
 const PUBLIC_ORIGIN = "https://localhost";
 const AIRTABLE_BASE_ID = "appE2EBASE01";
@@ -227,6 +228,11 @@ it.each(PROVIDERS)(
   providerConnectionContract,
 );
 
+it(
+  "shopify reads as degraded when a health check finds that Shopify refuses the order update webhook",
+  shopifyOrderUpdateWebhookRefused,
+);
+
 async function providerConnectionContract(row: ProviderCase): Promise<void> {
   providerCalls = [];
   network.use(...PROVIDER_HANDLERS);
@@ -271,6 +277,80 @@ async function providerConnectionContract(row: ProviderCase): Promise<void> {
   expect(replay.status).toBe(200);
   expect(callsForProvider(row.provider)).toHaveLength(providerCallCount);
   await assertConnectionCardinality(row, scenario.organisationId);
+}
+
+/**
+ * A shop connects with all six webhooks. Later the shop stops sharing
+ * protected customer data for order updates, so Shopify refuses the
+ * orders/updated webhook when the 15-minute health check registers the
+ * webhooks again, and order changes no longer arrive by webhook. The
+ * operator's account list then shows the Shopify account as degraded.
+ */
+async function shopifyOrderUpdateWebhookRefused(): Promise<void> {
+  const row = PROVIDERS.find((candidate) => candidate.provider === "shopify");
+  if (row === undefined) throw new Error("The Shopify row is missing");
+  providerCalls = [];
+  network.use(...PROVIDER_HANDLERS);
+  const scenario = await createControlScenario(row.provider);
+  const started = await startProviderConnection(row, scenario);
+  const callback = await exports.default.fetch(
+    await providerCallbackUrl(row, started.authorizationUrl),
+  );
+  expect(callback.status).toBe(200);
+  const account = await readConnectedAccount(row, scenario.organisationId);
+  await assertPublicAccountProjection(
+    row,
+    scenario,
+    account.integrationAccountId,
+  );
+
+  const refusedTopics: string[] = [];
+  network.use(
+    http.post(
+      `https://${SHOP_DOMAIN}/admin/api/2026-07/graphql.json`,
+      async ({ request }) => {
+        const body = await readGraphqlRequest(request.clone());
+        if (
+          !body.query.includes("PantryWebhookSubscriptionCreate") ||
+          body.variables.topic !== "ORDERS_UPDATED"
+        )
+          return undefined;
+        refusedTopics.push(body.variables.topic);
+        return HttpResponse.json({
+          data: {
+            webhookSubscriptionCreate: {
+              webhookSubscription: null,
+              userErrors: [
+                {
+                  field: ["webhookSubscription"],
+                  message:
+                    "This app is not approved to subscribe to webhook topics containing protected customer data.",
+                },
+              ],
+            },
+          },
+        });
+      },
+    ),
+  );
+  await runScheduledOnboardingReconciliation(env, Date.now());
+  expect(refusedTopics).toEqual(["ORDERS_UPDATED"]);
+
+  const accounts = await exports.default.fetch(
+    `${PUBLIC_ORIGIN}/v1/control/organisations/${scenario.organisationId}/accounts`,
+    { headers: controlReadHeaders(scenario.session) },
+  );
+  expect(accounts.status).toBe(200);
+  await expect(accounts.json()).resolves.toMatchObject({
+    ok: true,
+    accounts: [
+      {
+        integrationAccountId: account.integrationAccountId,
+        provider: "shopify",
+        lifecycle: { kind: "degraded" },
+      },
+    ],
+  });
 }
 
 async function createControlScenario(
