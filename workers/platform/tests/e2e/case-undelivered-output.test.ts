@@ -66,6 +66,12 @@ async function undeliveredOutputJourney(test: TestContext): Promise<void> {
     .first<{ name: string }>();
   if (registry === null) throw new Error("Case Actor missing");
   const caseActor = env.CASE.getByName(registry.name);
+  // The thread shows the answer before the Connector's receipt settles it in
+  // the Case. On a slow machine the seed below found no settled answer yet
+  // (CI run 45147079820).
+  await expect
+    .poll(() => runInDurableObject(caseActor, readOutputs), { timeout: 30_000 })
+    .toEqual([{ outputId: expect.any(String), kind: "settled", reason: null }]);
 
   // The fault: an answer from a day ago that is still pending.
   await runInDurableObject(caseActor, seedStalePendingOutput);
