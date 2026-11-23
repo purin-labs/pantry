@@ -105,19 +105,19 @@ and correct it in the same commit when one of its statements changes. Open
 plans are in `docs/`, closed plans in `docs/history/`. `services/platform` is
 the Worker `pantry`, and `scripts/layers.json` gives each file its module.
 
-| Layer        | Code                                                           | Specs                                                                                                      |
-| ------------ | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Foundation   | `foundation/*`, `packages/contracts`, `packages/collaboration` | [FND-01](docs/specs/foundation/01-tenancy-and-placement.md) to FND-11                                      |
-| Commerce     | `areas/commerce`, `services/commerce` (the engine)             | [COM-01](docs/specs/areas/commerce/01-commerce-domain.md) to COM-05                                        |
-| Café         | `areas/cafe`: menus, boards, the order queue, the Register     | [CAFE-01](docs/specs/areas/cafe/01-menus-boards-and-the-order-queue.md)                                    |
-| Kitchen      | `areas/kitchen`: views, physics, recipe workflows, costs       | [KIT-01](docs/specs/areas/kitchen/01-orchestration-views.md) to KIT-04                                     |
-| Inbox        | `areas/inbox`: email and WhatsApp conversations                | [INB-01](docs/specs/areas/inbox/01-one-inbox.md)                                                           |
-| Brain        | `areas/brain`: Memory, Evals, Case execution                   | [BRN-01](docs/specs/areas/brain/01-brain.md)                                                               |
-| Integrations | `areas/integrations`: providers, custom connectors             | [INT-01](docs/specs/areas/integrations/01-integrations-and-connectors.md)                                  |
-| Devices      | `areas/devices`: the device fleet, the shop gateway            | [DEV-01](docs/specs/areas/devices/01-devices.md)                                                           |
-| Organisation | `areas/organisation`: onboarding, access, billing, Jev         | [ORG-01](docs/specs/areas/organisation/01-onboarding-and-lifecycle.md), ORG-02                             |
-| Surfaces     | The Portal (`apps/portal`), Slack, email, WhatsApp, voice      | [PRT-01](docs/specs/surfaces/portal/01-portal.md), [VOX-01](docs/specs/surfaces/voice/01-voice-control.md) |
-| Engineering  | Decisions, code and repository, names, testing                 | [ENG-01](docs/specs/engineering/01-decision-log.md) to ENG-04                                              |
+| Layer        | Code                                                                              | Specs                                                                                                      |
+| ------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Foundation   | `foundation/*`, `packages/contracts`, `packages/collaboration`                    | [FND-01](docs/specs/foundation/01-tenancy-and-placement.md) to FND-11                                      |
+| Commerce     | `areas/commerce`, `services/commerce` (the engine)                                | [COM-01](docs/specs/areas/commerce/01-commerce-domain.md) to COM-05                                        |
+| Café         | `areas/cafe`: menus, boards, the order queue, the Register                        | [CAFE-01](docs/specs/areas/cafe/01-menus-boards-and-the-order-queue.md)                                    |
+| Kitchen      | `areas/kitchen`: views, physics, recipe workflows, costs                          | [KIT-01](docs/specs/areas/kitchen/01-orchestration-views.md) to KIT-04                                     |
+| Inbox        | `areas/inbox`: email and WhatsApp conversations                                   | [INB-01](docs/specs/areas/inbox/01-one-inbox.md)                                                           |
+| Brain        | `areas/brain`: Memory, Evals, Case execution                                      | [BRN-01](docs/specs/areas/brain/01-brain.md)                                                               |
+| Integrations | `areas/integrations`: providers, custom connectors, Shopify                       | [INT-01](docs/specs/areas/integrations/01-integrations-and-connectors.md)                                  |
+| Devices      | `areas/devices`: the device fleet, the shop gateway                               | [DEV-01](docs/specs/areas/devices/01-devices.md)                                                           |
+| Organisation | `areas/organisation`: onboarding, access, billing, Jev                            | [ORG-01](docs/specs/areas/organisation/01-onboarding-and-lifecycle.md), ORG-02                             |
+| Surfaces     | `surfaces/*`: Slack, email, WhatsApp, voice, the Portal (`apps/portal` builds it) | [PRT-01](docs/specs/surfaces/portal/01-portal.md), [VOX-01](docs/specs/surfaces/voice/01-voice-control.md) |
+| Engineering  | Decisions, code and repository, names, testing                                    | [ENG-01](docs/specs/engineering/01-decision-log.md) to ENG-04                                              |
 
 ## Code rules
 
@@ -129,10 +129,10 @@ full. Do not raise a ratchet count. When one falls, run its lint with `--update`
   package or a public file that `contracts` in `scripts/layers.json` lists.
   Only the owner module of a D1 table writes it. Remove a crossing with a
   port. After a new file, run `node scripts/check-layers.mjs --areas --write`.
-- **Packages.** A foundation module is a package in `foundation/`. An area is
-  a package in `areas/<area>/`, with `server/` for the Worker and `ui/` for the
-  Portal. Import another module by its package name. A package imports no file
-  of the Worker ([the move runbook](docs/runbooks/refactor-17-module-move.md)).
+- **Packages.** A foundation module (`foundation/`), an area (`areas/`) and a
+  surface (`surfaces/`) are packages, the last two with `server/` (Worker) and
+  `ui/` (Portal). Import another module by its package name. A package imports
+  no file of the Worker ([runbook](docs/runbooks/refactor-17-module-move.md)).
 - **Routes** (`pnpm lint:runtime-boundary`). A route file parses the request,
   checks authorization, calls one domain function and maps its result. It runs
   no D1 query. Actor, Slack and chat code imports no route file. A domain

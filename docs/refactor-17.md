@@ -344,28 +344,29 @@ physical bake. This refactor does not remove `schedule.ts`.
 
 ## What is left
 
-State on 2026-11-23, on `dev` at `7de9d964`. The three stages have their main result:
+State on 2026-11-23, after the surfaces group. The three stages have their main
+result, and CI is green: the Pantry run on `c5cabc48` (run 45082677761) passed the
+E2E job and the Kitchen job, the first run with no failure.
 
 - Stage A: the layers are in place, and `pnpm lint:layers` finds 0 crossings.
 - Stage S: the 33 specs are written, 56 plans are in `docs/history/`, and `AGENTS.md`
   has 249 lines.
-- Stage B: each foundation module is a package in `foundation/`, and each product
-  area is a package in `areas/<area>/` with `server/` and `ui/`.
+- Stage B: each foundation module is a package in `foundation/`. Each product area
+  is a package in `areas/<area>/` and each surface is a package in
+  `surfaces/<surface>/`, with `server/` and `ui/`.
 
 The open work, each item with its own decision:
 
-| Item                                                                                                              | Cost                                                                                                                                                                                                                                    | Default                      |
-| ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| The surfaces (`slack`, `chat`, `voice`, `whatsapp`, Shopify, the Portal shell) move to `surfaces/`                | One more group with the move script: about 370 files, one freeze of `dev` of 30 minutes                                                                                                                                                 | They stay where they are     |
-| `services/platform` becomes `workers/platform`                                                                    | The Wrangler files, the deploy scripts and the CI paths change; a release of its own                                                                                                                                                    | The folder keeps its name    |
-| A `contract` package for each area                                                                                | The public files of `contracts` in `scripts/layers.json` move; it ends 3 package cycles                                                                                                                                                 | One package for each area    |
-| The nine kinds of layer debt that `pnpm lint:layer-debts` counts                                                  | Each kind is its own change; the largest are 249 imports of files that are not public                                                                                                                                                   | The counts may not grow      |
-| The 216 code faults that the second read of the specs confirmed, 8 of high severity                               | One change for each fault, with a journey; the list is with the owner                                                                                                                                                                   | No fault is corrected        |
-| One outbox table shape for the 5 outboxes, new names for classes and tables, the deletion of each old-row adapter | Each needs a D1 patch or an Actor schema step                                                                                                                                                                                           | Nothing changes              |
-| Plan 91 moves to `docs/history/`; the 15 other source documents of the specs                                      | One run of `scripts/move-plan-to-history.mjs` after phase 6 of Plan 91                                                                                                                                                                  | They stay in `docs/`         |
-| A short `AGENTS.md` for each area                                                                                 | 8 short files                                                                                                                                                                                                                           | The root `AGENTS.md` only    |
-| A CI run with no failure                                                                                          | The E2E job passed in CI run 45071075553 (`e67faac0`). In that run the Kitchen job failed in five browser journeys, which named moved Portal files by their old address; the correction is on `dev` and the five journeys pass on a Mac | Read the next run            |
-| 42 test files call `runDurableObjectAlarm` and most ignore its result                                             | The same race as in the mail journeys can fail them on a slow runner                                                                                                                                                                    | Correct a file when it fails |
+| Item                                                                                                              | Cost                                                                                                                                                              | Default                          |
+| ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| `services/platform` becomes `workers/platform`, and `apps/portal` (the Portal build) goes to `surfaces/portal`    | The Wrangler files, the deploy scripts, the CI paths and the paths of the R2 files change; a release of its own                                                   | The two folders keep their names |
+| A `contract` package for each area                                                                                | The public files of `contracts` in `scripts/layers.json` move; it ends the 3 package cycles between the areas. The 2 cycles between the surfaces need a port each | One package for each area        |
+| The nine kinds of layer debt that `pnpm lint:layer-debts` counts                                                  | Each kind is its own change; the largest are 249 imports of files that are not public                                                                             | The counts may not grow          |
+| The 216 code faults that the second read of the specs confirmed, 8 of high severity                               | One change for each fault, with a journey; the list is with the owner                                                                                             | No fault is corrected            |
+| One outbox table shape for the 5 outboxes, new names for classes and tables, the deletion of each old-row adapter | Each needs a D1 patch or an Actor schema step                                                                                                                     | Nothing changes                  |
+| Plan 91 moves to `docs/history/`; the 15 other source documents of the specs                                      | One run of `scripts/move-plan-to-history.mjs` after phase 6 of Plan 91                                                                                            | They stay in `docs/`             |
+| A short `AGENTS.md` for each area                                                                                 | 8 short files                                                                                                                                                     | The root `AGENTS.md` only        |
+| 42 test files call `runDurableObjectAlarm` and most ignore its result                                             | The same race as in the mail journeys can fail them on a slow runner                                                                                              | Correct a file when it fails     |
 
 The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
@@ -553,17 +554,29 @@ the old stack is deleted. Stage B starts with step 1. In this order:
    folder when that folder is the name of the area or `commerce/`
    (`src/devices/store.ts` is `areas/devices/server/store.ts`). The Worker bundle
    differs only in the `owner` paths of five state machine files, and the Portal build
-   has the same 5 pages and 563 files. 203 TypeScript files stay in
+   has the same 5 pages and 563 files. 203 TypeScript files stayed in
    `services/platform/src` (the Worker module and the surfaces Slack, chat, voice and
-   Shopify), and 166 files stay in `apps/portal/src`.
+   Shopify), and 166 files stayed in `apps/portal/src`, until the surfaces group.
+   Done on 2026-11-23, as the fourth group in one freeze: each surface is one package
+   in `surfaces/<surface>/` (`@purin-labs/surface-slack`, `-email`, `-whatsapp`,
+   `-webhooks`, `-voice` and `-portal`), and the Shopify module is the folder
+   `areas/integrations/shopify/` of `@purin-labs/area-integrations`, one folder that a
+   person can delete (tags `refactor-17-surfaces-1-before` and
+   `refactor-17-surfaces-1-after`). 267 files moved. The Worker bundle has the same
+   bytes before and after, and the Portal build has the same 5 pages and 563 files.
+   `apps/portal` stays the Vite application: its HTML pages, its config, `public/`
+   and 70 entry and preview files. Its shell, router, page table and chat feature are
+   in `surfaces/portal/ui/`. 31 files stay in `services/platform/src`, all of the
+   Worker module: the Worker entries, the Actor class files and the wiring.
 3. The journeys stay in `services/platform/tests` and import a module by its package
    name. No module needed a `testing` entry.
 4. Not done, each with its own decision:
-   - The surfaces (`slack`, `chat`, `voice`, `whatsapp`, the Portal shell) stay where
-     they are. The same script can move them to `surfaces/`.
-   - `services/platform` stays the folder of the Platform Worker. A move to
-     `workers/platform` changes the Wrangler files, the deploy scripts and the CI
-     paths, so it needs a release of its own.
+   - `services/platform` stays the folder of the Platform Worker, and `apps/portal`
+     stays the folder of the Portal build. A move to `workers/platform` and to
+     `surfaces/portal` changes the Wrangler files, the deploy scripts, the CI paths
+     and the paths of the R2 files, so it needs a release of its own.
+   - The surface packages import each other in two circles (`email`, `whatsapp`,
+     `slack` and `webhooks`; `portal` and `voice`). A port for each removes it.
    - The eight area packages import each other in a circle (`pnpm` reports three
      cycles). A `contract` package for each area (`areas/<area>/contract`) removes
      it: the public files of `contracts` in `scripts/layers.json` move there.

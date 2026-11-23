@@ -155,8 +155,12 @@ pnpm --filter @purin-labs/platform check:types
   `collaboration`. The area group has the tags `refactor-17-areas-1-before` and
   `refactor-17-areas-1-after` and the plans `area-devices`, `area-brain`,
   `area-organisation`, `area-cafe`, `area-inbox`, `area-integrations`,
-  `area-commerce` and `area-kitchen`. A branch that was cut before the groups
-  does the steps for the first group, then for the second, then for the areas.
+  `area-commerce` and `area-kitchen`. The surfaces group has the tags
+  `refactor-17-surfaces-1-before` and `refactor-17-surfaces-1-after` and the
+  plans `surface-whatsapp`, `surface-email`, `shopify`, `surface-slack`,
+  `surface-webhooks`, `surface-voice` and `surface-portal`. A branch that was
+  cut before the groups does the steps for the first group, then for the
+  second, then for the areas, then for the surfaces.
 - Between the two tags of the second group there are four small commits that
   are not moves: the Portal lints read `PORTAL_SOURCE`, 17 `ui` names lose
   `export`, the layer check reads `packages/collaboration`, and one script
@@ -255,8 +259,8 @@ Copy `scripts/refactor-17/plans/kernel.json` and change:
 - `package.typeCheck`: `false` if the module reads a key that another module
   merges into `Env`. Give the keys in `about`.
 
-No foundation module and no area is left. The same script moves a module of
-another layer; these plan options exist for the cases so far:
+No foundation module, no area and no surface is left. These plan options exist
+for the cases so far:
 
 - `package.existing: true` moves the files into a package that exists
   (`contracts`, `collaboration`). The script changes no manifest field but the
@@ -277,6 +281,16 @@ another layer; these plan options exist for the cases so far:
 - A class that a Worker entry exports for a binding carries `@public` with the
   entry and the binding, because knip judges each export of a foundation
   package.
+- `stays` names the files of the module that do not move: a path, or a folder
+  that ends with `/` (`surface-portal`: the entries of the Portal build and
+  `dev/` stay in `apps/portal/src`).
+- A plan can move a module into a folder of the package of another module
+  (`shopify` in `areas/integrations/shopify/`), with `package.existing: true`.
+  The folder gets the rule of the module in `scripts/layers.json`, and a second
+  run of the plan of that package keeps the export entry and the rule.
+- A moved surface file keeps a relative import to a surface that has not moved
+  yet, as an area file does for a public file of another area.
+- An edit with an empty `replace` removes its `find` text.
 
 ## The group of 2026-11-23
 
@@ -304,6 +318,76 @@ the four plans.
   `placement-move.machine.ts` are the whole difference: with the new paths in
   the bundle of before, the bytes are the same.
 - Not run: the full E2E suite, the Kitchen journeys and a release.
+
+## The surfaces group of 2026-11-23
+
+Branch `refactor-17-surfaces-1`, on `origin/dev` at `c5cabc48`. Tags
+`refactor-17-surfaces-1-before` and `refactor-17-surfaces-1-after`. Each surface
+is one package `@purin-labs/surface-<name>` in `surfaces/<name>/`. The Shopify
+module is the folder `areas/integrations/shopify/` of the package
+`@purin-labs/area-integrations`.
+
+| Module     | Files to `server/`                   | Files to `ui/` | Files changed | Imports changed (by name / relative) |
+| ---------- | ------------------------------------ | -------------- | ------------- | ------------------------------------ |
+| `whatsapp` | 8                                    | 0              | 30            | 26 (23 / 3)                          |
+| `email`    | 10                                   | 0              | 17            | 12 (12 / 0)                          |
+| `shopify`  | 23, to `areas/integrations/shopify/` | —              | 22            | 24 (24 / 0)                          |
+| `slack`    | 63                                   | 0              | 81            | 141 (80 / 61)                        |
+| `webhooks` | 18                                   | 0              | 19            | 22 (22 / 0)                          |
+| `voice`    | 11                                   | 17             | 34            | 26 (23 / 3)                          |
+| `portal`   | 39                                   | 79             | 90            | 88 (86 / 2)                          |
+
+- **The Portal.** `apps/portal` stays the Vite application: its HTML pages, its
+  config, `public/` and, in `apps/portal/src`, the entries that an HTML page
+  names (`bootstrap.tsx`, `tv/main.tsx`), the folder `dev/` and
+  `vite-env.d.ts`: 70 files, which `stays` in the plan names. The shell, the
+  router, the page table, `styles.css` and the chat feature are in
+  `surfaces/portal/ui/`. The Wrangler file names the build folder
+  `apps/portal/dist`, so a rename of `apps/portal` belongs with the rename of
+  `services/platform`.
+- **The Worker.** 31 files stay in `services/platform/src`, all of
+  `workers/platform`: the six Worker entries, the Actor class files and the
+  wiring files. The entry of the Slack ingress Worker joined them before the
+  moves.
+- **The order.** `whatsapp`, `email`, `shopify`, `slack`, `webhooks`, `voice`,
+  `portal`. The surfaces import each other in two circles (`slack` and
+  `webhooks`; `portal` and `voice`). Five imports stayed relative until the
+  other surface moved, and none is left.
+- **Shopify.** The module keeps its name `areas/shopify` and its rule in
+  `scripts/layers.json`. Temporary imports from `areas/commerce`, from
+  `areas/integrations/server` and from a Worker file were refused by
+  `pnpm lint:layers` and by the count `shopify-rule` of `pnpm lint:layer-debts`.
+  `REMOVE.md` names each file by its path in the repository.
+- **The action registry.** Before the moves, the generated registry went to
+  `foundation/authority/generated/action-registry.ts`, beside the action
+  ledger: two Shopify files import it, and a package imports no file of the
+  Worker. `actions:generate` writes it there, with the same bytes.
+- **Lints.** The three type check programs of the Worker read
+  `surfaces/*/server` and the Shopify folder, and the program of the Portal
+  reads `surfaces/*/ui`. The runtime boundary lint and the tool effects lint
+  read `surfaces/*/server`; the files of `slack/` are the top-level files of
+  `surfaces/slack/server/`. For each of these, a temporary fault was refused.
+  The layer debt `portal-default` fell from 26 rules to 2.
+- **Journeys.** Before the moves, ten browser journeys and the loader of the
+  voice bench named their Portal files with `sourceUrl` and `checkoutUrl`, so
+  the script changed those paths.
+- **The result.** Each move commit is the output of the script, and `--check`
+  prints "Nothing to change." for each of the 28 plans. Each quick check of the
+  table passes. The clone baseline did not change (795 copies, 14,331 lines).
+  The Worker bundle has the same bytes before and after (10,411,698 bytes), and
+  so has the bundle of the Slack ingress Worker. The Portal build has the same
+  5 pages and 563 files. Twelve shared chunks have other names, because the
+  bundler names a chunk after a module and the order of the modules follows
+  the paths: compare the modules of each chunk in the source maps, not the
+  names. `pnpm` reports two more cycles between packages (`email`, `whatsapp`,
+  `slack` and `webhooks`; `portal` and `voice`).
+- Run again on the branch before the landing: the lints, the type checks,
+  `pnpm test:units`, the Portal build, the five other Workers, the bundle
+  comparison, nine E2E files (Slack, the Slack ingress Worker, the mailbox,
+  WhatsApp, voice, the Portal chat, the webhooks, the idle tenant cost) and
+  four browser journeys, one of them on the built Portal.
+- Not run before the landing: the full E2E suite (CI runs it), the Kitchen
+  journeys that need `MUJOCO_DIR`, the live Slack journey and a release.
 
 ## The area group of 2026-11-23
 
