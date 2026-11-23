@@ -26,6 +26,8 @@ export const MAX_RECORDING_BYTES = 16 * 1024 * 1024;
 export const MAX_REQUEST_BYTES = 4096;
 export const MARUZEN_GLB_SHA256 =
   "a933f3458b83e61242b27727ac3f54a1b40799468ba17488d80881e3cbdb2599";
+const MARUZEN_MBCO4_GLB_SHA256 =
+  "1e04152e74446ed8479cdcfa5419e58918b918dd770b5fb4659cd8fce4eeee85";
 /**
  * Earlier exports of the Maruzen visual that recordings may name. A recording
  * keeps the identity that produced it. The export of 2026-10-16 only removed
@@ -177,6 +179,7 @@ export const PHYSICS_CELLS = [
   "combined-blocked-rack",
   "combined-unreachable-rack",
   "pan-staging",
+  "spanner-oven",
 ] as const;
 
 export type PhysicsCell = (typeof PHYSICS_CELLS)[number];
@@ -656,7 +659,7 @@ export type PhysicsFixture =
       kind: "maruzen-oven" | "oven-and-rack";
       pose: PhysicsPose;
       doorAngle: number;
-      glbSha256: typeof MARUZEN_GLB_SHA256;
+      glbSha256: typeof MARUZEN_GLB_SHA256 | typeof MARUZEN_MBCO4_GLB_SHA256;
     }>;
 type TransferRecording<Request extends NativeRequest> = Readonly<{
   [validated]: true;
@@ -1593,6 +1596,23 @@ function parseFixture(
     return { kind: "rack" };
   }
   keys(raw, ["kind", "pose", "doorAngle", "glbSha256"]);
+  if (
+    raw.kind === "maruzen-oven" &&
+    raw.glbSha256 === MARUZEN_MBCO4_GLB_SHA256
+  ) {
+    const doorAngle = request.case === "closed-door" ? 0 : 1.9;
+    if (Math.abs(number(raw.doorAngle, 0, 1.92) - doorAngle) > 1e-8) {
+      throw new Error(
+        "Oven task requires the matching Maruzen visual and fixed-door pose.",
+      );
+    }
+    return {
+      kind: raw.kind,
+      pose: parsePose(raw.pose),
+      doorAngle,
+      glbSha256: MARUZEN_MBCO4_GLB_SHA256,
+    };
+  }
   const doorAngle = request.case === "closed-door" ? 0 : (100 * Math.PI) / 180;
   if (
     (raw.kind !== "maruzen-oven" && raw.kind !== "oven-and-rack") ||

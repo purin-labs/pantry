@@ -29,11 +29,16 @@ import { RobotLimits } from "./robot-limits";
 import { summarizeMargins } from "@purin-labs/bakery-model/bakery-margins";
 
 type Task = "table-to-rack" | "table-to-oven";
-type Scenario = "nominal" | "blocked" | "unreachable";
+type Workcell = "separate" | "spanner-oven";
+type Scenario = "nominal" | "blocked" | "unreachable" | "closed-door" | "slip";
 const ROBOT_ITEMS = ROBOT_IDS.map((robot) => ({
   value: robot,
   label: ROBOTS[robot].label,
 }));
+const WORKCELL_ITEMS = [
+  { value: "separate", label: "Standard fork clamp" },
+  { value: "spanner-oven", label: "Spanner oven (MBCO-4ME)" },
+];
 const TASK_ITEMS = [
   { value: "table-to-rack", label: "Table to rack" },
   { value: "table-to-oven", label: "Table to oven" },
@@ -42,6 +47,12 @@ const SCENARIO_ITEMS = [
   { value: "nominal", label: "Nominal" },
   { value: "blocked", label: "Blocked destination" },
   { value: "unreachable", label: "Unreachable destination" },
+];
+const SPANNER_SCENARIO_ITEMS = [
+  { value: "nominal", label: "Nominal" },
+  { value: "blocked", label: "Blocked destination" },
+  { value: "closed-door", label: "Closed door" },
+  { value: "slip", label: "Slip (lost grasp)" },
 ];
 type Entry = Readonly<{
   robot: RobotModel;
@@ -65,6 +76,7 @@ type State = Readonly<{
   forwardMm: string;
   lateralMm: string;
   robot: RobotModel;
+  cell: Workcell;
   task: Task;
   scenario: Scenario;
   progress: Progress;
@@ -87,6 +99,7 @@ export class RobotComparison extends React.Component<Props, State> {
     forwardMm: "0",
     lateralMm: "0",
     robot: "fanuc-crx10ial",
+    cell: "separate",
     task: "table-to-rack",
     scenario: "nominal",
     progress: { kind: "idle" },
@@ -127,6 +140,25 @@ export class RobotComparison extends React.Component<Props, State> {
     if (value !== null) this.setState({ robot: parseRobotModel(value) });
   }
 
+  private chooseWorkcell(value: string | null): void {
+    if (value === "spanner-oven") {
+      this.setState((state) => ({
+        cell: "spanner-oven",
+        robot: "fairino-fr10",
+        task: "table-to-oven",
+        scenario: state.scenario === "unreachable" ? "nominal" : state.scenario,
+      }));
+    } else if (value === "separate") {
+      this.setState((state) => ({
+        cell: "separate",
+        scenario:
+          state.scenario === "closed-door" || state.scenario === "slip"
+            ? "nominal"
+            : state.scenario,
+      }));
+    }
+  }
+
   private chooseTask(value: string | null): void {
     const task = value;
     if (task === "table-to-rack" || task === "table-to-oven")
@@ -138,7 +170,9 @@ export class RobotComparison extends React.Component<Props, State> {
     if (
       scenario === "nominal" ||
       scenario === "blocked" ||
-      scenario === "unreachable"
+      scenario === "unreachable" ||
+      scenario === "closed-door" ||
+      scenario === "slip"
     )
       this.setState({ scenario });
   }
@@ -207,7 +241,7 @@ export class RobotComparison extends React.Component<Props, State> {
     )
       return;
     const generation = ++this.generation;
-    const { task, scenario } = this.state;
+    const { cell, task, scenario } = this.state;
     const entries: Entry[] = [];
     this.setState({ entries: [] });
     try {
@@ -235,7 +269,7 @@ export class RobotComparison extends React.Component<Props, State> {
             },
           });
           const result = await this.props.runner.execute(
-            { kind: "selection", robot, task, scenario, ingredients },
+            { kind: "selection", robot, cell, task, scenario, ingredients },
             this.prepared.bind(this, robot, task, scenario, ingredients),
             this.progress.bind(this),
           );
@@ -332,6 +366,8 @@ export class RobotComparison extends React.Component<Props, State> {
     const progress = this.state.progress;
     const busy = progress.kind === "running";
     const disabled = busy || this.props.disabled;
+    const isSpanner = this.state.cell === "spanner-oven";
+    const scenarios = isSpanner ? SPANNER_SCENARIO_ITEMS : SCENARIO_ITEMS;
     return (
       <section
         className="robot-comparison"
@@ -345,12 +381,26 @@ export class RobotComparison extends React.Component<Props, State> {
         </p>
         <div className="robot-comparison-controls">
           <label>
+            Workcell
+            <Select.Root
+              items={WORKCELL_ITEMS}
+              value={this.state.cell}
+              onValueChange={this.chooseWorkcell.bind(this)}
+              disabled={disabled}
+            >
+              <Select.Trigger>
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Popup>{WORKCELL_ITEMS.map(renderItem)}</Select.Popup>
+            </Select.Root>
+          </label>
+          <label>
             Robot
             <Select.Root
               items={ROBOT_ITEMS}
               value={this.state.robot}
               onValueChange={this.chooseRobot.bind(this)}
-              disabled={disabled}
+              disabled={disabled || isSpanner}
             >
               <Select.Trigger>
                 <Select.Value />
@@ -364,7 +414,7 @@ export class RobotComparison extends React.Component<Props, State> {
               items={TASK_ITEMS}
               value={this.state.task}
               onValueChange={this.chooseTask.bind(this)}
-              disabled={disabled}
+              disabled={disabled || isSpanner}
             >
               <Select.Trigger>
                 <Select.Value />
@@ -375,7 +425,7 @@ export class RobotComparison extends React.Component<Props, State> {
           <label>
             Case
             <Select.Root
-              items={SCENARIO_ITEMS}
+              items={scenarios}
               value={this.state.scenario}
               onValueChange={this.chooseScenario.bind(this)}
               disabled={disabled}
@@ -383,7 +433,7 @@ export class RobotComparison extends React.Component<Props, State> {
               <Select.Trigger>
                 <Select.Value />
               </Select.Trigger>
-              <Select.Popup>{SCENARIO_ITEMS.map(renderItem)}</Select.Popup>
+              <Select.Popup>{scenarios.map(renderItem)}</Select.Popup>
             </Select.Root>
           </label>
         </div>
@@ -439,7 +489,7 @@ export class RobotComparison extends React.Component<Props, State> {
           </button>
           <button
             type="button"
-            disabled={disabled}
+            disabled={disabled || isSpanner}
             onClick={this.compare.bind(this)}
           >
             Compare existing arms

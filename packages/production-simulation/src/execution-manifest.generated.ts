@@ -3,22 +3,22 @@
 export const PRODUCTION_EXECUTION_MANIFEST = {
   "schemaVersion": 1,
   "bundle": {
-    "id": "bae80357447dd1760ce88de78a1a3bb28e34f6017f9e346935ad66cea57ba21c",
+    "id": "74f337638cea85d8e0c7f6b3db0d7a901dca9d26db452fcc8b4754d8e4ad435c",
     "backend": "browser",
     "protocolVersion": 5,
     "checkpointSchemaVersion": 4,
-    "controllerSourceHash": "cde591e2539d6131e3f288b85be6332999de90a4bb0cc819ac2a6485500ad1ad",
-    "controllerHash": "78df6544de0d7b0a1bf3bdb5c5f240fa3a8240ac55b6e5f60a8f3275db1378d1",
-    "runtimeHash": "f6616e50ec07ae2d951d4d693af0853c935462b1833d94f7fa2957a446f28d35",
-    "engineHash": "5b584ab281cec146b0044c1cfeb5112d4b91c8caa458d1a753864e2341e0fe68"
+    "controllerSourceHash": "e6a03799ef1000b184628ef158b574341e97c515562c3197844f6182285bd794",
+    "controllerHash": "45937d027007608df82a22136147a835f52c37389888c796cafd81254b63e8d7",
+    "runtimeHash": "9f07e7261fd2c0e8ea6b245fc3ea0f6a535165ee7d8c7d7f9119070bdf61920a",
+    "engineHash": "e97340d4ae666e54f9bcd042a2aefca7026349ac156bac9514b9d9db5a88fb28"
   },
   "engine": {
     "file": "production-engine.mjs",
-    "sha256": "5b584ab281cec146b0044c1cfeb5112d4b91c8caa458d1a753864e2341e0fe68",
-    "byteLength": 809959
+    "sha256": "e97340d4ae666e54f9bcd042a2aefca7026349ac156bac9514b9d9db5a88fb28",
+    "byteLength": 811714
   },
   "runtime": {
-    "id": "e0d681c26b964f8aa60d2bc54d4b44d8f31eca2b994d5669882e064802a31f3f",
+    "id": "d1e245daa6523eb5746f9b2a42fc05c8e3cf42c049480cda579e2364687a4802",
     "files": [
       {
         "file": "bakery-native.js",
@@ -27,8 +27,8 @@ export const PRODUCTION_EXECUTION_MANIFEST = {
       },
       {
         "file": "bakery_native.wasm",
-        "sha256": "556b63ebe149c8fbce5958d178b2a99dc574c72c678723f6ab38dd2fd6df8360",
-        "byteLength": 6271442
+        "sha256": "ce4dd18656be2a08f71c38a70d48899fba27106a9df7b59ba9d9c3810ff83d0a",
+        "byteLength": 6271586
       },
       {
         "file": "models.json",

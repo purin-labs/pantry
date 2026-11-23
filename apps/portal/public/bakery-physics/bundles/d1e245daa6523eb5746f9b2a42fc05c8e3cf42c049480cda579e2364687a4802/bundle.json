@@ -1,5 +1,5 @@
 {
-  "id": "e0d681c26b964f8aa60d2bc54d4b44d8f31eca2b994d5669882e064802a31f3f",
+  "id": "d1e245daa6523eb5746f9b2a42fc05c8e3cf42c049480cda579e2364687a4802",
   "schemaVersion": 2,
   "files": {
     "module": {
@@ -9,8 +9,8 @@
     },
     "wasm": {
       "file": "bakery_native.wasm",
-      "sha256": "556b63ebe149c8fbce5958d178b2a99dc574c72c678723f6ab38dd2fd6df8360",
-      "byteLength": 6271442
+      "sha256": "ce4dd18656be2a08f71c38a70d48899fba27106a9df7b59ba9d9c3810ff83d0a",
+      "byteLength": 6271586
     },
     "models": {
       "file": "models.json",

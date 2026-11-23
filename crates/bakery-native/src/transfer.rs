@@ -234,6 +234,21 @@ fn phase_event(event: &Event) -> Option<(usize, &str)> {
     }
 }
 
+fn spanner_place_and_release(dest_grip: Point, place_seconds: f64) -> [Phase; 3] {
+    let seated = dest_grip + Point::new(0., 0., 0.004);
+    [
+        Phase::new("place", seated, place_seconds, true, true),
+        Phase::new("release", seated, 1.0, false, false),
+        Phase::new(
+            "clear_rear",
+            seated + Point::new(0., 0.004, 0.),
+            0.8,
+            false,
+            false,
+        ),
+    ]
+}
+
 fn spanner_loading_phases(engine: &Engine) -> Result<Vec<Phase>> {
     let source_site = engine.site("source_tray_center")?;
     let dest_site = engine.site(BakeryTask::Oven.destination())?;
@@ -242,7 +257,7 @@ fn spanner_loading_phases(engine: &Engine) -> Result<Vec<Phase>> {
     let slide_z = (dest_site.z + 0.042).max(source_site.z + 0.30);
     let initial = engine.grasp_site();
     let mouth_out = Point::new(dest_grip.x, dest_grip.y - 0.48, dest_grip.z + 0.049);
-    Ok(vec![
+    let mut phases = vec![
         Phase::new("settle", initial, 0.5, false, false),
         Phase::new(
             "approach",
@@ -282,27 +297,9 @@ fn spanner_loading_phases(engine: &Engine) -> Result<Vec<Phase>> {
             true,
             true,
         ),
-        Phase::new(
-            "place",
-            dest_grip + Point::new(0., 0., 0.004),
-            1.5,
-            true,
-            true,
-        ),
-        Phase::new(
-            "release",
-            dest_grip + Point::new(0., 0., 0.004),
-            1.0,
-            false,
-            false,
-        ),
-        Phase::new(
-            "clear_rear",
-            dest_grip + Point::new(0., 0.004, 0.004),
-            0.8,
-            false,
-            false,
-        ),
+    ];
+    phases.extend(spanner_place_and_release(dest_grip, 1.5));
+    phases.extend([
         Phase::new(
             "lift_clear",
             dest_grip + Point::new(0., 0.004, 0.049),
@@ -312,7 +309,8 @@ fn spanner_loading_phases(engine: &Engine) -> Result<Vec<Phase>> {
         ),
         Phase::new("clear_oven_front", mouth_out, 2.5, false, false),
         Phase::new("settled", mouth_out, 2.0, false, false),
-    ])
+    ]);
+    Ok(phases)
 }
 
 fn spanner_unloading_phases(
@@ -327,7 +325,7 @@ fn spanner_unloading_phases(
     let enter_z = tray_pos.z + 0.060;
     let slide_z = tray_pos.z + 0.042;
     let retract = dest_grip + Point::new(0., 0.004, 0.16);
-    Ok(vec![
+    let mut phases = vec![
         Phase::new("settle", Point::from(previous_target), 0.5, false, false),
         Phase::new(
             "align_oven",
@@ -374,30 +372,13 @@ fn spanner_unloading_phases(
             true,
             true,
         ),
-        Phase::new(
-            "place",
-            dest_grip + Point::new(0., 0., 0.004),
-            3.0,
-            true,
-            true,
-        ),
-        Phase::new(
-            "release",
-            dest_grip + Point::new(0., 0., 0.004),
-            1.0,
-            false,
-            false,
-        ),
-        Phase::new(
-            "clear_rear",
-            dest_grip + Point::new(0., 0.004, 0.004),
-            0.8,
-            false,
-            false,
-        ),
+    ];
+    phases.extend(spanner_place_and_release(dest_grip, 3.0));
+    phases.extend([
         Phase::new("retract", retract, 2.0, false, false),
         Phase::new("settled", retract, 2.0, false, false),
-    ])
+    ]);
+    Ok(phases)
 }
 
 fn unloading_phases(
