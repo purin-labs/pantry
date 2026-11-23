@@ -383,9 +383,9 @@ The overlay leaves controls and menus outside the beam's clipping area.
 
 `PermissionRequestCard` is a consent card for a permission request, in the
 style of an OAuth consent screen. It shows the requester and target avatars, a
-title, the account chip and the subtitle, an optional scope `<select>`, the
-requested permissions, the footnote and the decision buttons. The inline card
-stacks these in one narrow column.
+title, the account chip and the subtitle, the requested permissions, the
+footnote and the decision buttons. The inline card stacks these in one narrow
+column.
 
 `PermissionRequestDialog` is the authorization screen, in a native modal
 `<dialog>` (through `syncDialog` and `cancelDialog`). It has two layouts, set
@@ -393,7 +393,7 @@ with `layout`:
 
 - `compact`: a narrow sheet with the app's icon, the question, the points in
   a filled box, the footnote and full-width actions. This is the default for
-  three items or fewer without a scope choice.
+  three items or fewer.
 - `split`: a wide card. The requester, the question, the account chip and the
   decision are on the left; the permissions are on the right, on a tinted
   band. Below 760px wide the card stacks. This is the default for a longer
@@ -460,9 +460,9 @@ card grows from the sheet's size while its content fades in. When the screen
 closes, the sheet grows back from the card. With reduced motion the two
 cross-fade.
 
-The card is presentation only. The caller owns `selectedIds`, the scope value,
-`pending`, and `error`, and does the work in the callbacks. Required items stay
-checked and disabled, and `onAllow` always receives them. While `pending` is set,
+The card is presentation only. The caller owns `selectedIds`, `pending`, and
+`error`, and does the work in the callbacks. Required items stay checked and
+disabled, and `onAllow` always receives them. While `pending` is set,
 both buttons are `aria-disabled` and the chosen button shows a spinner, so focus
 stays on it.
 
@@ -486,7 +486,6 @@ When the agent asks, name it with `AGENT_NAME` from `src/agent-name.ts`.
   target={{ name: "Noix de Beurre", icon: <Croissant /> }}
   title={`${AGENT_NAME} would like to read a public link`}
   subtitle="Only allow this if you trust the request."
-  scope={null}
   listHeading={`This will allow ${AGENT_NAME} to:`}
   items={items}
   selectedIds={selectedIds}

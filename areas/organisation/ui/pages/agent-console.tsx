@@ -1332,7 +1332,7 @@ function NewAgentModal(
   return (
     <AgentModal
       title="Create agent"
-      description="Assign an area and review access before running this agent. Add an event or schedule to automate its work."
+      description="The agent starts at once, with the access that you choose below. Add an event or a schedule to run it on its own."
       close={close}
       footer={
         <>

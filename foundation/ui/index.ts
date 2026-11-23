@@ -91,7 +91,6 @@ export {
   type PermissionRequestDecision,
   type PermissionRequestDialogProps,
   type PermissionRequestItem,
-  type PermissionRequestScope,
 } from "./permission-request";
 export {
   holdLayoutMorph,

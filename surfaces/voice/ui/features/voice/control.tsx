@@ -1111,7 +1111,6 @@ function VoiceAccessPrompt(
           ? "Voice control is off for this workspace."
           : "Voice control is off for this workspace. Only allow this if you expected this request."
       }
-      scope={null}
       listHeading="This will allow:"
       items={[
         {

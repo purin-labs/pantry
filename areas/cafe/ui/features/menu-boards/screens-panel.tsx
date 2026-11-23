@@ -9,6 +9,7 @@ import {
 import { isRecord } from "@purin-labs/std";
 import { DialogHeading, cancelDialog, syncDialog } from "@purin-labs/ui/dialog";
 import { Select } from "@purin-labs/ui/select";
+import { Button } from "@purin-labs/ui/index";
 import { controlAnswer, controlRead, controlWrite } from "@purin-labs/control/portal/control-client";
 import { controlPath } from "@purin-labs/control/portal/control-paths";
 import "./menu-boards.css";
@@ -132,9 +133,9 @@ function ScreenRow(props: Readonly<{
     </Select.Root>
     {confirming ? <div className="menu-screens-confirm">
       <span>Remove {screen.name}? It goes back to its pairing code.</span>
-      <button type="button" className="secondary" onClick={() => setConfirming(false)}>Keep</button>
-      <button type="button" className="menu-boards-primary" onClick={props.onRemove}>Remove</button>
-    </div> : <button type="button" className="secondary" onClick={() => setConfirming(true)}>Remove</button>}
+      <Button variant="secondary" onClick={() => setConfirming(false)}>Keep</Button>
+      <Button variant="danger" onClick={props.onRemove}>Remove</Button>
+    </div> : <Button variant="secondary" onClick={() => setConfirming(true)}>Remove</Button>}
   </li>;
 }
 
@@ -210,7 +211,7 @@ function PairDialog(props: Readonly<{
       </label>
       {error === null ? null : <p className="description-draft-error" role="alert">{error}</p>}
       <div className="menu-screens-dialog-actions">
-        <button type="button" className="secondary" onClick={props.onClose}>Cancel</button>
+        <Button variant="secondary" onClick={props.onClose}>Cancel</Button>
         <button
           type="submit"
           className="menu-boards-primary"

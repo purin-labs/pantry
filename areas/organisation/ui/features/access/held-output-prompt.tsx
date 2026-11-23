@@ -88,7 +88,6 @@ export function HeldOutputPrompt(props: Props): React.ReactNode {
         {...party}
         title="This answer is unavailable"
         subtitle={load.message}
-        scope={null}
         listHeading=""
         items={[]}
         selectedIds={[]}
@@ -135,7 +134,6 @@ export function HeldOutputPrompt(props: Props): React.ReactNode {
           : `${AGENT_NAME} wants to post an answer in ${destination}`
       }
       subtitle={whyText(view)}
-      scope={null}
       listHeading={item.label}
       items={[item]}
       selectedIds={[item.id]}

@@ -133,7 +133,6 @@ export function AgentPermissionRequestPrompt(props: Props): React.ReactNode {
         target={agentParty(props.workspaceName)}
         title="This permission request is unavailable"
         subtitle={load.message}
-        scope={null}
         listHeading=""
         items={[]}
         selectedIds={[]}
@@ -190,7 +189,6 @@ export function AgentPermissionRequestPrompt(props: Props): React.ReactNode {
           </>
         )
       }
-      scope={null}
       listHeading={`This will allow ${AGENT_NAME} to:`}
       items={view.items.map((item) => ({
         id: item.itemId,

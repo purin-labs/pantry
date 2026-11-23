@@ -104,7 +104,6 @@ export function AiBudgetRaisePrompt(props: Props): React.ReactNode {
       target={workspaceParty(props.workspaceName)}
       title="Raise the AI budget for new threads"
       subtitle={<>A request in Slack stopped at an AI budget limit.</>}
-      scope={null}
       listHeading="Choose what to raise:"
       items={items}
       selectedIds={chosen}
