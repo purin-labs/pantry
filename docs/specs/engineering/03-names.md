@@ -314,9 +314,9 @@ exported `PurinMark` and `PurinIcon`.
   wallet". Neither uses the public name Seams Pay.
 
 **Domains:** `MENU_HOST_SUFFIX` of the shop is still `menu.seams.tokyo`, with no route.
-Plan 93 records that the domain of the QR order page is not chosen. The local
-`PANTRY_PROVIDER_INGRESS_ORIGIN` also names an old host. The shop site is
-`shop.purin.io`.
+Plan 93 records that the domain of the QR order page is not chosen.
+The local `PANTRY_PROVIDER_INGRESS_ORIGIN` is still the Square sandbox tunnel
+`square-sandbox-webhook.seams.sh`. The shop site is `shop.purin.io`.
 
 **Wallet relayer:** the production `SEAMS_RELAYER_URL` names `seams-sdk-d1-gateway`, and
 the identity link returns this address. Plan 93 records the deletion of the
