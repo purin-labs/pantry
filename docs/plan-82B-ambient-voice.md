@@ -38,17 +38,17 @@ give the signed-in member's commands. A speaker check closes that gap for every 
 
 ## What exists and stays
 
-| Part                                    | Where                                                                             | Use in this plan                                                     |
-| --------------------------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Capture, VAD, wake phrase, hold-to-talk | `apps/portal/src/features/voice/session.ts`, `wake-worker.ts`, `start-attempt.ts` | The VAD gives the speech pieces. The wake and the key stay.          |
-| Shop Mac transcription and noise rule   | `services/shop-voice/shop_voice/engines/` (service 0.5.1, Plan 82C)               | Transcribes the member's speech. The noise rule (Plan 82 D11) stays. |
-| Workers AI fallback                     | `services/platform/src/voice/`                                                    | Wake and key commands only (D6).                                     |
-| Spoken answers                          | Mac `POST /speech`, Kokoro `af_heart` (Plan 82 D9)                                | The follow-up window starts when an answer ends.                     |
-| Speaker model                           | seams-wallet VoiceID: ReDimNet B1, ONNX Runtime Web                               | The speaker check (D2).                                              |
-| Jev transport, allowance and switches   | `integrations/typesafe/system-one-client.ts`, Plan 88                             | One option for the addressee check (D5).                             |
-| Screen context                          | [Plan 87](history/plan-87-screen-context.md)                                      | The page on screen is one input to the addressee check.              |
-| Chat send, approvals, receipts          | `features/chat/api.ts`, `approval-authentication.ts`                              | An accepted sentence goes through the same send path as typed text.  |
-| Daily counts on the device              | Plan 82 D11                                                                       | New counts for each gate.                                            |
+| Part                                    | Where                                                                                        | Use in this plan                                                     |
+| --------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Capture, VAD, wake phrase, hold-to-talk | `surfaces/voice/ui/features/voice/session.ts`, `wake-worker.ts`, `start-attempt.ts`          | The VAD gives the speech pieces. The wake and the key stay.          |
+| Shop Mac transcription and noise rule   | `services/shop-voice/shop_voice/engines/` (service 0.5.1, Plan 82C)                          | Transcribes the member's speech. The noise rule (Plan 82 D11) stays. |
+| Workers AI fallback                     | `surfaces/voice/server/`                                                                     | Wake and key commands only (D6).                                     |
+| Spoken answers                          | Mac `POST /speech`, Kokoro `af_heart` (Plan 82 D9)                                           | The follow-up window starts when an answer ends.                     |
+| Speaker model                           | seams-wallet VoiceID: ReDimNet B1, ONNX Runtime Web                                          | The speaker check (D2).                                              |
+| Jev transport, allowance and switches   | `foundation/agent/integrations/typesafe/system-one-client.ts`, Plan 88                       | One option for the addressee check (D5).                             |
+| Screen context                          | [Plan 87](history/plan-87-screen-context.md)                                                 | The page on screen is one input to the addressee check.              |
+| Chat send, approvals, receipts          | `surfaces/portal/ui/features/chat/api.ts`, `foundation/authority/approval-authentication.ts` | An accepted sentence goes through the same send path as typed text.  |
+| Daily counts on the device              | Plan 82 D11                                                                                  | New counts for each gate.                                            |
 
 ## Evidence so far
 

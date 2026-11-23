@@ -107,9 +107,9 @@ uv run --no-project --python 3.13 --with torch --with numpy python export.py wei
 ```
 
 A round takes about 40 minutes on the M4 Pro. When a model passes, the switch is one release: set
-`WAKE_PHRASE` and `WAKE_MODEL` in `apps/portal/src/features/voice/wake-phrase.ts`, copy the model
+`WAKE_PHRASE` and `WAKE_MODEL` in `surfaces/voice/ui/features/voice/wake-phrase.ts`, copy the model
 to `apps/portal/public/voice/`, set `scripts/shop-voice/wake-phrase.json` (the journeys read it),
-put "Sous Chef" first in `ASSISTANT_NAMES` in `services/platform/src/voice/vocabulary.ts`, and run
+put "Sous Chef" first in `ASSISTANT_NAMES` in `surfaces/voice/server/vocabulary.ts`, and run
 the closed-chat Chrome journey. Keep `hey_satyr.onnx` until one production wake passes on the new
 model. The wake worker then drops the old file from each device's cache.
 
@@ -206,8 +206,8 @@ These are outside the repositories, so the move does not change them:
   benches).
 - Playwright 1.64.1 in `~/Dev/rust/seams-wallet/node_modules/playwright`, for `PLAYWRIGHT_MODULE`.
   After the move, use the new seams-wallet path.
-- The account Worker in `~/Dev/rust/seams-monorepo/.artifacts/shared-account-platform/account-worker/index.mjs`,
-  for `SATYR_ACCOUNT_WORKER_ARTIFACT`. After the move, use the new seams-monorepo path.
+- No account Worker: since Plan 95, Pantry has its own accounts, and no journey reads
+  `SATYR_ACCOUNT_WORKER_ARTIFACT`.
 - Claude Code keeps its project notes in a folder named after the checkout's path. A checkout at a
   new path starts with no notes. Today three folders hold separate copies, named after the clones
   `satyr`, `seams-atelier` and `pantry`, for example
@@ -232,7 +232,7 @@ These are outside the repositories, so the move does not change them:
 
 | Check                           | Command or file                                                                                                                                                                         |
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Platform journey                | `services/platform/tests/e2e/voice-control.test.ts` (needs `SATYR_ACCOUNT_WORKER_ARTIFACT`)                                                                                             |
+| Platform journey                | `workers/platform/tests/e2e/voice-control.test.ts`                                                                                             |
 | Mac journey                     | `scripts/shop-voice/run-journey.py` (run `pnpm portal:build` first: it reads the install script from `apps/portal/dist`; `SHOP_VOICE_BENCH` names the bench after a move)               |
 | Chrome journey                  | `scripts/shop-voice/run-portal-journey.py` (needs `PLAYWRIGHT_MODULE`; run `pnpm portal:build`, `pnpm async-control:build` and `pnpm --filter @purin-labs/contracts media:build` first) |
 | Safari on the iOS Simulator     | `scripts/shop-voice/run-safari-journey.py`                                                                                                                                              |

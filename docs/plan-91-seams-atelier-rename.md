@@ -475,7 +475,7 @@ satyr symbol, so it does not fit the new name.
   pipeline, and measure false wakes on the same noise set.
 - Until the new model passes, the Portal keeps "Hey Satyr" in the voice
   prompts. Only the privacy text changes ("Seams keeps no audio.").
-- Update the speech bias list in `services/platform/src/voice/vocabulary.ts`
+- Update the speech bias list in `surfaces/voice/server/vocabulary.ts`
   and the lexicon entry in `services/shop-voice/shop_voice/speech.py`.
 - Plan 82B has no addressee check in the code yet. Update the Plan 82B text
   so that the check, when it is built, listens for "Sous Chef".
