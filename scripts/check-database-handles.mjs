@@ -9,9 +9,9 @@
 //    source file may not grow past scripts/database-handles-ratchet.json. A
 //    plain handle is right only for code that names the tables in both
 //    databases (organisation, organisation_placement,
-//    control_mutation_receipt) or that copies rows between them. Run
-//    `node scripts/refactor-12/database-roles.mjs --write` to name the
-//    database of a new handle.
+//    control_mutation_receipt) or that copies rows between them. Give a new
+//    handle the type GlobalDatabase or OrganisationDatabase of
+//    foundation/kernel/database-handles.ts by the tables that its SQL names.
 // 3. Only foundation/tenancy/data/shared-rows/ writes the three tables that
 //    are in both baselines: no other source file may INSERT, UPDATE, DELETE or
 //    REPLACE a row of organisation, organisation_placement or
