@@ -3,7 +3,8 @@ import { Select } from "@purin-labs/ui/select";
 import { COMMERCE_CANCELLATION_REASONS, COMMERCE_CANCELLATION_REFUNDS, COMMERCE_TABLE_DENSITIES, commerceOptionItem, renderCommerceSelectParts, type CommerceSelectItem } from "./select-items";
 import React from "react";
 import { ArrowLeft, Package, Search, ShoppingCart } from "lucide-react";
-import "./product-detail.css";
+import { workspacePageDescriptor } from "@purin-labs/ui/route";
+import "./record.css";
 import { ProductDescriptionDraftControl } from "../description-draft/control";
 import { ProductSaleDetails } from "./product-sale-details";
 import type { ProductDescriptionActionTransport } from "../description-draft/editor";
@@ -887,17 +888,12 @@ function CommerceGraphOverview(
     boardInteraction: CommerceBoardInteraction;
   }>,
 ): React.ReactNode {
+  // The page title already names this section: Purchasing.
   return (
     <section
-      className="portal-band commerce-panel"
-      aria-labelledby="commerce-graph-overview-title"
+      className="portal-band commerce-panel commerce-purchasing"
+      aria-label="Suppliers"
     >
-      <div className="section-heading">
-        <div>
-          <h2 id="commerce-graph-overview-title">Suppliers and purchasing</h2>
-          <p>Who you buy from, and what needs reordering.</p>
-        </div>
-      </div>
       <PurchasingControls
         organisationId={props.boardInteraction.organisationId}
         active={props.metadata.lists.some(isSupplierDirectory)}
@@ -2030,8 +2026,7 @@ function renderCommerceBoardCard(
         )}
       </dl>
       {interaction.canOperate && interaction.mutate !== undefined ? (
-        <label className="commerce-board-move-control">
-          <span>Move to lane</span>
+        <div className="commerce-board-move-control">
           <Select.Root
             items={laneOptions.map(commerceOptionItem)}
             value={laneId}
@@ -2053,12 +2048,18 @@ function renderCommerceBoardCard(
               {laneOptions.map(renderCommerceBoardLaneOption)}
             </Select.Popup>
           </Select.Root>
-        </label>
+        </div>
       ) : null}
       {model.list?.listId === REPLENISHMENT_QUEUE_LIST_ID ? (
         <PurchaseRequestCardEditor
           model={model}
           row={row}
+          ownerAndDeliveryShown={
+            cardAttributeIds.some(isAttributeId.bind(null, "owner")) &&
+            cardAttributeIds.some(
+              isAttributeId.bind(null, "expected_delivery_at"),
+            )
+          }
           organisationId={interaction.organisationId}
           canOperate={interaction.canOperate}
           mutate={interaction.mutate}
@@ -2067,6 +2068,13 @@ function renderCommerceBoardCard(
       ) : null}
     </article>
   );
+}
+
+function isAttributeId(
+  wanted: string,
+  attributeId: AttributeDefinitionId,
+): boolean {
+  return String(attributeId) === wanted;
 }
 
 function renderCommerceBoardCardFact(
@@ -2817,9 +2825,6 @@ function CommerceEntityTable(
           </button>
         </div>
       </form>
-      <p className="commerce-table-count">
-        {model.rows.length} {model.rows.length === 1 ? "record" : "records"}
-      </p>
       {renderCommerceEntityColumnTable(
         props.props,
         title,
@@ -2974,41 +2979,27 @@ function CommerceEntityDossierView(
     actionBusy: boolean;
   }>,
 ): React.ReactNode {
-  const recordPage = props.page === "products" || props.page === "orders";
   const label = commerceEntityName(props.model.entity);
   useDossierSurface(props.page, props.model, label);
   const noAttributes = props.model.entity.attributes.length === 0;
   const labelIsDisplayName = label === props.model.entity.displayName;
+  const source = commerceDossierSource(props.model);
+  const relationships = seedIncidentRelationships(props.model);
+  // A record heads its own page: the record's name is the page title.
   return (
     <section
-      className={`portal-band commerce-panel commerce-dossier${recordPage ? " product-dossier" : ""}`}
-      aria-labelledby={
-        recordPage ? "portal-page-title" : "commerce-dossier-title"
-      }
+      className="portal-band commerce-panel commerce-dossier commerce-record"
+      aria-labelledby="portal-page-title"
     >
       <button type="button" className="commerce-back" onClick={props.onBack}>
-        {recordPage ? <ArrowLeft size={16} aria-hidden="true" /> : null}
-        Back to {entityReferenceTypeLabel(props.model.entity.reference)}
+        <ArrowLeft size={16} aria-hidden="true" />
+        Back to {workspacePageDescriptor(props.page).navigationLabel}
       </button>
       <div className="section-heading">
-        {recordPage ? (
-          <span className="product-detail-icon" aria-hidden="true">
-            {commerceEntityIcon(
-              String(props.model.entity.reference.typeId),
-              28,
-            )}
-          </span>
-        ) : null}
-        <div>
-          {recordPage ? (
-            <h1 id="portal-page-title" tabIndex={-1}>
-              {label}
-            </h1>
-          ) : (
-            <h2 id="commerce-dossier-title">{label}</h2>
-          )}
-          <p>{commerceDossierSubtitle(props.model)}</p>
-        </div>
+        <h1 id="portal-page-title" tabIndex={-1}>
+          {label}
+        </h1>
+        {source === null ? null : <p>{source}</p>}
       </div>
       <DossierFreshnessNotice entity={props.model.entity} />
       <OrderCancellationControl
@@ -3017,15 +3008,6 @@ function CommerceEntityDossierView(
         entity={props.model.entity}
         canPropose={props.canPropose}
         commerceOperations={props.commerceOperations}
-        onActionProposed={props.onActionProposed}
-        actionBusy={props.actionBusy}
-      />
-      <ProductDescriptionDraftControl
-        key={`${props.organisationId}:${props.model.entity.reference.entityId}`}
-        organisationId={props.organisationId}
-        entity={props.model.entity}
-        canPropose={props.canPropose}
-        actionTransport={props.descriptionDraftActions}
         onActionProposed={props.onActionProposed}
         actionBusy={props.actionBusy}
       />
@@ -3058,18 +3040,24 @@ function CommerceEntityDossierView(
           </dl>
         )}
       </section>
-      <section
-        className="commerce-dossier-section"
-        aria-labelledby="commerce-relationships-title"
-      >
-        <h3 id="commerce-relationships-title">Related records</h3>
-        {seedIncidentRelationships(props.model).length === 0 ? (
-          <p className="empty-state commerce-empty">
-            Nothing else is linked to this record yet.
-          </p>
-        ) : (
+      <ProductDescriptionDraftControl
+        key={`${props.organisationId}:${props.model.entity.reference.entityId}`}
+        organisationId={props.organisationId}
+        entity={props.model.entity}
+        canPropose={props.canPropose}
+        actionTransport={props.descriptionDraftActions}
+        onActionProposed={props.onActionProposed}
+        actionBusy={props.actionBusy}
+      />
+      {/* A section with nothing in it is left out. */}
+      {relationships.length === 0 ? null : (
+        <section
+          className="commerce-dossier-section"
+          aria-labelledby="commerce-relationships-title"
+        >
+          <h3 id="commerce-relationships-title">Related records</h3>
           <ul className="commerce-relationship-list">
-            {seedIncidentRelationships(props.model).map(
+            {relationships.map(
               renderRelationship.bind(
                 null,
                 props.model.traversal.entities,
@@ -3078,25 +3066,21 @@ function CommerceEntityDossierView(
               ),
             )}
           </ul>
-        )}
-      </section>
-      <section
-        className="commerce-dossier-section"
-        aria-labelledby="commerce-list-context-title"
-      >
-        <h3 id="commerce-list-context-title">Operational details</h3>
-        {props.model.contextualListEntries.length === 0 ? (
-          <p className="empty-state commerce-empty">
-            This record is not being tracked in any list.
-          </p>
-        ) : (
+        </section>
+      )}
+      {props.model.contextualListEntries.length === 0 ? null : (
+        <section
+          className="commerce-dossier-section"
+          aria-labelledby="commerce-list-context-title"
+        >
+          <h3 id="commerce-list-context-title">Operational details</h3>
           <dl className="commerce-facts">
             {props.model.contextualListEntries.flatMap(
               renderContextualListEntry,
             )}
           </dl>
-        )}
-      </section>
+        </section>
+      )}
       <CommerceActivityPanel activity={props.activity} />
     </section>
   );
@@ -3583,9 +3567,7 @@ function renderCommerceActivityContent(
       return (
         <>
           {activity.result.events.length === 0 ? (
-            <p className="empty-state commerce-empty">
-              Nothing has happened to this record yet.
-            </p>
+            <p className="empty-state commerce-empty">No activity yet.</p>
           ) : (
             <ol className="commerce-activity-list">
               {activity.result.events.map(renderCommerceActivityEvent)}
@@ -3912,7 +3894,7 @@ function commercePageEntityLabel(
     case "products":
       return "Products";
     case "orders":
-      return "Customer orders";
+      return "Orders";
     default:
       return assertNever(page, "Unhandled commerce graph value");
   }
@@ -3959,10 +3941,6 @@ function entityReferenceLabel(reference: CommerceEntityRef): string {
   return `${reference.typeId}:${reference.entityId}`;
 }
 
-function entityReferenceTypeLabel(reference: CommerceEntityRef): string {
-  return commerceEntityTypeLabel(String(reference.typeId), true);
-}
-
 /**
  * Only the records linked directly to this one. A two-hop traversal also
  * returns edges between two of those neighbours, which would list a neighbour a
@@ -3979,20 +3957,12 @@ function seedIncidentRelationships(
   );
 }
 
-/**
- * What this record is and where its facts come from, in one line. The exact
- * reference and revision live in the technical details below it.
- */
-function commerceDossierSubtitle(model: CommerceEntityDossierModel): string {
-  const typeLabel = commerceEntityTypeLabel(
-    String(model.entity.reference.typeId),
-    false,
-  );
-  const capitalized = `${typeLabel.slice(0, 1).toLocaleUpperCase()}${typeLabel.slice(1)}`;
+/** Where the record's facts come from, or null when nothing says. */
+function commerceDossierSource(model: CommerceEntityDossierModel): string | null {
   const provenance = model.provenance[0];
   return provenance === undefined
-    ? capitalized
-    : `${capitalized} · synced from ${commerceSourceLabel(String(provenance.source))}`;
+    ? null
+    : `From ${commerceSourceLabel(String(provenance.source))}`;
 }
 
 function sameEntityRef(

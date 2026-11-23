@@ -217,7 +217,7 @@ export function ProductSaleDetails(
       {photos.length === 0 && !props.canEdit ? null : (
         <div className="product-photos" ref={gallery}>
           {photos.length === 0 ? (
-            <p>No photos yet. Buyers see the photos that you add here.</p>
+            <p>No photos yet.</p>
           ) : (
             <ol className="product-photo-list" aria-label="Photos">
               {photos.map((photo, index) => (
@@ -296,12 +296,6 @@ export function ProductSaleDetails(
                 <ImagePlus size={16} aria-hidden="true" />
                 {saving ? "Saving…" : "Add photo"}
               </button>
-              {photos.length > 1 ? (
-                <span>
-                  The main photo shows in lists. Buyers see the photos in this
-                  order.
-                </span>
-              ) : null}
             </div>
           ) : null}
           {work.kind === "failed" ? (
@@ -311,12 +305,20 @@ export function ProductSaleDetails(
           ) : null}
         </div>
       )}
-      <div>
-        <strong>
-          {formatMoneyMinor(details.price.amountMinor, details.price.currency)}
-        </strong>
-        {details.description.length === 0 ? null : <p>{details.description}</p>}
-      </div>
+      <dl className="commerce-facts">
+        <div>
+          <dt>Price</dt>
+          <dd className="commerce-numeric">
+            {formatMoneyMinor(details.price.amountMinor, details.price.currency)}
+          </dd>
+        </div>
+        {details.description.length === 0 ? null : (
+          <div className="commerce-fact-prose">
+            <dt>Description</dt>
+            <dd>{details.description}</dd>
+          </div>
+        )}
+      </dl>
     </div>
   );
 }

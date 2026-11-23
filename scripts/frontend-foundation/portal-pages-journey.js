@@ -51,22 +51,17 @@ async function reviewPortalPages(page) {
     {
       name: "product-detail",
       path: "/commerce-preview.html?page=products&resource=product_financier",
-      ready: "#commerce-dossier-title",
+      ready: "h1#portal-page-title",
     },
     {
       name: "order-detail",
       path: "/commerce-preview.html?page=orders&resource=ord_1041",
-      ready: "#commerce-dossier-title",
+      ready: "h1#portal-page-title",
     },
     {
       name: "supplier-detail",
       path: "/commerce-preview.html?page=suppliers&resource=kyoto-roastery",
-      ready: "#commerce-dossier-title",
-    },
-    {
-      name: "online-overview",
-      path: "/commerce-preview.html?page=commerce",
-      ready: ".commerce-count-grid",
+      ready: "h1#portal-page-title",
     },
     {
       name: "capabilities",

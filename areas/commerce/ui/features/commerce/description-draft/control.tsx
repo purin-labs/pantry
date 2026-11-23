@@ -58,10 +58,7 @@ export function ProductDescriptionDraftControl(props: Readonly<{
   if (state.kind === "closed" && source === null) return null;
   return <section className="commerce-dossier-section description-draft-section" aria-labelledby="description-draft-title">
     <div className="description-draft-heading">
-      <div>
-        <h3 id="description-draft-title">Description draft</h3>
-        <p>Shape the next version together. The current product description stays unchanged.</p>
-      </div>
+      <h3 id="description-draft-title">Description draft</h3>
       {state.kind === "closed" && source !== null &&
         <button type="button" className="secondary" disabled={source.freshness !== "current"}
           onClick={openDescriptionEditor.bind(null, source.revision, setState)}>

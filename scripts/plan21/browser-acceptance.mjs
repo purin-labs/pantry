@@ -278,7 +278,7 @@ async function main() {
   );
   assertCheck(
     home.navigationLabels.includes("Products") &&
-      home.navigationLabels.includes("Customer orders"),
+      home.navigationLabels.includes("Orders"),
     "workspace shell exposes canonical Commerce navigation",
   );
   assertCheck(
@@ -334,11 +334,11 @@ async function main() {
     "command palette exposes a modal dialog, combobox listbox, and active option semantics",
   );
   const commandNavigation = runCli("run-code", [
-    "async (page) => { await page.keyboard.press('Meta+K'); const input = page.getByRole('combobox', { name: 'Search workspace pages' }); await input.fill('customer orders'); const activeLabel = (await page.locator('[role=option][aria-selected=true] span').textContent() ?? '').trim(); await page.keyboard.press('Enter'); await page.locator('h1#portal-page-title').filter({ hasText: 'Customer orders' }).waitFor({ state: 'visible', timeout: 10_000 }); return { activeLabel, path: await page.evaluate(() => location.pathname), focused: await page.evaluate(() => document.activeElement?.id === 'portal-page-title'), focusIndicator: await page.evaluate(() => { const active = document.activeElement; if (!(active instanceof HTMLElement)) return null; const style = getComputedStyle(active); return { matchesFocusVisible: active.matches(':focus-visible'), outlineStyle: style.outlineStyle, outlineColor: style.outlineColor, outlineWidth: style.outlineWidth }; }) }; }",
+    "async (page) => { await page.keyboard.press('Meta+K'); const input = page.getByRole('combobox', { name: 'Search workspace pages' }); await input.fill('customer orders'); const activeLabel = (await page.locator('[role=option][aria-selected=true] span').textContent() ?? '').trim(); await page.keyboard.press('Enter'); await page.locator('h1#portal-page-title').filter({ hasText: 'Orders' }).waitFor({ state: 'visible', timeout: 10_000 }); return { activeLabel, path: await page.evaluate(() => location.pathname), focused: await page.evaluate(() => document.activeElement?.id === 'portal-page-title'), focusIndicator: await page.evaluate(() => { const active = document.activeElement; if (!(active instanceof HTMLElement)) return null; const style = getComputedStyle(active); return { matchesFocusVisible: active.matches(':focus-visible'), outlineStyle: style.outlineStyle, outlineColor: style.outlineColor, outlineWidth: style.outlineWidth }; }) }; }",
   ]);
   assertCheck(
-    commandNavigation.activeLabel === "Customer orders",
-    "command palette filters to the canonical Customer orders destination",
+    commandNavigation.activeLabel === "Orders",
+    "command palette filters to the canonical Orders destination",
   );
   assertCheck(
     commandNavigation.path === "/portal/cafe-browser-lab/orders" &&
@@ -527,31 +527,31 @@ async function main() {
     "canonical navigation does not create a document navigation",
   );
   const interruptedRoute = runCli("run-code", [
-    "async (page) => { let releaseProduct = () => {}; const productGate = new Promise((resolve) => { releaseProduct = resolve; }); const pattern = '**/v1/control/organisations/organisation_browser/products?**'; await page.route(pattern, async (route) => { await productGate; await route.continue(); }, { times: 1 }); const open = async (query, heading) => { await page.keyboard.press('Meta+K'); const input = page.getByRole('combobox', { name: 'Search workspace pages' }); await input.pressSequentially(query); await page.keyboard.press('Enter'); await page.locator('h1#portal-page-title').filter({ hasText: heading }).waitFor({ state: 'visible', timeout: 10_000 }); }; await open('products', 'Products'); await open('customer orders', 'Customer orders'); releaseProduct(); await page.waitForTimeout(500); await page.unroute(pattern); return { path: await page.evaluate(() => location.pathname), heading: (await page.locator('h1#portal-page-title').textContent() ?? '').trim() }; }",
+    "async (page) => { let releaseProduct = () => {}; const productGate = new Promise((resolve) => { releaseProduct = resolve; }); const pattern = '**/v1/control/organisations/organisation_browser/products?**'; await page.route(pattern, async (route) => { await productGate; await route.continue(); }, { times: 1 }); const open = async (query, heading) => { await page.keyboard.press('Meta+K'); const input = page.getByRole('combobox', { name: 'Search workspace pages' }); await input.pressSequentially(query); await page.keyboard.press('Enter'); await page.locator('h1#portal-page-title').filter({ hasText: heading }).waitFor({ state: 'visible', timeout: 10_000 }); }; await open('products', 'Products'); await open('customer orders', 'Orders'); releaseProduct(); await page.waitForTimeout(500); await page.unroute(pattern); return { path: await page.evaluate(() => location.pathname), heading: (await page.locator('h1#portal-page-title').textContent() ?? '').trim() }; }",
   ]);
   assertCheck(
     interruptedRoute.path === "/portal/cafe-browser-lab/orders" &&
-      interruptedRoute.heading === "Customer orders",
-    "an interrupted Products request cannot overwrite the newer Customer orders route",
+      interruptedRoute.heading === "Orders",
+    "an interrupted Products request cannot overwrite the newer Orders route",
   );
   const refreshedRoute = runCli("run-code", [
-    "async (page) => { await page.reload(); await page.locator('h1#portal-page-title').filter({ hasText: 'Customer orders' }).waitFor({ state: 'visible', timeout: 10_000 }); const text = (await page.locator('body').textContent() ?? '').replace(/\\s+/gu, ' '); return { path: await page.evaluate(() => location.pathname), heading: (await page.locator('h1#portal-page-title').textContent() ?? '').trim(), globalOpening: text.includes('Opening Pantry') }; }",
+    "async (page) => { await page.reload(); await page.locator('h1#portal-page-title').filter({ hasText: 'Orders' }).waitFor({ state: 'visible', timeout: 10_000 }); const text = (await page.locator('body').textContent() ?? '').replace(/\\s+/gu, ' '); return { path: await page.evaluate(() => location.pathname), heading: (await page.locator('h1#portal-page-title').textContent() ?? '').trim(), globalOpening: text.includes('Opening Pantry') }; }",
   ]);
   assertCheck(
     refreshedRoute.path === "/portal/cafe-browser-lab/orders" &&
-      refreshedRoute.heading === "Customer orders" &&
+      refreshedRoute.heading === "Orders" &&
       !refreshedRoute.globalOpening,
     "refresh restores the nested route without a global opening screen",
   );
   runCli("goto", [`${baseUrl}/portal/cafe-browser-lab`]);
   runCli("run-code", [
-    "async (page) => { await page.keyboard.press('Meta+K'); const input = page.getByRole('combobox', { name: 'Search workspace pages' }); await input.pressSequentially('customer orders'); await page.keyboard.press('Enter'); await page.locator('h1#portal-page-title').filter({ hasText: 'Customer orders' }).waitFor({ state: 'visible', timeout: 10_000 }); return true; }",
+    "async (page) => { await page.keyboard.press('Meta+K'); const input = page.getByRole('combobox', { name: 'Search workspace pages' }); await input.pressSequentially('customer orders'); await page.keyboard.press('Enter'); await page.locator('h1#portal-page-title').filter({ hasText: 'Orders' }).waitFor({ state: 'visible', timeout: 10_000 }); return true; }",
   ]);
   const orders = checkPage();
   assertCommonPage(orders, "/portal/cafe-browser-lab/orders");
   assertCheck(
-    orders.heading === "Customer orders",
-    "same-shell navigation opens Customer orders",
+    orders.heading === "Orders",
+    "same-shell navigation opens Orders",
   );
   runCli("go-back");
   assertCheck(

@@ -75,7 +75,7 @@ async function verifyPortalInterface(page) {
 
   await page.goto(`${origin}/commerce-preview.html?page=orders`);
   const table = page.getByRole("region", {
-    name: "Customer orders table",
+    name: "Orders table",
     exact: true,
   });
   await table.waitFor();

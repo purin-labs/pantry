@@ -206,7 +206,7 @@ export function commerceEntityTypeLabel(
     case "trade_partner":
       return plural ? "suppliers" : "supplier";
     case "order":
-      return plural ? "customer orders" : "customer order";
+      return plural ? "orders" : "order";
     case "product":
       return plural ? "products" : "product";
     case "inventory_item":

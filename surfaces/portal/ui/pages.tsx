@@ -606,7 +606,6 @@ function renderOrders(page: PageContext): React.ReactNode {
         <SupplierPayoutsPanel
           organisationId={state.organisation.organisation.organisationId}
           workspaceName={state.organisation.organisation.name}
-          canManage={canManage}
           accessRole={payoutReadRole(state.organisation.membership.role)}
           access={ACCESS_ROUTE_TRANSPORT}
           mutate={supplierPayoutControlMutation}

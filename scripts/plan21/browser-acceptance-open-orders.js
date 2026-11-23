@@ -3,7 +3,7 @@ async (page) => {
     ["/portal/cafe-browser-lab/commerce", "Commerce overview"],
     ["/portal/cafe-browser-lab/products", "Products"],
     ["/portal/cafe-browser-lab/inventory", "Inventory"],
-    ["/portal/cafe-browser-lab/orders", "Customer orders"],
+    ["/portal/cafe-browser-lab/orders", "Orders"],
     ["/portal/cafe-browser-lab/operations", "Operations"],
     ["/portal/cafe-browser-lab/agents", "Agents"],
     ["/portal/cafe-browser-lab/integrations", "Integrations"],
@@ -59,7 +59,7 @@ async (page) => {
   await page.keyboard.press("Enter");
   await page
     .locator("h1")
-    .filter({ hasText: "Customer orders" })
+    .filter({ hasText: "Orders" })
     .waitFor({ state: "visible", timeout: 10_000 });
   return {
     path: page

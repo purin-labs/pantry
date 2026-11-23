@@ -345,6 +345,17 @@ function Metric(
   );
 }
 
+/** A filter's count, beside its name; nothing when the view has none. */
+function FilterCount(props: Readonly<{ value: number | undefined }>) {
+  // The space keeps the name and the count apart for a screen reader.
+  return props.value === undefined ? null : (
+    <>
+      {" "}
+      <span className="stock-filter-count">{props.value}</span>
+    </>
+  );
+}
+
 export class InventoryPage extends React.Component<Props, State> {
   state: State = {
     load: { kind: "loading" },
@@ -681,49 +692,50 @@ export class InventoryPage extends React.Component<Props, State> {
         : [];
     let selected: StockRow | null = null;
     for (const row of rows) if (row.id === this.state.selected) selected = row;
+    // Products shows each count once, on its filter.
+    const productCounts = products
+      ? {
+          all: rows.length + load.data.untrackedProducts.length,
+          reorder: rows.filter(needsReorder).length,
+          uncounted:
+            rows.filter(needsCount).length +
+            load.data.untrackedProducts.filter(availabilityUnknown).length,
+          archived: load.data.archivedProducts.length,
+        }
+      : null;
     return (
       <div className="stock-page">
-        <div className="stock-metrics">
-          <Metric
-            label={products ? "Product shortages" : "Needs replenishment"}
-            value={rows.filter(needsReorder).length}
-            description="Low or out of stock"
-          />
-          <Metric
-            label={products ? "Stock records" : "Expiring within 7 days"}
-            value={products ? rows.length : rows.filter(expiringSoon).length}
-            description={
-              products
-                ? "Finished goods across locations"
-                : "Items with recorded expiry"
-            }
-          />
-          <Metric
-            label={products ? "Availability unknown" : "Not counted yet"}
-            value={
-              rows.filter(needsCount).length +
-              (products
-                ? load.data.untrackedProducts.filter(availabilityUnknown).length
-                : 0)
-            }
-            description="No balance recorded"
-          />
-        </div>
-        <section className="stock-list" aria-label="Stock levels">
-          <div className="stock-toolbar">
-            <h2>
-              {products
-                ? "Products & availability"
-                : timeline
-                  ? "Expiry and deliveries"
-                  : "Stock levels"}
-            </h2>
-            {products ? null : (
+        {products ? null : (
+          <div className="stock-metrics">
+            <Metric
+              label="Needs replenishment"
+              value={rows.filter(needsReorder).length}
+              description="Low or out of stock"
+            />
+            <Metric
+              label="Expiring within 7 days"
+              value={rows.filter(expiringSoon).length}
+              description="Items with recorded expiry"
+            />
+            <Metric
+              label="Not counted yet"
+              value={rows.filter(needsCount).length}
+              description="No balance recorded"
+            />
+          </div>
+        )}
+        <section
+          className="stock-list"
+          aria-label={products ? "Products" : "Stock levels"}
+        >
+          {products ? null : (
+            <div className="stock-toolbar">
+              <h2>{timeline ? "Expiry and deliveries" : "Stock levels"}</h2>
               <a href={this.props.suppliersHref}>
                 Suppliers & purchasing <ArrowUpRight size={16} />
               </a>
-            )}
-          </div>
+            </div>
+          )}
           <div className="stock-tools">
             <label className="stock-search">
               <Search size={18} />
@@ -779,18 +791,21 @@ export class InventoryPage extends React.Component<Props, State> {
                 onClick={this.changeFilter.bind(this, "all")}
               >
                 {products ? "All products" : "All stock"}
+                <FilterCount value={productCounts?.all} />
               </button>
               <button
                 aria-pressed={this.state.filter === "reorder"}
                 onClick={this.changeFilter.bind(this, "reorder")}
               >
                 {products ? "Shortages" : "Needs replenishment"}
+                <FilterCount value={productCounts?.reorder} />
               </button>
               <button
                 aria-pressed={this.state.filter === "uncounted"}
                 onClick={this.changeFilter.bind(this, "uncounted")}
               >
                 {products ? "Availability unknown" : "Not counted"}
+                <FilterCount value={productCounts?.uncounted} />
               </button>
               {products && (
                 <button
@@ -798,6 +813,7 @@ export class InventoryPage extends React.Component<Props, State> {
                   onClick={this.changeFilter.bind(this, "archived")}
                 >
                   Archived
+                  <FilterCount value={productCounts?.archived} />
                 </button>
               )}
               {!products && (
@@ -808,9 +824,9 @@ export class InventoryPage extends React.Component<Props, State> {
                   Expiring within 7 days
                 </button>
               )}
-              <span>
-                {visible.length + untracked.length + archived.length} records
-              </span>
+              {products ? null : (
+                <span>{visible.length} records</span>
+              )}
             </div>
           )}
           {timeline ? (
@@ -854,13 +870,10 @@ export class InventoryPage extends React.Component<Props, State> {
               }
             />
           )}
-          {timeline ? null : (
+          {timeline || products ? null : (
             <p className="stock-footnote">
               Available stock excludes allocations and unusable lots. A dash
               means that quantity hasn’t been reported.
-              {products
-                ? " A made-to-order product keeps no stock count."
-                : null}
             </p>
           )}
         </section>

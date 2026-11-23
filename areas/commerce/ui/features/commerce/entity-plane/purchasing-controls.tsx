@@ -388,6 +388,8 @@ export function PurchaseRequestCardEditor(
   props: Readonly<{
     model: CommercePublishedCollectionModel;
     row: CommerceCollectionRow;
+    /** The card's facts already name who orders and the delivery day. */
+    ownerAndDeliveryShown: boolean;
     organisationId: string;
     canOperate: boolean;
     mutate: CommerceMutationTransport | undefined;
@@ -400,7 +402,9 @@ export function PurchaseRequestCardEditor(
   const [open, setOpen] = React.useState(false);
   const formId = React.useId();
   if (props.model.list === null) return null;
-  const summary = purchaseRequestSummary(props.row.entry);
+  const summary = props.ownerAndDeliveryShown
+    ? null
+    : purchaseRequestSummary(props.row.entry);
   const canOrder = props.canOperate && props.mutate !== undefined;
   if (summary === null && !canOrder) return null;
   const name = props.row.entity.displayName;

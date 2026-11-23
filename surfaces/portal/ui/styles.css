@@ -6099,6 +6099,7 @@ label.checkbox-label {
   display: grid;
   gap: 6px;
   margin: 0;
+  font-size: 13px;
 }
 
 /* A card is narrow, so a field name sits above its value rather than beside
@@ -6120,8 +6121,6 @@ label.checkbox-label {
 
 .commerce-board-move-control {
   display: grid;
-  gap: 5px;
-  color: var(--ink-2);
   font-size: 12px;
 }
 
@@ -6284,14 +6283,6 @@ label.checkbox-label {
   margin-top: 28px;
   padding-top: 0;
   border-top: 0;
-}
-
-.commerce-table-count {
-  margin: 0 0 12px;
-  color: var(--ink-2);
-  font-size: 12px;
-  text-align: end;
-  font-variant-numeric: tabular-nums;
 }
 
 .commerce-load-more {
@@ -9596,6 +9587,7 @@ a.agent-work-row:hover .agent-work-title {
 
 /* A pipeline needs room the 920px reading column does not have, so the board
    spans the page while the prose above it stays measured. */
+.commerce-purchasing,
 .commerce-collection {
   max-width: none;
 }

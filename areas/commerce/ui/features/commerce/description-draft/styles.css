@@ -5,24 +5,14 @@
 
 .description-draft-heading {
   display: flex;
-  align-items: end;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  gap: 20px;
-}
-
-.description-draft-heading > div:first-child {
-  min-width: 0;
+  gap: 8px 20px;
 }
 
 .description-draft-heading h3 {
-  margin-bottom: 8px;
-}
-
-.description-draft-heading p {
-  max-width: 55ch;
   margin: 0;
-  color: var(--ink-2);
-  line-height: 1.5;
 }
 
 .description-draft-heading button:not(:where(.pantry-select-trigger)) {
@@ -292,15 +282,10 @@
 }
 
 @media (max-width: 760px) {
-  .description-draft-heading,
   .description-draft-editor-header,
   .description-draft-editor-footer {
     align-items: start;
     flex-direction: column;
-  }
-
-  .description-draft-heading button:not(:where(.pantry-select-trigger)) {
-    width: 100%;
   }
 
   .description-draft-workspace {

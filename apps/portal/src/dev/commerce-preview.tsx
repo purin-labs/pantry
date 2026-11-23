@@ -1,13 +1,14 @@
 /**
- * Dev-only visual harness for the Checkout, Inventory, Orders, and
- * Suppliers pages.
+ * Dev-only visual harness for the Checkout, Products, Orders, Payments,
+ * Payouts and Purchasing pages.
  *
  * Serves at /commerce-preview.html under `pnpm portal`. Mounts the real
  * routes against fixture transports so the pages can be reviewed without
  * the control plane:
  *
- *   ?page=checkout | orders | suppliers
+ *   ?page=checkout | products | orders | payments | payouts | suppliers
  *   &scenario=populated | empty          (checkout also: fresh or retry)
+ *   &resource=<id>                       a product, order or supplier record
  */
 import React from "react";
 import { createRoot } from "react-dom/client";
@@ -25,9 +26,26 @@ import type {
 } from "@purin-labs/commerce-contracts";
 
 import "@purin-labs/surface-portal/ui/styles.css";
+import { PageHeader } from "@purin-labs/ui/page-components";
+import {
+  workspacePageDescriptor,
+  workspacePageHeader,
+} from "@purin-labs/ui/route";
 import { CheckoutProfilesRoute } from "@purin-labs/area-commerce/ui/features/checkout-profiles/route";
 import { CommerceEntityPlaneRoute } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/route";
 import { SupplierPayoutsPanel } from "@purin-labs/area-commerce/ui/features/payouts/route";
+// The Portal's own lazy pages, so the preview mounts what the Portal mounts.
+import {
+  BankPayoutsRoute,
+  InventoryPage,
+  PaymentsRoute,
+} from "@purin-labs/surface-portal/ui/page-code";
+import {
+  previewBankPayouts,
+  previewInventory,
+  previewOrderTimes,
+  previewPayments,
+} from "./commerce-preview-reads";
 import { CounterSaleRoute } from "@purin-labs/area-cafe/ui/features/terminals/counter-sale-route";
 import type { CounterSale } from "@purin-labs/control-api/portal/counter-sale";
 import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";
@@ -71,7 +89,13 @@ async function unavailablePayoutOptions(): Promise<never> {
 }
 
 type PreviewPage =
-  "checkout" | "products" | "orders" | "suppliers" | "counter";
+  | "checkout"
+  | "products"
+  | "orders"
+  | "payments"
+  | "payouts"
+  | "suppliers"
+  | "counter";
 type Scenario = "populated" | "empty" | "fresh" | "retry";
 
 const NOW = "2026-08-31T09:00:00.000Z";
@@ -263,18 +287,10 @@ const PRODUCT_ENTITIES = [
       entityId: "product_financier",
     },
     revision: 3,
-    displayName: "Brown butter financier · 焦がしバター",
-    attributes: [
-      systemAttribute("product", "description", {
-        kind: "long_text",
-        value:
-          "A small almond cake with browned butter and a crisp golden edge. Baked fresh each morning.",
-      }),
-      systemAttribute("product", "lifecycle", {
-        kind: "status",
-        value: "active",
-      }),
-    ],
+    displayName: "Brown butter financier",
+    // A product in the commerce graph has no attributes; its price, photos
+    // and description come from the stock overview, as in the Portal.
+    attributes: [],
     provenance: PROVENANCE("product", "product_financier"),
     freshness: { state: "current", observedAt: NOW },
   },
@@ -1097,6 +1113,19 @@ async function commercePreviewFetch(
     return jsonResponse(previewCounterEnvelope());
   }
   const url = String(input);
+  if (url.includes("/commerce/inventory"))
+    return jsonResponse(previewInventory(scenario));
+  if (url.includes("/commerce/costs")) return jsonResponse({ ok: false }, 404);
+  if (url.includes("/commerce/payments?"))
+    return jsonResponse(
+      scenario === "empty"
+        ? { truncated: false, steps: [] }
+        : previewPayments(url),
+    );
+  if (url.includes("/commerce/bank-payouts?"))
+    return jsonResponse(previewBankPayouts(url, scenario));
+  if (url.includes("/commerce/order-times?"))
+    return jsonResponse(previewOrderTimes(url));
   if (url.includes("/commerce/priced-offers")) {
     return jsonResponse({
       ok: true,
@@ -1240,6 +1269,8 @@ function parsePage(value: string | null): PreviewPage {
   return value === "orders" ||
     value === "suppliers" ||
     value === "products" ||
+    value === "payments" ||
+    value === "payouts" ||
     value === "counter"
     ? value
     : "checkout";
@@ -1256,6 +1287,7 @@ function PreviewApp(): React.ReactNode {
   const navigate = useNavigate();
   const page = parsePage(params.get("page"));
   const scenario = parseScenario(params.get("scenario"));
+  const resourceId = params.get("resource");
   React.useMemo(installCommerceFetchStub.bind(null, scenario), [scenario]);
   const fetcher = React.useMemo(buildGraphFetcher.bind(null, scenario), [
     scenario,
@@ -1285,6 +1317,8 @@ function PreviewApp(): React.ReactNode {
                 "products",
                 "checkout",
                 "orders",
+                "payments",
+                "payouts",
                 "suppliers",
                 "counter",
               ] as const
@@ -1312,12 +1346,11 @@ function PreviewApp(): React.ReactNode {
               ),
             )}
           </nav>
-          <header className="portal-heading">
-            <h1 id="portal-page-title" tabIndex={-1}>
-              {pageTitle(page)}
-            </h1>
-            <p>{pageDescription(page)}</p>
-          </header>
+          {/* A product, order or supplier record heads itself, as in the Portal. */}
+          {(page === "products" || page === "orders" || page === "suppliers") &&
+          resourceId !== null ? null : (
+            <PageHeader {...previewHeader(page, resourceId)} />
+          )}
           {page === "checkout" ? (
             <CheckoutProfilesRoute
               organisationId="organisation_preview"
@@ -1325,6 +1358,32 @@ function PreviewApp(): React.ReactNode {
               integrationsPath={`/commerce-preview.html?page=${page}&scenario=${scenario}`}
               mutate={checkoutMutation}
             />
+          ) : page === "products" && resourceId === null ? (
+            <React.Suspense fallback={null}>
+              <InventoryPage
+                userId="user_preview"
+                organisationId="organisation_preview"
+                view="products"
+                suppliersHref="/commerce-preview.html?page=suppliers"
+                productionHref="/commerce-preview.html?page=products"
+                productsHref="/commerce-preview.html?page=products&resource="
+                ordersHref="/commerce-preview.html?page=orders&resource="
+                canReceive={params.get("role") !== "viewer"}
+                canManage={params.get("role") !== "viewer"}
+                mutate={commerceMutation}
+              />
+            </React.Suspense>
+          ) : page === "payments" ? (
+            <React.Suspense fallback={null}>
+              <PaymentsRoute organisationId="organisation_preview" />
+            </React.Suspense>
+          ) : page === "payouts" ? (
+            <React.Suspense fallback={null}>
+              <BankPayoutsRoute
+                organisationId="organisation_preview"
+                integrationsPath="/integrations-preview.html"
+              />
+            </React.Suspense>
           ) : page === "counter" ? (
             <CounterSaleRoute
               organisationId="organisation_preview"
@@ -1337,11 +1396,10 @@ function PreviewApp(): React.ReactNode {
             />
           ) : (
             <>
-              {page === "suppliers" && params.get("resource") === null ? (
+              {page === "suppliers" && resourceId === null ? (
                 <SupplierPayoutsPanel
                   organisationId="organisation_preview"
                   workspaceName="Nuki Cafe"
-                  canManage={params.get("role") !== "viewer"}
                   accessRole={params.get("role") === "viewer" ? null : "owner"}
                   access={PREVIEW_PAYOUT_ACCESS}
                   mutate={checkoutMutation}
@@ -1350,7 +1408,7 @@ function PreviewApp(): React.ReactNode {
               <CommerceEntityPlaneRoute
                 organisationId="organisation_preview"
                 page={page}
-                resourceId={params.get("resource")}
+                resourceId={resourceId}
                 resourceHref={previewResourceHref}
                 onBack={backToPreviewCollection.bind(null, navigate, page)}
                 fetcher={fetcher}
@@ -1376,34 +1434,15 @@ function PreviewApp(): React.ReactNode {
   );
 }
 
-function pageTitle(page: PreviewPage): string {
-  switch (page) {
-    case "counter":
-      return "Counters & payments";
-    case "products":
-      return "Products";
-    case "checkout":
-      return "Checkout";
-    case "orders":
-      return "Orders";
-    case "suppliers":
-      return "Suppliers";
-  }
-}
-
-function pageDescription(page: PreviewPage): string {
-  switch (page) {
-    case "counter":
-      return "Review a counter sale and its next available actions.";
-    case "products":
-      return "Manage products and review their details.";
-    case "checkout":
-      return "How do customers buy from this storefront?";
-    case "orders":
-      return "Customer orders projected from the connected commerce system.";
-    case "suppliers":
-      return "Manage suppliers, supplied items, and purchasing work for low stock.";
-  }
+/** The title and subtitle that the Portal shows on this page. */
+function previewHeader(
+  page: PreviewPage,
+  resourceId: string | null,
+): { readonly title: string; readonly description: string | null } {
+  return workspacePageHeader(
+    workspacePageDescriptor(page === "counter" ? "terminals" : page),
+    resourceId,
+  );
 }
 
 function previewResourceHref(

@@ -1248,7 +1248,9 @@ export class ControlPortalApp extends React.Component<
     );
     // These pages open on the record's own heading, not the page title.
     const commerceRecordPage =
-      (state.page === "products" || state.page === "orders") &&
+      (state.page === "products" ||
+        state.page === "orders" ||
+        state.page === "suppliers") &&
       routeSelection.resourceId !== null;
     const workspacePageContent =
       PAGES[state.page].render({

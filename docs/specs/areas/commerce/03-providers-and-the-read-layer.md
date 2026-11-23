@@ -113,7 +113,7 @@ builds the rows. The read has no page and no cursor.
   expired and quarantined lots and subtracts the reservations.
 - The drawer shows the lots, the 10 newest movements and the reservations (`held` or
   `allocated_to_order`). The Products page also shows price and unit margin from Costs
-  & margins (KIT-04). The Products summary counts "Product shortages" (low and out).
+  & margins (KIT-04). Its filter "Shortages" counts the low and out products.
 
 The stock operations:
 

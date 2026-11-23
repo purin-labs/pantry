@@ -6,7 +6,7 @@ async (page) => {
     ["/portal/cafe-browser-lab/products", "Products"],
     ["/portal/cafe-browser-lab/products/product_croissant", "Butter Croissant"],
     ["/portal/cafe-browser-lab/inventory", "Inventory"],
-    ["/portal/cafe-browser-lab/orders", "Customer orders"],
+    ["/portal/cafe-browser-lab/orders", "Orders"],
     ["/portal/cafe-browser-lab/orders/order_plan21_attention", "Order #1041"],
     ["/portal/cafe-browser-lab/operations", "Operations"],
     ["/portal/cafe-browser-lab/agents", "Agents"],

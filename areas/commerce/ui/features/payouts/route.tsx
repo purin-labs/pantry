@@ -56,7 +56,6 @@ type PayoutsState =
 export function SupplierPayoutsPanel(props: {
   readonly organisationId: string;
   readonly workspaceName: string;
-  readonly canManage: boolean;
   /** The role whose payout reads this person may allow, or null. */
   readonly accessRole: PayoutReadRole | null;
   readonly access: PayoutReadAccess;
@@ -139,10 +138,7 @@ export function SupplierPayoutsPanel(props: {
   ) {
     return (
       <section className="payout-panel payout-panel-quiet payout-panel-hidden">
-        <span>
-          Nothing is outstanding. Payouts appear here while their outcome is
-          still unknown.
-        </span>
+        <span>No outstanding supplier payouts.</span>
         {displaySwitch}
       </section>
     );
@@ -194,37 +190,32 @@ export function SupplierPayoutsPanel(props: {
                 {formatMoneyMinor(payout.recipientAmountMinor, payout.currency)}
               </span>
             </div>
-            <div className="payout-row-state">
+            <p className="payout-row-state">
               <span className={`payout-badge payout-badge-${toneFor(payout)}`}>
                 {labelFor(payout)}
               </span>
-              {payout.approved ? null : (
+              {/* "Needs approval" already says that it is not approved. */}
+              {payout.approved || payout.state === "approval_pending" ? null : (
                 <span className="payout-badge payout-badge-quiet">
                   Not approved
                 </span>
               )}
-            </div>
-            <p className="payout-row-guidance">{payoutGuidance(payout)}</p>
-            <span className="payout-row-detail">
-              {railLabel(payout.rail)} · payable {payout.payableId}
-            </span>
-            <a
-              className="secondary-button payout-audit-link"
-              href={supplierPayoutAuditPath(
-                props.organisationId,
-                payout.payoutId,
-              )}
-            >
-              Download audit
-            </a>
+              {payoutGuidance(payout)}
+            </p>
+            <p className="payout-row-detail">
+              {railLabel(payout.rail)} · payable {payout.payableId} ·{" "}
+              <a
+                href={supplierPayoutAuditPath(
+                  props.organisationId,
+                  payout.payoutId,
+                )}
+              >
+                Download audit
+              </a>
+            </p>
           </li>
         ))}
       </ul>
-      {props.canManage ? null : (
-        <p className="payout-panel-note">
-          You can see these payouts but not act on them.
-        </p>
-      )}
     </section>
   );
 }

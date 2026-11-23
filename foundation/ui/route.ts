@@ -127,6 +127,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Products",
     description:
       "Manage products for sale online and review finished-product availability.",
+    titleOnly: true,
     group: "commerce",
     resource: {
       kind: "detail",
@@ -209,7 +210,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     segment: "payouts",
     navigationLabel: "Payouts",
     title: "Payouts",
-    description: "See when your card sales reach the bank.",
+    description: "When your card sales reach the bank.",
     group: "commerce",
     resource: { kind: "none" },
   },
@@ -218,8 +219,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     segment: "payments",
     navigationLabel: "Payments",
     title: "Payments",
-    description:
-      "See card payments, the declined ones, and whether the buyer paid later.",
+    description: "Card payments, and whether a declined buyer paid later.",
     group: "commerce",
     resource: { kind: "none" },
   },
@@ -227,15 +227,16 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     page: "orders",
     segment: "orders",
     navigationLabel: "Orders",
-    title: "Customer orders",
+    title: "Orders",
     description:
       "Track payment, fulfillment, and problems for customer orders.",
+    titleOnly: true,
     group: "commerce",
     resource: {
       kind: "detail",
       resource: "customer_order",
       detailSegment: "orders",
-      title: "Customer order detail",
+      title: "Order detail",
       description:
         "See this order's status, payment, fulfillment, and recent changes.",
     },
@@ -244,9 +245,10 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     page: "suppliers",
     segment: "suppliers",
     navigationLabel: "Purchasing",
-    title: "Suppliers",
+    title: "Purchasing",
     description:
       "Manage suppliers, supplied items, and purchasing work for low stock.",
+    titleOnly: true,
     group: "kitchen",
     resource: {
       kind: "detail",

@@ -1,11 +1,7 @@
+/* A section of the Purchasing page: a heading and one framed list of rows. */
 .payout-panel {
-  border: 1px solid transparent;
-  border-radius: var(--pantry-radius-card);
-  background: var(--paper);
-  box-shadow: var(--shadow-card);
-  padding: 18px;
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .payout-panel-quiet {
@@ -32,9 +28,9 @@
 
 .payout-panel-heading h2 {
   margin: 0;
-  font-family: var(--display);
-  font-size: var(--pantry-text-heading);
-  font-weight: 300;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 600;
 }
 
 .payout-panel-badges {
@@ -45,34 +41,27 @@
   gap: 8px;
 }
 
-.payout-panel-note {
-  margin: 0;
-  font-size: 12px;
-  color: var(--ink-2);
-}
-
 .payout-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--pantry-radius-control);
+  background: var(--paper);
 }
 
 .payout-row {
   display: grid;
-  gap: 6px;
-  padding: 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--pantry-radius-control);
+  gap: 4px;
+  padding: 12px 16px;
 }
 
-.payout-audit-link {
-  display: inline-flex;
-  align-items: center;
-  min-height: 40px;
-  justify-self: start;
-  margin-top: 4px;
+.payout-row + .payout-row {
+  border-top: 1px solid var(--hairline);
+}
+
+.payout-row-detail a {
+  white-space: nowrap;
   color: var(--pantry-link);
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -141,10 +130,11 @@
 .payout-row-state {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  align-items: baseline;
+  gap: 4px 8px;
 }
 
-.payout-row-guidance,
+.payout-row-state,
 .payout-row-detail {
   margin: 0;
   font-size: 13px;
