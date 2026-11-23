@@ -12,8 +12,11 @@ the Mac, in the account that stays signed in. It needs Apple silicon and macOS 1
 no administrator.
 
 ```bash
-curl -fsSL https://<origin>/shop-voice/install.sh | sh -s -- --origin https://<origin> --organisation <id> --mac <id> --code <code> --accept-letsencrypt-terms
+curl -fsSL https://<origin>/shop-voice/install.sh | sh -s -- --origin https://<origin> --organisation <id> --mac <id> --code=<code> --accept-letsencrypt-terms
 ```
+
+Write the code after `--code=`, as the Portal does. A code can start with `-`, and the
+enroll command then reads it as a value, not as an option.
 
 The Worker serves the script from the Portal's assets. `pack.mjs` writes it at the Portal build.
 The flag accepts the Let's Encrypt subscriber agreement, for the certificate of the Mac's name.

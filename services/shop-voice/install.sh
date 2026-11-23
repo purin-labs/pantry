@@ -1,7 +1,8 @@
 #!/bin/sh
 # Installs the Pantry shop voice service on this Mac (Plan 82). The Portal shows the command:
 #   curl -fsSL <origin>/shop-voice/install.sh | sh -s -- --origin <origin> \
-#     --organisation <id> --mac <id> --code <one-time code> --accept-letsencrypt-terms
+#     --organisation <id> --mac <id> --code=<one-time code> --accept-letsencrypt-terms
+# The code is base64url, so it can start with "-": `--code=` keeps it a value.
 # An enrolled Mac updates its service with `sh -s -- --update`, and keeps its enrollment.
 # It needs no administrator. It downloads Python and the packages now (about 0.7 GB). The
 # service downloads the models after enrollment (1.7 GB). `pack.mjs` fills in the source.
