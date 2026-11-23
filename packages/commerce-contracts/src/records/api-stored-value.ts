@@ -50,23 +50,29 @@ function storedValueCommand<Properties extends TProperties>(
   );
 }
 
-/** `normalizeGiftCardCode`: NFKC, upper case, no spaces or hyphens. */
+/** A gift card code that decodes to its `normalizeGiftCardCode` form. */
 export const giftCardCodeSchema = Type.Codec(
   Type.Refine(Type.String(), isGiftCardCode, giftCardCodeError),
 )
   .Decode(normalizeGiftCardCode)
   .Encode(sameText);
 
-function normalizeGiftCardCode(value: string): string {
+/**
+ * A gift card code as Commerce compares it: NFKC, so full-width forms are
+ * ASCII, then upper case, with no spaces or hyphens. The storefront, the
+ * client and the engine use this one function.
+ */
+export function normalizeGiftCardCode(value: string): string {
   return value.normalize("NFKC").toUpperCase().replace(/[\s-]/gu, "");
 }
 
-function isGiftCardCode(value: string): boolean {
+/** True when the normalized code is 8 to 32 letters or digits. */
+export function isGiftCardCode(value: string): boolean {
   return /^[0-9A-Z]{8,32}$/u.test(normalizeGiftCardCode(value));
 }
 
 function giftCardCodeError(): string {
-  return "must be 8 to 32 letters or digits";
+  return "a gift card code must be 8 to 32 letters or digits";
 }
 
 function sameText(value: string): string {

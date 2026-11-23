@@ -13,6 +13,10 @@ import {
   wireCheckoutProfileReferenceSchema,
 } from "./api-admin.ts";
 import {
+  giftCardCodeSchema,
+  normalizeGiftCardCode,
+} from "./api-stored-value.ts";
+import {
   Absent,
   ImmutableArray,
   ReadonlyStrictObject,
@@ -184,25 +188,6 @@ export const buyerCheckoutIdentitySchema = Type.Union([
     contact: Absent,
   }),
 ]);
-
-/** `normalizeGiftCardCode`: NFKC, upper case, no spaces or hyphens. */
-const giftCardCodeSchema = Type.Codec(
-  Type.Refine(Type.String(), isGiftCardCode, giftCardCodeError),
-)
-  .Decode(normalizeGiftCardCode)
-  .Encode(sameText);
-
-function normalizeGiftCardCode(value: string): string {
-  return value.normalize("NFKC").toUpperCase().replace(/[\s-]/gu, "");
-}
-
-function isGiftCardCode(value: string): boolean {
-  return /^[0-9A-Z]{8,32}$/u.test(normalizeGiftCardCode(value));
-}
-
-function giftCardCodeError(): string {
-  return "a gift card code must be 8 to 32 letters or digits";
-}
 
 /** Five different gift card codes or fewer, compared after normalization. */
 const giftCardCodesSchema = Type.Refine(

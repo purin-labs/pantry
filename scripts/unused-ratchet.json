@@ -1,5 +1,5 @@
 {
-  "packageEntryExports": 993,
+  "packageEntryExports": 992,
   "files": [],
   "exports": [
     "areas/cafe/ui/features/terminals/counter-sale-api.ts#manualCashRefundCounterSale",

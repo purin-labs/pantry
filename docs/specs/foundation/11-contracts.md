@@ -309,10 +309,10 @@ Neighbours:
 - **Lone surrogates in the access decoders.** `jsonInput` in `access-control.ts` tests
   the JSON text for a lone surrogate. `JSON.stringify` writes a lone surrogate as an
   escape, so the test finds none.
-- **Host Unicode tables.** Six places normalize commerce text with
+- **Host Unicode tables.** Four places normalize commerce text with
   `String.prototype.normalize("NFKC")`, which uses the tables of the JavaScript engine.
-  They are gift card codes (three copies of one function), catalog search, Stripe
-  dispute text and `normalizeUntrustedCommerceText` in the Platform
+  They are gift card codes (`normalizeGiftCardCode` in `records/api-stored-value.ts`),
+  catalog search, Stripe dispute text and `normalizeUntrustedCommerceText` in the Platform
   (`context/untrusted-commerce-text.ts`).
 - **Timestamps through `Date`.** The record schemas of checkout profiles, shipment
   operations, food service, plugin outputs and the point of sale write a timestamp

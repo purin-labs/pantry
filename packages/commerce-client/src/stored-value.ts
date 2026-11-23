@@ -5,7 +5,11 @@
 // and its last four characters. Store credit belongs to one customer. A
 // checkout holds what it will take, the placed order redeems the hold, and a
 // refund of a stored-value payment returns the amount to its account.
-import { parseCommerceStoredValueAccountsV1 } from "@purin-labs/commerce-contracts/records/api-stored-value";
+import {
+  isGiftCardCode,
+  normalizeGiftCardCode as normalizeGiftCardCodeText,
+  parseCommerceStoredValueAccountsV1,
+} from "@purin-labs/commerce-contracts/records/api-stored-value";
 import type { CheckoutStoredValue } from "@purin-labs/commerce-contracts";
 
 import type { CommerceEngineTimestamp } from "./commerce-resources.ts";
@@ -127,18 +131,12 @@ export function generateGiftCardCode(): string {
     .join("-");
 }
 
-/**
- * A code as Commerce compares it: full-width forms as ASCII, upper case,
- * with no spaces or hyphens.
- */
+/** A code as Commerce compares it (`normalizeGiftCardCode` of the records). */
 export function normalizeGiftCardCode(value: unknown, field: string): string {
-  const code = requireString(value, field)
-    .normalize("NFKC")
-    .toUpperCase()
-    .replace(/[\s-]/gu, "");
-  if (!/^[0-9A-Z]{8,32}$/u.test(code))
+  const code = requireString(value, field);
+  if (!isGiftCardCode(code))
     throw new Error(`${field} must be 8 to 32 letters or digits`);
-  return code;
+  return normalizeGiftCardCodeText(code);
 }
 
 export function parseIssueGiftCardCommand(

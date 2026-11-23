@@ -1,5 +1,5 @@
 {
-  "total": {"copies":789,"lines":14124},
+  "total": {"copies":788,"lines":14108},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -317,7 +317,6 @@
     "packages/commerce-contracts/src/entity-command-authority.ts = packages/commerce-contracts/src/list-view-command-authority.ts": {"copies":1,"lines":12},
     "packages/commerce-contracts/src/payment-binding.ts = packages/commerce-contracts/src/payment-binding.ts": {"copies":1,"lines":20},
     "packages/commerce-contracts/src/records/api-international-addresses.ts = packages/commerce-contracts/src/records/api-storefront.ts": {"copies":1,"lines":7},
-    "packages/commerce-contracts/src/records/api-stored-value.ts = packages/commerce-contracts/src/records/api-storefront.ts": {"copies":1,"lines":16},
     "packages/commerce-contracts/src/records/commerce-records.ts = packages/commerce-contracts/src/records/commerce-records.ts": {"copies":4,"lines":71},
     "packages/commerce-control-api/src/portal/entity-plane.ts = packages/commerce-control-api/src/portal/entity-plane.ts": {"copies":1,"lines":8},
     "packages/commerce-query-sqlite/src/compiler.ts = packages/commerce-query-sqlite/src/compiler.ts": {"copies":3,"lines":66},
