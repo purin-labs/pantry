@@ -275,7 +275,9 @@ The `workflow_canvas` room (FND-10) holds the card positions of one saved run of
   its tasks in its `task_dependencies` attribute.
 - **Procedure reader:** two graph reads at depth 1 with a limit of 100. It needs seven
   operations and five equipment records, and it refuses a cursor, a full page or a
-  changed merchant revision between the reads.
+  changed merchant revision between the reads. An oven takes up to `ovenTrays` (6) trays,
+  a cooling rack up to `rackTrays` (16), and another station up to `traysPerBatch` (4):
+  the largest value of the setting that the capacity becomes.
 - **Fingerprint:** `bakeryProcedureKey` covers the type, id and revision of each
   procedure, operation and equipment entity and each relationship, apart from
   `bakery_scenario_procedure`. The procedure reader also drops

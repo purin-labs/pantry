@@ -1,5 +1,6 @@
 import {
   bakeryProcedureKey,
+  fields,
   financierOperations,
   parseSettings,
   type Operation,
@@ -282,7 +283,7 @@ export function compileProcedure(
       equipmentByStation.has(id) ||
       capacity === null ||
       capacity < 1 ||
-      capacity > (id === "cool" ? 16 : 4)
+      capacity > stationCapacityLimit(id)
     ) {
       return invalid(
         "Equipment needs a unique supported station and a valid tray capacity.",
@@ -560,6 +561,19 @@ function attributeScopeMatches(
     attribute.scope.entityTypeId === entity.reference.typeId &&
     attribute.scope.typeRevision === entity.typeRevision
   );
+}
+
+/**
+ * The most trays a station may record: the limit of the setting that its
+ * capacity becomes. The oven gives ovenTrays and the cooling rack gives
+ * rackTrays. Any other station holds one batch, so traysPerBatch bounds it.
+ */
+function stationCapacityLimit(id: StationId): number {
+  const key: SettingsField =
+    id === "bake" ? "ovenTrays" : id === "cool" ? "rackTrays" : "traysPerBatch";
+  const field = fields.find((candidate) => candidate.key === key);
+  if (field === undefined) throw new Error(`Missing setting ${key}`);
+  return field.max;
 }
 
 function stationValue(value: string | null): StationId | null {

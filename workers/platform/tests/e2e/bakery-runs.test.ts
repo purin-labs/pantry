@@ -79,6 +79,7 @@ import {
 } from "@purin-labs/bakery-model/bakery-procedure";
 import {
   parseCommerceGraphQuery,
+  parseEntityPlaneCommand,
   CommerceEntityPlaneClient,
 } from "@purin-labs/commerce-client";
 import type { CommerceGraphQuery } from "@purin-labs/commerce-contracts";
@@ -1340,6 +1341,113 @@ async function stageScenarioProposal(
     )
     .run();
   return { effectId, surfaceSessionId, manifest };
+}
+
+it(
+  "loads a procedure whose oven holds six trays and saves a shift at that capacity",
+  sixTrayOvenJourney,
+);
+
+/**
+ * The settings take an oven of up to six trays. A shop records its oven as six
+ * trays on the sample procedure's equipment, through the commerce engine as
+ * any record edit goes. The Kitchen then reads the procedure with six oven
+ * trays, and the owner saves a shift scenario at that capacity.
+ */
+async function sixTrayOvenJourney(): Promise<void> {
+  const owner = await client("bakery-six-tray-oven");
+  const organisation = await workspace(owner, "Six tray oven");
+  const merchantId = `merchant_bakery_c3_${crypto.randomUUID().replaceAll("-", "")}`;
+  await connectCommerceFixture(organisation, owner.identity.userId, merchantId);
+  const sample = await sendScenario(
+    `/v1/control/organisations/${organisation}/commerce/bakery/sample`,
+    owner.session,
+    {},
+  );
+  expect(sample.status, await sample.text()).toBe(200);
+  const entityPlane = new CommerceEntityPlaneClient({
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
+  });
+  const ovenRef = customEntityRef(
+    "bakery_equipment",
+    `${FINANCIER_SAMPLE_ID}:equipment:bake`,
+  );
+  const read = await readBakeryGraph(entityPlane, merchantId, {
+    kind: "entity_by_ref",
+    reference: ovenRef,
+    traversal: { maxDepth: 0, resultLimit: 1 },
+    filter: null,
+  });
+  const oven = read.entities[0];
+  if (oven === undefined || !("attributes" in oven))
+    throw new Error("Missing sample oven");
+  const commandId = `six-tray-oven-${crypto.randomUUID()}`;
+  const context = {
+    organisationId: organisation,
+    merchantId,
+    principalId: owner.identity.userId,
+    sensitivityCeiling: "restricted",
+    expiresAt: new Date(Date.now() + 60_000).toISOString(),
+    causation: { kind: "command", commandId },
+  } as const;
+  const patched = await entityPlane.command(
+    parseEntityPlaneCommand({
+      organisationId: organisation,
+      merchantId,
+      commandId,
+      expectedMerchantRevision: read.merchantRevision,
+      authority: {
+        kind: "entity_command",
+        context,
+        scope: { kind: "entity", entityRef: ovenRef },
+        target: { entityRef: ovenRef, expectedRevision: oven.revision },
+      },
+      command: {
+        kind: "patch_custom_entity",
+        command: {
+          entityRef: ovenRef,
+          typeRevision: 1,
+          expectedRevision: oven.revision,
+          displayName: null,
+          attributes: oven.attributes.map((attribute) =>
+            attribute.attributeId === "capacity_trays"
+              ? { ...attribute, value: { kind: "integer", value: 6n } }
+              : attribute,
+          ),
+        },
+      },
+    }),
+  );
+  expect(patched.ok && patched.value.status).toBe("accepted");
+
+  // The Kitchen reads the procedure with the six-tray oven.
+  const source = await readBakeryProcedure(
+    readBakeryGraph.bind(null, entityPlane, merchantId),
+    customEntityRef("bakery_procedure", FINANCIER_SAMPLE_ID),
+    sampleSettings(),
+  );
+  if (source.kind !== "ready") throw new Error(source.message);
+  expect(source.procedure.settings.ovenTrays).toBe(6);
+
+  // The owner saves a shift scenario at that capacity.
+  const scenario = parseScenarioCopy({
+    id: "scenario-six-tray-oven",
+    name: "Six tray oven",
+    note: "The new deck oven",
+    procedureId: FINANCIER_SAMPLE_ID,
+    fingerprint: await bakeryFingerprint(source.procedure.revisionKey),
+    settings: source.procedure.settings,
+  });
+  if (scenario === null) throw new Error("Scenario fixture invalid");
+  const saved = await sendScenario(
+    `/v1/control/organisations/${organisation}/commerce/bakery/scenario`,
+    owner.session,
+    scenario,
+  );
+  expect(saved.status, await saved.clone().text()).toBe(200);
+  expect(await saved.json()).toMatchObject({ ok: true });
 }
 
 async function sendScenario(
