@@ -968,6 +968,21 @@ Stripe Connect redirects, the Meta webhook and the remaining console names.
   `outlayer-email-recovery-example` (no custom domain, last deployment about
   four months earlier) is deleted. Of step 7 only `hadimar` remains, which
   the owner keeps.
+- **Renamed on 23 November 2026 (owner's word):** the Pages projects of the
+  company site. Cloudflare cannot rename a project, so two new projects
+  serve the same build: `purin-app` (`purin.io`, production branch `main`)
+  and `purin-app-staging` (`staging.purin.io`, production branch `dev`).
+  The `purin-monorepo` secret `CF_PAGES_PROJECT_VITE` names them in its
+  production and staging environments, and the deploy runs 45218674838
+  (production) and 45218668707 (staging) passed on them. A Pages custom
+  domain becomes active only when its proxied CNAME points to the
+  project's own `pages.dev` name. So change the CNAME first, and then move
+  the domain: the site then shows Cloudflare error 522 for about 10
+  seconds (staging) to 55 seconds (production). A move without the CNAME
+  change stays at "CNAME record not set" (staging showed 522 for 10
+  minutes before the rollback). The Pantry token cannot edit DNS. The old
+  projects `seams-site` and `seams-site-staging` hold no custom domain and
+  wait for the owner's word to delete them.
 - **Deferred on 23 November 2026:** the Meta webhook and every WhatsApp
   check. Meta banned the owner's account.
 - **Closed:** the stale zone record `seams.sh` (its name servers point to the
