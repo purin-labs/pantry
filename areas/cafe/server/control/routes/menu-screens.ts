@@ -366,16 +366,23 @@ async function openSocket(request: Request, env: Env): Promise<Response> {
   }
 }
 
-/** The shop's merchant and a storefront client, or null when it has neither. */
+/** The shop's Commerce merchant and a storefront client. */
+export type CafeShop = Readonly<{
+  merchantId: string;
+  buyer: CommerceStorefrontClient;
+}>;
+
+/**
+ * The shop's merchant and a storefront client. `no_merchant` when the
+ * Organisation has no Commerce merchant, or this Worker has no Commerce; null
+ * when the read fails.
+ */
 export async function resolveCafeBuyer(
   env: Env,
   organisationId: OrganisationId,
-): Promise<Readonly<{
-  merchantId: string;
-  buyer: CommerceStorefrontClient;
-}> | null> {
+): Promise<CafeShop | "no_merchant" | null> {
   const base = env.COMMERCE_BASE_URL?.trim();
-  if (base === undefined || base.length === 0) return null;
+  if (base === undefined || base.length === 0) return "no_merchant";
   try {
     const scope = await OrganisationExecutionScope.resolve(env, organisationId);
     if (!scope.ok) return null;
@@ -389,7 +396,10 @@ export async function resolveCafeBuyer(
       organisationId,
       environment,
     });
-    if (!binding.ok) return null;
+    if (!binding.ok)
+      return binding.error.code === "commerce_binding_not_found"
+        ? "no_merchant"
+        : null;
     const merchantId = binding.value.merchantId;
     const buyer = new CommerceStorefrontClient({
       baseUrl: base,
@@ -436,7 +446,7 @@ export async function readPublishedCafeMenu(
 }> | null> {
   try {
     const shop = await resolveCafeBuyer(env, organisationId);
-    if (shop === null) return null;
+    if (shop === null || shop === "no_merchant") return null;
     const { merchantId, buyer } = shop;
     // The QR code opens the shop's order page; the shop name read runs
     // beside the guest session, and a failed read keeps the hosted page.

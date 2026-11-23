@@ -1,5 +1,5 @@
 {
-  "total": {"copies":786,"lines":14075},
+  "total": {"copies":786,"lines":14074},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -19,7 +19,7 @@
     "areas/cafe/server/agent-tools/drafts/handlers.ts = areas/cafe/server/agent-tools/drafts/handlers.ts": {"copies":3,"lines":47},
     "areas/cafe/server/control/admission/menu-draft.ts = areas/inbox/server/control/admission/email-draft.ts": {"copies":1,"lines":14},
     "areas/cafe/server/control/routes/commerce-menu-publication.ts = areas/cafe/server/control/routes/commerce-menu-publication.ts": {"copies":1,"lines":10},
-    "areas/cafe/server/control/routes/menu-screens.ts = areas/cafe/server/control/routes/menu-screens.ts": {"copies":1,"lines":15},
+    "areas/cafe/server/control/routes/menu-screens.ts = areas/cafe/server/control/routes/menu-screens.ts": {"copies":1,"lines":14},
     "areas/cafe/server/control/routes/order-queue.ts = areas/cafe/server/control/routes/sold-out.ts": {"copies":2,"lines":30},
     "areas/cafe/server/control/routes/order-queue.ts = areas/cafe/server/control/routes/terminal-operations.ts": {"copies":1,"lines":13},
     "areas/cafe/server/control/routes/order-times.ts = areas/commerce/server/control/routes/bank-payouts.ts": {"copies":1,"lines":13},

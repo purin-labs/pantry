@@ -4,7 +4,10 @@ import {
   CAFE_MENU_ID,
   CAFE_STOREFRONT_ID,
 } from "@purin-labs/area-cafe/server/control/routes/commerce-menu-publication";
-import { resolveCafeBuyer } from "@purin-labs/area-cafe/server/control/routes/menu-screens";
+import {
+  resolveCafeBuyer,
+  type CafeShop,
+} from "@purin-labs/area-cafe/server/control/routes/menu-screens";
 import { listDevices } from "@purin-labs/area-devices/server/store";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
@@ -27,7 +30,10 @@ const cache = new Map<
   Readonly<{ terms: readonly string[]; until: number }>
 >();
 
-type Shop = NonNullable<Awaited<ReturnType<typeof resolveCafeBuyer>>>;
+type StockNames = Readonly<{ recipes: string[]; items: string[] }>;
+
+/** A shop with no Commerce merchant has no products, recipes or stock items. */
+const NO_STOCK: StockNames = { recipes: [], items: [] };
 
 /**
  * The shop vocabulary for Whisper: the names that a baker says. Each name is
@@ -39,7 +45,8 @@ type Shop = NonNullable<Awaited<ReturnType<typeof resolveCafeBuyer>>>;
  *
  * Each source takes a turn, so a long menu does not push out the ingredients.
  * Null when a source fails: the Mac then keeps its last whole list, which a
- * short list would replace for five minutes.
+ * short list would replace for five minutes. A shop with no Commerce merchant
+ * is not a failure: its list holds the agent's names and the devices.
  */
 export async function readVoiceVocabulary(
   env: Env,
@@ -50,8 +57,12 @@ export async function readVoiceVocabulary(
   if (cached !== undefined && cached.until > now) return cached.terms;
   const shop = await resolveCafeBuyer(env, organisationId);
   const [catalog, stock, devices] = await Promise.all([
-    shop === null ? null : readCatalogNames(shop),
-    shop === null ? null : readStockNames(env, organisationId, shop),
+    shop === "no_merchant" ? [] : shop === null ? null : readCatalogNames(shop),
+    shop === "no_merchant"
+      ? NO_STOCK
+      : shop === null
+        ? null
+        : readStockNames(env, organisationId, shop),
     readDeviceNames(env, organisationId),
   ]);
   if (catalog === null || stock === null || devices === null) return null;
@@ -96,7 +107,7 @@ function vocabularyOf(
 }
 
 /** The published products as a guest of the order page sees them, the menu first. */
-async function readCatalogNames(shop: Shop): Promise<string[] | null> {
+async function readCatalogNames(shop: CafeShop): Promise<string[] | null> {
   try {
     const session = await shop.buyer.createSession(
       shop.merchantId,
@@ -132,8 +143,8 @@ async function readCatalogNames(shop: Shop): Promise<string[] | null> {
 async function readStockNames(
   env: Env,
   organisationId: OrganisationId,
-  shop: Shop,
-): Promise<Readonly<{ recipes: string[]; items: string[] }> | null> {
+  shop: CafeShop,
+): Promise<StockNames | null> {
   const client = createCommerceClient(env, undefined, {
     kind: "organisation",
     organisationId: String(organisationId),

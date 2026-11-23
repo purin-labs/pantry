@@ -211,7 +211,9 @@ most 60 terms and 600 characters. Whisper takes it as `initial_prompt`, and Qwen
 its system prompt.
 
 If a source fails, the route answers 503, so the Mac keeps its last list in memory. The
-fallback waits at most 800 ms for the list, and then runs with no prompt.
+fallback waits at most 800 ms for the list, and then runs with no prompt. A shop with no
+Commerce merchant has no products, recipes or stock items, and this is not a failure: its
+list holds the agent's names and the devices.
 
 ### Agents
 
@@ -403,8 +405,6 @@ The talk key works only while the page is in front.
   not measured.
 - **Known faults in the code:**
   - The chat routes need the admin role, but the voice routes admit an operator.
-  - With no commerce merchant binding, the vocabulary read answers 503, so the
-    Organisation has no shop vocabulary, not even the agent's names.
   - A failed DNS removal at a revoke is not tried again before the end of the
     Organisation.
   - Each Mac heartbeat writes one D1 row, also when nothing changed.

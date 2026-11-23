@@ -654,6 +654,18 @@ async function voiceControlJourney(_test: TestContext): Promise<void> {
     404,
     "organisation_role_insufficient",
   );
+  // This shop has no Commerce merchant yet. The Mac and the Portal still get
+  // the agent's names, so the Mac does not ask again at each heartbeat.
+  const macVocabulary = await voiceMacRequest(credential, "vocabulary", "GET");
+  expect(macVocabulary.status, await macVocabulary.clone().text()).toBe(200);
+  expect(await json(macVocabulary)).toEqual({ terms: ["Sous Chef", "Pantry"] });
+  const portalVocabulary = await exports.default.fetch(
+    `https://localhost${voicePath(owner, "vocabulary")}`,
+    { headers: mutationHeaders(owner.session) },
+  );
+  expect(await json(portalVocabulary)).toEqual({
+    terms: ["Sous Chef", "Pantry"],
+  });
   const granted = await json(
     await post(owner, voicePath(owner, "grants"), { deviceId: DEVICE }),
   );
