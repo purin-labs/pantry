@@ -1,5 +1,5 @@
 {
-  "total": {"copies":795,"lines":14331},
+  "total": {"copies":795,"lines":14330},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -299,7 +299,7 @@
     "foundation/conversation/control/routes/chat-goal.ts = foundation/conversation/control/routes/chat-sharing.ts": {"copies":1,"lines":19},
     "foundation/conversation/projects/case-moves.ts = foundation/conversation/projects/commands.ts": {"copies":1,"lines":29},
     "foundation/kernel/queue-fields.ts = packages/contracts/src/boundary.ts": {"copies":1,"lines":13},
-    "foundation/tenancy/data/control-plane.ts = foundation/tenancy/data/control-plane.ts": {"copies":1,"lines":38},
+    "foundation/tenancy/data/control-plane.ts = foundation/tenancy/data/control-plane.ts": {"copies":1,"lines":37},
     "foundation/tenancy/data/organisation-lifecycle.ts = foundation/tenancy/data/organisation-lifecycle.ts": {"copies":11,"lines":184},
     "foundation/tenancy/data/shared-rows/placement-row.ts = foundation/tenancy/data/shared-rows/placement-row.ts": {"copies":1,"lines":21},
     "foundation/ui/preferences/appearance-controls.tsx = foundation/ui/preferences/appearance-controls.tsx": {"copies":1,"lines":14},
