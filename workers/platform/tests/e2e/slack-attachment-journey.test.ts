@@ -287,15 +287,24 @@ it("refuses an oversized batch without running the agent on partial input", asyn
 
   expect(accepted.status).toBe(200);
 
-  // The good file is never fetched, because the batch was already refused.
+  // The person who sent the files reads why the batch was refused, once, in
+  // the thread of the message: the rule and its limit.
   await expect
     .poll(
-      function downloadCount() {
-        return files.downloads.length;
+      function threadNotices() {
+        return slack.messages.filter(
+          (message) =>
+            message.channel === CHANNEL_ID && message.thread_ts === rootTs,
+        ).length;
       },
-      { timeout: 5_000 },
+      { timeout: 15_000 },
     )
-    .toBe(0);
+    .toBe(1);
+  const notice = slack.messages.find((message) => message.thread_ts === rootTs);
+  expect(notice?.text).toContain("huge.bin");
+  expect(notice?.text).toContain("25 MiB");
+  // The good file is never fetched, because the batch was already refused.
+  expect(files.downloads).toHaveLength(0);
   expect(model.requests).toHaveLength(0);
 });
 

@@ -371,8 +371,16 @@ async function processAcceptedSlackCaseMessage(
     ),
   ]);
   const recordsReadAt = Date.now();
-  if (attachments.kind === "retry" || attachments.kind === "rejected") {
+  if (attachments.kind === "retry") {
     return attachments;
+  }
+  if (attachments.kind === "refused") {
+    return tellAttachmentsRefused(
+      body,
+      attachments.rejection,
+      connectorIdentity,
+      connector,
+    );
   }
   if (!workspace.value.ok) {
     return retry(body.receivedAt, workspace.value.error.code);
@@ -1072,7 +1080,8 @@ async function ingestCaseAttachments(
       readonly kind: "ready";
       readonly value: readonly StoredMessageAttachment[];
     }
-  | Variant<SlackCaseProcessingResult, "retry" | "rejected">
+  | { readonly kind: "refused"; readonly rejection: AttachmentRejection }
+  | Variant<SlackCaseProcessingResult, "retry">
 > {
   if (body.event.files.length === 0) {
     return { kind: "ready", value: [] };
@@ -1112,20 +1121,80 @@ async function ingestCaseAttachments(
     case "retryable_failure":
       return retry(body.receivedAt, `slack_attachment_${batch.failure.code}`);
     case "rejected":
-      return {
-        kind: "rejected",
-        reason: describeAttachmentRejection(batch.rejection),
-      };
+      return { kind: "refused", rejection: batch.rejection };
     default:
       return assertNever(batch);
   }
 }
 
 /**
- * Renders a permanent refusal for the Connector's user-visible notice.
- *
- * The applied limit travels with the reason so the message can say what the
- * rule was, not just that a rule was broken.
+ * Tell the thread why the files of a message were refused, and settle the
+ * message as rejected: no agent turn starts on part of its input. The notice
+ * is fixed platform text with the rule, its limit and the file name that the
+ * sender gave. Its delivery identity names the message, so a repeated claim
+ * posts once. A delivery that Slack defers tries again with the next claim.
+ */
+async function tellAttachmentsRefused(
+  body: SlackCaseCommand,
+  rejection: AttachmentRejection,
+  connectorIdentity: ConnectorIdentity,
+  connector: Pick<OngoingCaseWalkingConnector, "deliver">,
+): Promise<SlackCaseProcessingResult> {
+  const told = await deliverPlatformText({
+    connector,
+    connectorIdentity,
+    body,
+    binding: slackCaseBinding(body),
+    deliveryId: `delivery_attachments_refused_${body.event.eventId}`,
+    text: attachmentRefusalText(body, rejection),
+  });
+  return told.kind === "completed"
+    ? { kind: "rejected", reason: describeAttachmentRejection(rejection) }
+    : told;
+}
+
+/** The notice that a person reads when the files of a message are refused. */
+function attachmentRefusalText(
+  body: SlackCaseCommand,
+  rejection: AttachmentRejection,
+): string {
+  const lead = "Sous Chef did not read this message, because";
+  const name = (fileId: string): string => {
+    for (const candidate of body.event.files)
+      if (candidate.kind === "hosted" && candidate.file.fileId === fileId)
+        return `“${candidate.file.displayName}”`;
+    return "one file";
+  };
+  const reason = ((): string => {
+    switch (rejection.code) {
+      case "file_count_exceeded":
+        return `it has ${rejection.observed} files and a message can have at most ${rejection.limit}`;
+      case "file_too_large":
+        return `${name(rejection.fileId)} is larger than ${mebibytes(rejection.limitBytes)}, the limit for one file`;
+      case "batch_too_large":
+        return `its files are larger than ${mebibytes(rejection.limitBytes)} together, the limit for one message`;
+      case "declared_size_invalid":
+      case "byte_length_mismatch":
+        return `Slack gave a size for ${name(rejection.fileId)} that does not match the file`;
+      case "contract_rejected":
+        return `${name(rejection.fileId)} is not a file that Sous Chef can accept`;
+      case "download_rejected":
+        return `Slack did not let Sous Chef download ${name(rejection.fileId)}`;
+      default:
+        return assertNever(rejection);
+    }
+  })();
+  return `${lead} ${reason}. Send it again without that file, or with fewer or smaller files.`;
+}
+
+function mebibytes(bytes: number): string {
+  return `${Math.floor(bytes / (1024 * 1024))} MiB`;
+}
+
+/**
+ * The reason that the Connector records for a refused batch. The applied
+ * limit travels with it, so the record says what the rule was, not just that
+ * a rule was broken.
  */
 function describeAttachmentRejection(rejection: AttachmentRejection): string {
   switch (rejection.code) {

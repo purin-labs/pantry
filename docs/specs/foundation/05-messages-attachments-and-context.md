@@ -93,8 +93,10 @@ stored file.
    `batch_too_large`, `declared_size_invalid`, `byte_length_mismatch`,
    `contract_rejected` or `download_rejected`. A download request that throws is also
    `download_rejected`: a network error, the 15 s deadline before the response starts, a
-   fourth redirect or a redirect to another host. The Connector then settles the work
-   as rejected with the rule and the observed value, and no agent turn starts.
+   fourth redirect or a redirect to another host. The thread gets one fixed notice with
+   the rule, its limit and the file name (`tellAttachmentsRefused`). The Connector then
+   settles the work as rejected with the rule and the observed value, and no agent turn
+   starts.
 
 The adapter downloads the files in groups. A group closes before the file that takes
 its declared bytes above 16 MiB, so a larger file is a group of its own, of at most
@@ -405,9 +407,6 @@ The agent loads more context with its tools, when the task needs it.
 
 ## Open work
 
-- A rejected batch of Slack files gets no message in the thread. The Connector records
-  the reason, and only a message that used each try gets the fixed notice. The
-  `ingress_notice` delivery of Plan 37 is not built.
 - The Worker holds a whole file in memory to compute its digest. Plan 37 makes a larger
   file limit wait for a streamed write and measured evidence. The code has no staged
   object and no expiry of one.
