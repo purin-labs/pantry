@@ -3,7 +3,11 @@ import { fixtureDatabase } from "./organisation-database";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { parseInboxConversations } from "@purin-labs/control-api";
+import {
+  parseInboxConversations,
+  whatsappConversationTab,
+  type WhatsAppConversationState,
+} from "@purin-labs/control-api";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { readWhatsAppIngressPolicy } from "@purin-labs/area-inbox/server/data/whatsapp";
 import { createGrant, enableCapability } from "./access-route-support";
@@ -210,19 +214,22 @@ it(
 async function newMessageJourney({ task }: TestContext): Promise<void> {
   const fixture = await customerWritesAgain();
   const listed = await readList(fixture.owner);
+  // The agent's turn is due, so the conversation is the agent's.
   expect(conversationOf(listed)).toMatchObject({
     caseId: fixture.caseId,
     preview: SECOND_TEXT,
     proposalId: null,
+    state: "agent_handled",
   });
   task.meta.inboxWhatsAppUnanswered = { listed: conversationOf(listed) };
 }
 
 // The model provider fails, so the agent cannot answer the customer's new
 // message. After the bounded turn attempts the operator is told what
-// happened, in the operations channel.
+// happened, in the operations channel, and the Inbox lists the customer
+// under "Waiting for you", not under "The agent answered".
 it(
-  "tells the operator that the agent could not answer when its turn attempts run out",
+  "tells the operator that the agent could not answer when its turn attempts run out, and lists the customer as waiting",
   unansweredJourney,
   120_000,
 );
@@ -264,7 +271,24 @@ async function unansweredJourney({ task }: TestContext): Promise<void> {
   expect(notice).not.toContain("24-hour service window");
   expect(notice).not.toContain(SECOND_TEXT);
 
-  task.meta.inboxWhatsAppUnanswered = { modelCalls, notice };
+  // No agent reply comes, so a person must answer the customer.
+  const listed = await readList(fixture.owner);
+  expect(conversationOf(listed)).toMatchObject({
+    caseId: fixture.caseId,
+    preview: SECOND_TEXT,
+    state: "no_reply_yet",
+  });
+  expect(
+    whatsappConversationTab(
+      record(conversationOf(listed)).state as WhatsAppConversationState,
+    ),
+  ).toBe("needs");
+
+  task.meta.inboxWhatsAppUnanswered = {
+    modelCalls,
+    notice,
+    state: record(conversationOf(listed)).state,
+  };
 }
 
 /**

@@ -331,6 +331,7 @@ async function readAccountConversations(
       preview: string | null;
       lastDirection: "inbound" | "outbound" | null;
       lastInboundAt: number | null;
+      agentWorks: boolean;
     }>
   >();
   if (openIds.length > 0) {
@@ -369,6 +370,7 @@ async function readAccountConversations(
         handoffRequested: window.handoffRequestedAt !== null,
         proposalLifecycle: proposal?.lifecycleKind ?? null,
         lastDirection: head?.lastDirection ?? null,
+        agentWorks: head?.agentWorks ?? false,
         agentMode,
       }),
       waitingSince: head?.lastInboundAt ?? window.closedAt ?? window.openedAt,

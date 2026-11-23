@@ -19,11 +19,14 @@ export const whatsappConversationStateSchema = Type.Union([
   Type.Literal("reply_waiting"),
   /** The agent asked for a person. */
   Type.Literal("handoff_requested"),
-  /** The customer wrote last, and a person owns the reply. */
+  /**
+   * The customer wrote last, and no agent reply comes: a person owns the
+   * reply, the agent only drafts, or its turns stopped.
+   */
   Type.Literal("no_reply_yet"),
   /** Meta did not confirm a send, and a person must check it. */
   Type.Literal("send_uncertain"),
-  /** The agent owns the conversation and answered, or works on it. */
+  /** The agent owns the conversation and answered, or a turn of it is due. */
   Type.Literal("agent_handled"),
   /** A person answered last. */
   Type.Literal("person_replied"),
@@ -62,6 +65,8 @@ export function whatsappConversationState(
     handoffRequested: boolean;
     proposalLifecycle: string | null;
     lastDirection: "inbound" | "outbound" | null;
+    /** An agent turn runs or is due for the Case (no pause, attempts left). */
+    agentWorks: boolean;
     agentMode: WhatsAppAgentMode;
   }>,
 ): WhatsAppConversationState {
@@ -77,7 +82,10 @@ export function whatsappConversationState(
     return input.lastDirection === "outbound"
       ? "person_replied"
       : "no_reply_yet";
-  if (input.lastDirection === "inbound" && input.agentMode !== "answer")
+  if (
+    input.lastDirection === "inbound" &&
+    (input.agentMode !== "answer" || !input.agentWorks)
+  )
     return "no_reply_yet";
   return "agent_handled";
 }

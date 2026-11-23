@@ -94,15 +94,20 @@ stores nothing of a WhatsApp message. Pantry never sends an unconfirmed reply ag
 
 The state of a WhatsApp row comes from `whatsappConversationState`, in this order:
 
-| State               | When                                                                                               | Section            |
-| ------------------- | -------------------------------------------------------------------------------------------------- | ------------------ |
-| `closed`            | The Case closed, or its window ended                                                               | Done               |
-| `send_uncertain`    | The proposal is `send_indeterminate`                                                               | Waiting for you    |
-| `reply_waiting`     | A proposal is `awaiting_approval` or `approved`                                                    | Waiting for you    |
-| `handoff_requested` | The agent asked for a person                                                                       | Waiting for you    |
-| `person_replied`    | `human_owned`, and the business wrote last                                                         | Done               |
-| `no_reply_yet`      | `human_owned` and the customer wrote last; or the customer wrote last and the mode is not `answer` | Waiting for you    |
-| `agent_handled`     | Any other open Case                                                                                | The agent answered |
+| State               | When                                                                                           | Section            |
+| ------------------- | ---------------------------------------------------------------------------------------------- | ------------------ |
+| `closed`            | The Case closed, or its window ended                                                           | Done               |
+| `send_uncertain`    | The proposal is `send_indeterminate`                                                           | Waiting for you    |
+| `reply_waiting`     | A proposal is `awaiting_approval` or `approved`                                                | Waiting for you    |
+| `handoff_requested` | The agent asked for a person                                                                   | Waiting for you    |
+| `person_replied`    | `human_owned`, and the business wrote last                                                     | Done               |
+| `no_reply_yet`      | `human_owned` and the customer wrote last; or the customer wrote last and no agent reply comes | Waiting for you    |
+| `agent_handled`     | Any other open Case                                                                            | The agent answered |
+
+No agent reply comes when the mode is not `answer`, or when no agent turn is due. A turn
+is due when the number is not paused and the Case waits for its next turn, or the turn
+runs now (`agentWorks` of `readWhatsAppConversationHeads`). So a customer whose agent
+turns ran out, or whose number paused, waits for a person.
 
 ### The agent setting
 

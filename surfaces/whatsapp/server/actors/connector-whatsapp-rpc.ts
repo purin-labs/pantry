@@ -204,6 +204,11 @@ export type WhatsAppConversationHead = {
   readonly preview: string | null;
   readonly lastDirection: "inbound" | "outbound" | null;
   readonly lastInboundAt: number | null;
+  /**
+   * An agent turn runs for the Case now, or one is due and the number is
+   * not paused. False when the turns ran out or the number is paused.
+   */
+  readonly agentWorks: boolean;
 };
 
 const WHATSAPP_PREVIEW_MAX = 200;
@@ -704,9 +709,28 @@ export async function readWhatsAppConversationHeads(
       preview,
       lastDirection: envelope.value.at(-1)?.direction ?? null,
       lastInboundAt: newest?.occurredAt ?? null,
+      agentWorks: agentWorksOn(runtime.value, supportCase),
     });
   }
   return { ok: true, value: heads };
+}
+
+function agentWorksOn(
+  runtime: WhatsAppRuntimeSnapshot,
+  supportCase: Readonly<{ caseId: string; debounceDueAt: number | null }>,
+): boolean {
+  switch (runtime.processing.kind) {
+    case "paused":
+      return false;
+    case "processing":
+      return (
+        runtime.processing.caseId === supportCase.caseId ||
+        supportCase.debounceDueAt !== null
+      );
+    case "waiting":
+    case "scheduled":
+      return supportCase.debounceDueAt !== null;
+  }
 }
 
 export async function readWhatsAppCasePanel(
