@@ -363,23 +363,22 @@ async (page) => {
         .getByText(LEARNED_FACT, { exact: true })
         .first()
         .waitFor();
+      // The heading of the waiting list is the status sentence.
       const waiting = this.owner.locator(
-        'section[aria-labelledby="brain-review"]',
+        'section[aria-labelledby="brain-status-line"]',
       );
       await this.capture(this.owner, "owner-candidate-waiting");
       const shown = {
         statements: await waiting
           .getByText(LEARNED_FACT, { exact: true })
           .count(),
-        needsReview: await waiting
-          .getByText("Needs review", { exact: true })
-          .count(),
         rows: await this.row(waiting, LEARNED_FACT).count(),
+        evals: await waiting.locator('a[id^="brain-row-evals-"]').count(),
       };
       // The Overview lists both that wait: the memory and its eval.
       this.check(
         "the Brain page lists the candidate as waiting for review",
-        shown.statements >= 1 && shown.needsReview === 2 && shown.rows === 1,
+        shown.statements >= 1 && shown.rows === 1 && shown.evals === 1,
         shown,
       );
       // The agent proposed an eval with the memory, so two items wait.
