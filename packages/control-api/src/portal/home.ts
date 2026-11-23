@@ -345,9 +345,7 @@ function isAvailableActionKind(
   );
 }
 
-export function isDestinationKind(
-  value: unknown,
-): value is HomeDestination["kind"] {
+function isDestinationKind(value: unknown): value is HomeDestination["kind"] {
   return (
     value === "home" ||
     value === "commerce" ||

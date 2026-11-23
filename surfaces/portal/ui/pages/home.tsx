@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router";
 
 import type { HomeSnapshot } from "@purin-labs/control-api/portal/home";
-import { isHomeDestination } from "../home";
 import { parseHomeResponse } from "@purin-labs/control-api/portal/home";
 import {
   ControlApiError,
@@ -27,7 +26,6 @@ import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import type {
   HomeAttentionItem,
-  HomeAvailableAction,
   HomeBlocker,
   HomeDestination,
   HomeSourceObservation,
@@ -103,29 +101,6 @@ function HomePageView(props: {
           }
         />
       );
-    case "empty": {
-      const nextAction = props.content.nextAction;
-      const destination = homeEmptyActionDestination(nextAction);
-      return (
-        <EmptyState
-          title="Home is ready"
-          detail={props.content.reason}
-          action={
-            nextAction === null || destination === null ? null : (
-              <Link
-                to={homeDestinationPath(
-                  props.organisationHandle,
-                  props.workspaceHandle,
-                  destination,
-                )}
-              >
-                {nextAction.label}
-              </Link>
-            )
-          }
-        />
-      );
-    }
     case "failed":
       return (
         <RecoverableError
@@ -150,16 +125,11 @@ function HomePageView(props: {
   }
 }
 
-type HomePageContent =
-  | Variant<
-      PageContent<HomeSnapshot>,
-      "loading" | "ready" | "failed" | "unauthorized"
-    >
-  | {
-      readonly kind: "empty";
-      readonly reason: string;
-      readonly nextAction: HomeAvailableAction | null;
-    };
+/** Home has no empty state: an Organisation with nothing to show still has its sections. */
+type HomePageContent = Variant<
+  PageContent<HomeSnapshot>,
+  "loading" | "ready" | "failed" | "unauthorized"
+>;
 
 type HomeRequestRevision = { current: number };
 type HomeContentSetter = React.Dispatch<React.SetStateAction<HomePageContent>>;
@@ -322,19 +292,6 @@ function sourceObservationIsDelayed(
   observation: HomeSourceObservation,
 ): boolean {
   return observation.status === "delayed";
-}
-
-function homeEmptyActionDestination(
-  action: { readonly label: string } | HomeAvailableAction | null,
-): HomeDestination | null {
-  if (
-    action === null ||
-    !("destination" in action) ||
-    !isHomeDestination(action.destination)
-  ) {
-    return null;
-  }
-  return action.destination;
 }
 
 function HomeLoading(): React.ReactNode {
