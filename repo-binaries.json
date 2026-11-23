@@ -2570,7 +2570,7 @@
           "bytes": 228286
         },
         "fr10-workcell/native/assets.json": {
-          "sha256": "ab67e21d7e659c18cc038aa38d9c88d2e24fe74e2cc8a274f1cdfb0c721f499d",
+          "sha256": "dcb8a05fb073b60f107adf296b6dc1995534221ddbd2c05ce401df95374aff96",
           "bytes": 38589
         },
         "fr10-workcell/native/dobot-cr10/combined-blocked-rack-nominal.json": {
@@ -2578,176 +2578,176 @@
           "bytes": 40423
         },
         "fr10-workcell/native/dobot-cr10/combined-blocked-rack-nominal.xml": {
-          "sha256": "a41f9a9af4b3cec4f3b1b8b307536e58094bafa4c8080b371deb082c08f8a293",
-          "bytes": 50837
+          "sha256": "dd9a4407af7d21089b552bb986c2f39f89ba93e133013d689f86238b41bae96e",
+          "bytes": 42232
         },
         "fr10-workcell/native/dobot-cr10/combined-blocked.json": {
           "sha256": "18710dba0c292a00aeebac3d4aebd4c7d80c8178057e83fb478e0ba73174c56d",
           "bytes": 40455
         },
         "fr10-workcell/native/dobot-cr10/combined-blocked.xml": {
-          "sha256": "10d227f67ed5c35bcff83fb795d3caf1971aa55c8332e65390f09c1d06cc4bd8",
-          "bytes": 50874
+          "sha256": "587d7f1236d276a1c01d8b78bdacf959228475cce9cc8432ef1a1c462f67dde5",
+          "bytes": 42269
         },
         "fr10-workcell/native/dobot-cr10/combined-closed-door.json": {
           "sha256": "f793510d5032cc801e6b0adc651ac65acdaee69206eaee1a24487f350cc0b601",
           "bytes": 39925
         },
         "fr10-workcell/native/dobot-cr10/combined-closed-door.xml": {
-          "sha256": "4a11b5303da30cb9ee00aa8a8029c2faf644df0a8e3fdc7b44b472e484da4745",
-          "bytes": 50572
+          "sha256": "55d5025f4a13a042cdd949bce90e01de6b8eda8a45f4c98c0f430022df2ec7c9",
+          "bytes": 41967
         },
         "fr10-workcell/native/dobot-cr10/combined-nominal.json": {
           "sha256": "681f3b3849bb93ec67e3718e1666c0717f0504a9b3553798d6f99df3c1d17cee",
           "bytes": 40005
         },
         "fr10-workcell/native/dobot-cr10/combined-nominal.xml": {
-          "sha256": "77c1503ee73389b20009bb5ef3dd58502d1035eb93c256c2f8a0d13ad70d1f82",
-          "bytes": 50624
+          "sha256": "86434c09e29156ea2dfcd9e518888e655cc13f22d94cca090f58b725341eb652",
+          "bytes": 42019
         },
         "fr10-workcell/native/dobot-cr10/combined-unreachable-rack-nominal.json": {
           "sha256": "06d5e4409927fafd0bcbcf74bb518b3ea8035e4f6e3a4f2ab07309bf49530036",
           "bytes": 40003
         },
         "fr10-workcell/native/dobot-cr10/combined-unreachable-rack-nominal.xml": {
-          "sha256": "eacf45b1e07f82b007157d9d294d3cd6fa3bbf4cad7b07093aa4b5cd02c22188",
-          "bytes": 50621
+          "sha256": "999f4e5acaacf60d0112729493b034f1eb2967644148f53cddc9825884afb549",
+          "bytes": 42016
         },
         "fr10-workcell/native/dobot-cr10/combined-unreachable.json": {
           "sha256": "2a693e4095562c11489e24db5fa6c57c684a0742b24b0d0ad1abf7512b1f7dcd",
           "bytes": 40247
         },
         "fr10-workcell/native/dobot-cr10/combined-unreachable.xml": {
-          "sha256": "a2e53a7acf3f5406c35a7e710454eec00e088049e030014d2cea6ba400e8ca25",
-          "bytes": 50653
+          "sha256": "3ddae0dc602175763e7352666152970bbd7a16c6f3e9440b94d7148cdd5dd1f6",
+          "bytes": 42048
         },
         "fr10-workcell/native/dobot-cr10/table-to-oven-blocked.json": {
           "sha256": "9f3a174260c95b454aa1b774e771af72378de4a7aeca1405bc65682c9728369e",
           "bytes": 38531
         },
         "fr10-workcell/native/dobot-cr10/table-to-oven-blocked.xml": {
-          "sha256": "1b2759fd933583f1cdb9c3f82ff786bad14a75780d7ba82fc44c7043a1113e75",
-          "bytes": 49844
+          "sha256": "22cdff7f9e8dbda881d63bef18849476152f71b1c0a8916ee2bc034bda5d1af3",
+          "bytes": 41239
         },
         "fr10-workcell/native/dobot-cr10/table-to-oven-closed-door.json": {
           "sha256": "415f0272dadc540c6aeff1c48333585c0e92cd92c46275b5839b0660840ac3ff",
           "bytes": 37957
         },
         "fr10-workcell/native/dobot-cr10/table-to-oven-closed-door.xml": {
-          "sha256": "b0ef004122c9420e867c77c6921f83b4475f034fdaa8515dc0c0143c48e7e9db",
-          "bytes": 49542
+          "sha256": "329a78a8061d170c4b06e1e4951f5ac64d61de8140df4aecc21d7cf852819b20",
+          "bytes": 40937
         },
         "fr10-workcell/native/dobot-cr10/table-to-oven-nominal.json": {
           "sha256": "b6d44a65ddd9a95809e847dcff62d16d3100983cd8ec5c0909a665a1ee5b671f",
           "bytes": 38052
         },
         "fr10-workcell/native/dobot-cr10/table-to-oven-nominal.xml": {
-          "sha256": "ef31f949b6d14ac95aa71525d4774b8aaaa93a780b1a41e14bc80e9a74a665fc",
-          "bytes": 49594
+          "sha256": "46b735da2846344072302642081d813835bc12c84d5904605b987a0168663157",
+          "bytes": 40989
         },
         "fr10-workcell/native/dobot-cr10/table-to-oven-unreachable.json": {
           "sha256": "f2cac599abdcca8b44b851c82550397ae91b83f7d37205bb52dfb3c2ad4d4505",
           "bytes": 38168
         },
         "fr10-workcell/native/dobot-cr10/table-to-oven-unreachable.xml": {
-          "sha256": "5dba731b17d4884745eb5736f6ecdc83bc5cb91d0264b5836f6d039a6b3865bf",
-          "bytes": 49623
+          "sha256": "a82f16a1951ff48077f813af5ef443e16b41f844cfcd2b92b7297fccfa92df9f",
+          "bytes": 41018
         },
         "fr10-workcell/native/dobot-cr10/table-to-rack-blocked.json": {
           "sha256": "69762f0d048855b5639925960a3d0bab41966204962f2746d39214d0b9eb8fbe",
           "bytes": 14378
         },
         "fr10-workcell/native/dobot-cr10/table-to-rack-blocked.xml": {
-          "sha256": "2ca5bcf66ad0cfdabc4eeede7147b40a58caa3b1463f967fecd74b183f2bc3d9",
-          "bytes": 20901
+          "sha256": "e6cdbf68ba3ec3ea6ba5bb054da2daf4a4daed1e29687c779d654d1669165bda",
+          "bytes": 20068
         },
         "fr10-workcell/native/dobot-cr10/table-to-rack-nominal.json": {
           "sha256": "d9cf56dd74d1b4c8f39e23814d72d09d7c0c979e9ee94ee3bc3dae2c37f8a29e",
           "bytes": 13976
         },
         "fr10-workcell/native/dobot-cr10/table-to-rack-nominal.xml": {
-          "sha256": "54db05d83343554a2a42aa6e31dcec713520a3051d7b37c54f7671fa8ed44418",
-          "bytes": 20689
+          "sha256": "daafbefee3fab57c4524cf7df6bf7353c872b52aebac081d8c56cf1c3531c767",
+          "bytes": 19856
         },
         "fr10-workcell/native/dobot-cr10/table-to-rack-unreachable.json": {
           "sha256": "2a61e70f79426926847bb9e2ec08fb6ab983de707a4fd39c5c256811918bbc57",
           "bytes": 13972
         },
         "fr10-workcell/native/dobot-cr10/table-to-rack-unreachable.xml": {
-          "sha256": "39658aa443a68e93ba1783fb61302d43f4e43c4f10f2c1da967614c0fcd3acf0",
-          "bytes": 20686
+          "sha256": "afcb9e9418d01d4c13ffdceca76716a2e2fcbd09471bb6e90dff66f9906727b3",
+          "bytes": 19853
         },
         "fr10-workcell/native/fairino-fr10/combined-blocked-rack-nominal.json": {
           "sha256": "6a399f5a5891a76f24478465f6c7f8c7b46bc7fd4f2d6d7aad00bf94be5824ee",
           "bytes": 40312
         },
         "fr10-workcell/native/fairino-fr10/combined-blocked-rack-nominal.xml": {
-          "sha256": "c09c5c0bd38b8018c9293a20e495abab38941b35a266f3674f4047423b7f0f84",
-          "bytes": 51192
+          "sha256": "3f7dcd1b609cb6e922c85fb83c0adfcd46c53cadd272361227343ddb5b40138c",
+          "bytes": 42587
         },
         "fr10-workcell/native/fairino-fr10/combined-blocked.json": {
           "sha256": "3cd329f2f81597904346ac39bc86b15492fb74473acbf7cf0dd3e1e15dd15d2d",
           "bytes": 40344
         },
         "fr10-workcell/native/fairino-fr10/combined-blocked.xml": {
-          "sha256": "f8f6f786399b0cc4571b6984e4ec00d49f74bc87f7d1ebe022033a8a763e8463",
-          "bytes": 51229
+          "sha256": "264eef7de6c675b9d5d345fbf128919564cca81caa0a90b5913c0b0e9b0b7f0d",
+          "bytes": 42624
         },
         "fr10-workcell/native/fairino-fr10/combined-closed-door.json": {
           "sha256": "75b7c9c7733175e0782347a4caffbc1881ccd625ce65cffc0197f39136f3c3b9",
           "bytes": 39814
         },
         "fr10-workcell/native/fairino-fr10/combined-closed-door.xml": {
-          "sha256": "6354c0790827e11d53a0ac61447000660d198d3d1f79e4a57c142895fe446a5c",
-          "bytes": 50927
+          "sha256": "bf7af5661b22723225a26ed29c012c9f2e90cd2bfff195fd192608e35d84d8bd",
+          "bytes": 42322
         },
         "fr10-workcell/native/fairino-fr10/combined-nominal.json": {
           "sha256": "9f1385056ede3e46d995424cc7f40beda5cd84253e5f94de323b84ee2fd990f8",
           "bytes": 39894
         },
         "fr10-workcell/native/fairino-fr10/combined-nominal.xml": {
-          "sha256": "4317e16a4715f55f9f4e5cded38f39bc7f228da77a67e18549d06f7e415d8e3f",
-          "bytes": 50979
+          "sha256": "7f639ec9be104a8ef5189497d014e86a54f940b8a8360c70d908d3689e3ba691",
+          "bytes": 42374
         },
         "fr10-workcell/native/fairino-fr10/combined-unreachable-rack-nominal.json": {
           "sha256": "01536354eddb14a0490af2f2e9a5ffd87acdba9990bdd995cb256d242f26a83d",
           "bytes": 39892
         },
         "fr10-workcell/native/fairino-fr10/combined-unreachable-rack-nominal.xml": {
-          "sha256": "4e83ed8f35c11262e5066721733d9230511cc5c855d22f2433ac005c8946cceb",
-          "bytes": 50976
+          "sha256": "9c5030fa269608f16fde340a851bd8b34c07f81f51e7d4163a599e43b166a4f7",
+          "bytes": 42371
         },
         "fr10-workcell/native/fairino-fr10/combined-unreachable.json": {
           "sha256": "ac5133e75ff8b7f094989bef02e4e851f4dab30585e1f679c1f54312aa95f3ec",
           "bytes": 40136
         },
         "fr10-workcell/native/fairino-fr10/combined-unreachable.xml": {
-          "sha256": "3ac992d41b459babbdc03756173e163dea9336e49470553becfb46b507c374c1",
-          "bytes": 51008
+          "sha256": "88ed812e5460bc8fc00a74372b8be8890608cdea180bb0883c06575a6581e73a",
+          "bytes": 42403
         },
         "fr10-workcell/native/fairino-fr10/pan-staging-blocked.json": {
           "sha256": "17f929ce10ae2f51f23cdce5fa3adf2dd2e98da62e6d448db47deac7d5a86771",
           "bytes": 27776
         },
         "fr10-workcell/native/fairino-fr10/pan-staging-blocked.xml": {
-          "sha256": "4d18545478016bb4931391bf68c8023256bf86a4843e044fe8db2dfceea127ad",
-          "bytes": 30142
+          "sha256": "1efe3f4c9aefb8c82cd0e48750f43de2d7bc6a5d224121b6acc4ba3290bf89ac",
+          "bytes": 29309
         },
         "fr10-workcell/native/fairino-fr10/pan-staging-nominal.json": {
           "sha256": "3a35a11a7f6034b63ead0376ce5faf9d7fabe6cd34946fe052b434d9d18d34f0",
           "bytes": 27374
         },
         "fr10-workcell/native/fairino-fr10/pan-staging-nominal.xml": {
-          "sha256": "2d5e61ca0b6f4c3aa85150ff370a3f893b81c61788fb2dbc6dd6bb655a2b9187",
-          "bytes": 29930
+          "sha256": "42704b730f2ee1258b2b4706961400c78670401c17037579e33840d783e033c4",
+          "bytes": 29097
         },
         "fr10-workcell/native/fairino-fr10/pan-staging-unreachable.json": {
           "sha256": "6efec9767bb220102a472e821fef01fb18757dca75f78fe0f4a06abc4efdc1da",
           "bytes": 27370
         },
         "fr10-workcell/native/fairino-fr10/pan-staging-unreachable.xml": {
-          "sha256": "d4276c369e6aae3db274e07da9ef87534d2c2a0186b343c93b357a252e65766d",
-          "bytes": 29927
+          "sha256": "cc28fade69c27f9aab4212b74e0bce6f33a642cc03be30e0a6ad365a8e237d68",
+          "bytes": 29094
         },
         "fr10-workcell/native/fairino-fr10/pour-over-station.json": {
           "sha256": "f0e82342b6691d69f4aade07bc27b9dff99c238a4325a1e1afab327dfc4262e3",
@@ -2786,492 +2786,492 @@
           "bytes": 38424
         },
         "fr10-workcell/native/fairino-fr10/table-to-oven-blocked.xml": {
-          "sha256": "b5c0d3ef5828795ca87b434784d28630840dee83f17045099b43c28525fa93fa",
-          "bytes": 50199
+          "sha256": "082f45b09269ed2edbf3667eee0e04822b0cb9f081e4306e0fcda813e99d6efc",
+          "bytes": 41594
         },
         "fr10-workcell/native/fairino-fr10/table-to-oven-closed-door.json": {
           "sha256": "99758b6d1e6a387edd3e6fc15dc19bd282a29e0e213a4322f463c9b20cdb4490",
           "bytes": 37850
         },
         "fr10-workcell/native/fairino-fr10/table-to-oven-closed-door.xml": {
-          "sha256": "9573bfdaab6ef3f28d55d01c1e84c3e70501aae4bca15aee1dbe4884a1c84157",
-          "bytes": 49897
+          "sha256": "d2c57fe1fd1ea1375a154ebc615954b2e224fcca9a8836334c80f03bb1c179d1",
+          "bytes": 41292
         },
         "fr10-workcell/native/fairino-fr10/table-to-oven-nominal.json": {
           "sha256": "b7a0fc43fdf46d4f64f395ad9948c84293588ff0fa1c28ce274ee1e45cadb2c3",
           "bytes": 37945
         },
         "fr10-workcell/native/fairino-fr10/table-to-oven-nominal.xml": {
-          "sha256": "6fa7b3ab0889a76e6081ec049a4946a23219c0d22809a031d95b45fe01585811",
-          "bytes": 49949
+          "sha256": "de7dae3685004bab189829a5ee752e5aec8669647d47572e86d5cb62137466c4",
+          "bytes": 41344
         },
         "fr10-workcell/native/fairino-fr10/table-to-oven-unreachable.json": {
           "sha256": "14879d0a8e6ad93a7f98032da81320c4df46b10209bf3d9174151295324cdb43",
           "bytes": 38061
         },
         "fr10-workcell/native/fairino-fr10/table-to-oven-unreachable.xml": {
-          "sha256": "257cce24e53f386d85541649dea4ce1cd147d406172129da9211fb49d0a157f7",
-          "bytes": 49978
+          "sha256": "e1c7483f1fd995ea66643081f0a57be70eed5038e4f504e077a3fe4f7f09e4bc",
+          "bytes": 41373
         },
         "fr10-workcell/native/fairino-fr10/table-to-rack-blocked.json": {
           "sha256": "68256998d38497b9fada2e104278176da944f74f8c3bccf9ae6604e2ce9ec515",
           "bytes": 14271
         },
         "fr10-workcell/native/fairino-fr10/table-to-rack-blocked.xml": {
-          "sha256": "0fa8f1d0aa51f3ca082aa13b64e61594b28ad6c53f10e48d129c80efa46d2d26",
-          "bytes": 21256
+          "sha256": "cf7a1e789d6db3021fad38912b8a41724f93326185ff75ff207524543e007c82",
+          "bytes": 20423
         },
         "fr10-workcell/native/fairino-fr10/table-to-rack-nominal.json": {
           "sha256": "fcf8d17db46a396911fc952f468886cda87ed2a5a175ae7b918963d725ac839e",
           "bytes": 13869
         },
         "fr10-workcell/native/fairino-fr10/table-to-rack-nominal.xml": {
-          "sha256": "3235d46338b45dd086fd5b43259b1ca9b90c7d4bcfef8328e25f38ce78903710",
-          "bytes": 21044
+          "sha256": "fe4fce412ad6ced7626bdb0e88ed611518c560610ddb2a4d6053f8faa630c601",
+          "bytes": 20211
         },
         "fr10-workcell/native/fairino-fr10/table-to-rack-unreachable.json": {
           "sha256": "102ab9d554b7e2a38414b1117ccc750334b6d799a365cc4b14509e1b2678a484",
           "bytes": 13865
         },
         "fr10-workcell/native/fairino-fr10/table-to-rack-unreachable.xml": {
-          "sha256": "e01a511a082263d5f02bae85e2d6c56139408bd3e5c3dd32b2b081b5feff0908",
-          "bytes": 21041
+          "sha256": "67ae5675c7a0b4054dde14d49e4b441e548afac320b69f35feccaa2e18a5f488",
+          "bytes": 20208
         },
         "fr10-workcell/native/fairino-fr5/combined-blocked-rack-nominal.json": {
           "sha256": "2c42864e15f2877ef1e4b91e82fdfbb8fa64a4c83450ca9e35d751ea0b06da62",
           "bytes": 40313
         },
         "fr10-workcell/native/fairino-fr5/combined-blocked-rack-nominal.xml": {
-          "sha256": "57b61433153b3e925c0ebca0b27987bbd464285ab97524860cc734fe942ef83c",
-          "bytes": 50855
+          "sha256": "fa139567f48ce1a477bb071b0e839e2e98747f37ab3bf3e18023a1240d141d02",
+          "bytes": 42250
         },
         "fr10-workcell/native/fairino-fr5/combined-blocked.json": {
           "sha256": "dd134cb28d14a479a7c7ae131241b90f572b156e6808e92ed95c64f26708facb",
           "bytes": 40345
         },
         "fr10-workcell/native/fairino-fr5/combined-blocked.xml": {
-          "sha256": "1f5841ee163e6666182b116641e78fefa6ffabbe97da29a5a1536fe5476e29e8",
-          "bytes": 50892
+          "sha256": "b9d2f516b8a4be8d15a6b15c22516c032ba86cbd9ea47dee453bece7939b209a",
+          "bytes": 42287
         },
         "fr10-workcell/native/fairino-fr5/combined-closed-door.json": {
           "sha256": "40ad9ab9bb7b73c77efdc49b1ef0435c12f25d0c28478cc0a2dc31e00350ea1a",
           "bytes": 39815
         },
         "fr10-workcell/native/fairino-fr5/combined-closed-door.xml": {
-          "sha256": "bf49bfb91dbe277ccaa427a45ebbc5b3493c4b3b2dcc5a97d766bcd8cf8f45ea",
-          "bytes": 50590
+          "sha256": "a28ae8df8057eff6767c759add7de6836ff5b58380babec7402f53f9f8a90424",
+          "bytes": 41985
         },
         "fr10-workcell/native/fairino-fr5/combined-nominal.json": {
           "sha256": "b01ad9d86777e52cf2d06381ee9b9d3f22fa19deb888968467b9a845855a56e8",
           "bytes": 39895
         },
         "fr10-workcell/native/fairino-fr5/combined-nominal.xml": {
-          "sha256": "b1cdabaf3e127d4ab517e3d23440b409da7d7ff9ec0896593468cd48aba8eab2",
-          "bytes": 50642
+          "sha256": "0afa0f04e2b813f0ac0acf7fef07143d38c00a438646daab5a627ff280e8ab22",
+          "bytes": 42037
         },
         "fr10-workcell/native/fairino-fr5/combined-unreachable-rack-nominal.json": {
           "sha256": "dca2aff4a6252be9dc5e28ca242e0e82b609f9ccba924aa267812a441fd4f254",
           "bytes": 39893
         },
         "fr10-workcell/native/fairino-fr5/combined-unreachable-rack-nominal.xml": {
-          "sha256": "c28a4386abcfc6c9c2e56078e465ce5785477a7e3898f8ec2f1f4af8b50a63f5",
-          "bytes": 50639
+          "sha256": "2cacdacad1f7f4bc9ed1b43ca093997bc047fb3ef7fbda0358a70ebf0f5b9d50",
+          "bytes": 42034
         },
         "fr10-workcell/native/fairino-fr5/combined-unreachable.json": {
           "sha256": "0ab6afe6f222bf742ea01c4c9d5cd90baf0bae5b6d30de00cd555f44414f9c86",
           "bytes": 40137
         },
         "fr10-workcell/native/fairino-fr5/combined-unreachable.xml": {
-          "sha256": "94ada948f97ac23f6531f07c7d2aacbb6e115a3020677192857ca55935f3ca16",
-          "bytes": 50671
+          "sha256": "ad50fd9561e66a547eb0d8f7334b66ebd33f8a0125fb0dec3ff8aef0f9e8ab09",
+          "bytes": 42066
         },
         "fr10-workcell/native/fairino-fr5/table-to-oven-blocked.json": {
           "sha256": "c1142eb0b05e677b47661c498c7e75279ea317bf8e64f312b9169c700ac604a0",
           "bytes": 38423
         },
         "fr10-workcell/native/fairino-fr5/table-to-oven-blocked.xml": {
-          "sha256": "ed4c9a4c2990730f850978477f45e5b41f96fca974c64a5948fa6e0b67d673bd",
-          "bytes": 49862
+          "sha256": "054d0000e1461459ddccab467da18ebdcc3a7a1bc8dbe590833270df5ea23493",
+          "bytes": 41257
         },
         "fr10-workcell/native/fairino-fr5/table-to-oven-closed-door.json": {
           "sha256": "f81f5e6752e08f368b9494ef095ce701d8fccaa7448464ec40e9beea18c9007b",
           "bytes": 37849
         },
         "fr10-workcell/native/fairino-fr5/table-to-oven-closed-door.xml": {
-          "sha256": "e12fc8a29383509b670e6be5496e2f93db2e75ef9072a45199c6eaccb958bc2b",
-          "bytes": 49560
+          "sha256": "24d082a8eedfcbc98fbdd221fd23cba8f2986a2ab408d2662f2172c12f6be52c",
+          "bytes": 40955
         },
         "fr10-workcell/native/fairino-fr5/table-to-oven-nominal.json": {
           "sha256": "76220fae4518c73eb49575ca73d1f0876a5d4b9b8bb7018a08c846e2a313ee33",
           "bytes": 37944
         },
         "fr10-workcell/native/fairino-fr5/table-to-oven-nominal.xml": {
-          "sha256": "6e60e6b2e527adfe298e91ea014ded454b9730a4845df705c0ad74c6dce099ce",
-          "bytes": 49612
+          "sha256": "59ff99d4b99c59c1707f74aefe234baad2b8d8db35223231e20e1dee601b31aa",
+          "bytes": 41007
         },
         "fr10-workcell/native/fairino-fr5/table-to-oven-unreachable.json": {
           "sha256": "33301052dc68188e0a2647d1ffcb1459ae9f9afbd08deaf731be24779a72e201",
           "bytes": 38060
         },
         "fr10-workcell/native/fairino-fr5/table-to-oven-unreachable.xml": {
-          "sha256": "340d84fddcc7ded7ac287a029aed8cb645b1402a1f015bde90c707ee1d485019",
-          "bytes": 49641
+          "sha256": "8c7cbaf433d63a6d36e591c7ecf8cdb5ca4ddb013b117ca2159f9fb49130edb9",
+          "bytes": 41036
         },
         "fr10-workcell/native/fairino-fr5/table-to-rack-blocked.json": {
           "sha256": "a79d9353ddc03304adac9f8efab835f21a22e20599fae213381b11bcc51b3bf7",
           "bytes": 14270
         },
         "fr10-workcell/native/fairino-fr5/table-to-rack-blocked.xml": {
-          "sha256": "b2ab039813b6db1aaa00c8f606977abeb40f2a44d566bb06734d5294ac53dbeb",
-          "bytes": 20919
+          "sha256": "b0d9bf8518ddd52156e520bb78c18bf61e87ca5f9c98da84b01a247de2b7e4ca",
+          "bytes": 20086
         },
         "fr10-workcell/native/fairino-fr5/table-to-rack-nominal.json": {
           "sha256": "d060333d112732f403ebd06fee28701895cb190cfbae5af141b79f667bde8787",
           "bytes": 13868
         },
         "fr10-workcell/native/fairino-fr5/table-to-rack-nominal.xml": {
-          "sha256": "520b0bf8af521332fb5ae374dc29af2e1709715347654d07a4bc7fcceac90e98",
-          "bytes": 20707
+          "sha256": "19f8d5374ec555c359564fa929aeb8b30fe5f54ee3fb0ee7919f2f55f1191062",
+          "bytes": 19874
         },
         "fr10-workcell/native/fairino-fr5/table-to-rack-unreachable.json": {
           "sha256": "344c939ee3a9d6e15f98fca7caf5a87af239a4b957dc9f1add707d53341b5a09",
           "bytes": 13864
         },
         "fr10-workcell/native/fairino-fr5/table-to-rack-unreachable.xml": {
-          "sha256": "e58e3ff4a11cd9a3ef811e22abf7f57897d8a3b977ec7cdcfb7a5a8675de48fc",
-          "bytes": 20704
+          "sha256": "a0f46ee920712d766cdbfafb3e7d2d786dcb29ff4e4f671544d6e91225df9936",
+          "bytes": 19871
         },
         "fr10-workcell/native/fanuc-crx10ial/combined-blocked-rack-nominal.json": {
           "sha256": "450e660284fa89d46c27eab776b6ae60330b22b95f76af7d32755848e6eda2d5",
           "bytes": 40474
         },
         "fr10-workcell/native/fanuc-crx10ial/combined-blocked-rack-nominal.xml": {
-          "sha256": "ac1c3f420ce4df540be9a8314a44eb8a0569d6070f90e8d019a20e9245163d2f",
-          "bytes": 50988
+          "sha256": "27d28505dd02cc284518fe529e4b56d9f1199dd01f13c099f313da6d4d2ce109",
+          "bytes": 42383
         },
         "fr10-workcell/native/fanuc-crx10ial/combined-blocked.json": {
           "sha256": "cf92c9554f9dabf083789d703a9f9ce1620861dc0d43f6abfc112c819ce4ab96",
           "bytes": 40506
         },
         "fr10-workcell/native/fanuc-crx10ial/combined-blocked.xml": {
-          "sha256": "3b9613cb3a169bf4b6474bb44cf7f09a4b665a4c8599f518cf82e76257b4ca6e",
-          "bytes": 51025
+          "sha256": "ab7e16b650c87cb613c50c8523f042c1aa9d5d059408336062f46aeda6df2d73",
+          "bytes": 42420
         },
         "fr10-workcell/native/fanuc-crx10ial/combined-closed-door.json": {
           "sha256": "fa27e4c2f617ef230ac1025925735279e992b1d051b22e37b460ed1b4a835b4f",
           "bytes": 39976
         },
         "fr10-workcell/native/fanuc-crx10ial/combined-closed-door.xml": {
-          "sha256": "746980c8d758d57554ca483f23dd295cae92d00936deb42dad1f49b5f592fbc9",
-          "bytes": 50723
+          "sha256": "782605d6372b3589995e5cf47f812884e898264d52cdd8d20b29dd22a04b21ff",
+          "bytes": 42118
         },
         "fr10-workcell/native/fanuc-crx10ial/combined-nominal.json": {
           "sha256": "ed260c2b5b741a1f6d136165bdfa1c1823696dab3bd0e4e7ee7fa6a008a4d140",
           "bytes": 40056
         },
         "fr10-workcell/native/fanuc-crx10ial/combined-nominal.xml": {
-          "sha256": "92666818f90317b8ff54a3ec9a3b9e833e8cd166621236bdc4e85a420f11faab",
-          "bytes": 50775
+          "sha256": "9c52a8cbf4f881aa65b6ce86003ade84b7758ab68390f41e00fc55d250ad2441",
+          "bytes": 42170
         },
         "fr10-workcell/native/fanuc-crx10ial/combined-unreachable-rack-nominal.json": {
           "sha256": "30f09cf4f26f1ebc40fe7885932d2ab098f360a582ebf9df57856012acab918e",
           "bytes": 40054
         },
         "fr10-workcell/native/fanuc-crx10ial/combined-unreachable-rack-nominal.xml": {
-          "sha256": "b1918bc069ca8266152057e35412e0bb76a95353e9f23980be12992825e4276d",
-          "bytes": 50772
+          "sha256": "c77827168bb43bb619e12b383d6067ee543bab597d5e9d4e3dd8dca16dc2d915",
+          "bytes": 42167
         },
         "fr10-workcell/native/fanuc-crx10ial/combined-unreachable.json": {
           "sha256": "3ce85fafcc7e2f217684a298fbf14812120b7750af8fb28c76352d7271fd4135",
           "bytes": 40298
         },
         "fr10-workcell/native/fanuc-crx10ial/combined-unreachable.xml": {
-          "sha256": "74602140e5803b5c43584df90d5819ad33f69c46164a1606e17d46985be1d38f",
-          "bytes": 50804
+          "sha256": "8479d6e6354b6824267458cef2352d9433b9c0f5b9509081b7bdf038660e690b",
+          "bytes": 42199
         },
         "fr10-workcell/native/fanuc-crx10ial/table-to-oven-blocked.json": {
           "sha256": "8ee5d0bbeaca3290fd610c4ea7bb74769ff16065311501fad2b9c520b2b8c92a",
           "bytes": 38584
         },
         "fr10-workcell/native/fanuc-crx10ial/table-to-oven-blocked.xml": {
-          "sha256": "307bf991838d5226c34163f3fee24958e72b2fb9ea96e1673b53766f62262b6a",
-          "bytes": 49995
+          "sha256": "d99717c7c8158e14d7e78d345bb62ff3040d355ab487f7ed2a7744045744b8d9",
+          "bytes": 41390
         },
         "fr10-workcell/native/fanuc-crx10ial/table-to-oven-closed-door.json": {
           "sha256": "9149873fef1638e889da5abcc5e5e3702a19f2a0a78a642d2207c99551b7bff8",
           "bytes": 38010
         },
         "fr10-workcell/native/fanuc-crx10ial/table-to-oven-closed-door.xml": {
-          "sha256": "dcadaca8a66a3417586082670262ce582f90e065b8ad8c6db9131cad9a9e3e22",
-          "bytes": 49693
+          "sha256": "8cc3103758850660014b0ba4846117341eeee8e525fae9d1532bb909bf60015b",
+          "bytes": 41088
         },
         "fr10-workcell/native/fanuc-crx10ial/table-to-oven-nominal.json": {
           "sha256": "65310e4014132b384e030fed0cda989d61d4992d018994c04a940bea92d24196",
           "bytes": 38105
         },
         "fr10-workcell/native/fanuc-crx10ial/table-to-oven-nominal.xml": {
-          "sha256": "18ee5d71f2d2cd7add3d7cd108bb344152183b11a2eab6aa1bb3983b9969cdc6",
-          "bytes": 49745
+          "sha256": "f48b0b48a113900ffa47afa06effa7d0568cc8f4d43e9a0dcbb70deb3b811348",
+          "bytes": 41140
         },
         "fr10-workcell/native/fanuc-crx10ial/table-to-oven-unreachable.json": {
           "sha256": "07ac9d1c7787cfc96ddc9e2a42272ed05723afdb01d7a724c86df5399ab0451d",
           "bytes": 38221
         },
         "fr10-workcell/native/fanuc-crx10ial/table-to-oven-unreachable.xml": {
-          "sha256": "b890983bf031bd7ea27b153d32873ac1e81ad511f7713b897fd0c0cfa782adc4",
-          "bytes": 49774
+          "sha256": "26473edb586255998cca900afb6e10d47e059c5bdb78352902ab64c59e1174d1",
+          "bytes": 41169
         },
         "fr10-workcell/native/fanuc-crx10ial/table-to-rack-blocked.json": {
           "sha256": "4d66a14edd3522e10576898ac0234298dabc2c815359fd0b669f2bedee7ac758",
           "bytes": 14431
         },
         "fr10-workcell/native/fanuc-crx10ial/table-to-rack-blocked.xml": {
-          "sha256": "89ab754dc423a5da72c0e819a622b06be5203c5e1ac81717fdcf44c641cbe646",
-          "bytes": 21027
+          "sha256": "6242c143698dfba215d5db5f5c25972989cd4a7598375373388ff5e98fbddc75",
+          "bytes": 20194
         },
         "fr10-workcell/native/fanuc-crx10ial/table-to-rack-nominal.json": {
           "sha256": "85daaae1589ea7594a79475383037f65c78f4b16c8d6bd09f9e45c2ff36ecf53",
           "bytes": 14029
         },
         "fr10-workcell/native/fanuc-crx10ial/table-to-rack-nominal.xml": {
-          "sha256": "7e712e2b634f783f0f94dd972e263c08461aba35c91acc36b33084dcc613410f",
-          "bytes": 20815
+          "sha256": "4aa833edf8559a7227ee9a28a988a134a42cbca814f8963c6d948dc0bfef1d24",
+          "bytes": 19982
         },
         "fr10-workcell/native/fanuc-crx10ial/table-to-rack-unreachable.json": {
           "sha256": "c89d236858412ceb4102f620874916d1584b8f393dc3ccedfe9e83b096cbf785",
           "bytes": 14025
         },
         "fr10-workcell/native/fanuc-crx10ial/table-to-rack-unreachable.xml": {
-          "sha256": "d97abacb19efeb405382fdf9d86f611fd5884215f0dcc76621ea9add5a8fb843",
-          "bytes": 20812
+          "sha256": "35fb189c6c55daabcbce57e36534b5e261d2f91840c40adf04cab19ed96928fd",
+          "bytes": 19979
         },
         "fr10-workcell/native/ufactory-xarm6/combined-blocked-rack-nominal.json": {
           "sha256": "704945f3d6655ebaabd8688b1bd48d757215ca00829c2167a0a1482734a119d8",
           "bytes": 40311
         },
         "fr10-workcell/native/ufactory-xarm6/combined-blocked-rack-nominal.xml": {
-          "sha256": "8fc9eb520cb42c3293ed230ff3d883e2405681ff96ddbcbfb4dcdac79b5f4ca1",
-          "bytes": 50764
+          "sha256": "e404508103ab0d96dcd49745d15b0832472917bec3fba86727166a2d10a8e7a2",
+          "bytes": 42159
         },
         "fr10-workcell/native/ufactory-xarm6/combined-blocked.json": {
           "sha256": "55e0470017f9cb5a2c620603f30abf3facc4203a1c59c685c0284e1edf73fcaa",
           "bytes": 40343
         },
         "fr10-workcell/native/ufactory-xarm6/combined-blocked.xml": {
-          "sha256": "9f882630668aca22b7aa0294f8e6eed837b54e43e11bb081cb54c794ec0819d4",
-          "bytes": 50801
+          "sha256": "9ad2df926878b2e455fb21ab37d86b27aa6e94c0ede816aae035b37b7cb22d11",
+          "bytes": 42196
         },
         "fr10-workcell/native/ufactory-xarm6/combined-closed-door.json": {
           "sha256": "bc20f973f2522f7eaa37026d28028b04f968eabf4362ba2509fbf681efddafaa",
           "bytes": 39813
         },
         "fr10-workcell/native/ufactory-xarm6/combined-closed-door.xml": {
-          "sha256": "6057fe4c531959499598145feb11809483d23f493c2c5e6d7b82af14345d39b5",
-          "bytes": 50499
+          "sha256": "c765aa16e755c56e898ebbe80e3148d07ea68473e17c3eb15dc134568ad4dc4d",
+          "bytes": 41894
         },
         "fr10-workcell/native/ufactory-xarm6/combined-nominal.json": {
           "sha256": "0a6f9b03b3d18cf83c2e3482e4be36a8ab78648acade8191a0972e0b8a9d2659",
           "bytes": 39893
         },
         "fr10-workcell/native/ufactory-xarm6/combined-nominal.xml": {
-          "sha256": "3bfbe6c26f538ff4c923536c985b368ab6e1c9ea2adb698b0c728942d3177e55",
-          "bytes": 50551
+          "sha256": "b11279745934ac43d8689b7acf89cf0b37be891d72db23b9aca57acae7da1cea",
+          "bytes": 41946
         },
         "fr10-workcell/native/ufactory-xarm6/combined-unreachable-rack-nominal.json": {
           "sha256": "adab3c4f200a7caaaf662bfe8df4b13c41e24fdfb1b6c0778d26ed7f4b38fe5b",
           "bytes": 39891
         },
         "fr10-workcell/native/ufactory-xarm6/combined-unreachable-rack-nominal.xml": {
-          "sha256": "0816acb49ba33591f527ce49c4f5548927bb3fe049808f31a14dbbead050e227",
-          "bytes": 50548
+          "sha256": "232ee13e31a0aa68fbb22135db4c91736127e2a8200e910860835ff6235786ee",
+          "bytes": 41943
         },
         "fr10-workcell/native/ufactory-xarm6/combined-unreachable.json": {
           "sha256": "c441e32e63d9cde733e66800dbdab01cfa1bc07d2e326799317d1af758a3f9d6",
           "bytes": 40135
         },
         "fr10-workcell/native/ufactory-xarm6/combined-unreachable.xml": {
-          "sha256": "623d2c84515e26d65ef23e456feb025fee054f5b186e7a78b2524b1b3a4af4ff",
-          "bytes": 50580
+          "sha256": "b302eaa329a60ef567926c467660d4be343eb268242a6e4c811201f55e31d29d",
+          "bytes": 41975
         },
         "fr10-workcell/native/ufactory-xarm6/table-to-oven-blocked.json": {
           "sha256": "6e752096016f199785f550092fc70b8bf3c2efebf0b9fc47848dc1cf2ab32096",
           "bytes": 38418
         },
         "fr10-workcell/native/ufactory-xarm6/table-to-oven-blocked.xml": {
-          "sha256": "5b1573f0c8d4b4bf0711ad346e823c2969f465e30e9db68ca620a6e8930f5691",
-          "bytes": 49771
+          "sha256": "6aef64f67f248efa098dc52c6a4ea256795f27d047ca806b480307bb166211cd",
+          "bytes": 41166
         },
         "fr10-workcell/native/ufactory-xarm6/table-to-oven-closed-door.json": {
           "sha256": "30d91a85d9f3d929442d9fad81035d0b51a75a869bd154fd9fad8f5cf216eebe",
           "bytes": 37844
         },
         "fr10-workcell/native/ufactory-xarm6/table-to-oven-closed-door.xml": {
-          "sha256": "8a519141f03248b04b5b160dabddb3884092623999988d37c84b8cd08b0bc52c",
-          "bytes": 49469
+          "sha256": "139b214c60b0174d9c1da515ab9e4ce33f483400aa521e3b9dfc445af9313bba",
+          "bytes": 40864
         },
         "fr10-workcell/native/ufactory-xarm6/table-to-oven-nominal.json": {
           "sha256": "4993edac7d1f551242e745b6cdc04195f235b58f46bfcb5f5da0b153468e6bbe",
           "bytes": 37939
         },
         "fr10-workcell/native/ufactory-xarm6/table-to-oven-nominal.xml": {
-          "sha256": "d547254e4dde50792bfb7e26a31df11a9fc39c334fe3b55be20fac80f0269195",
-          "bytes": 49521
+          "sha256": "7393daba43b0c43890b8e890e6bfc86de310cf6c0f58c4b4307d546522374d7a",
+          "bytes": 40916
         },
         "fr10-workcell/native/ufactory-xarm6/table-to-oven-unreachable.json": {
           "sha256": "897f0b00de3a09900db821c13a7433bde5df6f2427a446307a1ffcbc94c9bb14",
           "bytes": 38055
         },
         "fr10-workcell/native/ufactory-xarm6/table-to-oven-unreachable.xml": {
-          "sha256": "8c5c749b9202691c975132d6af3e7944d98f9d9a704b85105f8fdc5bbbc553d2",
-          "bytes": 49550
+          "sha256": "eecb00920a231bb7bb491c6a691d132885cee317327026707c1dec05eb29abfe",
+          "bytes": 40945
         },
         "fr10-workcell/native/ufactory-xarm6/table-to-rack-blocked.json": {
           "sha256": "8fa7d17b0eabe1889a797ba11befd253a65a2f3dc6f59f1d203fdb30bc832541",
           "bytes": 14265
         },
         "fr10-workcell/native/ufactory-xarm6/table-to-rack-blocked.xml": {
-          "sha256": "bc837043f1cd7b3e6e9a7b8566a4f3a85dde555c26955c1896cb9c517df6eb29",
-          "bytes": 20828
+          "sha256": "0fb9b9d1ca1698b13e5298028e9a7094cef4c76207786f12871c0102002a8c14",
+          "bytes": 19995
         },
         "fr10-workcell/native/ufactory-xarm6/table-to-rack-nominal.json": {
           "sha256": "cec32904aca3c4bcdc16f054f927540dfff1dba4e8d00a52a4a7eae8d54973c6",
           "bytes": 13863
         },
         "fr10-workcell/native/ufactory-xarm6/table-to-rack-nominal.xml": {
-          "sha256": "6e172698d277ab19b84243d77917e853436d3a42b71001de07d83c33fa10ba36",
-          "bytes": 20616
+          "sha256": "d0c327b6b1459c3c9d34cf0e012ea3b2aa22ef31b90b50d97de701bae34a8258",
+          "bytes": 19783
         },
         "fr10-workcell/native/ufactory-xarm6/table-to-rack-unreachable.json": {
           "sha256": "cd179b2fcb75adff878892989e618046d584da240aeee802e2dcac3ebe897f1e",
           "bytes": 13859
         },
         "fr10-workcell/native/ufactory-xarm6/table-to-rack-unreachable.xml": {
-          "sha256": "0bcf6b47447b5cda656283c9c826e2b92992d39aa0451fd6bb9c1ff7559b4044",
-          "bytes": 20613
+          "sha256": "6f55bfc4dca4cb34bac4258853c69b152b6bde39550afb26adbb461d747ffd8c",
+          "bytes": 19780
         },
         "fr10-workcell/native/universal-robots-ur5e/combined-blocked-rack-nominal.json": {
           "sha256": "526f0221b572d87c39994192522b59b5e5c7a29c939da5c2b37ea701c0e5b9ee",
           "bytes": 43832
         },
         "fr10-workcell/native/universal-robots-ur5e/combined-blocked-rack-nominal.xml": {
-          "sha256": "c5031acf8d9c12c7576c32cd9b2c15b7cd33859db64c4babeb700c028e704b21",
-          "bytes": 55107
+          "sha256": "80dda9b05abccdd8397885e626366ba087eee993ac128e98582193f10f434c32",
+          "bytes": 46502
         },
         "fr10-workcell/native/universal-robots-ur5e/combined-blocked.json": {
           "sha256": "a88f9402a9aaa366eb09fe9c61041286a5e6e98d0f354b4957239b653cf3b4db",
           "bytes": 43892
         },
         "fr10-workcell/native/universal-robots-ur5e/combined-blocked.xml": {
-          "sha256": "0c6821858cc396efaf2b752268af6f2059b9e59ab19821b419575db055d7eaf2",
-          "bytes": 55144
+          "sha256": "f9bcca268ce4a0000636e85eea852c0e5c0e1b5fbd6969df910f5e675a5a85dc",
+          "bytes": 46539
         },
         "fr10-workcell/native/universal-robots-ur5e/combined-closed-door.json": {
           "sha256": "62da9257df59aaaefdf74f5bf26b2c797cb79485706fed79092dbf9e77bab2e6",
           "bytes": 43353
         },
         "fr10-workcell/native/universal-robots-ur5e/combined-closed-door.xml": {
-          "sha256": "50396ca48c2fef98b3f4355ff20ede6d4a5384638312aa5bf57f6afa8eb3b30f",
-          "bytes": 54842
+          "sha256": "9cced5d8203610e75030f0097bb78fb25e22f5a56e842a79a8757a94fae8662d",
+          "bytes": 46237
         },
         "fr10-workcell/native/universal-robots-ur5e/combined-nominal.json": {
           "sha256": "6ca02816b1ee4a0342c67d45a69fe7542af03c73f74bccbc9e1058cf0c45d95f",
           "bytes": 43428
         },
         "fr10-workcell/native/universal-robots-ur5e/combined-nominal.xml": {
-          "sha256": "215400e0ff9ebb8e6484a06db52a6a64480750ae111adfd0229f54d94973eecb",
-          "bytes": 54894
+          "sha256": "eb703aecaf96be0401a4f9d755e9b759cc6fb969d585f0f6150c2d2a49958bc4",
+          "bytes": 46289
         },
         "fr10-workcell/native/universal-robots-ur5e/combined-unreachable-rack-nominal.json": {
           "sha256": "ca9355f0739fdd7bf78afe371c57d388f5f579fdb6d27921eae641ed334a63cd",
           "bytes": 43400
         },
         "fr10-workcell/native/universal-robots-ur5e/combined-unreachable-rack-nominal.xml": {
-          "sha256": "25545eef129c35b8b4913b5784c814cec14d5b386ae2da9cc35419233772040b",
-          "bytes": 54892
+          "sha256": "e9da5d75e0dcf0eb2ec8c8600d59251d5d725fe04c0cd2470fccb0eed886f04a",
+          "bytes": 46287
         },
         "fr10-workcell/native/universal-robots-ur5e/combined-unreachable.json": {
           "sha256": "852b0fbb4a8fdf17b0f6d01677034b1142e6dab1b93ad1818bb141029fb5ce0b",
           "bytes": 43714
         },
         "fr10-workcell/native/universal-robots-ur5e/combined-unreachable.xml": {
-          "sha256": "b19f78297c9a93f2a53856890e7928fc2a9403917139e69ba3f9d89bd7dc407d",
-          "bytes": 54923
+          "sha256": "63eb6c7ce3d4b56dcb2441452b8e5718ed05c9d17f613f6508159c7196b64031",
+          "bytes": 46318
         },
         "fr10-workcell/native/universal-robots-ur5e/table-to-oven-blocked.json": {
           "sha256": "ef5364243cf2ceb9804ad29e3f2f32c0bf36cf4e67341634e8eab43d0e183167",
           "bytes": 41585
         },
         "fr10-workcell/native/universal-robots-ur5e/table-to-oven-blocked.xml": {
-          "sha256": "995e40f25da2d4a518e449d74e9d66aa84f19a9c2d08bf27624e5720db4dd8f5",
-          "bytes": 54055
+          "sha256": "f4b3186df3a4e5f7d396893a3e8d7dd50ee3117aecb1892a01b69049023a2d96",
+          "bytes": 45450
         },
         "fr10-workcell/native/universal-robots-ur5e/table-to-oven-closed-door.json": {
           "sha256": "98775de13d2ddc4662e74ee7a9286f717db51743d114bcbbfdbf2af0291ffe4e",
           "bytes": 41011
         },
         "fr10-workcell/native/universal-robots-ur5e/table-to-oven-closed-door.xml": {
-          "sha256": "7cb6f1b3f92a270de6f9841dbdfb89aa41e82224fc1dc9e6c817d18f602fac56",
-          "bytes": 53753
+          "sha256": "039dc0aa11fc9dd70793ab5729487cf84cb5f86db671f7f82e17fe5c7fb95fff",
+          "bytes": 45148
         },
         "fr10-workcell/native/universal-robots-ur5e/table-to-oven-nominal.json": {
           "sha256": "2e29019b5578a5323ad287ca95405450068fe8c07e95af1e011ce8e03cfe4bdb",
           "bytes": 41106
         },
         "fr10-workcell/native/universal-robots-ur5e/table-to-oven-nominal.xml": {
-          "sha256": "c6ab87576aeb45aff17c0999dd574639a514ef04c4354fbfed5da574ecdbf179",
-          "bytes": 53805
+          "sha256": "b647a98aaa72d59b9e337f46d0046166b4b8040aaaf450fe8dc2b28e1983f466",
+          "bytes": 45200
         },
         "fr10-workcell/native/universal-robots-ur5e/table-to-oven-unreachable.json": {
           "sha256": "3eda4a135460377a26c7d1eba4b406f7b69fcc4de25f47535364ec60dcbcf8e7",
           "bytes": 41222
         },
         "fr10-workcell/native/universal-robots-ur5e/table-to-oven-unreachable.xml": {
-          "sha256": "a6b694213516ef4e26f3960b9973f81c66a82240b874f2ee84033407eb6e6b1e",
-          "bytes": 53834
+          "sha256": "a28f6812449797db28e7fed338851fcef8ae49416969d07d8a204a7160bc23e7",
+          "bytes": 45229
         },
         "fr10-workcell/native/universal-robots-ur5e/table-to-rack-blocked.json": {
           "sha256": "b25786113e3b32f9b8ec85fff41b8e8e4d17275d6fad6531ac9a98187ade6566",
           "bytes": 17432
         },
         "fr10-workcell/native/universal-robots-ur5e/table-to-rack-blocked.xml": {
-          "sha256": "60fbc079c1027e4cbef05a90815b5e0066bf173b9a651865b79ffba523623f28",
-          "bytes": 25112
+          "sha256": "0135ac354d8c9c212b39868a566cade1db39799e003d1192594a7412437cad48",
+          "bytes": 24279
         },
         "fr10-workcell/native/universal-robots-ur5e/table-to-rack-nominal.json": {
           "sha256": "eff5458ceb8b2b0f59852a53c231762d74e000a0a69fdfd8c32826514084b65a",
           "bytes": 17030
         },
         "fr10-workcell/native/universal-robots-ur5e/table-to-rack-nominal.xml": {
-          "sha256": "e75a77700f38f0e5c6910c7ded66cc4c8cf3eadbb16b1b069fcf761249c27679",
-          "bytes": 24900
+          "sha256": "3e072d34a63c731014a5021611e896353efe2036cbded87572a66646c694670a",
+          "bytes": 24067
         },
         "fr10-workcell/native/universal-robots-ur5e/table-to-rack-unreachable.json": {
           "sha256": "2266f3b040dd0ec51682d5e9278fb862223b6979a63661c82816d078c2bfef09",
           "bytes": 17026
         },
         "fr10-workcell/native/universal-robots-ur5e/table-to-rack-unreachable.xml": {
-          "sha256": "0619cdb0fae55e2c5dcaf08e2bbd11f104af582680acc78cca528e69fbf35888",
-          "bytes": 24897
+          "sha256": "ac5caad2fb9525ec850a9f36e96d5039ecf277d465747f18809e5e4c8be9a48d",
+          "bytes": 24064
         },
         "fr10-workcell/rack.png": {
           "sha256": "0f81229f4d6a10c6f6b6beae110898a86c4bde62f8e45d5463bc526fdede4c5a",
           "bytes": 227697
         },
         "fr10-workcell/recordings/nominal.json": {
-          "sha256": "adafe6b63917d45b30d40c8233775e1cf8e374ab637375b37facec78de252f6d",
-          "bytes": 537745
+          "sha256": "72a4d9eed9ca37d6613e9f2cac3c4afbbcecc16e40f6fdbc3641f94c660090fe",
+          "bytes": 537437
         },
         "fr10-workcell/recordings/oven-cycle.json": {
-          "sha256": "17bd82679e2dc5767e356b06c035494d37ebad0c09de2992e7b0d089c67a46d1",
-          "bytes": 1454572
+          "sha256": "0577d1291e7153b62b724f19970301afbad023328e3834766e1ad953052aec81",
+          "bytes": 1454565
         },
         "fr10-workcell/recordings/oven-loading.json": {
-          "sha256": "81efc38b152429bc962ba593296d0acf25a6ce5ab10867a27772477de60fb829",
-          "bytes": 714259
+          "sha256": "70714011b30107958250c84454f41b2e67eff089c0ed69f842f9aecd3e4d0806",
+          "bytes": 714716
         },
         "fr10-workcell/recordings/oven-rack-cycle.json": {
-          "sha256": "ca10b11659363efc974c146524d4ad6f34d93218110b4415a0cc60e3be4bdfe4",
-          "bytes": 2011581
+          "sha256": "a8dffa8be5da593044755058f50a57bbc43ccbf755bfef35ad82869f6bbabc3e",
+          "bytes": 2011756
         },
         "fr10-workcell/source.png": {
           "sha256": "6b6efcd1e731504f6347305c3207f55840c990efbf353ffa41e0760d2f4d5275",
@@ -6193,6 +6193,10 @@
           "sha256": "2fb6f2202b71dcb9df1b3eb07e3e5915c7d7f4acf86318713b7eedad48da0511",
           "bytes": 75538
         },
+        "maruzen-mbco-4me/model.xml": {
+          "sha256": "5016972aa534f63d6c9f8752f9df83bffad6f3f77cf4d1077cfbb968f0da38fb",
+          "bytes": 10741
+        },
         "maruzen-mbco-4me/native.xml": {
           "sha256": "cdfb69322eb1fa08cc387f74cbfea8b61c143cb5876e083571221ef0c0dabac7",
           "bytes": 8572
@@ -6224,6 +6228,10 @@
         "maruzen-mbco-4me/studio-right.png": {
           "sha256": "96b920dde8e3484be4179d318afb262c0730d51024b75af0db1ed5b142334c64",
           "bytes": 1796214
+        },
+        "maruzen-mbco-4me/tray_model.xml": {
+          "sha256": "bfece5fc05debee0c42f976e7388bbae01bafb780705cd4947d1408cf3231eae",
+          "bytes": 1736
         },
         "maruzen-mbco-4me/visual_assets.xml": {
           "sha256": "5fea63b13eabb8ba91e04a60138c4bdec23970f722cc8faa2239ebb537461b1f",
@@ -6434,8 +6442,8 @@
           "bytes": 56784
         },
         "maruzen-mbco-5e/oven.xml": {
-          "sha256": "83ce87add4eaf8a960b2814a27369bbad8784b810cfb76f2100cd025c922132e",
-          "bytes": 8661
+          "sha256": "41a8f2d4fda74a171a16dd6b88fcb4268cd12f94ae94a9f4cdd44a80b040e297",
+          "bytes": 13397
         },
         "maruzen-mbco-5e/preview-closed.png": {
           "sha256": "607f412c65d69739de3cc8c1d210453e04463aca35020b4ebb32625d82bd4932",
@@ -6474,8 +6482,8 @@
           "bytes": 2727211
         },
         "maruzen-mbco-5e/tray.xml": {
-          "sha256": "c6decdb97c5e1d524e4cbae9deff27eb3ac2fd2cbe15d749fced5512346c3817",
-          "bytes": 977
+          "sha256": "7591761b5ad15a25486d8f4c0ea4799a4ba97597f4449550c452c44047ffee9c",
+          "bytes": 1234
         },
         "maruzen-mbco-5e/visual_assets.xml": {
           "sha256": "9f9ee47cb8b8206daa262e331ee77d0771e9105db0b8d97c91e8fc10ebc6dfee",
@@ -10910,8 +10918,8 @@
           "bytes": 7685
         },
         "dobot-cr10/robot.xml": {
-          "sha256": "1af4ba0d636713269cb2ec7d47842d8f47b6722489ed6615af31bb38264c768e",
-          "bytes": 8631
+          "sha256": "0ca0dfbc58d87db8dbf9943c9b1bfb7bb216829b99bd3069643585e0e94d0e3e",
+          "bytes": 9688
         },
         "dobot-cr10/scene.xml": {
           "sha256": "90f723fb27350ca2527641e6b3b7fdcc5cd28f17bf642b8262d590651dbb3ac2",
@@ -10942,8 +10950,8 @@
           "bytes": 8269
         },
         "fairino-fr10/robot.xml": {
-          "sha256": "bdac396754559954e6d851525c5c83fc7e2fdd7ee8b07736639e107d9f9edbb7",
-          "bytes": 8922
+          "sha256": "bdf81eedc4aa92bdb79daf230d475efca5314fe2c611a21922d3a4fa2fb8455b",
+          "bytes": 9959
         },
         "fairino-fr10/scene.xml": {
           "sha256": "46af468ad78e4a8ae1fd0838db9f56f1c977b56abd65a1bd902c243bead50804",
@@ -10974,8 +10982,8 @@
           "bytes": 8225
         },
         "fairino-fr5/robot.xml": {
-          "sha256": "cd70b31753fceccbb43d7a0fa046de9474939e9261ce1ede0e25bf463dda5435",
-          "bytes": 8611
+          "sha256": "0ca632b81896cabbe6c5731f79aa6b54653d04159c76a3f9038c9891f99abfd4",
+          "bytes": 9648
         },
         "fairino-fr5/scene.xml": {
           "sha256": "c18c07ed6a170f7ab89404acfa222d59e3602e3203c26b01032dbe02a6e6ca5f",
@@ -11126,8 +11134,8 @@
           "bytes": 8314
         },
         "fanuc-crx10ial/robot.xml": {
-          "sha256": "57b2476fb9f5ef02b23dfdfdb6403604f599f329e496c025a5ed4184a796d813",
-          "bytes": 11112
+          "sha256": "44f3755061b2763aba86e926d91930e62b6bdbe9b93c0211b7105151df00402d",
+          "bytes": 12285
         },
         "fanuc-crx10ial/scene.xml": {
           "sha256": "aff36a1189c3d55a75fe8fb136ac06c8b31c086c96db03a7e7961d6729149b58",
@@ -11170,8 +11178,8 @@
           "bytes": 7234
         },
         "ufactory-xarm6/robot.xml": {
-          "sha256": "467449424428bb321215e520ca435f40340c76f912114919a1174a8461224457",
-          "bytes": 8539
+          "sha256": "4dc7b60008b724e27bda5a1d4eace0e91d286b53b70694abb5086fa00166fa36",
+          "bytes": 9576
         },
         "ufactory-xarm6/scene.xml": {
           "sha256": "869cd7a5b4b70c10959f94dba6ff7f0192370ca429a6edb41547558c77898278",
@@ -11338,8 +11346,8 @@
           "bytes": 8690
         },
         "universal-robots-ur5e/robot.xml": {
-          "sha256": "140f3c31864767996b9eeec1bf8f3b1807e6c4ba77e4f37d42a25228cb46256f",
-          "bytes": 15024
+          "sha256": "70935ce3977ab9c70c005341419f78d930eecff3fb924c7bbad6a84170ea2238",
+          "bytes": 16309
         },
         "universal-robots-ur5e/scene.xml": {
           "sha256": "6910d2d84f51c4c586790d98390eb72b3b9838fcb103309cdc4cac98fc468efd",

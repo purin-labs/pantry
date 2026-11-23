@@ -31,7 +31,7 @@ const UR5E_CHART = [
 // docs/evidence/refactor-16/ci-ur5e-mass-check.md and, for the nine appliance
 // entries that Refactor 16 step 9 added, docs/evidence/refactor-16/step-9.md.
 const ASSESSED_ASSETS_SHA256: string =
-  "09a0c0e1682605b327c5066a344bcdb6f94585925ce1e3a10a393abde602d90b";
+  "dcb8a05fb073b60f107adf296b6dc1995534221ddbd2c05ce401df95374aff96";
 
 const fixed = tooling.bodies.tool;
 const jaw = tooling.bodies.jaw;

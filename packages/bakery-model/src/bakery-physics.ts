@@ -142,7 +142,7 @@ export type PhysicsLayout =
   | Readonly<{ kind: "rack-translation"; xMm: number; yMm: number }>;
 
 export const PHYSICS_ASSETS_SHA256 =
-  "ab67e21d7e659c18cc038aa38d9c88d2e24fe74e2cc8a274f1cdfb0c721f499d";
+  "dcb8a05fb073b60f107adf296b6dc1995534221ddbd2c05ce401df95374aff96";
 
 export function parsePhysicsLayout(value: unknown): PhysicsLayout {
   const raw = object(value);

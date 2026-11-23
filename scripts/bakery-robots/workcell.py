@@ -36,6 +36,25 @@ def destination_site(task: BakeryTask) -> str:
     raise ValueError(f"Unknown task: {task}")
 
 
+def _apply_legacy_fork_contact_defaults(spec: mujoco.MjSpec) -> None:
+    """Keep legacy fork-clamp cells on the verified MBCO-5E steel/tray contact model.
+
+    Standalone `maruzen-mbco-5e` uses stiffer `condim=4` / `solref=0.004` defaults
+    for 10-scenario appliance audits, while the legacy fork-clamp workcells
+    are calibrated to MuJoCo default compliance (`solref=0.02`, `solimp=0.9 0.95`,
+    `condim=3`, `friction=0.4 0.005 0.0001`).
+    """
+    spec.default.geom.condim = 3
+    spec.default.geom.friction = [0.4, 0.005, 0.0001]
+    spec.default.geom.solref = [0.02, 1.0]
+    spec.default.geom.solimp = [0.9, 0.95, 0.001, 0.5, 2.0]
+    for geom in spec.geoms:
+        geom.condim = 3
+        geom.friction = [0.4, 0.005, 0.0001]
+        geom.solref = [0.02, 1.0]
+        geom.solimp = [0.9, 0.95, 0.001, 0.5, 2.0]
+
+
 def add_oven(
     cell: mujoco.MjSpec, closed: bool, combined: bool, robot_spec: RobotSpec
 ) -> None:
@@ -43,6 +62,7 @@ def add_oven(
     if combined and robot_spec.slug == "universal-robots-ur5e":
         x, y = 1.35, 0.35
     oven = mujoco.MjSpec.from_file(str(TRAY.parent / "oven.xml"))
+    _apply_legacy_fork_contact_defaults(oven)
     oven.default.name = "oven_defaults"
     for sensor in list(oven.sensors):
         oven.delete(sensor)
@@ -163,6 +183,7 @@ def compose_cell(
     cell.attach(gripper, site=cell.site("cell_nominal_flange"), prefix="")
 
     tray = mujoco.MjSpec.from_file(str(TRAY))
+    _apply_legacy_fork_contact_defaults(tray)
     tray.default.name = "tray_defaults"
     tray.body("mbco_tray").add_geom(
         name="cold_contents",
