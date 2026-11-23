@@ -151,13 +151,13 @@ export function InboxAgentSheet(props: Props): React.ReactNode {
             />
             <Choice
               title="Agent drafts"
-              detail="The agent prepares each reply. A person approves it before it is sent."
+              detail="The agent prepares each reply. A person approves it before it is sent. A reply to a linked supplier contact can go at once."
               selected={emailMode === "draft"}
               onSelect={() => setEmailMode("draft")}
             />
             <Choice
               title="Agent answers"
-              detail="Not available for email. Each email reply waits for approval."
+              detail="Not available for email."
               selected={false}
               disabled={true}
               onSelect={() => undefined}
