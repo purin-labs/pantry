@@ -413,7 +413,7 @@ drawer. It shares the theme tokens.
 - On Home, the link to the approvals section changes only the address hash. No code
   scrolls to `#operations-title`, and the section is absent in the setup state.
 - Old names remain on the `/ecommerce` page, the approval toast and the Billing and Jev
-  payment text. The sign-in note still says "Platform project".
+  payment text.
 
 ## Sources
 

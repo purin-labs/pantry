@@ -115,7 +115,7 @@ export function SignIn(): React.ReactNode {
           </a>
         </div>
         <p className="signin-access-note">
-          Sign in to select a Platform project or create one. If you have an
+          Sign in to open your organisation or create one. If you have an
           invitation, use the invited Google account.
         </p>
       </section>
