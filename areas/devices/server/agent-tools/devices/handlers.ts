@@ -79,7 +79,7 @@ export function readDevicesForEmbeddedHarness(
           work: device.work,
           needsAttention: device.needsAttention,
         })),
-        // Atelier names each Mac, and the engine ids come from the catalogue, so a
+        // Pantry names each Mac, and the engine ids come from the catalogue, so a
         // row holds no text that the Mac wrote.
         shopMacs: macs.map(({ view, engineChoice }) => ({
           macId: view.deviceId,

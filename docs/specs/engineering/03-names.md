@@ -303,7 +303,6 @@ exported `PurinMark` and `PurinIcon`.
   `pantry.bakeryos.vitrineCustomOrders.v1`.
 - The root package name `seams-pantry`.
 - A comment in `surface-observation.ts` says that the wire values keep old names.
-- A comment in `areas/devices/server/agent-tools/devices/handlers.ts` has an old name.
 
 **The commerce engine in Portal text:** `areas/organisation/ui/pages/automation.tsx` and
 `areas/commerce/ui/features/commerce/production-plan.tsx` show these words to people.
