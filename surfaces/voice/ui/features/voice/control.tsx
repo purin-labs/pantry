@@ -46,6 +46,7 @@ import {
 } from "@purin-labs/control/portal/control-client";
 import { voiceCountsToday, voiceHeardLastDays } from "./counts";
 import { WAKE_PHRASE } from "./wake-phrase";
+import { VoiceWave, voiceWaveState } from "./wave";
 import {
   chosenMicrophone,
   voiceControlIsOn,
@@ -184,6 +185,7 @@ export function VoiceControl(props: Props): React.ReactNode {
   }, [blockedByPolicy]);
 
   const text = statusText(status);
+  const wave = voiceWaveState(status);
   return (
     <>
       {status.kind === "needs_tap" ? (
@@ -221,7 +223,11 @@ export function VoiceControl(props: Props): React.ReactNode {
         title={toggleLabel(status)}
         onClick={() => setOpen(true)}
       >
-        <Mic aria-hidden="true" size={17} />
+        {wave !== null ? (
+          <VoiceWave state={wave} level={session.level} />
+        ) : (
+          <Mic aria-hidden="true" size={17} />
+        )}
       </button>
       {/* The composer is a form, and its rules and submit reach all inside it. */}
       {createPortal(

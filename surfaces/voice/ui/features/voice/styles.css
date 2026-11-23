@@ -43,6 +43,105 @@
 .voice-status[data-state="capturing"] {
   color: var(--pantry-accent-text);
 }
+/* The mic button carries the wave on a tint of the accent while it listens.
+   The circle may clip the tips of the outer bars. */
+.chat-composer .voice-toggle:has(.voice-wave) {
+  overflow: hidden;
+  background: color-mix(in oklab, var(--pantry-accent) 14%, var(--surface));
+}
+.chat-composer .voice-toggle:has(.voice-wave[data-state="hearing"]) {
+  background: color-mix(in oklab, var(--pantry-accent) 26%, var(--surface));
+}
+
+/* wave.tsx: five bars. Only their scale changes, so the compositor draws the
+   CSS motion; the live level writes the same scale from one frame callback. */
+.voice-wave {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 2.5px;
+  height: 26px;
+  color: var(--pantry-accent);
+}
+.voice-wave > span {
+  width: 3px;
+  height: 100%;
+  border-radius: var(--pantry-radius-pill);
+  background: currentcolor;
+  scale: 1 0.25;
+  transition: scale var(--motion-quick);
+}
+/* The microphone's level sets each frame: a transition would only lag it. */
+.voice-wave[data-live] > span {
+  transition: none;
+}
+/* A lens shape: the middle bar reaches highest. Each bar keeps its own pace. */
+.voice-wave > span:nth-child(1) {
+  --voice-wave-index: 0;
+  --voice-wave-peak: 0.55;
+  --voice-wave-pace: 470ms;
+}
+.voice-wave > span:nth-child(2) {
+  --voice-wave-index: 1;
+  --voice-wave-peak: 0.85;
+  --voice-wave-pace: 360ms;
+}
+.voice-wave > span:nth-child(3) {
+  --voice-wave-index: 2;
+  --voice-wave-peak: 1;
+  --voice-wave-pace: 520ms;
+}
+.voice-wave > span:nth-child(4) {
+  --voice-wave-index: 3;
+  --voice-wave-peak: 0.75;
+  --voice-wave-pace: 410ms;
+}
+.voice-wave > span:nth-child(5) {
+  --voice-wave-index: 4;
+  --voice-wave-peak: 0.5;
+  --voice-wave-pace: 580ms;
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* Waiting for the wake phrase: a slow ripple from left to right. */
+  .voice-wave[data-state="listening"] > span {
+    animation: voice-wave-ripple 1.8s ease-in-out infinite;
+    animation-delay: calc(var(--voice-wave-index) * 150ms);
+  }
+  /* Hearing a command with no level to follow: each bar rises and falls at
+     its own pace. */
+  .voice-wave[data-state="hearing"]:not([data-live]) > span {
+    animation: voice-wave-speak var(--voice-wave-pace) ease-in-out infinite
+      alternate;
+  }
+  /* Transcribing: one pulse crosses the bars, as the light crosses the edge. */
+  .voice-wave[data-state="transcribing"] > span {
+    animation: voice-wave-pulse 1s ease-in-out infinite;
+    animation-delay: calc(var(--voice-wave-index) * 90ms);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .voice-wave[data-state="hearing"] > span {
+    scale: 1 var(--voice-wave-peak);
+  }
+}
+@keyframes voice-wave-ripple {
+  50% {
+    scale: 1 calc(0.25 + var(--voice-wave-peak) * 0.35);
+  }
+}
+@keyframes voice-wave-speak {
+  to {
+    scale: 1 var(--voice-wave-peak);
+  }
+}
+@keyframes voice-wave-pulse {
+  30% {
+    scale: 1 0.65;
+  }
+  60% {
+    scale: 1 0.25;
+  }
+}
 .voice-cloud {
   padding: 1px 6px;
   border: 1px solid currentColor;

@@ -46,6 +46,32 @@ export async function connectVoiceMicrophone(
   return capture;
 }
 
+/** Quiet room and near voice, in dBFS: the ends of the meter's 0 to 1. */
+const METER_FLOOR_DB = -50;
+const METER_TOP_DB = -12;
+
+/**
+ * The microphone's loudness now, from 0 to 1, for the wave while a command is
+ * heard. It reads the last 32 ms on this device and keeps nothing.
+ */
+export function voiceLevelMeter(
+  audio: AudioContext,
+  stream: MediaStream,
+): () => number {
+  const analyser = audio.createAnalyser();
+  analyser.fftSize = 512;
+  audio.createMediaStreamSource(stream).connect(analyser);
+  const samples = new Float32Array(analyser.fftSize);
+  return () => {
+    analyser.getFloatTimeDomainData(samples);
+    let sum = 0;
+    for (const sample of samples) sum += sample * sample;
+    const decibels = 20 * Math.log10(Math.sqrt(sum / samples.length) + 1e-9);
+    const level = (decibels - METER_FLOOR_DB) / (METER_TOP_DB - METER_FLOOR_DB);
+    return Math.min(1, Math.max(0, level));
+  };
+}
+
 export function newVoiceWorker(): Worker {
   return new Worker(new URL("./wake-worker.ts", import.meta.url), {
     type: "module",

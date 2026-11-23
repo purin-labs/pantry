@@ -161,6 +161,16 @@ function previewSession(): Readonly<{
       return () => listeners.delete(listener);
     },
     status: () => status,
+    // A voice in syllables, louder and quieter about four times a second.
+    level: () => {
+      const seconds = performance.now() / 1000;
+      return Math.max(
+        0,
+        0.55 +
+          0.35 * Math.sin(seconds * 8.1) * Math.sin(seconds * 2.3) +
+          0.1 * Math.sin(seconds * 21),
+      );
+    },
     resume: async () => undefined,
     unlockSpeech: () => undefined,
     close: () => undefined,
