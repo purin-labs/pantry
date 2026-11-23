@@ -142,7 +142,14 @@ outside the engine. A `gmo_stera` collection runs through the Platform `DeviceFl
 - A terminal assignment binds one Pantry location to one terminal target at one Square
   location. It is `active` or `retired` (`replaced`, `revoked`, `connection_removed`).
   One location has at most one active assignment. A new assignment retires the old one
-  in the same batch. A payment attempt keeps its own binding, so it stays recoverable.
+  in the same batch. A Square payment attempt keeps its own binding, so it stays
+  recoverable after a retirement. The record of a `gmo_stera` capture or decline on the
+  sale reads the active assignment, so an operator cannot retire a `lan_gateway_device`
+  counter while its last collection is unresolved: the terminal still collects, its
+  result is unknown, or the sale does not record the result yet. The refusal
+  (`terminal_collection_unresolved`, 409) tells the operator to finish or cancel the
+  collection first. When Pantry cannot read the collection, the refusal is
+  `terminal_collection_unverifiable` (503).
 
 | Target               | Environment   | How Pantry makes it                                                                                                                                                                                                                                      |
 | -------------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -237,7 +244,7 @@ The control routes are under `/v1/control/organisations/:id/commerce`:
 | `POST /terminal-operations`                                                                                      | Admin         | Assign a Sandbox test device (development only)                                                     |
 | `POST /terminal-operations/pairings`, `GET …/pairings/:deviceCodeId`, `POST …/pairings/:deviceCodeId/activation` | Admin         | Start, read and complete a Terminal pairing (production only)                                       |
 | `POST /terminal-operations/square-pos-app`                                                                       | Admin         | Assign the Square Point of Sale app (production only)                                               |
-| `POST /terminal-operations/:pantryLocationId/retirement`                                                         | Operator      | Retire the assignment of a counter                                                                  |
+| `POST /terminal-operations/:pantryLocationId/retirement`                                                         | Operator      | Retire the assignment of a counter, after its last LAN collection is resolved                       |
 | `GET /payments`, `GET /failed-payments`, `GET /bank-payouts`                                                     | Operator      | The payment reads                                                                                   |
 
 Each profile and terminal mutation has an `Idempotency-Key`, and its receipt is in the

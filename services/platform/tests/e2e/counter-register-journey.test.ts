@@ -38,7 +38,7 @@ it(
 );
 
 it(
-  "collects FeliCa over GMO stera LAN gateway via DeviceFleetActor, enforces terminal exclusivity and result_unknown lock across socket drop/reconnect, and settles manual cash refund",
+  "collects FeliCa over GMO stera LAN gateway via DeviceFleetActor, enforces terminal exclusivity and result_unknown lock across socket drop/reconnect, refuses to retire the counter until the sale records the payment, and settles manual cash refund",
   { timeout: 180_000 },
   gmoSteraLanGatewayEndToEndJourney,
 );
@@ -80,7 +80,9 @@ async function operatorCashAndRbacJourney(): Promise<void> {
     staff.session,
     "GET",
   );
-  expect(registerResponse.status, JSON.stringify(registerResponse.body)).toBe(200);
+  expect(registerResponse.status, JSON.stringify(registerResponse.body)).toBe(
+    200,
+  );
   const register = extractRegister(registerResponse.body);
   expect(register.pantryLocationId).toBe(locationId);
   expect(register.policy?.cashEnabled).toBe(true);
@@ -292,7 +294,9 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
   const steraDevice = found("stera_lan_1", "Counter stera", {
     kind: "payment_terminal",
     model: "stera terminal",
-    capabilities: [{ id: "collect_payment", label: "Collect payment", revision: 1 }],
+    capabilities: [
+      { id: "collect_payment", label: "Collect payment", revision: 1 },
+    ],
   });
   const gateway1 = await connectGateway(credential);
   await helloAndWait(gateway1, [steraDevice]);
@@ -325,7 +329,9 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
     state: { kind: "active" },
   });
   if (!parsedAssignment.ok) {
-    throw new Error(`Invalid assignment: ${JSON.stringify(parsedAssignment.error)}`);
+    throw new Error(
+      `Invalid assignment: ${JSON.stringify(parsedAssignment.error)}`,
+    );
   }
   const saved = await activateTerminalAssignment({
     db: organisationDatabase(organisationId),
@@ -337,7 +343,8 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
 
   // Verify Register snapshot exposes the gmo_stera LAN terminal.
   const register = extractRegister(
-    (await send(`${base}/commerce/counter-register`, staff.session, "GET")).body,
+    (await send(`${base}/commerce/counter-register`, staff.session, "GET"))
+      .body,
   );
   expect(register.terminal).toMatchObject({
     assigned: true,
@@ -351,16 +358,26 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
 
   // 3. Operator opens Sale #1 and dispatches a FeliCa payment to the LAN gateway.
   const checkout1 = `chk_stera_1_${crypto.randomUUID().slice(0, 8)}`;
-  const open1 = await send(`${base}/commerce/counter-sales`, staff.session, "POST", {
-    pantryLocationId: locationId,
-    checkoutId: checkout1,
-    tenderMode: "terminal",
-    lines: [menuLine("l1", COOKIE_ENTRY, [], 1)],
-  });
+  const open1 = await send(
+    `${base}/commerce/counter-sales`,
+    staff.session,
+    "POST",
+    {
+      pantryLocationId: locationId,
+      checkoutId: checkout1,
+      tenderMode: "terminal",
+      lines: [menuLine("l1", COOKIE_ENTRY, [], 1)],
+    },
+  );
   expect(open1.status, JSON.stringify(open1.body)).toBe(200);
   const sale1 = parseCounterSaleEnvelope(
-    (await send(`${base}/commerce/counter-sales/${checkout1}`, staff.session, "GET"))
-      .body,
+    (
+      await send(
+        `${base}/commerce/counter-sales/${checkout1}`,
+        staff.session,
+        "GET",
+      )
+    ).body,
   );
   const quote1 = sale1.quote!;
 
@@ -393,6 +410,19 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
     currency: "JPY",
   });
 
+  // The operator cannot retire the counter while the terminal collects.
+  const retirement = `${base}/commerce/terminal-operations/${encodeURIComponent(locationId)}/retirement`;
+  const retiredWhileCollecting = await send(
+    retirement,
+    staff.session,
+    "POST",
+    {},
+  );
+  expect(retiredWhileCollecting.status).toBe(409);
+  expect(retiredWhileCollecting.body).toMatchObject({
+    error: "terminal_collection_unresolved",
+  });
+
   // 4. Exclusivity: second concurrent sale on the same terminal is refused with 409 terminal_busy!
   const checkout2 = `chk_stera_2_${crypto.randomUUID().slice(0, 8)}`;
   await send(`${base}/commerce/counter-sales`, staff.session, "POST", {
@@ -402,8 +432,13 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
     lines: [menuLine("l2", COOKIE_ENTRY, [], 1)],
   });
   const sale2 = parseCounterSaleEnvelope(
-    (await send(`${base}/commerce/counter-sales/${checkout2}`, staff.session, "GET"))
-      .body,
+    (
+      await send(
+        `${base}/commerce/counter-sales/${checkout2}`,
+        staff.session,
+        "GET",
+      )
+    ).body,
   );
   const busyRes = await send(
     `${base}/commerce/counter-sales/${checkout2}/collection`,
@@ -445,8 +480,13 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
     lines: [menuLine("l3", COOKIE_ENTRY, [], 1)],
   });
   const sale3 = parseCounterSaleEnvelope(
-    (await send(`${base}/commerce/counter-sales/${checkout3}`, staff.session, "GET"))
-      .body,
+    (
+      await send(
+        `${base}/commerce/counter-sales/${checkout3}`,
+        staff.session,
+        "GET",
+      )
+    ).body,
   );
   const lockedRes = await send(
     `${base}/commerce/counter-sales/${checkout3}/collection`,
@@ -477,10 +517,23 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
     reasonCode: null,
   });
 
+  // The terminal captured the card, but the sale does not record the payment
+  // yet: the counter still cannot be retired.
+  const retiredBeforeRecord = await send(retirement, staff.session, "POST", {});
+  expect(retiredBeforeRecord.status).toBe(409);
+  expect(retiredBeforeRecord.body).toMatchObject({
+    error: "terminal_collection_unresolved",
+  });
+
   // Give DeviceFleetActor a moment to persist terminal_result, then operator reconciles sale #1.
   let reconciledSale = parseCounterSaleEnvelope(
-    (await send(`${base}/commerce/counter-sales/${checkout1}`, staff.session, "GET"))
-      .body,
+    (
+      await send(
+        `${base}/commerce/counter-sales/${checkout1}`,
+        staff.session,
+        "GET",
+      )
+    ).body,
   );
   await expect
     .poll(async () => {
@@ -532,6 +585,16 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
   );
   const refundedSale = parseCounterSaleEnvelope(ownerManualRefund.body);
   expect(refundedSale.afterSale?.refundState).toBe("completed");
+
+  // 8. The sale records the payment, so the operator retires the counter, and
+  // the Register shows no terminal.
+  const retired = await send(retirement, staff.session, "POST", {});
+  expect(retired.status, JSON.stringify(retired.body)).toBe(200);
+  const afterRetirement = extractRegister(
+    (await send(`${base}/commerce/counter-register`, staff.session, "GET"))
+      .body,
+  );
+  expect(afterRetirement.terminal).toMatchObject({ assigned: false });
 
   await gateway2.close();
 }

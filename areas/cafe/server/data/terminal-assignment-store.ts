@@ -165,8 +165,9 @@ export async function activateTerminalAssignment(
 /**
  * Retire a location's assignment without replacing it.
  *
- * The location stops taking card-present payments; unresolved collections keep
- * their own revision and stay recoverable.
+ * The location stops taking card-present payments. A Square attempt keeps its
+ * own binding and stays recoverable. A LAN collection needs the active
+ * assignment, so `retireCounterTerminal` refuses while one is unresolved.
  */
 export async function retireTerminalAssignment(
   input: Readonly<{

@@ -79,7 +79,12 @@ export type CounterRegisterDeps = Readonly<{
 
 export type CounterRegisterFailure =
   | Readonly<{ kind: "commerce"; error: CommerceClientError }>
-  | Readonly<{ kind: "error"; code: string; status: number; extra?: Record<string, unknown> }>;
+  | Readonly<{
+      kind: "error";
+      code: string;
+      status: number;
+      extra?: Record<string, unknown>;
+    }>;
 
 export type CounterRegisterResult<T> =
   | Readonly<{ ok: true; value: T }>
@@ -97,7 +102,9 @@ function fail(
   return { ok: false, failure: { kind: "error", code, status, extra } };
 }
 
-function commerceFail(error: CommerceClientError): CounterRegisterResult<never> {
+function commerceFail(
+  error: CommerceClientError,
+): CounterRegisterResult<never> {
   return { ok: false, failure: { kind: "commerce", error } };
 }
 
@@ -127,10 +134,16 @@ export async function loadCounterRegisterSnapshot(
   if (!marks.ok) return commerceFail(marks.error);
   if (!queue.ok) return commerceFail(queue.error);
 
-  const locationId = resolveRegisterLocationId(stock.value, requestedLocationId);
+  const locationId = resolveRegisterLocationId(
+    stock.value,
+    requestedLocationId,
+  );
   const posConfig =
     locationId.length > 0
-      ? await deps.client.readPointOfSaleConfiguration(deps.merchantId, locationId)
+      ? await deps.client.readPointOfSaleConfiguration(
+          deps.merchantId,
+          locationId,
+        )
       : null;
 
   let policy: CounterRegisterPolicy | null = null;
@@ -151,7 +164,9 @@ export async function loadCounterRegisterSnapshot(
               }
             : { kind: "none", basisPoints: 0, inclusion: "included" },
       };
-    } else if (!(posConfig.error.kind === "http" && posConfig.error.status === 404)) {
+    } else if (!(
+      posConfig.error.kind === "http" && posConfig.error.status === 404
+    )) {
       return commerceFail(posConfig.error);
     }
   }
@@ -383,8 +398,7 @@ export async function collectCounterSalePayment(
       expiresAt: collected.value.session.expiresAt,
     });
     if (!dispatched.ok) {
-      const status =
-        dispatched.reason === "gateway_offline" ? 503 : 409;
+      const status = dispatched.reason === "gateway_offline" ? 503 : 409;
       return fail(dispatched.reason, status, {
         activeAttemptId: dispatched.active?.paymentAttemptId ?? null,
       });
@@ -407,8 +421,15 @@ export async function reconcileCounterSale(
       ? fail("counter_sale_not_found", 404)
       : commerceFail(current.error);
   }
-  if (current.value.paymentAttempt?.binding.paymentBinding.provider === "gmo_stera") {
-    return reconcileGatewayTerminalSale(deps, current.value, input.idempotencyKey);
+  if (
+    current.value.paymentAttempt?.binding.paymentBinding.provider ===
+    "gmo_stera"
+  ) {
+    return reconcileGatewayTerminalSale(
+      deps,
+      current.value,
+      input.idempotencyKey,
+    );
   }
   const reconciled = await deps.client.reconcileCounterSalePayment(
     deps.merchantId,
@@ -440,7 +461,10 @@ export async function recordCounterSaleHandoffResult(
   const recorded = await deps.client.recordCounterSaleHandoffResult(
     deps.merchantId,
     input.checkoutId,
-    { schemaVersion: "commerce.counter-sale-handoff-result.v1", ...input.result },
+    {
+      schemaVersion: "commerce.counter-sale-handoff-result.v1",
+      ...input.result,
+    },
   );
   if (!recorded.ok) {
     if (recorded.error.kind === "http" && recorded.error.status === 404)
@@ -489,20 +513,22 @@ export async function cancelCounterSaleCollection(
       await stub.cancelTerminalCollection({
         gatewayId: assignment.value.target.gatewayId,
         sourceKey: assignment.value.target.deviceSourceKey,
-        requestId: existingRecord?.requestId ?? `cancel_${input.idempotencyKey}`,
+        requestId:
+          existingRecord?.requestId ?? `cancel_${input.idempotencyKey}`,
         paymentAttemptId: attempt.paymentAttemptId,
       });
     }
-    return reconcileGatewayTerminalSale(deps, current.value, input.idempotencyKey);
+    return reconcileGatewayTerminalSale(
+      deps,
+      current.value,
+      input.idempotencyKey,
+    );
   }
   return reconcileCounterSale(deps, input);
 }
 
 export type CounterSaleAfterSaleAction =
-  | "ready"
-  | "handover"
-  | "refund"
-  | "manual_cash_refund";
+  "ready" | "handover" | "refund" | "manual_cash_refund";
 
 export async function executeCounterSaleAfterSale(
   deps: CounterRegisterDeps,
@@ -549,10 +575,22 @@ export async function executeCounterSaleAfterSale(
       });
       break;
     case "refund":
-      mutated = await refundCounterSale(deps, placed.value, input.idempotencyKey, false, input.reason);
+      mutated = await refundCounterSale(
+        deps,
+        placed.value,
+        input.idempotencyKey,
+        false,
+        input.reason,
+      );
       break;
     case "manual_cash_refund":
-      mutated = await refundCounterSale(deps, placed.value, input.idempotencyKey, true, input.reason);
+      mutated = await refundCounterSale(
+        deps,
+        placed.value,
+        input.idempotencyKey,
+        true,
+        input.reason,
+      );
       break;
     default:
       return assertNever(input.action);
@@ -639,13 +677,15 @@ async function reconcileGatewayTerminalSale(
         paymentAttemptId: attempt.paymentAttemptId,
         paymentAttemptRevision: attempt.revision,
         providerPaymentReference:
-          record.providerPaymentReference ?? `stera_${attempt.paymentAttemptId}`,
+          record.providerPaymentReference ??
+          `stera_${attempt.paymentAttemptId}`,
         capturedAt: new Date(record.updatedAt).toISOString(),
         paymentMethod: record.paymentMethod,
         ...(record.tenderBrand === null
           ? {}
           : { tenderBrand: record.tenderBrand }),
-        providerRefundable: record.providerRefundable ?? record.paymentMethod !== "felica",
+        providerRefundable:
+          record.providerRefundable ?? record.paymentMethod !== "felica",
       });
       if (!captured.ok) return commerceFail(captured.error);
     }
@@ -778,7 +818,13 @@ async function resolvePlacedCounterSale(
   ) {
     return fail("counter_sale_after_sale_not_found", 409);
   }
-  return ok({ sale: sale.value, snapshot: snapshot.value, order, payment, fulfillment });
+  return ok({
+    sale: sale.value,
+    snapshot: snapshot.value,
+    order,
+    payment,
+    fulfillment,
+  });
 }
 
 async function refundCounterSale(
@@ -931,7 +977,8 @@ function buildRegisterMenu(
   const menu =
     stock.foodService.resources.menus.find(
       (candidate) =>
-        candidate.menuId === menuId && candidate.lifecycle.state === "published",
+        candidate.menuId === menuId &&
+        candidate.lifecycle.state === "published",
     ) ??
     stock.foodService.resources.menus.find(
       (candidate) => candidate.lifecycle.state === "published",
@@ -990,8 +1037,7 @@ function buildRegisterMenu(
         currency: offer.price.currency,
       },
       soldOutUntil,
-      available:
-        soldOutUntil === null && offer.lifecycle.state === "listed",
+      available: soldOutUntil === null && offer.lifecycle.state === "listed",
       modifierGroups,
     };
     const bucket = entriesBySection.get(entry.sectionId) ?? [];
@@ -1066,4 +1112,25 @@ function emptyTerminal(blockedReason: string): CounterRegisterTerminal {
     blockedReason,
     supportedMethods: [],
   };
+}
+
+/**
+ * True when the sale records the end of a terminal collection: the payment
+ * for a capture, the decline for a decline or a cancel.
+ */
+export function counterSaleRecordsCollection(
+  sale: CommerceCounterSaleV1,
+  record: Readonly<{
+    state: "captured" | "declined" | "cancelled";
+    paymentAttemptId: string;
+  }>,
+): boolean {
+  if (record.state === "captured")
+    return sale.checkout.lifecycle.state === "accepted";
+  const attempt = sale.paymentAttempt;
+  return (
+    attempt === null ||
+    attempt.paymentAttemptId !== record.paymentAttemptId ||
+    attempt.lifecycle.state === "declined"
+  );
 }

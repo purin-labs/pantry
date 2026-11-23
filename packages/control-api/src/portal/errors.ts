@@ -69,6 +69,8 @@ export type ControlErrorKind =
   | "supplier_payout_read_unavailable"
   | "slack_channel_taken"
   | "slack_channel_connection_inactive"
+  | "terminal_collection_unresolved"
+  | "terminal_collection_unverifiable"
   | "unknown";
 
 type ControlApiProblem = {
@@ -252,6 +254,9 @@ function controlErrorKind(code: string | null): ControlErrorKind {
       return "slack_channel_taken";
     case "slack_channel_destination_inactive":
       return "slack_channel_connection_inactive";
+    case "terminal_collection_unresolved":
+    case "terminal_collection_unverifiable":
+      return code;
     default:
       // A refusal for access that no prompt resolved still says so, rather
       // than asking the person to try again.
@@ -400,6 +405,10 @@ function controlErrorMessage(kind: ControlErrorKind): string {
       return "Another Purin Pantry workspace already posts in this channel. Choose another channel, or remove it from that workspace first.";
     case "slack_channel_connection_inactive":
       return "This Slack workspace is not connected. Connect it again, then add the channel.";
+    case "terminal_collection_unresolved":
+      return "This counter has a card collection that is not finished. Finish or cancel the collection on the Register, then retire the counter.";
+    case "terminal_collection_unverifiable":
+      return "Pantry could not read the last card collection of this counter. Try again in a minute.";
     case "unknown":
       return "Pantry could not complete this request. Try again.";
     default:
