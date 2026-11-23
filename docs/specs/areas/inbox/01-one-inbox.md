@@ -389,7 +389,10 @@ in `registry.ts`. The capabilities are in
   An email check looks for the Message-ID in Gmail. A WhatsApp `send_indeterminate`
   pauses the number, and a person states if the message went (`resolve`).
 - **When the daily WhatsApp budget ends,** the number pauses with `daily_token_budget`,
-  and the operator gets one notice. A `resume` or a new policy starts it again.
+  and the operator gets one notice for that day. The turn of the Case waits for the end
+  of the UTC day. Then the pause ends by itself (`endWhatsAppBudgetPause`), and the
+  waiting turns run. A `resume` starts it sooner. A paused number wakes for no turn, and
+  only the budget pause wakes at its end.
 - **When the agent's turns fail,** the Case tries again after 60 s. After 3 attempts it
   stops, and the operator gets one notice, `turn_attempts_exhausted`, that says the
   agent could not answer. The next customer message starts new attempts.

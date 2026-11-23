@@ -163,7 +163,7 @@ function renderOperatorNotice(
     case "hourly_message_limit":
       return `${head} ${reason.observed} messages this hour reached the published limit of ${reason.limit}. ${tail}`;
     case "daily_token_budget":
-      return `${head} The daily agent token budget of ${reason.limit} is exhausted. ${tail}`;
+      return `${head} The daily agent token budget of ${reason.limit} is exhausted. The agent starts again when the UTC day ends, and answers the customers who wrote in the meantime. To start it sooner, raise the budget, publish the policy and resume it from the WhatsApp integration page.`;
     case "message_too_large":
       return `${head} A message exceeded the published size limit of ${reason.limitBytes} bytes. Skip that message or raise the limit. ${tail}`;
     case "unsupported_message_type":

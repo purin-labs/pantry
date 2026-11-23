@@ -54,6 +54,7 @@ import {
   sessionQuiescenceProver,
 } from "@purin-labs/conversation/actors/case/abandoned-assignments";
 import {
+  deferWhatsAppTurn,
   pauseWhatsAppRuntime,
   readWhatsAppEnvelope,
   recordWhatsAppProposal,
@@ -841,23 +842,26 @@ function nonEmptyCueText(value: string): boolean {
 
 /**
  * An exhausted daily budget is overflow: the account stops taking agent work
- * until the window rolls over or the operator republishes the policy, and the
- * operator is told once.
+ * until its UTC day ends (endWhatsAppBudgetPause) or an operator resumes it,
+ * and the operator is told once for that day. The turn of this Case waits
+ * for the end of the day, with no attempt counted.
  */
 function exhaustedBudget(
   input: WhatsAppCaseTurnInput,
   window: Readonly<{ reserved: number; consumed: number }>,
 ): Variant<WhatsAppCaseTurnOutcome, "skipped"> {
+  const windowEndsAt = utcDayEndsAt(input.now);
   const paused = pauseWhatsAppRuntime(input.connectorSql, {
     reason: {
       kind: "daily_token_budget",
       reserved: window.reserved,
       consumed: window.consumed,
       limit: input.limits.dailyAgentTokenBudget,
-      windowEndsAt: utcDayEndsAt(input.now),
+      windowEndsAt,
     },
     now: input.now,
   });
+  deferWhatsAppTurn(input.connectorSql, input.caseId, windowEndsAt);
   return {
     kind: "skipped",
     reason: "daily_token_budget_exhausted",

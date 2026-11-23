@@ -84,6 +84,8 @@ export type FixtureOptions = Readonly<{
    * do, so that the Portal Inbox lists the conversation.
    */
   inbox?: boolean;
+  /** The number's daily agent token budget, in place of the default. */
+  dailyAgentTokenBudget?: number;
 }>;
 
 export async function installFixture(
@@ -193,7 +195,7 @@ export async function installFixture(
       environment: "development",
       request: {
         kind: "enabled",
-        ...limits(),
+        ...numberLimits(options),
         relevantMessageTopics: "Bakery orders",
         automaticAcknowledgementText: "Thank you for contacting the bakery.",
         agentMode: "answer",
@@ -246,7 +248,7 @@ export async function installFixture(
       identity,
       integrationAccountId,
       policyVersion: policy.policyVersion,
-      limits: limits(),
+      limits: numberLimits(options),
       supportBindingId: binding.supportBindingId,
       bindingRevision: binding.currentRevision,
       credentialGeneration: 1,
@@ -374,6 +376,12 @@ export async function recordAgentDraft(
 function fixtureCaseId(fixture: Fixture): string {
   return fixture.caseId;
 }
+function numberLimits(options: FixtureOptions): WhatsAppIngressLimits {
+  return options.dailyAgentTokenBudget === undefined
+    ? limits()
+    : { ...limits(), dailyAgentTokenBudget: options.dailyAgentTokenBudget };
+}
+
 export function limits(): WhatsAppIngressLimits {
   return {
     maxActiveCases: 3,

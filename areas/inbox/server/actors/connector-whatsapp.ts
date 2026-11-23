@@ -520,9 +520,11 @@ function whatsAppNoticeKey(
       return `notice_${policyVersion}_${reason.kind}_${reason.caseId}`;
     case "send_indeterminate":
       return `notice_${policyVersion}_${reason.kind}_${reason.proposalId}`;
+    case "daily_token_budget":
+      // One notice for each budget day: the pause ends with the day.
+      return `notice_${policyVersion}_${reason.kind}_${reason.windowEndsAt}`;
     case "active_case_limit":
     case "hourly_message_limit":
-    case "daily_token_budget":
       return `notice_${policyVersion}_${reason.kind}`;
   }
 }
@@ -609,6 +611,13 @@ export function resumeWhatsAppRuntime(
   }
   const updated = updateWhatsAppRuntimePolicy(sql, input);
   if (!updated.ok) return updated;
+  // A turn that a pause moved to its end runs at once after a resume.
+  sql.exec(
+    `UPDATE connector_whatsapp_case SET debounce_due_at = ?
+      WHERE closed_at IS NULL AND debounce_due_at > ?`,
+    input.now,
+    input.now,
+  );
   const next = nextWhatsAppDebounceAt(sql);
   sql.exec(
     "UPDATE connector_whatsapp_runtime SET processing_json = ? WHERE singleton = 1",
@@ -1265,8 +1274,16 @@ export function nextWhatsAppSweepAt(sql: SqlStorage): number | null {
   const runtime = readWhatsAppRuntime(sql);
   if (runtime === null || runtime.disabledAt !== null) return null;
   const candidates: number[] = [];
-  const debounce = nextWhatsAppDebounceAt(sql);
-  if (debounce !== null) candidates.push(debounce);
+  if (runtime.processing.kind === "paused") {
+    // A paused number runs no turn, so a due turn must not wake it: the wake
+    // would find nothing to claim and arm itself again at once. A pause for
+    // the daily budget wakes when its day ends.
+    const pauseEndsAt = whatsAppPauseEndsAt(runtime.processing.reason);
+    if (pauseEndsAt !== null) candidates.push(pauseEndsAt);
+  } else {
+    const debounce = nextWhatsAppDebounceAt(sql);
+    if (debounce !== null) candidates.push(debounce);
+  }
   const notice =
     sql
       .exec<Record<string, SqlStorageValue>>(
@@ -1307,6 +1324,52 @@ export function nextWhatsAppSweepAt(sql: SqlStorage): number | null {
     );
   }
   return candidates.length === 0 ? null : Math.min(...candidates);
+}
+
+/** When a pause ends by itself, or null when only a person ends it. */
+function whatsAppPauseEndsAt(reason: WhatsAppPauseReason): number | null {
+  return reason.kind === "daily_token_budget" ? reason.windowEndsAt : null;
+}
+
+/**
+ * Ends a pause for the daily token budget once its UTC day has ended: the new
+ * day has a new budget. The turns that waited for the pause are due then.
+ * Returns true when it ended the pause.
+ */
+export function endWhatsAppBudgetPause(sql: SqlStorage, now: number): boolean {
+  const runtime = readWhatsAppRuntime(sql);
+  if (
+    runtime === null ||
+    runtime.disabledAt !== null ||
+    runtime.processing.kind !== "paused"
+  )
+    return false;
+  const endsAt = whatsAppPauseEndsAt(runtime.processing.reason);
+  if (endsAt === null || now < endsAt) return false;
+  const next = nextWhatsAppDebounceAt(sql);
+  sql.exec(
+    "UPDATE connector_whatsapp_runtime SET processing_json = ? WHERE singleton = 1",
+    JSON.stringify(
+      next === null ? { kind: "waiting" } : { kind: "scheduled", at: next },
+    ),
+  );
+  return true;
+}
+
+/**
+ * Moves the next agent turn of a Case to `at`, with no attempt counted: the
+ * turn did not fail, a pause stopped it.
+ */
+export function deferWhatsAppTurn(
+  sql: SqlStorage,
+  caseId: string,
+  at: number,
+): void {
+  sql.exec(
+    "UPDATE connector_whatsapp_case SET debounce_due_at = ? WHERE case_id = ? AND closed_at IS NULL",
+    at,
+    caseId,
+  );
 }
 
 type WhatsAppSweep = {

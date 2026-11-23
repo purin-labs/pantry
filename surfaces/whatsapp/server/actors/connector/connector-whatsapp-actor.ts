@@ -15,6 +15,7 @@ import {
   activateWhatsAppRuntime,
   claimDueWhatsAppCase,
   completeWhatsAppProcessing,
+  endWhatsAppBudgetPause,
   createWhatsAppChannelSchema,
   disableWhatsAppRuntime,
   expireWhatsAppProposals,
@@ -544,6 +545,10 @@ export class ConnectorWhatsApp {
           reason: "turn_lease_expired",
         });
       }
+      // A pause for the daily budget ends with its UTC day.
+      this.host.ctx.storage.transactionSync(
+        endWhatsAppBudgetPause.bind(null, this.host.ctx.storage.sql, now),
+      );
       const expired = this.host.ctx.storage.transactionSync(
         expireWhatsAppProposals.bind(null, this.host.ctx.storage.sql, now),
       );

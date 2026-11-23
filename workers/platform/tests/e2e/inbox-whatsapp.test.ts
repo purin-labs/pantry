@@ -12,7 +12,13 @@ import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plan
 import { readWhatsAppIngressPolicy } from "@purin-labs/area-inbox/server/data/whatsapp";
 import { createGrant, enableCapability } from "./access-route-support";
 import { network } from "./network";
-import { ORGANISATION_ID } from "./slack-journey-support";
+import {
+  ORGANISATION_ID,
+  openRouterText,
+  openRouterToolCall,
+  openRouterUsage,
+} from "./slack-journey-support";
+import { isRecord } from "@purin-labs/std";
 import {
   CUSTOMER_ID,
   PHONE_NUMBER_ID,
@@ -32,6 +38,7 @@ const CUSTOMER_TEXT = "Can I move my Saturday pickup?";
 const REPLY = "Yes, we moved your pickup to 4 pm.";
 const PERSON_REPLY = "A person says hello.";
 const SECOND_TEXT = "Can I change my bakery order to Sunday instead?";
+const THIRD_TEXT = "And can the bakery order include two more tarts?";
 const BASE = `https://localhost/v1/control/organisations/${ORGANISATION_ID}`;
 
 it(
@@ -254,13 +261,7 @@ async function unansweredJourney({ task }: TestContext): Promise<void> {
   const fixture = await customerWritesAgain();
 
   // Each turn fails; the Case waits for its next attempt.
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
-    await runInDurableObject(
-      fixture.connector,
-      makeTurnDue.bind(null, fixture.caseId),
-    );
-    await runDurableObjectAlarm(fixture.connector);
-  }
+  for (let attempt = 1; attempt <= 3; attempt += 1) await runDueTurn(fixture);
   expect(modelCalls).toBeGreaterThanOrEqual(3);
 
   // One notice tells the operator that the agent could not answer, not that
@@ -291,15 +292,170 @@ async function unansweredJourney({ task }: TestContext): Promise<void> {
   };
 }
 
+// The agent answers until the number's daily token budget is gone. The
+// next customer message pauses the number, the operator is told once, and
+// the customer waits for a person. When the UTC day ends the pause ends by
+// itself, and the agent answers that customer with no operator step.
+it(
+  "pauses the agent when the daily budget runs out, and answers the waiting customer when the UTC day ends",
+  budgetJourney,
+  120_000,
+);
+
+async function budgetJourney({ task }: TestContext): Promise<void> {
+  const sends: string[] = [];
+  const notices: string[] = [];
+  let modelCalls = 0;
+  network.use(
+    http.post("https://openrouter.ai/api/v1/chat/completions", () => {
+      modelCalls += 1;
+      // Each turn proposes one reply, then ends: 50 tokens a turn.
+      return modelCalls % 2 === 1
+        ? openRouterToolCall(
+            "whatsapp_reply_propose",
+            { body: `Agent reply ${String((modelCalls + 1) / 2)}` },
+            `wa_budget_${String(modelCalls)}`,
+            openRouterUsage(20, 0, 5),
+          )
+        : openRouterText(
+            "Done",
+            `wa_budget_${String(modelCalls)}`,
+            openRouterUsage(20, 0, 5),
+          );
+    }),
+    http.post(
+      `https://graph.facebook.com/v23.0/${PHONE_NUMBER_ID}/messages`,
+      async ({ request }) => {
+        sends.push(JSON.stringify(await request.json()));
+        return HttpResponse.json({
+          messages: [{ id: `wamid.P83_BUDGET_${String(sends.length)}` }],
+        });
+      },
+    ),
+    http.post("https://slack.com/api/chat.postMessage", async ({ request }) => {
+      const body: unknown = await request.json();
+      notices.push(String(record(body).text));
+      return HttpResponse.json({ ok: true, channel: "C0E2EACTOR", ts: "1" });
+    }),
+  );
+  const fixture = await customerWritesAgain({ dailyAgentTokenBudget: 50 });
+
+  // The agent answers the second message. That turn uses the day's budget.
+  await runDueTurn(fixture);
+  expect(sends).toHaveLength(1);
+  expect(sends[0]).toContain("Agent reply 1");
+
+  // The third message finds no budget: the number pauses and tells the
+  // operator once, and the customer waits for a person.
+  await customerWrites(fixture, "wamid.P83_THIRD", THIRD_TEXT);
+  await runDueTurn(fixture);
+  expect(sends).toHaveLength(1);
+  expect(notices).toHaveLength(1);
+  expect(notices[0]).toContain("daily agent token budget");
+  expect(notices[0]).not.toContain(THIRD_TEXT);
+  expect(conversationOf(await readList(fixture.owner))).toMatchObject({
+    preview: THIRD_TEXT,
+    state: "no_reply_yet",
+  });
+
+  // The UTC day ends. The pause ends with it, and the agent answers the
+  // waiting customer. No operator resumed the number.
+  await runInDurableObject(fixture.connector, endBudgetDay);
+  await runDurableObjectAlarm(fixture.connector);
+  expect(sends).toHaveLength(2);
+  expect(sends[1]).toContain("Agent reply 2");
+  expect(notices).toHaveLength(1);
+  expect(conversationOf(await readList(fixture.owner))).toMatchObject({
+    state: "agent_handled",
+  });
+
+  task.meta.inboxWhatsAppUnanswered = {
+    budget: { replies: sends.length, notices, modelCalls },
+  };
+}
+
+/** Runs the Case's due agent turn now, in the Connector's alarm. */
+async function runDueTurn(fixture: Fixture): Promise<void> {
+  await runInDurableObject(
+    fixture.connector,
+    makeTurnDue.bind(null, fixture.caseId),
+  );
+  await runDurableObjectAlarm(fixture.connector);
+}
+
+/**
+ * What the end of the UTC day changes for the Connector: today's token use
+ * becomes yesterday's, and each time that falls due by the end of the day
+ * is due now.
+ */
+function endBudgetDay(_actor: unknown, state: DurableObjectState): void {
+  const sql = state.storage.sql;
+  const now = Date.now();
+  const today = new Date(now).toISOString().slice(0, 10);
+  const yesterday = new Date(now - 86_400_000).toISOString().slice(0, 10);
+  const dayEnd = Date.parse(`${today}T23:59:59.999Z`) + 1;
+  sql.exec(
+    "UPDATE connector_whatsapp_reservation SET utc_day = ? WHERE utc_day = ?",
+    yesterday,
+    today,
+  );
+  sql.exec(
+    "UPDATE connector_whatsapp_case SET debounce_due_at = ? WHERE debounce_due_at IS NOT NULL AND debounce_due_at <= ?",
+    now - 1,
+    dayEnd,
+  );
+  const row = sql
+    .exec<{ processing_json: string }>(
+      "SELECT processing_json FROM connector_whatsapp_runtime",
+    )
+    .one();
+  const processing: unknown = JSON.parse(row.processing_json);
+  if (
+    isRecord(processing) &&
+    isRecord(processing.reason) &&
+    typeof processing.reason.windowEndsAt === "number" &&
+    processing.reason.windowEndsAt <= dayEnd
+  )
+    sql.exec(
+      "UPDATE connector_whatsapp_runtime SET processing_json = ?",
+      JSON.stringify({
+        ...processing,
+        reason: { ...processing.reason, windowEndsAt: now - 1 },
+      }),
+    );
+}
+
+async function customerWrites(
+  fixture: Fixture,
+  providerMessageId: string,
+  body: string,
+): Promise<void> {
+  const accepted = await fixture.connector.acceptWhatsAppEvent({
+    identity: fixture.identity,
+    event: {
+      kind: "text_message",
+      customerWaId: CUSTOMER_ID,
+      providerMessageId,
+      providerTimestamp: Date.now(),
+      body,
+    },
+    now: Date.now(),
+  });
+  expect(accepted, JSON.stringify(accepted)).toMatchObject({ ok: true });
+}
+
 /**
  * The fixture's conversation after its owner can read the number, rejects
  * the agent's draft, and the customer sends a second message.
  */
-async function customerWritesAgain(): Promise<Fixture> {
+async function customerWritesAgain(
+  options: Readonly<{ dailyAgentTokenBudget?: number }> = {},
+): Promise<Fixture> {
   const fixture = await installFixture({
     customerText: CUSTOMER_TEXT,
     reply: REPLY,
     inbox: true,
+    ...options,
   });
   const refused = await readList(fixture.owner);
   await allow(
@@ -313,18 +469,7 @@ async function customerWritesAgain(): Promise<Fixture> {
     {},
   );
   expect(rejected.status, await rejected.clone().text()).toBe(200);
-  const accepted = await fixture.connector.acceptWhatsAppEvent({
-    identity: fixture.identity,
-    event: {
-      kind: "text_message",
-      customerWaId: CUSTOMER_ID,
-      providerMessageId: "wamid.P83_SECOND",
-      providerTimestamp: Date.now(),
-      body: SECOND_TEXT,
-    },
-    now: Date.now(),
-  });
-  expect(accepted, JSON.stringify(accepted)).toMatchObject({ ok: true });
+  await customerWrites(fixture, "wamid.P83_SECOND", SECOND_TEXT);
   return fixture;
 }
 
