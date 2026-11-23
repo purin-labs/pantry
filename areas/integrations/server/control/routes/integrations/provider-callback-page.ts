@@ -38,7 +38,7 @@ export function providerCompletionPage(
       : failed
         ? "Connection not finished"
         : "Authorization received",
-    detail: `<p class="callback-copy" id="status">${
+    detail: `<p class="callback-copy" id="status" role="status">${
       connected
         ? "Taking you back to Pantry&hellip;"
         : failed
@@ -423,8 +423,8 @@ function providerCallbackFailureDetail(reasonCode: string): string {
     case "provider_callback_signature_invalid":
       return "We could not verify this response, so we stopped here. Start a new connection to try again.";
     case "provider_asset_missing":
-      return "The sign-in finished without sharing the business account that Pantry needs, so nothing was stored. The portal explains what to do next.";
+      return "The sign-in finished without sharing the business account that Pantry needs, so nothing was stored. Pantry explains what to do next.";
     default:
-      return "Something went wrong partway through. The portal has the details and a way to retry.";
+      return "Something went wrong partway through. Pantry has the details and a way to retry.";
   }
 }

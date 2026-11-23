@@ -32,9 +32,9 @@ async function main() {
   const envPath = resolve(repositoryRoot, ".env.local");
   const wrangler = resolve(
     repositoryRoot,
-    "services/platform/node_modules/.bin/wrangler",
+    "workers/platform/node_modules/.bin/wrangler",
   );
-  const config = resolve(repositoryRoot, "services/platform/wrangler.jsonc");
+  const config = resolve(repositoryRoot, "workers/platform/wrangler.jsonc");
   const result = spawnSync(
     wrangler,
     ["secret", "delete", secretName, "--config", config, "--env", environment],

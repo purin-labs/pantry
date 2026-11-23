@@ -7,7 +7,6 @@ import { brainAddress, brainAddressSearch } from "@purin-labs/area-brain/ui/feat
 import {
   ArrowLeft,
   ArrowRight,
-  Bot,
   CircleAlert,
   ShieldCheck,
   Zap,
@@ -58,6 +57,7 @@ import {
 } from "./agent-console-shared";
 import { DocumentEditor, type AgentRevisionLoader } from "./agent-documents";
 import { AgentModal } from "./agent-modal";
+import "./agent-rows.css";
 import {
   AGENT_STARTER_TEMPLATES,
   starterTemplateById,
@@ -145,10 +145,7 @@ export function AgentsPageHeading(props: {
         <h1 id="portal-page-title" tabIndex={-1}>
           Agents
         </h1>
-        <p>
-          Delegate café work. Choose when agents run and which actions need your
-          approval.
-        </p>
+        <p>Choose when agents run and what needs your approval.</p>
       </div>
       {props.children}
     </header>
@@ -351,12 +348,10 @@ function AgentListView(props: ConsoleViewProps): React.ReactNode {
         <AgentBlankState {...props} />
       ) : (
         <section className="agent-roster" aria-labelledby="agent-roster-title">
-          <h2 id="agent-roster-title">
-            Your agents <span>{props.snapshot.definitions.length}</span>
-          </h2>
-          <div className="agent-card-grid">
-            {props.snapshot.definitions.map(renderAgentCard.bind(null, props))}
-          </div>
+          <h2 id="agent-roster-title">Your agents</h2>
+          <ul className="agent-rows">
+            {props.snapshot.definitions.map(renderAgentRow.bind(null, props))}
+          </ul>
         </section>
       )}
       <div className="agent-recent-work">
@@ -453,7 +448,8 @@ function renderTemplateCard(
   );
 }
 
-function renderAgentCard(
+/** One agent: its job, when it runs, and which tools it has. */
+function renderAgentRow(
   props: ConsoleViewProps,
   definition: AgentDefinition,
 ): React.ReactNode {
@@ -476,65 +472,37 @@ function renderAgentCard(
   const capabilities = Array.from(
     new Set(installations.flatMap(installationCapabilities)),
   );
-  const proposals = openProposalsForDefinition(
+  const status = agentCardStatus(
     props.snapshot,
     definition,
-  ).length;
+    installations,
+    cues.length + schedules.length,
+  );
   return (
-    <article className="agent-card" key={definition.agentDefinitionId}>
-      <div className="agent-card-heading">
-        <span className="agent-card-icon">
-          <Bot size={19} aria-hidden="true" />
-        </span>
-        <div>
-          <h3>{definition.displayName}</h3>
-          <p>{humanizeIdentifier(definition.role)}</p>
-        </div>
+    <li className="agent-row" key={definition.agentDefinitionId}>
+      <div className="agent-row-main">
+        <h3>
+          {definition.displayName}
+          {/* The triggers of a running agent say that it runs. */}
+          {status.kind === "success" ? null : <StatusChip status={status} />}
+        </h3>
+        <p>{definition.purpose}</p>
+        <p className="agent-row-facts">
+          <span title={agentAssignmentSummary(props.snapshot, installations)}>
+            <Zap size={15} aria-hidden="true" />
+            {triggers.length === 0
+              ? "No automatic triggers"
+              : triggers.join(" · ")}
+          </span>
+          <span>
+            <ShieldCheck size={15} aria-hidden="true" />
+            {capabilities.length === 0
+              ? "No commerce tools"
+              : capabilities.map(capabilityLabel).join(" · ")}
+          </span>
+        </p>
       </div>
-      <p className="agent-card-purpose">{definition.purpose}</p>
-      <div className="agent-card-facts">
-        <div className="agent-card-fact">
-          <Zap size={16} aria-hidden="true" />
-          <div>
-            <strong>
-              {triggers.length === 0
-                ? "No automatic triggers"
-                : triggers.join(" · ")}
-            </strong>
-            <p>{agentAssignmentSummary(props.snapshot, installations)}</p>
-          </div>
-        </div>
-        <div className="agent-card-fact">
-          <ShieldCheck size={16} aria-hidden="true" />
-          <div>
-            <strong>
-              {capabilities.length === 0
-                ? "No commerce tools"
-                : "Commerce tools"}
-            </strong>
-            <p>
-              {capabilities.length === 0
-                ? "Needed only for commerce work. Add them under Configure."
-                : capabilities.map(capabilityLabel).join(" · ")}
-            </p>
-          </div>
-        </div>
-      </div>
-      {proposals === 0 ? null : (
-        <span className="agent-card-badge">
-          {proposals} suggested {proposals === 1 ? "change" : "changes"}
-        </span>
-      )}
-      <div className="agent-card-footer">
-        <StatusChip
-          status={agentCardStatus(
-            props.snapshot,
-            definition,
-            installations,
-            cues.length + schedules.length,
-          )}
-        />
-        <span className="agent-card-actions">
+      <span className="agent-card-actions">
           {props.canConfigure &&
           definition.lifecycle === "active" &&
           !installations.some(hasActiveArea.bind(null, props.snapshot)) &&
@@ -564,9 +532,8 @@ function renderAgentCard(
             <span className="visually-hidden"> {definition.displayName}</span>
             <ArrowRight size={16} aria-hidden="true" />
           </button>
-        </span>
-      </div>
-    </article>
+      </span>
+    </li>
   );
 }
 
@@ -1332,7 +1299,7 @@ function NewAgentModal(
   return (
     <AgentModal
       title="Create agent"
-      description="Assign an area and review access before running this agent. Add an event or schedule to automate its work."
+      description="The agent starts at once, with the access that you choose below. Add an event or a schedule to run it on its own."
       close={close}
       footer={
         <>

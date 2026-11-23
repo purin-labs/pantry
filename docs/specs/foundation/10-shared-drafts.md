@@ -214,7 +214,7 @@ to the spec of its area.
   `agent-presence.ts`. Each document has its own package, but the workflow canvas and
   the workflow draft share one package. All of them pin `yjs` 13.6.32 and the V1
   update encoding.
-- **Server.** In `services/platform/src/actors/`: `collaboration-room.ts` (the room),
+- **Server.** In `workers/platform/src/actors/`: `collaboration-room.ts` (the room),
   `collaboration-room-dispatch.ts` (the route and socket dispatch),
   `collaboration-agent.ts` (the agent name) and `collaboration-slack-thread.ts` (the
   Slack thread link). `commerce-collaboration-rooms.ts` and
@@ -447,7 +447,7 @@ Boundaries:
   The hibernation decision is in
   [Plan 57](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-57-live-delivery.md).
 - Where a source differs from the code, this spec follows the code.
-- E2E journeys in `services/platform/tests/e2e/`: `product-description-draft.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `product-description-draft.test.ts`,
   `description-draft-reconnect.test.ts`, `collaboration-drafts.test.ts`,
   `slack-draft-permission.test.ts`, `slack-email-draft-label.test.ts`,
   `pi-commerce-description.test.ts`, `commerce-propose-permission.test.ts` and

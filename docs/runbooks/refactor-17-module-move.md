@@ -68,7 +68,7 @@ The quick checks of step 6:
 | `pnpm --filter @purin-labs/portal exec tsc --noEmit -p .`                                                                                                                                                                                     | 34 s     |
 | `pnpm check:packages`                                                                                                                                                                                                                         | 7 s      |
 | `pnpm portal:build`                                                                                                                                                                                                                           | 4 s      |
-| `pnpm exec wrangler deploy --dry-run --env production --outdir <folder>` in `services/platform`. With Docker, it also builds the three container images                                                                                       | 9 s      |
+| `pnpm exec wrangler deploy --dry-run --env production --outdir <folder>` in `workers/platform`. With Docker, it also builds the three container images                                                                                        | 9 s      |
 | The five other Workers: `pnpm --filter @purin-labs/platform` with `code-mode-sandbox:check`, `model-exit:check`, `chatgpt-exit:check`, `vault-onepassword:check` and `slack-ingress:check`                                                    | 30 s     |
 | When the move takes Portal files, one browser journey: start the Portal dev server of the checkout on a free port, then `node scripts/production-simulation/run-journeys.mjs --id persistent-chat-browser --base-url http://127.0.0.1:<port>` | 1 minute |
 
@@ -319,6 +319,46 @@ the four plans.
   the bundle of before, the bytes are the same.
 - Not run: the full E2E suite, the Kitchen journeys and a release.
 
+## The folder of the Worker (2026-11-23)
+
+`services/platform` is `workers/platform` since 2026-11-23, by one run of
+`scripts/refactor-17/rename-folder.mjs`. The table of renamed folders is
+`scripts/refactor-17/folder-renames.mjs`; the move script reads it, so each
+plan still finds its files. Tags `refactor-17-workers-platform-before` and
+`refactor-17-workers-platform-after`.
+
+- **What changed.** 890 files moved, and 134 other files name the new path:
+  documents, scripts, lints, ratchets, `scripts/layers.json` and the configs.
+  Paths from the folder to a sibling got one more step
+  (`../../services/shop-gateway/build.sh`, the Dockerfiles of the three
+  containers and of the ChatGPT exit). Plans, evidence and history keep the old
+  path in their text.
+- **What did not change.** No Worker name, Durable Object class, binding,
+  route or R2 key. The package is still `@purin-labs/platform`, and CI finds it
+  by that name. The bundle of the Platform Worker and of the Slack ingress
+  Worker has the same bytes before and after, and the four other Worker checks
+  pass. So the rename needed no release.
+- **Another checkout, after the pull.** Git leaves the ignored files in the
+  old folder. Run `node scripts/refactor-17/rename-folder.mjs --local-files`
+  to list them and `--move-local` to move them: `.dev.vars` and its variants
+  (the local secrets), `.wrangler/` (the local D1 and Actor state) and
+  `output/`. Then run `pnpm install`, and start each `wrangler dev` again.
+- **An open branch.** `git rebase refactor-17-workers-platform-before`, then
+  `git -c merge.directoryRenames=true rebase -X theirs
+refactor-17-workers-platform-after`, then the script with `--stage` and one
+  commit, then `git rebase origin/dev`, `pnpm install` and the type check.
+  Without the config, git stops at each new file of the old folder: `git add`
+  it and continue.
+- **Checked before the landing:** `--check` of the script and of the 28 move
+  plans, each lint with the same counts, the type checks, `pnpm test:units`,
+  the Portal build, nine E2E files and two browser journeys, one of them on
+  the built Portal. The dry run also built the four container images and ran
+  the deploy command as a dry run.
+- **A limit of the script.** It reads a relative path from the folder of its
+  file or of its package. It does not find a path that is relative to another
+  working folder; the type checks, the bundles and the journeys guard that
+  case.
+
 ## The surfaces group of 2026-11-23
 
 Branch `refactor-17-surfaces-1`, on `origin/dev` at `c5cabc48`. Tags
@@ -344,8 +384,8 @@ module is the folder `areas/integrations/shopify/` of the package
   router, the page table, `styles.css` and the chat feature are in
   `surfaces/portal/ui/`. The Wrangler file names the build folder
   `apps/portal/dist`, so a rename of `apps/portal` belongs with the rename of
-  `services/platform`.
-- **The Worker.** 31 files stay in `services/platform/src`, all of
+  `workers/platform`.
+- **The Worker.** 31 files stay in `workers/platform/src`, all of
   `workers/platform`: the six Worker entries, the Actor class files and the
   wiring files. The entry of the Slack ingress Worker joined them before the
   moves.
@@ -407,7 +447,7 @@ package `@purin-labs/area-<name>` in `areas/<name>/`.
 | `kitchen`      | 78                 | 275            | 128           | 204 (143 / 61)                       |
 
 - **The layout.** A Worker file keeps its sub-path below
-  `services/platform/src/`, without its first folder when that folder is the
+  `workers/platform/src/`, without its first folder when that folder is the
   name of the area or `commerce/`. The `sourcePrefixes` of each plan hold this
   rule, so `--sync-plan` gives a later file the same place. A Portal file keeps
   its sub-path below `apps/portal/src/` (`ui/features/<feature>/`). No two

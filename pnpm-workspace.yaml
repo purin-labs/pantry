@@ -1,7 +1,7 @@
 packages:
   - packages/*
   - apps/*
-  - services/platform
+  - workers/platform
   - scripts/punter
   - services/commerce
   - foundation/*

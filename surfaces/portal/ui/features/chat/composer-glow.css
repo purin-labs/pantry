@@ -1,0 +1,136 @@
+/* The composer's edge (composer-glow.tsx). Each layer animates only opacity
+   and translate, so the compositor runs it while the page is busy. The colours
+   are the theme's accent, in light and dark mode. */
+.composer-glow {
+  --composer-glow-in: var(--motion-smooth);
+  --composer-glow-out: var(--motion-exit);
+  position: absolute;
+  inset: -1px;
+  z-index: 1;
+  border-radius: 22px;
+  pointer-events: none;
+  transition: opacity var(--composer-glow-in);
+}
+.composer-glow > span {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity var(--composer-glow-out);
+}
+/* A glow around the composer and a faint wash of the accent inside it. */
+.composer-glow-halo {
+  background: color-mix(in oklch, var(--pantry-accent) 7%, transparent);
+  box-shadow:
+    0 0 0 4px color-mix(in oklch, var(--pantry-accent) 22%, transparent),
+    0 0 32px 4px color-mix(in oklch, var(--pantry-accent) 48%, transparent);
+}
+.composer-glow-ring {
+  border: 1.5px solid var(--pantry-accent);
+}
+/* A 2px band of the edge. A light crosses it from left to right, so it runs
+   along the top and the bottom at one speed and lights each side in turn. */
+.composer-glow-sweep {
+  overflow: hidden;
+  padding: 2px;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+.composer-glow-sweep::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--pantry-accent) 75%,
+    transparent
+  );
+  translate: -100% 0;
+}
+
+/* Listening for the wake phrase: the ring and a faint halo. */
+.composer-glow[data-voice="listening"] .composer-glow-ring {
+  opacity: 0.85;
+  transition: opacity var(--composer-glow-in);
+}
+.composer-glow[data-voice="listening"][data-work="off"] .composer-glow-halo {
+  opacity: 0.3;
+  transition: opacity var(--composer-glow-in);
+}
+/* The wake phrase or the talk key: the ring is whole and the halo glows. */
+.composer-glow[data-voice="hearing"]
+  :is(.composer-glow-ring, .composer-glow-halo) {
+  opacity: 1;
+  transition: opacity var(--composer-glow-in);
+}
+/* Transcribing, or agent work: the light crosses the edge, and the ring of an
+   open microphone stays dim under it. */
+.composer-glow:is(
+    [data-voice="transcribing"],
+    [data-voice="listening"][data-work="on"]
+  )
+  .composer-glow-ring {
+  opacity: 0.4;
+}
+.composer-glow:is([data-voice="transcribing"], [data-work="on"]):not(
+    [data-voice="hearing"]
+  )
+  .composer-glow-sweep {
+  opacity: 1;
+  transition: opacity var(--composer-glow-in);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* One scan for a transcribed command and for the agent's turn after it, so
+     the light keeps its place when the one becomes the other. */
+  .composer-glow-sweep::before {
+    animation: composer-glow-scan 2s cubic-bezier(0.45, 0, 0.55, 1) infinite
+      paused;
+  }
+  .composer-glow:is([data-voice="transcribing"], [data-work="on"])
+    .composer-glow-sweep::before {
+    animation-play-state: running;
+  }
+  /* The ring and its halo breathe as one while nothing else happens. */
+  .composer-glow[data-voice="listening"][data-work="off"] {
+    animation: composer-glow-breathe 3.2s ease-in-out infinite;
+  }
+  /* The halo blooms with the ring, then pulses while the person speaks. */
+  .composer-glow[data-voice="hearing"] .composer-glow-halo {
+    animation: composer-glow-hear 1.4s ease-in-out
+      var(--pantry-spring-smooth-duration) infinite;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Nothing moves: the whole edge takes the light, and states fade. */
+  .composer-glow {
+    --composer-glow-in: calc(150ms * var(--agent-motion-factor, 1)) ease-out;
+    --composer-glow-out: var(--composer-glow-in);
+  }
+  .composer-glow-sweep::before {
+    width: 100%;
+    background: var(--pantry-accent);
+    translate: none;
+  }
+}
+/* The light starts and ends outside the edge: 250% of its own 40% is 100%. */
+@keyframes composer-glow-scan {
+  to {
+    translate: 250% 0;
+  }
+}
+@keyframes composer-glow-breathe {
+  50% {
+    opacity: 0.4;
+  }
+}
+@keyframes composer-glow-hear {
+  50% {
+    opacity: 0.55;
+  }
+}

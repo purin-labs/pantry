@@ -27,7 +27,7 @@ but only a person can accept it.
   workspace opens, every 5 minutes while the tab is in view (`REFRESH_MS` in
   `brain-summary.ts`), and after each read of the Brain page or the Evals.
 - **Overview**: one status line with the number of items that wait, the items that
-  wait (most recent change first), the newest learning event and four counts.
+  wait (most recent change first) and four counts as filters.
 - **Learning**: a flow of boxes for the stages of the loop, each with its count, and a
   log below it, newest event first. The page derives both from the Memory histories
   and the Eval runs that it already reads.
@@ -392,7 +392,7 @@ last try named: `indeterminate`, `failed` or `unavailable`.
   and [the browser captures](https://github.com/seams-tech/pantry-history/tree/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42J-brain/browser/).
 - The [IFC integration guide](../../../../foundation/authority/policy/information-flow/README.md)
   and [FND-07](../../foundation/07-information-flow.md).
-- E2E journeys in `services/platform/tests/e2e/`: `memory-access.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `memory-access.test.ts`,
   `memory-teaching.test.ts`, `memory-admission.test.ts`, `memory-commands.test.ts`,
   `eval-commands.test.ts`, `mail-inbox.test.ts` (filters `gives the mailbox agent the
 accepted Memory` and `compares the accepted and a candidate Memory`),

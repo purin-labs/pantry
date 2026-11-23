@@ -279,7 +279,7 @@ or dismisses it. An accepted brief sends nothing and changes nothing.
 - **OrganisationActor SQLite:** `action_ledger` (`actors/action-ledger.ts`, FND-06).
   **Case SQLite** (`actors/case-schema.ts`): `case_commerce_proposal` and
   `case_commerce_approval`.
-- **Regional D1** (`services/platform/migrations-regional/0001_current_schema.sql`):
+- **Regional D1** (`workers/platform/migrations-regional/0001_current_schema.sql`):
   `operational_area`, `agent_responsibility_scope`, `agent_definition`,
   `agent_definition_revision`, `agent_installation`, `agent_area_assignment`, `skill`,
   `skill_revision`, `skill_binding`, `cue_binding`, `schedule_binding`,
@@ -290,7 +290,7 @@ or dismisses it. An accepted brief sends nothing and changes nothing.
   reconcile and the receipt check. The routes `…/entity-plane/purchasing-preset` and
   `…/purchasing-reconcile` need `entity_plane:write`. The public ids are in
   `packages/commerce-contracts/src/entity-plane-purchasing.ts`.
-- **Main files** in `services/platform/src/`: `action-model.ts`, `actions.ts`,
+- **Main files** in `workers/platform/src/`: `action-model.ts`, `actions.ts`,
   `provider-execution.ts`, `case-*.ts`, `operations-workbench.ts` and `purchasing/`
   in `commerce/`; `data/agent-operations/`; `slack/commerce-approval.ts`. The Portal
   shapes are in `@purin-labs/commerce-control-api` (`portal/commerce-actions.ts`).
@@ -436,7 +436,7 @@ Neighbours:
     [follow-up preparation](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-39-followup-preparation-2026-10-01.md),
     [overlapped start](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-39-overlap-initialization-2026-10-01.md),
     [mock shop](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-39-mock-shop-2026-10-01.md).
-- E2E journeys in `services/platform/tests/e2e/` (`.test.ts`):
+- E2E journeys in `workers/platform/tests/e2e/` (`.test.ts`):
   - Actions: `slack-commerce-approval`, `pi-commerce-actions`, `portal-order-cancel`,
     `slack-offer-price-change`, `pi-cafe-menu-publication`, `pi-merchant-plugin`,
     `pi-commerce-description`, `commerce-propose-permission`,

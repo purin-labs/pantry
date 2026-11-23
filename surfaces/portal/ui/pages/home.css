@@ -1,0 +1,45 @@
+/* Home: one quiet line when nothing waits, and the counts of today as one
+   list. A zero is muted, so that the count that matters stands out. */
+.home-quiet {
+  margin: 0 0 16px;
+  color: var(--ink-2);
+}
+
+.home-counts {
+  display: grid;
+  max-width: 560px;
+  margin: 0 0 16px;
+  padding: 0 18px;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+.home-counts li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 0;
+  font-weight: 600;
+}
+
+.home-counts li + li {
+  border-top: 1px solid var(--border);
+}
+
+.home-counts strong {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.home-counts li[data-quiet="true"] {
+  color: var(--ink-2);
+  font-weight: 400;
+}
+
+.home-counts li[data-quiet="true"] strong {
+  color: var(--ink-3);
+  font-weight: 500;
+}

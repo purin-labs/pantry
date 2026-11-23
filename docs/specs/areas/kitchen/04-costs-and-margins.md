@@ -214,7 +214,7 @@ The tools are in `areas/kitchen/server/agent-tools/kitchen/costs.ts` and
 
 ## Contracts
 
-- Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`), owned
+- Regional D1 (`workers/platform/migrations-regional/0001_current_schema.sql`), owned
   by `areas/kitchen` in `scripts/layers.json`:
   - `bakery_cost_plan`: one row for each Organisation, with `revision`,
     `daily_labor_minor`, `daily_rent_minor` and `forecast_json`.
@@ -225,7 +225,7 @@ The tools are in `areas/kitchen/server/agent-tools/kitchen/costs.ts` and
     `invoiced_quantity`, `invoiced_unit`, `invoice_total_minor`, `invoice_reference`
     (1 to 120 characters, not null) and `supplier_id`.
   - The patch scripts for deployed databases are
-    `services/platform/scripts/plan-86-costs-plan-d1-patch.sql`,
+    `workers/platform/scripts/plan-86-costs-plan-d1-patch.sql`,
     `plan-86-costs-formulas-d1-patch.sql` and `plan-86-lot-costs-d1-patch.sql`.
 - The read uses `supplier_payable` (COM-05) and writes it never.
 - The commerce engine keeps the pack prices in the `supply_cost_terms` list
@@ -351,7 +351,7 @@ saved rows.
 
 - [Plan 86](../../../history/plan-86-bakery-costs-and-margins.md). Where it differs from the
   code, this spec follows the code. The plan gives no evidence links in the archive.
-- E2E journeys: `services/platform/tests/e2e/costs-and-margins.test.ts`, with its
+- E2E journeys: `workers/platform/tests/e2e/costs-and-margins.test.ts`, with its
   helper `costs-sheet-room-support.ts`, and
   `services/commerce/tests/purchasing-replenishment.test.ts` for the
   `supply_cost_terms` list.

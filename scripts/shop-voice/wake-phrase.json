@@ -1,6 +1,6 @@
 {
-  "phrase": "Hey Satyr",
-  "model": "hey_satyr.onnx",
-  "voice": "Tessa",
-  "said": "hey, sayter"
+  "phrase": "Hey Sous Chef",
+  "model": "hey_sous_chef.onnx",
+  "voice": "Samantha",
+  "said": "hey, sous chef"
 }

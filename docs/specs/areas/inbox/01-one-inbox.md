@@ -215,11 +215,19 @@ Control routes under `/v1/control/organisations/:id/`:
 | `POST agent-mailboxes/:account/{bind,policy,resume,skip-and-resume,reconnect,disable,revoke,model-consent}` | Admin                                        | The mailbox agent                                                                       |
 | `POST agent-mailboxes/:account/check`                                                                       | Admin                                        | Look for new mail now                                                                   |
 | `POST agent-mailboxes/:account/sender-links`, `…/sender-links/read`                                         | Admin; viewer and the mailbox grant          | Link a sender to a supplier; read the link                                              |
-| `GET`, `POST email-operational/:id/…`                                                                       | Viewer, admin                                | New outbound mail that the agent proposes                                               |
+| `GET email-operational/:id`                                                                                 | Admin, or viewer and the mailbox grant       | One outbound mail that the agent proposes, and an approval challenge                    |
+| `POST email-operational/:id/{approve,reject,edit,attest-present,attest-absent}`                             | Admin                                        | Decide or change the proposed mail                                                      |
 | `GET whatsapp-cases/:id`, `GET whatsapp-replies/:id`                                                        | Viewer and `whatsapp.support.read`           | The Case panel; one proposal                                                            |
 | `POST whatsapp-cases/:id/{take-over,return-to-agent,human-reply,close}`                                     | Admin                                        | Ownership and a person's reply                                                          |
 | `POST whatsapp-replies/:id/{approve,reject,edit,resolve}`                                                   | Admin                                        | Decide a proposal                                                                       |
 | `POST whatsapp-accounts/:account/{select,bind,policy,…}`                                                    | Admin                                        | The number, and `{agent: {agentMode, alwaysWaitTopics}}`                                |
+
+The preview of an operational draft shows the recipient, the subject and the body
+(`mayReadOperationalEmailDraft`). An owner or an admin reads it, because they decide
+it. Another member needs a grant for the mailbox: on a full mailbox the read of a reply
+draft (`authorizeMailSource`), on a send-only mailbox `email.operational.propose` on
+that exact account. Any other member gets `email_operational_not_found` (404), as for
+an unknown id. The chat approval card reads the same route.
 
 The email reply actions (except `relationship`), the person reply and the WhatsApp
 actions replay their receipt for the same `Idempotency-Key`.
@@ -241,7 +249,7 @@ returns `no-store` JSON.
   open proposal is older than those 100 gets its state with no proposal.
 
 **Records.** The regional D1 baseline is
-`services/platform/migrations-regional/0001_current_schema.sql`:
+`workers/platform/migrations-regional/0001_current_schema.sql`:
 
 | Table                                                                             | Holds                                                                                                                        |
 | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -405,6 +413,9 @@ in `registry.ts`. The capabilities are in
 - No route moves a Gmail reply to `approved` or `operator_attested_*`. A person cannot
   attest an unconfirmed Gmail reply.
 - `whatsapp_support_reply_send` has no exit check yet (Refactor 17, Appendix C).
+- WhatsApp is deferred since 23 November 2026: Meta banned the owner's account, so no
+  WhatsApp connect, webhook or live check runs until the owner has a working Meta business
+  account.
 
 ## Sources
 
@@ -414,7 +425,7 @@ in `registry.ts`. The capabilities are in
   Background: [Plan 89](../../../history/plan-89-outside-written-content.md) and
   [FND-07](../../foundation/07-information-flow.md). Plans 29, 32 and 40D are in
   [the archive](https://github.com/seams-tech/pantry-history/tree/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs).
-- E2E journeys in `services/platform/tests/e2e/`: `inbox-whatsapp.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `inbox-whatsapp.test.ts`,
   `mail-inbox.test.ts`, `mail-inbox-reconnect.test.ts`,
   `mail-reply-shared-draft.test.ts`, `mail-chat-reply-sources.test.ts`,
   `mailbox-setup.test.ts`, `mailbox-check-now.test.ts`, `mailbox-spam-rescue.test.ts`,

@@ -1,4 +1,4 @@
-import gateway from "../../services/platform/src/integration-gateway";
+import gateway from "../../workers/platform/src/integration-gateway";
 import { reconcileCommerceOutbox } from "../../areas/commerce/server/outbox-worker";
 import { newRequestId, parseIntegrationAccountId } from "../../foundation/kernel/ids";
 import { ensureCreatedOrganisationActor } from "../../foundation/agent/control/organisation-runtime";
@@ -10,10 +10,10 @@ import {
   type IssuedControlSession,
 } from "../../foundation/tenancy/data/control-plane";
 import { newControlMutationIdentity, type ControlMutationReceiptScope } from "../../foundation/tenancy/data/control-mutation";
-import { CaseDO } from "../../services/platform/src/actors/case";
-import { ConnectorDO } from "../../services/platform/src/actors/connector";
-import { SessionDO } from "../../services/platform/src/actors/agent-session";
-import { OrganisationDO } from "../../services/platform/src/actors/organisation";
+import { CaseDO } from "../../workers/platform/src/actors/case";
+import { ConnectorDO } from "../../workers/platform/src/actors/connector";
+import { SessionDO } from "../../workers/platform/src/actors/agent-session";
+import { OrganisationDO } from "../../workers/platform/src/actors/organisation";
 import { parseInitialOrganisationPlacement } from "../../foundation/tenancy/placement";
 import type { Env } from "../../foundation/kernel/env";
 import {

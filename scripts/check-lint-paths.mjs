@@ -117,7 +117,9 @@ for (const source of SOURCES) {
     const pattern = match[1].replace(/#.*$/, "");
     if (seen.has(pattern)) continue;
     seen.add(pattern);
-    if (ABSENT.has(pattern) || MODULE_NAMES.has(pattern)) continue;
+    if (ABSENT.has(pattern)) continue;
+    // A module name that is also a folder (workers/platform) is a path too.
+    if (MODULE_NAMES.has(pattern) && !tracked.some(matcher(pattern))) continue;
     checked += 1;
     if (!tracked.some(matcher(pattern))) {
       const line = text.slice(0, match.index).split("\n").length;

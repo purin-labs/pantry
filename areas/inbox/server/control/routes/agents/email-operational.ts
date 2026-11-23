@@ -21,6 +21,8 @@ import {
 import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 import { hasExactKeys, isPositiveInteger } from "@purin-labs/std";
 import { agentMailboxConnector } from "../../../mail-inbox/agent-mailbox-connector";
+import { mailControlAuthority } from "../../../mail-inbox/contract/control-authority";
+import { mayReadOperationalEmailDraft } from "../../../mail-inbox/contract/mail-source-authorization";
 import {
   emailApprovalChallenge,
   emailApprovalSecret,
@@ -139,6 +141,15 @@ export async function handleEmailOperational(
   }
   const accountId = parseIntegrationAccountId(projection.integrationAccountId);
   if (!accountId.ok) return controlError("email_operational_not_found", 404);
+  // A member who may not read the draft gets the answer of an unknown id.
+  if (action === null) {
+    const authority = await mailControlAuthority(authorized);
+    if (
+      authority === null ||
+      !(await mayReadOperationalEmailDraft(env, authority, accountId.value))
+    )
+      return controlError("email_operational_not_found", 404);
+  }
   const connector = await agentMailboxConnector(
     env,
     authorized.organisationId,

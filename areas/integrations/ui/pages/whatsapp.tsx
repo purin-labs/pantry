@@ -303,7 +303,10 @@ export function whatsappAttemptFailureCopy(
 /**
  * The enablement disclosure. It describes the actual temporary processing
  * boundary rather than a marketing retention label, and it names the
- * inference provider the organisation selected.
+ * inference provider the organisation selected. The list says, for each agent
+ * setting of the Inbox, what goes with no approval: `processWhatsAppCaseTurn`
+ * holds a reply for a person only in `draft` and for an always-wait topic in
+ * `answer`, and the Connector sends every other reply at once.
  */
 function WhatsAppProcessingDisclosure(props: {
   readonly inferenceProvider: string;
@@ -321,9 +324,25 @@ function WhatsAppProcessingDisclosure(props: {
       </p>
       <p>
         Your AI account, <strong>{props.inferenceProvider}</strong>, processes
-        these messages under your organisation's data terms. Every agent reply
-        needs your approval before Pantry sends it.
+        these messages under your organisation's data terms. The agent setting
+        in the Inbox decides what Pantry sends with no approval:
       </p>
+      <ul>
+        <li>
+          <strong>No agent:</strong> Pantry sends your fixed acknowledgement
+          with no approval. People write all other replies.
+        </li>
+        <li>
+          <strong>Agent drafts:</strong> each agent reply waits for approval in
+          the Inbox. Pantry sends no acknowledgement.
+        </li>
+        <li>
+          <strong>Agent answers</strong> (the default): if a message matches
+          your topics, the agent's reply goes with no approval. If it names a
+          topic that always waits, the reply waits for approval. Any other
+          message gets your fixed acknowledgement with no approval.
+        </li>
+      </ul>
     </>
   );
 }

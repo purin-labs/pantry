@@ -121,7 +121,10 @@ the exit decides.
 
 - A label states the writer `outside` when a source holds free text of a person outside
   the Organisation. `OUTSIDE_WRITTEN_READ_CAPABILITIES` names `email.mailbox.read` and
-  `whatsapp.support.read`. No other source sets the writer.
+  `whatsapp.support.read`. The link read (`read_message_link`) records the text of a
+  public page with the message's ingress label and the writer `outside`
+  (`recordMessageLinkObservation`), before the model reads it. No other source sets
+  the writer.
 - A join keeps the writer. Only `acceptedByPersonFlowLabel` removes it, when a turn
   reads an accepted Memory. The stored label keeps it. A model summary removes nothing.
 - The rule runs after the level rule and the Organisation's rules. A tool effect of
@@ -279,7 +282,7 @@ Other records hold a label or a binding as JSON: `case_journal` and the Case out
 (Case Actor), `memory_revision`, `eval_revision` and `eval_run_result` (Brain), and the
 D1 tables `context_projection` and `side_case_proposal`.
 
-Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`):
+Regional D1 (`workers/platform/migrations-regional/0001_current_schema.sql`):
 
 - `held_output_request`: one row for each held answer (`subject` `output`) or held step
   (`subject` `effect`). It has the `reason`, the `status` (`pending`, `allowed`,
@@ -317,7 +320,7 @@ The control routes are under `/v1/control/organisations/:id/access-control`, in
   `pnpm lint:tool-effects` (`scripts/check-tool-effects.mjs`) refuses a `draft`,
   `receipt` or `scheduled` tool with no `prepare`.
 
-| Work                       | Entry point in `services/platform/src/`                                                                                    |
+| Work                       | Entry point in `workers/platform/src/`                                                                                     |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | Turn context               | `context/turn-context.ts` (`prepareTurnContext`, `assembleTurnContext`)                                                    |
 | Session observations       | `prepareSessionInformationFlow`, `admitSessionInformationFlowObservation`                                                  |
@@ -398,12 +401,10 @@ planner and interpreter; a second policy engine.
 - `schedule_follow_up`, `menu_board_archive` and `whatsapp_support_reply_send` run no
   exit check. The proposal tools and the surface tools also run none
   ([Refactor 17](../../refactor-17.md), Appendix C). Plan 89 says that a follow-up asks.
-- The link read (`read_message_link`) records no observation, so its text has no label
-  and no writer. No source adapter makes a public label for a published menu, a
-  fetched page or documentation.
-- `outsideWrittenFlowLabel` has no caller. Thus only a label of `email.mailbox.read` or
-  `whatsapp.support.read` states the writer. A mailbox, WhatsApp or scheduled turn is
-  not marked by its own ingress.
+- No source adapter makes a public label for a published menu, a fetched page or
+  documentation. The link read gives a page the message's ingress label.
+- Only a label of `email.mailbox.read`, `whatsapp.support.read` or the link read states
+  the writer. A mailbox, WhatsApp or scheduled turn is not marked by its own ingress.
 - A turn of no person cannot ask, so its blocked effect stays refused. Commerce
   execution after a signed approval and a custom connector read are also refused, with
   no question.
@@ -420,9 +421,10 @@ planner and interpreter; a second policy engine.
   not built. A handoff sink and an `artifact_export` sink are not built.
 - The nine reader kinds stay in stored labels. `policyLevel` gives a stored policy its
   level at each read, so no background conversion runs.
-- The two journeys of the writer rule add the outside read to the running turn
-  directly (`raiseLabel` in `tests/e2e/held-exit-support.ts`), and they use fake
-  services. They read no mailbox. No file in `services/platform/tests/` holds the
+- `outside-written-effect.test.ts` adds the outside read to the running turn directly
+  (`raiseLabel` in `tests/e2e/held-exit-support.ts`). `outside-written-link.test.ts`
+  reads a fake public page through the link read of a Slack thread. Both use fake
+  services, and they read no mailbox. No file in `workers/platform/tests/` holds the
   reason code `aifc.other_recipient`.
 - The Slack stream calls and `chat.update` send no preview flag. Their link preview
   was not checked on real Slack.
@@ -439,9 +441,10 @@ planner and interpreter; a second policy engine.
   [Plan 29](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-29-organisation-agent-email-mailboxes.md).
 - The sources name no evidence file in the archive. Where a source differs from the
   code, this spec follows the code.
-- E2E journeys in `services/platform/tests/e2e/`: `slack-held-output.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `slack-held-output.test.ts`,
   `slack-held-effect.test.ts`, `slack-exit-levels.test.ts`,
-  `outside-written-effect.test.ts`, `airtable-exit-approval.test.ts`,
+  `outside-written-effect.test.ts`, `outside-written-link.test.ts`,
+  `airtable-exit-approval.test.ts`,
   `slack-streamed-answer-withheld.test.ts`, `slack-context-search-labels.test.ts`,
   `slack-email-draft-label.test.ts`, `project-ifc.test.ts`,
   `chat-side-case-ifc.test.ts`, `pi-menu-board-one-allow.test.ts`,

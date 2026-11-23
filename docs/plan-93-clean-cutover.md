@@ -2,8 +2,9 @@
 
 Status: 22 November 2026. Steps 0 to 6 are done. The new stack serves
 production on `pantry.purin.io`, the providers use the new callbacks, and the
-old stack is deleted. Step 7 (other projects) and the separate work in "Step
-6 results" are open.
+old stack is deleted. Checked on 23 November 2026: the follow-ups that remain
+need the owner, and WhatsApp is deferred ("Follow-up results", "Still
+open"). Step 7 is done: only `hadimar` remains, which the owner keeps.
 
 Change on 21 November 2026 ([Plan 95](plan-95-pantry-own-accounts.md) step
 4): Pantry no longer binds the Console. The new stack has no
@@ -960,13 +961,16 @@ Stripe Connect redirects, the Meta webhook and the remaining console names.
 - **Still open:** a test order on `shop.purin.io` (the café menu was
   closed at midnight); the owner's first Turn on of the Gmail mailbox with
   the consent checkbox; the OpenRouter "Input & Output Logging" setting of
-  the Purin account, which the API cannot read; the zone `seams.tech`,
-  which Cloudflare refuses to remove because this account holds its
-  Cloudflare Registrar registration, expired on 11 October 2026 and now in
-  the redemption period (restore: $66.00 plus $49.20 for one year); and
-  the `speak-to-sign` project (Pages, KV `speak-to-sign-faucet-limits`)
-  with the domain `tatchi.xyz`, which still serves visitors from this
-  account. The stale zone record `seams.sh` (its name servers point to the
+  the Purin account, which the API cannot read (on 23 November 2026 the
+  owner's Chrome had no OpenRouter sign-in, so the setting is still not
+  read).
+- **Closed on 23 November 2026 (owner's yes):** the Pages project
+  `outlayer-email-recovery-example` (no custom domain, last deployment about
+  four months earlier) is deleted. Of step 7 only `hadimar` remains, which
+  the owner keeps.
+- **Deferred on 23 November 2026:** the Meta webhook and every WhatsApp
+  check. Meta banned the owner's account.
+- **Closed:** the stale zone record `seams.sh` (its name servers point to the
   other account) and the token "Cloudflare Tunnel API Token for seams.sh"
   (no tunnel exists) are deleted. The token "seams-monorepo GitHub
   Actions" (Pages, D1 and Workers scripts in the whole account) was the
@@ -977,6 +981,18 @@ Stripe Connect redirects, the Meta webhook and the remaining console names.
   Cloudflare secrets to the seamsadmin account on 20 November. Of step 7 only `hadimar` (the owner keeps
   it) and the Pages project `outlayer-email-recovery-example` remain; the
   other groups are gone.
+- **Decided on 23 November 2026:** the owner deleted the domain
+  `seams.tech` and does not restore it. Its lapse costs nothing. Cloudflare
+  keeps the zone while this account holds the expired Registrar
+  registration. The owner keeps the `speak-to-sign` project (Pages, KV
+  `speak-to-sign-faucet-limits`). The owner deleted `tatchi.xyz`: its
+  website records (`tatchi.xyz` and `wallet.tatchi.xyz`, which pointed to
+  Pages projects in the seamsadmin account) and its Google verification
+  record are deleted, and the domain serves no website. Cloudflare refuses
+  to remove the zone while this account holds the Registrar registration,
+  which ends on 11 August 2027 with auto renew off. The owner also stopped
+  the mail: Email Routing for the domain, its forwarding rules and its mail
+  records are deleted, and the zone has no DNS records.
 
 ### 7. Other projects (separate)
 

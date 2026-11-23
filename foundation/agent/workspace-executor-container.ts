@@ -56,7 +56,7 @@ export type WorkspaceExecutorInspectionInvocation =
     };
 
 /**
- * @public `services/platform/src/integration-gateway.ts` exports it for the
+ * @public `workers/platform/src/integration-gateway.ts` exports it for the
  * container binding of `wrangler.jsonc`.
  */
 export class WorkspaceExecutorContainer extends Container<Env> {

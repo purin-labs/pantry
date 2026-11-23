@@ -10,6 +10,7 @@ export {
   type AttachmentState,
 } from "./attachment";
 export { Button, type ButtonProps, type ButtonVariant } from "./button";
+export { RemoveConfirm, type RemoveConfirmProps } from "./remove-confirm";
 export { EmptyState, type EmptyStateProps } from "./empty-state";
 export {
   CrmTable,
@@ -91,7 +92,6 @@ export {
   type PermissionRequestDecision,
   type PermissionRequestDialogProps,
   type PermissionRequestItem,
-  type PermissionRequestScope,
 } from "./permission-request";
 export {
   holdLayoutMorph,

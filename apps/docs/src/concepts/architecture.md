@@ -5,7 +5,7 @@ description: The runtime, service, and data boundaries that make up Purin Pantry
 
 # Architecture
 
-Pantry is Cloudflare-native. `services/platform` owns the Worker, HTTP routes,
+Pantry is Cloudflare-native. `workers/platform` owns the Worker, HTTP routes,
 Slack ingress, OAuth, onboarding, D1 migrations, Durable Objects, queues, R2,
 KV, and container orchestration. The portal is compiled into Worker assets for
 deployment, while its source lives in `apps/portal`.
@@ -14,7 +14,7 @@ deployment, while its source lives in `apps/portal`.
 
 ```mermaid
 flowchart TB
-    Portal["apps/portal"] --> Platform["services/platform\nCloudflare Worker"]
+    Portal["apps/portal"] --> Platform["workers/platform\nCloudflare Worker"]
     Slack["Slack ingress"] --> Platform
     OAuth["OAuth callbacks"] --> Platform
     Webhooks["Provider webhooks"] --> Platform
@@ -71,7 +71,7 @@ budgets, cancellation, and output receipts for all active routes.
 
 | Area               | Responsibility                                                      | Location                                                       |
 | ------------------ | ------------------------------------------------------------------- | -------------------------------------------------------------- |
-| Platform           | Control plane, integrations, actors, projections, and orchestration | `services/platform`                                            |
+| Platform           | Control plane, integrations, actors, projections, and orchestration | `workers/platform`                                            |
 | Portal             | Merchant and agent operations UI                                    | `apps/portal`                                                  |
 | Commerce contracts | Provider-neutral TypeScript contract schemas                        | `packages/contracts`                                           |
 | Commerce authority | Private catalog, inventory, checkout, order, and fulfillment state  | `services/commerce` or the selected provider                 |

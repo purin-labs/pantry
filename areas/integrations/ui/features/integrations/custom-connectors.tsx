@@ -23,6 +23,7 @@ import { customConnectorCollectionPath, customConnectorActionPath, customConnect
 import type { CustomConnectorAccountView, CustomConnectorAction, CustomConnectorWritePreview, CustomConnectorJsonValue, CustomConnectorMutationResult, CustomConnectorRevisionView, CustomConnectorSetupAttempt, CustomConnectorSummary } from "@purin-labs/control-api/portal/custom-connectors";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, errorMessage, isRecord } from "@purin-labs/std";
+import { RemoveConfirm } from "@purin-labs/ui/index";
 
 type Loadable<Value> =
   | { readonly kind: "loading" }
@@ -462,6 +463,7 @@ function CustomConnectorReview(props: {
 }): React.ReactNode {
   const definition = props.head.definition ?? props.head.authoringDocument;
   const operations = readOperationReviews(definition);
+  const connectorName = props.detail.summary.name ?? "this connector";
   return (
     <>
       <header className="custom-connector-review-heading">
@@ -562,24 +564,24 @@ function CustomConnectorReview(props: {
           ) : null}
           {props.detail.summary.lifecycle === "disabled" ? (
             props.detail.accounts.length === 0 ? (
-              <button
-                type="button"
-                className="button-danger"
-                disabled={props.busy}
-                onClick={props.runLifecycleAction.bind(null, "remove")}
-              >
-                Remove connector
-              </button>
+              <RemoveConfirm
+                label="Remove connector…"
+                question={`Remove ${connectorName}?`}
+                consequence="Its definition and revisions are deleted. To use this API again, add the connector again."
+                confirmLabel="Remove connector"
+                busy={props.busy}
+                onConfirm={props.runLifecycleAction.bind(null, "remove")}
+              />
             ) : null
           ) : (
-            <button
-              type="button"
-              className="button-secondary"
-              disabled={props.busy}
-              onClick={props.runLifecycleAction.bind(null, "disable")}
-            >
-              Disable connector
-            </button>
+            <RemoveConfirm
+              label="Disable connector…"
+              question={`Disable ${connectorName}?`}
+              consequence="Agents stop using it and its accounts at once. Resume it to use it again."
+              confirmLabel="Disable connector"
+              busy={props.busy}
+              onConfirm={props.runLifecycleAction.bind(null, "disable")}
+            />
           )}
         </div>
       ) : null}

@@ -38,17 +38,17 @@ give the signed-in member's commands. A speaker check closes that gap for every 
 
 ## What exists and stays
 
-| Part                                    | Where                                                                             | Use in this plan                                                     |
-| --------------------------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Capture, VAD, wake phrase, hold-to-talk | `apps/portal/src/features/voice/session.ts`, `wake-worker.ts`, `start-attempt.ts` | The VAD gives the speech pieces. The wake and the key stay.          |
-| Shop Mac transcription and noise rule   | `services/shop-voice/shop_voice/engines/` (service 0.5.1, Plan 82C)               | Transcribes the member's speech. The noise rule (Plan 82 D11) stays. |
-| Workers AI fallback                     | `services/platform/src/voice/`                                                    | Wake and key commands only (D6).                                     |
-| Spoken answers                          | Mac `POST /speech`, Kokoro `af_heart` (Plan 82 D9)                                | The follow-up window starts when an answer ends.                     |
-| Speaker model                           | seams-wallet VoiceID: ReDimNet B1, ONNX Runtime Web                               | The speaker check (D2).                                              |
-| Jev transport, allowance and switches   | `integrations/typesafe/system-one-client.ts`, Plan 88                             | One option for the addressee check (D5).                             |
-| Screen context                          | [Plan 87](history/plan-87-screen-context.md)                                      | The page on screen is one input to the addressee check.              |
-| Chat send, approvals, receipts          | `features/chat/api.ts`, `approval-authentication.ts`                              | An accepted sentence goes through the same send path as typed text.  |
-| Daily counts on the device              | Plan 82 D11                                                                       | New counts for each gate.                                            |
+| Part                                    | Where                                                                                        | Use in this plan                                                     |
+| --------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Capture, VAD, wake phrase, hold-to-talk | `surfaces/voice/ui/features/voice/session.ts`, `wake-worker.ts`, `start-attempt.ts`          | The VAD gives the speech pieces. The wake and the key stay.          |
+| Shop Mac transcription and noise rule   | `services/shop-voice/shop_voice/engines/` (service 0.5.1, Plan 82C)                          | Transcribes the member's speech. The noise rule (Plan 82 D11) stays. |
+| Workers AI fallback                     | `surfaces/voice/server/`                                                                     | Wake and key commands only (D6).                                     |
+| Spoken answers                          | Mac `POST /speech`, Kokoro `af_heart` (Plan 82 D9)                                           | The follow-up window starts when an answer ends.                     |
+| Speaker model                           | seams-wallet VoiceID: ReDimNet B1, ONNX Runtime Web                                          | The speaker check (D2).                                              |
+| Jev transport, allowance and switches   | `foundation/agent/integrations/typesafe/system-one-client.ts`, Plan 88                       | One option for the addressee check (D5).                             |
+| Screen context                          | [Plan 87](history/plan-87-screen-context.md)                                                 | The page on screen is one input to the addressee check.              |
+| Chat send, approvals, receipts          | `surfaces/portal/ui/features/chat/api.ts`, `foundation/authority/approval-authentication.ts` | An accepted sentence goes through the same send path as typed text.  |
+| Daily counts on the device              | Plan 82 D11                                                                                  | New counts for each gate.                                            |
 
 ## Evidence so far
 
@@ -79,7 +79,7 @@ The voice dialog gets one choice for each member on each device:
 
 | Mode                | How speech reaches the agent                                   |
 | ------------------- | -------------------------------------------------------------- |
-| Wake phrase (today) | "Hey Satyr" or the held key                                    |
+| Wake phrase (today) | "Hey Sous Chef" or the held key                                |
 | Follow-up           | As above, and 8 s after each spoken answer with no wake phrase |
 | Ambient             | As above, and any sentence that passes the four gates          |
 
@@ -108,7 +108,7 @@ asks for speaker enrollment first.
    does. The Mac applies the noise rule. If the Mac does not answer, the piece is dropped (D6).
 4. **Addressee.** A check decides if the sentence is for the agent. The rules come first, and
    the model runs only when no rule decides:
-   - The sentence names "Sous Chef", or "Satyr" while the wake phrase is "Hey Satyr": accept.
+   - The sentence names "Sous Chef": accept.
      "Chef" alone does not count, because a kitchen says "yes chef", and "the sous chef" can be a
      person on the staff. The first "Hey Sous Chef" wake models woke on "hey" + any word + "chef"
      ([Plan 91](plan-91-seams-atelier-rename.md), phase 6), so G0.2 includes such sentences.
@@ -242,7 +242,7 @@ existing noise sets. No customer audio is recorded.
 
 Enrollment, the speaker check on the device and the follow-up window (D8), with no addressee
 model. Rules: speaker match, the Mac noise rule and the drop of thanks and filler words. The
-speaker check also guards the wake phrase and the key, so a customer's "Hey Satyr" does
+speaker check also guards the wake phrase and the key, so a customer's "Hey Sous Chef" does
 nothing on a device in Follow-up mode.
 
 ### Phase 2 — Ambient mode

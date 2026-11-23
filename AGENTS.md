@@ -98,12 +98,12 @@ keep the names of their time: do not rewrite them.
 
 ## Where things are
 
-A spec describes what is built. A plan describes work that is not built.
-[The spec index](docs/specs/README.md) lists the 33 specs and maps each old
-plan number to its spec. Read the spec of a subsystem before you change it,
-and correct it in the same commit when one of its statements changes. Open
-plans are in `docs/`, closed plans in `docs/history/`. `services/platform` is
-the Worker `pantry`, and `scripts/layers.json` gives each file its module.
+A spec describes what is built; a plan describes work that is not built. [The
+spec index](docs/specs/README.md) lists the 33 specs and maps each old plan
+number to its spec. Read the spec of a subsystem before you change it, and
+correct it in the same commit when a statement changes. Open plans are in
+`docs/`, closed plans in `docs/history/`. `workers/platform` is the Worker
+`pantry` (`services/platform` in old plans); `scripts/layers.json` maps each file.
 
 | Layer        | Code                                                                              | Specs                                                                                                      |
 | ------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
@@ -179,7 +179,7 @@ that lets a person do something new gives the agent a way to do it:
 
 - Add a tool with the definer of its family in
   `areas/<area>/server/agent-tools/`, and one line at the end of its group in
-  `services/platform/src/agent-tools/registry.ts`. Or add a Code Mode
+  `workers/platform/src/agent-tools/registry.ts`. Or add a Code Mode
   capability. The agent acts through the person's own checks and approvals.
 - A new capability goes into `capability-catalogue.ts` of
   `foundation/authority`. Apply `node scripts/capability-policy-backfill-sql.mjs`
@@ -220,7 +220,7 @@ Add a large file with `node scripts/repo-binaries.mjs upload <path>`, not with
 ## Testing
 
 [ENG-04](docs/specs/engineering/04-testing.md) gives the suites and the checks
-that each kind of change must include. `services/platform/tests/AGENTS.md` adds rules.
+that each kind of change must include. `workers/platform/tests/AGENTS.md` adds rules.
 
 - Do not write unit tests.
 - Highly prefer E2E tests as the sole testing mechanism. Use them to verify
@@ -239,8 +239,8 @@ that each kind of change must include. `services/platform/tests/AGENTS.md` adds 
 ## Persistence and deployment
 
 - The D1 schema is two replaceable baselines, `migrations-global` and
-  `migrations-regional` in `services/platform`. A change to a baseline ships
-  with a patch script in `services/platform/scripts/` (`pnpm lint:d1-patch`).
+  `migrations-regional` in `workers/platform`. A change to a baseline ships
+  with a patch script in `workers/platform/scripts/` (`pnpm lint:d1-patch`).
   Apply the patch to each bound database before the release.
 - For a production release, follow
   [the deploy runbook](docs/runbooks/platform-production-deploy.md), and

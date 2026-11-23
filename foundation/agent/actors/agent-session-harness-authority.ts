@@ -1053,14 +1053,12 @@ export function canonicalHarnessCheckpointObjectKey(input: {
   cursor: AcceptedHarnessEventCursor;
   sha256: Sha256Digest;
 }): string {
-  return [
-    "harness-checkpoints",
-    encodeURIComponent(input.organisationId),
+  return `harness-checkpoints/${encodeURIComponent(input.organisationId)}/${[
     encodeURIComponent(input.sessionId),
     encodeURIComponent(input.cursor.turn.turnId),
     `sequence-${input.cursor.lastSequence}`,
     `${input.sha256}.bin`,
-  ].join("/");
+  ].join("/")}`;
 }
 
 export function listHarnessCheckpointObjectKeys(

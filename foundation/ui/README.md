@@ -130,6 +130,27 @@ raw `<button>` the same look. They stay for the pages that do not use `Button`
 yet. Do not use them in new code. A toggle in a segmented control, an icon
 button and a row that opens a record are not a `Button`.
 
+### Remove with a confirm in place
+
+`RemoveConfirm` (`remove-confirm.tsx`) is the one action that removes or cuts
+something off: an account, a connector, a grant. The first press replaces the
+button with the question, the consequence and two buttons, in place. Only the
+second press runs `onConfirm`. No dialog opens over the page or the drawer.
+`data` gives the confirm button `data-*` attributes, for a page action that
+reads its record from the button.
+
+```tsx
+<RemoveConfirm
+  label="Remove this Stripe account…"
+  question="Remove Purin Café?"
+  consequence="Purin Pantry stops using it at once and deletes its access."
+  confirmLabel="Remove Purin Café"
+  busy={busy}
+  onConfirm={removeAccount}
+  data={{ "account-id": account.integrationAccountId }}
+/>
+```
+
 ### Grain fields
 
 `GrainField` (`grain-field.tsx` + `grain-field.css`) is a moving, grainy
@@ -231,7 +252,7 @@ and error stacks appear as stored tool results. The runtime has no structured
 plan, test-result, or public reasoning event contract, so those gallery examples
 remain demonstrations. No private model reasoning is exposed.
 
-The native journey is `services/platform/tests/e2e/chat-execution.test.ts`.
+The native journey is `workers/platform/tests/e2e/chat-execution.test.ts`.
 Run it with the platform's E2E Vitest configuration. It checks real accepted
 tool data, pagination, Actor restart, and denied reads from another member. The
 browser journey is `scripts/frontend-foundation/chat-trace-journey.js`,
@@ -373,19 +394,21 @@ The default size is 360 × 340 pixels. `className` and `style` allow a different
 width. Long content increases the height. The `theme` prop controls the card
 and glow together. The preview uses synthetic levels and needs no audio access.
 
-Chat and Kitchen also use the light in their text inputs through
-`features/chat/work-glow.tsx`. This overlay follows the existing work and stream
-states. It fades after completion, failure, pause, cancellation, approval, or
-expiry. It follows the portal theme and preserves reduced motion.
-The overlay leaves controls and menus outside the beam's clipping area.
+The chat composer does not use this engine. Its edge,
+`surfaces/portal/ui/features/chat/composer-glow.tsx`, is plain CSS in the theme
+accent. A ring breathes while voice control listens for the wake phrase. A halo
+glows while it hears a command. A light crosses the edge while a command is
+transcribed or the agent works, and it ends after completion, failure, pause,
+cancellation, approval or expiry. It animates only opacity and translate, and
+with reduced motion the states only fade.
 
 ### Permission requests
 
 `PermissionRequestCard` is a consent card for a permission request, in the
 style of an OAuth consent screen. It shows the requester and target avatars, a
-title, the account chip and the subtitle, an optional scope `<select>`, the
-requested permissions, the footnote and the decision buttons. The inline card
-stacks these in one narrow column.
+title, the account chip and the subtitle, the requested permissions, the
+footnote and the decision buttons. The inline card stacks these in one narrow
+column.
 
 `PermissionRequestDialog` is the authorization screen, in a native modal
 `<dialog>` (through `syncDialog` and `cancelDialog`). It has two layouts, set
@@ -393,7 +416,7 @@ with `layout`:
 
 - `compact`: a narrow sheet with the app's icon, the question, the points in
   a filled box, the footnote and full-width actions. This is the default for
-  three items or fewer without a scope choice.
+  three items or fewer.
 - `split`: a wide card. The requester, the question, the account chip and the
   decision are on the left; the permissions are on the right, on a tinted
   band. Below 760px wide the card stacks. This is the default for a longer
@@ -460,9 +483,9 @@ card grows from the sheet's size while its content fades in. When the screen
 closes, the sheet grows back from the card. With reduced motion the two
 cross-fade.
 
-The card is presentation only. The caller owns `selectedIds`, the scope value,
-`pending`, and `error`, and does the work in the callbacks. Required items stay
-checked and disabled, and `onAllow` always receives them. While `pending` is set,
+The card is presentation only. The caller owns `selectedIds`, `pending`, and
+`error`, and does the work in the callbacks. Required items stay checked and
+disabled, and `onAllow` always receives them. While `pending` is set,
 both buttons are `aria-disabled` and the chosen button shows a spinner, so focus
 stays on it.
 
@@ -486,7 +509,6 @@ When the agent asks, name it with `AGENT_NAME` from `src/agent-name.ts`.
   target={{ name: "Noix de Beurre", icon: <Croissant /> }}
   title={`${AGENT_NAME} would like to read a public link`}
   subtitle="Only allow this if you trust the request."
-  scope={null}
   listHeading={`This will allow ${AGENT_NAME} to:`}
   items={items}
   selectedIds={selectedIds}

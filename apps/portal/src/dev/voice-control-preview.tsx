@@ -1,4 +1,5 @@
 import type { VoiceMacView } from "@purin-labs/control-api";
+import { ArrowUp } from "lucide-react";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import type {
@@ -10,16 +11,18 @@ import type {
   VoiceSession,
   VoiceStatus,
 } from "@purin-labs/surface-voice/ui/features/voice/session";
+import { ComposerGlow } from "@purin-labs/surface-portal/ui/features/chat/composer-glow";
 import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
 import "@purin-labs/surface-portal/ui/styles.css";
 import "@purin-labs/surface-portal/ui/features/chat/styles.css";
 import "./agent-components-preview.css";
 
 /**
- * The voice dialog, its Shop Mac view and its access prompt, with no microphone
- * and no Platform. `status` picks the session's state, `macs` the manager's
- * list and `member=1` a refused list. `window.__voiceMacs` changes the list
- * while the dialog is open.
+ * The voice dialog, its Shop Mac view, its access prompt and the composer's
+ * edge, with no microphone and no Platform. `status` picks the session's
+ * state, `work=1` adds agent work, and `cycle=1` steps through a spoken
+ * command. `macs` picks the manager's list and `member=1` a refused list.
+ * `window.__voiceMacs` changes the list while the dialog is open.
  */
 const query = new URLSearchParams(window.location.search);
 const organisationId = "organisation_preview";
@@ -30,7 +33,9 @@ const STATUSES: Readonly<Record<string, VoiceStatus>> = {
   starting: { kind: "starting" },
   listening: { kind: "listening", path: "shop_mac" },
   cloud: { kind: "listening", path: "workers_ai" },
+  hearing: { kind: "capturing", path: "shop_mac", hold: false },
   hold: { kind: "capturing", path: "shop_mac", hold: true },
+  transcribing: { kind: "transcribing", path: "shop_mac" },
   tap: { kind: "needs_tap" },
   other_tab: { kind: "blocked", reason: "other_tab" },
   microphone: { kind: "blocked", reason: "microphone" },
@@ -137,7 +142,10 @@ window.fetch = async (input, init) => {
 };
 
 /** The dialog needs the session's state and calls. A real one opens the microphone. */
-function previewSession(): VoiceSession {
+function previewSession(): Readonly<{
+  session: VoiceSession;
+  set: (next: VoiceStatus) => void;
+}> {
   let status = STATUSES[query.get("status") ?? "off"] ?? { kind: "off" };
   const key = `pantry.voice.on.${organisationId}`;
   if (status.kind === "off") localStorage.removeItem(key);
@@ -153,6 +161,16 @@ function previewSession(): VoiceSession {
       return () => listeners.delete(listener);
     },
     status: () => status,
+    // A voice in syllables, louder and quieter about four times a second.
+    level: () => {
+      const seconds = performance.now() / 1000;
+      return Math.max(
+        0,
+        0.55 +
+          0.35 * Math.sin(seconds * 8.1) * Math.sin(seconds * 2.3) +
+          0.1 * Math.sin(seconds * 21),
+      );
+    },
     resume: async () => undefined,
     unlockSpeech: () => undefined,
     close: () => undefined,
@@ -170,10 +188,37 @@ function previewSession(): VoiceSession {
       set({ kind: "off" });
     },
   };
-  return fake as unknown as VoiceSession;
+  return { session: fake as unknown as VoiceSession, set };
 }
 
-const session = previewSession();
+const { session, set: setStatus } = previewSession();
+
+/** A spoken command: the wake phrase, the command, its text, then the agent's turn. */
+const CYCLE: readonly Readonly<{
+  status: VoiceStatus;
+  working: boolean;
+  ms: number;
+}>[] = [
+  { status: { kind: "listening", path: "shop_mac" }, working: false, ms: 4000 },
+  { status: STATUSES.hearing!, working: false, ms: 2600 },
+  { status: STATUSES.transcribing!, working: false, ms: 1400 },
+  { status: { kind: "listening", path: "shop_mac" }, working: true, ms: 4000 },
+];
+
+function useCycle(): boolean {
+  const [step, setStep] = React.useState(0);
+  const cycling = query.get("cycle") === "1";
+  React.useEffect(() => {
+    if (!cycling) return;
+    const current = CYCLE[step % CYCLE.length]!;
+    setStatus(current.status);
+    const timer = setTimeout(() => setStep(step + 1), current.ms);
+    return () => clearTimeout(timer);
+  }, [cycling, step]);
+  return cycling
+    ? CYCLE[step % CYCLE.length]!.working
+    : query.get("work") === "1";
+}
 
 /** `role=member` reads no change action on the capability, so the prompt explains. */
 const access: Pick<AccessRouteTransport, "read" | "mutate"> = {
@@ -204,6 +249,7 @@ const access: Pick<AccessRouteTransport, "read" | "mutate"> = {
 
 function VoiceControlPreview(): React.ReactNode {
   usePortalTheme();
+  const working = useCycle();
   return (
     <main className="agent-preview">
       <form
@@ -211,6 +257,12 @@ function VoiceControlPreview(): React.ReactNode {
         onSubmit={(event) => event.preventDefault()}
       >
         <div className="chat-composer-surface">
+          <ComposerGlow
+            work={null}
+            stream={{ kind: "idle" }}
+            sending={working}
+            voice={session}
+          />
           <VoiceControl
             session={session}
             organisationId={organisationId}
@@ -219,7 +271,23 @@ function VoiceControlPreview(): React.ReactNode {
             accessPath="#access"
             access={access}
           />
-          <textarea aria-label="Message" />
+          <textarea
+            aria-label="Message"
+            placeholder="Ask anything, or describe an app to connect…"
+          />
+          <div className="chat-composer-toolbar">
+            <button
+              type="button"
+              className="primary-button chat-send-button"
+              data-state={working ? "stop" : "send"}
+              aria-label={working ? "Stop response" : "Send message"}
+            >
+              <span className="chat-send-icons" aria-hidden="true">
+                <ArrowUp data-icon="send" size={20} />
+                <span data-icon="stop" className="chat-stop-icon" />
+              </span>
+            </button>
+          </div>
         </div>
       </form>
     </main>

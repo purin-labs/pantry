@@ -1,4 +1,3 @@
-import type { CheckoutProfile } from "@purin-labs/commerce-contracts";
 import React from "react";
 import { Link } from "react-router";
 import { PageSkeleton, RecoverableError } from "@purin-labs/ui/page-components";
@@ -101,28 +100,41 @@ export function CheckoutProfilesRoute(props: {
   const review = activeReview(state);
   const busy = busyAction(state);
   const settingsOpen = settingsProfileId === selected.profile.checkoutProfileId;
+  const unsaved = profileDraftChanged(editorDraft, selected.profile);
 
   return (
     <section
       className="checkout-profile-workspace"
       aria-label="Checkout profiles"
     >
-      <BuyingExperience
-        configuration={editorDraft.configuration}
-        activeCount={activeStorefronts.length}
-        isDraft={selected.profile.lifecycle.state === "draft"}
-        unsaved={profileDraftChanged(editorDraft, selected.profile)}
-      />
-
       <div className="checkout-profile-detail">
         <header className="checkout-profile-detail-header">
-          <div>
-            <div className="checkout-profile-title-line">
-              <h2>{selected.profile.name}</h2>
-              <ProfileState state={selected.profile.lifecycle.state} />
-            </div>
-            <p>{activeStorefrontSummary(activeStorefronts)}</p>
+          <div className="checkout-profile-title-line">
+            <h2>{selected.profile.name}</h2>
+            <ProfileState state={selected.profile.lifecycle.state} />
+            {unsaved ? (
+              <span className="checkout-blocked">Unsaved changes</span>
+            ) : null}
+            <span className="checkout-profile-live">
+              {activeStorefrontSummary(activeStorefronts)}
+            </span>
           </div>
+          <button
+            type="button"
+            className="checkout-settings-toggle"
+            aria-expanded={settingsOpen}
+            aria-controls="checkout-settings-form"
+            onClick={setSettingsProfileId.bind(
+              null,
+              settingsOpen ? null : selected.profile.checkoutProfileId,
+            )}
+          >
+            {settingsOpen
+              ? "Hide settings"
+              : selected.profile.lifecycle.state === "draft" && props.canManage
+                ? "Edit settings"
+                : "View settings"}
+          </button>
         </header>
 
         {error === null ? null : (
@@ -135,86 +147,46 @@ export function CheckoutProfilesRoute(props: {
             {error}
           </p>
         )}
-        {selected.profile.lifecycle.state === "draft" ? null : (
+        {selected.profile.lifecycle.state === "retired" ? (
           <p className="checkout-profile-locked-note">
-            {lockedProfileNote(selected.profile.lifecycle.state)}
+            Retired profiles are locked and cannot be activated again. In-flight
+            checkouts stay valid.
           </p>
-        )}
+        ) : null}
 
-        <div className="checkout-profile-grid">
-          <div className="checkout-settings">
-            <div className="checkout-settings-heading">
-              <div>
-                <h3>Checkout settings</h3>
-                <p>
-                  Control customer details, order limits, fulfillment, and
-                  payment rules.
-                </p>
-              </div>
-              <button
-                type="button"
-                aria-expanded={settingsOpen}
-                aria-controls="checkout-settings-form"
-                onClick={setSettingsProfileId.bind(
-                  null,
-                  settingsOpen ? null : selected.profile.checkoutProfileId,
-                )}
-              >
-                {settingsOpen
-                  ? "Hide settings"
-                  : selected.profile.lifecycle.state === "draft" &&
-                      props.canManage
-                    ? "Edit settings"
-                    : "View settings"}
-              </button>
-            </div>
-            <ol className="checkout-settings-guide">
-              <li>
-                <strong>Configure</strong>
-                <span>
-                  Create a draft to make changes without affecting customers.
-                </span>
-              </li>
-              <li>
-                <strong>Save and publish</strong>
-                <span>Review the settings and publish the saved version.</span>
-              </li>
-              <li>
-                <strong>Activate</strong>
-                <span>
-                  Choose the storefront that should use this checkout.
-                </span>
-              </li>
-            </ol>
-            <div id="checkout-settings-form" hidden={!settingsOpen}>
-              <ProfileEditor
-                profile={selected}
-                draft={editorDraft}
-                readiness={readiness}
-                canManage={props.canManage}
-                busy={busy}
-                dispatch={controller.context.dispatch}
-                onSave={submitSave.bind(
-                  null,
-                  controller.context,
-                  selected,
-                  editorDraft,
-                )}
-              />
-            </div>
-          </div>
+        <BuyingExperience
+          configuration={editorDraft.configuration}
+          isDraft={selected.profile.lifecycle.state === "draft"}
+          unsaved={unsaved}
+        />
 
-          <ProfileLifecycle
-            collection={state.collection}
+        <div id="checkout-settings-form" hidden={!settingsOpen}>
+          <ProfileEditor
             profile={selected}
             draft={editorDraft}
             readiness={readiness}
-            activationStorefrontId={state.activationStorefrontId}
             canManage={props.canManage}
-            busy={busy !== null}
+            busy={busy}
             dispatch={controller.context.dispatch}
+            onSave={submitSave.bind(
+              null,
+              controller.context,
+              selected,
+              editorDraft,
+            )}
           />
         </div>
+
+        <ProfileLifecycle
+          collection={state.collection}
+          profile={selected}
+          draft={editorDraft}
+          readiness={readiness}
+          activationStorefrontId={state.activationStorefrontId}
+          canManage={props.canManage}
+          busy={busy !== null}
+          dispatch={controller.context.dispatch}
+        />
 
         {review === null ? null : (
           <ReviewPanel
@@ -255,18 +227,8 @@ function focusCheckoutError(
 }
 
 function activeStorefrontSummary(activeStorefronts: readonly string[]): string {
-  if (activeStorefronts.length === 0) {
-    return "This version is not active on a storefront.";
-  }
-  return `Used by ${activeStorefronts.length} ${activeStorefronts.length === 1 ? "storefront" : "storefronts"}.`;
-}
-
-function lockedProfileNote(
-  state: Exclude<CheckoutProfile["lifecycle"]["state"], "draft">,
-): string {
-  return state === "published"
-    ? "Published configuration · Create a draft to change these settings."
-    : "Retired profiles are locked and cannot be activated again. In-flight checkouts stay valid.";
+  if (activeStorefronts.length === 0) return "Not live on a storefront";
+  return `Live on ${activeStorefronts.length} ${activeStorefronts.length === 1 ? "storefront" : "storefronts"}`;
 }
 
 function closeReview(dispatch: React.Dispatch<CheckoutProfilesAction>): void {

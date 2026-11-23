@@ -1038,7 +1038,7 @@ function PreviewApp(): React.ReactNode {
       }}
     >
       <PageHeader
-        title="Brain"
+        title="Knowledge"
         description="Review what the agents have learned and decide what they may use."
       />
       <BrainRoute

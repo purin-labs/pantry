@@ -20,7 +20,7 @@
 //   Objects, R2, KV, D1, Queues, the Cache API and `cloudflare:` modules
 //   appear only in CLOUDFLARE_ADAPTERS.
 // - Platform actors, Slack code and chat code import no route file in
-//   services/platform/src/control/routes/ (Refactor 10 step 3), by a relative
+//   workers/platform/src/control/routes/ (Refactor 10 step 3), by a relative
 //   path or by a package name. A route parses, authorizes and calls domain
 //   code; domain code does not call back. A route file runs no D1 query
 //   either: the query lives in a data/ module. A foundation package keeps the

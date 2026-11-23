@@ -3,7 +3,7 @@
 // registers the Session turn rule (`actors/agent-session.ts`). A trial Worker
 // loads neither, so it registers both here, with the production
 // implementations, before it serves a request.
-import "../../services/platform/src/worker-ports.ts";
+import "../../workers/platform/src/worker-ports.ts";
 import { authorizeChatHarnessLease } from "../../foundation/conversation/chat/turn-access.ts";
 import { registerSessionTurnAccess } from "../../foundation/agent/actors/session-turn-access.ts";
 

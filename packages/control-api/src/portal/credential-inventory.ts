@@ -97,16 +97,6 @@ export type CredentialRotationReceipt = {
   readonly policyActivation: "completed" | "reconciling";
 };
 
-/** Receipt returned by POST …/accounts/:a/revoke-credential on success. */
-export type CredentialRevocationReceipt = {
-  readonly revocationId: string;
-  readonly state: CredentialRevocationState;
-  readonly credentialGenerationCount: number;
-  readonly vaultSecretCount: number;
-  readonly startedAt: number;
-  readonly committedAt: number;
-};
-
 export function parseCredentialInventoryResponse(
   raw: unknown,
 ): CredentialInventory {
@@ -155,38 +145,6 @@ export function parseCredentialRotationReceiptResponse(
     previousGeneration: rotation.previous_generation,
     activeGeneration: rotation.active_generation,
     policyActivation: rotation.policy_activation,
-  };
-}
-
-/**
- * Parses the revocation receipt out of a revoke-credential success response.
- * Returns null when the receipt is absent (idempotent replay).
- */
-export function parseCredentialRevocationReceiptResponse(
-  raw: unknown,
-): CredentialRevocationReceipt | null {
-  if (!isRecord(raw) || raw.kind !== "success") {
-    throw new Error("Credential revocation response is invalid.");
-  }
-  const revocation = raw.revocation;
-  if (
-    !isRecord(revocation) ||
-    typeof revocation.revocation_id !== "string" ||
-    !isCredentialRevocationState(revocation.state) ||
-    !isNonNegativeInteger(revocation.credential_generation_count) ||
-    !isNonNegativeInteger(revocation.vault_secret_count) ||
-    !epochMs(revocation.started_at) ||
-    !epochMs(revocation.committed_at)
-  ) {
-    return null;
-  }
-  return {
-    revocationId: revocation.revocation_id,
-    state: revocation.state,
-    credentialGenerationCount: revocation.credential_generation_count,
-    vaultSecretCount: revocation.vault_secret_count,
-    startedAt: revocation.started_at,
-    committedAt: revocation.committed_at,
   };
 }
 

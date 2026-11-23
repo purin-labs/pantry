@@ -5,7 +5,7 @@ Last reviewed: 2026-10-19
 
 A Pi Code Mode script runs in the QuickJS VM of the `CodeModeSandbox` class.
 That class lives in its own Worker, `pantry-code-sandbox`
-(`services/platform/wrangler.code-mode-sandbox.jsonc`). The Platform Worker
+(`workers/platform/wrangler.code-mode-sandbox.jsonc`). The Platform Worker
 binds the class by name as `CODE_MODE_SANDBOX`. [Integration architecture: capabilities and tools (was Spec 10)](../architecture/integrations.md#capabilities-and-tools)
 describes the engine and its recovery. This runbook covers the deployment
 order, what an unfinished script depends on, a release that changes it, and a
@@ -54,7 +54,7 @@ A harness that starts `wrangler dev` by itself must pass the three profiles:
 wrangler.model-exit.jsonc`. With the
 Platform profile alone the Worker starts, and a Pi script ends with a sandbox
 failure. `scripts/plan40/real-worker.mjs` and
-`services/platform/scripts/whatsapp-dev.sh` start the Platform Worker alone.
+`workers/platform/scripts/whatsapp-dev.sh` start the Platform Worker alone.
 
 ## CPU limit
 
@@ -139,7 +139,7 @@ Set `ORIGIN` to the public origin of the Platform Worker and
 6. Read the state. It must name `admission_open`. Then run one turn with a
    script.
 
-The journey `services/platform/tests/e2e/durable-codemode-release.test.ts`
+The journey `workers/platform/tests/e2e/durable-codemode-release.test.ts`
 rehearses this procedure on the real route. It observed these answers:
 
 | Step                                  | Blockers in the answer                                            |

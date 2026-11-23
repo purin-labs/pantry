@@ -97,7 +97,7 @@ these rules:
 To remove a crossing, use a port: the lower module defines an interface, and the higher
 module gives the implementation. `definePort` is in `foundation/kernel/port.ts`.
 
-The lint reads the `.ts` and `.tsx` files under `covers`: `services/platform/src/`,
+The lint reads the `.ts` and `.tsx` files under `covers`: `workers/platform/src/`,
 `apps/portal/src/` and `foundation/`. For other packages, it reads only the workspace
 dependencies in `package.json`. It finds a D1 write by a literal table name. Its list of
 known crossings is empty. A new entry needs a `reason` and a `fix`.
@@ -193,7 +193,7 @@ Other lints guard one subsystem. The spec of that subsystem describes these:
   `areas/integrations/server/provider-workflows`. `pnpm lint:fix` repairs that folder.
 - `pnpm lint:ifc-boundaries` first runs `scripts/check-ifc-destinations.mjs`, which
   refuses a new information-flow destination with no class. It then runs ESLint on
-  `services/platform/src`, `foundation` and `apps/portal/src` with the style rules off.
+  `workers/platform/src`, `foundation` and `apps/portal/src` with the style rules off.
   ESLint applies the restricted imports and refuses the global `fetch` as a value. Pass
   `runtimeFetch` from `foundation/kernel/runtime-fetch.ts`.
 - For a file that you edit, run `pnpm exec eslint --fix <file>`, then
@@ -203,7 +203,7 @@ Other lints guard one subsystem. The spec of that subsystem describes these:
 
 | Concern                   | The one place                                                                                                                                                                                                                                                                                                                          |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| An agent tool             | One value from the definer of its family under `services/platform/src/agent-tools/`, and one line in `registry.ts`                                                                                                                                                                                                                     |
+| An agent tool             | One value from the definer of its family under `workers/platform/src/agent-tools/`, and one line in `registry.ts`                                                                                                                                                                                                                      |
 | The Actor lifecycle       | `PlacedActor` (`actors/lifecycle/placed-actor.ts`). `SessionActor`, `CaseActor`, `ConnectorActorBase` and `OrganisationActorBase` extend it. `DeviceFleetActor`, `ConversationResidencyActor`, `BakeRunActor` and `CodeModePlatformGovernorActor` extend `DurableObject` directly                                                      |
 | An Actor alarm and schema | `rearmActorAlarm`, `setActorAlarm` and `armAlarmBy` (`actors/lifecycle/actor-alarm.ts`), and `actors/schema-migrations.ts`. The four direct Actors, `session-actor.ts`, `actor-export.ts` and `actor-activation.ts` also call `setAlarm` directly                                                                                      |
 | A control route           | A route parses, checks authorization, calls one domain function and maps its result. In new and moved code, a domain function returns a `Result`, knows no HTTP and throws only for a programmer error                                                                                                                                 |
@@ -334,7 +334,7 @@ acceptance before Stage B moves its files.
   - Actors: [placed actor](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-10/step-2-placed-actor.md), [alarms](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-10/step-2-alarm-scheduler.md), [schemas](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-10/step-2-schema-migrations.md), [Session split](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-10/step-2-session-split.md), [actor splits](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-10/step-2-actor-splits.md), [parser contracts](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-10/step-2-parser-contracts.md)
   - Portal: [simulation](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-10/step-4-simulation-package.md), [settings](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-10/step-4-settings-split.md), [split](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-10/step-4-portal-split.md), [sweep](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-10/step-4-portal-sweep.md), [playback](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-10/step-4-playback-controller.md), [typed reads](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/refactor-10/step-4-typed-reads.md)
 - This subsystem has no product journey. The lints are its checks. Plan 92 names these
-  journeys in `services/platform/tests/e2e/`: `case-context-discovery-access.test.ts`,
+  journeys in `workers/platform/tests/e2e/`: `case-context-discovery-access.test.ts`,
   `whatsapp-erasure.test.ts`, `session-quarantine-end.test.ts` and
   `pi-sdk-actor.test.ts`. The Kitchen journey index is
   `scripts/production-simulation/journeys.json`.

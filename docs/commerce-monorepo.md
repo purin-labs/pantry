@@ -17,7 +17,7 @@ collaborative authoring. General desktop filesystem synchronization is deferred.
 | **Commerce**          | Transactional commerce authority                                  | `services/commerce`                                                                                       | Independent service and database      |
 | **Contracts**           | Shared commerce language and domain contracts                     | `packages/contracts`                                                                                        | Compiled into Pantry and its consumers |
 | **Urk**                 | Merchant-agent behavior and operating judgment                    | `surfaces/slack/server/data/urk-skills.ts` and Pantry agent configuration                                    | Pantry runtime                         |
-| **Commerce Read Layer** | Rebuildable projections, queries, search, and operational history | `services/platform` OrganisationActor projections, normalized commerce relations, and `CommerceGraphReader` | Pantry runtime                         |
+| **Commerce Read Layer** | Rebuildable projections, queries, search, and operational history | `workers/platform` OrganisationActor projections, normalized commerce relations, and `CommerceGraphReader` | Pantry runtime                         |
 | **Punter**              | Independent buyer and acceptance scenarios                        | `scripts/punter`                                                                                            | CLI and CI harness                    |
 
 These names make ownership understandable. They do not create a package,

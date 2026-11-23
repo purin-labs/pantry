@@ -94,7 +94,7 @@ with a Portal session reaches `POST …/agent-mailboxes/{account}/model-consent`
 
 The release that brought the review list adds the column
 `consented_by_user_id`. Apply
-`services/platform/scripts/gmail-model-consent-d1-patch.sql` to each regional
+`workers/platform/scripts/gmail-model-consent-d1-patch.sql` to each regional
 database before that release.
 
 ## Normal operating loop

@@ -1,7 +1,6 @@
-import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { credentialRotationSupported, findCredentialAccountRecord } from "../../credential-inventory";
-import type { CredentialAccountRecord, CredentialInventory, CredentialRotationReceipt, CredentialRevocationReceipt } from "@purin-labs/control-api/portal/credential-inventory";
+import type { CredentialAccountRecord, CredentialInventory, CredentialRotationReceipt } from "@purin-labs/control-api/portal/credential-inventory";
 import { StatusChip } from "@purin-labs/ui/page-components";
 import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import {
@@ -17,12 +16,12 @@ import {
   integrationLifecycleStatus,
   isFullMailboxGmailAccount,
   reconnectableProvider,
-  renderConnectionRecency,
   renderMutationFeedback,
 } from "./settings-support";
 import type { CredentialActionOutcome, IntegrationsPageActions, PendingProviderAuthorization, SettingsMutationFeedback } from "./settings-types";
 import type { IntegrationAccount } from "@purin-labs/control-api/portal/settings";
 import { ConfirmButton } from "./workspace";
+import { RemoveConfirm } from "@purin-labs/ui/index";
 
 type IntegrationAccountControls = {
   readonly mutations: MutationLedger;
@@ -117,8 +116,7 @@ function renderReadonlyIntegrationAccountRow(
       <div className="connection-body">
         {renderConnectionHead(account, accounts.length > 1)}
         {renderConnectionProblem(account)}
-        {renderIntegrationAccountDetails(account)}
-        {renderConnectionRecency(account)}
+        {renderAccountAccess(account)}
       </div>
     </div>
   );
@@ -150,33 +148,25 @@ function renderIntegrationAccountRow(
           kind: "integration_account",
           integrationAccountId: account.integrationAccountId,
         })}
-        {renderIntegrationAccountDetails(account)}
-        {renderConnectionRecency(account)}
+        {renderAccountAccess(account)}
         <div className="connection-command">
           {commands.primary}
           {commands.cancel}
           {commands.secondary}
+          {record === null ? null : (
+            <CredentialRotateAction
+              account={account}
+              record={record}
+              busy={integrationAccountBusy(
+                controls.mutations,
+                controls.pendingAuthorization,
+                account.integrationAccountId,
+              )}
+              rotate={actions.rotateCredential}
+            />
+          )}
           {commands.danger}
         </div>
-        {record === null ? null : (
-          <CredentialRecoveryActions
-            account={account}
-            record={record}
-            candidates={groupAccounts.filter(
-              isCredentialReplacementCandidate.bind(
-                null,
-                account.integrationAccountId,
-              ),
-            )}
-            busy={integrationAccountBusy(
-              controls.mutations,
-              controls.pendingAuthorization,
-              account.integrationAccountId,
-            )}
-            rotate={actions.rotateCredential}
-            revoke={actions.revokeCredential}
-          />
-        )}
       </div>
     </div>
   );
@@ -301,35 +291,22 @@ function connectionCause(service: string, reasonCode: string): string {
   }
 }
 
-function isCredentialReplacementCandidate(
-  integrationAccountId: string,
-  account: IntegrationAccount,
-): boolean {
+/**
+ * One sentence says what the account lets Purin Pantry do, and a second one
+ * names what it reaches when that is more than the account itself.
+ */
+function renderAccountAccess(account: IntegrationAccount): React.ReactNode {
   return (
-    account.integrationAccountId !== integrationAccountId &&
-    account.lifecycle.kind === "active"
-  );
-}
-
-function renderIntegrationAccountDetails(
-  account: IntegrationAccount,
-): React.ReactNode {
-  return (
-    <dl className="integration-account-details">
-      <div>
-        <dt>What Purin Pantry can do</dt>
-        <dd>{describeAccountAccess(account)}</dd>
-      </div>
+    <>
+      <p className="connection-meta">{describeAccountAccess(account)}</p>
       {account.selectedResources.length === 0 ||
       account.provider === "slack" ? null : (
-        <div>
-          <dt>Connected to</dt>
-          <dd>
-            {account.selectedResources.map(formatSelectedResource).join(" · ")}
-          </dd>
-        </div>
+        <p className="connection-meta">
+          Connected to{" "}
+          {account.selectedResources.map(formatSelectedResource).join(" · ")}
+        </p>
       )}
-    </dl>
+    </>
   );
 }
 
@@ -409,12 +386,13 @@ export function integrationAccountCommands(
     controls.pendingAuthorization,
     account.integrationAccountId,
   );
-  const reconnectButton = (filled: boolean): React.ReactNode =>
+  // Reconnect is a repair: it shows only when the account needs one.
+  const reconnectButton = (): React.ReactNode =>
     provider === null ? null : (
       <button
         key="reconnect"
         type="button"
-        className={filled ? "connection-primary-action" : undefined}
+        className="connection-primary-action"
         data-provider={provider}
         data-account-id={account.integrationAccountId}
         onClick={actions.reconnectAccount}
@@ -447,37 +425,26 @@ export function integrationAccountCommands(
       Cancel
     </button>
   ) : null;
-  const disconnect = (
-    <ConfirmButton
-      key="disconnect"
-      confirmKey={`disable:${account.integrationAccountId}`}
-      pendingConfirm={controls.pendingConfirm}
-      requestConfirm={controls.requestConfirm}
-      onConfirmed={actions.disableAccount}
-      disabled={rowBusy}
-      label={subject === null ? "Disconnect" : `Disconnect ${subject}`}
-      confirmLabel={
-        subject === null
-          ? `Confirm ${service} disconnection`
-          : `Confirm: disconnect ${subject}`
+  // The one action that cuts the account off. Removal revokes the stored
+  // sign-in or key and erases what the account held, so a softer
+  // "Disconnect" beside it would only leave a second, weaker way out.
+  const remove = (
+    <RemoveConfirm
+      key="remove"
+      label={subject === null ? `Remove ${accountNoun(account)}…` : `Remove ${subject}…`}
+      question={`Remove ${subject ?? account.displayName}?`}
+      consequence="Purin Pantry stops using it at once and deletes its access. To use it again, connect it again."
+      confirmLabel={`Remove ${subject ?? account.displayName}`}
+      busy={
+        rowBusy ||
+        (account.lifecycle.kind === "disabled" &&
+          account.isDefaultForProvider &&
+          account.accountKind !== "mailbox")
       }
+      onConfirm={actions.removeAccount}
       data={{ "account-id": account.integrationAccountId }}
     />
   );
-  const removeSlackWorkspace =
-    account.provider === "slack" ? (
-      <ConfirmButton
-        key="remove-workspace"
-        confirmKey={`remove:${account.integrationAccountId}`}
-        pendingConfirm={controls.pendingConfirm}
-        requestConfirm={controls.requestConfirm}
-        onConfirmed={actions.removeAccount}
-        disabled={rowBusy}
-        label="Remove this Slack workspace"
-        confirmLabel="Confirm: remove this Slack workspace"
-        data={{ "account-id": account.integrationAccountId }}
-      />
-    ) : null;
 
   switch (account.lifecycle.kind) {
     case "connecting":
@@ -506,7 +473,8 @@ export function integrationAccountCommands(
       };
     case "active":
       return {
-        primary: null,
+        // A sign-in window that is already open still shows what it waits for.
+        primary: waiting ? reconnectButton() : null,
         cancel: cancelAuthorization,
         secondary: [
           account.isDefaultForProvider ? null : (
@@ -520,50 +488,24 @@ export function integrationAccountCommands(
               Make default
             </button>
           ),
-          reconnectButton(false),
           refreshResources,
         ].filter(Boolean),
-        danger: [removeSlackWorkspace ?? disconnect],
+        danger: [remove],
       };
     case "degraded":
     case "reauth_required":
       return {
-        primary: reconnectButton(true),
+        primary: reconnectButton(),
         cancel: cancelAuthorization,
         secondary: [refreshResources].filter(Boolean),
-        danger: [disconnect],
+        danger: [remove],
       };
     case "disabled":
       return {
-        primary: reconnectButton(true),
+        primary: reconnectButton(),
         cancel: cancelAuthorization,
         secondary: [],
-        danger:
-          removeSlackWorkspace !== null
-            ? [removeSlackWorkspace]
-            : [
-                <ConfirmButton
-                  key="remove"
-                  confirmKey={`remove:${account.integrationAccountId}`}
-                  pendingConfirm={controls.pendingConfirm}
-                  requestConfirm={controls.requestConfirm}
-                  onConfirmed={actions.removeAccount}
-                  disabled={
-                    rowBusy ||
-                    (account.isDefaultForProvider &&
-                      account.accountKind !== "mailbox")
-                  }
-                  label={
-                    subject === null ? "Remove connection" : `Remove ${subject}`
-                  }
-                  confirmLabel={
-                    subject === null
-                      ? "Confirm connection removal"
-                      : `Confirm: remove ${subject}`
-                  }
-                  data={{ "account-id": account.integrationAccountId }}
-                />,
-              ],
+        danger: [remove],
       };
     case "revoked":
       return { primary: null, cancel: null, secondary: [], danger: [] };
@@ -572,45 +514,19 @@ export function integrationAccountCommands(
   }
 }
 
-/**
- * Credential recovery actions rendered beside Reconnect/Disable. Rotation is a
- * dedicated secret-accepting form: the field is password-typed, never echoed
- * back, and cleared before the request leaves the component. Revocation is
- * metadata only and never touches secret values.
- */
-function CredentialRecoveryActions(props: {
-  readonly account: IntegrationAccount;
-  readonly record: CredentialAccountRecord;
-  readonly candidates: readonly IntegrationAccount[];
-  readonly busy: boolean;
-  readonly rotate: (
-    integrationAccountId: string,
-    replacementSecret: string,
-  ) => Promise<CredentialActionOutcome>;
-  readonly revoke: (
-    integrationAccountId: string,
-    replacementIntegrationAccountId: string | null,
-  ) => Promise<CredentialActionOutcome>;
-}): React.ReactNode {
-  return (
-    <div className="account-actions credential-recovery-actions">
-      <CredentialRotateAction
-        account={props.account}
-        record={props.record}
-        busy={props.busy}
-        rotate={props.rotate}
-      />
-      <CredentialRevokeAction
-        account={props.account}
-        record={props.record}
-        candidates={props.candidates}
-        busy={props.busy}
-        revoke={props.revoke}
-      />
-    </div>
-  );
+/** What the card's own remove action calls the account. */
+function accountNoun(account: IntegrationAccount): string {
+  return account.provider === "slack"
+    ? "this Slack workspace"
+    : `this ${providerLabel(account.provider)} account`;
 }
 
+/**
+ * Replace key, for an account that Purin Pantry reaches with a pasted key. The
+ * field is password-typed, never echoed back, and cleared before the request
+ * leaves the component. An account with a provider sign-in has no key to
+ * paste: Reconnect refreshes it.
+ */
 type CredentialRotateFormState = {
   readonly open: boolean;
   readonly pending: boolean;
@@ -777,16 +693,12 @@ function beginCredentialRotateSubmit(
 
 function finishCredentialRotateSubmit(
   outcome: CredentialActionOutcome,
-  state: CredentialRotateFormState,
 ): CredentialRotateFormState {
   return {
     open: outcome.kind === "failed",
     pending: false,
     secret: "",
-    outcome:
-      outcome.kind === "rotated" || outcome.kind === "failed"
-        ? outcome
-        : state.outcome,
+    outcome,
   };
 }
 
@@ -801,8 +713,6 @@ function renderCredentialRotateOutcome(
           {formatCredentialRotationReceipt(outcome.receipt)}
         </p>
       );
-    case "revoked":
-      return null;
     case "failed":
       return (
         <p className="error-text" role="alert">
@@ -823,283 +733,4 @@ function formatCredentialRotationReceipt(
       ? "The updated access policy is live."
       : "The access policy update is finishing in the background.";
   return `The new key is active. Generation ${receipt.activeGeneration} replaced generation ${receipt.previousGeneration}. ${activation} Receipt ${receipt.credentialRotationId}.`;
-}
-
-type CredentialRevokeStage = "idle" | "confirm" | "replacement";
-
-type CredentialRevokeState = {
-  readonly stage: CredentialRevokeStage;
-  readonly pending: boolean;
-  readonly replacementId: string;
-  readonly outcome: CredentialActionOutcome | null;
-};
-
-function CredentialRevokeAction(props: {
-  readonly account: IntegrationAccount;
-  readonly record: CredentialAccountRecord;
-  readonly candidates: readonly IntegrationAccount[];
-  readonly busy: boolean;
-  readonly revoke: (
-    integrationAccountId: string,
-    replacementIntegrationAccountId: string | null,
-  ) => Promise<CredentialActionOutcome>;
-}): React.ReactNode {
-  const [state, setState] = React.useState<CredentialRevokeState>({
-    stage: "idle",
-    pending: false,
-    replacementId: "",
-    outcome: null,
-  });
-  const alreadyRevoked = props.record.revocation !== null;
-  if (state.stage === "idle") {
-    return (
-      <div className="credential-action">
-        <button
-          type="button"
-          className="danger-button"
-          onClick={requestCredentialRevoke.bind(null, setState)}
-          disabled={props.busy || alreadyRevoked}
-        >
-          Block access now…
-        </button>
-        {alreadyRevoked ? (
-          <small className="notice-text">
-            Access is already blocked. Reconnect to restore it.
-          </small>
-        ) : null}
-        {renderCredentialRevokeOutcome(state.outcome)}
-      </div>
-    );
-  }
-  if (state.stage === "confirm") {
-    return (
-      <div
-        className="credential-action"
-        role="group"
-        aria-label="Confirm blocking access"
-      >
-        <p className="notice-text">
-          Agents stop using this connection at once. Reconnect to restore
-          access.
-        </p>
-        <button
-          type="button"
-          className="danger-button"
-          onClick={confirmCredentialRevoke.bind(null, props, setState, state)}
-          disabled={props.busy || state.pending}
-        >
-          Block access
-        </button>
-        <button
-          type="button"
-          onClick={cancelCredentialRevoke.bind(null, setState)}
-          disabled={state.pending}
-        >
-          Cancel
-        </button>
-        {renderCredentialRevokeOutcome(state.outcome)}
-      </div>
-    );
-  }
-  return (
-    <div
-      className="credential-action"
-      role="group"
-      aria-label="Choose a replacement default account"
-    >
-      <p className="notice-text">
-        This is the default {providerLabel(props.account.provider)} account.
-        Choose another default account to block this one.
-      </p>
-      <label>
-        <span>New default account</span>
-        <Select.Root
-          items={[
-            { value: "", label: "Choose an account…" },
-            ...props.candidates.map(credentialReplacementItem),
-          ]}
-          value={state.replacementId}
-          onValueChange={changeCredentialReplacement.bind(null, setState)}
-        >
-          <Select.Trigger>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Popup>
-            <Select.Item value="">Choose an account…</Select.Item>
-            {props.candidates.map(renderCredentialReplacementOption)}
-          </Select.Popup>
-        </Select.Root>
-      </label>
-      <button
-        type="button"
-        className="danger-button"
-        onClick={confirmCredentialRevoke.bind(null, props, setState, state)}
-        disabled={
-          props.busy || state.pending || state.replacementId.length === 0
-        }
-      >
-        Block and change default
-      </button>
-      <button
-        type="button"
-        onClick={cancelCredentialRevoke.bind(null, setState)}
-        disabled={state.pending}
-      >
-        Cancel
-      </button>
-      {renderCredentialRevokeOutcome(state.outcome)}
-    </div>
-  );
-}
-
-function credentialReplacementItem(
-  account: IntegrationAccount,
-): { value: string; label: string } {
-  return { value: account.integrationAccountId, label: account.displayName };
-}
-
-function renderCredentialReplacementOption(
-  account: IntegrationAccount,
-): React.ReactNode {
-  return (
-    <Select.Item
-      key={account.integrationAccountId}
-      value={account.integrationAccountId}
-    >
-      {account.displayName}
-    </Select.Item>
-  );
-}
-
-function requestCredentialRevoke(
-  setState: React.Dispatch<React.SetStateAction<CredentialRevokeState>>,
-): void {
-  setState(toConfirmCredentialRevoke);
-}
-
-function toConfirmCredentialRevoke(
-  state: CredentialRevokeState,
-): CredentialRevokeState {
-  return {
-    stage: "confirm",
-    pending: false,
-    replacementId: state.replacementId,
-    outcome: null,
-  };
-}
-
-function cancelCredentialRevoke(
-  setState: React.Dispatch<React.SetStateAction<CredentialRevokeState>>,
-): void {
-  setState(toIdleCredentialRevoke);
-}
-
-function toIdleCredentialRevoke(
-  state: CredentialRevokeState,
-): CredentialRevokeState {
-  return {
-    stage: "idle",
-    pending: false,
-    replacementId: "",
-    outcome: state.outcome,
-  };
-}
-
-function changeCredentialReplacement(
-  setState: React.Dispatch<React.SetStateAction<CredentialRevokeState>>,
-  replacementId: string | null,
-): void {
-  if (replacementId === null) return;
-  setState(withCredentialReplacement.bind(null, replacementId));
-}
-
-function withCredentialReplacement(
-  replacementId: string,
-  state: CredentialRevokeState,
-): CredentialRevokeState {
-  return { ...state, replacementId };
-}
-
-async function confirmCredentialRevoke(
-  props: {
-    readonly account: IntegrationAccount;
-    readonly revoke: (
-      integrationAccountId: string,
-      replacementIntegrationAccountId: string | null,
-    ) => Promise<CredentialActionOutcome>;
-  },
-  setState: React.Dispatch<React.SetStateAction<CredentialRevokeState>>,
-  state: CredentialRevokeState,
-): Promise<void> {
-  if (state.pending) return;
-  const replacementId =
-    state.stage === "replacement" ? state.replacementId.trim() : "";
-  setState(beginCredentialRevokeSubmit);
-  const outcome = await props.revoke(
-    props.account.integrationAccountId,
-    replacementId.length === 0 ? null : replacementId,
-  );
-  setState(finishCredentialRevokeSubmit.bind(null, outcome));
-}
-
-function beginCredentialRevokeSubmit(
-  state: CredentialRevokeState,
-): CredentialRevokeState {
-  return { ...state, pending: true };
-}
-
-function finishCredentialRevokeSubmit(
-  outcome: CredentialActionOutcome,
-  state: CredentialRevokeState,
-): CredentialRevokeState {
-  if (
-    outcome.kind === "failed" &&
-    outcome.errorKind === "default_account_replacement_required"
-  ) {
-    return {
-      stage: "replacement",
-      pending: false,
-      replacementId: state.replacementId,
-      outcome: null,
-    };
-  }
-  if (outcome.kind === "failed") {
-    return { ...state, pending: false, outcome };
-  }
-  return { stage: "idle", pending: false, replacementId: "", outcome };
-}
-
-function renderCredentialRevokeOutcome(
-  outcome: CredentialActionOutcome | null,
-): React.ReactNode {
-  if (outcome === null) return null;
-  switch (outcome.kind) {
-    case "revoked":
-      return (
-        <p className="notice-text" role="status">
-          {formatCredentialRevocationReceipt(outcome.receipt)}
-        </p>
-      );
-    case "rotated":
-      return null;
-    case "failed":
-      return (
-        <p className="error-text" role="alert">
-          {outcome.message}
-        </p>
-      );
-    default:
-      return assertNever(outcome, "Unexpected settings state");
-  }
-}
-
-function formatCredentialRevocationReceipt(
-  receipt: CredentialRevocationReceipt | null,
-): string {
-  if (receipt === null) return "The credential was revoked.";
-  const restriction =
-    receipt.state === "policy_activated"
-      ? "Access restriction is active."
-      : "Access restriction is being applied.";
-  return `Credential revoked. ${receipt.credentialGenerationCount} generation${receipt.credentialGenerationCount === 1 ? "" : "s"} and ${receipt.vaultSecretCount} stored secret${receipt.vaultSecretCount === 1 ? "" : "s"} were revoked. ${restriction} Receipt ${receipt.revocationId}.`;
 }

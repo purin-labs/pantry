@@ -270,7 +270,7 @@ the same maintenance window.
 - OAuth and onboarding:
   [`onboarding.ts`](../../areas/organisation/server/control/routes/onboarding.ts)
 - Shopify GraphQL, webhook, and snapshot boundary:
-  [`shopify-connector.ts`](../../services/platform/src/shopify-connector.ts)
+  [`shopify-connector.ts`](../../workers/platform/src/shopify-connector.ts)
 - Provider health projection:
   [`onboarding-projection.ts`](../../areas/organisation/server/data/onboarding-projection.ts)
 - Merchant presentation: [commerce feature](../../areas/commerce/ui/features/commerce/index.ts)

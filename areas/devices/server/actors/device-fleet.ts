@@ -161,7 +161,7 @@ export type DeviceSample = Readonly<{
 }>;
 
 /**
- * @public `services/platform/src/integration-gateway.ts` exports it for the
+ * @public `workers/platform/src/integration-gateway.ts` exports it for the
  * Durable Object binding DEVICE_FLEET of `wrangler.jsonc`.
  */
 export class DeviceFleetActor extends DurableObject<Env> {

@@ -13,7 +13,7 @@ answers with a receipt. An observation grants no authority and proves no saved r
 
 ### The tool list
 
-- `TOOLS` in `services/platform/src/agent-tools/registry.ts` is the one list: 122 tools.
+- `TOOLS` in `workers/platform/src/agent-tools/registry.ts` is the one list: 122 tools.
   Each tool is one `defineTool` value in a family module. A family is the set of tools
   that take the same services of a turn, for example `kitchen`, `commerce` or `devices`.
 - The order of the list is the order of the model definitions. A Session pins the
@@ -160,9 +160,9 @@ approval and the receipt of the person's own action on that page.
 - The first message of a chat sets the chat origin from its observation: the area, the
   page, the title, the record and the time. The origin never changes. A chat whose
   first message carried no page has no origin.
-- The thread header shows the origin as chips, for example
-  `Commerce › Orders › #1042`. A row of the chat list shows the same label as one muted
-  line. A fork copies the timeline up to the chosen answer. Its origin comes from the
+- A row of the chat list shows the origin as one muted line, for example
+  `Commerce › Orders › #1042`. The thread header does not repeat it: each message says
+  where it was sent from. A fork copies the timeline up to the chosen answer. Its origin comes from the
   first user message of that timeline, so it is the origin of the source chat.
 - The composer shows the page on screen as a chip. The chip is on for a new chat, and
   on the page of the chat origin. A different record on that page counts as the same
@@ -268,7 +268,7 @@ state or path. The list reads only the Portal chats of the Case that the reader 
 
 ## Contracts
 
-- **Tool modules** in `services/platform/src/agent-tools/`: `define-tool.ts`
+- **Tool modules** in `workers/platform/src/agent-tools/`: `define-tool.ts`
   (`defineToolFamily`, `modelToolDefinition`), `registry.ts`, `session-wiring.ts`
   (`SESSION_TOOL_WIRING`), `session-support.ts` (`settleToolEffect`), `tool-effect.ts`,
   `errors.ts`, `host-tools.ts` and the folders of the tool modules. A folder is not
@@ -425,7 +425,7 @@ Organisation erases the D1 rows. The poll of a browser reads only and writes no 
   [the thresholds](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-87-d14-thresholds.md).
 - Where a source differs from the code, this spec follows the code. The plans name the
   tool list in `actors/harness-tool-catalog.ts` and a view on Costs & margins only.
-- E2E journeys in `services/platform/tests/e2e/`. The screen: `chat-page-view.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`. The screen: `chat-page-view.test.ts`,
   `chat-kitchen-observation.test.ts`, `chat-costs-commands.test.ts`,
   `chat-pastry-bench.test.ts`, `chat-screen-relevance.test.ts`,
   `chat-screen-knowledge.test.ts`, `portal-chat-finalization.test.ts` (the push

@@ -258,8 +258,8 @@ The sweep also counts failed rotations and the denials of the last 24 hours
 | `vault_root_rotation_job`         | Global   | One root rotation job: versions, state, cursor, counts, failure code                                                                |
 
 The Vault has no table in Actor SQLite. The baselines are
-`services/platform/migrations-regional/0001_current_schema.sql` and
-`services/platform/migrations-global/0001_current_schema.sql`.
+`workers/platform/migrations-regional/0001_current_schema.sql` and
+`workers/platform/migrations-global/0001_current_schema.sql`.
 
 Routes under `/v1/control/organisations/:id` (`control/routes/vault.ts`,
 `control/routes/integrations/credentials.ts`):
@@ -300,10 +300,10 @@ Operator routes (`control/routes/operators.ts`, `gateway/admin/actor-registry.ts
   `keyring.ts`, `domain.ts`, the resolvers (`*-resolution.ts`), `secret-revocation.ts`,
   `root-rotation.ts`, `root-closure.ts`, `backup.ts`, `alerts.ts`, `items.ts`,
   `stores.ts`, `external-import.ts` and `onepassword.ts`.
-- `services/platform/src/vault-onepassword/` is the 1Password store Worker: `worker.ts`,
+- `workers/platform/src/vault-onepassword/` is the 1Password store Worker: `worker.ts`,
   `handler.ts` and `protocol.ts`. Its operations are `list_vaults`, `list_items`,
   `create_item`, `update_item`, `archive_item` and `read_secret`. Its profile is
-  `services/platform/wrangler.vault-onepassword.jsonc`.
+  `workers/platform/wrangler.vault-onepassword.jsonc`.
   `scripts/vault-onepassword-worker.mjs` prepares the SDK loader, checks and deploys it
   before the Platform Worker.
 - `packages/control-api/src/vault.ts` (`@purin-labs/control-api`) holds the TypeBox
@@ -420,12 +420,12 @@ A refused role on an Organisation route gets 404. A root rotation needs the
   which completed the move from the old credential sources.
 - [The security architecture](../../architecture/security.md#vault-policy-and-revocation):
   the section "Vault, policy and revocation".
-- E2E journeys in `services/platform/tests/e2e/`:
+- E2E journeys in `workers/platform/tests/e2e/`:
   - Items and stores: `vault-items.test.ts` and `vault-onepassword.test.ts`, with
     `vault-support.ts` and the fake 1Password client in `onepassword-network.ts`.
   - Root rotation in two regional databases: `regional-onboarding.test.ts`
     (`regional-execution-support.ts`).
   - Vault rows in provider journeys: `providers-connection.test.ts`,
     `providers-webhooks.test.ts` and `provider-removed-access.test.ts`.
-- Other tests in `services/platform/tests/`: `credential-vault-*.test.ts`,
+- Other tests in `workers/platform/tests/`: `credential-vault-*.test.ts`,
   `vault-canary-probe.test.ts` and `credential-lifecycle.test.ts`.

@@ -256,13 +256,13 @@ the key, the test and the commit stay human steps. A key never enters chat or a 
 
 ## Contracts
 
-- Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`).
+- Regional D1 (`workers/platform/migrations-regional/0001_current_schema.sql`).
   `foundation/connections` owns `integration_account` and the attempt, state,
   provisioning, connection, generation, default, observation, resource and webhook
   `provider_*` tables. `areas/integrations` owns the four `custom_connector*` tables,
   `provider_account_cleanup`, `credential_rotation` and `discord_interaction_install`.
   `areas/organisation` owns `provider_account_tombstone` (`scripts/layers.json`).
-- Global D1 (`services/platform/migrations-global/0001_current_schema.sql`).
+- Global D1 (`workers/platform/migrations-global/0001_current_schema.sql`).
   `areas/organisation` owns `provider_manifest`.
 - `provider_connection`: `source_kind` (`built_in`, `custom_api`), `auth_mode`
   (`shared_pantry_app`, `api_key`, `webhook_secret`), `granted_scopes`, the Gmail
@@ -357,7 +357,7 @@ never becomes error text.
 ### The public origin and the provider callbacks
 
 The Platform Worker `pantry` has one custom domain, `pantry.purin.io`
-(`services/platform/wrangler.jsonc`). `PANTRY_PUBLIC_ORIGIN` and
+(`workers/platform/wrangler.jsonc`). `PANTRY_PUBLIC_ORIGIN` and
 `PANTRY_OAUTH_CALLBACK_ORIGIN` are `https://pantry.purin.io` in production and
 `https://localhost:3003` locally. A provider redirect URI is
 `<PANTRY_OAUTH_CALLBACK_ORIGIN>/v1/control/providers/<provider>/callback`. A Shopify
@@ -401,7 +401,7 @@ Drive token stays bound to its client, so a new client ID needs a reconnect.
 ## Open work
 
 - Custom connectors have no OpenAPI import and no per-account rate or concurrency limit.
-- `services/platform/wrangler.jsonc` has only the `local` and `production` profiles.
+- `workers/platform/wrangler.jsonc` has only the `local` and `production` profiles.
   Staging has no Wrangler profile.
 - [Google OAuth clients](../../../integrations/google-oauth.md) records these settings
   outside the code. Google has not verified the Gmail scopes, so a Gmail or Drive
@@ -423,7 +423,7 @@ Drive token stays bound to its client, so a new client ID needs a reconnect.
   [Plan 29](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-29-organisation-agent-email-mailboxes.md)
   and
   [Plan 32](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-32-whatsapp-customer-support.md).
-- E2E journeys in `services/platform/tests/e2e/`: `providers-connection.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `providers-connection.test.ts`,
   `providers-webhooks.test.ts`, `provider-removed-access.test.ts`,
   `custom-connector-review.test.ts`, `custom-connector-fetch-placement.test.ts`,
   `remote-mcp.test.ts` (REST and MCP reads, approved writes, the refusal route and the

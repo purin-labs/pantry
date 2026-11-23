@@ -1236,6 +1236,17 @@ function buildTransport(scenario: Scenario): AccessRouteTransport {
         };
       }
       await new Promise((resolve) => setTimeout(resolve, 350));
+      // As the server does, a change names the revision that it read.
+      if (command.expectedRevision !== access.revision) {
+        return {
+          ok: false,
+          error: {
+            kind: "control",
+            controlKind: "configuration_conflict",
+            message: "Access changed. Refresh the controls and try again.",
+          },
+        };
+      }
       applyPreviewMutation(access, command);
       return accessSuccess(undefined);
     },

@@ -29,6 +29,12 @@ short token that lets one member's device call one Mac.
 - One session for each Organisation works on every Portal page (`features/voice/host.ts`).
   A page mark shows that voice listens, needs a tap or stopped. Leaving the workspace
   closes the microphone, and the setting stays.
+- In the chat, the composer's edge shows the state in the theme accent
+  (`features/chat/composer-glow.tsx`): a thin ring breathes while voice listens for the
+  wake phrase, a halo pulses while a person speaks, and one light crosses the edge while
+  the command is transcribed and while the agent works. The mic button shows five bars
+  (`features/voice/wave.tsx`). While a person speaks, the bars follow the loudness of the
+  microphone stream that is already open. With reduced motion, the states only fade.
 - One device listens in one tab (the Web Lock `pantry-voice-control`). While voice is on,
   the Portal asks the browser to keep the screen awake.
 - The Portal counts wakes, near wakes, key holds, wakes with no command, and the texts
@@ -51,8 +57,8 @@ reads all audio. The wake model runs only within 2 s of speech. Audio stays in t
 The worker holds at most 50 chunks (4 s). If the device cannot keep up, the worker drops
 the oldest chunk, so a capture can lose audio with no message to the person.
 
-- **Wake phrase.** The phrase in the code is "Hey Satyr" (`WAKE_PHRASE`), with the model
-  `hey_satyr.onnx` (`WAKE_MODEL`). A score of at least 0.995 wakes the Portal. The worker
+- **Wake phrase.** The phrase in the code is "Hey Sous Chef" (`WAKE_PHRASE`), with the model
+  `hey_sous_chef.onnx` (`WAKE_MODEL`). A score of at least 0.995 wakes the Portal. The worker
   scores only a full window of 16 embeddings.
 - **Held key.** While the page has focus, a person holds Right Option (Right Alt on other
   systems), speaks and releases. The code also accepts Fn on a browser that reports it.
@@ -196,7 +202,7 @@ Mac's private IPv4 address, and the Platform refuses a public address.
 ### The shop vocabulary
 
 `readVoiceVocabulary` builds one list for the Mac, the fallback and the text check. The
-agent's names come first: "Satyr", "Sous Chef" and "Pantry". Then each source gives one
+agent's names come first: "Sous Chef" and "Pantry". Then each source gives one
 name in turn. The sources are published products (the menu first), active recipes, active
 stock items, and devices with the enrollment `active` or `restricted`. The list holds at
 most 60 terms and 600 characters. Whisper takes it as `initial_prompt`, and Qwen3-ASR as
@@ -223,9 +229,9 @@ to 4.1 GB onto shop hardware and changes the model that hears spoken approvals.
 | `voice_transcription_use` | One fallback call: member, device, start, finish and billed `audio_milliseconds`. It holds no text                                                                                                                                                         |
 | `voice_confirmation`      | One phrase: member, chat, `target_kind`, `target_id`, `phrase`, `state` (`open`, `matched`, `spent`), `refused_attempts`, and the host and engine of a match                                                                                               |
 
-The baseline is `services/platform/migrations-regional/0001_current_schema.sql`. Voice
+The baseline is `workers/platform/migrations-regional/0001_current_schema.sql`. Voice
 has no Actor SQLite table and no event kind. Its patch scripts are
-`services/platform/scripts/voice-*-d1-patch.sql`.
+`workers/platform/scripts/voice-*-d1-patch.sql`.
 
 ### Control routes
 
@@ -292,7 +298,7 @@ to the Platform. A grant has no authority at the Platform.
 | Part                                          | Path                                                                                       |
 | --------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | Shapes, engine catalogue, text check          | `packages/control-api/src/voice.ts`, `voice-engines.ts`, `voice-text-check.ts`             |
-| Platform routes, records, engine, Mac rows    | `services/platform/src/voice/`                                                             |
+| Platform routes, records, engine, Mac rows    | `workers/platform/src/voice/`                                                              |
 | Portal session, path choice, commands, dialog | `surfaces/voice/ui/features/voice/session.ts`, `transport.ts`, `command.ts`, `control.tsx` |
 | Listening worker and its files                | `surfaces/voice/ui/features/voice/wake-worker.ts`, `apps/portal/public/voice/`             |
 | Chat send of a spoken command                 | `acceptVoiceCommand` in `surfaces/portal/ui/features/chat/route.tsx`                       |
@@ -363,7 +369,7 @@ commands.
 - **FND-07** owns information flow, and **FND-09** owns the agent tools and page context.
 - **DEV-01** owns the Devices page, which only reads the Mac rows. **PRT-01** owns the
   Portal.
-- **ENG-03** owns names. "Hey Satyr" and `hey_satyr.onnx` keep the old name on purpose.
+- **ENG-03** owns names.
 - **[Plan 82B](../../../plan-82B-ambient-voice.md)** stays a plan. It owns commands with
   no wake phrase or key: the follow-up window, ambient mode and the speaker check.
 
@@ -381,9 +387,10 @@ The talk key works only while the page is in front.
   limits are also open: 95% heard at 1 m, and at most one false wake in 8 hours.
 - **Live checks.** The 6 s fallback limit at p95 and a live command on each host are open.
 - **Mac enrollment.** The handover records no Mac on this stack and no token for its zone.
-- **Wake phrase.** "Hey Sous Chef" waits for a model that passes
-  `scripts/plan-82-g04/compare.py`. Four models did not pass. The next step is the owner's
-  check with `scripts/plan-82-g04/real-voices.py`.
+- **Wake phrase.** The "Hey Sous Chef" model fails the macOS voice check of
+  `scripts/plan-82-g04/compare.py` (53.3% heard against 66.5% for "Hey Satyr"), and no
+  recording of real voices has scored it (`scripts/plan-82-g04/real-voices.py`). The
+  owner's first wake in production worked.
 - **Qwen3-ASR as the default.** It needs a room-sound recording in a shop and a week of
   use. If it passes, the Platform writes Qwen3-ASR as the choice of each new Mac.
 - **Japanese.** Not built. It needs a latency measure, `language: "ja"` and a phrase bank.
@@ -414,7 +421,7 @@ The talk key works only while the page is in front.
   handover](../../../plan-82-voice-handover.md). Where they differ from the code, this
   spec follows the code. Background: [Plan 82B](../../../plan-82B-ambient-voice.md).
 - Evidence in the archive: [Plan 82 Phase 0](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-82-phase-0.md).
-- E2E journeys in `services/platform/tests/e2e/`: `voice-control.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `voice-control.test.ts`,
   `devices-page.test.ts` and `device-agent.test.ts`.
 - Journeys in `scripts/shop-voice/`: `run-journey.py` (the Mac), `run-portal-journey.py`
   (Chrome) and `run-safari-journey.py` (the iOS Simulator). Benches:

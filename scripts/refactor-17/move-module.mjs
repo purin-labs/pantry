@@ -74,9 +74,21 @@ import {
 } from "node:fs";
 import { dirname, join, posix, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { format, getFileInfo, resolveConfig } from "prettier";
+import { format, resolveConfig } from "prettier";
 
-import { clonePairKey, clonesBaselineText } from "../lib/clones-ratchet.mjs";
+import {
+  clonesBaselineAfterRename,
+  formatWhenClean,
+  FROZEN,
+  keepOrder,
+  MARKDOWN_LINK,
+  relativeSpecifier,
+  RELATIVE_PATH,
+  SOURCE,
+  TEXT,
+  UNREAD,
+} from "../lib/tree-rewrite.mjs";
+import { FOLDER_RENAMES, inFolder, renamedPath } from "./folder-renames.mjs";
 
 const started = Date.now();
 const args = process.argv.slice(2);
@@ -103,24 +115,15 @@ const checkOnly = flag("--check");
 const LAYER_MAP = "scripts/layers.json";
 const CLONES_RATCHET = "scripts/clones-ratchet.json";
 const WORKSPACE_FILE = "pnpm-workspace.yaml";
-
-// Plans, refactor documents, evidence and handovers keep the old paths
-// (AGENTS.md, "Old and new names"). The plans of this script name the old
-// paths on purpose.
-const FROZEN = [
-  /^docs\/(plan-|refactor-|evidence\/|handoffs\/|history\/)/,
-  /(^|\/)docs\/plan[^/]*\.md$/,
-  /^scripts\/refactor-17\//,
+// The folder of the Platform Worker, by its old and its new name: a plan of a
+// move before the rename names the old one.
+const WORKER_FOLDER = "services/platform";
+const workerFolders = [
+  WORKER_FOLDER,
+  ...FOLDER_RENAMES.filter(({ from }) => from === WORKER_FOLDER).map(
+    ({ to }) => to,
+  ),
 ];
-// Bundles, vendored code and files that a tool writes.
-const UNREAD = [
-  /(^|\/)(node_modules|dist|vendor|wasm-pkg|media-wasm-pkg|generated)\//,
-  /^apps\/portal\/public\//,
-  /^pnpm-lock\.yaml$/,
-];
-const SOURCE = /\.(ts|tsx|mts|cts|mjs|cjs|js|jsx|vue)$/;
-const TEXT =
-  /(\.(ts|tsx|mts|cts|mjs|cjs|js|jsx|vue|json|jsonc|md|yml|yaml|toml|sh|css|html|py|rs)|(^|\/)(Dockerfile[^/]*|\.dockerignore|Caddyfile))$/;
 
 const faults = [];
 const notes = [];
@@ -277,7 +280,10 @@ function laterPath(path) {
   while (!known.has(current) && laterMoves.has(current)) {
     current = laterMoves.get(current);
   }
-  return known.has(current) ? current : path;
+  if (known.has(current)) return current;
+  // A file that stayed in a folder that scripts/refactor-17/rename-folder.mjs
+  // renamed (services/platform is workers/platform).
+  return known.has(renamedPath(current)) ? renamedPath(current) : path;
 }
 /** The place now of a folder that a later plan moved whole, or null. */
 const laterFolders = new Map();
@@ -285,7 +291,14 @@ function laterFolder(folder) {
   if (laterFolders.has(folder)) return laterFolders.get(folder);
   const prefix = `${folder}/`;
   let place = null;
-  if (!tree.some((path) => path.startsWith(prefix))) {
+  const renamed = renamedPath(folder);
+  if (
+    renamed !== folder &&
+    tree.some((path) => path.startsWith(`${renamed}/`))
+  ) {
+    // The folder holds files under its new name.
+    place = renamed;
+  } else if (!tree.some((path) => path.startsWith(prefix))) {
     // The last plan in foundationOrder that moved a file of the folder moved
     // the rest of it, and the name of the folder with it. The areas move
     // after the foundation.
@@ -314,7 +327,7 @@ function laterFolder(folder) {
   return place;
 }
 const PATH_IN_TEXT =
-  /(?<![\w./@-])((?:apps|packages|services)\/[\w@.*/{},-]+)/g;
+  /(?<![\w./@-])((?:apps|packages|services|workers)\/[\w@.*/{},-]+)/g;
 /** A text of the plan, with each path that a later plan moved at its place. */
 function laterText(text) {
   return text.replace(PATH_IN_TEXT, (path) => {
@@ -433,7 +446,9 @@ stopOnFaults();
 // the versions of the Worker and of the Portal. The first one that has the
 // name gives its version.
 const versionSources = [plan.package.versionsFrom].flat();
-const versions = versionSources.map((path) => JSON.parse(original(path)));
+const versions = versionSources.map((path) =>
+  JSON.parse(original(laterPath(path))),
+);
 function versionOf(name) {
   const version = versions
     .map((manifest) => ({
@@ -674,19 +689,6 @@ function fileOfAnotherSurface(path) {
 const intoWorker = new Set();
 const inTree = (path) => known.has(path);
 
-function relativeSpecifier(fromFolder, target, style) {
-  const path =
-    style === "bare"
-      ? target.replace(/\.(d\.ts|tsx?|mts|mjs|js)$/, "")
-      : style === "js"
-        ? target.replace(/\.tsx?$/, ".js")
-        : style === "folder"
-          ? target.replace(/\/index\.(tsx?|mjs|js)$/, "")
-          : target;
-  const relative = posix.relative(fromFolder, path);
-  return relative.startsWith(".") ? relative : `./${relative}`;
-}
-
 const LEADS = [
   String.raw`\bfrom\s*`,
   String.raw`\bimport\s*(?:\(\s*)?`,
@@ -753,7 +755,7 @@ function newSpecifier(path, specifier) {
     // packages/contracts: the moved file names it by its new relative path.
     const built = resolveIn(onDisk, posix.dirname(oldPath), bare);
     if (built === null || built.file.startsWith("../")) return null;
-    if (built.file.startsWith("services/platform/")) {
+    if (workerFolders.some((folder) => inFolder(built.file, folder))) {
       faults.push(
         `${oldPath} imports ${built.file}, a file that the Worker package builds. A package cannot import a file of the Worker.`,
       );
@@ -846,7 +848,6 @@ const FROM_ROOT = new RegExp(
     .join("|")})(?![\\w/-])`,
   "g",
 );
-const RELATIVE_PATH = /(?<![\w/@.-])(\.{1,2}\/[\w@./-]+)/g;
 /** True for a file or a folder of the tree, at its path after the move. */
 const exists = (path) =>
   known.has(path) || existsSync(join(root, diskPath(path)));
@@ -899,8 +900,10 @@ function movedPath(path) {
 }
 // A glob of the Worker source below its root that selects a moved file, in a
 // folder that does not move whole: the moved file leaves the glob.
-const GLOB =
-  /(?<![\w./@-])(services\/platform\/src\/[\w@./-]*\*[\w@.*/{},-]*)/g;
+const GLOB = new RegExp(
+  `(?<![\\w./@-])((?:${workerFolders.map(escaped).join("|")})\\/src\\/[\\w@./-]*\\*[\\w@.*/{},-]*)`,
+  "g",
+);
 // A path or a glob in the target folder, which can select the moved file.
 const TARGET_PATH = new RegExp(
   `(?<![\\w./@-])(${escaped(plan.target)}/[\\w@.*/{},-]*)`,
@@ -987,7 +990,6 @@ for (const path of tree) {
 // A frozen document keeps the old paths in its text. A Markdown link is the
 // exception: `pnpm lint:doc-links` refuses a link to a file that is gone, so
 // the target of a link to a moved file follows the file.
-const MARKDOWN_LINK = /(\]\()([^)\s#]+)(?=[)#\s])/g;
 for (const path of tree) {
   if (!path.endsWith(".md")) continue;
   if (!FROZEN.some((pattern) => pattern.test(path))) continue;
@@ -1104,53 +1106,20 @@ for (const path of tree) {
 // keys stays in that order. No count of a ratchet changes here.
 
 if (pending.has(CLONES_RATCHET)) {
-  const baseline = readJson(CLONES_RATCHET);
-  const pairs = {};
-  for (const [pair, entry] of Object.entries(baseline.pairs)) {
-    const [first, second] = pair.split(" = ");
-    const key = clonePairKey(first, second);
-    if (pairs[key] !== undefined) {
-      faults.push(`${CLONES_RATCHET}: the move gives two lines for ${key}`);
-    }
-    pairs[key] = entry;
-  }
-  put(CLONES_RATCHET, clonesBaselineText(baseline.total, pairs), "path");
-}
-const inOrder = (keys) =>
-  keys.every((key, at) => at === 0 || keys[at - 1] < key);
-function sameOrder(before, after) {
-  if (
-    before === null ||
-    after === null ||
-    typeof before !== "object" ||
-    typeof after !== "object" ||
-    Array.isArray(before) !== Array.isArray(after)
-  ) {
-    return after;
-  }
-  if (Array.isArray(after)) {
-    const sorted =
-      before.every((item) => typeof item === "string") &&
-      inOrder(before) &&
-      !inOrder(after);
-    return sorted ? [...after].sort() : after;
-  }
-  const beforeValues = Object.values(before);
-  const entries = Object.entries(after).map(([key, value], at) => [
-    key,
-    sameOrder(beforeValues[at], value),
-  ]);
-  if (inOrder(Object.keys(before)) && !inOrder(Object.keys(after))) {
-    entries.sort(([a], [b]) => (a < b ? -1 : 1));
-  }
-  return Object.fromEntries(entries);
+  put(
+    CLONES_RATCHET,
+    clonesBaselineAfterRename(readJson(CLONES_RATCHET), (key) =>
+      faults.push(`${CLONES_RATCHET}: the move gives two lines for ${key}`),
+    ),
+    "path",
+  );
 }
 for (const path of [...pending.keys()]) {
   if (!/^scripts\/[^/]+-ratchet\.json$/.test(path)) continue;
   if (path === CLONES_RATCHET) continue;
   const before = JSON.parse(original(path));
   const plain = `${JSON.stringify(before, null, 2)}\n` === original(path);
-  const ordered = sameOrder(before, readJson(path));
+  const ordered = keepOrder(before, readJson(path));
   put(
     path,
     plain
@@ -1178,7 +1147,9 @@ function editDone(edit, text, seen = new Set()) {
     return true;
   }
   seen.add(edit);
-  return plansHere.some(({ edits }) =>
+  // The edits of a folder rename (folder-renames.mjs) come after each plan.
+  const renameEdits = FOLDER_RENAMES.flatMap(({ edits = [] }) => edits);
+  return [...plansHere, { edits: renameEdits }].some(({ edits }) =>
     edits.some(
       (next) =>
         !seen.has(next) &&
@@ -1294,26 +1265,11 @@ for (const [path, text] of [...pending]) {
     keptForm.push(path);
     continue;
   }
-  const filepath = join(root, path);
-  const info = await getFileInfo(filepath, {
-    ignorePath: join(root, ".prettierignore"),
-  });
-  if (info.ignored || info.inferredParser === null) continue;
-  const options = { ...(await resolveConfig(filepath)), filepath };
-  let clean;
-  try {
-    clean = (await format(before, options)) === before;
-  } catch {
-    clean = false;
-  }
-  if (!clean) {
-    leftUnformatted.push(path);
-    continue;
-  }
-  const next = await format(text, options);
-  if (next === text) continue;
+  const result = await formatWhenClean(root, path, before, text);
+  if (result.state === "unclean") leftUnformatted.push(path);
+  if (result.state !== "formatted") continue;
   formatted += 1;
-  put(path, next, "format");
+  put(path, result.text, "format");
 }
 
 // ---------------------------------------------------------------------------
@@ -1322,9 +1278,11 @@ for (const [path, text] of [...pending]) {
 function groupOf(path) {
   if (oldPathOf.has(path)) return "moved files";
   if (path.startsWith(`${plan.target}/`)) return "new package files";
-  if (/^services\/platform\/tests\/e2e\//.test(path)) return "journeys";
-  if (/^services\/platform\/tests\//.test(path)) return "unit tests";
-  if (/^services\/platform\/src\//.test(path)) return "Worker source";
+  const inWorker = (folder) =>
+    workerFolders.some((worker) => path.startsWith(`${worker}/${folder}/`));
+  if (inWorker("tests/e2e")) return "journeys";
+  if (inWorker("tests")) return "unit tests";
+  if (inWorker("src")) return "Worker source";
   if (
     path === "eslint.config.mjs" ||
     /^scripts\/(check-[^/]+\.mjs|[^/]+-ratchet\.json|layers\.json|lib\/)/.test(

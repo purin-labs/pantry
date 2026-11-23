@@ -5,7 +5,10 @@ import {
   prepareInitialPlacementActivation,
 } from "./shared-rows/placement-row";
 import { prepareBootstrapReceiptPublication } from "./shared-rows/mutation-receipt";
-import type { GlobalDatabase, OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type {
+  GlobalDatabase,
+  OrganisationDatabase,
+} from "@purin-labs/kernel/database-handles";
 import type { ControlMembershipAvailability } from "@purin-labs/control-api";
 import type {
   OrganisationAccess,
@@ -66,9 +69,7 @@ import type {
 } from "./query-source";
 import type { OnboardingControlRole } from "@purin-labs/contracts";
 import { encodeBase64Url, isPositiveInteger, isRecord } from "@purin-labs/std";
-import {
-  prepareConfigurationVersionBump,
-} from "./organisation-onboarding-row";
+import { prepareConfigurationVersionBump } from "./organisation-onboarding-row";
 
 export type ControlRole = OnboardingControlRole;
 export type AssignableControlRole = Exclude<ControlRole, "owner">;
@@ -194,6 +195,7 @@ type OrganisationMembershipMutation = {
 type OrganisationMembershipMutationError =
   | { readonly code: "organisation_membership_not_found" }
   | { readonly code: "organisation_final_owner_required" }
+  | { readonly code: "organisation_owner_required" }
   | { readonly code: "configuration_version_conflict" }
   | {
       readonly code: "organisation_lifecycle_conflict";
@@ -1409,6 +1411,12 @@ export async function changeOrganisationServiceRole(input: {
     return { ok: false, error: { code: "organisation_membership_not_found" } };
   }
   if (
+    (member.role === "owner" || input.nextRole === "owner") &&
+    !(await actsAsOwner(session, input.organisationId, input.changedByUserId))
+  ) {
+    return { ok: false, error: { code: "organisation_owner_required" } };
+  }
+  if (
     member.role === "owner" &&
     input.nextRole !== "owner" &&
     (await countActiveOrganisationOwners(session, input.organisationId)) === 1
@@ -1446,7 +1454,12 @@ export async function changeOrganisationServiceRole(input: {
         role: input.nextRole,
         now: input.now,
       }),
-      prepareConfigurationVersionBump(session, input.organisationId, input.now, { atConfigurationVersion: state.configurationVersion }),
+      prepareConfigurationVersionBump(
+        session,
+        input.organisationId,
+        input.now,
+        { atConfigurationVersion: state.configurationVersion },
+      ),
       parts.readinessInvalidation(session, input.organisationId),
       prepareOnboardingEvent(session, input.mutation.identity, {
         eventId: `event_${crypto.randomUUID()}`,
@@ -1564,6 +1577,12 @@ export async function revokeOrganisationMembership(input: {
   }
   if (
     member.role === "owner" &&
+    !(await actsAsOwner(session, input.organisationId, input.revokedByUserId))
+  ) {
+    return { ok: false, error: { code: "organisation_owner_required" } };
+  }
+  if (
+    member.role === "owner" &&
     (await countActiveOrganisationOwners(session, input.organisationId)) === 1
   ) {
     return { ok: false, error: { code: "organisation_final_owner_required" } };
@@ -1590,7 +1609,9 @@ export async function revokeOrganisationMembership(input: {
       userId: input.targetUserId,
       now: input.now,
     }),
-    prepareConfigurationVersionBump(session, input.organisationId, input.now, { atConfigurationVersion: state.configurationVersion }),
+    prepareConfigurationVersionBump(session, input.organisationId, input.now, {
+      atConfigurationVersion: state.configurationVersion,
+    }),
     parts.readinessInvalidation(session, input.organisationId),
     prepareControlMutationReceipt(session, {
       scope: input.mutation.scope,
@@ -1753,6 +1774,23 @@ export function parseFencedOrganisationMembership(
   row: OrganisationMembershipRow,
 ): ActiveOrganisationMembership | null {
   return parseActiveOrganisationMembership(row);
+}
+
+/**
+ * Only an owner gives the role `owner`, takes it away, or changes or removes
+ * a member who is an owner. An admin changes the roles below owner.
+ */
+async function actsAsOwner(
+  db: OrganisationQuerySource,
+  organisationId: OrganisationId,
+  userId: UserId,
+): Promise<boolean> {
+  const actor = await readActiveOrganisationMembership(
+    db,
+    organisationId,
+    userId,
+  );
+  return actor?.role === "owner";
 }
 
 async function countActiveOrganisationOwners(

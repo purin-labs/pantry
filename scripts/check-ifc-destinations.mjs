@@ -24,7 +24,7 @@ const SINKS = "foundation/authority/policy/information-flow/sinks.ts";
 const EFFECTS_WITH_A_NAMED_CALLER = new Set([
   "foundation/authority/access-control/decision-explanation.ts",
   "foundation/control/worker/routes/access-control-explain.ts",
-  "services/platform/src/actors/agent-session.ts",
+  "workers/platform/src/actors/agent-session.ts",
   // Refactor 10 moved these effects out of agent-session.ts unchanged.
   "areas/inbox/server/agent-tools/channels/handlers.ts",
   "foundation/tool-handlers/agent-tools/session-support.ts",

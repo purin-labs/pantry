@@ -12,12 +12,12 @@ provider fixtures. Optional live harness acceptance uses separately selected inp
 
 Use these sources to determine the actual suite and CI behavior:
 
-- [Platform E2E configuration](services/platform/vitest.e2e.config.ts)
-- [E2E runtime bindings](services/platform/tests/e2e/wrangler.jsonc)
-- [Platform commands](services/platform/package.json)
+- [Platform E2E configuration](workers/platform/vitest.e2e.config.ts)
+- [E2E runtime bindings](workers/platform/tests/e2e/wrangler.jsonc)
+- [Platform commands](workers/platform/package.json)
 - [Pantry CI workflow](.github/workflows/pantry.yml)
 - [Commerce CI workflow](.github/workflows/commerce-components.yml)
-- [Test maintenance guide](services/platform/tests/AGENTS.md)
+- [Test maintenance guide](workers/platform/tests/AGENTS.md)
 
 The original August four-family/eight-execution budget is historical. The current
 suite includes later bakery, inventory, chat, attachment, access, and regional
@@ -27,13 +27,13 @@ journeys. Avoid fixed test counts or timing claims that lack a dated run artifac
 
 | Boundary                                            | Existing journey or acceptance owner                                                                                                                                         |
 | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Slack admission, Case execution, and final delivery | [Slack Actor journey](services/platform/tests/e2e/slack-actor-journey.test.ts)                                                                                               |
-| Provider connection and signed ingress              | [Connections](services/platform/tests/e2e/providers-connection.test.ts), [webhooks](services/platform/tests/e2e/providers-webhooks.test.ts)                                  |
-| Authorized capability discovery                     | [Discovery journey](services/platform/tests/e2e/slack-discovery-journey.test.ts)                                                                                             |
-| Attachments and reconstruction after replacement    | [Attachment journey](services/platform/tests/e2e/slack-attachment-journey.test.ts), [isolated restore journey](services/platform/tests/e2e/slack-attachment-restore.test.ts) |
-| Inventory operations                                | [Inventory E2E](services/platform/tests/e2e/inventory-operations.test.ts), Plan 47                                                                                           |
-| Saved Kitchen runs and authority                   | [Bakery runs](services/platform/tests/e2e/bakery-runs.test.ts)                                                                                                               |
-| Chat completion                                     | [Portal finalization](services/platform/tests/e2e/portal-chat-finalization.test.ts), Plans 45/45A                                                                            |
+| Slack admission, Case execution, and final delivery | [Slack Actor journey](workers/platform/tests/e2e/slack-actor-journey.test.ts)                                                                                               |
+| Provider connection and signed ingress              | [Connections](workers/platform/tests/e2e/providers-connection.test.ts), [webhooks](workers/platform/tests/e2e/providers-webhooks.test.ts)                                  |
+| Authorized capability discovery                     | [Discovery journey](workers/platform/tests/e2e/slack-discovery-journey.test.ts)                                                                                             |
+| Attachments and reconstruction after replacement    | [Attachment journey](workers/platform/tests/e2e/slack-attachment-journey.test.ts), [isolated restore journey](workers/platform/tests/e2e/slack-attachment-restore.test.ts) |
+| Inventory operations                                | [Inventory E2E](workers/platform/tests/e2e/inventory-operations.test.ts), Plan 47                                                                                           |
+| Saved Kitchen runs and authority                   | [Bakery runs](workers/platform/tests/e2e/bakery-runs.test.ts)                                                                                                               |
+| Chat completion                                     | [Portal finalization](workers/platform/tests/e2e/portal-chat-finalization.test.ts), Plans 45/45A                                                                            |
 | Native bakery execution and recovery                | [Native runner guide](crates/bakery-native/README.md), [release ledger](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42-release-readiness.md)                                                          |
 | Buyer checkout, pickup, and export                  | [Punter](scripts/punter/README.md), commerce lab, Plans 22/23/33                                                                                                             |
 

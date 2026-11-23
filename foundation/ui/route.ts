@@ -67,6 +67,8 @@ export type WorkspacePageDescriptor = {
   readonly navigationLabel: string;
   readonly title: string;
   readonly description: string;
+  /** The page shows its title alone. Search still reads the description. */
+  readonly titleOnly?: true;
   readonly group: WorkspaceNavigationGroupName;
   readonly resource: WorkspacePageResource;
 };
@@ -87,6 +89,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Home",
     description:
       "See what needs attention today and what is blocking the workspace.",
+    titleOnly: true,
     group: "Workspace",
     resource: { kind: "none" },
   },
@@ -512,9 +515,12 @@ export function workspacePageDescriptor(
 export function workspacePageHeader(
   descriptor: WorkspacePageDescriptor,
   resourceId: string | null,
-): { readonly title: string; readonly description: string } {
+): { readonly title: string; readonly description: string | null } {
   if (resourceId === null || descriptor.resource.kind === "none") {
-    return { title: descriptor.title, description: descriptor.description };
+    return {
+      title: descriptor.title,
+      description: descriptor.titleOnly === true ? null : descriptor.description,
+    };
   }
   return {
     title: descriptor.resource.title,

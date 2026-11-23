@@ -25,8 +25,8 @@ import { listProviderResourcePage } from "@purin-labs/connections/data/provider-
 import {
   activateTerminalAssignment,
   readActiveTerminalAssignment,
-  retireTerminalAssignment,
 } from "../../data/terminal-assignment-store";
+import { retireCounterTerminal } from "../../terminal-retirement";
 import { readTerminalOperations } from "../../data/terminal-operations-readback";
 import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
@@ -1289,15 +1289,7 @@ function nonEmpty(value: unknown): value is string {
   return typeof value === "string" && value.length > 0;
 }
 
-/**
- * Retire a counter's assignment.
- *
- * A terminal still holding an unresolved collection cannot be retired: the
- * collection's outcome is not yet known, and removing the assignment would
- * leave a possibly-captured payment with nothing to reconcile against. The
- * operator resolves the collection first, which is the same order the money
- * itself moves in.
- */
+/** Retire a counter's assignment (`retireCounterTerminal` holds the rule). */
 async function handleTerminalRetirement(
   request: Request,
   env: Env,
@@ -1327,31 +1319,19 @@ async function handleTerminalRetirement(
   if (admitted instanceof Response) return admitted;
   const { boundary, scope, user: identity } = admitted;
 
-  const assignment = await readActiveTerminalAssignment(
-    authorized.executionScope.database,
-    authorized.organisationId,
-    route.pantryLocationIdRaw,
-  );
-  if (!assignment.ok) {
-    return controlError(
-      assignment.error.code === "terminal_assignment_corrupt"
-        ? "terminal_assignment_corrupt"
-        : "terminal_assignment_not_found",
-      assignment.error.code === "terminal_assignment_corrupt" ? 409 : 404,
-    );
-  }
   const now = Date.now();
-  const retired = await retireTerminalAssignment({
-    db: authorized.executionScope.database,
+  const retired = await retireCounterTerminal({
+    env,
+    scope: authorized.executionScope,
     organisationId: authorized.organisationId,
-    assignmentId: assignment.value.assignmentId,
-    revision: assignment.value.revision,
-    // The operator withdrew this counter's authority; nothing replaced it and
-    // the provider connection is untouched.
-    reason: "revoked",
+    pantryLocationId: route.pantryLocationIdRaw,
     now,
   });
-  if (!retired) return controlError("terminal_assignment_conflict", 409);
+  if (!retired.ok)
+    return controlError(
+      retired.error.code,
+      RETIREMENT_ERROR_STATUS[retired.error.code],
+    );
   const responseBody = {
     ok: true,
     terminalOperations: await readTerminalOperationsOf(env, authorized, now),
@@ -1369,6 +1349,14 @@ async function handleTerminalRetirement(
     return controlError(recordedMutationReceipt.error.code, 409);
   return controlJson(responseBody);
 }
+
+const RETIREMENT_ERROR_STATUS = {
+  terminal_assignment_not_found: 404,
+  terminal_assignment_corrupt: 409,
+  terminal_assignment_conflict: 409,
+  terminal_collection_unresolved: 409,
+  terminal_collection_unverifiable: 503,
+} as const;
 
 function match(pathname: string, pattern: RegExp): readonly string[] | null {
   const captures = pattern.exec(pathname);

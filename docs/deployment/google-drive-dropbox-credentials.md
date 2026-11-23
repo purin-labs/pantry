@@ -237,7 +237,7 @@ Add the four public values to the matching Wrangler environment's `vars`:
 ```
 
 The current production deployment uses the top-level `vars` in
-`services/platform/wrangler.jsonc`. A staging deployment must first have a real
+`workers/platform/wrangler.jsonc`. A staging deployment must first have a real
 `env.staging` Worker configuration with its own name, D1 database, Durable
 Objects, queues, buckets, service bindings, origins, and `vars`. The repository
 does not currently define that environment. Do not point `--env staging` at

@@ -121,7 +121,7 @@ export function levelLabel(level: AccessLevel): string {
   }
 }
 
-export function recipientsWhoCanChange(system: AccessSystem): number {
+function recipientsWhoCanChange(system: AccessSystem): number {
   let count = 0;
   for (const recipient of system.recipients) {
     if (

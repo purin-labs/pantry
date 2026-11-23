@@ -14,7 +14,7 @@ if (file === undefined)
   throw new Error("Name the Wrangler file of the Worker to deploy");
 const root = resolve(import.meta.dirname, "..");
 const { unstable_readConfig } = createRequire(
-  resolve(root, "services/platform/package.json"),
+  resolve(root, "workers/platform/package.json"),
 )("wrangler");
 const config = unstable_readConfig({
   config: resolve(process.cwd(), file),

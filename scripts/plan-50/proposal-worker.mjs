@@ -2,8 +2,8 @@
 import "./trial-ports.mjs";
 import { CandidateActor as RecoveryActor } from "./recovery-worker.mjs";
 import { registerSession, seedDraftAuthority } from "./draft-seed.mjs";
-import { OrganisationDO } from "../../services/platform/src/actors/organisation.ts";
-import { CaseDO } from "../../services/platform/src/actors/case.ts";
+import { OrganisationDO } from "../../workers/platform/src/actors/organisation.ts";
+import { CaseDO } from "../../workers/platform/src/actors/case.ts";
 import { proposeCommerceActionForHarness } from "../../areas/commerce/server/actors/harness-commerce-proposal.ts";
 import { createActorActivationSchema } from "../../foundation/actor-runtime/actors/actor-activation.ts";
 import { createActorExecutionBarrierSchema } from "../../foundation/actor-runtime/actors/actor-execution-quiescence.ts";
@@ -25,7 +25,7 @@ import { acceptedExecutionAuthority } from "../../foundation/tenancy/organisatio
 import { CAPABILITY_KEYS } from "../../foundation/authority/authorization/capability-catalogue.ts";
 import { catalogHarnessToolCatalogDigest } from "../../foundation/agent-tools/catalog/selection.ts";
 import { createCatalogHarnessCodeMode } from "../../foundation/agent-tools/catalog/code-mode.ts";
-import { TOOL_REGISTRY } from "../../services/platform/src/agent-tools/registry.ts";
+import { TOOL_REGISTRY } from "../../workers/platform/src/agent-tools/registry.ts";
 import {
   createAccessGrant,
   revokeAccessGrant,

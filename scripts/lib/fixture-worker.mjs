@@ -1,7 +1,7 @@
 // The local fixture Worker of a browser journey (Plans 42J, 74, 81 and the
 // shop Mac journeys), started by the journey's provider process. Pantry keeps
 // its own members (Plan 95), so the Worker needs no outside account authority.
-import { unstable_startWorker } from "../../services/platform/node_modules/wrangler/wrangler-dist/cli.js";
+import { unstable_startWorker } from "../../workers/platform/node_modules/wrangler/wrangler-dist/cli.js";
 import { execFileSync } from "node:child_process";
 import { existsSync, openSync, closeSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -19,7 +19,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 export function prepareFixtureState({ config, persistence, log }) {
   const schema = join(persistence, "schema.sql");
   execFileSync("node", [
-    join(root, "services/platform/scripts/single-database-schema.mjs"),
+    join(root, "workers/platform/scripts/single-database-schema.mjs"),
     schema,
   ]);
   const fd = openSync(log, "w");

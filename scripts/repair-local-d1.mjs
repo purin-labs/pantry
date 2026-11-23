@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Brings each local D1 database of a Worker profile up to its baseline with
 // the patch scripts that deployed databases take
-// (services/platform/scripts/*d1*.sql), then adds the missing capability
+// (workers/platform/scripts/*d1*.sql), then adds the missing capability
 // policy rows. `pnpm backend` runs it when check-d1-schema.mjs finds drift.
 //
 //   node scripts/repair-local-d1.mjs <platform|commerce> [--persist-to <dir>]
@@ -40,7 +40,7 @@ import {
 import { d1Execute, d1Rows } from "./d1-wrangler.mjs";
 
 const root = resolve(import.meta.dirname, "..");
-const PATCH_DIRECTORY = "services/platform/scripts";
+const PATCH_DIRECTORY = "workers/platform/scripts";
 const SCHEMA_QUERY = `
 SELECT type, name, sql FROM sqlite_master
 WHERE type IN ('table', 'index', 'trigger') AND sql IS NOT NULL

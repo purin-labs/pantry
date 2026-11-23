@@ -279,7 +279,7 @@ Stripe or Shopify webhook, or OrganisationDO.applyCommerceDelivery
 
 ## Contracts
 
-- **Actors** (`services/platform/src/actors/`): `CaseDO` over `CaseActor` (`case.ts`,
+- **Actors** (`workers/platform/src/actors/`): `CaseDO` over `CaseActor` (`case.ts`,
   `case/case-actor.ts`, binding `CASE`), `ConnectorDO` (`connector.ts`, `connector/`,
   binding `CONNECTOR`) and `SessionDO` (`agent-session.ts`, binding `SESSION`).
 - **Case SQLite** (`case-schema.ts`, version 2): `case_meta`, `case_trigger`,
@@ -291,7 +291,7 @@ Stripe or Shopify webhook, or OrganisationDO.applyCommerceDelivery
   `connector_case_work`, `connector_case_work_receipt`, `connector_case_native_message`,
   `connector_case_steering`, `connector_parked_case_work` and `connector_side_case`.
   **Organisation SQLite**: `cue_delivery` (`actors/cue-delivery.ts`).
-- **Regional D1** (`services/platform/migrations-regional/0001_current_schema.sql`):
+- **Regional D1** (`workers/platform/migrations-regional/0001_current_schema.sql`):
   `project`, `project_member`, `project_operation`, `project_access_operation`,
   `organisation_default_project`, `case_project`, `portal_conversation`,
   `portal_conversation_user`, `portal_chat_directory`, `portal_chat_directory_project`,
@@ -351,7 +351,7 @@ exceptions: `POST /cases/commands` checks only the Organisation role, and
 | `GET`, `POST /chat/conversations/:id/access`                             | `share_conversation`, `move_shared_conversation`                                                 |
 | `POST /chat/conversations/:id/side-cases/:proposalId/start`, `…/dismiss` | Start or dismiss a side Case                                                                     |
 
-The main code: `services/platform/src/` with `actors/case/`, `actors/connector/`,
+The main code: `workers/platform/src/` with `actors/case/`, `actors/connector/`,
 `actors/case-direct-processing.ts`, `projects/`, `chat/store.ts`, `chat/forks.ts`,
 `chat/side-cases.ts`, `chat/side-case-start.ts`, `actors/connector-side-case.ts`,
 `cues/`, `gateway/cue-delivery.ts`, `schedules/` and `surfaces/portal/ui/features/chat/`.
@@ -463,7 +463,7 @@ channel; side Cases for email, WhatsApp, canvas chats and scheduled turns.
   and connector delivery" and "Cues and proactive work". Where a source differs from the
   code, this spec follows the code. The checks are in the
   [information-flow guide](../../../foundation/authority/policy/information-flow/README.md).
-- E2E journeys in `services/platform/tests/e2e/`: `case-command-recovery.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `case-command-recovery.test.ts`,
   `case-undelivered-output.test.ts`, `case-projection-outbox.test.ts`,
   `slack-connector-admission.test.ts`, `slack-concurrent-cases.test.ts`,
   `slack-streamed-answer.test.ts`, `slack-held-output.test.ts`, `projects.test.ts`,

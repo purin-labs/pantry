@@ -1,10 +1,14 @@
-import type { StoredMessageAttachment, UserMessage } from "@purin-labs/contracts";
+import type {
+  StoredMessageAttachment,
+  UserMessage,
+} from "@purin-labs/contracts";
 
 import { attachmentManifestLine } from "../messages/attachment-inspection";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   readMessageLink,
   type MessageLinkEgress,
+  type MessageLinkReceipt,
 } from "../messages/link-reader";
 import type { EmbeddedHarnessUserInput } from "./embedded-harness";
 import { assertNever } from "@purin-labs/std";
@@ -159,6 +163,14 @@ function imageMediaType(dataUrl: string): string {
 export function createMessageLinkTool(input: {
   readonly links: readonly string[];
   readonly egress?: MessageLinkEgress;
+  /**
+   * Records the page text in the Session before the model reads it. Someone
+   * outside the Organisation wrote the page, so a later effect with a
+   * consequence in this Session asks the person who asked (Plan 89).
+   */
+  readonly recordObservation: (observed: {
+    readonly receipt: MessageLinkReceipt;
+  }) => Promise<void>;
 }) {
   return async function read(request: {
     readonly url: string;
@@ -177,13 +189,15 @@ export function createMessageLinkTool(input: {
       egress: input.egress,
     });
 
-    return result.ok
-      ? {
-          outcome: "read",
-          content: result.value.content,
-          receipt: result.value.receipt,
-        }
-      : { outcome: "refused", reason: result.error };
+    if (!result.ok) return { outcome: "refused", reason: result.error };
+    if (result.value.content.kind === "text") {
+      await input.recordObservation({ receipt: result.value.receipt });
+    }
+    return {
+      outcome: "read",
+      content: result.value.content,
+      receipt: result.value.receipt,
+    };
   };
 }
 

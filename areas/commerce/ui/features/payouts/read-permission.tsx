@@ -79,7 +79,6 @@ export function PayoutReadPermission(props: {
       target={workspaceParty(props.workspaceName)}
       title={`Allow the ${ROLE_SUBJECT[role]} to read supplier payouts?`}
       subtitle={`Every ${role} will see what ${props.workspaceName} pays its suppliers, here and in direct messages with Sous Chef in Slack.`}
-      scope={null}
       listHeading="This will:"
       items={[
         {

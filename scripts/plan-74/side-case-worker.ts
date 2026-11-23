@@ -2,7 +2,7 @@
 // request uses production routing. The /test routes build the fixture, sign a
 // person in and read the simulated model's record, which a browser cannot do
 // on its own.
-import gateway from "../../services/platform/src/integration-gateway";
+import gateway from "../../workers/platform/src/integration-gateway";
 import { requireActiveOrganisationActor } from "../../foundation/actor-runtime/actors/actor-router";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../foundation/authority/authorization/access-grants/turn-authority";
 import { createAccessGrant } from "../../foundation/authority/data/access-grants";
@@ -22,7 +22,7 @@ export {
   CaseDO,
   ConnectorDO,
   CodeModePlatformGovernorActor,
-} from "../../services/platform/src/integration-gateway";
+} from "../../workers/platform/src/integration-gateway";
 
 const names = ["Owner", "Other"] as const;
 const { fixtureUser, admittedOrganisation, login } = fixturePeople(

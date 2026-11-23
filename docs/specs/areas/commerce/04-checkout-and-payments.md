@@ -142,7 +142,14 @@ outside the engine. A `gmo_stera` collection runs through the Platform `DeviceFl
 - A terminal assignment binds one Pantry location to one terminal target at one Square
   location. It is `active` or `retired` (`replaced`, `revoked`, `connection_removed`).
   One location has at most one active assignment. A new assignment retires the old one
-  in the same batch. A payment attempt keeps its own binding, so it stays recoverable.
+  in the same batch. A Square payment attempt keeps its own binding, so it stays
+  recoverable after a retirement. The record of a `gmo_stera` capture or decline on the
+  sale reads the active assignment, so an operator cannot retire a `lan_gateway_device`
+  counter while its last collection is unresolved: the terminal still collects, its
+  result is unknown, or the sale does not record the result yet. The refusal
+  (`terminal_collection_unresolved`, 409) tells the operator to finish or cancel the
+  collection first. When Pantry cannot read the collection, the refusal is
+  `terminal_collection_unverifiable` (503).
 
 | Target               | Environment   | How Pantry makes it                                                                                                                                                                                                                                      |
 | -------------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -219,7 +226,7 @@ assignment. No agent tool starts a collection.
   Payments need `orders:read` or `orders:write`. `payments:record` records results of an
   app that runs its own provider. An API key may not hold it. An app installation can
   hold it, and the engine's operator token passes every scope check.
-- Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`):
+- Regional D1 (`workers/platform/migrations-regional/0001_current_schema.sql`):
   `cafe_terminal_assignment` (module `areas/cafe` in `scripts/layers.json`) and
   `paid_receipt`.
 - Agent tools: `areas/commerce/server/agent-tools/commerce/payments.ts` and
@@ -237,7 +244,7 @@ The control routes are under `/v1/control/organisations/:id/commerce`:
 | `POST /terminal-operations`                                                                                      | Admin         | Assign a Sandbox test device (development only)                                                     |
 | `POST /terminal-operations/pairings`, `GET …/pairings/:deviceCodeId`, `POST …/pairings/:deviceCodeId/activation` | Admin         | Start, read and complete a Terminal pairing (production only)                                       |
 | `POST /terminal-operations/square-pos-app`                                                                       | Admin         | Assign the Square Point of Sale app (production only)                                               |
-| `POST /terminal-operations/:pantryLocationId/retirement`                                                         | Operator      | Retire the assignment of a counter                                                                  |
+| `POST /terminal-operations/:pantryLocationId/retirement`                                                         | Operator      | Retire the assignment of a counter, after its last LAN collection is resolved                       |
 | `GET /payments`, `GET /failed-payments`, `GET /bank-payouts`                                                     | Operator      | The payment reads                                                                                   |
 
 Each profile and terminal mutation has an `Idempotency-Key`, and its receipt is in the
@@ -354,7 +361,7 @@ Neighbours:
   [recovery fixtures](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/square-recovery-gaps-20260908.md)
   and
   [runtime evidence](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/square-post-refresh-readiness-20260908.md).
-- E2E journeys in `services/platform/tests/e2e/`: `square-in-commerce.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `square-in-commerce.test.ts`,
   `stripe-in-commerce.test.ts` and `paid-receipt-outbox.test.ts`.
 - Journeys in `services/commerce/tests/`: `plan33-core-acceptance.test.ts`,
   `punter-acceptance.test.ts`, `checkout-profile-http.test.ts`,

@@ -70,7 +70,7 @@ def score(folder: Path, sous_chef_model: Path) -> None:
     import wake as w
 
     features = w.Features(DATA / "models")
-    models = {"satyr": ROOT / "apps/portal/public/voice/hey_satyr.onnx", "sous-chef": sous_chef_model}
+    models = {"satyr": PHRASES["satyr"].onnx(DATA), "sous-chef": sous_chef_model}
     sessions = {key: ort.InferenceSession(str(path), providers=["CPUExecutionProvider"]) for key, path in models.items()}
     takes = json.loads((folder / "session.json").read_text())["takes"]
     rows = []

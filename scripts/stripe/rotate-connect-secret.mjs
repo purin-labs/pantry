@@ -63,7 +63,7 @@ async function main() {
     throw new Error("The new key belongs to another Stripe account");
   console.log(`Stripe accepted the new ${mode(newKey)}-mode key.`);
 
-  for (const directory of [".", "services/platform", "services/commerce"]) {
+  for (const directory of [".", "workers/platform", "services/commerce"]) {
     let names = [];
     try {
       names = readdirSync(join(root, directory));

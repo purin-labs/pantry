@@ -26,7 +26,7 @@
       ],
       "project": ["scripts/**/*.{js,cjs,mjs,ts}", "services/*/*.mjs"]
     },
-    "services/platform": {
+    "workers/platform": {
       "vitest": false,
       "entry": [
         "src/integration-gateway.ts",

@@ -51,7 +51,6 @@ type RegionalCopyInput = {
 };
 const PAGE_SIZE = 20;
 const ARCHIVE_PAGE_SIZE = 1_000;
-const ORGANISATION_DATA_ARCHIVE_PREFIX = "state-object-organisation-data-v1";
 // Directory records and global authority remain in their owning store.
 const EXCLUDED = new Set([
   ...COPY_EXCLUDED_SHARED_TABLES,
@@ -1028,7 +1027,7 @@ export function organisationDataArchivePrefix(
   organisationId: OrganisationId,
   exportId: ActorExportId,
 ): string {
-  return `${ORGANISATION_DATA_ARCHIVE_PREFIX}/${organisationId}/${exportId}/`;
+  return `state-object-organisation-data-v1/${organisationId}/${exportId}/`;
 }
 
 function isOrganisationDataArchiveObject(

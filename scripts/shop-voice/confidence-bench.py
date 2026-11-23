@@ -74,7 +74,7 @@ VOICES = tuple(os.environ.get("SHOP_VOICE_VOICES", "Samantha,Daniel,Karen").spli
 # A shop's vocabulary, with the terms that Whisper repeated on noise in the owner's first test.
 PROMPT = os.environ.get("SHOP_VOICE_PROMPT") or ", ".join((
     "Black sesame", "Matcha Tea", "Kouign-amann", "financier", "croissant", "ginger tea", "siphon", "latte",
-    "pour-over", "Satyr", "brown butter", "pistachio", "madeleine", "canelé"))
+    "pour-over", "Sous Chef", "brown butter", "pistachio", "madeleine", "canelé"))
 COMMANDS = (
     "Put two trays of kouign amann in the second oven.",
     "How much butter is left for tomorrow?",

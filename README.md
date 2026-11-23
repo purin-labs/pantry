@@ -49,7 +49,7 @@ acceptance does not establish physical production readiness. See the
 
 ```text
 Browser portal ───────────────┐
-Slack / provider webhooks ────┼──> services/platform (Cloudflare Worker)
+Slack / provider webhooks ────┼──> workers/platform (Cloudflare Worker)
 OAuth callbacks ──────────────┘        │
                                       ├── D1 / Durable Objects
                                       ├── Queues / R2 / KV
@@ -81,10 +81,13 @@ history, tools, checkpoints, budgets, cancellation, and delivery for every route
 pantry/
 ├── apps/
 │   └── portal/                 # React operator portal
+├── foundation/                 # Foundation modules: kernel, tenancy, agent, control, ui
+├── areas/                      # Product areas: commerce, cafe, kitchen, inbox and more
+├── surfaces/                   # Portal, Slack, email, WhatsApp, webhooks and voice
 ├── services/
-│   ├── platform/               # Control plane, integrations and Sous Chef
 │   ├── workspace-executor/     # Heavy execution Container image
-│   └── commerce/             # Commerce engine: private commerce authority
+│   └── commerce/               # Commerce engine: private commerce authority
+├── workers/platform/          # The Platform Worker: entries, Actor classes, D1 and journeys
 ├── packages/
 │   ├── contracts/              # Provider-neutral contract schemas
 │   └── bakery-model/           # Kitchen model: recipes, procedures, physics

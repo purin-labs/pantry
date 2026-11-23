@@ -291,7 +291,7 @@ reason. A later note in the same entry describes the code today.
 ## Contracts
 
 The log owns no table, route, event, capability or agent tool. The decisions rest on
-these records and files, under `services/platform/src/` unless a path has another root.
+these records and files, under `workers/platform/src/` unless a path has another root.
 
 | Topic         | Records                                                                                                                  | Main files                                                                                            |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
@@ -304,7 +304,7 @@ these records and files, under `services/platform/src/` unless a path has anothe
 | Context, cues | `context_projection`, `context_projection_fts`, `cue_subscription`                                                       | `context/`, `cues/engine.ts`                                                                          |
 | Policy        | `organisation_capability_policy`                                                                                         | `policy-snapshot.ts`, `authorization/capability-catalogue.ts`                                         |
 | Approval      | `action_ledger` (Actor SQLite)                                                                                           | `actors/action-ledger.ts`, `approval-authentication.ts`, `commerce/action-model.ts`                   |
-| Actions       | `ActionDef`, `CanonicalAction`                                                                                           | `services/platform/action-registry/registry.ts`, `generated/action-registry.ts`                       |
+| Actions       | `ActionDef`, `CanonicalAction`                                                                                           | `workers/platform/action-registry/registry.ts`, `generated/action-registry.ts`                        |
 | Vault         | `vault_secret`                                                                                                           | `credential-vault/`                                                                                   |
 | Connections   | `provider_connection`, `integration_account`, `provider_authorization_state`                                             | `provider-adapters/catalogue.ts`, `provider-workflows/`, `provider-lifecycle/`                        |
 | WhatsApp      | `whatsapp_ingress_policy`, `whatsapp_ingress_policy_revision`                                                            | `whatsapp/`, `actors/connector-whatsapp.ts`                                                           |
@@ -345,8 +345,8 @@ it records that person as the approver.
 | Organisation, Case, Connector schema versions | 10, 2, 2 | `ORGANISATION_ACTOR_SCHEMA_VERSION`, `CASE_ACTOR_SCHEMA_VERSION`, `CONNECTOR_ACTOR_SCHEMA_VERSION` |
 | Checkpoint plaintext                          | 16 MiB   | `MAX_CHECKPOINT_PLAINTEXT_BYTES`                                                                   |
 | WhatsApp service window                       | 24 hours | `WHATSAPP_SERVICE_WINDOW_MS`                                                                       |
-| Workspace executor instances                  | 4        | `max_instances`, `services/platform/wrangler.jsonc`                                                |
-| Link fetch, custom connector fetch instances  | 1, 10    | `max_instances`, `services/platform/wrangler.jsonc`                                                |
+| Workspace executor instances                  | 4        | `max_instances`, `workers/platform/wrangler.jsonc`                                                 |
+| Link fetch, custom connector fetch instances  | 1, 10    | `max_instances`, `workers/platform/wrangler.jsonc`                                                 |
 
 ### Information flow
 
@@ -412,7 +412,7 @@ These questions from the original log stay undecided:
   [Plan 32](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-32-whatsapp-customer-support.md),
   [Plan 42 release ledger](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42-release-readiness.md),
   [Refactor 2](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/refactor-2.md).
-- E2E journeys in `services/platform/tests/e2e/`: `placement-move.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `placement-move.test.ts`,
   `actor-activation-placement.test.ts`, `checkpoint-restart.test.ts`,
   `chat-model-route-unavailable.test.ts`, `claude-oauth.test.ts`,
   `slack-actor-journey.test.ts`, `slack-commerce-approval.test.ts`,

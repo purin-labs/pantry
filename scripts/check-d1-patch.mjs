@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 // Fails when a change to a deployed D1 baseline ships without a patch.
 //
-// The baselines services/platform/migrations-global/0001_current_schema.sql and
+// The baselines workers/platform/migrations-global/0001_current_schema.sql and
 // migrations-regional/0001_current_schema.sql are edited in place, and a
 // deployed database never reads them again. A person applies a patch script
 // to each database by hand. This check compares each baseline with its copy at
 // the base revision. Every table, index or trigger that the change adds,
 // removes or alters must be named in a patch script that the change adds
-// (services/platform/scripts/*d1*.sql), or in the waiver file
-// services/platform/scripts/d1-patch-waivers.txt (one `object: reason` per
+// (workers/platform/scripts/*d1*.sql), or in the waiver file
+// workers/platform/scripts/d1-patch-waivers.txt (one `object: reason` per
 // line) when no deployed database needs a patch.
 //
 //   node scripts/check-d1-patch.mjs [--base <revision>]
@@ -19,13 +19,14 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { snapshotOfBaseline } from "./d1-schema-snapshot.mjs";
+import { formerPath } from "./refactor-17/folder-renames.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const BASELINES = [
-  "services/platform/migrations-global/0001_current_schema.sql",
-  "services/platform/migrations-regional/0001_current_schema.sql",
+  "workers/platform/migrations-global/0001_current_schema.sql",
+  "workers/platform/migrations-regional/0001_current_schema.sql",
 ];
-const PATCH_DIRECTORY = "services/platform/scripts";
+const PATCH_DIRECTORY = "workers/platform/scripts";
 const WAIVERS = `${PATCH_DIRECTORY}/d1-patch-waivers.txt`;
 
 const baseIndex = process.argv.indexOf("--base");
@@ -43,7 +44,11 @@ if (!base)
 
 const changes = [];
 for (const path of BASELINES) {
-  const before = git(["show", `${base}:${path}`], true);
+  // A base from before the rename of the Worker folder holds the baseline
+  // at its old path (scripts/refactor-17/folder-renames.mjs).
+  const before =
+    git(["show", `${base}:${path}`], true) ??
+    git(["show", `${base}:${formerPath(path)}`], true);
   const after = readFileSync(resolve(root, path), "utf8");
   if (before === null || before === after) continue;
   const oldSnapshot = snapshotOfBaseline(before);

@@ -1,4 +1,3 @@
-import { Select } from "./select";
 import React from "react";
 import { flushSync } from "react-dom";
 import {
@@ -50,19 +49,6 @@ export type PermissionRequestItem = {
   readonly label: string;
   readonly description: string | null;
   readonly required: boolean;
-};
-
-type PermissionRequestScopeOption = {
-  readonly id: string;
-  readonly label: string;
-  readonly icon?: React.ReactNode;
-};
-
-export type PermissionRequestScope = {
-  readonly label: string;
-  readonly options: readonly PermissionRequestScopeOption[];
-  readonly value: string;
-  readonly onChange: (id: string) => void;
 };
 
 type PermissionRequestAction = {
@@ -121,7 +107,6 @@ export type PermissionRequestCardProps = {
   readonly target: PermissionRequestParty;
   readonly title: string;
   readonly subtitle: React.ReactNode | null;
-  readonly scope: PermissionRequestScope | null;
   /** The list header, such as "This will allow Pantry agent to:". */
   readonly listHeading: string;
   readonly items: readonly PermissionRequestItem[];
@@ -144,7 +129,7 @@ type AuthorizationLayout = "compact" | "split";
 type DialogLayout = AuthorizationLayout | "result";
 
 export type PermissionRequestDialogProps = PermissionRequestCardProps & {
-  /** By default, three items or fewer without a scope choice are compact. */
+  /** By default, three items or fewer are compact. */
   readonly layout?: AuthorizationLayout;
   readonly open: boolean;
   /** Called for Escape and for a click on the backdrop. */
@@ -220,9 +205,7 @@ export function PermissionRequestDialog(
     onClose,
   );
   const card = { ...rest, decision: minimizer.decision };
-  const chosen =
-    layout ??
-    (card.scope === null && card.items.length <= 3 ? "compact" : "split");
+  const chosen = layout ?? (card.items.length <= 3 ? "compact" : "split");
   const decision = card.decision;
   return (
     <AuthorizationDialog
@@ -606,7 +589,6 @@ export function AuthorizationScreen(
         target={props.target}
         title={props.title}
         subtitle={props.subtitle}
-        scope={null}
         aside={
           <AsideList id={ids.list} heading={props.asideHeading}>
             {props.aside}
@@ -908,7 +890,6 @@ function AuthorizationFrame(
     target: PermissionRequestParty;
     title: string;
     subtitle: React.ReactNode | null;
-    scope: React.ReactNode;
     aside: React.ReactNode;
     decision: React.ReactNode;
     account: PermissionRequestAccount | null;
@@ -942,7 +923,6 @@ function AuthorizationFrame(
             {props.subtitle}
           </p>
         )}
-        {props.scope}
       </div>
       <CollapsibleAside>{props.aside}</CollapsibleAside>
       <div className="permission-request-decision">{props.decision}</div>
@@ -1104,11 +1084,6 @@ function PermissionRequestContent(
       target={props.target}
       title={props.title}
       subtitle={props.subtitle}
-      scope={
-        props.scope === null ? null : (
-          <ScopeSelect scope={props.scope} disabled={pending} />
-        )
-      }
       aside={
         <AsideList id={props.ids.list} heading={props.listHeading}>
           <ul>
@@ -1214,56 +1189,6 @@ function ResultView(
         errorId={decision.error === null ? undefined : ids.error}
       />
     </div>
-  );
-}
-
-function ScopeSelect(
-  props: Readonly<{ scope: PermissionRequestScope; disabled: boolean }>,
-): React.ReactNode {
-  const id = React.useId();
-  const scope = props.scope;
-  const current = scope.options.find(matchesScope.bind(null, scope.value));
-  return (
-    <div className="permission-request-scope">
-      <label htmlFor={id}>{scope.label}</label>
-      <span
-        className="permission-request-select"
-        data-icon={current?.icon !== undefined}
-      >
-        {current?.icon !== undefined && (
-          <span className="permission-request-select-icon" aria-hidden="true">
-            {current.icon}
-          </span>
-        )}
-        <Select.Root
-          items={scope.options.map(scopeItem)}
-          value={scope.value}
-          disabled={props.disabled}
-          onValueChange={changeScope.bind(null, scope.onChange)}
-        >
-          <Select.Trigger id={id}>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Popup>{scope.options.map(renderScopeOption)}</Select.Popup>
-        </Select.Root>
-      </span>
-    </div>
-  );
-}
-
-function scopeItem(
-  option: PermissionRequestScopeOption,
-): Readonly<{ value: string; label: string }> {
-  return { value: option.id, label: option.label };
-}
-
-function renderScopeOption(
-  option: PermissionRequestScopeOption,
-): React.ReactNode {
-  return (
-    <Select.Item key={option.id} value={option.id}>
-      {option.label}
-    </Select.Item>
   );
 }
 
@@ -1482,18 +1407,4 @@ function allow(
   selected: ReadonlySet<string>,
 ): void {
   onAllow([...selected]);
-}
-
-function matchesScope(
-  value: string,
-  option: PermissionRequestScopeOption,
-): boolean {
-  return option.id === value;
-}
-
-function changeScope(
-  onChange: (id: string) => void,
-  value: string | null,
-): void {
-  if (value !== null) onChange(value);
 }

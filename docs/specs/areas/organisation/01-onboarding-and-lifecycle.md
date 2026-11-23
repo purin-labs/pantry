@@ -222,8 +222,11 @@ provider attempt for an `active`, `disabled`, `degraded` or `reauth_required` ac
   the Vault secrets, the voice Macs and the devices (DEV-01). The cleanup row becomes
   `pending_purge`.
 - **Purge.** After `purge_after`, the run moves the lifecycle to `purging`. It erases
-  the Session Actors and their objects (`organisation_harness_erasure`), the
-  attachments, the device fleets and the WhatsApp Connectors. It closes the commerce
+  the Session Actors and their objects (`organisation_harness_erasure`), each R2
+  object of the Organisation (`PURGE_R2_PREFIXES`: attachments, Kitchen runs and
+  artifacts, workflow documents, snapshots and exports), the device fleets and the
+  WhatsApp Connectors. An export that a relocation or restore journal still names
+  stays. It closes the commerce
   merchant and moves shared Slack credentials to an Organisation that still uses the
   workspace. Then one batch moves to `purged` and runs `PURGE_CATALOGUE`
   (`data/purge-catalogue.ts`). Last, the run publishes the directory row and deletes the
@@ -281,7 +284,7 @@ connections and Vault secrets, and it purges the Organisation.
 
 ## Contracts
 
-- Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`). This
+- Regional D1 (`workers/platform/migrations-regional/0001_current_schema.sql`). This
   module owns `organisation_onboarding_selection`, `organisation_setup_snapshot`,
   `organisation_communication_destination`, `organisation_slack_channel`,
   `organisation_readiness_assessment`, `organisation_activation_attempt`,
@@ -435,13 +438,14 @@ The routes are in `control/routes/onboarding.ts` and `control/routes/operators.t
   specs: [FND-01](../../foundation/01-tenancy-and-placement.md),
   [FND-06](../../foundation/06-identity-policy-and-approval.md) and
   [DEV-01](../devices/01-devices.md).
-- E2E journeys in `services/platform/tests/e2e/`: `organisation-setup.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `organisation-setup.test.ts`,
   `regional-onboarding.test.ts`, `new-organisation-first-chat.test.ts`,
   `organisation-archive-access.test.ts`, `organisation-lifecycle-placement.test.ts`,
   `slack-answer-before-archive.test.ts`, `purged-organisation-reclaim.test.ts`,
   `purged-organisation-commerce.test.ts`, `slack-channel-after-deletion.test.ts`,
   `gmail-after-deletion.test.ts`, `whatsapp-erasure.test.ts`,
-  `device-fleet-end.test.ts` and `idle-tenant-cost.test.ts`. The closure suite is
+  `kitchen-files-erasure.test.ts`, `device-fleet-end.test.ts` and
+  `idle-tenant-cost.test.ts`. The closure suite is
   `pnpm --filter @purin-labs/platform test:onboarding-closure`.
 - Browser journey: `scripts/frontend-foundation/portal-account-setup-journey.mjs`, and
   the preview `apps/portal/organisations-preview.html?setup=live`.

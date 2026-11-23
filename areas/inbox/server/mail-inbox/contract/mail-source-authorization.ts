@@ -3,13 +3,17 @@ import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
 } from "@purin-labs/tenancy/organisation-execution-scope";
-import { parseOrganisationId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
+import {
+  parseOrganisationId,
+  type IntegrationAccountId,
+} from "@purin-labs/kernel/ids";
 import type { FlowLabel } from "@purin-labs/authority/policy/information-flow/labels";
 import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import { selectActiveGrants } from "@purin-labs/authority/authorization/access-grants/compiler";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,
+  EMAIL_OPERATIONAL_RESOURCE_SCOPE,
 } from "@purin-labs/authority/authorization/capability-catalogue";
 import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
 import {
@@ -20,7 +24,14 @@ import {
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { validateNativeRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
-import { createCurrentSourceFlowLabel, evaluateFlowLabelSink } from "@purin-labs/authority/policy/index";
+import {
+  createCurrentSourceFlowLabel,
+  evaluateFlowLabelSink,
+} from "@purin-labs/authority/policy/index";
+import {
+  parseControlRole,
+  roleMayConfigure,
+} from "@purin-labs/tenancy/data/control-plane";
 import type { Variant } from "@purin-labs/type-utils";
 export async function authorizeMailSource(
   env: OrganisationPlacementBindings,
@@ -51,10 +62,11 @@ export async function authorizeMailSource(
       "full_mailbox_pilot"
   )
     return null;
-  const grantIds = await mailboxReadGrantIds(
+  const grantIds = await accountGrantIds(
     execution.value.database,
     authority,
     integrationAccountId,
+    MAILBOX_READ,
   );
   if (grantIds === null) return null;
   const label = await createCurrentSourceFlowLabel({
@@ -121,23 +133,92 @@ export async function mailboxAwaitsReconnect(
   )
     return false;
   return (
-    (await mailboxReadGrantIds(
+    (await accountGrantIds(
       execution.value.database,
       authority,
       integrationAccountId,
+      MAILBOX_READ,
     )) !== null
   );
 }
 
 /**
- * The person's active grants that read this mailbox, or null when the
- * person's authority is not live, the Organisation's policy turns the read
- * off, or no grant reads it.
+ * Whether the person may read the preview of an operational email draft of
+ * this account: recipient, subject and body. An owner or an admin decides
+ * the draft, so reads it. Any other member needs a grant for the mailbox:
+ * on a full mailbox the read of a reply draft (`authorizeMailSource`), on a
+ * send-only mailbox `email.operational.propose` on this exact account.
  */
-async function mailboxReadGrantIds(
+export async function mayReadOperationalEmailDraft(
+  env: OrganisationPlacementBindings,
+  authority: Variant<RequestAuthority, "control">,
+  integrationAccountId: IntegrationAccountId,
+): Promise<boolean> {
+  const role = parseControlRole(authority.role);
+  if (!role.ok) return false;
+  if (roleMayConfigure(role.value)) return true;
+  const organisationId = parseOrganisationId(authority.organisationId);
+  if (!organisationId.ok) return false;
+  const execution = await OrganisationExecutionScope.resolve(
+    env,
+    organisationId.value,
+  );
+  if (!execution.ok) return false;
+  const context = await resolveActiveProviderAccountContext({
+    db: execution.value.database,
+    organisationId: organisationId.value,
+    integrationAccountId,
+  });
+  if (
+    !context.ok ||
+    context.value.account.provider !== "gmail" ||
+    context.value.connection.authorizationProduct.kind !== "gmail"
+  )
+    return false;
+  switch (context.value.connection.authorizationProduct.product) {
+    case "full_mailbox_pilot":
+      return (
+        (await authorizeMailSource(env, authority, integrationAccountId)) !==
+        null
+      );
+    case "send_only":
+      return (
+        (await accountGrantIds(
+          execution.value.database,
+          authority,
+          integrationAccountId,
+          OPERATIONAL_PROPOSE,
+        )) !== null
+      );
+  }
+}
+
+/** A capability and its resource scope on one connected account. */
+type AccountCapability = Readonly<{
+  capabilityId: string;
+  resourceScope: string;
+}>;
+
+const MAILBOX_READ: AccountCapability = {
+  capabilityId: CAPABILITY_KEYS.emailMailboxRead,
+  resourceScope: EMAIL_MAILBOX_RESOURCE_SCOPE,
+};
+
+const OPERATIONAL_PROPOSE: AccountCapability = {
+  capabilityId: CAPABILITY_KEYS.emailOperationalPropose,
+  resourceScope: EMAIL_OPERATIONAL_RESOURCE_SCOPE,
+};
+
+/**
+ * The person's active grants of the capability on this account, or null when
+ * the person's authority is not live, the Organisation's policy turns the
+ * capability off, or no grant gives it.
+ */
+async function accountGrantIds(
   db: OrganisationDatabase,
   authority: Variant<RequestAuthority, "control">,
   integrationAccountId: IntegrationAccountId,
+  capability: AccountCapability,
 ): Promise<readonly string[] | null> {
   const organisationId = parseOrganisationId(authority.organisationId);
   if (!organisationId.ok) return null;
@@ -149,7 +230,7 @@ async function mailboxReadGrantIds(
   );
   if (
     !policy.ok ||
-    !policy.value.authz.allowedTools.includes(CAPABILITY_KEYS.emailMailboxRead)
+    !policy.value.authz.allowedTools.includes(capability.capabilityId)
   )
     return null;
   const grants = await listAccessGrants({
@@ -169,10 +250,10 @@ async function mailboxReadGrantIds(
     const target = grant.target;
     if (
       target.kind === "provider_resource" &&
-      target.capabilityId === CAPABILITY_KEYS.emailMailboxRead &&
+      target.capabilityId === capability.capabilityId &&
       target.capabilityVersion === 1 &&
       target.integrationAccountId === integrationAccountId &&
-      target.resourceScope === EMAIL_MAILBOX_RESOURCE_SCOPE
+      target.resourceScope === capability.resourceScope
     )
       grantIds.push(grant.grantId);
   }

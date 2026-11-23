@@ -49,7 +49,7 @@ import {
 } from "../../foundation/agent/actors/pi-durable-tools.ts";
 import { hasUnfinishedCodeModeCall } from "../../foundation/agent/actors/pi-durable-recovery.ts";
 import { piToolRules } from "../../foundation/agent/actors/pi-tool-replay.ts";
-import { TOOL_REGISTRY } from "../../services/platform/src/agent-tools/registry.ts";
+import { TOOL_REGISTRY } from "../../workers/platform/src/agent-tools/registry.ts";
 import { preflightHarnessTurnLease } from "../../foundation/agent/actors/agent-session-harness-authority.ts";
 import { buildCanonicalTextTurnStart } from "../../foundation/agent/actors/agent-session-turn-start.ts";
 import {

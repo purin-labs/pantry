@@ -230,7 +230,6 @@ function ChatCapabilityPermissionPrompt(props: Props): React.ReactNode {
             </>
           )
         }
-        scope={null}
         listHeading={`This will allow ${AGENT_NAME} to:`}
         items={capabilities.map((item) => ({
           id: item.capabilityId,

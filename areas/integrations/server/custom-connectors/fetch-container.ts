@@ -8,7 +8,7 @@ const CUSTOM_CONNECTOR_FETCH_PORT = 8080;
 /**
  * Credentialed egress for reviewed custom connector operations.
  *
- * @public `services/platform/src/integration-gateway.ts` exports it for the
+ * @public `workers/platform/src/integration-gateway.ts` exports it for the
  * container binding CUSTOM_CONNECTOR_FETCH of `wrangler.jsonc`.
  */
 export class CustomConnectorFetchContainer extends Container<Env> {

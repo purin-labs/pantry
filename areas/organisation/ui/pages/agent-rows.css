@@ -1,0 +1,73 @@
+/* The agents, as rows of one list: the job, when it runs, and its tools. */
+.agent-rows {
+  margin: 0;
+  padding: 0 20px;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+.agent-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  padding: 18px 0;
+}
+
+.agent-row + .agent-row {
+  border-top: 1px solid var(--border);
+}
+
+.agent-row-main {
+  display: grid;
+  flex: 1 1 320px;
+  gap: 4px;
+  min-width: 0;
+}
+
+.agent-row-main h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--ink-strong);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.agent-row-main p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.agent-row-main .agent-row-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin-top: 4px;
+  color: var(--ink);
+}
+
+.agent-row-facts span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.agent-row-facts svg {
+  flex-shrink: 0;
+  color: var(--ink-2);
+}
+
+/* The action sits on the line of the subtitle, below the fixed top bar. */
+.agents-page-heading {
+  align-items: flex-end;
+}

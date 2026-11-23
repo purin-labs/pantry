@@ -1,6 +1,6 @@
 # Plan 91 — Seams Atelier rename
 
-Status: phases 1, 2, 3 and 5 in production (satyr-edge `347178c4`, released from `peitalin/seams-atelier`; the repository is now `seams-tech/pantry`); phase 4 done on 22 November 2026 with the Plan 93 cutover (see "Phase 4 after Plan 93"); phase 6 open: four "Hey Sous Chef" models trained on 23 November 2026, none passes yet, and the Portal keeps "Hey Satyr" (see "Phase 6: the wake phrase"). See "Built". On 18 November 2026 the owner renamed Atelier to **Pantry** and Commis to **Gantry**: see "Pantry and Gantry". On 22 November 2026 the owner chose the Purin names, and phase 4 now follows [Plan 93](plan-93-clean-cutover.md): see "Purin names" and "Phase 4 after Plan 93".
+Status: phases 1, 2, 3 and 5 in production (satyr-edge `347178c4`, released from `peitalin/seams-atelier`; the repository is now `seams-tech/pantry`); phase 4 done on 22 November 2026 with the Plan 93 cutover (see "Phase 4 after Plan 93"); phase 6 done on 23 November 2026: the owner switched the wake phrase to "Hey Sous Chef" with the round 3 model, which fails only the macOS voice check; released at 05:51 UTC (`pantry` `9cc4dc3b`), and the owner's first wake in production worked (see "Phase 6: the wake phrase"). See "Built". On 18 November 2026 the owner renamed Atelier to **Pantry** and Commis to **Gantry**: see "Pantry and Gantry". On 22 November 2026 the owner chose the Purin names, and phase 4 now follows [Plan 93](plan-93-clean-cutover.md): see "Purin names" and "Phase 4 after Plan 93".
 Date: 16 November 2026.
 Owner: Portal, Platform, commerce, docs and the seams-site.
 Replaces: the Antigravity draft `seams_product_rename_plan.md` (outside this
@@ -475,7 +475,7 @@ satyr symbol, so it does not fit the new name.
   pipeline, and measure false wakes on the same noise set.
 - Until the new model passes, the Portal keeps "Hey Satyr" in the voice
   prompts. Only the privacy text changes ("Seams keeps no audio.").
-- Update the speech bias list in `services/platform/src/voice/vocabulary.ts`
+- Update the speech bias list in `surfaces/voice/server/vocabulary.ts`
   and the lexicon entry in `services/shop-voice/shop_voice/speech.py`.
 - Plan 82B has no addressee check in the code yet. Update the Plan 82B text
   so that the check, when it is built, listens for "Sous Chef".
@@ -796,23 +796,30 @@ State on 22 November 2026:
 
 Phase 4 is done, on 22 November 2026. Open items, each outside the switch:
 
-- Meta keeps its old name and URLs until its business verification passes.
-- `satyr-gmail-dev` and `satyr-drive-pilot` go when local development moves
-  to `purin-pantry` (Plan 93 follow-ups).
-- The Dropbox icons: the console opens only a native file picker, which
-  the browser tools cannot fill. The owner picks
-  `docs/brand/purin-logo/icon-pack/mark-64.png` and `mark-256.png` (the
-  exact sizes) on the Branding tab of the app "Purin Pantry" and saves.
+- Meta keeps its old name and URLs. Deferred on 23 November 2026: Meta
+  banned the owner's account, so every WhatsApp integration waits until the
+  owner has a working Meta business account.
+- `satyr-gmail-dev` and `satyr-drive-pilot` are deleted (Plan 93 follow-ups,
+  22 November 2026). On 23 November 2026 Google shows both as
+  `DELETE_REQUESTED`; it removes them for good after 22 December 2026.
+- The Dropbox icons: the Branding buttons open the Dropbox Chooser, a popup
+  that picks a file from the owner's Dropbox; the browser tools cannot reach
+  the popup. On 23 November 2026 the two files went into the owner's Dropbox,
+  folder `Purin Pantry icons` (`purin-pantry-icon-64.png` and
+  `purin-pantry-icon-256.png`, copies of `docs/brand/purin-logo/icon-pack/mark-64.png`
+  and `mark-256.png`). The owner picks them on the Branding tab of the app
+  "Purin Pantry" and saves.
 - The callback page now has the Portal's look (dev `29024dc0`, released in
   `pantry` `5e878705`).
 
 ### Phase 6: the wake phrase
 
-State on 23 November 2026: no "Hey Sous Chef" model passes yet, so the
-Portal keeps "Hey Satyr". Each model is better than the live "Hey Satyr"
-model on every shared test. But each hears fewer clips from macOS voices,
-which no model trains on, and the rule requires that check. A recording of
-real voices decides the next step (see the end of this section).
+State on 23 November 2026: the wake phrase is "Hey Sous Chef", with the
+round 3 model, by the owner's decision. No model passes the rule below.
+Each model is better than the old "Hey Satyr" model on every shared test.
+But each hears fewer clips from macOS voices, which no model trains on,
+and the rule requires that check. The owner chose the switch without the
+real-voice check (see "The switch" at the end of this section).
 
 **Pipeline.** The same pipeline as "Hey Satyr", in `scripts/plan-82-g04`.
 `phrases.py` holds each phrase: its wake forms, near phrases, near test and
@@ -886,7 +893,7 @@ against 67%). It is worse for Rishi (Indian English, 0% against 63%), Tessa
 Reed and Shelley (31% to 54% against 54% to 81%). So the macOS check now
 measures robotic voices and one accent more than people.
 
-The next step is a check on real voices, not more synthetic data. One
+A check on real voices measures more than more synthetic data. One
 person says each phrase 10 times at 1 m and 10 times at 2 m (about 3
 minutes):
 
@@ -895,11 +902,8 @@ minutes):
 ~/.satyr-voice-test/wake/.venv/bin/python scripts/plan-82-g04/real-voices.py score
 ```
 
-If round 3 hears the owner's "Hey Sous Chef" at least as often as the live
-model hears the owner's "Hey Satyr", and neither model wakes on the other
-phrase, the owner can decide to replace check 3 with this check and
-release round 3. The rule in `compare.py` stays as it is until the owner
-decides.
+This check has not run. The rule in `compare.py` stays as it is, so a
+later model is measured the same way.
 
 Fixed during this work: the Plan 91 codemod had changed the training forms
 from "hey satyr" to "hey pantry", the data folder to `~/.pantry-voice-test`,
@@ -908,11 +912,62 @@ and the Mac's lexicon so that it read "pantry" as "Satyr". The Mac now says
 phrase and its model from `features/voice/wake-phrase.ts`, so the switch is
 a change of two names and one model file. The Chrome voice journey opens the
 fixture shop by its real handle and no longer reloads at the first voice
-start. Its closed-chat scene passes with "Hey Satyr".
+start.
 
-Released: nothing. The pipeline, the fixes and this record are on `dev`
-(owner's yes on 23 November 2026). The phrase stays "Hey Satyr" in
-production, and the shop voice 0.5.2 reaches a Mac only at its next install.
+**The switch** (owner's decision, 23 November 2026). The round 3 model is
+`apps/portal/public/voice/hey_sous_chef.onnx` (SHA-256 `3a0c6e3b…`).
+`WAKE_PHRASE` is "Hey Sous Chef" and `WAKE_MODEL` is `hey_sous_chef`, so the
+prompts, the approval text and the dev recorder say the new phrase. "Sous
+Chef" is the first speech term, and "Satyr" left the speech terms, the Mac's
+lexicon and the confidence bench prompt. The journeys say "hey, sous chef"
+with the macOS voice Samantha (`scripts/shop-voice/wake-phrase.json`); the
+model scores it 1.0, and five natural macOS voices score at least 0.997.
+The Portal no longer loads `hey_satyr.onnx`, and the wake worker removes it
+from each device's cache. The file stayed in `apps/portal/public/voice` as
+the rollback until the first production wake (see "Released").
+
+Proof on the branch, 23 November 2026:
+
+- The closed-chat Chrome journey passes. The Portal wakes on "hey, sous
+  chef" two times and opens the chat beside the page.
+- The Platform voice journey passes (4 tests), with "Sous Chef" as the
+  first speech term.
+- The phase bench on the Portal's model file, with 18 macOS voices
+  (`output/shop-voice/wake-phase-bench-hey-sous-chef.json`): the four
+  natural voices Samantha, Daniel, Karen and Moira are heard in 376 of 384
+  clips, against 348 of 384 for "Hey Satyr". All 18 voices: 710 of 1,728
+  against 1,397 of 1,728, because Rishi, Tessa and the novelty voices
+  (Ralph, Eddy, Flo, Sandy, Shelley, Rocko, Grandma and Grandpa) fail. Café
+  talk: no false wake in 17.8 minutes, against 4.
+
+Known risk: on macOS voices the model hears 53.3% against 66.5% for "Hey
+Satyr" (compare check 3), and it does not hear the Indian English voice
+Rishi. A person with such an accent may need the held key.
+
+**Released** on 23 November 2026 at 05:51 UTC, with the owner's words
+"Push and release": `pantry` `9cc4dc3b` (before: `fc7b7dcd`). Only the
+Platform Worker changed. It is a narrow release: the live commit `c2348c16`
+and the eight voice commits of this phase, as release commit `cd06042d`
+(ref `refs/backup/released-2026-11-23-hey-sous-chef`). The Refactor 17
+moves on `dev` are not in it. Before the upload, the release tree passed the
+Portal build, the type checks, both voice journeys and the D1 schema check.
+After it: `/health` and `/portal` answer 200, `/voice/hey_sous_chef.onnx`
+has the model's SHA-256, the Portal file with the new phrase is served,
+`/shop-voice/install.sh` gives shop voice 0.5.2, and 114 tail events were
+`ok` with no exception. Rollback target: `fc7b7dcd`.
+
+**First wake in production**, 23 November 2026 at about 06:37 UTC: the owner
+said "Hey Sous Chef" to the production Portal in Chrome on the Mac, and the
+spoken question "What's your name?" reached the chat, and Sous Chef
+answered. A first try failed because the owner spoke while voice control
+still said "Starting voice control…" (the first start downloads about 15 MB).
+After that wake, `hey_satyr.onnx` left `apps/portal/public/voice` on `dev`
+(owner's yes). It leaves production with the next release; until then the
+live Portal serves it but does not load it. A rollback to "Hey Satyr" now
+needs the earlier version `fc7b7dcd`, or the file again from
+`~/.satyr-voice-test/wake/models/hey_satyr.onnx` (SHA-256 `6d1b58d9…`).
+Open: the owner's real-voice check (`real-voices.py`), which measures how
+often the model hears a person.
 
 ## Built
 
@@ -1008,7 +1063,8 @@ State on 17 November 2026:
   (pull request 74 waits for the owner), and the archive of
   `seams-tech/satyr`. Changed on 22 November 2026: phase 4 is done (see
   "Phase 4 after Plan 93"), the mark is the Purin cat, and the company site
-  is `purin.io`.
+  is `purin.io`. Changed on 23 November 2026: phase 6 is done (see "Phase 6:
+  the wake phrase").
 
 ## Acceptance
 
@@ -1078,9 +1134,10 @@ State on 17 November 2026:
 5. **The company name.** Is the company registered? Default: "Seams" only,
    with no 株式会社.
 6. **The switcher areas.** Default: Commerce, Café and Kitchen.
-7. **The wake phrase.** Default: keep "Hey Satyr" until a "Hey Sous Chef"
-   model passes. On 23 November 2026 four models did not pass the macOS
-   voice check (see "Phase 6: the wake phrase").
+7. **The wake phrase.** Decided on 23 November 2026: the owner switched
+   to "Hey Sous Chef" with the round 3 model. It passes the false-wake and
+   recall checks and fails the macOS voice check (see "Phase 6: the wake
+   phrase"). Earlier default: keep "Hey Satyr" until a model passes.
 8. **The public domain.** Decided on 21 November 2026 in Plan 93
    (decision 2): `pantry.purin.io`, with no redirect from the old address.
    Earlier default: `pantry.seams.sh` (was `atelier.seams.sh`).

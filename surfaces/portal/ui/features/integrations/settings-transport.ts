@@ -16,7 +16,7 @@ import {
 } from "@purin-labs/control/portal/control-paths";
 import { parseWhatsAppSurface, type WhatsAppSurface } from "@purin-labs/control-api/portal/whatsapp";
 import { whatsappAccountActionPath, whatsappAccountsPath } from "@purin-labs/area-inbox/ui/whatsapp";
-import { parseCredentialRotationReceiptResponse, parseCredentialRevocationReceiptResponse } from "@purin-labs/control-api/portal/credential-inventory";
+import { parseCredentialRotationReceiptResponse } from "@purin-labs/control-api/portal/credential-inventory";
 import {
   assertNever,
   isNonEmptyString,
@@ -611,23 +611,6 @@ export async function executeIntegrationsRoute(
             `/v1/control/organisations/${encodeURIComponent(organisationId)}/accounts/${encodeURIComponent(command.integrationAccountId)}/credential-rotations`,
             "POST",
             { replacementSecret: command.replacementSecret },
-            configurationVersion,
-          ),
-        ),
-      };
-    case "revoke_credential":
-      return {
-        kind: "credential_revocation",
-        receipt: parseCredentialRevocationReceiptResponse(
-          await controlMutation(
-            `/v1/control/organisations/${encodeURIComponent(organisationId)}/accounts/${encodeURIComponent(command.integrationAccountId)}/revoke-credential`,
-            "POST",
-            command.replacementIntegrationAccountId === null
-              ? {}
-              : {
-                  replacementIntegrationAccountId:
-                    command.replacementIntegrationAccountId,
-                },
             configurationVersion,
           ),
         ),

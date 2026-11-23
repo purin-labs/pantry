@@ -391,5 +391,5 @@ needs new native requests and recordings; an old recording is never reinterprete
   `scripts/bakery-mujoco/` (`verify_rust_appliances.py` and the other `verify_rust_*`
   files). The CI job `bakery-physics` in `.github/workflows/pantry.yml` runs the
   headless set `ci` and then the browser set `ci-browser`.
-- E2E journey in `services/platform/tests/e2e/`: `bakery-runs.test.ts` reads a native
+- E2E journey in `workers/platform/tests/e2e/`: `bakery-runs.test.ts` reads a native
   recording through the shared parser.

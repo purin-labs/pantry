@@ -1,0 +1,556 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": "src/integration-gateway.ts",
+  "compatibility_date": "2026-07-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "minify": true,
+  // Plan 93: the Worker has one address, its custom domain on purin.io.
+  "workers_dev": false,
+  "preview_urls": false,
+  "dev": {
+    "ip": "127.0.0.1",
+    "port": 3101,
+    "inspector_port": 9231,
+  },
+  "observability": {
+    "enabled": true,
+  },
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "../../apps/portal/dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": [
+      "/v1/*",
+      "/hook/*",
+      "/slack/*",
+      "/health",
+      "/__scheduled",
+      "/cdn-cgi/local/scheduled",
+    ],
+  },
+  "exports": {
+    "OrganisationDO": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "SessionDO": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "CaseDO": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "ConnectorDO": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "CodeModePlatformGovernorActor": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "ConversationResidencyActor": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "DeviceFleetActor": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    // Plan 24 S4: one approved bake run with two cobots and the oven.
+    "BakeRunActor": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "WorkspaceExecutorContainer": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "MessageLinkFetchContainer": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "CustomConnectorFetchContainer": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+  },
+  "env": {
+    "local": {
+      "name": "pantry",
+      "triggers": {
+        "crons": [],
+      },
+      "vars": {
+        "PANTRY_DEPLOYMENT_PROFILE": "local",
+        "PANTRY_ORGANISATION_PLACEMENT_PROFILE": "{\"kind\":\"affinity\",\"placementCellId\":\"local-wnam\",\"locationHint\":\"wnam\",\"databaseBinding\":\"ORGANISATION_DB_WNAM\",\"cells\":[{\"kind\":\"affinity\",\"placementCellId\":\"local-eu\",\"locationHint\":\"weur\",\"databaseBinding\":\"ORGANISATION_DB_EU\"},{\"kind\":\"affinity\",\"placementCellId\":\"multi-region-preview\",\"locationHint\":\"wnam\",\"databaseBinding\":\"DB\"}]}",
+        "PANTRY_PUBLIC_ORIGIN": "https://localhost:3003",
+        "PANTRY_OAUTH_CALLBACK_ORIGIN": "https://localhost:3003",
+        "PANTRY_PROVIDER_INGRESS_ORIGIN": "https://square-sandbox-webhook.seams.sh",
+        "PANTRY_VAULT_ACTIVE_KEY_VERSION": "v1",
+        "SQUARE_OAUTH_ENVIRONMENT": "development",
+        "COMMERCE_BASE_URL": "http://127.0.0.1:3102",
+        "AIRTABLE_OAUTH_CLIENT_ID": "55e93b04-5c92-4a8d-b96b-d83e7a4caa32",
+        "DROPBOX_OAUTH_CLIENT_ID": "08go391f1qw6vbd",
+        "GDRIVE_OAUTH_CLIENT_ID": "136715459438-i2qutsi27kb4ka9c3qkhvu1v42jvuhdq.apps.googleusercontent.com",
+        "GDRIVE_PICKER_APP_ID": "136715459438",
+        "GMAIL_OAUTH_CLIENT_ID": "136715459438-i2qutsi27kb4ka9c3qkhvu1v42jvuhdq.apps.googleusercontent.com",
+        "GMAIL_PUBSUB_AUDIENCE": "https://localhost:3003/hook/email/google",
+        "GMAIL_PUBSUB_TOPIC": "projects/purin-pantry/topics/pantry-gmail-push-local",
+        "GMAIL_PUBSUB_SERVICE_ACCOUNT": "pantry-gmail-push@purin-pantry.iam.gserviceaccount.com",
+        "GOOGLE_OIDC_CLIENT_ID": "136715459438-i2qutsi27kb4ka9c3qkhvu1v42jvuhdq.apps.googleusercontent.com",
+        "SQUARE_OAUTH_CLIENT_ID": "sandbox-sq0idb-dhhMJAse67TqZ6YdbxKlJw",
+        "SLACK_APP_ID": "A0BTDETNVJ5",
+        "SLACK_CLIENT_ID": "11568910548192.11931503777617",
+        "WHATSAPP_APP_ID": "3167174123466651",
+        "WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID": "1758815688595131",
+      },
+      "services": [
+        {
+          "binding": "COMMERCE",
+          "service": "pantry-commerce",
+        },
+        {
+          "binding": "MODEL_EXIT",
+          "service": "pantry-model-exit-local",
+        },
+        {
+          "binding": "CHATGPT_EXIT",
+          "service": "pantry-chatgpt-exit-local",
+        },
+        {
+          "binding": "VAULT_ONEPASSWORD",
+          "service": "pantry-vault-onepassword-local",
+        },
+      ],
+      "ai": { "binding": "AI" },
+      "secrets_store_secrets": [
+        {
+          "binding": "DATA_ENCRYPTION_ROOT",
+          "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
+          "secret_name": "pantry-data-encryption-root",
+        },
+        {
+          "binding": "VAULT_ROOT_V1",
+          "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
+          "secret_name": "pantry-vault-root",
+        },
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "ORGANISATION",
+            "class_name": "OrganisationDO",
+          },
+          {
+            "name": "SESSION",
+            "class_name": "SessionDO",
+          },
+          {
+            "name": "CASE",
+            "class_name": "CaseDO",
+          },
+          {
+            "name": "CONNECTOR",
+            "class_name": "ConnectorDO",
+          },
+          {
+            "name": "CODE_MODE_PLATFORM_GOVERNOR_ACTOR",
+            "class_name": "CodeModePlatformGovernorActor",
+          },
+          {
+            // The QuickJS VM of a Pi Code Mode script runs in a Worker of
+            // its own (wrangler.code-mode-sandbox.jsonc). Deploy that
+            // Worker first.
+            "name": "CODE_MODE_SANDBOX",
+            "class_name": "CodeModeSandbox",
+            "script_name": "pantry-code-sandbox-local",
+          },
+          {
+            "name": "CONVERSATION_RESIDENCY",
+            "class_name": "ConversationResidencyActor",
+          },
+          {
+            "name": "DEVICE_FLEET",
+            "class_name": "DeviceFleetActor",
+          },
+          {
+            "name": "BAKE_RUN",
+            "class_name": "BakeRunActor",
+          },
+          {
+            "name": "WORKSPACE_EXECUTOR",
+            "class_name": "WorkspaceExecutorContainer",
+          },
+          {
+            "name": "MESSAGE_LINK_FETCH",
+            "class_name": "MessageLinkFetchContainer",
+          },
+          {
+            "name": "CUSTOM_CONNECTOR_FETCH",
+            "class_name": "CustomConnectorFetchContainer",
+          },
+        ],
+      },
+      "containers": [
+        {
+          "class_name": "MessageLinkFetchContainer",
+          "image": "../../services/message-link-fetch/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 1,
+        },
+        {
+          "class_name": "CustomConnectorFetchContainer",
+          "image": "../../services/custom-connector-fetch/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 10,
+        },
+        {
+          "class_name": "WorkspaceExecutorContainer",
+          "image": "../../services/workspace-executor/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 4,
+          "constraints": {
+            "regions": ["ENAM", "WNAM", "EEUR", "WEUR"],
+          },
+        },
+      ],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "pantry",
+          "database_id": "b97fca3b-5335-4888-a0bf-8a5df5ed194c",
+          "migrations_dir": "migrations-global",
+        },
+        // Local emulator databases. These IDs do not name production resources.
+        {
+          "binding": "ORGANISATION_DB_WNAM",
+          "database_name": "pantry-local-wnam",
+          "database_id": "00000000-0000-4000-8000-000000000055",
+          "migrations_dir": "migrations-regional",
+        },
+        {
+          "binding": "ORGANISATION_DB_EU",
+          "database_name": "pantry-local-eu",
+          "database_id": "00000000-0000-4000-8000-000000000056",
+          "migrations_dir": "migrations-regional",
+        },
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "POLICY_KV",
+          "id": "6a6f26a1712b46989f3f731ae9cb2998",
+          "preview_id": "6a6f26a1712b46989f3f731ae9cb2998",
+        },
+      ],
+      "r2_buckets": [
+        {
+          "binding": "ARCHIVE",
+          "bucket_name": "pantry-archive",
+          "preview_bucket_name": "pantry-archive-dev",
+        },
+      ],
+      "queues": {
+        "producers": [
+          {
+            "binding": "EVENT_Q",
+            "queue": "pantry-events",
+          },
+          {
+            "binding": "CUE_Q",
+            "queue": "pantry-cues",
+          },
+        ],
+        "consumers": [
+          {
+            "queue": "pantry-events",
+            "max_batch_size": 10,
+            "max_batch_timeout": 5,
+            "max_retries": 5,
+            "retry_delay": 30,
+            "dead_letter_queue": "pantry-event-dlq",
+          },
+          {
+            "queue": "pantry-cues",
+            "max_batch_size": 10,
+            "max_batch_timeout": 5,
+            "max_retries": 5,
+            "retry_delay": 30,
+            "dead_letter_queue": "pantry-cue-dlq",
+          },
+        ],
+      },
+    },
+    "production": {
+      "name": "pantry",
+      // Each storage step crosses an ocean when the Worker runs where a request
+      // enters, and a browser in Japan can enter at Los Angeles over HTTP/3.
+      "placement": {
+        "region": "aws:ap-northeast-1",
+      },
+      "routes": [{ "pattern": "pantry.purin.io", "custom_domain": true }],
+      "triggers": {
+        "crons": ["* * * * *", "*/5 * * * *", "*/15 * * * *"],
+      },
+      "vars": {
+        "PANTRY_PUBLIC_ORIGIN": "https://pantry.purin.io",
+        "PANTRY_OAUTH_CALLBACK_ORIGIN": "https://pantry.purin.io",
+        // Production has one cell, in Asia Pacific. The global database, the
+        // regional database, the archive bucket and the Actors are in Tokyo.
+        "PANTRY_ORGANISATION_PLACEMENT_PROFILE": "{\"kind\":\"affinity\",\"placementCellId\":\"production-apac\",\"locationHint\":\"apac\",\"databaseBinding\":\"ORGANISATION_DB_APAC\"}",
+        "PANTRY_VAULT_ACTIVE_KEY_VERSION": "v1",
+        "SEAMS_RELAYER_URL": "https://seams-sdk-d1-gateway.n6378056.workers.dev",
+        "SEAMS_WALLET_ORIGIN": "https://sign.seams.sh",
+        // The Purin Pantry OAuth integrations at Airtable and Notion (Plan 91).
+        "AIRTABLE_OAUTH_CLIENT_ID": "7abda7cf-c1eb-40f8-b5fa-2efb85d9edc3",
+        "NOTION_OAUTH_CLIENT_ID": "420d872b-594c-8155-af3d-003739e7cf01",
+        "DROPBOX_OAUTH_CLIENT_ID": "08go391f1qw6vbd",
+        "GDRIVE_OAUTH_CLIENT_ID": "136715459438-i2qutsi27kb4ka9c3qkhvu1v42jvuhdq.apps.googleusercontent.com",
+        "GDRIVE_PICKER_APP_ID": "136715459438",
+        "GMAIL_OAUTH_CLIENT_ID": "136715459438-i2qutsi27kb4ka9c3qkhvu1v42jvuhdq.apps.googleusercontent.com",
+        "GMAIL_PUBSUB_AUDIENCE": "https://pantry.purin.io/hook/email/google",
+        "GMAIL_PUBSUB_TOPIC": "projects/purin-pantry/topics/pantry-gmail-push",
+        "GMAIL_PUBSUB_SERVICE_ACCOUNT": "pantry-gmail-push@purin-pantry.iam.gserviceaccount.com",
+        "COMMERCE_BASE_URL": "https://commerce.pantry.purin.io",
+        // No SHOP_ORDER_PAGE_ORIGIN yet: the order page domain is not chosen,
+        // so QR codes keep the shop.purin.io/shops/<merchant> address.
+        "WHATSAPP_APP_ID": "3167174123466651",
+        "WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID": "1758815688595131",
+        "PANTRY_DEPLOYMENT_PROFILE": "production",
+        "SQUARE_OAUTH_ENVIRONMENT": "production",
+        "GOOGLE_OIDC_CLIENT_ID": "136715459438-i2qutsi27kb4ka9c3qkhvu1v42jvuhdq.apps.googleusercontent.com",
+        "SLACK_APP_ID": "A0BFVDZLFLM",
+        "SLACK_CLIENT_ID": "11568910548192.11539475695701",
+      },
+      "services": [
+        {
+          "binding": "COMMERCE",
+          "service": "pantry-commerce",
+        },
+        // Plan 73: every direct model-provider request leaves through this
+        // Worker, which runs near AWS Tokyo. It deploys first.
+        {
+          "binding": "MODEL_EXIT",
+          "service": "pantry-model-exit",
+        },
+        {
+          "binding": "CHATGPT_EXIT",
+          "service": "pantry-chatgpt-exit",
+        },
+        {
+          "binding": "VAULT_ONEPASSWORD",
+          "service": "pantry-vault-onepassword",
+        },
+      ],
+      "secrets": {
+        "required": [
+          "SLACK_SIGNING_SECRET",
+          "SLACK_CLIENT_SECRET",
+          "SLACK_OAUTH_STATE_SECRET",
+          "SQUARE_OAUTH_CLIENT_ID",
+          "SQUARE_OAUTH_CLIENT_SECRET",
+          "STRIPE_CONNECT_CLIENT_ID",
+          "STRIPE_CONNECT_CLIENT_SECRET",
+          "STRIPE_CONNECT_WEBHOOK_ID",
+          "STRIPE_CONNECT_WEBHOOK_SECRET",
+          "SHOPIFY_CLIENT_ID",
+          "SHOPIFY_CLIENT_SECRET",
+          "SESSION_TOKEN_SECRET",
+          "ORGANISATION_ADMIN_TOKEN",
+          "GOOGLE_OIDC_CLIENT_SECRET",
+          "AIRTABLE_OAUTH_CLIENT_SECRET",
+          "NOTION_OAUTH_CLIENT_SECRET",
+          "GMAIL_OAUTH_CLIENT_SECRET",
+          "DROPBOX_OAUTH_CLIENT_SECRET",
+          "GDRIVE_OAUTH_CLIENT_SECRET",
+          "GDRIVE_PICKER_API_KEY",
+          "COMMERCE_SERVICE_TOKEN",
+          "OPENROUTER_API_KEY",
+          "TYPESAFE_API_KEY",
+          "WHATSAPP_APP_SECRET",
+          "WHATSAPP_VERIFY_TOKEN",
+        ],
+      },
+      "ai": { "binding": "AI" },
+      "secrets_store_secrets": [
+        {
+          "binding": "DATA_ENCRYPTION_ROOT",
+          "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
+          "secret_name": "pantry-data-encryption-root",
+        },
+        {
+          "binding": "VAULT_ROOT_V1",
+          "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
+          "secret_name": "pantry-vault-root",
+        },
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "ORGANISATION",
+            "class_name": "OrganisationDO",
+          },
+          {
+            "name": "SESSION",
+            "class_name": "SessionDO",
+          },
+          {
+            "name": "CASE",
+            "class_name": "CaseDO",
+          },
+          {
+            "name": "CONNECTOR",
+            "class_name": "ConnectorDO",
+          },
+          {
+            "name": "CODE_MODE_PLATFORM_GOVERNOR_ACTOR",
+            "class_name": "CodeModePlatformGovernorActor",
+          },
+          {
+            // The QuickJS VM of a Pi Code Mode script runs in a Worker of
+            // its own (wrangler.code-mode-sandbox.jsonc). Deploy that
+            // Worker first.
+            "name": "CODE_MODE_SANDBOX",
+            "class_name": "CodeModeSandbox",
+            "script_name": "pantry-code-sandbox",
+          },
+          {
+            "name": "CONVERSATION_RESIDENCY",
+            "class_name": "ConversationResidencyActor",
+          },
+          {
+            "name": "DEVICE_FLEET",
+            "class_name": "DeviceFleetActor",
+          },
+          {
+            "name": "BAKE_RUN",
+            "class_name": "BakeRunActor",
+          },
+          {
+            "name": "WORKSPACE_EXECUTOR",
+            "class_name": "WorkspaceExecutorContainer",
+          },
+          {
+            "name": "MESSAGE_LINK_FETCH",
+            "class_name": "MessageLinkFetchContainer",
+          },
+          {
+            "name": "CUSTOM_CONNECTOR_FETCH",
+            "class_name": "CustomConnectorFetchContainer",
+          },
+        ],
+      },
+      "containers": [
+        {
+          "class_name": "MessageLinkFetchContainer",
+          "image": "../../services/message-link-fetch/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 1,
+          // Each region has one link-fetch Actor, named after the location
+          // hint of its organisations. Production has one cell, in Asia
+          // Pacific. A cell of another region needs a class of its own with
+          // its own region.
+          "constraints": {
+            "regions": ["APAC"],
+          },
+          "name": "pantry-message-link-fetch",
+        },
+        {
+          "class_name": "CustomConnectorFetchContainer",
+          "image": "../../services/custom-connector-fetch/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 10,
+          // Each organisation has its own fetch container Actor, asked for
+          // with the location hint of the organisation's placement.
+          // Production has one cell, in Asia Pacific. A cell of another
+          // region needs a class of its own with its own region.
+          "constraints": {
+            "regions": ["APAC"],
+          },
+          "name": "pantry-custom-connector-fetch",
+        },
+        {
+          "class_name": "WorkspaceExecutorContainer",
+          "image": "../../services/workspace-executor/Dockerfile",
+          "image_build_context": "../..",
+          "instance_type": "lite",
+          "max_instances": 4,
+          "constraints": {
+            "regions": ["APAC"],
+          },
+          "name": "pantry-workspace-executor",
+        },
+      ],
+      "d1_databases": [
+        // Both databases are served from Tokyo (`served_by_colo` of a query
+        // is NRT). A location hint names a region, and Cloudflare chooses the
+        // site in it: the hint "apac" gave Singapore, Seoul and Hong Kong
+        // (66 ms for each read from Tokyo). A database made from Japan with
+        // no hint is served from Tokyo or Osaka. Check the colo of a new
+        // database before a release binds it.
+        {
+          "binding": "DB",
+          "database_name": "pantry-global-apac",
+          "database_id": "ced3f859-6a2b-4e54-bc8e-92d2dae424fa",
+          "migrations_dir": "migrations-global",
+        },
+        {
+          "binding": "ORGANISATION_DB_APAC",
+          "database_name": "pantry-organisation-apac",
+          "database_id": "130a94eb-71a6-40a9-991d-b359f36a939a",
+          "migrations_dir": "migrations-regional",
+        },
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "POLICY_KV",
+          // The namespace pantry-policy.
+          "id": "1b538734635b4da481ac9cf7c3315d36",
+          "preview_id": "1b538734635b4da481ac9cf7c3315d36",
+        },
+      ],
+      "r2_buckets": [
+        {
+          "binding": "ARCHIVE",
+          "bucket_name": "pantry-archive-apac",
+          "preview_bucket_name": "pantry-archive-dev",
+        },
+      ],
+      "queues": {
+        "producers": [
+          {
+            "binding": "EVENT_Q",
+            "queue": "pantry-events",
+          },
+          {
+            "binding": "CUE_Q",
+            "queue": "pantry-cues",
+          },
+        ],
+        "consumers": [
+          {
+            "queue": "pantry-events",
+            "max_batch_size": 10,
+            "max_batch_timeout": 5,
+            "max_retries": 5,
+            "retry_delay": 30,
+            "dead_letter_queue": "pantry-event-dlq",
+          },
+          {
+            "queue": "pantry-cues",
+            "max_batch_size": 10,
+            "max_batch_timeout": 5,
+            "max_retries": 5,
+            "retry_delay": 30,
+            "dead_letter_queue": "pantry-cue-dlq",
+          },
+        ],
+      },
+    },
+  },
+}

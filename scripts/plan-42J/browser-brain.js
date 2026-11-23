@@ -396,13 +396,10 @@ async (page) => {
       );
       const ownerStatus = {
         line: await this.owner.locator("#brain-status-line").innerText(),
-        latest: await this.owner.locator(".brain-status-latest").innerText(),
       };
       this.check(
-        "the Overview says how many items wait, and names the latest event",
-        ownerStatus.line === "2 items wait for your decision." &&
-          ownerStatus.latest.startsWith("Latest") &&
-          ownerStatus.latest.includes("proposed"),
+        "the Overview says how many items wait",
+        ownerStatus.line === "2 items wait for your decision.",
         ownerStatus,
       );
 
@@ -1424,13 +1421,11 @@ async (page) => {
           }
           return {
             sideways: document.documentElement.scrollWidth - width,
-            // The rings of the Overview are a backdrop that its box clips.
             cut: [...page.querySelectorAll("*")]
               .filter(
                 (element) =>
                   visible(element) &&
-                  element.getBoundingClientRect().right > width + 1 &&
-                  !element.closest(".brain-status-rings"),
+                  element.getBoundingClientRect().right > width + 1,
               )
               .map((element) => String(element.className).slice(0, 60))
               .slice(0, 5),

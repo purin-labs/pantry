@@ -5,7 +5,7 @@
 import { sha256Hex } from "../../packages/std/src/index";
 import { parseRunSnapshot } from "../../packages/bakery-model/src/bakery-run-snapshot";
 import interrupted from "../../assets/bakery-mujoco/combined-bakery/rust-evidence/shared-run-interrupted.json";
-import gateway from "../../services/platform/src/integration-gateway";
+import gateway from "../../workers/platform/src/integration-gateway";
 import { requireActiveOrganisationActor } from "../../foundation/actor-runtime/actors/actor-router";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../foundation/authority/authorization/access-grants/turn-authority";
 import { bakeryRunSnapshotPrefix } from "../../areas/kitchen/server/bakery/saved-runs";
@@ -20,7 +20,7 @@ export {
   CaseDO,
   ConnectorDO,
   CodeModePlatformGovernorActor,
-} from "../../services/platform/src/integration-gateway";
+} from "../../workers/platform/src/integration-gateway";
 
 const names = ["Owner", "Other", "Member"] as const;
 const { admittedOrganisation, login } = fixturePeople(

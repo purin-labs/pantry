@@ -2,7 +2,7 @@ import type { FirstOperationalTask, OnboardingActivation, OrganisationOnboarding
 import type { CommerceSystemSyncView, CommerceSystemView } from "@purin-labs/control-api/portal/portal-types";
 import React from "react";
 import type { ControlErrorKind } from "@purin-labs/control-api/portal/errors";
-import type { CredentialInventory, CredentialRotationReceipt, CredentialRevocationReceipt } from "@purin-labs/control-api/portal/credential-inventory";
+import type { CredentialInventory, CredentialRotationReceipt } from "@purin-labs/control-api/portal/credential-inventory";
 import type { PageContent } from "@purin-labs/control/portal/page-content";
 import type { WhatsAppSurface } from "@purin-labs/control-api/portal/whatsapp";
 import type { WhatsAppPanelActions } from "../../pages/whatsapp";
@@ -135,10 +135,6 @@ export type IntegrationsPageActions = EmailReviewActions & {
     integrationAccountId: string,
     replacementSecret: string,
   ) => Promise<CredentialActionOutcome>;
-  readonly revokeCredential: (
-    integrationAccountId: string,
-    replacementIntegrationAccountId: string | null,
-  ) => Promise<CredentialActionOutcome>;
   readonly readMailboxSetup: ReadMailboxSetup;
   readonly setUpMailbox: (request: MailboxSetupRequest) => void;
   readonly resumeMailbox: SettingsMouseHandler;
@@ -157,10 +153,6 @@ export type CredentialActionOutcome =
   | {
       readonly kind: "rotated";
       readonly receipt: CredentialRotationReceipt | null;
-    }
-  | {
-      readonly kind: "revoked";
-      readonly receipt: CredentialRevocationReceipt | null;
     }
   | {
       readonly kind: "failed";
@@ -239,11 +231,6 @@ export type IntegrationsCommand =
       readonly replacementSecret: string;
     }
   | {
-      readonly kind: "revoke_credential";
-      readonly integrationAccountId: string;
-      readonly replacementIntegrationAccountId: string | null;
-    }
-  | {
       readonly kind: "set_up_mailbox";
       readonly integrationAccountId: string;
       readonly agent: MailboxSetupAgentChoice;
@@ -304,10 +291,6 @@ export type IntegrationsCommandResult =
   | {
       readonly kind: "credential_rotation";
       readonly receipt: CredentialRotationReceipt | null;
-    }
-  | {
-      readonly kind: "credential_revocation";
-      readonly receipt: CredentialRevocationReceipt | null;
     };
 
 /**

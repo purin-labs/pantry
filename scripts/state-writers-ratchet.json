@@ -7,6 +7,6 @@
     "surfaces/slack/server/side-cases.ts": 1
   },
   "organisation_lifecycle": {
-    "services/platform/tests/e2e/full-worker.ts": 1
+    "workers/platform/tests/e2e/full-worker.ts": 1
   }
 }

@@ -93,7 +93,7 @@ slack-live-reply-evidence.json
 docs/evidence/plan-55c/
 
 # The prepared 1Password SDK loader (scripts/vault-onepassword-worker.mjs).
-services/platform/.generated/
+workers/platform/.generated/
 services/shop-gateway/dist/
 
 # Plan 82C Phase 3: real voice recordings stay on this Mac.

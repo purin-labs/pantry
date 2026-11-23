@@ -2,7 +2,7 @@ import { createRequire } from "node:module";
 import { readFile, readdir } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { singleDatabaseMigrations } from "../../services/platform/scripts/single-database-schema.mjs";
+import { singleDatabaseMigrations } from "../../workers/platform/scripts/single-database-schema.mjs";
 
 const [runtimeDirectory, workerPath, persistenceDirectory, providerUrl, group] =
   process.argv.slice(2);
@@ -158,7 +158,7 @@ async function readFixtureQueries() {
   const plugin = pathToFileURL(
     join(
       repository,
-      "services/platform/node_modules/@cloudflare/vitest-plugin/dist/pool/index.mjs",
+      "workers/platform/node_modules/@cloudflare/vitest-plugin/dist/pool/index.mjs",
     ),
   );
   const { readD1Migrations } = await import(plugin.href);

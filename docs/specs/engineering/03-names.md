@@ -101,20 +101,19 @@ value. The binding `POLICY_KV` has the name of the old namespace, but it points 
 | Cookies `satyr_control_session`, `satyr_control_csrf`     | `pantry_session`, `pantry_csrf`                                           |
 | Browser storage keys `satyr:*`                            | `pantry:*`                                                                |
 | launchd label `sh.seams.satyr.*`, folder `~/.satyr-voice` | `io.purin.pantry.*`, `~/.pantry-voice`                                    |
+| Wake phrase "Hey Satyr", model `hey_satyr.onnx`           | "Hey Sous Chef", `hey_sous_chef.onnx`                                     |
 
 ### Values that keep an old name on purpose
 
-| Value                                                             | Where                                                                                                                                                                         | Why                                                                             |
-| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| The wake phrase "Hey Satyr" and the model `hey_satyr`             | `surfaces/voice/ui/features/voice/wake-phrase.ts`, `scripts/shop-voice/wake-phrase.json`, `apps/portal/public/voice/hey_satyr.onnx`                                           | The model hears only this phrase. It stays until a "Hey Sous Chef" model passes |
-| The speech term "Satyr"                                           | `ASSISTANT_NAMES` in `surfaces/voice/server/vocabulary.ts`, the lexicon in `services/shop-voice/shop_voice/speech.py`, the prompt in `scripts/shop-voice/confidence-bench.py` | Speech engines must hear and say the wake word                                  |
-| The wake training scripts                                         | `scripts/plan-82-g04/`                                                                                                                                                        | They train and compare the two phrases                                          |
-| The pinned Kitchen physics bundles                                | `apps/portal/public/bakery-physics`                                                                                                                                           | A saved run names its bundle by hash                                            |
-| The native source of the bundles                                  | `crates/bakery-native`                                                                                                                                                        | The bundles hash this source                                                    |
-| The browser folder `satyr-physics-results`                        | `opfs-result-files.ts` and `physics-result-directory.ts` in `areas/kitchen/ui/features/production-run/`                                                                       | The pinned execution bundle holds this name                                     |
-| R2 file names and model text                                      | `repo-binaries.json`, `scripts/bakery-mujoco`                                                                                                                                 | These names are inputs of the pinned builds                                     |
-| Plan file names and the applied D1 patch scripts of the old stack | `docs/`, `services/platform/scripts/`                                                                                                                                         | They are records                                                                |
-| The rename script                                                 | `scripts/rename/plan-93-cutover.mjs`                                                                                                                                          | Its search patterns must match the old names                                    |
+| Value                                                             | Where                                                                                                   | Why                                          |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| The wake training scripts                                         | `scripts/plan-82-g04/`                                                                                  | They train and compare the two phrases       |
+| The pinned Kitchen physics bundles                                | `apps/portal/public/bakery-physics`                                                                     | A saved run names its bundle by hash         |
+| The native source of the bundles                                  | `crates/bakery-native`                                                                                  | The bundles hash this source                 |
+| The browser folder `satyr-physics-results`                        | `opfs-result-files.ts` and `physics-result-directory.ts` in `areas/kitchen/ui/features/production-run/` | The pinned execution bundle holds this name  |
+| R2 file names and model text                                      | `repo-binaries.json`, `scripts/bakery-mujoco`                                                           | These names are inputs of the pinned builds  |
+| Plan file names and the applied D1 patch scripts of the old stack | `docs/`, `workers/platform/scripts/`                                                                    | They are records                             |
+| The rename script                                                 | `scripts/rename/plan-93-cutover.mjs`                                                                    | Its search patterns must match the old names |
 
 The plain French words "atelier" and "commis" appear in recipe, lighting and test data.
 
@@ -126,17 +125,17 @@ This spec owns no D1 or Actor table, route, event, capability or agent tool.
 
 `WORKER_NAMES` and `WORKER_DOMAINS` in `scripts/worker-environment.mjs` are the one list.
 
-| Service           | Production Worker          | Address                    | Wrangler file                                        |
-| ----------------- | -------------------------- | -------------------------- | ---------------------------------------------------- |
-| Platform          | `pantry`                   | `pantry.purin.io`          | `services/platform/wrangler.jsonc`                   |
-| Commerce engine   | `pantry-commerce`          | `commerce.pantry.purin.io` | `services/commerce/wrangler.jsonc`                   |
-| Slack ingress     | `pantry-slack-ingress`     | `slack.pantry.purin.io`    | `services/platform/wrangler.slack-ingress.jsonc`     |
-| Docs              | `pantry-docs`              | `docs.pantry.purin.io`     | `apps/docs/wrangler.jsonc`                           |
-| Shop              | `purin-shop`               | `shop.purin.io`            | `apps/storefront/wrangler.jsonc`                     |
-| Code Mode sandbox | `pantry-code-sandbox`      | None                       | `services/platform/wrangler.code-mode-sandbox.jsonc` |
-| Model exit        | `pantry-model-exit`        | None                       | `services/platform/wrangler.model-exit.jsonc`        |
-| ChatGPT exit      | `pantry-chatgpt-exit`      | None                       | `services/platform/wrangler.chatgpt-exit.jsonc`      |
-| 1Password store   | `pantry-vault-onepassword` | None                       | `services/platform/wrangler.vault-onepassword.jsonc` |
+| Service           | Production Worker          | Address                    | Wrangler file                                       |
+| ----------------- | -------------------------- | -------------------------- | --------------------------------------------------- |
+| Platform          | `pantry`                   | `pantry.purin.io`          | `workers/platform/wrangler.jsonc`                   |
+| Commerce engine   | `pantry-commerce`          | `commerce.pantry.purin.io` | `services/commerce/wrangler.jsonc`                  |
+| Slack ingress     | `pantry-slack-ingress`     | `slack.pantry.purin.io`    | `workers/platform/wrangler.slack-ingress.jsonc`     |
+| Docs              | `pantry-docs`              | `docs.pantry.purin.io`     | `apps/docs/wrangler.jsonc`                          |
+| Shop              | `purin-shop`               | `shop.purin.io`            | `apps/storefront/wrangler.jsonc`                    |
+| Code Mode sandbox | `pantry-code-sandbox`      | None                       | `workers/platform/wrangler.code-mode-sandbox.jsonc` |
+| Model exit        | `pantry-model-exit`        | None                       | `workers/platform/wrangler.model-exit.jsonc`        |
+| ChatGPT exit      | `pantry-chatgpt-exit`      | None                       | `workers/platform/wrangler.chatgpt-exit.jsonc`      |
+| 1Password store   | `pantry-vault-onepassword` | None                       | `workers/platform/wrangler.vault-onepassword.jsonc` |
 
 The local profiles of the sandbox, the two exit Workers and the 1Password store add the
 suffix `-local`. The Platform and the commerce engine have the same name in both profiles.
@@ -171,7 +170,7 @@ The Durable Object classes of the commerce engine are `CommerceMerchantDO` and
 | Configuration version         | `x-pantry-configuration-version`                                                                                                                                    | `foundation/tenancy/data/control-mutation.ts`                                             |
 | Gateway identity              | `x-pantry-device-gateway`, `-organisation`, `-location`                                                                                                             | `areas/devices/server/gateway-routes.ts`                                                  |
 | Voice device                  | `x-pantry-voice-device`                                                                                                                                             | `VOICE_DEVICE_HEADER`, `packages/control-api/src/voice.ts`                                |
-| Exit Workers                  | `x-pantry-upstream-url`, `x-pantry-exit-colo`                                                                                                                       | `chatgpt-exit/forward.ts`, `model-exit/protocol.ts` in `services/platform/src/`           |
+| Exit Workers                  | `x-pantry-upstream-url`, `x-pantry-exit-colo`                                                                                                                       | `chatgpt-exit/forward.ts`, `model-exit/protocol.ts` in `workers/platform/src/`            |
 | Commerce lab                  | `x-pantry-lab-timestamp`, `x-pantry-lab-signature`                                                                                                                  | `areas/commerce/server/commerce-lab/ingress.ts`                                           |
 | Connector probe               | `x-pantry-probe-key`                                                                                                                                                | `crates/custom-connector-fetch/src/lib.rs`                                                |
 | Commerce webhook              | `x-commerce-event-id`, `-event-kind`, `-timestamp`, `-signature`                                                                                                    | `services/commerce/src/webhooks.ts`                                                       |
@@ -284,12 +283,11 @@ cannot prove them.
   local profile still uses the old Airtable integration.
 - A full Stripe connect through the sign-up form of Stripe has not run on the live stack.
 
-**The wake phrase (Plan 91 phase 6):** Plan 91 records four "Hey Sous Chef" models, and
-each fails the macOS voice check. `scripts/plan-82-g04/compare.py` holds the pass rule. No
-such model is in git or in `repo-binaries.json`. The next step is a recording of real
-voices with `real-voices.py`. A switch changes `WAKE_PHRASE`, `WAKE_MODEL`, the model file,
-`scripts/shop-voice/wake-phrase.json`, `ASSISTANT_NAMES`, the speech lexicon and the prompt
-in `scripts/shop-voice/confidence-bench.py`.
+**The wake phrase (Plan 91 phase 6):** the phrase is "Hey Sous Chef" since 23 November 2026,
+by the owner's decision. Its model fails the macOS voice check of
+`scripts/plan-82-g04/compare.py`, mostly on Indian English and older macOS voices. The
+owner's first wake in production worked; no recording of real voices has scored it yet
+(`real-voices.py`).
 
 **The mark:** the Portal and the docs still show the goat mark (`pantry-mark-*`,
 `PantryMark`). Only the provider callback page shows the Purin cat. No feature uses the
@@ -306,7 +304,6 @@ exported `PurinMark` and `PurinIcon`.
 - The root package name `seams-pantry`.
 - A comment in `surface-observation.ts` says that the wire values keep old names.
 - A comment in `areas/devices/server/agent-tools/devices/handlers.ts` has an old name.
-- The docstring of `scripts/shop-voice/phrase-bench.py` names Satyr.
 
 **The commerce engine in Portal text:** `areas/organisation/ui/pages/automation.tsx` and
 `areas/commerce/ui/features/commerce/production-plan.tsx` show these words to people.
@@ -335,6 +332,6 @@ the identity link returns this address. Plan 93 records the deletion of the
   follows the code. They give no evidence link in the archive.
 - [AGENTS.md](../../../AGENTS.md), sections "Product direction" and "Old and new names".
 - Checks: `scripts/worker-environment.test.mjs` and
-  `services/platform/tests/environment-configuration.test.ts` cover the Platform profiles
-  and the commerce release target. `services/platform/tests/e2e/voice-control.test.ts`
+  `workers/platform/tests/environment-configuration.test.ts` cover the Platform profiles
+  and the commerce release target. `workers/platform/tests/e2e/voice-control.test.ts`
   covers the speech terms. No E2E journey has the names as its subject.

@@ -287,7 +287,7 @@ for (const database of ["global", "regional"]) {
   const sql = readFileSync(
     join(
       root,
-      `services/platform/migrations-${database}/0001_current_schema.sql`,
+      `workers/platform/migrations-${database}/0001_current_schema.sql`,
     ),
     "utf8",
   );

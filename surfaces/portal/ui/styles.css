@@ -3535,12 +3535,6 @@ a.commerce-count:hover {
   margin: 0;
 }
 
-.mailbox-danger-actions > button:not(:where(.pantry-select-trigger)) {
-  min-height: 40px;
-  color: var(--danger-text);
-  box-shadow: var(--pantry-danger-ring);
-}
-
 /* Provider onboarding (file storage, email, WhatsApp) ------------------- */
 
 /*
@@ -4400,9 +4394,6 @@ a.commerce-count:hover {
 
 .integration-form button:not(:where(.pantry-select-trigger))[type="submit"] {
   margin-top: 8px;
-}
-
-@media (max-width: 720px) {
 }
 
 @media (max-width: 560px) {
@@ -8594,13 +8585,6 @@ textarea:focus-visible {
   font-weight: 500;
 }
 
-.agent-roster h2 > span {
-  margin-inline-start: 8px;
-  color: var(--ink-2);
-  font-size: 13px;
-  font-weight: 400;
-}
-
 .agent-console {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -8673,12 +8657,6 @@ textarea:focus-visible {
   }
 }
 
-.agent-card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-  gap: 16px;
-}
-
 .agent-card {
   display: flex;
   flex-direction: column;
@@ -8722,16 +8700,6 @@ textarea:focus-visible {
   justify-content: flex-start;
 }
 
-.agent-card-icon {
-  display: grid;
-  place-items: center;
-  flex: 0 0 36px;
-  height: 36px;
-  border-radius: 9px;
-  color: var(--ok-text);
-  background: var(--ok-bg);
-}
-
 .agent-card-heading h3,
 .agent-card-heading h4,
 .template-card h3 {
@@ -8758,41 +8726,6 @@ textarea:focus-visible {
 .agent-card-heading p {
   margin-block-start: 2px;
   font-size: 12px;
-}
-
-.agent-card-facts {
-  display: grid;
-  gap: 14px;
-  margin-block: 2px;
-}
-
-.agent-card-fact {
-  display: grid;
-  grid-template-columns: 16px minmax(0, 1fr);
-  align-items: start;
-  gap: 9px;
-  font-size: 13px;
-}
-
-.agent-card-fact svg {
-  margin-block-start: 3px;
-  color: var(--ink-2);
-}
-
-.agent-card-fact p {
-  margin-block-start: 3px;
-  font-size: 12px;
-}
-
-.agent-card-footer {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 8px;
-  margin-block-start: auto;
-  padding-block-start: 10px;
-  border-top: 1px solid var(--border);
 }
 
 /* The card's actions stay together at its trailing edge. They have no
@@ -8965,15 +8898,6 @@ a.agent-work-row:hover .agent-work-title {
   .agent-attention > div {
     flex-basis: calc(100% - 40px);
   }
-}
-
-.agent-card-badge {
-  align-self: flex-start;
-  padding: 2px 10px;
-  border-radius: 9999px;
-  background: var(--warn-bg);
-  color: var(--warn-text);
-  font-size: 12px;
 }
 
 .agent-blank-state > p {

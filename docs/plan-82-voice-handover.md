@@ -13,19 +13,24 @@ Voice control works in production on every Portal page again. The Plan 91 rename
 work that remains needs a real shop, and the owner has no shop for a while. So the voice plans
 wait, except the steps in "Steps that do not need a shop".
 
-| Plan                                                         | State on 2026-11-18                                                                                                |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| Plan                                                                 | State on 2026-11-18                                                                                                |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | [82 — Portal voice control](history/plan-82-portal-voice-control.md) | Phases 0–3 and D9–D12 in production, with the wake model fault. Phase 4 (the owner's shift) and Phase 5 remain.    |
-| [82B — Ambient voice](plan-82B-ambient-voice.md)             | Draft. Nothing is built. Decisions D1–D9 need the owner.                                                           |
+| [82B — Ambient voice](plan-82B-ambient-voice.md)                     | Draft. Nothing is built. Decisions D1–D9 need the owner.                                                           |
 | [82C — Speech engines](history/plan-82C-speech-engines.md)           | Phases 0–3 in production (service 0.5.1). D5, the week of use and Phase 4 are deferred until the owner has a shop. |
 
 ## What runs in production
 
-Checked on 2026-11-18:
+Checked on 2026-11-18, and after the wake phrase release of 2026-11-23 (`pantry` `9cc4dc3b`):
+
+- Since 2026-11-23 09:20 UTC (`pantry` `f47416c5`, before `9cc4dc3b`), the composer's edge
+  and the mic-button wave show the voice state. The release is the 05:51 release plus the
+  three voice-look commits (`refs/backup/released-2026-11-23-voice-look`), so the rest of
+  `dev` is still not in production.
 
 - The Portal and the Platform hold all the voice work of Plans 82 and 82C. The live install script
-  (`/shop-voice/install.sh`) gives service 0.5.1.
-- A command starts with "Hey Satyr" or a held Right Option key. The shop Mac transcribes it with
+  (`/shop-voice/install.sh`) gives service 0.5.2.
+- A command starts with "Hey Sous Chef" or a held Right Option key. The shop Mac transcribes it with
   Whisper large-v3-turbo. If the Mac does not answer, Whisper on Workers AI is the fallback.
 - A manager can choose Qwen3-ASR 1.7B for one Mac in the voice dialog. Whisper stays the default
   for new Macs (Plan 82C D5).
@@ -82,13 +87,13 @@ renamed is still loaded by its old name.
 ## The wake phrase (Plan 91 phase 6)
 
 On 23 November 2026, four "Hey Sous Chef" models were trained with the same pipeline as "Hey
-Satyr", and none passes the rule in `scripts/plan-82-g04/compare.py`. The Portal keeps "Hey
-Satyr". The latest model (round 3, with VCTK accent clips) is better on every shared test (4 false
-wakes against 5 in 37.1 h, mean recall 91.0% against 86.2%). It hears 53.3% of macOS voice clips
-against 66.5%: better on three natural macOS voices, much worse on Rishi, Tessa and four old formant
-voices. Plan 91, "Phase 6: the wake phrase", has the rule and the numbers of each round. The next
-step is the owner's real-voice check with `scripts/plan-82-g04/real-voices.py` (about 3 minutes):
-`record`, then `score`.
+Satyr", and none passes the rule in `scripts/plan-82-g04/compare.py`. The owner then chose the
+switch to "Hey Sous Chef" with round 3 (VCTK accent clips). It is better on every shared test (4
+false wakes against 5 in 37.1 h, mean recall 91.0% against 86.2%). It hears 53.3% of macOS voice
+clips against 66.5%: better on three natural macOS voices, much worse on Rishi, Tessa and four old
+formant voices. Plan 91, "Phase 6: the wake phrase", has the rule, the numbers of each round and the
+switch. The owner's real-voice check with `scripts/plan-82-g04/real-voices.py` (about 3 minutes,
+`record`, then `score`) has not run.
 
 How to train and measure a phrase (Python from `~/.satyr-voice-test/wake/.venv`, torch through
 `uv`):
@@ -106,12 +111,14 @@ uv run --no-project --python 3.13 --with torch --with numpy python export.py wei
 ~/.satyr-voice-test/wake/.venv/bin/python compare.py sous-chef
 ```
 
-A round takes about 40 minutes on the M4 Pro. When a model passes, the switch is one release: set
-`WAKE_PHRASE` and `WAKE_MODEL` in `apps/portal/src/features/voice/wake-phrase.ts`, copy the model
+A round takes about 40 minutes on the M4 Pro. A switch of phrase is one release: set
+`WAKE_PHRASE` and `WAKE_MODEL` in `surfaces/voice/ui/features/voice/wake-phrase.ts`, copy the model
 to `apps/portal/public/voice/`, set `scripts/shop-voice/wake-phrase.json` (the journeys read it),
-put "Sous Chef" first in `ASSISTANT_NAMES` in `services/platform/src/voice/vocabulary.ts`, and run
-the closed-chat Chrome journey. Keep `hey_satyr.onnx` until one production wake passes on the new
-model. The wake worker then drops the old file from each device's cache.
+put the name first in `ASSISTANT_NAMES` in `surfaces/voice/server/vocabulary.ts`, and run
+the closed-chat Chrome journey. The wake worker drops the old model from each device's cache.
+Keep the old model file until one production wake works on the new one, then delete it.
+`hey_satyr.onnx` went that way on 23 November 2026; its copy for the benches is
+`~/.satyr-voice-test/wake/models/hey_satyr.onnx`.
 
 ## Steps that need a shop
 
@@ -137,10 +144,10 @@ These wait until the owner has a shop. Do not ask the owner for them before that
    one through real Workers AI, on the deployed Worker, from the Portal to an agent answer. Measure
    the fallback time from the end of a 3 s command: the limit is 6 s at p95. This needs a signed-in
    Portal in the owner's Chrome. It is about one hour of agent work.
-5. **The wake phrase rename.** The Purin rename kept the agent's name "Sous Chef". Four models
-   did not pass on 23 November 2026: see "The wake phrase (Plan 91 phase 6)". The Mac's lexicon
-   already says "sous" correctly (shop voice 0.5.2). Until a model passes, the Portal says "Hey
-   Satyr".
+5. **The wake phrase rename.** The code says "Hey Sous Chef" since 23 November 2026, by the
+   owner's decision, in production since 05:51 UTC (`pantry` `9cc4dc3b`): see "The wake phrase
+   (Plan 91 phase 6)". The owner's first production wake worked on the same day, and
+   `hey_satyr.onnx` left the Portal on `dev`. Open: the owner's real-voice check.
 6. **Plan 82B decisions.** The owner decides D1–D9. D9 needs counsel before any release, because a
    speaker template can be personal information.
 7. **Plan 82 Phase 5: Japanese.** Measure Whisper latency on the Japanese phrases, pass
@@ -180,11 +187,11 @@ No voice file names the GitHub organisation, so step 1 changes nothing for voice
 
 Git ignores these files. A moved folder keeps them, but a new clone does not have them:
 
-| Item                                         | Size   | What to do                                                                                                            |
-| -------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------- |
+| Item                                         | Size   | What to do                                                                                                        |
+| -------------------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------- |
 | `.cache/human/2026-11-16-1912/`              | 9.6 MB | The owner's voice. The D5 run needs it. Never commit it. In the clone `~/Dev/purin-labs/pantry` since 2026-11-18. |
 | `output/shop-voice/`                         | 25 MB  | Journey and bench results that the plans cite. In the clone `~/Dev/purin-labs/pantry` since 2026-11-18.           |
-| `.claude/launch.json`, `voice-recorder-p82c` | —      | The new clone has no `.claude/launch.json`. Add the entry with the new path if you use the recorder.                  |
+| `.claude/launch.json`, `voice-recorder-p82c` | —      | The new clone has no `.claude/launch.json`. Add the entry with the new path if you use the recorder.              |
 
 ### What stays where it is
 
@@ -206,8 +213,8 @@ These are outside the repositories, so the move does not change them:
   benches).
 - Playwright 1.64.1 in `~/Dev/rust/seams-wallet/node_modules/playwright`, for `PLAYWRIGHT_MODULE`.
   After the move, use the new seams-wallet path.
-- The account Worker in `~/Dev/rust/seams-monorepo/.artifacts/shared-account-platform/account-worker/index.mjs`,
-  for `SATYR_ACCOUNT_WORKER_ARTIFACT`. After the move, use the new seams-monorepo path.
+- No account Worker: since Plan 95, Pantry has its own accounts, and no journey reads
+  `SATYR_ACCOUNT_WORKER_ARTIFACT`.
 - Claude Code keeps its project notes in a folder named after the checkout's path. A checkout at a
   new path starts with no notes. Today three folders hold separate copies, named after the clones
   `satyr`, `seams-atelier` and `pantry`, for example
@@ -232,7 +239,7 @@ These are outside the repositories, so the move does not change them:
 
 | Check                           | Command or file                                                                                                                                                                         |
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Platform journey                | `services/platform/tests/e2e/voice-control.test.ts` (needs `SATYR_ACCOUNT_WORKER_ARTIFACT`)                                                                                             |
+| Platform journey                | `workers/platform/tests/e2e/voice-control.test.ts`                                                                                                                                      |
 | Mac journey                     | `scripts/shop-voice/run-journey.py` (run `pnpm portal:build` first: it reads the install script from `apps/portal/dist`; `SHOP_VOICE_BENCH` names the bench after a move)               |
 | Chrome journey                  | `scripts/shop-voice/run-portal-journey.py` (needs `PLAYWRIGHT_MODULE`; run `pnpm portal:build`, `pnpm async-control:build` and `pnpm --filter @purin-labs/contracts media:build` first) |
 | Safari on the iOS Simulator     | `scripts/shop-voice/run-safari-journey.py`                                                                                                                                              |

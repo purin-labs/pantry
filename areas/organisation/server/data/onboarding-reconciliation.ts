@@ -1,5 +1,9 @@
 import { purgeArchivedOrganisation } from "@purin-labs/tenancy/data/organisation-purge";
 import {
+  PURGE_R2_PREFIXES,
+  purgeR2Prefix,
+} from "@purin-labs/tenancy/data/purge-catalogue";
+import {
   prepareArchiveCleanupAwaitsPurge,
   prepareOrganisationLifecycleMove,
   ARCHIVE_CLEANUP_PLACEMENT_STATUSES,
@@ -29,9 +33,7 @@ import {
   type ActorRegistryEntry,
   type ActorRegistryId,
 } from "@purin-labs/actor-runtime/actors/actor-registry";
-import {
-  resolveActiveOrganisationActor,
-} from "@purin-labs/actor-runtime/actors/actor-router";
+import { resolveActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type { AdmittedOrganisationArchiveCleanup } from "@purin-labs/actor-runtime/actors/organisation-archive-cleanup";
 import { resolveActiveOrganisationPlacementRecord } from "@purin-labs/tenancy/data/organisation-placement";
@@ -966,8 +968,9 @@ async function reconcileSetupSnapshots(
     db,
     organisation.organisationId,
   ).run();
-  await prepareProjectionRevisionBump(db, organisation.organisationId, { updatedAt: now })
-    .run();
+  await prepareProjectionRevisionBump(db, organisation.organisationId, {
+    updatedAt: now,
+  }).run();
   return Math.max(result.meta.changes ?? 0, 1);
 }
 
@@ -1222,7 +1225,9 @@ async function reconcileArchivedOrganisation(
         throw new Error("organisation_purge_lifecycle_conflict");
     }
     // The purge deletes the only rows that name these records.
-    if (!(await parts.removeVoiceMacNames(env, db, organisation.organisationId)))
+    if (
+      !(await parts.removeVoiceMacNames(env, db, organisation.organisationId))
+    )
       throw new Error("voice_mac_names_not_removed");
     const harnessErasure = await reconcileOrganisationHarnessErasure({
       db,
@@ -1237,8 +1242,11 @@ async function reconcileArchivedOrganisation(
     if (harnessErasure.status !== "completed") {
       return harnessErasure.repairCount;
     }
-    await deleteOrganisationAttachmentObjects(
+    // Each R2 object of the Organisation (PURGE_R2_PREFIXES) goes before
+    // its D1 rows.
+    await deleteOrganisationObjects(
       archive,
+      directory,
       organisation.organisationId,
     );
     // The WhatsApp Connectors hold the only copy of any still-encrypted
@@ -2416,34 +2424,36 @@ function errorCode(error: unknown): string {
   return "organisation_harness_erasure_failed";
 }
 
-async function deleteOrganisationAttachmentObjects(
+/**
+ * Deletes each R2 object under each prefix of `PURGE_R2_PREFIXES`. An export
+ * that a relocation or restore journal still names stays, as in the Session
+ * erasure. An Organisation with no object costs one list for each prefix and
+ * no write.
+ */
+async function deleteOrganisationObjects(
   archive: R2Bucket,
+  directory: GlobalDatabase,
   organisationId: OrganisationId,
 ): Promise<void> {
-  const prefix = `attachments/${organisationId}/`;
-  let cursor: string | undefined;
-
-  while (true) {
-    const page = await archive.list({ prefix, cursor, limit: 1_000 });
-    const keys = page.objects.map(attachmentObjectKey);
-
-    if (keys.length > 0) {
-      await archive.delete(keys);
+  const retained = await listRetainedHarnessObjectKeys(directory);
+  for (const entry of PURGE_R2_PREFIXES) {
+    const prefix = purgeR2Prefix(entry, organisationId);
+    let cursor: string | undefined;
+    while (true) {
+      const page = await archive.list({ prefix, cursor, limit: 1_000 });
+      const keys = page.objects
+        .map(objectKeyOf)
+        .filter((key) => !retained.has(key));
+      if (keys.length > 0) await archive.delete(keys);
+      if (!page.truncated) break;
+      if (page.cursor === undefined || page.cursor === cursor)
+        throw new Error("organisation object purge cursor did not advance");
+      cursor = page.cursor;
     }
-
-    if (!page.truncated) {
-      return;
-    }
-
-    if (page.cursor === undefined || page.cursor === cursor) {
-      throw new Error("attachment purge cursor did not advance");
-    }
-
-    cursor = page.cursor;
   }
 }
 
-function attachmentObjectKey(object: R2Object): string {
+function objectKeyOf(object: R2Object): string {
   return object.key;
 }
 

@@ -127,7 +127,6 @@ export function PermissionRequiredPrompt(props: Props): React.ReactNode {
       target={{ name: "Purin Pantry", icon: <PantryMark /> }}
       title={`${props.action} needs permission to ${label}`}
       subtitle={subtitle(permission, props.grantScope)}
-      scope={null}
       listHeading="This will allow you to:"
       items={[
         {

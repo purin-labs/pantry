@@ -303,8 +303,9 @@ Both capabilities are in `authorization/capability-catalogue.ts` and need
 - **Time limits.** A proposal expires after 1 hour (`OPERATOR_DRAFT_TTL_MS` in
   `actors/session/proposal-staging.ts`). A draft merge has a deadline of 30 s. Revisions
   have no time limit.
-- **Retention.** The Organisation purge erases `bakery_workflow` and
-  `bakery_workflow_revision` (`data/purge-catalogue.ts`). The draft lives in the
+- **Retention.** The Organisation purge erases `bakery_workflow`,
+  `bakery_workflow_revision` and the R2 objects under `bakery-workflows/<org>/`
+  (`data/purge-catalogue.ts`). The draft lives in the
   Organisation Actor.
 - **Information flow.** An agent read enters the turn under the `recipe_workflow`
   source label, which every member reads (`policy/information-flow/source-labels.ts`).
@@ -352,8 +353,9 @@ Both capabilities are in `authorization/capability-catalogue.ts` and need
 - **Plan 84 later slices.** Bounded retry, a tray reject route, a typed node reference in
   `AdmissionProblem` and a shared review by a second admin are not built. A failure
   preset (`check`) stays in its animation and does not lower to a scripted decision.
-- **Retention.** No code deletes the objects under `bakery-workflows/<org>/` in R2. A
-  declined or expired proposal keeps its document.
+- **Retention.** Only the Organisation purge deletes the objects under
+  `bakery-workflows/<org>/` in R2. A declined or expired proposal keeps its document
+  until then.
 - **IFC guide.** `foundation/authority/policy/information-flow/README.md` does not list
   the `recipe_workflow` source.
 - **Canvas checks.** No journey checks pan, zoom, Space or the wheel. The wire check is a
@@ -391,7 +393,7 @@ Both capabilities are in `authorization/capability-catalogue.ts` and need
   [six-hour evidence](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-61E-six-hour-evidence.md);
   the
   [design profile images](https://github.com/seams-tech/pantry-history/tree/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/workflow-canvas-profile).
-- E2E journeys in `services/platform/tests/e2e/`: `bakery-workflow-draft.test.ts` (two
+- E2E journeys in `workers/platform/tests/e2e/`: `bakery-workflow-draft.test.ts` (two
   people, offline edits, one revision) and `bakery-workflow-agent.test.ts` (the agent
   proposal, approval and each refusal), with `workflow-draft-peer.ts`.
 - Browser journeys in `scripts/plan-84/`: `browser-draft.js` and `browser-proposal.js`.

@@ -21,13 +21,13 @@ Organisation setup and lifecycle are in [onboarding.md](./onboarding.md).
 ### Workers and resources
 
 The platform Worker `pantry` starts in
-[`integration-gateway.ts`](../../services/platform/src/integration-gateway.ts)
+[`integration-gateway.ts`](../../workers/platform/src/integration-gateway.ts)
 and its Actors are in
-[`services/platform/src/actors/`](../../services/platform/src/actors/). The
+[`workers/platform/src/actors/`](../../workers/platform/src/actors/). The
 Cloudflare classes keep their deployed names (`OrganisationDO`,
 `ConnectorDO`, `CaseDO`, `SessionDO`). This document uses the domain names
 `OrganisationActor`, `ConnectorActor`, `CaseActor` and `AgentSessionActor`.
-The platform profile in [`wrangler.jsonc`](../../services/platform/wrangler.jsonc)
+The platform profile in [`wrangler.jsonc`](../../workers/platform/wrangler.jsonc)
 binds:
 
 | Binding                             | Resource                        | Responsibility                                                      |
@@ -238,7 +238,7 @@ holds AES-GCM encrypted checkpoints
 `attachments/<organisation>/…` holds attachments by content digest and
 their derived objects. A provider filename never builds a key. The cron
 collector
-([`message-attachment-collection.ts`](../../services/platform/src/message-attachment-collection.ts))
+([`message-attachment-collection.ts`](../../workers/platform/src/message-attachment-collection.ts))
 asks every live Case and Session which objects they name, keeps those and
 recent uploads, and deletes the rest. It never deletes on a partial listing.
 
@@ -268,7 +268,7 @@ Every D1 query, Actor identity, registry lookup and object key binds the
 Organisation. A Connector identity binds the exact integration account.
 Session tools get capability references, never Actor namespaces, raw SQL or
 credentials. Cross-Organisation references fail closed. A D1 baseline
-change ships with a patch script in `services/platform/scripts/`. Harness
+change ships with a patch script in `workers/platform/scripts/`. Harness
 checkpoints are never converted across a backend, build or format boundary.
 
 ## Agent sessions
@@ -488,7 +488,7 @@ keep their order with the emissions
 ### Tool calls and replay
 
 Pi gets model-visible tools from the accepted catalog
-([`agent-tools/`](../../services/platform/src/agent-tools/registry.ts), selected by
+([`agent-tools/`](../../workers/platform/src/agent-tools/registry.ts), selected by
 [`catalog/selection.ts`](../../foundation/agent-tools/catalog/selection.ts)).
 The Tool Host
 ([`embedded-harness-tool-host.ts`](../../foundation/agent/actors/embedded-harness-tool-host.ts))
@@ -661,10 +661,10 @@ Stripe or Shopify webhook, or OrganisationActor.applyCommerceDelivery
 A commerce delivery writes its cues into `commerce_cue_outbox` with the
 projection. The Worker sends each to `CUE_Q` and marks it enqueued. The
 Commerce outbox reconciliation sends recoverable cues again
-([`commerce-outbox-worker.ts`](../../services/platform/src/commerce-outbox-worker.ts)).
+([`commerce-outbox-worker.ts`](../../workers/platform/src/commerce-outbox-worker.ts)).
 A `CueEvent` carries the Organisation, integration account, source, native
 identity, event type, payload and time
-([`cue-engine.ts`](../../services/platform/src/cue-engine.ts)):
+([`cue-engine.ts`](../../workers/platform/src/cue-engine.ts)):
 
 - `stripe`: `charge.failed`, `invoice.payment_failed`, `refund.failed`,
   `customer.subscription.deleted`;
@@ -680,7 +680,7 @@ type, a Slack scope (workspace, channel, thread key), a debounce time, a
 maximum count for each hour and a `propose` action with a template.
 `compileAndStoreCueSnapshot` writes the enabled rows as one versioned
 snapshot to `POLICY_KV` (`cue:<organisation>:latest`). Matching
-([`cue-queue-consumer.ts`](../../services/platform/src/cue-queue-consumer.ts))
+([`cue-queue-consumer.ts`](../../workers/platform/src/cue-queue-consumer.ts))
 reads only this snapshot and makes no model call. `entity_plane_changed`
 matches a saved commerce view through a Commerce membership read.
 
@@ -708,10 +708,10 @@ A cue cannot approve itself or widen an agent's authority.
 ### Schedules
 
 A `schedule_binding` sets an hourly, daily or weekly window in a time zone
-([`schedule-window.ts`](../../services/platform/src/schedule-window.ts)).
+([`schedule-window.ts`](../../workers/platform/src/schedule-window.ts)).
 The fifteen-minute cron claims each due window in D1, then sends one
 `agent_schedule.dispatch.v1` message to `EVENT_Q`
-([`schedule-dispatch.ts`](../../services/platform/src/schedule-dispatch.ts)).
+([`schedule-dispatch.ts`](../../workers/platform/src/schedule-dispatch.ts)).
 The claim fences double dispatch. A missed window is not filled in later.
 The consumer opens an unbound Case, so a scheduled run emits no provider
 output, and records a `schedule_dispatch_receipt`.

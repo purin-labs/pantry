@@ -1,14 +1,13 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Toaster } from "sonner";
-import { Building2, Croissant, Store } from "lucide-react";
+import { Croissant } from "lucide-react";
 import {
   PermissionRequestCard,
   PermissionRequestDialog,
   PantryMark,
   type PermissionRequestCardProps,
   type PermissionRequestItem,
-  type PermissionRequestScope,
 } from "@purin-labs/ui/index";
 import { AGENT_NAME } from "@purin-labs/ui/agent-name";
 import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
@@ -61,16 +60,6 @@ const items: readonly PermissionRequestItem[] = [
   },
 ];
 
-const scopeOptions = [
-  { id: "noix", label: "Noix de Beurre", icon: <Croissant size={14} /> },
-  {
-    id: "noix-ginza",
-    label: "Noix de Beurre · Ginza",
-    icon: <Store size={14} />,
-  },
-  { id: "pantry", label: "Pantry Bakery Group", icon: <Building2 size={14} /> },
-];
-
 /** The brand README: dark marks for light surfaces, light marks for dark. */
 const requester = { name: AGENT_NAME, icon: <PantryMark /> };
 const target = { name: "Noix de Beurre", icon: <Croissant size={22} /> };
@@ -90,19 +79,7 @@ function usePreviewSelection(): {
   return { selectedIds, onSelectionChange: setSelectedIds };
 }
 
-function useScope(): PermissionRequestScope {
-  const [value, setValue] = React.useState("noix");
-  return {
-    label: "Grant access for:",
-    options: scopeOptions,
-    value,
-    onChange: setValue,
-  };
-}
-
-function sharedProps(
-  scope: PermissionRequestScope | null,
-): Omit<
+function sharedProps(): Omit<
   PermissionRequestCardProps,
   "decision" | "selectedIds" | "onSelectionChange"
 > {
@@ -111,7 +88,6 @@ function sharedProps(
     target,
     title: `${AGENT_NAME} would like to read a public link`,
     subtitle: "Only allow this if you trust the request.",
-    scope,
     listHeading: `This will allow ${AGENT_NAME} to:`,
     items,
     footnote: "You can remove this access later in Settings › Access.",
@@ -122,18 +98,17 @@ function sharedProps(
 function GrantSample(
   props: Readonly<{ onResult: (text: string) => void }>,
 ): React.ReactNode {
-  const scope = useScope();
   const selection = usePreviewSelection();
   return (
     <PermissionRequestCard
-      {...sharedProps(scope)}
+      {...sharedProps()}
       {...selection}
       decision={{
         kind: "grant",
         pending: null,
         error: null,
         onAllow: (ids) => {
-          reportAllow(props.onResult, scope.value, ids);
+          props.onResult(`Allowed: ${ids.join(", ")}.`);
           return Promise.resolve(true);
         },
         onDeny: props.onResult.bind(null, "Denied."),
@@ -150,7 +125,7 @@ function PendingSample(): React.ReactNode {
   return (
     <div>
       <PermissionRequestCard
-        {...sharedProps(null)}
+        {...sharedProps()}
         {...selection}
         signedInAs={null}
         footnote={null}
@@ -178,7 +153,7 @@ function ErrorSample(): React.ReactNode {
   const selection = usePreviewSelection();
   return (
     <PermissionRequestCard
-      {...sharedProps(null)}
+      {...sharedProps()}
       {...selection}
       footnote={null}
       decision={{
@@ -204,7 +179,7 @@ function ExplainSample(
   );
   return (
     <PermissionRequestCard
-      {...sharedProps(null)}
+      {...sharedProps()}
       {...selection}
       subtitle="Your role cannot grant this access."
       footnote={null}
@@ -243,7 +218,6 @@ function ExplainSample(
 function DialogSample(
   props: Readonly<{ onResult: (text: string) => void; compact: boolean }>,
 ): React.ReactNode {
-  const scope = useScope();
   const selection = usePreviewSelection();
   const [open, setOpen] = React.useState(false);
   const [pending, setPending] = React.useState<"allow" | "deny" | null>(null);
@@ -278,7 +252,7 @@ function DialogSample(
         {props.compact ? "Open compact dialog" : "Open permission dialog"}
       </button>
       <PermissionRequestDialog
-        {...sharedProps(props.compact ? null : scope)}
+        {...sharedProps()}
         {...(props.compact ? { items: items.slice(0, 2) } : {})}
         {...selection}
         open={open}
@@ -372,14 +346,6 @@ const previewGrid: React.CSSProperties = {
   alignItems: "start",
 };
 const previewColumn: React.CSSProperties = { minWidth: 0 };
-
-function reportAllow(
-  onResult: (text: string) => void,
-  scope: string,
-  ids: readonly string[],
-): void {
-  onResult(`Allowed for ${scope}: ${ids.join(", ")}.`);
-}
 
 function checkAgain(
   setPending: (pending: "primary" | "secondary" | null) => void,

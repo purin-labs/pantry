@@ -3,7 +3,7 @@
 This document describes how Pantry keeps credentials, network egress and
 external actions under trusted control. It states the current invariants, the
 owners and the modules that enforce them. Module paths are relative to
-[`services/platform/src/`](../../services/platform/src/).
+[`workers/platform/src/`](../../workers/platform/src/).
 
 | Replaces                                              | Section                                                                      |
 | ----------------------------------------------------- | ---------------------------------------------------------------------------- |

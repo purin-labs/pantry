@@ -35,10 +35,10 @@ fi
 
 # Files that the import moved.
 sed -i.bak \
-  -e 's#services/platform/scripts/plan55c/binding-observation.ts#services/platform/tests/e2e/binding-observation.ts#g' \
-  -e 's#services/platform/scripts/plan55c/sqlite-observation.ts#services/platform/tests/e2e/sqlite-observation.ts#g' \
-  -e 's#services/platform/scripts/plan55/full-worker.ts#services/platform/tests/e2e/full-worker.ts#g' \
-  -e 's#services/platform/scripts/plan55/merchant-fixture.ts#services/platform/tests/e2e/merchant-fixture.ts#g' \
+  -e 's#workers/platform/scripts/plan55c/binding-observation.ts#workers/platform/tests/e2e/binding-observation.ts#g' \
+  -e 's#workers/platform/scripts/plan55c/sqlite-observation.ts#workers/platform/tests/e2e/sqlite-observation.ts#g' \
+  -e 's#workers/platform/scripts/plan55/full-worker.ts#workers/platform/tests/e2e/full-worker.ts#g' \
+  -e 's#workers/platform/scripts/plan55/merchant-fixture.ts#workers/platform/tests/e2e/merchant-fixture.ts#g' \
   -e 's#output/bakery-assets/models/#areas/kitchen/ui/features/production-run/models/#g' \
   "$scratch/work.patch"
 

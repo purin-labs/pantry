@@ -407,7 +407,7 @@ merchant actions. Direct D1 lifecycle updates are not allowed.
 
 The `*/15 * * * *` cron (staging and production) calls
 `runScheduledOnboardingReconciliation` in
-[`onboarding-reconciliation-runner.ts`](../../services/platform/src/onboarding-reconciliation-runner.ts).
+[`onboarding-reconciliation-runner.ts`](../../workers/platform/src/onboarding-reconciliation-runner.ts).
 It first runs the automatic archive. Then, for each Organisation whose
 runtime is Cloudflare-authoritative, it publishes the directory row,
 reconciles policy publication, credential cutovers, account cleanup and

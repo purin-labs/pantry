@@ -18,11 +18,7 @@ import {
 import { ApplyDefaultsDialog } from "./defaults-dialog";
 import { ExplanationPanel } from "./decision-explanation";
 import type { FileResourcePickerTransport } from "./file-resource-picker";
-import {
-  GrantAccessDialog,
-  RevokeGrantDialog,
-  type GrantDraft,
-} from "./grant-dialog";
+import { GrantAccessDialog, GrantForm, type GrantDraft } from "./grant-dialog";
 import { AiBudgetSection } from "./ai-budget";
 import { RelatedCases } from "./related-cases";
 import { SystemAccessView } from "./system-access";
@@ -92,8 +88,6 @@ export function AccessRoute(props: AccessRouteProps): React.ReactNode {
     readBrowserInitialFileProvider,
   );
   const [defaultsDialogOpen, setDefaultsDialogOpen] = React.useState(false);
-  const [revokeGrant, setRevokeGrant] =
-    React.useState<AccessControlGrantView | null>(null);
   const [destinationDialogOpen, setDestinationDialogOpen] =
     React.useState(false);
   const [destinationSources, setDestinationSources] = React.useState<
@@ -107,9 +101,6 @@ export function AccessRoute(props: AccessRouteProps): React.ReactNode {
   >(new Set());
   const [explanation, setExplanation] =
     React.useState<AccessExplainResult | null>(null);
-  const [grantSystem, setGrantSystem] = React.useState<AccessSystem | null>(
-    null,
-  );
   const [checkOpen, setCheckOpen] = React.useState(false);
   const [aiBudgetRaiseClosed, setAiBudgetRaiseClosed] = React.useState(false);
   const [closedPermissionRequest, setClosedPermissionRequest] = React.useState<
@@ -297,17 +288,33 @@ export function AccessRoute(props: AccessRouteProps): React.ReactNode {
             ) : null
           }
           onOpenCheck={setCheckOpen.bind(null, true)}
-          onShare={shareSystem.bind(
+          onShareAny={openGrantDialog.bind(
             null,
-            view,
             grantTrigger,
-            initialFileSetupOpened,
             setGrantDialogOpen,
             setMutation,
-            setInitialFileProvider,
-            setGrantSystem,
           )}
-          onRevoke={setRevokeGrant}
+          grantForm={renderSystemGrantForm.bind(
+            null,
+            props,
+            loadRevision,
+            setContent,
+            mutation,
+            setMutation,
+            resourceOptions,
+            setResourceOptions,
+            content,
+          )}
+          onRevoke={revokeAccess.bind(
+            null,
+            props,
+            loadRevision,
+            setContent,
+            setMutation,
+            view,
+          )}
+          busy={busy}
+          clearProblem={setMutation.bind(null, { kind: "idle" })}
           onApplyDefaults={setDefaultsDialogOpen.bind(null, true)}
           loadMore={loadMorePage.bind(
             null,
@@ -425,8 +432,7 @@ export function AccessRoute(props: AccessRouteProps): React.ReactNode {
         busy={busy}
         initialFileProvider={initialFileProvider}
         initialSubjectRef={preferredFileSubjectRef(subjects)}
-        scopeLabel={grantSystem === null ? null : grantSystem.label}
-        capabilities={grantCapabilities(view, grantSystem)}
+        capabilities={view.capabilities}
         subjects={subjects}
         integrations={integrations}
         integrationProviders={integrationProviderMap(view)}
@@ -443,7 +449,6 @@ export function AccessRoute(props: AccessRouteProps): React.ReactNode {
           grantTrigger,
           setInitialFileProvider,
           setInitialCustomConnector,
-          setGrantSystem,
         )}
         chooseCapability={selectCapabilityResources.bind(
           null,
@@ -458,7 +463,7 @@ export function AccessRoute(props: AccessRouteProps): React.ReactNode {
           setResourceOptions,
           setMutation,
         )}
-        submit={createGrant.bind(
+        submit={submitGrantDialog.bind(
           null,
           props,
           loadRevision,
@@ -468,7 +473,6 @@ export function AccessRoute(props: AccessRouteProps): React.ReactNode {
           grantTrigger,
           setInitialFileProvider,
           setInitialCustomConnector,
-          setGrantSystem,
           view,
         )}
       />
@@ -483,20 +487,6 @@ export function AccessRoute(props: AccessRouteProps): React.ReactNode {
           setContent,
           setMutation,
           setDefaultsDialogOpen,
-          view,
-        )}
-      />
-      <RevokeGrantDialog
-        grant={revokeGrant}
-        busy={busy}
-        close={setRevokeGrant.bind(null, null)}
-        revoke={revokeAccess.bind(
-          null,
-          props,
-          loadRevision,
-          setContent,
-          setMutation,
-          setRevokeGrant,
           view,
         )}
       />
@@ -785,18 +775,9 @@ async function createGrant(
   revision: React.MutableRefObject<number>,
   setContent: React.Dispatch<React.SetStateAction<AccessContent>>,
   setMutation: React.Dispatch<React.SetStateAction<MutationState>>,
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  trigger: React.RefObject<HTMLButtonElement | null>,
-  setInitialFileProvider: React.Dispatch<
-    React.SetStateAction<FileResourceAccount["provider"] | null>
-  >,
-  setInitialCustomConnector: React.Dispatch<
-    React.SetStateAction<CustomConnectorAccessHandoff | null>
-  >,
-  setGrantSystem: React.Dispatch<React.SetStateAction<AccessSystem | null>>,
   view: AccessControlView,
   draft: GrantDraft,
-): Promise<void> {
+): Promise<boolean> {
   const target = grantTarget(draft);
   if (!target.ok || draft.subject.revision === null) {
     setMutation({
@@ -805,9 +786,9 @@ async function createGrant(
         ? "Choose a current subject and try again."
         : target.message,
     });
-    return;
+    return false;
   }
-  const complete = await runMutation(
+  return runMutation(
     props,
     revision,
     setContent,
@@ -823,14 +804,191 @@ async function createGrant(
     },
     "Access granted.",
   );
-  if (complete)
+}
+
+async function submitGrantDialog(
+  props: AccessRouteProps,
+  revision: React.MutableRefObject<number>,
+  setContent: React.Dispatch<React.SetStateAction<AccessContent>>,
+  setMutation: React.Dispatch<React.SetStateAction<MutationState>>,
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
+  trigger: React.RefObject<HTMLButtonElement | null>,
+  setInitialFileProvider: React.Dispatch<
+    React.SetStateAction<FileResourceAccount["provider"] | null>
+  >,
+  setInitialCustomConnector: React.Dispatch<
+    React.SetStateAction<CustomConnectorAccessHandoff | null>
+  >,
+  view: AccessControlView,
+  draft: GrantDraft,
+): Promise<void> {
+  if (await createGrant(props, revision, setContent, setMutation, view, draft))
     closeGrantDialog(
       setOpen,
       trigger,
       setInitialFileProvider,
       setInitialCustomConnector,
-      setGrantSystem,
     );
+}
+
+/**
+ * The grant form in a system's drawer: the system's own actions, its account
+ * fixed, and the file choice for a file store. A grant starts the form again,
+ * because the new view revision gives the form a new key.
+ */
+function renderSystemGrantForm(
+  props: AccessRouteProps,
+  revision: React.MutableRefObject<number>,
+  setContent: React.Dispatch<React.SetStateAction<AccessContent>>,
+  mutation: MutationState,
+  setMutation: React.Dispatch<React.SetStateAction<MutationState>>,
+  resources: readonly AccessControlOption[],
+  setResources: React.Dispatch<
+    React.SetStateAction<readonly AccessControlOption[]>
+  >,
+  content: AccessContent,
+  system: AccessSystem,
+): React.ReactNode {
+  if (content.kind !== "ready") return null;
+  const { view, subjects, integrations } = content;
+  const fileProvider = fileSetupProvider(view, system);
+  return (
+    <GrantForm
+      key={`${system.key}:${view.revision}`}
+      organisationId={props.organisationId}
+      initialCustomConnector={null}
+      active
+      busy={mutation.kind === "busy"}
+      problem={mutation.kind === "failed" ? mutation.message : null}
+      initialFileProvider={fileProvider}
+      initialSubjectRef={
+        fileProvider === null ? "" : preferredFileSubjectRef(subjects)
+      }
+      fixedIntegration={findIntegration(integrations, system.key)}
+      capabilities={grantCapabilities(view, system)}
+      subjects={subjects}
+      integrations={integrations}
+      integrationProviders={integrationProviderMap(view)}
+      integrationsPath={props.integrationsPath}
+      resources={resources}
+      fileAccounts={fileResourceAccounts(view, fileProvider)}
+      filePicker={bindFileResourcePicker(props.transport, props.organisationId)}
+      cancel={null}
+      chooseCapability={selectCapabilityResources.bind(
+        null,
+        props,
+        setResources,
+        setMutation,
+        view,
+      )}
+      chooseIntegration={loadResourceOptions.bind(
+        null,
+        props,
+        setResources,
+        setMutation,
+      )}
+      submit={createGrant.bind(
+        null,
+        props,
+        revision,
+        setContent,
+        setMutation,
+        view,
+      )}
+      levels={
+        view.capabilities.some(capabilityBelongsToSystem.bind(null, system))
+          ? {
+              held: system.recipients.flatMap(recipientGrants),
+              submit: createGrants.bind(
+                null,
+                props,
+                revision,
+                setContent,
+                setMutation,
+                view,
+              ),
+            }
+          : null
+      }
+    />
+  );
+}
+
+function recipientGrants(
+  recipient: AccessSystem["recipients"][number],
+): readonly AccessControlGrantView[] {
+  return recipient.grants;
+}
+
+/**
+ * Grants a level: its actions one at a time, as the mailbox setup does. Each
+ * grant names the revision that the view had after the grant before it. A
+ * refusal stops the run; the grants before it stay, and the message says
+ * how many there are.
+ */
+async function createGrants(
+  props: AccessRouteProps,
+  revision: React.MutableRefObject<number>,
+  setContent: React.Dispatch<React.SetStateAction<AccessContent>>,
+  setMutation: React.Dispatch<React.SetStateAction<MutationState>>,
+  view: AccessControlView,
+  drafts: readonly GrantDraft[],
+): Promise<void> {
+  setMutation({ kind: "busy" });
+  let expectedRevision = view.revision;
+  let granted = 0;
+  const stop = async (problem: string): Promise<void> => {
+    await beginLoad(props, revision, setContent);
+    setMutation({
+      kind: "failed",
+      message: `${problem} ${granted} of ${drafts.length} actions were granted.`,
+    });
+  };
+  for (const draft of drafts) {
+    const target = grantTarget(draft);
+    if (!target.ok) return stop(target.message);
+    if (draft.subject.revision === null)
+      return stop("Choose a current subject and try again.");
+    const result = await props.transport.mutate(props.organisationId, {
+      kind: "create_grant",
+      expectedRevision,
+      subjectRef: {
+        subjectRefId: draft.subject.refId,
+        revision: draft.subject.revision,
+      },
+      target: target.value,
+    });
+    if (!result.ok)
+      return stop(
+        accessProblem(result.error, "Refresh the controls and try again."),
+      );
+    granted += 1;
+    if (granted === drafts.length) break;
+    const next = await props.transport.read(props.organisationId, null, null);
+    if (!next.ok)
+      return stop(
+        accessProblem(next.error, "Refresh the controls and try again."),
+      );
+    expectedRevision = next.value.revision;
+  }
+  await refreshAfterMutation(
+    props,
+    revision,
+    setContent,
+    setMutation,
+    granted === 1 ? "Access granted." : `Access granted: ${granted} actions.`,
+  );
+}
+
+/** A connected account's system key is the refId of its option. */
+function findIntegration(
+  integrations: readonly AccessControlOption[],
+  systemKey: string,
+): AccessControlOption | null {
+  for (const integration of integrations) {
+    if (integration.refId === systemKey) return integration;
+  }
+  return null;
 }
 
 async function revokeAccess(
@@ -838,11 +996,10 @@ async function revokeAccess(
   revision: React.MutableRefObject<number>,
   setContent: React.Dispatch<React.SetStateAction<AccessContent>>,
   setMutation: React.Dispatch<React.SetStateAction<MutationState>>,
-  setGrant: React.Dispatch<React.SetStateAction<AccessControlGrantView | null>>,
   view: AccessControlView,
   grant: AccessControlGrantView,
 ): Promise<void> {
-  const complete = await runMutation(
+  await runMutation(
     props,
     revision,
     setContent,
@@ -856,7 +1013,6 @@ async function revokeAccess(
     },
     "Access revoked.",
   );
-  if (complete) setGrant(null);
 }
 
 async function changeCapabilityMode(
@@ -1315,10 +1471,19 @@ async function selectCapabilityResources(
   setMutation: React.Dispatch<React.SetStateAction<MutationState>>,
   view: AccessControlView,
   capability: AccessControlCapabilityView | null,
+  integration: AccessControlOption | null,
 ): Promise<void> {
   setResources([]);
   if (capability === null || capability.definition.target === "file_resource")
     return;
+  // A drawer fixes the account: its resources are the choices.
+  if (
+    integration !== null &&
+    capability.definition.target === "provider_resource"
+  ) {
+    await loadResourceOptions(props, setResources, setMutation, integration);
+    return;
+  }
   if (isPublishedCommerceTargetCapability(capability)) {
     const result = await readAllOptions(
       props.transport,
@@ -1485,30 +1650,6 @@ function findCapabilityView(
  * Opens the grant dialog for one system, or for any system when none is
  * given. A file account starts in the focused read-only file setup.
  */
-function shareSystem(
-  view: AccessControlView,
-  trigger: React.MutableRefObject<HTMLButtonElement | null>,
-  fileSetupOpened: React.MutableRefObject<boolean>,
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  setMutation: React.Dispatch<React.SetStateAction<MutationState>>,
-  setInitialFileProvider: React.Dispatch<
-    React.SetStateAction<FileResourceAccount["provider"] | null>
-  >,
-  setGrantSystem: React.Dispatch<React.SetStateAction<AccessSystem | null>>,
-  system: AccessSystem | null,
-  event: React.MouseEvent<HTMLButtonElement>,
-): void {
-  const fileProvider = fileSetupProvider(view, system);
-  if (fileProvider !== null) {
-    fileSetupOpened.current = true;
-    setInitialFileProvider(fileProvider);
-    setGrantSystem(null);
-  } else {
-    setGrantSystem(system);
-  }
-  openGrantDialog(trigger, setOpen, setMutation, event);
-}
-
 function fileSetupProvider(
   view: AccessControlView,
   system: AccessSystem | null,
@@ -1583,12 +1724,10 @@ function closeGrantDialog(
   setInitialCustomConnector: React.Dispatch<
     React.SetStateAction<CustomConnectorAccessHandoff | null>
   >,
-  setGrantSystem: React.Dispatch<React.SetStateAction<AccessSystem | null>>,
 ): void {
   setOpen(false);
   setInitialFileProvider(null);
   setInitialCustomConnector(null);
-  setGrantSystem(null);
   window.requestAnimationFrame(focusElement.bind(null, trigger.current));
 }
 

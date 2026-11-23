@@ -16,10 +16,11 @@ export const SOURCE_ROOTS = [
   "packages",
   "services",
   "surfaces",
+  "workers",
 ];
 
 /** The folders that hold the source of the Platform Worker. */
-export const PLATFORM_SOURCE = ["services/platform/src", "foundation"];
+export const PLATFORM_SOURCE = ["workers/platform/src", "foundation"];
 // The Worker side of packages/collaboration (Refactor 17, Stage B).
 PLATFORM_SOURCE.push("packages/collaboration/worker");
 // The Worker side of the area devices (Refactor 17, Stage B).

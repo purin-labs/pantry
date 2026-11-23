@@ -4,14 +4,15 @@ The `services/` tree contains independently owned runtime and commerce
 components. Deployment proximity does not permit shared databases or private
 source imports.
 
-| Component    | Responsibility                                                                                             | Runtime boundary                      |
-| ------------ | ---------------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| `platform`   | HTTP control plane, Slack ingress, OAuth, onboarding, state, queues, gateways, and container orchestration | Cloudflare Worker                     |
-| `commerce` | Private catalog and transactional commerce authority                                                       | Independent service and database      |
-| `shop-voice` | Speech-to-text for Portal voice control, on a Mac in the shop                                              | Python service on the shop Mac        |
-| `shop-gateway` | Connects a shop's kitchen devices to Pantry with one outbound socket (Plan 85)                               | Rust program on a shop computer       |
+| Component      | Responsibility                                                                 | Runtime boundary                 |
+| -------------- | ------------------------------------------------------------------------------ | -------------------------------- |
+| `commerce`     | Private catalog and transactional commerce authority                           | Independent service and database |
+| `shop-voice`   | Speech-to-text for Portal voice control, on a Mac in the shop                  | Python service on the shop Mac   |
+| `shop-gateway` | Connects a shop's kitchen devices to Pantry with one outbound socket (Plan 85) | Rust program on a shop computer  |
 
-Urk runs inside Platform; Punter lives in `scripts/punter`.
+The Platform Worker is in `workers/platform`: the HTTP control plane, Slack
+ingress, OAuth, onboarding, state, queues, gateways and container
+orchestration. Urk runs inside Platform; Punter lives in `scripts/punter`.
 
 The browser portal lives in `apps/portal`. Shared implementation packages live
 in `packages/`.
@@ -21,13 +22,13 @@ in `packages/`.
 The Lowerarchy names describe responsibilities independently from physical
 layout:
 
-| Module              | Current home                                                                         |
-| ------------------- | ------------------------------------------------------------------------------------ |
-| Commerce          | `services/commerce`                                                                |
-| Contracts           | `packages/contracts`                                                                 |
-| Urk                 | `areas/commerce/server/data/merchant-agent-skills.ts` and the Pantry agent runtime               |
-| Commerce Read Layer | OrganisationActor projections and CommerceGraphReader sources in `services/platform` |
-| Punter              | `scripts/punter`                                                                     |
+| Module              | Current home                                                                        |
+| ------------------- | ----------------------------------------------------------------------------------- |
+| Commerce            | `services/commerce`                                                                 |
+| Contracts           | `packages/contracts`                                                                |
+| Urk                 | `areas/commerce/server/data/merchant-agent-skills.ts` and the Pantry agent runtime  |
+| Commerce Read Layer | OrganisationActor projections and CommerceGraphReader sources in `workers/platform` |
+| Punter              | `scripts/punter`                                                                    |
 
 Only a measured runtime requirement creates a new deployment boundary.
 

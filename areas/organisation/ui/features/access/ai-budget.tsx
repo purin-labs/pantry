@@ -29,15 +29,7 @@ export function AiBudgetSection(props: Props): React.ReactNode {
       aria-labelledby="ai-budgets-title"
     >
       <h2 id="ai-budgets-title">AI budgets</h2>
-      <p>
-        Set the token, runtime, and tool-call limits for new AI sessions. A chat
-        or Slack thread can use multiple sessions. Existing sessions keep their
-        limits and usage.
-      </p>
-      <p>
-        Provider quotas and narrower agent or mailbox limits still apply.
-        Changing these settings does not buy credits or grant access.
-      </p>
+      <p>Limits for each new AI session. Provider quotas still apply.</p>
       {state.kind === "loading" && <p role="status">Loading AI budgets…</p>}
       {state.kind === "failed" && (
         <>
@@ -92,7 +84,7 @@ function AiBudgetForm(
         className="access35-budget-fields"
         disabled={busy || !props.view.canManage}
       >
-        <legend>Session limits · All fields required</legend>
+        <legend className="visually-hidden">Session limits</legend>
         <div className="access35-budget-field">
           <label htmlFor="ai-budget-tokens">Tokens</label>
           <input
@@ -107,12 +99,11 @@ function AiBudgetForm(
             aria-describedby="ai-budget-token-help"
           />
           <p id="ai-budget-token-help">
-            Up to {props.view.maximum.maxTokens.toLocaleString()} per session,
-            as reported by the model provider.
+            Maximum {props.view.maximum.maxTokens.toLocaleString()}
           </p>
         </div>
         <div className="access35-budget-field">
-          <label htmlFor="ai-budget-runtime">Active runtime (seconds)</label>
+          <label htmlFor="ai-budget-runtime">Seconds for each request</label>
           <input
             id="ai-budget-runtime"
             name="seconds"
@@ -122,11 +113,7 @@ function AiBudgetForm(
             max={props.view.maximum.maxWallMs / 1000}
             step="1"
             defaultValue={view.limits.maxWallMs / 1000}
-            aria-describedby="ai-budget-runtime-help"
           />
-          <p id="ai-budget-runtime-help">
-            Time limit for each request in the session.
-          </p>
         </div>
         <div className="access35-budget-field">
           <label htmlFor="ai-budget-calls">Tool calls</label>
@@ -142,21 +129,18 @@ function AiBudgetForm(
             aria-describedby="ai-budget-calls-help"
           />
           <p id="ai-budget-calls-help">
-            Up to {props.view.maximum.maxToolCalls.toLocaleString()} per
-            session.
+            Maximum {props.view.maximum.maxToolCalls.toLocaleString()}
           </p>
         </div>
       </fieldset>
-      <p>
-        Current settings: {view.limits.maxTokens.toLocaleString()} tokens,{" "}
-        {view.limits.maxWallMs / 1000} seconds, {view.limits.maxToolCalls} tool
-        calls.
-      </p>
       <p role="status">{saveStatus(save)}</p>
       {save.kind === "failed" && (
         <p role="alert">
-          {save.message} Your input is preserved. Reload settings before
-          retrying a revision conflict.
+          {save.message} Your input is preserved. Reload the settings before you
+          retry a revision conflict.{" "}
+          <button type="button" onClick={props.onReload}>
+            Reload settings
+          </button>
         </p>
       )}
       {props.view.canManage ? (
@@ -166,17 +150,14 @@ function AiBudgetForm(
             className="connection-primary-action"
             disabled={busy}
           >
-            Save AI budgets
+            Save
           </button>
           <button
             type="reset"
             disabled={busy}
             onClick={clearSaveState.bind(null, setSave)}
           >
-            Cancel changes
-          </button>
-          <button type="button" disabled={busy} onClick={props.onReload}>
-            Reload settings
+            Cancel
           </button>
         </div>
       ) : (

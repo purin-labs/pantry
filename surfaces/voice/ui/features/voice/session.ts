@@ -26,6 +26,7 @@ import {
   startVoiceWorker,
   stopVoiceMicrophone,
   VOICE_SAMPLE_RATE,
+  voiceLevelMeter,
 } from "./capture";
 import { addVoiceCount, addVoiceHeard } from "./counts";
 import { deleteVoiceModels } from "./model-cache";
@@ -122,6 +123,7 @@ export class VoiceSession {
   private readonly listeners = new Set<() => void>();
   private stream: MediaStream | null = null;
   private audio: AudioContext | null = null;
+  private meter: (() => number) | null = null;
   /** The capture runs at 16 kHz, which would cut the top of the Mac's voice. */
   private speaker: AudioContext | null = null;
   private answerSound: AudioBufferSourceNode | null = null;
@@ -209,6 +211,9 @@ export class VoiceSession {
   };
 
   readonly status = (): VoiceStatus => this.current;
+
+  /** The microphone's loudness now, 0 to 1. Zero while the microphone is closed. */
+  readonly level = (): number => this.meter?.() ?? 0;
 
   /** Changes when a card should read its phrase again, after a refusal. */
   readonly approvalEpoch = (): number => this.epoch;
@@ -478,6 +483,7 @@ export class VoiceSession {
     this.audio = audio;
     const capture = await connectVoiceMicrophone(audio, stream);
     if (attempt.cancelled) return;
+    this.meter = voiceLevelMeter(audio, stream);
     const worker = newVoiceWorker();
     if (!attempt.open(worker.terminate.bind(worker))) return;
     this.worker = worker;
@@ -520,6 +526,7 @@ export class VoiceSession {
     this.transport = null;
     this.worker = null;
     this.stream = null;
+    this.meter = null;
     this.audio?.removeEventListener("statechange", this.onAudioState);
     this.audio = null;
     void this.screenLock?.release();
