@@ -4,7 +4,7 @@ Status: 22 November 2026. Steps 0 to 6 are done. The new stack serves
 production on `pantry.purin.io`, the providers use the new callbacks, and the
 old stack is deleted. Checked on 23 November 2026: the follow-ups that remain
 need the owner, and WhatsApp is deferred ("Follow-up results", "Still
-open"). Step 7 keeps one Pages project that waits for the owner's yes.
+open"). Step 7 is done: only `hadimar` remains, which the owner keeps.
 
 Change on 21 November 2026 ([Plan 95](plan-95-pantry-own-accounts.md) step
 4): Pantry no longer binds the Console. The new stack has no
@@ -963,9 +963,11 @@ Stripe Connect redirects, the Meta webhook and the remaining console names.
   the consent checkbox; the OpenRouter "Input & Output Logging" setting of
   the Purin account, which the API cannot read (on 23 November 2026 the
   owner's Chrome had no OpenRouter sign-in, so the setting is still not
-  read); and the owner's yes to delete the Pages project
-  `outlayer-email-recovery-example` (no custom domain, last deployment
-  about four months before 23 November 2026).
+  read).
+- **Closed on 23 November 2026 (owner's yes):** the Pages project
+  `outlayer-email-recovery-example` (no custom domain, last deployment about
+  four months earlier) is deleted. Of step 7 only `hadimar` remains, which
+  the owner keeps.
 - **Deferred on 23 November 2026:** the Meta webhook and every WhatsApp
   check. Meta banned the owner's account.
 - **Closed:** the stale zone record `seams.sh` (its name servers point to the
