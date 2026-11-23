@@ -345,7 +345,8 @@ The routes are in `control/routes/onboarding.ts` and `control/routes/operators.t
   header (FND-06), an `idempotency-key` of 8 to 128 characters and
   `x-pantry-configuration-version`. The same key and body return the stored answer. The
   same key with another body answers 409 `idempotency_key_conflict`. A stale version
-  answers 409 `configuration_version_conflict` and changes nothing.
+  answers 409 `configuration_version_conflict` and changes nothing. `stage-viewed` needs
+  the `Origin` and the CSRF header, and no key or version.
 - Of these six, a success answers `{ kind: "success", projection, receipt }`, and delete
   answers the receipt alone. `POST /organisations` answers `{ ok: true, organisation }`,
   and `stage-viewed` answers `{ kind: "success" }`. A failed activation answers the
@@ -412,7 +413,6 @@ The routes are in `control/routes/onboarding.ts` and `control/routes/operators.t
 
 - **A restore after the cleanup.** Reconnect refuses a `revoked` connection, and
   `createConnectedIntegration` throws for its `disabled` account.
-- **The stage route.** `POST …/onboarding/stage-viewed` has no Origin or CSRF check.
 - **No failed cleanup.** No code writes `organisation_archive_cleanup.status = 'failed'`.
 - **Labels that differ.** The tombstone names the first active owner, also when an admin
   archives. `OrganisationOnboardingLifecycle` has no `purging` or `purged`.

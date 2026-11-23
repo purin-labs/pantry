@@ -936,12 +936,15 @@ async function handleStageViewed(
   if (request.method !== "POST") {
     return controlError("method_not_allowed", 405);
   }
+  // A write in the person's name: the Origin and CSRF checks apply. The
+  // record only says what the reader opened, so the access check discloses.
   const authorized = await authorizeOrganisationRequest(
     request,
     env,
     organisationIdRaw,
     "viewer",
-    false,
+    true,
+    "disclose",
   );
   if (!authorized.ok) return authorized.response;
   const body = await readJsonRecord(request);

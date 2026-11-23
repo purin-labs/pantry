@@ -135,6 +135,67 @@ async function idleSetupJourney({ task }: TestContext): Promise<void> {
   };
 }
 
+// The Portal records each setup stage that a person opens. A page on
+// another site, or a request without the Portal's CSRF header, cannot add
+// such a record in the person's name.
+it(
+  "records a viewed setup stage only from the Portal with its CSRF header",
+  stageViewedJourney,
+  120_000,
+);
+
+async function stageViewedJourney({ task }: TestContext): Promise<void> {
+  const { ownerSession: owner } = await installSlackActorFixture();
+  const path = `${BASE}/onboarding/stage-viewed`;
+  const body = JSON.stringify({ stage: "operating_profile" });
+  const viewed = await exports.default.fetch(path, {
+    method: "POST",
+    headers: headers(owner),
+    body,
+  });
+  expect(viewed.status, await viewed.clone().text()).toBe(200);
+  expect(await stageViews()).toBe(1);
+
+  // Denied: no CSRF header, as a form on another page sends it.
+  const noCsrf = headers(owner);
+  noCsrf.delete("x-pantry-csrf");
+  const forged = await exports.default.fetch(path, {
+    method: "POST",
+    headers: noCsrf,
+    body,
+  });
+  expect(forged.status).toBe(403);
+  expect(await forged.json()).toMatchObject({ error: "csrf_invalid" });
+  // Denied: another origin.
+  const elsewhere = headers(owner);
+  elsewhere.set("origin", "https://elsewhere.example");
+  const crossSite = await exports.default.fetch(path, {
+    method: "POST",
+    headers: elsewhere,
+    body,
+  });
+  expect(crossSite.status).toBe(403);
+  expect(await crossSite.json()).toMatchObject({ error: "origin_invalid" });
+  expect(await stageViews()).toBe(1);
+
+  task.meta.organisationSetupReadiness = {
+    portal: viewed.status,
+    withoutCsrf: forged.status,
+    otherOrigin: crossSite.status,
+    stageViews: 1,
+  };
+}
+
+async function stageViews(): Promise<number> {
+  const row = await fixtureDatabase()
+    .prepare(
+      "SELECT COUNT(*) AS count FROM onboarding_event WHERE organisation_id = ? AND event_type = 'onboarding_stage_viewed'",
+    )
+    .bind(ORGANISATION_ID)
+    .first<{ count: number }>();
+  return row?.count ?? 0;
+}
+
 function isQuarterHourCron(cron: string): boolean {
   return cron.trim().startsWith("*/15 ");
 }
