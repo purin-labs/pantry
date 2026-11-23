@@ -21,11 +21,11 @@ wait, except the steps in "Steps that do not need a shop".
 
 ## What runs in production
 
-Checked on 2026-11-18:
+Checked on 2026-11-18, and after the wake phrase release of 2026-11-23 (`pantry` `9cc4dc3b`):
 
 - The Portal and the Platform hold all the voice work of Plans 82 and 82C. The live install script
-  (`/shop-voice/install.sh`) gives service 0.5.1.
-- A command starts with "Hey Satyr" or a held Right Option key. The shop Mac transcribes it with
+  (`/shop-voice/install.sh`) gives service 0.5.2.
+- A command starts with "Hey Sous Chef" or a held Right Option key. The shop Mac transcribes it with
   Whisper large-v3-turbo. If the Mac does not answer, Whisper on Workers AI is the fallback.
 - A manager can choose Qwen3-ASR 1.7B for one Mac in the voice dialog. Whisper stays the default
   for new Macs (Plan 82C D5).
@@ -139,8 +139,9 @@ These wait until the owner has a shop. Do not ask the owner for them before that
    the fallback time from the end of a 3 s command: the limit is 6 s at p95. This needs a signed-in
    Portal in the owner's Chrome. It is about one hour of agent work.
 5. **The wake phrase rename.** The code says "Hey Sous Chef" since 23 November 2026, by the
-   owner's decision: see "The wake phrase (Plan 91 phase 6)". Open: the release, one production wake
-   on the new model and then the removal of `hey_satyr.onnx`, and the owner's real-voice check.
+   owner's decision, in production since 05:51 UTC (`pantry` `9cc4dc3b`): see "The wake phrase
+   (Plan 91 phase 6)". Open: one production wake on the new model and then the removal of
+   `hey_satyr.onnx`, and the owner's real-voice check.
 6. **Plan 82B decisions.** The owner decides D1–D9. D9 needs counsel before any release, because a
    speaker template can be personal information.
 7. **Plan 82 Phase 5: Japanese.** Measure Whisper latency on the Japanese phrases, pass

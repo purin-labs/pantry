@@ -1,6 +1,6 @@
 # Plan 91 — Seams Atelier rename
 
-Status: phases 1, 2, 3 and 5 in production (satyr-edge `347178c4`, released from `peitalin/seams-atelier`; the repository is now `seams-tech/pantry`); phase 4 done on 22 November 2026 with the Plan 93 cutover (see "Phase 4 after Plan 93"); phase 6: on 23 November 2026 the owner switched the wake phrase to "Hey Sous Chef" with the round 3 model, which fails only the macOS voice check; the switch is on `dev` and not released (see "Phase 6: the wake phrase"). See "Built". On 18 November 2026 the owner renamed Atelier to **Pantry** and Commis to **Gantry**: see "Pantry and Gantry". On 22 November 2026 the owner chose the Purin names, and phase 4 now follows [Plan 93](plan-93-clean-cutover.md): see "Purin names" and "Phase 4 after Plan 93".
+Status: phases 1, 2, 3 and 5 in production (satyr-edge `347178c4`, released from `peitalin/seams-atelier`; the repository is now `seams-tech/pantry`); phase 4 done on 22 November 2026 with the Plan 93 cutover (see "Phase 4 after Plan 93"); phase 6: on 23 November 2026 the owner switched the wake phrase to "Hey Sous Chef" with the round 3 model, which fails only the macOS voice check; released on 23 November 2026, 05:51 UTC (`pantry` `9cc4dc3b`; see "Phase 6: the wake phrase"). See "Built". On 18 November 2026 the owner renamed Atelier to **Pantry** and Commis to **Gantry**: see "Pantry and Gantry". On 22 November 2026 the owner chose the Purin names, and phase 4 now follows [Plan 93](plan-93-clean-cutover.md): see "Purin names" and "Phase 4 after Plan 93".
 Date: 16 November 2026.
 Owner: Portal, Platform, commerce, docs and the seams-site.
 Replaces: the Antigravity draft `seams_product_rename_plan.md` (outside this
@@ -938,6 +938,19 @@ Proof on the branch, 23 November 2026:
 Known risk: on macOS voices the model hears 53.3% against 66.5% for "Hey
 Satyr" (compare check 3), and it does not hear the Indian English voice
 Rishi. A person with such an accent may need the held key.
+
+**Released** on 23 November 2026 at 05:51 UTC, with the owner's words
+"Push and release": `pantry` `9cc4dc3b` (before: `fc7b7dcd`). Only the
+Platform Worker changed. It is a narrow release: the live commit `c2348c16`
+and the eight voice commits of this phase, as release commit `cd06042d`
+(ref `refs/backup/released-2026-11-23-hey-sous-chef`). The Refactor 17
+moves on `dev` are not in it. Before the upload, the release tree passed the
+Portal build, the type checks, both voice journeys and the D1 schema check.
+After it: `/health` and `/portal` answer 200, `/voice/hey_sous_chef.onnx`
+has the model's SHA-256, the Portal file with the new phrase is served,
+`/shop-voice/install.sh` gives shop voice 0.5.2, and 114 tail events were
+`ok` with no exception. Rollback target: `fc7b7dcd`. Open: one wake in
+production on a real device, then the removal of `hey_satyr.onnx`.
 
 ## Built
 
