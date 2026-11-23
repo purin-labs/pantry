@@ -269,8 +269,9 @@ When a file loses a counted call, run the script of its ratchet with `--update`:
   only when the cookie exists.
 - `controlMutation` keeps its key in `sessionStorage` (`pantry:mutation:<intent>`) until
   the request succeeds. A retry of the same body reuses the key.
-- `controlMutation` and `controlUpload` forget each shared read when the write starts
-  and when it ends.
+- `controlMutation`, `controlUpload`, `controlWrite` and `controlSecretMutation` forget
+  each shared read when the write starts and when it ends. The last two are
+  `controlMutation` with a fresh key.
 - `forgetControlReads` clears each kept response. The Portal calls it on a missing
   session, a retry, account setup, a sign-out in this tab and two Costs paths.
 - `useLatestRead` drops an answer that arrives out of order. `useMutation` runs one

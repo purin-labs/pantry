@@ -360,26 +360,14 @@ export async function controlMutation(
   if (csrf === null) {
     throw new Error("Your control session expired. Sign in again.");
   }
-  const fingerprint = JSON.stringify({
-    path,
-    method,
-    body,
-    expectedConfigurationVersion,
-  });
-  const intentKey =
+  // A prepared key keeps nothing of the body: no fingerprint is made or stored.
+  const { intentKey, idempotencyKey } =
     typeof mutationIntent === "object"
-      ? null
-      : (mutationIntent ?? `control:${fingerprint}`);
-  const stored =
-    intentKey === null
-      ? undefined
-      : readStoredMutationIntent(intentKey, fingerprint);
-  const idempotencyKey =
-    typeof mutationIntent === "object"
-      ? mutationIntent.idempotencyKey
-      : (stored?.idempotencyKey ?? `portal-${crypto.randomUUID()}`);
-  if (intentKey !== null && stored === undefined)
-    writeStoredMutationIntent(intentKey, { fingerprint, idempotencyKey });
+      ? { intentKey: null, idempotencyKey: mutationIntent.idempotencyKey }
+      : storedMutationIntent(
+          JSON.stringify({ path, method, body, expectedConfigurationVersion }),
+          mutationIntent,
+        );
   const headers: Record<string, string> = {
     "content-type": "application/json",
     "x-pantry-csrf": csrf,
@@ -400,6 +388,23 @@ export async function controlMutation(
   );
   if (intentKey !== null) clearStoredMutationIntent(intentKey, idempotencyKey);
   return result;
+}
+
+/**
+ * The stored key of a write intent: the key of an earlier attempt with the
+ * same fingerprint, or a new key that is stored now.
+ */
+function storedMutationIntent(
+  fingerprint: string,
+  mutationIntent: string | undefined,
+): Readonly<{ intentKey: string; idempotencyKey: string }> {
+  const intentKey = mutationIntent ?? `control:${fingerprint}`;
+  const stored = readStoredMutationIntent(intentKey, fingerprint);
+  if (stored !== undefined)
+    return { intentKey, idempotencyKey: stored.idempotencyKey };
+  const idempotencyKey = `portal-${crypto.randomUUID()}`;
+  writeStoredMutationIntent(intentKey, { fingerprint, idempotencyKey });
+  return { intentKey, idempotencyKey };
 }
 
 /**
@@ -518,44 +523,32 @@ export function controlWrite(
     method,
     body,
     undefined,
-    { kind: "prepared", idempotencyKey: `portal-${crypto.randomUUID()}` },
+    freshMutationIntent(),
     signal,
   );
 }
 
 /**
- * Mutation transport for secret-carrying commands. Unlike controlMutation it
- * never fingerprints the request body into sessionStorage, so the supplied
- * secret exists only inside this request. Each submission gets a fresh
- * idempotency key; retries re-enter the secret, so replay pinning is not
- * needed here.
+ * A write that carries a secret. Like `controlWrite`, it keeps no copy of the
+ * body in the tab, so the secret exists only inside this request, and each
+ * submission gets a fresh idempotency key: a retry enters the secret again.
+ * Like every write, it forgets the shared reads.
  */
-export async function controlSecretMutation(
+export function controlSecretMutation(
   path: string,
   method: "POST" | "PUT",
   body: unknown,
   expectedConfigurationVersion?: number,
 ): Promise<unknown> {
-  const csrf = readCookie("pantry_csrf");
-  if (csrf === null) {
-    throw new Error("Your control session expired. Sign in again.");
-  }
-  return responseJson(
-    await fetch(path, {
-      method,
-      headers: {
-        "content-type": "application/json",
-        "x-pantry-csrf": csrf,
-        "idempotency-key": `portal-${crypto.randomUUID()}`,
-        ...(expectedConfigurationVersion === undefined
-          ? {}
-          : {
-              "x-pantry-configuration-version": String(
-                expectedConfigurationVersion,
-              ),
-            }),
-      },
-      body: JSON.stringify(body),
-    }),
+  return controlMutation(
+    path,
+    method,
+    body,
+    expectedConfigurationVersion,
+    freshMutationIntent(),
   );
+}
+
+function freshMutationIntent(): ControlMutationIntent {
+  return { kind: "prepared", idempotencyKey: `portal-${crypto.randomUUID()}` };
 }
