@@ -57,10 +57,6 @@ export class LexiconValidationError extends TypeError {
   }
 }
 
-export function initializeBrowserValidators(): Promise<void> {
-  return Promise.resolve();
-}
-
 function jsonValue(value: unknown): unknown {
   let text: string | undefined;
   try {

@@ -35,10 +35,6 @@ async function mountMailInbox(page) {
     const { BrowserRouter } = await import(
       router ?? "/node_modules/.vite/deps/react-router.js"
     );
-    // The Portal starts its commerce validators before any page, as here.
-    const { initializeBrowserValidators } =
-      await import("/@id/@purin-labs/commerce-contracts/browser-validators");
-    await initializeBrowserValidators();
     const originalFetch = window.fetch.bind(window);
     document.cookie = "pantry_csrf=inbox-fixture; path=/";
     const draftBody =

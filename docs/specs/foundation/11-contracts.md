@@ -320,9 +320,7 @@ Neighbours:
 - **Unicode proof.** No CI step runs `unicode:check`. The generator pins
   `NormalizationTest.txt`, but no script runs its lines against `normalizeCommerceNfkc`.
 - **Names from the Wasm boundary.** `actor-wasm.ts`, `commerce-wasm.ts`,
-  `message-wasm.ts`, the `commerce_wasm_*` error codes and
-  `initializeBrowserValidators()` remain. The Portal still waits for that function,
-  which resolves at once.
+  `message-wasm.ts` and the `commerce_wasm_*` error codes remain.
 - **Rust copies.** `crates/workspace-executor/src/contracts.rs` holds Rust copies of
   the identity, digest, attachment id and preparation limit types, written by hand,
   with their parse functions and serde validators. Only `wire.rs` is generated.

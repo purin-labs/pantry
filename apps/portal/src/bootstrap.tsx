@@ -66,15 +66,7 @@ async function renderApplication(pathname: string): Promise<void> {
   }
   // The page's reads start now and run beside the load of the Portal's code.
   startPortalReads(pathname);
-  const [, { ControlPortalRouter }] = await Promise.all([
-    initializePortalValidators(),
-    import("@purin-labs/surface-portal/ui/portal"),
-  ]);
+  const { ControlPortalRouter } =
+    await import("@purin-labs/surface-portal/ui/portal");
   portalRoot.render(<ControlPortalRouter />);
-}
-
-async function initializePortalValidators(): Promise<void> {
-  const { initializeBrowserValidators } =
-    await import("@purin-labs/commerce-contracts/browser-validators");
-  await initializeBrowserValidators();
 }

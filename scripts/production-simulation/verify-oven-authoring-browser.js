@@ -161,9 +161,6 @@ async function forwardAuthorRequest(route) {
 }
 async function mountAuthorWorkspace(organisationId) {
   const { sourceUrl } = await import("/source-url.js");
-  const { initializeBrowserValidators } =
-    await import("/@id/@purin-labs/commerce-contracts/browser-validators");
-  await initializeBrowserValidators();
   const { default: React } = await import("/@id/react");
   const { default: ReactDOM } = await import("/@id/react-dom/client");
   const { MemoryRouter } = await import("/@id/react-router");

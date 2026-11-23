@@ -1420,9 +1420,7 @@ function backToPreviewCollection(
   void navigate(`/commerce-preview.html?page=${page}`);
 }
 
-async function mount(): Promise<void> {
-  const validators = await import("@purin-labs/commerce-contracts/browser-validators");
-  await validators.initializeBrowserValidators();
+function mount(): void {
   const container = document.getElementById("root");
   if (container === null) return;
   createRoot(container).render(
@@ -1432,4 +1430,4 @@ async function mount(): Promise<void> {
   );
 }
 
-void mount();
+mount();
