@@ -3,7 +3,7 @@ import type {
   ProductionAssignment,
   ProductionRoute,
 } from "./bakery-production-scenario.ts";
-import { isString } from "@purin-labs/std";
+import { compareCodePoints, isString } from "@purin-labs/std";
 
 export type ProductionManualTask = Readonly<{
   bakeryTaskId: string;
@@ -194,7 +194,7 @@ function compareManualTask(
   left: ProductionManualTask,
   right: ProductionManualTask,
 ): number {
-  return left.bakeryTaskId.localeCompare(right.bakeryTaskId);
+  return compareCodePoints(left.bakeryTaskId, right.bakeryTaskId);
 }
 
 export function validProductionWorkflow(

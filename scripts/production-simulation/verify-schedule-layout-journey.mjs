@@ -2,6 +2,12 @@
 // process, in both orders, and check that each result depends only on its own
 // layout (Refactor 16 step 15A, finding F29).
 //
+// It also schedules one rehearsal of five cold trays on hosts with different
+// locales, and checks that the plan fingerprint and the order of the trays do
+// not depend on the host. The five trays have the same release and deadline,
+// so the scheduler breaks the tie on the tray letter; a Hawaiian collation
+// sorts the vowels A, E, I and O before B.
+//
 // A reference for each layout comes from a fresh process that compiles only
 // that layout. In one process the journey then compiles pairs of layouts in
 // both orders and compares each result with its reference. The result is the
@@ -18,7 +24,7 @@
 // Usage: tsx scripts/production-simulation/verify-schedule-layout-journey.mjs <fresh output dir>
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { canonicalJson, sha256Hex } from "../../packages/std/src/index.ts";
@@ -28,6 +34,12 @@ import {
 } from "../../packages/bakery-model/src/bakery.ts";
 import { compileFinancier } from "../../packages/production-simulation/src/recipes/bakery/financier.ts";
 import * as schedule from "../../packages/production-simulation/src/recipes/bakery/schedule.ts";
+import { parsePhysicsReplay } from "../../packages/bakery-model/src/bakery-physics.ts";
+import { compileWorkcellInput } from "../../packages/production-simulation/src/recipes/bakery/workcell-input.ts";
+import {
+  acceptProductionRecording,
+  compileRehearsalWorkcells,
+} from "../../packages/production-simulation/src/recipes/bakery/production-workcells.ts";
 
 const script = fileURLToPath(import.meta.url);
 const mode =
@@ -111,6 +123,93 @@ function travelTotal(travel) {
   return total.toString();
 }
 
+// Five rehearsal trays, each with its own request and its accepted recording
+// of the recorded nominal table-to-rack example. One baker stages and clears
+// every tray, so the trays take the cell one after another.
+const TRAYS = ["A", "B", "C", "D", "E"];
+const HOST_LOCALES = ["en_US.UTF-8", "haw_US.UTF-8"];
+const RECORDING = fileURLToPath(
+  new URL(
+    "../../assets/bakery-mujoco/fr10-workcell/recordings/nominal.json",
+    import.meta.url,
+  ),
+);
+
+async function rehearsalOnThisHost() {
+  const parsed = parseSettings({
+    ...sampleSettings(),
+    batchCount: TRAYS.length,
+    traysPerBatch: 1,
+    workerCount: 1,
+    horizonMinutes: 240,
+  });
+  assert.equal(parsed.kind, "valid", JSON.stringify(parsed));
+  const example = JSON.parse(readFileSync(RECORDING, "utf8"));
+  const trays = [];
+  const recordings = [];
+  for (const [index, batchId] of TRAYS.entries()) {
+    const request = {
+      ...example.request,
+      runId: `${example.request.runId.slice(0, -1)}${index}`,
+      attemptId: `${example.request.attemptId.slice(0, -1)}${index}`,
+    };
+    const replay = parsePhysicsReplay(JSON.stringify({ ...example, request }));
+    assert.equal(replay.kind, "accepted", replay.message);
+    const input = compileWorkcellInput(
+      replay.recording.request,
+      "0",
+      "cold-cell-1",
+    );
+    assert.equal(input.kind, "ready", input.message);
+    trays.push({
+      batchId,
+      workerId: "human-1",
+      dependsOn: [],
+      earliestStartSeconds: 0,
+      input: input.input,
+      successors: [],
+    });
+    recordings.push(replay.recording);
+  }
+  const compiled = await compileRehearsalWorkcells(parsed.settings, trays);
+  assert.equal(compiled.kind, "ready", compiled.message);
+  let plan = compiled.plan;
+  for (const [index, batchId] of TRAYS.entries()) {
+    const accepted = acceptProductionRecording(
+      plan,
+      plan.fingerprint,
+      `batch:${batchId}:native:1`,
+      recordings[index],
+    );
+    assert.equal(accepted.kind, "ready", accepted.message);
+    plan = accepted.plan;
+  }
+  const run = schedule.simulateProduction(plan);
+  return {
+    collation: new Intl.Collator().resolvedOptions().locale,
+    fingerprint: plan.fingerprint,
+    kind: run.kind,
+    trayOrder: run.intervals
+      .filter((interval) => interval.kind === "native")
+      .map((interval) => interval.batch)
+      .join(""),
+    intervals: await digest(run.intervals),
+  };
+}
+
+function rehearsalOnHost(locale) {
+  const stdout = execFileSync(
+    process.execPath,
+    [...process.execArgv, script, "--rehearsal"],
+    {
+      encoding: "utf8",
+      maxBuffer: 16 * 1024 * 1024,
+      env: { ...process.env, LC_ALL: locale, LANG: locale },
+    },
+  );
+  return JSON.parse(stdout.trim().split("\n").at(-1));
+}
+
 function reference(name) {
   const stdout = execFileSync(
     process.execPath,
@@ -123,6 +222,10 @@ function reference(name) {
 if (process.argv[2] === "--reference") {
   const result = await compileFor(process.argv[3]);
   process.stdout.write(`${JSON.stringify(result)}\n`);
+  process.exit(0);
+}
+if (process.argv[2] === "--rehearsal") {
+  process.stdout.write(`${JSON.stringify(await rehearsalOnThisHost())}\n`);
   process.exit(0);
 }
 if (process.argv[2] === "--order") {
@@ -206,6 +309,31 @@ for (const order of orders) {
   sequences.push({ order, legs });
 }
 
+// The same rehearsal on hosts with different locales.
+const hosts = {};
+for (const locale of HOST_LOCALES) hosts[locale] = rehearsalOnHost(locale);
+const [firstLocale, ...otherLocales] = HOST_LOCALES;
+const first = hosts[firstLocale];
+if (first.kind !== "complete")
+  problems.push(`The rehearsal on ${firstLocale} ends as ${first.kind}`);
+for (const locale of otherLocales) {
+  const host = hosts[locale];
+  if (host.collation.split("-")[0] !== locale.split("_")[0])
+    problems.push(
+      `The host ${locale} collates as ${host.collation}, so it shows nothing`,
+    );
+  if (host.fingerprint !== first.fingerprint)
+    problems.push(
+      `The rehearsal fingerprint on ${locale} differs from ${firstLocale}`,
+    );
+  if (host.trayOrder !== first.trayOrder)
+    problems.push(
+      `The trays run in the order ${host.trayOrder} on ${locale} and ${first.trayOrder} on ${firstLocale}`,
+    );
+  if (host.intervals !== first.intervals)
+    problems.push(`The rehearsal schedule on ${locale} differs`);
+}
+
 if (mode !== "explicit")
   problems.push("The schedule module still exports setScheduleSpatialLayout");
 const report = {
@@ -215,6 +343,7 @@ const report = {
   getterExported: typeof schedule.getScheduleSpatialLayout === "function",
   references,
   sequences,
+  hosts,
   problems,
   passed: problems.length === 0,
 };

@@ -48,7 +48,7 @@ import {
   type WorkcellResourceId,
 } from "./workcell-input.ts";
 import type { VariantBy } from "@purin-labs/type-utils";
-import { assertNever } from "@purin-labs/std";
+import { assertNever, compareCodePoints } from "@purin-labs/std";
 import {
   along,
   route,
@@ -2152,7 +2152,7 @@ function priority(a: Work, b: Work): number {
   return (
     a.batch.deadline - b.batch.deadline ||
     a.batch.release - b.batch.release ||
-    a.batch.id.localeCompare(b.batch.id)
+    compareCodePoints(a.batch.id, b.batch.id)
   );
 }
 

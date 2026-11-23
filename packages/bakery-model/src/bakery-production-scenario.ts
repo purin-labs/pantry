@@ -386,7 +386,9 @@ function compareAssignment(
   left: ProductionAssignment,
   right: ProductionAssignment,
 ): number {
-  return left.batchId.localeCompare(right.batchId) || left.tray - right.tray;
+  return (
+    compareCodePoints(left.batchId, right.batchId) || left.tray - right.tray
+  );
 }
 
 function text(value: unknown, length: number): value is string {
@@ -404,6 +406,7 @@ import type {
 } from "@purin-labs/commerce-contracts";
 import {
   canonicalJson,
+  compareCodePoints,
   hasExactKeys,
   isRecord,
   isSha256Hex,

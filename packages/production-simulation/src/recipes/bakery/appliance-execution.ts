@@ -1,4 +1,5 @@
 import { canonicalJson, isRecord, parseJsonOrNull, sha256Hex } from "@purin-labs/std";
+import { compareCompletedTasks } from "./completed-task-order.ts";
 import { strFromU8, strToU8 } from "fflate";
 import { exchangeNow, type CellModule } from "../../native/wasm-transport.ts";
 import {
@@ -698,12 +699,7 @@ export function extractScheduledTasks(
         definition: definitionMap.get(`${workflowId}/${taskKey}`) ?? null,
       });
     }
-    completed.sort((a, b) => {
-      if (a.startedAtUs !== b.startedAtUs) return a.startedAtUs - b.startedAtUs;
-      if (a.completedAtUs !== b.completedAtUs)
-        return a.completedAtUs - b.completedAtUs;
-      return a.taskId.localeCompare(b.taskId);
-    });
+    completed.sort(compareCompletedTasks);
     return completed;
   }
 

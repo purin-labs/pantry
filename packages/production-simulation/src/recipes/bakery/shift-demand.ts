@@ -1,3 +1,4 @@
+import { compareCodePoints } from "@purin-labs/std";
 import type { BakeryServiceShiftInput } from "./shift-preset.ts";
 import { FINANCIER_FLAVOURS } from "./financier-flavours.ts";
 import { PIE_TYPES } from "./pie-products.ts";
@@ -85,5 +86,7 @@ export function bakeryShiftDemand(input: BakeryServiceShiftInput): ShiftDemand {
 }
 
 function compareRetailOrders(left: RetailOrder, right: RetailOrder): number {
-  return left.atSeconds - right.atSeconds || left.id.localeCompare(right.id);
+  return (
+    left.atSeconds - right.atSeconds || compareCodePoints(left.id, right.id)
+  );
 }

@@ -1,3 +1,4 @@
+import { compareCodePoints } from "@purin-labs/std";
 import type { StrictUnion } from "@purin-labs/type-utils";
 import { logisticsView, type LogisticsView } from "../../logistics-view.ts";
 import type { RunState } from "../../state.ts";
@@ -85,7 +86,7 @@ function connect(
 }
 
 function compareNodes(left: ShiftTraceNode, right: ShiftTraceNode): number {
-  return left.timeUs - right.timeUs || left.id.localeCompare(right.id);
+  return left.timeUs - right.timeUs || compareCodePoints(left.id, right.id);
 }
 
 function graph(

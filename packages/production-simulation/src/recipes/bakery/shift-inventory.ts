@@ -1,3 +1,4 @@
+import { compareCodePoints } from "@purin-labs/std";
 import type { ArrivalSourceId } from "../../identity.ts";
 import type { CompiledScenario } from "../../scenario.ts";
 import type { RunState } from "../../state.ts";
@@ -104,7 +105,9 @@ function compareSupply(left: RetailSupply, right: RetailSupply): number {
 }
 
 function compareOrders(left: RetailOrder, right: RetailOrder): number {
-  return left.atSeconds - right.atSeconds || left.id.localeCompare(right.id);
+  return (
+    left.atSeconds - right.atSeconds || compareCodePoints(left.id, right.id)
+  );
 }
 
 function normalizeRetailStock(

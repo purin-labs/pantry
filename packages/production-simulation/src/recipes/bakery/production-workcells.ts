@@ -72,7 +72,12 @@ import {
   MAX_EXPERIMENT_BYTES,
 } from "./workcell-experiment.ts";
 import type { Variant } from "@purin-labs/type-utils";
-import { hasExactKeys, isString, isRecord } from "@purin-labs/std";
+import {
+  compareCodePoints,
+  hasExactKeys,
+  isString,
+  isRecord,
+} from "@purin-labs/std";
 
 const validated: unique symbol = Symbol("compiled production workcells");
 export type ProductionSource =
@@ -1053,7 +1058,7 @@ function compareOperation(
   right: OperationIdentity,
 ): number {
   return (
-    left.batchId.localeCompare(right.batchId) ||
+    compareCodePoints(left.batchId, right.batchId) ||
     left.tray - right.tray ||
     left.step - right.step
   );
