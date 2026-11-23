@@ -36,7 +36,7 @@ import {
 import {
   parseShopifyCommerceRefreshQueuePayload,
   type ShopifyCommerceRefreshQueueMessage,
-} from "./shopify/queue-messages";
+} from "@purin-labs/area-integrations/shopify/queue-messages";
 
 export type IngressQueueMessage =
   | CommerceDeliveryQueueMessage

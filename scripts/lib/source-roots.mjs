@@ -42,6 +42,9 @@ PLATFORM_SOURCE.push("areas/kitchen/server");
 PLATFORM_SOURCE.push("surfaces/whatsapp/server");
 // The Worker side of the surface email (Refactor 17, Stage B).
 PLATFORM_SOURCE.push("surfaces/email/server");
+// The Shopify module in the package of the area integrations (Refactor 17,
+// Stage B).
+PLATFORM_SOURCE.push("areas/integrations/shopify");
 
 /**
  * The folders that hold the source of the Portal, in the browser. The package

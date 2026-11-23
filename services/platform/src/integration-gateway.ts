@@ -83,8 +83,8 @@ import {
   handleConfigureShopifyCredential,
   handleConfigureShopifyCues,
   handleTriggerShopifyTestOrder,
-} from "./shopify/admin";
-import { handleShopifyWebhook } from "./shopify/webhooks";
+} from "@purin-labs/area-integrations/shopify/admin";
+import { handleShopifyWebhook } from "@purin-labs/area-integrations/shopify/webhooks";
 import { handleSlackEvents } from "./slack-ingress/events";
 import {
   handleSlackInstall,

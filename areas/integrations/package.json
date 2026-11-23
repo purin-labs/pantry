@@ -22,7 +22,11 @@
     "./ui/features/jev-features/route": "./ui/features/jev-features/route.tsx",
     "./ui/features/vault/route": "./ui/features/vault/route.tsx",
     "./ui/pages/whatsapp": "./ui/pages/whatsapp.tsx",
-    "./ui/provider-onboarding": "./ui/provider-onboarding.tsx"
+    "./ui/provider-onboarding": "./ui/provider-onboarding.tsx",
+    "./shopify/*": {
+      "types": "./shopify/*.ts",
+      "default": "./shopify/*.ts"
+    }
   },
   "dependencies": {
     "@cloudflare/containers": "^0.3.7",

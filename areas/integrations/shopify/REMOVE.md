@@ -18,7 +18,7 @@ Shopify reaches commerce through the port `commerceDeliveryIntake`
 
 ## 1. This folder
 
-Delete `services/platform/src/shopify/`: the connector, the webhooks, the action
+Delete `areas/integrations/shopify/`: the connector, the webhooks, the action
 execution, the provider adapter (`provider-adapter.ts`), the connection workflow
 (`connection-workflow.ts`), the location observation (`location-observation.ts`) and
 the queue message (`queue-messages.ts`), the normalizers of the deliveries
@@ -47,7 +47,7 @@ Find the importers again:
 
 ```bash
 grep -rlsE 'from "[^"]*shopify/[a-z/-]+"' services/platform/src areas surfaces |
-  grep -v services/platform/src/shopify/
+  grep -v areas/integrations/shopify/
 ```
 
 ## 3. The value `"shopify"` in the closed unions
@@ -97,7 +97,7 @@ type check then shows the pages that still handle it.
 
 ## 8. The map and the lints
 
-Remove the rule `services/platform/src/shopify/` and the pairs with `areas/shopify`
+Remove the rule `areas/integrations/shopify/` and the pairs with `areas/shopify`
 from `scripts/layers.json` and `scripts/layers-ratchet.json`, then run
 `node scripts/check-layers.mjs --update`, `node scripts/check-unused.mjs --update`
 and `node scripts/check-clones.mjs --update`.

@@ -153,8 +153,8 @@ The stock operations:
 
 ### The Shopify module
 
-The Shopify module is in `services/platform/src/shopify/`.
-[REMOVE.md](../../../../services/platform/src/shopify/REMOVE.md) lists the steps of a
+The Shopify module is in `areas/integrations/shopify/`.
+[REMOVE.md](../../../../areas/integrations/shopify/REMOVE.md) lists the steps of a
 removal. Some Shopify code is outside the folder: the order refresh consumer in
 `gateway/support.ts`, the Shopify cue event types and their parsers in
 `cues/engine.ts`, and the onboarding Shopify cue subscription in

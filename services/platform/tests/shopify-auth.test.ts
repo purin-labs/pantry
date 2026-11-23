@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
   acquireShopifyAdminAccess,
   parseShopifyClientCredentials,
-} from "../src/shopify/auth";
+} from "@purin-labs/area-integrations/shopify/auth";
 
 let capturedAuthReceiver: unknown = null;
 

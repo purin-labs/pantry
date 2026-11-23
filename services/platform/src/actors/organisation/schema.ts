@@ -2,7 +2,7 @@ import { createMailEvaluationSchema } from "@purin-labs/area-inbox/server/mail-i
 import { createActionLedgerSchema } from "@purin-labs/authority/actors/action-ledger";
 import { createCueDeliverySchema } from "@purin-labs/agent/actors/cue-delivery";
 import { createCommerceProjectionSchema } from "@purin-labs/area-commerce/server/actors/commerce-projection";
-import { createShopifyLocationObservationSchema } from "../../shopify/location-observation";
+import { createShopifyLocationObservationSchema } from "@purin-labs/area-integrations/shopify/location-observation";
 import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import { createCaseContextDiscoveryEvaluationSchema } from "@purin-labs/agent/case-context-discovery/evaluation-store";
 import { createEvalSchema } from "@purin-labs/area-brain/server/evals/store";

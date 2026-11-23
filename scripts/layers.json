@@ -453,7 +453,7 @@
     "services/platform/src/gateway-routing/": "surfaces/webhooks",
     "services/platform/src/gateway/admin/": "surfaces/webhooks",
     "services/platform/src/model-exit/": "foundation/agent",
-    "services/platform/src/shopify/": "areas/shopify",
+    "areas/integrations/shopify/": "areas/shopify",
     "services/platform/src/slack-ingress/": "surfaces/slack",
     "services/platform/src/slack/": "surfaces/slack",
     "services/platform/src/vault-onepassword/": "foundation/authority",

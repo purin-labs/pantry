@@ -25,18 +25,18 @@ import {
   parseShopifyCommerceProductDeletionBody,
   parseShopifyCommerceRefreshTarget,
   parseShopifyCueEvent,
-} from "../src/shopify/connector/webhook-ingress";
+} from "@purin-labs/area-integrations/shopify/connector/webhook-ingress";
 import {
   fetchShopifyInitialCommerce,
   fetchShopifyOrderCommerceRefresh,
-} from "../src/shopify/connector/initial-sync";
-import { registerShopifyWebhooks } from "../src/shopify/connector/webhook-registration";
+} from "@purin-labs/area-integrations/shopify/connector/initial-sync";
+import { registerShopifyWebhooks } from "@purin-labs/area-integrations/shopify/connector/webhook-registration";
 import {
   normalizeShopifyCommerceCatalogDelivery,
   normalizeShopifyCommerceInventoryDelivery,
   normalizeShopifyCommerceOrderDelivery,
   normalizeShopifyCommerceResourceDelivery,
-} from "../src/shopify/delivery-normalizers";
+} from "@purin-labs/area-integrations/shopify/delivery-normalizers";
 import { isRecord } from "@purin-labs/std";
 
 type CapturedShopifyRequest = {

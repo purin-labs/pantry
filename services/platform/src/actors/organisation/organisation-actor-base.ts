@@ -42,7 +42,7 @@ import {
   type ShopifyLocationObservationAcceptanceError,
   type ShopifyLocationObservationInput,
   type ShopifyLocationObservationResult,
-} from "../../shopify/location-observation";
+} from "@purin-labs/area-integrations/shopify/location-observation";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   applyEvalCommand,

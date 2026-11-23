@@ -10,7 +10,7 @@ import {
   createShopifyLocationObservationSchema,
   parseShopifyLocationObservationEnvelope,
   readShopifyLocationObservation,
-} from "../src/shopify/location-observation";
+} from "@purin-labs/area-integrations/shopify/location-observation";
 import {
   createCommerceProjectionSchema,
   readCurrentCommerceProjection,

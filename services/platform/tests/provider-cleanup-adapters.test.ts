@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { airtableCleanupAdapter } from "@purin-labs/area-integrations/server/provider-adapters/airtable";
 import { gmailCleanupAdapter } from "@purin-labs/area-integrations/server/provider-adapters/gmail";
 import { notionCleanupAdapter } from "@purin-labs/area-integrations/server/provider-adapters/notion";
-import { shopifyCleanupAdapter } from "../src/shopify/provider-adapter";
+import { shopifyCleanupAdapter } from "@purin-labs/area-integrations/shopify/provider-adapter";
 import { slackCleanupAdapter } from "@purin-labs/area-integrations/server/provider-adapters/slack";
 import { stripeCleanupAdapter } from "@purin-labs/area-integrations/server/provider-adapters/stripe";
 import { whatsappCleanupAdapter } from "@purin-labs/area-integrations/server/provider-adapters/whatsapp";

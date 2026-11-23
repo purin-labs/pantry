@@ -16,7 +16,7 @@ import {
   materializeShopifyWriteCredential,
   reconcileShopifyOrderCancellation,
   type ShopifyWriteCredential,
-} from "../src/shopify/action-execution";
+} from "@purin-labs/area-integrations/shopify/action-execution";
 
 describe("Shopify typed action execution", function shopifyExecutionSuite() {
   it("accepts only the generated order-cancel argument shape", function parsesTypedCall() {

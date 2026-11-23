@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { triggerShopifyDevelopmentOrder } from "../src/shopify/acceptance";
+import { triggerShopifyDevelopmentOrder } from "@purin-labs/area-integrations/shopify/acceptance";
 import { isRecord } from "@purin-labs/std";
 
 type CapturedShopifyAcceptanceRequest = {

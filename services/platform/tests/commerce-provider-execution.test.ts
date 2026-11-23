@@ -37,15 +37,20 @@ vi.mock(
       accountMocks.resolveActiveProviderAccountContext,
   }),
 );
-vi.mock("../src/shopify/action-execution", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/shopify/action-execution")>()),
-  reconcileShopifyOrderCancellation:
-    shopifyMocks.reconcileShopifyOrderCancellation,
-  resolveShopifyWriteCredential: shopifyMocks.resolveShopifyWriteCredential,
-  resolveShopifyWriteCredentialForAction:
-    shopifyMocks.resolveShopifyWriteCredentialForAction,
-  executeShopifyAction: shopifyMocks.executeShopifyAction,
-}));
+vi.mock(
+  "@purin-labs/area-integrations/shopify/action-execution",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/area-integrations/shopify/action-execution")
+    >()),
+    reconcileShopifyOrderCancellation:
+      shopifyMocks.reconcileShopifyOrderCancellation,
+    resolveShopifyWriteCredential: shopifyMocks.resolveShopifyWriteCredential,
+    resolveShopifyWriteCredentialForAction:
+      shopifyMocks.resolveShopifyWriteCredentialForAction,
+    executeShopifyAction: shopifyMocks.executeShopifyAction,
+  }),
+);
 vi.mock("@purin-labs/connections/data/commerce-merchant-binding", () => ({
   resolveCommerceMerchantBinding:
     commerceEngineMocks.resolveCommerceMerchantBinding,

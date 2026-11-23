@@ -60,8 +60,8 @@ import { providerModules } from "@purin-labs/area-integrations/server/contract/p
 import { providerServices } from "@purin-labs/area-integrations/server/contract/provider-services";
 import { readProviderCleanupContext } from "@purin-labs/area-integrations/server/provider-adapters/catalogue";
 import { reconcileProviderManifestObservations } from "@purin-labs/area-integrations/server/provider-lifecycle/observation";
-import { shopifyCommerceProvider } from "./shopify/commerce-provider";
-import { SHOPIFY_PROVIDER_MODULE } from "./shopify/provider-module";
+import { shopifyCommerceProvider } from "@purin-labs/area-integrations/shopify/commerce-provider";
+import { SHOPIFY_PROVIDER_MODULE } from "@purin-labs/area-integrations/shopify/provider-module";
 import { tearDownAgentMailboxForRemoval } from "@purin-labs/area-inbox/server/mail-inbox/agent-mailbox-teardown";
 import { verifiedContacts } from "@purin-labs/area-inbox/server/mail-inbox/contract/verified-contacts";
 import {

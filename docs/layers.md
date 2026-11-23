@@ -390,8 +390,8 @@ import. A module with no line for one of these has none.
 ## areas/shopify
 
 - Folders: 2
-  - `services/platform/src/shopify/`
-  - `services/platform/src/shopify/connector/`
+  - `areas/integrations/shopify/`
+  - `areas/integrations/shopify/connector/`
 
 ## surfaces/docs-site
 

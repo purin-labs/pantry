@@ -39,7 +39,7 @@ import {
 } from "@purin-labs/area-commerce/server/contract/queue-messages";
 import type { EmailChangeQueueMessage } from "@purin-labs/surface-email/server/mail/queue-messages";
 import type { IngressQueueMessageError } from "@purin-labs/kernel/queue-fields";
-import type { ShopifyCommerceRefreshQueueMessage } from "../shopify/queue-messages";
+import type { ShopifyCommerceRefreshQueueMessage } from "@purin-labs/area-integrations/shopify/queue-messages";
 import { gmailConnectorIdValue } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
 import {
   parseConnectorId,
@@ -49,8 +49,8 @@ import {
   traceLog,
   traceWarn,
 } from "@purin-labs/kernel/observability";
-import { fetchShopifyOrderCommerceRefresh } from "../shopify/connector/initial-sync";
-import { resolveShopifyWriteCredential } from "../shopify/action-execution";
+import { fetchShopifyOrderCommerceRefresh } from "@purin-labs/area-integrations/shopify/connector/initial-sync";
+import { resolveShopifyWriteCredential } from "@purin-labs/area-integrations/shopify/action-execution";
 import type { Result } from "@purin-labs/kernel/result";
 import type {
   SlackEnvelope,
@@ -64,7 +64,7 @@ import {
 import {
   normalizeShopifyCommerceOrderDelivery,
   normalizeShopifyCommerceResourceDelivery,
-} from "../shopify/delivery-normalizers";
+} from "@purin-labs/area-integrations/shopify/delivery-normalizers";
 import {
   parseCanonicalCommerceDelivery,
   parseCommerceCueFacts,

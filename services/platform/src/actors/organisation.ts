@@ -188,7 +188,7 @@ import { createCodeModeBudgetSchema } from "@purin-labs/agent/actors/code-mode-b
 import {
   type AssignShopifyLocationClassificationInput,
   type ShopifyLocationObservationInput,
-} from "../shopify/location-observation";
+} from "@purin-labs/area-integrations/shopify/location-observation";
 import type { CaseExecutionEffectRecords } from "@purin-labs/agent/case-execution/records";
 import { readCaseEffectRecords } from "@purin-labs/area-brain/server/actors/organisation-execution-records";
 import { type AcceptedMemoryCursor } from "@purin-labs/area-brain/server/memory/store";

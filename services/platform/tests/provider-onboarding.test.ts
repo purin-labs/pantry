@@ -17,7 +17,7 @@ import {
   parseSlackInstallation,
   observeSlackProviderIdentity,
 } from "@purin-labs/area-integrations/server/provider-adapters/slack";
-import { parseShopifyIdentityResponse } from "../src/shopify/provider-adapter";
+import { parseShopifyIdentityResponse } from "@purin-labs/area-integrations/shopify/provider-adapter";
 import {
   parseStripeAccountSummary,
   stripeCredentialEnvironment,
