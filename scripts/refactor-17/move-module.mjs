@@ -1008,17 +1008,25 @@ for (const path of tree) {
     }
   }
   if (plan.package.existing === true) {
-    // The line of the package gives the module each file in it.
-    if (map.packages[plan.target] !== plan.module) {
+    // The line of the package gives the module each file in it. The layer
+    // check reads a package under a cover file by file, so such a package can
+    // hold a folder of another module (areas/shopify in areas/integrations).
+    const covered = map.covers.some((cover) => rule.startsWith(cover));
+    if (map.packages[plan.target] !== plan.module && !covered) {
       faults.push(
         `${LAYER_MAP}: packages gives ${plan.target} to ${map.packages[plan.target] ?? "no module"}, and the plan moves ${plan.module} into it.`,
       );
     }
     // A package under a cover has a rule for each of its folders: a moved
-    // file with no rule gets one for its first folder in the package.
-    if (map.covers.some((cover) => rule.startsWith(cover))) {
+    // file with no rule, or whose longest rule names another module, gets a
+    // rule for its first folder in the package.
+    if (covered) {
+      const longest = Object.keys(map.rules).sort(
+        (a, b) => b.length - a.length,
+      );
       for (const to of planFiles.values()) {
-        const ruled = Object.keys(map.rules).some((key) => to.startsWith(key));
+        const key = longest.find((prefix) => to.startsWith(prefix));
+        const ruled = key !== undefined && map.rules[key] === plan.module;
         if (ruled) continue;
         const inside = to.slice(rule.length);
         const folder = inside.includes("/")
