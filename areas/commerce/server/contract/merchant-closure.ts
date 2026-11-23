@@ -2,8 +2,8 @@
 // refactor 11). Without the close, the API keys, the outbound webhook
 // subscriptions and the Stripe and Square links that the Organisation set up
 // stay live after the Organisation is gone. The purge runs this before its
-// D1 batch; the merchant bindings stay after the purge, so a purge that
-// stopped here finds the same merchants again, and a repeated close changes
+// D1 batch, which erases the merchant bindings. A purge that stops between
+// the two finds the same merchants again, and a repeated close changes
 // nothing.
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { Env } from "@purin-labs/kernel/env";
