@@ -178,8 +178,9 @@ keeps the last answer and shows an updating notice.
   are `appearance`, `chat` and `bakeryos` (the Kitchen scene).
 - Kitchen pages can have their own light or dark mode. The palette stays the account
   palette.
-- A script in `apps/portal/index.html` sets the theme on `/portal` addresses before the
-  first paint, from the local copy.
+- A script in `apps/portal/index.html` sets the theme before the first paint, from the
+  local copy, on `/`, `/sign-in` and the `/portal` addresses: each address where the
+  Portal shows the Organisation list or a workspace.
 - If a save fails, the choice stays for the session, and the Portal says that it did
   not sync. After a revision conflict, the Portal applies the edit again one time.
 

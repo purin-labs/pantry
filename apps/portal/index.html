@@ -9,7 +9,14 @@
       content="Purin Pantry: the operating system for modern bakeries &amp; cafés."
     />
     <script>
-      if (location.pathname.startsWith("/portal")) {
+      // The addresses where the Portal's router renders: "/" and "/sign-in"
+      // show the Organisation list too. The other entries of bootstrap.tsx
+      // keep their own look.
+      if (
+        location.pathname === "/" ||
+        /^\/sign-in\/?$/.test(location.pathname) ||
+        location.pathname.startsWith("/portal")
+      ) {
         let mode = "system";
         let palette = null;
         try {
