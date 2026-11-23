@@ -10,10 +10,8 @@ import type {
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { validateMessageAttachmentPreparationReceipt } from "../messages/message-wasm";
 import { traceLog } from "@purin-labs/kernel/observability";
-import {
-  attachmentManifestLine,
-  MAX_SAMPLED_FRAMES,
-} from "../messages/attachment-inspection";
+import { MAX_SAMPLED_FRAMES } from "../messages/attachment-inspection";
+import { attachmentManifestLine } from "@purin-labs/contracts/message";
 import { MESSAGE_ATTACHMENT_POLICY } from "@purin-labs/control-api";
 import type { Result } from "@purin-labs/kernel/result";
 import { parseStoredAttachment } from "../messages/stored-attachment";

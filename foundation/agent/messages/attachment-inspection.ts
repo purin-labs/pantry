@@ -15,6 +15,7 @@ import { readDerivedStills } from "./derived-stills";
 import type { Variant } from "@purin-labs/type-utils";
 import { sha256Hex } from "@purin-labs/std";
 import { MESSAGE_ATTACHMENT_POLICY } from "@purin-labs/control-api";
+import { attachmentManifestLine } from "@purin-labs/contracts/message";
 
 /**
  * Bounded inspection of one admitted attachment.
@@ -483,24 +484,4 @@ function canExtractHere(attachment: StoredMessageAttachment): boolean {
     supportsOfficeExtraction(mediaType) ||
     mediaType === "application/pdf"
   );
-}
-
-/** One provenance-marked line stating exactly what is known about the file. */
-export function attachmentManifestLine(
-  attachment: StoredMessageAttachment,
-): string {
-  const evidence =
-    attachment.descriptor.media.kind === "signature_verified"
-      ? "verified from bytes"
-      : attachment.descriptor.media.kind === "provider_declared"
-        ? "provider-declared"
-        : "unidentified";
-
-  return [
-    `[attachment ${String(attachment.id)}] ${String(attachment.displayName)}`,
-    `class=${attachment.descriptor.kind}`,
-    `mediaType=${String(attachment.descriptor.media.mediaType)} (${evidence})`,
-    `bytes=${attachment.byteLength}`,
-    `sha256=${String(attachment.sha256)}`,
-  ].join(" ");
 }

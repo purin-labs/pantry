@@ -3,7 +3,7 @@ import type {
   UserMessage,
 } from "@purin-labs/contracts";
 
-import { attachmentManifestLine } from "../messages/attachment-inspection";
+import { attachmentManifestLine } from "@purin-labs/contracts/message";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   readMessageLink,

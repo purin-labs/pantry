@@ -39,6 +39,7 @@ import {
   type AttachmentPreparationLimit,
 } from "../message-attachment-preparation";
 import { persistDerivedStills } from "../../messages/derived-stills";
+import { attachmentManifestLine } from "@purin-labs/contracts/message";
 import {
   prepareAcceptedMessageAttachment,
   readAcceptedMessageAttachment,
@@ -601,7 +602,7 @@ async function harnessInputsForAttachment(input: {
 }): Promise<readonly Exclude<EmbeddedHarnessUserInput, { kind: "text" }>[]> {
   const { attachment, bytes } = input;
   const descriptor = attachment.descriptor;
-  const manifest = attachmentManifest(attachment);
+  const manifest = `${attachmentManifestLine(attachment)} contents not read`;
 
   if (
     descriptor.kind === "image" &&
@@ -755,23 +756,4 @@ function frameBytesFor(
   return frame.byteLength > 0 && end <= bytes.byteLength
     ? bytes.slice(frame.byteOffset, end)
     : null;
-}
-
-/** One provenance-marked line per attachment, stating exactly what is known. */
-function attachmentManifest(attachment: StoredMessageAttachment): string {
-  const descriptor = attachment.descriptor;
-  const identification =
-    descriptor.media.kind === "signature_verified"
-      ? `verified ${descriptor.media.method}`
-      : descriptor.media.kind === "provider_declared"
-        ? "provider-declared"
-        : "unidentified";
-  return [
-    `[attachment ${attachment.id}] ${attachment.displayName}`,
-    `class=${descriptor.kind}`,
-    `mediaType=${descriptor.media.mediaType} (${identification})`,
-    `bytes=${attachment.byteLength}`,
-    `sha256=${attachment.sha256}`,
-    "contents not read",
-  ].join(" ");
 }

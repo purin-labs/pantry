@@ -1151,19 +1151,32 @@ function renderPart(part: UserMessagePart): string {
         ? `[link] ${part.link.presentation.label} (${part.link.url})`
         : `[link] ${part.link.url}`;
     case "attachment":
-      return renderAttachmentManifest(part.attachment);
+      return `${attachmentManifestLine(part.attachment)} contents not read`;
   }
 }
 
-function renderAttachmentManifest(attachment: StoredMessageAttachment): string {
-  const descriptor = attachment.descriptor;
+/**
+ * The one line that names a file of a message for the model: its id, name,
+ * class, media type and how that type was found, size and digest. The line
+ * says nothing about the content, so each caller states if it was read.
+ */
+export function attachmentManifestLine(
+  attachment: StoredMessageAttachment,
+): string {
+  const media = attachment.descriptor.media;
   const identification =
-    descriptor.kind === "opaque" && descriptor.media.kind === "unknown"
-      ? "unidentified"
-      : descriptor.media.kind === "signature_verified"
-        ? "verified from bytes"
-        : "provider-declared";
-  return `[attachment ${attachment.id}] ${attachment.displayName} class=${descriptor.kind} mediaType=${descriptor.media.mediaType} (${identification}) bytes=${attachment.byteLength} sha256=${attachment.sha256} contents not read`;
+    media.kind === "signature_verified"
+      ? "verified from bytes"
+      : media.kind === "provider_declared"
+        ? "provider-declared"
+        : "unidentified";
+  return [
+    `[attachment ${attachment.id}] ${attachment.displayName}`,
+    `class=${attachment.descriptor.kind}`,
+    `mediaType=${media.mediaType} (${identification})`,
+    `bytes=${attachment.byteLength}`,
+    `sha256=${attachment.sha256}`,
+  ].join(" ");
 }
 
 function attachmentNames(message: UserMessage): string[] {
