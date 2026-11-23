@@ -8,7 +8,6 @@ import {
 
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { listActiveTerminalAssignments } from "./terminal-assignment-store";
-import type { Variant } from "@purin-labs/type-utils";
 import type { TerminalCounterReadback } from "@purin-labs/control-api";
 /**
  * What an operator needs in order to answer "can this counter take a payment
@@ -104,7 +103,6 @@ async function readCounter(
     blockedReason: binding.ok ? null : "assignment_retired",
     assignment: described,
     credentialHealth: authority.credentialHealth,
-    webhook: authority.webhook,
     paymentsLinked:
       binding.ok && linkedLocationIds.has(assignment.providerLocationId),
   };
@@ -114,16 +112,11 @@ type TerminalAuthorityRow = Readonly<{
   accountLifecycle: unknown;
   accountCapabilityRevision: unknown;
   connectionLifecycle: unknown;
-  connectionCredentialGeneration: unknown;
-  webhookLifecycle: unknown;
-  webhookCredentialGeneration: unknown;
-  lastVerifiedAt: unknown;
-  webhookUpdatedAt: unknown;
 }>;
 
 type TerminalAuthorityReadback = Pick<
   TerminalCounterReadback,
-  "credentialHealth" | "webhook"
+  "credentialHealth"
 > &
   Readonly<{ capabilityCurrent: boolean }>;
 
@@ -136,21 +129,10 @@ async function readTerminalAuthority(
     .prepare(
       `SELECT integration_account.lifecycle AS accountLifecycle,
             integration_account.updated_at AS accountCapabilityRevision,
-            provider_connection.lifecycle AS connectionLifecycle,
-            provider_connection.credential_generation AS connectionCredentialGeneration,
-            provider_webhook.lifecycle AS webhookLifecycle,
-            provider_webhook.credential_generation AS webhookCredentialGeneration,
-            provider_webhook.last_verified_at AS lastVerifiedAt,
-            provider_webhook.updated_at AS webhookUpdatedAt
+            provider_connection.lifecycle AS connectionLifecycle
      FROM integration_account
      JOIN provider_connection
        ON provider_connection.provider_connection_id = integration_account.provider_connection_id
-     LEFT JOIN provider_webhook
-       ON provider_webhook.integration_account_id = integration_account.integration_account_id
-      AND provider_webhook.provider = 'square'
-      AND provider_webhook.environment = integration_account.environment
-      AND provider_webhook.provider_native_id = integration_account.provider_account_id
-      AND provider_webhook.event_type = 'terminal_events'
      WHERE integration_account.organisation_id = ?
        AND integration_account.integration_account_id = ?
        AND integration_account.provider = 'square'
@@ -168,7 +150,6 @@ async function readTerminalAuthority(
     return {
       capabilityCurrent: false,
       credentialHealth: "unavailable",
-      webhook: { kind: "unconfigured" },
     };
   }
   return {
@@ -182,7 +163,6 @@ async function readTerminalAuthority(
         ),
       ),
     credentialHealth: terminalCredentialHealth(row),
-    webhook: terminalWebhookReadback(row),
   };
 }
 
@@ -207,39 +187,6 @@ function terminalCredentialHealth(
   return accountLifecycle === "active" && connectionLifecycle === "active"
     ? "active"
     : "unavailable";
-}
-
-function terminalWebhookReadback(
-  row: TerminalAuthorityRow,
-): TerminalCounterReadback["webhook"] {
-  if (row.webhookLifecycle === null) return { kind: "unconfigured" };
-  const lifecycle = requireWebhookLifecycle(row.webhookLifecycle);
-  const connectionGeneration = requirePositiveInteger(
-    row.connectionCredentialGeneration,
-    "connection credential generation",
-  );
-  const webhookGeneration = requirePositiveInteger(
-    row.webhookCredentialGeneration,
-    "webhook credential generation",
-  );
-  const updatedAt = requireNonnegativeInteger(
-    row.webhookUpdatedAt,
-    "webhook update time",
-  );
-  const lastVerifiedAt =
-    row.lastVerifiedAt === null
-      ? null
-      : requireNonnegativeInteger(
-          row.lastVerifiedAt,
-          "webhook verification time",
-        );
-  return {
-    kind: "configured",
-    lifecycle,
-    credentialCurrent: connectionGeneration === webhookGeneration,
-    lastVerifiedAt,
-    updatedAt,
-  };
 }
 
 type TerminalAccountLifecycle =
@@ -280,27 +227,6 @@ function requireConnectionLifecycle(raw: unknown): TerminalConnectionLifecycle {
     default:
       throw new Error("Terminal connection lifecycle is corrupt");
   }
-}
-
-function requireWebhookLifecycle(
-  raw: unknown,
-): Variant<TerminalCounterReadback["webhook"], "configured">["lifecycle"] {
-  switch (raw) {
-    case "pending":
-    case "live":
-    case "degraded":
-    case "disabled":
-    case "revoked":
-      return raw;
-    default:
-      throw new Error("Terminal webhook lifecycle is corrupt");
-  }
-}
-
-function requirePositiveInteger(raw: unknown, field: string): number {
-  if (typeof raw === "number" && Number.isSafeInteger(raw) && raw > 0)
-    return raw;
-  throw new Error(`Terminal ${field} is corrupt`);
 }
 
 function requireNonnegativeInteger(raw: unknown, field: string): number {

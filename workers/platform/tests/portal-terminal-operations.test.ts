@@ -53,13 +53,6 @@ function counter(
     blockedReason: null,
     assignment: assignment(),
     credentialHealth: "active",
-    webhook: {
-      kind: "configured",
-      lifecycle: "live",
-      credentialCurrent: true,
-      lastVerifiedAt: 4,
-      updatedAt: 4,
-    },
     paymentsLinked: true,
     ...overrides,
   };

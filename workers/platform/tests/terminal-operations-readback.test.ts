@@ -137,43 +137,6 @@ describe("terminal operations readback", function readbackSuite() {
     expect(counter?.assignment.capabilityCurrent).toBe(true);
     expect(counter?.assignment.healthIsObservable).toBe(true);
     expect(counter?.credentialHealth).toBe("active");
-    expect(counter?.webhook).toEqual({ kind: "unconfigured" });
-  });
-
-  it("reports the webhook lifecycle, credential generation, and verification time", async function webhookReadback() {
-    const active = assignment();
-    await activateTerminalAssignment({
-      db,
-      organisationId: ORGANISATION,
-      assignment: active,
-      now: 1,
-    });
-    database
-      .prepare(
-        `INSERT INTO provider_webhook (
-           provider_webhook_id, organisation_id, integration_account_id, provider,
-           provider_native_id, event_type, lifecycle, lifecycle_reason_code,
-           signing_secret_ref, credential_generation, last_verified_at, updated_at, environment
-         ) VALUES (
-           'provider_webhook_terminal', ?, 'integration_square', 'square',
-           'merchant_square', 'terminal_events', 'live', NULL,
-           'vault:square:webhook:terminal', 1, 4, 4, 'production'
-         )`,
-      )
-      .run(ORGANISATION);
-    const operations = await readTerminalOperations({
-      db,
-      organisationId: ORGANISATION,
-      now: 5,
-      linkedLocationIds: new Set(),
-    });
-    expect(operations.counters[0]?.webhook).toEqual({
-      kind: "configured",
-      lifecycle: "live",
-      credentialCurrent: true,
-      lastVerifiedAt: 4,
-      updatedAt: 4,
-    });
   });
 
   it("marks an assignment stale after its account capability revision changes", async function staleCapability() {
@@ -217,39 +180,6 @@ describe("terminal operations readback", function readbackSuite() {
     });
     expect(operations.counters[0]?.credentialHealth).toBe("reauth_required");
     expect(operations.counters[0]?.blockedReason).toBeNull();
-  });
-
-  it("surfaces a webhook key from an obsolete credential generation", async function staleWebhookCredential() {
-    await activateTerminalAssignment({
-      db,
-      organisationId: ORGANISATION,
-      assignment: assignment(),
-      now: 1,
-    });
-    database
-      .prepare(
-        `INSERT INTO provider_webhook (
-           provider_webhook_id, organisation_id, integration_account_id, provider,
-           provider_native_id, event_type, lifecycle, lifecycle_reason_code,
-           signing_secret_ref, credential_generation, last_verified_at, updated_at, environment
-         ) VALUES (
-           'provider_webhook_stale', ?, 'integration_square', 'square',
-           'merchant_square', 'terminal_events', 'live', NULL,
-           'vault:organisation_1:square:merchant_square:webhook:g2', 2, 4, 4, 'production'
-         )`,
-      )
-      .run(ORGANISATION);
-    const operations = await readTerminalOperations({
-      db,
-      organisationId: ORGANISATION,
-      now: 5,
-      linkedLocationIds: new Set(),
-    });
-    expect(operations.counters[0]?.webhook).toMatchObject({
-      kind: "configured",
-      lifecycle: "live",
-      credentialCurrent: false,
-    });
   });
 
   it("reports a sandbox counter as one whose health cannot be observed", async function simulated() {

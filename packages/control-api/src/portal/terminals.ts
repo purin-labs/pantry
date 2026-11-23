@@ -1,5 +1,5 @@
 import type { Variant } from "@purin-labs/type-utils";
-import { hasExactKeys, isNonNegativeInteger } from "@purin-labs/std";
+import { hasExactKeys } from "@purin-labs/std";
 import type {
   TerminalBlockedReason,
   TerminalCounterReadback,
@@ -312,7 +312,6 @@ function parseCounter(raw: unknown): TerminalCounterReadback {
       "blockedReason",
       "assignment",
       "credentialHealth",
-      "webhook",
       "paymentsLinked",
     ],
     "terminal counter",
@@ -328,7 +327,6 @@ function parseCounter(raw: unknown): TerminalCounterReadback {
     blockedReason: parseBlockedReason(object.blockedReason),
     assignment: parseAssignment(object.assignment),
     credentialHealth: parseCredentialHealth(object.credentialHealth),
-    webhook: parseWebhook(object.webhook),
     paymentsLinked: object.paymentsLinked,
   };
 }
@@ -412,40 +410,6 @@ function parseCredentialHealth(
     default:
       throw new Error("Terminal credential health is invalid.");
   }
-}
-
-function parseWebhook(raw: unknown): TerminalCounterReadback["webhook"] {
-  const object = requireObject(raw, "terminal webhook");
-  if (object.kind === "unconfigured") {
-    requireExactKeys(object, ["kind"], "terminal webhook");
-    return { kind: "unconfigured" };
-  }
-  requireExactKeys(
-    object,
-    ["kind", "lifecycle", "credentialCurrent", "lastVerifiedAt", "updatedAt"],
-    "terminal webhook",
-  );
-  if (
-    object.kind !== "configured" ||
-    (object.lifecycle !== "pending" &&
-      object.lifecycle !== "live" &&
-      object.lifecycle !== "degraded" &&
-      object.lifecycle !== "disabled" &&
-      object.lifecycle !== "revoked") ||
-    typeof object.credentialCurrent !== "boolean" ||
-    (object.lastVerifiedAt !== null &&
-      !isNonNegativeInteger(object.lastVerifiedAt)) ||
-    !isNonNegativeInteger(object.updatedAt)
-  ) {
-    throw new Error("Terminal webhook is invalid.");
-  }
-  return {
-    kind: "configured",
-    lifecycle: object.lifecycle,
-    credentialCurrent: object.credentialCurrent,
-    lastVerifiedAt: object.lastVerifiedAt,
-    updatedAt: object.updatedAt,
-  };
 }
 
 function requireObject(raw: unknown, field: string): Record<string, unknown> {

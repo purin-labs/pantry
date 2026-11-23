@@ -92,15 +92,6 @@ export type TerminalCounterReadback = Readonly<{
     | "disabled"
     | "revoked"
     | "unavailable";
-  webhook:
-    | Readonly<{ kind: "unconfigured" }>
-    | Readonly<{
-        kind: "configured";
-        lifecycle: "pending" | "live" | "degraded" | "disabled" | "revoked";
-        credentialCurrent: boolean;
-        lastVerifiedAt: number | null;
-        updatedAt: number;
-      }>;
   /**
    * Whether Commerce takes this location's Square Terminal payments: the
    * merchant links the location in Commerce (Plan 80). A counter that is

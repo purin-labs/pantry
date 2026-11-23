@@ -330,8 +330,8 @@ Neighbours:
   (`terminal_busy`). Only a `gmo_stera` terminal has one (Plan 90).
 - The engine has no call to cancel a pending Terminal checkout. The Platform cancel of a
   Square counter collection only reconciles.
-- Square payment notifications are not built. No code registers or writes the Square
-  `terminal_events` webhook, so the page shows it as unconfigured.
+- Square payment notifications are not built. No code registers a Square
+  `terminal_events` webhook, and the Terminal readback reports no webhook state.
 - Terminal health, pairing attempts and payment observations have parsers
   (`records/terminal.ts`), but no production code stores or reads them.
 - After its one-hour alarm window, a Terminal checkout is read only on request. The
