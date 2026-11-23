@@ -14,6 +14,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import { readDerivedStills } from "./derived-stills";
 import type { Variant } from "@purin-labs/type-utils";
 import { sha256Hex } from "@purin-labs/std";
+import { MESSAGE_ATTACHMENT_POLICY } from "@purin-labs/control-api";
 
 /**
  * Bounded inspection of one admitted attachment.
@@ -32,8 +33,9 @@ import { sha256Hex } from "@purin-labs/std";
  */
 
 const MEDIA_HEADER_BYTES = 64 * 1024;
-const MAX_MEDIA_SOURCE_BYTES = 25 * 1024 * 1024;
-const MAX_SAMPLED_FRAMES = 12;
+/** A media file is read whole, so its limit is the file limit of a message. */
+const MAX_MEDIA_SOURCE_BYTES = MESSAGE_ATTACHMENT_POLICY.maxFileBytes;
+export const MAX_SAMPLED_FRAMES = 12;
 
 export const ATTACHMENT_TEXT_LIMITS = {
   maxSourceBytes: 1024 * 1024,

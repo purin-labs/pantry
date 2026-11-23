@@ -10,7 +10,11 @@ import type {
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { validateMessageAttachmentPreparationReceipt } from "../messages/message-wasm";
 import { traceLog } from "@purin-labs/kernel/observability";
-import { attachmentManifestLine } from "../messages/attachment-inspection";
+import {
+  attachmentManifestLine,
+  MAX_SAMPLED_FRAMES,
+} from "../messages/attachment-inspection";
+import { MESSAGE_ATTACHMENT_POLICY } from "@purin-labs/control-api";
 import type { Result } from "@purin-labs/kernel/result";
 import { parseStoredAttachment } from "../messages/stored-attachment";
 import type { EmbeddedHarnessUserInput } from "./embedded-harness";
@@ -25,10 +29,10 @@ import { isRecord, sha256Hex } from "@purin-labs/std";
 
 const MESSAGE_PREPARATION_HANDLER_REVISION = "message-preparation.v1";
 export const MESSAGE_PREPARATION_LIMITS: MessageAttachmentPreparationLimits = {
-  maxInputBytes: 25 * 1024 * 1024,
+  maxInputBytes: MESSAGE_ATTACHMENT_POLICY.maxFileBytes,
   maxOutputBytes: 36 * 1024 * 1024,
   maxDurationMs: 30_000,
-  maxFrames: 12,
+  maxFrames: MAX_SAMPLED_FRAMES,
 };
 
 export type MessagePreparationError = {
