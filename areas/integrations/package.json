@@ -18,6 +18,7 @@
     "./ui/features/integrations/custom-connectors": "./ui/features/integrations/custom-connectors.tsx",
     "./ui/features/integrations/integrations-page": "./ui/features/integrations/integrations-page.tsx",
     "./ui/features/integrations/settings-routes": "./ui/features/integrations/settings-routes.tsx",
+    "./ui/features/jev-features/facts": "./ui/features/jev-features/facts.tsx",
     "./ui/features/jev-features/paid-use": "./ui/features/jev-features/paid-use.tsx",
     "./ui/features/jev-features/route": "./ui/features/jev-features/route.tsx",
     "./ui/features/vault/route": "./ui/features/vault/route.tsx",

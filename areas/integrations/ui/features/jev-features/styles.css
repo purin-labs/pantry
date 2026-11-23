@@ -209,34 +209,3 @@
   flex-basis: 100%;
   font-size: 13px;
 }
-
-/* Settings › Billing: one flat list of values. */
-
-.billing-values {
-  display: grid;
-  margin: 0;
-  border-block-start: 1px solid var(--border);
-}
-
-.billing-value {
-  display: grid;
-  grid-template-columns: minmax(12ch, 16rem) 1fr;
-  gap: var(--pantry-space-1) var(--pantry-space-4);
-  padding-block: var(--pantry-space-3);
-  border-block-end: 1px solid var(--border);
-}
-
-.billing-value dt {
-  color: var(--ink-3);
-}
-
-.billing-value dd {
-  margin: 0;
-  color: var(--ink);
-}
-
-@media (max-width: 560px) {
-  .billing-value {
-    grid-template-columns: 1fr;
-  }
-}

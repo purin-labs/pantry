@@ -20,6 +20,7 @@
     "./ui/main": "./ui/main.tsx",
     "./ui/pages/home": "./ui/pages/home.tsx",
     "./ui/portal": "./ui/portal.tsx",
+    "./ui/portal-shell": "./ui/portal-shell.tsx",
     "./ui/public-docs": "./ui/public-docs.tsx",
     "./ui/shell": "./ui/shell.tsx",
     "./ui/tv/player": "./ui/tv/player.tsx",

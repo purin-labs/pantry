@@ -336,8 +336,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     segment: "api-keys",
     navigationLabel: "API keys",
     title: "API keys",
-    description:
-      "Give your own systems a key to read and change the shop. Each change records the key that made it.",
+    description: "Keys for your own systems. Each change records its key.",
     group: "Settings",
     resource: { kind: "none" },
   },
@@ -358,6 +357,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Billing",
     description:
       "See the Jev use of this month, paid use and the monthly spending limit.",
+    titleOnly: true,
     group: "Settings",
     resource: { kind: "none" },
   },
@@ -415,6 +415,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     navigationLabel: "Workspace settings",
     title: "Workspace settings",
     description: "Manage members, roles, and workspace access.",
+    titleOnly: true,
     group: "Settings",
     resource: { kind: "none" },
   },

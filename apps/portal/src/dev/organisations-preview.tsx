@@ -203,7 +203,7 @@ const SETUP_VIEWS: Record<string, OpenAccountSetupView> = {
       step: "prepare",
       title: "The setup stopped",
       reason: "Pantry could not complete this request. Try again.",
-      next: "Try again to continue the same setup. Pantry does not make a second organisation.",
+      next: "Pantry does not make a second organisation.",
       detail: "Error code: authority_unavailable",
       action: "Try again",
       signIn: true,

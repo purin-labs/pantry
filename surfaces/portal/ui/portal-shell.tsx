@@ -38,6 +38,7 @@ import { workspaceRouteSelection } from "./portal-routing";
 import type { Membership } from "@purin-labs/control-api/portal/portal-types";
 import type { PortalOrganisation, PortalState } from "./portal-types";
 import "./portal-brand.css";
+import "./sign-in.css";
 
 function reloadPortalPage(): void {
   window.location.reload();
@@ -85,48 +86,28 @@ function onboardingStepHref(
 
 export function SignIn(): React.ReactNode {
   return (
-    <main id="portal-content" className="signin-shell" tabIndex={-1}>
-      <section className="signin-access" aria-labelledby="signin-title">
-        <div className="signin-brand" aria-label="Purin Pantry">
-          <img
-            className="signin-brand-mark"
-            src="/brand/pantry-mark-dark-32.png"
-            alt=""
-            width={28}
-            height={28}
-          />
-          <div className="signin-brand-copy">
-            <strong>Purin Pantry</strong>
-            <span className="portal-brand-subtitle">
-              Bakery operating system
-            </span>
-          </div>
-        </div>
-        <div className="signin-access-body">
-          <h1 id="signin-title" tabIndex={-1}>
-            Sign in to Purin Pantry
-          </h1>
-          <p className="signin-intro">
-            Open your workspace and continue operating.
-          </p>
-          <a className="signin-button" href={signInPath()}>
-            <GoogleMark />
-            <span>Continue with Google</span>
-          </a>
-        </div>
-        <p className="signin-access-note">
-          Sign in to open your organisation or create one. If you have an
-          invitation, use the invited Google account.
+    <main id="portal-content" className="auth-status-shell" tabIndex={-1}>
+      <section
+        className="auth-status-panel signin-panel"
+        aria-labelledby="signin-title"
+      >
+        <img
+          className="signin-mark"
+          src="/brand/pantry-mark-dark-32.png"
+          alt=""
+          width={32}
+          height={32}
+        />
+        <h1 id="signin-title" tabIndex={-1}>
+          Sign in to Purin Pantry
+        </h1>
+        <a className="signin-button" href={signInPath()}>
+          <GoogleMark />
+          <span>Continue with Google</span>
+        </a>
+        <p className="signin-note">
+          If you have an invitation, use the invited Google account.
         </p>
-      </section>
-      <section className="signin-story" aria-labelledby="signin-story-title">
-        <div className="signin-story-body">
-          <h2 id="signin-story-title">One place to run your café</h2>
-          <p>
-            Commerce, inventory, daily operations, and approval requests stay
-            connected.
-          </p>
-        </div>
       </section>
     </main>
   );

@@ -20,8 +20,8 @@ it only through the same domain functions.
 Google sign-in makes the `app_user` row and a control session (FND-06). The
 Organisations page shows a **Set up Purin Pantry** button to each person, also to a
 person who has Organisations. A click opens the dialog. A saved setup record opens the
-dialog with no click. The dialog has a segmented bar, a counter ("Step 2 of 4") and
-`aria-current="step"` on the current segment:
+dialog with no click. The dialog has a segmented bar with `aria-current="step"` on the
+current segment. The step names are text for screen readers only:
 
 1. **Organisation.** One field of at most 120 characters. An empty name sends nothing.
 2. **Prepare.** `POST /v1/control/organisations` with `{ operationId, name }`. The route

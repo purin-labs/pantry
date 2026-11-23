@@ -92,11 +92,11 @@ export function JevSetupBody(props: {
     <>
       <div className="account-setup-intro">
         <h4 ref={props.heading} tabIndex={-1} className="account-setup-heading">
-          Use Jev for mail sorting, related Cases and screen suggestions
+          Turn on Jev?
         </h4>
         <p className="account-setup-lead">
-          Jev is a small AI model. TypeSafe runs it and processes the data for
-          Purin. This step is optional.
+          Jev is a small AI model. TypeSafe runs it and processes this data for
+          Purin.
         </p>
       </div>
       {state.kind === "result" ? (
@@ -113,8 +113,8 @@ export function JevSetupBody(props: {
         {state.kind === "busy"
           ? "Pantry turns on the Jev switches."
           : state.kind === "result"
-            ? "You can change each switch later in "
-            : "If you skip, every switch stays off. You can change them later in "}
+            ? "Change them later in "
+            : "Skip leaves every switch off. Change them later in "}
         {state.kind === "busy" ? null : (
           <>
             <Link to={props.settingsPath}>Settings › Jev</Link>.
@@ -137,23 +137,11 @@ function renderJevFeature(item: (typeof FEATURES)[number]): React.ReactNode {
 function JevSetupOutcome(props: {
   readonly result: JevSetupResult;
 }): React.ReactNode {
-  const missed = props.result.some(hasProblem);
   return (
-    <>
-      <dl className="account-setup-summary">
-        {props.result.map(renderJevOutcome)}
-      </dl>
-      {missed ? (
-        <p className="account-setup-note">
-          Some switches are not on. The setup continues without them.
-        </p>
-      ) : null}
-    </>
+    <dl className="account-setup-summary">
+      {props.result.map(renderJevOutcome)}
+    </dl>
   );
-}
-
-function hasProblem(item: JevSetupResult[number]): boolean {
-  return item.problem !== null;
 }
 
 function renderJevOutcome(item: JevSetupResult[number]): React.ReactNode {

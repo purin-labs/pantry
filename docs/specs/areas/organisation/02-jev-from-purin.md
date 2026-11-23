@@ -149,8 +149,10 @@ The byte and token limits of Related Cases alone stop it at 50 calls.
 ### Settings › Billing
 
 Settings › Billing (`areas/organisation/ui/features/billing/route.tsx`) reads the same view.
-It shows the Jev use of the month against the free use, paid use, the charge of the
-month, the spending limit and the prompt. Its "Turn on paid use" opens Settings › Jev at
+It shows label and value rows: the free use of the month against its limit, the date
+the free use starts again, paid use, the charge of the month and the spending limit, and
+the prompt. On the Organisation's own key, one row says that TypeSafe bills that key.
+Its "Turn on paid use" and its link "Change paid use in Jev" open Settings › Jev at
 `#jev-paid-use`. It keeps no copy of a balance.
 
 ### The setup step

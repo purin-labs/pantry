@@ -1,0 +1,14 @@
+/* Access › Data flow: "Include" and "Check destination" trail each source. */
+/* The two stay on one line, also on a narrow screen. */
+.access35-action-row > .access35-source-actions {
+  flex: 0 0 auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.access35-source-actions .checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}

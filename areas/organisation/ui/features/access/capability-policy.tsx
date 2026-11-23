@@ -41,10 +41,7 @@ export function CapabilityListView(
       aria-labelledby="access35-capabilities-title"
     >
       <div className="access35-section-heading">
-        <div>
-          <h2 id="access35-capabilities-title">What can be done</h2>
-          <p>Choose what runs by itself, what asks first, and what stays off.</p>
-        </div>
+        <h2 id="access35-capabilities-title">Actions</h2>
         {canManage ? (
           <button
             type="button"
@@ -56,32 +53,33 @@ export function CapabilityListView(
           </button>
         ) : null}
       </div>
-      <div className="access35-filters" aria-label="Find an action">
-        <label>
-          <span>Find an action</span>
+      {props.view.capabilities.length === 0 ? (
+        <div className="access35-empty">
+          <h3>No actions yet</h3>
+        </div>
+      ) : (
+        <div className="access35-system-filters">
           <input
             type="search"
+            aria-label="Find an action"
             value={search}
             onChange={changeSearch.bind(null, setSearch)}
-            placeholder="Search actions, such as email or refund…"
+            placeholder="Email, refund, Shopify"
           />
-        </label>
-        <label>
-          <span>Show</span>
           <Select.Root
             items={MODE_FILTER_OPTIONS}
             value={modeFilter}
             onValueChange={changeModeFilter.bind(null, setModeFilter)}
           >
-            <Select.Trigger>
+            <Select.Trigger aria-label="Show actions">
               <Select.Value />
             </Select.Trigger>
             <Select.Popup>
               {MODE_FILTER_OPTIONS.map(renderModeOption)}
             </Select.Popup>
           </Select.Root>
-        </label>
-      </div>
+        </div>
+      )}
       {narrowed ? (
         <p className="access35-result-count" role="status">
           {matching.length === 0
@@ -123,7 +121,10 @@ function isNotEmpty(term: string): boolean {
   return term.length > 0;
 }
 
-/** Each term must be in the action's name, description, group or provider. */
+/**
+ * Each term must be in the action's name, description, group or provider.
+ * The row does not show the description; the search still reads it.
+ */
 function matchesCapability(
   terms: readonly string[],
   modeFilter: ModeFilter,
@@ -183,7 +184,6 @@ function renderCapability(
     >
       <div className="access35-action-text">
         <h4>{capability.definition.label}</h4>
-        <p>{capability.definition.description}</p>
         <small>{capabilityMeta(capability)}</small>
         {renderCapabilityNote(integrationsPath, capability)}
       </div>
@@ -229,7 +229,7 @@ function renderCapabilityNote(
     return (
       <p className="access35-note">
         <CircleAlert aria-hidden="true" size={17} /> Off for everyone it is
-        shared with. The shares stay listed and work again when you turn it on.
+        shared with. The shares stay and work again when you turn it on.
       </p>
     );
   }

@@ -539,7 +539,7 @@ describe("Café settings page ownership", () => {
     expect(integrationsMarkup).toContain('name="openAiApiKey"');
     expect(integrationsMarkup).toContain("OpenAI bills usage to your account.");
     expect(integrationsMarkup).not.toContain("sk-organisation-secret");
-    expect(workspaceMarkup).toContain("Members and roles");
+    expect(workspaceMarkup).toContain('id="team-title">Members</h2>');
   });
 
   it("associates Slack setup errors with the affected field", () => {

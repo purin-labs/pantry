@@ -1,5 +1,5 @@
 import React from "react";
-import { Copy, KeySquare, Plus } from "lucide-react";
+import { Copy, Plus } from "lucide-react";
 
 import { EmptyState, SideDrawer } from "@purin-labs/ui/index";
 import { apiKeyErrorMessage, GRANTABLE_SCOPE_LABELS, GRANTABLE_SCOPES, issueCommerceApiKey, readCommerceApiKeys, revokeCommerceApiKey, type GrantableScope } from "./api";
@@ -104,11 +104,7 @@ export function CommerceApiKeysRoute(props: {
   if (!props.canManage)
     return (
       <div className="vault-page">
-        <EmptyState
-          icon={<KeySquare size={20} />}
-          title="API keys are for owners and admins"
-          description="An owner or admin can give the shop's own systems a key."
-        />
+        <EmptyState title="API keys are for owners and admins" />
       </div>
     );
 
@@ -154,9 +150,7 @@ export function CommerceApiKeysRoute(props: {
         </div>
       ) : keys.length === 0 ? (
         <EmptyState
-          icon={<KeySquare size={20} />}
           title="No API keys"
-          description="Create a key when one of your systems needs to reach the shop."
           actions={
             <button
               type="button"
@@ -189,9 +183,6 @@ export function CommerceApiKeysRoute(props: {
                   })
                 }
               >
-                <span className="vault-row-icon" aria-hidden="true">
-                  <KeySquare size={16} />
-                </span>
                 <span className="vault-row-text">
                   <span className="vault-row-title">{key.label}</span>
                   <span className="vault-row-detail">
@@ -416,14 +407,12 @@ function KeyDetails(props: {
   const { apiKey } = props;
   return (
     <dl className="vault-details">
-      <div>
-        <dt>Status</dt>
-        <dd>
-          {apiKey.revokedAt === null
-            ? "Active"
-            : `Revoked ${formatDate(apiKey.revokedAt)}`}
-        </dd>
-      </div>
+      {apiKey.revokedAt === null ? null : (
+        <div>
+          <dt>Revoked</dt>
+          <dd>{formatDate(apiKey.revokedAt)}</dd>
+        </div>
+      )}
       <div>
         <dt>Created</dt>
         <dd>{formatDate(apiKey.createdAt)}</dd>

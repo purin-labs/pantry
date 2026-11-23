@@ -17,7 +17,7 @@ import type {
   AccessControlSubjectView,
   AccessControlView,
 } from "@purin-labs/control-api/portal/access-models";
-import { Fact, StatusIcon } from "./presentation";
+import "./data-flow.css";
 
 export type DataFlowCheck =
   | Readonly<{
@@ -64,28 +64,16 @@ export function SourcePolicyListView(
       className="access35-section"
       aria-labelledby="access35-sources-title"
     >
-      <div className="access35-section-heading">
-        <div>
-          <h2 id="access35-sources-title">Can this data be shared?</h2>
-          <p>
-            Select the information to include, then check its destination. Every
-            source must permit delivery.
-          </p>
-        </div>
-      </div>
+      <h2 id="access35-sources-title">Can this data be shared?</h2>
       {props.view.sourceFlowPolicies.items.length === 0 ? (
         <div className="access35-empty">
           <h3>No protected sources yet</h3>
-          <p>
-            Granting read access to a connected resource creates its source
-            policy here.
-          </p>
           <Link className="access35-empty-action" to={props.accessPath}>
-            Go to access grants
+            Go to Access
           </Link>
         </div>
       ) : (
-        <ul className="access35-card-list">
+        <ul className="access35-action-list">
           {props.view.sourceFlowPolicies.items.map(
             renderSource.bind(
               null,
@@ -285,56 +273,38 @@ function DataFlowTargetField(
   }
 }
 
+/**
+ * A source is one row: its name, one quiet line (account, action, readers,
+ * and "Unavailable" when it is), "Include" for the combined check and
+ * "Check destination".
+ */
 function renderSource(
   selected: ReadonlySet<string>,
   toggle: (source: AccessControlSourcePolicyView) => void,
   check: (source: AccessControlSourcePolicyView) => void,
   source: AccessControlSourcePolicyView,
 ): React.ReactNode {
-  const checked = selected.has(source.sourceRefId);
+  const readers =
+    source.readers.length === 0
+      ? "No readers"
+      : `Readers: ${source.readers.map(subjectLabel).join(", ")}`;
+  const meta = [source.owner.label, source.capability.label, readers];
+  if (source.availability.kind !== "available") meta.push("Unavailable");
   return (
-    <li className="access35-source-card" key={source.sourceRefId}>
-      <div className="access35-card-lead">
-        <StatusIcon
-          status={
-            source.availability.kind === "available"
-              ? "available"
-              : "unavailable"
-          }
-        />
-        <div>
-          <h3>{source.resourceLabel}</h3>
-          <p>
-            {source.owner.label} · {source.capability.label}
-          </p>
-        </div>
+    <li className="access35-action-row" key={source.sourceRefId}>
+      <div className="access35-action-text">
+        <h3>{source.resourceLabel}</h3>
+        <small>{meta.join(" · ")}</small>
       </div>
-      <dl className="access35-card-facts">
-        <Fact
-          label="Readers"
-          value={
-            source.readers.length === 0
-              ? "None available"
-              : source.readers.map(subjectLabel).join(", ")
-          }
-        />
-        <Fact
-          label="Status"
-          value={
-            source.availability.kind === "available"
-              ? "Available"
-              : "Unavailable"
-          }
-        />
-      </dl>
       <div className="access35-source-actions">
         <label className="checkbox-label">
           <input
             type="checkbox"
-            checked={checked}
+            checked={selected.has(source.sourceRefId)}
             onChange={toggle.bind(null, source)}
+            aria-label={`Include ${source.resourceLabel}`}
           />
-          <span>Include in destination check</span>
+          <span aria-hidden="true">Include</span>
         </label>
         <button
           type="button"

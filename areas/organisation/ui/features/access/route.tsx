@@ -187,7 +187,6 @@ export function AccessRoute(props: AccessRouteProps): React.ReactNode {
     (linkedHeldOutput !== closedHeldOutput ? linkedHeldOutput : null);
   const aiBudgetRaise =
     new URLSearchParams(location.search).get("aiBudget") === "raise";
-  const emptyMessage = emptySubviewMessage(props.subview, view);
   const busy = mutation.kind === "busy";
   const destinations = destinationOptions(subjects);
   return (
@@ -327,8 +326,6 @@ export function AccessRoute(props: AccessRouteProps): React.ReactNode {
           )}
           loadingMore={loadingMore === "grants"}
         />
-      ) : emptyMessage !== null ? (
-        <AccessEmptyState subview={props.subview} message={emptyMessage} />
       ) : props.subview === "capabilities" ? (
         <CapabilityListView
           view={view}
@@ -375,8 +372,8 @@ export function AccessRoute(props: AccessRouteProps): React.ReactNode {
       {props.subview === "data_flow" && selectedSources.size > 0 ? (
         <div className="access35-combined-check">
           <p>
-            {selectedSources.size} protected{" "}
-            {selectedSources.size === 1 ? "source" : "sources"} selected.
+            {selectedSources.size}{" "}
+            {selectedSources.size === 1 ? "source" : "sources"} selected
           </p>
           <button
             type="button"
@@ -634,60 +631,6 @@ async function readOptionsOrFallback(
     return { ok: true, value: fallback };
   }
   return result;
-}
-
-function emptySubviewMessage(
-  subview: AccessSubview,
-  view: AccessControlView,
-): string | null {
-  switch (subview) {
-    case "access":
-      return view.grants.items.length === 0
-        ? "No access grants are configured for this workspace yet."
-        : null;
-    case "capabilities":
-      return view.capabilities.length === 0
-        ? "No capabilities are available for this workspace yet."
-        : null;
-    case "data_flow":
-      return view.sourceFlowPolicies.items.length === 0
-        ? "No protected information sources are configured for this workspace yet."
-        : null;
-    default:
-      return assertNever(subview, "Unhandled access subview");
-  }
-}
-
-function AccessEmptyState(
-  props: Readonly<{
-    subview: AccessSubview;
-    message: string;
-  }>,
-): React.ReactNode {
-  return (
-    <section
-      className="portal-band access35-empty-state"
-      aria-labelledby="access35-empty-state-title"
-    >
-      <h2 id="access35-empty-state-title">
-        {emptySubviewTitle(props.subview)}
-      </h2>
-      <p>{props.message}</p>
-    </section>
-  );
-}
-
-function emptySubviewTitle(subview: AccessSubview): string {
-  switch (subview) {
-    case "access":
-      return "No access grants yet";
-    case "capabilities":
-      return "No capabilities yet";
-    case "data_flow":
-      return "No protected sources yet";
-    default:
-      return assertNever(subview, "Unhandled access subview");
-  }
 }
 
 function accessFailure(): AccessError {

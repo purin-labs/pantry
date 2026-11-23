@@ -151,14 +151,17 @@ window.fetch = async (input, init) => {
 
 function Page(props: {
   readonly title: string;
-  readonly description: string;
+  /** Billing shows its title alone, as in the Portal. */
+  readonly description?: string;
   readonly children: React.ReactNode;
 }): React.ReactNode {
   return (
     <main style={{ padding: 24 }}>
       <header style={{ marginBlockEnd: 16 }}>
         <h1 style={{ margin: 0 }}>{props.title}</h1>
-        <p style={{ margin: "4px 0 0" }}>{props.description}</p>
+        {props.description === undefined ? null : (
+          <p style={{ margin: "4px 0 0" }}>{props.description}</p>
+        )}
       </header>
       {props.children}
     </main>
@@ -190,10 +193,7 @@ createRoot(root).render(
         <Route
           path="/billing"
           element={
-            <Page
-              title="Billing"
-              description="See the Jev use of this month, paid use and the monthly spending limit."
-            >
+            <Page title="Billing">
               <BillingRoute
                 organisationId="organisation_jev_preview"
                 isOwner={owner}

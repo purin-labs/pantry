@@ -1,0 +1,10 @@
+/* Billing's labels are longer than those of Jev: the label column is wider. */
+.billing-page .jev-facts > div {
+  grid-template-columns: minmax(170px, 14rem) minmax(0, 1fr);
+}
+
+@media (max-width: 560px) {
+  .billing-page .jev-facts > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

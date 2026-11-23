@@ -43,9 +43,8 @@ export function WorkspaceSettingsPage(
         <div>
           <h2 id="lifecycle-title">Archive workspace</h2>
           <p>
-            Archiving disconnects Shopify, Stripe, and Slack immediately and
-            stops workspace updates. You can restore the workspace until data
-            deletion starts.
+            Archive disconnects Shopify, Stripe and Slack at once and stops
+            updates. You can restore it until data deletion starts.
           </p>
         </div>
         {props.organisation.lifecycle === "archived" ? (
@@ -76,10 +75,7 @@ export function WorkspaceSettingsPage(
     <>
       <section className="portal-band" aria-labelledby="team-title">
         <div className="section-heading">
-          <div>
-            <h2 id="team-title">Members and roles</h2>
-            <p>Workspace roles control setup and daily operations.</p>
-          </div>
+          <h2 id="team-title">Members</h2>
         </div>
         <div className="account-list">
           {renderOrganisationMembers(
@@ -93,20 +89,20 @@ export function WorkspaceSettingsPage(
             props.organisation.role === "owner",
             props.feedback,
           )}
+          {renderOrganisationInvitations(
+            props.invitations,
+            props.actions.revokeInvitation,
+            props.mutations,
+            props.pendingConfirm,
+            props.requestConfirm,
+            props.canManage,
+            props.feedback,
+          )}
         </div>
-        {renderOrganisationInvitations(
-          props.invitations,
-          props.actions.revokeInvitation,
-          props.mutations,
-          props.pendingConfirm,
-          props.requestConfirm,
-          props.canManage,
-          props.feedback,
-        )}
         {props.canManage ? (
           <form className="inline-form" onSubmit={props.actions.inviteMember}>
             <label>
-              <span>Google account email</span>
+              <span>Google account</span>
               <input name="email" type="email" required />
             </label>
             <label>
@@ -129,13 +125,12 @@ export function WorkspaceSettingsPage(
                 kind: "invite_member",
               })}
             >
-              Invite member
+              Invite
             </button>
             {renderMutationFeedback(props.feedback, { kind: "invite_member" })}
             <p className="notice-text">
-              Share the invitation link with the invited person. They must sign
-              in with this Google account and accept the invitation. The link
-              expires after 7 days.
+              Share the invitation link. It works for 7 days, for this Google
+              account only.
             </p>
           </form>
         ) : null}
@@ -197,7 +192,7 @@ function renderOrganisationMember(
         <strong>{member.displayName}</strong>
         <small>{member.email}</small>
         {editable && isFinalOwner ? (
-          <small>Keep at least one owner in this workspace.</small>
+          <small>Keep at least one owner.</small>
         ) : null}
         {canManage && !editable ? (
           <small>Only an owner can change an owner.</small>
@@ -229,8 +224,9 @@ function renderOrganisationMember(
             requestConfirm={controls.requestConfirm}
             onConfirmed={remove}
             disabled={rowBusy || isFinalOwner}
-            label="Remove member"
-            confirmLabel="Confirm member removal"
+            label="Remove"
+            confirmLabel="Confirm removal"
+            name={member.displayName}
             data={{ "control-identity-id": member.userId }}
           />
         </div>
@@ -254,16 +250,12 @@ function renderOrganisationInvitations(
   canManage: boolean,
   feedback: SettingsMutationFeedback,
 ): React.ReactNode {
-  const pending = invitations.filter(isPendingInvitation);
-  if (pending.length === 0) return null;
   const controls = { mutations, pendingConfirm, requestConfirm, feedback };
-  return (
-    <div className="account-list" aria-label="Pending invitations">
-      {pending.map(
-        renderOrganisationInvitationRow.bind(null, revoke, controls, canManage),
-      )}
-    </div>
-  );
+  return invitations
+    .filter(isPendingInvitation)
+    .map(
+      renderOrganisationInvitationRow.bind(null, revoke, controls, canManage),
+    );
 }
 
 function renderOrganisationInvitationRow(
@@ -282,8 +274,8 @@ function renderOrganisationInvitationRow(
       <span>
         <strong>{invitation.invitedEmail}</strong>
         <small>
-          Pending {formatControlRole(invitation.role)} invitation · requires
-          acceptance when they sign in with this Google account
+          Invited as {formatControlRole(invitation.role)} · until{" "}
+          {formatInvitationExpiry(invitation.expiresAt)}
         </small>
       </span>
       {canManage ? (
@@ -298,6 +290,7 @@ function renderOrganisationInvitationRow(
           )}
           label="Revoke"
           confirmLabel="Confirm revoke"
+          name={invitation.invitedEmail}
           data={{ "invitation-id": invitation.organisationInvitationId }}
         />
       ) : null}
@@ -317,9 +310,12 @@ export function ConfirmButton(props: {
   readonly disabled: boolean;
   readonly label: string;
   readonly confirmLabel: string;
+  /** The row's name; the accessible name is the label and this name. */
+  readonly name?: string;
   readonly data: Readonly<Record<string, string>>;
 }): React.ReactNode {
   const confirming = props.pendingConfirm === props.confirmKey;
+  const label = confirming ? props.confirmLabel : props.label;
   const attributes: Record<string, string> = {};
   for (const [key, value] of Object.entries(props.data))
     attributes[`data-${key}`] = value;
@@ -329,6 +325,9 @@ export function ConfirmButton(props: {
       {...attributes}
       className={confirming ? "confirming" : undefined}
       aria-pressed={confirming}
+      aria-label={
+        props.name === undefined ? undefined : `${label} ${props.name}`
+      }
       disabled={props.disabled}
       onClick={
         confirming
@@ -340,7 +339,7 @@ export function ConfirmButton(props: {
             )
       }
     >
-      {confirming ? props.confirmLabel : props.label}
+      {label}
     </button>
   );
 }
@@ -382,4 +381,11 @@ function changeMemberRole(
   role: string | null,
 ): void {
   if (role !== null) void changeRole(userId, role);
+}
+
+function formatInvitationExpiry(expiresAt: number): string {
+  return new Date(expiresAt).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
 }

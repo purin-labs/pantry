@@ -1,55 +1,8 @@
-import React from "react";
-import { CheckCircle2, LockKeyhole, ShieldQuestion } from "lucide-react";
-
 import { providerLabel } from "@purin-labs/area-integrations/ui/integration-catalogue";
 import type {
   AccessControlCapabilityView,
   AccessControlGrantView,
 } from "@purin-labs/control-api/portal/access-models";
-
-export function Fact(
-  props: Readonly<{ label: string; value: string }>,
-): React.ReactNode {
-  return (
-    <div>
-      <dt>{props.label}</dt>
-      <dd>{props.value}</dd>
-    </div>
-  );
-}
-
-export function StatusIcon(
-  props: Readonly<{
-    status: AccessControlCapabilityView["availability"];
-  }>,
-): React.ReactNode {
-  switch (props.status) {
-    case "available":
-      return (
-        <CheckCircle2
-          className="access35-status-icon available"
-          aria-label="Available"
-          size={20}
-        />
-      );
-    case "needs_attention":
-      return (
-        <ShieldQuestion
-          className="access35-status-icon attention"
-          aria-label="Needs attention"
-          size={20}
-        />
-      );
-    case "unavailable":
-      return (
-        <LockKeyhole
-          className="access35-status-icon unavailable"
-          aria-label="Unavailable"
-          size={20}
-        />
-      );
-  }
-}
 
 export function riskLabel(
   risk: AccessControlGrantView["capability"]["risk"],

@@ -35,6 +35,7 @@ import { organisationPath, workspacePagePath } from "@purin-labs/ui/route";
 import { AgentModal } from "./agent-modal";
 import { AccountSetup, type AccountSetupListing } from "./account-onboarding";
 import { assertNever } from "@purin-labs/std";
+import "./organisations.css";
 
 type OrganisationWorkspaceListItem = {
   readonly workspaceId: string;
@@ -349,14 +350,16 @@ export function OrganisationListLoading(): React.ReactNode {
 }
 
 function OrganisationPage(props: {
+  /** The page's action, beside its title. */
+  readonly action?: React.ReactNode;
   readonly children: React.ReactNode;
 }): React.ReactNode {
   return (
     <div className="organisation-page">
-      <PageHeader
-        title="Organisations"
-        description="Open a workspace, or manage the organisations you belong to."
-      />
+      <div className="organisation-page-head">
+        <PageHeader title="Organisations" description={null} />
+        {props.action}
+      </div>
       {props.children}
     </div>
   );
@@ -381,25 +384,16 @@ export function OrganisationListPage(props: {
     </button>
   );
   return (
-    <OrganisationPage>
+    <OrganisationPage
+      action={props.organisations.length === 0 ? null : createButton}
+    >
       {props.notice}
-      <section
-        className="portal-band"
-        aria-labelledby="organisation-list-title"
-      >
-        <div className="organisation-list-heading">
-          <h2 id="organisation-list-title">Your organisations</h2>
-          {props.organisations.length === 0 ? null : createButton}
-        </div>
-        <div className="organisation-list">
-          {renderOrganisationList(
-            props.organisationActions,
-            props.refresh,
-            props.organisations,
-            createButton,
-          )}
-        </div>
-      </section>
+      {renderOrganisationList(
+        props.organisationActions,
+        props.refresh,
+        props.organisations,
+        createButton,
+      )}
       {props.supportTools === null ? null : (
         <WorkspaceSupportToolsPanel tools={props.supportTools} />
       )}
@@ -433,24 +427,19 @@ function renderOrganisationList(
 ): React.ReactNode {
   if (organisations.length === 0) {
     return (
-      <div className="empty-state organisation-setup-invitation">
+      <div className="organisation-empty">
         <strong>No organisations yet</strong>
-        <span>
-          Purin Pantry runs in an organisation that you own. Set it up in three
-          steps:
-        </span>
-        <ol className="organisation-setup-preview">
-          <li>Name your organisation</li>
-          <li>Pantry prepares it</li>
-          <li>Turn on Jev, or skip</li>
-        </ol>
         {createButton}
       </div>
     );
   }
-  return [...organisations]
-    .sort(compareArchivedLast)
-    .map(renderOrganisationListItem.bind(null, actions, refresh));
+  return (
+    <ul className="organisation-list" aria-label="Organisations">
+      {[...organisations]
+        .sort(compareArchivedLast)
+        .map(renderOrganisationListItem.bind(null, actions, refresh))}
+    </ul>
+  );
 }
 
 /** Archived organisations sink below the ones still in use; the order the
@@ -504,32 +493,24 @@ function OrganisationListRow(props: {
     kind: "idle",
   });
   const canManage = props.item.role === "owner";
-  const note = organisationLifecycleNote(props.item.lifecycle, canManage);
+  const facts = [
+    organisationRoleLabel(props.item.role),
+    organisationPlanLabel(props.item.plan),
+  ];
+  const lifecycle = organisationLifecycleNote(props.item.lifecycle);
+  if (lifecycle !== null) facts.push(lifecycle);
   return (
-    <article
-      className="organisation-card"
-      data-lifecycle={props.item.lifecycle}
-    >
-      <div className="organisation-card-head">
+    <li className="organisation-row" data-lifecycle={props.item.lifecycle}>
+      <div className="organisation-row-head">
         <Link
           className="organisation-row-link"
           to={organisationPath(props.item.organisationHandle)}
         >
-          <span
-            className="console-switcher-avatar console-switcher-organisation-avatar organisation-card-avatar"
-            aria-hidden="true"
-          />
-          <span className="organisation-card-copy">
+          <span className="organisation-row-copy">
             <strong>{props.item.name}</strong>
-            <small>
-              {organisationRoleLabel(props.item.role)} ·{" "}
-              {organisationPlanLabel(props.item.plan)}
-            </small>
+            <small>{facts.join(" · ")}</small>
           </span>
         </Link>
-        <span className={`lifecycle lifecycle-${props.item.lifecycle}`}>
-          {organisationLifecycleLabel(props.item.lifecycle)}
-        </span>
         {canManage ? (
           <details
             className="organisation-menu"
@@ -582,7 +563,6 @@ function OrganisationListRow(props: {
           </details>
         ) : null}
       </div>
-      {note === null ? null : <p className="organisation-card-note">{note}</p>}
       {renderOrganisationWorkspaces(props.item)}
       {renderOrganisationActionDialog(props, state, setState)}
       {state.kind === "busy" ? (
@@ -595,7 +575,7 @@ function OrganisationListRow(props: {
           {state.message}
         </p>
       ) : null}
-    </article>
+    </li>
   );
 }
 
@@ -889,27 +869,17 @@ function renderOrganisationWorkspaces(
   item: OrganisationListItem,
 ): React.ReactNode {
   if (item.lifecycle === "archived") return null;
-  if (item.workspaces.length === 0) {
-    return (
-      <p className="organisation-card-note">
-        {item.role === "owner" || item.role === "admin"
-          ? "No workspaces yet. Open the organisation to create one."
-          : "No workspaces yet."}
-      </p>
-    );
-  }
-  const labelId = `organisation-workspaces-${item.organisationId}`;
+  if (item.workspaces.length === 0)
+    return <p className="organisation-row-note">No workspaces yet.</p>;
   return (
-    <div className="organisation-card-workspaces">
-      <p className="eyebrow" id={labelId}>
-        Workspaces
-      </p>
-      <ul aria-labelledby={labelId}>
-        {item.workspaces.map(
-          renderOrganisationWorkspace.bind(null, item.organisationHandle),
-        )}
-      </ul>
-    </div>
+    <ul
+      className="organisation-row-workspaces"
+      aria-label={`Workspaces of ${item.name}`}
+    >
+      {item.workspaces.map(
+        renderOrganisationWorkspace.bind(null, item.organisationHandle),
+      )}
+    </ul>
   );
 }
 
@@ -926,10 +896,6 @@ function renderOrganisationWorkspace(
           "overview",
         )}
       >
-        <span
-          className="console-switcher-avatar console-switcher-workspace-avatar"
-          aria-hidden="true"
-        />
         <span>{workspace.name}</span>
         <ArrowRight size={16} strokeWidth={1.5} aria-hidden="true" />
       </Link>
@@ -937,19 +903,17 @@ function renderOrganisationWorkspace(
   );
 }
 
+/** The state of an organisation that is not active, or null. */
 function organisationLifecycleNote(
   lifecycle: OrganisationOnboardingLifecycle["kind"],
-  canManage: boolean,
 ): string | null {
   switch (lifecycle) {
     case "configuring":
-      return "Not activated yet. Open the organisation to finish setup.";
+      return "Setup not finished";
     case "activating":
-      return "Activation is in progress.";
+      return "Activating";
     case "archived":
-      return canManage
-        ? "Archived. Unarchive it from the menu to use it again."
-        : "Archived. Its owner can unarchive it.";
+      return "Archived";
     case "active":
       return null;
     default:
@@ -974,23 +938,6 @@ function organisationRoleLabel(role: OnboardingControlRole): string {
 
 function organisationPlanLabel(plan: string): string {
   return plan === "beta" ? "Beta" : "Organisation plan";
-}
-
-function organisationLifecycleLabel(
-  lifecycle: OrganisationOnboardingLifecycle["kind"],
-): string {
-  switch (lifecycle) {
-    case "configuring":
-      return "Configuring";
-    case "activating":
-      return "Activating";
-    case "active":
-      return "Active";
-    case "archived":
-      return "Archived";
-    default:
-      return assertNever(lifecycle, "Unhandled organisation value");
-  }
 }
 
 function WorkspaceSupportToolsPanel(props: {

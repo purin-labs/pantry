@@ -907,10 +907,7 @@ export function OperationalAreasSection(
       <div className="section-heading">
         <div>
           <h2 id="operational-areas-title">Operational areas</h2>
-          <p>
-            An area groups agent assignments. Its responsibility scopes tell
-            which records its agents work on.
-          </p>
+          <p>Each area groups agent work and the records it covers.</p>
         </div>
         {props.canConfigure ? (
           <div className="operational-areas-actions">
@@ -946,11 +943,11 @@ export function OperationalAreasSection(
       {props.snapshot.areas.length === 0 ? (
         <p className="empty-state">No operational areas yet.</p>
       ) : (
-        <div className="commerce-list">
+        <ul className="agent-rows">
           {props.snapshot.areas.map(
             renderArea.bind(null, props.snapshot.responsibilityScopes),
           )}
-        </div>
+        </ul>
       )}
       <SideDrawer
         open={props.canConfigure && drawer === "area"}
@@ -1221,15 +1218,12 @@ function hasAuthorablePublishedResource(
   );
 }
 
-function renderResponsibilityScope(
+/** A published scope is its label; an archived one says so. */
+function responsibilityScopeText(
   record: AgentOperationsSnapshot["responsibilityScopes"][number],
-): React.ReactNode {
-  return (
-    <li key={record.scopeId}>
-      {responsibilityScopeLabel(record.scope)} ·{" "}
-      {humanizeIdentifier(record.lifecycle)}
-    </li>
-  );
+): string {
+  const label = responsibilityScopeLabel(record.scope);
+  return record.lifecycle === "published" ? label : `${label} (archived)`;
 }
 
 function responsibilityScopeLabel(
@@ -1251,25 +1245,26 @@ function responsibilityScopeLabel(
   }
 }
 
+/** An area is one row: its name, its purpose and its scopes. */
 function renderArea(
   scopes: AgentOperationsSnapshot["responsibilityScopes"],
   area: OperationalArea,
 ): React.ReactNode {
   const areaScopes = scopes.filter((record) => record.areaId === area.areaId);
+  const facts = [
+    area.purpose,
+    areaScopes.length === 0
+      ? "No scopes"
+      : areaScopes.map(responsibilityScopeText).join(", "),
+  ];
+  if (area.lifecycle !== "active") facts.push(humanizeIdentifier(area.lifecycle));
   return (
-    <article className="commerce-card" key={area.areaId}>
-      <h3>{area.name}</h3>
-      <p>
-        {area.purpose} · {humanizeIdentifier(area.lifecycle)}
-      </p>
-      {areaScopes.length === 0 ? (
-        <p>No responsibility scopes yet.</p>
-      ) : (
-        <ul aria-label={`Responsibility scopes of ${area.name}`}>
-          {areaScopes.map(renderResponsibilityScope)}
-        </ul>
-      )}
-    </article>
+    <li className="agent-row" key={area.areaId}>
+      <div className="agent-row-main">
+        <h3>{area.name}</h3>
+        <p>{facts.join(" · ")}</p>
+      </div>
+    </li>
   );
 }
 

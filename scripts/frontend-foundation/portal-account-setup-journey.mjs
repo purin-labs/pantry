@@ -35,7 +35,10 @@ export async function runAccountSetupJourney(page, options) {
   await dialog
     .getByRole("heading", { name: "Name your organisation", exact: true })
     .waitFor();
-  await dialog.getByText("Step 1 of 4", { exact: true }).waitFor();
+  // The bar names the current step for a screen reader.
+  await dialog
+    .getByText("Organisation, current step", { exact: true })
+    .waitFor();
   await dialog
     .getByRole("button", { name: "Create organisation", exact: true })
     .click();
@@ -77,9 +80,7 @@ export async function runAccountSetupJourney(page, options) {
   await dialog
     .getByRole("button", { name: "Turn on Jev", exact: true })
     .click();
-  await dialog
-    .getByText("Some switches are not on.", { exact: false })
-    .waitFor();
+  await dialog.getByRole("button", { name: "Continue", exact: true }).waitFor();
   assertEqual(
     await dialog
       .getByText("Not on. Connect a Gmail mailbox first.", { exact: true })
@@ -477,8 +478,7 @@ function answerInvitation(invitation, route) {
   );
 }
 
-const JEV_STEP =
-  "Use Jev for mail sorting, related Cases and screen suggestions";
+const JEV_STEP = "Turn on Jev?";
 const JEV_FEATURES = [
   "mail_classification",
   "related_cases",
@@ -560,7 +560,7 @@ async function verifyOrganisationStartup(page, fixture, options) {
   await page.reload();
   await page.getByText("No organisations yet", { exact: true }).waitFor();
   await denied;
-  assertEqual(await page.locator(".organisation-card").count(), 0);
+  assertEqual(await page.locator(".organisation-row").count(), 0);
   const revoked = {
     requests: startup.requests,
     views: await page.evaluate(readStartupViews),
@@ -677,7 +677,7 @@ function installStartupObserver() {
 }
 
 function recordStartupView() {
-  if (document.querySelector(".organisation-card") !== null)
+  if (document.querySelector(".organisation-row") !== null)
     window.portalStartupOrganisationSeen = true;
   const skeleton = document.querySelector(".route-page-skeleton");
   const title = document.querySelector("h1");

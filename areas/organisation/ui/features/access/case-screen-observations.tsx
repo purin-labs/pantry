@@ -5,7 +5,7 @@ import type {
   AccessRouteTransport,
 } from "@purin-labs/control-api/portal/access-models";
 import { navigationGroupTitle } from "@purin-labs/ui/route";
-import { Select } from "@purin-labs/ui/select";
+import { CaseSelect } from "./case-select";
 import "./case-screen-observations.css";
 
 /**
@@ -83,31 +83,17 @@ export class CaseScreenObservations extends React.Component<Props, State> {
       >
         <h2 id="on-screen-title">On screen</h2>
         <p>
-          The pages that the agent of a Case received from a person's screen:
-          the page, the time and the records on it. Values on the page are not
-          shown here.
+          The pages that the agent of a Case got from a screen. Page values are
+          not shown.
         </p>
         <div className="access35-related-controls">
-          <label htmlFor="on-screen-selection">
-            Case
-            <Select.Root
-              items={[
-                { value: "", label: "Select a current Case" },
-                ...this.props.cases.map(caseItem),
-              ]}
-              value={state.caseRef}
-              onValueChange={this.select.bind(this)}
-              disabled={state.kind === "loading"}
-            >
-              <Select.Trigger id="on-screen-selection">
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Popup>
-                <Select.Item value="">Select a current Case</Select.Item>
-                {this.props.cases.map(renderCaseOption)}
-              </Select.Popup>
-            </Select.Root>
-          </label>
+          <CaseSelect
+            id="on-screen-selection"
+            cases={this.props.cases}
+            value={state.caseRef}
+            onChange={this.select.bind(this)}
+            disabled={state.kind === "loading"}
+          />
         </div>
         {renderState(state)}
       </section>
@@ -162,23 +148,5 @@ function renderObservation(
               .join("; ")}
       </span>
     </li>
-  );
-}
-
-function caseItem(
-  option: AccessControlOption,
-): Readonly<{ value: string; label: string }> {
-  return { value: option.refId, label: option.label };
-}
-
-function renderCaseOption(option: AccessControlOption): React.ReactNode {
-  return (
-    <Select.Item
-      key={option.refId}
-      value={option.refId}
-      disabled={option.revision === null}
-    >
-      {option.label}
-    </Select.Item>
   );
 }

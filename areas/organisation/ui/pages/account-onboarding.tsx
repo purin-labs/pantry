@@ -1,5 +1,5 @@
 import React from "react";
-import { Check, CircleAlert } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 import { Link } from "react-router";
 import {
   ORGANISATION_NAME_MAX,
@@ -237,7 +237,7 @@ function createFailure(
         step: "prepare",
         title: "The setup stopped",
         reason,
-        next: "Try again to continue the same setup. Pantry does not make a second organisation.",
+        next: "Pantry does not make a second organisation.",
         detail,
         action: "Try again",
         signIn: true,
@@ -640,9 +640,9 @@ function renderSetupStep(
       aria-current={index === current ? "step" : undefined}
     >
       <span className="account-setup-step-bar" aria-hidden="true" />
-      <span className="account-setup-step-label">
+      <span className="visually-hidden">
         {step.label}
-        <span className="visually-hidden">{STEP_STATE_TEXT[state]}</span>
+        {STEP_STATE_TEXT[state]}
       </span>
     </li>
   );
@@ -682,7 +682,7 @@ export function AccountSetupDialog(props: {
     <AgentModal
       className="account-setup-modal"
       title="Set up Purin Pantry"
-      description={`Step ${stepIndex(viewStep(props.view)) + 1} of ${STEPS.length}`}
+      description={null}
       close={props.actions.close}
       footer={setupFooter(props.view, props.actions)}
     >
@@ -697,14 +697,16 @@ export function AccountSetupDialog(props: {
 function SetupIntro(props: {
   readonly heading: React.RefObject<HTMLHeadingElement | null>;
   readonly title: string;
-  readonly lead: string;
+  readonly lead: string | null;
 }): React.ReactNode {
   return (
     <div className="account-setup-intro">
       <h4 ref={props.heading} tabIndex={-1} className="account-setup-heading">
         {props.title}
       </h4>
-      <p className="account-setup-lead">{props.lead}</p>
+      {props.lead === null ? null : (
+        <p className="account-setup-lead">{props.lead}</p>
+      )}
     </div>
   );
 }
@@ -747,13 +749,10 @@ function setupBody(
     case "done":
       return (
         <div className="account-setup-result">
-          <span className="account-setup-result-mark" aria-hidden="true">
-            <Check size={22} strokeWidth={2.25} />
-          </span>
           <SetupIntro
             heading={heading}
             title="Purin Pantry is ready"
-            lead={`${view.name} is in your organisation list. Open it to start.`}
+            lead={`${view.name} is in your organisation list.`}
           />
         </div>
       );
@@ -809,11 +808,11 @@ function OrganisationName(props: {
       <SetupIntro
         heading={props.heading}
         title="Name your organisation"
-        lead="Purin Pantry makes a new organisation for your shop. You become its owner."
+        lead="You become its owner."
       />
       <div className="account-setup-name">
         <label>
-          <span>Organisation name</span>
+          <span className="visually-hidden">Organisation name</span>
           <input
             ref={input}
             name="organisationName"
@@ -847,15 +846,9 @@ function SetupProgress(props: {
     <>
       <SetupIntro
         heading={props.heading}
-        title="Purin Pantry prepares your organisation"
-        lead="This takes a few seconds. Keep this window open to see the result."
+        title={`Pantry prepares ${props.name}`}
+        lead={null}
       />
-      <dl className="account-setup-summary">
-        <div>
-          <dt>Organisation</dt>
-          <dd>{props.name}</dd>
-        </div>
-      </dl>
       <div className="account-setup-progress-block">
         <div
           className="account-setup-progress"
@@ -873,8 +866,8 @@ function SetupProgress(props: {
         </div>
       </div>
       <p className="account-setup-note">
-        If you close this window, Pantry continues the setup when you open this
-        page again.
+        You can close this window. The setup goes on when you open this page
+        again.
       </p>
     </>
   );

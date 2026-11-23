@@ -1,4 +1,3 @@
-import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import type {
   CaseContextCollectionMetadataView,
@@ -6,6 +5,7 @@ import type {
   CaseContextCollectionRelationshipView,
 } from "@purin-labs/control-api";
 import type { AccessControlOption, AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
+import { CaseSelect } from "./case-select";
 
 type Props = Readonly<{
   organisationId: string;
@@ -193,37 +193,23 @@ export class RelatedCases extends React.Component<Props, State> {
         aria-labelledby="related-cases-title"
       >
         <h2 id="related-cases-title">Related Cases</h2>
-        <p>
-          Review links between Cases you can read. Confirming a link preserves
-          existing source permissions.
-        </p>
+        <p>A confirmed link keeps the permissions of each source.</p>
         <div className="access35-related-controls">
-          <label htmlFor="related-cases-selection">
-            Case
-            <Select.Root
-              items={[
-                { value: "", label: "Select a current Case" },
-                ...this.props.cases.map(caseItem),
-              ]}
-              value={state.caseRef}
-              onValueChange={this.select.bind(this)}
-              disabled={busy}
-            >
-              <Select.Trigger id="related-cases-selection" ref={this.selection}>
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Popup>
-                <Select.Item value="">Select a current Case</Select.Item>
-                {this.props.cases.map(renderCaseOption)}
-              </Select.Popup>
-            </Select.Root>
-          </label>
+          <CaseSelect
+            id="related-cases-selection"
+            cases={this.props.cases}
+            value={state.caseRef}
+            onChange={this.select.bind(this)}
+            disabled={busy}
+            triggerRef={this.selection}
+          />
           <button
             type="button"
+            aria-label="Reload Related Cases"
             onClick={this.refresh.bind(this)}
             disabled={busy || state.caseRef === ""}
           >
-            Reload Related Cases
+            Reload
           </button>
         </div>
         <p role="status">{relatedCasesStatus(state)}</p>
@@ -251,20 +237,4 @@ function caseHasReference(
   option: AccessControlOption,
 ): boolean {
   return option.refId === reference;
-}
-function caseItem(
-  option: AccessControlOption,
-): Readonly<{ value: string; label: string }> {
-  return { value: option.refId, label: option.label };
-}
-function renderCaseOption(option: AccessControlOption): React.ReactNode {
-  return (
-    <Select.Item
-      key={option.refId}
-      value={option.refId}
-      disabled={option.revision === null}
-    >
-      {option.label}
-    </Select.Item>
-  );
 }

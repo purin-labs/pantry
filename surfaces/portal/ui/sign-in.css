@@ -1,0 +1,38 @@
+/* The sign-in page: one centred panel, the layout of the load failure page
+   (.auth-status-shell and .auth-status-panel). */
+.signin-panel {
+  display: grid;
+  gap: 20px;
+}
+
+.signin-panel h1 {
+  margin: 0;
+}
+
+.signin-mark {
+  display: block;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.signin-panel .signin-button {
+  width: 100%;
+  min-height: 50px;
+  gap: 12px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.google-mark {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.signin-note {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.5;
+}
