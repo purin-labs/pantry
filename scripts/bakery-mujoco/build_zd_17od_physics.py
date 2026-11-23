@@ -1,4 +1,6 @@
-"""Build and verify the MuJoCo mechanical and active-state model for the WPM ZD-17OD."""
+"""Build and verify the MuJoCo 4.0 mechanical and active-state model for the WPM ZD-17OD."""
+
+from __future__ import annotations
 
 import csv
 import hashlib
@@ -9,11 +11,29 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from appliance_physics_kit import (
+    BLENDER_BIN,
+    COL_ACCESSORY_RGBA,
+    COL_ARTIC_RGBA,
+    COL_BASE_RGBA,
+    COL_WALL_RGBA,
+    ROOT,
+    SITE_GRASP_RGBA,
+    SITE_SUPPORT_RGBA,
+    Y_AXIS_QUAT,
+    add_adjacent_excludes,
+    add_standard_defaults,
+    emit_standalone_models,
+    export_and_verify_native_xml as kit_export_native_xml,
+    numbers,
+    prepare_blender_assembly,
+    verify_frames_and_motions as kit_verify_frames_and_motions,
+    write_xml,
+)
+
 NAME = "wpm-zd-17od"
 ASSETS = ROOT / "assets/bakery-mujoco" / NAME
-BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
-VENV_PYTHON = ROOT / "scripts/bakery-mujoco/.venv/bin/python"
 
 NAMES = (
     "zd17_grinder",
@@ -69,67 +89,15 @@ SCALAR_VISUAL_AXES = {
 }
 
 
-def numbers(values):
-    return " ".join(f"{value:.9g}" for value in values)
-
-
-def write_xml(path: Path, element: ET.Element):
-    ET.indent(element, space="  ")
-    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
-
-
 def export_blender_meshes_and_xml():
-    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml + scene.xml."""
-    import bpy
-
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from build_oven_visuals import export_visual_meshes
-
+    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml + scene.xml + model.xml."""
     source = ASSETS / f"{NAME}.blend"
-    bpy.ops.wm.open_mainfile(filepath=str(source))
-    bpy.context.scene.frame_set(1)
-    bpy.context.view_layer.update()
-
-    parts = [bpy.data.objects[name] for name in NAMES]
-    poses = {obj.name: obj.matrix_world.copy() for obj in parts}
-
-    # Reparent every child mesh under the root to its nearest articulated ancestor in NAMES (preserving matrix_world)
-    for obj in list(parts[0].children_recursive):
-        if obj.type != "MESH" and obj not in parts:
-            continue
-        parent = obj.parent
-        while parent is not None and parent not in parts:
-            parent = parent.parent
-        if parent is None:
-            continue
-        pose = obj.matrix_world.copy()
-        obj.animation_data_clear()
-        obj.parent = parent
-        obj.matrix_world = pose
-        if obj.type == "MESH" and len(obj.data.vertices) >= 3:
-            xs = [v.co.x for v in obj.data.vertices]
-            ys = [v.co.y for v in obj.data.vertices]
-            zs = [v.co.z for v in obj.data.vertices]
-            if max(zs) - min(zs) < 1e-5:
-                obj.data.vertices[0].co.z += 2e-5
-                obj.data.update()
-            if max(ys) - min(ys) < 1e-5:
-                obj.data.vertices[0].co.y += 2e-5
-                obj.data.update()
-            if max(xs) - min(xs) < 1e-5:
-                obj.data.vertices[0].co.x += 2e-5
-                obj.data.update()
-    bpy.context.view_layer.update()
-
-    for mat in bpy.data.materials:
-        if "metallic" not in mat:
-            mat["metallic"] = 0.0
-        if "roughness" not in mat:
-            mat["roughness"] = 0.35
-        if "emission" not in mat:
-            mat["emission"] = 0.0
-
-    export_visual_meshes(parts, ASSETS)
+    parts, poses = prepare_blender_assembly(
+        source,
+        NAMES,
+        ASSETS,
+        default_roughness=0.35,
+    )
 
     grinder_mass_sum = round(sum(MASSES[k] for k in GRINDER_BODY_NAMES), 6)
     assert grinder_mass_sum == 3.800, f"Expected 3.800 kg grinder mass, got {grinder_mass_sum}"
@@ -142,13 +110,12 @@ def export_blender_meshes_and_xml():
     ET.SubElement(app, "option", timestep="0.002", integrator="implicitfast")
     ET.SubElement(app, "size", nuserdata="8")
 
-    defaults = ET.SubElement(app, "default")
-    ET.SubElement(
-        defaults,
-        "geom",
-        friction="0.65 0.005 0.0001",
-        solref="0.003 1",
-        solimp="0.96 0.995 0.001",
+    defaults = add_standard_defaults(
+        app,
+        friction="0.65 0.015 0.003",
+        solref="0.004 1",
+        solimp="0.95 0.99 0.001",
+        condim="4",
     )
 
     asset = ET.SubElement(app, "asset")
@@ -163,7 +130,7 @@ def export_blender_meshes_and_xml():
         size="1.2 1.2 0.05",
         rgba="0.28 0.30 0.33 1",
         contype="1",
-        conaffinity="3",
+        conaffinity="1",
         group="2",
     )
 
@@ -209,12 +176,12 @@ def export_blender_meshes_and_xml():
     lid = bodies["zd17_hopper_lid"]
     pf = bodies["zd17_portafilter"]
 
-    # Four rubber feet collision cylinders touching Z = 0.000 m
+    # Four rubber feet collision cylinders touching Z = 0.000 m (aligned to visual anti-slip elastomer pads)
     for foot_name, fx, fy in (
-        ("zd17_foot_fl_col", -0.0460, -0.0950),
-        ("zd17_foot_fr_col", 0.0460, -0.0950),
-        ("zd17_foot_rl_col", -0.0460, 0.0950),
-        ("zd17_foot_rr_col", 0.0460, 0.0950),
+        ("zd17_foot_fl_col", -0.0450, -0.0880),
+        ("zd17_foot_fr_col", 0.0450, -0.0880),
+        ("zd17_foot_rl_col", -0.0450, 0.0940),
+        ("zd17_foot_rr_col", 0.0450, 0.0940),
     ):
         ET.SubElement(
             base,
@@ -223,20 +190,26 @@ def export_blender_meshes_and_xml():
             type="cylinder",
             pos=numbers((fx, fy, 0.0030)),
             size="0.0110 0.0030",
-            contype="2",
+            contype="1",
             conaffinity="1",
             group="3",
-            mass="0",
+            rgba=COL_BASE_RGBA,
         )
 
-    # Grinder plinth, tower, chute, and hands-free portafilter fork support shelves (top at exact Z = 0.1120 m)
-    for cname, cpos, csize in (
-        ("zd17_plinth_col", (0.0, 0.0, 0.0170), (0.0625, 0.1175, 0.0110)),
-        ("zd17_tower_col", (0.0, 0.0360, 0.1440), (0.0580, 0.0780, 0.1140)),
-        ("zd17_hopper_col", (0.0, 0.0200, 0.3420), (0.0480, 0.0480, 0.0580)),
-        ("zd17_fork_left_shelf_col", (-0.0320, -0.0840, 0.1085), (0.0060, 0.0330, 0.0035)),
-        ("zd17_fork_right_shelf_col", (0.0320, -0.0840, 0.1085), (0.0060, 0.0330, 0.0035)),
-        ("zd17_fork_backstop_col", (0.0, -0.0465, 0.1260), (0.0280, 0.0025, 0.0160)),
+    # Grinder plinth, front catch tray, tower (recessed central bay behind fork), side cheeks,
+    # and hands-free portafilter fork support shelves (top at exact Z = 0.1120 m)
+    for cname, cpos, csize, crgba in (
+        ("zd17_plinth_col", (0.0, 0.0, 0.0155), (0.0625, 0.1175, 0.0100), COL_BASE_RGBA),
+        ("zd17_front_tray_col", (0.0, -0.0820, 0.0435), (0.0530, 0.0340, 0.0185), COL_BASE_RGBA),
+        ("zd17_tower_col", (0.0, 0.0368, 0.1405), (0.0615, 0.0808, 0.1155), COL_BASE_RGBA),
+        ("zd17_tower_cheek_left_col", (-0.0520, -0.0494, 0.1405), (0.0095, 0.0054, 0.1155), COL_BASE_RGBA),
+        ("zd17_tower_cheek_right_col", (0.0520, -0.0494, 0.1405), (0.0095, 0.0054, 0.1155), COL_BASE_RGBA),
+        ("zd17_fork_left_shelf_col", (-0.0320, -0.0800, 0.1080), (0.0060, 0.0360, 0.0040), COL_WALL_RGBA),
+        ("zd17_fork_right_shelf_col", (0.0320, -0.0800, 0.1080), (0.0060, 0.0360, 0.0040), COL_WALL_RGBA),
+        ("zd17_fork_rail_left_col", (-0.0392, -0.0760, 0.1125), (0.0018, 0.0320, 0.0043), COL_WALL_RGBA),
+        ("zd17_fork_rail_right_col", (0.0392, -0.0760, 0.1125), (0.0018, 0.0320, 0.0043), COL_WALL_RGBA),
+        ("zd17_fork_backstop_col", (0.0, -0.0465, 0.1260), (0.0280, 0.0025, 0.0160), COL_WALL_RGBA),
+        ("zd17_hopper_gate_col", (0.0405, 0.0200, 0.2880), (0.0190, 0.0135, 0.0040), COL_WALL_RGBA),
     ):
         ET.SubElement(
             base,
@@ -245,20 +218,41 @@ def export_blender_meshes_and_xml():
             type="box",
             pos=numbers(cpos),
             size=numbers(csize),
-            contype="2",
+            contype="1",
             conaffinity="1",
             group="3",
-            mass="0",
+            rgba=crgba,
         )
 
-    # Operational sites on zd17_grinder
+    # Cylindrical grounds chute, hopper neck, lower funnel, and upper bean hopper drum (top Z = 0.4020 m)
+    for cname, cpos, csize, crgba in (
+        ("zd17_chute_col", (0.0, -0.0560, 0.1765), (0.0285, 0.0175), COL_BASE_RGBA),
+        ("zd17_upper_neck_col", (0.0, 0.0200, 0.2705), (0.0390, 0.0150), COL_BASE_RGBA),
+        ("zd17_hopper_funnel_col", (0.0, 0.0200, 0.2993), (0.0535, 0.0148), COL_WALL_RGBA),
+        ("zd17_hopper_drum_col", (0.0, 0.0200, 0.3570), (0.0596, 0.0450), COL_WALL_RGBA),
+    ):
+        ET.SubElement(
+            base,
+            "geom",
+            name=cname,
+            type="cylinder",
+            pos=numbers(cpos),
+            size=numbers(csize),
+            contype="1",
+            conaffinity="1",
+            group="3",
+            rgba=crgba,
+        )
+
+    # Operational sites on zd17_grinder (group 4, visible semi-transparent rgba)
     ET.SubElement(
         base,
         "site",
         name="zd17_chute_exit_site",
         pos="0 -0.0840 0.1550",
         size="0.004",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         base,
@@ -266,7 +260,8 @@ def export_blender_meshes_and_xml():
         name="zd17_fork_seat_site",
         pos="0 -0.0840 0.1260",
         size="0.004",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         base,
@@ -275,7 +270,8 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 -0.0840 0.1120",
         size="0.0400 0.0350 0.0025",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
 
     # 1. zd17_collar: stepless grind adjustment collar (hinge zd17_collar_dial, axis 0 0 1, range 0 .. 5.236 rad)
@@ -289,43 +285,47 @@ def export_blender_meshes_and_xml():
         range="0 5.236",
         damping="0.35",
         armature="0.003",
+        frictionloss="0.15",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         collar,
         "geom",
         name="zd17_collar_col",
         type="cylinder",
-        pos="0 0 0.0020",
-        size="0.0450 0.0090",
-        contype="0",
-        conaffinity="0",
+        pos="0 0 -0.0028",
+        size="0.0503 0.0092",
+        contype="1",
+        conaffinity="1",
         group="3",
-        mass="0",
+        rgba=COL_ARTIC_RGBA,
     )
 
-    # 2. zd17_burr_rotor: 40 mm stainless conical burr (hinge zd17_burr_spin, axis 0 0 1, range -1000 .. 1000 rad)
+    # 2. zd17_burr_rotor: 40 mm stainless conical burr (continuous hinge zd17_burr_spin, axis 0 0 1, unlimited)
     ET.SubElement(
         burr,
         "joint",
         name="zd17_burr_spin",
         type="hinge",
         axis="0 0 1",
-        limited="true",
-        range="-1000 1000",
+        limited="false",
         damping="0.0025",
         armature="0.0006",
+        frictionloss="0.01",
+        solreffriction="0.004 1",
     )
     ET.SubElement(
         burr,
         "geom",
         name="zd17_burr_col",
         type="cylinder",
-        pos="0 0 0.0035",
-        size="0.0195 0.0100",
-        contype="0",
-        conaffinity="0",
+        pos="0 0 0.0070",
+        size="0.0205 0.0150",
+        contype="1",
+        conaffinity="1",
         group="3",
-        mass="0",
+        rgba=COL_ARTIC_RGBA,
     )
 
     # 3. zd17_pf_trigger: microswitch button behind fork (slide zd17_trigger_press, axis 0 1 0, range 0 .. 0.006 m)
@@ -340,18 +340,19 @@ def export_blender_meshes_and_xml():
         stiffness="38.0",
         damping="0.60",
         armature="0.001",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         trig,
         "geom",
         name="zd17_trigger_col",
         type="box",
-        pos="0 -0.0040 0",
-        size="0.0065 0.0040 0.0065",
-        contype="0",
-        conaffinity="0",
+        pos="0 0.0152 0.0080",
+        size="0.0058 0.0098 0.0058",
+        contype="1",
+        conaffinity="1",
         group="3",
-        mass="0",
+        rgba=COL_ARTIC_RGBA,
     )
 
     # 4. zd17_hopper_lid: dark-tinted hopper lid (slide zd17_lid_lift, axis 0 0 1, range 0 .. 0.060 m)
@@ -365,18 +366,21 @@ def export_blender_meshes_and_xml():
         range="0 0.060",
         damping="1.80",
         armature="0.002",
+        frictionloss="1.15",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         lid,
         "geom",
         name="zd17_lid_col",
         type="cylinder",
-        pos="0 0 0.0020",
-        size="0.0595 0.0040",
-        contype="2",
+        pos="0 0 0.0015",
+        size="0.0600 0.0065",
+        contype="1",
         conaffinity="1",
         group="3",
-        mass="0",
+        rgba=COL_ARTIC_RGBA,
     )
 
     # 5. zd17_portafilter: 58 mm stainless double-spout portafilter (freejoint zd17_portafilter_free)
@@ -385,26 +389,86 @@ def export_blender_meshes_and_xml():
         pf,
         "geom",
         name="zd17_pf_head_col",
-        type="box",
-        pos="0 0 -0.0110",
-        size="0.0355 0.0310 0.0030",
+        type="cylinder",
+        pos="0 0 0",
+        size="0.0350 0.0140",
         contype="1",
-        conaffinity="2",
+        conaffinity="1",
         group="3",
-        mass="0",
+        rgba=COL_ACCESSORY_RGBA,
+    )
+    ET.SubElement(
+        pf,
+        "geom",
+        name="zd17_pf_bayonet_ears_col",
+        type="box",
+        pos="0 0 0.0105",
+        size="0.0395 0.0090 0.0024",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ACCESSORY_RGBA,
+    )
+    ET.SubElement(
+        pf,
+        "geom",
+        name="zd17_pf_spout_manifold_col",
+        type="box",
+        pos="0 0 -0.0175",
+        size="0.0160 0.0070 0.0035",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ACCESSORY_RGBA,
+    )
+    ET.SubElement(
+        pf,
+        "geom",
+        name="zd17_pf_spout_left_col",
+        type="cylinder",
+        pos="-0.0125 -0.0020 -0.0235",
+        size="0.0048 0.0045",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ACCESSORY_RGBA,
+    )
+    ET.SubElement(
+        pf,
+        "geom",
+        name="zd17_pf_spout_right_col",
+        type="cylinder",
+        pos="0.0125 -0.0020 -0.0235",
+        size="0.0048 0.0045",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ACCESSORY_RGBA,
+    )
+    ET.SubElement(
+        pf,
+        "geom",
+        name="zd17_pf_neck_col",
+        type="box",
+        pos="0 -0.0440 0.0010",
+        size="0.0085 0.0120 0.0085",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ACCESSORY_RGBA,
     )
     ET.SubElement(
         pf,
         "geom",
         name="zd17_pf_handle_col",
         type="cylinder",
-        pos="0 -0.1080 0",
-        quat="0.70710678 0.70710678 0 0",
-        size="0.0130 0.0520",
+        pos="0 -0.1108 0",
+        quat=Y_AXIS_QUAT,
+        size="0.0135 0.0558",
         contype="1",
-        conaffinity="2",
+        conaffinity="1",
         group="3",
-        mass="0",
+        rgba=COL_ACCESSORY_RGBA,
     )
     ET.SubElement(
         pf,
@@ -412,7 +476,8 @@ def export_blender_meshes_and_xml():
         name="vessel_socket",
         pos="0 -0.1080 0",
         size="0.005",
-        group="3",
+        group="4",
+        rgba=SITE_GRASP_RGBA,
     )
     ET.SubElement(
         pf,
@@ -420,7 +485,8 @@ def export_blender_meshes_and_xml():
         name="zd17_pf_basket_center",
         pos="0 0 0",
         size="0.004",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     payload = ET.SubElement(pf, "body", name="ingredient_payload", pos="0 0 0")
     ET.SubElement(
@@ -442,6 +508,18 @@ def export_blender_meshes_and_xml():
         group="2",
         rgba="0.28 0.16 0.09 0",
         mass="0",
+    )
+
+    # Adjacent articulated-body contact exclusions (zd17_portafilter stays UN-excluded for fork contact)
+    contact = add_adjacent_excludes(
+        app,
+        (
+            ("exclude_grinder_collar", "zd17_grinder", "zd17_collar"),
+            ("exclude_grinder_burr", "zd17_grinder", "zd17_burr_rotor"),
+            ("exclude_grinder_trigger", "zd17_grinder", "zd17_pf_trigger"),
+            ("exclude_grinder_lid", "zd17_grinder", "zd17_hopper_lid"),
+            ("exclude_collar_burr", "zd17_collar", "zd17_burr_rotor"),
+        ),
     )
 
     # Actuators
@@ -480,8 +558,8 @@ def export_blender_meshes_and_xml():
         "position",
         name="zd17_lid_actuator",
         joint="zd17_lid_lift",
-        kp="420",
-        kv="12.0",
+        kp="750",
+        kv="16.0",
         ctrlrange="0 0.060",
         forcerange="-25 25",
     )
@@ -520,6 +598,18 @@ def export_blender_meshes_and_xml():
     ET.SubElement(scene_world, "light", pos="-0.8 -1.4 1.8", dir="0.35 0.6 -0.8")
     write_xml(ASSETS / "scene.xml", scene)
 
+    emit_standalone_models(
+        ASSETS,
+        model_name="zd17_grinder",
+        defaults=defaults,
+        asset=asset,
+        root_body=base,
+        contact=contact,
+        sensors=sensors,
+        exclude_sensors=("zd17_pf_relpos", "zd17_burr_torque"),
+        accessories=(("portafilter_model.xml", "zd17_portafilter", pf),),
+    )
+
     (ASSETS / "physics-export.json").write_text(
         json.dumps(
             {
@@ -532,7 +622,7 @@ def export_blender_meshes_and_xml():
                 "burr_diameter_mm": 40,
                 "hopper_capacity_g": 450,
                 "grind_rate_g_per_s": [1.5, 2.0],
-                "scope": "Articulated MuJoCo 3.13 belt-driven 40 mm conical burr, stepless collar, hopper lid, microswitch trigger, and 6-DOF 58 mm portafilter model.",
+                "scope": "Articulated MuJoCo 4.0 Filament PBR belt-driven 40 mm conical burr, stepless collar, hopper lid, microswitch trigger, and 6-DOF 58 mm portafilter model.",
             },
             indent=2,
         )
@@ -541,12 +631,7 @@ def export_blender_meshes_and_xml():
 
 
 def export_native_xml(mujoco, np):
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from appliance_physics_kit import export_and_verify_native_xml
-
-    model, rebuilt = export_and_verify_native_xml(
-        ASSETS, NAME, mujoco, np, strip_general_input=False
-    )
+    model, rebuilt = kit_export_native_xml(ASSETS, NAME, mujoco, np)
     grinder_sum = sum(float(rebuilt.body(b).mass[0]) for b in GRINDER_BODY_NAMES)
     pf_mass = float(rebuilt.body("zd17_portafilter").mass[0])
     assert abs(grinder_sum - 3.800) < 1e-6, grinder_sum
@@ -556,7 +641,7 @@ def export_native_xml(mujoco, np):
 
 def write_package_docs(report: dict):
     s = report["stages"]
-    readme = f"""# WPM ZD-17OD — Blender 5.2 Visual & MuJoCo 3.13 Physics Package
+    readme = f"""# WPM ZD-17OD — Blender 5.2 Visual & MuJoCo 4.0.0 Physics Package
 
 On-demand conical burr espresso grinder (`WPM ZD-17OD`, Japan `100 V AC`, `50/60 Hz`, `130 W` SKU) with `40 mm` stainless conical burr, belt-driven dual-bearing spindle, `450 g` clear conical bean hopper, angled touch LCD panel (`1-CUP`, `2-CUP`, `MANUAL`), anti-static stainless grounds chute, and hands-free portafilter fork with microswitch trigger.
 See the [equipment reference specification](../../../docs/equipment/wpm-zd-17od/README.md).
@@ -569,7 +654,7 @@ See the [equipment reference specification](../../../docs/equipment/wpm-zd-17od/
 - [Editable Blender 5.2 source](wpm-zd-17od.blend), [articulated GLB](wpm-zd-17od.glb), and standalone [58 mm portafilter GLB](wpm-zd-17od-portafilter.glb).
 - Metal GPU Cycles renders (`1400 × 1200`, `48` samples + OIDN): [studio-main.png](studio-main.png), [studio-front.png](studio-front.png), [studio-right.png](studio-right.png), [studio-open.png](studio-open.png), and [studio-active.png](studio-active.png).
 - Verification manifests: [build-report.json](build-report.json), [inspection-report.json](inspection-report.json), and [physics-export.json](physics-export.json).
-- MuJoCo 3.13 MJCF models: [appliance.xml](appliance.xml), [scene.xml](scene.xml), and collision-only [native.xml](native.xml).
+- MuJoCo 4.0 MJCF models: [appliance.xml](appliance.xml), [scene.xml](scene.xml), standalone [model.xml](model.xml) and [portafilter_model.xml](portafilter_model.xml), and collision-only [native.xml](native.xml).
 - Active-state simulation & frame alignment: [active-states.md](active-states.md), [active-states.json](active-states.json), [report.json](active-state-evidence/report.json), [frames-report.json](active-state-evidence/frames-report.json), [motion-report.json](active-state-evidence/motion-report.json), and [trace.csv](active-state-evidence/trace.csv).
 
 ## Retained Bodies & Joints (`NAMES`)
@@ -578,7 +663,7 @@ See the [equipment reference specification](../../../docs/equipment/wpm-zd-17od/
 | --- | --- | --- | --- | --- |
 | `zd17_grinder` | `3.360` | Fixed base (`Z = 0.000 m` feet) | — | `125 × 235 × 410 mm` envelope |
 | `zd17_collar` | `0.180` | `zd17_collar_dial` (`hinge`) | `0 0 1` | `0 .. 5.236 rad` |
-| `zd17_burr_rotor` | `0.160` | `zd17_burr_spin` (`hinge`) | `0 0 1` | `-1000 .. 1000 rad` |
+| `zd17_burr_rotor` | `0.160` | `zd17_burr_spin` (`hinge`) | `0 0 1` | Continuous (`limited="false"`) |
 | `zd17_pf_trigger` | `0.015` | `zd17_trigger_press` (`slide`) | `0 1 0` | `0 .. 0.006 m` |
 | `zd17_hopper_lid` | `0.085` | `zd17_lid_lift` (`slide`) | `0 0 1` | `0 .. 0.060 m` |
 | **Grinder Total** | **`3.800`** | — | — | Exact published grinder mass |
@@ -593,9 +678,9 @@ scripts/bakery-mujoco/.venv/bin/python scripts/bakery-mujoco/build_zd_17od_physi
 """
     (ASSETS / "README.md").write_text(readme, encoding="utf-8")
 
-    active_md = f"""# WPM ZD-17OD — MuJoCo 3.13 Active-State & Frame Alignment Verification
+    active_md = f"""# WPM ZD-17OD — MuJoCo 4.0.0 Active-State & Frame Alignment Verification
 
-Verified at `dt = 0.002 s` across `{report['trace_samples']}` recorded telemetry samples (`active-state-evidence/trace.csv`, SHA-256 `{report['trace_csv_sha256'][:16]}…`).
+Verified in MuJoCo `{report['mujoco_version']}` at `dt = 0.002 s` across `{report['trace_samples']}` recorded telemetry samples (`active-state-evidence/trace.csv`, SHA-256 `{report['trace_csv_sha256'][:16]}…`).
 
 ## Verified Stages
 
@@ -813,115 +898,16 @@ def run_active_state_verification():
 
     # Stage 5: Verify BOTH rest frames AND --motion sampled scalar-joint trajectories via inspect_appliance_frames.mjs
     evidence_dir = ASSETS / "active-state-evidence"
-    evidence_dir.mkdir(parents=True, exist_ok=True)
     native_sha = hashlib.sha256((ASSETS / "native.xml").read_bytes()).hexdigest()
-    glb_str = str(ASSETS / f"{NAME}.glb")
-
-    native_data = mujoco.MjData(native_model)
-    mujoco.mj_resetData(native_model, native_data)
-    mujoco.mj_forward(native_model, native_data)
-    body_poses = {}
-    for bname in NAMES:
-        bid = native_model.body(bname).id
-        pos = native_data.xpos[bid]
-        quat = native_data.xquat[bid]
-        body_poses[bname] = [
-            float(pos[0]),
-            float(pos[1]),
-            float(pos[2]),
-            float(quat[0]),
-            float(quat[1]),
-            float(quat[2]),
-            float(quat[3]),
-        ]
-
-    frames_in = evidence_dir / "frames-input.json"
-    frames_out = evidence_dir / "frames-report.json"
-    frames_in.write_text(
-        json.dumps(
-            {
-                NAME: {
-                    "glb": glb_str,
-                    "native_sha256": native_sha,
-                    "bodies": body_poses,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
+    frames_report, motion_report = kit_verify_frames_and_motions(
+        ASSETS,
+        NAME,
+        NAMES,
+        SCALAR_VISUAL_AXES,
+        mujoco,
+        evidence_dir,
+        cleanup_inputs=True,
     )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(frames_in),
-            str(frames_out),
-        ],
-        check=True,
-    )
-    frames_report = json.loads(frames_out.read_text())
-    assert frames_report["passed"] is True, frames_report
-
-    # Sample 21 points across each scalar joint's full range for --motion check
-    motions = []
-    for jname, vaxis in SCALAR_VISUAL_AXES.items():
-        jid = native_model.joint(jname).id
-        jtype = int(native_model.jnt_type[jid])
-        kind = "hinge" if jtype == int(mujoco.mjtJoint.mjJNT_HINGE) else "slide"
-        low, high = native_model.jnt_range[jid]
-        bid = int(native_model.jnt_bodyid[jid])
-        samples = []
-        for idx in range(21):
-            val = float(low + (high - low) * idx / 20.0)
-            mujoco.mj_resetData(native_model, native_data)
-            native_data.qpos[native_model.jnt_qposadr[jid]] = val
-            mujoco.mj_forward(native_model, native_data)
-            samples.append(
-                {
-                    "value": val,
-                    "pose": [
-                        *native_data.xpos[bid].tolist(),
-                        *native_data.xquat[bid].tolist(),
-                    ],
-                }
-            )
-        motions.append(
-            {
-                "joint": jname,
-                "body": native_model.body(bid).name,
-                "kind": kind,
-                "visual_axis": vaxis,
-                "samples": samples,
-            }
-        )
-
-    motion_in = evidence_dir / "motion-input.json"
-    motion_out = evidence_dir / "motion-report.json"
-    motion_in.write_text(
-        json.dumps(
-            {
-                NAME: {
-                    "glb": glb_str,
-                    "native_sha256": native_sha,
-                    "motions": motions,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
-    )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(motion_in),
-            str(motion_out),
-            "--motion",
-        ],
-        check=True,
-    )
-    motion_report = json.loads(motion_out.read_text())
-    assert motion_report["passed"] is True, motion_report
 
     rest_frames = frames_report["appliances"][NAME]["frames"]
     motion_items = motion_report["appliances"][NAME]["motions"]

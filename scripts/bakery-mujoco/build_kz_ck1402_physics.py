@@ -9,10 +9,25 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from appliance_physics_kit import (
+    BLENDER_BIN,
+    COL_ARTIC_RGBA,
+    COL_BASE_RGBA,
+    COL_WALL_RGBA,
+    ROOT,
+    SITE_SUPPORT_RGBA,
+    add_adjacent_excludes,
+    add_standard_defaults,
+    emit_standalone_models,
+    export_and_verify_native_xml as kit_export_native_xml,
+    numbers,
+    prepare_blender_assembly,
+    verify_frames_and_motions as kit_verify_frames_and_motions,
+    write_xml,
+)
+
 ASSETS = ROOT / "assets/bakery-mujoco/panasonic-kz-ck1402"
-BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
-VENV_PYTHON = ROOT / "scripts/bakery-mujoco/.venv/bin/python"
 
 BUTTON_NAMES = (
     "kz_timer_button",
@@ -87,65 +102,29 @@ POWER_LEVELS_W = {
 FRYING_TEMPS_C = (140.0, 150.0, 160.0, 170.0, 180.0, 190.0, 200.0)
 
 
-def numbers(values):
-    return " ".join(f"{value:.9g}" for value in values)
-
-
-def write_xml(path: Path, element: ET.Element):
-    ET.indent(element, space="  ")
-    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
-
-
 def export_blender_meshes_and_xml():
-    """Run inside Blender to export body-local OBJ meshes and construct hob.xml, appliance.xml, and scene.xml."""
-    import bpy
-
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from build_oven_visuals import export_visual_meshes
-
+    """Run inside Blender to export body-local OBJ meshes and construct hob.xml, appliance.xml, model.xml, and scene.xml."""
     source = ASSETS / "panasonic-kz-ck1402.blend"
-    bpy.ops.wm.open_mainfile(filepath=str(source))
-    bpy.context.scene.frame_set(1)
-    bpy.context.view_layer.update()
-
-    parts = [bpy.data.objects[name] for name in NAMES]
-    poses = {obj.name: obj.matrix_world.copy() for obj in parts}
-
-    # Reparent every mesh under kz_hob to its nearest articulated ancestor in NAMES while preserving world pose
-    for obj in list(parts[0].children_recursive):
-        if obj.type != "MESH" and obj not in parts:
-            continue
-        parent = obj.parent
-        while parent is not None and parent not in parts:
-            parent = parent.parent
-        if parent is None:
-            continue
-        pose = obj.matrix_world.copy()
-        obj.animation_data_clear()
-        obj.parent = parent
-        obj.matrix_world = pose
-        if obj.type == "MESH" and len(obj.data.vertices) >= 3:
-            zs = [v.co.z for v in obj.data.vertices]
-            if max(zs) - min(zs) < 1e-5:
-                obj.data.vertices[0].co.z += 2e-5
-                obj.data.update()
-    bpy.context.view_layer.update()
-
-    for mat in bpy.data.materials:
-        if "metallic" not in mat:
-            mat["metallic"] = 0.0
-        if "roughness" not in mat:
-            mat["roughness"] = 0.32
-        if "emission" not in mat:
-            mat["emission"] = 0.0
-
-    export_visual_meshes(parts, ASSETS)
+    parts, poses = prepare_blender_assembly(
+        source,
+        NAMES,
+        ASSETS,
+        default_roughness=0.32,
+    )
 
     # Build standalone hob.xml / appliance.xml
     hob = ET.Element("mujoco", model="panasonic-kz-ck1402 — commercial 100V induction hotplate")
     ET.SubElement(hob, "compiler", angle="radian")
     ET.SubElement(hob, "option", timestep="0.002", integrator="implicitfast")
     ET.SubElement(hob, "size", nuserdata="5")
+
+    defaults = add_standard_defaults(
+        hob,
+        friction="0.60 0.015 0.003",
+        solref="0.004 1",
+        solimp="0.95 0.99 0.001",
+        condim="4",
+    )
 
     asset = ET.SubElement(hob, "asset")
     ET.SubElement(asset, "include", file="visual_assets.xml")
@@ -154,7 +133,11 @@ def export_blender_meshes_and_xml():
     bodies = {}
     for obj in parts:
         name = obj.name
-        parent_obj = obj.parent if (obj.parent and obj.parent.name in poses) else (parts[0] if name != "kz_hob" else None)
+        parent_obj = (
+            obj.parent
+            if (obj.parent and obj.parent.name in poses)
+            else (parts[0] if name != "kz_hob" else None)
+        )
         parent_el = bodies.get(parent_obj.name) if parent_obj else None
         transform = (
             poses[name]
@@ -182,7 +165,7 @@ def export_blender_meshes_and_xml():
     fan = bodies["kz_cooling_fan"]
     mag_plug = bodies["kz_magnetic_plug"]
 
-    # Four rubber feet collision cylinders touching Z = 0.000 m
+    # Four rubber feet collision cylinders touching Z = 0.000 m up to Z = 0.0050 m
     for foot_name, fx, fy in (
         ("kz_foot_fl_col", -0.1200, -0.1274),
         ("kz_foot_fr_col", 0.1200, -0.1274),
@@ -194,30 +177,39 @@ def export_blender_meshes_and_xml():
             "geom",
             name=foot_name,
             type="cylinder",
-            pos=numbers((fx, fy, 0.0020)),
-            size="0.0085 0.0020",
-            friction="0.85 0.005 0.0001",
+            pos=numbers((fx, fy, 0.0025)),
+            size="0.0095 0.0025",
+            friction="0.85 0.015 0.003",
+            contype="1",
+            conaffinity="1",
             group="3",
+            rgba=COL_BASE_RGBA,
         )
 
-    # Lower molded chassis collision box and sloped front control panel collision box
+    # Lower molded chassis collision box (Z = 0.0034 .. 0.0510 m) and sloped front control panel collision box
     ET.SubElement(
         base,
         "geom",
         name="ih_housing",
         type="box",
-        pos="0 0.0245 0.0250",
-        size="0.1520 0.1480 0.0250",
+        pos="0 0.0245 0.0272",
+        size="0.1520 0.1480 0.0238",
+        contype="1",
+        conaffinity="1",
         group="3",
+        rgba=COL_BASE_RGBA,
     )
     ET.SubElement(
         base,
         "geom",
         name="kz_front_deck_col",
         type="box",
-        pos="0 -0.1455 0.0220",
-        size="0.1480 0.0270 0.0180",
+        pos="0 -0.1475 0.0238",
+        size="0.1490 0.0250 0.0202",
+        contype="1",
+        conaffinity="1",
         group="3",
+        rgba=COL_BASE_RGBA,
     )
 
     # 296 x 286 mm crystallized glass cooking plate collision box with top at Z = 0.0540 m
@@ -228,20 +220,50 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 0.0245 0.0525",
         size="0.1480 0.1430 0.0015",
-        friction="0.5 0.005 0.0001",
+        friction="0.50 0.015 0.003",
         solref="0.004 1",
         solimp="0.95 0.99 0.001",
+        contype="1",
+        conaffinity="1",
         group="3",
+        rgba=COL_WALL_RGBA,
     )
 
-    # Cooking zone center site and touch sensor site at (0.0, 0.0200, 0.0540) m (Ø190 mm ring, usable 120-260 mm)
+    # Rear stowed magnetic power cord coil and JIS 100V plug (kept >= 5 mm above floor)
+    ET.SubElement(
+        base,
+        "geom",
+        name="kz_cord_coil_col",
+        type="box",
+        pos="0.0800 0.2540 0.0130",
+        size="0.0780 0.0700 0.0070",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_WALL_RGBA,
+    )
+    ET.SubElement(
+        base,
+        "geom",
+        name="kz_jis_plug_col",
+        type="box",
+        pos="-0.0355 0.3200 0.0130",
+        size="0.0215 0.0120 0.0080",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_WALL_RGBA,
+    )
+
+    # Cooking zone center site and touch sensor site at (0.0, 0.0200, 0.0540) m (group 4, visible rgba)
     ET.SubElement(
         base,
         "site",
         name="ih_zone",
         pos="0 0.0200 0.0540",
-        size="0.002",
-        group="3",
+        size="0.004",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         base,
@@ -250,7 +272,8 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos="0 0.0200 0.0540",
         size="0.1300 0.0020",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
 
     # 7 tactile membrane button slide joints (0.6 mm travel along local -Z normal of sloped panel)
@@ -268,9 +291,24 @@ def export_blender_meshes_and_xml():
             springref="-0.001",
             stiffness="45",
             damping="0.25",
+            solreffriction="0.004 1",
+            solreflimit="0.005 1",
+        )
+        half_x = 0.0125 if btn_name == "kz_start_button" else 0.0085
+        ET.SubElement(
+            btn_body,
+            "geom",
+            name=f"{btn_name}_col",
+            type="box",
+            pos="0 0 0.0003",
+            size=numbers((half_x, 0.0075, 0.0007)),
+            contype="1",
+            conaffinity="1",
+            group="3",
+            rgba=COL_ARTIC_RGBA,
         )
 
-    # Underside cooling fan hinge joint (`kz_fan_spin`)
+    # Underside cooling fan hinge joint (`kz_fan_spin`) and collision disc
     ET.SubElement(
         fan,
         "joint",
@@ -280,6 +318,18 @@ def export_blender_meshes_and_xml():
         limited="false",
         damping="0.0004",
         armature="0.0002",
+    )
+    ET.SubElement(
+        fan,
+        "geom",
+        name="kz_cooling_fan_col",
+        type="cylinder",
+        pos="0 0 0.0017",
+        size="0.0550 0.0029",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ARTIC_RGBA,
     )
 
     # Detachable magnetic breakaway plug slide joint (`kz_magnetic_breakaway`, 0 .. 40 mm along local +Y detachment axis)
@@ -293,7 +343,30 @@ def export_blender_meshes_and_xml():
         range="0 0.040",
         stiffness="12",
         damping="0.8",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
+    ET.SubElement(
+        mag_plug,
+        "geom",
+        name="kz_magnetic_plug_col",
+        type="box",
+        pos="0 0.0080 0",
+        size="0.0130 0.0160 0.0080",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ARTIC_RGBA,
+    )
+
+    # Adjacent articulated-body contact exclusions
+    exclude_pairs = [
+        (f"exclude_hob_{btn_name}", "kz_hob", btn_name) for btn_name in BUTTON_NAMES
+    ] + [
+        ("exclude_hob_cooling_fan", "kz_hob", "kz_cooling_fan"),
+        ("exclude_hob_magnetic_plug", "kz_hob", "kz_magnetic_plug"),
+    ]
+    contact = add_adjacent_excludes(hob, exclude_pairs)
 
     # Actuators for all 7 buttons, the cooling fan motor, and the magnetic breakaway plug
     actuators = ET.SubElement(hob, "actuator")
@@ -347,6 +420,17 @@ def export_blender_meshes_and_xml():
 
     write_xml(ASSETS / "hob.xml", hob)
     write_xml(ASSETS / "appliance.xml", hob)
+
+    # Emit standalone MjSpec.attach-ready model.xml
+    emit_standalone_models(
+        ASSETS,
+        model_name="kz_hob",
+        defaults=defaults,
+        asset=asset,
+        root_body=base,
+        contact=contact,
+        sensors=sensors,
+    )
 
     # Build scene.xml including hob.xml, ../induction-pan/pan.xml, and ../induction-pan/studio.xml
     scene = ET.Element("mujoco", model="Panasonic KZ-CK1402 induction physics lab")
@@ -459,7 +543,7 @@ def export_native_xml(mujoco, np):
     data = mujoco.MjData(model)
     mujoco.mj_forward(model, data)
     spec.body("ih_pan").pos = data.site("ih_zone").xpos + (0, 0, 0.004)
-    export_and_verify_native_xml(
+    kit_export_native_xml(
         ASSETS, "panasonic-kz-ck1402", mujoco, np, spec=spec, strip_general_input=False
     )
 
@@ -469,6 +553,30 @@ def run_active_state_verification():
     import numpy as np
 
     export_native_xml(mujoco, np)
+
+    # Verify GLB rest frames and 21-sample scalar joint trajectories
+    tilt_rad = math.radians(16.0)
+    visual_motions = {
+        "kz_fan_spin": [0.0, 0.0, 1.0],
+        "kz_magnetic_breakaway": [math.sqrt(0.5), math.sqrt(0.5), 0.0],
+        **{
+            btn_name.replace("_button", "_press"): [
+                0.0,
+                math.sin(tilt_rad),
+                -math.cos(tilt_rad),
+            ]
+            for btn_name in BUTTON_NAMES
+        },
+    }
+    kit_verify_frames_and_motions(
+        ASSETS,
+        "panasonic-kz-ck1402",
+        NAMES,
+        visual_motions,
+        mujoco,
+        ASSETS / "active-state-evidence",
+        cleanup_inputs=True,
+    )
 
     model = mujoco.MjModel.from_xml_path(str(ASSETS / "scene.xml"))
     data = mujoco.MjData(model)
@@ -752,7 +860,7 @@ def run_active_state_verification():
 
 
 def main():
-    if "--blender-export" in sys.argv:
+    if "--blender-export" in sys.argv or "bpy" in sys.modules:
         export_blender_meshes_and_xml()
         return
 

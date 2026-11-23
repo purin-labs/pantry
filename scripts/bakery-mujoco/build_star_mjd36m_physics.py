@@ -11,9 +11,28 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "assets/bakery-mujoco/star-mjd36m"
-BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from appliance_physics_kit import (
+    BLENDER_BIN,
+    COL_ARTIC_RGBA,
+    COL_BASE_RGBA,
+    COL_WALL_RGBA,
+    ROOT,
+    SITE_SUPPORT_RGBA,
+    X_AXIS_QUAT,
+    Y_AXIS_QUAT,
+    add_adjacent_excludes,
+    add_standard_defaults,
+    emit_standalone_models,
+    export_and_verify_native_xml as kit_export_native_xml,
+    numbers,
+    prepare_blender_assembly,
+    verify_frames_and_motions as kit_verify_frames_and_motions,
+    write_xml,
+)
+
+NAME = "star-mjd36m"
+ASSETS = ROOT / "assets/bakery-mujoco" / NAME
 
 NAMES = (
     "mjd_casing",
@@ -61,61 +80,15 @@ VISUAL_AXES = {
 }
 
 
-def numbers(values) -> str:
-    return " ".join(f"{value:.9g}" for value in values)
-
-
-def write_xml(path: Path, element: ET.Element) -> None:
-    ET.indent(element, space="  ")
-    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
-
-
 def export_blender_meshes_and_xml() -> None:
-    import bpy
-
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from build_oven_visuals import export_visual_meshes
-
-    source = ASSETS / "star-mjd36m.blend"
-    bpy.ops.wm.open_mainfile(filepath=str(source))
-    bpy.context.scene.frame_set(1)
-    bpy.context.view_layer.update()
-    for obj in list(bpy.data.objects):
-        obj.animation_data_clear()
-    bpy.context.view_layer.update()
-
-    parts = [bpy.data.objects[name] for name in NAMES]
-    poses = {obj.name: obj.matrix_world.copy() for obj in parts}
-
-    for obj in list(parts[0].children_recursive):
-        if obj.type != "MESH" and obj not in parts:
-            continue
-        parent = obj.parent
-        while parent is not None and parent not in parts:
-            parent = parent.parent
-        if parent is None:
-            continue
-        pose = obj.matrix_world.copy()
-        obj.animation_data_clear()
-        obj.parent = parent
-        obj.matrix_world = pose
-        if obj.type == "MESH" and len(obj.data.vertices) >= 3:
-            for axis_i in range(3):
-                vals = [v.co[axis_i] for v in obj.data.vertices]
-                if max(vals) - min(vals) < 1e-5:
-                    obj.data.vertices[0].co[axis_i] += 2e-5
-            obj.data.update()
-    bpy.context.view_layer.update()
-
-    for mat in bpy.data.materials:
-        if "metallic" not in mat:
-            mat["metallic"] = 0.0
-        if "roughness" not in mat:
-            mat["roughness"] = 0.30
-        if "emission" not in mat:
-            mat["emission"] = 0.0
-
-    export_visual_meshes(parts, ASSETS)
+    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml, scene.xml, and model.xml."""
+    source = ASSETS / f"{NAME}.blend"
+    parts, poses = prepare_blender_assembly(
+        source,
+        NAMES,
+        ASSETS,
+        default_roughness=0.30,
+    )
 
     app = ET.Element(
         "mujoco",
@@ -124,6 +97,14 @@ def export_blender_meshes_and_xml() -> None:
     ET.SubElement(app, "compiler", angle="radian")
     ET.SubElement(app, "option", timestep="0.002", integrator="implicitfast")
     ET.SubElement(app, "size", nuserdata="8")
+
+    defaults = add_standard_defaults(
+        app,
+        friction="0.60 0.015 0.003",
+        solref="0.004 1",
+        solimp="0.95 0.99 0.001",
+        condim="4",
+    )
 
     asset = ET.SubElement(app, "asset")
     ET.SubElement(asset, "include", file="visual_assets.xml")
@@ -136,8 +117,9 @@ def export_blender_meshes_and_xml() -> None:
         type="plane",
         size="1.5 1.5 0.05",
         rgba="0.28 0.30 0.33 1",
-        contype="4",
-        conaffinity="4",
+        contype="1",
+        conaffinity="1",
+        group="2",
     )
 
     bodies = {}
@@ -192,17 +174,18 @@ def export_blender_meshes_and_xml() -> None:
             type="cylinder",
             pos=numbers((fx, fy, 0.0035)),
             size="0.0150 0.0035",
-            contype="2",
+            contype="1",
             conaffinity="1",
             group="3",
+            rgba=COL_BASE_RGBA,
         )
 
-    for cname, cpos, csize in (
-        ("mjd_bottom_pan_col", (0.0, 0.0040, 0.0095), (0.1570, 0.1735, 0.0025)),
-        ("mjd_left_wall_col", (-0.1610, 0.0, 0.0525), (0.0040, 0.1775, 0.0455)),
-        ("mjd_right_wall_col", (0.1610, 0.0, 0.0525), (0.0040, 0.1775, 0.0455)),
-        ("mjd_rear_wall_col", (0.0, 0.1725, 0.0550), (0.1570, 0.0050, 0.0430)),
-        ("mjd_top_deck_col", (0.0, 0.0, 0.1010), (0.1650, 0.1775, 0.0030)),
+    for cname, cpos, csize, crgba in (
+        ("mjd_bottom_pan_col", (0.0, 0.0040, 0.0095), (0.1570, 0.1735, 0.0025), COL_BASE_RGBA),
+        ("mjd_left_wall_col", (-0.1610, 0.0, 0.0525), (0.0040, 0.1775, 0.0455), COL_WALL_RGBA),
+        ("mjd_right_wall_col", (0.1610, 0.0, 0.0525), (0.0040, 0.1775, 0.0455), COL_WALL_RGBA),
+        ("mjd_rear_wall_col", (0.0, 0.1725, 0.0550), (0.1570, 0.0050, 0.0430), COL_WALL_RGBA),
+        ("mjd_top_deck_col", (0.0, 0.0, 0.1010), (0.1650, 0.1775, 0.0030), COL_WALL_RGBA),
     ):
         ET.SubElement(
             casing,
@@ -211,13 +194,30 @@ def export_blender_meshes_and_xml() -> None:
             type="box",
             pos=numbers(cpos),
             size=numbers(csize),
-            contype="2",
+            contype="1",
             conaffinity="1",
             group="3",
+            rgba=crgba,
         )
 
-    ET.SubElement(casing, "site", name="mjd_top_load_deck_site", pos="0 0 0.1040", size="0.008", group="3")
-    ET.SubElement(casing, "site", name="mjd_dk_port_site", pos="-0.0850 0.1755 0.0280", size="0.004", group="3")
+    ET.SubElement(
+        casing,
+        "site",
+        name="mjd_top_load_deck_site",
+        pos="0 0 0.1040",
+        size="0.008",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
+    )
+    ET.SubElement(
+        casing,
+        "site",
+        name="mjd_dk_port_site",
+        pos="-0.0850 0.1755 0.0280",
+        size="0.004",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
+    )
 
     # Sliding cash drawer joint (0 .. 0.210 m forward along -Y)
     ET.SubElement(
@@ -230,11 +230,25 @@ def export_blender_meshes_and_xml() -> None:
         range="0 0.210",
         damping="4.2",
         armature="0.012",
+        frictionloss="0.15",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     for dname, dpos, dsize in (
-        ("mjd_drawer_front_col", (0.0, -0.1725, -0.0005), (0.1560, 0.0050, 0.0430)),
-        ("mjd_till_floor_col", (0.0, -0.0080, -0.0330), (0.1480, 0.1540, 0.0030)),
+        ("mjd_drawer_front_col", (0.0, -0.1725, -0.0005), (0.1650, 0.0055, 0.0430)),
+        ("mjd_till_floor_col", (0.0, -0.0080, -0.0305), (0.1480, 0.1540, 0.0065)),
         ("mjd_till_divider_col", (0.0, -0.0200, 0.0010), (0.1450, 0.0030, 0.0300)),
+        ("mjd_drawer_left_wall_col", (-0.1500, -0.0060, -0.0040), (0.0045, 0.1560, 0.0320)),
+        ("mjd_drawer_right_wall_col", (0.1500, -0.0060, -0.0040), (0.0045, 0.1560, 0.0320)),
+        ("mjd_drawer_rear_wall_col", (0.0, 0.1460, -0.0040), (0.1480, 0.0045, 0.0320)),
+        ("mjd_bill_divider_left_col", (-0.0478, 0.0660, -0.0050), (0.0030, 0.0800, 0.0280)),
+        ("mjd_bill_divider_right_col", (0.0478, 0.0660, -0.0050), (0.0030, 0.0800, 0.0280)),
+        ("mjd_coin_divider_1_col", (-0.0980, -0.0920, -0.0050), (0.0030, 0.0720, 0.0260)),
+        ("mjd_coin_divider_2_col", (-0.0490, -0.0920, -0.0050), (0.0030, 0.0720, 0.0260)),
+        ("mjd_coin_divider_3_col", (0.0000, -0.0920, -0.0050), (0.0030, 0.0720, 0.0260)),
+        ("mjd_coin_divider_4_col", (0.0490, -0.0920, -0.0050), (0.0030, 0.0720, 0.0260)),
+        ("mjd_coin_divider_5_col", (0.0980, -0.0920, -0.0050), (0.0030, 0.0720, 0.0260)),
+        ("mjd_coin_scoop_ramp_col", (0.0, -0.1480, -0.0180), (0.1480, 0.0180, 0.0160)),
     ):
         ET.SubElement(
             drawer,
@@ -243,14 +257,33 @@ def export_blender_meshes_and_xml() -> None:
             type="box",
             pos=numbers(dpos),
             size=numbers(dsize),
-            contype="2",
+            contype="1",
             conaffinity="1",
             group="3",
+            rgba=COL_ARTIC_RGBA,
         )
-    ET.SubElement(drawer, "site", name="mjd_coin_tray_site", pos="0 -0.0920 -0.0150", size="0.006", group="3")
-    ET.SubElement(drawer, "site", name="mjd_bill_tray_site", pos="0 0.0600 -0.0150", size="0.006", group="3")
+    ET.SubElement(
+        drawer,
+        "site",
+        name="mjd_coin_tray_site",
+        pos="0 -0.0920 -0.0150",
+        size="0.006",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
+    )
+    ET.SubElement(
+        drawer,
+        "site",
+        name="mjd_bill_tray_site",
+        pos="0 0.0600 -0.0150",
+        size="0.006",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
+    )
 
     # Three spring-loaded wire bill clips (0 .. 0.55 rad about +X)
+    clip_pitch = math.atan2(-0.038, 0.092)
+    clip_quat = numbers((math.cos(0.5 * clip_pitch), math.sin(0.5 * clip_pitch), 0.0, 0.0))
     for idx, clip_el in enumerate((c1, c2, c3), 1):
         ET.SubElement(
             clip_el,
@@ -263,17 +296,35 @@ def export_blender_meshes_and_xml() -> None:
             stiffness="0.45",
             damping="0.08",
             armature="0.0005",
+            frictionloss="0.02",
+            solreffriction="0.004 1",
+            solreflimit="0.005 1",
+        )
+        ET.SubElement(
+            clip_el,
+            "geom",
+            name=f"mjd_clip_{idx}_pivot_col",
+            type="cylinder",
+            pos="0 0 0",
+            quat=X_AXIS_QUAT,
+            size="0.0042 0.0190",
+            contype="1",
+            conaffinity="1",
+            group="3",
+            rgba=COL_ARTIC_RGBA,
         )
         ET.SubElement(
             clip_el,
             "geom",
             name=f"mjd_clip_{idx}_col",
             type="box",
-            pos="0 0.0420 -0.0160",
-            size="0.0180 0.0420 0.0040",
-            contype="0",
-            conaffinity="0",
+            pos="0 0.0460 -0.0190",
+            quat=clip_quat,
+            size="0.0185 0.0495 0.0045",
+            contype="1",
+            conaffinity="1",
             group="3",
+            rgba=COL_ARTIC_RGBA,
         )
 
     # Front security key cylinder lock (-1.5708 .. 1.5708 rad about +Y)
@@ -287,6 +338,9 @@ def export_blender_meshes_and_xml() -> None:
         range="-1.5708 1.5708",
         damping="0.06",
         armature="0.0003",
+        frictionloss="0.05",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         lock,
@@ -294,11 +348,28 @@ def export_blender_meshes_and_xml() -> None:
         name="mjd_key_lock_col",
         type="cylinder",
         pos="0 0.0010 0",
-        quat=numbers((math.cos(math.pi / 4), math.sin(math.pi / 4), 0.0, 0.0)),
+        quat=Y_AXIS_QUAT,
         size="0.0085 0.0030",
-        contype="0",
-        conaffinity="0",
+        contype="1",
+        conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
+    )
+
+    # Adjacent articulated-body contact exclusions (keeps all colliders active for external contact)
+    contact = add_adjacent_excludes(
+        app,
+        (
+            ("exclude_casing_drawer", "mjd_casing", "mjd_drawer"),
+            ("exclude_casing_clip_1", "mjd_casing", "mjd_bill_clip_1"),
+            ("exclude_casing_clip_2", "mjd_casing", "mjd_bill_clip_2"),
+            ("exclude_casing_clip_3", "mjd_casing", "mjd_bill_clip_3"),
+            ("exclude_casing_key_lock", "mjd_casing", "mjd_key_lock"),
+            ("exclude_drawer_clip_1", "mjd_drawer", "mjd_bill_clip_1"),
+            ("exclude_drawer_clip_2", "mjd_drawer", "mjd_bill_clip_2"),
+            ("exclude_drawer_clip_3", "mjd_drawer", "mjd_bill_clip_3"),
+            ("exclude_drawer_key_lock", "mjd_drawer", "mjd_key_lock"),
+        ),
     )
 
     # Actuators
@@ -344,7 +415,25 @@ def export_blender_meshes_and_xml() -> None:
     ET.SubElement(sensors, "jointpos", name="mjd_lock_pos", joint="mjd_lock_turn")
 
     write_xml(ASSETS / "appliance.xml", app)
-    write_xml(ASSETS / "scene.xml", app)
+
+    scene = ET.Element("mujoco", model="star-mjd36m physics lab")
+    ET.SubElement(scene, "include", file="appliance.xml")
+    visual = ET.SubElement(scene, "visual")
+    ET.SubElement(visual, "global", offwidth="1400", offheight="1200")
+    ET.SubElement(visual, "headlight", ambient="0.42 0.42 0.44")
+    scene_world = ET.SubElement(scene, "worldbody")
+    ET.SubElement(scene_world, "light", pos="0.8 -1.2 1.4", dir="-0.35 0.6 -0.8")
+    write_xml(ASSETS / "scene.xml", scene)
+
+    emit_standalone_models(
+        ASSETS,
+        model_name="mjd_casing",
+        defaults=defaults,
+        asset=asset,
+        root_body=casing,
+        contact=contact,
+        sensors=sensors,
+    )
 
     (ASSETS / "physics-export.json").write_text(
         json.dumps(
@@ -357,7 +446,7 @@ def export_blender_meshes_and_xml() -> None:
                 "drawer_stroke_m": 0.210,
                 "till_layout": "3-bill / 6-coin (3札6硬貨)",
                 "solenoid_drive": "24V DC 1.0A via 6-pin RJ12 DK-Port from Star mC-Print3",
-                "scope": "Articulated MuJoCo mechanical, 24V DK-Port solenoid kick-out, 3 spring-loaded wire bill clips, and 3-position key lock model.",
+                "scope": "Articulated MuJoCo 4.0 mechanical, 24V DK-Port solenoid kick-out, 3 spring-loaded wire bill clips, and 3-position key lock model.",
             },
             indent=2,
         )
@@ -366,122 +455,19 @@ def export_blender_meshes_and_xml() -> None:
 
 
 def export_native_xml(mujoco, np) -> None:
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from appliance_physics_kit import export_and_verify_native_xml
-
-    export_and_verify_native_xml(ASSETS, "star-mjd36m", mujoco, np)
+    kit_export_native_xml(ASSETS, NAME, mujoco, np)
 
 
 def verify_frames_and_motions(mujoco, evidence_dir: Path) -> tuple[dict, dict]:
-    native_path = ASSETS / "native.xml"
-    glb_path = ASSETS / "star-mjd36m.glb"
-    native_sha = hashlib.sha256(native_path.read_bytes()).hexdigest()
-
-    native_model = mujoco.MjModel.from_xml_path(str(native_path))
-    native_data = mujoco.MjData(native_model)
-    mujoco.mj_forward(native_model, native_data)
-
-    body_poses = {}
-    for bname in NAMES:
-        bid = native_model.body(bname).id
-        pos = native_data.xpos[bid]
-        quat = native_data.xquat[bid]
-        body_poses[bname] = [
-            float(pos[0]),
-            float(pos[1]),
-            float(pos[2]),
-            float(quat[0]),
-            float(quat[1]),
-            float(quat[2]),
-            float(quat[3]),
-        ]
-    frames_in = evidence_dir / "frames-input.json"
-    frames_out = evidence_dir / "frames-report.json"
-    frames_in.write_text(
-        json.dumps(
-            {
-                "star-mjd36m": {
-                    "glb": str(glb_path),
-                    "native_sha256": native_sha,
-                    "bodies": body_poses,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
+    return kit_verify_frames_and_motions(
+        ASSETS,
+        NAME,
+        NAMES,
+        VISUAL_AXES,
+        mujoco,
+        evidence_dir,
+        cleanup_inputs=True,
     )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(frames_in),
-            str(frames_out),
-        ],
-        check=True,
-    )
-    frames_report = json.loads(frames_out.read_text())
-    assert frames_report["passed"], frames_report
-
-    motions = []
-    for jname, vaxis in VISUAL_AXES.items():
-        jid = native_model.joint(jname).id
-        jtype = int(native_model.jnt_type[jid])
-        kind = "hinge" if jtype == int(mujoco.mjtJoint.mjJNT_HINGE) else "slide"
-        low, high = native_model.jnt_range[jid]
-        bid = int(native_model.jnt_bodyid[jid])
-        samples = []
-        for idx in range(21):
-            val = float(low + (high - low) * idx / 20.0)
-            mujoco.mj_resetData(native_model, native_data)
-            native_data.qpos[native_model.jnt_qposadr[jid]] = val
-            mujoco.mj_forward(native_model, native_data)
-            samples.append(
-                {
-                    "value": val,
-                    "pose": [
-                        *native_data.xpos[bid].tolist(),
-                        *native_data.xquat[bid].tolist(),
-                    ],
-                }
-            )
-        motions.append(
-            {
-                "joint": jname,
-                "body": native_model.body(bid).name,
-                "kind": kind,
-                "visual_axis": vaxis,
-                "samples": samples,
-            }
-        )
-
-    motion_in = evidence_dir / "motion-input.json"
-    motion_out = evidence_dir / "motion-report.json"
-    motion_in.write_text(
-        json.dumps(
-            {
-                "star-mjd36m": {
-                    "glb": str(glb_path),
-                    "native_sha256": native_sha,
-                    "motions": motions,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
-    )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(motion_in),
-            str(motion_out),
-            "--motion",
-        ],
-        check=True,
-    )
-    motion_report = json.loads(motion_out.read_text())
-    assert motion_report["passed"], motion_report
-    return frames_report, motion_report
 
 
 def write_asset_docs(report: dict) -> None:
@@ -520,7 +506,7 @@ See the [hardware reference sheet](../../../docs/equipment/star-mjd36m/README.md
 
 - `star-mjd36m.blend` / `star-mjd36m.glb`: Editable Blender 5.2 source and glTF 2.0 runtime asset (`{report['glb_sha256'][:12]}…`).
 - `studio-{{main,front,right,open}}.png`: Cycles Metal GPU studio renders (`1400 × 1200`, `48` samples + OIDN).
-- `appliance.xml` / `scene.xml` / `native.xml` / `physics-export.json`: MuJoCo 3.13 MJCF & collision-only native physics models.
+- `appliance.xml` / `scene.xml` / `model.xml` / `native.xml` / `physics-export.json`: MuJoCo 4.0 MJCF, standalone attachable model, & collision-only native physics models.
 - `build-report.json` / `inspection-report.json` / `active-states.json` / `active-states.md`: Automated QA & frame-alignment reports (`max_rest_pos_err = {rf['rest_max_position_error_m']:.3e} m`, `max_motion_pos_err = {rf['motion_max_position_error_m']:.3e} m`).
 """
     (ASSETS / "README.md").write_text(readme, encoding="utf-8")

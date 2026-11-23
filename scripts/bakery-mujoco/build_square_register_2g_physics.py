@@ -11,9 +11,28 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "assets/bakery-mujoco/square-register-2g"
-BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from appliance_physics_kit import (
+    BLENDER_BIN,
+    COL_ACCESSORY_RGBA,
+    COL_ARTIC_RGBA,
+    COL_BASE_RGBA,
+    ROOT,
+    SITE_GRASP_RGBA,
+    SITE_SUPPORT_RGBA,
+    X_AXIS_QUAT,
+    add_adjacent_excludes,
+    add_standard_defaults,
+    emit_standalone_models,
+    export_and_verify_native_xml as kit_export_native_xml,
+    numbers,
+    prepare_blender_assembly,
+    verify_frames_and_motions as kit_verify_frames_and_motions,
+    write_xml,
+)
+
+NAME = "square-register-2g"
+ASSETS = ROOT / "assets/bakery-mujoco" / NAME
 
 NAMES = (
     "sqreg_base",
@@ -59,63 +78,15 @@ VISUAL_AXES = {
 CARD_REST_POS = (0.1240, 0.0700, 0.0044)
 
 
-def numbers(values) -> str:
-    return " ".join(f"{value:.9g}" for value in values)
-
-
-def write_xml(path: Path, element: ET.Element) -> None:
-    ET.indent(element, space="  ")
-    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
-
-
 def export_blender_meshes_and_xml() -> None:
-    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml and scene.xml."""
-    import bpy
-
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from build_oven_visuals import export_visual_meshes
-
-    source = ASSETS / "square-register-2g.blend"
-    bpy.ops.wm.open_mainfile(filepath=str(source))
-    bpy.context.scene.frame_set(1)
-    bpy.context.view_layer.update()
-    for obj in list(bpy.data.objects):
-        obj.animation_data_clear()
-    bpy.context.view_layer.update()
-
-    parts = [bpy.data.objects[name] for name in NAMES]
-    poses = {obj.name: obj.matrix_world.copy() for obj in parts}
-
-    # Reparent every mesh under sqreg_base to its nearest articulated ancestor in NAMES while preserving world pose
-    for obj in list(parts[0].children_recursive):
-        if obj.type != "MESH" and obj not in parts:
-            continue
-        parent = obj.parent
-        while parent is not None and parent not in parts:
-            parent = parent.parent
-        if parent is None:
-            continue
-        pose = obj.matrix_world.copy()
-        obj.animation_data_clear()
-        obj.parent = parent
-        obj.matrix_world = pose
-        if obj.type == "MESH" and len(obj.data.vertices) >= 3:
-            for axis_i in range(3):
-                vals = [v.co[axis_i] for v in obj.data.vertices]
-                if max(vals) - min(vals) < 1e-5:
-                    obj.data.vertices[0].co[axis_i] += 2e-5
-            obj.data.update()
-    bpy.context.view_layer.update()
-
-    for mat in bpy.data.materials:
-        if "metallic" not in mat:
-            mat["metallic"] = 0.0
-        if "roughness" not in mat:
-            mat["roughness"] = 0.30
-        if "emission" not in mat:
-            mat["emission"] = 0.0
-
-    export_visual_meshes(parts, ASSETS)
+    """Run inside Blender to export body-local OBJ meshes and construct appliance.xml, scene.xml, and model.xml."""
+    source = ASSETS / f"{NAME}.blend"
+    parts, poses = prepare_blender_assembly(
+        source,
+        NAMES,
+        ASSETS,
+        default_roughness=0.30,
+    )
 
     app = ET.Element(
         "mujoco",
@@ -124,6 +95,14 @@ def export_blender_meshes_and_xml() -> None:
     ET.SubElement(app, "compiler", angle="radian")
     ET.SubElement(app, "option", timestep="0.002", integrator="implicitfast")
     ET.SubElement(app, "size", nuserdata="8")
+
+    defaults = add_standard_defaults(
+        app,
+        friction="0.60 0.015 0.003",
+        solref="0.004 1",
+        solimp="0.95 0.99 0.001",
+        condim="4",
+    )
 
     asset = ET.SubElement(app, "asset")
     ET.SubElement(asset, "include", file="visual_assets.xml")
@@ -136,8 +115,9 @@ def export_blender_meshes_and_xml() -> None:
         type="plane",
         size="1.5 1.5 0.05",
         rgba="0.28 0.30 0.33 1",
-        contype="4",
-        conaffinity="4",
+        contype="1",
+        conaffinity="1",
+        group="2",
     )
 
     bodies = {}
@@ -184,8 +164,8 @@ def export_blender_meshes_and_xml() -> None:
     # Base collision boxes (174 mm rounded-corner graphite base & curved neck) + counter NFC card rest pad at Z_top = 0.0040 m
     for cname, cpos, csize in (
         ("sqreg_base_ring_col", (0.0, -0.0808, 0.0018), (0.0780, 0.0490, 0.0018)),
-        ("sqreg_base_deck_col", (0.0, -0.0808, 0.0088), (0.0870, 0.0572, 0.0052)),
-        ("sqreg_pedestal_col", (0.0, -0.0540, 0.0820), (0.0780, 0.0200, 0.0680)),
+        ("sqreg_base_deck_col", (0.0, -0.0808, 0.0103), (0.0870, 0.0572, 0.0067)),
+        ("sqreg_pedestal_col", (0.0, -0.0540, 0.0520), (0.0780, 0.0260, 0.0400)),
         ("sqreg_card_pad_col", (0.1240, 0.0700, 0.0020), (0.0305, 0.0465, 0.0020)),
     ):
         ET.SubElement(
@@ -195,10 +175,38 @@ def export_blender_meshes_and_xml() -> None:
             type="box",
             pos=numbers(cpos),
             size=numbers(csize),
-            contype="2",
+            contype="1",
             conaffinity="1",
             group="3",
+            rgba=COL_BASE_RGBA,
         )
+    neck_ang = math.radians(28.0)
+    ET.SubElement(
+        base,
+        "geom",
+        name="sqreg_neck_upper_col",
+        type="box",
+        pos="0 -0.0780 0.1180",
+        quat=numbers((math.cos(0.5 * neck_ang), math.sin(0.5 * neck_ang), 0.0, 0.0)),
+        size="0.0680 0.0180 0.0420",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_BASE_RGBA,
+    )
+    ET.SubElement(
+        base,
+        "geom",
+        name="sqreg_hinge_bar_col",
+        type="cylinder",
+        pos="0 -0.0885 0.1500",
+        quat=X_AXIS_QUAT,
+        size="0.0065 0.0580",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_BASE_RGBA,
+    )
 
     ET.SubElement(
         base,
@@ -206,7 +214,8 @@ def export_blender_meshes_and_xml() -> None:
         name="sqreg_usb_hub_site",
         pos="0 -0.0320 0.0074",
         size="0.005",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         base,
@@ -215,7 +224,8 @@ def export_blender_meshes_and_xml() -> None:
         type="box",
         pos="0.1240 0.0700 0.0044",
         size="0.0300 0.0460 0.0012",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
 
     # Operator 13.2 in screen tilt joint (-0.20 .. 0.35 rad about +X)
@@ -229,6 +239,9 @@ def export_blender_meshes_and_xml() -> None:
         range="-0.20 0.35",
         damping="1.8",
         armature="0.008",
+        frictionloss="0.25",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     tilt_rad = math.radians(34.4)
     s_mid = 0.01564
@@ -239,10 +252,11 @@ def export_blender_meshes_and_xml() -> None:
         type="box",
         pos=numbers((0.0, s_mid * math.sin(tilt_rad), s_mid * math.cos(tilt_rad))),
         quat=numbers((math.cos(-0.5 * tilt_rad), math.sin(-0.5 * tilt_rad), 0.0, 0.0)),
-        size="0.15875 0.0060 0.1015",
-        contype="2",
+        size="0.15875 0.0080 0.1075",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         screen,
@@ -250,7 +264,8 @@ def export_blender_meshes_and_xml() -> None:
         name="sqreg_operator_ui_site",
         pos="0 0.0060 0.0180",
         size="0.006",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
 
     # Customer 7.0 in payment display slide/undock joint (0 .. 0.180 m along +Y)
@@ -264,17 +279,21 @@ def export_blender_meshes_and_xml() -> None:
         range="0 0.180",
         damping="3.5",
         armature="0.006",
+        frictionloss="0.04",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         cust,
         "geom",
         name="sqreg_customer_base_col",
         type="box",
-        pos="0 0 -0.0080",
-        size="0.0870 0.0870 0.0140",
-        contype="2",
+        pos="0 0 -0.0078",
+        size="0.0870 0.0870 0.0138",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         cust,
@@ -283,9 +302,22 @@ def export_blender_meshes_and_xml() -> None:
         type="box",
         pos="0 0.0160 0.0080",
         size="0.0820 0.0680 0.0060",
-        contype="2",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
+    )
+    ET.SubElement(
+        cust,
+        "geom",
+        name="sqreg_customer_magstripe_ridge_col",
+        type="box",
+        pos="0 -0.0675 0.0140",
+        size="0.0850 0.0195 0.0080",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         cust,
@@ -293,7 +325,8 @@ def export_blender_meshes_and_xml() -> None:
         name="sqreg_nfc_tap_site",
         pos="0 0.0180 0.0144",
         size="0.006",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         cust,
@@ -302,7 +335,8 @@ def export_blender_meshes_and_xml() -> None:
         type="box",
         pos="0 0.0180 0.0148",
         size="0.0650 0.0550 0.0035",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         cust,
@@ -310,7 +344,8 @@ def export_blender_meshes_and_xml() -> None:
         name="sqreg_emv_slot_site",
         pos="0 0.0860 -0.0130",
         size="0.004",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         cust,
@@ -318,7 +353,8 @@ def export_blender_meshes_and_xml() -> None:
         name="sqreg_magstripe_site",
         pos="0 -0.0735 0.0160",
         size="0.004",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
 
     # Side power/wake tactile button slide joint (0 .. 0.002 m along -X)
@@ -333,6 +369,9 @@ def export_blender_meshes_and_xml() -> None:
         stiffness="4.0",
         damping="0.35",
         armature="0.0002",
+        frictionloss="0.01",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         pwr,
@@ -341,9 +380,10 @@ def export_blender_meshes_and_xml() -> None:
         type="box",
         pos="0.0005 0 0",
         size="0.0015 0.0090 0.0028",
-        contype="2",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
     )
 
     # 6-DOF contactless EMV payment card resting stably at CARD_REST_POS (Z = 0.0044 m)
@@ -356,8 +396,9 @@ def export_blender_meshes_and_xml() -> None:
         pos="0 0 0",
         size="0.0270 0.0428 0.0004",
         contype="1",
-        conaffinity="6",
+        conaffinity="1",
         group="3",
+        rgba=COL_ACCESSORY_RGBA,
     )
     ET.SubElement(
         card,
@@ -365,7 +406,20 @@ def export_blender_meshes_and_xml() -> None:
         name="vessel_socket",
         pos="0 0.0100 0",
         size="0.004",
-        group="3",
+        group="4",
+        rgba=SITE_GRASP_RGBA,
+    )
+
+    # Adjacent articulated-body contact exclusions (sqreg_payment_card stays UN-excluded for pad & NFC contact)
+    contact = add_adjacent_excludes(
+        app,
+        (
+            ("exclude_base_operator_screen", "sqreg_base", "sqreg_operator_screen"),
+            ("exclude_base_customer_display", "sqreg_base", "sqreg_customer_display"),
+            ("exclude_base_power_button", "sqreg_base", "sqreg_power_button"),
+            ("exclude_screen_customer_display", "sqreg_operator_screen", "sqreg_customer_display"),
+            ("exclude_screen_power_button", "sqreg_operator_screen", "sqreg_power_button"),
+        ),
     )
 
     # Actuators
@@ -419,7 +473,27 @@ def export_blender_meshes_and_xml() -> None:
     )
 
     write_xml(ASSETS / "appliance.xml", app)
-    write_xml(ASSETS / "scene.xml", app)
+
+    scene = ET.Element("mujoco", model="square-register-2g physics lab")
+    ET.SubElement(scene, "include", file="appliance.xml")
+    visual = ET.SubElement(scene, "visual")
+    ET.SubElement(visual, "global", offwidth="1400", offheight="1200")
+    ET.SubElement(visual, "headlight", ambient="0.42 0.42 0.44")
+    scene_world = ET.SubElement(scene, "worldbody")
+    ET.SubElement(scene_world, "light", pos="0.8 -1.2 1.4", dir="-0.35 0.6 -0.8")
+    write_xml(ASSETS / "scene.xml", scene)
+
+    emit_standalone_models(
+        ASSETS,
+        model_name="sqreg_base",
+        defaults=defaults,
+        asset=asset,
+        root_body=base,
+        contact=contact,
+        sensors=sensors,
+        exclude_sensors=("sqreg_card_to_nfc_sense",),
+        accessories=(("payment_card_model.xml", "sqreg_payment_card", card),),
+    )
 
     (ASSETS / "physics-export.json").write_text(
         json.dumps(
@@ -435,7 +509,7 @@ def export_blender_meshes_and_xml() -> None:
                 "customer_display_envelope_m": [0.1740, 0.1740, 0.0440],
                 "payment_card_dimensions_m": [0.0856, 0.0540, 0.0008],
                 "interfaces": ["5-port USB hub", "Ethernet", "Wi-Fi", "NFC Contactless", "EMV IC Chip", "Magstripe"],
-                "scope": "Articulated MuJoCo mechanical, dual-display tilt/undock, power button, and 6-DOF contactless NFC card tap model.",
+                "scope": "Articulated MuJoCo 4.0 mechanical, dual-display tilt/undock, power button, and 6-DOF contactless NFC card tap model.",
             },
             indent=2,
         )
@@ -444,124 +518,19 @@ def export_blender_meshes_and_xml() -> None:
 
 
 def export_native_xml(mujoco, np) -> None:
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from appliance_physics_kit import export_and_verify_native_xml
-
-    export_and_verify_native_xml(ASSETS, "square-register-2g", mujoco, np)
+    kit_export_native_xml(ASSETS, NAME, mujoco, np)
 
 
 def verify_frames_and_motions(mujoco, evidence_dir: Path) -> tuple[dict, dict]:
-    native_path = ASSETS / "native.xml"
-    glb_path = ASSETS / "square-register-2g.glb"
-    native_sha = hashlib.sha256(native_path.read_bytes()).hexdigest()
-
-    native_model = mujoco.MjModel.from_xml_path(str(native_path))
-    native_data = mujoco.MjData(native_model)
-    mujoco.mj_forward(native_model, native_data)
-
-    # 1. Rest-frame alignment check
-    body_poses = {}
-    for bname in NAMES:
-        bid = native_model.body(bname).id
-        pos = native_data.xpos[bid]
-        quat = native_data.xquat[bid]
-        body_poses[bname] = [
-            float(pos[0]),
-            float(pos[1]),
-            float(pos[2]),
-            float(quat[0]),
-            float(quat[1]),
-            float(quat[2]),
-            float(quat[3]),
-        ]
-    frames_in = evidence_dir / "frames-input.json"
-    frames_out = evidence_dir / "frames-report.json"
-    frames_in.write_text(
-        json.dumps(
-            {
-                "square-register-2g": {
-                    "glb": str(glb_path),
-                    "native_sha256": native_sha,
-                    "bodies": body_poses,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
+    return kit_verify_frames_and_motions(
+        ASSETS,
+        NAME,
+        NAMES,
+        VISUAL_AXES,
+        mujoco,
+        evidence_dir,
+        cleanup_inputs=True,
     )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(frames_in),
-            str(frames_out),
-        ],
-        check=True,
-    )
-    frames_report = json.loads(frames_out.read_text())
-    assert frames_report["passed"], frames_report
-
-    # 2. Sampled scalar-joint motion trajectory check (21 samples per scalar joint)
-    motions = []
-    for jname, vaxis in VISUAL_AXES.items():
-        jid = native_model.joint(jname).id
-        jtype = int(native_model.jnt_type[jid])
-        kind = "hinge" if jtype == int(mujoco.mjtJoint.mjJNT_HINGE) else "slide"
-        low, high = native_model.jnt_range[jid]
-        bid = int(native_model.jnt_bodyid[jid])
-        samples = []
-        for idx in range(21):
-            val = float(low + (high - low) * idx / 20.0)
-            mujoco.mj_resetData(native_model, native_data)
-            native_data.qpos[native_model.jnt_qposadr[jid]] = val
-            mujoco.mj_forward(native_model, native_data)
-            samples.append(
-                {
-                    "value": val,
-                    "pose": [
-                        *native_data.xpos[bid].tolist(),
-                        *native_data.xquat[bid].tolist(),
-                    ],
-                }
-            )
-        motions.append(
-            {
-                "joint": jname,
-                "body": native_model.body(bid).name,
-                "kind": kind,
-                "visual_axis": vaxis,
-                "samples": samples,
-            }
-        )
-
-    motion_in = evidence_dir / "motion-input.json"
-    motion_out = evidence_dir / "motion-report.json"
-    motion_in.write_text(
-        json.dumps(
-            {
-                "square-register-2g": {
-                    "glb": str(glb_path),
-                    "native_sha256": native_sha,
-                    "motions": motions,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
-    )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(motion_in),
-            str(motion_out),
-            "--motion",
-        ],
-        check=True,
-    )
-    motion_report = json.loads(motion_out.read_text())
-    assert motion_report["passed"], motion_report
-    return frames_report, motion_report
 
 
 def write_asset_docs(report: dict) -> None:
@@ -601,7 +570,7 @@ See the [hardware reference sheet](../../../docs/equipment/square-register-2g/RE
 - `square-register-2g.blend` / `square-register-2g.glb`: Editable Blender 5.2 source and glTF 2.0 runtime asset (`{report['glb_sha256'][:12]}…`).
 - `cafeos-order-ui.png` / `customer-tap-ui.png`: Embedded Satyr Kitchen / CafeOS POS & NFC tap UI textures.
 - `studio-{{main,front,right,active}}.png`: Cycles Metal GPU studio renders (`1400 × 1200`, `48` samples + OIDN).
-- `appliance.xml` / `scene.xml` / `native.xml` / `physics-export.json`: MuJoCo 3.13 MJCF & collision-only native physics models.
+- `appliance.xml` / `scene.xml` / `model.xml` / `payment_card_model.xml` / `native.xml` / `physics-export.json`: MuJoCo 4.0 MJCF, standalone attachable models, & collision-only native physics models.
 - `build-report.json` / `inspection-report.json` / `active-states.json` / `active-states.md`: Automated QA & frame-alignment reports (`max_rest_pos_err = {rf['rest_max_position_error_m']:.3e} m`, `max_motion_pos_err = {rf['motion_max_position_error_m']:.3e} m`).
 """
     (ASSETS / "README.md").write_text(readme, encoding="utf-8")
