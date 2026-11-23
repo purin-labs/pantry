@@ -182,8 +182,16 @@ function renderCapability(
       className="access35-action-row"
       key={`${capability.definition.capabilityId}@${capability.definition.capabilityVersion}`}
     >
-      <div className="access35-action-text">
+      {/* The row shows the name; the description stays on hover and for
+          screen readers, because it can carry a limit of the action. */}
+      <div
+        className="access35-action-text"
+        title={capability.definition.description}
+      >
         <h4>{capability.definition.label}</h4>
+        <span id={descriptionId(capability)} className="visually-hidden">
+          {capability.definition.description}
+        </span>
         <small>{capabilityMeta(capability)}</small>
         {renderCapabilityNote(integrationsPath, capability)}
       </div>
@@ -198,7 +206,10 @@ function renderCapability(
             capability,
           )}
         >
-          <Select.Trigger aria-label={`Mode for ${capability.definition.label}`}>
+          <Select.Trigger
+            aria-label={`Mode for ${capability.definition.label}`}
+            aria-describedby={descriptionId(capability)}
+          >
             <Select.Value />
           </Select.Trigger>
           <Select.Popup>{modes.map(renderModeOption)}</Select.Popup>
@@ -352,4 +363,10 @@ function changeCapabilityMode(
 ): void {
   if (mode === "enabled" || mode === "approval_required" || mode === "disabled")
     change(capability, mode);
+}
+
+function descriptionId(capability: {
+  readonly definition: { readonly capabilityId: string };
+}): string {
+  return `access-action-${capability.definition.capabilityId.replace(/[^a-z0-9_-]/giu, "-")}`;
 }
