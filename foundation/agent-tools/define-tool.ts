@@ -331,7 +331,7 @@ function readReceiptId(value: unknown): string {
     typeof value !== "object" ||
     typeof (value as { receiptId?: unknown }).receiptId !== "string"
   ) {
-    throw new Error("Order queue receipt missing");
+    throw new Error("Tool result has no receiptId");
   }
   return (value as { receiptId: string }).receiptId;
 }
