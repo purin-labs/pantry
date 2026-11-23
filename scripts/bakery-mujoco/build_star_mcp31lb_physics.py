@@ -385,52 +385,11 @@ def export_blender_meshes_and_xml() -> None:
     )
 
 
-def strip_visual_meshes(root: ET.Element, model) -> None:
-    for parent in root.iter():
-        for geom in list(parent):
-            if geom.tag != "geom" or not geom.get("name"):
-                continue
-            index = model.geom(geom.get("name")).id
-            if (
-                model.geom_contype[index] == 0
-                and model.geom_conaffinity[index] == 0
-                and geom.get("type") == "mesh"
-                and geom.get("mass") == "0"
-            ):
-                parent.remove(geom)
-
-
 def export_native_xml(mujoco, np) -> None:
-    spec = mujoco.MjSpec.from_file(str(ASSETS / "scene.xml"))
-    model = spec.compile()
-    data = mujoco.MjData(model)
-    mujoco.mj_forward(model, data)
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from appliance_physics_kit import export_and_verify_native_xml
 
-    root = ET.fromstring(spec.to_xml())
-    strip_visual_meshes(root, model)
-    used_meshes = {geom.get("mesh") for geom in root.iter("geom")}
-    used_materials = {geom.get("material") for geom in root.iter("geom")}
-    assets = root.find("asset")
-    if assets is not None:
-        for asset in list(assets):
-            if (asset.tag == "mesh" and asset.get("name") not in used_meshes) or (
-                asset.tag == "material" and asset.get("name") not in used_materials
-            ):
-                assets.remove(asset)
-    for actuator in root.iter("general"):
-        actuator.attrib.pop("input", None)
-    ET.indent(root, space="  ")
-    native_path = ASSETS / "native.xml"
-    native_path.write_text(ET.tostring(root, encoding="unicode") + "\n")
-
-    rebuilt = mujoco.MjModel.from_xml_path(str(native_path))
-    for field in ("body_mass", "body_inertia", "qpos0", "dof_damping"):
-        if not np.allclose(
-            getattr(model, field), getattr(rebuilt, field), rtol=1e-5, atol=1e-9
-        ):
-            raise RuntimeError(f"Export changed native {field} for star-mcp31lb")
-    if (rebuilt.nq, rebuilt.nv) != (model.nq, model.nv):
-        raise RuntimeError("Export changed native degrees of freedom for star-mcp31lb")
+    export_and_verify_native_xml(ASSETS, "star-mcp31lb", mujoco, np)
 
 
 def verify_frames_and_motions(mujoco, evidence_dir: Path) -> tuple[dict, dict]:

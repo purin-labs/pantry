@@ -11,9 +11,28 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from appliance_physics_kit import (
+    BLENDER_BIN,
+    COL_ACCESSORY_RGBA,
+    COL_ARTIC_RGBA,
+    COL_BASE_RGBA,
+    COL_WALL_RGBA,
+    ROOT,
+    SITE_GRASP_RGBA,
+    SITE_SUPPORT_RGBA,
+    Y_AXIS_QUAT,
+    add_adjacent_excludes,
+    add_standard_defaults,
+    emit_standalone_models,
+    export_and_verify_native_xml as kit_export_native_xml,
+    numbers,
+    prepare_blender_assembly,
+    verify_frames_and_motions as kit_verify_frames_and_motions,
+    write_xml,
+)
+
 ASSETS = ROOT / "assets/bakery-mujoco/maruzen-mbco-4me"
-BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
 
 NAMES = (
     "mbco4_oven",
@@ -63,65 +82,10 @@ VISUAL_MOTIONS = {
 }
 
 
-def numbers(values) -> str:
-    return " ".join(f"{value:.9g}" for value in values)
-
-
-def write_xml(path: Path, element: ET.Element) -> None:
-    ET.indent(element, space="  ")
-    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
-
-
 def export_blender_meshes_and_xml() -> None:
     """Run inside Blender to export body-local OBJ meshes and author appliance.xml and scene.xml."""
-    import bpy
-
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from build_oven_visuals import export_visual_meshes
-
     source = ASSETS / "maruzen-mbco-4me.blend"
-    bpy.ops.wm.open_mainfile(filepath=str(source))
-    bpy.context.scene.frame_set(1)
-    for obj in list(bpy.data.objects):
-        obj.animation_data_clear()
-    bpy.context.view_layer.update()
-
-    parts = [bpy.data.objects[name] for name in NAMES]
-    poses = {obj.name: obj.matrix_world.copy() for obj in parts}
-
-    # Reparent every mesh under mbco4_oven to its nearest articulated ancestor in NAMES while preserving world pose
-    for obj in list(parts[0].children_recursive):
-        if obj.type != "MESH":
-            continue
-        parent = obj.parent
-        while parent is not None and parent not in parts:
-            parent = parent.parent
-        if parent is None:
-            continue
-        pose = obj.matrix_world.copy()
-        obj.animation_data_clear()
-        obj.parent = parent
-        obj.matrix_world = pose
-        if len(obj.data.vertices) >= 3:
-            zs = [v.co.z for v in obj.data.vertices]
-            if max(zs) - min(zs) < 1e-5:
-                obj.data.vertices[0].co.z += 2e-5
-                obj.data.update()
-    bpy.context.view_layer.update()
-
-    for mat in bpy.data.materials:
-        if "metallic" not in mat:
-            mat["metallic"] = 0.0
-        if "roughness" not in mat:
-            mat["roughness"] = 0.30
-        if "emission" not in mat:
-            mat["emission"] = 0.0
-
-    mesh_dir = ASSETS / "meshes"
-    if mesh_dir.is_dir():
-        for stale_obj in mesh_dir.glob("*.obj"):
-            stale_obj.unlink()
-    export_visual_meshes(parts, ASSETS)
+    parts, poses = prepare_blender_assembly(source, NAMES, ASSETS)
 
     app = ET.Element(
         "mujoco",
@@ -131,15 +95,7 @@ def export_blender_meshes_and_xml() -> None:
     ET.SubElement(app, "option", timestep="0.002", integrator="implicitfast")
     ET.SubElement(app, "size", nuserdata="8")
 
-    defaults = ET.SubElement(app, "default")
-    ET.SubElement(
-        defaults,
-        "geom",
-        condim="4",
-        friction="0.60 0.015 0.003",
-        solref="0.004 1",
-        solimp="0.95 0.99 0.001",
-    )
+    defaults = add_standard_defaults(app)
 
     asset = ET.SubElement(app, "asset")
     ET.SubElement(asset, "include", file="visual_assets.xml")
@@ -198,13 +154,13 @@ def export_blender_meshes_and_xml() -> None:
     damper = bodies["mbco4_damper"]
     tray = bodies["mbco4_tray"]
 
-    col_base_rgba = "0.20 0.75 0.35 0.45"
-    col_wall_rgba = "0.25 0.55 0.90 0.45"
-    col_artic_rgba = "0.95 0.55 0.15 0.50"
-    col_tray_rgba = "0.90 0.80 0.15 0.50"
-    site_support_rgba = "0.15 0.80 0.85 0.35"
-    site_grasp_rgba = "0.95 0.25 0.25 0.40"
-    y_axis_quat = numbers((math.cos(math.pi / 4), math.sin(math.pi / 4), 0.0, 0.0))
+    col_base_rgba = COL_BASE_RGBA
+    col_wall_rgba = COL_WALL_RGBA
+    col_artic_rgba = COL_ARTIC_RGBA
+    col_tray_rgba = COL_ACCESSORY_RGBA
+    site_support_rgba = SITE_SUPPORT_RGBA
+    site_grasp_rgba = SITE_GRASP_RGBA
+    y_axis_quat = Y_AXIS_QUAT
 
     # Four 50 mm stainless adjustable feet touching Z = 0.0000 m (CAD: 100 mm from front, 60 mm from rear)
     for foot_name, fx, fy in (
@@ -500,15 +456,16 @@ def export_blender_meshes_and_xml() -> None:
         mass="0",
     )
 
-    contact = ET.SubElement(app, "contact")
-    for ex_name, b1, b2 in (
-        ("exclude_oven_door", "mbco4_oven", "mbco4_door"),
-        ("exclude_door_handle", "mbco4_door", "mbco4_handle"),
-        ("exclude_oven_handle", "mbco4_oven", "mbco4_handle"),
-        ("exclude_oven_fan", "mbco4_oven", "mbco4_fan"),
-        ("exclude_oven_damper", "mbco4_oven", "mbco4_damper"),
-    ):
-        ET.SubElement(contact, "exclude", name=ex_name, body1=b1, body2=b2)
+    contact = add_adjacent_excludes(
+        app,
+        (
+            ("exclude_oven_door", "mbco4_oven", "mbco4_door"),
+            ("exclude_door_handle", "mbco4_door", "mbco4_handle"),
+            ("exclude_oven_handle", "mbco4_oven", "mbco4_handle"),
+            ("exclude_oven_fan", "mbco4_oven", "mbco4_fan"),
+            ("exclude_oven_damper", "mbco4_oven", "mbco4_damper"),
+        ),
+    )
 
     actuators = ET.SubElement(app, "actuator")
     ET.SubElement(
@@ -571,36 +528,17 @@ def export_blender_meshes_and_xml() -> None:
     write_xml(ASSETS / "appliance.xml", app)
     write_xml(ASSETS / "scene.xml", app)
 
-    # Emit standalone MjSpec.attach-ready oven model.xml (no floor, no freejoint tray)
-    import copy
-
-    oven_model = ET.Element("mujoco", model="mbco4_oven")
-    ET.SubElement(oven_model, "compiler", angle="radian")
-    oven_model.append(copy.deepcopy(defaults))
-    oven_model.append(copy.deepcopy(asset))
-    oven_world = ET.SubElement(oven_model, "worldbody")
-    oven_world.append(copy.deepcopy(oven))
-    oven_model.append(copy.deepcopy(contact))
-    oven_sensors = ET.SubElement(oven_model, "sensor")
-    for sensor_el in sensors:
-        if sensor_el.get("name") != "mbco4_tray_sense":
-            oven_sensors.append(copy.deepcopy(sensor_el))
-    write_xml(ASSETS / "model.xml", oven_model)
-
-    # Emit standalone MjSpec.attach-ready tray_model.xml (zero transform, no freejoint)
-    tray_model = ET.Element("mujoco", model="mbco4_tray")
-    ET.SubElement(tray_model, "compiler", angle="radian")
-    tray_model.append(copy.deepcopy(defaults))
-    tray_model.append(copy.deepcopy(asset))
-    tray_world = ET.SubElement(tray_model, "worldbody")
-    tray_copy = copy.deepcopy(tray)
-    tray_copy.set("pos", "0 0 0")
-    tray_copy.set("quat", "1 0 0 0")
-    for child in list(tray_copy):
-        if child.tag == "freejoint":
-            tray_copy.remove(child)
-    tray_world.append(tray_copy)
-    write_xml(ASSETS / "tray_model.xml", tray_model)
+    emit_standalone_models(
+        ASSETS,
+        model_name="mbco4_oven",
+        defaults=defaults,
+        asset=asset,
+        root_body=oven,
+        contact=contact,
+        sensors=sensors,
+        exclude_sensors=("mbco4_tray_sense",),
+        accessories=(("tray_model.xml", "mbco4_tray", tray),),
+    )
 
     (ASSETS / "physics-export.json").write_text(
         json.dumps(
@@ -625,174 +563,14 @@ def export_blender_meshes_and_xml() -> None:
     )
 
 
-def strip_visual_meshes(root: ET.Element, model) -> None:
-    for parent in root.iter():
-        for geom in list(parent):
-            if geom.tag != "geom" or not geom.get("name"):
-                continue
-            index = model.geom(geom.get("name")).id
-            if (
-                model.geom_contype[index] == 0
-                and model.geom_conaffinity[index] == 0
-                and geom.get("type") == "mesh"
-                and geom.get("mass") == "0"
-            ):
-                parent.remove(geom)
-
-
 def export_and_verify_native_xml(mujoco, np) -> None:
-    spec = mujoco.MjSpec.from_file(str(ASSETS / "scene.xml"))
-    model = spec.compile()
-    data = mujoco.MjData(model)
-    mujoco.mj_forward(model, data)
-
-    root = ET.fromstring(spec.to_xml())
-    strip_visual_meshes(root, model)
-    used_meshes = {geom.get("mesh") for geom in root.iter("geom")}
-    used_materials = {geom.get("material") for geom in root.iter("geom")}
-    assets = root.find("asset")
-    if assets is not None:
-        used_textures: set[str] = set()
-        for asset in list(assets):
-            if asset.tag == "material" and asset.get("name") in used_materials:
-                for layer in asset.findall("layer"):
-                    if layer.get("texture"):
-                        used_textures.add(layer.get("texture"))
-                if asset.get("texture"):
-                    used_textures.add(asset.get("texture"))
-        for asset in list(assets):
-            if (
-                (asset.tag == "mesh" and asset.get("name") not in used_meshes)
-                or (asset.tag == "material" and asset.get("name") not in used_materials)
-                or (asset.tag == "texture" and asset.get("name") not in used_textures)
-            ):
-                assets.remove(asset)
-    for actuator in root.iter("general"):
-        actuator.attrib.pop("input", None)
-    ET.indent(root, space="  ")
-    native_path = ASSETS / "native.xml"
-    native_path.write_text(ET.tostring(root, encoding="unicode") + "\n")
-
-    rebuilt = mujoco.MjModel.from_xml_path(str(native_path))
-    for field in ("body_mass", "body_inertia", "qpos0", "dof_damping"):
-        if not np.allclose(getattr(model, field), getattr(rebuilt, field), rtol=1e-5, atol=1e-9):
-            raise RuntimeError(f"Export changed native {field} for maruzen-mbco-4me")
-    if (rebuilt.nq, rebuilt.nv) != (model.nq, model.nv):
-        raise RuntimeError(f"Export changed native DOFs: {(rebuilt.nq, rebuilt.nv)} vs {(model.nq, model.nv)}")
+    kit_export_native_xml(ASSETS, "maruzen-mbco-4me", mujoco, np)
 
 
 def verify_frames_and_motions(mujoco, evidence_dir: Path) -> tuple[dict, dict]:
-    native_path = ASSETS / "native.xml"
-    glb_path = ASSETS / "maruzen-mbco-4me.glb"
-    native_sha = hashlib.sha256(native_path.read_bytes()).hexdigest()
-
-    native_model = mujoco.MjModel.from_xml_path(str(native_path))
-    native_data = mujoco.MjData(native_model)
-    mujoco.mj_forward(native_model, native_data)
-
-    body_poses = {}
-    for bname in NAMES:
-        bid = native_model.body(bname).id
-        pos = native_data.xpos[bid]
-        quat = native_data.xquat[bid]
-        body_poses[bname] = [
-            float(pos[0]),
-            float(pos[1]),
-            float(pos[2]),
-            float(quat[0]),
-            float(quat[1]),
-            float(quat[2]),
-            float(quat[3]),
-        ]
-
-    frames_in = evidence_dir / "frames-input.json"
-    frames_out = evidence_dir / "frames-report.json"
-    frames_in.write_text(
-        json.dumps(
-            {
-                "maruzen-mbco-4me": {
-                    "glb": str(glb_path),
-                    "native_sha256": native_sha,
-                    "bodies": body_poses,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
+    return kit_verify_frames_and_motions(
+        ASSETS, "maruzen-mbco-4me", NAMES, VISUAL_MOTIONS, mujoco, evidence_dir
     )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(frames_in),
-            str(frames_out),
-        ],
-        check=True,
-    )
-    frames_report = json.loads(frames_out.read_text())
-    assert frames_report["passed"] is True, frames_report
-
-    # Sample 21 scalar-joint poses per joint (including nested mbco4_handle on mbco4_door)
-    motions = []
-    for joint_name, visual_axis in VISUAL_MOTIONS.items():
-        jid = native_model.joint(joint_name).id
-        jtype = int(native_model.jnt_type[jid])
-        kind = "hinge" if jtype == int(mujoco.mjtJoint.mjJNT_HINGE) else "slide"
-        if native_model.jnt_limited[jid]:
-            low, high = native_model.jnt_range[jid]
-        else:
-            low, high = -math.pi, math.pi
-        bid = int(native_model.jnt_bodyid[jid])
-        samples = []
-        for idx in range(21):
-            val = float(low + (high - low) * idx / 20.0)
-            mujoco.mj_resetData(native_model, native_data)
-            native_data.qpos[native_model.jnt_qposadr[jid]] = val
-            mujoco.mj_forward(native_model, native_data)
-            samples.append(
-                {
-                    "value": val,
-                    "pose": [*native_data.xpos[bid].tolist(), *native_data.xquat[bid].tolist()],
-                }
-            )
-        motions.append(
-            {
-                "joint": joint_name,
-                "body": native_model.body(bid).name,
-                "kind": kind,
-                "visual_axis": list(visual_axis),
-                "samples": samples,
-            }
-        )
-
-    motion_in = evidence_dir / "motion-input.json"
-    motion_out = evidence_dir / "motion-report.json"
-    motion_in.write_text(
-        json.dumps(
-            {
-                "maruzen-mbco-4me": {
-                    "glb": str(glb_path),
-                    "native_sha256": native_sha,
-                    "motions": motions,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
-    )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(motion_in),
-            str(motion_out),
-            "--motion",
-        ],
-        check=True,
-    )
-    motion_report = json.loads(motion_out.read_text())
-    assert motion_report["passed"] is True, motion_report
-    return frames_report, motion_report
 
 
 def write_asset_docs(report: dict) -> None:

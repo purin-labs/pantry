@@ -8,27 +8,11 @@ from pathlib import Path
 
 import mujoco
 import numpy as np
+from appliance_physics_kit import prune_unused_assets, strip_visual_meshes
 from live_panels import READOUTS, model_spec
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "assets/bakery-mujoco/fr10-workcell/native/assets.json"
-
-
-def strip_visual_meshes(root, model):
-    # Three.js owns the detailed visuals. Zero-mass, noncontact meshes do not
-    # belong in the Wasm package. Keep collision proxies and payload markers.
-    for parent in root.iter():
-        for geom in list(parent):
-            if geom.tag != "geom" or not geom.get("name"):
-                continue
-            index = model.geom(geom.get("name")).id
-            if (
-                model.geom_contype[index] == 0
-                and model.geom_conaffinity[index] == 0
-                and geom.get("type") == "mesh"
-                and geom.get("mass") == "0"
-            ):
-                parent.remove(geom)
 
 
 def export():
@@ -44,16 +28,10 @@ def export():
             model = spec.compile()
         root = ET.fromstring(spec.to_xml())
         strip_visual_meshes(root, model)
-        used_meshes = {geom.get("mesh") for geom in root.iter("geom")}
-        used_materials = {geom.get("material") for geom in root.iter("geom")}
+        prune_unused_assets(root)
         assets = root.find("asset")
         if assets is not None:
             for asset in list(assets):
-                if (asset.tag == "mesh" and asset.get("name") not in used_meshes) or (
-                    asset.tag == "material" and asset.get("name") not in used_materials
-                ):
-                    assets.remove(asset)
-                    continue
                 filename = asset.get("file")
                 if filename:
                     source = (directory / filename).resolve()

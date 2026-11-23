@@ -1258,8 +1258,40 @@ def export_visual_meshes(bodies, directory):
                         )
                         written_textures.add(tex_name)
                 rgba_vals = rgba_override if rgba_override is not None else surface.diffuse_color
-                metallic_val = 1.0 if (has_orm or has_metallic_map) else float(surface["metallic"])
-                roughness_val = 1.0 if (has_orm or has_roughness_map) else float(surface["roughness"])
+                bsdf = (
+                    surface.node_tree.nodes.get("Principled BSDF")
+                    if (surface.use_nodes and surface.node_tree)
+                    else None
+                )
+                base_metallic = float(
+                    surface["metallic"]
+                    if "metallic" in surface
+                    else (
+                        bsdf.inputs["Metallic"].default_value
+                        if bsdf and "Metallic" in bsdf.inputs
+                        else 0.0
+                    )
+                )
+                base_roughness = float(
+                    surface["roughness"]
+                    if "roughness" in surface
+                    else (
+                        bsdf.inputs["Roughness"].default_value
+                        if bsdf and "Roughness" in bsdf.inputs
+                        else 0.35
+                    )
+                )
+                base_emission = float(
+                    surface["emission"]
+                    if "emission" in surface
+                    else (
+                        bsdf.inputs["Emission Strength"].default_value
+                        if bsdf and "Emission Strength" in bsdf.inputs
+                        else 0.0
+                    )
+                )
+                metallic_val = 1.0 if (has_orm or has_metallic_map) else base_metallic
+                roughness_val = 1.0 if (has_orm or has_roughness_map) else base_roughness
                 mat_el = ET.SubElement(
                     assets,
                     "material",
@@ -1268,8 +1300,8 @@ def export_visual_meshes(bodies, directory):
                     metallic=str(metallic_val),
                     roughness=str(roughness_val),
                     specular="0.5",
-                    shininess=str(1 - float(surface["roughness"])),
-                    emission=str(min(1, surface["emission"])),
+                    shininess=str(max(0.0, 1.0 - base_roughness)),
+                    emission=str(min(1.0, max(0.0, base_emission))),
                 )
                 for tex_name, _fname, _colorspace, role in layers:
                     ET.SubElement(mat_el, "layer", texture=tex_name, role=role)
