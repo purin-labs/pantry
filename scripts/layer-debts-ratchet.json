@@ -28,7 +28,7 @@
       "writes": 17
     },
     "portal-default": {
-      "files": 26
+      "files": 2
     }
   },
   "kinds": {
@@ -199,7 +199,7 @@
       "reason": "The rule of the whole Portal source folder gives the Portal surface module to each file with no line of its own. So the layer check never refuses a new Portal file, and that file may import each area.",
       "fix": "Give each listed file its own line or a folder rule in the map, then remove the rule of the whole folder. A new Portal file then needs a line, as a new Platform file does.",
       "counts": {
-        "files surfaces/portal": 26
+        "files surfaces/portal": 2
       }
     }
   }
