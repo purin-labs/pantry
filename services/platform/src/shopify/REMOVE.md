@@ -7,13 +7,14 @@ removal is one piece of work with a known end.
 The counts are from 2026-11-21. Run the commands again before a removal.
 
 After step A2.5, the commerce area reaches Shopify through one port,
-`CommerceProvider` (`commerce/contract/commerce-provider.ts`). The Shopify
-implementation is `shopifyCommerceProvider` in `commerce-provider.ts` of this
-folder. The provider catalogue reaches the Shopify entry through the port
-`providerModules` (`integrations/contract/provider-modules.ts`), and the entry is
-`SHOPIFY_PROVIDER_MODULE` in `provider-module.ts` of this folder. The Worker
-registers both in `worker-ports.ts`, two lines. Shopify reaches commerce through
-the port `commerceDeliveryIntake` (`commerce/contract/delivery-intake.ts`).
+`CommerceProvider` (`areas/commerce/server/contract/commerce-provider.ts`). The
+Shopify implementation is `shopifyCommerceProvider` in `commerce-provider.ts` of
+this folder. The provider catalogue reaches the Shopify entry through the port
+`providerModules` (`areas/integrations/server/contract/provider-modules.ts`), and
+the entry is `SHOPIFY_PROVIDER_MODULE` in `provider-module.ts` of this folder. The
+Worker registers both in `services/platform/src/worker-ports.ts`, two lines.
+Shopify reaches commerce through the port `commerceDeliveryIntake`
+(`areas/commerce/server/contract/delivery-intake.ts`).
 
 ## 1. This folder
 
@@ -31,13 +32,13 @@ and the credential check (`credential-replacement.ts`).
 
 Seven source files outside the folder import it. Remove the Shopify lines in each one.
 
-| File                                                                                                        | What it uses                                                                                                                                                                                                                                             |
-| ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `worker-ports.ts`                                                                                           | The two registration lines: `shopifyCommerceProvider` and `SHOPIFY_PROVIDER_MODULE`. The type check then shows the `shopify` members of `ConnectedCommerceProviders` and `ProviderModules`, and the `shopify` getter of `provider-adapters/catalogue.ts` |
-| `integration-gateway.ts`                                                                                    | The Shopify routes of the Worker                                                                                                                                                                                                                         |
-| `ingress-queue.ts`                                                                                          | The queue message type in the union, and its parser                                                                                                                                                                                                      |
-| `gateway/support.ts`                                                                                        | The queue message for a webhook, and the order and resource normalizers                                                                                                                                                                                  |
-| `actors/organisation.ts`, `actors/organisation/schema.ts`, `actors/organisation/organisation-actor-base.ts` | The location observation that the Organisation actor holds                                                                                                                                                                                               |
+| File                                                                                                                                                                          | What it uses                                                                                                                                                                                                                                                                       |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `services/platform/src/worker-ports.ts`                                                                                                                                       | The two registration lines: `shopifyCommerceProvider` and `SHOPIFY_PROVIDER_MODULE`. The type check then shows the `shopify` members of `ConnectedCommerceProviders` and `ProviderModules`, and the `shopify` getter of `areas/integrations/server/provider-adapters/catalogue.ts` |
+| `services/platform/src/integration-gateway.ts`                                                                                                                                | The Shopify routes of the Worker                                                                                                                                                                                                                                                   |
+| `services/platform/src/ingress-queue.ts`                                                                                                                                      | The queue message type in the union, and its parser                                                                                                                                                                                                                                |
+| `services/platform/src/gateway/support.ts`                                                                                                                                    | The queue message for a webhook, and the order and resource normalizers                                                                                                                                                                                                            |
+| `services/platform/src/actors/organisation.ts`, `services/platform/src/actors/organisation/schema.ts`, `services/platform/src/actors/organisation/organisation-actor-base.ts` | The location observation that the Organisation actor holds                                                                                                                                                                                                                         |
 
 Each of these files holds only call lines or registration lines for Shopify. The
 Shopify code itself is in this folder.
@@ -45,7 +46,8 @@ Shopify code itself is in this folder.
 Find the importers again:
 
 ```bash
-grep -rlE 'from "[^"]*shopify/[a-z/-]+"' services/platform/src | grep -v src/shopify/
+grep -rlsE 'from "[^"]*shopify/[a-z/-]+"' services/platform/src areas surfaces |
+  grep -v services/platform/src/shopify/
 ```
 
 ## 3. The value `"shopify"` in the closed unions
@@ -76,7 +78,7 @@ Also delete `packages/commerce-contracts/src/records/shopify.ts` and
   `import-m8-shopify-automation-token.mjs`, `import-m8-shopify-local-credentials.mjs`
   and `link-m8-shopify-app.mjs`, with their lines in the root `package.json`.
 - The `SHOPIFY_*` values in `services/platform/wrangler.jsonc`, the Wrangler secrets
-  `SHOPIFY_CLIENT_ID` and `SHOPIFY_CLIENT_SECRET`, and their bindings in `env.ts`.
+  `SHOPIFY_CLIENT_ID` and `SHOPIFY_CLIENT_SECRET`, and their bindings in `foundation/kernel/env.ts`.
 - The OAuth callback and the webhook address at Shopify, in the Shopify partner
   account. A person must remove these.
 
