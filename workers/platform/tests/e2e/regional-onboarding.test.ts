@@ -1549,7 +1549,7 @@ async function readLateSessionState(
   return state.storage.get<string>("regional-late-session-state");
 }
 
-it.skipIf(env.TEST_REGIONAL_MIGRATIONS.length === 0)(
+it(
   "abandons a copied target and recovers in the source region through a fresh epoch",
   regionalAbandonmentJourney,
   100_000,
@@ -1956,7 +1956,7 @@ async function reportFullCapacity(
   return result;
 }
 
-it.skipIf(env.TEST_REGIONAL_MIGRATIONS.length === 0)(
+it(
   "restores retired identities in a regional database after interrupted publication",
   regionalRetirementRecoveryJourney,
   100_000,
