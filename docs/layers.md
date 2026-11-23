@@ -482,7 +482,7 @@ import. A module with no line for one of these has none.
   - `workers/platform/src/slack-ingress/`
   - `workers/platform/src/vault-onepassword/`
 - Packages: `workers/platform`
-- Tables (5): `connector`, `install`, `thread_binding`, `thread_file_watch`, `tool_call`
+- Tables (3): `thread_binding`, `thread_file_watch`, `tool_call`
 
 ## workers/punter
 

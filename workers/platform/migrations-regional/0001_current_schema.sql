@@ -34,18 +34,6 @@ BEGIN
       updated_at = NEW.updated_at
   WHERE organisation_id = NEW.organisation_id;
 END;
-CREATE TABLE install (
-  organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),
-  surface_kind TEXT NOT NULL,
-  workspace_id TEXT NOT NULL,
-  install_model TEXT NOT NULL CHECK (install_model IN ('unlisted', 'marketplace', 'custom')),
-  bot_token_ref TEXT NOT NULL,
-  scopes TEXT NOT NULL,
-  installed_at INTEGER NOT NULL,
-  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'revoked', 'disabled')), last_event_received_at INTEGER,
-  PRIMARY KEY (organisation_id, surface_kind, workspace_id)
-);
-CREATE UNIQUE INDEX idx_install_workspace ON install (surface_kind, workspace_id);
 CREATE TABLE credential_ref (
   organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),
   provider TEXT NOT NULL,
@@ -111,15 +99,6 @@ CREATE TABLE cue_subscription (
   PRIMARY KEY (organisation_id, subscription_id)
 );
 CREATE INDEX idx_cue_subscription_event ON cue_subscription (organisation_id, source, event_type);
-CREATE TABLE connector (
-  organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),
-  provider TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'disabled', 'error')),
-  webhook_secret_ref TEXT,
-  webhook_status TEXT CHECK (webhook_status IS NULL OR webhook_status IN ('none', 'pending', 'live')),
-  installed_at INTEGER NOT NULL, api_credential_ref TEXT, shop_domain TEXT,
-  PRIMARY KEY (organisation_id, provider)
-);
 CREATE TABLE vault_secret (
   organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),
   vault_handle TEXT NOT NULL,

@@ -76,7 +76,6 @@ export const PURGE_CATALOGUE = [
   { table: "commerce_export_preset_publication", action: "erase" },
   { table: "commerce_lab_run", action: "erase" },
   { table: "commerce_lab_organisation", action: "erase" },
-  { table: "connector", action: "erase" },
   { table: "contact_endpoint_verification", action: "erase" },
   { table: "context_projection", action: "erase" },
   { table: "context_projection_fts", action: "erase" },
@@ -213,7 +212,6 @@ export const PURGE_CATALOGUE = [
   { table: "external_vault_import", action: "erase" },
   { table: "gmail_inference_eligibility", action: "erase" },
   { table: "held_output_request", action: "erase" },
-  { table: "install", action: "erase" },
   {
     table: "onboarding_audit_event",
     action: "keep",
