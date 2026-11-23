@@ -218,7 +218,9 @@ The link reader (`messages/link-reader.ts`) works as follows:
 - The record gives one outcome: `collected`, `skipped` with its reason, or `uncertain`.
   The outcome is `uncertain` when an R2 delete call fails. The record then lists the
   deleted, the uncertain and the not attempted keys.
-- The erasure of an Organisation deletes the `attachments/<organisationId>/` prefix.
+- The erasure of an Organisation deletes each R2 prefix of `PURGE_R2_PREFIXES`
+  (`data/purge-catalogue.ts`). Two of them are `attachments/<organisationId>/` and
+  `attachment-collection/<organisationId>/`.
 
 ### The context of a turn
 
