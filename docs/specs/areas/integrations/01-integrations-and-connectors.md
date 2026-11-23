@@ -274,7 +274,8 @@ the key, the test and the commit stay human steps. A key never enters chat or a 
   (`custom-connectors/fetch-container.ts`) is named by the Organisation ID.
 - Modules: `provider-adapters/`, `provider-workflows/`, `provider-lifecycle/` and
   `integrations/contract/` (the public provider contracts). Portal:
-  `apps/portal/src/features/integrations/`, with the client `custom-connector-api.ts`.
+  `areas/integrations/ui/features/integrations/`, with the client
+  `custom-connector-api.ts`.
 
 Connection routes (`control/routes/integrations.ts`) are under
 `/v1/control/organisations/:id`, except the callback:

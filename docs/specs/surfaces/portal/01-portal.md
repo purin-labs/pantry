@@ -331,8 +331,8 @@ no value writes nothing. An unknown area answers `404`.
 In `scripts/layers.json`, `portal.tsx`, `shell.tsx`, `portal-shell.tsx` and the chat are
 `surfaces/portal`. `console-sidebar.tsx`, `console-tools.tsx`, `route.ts`,
 `foundation/ui/` and `foundation/ui/preferences/` are `foundation/ui`.
-`workspace-switcher.tsx` is `areas/organisation`. Most folders in
-`apps/portal/src/features/` belong to their product area.
+`workspace-switcher.tsx` is `areas/organisation`. The feature folders of a product area
+are in `areas/<area>/ui/features/`.
 
 ## Rules and limits
 

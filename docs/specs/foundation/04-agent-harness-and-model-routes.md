@@ -245,7 +245,7 @@ OpenRouter route of Purin AI goes direct.
   (`scripts/model-exit-worker.mjs`) and `chatgpt-exit:check`
   (`scripts/chatgpt-exit-worker.mjs`). The profile rules of each check are in
   `scripts/worker-environment.mjs`.
-- Portal: `apps/portal/src/features/integrations/` (`inference.tsx`, `codex.tsx`,
+- Portal: `areas/integrations/ui/features/integrations/` (`inference.tsx`, `codex.tsx`,
   `claude-connection.tsx`, `slack-reasoning-effort.tsx`). The shapes are in
   `packages/control-api/src/` (`portal/inference.ts`, `agents.ts`, `claude.ts`,
   `chat.ts`, `slack-reasoning-effort.ts`).

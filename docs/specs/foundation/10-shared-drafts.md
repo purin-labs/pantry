@@ -220,7 +220,7 @@ to the spec of its area.
   Slack thread link). `commerce-collaboration-rooms.ts` and
   `inbox-collaboration-rooms.ts` join the two drafts of this spec to the dispatch.
   `product-description-draft.ts` and `email-draft.ts` hold their storage and rules.
-- **Portal.** `apps/portal/src/features/collaboration/`: `document-client.ts`,
+- **Portal.** `packages/collaboration/portal/`: `document-client.ts`,
   `text-client.ts`, `socket-liveness.ts`, `draft-presence.tsx`, `agent-cursors.tsx`,
   `slack-thread-control.tsx` and `draft-leave-dialog.tsx`. The description editor is in
   `areas/commerce/ui/features/commerce/description-draft/`.
