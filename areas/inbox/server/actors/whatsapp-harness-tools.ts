@@ -87,7 +87,7 @@ export async function createWhatsAppHarnessToolHost(
         );
       }
       outcome = { kind: "proposed", body: trimmed };
-      return "Reply proposed. A human operator must approve it before it is sent.";
+      return "Reply proposed. Pantry sends it, or holds it for a person's approval, as your instructions say.";
     },
     requestHandoff: (inputJson) => {
       requireNoOutcome();

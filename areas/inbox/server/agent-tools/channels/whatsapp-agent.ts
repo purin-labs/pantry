@@ -66,7 +66,7 @@ const whatsAppReplyPropose = defineWhatsAppAgentTool({
   ...hostTool(WHATSAPP_SUPPORT_HOST),
   name: "whatsapp_reply_propose",
   description:
-    "Propose exactly one plain-text reply for a human to approve. This does not send anything. Call it once.",
+    "Propose exactly one plain-text reply to the customer. Pantry sends it at once, or holds it for a person's approval, as your instructions say. Call it once.",
   input: jsonSchema(REPLY_PROPOSE_PARAMETERS),
   parameters: REPLY_PROPOSE_PARAMETERS,
   effect: "proposal",
