@@ -74,9 +74,20 @@ import {
 } from "node:fs";
 import { dirname, join, posix, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { format, getFileInfo, resolveConfig } from "prettier";
+import { format, resolveConfig } from "prettier";
 
-import { clonePairKey, clonesBaselineText } from "../lib/clones-ratchet.mjs";
+import {
+  clonesBaselineAfterRename,
+  formatWhenClean,
+  FROZEN,
+  keepOrder,
+  MARKDOWN_LINK,
+  relativeSpecifier,
+  RELATIVE_PATH,
+  SOURCE,
+  TEXT,
+  UNREAD,
+} from "../lib/tree-rewrite.mjs";
 
 const started = Date.now();
 const args = process.argv.slice(2);
@@ -103,24 +114,6 @@ const checkOnly = flag("--check");
 const LAYER_MAP = "scripts/layers.json";
 const CLONES_RATCHET = "scripts/clones-ratchet.json";
 const WORKSPACE_FILE = "pnpm-workspace.yaml";
-
-// Plans, refactor documents, evidence and handovers keep the old paths
-// (AGENTS.md, "Old and new names"). The plans of this script name the old
-// paths on purpose.
-const FROZEN = [
-  /^docs\/(plan-|refactor-|evidence\/|handoffs\/|history\/)/,
-  /(^|\/)docs\/plan[^/]*\.md$/,
-  /^scripts\/refactor-17\//,
-];
-// Bundles, vendored code and files that a tool writes.
-const UNREAD = [
-  /(^|\/)(node_modules|dist|vendor|wasm-pkg|media-wasm-pkg|generated)\//,
-  /^apps\/portal\/public\//,
-  /^pnpm-lock\.yaml$/,
-];
-const SOURCE = /\.(ts|tsx|mts|cts|mjs|cjs|js|jsx|vue)$/;
-const TEXT =
-  /(\.(ts|tsx|mts|cts|mjs|cjs|js|jsx|vue|json|jsonc|md|yml|yaml|toml|sh|css|html|py|rs)|(^|\/)(Dockerfile[^/]*|\.dockerignore|Caddyfile))$/;
 
 const faults = [];
 const notes = [];
@@ -674,19 +667,6 @@ function fileOfAnotherSurface(path) {
 const intoWorker = new Set();
 const inTree = (path) => known.has(path);
 
-function relativeSpecifier(fromFolder, target, style) {
-  const path =
-    style === "bare"
-      ? target.replace(/\.(d\.ts|tsx?|mts|mjs|js)$/, "")
-      : style === "js"
-        ? target.replace(/\.tsx?$/, ".js")
-        : style === "folder"
-          ? target.replace(/\/index\.(tsx?|mjs|js)$/, "")
-          : target;
-  const relative = posix.relative(fromFolder, path);
-  return relative.startsWith(".") ? relative : `./${relative}`;
-}
-
 const LEADS = [
   String.raw`\bfrom\s*`,
   String.raw`\bimport\s*(?:\(\s*)?`,
@@ -846,7 +826,6 @@ const FROM_ROOT = new RegExp(
     .join("|")})(?![\\w/-])`,
   "g",
 );
-const RELATIVE_PATH = /(?<![\w/@.-])(\.{1,2}\/[\w@./-]+)/g;
 /** True for a file or a folder of the tree, at its path after the move. */
 const exists = (path) =>
   known.has(path) || existsSync(join(root, diskPath(path)));
@@ -987,7 +966,6 @@ for (const path of tree) {
 // A frozen document keeps the old paths in its text. A Markdown link is the
 // exception: `pnpm lint:doc-links` refuses a link to a file that is gone, so
 // the target of a link to a moved file follows the file.
-const MARKDOWN_LINK = /(\]\()([^)\s#]+)(?=[)#\s])/g;
 for (const path of tree) {
   if (!path.endsWith(".md")) continue;
   if (!FROZEN.some((pattern) => pattern.test(path))) continue;
@@ -1104,53 +1082,20 @@ for (const path of tree) {
 // keys stays in that order. No count of a ratchet changes here.
 
 if (pending.has(CLONES_RATCHET)) {
-  const baseline = readJson(CLONES_RATCHET);
-  const pairs = {};
-  for (const [pair, entry] of Object.entries(baseline.pairs)) {
-    const [first, second] = pair.split(" = ");
-    const key = clonePairKey(first, second);
-    if (pairs[key] !== undefined) {
-      faults.push(`${CLONES_RATCHET}: the move gives two lines for ${key}`);
-    }
-    pairs[key] = entry;
-  }
-  put(CLONES_RATCHET, clonesBaselineText(baseline.total, pairs), "path");
-}
-const inOrder = (keys) =>
-  keys.every((key, at) => at === 0 || keys[at - 1] < key);
-function sameOrder(before, after) {
-  if (
-    before === null ||
-    after === null ||
-    typeof before !== "object" ||
-    typeof after !== "object" ||
-    Array.isArray(before) !== Array.isArray(after)
-  ) {
-    return after;
-  }
-  if (Array.isArray(after)) {
-    const sorted =
-      before.every((item) => typeof item === "string") &&
-      inOrder(before) &&
-      !inOrder(after);
-    return sorted ? [...after].sort() : after;
-  }
-  const beforeValues = Object.values(before);
-  const entries = Object.entries(after).map(([key, value], at) => [
-    key,
-    sameOrder(beforeValues[at], value),
-  ]);
-  if (inOrder(Object.keys(before)) && !inOrder(Object.keys(after))) {
-    entries.sort(([a], [b]) => (a < b ? -1 : 1));
-  }
-  return Object.fromEntries(entries);
+  put(
+    CLONES_RATCHET,
+    clonesBaselineAfterRename(readJson(CLONES_RATCHET), (key) =>
+      faults.push(`${CLONES_RATCHET}: the move gives two lines for ${key}`),
+    ),
+    "path",
+  );
 }
 for (const path of [...pending.keys()]) {
   if (!/^scripts\/[^/]+-ratchet\.json$/.test(path)) continue;
   if (path === CLONES_RATCHET) continue;
   const before = JSON.parse(original(path));
   const plain = `${JSON.stringify(before, null, 2)}\n` === original(path);
-  const ordered = sameOrder(before, readJson(path));
+  const ordered = keepOrder(before, readJson(path));
   put(
     path,
     plain
@@ -1294,26 +1239,11 @@ for (const [path, text] of [...pending]) {
     keptForm.push(path);
     continue;
   }
-  const filepath = join(root, path);
-  const info = await getFileInfo(filepath, {
-    ignorePath: join(root, ".prettierignore"),
-  });
-  if (info.ignored || info.inferredParser === null) continue;
-  const options = { ...(await resolveConfig(filepath)), filepath };
-  let clean;
-  try {
-    clean = (await format(before, options)) === before;
-  } catch {
-    clean = false;
-  }
-  if (!clean) {
-    leftUnformatted.push(path);
-    continue;
-  }
-  const next = await format(text, options);
-  if (next === text) continue;
+  const result = await formatWhenClean(root, path, before, text);
+  if (result.state === "unclean") leftUnformatted.push(path);
+  if (result.state !== "formatted") continue;
   formatted += 1;
-  put(path, next, "format");
+  put(path, result.text, "format");
 }
 
 // ---------------------------------------------------------------------------
