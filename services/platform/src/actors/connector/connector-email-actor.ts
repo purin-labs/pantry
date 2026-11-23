@@ -191,7 +191,7 @@ import type { ConnectorResult } from "@purin-labs/conversation/actors/connector/
 import {
   type ConnectorEmailIdentityRequest,
   type EmailReplyProvenance,
-} from "./whatsapp-parsers";
+} from "@purin-labs/surface-whatsapp/server/actors/connector/whatsapp-parsers";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**

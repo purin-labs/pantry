@@ -2152,6 +2152,9 @@ importers:
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../../packages/std
+      '@purin-labs/surface-whatsapp':
+        specifier: workspace:*
+        version: link:../../surfaces/whatsapp
       '@purin-labs/tenancy':
         specifier: workspace:*
         version: link:../../foundation/tenancy
@@ -2210,6 +2213,52 @@ importers:
       yjs:
         specifier: 13.6.32
         version: 13.6.32
+
+  surfaces/whatsapp:
+    dependencies:
+      '@purin-labs/actor-runtime':
+        specifier: workspace:*
+        version: link:../../foundation/actor-runtime
+      '@purin-labs/area-inbox':
+        specifier: workspace:*
+        version: link:../../areas/inbox
+      '@purin-labs/authority':
+        specifier: workspace:*
+        version: link:../../foundation/authority
+      '@purin-labs/connections':
+        specifier: workspace:*
+        version: link:../../foundation/connections
+      '@purin-labs/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@purin-labs/control':
+        specifier: workspace:*
+        version: link:../../foundation/control
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../packages/control-api
+      '@purin-labs/conversation':
+        specifier: workspace:*
+        version: link:../../foundation/conversation
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../../foundation/kernel
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../packages/std
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../../foundation/tenancy
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../packages/type-utils
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
 
 packages:
 

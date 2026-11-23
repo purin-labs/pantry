@@ -9,7 +9,7 @@ import type {
   WhatsAppReplyProposalLifecycle,
 } from "@purin-labs/area-inbox/server/data/whatsapp";
 import type { WhatsAppSendOutcome } from "@purin-labs/connections/whatsapp/graph";
-import type { WhatsAppWebhookEvent } from "../src/whatsapp/webhook";
+import type { WhatsAppWebhookEvent } from "@purin-labs/surface-whatsapp/server/webhook";
 import { parseVaultHandle } from "@purin-labs/authority/credential-vault/index";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import {

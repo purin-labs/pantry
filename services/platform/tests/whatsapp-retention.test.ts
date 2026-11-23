@@ -20,7 +20,7 @@ import {
   recordWhatsAppProposal,
   type WhatsAppIngressLimits,
 } from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
-import { dispatchWhatsAppReply } from "../src/actors/connector-whatsapp-proposal";
+import { dispatchWhatsAppReply } from "@purin-labs/surface-whatsapp/server/actors/connector-whatsapp-proposal";
 import { createWhatsAppContentCipher } from "@purin-labs/area-inbox/server/actors/whatsapp-active-content";
 
 import {

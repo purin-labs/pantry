@@ -6,6 +6,7 @@ packages:
   - services/commerce
   - foundation/*
   - areas/*
+  - surfaces/*
 
 allowBuilds:
   esbuild: true

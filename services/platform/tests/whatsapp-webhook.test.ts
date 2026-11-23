@@ -4,7 +4,7 @@ import {
   parseWhatsAppWebhookBody,
   verifyWhatsAppWebhookChallenge,
   verifyWhatsAppWebhookSignature,
-} from "../src/whatsapp/webhook";
+} from "@purin-labs/surface-whatsapp/server/webhook";
 import {
   FIXTURE_APP_SECRET,
   FIXTURE_CUSTOMER_WA_ID,

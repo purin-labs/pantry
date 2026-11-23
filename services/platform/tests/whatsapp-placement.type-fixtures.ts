@@ -2,7 +2,7 @@ import { deliverWhatsAppOperatorNotice } from "../src/actors/whatsapp-operator-n
 import {
   dispatchWhatsAppReply,
   previewWhatsAppProposal,
-} from "../src/actors/connector-whatsapp-proposal";
+} from "@purin-labs/surface-whatsapp/server/actors/connector-whatsapp-proposal";
 import {
   acceptWhatsAppEvent,
   dispatchWhatsAppReplyFor,
@@ -11,7 +11,7 @@ import {
   type WhatsAppRpcDeps,
   type WhatsAppReplyOrigin,
   type WhatsAppReplyExecutionDeps,
-} from "../src/actors/connector-whatsapp-rpc";
+} from "@purin-labs/surface-whatsapp/server/actors/connector-whatsapp-rpc";
 
 declare const preview: Parameters<typeof previewWhatsAppProposal>[0];
 declare const dispatch: Parameters<typeof dispatchWhatsAppReply>[0];

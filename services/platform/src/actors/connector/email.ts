@@ -43,7 +43,7 @@ import {
 import { ensureConnectorIdentity } from "@purin-labs/conversation/actors/connector/ingress-parsers";
 import { invalid } from "@purin-labs/conversation/actors/connector/support";
 import type { ConnectorResult } from "@purin-labs/conversation/actors/connector/types";
-import type { EmailMailboxRevocationRequest } from "./whatsapp-parsers";
+import type { EmailMailboxRevocationRequest } from "@purin-labs/surface-whatsapp/server/actors/connector/whatsapp-parsers";
 
 export type EmailMailboxDisposal = {
   readonly proposalId: string;

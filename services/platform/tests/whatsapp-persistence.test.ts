@@ -42,7 +42,7 @@ import {
   validateNativeRequestAuthority,
   buildWhatsAppSupportAuthority,
 } from "@purin-labs/authority/request-authority/index";
-import { resolveWhatsAppOrganisationCredential } from "../src/whatsapp/credential";
+import { resolveWhatsAppOrganisationCredential } from "@purin-labs/surface-whatsapp/server/credential";
 import {
   parseE164PhoneNumber,
   parseMetaBusinessPortfolioId,

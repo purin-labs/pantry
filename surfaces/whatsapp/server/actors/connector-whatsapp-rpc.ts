@@ -72,7 +72,7 @@ import {
   type WhatsAppPauseReason,
   type WhatsAppRuntimeSnapshot,
 } from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
-import { deliverWhatsAppOperatorNotice } from "./whatsapp-operator-notice";
+import { deliverWhatsAppOperatorNotice } from "../../../../services/platform/src/actors/whatsapp-operator-notice";
 import {
   createWhatsAppContentCipher,
   type WhatsAppContentCipher,

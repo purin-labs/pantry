@@ -11,7 +11,11 @@
     "areas/*/**/*.fixtures.ts": ["exports", "types"],
     "areas/*/**/*.type-fixtures.ts": ["exports", "types"],
     "areas/*/**/*.typecheck.ts": ["exports", "types"],
-    "areas/*/**/*.d.ts": ["exports", "types"]
+    "areas/*/**/*.d.ts": ["exports", "types"],
+    "surfaces/*/**/*.fixtures.ts": ["exports", "types"],
+    "surfaces/*/**/*.type-fixtures.ts": ["exports", "types"],
+    "surfaces/*/**/*.typecheck.ts": ["exports", "types"],
+    "surfaces/*/**/*.d.ts": ["exports", "types"]
   },
   "workspaces": {
     ".": {
@@ -77,6 +81,16 @@
         "scripts/*.mjs"
       ],
       "project": ["src/.vitepress/**/*.{ts,vue}", "scripts/*.mjs"]
+    },
+    "surfaces/*": {
+      "entry": [
+        "server/**/*.fixtures.ts",
+        "server/**/*.type-fixtures.ts",
+        "ui/**/*.type-fixtures.ts",
+        "ui/**/*.typecheck.ts"
+      ],
+      "project": ["**/*.{ts,tsx}"],
+      "includeEntryExports": true
     },
     "areas/kitchen": {
       "entry": [

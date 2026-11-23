@@ -92,7 +92,7 @@ import { ConnectorActorBase } from "@purin-labs/conversation/actors/connector/co
 import {
   ConnectorWhatsApp,
   type ConnectorWhatsAppRpc,
-} from "./connector/connector-whatsapp-actor";
+} from "@purin-labs/surface-whatsapp/server/actors/connector/connector-whatsapp-actor";
 import {
   ConnectorEvals,
   type ConnectorEvalsRpc,

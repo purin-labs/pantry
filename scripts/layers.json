@@ -6,7 +6,8 @@
     "apps/portal/src/",
     "foundation/",
     "packages/collaboration/",
-    "areas/"
+    "areas/",
+    "surfaces/"
   ],
   "layers": ["foundation", "areas", "surfaces", "workers"],
   "foundationOrder": [
@@ -28,6 +29,7 @@
     "testing"
   ],
   "packages": {
+    "surfaces/whatsapp": "surfaces/whatsapp",
     "areas/kitchen": "areas/kitchen",
     "areas/commerce": "areas/commerce",
     "areas/integrations": "areas/integrations",
@@ -414,6 +416,7 @@
     "workspace_revision_receipt": "foundation/agent"
   },
   "rules": {
+    "surfaces/whatsapp/": "surfaces/whatsapp",
     "areas/kitchen/": "areas/kitchen",
     "areas/commerce/": "areas/commerce",
     "areas/integrations/": "areas/integrations",
@@ -454,7 +457,6 @@
     "services/platform/src/slack/": "surfaces/slack",
     "services/platform/src/vault-onepassword/": "foundation/authority",
     "services/platform/src/voice/": "surfaces/voice",
-    "services/platform/src/whatsapp/": "surfaces/whatsapp",
     "packages/collaboration/portal/": "foundation/collaboration",
     "packages/collaboration/worker/": "foundation/collaboration"
   },
@@ -470,17 +472,13 @@
     "services/platform/src/actors/connector-slack-case-work.ts": "surfaces/slack",
     "services/platform/src/actors/connector-slack-ingress.ts": "surfaces/slack",
     "services/platform/src/actors/connector-slack-stream.ts": "surfaces/slack",
-    "services/platform/src/actors/connector-whatsapp-proposal.ts": "surfaces/whatsapp",
-    "services/platform/src/actors/connector-whatsapp-rpc.ts": "surfaces/whatsapp",
     "services/platform/src/actors/connector.ts": "workers/platform",
     "services/platform/src/actors/connector/connector-email-actor.ts": "surfaces/email",
-    "services/platform/src/actors/connector/connector-whatsapp-actor.ts": "surfaces/whatsapp",
     "services/platform/src/actors/connector/email-parsers.ts": "surfaces/email",
     "services/platform/src/actors/connector/email-work.ts": "surfaces/email",
     "services/platform/src/actors/connector/email.ts": "surfaces/email",
     "services/platform/src/actors/connector/slack-channel.ts": "surfaces/slack",
     "services/platform/src/actors/connector/slack-delivery.ts": "surfaces/slack",
-    "services/platform/src/actors/connector/whatsapp-parsers.ts": "surfaces/whatsapp",
     "services/platform/src/actors/bake-run.ts": "workers/platform",
     "services/platform/src/actors/bake-run-ports.ts": "workers/platform",
     "services/platform/src/actors/organisation-alarm.ts": "workers/platform",

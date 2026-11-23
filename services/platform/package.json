@@ -86,6 +86,7 @@
     "@purin-labs/area-integrations": "workspace:*",
     "@purin-labs/area-commerce": "workspace:*",
     "@purin-labs/area-kitchen": "workspace:*",
+    "@purin-labs/surface-whatsapp": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

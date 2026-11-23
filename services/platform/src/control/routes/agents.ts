@@ -16,7 +16,7 @@ import {
   type WhatsAppAccountAction,
   type WhatsAppCaseAction,
   type WhatsAppReplyAction,
-} from "../../whatsapp/control";
+} from "@purin-labs/surface-whatsapp/server/control";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import {

@@ -13,7 +13,7 @@ import {
   verifyWhatsAppWebhookSignature,
   type WhatsAppWebhookEvent,
 } from "./webhook";
-import type { WhatsAppAdmissionRequest } from "../actors/connector-whatsapp-rpc";
+import type { WhatsAppAdmissionRequest } from "./actors/connector-whatsapp-rpc";
 import type { Env } from "@purin-labs/kernel/env";
 import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import {

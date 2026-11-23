@@ -103,7 +103,7 @@ import {
   handleStripeConnectWebhook,
   handleStripeWebhook,
 } from "@purin-labs/area-commerce/server/stripe/webhooks";
-import { handleWhatsAppWebhook } from "./whatsapp/webhook-route";
+import { handleWhatsAppWebhook } from "@purin-labs/surface-whatsapp/server/webhook-route";
 // The Worker registers the ports of the lower modules (`worker-ports.ts`)
 // before it serves a request or starts an Actor.
 import "./worker-ports";

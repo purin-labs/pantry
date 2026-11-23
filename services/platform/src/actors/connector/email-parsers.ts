@@ -50,7 +50,7 @@ import {
 import type {
   ConnectorEmailIdentityRequest,
   EmailMailboxRevocationRequest,
-} from "./whatsapp-parsers";
+} from "@purin-labs/surface-whatsapp/server/actors/connector/whatsapp-parsers";
 
 export type EmailReplyProposalCreateRequest = ConnectorEmailIdentityRequest & {
   readonly execution: SessionTurnExecution;

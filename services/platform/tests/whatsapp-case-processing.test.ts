@@ -64,8 +64,8 @@ vi.mock("@purin-labs/area-inbox/server/data/whatsapp", async (importOriginal) =>
   readWhatsAppSendAuthority: orchestratorMocks.readWhatsAppSendAuthority,
   recordWhatsAppMessageReceipt: orchestratorMocks.recordWhatsAppMessageReceipt,
 }));
-vi.mock("../src/whatsapp/credential", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/whatsapp/credential")>()),
+vi.mock("@purin-labs/surface-whatsapp/server/credential", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/surface-whatsapp/server/credential")>()),
   resolveWhatsAppOrganisationCredential:
     orchestratorMocks.resolveWhatsAppOrganisationCredential,
 }));
@@ -85,8 +85,8 @@ import {
   whatsAppTokenWindowTotals,
   type WhatsAppIngressLimits,
 } from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
-import { dispatchWhatsAppReply } from "../src/actors/connector-whatsapp-proposal";
-import { readWhatsAppCasePanel } from "../src/actors/connector-whatsapp-rpc";
+import { dispatchWhatsAppReply } from "@purin-labs/surface-whatsapp/server/actors/connector-whatsapp-proposal";
+import { readWhatsAppCasePanel } from "@purin-labs/surface-whatsapp/server/actors/connector-whatsapp-rpc";
 import { processWhatsAppCaseTurn } from "@purin-labs/area-inbox/server/actors/whatsapp-case-processing";
 import {
   createWhatsAppContentCipher,

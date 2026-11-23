@@ -456,9 +456,10 @@ import. A module with no line for one of these has none.
 ## surfaces/whatsapp
 
 - Folders: 3
-  - `services/platform/src/actors/`
-  - `services/platform/src/actors/connector/`
-  - `services/platform/src/whatsapp/`
+  - `surfaces/whatsapp/server/`
+  - `surfaces/whatsapp/server/actors/`
+  - `surfaces/whatsapp/server/actors/connector/`
+- Packages: `surfaces/whatsapp`
 
 ## workers/platform
 

@@ -15,6 +15,7 @@ export const SOURCE_ROOTS = [
   "foundation",
   "packages",
   "services",
+  "surfaces",
 ];
 
 /** The folders that hold the source of the Platform Worker. */
@@ -37,6 +38,8 @@ PLATFORM_SOURCE.push("areas/integrations/server");
 PLATFORM_SOURCE.push("areas/commerce/server");
 // The Worker side of the area kitchen (Refactor 17, Stage B).
 PLATFORM_SOURCE.push("areas/kitchen/server");
+// The Worker side of the surface whatsapp (Refactor 17, Stage B).
+PLATFORM_SOURCE.push("surfaces/whatsapp/server");
 
 /**
  * The folders that hold the source of the Portal, in the browser. The package
