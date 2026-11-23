@@ -216,13 +216,15 @@ class BakeryTrayController:
       q_cmd: np.ndarray,
       cam_cal: tuple[float, float, np.ndarray] | None,
       *,
-      narrow_x: bool = False,
+      yaw_rad: float = 0.0,
   ) -> float:
     """Measure real-vs-nominal end-effector Z offset from overhead depth on the spanner beam.
 
     Compensates combined robot-base Z offset (`table_dz_m`), base tilt (`table_tilt_deg`),
     servo droop (`gain_scale`), and gravity-comp residual (`gravcomp_delta`) to <0.5 mm
     using purely unprivileged `overhead_cam_depth` + nominal CAD kinematics.
+    Samples only the rotated 48 mm-wide spanner beam strip ahead of the wrist flange so
+    the FR10 forearm/wrist never biases the median at any tray yaw.
     """
     kd = mujoco.MjData(self._kin_model)
     for k, jid in enumerate(self._arm_jids):
@@ -241,23 +243,22 @@ class BakeryTrayController:
       dx_cam = dy_cam = 0.0
 
     xc, yc = target_xy
-    if narrow_x:
-      roi = (
-          valid
-          & (np.abs((xw - dx_cam) - xc) < 0.032)
-          & (np.abs((yw - dy_cam) - (yc - 0.02)) < 0.14)
-          & (zw > z_beam_fk - 0.050)
-          & (zw < z_beam_fk + 0.050)
-      )
-    else:
-      roi = (
-          valid
-          & (np.abs((xw - dx_cam) - xc) < 0.14)
-          & (np.abs((yw - dy_cam) - yc) < 0.14)
-          & (zw > z_beam_fk - 0.050)
-          & (zw < z_beam_fk + 0.050)
-      )
-    if int(np.count_nonzero(roi)) < 40:
+    rx = (xw - dx_cam) - xc
+    ry = (yw - dy_cam) - yc
+    # Tool +X (along spanner beam from wrist toward rear blade) = (-sin(yaw), cos(yaw))
+    # Tool -Y (across spanner beam width) = (cos(yaw), sin(yaw))
+    sy, cy = math.sin(yaw_rad), math.cos(yaw_rad)
+    u_along = -sy * rx + cy * ry
+    u_perp = cy * rx + sy * ry
+    roi = (
+        valid
+        & (np.abs(u_perp) < 0.024)
+        & (u_along > -0.09)
+        & (u_along < 0.14)
+        & (zw > z_beam_fk - 0.050)
+        & (zw < z_beam_fk + 0.050)
+    )
+    if int(np.count_nonzero(roi)) < 35:
       return 0.0
     z_beam_obs = float(np.median(zw[roi]))
     return float(np.clip(z_beam_obs - z_beam_fk, -0.045, 0.045))
@@ -411,33 +412,32 @@ class BakeryTrayController:
       x_prep_cal = tx
       for attempt in range(max_attempts):
         p_hover = np.array([tx, ty, tz + 0.160], dtype=np.float64)
-        q_hover = self._ik(state['cmd_q'], p_hover, tyaw)
-        move_joints(q_hover, ws.GRIPPER_OPEN_M, max_step_rad=0.024, settle_ticks=6)
+        move_joints(self._ik(state['cmd_q'], p_hover, tyaw), ws.GRIPPER_OPEN_M, max_step_rad=0.024, settle_ticks=16)
 
         if self._use_ee_depth_cal:
           # Eye-to-hand spanner-beam Z calibration over prep table (rejects ±20 mm table_dz + ±1.5 deg tilt!)
           dz_prep = self._measure_ee_z_offset(
-              state['meas']['overhead_cam_depth'], (tx, ty), state['cmd_q'], cam_cal, narrow_x=False
+              state['meas']['overhead_cam_depth'], (tx, ty), state['cmd_q'], cam_cal, yaw_rad=tyaw
           )
           x_prep_cal = tx
 
         if self._use_vision:
           # Descend to 6.5 cm above tray (triggers any T3 `push` before final descent!),
-          # then swing completely clear of overhead_cam's prep-table FOV to re-perceive cleanly!
+          # then swing completely clear of overhead_cam's prep-table FOV AND oven front-right corner!
           p_probe = np.array([tx, ty, tz + 0.068 - dz_prep], dtype=np.float64)
           move_cartesian(p_hover, p_probe, tyaw, tyaw, ws.GRIPPER_OPEN_M, step_m=0.016, settle_ticks=14)
           move_cartesian(p_probe, p_hover, tyaw, tyaw, ws.GRIPPER_OPEN_M, step_m=0.020, settle_ticks=2)
-          # Clear overhead view of prep table completely before re-localizing
-          p_peek = np.array([-0.10, -0.48, 1.24], dtype=np.float64)
+          # Clear overhead view of prep table cleanly over the open front corridor (far from oven corner!)
+          p_peek = np.array([0.12, -0.68, 1.30], dtype=np.float64)
           move_cartesian(p_hover, p_peek, tyaw, 0.0, ws.GRIPPER_OPEN_M, step_m=0.026, max_step_rad=0.026, settle_ticks=6)
           tray_re = self._perceive_tray(state['meas']['overhead_cam_depth'], cam_cal)
           if tray_re is not None:
             tx, ty, tz, tyaw = tray_re
           p_hover = np.array([tx, ty, tz + 0.160], dtype=np.float64)
-          move_cartesian(p_peek, p_hover, 0.0, tyaw, ws.GRIPPER_OPEN_M, step_m=0.026, max_step_rad=0.026, settle_ticks=6)
+          move_cartesian(p_peek, p_hover, 0.0, tyaw, ws.GRIPPER_OPEN_M, step_m=0.026, max_step_rad=0.026, settle_ticks=16)
           if self._use_ee_depth_cal:
             dz_prep = self._measure_ee_z_offset(
-                state['meas']['overhead_cam_depth'], (tx, ty), state['cmd_q'], cam_cal, narrow_x=False
+                state['meas']['overhead_cam_depth'], (tx, ty), state['cmd_q'], cam_cal, yaw_rad=tyaw
             )
             x_prep_cal = tx
 
@@ -452,11 +452,12 @@ class BakeryTrayController:
         actuate_gripper(ws.GRIPPER_CLOSE_M, ticks=34, mode='close')
 
         # Lift straight up +30 cm (smoothly; covers 0.15 s T3 `slip` pull!)
-        p_lifted = np.array([tx, ty, max(tz + 0.300, rail2_target[2] + 0.052) - dz_prep], dtype=np.float64)
+        slide_z_off = 0.042 if self._use_ee_depth_cal else 0.052
+        p_lifted = np.array([tx, ty, max(tz + 0.300, rail2_target[2] + slide_z_off) - dz_prep], dtype=np.float64)
         move_cartesian(p_grasp, p_lifted, tyaw, tyaw, ws.GRIPPER_CLOSE_M, step_m=0.010, max_step_rad=0.020, settle_ticks=14)
 
         # Level Cartesian carry forward to clear corridor (Y = -0.48, 80 mm in front of oven face!)
-        p_corridor = np.array([0.04, -0.48, rail2_target[2] + 0.052 - 0.5 * dz_prep], dtype=np.float64)
+        p_corridor = np.array([0.04, -0.48, rail2_target[2] + slide_z_off - 0.5 * dz_prep], dtype=np.float64)
         move_cartesian(p_lifted, p_corridor, tyaw, 0.0, ws.GRIPPER_CLOSE_M, step_m=0.016, max_step_rad=0.020, settle_ticks=6)
 
         if self._use_vision and attempt + 1 < max_attempts:
@@ -472,12 +473,12 @@ class BakeryTrayController:
       # --- Stage 2: Level Cartesian Corridor -> Oven Mouth Alignment (80 mm clear of oven face) ---
       # Clamped tray sits +5 mm along tool +X (+Y world) relative to cell_grasp, and +6 mm right
       # in +X from grasp-centroid & j1-approach compliance -> compensate (-0.006, -0.005, 0.0).
-      # Slide in with tray deck ~32 mm above Rail #2 (CLEAR ABOVE the 22 mm rail side-guides,
-      # and still ~26 mm BELOW Rail #3!), then lower to ~4 mm above Rail #2 and release under gravity!
+      # With v2 exact Z-calibration, slide at +42 mm (tray deck ~1.153 m): dead-center with
+      # +16 mm clearance ABOVE Rail #2 side guides (1.137 m) AND +16 mm BELOW Rail #3 ledges (1.191 m)!
       rail2_grip = rail2_target - np.array([0.006, 0.005, 0.0], dtype=np.float64)
 
-      p_mouth = np.array([rail2_grip[0], rail2_grip[1] - 0.48, rail2_grip[2] + 0.052], dtype=np.float64)
-      move_cartesian(p_corridor, p_mouth, 0.0, 0.0, ws.GRIPPER_CLOSE_M, step_m=0.014, max_step_rad=0.020, settle_ticks=6)
+      p_mouth = np.array([rail2_grip[0], rail2_grip[1] - 0.48, rail2_grip[2] + slide_z_off], dtype=np.float64)
+      move_cartesian(p_corridor, p_mouth, 0.0, 0.0, ws.GRIPPER_CLOSE_M, step_m=0.014, max_step_rad=0.020, settle_ticks=14)
 
       dz_oven = 0.0
       dx_oven = 0.0
@@ -488,7 +489,7 @@ class BakeryTrayController:
             (float(p_mouth[0]), float(p_mouth[1])),
             state['cmd_q'],
             cam_cal,
-            narrow_x=True,
+            yaw_rad=0.0,
         )
         # 2. Infer base tilt from two-point Z difference (subtracting ~8.5 mm nominal 0.85 kg tray
         #    elastic droop at oven mouth so T0 zero-tilt stays unbiased at 0.00 deg!)
@@ -498,7 +499,7 @@ class BakeryTrayController:
         )
         dx_oven = float(np.clip(-(rail2_grip[2] + 0.03 - ws.ARM_BASE_POS[2]) * sin_tilt, -0.014, 0.014))
         p_mouth_cal = np.array(
-            [rail2_grip[0] - dx_oven, rail2_grip[1] - 0.48, rail2_grip[2] + 0.052 - dz_oven],
+            [rail2_grip[0] - dx_oven, rail2_grip[1] - 0.48, rail2_grip[2] + slide_z_off - dz_oven],
             dtype=np.float64,
         )
         move_cartesian(p_mouth, p_mouth_cal, 0.0, 0.0, ws.GRIPPER_CLOSE_M, step_m=0.008, max_step_rad=0.016, settle_ticks=4)
@@ -506,7 +507,7 @@ class BakeryTrayController:
 
       # --- Stage 3: Linear Slide Insertion into Maruzen MBCO-4ME Rail #2 ---
       p_over_rail2 = np.array(
-          [rail2_grip[0] - dx_oven, rail2_grip[1], rail2_grip[2] + 0.052 - dz_oven], dtype=np.float64
+          [rail2_grip[0] - dx_oven, rail2_grip[1], rail2_grip[2] + slide_z_off - dz_oven], dtype=np.float64
       )
       move_cartesian(p_mouth, p_over_rail2, 0.0, 0.0, ws.GRIPPER_CLOSE_M, step_m=0.010, max_step_rad=0.018, settle_ticks=6)
 

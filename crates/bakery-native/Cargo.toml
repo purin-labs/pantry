@@ -27,3 +27,7 @@ lto = "fat"
 [[bin]]
 name = "cobot-controller"
 path = "controller/main.rs"
+
+# Declare a standalone workspace boundary so nested git worktrees under
+# `.claude/worktrees/` do not inherit the outer checkout's workspace.
+[workspace]
