@@ -1,6 +1,8 @@
 // Plan 87 J5: the agent runs a view command on Costs & margins in the
 // person's browser. The command reaches only the page that the person's
 // message carried, and the receipt gives the agent the page as it now is.
+// A Code Mode script has no view command, so only the model changes what
+// the person sees.
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import {
@@ -88,7 +90,8 @@ type Model = { requests: string[]; toolResults: string[] };
  * Costs. The agent's command reaches the owner's browser, which answers
  * with the page as it now shows it; the agent reads that observation. A
  * message that carried no Costs page gets no command: the tool refuses, and
- * no command reaches the browser.
+ * no command reaches the browser. A script that the agent writes for a
+ * message with the page cannot call the tool either.
  */
 it(
   "runs a Costs view command in the person's browser only for a page that the message carried",
@@ -163,10 +166,39 @@ it(
     expect(refusal).toContain("does not carry Costs & margins");
     expect(await pageCommandCount(author)).toBe(1);
 
+    // A Code Mode script cannot run a view command, also when the message
+    // carries the page: only the model changes what the person sees.
+    network.use(
+      http.post(
+        "https://openrouter.ai/api/v1/chat/completions",
+        selectInScript.bind(null, model),
+      ),
+    );
+    model.toolResults.length = 0;
+    const scripted = await send(
+      author,
+      paths.chat,
+      conversationId,
+      route.model,
+      {
+        label: "script",
+        text: "Select the Matcha financier from a script.",
+        surfaceObservation: costsObservation("None"),
+      },
+    );
+    expect(scripted.status, await scripted.clone().text()).toBe(200);
+    await finished(author, conversationId);
+    const scriptResult = model.toolResults.at(-1) ?? "";
+    expect(scriptResult, scriptResult).toMatch(
+      /SCRIPT_REFUSED TypeError: tools\.costs_view_select_product does not exist/,
+    );
+    expect(await pageCommandCount(author)).toBe(1);
+
     task.meta.chatCostsCommands = {
       pageCommand: effect.command,
       shownToolResult: shownResult,
       refusedToolResult: refusal,
+      scriptToolResult: scriptResult,
       modelRequests: model.requests.length,
     };
   },
@@ -206,6 +238,57 @@ async function selectProduct(
         "costs_view_select_product",
         { productId: PRODUCT_ID },
         `j5_select_${model.requests.length}`,
+      )
+    : openRouterToolCall(
+        "tool_search",
+        { query: "costs_view_select_product", limit: 1 },
+        `j5_discover_${model.requests.length}`,
+      );
+}
+
+/**
+ * The scripted model of the script step: it finds the select tool, then
+ * calls it from a Code Mode script, and answers with the script's result.
+ */
+async function selectInScript(
+  model: Model,
+  { request }: Parameters<HttpResponseResolver>[0],
+): Promise<Response> {
+  const body: unknown = await request.json();
+  if (!isRecord(body) || !Array.isArray(body.messages))
+    throw new Error("Invalid model request");
+  model.requests.push(JSON.stringify(body));
+  const last: unknown = body.messages.at(-1);
+  if (
+    isRecord(last) &&
+    last.role === "tool" &&
+    lastToolCallName(body.messages) === "codemode"
+  ) {
+    model.toolResults.push(JSON.stringify(last.content));
+    return openRouterText("Done.", `j5_reply_${model.requests.length}`);
+  }
+  const offered = Array.isArray(body.tools)
+    ? body.tools.some(
+        (tool: unknown) =>
+          isRecord(tool) &&
+          isRecord(tool.function) &&
+          tool.function.name === "costs_view_select_product",
+      )
+    : false;
+  return offered
+    ? openRouterToolCall(
+        "codemode",
+        {
+          code: [
+            "try {",
+            `  await tools.costs_view_select_product({ productId: ${JSON.stringify(PRODUCT_ID)} });`,
+            '  text("SCRIPT_RAN");',
+            "} catch (error) {",
+            '  text("SCRIPT_REFUSED " + String(error));',
+            "}",
+          ].join("\n"),
+        },
+        `j5_script_${model.requests.length}`,
       )
     : openRouterToolCall(
         "tool_search",

@@ -80,6 +80,7 @@ const pastryBenchConfigure = defineKitchenTool({
   },
   effect: "surface",
   rerun: RERUN,
+  modelOnly: true,
   selection: {
     kind: "surface",
     surface: KITCHEN_SURFACE,
@@ -98,6 +99,7 @@ const pastryBenchPrepare = defineKitchenTool({
   decode: (): PastryBenchViewCommand => ({ name: "prepare_pastry_bench" }),
   effect: "surface",
   rerun: RERUN,
+  modelOnly: true,
   selection: {
     kind: "surface",
     surface: KITCHEN_SURFACE,

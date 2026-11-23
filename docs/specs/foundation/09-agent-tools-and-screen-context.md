@@ -226,8 +226,9 @@ approval and the receipt of the person's own action on that page.
   `surface_effect_expired` (a receipt at or after the deadline) and
   `surface_effect_authority_invalid` (the turn lease is not current). The route then
   answers 404 or 409, and it answers 422 for a malformed receipt.
-- The Kitchen tools are `modelOnly`, and their text tells the agent to call them
-  directly. The chat shows a view command as a read: "Nothing was saved."
+- Each page command tool is `modelOnly`, so a Code Mode script cannot change what the
+  person sees. The text of a Kitchen tool also tells the agent to call it directly.
+  The chat shows a view command as a read: "Nothing was saved."
 - The page marks its elements with `data-surface-target`. One overlay draws the named
   label of the agent on the target of a command for 5 s. A shared room holds the label
   of an agent edit for the same time (FND-10).

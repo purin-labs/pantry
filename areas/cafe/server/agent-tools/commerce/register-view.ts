@@ -44,6 +44,7 @@ const registerAddItem = defineCafeTool({
   }),
   effect: "surface",
   rerun: RERUN,
+  modelOnly: true,
   selection: {
     kind: "surface",
     surface: REGISTER_SURFACE,
@@ -72,6 +73,7 @@ const registerUpdateLine = defineCafeTool({
   }),
   effect: "surface",
   rerun: RERUN,
+  modelOnly: true,
   selection: {
     kind: "surface",
     surface: REGISTER_SURFACE,
@@ -96,6 +98,7 @@ const registerRemoveLine = defineCafeTool({
   }),
   effect: "surface",
   rerun: RERUN,
+  modelOnly: true,
   selection: {
     kind: "surface",
     surface: REGISTER_SURFACE,
@@ -114,6 +117,7 @@ const registerClearBasket = defineCafeTool({
   decode: (): RegisterViewCommand => ({ name: "register_clear_basket" }),
   effect: "surface",
   rerun: RERUN,
+  modelOnly: true,
   selection: {
     kind: "surface",
     surface: REGISTER_SURFACE,

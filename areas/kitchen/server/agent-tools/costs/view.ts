@@ -40,6 +40,7 @@ const costsViewOpenTab = defineKitchenTool({
   decode: (input): CostsViewCommand => ({ name: "open_tab", tab: input.tab }),
   effect: "surface",
   rerun: RERUN,
+  modelOnly: true,
   selection: { kind: "surface", surface: COSTS_SURFACE, command: "open_tab" },
   unavailable: UNAVAILABLE,
   handler: costsViewHandler,
@@ -60,6 +61,7 @@ const costsViewFilterCategory = defineKitchenTool({
   }),
   effect: "surface",
   rerun: RERUN,
+  modelOnly: true,
   selection: {
     kind: "surface",
     surface: COSTS_SURFACE,
@@ -84,6 +86,7 @@ const costsViewSelectProduct = defineKitchenTool({
   }),
   effect: "surface",
   rerun: RERUN,
+  modelOnly: true,
   selection: {
     kind: "surface",
     surface: COSTS_SURFACE,
