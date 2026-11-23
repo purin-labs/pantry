@@ -17,7 +17,11 @@ import {
   RecoverableError,
   formatRelativeTime,
 } from "@purin-labs/ui/page-components";
-import { workspacePagePath, workspaceResourcePath } from "@purin-labs/ui/route";
+import {
+  OPERATIONS_SECTION_ID,
+  workspacePagePath,
+  workspaceResourcePath,
+} from "@purin-labs/ui/route";
 import {
   readCommerceHomeAggregations,
   type CommerceHomeAggregation,
@@ -32,10 +36,23 @@ import type {
 } from "@purin-labs/control-api";
 import "./home.css";
 
+/**
+ * The addresses of Home's links. The Approvals and activity section is on
+ * Home only when the workspace is not setting up; with no section, a link to
+ * it would change only the address, so Home shows none.
+ */
+type HomeLinks = Readonly<{
+  organisationHandle: string;
+  workspaceHandle: string;
+  operationsOnPage: boolean;
+}>;
+
 export function HomePage(props: {
   readonly organisationId: string;
   readonly organisationHandle: string;
   readonly workspaceHandle: string;
+  /** Whether the Approvals and activity section is on this page. */
+  readonly operationsOnPage: boolean;
 }): React.ReactNode {
   const [content, setContent] = React.useState<HomePageContent>({
     kind: "loading",
@@ -64,8 +81,11 @@ export function HomePage(props: {
   );
   return (
     <HomePageView
-      organisationHandle={props.organisationHandle}
-      workspaceHandle={props.workspaceHandle}
+      links={{
+        organisationHandle: props.organisationHandle,
+        workspaceHandle: props.workspaceHandle,
+        operationsOnPage: props.operationsOnPage,
+      }}
       content={content}
       commerceAggregations={commerceAggregations}
       retry={retryHomePage.bind(
@@ -81,8 +101,7 @@ export function HomePage(props: {
 }
 
 function HomePageView(props: {
-  readonly organisationHandle: string;
-  readonly workspaceHandle: string;
+  readonly links: HomeLinks;
   readonly content: HomePageContent;
   readonly commerceAggregations?: HomeCommerceAggregationsState;
   readonly retry: () => void;
@@ -93,8 +112,7 @@ function HomePageView(props: {
     case "ready":
       return (
         <HomeReady
-          organisationHandle={props.organisationHandle}
-          workspaceHandle={props.workspaceHandle}
+          links={props.links}
           content={props.content}
           commerceAggregations={
             props.commerceAggregations ?? { kind: "loading" }
@@ -308,8 +326,7 @@ function HomeLoading(): React.ReactNode {
 }
 
 function HomeReady(props: {
-  readonly organisationHandle: string;
-  readonly workspaceHandle: string;
+  readonly links: HomeLinks;
   readonly content: Variant<PageContent<HomeSnapshot>, "ready">;
   readonly commerceAggregations: HomeCommerceAggregationsState;
 }): React.ReactNode {
@@ -330,21 +347,13 @@ function HomeReady(props: {
     <>
       {renderHomeFreshness(props.content, active)}
       {attention.length === 0 && !active ? null : (
-        <HomeAttention
-          organisationHandle={props.organisationHandle}
-          workspaceHandle={props.workspaceHandle}
-          items={attention}
-        />
+        <HomeAttention links={props.links} items={attention} />
       )}
       {active
         ? renderHomeCommerceAggregations(props.commerceAggregations)
         : null}
       {blockers.length === 0 || settingUp ? null : (
-        <HomeBlockers
-          organisationHandle={props.organisationHandle}
-          workspaceHandle={props.workspaceHandle}
-          blockers={blockers}
-        />
+        <HomeBlockers links={props.links} blockers={blockers} />
       )}
       {settingUp ? null : renderHomeSources(snapshot.sourceObservations)}
     </>
@@ -464,8 +473,7 @@ function renderHomeFreshness(
 }
 
 function HomeAttention(props: {
-  readonly organisationHandle: string;
-  readonly workspaceHandle: string;
+  readonly links: HomeLinks;
   readonly items: readonly HomeAttentionItem[];
 }): React.ReactNode {
   if (props.items.length === 0)
@@ -477,21 +485,14 @@ function HomeAttention(props: {
     >
       <h2 id="home-attention-title">Needs attention</h2>
       <div className="action-list">
-        {props.items.map(
-          renderAttentionItem.bind(
-            null,
-            props.organisationHandle,
-            props.workspaceHandle,
-          ),
-        )}
+        {props.items.map(renderAttentionItem.bind(null, props.links))}
       </div>
     </section>
   );
 }
 
 function renderAttentionItem(
-  organisationHandle: string,
-  workspaceHandle: string,
+  links: HomeLinks,
   item: HomeAttentionItem,
 ): React.ReactNode {
   return (
@@ -515,23 +516,13 @@ function renderAttentionItem(
           {formatObservedAt(item.observedAt)}
         </time>
       </div>
-      <Link
-        className="primary-button"
-        to={homeDestinationPath(
-          organisationHandle,
-          workspaceHandle,
-          item.nextAction.destination,
-        )}
-      >
-        {item.nextAction.label}
-      </Link>
+      {renderHomeAction(links, item.nextAction)}
     </article>
   );
 }
 
 function HomeBlockers(props: {
-  readonly organisationHandle: string;
-  readonly workspaceHandle: string;
+  readonly links: HomeLinks;
   readonly blockers: readonly HomeBlocker[];
 }): React.ReactNode {
   return (
@@ -544,21 +535,14 @@ function HomeBlockers(props: {
        * suspension, an unreachable source), so it is not named "setup". */}
       <h2 id="home-blockers-title">Workspace status</h2>
       <div className="action-list">
-        {props.blockers.map(
-          renderHomeBlocker.bind(
-            null,
-            props.organisationHandle,
-            props.workspaceHandle,
-          ),
-        )}
+        {props.blockers.map(renderHomeBlocker.bind(null, props.links))}
       </div>
     </section>
   );
 }
 
 function renderHomeBlocker(
-  organisationHandle: string,
-  workspaceHandle: string,
+  links: HomeLinks,
   blocker: HomeBlocker,
 ): React.ReactNode {
   return (
@@ -570,16 +554,7 @@ function renderHomeBlocker(
           <strong>Impact:</strong> {blocker.consequence}
         </p>
       </div>
-      <Link
-        className="primary-button"
-        to={homeDestinationPath(
-          organisationHandle,
-          workspaceHandle,
-          blocker.nextAction.destination,
-        )}
-      >
-        {blocker.nextAction.label}
-      </Link>
+      {renderHomeAction(links, blocker.nextAction)}
     </article>
   );
 }
@@ -610,11 +585,24 @@ function renderSourceObservation(
   );
 }
 
+/** The link of an item's next action, or nothing when its target is not here. */
+function renderHomeAction(
+  links: HomeLinks,
+  action: Readonly<{ label: string; destination: HomeDestination }>,
+): React.ReactNode {
+  const to = homeDestinationPath(links, action.destination);
+  return to === null ? null : (
+    <Link className="primary-button" to={to}>
+      {action.label}
+    </Link>
+  );
+}
+
 function homeDestinationPath(
-  organisationHandle: string,
-  workspaceHandle: string,
+  links: HomeLinks,
   destination: HomeDestination,
-): string {
+): string | null {
+  const { organisationHandle, workspaceHandle } = links;
   switch (destination.kind) {
     case "home":
       return workspacePagePath(organisationHandle, workspaceHandle, "overview");
@@ -637,7 +625,9 @@ function homeDestinationPath(
         destination.resourceId,
       );
     case "operations":
-      return `${workspacePagePath(organisationHandle, workspaceHandle, "overview")}#operations-title`;
+      return links.operationsOnPage
+        ? `${workspacePagePath(organisationHandle, workspaceHandle, "overview")}#${OPERATIONS_SECTION_ID}`
+        : null;
     case "integrations":
       return workspacePagePath(
         organisationHandle,

@@ -540,6 +540,12 @@ export function organisationPath(organisationHandle: string): string {
   return `/portal/${encodeURIComponent(organisationHandle)}`;
 }
 
+/**
+ * The id of the Approvals and activity section on Home. A Home link to it
+ * carries it as the address hash, and the section scrolls into view.
+ */
+export const OPERATIONS_SECTION_ID = "operations-title";
+
 export function workspacePagePath(
   organisationHandle: string,
   workspaceHandle: string,

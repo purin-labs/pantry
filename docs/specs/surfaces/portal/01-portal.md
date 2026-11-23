@@ -159,8 +159,12 @@ server, and a viewer may read it. The sections appear in this order:
 | `active`      | Needs attention (also when empty), the counts, the blockers, the source line and approvals |
 | `archived`    | Any attention items, the blockers, the source line and approvals                           |
 
-"Approvals" is the **Approvals and activity** section below the brief. The client can
-show a warning for a `delayed` source on an active workspace. The server sends only
+"Approvals" is the **Approvals and activity** section below the brief. Its heading has
+the id `OPERATIONS_SECTION_ID` (`foundation/ui/route.ts`). A Home link to it, such as
+**Review change**, **Review recovery** or **Open operations**, moves the section into view
+and focuses its heading, also when the address with the hash opens Home. While the
+workspace is `configuring` or `activating`, the section is absent, and Home shows no link
+to it. The client can show a warning for a `delayed` source on an active workspace. The server sends only
 `current` or `unavailable`, so this warning does not appear. During a refresh, Home
 keeps the last answer and shows an updating notice.
 
@@ -411,9 +415,7 @@ drawer. It shares the theme tokens.
 - 309 lines in 37 Portal CSS files outside `dev/` hold a hex colour, against the rule
   for raw shades.
 - The server sends an empty `today` list. Home items have no assignee.
-- On Home, the link to the approvals section changes only the address hash. No code
-  scrolls to `#operations-title`, and the section is absent in the setup state.
-- Old names remain on the `/ecommerce` page and in the Billing and Jev payment text.
+- Old names remain on the `/ecommerce` page.
 
 ## Sources
 

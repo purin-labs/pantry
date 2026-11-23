@@ -674,6 +674,7 @@ function renderWorkspaceHome(page: PageContext): React.ReactNode {
           organisationId={state.organisation.organisation.organisationId}
           organisationHandle={state.organisation.membership.organisationHandle}
           workspaceHandle={state.workspace.workspaceHandle}
+          operationsOnPage={!setupHomePage}
         />
       ) : null}
       {homePage && !setupHomePage ? (

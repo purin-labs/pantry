@@ -53,6 +53,7 @@ import {
 } from "./agent-console";
 import { useLocation, useNavigate } from "react-router";
 import { pageAddress, pageLink } from "@purin-labs/ui/page-address";
+import { OPERATIONS_SECTION_ID } from "@purin-labs/ui/route";
 import { AgentSchedulesPanel } from "../features/agent-schedules/route";
 import type { BrainTransport } from "@purin-labs/area-brain/ui/features/brain/api";
 import {
@@ -677,6 +678,22 @@ function agentOperationIntent(command: AgentOperationCommand): string {
   return `agent-operation:${command.kind}:${JSON.stringify(command)}`;
 }
 
+/**
+ * A link with the hash of this heading, such as Home's "Review change", moves
+ * the heading into view and focus. The section reads its data first, so this
+ * also runs when the address with the hash opens the page.
+ */
+function useHashTarget(id: string): React.RefObject<HTMLHeadingElement | null> {
+  const heading = React.useRef<HTMLHeadingElement>(null);
+  const location = useLocation();
+  React.useEffect(() => {
+    if (location.hash !== `#${id}`) return;
+    heading.current?.scrollIntoView({ block: "start" });
+    heading.current?.focus({ preventScroll: true });
+  }, [id, location.hash, location.key]);
+  return heading;
+}
+
 type OperationsPageProps = {
   readonly organisationId: string;
   readonly snapshot: AgentOperationsSnapshot;
@@ -688,14 +705,17 @@ type OperationsPageProps = {
 };
 
 function OperationsPage(props: OperationsPageProps): React.ReactNode {
+  const heading = useHashTarget(OPERATIONS_SECTION_ID);
   return (
     <section
       className="portal-band commerce-panel"
-      aria-labelledby="operations-title"
+      aria-labelledby={OPERATIONS_SECTION_ID}
     >
       <div className="section-heading">
         <div>
-          <h2 id="operations-title">Approvals and activity</h2>
+          <h2 id={OPERATIONS_SECTION_ID} ref={heading} tabIndex={-1}>
+            Approvals and activity
+          </h2>
           <p>
             Shipments to fix, approvals to decide, and what happened recently.
           </p>

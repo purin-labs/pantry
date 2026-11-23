@@ -3,6 +3,7 @@
 import React from "../../../apps/portal/node_modules/react";
 // @ts-expect-error React DOM runtime declarations are scoped to apps/portal.
 import { renderToStaticMarkup } from "../../../apps/portal/node_modules/react-dom/server";
+import { StaticRouter } from "../../../apps/portal/node_modules/react-router";
 import { describe, expect, it } from "vitest";
 
 import { EMPTY_AGENT_OPERATIONS_SNAPSHOT, type AgentOperationsTransport } from "@purin-labs/area-organisation/ui/agent-operations";
@@ -453,32 +454,37 @@ function agentConsoleSnapshot(
   };
 }
 
+/** The Approvals and activity section reads the address, as on Home. */
 function renderOperationsRoute(
   snapshot: AgentOperationsSnapshot,
   canManage: boolean,
 ): string {
   return renderToStaticMarkup(
-    React.createElement(AgentOperationsRouteView, {
-      organisationId: ORGANISATION_ID,
-      page: "operations",
-      canManage,
-      commerceActionBusy: false,
-      refreshKey: "initial",
-      loadAction: unusedLoadAction,
-      transport: TRANSPORT,
-      commerceOperations: COMMERCE_OPERATIONS,
-      content: {
-        kind: "ready",
-        data: snapshot,
-        freshness: { kind: "current" },
-        updating: false,
-      },
-      mutation: { kind: "idle" },
-      retry: ignore,
-      submit: unusedSubmit,
-      run: unusedRun,
-      loadRevisions: unusedLoadRevisions,
-    }),
+    React.createElement(
+      StaticRouter,
+      { location: "/portal/cafe/main" },
+      React.createElement(AgentOperationsRouteView, {
+        organisationId: ORGANISATION_ID,
+        page: "operations",
+        canManage,
+        commerceActionBusy: false,
+        refreshKey: "initial",
+        loadAction: unusedLoadAction,
+        transport: TRANSPORT,
+        commerceOperations: COMMERCE_OPERATIONS,
+        content: {
+          kind: "ready",
+          data: snapshot,
+          freshness: { kind: "current" },
+          updating: false,
+        },
+        mutation: { kind: "idle" },
+        retry: ignore,
+        submit: unusedSubmit,
+        run: unusedRun,
+        loadRevisions: unusedLoadRevisions,
+      }),
+    ),
   );
 }
 

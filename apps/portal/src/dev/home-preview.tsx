@@ -122,6 +122,7 @@ createRoot(root).render(
             organisationId="organisation_preview"
             organisationHandle="preview"
             workspaceHandle="cafe"
+            operationsOnPage={true}
           />
         </div>
       </main>
