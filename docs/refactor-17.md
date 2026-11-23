@@ -344,9 +344,11 @@ physical bake. This refactor does not remove `schedule.ts`.
 
 ## What is left
 
-State on 2026-11-23, after the surfaces group. The three stages have their main
-result, and CI is green: the Pantry run on `c5cabc48` (run 45082677761) passed the
-E2E job and the Kitchen job, the first run with no failure.
+State on 2026-11-23, after the surfaces group and the rename of the Worker folder.
+The three stages have their main result. CI is green: the Pantry run on `0ff7a2c4`
+(run 45135878873) passed the E2E job and the Kitchen job. `main` is at `0ff7a2c4`
+since 2026-11-23, and that commit is in production since 10:29 UTC of that day
+(`pantry` `2573c620`).
 
 - Stage A: the layers are in place, and `pnpm lint:layers` finds 0 crossings.
 - Stage S: the 33 specs are written, 56 plans are in `docs/history/`, and `AGENTS.md`
@@ -359,15 +361,15 @@ E2E job and the Kitchen job, the first run with no failure.
 
 The open work, each item with its own decision:
 
-| Item                                                                                                              | Cost                                                                                                                                                                          | Default                      |
-| ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| A `contract` package for each area                                                                                | The public files of `contracts` in `scripts/layers.json` move; it ends the 3 package cycles between the areas. The 2 cycles between the surfaces need a port each             | One package for each area    |
-| The nine kinds of layer debt that `pnpm lint:layer-debts` counts                                                  | Each kind is its own change; the largest are 249 imports of files that are not public                                                                                         | The counts may not grow      |
-| The 208 code faults of lower severity that the second read of the specs confirmed                                 | One change for each fault, with a journey; the list is with the owner. The high-severity faults are corrected on `dev` since 2026-11-23, and one of the eight was not a fault | No other fault is corrected  |
-| One outbox table shape for the 5 outboxes, new names for classes and tables, the deletion of each old-row adapter | Each needs a D1 patch or an Actor schema step                                                                                                                                 | Nothing changes              |
-| Plan 91 moves to `docs/history/`; the 15 other source documents of the specs                                      | One run of `scripts/move-plan-to-history.mjs` after phase 6 of Plan 91                                                                                                        | They stay in `docs/`         |
-| A short `AGENTS.md` for each area                                                                                 | 8 short files                                                                                                                                                                 | The root `AGENTS.md` only    |
-| 42 test files call `runDurableObjectAlarm` and most ignore its result                                             | The same race as in the mail journeys can fail them on a slow runner                                                                                                          | Correct a file when it fails |
+| Item                                                                                                              | Cost                                                                                                                                                                                   | Default                      |
+| ----------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| A `contract` package for each area                                                                                | The public files of `contracts` in `scripts/layers.json` move; it ends the 3 package cycles between the areas. The 2 cycles between the surfaces need a port each                      | One package for each area    |
+| The nine kinds of layer debt that `pnpm lint:layer-debts` counts                                                  | Each kind is its own change; the largest are 249 imports of files that are not public                                                                                                  | The counts may not grow      |
+| The 208 code faults of lower severity that the second read of the specs confirmed                                 | One change for each fault, with a journey; the list is with the owner. The high-severity faults are corrected and in production since 2026-11-23, and one of the eight was not a fault | No other fault is corrected  |
+| One outbox table shape for the 5 outboxes, new names for classes and tables, the deletion of each old-row adapter | Each needs a D1 patch or an Actor schema step                                                                                                                                          | Nothing changes              |
+| Plan 91 moves to `docs/history/`; the 15 other source documents of the specs                                      | One run of `scripts/move-plan-to-history.mjs` after phase 6 of Plan 91                                                                                                                 | They stay in `docs/`         |
+| A short `AGENTS.md` for each area                                                                                 | 8 short files                                                                                                                                                                          | The root `AGENTS.md` only    |
+| 42 test files call `runDurableObjectAlarm` and most ignore its result                                             | The same race as in the mail journeys can fail them on a slow runner                                                                                                                   | Correct a file when it fails |
 
 The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
