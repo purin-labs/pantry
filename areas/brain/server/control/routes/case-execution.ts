@@ -134,8 +134,9 @@ export function matchCaseExecutionRoute(
 /**
  * The read-only execution projection of a Case. No route here changes a
  * record. Reading needs no management role: the live context capability, the
- * Case's place in a Project the person can read and each record's stored
- * label decide what is returned.
+ * access of the chat that presents the Case (any other Case belongs to the
+ * whole Organisation, whatever its Project) and each record's stored label
+ * decide what is returned.
  */
 export async function handleCaseExecutionRoute(
   request: Request,

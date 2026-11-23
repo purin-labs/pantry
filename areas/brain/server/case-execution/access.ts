@@ -363,9 +363,9 @@ type OpenedCase = Readonly<{
 /**
  * Opens a Case for one person. The person needs the live context capability.
  * A Case that a chat presents follows the chat's own access, and its Actor is
- * the one the chat's stored address names. Any other Case must be filed in a
- * Project the person can read. A Case that fails any of these answers as a
- * missing one.
+ * the one the chat's stored address names. Any other Case belongs to the whole
+ * Organisation, whatever its Project (Plan 27C). A Case that fails any of these
+ * answers as a missing one.
  */
 async function openCaseExecution(
   env: Env,
