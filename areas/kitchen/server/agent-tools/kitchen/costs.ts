@@ -5,9 +5,12 @@ import {
   type CostsSheetCell,
   type CostsSheetCellChange,
 } from "@purin-labs/costs-sheet-crdt";
+import { ProposalArgumentError } from "@purin-labs/agent-tools/errors";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import {
   COST_SCENARIO_LIMITS,
+  LOT_INVOICE_LIMITS,
+  lotCostLineProblem,
   normalizeCostForecastPlan,
   type ActualsWindowDays,
   type BakeryCostCalculation,
@@ -227,7 +230,7 @@ export type LotCostSaveRequest = Readonly<{
   invoicedQuantity: number;
   invoicedUnit: CostUnit;
   invoiceTotalMinor: number;
-  invoiceReference: string | null;
+  invoiceReference: string;
   supplierId: string | null;
 }>;
 
@@ -486,7 +489,7 @@ export const supplyCostSave = defineKitchenTool({
 export const lotCostSave = defineKitchenTool({
   name: "lot_cost_save",
   description:
-    "Record or update one received inventory lot's purchase invoice cost (invoiceTotalMinor, invoicedQuantity, invoicedUnit, optional invoiceReference and supplierId) for FIFO or weighted-average lot cost valuation on the Kitchen Costs & margins spreadsheet. " +
+    "Record or update one received inventory lot's purchase invoice cost (invoiceTotalMinor, invoicedQuantity, invoicedUnit, the supplier's invoiceReference and an optional supplierId) for FIFO or weighted-average lot cost valuation on the Kitchen Costs & margins spreadsheet. " +
     "Use lotId, inventoryItemId and expectedRevision from costs_read.lots (expectedRevision is null when the lot has no saved lot_invoice record yet). invoicedUnit must match the item's baseUnit family. " +
     "Say what you will change before you save, unless the person gave the exact change. A save moves no stock and pays nothing.",
   input: jsonSchema({
@@ -521,12 +524,13 @@ export const lotCostSave = defineKitchenTool({
         minimum: 0,
       },
       invoiceReference: {
-        type: ["string", "null"],
-        maxLength: 160,
+        type: "string",
+        minLength: 1,
+        maxLength: LOT_INVOICE_LIMITS.invoiceReference,
       },
       supplierId: {
         type: ["string", "null"],
-        maxLength: 128,
+        maxLength: LOT_INVOICE_LIMITS.supplierId,
       },
     },
     required: [
@@ -1028,17 +1032,11 @@ function parseLotCostSaveArgs(input: unknown): LotCostSaveRequest {
     throw new TypeError("lot_cost_save arguments are invalid");
   }
 
-  const invoiceReference =
-    input.invoiceReference === null ||
-    input.invoiceReference.trim().length === 0
-      ? null
-      : input.invoiceReference.trim();
   const supplierId =
     input.supplierId === null || input.supplierId.trim().length === 0
       ? null
       : input.supplierId.trim();
-
-  return {
+  const request = {
     lotId: input.lotId.trim(),
     inventoryItemId: input.inventoryItemId.trim(),
     expectedRevision:
@@ -1047,9 +1045,12 @@ function parseLotCostSaveArgs(input: unknown): LotCostSaveRequest {
     invoicedQuantity: input.invoicedQuantity,
     invoicedUnit: input.invoicedUnit,
     invoiceTotalMinor: Number(input.invoiceTotalMinor),
-    invoiceReference,
+    invoiceReference: input.invoiceReference?.trim() ?? "",
     supplierId,
   };
+  const problem = lotCostLineProblem(request);
+  if (problem !== null) throw new ProposalArgumentError(problem);
+  return request;
 }
 
 function parseSupplyCostSaveArgs(input: unknown): SupplyCostSaveRequest {

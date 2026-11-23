@@ -1,6 +1,7 @@
 import React from "react";
 import { ArrowUpRight, Receipt } from "lucide-react";
 import {
+  LOT_INVOICE_LIMITS,
   convertCostQuantity,
   type CalculatedSupplyUsage,
   type CostValuationBasis,
@@ -84,10 +85,16 @@ export function buildLotWritesForSheet(
       };
     }
     const invoiceTotalMinor = Math.round(totalMajor * 10 ** digits);
-    const invoiceReference =
-      edit.invoiceReference.trim().length > 0
-        ? edit.invoiceReference.trim()
-        : null;
+    const invoiceReference = edit.invoiceReference.trim();
+    if (
+      invoiceReference.length === 0 ||
+      invoiceReference.length > LOT_INVOICE_LIMITS.invoiceReference
+    ) {
+      return {
+        ok: false,
+        error: `Enter the supplier invoice reference for lot ${lot.lotCode}, 1 to ${LOT_INVOICE_LIMITS.invoiceReference} characters.`,
+      };
+    }
     const expectedRevision =
       lot.invoiceCost?.source === "lot_invoice"
         ? lot.invoiceCost.revision

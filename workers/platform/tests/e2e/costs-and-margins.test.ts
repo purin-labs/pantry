@@ -153,6 +153,7 @@ type Journey = {
   stalePlanArgs: CostsPlanArgs | null;
   saveLotArgs: LotCostArgs | null;
   staleLotArgs: LotCostArgs | null;
+  longLotArgs: LotCostArgs | null;
   editSheetArgs: Readonly<{
     changes: readonly Readonly<{ cellKey: string; value: string | null }>[];
   }> | null;
@@ -286,6 +287,10 @@ function scripts(journey: Journey): Readonly<Record<string, Script>> {
     STALELOTCOST: {
       tool: "lot_cost_save",
       args: requireArgs(() => journey.staleLotArgs),
+    },
+    LONGLOTCOST: {
+      tool: "lot_cost_save",
+      args: requireArgs(() => journey.longLotArgs),
     },
     EDITSHEET: {
       tool: "costs_sheet_edit",
@@ -987,6 +992,7 @@ it(
       stalePlanArgs: null,
       saveLotArgs: null,
       staleLotArgs: null,
+      longLotArgs: null,
       editSheetArgs: null,
     };
 
@@ -1745,6 +1751,27 @@ it(
     });
     expect(lot1StaleResp.status).toBe(409);
 
+    // A lot invoice needs a supplier invoice reference of 1 to 120 characters
+    // and a supplier id of at most 128. Any other value is refused with
+    // lot_cost_invalid and a reason, and nothing is stored.
+    for (const [refused, change] of [
+      ["no reference", { invoiceReference: null }],
+      ["a long reference", { invoiceReference: "R".repeat(121) }],
+      ["a long supplier id", { supplierId: "s".repeat(129) }],
+    ] as const) {
+      const response = await fetchCosts(author, paths.organisation, "POST", {
+        ...lot1SavePayload,
+        lotId: butterLot2.id,
+        ...change,
+      });
+      expect(response.status, refused).toBe(422);
+      expect(await response.json(), refused).toMatchObject({
+        ok: false,
+        error: "lot_cost_invalid",
+        detail: expect.stringMatching(/reference|supplier/u),
+      });
+    }
+
     // Save Lot 2 purchase invoice cost via HTTP save_sheet lotWrites: ¥1,800 for 450g (4.00 ¥/g).
     const lot2SheetResp = await fetchCosts(author, paths.organisation, "POST", {
       kind: "save_sheet",
@@ -1892,6 +1919,16 @@ it(
     };
     await chatApproved(fixture, "STALELOTCOST");
     expect(lastOutput("STALELOTCOST")).toContain("changed after you read it");
+
+    // The agent's save of a supplier id longer than the lot table holds is
+    // refused before any write, with the limit in the reason.
+    journey.longLotArgs = {
+      ...journey.saveLotArgs,
+      expectedRevision: 2,
+      supplierId: "s".repeat(129),
+    };
+    await chatDirect(fixture, author, "LONGLOTCOST");
+    expect(lastOutput("LONGLOTCOST")).toContain("128 characters");
 
     await chatDirect(fixture, author, "FIFOCOSTS");
     const fifoAgentText = lastOutput("FIFOCOSTS");

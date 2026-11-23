@@ -4,6 +4,7 @@ import {
   NonNegativeInteger,
   PositiveInteger,
 } from "@purin-labs/contract-schema";
+import { isRecord } from "@purin-labs/std";
 import { recipeRevisionResourceSchema } from "@purin-labs/commerce-contracts/records/api-food-service";
 import {
   COST_SCENARIO_LIMITS,
@@ -320,7 +321,7 @@ export const lotCostLineWriteSchema = Type.Object({
   invoicedQuantity: Type.Number({ exclusiveMinimum: 0 }),
   invoicedUnit: costUnitSchema,
   invoiceTotalMinor: nonNegativeInt,
-  invoiceReference: nullableText,
+  invoiceReference: text,
   supplierId: nullableText,
 });
 
@@ -337,7 +338,7 @@ export const lotCostWriteSchema = Type.Object({
   invoicedQuantity: Type.Number({ exclusiveMinimum: 0 }),
   invoicedUnit: costUnitSchema,
   invoiceTotalMinor: nonNegativeInt,
-  invoiceReference: nullableText,
+  invoiceReference: text,
   supplierId: nullableText,
 });
 
@@ -442,19 +443,55 @@ function validateSupplyLineFields(line: SupplyCostLineWrite): void {
   }
 }
 
-function validateLotCostLineFields(line: LotCostLineWrite): void {
-  if (!/^[A-Z]{3}$/u.test(line.currency)) {
-    throw new Error("Currency must be a 3-letter ISO code such as JPY.");
-  }
-  if (!Number.isFinite(line.invoicedQuantity) || line.invoicedQuantity <= 0) {
-    throw new Error("Enter a positive invoiced quantity.");
-  }
+/** The longest values that a row of bakery_lot_invoice_cost holds. */
+export const LOT_INVOICE_LIMITS = Object.freeze({
+  id: 160,
+  invoiceReference: 120,
+  supplierId: 128,
+} as const);
+
+const MISSING_INVOICE_REFERENCE = `Enter the supplier invoice reference, 1 to ${LOT_INVOICE_LIMITS.invoiceReference} characters.`;
+
+/**
+ * Why one lot invoice line cannot be saved, or null when it can. The person's
+ * save, the cost sheet save and lot_cost_save give this reason.
+ */
+export function lotCostLineProblem(
+  line: Pick<
+    LotCostLineWrite,
+    | "lotId"
+    | "inventoryItemId"
+    | "currency"
+    | "invoicedQuantity"
+    | "invoiceReference"
+    | "supplierId"
+  >,
+): string | null {
+  if (!/^[A-Z]{3}$/u.test(line.currency))
+    return "Currency must be a 3-letter ISO code such as JPY.";
+  if (!Number.isFinite(line.invoicedQuantity) || line.invoicedQuantity <= 0)
+    return "Enter a positive invoiced quantity.";
   if (
-    line.invoiceReference !== null &&
-    line.invoiceReference.trim().length === 0
-  ) {
-    throw new Error("Enter a supplier invoice reference.");
-  }
+    line.lotId.length > LOT_INVOICE_LIMITS.id ||
+    line.inventoryItemId.length > LOT_INVOICE_LIMITS.id
+  )
+    return `A lot id and an item id have at most ${LOT_INVOICE_LIMITS.id} characters.`;
+  if (
+    line.invoiceReference.trim().length === 0 ||
+    line.invoiceReference.length > LOT_INVOICE_LIMITS.invoiceReference
+  )
+    return MISSING_INVOICE_REFERENCE;
+  if (
+    line.supplierId !== null &&
+    line.supplierId.length > LOT_INVOICE_LIMITS.supplierId
+  )
+    return `A supplier id has at most ${LOT_INVOICE_LIMITS.supplierId} characters.`;
+  return null;
+}
+
+function validateLotCostLineFields(line: LotCostLineWrite): void {
+  const problem = lotCostLineProblem(line);
+  if (problem !== null) throw new Error(problem);
 }
 
 export function parseSupplyCostWrite(value: unknown): SupplyCostWrite {
@@ -472,7 +509,13 @@ export function parseSupplyCostWrite(value: unknown): SupplyCostWrite {
 export function parseLotCostWrite(value: unknown): LotCostWrite {
   const result = decodeLotCostWrite(value);
   if (!result.ok) {
-    throw new Error("The lot invoice cost fields are invalid.");
+    throw new Error(
+      isRecord(value) &&
+        (typeof value.invoiceReference !== "string" ||
+          value.invoiceReference.length === 0)
+        ? MISSING_INVOICE_REFERENCE
+        : "The lot invoice cost fields are invalid.",
+    );
   }
   if (!Number.isFinite(Date.parse(result.value.requestedAt))) {
     throw new Error("The lot invoice save time is invalid.");

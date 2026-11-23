@@ -105,10 +105,13 @@ the production batches.
 ### Lot costs from purchase invoices
 
 - A person records the invoice of one received lot: the invoiced quantity and unit, the
-  total, a reference and an optional supplier. The row goes to
-  `bakery_lot_invoice_cost`. The write contract and `lot_cost_save` accept no reference
-  (`null`), but the column `invoice_reference` is not null, so such a save fails at
-  the D1 insert.
+  total, the supplier's invoice reference and an optional supplier. The row goes to
+  `bakery_lot_invoice_cost`.
+- `lotCostLineProblem` (`kitchen-control-api`) holds the limits of that row
+  (`LOT_INVOICE_LIMITS`): a reference of 1 to 120 characters, a supplier id of at most
+  128 and a lot or item id of at most 160. The save route and the sheet save refuse
+  another value with a reason, `lot_cost_save` refuses it as an argument the agent can
+  correct, and the lots drawer asks for the reference before it saves.
 - A lot save refuses an unknown lot, a lot of another item and a lot of a finished good
   with `lot_cost_invalid`. It refuses an invoiced unit that does not convert to the
   base unit of the item with `lot_cost_unit_mismatch`.
