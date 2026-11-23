@@ -343,21 +343,19 @@ change. The browser can report only `onboarding_stage_viewed`.
 
 ### Event catalog
 
-The `onboarding_event` CHECK allows these types. Platform emits no invitation
-type and its TypeScript event union omits them; the CHECK keeps them so that
-deployed databases need no table rebuild.
+The `onboarding_event` CHECK allows these types. `organisation_invitation`
+keeps the state of an invitation, so no invitation type is an event.
 
-| Group          | Event types                                                                               | Emitted by                                           |
-| -------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| Onboarding     | `onboarding_started`, `_resumed`, `_stage_viewed`, `_stage_completed`                     | Bootstrap, setup, activation                         |
-| Organisation   | `organisation_created`, `organisation_archived`                                           | Bootstrap, `organisation-lifecycle.ts`               |
-| Invitation     | `invitation_created`, `_accepted`, `_revoked`                                             | None yet (`organisation_invitation` keeps the state) |
-| Provider       | `provider_attempt_started`, `_connected`, `_cancelled`, `_failed`, `_expired`             | `provider-attempt.ts`                                |
-| Reconciliation | `provider_reconciliation_started`, `_completed`, `_failed`                                | `onboarding-reconciliation.ts`                       |
-| Accounts       | `default_account_changed`                                                                 | `integration-account.ts`                             |
-| Setup          | `setup_saved`, `readiness_assessed`, `readiness_invalidated`                              | Setup, readiness, account changes                    |
-| Activation     | `activation_started`, `_phase_completed`, `_succeeded`, `_failed`, `first_task_presented` | `activation.ts`                                      |
-| Support        | `support_reference_created`                                                               | `activation.ts`, `provider-attempt.ts`               |
+| Group          | Event types                                                                               | Emitted by                             |
+| -------------- | ----------------------------------------------------------------------------------------- | -------------------------------------- |
+| Onboarding     | `onboarding_started`, `_resumed`, `_stage_viewed`, `_stage_completed`                     | Bootstrap, setup, activation           |
+| Organisation   | `organisation_created`, `organisation_archived`                                           | Bootstrap, `organisation-lifecycle.ts` |
+| Provider       | `provider_attempt_started`, `_connected`, `_cancelled`, `_failed`, `_expired`             | `provider-attempt.ts`                  |
+| Reconciliation | `provider_reconciliation_started`, `_completed`, `_failed`                                | `onboarding-reconciliation.ts`         |
+| Accounts       | `default_account_changed`                                                                 | `integration-account.ts`               |
+| Setup          | `setup_saved`, `readiness_assessed`, `readiness_invalidated`                              | Setup, readiness, account changes      |
+| Activation     | `activation_started`, `_phase_completed`, `_succeeded`, `_failed`, `first_task_presented` | `activation.ts`                        |
+| Support        | `support_reference_created`                                                               | `activation.ts`, `provider-attempt.ts` |
 
 ### Audit evidence
 

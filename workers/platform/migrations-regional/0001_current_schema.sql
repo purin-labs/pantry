@@ -1054,7 +1054,6 @@ CREATE TABLE onboarding_event (
     event_type IN (
       'onboarding_started', 'onboarding_resumed', 'onboarding_stage_viewed',
       'onboarding_stage_completed', 'organisation_created', 'organisation_archived',
-      'invitation_created', 'invitation_accepted', 'invitation_revoked',
       'provider_attempt_started', 'provider_attempt_connected',
       'provider_attempt_cancelled', 'provider_attempt_failed',
       'provider_attempt_expired', 'provider_reconciliation_started',

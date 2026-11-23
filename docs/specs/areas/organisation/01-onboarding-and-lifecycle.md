@@ -420,8 +420,6 @@ The routes are in `control/routes/onboarding.ts` and `control/routes/operators.t
 - **The stage route.** `POST …/onboarding/stage-viewed` has no Origin or CSRF check.
 - **No terminal failure.** Each activation failure is 503. The 422 answer has no
   producer. No code writes `organisation_archive_cleanup.status = 'failed'`.
-- **Invitation events.** The `onboarding_event` CHECK allows three invitation types,
-  and no code emits them.
 - **Labels that differ.** The tombstone names the first active owner, also when an admin
   archives. `OrganisationOnboardingLifecycle` has no `purging` or `purged`.
 - **Billing** (Plan 95 step 6) is not built, and the plan is always `beta`.
