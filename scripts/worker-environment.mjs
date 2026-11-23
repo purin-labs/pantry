@@ -6,7 +6,7 @@ import { requirePublicOrigin } from "../foundation/kernel/public-origin.ts";
 import { CODE_MODE_SANDBOX_INTERRUPT_BUDGET } from "../foundation/agent/code-mode-sandbox/limits.ts";
 
 const root = resolve(import.meta.dirname, "..");
-const require = createRequire(resolve(root, "services/platform/package.json"));
+const require = createRequire(resolve(root, "workers/platform/package.json"));
 const { unstable_readConfig } = require("wrangler");
 
 /**
@@ -90,7 +90,7 @@ function routeTarget(route) {
 
 /** The source folder of a Worker service. */
 export function workerDirectory(service) {
-  if (service === "platform") return resolve(root, "services/platform");
+  if (service === "platform") return resolve(root, "workers/platform");
   if (service === "commerce") return resolve(root, "services/commerce");
   throw new Error("Unknown Worker service");
 }
@@ -115,7 +115,7 @@ export function readWorkerEnvironment(service, environment) {
   return config;
 }
 
-const SLACK_INGRESS_CONFIG = "services/platform/wrangler.slack-ingress.jsonc";
+const SLACK_INGRESS_CONFIG = "workers/platform/wrangler.slack-ingress.jsonc";
 const SLACK_INGRESS_VARS = [
   "PANTRY_DEPLOYMENT_PROFILE",
   "PANTRY_ORGANISATION_PLACEMENT_PROFILE",
@@ -195,7 +195,7 @@ function slackIngressProfileDifferences(platform, ingress) {
 }
 
 const CODE_MODE_SANDBOX_CONFIG =
-  "services/platform/wrangler.code-mode-sandbox.jsonc";
+  "workers/platform/wrangler.code-mode-sandbox.jsonc";
 /**
  * The slowest rate of QuickJS interrupt polls that the CPU limit must cover.
  * Cloudflare measured about 10,000 polls for each second of computation, and
@@ -285,7 +285,7 @@ const CODE_MODE_SANDBOX_FORBIDDEN_BINDINGS = [
   "containers",
 ];
 
-const MODEL_EXIT_CONFIG = "services/platform/wrangler.model-exit.jsonc";
+const MODEL_EXIT_CONFIG = "workers/platform/wrangler.model-exit.jsonc";
 /** The data centre closest to AWS Tokyo. Never Smart Placement. */
 const MODEL_EXIT_PLACEMENT = { region: "aws:ap-northeast-1" };
 
@@ -346,7 +346,7 @@ function modelExitProfileDifferences(platform, exit, environment, name) {
 }
 
 const VAULT_ONEPASSWORD_CONFIG =
-  "services/platform/wrangler.vault-onepassword.jsonc";
+  "workers/platform/wrangler.vault-onepassword.jsonc";
 
 /**
  * The profile of the 1Password store Worker (Plan 79).
@@ -396,7 +396,7 @@ export function readVaultOnePasswordEnvironment(environment) {
   return store;
 }
 
-const CHATGPT_EXIT_CONFIG = "services/platform/wrangler.chatgpt-exit.jsonc";
+const CHATGPT_EXIT_CONFIG = "workers/platform/wrangler.chatgpt-exit.jsonc";
 
 /**
  * The profile of the ChatGPT exit Worker (Plan 75).

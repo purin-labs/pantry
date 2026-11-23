@@ -40,7 +40,7 @@
       "containers": [
         {
           "class_name": "ChatGptExitContainer",
-          "image": "../chatgpt-exit/Dockerfile",
+          "image": "../../services/chatgpt-exit/Dockerfile",
           "image_build_context": "../..",
           "instance_type": "lite",
           "max_instances": 1,
@@ -63,7 +63,7 @@
       "containers": [
         {
           "class_name": "ChatGptExitContainer",
-          "image": "../chatgpt-exit/Dockerfile",
+          "image": "../../services/chatgpt-exit/Dockerfile",
           "image_build_context": "../..",
           "instance_type": "lite",
           "max_instances": 1,

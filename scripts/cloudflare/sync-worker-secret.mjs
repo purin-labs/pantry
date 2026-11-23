@@ -38,7 +38,7 @@ const WORKERS = new Map([
     "platform",
     {
       label: "the Pantry Worker",
-      config: "services/platform/wrangler.jsonc",
+      config: "workers/platform/wrangler.jsonc",
       secrets: SUPPORTED_SECRETS,
       mayGenerate: true,
       read: readWorkerEnvironment.bind(null, "platform"),
@@ -48,7 +48,7 @@ const WORKERS = new Map([
     "slack-ingress",
     {
       label: "the Slack ingress Worker",
-      config: "services/platform/wrangler.slack-ingress.jsonc",
+      config: "workers/platform/wrangler.slack-ingress.jsonc",
       secrets: SLACK_INGRESS_SECRETS,
       mayGenerate: false,
       read: readSlackIngressEnvironment,
@@ -89,7 +89,7 @@ async function main() {
   const secretValue = await resolveSecretValue(secretName, generate, envPath);
   const wrangler = resolve(
     repositoryRoot,
-    "services/platform/node_modules/.bin/wrangler",
+    "workers/platform/node_modules/.bin/wrangler",
   );
   const config = resolve(repositoryRoot, worker.config);
   const result = spawnSync(

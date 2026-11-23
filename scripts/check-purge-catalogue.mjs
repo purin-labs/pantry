@@ -21,7 +21,7 @@ import { pathToFileURL } from "node:url";
 const root = new URL("..", import.meta.url).pathname;
 const baseline = join(
   root,
-  "services/platform/migrations-regional/0001_current_schema.sql",
+  "workers/platform/migrations-regional/0001_current_schema.sql",
 );
 const cataloguePath = join(root, "foundation/tenancy/data/purge-catalogue.ts");
 const { PURGE_CATALOGUE, PURGE_R2_PREFIXES } = await import(
@@ -130,7 +130,7 @@ for (const folder of [
   "foundation",
   "areas",
   "surfaces",
-  "services/platform/src",
+  "workers/platform/src",
 ])
   for (const file of sourceFiles(join(root, folder)))
     for (const [, keyRoot, encoder] of readFileSync(file, "utf8").matchAll(

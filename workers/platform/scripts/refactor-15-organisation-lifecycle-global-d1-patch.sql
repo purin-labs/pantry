@@ -9,7 +9,7 @@
 -- workspace with no live owner becomes its owner.
 -- Apply to the deployed GLOBAL database (and a local combined database)
 -- before the release:
---   wrangler d1 execute <global database> --env production --remote --file services/platform/scripts/refactor-15-organisation-lifecycle-global-d1-patch.sql
+--   wrangler d1 execute <global database> --env production --remote --file workers/platform/scripts/refactor-15-organisation-lifecycle-global-d1-patch.sql
 -- Apply the regional patch first. The script is safe to repeat: a second run
 -- swaps the column again with the same values.
 ALTER TABLE organisation ADD COLUMN status_next TEXT NOT NULL DEFAULT 'active'

@@ -13,7 +13,7 @@ async (page) => {
   //
   // The harness Worker has no shop, so this browser answers the shop's
   // image list, the upload and the image bytes, and records the upload. The
-  // E2E journey services/platform/tests/e2e/pi-menu-board-image.test.ts
+  // E2E journey workers/platform/tests/e2e/pi-menu-board-image.test.ts
   // proves those routes, the release address and the public screen route.
   const WORKER = "http://127.0.0.1:8874";
   const PORTAL = "http://127.0.0.1:3174";

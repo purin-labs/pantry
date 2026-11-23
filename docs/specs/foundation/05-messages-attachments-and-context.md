@@ -299,7 +299,7 @@ The agent loads more context with its tools, when the task needs it.
 - **Rust.** `crates/media-inspect` (media facts and frame selection, also built to Wasm
   for the Worker), `crates/workspace-executor` (the `prepare_message_attachment`
   operation) and `crates/message-link-fetch` (the pinned fetch).
-- **Platform files** in `services/platform/src/`: `slack/events.ts`,
+- **Platform files** in `workers/platform/src/`: `slack/events.ts`,
   `slack/user-message.ts`, `slack/attachments.ts`, `chat/attachments.ts`, `messages/`
   (inspection, text of PDF and office files, frames, link reader, collection),
   `actors/message-preparation.ts`, `actors/message-attachment-preparation.ts`,
@@ -439,7 +439,7 @@ The agent loads more context with its tools, when the task needs it.
   [Plan 35](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-35-access-and-data-flow-controls.md) and
   [Plan 36](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-36-async-control-primitives.md).
   Its journey on real Slack is `pnpm --filter @purin-labs/platform canary:plan37`
-  (`services/platform/scripts/plan37-attachment-canary.ts`).
+  (`workers/platform/scripts/plan37-attachment-canary.ts`).
 - [Plan 42G](../../history/plan-42G-automatic-context-loading.md), with its
   [implementation evidence](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42G-automatic-context-2026-10-01.md)
   and the records in the same folder of the archive:
@@ -454,7 +454,7 @@ The agent loads more context with its tools, when the task needs it.
 - Where a source differs from the code, this spec follows the code. Plan 37 names Rust
   contracts, and both plans name a second harness. The code keeps the contracts in
   TypeScript (FND-11) and runs Pi on each route (FND-04).
-- E2E journeys in `services/platform/tests/e2e/`: `slack-attachment-journey.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `slack-attachment-journey.test.ts`,
   `slack-attachment-restore.test.ts`, `message-link-fetch-placement.test.ts`,
   `message-link-session-origin.test.ts`, `chat-fork-retention.test.ts`,
   `portal-chat-finalization.test.ts` (saved context, interrupted Kitchen preparation, an

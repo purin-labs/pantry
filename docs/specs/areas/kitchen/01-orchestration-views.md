@@ -413,7 +413,7 @@ selection and no capability.
   [42F human transfer](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42F-human-transfer-2026-10-01.md),
   [42E/F closeout](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42EF-closeout-2026-10-01.md),
   [calibration intake](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42-physical-calibration.md).
-- E2E journeys in `services/platform/tests/e2e/`: `bakery-runs.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `bakery-runs.test.ts`,
   `bakery-run-artifacts.test.ts`, `bakery-appliance-runs.test.ts`,
   `bakery-agent-canvas.test.ts`, `bakery-procedure-access.test.ts`,
   `bakery-surface-quarantine.test.ts`, `canvas-chat-signals.test.ts` and

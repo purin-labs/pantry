@@ -18,7 +18,7 @@ transcripts.
 
 Reuse **Financier Factory → Cafe operations** at `https://localhost:3003`, backed
 by the existing local Worker on `127.0.0.1:3101` and
-`services/platform/.wrangler/square-acceptance`. Organisation:
+`workers/platform/.wrangler/square-acceptance`. Organisation:
 `organisation_e980f411-e92b-4faf-8745-bf58ae9b7413`. The signed-in operator is Pta. Use
 the existing full-mailbox Gmail account
 `integration_account_00e83783-2c42-4434-af1a-e5018a62bd33` and its existing agent
@@ -192,13 +192,13 @@ using the existing platform deployment command. Record the deployed version and
 schema verification before enabling the named test mailbox. Preserve the
 connected mailbox when upgrading a database whose squashed baseline is already
 applied. Inspect the three Inbox tables and `mail_classification_matches` index;
-use `services/platform/scripts/plan29f-inbox-d1-patch.sql` for the additive upgrade.
+use `workers/platform/scripts/plan29f-inbox-d1-patch.sql` for the additive upgrade.
 It creates empty tables and grants no eligibility. The shared deployment schema
 check verifies the Inbox columns and classification index. Durable Object Inbox
 tables are upgraded by their owning Connector.
 
 For the configured local database, back it up before applying the patch, then run
-from `services/platform`:
+from `workers/platform`:
 
 ```sh
 pnpm exec wrangler d1 execute pantry --env local --local --persist-to .wrangler/square-acceptance --file scripts/plan29f-inbox-d1-patch.sql

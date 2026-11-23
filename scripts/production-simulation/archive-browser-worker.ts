@@ -4,7 +4,7 @@
 // Every /v1 request uses production routing and authorization. GET
 // /fixture/setup builds the Organisation and signs in its two people, which a
 // browser cannot do alone.
-import gateway from "../../services/platform/src/integration-gateway";
+import gateway from "../../workers/platform/src/integration-gateway";
 import { issueControlSession } from "../../foundation/tenancy/data/control-plane";
 import type { Env } from "../../foundation/kernel/env";
 import type { OrganisationId } from "../../foundation/kernel/ids";
@@ -16,7 +16,7 @@ export {
   CaseDO,
   ConnectorDO,
   CodeModePlatformGovernorActor,
-} from "../../services/platform/src/integration-gateway";
+} from "../../workers/platform/src/integration-gateway";
 
 const { admittedOrganisation } = fixturePeople("archive-", "archive-browser");
 

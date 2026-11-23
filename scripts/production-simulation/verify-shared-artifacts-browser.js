@@ -13,7 +13,7 @@ async function verifySharedArtifactsBrowser(page) {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await openArchive(page, fixture, 0);
   const source = checkoutUrl(
-    "services/platform/tests/fixtures/bakery-persistent-failure.json",
+    "workers/platform/tests/fixtures/bakery-persistent-failure.json",
   );
   const file = await page.request.get(new URL(source, page.url()).href);
   await page

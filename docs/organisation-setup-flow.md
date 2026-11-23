@@ -87,5 +87,5 @@ scripts/frontend-foundation/browser-journeys.mjs --account-setup`. It checks
   an empty name, a lost answer and its retry with one operation id, a reload,
   an unlisted organisation, the limit and the unverified refusals, and the
   invitation page.
-- `services/platform/tests/e2e/organisation-setup.test.ts` (J4) checks the
+- `workers/platform/tests/e2e/organisation-setup.test.ts` (J4) checks the
   route.

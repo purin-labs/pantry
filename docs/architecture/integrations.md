@@ -24,12 +24,12 @@ and provider setup for [Shopify](../integrations/shopify.md),
 
 This document uses the Actor names of `AGENTS.md`. The Durable Object classes
 are `ConnectorDO`, `CaseDO`, `SessionDO` (`AgentSessionActor`) and
-`OrganisationDO` in [`actors/`](../../services/platform/src/actors/).
+`OrganisationDO` in [`actors/`](../../workers/platform/src/actors/).
 
 ## Ingress gateway
 
 The Integration Gateway is the public provider boundary of the Platform Worker
-([`integration-gateway.ts`](../../services/platform/src/integration-gateway.ts),
+([`integration-gateway.ts`](../../workers/platform/src/integration-gateway.ts),
 [`gateway-routing/`](../../surfaces/webhooks/server/gateway-routing/)). It
 verifies a provider request, parses it once into a typed record, resolves the
 Organisation and the integration account, and hands durable work to an Actor
@@ -99,13 +99,13 @@ at-least-once delivery has one effect.
 A commerce webhook binds the event to one active provider connection and
 credential generation before it parses the body. Shopify catalog and inventory
 payloads enter canonical delivery directly
-([`shopify-connector.ts`](../../services/platform/src/shopify-connector.ts)).
+([`shopify-connector.ts`](../../workers/platform/src/shopify-connector.ts)).
 An Order body is incomplete, so the boundary queues
 `shopify.commerce_refresh.v1` with the exact Organisation, account, shop,
 webhook and Order GID; the consumer fetches that Order and uses the mapper of
 the initial sync. A Commerce merchant posts every event to
 `/hook/commerce/:org`
-([`commerce-webhooks.ts`](../../services/platform/src/commerce-webhooks.ts)).
+([`commerce-webhooks.ts`](../../workers/platform/src/commerce-webhooks.ts)).
 The post carries no change: a valid signature, less than five minutes old,
 queues a feed read. The feed stays the truth, and a one-minute reconcile covers
 a lost post. Accepted events update rebuildable Platform projections and may
@@ -124,7 +124,7 @@ is an immutable destination: `slack` (thread reply with `threadTs`),
 copies it into each outbox entry. `ConnectorActor` delivers from that copy and
 reads no mutable Case state during the effect. A Slack answer streams with
 `chat.startStream`, `chat.appendStream` and `chat.stopStream`
-([`slack-stream.ts`](../../services/platform/src/slack-stream.ts)). Each part
+([`slack-stream.ts`](../../workers/platform/src/slack-stream.ts)). Each part
 waits for the information-flow check of its destination. The provider receipt
 settles the exact outbox entry.
 
@@ -137,7 +137,7 @@ settles the exact outbox entry.
 - Attachments are checked for metadata and size, then stored as
   Organisation-scoped, content-addressed R2 objects under
   `attachments/<organisation>/`. Records carry references, not bytes
-  ([`stored-attachment.ts`](../../services/platform/src/stored-attachment.ts)).
+  ([`stored-attachment.ts`](../../workers/platform/src/stored-attachment.ts)).
   The harness gets an attachment only after Case and session authorization.
 
 An invalid signature or OAuth state is rejected before any side effect. An
@@ -156,7 +156,7 @@ Agents and generated code reach providers only through typed capabilities.
 `AgentSessionActor` owns the accepted tool catalog, the tool-call budget,
 private history and the turn. The Harness Tool Host
 ([`embedded-harness-tool-host.ts`](../../foundation/agent/actors/embedded-harness-tool-host.ts),
-[`agent-tools/`](../../services/platform/src/agent-tools/registry.ts))
+[`agent-tools/`](../../workers/platform/src/agent-tools/registry.ts))
 parses arguments and runs the trusted handlers. `OrganisationActor` owns the
 action ledger. A Connector delivers. It is not a tool executor and not a
 commerce source of truth.
@@ -205,7 +205,7 @@ An attachment from another message, or a URL that the model composed, is
 refused before any read.
 
 The link reader
-([`message-link-reader.ts`](../../services/platform/src/message-link-reader.ts))
+([`message-link-reader.ts`](../../workers/platform/src/message-link-reader.ts))
 sends no credential or cookie. It resolves the host over DoH, refuses
 non-public addresses, revalidates each redirect and bounds the body.
 `MessageLinkFetchContainer` pins the request to the validated address. The
@@ -230,14 +230,14 @@ see [Action ledger](./security.md#action-ledger) and
 `integration_account` or `custom_connector`.
 
 `CommerceActionRequest`
-([`commerce-actions.ts`](../../services/platform/src/commerce-actions.ts))
+([`commerce-actions.ts`](../../workers/platform/src/commerce-actions.ts))
 lists the commerce actions, and each source supports a subset
 ([`harness-commerce-proposal.ts`](../../areas/commerce/server/actors/harness-commerce-proposal.ts)):
 `commerce` supports `publish_catalog_listing`, `cancel_order`,
 `attach_tracking` and `adjust_offer_price`; `shopify` supports `cancel_order`.
-[`commerce-provider-execution.ts`](../../services/platform/src/commerce-provider-execution.ts)
+[`commerce-provider-execution.ts`](../../workers/platform/src/commerce-provider-execution.ts)
 runs an approved action through `@commerce/client`, or through
-[`shopify-action-execution.ts`](../../services/platform/src/shopify-action-execution.ts)
+[`shopify-action-execution.ts`](../../workers/platform/src/shopify-action-execution.ts)
 for the Shopify cancel. The handler gets the canonical connection authority,
 the normalized parameters and the stable effect identity. Browser and model
 input cannot supply a host, credential, account or environment.
@@ -250,8 +250,8 @@ A Case summary after an action is a delivery receipt only.
 
 Code Mode composes capability calls within one assignment. Pi is the only
 harness. A Pi script runs in the QuickJS VM of the `CodeModeSandbox` Worker
-([`code-mode-sandbox/worker.ts`](../../services/platform/src/code-mode-sandbox/worker.ts),
-[`wrangler.code-mode-sandbox.jsonc`](../../services/platform/wrangler.code-mode-sandbox.jsonc)),
+([`code-mode-sandbox/worker.ts`](../../workers/platform/src/code-mode-sandbox/worker.ts),
+[`wrangler.code-mode-sandbox.jsonc`](../../workers/platform/wrangler.code-mode-sandbox.jsonc)),
 and the reservation records the placement `cloudflare_sandbox_worker`. The
 sandbox has no credential, database, storage, route or outbound binding. A
 script reaches a capability only through the exchange that the Session Actor
@@ -291,7 +291,7 @@ owners release the reservation.
 materializes an immutable workspace revision and runs the accepted task with
 `enableInternet = false`. It returns content-addressed artifacts, measured
 usage and a `ValidatedProductFolderChangesetV1`.
-[`workspace-execution-coordinator.ts`](../../services/platform/src/actors/workspace-execution-coordinator.ts)
+[`workspace-execution-coordinator.ts`](../../workers/platform/src/actors/workspace-execution-coordinator.ts)
 checks that the changeset names the same Organisation, workspace and base
 revision before
 [`workspace-revision-store.ts`](../../foundation/agent/workspace-revision-store.ts)
@@ -489,7 +489,7 @@ stays connected.
   until the new generation is proven.
 - **Rotation** stores a new generation, verifies it, switches the active
   generation in one step and revokes the old one
-  ([`provider-credential-cutover.ts`](../../services/platform/src/provider-credential-cutover.ts)).
+  ([`provider-credential-cutover.ts`](../../workers/platform/src/provider-credential-cutover.ts)).
 - **Disable** sets the account to `disabled` before it returns. Ingress,
   egress, tools and activation dependencies stop at once. Provider cleanup is
   asynchronous and visible.
@@ -725,7 +725,7 @@ A Worker cannot pin a validated address and still verify the TLS host name, so
 ([`crates/custom-connector-fetch`](../../crates/custom-connector-fetch/)), one
 for each Organisation at its location hint, sends every credentialed request.
 The Worker side
-([`custom-connector-egress.ts`](../../services/platform/src/custom-connector-egress.ts))
+([`custom-connector-egress.ts`](../../workers/platform/src/custom-connector-egress.ts))
 resolves A and AAAA records over DoH, refuses the name if any answer is not
 public (`destination_not_public`), keeps the absolute deadline, and only then
 builds the secret-bearing request. The Rust client revalidates the address,

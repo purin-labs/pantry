@@ -17,7 +17,7 @@ import { PLATFORM_SOURCE } from "../../../scripts/lib/source-roots.mjs";
 // its substitutions. A fragment that a statement interpolates by name is
 // checked on its own.
 
-// The Worker source: services/platform/src and the folders of the packages
+// The Worker source: workers/platform/src and the folders of the packages
 // that the Worker bundles (Refactor 17), as scripts/lib/source-roots.mjs
 // lists them for the lints. A file is named by its path from the repository
 // root.

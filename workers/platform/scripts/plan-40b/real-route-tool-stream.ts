@@ -9,7 +9,7 @@
  * the whole rect is known and how the text grows. It writes no secret: the
  * key is read here and goes only to the provider.
  *
- * Build and run (from services/platform):
+ * Build and run (from workers/platform):
  *   npx esbuild scripts/plan-40b/real-route-tool-stream.ts --bundle \
  *     --platform=node --format=esm --outfile=<scratch>/stream.mjs \
  *     --external:cloudflare:* --log-level=error

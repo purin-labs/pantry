@@ -226,7 +226,7 @@ assignment. No agent tool starts a collection.
   Payments need `orders:read` or `orders:write`. `payments:record` records results of an
   app that runs its own provider. An API key may not hold it. An app installation can
   hold it, and the engine's operator token passes every scope check.
-- Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`):
+- Regional D1 (`workers/platform/migrations-regional/0001_current_schema.sql`):
   `cafe_terminal_assignment` (module `areas/cafe` in `scripts/layers.json`) and
   `paid_receipt`.
 - Agent tools: `areas/commerce/server/agent-tools/commerce/payments.ts` and
@@ -361,7 +361,7 @@ Neighbours:
   [recovery fixtures](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/square-recovery-gaps-20260908.md)
   and
   [runtime evidence](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/square-post-refresh-readiness-20260908.md).
-- E2E journeys in `services/platform/tests/e2e/`: `square-in-commerce.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `square-in-commerce.test.ts`,
   `stripe-in-commerce.test.ts` and `paid-receipt-outbox.test.ts`.
 - Journeys in `services/commerce/tests/`: `plan33-core-acceptance.test.ts`,
   `punter-acceptance.test.ts`, `checkout-profile-http.test.ts`,

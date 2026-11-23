@@ -284,7 +284,7 @@ connections and Vault secrets, and it purges the Organisation.
 
 ## Contracts
 
-- Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`). This
+- Regional D1 (`workers/platform/migrations-regional/0001_current_schema.sql`). This
   module owns `organisation_onboarding_selection`, `organisation_setup_snapshot`,
   `organisation_communication_destination`, `organisation_slack_channel`,
   `organisation_readiness_assessment`, `organisation_activation_attempt`,
@@ -438,7 +438,7 @@ The routes are in `control/routes/onboarding.ts` and `control/routes/operators.t
   specs: [FND-01](../../foundation/01-tenancy-and-placement.md),
   [FND-06](../../foundation/06-identity-policy-and-approval.md) and
   [DEV-01](../devices/01-devices.md).
-- E2E journeys in `services/platform/tests/e2e/`: `organisation-setup.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `organisation-setup.test.ts`,
   `regional-onboarding.test.ts`, `new-organisation-first-chat.test.ts`,
   `organisation-archive-access.test.ts`, `organisation-lifecycle-placement.test.ts`,
   `slack-answer-before-archive.test.ts`, `purged-organisation-reclaim.test.ts`,

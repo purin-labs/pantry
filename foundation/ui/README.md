@@ -231,7 +231,7 @@ and error stacks appear as stored tool results. The runtime has no structured
 plan, test-result, or public reasoning event contract, so those gallery examples
 remain demonstrations. No private model reasoning is exposed.
 
-The native journey is `services/platform/tests/e2e/chat-execution.test.ts`.
+The native journey is `workers/platform/tests/e2e/chat-execution.test.ts`.
 Run it with the platform's E2E Vitest configuration. It checks real accepted
 tool data, pagination, Actor restart, and denied reads from another member. The
 browser journey is `scripts/frontend-foundation/chat-trace-journey.js`,

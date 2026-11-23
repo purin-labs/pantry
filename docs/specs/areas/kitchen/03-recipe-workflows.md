@@ -393,7 +393,7 @@ Both capabilities are in `authorization/capability-catalogue.ts` and need
   [six-hour evidence](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-61E-six-hour-evidence.md);
   the
   [design profile images](https://github.com/seams-tech/pantry-history/tree/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/workflow-canvas-profile).
-- E2E journeys in `services/platform/tests/e2e/`: `bakery-workflow-draft.test.ts` (two
+- E2E journeys in `workers/platform/tests/e2e/`: `bakery-workflow-draft.test.ts` (two
   people, offline edits, one revision) and `bakery-workflow-agent.test.ts` (the agent
   proposal, approval and each refusal), with `workflow-draft-peer.ts`.
 - Browser journeys in `scripts/plan-84/`: `browser-draft.js` and `browser-proposal.js`.

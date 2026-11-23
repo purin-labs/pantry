@@ -132,7 +132,7 @@ const ifcBoundaryOwners = [
   "foundation/conversation/chat/conversation-disclosure.ts",
   "foundation/agent/actors/actor-journal.ts",
   "foundation/agent/actors/actor-journal/**/*.ts",
-  "services/platform/src/actors/agent-session.ts",
+  "workers/platform/src/actors/agent-session.ts",
   "foundation/tool-handlers/actors/session/**/*.ts",
   "foundation/agent/actors/session/**/*.ts",
 ];
@@ -332,7 +332,7 @@ export default [
       "foundation/conversation/chat/input-admission.ts",
       "foundation/agent/actors/actor-journal.ts",
       "foundation/agent/actors/actor-journal/**/*.ts",
-      "services/platform/src/actors/agent-session.ts",
+      "workers/platform/src/actors/agent-session.ts",
       "foundation/tool-handlers/actors/session/**/*.ts",
       "foundation/agent/actors/session/**/*.ts",
     ],
@@ -419,8 +419,8 @@ export default [
     // authorized reader verifies what it returns. Every other file reaches
     // them through those.
     files: [
-      "services/platform/src/actors/organisation.ts",
-      "services/platform/src/actors/organisation/organisation-*.ts",
+      "workers/platform/src/actors/organisation.ts",
+      "workers/platform/src/actors/organisation/organisation-*.ts",
       "foundation/tenancy/actors/organisation/organisation-record.ts",
       "foundation/agent/actors/organisation/organisation-policy.ts",
       "areas/commerce/server/actors/organisation/organisation-commerce.ts",
@@ -445,7 +445,7 @@ export default [
   {
     // Each Actor reads its own execution records for the execution
     // projection. Every other file reaches them through that projection.
-    files: ["services/platform/src/actors/case.ts"],
+    files: ["workers/platform/src/actors/case.ts"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -465,7 +465,7 @@ export default [
   },
   {
     files: [
-      "services/platform/src/actors/agent-session.ts",
+      "workers/platform/src/actors/agent-session.ts",
       "foundation/tool-handlers/actors/session/**/*.ts",
       "foundation/agent/actors/session/**/*.ts",
     ],

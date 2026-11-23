@@ -12,11 +12,11 @@
     "foundation/authority/credential-vault/index.ts#createVaultItem",
     "foundation/authority/credential-vault/index.ts#listVaultItems",
     "packages/contracts/src/case-output.ts#caseContributionSourceSchema",
-    "services/platform/tests/e2e/full-worker.ts#CodeModePlatformGovernorActor",
-    "services/platform/tests/e2e/full-worker.ts#FullCase",
-    "services/platform/tests/e2e/full-worker.ts#FullClient",
-    "services/platform/tests/e2e/full-worker.ts#FullOrganisation",
-    "services/platform/tests/e2e/full-worker.ts#FullSession",
-    "services/platform/tests/e2e/full-worker.ts#default"
+    "workers/platform/tests/e2e/full-worker.ts#CodeModePlatformGovernorActor",
+    "workers/platform/tests/e2e/full-worker.ts#FullCase",
+    "workers/platform/tests/e2e/full-worker.ts#FullClient",
+    "workers/platform/tests/e2e/full-worker.ts#FullOrganisation",
+    "workers/platform/tests/e2e/full-worker.ts#FullSession",
+    "workers/platform/tests/e2e/full-worker.ts#default"
   ]
 }

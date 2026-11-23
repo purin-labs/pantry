@@ -6,6 +6,7 @@
     "packages",
     "services",
     "surfaces",
+    "workers",
     "crates"
   ],
   "format": ["typescript", "tsx", "javascript", "jsx", "rust"],

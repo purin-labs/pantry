@@ -1,6 +1,6 @@
 # Runbook — Urk Order Attention Acceptance
 
-Owner: `services/platform` · Plan: [Plan 39](../history/plan-39-urk-merchant-agent-parity.md)
+Owner: `workers/platform` · Plan: [Plan 39](../history/plan-39-urk-merchant-agent-parity.md)
 Scope revised: 2026-10-01 · Mock-order acceptance passed
 
 The operator selected mock orders as the acceptance target on 2026-10-01.

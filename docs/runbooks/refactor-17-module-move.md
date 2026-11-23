@@ -68,7 +68,7 @@ The quick checks of step 6:
 | `pnpm --filter @purin-labs/portal exec tsc --noEmit -p .`                                                                                                                                                                                     | 34 s     |
 | `pnpm check:packages`                                                                                                                                                                                                                         | 7 s      |
 | `pnpm portal:build`                                                                                                                                                                                                                           | 4 s      |
-| `pnpm exec wrangler deploy --dry-run --env production --outdir <folder>` in `services/platform`. With Docker, it also builds the three container images                                                                                       | 9 s      |
+| `pnpm exec wrangler deploy --dry-run --env production --outdir <folder>` in `workers/platform`. With Docker, it also builds the three container images                                                                                        | 9 s      |
 | The five other Workers: `pnpm --filter @purin-labs/platform` with `code-mode-sandbox:check`, `model-exit:check`, `chatgpt-exit:check`, `vault-onepassword:check` and `slack-ingress:check`                                                    | 30 s     |
 | When the move takes Portal files, one browser journey: start the Portal dev server of the checkout on a free port, then `node scripts/production-simulation/run-journeys.mjs --id persistent-chat-browser --base-url http://127.0.0.1:<port>` | 1 minute |
 
@@ -344,8 +344,8 @@ module is the folder `areas/integrations/shopify/` of the package
   router, the page table, `styles.css` and the chat feature are in
   `surfaces/portal/ui/`. The Wrangler file names the build folder
   `apps/portal/dist`, so a rename of `apps/portal` belongs with the rename of
-  `services/platform`.
-- **The Worker.** 31 files stay in `services/platform/src`, all of
+  `workers/platform`.
+- **The Worker.** 31 files stay in `workers/platform/src`, all of
   `workers/platform`: the six Worker entries, the Actor class files and the
   wiring files. The entry of the Slack ingress Worker joined them before the
   moves.
@@ -407,7 +407,7 @@ package `@purin-labs/area-<name>` in `areas/<name>/`.
 | `kitchen`      | 78                 | 275            | 128           | 204 (143 / 61)                       |
 
 - **The layout.** A Worker file keeps its sub-path below
-  `services/platform/src/`, without its first folder when that folder is the
+  `workers/platform/src/`, without its first folder when that folder is the
   name of the area or `commerce/`. The `sourcePrefixes` of each plan hold this
   rule, so `--sync-plan` gives a later file the same place. A Portal file keeps
   its sub-path below `apps/portal/src/` (`ui/features/<feature>/`). No two

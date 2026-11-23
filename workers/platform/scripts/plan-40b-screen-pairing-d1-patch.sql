@@ -1,6 +1,6 @@
 -- Plan 40B phase 1: menu board screens wait for pairing in the GLOBAL
 -- database. Apply once to the global database before the release:
---   wrangler d1 execute <global database> --remote --file services/platform/scripts/plan-40b-screen-pairing-d1-patch.sql
+--   wrangler d1 execute <global database> --remote --file workers/platform/scripts/plan-40b-screen-pairing-d1-patch.sql
 -- Adds table screen_pairing and index screen_pairing_expiry. The combined
 -- test schema (migrations/0001_current_schema.sql) carries the same DDL.
 CREATE TABLE IF NOT EXISTS screen_pairing (

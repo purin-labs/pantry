@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { sleep } from "../../packages/std/src/index.ts";
-import { singleDatabaseMigrations } from "../../services/platform/scripts/single-database-schema.mjs";
+import { singleDatabaseMigrations } from "../../workers/platform/scripts/single-database-schema.mjs";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "../..");

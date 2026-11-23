@@ -42,7 +42,7 @@ Sous Chef runs inside Platform; its instructions and skills live in
 The portal and docs apps are browser surfaces. They do not receive private
 runtime database access or raw provider credentials.
 
-`services/platform` owns the active harness paths. A
+`workers/platform` owns the active harness paths. A
 `organisation_subscription` + `openai` route runs Pi with the organisation's ChatGPT
 sign-in. The
 `organisation_byo` + `openai` route runs Pi with the organisation's purpose-bound OpenAI

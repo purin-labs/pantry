@@ -146,9 +146,9 @@ completion claim.
 | Commerce projections             | The lab, complete Shopify order/catalog webhooks, bounded initial snapshot, CK0R query envelopes, governed receipts, and merchant presentation provide working evidence. The deployed Nuki organisation completed one live governed cancellation and shows the refreshed projection and receipt in the portal.                                                                  | Broader provider and browser breadth was outside the accepted slice.                                                                                                             |
 | Onboarding                       | Plan 5 defines the resumable organisation, connection, resource-selection, readiness, activation, and first-task contracts.                                                                                                                                                                                                                                                     | The first operational task must land in the new commerce console and the connection section must become a merchant page.                                                         |
 
-The current NF9 evidence is concentrated in the [history authority tests](../../services/platform/tests/agent-session-harness-authority.test.ts),
-[checkpoint classification tests](../../services/platform/tests/nf9-checkpoint-classification.test.ts),
-and the current [Slack Actor journey](../../services/platform/tests/e2e/slack-actor-journey.test.ts).
+The current NF9 evidence is concentrated in the [history authority tests](../../workers/platform/tests/agent-session-harness-authority.test.ts),
+[checkpoint classification tests](../../workers/platform/tests/nf9-checkpoint-classification.test.ts),
+and the current [Slack Actor journey](../../workers/platform/tests/e2e/slack-actor-journey.test.ts).
 
 The August local evidence separated two operating paths. The historical
 interactive Slack test drives the real Case, Session, and Connector persistence

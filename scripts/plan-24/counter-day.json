@@ -1,5 +1,5 @@
 {
-  "about": "Plan 24 S1: a declared café morning of counter sales of one fresh product. The bake proposal journey (services/platform/tests/e2e/bake-proposal.test.ts) places each sale through the café's QR order path and each restock through Commerce, in this order. A checkpoint is where the journey stops to decide the proposals.",
+  "about": "Plan 24 S1: a declared café morning of counter sales of one fresh product. The bake proposal journey (workers/platform/tests/e2e/bake-proposal.test.ts) places each sale through the café's QR order path and each restock through Commerce, in this order. A checkpoint is where the journey stops to decide the proposals.",
   "product": {
     "inventoryItemId": "inventory_counter_financier",
     "positionId": "position_counter_financier_cafe",

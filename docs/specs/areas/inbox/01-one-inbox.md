@@ -249,7 +249,7 @@ returns `no-store` JSON.
   open proposal is older than those 100 gets its state with no proposal.
 
 **Records.** The regional D1 baseline is
-`services/platform/migrations-regional/0001_current_schema.sql`:
+`workers/platform/migrations-regional/0001_current_schema.sql`:
 
 | Table                                                                             | Holds                                                                                                                        |
 | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -422,7 +422,7 @@ in `registry.ts`. The capabilities are in
   Background: [Plan 89](../../../history/plan-89-outside-written-content.md) and
   [FND-07](../../foundation/07-information-flow.md). Plans 29, 32 and 40D are in
   [the archive](https://github.com/seams-tech/pantry-history/tree/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs).
-- E2E journeys in `services/platform/tests/e2e/`: `inbox-whatsapp.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `inbox-whatsapp.test.ts`,
   `mail-inbox.test.ts`, `mail-inbox-reconnect.test.ts`,
   `mail-reply-shared-draft.test.ts`, `mail-chat-reply-sources.test.ts`,
   `mailbox-setup.test.ts`, `mailbox-check-now.test.ts`, `mailbox-spam-rescue.test.ts`,

@@ -17,8 +17,8 @@ Inspect the matching code in:
 
 - `areas/integrations/server/provider-adapters/` for provider behavior and lifecycle;
 - `foundation/authority/authorization/capability-catalogue.ts` for capability definitions;
-- `services/platform/src/agent-tools/` (one `defineTool` per tool, `registry.ts`, and `catalog/` for selection and calls) for model-facing exposure;
-- `services/platform/src/integration-gateway.ts` for governed provider execution;
+- `workers/platform/src/agent-tools/` (one `defineTool` per tool, `registry.ts`, and `catalog/` for selection and calls) for model-facing exposure;
+- `workers/platform/src/integration-gateway.ts` for governed provider execution;
 - `foundation/authority/credential-vault/` for purpose-bound credential resolution.
 
 For a merchant-configured REST or MCP connection, first inspect

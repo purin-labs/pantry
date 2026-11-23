@@ -298,7 +298,7 @@ no value writes nothing. An unknown area answers `404`.
 ### Records
 
 - Global D1 `user_preferences`
-  (`services/platform/migrations-global/0001_current_schema.sql`) has `user_id`, `area`,
+  (`workers/platform/migrations-global/0001_current_schema.sql`) has `user_id`, `area`,
   `schema_version`, `revision`, `values_json` and `updated_at`, with the key
   `(user_id, area)`. `scripts/layers.json` gives it to `areas/organisation`.
 - `packages/control-api/src/user-preferences.ts` holds the preference contract.
@@ -431,7 +431,7 @@ drawer. It shares the theme tokens.
   [Chat decisions and shipment review](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/portal-ui-chat-decisions-review.md),
   [navigation, questions and table review](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/portal-ui-navigation-review.md),
   [file access and Inbox detail review](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/portal-ui-file-access-review.md).
-- E2E journeys in `services/platform/tests/e2e/`: `user-preferences.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `user-preferences.test.ts`,
   `portal-chat-approval-wait.test.ts`, `portal-chat-finalization.test.ts`,
   `portal-order-cancel.test.ts` and `portal-supplier-payout-read.test.ts`.
 - Browser journeys in `scripts/`: `plan21/browser-acceptance.mjs`,

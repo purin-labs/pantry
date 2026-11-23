@@ -13,8 +13,8 @@ schema upgrades. FND-03 gives what a Case and a Session do with them.
 
 ### The Workers and their resources
 
-The platform Worker `pantry` starts in `services/platform/src/integration-gateway.ts`
-and exports each Actor class. `services/platform/wrangler.jsonc` binds:
+The platform Worker `pantry` starts in `workers/platform/src/integration-gateway.ts`
+and exports each Actor class. `workers/platform/wrangler.jsonc` binds:
 
 | Binding                                                              | Resource                                               | Responsibility                                                                         |
 | -------------------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------- |
@@ -294,7 +294,7 @@ registry row.
 
 ## Contracts
 
-- Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`):
+- Regional D1 (`workers/platform/migrations-regional/0001_current_schema.sql`):
   `durable_object_registry`. Global D1 (`migrations-global/`):
   `state_object_relocation_item`, `state_object_relocation_exclusion`,
   `state_object_relocation_copy` and `state_object_restore_item`.
@@ -331,7 +331,7 @@ registry row.
 - Packages: `@purin-labs/std/state-machine` (machine definitions),
   `@purin-labs/contracts` (`CommandEnvelope`, `EventEnvelope`, `HarnessTurnLease`).
 
-| File in `services/platform/src/actors/`                                                                                          | Content                                                                              |
+| File in `workers/platform/src/actors/`                                                                                           | Content                                                                              |
 | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | `actor-router.ts`, `actor-stubs.ts`                                                                                              | Resolve an Actor; the stub at its placement                                          |
 | `actor-registry.ts`, `actor-activation.ts`, `actor-placement-admission.ts`                                                       | The registry row, the activation row, the placement fence                            |
@@ -428,7 +428,7 @@ Boundaries:
   [Refactor 10](../../history/refactor-10.md), [Refactor 12](../../history/refactor-12.md), the
   [deploy runbook](../../runbooks/platform-production-deploy.md) and the
   [E2E coverage guide](../../../test-coverage-e2e.md).
-- E2E journeys in `services/platform/tests/e2e/`: `actor-recovery.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `actor-recovery.test.ts`,
   `actor-activation-placement.test.ts`, `placement-move.test.ts`,
   `unregistered-actors.test.ts`, `session-alarm-steps.test.ts`,
   `session-quarantine-end.test.ts`, `case-undelivered-output.test.ts`,

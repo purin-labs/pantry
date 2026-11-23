@@ -411,7 +411,7 @@ Neighbours:
   [purchasing and query](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-47-purchasing-query-2026-10-02.md),
   [production recovery](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-47-production-recovery-2026-10-02.md),
   [schema 49 upgrade](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-47-schema-49-upgrade-2026-10-10.json).
-- E2E journeys in `services/platform/tests/e2e/`: `commerce-lab.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `commerce-lab.test.ts`,
   `commerce-feed-catch-up.test.ts`, `commerce-webhook-catch-up.test.ts`,
   `inventory-operations.test.ts`, `chat-agent-stock-report.test.ts`,
   `pi-stock-actions.test.ts`, `chat-agent-order-read.test.ts`,

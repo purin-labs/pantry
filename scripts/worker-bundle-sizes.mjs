@@ -23,30 +23,30 @@ import { isUploadedModule } from "./lib/side-worker.mjs";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 const WORKERS = [
-  { name: "platform", folder: "services/platform" },
+  { name: "platform", folder: "workers/platform" },
   {
     name: "slack-ingress",
-    folder: "services/platform",
+    folder: "workers/platform",
     config: "wrangler.slack-ingress.jsonc",
   },
   {
     name: "model-exit",
-    folder: "services/platform",
+    folder: "workers/platform",
     config: "wrangler.model-exit.jsonc",
   },
   {
     name: "chatgpt-exit",
-    folder: "services/platform",
+    folder: "workers/platform",
     config: "wrangler.chatgpt-exit.jsonc",
   },
   {
     name: "code-mode-sandbox",
-    folder: "services/platform",
+    folder: "workers/platform",
     config: "wrangler.code-mode-sandbox.jsonc",
   },
   {
     name: "vault-onepassword",
-    folder: "services/platform",
+    folder: "workers/platform",
     config: "wrangler.vault-onepassword.jsonc",
   },
   { name: "commerce", folder: "services/commerce" },

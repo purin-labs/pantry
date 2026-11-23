@@ -184,7 +184,7 @@ The tools are in `areas/integrations/server/agent-tools/jev/`, the family `jev`.
     (`jev-features/screen-relevance.ts`).
   - `jev_usage_hour` and `jev_usage_cursor` (`jev-features/usage-records.ts`).
   - `jev_paid_use` (`jev-features/paid-use.ts`).
-- Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`):
+- Regional D1 (`workers/platform/migrations-regional/0001_current_schema.sql`):
   `mail_classification_eligibility`, with `funding` and `connection_revision`. The Purin
   key pins revision 0. The model is `jev-1.13.0`, the recipient `typesafe`, and the
   review ends 10 years after the switch (`SWITCH_REVIEW_MS`).
@@ -208,11 +208,11 @@ The tools are in `areas/integrations/server/agent-tools/jev/`, the family `jev`.
 - The draft family `jev_feature` (`integrations/contract/jev-draft.ts`) in
   `data/operator-configuration-draft.ts`.
 - The Worker secret `TYPESAFE_API_KEY` is in `env.production.secrets.required` of
-  `services/platform/wrangler.jsonc` and in `foundation/kernel/env.ts`.
-- `services/platform/scripts/plan-88-mail-eligibility-funding-d1-patch.sql` is a record
+  `workers/platform/wrangler.jsonc` and in `foundation/kernel/env.ts`.
+- `workers/platform/scripts/plan-88-mail-eligibility-funding-d1-patch.sql` is a record
   of the old stack. The new databases loaded the baseline with the column.
 
-The control routes (`services/platform/src/control/routes/`):
+The control routes (`workers/platform/src/control/routes/`):
 
 | Route                                                             | Role   | Purpose                                                      |
 | ----------------------------------------------------------------- | ------ | ------------------------------------------------------------ |
@@ -306,7 +306,7 @@ parser refuses, gives 422. Another refusal gives 409, and a failure of the Actor
   [Phase 3 journey](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-88-phase-3-journey.md).
   The change to paid use: [Plan 95](../../../plan-95-pantry-own-accounts.md) step 3.
   The boundary: [Plan 87](../../../history/plan-87-screen-context.md) section 3A.
-- E2E journeys in `services/platform/tests/e2e/`: `plan-88-jev-features.test.ts` (J1,
+- E2E journeys in `workers/platform/tests/e2e/`: `plan-88-jev-features.test.ts` (J1,
   J2, J3, J4, J6 and J7) and `plan-88-jev-agent.test.ts` (J5). Neighbour journeys:
   `chat-screen-relevance.test.ts`, `mail-inbox.test.ts` and
   `organisation-case-context-collection-placement.test.ts`.

@@ -10,7 +10,7 @@
 -- then refactor-9-d1-chat-placement-patch.sql first: this file expects the
 -- renamed Project tables and a chat table that names its Case.
 --
--- Run from services/platform against each organisation database:
+-- Run from workers/platform against each organisation database:
 --   pnpm exec wrangler d1 execute ORGANISATION_DB_WNAM --env production --remote --file scripts/refactor-9-d1-patch.sql
 --   pnpm exec wrangler d1 execute ORGANISATION_DB_APAC --env production --remote --file scripts/refactor-9-d1-patch.sql
 --

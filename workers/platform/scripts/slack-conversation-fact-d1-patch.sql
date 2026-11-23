@@ -1,6 +1,6 @@
 -- Plan 27C step 2: what Slack says about each connected conversation.
 -- Apply to each deployed REGIONAL database before the release that reads it:
---   wrangler d1 execute <regional database> --env production --remote --file services/platform/scripts/slack-conversation-fact-d1-patch.sql
+--   wrangler d1 execute <regional database> --env production --remote --file workers/platform/scripts/slack-conversation-fact-d1-patch.sql
 -- Adds table slack_conversation_fact. The statement is safe to repeat.
 CREATE TABLE IF NOT EXISTS slack_conversation_fact (
   organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),

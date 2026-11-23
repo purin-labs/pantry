@@ -6,7 +6,7 @@ import { parseEnv } from "node:util";
 import { readWorkerEnvironment } from "./worker-environment.mjs";
 
 const root = resolve(import.meta.dirname, "..");
-const platformPath = resolve(root, "services/platform/.dev.vars.local");
+const platformPath = resolve(root, "workers/platform/.dev.vars.local");
 const commercePath = resolve(root, "services/commerce/.dev.vars.local");
 const platformConfig = readWorkerEnvironment("platform", "local");
 const secretsStoreId = platformConfig.secrets_store_secrets[0].store_id;

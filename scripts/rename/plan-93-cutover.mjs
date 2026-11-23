@@ -38,8 +38,8 @@ const SELF = "scripts/rename/plan-93-cutover.mjs";
 
 /** The two D1 baselines. The new databases load them fresh, so their old names change too. */
 const BASELINES = [
-  "services/platform/migrations-global/0001_current_schema.sql",
-  "services/platform/migrations-regional/0001_current_schema.sql",
+  "workers/platform/migrations-global/0001_current_schema.sql",
+  "workers/platform/migrations-regional/0001_current_schema.sql",
 ];
 
 /**
@@ -391,7 +391,7 @@ function waiveBaselineChanges() {
   ].map((match) => match[1]);
   if (objects.length === 0) return;
   fs.appendFileSync(
-    "services/platform/scripts/d1-patch-waivers.txt",
+    "workers/platform/scripts/d1-patch-waivers.txt",
     objects
       .map(
         (object) =>

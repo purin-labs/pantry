@@ -470,18 +470,18 @@ import. A module with no line for one of these has none.
 ## workers/platform
 
 - Folders: 11
-  - `services/platform/src/`
-  - `services/platform/src/actors/`
-  - `services/platform/src/actors/organisation/`
-  - `services/platform/src/agent-tools/`
-  - `services/platform/src/chatgpt-exit/`
-  - `services/platform/src/code-mode-sandbox/`
-  - `services/platform/src/control/`
-  - `services/platform/src/control/routes/`
-  - `services/platform/src/model-exit/`
-  - `services/platform/src/slack-ingress/`
-  - `services/platform/src/vault-onepassword/`
-- Packages: `services/platform`
+  - `workers/platform/src/`
+  - `workers/platform/src/actors/`
+  - `workers/platform/src/actors/organisation/`
+  - `workers/platform/src/agent-tools/`
+  - `workers/platform/src/chatgpt-exit/`
+  - `workers/platform/src/code-mode-sandbox/`
+  - `workers/platform/src/control/`
+  - `workers/platform/src/control/routes/`
+  - `workers/platform/src/model-exit/`
+  - `workers/platform/src/slack-ingress/`
+  - `workers/platform/src/vault-onepassword/`
+- Packages: `workers/platform`
 - Tables (5): `connector`, `install`, `thread_binding`, `thread_file_watch`, `tool_call`
 
 ## workers/punter

@@ -12,7 +12,7 @@ while IFS='=' read -r key value; do
   ARGS+=(--var "$key:$value")
 done < <(grep -E '^WHATSAPP_[A-Z_]+=' .dev.vars || true)
 if [ ${#ARGS[@]} -eq 0 ]; then
-  echo "No WHATSAPP_* entries in services/platform/.dev.vars" >&2
+  echo "No WHATSAPP_* entries in workers/platform/.dev.vars" >&2
   exit 1
 fi
 exec pnpm exec wrangler dev --port "${PORT:-8787}" "${ARGS[@]}"

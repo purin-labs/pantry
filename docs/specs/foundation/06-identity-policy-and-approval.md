@@ -272,10 +272,10 @@ decision.
 
 ## Contracts
 
-- **Global D1** (`services/platform/migrations-global/0001_current_schema.sql`):
+- **Global D1** (`workers/platform/migrations-global/0001_current_schema.sql`):
   `app_user`, `control_session`, `control_oidc_state` and `control_support_role`.
   `control_mutation_receipt` is in both baselines.
-- **Regional D1** (`services/platform/migrations-regional/0001_current_schema.sql`):
+- **Regional D1** (`workers/platform/migrations-regional/0001_current_schema.sql`):
   `person`, `service_role_grant`, `organisation_invitation`, `access_grant`,
   `organisation_capability_policy`, `policy_snapshot`, `workspace_ai_budget`,
   `agent_permission_request`, `person_authz_role` and `person_authz_audit`.
@@ -318,7 +318,7 @@ The control routes are under `/v1/control`. `…` is `/v1/control/organisations/
 | `POST …/custom-connectors/:c/actions/:nonce/approval`, `/rejection`                             | Admin                                 | Decide a custom connector write                     |
 | `GET`, `POST /v1/admin/person-roles`                                                            | The bearer `ORGANISATION_ADMIN_TOKEN` | Give or remove the `approve` role of a person       |
 
-The main files, under `services/platform/src/`:
+The main files, under `workers/platform/src/`:
 
 | Topic                        | Files                                                                                                                                                                                                                                                                                                                                                                                    |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -444,7 +444,7 @@ The boundaries:
   and [Refactor 17](../../refactor-17.md), the entries "A2.1 — One decision API" and
   "A2.1: the decisions", and Appendix E. They give no archive link for this subsystem.
 - Where a source differs from the code, this spec follows the code. E2E journeys in
-  `services/platform/tests/e2e/`. Accounts:
+  `workers/platform/tests/e2e/`. Accounts:
   `organisation-setup.test.ts`, `organisation-invitation.test.ts`,
   `member-removal-access.test.ts`, `organisation-archive-access.test.ts`,
   `slack-viewer-refusal.test.ts` and `bakery-agent-canvas.test.ts`. Grants and policy:

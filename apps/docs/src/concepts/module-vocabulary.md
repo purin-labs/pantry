@@ -13,7 +13,7 @@ independently from package layout and deployment.
 | Commerce engine     | Coordinates transactional commerce                     | `services/commerce`                                                                | Independent service and database      |
 | Contracts           | Defines shared commerce language                       | `packages/contracts`                                                                 | Compiled into Pantry and consumers   |
 | Sous Chef           | Operates the merchant business                         | `areas/commerce/server/data/merchant-agent-skills.ts` and Pantry agent configuration           | Pantry runtime                       |
-| Commerce Read Layer | Records projections, queries, and operational history  | OrganisationActor projections and CommerceGraphReader sources in `services/platform` | Pantry runtime                       |
+| Commerce Read Layer | Records projections, queries, and operational history  | OrganisationActor projections and CommerceGraphReader sources in `workers/platform` | Pantry runtime                       |
 | Punter              | Buys and proves the system through acceptance journeys | `scripts/punter`                                                                     | CLI and CI harness                    |
 
 Pantry hosts the organisation control plane, provider connections, Cases, agent

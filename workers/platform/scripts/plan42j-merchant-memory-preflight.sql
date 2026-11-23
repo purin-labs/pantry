@@ -4,7 +4,7 @@
 -- written by a released command. This file changes nothing. It reports which
 -- of the table and its index a database still has.
 --
--- Run the statement below from services/platform against every production
+-- Run the statement below from workers/platform against every production
 -- database, as a command. A remote --file run reports a count of queries and
 -- never the rows, so it cannot show that a database has neither.
 --   pnpm exec wrangler d1 execute DB --env production --remote --json --command "<the SELECT below>"

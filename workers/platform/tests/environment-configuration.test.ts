@@ -89,7 +89,7 @@ describe("actual Wrangler configuration loading", function configurationLoading(
       env: "production",
     });
     const commerceEngine = unstable_readConfig({
-      config: resolve("../commerce/wrangler.jsonc"),
+      config: resolve("../../services/commerce/wrangler.jsonc"),
       env: "production",
     });
     expect(platform.vars.SQUARE_OAUTH_ENVIRONMENT).toBe("production");

@@ -143,7 +143,7 @@ function describe(arg) {
 
 function wrangler(args) {
   execFileSync("pnpm", ["-s", "exec", "wrangler", ...args], {
-    cwd: join(root, "services/platform"),
+    cwd: join(root, "workers/platform"),
     stdio: ["ignore", "ignore", "inherit"],
   });
 }
@@ -154,7 +154,7 @@ const execFileAsync = promisify(execFile);
 async function wranglerAsync(args) {
   try {
     await execFileAsync("pnpm", ["-s", "exec", "wrangler", ...args], {
-      cwd: join(root, "services/platform"),
+      cwd: join(root, "workers/platform"),
       maxBuffer: 16 * 1024 * 1024,
     });
   } catch (error) {

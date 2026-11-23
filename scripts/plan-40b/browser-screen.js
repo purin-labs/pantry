@@ -3,7 +3,7 @@ async (page) => {
   //
   // The built Portal serves /tv with its service worker. This browser answers
   // the screen API and the signal socket with the shapes that the Pantry
-  // Worker answers in services/platform/tests/e2e/menu-board-screen.test.ts,
+  // Worker answers in workers/platform/tests/e2e/menu-board-screen.test.ts,
   // so that the check covers the player alone: pairing, playing, a signal,
   // the saved copy while offline, a restart with no network, the catch-up
   // after reconnect, and the end of the pairing.

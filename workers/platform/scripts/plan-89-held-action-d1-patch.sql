@@ -2,7 +2,7 @@
 -- person outside the Organisation. The request stores the exact action.
 -- Apply ONE time to each deployed REGIONAL database before the release that
 -- reads it:
---   wrangler d1 execute <regional database> --env production --remote --file services/platform/scripts/plan-89-held-action-d1-patch.sql
+--   wrangler d1 execute <regional database> --env production --remote --file workers/platform/scripts/plan-89-held-action-d1-patch.sql
 -- Alters table held_output_request: the reason check accepts
 -- 'outside_written', and the columns action_digest and action_json are new.
 -- SQLite cannot change a check, so the patch copies the rows into a new table.

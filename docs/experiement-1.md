@@ -89,7 +89,7 @@ the CLI loads these as built-in extensions, while SDK sessions explicitly add
 `createMcpExtension()`. The SDK is documented for Node.js and Bun.
 
 Satyr started this experiment with Pi packages pinned to `0.82.0` in
-[`services/platform/package.json`](../services/platform/package.json).
+[`workers/platform/package.json`](../workers/platform/package.json).
 [`pi-embedded-adapter.ts`](../foundation/agent/actors/pi-embedded-adapter.ts)
 constructed the lower-level `pi-agent-core.Agent` and supplied Tool Host tools
 directly at the start of the experiment. That integration did not automatically
@@ -97,7 +97,7 @@ load the advertised extensions.
 The latest documentation did not establish availability in that pinned release.
 
 Satyr already has a governed Dynamic Worker executor in
-[`harness-tool-catalog.ts`](../services/platform/src/actors/harness-tool-catalog.ts),
+[`harness-tool-catalog.ts`](../workers/platform/src/actors/harness-tool-catalog.ts),
 including capability callbacks, budget admission and settlement. Initial source
 inspection found an `executeCode` interface without a production call site in
 the reviewed harness paths. Confirm its actual reachability before using it as a

@@ -13,7 +13,7 @@
 -- may for an archived one.
 -- Apply to each deployed REGIONAL database (and a local combined
 -- database) before the release that writes 'purged':
---   wrangler d1 execute <regional database> --env production --remote --file services/platform/scripts/refactor-15-organisation-lifecycle-regional-d1-patch.sql
+--   wrangler d1 execute <regional database> --env production --remote --file workers/platform/scripts/refactor-15-organisation-lifecycle-regional-d1-patch.sql
 -- The script is safe to repeat: a second run swaps the column again with the
 -- same values and rebuilds the same objects.
 -- Four triggers read organisation.status or organisation_onboarding, so they

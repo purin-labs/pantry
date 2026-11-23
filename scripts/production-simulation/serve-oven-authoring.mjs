@@ -27,7 +27,7 @@ import {
 } from "../../areas/kitchen/server/bakery/operation.ts";
 import { saveProductionScenario } from "../../areas/kitchen/server/bakery/production-scenario.ts";
 import { canonicalJson } from "../../packages/std/src/index.ts";
-import { startCommerceWorker } from "../../services/platform/tests/commerce-fixture-worker.ts";
+import { startCommerceWorker } from "../../workers/platform/tests/commerce-fixture-worker.ts";
 
 const output = resolve(
   process.argv[2] ?? "output/acceptance/plan-70/oven-authoring-storage",

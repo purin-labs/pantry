@@ -8,7 +8,7 @@
 -- when the table holds any row. A remote file runs as one unit, so a failure
 -- leaves the database as it was, rows included.
 --
--- Run from services/platform:
+-- Run from workers/platform:
 --   pnpm exec wrangler d1 execute <binding> --env production --remote --file scripts/plan42j-merchant-memory-removal-patch.sql
 -- Then run the preflight again. It must return no row.
 CREATE TABLE plan_42g_merchant_memory_guard (

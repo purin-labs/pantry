@@ -195,21 +195,21 @@
       "containers": [
         {
           "class_name": "MessageLinkFetchContainer",
-          "image": "../message-link-fetch/Dockerfile",
+          "image": "../../services/message-link-fetch/Dockerfile",
           "image_build_context": "../..",
           "instance_type": "lite",
           "max_instances": 1,
         },
         {
           "class_name": "CustomConnectorFetchContainer",
-          "image": "../custom-connector-fetch/Dockerfile",
+          "image": "../../services/custom-connector-fetch/Dockerfile",
           "image_build_context": "../..",
           "instance_type": "lite",
           "max_instances": 10,
         },
         {
           "class_name": "WorkspaceExecutorContainer",
-          "image": "../workspace-executor/Dockerfile",
+          "image": "../../services/workspace-executor/Dockerfile",
           "image_build_context": "../..",
           "instance_type": "lite",
           "max_instances": 4,
@@ -446,7 +446,7 @@
       "containers": [
         {
           "class_name": "MessageLinkFetchContainer",
-          "image": "../message-link-fetch/Dockerfile",
+          "image": "../../services/message-link-fetch/Dockerfile",
           "image_build_context": "../..",
           "instance_type": "lite",
           "max_instances": 1,
@@ -461,7 +461,7 @@
         },
         {
           "class_name": "CustomConnectorFetchContainer",
-          "image": "../custom-connector-fetch/Dockerfile",
+          "image": "../../services/custom-connector-fetch/Dockerfile",
           "image_build_context": "../..",
           "instance_type": "lite",
           "max_instances": 10,
@@ -476,7 +476,7 @@
         },
         {
           "class_name": "WorkspaceExecutorContainer",
-          "image": "../workspace-executor/Dockerfile",
+          "image": "../../services/workspace-executor/Dockerfile",
           "image_build_context": "../..",
           "instance_type": "lite",
           "max_instances": 4,

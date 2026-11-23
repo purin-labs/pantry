@@ -2018,223 +2018,6 @@ importers:
         specifier: 4.107.0
         version: 4.107.0(@cloudflare/workers-types@5.20260707.1)
 
-  services/platform:
-    dependencies:
-      '@1password/sdk':
-        specifier: 0.5.0
-        version: 0.5.0
-      '@cloudflare/containers':
-        specifier: ^0.3.7
-        version: 0.3.7
-      '@earendil-works/chord':
-        specifier: 1.6.0
-        version: 1.6.0(esbuild@0.28.1)(ws@8.21.0)
-      '@earendil-works/pi-ai':
-        specifier: 1.6.0
-        version: 1.6.0(@aws-sdk/credential-provider-node@3.972.84)(@smithy/signature-v4@5.7.3)(google-auth-library@10.9.1)(undici@8.10.2)(ws@8.21.0)(zod@4.4.3)
-      '@earendil-works/pi-codemode':
-        specifier: 1.6.0
-        version: 1.6.0
-      '@earendil-works/pi-durable':
-        specifier: 1.6.0
-        version: 1.6.0(@aws-sdk/credential-provider-node@3.972.84)(@smithy/signature-v4@5.7.3)(esbuild@0.28.1)(google-auth-library@10.9.1)(undici@8.10.2)(ws@8.21.0)(zod@4.4.3)
-      '@earendil-works/pi-mcp':
-        specifier: 1.6.0
-        version: 1.6.0
-      '@earendil-works/pi-schema':
-        specifier: 1.6.0
-        version: 1.6.0
-      '@purin-labs/actor-runtime':
-        specifier: workspace:*
-        version: link:../../foundation/actor-runtime
-      '@purin-labs/agent':
-        specifier: workspace:*
-        version: link:../../foundation/agent
-      '@purin-labs/agent-tools':
-        specifier: workspace:*
-        version: link:../../foundation/agent-tools
-      '@purin-labs/area-brain':
-        specifier: workspace:*
-        version: link:../../areas/brain
-      '@purin-labs/area-cafe':
-        specifier: workspace:*
-        version: link:../../areas/cafe
-      '@purin-labs/area-commerce':
-        specifier: workspace:*
-        version: link:../../areas/commerce
-      '@purin-labs/area-devices':
-        specifier: workspace:*
-        version: link:../../areas/devices
-      '@purin-labs/area-inbox':
-        specifier: workspace:*
-        version: link:../../areas/inbox
-      '@purin-labs/area-integrations':
-        specifier: workspace:*
-        version: link:../../areas/integrations
-      '@purin-labs/area-kitchen':
-        specifier: workspace:*
-        version: link:../../areas/kitchen
-      '@purin-labs/area-organisation':
-        specifier: workspace:*
-        version: link:../../areas/organisation
-      '@purin-labs/async-control':
-        specifier: workspace:*
-        version: link:../../packages/async-control
-      '@purin-labs/authority':
-        specifier: workspace:*
-        version: link:../../foundation/authority
-      '@purin-labs/bakery-model':
-        specifier: workspace:*
-        version: link:../../packages/bakery-model
-      '@purin-labs/bakery-workflow':
-        specifier: workspace:*
-        version: link:../../packages/bakery-workflow
-      '@purin-labs/cafe-control-api':
-        specifier: workspace:*
-        version: link:../../packages/cafe-control-api
-      '@purin-labs/collaboration':
-        specifier: workspace:*
-        version: link:../../packages/collaboration
-      '@purin-labs/commerce-client':
-        specifier: workspace:*
-        version: link:../../packages/commerce-client
-      '@purin-labs/commerce-contracts':
-        specifier: workspace:*
-        version: link:../../packages/commerce-contracts
-      '@purin-labs/commerce-control-api':
-        specifier: workspace:*
-        version: link:../../packages/commerce-control-api
-      '@purin-labs/commerce-query-sqlite':
-        specifier: workspace:*
-        version: link:../../packages/commerce-query-sqlite
-      '@purin-labs/connections':
-        specifier: workspace:*
-        version: link:../../foundation/connections
-      '@purin-labs/contract-schema':
-        specifier: workspace:*
-        version: link:../../packages/contract-schema
-      '@purin-labs/contracts':
-        specifier: workspace:*
-        version: link:../../packages/contracts
-      '@purin-labs/control':
-        specifier: workspace:*
-        version: link:../../foundation/control
-      '@purin-labs/control-api':
-        specifier: workspace:*
-        version: link:../../packages/control-api
-      '@purin-labs/conversation':
-        specifier: workspace:*
-        version: link:../../foundation/conversation
-      '@purin-labs/costs-sheet-crdt':
-        specifier: workspace:*
-        version: link:../../packages/costs-sheet-crdt
-      '@purin-labs/email-draft-crdt':
-        specifier: workspace:*
-        version: link:../../packages/email-draft-crdt
-      '@purin-labs/kernel':
-        specifier: workspace:*
-        version: link:../../foundation/kernel
-      '@purin-labs/kitchen-control-api':
-        specifier: workspace:*
-        version: link:../../packages/kitchen-control-api
-      '@purin-labs/mail-reply-crdt':
-        specifier: workspace:*
-        version: link:../../packages/mail-reply-crdt
-      '@purin-labs/menu-board-crdt':
-        specifier: workspace:*
-        version: link:../../packages/menu-board-crdt
-      '@purin-labs/menu-draft-crdt':
-        specifier: workspace:*
-        version: link:../../packages/menu-draft-crdt
-      '@purin-labs/product-description-crdt':
-        specifier: workspace:*
-        version: link:../../packages/product-description-crdt
-      '@purin-labs/production-plan-crdt':
-        specifier: workspace:*
-        version: link:../../packages/production-plan-crdt
-      '@purin-labs/production-simulation':
-        specifier: workspace:*
-        version: link:../../packages/production-simulation
-      '@purin-labs/std':
-        specifier: workspace:*
-        version: link:../../packages/std
-      '@purin-labs/surface-email':
-        specifier: workspace:*
-        version: link:../../surfaces/email
-      '@purin-labs/surface-portal':
-        specifier: workspace:*
-        version: link:../../surfaces/portal
-      '@purin-labs/surface-slack':
-        specifier: workspace:*
-        version: link:../../surfaces/slack
-      '@purin-labs/surface-voice':
-        specifier: workspace:*
-        version: link:../../surfaces/voice
-      '@purin-labs/surface-webhooks':
-        specifier: workspace:*
-        version: link:../../surfaces/webhooks
-      '@purin-labs/surface-whatsapp':
-        specifier: workspace:*
-        version: link:../../surfaces/whatsapp
-      '@purin-labs/tenancy':
-        specifier: workspace:*
-        version: link:../../foundation/tenancy
-      '@purin-labs/tool-handlers':
-        specifier: workspace:*
-        version: link:../../foundation/tool-handlers
-      '@purin-labs/type-utils':
-        specifier: workspace:*
-        version: link:../../packages/type-utils
-      '@purin-labs/ui':
-        specifier: workspace:*
-        version: link:../../foundation/ui
-      '@purin-labs/workflow-canvas-crdt':
-        specifier: workspace:*
-        version: link:../../packages/workflow-canvas-crdt
-      typebox:
-        specifier: 1.3.27
-        version: 1.3.27
-    devDependencies:
-      '@cloudflare/vitest-plugin':
-        specifier: 1.0.0
-        version: 1.0.0(patch_hash=b9ec2ad5ecd2c47bab0af04a5ab030d2a7b204351a8e8a5e74d5ee2b311a3ac9)(@cloudflare/workers-types@5.20260707.1)(@vitest/runner@4.1.9)(@vitest/snapshot@4.1.9)(vitest@4.1.9(@opentelemetry/api@1.9.1)(@types/node@25.9.3)(msw@2.15.0(@types/node@25.9.3)(typescript@5.9.3))(vite@8.0.16(@types/node@25.9.3)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.1)))
-      '@cloudflare/workers-types':
-        specifier: 5.20260707.1
-        version: 5.20260707.1
-      '@msw/cloudflare':
-        specifier: 0.0.1
-        version: 0.0.1(msw@2.15.0(@types/node@25.9.3)(typescript@5.9.3))
-      '@types/node':
-        specifier: 25.9.3
-        version: 25.9.3
-      esbuild:
-        specifier: 0.28.1
-        version: 0.28.1
-      miniflare:
-        specifier: 4.20260701.0
-        version: 4.20260701.0
-      msw:
-        specifier: 2.15.0
-        version: 2.15.0(@types/node@25.9.3)(typescript@5.9.3)
-      tsrs:
-        specifier: 0.18.0-ts7.1.0-dev.20260929
-        version: 0.18.0-ts7.1.0-dev.20260929
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
-      vite:
-        specifier: 8.0.16
-        version: 8.0.16(@types/node@25.9.3)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.1)
-      vitest:
-        specifier: 4.1.9
-        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@25.9.3)(msw@2.15.0(@types/node@25.9.3)(typescript@5.9.3))(vite@8.0.16(@types/node@25.9.3)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.1))
-      wrangler:
-        specifier: 4.107.0
-        version: 4.107.0(@cloudflare/workers-types@5.20260707.1)
-      yjs:
-        specifier: 13.6.32
-        version: 13.6.32
-
   surfaces/email:
     dependencies:
       '@purin-labs/actor-runtime':
@@ -2684,6 +2467,223 @@ importers:
       tsrs:
         specifier: 0.18.0-ts7.1.0-dev.20260929
         version: 0.18.0-ts7.1.0-dev.20260929
+
+  workers/platform:
+    dependencies:
+      '@1password/sdk':
+        specifier: 0.5.0
+        version: 0.5.0
+      '@cloudflare/containers':
+        specifier: ^0.3.7
+        version: 0.3.7
+      '@earendil-works/chord':
+        specifier: 1.6.0
+        version: 1.6.0(esbuild@0.28.1)(ws@8.21.0)
+      '@earendil-works/pi-ai':
+        specifier: 1.6.0
+        version: 1.6.0(@aws-sdk/credential-provider-node@3.972.84)(@smithy/signature-v4@5.7.3)(google-auth-library@10.9.1)(undici@8.10.2)(ws@8.21.0)(zod@4.4.3)
+      '@earendil-works/pi-codemode':
+        specifier: 1.6.0
+        version: 1.6.0
+      '@earendil-works/pi-durable':
+        specifier: 1.6.0
+        version: 1.6.0(@aws-sdk/credential-provider-node@3.972.84)(@smithy/signature-v4@5.7.3)(esbuild@0.28.1)(google-auth-library@10.9.1)(undici@8.10.2)(ws@8.21.0)(zod@4.4.3)
+      '@earendil-works/pi-mcp':
+        specifier: 1.6.0
+        version: 1.6.0
+      '@earendil-works/pi-schema':
+        specifier: 1.6.0
+        version: 1.6.0
+      '@purin-labs/actor-runtime':
+        specifier: workspace:*
+        version: link:../../foundation/actor-runtime
+      '@purin-labs/agent':
+        specifier: workspace:*
+        version: link:../../foundation/agent
+      '@purin-labs/agent-tools':
+        specifier: workspace:*
+        version: link:../../foundation/agent-tools
+      '@purin-labs/area-brain':
+        specifier: workspace:*
+        version: link:../../areas/brain
+      '@purin-labs/area-cafe':
+        specifier: workspace:*
+        version: link:../../areas/cafe
+      '@purin-labs/area-commerce':
+        specifier: workspace:*
+        version: link:../../areas/commerce
+      '@purin-labs/area-devices':
+        specifier: workspace:*
+        version: link:../../areas/devices
+      '@purin-labs/area-inbox':
+        specifier: workspace:*
+        version: link:../../areas/inbox
+      '@purin-labs/area-integrations':
+        specifier: workspace:*
+        version: link:../../areas/integrations
+      '@purin-labs/area-kitchen':
+        specifier: workspace:*
+        version: link:../../areas/kitchen
+      '@purin-labs/area-organisation':
+        specifier: workspace:*
+        version: link:../../areas/organisation
+      '@purin-labs/async-control':
+        specifier: workspace:*
+        version: link:../../packages/async-control
+      '@purin-labs/authority':
+        specifier: workspace:*
+        version: link:../../foundation/authority
+      '@purin-labs/bakery-model':
+        specifier: workspace:*
+        version: link:../../packages/bakery-model
+      '@purin-labs/bakery-workflow':
+        specifier: workspace:*
+        version: link:../../packages/bakery-workflow
+      '@purin-labs/cafe-control-api':
+        specifier: workspace:*
+        version: link:../../packages/cafe-control-api
+      '@purin-labs/collaboration':
+        specifier: workspace:*
+        version: link:../../packages/collaboration
+      '@purin-labs/commerce-client':
+        specifier: workspace:*
+        version: link:../../packages/commerce-client
+      '@purin-labs/commerce-contracts':
+        specifier: workspace:*
+        version: link:../../packages/commerce-contracts
+      '@purin-labs/commerce-control-api':
+        specifier: workspace:*
+        version: link:../../packages/commerce-control-api
+      '@purin-labs/commerce-query-sqlite':
+        specifier: workspace:*
+        version: link:../../packages/commerce-query-sqlite
+      '@purin-labs/connections':
+        specifier: workspace:*
+        version: link:../../foundation/connections
+      '@purin-labs/contract-schema':
+        specifier: workspace:*
+        version: link:../../packages/contract-schema
+      '@purin-labs/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@purin-labs/control':
+        specifier: workspace:*
+        version: link:../../foundation/control
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../packages/control-api
+      '@purin-labs/conversation':
+        specifier: workspace:*
+        version: link:../../foundation/conversation
+      '@purin-labs/costs-sheet-crdt':
+        specifier: workspace:*
+        version: link:../../packages/costs-sheet-crdt
+      '@purin-labs/email-draft-crdt':
+        specifier: workspace:*
+        version: link:../../packages/email-draft-crdt
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../../foundation/kernel
+      '@purin-labs/kitchen-control-api':
+        specifier: workspace:*
+        version: link:../../packages/kitchen-control-api
+      '@purin-labs/mail-reply-crdt':
+        specifier: workspace:*
+        version: link:../../packages/mail-reply-crdt
+      '@purin-labs/menu-board-crdt':
+        specifier: workspace:*
+        version: link:../../packages/menu-board-crdt
+      '@purin-labs/menu-draft-crdt':
+        specifier: workspace:*
+        version: link:../../packages/menu-draft-crdt
+      '@purin-labs/product-description-crdt':
+        specifier: workspace:*
+        version: link:../../packages/product-description-crdt
+      '@purin-labs/production-plan-crdt':
+        specifier: workspace:*
+        version: link:../../packages/production-plan-crdt
+      '@purin-labs/production-simulation':
+        specifier: workspace:*
+        version: link:../../packages/production-simulation
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../packages/std
+      '@purin-labs/surface-email':
+        specifier: workspace:*
+        version: link:../../surfaces/email
+      '@purin-labs/surface-portal':
+        specifier: workspace:*
+        version: link:../../surfaces/portal
+      '@purin-labs/surface-slack':
+        specifier: workspace:*
+        version: link:../../surfaces/slack
+      '@purin-labs/surface-voice':
+        specifier: workspace:*
+        version: link:../../surfaces/voice
+      '@purin-labs/surface-webhooks':
+        specifier: workspace:*
+        version: link:../../surfaces/webhooks
+      '@purin-labs/surface-whatsapp':
+        specifier: workspace:*
+        version: link:../../surfaces/whatsapp
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../../foundation/tenancy
+      '@purin-labs/tool-handlers':
+        specifier: workspace:*
+        version: link:../../foundation/tool-handlers
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../packages/type-utils
+      '@purin-labs/ui':
+        specifier: workspace:*
+        version: link:../../foundation/ui
+      '@purin-labs/workflow-canvas-crdt':
+        specifier: workspace:*
+        version: link:../../packages/workflow-canvas-crdt
+      typebox:
+        specifier: 1.3.27
+        version: 1.3.27
+    devDependencies:
+      '@cloudflare/vitest-plugin':
+        specifier: 1.0.0
+        version: 1.0.0(patch_hash=b9ec2ad5ecd2c47bab0af04a5ab030d2a7b204351a8e8a5e74d5ee2b311a3ac9)(@cloudflare/workers-types@5.20260707.1)(@vitest/runner@4.1.9)(@vitest/snapshot@4.1.9)(vitest@4.1.9(@opentelemetry/api@1.9.1)(@types/node@25.9.3)(msw@2.15.0(@types/node@25.9.3)(typescript@5.9.3))(vite@8.0.16(@types/node@25.9.3)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.1)))
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      '@msw/cloudflare':
+        specifier: 0.0.1
+        version: 0.0.1(msw@2.15.0(@types/node@25.9.3)(typescript@5.9.3))
+      '@types/node':
+        specifier: 25.9.3
+        version: 25.9.3
+      esbuild:
+        specifier: 0.28.1
+        version: 0.28.1
+      miniflare:
+        specifier: 4.20260701.0
+        version: 4.20260701.0
+      msw:
+        specifier: 2.15.0
+        version: 2.15.0(@types/node@25.9.3)(typescript@5.9.3)
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vite:
+        specifier: 8.0.16
+        version: 8.0.16(@types/node@25.9.3)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.1)
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@25.9.3)(msw@2.15.0(@types/node@25.9.3)(typescript@5.9.3))(vite@8.0.16(@types/node@25.9.3)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.1))
+      wrangler:
+        specifier: 4.107.0
+        version: 4.107.0(@cloudflare/workers-types@5.20260707.1)
+      yjs:
+        specifier: 13.6.32
+        version: 13.6.32
 
 packages:
 
@@ -10866,7 +10866,7 @@ snapshots:
       magic-string: 0.30.21
       obug: 2.1.3
       pathe: 2.0.3
-      picomatch: 4.0.4
+      picomatch: 4.0.7
       std-env: 4.1.0
       tinybench: 2.9.0
       tinyexec: 1.2.4
@@ -10894,7 +10894,7 @@ snapshots:
       magic-string: 0.30.21
       obug: 2.1.3
       pathe: 2.0.3
-      picomatch: 4.0.4
+      picomatch: 4.0.7
       std-env: 4.1.0
       tinybench: 2.9.0
       tinyexec: 1.2.4

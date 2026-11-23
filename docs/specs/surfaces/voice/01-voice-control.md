@@ -223,9 +223,9 @@ to 4.1 GB onto shop hardware and changes the model that hears spoken approvals.
 | `voice_transcription_use` | One fallback call: member, device, start, finish and billed `audio_milliseconds`. It holds no text                                                                                                                                                         |
 | `voice_confirmation`      | One phrase: member, chat, `target_kind`, `target_id`, `phrase`, `state` (`open`, `matched`, `spent`), `refused_attempts`, and the host and engine of a match                                                                                               |
 
-The baseline is `services/platform/migrations-regional/0001_current_schema.sql`. Voice
+The baseline is `workers/platform/migrations-regional/0001_current_schema.sql`. Voice
 has no Actor SQLite table and no event kind. Its patch scripts are
-`services/platform/scripts/voice-*-d1-patch.sql`.
+`workers/platform/scripts/voice-*-d1-patch.sql`.
 
 ### Control routes
 
@@ -292,7 +292,7 @@ to the Platform. A grant has no authority at the Platform.
 | Part                                          | Path                                                                                       |
 | --------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | Shapes, engine catalogue, text check          | `packages/control-api/src/voice.ts`, `voice-engines.ts`, `voice-text-check.ts`             |
-| Platform routes, records, engine, Mac rows    | `services/platform/src/voice/`                                                             |
+| Platform routes, records, engine, Mac rows    | `workers/platform/src/voice/`                                                              |
 | Portal session, path choice, commands, dialog | `surfaces/voice/ui/features/voice/session.ts`, `transport.ts`, `command.ts`, `control.tsx` |
 | Listening worker and its files                | `surfaces/voice/ui/features/voice/wake-worker.ts`, `apps/portal/public/voice/`             |
 | Chat send of a spoken command                 | `acceptVoiceCommand` in `surfaces/portal/ui/features/chat/route.tsx`                       |
@@ -414,7 +414,7 @@ The talk key works only while the page is in front.
   handover](../../../plan-82-voice-handover.md). Where they differ from the code, this
   spec follows the code. Background: [Plan 82B](../../../plan-82B-ambient-voice.md).
 - Evidence in the archive: [Plan 82 Phase 0](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-82-phase-0.md).
-- E2E journeys in `services/platform/tests/e2e/`: `voice-control.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `voice-control.test.ts`,
   `devices-page.test.ts` and `device-agent.test.ts`.
 - Journeys in `scripts/shop-voice/`: `run-journey.py` (the Mac), `run-portal-journey.py`
   (Chrome) and `run-safari-journey.py` (the iOS Simulator). Benches:

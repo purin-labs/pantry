@@ -1,6 +1,6 @@
 # Edge test maintenance guide
 
-This file applies to `services/platform/tests/**`.
+This file applies to `workers/platform/tests/**`.
 
 Tests are executable evidence for current product behavior. They are not the
 source of product intent. When a test conflicts with current specifications,

@@ -4,7 +4,7 @@
 -- each due receipt.
 -- Apply to each deployed REGIONAL database (and a local combined database)
 -- before the release that writes it:
---   wrangler d1 execute <regional database> --env production --remote --file services/platform/scripts/refactor-15-paid-receipt-d1-patch.sql
+--   wrangler d1 execute <regional database> --env production --remote --file workers/platform/scripts/refactor-15-paid-receipt-d1-patch.sql
 -- Both statements are safe to repeat.
 CREATE TABLE IF NOT EXISTS paid_receipt (
   organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),

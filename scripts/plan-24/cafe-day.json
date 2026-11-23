@@ -1,5 +1,5 @@
 {
-  "about": "Plan 24 exit gate: one declared café day of counter sales of fresh financiers. The café day journey (services/platform/tests/e2e/bake-cafe-day.test.ts) runs it two times, each with a fresh Organisation, gateway and identities, in approval mode. Each fall below the level opens one proposal; at each checkpoint a person approves it (in the Portal or on its Slack card), two cobots bake it through the real gateway and the controller simulator, and a person checks the pieces.",
+  "about": "Plan 24 exit gate: one declared café day of counter sales of fresh financiers. The café day journey (workers/platform/tests/e2e/bake-cafe-day.test.ts) runs it two times, each with a fresh Organisation, gateway and identities, in approval mode. Each fall below the level opens one proposal; at each checkpoint a person approves it (in the Portal or on its Slack card), two cobots bake it through the real gateway and the controller simulator, and a person checks the pieces.",
   "openingStock": 16,
   "level": { "levelPieces": 12, "piecesPerGroup": 8 },
   "bakes": [

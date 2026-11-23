@@ -213,7 +213,7 @@ installation with settings. It needs at least one function, handler or action.
   `plugin-eviction-journey`, `state-machine-journey`, `request-shape-journey`,
   `merchant-keys-journey`, `credential-lifecycle-journey` and `flash-sale-journey`.
   The contract names the other journeys.
-- E2E journeys in `services/platform/tests/e2e/`: `pi-merchant-plugin.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `pi-merchant-plugin.test.ts`,
   `commerce-api-keys.test.ts`, `commerce-app-access.test.ts`,
   `commerce-feed-catch-up.test.ts`, `commerce-webhook-catch-up.test.ts` and
   `purged-organisation-commerce.test.ts`.

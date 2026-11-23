@@ -67,7 +67,7 @@
     "lint:plan-numbers": "node scripts/check-plan-numbers.mjs",
     "lint:fix": "pnpm lint:provider-workflows --fix",
     "lint:provider-workflows": "eslint areas/integrations/server/provider-workflows foundation/agent/provider-workflows",
-    "lint:ifc-boundaries": "node scripts/check-ifc-destinations.mjs && eslint services/platform/src foundation areas surfaces apps/portal/src --rule 'curly: off' --rule 'one-var: off' --rule '@stylistic/padding-line-between-statements: off'",
+    "lint:ifc-boundaries": "node scripts/check-ifc-destinations.mjs && eslint workers/platform/src foundation areas surfaces apps/portal/src --rule 'curly: off' --rule 'one-var: off' --rule '@stylistic/padding-line-between-statements: off'",
     "lint:runtime-boundary": "node scripts/check-runtime-boundary.mjs",
     "lint:state-machines": "node scripts/check-state-machines.mjs",
     "lint:commerce-spec": "node scripts/check-commerce-spec.mjs",

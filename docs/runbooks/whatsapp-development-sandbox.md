@@ -81,7 +81,7 @@ credential-revocation recovery drill after Meta approval. See the
 [checkpoint note](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-32-meta-webhook-checkpoint-2026-08-27.md)
 and [signup drill](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-32-meta-embedded-signup-drill-2026-09-04.md).
 
-### Values to place in `services/platform/.dev.vars`
+### Values to place in `workers/platform/.dev.vars`
 
 Never print, commit, or copy these into fixtures.
 
@@ -109,7 +109,7 @@ in the organisation Vault. They do not belong in `.dev.vars` or Wrangler secrets
 
 `wrangler.jsonc` declares the non-secret application bindings and required
 secret names. Keep local values in the gitignored `.dev.vars`; use
-`services/platform/scripts/whatsapp-dev.sh` for a local Worker. Install the
+`workers/platform/scripts/whatsapp-dev.sh` for a local Worker. Install the
 two genuine secrets (`WHATSAPP_APP_SECRET` and `WHATSAPP_VERIFY_TOKEN`) with
 Wrangler for the deployed Worker.
 Deploy non-secret binding changes only from a clean, reviewed worktree.

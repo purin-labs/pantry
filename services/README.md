@@ -10,7 +10,7 @@ source imports.
 | `shop-voice`   | Speech-to-text for Portal voice control, on a Mac in the shop                  | Python service on the shop Mac   |
 | `shop-gateway` | Connects a shop's kitchen devices to Pantry with one outbound socket (Plan 85) | Rust program on a shop computer  |
 
-The Platform Worker is in `services/platform`: the HTTP control plane, Slack
+The Platform Worker is in `workers/platform`: the HTTP control plane, Slack
 ingress, OAuth, onboarding, state, queues, gateways and container
 orchestration. Urk runs inside Platform; Punter lives in `scripts/punter`.
 
@@ -22,13 +22,13 @@ in `packages/`.
 The Lowerarchy names describe responsibilities independently from physical
 layout:
 
-| Module              | Current home                                                                         |
-| ------------------- | ------------------------------------------------------------------------------------ |
-| Commerce            | `services/commerce`                                                                  |
-| Contracts           | `packages/contracts`                                                                 |
-| Urk                 | `areas/commerce/server/data/merchant-agent-skills.ts` and the Pantry agent runtime   |
-| Commerce Read Layer | OrganisationActor projections and CommerceGraphReader sources in `services/platform` |
-| Punter              | `scripts/punter`                                                                     |
+| Module              | Current home                                                                        |
+| ------------------- | ----------------------------------------------------------------------------------- |
+| Commerce            | `services/commerce`                                                                 |
+| Contracts           | `packages/contracts`                                                                |
+| Urk                 | `areas/commerce/server/data/merchant-agent-skills.ts` and the Pantry agent runtime  |
+| Commerce Read Layer | OrganisationActor projections and CommerceGraphReader sources in `workers/platform` |
+| Punter              | `scripts/punter`                                                                    |
 
 Only a measured runtime requirement creates a new deployment boundary.
 

@@ -49,7 +49,7 @@ acceptance does not establish physical production readiness. See the
 
 ```text
 Browser portal ───────────────┐
-Slack / provider webhooks ────┼──> services/platform (Cloudflare Worker)
+Slack / provider webhooks ────┼──> workers/platform (Cloudflare Worker)
 OAuth callbacks ──────────────┘        │
                                       ├── D1 / Durable Objects
                                       ├── Queues / R2 / KV
@@ -87,7 +87,7 @@ pantry/
 ├── services/
 │   ├── workspace-executor/     # Heavy execution Container image
 │   └── commerce/               # Commerce engine: private commerce authority
-├── services/platform/          # The Platform Worker: entries, Actor classes, D1 and journeys
+├── workers/platform/          # The Platform Worker: entries, Actor classes, D1 and journeys
 ├── packages/
 │   ├── contracts/              # Provider-neutral contract schemas
 │   └── bakery-model/           # Kitchen model: recipes, procedures, physics

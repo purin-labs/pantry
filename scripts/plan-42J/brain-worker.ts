@@ -5,7 +5,7 @@
 import gateway, {
   ConnectorDO as ProductionConnectorDO,
   SessionDO as ProductionSessionDO,
-} from "../../services/platform/src/integration-gateway";
+} from "../../workers/platform/src/integration-gateway";
 import {
   requireActiveOrganisationActor,
   resolveActiveConnectorActor,
@@ -51,7 +51,7 @@ import {
   type OrganisationId,
 } from "../../foundation/kernel/ids";
 import { OrganisationExecutionScope } from "../../foundation/tenancy/organisation-execution-scope";
-import { acceptMailboxModelTerms } from "../../services/platform/tests/mailbox-model-consent-fixture";
+import { acceptMailboxModelTerms } from "../../workers/platform/tests/mailbox-model-consent-fixture";
 import { defaultDenyPolicy } from "../../foundation/authority/policy-snapshot";
 import { fixturePeople } from "./account-authority";
 
@@ -59,7 +59,7 @@ export {
   OrganisationDO,
   CaseDO,
   CodeModePlatformGovernorActor,
-} from "../../services/platform/src/integration-gateway";
+} from "../../workers/platform/src/integration-gateway";
 
 const CONTROL = "https://brain-fixture.internal";
 const names = ["Owner", "Other"] as const;

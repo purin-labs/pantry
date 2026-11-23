@@ -238,7 +238,7 @@ if (errors.length === 0)
 // 6. A bundle that a Platform test fixture names stays in git. The edge
 // journeys read it from the Portal build, and CI has no copy of the bundles
 // that repo-binaries.json keeps in R2.
-const FIXTURES = "services/platform/tests/fixtures";
+const FIXTURES = "workers/platform/tests/fixtures";
 const inR2 = new Set(
   Object.keys(
     JSON.parse(readFileSync(join(root, "repo-binaries.json"), "utf8"))

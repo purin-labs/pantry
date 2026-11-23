@@ -131,7 +131,7 @@ it holds the capability. No image reaches a model.
 
 ## Contracts
 
-- Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`):
+- Regional D1 (`workers/platform/migrations-regional/0001_current_schema.sql`):
   `device_gateway`, `device_enrollment`, `device_event`, `device_alert`,
   `device_alert_setting`, `device_camera_policy` and `device_snapshot`.
 - `DeviceFleetActor` (`areas/devices/server/actors/device-fleet.ts`): one for each
@@ -223,7 +223,7 @@ at least one time a day for this work. A heartbeat writes only the 5-minute D1 s
   (`revokeOrganisationDevicesStatements` in `devices/store.ts`). `devices/purge.ts`
   erases each fleet Actor and deletes each snapshot image.
 - **Plan 24** owns cobot dispatch and receipts. It meets Devices in
-  `services/platform/src/actors/bake-run-ports.ts`: the reserve, the Work fact, the
+  `workers/platform/src/actors/bake-run-ports.ts`: the reserve, the Work fact, the
   pause, resume and settle commands for a run's cobots, and the dispatch ledger
   (`device-fleet-cobot.ts`). The Actor forwards reports, clocks, faults, lost sockets and
   revokes to the run. For an unknown result, it sends `cobot_inquire`, not the task.
@@ -262,6 +262,6 @@ at least one time a day for this work. A heartbeat writes only the 5-minute D1 s
   [Phase 5](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-85-phase-5.md).
   The boundaries: [Plan 24](../../../plan-24-cafeos-bakery-automation.md) and
   [Plan 90](../../../plan-90-cafe-pos-checkout.md).
-- E2E journeys in `services/platform/tests/e2e/`: `devices-page.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `devices-page.test.ts`,
   `device-fleet.test.ts`, `device-agent.test.ts`, `device-fleet-camera.test.ts`,
   `device-commands.test.ts` and `device-fleet-end.test.ts`.

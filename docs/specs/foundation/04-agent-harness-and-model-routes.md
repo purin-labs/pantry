@@ -231,7 +231,7 @@ OpenRouter route of Purin AI goes direct.
 - Pi: `actors/pi-durable-runtime.ts`, `pi-model-transport.ts`, `pi-durable-tools.ts`,
   `pi-tool-replay.ts`, `pi-history-adapter.ts`, `pi-durable-checkpoint.ts` and
   `pi-durable-recovery.ts`. The six `@earendil-works` packages are pinned at 1.6.0 in
-  `services/platform/package.json`.
+  `workers/platform/package.json`.
 - The lease: `createEmbeddedHarnessModelRouteLease` in `actors/session/model-route.ts`.
 - Routes, models and connections (`foundation/agent/models/`): `route.ts`,
   `catalog.ts`, `codex-connection.ts`, `chatgpt-agent-oauth.ts`, `chatgpt-oauth.ts`,
@@ -256,7 +256,7 @@ OpenRouter route of Purin AI goes direct.
   `slack-reasoning-effort.ts` in `surfaces/slack`, `services/chatgpt-exit/` in
   `workers/chatgpt-exit`, and the two packages in `foundation/contracts`.
 
-Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`):
+Regional D1 (`workers/platform/migrations-regional/0001_current_schema.sql`):
 
 | Table                                      | Holds                                                                                                              |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
@@ -386,7 +386,7 @@ Boundaries:
   "Harness adapter".
 - [Plan 96](../../plan-96-gemini-models.md), as background.
 - Where a source differs from the code, this spec follows the code.
-- E2E journeys in `services/platform/tests/e2e/`:
+- E2E journeys in `workers/platform/tests/e2e/`:
   - Routes and sign-ins: `chatgpt-subscription-slack.test.ts`,
     `chatgpt-subscription-portal.test.ts`, `claude-oauth.test.ts`,
     `claude-model-choice-portal.test.ts`, `gemini-key-portal.test.ts`,
@@ -397,4 +397,4 @@ Boundaries:
     `checkpoint-restart.test.ts` and `checkpoint-atomic-acceptance.test.ts`.
   - The exits in the E2E runtime: `model-exit-network.ts` (`ChatGptExitNetwork`).
 - The live journey on real services: `pnpm --filter @purin-labs/platform
-slack:live-reply` (`services/platform/scripts/slack-live-reply-journey.ts`).
+slack:live-reply` (`workers/platform/scripts/slack-live-reply-journey.ts`).

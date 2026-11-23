@@ -13,7 +13,7 @@
 -- a failure leaves the database as it was. A second run fails on the first
 -- rename and changes nothing.
 --
--- Run from services/platform, then run refactor-9-d1-patch.sql:
+-- Run from workers/platform, then run refactor-9-d1-patch.sql:
 --   pnpm exec wrangler d1 execute ORGANISATION_DB_WNAM --env production --remote --file scripts/refactor-9-d1-schema-patch.sql
 --   pnpm exec wrangler d1 execute ORGANISATION_DB_APAC --env production --remote --file scripts/refactor-9-d1-schema-patch.sql
 

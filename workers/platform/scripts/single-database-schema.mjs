@@ -1,7 +1,7 @@
 // The schema of one database that holds both deployed schemas, for unit tests
 // and local harnesses that run one database.
 //
-//   node services/platform/scripts/single-database-schema.mjs <out.sql | ->
+//   node workers/platform/scripts/single-database-schema.mjs <out.sql | ->
 //
 // Production keeps global records and each Organisation's records in two
 // databases (migrations-global, migrations-regional). A harness with one

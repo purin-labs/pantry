@@ -236,7 +236,7 @@ kind. The action kinds are:
 | `apps/storefront`, `scripts/punter`                              | The buyer application and the buyer acceptance client                                                                                                                                                                                                                                                                                            |
 | `areas/commerce/server/contract/`                                | The public files of the area in the Platform: the provider port, the delivery intake, the engine client, the queue messages                                                                                                                                                                                                                      |
 
-- Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`):
+- Regional D1 (`workers/platform/migrations-regional/0001_current_schema.sql`):
   `organisation_commerce_system` has one row for each Organisation, with `system_kind`
   and `revision`. `commerce_merchant_binding` has the merchant id, the environment, and
   the id and the public key of the delivery key. `commerce_capability_activation` has
@@ -411,16 +411,16 @@ Neighbours:
   differ from the code, this spec follows the code. The evidence of Plan 22 in the
   archive:
   [production acceptance](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-22-production-acceptance-2026-08-12.md).
-- E2E journeys in `services/platform/tests/e2e/`: `commerce-feed-catch-up.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `commerce-feed-catch-up.test.ts`,
   `commerce-webhook-catch-up.test.ts`, `commerce-lab.test.ts`,
   `inventory-operations.test.ts` and `purged-organisation-commerce.test.ts`.
 - Journeys in `services/commerce/tests/`: `punter-acceptance.test.ts` (the two Punter
   scenarios on a real engine with test providers), `commerce-authority.test.ts` (the
   typed commands), `lapsed-hold-journey.test.ts` and `expired-lot-journey.test.ts`. In
   `apps/storefront/tests/`: `storefront-cart-recovery.test.tsx`.
-- Other tests in `services/platform/tests/`: `organisation-commerce-system.test.ts`,
+- Other tests in `workers/platform/tests/`: `organisation-commerce-system.test.ts`,
   `commerce-capability-activation.test.ts` and `pantry-commerce-demo-route.test.ts`.
-  No file in `services/platform/tests/e2e/` calls the selection route or the capability
+  No file in `workers/platform/tests/e2e/` calls the selection route or the capability
   routes. The E2E fixtures write the selection row directly.
 - Scripts: `pnpm --filter @purin-labs/punter scenario:pickup` and `scenario:shipping`,
   `scripts/patisserie/run-storefront-journey.py`, and in `services/commerce/scripts/`

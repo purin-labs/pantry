@@ -338,11 +338,11 @@ Neighbours:
   [the status ledger](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-78-foundations.md).
 - Plan 78 replaced step 7 of [Plan 77](../../history/plan-77-underclerk-modular-core.md)
   (COM-02). [The layers page](../../layers.md) gives the module of each package.
-- E2E journeys in `services/platform/tests/e2e/`: `checkpoint-restart.test.ts` and
+- E2E journeys in `workers/platform/tests/e2e/`: `checkpoint-restart.test.ts` and
   `checkpoint-atomic-acceptance.test.ts` (Session restore and checkpoints),
   `slack-attachment-journey.test.ts` and `slack-attachment-restore.test.ts` (messages
   and attachments), and the `durable-codemode-*.test.ts` journeys (tool calls).
-- Other tests in `services/platform/tests/`: `workspace-executor-inspection.test.ts`,
+- Other tests in `workers/platform/tests/`: `workspace-executor-inspection.test.ts`,
   `workspace-executor-envelope.test.ts`, `commerce-query-schema.test.ts` (the Unicode
   fold) and `commerce-wasm-query.test.ts` (the planner and the cursor).
 - Journeys in `services/commerce/tests/`: `entity-plane.test.ts`,

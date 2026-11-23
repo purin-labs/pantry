@@ -461,7 +461,7 @@ version plus a Pantry reconnect procedure.
 
 ## Current deployment readiness
 
-Audited against the runtime, `services/platform/wrangler.jsonc`, and the remote
+Audited against the runtime, `workers/platform/wrangler.jsonc`, and the remote
 production Worker secret-name inventory on 2026-08-30. Secret values were not
 read.
 

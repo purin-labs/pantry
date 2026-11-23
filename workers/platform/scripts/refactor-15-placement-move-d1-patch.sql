@@ -9,7 +9,7 @@
 --      each quarantined Actor that a relocation left out.
 -- Apply to the deployed GLOBAL database (and a local combined database)
 -- before the release that writes them:
---   wrangler d1 execute <global database> --env production --remote --file services/platform/scripts/refactor-15-placement-move-d1-patch.sql
+--   wrangler d1 execute <global database> --env production --remote --file workers/platform/scripts/refactor-15-placement-move-d1-patch.sql
 -- SQLite cannot change a CHECK in place, so state_object_restore is rebuilt:
 -- the new table is created, every row is copied, the old table is dropped and
 -- the new one takes its name. Its child state_object_restore_item is rebuilt

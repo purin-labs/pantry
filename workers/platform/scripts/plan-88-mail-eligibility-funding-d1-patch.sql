@@ -4,7 +4,7 @@
 -- connection revision, as before. funding joins the primary key.
 -- Apply to each deployed REGIONAL database (and a local combined database)
 -- before the release that writes it:
---   wrangler d1 execute <regional database> --env production --remote --file services/platform/scripts/plan-88-mail-eligibility-funding-d1-patch.sql
+--   wrangler d1 execute <regional database> --env production --remote --file workers/platform/scripts/plan-88-mail-eligibility-funding-d1-patch.sql
 -- SQLite cannot change a CHECK or a primary key in place, so the table is
 -- rebuilt: the new table is created, every row is copied as funding
 -- 'organisation_byo', the old table is dropped and the new one takes its

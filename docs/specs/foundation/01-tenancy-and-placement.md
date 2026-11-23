@@ -38,7 +38,7 @@ domain state.
 ### The two D1 databases
 
 - The Worker binds the global database as `DB`. Its baseline is
-  `services/platform/migrations-global/0001_current_schema.sql`, with 28 tables.
+  `workers/platform/migrations-global/0001_current_schema.sql`, with 28 tables.
 - The Worker binds one regional database for each cell: `ORGANISATION_DB_WNAM`,
   `ORGANISATION_DB_APAC` or `ORGANISATION_DB_EU`. A profile can also bind a cell to
   `DB` itself. The baseline is `migrations-regional/0001_current_schema.sql`, with 193
@@ -49,7 +49,7 @@ domain state.
 - A brand is a type-only property. At run time, a handle is the binding itself.
   `sameBinding(a, b)` tells when a profile binds a cell to `DB`.
 - `SingleDatabase` holds both schemas. Only unit tests make one, from
-  `singleDatabaseSchema()` (`services/platform/scripts/single-database-schema.mjs`).
+  `singleDatabaseSchema()` (`workers/platform/scripts/single-database-schema.mjs`).
 - The E2E suite loads the two baselines into two databases, as production does. An E2E
   file reaches Organisation records through `organisationDatabase(id)` or
   `fixtureDatabase()` (`tests/e2e/organisation-database.ts`).
@@ -98,7 +98,7 @@ A rename, an archive, a restore, a deletion and a purge write the regional
   only the deployed cells. If no cell is deployed, it offers the root cell. For a
   profile that does not parse, it answers 503
   `organisation_placement_configuration_invalid`.
-- The Slack ingress Worker (`services/platform/wrangler.slack-ingress.jsonc`) has its
+- The Slack ingress Worker (`workers/platform/wrangler.slack-ingress.jsonc`) has its
   own copy of the profile and its own `DB` and `ORGANISATION_DB_APAC` bindings. Its
   check and its deploy (`scripts/slack-ingress-worker.mjs`) refuse a copy that differs
   from the production profile of the platform Worker.
@@ -216,7 +216,7 @@ Durable Object and of D1, each queue message, each KV write and each R2 write.
   the first call of an object write nothing when its data is current.
 - Before you add a cron trigger, an alarm, a poll or a queue retry, calculate its cost
   for one idle Organisation for 30 days. An alarm that arms itself again needs an end.
-- The guard is `services/platform/tests/e2e/idle-tenant-cost.test.ts`. It runs each
+- The guard is `workers/platform/tests/e2e/idle-tenant-cost.test.ts`. It runs each
   production cron trigger for one hour on a shop where nothing changes. It stops each
   object before each five minutes.
 - `IDLE_HOUR_BUDGET` permits one line: 12 rows of `OrganisationActor` SQLite in one
@@ -227,7 +227,7 @@ Durable Object and of D1, each queue message, each KV write and each R2 write.
 - `USD_PER_MILLION` (`tests/e2e/write-meter.ts`) holds the list prices: rows 1.0, queue
   messages 1.2, KV writes 5.0 and R2 writes 4.5.
 
-The production Worker has three cron triggers (`services/platform/wrangler.jsonc`,
+The production Worker has three cron triggers (`workers/platform/wrangler.jsonc`,
 `integration-gateway.ts`):
 
 | Trigger        | Work                                                                                                                                                             |
@@ -278,7 +278,7 @@ The production Worker has three cron triggers (`services/platform/wrangler.jsonc
 | `GET`, `POST /v1/admin/state-object-restore`    | The platform operator | Inspect a restore. Commands: `prepare`, `start`, `resume`, `abandon`                                                           |
 
 The contract of the home regions is `packages/control-api/src/home-region.ts`. The main
-files are in `services/platform/src/`:
+files are in `workers/platform/src/`:
 
 | File                                                       | Purpose                                                                      |
 | ---------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -296,7 +296,7 @@ The lints: `pnpm lint:database-handles` (`scripts/check-database-handles.mjs`) r
 cast to a handle type outside `database-handles.ts`. It refuses a new plain `D1Database`
 above the count in `scripts/database-handles-ratchet.json`. It refuses SQL text that
 writes a shared table outside `data/shared-rows/`. `pnpm lint:d1-patch` refuses a
-baseline change without a patch script in `services/platform/scripts/`.
+baseline change without a patch script in `workers/platform/scripts/`.
 `pnpm --filter @purin-labs/platform d1:schema:remote:check` runs
 `scripts/check-d1-schema.mjs` for production. It fails when a bound database lacks a
 table, a column, an index or a trigger of its baseline.
@@ -410,7 +410,7 @@ The boundaries:
 - Background: [Plan 93](../../plan-93-clean-cutover.md). The rule for the cost of each
   tenant is in `AGENTS.md`, section "Cost of each tenant".
 - Where a source differs from the code, this spec follows the code.
-- E2E journeys in `services/platform/tests/e2e/`: `idle-tenant-cost.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `idle-tenant-cost.test.ts`,
   `shared-organisation-rows.test.ts`, `regional-onboarding.test.ts`,
   `placement-move.test.ts`, `organisation-lifecycle-placement.test.ts`,
   `control-receipt-placement.test.ts`, `actor-activation-placement.test.ts`,

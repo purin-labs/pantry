@@ -267,7 +267,7 @@ who asked.
   `protocol.ts`), and `@purin-labs/cafe-control-api` (`menu-boards.ts`: releases,
   summaries, the feed, facts, pairing shapes and the parsers). The order queue, sold-out,
   pickup, comment and version shapes are in `@purin-labs/control-api`.
-- `OrganisationDO` (`services/platform/src/actors/organisation.ts`) holds the rooms
+- `OrganisationDO` (`workers/platform/src/actors/organisation.ts`) holds the rooms
   through `cafe-collaboration-rooms.ts`. Its SQLite tables:
 
 | Table                              | Owner file                      | Holds                                                                             |
@@ -278,7 +278,7 @@ who asked.
 | `menu_board_version`               | `actors/menu-board-versions.ts` | Frozen copies: `created`, `named`, `published`, `before_restore`, `auto`          |
 | `menu_screen`                      | `actors/menu-screens.ts`        | Paired screens, the token hash, `last_seen_at` and `removed_at`                   |
 
-- Global D1 (`services/platform/migrations-global/0001_current_schema.sql`):
+- Global D1 (`workers/platform/migrations-global/0001_current_schema.sql`):
   `screen_pairing`, written only by `data/screen-pairing.ts`. The regional D1 has no
   table of this subsystem.
 - The Actor's commands are in `actors/menu-board-commands.ts`. The templates, the agent
@@ -419,7 +419,7 @@ retention: an archive deletes nothing, and no route deletes a board.
   [Phase 7 browser journey](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-40b-phase-7/board-agent-browser.json).
 - Background: [Plan 90](../../../plan-90-cafe-pos-checkout.md), which stays a plan. The
   commerce contract: [the commerce spec](../../../../services/commerce/docs/spec.md).
-- E2E journeys in `services/platform/tests/e2e/`: `menu-board-screen.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `menu-board-screen.test.ts`,
   `cafe-menu-publication.test.ts`, `pi-cafe-menu-publication.test.ts`,
   `order-queue.test.ts`, `chat-agent-order-queue.test.ts`,
   `chat-agent-order-queue-recovery.test.ts`, the `pi-menu-board-*.test.ts` journeys

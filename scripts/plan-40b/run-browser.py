@@ -4,7 +4,7 @@
 The Portal is built and served with `vite preview`, so that the page runs
 with its service worker as in production. The browser answers the screen API
 and the signal socket with the shapes that the Pantry Worker answers in the
-E2E journey `services/platform/tests/e2e/menu-board-screen.test.ts`; that
+E2E journey `workers/platform/tests/e2e/menu-board-screen.test.ts`; that
 journey proves the server side. This one proves the player: pairing,
 playing, a signal, the saved copy offline, a restart with no network, the
 catch-up after reconnect, and the end of the pairing.

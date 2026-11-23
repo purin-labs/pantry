@@ -1,6 +1,6 @@
 // The check and deploy of a small Worker beside the platform Worker: the
 // Slack ingress, model exit, ChatGPT exit, Code Mode sandbox and 1Password
-// store Workers. Wrangler builds each one from services/platform, with the
+// store Workers. Wrangler builds each one from workers/platform, with the
 // Wrangler profile that the script names.
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, readdirSync, rmSync, statSync } from "node:fs";
@@ -14,10 +14,10 @@ import {
 
 export const platformDirectory = resolve(
   import.meta.dirname,
-  "../../services/platform",
+  "../../workers/platform",
 );
 
-/** Runs Wrangler in services/platform. A failure ends the process. */
+/** Runs Wrangler in workers/platform. A failure ends the process. */
 function wrangler(args) {
   const result = spawnSync("pnpm", ["exec", "wrangler", ...args], {
     cwd: platformDirectory,

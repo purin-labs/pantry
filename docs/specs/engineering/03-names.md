@@ -113,7 +113,7 @@ value. The binding `POLICY_KV` has the name of the old namespace, but it points 
 | The native source of the bundles                                  | `crates/bakery-native`                                                                                                                                                        | The bundles hash this source                                                    |
 | The browser folder `satyr-physics-results`                        | `opfs-result-files.ts` and `physics-result-directory.ts` in `areas/kitchen/ui/features/production-run/`                                                                       | The pinned execution bundle holds this name                                     |
 | R2 file names and model text                                      | `repo-binaries.json`, `scripts/bakery-mujoco`                                                                                                                                 | These names are inputs of the pinned builds                                     |
-| Plan file names and the applied D1 patch scripts of the old stack | `docs/`, `services/platform/scripts/`                                                                                                                                         | They are records                                                                |
+| Plan file names and the applied D1 patch scripts of the old stack | `docs/`, `workers/platform/scripts/`                                                                                                                                          | They are records                                                                |
 | The rename script                                                 | `scripts/rename/plan-93-cutover.mjs`                                                                                                                                          | Its search patterns must match the old names                                    |
 
 The plain French words "atelier" and "commis" appear in recipe, lighting and test data.
@@ -126,17 +126,17 @@ This spec owns no D1 or Actor table, route, event, capability or agent tool.
 
 `WORKER_NAMES` and `WORKER_DOMAINS` in `scripts/worker-environment.mjs` are the one list.
 
-| Service           | Production Worker          | Address                    | Wrangler file                                        |
-| ----------------- | -------------------------- | -------------------------- | ---------------------------------------------------- |
-| Platform          | `pantry`                   | `pantry.purin.io`          | `services/platform/wrangler.jsonc`                   |
-| Commerce engine   | `pantry-commerce`          | `commerce.pantry.purin.io` | `services/commerce/wrangler.jsonc`                   |
-| Slack ingress     | `pantry-slack-ingress`     | `slack.pantry.purin.io`    | `services/platform/wrangler.slack-ingress.jsonc`     |
-| Docs              | `pantry-docs`              | `docs.pantry.purin.io`     | `apps/docs/wrangler.jsonc`                           |
-| Shop              | `purin-shop`               | `shop.purin.io`            | `apps/storefront/wrangler.jsonc`                     |
-| Code Mode sandbox | `pantry-code-sandbox`      | None                       | `services/platform/wrangler.code-mode-sandbox.jsonc` |
-| Model exit        | `pantry-model-exit`        | None                       | `services/platform/wrangler.model-exit.jsonc`        |
-| ChatGPT exit      | `pantry-chatgpt-exit`      | None                       | `services/platform/wrangler.chatgpt-exit.jsonc`      |
-| 1Password store   | `pantry-vault-onepassword` | None                       | `services/platform/wrangler.vault-onepassword.jsonc` |
+| Service           | Production Worker          | Address                    | Wrangler file                                       |
+| ----------------- | -------------------------- | -------------------------- | --------------------------------------------------- |
+| Platform          | `pantry`                   | `pantry.purin.io`          | `workers/platform/wrangler.jsonc`                   |
+| Commerce engine   | `pantry-commerce`          | `commerce.pantry.purin.io` | `services/commerce/wrangler.jsonc`                  |
+| Slack ingress     | `pantry-slack-ingress`     | `slack.pantry.purin.io`    | `workers/platform/wrangler.slack-ingress.jsonc`     |
+| Docs              | `pantry-docs`              | `docs.pantry.purin.io`     | `apps/docs/wrangler.jsonc`                          |
+| Shop              | `purin-shop`               | `shop.purin.io`            | `apps/storefront/wrangler.jsonc`                    |
+| Code Mode sandbox | `pantry-code-sandbox`      | None                       | `workers/platform/wrangler.code-mode-sandbox.jsonc` |
+| Model exit        | `pantry-model-exit`        | None                       | `workers/platform/wrangler.model-exit.jsonc`        |
+| ChatGPT exit      | `pantry-chatgpt-exit`      | None                       | `workers/platform/wrangler.chatgpt-exit.jsonc`      |
+| 1Password store   | `pantry-vault-onepassword` | None                       | `workers/platform/wrangler.vault-onepassword.jsonc` |
 
 The local profiles of the sandbox, the two exit Workers and the 1Password store add the
 suffix `-local`. The Platform and the commerce engine have the same name in both profiles.
@@ -171,7 +171,7 @@ The Durable Object classes of the commerce engine are `CommerceMerchantDO` and
 | Configuration version         | `x-pantry-configuration-version`                                                                                                                                    | `foundation/tenancy/data/control-mutation.ts`                                             |
 | Gateway identity              | `x-pantry-device-gateway`, `-organisation`, `-location`                                                                                                             | `areas/devices/server/gateway-routes.ts`                                                  |
 | Voice device                  | `x-pantry-voice-device`                                                                                                                                             | `VOICE_DEVICE_HEADER`, `packages/control-api/src/voice.ts`                                |
-| Exit Workers                  | `x-pantry-upstream-url`, `x-pantry-exit-colo`                                                                                                                       | `chatgpt-exit/forward.ts`, `model-exit/protocol.ts` in `services/platform/src/`           |
+| Exit Workers                  | `x-pantry-upstream-url`, `x-pantry-exit-colo`                                                                                                                       | `chatgpt-exit/forward.ts`, `model-exit/protocol.ts` in `workers/platform/src/`            |
 | Commerce lab                  | `x-pantry-lab-timestamp`, `x-pantry-lab-signature`                                                                                                                  | `areas/commerce/server/commerce-lab/ingress.ts`                                           |
 | Connector probe               | `x-pantry-probe-key`                                                                                                                                                | `crates/custom-connector-fetch/src/lib.rs`                                                |
 | Commerce webhook              | `x-commerce-event-id`, `-event-kind`, `-timestamp`, `-signature`                                                                                                    | `services/commerce/src/webhooks.ts`                                                       |
@@ -335,6 +335,6 @@ the identity link returns this address. Plan 93 records the deletion of the
   follows the code. They give no evidence link in the archive.
 - [AGENTS.md](../../../AGENTS.md), sections "Product direction" and "Old and new names".
 - Checks: `scripts/worker-environment.test.mjs` and
-  `services/platform/tests/environment-configuration.test.ts` cover the Platform profiles
-  and the commerce release target. `services/platform/tests/e2e/voice-control.test.ts`
+  `workers/platform/tests/environment-configuration.test.ts` cover the Platform profiles
+  and the commerce release target. `workers/platform/tests/e2e/voice-control.test.ts`
   covers the speech terms. No E2E journey has the names as its subject.

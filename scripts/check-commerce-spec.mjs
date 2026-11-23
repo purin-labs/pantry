@@ -128,7 +128,7 @@ for (const machine of machines)
 
 for (const journey of new Set(spec.match(/[\w./-]+\.test\.ts/gu) ?? [])) {
   const path = journey.startsWith("tests/e2e/")
-    ? join(root, "services/platform", journey)
+    ? join(root, "workers/platform", journey)
     : join(service, "tests", journey.replace(/^tests\//u, ""));
   if (!existsSync(path))
     failures.push(`The spec names ${journey}, which does not exist`);

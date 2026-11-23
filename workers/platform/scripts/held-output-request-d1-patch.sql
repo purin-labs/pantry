@@ -1,6 +1,6 @@
 -- Plan 27C step 3: an output that waits for a person's approval at the exit.
 -- Apply to each deployed REGIONAL database before the release that reads it:
---   wrangler d1 execute <regional database> --env production --remote --file services/platform/scripts/held-output-request-d1-patch.sql
+--   wrangler d1 execute <regional database> --env production --remote --file workers/platform/scripts/held-output-request-d1-patch.sql
 -- Adds table held_output_request and indexes idx_held_output_request_status and
 -- idx_held_output_request_effect.
 -- The statements are safe to repeat.

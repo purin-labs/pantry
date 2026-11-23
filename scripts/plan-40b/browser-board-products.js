@@ -17,7 +17,7 @@ async (page) => {
   // The harness Worker has no shop, so this browser answers the product
   // list read, the photo's bytes and the TV feed's shop facts, as
   // browser-sold-out.js does; it records no write. The E2E journey
-  // services/platform/tests/e2e/pi-menu-board-products.test.ts proves that
+  // workers/platform/tests/e2e/pi-menu-board-products.test.ts proves that
   // the server gives the photo in those reads.
   const WORKER = "http://127.0.0.1:8874";
   const PORTAL = "http://127.0.0.1:3174";

@@ -54,9 +54,9 @@ one file with one case deleted, and deletes no file.
 
 | Suite                  | Where                                                      | Size                           | Runner                                        | Command                                               |
 | ---------------------- | ---------------------------------------------------------- | ------------------------------ | --------------------------------------------- | ----------------------------------------------------- |
-| Platform journeys      | `services/platform/tests/e2e/`                             | 251 files                      | Vitest with the Cloudflare plugin, in workerd | `pnpm --filter @purin-labs/platform test:e2e`         |
-| Platform unit          | `services/platform/tests/`                                 | 300 files                      | Vitest in Node                                | `pnpm --filter @purin-labs/platform test`             |
-| Platform type fixtures | `services/platform/tests/`                                 | 90 files                       | The type check                                | `pnpm --filter @purin-labs/platform check:test-types` |
+| Platform journeys      | `workers/platform/tests/e2e/`                              | 251 files                      | Vitest with the Cloudflare plugin, in workerd | `pnpm --filter @purin-labs/platform test:e2e`         |
+| Platform unit          | `workers/platform/tests/`                                  | 300 files                      | Vitest in Node                                | `pnpm --filter @purin-labs/platform test`             |
+| Platform type fixtures | `workers/platform/tests/`                                  | 90 files                       | The type check                                | `pnpm --filter @purin-labs/platform check:test-types` |
 | Commerce               | `services/commerce/tests/`                                 | 86 files, 69 named `*-journey` | Vitest in Node                                | `pnpm commerce:test`                                  |
 | Kitchen journeys       | `scripts/production-simulation/`, `scripts/bakery-robots/` | 128 rows, 122 files            | `run-journeys.mjs`                            | See "The Kitchen journey index"                       |
 | Portal                 | `areas/kitchen/ui/features/workflow-simulator/`            | 5 files                        | `node --test`                                 | `pnpm --filter @purin-labs/portal test`               |
@@ -113,7 +113,7 @@ The commerce lab commands need a running Worker. `scripts/lab/run-commerce-lab.m
 
 ### The Platform E2E runtime
 
-`services/platform/vitest.e2e.config.ts` runs the journeys in workerd with no remote
+`workers/platform/vitest.e2e.config.ts` runs the journeys in workerd with no remote
 binding. One file runs at a time, and a failed test does not retry.
 
 | Part                             | How the suite provides it                                                                                                                                    |
@@ -156,7 +156,7 @@ The helpers are in `tests/e2e/organisation-database.ts`:
   rows that name the Organisation.
 
 Most unit suites run on one database that `singleDatabaseSchema()`
-(`services/platform/scripts/single-database-schema.mjs`) builds from the two baselines.
+(`workers/platform/scripts/single-database-schema.mjs`) builds from the two baselines.
 That schema hides a statement sent to the wrong database, so two guards exist:
 
 - `tests/split-topology.ts` builds one global and one regional database for a unit test.
@@ -276,7 +276,7 @@ missing.
 
 | Journey                                                                                                                                                     | Real service                                   | Needs                                                                                                           |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `services/platform/scripts/slack-live-reply-journey.ts`                                                                                                     | The deployed Worker, Slack and the model route | `SLACK_LIVE_USER_TOKEN`, `SLACK_LIVE_CHANNEL`, `SLACK_APP_USER_ID`                                              |
+| `workers/platform/scripts/slack-live-reply-journey.ts`                                                                                                      | The deployed Worker, Slack and the model route | `SLACK_LIVE_USER_TOKEN`, `SLACK_LIVE_CHANNEL`, `SLACK_APP_USER_ID`                                              |
 | `e2e/goal-pi-live`, `e2e/chat-menu-board-permission-live`, `e2e/order-attention`, one case of `e2e/portal-chat-finalization`, two cases of `e2e/mail-inbox` | The model through OpenRouter                   | `PANTRY_PI_ACCEPTANCE_API_KEY`                                                                                  |
 | `services/commerce/tests/square-journey.test.ts` (two cases)                                                                                                | Square sandbox                                 | `COMMERCE_SQUARE_SANDBOX_TOKEN`, `COMMERCE_SQUARE_SANDBOX_APPLICATION_ID`                                       |
 | `services/commerce/tests/stripe-journey.test.ts`                                                                                                            | Stripe test mode                               | `COMMERCE_STRIPE_TEST_SECRET_KEY`, `COMMERCE_STRIPE_TEST_PUBLISHABLE_KEY`, `COMMERCE_STRIPE_TEST_ACCOUNT`       |
@@ -308,19 +308,19 @@ for a draft pull request and its cancel rule are the same as in `pantry.yml`.
 
 This subsystem has no D1 table, Actor table, event, capability or agent tool of its own.
 
-| File                                                 | Purpose                                                                 |
-| ---------------------------------------------------- | ----------------------------------------------------------------------- |
-| `services/platform/vitest.config.ts`                 | The Platform unit suite. It builds the commerce fixture Worker one time |
-| `services/platform/vitest.e2e.config.ts`             | The E2E runtime, bindings, fake secrets and placement cells             |
-| `services/platform/tests/e2e/write-meter.ts`         | The write counter and the cost for 30 days                              |
-| `services/platform/tests/journey-artifacts.ts`       | The artifact writer. A path is one `.json` file under `output/`         |
-| `services/platform/tests/commerce-fixture-worker.ts` | The build and the start of the commerce fixture Worker                  |
-| `services/platform/tests/shop-gateway-adapters.ts`   | The runs of the real gateway binary and the controller simulator        |
-| `services/commerce/vitest.config.ts`                 | The commerce suite                                                      |
-| `services/commerce/tests/fixture-worker/`            | The commerce fixture Worker and its scenarios                           |
-| `foundation/kernel/fault-injection-auth.ts`          | The bearer check of the fault routes                                    |
-| `scripts/production-simulation/run-journeys.mjs`     | The Kitchen runner and the index check                                  |
-| `scripts/list-tests.mjs`                             | Lists each test file with its kind, lines, mocks and source imports     |
+| File                                                | Purpose                                                                 |
+| --------------------------------------------------- | ----------------------------------------------------------------------- |
+| `workers/platform/vitest.config.ts`                 | The Platform unit suite. It builds the commerce fixture Worker one time |
+| `workers/platform/vitest.e2e.config.ts`             | The E2E runtime, bindings, fake secrets and placement cells             |
+| `workers/platform/tests/e2e/write-meter.ts`         | The write counter and the cost for 30 days                              |
+| `workers/platform/tests/journey-artifacts.ts`       | The artifact writer. A path is one `.json` file under `output/`         |
+| `workers/platform/tests/commerce-fixture-worker.ts` | The build and the start of the commerce fixture Worker                  |
+| `workers/platform/tests/shop-gateway-adapters.ts`   | The runs of the real gateway binary and the controller simulator        |
+| `services/commerce/vitest.config.ts`                | The commerce suite                                                      |
+| `services/commerce/tests/fixture-worker/`           | The commerce fixture Worker and its scenarios                           |
+| `foundation/kernel/fault-injection-auth.ts`         | The bearer check of the fault routes                                    |
+| `scripts/production-simulation/run-journeys.mjs`    | The Kitchen runner and the index check                                  |
+| `scripts/list-tests.mjs`                            | Lists each test file with its kind, lines, mocks and source imports     |
 
 The Plan 24 cobot journeys build the controller simulator. Set `MUJOCO_DIR` to an SDK from
 `node scripts/bakery-robots/install-native-sdk.mjs <dir>`, or set
@@ -395,7 +395,7 @@ The boundaries to the neighbours:
 ## Sources
 
 - [`AGENTS.md`](../../../AGENTS.md), section "Testing", and
-  [`services/platform/tests/AGENTS.md`](../../../services/platform/tests/AGENTS.md). These
+  [`workers/platform/tests/AGENTS.md`](../../../workers/platform/tests/AGENTS.md). These
   two guides are not plans and do not move.
 - [The decision for each test file](../../refactor-17-test-decisions.md),
   [Refactor 17](../../refactor-17.md), section "Prune with each step", and
@@ -404,8 +404,8 @@ The boundaries to the neighbours:
   [`commerce-components.yml`](../../../.github/workflows/commerce-components.yml) and
   [`journeys.json`](../../../scripts/production-simulation/journeys.json).
 - The sources give no archive evidence link for this subsystem.
-- Journeys of this subsystem: `services/platform/tests/e2e/idle-tenant-cost.test.ts`,
+- Journeys of this subsystem: `workers/platform/tests/e2e/idle-tenant-cost.test.ts`,
   `new-organisation-first-chat.test.ts` and `slack-steer-park-loss.test.ts`;
   `services/commerce/tests/punter-acceptance.test.ts`;
-  `services/platform/scripts/slack-live-reply-journey.ts`; and the journeys of
+  `workers/platform/scripts/slack-live-reply-journey.ts`; and the journeys of
   `scripts/production-simulation/journeys.json`.

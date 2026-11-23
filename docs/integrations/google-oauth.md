@@ -31,8 +31,8 @@ Picker API and `https://pantry.purin.io/*`.
 Local development uses the production client "Purin Pantry web" of
 `purin-pantry` for sign-in, Gmail and Drive, with the local callbacks of the
 table below and the JavaScript origin `https://localhost:3003`. The
-`env.local` profile of `services/platform/wrangler.jsonc` holds the same
-client id; the git-ignored `services/platform/.dev.vars.local` holds its
+`env.local` profile of `workers/platform/wrangler.jsonc` holds the same
+client id; the git-ignored `workers/platform/.dev.vars.local` holds its
 secret and the "Pantry Picker" key, which also allows
 `https://localhost:3003/*`. Local Gmail push uses the topic
 `projects/purin-pantry/topics/pantry-gmail-push-local`, which has no
@@ -68,11 +68,11 @@ these Google callbacks.
 
 ## Where configuration and secrets live
 
-- Local client IDs and origins: `services/platform/wrangler.jsonc`, under
+- Local client IDs and origins: `workers/platform/wrangler.jsonc`, under
   `env.local.vars`.
-- Local client secrets: ignored `services/platform/.dev.vars.local`, using
+- Local client secrets: ignored `workers/platform/.dev.vars.local`, using
   the three secret names in the inventory. The committed
-  `services/platform/.dev.vars.example` lists names without values.
+  `workers/platform/.dev.vars.example` lists names without values.
 - Production client secrets: Cloudflare Worker secrets for `pantry`,
   selected explicitly with the production profile. Production SSO and Drive
   client IDs currently live there too.

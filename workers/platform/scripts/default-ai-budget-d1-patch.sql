@@ -10,7 +10,7 @@
 -- Every existing row keeps its values; only a new Organisation gets the new
 -- default.
 -- Apply to each deployed REGIONAL database before the release:
---   wrangler d1 execute <regional database> --env production --remote --file services/platform/scripts/default-ai-budget-d1-patch.sql
+--   wrangler d1 execute <regional database> --env production --remote --file workers/platform/scripts/default-ai-budget-d1-patch.sql
 -- SQLite cannot change a default in place, so workspace_ai_budget is rebuilt:
 -- the new table is created, every row is copied, the old table is dropped and
 -- the new one takes its name. No table refers to workspace_ai_budget. Its

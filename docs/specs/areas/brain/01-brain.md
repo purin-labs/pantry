@@ -392,7 +392,7 @@ last try named: `indeterminate`, `failed` or `unavailable`.
   and [the browser captures](https://github.com/seams-tech/pantry-history/tree/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42J-brain/browser/).
 - The [IFC integration guide](../../../../foundation/authority/policy/information-flow/README.md)
   and [FND-07](../../foundation/07-information-flow.md).
-- E2E journeys in `services/platform/tests/e2e/`: `memory-access.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `memory-access.test.ts`,
   `memory-teaching.test.ts`, `memory-admission.test.ts`, `memory-commands.test.ts`,
   `eval-commands.test.ts`, `mail-inbox.test.ts` (filters `gives the mailbox agent the
 accepted Memory` and `compares the accepted and a candidate Memory`),

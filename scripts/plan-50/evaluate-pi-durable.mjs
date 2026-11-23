@@ -130,7 +130,7 @@ if (codeModeTrial || draftBrowser || draft) {
   await mkdir(sandboxDirectory);
   await build({
     entryPoints: [
-      join(repository, "services/platform/src/code-mode-sandbox/worker.ts"),
+      join(repository, "workers/platform/src/code-mode-sandbox/worker.ts"),
     ],
     outfile: join(sandboxDirectory, "worker.mjs"),
     bundle: true,
@@ -454,19 +454,19 @@ async function sourceEvidence() {
       "foundation/agent/actors/session-execution-admission.ts",
       "foundation/actor-runtime/actors/actor-activation.ts",
       "foundation/tenancy/organisation-execution-scope.ts",
-      "services/platform/migrations-global/0001_current_schema.sql",
-      "services/platform/migrations-regional/0001_current_schema.sql",
-      "services/platform/scripts/single-database-schema.mjs",
-      "services/platform/package.json",
+      "workers/platform/migrations-global/0001_current_schema.sql",
+      "workers/platform/migrations-regional/0001_current_schema.sql",
+      "workers/platform/scripts/single-database-schema.mjs",
+      "workers/platform/package.json",
       "pnpm-lock.yaml",
     );
   if (proposal || providerTrial)
     files.push(
       "scripts/plan-50/proposal-worker.mjs",
       "areas/commerce/server/actors/harness-commerce-proposal.ts",
-      "services/platform/src/actors/case.ts",
+      "workers/platform/src/actors/case.ts",
       "foundation/authority/actors/action-ledger.ts",
-      "services/platform/src/actors/organisation.ts",
+      "workers/platform/src/actors/organisation.ts",
       "foundation/authority/authorization/access-grants/turn-authority.ts",
       "foundation/authority/data/access-grants.ts",
       "foundation/authority/policy/information-flow/source-labels.ts",
@@ -2714,7 +2714,7 @@ function isTextContent(content) {
 // Each trial runs its own built Commerce fixture Worker (Plan 76 phase 1)
 // and reaches it over HTTP, as Platform reaches production.
 async function loadCommerceFixture() {
-  const helper = "services/platform/tests/commerce-fixture-worker.ts";
+  const helper = "workers/platform/tests/commerce-fixture-worker.ts";
   const { startCommerceWorker } = await import(
     pathToFileURL(join(repository, helper)).href
   );

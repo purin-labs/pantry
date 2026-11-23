@@ -14,11 +14,11 @@ export { ProposalCase } from "./proposal-worker.mjs";
 import { CommerceAdminClient } from "../../packages/commerce-client/src/index.ts";
 import { issueControlSession } from "../../foundation/tenancy/data/control-plane.ts";
 import { googleConfig } from "../../foundation/control/worker/google-oidc-config.ts";
-import { completeCommerceApprovalFixture } from "../../services/platform/tests/e2e/commerce-approval-fixture.ts";
+import { completeCommerceApprovalFixture } from "../../workers/platform/tests/e2e/commerce-approval-fixture.ts";
 import {
   handleCommerceControlRoute,
   matchCommerceControlRoute,
-} from "../../services/platform/src/control/routes/commerce.ts";
+} from "../../workers/platform/src/control/routes/commerce.ts";
 import { readSessionTurnFlowBinding } from "../../foundation/agent/actors/agent-session-information-flow.ts";
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
 import { createModels } from "@earendil-works/pi-ai/models";

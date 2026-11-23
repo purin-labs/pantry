@@ -86,7 +86,7 @@ for (const database of databases) {
 }
 if (failed) {
   console.error(
-    "\nFix what the lines above name, then run this check again. For a schema difference, apply the patch scripts of the missing changes (services/platform/scripts/*-d1-patch.sql). For a missing policy row, apply the backfill SQL.",
+    "\nFix what the lines above name, then run this check again. For a schema difference, apply the patch scripts of the missing changes (workers/platform/scripts/*-d1-patch.sql). For a missing policy row, apply the backfill SQL.",
   );
   process.exitCode = 1;
 }

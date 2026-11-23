@@ -1,7 +1,7 @@
 -- Schedule runs on the Agents page: the runs of a day by their dispatch time,
 -- and the Project that receives a schedule's results (Plan 42J).
 -- Apply to each deployed REGIONAL database before the release that reads it:
---   wrangler d1 execute <regional database> --env production --remote --file services/platform/scripts/schedule-runs-d1-patch.sql
+--   wrangler d1 execute <regional database> --env production --remote --file workers/platform/scripts/schedule-runs-d1-patch.sql
 -- Adds index idx_schedule_dispatch_receipt_time on table
 -- schedule_dispatch_receipt. Alters table schedule_binding: adds column
 -- project_id and fills it for each schedule revision written before it, with

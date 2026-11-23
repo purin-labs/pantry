@@ -282,7 +282,7 @@ Other records hold a label or a binding as JSON: `case_journal` and the Case out
 (Case Actor), `memory_revision`, `eval_revision` and `eval_run_result` (Brain), and the
 D1 tables `context_projection` and `side_case_proposal`.
 
-Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`):
+Regional D1 (`workers/platform/migrations-regional/0001_current_schema.sql`):
 
 - `held_output_request`: one row for each held answer (`subject` `output`) or held step
   (`subject` `effect`). It has the `reason`, the `status` (`pending`, `allowed`,
@@ -320,7 +320,7 @@ The control routes are under `/v1/control/organisations/:id/access-control`, in
   `pnpm lint:tool-effects` (`scripts/check-tool-effects.mjs`) refuses a `draft`,
   `receipt` or `scheduled` tool with no `prepare`.
 
-| Work                       | Entry point in `services/platform/src/`                                                                                    |
+| Work                       | Entry point in `workers/platform/src/`                                                                                     |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | Turn context               | `context/turn-context.ts` (`prepareTurnContext`, `assembleTurnContext`)                                                    |
 | Session observations       | `prepareSessionInformationFlow`, `admitSessionInformationFlowObservation`                                                  |
@@ -424,7 +424,7 @@ planner and interpreter; a second policy engine.
 - `outside-written-effect.test.ts` adds the outside read to the running turn directly
   (`raiseLabel` in `tests/e2e/held-exit-support.ts`). `outside-written-link.test.ts`
   reads a fake public page through the link read of a Slack thread. Both use fake
-  services, and they read no mailbox. No file in `services/platform/tests/` holds the
+  services, and they read no mailbox. No file in `workers/platform/tests/` holds the
   reason code `aifc.other_recipient`.
 - The Slack stream calls and `chat.update` send no preview flag. Their link preview
   was not checked on real Slack.
@@ -441,7 +441,7 @@ planner and interpreter; a second policy engine.
   [Plan 29](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-29-organisation-agent-email-mailboxes.md).
 - The sources name no evidence file in the archive. Where a source differs from the
   code, this spec follows the code.
-- E2E journeys in `services/platform/tests/e2e/`: `slack-held-output.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `slack-held-output.test.ts`,
   `slack-held-effect.test.ts`, `slack-exit-levels.test.ts`,
   `outside-written-effect.test.ts`, `outside-written-link.test.ts`,
   `airtable-exit-approval.test.ts`,
