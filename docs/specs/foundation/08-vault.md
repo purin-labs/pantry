@@ -152,7 +152,7 @@ apart from the Slack resolvers.
 ### Alert signals
 
 The scheduled reconciliation (cron `*/15 * * * *`) ends with the Vault alert sweep
-(`sweepVaultAlertSignals`). The sweep reads each regional database and writes nothing.
+(`sweepVaultAlerts` in `alerts.ts`). The sweep reads each regional database and writes nothing.
 It sends a `traceWarn` for each signal that is not zero.
 
 | Trace                                      | Condition                                                                            | Constant                                                        |

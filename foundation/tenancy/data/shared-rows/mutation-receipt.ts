@@ -7,7 +7,11 @@
  * rules of the regional copy). See docs/history/refactor-12.md.
  */
 import { assertNever } from "@purin-labs/std";
-import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import {
+  configuredOrganisationDatabases,
+  type OrganisationExecutionScope,
+  type OrganisationPlacementBindings,
+} from "../../organisation-execution-scope";
 import type {
   ControlMutationBoundary,
   ControlMutationIdentity,
@@ -28,6 +32,8 @@ type MutationReceiptRow = {
 };
 
 const MUTATION_RECEIPT_TTL_MS = 24 * 60 * 60 * 1_000;
+/** The expired receipts that one scheduled run deletes in each database. */
+const EXPIRED_RECEIPT_PAGE = 500;
 
 export async function readControlMutationReplay(input: {
   readonly db: QuerySource;
@@ -223,6 +229,40 @@ export function prepareBootstrapReceiptPublication(
       input.organisationId,
       input.fenceToken,
     );
+}
+
+/**
+ * Deletes receipts whose day ended, oldest first, a page at a time. After it,
+ * the key of the receipt starts a new request. A receipt that still waits for
+ * its final answer (202) stays. With nothing expired, it reads the expiry
+ * index and writes nothing.
+ */
+function prepareExpiredReceiptsDeletion(
+  db: QuerySource,
+  now: number,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `DELETE FROM control_mutation_receipt WHERE receipt_id IN (
+         SELECT receipt_id FROM control_mutation_receipt
+         WHERE expires_at <= ? AND response_status <> 202
+         ORDER BY expires_at LIMIT ?)`,
+    )
+    .bind(now, EXPIRED_RECEIPT_PAGE);
+}
+
+/**
+ * A receipt answers a repeat of its request for one day. The 15-minute
+ * onboarding run deletes the receipts whose day ended, in the global
+ * database and in each regional one.
+ */
+export async function deleteExpiredMutationReceipts(
+  env: OrganisationPlacementBindings,
+  now: number,
+): Promise<void> {
+  await prepareExpiredReceiptsDeletion(env.DB, now).run();
+  for (const database of configuredOrganisationDatabases(env))
+    await prepareExpiredReceiptsDeletion(database, now).run();
 }
 
 /** A purge drops the Organisation's expired receipts with its other rows. */

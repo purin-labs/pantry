@@ -7,6 +7,12 @@ import {
   upsertUser,
   type IssuedControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
+import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
+import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
 import { commerceClient, commerceHeaders } from "./commerce-support";
 
 declare module "vitest" {
@@ -42,6 +48,16 @@ it(
 it(
   "takes the same organisation names at creation and at a rename, and refuses a name that is too short or too long at both",
   nameRuleJourney,
+  120_000,
+);
+
+// A mutation receipt lives one day. Within the day, a repeat of a rename
+// under the same Idempotency-Key answers from the receipt, and another name
+// under that key is a conflict. After the day, the scheduled run deletes the
+// receipt, so the key starts a new rename.
+it(
+  "replays a rename under its key for one day, and takes the key as new after the scheduled run deletes the receipt",
+  receiptLifetimeJourney,
   120_000,
 );
 
@@ -204,6 +220,97 @@ async function nameRuleJourney(context: TestContext): Promise<void> {
   };
 }
 
+async function receiptLifetimeJourney(context: TestContext): Promise<void> {
+  const owner = await commerceClient(`receipt-owner-${crypto.randomUUID()}`);
+  const made = await create(owner.session, "receipt_operation_made", "Rye");
+  expect(made.status, JSON.stringify(made)).toBe(200);
+  const organisationId = String(made.organisationId);
+  const key = `rename-${crypto.randomUUID()}`;
+  // A retry sends the request again as it was: the same key and version.
+  const { configurationVersion } = await organisationProjection(
+    owner.session,
+    organisationId,
+  );
+  const retry = { idempotencyKey: key, configurationVersion };
+
+  const first = await rename(
+    owner.session,
+    organisationId,
+    "Rye Bakery",
+    retry,
+  );
+  expect(first).toEqual({ status: 200, code: null });
+  const replayed = await rename(
+    owner.session,
+    organisationId,
+    "Rye Bakery",
+    retry,
+  );
+  expect(replayed).toEqual({ status: 200, code: null });
+  // Denied within the day: another name under the same key.
+  const conflict = await rename(
+    owner.session,
+    organisationId,
+    "Rye Cafe",
+    retry,
+  );
+  expect(conflict).toEqual({ status: 409, code: "idempotency_key_conflict" });
+  expect(await organisationName(owner.session, organisationId)).toBe(
+    "Rye Bakery",
+  );
+  const receiptsBefore = await renameReceipts(organisationId, key);
+  expect(receiptsBefore).toBe(1);
+
+  // A day and a quarter of an hour later, the scheduled run has deleted the
+  // receipt: the key starts a new rename.
+  await runScheduledOnboardingReconciliation(
+    env,
+    Date.now() + 24 * 60 * 60 * 1_000 + 15 * 60 * 1_000,
+  );
+  const receiptsAfter = await renameReceipts(organisationId, key);
+  expect(receiptsAfter).toBe(0);
+  const later = await rename(owner.session, organisationId, "Rye Cafe", {
+    idempotencyKey: key,
+  });
+  expect(later).toEqual({ status: 200, code: null });
+  expect(await organisationName(owner.session, organisationId)).toBe(
+    "Rye Cafe",
+  );
+
+  context.task.meta.organisationSetup = {
+    first,
+    replayed,
+    conflict,
+    receiptsBefore,
+    receiptsAfter,
+    later,
+  };
+}
+
+/** The receipts of the rename route under one key, in every database. */
+async function renameReceipts(
+  organisationId: string,
+  key: string,
+): Promise<number> {
+  const scope = await requireOrganisationExecutionScope(
+    env,
+    parseRequiredOrganisationId(organisationId),
+  );
+  const row = await scope.database
+    .prepare(
+      "SELECT COUNT(*) AS count FROM control_mutation_receipt WHERE organisation_scope = ? AND idempotency_key = ?",
+    )
+    .bind(organisationId, key)
+    .first<{ count: number }>();
+  return row?.count ?? 0;
+}
+
+function parseRequiredOrganisationId(raw: string): OrganisationId {
+  const parsed = parseOrganisationId(raw);
+  if (!parsed.ok) throw new Error(parsed.error.code);
+  return parsed.value;
+}
+
 async function testOrganisationJourney(context: TestContext): Promise<void> {
   // The list is `Test-Owner@pantry.test, second@pantry.test`: the check
   // ignores case and spaces.
@@ -356,13 +463,15 @@ async function rename(
   session: IssuedControlSession,
   organisationId: string,
   name: string,
+  retry?: Readonly<{ idempotencyKey: string; configurationVersion?: number }>,
 ): Promise<Readonly<{ status: number; code: string | null }>> {
-  const { configurationVersion } = await organisationProjection(
-    session,
-    organisationId,
-  );
+  const idempotencyKey = retry?.idempotencyKey ?? crypto.randomUUID();
+  const configurationVersion =
+    retry?.configurationVersion ??
+    (await organisationProjection(session, organisationId))
+      .configurationVersion;
   const headers = commerceHeaders(session);
-  headers.set("idempotency-key", crypto.randomUUID());
+  headers.set("idempotency-key", idempotencyKey);
   headers.set("x-pantry-configuration-version", String(configurationVersion));
   const response = await exports.default.fetch(
     `https://localhost/v1/control/organisations/${organisationId}`,

@@ -1,7 +1,9 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import type { VaultKeyVersion } from "./keyring";
+import type { Env } from "@purin-labs/kernel/env";
+import { configuredOrganisationDatabases } from "@purin-labs/tenancy/organisation-execution-scope";
+import { loadCredentialVaultKeyRing, type VaultKeyVersion } from "./keyring";
 
 // Plan 12 V3: the provisional benign-policy staleness budget, adopted as
 // the explicit delivery-path constants. Restrictions target 3 seconds p95
@@ -65,7 +67,7 @@ export async function recordCredentialAccessDenial(input: {
   });
 }
 
-export type VaultAlertSweep = {
+type VaultAlertSweep = {
   readonly sweptAt: number;
   readonly unknownKeyVersionRows: number;
   readonly staleSupersededGenerations: number;
@@ -76,7 +78,25 @@ export type VaultAlertSweep = {
   readonly denialsByPurpose: Readonly<Record<string, number>>;
 };
 
-export async function sweepVaultAlertSignals(input: {
+/**
+ * The Vault alert sweep of the 15-minute onboarding run, over the regional
+ * database of each cell. It writes nothing.
+ */
+export async function sweepVaultAlerts(env: Env, now: number): Promise<void> {
+  const keyring = await loadCredentialVaultKeyRing(env);
+  const readableKeyVersions = keyring.ok
+    ? new Set(keyring.value.readable.map((binding) => binding.version))
+    : new Set<VaultKeyVersion>();
+  for (const database of configuredOrganisationDatabases(env)) {
+    await sweepVaultAlertSignals({
+      db: database,
+      readableKeyVersions,
+      now,
+    });
+  }
+}
+
+async function sweepVaultAlertSignals(input: {
   readonly db: OrganisationDatabase;
   readonly readableKeyVersions: ReadonlySet<VaultKeyVersion>;
   readonly now: number;

@@ -77,7 +77,6 @@ export {
   verifyRestoredVaultBackup,
   type VaultBackupEnvelope,
 } from "./backup";
-export { sweepVaultAlertSignals } from "./alerts";
 export { commandVaultItem, createVaultItem, listVaultItems } from "./items";
 export {
   commandVaultStoreItem,

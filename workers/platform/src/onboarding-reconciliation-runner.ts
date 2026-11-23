@@ -19,17 +19,14 @@ import { reconcileProviderAccountCleanup } from "@purin-labs/area-integrations/s
 import { archiveOrganisation } from "@purin-labs/tenancy/data/organisation-lifecycle";
 import { publishOrganisationDirectoryRow } from "@purin-labs/tenancy/data/shared-rows/organisation-row";
 import { publishStoppedInitialPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
+import { deleteExpiredMutationReceipts } from "@purin-labs/tenancy/data/shared-rows/mutation-receipt";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { reconcileProviderManifestObservations } from "@purin-labs/area-integrations/server/provider-lifecycle/observation";
 import { reconcileInterruptedProviderCredentialCutovers } from "@purin-labs/area-integrations/server/contract/credential-cutover";
-import {
-  loadCredentialVaultKeyRing,
-  type VaultKeyVersion,
-} from "@purin-labs/authority/credential-vault/keyring";
-import { sweepVaultAlertSignals } from "@purin-labs/authority/credential-vault/index";
+import { sweepVaultAlerts } from "@purin-labs/authority/credential-vault/alerts";
 import { reconcileOrganisationEmailWatches } from "@purin-labs/surface-email/server/mail/watch-reconciliation";
 import {
   holdOrganisationPolicyDistribution,
@@ -144,6 +141,7 @@ export async function runScheduledOnboardingReconciliation(
       await reconcileOrganisationEmailWatches({ env, scope, now });
     }
   }
+  await deleteExpiredMutationReceipts(env, now);
   await sweepVaultAlerts(env, now);
 }
 
@@ -165,20 +163,6 @@ async function hasActiveOrganisationOnboarding(
     .bind(organisationId)
     .first<{ readonly present: number }>();
   return row !== null;
-}
-
-async function sweepVaultAlerts(env: Env, now: number): Promise<void> {
-  const keyring = await loadCredentialVaultKeyRing(env);
-  const readableKeyVersions = keyring.ok
-    ? new Set(keyring.value.readable.map((binding) => binding.version))
-    : new Set<VaultKeyVersion>();
-  for (const database of configuredOrganisationDatabases(env)) {
-    await sweepVaultAlertSignals({
-      db: database,
-      readableKeyVersions,
-      now,
-    });
-  }
 }
 
 async function archiveIdleConfiguringOrganisations(
