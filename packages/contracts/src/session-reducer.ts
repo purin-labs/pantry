@@ -31,7 +31,8 @@ import type { Variant } from "@purin-labs/type-utils";
 
 // The Plan 78 port of the Rust session reducer (actor.rs) and its JSON
 // boundary (actor/serialized.rs). Each function takes the decoded request and
-// returns the response that the Wasm export writes, in serde's field order.
+// returns its response, in serde's field order; foundation/agent/actor-wasm.ts
+// reads it.
 
 export const ADVANCE_SESSION_COMMAND_SCHEMA =
   "pantry.actor.advance-session-command.v1";

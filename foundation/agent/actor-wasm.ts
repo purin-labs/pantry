@@ -5,19 +5,15 @@ import type {
   SessionTransition,
 } from "@purin-labs/contracts";
 import {
-  advanceSessionCommand as advanceSessionCommandTypescript,
-  restoreSession as restoreSessionTypescript,
-  validateHarnessCheckpointRestoreRecord as validateHarnessCheckpointRestoreRecordTypescript,
+  ADVANCE_SESSION_COMMAND_SCHEMA,
+  RESTORE_SESSION_SCHEMA,
+  VALIDATE_HARNESS_CHECKPOINT_RESTORE_SCHEMA,
+  advanceSessionCommand,
+  restoreSession,
+  validateHarnessCheckpointRestoreRecord,
 } from "@purin-labs/contracts/session-reducer";
 import type { Result } from "@purin-labs/kernel/result";
 import { isRecord } from "@purin-labs/std";
-
-const ADVANCE_SCHEMA = "pantry.actor.advance-session-command.v1";
-const RESTORE_SCHEMA = "pantry.actor.restore-session.v1";
-const VALIDATE_HARNESS_CHECKPOINT_RESTORE_SCHEMA =
-  "pantry.actor.validate-harness-checkpoint-restore.v1";
-const ENCODER = new TextEncoder();
-const DECODER = new TextDecoder();
 
 export type ActorReducerValidationError =
   | { code: "actor_reducer_response_invalid" }
@@ -30,21 +26,21 @@ export function validateCanonicalSessionAdvance(input: {
   readonly transition: SessionTransition;
   readonly state: AgentSessionLifecycle;
 }): Result<true, ActorReducerValidationError> {
-  const response = decodeResponse(
-    reducerResponse(
-      {
-        schema: ADVANCE_SCHEMA,
-        current: input.current,
-        command: input.command,
-      },
-      advanceSessionCommandTypescript,
-    ),
+  const response = reducerValue(
+    {
+      schema: ADVANCE_SESSION_COMMAND_SCHEMA,
+      current: input.current,
+      command: input.command,
+    },
+    advanceSessionCommand,
   );
   if (!response.ok) return response;
+  const { transition, state } = response.value;
+  if (!isRecord(transition) || !isRecord(state))
+    return { ok: false, error: { code: "actor_reducer_response_invalid" } };
   if (
-    JSON.stringify(response.value.transition) !==
-      JSON.stringify(input.transition) ||
-    JSON.stringify(response.value.state) !== JSON.stringify(input.state)
+    JSON.stringify(transition) !== JSON.stringify(input.transition) ||
+    JSON.stringify(state) !== JSON.stringify(input.state)
   ) {
     return { ok: false, error: { code: "actor_reducer_result_mismatch" } };
   }
@@ -62,14 +58,19 @@ export function validateCanonicalSessionRestore(input: {
   }[];
   readonly state: AgentSessionLifecycle;
 }): Result<true, ActorReducerValidationError> {
-  const response = decodeRestoreResponse(
-    reducerResponse(
-      { schema: RESTORE_SCHEMA, snapshot: input.snapshot, tail: input.tail },
-      restoreSessionTypescript,
-    ),
+  const response = reducerValue(
+    {
+      schema: RESTORE_SESSION_SCHEMA,
+      snapshot: input.snapshot,
+      tail: input.tail,
+    },
+    restoreSession,
   );
   if (!response.ok) return response;
-  return JSON.stringify(response.value.state) === JSON.stringify(input.state)
+  const state = response.value.state;
+  if (!isRecord(state))
+    return { ok: false, error: { code: "actor_reducer_response_invalid" } };
+  return JSON.stringify(state) === JSON.stringify(input.state)
     ? { ok: true, value: true }
     : { ok: false, error: { code: "actor_reducer_result_mismatch" } };
 }
@@ -78,124 +79,46 @@ export function validateCanonicalHarnessCheckpointRestore(input: {
   readonly state: AgentSessionLifecycle;
   readonly checkpoint: HarnessCheckpointRecord;
 }): Result<true, ActorReducerValidationError> {
-  return decodeValidationResponse(
-    reducerResponse(
-      {
-        schema: VALIDATE_HARNESS_CHECKPOINT_RESTORE_SCHEMA,
-        state: input.state,
-        checkpoint: input.checkpoint,
-      },
-      validateHarnessCheckpointRestoreRecordTypescript,
-    ),
+  const response = reducerValue(
+    {
+      schema: VALIDATE_HARNESS_CHECKPOINT_RESTORE_SCHEMA,
+      state: input.state,
+      checkpoint: input.checkpoint,
+    },
+    validateHarnessCheckpointRestoreRecord,
   );
-}
-
-/** The reducer's answer to the JSON request, as response bytes. */
-function reducerResponse(
-  request: object,
-  typescript: (input: unknown) => unknown,
-): Uint8Array {
-  return ENCODER.encode(typescriptText(typescript, JSON.stringify(request)));
-}
-
-function typescriptText(
-  typescript: (input: unknown) => unknown,
-  json: string,
-): string {
-  try {
-    return JSON.stringify(typescript(JSON.parse(json)));
-  } catch {
-    // A fault in the reducer answers as an invalid response, never as a state.
-    return "{}";
-  }
-}
-
-function decodeResponse(
-  bytes: Uint8Array,
-): Result<ActorAdvanceValue, ActorReducerValidationError> {
-  let decoded: unknown;
-  try {
-    decoded = JSON.parse(DECODER.decode(bytes));
-  } catch {
-    return { ok: false, error: { code: "actor_reducer_response_invalid" } };
-  }
-  if (!isRecord(decoded) || typeof decoded.status !== "string") {
-    return { ok: false, error: { code: "actor_reducer_response_invalid" } };
-  }
-  if (decoded.status === "error" && isRecord(decoded.error)) {
-    const reason = decoded.error.code;
-    return typeof reason === "string" && reason.length > 0
-      ? { ok: false, error: { code: "actor_reducer_rejected", reason } }
-      : { ok: false, error: { code: "actor_reducer_response_invalid" } };
-  }
-  if (decoded.status !== "ok" || !isRecord(decoded.value)) {
-    return { ok: false, error: { code: "actor_reducer_response_invalid" } };
-  }
-  const transition = decoded.value.transition;
-  const state = decoded.value.state;
-  return isRecord(transition) && isRecord(state)
-    ? { ok: true, value: { transition, state } }
-    : { ok: false, error: { code: "actor_reducer_response_invalid" } };
-}
-
-function decodeRestoreResponse(
-  bytes: Uint8Array,
-): Result<ActorRestoreValue, ActorReducerValidationError> {
-  let decoded: unknown;
-  try {
-    decoded = JSON.parse(DECODER.decode(bytes));
-  } catch {
-    return { ok: false, error: { code: "actor_reducer_response_invalid" } };
-  }
-  if (!isRecord(decoded) || typeof decoded.status !== "string") {
-    return { ok: false, error: { code: "actor_reducer_response_invalid" } };
-  }
-  if (decoded.status === "error" && isRecord(decoded.error)) {
-    const reason = decoded.error.code;
-    return typeof reason === "string" && reason.length > 0
-      ? { ok: false, error: { code: "actor_reducer_rejected", reason } }
-      : { ok: false, error: { code: "actor_reducer_response_invalid" } };
-  }
-  if (
-    decoded.status !== "ok" ||
-    !isRecord(decoded.value) ||
-    !isRecord(decoded.value.state)
-  ) {
-    return { ok: false, error: { code: "actor_reducer_response_invalid" } };
-  }
-  return { ok: true, value: { state: decoded.value.state } };
-}
-
-function decodeValidationResponse(
-  bytes: Uint8Array,
-): Result<true, ActorReducerValidationError> {
-  let decoded: unknown;
-  try {
-    decoded = JSON.parse(DECODER.decode(bytes));
-  } catch {
-    return { ok: false, error: { code: "actor_reducer_response_invalid" } };
-  }
-  if (!isRecord(decoded) || typeof decoded.status !== "string") {
-    return { ok: false, error: { code: "actor_reducer_response_invalid" } };
-  }
-  if (decoded.status === "error" && isRecord(decoded.error)) {
-    const reason = decoded.error.code;
-    return typeof reason === "string" && reason.length > 0
-      ? { ok: false, error: { code: "actor_reducer_rejected", reason } }
-      : { ok: false, error: { code: "actor_reducer_response_invalid" } };
-  }
-  return decoded.status === "ok" &&
-    isRecord(decoded.value) &&
-    decoded.value.valid === true
+  if (!response.ok) return response;
+  return response.value.valid === true
     ? { ok: true, value: true }
     : { ok: false, error: { code: "actor_reducer_response_invalid" } };
 }
 
-type ActorAdvanceValue = {
-  readonly transition: Record<string, unknown>;
-  readonly state: Record<string, unknown>;
-};
-
-type ActorRestoreValue = {
-  readonly state: Record<string, unknown>;
-};
+/**
+ * The value of the reducer's answer to one request. The reducer reads JSON
+ * values, as a stored or sent request holds them, so it gets a JSON copy: a
+ * field with no value is absent. A fault in the reducer answers as an invalid
+ * response, never as a state.
+ */
+function reducerValue(
+  request: object,
+  reducer: (input: unknown) => unknown,
+): Result<Record<string, unknown>, ActorReducerValidationError> {
+  let answer: unknown;
+  try {
+    answer = reducer(JSON.parse(JSON.stringify(request)));
+  } catch {
+    return { ok: false, error: { code: "actor_reducer_response_invalid" } };
+  }
+  if (!isRecord(answer) || typeof answer.status !== "string") {
+    return { ok: false, error: { code: "actor_reducer_response_invalid" } };
+  }
+  if (answer.status === "error" && isRecord(answer.error)) {
+    const reason = answer.error.code;
+    return typeof reason === "string" && reason.length > 0
+      ? { ok: false, error: { code: "actor_reducer_rejected", reason } }
+      : { ok: false, error: { code: "actor_reducer_response_invalid" } };
+  }
+  return answer.status === "ok" && isRecord(answer.value)
+    ? { ok: true, value: answer.value }
+    : { ok: false, error: { code: "actor_reducer_response_invalid" } };
+}

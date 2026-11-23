@@ -1,5 +1,5 @@
 {
-  "total": {"copies":788,"lines":14108},
+  "total": {"copies":786,"lines":14075},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -237,7 +237,6 @@
     "foundation/actor-runtime/actors/actor-relocation.ts = foundation/actor-runtime/actors/actor-relocation.ts": {"copies":1,"lines":13},
     "foundation/actor-runtime/actors/actor-relocation.ts = foundation/actor-runtime/actors/actor-restore.ts": {"copies":1,"lines":21},
     "foundation/actor-runtime/actors/actor-restore.ts = foundation/actor-runtime/actors/actor-restore.ts": {"copies":5,"lines":80},
-    "foundation/agent/actor-wasm.ts = foundation/agent/actor-wasm.ts": {"copies":2,"lines":33},
     "foundation/agent/actors/actor-journal/parsers.ts = foundation/agent/context/assembly/index.ts": {"copies":1,"lines":28},
     "foundation/agent/actors/actor-journal/transactions.ts = foundation/agent/actors/actor-journal/transactions.ts": {"copies":14,"lines":223},
     "foundation/agent/actors/actor-journal/transactions.ts = foundation/agent/actors/actor-journal/transitions.ts": {"copies":7,"lines":60},
