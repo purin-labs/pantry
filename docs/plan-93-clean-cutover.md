@@ -980,9 +980,12 @@ Stripe Connect redirects, the Meta webhook and the remaining console names.
   the domain: the site then shows Cloudflare error 522 for about 10
   seconds (staging) to 55 seconds (production). A move without the CNAME
   change stays at "CNAME record not set" (staging showed 522 for 10
-  minutes before the rollback). The Pantry token cannot edit DNS. The old
-  projects `seams-site` and `seams-site-staging` hold no custom domain and
-  wait for the owner's word to delete them.
+  minutes before the rollback). The Pantry token cannot edit DNS. On the
+  owner's yes, the old projects `seams-site` and `seams-site-staging` are
+  deleted. Cloudflare refuses to delete a project with too many deployments
+  (code 8000076), so their 439 old deployments were deleted first. The
+  account's Pages projects are now `purin-app`, `purin-app-staging` and
+  `speak-to-sign`.
 - **Deferred on 23 November 2026:** the Meta webhook and every WhatsApp
   check. Meta banned the owner's account.
 - **Closed:** the stale zone record `seams.sh` (its name servers point to the
