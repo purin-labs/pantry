@@ -34,7 +34,7 @@ const TEST_SECRET_BINDINGS = {
   STRIPE_CONNECT_WEBHOOK_SECRET: "whsec_e2e",
   ORGANISATION_ADMIN_TOKEN: "organisation-admin-e2e-token-000000000000",
   COMMERCE_SERVICE_TOKEN: "commerce-e2e-token",
-  PANTRY_FAULT_INJECTION_TOKEN: "fault-injection-e2e-token",
+  PANTRY_FAULT_INJECTION_TOKEN: "fault-injection-e2e-token-0000000000000",
   WHATSAPP_APP_SECRET: "whatsapp-e2e-app-secret",
 } as const;
 
