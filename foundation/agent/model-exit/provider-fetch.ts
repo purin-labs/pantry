@@ -9,8 +9,8 @@ export type ModelExitBinding = {
 
 /**
  * The fetch of a direct request to a model provider: the ChatGPT
- * subscription, OpenAI, Anthropic and the Claude account, with their
- * sign-in, refresh and allowance requests. The request goes through the
+ * subscription, OpenAI, Anthropic, the Gemini API and the Claude account,
+ * with their sign-in, refresh and allowance requests. The request goes through the
  * model exit Worker, which runs near AWS Tokyo. A chatgpt.com request goes
  * through the ChatGPT exit instead: chatgpt.com refuses requests from a
  * Worker and accepts them from a container. The OpenRouter platform route

@@ -154,12 +154,12 @@ export type PiInferenceRoute =
   | {
       /**
        * The organisation's ChatGPT subscription through pi-ai's legacy
-       * Codex provider. Its effort is a thinking level, `high` or `xhigh`.
+       * Codex provider. Its effort is the thinking level `high`.
        */
       readonly kind: "openai-codex";
       readonly model: Model<"openai-codex-responses">;
       readonly provider: Provider<"openai-codex-responses">;
-      readonly thinkingLevel: "high" | "xhigh";
+      readonly thinkingLevel: "high";
       readonly providerFetch: typeof fetch;
       resolveModelApiKey(): Promise<string>;
       observeResponse: OrganisationChatGptSubscriptionLease["observeResponse"];
@@ -174,7 +174,7 @@ export type PiInferenceRoute =
       readonly kind: "openai-chatgpt";
       readonly model: Model<"openai-responses">;
       readonly provider: Provider<"openai-responses">;
-      readonly thinkingLevel: "high" | "xhigh";
+      readonly thinkingLevel: "high";
       readonly providerFetch: typeof fetch;
       resolveModelApiKey(): Promise<string>;
       observeResponse: OrganisationChatGptSubscriptionLease["observeResponse"];

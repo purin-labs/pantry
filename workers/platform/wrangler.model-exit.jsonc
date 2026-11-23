@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   // The model exit Worker (Plan 73). The Platform Worker sends each direct
   // request to a model provider through it: the ChatGPT subscription, the
-  // BYO OpenAI and Anthropic keys and the Claude account, with their
+  // BYO OpenAI, Anthropic and Gemini keys and the Claude account, with their
   // sign-in, refresh and allowance requests. OpenAI and Anthropic refuse
   // requests from Hong Kong, and a Session with the "apac" location hint
   // can run there. This Worker runs near AWS Tokyo, so the provider sees a
