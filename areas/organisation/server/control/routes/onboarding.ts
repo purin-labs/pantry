@@ -3,7 +3,10 @@ import { signalChat } from "@purin-labs/conversation/chat/signals";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import type { Env } from "@purin-labs/kernel/env";
 import { createOwnedOrganisation } from "@purin-labs/tenancy/organisation-access/creation";
-import { readOrganisationCreationRequest } from "@purin-labs/control-api";
+import {
+  readOrganisationCreationRequest,
+  readOrganisationName,
+} from "@purin-labs/control-api";
 import {
   acceptInvitation,
   issueInvitation,
@@ -388,16 +391,8 @@ async function handleOrganisationRename(
   );
   if (!authorized.ok) return authorized.response;
   const body = await readJsonRecord(request);
-  const name =
-    body.ok && typeof body.value.name === "string"
-      ? body.value.name.trim()
-      : "";
-  if (
-    !body.ok ||
-    name.length < 2 ||
-    name.length > 80 ||
-    Object.keys(body.value).length !== 1
-  ) {
+  const name = body.ok ? readOrganisationName(body.value.name) : null;
+  if (!body.ok || name === null || Object.keys(body.value).length !== 1) {
     return controlError("organisation_rename_request_invalid", 422);
   }
   const admitted = await admitUserMutation({

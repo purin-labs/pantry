@@ -24,8 +24,24 @@ export type OrganisationCreationRequest = Readonly<{
   purpose?: "test";
 }>;
 
+/** The shortest organisation name that Pantry takes, after a trim. */
+export const ORGANISATION_NAME_MIN = 2;
 /** The longest organisation name that Pantry takes, after a trim. */
 export const ORGANISATION_NAME_MAX = 120;
+
+/**
+ * The trimmed name, or null when it is not a string of
+ * `ORGANISATION_NAME_MIN` to `ORGANISATION_NAME_MAX` characters. Creation and
+ * a rename take the same names.
+ */
+export function readOrganisationName(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const name = value.trim();
+  return name.length < ORGANISATION_NAME_MIN ||
+    name.length > ORGANISATION_NAME_MAX
+    ? null
+    : name;
+}
 
 const OPERATION_ID = /^[A-Za-z0-9_-]{8,128}$/u;
 
@@ -40,12 +56,11 @@ export function readOrganisationCreationRequest(
     !isRecord(value) ||
     typeof value.operationId !== "string" ||
     !OPERATION_ID.test(value.operationId) ||
-    typeof value.name !== "string" ||
     (value.purpose !== undefined && value.purpose !== "test")
   )
     return null;
-  const name = value.name.trim();
-  if (name.length === 0 || name.length > ORGANISATION_NAME_MAX) return null;
+  const name = readOrganisationName(value.name);
+  if (name === null) return null;
   return value.purpose === "test"
     ? { operationId: value.operationId, name, purpose: "test" }
     : { operationId: value.operationId, name };

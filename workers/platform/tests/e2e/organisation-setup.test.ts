@@ -35,6 +35,16 @@ it(
   120_000,
 );
 
+// One name rule for an Organisation. The owner makes one with the longest
+// name that Pantry takes and renames it to another name of that length and
+// to the shortest one. A name that is one character too short or too long is
+// refused, at creation and at a rename, as a problem with the name.
+it(
+  "takes the same organisation names at creation and at a rename, and refuses a name that is too short or too long at both",
+  nameRuleJourney,
+  120_000,
+);
+
 type Created = Readonly<{
   status: number;
   organisationId: string | null;
@@ -129,6 +139,68 @@ async function setupJourney(context: TestContext): Promise<void> {
       fifthAgain.organisationId === more[3]?.organisationId,
     ownedOrganisations: owned.length,
     unverified,
+  };
+}
+
+async function nameRuleJourney(context: TestContext): Promise<void> {
+  const owner = await commerceClient(`name-owner-${crypto.randomUUID()}`);
+  const longest = "Rhubarb and Rye Bakery ".repeat(6).slice(0, 120);
+  const otherLongest = "Croissant and Coffee House ".repeat(5).slice(0, 120);
+  expect([longest.trim().length, otherLongest.trim().length]).toEqual([
+    120, 120,
+  ]);
+
+  // Denied at creation: one character, and 121 characters.
+  const tooShort = await create(owner.session, "name_operation_short", "Q");
+  const tooLong = await create(
+    owner.session,
+    "name_operation_long",
+    `${longest}X`,
+  );
+  expect([tooShort, tooLong]).toEqual([
+    { status: 422, organisationId: null, code: "organisation_create_invalid" },
+    { status: 422, organisationId: null, code: "organisation_create_invalid" },
+  ]);
+  expect(await ownedOrganisations(owner.session)).toEqual([]);
+
+  const made = await create(owner.session, "name_operation_made", longest);
+  expect(made.status, JSON.stringify(made)).toBe(200);
+  const organisationId = String(made.organisationId);
+
+  // A rename takes each name that creation takes.
+  const renamedLongest = await rename(
+    owner.session,
+    organisationId,
+    otherLongest,
+  );
+  expect(renamedLongest).toEqual({ status: 200, code: null });
+  expect(await organisationName(owner.session, organisationId)).toBe(
+    otherLongest,
+  );
+  const renamedShortest = await rename(owner.session, organisationId, "Ox");
+  expect(renamedShortest).toEqual({ status: 200, code: null });
+
+  // Denied at a rename: the same two names that creation refused.
+  const renamedTooShort = await rename(owner.session, organisationId, "Q");
+  const renamedTooLong = await rename(
+    owner.session,
+    organisationId,
+    `${longest}X`,
+  );
+  expect([renamedTooShort, renamedTooLong]).toEqual([
+    { status: 422, code: "organisation_rename_request_invalid" },
+    { status: 422, code: "organisation_rename_request_invalid" },
+  ]);
+  expect(await organisationName(owner.session, organisationId)).toBe("Ox");
+
+  context.task.meta.organisationSetup = {
+    createdTooShort: tooShort,
+    createdTooLong: tooLong,
+    created: made.status,
+    renamedLongest,
+    renamedShortest,
+    renamedTooShort,
+    renamedTooLong,
   };
 }
 
@@ -246,6 +318,61 @@ async function organisationEnvironment(
   if (response.status !== 200 || found.length === 0)
     throw new Error(`No environment in ${JSON.stringify(body).slice(0, 400)}`);
   return new Set(found).size === 1 ? found[0] : found;
+}
+
+/** The projection of the organisation, as the Portal reads it. */
+async function organisationProjection(
+  session: IssuedControlSession,
+  organisationId: string,
+): Promise<Readonly<{ configurationVersion: number; name: string }>> {
+  const response = await exports.default.fetch(
+    `https://localhost/v1/control/organisations/${organisationId}`,
+    { headers: commerceHeaders(session) },
+  );
+  const body: unknown = await response.json();
+  if (
+    response.status !== 200 ||
+    !isRecord(body) ||
+    typeof body.configuration_version !== "number" ||
+    !isRecord(body.organisation) ||
+    typeof body.organisation.name !== "string"
+  )
+    throw new Error(`No projection in ${JSON.stringify(body).slice(0, 400)}`);
+  return {
+    configurationVersion: body.configuration_version,
+    name: body.organisation.name,
+  };
+}
+
+async function organisationName(
+  session: IssuedControlSession,
+  organisationId: string,
+): Promise<string> {
+  return (await organisationProjection(session, organisationId)).name;
+}
+
+/** The rename of the Organisations page, with the version that it read. */
+async function rename(
+  session: IssuedControlSession,
+  organisationId: string,
+  name: string,
+): Promise<Readonly<{ status: number; code: string | null }>> {
+  const { configurationVersion } = await organisationProjection(
+    session,
+    organisationId,
+  );
+  const headers = commerceHeaders(session);
+  headers.set("idempotency-key", crypto.randomUUID());
+  headers.set("x-pantry-configuration-version", String(configurationVersion));
+  const response = await exports.default.fetch(
+    `https://localhost/v1/control/organisations/${organisationId}`,
+    { method: "PATCH", headers, body: JSON.stringify({ name }) },
+  );
+  const body: unknown = await response.json();
+  return {
+    status: response.status,
+    code: isRecord(body) && typeof body.error === "string" ? body.error : null,
+  };
 }
 
 async function create(

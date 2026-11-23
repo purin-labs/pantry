@@ -9,7 +9,10 @@ import type {
   GlobalDatabase,
   OrganisationDatabase,
 } from "@purin-labs/kernel/database-handles";
-import type { ControlMembershipAvailability } from "@purin-labs/control-api";
+import {
+  readOrganisationName,
+  type ControlMembershipAvailability,
+} from "@purin-labs/control-api";
 import type {
   OrganisationAccess,
   OrganisationAdmissionAction,
@@ -2030,10 +2033,8 @@ function normalizeDisplayName(displayName: string): string {
 }
 
 function normalizeOrganisationName(organisationName: string): string {
-  const normalized = organisationName.trim();
-  if (normalized.length < 2 || normalized.length > 120) {
-    throw new Error("organisation name is invalid");
-  }
+  const normalized = readOrganisationName(organisationName);
+  if (normalized === null) throw new Error("organisation name is invalid");
   return normalized;
 }
 

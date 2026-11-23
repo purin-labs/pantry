@@ -306,7 +306,8 @@ connections and Vault secrets, and it purges the Organisation.
 - `packages/contracts/src/types/` holds `OnboardingProjectionV1`,
   `OrganisationOnboardingLifecycle`, `FirstOperationalTask` and the other `Onboarding*`
   types. `packages/control-api/src/organisations.ts` holds
-  `readOrganisationCreationRequest` and `ORGANISATION_NAME_MAX`.
+  `readOrganisationCreationRequest` and the one name rule of creation and rename
+  (`readOrganisationName`, `ORGANISATION_NAME_MIN`, `ORGANISATION_NAME_MAX`).
 
 `GET …` returns one `OnboardingProjectionV1` (`data/onboarding-projection.ts`): the
 revisions, the Organisation, the membership, the steps, the provider accounts, the
@@ -321,20 +322,20 @@ a match answers 304.
 The routes are in `control/routes/onboarding.ts` and `control/routes/operators.ts`.
 `…` is `/v1/control/organisations/:id`. FND-06 has the member and invitation routes.
 
-| Route                                                                  | Role            | Purpose                                                      |
-| ---------------------------------------------------------------------- | --------------- | ------------------------------------------------------------ |
-| `GET /home-regions`, `GET /setup/catalog`                              | A session       | The placement cells; the templates and presets               |
-| `GET`, `POST /organisations`                                           | A session       | The memberships; make an Organisation                        |
-| `GET …`                                                                | Viewer          | The projection, after a readiness refresh                    |
-| `PATCH …`, `DELETE …`                                                  | Owner           | Rename (2 to 80 characters); delete an archived Organisation |
-| `PUT …/setup`                                                          | Admin           | Save the setup                                               |
-| `POST …/onboarding/stage-viewed`                                       | Viewer          | Record `onboarding_stage_viewed`                             |
-| `GET …/readiness`                                                      | Viewer          | The current assessment, after a manifest check               |
-| `POST …/activate`, `…/archive`, `…/restore`                            | Admin           | Activate, archive, restore                                   |
-| `GET …/support/:reference`                                             | Viewer          | Diagnostics of one support reference                         |
-| `GET /operator/onboarding`                                             | `support_agent` | Look up onboarding cases                                     |
-| `POST /operator/organisations/:id/reconcile`, `…/actions`              | `support_admin` | Reconcile now; one support action                            |
-| `GET /operator/organisations/:id/harness-history`, `…/harness-erasure` | `support_admin` | The harness history; the erasure receipts                    |
+| Route                                                                  | Role            | Purpose                                                       |
+| ---------------------------------------------------------------------- | --------------- | ------------------------------------------------------------- |
+| `GET /home-regions`, `GET /setup/catalog`                              | A session       | The placement cells; the templates and presets                |
+| `GET`, `POST /organisations`                                           | A session       | The memberships; make an Organisation                         |
+| `GET …`                                                                | Viewer          | The projection, after a readiness refresh                     |
+| `PATCH …`, `DELETE …`                                                  | Owner           | Rename (2 to 120 characters); delete an archived Organisation |
+| `PUT …/setup`                                                          | Admin           | Save the setup                                                |
+| `POST …/onboarding/stage-viewed`                                       | Viewer          | Record `onboarding_stage_viewed`                              |
+| `GET …/readiness`                                                      | Viewer          | The current assessment, after a manifest check                |
+| `POST …/activate`, `…/archive`, `…/restore`                            | Admin           | Activate, archive, restore                                    |
+| `GET …/support/:reference`                                             | Viewer          | Diagnostics of one support reference                          |
+| `GET /operator/onboarding`                                             | `support_agent` | Look up onboarding cases                                      |
+| `POST /operator/organisations/:id/reconcile`, `…/actions`              | `support_admin` | Reconcile now; one support action                             |
+| `GET /operator/organisations/:id/harness-history`, `…/harness-erasure` | `support_admin` | The harness history; the erasure receipts                     |
 
 - Rename, delete, setup, activate, archive and restore need the `Origin`, the CSRF
   header (FND-06), an `idempotency-key` of 8 to 128 characters and
@@ -366,14 +367,14 @@ The routes are in `control/routes/onboarding.ts` and `control/routes/operators.t
 | Rename, delete an archived Organisation        | No                                                 | No       | No    | Yes   | No                                     | No    |
 | Disable, reconnect or rotate an account        | No                                                 | No       | Yes   | Yes   | `disable_account`                      | No    |
 
-| Limit                                      | Value                        | Constant                                            |
-| ------------------------------------------ | ---------------------------- | --------------------------------------------------- |
-| Active Organisations of one owner          | 5                            | `ORGANISATION_OWNER_LIMIT`                          |
-| Organisation name at creation; at a rename | 1 to 120; 2 to 80 characters | `ORGANISATION_NAME_MAX`; no constant for the rename |
-| Activation lease                           | 5 minutes                    | `ACTIVATION_LEASE_MS`                               |
-| Time from archive to purge                 | 30 days                      | `ARCHIVE_PURGE_DELAY_MS`                            |
-| Idle time before the automatic archive     | 30 days                      | `AUTOMATIC_ARCHIVE_IDLE_MS`                         |
-| Mutation receipt                           | At least 24 hours            | `MUTATION_RECEIPT_TTL_MS`                           |
+| Limit                                          | Value               | Constant                                         |
+| ---------------------------------------------- | ------------------- | ------------------------------------------------ |
+| Active Organisations of one owner              | 5                   | `ORGANISATION_OWNER_LIMIT`                       |
+| Organisation name, at creation and at a rename | 2 to 120 characters | `ORGANISATION_NAME_MIN`, `ORGANISATION_NAME_MAX` |
+| Activation lease                               | 5 minutes           | `ACTIVATION_LEASE_MS`                            |
+| Time from archive to purge                     | 30 days             | `ARCHIVE_PURGE_DELAY_MS`                         |
+| Idle time before the automatic archive         | 30 days             | `AUTOMATIC_ARCHIVE_IDLE_MS`                      |
+| Mutation receipt                               | At least 24 hours   | `MUTATION_RECEIPT_TTL_MS`                        |
 
 - **Lifecycle authority.** `data/organisation-lifecycle-moves.ts` writes each move of
   the lifecycle. A relocation copy and `restoreOrganisationDataArchive` insert the

@@ -3,6 +3,7 @@ import { Check, CircleAlert } from "lucide-react";
 import { Link } from "react-router";
 import {
   ORGANISATION_NAME_MAX,
+  ORGANISATION_NAME_MIN,
   readOrganisationCreationRequest,
   type CreatedOrganisation,
   type OrganisationCreationRequest,
@@ -431,7 +432,10 @@ export class AccountSetup extends React.Component<
       name,
     });
     if (request === null) {
-      this.showName(name, "Enter a name for the organisation.");
+      this.showName(
+        name,
+        `Enter a name of ${ORGANISATION_NAME_MIN} to ${ORGANISATION_NAME_MAX} characters for the organisation.`,
+      );
       return;
     }
     try {

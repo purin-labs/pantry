@@ -1,4 +1,9 @@
-import type { ControlMembershipAvailability } from "@purin-labs/control-api";
+import {
+  ORGANISATION_NAME_MAX,
+  ORGANISATION_NAME_MIN,
+  readOrganisationName,
+  type ControlMembershipAvailability,
+} from "@purin-labs/control-api";
 import React from "react";
 import {
   Archive,
@@ -685,8 +690,8 @@ function RenameOrganisationDialog(props: {
             ref={nameField}
             name="organisationName"
             defaultValue={props.item.name}
-            minLength={2}
-            maxLength={80}
+            minLength={ORGANISATION_NAME_MIN}
+            maxLength={ORGANISATION_NAME_MAX}
             required
             aria-invalid={props.request.kind === "failed"}
             aria-describedby={
@@ -802,17 +807,22 @@ async function submitOrganisationRename(
   event: React.FormEvent<HTMLFormElement>,
 ): Promise<void> {
   event.preventDefault();
-  const name = new FormData(event.currentTarget).get("organisationName");
-  if (typeof name !== "string" || name.trim().length < 2) {
+  const name = readOrganisationName(
+    new FormData(event.currentTarget).get("organisationName"),
+  );
+  if (name === null) {
     setState({
       kind: "renaming",
-      request: { kind: "failed", message: "Enter an organisation name." },
+      request: {
+        kind: "failed",
+        message: `Enter an organisation name of ${ORGANISATION_NAME_MIN} to ${ORGANISATION_NAME_MAX} characters.`,
+      },
     });
     return;
   }
   setState({ kind: "renaming", request: { kind: "busy" } });
   try {
-    await actions.rename(item, name.trim());
+    await actions.rename(item, name);
     setState({ kind: "idle" });
     refresh();
   } catch {
