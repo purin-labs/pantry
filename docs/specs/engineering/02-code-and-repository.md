@@ -261,8 +261,10 @@ This subsystem has no role check. A person and an agent pass the same lints.
 | R2 download tries                               | 4, with waits of 2, 8 and 30 s      | `DOWNLOAD_RETRY_DELAYS_MS`                     |
 | A plan number                                   | At most three digits and one letter | `MENTION`, `scripts/check-plan-numbers.mjs`    |
 
-- **File size scope.** The lint reads `.ts`, `.tsx`, `.mjs`, `.js` and `.css` under
-  `SOURCE_ROOTS`, `.rs` under `crates/`, and `.mjs`, `.js` and `.py` under `scripts/`.
+- **File size scope.** The lint reads each JavaScript and TypeScript file (`.ts`,
+  `.tsx`, `.mts`, `.cts`, `.js`, `.jsx`, `.mjs`, `.cjs`) under `SOURCE_ROOTS` and
+  `scripts/`, `.css` under `SOURCE_ROOTS`, `.py` under `scripts/` and `.rs` under
+  `crates/`.
   It skips tests, bindings, generated files, `dist`, `public`, `vendor` and
   `packages/commerce-contracts/src/unicode-tables.ts`.
 - **Tracked files only.** The file size, doc link and plan number lints read
@@ -309,7 +311,6 @@ acceptance before Stage B moves its files.
 
 **Gaps in the lints.**
 
-- `lint:file-size` does not read `.ts` or `.cjs` files under `scripts/`.
 - `lint:layers` finds a package by its folder name, so it does not see an import of
   `@purin-labs/commerce-worker`. `lint:runtime-boundary` refuses that import outside
   the commerce code.

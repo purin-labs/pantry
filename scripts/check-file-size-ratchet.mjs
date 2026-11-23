@@ -24,11 +24,13 @@ const LIMIT = 3000;
 // Source code only: tests, generated files and data tables are not checked.
 // Since Refactor 16 step 14 the ratchet also covers the Rust crates and the
 // scripts (journeys, builders and tools). Since Refactor 17 step A2.3 it
-// covers the style sheets.
+// covers the style sheets. Each JavaScript or TypeScript form counts, also a
+// CommonJS file such as scripts/shop-voice/portal-browser.cjs.
+const SCRIPT = "ts|tsx|mts|cts|js|jsx|mjs|cjs";
 const SOURCE = [
-  new RegExp(`^(${SOURCE_ROOTS.join("|")})/.+\\.(ts|tsx|mjs|js|css)$`),
+  new RegExp(`^(${SOURCE_ROOTS.join("|")})/.+\\.(${SCRIPT}|css)$`),
   /^crates\/.+\.rs$/,
-  /^scripts\/.+\.(mjs|js|py)$/,
+  new RegExp(`^scripts/.+\\.(${SCRIPT}|py)$`),
 ];
 const EXCLUDED = [
   /(^|\/)(tests?|bindings|generated|dist|public|vendor|node_modules)\//,
