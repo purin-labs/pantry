@@ -241,10 +241,11 @@ async function executeSelectedTool(
   }
   const request = tool.parse(input);
   if (tool.selection.kind === "capability") {
-    await claimDirectCapability(
+    await claimToolCapability(
       authority.claimCapability,
       callId,
       tool.selection.capability,
+      execution.kind === "code_mode" ? "code_mode" : "direct_tool",
     );
   }
   const call = {
@@ -262,16 +263,17 @@ async function executeSelectedTool(
   return handler(request, call);
 }
 
-async function claimDirectCapability(
+/**
+ * Claims the capability of one call from the run budget. The claim id names
+ * the boundary: a call of the model or a call inside a Code Mode script.
+ */
+async function claimToolCapability(
   claimCapability: HarnessCapabilityClaim,
   callId: string,
   capability: HarnessCapabilityName,
+  boundary: "direct_tool" | "code_mode",
 ): Promise<null> {
-  const claimed = await claimCapability({
-    callId,
-    capability,
-    boundary: "direct_tool",
-  });
+  const claimed = await claimCapability({ callId, capability, boundary });
   if (!claimed.ok) {
     throw claimed.error.detail === "budget_exhausted"
       ? new CapabilityBudgetError(CAPABILITY_BUDGET_TEXT)
