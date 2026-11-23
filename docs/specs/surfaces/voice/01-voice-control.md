@@ -172,7 +172,10 @@ Mac's private IPv4 address, and the Platform refuses a public address.
 - The Mac runs one command and holds two more. After that it answers `busy`.
 - No audio goes to disk. No transcript or answer text goes to a log or to the Platform.
 - The service keeps the Mac awake. It updates only with `install.sh --update`.
-- At a revoke, the Platform clears the Mac's secrets and removes its DNS names. At the
+- At a revoke, the Platform clears the Mac's secrets and removes its DNS names. If DNS
+  fails, the revoke answers `dnsRemoved: false`, and the row keeps the private address
+  that the name still holds. The 15-minute run tries each such name again
+  (`retryRevokedVoiceMacNames`), and clears the address when the name is gone. At the
   first refused heartbeat (a 401 answer), the Mac stops all answers. After five refused
   heartbeats, it deletes its models, certificate and credential and stays stopped. Only
   an accepted heartbeat resets the count. A 503, a lost network or an answer that the
@@ -407,8 +410,6 @@ The talk key works only while the page is in front.
 - **Smaller Macs.** Plan 82C measured the engines on an M4 Pro. A Mac with less memory is
   not measured.
 - **Known faults in the code:**
-  - A failed DNS removal at a revoke is not tried again before the end of the
-    Organisation.
   - Each Mac heartbeat writes one D1 row, also when nothing changed.
   - A heartbeat 401 does not always mean a revoke. The Platform also answers 401 if the
     Organisation scope does not resolve, for example at a placement conflict, or if a

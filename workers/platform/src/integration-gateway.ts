@@ -5,6 +5,7 @@ import type { GatewayRoute } from "@purin-labs/surface-webhooks/server/gateway-r
 import { matchGatewayRoute } from "@purin-labs/surface-webhooks/server/gateway-routing/match";
 import { handleSlackInteractions } from "@purin-labs/surface-slack/server/interactions";
 import { runScheduledOnboardingReconciliation } from "./onboarding-reconciliation-runner";
+import { retryRevokedVoiceMacNames } from "@purin-labs/surface-voice/server/dns";
 import {
   handleCommerceLabRoute,
   matchCommerceLabRoute,
@@ -181,6 +182,7 @@ export default {
     ctx.waitUntil(
       runScheduledActorRegistryReconciliation(env, controller.scheduledTime),
     );
+    ctx.waitUntil(retryRevokedVoiceMacNames(env));
   },
 } satisfies ExportedHandler<Env, unknown>;
 

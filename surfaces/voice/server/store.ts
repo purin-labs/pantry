@@ -13,7 +13,10 @@ import { encodeBase64Url, sha256Hex } from "@purin-labs/std";
 
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { readOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
-import type { OrganisationId } from "@purin-labs/kernel/ids";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 
 const CODE_TTL_MS = 15 * 60_000;
@@ -364,6 +367,11 @@ export async function listVoiceMacNameIds(
   return rows.results.map((row) => row.name_id);
 }
 
+/**
+ * Revokes a Mac and clears its secrets at once. It keeps the private address
+ * while the Mac's public name still holds it: `forgetRevokedVoiceMacAddress`
+ * clears it when the name is gone from DNS.
+ */
 export async function revokeVoiceMac(
   db: OrganisationDatabase,
   input: Readonly<{
@@ -377,14 +385,70 @@ export async function revokeVoiceMac(
     .prepare(
       `UPDATE voice_mac
           SET state = 'revoked', credential_sha256 = NULL, code_sha256 = NULL,
-              code_expires_at = NULL, private_address = NULL,
-              revoked_at = ?, revoked_by_user_id = ?
+              code_expires_at = NULL, revoked_at = ?, revoked_by_user_id = ?
         WHERE mac_id = ? AND organisation_id = ? AND state <> 'revoked'
         RETURNING name_id`,
     )
     .bind(input.now, input.userId, input.macId, input.organisationId)
     .first<{ name_id: string }>();
   return row === null ? null : { nameId: row.name_id };
+}
+
+/** A revoked Mac whose public name may still hold its private address. */
+export type RevokedVoiceMacName = Readonly<{
+  organisationId: OrganisationId;
+  macId: string;
+  nameId: string;
+}>;
+
+/** A run that tries again finds at most this many names. */
+const REVOKED_NAME_BATCH = 50;
+
+/**
+ * The revoked Macs whose names a revoke could not remove from DNS, in every
+ * Organisation of this database, the oldest revoke first.
+ */
+export async function listRevokedVoiceMacNames(
+  db: OrganisationDatabase,
+): Promise<readonly RevokedVoiceMacName[]> {
+  const rows = await db
+    .prepare(
+      `SELECT organisation_id AS organisationId, mac_id AS macId,
+              name_id AS nameId
+         FROM voice_mac
+        WHERE state = 'revoked' AND private_address IS NOT NULL
+        ORDER BY revoked_at, mac_id
+        LIMIT ?`,
+    )
+    .bind(REVOKED_NAME_BATCH)
+    .all<Readonly<{ organisationId: string; macId: string; nameId: string }>>();
+  return rows.results.flatMap((row) => {
+    const organisationId = parseOrganisationId(row.organisationId);
+    return organisationId.ok
+      ? [
+          {
+            organisationId: organisationId.value,
+            macId: row.macId,
+            nameId: row.nameId,
+          },
+        ]
+      : [];
+  });
+}
+
+/** The name of a revoked Mac is gone from DNS, so its row keeps no address. */
+export async function forgetRevokedVoiceMacAddress(
+  db: OrganisationDatabase,
+  mac: Pick<RevokedVoiceMacName, "organisationId" | "macId">,
+): Promise<void> {
+  await db
+    .prepare(
+      `UPDATE voice_mac SET private_address = NULL
+        WHERE mac_id = ? AND organisation_id = ? AND state = 'revoked'
+          AND private_address IS NOT NULL`,
+    )
+    .bind(mac.macId, mac.organisationId)
+    .run();
 }
 
 /**

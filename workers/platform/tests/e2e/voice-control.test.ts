@@ -1,4 +1,9 @@
 import { env, exports } from "cloudflare:workers";
+import {
+  createExecutionContext,
+  createScheduledController,
+  waitOnExecutionContext,
+} from "cloudflare:test";
 import { fixtureDatabase } from "./organisation-database";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { afterEach, beforeEach, expect, it, type TestContext } from "vitest";
@@ -18,6 +23,7 @@ import {
   deleteArchivedOrganisation,
 } from "@purin-labs/tenancy/data/organisation-lifecycle";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
+import gateway from "../../src/integration-gateway";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
@@ -241,6 +247,20 @@ function sendAudio(
       body: audio,
     },
   );
+}
+
+/** The Worker's 15-minute cron trigger, with every job that it starts. */
+async function runFifteenMinuteJobs(): Promise<void> {
+  const context = createExecutionContext();
+  gateway.scheduled(
+    createScheduledController({
+      cron: "*/15 * * * *",
+      scheduledTime: Date.now(),
+    }),
+    env,
+    context,
+  );
+  await waitOnExecutionContext(context);
 }
 
 function heartbeat(
@@ -920,19 +940,26 @@ async function voiceControlJourney(_test: TestContext): Promise<void> {
     ]),
   });
 
-  // 15. Revocation removes the Mac's names and stops its credential.
+  // 15. Revocation stops the Mac's credential at once. DNS is down, so the
+  // Mac's name keeps its private address until the next 15-minute run.
+  dnsDown = true;
   const revoked = await post(
     owner,
     voicePath(owner, `macs/${macId}/revoke`),
     {},
   );
-  expect(await json(revoked)).toEqual({ ok: true, dnsRemoved: true });
-  expect(records).toEqual([]);
+  expect(await json(revoked)).toEqual({ ok: true, dnsRemoved: false });
   await expectError(
     heartbeat(credential, "192.168.1.20"),
     401,
     "voice_mac_refused",
   );
+  expect(records).toMatchObject([{ type: "A", content: "192.168.1.31" }]);
+  await runFifteenMinuteJobs();
+  expect(records).toHaveLength(1);
+  dnsDown = false;
+  await runFifteenMinuteJobs();
+  expect(records).toEqual([]);
   await expectError(
     voiceMacRequest(credential, "vocabulary", "GET"),
     401,

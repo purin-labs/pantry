@@ -26,7 +26,7 @@ import {
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { removeVoiceMacRecords, voiceMacHostname } from "./dns";
+import { removeRevokedVoiceMacName, voiceMacHostname } from "./dns";
 import {
   checkVoiceConfirmation,
   issueVoiceConfirmation,
@@ -434,8 +434,15 @@ async function revoke(
     now: Date.now(),
   });
   if (revoked === null) return controlError("voice_mac_not_found", 404);
-  const hostname = voiceMacHostname(env, revoked.nameId);
-  const dnsRemoved =
-    hostname !== null && (await removeVoiceMacRecords(env, hostname));
+  // A name that stays in DNS is tried again by the 15-minute run.
+  const dnsRemoved = await removeRevokedVoiceMacName(
+    env,
+    authorized.executionScope.database,
+    {
+      organisationId: authorized.organisationId,
+      macId,
+      nameId: revoked.nameId,
+    },
+  );
   return controlJson({ ok: true, dnsRemoved });
 }

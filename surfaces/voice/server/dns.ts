@@ -1,4 +1,11 @@
 import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import { configuredOrganisationDatabases } from "@purin-labs/tenancy/organisation-execution-scope";
+import {
+  forgetRevokedVoiceMacAddress,
+  listRevokedVoiceMacNames,
+  type RevokedVoiceMacName,
+} from "./store";
 
 const CLOUDFLARE_API = "https://api.cloudflare.com/client/v4";
 const RECORD_TTL_SECONDS = 60;
@@ -127,7 +134,7 @@ export const putVoiceMacChallenge = (
 export const removeVoiceMacChallenge = (env: Env, hostname: string) =>
   removeRecords(env, "TXT", `_acme-challenge.${hostname}`);
 
-export async function removeVoiceMacRecords(
+async function removeVoiceMacRecords(
   env: Env,
   hostname: string,
 ): Promise<boolean> {
@@ -153,4 +160,33 @@ export async function removeVoiceMacNames(
     }),
   );
   return removed.every(Boolean);
+}
+
+/**
+ * Removes the names of a revoked Mac. Its row forgets the private address only
+ * when the names are gone, so a name that stays is tried again.
+ */
+export async function removeRevokedVoiceMacName(
+  env: Env,
+  db: OrganisationDatabase,
+  mac: RevokedVoiceMacName,
+): Promise<boolean> {
+  const hostname = voiceMacHostname(env, mac.nameId);
+  if (hostname === null || !(await removeVoiceMacRecords(env, hostname)))
+    return false;
+  await forgetRevokedVoiceMacAddress(db, mac);
+  return true;
+}
+
+/**
+ * The 15-minute run tries again each name that a revoke could not remove, in
+ * each Organisation database, so the private address of a revoked Mac does not
+ * stay in public DNS. With no voice zone it reads nothing, and with no such
+ * name it writes nothing.
+ */
+export async function retryRevokedVoiceMacNames(env: Env): Promise<void> {
+  if (voiceDns(env) === null) return;
+  for (const db of configuredOrganisationDatabases(env))
+    for (const mac of await listRevokedVoiceMacNames(db))
+      await removeRevokedVoiceMacName(env, db, mac);
 }
