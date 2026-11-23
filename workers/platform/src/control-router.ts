@@ -236,7 +236,7 @@ import {
   handleSessionControlRoute,
   matchSessionControlRoute,
   type SessionControlRoute,
-} from "@purin-labs/agent/control/routes/sessions";
+} from "@purin-labs/control/worker/routes/sessions";
 import { resolveControlSupportRole } from "@purin-labs/area-organisation/server/data/onboarding-support";
 import {
   handleWorkspaceControlRoute,

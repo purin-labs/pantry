@@ -336,17 +336,17 @@ prompts), `features/integrations/workspace.tsx` (members and invitations),
 
 `scripts/layers.json` gives the module of each file:
 
-| Module                                 | Files                                                                                                                                                                 |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `foundation/tenancy`                   | `organisation-access/`, `data/control-plane.ts`, `data/workspace-ai-budget.ts`                                                                                        |
-| `foundation/authority`                 | `authorization/`, `access-control/`, `request-authority/`, `policy-snapshot.ts`, `data/capability-policy.ts`, `actors/action-ledger.ts`, `approval-authentication.ts` |
-| `foundation/control`                   | `control/oidc.ts`, `control/authorization.ts`, `control/pending-decisions.ts`, `control/decide-pending-decision.ts`, `control/routes/pending-decisions.ts`            |
-| `foundation/agent`                     | `control/routes/sessions.ts`, `actors/organisation/organisation-policy.ts`                                                                                            |
-| `foundation/conversation`              | `control/routes/agent-permission-requests.ts`, `control/routes/held-output-requests.ts`                                                                               |
-| `areas/organisation`                   | `control/routes/onboarding.ts`                                                                                                                                        |
-| `areas/commerce`, `areas/integrations` | `control/routes/commerce/actions.ts`, `control/routes/custom-connectors/write-actions.ts`                                                                             |
-| `surfaces/slack`                       | `slack/commerce-approval.ts`, `slack/decision-card.ts`, `slack/permission-request-deny.ts`                                                                            |
-| `workers/platform`                     | `control/pending-decision-parts.ts`                                                                                                                                   |
+| Module                                 | Files                                                                                                                                                                                    |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `foundation/tenancy`                   | `organisation-access/`, `data/control-plane.ts`, `data/workspace-ai-budget.ts`                                                                                                           |
+| `foundation/authority`                 | `authorization/`, `access-control/`, `request-authority/`, `policy-snapshot.ts`, `data/capability-policy.ts`, `actors/action-ledger.ts`, `approval-authentication.ts`                    |
+| `foundation/control`                   | `control/oidc.ts`, `control/routes/sessions.ts`, `control/authorization.ts`, `control/pending-decisions.ts`, `control/decide-pending-decision.ts`, `control/routes/pending-decisions.ts` |
+| `foundation/agent`                     | `actors/organisation/organisation-policy.ts`                                                                                                                                             |
+| `foundation/conversation`              | `control/routes/agent-permission-requests.ts`, `control/routes/held-output-requests.ts`                                                                                                  |
+| `areas/organisation`                   | `control/routes/onboarding.ts`                                                                                                                                                           |
+| `areas/commerce`, `areas/integrations` | `control/routes/commerce/actions.ts`, `control/routes/custom-connectors/write-actions.ts`                                                                                                |
+| `surfaces/slack`                       | `slack/commerce-approval.ts`, `slack/decision-card.ts`, `slack/permission-request-deny.ts`                                                                                               |
+| `workers/platform`                     | `control/pending-decision-parts.ts`                                                                                                                                                      |
 
 ## Rules and limits
 
