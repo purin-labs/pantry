@@ -1,0 +1,134 @@
+{
+  "about": "Refactor 17, Stage B, decision D1: the files of the surface voice join one workspace package @purin-labs/surface-voice in surfaces/voice. scripts/refactor-17/move-module.mjs reads this plan. files: each source file that scripts/layers.json gives the module, with its place in the target folder: a Worker file goes to server/ with its sub-path below services/platform/src/, less its first folder when that folder is voice/ (the longer line of sourcePrefixes gives this rule, one time for each file), a Portal file goes to ui/ and keeps its sub-path below apps/portal/src/ (ui/features/voice/), and no two files share a place. sourcePrefixes: where --sync-plan puts a file that the module gets later. package: the manifest and the tsconfig of the new package; the versions of devDependencies come from the Worker and the Portal manifests. The exports map gives each .ts file of server/ and of ui/ and each style sheet of ui/ as an entry; a .tsx file that another module imports has an entry of its own. The tsconfig of the package reads server/ only. The Worker tsconfigs include surfaces/*/server and the Portal tsconfig includes surfaces/*/ui, so each file stays in the program that checked it before the move. edits: text edits of the files that name a source folder and cannot read scripts/lib/source-roots.mjs; an edit is done when the file holds its replace text, and an edit with an empty replace text is done when the file does not hold its find text. The voice wake worker is an entry that the voice client starts with new URL: its knip entry moves from apps/portal to surfaces/*, and the stale entry src/ui/index.ts of apps/portal goes with it. keepForm: each file where an import stays on its line, because the wrap of Prettier would move a ratchet, with its reason. regenerate: the commands that write a generated file again. ui/features/voice/answer.ts type-imports features/chat/delivery.ts of the surface portal, which moves later: the import keeps a relative path until the portal move names it by its package. package.typeCheck false: the package has no check:types script of its own. Its own files pass, but the files of @purin-labs/tenancy, @purin-labs/actor-runtime, @purin-labs/agent, @purin-labs/conversation, @purin-labs/authority and @purin-labs/area-cafe that it imports read the Env keys CASE, CODE_MODE_SANDBOX, CONNECTOR, EVENT_Q, MESSAGE_LINK_FETCH, ORGANISATION and SESSION, which the Worker and the surface webhooks merge with declare module of @purin-labs/kernel/env. The package alone gives 143 errors, none in its own files. The Worker program checks each file of server/, and the Portal program each file of ui/.",
+  "module": "surfaces/voice",
+  "target": "surfaces/voice",
+  "workspaceEntry": "surfaces/*",
+  "sourcePrefixes": {
+    "services/platform/src/voice/": "server/",
+    "services/platform/src/": "server/",
+    "apps/portal/src/": "ui/"
+  },
+  "files": {
+    "apps/portal/src/features/voice/answer.ts": "ui/features/voice/answer.ts",
+    "apps/portal/src/features/voice/approvals.tsx": "ui/features/voice/approvals.tsx",
+    "apps/portal/src/features/voice/capture.ts": "ui/features/voice/capture.ts",
+    "apps/portal/src/features/voice/command.ts": "ui/features/voice/command.ts",
+    "apps/portal/src/features/voice/control.tsx": "ui/features/voice/control.tsx",
+    "apps/portal/src/features/voice/counts.ts": "ui/features/voice/counts.ts",
+    "apps/portal/src/features/voice/host.ts": "ui/features/voice/host.ts",
+    "apps/portal/src/features/voice/model-cache.ts": "ui/features/voice/model-cache.ts",
+    "apps/portal/src/features/voice/page-mark.tsx": "ui/features/voice/page-mark.tsx",
+    "apps/portal/src/features/voice/session.ts": "ui/features/voice/session.ts",
+    "apps/portal/src/features/voice/setting.ts": "ui/features/voice/setting.ts",
+    "apps/portal/src/features/voice/start-attempt.ts": "ui/features/voice/start-attempt.ts",
+    "apps/portal/src/features/voice/styles.css": "ui/features/voice/styles.css",
+    "apps/portal/src/features/voice/transport.ts": "ui/features/voice/transport.ts",
+    "apps/portal/src/features/voice/wake-phrase.ts": "ui/features/voice/wake-phrase.ts",
+    "apps/portal/src/features/voice/wake-worker.ts": "ui/features/voice/wake-worker.ts",
+    "apps/portal/src/features/voice/worker-protocol.ts": "ui/features/voice/worker-protocol.ts",
+    "services/platform/src/voice/confirmation.ts": "server/confirmation.ts",
+    "services/platform/src/voice/dns.ts": "server/dns.ts",
+    "services/platform/src/voice/engines/workers-ai-whisper.ts": "server/engines/workers-ai-whisper.ts",
+    "services/platform/src/voice/grant.ts": "server/grant.ts",
+    "services/platform/src/voice/mac-devices.ts": "server/mac-devices.ts",
+    "services/platform/src/voice/mac-routes.ts": "server/mac-routes.ts",
+    "services/platform/src/voice/routes.ts": "server/routes.ts",
+    "services/platform/src/voice/store.ts": "server/store.ts",
+    "services/platform/src/voice/transcribe.ts": "server/transcribe.ts",
+    "services/platform/src/voice/vocabulary.ts": "server/vocabulary.ts",
+    "services/platform/src/voice/wav.ts": "server/wav.ts"
+  },
+  "package": {
+    "name": "@purin-labs/surface-voice",
+    "exports": {
+      "./server/*": {
+        "types": "./server/*.ts",
+        "default": "./server/*.ts"
+      },
+      "./ui/*.css": "./ui/*.css",
+      "./ui/*": {
+        "types": "./ui/*.ts",
+        "default": "./ui/*.ts"
+      },
+      "./ui/features/voice/approvals": "./ui/features/voice/approvals.tsx",
+      "./ui/features/voice/control": "./ui/features/voice/control.tsx",
+      "./ui/features/voice/page-mark": "./ui/features/voice/page-mark.tsx"
+    },
+    "dependencies": {
+      "@purin-labs/area-cafe": "workspace:*",
+      "@purin-labs/area-commerce": "workspace:*",
+      "@purin-labs/area-devices": "workspace:*",
+      "@purin-labs/area-organisation": "workspace:*",
+      "@purin-labs/authority": "workspace:*",
+      "@purin-labs/control": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/type-utils": "workspace:*",
+      "@purin-labs/ui": "workspace:*",
+      "lucide-react": "^0.542.0",
+      "onnxruntime-web": "1.22.0",
+      "react": "^19.1.1",
+      "react-dom": "^19.1.1",
+      "react-router": "^7.18.2"
+    },
+    "devDependencies": [
+      "@cloudflare/workers-types",
+      "@types/react",
+      "@types/react-dom",
+      "tsrs"
+    ],
+    "versionsFrom": [
+      "services/platform/package.json",
+      "apps/portal/package.json"
+    ],
+    "tsconfig": {
+      "extends": "../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": ["ESNext"],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": ["@cloudflare/workers-types"],
+        "allowImportingTsExtensions": true
+      },
+      "include": ["server/**/*.ts"]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Worker files of the package",
+      "find": "PLATFORM_SOURCE.push(\"surfaces/webhooks/server\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"surfaces/webhooks/server\");\n// The Worker side of the surface voice (Refactor 17, Stage B).\nPLATFORM_SOURCE.push(\"surfaces/voice/server\");\n"
+    },
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the Portal lints and the ESLint rules of the Portal source read the Portal files of the package",
+      "find": "PORTAL_SOURCE.push(\"areas/kitchen/ui\");\n",
+      "replace": "PORTAL_SOURCE.push(\"areas/kitchen/ui\");\n// The Portal side of the surface voice (Refactor 17, Stage B).\nPORTAL_SOURCE.push(\"surfaces/voice/ui\");\n"
+    },
+    {
+      "file": "knip.json",
+      "why": "the voice client starts the wake worker with new URL, so the worker is an entry of knip in the surface packages, as it was in the Portal",
+      "find": "    \"surfaces/*\": {\n      \"entry\": [\n        \"server/**/*.fixtures.ts\",\n        \"server/**/*.type-fixtures.ts\",\n        \"ui/**/*.type-fixtures.ts\",\n        \"ui/**/*.typecheck.ts\"\n      ],\n      \"project\": [\"**/*.{ts,tsx}\"],\n      \"includeEntryExports\": true\n    },\n    \"areas/kitchen\": {\n",
+      "replace": "    \"surfaces/*\": {\n      \"entry\": [\n        \"server/**/*.fixtures.ts\",\n        \"server/**/*.type-fixtures.ts\",\n        \"ui/**/*.type-fixtures.ts\",\n        \"ui/**/*.typecheck.ts\",\n        \"ui/features/voice/wake-worker.ts\"\n      ],\n      \"project\": [\"**/*.{ts,tsx}\"],\n      \"includeEntryExports\": true\n    },\n    \"areas/kitchen\": {\n"
+    },
+    {
+      "file": "knip.json",
+      "why": "the Portal entry of the wake worker leaves with the worker, and src/ui/index.ts names no file since the ui move",
+      "find": "        \"src/ui/index.ts\",\n        \"src/features/voice/wake-worker.ts\",\n",
+      "replace": ""
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": ["node", "scripts/check-layers.mjs", "--areas", "--write"],
+      "writes": ["docs/layers.md"]
+    }
+  ]
+}
