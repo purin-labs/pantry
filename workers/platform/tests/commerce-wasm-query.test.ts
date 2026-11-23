@@ -6,8 +6,8 @@ import {
   planCommerceGraphQuery,
 } from "@purin-labs/area-commerce/server/commerce-wasm";
 
-describe("commerce query WASM boundary", function commerceQueryWasmSuite() {
-  it("returns the Rust planner outcome and round-trips its cursor codec", function validPlannerOutput() {
+describe("commerce query planner and cursor", function commerceQueryPlannerSuite() {
+  it("returns the planner outcome and round-trips its cursor codec", function validPlannerOutput() {
     const firstPage = planCommerceGraphQuery(createPlannerRequest(1));
 
     expect(firstPage.ok).toBe(true);
@@ -34,14 +34,14 @@ describe("commerce query WASM boundary", function commerceQueryWasmSuite() {
     });
   });
 
-  it("rejects malformed planner requests before crossing the byte boundary", function malformedPlannerRequest() {
+  it("rejects malformed planner requests before the planner runs", function malformedPlannerRequest() {
     expect(planCommerceGraphQuery({ query: {} })).toEqual({
       ok: false,
       error: { code: "commerce_wasm_input_invalid" },
     });
   });
 
-  it("returns Rust cursor mismatch and stale outcomes", function cursorSafetyOutcomes() {
+  it("returns cursor mismatch and stale outcomes", function cursorSafetyOutcomes() {
     const firstPage = planCommerceGraphQuery(createPlannerRequest(1));
     expect(firstPage.ok).toBe(true);
     if (!firstPage.ok || firstPage.value.kind !== "planned") {

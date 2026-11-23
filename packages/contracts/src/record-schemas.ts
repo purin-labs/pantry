@@ -1,9 +1,9 @@
 import { Type, type Static } from "typebox";
 import { fileResourceScopeSchema } from "./access-control.ts";
 
-// Plan 78: TypeBox schemas of goal.rs, portal_chat.rs and file_context.rs.
-// Rust only serializes these types, so they carry no parser of their own;
-// goal.ts keeps its own TypeScript checks.
+// Plan 78: TypeBox schemas of the Case goal, the Portal chat stream record and
+// the file context. Only their types leave this file, so no parser checks a
+// value against them; goal.ts keeps its own TypeScript checks.
 
 const caseGoalStateSchema = Type.Union([
   Type.Object({ kind: Type.Literal("active") }),

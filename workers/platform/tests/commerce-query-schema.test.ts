@@ -419,7 +419,7 @@ describe("OrganisationActor normalized commerce relation", () => {
     });
   });
 
-  it("materializes the locked Unicode fold corpus through contracts Wasm", () => {
+  it("materializes the locked Unicode fold corpus through the commerce contracts", () => {
     expect(
       materializeCommerceRelationText("Cafe\u0301", "Straße STRASSE ＡＢ"),
     ).toEqual({
