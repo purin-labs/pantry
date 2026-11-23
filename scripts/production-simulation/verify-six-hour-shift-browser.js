@@ -233,7 +233,7 @@ async function verifySixHourShiftBrowser(page) {
         "areas/kitchen/ui/features/production-run/bakery-shift-author.tsx",
       )
     );
-    await import(sourceUrl("apps/portal/src/styles.css"));
+    await import(sourceUrl("surfaces/portal/ui/styles.css"));
     await import(
       sourceUrl("areas/kitchen/ui/features/production-run/oven-workspace.css")
     );

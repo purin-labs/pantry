@@ -16,7 +16,7 @@ import type { VoiceWorkerEvent } from "@purin-labs/surface-voice/ui/features/voi
 import { WAKE_PHRASE } from "@purin-labs/surface-voice/ui/features/voice/wake-phrase";
 import { Select } from "@purin-labs/ui/index";
 import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import "./voice-recorder.css";
 
 /**

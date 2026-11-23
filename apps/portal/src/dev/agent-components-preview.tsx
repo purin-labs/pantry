@@ -19,7 +19,7 @@ import { TextComponentsPreview } from "./text-components-preview";
 import { CrmTablePreview } from "./crm-table-preview";
 import { SelectPreview } from "./select-preview";
 import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import "./agent-components-preview.css";
 
 const MOTIONS = [

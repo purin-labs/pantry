@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import "../styles.css";
-import { configurationDraftInserts } from "../features/chat/configuration-draft-cards";
+import "@purin-labs/surface-portal/ui/styles.css";
+import { configurationDraftInserts } from "@purin-labs/surface-portal/ui/features/chat/configuration-draft-cards";
 import type { ConfigurationDraftView } from "@purin-labs/control-api/portal/configuration-drafts";
 import { commerceActionTitle } from "@purin-labs/area-commerce/ui/features/governed-actions/commerce";
 import { OrderRefundDetails } from "@purin-labs/area-commerce/ui/features/governed-actions/order-refund-details";

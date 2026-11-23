@@ -1,8 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { TvPlayer } from "./player";
-import "./tv.css";
+import { TvPlayer } from "@purin-labs/surface-portal/ui/tv/player";
+import "@purin-labs/surface-portal/ui/tv/tv.css";
 
 const root = document.getElementById("root");
 if (root === null) throw new Error("The screen page has no root");

@@ -14,7 +14,7 @@ import {
   // @ts-expect-error The portal build type-checks this JSX module.
 } from "@purin-labs/area-organisation/ui/pages/workspaces";
 // @ts-expect-error Platform's test tsconfig intentionally excludes JSX; the portal builds this module separately.
-import { selectPreferredWorkspace } from "../../../apps/portal/src/portal";
+import { selectPreferredWorkspace } from "@purin-labs/surface-portal/ui/portal";
 
 describe("Café organisations page ownership", () => {
   it("opens the last valid workspace and falls back to the default workspace", () => {

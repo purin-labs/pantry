@@ -24,7 +24,7 @@ import type {
   CommerceResourceType,
 } from "@purin-labs/commerce-contracts";
 
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import { CheckoutProfilesRoute } from "@purin-labs/area-commerce/ui/features/checkout-profiles/route";
 import { CommerceEntityPlaneRoute } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/route";
 import { SupplierPayoutsPanel } from "@purin-labs/area-commerce/ui/features/payouts/route";

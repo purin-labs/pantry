@@ -6,7 +6,7 @@ public policy pages, the identity-link page, and the provider authorization
 popup) **and the buyer storefront served from `apps/storefront`**. Both consume
 the same tokens from
 [`packages/frontend-theme.css`](../packages/frontend-theme.css); the portal's
-stylesheet is [`apps/portal/src/styles.css`](../apps/portal/src/styles.css) and
+stylesheet is [`surfaces/portal/ui/styles.css`](../surfaces/portal/ui/styles.css) and
 the storefront's is
 [`apps/storefront/src/styles.css`](../apps/storefront/src/styles.css). Shared
 shell and semantic page patterns live in `shell.tsx`, `page-components.tsx`, and

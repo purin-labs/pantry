@@ -18,7 +18,7 @@ import {
 import { isRecord } from "@purin-labs/std";
 import { ProductionPlanPanel } from "@purin-labs/area-commerce/ui/features/commerce/production-plan";
 import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 
 /**
  * Plan 40D preview: two people on one location's plan. The page answers the

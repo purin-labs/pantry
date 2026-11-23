@@ -5,7 +5,7 @@ import {
   GrainFieldSelect,
   type GrainFieldName,
 } from "@purin-labs/ui/index";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import "./gradients-preview.css";
 
 // Development preview of GrainField and GrainFieldSelect: a hero panel on a

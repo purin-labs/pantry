@@ -4,7 +4,7 @@ import {
   VoiceAssistantCard,
   type VoiceAssistantState,
 } from "@purin-labs/ui/voice-assistant-card";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import "./voice-assistant-preview.css";
 
 const transcript =

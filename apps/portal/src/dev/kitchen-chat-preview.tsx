@@ -3,15 +3,15 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router";
 import { UserPreferencesProvider } from "@purin-labs/ui/preferences/context";
-import "../styles.css";
-import { PortalFrame } from "../shell";
+import "@purin-labs/surface-portal/ui/styles.css";
+import { PortalFrame } from "@purin-labs/surface-portal/ui/shell";
 import { PageHeader } from "@purin-labs/ui/page-components";
 import { workspacePageDescriptor } from "@purin-labs/ui/route";
 import {
   controlMutation,
   type ControlMutationIntent,
 } from "@purin-labs/control/portal/control-client";
-import { ConnectedChatPage as ChatPage } from "../features/chat/route";
+import { ConnectedChatPage as ChatPage } from "@purin-labs/surface-portal/ui/features/chat/route";
 import { BakerySurfaceEffectBridge } from "@purin-labs/area-kitchen/ui/features/bakery-surface-effect-bridge";
 import WorkflowSimulatorRoute from "@purin-labs/area-kitchen/ui/features/workflow-simulator/route";
 import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";

@@ -5,7 +5,7 @@ import { validateCommerceEntityShape } from "@purin-labs/commerce-contracts/brow
 import type { CommerceEntity } from "@purin-labs/commerce-contracts";
 import { ProductDescriptionDraftControl } from "../../../areas/commerce/ui/features/commerce/description-draft/control";
 import DescriptionEditor from "../../../areas/commerce/ui/features/commerce/description-draft/editor";
-import "../../../apps/portal/src/styles.css";
+import "../../../surfaces/portal/ui/styles.css";
 
 const root = document.getElementById("root");
 

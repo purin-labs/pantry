@@ -3,8 +3,8 @@ import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router";
 import type { OrganisationCreationRequest } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
-import "../styles.css";
-import { PortalFrame } from "../shell";
+import "@purin-labs/surface-portal/ui/styles.css";
+import { PortalFrame } from "@purin-labs/surface-portal/ui/shell";
 import {
   OrganisationsRoute,
   type OrganisationActions,

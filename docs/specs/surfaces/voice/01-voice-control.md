@@ -251,7 +251,7 @@ The refusals are `voice_disabled` (403); `voice_device_invalid`, `voice_audio_in
 `transcription_unavailable`, `voice_vocabulary_unavailable` and `voice_dns_unavailable`
 (503).
 
-The chat route (`services/platform/src/control/routes/chat.ts`) answers `voice_disabled`
+The chat route (`surfaces/portal/server/control/routes/chat.ts`) answers `voice_disabled`
 for a message with `inputMode` while the capability is off. So a valid Mac grant cannot
 put a command in the chat.
 
@@ -295,7 +295,7 @@ to the Platform. A grant has no authority at the Platform.
 | Platform routes, records, engine, Mac rows    | `services/platform/src/voice/`                                                             |
 | Portal session, path choice, commands, dialog | `surfaces/voice/ui/features/voice/session.ts`, `transport.ts`, `command.ts`, `control.tsx` |
 | Listening worker and its files                | `surfaces/voice/ui/features/voice/wake-worker.ts`, `apps/portal/public/voice/`             |
-| Chat send of a spoken command                 | `acceptVoiceCommand` in `apps/portal/src/features/chat/route.tsx`                          |
+| Chat send of a spoken command                 | `acceptVoiceCommand` in `surfaces/portal/ui/features/chat/route.tsx`                       |
 | Mac service and engines                       | `services/shop-voice/shop_voice/`, `shop_voice/engines/`                                   |
 | Journeys, benches, wake model tools           | `scripts/shop-voice/`, `scripts/plan-82-g04/`                                              |
 

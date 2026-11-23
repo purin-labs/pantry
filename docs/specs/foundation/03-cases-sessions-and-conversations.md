@@ -354,7 +354,7 @@ exceptions: `POST /cases/commands` checks only the Organisation role, and
 The main code: `services/platform/src/` with `actors/case/`, `actors/connector/`,
 `actors/case-direct-processing.ts`, `projects/`, `chat/store.ts`, `chat/forks.ts`,
 `chat/side-cases.ts`, `chat/side-case-start.ts`, `actors/connector-side-case.ts`,
-`cues/`, `gateway/cue-delivery.ts`, `schedules/` and `apps/portal/src/features/chat/`.
+`cues/`, `gateway/cue-delivery.ts`, `schedules/` and `surfaces/portal/ui/features/chat/`.
 
 ## Rules and limits
 

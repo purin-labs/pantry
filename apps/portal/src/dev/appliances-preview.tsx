@@ -6,7 +6,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { Select } from "@purin-labs/ui/index";
 import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import "./appliances-preview.css";
 import {
   APPLIANCE_CATALOG,

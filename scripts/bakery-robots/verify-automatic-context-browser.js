@@ -108,7 +108,7 @@ async function mountAutomaticContext() {
     await Promise.all(
       [
         "/src/dev/workflow-preview.tsx",
-        sourceUrl("apps/portal/src/workflow-demo.tsx"),
+        sourceUrl("surfaces/portal/ui/workflow-demo.tsx"),
       ].map(async (path) => (await fetch(path)).text()),
     )
   ).join("\n");
@@ -124,7 +124,7 @@ async function mountAutomaticContext() {
   const { default: React } = await import(reactUrl);
   const { default: ReactDOM } = await import(domUrl);
   const { MemoryRouter } = await import(routerUrl);
-  await import(sourceUrl("apps/portal/src/styles.css"));
+  await import(sourceUrl("surfaces/portal/ui/styles.css"));
   const { default: Bakery } = await import(
     sourceUrl("areas/kitchen/ui/features/workflow-simulator/route.tsx")
   );
@@ -156,7 +156,7 @@ async function mountAutomaticContext() {
   if (!protocolUrl) throw new Error("Missing protocol import");
   const protocol = await import(protocolUrl);
   const { ChatContextChip } = await import(
-    sourceUrl("apps/portal/src/features/chat/context.tsx")
+    sourceUrl("surfaces/portal/ui/features/chat/context.tsx")
   );
   const organisationId = "automatic-browser";
   const fixture = {
@@ -425,7 +425,7 @@ async function mountAutomaticContext() {
   const stylesheet = document.createElement("style");
   stylesheet.textContent = await (
     await fetch(
-      `${sourceUrl("apps/portal/src/styles.css")}?direct&t=${Date.now()}`,
+      `${sourceUrl("surfaces/portal/ui/styles.css")}?direct&t=${Date.now()}`,
     )
   ).text();
   document.head.append(stylesheet);

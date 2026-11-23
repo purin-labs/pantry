@@ -2,7 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter, Route, Routes } from "react-router";
 import type { JevFeaturesView } from "@purin-labs/control-api/portal/jev-features";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import { BillingRoute } from "@purin-labs/area-organisation/ui/features/billing/route";
 import { JevFeaturesRoute } from "@purin-labs/area-integrations/ui/features/jev-features/route";
 

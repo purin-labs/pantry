@@ -7,7 +7,7 @@ import { createRoot } from "react-dom/client";
 import {
   showRequestedPhysicsEvidence,
   WorkflowDemoApp,
-} from "../workflow-demo";
+} from "@purin-labs/surface-portal/ui/workflow-demo";
 import { installChatPreviewFetch } from "./chat-preview-data";
 
 installChatPreviewFetch();

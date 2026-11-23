@@ -22,11 +22,11 @@ import type {
   CaseContextCollectionRelationshipView,
 } from "@purin-labs/control-api";
 
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import { installCustomConnectorPreview } from "./custom-connector-preview";
 import { installPermissionRequestsPreview } from "./permission-requests-preview-data";
 import { AccessRoute } from "@purin-labs/area-organisation/ui/features/access/route";
-import { WorkspaceLayout } from "../shell";
+import { WorkspaceLayout } from "@purin-labs/surface-portal/ui/shell";
 import type {
   AiBudgetLimits,
   AiBudgetView,

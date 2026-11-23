@@ -7,7 +7,7 @@ import {
   canProjectAgentEvent,
   projectAcceptedTurnReplay,
   createPortalChatStreamResponse,
-} from "../../services/platform/src/chat/portal-stream.ts";
+} from "../../surfaces/portal/server/chat/portal-stream.ts";
 import { createSessionReplayResponse } from "../../foundation/agent/actors/session/replay.ts";
 import { readChatControlAuthority } from "../../foundation/conversation/chat/information-flow.ts";
 import {

@@ -2,7 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, useLocation, useNavigate } from "react-router";
 import { parseEntityRef } from "@purin-labs/commerce-client";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import {
   brainItemsToReview,
   evalTaskId,
@@ -37,11 +37,11 @@ import {
   sampleExecutionPage,
 } from "./brain-execution-sample";
 import { BrainRoute } from "@purin-labs/area-brain/ui/features/brain/route";
-import { ConnectedChatPage as ChatPage } from "../features/chat/route";
+import { ConnectedChatPage as ChatPage } from "@purin-labs/surface-portal/ui/features/chat/route";
 import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";
 import { installChatPreviewFetch } from "./chat-preview-data";
 import { PageHeader } from "@purin-labs/ui/page-components";
-import { PortalFrame } from "../shell";
+import { PortalFrame } from "@purin-labs/surface-portal/ui/shell";
 
 const root = document.getElementById("root");
 if (root === null || !import.meta.env.DEV)

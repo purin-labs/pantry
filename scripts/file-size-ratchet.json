@@ -1,8 +1,6 @@
 {
   "limit": 3000,
   "files": {
-    "apps/portal/src/features/chat/route.tsx": 4255,
-    "apps/portal/src/styles.css": 10385,
     "apps/storefront/src/storefront.tsx": 9334,
     "apps/storefront/src/styles.css": 3907,
     "areas/commerce/ui/features/commerce/entity-plane/route.tsx": 4051,
@@ -14,6 +12,8 @@
     "packages/commerce-contracts/src/records/commerce-records.ts": 3253,
     "packages/production-simulation/src/recipes/bakery/appliance-execution.ts": 3819,
     "packages/production-simulation/src/recipes/bakery/schedule.ts": 4510,
-    "scripts/plan-50/evaluate-pi-durable.mjs": 5289
+    "scripts/plan-50/evaluate-pi-durable.mjs": 5289,
+    "surfaces/portal/ui/features/chat/route.tsx": 4255,
+    "surfaces/portal/ui/styles.css": 10385
   }
 }

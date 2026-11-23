@@ -2,7 +2,7 @@ import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import "./theme-preview.css";
 
 const SHADES = [

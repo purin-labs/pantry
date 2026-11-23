@@ -1,11 +1,5 @@
 {
   "files": {
-    "apps/portal/src/features/chat/conversation-sharing.tsx": 2,
-    "apps/portal/src/features/chat/goal.tsx": 2,
-    "apps/portal/src/features/chat/project-sharing.tsx": 2,
-    "apps/portal/src/features/chat/screen-relevance.ts": 2,
-    "apps/portal/src/pages/home.tsx": 1,
-    "apps/portal/src/portal.tsx": 8,
     "areas/cafe/ui/features/content-studio/route.tsx": 5,
     "areas/cafe/ui/features/menu-boards/board-archive.tsx": 1,
     "areas/cafe/ui/features/menu-boards/board-comments.tsx": 2,
@@ -42,6 +36,12 @@
     "areas/organisation/ui/features/access/held-output-prompt.tsx": 2,
     "areas/organisation/ui/features/access/permission-requests-summary.ts": 1,
     "packages/collaboration/portal/slack-thread-control.tsx": 2,
+    "surfaces/portal/ui/features/chat/conversation-sharing.tsx": 2,
+    "surfaces/portal/ui/features/chat/goal.tsx": 2,
+    "surfaces/portal/ui/features/chat/project-sharing.tsx": 2,
+    "surfaces/portal/ui/features/chat/screen-relevance.ts": 2,
+    "surfaces/portal/ui/pages/home.tsx": 1,
+    "surfaces/portal/ui/portal.tsx": 8,
     "surfaces/voice/ui/features/voice/approvals.tsx": 1,
     "surfaces/voice/ui/features/voice/control.tsx": 2
   }

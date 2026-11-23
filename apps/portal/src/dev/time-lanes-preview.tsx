@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import {
   ScheduleLanes,
   type ScheduledAgent,

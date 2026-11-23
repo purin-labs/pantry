@@ -151,6 +151,9 @@ importers:
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../../packages/std
+      '@purin-labs/surface-portal':
+        specifier: workspace:*
+        version: link:../../surfaces/portal
       '@purin-labs/surface-voice':
         specifier: workspace:*
         version: link:../../surfaces/voice
@@ -2158,6 +2161,9 @@ importers:
       '@purin-labs/surface-email':
         specifier: workspace:*
         version: link:../../surfaces/email
+      '@purin-labs/surface-portal':
+        specifier: workspace:*
+        version: link:../../surfaces/portal
       '@purin-labs/surface-slack':
         specifier: workspace:*
         version: link:../../surfaces/slack
@@ -2290,6 +2296,130 @@ importers:
         specifier: 0.18.0-ts7.1.0-dev.20260929
         version: 0.18.0-ts7.1.0-dev.20260929
 
+  surfaces/portal:
+    dependencies:
+      '@base-ui/react':
+        specifier: ^1.8.0
+        version: 1.8.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@purin-labs/actor-runtime':
+        specifier: workspace:*
+        version: link:../../foundation/actor-runtime
+      '@purin-labs/agent':
+        specifier: workspace:*
+        version: link:../../foundation/agent
+      '@purin-labs/area-brain':
+        specifier: workspace:*
+        version: link:../../areas/brain
+      '@purin-labs/area-cafe':
+        specifier: workspace:*
+        version: link:../../areas/cafe
+      '@purin-labs/area-commerce':
+        specifier: workspace:*
+        version: link:../../areas/commerce
+      '@purin-labs/area-devices':
+        specifier: workspace:*
+        version: link:../../areas/devices
+      '@purin-labs/area-inbox':
+        specifier: workspace:*
+        version: link:../../areas/inbox
+      '@purin-labs/area-integrations':
+        specifier: workspace:*
+        version: link:../../areas/integrations
+      '@purin-labs/area-kitchen':
+        specifier: workspace:*
+        version: link:../../areas/kitchen
+      '@purin-labs/area-organisation':
+        specifier: workspace:*
+        version: link:../../areas/organisation
+      '@purin-labs/authority':
+        specifier: workspace:*
+        version: link:../../foundation/authority
+      '@purin-labs/bakery-model':
+        specifier: workspace:*
+        version: link:../../packages/bakery-model
+      '@purin-labs/cafe-control-api':
+        specifier: workspace:*
+        version: link:../../packages/cafe-control-api
+      '@purin-labs/collaboration':
+        specifier: workspace:*
+        version: link:../../packages/collaboration
+      '@purin-labs/commerce-control-api':
+        specifier: workspace:*
+        version: link:../../packages/commerce-control-api
+      '@purin-labs/connections':
+        specifier: workspace:*
+        version: link:../../foundation/connections
+      '@purin-labs/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@purin-labs/control':
+        specifier: workspace:*
+        version: link:../../foundation/control
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../packages/control-api
+      '@purin-labs/conversation':
+        specifier: workspace:*
+        version: link:../../foundation/conversation
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../../foundation/kernel
+      '@purin-labs/production-simulation':
+        specifier: workspace:*
+        version: link:../../packages/production-simulation
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../packages/std
+      '@purin-labs/surface-slack':
+        specifier: workspace:*
+        version: link:../slack
+      '@purin-labs/surface-voice':
+        specifier: workspace:*
+        version: link:../voice
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../../foundation/tenancy
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../packages/type-utils
+      '@purin-labs/ui':
+        specifier: workspace:*
+        version: link:../../foundation/ui
+      '@radix-ui/react-dropdown-menu':
+        specifier: ^2.1.24
+        version: 2.1.24(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      lucide-react:
+        specifier: ^0.542.0
+        version: 0.542.0(react@19.2.7)
+      react:
+        specifier: ^19.1.1
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.1.1
+        version: 19.2.7(react@19.2.7)
+      react-router:
+        specifier: ^7.18.2
+        version: 7.18.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      sonner:
+        specifier: ^2.0.7
+        version: 2.0.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      voice-glow:
+        specifier: 0.2.1
+        version: 0.2.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      '@types/react':
+        specifier: ^19.1.12
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.1.9
+        version: 19.2.3(@types/react@19.2.17)
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
+
   surfaces/slack:
     dependencies:
       '@purin-labs/actor-runtime':
@@ -2398,6 +2528,9 @@ importers:
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../../packages/std
+      '@purin-labs/surface-portal':
+        specifier: workspace:*
+        version: link:../portal
       '@purin-labs/tenancy':
         specifier: workspace:*
         version: link:../../foundation/tenancy

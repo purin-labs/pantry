@@ -7,7 +7,7 @@ Account, identity, and public pages sit outside the workspace.
 The buyer storefront in `apps/storefront` is a separate app.
 
 The route registry is [`route.ts`](../foundation/ui/route.ts).
-The mounted page controller is [`portal.tsx`](../apps/portal/src/portal.tsx).
+The mounted page controller is [`portal.tsx`](../surfaces/portal/ui/portal.tsx).
 Both sources matter: a registered route does not prove that a page has content.
 
 In the tables, `W` means `/portal/:organisationHandle/:workspaceHandle`.

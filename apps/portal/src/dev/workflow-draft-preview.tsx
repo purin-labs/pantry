@@ -5,7 +5,7 @@ import {
 } from "@purin-labs/control/portal/control-client";
 import { LatteWorkspace } from "@purin-labs/area-kitchen/ui/features/production-run/latte/latte-physics-view";
 import { RecipeWorkspaceContext } from "@purin-labs/area-kitchen/ui/features/production-run/recipe-workspace";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 
 // One recipe view against a Worker's control routes, for the Plan 84 browser
 // journey. `?organisation=<id>` picks the Organisation, and the browser's own

@@ -1,9 +1,9 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createMemoryRouter } from "react-router";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import { MenuDraftRoute } from "@purin-labs/area-cafe/ui/features/content-studio/route";
-import { registerPortalBoardChat } from "../portal-board-chat";
+import { registerPortalBoardChat } from "@purin-labs/surface-portal/ui/portal-board-chat";
 
 // Menus (Items, Boards, Screens) against a Worker's control routes, for the
 // Plan 40B browser journey. `?organisation=<id>&tab=boards` picks the

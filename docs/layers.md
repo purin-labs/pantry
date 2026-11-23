@@ -408,18 +408,20 @@ import. A module with no line for one of these has none.
 
 ## surfaces/portal
 
-- Folders: 10
+- Folders: 12
   - `apps/portal/src/`
   - `apps/portal/src/dev/`
-  - `apps/portal/src/features/chat/`
-  - `apps/portal/src/features/integrations/`
-  - `apps/portal/src/pages/`
   - `apps/portal/src/tv/`
-  - `services/platform/src/chat/`
-  - `services/platform/src/chat/turn/`
-  - `services/platform/src/control/routes/`
-  - `services/platform/src/control/routes/chat/`
-- Packages: `apps/portal`
+  - `surfaces/portal/server/chat/`
+  - `surfaces/portal/server/chat/turn/`
+  - `surfaces/portal/server/control/routes/`
+  - `surfaces/portal/server/control/routes/chat/`
+  - `surfaces/portal/ui/`
+  - `surfaces/portal/ui/features/chat/`
+  - `surfaces/portal/ui/features/integrations/`
+  - `surfaces/portal/ui/pages/`
+  - `surfaces/portal/ui/tv/`
+- Packages: `apps/portal`, `surfaces/portal`
 
 ## surfaces/slack
 

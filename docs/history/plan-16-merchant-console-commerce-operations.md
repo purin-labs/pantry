@@ -556,7 +556,7 @@ history entry is accepted.
 ## MC1 — Integrations dashboard
 
 MC1 turns the existing connection-management section in
-[`apps/portal/src/portal.tsx`](../../apps/portal/src/portal.tsx) into a merchant
+[`apps/portal/src/portal.tsx`](../../surfaces/portal/ui/portal.tsx) into a merchant
 page. Plan 5 remains the authority for connection attempts, provider account
 identity, resource selection, readiness, activation, reconnect, disable, and
 removal.

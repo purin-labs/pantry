@@ -8,7 +8,7 @@ import { parseIntegrationRouteSelection } from "@purin-labs/area-integrations/ui
 import {
   executeIntegrationsRoute,
   // @ts-expect-error The portal build type-checks this JSX module.
-} from "../../../apps/portal/src/portal";
+} from "@purin-labs/surface-portal/ui/portal";
 
 import {
   IntegrationsRouteView,

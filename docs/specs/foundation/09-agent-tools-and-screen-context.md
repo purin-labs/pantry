@@ -286,7 +286,7 @@ state or path. The list reads only the Portal chats of the Case that the reader 
   (`SurfacePageCommandV1`), `screen-relevance.ts`, `case-screen-observations.ts` and
   `chat-signals.ts`. The Kitchen effect and receipt are in
   `packages/bakery-model/src/bakery-surface.ts`.
-- **Server modules** in `services/platform/src/chat/`: `screen-observation-admission.ts`,
+- **Server modules** in `surfaces/portal/server/chat/`: `screen-observation-admission.ts`,
   `surface-registry.ts`, `kitchen-observation.ts`, `origin.ts`, `screen-prompt.ts`,
   `screen-relevance.ts` and `case-screen-observations.ts`. The effect path is
   `actors/bakery-surface-effect.ts` and `agent-tools/costs/view-handler.ts`.
@@ -294,7 +294,7 @@ state or path. The list reads only the Portal chats of the Case that the reader 
   `foundation/ui/features/`, `bakery-surface-effect-bridge.tsx` and
   `bakery-surface-registry.ts` in `areas/kitchen/ui/features/`, and
   `screen-chip.tsx`, `screen-send.ts`, `screen-relevance.ts` and `origin-chips.tsx`
-  in `apps/portal/src/features/chat/`.
+  in `surfaces/portal/ui/features/chat/`.
 - **Regional D1**: `bakery_surface_effect_delivery` and `bakery_surface_timeline_event`
   (the Kitchen area owns them). The chat origin and the observations are in the
   `state_json` of the Portal conversation, with no column of their own.

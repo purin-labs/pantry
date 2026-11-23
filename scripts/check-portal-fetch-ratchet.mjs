@@ -33,9 +33,9 @@ const NOT_CONTROL = new Set([
   // The voice transport's other calls go to the shop Mac's own origin.
   "surfaces/voice/ui/features/voice/transport.ts",
   // The identity link page calls /v1/identity-links, outside the control API.
-  "apps/portal/src/main.tsx",
+  "surfaces/portal/ui/main.tsx",
   // A paired screen reads the screens API with its own device credential.
-  "apps/portal/src/tv/player.tsx",
+  "surfaces/portal/ui/tv/player.tsx",
 ]);
 const CALL = /(?<![\w.$])fetch\s*\(/gu;
 

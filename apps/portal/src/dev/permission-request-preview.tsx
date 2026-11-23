@@ -12,7 +12,7 @@ import {
 } from "@purin-labs/ui/index";
 import { AGENT_NAME } from "@purin-labs/ui/agent-name";
 import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import "./agent-components-preview.css";
 import { ChatAgentPermissionSample } from "./chat-agent-permission-preview";
 

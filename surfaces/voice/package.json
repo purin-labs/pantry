@@ -30,6 +30,7 @@
     "@purin-labs/tenancy": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
     "@purin-labs/ui": "workspace:*",
+    "@purin-labs/surface-portal": "workspace:*",
     "lucide-react": "^0.542.0",
     "onnxruntime-web": "1.22.0",
     "react": "^19.1.1",

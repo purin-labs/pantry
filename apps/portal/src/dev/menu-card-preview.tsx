@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import { CafeMenuPublicationDetails } from "@purin-labs/area-commerce/ui/features/governed-actions/cafe-menu-details";
 import { commerceActionTitle } from "@purin-labs/area-commerce/ui/features/governed-actions/commerce";
 import { MenuPriceChangeDetails } from "@purin-labs/area-commerce/ui/features/governed-actions/menu-price-card";

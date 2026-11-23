@@ -32,8 +32,8 @@ vi.mock(
   },
 );
 import { timelineVisibleMessages } from "@purin-labs/conversation/chat/conversation";
-import { chatActionFlowSink } from "../src/chat/turn/timeline";
-import { resumeConversationExecution } from "../src/chat/application";
+import { chatActionFlowSink } from "@purin-labs/surface-portal/server/chat/turn/timeline";
+import { resumeConversationExecution } from "@purin-labs/surface-portal/server/chat/application";
 import {
   createCustomConnectorDraft,
   prepareCustomConnectorDraftDocument,
@@ -190,9 +190,9 @@ vi.mock(
   },
 );
 
-import { handlePortalChat as nativeAdmitPortalChat } from "../src/control/routes/chat";
-import { handlePortalChatConversation as nativeHandlePortalChatConversation } from "../src/control/routes/chat/conversation";
-import { handlePortalChatCancel as nativeHandlePortalChatCancel } from "../src/control/routes/chat/cancel";
+import { handlePortalChat as nativeAdmitPortalChat } from "@purin-labs/surface-portal/server/control/routes/chat";
+import { handlePortalChatConversation as nativeHandlePortalChatConversation } from "@purin-labs/surface-portal/server/control/routes/chat/conversation";
+import { handlePortalChatCancel as nativeHandlePortalChatCancel } from "@purin-labs/surface-portal/server/control/routes/chat/cancel";
 import type { ConversationExecution } from "@purin-labs/conversation/chat/execution";
 import {
   conversationTimeline,

@@ -8,9 +8,9 @@ import {
   useNavigate,
   type NavigateFunction,
 } from "react-router";
-import "../styles.css";
-import { PortalFrame } from "../shell";
-import { ConnectedChatPage as ChatPage } from "../features/chat/route";
+import "@purin-labs/surface-portal/ui/styles.css";
+import { PortalFrame } from "@purin-labs/surface-portal/ui/shell";
+import { ConnectedChatPage as ChatPage } from "@purin-labs/surface-portal/ui/features/chat/route";
 import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";
 import { installChatPreviewFetch } from "./chat-preview-data";
 import { ChatExecutionPreviewControls } from "./chat-execution-preview";

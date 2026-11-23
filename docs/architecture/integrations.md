@@ -770,7 +770,7 @@ outcome. Changed arguments need a new proposal.
 ### Authoring in Portal chat
 
 Portal chat can draft a connector
-([`chat/application.ts`](../../services/platform/src/chat/application.ts),
+([`chat/application.ts`](../../surfaces/portal/server/chat/application.ts),
 [`authoring.ts`](../../areas/integrations/server/custom-connectors/authoring.ts)).
 A turn has at most eight model steps: replies, documentation reads through the
 credential-free link path, and new or revised definitions. The real parser

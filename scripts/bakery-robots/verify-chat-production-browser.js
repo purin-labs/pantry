@@ -1951,7 +1951,7 @@ function isFocused(element) {
 async function serveParityStyles(route) {
   await route.fulfill({
     contentType: "application/javascript",
-    body: `import "${checkoutUrl("apps/portal/src/styles.css")}"; import "${checkoutUrl("apps/portal/src/workflow-demo.css")}";`,
+    body: `import "${checkoutUrl("surfaces/portal/ui/styles.css")}"; import "${checkoutUrl("surfaces/portal/ui/workflow-demo.css")}";`,
   });
 }
 

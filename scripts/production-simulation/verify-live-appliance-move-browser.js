@@ -369,7 +369,7 @@ function filterViteFullReload(ws) {
 async function liveMoveStyles(route) {
   await route.fulfill({
     contentType: "application/javascript",
-    body: `import "${checkoutUrl("apps/portal/src/styles.css")}";`,
+    body: `import "${checkoutUrl("surfaces/portal/ui/styles.css")}";`,
   });
 }
 

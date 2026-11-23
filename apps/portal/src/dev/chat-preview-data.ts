@@ -1,5 +1,5 @@
 import { isUserId, isConversationId, parseConversationId, parseProjectId, type ConversationId, type Project, type ProjectId } from "@purin-labs/control-api";
-import type { ChatStreamRecord } from "../features/chat/stream";
+import type { ChatStreamRecord } from "@purin-labs/surface-portal/ui/features/chat/stream";
 import {
   draftsPreviewEnabled,
   previewDraftPageData,

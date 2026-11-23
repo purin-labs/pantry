@@ -36,9 +36,9 @@ const CONVERSATION_DELIVERIES = new Set([
   "foundation/authority/access-control/decision-explanation.ts",
   "foundation/conversation/actors/case-conversation-sink.ts",
   "foundation/conversation/case-context-discovery/metadata.ts",
-  "services/platform/src/chat/application.ts",
+  "surfaces/portal/server/chat/application.ts",
   // Refactor 13 moved the timeline effects out of application.ts unchanged.
-  "services/platform/src/chat/turn/timeline.ts",
+  "surfaces/portal/server/chat/turn/timeline.ts",
   "foundation/conversation/chat/conversation-disclosure.ts",
   "foundation/conversation/chat/information-flow.ts",
   "foundation/control/worker/routes/access-control-explain.ts",

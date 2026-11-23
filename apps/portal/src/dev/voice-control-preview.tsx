@@ -11,8 +11,8 @@ import type {
   VoiceStatus,
 } from "@purin-labs/surface-voice/ui/features/voice/session";
 import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
-import "../styles.css";
-import "../features/chat/styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
+import "@purin-labs/surface-portal/ui/features/chat/styles.css";
 import "./agent-components-preview.css";
 
 /**

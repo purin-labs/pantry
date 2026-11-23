@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import type {
   VaultEvent,
   VaultItemCommand,
@@ -16,7 +16,7 @@ import type { VaultKeyView } from "@purin-labs/area-integrations/ui/features/vau
 import { VaultRoute } from "@purin-labs/area-integrations/ui/features/vault/route";
 import { PageHeader } from "@purin-labs/ui/page-components";
 import { workspacePageDescriptor } from "@purin-labs/ui/route";
-import { PortalFrame } from "../shell";
+import { PortalFrame } from "@purin-labs/surface-portal/ui/shell";
 
 const root = document.getElementById("root");
 if (root === null || !import.meta.env.DEV)

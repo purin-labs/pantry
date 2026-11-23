@@ -1,6 +1,6 @@
 import type { Chat } from "@purin-labs/control-api/portal/chat";
 
-import type { ChatStreamState } from "../../../../../apps/portal/src/features/chat/delivery";
+import type { ChatStreamState } from "@purin-labs/surface-portal/ui/features/chat/delivery";
 import { finishedSentences, spokenAnswer } from "./command";
 import type { VoiceSession } from "./session";
 

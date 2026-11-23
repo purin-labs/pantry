@@ -42,7 +42,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes, useSearchParams } from "react-router";
 import { Toaster } from "sonner";
 
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import { installClaudeConnectionPreview } from "./claude-connection-preview";
 import { installVaultIntegrationPreview } from "./vault-integration-preview";
 import { installCustomConnectorPreview } from "./custom-connector-preview";

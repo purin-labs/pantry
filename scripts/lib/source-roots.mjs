@@ -51,6 +51,8 @@ PLATFORM_SOURCE.push("surfaces/slack/server");
 PLATFORM_SOURCE.push("surfaces/webhooks/server");
 // The Worker side of the surface voice (Refactor 17, Stage B).
 PLATFORM_SOURCE.push("surfaces/voice/server");
+// The Worker side of the surface portal (Refactor 17, Stage B).
+PLATFORM_SOURCE.push("surfaces/portal/server");
 
 /**
  * The folders that hold the source of the Portal, in the browser. The package
@@ -83,6 +85,8 @@ PORTAL_SOURCE.push("areas/commerce/ui");
 PORTAL_SOURCE.push("areas/kitchen/ui");
 // The Portal side of the surface voice (Refactor 17, Stage B).
 PORTAL_SOURCE.push("surfaces/voice/ui");
+// The Portal side of the surface portal (Refactor 17, Stage B).
+PORTAL_SOURCE.push("surfaces/portal/ui");
 
 /** True when a repository path is in one of `folders`. */
 export function inFolders(path, folders) {

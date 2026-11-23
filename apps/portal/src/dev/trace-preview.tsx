@@ -35,7 +35,7 @@ import {
 import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
 import { TraceReferenceReplay } from "./trace-reference-replay";
 import { ChatActivityPreview } from "./chat-activity-preview";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import "./trace-preview.css";
 
 type RowProps = {

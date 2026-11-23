@@ -1,5 +1,5 @@
-import { createPortalChatStreamResponse } from "../src/chat/portal-stream";
-import type { AdmittedConversationExecution } from "../src/chat/application";
+import { createPortalChatStreamResponse } from "@purin-labs/surface-portal/server/chat/portal-stream";
+import type { AdmittedConversationExecution } from "@purin-labs/surface-portal/server/chat/application";
 import {
   saveConversation,
   reconcileRevokedConversationRun,

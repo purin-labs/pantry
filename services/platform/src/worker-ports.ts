@@ -138,7 +138,7 @@ import {
   selectSlackDmOrganisation,
 } from "@purin-labs/surface-slack/server/organisation-routing";
 import { chatSurfaces } from "@purin-labs/conversation/chat/surface-registry";
-import { KITCHEN_CHAT_SURFACES } from "./chat/kitchen-observation";
+import { KITCHEN_CHAT_SURFACES } from "@purin-labs/surface-portal/server/chat/kitchen-observation";
 
 memoryService.register({
   readMemoryViews: (...input) => readMemoryViews(...input),

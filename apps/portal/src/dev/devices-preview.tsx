@@ -7,7 +7,7 @@ import type {
   DeviceSnapshotList,
   KitchenDeviceView,
 } from "@purin-labs/control-api";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import { DevicesRoute } from "@purin-labs/area-devices/ui/features/devices/route";
 
 // The Devices page with a stand-in list. `?role=viewer` removes the network

@@ -17,7 +17,7 @@ but only a person can accept it.
   Knowledge, Skills, Learning, Tests and Context. The Tests tab is the Evals view.
   Activity is the second tab of the Agents page. An old `/brain`, `/activity` or
   `/tests` address opens the page that holds its view (`renderBrain` in
-  `apps/portal/src/pages.tsx`).
+  `surfaces/portal/ui/pages.tsx`).
 - The address holds the view, the selected Memory, the state filter, the Eval, the Case
   and the selected record (`view`, `memory`, `state`, `eval`, `case`, `record` in
   `features/brain/address.ts`). A link opens the same view.

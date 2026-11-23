@@ -10,7 +10,7 @@ import {
   type AgentPermissionRequestView,
   type ChatPermissionRequest,
 } from "@purin-labs/control-api";
-import { ChatPermissionPrompt } from "../features/chat/permission-prompt";
+import { ChatPermissionPrompt } from "@purin-labs/surface-portal/ui/features/chat/permission-prompt";
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 
 const ORGANISATION_ID = "organisation_preview";

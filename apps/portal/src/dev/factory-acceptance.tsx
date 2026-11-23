@@ -2,7 +2,7 @@ import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router";
 import { canonicalJson } from "@purin-labs/std";
 import WorkflowSimulatorRoute from "@purin-labs/area-kitchen/ui/features/workflow-simulator/route";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 
 declare global {
   interface Window {

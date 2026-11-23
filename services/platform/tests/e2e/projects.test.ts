@@ -17,8 +17,8 @@ import {
   type ActorRelocationId,
 } from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
-import { admitTurn } from "../../src/chat/turn/admission";
-import { resumeConversationExecution } from "../../src/chat/application";
+import { admitTurn } from "@purin-labs/surface-portal/server/chat/turn/admission";
+import { resumeConversationExecution } from "@purin-labs/surface-portal/server/chat/application";
 import * as modelRoutes from "@purin-labs/agent/models/route";
 import { deriveDirectCaseIdentities } from "@purin-labs/conversation/actors/case-direct-processing";
 import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";

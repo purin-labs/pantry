@@ -8,7 +8,7 @@ import {
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 import "./operations-trace-preview.css";
 
 type ExampleState =

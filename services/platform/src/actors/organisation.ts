@@ -27,7 +27,7 @@ import {
   ensureWorkspaceCanvasChat,
   continueWorkspaceCanvasChat,
 } from "@purin-labs/conversation/chat/workspace-canvas";
-import { readWorkspaceCanvasChat } from "../chat/workspace-canvas-read";
+import { readWorkspaceCanvasChat } from "@purin-labs/surface-portal/server/chat/workspace-canvas-read";
 import {
   CHAT_SIGNAL,
   SURFACE_EFFECT_SIGNAL,

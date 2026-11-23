@@ -11,7 +11,7 @@ import { FinancierBatterWorkspace } from "@purin-labs/area-kitchen/ui/features/p
 import { FinancierPackWorkspace } from "@purin-labs/area-kitchen/ui/features/production-run/financier-pack/financier-pack-physics-view";
 import { GingerTeaWorkspace } from "@purin-labs/area-kitchen/ui/features/production-run/ginger-tea/ginger-tea-physics-view";
 import { LatteWorkspace } from "@purin-labs/area-kitchen/ui/features/production-run/latte/latte-physics-view";
-import "../styles.css";
+import "@purin-labs/surface-portal/ui/styles.css";
 
 // One recipe view with its default recipe and no workspace, as in the local
 // fixture: `?recipe=<name>`. The Refactor 10 playback journey runs each view

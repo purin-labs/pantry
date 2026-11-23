@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { conversationPrompt } from "../src/chat/prompt";
+import { conversationPrompt } from "@purin-labs/surface-portal/server/chat/prompt";
 import {
   parseConversation,
   type Conversation,

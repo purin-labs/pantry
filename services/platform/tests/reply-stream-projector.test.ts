@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { projectReplyStreamText } from "../src/chat/reply-stream-projector";
+import { projectReplyStreamText } from "@purin-labs/surface-portal/server/chat/reply-stream-projector";
 
 describe("portal reply stream projector", function replyProjectorSuite() {
   it("releases only the decoded reply text", function projectsReply() {

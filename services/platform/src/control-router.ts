@@ -95,7 +95,7 @@ import {
   type CaseContextDiscoveryRoute,
 } from "@purin-labs/conversation/control/routes/case-context-discovery";
 import { resolveCaseContextCollectionSelectionVerification } from "@purin-labs/area-inbox/server/case-context-discovery/source";
-import { handleCaseScreenObservationsRoute } from "./control/routes/case-screen-observations";
+import { handleCaseScreenObservationsRoute } from "@purin-labs/surface-portal/server/control/routes/case-screen-observations";
 import {
   handleMemoryRoute,
   matchMemoryRoute,
@@ -221,7 +221,7 @@ import {
   handlePortalChatControlRoute,
   matchPortalChatControlRoute,
   type PortalChatControlRoute,
-} from "./control/routes/chat/router";
+} from "@purin-labs/surface-portal/server/control/routes/chat/router";
 import {
   handleOnboardingControlRoute,
   matchOnboardingControlRoute,

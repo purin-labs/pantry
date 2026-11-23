@@ -4,10 +4,10 @@ import {
   ChatDraftConflictError,
   type saveChatDraft,
   type readChat,
-} from "../../../apps/portal/src/features/chat/api";
+} from "@purin-labs/surface-portal/ui/features/chat/api";
 import type { Chat } from "@purin-labs/control-api/portal/chat";
 // @ts-expect-error The portal build type-checks JSX separately from platform tests.
-import { ChatPage } from "../../../apps/portal/src/features/chat/route";
+import { ChatPage } from "@purin-labs/surface-portal/ui/features/chat/route";
 
 const transport = vi.hoisted(function createTransport() {
   return {
@@ -16,7 +16,7 @@ const transport = vi.hoisted(function createTransport() {
   };
 });
 
-vi.mock("../../../apps/portal/src/features/chat/api", mockChatApi);
+vi.mock("@purin-labs/surface-portal/ui/features/chat/api", mockChatApi);
 
 async function mockChatApi(importOriginal: () => Promise<object>) {
   return {

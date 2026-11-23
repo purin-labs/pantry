@@ -21,7 +21,7 @@ async function mountMailInbox(page) {
     );
     // The Inbox renders in the Portal's own frame, as on the real page.
     const { PortalFrame } = await import(
-      sourceUrl("apps/portal/src/shell.tsx")
+      sourceUrl("surfaces/portal/ui/shell.tsx")
     );
     // The frame's router context must come from the same module instance.
     const router = performance

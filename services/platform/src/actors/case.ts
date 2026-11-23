@@ -28,7 +28,7 @@ const CASE_PARTS: CaseParts = {
     // part, so the Worker start does not load the chat run.
     async resumeExecution(env, scope, execution, caseActor) {
       const { resumeConversationExecution } = await import(
-        "../chat/application"
+        "@purin-labs/surface-portal/server/chat/application"
       );
       return resumeConversationExecution(env, scope, execution, caseActor);
     },
