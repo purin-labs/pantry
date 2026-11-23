@@ -42,8 +42,12 @@ may read. Labels decide where the result may go. Keep both at their boundaries.
 3. Any other `private` policy stops the sink.
 4. Any other `internal` policy passes inside the Organisation. A sink that reaches
    outside it returns `approval_required`: a Slack Connect channel
-   (`reachesOutside`), a WhatsApp reply, a catalogue publish, an Airtable write or a
-   custom connector write.
+   (`reachesOutside`), an Airtable write or a custom connector write.
+
+`OUTSIDE_CAPABILITIES` also names a WhatsApp reply and a catalogue publish, but
+no sink runs rule 4 for them today. `whatsapp_support_reply_send` has no exit
+check: its body must be the requester's own text. A catalogue change is a
+commerce proposal (`commerce.action.propose`) that a person approves.
 
 A write to another company's service (`OTHER_SERVICE_CAPABILITIES`) has no reader
 in the audience, so rule 1 does not pass its internal policies. Private content
