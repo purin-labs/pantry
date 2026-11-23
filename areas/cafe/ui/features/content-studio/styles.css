@@ -1,16 +1,14 @@
+/* The Menu items sheet (Plan 40B): the shared menu draft, its publication,
+   the shop address and a review snapshot, in one column. Each section is
+   one framed list of item rows. */
+
 .content-studio-stack {
   display: grid;
   gap: 24px;
 }
 
-.content-studio-card,
-.content-studio-coming-next {
+.content-studio-menu {
   position: relative;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  background: var(--paper);
-  padding: clamp(20px, 3vw, 34px);
 }
 
 .content-studio-menu-title {
@@ -30,9 +28,23 @@
   outline-offset: 2px;
 }
 
+.content-studio-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+  margin-bottom: 16px;
+}
+
+.content-studio-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .content-studio-menu-toolbar,
-.content-studio-menu-section-header,
-.content-studio-menu-item footer {
+.content-studio-menu-section-header {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -47,16 +59,11 @@
 
 .content-studio-menu-board {
   display: grid;
-  align-items: start;
-  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
-  gap: 16px;
+  gap: 20px;
 }
 
-.content-studio-menu-section {
-  min-height: 190px;
-  border-radius: 16px;
-  background: var(--surface);
-  padding: 16px;
+.content-studio-menu-section-header {
+  margin-bottom: 8px;
 }
 
 .content-studio-menu-section-header h3 {
@@ -66,75 +73,82 @@
   line-height: 1.5;
 }
 
+.content-studio-menu-add {
+  width: auto;
+  min-width: 160px;
+}
+
 .content-studio-menu-items {
-  display: grid;
-  gap: 10px;
-  margin-top: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+  overflow: hidden;
 }
 
 .content-studio-menu-empty {
-  margin: 24px 0;
+  margin: 16px 0;
   text-align: center;
   color: var(--ink-2);
 }
 
+/* One item: the grip, the name over the description, the section and
+   Remove. */
 .content-studio-menu-item {
-  position: relative;
   display: grid;
-  gap: 8px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--paper);
-  padding: 14px;
-  box-shadow: 0 5px 18px
-    color-mix(in oklch, var(--pantry-shadow-color) 6%, transparent);
+  grid-template-columns: 16px minmax(0, 1fr) 150px auto;
+  align-items: center;
+  gap: 2px 12px;
+  padding: 10px 14px;
+}
+
+.content-studio-menu-item + .content-studio-menu-item {
+  border-top: 1px solid var(--hairline);
 }
 
 .content-studio-menu-item[draggable="true"] {
   cursor: grab;
 }
 
+/* Each part names its cell: an item with a row and no column would take a
+   cell before the name and the description do. */
 .content-studio-menu-grip {
-  position: absolute;
-  top: 8px;
-  right: 10px;
+  grid-area: 1 / 1 / span 2;
   color: var(--ink-3);
   letter-spacing: -3px;
 }
 
 .content-studio-menu-item input,
 .content-studio-menu-item textarea {
+  grid-column: 2;
   width: 100%;
   box-sizing: border-box;
   border: 0;
   background: transparent;
+  padding: 0;
   color: inherit;
   font: inherit;
 }
 
 .content-studio-menu-item input {
-  padding-right: 24px;
+  grid-row: 1;
   font-weight: 500;
 }
 
 .content-studio-menu-item textarea {
-  resize: vertical;
+  grid-row: 2;
+  min-height: 0;
+  field-sizing: content;
+  resize: none;
   color: var(--ink-2);
   line-height: 1.45;
 }
 
-.content-studio-menu-item code {
-  color: var(--ink-2);
-  font-size: 0.7rem;
-  overflow-wrap: anywhere;
+.content-studio-menu-placement {
+  grid-area: 1 / 3 / span 2;
 }
 
-.content-studio-menu-placement {
-  display: grid;
-  gap: var(--pantry-space-2);
-  min-width: 0;
-  color: var(--ink-2);
-  font-size: var(--pantry-text-label);
+.content-studio-menu-item > button.pantry-button {
+  grid-area: 1 / 4 / span 2;
 }
 
 .content-studio-menu-placement button:where(.pantry-select-trigger) {
@@ -149,155 +163,30 @@
   font: inherit;
 }
 
-.content-studio-menu-item footer {
-  justify-content: flex-end;
+.content-studio-review {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px 24px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  align-items: center;
 }
 
-.content-studio-menu-note {
-  margin: 18px 0 0;
-  color: var(--ink-2);
-  font-size: 0.82rem;
-}
-
-.content-studio-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 28px;
-}
-
-.content-studio-header h2,
-.content-studio-coming-next h2,
 .content-studio-review h3 {
   margin: 2px 0 8px;
+  font-size: var(--pantry-text-body);
+  font-weight: 500;
+  line-height: 1.5;
 }
 
-.content-studio-header p,
-.content-studio-coming-next p,
 .content-studio-review p {
   margin: 0;
   color: var(--ink-2);
 }
 
-.content-studio-eyebrow,
-.content-studio-preview-label {
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.content-studio-status {
-  display: grid;
-  justify-items: end;
-  gap: 10px;
-}
-
-.content-studio-email-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.12fr) minmax(280px, 0.88fr);
-  gap: clamp(22px, 4vw, 48px);
-  align-items: start;
-}
-
-.content-studio-fields {
-  display: grid;
-  gap: 18px;
-}
-
-.content-studio-field {
-  display: grid;
-  gap: 7px;
-  font-weight: 650;
-}
-
-.content-studio-field textarea {
-  width: 100%;
-  resize: vertical;
-  box-sizing: border-box;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  padding: 12px 14px;
-  font: inherit;
-  line-height: 1.5;
-  background: var(--paper);
-  color: inherit;
-}
-
-.content-studio-field-body textarea {
-  min-height: 250px;
-}
-
-.content-studio-field small {
-  justify-self: end;
-  color: var(--ink-2);
-  font-weight: 500;
-}
-
-.content-studio-preview {
-  min-height: 390px;
-  border-radius: 18px;
-  background: var(--pantry-surface);
-  padding: 22px;
-  box-shadow: inset 0 0 0 1px
-    color-mix(in oklch, var(--pantry-shadow-color) 10%, transparent);
-}
-
-.content-studio-preview-chrome {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 24px;
-}
-
-.content-studio-preview-chrome span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--pantry-hairline);
-}
-
-.content-studio-preview h3 {
-  margin: 10px 0 4px;
-  font-size: 1.18rem;
-}
-
-.content-studio-preview-text {
-  margin: 0 0 22px;
-  color: var(--pantry-ink-muted);
-}
-
-.content-studio-preview-body {
-  min-height: 230px;
-  border-radius: 12px;
-  background: var(--paper);
-  padding: 22px;
-  white-space: pre-wrap;
-  line-height: 1.6;
-  box-shadow: 0 8px 30px
-    color-mix(in oklch, var(--pantry-shadow-color) 8%, transparent);
-}
-
-.content-studio-review {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 14px 24px;
-  margin-top: 30px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border);
-  align-items: center;
-}
-
-.content-studio-review > button:not(:where(.pantry-select-trigger)) {
-  min-height: 44px;
-  padding-inline: var(--pantry-space-4);
+.content-studio-review > button.pantry-button {
   justify-self: start;
-}
-
-.content-studio-review h3 {
-  font-size: var(--pantry-text-body);
-  font-weight: 500;
-  line-height: 1.5;
 }
 
 .content-studio-reviewed,
@@ -317,70 +206,6 @@
   white-space: pre-wrap;
 }
 
-.content-studio-card .collaboration-slack-thread {
-  margin-top: 24px;
-  border-top: 1px solid var(--border);
-  padding-top: 20px;
-}
-
-.content-studio-card .collaboration-slack-thread summary {
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.content-studio-card .collaboration-slack-thread form {
-  display: grid;
-  gap: 10px;
-  margin-top: 16px;
-}
-
-.content-studio-card .collaboration-slack-thread input {
-  width: 100%;
-  box-sizing: border-box;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 12px;
-  font: inherit;
-}
-
-.content-studio-coming-next {
-  background: var(--pantry-category-neutral-surface);
-  color: var(--pantry-category-neutral-text);
-}
-
-.content-studio-coming-next p {
-  max-width: 62ch;
-  color: var(--pantry-category-neutral-text);
-}
-
-@media (max-width: 880px) {
-  .content-studio-header,
-  .content-studio-email-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .content-studio-header {
-    display: grid;
-  }
-
-  .content-studio-status {
-    justify-items: start;
-  }
-}
-
-@media (max-width: 520px) {
-  .content-studio-menu-placement button:where(.pantry-select-trigger) {
-    font-size: 16px;
-  }
-  .content-studio-review {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-.content-studio-publish {
-  margin-top: 24px;
-}
-
 .content-studio-shop-link {
   display: inline-block;
   margin-top: 8px;
@@ -395,7 +220,6 @@
   display: flex;
   align-items: center;
   max-width: 100%;
-  margin-top: 12px;
   border: 1px solid var(--border);
   border-radius: var(--pantry-radius-control, 10px);
   background: var(--paper);
@@ -433,11 +257,6 @@
   color: var(--ink);
 }
 
-.content-studio-menu-add {
-  width: auto;
-  min-width: 160px;
-}
-
 .content-studio-hours {
   display: grid;
   grid-column: 1 / -1;
@@ -465,7 +284,7 @@
   gap: 8px 12px;
 }
 
-.content-studio-hours > button:not(:where(.pantry-select-trigger)) {
+.content-studio-hours > button.pantry-button {
   justify-self: start;
 }
 
@@ -482,4 +301,23 @@
   flex: none;
   width: auto;
   margin: 0;
+}
+
+/* On a phone, the section and Remove go under the name. */
+@media (max-width: 560px) {
+  .content-studio-menu-item {
+    grid-template-columns: 16px minmax(0, 1fr) auto;
+  }
+  .content-studio-menu-placement {
+    grid-area: 3 / 2;
+  }
+  .content-studio-menu-item > button.pantry-button {
+    grid-area: 1 / 3 / span 3;
+  }
+  .content-studio-menu-placement button:where(.pantry-select-trigger) {
+    font-size: 16px;
+  }
+  .content-studio-review {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

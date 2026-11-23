@@ -57,13 +57,9 @@ export function MenuScreensPanel(props: Readonly<{ organisationId: string }>): R
         : "The screen could not be changed. Try again.");
     await reload();
   };
-  return <section className="content-studio-card menu-screens">
-    <header className="menu-boards-header">
-      <div>
-        <p className="content-studio-eyebrow">Shop screens</p>
-        <h2>Screens</h2>
-        <p>Each screen plays one board. It keeps a saved copy, so it still shows the menu when the network drops.</p>
-      </div>
+  // The sheet's title names the screens; each row says if it plays a saved copy.
+  return <section className="menu-screens" aria-label="Screens">
+    <header className="menu-screens-header">
       <button
         type="button"
         className="menu-boards-primary"
@@ -80,10 +76,10 @@ export function MenuScreensPanel(props: Readonly<{ organisationId: string }>): R
       Make a board first, then add the screen that plays it.
     </p> : null}
     {state.kind === "ready" && boards.length > 0 && screens.length === 0 ? <p className="content-studio-menu-empty">
-      No screens yet. Open {window.location.origin}/tv on a TV or a tablet, then add it here with its code.
+      No screens yet.
     </p> : null}
     {message === null ? null : <p className="description-draft-error" role="alert">{message}</p>}
-    <ul className="menu-screens-list">
+    {screens.length === 0 ? null : <ul className="menu-screens-list">
       {screens.map((screen) => <ScreenRow
         key={screen.screenId}
         screen={screen}
@@ -91,7 +87,7 @@ export function MenuScreensPanel(props: Readonly<{ organisationId: string }>): R
         onAssign={(boardId) => void change("PUT", screen.screenId, { boardId })}
         onRemove={() => void change("DELETE", screen.screenId)}
       />)}
-    </ul>
+    </ul>}
     <PairDialog
       open={pairing}
       organisationId={props.organisationId}
@@ -117,7 +113,7 @@ function ScreenRow(props: Readonly<{
     <div className="menu-screens-name">
       <strong>{screen.name}</strong>
       <span className="menu-screens-status" data-live={screen.connected ? "true" : "false"}>
-        <span aria-hidden="true" />
+        {screen.connected ? null : <span aria-hidden="true" />}
         {screenStatus(screen)}
       </span>
     </div>
@@ -242,7 +238,7 @@ function pairFailure(code: unknown): string {
 }
 
 function screenStatus(screen: MenuScreenSummary): string {
-  if (screen.connected) return "Live now";
+  if (screen.connected) return "Live";
   if (screen.lastSeenAt === null) return "Not connected yet";
   const time = new Date(screen.lastSeenAt).toLocaleString([], {
     month: "short",
@@ -250,7 +246,7 @@ function screenStatus(screen: MenuScreenSummary): string {
     hour: "2-digit",
     minute: "2-digit",
   });
-  return `Offline since ${time} · it shows its saved copy`;
+  return `Offline since ${time} · shows its saved copy`;
 }
 
 async function readScreens(organisationId: string): Promise<ScreensState> {

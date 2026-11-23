@@ -60,12 +60,12 @@ const keyOf = (option: Option): string => `${option.layout}:${option.start}`;
 
 export function StartBoard(props: Readonly<{
   organisationId: string;
-  /** The buttons that open the Menus sheets, for a shop with no board yet. */
+  /** The buttons that open the Menus sheets: the layer covers the board list. */
   menuLinks?: React.ReactNode;
   /** Null when the shop has no board yet. */
   onCancel: (() => void) | null;
   onCreated: (boardId: string) => Promise<void>;
-  /** The menu's size, for the line under the designed menus. */
+  /** The menu's size, beside the designed menus. */
   menuSize: Readonly<{ items: number; sections: number }>;
   /** The archived boards, when every board is archived, to restore one. */
   archived?: React.ReactNode;
@@ -116,18 +116,17 @@ export function StartBoard(props: Readonly<{
   </label>;
   return <div className="menu-board-start-layer">
     <form className="menu-boards-new menu-board-start" aria-label="Start a board" onSubmit={(event) => void submit(event)}>
-      {props.menuLinks === undefined || props.onCancel !== null ? null : <div className="menu-board-start-tabs">{props.menuLinks}</div>}
+      {props.menuLinks === undefined ? null : <div className="menu-board-start-tabs">{props.menuLinks}</div>}
       <header>
         <h2>Start a board</h2>
-        <p>Your products and their live prices fill the board. One board fits every screen, and you can change everything on the canvas later.</p>
       </header>
       <fieldset className="menu-board-start-grid" data-count={LAYOUT_OPTIONS.length}>
-        <legend>Start from a layout</legend>
+        <legend>Layout</legend>
         {LAYOUT_OPTIONS.map(card)}
       </fieldset>
       <fieldset className="menu-board-start-grid" data-count={DESIGNS.length}>
         <legend>
-          Or a designed menu, filled with your products
+          Designed menu
           <span>{props.menuSize.items === 1 ? "1 product" : `${props.menuSize.items} products`} · {props.menuSize.sections === 1 ? "1 section" : `${props.menuSize.sections} sections`}</span>
         </legend>
         {DESIGN_OPTIONS.map(card)}
@@ -137,7 +136,6 @@ export function StartBoard(props: Readonly<{
           <span>Name</span>
           <input value={title} maxLength={MENU_BOARD_TEXT_LIMIT} required onChange={(event) => setTitle(event.target.value)} />
         </label>
-        <span className="menu-board-start-summary">{option?.name}</span>
         {props.onCancel === null ? null : <button type="button" className="menu-board-text-button" onClick={props.onCancel}>Cancel</button>}
         <button type="submit" className="menu-boards-primary" disabled={busy || title.trim().length === 0 || option === undefined}>
           {busy ? "Creating…" : "Create board"}

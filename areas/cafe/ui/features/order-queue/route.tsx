@@ -59,7 +59,7 @@ export function OrderQueueRoute(props: Readonly<{ organisationId: string }>): Re
     <section aria-label="To prepare">
       <h2>To prepare <span>{preparing.length}</span></h2>
       {preparing.length === 0
-        ? <p className="order-queue-note">No order waits. A new QR order appears here.</p>
+        ? <p className="order-queue-note">No order waits.</p>
         : <ul>{preparing.map(row)}</ul>}
     </section>
     <section aria-label="Ready to collect">
@@ -94,7 +94,7 @@ function SoldOutToday(props: Readonly<{ organisationId: string }>): React.ReactN
   if (items === null || items.length === 0) return null;
   return <section aria-label="Sold out today" className="order-queue-sold-out">
     <h2>Sold out today</h2>
-    <p className="order-queue-note">A mark ends at midnight. Items with a stock count also show as sold out when their stock ends.</p>
+    <p className="order-queue-note">A mark ends at midnight.</p>
     <ul>
       {items.map((item) => <li key={item.variantId} className="order-queue-sold-out-row" data-sold-out={item.soldOutUntil === null ? undefined : "true"}>
         <span>{item.title}</span>

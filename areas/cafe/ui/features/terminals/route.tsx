@@ -1,6 +1,7 @@
 import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { toast } from "sonner";
+import { Button } from "@purin-labs/ui/index";
 import { PageSkeleton, RecoverableError } from "@purin-labs/ui/page-components";
 import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 
@@ -85,13 +86,10 @@ export function TerminalOperationsPanel(
   const operations = state.view.operations;
 
   return (
-    <section className="terminal-panel">
-      <header className="terminal-panel-heading">
-        <h2>Card-present counters</h2>
-        <span className="terminal-panel-timestamp">
-          As of {new Date(operations.generatedAt).toLocaleString()}
-        </span>
-      </header>
+    <section className="terminal-page" aria-label="Counters">
+      <p className="terminal-panel-timestamp">
+        As of {new Date(operations.generatedAt).toLocaleString()}
+      </p>
       {operations.counters.length === 0 &&
       operations.unreadableAssignments === 0 ? (
         <p className="terminal-panel-warning">
@@ -105,19 +103,18 @@ export function TerminalOperationsPanel(
           Those counters exist but Purin Pantry cannot describe them.
         </p>
       ) : null}
-      <ul className="terminal-list">
-        {operations.counters.map(
-          renderTerminalCounter.bind(null, {
-            organisationId: props.organisationId,
-            canManage: props.canManage,
-            busy,
-            setConfirming,
-          }),
-        )}
-      </ul>
-      <p className="terminal-panel-note">
-        Ring up counter sales from Café › Register.
-      </p>
+      {operations.counters.length === 0 ? null : (
+        <ul className="terminal-list">
+          {operations.counters.map(
+            renderTerminalCounter.bind(null, {
+              organisationId: props.organisationId,
+              canManage: props.canManage,
+              busy,
+              setConfirming,
+            }),
+          )}
+        </ul>
+      )}
       {props.canManage ? (
         <details
           className="terminal-settings"
@@ -239,45 +236,32 @@ function renderTerminalCounter(
       <div className="terminal-row-identity">
         <span className="terminal-row-location">{counter.pantryLocationId}</span>
         <span className="terminal-row-device">
-          Credentials {credentialHealthLabel(counter.credentialHealth)}
-        </span>
-        <span className="terminal-row-device">
-          {counter.assignment.targetKind === "sandbox_simulated"
-            ? "Source: Square Sandbox test scenario · physical health unknown"
-            : counter.assignment.targetKind === "square_pos_app"
-              ? "Square Point of Sale app on the counter iPad · Square checks each payment"
-              : "Source: Square Devices API"}
+          {targetLabel(counter.assignment.targetKind)} · Credentials{" "}
+          {credentialHealthLabel(counter.credentialHealth)}
         </span>
       </div>
       <div className="terminal-row-state">
-        <span className={`terminal-badge terminal-badge-${badgeTone(counter)}`}>
+        <span data-tone={counter.blockedReason === null ? undefined : "quiet"}>
           {statusLabel(counter)}
         </span>
         {counter.paymentsLinked ? null : (
-          <span className="terminal-badge terminal-badge-caution">
-            Not linked for payments
-          </span>
+          <span data-tone="caution">Not linked for payments</span>
         )}
         {counter.assignment.healthIsObservable ? null : (
-          <span className="terminal-badge terminal-badge-quiet">
-            Health not reported
-          </span>
+          <span data-tone="quiet">Health not reported</span>
         )}
         {counter.assignment.capabilityCurrent ? null : (
-          <span className="terminal-badge terminal-badge-caution">
-            Configuration out of date
-          </span>
+          <span data-tone="caution">Configuration out of date</span>
         )}
       </div>
       {context.canManage && counter.blockedReason !== "assignment_retired" ? (
-        <button
-          type="button"
-          className="terminal-row-action"
+        <Button
+          variant="danger"
           disabled={context.busy === counter.pantryLocationId}
           onClick={context.setConfirming.bind(null, counter)}
         >
           Stop taking payments
-        </button>
+        </Button>
       ) : null}
     </li>
   );
@@ -328,12 +312,19 @@ function statusLabel(counter: TerminalCounterReadback): string {
   }
 }
 
-function badgeTone(counter: TerminalCounterReadback): "ready" | "quiet" {
-  switch (counter.blockedReason) {
-    case null:
-      return "ready";
-    case "assignment_retired":
-      return "quiet";
+/** What takes the counter's card payments. */
+function targetLabel(
+  targetKind: TerminalCounterReadback["assignment"]["targetKind"],
+): string {
+  switch (targetKind) {
+    case "sandbox_simulated":
+      return "Square Sandbox test scenario";
+    case "square_pos_app":
+      return "Square app on the counter iPad";
+    case "paired_physical":
+      return "Square Terminal";
+    case "lan_gateway_device":
+      return "Terminal on the shop gateway";
   }
 }
 
@@ -457,10 +448,6 @@ function TerminalSetup(
             ? "Replace Sandbox terminal"
             : "Set up Sandbox terminal"}
         </h3>
-        <p>
-          Choose the Purin Checkout counter, Square payment location, and
-          documented test scenario.
-        </p>
       </div>
       <div className="terminal-setup-fields">
         <label>
@@ -492,13 +479,18 @@ function TerminalSetup(
         </label>
       </div>
       {canConfigure ? (
-        <button type="submit" className="terminal-row-action" disabled={busy}>
+        <Button
+          variant="secondary"
+          type="submit"
+          className="terminal-setup-submit"
+          disabled={busy}
+        >
           {busy
             ? "Saving…"
             : props.replace
               ? "Replace terminal"
               : "Activate terminal"}
-        </button>
+        </Button>
       ) : (
         <p className="terminal-panel-warning">
           Publish a counter policy and refresh an active Square account’s
@@ -560,14 +552,14 @@ function TerminalPairingSetup(
         {progress.pairing.status === "expired" ? null : (
           <p className="terminal-pairing-code">{progress.pairing.code}</p>
         )}
-        <button
-          type="button"
-          className="terminal-row-action"
+        <Button
+          variant="secondary"
+          className="terminal-setup-submit"
           disabled={busy}
           onClick={setProgress.bind(null, null)}
         >
           {progress.pairing.status === "expired" ? "Get a new code" : "Cancel"}
-        </button>
+        </Button>
       </section>
     );
   return (
@@ -579,10 +571,6 @@ function TerminalPairingSetup(
         <h3>
           {props.replace ? "Replace Square Terminal" : "Pair a Square Terminal"}
         </h3>
-        <p>
-          Choose the Purin Checkout counter and the Square location of the
-          Terminal. Purin Pantry then shows a code to type on the Terminal.
-        </p>
       </div>
       <div className="terminal-setup-fields">
         <label>
@@ -615,9 +603,14 @@ function TerminalPairingSetup(
         </label>
       </div>
       {canPair ? (
-        <button type="submit" className="terminal-row-action" disabled={busy}>
+        <Button
+          variant="secondary"
+          type="submit"
+          className="terminal-setup-submit"
+          disabled={busy}
+        >
           {busy ? "Asking Square…" : "Get a pairing code"}
-        </button>
+        </Button>
       ) : (
         <p className="terminal-panel-warning">
           Publish a counter policy and refresh an active Square account’s
@@ -654,10 +647,9 @@ function SquarePosAppSetup(
       <div className="terminal-setup-heading">
         <h3>Use the Square app on an iPad</h3>
         <p>
-          For a counter with a Square Reader and no Square Terminal. The
-          Register opens the Square Point of Sale app on the same iPad, and
-          Purin Pantry checks each payment with Square. In the Square Developer
-          Console, add this web callback URL to the Point of Sale API:{" "}
+          For a counter with a Square Reader and no Square Terminal. In the
+          Square Developer Console, add this web callback URL to the Point of
+          Sale API:{" "}
           <code>{`${window.location.origin}${SQUARE_POS_CALLBACK_PATH}`}</code>
         </p>
       </div>
@@ -681,9 +673,14 @@ function SquarePosAppSetup(
           />
         </label>
       </div>
-      <button type="submit" className="terminal-row-action" disabled={busy}>
+      <Button
+        variant="secondary"
+        type="submit"
+        className="terminal-setup-submit"
+        disabled={busy}
+      >
         {busy ? "Saving…" : "Use the Square app"}
-      </button>
+      </Button>
     </form>
   );
 }

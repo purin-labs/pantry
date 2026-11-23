@@ -130,19 +130,6 @@
   background: var(--paper);
 }
 
-.menu-canvas-layers header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.menu-canvas-layers h3 {
-  margin: 0;
-  font-size: var(--pantry-text-body);
-}
-
-.menu-canvas-layers header span,
 .menu-canvas-layer-detail {
   color: var(--ink-2);
   font-size: var(--pantry-text-label);

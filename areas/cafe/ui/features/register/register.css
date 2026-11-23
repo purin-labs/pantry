@@ -1,3 +1,7 @@
+/* The Register (Plan 90): the menu as keys for a counter tablet, and the
+   ticket with the basket, the totals and the payment. Colours are the
+   Portal tokens. */
+
 .register-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(320px, 420px);
@@ -24,7 +28,11 @@
   padding: 18px;
   border: 1px solid var(--border);
   border-radius: 14px;
-  background: var(--surface);
+  background: var(--paper);
+}
+
+.register-ticket h2 {
+  margin: 0;
 }
 
 .register-header-bar {
@@ -35,27 +43,10 @@
   gap: 10px;
 }
 
-.register-status-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.register-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--surface-subtle, var(--surface));
-  font-size: 0.82rem;
-  color: var(--text-muted);
-}
-
-.register-pill[data-tone="ready"] {
-  color: var(--text);
-  border-color: var(--accent);
+/* Cash, the terminal and the order queue, as one plain line. */
+.register-facts {
+  margin: 0;
+  color: var(--ink-2);
 }
 
 .register-tabs {
@@ -64,23 +55,34 @@
   gap: 8px;
 }
 
+.register-tab,
+.register-tile,
+.register-quick-btn,
+.register-method-btn,
+.register-qty-btn {
+  border: 1px solid var(--border);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
 .register-tab {
   min-height: 40px;
   padding: 8px 14px;
   border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
   font-weight: 500;
-  cursor: pointer;
 }
 
-.register-tab[aria-selected="true"] {
-  background: var(--text);
-  color: var(--surface);
-  border-color: var(--text);
+.register-tab[aria-selected="true"],
+.register-method-btn[aria-pressed="true"],
+.register-quick-btn[aria-pressed="true"] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
 }
 
+/* The menu keys: large tap targets for the counter tablet. */
 .register-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
@@ -96,14 +98,10 @@
   padding: 14px;
   text-align: left;
   border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  cursor: pointer;
 }
 
 .register-tile:hover:not(:disabled) {
-  border-color: var(--accent);
+  border-color: var(--ink-3);
 }
 
 .register-tile:disabled {
@@ -122,10 +120,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  color: var(--ink-2);
   font-size: 0.9rem;
 }
 
 .register-tile-price {
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
   font-weight: 600;
 }
@@ -134,8 +134,8 @@
   font-size: 0.74rem;
   padding: 2px 7px;
   border-radius: 999px;
-  background: var(--danger-soft, rgba(180, 35, 24, 0.12));
-  color: var(--danger, #b42318);
+  background: var(--danger-bg);
+  color: var(--danger-text);
   font-weight: 600;
 }
 
@@ -153,7 +153,7 @@
   justify-content: space-between;
   gap: 10px;
   padding-bottom: 10px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--hairline);
 }
 
 .register-basket-info {
@@ -164,7 +164,7 @@
 
 .register-basket-mods {
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: var(--ink-2);
 }
 
 .register-basket-controls {
@@ -177,17 +177,12 @@
   min-width: 32px;
   min-height: 32px;
   border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  cursor: pointer;
 }
 
 .register-totals {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding-top: 6px;
 }
 
 .register-total-row {
@@ -203,8 +198,7 @@
 }
 
 .register-total-tax {
-  font-size: 0.82rem;
-  color: var(--text-muted);
+  color: var(--ink-2);
 }
 
 .register-tender-section {
@@ -212,7 +206,11 @@
   flex-direction: column;
   gap: 10px;
   padding-top: 10px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--hairline);
+}
+
+.register-tender-section h3 {
+  margin: 0;
 }
 
 .register-quick-row,
@@ -229,47 +227,13 @@
   min-height: 40px;
   padding: 8px 10px;
   border-radius: 9px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
   font-weight: 500;
-  cursor: pointer;
 }
 
-.register-method-btn[aria-pressed="true"],
-.register-quick-btn[aria-pressed="true"] {
-  border-color: var(--text);
-  background: var(--text);
-  color: var(--surface);
-}
-
-.register-primary-btn {
+/* A charge button fills the ticket's width. */
+.register-ticket button.pantry-button.register-wide,
+.side-drawer button.pantry-button.register-wide {
   width: 100%;
-  min-height: 46px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: none;
-  background: var(--text);
-  color: var(--surface);
-  font-weight: 600;
-  font-size: 0.96rem;
-  cursor: pointer;
-}
-
-.register-primary-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.register-secondary-btn {
-  min-height: 40px;
-  padding: 8px 12px;
-  border-radius: 9px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  font-weight: 500;
-  cursor: pointer;
 }
 
 .register-cash-input {
@@ -278,17 +242,15 @@
   padding: 8px 12px;
   border-radius: 9px;
   border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
   font-variant-numeric: tabular-nums;
 }
 
 .register-change-preview {
   display: flex;
   justify-content: space-between;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: var(--surface-subtle, rgba(0, 0, 0, 0.04));
   font-variant-numeric: tabular-nums;
 }
 
@@ -296,10 +258,10 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 16px;
-  border-radius: 12px;
-  border: 1px solid var(--accent);
-  background: var(--surface);
+}
+
+.register-pickup-card p {
+  margin: 0;
 }
 
 .register-pickup-code {
@@ -309,11 +271,21 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* In the narrow ticket, each value of a sale sits at the end of its row. */
+.register-ticket .sale-facts > div {
+  display: flex;
+  justify-content: space-between;
+}
+
+.register-ticket .sale-facts > div:first-child dd {
+  font-weight: 600;
+}
+
 .register-error {
   padding: 10px 12px;
   border-radius: 8px;
-  background: var(--danger-soft, rgba(180, 35, 24, 0.1));
-  color: var(--danger, #b42318);
+  background: var(--danger-bg);
+  color: var(--danger-text);
   font-size: 0.88rem;
 }
 
@@ -345,12 +317,12 @@
   cursor: pointer;
 }
 
+/* The browser prints the ticket: the sale and its facts. The ticket is an
+   aside, so the rule for the Portal's own asides leaves it. */
 @media print {
   .register-catalog,
   .register-action-row,
-  nav,
-  aside,
-  header {
+  body:has(.register-layout) :is(nav, aside:not(.register-ticket), header) {
     display: none !important;
   }
 

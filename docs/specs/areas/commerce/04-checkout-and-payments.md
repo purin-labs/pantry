@@ -175,8 +175,11 @@ outside the engine. A `gmo_stera` collection runs through the Platform `DeviceFl
 - The merchant's alarm reads a waiting Terminal checkout every 5 s for 10 minutes, then
   every 60 s, until it is one hour old. A read that finds the checkout still waiting
   writes nothing.
-- The **Counters & payments** page shows each counter, its Square location, its target,
-  its assignment revision, the credential health and the webhook state.
+- The **Counters & payments** page shows each counter as one row: its target, the
+  credential health, Ready or Retired, and a warning when the counter is not linked for
+  payments, does not report its health or has an old configuration. The terminal setup
+  and one counter sale (`?counterSale=`) are under the list. The page does not show the
+  Square location, the assignment revision or the webhook state.
 
 ### Receipts and payment reads
 

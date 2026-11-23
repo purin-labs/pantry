@@ -72,6 +72,8 @@ async (page) => {
   check("the start screen keeps the Menu items and Screens buttons",
     await start.getByRole("button", { name: "Menu items", exact: true }).isVisible() &&
       await start.getByRole("button", { name: "Screens", exact: true }).isVisible());
+  check("the page has one Menu items button",
+    (await page.getByRole("button", { name: "Menu items", exact: true }).count()) === 1);
   check("the start screen has no screen step", (await start.getByText("Screen", { exact: true }).count()) === 0 &&
     (await start.locator('input[name="menu-board-shape"]').count()) === 0);
   await capture("01-start");
@@ -79,7 +81,7 @@ async (page) => {
   // 2. The Matcha design.
   await start.locator('input[value="canvas_landscape:matcha_bar"]').check();
   await start.getByLabel("Name", { exact: true }).fill("Window");
-  check("the summary names the choice", (await start.locator(".menu-board-start-summary").textContent()) === "Matcha");
+  check("the Matcha design is the choice", await start.locator('input[value="canvas_landscape:matcha_bar"]').isChecked());
   await capture("02-matcha");
   await start.getByRole("button", { name: "Create board", exact: true }).click();
   await start.waitFor({ state: "detached", timeout: 15_000 });

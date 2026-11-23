@@ -60,8 +60,9 @@ export function ArchiveBoardButton(props: Readonly<{
     <button
       type="button"
       className="menu-board-text-button"
+      // The selected chip above names the board.
+      aria-label={`Archive ${props.title}`}
       disabled={state === "busy" || onScreen}
-      title={onScreen ? "A screen shows this board. Show another board on that screen first." : undefined}
       onClick={async () => {
         setState("busy");
         const outcome = await setArchived(props.organisationId, props.boardId, true);
@@ -74,7 +75,7 @@ export function ArchiveBoardButton(props: Readonly<{
       }}
     >
       <Archive size={14} aria-hidden="true" />
-      {`Archive ${props.title}`}
+      Archive
     </button>
     {onScreen ? <p className="menu-boards-drawer-note">A screen shows this board, so it cannot be archived.</p> : null}
     {typeof state === "object" ? <p className="description-draft-error" role="alert">{state.message}</p> : null}

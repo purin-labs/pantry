@@ -107,7 +107,10 @@ const EMPTY_MENU: MenuDraftSnapshot = { title: "Café menu", sections: [], items
  */
 export function MenuBoardsPanel(props: Readonly<{
   organisationId: string;
-  /** The buttons that open the Menus sheets, at the top of the left panel. */
+  /**
+   * The buttons that open the Menus sheets, once on the page: at the top of
+   * the left panel, or on the start layer while it covers that panel.
+   */
   menuLinks?: React.ReactNode;
   /** An open sheet over the canvas: the menu items or the screens. */
   sheet?: React.ReactNode;
@@ -147,6 +150,8 @@ export function MenuBoardsPanel(props: Readonly<{
   }, [props.organisationId, reload, sheetOpen]);
   const list = boards.kind === "ready" ? boards.boards : [];
   const board = list.find((candidate) => candidate.boardId === selected) ?? null;
+  // The start layer covers the board list, so the sheet links move onto it.
+  const starting = creating || (boards.kind === "ready" && list.length === 0);
   // On a wide screen the Portal draws no rail and no top bar here: the
   // workspace draws its own menu and the console's tools.
   const chrome = useCanvasChrome();
@@ -163,7 +168,7 @@ export function MenuBoardsPanel(props: Readonly<{
     {chrome === null ? null : <CanvasMenu chrome={chrome} title={board?.title ?? null} onNewBoard={setCreating.bind(null, true)} />}
     {chrome === null ? null : <CanvasConsole chrome={chrome} />}
     <aside className="menu-board-panel menu-board-panel-start" aria-label="Boards and layers">
-      {props.menuLinks}
+      {starting ? null : props.menuLinks}
       <section className="menu-board-panel-section menu-boards-list" aria-label="Board list">
         <header>
           <h3>Boards</h3>
@@ -206,7 +211,7 @@ export function MenuBoardsPanel(props: Readonly<{
       {list.length === 0 ? null : archivedList}
       <div className="menu-board-layers-host" ref={setLayersHost} />
     </aside>
-    {creating || (boards.kind === "ready" && list.length === 0) ? <StartBoard
+    {starting ? <StartBoard
       organisationId={props.organisationId}
       menuLinks={props.menuLinks}
       onCancel={list.length === 0 ? null : () => setCreating(false)}

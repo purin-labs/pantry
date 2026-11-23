@@ -3,6 +3,7 @@ import {
   counterPrinterJobMessage,
   type CounterSaleReceipt,
 } from "@purin-labs/control-api";
+import { Button } from "@purin-labs/ui/index";
 
 import { printOnPrinter, readSaleReceipt } from "./receipt-requests";
 
@@ -103,14 +104,9 @@ export function ReceiptPrintControl(
 
   return (
     <>
-      <button
-        type="button"
-        className="register-secondary-btn"
-        disabled={busy}
-        onClick={() => void print()}
-      >
+      <Button variant="secondary" disabled={busy} onClick={() => void print()}>
         {busy ? "Printing…" : "Print receipt"}
-      </button>
+      </Button>
       {notice !== null ? (
         <div
           className={
@@ -122,13 +118,9 @@ export function ReceiptPrintControl(
         >
           <span>{notice.text}</span>
           {notice.fallback ? (
-            <button
-              type="button"
-              className="register-secondary-btn"
-              onClick={() => window.print()}
-            >
+            <Button variant="secondary" onClick={() => window.print()}>
               Print in the browser
-            </button>
+            </Button>
           ) : null}
         </div>
       ) : null}

@@ -29,22 +29,10 @@
   font-weight: 500;
 }
 
-.menu-boards-header {
+.menu-screens-header {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.menu-boards-header h2 {
-  margin: 0 0 6px;
-}
-
-.menu-boards-header p {
-  margin: 0;
-  color: var(--ink-2);
+  justify-content: flex-end;
+  margin-bottom: 12px;
 }
 
 .menu-boards-primary {
@@ -258,12 +246,15 @@
   gap: 8px;
 }
 
+/* The screens: one framed list of rows. */
 .menu-screens-list {
   margin: 0;
   padding: 0;
   list-style: none;
-  display: grid;
-  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+  overflow: hidden;
 }
 
 .menu-screens-row {
@@ -272,9 +263,10 @@
   align-items: center;
   gap: 14px;
   padding: 14px 16px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--paper);
+}
+
+.menu-screens-row + .menu-screens-row {
+  border-top: 1px solid var(--hairline);
 }
 
 .menu-screens-name {
@@ -292,15 +284,12 @@
   font-size: var(--pantry-text-label);
 }
 
+/* A dot only beside a screen that is offline. */
 .menu-screens-status span {
   width: 8px;
   height: 8px;
   border-radius: 999px;
   background: var(--ink-3);
-}
-
-.menu-screens-status[data-live="true"] span {
-  background: #2f9e5b;
 }
 
 .menu-screens-confirm {

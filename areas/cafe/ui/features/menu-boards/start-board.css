@@ -43,16 +43,10 @@
 }
 
 .menu-board-start header h2 {
-  margin: 0 0 6px;
+  margin: 0;
   font-size: 24px;
   font-weight: 600;
   letter-spacing: -0.01em;
-}
-
-.menu-board-start header p {
-  margin: 0;
-  color: var(--ink-2);
-  font-size: 14px;
 }
 
 .menu-board-start fieldset {
@@ -294,12 +288,6 @@
   color: var(--ink);
   font: inherit;
   font-size: 14px;
-}
-
-.menu-board-start-summary {
-  align-self: center;
-  color: var(--ink-2);
-  font-size: 13px;
 }
 
 .menu-board-start footer .menu-boards-primary {

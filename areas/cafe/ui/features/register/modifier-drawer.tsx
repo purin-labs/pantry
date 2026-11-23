@@ -3,7 +3,8 @@ import type {
   CounterRegisterMenuEntry,
   CounterRegisterModifierGroup,
 } from "@purin-labs/control-api";
-import { SideDrawer } from "@purin-labs/ui/index";
+import { formatMoneyMinorEnglish } from "@purin-labs/ui/formatting";
+import { Button, SideDrawer } from "@purin-labs/ui/index";
 
 export type ModifierDrawerSelection = Readonly<{
   entry: CounterRegisterMenuEntry;
@@ -106,9 +107,10 @@ export function RegisterModifierDrawer(
       close={props.close}
       footer={
         entry === null ? undefined : (
-          <button
-            type="button"
-            className="register-primary-btn"
+          <Button
+            variant="primary"
+            size="lg"
+            className="register-wide"
             disabled={!isValid}
             onClick={() => {
               props.onAdd({
@@ -119,8 +121,8 @@ export function RegisterModifierDrawer(
               props.close();
             }}
           >
-            Add {quantity} · {formatMoney(lineTotalMinor, entry.unitPrice.currency)}
-          </button>
+            Add {quantity} · {formatMoneyMinorEnglish(lineTotalMinor, entry.unitPrice.currency)}
+          </Button>
         )
       }
     >
@@ -159,7 +161,7 @@ export function RegisterModifierDrawer(
                       </span>
                       <span>
                         {opt.priceDeltaMinor > 0
-                          ? `+${formatMoney(opt.priceDeltaMinor, opt.currency)}`
+                          ? `+${formatMoneyMinorEnglish(opt.priceDeltaMinor, opt.currency)}`
                           : "Included"}
                       </span>
                     </label>
@@ -173,6 +175,7 @@ export function RegisterModifierDrawer(
             <button
               type="button"
               className="register-qty-btn"
+              aria-label="Decrease quantity"
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
             >
               −
@@ -181,6 +184,7 @@ export function RegisterModifierDrawer(
             <button
               type="button"
               className="register-qty-btn"
+              aria-label="Increase quantity"
               onClick={() => setQuantity((q) => Math.min(20, q + 1))}
             >
               +
@@ -190,12 +194,4 @@ export function RegisterModifierDrawer(
       )}
     </SideDrawer>
   );
-}
-
-export function formatMoney(amountMinor: number, currency: string): string {
-  const code = currency.toUpperCase();
-  if (code === "JPY") {
-    return `¥${amountMinor.toLocaleString("ja-JP")}`;
-  }
-  return `${code} ${(amountMinor / 100).toFixed(2)}`;
 }

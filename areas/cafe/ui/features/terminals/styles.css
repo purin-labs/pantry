@@ -1,3 +1,11 @@
+/* Counters & payments: the counters as one framed list of rows, the
+   terminal setup under them, and one counter sale in its own panel. */
+
+.terminal-page {
+  display: grid;
+  gap: 20px;
+}
+
 .terminal-panel {
   border: 1px solid transparent;
   border-radius: var(--pantry-radius-panel);
@@ -30,6 +38,7 @@
 }
 
 .terminal-panel-timestamp {
+  margin: 0;
   color: var(--ink-2);
   font-size: 12px;
 }
@@ -41,11 +50,14 @@
 }
 
 .terminal-setup {
-  border: 1px solid var(--hairline);
-  border-radius: 10px;
-  padding: 20px;
   display: grid;
   gap: 18px;
+}
+
+.terminal-settings > .terminal-setup + .terminal-setup {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--hairline);
 }
 
 .terminal-setup-heading {
@@ -82,21 +94,31 @@
   color: var(--ink-2);
 }
 
+.terminal-setup-submit {
+  justify-self: start;
+}
+
+/* The counters: one framed list. */
 .terminal-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--pantry-radius-card);
+  background: var(--paper);
+  overflow: hidden;
 }
 
 .terminal-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
-  padding: 20px;
-  border: 1px solid var(--border);
-  border-radius: var(--pantry-radius-card);
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px 16px;
+  padding: 14px 18px;
+}
+
+.terminal-row + .terminal-row {
+  border-top: 1px solid var(--hairline);
 }
 
 .terminal-row-identity {
@@ -113,14 +135,21 @@
 .terminal-row-device {
   color: var(--ink-2);
   font-size: 12px;
-  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
+/* The counter's state as words; a warning in the warning colour. */
 .terminal-row-state {
   display: flex;
-  align-content: start;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 4px 12px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.terminal-row-state [data-tone="caution"] {
+  color: var(--pantry-warning-text);
 }
 
 .terminal-badge {
@@ -136,6 +165,11 @@
   background: var(--pantry-success-surface);
 }
 
+.terminal-badge-busy {
+  color: var(--ink);
+  background: var(--surface);
+}
+
 .terminal-badge-caution {
   color: var(--pantry-warning-text);
   background: transparent;
@@ -144,21 +178,6 @@
 .terminal-badge-quiet {
   color: var(--ink-2);
   background: transparent;
-}
-
-.terminal-row-collection {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--ink-2);
-}
-
-.terminal-row-action {
-  justify-self: start;
-}
-
-.terminal-row > :not(.terminal-row-identity, .terminal-row-state) {
-  grid-column: 1 / -1;
 }
 
 .terminal-confirm-content {
@@ -203,30 +222,6 @@
   line-height: 1.5;
 }
 
-.counter-sale-facts {
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
-  gap: 12px;
-}
-
-.counter-sale-facts div {
-  display: grid;
-  gap: 2px;
-}
-
-.counter-sale-facts dt {
-  font-size: 12px;
-  color: var(--ink-2);
-}
-
-.counter-sale-facts dd {
-  margin: 0;
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
-}
-
 .counter-sale-recovery {
   border: 1px solid var(--hairline);
   border-radius: 10px;
@@ -243,19 +238,6 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-}
-
-.counter-sale-actions > button:not(:where(.pantry-select-trigger)) {
-  min-height: 44px;
-  max-width: 100%;
-  white-space: normal;
-}
-
-.counter-sale-print-note {
-  margin: 0;
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--ink-2);
 }
 
 /*
@@ -282,8 +264,7 @@
     background: white;
     border-radius: 0;
   }
-  .counter-sale-actions,
-  .counter-sale-print-note {
+  .counter-sale-actions {
     display: none;
   }
 
@@ -304,12 +285,8 @@
   font-size: 13px;
   color: var(--ink-2);
 }
-.terminal-settings > .terminal-setup {
+.terminal-settings > summary + * {
   margin-top: 16px;
-}
-.terminal-row-device {
-  line-height: 1.5;
-  overflow-wrap: anywhere;
 }
 .terminal-setup-fields input,
 .terminal-setup-fields button:where(.pantry-select-trigger) {
@@ -324,19 +301,12 @@
   font: inherit;
   font-size: 14px;
 }
-.terminal-sale-form .terminal-setup-fields {
-  grid-template-columns: minmax(0, 1fr) 100px;
-}
-.terminal-sale-form > button:not(:where(.pantry-select-trigger)) {
-  color: var(--pantry-on-primary);
-  background: var(--pantry-primary);
-  border-radius: var(--pantry-radius-pill);
-  box-shadow: var(--pantry-primary-ring);
-}
-.terminal-panel button:not(:where(.pantry-select-trigger)):focus-visible,
-.terminal-panel summary:focus-visible,
-.terminal-panel input:focus-visible,
-.terminal-panel button:where(.pantry-select-trigger):focus-visible {
+:is(.terminal-page, .terminal-panel)
+  button:not(:where(.pantry-select-trigger)):focus-visible,
+:is(.terminal-page, .terminal-panel) summary:focus-visible,
+:is(.terminal-page, .terminal-panel) input:focus-visible,
+:is(.terminal-page, .terminal-panel)
+  button:where(.pantry-select-trigger):focus-visible {
   outline: 2px solid var(--pantry-focus);
   outline-offset: 2px;
 }
@@ -344,19 +314,15 @@
   .terminal-panel {
     padding: 16px;
   }
-  .terminal-setup,
-  .terminal-row {
-    padding: 14px;
-  }
   .terminal-row {
     grid-template-columns: minmax(0, 1fr);
+    padding: 14px;
+  }
+  .terminal-row > button.pantry-button {
+    justify-self: start;
   }
   .terminal-setup-fields {
     grid-template-columns: minmax(0, 1fr);
-  }
-  .terminal-sale-form .terminal-setup-fields {
-    grid-template-columns: minmax(0, 1fr) 72px;
-    gap: 12px 8px;
   }
   .terminal-setup-fields input,
   .terminal-setup-fields button:where(.pantry-select-trigger) {

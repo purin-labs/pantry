@@ -1,6 +1,6 @@
 import { DraftLeaveDialog } from "@purin-labs/collaboration/portal/draft-leave-dialog";
 import { Select } from "@purin-labs/ui/select";
-import { SideDrawer } from "@purin-labs/ui/index";
+import { Button, SideDrawer } from "@purin-labs/ui/index";
 import React from "react";
 import {
   MENU_HOUR_DAYS,
@@ -181,21 +181,17 @@ function MenuDraftEditor(
   React.useEffect(loadCafeMenuOptions.bind(null, props.organisationId, setOptions), [props.organisationId]);
   const products = options.kind === "ready" ? options.products : [];
   const readOnly = view.access === "read" || view.kind === "failed";
-  return <section ref={surface} className="content-studio-card content-studio-menu">
+  return <section ref={surface} className="content-studio-menu">
     <DraftMousePointers participants={menuPresenceViews(view)} />
     <header className="content-studio-header">
-      <div>
-        <p className="content-studio-eyebrow">Shared layout draft</p>
-        <input
-          className="content-studio-menu-title"
-          aria-label="Menu title"
-          value={view.draft.title}
-          maxLength={MENU_TEXT_LIMIT}
-          readOnly={readOnly}
-          onChange={renameMenu.bind(null, client)}
-        />
-        <p>Arrange items into sections and prepare your menu for review.</p>
-      </div>
+      <input
+        className="content-studio-menu-title"
+        aria-label="Menu title"
+        value={view.draft.title}
+        maxLength={MENU_TEXT_LIMIT}
+        readOnly={readOnly}
+        onChange={renameMenu.bind(null, client)}
+      />
       <div className="content-studio-status">
         <span className="description-draft-sync-status" data-state={view.kind}>{menuConnectionLabel(view)}</span>
         <DraftParticipants participants={menuPresenceViews(view)} />
@@ -203,21 +199,16 @@ function MenuDraftEditor(
     </header>
     <div className="content-studio-menu-toolbar">
       <span>{view.draft.sections.length} sections · {view.draft.items.length} items</span>
-      <button
-        type="button"
-        className="secondary"
+      <Button
+        variant="secondary"
         disabled={readOnly || view.draft.sections.length >= MENU_SECTION_LIMIT}
         onClick={addMenuSection.bind(null, client, view.draft)}
       >
         Add section
-      </button>
+      </Button>
     </div>
     {view.draft.sections.length === 0 ? (
-      <p className="content-studio-menu-empty">
-        {readOnly
-          ? "No menu sections yet. Sections and items appear here when an editor adds them."
-          : "Add your first section, then add the items you serve."}
-      </p>
+      <p className="content-studio-menu-empty">No sections yet.</p>
     ) : null}
     <div className="content-studio-menu-board">
       {view.draft.sections.map(renderMenuSection.bind(null, client, view.draft, readOnly, products))}
@@ -276,21 +267,20 @@ function MenuPublishPanel(props: Readonly<{
   const shopUrl = props.options.kind === "ready" ? props.options.shopUrl : null;
   return <div className="content-studio-review content-studio-publish">
     <div>
-      <p className="content-studio-eyebrow">Café shop</p>
-      <h3>Publish the menu</h3>
+      <h3>Publish</h3>
       <p>
         {published === null
-          ? "Customers see this menu in the café shop after you publish it."
-          : `The shop shows revision ${published.revision} with ${published.entries} items. Publish again to replace it.`}
+          ? "The shop shows no menu yet."
+          : `The shop shows revision ${published.revision} with ${published.entries} items.`}
       </p>
       {shopUrl === null ? null : <a className="content-studio-shop-link" href={shopUrl} target="_blank" rel="noopener noreferrer">
         Open shop
       </a>}
     </div>
     {props.options.kind === "ready" ? <MenuHoursEditor hours={hours} setHours={setHours} /> : null}
-    <button type="button" disabled={!props.canPublish || props.state.kind === "publishing"} onClick={publish}>
+    <Button variant="primary" disabled={!props.canPublish || props.state.kind === "publishing"} onClick={publish}>
       {props.state.kind === "publishing" ? "Publishing…" : "Publish menu"}
-    </button>
+    </Button>
     {props.state.kind === "published" ? <p className="content-studio-published" role="status">
       Published revision {props.state.revision} with {props.state.entries} items. Customers see it within a few seconds.
     </p> : null}
@@ -317,9 +307,7 @@ function ShopNamePanel(props: Readonly<{
   };
   return <form className="content-studio-review content-studio-shop-name" onSubmit={save}>
     <div>
-      <p className="content-studio-eyebrow">Order page</p>
       <h3>Shop address</h3>
-      <p>Customers open this address from the QR code to see the menu and order.</p>
       <label className="content-studio-shop-address">
         <span aria-hidden="true">{props.address.prefix}</span>
         <input
@@ -339,12 +327,12 @@ function ShopNamePanel(props: Readonly<{
         <span aria-hidden="true">{props.address.suffix}</span>
       </label>
       <p id="content-studio-shop-address-rule" className="content-studio-shop-rule">
-        3 to 30 lowercase letters, digits and hyphens. An earlier address keeps opening your shop.
+        3 to 30 lowercase letters, digits and hyphens. An earlier address keeps working.
       </p>
     </div>
-    <button type="submit" disabled={unchanged || name.length === 0 || state.kind === "saving"}>
+    <Button variant="secondary" type="submit" disabled={unchanged || name.length === 0 || state.kind === "saving"}>
       {state.kind === "saving" ? "Saving…" : "Save address"}
-    </button>
+    </Button>
     {state.kind === "saved" ? <p className="content-studio-published" role="status">
       Saved. The QR code on your screens shows the new address within a few seconds.
     </p> : null}
@@ -449,7 +437,7 @@ function MenuHoursEditor(props: Readonly<{
       All day
     </label>
     {hours === null ? null : <>
-      <p>Times use {hours.timeZone} time. Customers cannot order from this menu outside these hours.</p>
+      <p>Times are in {hours.timeZone}. Customers cannot order outside these hours.</p>
       {hours.slots.map((slot, index) => <div key={index} className="content-studio-hours-slot" role="group" aria-label={`Hours ${index + 1}`}>
         <div className="content-studio-hours-days">
           {MENU_HOUR_DAYS.map((day) => <label key={day}>
@@ -467,13 +455,12 @@ function MenuHoursEditor(props: Readonly<{
         </div>
         <label>From <input type="time" value={slot.startsAt} onChange={(event) => setSlot(index, { ...slot, startsAt: event.target.value })} /></label>
         <label>To <input type="time" value={slot.endsAt === "24:00" ? "23:59" : slot.endsAt} onChange={(event) => setSlot(index, { ...slot, endsAt: event.target.value })} /></label>
-        {hours.slots.length === 1 ? null : <button
-          type="button"
-          className="secondary"
+        {hours.slots.length === 1 ? null : <Button
+          variant="secondary"
           onClick={() => setHours({ ...hours, slots: hours.slots.filter((_, at) => at !== index) })}
-        >Remove</button>}
+        >Remove</Button>}
       </div>)}
-      <button type="button" className="secondary" onClick={() => setHours({ ...hours, slots: [...hours.slots, newSlot] })}>Add hours</button>
+      <Button variant="secondary" onClick={() => setHours({ ...hours, slots: [...hours.slots, newSlot] })}>Add hours</Button>
     </>}
   </fieldset>;
 }
@@ -589,13 +576,12 @@ function MenuReviewPanel(props: Readonly<{
 }>): React.ReactNode {
   return <div className="content-studio-review">
     <div>
-      <p className="content-studio-eyebrow">Menu review</p>
-      <h3>Save a review snapshot</h3>
-      <p>Keep a copy of the saved menu for review. This does not publish it.</p>
+      <h3>Review snapshot</h3>
+      <p>A copy of the saved menu. It does not publish the menu.</p>
     </div>
-    <button type="button" className="secondary" disabled={!props.canReview || props.state.kind === "loading"} onClick={props.onReview}>
+    <Button variant="secondary" disabled={!props.canReview || props.state.kind === "loading"} onClick={props.onReview}>
       {props.state.kind === "loading" ? "Saving snapshot…" : "Save snapshot"}
-    </button>
+    </Button>
     {props.state.kind === "ready" ? <div className="content-studio-reviewed">
       <strong>Revision {props.state.review.documentRevision}</strong>
       <span>{props.state.review.draft.title}</span>
@@ -652,7 +638,7 @@ function renderMenuSection(
       </Select.Root>
     </div>
     <div className="content-studio-menu-items">
-      {items.length === 0 ? <p className="content-studio-menu-empty">{readOnly ? "No items in this section." : "Add an item, or move one here from another section."}</p> : null}
+      {items.length === 0 ? <p className="content-studio-menu-empty">No items.</p> : null}
       {items.map(renderMenuItem.bind(null, client, draft, readOnly))}
     </div>
   </div>;
@@ -688,8 +674,7 @@ function renderMenuItem(
       readOnly={readOnly}
       onChange={editMenuItemDescription.bind(null, client, item)}
     />
-    <label className="content-studio-menu-placement">
-      <span>Section</span>
+    <div className="content-studio-menu-placement">
       <Select.Root
         items={draft.sections.map(menuSectionItem)}
         value={item.placement.sectionId}
@@ -699,12 +684,10 @@ function renderMenuItem(
         <Select.Trigger aria-label={`Section for ${item.displayName}`}><Select.Value /></Select.Trigger>
         <Select.Popup>{draft.sections.map(renderMenuSectionOption)}</Select.Popup>
       </Select.Root>
-    </label>
-    <footer>
-      <button type="button" className="secondary" aria-label={`Remove ${item.displayName}`} disabled={readOnly} onClick={deleteMenuItem.bind(null, client, item.id)}>
-        Remove
-      </button>
-    </footer>
+    </div>
+    <Button variant="secondary" aria-label={`Remove ${item.displayName}`} disabled={readOnly} onClick={deleteMenuItem.bind(null, client, item.id)}>
+      Remove
+    </Button>
   </article>;
 }
 

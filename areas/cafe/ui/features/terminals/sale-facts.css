@@ -1,0 +1,29 @@
+/* The money facts of a counter sale: a label and a value on each row. */
+.sale-facts {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.sale-facts > div {
+  display: grid;
+  grid-template-columns: minmax(120px, 170px) minmax(0, 1fr);
+  gap: 12px;
+  line-height: 1.5;
+}
+
+.sale-facts dt {
+  color: var(--ink-2);
+}
+
+.sale-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 560px) {
+  .sale-facts > div {
+    grid-template-columns: 100px minmax(0, 1fr);
+  }
+}

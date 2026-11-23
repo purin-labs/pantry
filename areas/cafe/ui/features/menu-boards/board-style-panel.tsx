@@ -78,10 +78,7 @@ export function BoardStylePanel(props: Readonly<{
   const preset = presetOf(style);
   return <aside className="menu-boards-drawer menu-board-style" aria-label="Board style">
     <header>
-      <div>
-        <span>Board</span>
-        <h3>Style</h3>
-      </div>
+      <h3>Style</h3>
       <button
         type="button"
         className="secondary"
@@ -186,8 +183,7 @@ export function BoardStylePanel(props: Readonly<{
         <Select.Popup>{MENU_BOARD_ITEM_ROWS.map((row) => <Select.Item key={row} value={row}>{ITEM_ROW_NAMES[row]}</Select.Item>)}</Select.Popup>
       </Select.Root>
     </label>
-    <p className="menu-boards-drawer-note">Every item of a section repeats this row. A section can choose another row.</p>
-    <p className="menu-boards-drawer-note">Sizes are board units: a landscape board is 1600 wide. Screens change only when you publish.</p>
+    <p className="menu-boards-drawer-note">Sizes are board units: a landscape board is 1600 wide.</p>
   </aside>;
 }
 

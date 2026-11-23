@@ -178,8 +178,7 @@
   border-bottom: 1px solid var(--border);
 }
 
-.menu-board-panel-section > header,
-.menu-canvas-layers > header {
+.menu-board-panel-section > header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -188,8 +187,7 @@
   padding-inline: 4px;
 }
 
-.menu-board-panel-section h3,
-.menu-canvas-layers h3 {
+.menu-board-panel-section h3 {
   margin: 0;
   font-size: 12px;
   font-weight: 600;

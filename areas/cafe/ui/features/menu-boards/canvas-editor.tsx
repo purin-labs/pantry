@@ -664,11 +664,8 @@ function LayersPanel(props: Readonly<{
         .filter((child) => child.placement.frameId === "stack" && child.placement.stackId === element.id)
         .sort((first, second) => first.placement.order - second.placement.order || first.id.localeCompare(second.id)),
     ]);
+  // The Layers tab above names the list; the front element is at the top.
   return <aside className="menu-canvas-layers" aria-label="Layers">
-    <header>
-      <h3>Layers</h3>
-      <span>Front at the top</span>
-    </header>
     <ol>
       {layers.map((element) => {
         const editors = props.participants.filter((participant) =>

@@ -2,6 +2,7 @@ import React from "react";
 import { toast } from "sonner";
 import { assertNever } from "@purin-labs/std";
 import { formatMoneyMinor } from "@purin-labs/ui/formatting";
+import { Button } from "@purin-labs/ui/index";
 import { PageSkeleton, RecoverableError } from "@purin-labs/ui/page-components";
 import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 
@@ -16,6 +17,7 @@ import {
   type CounterSaleMutationTransport,
 } from "./counter-sale-api";
 import type { CounterSale } from "@purin-labs/control-api/portal/counter-sale";
+import { SaleFacts } from "./sale-facts";
 import "./styles.css";
 
 type SaleState =
@@ -88,59 +90,27 @@ export function CounterSaleRoute(
 
       <p className="counter-sale-guidance">{counterSaleGuidance(sale)}</p>
 
-      <dl className="counter-sale-facts">
-        <div>
-          <dt>Sale reference</dt>
-          <dd>{sale.checkoutId}</dd>
-        </div>
-        <div>
-          <dt>Counter</dt>
-          <dd>{sale.pantryLocationId}</dd>
-        </div>
-        {sale.quote === null ? null : (
-          <div>
-            <dt>Line items</dt>
-            <dd>{sale.quote.lineCount}</dd>
-          </div>
-        )}
-        {sale.quote === null ? null : (
-          <div>
-            <dt>Total</dt>
-            <dd>
-              <bdi>
-                {formatMoneyMinor(
-                  sale.quote.amount.amountMinor,
-                  sale.quote.amount.currency,
-                )}
-              </bdi>
-            </dd>
-          </div>
-        )}
-        {sale.orderId === null ? null : (
-          <div>
-            <dt>Order</dt>
-            <dd>{sale.orderId}</dd>
-          </div>
-        )}
-        {sale.capturedPaymentReference === null ? null : (
-          <div>
-            <dt>Payment</dt>
-            <dd>{sale.capturedPaymentReference}</dd>
-          </div>
-        )}
-        {sale.afterSale === null ? null : (
-          <div>
-            <dt>Pickup</dt>
-            <dd>{sale.afterSale.fulfillment.state.replaceAll("_", " ")}</dd>
-          </div>
-        )}
-        {sale.afterSale === null ? null : (
-          <div>
-            <dt>Refund</dt>
-            <dd>{sale.afterSale.refundState.replaceAll("_", " ")}</dd>
-          </div>
-        )}
-      </dl>
+      <SaleFacts
+        label="Sale"
+        rows={[
+          ["Sale reference", sale.checkoutId],
+          ["Counter", sale.pantryLocationId],
+          sale.quote === null ? null : ["Line items", sale.quote.lineCount],
+          sale.quote === null
+            ? null
+            : ["Total", <bdi>{saleTotal(sale.quote.amount)}</bdi>],
+          sale.orderId === null ? null : ["Order", sale.orderId],
+          sale.capturedPaymentReference === null
+            ? null
+            : ["Payment", sale.capturedPaymentReference],
+          sale.afterSale === null
+            ? null
+            : ["Pickup", sale.afterSale.fulfillment.state.replaceAll("_", " ")],
+          sale.afterSale === null
+            ? null
+            : ["Refund", sale.afterSale.refundState.replaceAll("_", " ")],
+        ]}
+      />
 
       {sale.recoverable === null ? null : (
         <div className="counter-sale-recovery">
@@ -156,55 +126,55 @@ export function CounterSaleRoute(
 
       <div className="counter-sale-actions">
         {props.collection.kind === "enabled" && sale.collectable ? (
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             onClick={takePayment.bind(null, props, sale, setState)}
           >
             Take payment
-          </button>
+          </Button>
         ) : null}
         {sale.state !== "complete" && sale.state !== "expired" ? (
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             onClick={refreshSale.bind(null, props, setState)}
           >
             {props.collection.kind === "enabled"
               ? "Reconcile payment"
               : "Refresh status"}
-          </button>
+          </Button>
         ) : null}
         {sale.state === "complete" || sale.state === "captured_unplaced" ? (
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             onClick={printCounterSaleReceipt.bind(null, receipt)}
           >
             Print receipt
-          </button>
+          </Button>
         ) : null}
         {props.collection.kind === "enabled" &&
         sale.afterSale?.fulfillment.state === "requested" ? (
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             onClick={runAfterSale.bind(null, props, setState, "ready")}
           >
             Mark pickup ready
-          </button>
+          </Button>
         ) : null}
         {props.collection.kind === "enabled" &&
         sale.afterSale?.fulfillment.state === "ready_for_pickup" ? (
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             onClick={runAfterSale.bind(null, props, setState, "handover")}
           >
             Hand to customer
-          </button>
+          </Button>
         ) : null}
         {props.collection.kind === "enabled" &&
         sale.afterSale?.payment.state === "captured" &&
         (sale.afterSale.refundState === "none" ||
           sale.afterSale.refundState === "pending") ? (
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             onClick={
               sale.afterSale.refundState === "pending"
                 ? runAfterSale.bind(null, props, setState, "refund")
@@ -214,16 +184,10 @@ export function CounterSaleRoute(
             {sale.afterSale.refundState === "pending"
               ? "Reconcile refund"
               : "Refund full amount"}
-          </button>
+          </Button>
         ) : null}
       </div>
 
-      {sale.state === "complete" || sale.state === "captured_unplaced" ? (
-        <p className="counter-sale-print-note">
-          Use your browser to print or save this receipt. Open this sale again
-          whenever you need another copy.
-        </p>
-      ) : null}
       {refundReview === null ? null : (
         <CounterRefundReview
           sale={refundReview}
@@ -242,6 +206,12 @@ export function CounterSaleRoute(
 
 function nextReadRevision(revision: number): number {
   return revision + 1;
+}
+
+function saleTotal(
+  amount: NonNullable<CounterSale["quote"]>["amount"],
+): string {
+  return formatMoneyMinor(amount.amountMinor, amount.currency);
 }
 
 function CounterRefundReview(
@@ -268,25 +238,15 @@ function CounterRefundReview(
           close={props.close}
         />
         <p>The full captured payment will be returned to the customer.</p>
-        <dl className="counter-sale-facts">
-          <div>
-            <dt>Sale</dt>
-            <dd>{props.sale.checkoutId}</dd>
-          </div>
-          {props.sale.quote === null ? null : (
-            <div>
-              <dt>Amount</dt>
-              <dd>
-                <bdi>
-                  {formatMoneyMinor(
-                    props.sale.quote.amount.amountMinor,
-                    props.sale.quote.amount.currency,
-                  )}
-                </bdi>
-              </dd>
-            </div>
-          )}
-        </dl>
+        <SaleFacts
+          label="Refund"
+          rows={[
+            ["Sale", props.sale.checkoutId],
+            props.sale.quote === null
+              ? null
+              : ["Amount", <bdi>{saleTotal(props.sale.quote.amount)}</bdi>],
+          ]}
+        />
         <div className="terminal-confirm-actions">
           <button ref={cancel} type="button" onClick={props.close}>
             Keep payment

@@ -7,7 +7,7 @@ import type {
   RegisterViewCommand,
 } from "@purin-labs/control-api";
 import type { CounterSale } from "@purin-labs/control-api/portal/counter-sale";
-import { EmptyState, useLatestRead } from "@purin-labs/ui/index";
+import { Button, EmptyState, useLatestRead } from "@purin-labs/ui/index";
 import {
   cancelCounterSaleCollection,
   collectCounterSale,
@@ -22,7 +22,9 @@ import {
   recordCounterSaleCash,
   recordCounterSaleHandoffResult,
 } from "../terminals/counter-sale-api";
-import { RegisterModifierDrawer, formatMoney } from "./modifier-drawer";
+import { SaleFacts } from "../terminals/sale-facts";
+import { formatMoneyMinorEnglish as formatMoney } from "@purin-labs/ui/formatting";
+import { RegisterModifierDrawer } from "./modifier-drawer";
 import { ReceiptPrintControl } from "./receipt-print";
 import { RegisterPageViewSource } from "./register-surface";
 import {
@@ -487,27 +489,10 @@ export function RegisterRoute(
   return (
     <div className="register-layout">
       <section className="register-catalog" aria-label="Café menu">
-        <div className="register-header-bar">
-          <div className="register-status-pills">
-            <span className="register-pill" data-tone={canCash ? "ready" : undefined}>
-              Cash: {canCash ? "Ready" : "Off"}
-            </span>
-            <span
-              className="register-pill"
-              data-tone={canTerminal ? "ready" : undefined}
-            >
-              Terminal:{" "}
-              {canTerminal
-                ? snapshot.terminal.provider === "gmo_stera"
-                  ? "GMO stera (LAN)"
-                  : "Square Terminal"
-                : "Not assigned"}
-            </span>
-            <span className="register-pill">
-              Open queue: {snapshot.openQueueCount}
-            </span>
-          </div>
-        </div>
+        <p className="register-facts">
+          {canCash ? "Cash ready" : "Cash off"} · {terminalFact(snapshot.terminal)} ·{" "}
+          {snapshot.openQueueCount} in the order queue
+        </p>
 
         <div className="register-tabs" role="tablist" aria-label="Menu sections">
           {snapshot.menu.sections.map((section) => (
@@ -580,19 +565,13 @@ export function RegisterRoute(
             <div className="register-header-bar">
               <h2>Basket</h2>
               {basket.length > 0 ? (
-                <button
-                  type="button"
-                  className="register-secondary-btn"
-                  onClick={() => setBasket([])}
-                >
+                <Button variant="secondary" onClick={() => setBasket([])}>
                   Clear
-                </button>
+                </Button>
               ) : null}
             </div>
 
-            {basket.length === 0 ? (
-              <p>Tap items on the menu to ring up a counter order.</p>
-            ) : (
+            {basket.length === 0 ? null : (
               <ul className="register-basket-list">
                 {basket.map((line) => (
                   <li
@@ -663,10 +642,10 @@ export function RegisterRoute(
               </div>
               {snapshot.policy?.tax.kind === "percentage" ? (
                 <div className="register-total-row register-total-tax">
+                  <span>Tax</span>
                   <span>
-                    {snapshot.policy.tax.inclusion === "included"
-                      ? `Includes ${(snapshot.policy.tax.basisPoints / 100).toFixed(0)}% tax`
-                      : `Plus ${(snapshot.policy.tax.basisPoints / 100).toFixed(0)}% tax`}
+                    {(snapshot.policy.tax.basisPoints / 100).toFixed(0)}%{" "}
+                    {snapshot.policy.tax.inclusion === "included" ? "included" : "added"}
                   </span>
                 </div>
               ) : null}
@@ -715,9 +694,10 @@ export function RegisterRoute(
                     <strong>{formatMoney(changeDueMinor, snapshot.currency)}</strong>
                   </div>
                 ) : null}
-                <button
-                  type="button"
-                  className="register-primary-btn"
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="register-wide"
                   disabled={
                     basket.length === 0 ||
                     busyAction !== null ||
@@ -729,7 +709,7 @@ export function RegisterRoute(
                   {busyAction === "cash"
                     ? "Recording cash…"
                     : `Complete cash sale (${formatMoney(basketTotalMinor, snapshot.currency)})`}
-                </button>
+                </Button>
               </div>
             ) : null}
 
@@ -752,9 +732,10 @@ export function RegisterRoute(
                     </button>
                   ))}
                 </div>
-                <button
-                  type="button"
-                  className="register-primary-btn"
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="register-wide"
                   disabled={basket.length === 0 || busyAction !== null}
                   onClick={() => void handleTerminalSale()}
                 >
@@ -765,7 +746,7 @@ export function RegisterRoute(
                     : onIpad
                       ? `Open Square app · ${paymentMethodLabel(paymentMethod, true)}`
                       : `Charge terminal · ${paymentMethodLabel(paymentMethod)}`}
-                </button>
+                </Button>
               </div>
             ) : null}
           </>
@@ -802,13 +783,13 @@ function ActiveSalePanel(
   const total = sale.quote?.amount;
   const completed = sale.state === "complete";
   const handedOver = sale.afterSale?.fulfillment.state === "completed";
+  const cash = sale.manualTender ?? null;
+  const cashAmount = (amountMinor: number | null, currency: string): string =>
+    amountMinor === null ? "—" : formatMoney(amountMinor, currency);
 
   return (
     <div className="register-pickup-card">
-      <div className="register-header-bar">
-        <h2>{completed ? "Sale complete" : "Payment in progress"}</h2>
-        <span>{sale.state}</span>
-      </div>
+      <h2>{completed ? "Sale complete" : "Payment in progress"}</h2>
       {sale.pickupCode ? (
         <div>
           <div>Pickup code</div>
@@ -816,56 +797,39 @@ function ActiveSalePanel(
         </div>
       ) : null}
       <p>{counterSaleGuidance(sale)}</p>
-      {total !== undefined ? (
-        <div className="register-total-row">
-          <span>Total</span>
-          <strong>{formatMoney(total.amountMinor, total.currency)}</strong>
-        </div>
-      ) : null}
-      {sale.manualTender !== undefined && sale.manualTender !== null ? (
-        <div className="register-change-preview">
-          <span>
-            Cash received:{" "}
-            {sale.manualTender.cashReceivedMinor !== null
-              ? formatMoney(
-                  sale.manualTender.cashReceivedMinor,
-                  sale.manualTender.currency,
-                )
-              : "—"}
-          </span>
-          <strong>
-            Change:{" "}
-            {sale.manualTender.changeDueMinor !== null
-              ? formatMoney(
-                  sale.manualTender.changeDueMinor,
-                  sale.manualTender.currency,
-                )
-              : "—"}
-          </strong>
-        </div>
-      ) : null}
-      {sale.paymentMethod ? (
-        <div className="register-total-row">
-          <span>Tender</span>
-          <span>
-            {paymentMethodLabel(sale.paymentMethod)}
-            {sale.tenderBrand ? ` · ${sale.tenderBrand}` : ""}
-            {sale.providerRefundable === false ? " (Cash refund only)" : ""}
-          </span>
-        </div>
-      ) : null}
+      <SaleFacts
+        label="Sale"
+        rows={[
+          total === undefined
+            ? null
+            : ["Total", formatMoney(total.amountMinor, total.currency)],
+          cash === null
+            ? null
+            : ["Cash received", cashAmount(cash.cashReceivedMinor, cash.currency)],
+          cash === null
+            ? null
+            : ["Change", cashAmount(cash.changeDueMinor, cash.currency)],
+          sale.paymentMethod
+            ? [
+                "Payment",
+                `${paymentMethodLabel(sale.paymentMethod)}${sale.tenderBrand ? ` · ${sale.tenderBrand}` : ""}${sale.providerRefundable === false ? " · Cash refund only" : ""}`,
+              ]
+            : null,
+        ]}
+      />
 
       {completed ? (
         <div className="register-action-row">
           {!handedOver ? (
-            <button
-              type="button"
-              className="register-primary-btn"
+            <Button
+              variant="primary"
+              size="lg"
+              className="register-wide"
               disabled={props.busyAction !== null}
               onClick={() => void props.onHandOverNow()}
             >
               {props.busyAction === "handover" ? "Handing over…" : "Hand over now"}
-            </button>
+            </Button>
           ) : (
             <p>Handed over to customer.</p>
           )}
@@ -873,34 +837,28 @@ function ActiveSalePanel(
             organisationId={props.organisationId}
             checkoutId={sale.checkoutId}
           />
-          <button
-            type="button"
-            className="register-secondary-btn"
-            onClick={props.onNewSale}
-          >
+          <Button variant="secondary" onClick={props.onNewSale}>
             {handedOver ? "New sale" : "Send to queue & new sale"}
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="register-tender-section">
           <div className="register-action-row">
-            <button
-              type="button"
-              className="register-primary-btn"
+            <Button
+              variant="primary"
               disabled={props.busyAction !== null}
               onClick={() => void props.onCheckTerminal()}
             >
               {props.busyAction === "reconcile" ? "Checking…" : "Check terminal"}
-            </button>
+            </Button>
             {sale.state === "collecting" ? (
-              <button
-                type="button"
-                className="register-secondary-btn"
+              <Button
+                variant="secondary"
                 disabled={props.busyAction !== null}
                 onClick={() => void props.onCancelTerminal()}
               >
                 {props.busyAction === "cancel" ? "Cancelling…" : "Cancel collection"}
-              </button>
+              </Button>
             ) : null}
           </div>
           {props.canSwitchToCash ? (
@@ -914,14 +872,13 @@ function ActiveSalePanel(
                 value={props.cashInput}
                 onChange={(event) => props.setCashInput(event.target.value)}
               />
-              <button
-                type="button"
-                className="register-secondary-btn"
+              <Button
+                variant="secondary"
                 disabled={props.busyAction !== null}
                 onClick={() => void props.onSwitchToCash()}
               >
                 Switch to cash
-              </button>
+              </Button>
             </div>
           ) : null}
         </div>
@@ -935,6 +892,16 @@ function parseCashMinor(raw: string, defaultTotal: number): number | null {
   if (trimmed.length === 0) return defaultTotal > 0 ? defaultTotal : null;
   const parsed = Number(trimmed);
   return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
+/** The counter's terminal as one fact: none, not ready, or what takes the card. */
+function terminalFact(terminal: CounterRegisterSnapshot["terminal"]): string {
+  if (!terminal.assigned) return "No terminal";
+  if (!terminal.ready) return "Terminal not ready";
+  if (terminal.targetKind === "square_pos_app") return "Square app ready";
+  return terminal.provider === "gmo_stera"
+    ? "GMO stera (LAN) ready"
+    : "Square Terminal ready";
 }
 
 function paymentMethodLabel(

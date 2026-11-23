@@ -12,7 +12,7 @@ import {
   type SurfaceCommandOutcome,
   type SurfaceViewSource,
 } from "@purin-labs/ui/features/surface-observation";
-import { formatMoney } from "./modifier-drawer";
+import { formatMoneyMinorEnglish as formatMoney } from "@purin-labs/ui/formatting";
 
 export type RegisterSurfaceState = Readonly<{
   snapshot: CounterRegisterSnapshot;
