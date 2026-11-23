@@ -157,9 +157,8 @@ type AudiencePolicy =
   | { readonly kind: "operator" }
   | { readonly kind: "customer"; readonly consentRequired: true };
 
-type RetentionPolicy =
-  | { readonly kind: "organisation_default" }
-  | { readonly kind: "days"; readonly days: number };
+/** No retention period is built (AD-034), so each account keeps the default. */
+type RetentionPolicy = { readonly kind: "organisation_default" };
 
 type ProviderWebhookLifecycle =
   | { readonly kind: "pending" }
@@ -2426,9 +2425,6 @@ function requireRetentionPolicy(raw: unknown): RetentionPolicy {
   }
   if (value.kind === "organisation_default") {
     return { kind: "organisation_default" };
-  }
-  if (value.kind === "days" && isPositiveInteger(value.days)) {
-    return { kind: "days", days: value.days };
   }
   throw new Error("retentionPolicy");
 }

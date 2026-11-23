@@ -190,7 +190,8 @@ reason. A later note in the same entry describes the code today.
 - **AD-034, 2026-07-15, Holds in part: audience and retention policy.** Customer
   messages never grant authority. Each `integration_account` row must carry an
   `audience_policy` and a `retention_policy`. The audience is `operator` or `customer`
-  with consent. The store accepts a retention of `days`, but no code applies it.
+  with consent. The only retention is `organisation_default`: no retention period is
+  built.
 
 ### Connections and channels
 

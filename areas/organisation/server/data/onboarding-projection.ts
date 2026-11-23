@@ -1602,14 +1602,7 @@ function projectAudiencePolicy(
 function projectRetentionPolicy(
   policy: IntegrationAccount["retentionPolicy"],
 ): ProviderAccountProjection["retention_policy"] {
-  switch (policy.kind) {
-    case "organisation_default":
-      return { kind: policy.kind };
-    case "days":
-      return { kind: policy.kind, days: policy.days };
-    default:
-      return assertNever(policy);
-  }
+  return { kind: policy.kind };
 }
 
 function projectOperatingProfile(
