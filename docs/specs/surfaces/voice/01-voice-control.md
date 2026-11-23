@@ -175,7 +175,9 @@ Mac's private IPv4 address, and the Platform refuses a public address.
 - At a revoke, the Platform clears the Mac's secrets and removes its DNS names. At the
   first refused heartbeat (a 401 answer), the Mac stops all answers. After five refused
   heartbeats, it deletes its models, certificate and credential and stays stopped. Only
-  an accepted heartbeat resets the count. A 503 or a lost network does not reset it.
+  an accepted heartbeat resets the count. A 503 or a lost network does not reset it. The
+  revoke dialog says this: the Mac stops within about one minute and deletes its files
+  within about five minutes.
 
 ### Speech engines
 
@@ -406,8 +408,6 @@ The talk key works only while the page is in front.
   - A failed DNS removal at a revoke is not tried again before the end of the
     Organisation.
   - Each Mac heartbeat writes one D1 row, also when nothing changed.
-  - The revoke dialog says that a Mac deletes its files within about one minute. The Mac
-    deletes them after five refused heartbeats, about five minutes.
   - A heartbeat answer that is not JSON stops the service until `launchd` restarts it.
   - A heartbeat 401 does not always mean a revoke. The Platform also answers 401 if the
     Organisation scope does not resolve, for example at a placement conflict, or if a

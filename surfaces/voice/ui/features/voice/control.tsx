@@ -906,8 +906,9 @@ function ShopMacRow(
       {confirming ? (
         <div className="voice-mac-confirm">
           <p>
-            This Mac stops and deletes its model, certificate and credential
-            within about one minute. To use it again, add it again.
+            This Mac stops answering within about one minute. It deletes its
+            model, certificate and credential within about five minutes. To use
+            it again, add it again.
           </p>
           <div className="voice-dialog-actions">
             <button
