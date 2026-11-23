@@ -116,7 +116,7 @@
     },
     {
       "run": ["pnpm", "--filter", "@purin-labs/platform", "actions:generate"],
-      "writes": ["services/platform/src/generated/action-registry.ts"]
+      "writes": ["foundation/authority/generated/action-registry.ts"]
     }
   ]
 }
