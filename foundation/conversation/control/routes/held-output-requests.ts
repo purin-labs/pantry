@@ -115,8 +115,10 @@ export async function handleHeldOutputRequestRoute(
 }
 
 /**
- * Records the answer to one held output and releases it. The person who
- * asked for the output, or an owner or admin, may answer.
+ * Records the answer to one held output and releases it. Only a member who
+ * may see the held content answers (`mayDecide`): for `private_source`, each
+ * such member; for `outside_written`, only the person who asked; for any
+ * other reason, the person who asked or an owner or admin.
  */
 export async function decideHeldOutput(
   env: Env,
