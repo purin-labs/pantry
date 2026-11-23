@@ -15,6 +15,7 @@ import type {
   MemoryRevisionRef,
   MemoryRevisionState,
 } from "./memory.ts";
+import type { OrganisationInferenceSelection } from "./portal/settings.ts";
 
 /** One exact Eval revision. Runs and results cite this pair. */
 export type EvalRevisionRef = Readonly<{
@@ -200,18 +201,13 @@ export const MAX_EVAL_RECEIVED_AT = 4_102_444_800_000;
 export const MAX_EVAL_CRITERIA = 6;
 
 /**
- * The inference authority one task is pinned to: the organisation's Codex
- * subscription, its own OpenAI or Anthropic key, or Pantry's platform key. A
- * task that cannot use its authority is unavailable. It never moves to
- * another one.
+ * The inference authority one task is pinned to: one of the inference
+ * selections of the Organisation's settings, such as a Claude or Codex
+ * sign-in, the Organisation's own OpenAI, Anthropic or Google key, or Pantry's
+ * platform key. A task that cannot use its authority is unavailable. It never
+ * moves to another one.
  */
-export type EvalRoute =
-  | "claude_oauth"
-  | "codex_subscription"
-  | "organisation_openai_api_key"
-  | "organisation_anthropic_api_key"
-  | "organisation_google_api_key"
-  | "pantry_platform";
+export type EvalRoute = OrganisationInferenceSelection["kind"];
 
 /**
  * The knowledge the agent under test is given. `current` is the accepted
