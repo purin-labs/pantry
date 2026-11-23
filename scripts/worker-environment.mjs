@@ -61,7 +61,7 @@ export function releaseTargetProblems(config) {
   if (!PRODUCTION_WORKER_NAMES.has(config.name))
     problems.push(`the Worker name ${config.name} is not a Pantry Worker`);
   if (config.workers_dev !== false) problems.push("a workers.dev address");
-  if (config.preview_urls === true) problems.push("preview addresses");
+  if (config.preview_urls !== false) problems.push("preview addresses");
   const domain = WORKER_DOMAINS[config.name];
   const routes = (config.routes ?? []).map(routeTarget);
   const expected = domain === undefined ? [] : [`${domain} (custom domain)`];

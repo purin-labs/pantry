@@ -236,8 +236,9 @@ privacy page `https://pantry.purin.io/docs/privacy` and the terms page
   `scripts/run-worker.mjs`, `scripts/lib/side-worker.mjs` and
   `scripts/check-release-target.mjs`. It refuses a name that is not a production name in
   `WORKER_NAMES`, so it also refuses a local name such as `pantry-model-exit-local`. It
-  refuses a `workers_dev` value other than `false`, `preview_urls: true`, and a route
-  other than the custom domain in `WORKER_DOMAINS`. It does not check a D1 or KV id.
+  refuses a `workers_dev` or `preview_urls` value other than `false`, also a missing
+  key. It refuses a route other than the custom domain in `WORKER_DOMAINS`. It does not
+  check a D1 or KV id.
 - **No new resources.** `run-worker.mjs` and `side-worker.mjs` deploy with
   `--experimental-provision=false`, so Wrangler cannot create a missing D1, KV or R2
   resource. `run-worker.mjs` also refuses resource creation options and target overrides.

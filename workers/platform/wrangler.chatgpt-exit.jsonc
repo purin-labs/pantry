@@ -12,6 +12,7 @@
   "main": "src/chatgpt-exit/worker.ts",
   "compatibility_date": "2026-07-07",
   "workers_dev": false,
+  "preview_urls": false,
   // The Worker runs near AWS Tokyo, so its container's Actor starts in Japan.
   // Never use Smart Placement here: it would move the Worker toward the
   // providers, in the United States.

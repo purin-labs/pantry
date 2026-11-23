@@ -10,6 +10,7 @@
   "main": "src/code-mode-sandbox/worker.ts",
   "compatibility_date": "2026-07-07",
   "workers_dev": false,
+  "preview_urls": false,
   // One execution computes for five seconds at most: the interrupt budget in
   // foundation/agent/code-mode-sandbox/limits.ts. The deploy check compares
   // both values.
