@@ -104,6 +104,7 @@
     "areas/integrations/ui/features/integrations/connection-dialog.tsx",
     "areas/integrations/ui/features/integrations/custom-connector-api.ts",
     "areas/integrations/ui/features/jev-features/api.ts",
+    "areas/integrations/ui/features/jev-features/facts.tsx",
     "areas/integrations/ui/features/jev-features/paid-use.tsx",
     "areas/integrations/ui/features/jev-features/styles.css",
     "areas/integrations/ui/features/vault/styles.css",
