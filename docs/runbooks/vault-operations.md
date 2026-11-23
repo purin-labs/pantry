@@ -143,7 +143,9 @@ provider itself.
 The scheduled reconciler sweeps Vault alert signals every run and emits
 `vault.alert.*` traces for: active rows under an unreadable key version,
 superseded generations older than one hour, rotations stuck before commit,
-failed rotations, revocations committed but not policy-activated within the
+rotations that failed within the last 24 hours
+(`vault.alert.failed_credential_rotations`), revocations committed but not
+policy-activated within the
 5-second alert threshold, and restriction-latency breaches. Denied
 resolutions write metadata-only `credential_access_denial` receipts and
 `vault.resolution_denied` traces. The delivery-path budget is explicit in

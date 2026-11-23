@@ -160,11 +160,12 @@ It sends a `traceWarn` for each signal that is not zero.
 | `vault.alert.unknown_key_version_rows`     | A live row has a key version that the keyring cannot read                            | —                                                               |
 | `vault.alert.stale_superseded_generations` | A superseded generation is older than 1 hour                                         | `STALE_GENERATION_ALERT_MS`                                     |
 | `vault.alert.stuck_credential_rotations`   | A rotation is `pending_verification` or `verified` for more than 15 minutes          | `STUCK_ROTATION_ALERT_MS`                                       |
+| `vault.alert.failed_credential_rotations`  | A rotation that started within the last 24 hours failed                              | `FAILED_ROTATION_WINDOW_MS`                                     |
 | `vault.alert.delayed_restrictions`         | A revocation is `committed`, with no policy activation, for more than 5 s            | `RESTRICTION_LATENCY_ALERT_MS`                                  |
 | `vault.alert.restriction_latency_breaches` | An activated revocation took more than 5 s. The trace also carries the target of 3 s | `RESTRICTION_LATENCY_ALERT_MS`, `RESTRICTION_LATENCY_TARGET_MS` |
 
-The sweep also counts failed rotations and the denials of the last 24 hours
-(`DENIAL_WINDOW_MS`). It sends no trace for these two counts.
+The sweep also counts the denials of the last 24 hours (`DENIAL_WINDOW_MS`). It sends
+no trace for this count.
 
 ### Vault items
 
@@ -428,7 +429,8 @@ A refused role on an Organisation route gets 404. A root rotation needs the
   - Items and stores: `vault-items.test.ts` and `vault-onepassword.test.ts`, with
     `vault-support.ts` and the fake 1Password client in `onepassword-network.ts`.
   - The retained-root check over more than 1,000 rows in two regional databases:
-    `vault-root-closure.test.ts`.
+    `vault-root-closure.test.ts`. The alert for a failed rotation:
+    `vault-alerts.test.ts`.
   - Root rotation in two regional databases: `regional-onboarding.test.ts`
     (`regional-execution-support.ts`).
   - Vault rows in provider journeys: `providers-connection.test.ts`,

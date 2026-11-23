@@ -13,6 +13,12 @@ const RESTRICTION_LATENCY_ALERT_MS = 5_000;
 const STUCK_ROTATION_ALERT_MS = 15 * 60 * 1_000;
 const STALE_GENERATION_ALERT_MS = 60 * 60 * 1_000;
 const DENIAL_WINDOW_MS = 24 * 60 * 60 * 1_000;
+/**
+ * A failed rotation stays as a record, so the sweep reports only the ones
+ * that started within this window: each alert is recent, and an old failure
+ * does not alert at every run.
+ */
+const FAILED_ROTATION_WINDOW_MS = 24 * 60 * 60 * 1_000;
 
 export type CredentialAccessPurpose =
   | "harness"
@@ -103,8 +109,9 @@ export async function sweepVaultAlertSignals(input: {
   const failedRotations = await input.db
     .prepare(
       `SELECT COUNT(*) AS failedCount FROM credential_rotation
-       WHERE status = 'failed'`,
+       WHERE status = 'failed' AND created_at >= ?`,
     )
+    .bind(input.now - FAILED_ROTATION_WINDOW_MS)
     .first<{ readonly failedCount: number }>();
   const delayedRestrictions = await input.db
     .prepare(
@@ -164,6 +171,13 @@ export async function sweepVaultAlertSignals(input: {
     traceWarn("vault.alert.stuck_credential_rotations", {
       requestId: newRequestId(),
       rotation_count: sweep.stuckRotations,
+    });
+  }
+  if (sweep.failedRotations > 0) {
+    traceWarn("vault.alert.failed_credential_rotations", {
+      requestId: newRequestId(),
+      rotation_count: sweep.failedRotations,
+      window_ms: FAILED_ROTATION_WINDOW_MS,
     });
   }
   if (sweep.delayedRestrictions > 0) {
