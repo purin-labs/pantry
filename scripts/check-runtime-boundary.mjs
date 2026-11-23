@@ -27,7 +27,9 @@
 //   folders of the Worker source (Refactor 17): its control/routes/ holds
 //   route files and its actors/, slack/ and chat/ hold no import of one. The
 //   Worker side of foundation/control keeps its route files in worker/routes/.
-//   An area package keeps the folders of the Worker source in server/.
+//   An area package and a surface package keep the folders of the Worker
+//   source in server/. The Slack surface keeps the files of slack/ at the top
+//   of surfaces/slack/server/.
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join, normalize, relative, resolve } from "node:path";
@@ -79,9 +81,10 @@ const pluginDirectory = (path) => {
 
 // Platform route files, and the Platform directories whose code may not import
 // one: in the Worker source, in each foundation package and in the server/
-// folder of each area package.
-const PLATFORM_ROUTES = /^(?:services\/platform\/src|foundation\/[^/]+|areas\/[^/]+\/server)\/control\/routes\/|^foundation\/control\/worker\/routes\//;
-const PLATFORM_ROUTE_FREE = /^(?:services\/platform\/src|foundation\/[^/]+|areas\/[^/]+\/server)\/(?:actors|slack|chat)\//;
+// folder of each area package and each surface package. The files of slack/
+// are the top-level files of surfaces/slack/server/.
+const PLATFORM_ROUTES = /^(?:services\/platform\/src|foundation\/[^/]+|(?:areas|surfaces)\/[^/]+\/server)\/control\/routes\/|^foundation\/control\/worker\/routes\//;
+const PLATFORM_ROUTE_FREE = /^(?:services\/platform\/src|foundation\/[^/]+|(?:areas|surfaces)\/[^/]+\/server)\/(?:actors|slack|chat)\/|^surfaces\/slack\/server\/[^/]+$/;
 
 const SOURCE = /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs)$/;
 const SKIPPED = /(^|\/)(node_modules|dist|public|wasm-pkg|generated|output|\.artifacts)\//;

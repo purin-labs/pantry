@@ -22,10 +22,10 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE =
   /^(services\/platform\/src\/(agent-tools|custom-connectors)|foundation\/agent-tools)\/.+\.ts$/;
-// An area package keeps the folders of the Worker source in server/
-// (Refactor 17, Stage B), with its tool families.
+// An area package and a surface package keep the folders of the Worker source
+// in server/ (Refactor 17, Stage B), with their tool families.
 const AREA_SOURCE =
-  /^areas\/[^/]+\/server\/(agent-tools|custom-connectors)\/.+\.ts$/;
+  /^(areas|surfaces)\/[^/]+\/server\/(agent-tools|custom-connectors)\/.+\.ts$/;
 const DEFINITION = /define\w+Tool\(\{\n([\s\S]*?)\n\}\);/g;
 const EFFECTS_WITH_PREPARE = new Set(["draft", "receipt", "scheduled"]);
 
