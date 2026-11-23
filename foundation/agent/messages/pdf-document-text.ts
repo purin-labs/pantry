@@ -375,7 +375,7 @@ function readHexString(
 
 function normalizePdfText(value: string): string {
   return value
-    .replace(/ /gu, "")
+    .replace(/\u0000/gu, "")
     .replace(/[ \t]+/gu, " ")
     .replace(/ *\n */gu, "\n")
     .replace(/\n{3,}/gu, "\n\n")
