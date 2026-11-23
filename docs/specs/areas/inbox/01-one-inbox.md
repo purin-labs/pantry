@@ -215,11 +215,19 @@ Control routes under `/v1/control/organisations/:id/`:
 | `POST agent-mailboxes/:account/{bind,policy,resume,skip-and-resume,reconnect,disable,revoke,model-consent}` | Admin                                        | The mailbox agent                                                                       |
 | `POST agent-mailboxes/:account/check`                                                                       | Admin                                        | Look for new mail now                                                                   |
 | `POST agent-mailboxes/:account/sender-links`, `…/sender-links/read`                                         | Admin; viewer and the mailbox grant          | Link a sender to a supplier; read the link                                              |
-| `GET`, `POST email-operational/:id/…`                                                                       | Viewer, admin                                | New outbound mail that the agent proposes                                               |
+| `GET email-operational/:id`                                                                                 | Admin, or viewer and the mailbox grant       | One outbound mail that the agent proposes, and an approval challenge                    |
+| `POST email-operational/:id/{approve,reject,edit,attest-present,attest-absent}`                             | Admin                                        | Decide or change the proposed mail                                                      |
 | `GET whatsapp-cases/:id`, `GET whatsapp-replies/:id`                                                        | Viewer and `whatsapp.support.read`           | The Case panel; one proposal                                                            |
 | `POST whatsapp-cases/:id/{take-over,return-to-agent,human-reply,close}`                                     | Admin                                        | Ownership and a person's reply                                                          |
 | `POST whatsapp-replies/:id/{approve,reject,edit,resolve}`                                                   | Admin                                        | Decide a proposal                                                                       |
 | `POST whatsapp-accounts/:account/{select,bind,policy,…}`                                                    | Admin                                        | The number, and `{agent: {agentMode, alwaysWaitTopics}}`                                |
+
+The preview of an operational draft shows the recipient, the subject and the body
+(`mayReadOperationalEmailDraft`). An owner or an admin reads it, because they decide
+it. Another member needs a grant for the mailbox: on a full mailbox the read of a reply
+draft (`authorizeMailSource`), on a send-only mailbox `email.operational.propose` on
+that exact account. Any other member gets `email_operational_not_found` (404), as for
+an unknown id. The chat approval card reads the same route.
 
 The email reply actions (except `relationship`), the person reply and the WhatsApp
 actions replay their receipt for the same `Idempotency-Key`.

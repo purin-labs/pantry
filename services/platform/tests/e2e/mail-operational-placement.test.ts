@@ -42,8 +42,12 @@ import {
 import { GMAIL_SEND_ONLY_SCOPES } from "@purin-labs/connections/mail/gmail-authorization";
 import {
   CAPABILITY_KEYS,
+  EMAIL_OPERATIONAL_RESOURCE_SCOPE,
   capabilityDefinitionById,
 } from "@purin-labs/authority/authorization/capability-catalogue";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
+import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import {
   parseConnectorId,
   type ConnectorId,
@@ -66,6 +70,13 @@ import {
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import type { SessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import { selfTestCount } from "./gmail-mailbox-support";
+import { gmailConnectorIdValue } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
+import { commerceClient } from "./commerce-support";
+import {
+  addOrganisationMember,
+  controlRequest,
+  type OrganisationClient,
+} from "./organisation-fixture";
 import {
   exportedItemCount,
   readBarrier,
@@ -175,6 +186,167 @@ it("refuses an operational email edit that started from an older version", async
     operationalEditVersion: { first: 2, secondRefused: true },
   });
 });
+
+/**
+ * The preview of an operational draft shows the recipient, the subject and
+ * the body. On a send-only mailbox, an admin reads it, because an admin
+ * decides it. A viewer reads it only with a grant of
+ * `email.operational.propose` on that mailbox. A viewer with no grant, or
+ * with the grant on another mailbox, gets the answer of an unknown draft.
+ */
+it("shows an operational draft only to a person who decides it or has a grant for its mailbox", async (test) => {
+  const fixture = await installFixture();
+  required(
+    await fixture.connector.createEmailOperationalProposal(
+      createRequest(fixture),
+    ),
+  );
+  const run = crypto.randomUUID();
+  const admin = await commerceClient(`operational-admin-${run}`);
+  const viewer = await commerceClient(`operational-viewer-${run}`);
+  await addOrganisationMember(ORGANISATION_ID, admin, "admin");
+  await addOrganisationMember(ORGANISATION_ID, viewer, "viewer");
+  await enableOperationalPropose(admin.identity.userId);
+  const otherMailbox = await connectSendOnlyMailbox(
+    `p55_other_${run.slice(0, 8)}`,
+    Date.now(),
+  );
+  const preview = async (client: OrganisationClient) => {
+    const response = await controlRequest(
+      client,
+      `/v1/control/organisations/${ORGANISATION_ID}/email-operational/${PROPOSAL_ID}`,
+      null,
+    );
+    const body: unknown = await response.json();
+    return {
+      status: response.status,
+      to: isRecord(body) && isRecord(body.proposal) ? body.proposal.to : null,
+      body:
+        isRecord(body) && isRecord(body.proposal) ? body.proposal.body : null,
+      error: isRecord(body) ? (body.error ?? null) : null,
+    };
+  };
+  const shown = {
+    status: 200,
+    to: "supplier@example.com",
+    body: BODY,
+    error: null,
+  };
+  const refused = {
+    status: 404,
+    to: null,
+    body: null,
+    error: "email_operational_not_found",
+  };
+
+  // Allowed: the admin decides the draft, so reads it with no grant.
+  const adminRead = await preview(admin);
+  expect(adminRead).toEqual(shown);
+  // Denied: a viewer with no grant for the mailbox.
+  const viewerRead = await preview(viewer);
+  expect(viewerRead).toEqual(refused);
+  // Denied: a viewer with the grant on another mailbox.
+  const viewerPerson = await personOf(viewer);
+  await grantOperationalPropose(
+    "grant_other_mailbox",
+    viewerPerson,
+    otherMailbox,
+  );
+  const otherGrantRead = await preview(viewer);
+  expect(otherGrantRead).toEqual(refused);
+  // Allowed: a viewer with the grant on this mailbox.
+  await grantOperationalPropose(
+    "grant_this_mailbox",
+    viewerPerson,
+    fixture.integrationAccountId,
+  );
+  const grantedRead = await preview(viewer);
+  expect(grantedRead).toEqual(shown);
+
+  Object.assign(test.task.meta, {
+    operationalDraftPreview: {
+      admin: adminRead.status,
+      viewerWithoutGrant: viewerRead,
+      viewerWithGrantOnAnotherMailbox: otherGrantRead,
+      viewerWithGrant: grantedRead.status,
+    },
+  });
+});
+
+/** The Organisation's policy turns on `email.operational.propose`. */
+async function enableOperationalPropose(userId: string): Promise<void> {
+  const scope = await requireOrganisationExecutionScope(env, ORGANISATION_ID);
+  const now = Date.now();
+  required(
+    await writeOrganisationCapabilityPolicy({
+      scope,
+      write: {
+        kind: "change",
+        capabilityId: CAPABILITY_KEYS.emailOperationalPropose,
+        expectedRevision: 1,
+        mode: "enabled",
+        provenance: {
+          kind: "operator",
+          userId,
+          mutationReceiptId: "receipt_operational_preview_policy",
+        },
+        now,
+      },
+    }),
+  );
+  required(
+    await compilePublishAndActivateOrganisationPolicy({
+      bindings: { db: fixtureDatabase(), kv: env.POLICY_KV },
+      organisationId: ORGANISATION_ID,
+      organisation: await requireActiveOrganisationActor({
+        env,
+        organisationId: ORGANISATION_ID,
+        now,
+      }),
+      now,
+    }),
+  );
+}
+
+async function personOf(client: OrganisationClient): Promise<string> {
+  const row = await fixtureDatabase()
+    .prepare(
+      "SELECT person_id AS personId FROM service_role_grant WHERE organisation_id = ? AND user_id = ? AND status = 'active'",
+    )
+    .bind(ORGANISATION_ID, client.identity.userId)
+    .first<{ personId: string }>();
+  if (row === null) throw new Error("The member has no person");
+  return row.personId;
+}
+
+async function grantOperationalPropose(
+  grantId: string,
+  personId: string,
+  integrationAccountId: IntegrationAccountId,
+): Promise<void> {
+  required(
+    await createAccessGrant({
+      db: fixtureDatabase(),
+      organisationId: ORGANISATION_ID,
+      grantId: `${grantId}_${personId}`,
+      subject: { kind: "person", personId },
+      target: {
+        kind: "provider_resource",
+        capabilityId: CAPABILITY_KEYS.emailOperationalPropose,
+        capabilityVersion: 1,
+        integrationAccountId,
+        resourceScope: EMAIL_OPERATIONAL_RESOURCE_SCOPE,
+      },
+      provenance: {
+        kind: "baseline",
+        profile: "read_and_propose",
+        profileVersion: 1,
+        materializationReceiptId: `receipt_${grantId}`,
+      },
+      now: Date.now(),
+    }),
+  );
+}
 
 async function operationalJourney(
   boundary: Boundary,
@@ -722,6 +894,50 @@ function required<Value>(
   return result.value;
 }
 
+/** A send-only Gmail account that may propose operational mail. */
+async function connectSendOnlyMailbox(
+  label: string,
+  now: number,
+): Promise<IntegrationAccountId> {
+  const handle = required(parseVaultHandle(`vault:${label}:gmail`));
+  required(
+    await storeVaultSecret({
+      db: fixtureDatabase(),
+      keys: env,
+      organisationId: ORGANISATION_ID,
+      handle,
+      secret: {
+        kind: "oauth_tokens",
+        accessToken: TOKEN,
+        refreshToken: `fixture-${label}-refresh`,
+        expiry: { kind: "expires", expiresAt: now + 3_600_000 },
+      },
+      now,
+    }),
+  );
+  const connected = await createActiveConnectedIntegration(fixtureDatabase(), {
+    organisationId: ORGANISATION_ID,
+    provider: "gmail",
+    authorizationProduct: "send_only",
+    providerSubjectId: `google_${label}`,
+    environment: "development",
+    authMode: "shared_pantry_app",
+    authority: { kind: "connection_credential", credentialRef: handle },
+    grantedScopes: GMAIL_SEND_ONLY_SCOPES,
+    createdByUserId: required(
+      parseUserId("user_ddea8ec2-b424-5505-a2f4-8f66b89b13ab"),
+    ),
+    providerAccountId: `gmail_${label}`,
+    accountKind: "mailbox",
+    displayName: "Bakery operational mail",
+    capabilities: [CAPABILITY_KEYS.emailOperationalPropose],
+    audiencePolicy: { kind: "operator" },
+    retentionPolicy: { kind: "organisation_default" },
+    now,
+  });
+  return connected.account.integrationAccountId;
+}
+
 async function installFixture(boundary?: Boundary): Promise<Fixture> {
   await installSlackActorFixture();
   await requireActiveOrganisationActor({
@@ -736,43 +952,10 @@ async function installFixture(boundary?: Boundary): Promise<Fixture> {
     )
     .bind(now, now, ORGANISATION_ID)
     .run();
-  const handle = required(parseVaultHandle("vault:p55-operational:gmail"));
-  required(
-    await storeVaultSecret({
-      db: fixtureDatabase(),
-      keys: env,
-      organisationId: ORGANISATION_ID,
-      handle,
-      secret: {
-        kind: "oauth_tokens",
-        accessToken: TOKEN,
-        refreshToken: "fixture-p55-operational-refresh",
-        expiry: { kind: "expires", expiresAt: now + 3_600_000 },
-      },
-      now,
-    }),
-  );
-  const connected = await createActiveConnectedIntegration(fixtureDatabase(), {
-    organisationId: ORGANISATION_ID,
-    provider: "gmail",
-    authorizationProduct: "send_only",
-    providerSubjectId: "google_p55_operational",
-    environment: "development",
-    authMode: "shared_pantry_app",
-    authority: { kind: "connection_credential", credentialRef: handle },
-    grantedScopes: GMAIL_SEND_ONLY_SCOPES,
-    createdByUserId: required(
-      parseUserId("user_ddea8ec2-b424-5505-a2f4-8f66b89b13ab"),
-    ),
-    providerAccountId: "gmail_p55_operational",
-    accountKind: "mailbox",
-    displayName: "Bakery operational mail",
-    capabilities: [CAPABILITY_KEYS.emailOperationalPropose],
-    audiencePolicy: { kind: "operator" },
-    retentionPolicy: { kind: "organisation_default" },
+  const integrationAccountId = await connectSendOnlyMailbox(
+    "p55_operational",
     now,
-  });
-  const integrationAccountId = connected.account.integrationAccountId;
+  );
   required(
     await registerEmailSenderAccount({
       db: fixtureDatabase(),
@@ -799,7 +982,7 @@ async function installFixture(boundary?: Boundary): Promise<Fixture> {
   const identity: Fixture["identity"] = {
     organisationId: ORGANISATION_ID,
     connectorId: required(
-      parseConnectorId(`connector_email_${integrationAccountId}`),
+      parseConnectorId(gmailConnectorIdValue(integrationAccountId)),
     ),
   };
   const connector = required(
