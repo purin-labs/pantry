@@ -548,7 +548,7 @@ export function WorkspaceLayout(props: {
   readonly sidebarFooter: React.ReactNode;
   readonly title: string;
   readonly hideHeader?: boolean;
-  readonly description: string;
+  readonly description: string | null;
   readonly status: React.ReactNode;
   readonly access: Pick<AccessRouteTransport, "read" | "mutate">;
 }): React.ReactNode {
@@ -1345,7 +1345,6 @@ function PortalBrand(props: {
       />
       <span className="portal-brand-copy">
         Purin Pantry
-        <span className="portal-brand-subtitle">Bakery operating system</span>
       </span>
     </Link>
   );

@@ -160,9 +160,9 @@ approval and the receipt of the person's own action on that page.
 - The first message of a chat sets the chat origin from its observation: the area, the
   page, the title, the record and the time. The origin never changes. A chat whose
   first message carried no page has no origin.
-- The thread header shows the origin as chips, for example
-  `Commerce › Orders › #1042`. A row of the chat list shows the same label as one muted
-  line. A fork copies the timeline up to the chosen answer. Its origin comes from the
+- A row of the chat list shows the origin as one muted line, for example
+  `Commerce › Orders › #1042`. The thread header does not repeat it: each message says
+  where it was sent from. A fork copies the timeline up to the chosen answer. Its origin comes from the
   first user message of that timeline, so it is the origin of the source chat.
 - The composer shows the page on screen as a chip. The chip is on for a new chat, and
   on the page of the chat origin. A different record on that page counts as the same

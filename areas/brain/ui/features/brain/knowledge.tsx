@@ -508,6 +508,8 @@ export function KnowledgeRows(props: {
   readonly seen: SeenRecords;
   /** A list of several kinds names the kind of each row. */
   readonly showKind: boolean;
+  /** A status that the heading of the list already says: its chip is left out. */
+  readonly impliedStatus?: string;
   readonly links: KnowledgeLinks;
   readonly onSeen: (key: string, changedAt: number | null) => void;
 }): React.ReactNode {
@@ -556,6 +558,7 @@ function KnowledgeRowLink(props: {
   readonly row: KnowledgeRow;
   readonly seen: SeenRecords;
   readonly showKind: boolean;
+  readonly impliedStatus?: string;
   readonly links: KnowledgeLinks;
   readonly onSeen: (key: string, changedAt: number | null) => void;
 }): React.ReactNode {
@@ -569,16 +572,18 @@ function KnowledgeRowLink(props: {
           {isNewRecord(props.seen, knowledgeRowKey(row), row.changedAt) ? (
             <span className="brain-row-new">New</span>
           ) : null}
-          {row.statuses.map((status) => (
-            <StatusChip key={status.label} status={status} />
-          ))}
+          {row.statuses.map((status) =>
+            status.label === props.impliedStatus ? null : (
+              <StatusChip key={status.label} status={status} />
+            ),
+          )}
         </span>
         <span className="brain-row-meta">
           {props.showKind ? `${knowledgeKindLabel(row.kind)} · ` : null}
           {row.scope}
           {row.changedAt === null ? null : (
             <>
-              {" · Updated "}
+              {" · "}
               <time
                 dateTime={new Date(row.changedAt).toISOString()}
                 title={formatAbsoluteTime(row.changedAt)}

@@ -81,12 +81,9 @@ function statusText(status: VoiceStatus): string | null {
       return null;
     case "starting":
       return "Starting voice control…";
-    case "listening": {
-      const key = voiceTalkKeyName();
-      return key === null
-        ? `Say "${WAKE_PHRASE}"`
-        : `Say "${WAKE_PHRASE}" or hold ${key}`;
-    }
+    // The microphone button carries the hint, so the composer stays one line.
+    case "listening":
+      return null;
     case "capturing":
       return status.hold ? "Listening. Release to send." : "Listening";
     case "transcribing":
@@ -105,6 +102,15 @@ function statusText(status: VoiceStatus): string | null {
           return "Voice control stopped. Open it to try again.";
       }
   }
+}
+
+/** How to give a command, as the label of the microphone button. */
+function toggleLabel(status: VoiceStatus): string {
+  if (status.kind !== "listening") return "Voice control";
+  const key = voiceTalkKeyName();
+  return key === null
+    ? `Voice control is on. Say "${WAKE_PHRASE}".`
+    : `Voice control is on. Say "${WAKE_PHRASE}" or hold ${key}.`;
 }
 
 function usesCloud(status: VoiceStatus): boolean {
@@ -189,7 +195,7 @@ export function VoiceControl(props: Props): React.ReactNode {
           Tap to start voice control
         </button>
       ) : null}
-      {text === null ? null : (
+      {text === null && !usesCloud(status) ? null : (
         <div
           className="voice-status"
           data-state={status.kind}
@@ -210,9 +216,9 @@ export function VoiceControl(props: Props): React.ReactNode {
         type="button"
         className="voice-toggle"
         data-state={status.kind}
-        aria-label="Voice control"
+        aria-label={toggleLabel(status)}
         aria-haspopup="dialog"
-        title="Voice control"
+        title={toggleLabel(status)}
         onClick={() => setOpen(true)}
       >
         <Mic aria-hidden="true" size={17} />

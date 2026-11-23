@@ -17,6 +17,7 @@
     "./ui/features/chat/permission-prompt": "./ui/features/chat/permission-prompt.tsx",
     "./ui/features/chat/route": "./ui/features/chat/route.tsx",
     "./ui/main": "./ui/main.tsx",
+    "./ui/pages/home": "./ui/pages/home.tsx",
     "./ui/portal": "./ui/portal.tsx",
     "./ui/public-docs": "./ui/public-docs.tsx",
     "./ui/shell": "./ui/shell.tsx",

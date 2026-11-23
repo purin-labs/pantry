@@ -209,15 +209,12 @@ export function ScreenChip({
       className="chat-screen-chip"
       data-attached={attached}
       aria-pressed={attached}
-      aria-label={
-        attached
-          ? `${name} goes with your message. Remove it.`
-          : `Send ${name} with your message.`
-      }
+      aria-label={chipLabel(name, attached)}
+      title={chipLabel(name, attached)}
       onClick={choose.bind(null, current, screen, !attached)}
     >
       {attached ? null : <Plus size={13} aria-hidden="true" />}
-      <span>{attached ? `On screen: ${name}` : name}</span>
+      <span>{name}</span>
       {attached ? <X size={13} aria-hidden="true" /> : null}
     </button>
   );
@@ -259,6 +256,12 @@ export function ScreenChip({
       </span>
     </span>
   );
+}
+
+function chipLabel(name: string, attached: boolean): string {
+  return attached
+    ? `${name} goes with your message. Remove it.`
+    : `Send ${name} with your message.`;
 }
 
 function startedOn(chat: Chat | null): string {

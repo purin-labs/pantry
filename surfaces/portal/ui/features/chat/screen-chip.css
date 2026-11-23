@@ -35,6 +35,18 @@
   outline: 2px solid var(--ink-2);
   outline-offset: 1px;
 }
+/* The chip sits in the toolbar row, after the add menu. A suggestion, a
+   question or the shared-chat notice takes its own row above the controls. */
+.chat-composer-toolbar > .chat-screen-chip {
+  align-self: center;
+  margin: 0 2px;
+}
+.chat-composer-toolbar > .chat-screen-suggestion,
+.chat-composer-toolbar > .chat-screen-chip[data-attached="blocked"] {
+  order: -1;
+  flex: 1 0 100%;
+  margin: 0 0 4px;
+}
 .chat-sent-from {
   display: block;
   margin-top: 2px;

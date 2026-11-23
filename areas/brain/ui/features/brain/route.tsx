@@ -479,7 +479,6 @@ function BrainRouteView(props: BrainRouteViewProps): React.ReactNode {
           evals={evals}
           toDecide={props.toDecide}
           canManage={props.canManage}
-          latest={log[0] ?? null}
           seen={props.seen}
           onSeen={props.onSeen}
           links={links}

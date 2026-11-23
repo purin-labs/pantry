@@ -327,11 +327,11 @@ describe("Café automation route ownership", () => {
         expect(markup).not.toContain("Propose commerce changes");
         if (lifecycle === "active") {
           expect(markup).toContain("Read commerce data");
-          expect(markup).toContain(
-            enabled ? "Triggers enabled" : "Manual only",
-          );
+          // An agent with a trigger shows the trigger, and no chip.
+          if (enabled) expect(markup).not.toContain("Manual only");
+          else expect(markup).toContain("Manual only");
         } else {
-          expect(markup).not.toContain("Triggers enabled");
+          expect(markup).not.toContain("Manual only");
           expect(markup).toContain("No commerce tools");
         }
       }

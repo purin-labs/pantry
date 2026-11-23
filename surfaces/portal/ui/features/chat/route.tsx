@@ -45,7 +45,6 @@ import {
 import React from "react";
 import { toast } from "sonner";
 import { ThreadTitle } from "./thread-title";
-import { ChatOriginChips } from "./origin-chips";
 import {
   X,
   History,
@@ -3222,12 +3221,7 @@ export class ChatPage extends React.Component<Props, State> {
             </button>
           </div>
         </div>
-        <ChatOriginChips origin={conversation?.origin ?? null} />
         <div className="chat-context-workspace">
-          <span>{this.props.context.workspace}</span>
-          <span className="chat-context-divider" aria-hidden="true">
-            ·
-          </span>
           <ChatContextChip
             organisationId={this.props.organisationId}
             context={this.props.context}
@@ -3443,12 +3437,9 @@ export class ChatPage extends React.Component<Props, State> {
         {this.state.selectedProject === null ? (
           <section className="chat-thread" aria-label="AI conversation">
             {opening ||
-            conversation?.sharing === null ||
-            conversation === null ? null : (
+            conversation?.sharing?.visibility !== "shared" ? null : (
               <div className="chat-visibility" role="status">
-                {conversation.sharing.visibility === "shared"
-                  ? "Shared with project"
-                  : "Private chat"}
+                Shared with project
                 {readOnly
                   ? " · View only — start a private chat to work with this context"
                   : ""}
@@ -3782,20 +3773,13 @@ export class ChatPage extends React.Component<Props, State> {
                   onPaste={this.pasteFiles.bind(this)}
                   rows={2}
                   maxLength={8000}
-                  placeholder="Ask anything, or describe an app to connect…"
+                  placeholder="Ask anything…"
                   disabled={
                     archived ||
                     needsRetry ||
                     inputBlocked ||
                     data.model.kind !== "ready"
                   }
-                />
-
-                <ScreenChip
-                  chat={data.conversation}
-                  organisationId={this.props.organisationId}
-                  draft={this.state.draft}
-                  onNewChat={this.moveDraftToNewChat.bind(this)}
                 />
                 {this.state.files.length > 0 ? (
                   <ul
@@ -3859,13 +3843,18 @@ export class ChatPage extends React.Component<Props, State> {
                       </a>
                     </div>
                   </details>
+                  <ScreenChip
+                    chat={data.conversation}
+                    organisationId={this.props.organisationId}
+                    draft={this.state.draft}
+                    onNewChat={this.moveDraftToNewChat.bind(this)}
+                  />
                   <details name="composer-menu" className="chat-access-menu">
-                    <summary>
+                    <summary aria-label="Workspace access" title="Workspace access">
                       <ShieldCheck size={17} aria-hidden="true" />
-                      Workspace access
-                      <ChevronDown size={14} aria-hidden="true" />
                     </summary>
                     <div className="chat-composer-menu">
+                      <p className="chat-menu-title">Workspace access</p>
                       <p>
                         Workspace grants and approval rules apply to this chat.
                       </p>

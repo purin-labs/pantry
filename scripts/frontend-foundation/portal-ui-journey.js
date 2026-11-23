@@ -14,7 +14,7 @@ async function verifyPortalInterface(page) {
   await retry.focus();
   await page.keyboard.press("Enter");
   await page
-    .getByRole("heading", { name: "How customers buy", exact: true })
+    .getByRole("region", { name: "How customers buy", exact: true })
     .waitFor();
   if (await retry.count())
     throw new Error("Checkout recovery retained the failed state.");
@@ -41,7 +41,7 @@ async function verifyPortalInterface(page) {
   const originalTokens = await tokens.inputValue();
   await tokens.fill("12345");
   await page
-    .getByRole("button", { name: "Cancel changes", exact: true })
+    .getByRole("button", { name: "Cancel", exact: true })
     .click();
   if ((await tokens.inputValue()) !== originalTokens) {
     throw new Error("Budget reset did not restore the current token limit.");
@@ -122,7 +122,7 @@ async function verifyPortalInterface(page) {
   await page.setViewportSize({ width: 320, height: 800 });
   await page.goto(`${origin}/brain-preview.html`);
   await page
-    .getByRole("navigation", { name: "Brain views", exact: true })
+    .getByRole("navigation", { name: "Knowledge views", exact: true })
     .waitFor();
   const counts = page.locator(".brain-count");
   const firstCount = await counts.nth(0).boundingBox();

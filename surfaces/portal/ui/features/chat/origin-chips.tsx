@@ -16,38 +16,7 @@ function chatOriginLabel(origin: ChatOrigin): string {
   return originParts(origin).join(" › ");
 }
 
-/** Where the chat started, as chips under the thread title (Plan 87). */
-export function ChatOriginChips({
-  origin,
-}: {
-  readonly origin: ChatOrigin | null;
-}): React.ReactNode {
-  if (origin === null) return null;
-  const parts = originParts(origin);
-  return (
-    <p
-      className="chat-origin"
-      aria-label={`Started on ${chatOriginLabel(origin)}`}
-    >
-      {parts.map(function originChip(part, index) {
-        return (
-          <React.Fragment key={index}>
-            {index === 0 ? null : (
-              <span className="chat-origin-divider" aria-hidden="true">
-                ›
-              </span>
-            )}
-            <span className="chat-origin-chip" aria-hidden="true">
-              {part}
-            </span>
-          </React.Fragment>
-        );
-      })}
-    </p>
-  );
-}
-
-/** The same label as one muted line in a chat list row. */
+/** Where the chat started, as one muted line in a chat list row (Plan 87). */
 export function ChatOriginLine({
   origin,
 }: {

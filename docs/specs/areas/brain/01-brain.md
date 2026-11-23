@@ -27,7 +27,7 @@ but only a person can accept it.
   workspace opens, every 5 minutes while the tab is in view (`REFRESH_MS` in
   `brain-summary.ts`), and after each read of the Brain page or the Evals.
 - **Overview**: one status line with the number of items that wait, the items that
-  wait (most recent change first), the newest learning event and four counts.
+  wait (most recent change first) and four counts as filters.
 - **Learning**: a flow of boxes for the stages of the loop, each with its count, and a
   log below it, newest event first. The page derives both from the Memory histories
   and the Eval runs that it already reads.

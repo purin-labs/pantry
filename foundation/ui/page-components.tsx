@@ -3,14 +3,14 @@ import { Link } from "react-router";
 
 export function PageHeader(props: {
   readonly title: string;
-  readonly description: string;
+  readonly description: string | null;
 }): React.ReactNode {
   return (
     <header className="portal-heading">
       <h1 id="portal-page-title" tabIndex={-1}>
         {props.title}
       </h1>
-      <p>{props.description}</p>
+      {props.description === null ? null : <p>{props.description}</p>}
     </header>
   );
 }

@@ -32,6 +32,7 @@ import type {
   HomeDestination,
   HomeSourceObservation,
 } from "@purin-labs/control-api";
+import "./home.css";
 
 export function HomePage(props: {
   readonly organisationId: string;
@@ -311,6 +312,12 @@ function homeFreshness(
   return { kind: "current" };
 }
 
+function sourceObservationIsCurrent(
+  observation: HomeSourceObservation,
+): boolean {
+  return observation.status === "current";
+}
+
 function sourceObservationIsDelayed(
   observation: HomeSourceObservation,
 ): boolean {
@@ -406,28 +413,27 @@ function renderHomeCommerceAggregations(
       </Notice>
     );
   }
+  /* One list in place of five tiles: a count is a label and a number, and the
+   * labels already say what the list is about. */
   return (
-    <section
-      className="portal-band home-section"
-      aria-labelledby="home-commerce-aggregations-title"
-    >
-      <h2 id="home-commerce-aggregations-title">Commerce today</h2>
-      <p>Open orders, stock shortages, and payment or delivery problems.</p>
-      <div className="commerce-count-grid">
-        {state.aggregations.map(renderHomeCommerceAggregation)}
-      </div>
-    </section>
+    <ul className="home-counts" aria-label="Commerce today">
+      {state.aggregations.map(renderHomeCommerceAggregation)}
+    </ul>
   );
 }
 
 function renderHomeCommerceAggregation(
   aggregation: CommerceHomeAggregation,
 ): React.ReactNode {
+  const count = homeAggregationCount(aggregation.result);
   return (
-    <div className="commerce-count" key={aggregation.name}>
-      <strong>{homeAggregationCount(aggregation.result)}</strong>
+    <li
+      key={aggregation.name}
+      data-quiet={count === 0 || count === "Unavailable"}
+    >
       <span>{homeAggregationLabel(aggregation.name)}</span>
-    </div>
+      <strong>{count}</strong>
+    </li>
   );
 }
 
@@ -457,14 +463,13 @@ function homeAggregationLabel(name: CommerceHomeAggregation["name"]): string {
 }
 
 /**
- * One quiet line replaces the old "Data update details" disclosure: source
- * freshness reads at a glance without opening anything, and the band it
- * occupied goes back to the content.
+ * One quiet line of source freshness. It shows only when a source is late or
+ * unavailable: a line of sources that are all current says nothing.
  */
 function renderHomeSources(
   observations: readonly HomeSourceObservation[],
 ): React.ReactNode {
-  if (observations.length === 0) return null;
+  if (observations.every(sourceObservationIsCurrent)) return null;
   return (
     <p className="home-sources" aria-label="Data freshness">
       {observations.map(renderSourceObservation)}
@@ -506,25 +511,23 @@ function HomeAttention(props: {
   readonly workspaceHandle: string;
   readonly items: readonly HomeAttentionItem[];
 }): React.ReactNode {
+  if (props.items.length === 0)
+    return <p className="home-quiet">Nothing needs your attention.</p>;
   return (
     <section
       className="portal-band home-section"
       aria-labelledby="home-attention-title"
     >
       <h2 id="home-attention-title">Needs attention</h2>
-      {props.items.length === 0 ? (
-        <p className="quiet-success">Nothing needs your attention right now.</p>
-      ) : (
-        <div className="action-list">
-          {props.items.map(
-            renderAttentionItem.bind(
-              null,
-              props.organisationHandle,
-              props.workspaceHandle,
-            ),
-          )}
-        </div>
-      )}
+      <div className="action-list">
+        {props.items.map(
+          renderAttentionItem.bind(
+            null,
+            props.organisationHandle,
+            props.workspaceHandle,
+          ),
+        )}
+      </div>
     </section>
   );
 }

@@ -29,7 +29,6 @@ import {
   buildAccessSystems,
   levelLabel,
   matchesSystem,
-  recipientsWhoCanChange,
   systemActionSearch,
   type AccessSystem,
   type SystemFilter,
@@ -95,10 +94,7 @@ export function SystemAccessView(
       aria-labelledby="access35-systems-title"
     >
       <div className="access35-section-heading">
-        <div>
-          <h2 id="access35-systems-title">Connected systems</h2>
-          <p>Who can use each connected system, and how.</p>
-        </div>
+        <h2 id="access35-systems-title">Connected systems</h2>
         <div className="access35-heading-actions">
           <button
             type="button"
@@ -466,16 +462,7 @@ function renderSystemSummary(
       );
   } else {
     parts.push(`Shared with ${recipients}`);
-    const canChange = recipientsWhoCanChange(system);
-    if (canChange > 0) parts.push(`${canChange} can change`);
   }
-  const approvals = system.approvalActions.length;
-  if (approvals > 0)
-    parts.push(
-      approvals === 1
-        ? "1 action asks first"
-        : `${approvals} actions ask first`,
-    );
   if (parts.length === 0) return system.detail;
   return parts.map((part, index) => (
     <React.Fragment key={index}>

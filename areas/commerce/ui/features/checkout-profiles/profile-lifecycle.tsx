@@ -49,28 +49,29 @@ export function ProfileLifecycle(props: {
     selectedStorefrontId !== null &&
     activeStorefronts.includes(selectedStorefrontId);
 
+  const checkCount =
+    props.readiness.items.length +
+    (props.profile.profile.lifecycle.state === "draft" ? 1 : 0);
   return (
-    <aside className="checkout-profile-preview" aria-label="Profile readiness">
-      <div className="checkout-profile-preview-heading">
-        <h3>Publish & activate</h3>
-        <span
-          className={
-            publicationBlockerCount === 0
-              ? "checkout-ready"
-              : "checkout-blocked"
-          }
-        >
-          {publicationBlockerCount === 0
-            ? "Checks passed"
-            : `${publicationBlockerCount} to resolve`}
-        </span>
-      </div>
+    <footer
+      className="checkout-profile-checks"
+      aria-label="Checks before publishing"
+    >
       <ul>
         {props.readiness.items.map(renderReadinessItem)}
         {props.profile.profile.lifecycle.state === "draft"
           ? renderSavedRevisionReadiness(unsaved)
           : null}
       </ul>
+      <span
+        className={
+          publicationBlockerCount === 0 ? "checkout-ready" : "checkout-blocked"
+        }
+      >
+        {publicationBlockerCount === 0
+          ? `${checkCount} of ${checkCount} checks passed`
+          : `${publicationBlockerCount} to resolve`}
+      </span>
 
       {props.canManage ? (
         <LifecycleActions
@@ -84,7 +85,7 @@ export function ProfileLifecycle(props: {
           dispatch={props.dispatch}
         />
       ) : null}
-    </aside>
+    </footer>
   );
 }
 
@@ -216,12 +217,10 @@ function renderReadinessItem(
   item: Readiness["items"][number],
 ): React.ReactNode {
   return (
-    <li key={item.label} data-ready={item.ready}>
+    <li key={item.label} data-ready={item.ready} title={item.detail}>
       <span aria-hidden="true">{item.ready ? "✓" : "!"}</span>
-      <div>
-        <strong>{item.label}</strong>
-        <p>{item.detail}</p>
-      </div>
+      <strong>{item.label}</strong>
+      {item.ready ? null : <p>{item.detail}</p>}
     </li>
   );
 }

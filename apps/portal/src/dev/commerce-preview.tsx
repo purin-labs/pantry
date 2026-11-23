@@ -1398,7 +1398,7 @@ function pageDescription(page: PreviewPage): string {
     case "products":
       return "Manage products and review their details.";
     case "checkout":
-      return "Publish typed checkout configuration and activate it per storefront.";
+      return "How do customers buy from this storefront?";
     case "orders":
       return "Customer orders projected from the connected commerce system.";
     case "suppliers":

@@ -27,14 +27,55 @@ export function ProfileList(props: {
 }): React.ReactNode {
   const [creating, setCreating] = React.useState(false);
   return (
-    <aside className="checkout-profile-list" aria-label="Profile list">
+    <section className="checkout-profile-list" aria-label="Checkout versions">
       <div className="checkout-profile-list-heading">
-        <div>
-          <p className="checkout-profile-eyebrow">Manage changes</p>
-          <h2>Checkout versions</h2>
-        </div>
-        <span>{props.collection.profiles.length}</span>
+        <h2>Versions</h2>
+        {props.canCreate ? (
+          <button
+            type="button"
+            aria-expanded={creating}
+            aria-controls="checkout-create-form"
+            onClick={setCreating.bind(null, !creating)}
+          >
+            {creating ? "Cancel new draft" : "New draft"}
+          </button>
+        ) : null}
       </div>
+      {props.canCreate ? (
+        <form
+          id="checkout-create-form"
+          hidden={!creating}
+          className="checkout-profile-create"
+          onSubmit={props.onCreate}
+          aria-describedby="checkout-profile-create-help"
+        >
+          <h3>New draft from the selected version</h3>
+          <label htmlFor="checkout-profile-create-name">Profile name</label>
+          <input
+            id="checkout-profile-create-name"
+            value={props.createForm.name}
+            onChange={changeCreateName.bind(null, props.dispatch)}
+            autoComplete="off"
+            required
+          />
+          <label htmlFor="checkout-profile-create-id">Profile ID</label>
+          <input
+            id="checkout-profile-create-id"
+            value={props.createForm.checkoutProfileId}
+            onChange={changeCreateId.bind(null, props.dispatch)}
+            pattern="[a-z0-9_-]+"
+            aria-describedby="checkout-profile-create-help"
+            autoComplete="off"
+            required
+          />
+          <small id="checkout-profile-create-help">
+            Use lowercase letters, numbers, underscores, and hyphens.
+          </small>
+          <button type="submit" disabled={props.busy}>
+            Create draft
+          </button>
+        </form>
+      ) : null}
       <div className="checkout-profile-list-items">
         {props.collection.profiles.map(
           renderProfileButton.bind(
@@ -45,58 +86,7 @@ export function ProfileList(props: {
           ),
         )}
       </div>
-      {props.canCreate ? (
-        <div
-          className="checkout-profile-create-disclosure"
-          data-open={creating}
-        >
-          <button
-            type="button"
-            aria-expanded={creating}
-            aria-controls="checkout-create-form"
-            onClick={setCreating.bind(null, !creating)}
-          >
-            {creating ? "Cancel new draft" : "Create a draft"}
-          </button>
-          <form
-            id="checkout-create-form"
-            hidden={!creating}
-            className="checkout-profile-create"
-            onSubmit={props.onCreate}
-            aria-describedby="checkout-profile-create-help"
-          >
-            <h3>Create a draft from these settings</h3>
-            <p id="checkout-profile-create-help">
-              Start with this profile’s settings and edit a new draft.
-            </p>
-            <label htmlFor="checkout-profile-create-name">Profile name</label>
-            <input
-              id="checkout-profile-create-name"
-              value={props.createForm.name}
-              onChange={changeCreateName.bind(null, props.dispatch)}
-              autoComplete="off"
-              required
-            />
-            <label htmlFor="checkout-profile-create-id">Profile ID</label>
-            <input
-              id="checkout-profile-create-id"
-              value={props.createForm.checkoutProfileId}
-              onChange={changeCreateId.bind(null, props.dispatch)}
-              pattern="[a-z0-9_-]+"
-              aria-describedby="checkout-profile-create-id-help"
-              autoComplete="off"
-              required
-            />
-            <small id="checkout-profile-create-id-help">
-              Use lowercase letters, numbers, underscores, and hyphens.
-            </small>
-            <button type="submit" disabled={props.busy}>
-              Create draft
-            </button>
-          </form>
-        </div>
-      ) : null}
-    </aside>
+    </section>
   );
 }
 
@@ -120,10 +110,8 @@ function renderProfileButton(
       onClick={selectProfile.bind(null, summary, dispatch)}
       key={summary.profile.checkoutProfileId}
     >
-      <span>
-        <strong>{summary.profile.name}</strong>
-        <small>Revision {summary.profile.revision}</small>
-      </span>
+      <strong>{summary.profile.name}</strong>
+      <small>Revision {summary.profile.revision}</small>
       <span>
         <ProfileState state={summary.profile.lifecycle.state} />
         {activeCount > 0 ? <small>{activeCount} active</small> : null}
