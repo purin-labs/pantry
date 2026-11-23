@@ -144,7 +144,8 @@ approval and the receipt of the person's own action on that page.
 - The Kitchen page sends its current view as `state`. The server checks the state and
   makes `view` and `commands` from it, so a browser cannot send a view that differs.
   A state that names another surface session, epoch or browser refuses the message
-  (422).
+  (422). While the Pastry Bench covers the Kitchen workspace, the message carries the
+  Pastry Bench view and its two commands, with no state (`screen-send.ts`).
 - `sources` names the saved records on screen, each by kind, id and revision. The
   record pages of Products, Orders and Suppliers name the open record and its linked
   records. The Portal sends at most 60 names.
@@ -393,9 +394,8 @@ Organisation erases the D1 rows. The poll of a browser reads only and writes no 
   The chat signal socket also needs the admin role, so the page of an operator gets no
   `surface_effect` signal and uses only the poll. No journey shows an operator who runs
   a Register command from a chat.
-- **Pastry Bench in the browser.** For an observation with a Kitchen state, the server
-  makes `commands` from that state. That list never has the Pastry Bench commands. The
-  journey sends an observation with no state. No browser journey proves the two tools.
+- **Pastry Bench in the browser.** `chat-pastry-bench.test.ts` sends the observation
+  that the Portal sends for the Pastry Bench. No browser journey proves the two tools.
 - **Origin.** A side Case, a Slack thread and the Case record have no chat origin.
 - **Discovery from the screen** is not built: an On screen entry starts no Case context
   discovery, and no route starts one from a screen source. A discovery selection

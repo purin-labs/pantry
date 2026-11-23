@@ -29,7 +29,11 @@ import {
 const BROWSER = "browser-pastry-owner";
 const SESSION_ID = "pastry-bench-session-1";
 
-/** The Pastry Bench page as the owner's browser sends it now. */
+/**
+ * The Pastry Bench page as the owner's browser sends it: its own view, its
+ * two commands and its own page session, with no Kitchen state, also while
+ * the Kitchen workspace is mounted behind it (`screen-send.ts`).
+ */
 function observation(pieType: string): SurfaceObservationV2 {
   return {
     kind: "surface-observation",
