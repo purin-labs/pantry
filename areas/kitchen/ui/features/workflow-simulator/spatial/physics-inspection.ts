@@ -66,7 +66,11 @@ export class PhysicsInspection {
       ((degrees: number | null) => void) | null,
   ) {
     this.model = new PhysicsModel(recording);
-    this.model.root.position.set(...robotCellPosition);
+    this.model.root.position.set(
+      robotCellPosition[0] + (this.model.usesSpannerTooling() ? 0.85 : 0),
+      robotCellPosition[1],
+      robotCellPosition[2],
+    );
     this.guide = new TaskSpatialGuide(this.model, select);
     plan.addInspectionControl(this.guide.element);
   }
