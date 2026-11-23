@@ -8,6 +8,7 @@ import {
   jsonResponse,
   methodNotAllowed,
   notFound,
+  readBoundedText,
 } from "@purin-labs/kernel/http";
 import { createCommerceDeliveryQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";
 import { createShopifyCommerceRefreshQueueMessage } from "./queue-messages";
@@ -39,6 +40,13 @@ import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { commerceObservationIdentity } from "@purin-labs/area-commerce/server/contract/observation-identity";
 import { decodePathSegmentValue } from "@purin-labs/control/worker/gateway/request-helpers";
+
+/**
+ * The largest webhook body that Pantry reads. A product with Shopify's
+ * 2,048 variants is about 2 MiB; a larger body is refused before it is read
+ * or its signature is checked.
+ */
+const SHOPIFY_WEBHOOK_BODY_LIMIT = 10 * 1_024 * 1_024;
 
 function isShopifyWebhookShopDomain(raw: string | null): raw is string {
   return raw !== null && /^[a-z0-9][a-z0-9-]*\.myshopify\.com$/i.test(raw);
@@ -91,7 +99,13 @@ export async function handleShopifyWebhook(
     return shopifyWebhookErrorResponse(secret.error);
   }
 
-  const rawBody = await request.text();
+  const rawBody = await readBoundedText(request, SHOPIFY_WEBHOOK_BODY_LIMIT);
+  if (rawBody === null)
+    return errorResponse(
+      "shopify_event_too_large",
+      "Shopify event is too large.",
+      413,
+    );
   const verified = await verifyShopifyWebhookSignature({
     rawBody,
     signatureHeader: request.headers.get("x-shopify-hmac-sha256"),

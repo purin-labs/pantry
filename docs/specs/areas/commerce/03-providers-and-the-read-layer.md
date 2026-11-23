@@ -182,7 +182,9 @@ Connection:
 - Pantry registers each topic of the table below except `app/uninstalled`
   (`SHOPIFY_WEBHOOK_TOPICS`). If Shopify refuses an order topic (no protected
   customer data), the topic is `unavailable`. Another refusal stops the connection.
-- `x-shopify-hmac-sha256` signs each body. A REST number id becomes a GraphQL GID
+- `x-shopify-hmac-sha256` signs each body. A body over 10 MiB
+  (`SHOPIFY_WEBHOOK_BODY_LIMIT`) gets 413 `shopify_event_too_large` before Pantry reads
+  it or checks its signature. A REST number id becomes a GraphQL GID
   (`gid://shopify/<Type>/<n>`) at the boundary.
 
 | Topic                                | Result                                                                                                                                                                  |

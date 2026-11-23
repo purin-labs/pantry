@@ -45,7 +45,8 @@ import {
 } from "./store";
 import { transcribeWithWorkersAi } from "./transcribe";
 import { readVoiceVocabulary } from "./vocabulary";
-import { readBoundedBody, readVoiceWav, VOICE_BODY_BYTE_LIMIT } from "./wav";
+import { readBoundedBytes } from "@purin-labs/kernel/http";
+import { readVoiceWav, VOICE_BODY_BYTE_LIMIT } from "./wav";
 
 /** The fallback does not wait longer than this for the shop vocabulary. */
 const VOCABULARY_WAIT_MS = 800;
@@ -222,7 +223,7 @@ async function transcribe(
   const deviceId = request.headers.get(VOICE_DEVICE_HEADER);
   if (deviceId === null || !DEVICE_PATTERN.test(deviceId))
     return controlError("voice_device_invalid", 400);
-  const body = await readBoundedBody(request, VOICE_BODY_BYTE_LIMIT);
+  const body = await readBoundedBytes(request, VOICE_BODY_BYTE_LIMIT);
   if (body === null) return controlError("too_long", 413);
   const wav = readVoiceWav(body);
   if (wav.kind === "too_long") return controlError("too_long", 413);

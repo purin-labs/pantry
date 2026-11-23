@@ -1,4 +1,5 @@
 import { isRecord } from "@purin-labs/std";
+import { readBoundedText } from "@purin-labs/kernel/http";
 export type JsonRecord = Record<string, unknown>;
 
 export async function readBoundedJsonRecord(
@@ -6,26 +7,13 @@ export async function readBoundedJsonRecord(
   maxBytes: number,
 ): Promise<JsonRecord | null> {
   if (request.body === null) return null;
-  const reader = request.body.getReader();
-  const decoder = new TextDecoder();
-  let bytes = 0;
-  let text = "";
+  const text = await readBoundedText(request, maxBytes);
+  if (text === null) return null;
   try {
-    while (true) {
-      const chunk = await reader.read();
-      if (chunk.done) break;
-      bytes += chunk.value.byteLength;
-      if (bytes > maxBytes) return null;
-      text += decoder.decode(chunk.value, { stream: true });
-    }
-    text += decoder.decode();
     const raw: unknown = JSON.parse(text);
     return isRecord(raw) ? raw : null;
   } catch {
     return null;
-  } finally {
-    await reader.cancel();
-    reader.releaseLock();
   }
 }
 

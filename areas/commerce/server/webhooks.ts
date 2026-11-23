@@ -16,6 +16,7 @@ import {
   errorResponse,
   jsonResponse,
   methodNotAllowed,
+  readBoundedText,
 } from "@purin-labs/kernel/http";
 import {
   newRequestId,
@@ -139,9 +140,8 @@ export async function handleCommerceWebhook(
       "Commerce webhooks are not configured.",
       503,
     );
-  const body = await request.text();
-  if (textEncoder.encode(body).byteLength > MAXIMUM_BODY_BYTES)
-    return refused();
+  const body = await readBoundedText(request, MAXIMUM_BODY_BYTES);
+  if (body === null) return refused();
   const timestamp = request.headers.get("x-commerce-timestamp") ?? "";
   const signedAt = Date.parse(timestamp);
   if (

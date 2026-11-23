@@ -79,6 +79,46 @@ it.each(WEBHOOK_CASES)(
   signedWebhookContract,
 );
 
+it(
+  "shopify refuses a body larger than any Shopify event before it reads or verifies it",
+  oversizedShopifyBody,
+);
+
+/**
+ * An outside sender who knows the Organisation and its shop domain posts a
+ * body of more than 10 MiB with a forged signature. Pantry refuses it with
+ * 413 before it reads the body or checks the signature, and a real signed
+ * order event of the shop is still admitted.
+ */
+async function oversizedShopifyBody(): Promise<void> {
+  const row = WEBHOOK_CASES.find(
+    (candidate): candidate is VariantBy<WebhookCase, "provider", "shopify"> =>
+      candidate.provider === "shopify",
+  );
+  if (row === undefined) throw new Error("The Shopify case is missing");
+  const scenario = await seedActiveWebhookScenario(row);
+  const webhook = await signedWebhook(row, scenario.organisationId);
+  const padding = "x".repeat(10 * 1_024 * 1_024);
+  const oversized = await postWebhook(
+    webhook.url,
+    JSON.stringify({ id: 43, name: "#1043", note: padding }),
+    webhook.invalidHeaders,
+  );
+  expect(oversized.status).toBe(413);
+  await expect(oversized.json()).resolves.toMatchObject({
+    ok: false,
+    error: { code: "shopify_event_too_large" },
+  });
+
+  const accepted = await postWebhook(
+    webhook.url,
+    webhook.body,
+    webhook.headers,
+  );
+  expect(accepted.status).toBe(200);
+  await assertWebhookAuthorityUnchanged(row, scenario);
+}
+
 async function signedWebhookContract(row: WebhookCase): Promise<void> {
   const scenario = await seedActiveWebhookScenario(row);
   const webhook = await signedWebhook(row, scenario.organisationId);
