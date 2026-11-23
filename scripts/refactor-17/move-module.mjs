@@ -638,7 +638,18 @@ function publicOfAnotherArea(path) {
     entry.endsWith("/") ? path.startsWith(entry) : path === entry,
   );
 }
-/** "moved file -> public file" for each import that stays relative. */
+/**
+ * True for a file of another surface, when this plan moves a surface. The
+ * surfaces import each other in circles (slack and webhooks, voice and the
+ * Portal), so no order moves each surface before its importers.
+ */
+function fileOfAnotherSurface(path) {
+  if (!plan.module.startsWith("surfaces/")) return false;
+  const module = moduleAtStart(path);
+  if (module === null || !module.startsWith("surfaces/")) return false;
+  return module !== plan.module;
+}
+/** "moved file -> file of another module" for each import that stays relative. */
 const intoWorker = new Set();
 const inTree = (path) => known.has(path);
 
@@ -700,11 +711,14 @@ function newSpecifier(path, specifier) {
       );
     }
     const left = resolveIn(inTree, posix.dirname(oldPath), bare);
-    if (left !== null && publicOfAnotherArea(left.file)) {
-      // A public file of another area that has not moved yet: the moved file
-      // names it by its relative path. The move of that area names it by its
-      // package, so no relative import into the Worker is left after the
-      // last area.
+    if (
+      left !== null &&
+      (publicOfAnotherArea(left.file) || fileOfAnotherSurface(left.file))
+    ) {
+      // A public file of another area, or a file of another surface, that has
+      // not moved yet: the moved file names it by its relative path. The move
+      // of that module names it by its package, so no relative import into
+      // the Worker or the Portal is left after the last move of the group.
       intoWorker.add(`${path} -> ${left.file}`);
       return relativeSpecifier(folder, left.file, left.style) + query;
     }
@@ -1328,7 +1342,7 @@ function printReport() {
   }
   if (intoWorker.size > 0) {
     console.log(
-      `${intoWorker.size} imports of a public file of another area that has not moved keep a relative path:`,
+      `${intoWorker.size} imports of a public file of another area or a file of another surface that has not moved keep a relative path:`,
     );
     for (const line of [...intoWorker].sort()) console.log(`  ${line}`);
   }
