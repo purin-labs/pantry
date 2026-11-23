@@ -1707,7 +1707,8 @@ function setConfiguringStatement(
   });
 }
 
-function parsePersistedReadinessBlockers(
+/** The blockers that an assessment row stores as JSON. Throws on a bad row. */
+export function parsePersistedReadinessBlockers(
   raw: unknown,
 ): readonly ReadinessBlocker[] {
   if (typeof raw !== "string") {

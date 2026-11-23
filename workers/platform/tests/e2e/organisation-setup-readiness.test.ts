@@ -1,4 +1,4 @@
-import { exports } from "cloudflare:workers";
+import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
@@ -10,6 +10,9 @@ import {
   discoverSlackChannel,
   installSlackActorFixture,
 } from "./slack-journey-support";
+import { slackAuthTestHandler } from "./slack-workspace-support";
+import { network } from "./network";
+import { runCronMinutes, WriteMeter, type WriteCounts } from "./write-meter";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -69,6 +72,71 @@ async function blockedActivationJourney({ task }: TestContext): Promise<void> {
     activation: { status: activated.status, answer },
     lifecycleAfter: record(record(after.organisation).lifecycle).kind,
   };
+}
+
+// The same shop waits in setup and nothing changes. The 15-minute run of the
+// production Worker still names the missing shop system in readiness, but a
+// run that finds nothing new writes no row and leaves the Organisation
+// unchanged, so that a shop in setup costs close to nothing.
+it(
+  "writes nothing in the 15-minute runs while a saved setup waits for its shop system",
+  idleSetupJourney,
+  180_000,
+);
+
+async function idleSetupJourney({ task }: TestContext): Promise<void> {
+  const owner = await savedSetupWithoutShop();
+  // The health check of the run asks Slack about the bot token.
+  const slackChecks: string[] = [];
+  network.use(slackAuthTestHandler(WORKSPACE_ID, slackChecks));
+  const crons = env.TEST_PRODUCTION_CRONS.filter(isQuarterHourCron);
+  expect(crons).toHaveLength(1);
+  const meter = new WriteMeter();
+  const quarter = 15 * 60_000;
+  const firstRunAt = Math.ceil(Date.now() / quarter) * quarter;
+  // The first run may settle what the setup left.
+  await runCronMinutes({ env: meter.env, crons, from: firstRunAt, minutes: 1 });
+  const settled = await readProjection(owner);
+  meter.takeStatements();
+
+  const idleRuns: WriteCounts[] = [];
+  for (const run of [1, 2, 3])
+    idleRuns.push(
+      await meter.during(() =>
+        runCronMinutes({
+          env: meter.env,
+          crons,
+          from: firstRunAt + run * quarter,
+          minutes: 1,
+        }),
+      ),
+    );
+  const statements = meter.takeStatements();
+  expect(
+    idleRuns.filter((written) => Object.keys(written).length > 0),
+    `rows that the idle runs wrote\n${statements.join("\n")}`,
+  ).toEqual([]);
+
+  // Readiness still names the missing shop system, and the Organisation
+  // reads as unchanged since the first run.
+  const after = await readProjection(owner);
+  expect(blockerCodes(record(after.readiness))).toContain(
+    "commerce_system_missing",
+  );
+  expect(after.updated_at).toBe(settled.updated_at);
+  expect(record(after.readiness).readiness_version).toBe(
+    record(settled.readiness).readiness_version,
+  );
+
+  task.meta.organisationSetupReadiness = {
+    idleRuns,
+    readinessVersion: record(after.readiness).readiness_version,
+    blockers: blockerCodes(record(after.readiness)),
+  };
+}
+
+function isQuarterHourCron(cron: string): boolean {
+  return cron.trim().startsWith("*/15 ");
 }
 
 /**

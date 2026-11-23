@@ -39,7 +39,10 @@ import {
   type ControlMutationIdentity,
   type ControlMutationReceiptScope,
 } from "@purin-labs/tenancy/data/control-mutation";
-import type { CapabilityProfile } from "./onboarding";
+import {
+  parsePersistedReadinessBlockers,
+  type CapabilityProfile,
+} from "./onboarding";
 import {
   prepareResolveOpenSupportReferences,
 } from "../contract/provider-support-references";
@@ -734,7 +737,7 @@ function activationStaleDetail(
   if (row.readinessVersion !== row.newestReadinessVersion) {
     return "readiness_assessment_superseded";
   }
-  if (!namesNoBlocker(row.blockers)) {
+  if (parsePersistedReadinessBlockers(row.blockers).length > 0) {
     return "readiness_assessment_blocked";
   }
   if (row.assessmentConfigurationVersion !== row.configurationVersion) {
@@ -753,13 +756,6 @@ function activationStaleDetail(
     return "organisation_lifecycle_incompatible";
   }
   return null;
-}
-
-/** True when the stored blockers of an assessment are an empty list. */
-function namesNoBlocker(raw: unknown): boolean {
-  if (typeof raw !== "string") return false;
-  const blockers: unknown = JSON.parse(raw);
-  return Array.isArray(blockers) && blockers.length === 0;
 }
 
 function readActivationRow(

@@ -267,22 +267,24 @@ outputs, and it runs the subjects below. It resumes a `running` attempt whose le
 ended, as the first active owner, with the key `activation-reconcile:<attemptId>`. Then
 it reconciles the email watches. After the last Organisation, it sweeps the Vault alerts.
 
-| Subject                 | Repair                                                                                        |
-| ----------------------- | --------------------------------------------------------------------------------------------- |
-| `open_attempts`         | Expire connection attempts after `expires_at`                                                 |
-| `credentials`           | Degrade an active account with no active credential generation                                |
-| `accounts`              | Degrade an active account whose connection is not active in its environment                   |
-| `webhooks`              | Degrade a default Shopify or Stripe account with no live webhook                              |
-| `default_accounts`      | Mark one active default account for each provider and environment                             |
-| `setup_snapshots`       | Delete the assessments when a saved setup lacks a policy, cue, commerce or destination record |
-| `readiness`             | Refresh the assessment of a `configuring` Organisation with `unknown` signals                 |
-| `archived_organisation` | The cleanup, then the purge, through `OrganisationActor.reconcileArchiveCleanup`              |
+| Subject                 | Repair                                                                                 |
+| ----------------------- | -------------------------------------------------------------------------------------- |
+| `open_attempts`         | Expire connection attempts after `expires_at`                                          |
+| `credentials`           | Degrade an active account with no active credential generation                         |
+| `accounts`              | Degrade an active account whose connection is not active in its environment            |
+| `webhooks`              | Degrade a default Shopify or Stripe account with no live webhook                       |
+| `default_accounts`      | Mark one active default account for each provider and environment                      |
+| `setup_snapshots`       | Delete the assessments when the newest one lacks the blocker of a missing setup record |
+| `readiness`             | Refresh the assessment of a `configuring` Organisation with `unknown` signals          |
+| `archived_organisation` | The cleanup, then the purge, through `OrganisationActor.reconcileArchiveCleanup`       |
 
 An account repair raises the configuration version, so readiness runs again. Only a
 subject that repairs something or fails writes an `onboarding_reconciliation_run` row
 and `provider_reconciliation_*` events. Most subjects expire, degrade or mark records.
-`setup_snapshots` deletes assessments. `archived_organisation` revokes credentials,
-connections and Vault secrets, and it purges the Organisation.
+`setup_snapshots` deletes assessments: a saved setup can lack its policy, cue, commerce
+system or destination, and an assessment that names each missing record stays.
+`archived_organisation` revokes credentials, connections and Vault secrets, and it
+purges the Organisation.
 
 ## Contracts
 
@@ -395,7 +397,7 @@ The routes are in `control/routes/onboarding.ts` and `control/routes/operators.t
   and the provider request id.
 - **Idle cost.** A run that finds nothing to repair writes no row. A readiness refresh
   writes only when the set of blockers changed or the current configuration version has
-  no assessment. "Open work" names one exception.
+  no assessment.
 - **Out of scope:** a suspended lifecycle (`suspension_reason_code` and `suspended_at`
   stay NULL), a choice of cell, an email for an invitation, and billing.
 - **Boundaries.** FND-01 owns the placement, the execution scope, the directory row and
@@ -410,9 +412,6 @@ The routes are in `control/routes/onboarding.ts` and `control/routes/operators.t
 
 - **A restore after the cleanup.** Reconnect refuses a `revoked` connection, and
   `createConnectedIntegration` throws for its `disabled` account.
-- **Repeated writes.** While a saved setup has no commerce system, `setup_snapshots`
-  deletes the assessments and writes a run row each 15 minutes. `readiness` then writes
-  a new assessment.
 - **The stage route.** `POST …/onboarding/stage-viewed` has no Origin or CSRF check.
 - **No failed cleanup.** No code writes `organisation_archive_cleanup.status = 'failed'`.
 - **Labels that differ.** The tombstone names the first active owner, also when an admin

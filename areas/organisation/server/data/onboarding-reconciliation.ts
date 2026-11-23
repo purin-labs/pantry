@@ -54,6 +54,7 @@ import {
 } from "@purin-labs/tenancy/data/control-mutation";
 import {
   ensureCurrentReadiness,
+  parsePersistedReadinessBlockers,
   prepareReadinessAssessmentDeletion,
 } from "./onboarding";
 import { expireProviderAttemptIfDue } from "@purin-labs/connections/data/provider-attempt";
@@ -930,40 +931,66 @@ async function reconcileDefaultAccounts(
   return changes;
 }
 
+/**
+ * A saved setup that lacks a policy, a cue, a commerce system or a destination
+ * cannot be ready. The repair ends the newest assessment only when that
+ * assessment does not name each missing record as a blocker, so that a setup
+ * that waits for its shop system writes nothing on each run.
+ */
 async function reconcileSetupSnapshots(
   db: OrganisationDatabase,
   organisation: RequiredOrganisationReconciliationState,
   now: number,
 ): Promise<number> {
-  const incomplete = await db
+  const setup = await db
     .prepare(
-      `SELECT 1 AS found
-     FROM organisation_onboarding_selection AS selection
-     WHERE selection.organisation_id = ?
-       AND (
+      `SELECT
          NOT EXISTS (
            SELECT 1 FROM organisation_setup_snapshot
            WHERE organisation_id = selection.organisation_id AND snapshot_kind = 'policy'
-         )
-         OR NOT EXISTS (
+         ) AS policyMissing,
+         NOT EXISTS (
            SELECT 1 FROM organisation_setup_snapshot
            WHERE organisation_id = selection.organisation_id AND snapshot_kind = 'cue'
-         )
-         OR NOT EXISTS (
+         ) AS cueMissing,
+         NOT EXISTS (
            SELECT 1 FROM organisation_commerce_system
            WHERE organisation_id = selection.organisation_id
-         )
-         OR NOT EXISTS (
+         ) AS commerceMissing,
+         NOT EXISTS (
            SELECT 1 FROM organisation_communication_destination
            WHERE organisation_id = selection.organisation_id
-         )
-       )`,
+         ) AS destinationMissing,
+         (
+           SELECT assessment.blockers FROM organisation_readiness_assessment AS assessment
+           WHERE assessment.organisation_id = selection.organisation_id
+           ORDER BY assessment.readiness_version DESC LIMIT 1
+         ) AS newestBlockers
+     FROM organisation_onboarding_selection AS selection
+     WHERE selection.organisation_id = ?`,
     )
     .bind(organisation.organisationId)
-    .first<{ readonly found: unknown }>();
-  if (incomplete?.found !== 1) {
-    return 0;
-  }
+    .first<{
+      readonly policyMissing: unknown;
+      readonly cueMissing: unknown;
+      readonly commerceMissing: unknown;
+      readonly destinationMissing: unknown;
+      readonly newestBlockers: unknown;
+    }>();
+  // No saved setup, or no assessment that could claim a ready setup.
+  if (setup === null || setup.newestBlockers === null) return 0;
+  const missing = [
+    setup.policyMissing === 1 ? "policy_snapshot_missing" : null,
+    setup.cueMissing === 1 ? "cue_snapshot_missing" : null,
+    setup.commerceMissing === 1 ? "commerce_system_missing" : null,
+    setup.destinationMissing === 1 ? "communication_destination_missing" : null,
+  ].filter((code) => code !== null);
+  const named = new Set<string>(
+    parsePersistedReadinessBlockers(setup.newestBlockers).map(
+      (blocker) => blocker.code,
+    ),
+  );
+  if (missing.every((code) => named.has(code))) return 0;
   const result = await prepareReadinessAssessmentDeletion(
     db,
     organisation.organisationId,
