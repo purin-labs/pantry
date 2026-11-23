@@ -33,7 +33,9 @@ export type JobTask =
       robot: unknown;
       ingredients: unknown;
       task: "table-to-rack" | "table-to-oven";
-      scenario: "nominal" | "blocked" | "unreachable";
+      cell?: "separate" | "spanner-oven";
+      scenario: "nominal" | "blocked" | "unreachable" | "closed-door" | "slip";
+      mode?: "transfer" | "oven-cycle";
     }>
   | Readonly<{
       kind: "request" | "prepared-request";
@@ -286,6 +288,45 @@ export class EnginePrograms {
   ): Promise<Job> {
     const robot = parseRobotModel(task.robot);
     const ingredients = parseIngredientLoad(task.ingredients);
+    if (task.cell === "spanner-oven") {
+      const mode = task.mode ?? "transfer";
+      if (
+        mode !== "transfer" &&
+        (task.task !== "table-to-oven" || task.scenario !== "nominal")
+      )
+        throw new Error("A browser cycle requires nominal oven loading.");
+      const generated = await this.program({
+        op: "prepare",
+        preparation: {
+          robot,
+          ingredientMassKg: ingredients.massKg,
+          ingredientForwardMm: ingredients.forwardMm,
+          ingredientLateralMm: ingredients.lateralMm,
+          clampForceN: 100,
+          task: task.task,
+          cell: "spanner-oven",
+          case: task.scenario,
+          timestep: 0.002,
+          rackXMm: 0,
+          rackYMm: 0,
+        },
+      });
+      if (generated.kind !== "prepared" || !isRecord(generated.request))
+        throw new Error("The browser controller returned an invalid request.");
+      const selected = parsePhysicsRequest(JSON.stringify(generated.request));
+      if (
+        selected.kind === "rejected" ||
+        selected.request.robot !== robot ||
+        selected.request.execution.backend !== "browser"
+      )
+        throw new Error("Prepared robot selection differs from this job.");
+      return {
+        request: selected.request,
+        program: programFor(mode, generated.request),
+        opened: null,
+        startedAt: 0,
+      };
+    }
     const reply = await this.program({
       op: "open",
       job,
@@ -349,15 +390,25 @@ function parseTask(raw: unknown): JobTask {
   if (
     raw.kind === "selection" &&
     (raw.task === "table-to-rack" || raw.task === "table-to-oven") &&
+    (raw.cell === undefined ||
+      raw.cell === "separate" ||
+      raw.cell === "spanner-oven") &&
+    (raw.mode === undefined ||
+      raw.mode === "transfer" ||
+      raw.mode === "oven-cycle") &&
     (raw.scenario === "nominal" ||
       raw.scenario === "blocked" ||
-      raw.scenario === "unreachable")
+      raw.scenario === "unreachable" ||
+      raw.scenario === "closed-door" ||
+      raw.scenario === "slip")
   )
     return {
       kind: "selection",
       robot: raw.robot,
       ingredients: raw.ingredients,
       task: raw.task,
+      ...(raw.cell === undefined ? {} : { cell: raw.cell }),
+      ...(raw.mode === undefined ? {} : { mode: raw.mode }),
       scenario: raw.scenario,
     };
   if (

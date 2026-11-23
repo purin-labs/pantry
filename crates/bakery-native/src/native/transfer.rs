@@ -12,6 +12,9 @@ use crate::robot::Robot;
 use crate::servo::{self, Arm, Payload};
 
 pub const OPEN_JAW_M: f64 = 0.025;
+pub const SPANNER_OPEN_JAW_M: f64 = 0.045;
+pub const SPANNER_CLOSED_JAW_M: f64 = -0.015;
+pub const SPANNER_MAX_CLAMP_N: f64 = 15.5;
 /// Where a cell keeps its carrier body while no carrier is admitted: below the
 /// floor, clear of every fixture, with its collisions disabled.
 pub const PARKED_TRAY: [f64; 7] = [0., 0., -10., 1., 0., 0., 0.];
@@ -46,6 +49,7 @@ pub struct Engine {
     tray_dof: usize,
     clamp_qpos: usize,
     clamp_actuator: usize,
+    is_spanner: bool,
     // The tray's geometry with the collision masks it was compiled with.
     tray_geoms: Vec<(usize, i32, i32)>,
     parked: bool,
@@ -177,6 +181,10 @@ impl Engine {
         let range = model.actuator_forcerange();
         let clamps = std::array::from_fn(|index| range[arm.actuators[index] * 2 + 1]);
         ratings.check(&clamps)?;
+        let is_spanner = names
+            .geometry
+            .iter()
+            .any(|name| name == "clamp_spanner_jaw_front_pad_col");
         Ok(Self {
             grasp: lookup(Object::Site, "cell_grasp")?,
             tool: lookup(Object::Body, "cell_gripper")?,
@@ -185,6 +193,7 @@ impl Engine {
             tray_dof: model.jnt_dofadr()[tray_joint] as usize,
             clamp_qpos: model.jnt_qposadr()[clamp] as usize,
             clamp_actuator: lookup(Object::Actuator, "clamp_servo")?,
+            is_spanner,
             reference: if persistent {
                 Some(lookup(Object::Body, "cell_reference")?)
             } else {
@@ -207,6 +216,23 @@ impl Engine {
         })
     }
 
+    pub fn is_spanner(&self) -> bool {
+        self.is_spanner
+    }
+    pub fn open_jaw_m(&self) -> f64 {
+        if self.is_spanner {
+            SPANNER_OPEN_JAW_M
+        } else {
+            OPEN_JAW_M
+        }
+    }
+    pub fn closed_jaw_m(&self) -> f64 {
+        if self.is_spanner {
+            SPANNER_CLOSED_JAW_M
+        } else {
+            -0.005
+        }
+    }
     pub fn timestep(&self) -> f64 {
         self.model.timestep()
     }
@@ -404,11 +430,12 @@ impl Engine {
     pub fn probe_contacts(&mut self, angles: &[f64; 6], closed: bool) -> Vec<Contact<'_>> {
         self.work += 1;
         self.model.reset(&mut self.probe);
+        let open_jaw = self.open_jaw_m();
         let qpos = self.probe.qpos_mut();
         for index in 0..3 {
             qpos[self.tray_qpos + index] = if index == 2 { -10. } else { 0. };
         }
-        qpos[self.clamp_qpos] = if closed { 0. } else { OPEN_JAW_M };
+        qpos[self.clamp_qpos] = if closed { 0. } else { open_jaw };
         self.arm.set_joints(&mut self.probe, angles);
         self.model.forward(&mut self.probe);
         self.contacts(&self.probe)
@@ -425,8 +452,13 @@ impl Engine {
             for axis in 0..3 {
                 center[axis] = site[self.grasp * 3 + axis];
             }
-            center[0] += 0.25;
-            center[2] += 0.001;
+            if self.is_spanner {
+                center[1] += 0.005;
+                center[2] -= 0.011;
+            } else {
+                center[0] += 0.25;
+                center[2] += 0.001;
+            }
             // The grasp offset locates the tray origin. Apply its actual inertial
             // offset in the live tray orientation when estimating carried weight.
             let (xmat, ipos) = (self.live.xmat(), model.body_ipos());
@@ -496,9 +528,14 @@ impl Engine {
 
     pub fn configure_clamp(&mut self, clamp_force_n: f64) {
         self.stages.clear();
+        let limit = if self.is_spanner {
+            clamp_force_n.min(SPANNER_MAX_CLAMP_N)
+        } else {
+            clamp_force_n
+        };
         let range = self.model.actuator_forcerange_mut();
-        range[self.clamp_actuator * 2] = -clamp_force_n;
-        range[self.clamp_actuator * 2 + 1] = clamp_force_n;
+        range[self.clamp_actuator * 2] = -limit;
+        range[self.clamp_actuator * 2 + 1] = limit;
         self.model.set_const(&mut self.live);
     }
 

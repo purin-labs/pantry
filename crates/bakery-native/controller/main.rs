@@ -19,7 +19,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, ensure};
-use bakery_native::assets::Assets;
+use bakery_native::assets::{Assets, Cell};
 use clap::Parser;
 use serde_json::json;
 
@@ -46,6 +46,9 @@ struct Args {
     /// change. Tasks do not survive a restart.
     #[arg(long)]
     state_dir: Option<PathBuf>,
+    /// The FR10 oven cell fixture (`separate` or `spanner-oven`).
+    #[arg(long, value_enum, default_value_t = Cell::Separate)]
+    cell: Cell,
 }
 
 /// The loop that advances the devices.
@@ -61,8 +64,12 @@ fn main() -> Result<()> {
         args.port <= u16::MAX - 3,
         "--port leaves no room for four ports"
     );
+    ensure!(
+        matches!(args.cell, Cell::Separate | Cell::SpannerOven),
+        "--cell must be separate or spanner-oven"
+    );
     let assets = Assets::load(&args.root).context("Load the model assets from --root")?;
-    let physics = Physics::run(&assets)?;
+    let physics = Physics::run(&assets, args.cell)?;
     let state_file = match &args.state_dir {
         Some(dir) => {
             std::fs::create_dir_all(dir)?;

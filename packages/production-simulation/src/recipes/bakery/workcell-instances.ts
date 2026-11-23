@@ -72,7 +72,7 @@ const INSTANCES = [
     name: "Maruzen shelf 3",
     role: "destination",
     model: "Maruzen MBCO-5E, shelf 3",
-    fixture: { bodies: [], geometry: ["mbco_", "oven_stand"] },
+    fixture: { bodies: [], geometry: ["mbco_", "mbco4_", "oven_stand"] },
     pose: [1.35, 0.2, 0.444, Math.SQRT1_2, 0, 0, -Math.SQRT1_2],
   },
   {

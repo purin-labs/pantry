@@ -23,16 +23,34 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
-import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from appliance_physics_kit import (
+    BLENDER_BIN,
+    COL_ACCESSORY_RGBA,
+    COL_ARTIC_RGBA,
+    COL_BASE_RGBA,
+    COL_WALL_RGBA,
+    ROOT,
+    SITE_GRASP_RGBA,
+    SITE_SUPPORT_RGBA,
+    Y_AXIS_QUAT,
+    add_adjacent_excludes,
+    add_standard_defaults,
+    emit_standalone_models,
+    export_and_verify_native_xml as kit_export_native_xml,
+    numbers,
+    prepare_blender_assembly,
+    verify_frames_and_motions as kit_verify_frames_and_motions,
+    write_xml,
+)
+
 NAME = "victoria-arduino-e1-prima"
 ASSETS = ROOT / "assets/bakery-mujoco" / NAME
-BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
 
 MACHINE_BODY_NAMES = (
     "e1p_body",
@@ -87,68 +105,15 @@ SCALAR_VISUAL_AXES = {
 }
 
 
-def numbers(values) -> str:
-    return " ".join(f"{value:.9g}" for value in values)
-
-
-def write_xml(path: Path, element: ET.Element) -> None:
-    ET.indent(element, space="  ")
-    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
-
-
 def export_blender_meshes_and_xml() -> None:
-    """Run inside Blender 5.2 to export body-local OBJ meshes and construct appliance.xml + scene.xml."""
-    import bpy
-
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from build_oven_visuals import export_visual_meshes
-
+    """Run inside Blender 5.2 to export body-local OBJ meshes and construct appliance.xml + scene.xml + model.xml."""
     source = ASSETS / f"{NAME}.blend"
-    bpy.ops.wm.open_mainfile(filepath=str(source))
-    bpy.context.scene.frame_set(1)
-    bpy.context.view_layer.update()
-
-    parts = [bpy.data.objects[name] for name in NAMES]
-    poses = {obj.name: obj.matrix_world.copy() for obj in parts}
-
-    # Reparent every child mesh under the root to its nearest articulated ancestor in NAMES (preserving matrix_world)
-    for obj in list(parts[0].children_recursive):
-        if obj.type != "MESH" and obj not in parts:
-            continue
-        parent = obj.parent
-        while parent is not None and parent not in parts:
-            parent = parent.parent
-        if parent is None:
-            continue
-        pose = obj.matrix_world.copy()
-        obj.animation_data_clear()
-        obj.parent = parent
-        obj.matrix_world = pose
-        if obj.type == "MESH" and len(obj.data.vertices) >= 3:
-            xs = [v.co.x for v in obj.data.vertices]
-            ys = [v.co.y for v in obj.data.vertices]
-            zs = [v.co.z for v in obj.data.vertices]
-            if max(zs) - min(zs) < 1e-5:
-                obj.data.vertices[0].co.z += 2e-5
-                obj.data.update()
-            if max(ys) - min(ys) < 1e-5:
-                obj.data.vertices[0].co.y += 2e-5
-                obj.data.update()
-            if max(xs) - min(xs) < 1e-5:
-                obj.data.vertices[0].co.x += 2e-5
-                obj.data.update()
-    bpy.context.view_layer.update()
-
-    for mat in bpy.data.materials:
-        if "metallic" not in mat:
-            mat["metallic"] = 0.0
-        if "roughness" not in mat:
-            mat["roughness"] = 0.35
-        if "emission" not in mat:
-            mat["emission"] = 0.0
-
-    shutil.rmtree(ASSETS / "meshes", ignore_errors=True)
-    export_visual_meshes(parts, ASSETS)
+    parts, poses = prepare_blender_assembly(
+        source,
+        NAMES,
+        ASSETS,
+        default_roughness=0.35,
+    )
 
     machine_mass_sum = round(sum(MASSES[k] for k in MACHINE_BODY_NAMES), 6)
     assert machine_mass_sum == 37.000, f"Expected 37.000 kg machine mass, got {machine_mass_sum}"
@@ -161,13 +126,12 @@ def export_blender_meshes_and_xml() -> None:
     ET.SubElement(app, "option", timestep="0.002", integrator="implicitfast")
     ET.SubElement(app, "size", nuserdata="10")
 
-    defaults = ET.SubElement(app, "default")
-    ET.SubElement(
-        defaults,
-        "geom",
-        friction="0.65 0.005 0.0001",
-        solref="0.003 1",
-        solimp="0.96 0.995 0.001",
+    defaults = add_standard_defaults(
+        app,
+        friction="0.65 0.015 0.003",
+        solref="0.004 1",
+        solimp="0.95 0.99 0.001",
+        condim="4",
     )
 
     asset = ET.SubElement(app, "asset")
@@ -182,7 +146,7 @@ def export_blender_meshes_and_xml() -> None:
         size="1.5 1.5 0.05",
         rgba="0.28 0.30 0.33 1",
         contype="1",
-        conaffinity="3",
+        conaffinity="1",
         group="2",
     )
 
@@ -229,7 +193,7 @@ def export_blender_meshes_and_xml() -> None:
     drip_tray = bodies["e1p_drip_tray"]
     pf = bodies["e1p_portafilter"]
 
-    # Four elastomer/stainless feet collision cylinders touching Z = 0.0000 m (height 34 mm)
+    # Four elastomer/stainless feet collision cylinders touching Z = 0.0000 m (extending to underbody at Z = 0.036 m)
     for foot_name, fx, fy in (
         ("e1p_foot_fl_col", -0.1580, -0.1520),
         ("e1p_foot_fr_col", 0.1580, -0.1520),
@@ -241,23 +205,32 @@ def export_blender_meshes_and_xml() -> None:
             "geom",
             name=foot_name,
             type="cylinder",
-            pos=numbers((fx, fy, 0.0170)),
-            size="0.0185 0.0170",
-            contype="2",
+            pos=numbers((fx, fy, 0.0180)),
+            size="0.0185 0.0180",
+            contype="1",
             conaffinity="1",
             group="3",
-            mass="0",
+            rgba=COL_BASE_RGBA,
         )
 
-    # Chassis core, side skins, sculpted 58 mm group hood, cup-warmer deck, and bayonet shelves (top Z = 0.2040 m)
-    for cname, cpos, csize in (
-        ("e1p_rear_core_col", (0.0, 0.0560, 0.1980), (0.1820, 0.1720, 0.1600)),
-        ("e1p_side_left_col", (-0.1960, 0.0360, 0.2000), (0.0055, 0.1920, 0.1640)),
-        ("e1p_side_right_col", (0.1960, 0.0360, 0.2000), (0.0055, 0.1920, 0.1640)),
-        ("e1p_group_hood_col", (0.0, -0.1560, 0.2780), (0.0540, 0.0440, 0.0420)),
-        ("e1p_cup_deck_col", (0.0, 0.0020, 0.3600), (0.1740, 0.1080, 0.0032)),
-        ("e1p_bayonet_left_shelf_col", (-0.0355, -0.1560, 0.2005), (0.0070, 0.0300, 0.0035)),
-        ("e1p_bayonet_right_shelf_col", (0.0355, -0.1560, 0.2005), (0.0070, 0.0300, 0.0035)),
+    # Chassis underbody, rear core, rear ribbed panel & utility fittings, side skins, front fascia,
+    # sculpted 58 mm group hood, cup-warmer deck & 3 perimeter cup rails, and bayonet shelves (top Z = 0.2040 m)
+    for cname, cpos, csize, crgba in (
+        ("e1p_underbody_col", (0.0, 0.0360, 0.0520), (0.1920, 0.1890, 0.0170), COL_BASE_RGBA),
+        ("e1p_rear_core_col", (0.0, 0.0550, 0.2130), (0.1860, 0.1710, 0.1470), COL_BASE_RGBA),
+        ("e1p_rear_panel_col", (0.0, 0.2385, 0.2140), (0.1870, 0.0145, 0.1558), COL_BASE_RGBA),
+        ("e1p_rear_utility_col", (0.0, 0.2380, 0.0620), (0.1200, 0.0110, 0.0180), COL_BASE_RGBA),
+        ("e1p_side_left_col", (-0.1920, 0.0345, 0.2030), (0.0134, 0.2205, 0.1690), COL_BASE_RGBA),
+        ("e1p_side_right_col", (0.1920, 0.0345, 0.2030), (0.0134, 0.2205, 0.1690), COL_BASE_RGBA),
+        ("e1p_front_fascia_col", (0.0, -0.1200, 0.3000), (0.1860, 0.0110, 0.0579), COL_BASE_RGBA),
+        ("e1p_group_hood_col", (0.0, -0.1575, 0.2810), (0.0610, 0.0485, 0.0450), COL_BASE_RGBA),
+        ("e1p_cup_deck_col", (0.0, 0.0020, 0.3612), (0.1790, 0.1120, 0.0020), COL_WALL_RGBA),
+        ("e1p_cup_rail_left_col", (-0.1810, 0.0680, 0.3705), (0.0025, 0.1680, 0.0085), COL_WALL_RGBA),
+        ("e1p_cup_rail_right_col", (0.1810, 0.0680, 0.3705), (0.0025, 0.1680, 0.0085), COL_WALL_RGBA),
+        ("e1p_cup_rail_rear_col", (0.0, 0.2360, 0.3705), (0.1830, 0.0025, 0.0085), COL_WALL_RGBA),
+        ("e1p_bayonet_left_shelf_col", (-0.0395, -0.1560, 0.2005), (0.0038, 0.0150, 0.0035), COL_WALL_RGBA),
+        ("e1p_bayonet_right_shelf_col", (0.0395, -0.1560, 0.2005), (0.0038, 0.0150, 0.0035), COL_WALL_RGBA),
+        ("e1p_group_backstop_col", (0.0, -0.1135, 0.2200), (0.0410, 0.0020, 0.0160), COL_BASE_RGBA),
     ):
         ET.SubElement(
             base,
@@ -266,20 +239,48 @@ def export_blender_meshes_and_xml() -> None:
             type="box",
             pos=numbers(cpos),
             size=numbers(csize),
-            contype="2",
+            contype="1",
             conaffinity="1",
             group="3",
-            mass="0",
+            rgba=crgba,
         )
 
-    # Operational sites on e1p_body
+    # Exposed upper 58 mm group collar above portafilter rim & clear of ferrule (Y_min=-0.1950 vs ferrule Y_max=-0.1955)
+    ET.SubElement(
+        base,
+        "geom",
+        name="e1p_group_head_col",
+        type="cylinder",
+        pos="0 -0.1560 0.2315",
+        size="0.0390 0.0045",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_BASE_RGBA,
+    )
+    # Fixed left-side hot-water economizer wand & aerator nozzle
+    ET.SubElement(
+        base,
+        "geom",
+        name="e1p_hot_water_wand_col",
+        type="capsule",
+        fromto="-0.1340 -0.1250 0.2560 -0.1340 -0.1760 0.1910",
+        size="0.0075",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_BASE_RGBA,
+    )
+
+    # Operational sites on e1p_body (group 4, visible semi-transparent rgba)
     ET.SubElement(
         base,
         "site",
         name="e1p_group_seat_site",
         pos="0 -0.1560 0.2140",
         size="0.004",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         base,
@@ -287,7 +288,8 @@ def export_blender_meshes_and_xml() -> None:
         name="e1p_hot_water_outlet_site",
         pos="-0.1340 -0.1760 0.1820",
         size="0.004",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         base,
@@ -296,7 +298,8 @@ def export_blender_meshes_and_xml() -> None:
         type="box",
         pos="0 -0.1560 0.2040",
         size="0.0450 0.0320 0.0025",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
 
     # 1. e1p_steam_wand: right-side (+X) 360-deg Cool-Touch stainless steam wand (axis -1 0 0, -0.20 .. 0.55 rad)
@@ -310,18 +313,58 @@ def export_blender_meshes_and_xml() -> None:
         range="-0.20 0.55",
         damping="0.45",
         armature="0.003",
+        frictionloss="0.30",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
+    )
+    ET.SubElement(
+        wand,
+        "geom",
+        name="e1p_steam_ball_nut_col",
+        type="cylinder",
+        pos="0 0.0020 0",
+        quat=Y_AXIS_QUAT,
+        size="0.0125 0.0070",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ARTIC_RGBA,
+    )
+    ET.SubElement(
+        wand,
+        "geom",
+        name="e1p_steam_wand_arch_col",
+        type="capsule",
+        fromto="0 0 0 0.0180 -0.0480 0.0280",
+        size="0.0055",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ARTIC_RGBA,
+    )
+    ET.SubElement(
+        wand,
+        "geom",
+        name="e1p_steam_wand_knee_col",
+        type="capsule",
+        fromto="0.0180 -0.0480 0.0280 0.0020 -0.0710 -0.0180",
+        size="0.0055",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         wand,
         "geom",
         name="e1p_steam_wand_col",
         type="capsule",
-        fromto="0 0 0 -0.0040 -0.0740 -0.1120",
-        size="0.0060",
-        contype="2",
+        fromto="0.0020 -0.0710 -0.0180 -0.0040 -0.0740 -0.1127",
+        size="0.0068",
+        contype="1",
         conaffinity="1",
         group="3",
-        mass="0",
+        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         wand,
@@ -329,7 +372,8 @@ def export_blender_meshes_and_xml() -> None:
         name="e1p_steam_tip_site",
         pos="-0.0040 -0.0740 -0.1180",
         size="0.004",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
 
     # 2. e1p_steam_lever: right-side (+X) Steam-by-Wire vertical blade paddle (axis 1 0 0, -0.38 .. 0.48 rad)
@@ -343,6 +387,9 @@ def export_blender_meshes_and_xml() -> None:
         range="-0.38 0.48",
         damping="0.26",
         armature="0.002",
+        frictionloss="0.08",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         steam_lever,
@@ -350,11 +397,23 @@ def export_blender_meshes_and_xml() -> None:
         name="e1p_steam_lever_col",
         type="box",
         pos="0 -0.0085 0.0230",
-        size="0.0120 0.0062 0.0240",
-        contype="0",
-        conaffinity="0",
+        size="0.0120 0.0070 0.0245",
+        contype="1",
+        conaffinity="1",
         group="3",
-        mass="0",
+        rgba=COL_ARTIC_RGBA,
+    )
+    ET.SubElement(
+        steam_lever,
+        "geom",
+        name="e1p_steam_lever_hub_col",
+        type="box",
+        pos="0 -0.0020 0",
+        size="0.0070 0.0105 0.0105",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ARTIC_RGBA,
     )
 
     # 3. e1p_hot_water_lever: left-side (-X) two-dose hot-water vertical blade paddle (axis 1 0 0, -0.38 .. 0.48 rad)
@@ -368,6 +427,9 @@ def export_blender_meshes_and_xml() -> None:
         range="-0.38 0.48",
         damping="0.26",
         armature="0.002",
+        frictionloss="0.08",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         hw_lever,
@@ -375,11 +437,23 @@ def export_blender_meshes_and_xml() -> None:
         name="e1p_hot_water_lever_col",
         type="box",
         pos="0 -0.0085 0.0230",
-        size="0.0120 0.0062 0.0240",
-        contype="0",
-        conaffinity="0",
+        size="0.0120 0.0070 0.0245",
+        contype="1",
+        conaffinity="1",
         group="3",
-        mass="0",
+        rgba=COL_ARTIC_RGBA,
+    )
+    ET.SubElement(
+        hw_lever,
+        "geom",
+        name="e1p_hot_water_lever_hub_col",
+        type="box",
+        pos="0 -0.0020 0",
+        size="0.0070 0.0105 0.0105",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ARTIC_RGBA,
     )
 
     # 4. e1p_tank_lid: top-rear 1.5 L water reservoir hinged cover (axis -1 0 0, 0 .. 1.05 rad)
@@ -393,6 +467,9 @@ def export_blender_meshes_and_xml() -> None:
         range="0 1.05",
         damping="0.55",
         armature="0.004",
+        frictionloss="0.35",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         tank_lid,
@@ -400,11 +477,11 @@ def export_blender_meshes_and_xml() -> None:
         name="e1p_tank_lid_col",
         type="box",
         pos="0 -0.0560 0.0002",
-        size="0.1750 0.0550 0.0020",
-        contype="2",
+        size="0.1770 0.0560 0.0022",
+        contype="1",
         conaffinity="1",
         group="3",
-        mass="0",
+        rgba=COL_ARTIC_RGBA,
     )
 
     # 5. e1p_drip_tray: pull-out stainless drip basin & diamond-perforated grate (slide axis 0 -1 0, 0 .. 0.160 m)
@@ -419,6 +496,9 @@ def export_blender_meshes_and_xml() -> None:
         range="0 0.160",
         damping="4.20",
         armature="0.008",
+        frictionloss="0.30",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         drip_tray,
@@ -426,11 +506,23 @@ def export_blender_meshes_and_xml() -> None:
         name="e1p_drip_grate_col",
         type="box",
         pos="0 0.0030 0.0280",
-        size="0.1680 0.0640 0.0020",
-        contype="2",
+        size="0.1760 0.0680 0.0020",
+        contype="1",
         conaffinity="1",
         group="3",
-        mass="0",
+        rgba=COL_ARTIC_RGBA,
+    )
+    ET.SubElement(
+        drip_tray,
+        "geom",
+        name="e1p_drip_pan_col",
+        type="box",
+        pos="0 0 -0.0020",
+        size="0.1880 0.0800 0.0280",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         drip_tray,
@@ -439,7 +531,8 @@ def export_blender_meshes_and_xml() -> None:
         type="box",
         pos="0 0.0030 0.0300",
         size="0.1700 0.0660 0.0025",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
 
     # 6. e1p_portafilter: detachable 58 mm stainless double-spout portafilter (freejoint e1p_portafilter_free)
@@ -448,25 +541,110 @@ def export_blender_meshes_and_xml() -> None:
         pf,
         "geom",
         name="e1p_pf_head_col",
-        type="box",
-        pos="0 0 -0.0070",
-        size="0.0410 0.0280 0.0030",
+        type="cylinder",
+        pos="0 0 -0.0010",
+        size="0.0395 0.0090",
         contype="1",
-        conaffinity="2",
+        conaffinity="1",
         group="3",
-        mass="0",
+        rgba=COL_ACCESSORY_RGBA,
+    )
+    ET.SubElement(
+        pf,
+        "geom",
+        name="e1p_pf_bayonet_ears_col",
+        type="box",
+        pos="0 0 -0.0065",
+        size="0.0433 0.0110 0.0035",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ACCESSORY_RGBA,
+    )
+    ET.SubElement(
+        pf,
+        "geom",
+        name="e1p_pf_lower_basket_col",
+        type="cylinder",
+        pos="0 0 -0.01725",
+        size="0.0320 0.00825",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ACCESSORY_RGBA,
+    )
+    ET.SubElement(
+        pf,
+        "geom",
+        name="e1p_pf_neck_bridge_col",
+        type="box",
+        pos="0 -0.0390 -0.0110",
+        size="0.0115 0.0120 0.0080",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ACCESSORY_RGBA,
+    )
+    ET.SubElement(
+        pf,
+        "geom",
+        name="e1p_pf_spout_manifold_col",
+        type="cylinder",
+        pos="0 0 -0.0275",
+        size="0.0115 0.0045",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ACCESSORY_RGBA,
+    )
+    ET.SubElement(
+        pf,
+        "geom",
+        name="e1p_pf_spout_left_col",
+        type="capsule",
+        fromto="0 0 -0.0290 -0.0225 -0.0115 -0.0411",
+        size="0.0048",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ACCESSORY_RGBA,
+    )
+    ET.SubElement(
+        pf,
+        "geom",
+        name="e1p_pf_spout_right_col",
+        type="capsule",
+        fromto="0 0 -0.0290 0.0225 -0.0115 -0.0411",
+        size="0.0048",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ACCESSORY_RGBA,
+    )
+    ET.SubElement(
+        pf,
+        "geom",
+        name="e1p_pf_ferrule_col",
+        type="cylinder",
+        pos="0 -0.0510 -0.0055",
+        quat="0.998135 0.061049 0 0",
+        size="0.0115 0.0195",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ACCESSORY_RGBA,
     )
     ET.SubElement(
         pf,
         "geom",
         name="e1p_pf_handle_col",
         type="capsule",
-        fromto="0 -0.0680 -0.0076 0 -0.1930 -0.0230",
-        size="0.0145",
+        fromto="0 -0.0720 -0.0081 0 -0.1955 -0.0231",
+        size="0.0155",
         contype="1",
-        conaffinity="2",
+        conaffinity="1",
         group="3",
-        mass="0",
+        rgba=COL_ACCESSORY_RGBA,
     )
     ET.SubElement(
         pf,
@@ -474,7 +652,8 @@ def export_blender_meshes_and_xml() -> None:
         name="vessel_socket",
         pos="0 -0.1300 -0.0155",
         size="0.005",
-        group="3",
+        group="4",
+        rgba=SITE_GRASP_RGBA,
     )
     ET.SubElement(
         pf,
@@ -482,7 +661,8 @@ def export_blender_meshes_and_xml() -> None:
         name="e1p_pf_basket_center",
         pos="0 0 0",
         size="0.004",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     payload = ET.SubElement(pf, "body", name="ingredient_payload", pos="0 0 0")
     ET.SubElement(
@@ -504,6 +684,20 @@ def export_blender_meshes_and_xml() -> None:
         group="2",
         rgba="0.28 0.16 0.09 0",
         mass="0",
+    )
+
+    # Adjacent articulated-body contact exclusions (e1p_portafilter stays UN-excluded for bayonet & drip-grate contact)
+    contact = add_adjacent_excludes(
+        app,
+        (
+            ("exclude_body_steam_wand", "e1p_body", "e1p_steam_wand"),
+            ("exclude_body_steam_lever", "e1p_body", "e1p_steam_lever"),
+            ("exclude_body_hot_water_lever", "e1p_body", "e1p_hot_water_lever"),
+            ("exclude_body_tank_lid", "e1p_body", "e1p_tank_lid"),
+            ("exclude_body_drip_tray", "e1p_body", "e1p_drip_tray"),
+            ("exclude_steam_wand_steam_lever", "e1p_steam_wand", "e1p_steam_lever"),
+            ("exclude_steam_wand_drip_tray", "e1p_steam_wand", "e1p_drip_tray"),
+        ),
     )
 
     # Actuators
@@ -589,6 +783,18 @@ def export_blender_meshes_and_xml() -> None:
     ET.SubElement(scene_world, "light", pos="1.0 -1.6 1.8", dir="-0.35 0.6 -0.8")
     write_xml(ASSETS / "scene.xml", scene)
 
+    emit_standalone_models(
+        ASSETS,
+        model_name="e1p_body",
+        defaults=defaults,
+        asset=asset,
+        root_body=base,
+        contact=contact,
+        sensors=sensors,
+        exclude_sensors=("e1p_pf_relpos",),
+        accessories=(("portafilter_model.xml", "e1p_portafilter", pf),),
+    )
+
     (ASSETS / "physics-export.json").write_text(
         json.dumps(
             {
@@ -601,7 +807,7 @@ def export_blender_meshes_and_xml() -> None:
                 "pump_architecture": "Commercial rotary/volumetric pump (9.0 bar extraction, dual internal tank + 3/8 BSP direct plumb-in)",
                 "heating_architecture": "NEO 0.20 L instant stainless brew boiler + 1.5 L thermally insulated stainless steam boiler (2.1 bar Steam-by-Wire)",
                 "water_reservoir_l": 1.5,
-                "scope": "Articulated MuJoCo 4.0.0 1-group commercial & specialty espresso machine with right Cool-Touch steam wand, right Steam-by-Wire paddle, left 2-dose hot-water paddle, top 1.5 L tank lid, pull-out diamond-perforated drip tray, and 6-DOF 58 mm portafilter.",
+                "scope": "Articulated MuJoCo 4.0 Filament PBR 1-group commercial & specialty espresso machine with right Cool-Touch steam wand, right Steam-by-Wire paddle, left 2-dose hot-water paddle, top 1.5 L tank lid, pull-out diamond-perforated drip tray, and 6-DOF 58 mm portafilter.",
             },
             indent=2,
         )
@@ -609,49 +815,8 @@ def export_blender_meshes_and_xml() -> None:
     )
 
 
-def strip_visual_meshes(root: ET.Element, model) -> None:
-    for parent in root.iter():
-        for geom in list(parent):
-            if geom.tag != "geom" or not geom.get("name"):
-                continue
-            index = model.geom(geom.get("name")).id
-            if (
-                model.geom_contype[index] == 0
-                and model.geom_conaffinity[index] == 0
-                and geom.get("type") == "mesh"
-                and geom.get("mass") == "0"
-            ):
-                parent.remove(geom)
-
-
 def export_native_xml(mujoco, np):
-    spec = mujoco.MjSpec.from_file(str(ASSETS / "scene.xml"))
-    model = spec.compile()
-    data = mujoco.MjData(model)
-    mujoco.mj_forward(model, data)
-
-    root = ET.fromstring(spec.to_xml())
-    strip_visual_meshes(root, model)
-    used_meshes = {geom.get("mesh") for geom in root.iter("geom")}
-    used_materials = {geom.get("material") for geom in root.iter("geom")}
-    assets = root.find("asset")
-    if assets is not None:
-        for asset in list(assets):
-            if (asset.tag == "mesh" and asset.get("name") not in used_meshes) or (
-                asset.tag == "material" and asset.get("name") not in used_materials
-            ):
-                assets.remove(asset)
-    ET.indent(root, space="  ")
-    native_path = ASSETS / "native.xml"
-    native_path.write_text(ET.tostring(root, encoding="unicode") + "\n")
-
-    rebuilt = mujoco.MjModel.from_xml_path(str(native_path))
-    for field in ("body_mass", "body_inertia", "qpos0", "dof_damping"):
-        if not np.allclose(getattr(model, field), getattr(rebuilt, field), rtol=1e-5, atol=1e-9):
-            raise RuntimeError(f"Export changed native {field} for {NAME}")
-    if (rebuilt.nq, rebuilt.nv) != (model.nq, model.nv):
-        raise RuntimeError(f"Export changed native (nq, nv) for {NAME}")
-
+    model, rebuilt = kit_export_native_xml(ASSETS, NAME, mujoco, np)
     machine_sum = sum(float(rebuilt.body(b).mass[0]) for b in MACHINE_BODY_NAMES)
     pf_mass = float(rebuilt.body("e1p_portafilter").mass[0])
     assert abs(machine_sum - 37.000) < 1e-6, machine_sum
@@ -674,7 +839,7 @@ See the [equipment reference specification](../../../docs/equipment/victoria-ard
 - [Editable Blender 5.2 source](victoria-arduino-e1-prima.blend), [articulated GLB](victoria-arduino-e1-prima.glb), and standalone [58 mm portafilter GLB](victoria-arduino-e1-prima-portafilter.glb).
 - Metal GPU Cycles renders (`1400 × 1200`, `64` samples + OIDN): [studio-main.png](studio-main.png), [studio-front.png](studio-front.png), [studio-right.png](studio-right.png), [studio-rear.png](studio-rear.png), [studio-open.png](studio-open.png), and [studio-active.png](studio-active.png).
 - Verification manifests: [build-report.json](build-report.json), [inspection-report.json](inspection-report.json), and [physics-export.json](physics-export.json).
-- MuJoCo 4.0.0 MJCF models: [appliance.xml](appliance.xml), [scene.xml](scene.xml), and collision-only [native.xml](native.xml).
+- MuJoCo 4.0 MJCF models: [appliance.xml](appliance.xml), [scene.xml](scene.xml), standalone [model.xml](model.xml) and [portafilter_model.xml](portafilter_model.xml), and collision-only [native.xml](native.xml).
 - Active-state simulation & frame alignment: [active-states.md](active-states.md), [active-states.json](active-states.json), [report.json](active-state-evidence/report.json), [frames-report.json](active-state-evidence/frames-report.json), [motion-report.json](active-state-evidence/motion-report.json), and [trace.csv](active-state-evidence/trace.csv).
 
 ## Retained Bodies & Joints (`NAMES`)
@@ -933,7 +1098,7 @@ def run_active_state_verification() -> None:
         if step == 0:
             state["mode"] = "portafilter_on_drip_grate"
             model.body_mass[payload_bid] = 1e-9
-            data.qpos[pf_qpos_adr : pf_qpos_adr + 3] = [0.0, -0.1720, 0.1085]
+            data.qpos[pf_qpos_adr : pf_qpos_adr + 3] = [0.0, -0.1720, 0.1450]
             data.qpos[pf_qpos_adr + 3 : pf_qpos_adr + 7] = [1.0, 0.0, 0.0, 0.0]
             data.qvel[pf_dof_adr : pf_dof_adr + 6] = 0.0
         elif step == 180:
@@ -963,117 +1128,16 @@ def run_active_state_verification() -> None:
 
     # Stage 6: Verify BOTH rest frames AND --motion sampled scalar-joint trajectories via inspect_appliance_frames.mjs
     evidence_dir = ASSETS / "active-state-evidence"
-    evidence_dir.mkdir(parents=True, exist_ok=True)
     native_sha = hashlib.sha256((ASSETS / "native.xml").read_bytes()).hexdigest()
-    glb_str = str(ASSETS / f"{NAME}.glb")
-
-    native_data = mujoco.MjData(native_model)
-    mujoco.mj_resetData(native_model, native_data)
-    mujoco.mj_forward(native_model, native_data)
-    body_poses = {}
-    for bname in NAMES:
-        bid = native_model.body(bname).id
-        pos = native_data.xpos[bid]
-        quat = native_data.xquat[bid]
-        body_poses[bname] = [
-            float(pos[0]),
-            float(pos[1]),
-            float(pos[2]),
-            float(quat[0]),
-            float(quat[1]),
-            float(quat[2]),
-            float(quat[3]),
-        ]
-
-    frames_in = evidence_dir / "frames-input.json"
-    frames_out = evidence_dir / "frames-report.json"
-    frames_in.write_text(
-        json.dumps(
-            {
-                NAME: {
-                    "glb": glb_str,
-                    "native_sha256": native_sha,
-                    "bodies": body_poses,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
+    frames_report, motion_report = kit_verify_frames_and_motions(
+        ASSETS,
+        NAME,
+        NAMES,
+        SCALAR_VISUAL_AXES,
+        mujoco,
+        evidence_dir,
+        cleanup_inputs=True,
     )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(frames_in),
-            str(frames_out),
-        ],
-        check=True,
-    )
-    frames_in.unlink(missing_ok=True)
-    frames_report = json.loads(frames_out.read_text())
-    assert frames_report["passed"] is True, frames_report
-
-    # Sample 21 points across each scalar joint's full range for --motion check
-    motions = []
-    for jname, vaxis in SCALAR_VISUAL_AXES.items():
-        jid = native_model.joint(jname).id
-        jtype = int(native_model.jnt_type[jid])
-        kind = "hinge" if jtype == int(mujoco.mjtJoint.mjJNT_HINGE) else "slide"
-        low, high = native_model.jnt_range[jid]
-        bid = int(native_model.jnt_bodyid[jid])
-        samples = []
-        for idx in range(21):
-            val = float(low + (high - low) * idx / 20.0)
-            mujoco.mj_resetData(native_model, native_data)
-            native_data.qpos[native_model.jnt_qposadr[jid]] = val
-            mujoco.mj_forward(native_model, native_data)
-            samples.append(
-                {
-                    "value": val,
-                    "pose": [
-                        *native_data.xpos[bid].tolist(),
-                        *native_data.xquat[bid].tolist(),
-                    ],
-                }
-            )
-        motions.append(
-            {
-                "joint": jname,
-                "body": native_model.body(bid).name,
-                "kind": kind,
-                "visual_axis": vaxis,
-                "samples": samples,
-            }
-        )
-
-    motion_in = evidence_dir / "motion-input.json"
-    motion_out = evidence_dir / "motion-report.json"
-    motion_in.write_text(
-        json.dumps(
-            {
-                NAME: {
-                    "glb": glb_str,
-                    "native_sha256": native_sha,
-                    "motions": motions,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
-    )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(motion_in),
-            str(motion_out),
-            "--motion",
-        ],
-        check=True,
-    )
-    motion_in.unlink(missing_ok=True)
-    motion_report = json.loads(motion_out.read_text())
-    assert motion_report["passed"] is True, motion_report
 
     rest_frames = frames_report["appliances"][NAME]["frames"]
     motion_items = motion_report["appliances"][NAME]["motions"]

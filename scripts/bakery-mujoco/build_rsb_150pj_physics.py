@@ -9,9 +9,26 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from appliance_physics_kit import (
+    BLENDER_BIN,
+    COL_ARTIC_RGBA,
+    COL_BASE_RGBA,
+    COL_WALL_RGBA,
+    ROOT,
+    SITE_SUPPORT_RGBA,
+    Y_AXIS_QUAT,
+    add_adjacent_excludes,
+    add_standard_defaults,
+    emit_standalone_models,
+    export_and_verify_native_xml as kit_export_native_xml,
+    numbers,
+    prepare_blender_assembly,
+    verify_frames_and_motions as kit_verify_frames_and_motions,
+    write_xml,
+)
+
 ASSETS = ROOT / "assets/bakery-mujoco/rinnai-rsb-150pj"
-BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
 
 NAMES = (
     "rsb_stove",
@@ -63,63 +80,49 @@ GAS_RATINGS_KW = {
 }
 
 
-def numbers(values):
-    return " ".join(f"{value:.9g}" for value in values)
-
-
 def euler_z_to_quat(deg: float) -> tuple[float, float, float, float]:
     half = math.radians(deg) * 0.5
     return (math.cos(half), 0.0, 0.0, math.sin(half))
 
 
-def write_xml(path: Path, element: ET.Element):
-    ET.indent(element, space="  ")
-    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
-
-
 def export_blender_meshes_and_xml():
-    """Run inside Blender to export body-local OBJ meshes and construct hob.xml, appliance.xml, and scene.xml."""
+    """Run inside Blender to export body-local OBJ meshes and construct hob.xml, appliance.xml, model.xml, and scene.xml."""
     import bpy
 
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
     from build_oven_visuals import export_visual_meshes
 
     source = ASSETS / "rinnai-rsb-150pj.blend"
-    bpy.ops.wm.open_mainfile(filepath=str(source))
-    bpy.context.scene.frame_set(1)
-    bpy.context.view_layer.update()
+    parts, poses = prepare_blender_assembly(
+        source,
+        NAMES,
+        ASSETS,
+        default_roughness=0.32,
+    )
 
-    parts = [bpy.data.objects[name] for name in NAMES]
-    poses = {obj.name: obj.matrix_world.copy() for obj in parts}
-
-    for obj in list(parts[0].children_recursive):
-        if obj.type != "MESH" and obj not in parts:
-            continue
-        parent = obj.parent
-        while parent is not None and parent not in parts:
-            parent = parent.parent
-        if parent is None:
-            continue
-        pose = obj.matrix_world.copy()
-        obj.animation_data_clear()
-        obj.parent = parent
-        obj.matrix_world = pose
-    bpy.context.view_layer.update()
-
+    # Sync Blender diffuse_color from Principled BSDF Base Color so MuJoCo visual materials match authored PBR colors.
     for mat in bpy.data.materials:
-        if "metallic" not in mat:
-            mat["metallic"] = 0.0
-        if "roughness" not in mat:
-            mat["roughness"] = 0.32
-        if "emission" not in mat:
-            mat["emission"] = 0.0
-
+        bsdf = (
+            mat.node_tree.nodes.get("Principled BSDF")
+            if (mat.use_nodes and mat.node_tree)
+            else None
+        )
+        if bsdf and "Base Color" in bsdf.inputs and not bsdf.inputs["Base Color"].is_linked:
+            bc = bsdf.inputs["Base Color"].default_value
+            mat.diffuse_color = (float(bc[0]), float(bc[1]), float(bc[2]), float(bc[3]))
     export_visual_meshes(parts, ASSETS)
 
     hob = ET.Element("mujoco", model="rinnai-rsb-150pj — commercial 1-burner gas stove")
     ET.SubElement(hob, "compiler", angle="radian")
     ET.SubElement(hob, "option", timestep="0.002", integrator="implicitfast")
     ET.SubElement(hob, "size", nuserdata="6")
+
+    defaults = add_standard_defaults(
+        hob,
+        friction="0.60 0.015 0.003",
+        solref="0.004 1",
+        solimp="0.95 0.99 0.001",
+        condim="4",
+    )
 
     asset = ET.SubElement(hob, "asset")
     ET.SubElement(asset, "include", file="visual_assets.xml")
@@ -177,19 +180,25 @@ def export_blender_meshes_and_xml():
             type="cylinder",
             pos=numbers((fx, fy, 0.0090)),
             size="0.0145 0.0090",
-            friction="0.85 0.005 0.0001",
+            friction="0.85 0.015 0.003",
+            contype="1",
+            conaffinity="1",
             group="3",
+            rgba=COL_BASE_RGBA,
         )
 
-    # Lower painted steel chassis and stamped SUS430 top deck collision boxes (299 x 279 mm)
+    # Lower painted steel chassis (covering front silkscreen panel at Y = -0.1381 m) and stamped SUS430 top deck
     ET.SubElement(
         base,
         "geom",
         name="ih_housing",
         type="box",
         pos="0 0 0.0350",
-        size="0.1470 0.1370 0.0170",
+        size="0.1470 0.1385 0.0170",
+        contype="1",
+        conaffinity="1",
         group="3",
+        rgba=COL_BASE_RGBA,
     )
     ET.SubElement(
         base,
@@ -198,30 +207,37 @@ def export_blender_meshes_and_xml():
         type="box",
         pos="0 0 0.0605",
         size="0.1495 0.1395 0.0085",
-        friction="0.45 0.005 0.0001",
+        friction="0.45 0.015 0.003",
+        contype="1",
+        conaffinity="1",
         group="3",
+        rgba=COL_BASE_RGBA,
     )
 
-    # 6-prong trivet horizontal cookware support plane at Z = 0.1060 m (named ih_plate for crates/bakery-native Hob controller)
+    # 6-prong trivet horizontal cookware support disc at Z = 0.1060 m (named ih_plate for crates/bakery-native Hob controller)
     ET.SubElement(
         base,
         "geom",
         name="ih_plate",
-        type="box",
+        type="cylinder",
         pos=numbers((BURNER_X, BURNER_Y, PAN_REST_Z - 0.0015)),
-        size="0.1480 0.1450 0.0015",
-        friction="0.5 0.005 0.0001",
+        size="0.0950 0.0015",
+        friction="0.50 0.015 0.003",
         solref="0.004 1",
         solimp="0.95 0.99 0.001",
+        contype="1",
+        conaffinity="1",
         group="3",
+        rgba=COL_WALL_RGBA,
     )
     ET.SubElement(
         base,
         "site",
         name="ih_zone",
         pos=numbers((BURNER_X, BURNER_Y, PAN_REST_Z)),
-        size="0.002",
-        group="3",
+        size="0.004",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         base,
@@ -230,7 +246,8 @@ def export_blender_meshes_and_xml():
         type="cylinder",
         pos=numbers((BURNER_X, BURNER_Y, PAN_REST_Z)),
         size="0.1350 0.0025",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
 
     # Removable Ø75 mm forged brass burner cap collision cylinder & vertical lift joint
@@ -244,20 +261,23 @@ def export_blender_meshes_and_xml():
         range="0 0.040",
         damping="4.0",
         armature="0.02",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         burner_cap,
         "geom",
         name="rsb_burner_cap_col",
         type="cylinder",
-        pos=numbers((BURNER_X, BURNER_Y, 0.0725)),
-        size="0.0375 0.0030",
-        contype="0",
-        conaffinity="0",
+        pos=numbers((BURNER_X, BURNER_Y, 0.0700)),
+        size="0.0372 0.0055",
+        contype="1",
+        conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
     )
 
-    # Removable 6-prong porcelain-enameled trivet lift joint + 6 radial prong proxy geoms
+    # Removable 6-prong porcelain-enameled trivet lift joint + enabled radial prong, lip, and base-ring colliders
     ET.SubElement(
         trivet,
         "joint",
@@ -268,10 +288,13 @@ def export_blender_meshes_and_xml():
         range="0 0.060",
         damping="6.0",
         armature="0.02",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     for idx, deg in enumerate(PRONG_ANGLES_DEG):
         ang = math.radians(deg)
-        r_mid = 0.0980
+        # Upper horizontal prong blade spanning r = 0.044 .. 0.165 m, Z = 0.0955 .. 0.1055 m
+        r_mid = 0.1045
         cx = BURNER_X + r_mid * math.cos(ang)
         cy = BURNER_Y + r_mid * math.sin(ang)
         ET.SubElement(
@@ -279,31 +302,66 @@ def export_blender_meshes_and_xml():
             "geom",
             name=f"rsb_trivet_fin_{idx}",
             type="box",
-            pos=numbers((cx, cy, 0.1025)),
+            pos=numbers((cx, cy, 0.1005)),
             quat=numbers(euler_z_to_quat(deg)),
-            size="0.0430 0.0032 0.0035",
-            contype="0",
-            conaffinity="0",
+            size="0.0605 0.0036 0.0050",
+            contype="1",
+            conaffinity="1",
             group="3",
+            rgba=COL_ARTIC_RGBA,
         )
-        lx = BURNER_X + 0.1480 * math.cos(ang)
-        ly = BURNER_Y + 0.1480 * math.sin(ang)
+        # Vertical riser leg connecting base ring to prong blade (r = 0.080 .. 0.114 m, Z = 0.0735 .. 0.0985 m)
+        leg_x = BURNER_X + 0.0970 * math.cos(ang)
+        leg_y = BURNER_Y + 0.0970 * math.sin(ang)
+        ET.SubElement(
+            trivet,
+            "geom",
+            name=f"rsb_trivet_leg_{idx}",
+            type="box",
+            pos=numbers((leg_x, leg_y, 0.0860)),
+            quat=numbers(euler_z_to_quat(deg)),
+            size="0.0170 0.0036 0.0125",
+            contype="1",
+            conaffinity="1",
+            group="3",
+            rgba=COL_ARTIC_RGBA,
+        )
+        # Outer pan-stop lip (r = 0.148 .. 0.1675 m, Z = 0.1040 .. 0.1110 m)
+        lx = BURNER_X + 0.1578 * math.cos(ang)
+        ly = BURNER_Y + 0.1578 * math.sin(ang)
         ET.SubElement(
             trivet,
             "geom",
             name=f"rsb_trivet_lip_{idx}",
             type="box",
-            pos=numbers((lx, ly, 0.1085)),
+            pos=numbers((lx, ly, 0.1075)),
             quat=numbers(euler_z_to_quat(deg)),
-            size="0.0035 0.0032 0.0025",
-            contype="0",
-            conaffinity="0",
+            size="0.0098 0.0036 0.0035",
+            contype="1",
+            conaffinity="1",
             group="3",
+            rgba=COL_ARTIC_RGBA,
+        )
+        # Lower trivet skirt chord connecting adjacent prongs around the ring (Z = 0.06825 .. 0.07825 m)
+        chord_deg = deg + 30.0
+        chord_ang = math.radians(chord_deg)
+        rx = BURNER_X + 0.1095 * math.cos(chord_ang)
+        ry = BURNER_Y + 0.1095 * math.sin(chord_ang)
+        ET.SubElement(
+            trivet,
+            "geom",
+            name=f"rsb_trivet_ring_{idx}",
+            type="box",
+            pos=numbers((rx, ry, 0.07325)),
+            quat=numbers(euler_z_to_quat(chord_deg + 90.0)),
+            size="0.0660 0.0120 0.0050",
+            contype="1",
+            conaffinity="1",
+            group="3",
+            rgba=COL_ARTIC_RGBA,
         )
 
-    # Push-and-turn piezo ignition / gas valve control knob joints:
-    # 1. rsb_knob_push: 4 mm inward push along +Y (押し回し)
-    # 2. rsb_knob_turn: 0 .. 90 deg (1.5708 rad) counter-clockwise rotation around -Y (止 -> 強火 -> 中火 -> とろ火)
+    # Push-and-turn piezo ignition / gas valve control knob joints & collider
     ET.SubElement(
         knob,
         "joint",
@@ -315,6 +373,8 @@ def export_blender_meshes_and_xml():
         stiffness="25",
         damping="2.5",
         armature="0.01",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         knob,
@@ -326,9 +386,24 @@ def export_blender_meshes_and_xml():
         range="0 1.5707963",
         damping="0.40",
         armature="0.005",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
+    )
+    ET.SubElement(
+        knob,
+        "geom",
+        name="rsb_control_knob_col",
+        type="cylinder",
+        pos="0 -0.0150 0",
+        quat=Y_AXIS_QUAT,
+        size="0.0205 0.0150",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ARTIC_RGBA,
     )
 
-    # Right-side swiveling Ø9.5 mm gas hose barb joint (±30 deg = ±0.5236 rad around X)
+    # Right-side swiveling Ø9.5 mm gas hose barb joint (±30 deg = ±0.5236 rad around X) & collider
     ET.SubElement(
         hose,
         "joint",
@@ -339,9 +414,23 @@ def export_blender_meshes_and_xml():
         range="-0.5235988 0.5235988",
         damping="0.35",
         armature="0.005",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
+    )
+    ET.SubElement(
+        hose,
+        "geom",
+        name="rsb_hose_end_col",
+        type="capsule",
+        fromto="-0.0120 0 0 0 0.0520 0",
+        size="0.0075",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ARTIC_RGBA,
     )
 
-    # Blue Bunsen gas flame crown vertical modulation joint (-14 mm retracted OFF to +4 mm High flame)
+    # Blue Bunsen gas flame crown vertical modulation joint (-14 mm retracted OFF to +4 mm High flame) & proxy collider
     ET.SubElement(
         flame,
         "joint",
@@ -352,6 +441,35 @@ def export_blender_meshes_and_xml():
         range="-0.0140 0.0040",
         damping="1.5",
         armature="0.01",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
+    )
+    ET.SubElement(
+        flame,
+        "geom",
+        name="rsb_flame_crown_col",
+        type="cylinder",
+        pos="0 0 0.0025",
+        size="0.0425 0.0062",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ARTIC_RGBA,
+    )
+
+    # Adjacent articulated-body contact exclusions (avoid self-collision while keeping all group-3 colliders enabled)
+    contact = add_adjacent_excludes(
+        hob,
+        (
+            ("exclude_stove_trivet", "rsb_stove", "rsb_trivet"),
+            ("exclude_stove_burner_cap", "rsb_stove", "rsb_burner_cap"),
+            ("exclude_stove_control_knob", "rsb_stove", "rsb_control_knob"),
+            ("exclude_stove_hose_end", "rsb_stove", "rsb_hose_end"),
+            ("exclude_stove_flame_crown", "rsb_stove", "rsb_flame_crown"),
+            ("exclude_trivet_burner_cap", "rsb_trivet", "rsb_burner_cap"),
+            ("exclude_trivet_flame_crown", "rsb_trivet", "rsb_flame_crown"),
+            ("exclude_burner_cap_flame_crown", "rsb_burner_cap", "rsb_flame_crown"),
+        ),
     )
 
     # Actuators
@@ -426,6 +544,17 @@ def export_blender_meshes_and_xml():
     write_xml(ASSETS / "hob.xml", hob)
     write_xml(ASSETS / "appliance.xml", hob)
 
+    # Emit standalone MjSpec.attach-ready model.xml
+    emit_standalone_models(
+        ASSETS,
+        model_name="rsb_stove",
+        defaults=defaults,
+        asset=asset,
+        root_body=base,
+        contact=contact,
+        sensors=sensors,
+    )
+
     # Build scene.xml including hob.xml, ../induction-pan/pan.xml, and ../induction-pan/studio.xml
     scene = ET.Element("mujoco", model="Rinnai RSB-150PJ commercial gas stove physics lab")
     ET.SubElement(scene, "include", file="hob.xml")
@@ -464,23 +593,9 @@ def export_blender_meshes_and_xml():
     )
 
 
-def strip_visual_meshes(root: ET.Element, model):
-    for parent in root.iter():
-        for geom in list(parent):
-            if geom.tag != "geom" or not geom.get("name"):
-                continue
-            index = model.geom(geom.get("name")).id
-            if (
-                model.geom_contype[index] == 0
-                and model.geom_conaffinity[index] == 0
-                and geom.get("type") == "mesh"
-                and geom.get("mass") == "0"
-            ):
-                parent.remove(geom)
-
-
 def export_native_xml(mujoco, np):
     sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from appliance_physics_kit import export_and_verify_native_xml
     from live_panels import STROKES, quaternion
 
     spec = mujoco.MjSpec.from_file(str(ASSETS / "scene.xml"))
@@ -550,31 +665,9 @@ def export_native_xml(mujoco, np):
     data = mujoco.MjData(model)
     mujoco.mj_forward(model, data)
     spec.body("ih_pan").pos = data.site("ih_zone").xpos + (0, 0, 0.004)
-    model = spec.compile()
-
-    root = ET.fromstring(spec.to_xml())
-    strip_visual_meshes(root, model)
-    used_meshes = {geom.get("mesh") for geom in root.iter("geom")}
-    used_materials = {geom.get("material") for geom in root.iter("geom")}
-    assets = root.find("asset")
-    if assets is not None:
-        for asset in list(assets):
-            if (asset.tag == "mesh" and asset.get("name") not in used_meshes) or (
-                asset.tag == "material" and asset.get("name") not in used_materials
-            ):
-                assets.remove(asset)
-    ET.indent(root, space="  ")
-    native_path = ASSETS / "native.xml"
-    native_path.write_text(ET.tostring(root, encoding="unicode") + "\n")
-
-    rebuilt = mujoco.MjModel.from_xml_path(str(native_path))
-    for field in ("body_mass", "body_inertia", "qpos0", "dof_damping"):
-        if not np.allclose(
-            getattr(model, field), getattr(rebuilt, field), rtol=1e-5, atol=1e-9
-        ):
-            raise RuntimeError(f"Export changed native {field} for rinnai-rsb-150pj")
-    if (rebuilt.nq, rebuilt.nv) != (model.nq, model.nv):
-        raise RuntimeError("Export changed native degrees of freedom.")
+    kit_export_native_xml(
+        ASSETS, "rinnai-rsb-150pj", mujoco, np, spec=spec, strip_general_input=False
+    )
 
 
 def write_asset_docs(report: dict):
@@ -630,6 +723,25 @@ def run_active_state_verification():
     import numpy as np
 
     export_native_xml(mujoco, np)
+
+    # Verify GLB rest frames and 21-sample scalar joint trajectories
+    visual_motions = {
+        "rsb_trivet_lift": [0.0, 0.0, 1.0],
+        "rsb_burner_cap_lift": [0.0, 0.0, 1.0],
+        "rsb_knob_push": [0.0, 1.0, 0.0],
+        "rsb_knob_turn": [0.0, -1.0, 0.0],
+        "rsb_hose_swivel": [1.0, 0.0, 0.0],
+        "rsb_flame_lift": [0.0, 0.0, 1.0],
+    }
+    kit_verify_frames_and_motions(
+        ASSETS,
+        "rinnai-rsb-150pj",
+        NAMES,
+        visual_motions,
+        mujoco,
+        ASSETS / "active-state-evidence",
+        cleanup_inputs=True,
+    )
 
     model = mujoco.MjModel.from_xml_path(str(ASSETS / "scene.xml"))
     data = mujoco.MjData(model)
@@ -929,7 +1041,7 @@ def run_active_state_verification():
 
 
 def main():
-    if "--blender-export" in sys.argv:
+    if "--blender-export" in sys.argv or "bpy" in sys.modules:
         export_blender_meshes_and_xml()
         return
 

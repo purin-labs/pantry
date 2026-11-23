@@ -14,6 +14,7 @@ import { robotCellPosition } from "@purin-labs/production-simulation/simulator/r
 import { sceneLegAt } from "@purin-labs/production-simulation/recipes/bakery/physics-playback";
 import { COLD_CELL } from "@purin-labs/production-simulation/recipes/bakery/workcell-instances";
 import ovenUrl from "../../../../../../assets/bakery-mujoco/maruzen-mbco-5e/maruzen-mbco-5e.glb?url";
+import mbco4OvenUrl from "../../../../../../assets/bakery-mujoco/maruzen-mbco-4me/maruzen-mbco-4me.glb?url";
 
 export type RackLayoutPresentation = Readonly<{
   applied: PhysicsLayout;
@@ -65,7 +66,11 @@ export class PhysicsInspection {
       ((degrees: number | null) => void) | null,
   ) {
     this.model = new PhysicsModel(recording);
-    this.model.root.position.set(...robotCellPosition);
+    this.model.root.position.set(
+      robotCellPosition[0] + (this.model.usesSpannerTooling() ? 0.85 : 0),
+      robotCellPosition[1],
+      robotCellPosition[2],
+    );
     this.guide = new TaskSpatialGuide(this.model, select);
     plan.addInspectionControl(this.guide.element);
   }
@@ -76,7 +81,7 @@ export class PhysicsInspection {
     const { loadVisual } = await import("./physics-asset-loader");
     if (this.abort.signal.aborted) return;
     const visual = await loadVisual(
-      ovenUrl,
+      this.model.usesMbco4Oven() ? mbco4OvenUrl : ovenUrl,
       fixture.glbSha256,
       this.abort.signal,
     );
