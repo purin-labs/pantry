@@ -1033,7 +1033,6 @@ function planReadFailure(
     case "organisation_placement_conflict":
     case "organisation_not_initialized":
     case "organisation_mismatch":
-    case "organisation_capacity_exceeded":
     case "invalid_policy_snapshot":
     case "policy_version_stale":
     case "policy_version_conflict":
@@ -1073,7 +1072,6 @@ function relationshipPlanReadFailure(
     case "organisation_placement_conflict":
     case "organisation_not_initialized":
     case "organisation_mismatch":
-    case "organisation_capacity_exceeded":
     case "invalid_policy_snapshot":
     case "policy_version_stale":
     case "policy_version_conflict":

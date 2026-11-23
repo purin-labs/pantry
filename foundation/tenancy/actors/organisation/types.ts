@@ -29,11 +29,6 @@ export type OrganisationMetaRequest = {
 export type OrganisationStateError =
   | { code: "organisation_not_initialized" }
   | { code: "organisation_mismatch" }
-  | {
-      code: "organisation_capacity_exceeded";
-      activeSessions: number;
-      maxConcurrentSessions: number;
-    }
   | { code: "invalid_policy_snapshot" }
   | {
       code: "policy_version_stale";

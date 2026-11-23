@@ -40,10 +40,10 @@ reason. A later note in the same entry describes the code today.
   Organisation id. AD-023 adds the epoch to the name.
 - **AD-012, 2026-07-07, Superseded: `OrganisationActor` owns admission quotas.** The
   decision also removed a separate runner object, and no such object exists. No code
-  enforces an Organisation limit of concurrent Sessions. The error type
-  `organisation_capacity_exceeded` remains, but no code produces it. One Connector runs
-  at most 4 Case turns at a time (`CASE_WORK_CONCURRENCY`). The AI budget, the Code Mode
-  budgets and the `max_instances` of each container class also limit the work.
+  enforces an Organisation limit of concurrent Sessions, and no error names one. One
+  Connector runs at most 4 Case turns at a time (`CASE_WORK_CONCURRENCY`). The AI budget,
+  the Code Mode budgets and the `max_instances` of each container class also limit the
+  work.
 - **AD-020, 2026-07-07, Superseded: greenfield, no live migration.** AD-039 replaced
   this decision when live state existed. Plan 93 later started a new stack with empty
   storage, so no stored value of the old stack remains.
