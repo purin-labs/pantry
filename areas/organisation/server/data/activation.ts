@@ -123,6 +123,8 @@ type ActivationError =
 
 type ActivationStaleDetail =
   | "readiness_assessment_missing"
+  | "readiness_assessment_superseded"
+  | "readiness_assessment_blocked"
   | "configuration_changed_since_assessment"
   | "client_configuration_stale"
   | "assessment_environment_mismatch"
@@ -141,6 +143,8 @@ type ActivationRow = {
   organisationName: unknown;
   readinessVersion: unknown;
   readinessHash: unknown;
+  newestReadinessVersion: unknown;
+  blockers: unknown;
   capabilityProfile: unknown;
   activationAttemptId: unknown;
   policySnapshotId: unknown;
@@ -725,6 +729,14 @@ function activationStaleDetail(
   ) {
     return "readiness_assessment_missing";
   }
+  // Only the newest assessment of the Organisation counts, and only when it
+  // names no blocker. The Portal offers no activation for a blocked one.
+  if (row.readinessVersion !== row.newestReadinessVersion) {
+    return "readiness_assessment_superseded";
+  }
+  if (!namesNoBlocker(row.blockers)) {
+    return "readiness_assessment_blocked";
+  }
   if (row.assessmentConfigurationVersion !== row.configurationVersion) {
     return "configuration_changed_since_assessment";
   }
@@ -743,6 +755,13 @@ function activationStaleDetail(
   return null;
 }
 
+/** True when the stored blockers of an assessment are an empty list. */
+function namesNoBlocker(raw: unknown): boolean {
+  if (typeof raw !== "string") return false;
+  const blockers: unknown = JSON.parse(raw);
+  return Array.isArray(blockers) && blockers.length === 0;
+}
+
 function readActivationRow(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
@@ -752,7 +771,11 @@ function readActivationRow(
   return db
     .prepare(
       `SELECT o.lifecycle, t.name AS organisationName, a.readiness_version AS readinessVersion,
-            a.readiness_hash AS readinessHash, o.capability_profile AS capabilityProfile,
+            a.readiness_hash AS readinessHash, a.blockers,
+            (SELECT MAX(latest.readiness_version)
+               FROM organisation_readiness_assessment AS latest
+              WHERE latest.organisation_id = o.organisation_id) AS newestReadinessVersion,
+            o.capability_profile AS capabilityProfile,
             x.activation_attempt_id AS activationAttemptId,
             a.policy_snapshot_id AS policySnapshotId, a.cue_snapshot_id AS cueSnapshotId,
             s.cue_preset_id AS cuePresetId, d.workspace_id AS cueWorkspaceId,

@@ -130,10 +130,12 @@ admission `available`. Then
 `OrganisationActor.activateOnboarding` (`actors/organisation/activation.ts`) runs one
 serialized command of the Organisation.
 
-- The assessment must have the sent version and hash, the current configuration
-  version, the version of the request header and the current environment. The lifecycle
-  must be `configuring` or `activating`. If not, the answer is 409
+- The assessment must have the sent version and hash. It must be the newest assessment
+  of the Organisation, and it must name no blocker. It must have the current
+  configuration version, the version of the request header and the current environment.
+  The lifecycle must be `configuring` or `activating`. If not, the answer is 409
   `activation_readiness_stale` with a `detail`: `readiness_assessment_missing`,
+  `readiness_assessment_superseded`, `readiness_assessment_blocked`,
   `configuration_changed_since_assessment`, `client_configuration_stale`,
   `assessment_environment_mismatch` or `organisation_lifecycle_incompatible`.
 - An attempt is unique for each Organisation and readiness hash, and it holds a lease of
@@ -406,12 +408,6 @@ The routes are in `control/routes/onboarding.ts` and `control/routes/operators.t
 
 ## Open work
 
-- **Activation does not check the blockers.** The route and `activationStaleDetail`
-  (`data/activation.ts`) check the version, the hash, the configuration, the
-  environment and the lifecycle. A `blocked` assessment with both snapshots can
-  activate. Only the projection hides the action. The check accepts any assessment of
-  the current configuration version, so a newer `blocked` assessment does not stop an
-  older one.
 - **A restore after the cleanup.** Reconnect refuses a `revoked` connection, and
   `createConnectedIntegration` throws for its `disabled` account.
 - **Repeated writes.** While a saved setup has no commerce system, `setup_snapshots`
@@ -436,6 +432,7 @@ The routes are in `control/routes/onboarding.ts` and `control/routes/operators.t
   [FND-06](../../foundation/06-identity-policy-and-approval.md) and
   [DEV-01](../devices/01-devices.md).
 - E2E journeys in `workers/platform/tests/e2e/`: `organisation-setup.test.ts`,
+  `organisation-setup-readiness.test.ts`,
   `regional-onboarding.test.ts`, `new-organisation-first-chat.test.ts`,
   `organisation-archive-access.test.ts`, `organisation-lifecycle-placement.test.ts`,
   `slack-answer-before-archive.test.ts`, `purged-organisation-reclaim.test.ts`,
