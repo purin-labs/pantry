@@ -17,6 +17,7 @@ import {
   requireActiveOrganisationActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
+  APPROVAL_STEP_UP_MAX_AGE_MS,
   approvalActionBindingMatches,
   digestApprovalAction,
   isCommerceActionNonce as isActionNonce,
@@ -125,8 +126,6 @@ import {
   executeCommerceAction,
 } from "../../../actions";
 import { commerceActionLedgerError } from "./support";
-
-const APPROVAL_STEP_UP_MAX_AGE_MS = 10 * 60 * 1000;
 
 function commerceActionProviderSupported(
   source: CommerceSource,

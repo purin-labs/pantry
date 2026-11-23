@@ -1,10 +1,11 @@
 import type { UserId } from "@purin-labs/control-api";
 import type { GlobalQuerySource } from "@purin-labs/tenancy/data/query-source";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import type { ApprovalActionBinding } from "@purin-labs/authority/approval-authentication";
 import {
+  APPROVAL_STEP_UP_MAX_AGE_MS,
   digestApprovalAction,
   isCommerceActionNonce,
+  type ApprovalActionBinding,
 } from "@purin-labs/authority/approval-authentication";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
@@ -49,7 +50,6 @@ const OIDC_STATE_COOKIE = "pantry_oidc_state";
 const CONTROL_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const CONTROL_SESSION_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 const CONTROL_SESSION_RENEWAL_STEP_MS = 60 * 60 * 1000;
-const APPROVAL_STEP_UP_MAX_AGE_MS = 10 * 60 * 1000;
 
 export type SessionControlRoute =
   | Readonly<{ kind: "googleStart" }>

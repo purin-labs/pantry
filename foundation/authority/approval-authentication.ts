@@ -18,6 +18,12 @@ import {
   sha256Hex,
 } from "@purin-labs/std";
 
+/**
+ * A Google step-up proves a fresh sign-in for this long: an approval needs a
+ * session signed in within it, and a step-up challenge lasts at most this.
+ */
+export const APPROVAL_STEP_UP_MAX_AGE_MS = 10 * 60 * 1000;
+
 declare const approvalProofDigestBrand: unique symbol;
 
 export type ApprovalProofDigest = string & {
