@@ -12,6 +12,8 @@
   "include": [
     "src/**/*.ts",
     "../../areas/*/server/**/*.ts",
+    "../../areas/integrations/shopify/**/*.ts",
+    "../../surfaces/*/server/**/*.ts",
     "tests/e2e/**/*.ts",
     "vitest.e2e.config.ts",
     "../../apps/portal/src/vite-env.d.ts"

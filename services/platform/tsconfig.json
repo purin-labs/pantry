@@ -12,5 +12,10 @@
     "resolvePackageJsonExports": true,
     "resolvePackageJsonImports": true
   },
-  "include": ["src/**/*.ts", "../../areas/*/server/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "../../areas/*/server/**/*.ts",
+    "../../areas/integrations/shopify/**/*.ts",
+    "../../surfaces/*/server/**/*.ts"
+  ]
 }
