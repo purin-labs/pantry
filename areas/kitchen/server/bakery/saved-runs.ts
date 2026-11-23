@@ -197,7 +197,8 @@ async function readSavedBakeryRunSnapshot(
     observedAt: Date.now(),
     evidence: "saved_simulation",
     settings,
-    trays: Array.isArray(document.trays) ? document.trays.length : 0,
+    // Only a rehearsal file lists its trays; another file's count is unknown.
+    trays: Array.isArray(document.trays) ? document.trays.length : null,
     operations: operations.length,
     recordedOperations: operations.filter(hasSavedRecording).length,
     assumptions: [

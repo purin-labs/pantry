@@ -322,9 +322,10 @@ async function agentCanvasJourney(
     .poll(requestCount.bind(null, model), { timeout: 50_000 })
     .toBeGreaterThanOrEqual(shared ? 10 : 6);
   expect(model.results).toHaveLength(shared ? 8 : 4);
+  // A saved appliance run holds no trays, so the agent reads no tray count.
   expect(model.results[0]).toMatchObject({
     success: true,
-    code_mode_value: { kind: "saved_bakery_run" },
+    code_mode_value: { kind: "saved_bakery_run", trays: null },
   });
   expect(model.results[1]).toMatchObject({
     success: true,
