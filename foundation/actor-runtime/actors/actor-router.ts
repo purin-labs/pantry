@@ -24,12 +24,14 @@ import {
   CONNECTOR_ACTOR_SCHEMA_VERSION,
   ORGANISATION_ACTOR_SCHEMA_VERSION,
 } from "./actor-schema-versions";
-import type {
-  CaseId,
-  ConnectorId,
-  SessionId,
-  OrganisationId,
+import {
+  newRequestId,
+  type CaseId,
+  type ConnectorId,
+  type SessionId,
+  type OrganisationId,
 } from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
 import type { OrganisationPlacement } from "@purin-labs/tenancy/placement";
 import type { Result } from "@purin-labs/kernel/result";
 import { assertNever } from "@purin-labs/std";
@@ -828,16 +830,14 @@ function traceActorResolution(
   startedAt: number,
 ): void {
   if (identity.objectKind !== "case") return;
-  console.log(
-    JSON.stringify({
-      event: "case.actor_resolution_timing",
-      organisation_id: identity.organisationId,
-      case_id: identity.logicalObjectId,
-      phase,
-      started_at: startedAt,
-      duration_ms: Date.now() - startedAt,
-    }),
-  );
+  traceLog("case.actor_resolution_timing", {
+    requestId: newRequestId(),
+    organisation_id: identity.organisationId,
+    case_id: identity.logicalObjectId,
+    phase,
+    started_at: startedAt,
+    duration_ms: Date.now() - startedAt,
+  });
 }
 
 async function activateReservedActor<TObject extends PlacedActorRpc>(

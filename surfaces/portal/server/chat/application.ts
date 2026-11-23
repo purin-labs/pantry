@@ -1,4 +1,10 @@
-import { type SessionId, parseRequestId, type ControlSessionId } from "@purin-labs/kernel/ids";
+import {
+  type SessionId,
+  newRequestId,
+  parseRequestId,
+  type ControlSessionId,
+} from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   attachmentParts,
@@ -186,18 +192,16 @@ export async function scheduleConversationExecution(
     controlSessionId: input.controlSessionId,
     conversationId: input.conversation.id,
   });
-  console.log(
-    JSON.stringify({
-      event: "chat.execution_scheduled",
-      organisation_id: input.scope.organisationId,
-      conversation_id: input.conversation.id,
-      started_at: scheduledAt,
-      duration_ms: Date.now() - scheduledAt,
-      identity_ms: identityReadyAt - scheduledAt,
-      actor_resolution_ms: actorReadyAt - identityReadyAt,
-      scheduling_rpc_ms: Date.now() - actorReadyAt,
-    }),
-  );
+  traceLog("chat.execution_scheduled", {
+    requestId: newRequestId(),
+    organisation_id: input.scope.organisationId,
+    conversation_id: input.conversation.id,
+    started_at: scheduledAt,
+    duration_ms: Date.now() - scheduledAt,
+    identity_ms: identityReadyAt - scheduledAt,
+    actor_resolution_ms: actorReadyAt - identityReadyAt,
+    scheduling_rpc_ms: Date.now() - actorReadyAt,
+  });
   await sessionPreparation;
 }
 

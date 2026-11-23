@@ -254,13 +254,11 @@ export abstract class CaseActor
     this.ctx.storage.transactionSync(
       createCaseSchema.bind(null, this.ctx.storage.sql),
     );
-    console.log(
-      JSON.stringify({
-        event: "case.schema_ready",
-        started_at: startedAt,
-        duration_ms: Date.now() - startedAt,
-      }),
-    );
+    traceLog("case.schema_ready", {
+      requestId: newRequestId(),
+      started_at: startedAt,
+      duration_ms: Date.now() - startedAt,
+    });
   }
 
   // Internal RPCs; operator authorization belongs to the control-plane caller.
@@ -399,16 +397,14 @@ export abstract class CaseActor
     persistConversationExecution(this.ctx.storage.sql, input);
     const persistedAt = Date.now();
     await this.rearm();
-    console.log(
-      JSON.stringify({
-        event: "chat.case_schedule_timing",
-        organisation_id: input.scope.organisationId,
-        conversation_id: input.conversationId,
-        started_at: startedAt,
-        persist_ms: persistedAt - startedAt,
-        alarm_ms: Date.now() - persistedAt,
-      }),
-    );
+    traceLog("chat.case_schedule_timing", {
+      requestId: newRequestId(),
+      organisation_id: input.scope.organisationId,
+      conversation_id: input.conversationId,
+      started_at: startedAt,
+      persist_ms: persistedAt - startedAt,
+      alarm_ms: Date.now() - persistedAt,
+    });
     this.ctx.waitUntil(this.resumeConversation());
   }
 
@@ -524,7 +520,10 @@ export abstract class CaseActor
     try {
       await work;
     } catch (error) {
-      console.warn("case.context_projection_retry", error);
+      traceWarn("case.context_projection_retry", {
+        requestId: newRequestId(),
+        error: errorMessage(error).slice(0, 500),
+      });
     } finally {
       this.projectionWork = null;
     }
@@ -891,18 +890,16 @@ export abstract class CaseActor
     if (result.ok) {
       await this.scheduleContextProjections();
     }
-    console.log(
-      JSON.stringify({
-        event: "case.trigger_admission_timing",
-        organisation_id: trigger.requestAuthority.organisationId,
-        case_id: trigger.caseId,
-        trigger_id: trigger.triggerId,
-        recovery_ms: recoveredAt - startedAt,
-        label_ms: labelledAt - recoveredAt,
-        commit_ms: committedAt - labelledAt,
-        projection_schedule_ms: Date.now() - committedAt,
-      }),
-    );
+    traceLog("case.trigger_admission_timing", {
+      requestId: newRequestId(),
+      organisation_id: trigger.requestAuthority.organisationId,
+      case_id: trigger.caseId,
+      trigger_id: trigger.triggerId,
+      recovery_ms: recoveredAt - startedAt,
+      label_ms: labelledAt - recoveredAt,
+      commit_ms: committedAt - labelledAt,
+      projection_schedule_ms: Date.now() - committedAt,
+    });
     return result;
   }
 
