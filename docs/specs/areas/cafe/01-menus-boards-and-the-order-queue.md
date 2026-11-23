@@ -388,9 +388,11 @@ retention: an archive deletes nothing, and no route deletes a board.
   shop name form. `MENU_HOST_SUFFIX` in `apps/storefront/wrangler.jsonc` still names
   `menu.seams.tokyo`.
 - With no order page origin, `hostedShopUrl` names `<COMMERCE_BASE_URL>/shops/<merchant>`
-  (`control/routes/commerce-menu-publication.ts:280`). The commerce engine serves no
-  `/shops/` path; `purin-shop` does. The comment in `services/platform/wrangler.jsonc`
-  says that QR codes keep `shop.purin.io/shops/<merchant>`.
+  (`areas/cafe/server/control/routes/commerce-menu-publication.ts`). The commerce
+  Worker serves no page: it redirects a `GET` outside `/v1/` to `SHOP_SITE_ORIGIN`
+  (`services/commerce/src/worker.ts`). So a QR code opens
+  `shop.purin.io/shops/<merchant>` after one redirect (checked in production on
+  2026-11-23). A QR code that names the order page itself needs the order page origin.
 - A board shows no stock count ("3 left"). The sold-out mark uses the device's time
   zone, because the commerce engine has no shop time zone.
 - The Portal edits one menu. A second menu, for example a morning menu, needs the commerce
