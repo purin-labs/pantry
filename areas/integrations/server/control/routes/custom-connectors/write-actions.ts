@@ -14,10 +14,8 @@ import {
   type MerchantActionRejectionEvidence,
 } from "@purin-labs/authority/approval-authentication";
 import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
-import {
-  consumeGoogleApprovalCeremony,
-  verifyGoogleApprovalGrant,
-} from "@purin-labs/control/worker/oidc";
+import { consumeGoogleApprovalCeremony } from "@purin-labs/control/worker/oidc";
+import { verifyApprovalStepUp } from "@purin-labs/control/worker/approval-step-up";
 import {
   executeApprovedCustomConnectorWrite,
   resolveApprovedCustomConnectorWrite,
@@ -41,11 +39,8 @@ import {
 import {
   authorizeOrganisationRequest,
   authenticateControlMutation,
-  APPROVAL_GRANT_COOKIE,
-  parseCookies,
   type AuthorizedOrganisationRequest,
 } from "@purin-labs/control/worker/authorization";
-import { googleConfig } from "@purin-labs/control/worker/google-oidc-config";
 import {
   controlError,
   controlJson,
@@ -158,31 +153,15 @@ export async function approveCustomConnectorWriteAction(
   const context = await prepareWriteMutation(request, env, route, "approval");
   if (!context.ok) return context.response;
   const now = Date.now();
-  if (now - context.authorized.authenticated.session.createdAt > 10 * 60_000) {
-    return controlError("approval_step_up_required", 401);
-  }
-  const config = googleConfig(env);
-  const grantRaw = parseCookies(request.headers.get("cookie")).get(
-    APPROVAL_GRANT_COOKIE,
-  );
-  if (config === null) return controlError("google_oidc_unconfigured", 503);
-  if (grantRaw === undefined)
-    return controlError("approval_step_up_required", 401);
-  const grant = await verifyGoogleApprovalGrant({
-    raw: grantRaw,
-    clientSecret: config.clientSecret,
+  const grant = await verifyApprovalStepUp({
+    request,
+    env,
+    session: context.authorized.authenticated.session,
+    organisationId: context.authorized.organisationId,
+    actionNonce: route.actionNonceRaw,
     now,
   });
-  if (
-    !grant.ok ||
-    grant.value.userId !== context.authorized.authenticated.session.userId ||
-    grant.value.challenge.expiresAt <= now ||
-    grant.value.challenge.organisationId !==
-      context.authorized.organisationId ||
-    grant.value.challenge.actionNonce !== route.actionNonceRaw
-  ) {
-    return controlError("approval_step_up_required", 401);
-  }
+  if (!grant.ok) return grant.error;
   const existing = await context.organisation.getAction({
     organisationId: context.authorized.organisationId,
     nonce: route.actionNonceRaw,

@@ -16,7 +16,6 @@ import {
   requireActiveOrganisationActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
-  APPROVAL_STEP_UP_MAX_AGE_MS,
   approvalActionBindingMatches,
   digestApprovalAction,
   isCommerceActionNonce as isActionNonce,
@@ -47,10 +46,8 @@ import {
   permissionRequiredResponse,
   personPermission,
 } from "@purin-labs/control/worker/permission-required";
-import {
-  consumeGoogleApprovalCeremony,
-  verifyGoogleApprovalGrant,
-} from "@purin-labs/control/worker/oidc";
+import { consumeGoogleApprovalCeremony } from "@purin-labs/control/worker/oidc";
+import { verifyApprovalStepUp } from "@purin-labs/control/worker/approval-step-up";
 import {
   readActiveOrganisationMembershipRevision,
   type ActiveOrganisationMembership,
@@ -104,8 +101,6 @@ import {
 } from "@purin-labs/control/worker/admission/control-mutation";
 import {
   authorizeOrganisationRequest,
-  APPROVAL_GRANT_COOKIE,
-  parseCookies,
   type AuthorizedOrganisationRequest,
 } from "@purin-labs/control/worker/authorization";
 import { readSupplierPayout } from "../../../data/supplier-payout-store";
@@ -113,7 +108,6 @@ import { readSealedPayoutPlan } from "../../../data/supplier-payout-plan";
 import { readSupplierPayoutAttempt } from "../../../data/supplier-payout-attempt";
 import { readSupplierDestinationRevision } from "../../../data/supplier-payable-store";
 import { controlError, controlJson, readJsonRecord } from "@purin-labs/control/worker/http";
-import { googleConfig } from "@purin-labs/control/worker/google-oidc-config";
 import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
 import { executeApprovedSupplierPayout } from "../supplier-payout-execution";
@@ -1123,12 +1117,16 @@ async function attachMerchantActionDestination(input: {
     : { ok: false, error: { code: attached.error.code } };
 }
 
-export async function handleCommerceActionApproval(
+/**
+ * The start of each decision route of one action: a POST of an owner or an
+ * admin, for an id that has the form of an action nonce.
+ */
+async function authorizeCommerceActionDecision(
   request: Request,
   env: Env,
   organisationIdRaw: string,
   actionNonceRaw: string,
-): Promise<Response> {
+): Promise<AuthorizedOrganisationRequest | Response> {
   if (request.method !== "POST") return controlError("method_not_allowed", 405);
   const authorized = await authorizeOrganisationRequest(
     request,
@@ -1140,6 +1138,22 @@ export async function handleCommerceActionApproval(
   if (!authorized.ok) return authorized.response;
   if (!isActionNonce(actionNonceRaw))
     return controlError("commerce_action_not_found", 404);
+  return authorized;
+}
+
+export async function handleCommerceActionApproval(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+  actionNonceRaw: string,
+): Promise<Response> {
+  const authorized = await authorizeCommerceActionDecision(
+    request,
+    env,
+    organisationIdRaw,
+    actionNonceRaw,
+  );
+  if (authorized instanceof Response) return authorized;
   const body = await readJsonRecord(request);
   if (!body.ok || Object.keys(body.value).length !== 0)
     return controlError("commerce_action_approval_invalid", 422);
@@ -1150,37 +1164,15 @@ export async function handleCommerceActionApproval(
   );
   if (boundary instanceof Response) return boundary;
   const now = Date.now();
-  if (
-    now - authorized.authenticated.session.createdAt >
-    APPROVAL_STEP_UP_MAX_AGE_MS
-  ) {
-    return controlError("approval_step_up_required", 401);
-  }
-  const config = googleConfig(env);
-  if (config === null) {
-    return controlError("google_oidc_unconfigured", 503);
-  }
-  const grantRaw = parseCookies(request.headers.get("cookie")).get(
-    APPROVAL_GRANT_COOKIE,
-  );
-  if (grantRaw === undefined) {
-    return controlError("approval_step_up_required", 401);
-  }
-  const grant = await verifyGoogleApprovalGrant({
-    raw: grantRaw,
-    clientSecret: config.clientSecret,
+  const grant = await verifyApprovalStepUp({
+    request,
+    env,
+    session: authorized.authenticated.session,
+    organisationId: authorized.organisationId,
+    actionNonce: actionNonceRaw,
     now,
   });
-  if (
-    !grant.ok ||
-    grant.value.userId !== authorized.authenticated.session.userId ||
-    grant.value.challenge.expiresAt <= now ||
-    grant.value.challenge.issuedAt > now ||
-    grant.value.challenge.organisationId !== authorized.organisationId ||
-    grant.value.challenge.actionNonce !== actionNonceRaw
-  ) {
-    return controlError("approval_step_up_required", 401);
-  }
+  if (!grant.ok) return grant.error;
   const identity = await resolveMutationUser(
     env,
     authorized.authenticated.session.userId,
@@ -1340,17 +1332,13 @@ export async function handleCommerceActionRejection(
   organisationIdRaw: string,
   actionNonceRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const authorized = await authorizeCommerceActionDecision(
     request,
     env,
     organisationIdRaw,
-    "admin",
-    true,
+    actionNonceRaw,
   );
-  if (!authorized.ok) return authorized.response;
-  if (!isActionNonce(actionNonceRaw))
-    return controlError("commerce_action_not_found", 404);
+  if (authorized instanceof Response) return authorized;
   const body = await readJsonRecord(request);
   if (
     !body.ok ||
@@ -1582,17 +1570,13 @@ export async function handleCommerceActionExecution(
   organisationIdRaw: string,
   actionNonceRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const authorized = await authorizeCommerceActionDecision(
     request,
     env,
     organisationIdRaw,
-    "admin",
-    true,
+    actionNonceRaw,
   );
-  if (!authorized.ok) return authorized.response;
-  if (!isActionNonce(actionNonceRaw))
-    return controlError("commerce_action_not_found", 404);
+  if (authorized instanceof Response) return authorized;
   const body = await readJsonRecord(request);
   if (!body.ok || Object.keys(body.value).length !== 0)
     return controlError("commerce_action_execution_invalid", 422);

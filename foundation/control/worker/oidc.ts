@@ -33,7 +33,7 @@ type GoogleOidcAuthentication =
       readonly challenge: ApprovalActionBinding;
     };
 
-type GoogleApprovalGrant = {
+export type GoogleApprovalGrant = {
   readonly stateHash: string;
   readonly userId: UserId;
   readonly challenge: ApprovalActionBinding;
