@@ -1,4 +1,5 @@
 """The calls of the Mac to the Platform. The Platform never calls the Mac."""
+import http.client
 import json
 import urllib.error
 import urllib.request
@@ -17,6 +18,11 @@ class PlatformRefused(Exception):
         self.code = code
 
 
+class PlatformAnswerInvalid(Exception):
+    """The Platform answered with a success that this service cannot read: no JSON object, a cut body,
+    or no field that the call needs. The service keeps running and asks again at the next heartbeat."""
+
+
 def _call(origin: str, method: str, route: str, credential: str | None, body: dict | None) -> dict:
     headers = {"User-Agent": f"pantry-shop-voice/{VERSION}", "Content-Type": "application/json"}
     if credential is not None:
@@ -25,13 +31,20 @@ def _call(origin: str, method: str, route: str, credential: str | None, body: di
                                      data=None if body is None else json.dumps(body).encode())
     try:
         with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as response:
-            return json.load(response)
+            answer = json.load(response)
     except urllib.error.HTTPError as error:
         try:
             code = str(json.load(error).get("error", "unknown"))
-        except ValueError:
+        except (ValueError, AttributeError, http.client.HTTPException):
             code = "unknown"
         raise PlatformRefused(error.code, code) from None
+    except OSError:
+        raise
+    except (ValueError, http.client.HTTPException) as error:
+        raise PlatformAnswerInvalid(f"{route}: {type(error).__name__}") from None
+    if not isinstance(answer, dict):
+        raise PlatformAnswerInvalid(f"{route}: not a JSON object")
+    return answer
 
 
 def enroll(origin: str, organisation_id: str, mac_id: str, code: str) -> dict:
@@ -47,7 +60,10 @@ def heartbeat(origin: str, credential: str, address: str, model_state: str, engi
 
 
 def vocabulary(origin: str, credential: str) -> list[str]:
-    return _call(origin, "GET", "vocabulary", credential, None)["terms"]
+    terms = _call(origin, "GET", "vocabulary", credential, None).get("terms")
+    if not isinstance(terms, list) or not all(isinstance(term, str) for term in terms):
+        raise PlatformAnswerInvalid("vocabulary: no list of terms")
+    return terms
 
 
 def put_challenge(origin: str, credential: str, value: str) -> None:

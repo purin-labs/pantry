@@ -99,6 +99,11 @@ def run_service() -> int:
             if str(error) != last_problem:
                 last_problem = str(error)
                 print(f"Platform unreachable: {error}", flush=True)
+        except platform_api.PlatformAnswerInvalid as error:
+            # A heartbeat that the service cannot read is not an accepted one: the refusals stay.
+            if str(error) != last_problem:
+                last_problem = str(error)
+                print(f"Platform answer unreadable: {error}", flush=True)
         transcription.unload_if_idle()
         speech.unload_if_idle()
         choice.remove_unused()

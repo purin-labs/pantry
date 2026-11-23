@@ -142,7 +142,7 @@ An approval card that a click can approve also shows a phrase while voice listen
 
 ### The shop Mac
 
-`services/shop-voice` is a Python service (version 0.5.2) for Apple silicon and macOS 14
+`services/shop-voice` is a Python service (version 0.5.3) for Apple silicon and macOS 14
 or later. It runs as the `launchd` job `io.purin.pantry.shop-voice` from
 `~/.pantry-voice`, in the session of the person who installed it. The install needs no
 administrator.
@@ -175,7 +175,9 @@ Mac's private IPv4 address, and the Platform refuses a public address.
 - At a revoke, the Platform clears the Mac's secrets and removes its DNS names. At the
   first refused heartbeat (a 401 answer), the Mac stops all answers. After five refused
   heartbeats, it deletes its models, certificate and credential and stays stopped. Only
-  an accepted heartbeat resets the count. A 503 or a lost network does not reset it. The
+  an accepted heartbeat resets the count. A 503, a lost network or an answer that the
+  service cannot read (no JSON object, a cut body, no list of terms) does not reset it,
+  and does not stop the service: it asks again at the next heartbeat. The
   revoke dialog says this: the Mac stops within about one minute and deletes its files
   within about five minutes.
 
@@ -408,7 +410,6 @@ The talk key works only while the page is in front.
   - A failed DNS removal at a revoke is not tried again before the end of the
     Organisation.
   - Each Mac heartbeat writes one D1 row, also when nothing changed.
-  - A heartbeat answer that is not JSON stops the service until `launchd` restarts it.
   - A heartbeat 401 does not always mean a revoke. The Platform also answers 401 if the
     Organisation scope does not resolve, for example at a placement conflict, or if a
     `VOICE_DNS_*` setting is missing. After five such answers, an enrolled Mac deletes
