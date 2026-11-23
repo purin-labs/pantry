@@ -1,12 +1,19 @@
 import { env, exports } from "cloudflare:workers";
+import { runInDurableObject } from "cloudflare:test";
 import { expect, it } from "vitest";
 
 import { HttpResponse, http } from "msw";
 
 import { docxArchive, h264Fixture, waveHeader } from "../media-fixtures";
 import { network } from "./network";
+import { fixtureDatabase } from "./organisation-database";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import {
   CHANNEL_ID,
+  ORGANISATION_ID,
+  SLACK_ACTOR_USER_ID,
+  createRequiredGrant,
   inspectSlackActors,
   installSlackActorFixture,
   modelSimulator,
@@ -445,6 +452,137 @@ it("delivers extracted document text to the model", async () => {
     fileLines.filter((line) => line.includes("contents not read")),
   ).toEqual([]);
 });
+
+/**
+ * A PDF above the 1 MiB that the Worker reads is stated as too large. The
+ * executor reads only plain text, so the turn spends no executor allocation
+ * and no capability call of its budget on it.
+ */
+it("states a large PDF as too large without an executor allocation", async () => {
+  await installSlackActorFixture();
+  await grantAttachmentInspection();
+  const model = modelSimulator();
+  const slack = slackSimulator();
+  const pdf = new Uint8Array(2 * 1024 * 1024);
+  pdf.set(PDF_BYTES);
+  const files = slackFileSimulator([
+    {
+      id: "F0E2EBIGPDF",
+      name: "catalogue.pdf",
+      mimetype: "application/pdf",
+      bytes: pdf,
+    },
+  ]);
+
+  network.use(
+    model.handler,
+    slack.handler,
+    files.infoHandler,
+    files.downloadHandler,
+  );
+
+  const rootTs = "1787555000.000001";
+  await exports.default.fetch(
+    await signedSlackRequest(
+      slackEnvelope({
+        eventType: "app_mention",
+        eventId: "Ev0E2EBIGPDF",
+        messageTs: rootTs,
+        threadTs: rootTs,
+        text: "<@U0PANTRY> what is in the catalogue",
+        files: [
+          {
+            id: "F0E2EBIGPDF",
+            name: "catalogue.pdf",
+            mimetype: "application/pdf",
+            size: pdf.byteLength,
+            timestamp: 1_787_555_000,
+          },
+        ],
+      }),
+    ),
+  );
+
+  model.releaseRoot.resolve(undefined);
+  await expect
+    .poll(
+      function modelCalls() {
+        return model.requests.length;
+      },
+      { timeout: 15_000 },
+    )
+    .toBeGreaterThan(0);
+  expect(JSON.stringify(model.requests[0])).toContain(
+    "contents not read; preparation=source_too_large",
+  );
+  expect(await attachmentPreparationClaims()).toBe(0);
+});
+
+/**
+ * The member who writes may inspect message files, as the baseline grant of a
+ * Slack channel gives: an inspection may then claim an executor allocation.
+ */
+async function grantAttachmentInspection(): Promise<void> {
+  const now = Date.now();
+  await fixtureDatabase().batch([
+    fixtureDatabase()
+      .prepare(
+        "UPDATE service_role_grant SET role = 'admin' WHERE organisation_id = ? AND user_id = ?",
+      )
+      .bind(ORGANISATION_ID, SLACK_ACTOR_USER_ID),
+    fixtureDatabase()
+      .prepare(
+        "UPDATE organisation_onboarding SET lifecycle = 'active', activation_attempt_id = NULL, readiness_version = NULL, activation_receipt_id = 'receipt_large_pdf', activated_at = ? WHERE organisation_id = ?",
+      )
+      .bind(now, ORGANISATION_ID),
+  ]);
+  for (const capabilityId of [
+    "context.case.read",
+    "message.attachment.inspect",
+  ])
+    await createRequiredGrant({
+      grantId: `grant_large_pdf_${capabilityId}`,
+      subject: { kind: "organisation_role", role: "admin" },
+      target: {
+        kind: "platform_capability",
+        capabilityId,
+        capabilityVersion: 1,
+      },
+      now,
+    });
+  const organisation = await requireActiveOrganisationActor({
+    env,
+    organisationId: ORGANISATION_ID,
+    now,
+  });
+  const published = await compilePublishAndActivateOrganisationPolicy({
+    bindings: { db: fixtureDatabase(), kv: env.POLICY_KV },
+    organisationId: ORGANISATION_ID,
+    organisation,
+    now,
+  });
+  if (!published.ok) throw new Error(published.error.code);
+}
+
+/** The executor allocations that the Session claimed from its run budget. */
+async function attachmentPreparationClaims(): Promise<number> {
+  const session = await fixtureDatabase()
+    .prepare(
+      "SELECT physical_object_name AS name FROM durable_object_registry WHERE organisation_id = ? AND object_kind = 'session' AND lifecycle_status = 'active'",
+    )
+    .bind(ORGANISATION_ID)
+    .first<{ name: string }>();
+  if (session === null) throw new Error("Slack Session missing");
+  return runInDurableObject(
+    env.SESSION.getByName(session.name),
+    (_instance, state) =>
+      state.storage.sql
+        .exec<{ claims: number }>(
+          "SELECT COUNT(*) AS claims FROM session_budget_event WHERE kind = 'RunCapabilityClaimed' AND payload LIKE '%attachment_preparation:%'",
+        )
+        .one().claims,
+  );
+}
 
 /**
  * Attachment preparation completes before the model receives the turn. A

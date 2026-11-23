@@ -26,11 +26,11 @@ import { attachmentManifestLine } from "@purin-labs/contracts/message";
  *
  * The Worker extracts the text of a plain text document, a PDF, a DOCX and an
  * ODT of at most 1 MiB. It reads the container facts of audio and video, and
- * the intra-frame stills of video. A larger document and the keyframes of an inter-frame
- * video go to the executor when the caller holds an allocation; the executor
- * reads only plain text and H.264. Each other file returns a model-visible
- * limitation rather than a guess: the agent is told plainly that the file was
- * stored and verified but not read.
+ * the intra-frame stills of video. A larger plain text document and the
+ * keyframes of an H.264 video go to the executor when the caller holds an
+ * allocation, because the executor reads nothing else. Each other file returns
+ * a model-visible limitation rather than a guess: the agent is told plainly
+ * that the file was stored and verified but not read.
  */
 
 const MEDIA_HEADER_BYTES = 64 * 1024;
@@ -168,18 +168,32 @@ type AttachmentInspectionInput = Readonly<{
 
 /**
  * Whether the inspection of this attachment can call the executor: for the
- * frames of a video, and for a document that is too large to read here. The
- * inspection of every other attachment uses only the attachment's own bytes.
+ * frames of a video, and for a plain text document that is too large to read
+ * here. The inspection of every other attachment uses only its own bytes.
  */
 export function inspectionMayUseExecutor(
   attachment: StoredMessageAttachment,
 ): boolean {
   return (
     attachment.descriptor.kind === "video" ||
-    (attachment.descriptor.kind !== "audio" &&
+    (executorReadsDocument(attachment) &&
       attachment.byteLength > ATTACHMENT_TEXT_LIMITS.maxSourceBytes)
   );
 }
+
+/**
+ * The executor reads plain text only. A larger PDF, DOCX or ODT would take
+ * an allocation for a refusal, so it is stated as too large here.
+ */
+function executorReadsDocument(attachment: StoredMessageAttachment): boolean {
+  return (
+    attachment.descriptor.kind === "document" &&
+    TEXTUAL_DOCUMENT_TYPES.has(String(attachment.descriptor.media.mediaType))
+  );
+}
+
+/** The executor decodes the keyframes of H.264 only. */
+const EXECUTOR_VIDEO_CODECS = new Set(["avc1", "avc3"]);
 
 export async function inspectMessageAttachment(
   input: AttachmentInspectionInput,
@@ -273,7 +287,8 @@ async function inspectDocumentAttachment(
     // Too large to read here. The executor can read it when the caller already
     // holds an allocation; otherwise the limit is stated rather than guessed at.
     const delegated =
-      input.readOversizedDocument === undefined
+      input.readOversizedDocument === undefined ||
+      !executorReadsDocument(attachment)
         ? null
         : await readForExecutor(input, input.readOversizedDocument);
 
@@ -378,7 +393,10 @@ async function decodeIfRequired(input: {
   readonly sampled: FrameSamplingOutcome;
   readonly decode: VideoFrameDecoder | undefined;
 }): Promise<readonly DecodedVideoStill[] | null> {
-  if (input.sampled.kind !== "decoder_required") {
+  if (
+    input.sampled.kind !== "decoder_required" ||
+    !EXECUTOR_VIDEO_CODECS.has(input.sampled.codec)
+  ) {
     return null;
   }
 

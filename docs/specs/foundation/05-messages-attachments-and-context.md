@@ -138,7 +138,8 @@ proves the Organisation prefix of the key, the object length and the SHA-256.
 
 - The Worker takes the frames of an intra-frame video from the bytes of the file. For
   H.264, the `WorkspaceExecutorContainer` decodes the selected keyframes to JPEG. Each
-  other codec gives `frames=decoder_required` in the facts and no frame.
+  other codec gives `frames=decoder_required` in the facts and no frame, with no
+  executor call.
 - The executor has no network and gets the bytes of one file. It reads only plain text
   and H.264. The Session reserves an allocation with the parent `attachment_preparation`
   from the run budget of the turn, and claims `message.attachment.inspect` for it.
@@ -414,7 +415,8 @@ The agent loads more context with its tools, when the task needs it.
   file limit wait for a streamed write and measured evidence. The code has no staged
   object and no expiry of one.
 - The executor has no handler for PDF, DOCX or ODT, so these files are read only up to
-  1 MiB. A PDF of scanned pages gives no text. DOC, spreadsheets and slides are opaque.
+  1 MiB. A larger one gets `source_too_large` with no executor call. A PDF of scanned
+  pages gives no text. DOC, spreadsheets and slides are opaque.
 - Video frames come only from intra-frame video and H.264. VP9 and AV1 have no decoder.
   Audio gives technical facts only.
 - A Portal message has no link part, so `read_message_link` finds no link in it. Only
