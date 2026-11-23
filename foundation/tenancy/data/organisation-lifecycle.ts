@@ -4,6 +4,7 @@ import {
   prepareOrganisationName,
   prepareOrganisationStatus,
 } from "./shared-rows/organisation-row";
+import { ARCHIVE_PURGE_DELAY_MS } from "./organisation-lifecycle.machine";
 import type {
   GlobalDatabase,
   OrganisationDatabaseSession,
@@ -114,8 +115,6 @@ type OrganisationLifecycleRow = {
   readonly projectionRevision: unknown;
   readonly purgeAfter: unknown;
 };
-
-const ARCHIVE_PURGE_DELAY_MS = 30 * 24 * 60 * 60 * 1_000;
 
 const ACTIVE_PLACEMENT = `EXISTS (SELECT 1 FROM organisation_placement
   WHERE organisation_id = ? AND placement_epoch = ? AND placement_cell_id = ?

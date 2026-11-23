@@ -1,6 +1,12 @@
 import type { MachineDefinition } from "@purin-labs/std/state-machine";
 
 /**
+ * After its first ten minutes, a Case that waits for an approval reads the
+ * action ledger each quarter hour (`caseAlarmReconcilers`).
+ */
+export const APPROVAL_READ_LATER_MS = 15 * 60_000;
+
+/**
  * The Case's wait for a person's decision on a commerce action (Refactor 15,
  * refactor 1). The action ledger in OrganisationActor owns the decision; the
  * Case derives this state from the ledger entry and never decides by itself.
@@ -22,7 +28,7 @@ export const CASE_APPROVAL_WAIT_MACHINE = {
       exit: {
         kind: "due",
         reconciler: "commerce_approval_wait",
-        afterMs: 15 * 60_000,
+        afterMs: APPROVAL_READ_LATER_MS,
       },
     },
     decided: {

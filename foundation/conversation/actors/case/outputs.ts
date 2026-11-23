@@ -28,7 +28,10 @@ import {
 } from "@purin-labs/std/state-machine";
 import { writeActorTransition } from "@purin-labs/actor-runtime/actors/lifecycle/state-transition";
 import { retainContextProjection } from "./lifecycle";
-import { CASE_OUTPUT_MACHINE } from "./output.machine";
+import {
+  CASE_OUTPUT_MACHINE,
+  UNDELIVERED_OUTPUT_TTL_MS,
+} from "./output.machine";
 import { equal, invalid, isOpen } from "./record-parsers";
 import type { DropHeldOutputRequest } from "./request-parsers";
 import type {
@@ -366,14 +369,6 @@ export async function inspectCase(
     : restored;
 }
 
-/**
- * How long an answer may wait for its delivery (Refactor 15, refactor 2).
- * Every retry of its surface has ended long before: the Connector gives up
- * on a Case work item within minutes, and a held answer is `held`, not
- * pending. An older pending answer would only reach the conversation late,
- * beside newer answers.
- */
-const UNDELIVERED_OUTPUT_TTL_MS = 24 * 60 * 60_000;
 const UNDELIVERED_OUTPUT_PAGE = 32;
 
 const PENDING_OUTPUT_AGE = `FROM case_output AS output

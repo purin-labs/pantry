@@ -1,6 +1,15 @@
 import type { MachineDefinition } from "@purin-labs/std/state-machine";
 
 /**
+ * How long an answer may wait for its delivery (Refactor 15, refactor 2).
+ * Every retry of its surface has ended long before: the Connector gives up
+ * on a Case work item within minutes, and a held answer is `held`, not
+ * pending. An older pending answer would only reach the conversation late,
+ * beside newer answers.
+ */
+export const UNDELIVERED_OUTPUT_TTL_MS = 24 * 60 * 60_000;
+
+/**
  * One answer of a Case on its way to the conversation (Refactor 15,
  * refactor 2). A resume path sends only a `pending` output: an output that
  * waits for a person's decision is `held`, and only that decision moves it.
@@ -25,7 +34,7 @@ export const CASE_OUTPUT_MACHINE = {
       exit: {
         kind: "due",
         reconciler: "undelivered_outputs",
-        afterMs: 24 * 60 * 60_000,
+        afterMs: UNDELIVERED_OUTPUT_TTL_MS,
       },
     },
     held: {

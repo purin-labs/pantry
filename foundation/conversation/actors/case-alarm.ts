@@ -4,6 +4,7 @@ import { parseLifecycle } from "./case/record-parsers";
 import type { AlarmReconciler } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import { nextUndeliveredOutputAt } from "./case/outputs";
 import { ASSIGNMENT_ABANDON_AFTER_MS } from "./case/assignment.machine";
+import { APPROVAL_READ_LATER_MS } from "./case/approval-wait.machine";
 import { activeAssignmentTimes } from "./case/lifecycle";
 
 /** How often a Case retries work that waits. */
@@ -16,7 +17,6 @@ const CASE_RECOVERY_INTERVAL_MS = 15_000;
  * update was lost (Refactor 15, refactor 1).
  */
 const APPROVAL_READ_FIRST_MS = 60_000;
-const APPROVAL_READ_LATER_MS = 15 * 60_000;
 const APPROVAL_READ_FIRST_WINDOW_MS = 10 * 60_000;
 /** The most approval waits that one alarm reads from the ledger. */
 const APPROVAL_READ_PAGE = 10;

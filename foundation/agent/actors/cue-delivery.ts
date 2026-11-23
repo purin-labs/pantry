@@ -1,4 +1,5 @@
 import type { OrganisationId } from "@purin-labs/kernel/ids";
+import { CUE_CLAIM_ABANDONED_AFTER_MS } from "./cue-delivery.machine";
 import type { CueSource } from "../cues/engine";
 import type { Result } from "@purin-labs/kernel/result";
 import {
@@ -48,13 +49,6 @@ type CueDeliveryRow = {
 };
 
 const HOUR_MS = 60 * 60 * 1000;
-/**
- * A claim whose lease ended this long ago is abandoned: the queue's five
- * retries, 30 s apart, come well inside it. The alarm ends such a claim as a
- * failed delivery, so a message that went to the dead-letter queue leaves no
- * claim behind.
- */
-export const CUE_CLAIM_ABANDONED_AFTER_MS = 15 * 60 * 1000;
 const CUE_DELIVERY_COLUMNS = [
   "organisation_id",
   "cue_id",

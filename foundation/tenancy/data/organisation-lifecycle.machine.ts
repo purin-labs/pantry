@@ -1,5 +1,8 @@
 import type { MachineDefinition } from "@purin-labs/std/state-machine";
 
+/** How long an archived Organisation waits for its purge. */
+export const ARCHIVE_PURGE_DELAY_MS = 30 * 24 * 60 * 60 * 1_000;
+
 /**
  * The lifecycle of an Organisation (Refactor 15, refactor 5). The state is
  * `organisation_onboarding.lifecycle` in the Organisation's regional
@@ -48,7 +51,7 @@ export const ORGANISATION_LIFECYCLE_MACHINE = {
       exit: {
         kind: "due",
         reconciler: "archived_organisation",
-        afterMs: 30 * 24 * 60 * 60 * 1_000,
+        afterMs: ARCHIVE_PURGE_DELAY_MS,
       },
     },
     purging: {

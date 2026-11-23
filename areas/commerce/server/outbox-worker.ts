@@ -46,7 +46,7 @@ import {
 } from "./provider";
 import { recordPaidReceipts } from "./paid-receipt";
 import { assertNever } from "@purin-labs/std";
-import { CUE_CLAIM_ABANDONED_AFTER_MS } from "@purin-labs/agent/actors/cue-delivery";
+import { CUE_CLAIM_ABANDONED_AFTER_MS } from "@purin-labs/agent/actors/cue-delivery.machine";
 
 /**
  * A cue that the queue has not settled is sent again only after its claim can
