@@ -11,12 +11,6 @@
   "docs/architecture/integrations.md -> ../../workers/platform/src/shopify-connector.ts": 1,
   "docs/architecture/integrations.md -> ../../workers/platform/src/slack-stream.ts": 1,
   "docs/architecture/integrations.md -> ../../workers/platform/src/stored-attachment.ts": 1,
-  "docs/architecture/runtime.md -> ../../workers/platform/src/commerce-outbox-worker.ts": 1,
-  "docs/architecture/runtime.md -> ../../workers/platform/src/cue-engine.ts": 1,
-  "docs/architecture/runtime.md -> ../../workers/platform/src/cue-queue-consumer.ts": 1,
-  "docs/architecture/runtime.md -> ../../workers/platform/src/message-attachment-collection.ts": 1,
-  "docs/architecture/runtime.md -> ../../workers/platform/src/schedule-dispatch.ts": 1,
-  "docs/architecture/runtime.md -> ../../workers/platform/src/schedule-window.ts": 1,
   "docs/experiement-1.md -> ../workers/platform/src/actors/harness-tool-catalog.ts": 1,
   "docs/history/plan-33-merchant-configurable-production-checkout.md -> ../../scripts/punter/tests/shipping-scenario.test.ts": 1,
   "docs/history/plan-39-urk-merchant-agent-parity.md -> ../../workers/platform/src/data/urk-skills.ts": 1,
@@ -27,6 +21,5 @@
   "docs/history/plan-76-standalone-underclerk.md -> ../../services/underclerk/docs/spec.md": 1,
   "docs/history/plan-76A-shopify-parity.md -> ../../services/underclerk/docs/spec.md": 1,
   "docs/history/plan-77-underclerk-modular-core.md -> ../../services/underclerk/docs/spec.md": 1,
-  "docs/history/refactor-9.md -> ../plan-52-chat-projects-and-context.md": 1,
   "docs/integrations/shopify.md -> ../../workers/platform/src/shopify-connector.ts": 1
 }

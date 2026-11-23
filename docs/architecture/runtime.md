@@ -238,7 +238,7 @@ holds AES-GCM encrypted checkpoints
 `attachments/<organisation>/…` holds attachments by content digest and
 their derived objects. A provider filename never builds a key. The cron
 collector
-([`message-attachment-collection.ts`](../../workers/platform/src/message-attachment-collection.ts))
+([`attachment-collection.ts`](../../foundation/conversation/messages/attachment-collection.ts))
 asks every live Case and Session which objects they name, keeps those and
 recent uploads, and deletes the rest. It never deletes on a partial listing.
 
@@ -661,10 +661,10 @@ Stripe or Shopify webhook, or OrganisationActor.applyCommerceDelivery
 A commerce delivery writes its cues into `commerce_cue_outbox` with the
 projection. The Worker sends each to `CUE_Q` and marks it enqueued. The
 Commerce outbox reconciliation sends recoverable cues again
-([`commerce-outbox-worker.ts`](../../workers/platform/src/commerce-outbox-worker.ts)).
+([`outbox-worker.ts`](../../areas/commerce/server/outbox-worker.ts)).
 A `CueEvent` carries the Organisation, integration account, source, native
 identity, event type, payload and time
-([`cue-engine.ts`](../../workers/platform/src/cue-engine.ts)):
+([`cues/engine.ts`](../../foundation/agent/cues/engine.ts)):
 
 - `stripe`: `charge.failed`, `invoice.payment_failed`, `refund.failed`,
   `customer.subscription.deleted`;
@@ -680,7 +680,7 @@ type, a Slack scope (workspace, channel, thread key), a debounce time, a
 maximum count for each hour and a `propose` action with a template.
 `compileAndStoreCueSnapshot` writes the enabled rows as one versioned
 snapshot to `POLICY_KV` (`cue:<organisation>:latest`). Matching
-([`cue-queue-consumer.ts`](../../workers/platform/src/cue-queue-consumer.ts))
+([`cues/queue-consumer.ts`](../../foundation/agent/cues/queue-consumer.ts))
 reads only this snapshot and makes no model call. `entity_plane_changed`
 matches a saved commerce view through a Commerce membership read.
 
@@ -708,10 +708,10 @@ A cue cannot approve itself or widen an agent's authority.
 ### Schedules
 
 A `schedule_binding` sets an hourly, daily or weekly window in a time zone
-([`schedule-window.ts`](../../workers/platform/src/schedule-window.ts)).
+([`schedules/window.ts`](../../foundation/agent/schedules/window.ts)).
 The fifteen-minute cron claims each due window in D1, then sends one
 `agent_schedule.dispatch.v1` message to `EVENT_Q`
-([`schedule-dispatch.ts`](../../workers/platform/src/schedule-dispatch.ts)).
+([`schedules/dispatch.ts`](../../foundation/agent/schedules/dispatch.ts)).
 The claim fences double dispatch. A missed window is not filled in later.
 The consumer opens an unbound Case, so a scheduled run emits no provider
 output, and records a `schedule_dispatch_receipt`.

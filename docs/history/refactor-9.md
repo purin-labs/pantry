@@ -141,7 +141,7 @@ Create no parallel ChatProject implementation or generic project framework.
 ## Relationship to other plans
 
 - [Refactor 8](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/refactor-8.md) owns Organisation naming, Case context naming, and qualified bakery/harness task names.
-- [Plan 52](../plan-52-chat-projects-and-context.md) supplies project briefs, references, personal ordering, and inherited context.
+- [Plan 52](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-52-projects-and-context.md) supplies project briefs, references, personal ordering, and inherited context.
 - [Plan 54](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-54-chat-shared-projects.md) supplies shared membership, conversation access, directory separation, and lifecycle behavior.
 - [Plan 54B](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-54B-shared-project-ifc.md) supplies protected context admission and disclosure enforcement.
 - [Plan 27](plan-27-ifc.md) owns the information-flow model.
