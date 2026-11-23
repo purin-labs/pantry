@@ -27,6 +27,7 @@ import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorizatio
 import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import { requireUserId } from "../test-ids";
 import { verifyParallelAssignmentExecution } from "./case-execution-support";
+import { isRecord } from "@purin-labs/std";
 import { network } from "./network";
 import {
   CHANNEL_ID,
@@ -128,6 +129,19 @@ async function acceptsCommerceLab(context: TestContext): Promise<void> {
     organisationId: ORGANISATION_ID,
     labNamespace: NAMESPACE,
   });
+  // Each scenario sends its events once, so no run has a second proposal,
+  // in Slack or in a Case, and the projection received no event twice.
+  const verifiedRuns =
+    isRecord(verification) && Array.isArray(verification.runs)
+      ? verification.runs
+      : [];
+  expect(verifiedRuns).toHaveLength(COMMERCE_LAB_SCENARIO_IDS.length);
+  for (const run of verifiedRuns)
+    expect(run).toMatchObject({
+      result: "success",
+      duplicateEffectCount: 0,
+      duplicateDeliveryCount: 0,
+    });
   await expect.poll(slack.visibleMessageCount).toBe(5);
   const caseExecution = await readInventoryCaseExecution();
   Object.assign(context.task.meta, {

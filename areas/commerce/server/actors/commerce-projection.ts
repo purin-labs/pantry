@@ -328,7 +328,6 @@ export type CommerceLabRunVerification = {
     readonly actionId: string;
     readonly authorized: true;
   }[];
-  readonly unauthorizedEffectCount: 0;
   readonly failureStage: string | null;
   readonly failureCode: string | null;
   readonly failureProviderEventId: string | null;

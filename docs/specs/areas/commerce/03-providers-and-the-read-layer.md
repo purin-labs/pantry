@@ -240,8 +240,10 @@ Actions and health:
 - **Scenario** records a run in D1 and returns its events. The script signs and posts
   each event, and the queue applies it. The same idempotency key gives the same events.
 - **Verify** completes each run that has all its receipts, projections and expected
-  proposal cues. It reports the duplicate counts. `unauthorizedEffectCount` is always 0.
-  The queue does not apply an event of a run that is not `running`.
+  proposal cues. It reports the proposal effects beyond the one that a scenario expects,
+  in Slack and in a Case together (`duplicateEffectCount`), and the events that the
+  projection received again (`duplicateDeliveryCount`). The queue does not apply an
+  event of a run that is not `running`.
 
 | Scenario              | Result                                                                        |
 | --------------------- | ----------------------------------------------------------------------------- |

@@ -1324,18 +1324,22 @@ function mapRunVerification(
     approvalReceipts: run.approvalReceipts,
     interventionReceipts: run.interventionReceipts,
     providerEffectReceipts: run.providerEffectReceipts,
-    duplicateEffectCount: duplicateSlackEffectCount(
+    duplicateEffectCount: duplicateProposalCount(
       evidence?.expectedSlackEffect,
-      slackEffectReceipts,
+      [...slackEffectReceipts, ...caseEffectReceipts],
     ),
-    unauthorizedEffectCount: run.unauthorizedEffectCount,
+    duplicateDeliveryCount: run.duplicateCount,
     failure,
   };
 }
 
-function duplicateSlackEffectCount(
+/**
+ * The proposal effects of a run beyond the one that its scenario expects,
+ * in Slack and in a Case together.
+ */
+function duplicateProposalCount(
   expected: CommerceLabRunEvidence["expectedSlackEffect"] | undefined,
-  receipts: readonly ReturnType<typeof mapSlackReceipt>[],
+  receipts: readonly Readonly<{ effectId: string }>[],
 ): number {
   const expectedCount = expected?.kind === "proposal" ? 1 : 0;
   return Math.max(0, receipts.length - expectedCount);

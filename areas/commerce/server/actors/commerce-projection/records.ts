@@ -538,8 +538,6 @@ export function verifyCommerceLabRun(
     approvalReceipts,
     interventionReceipts,
     providerEffectReceipts,
-    // Provider receipts can only be built from ledger states reached after signed approval.
-    unauthorizedEffectCount: 0,
     failureStage: run.failureStage,
     failureCode: run.failureCode,
     failureProviderEventId: run.failureProviderEventId,
