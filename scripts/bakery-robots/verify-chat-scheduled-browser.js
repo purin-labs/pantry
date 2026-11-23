@@ -36,6 +36,11 @@ async function verifyScheduledChatParity(page) {
       effects: [],
       receipts: [],
       deadlines: [],
+      // When each effect was made, and the longest time in ms from there to
+      // the receipt of an effect that is no simulation. A slow machine gets
+      // more time to start an effect (see `enqueue`).
+      enqueuedAt: new Map(),
+      slowestReceiptMs: 0,
       writes: [],
       saveRequests: [],
       snapshots: new Map(),
@@ -59,6 +64,15 @@ async function verifyScheduledChatParity(page) {
         const receipt = JSON.parse(init.body).receipt;
         for (const pending of fixture.effects) {
           if (pending.effect.effectId !== receipt.effectId) continue;
+          const enqueuedAt = fixture.enqueuedAt.get(receipt.effectId);
+          if (
+            enqueuedAt !== undefined &&
+            pending.effect.command.kind !== "simulate_workcell"
+          )
+            fixture.slowestReceiptMs = Math.max(
+              fixture.slowestReceiptMs,
+              Date.now() - enqueuedAt,
+            );
           console.info(
             "[bakery-acceptance]",
             JSON.stringify({
@@ -118,12 +132,21 @@ async function verifyScheduledChatParity(page) {
         .context;
     }
     async function enqueue(command) {
+      // The deadline is a limit of this harness, not a product check: the
+      // page must start the effect before it. On the CI runner one frame of
+      // the Kitchen scene took up to 25 s, and an effect with 30 s expired
+      // before the page ran it (CI run 45096966722). So the deadline grows
+      // with the slowest receipt so far, and stays near 30 s on a fast
+      // machine, where a longer deadline only keeps the ledger full.
+      const slack = Math.min(120000, 4 * fixture.slowestReceiptMs);
       const context = await capture();
       const effect = await createBakerySurfaceEffect({
         effectId: `surface_effect_${crypto.randomUUID().replaceAll("-", "")}aaaaaaaa`,
         dispatchId: crypto.randomUUID(),
         deadlineAt:
-          Date.now() + (command.kind === "simulate_workcell" ? 150000 : 30000),
+          Date.now() +
+          slack +
+          (command.kind === "simulate_workcell" ? 150000 : 30000),
         command: {
           schemaVersion: 1,
           target: {
@@ -134,6 +157,7 @@ async function verifyScheduledChatParity(page) {
         },
       });
       fixture.effects.push({ effect });
+      fixture.enqueuedAt.set(effect.effectId, Date.now());
       fixture.deadlines.push(effect.deadlineAt);
       console.info(
         "[bakery-acceptance]",
