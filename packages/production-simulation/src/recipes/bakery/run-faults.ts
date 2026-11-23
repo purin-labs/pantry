@@ -61,6 +61,24 @@ export function hasFaults(faults: RunFaults): boolean {
   );
 }
 
+/**
+ * A baker's handling of one cold tray: staging before its robot chain and
+ * clearance after it. The schedule times these steps, and each production
+ * fingerprint records the same values.
+ */
+export const COLD_TRAY_HANDLING = Object.freeze({
+  stagingSeconds: 30,
+  clearanceSeconds: 15,
+  material: "cold-proxy",
+} as const);
+
+/** A baker's time to stage a cold tray, or to clear it after its chain. */
+export function coldTrayHandlingSeconds(phase: "stage" | "clear"): number {
+  return phase === "stage"
+    ? COLD_TRAY_HANDLING.stagingSeconds
+    : COLD_TRAY_HANDLING.clearanceSeconds;
+}
+
 export function handlingTaskId(
   batchId: string,
   tray: number,

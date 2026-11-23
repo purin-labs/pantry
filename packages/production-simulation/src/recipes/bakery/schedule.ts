@@ -34,6 +34,7 @@ import {
 import {
   NO_FAULTS,
   absentBaker,
+  coldTrayHandlingSeconds,
   handlingTaskId,
   outageResourceName,
   recoveryFor,
@@ -1492,9 +1493,7 @@ export function* simulateSteps(
             ? HUMAN_CELL_TRANSFER.pickupSeconds +
               HUMAN_CELL_TRANSFER.carrySeconds +
               HUMAN_CELL_TRANSFER.placementSeconds
-            : step.phase === "stage"
-              ? 30
-              : 15;
+            : coldTrayHandlingSeconds(step.phase);
         const end = arrival + duration;
         const failure = input.faults.failure;
         const failedAt =

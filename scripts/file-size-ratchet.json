@@ -11,7 +11,7 @@
     "packages/bakery-model/src/bakery-surface.ts": 4991,
     "packages/commerce-contracts/src/records/commerce-records.ts": 3253,
     "packages/production-simulation/src/recipes/bakery/appliance-execution.ts": 3819,
-    "packages/production-simulation/src/recipes/bakery/schedule.ts": 4510,
+    "packages/production-simulation/src/recipes/bakery/schedule.ts": 4509,
     "scripts/plan-50/evaluate-pi-durable.mjs": 5289,
     "surfaces/portal/ui/features/chat/route.tsx": 4241,
     "surfaces/portal/ui/styles.css": 10212

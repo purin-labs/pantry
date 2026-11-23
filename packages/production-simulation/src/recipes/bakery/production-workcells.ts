@@ -47,6 +47,7 @@ import {
 } from "./native-continuation.ts";
 import { physicsDuration } from "./physics-playback.ts";
 import {
+  COLD_TRAY_HANDLING,
   NO_FAULTS,
   faultProblem,
   handlingTaskId,
@@ -333,11 +334,7 @@ export async function compileProductionWorkcells(
       operations: operations.map(executionIdentity),
       manualTasks,
       procedureFingerprint: workflow.procedureFingerprint,
-      handling: {
-        stagingSeconds: 30,
-        clearanceSeconds: 15,
-        material: "cold-proxy",
-      },
+      handling: COLD_TRAY_HANDLING,
     }),
   );
   const bound: ProductionWorkcell[] = [];
@@ -631,11 +628,7 @@ function rehearsalFingerprintSource(
     operations: operations.map(rehearsalOperationIdentity),
     planned: planned.map(plannedOperationIdentity),
     ...(hasFaults(faults) ? { faults } : {}),
-    handling: {
-      stagingSeconds: 30,
-      clearanceSeconds: 15,
-      material: "cold-proxy",
-    },
+    handling: COLD_TRAY_HANDLING,
   };
 }
 function rehearsalOperationIdentity(operation: ProductionWorkcell) {
@@ -1416,11 +1409,7 @@ function productionRunFingerprintSource(
     operations: operations.map(boundOperationIdentity),
     manualTasks,
     procedureFingerprint,
-    handling: {
-      stagingSeconds: 30,
-      clearanceSeconds: 15,
-      material: "cold-proxy",
-    },
+    handling: COLD_TRAY_HANDLING,
   };
 }
 
