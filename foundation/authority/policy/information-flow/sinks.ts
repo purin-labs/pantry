@@ -134,7 +134,6 @@ export function evaluateFlowLabelSink(input: FlowSinkCheck): FlowLabelDecision {
     return {
       kind: "deny",
       reason: audienceNotPermittedReason(),
-      violationAction: "deny",
     };
   }
   const audiences =
@@ -154,7 +153,6 @@ export function evaluateFlowLabelSink(input: FlowSinkCheck): FlowLabelDecision {
     return {
       kind: "deny",
       reason: audienceNotPermittedReason(),
-      violationAction: "deny",
     };
   }
   // A model call keeps its own reader rule. Each other sink is an exit, and
@@ -167,7 +165,6 @@ export function evaluateFlowLabelSink(input: FlowSinkCheck): FlowLabelDecision {
       return {
         kind: "deny",
         reason: audienceNotPermittedReason(),
-        violationAction: "deny",
       };
     return { kind: "allow" };
   }
@@ -179,7 +176,6 @@ export function evaluateFlowLabelSink(input: FlowSinkCheck): FlowLabelDecision {
     return {
       kind: "deny",
       reason: audienceNotPermittedReason(),
-      violationAction: "deny",
     };
   const rules = decideOrganisationToolEffect(input.organisationAuthz, sink);
   if (rules.kind !== "allow") return rules;
@@ -248,7 +244,6 @@ export async function decideFlowSink(
         flowBindingDigest,
         decisionDigest,
         reason: evaluated.reason,
-        violationAction: evaluated.violationAction,
       };
   }
 }
@@ -301,7 +296,6 @@ function decideExit(
             ruleId: null,
             reasonCode: "aifc.other_recipient",
           },
-          violationAction: "deny",
         };
       continue;
     }
@@ -462,7 +456,6 @@ function denied(): FlowLabelDecision {
   return {
     kind: "deny",
     reason: audienceNotPermittedReason(),
-    violationAction: "deny",
   };
 }
 

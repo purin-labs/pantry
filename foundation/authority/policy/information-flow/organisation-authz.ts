@@ -79,7 +79,6 @@ export function decideOrganisationToolEffect(
     return {
       kind: "deny",
       reason: toolRuleReason("deny", sink.capabilityId),
-      violationAction: "deny",
     };
   if (authz.approvalRequired.has(sink.capabilityId) && !sink.approvalSatisfied)
     return {

@@ -1,4 +1,4 @@
-import type { RequestAuthority, ViolationAction } from "@purin-labs/contracts";
+import type { RequestAuthority } from "@purin-labs/contracts";
 
 import type { ContextVisibility } from "../../authorization/access-grants/types";
 import type { Variant } from "@purin-labs/type-utils";
@@ -293,7 +293,6 @@ export type FlowDecision =
       readonly flowBindingDigest: string;
       readonly decisionDigest: string;
       readonly reason: FlowDecisionReason;
-      readonly violationAction: ViolationAction;
     }>;
 
 export type FlowLabelDecision =
@@ -305,7 +304,6 @@ export type FlowLabelDecision =
   | Readonly<{
       readonly kind: "deny";
       readonly reason: FlowDecisionReason;
-      readonly violationAction: ViolationAction;
     }>;
 
 export type FlowLabelError =

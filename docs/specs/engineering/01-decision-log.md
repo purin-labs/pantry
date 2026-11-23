@@ -172,7 +172,7 @@ reason. A later note in the same entry describes the code today.
   restrict. Natural-language rules and LLM evaluation of actions stay rejected. The
   output screen is built for Slack: it holds emails, card numbers, credentials and
   internal model markers. In a Slack direct message, it holds only the markers.
-  `ViolationAction` has four values, and the code uses only `deny`. Suspicion
+  A flow denial only refuses: it has no halt, escalation or coaching action. Suspicion
   escalation and redaction at rest are not built.
 - **AD-033, revised 2026-08-05, Holds: approval is provider-neutral.**
   Pantry owns the identity, the role, the challenge and the receipt. An authentication

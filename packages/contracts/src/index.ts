@@ -151,7 +151,6 @@ export type { InstallModel } from "./types/InstallModel";
 export type { SurfaceRef } from "./types/SurfaceRef";
 export type { OrganisationOnboardingLifecycle } from "./types/OrganisationOnboardingLifecycle";
 export type { Track } from "./types/Track";
-export type { ViolationAction } from "./types/ViolationAction";
 export type { IdempotencyKey } from "./types/IdempotencyKey";
 export type { Sha256Digest } from "./types/Sha256Digest";
 export type { WorkspaceId } from "./types/WorkspaceId";
