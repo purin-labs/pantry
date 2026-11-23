@@ -1,0 +1,139 @@
+{
+  "about": "Refactor 17, Stage B, decision D1: the files of the surface slack join one workspace package @purin-labs/surface-slack in surfaces/slack. scripts/refactor-17/move-module.mjs reads this plan. files: each source file that scripts/layers.json gives the module, with its place in the target folder: a Worker file goes to server/ with its sub-path below services/platform/src/, less its first folder when that folder is slack/ (the longer line of sourcePrefixes gives this rule, one time for each file, and no two files then share a place: slack/events.ts is server/events.ts and slack-ingress/events.ts is server/slack-ingress/events.ts). The entry of the Slack ingress Worker, slack-ingress/worker.ts, belongs to workers/platform and stays (the preparation commit \"Refactor 17: the entry of the Slack ingress Worker goes to workers/platform\"). sourcePrefixes: where --sync-plan puts a file that the module gets later. package: the manifest and the tsconfig of the new package; the versions of devDependencies come from the Worker manifest. The exports map gives each .ts file of server/ as an entry. The tsconfig of the package reads server/ only. The Worker tsconfigs include surfaces/*/server, so each file stays in the program that checked it before the move. edits: text edits of the files that name a source folder and cannot read scripts/lib/source-roots.mjs; an edit is done when the file holds its replace text. keepForm: each file where an import stays on its line, because the wrap of Prettier would move a ratchet, with its reason. regenerate: the commands that write a generated file again. slack-ingress/events.ts, slack-ingress/install.ts and gateway-routing/slack.ts import files of the surface webhooks, which moves later: the imports keep a relative path until the webhooks move names them by its package. package.typeCheck false: the package has no check:types script of its own. Its own files read the Env keys CASE, CONNECTOR, ORGANISATION and SESSION, which the Actor files of the Worker (services/platform/src/actors/case.ts, connector.ts, organisation.ts and agent-session.ts, workers/platform) merge with declare module of @purin-labs/kernel/env. Through the foundation packages that it imports the program also lacks CODE_MODE_SANDBOX, EVENT_Q and MESSAGE_LINK_FETCH. The package alone gives 239 errors, 58 of them in its own files. The Worker program checks each file of server/.",
+  "module": "surfaces/slack",
+  "target": "surfaces/slack",
+  "workspaceEntry": "surfaces/*",
+  "sourcePrefixes": {
+    "services/platform/src/slack/": "server/",
+    "services/platform/src/": "server/"
+  },
+  "files": {
+    "services/platform/src/actors/connector-side-case.ts": "server/actors/connector-side-case.ts",
+    "services/platform/src/actors/connector-slack-case-work.ts": "server/actors/connector-slack-case-work.ts",
+    "services/platform/src/actors/connector-slack-ingress.ts": "server/actors/connector-slack-ingress.ts",
+    "services/platform/src/actors/connector-slack-stream.ts": "server/actors/connector-slack-stream.ts",
+    "services/platform/src/actors/connector/slack-channel.ts": "server/actors/connector/slack-channel.ts",
+    "services/platform/src/actors/connector/slack-delivery.ts": "server/actors/connector/slack-delivery.ts",
+    "services/platform/src/actors/whatsapp-operator-notice.ts": "server/actors/whatsapp-operator-notice.ts",
+    "services/platform/src/agent-tools/slack/handlers.ts": "server/agent-tools/slack/handlers.ts",
+    "services/platform/src/agent-tools/slack/side-case-proposal.ts": "server/agent-tools/slack/side-case-proposal.ts",
+    "services/platform/src/agent-tools/slack/slack.ts": "server/agent-tools/slack/slack.ts",
+    "services/platform/src/agent-tools/slack/turn-services.ts": "server/agent-tools/slack/turn-services.ts",
+    "services/platform/src/control/routes/chat-slack-messages.ts": "server/control/routes/chat-slack-messages.ts",
+    "services/platform/src/control/routes/slack-reasoning-effort.ts": "server/control/routes/slack-reasoning-effort.ts",
+    "services/platform/src/data/identity-link.ts": "server/data/identity-link.ts",
+    "services/platform/src/data/slack-message-proposal.ts": "server/data/slack-message-proposal.ts",
+    "services/platform/src/gateway-routing/slack.ts": "server/gateway-routing/slack.ts",
+    "services/platform/src/slack-ingress/events.ts": "server/slack-ingress/events.ts",
+    "services/platform/src/slack-ingress/handler.ts": "server/slack-ingress/handler.ts",
+    "services/platform/src/slack-ingress/install.ts": "server/slack-ingress/install.ts",
+    "services/platform/src/slack/attachments.ts": "server/attachments.ts",
+    "services/platform/src/slack/bake-proposal-announce.ts": "server/bake-proposal-announce.ts",
+    "services/platform/src/slack/bake-proposal-card.ts": "server/bake-proposal-card.ts",
+    "services/platform/src/slack/bake-proposal-decision.ts": "server/bake-proposal-decision.ts",
+    "services/platform/src/slack/bake-run-announce.ts": "server/bake-run-announce.ts",
+    "services/platform/src/slack/bake-run-card.ts": "server/bake-run-card.ts",
+    "services/platform/src/slack/budget-notice.ts": "server/budget-notice.ts",
+    "services/platform/src/slack/card-delivery-ids.ts": "server/card-delivery-ids.ts",
+    "services/platform/src/slack/case-command-message.ts": "server/case-command-message.ts",
+    "services/platform/src/slack/case-command.ts": "server/case-command.ts",
+    "services/platform/src/slack/case-processing.ts": "server/case-processing.ts",
+    "services/platform/src/slack/case-routing.ts": "server/case-routing.ts",
+    "services/platform/src/slack/commerce-approval-card.ts": "server/commerce-approval-card.ts",
+    "services/platform/src/slack/commerce-approval.ts": "server/commerce-approval.ts",
+    "services/platform/src/slack/configuration-presentation.ts": "server/configuration-presentation.ts",
+    "services/platform/src/slack/configuration-reply.ts": "server/configuration-reply.ts",
+    "services/platform/src/slack/connector-ingress.ts": "server/connector-ingress.ts",
+    "services/platform/src/slack/conversation-facts.ts": "server/conversation-facts.ts",
+    "services/platform/src/slack/decision-card.ts": "server/decision-card.ts",
+    "services/platform/src/slack/device-alert-card.ts": "server/device-alert-card.ts",
+    "services/platform/src/slack/email-review-notice.ts": "server/email-review-notice.ts",
+    "services/platform/src/slack/events.ts": "server/events.ts",
+    "services/platform/src/slack/held-output-notice.ts": "server/held-output-notice.ts",
+    "services/platform/src/slack/held-output-release.ts": "server/held-output-release.ts",
+    "services/platform/src/slack/ingress-admission.ts": "server/ingress-admission.ts",
+    "services/platform/src/slack/install-organisation.ts": "server/install-organisation.ts",
+    "services/platform/src/slack/interaction-reply.ts": "server/interaction-reply.ts",
+    "services/platform/src/slack/interactions.ts": "server/interactions.ts",
+    "services/platform/src/slack/messages.ts": "server/messages.ts",
+    "services/platform/src/slack/notice-card.ts": "server/notice-card.ts",
+    "services/platform/src/slack/organisation-routing.ts": "server/organisation-routing.ts",
+    "services/platform/src/slack/permission-request-deny.ts": "server/permission-request-deny.ts",
+    "services/platform/src/slack/permission-request-notice.ts": "server/permission-request-notice.ts",
+    "services/platform/src/slack/permission-request-release.ts": "server/permission-request-release.ts",
+    "services/platform/src/slack/portal-links.ts": "server/portal-links.ts",
+    "services/platform/src/slack/side-case-posts.ts": "server/side-case-posts.ts",
+    "services/platform/src/slack/side-cases.ts": "server/side-cases.ts",
+    "services/platform/src/slack/signature.ts": "server/signature.ts",
+    "services/platform/src/slack/stop-command.ts": "server/stop-command.ts",
+    "services/platform/src/slack/stream.ts": "server/stream.ts",
+    "services/platform/src/slack/supplier-payout-cards.ts": "server/supplier-payout-cards.ts",
+    "services/platform/src/slack/supplier-payout-command.ts": "server/supplier-payout-command.ts",
+    "services/platform/src/slack/supplier-payout-reply.ts": "server/supplier-payout-reply.ts",
+    "services/platform/src/slack/user-message.ts": "server/user-message.ts"
+  },
+  "package": {
+    "name": "@purin-labs/surface-slack",
+    "exports": {
+      "./server/*": {
+        "types": "./server/*.ts",
+        "default": "./server/*.ts"
+      }
+    },
+    "dependencies": {
+      "@purin-labs/actor-runtime": "workspace:*",
+      "@purin-labs/agent": "workspace:*",
+      "@purin-labs/agent-tools": "workspace:*",
+      "@purin-labs/area-brain": "workspace:*",
+      "@purin-labs/area-commerce": "workspace:*",
+      "@purin-labs/area-devices": "workspace:*",
+      "@purin-labs/area-inbox": "workspace:*",
+      "@purin-labs/area-integrations": "workspace:*",
+      "@purin-labs/area-kitchen": "workspace:*",
+      "@purin-labs/area-organisation": "workspace:*",
+      "@purin-labs/authority": "workspace:*",
+      "@purin-labs/connections": "workspace:*",
+      "@purin-labs/contracts": "workspace:*",
+      "@purin-labs/control": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/conversation": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/kitchen-control-api": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/tool-handlers": "workspace:*",
+      "@purin-labs/type-utils": "workspace:*"
+    },
+    "devDependencies": ["@cloudflare/workers-types", "tsrs"],
+    "versionsFrom": "services/platform/package.json",
+    "tsconfig": {
+      "extends": "../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": ["ESNext"],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": ["@cloudflare/workers-types"],
+        "allowImportingTsExtensions": true
+      },
+      "include": ["server/**/*.ts"]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Worker files of the package",
+      "find": "PLATFORM_SOURCE.push(\"areas/integrations/shopify\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"areas/integrations/shopify\");\n// The Worker side of the surface slack (Refactor 17, Stage B).\nPLATFORM_SOURCE.push(\"surfaces/slack/server\");\n"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": ["node", "scripts/check-layers.mjs", "--areas", "--write"],
+      "writes": ["docs/layers.md"]
+    }
+  ]
+}
