@@ -300,9 +300,7 @@ function settleTransaction(
         value: {
           inputTokens: input.result.value.usage.inputTokens,
           outputTokens: input.result.value.usage.outputTokens,
-          estimatedCostMicrousd: Math.ceil(
-            input.result.value.usage.costUsd * 1_000_000,
-          ),
+          estimatedCostMicrousd: input.result.value.usage.costMicrousd,
         },
       }
     : input.result;

@@ -243,9 +243,7 @@ function commitScreenRelevanceCheck(
           value: {
             inputTokens: input.evaluated.value.usage.inputTokens,
             outputTokens: input.evaluated.value.usage.outputTokens,
-            estimatedCostMicrousd: Math.ceil(
-              input.evaluated.value.usage.costUsd * 1_000_000,
-            ),
+            estimatedCostMicrousd: input.evaluated.value.usage.costMicrousd,
           },
         }
       : input.evaluated,

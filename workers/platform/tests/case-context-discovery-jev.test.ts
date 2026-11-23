@@ -91,7 +91,7 @@ async function directTypeSafe(): Promise<void> {
   });
   expect(result).toMatchObject({
     ok: true,
-    value: { model: "jev-1.13.0", usage: { costUsd: 0.000042 } },
+    value: { model: "jev-1.13.0", usage: { costMicrousd: 42 } },
   });
   const [url, init] = fetcher.mock.calls[0]!;
   expect(url).toBe("https://api.typesafe.ai/v1/systemone");

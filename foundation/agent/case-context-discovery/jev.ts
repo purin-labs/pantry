@@ -1,5 +1,8 @@
 import type { Result } from "@purin-labs/kernel/result";
-import type { JevError } from "../integrations/typesafe/system-one-client";
+import {
+  jevInputCostMicrousd,
+  type JevError,
+} from "../integrations/typesafe/system-one-client";
 import {
   TypeSafeDisclosure,
   type TypeSafeDisclosureDenied,
@@ -32,7 +35,7 @@ export type JevEvaluation = Readonly<{
   usage: Readonly<{
     inputTokens: number;
     outputTokens: number;
-    costUsd: number;
+    costMicrousd: number;
   }>;
 }>;
 
@@ -201,14 +204,8 @@ function parseEvaluation(
     Object.keys(raw.answers).length !== candidates.length
   )
     return failure("jev_response_invalid");
-  // TypeSafe bills pinned Jev 1.13 input at $0.042/M tokens; output is free.
-  const costUsd = (raw.usage.input_tokens * 0.042) / 1_000_000;
-  if (
-    typeof costUsd !== "number" ||
-    !Number.isFinite(costUsd) ||
-    costUsd < 0 ||
-    costUsd > Number.MAX_SAFE_INTEGER / 1_000_000
-  )
+  const costMicrousd = jevInputCostMicrousd(raw.usage.input_tokens);
+  if (!Number.isSafeInteger(costMicrousd))
     return failure("jev_response_invalid");
   const decisions: JevRelationshipDecision[] = [];
   for (const [index, candidate] of candidates.entries()) {
@@ -244,7 +241,7 @@ function parseEvaluation(
       usage: {
         inputTokens: raw.usage.input_tokens,
         outputTokens: raw.usage.output_tokens,
-        costUsd,
+        costMicrousd,
       },
     },
   };

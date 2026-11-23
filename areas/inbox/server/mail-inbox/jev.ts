@@ -8,7 +8,10 @@ import {
 import type { TypeSafeInferenceSink } from "@purin-labs/authority/policy/information-flow/types";
 import type { FlowLabel } from "@purin-labs/authority/policy/information-flow/labels";
 import type { TypeSafeCredential } from "@purin-labs/agent/integrations/typesafe/credential";
-import type { JevError } from "@purin-labs/agent/integrations/typesafe/system-one-client";
+import {
+  jevInputCostMicrousd,
+  type JevError,
+} from "@purin-labs/agent/integrations/typesafe/system-one-client";
 import type { Result } from "@purin-labs/kernel/result";
 import type { TypeSafeUsageMeasurement } from "@purin-labs/agent/integrations/typesafe/evaluation-ledger";
 
@@ -100,7 +103,7 @@ export class JevMailRequest {
         return invalid();
       decisions.push({ ruleId: rule.ruleId, outcome: answer.choice });
     }
-    const cost = Math.ceil(raw.usage.input_tokens * 0.042);
+    const cost = jevInputCostMicrousd(raw.usage.input_tokens);
     if (!Number.isSafeInteger(cost)) return invalid();
     return {
       ok: true,

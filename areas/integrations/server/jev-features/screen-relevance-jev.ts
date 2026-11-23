@@ -7,7 +7,10 @@ import {
   type TypeSafeDisclosureDenied,
 } from "@purin-labs/agent/integrations/typesafe/disclosure";
 import type { TypeSafeCredential } from "@purin-labs/agent/integrations/typesafe/credential";
-import type { JevError } from "@purin-labs/agent/integrations/typesafe/system-one-client";
+import {
+  jevInputCostMicrousd,
+  type JevError,
+} from "@purin-labs/agent/integrations/typesafe/system-one-client";
 
 export const SCREEN_RELEVANCE_JEV_MODEL = "jev-1.13.0";
 /** The most that one check sends: the draft, the last answer and the titles. */
@@ -36,7 +39,7 @@ type ScreenRelevanceScores = Readonly<{
   usage: Readonly<{
     inputTokens: number;
     outputTokens: number;
-    costUsd: number;
+    costMicrousd: number;
   }>;
 }>;
 
@@ -145,8 +148,7 @@ function parseScores(raw: unknown): Result<ScreenRelevanceScores, JevError> {
       usage: {
         inputTokens: raw.usage.input_tokens,
         outputTokens: raw.usage.output_tokens,
-        // TypeSafe bills pinned Jev 1.13 input at $0.042/M tokens; output is free.
-        costUsd: (raw.usage.input_tokens * 0.042) / 1_000_000,
+        costMicrousd: jevInputCostMicrousd(raw.usage.input_tokens),
       },
     },
   };

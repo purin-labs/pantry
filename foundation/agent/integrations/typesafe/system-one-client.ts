@@ -6,6 +6,14 @@ const SYSTEM_ONE_URL = "https://api.typesafe.ai/v1/systemone";
 const MAX_RESPONSE_BYTES = 32_768;
 export const SYSTEM_ONE_MAX_REQUEST_BYTES = 24_576;
 
+/**
+ * What TypeSafe bills for one Jev call, in millionths of a dollar: the pinned
+ * Jev 1.13 input costs $0.042 for each million tokens, and output is free.
+ */
+export function jevInputCostMicrousd(inputTokens: number): number {
+  return Math.ceil(inputTokens * 0.042);
+}
+
 export type JevError = Readonly<{
   code:
     | "jev_credential_unavailable"
