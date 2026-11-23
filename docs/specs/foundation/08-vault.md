@@ -189,7 +189,9 @@ The sweep also counts failed rotations and the denials of the last 24 hours
   nothing before the choice.
 - Pantry stores the token as a `bearer` secret
   (`vault:onepassword_service_account:<id>`) and one `vault_store` row. This token is
-  the only 1Password secret in Purin Vault. A new connection revokes the old token.
+  the only 1Password secret in Purin Vault. A new connection revokes the old token in
+  the batch that writes the row, and only when the row now names the new token. If a
+  placement change refuses the row, Pantry revokes the new token and keeps the old one.
 - While 1Password is connected, each new item goes to 1Password. The list shows the
   1Password items first, then the Purin Vault items. A command goes to the store that
   holds the item: a Purin Vault id has 32 hex digits, a 1Password id has 26 characters.

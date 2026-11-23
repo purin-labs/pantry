@@ -37,7 +37,10 @@ import {
   resolveVaultHandle,
   storeOrganisationPlacementVaultSecret,
 } from "./service";
-import { prepareVaultSecretRevocation } from "./secret-revocation";
+import {
+  prepareGuardedVaultSecretRevocation,
+  prepareVaultSecretRevocation,
+} from "./secret-revocation";
 
 /**
  * The Vault's stores (Plan 79). An Organisation keeps its items in Pantry
@@ -309,14 +312,30 @@ export async function connectOnePassword(
         input.now,
         ...placement.bindings,
       ),
+    // The previous token stops only when the row names the new one: a
+    // placement change that refused the row write keeps the previous token.
     ...(previous === null
       ? []
-      : [revokeStatement(input, previous.tokenHandle)]),
+      : [
+          prepareGuardedVaultSecretRevocation(db, {
+            organisationId: input.scope.organisationId,
+            handle: previous.tokenHandle,
+            now: input.now,
+            guard: {
+              sql: `EXISTS (SELECT 1 FROM vault_store
+                WHERE organisation_id = ? AND token_handle = ?)`,
+              bindings: [input.scope.organisationId, handle.value],
+            },
+          }),
+        ]),
   ]);
   listCache.delete(input.scope.organisationId);
   const store = await readOnePasswordStore(input.scope);
-  if (store === null || store.tokenHandle !== handle.value)
+  if (store === null || store.tokenHandle !== handle.value) {
+    // No row names the new token, so it has no owner: revoke it.
+    await db.batch([revokeStatement(input, handle.value)]);
     return unavailable();
+  }
   await recordVaultEvent(input, "store_connected", null, "onepassword");
   return { ok: true, value: { kind: "store", store: storeView(store, true) } };
 }
