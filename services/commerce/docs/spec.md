@@ -1408,7 +1408,6 @@ so a recipe edit does not change an existing menu or production request.
 | Tax adapter                            | Shopify Tax                   | Planned; needs its own plan | none yet        |
 | Fulfillment orders and stock transfers | Fulfillment orders, transfers | Planned; needs its own plan | none yet        |
 | Bundles                                | Bundles                       | Planned; needs its own plan | none yet        |
-| Staff accounts                         | Staff and permissions         | Planned                     | Plan 76 phase 2 |
 | Shopify import tool                    | none                          | Planned; a separate plan    | none yet        |
 
 ## 23. Non-goals
