@@ -635,26 +635,17 @@ export async function readOrganisationLotInvoiceCosts(
   db: OrganisationDatabase,
   organisationId: string,
 ): Promise<ReadonlyMap<string, SupplyLotInvoiceCost>> {
-  let rows: D1Result<LotInvoiceCostRow>;
-  try {
-    rows = await db
-      .prepare(
-        `SELECT lot_id, inventory_item_id, revision, currency,
-                invoiced_quantity, invoiced_unit, invoice_total_minor,
-                invoice_reference, supplier_id
-           FROM bakery_lot_invoice_cost
-          WHERE organisation_id = ?1
-          ORDER BY lot_id ASC`,
-      )
-      .bind(organisationId)
-      .all<LotInvoiceCostRow>();
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (msg.includes("bakery_lot_invoice_cost")) {
-      return new Map();
-    }
-    throw error;
-  }
+  const rows = await db
+    .prepare(
+      `SELECT lot_id, inventory_item_id, revision, currency,
+              invoiced_quantity, invoiced_unit, invoice_total_minor,
+              invoice_reference, supplier_id
+         FROM bakery_lot_invoice_cost
+        WHERE organisation_id = ?1
+        ORDER BY lot_id ASC`,
+    )
+    .bind(organisationId)
+    .all<LotInvoiceCostRow>();
 
   const out = new Map<string, SupplyLotInvoiceCost>();
   for (const row of rows.results ?? []) {
@@ -671,29 +662,20 @@ export async function readReplenishmentSupplierPayables(
   organisationId: string,
   merchantId: string,
 ): Promise<ReadonlyMap<string, ReplenishmentPayableSummary>> {
-  let rows: D1Result<SupplierPayableRow>;
-  try {
-    rows = await db
-      .prepare(
-        `SELECT payable_id, supplier_id, purchase_request_id,
-                currency, gross_amount_minor, settled_minor, lifecycle,
-                revision, updated_at
-           FROM supplier_payable
-          WHERE organisation_id = ?1
-            AND merchant_id = ?2
-            AND purchase_request_id IS NOT NULL
-            AND lifecycle != 'void'
-          ORDER BY updated_at DESC, payable_id ASC`,
-      )
-      .bind(organisationId, merchantId)
-      .all<SupplierPayableRow>();
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (msg.includes("supplier_payable")) {
-      return new Map();
-    }
-    throw error;
-  }
+  const rows = await db
+    .prepare(
+      `SELECT payable_id, supplier_id, purchase_request_id,
+              currency, gross_amount_minor, settled_minor, lifecycle,
+              revision, updated_at
+         FROM supplier_payable
+        WHERE organisation_id = ?1
+          AND merchant_id = ?2
+          AND purchase_request_id IS NOT NULL
+          AND lifecycle != 'void'
+        ORDER BY updated_at DESC, payable_id ASC`,
+    )
+    .bind(organisationId, merchantId)
+    .all<SupplierPayableRow>();
 
   const out = new Map<string, ReplenishmentPayableSummary>();
   for (const row of rows.results ?? []) {
@@ -757,7 +739,6 @@ export async function saveOrganisationLotInvoiceCost(
     }
   }
 
-  await ensureLotInvoiceCostTable(input.db);
   const existingRow = await input.db
     .prepare(
       `SELECT lot_id, inventory_item_id, revision, currency,
@@ -904,30 +885,6 @@ export async function saveOrganisationLotInvoiceCost(
       supplierId: write.supplierId,
     },
   };
-}
-
-async function ensureLotInvoiceCostTable(
-  db: OrganisationDatabase,
-): Promise<void> {
-  await db
-    .prepare(
-      `CREATE TABLE IF NOT EXISTS bakery_lot_invoice_cost (
-         organisation_id TEXT NOT NULL,
-         lot_id TEXT NOT NULL,
-         inventory_item_id TEXT NOT NULL,
-         revision INTEGER NOT NULL CHECK (revision >= 1),
-         currency TEXT NOT NULL,
-         invoiced_quantity REAL NOT NULL CHECK (invoiced_quantity > 0),
-         invoiced_unit TEXT NOT NULL CHECK (invoiced_unit IN ('each', 'gram', 'kilogram', 'milliliter', 'liter')),
-         invoice_total_minor INTEGER NOT NULL CHECK (invoice_total_minor >= 0),
-         invoice_reference TEXT,
-         supplier_id TEXT,
-         updated_by TEXT NOT NULL,
-         updated_at INTEGER NOT NULL,
-         PRIMARY KEY (organisation_id, lot_id)
-       )`,
-    )
-    .run();
 }
 
 function decodeLotInvoiceCostRow(
