@@ -95,7 +95,16 @@ The Integrations page, the access pages and the commerce pages show Shopify as a
 choice. Remove the entry from `areas/integrations/ui/integration-catalogue.ts` first; the
 type check then shows the pages that still handle it.
 
-## 8. The map and the lints
+## 8. The package, the map and the lints
+
+This folder is a part of the package `@purin-labs/area-integrations` (Refactor 17,
+Stage B). Remove its lines outside the folder:
+
+- the export entry `./shopify/*` in `areas/integrations/package.json`;
+- the line `areas/integrations/shopify` of `PLATFORM_SOURCE` in
+  `scripts/lib/source-roots.mjs`;
+- the line `../../areas/integrations/shopify/**/*.ts` in `tsconfig.json`,
+  `tsconfig.tests.json` and `tsconfig.e2e.json` of `services/platform`.
 
 Remove the rule `areas/integrations/shopify/` and the pairs with `areas/shopify`
 from `scripts/layers.json` and `scripts/layers-ratchet.json`, then run
