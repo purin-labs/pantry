@@ -162,6 +162,7 @@ describe("message tools", function messageToolsSuite() {
   it("reads only a link the author actually wrote", async function refusesInventedLink() {
     const read = createMessageLinkTool({
       links: ["https://example.com/spec"],
+      recordObservation: noObservation,
       egress: {
         resolve: async function resolve(_hostname, _deadlineAtUnixMs) {
           return ["93.184.216.34"];
@@ -183,7 +184,10 @@ describe("message tools", function messageToolsSuite() {
   });
 
   it("refuses every read while no pinning egress exists", async function failsClosedWithoutEgress() {
-    const read = createMessageLinkTool({ links: ["https://example.com/spec"] });
+    const read = createMessageLinkTool({
+      links: ["https://example.com/spec"],
+      recordObservation: noObservation,
+    });
     const result = await read({ url: "https://example.com/spec" });
 
     expect(result).toEqual({
@@ -196,6 +200,7 @@ describe("message tools", function messageToolsSuite() {
     const pinned: string[] = [];
     const read = createMessageLinkTool({
       links: ["https://example.com/spec"],
+      recordObservation: noObservation,
       egress: {
         resolve: async function resolve(_hostname, _deadlineAtUnixMs) {
           return ["93.184.216.34"];
@@ -308,3 +313,5 @@ function attachmentFor(
     storedAt: 1_700_000_000,
   } as unknown as StoredMessageAttachment;
 }
+
+async function noObservation(): Promise<void> {}

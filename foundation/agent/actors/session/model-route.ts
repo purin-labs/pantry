@@ -1,9 +1,6 @@
 import { resolveClaudeAccessToken } from "../../models/claude-connection";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import type {
-  HarnessTurnLease,
-  StoredMessageAttachment,
-} from "@purin-labs/contracts";
+import type { HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type SessionId } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
@@ -12,7 +9,6 @@ import { modelProviderFetch } from "../../model-exit/provider-fetch";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   SessionExecutionAdmission,
-  requireSessionExecution,
   admittedSessionOperation,
 } from "../session-execution-admission";
 import { createWorkerMessageLinkEgress } from "../../messages/link-egress";
@@ -25,11 +21,6 @@ import {
 } from "../../models/codex-connection";
 import type { ChatGptSubscriptionApi } from "../embedded-harness";
 import { resolveOrganisationModelCredentialForRoute } from "@purin-labs/authority/credential-vault/index";
-import { admitSessionInformationFlowObservation } from "../agent-session-information-flow";
-import {
-  createCurrentSourceFlowLabel,
-  ObservationEvidence,
-} from "@purin-labs/authority/policy/index";
 import { assertNever, errorMessage } from "@purin-labs/std";
 import type { VariantBy } from "@purin-labs/type-utils";
 
@@ -299,70 +290,6 @@ async function resolveEmbeddedSessionModelApiKey(
  * The attachment's own digest is the content digest, so the observation names
  * the exact bytes that were read rather than a summary of them.
  */
-export async function recordMessageAttachmentObservation(
-  context: Readonly<{
-    execution: SessionExecutionAdmission;
-    storage: DurableObjectStorage;
-    lease: HarnessTurnLease;
-    caseId: string;
-  }>,
-  observed: Readonly<{ attachment: StoredMessageAttachment }>,
-): Promise<void> {
-  await requireSessionExecution(context.execution, context.lease);
-  const observedAt = Date.now();
-  // The attachment was admitted under this conversation's authority, so its
-  // label is that ingress label — not a broader one derived from the session.
-  const label = await createCurrentSourceFlowLabel({
-    kind: "ingress",
-    db: context.execution.scope.database,
-    authority: context.lease.requestAuthority,
-  });
-  if (!label.ok) {
-    throw new Error(
-      `Message attachment flow label is unavailable: ${label.error.code}`,
-    );
-  }
-  const inputLabel = label.value;
-  const evidence = await ObservationEvidence.create({
-    source: {
-      kind: "case_entry",
-      caseId: context.caseId,
-      entryId: String(observed.attachment.id),
-    },
-    sourceRevision: observedAt,
-    contentDigest: String(observed.attachment.sha256),
-    inputLabel,
-    observedAt,
-  });
-  if (!evidence.ok) {
-    throw new Error(
-      `Message attachment observation is invalid: ${evidence.error.code}`,
-    );
-  }
-  await requireSessionExecution(context.execution, context.lease);
-  const admitted = await admitSessionInformationFlowObservation({
-    authorizeCommit: requireSessionExecution.bind(
-      null,
-      context.execution,
-      context.lease,
-    ),
-    sql: context.storage.sql,
-    transactionSync: context.storage.transactionSync.bind(context.storage),
-    organisationId: context.execution.scope.organisationId,
-    sessionId: context.lease.session.sessionId,
-    turnId: context.lease.turn.turnId,
-    authorityPartitionDigest: context.lease.authorityPartitionDigest,
-    inputLabel,
-    observation: evidence.value,
-    observedAt,
-  });
-  if (!admitted.ok) {
-    throw new Error(
-      `Message attachment information-flow commit failed: ${admitted.error.code}`,
-    );
-  }
-}
-
 export function admittedMessageLinkEgress(
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,

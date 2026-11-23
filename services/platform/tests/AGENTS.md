@@ -69,7 +69,10 @@ test and any fixture that exists only for the obsolete behavior.
   writer rule (Plan 89): a Portal request that read text of an outside person
   asks before an Airtable write, shows the exact record to the person who
   asked, refuses another member, writes one time after Allow, and asks again
-  for another record. Step 10 of `e2e/chat-agent-recipes-suppliers.test.ts`
+  for another record. `e2e/outside-written-link.test.ts` reads a fake public
+  page through the link read of a Slack thread: after the channel's Allow the
+  Airtable write asks again with the exact record, and a thread with no link
+  writes. Step 10 of `e2e/chat-agent-recipes-suppliers.test.ts`
   follows the rule in a Portal chat, in a later message of the chat that read
   the text. The supplier Memory journey of `e2e/mail-inbox.test.ts` covers
   the direct reply rule: a stranger's direct reply becomes a draft, and a

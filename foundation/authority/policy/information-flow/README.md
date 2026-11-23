@@ -80,7 +80,10 @@ data. Each `tool_effect` meets them, even with an empty label. Build a check wit
 
 A label can state a writer, `outside` (Plan 89): a source of the Session holds
 free text that a person outside the Organisation wrote. `source-labels.ts`
-names the read capabilities of such sources. A join keeps the writer, and only
+names the read capabilities of such sources. The link read of a public page
+records the page text with the message's ingress label and the writer `outside`
+(`recordMessageLinkObservation` in `agent/actors/session/message-observations.ts`),
+before the model reads it. A join keeps the writer, and only
 `acceptedByPersonFlowLabel` removes it, for a record that a person accepted.
 
 After the exit rule and the Organisation's rules, a tool effect of such a
@@ -204,5 +207,6 @@ prompt.
 
 Run `pnpm lint:ifc-boundaries`, the platform type checks and the affected journeys.
 `tests/e2e/slack-held-output.test.ts` and `slack-held-effect.test.ts` are the
-reference journeys, and `outside-written-effect.test.ts` for the writer rule. Change this guide when the kernel, a sink or a rule for every
+reference journeys, and `outside-written-effect.test.ts` and
+`outside-written-link.test.ts` for the writer rule. Change this guide when the kernel, a sink or a rule for every
 surface changes.

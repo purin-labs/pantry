@@ -55,7 +55,7 @@ type MessageLinkContent =
    */
   | { readonly kind: "binary" };
 
-type MessageLinkReceipt = {
+export type MessageLinkReceipt = {
   /** Scheme, host, and port only. Never the path, query, or fragment. */
   readonly requestedOrigin: string;
   readonly finalOrigin: string;

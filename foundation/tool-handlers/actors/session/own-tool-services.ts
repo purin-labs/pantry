@@ -16,10 +16,12 @@ import {
 } from "@purin-labs/agent/actors/message-tools";
 import { admittedSessionOperation } from "@purin-labs/agent/actors/session-execution-admission";
 import { readPreparedInspection } from "@purin-labs/agent/actors/session/attachments";
+import { admittedMessageLinkEgress } from "@purin-labs/agent/actors/session/model-route";
 import {
-  admittedMessageLinkEgress,
   recordMessageAttachmentObservation,
-} from "@purin-labs/agent/actors/session/model-route";
+  recordMessageLinkObservation,
+  type MessageObservationContext,
+} from "@purin-labs/agent/actors/session/message-observations";
 import type {
   OwnToolServicesSession,
   ToolTurnContext,
@@ -40,6 +42,12 @@ export function sessionOwnToolServices(
   session: OwnToolServicesSession,
 ): SessionOwnToolServices {
   const tool = withToolContext(turn);
+  const observed: MessageObservationContext = {
+    execution: turn.execution,
+    storage: turn.storage,
+    lease: turn.lease,
+    caseId: turn.assignment.caseId,
+  };
   return {
     files: {
       searchFiles: tool(searchFilesForEmbeddedHarness),
@@ -65,12 +73,10 @@ export function sessionOwnToolServices(
           turn.env.ARCHIVE,
           turn.lease,
         ),
-        recordObservation: recordMessageAttachmentObservation.bind(null, {
-          execution: turn.execution,
-          storage: turn.storage,
-          lease: turn.lease,
-          caseId: turn.assignment.caseId,
-        }),
+        recordObservation: recordMessageAttachmentObservation.bind(
+          null,
+          observed,
+        ),
       }),
       readMessageLink: admittedSessionOperation(
         turn.execution,
@@ -82,6 +88,7 @@ export function sessionOwnToolServices(
             turn.lease,
             turn.env,
           ),
+          recordObservation: recordMessageLinkObservation.bind(null, observed),
         }),
       ),
     },

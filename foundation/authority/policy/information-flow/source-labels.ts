@@ -6,7 +6,10 @@ import {
   type ProjectId,
   type UserId,
 } from "@purin-labs/control-api";
-import type { CapabilityDefinition, RequestAuthority } from "@purin-labs/contracts";
+import type {
+  CapabilityDefinition,
+  RequestAuthority,
+} from "@purin-labs/contracts";
 
 import {
   CAPABILITY_CATALOGUE,
@@ -792,8 +795,11 @@ function createFlowLabel(
  * The read capabilities whose result holds free text that a person outside
  * the Organisation wrote: an email, a customer's WhatsApp message (Plan 89).
  * The label of such a source states the writer `outside`. A typed fact of
- * Pantry's own records is not such a text. When a new read returns outside
- * text, add its capability here in the same change.
+ * Pantry's own records is not such a text. When a new read of a connected
+ * resource returns outside text, add its capability here in the same change.
+ * A read whose label does not come from a resource grant calls
+ * `outsideWrittenFlowLabel` itself: the link read of a public page
+ * (`recordMessageLinkObservation`) does so.
  */
 const OUTSIDE_WRITTEN_READ_CAPABILITIES: ReadonlySet<string> = new Set([
   CAPABILITY_KEYS.emailMailboxRead,
