@@ -1,0 +1,104 @@
+{
+  "about": "Refactor 17, Stage B, decision D1: the files of the surface whatsapp join one workspace package @purin-labs/surface-whatsapp in surfaces/whatsapp. scripts/refactor-17/move-module.mjs reads this plan. files: each source file that scripts/layers.json gives the module, with its place in the target folder: a Worker file goes to server/ with its sub-path below services/platform/src/, less its first folder when that folder is whatsapp/ (the longer line of sourcePrefixes gives this rule, one time for each file, and no two files then share a place). sourcePrefixes: where --sync-plan puts a file that the module gets later. package: the manifest and the tsconfig of the new package; the versions of devDependencies come from the Worker manifest. The exports map gives each .ts file of server/ as an entry. The tsconfig of the package reads server/ only. The Worker tsconfigs include surfaces/*/server (the preparation commit \"Type checks: the Worker and the Portal programs read the surface packages and the Shopify folder\"), so each file stays in the program that checked it before the move. edits: text edits of the files that name a root folder or a source folder and cannot read scripts/lib/source-roots.mjs; an edit is done when the file holds its replace text. The first surface package: the edits add the root folder surfaces to the source roots, the clone scan, knip and the IFC ESLint run. keepForm: each file where an import stays on its line, because the wrap of Prettier would move a ratchet, with its reason. regenerate: the commands that write a generated file again. connector-whatsapp-rpc.ts imports actors/whatsapp-operator-notice.ts of the surface slack, which moves later: the import keeps a relative path until the slack move names it by its package. package.typeCheck false: the package has no check:types script of its own. Its own file server/webhook-route.ts reads the Env key CONNECTOR, which services/platform/src/actors/connector.ts (workers/platform) merges with declare module of @purin-labs/kernel/env. Through the foundation packages that it imports the program also lacks CASE, CODE_MODE_SANDBOX, EVENT_Q, MESSAGE_LINK_FETCH, ORGANISATION and SESSION. The package alone gives 141 errors, 2 of them in its own files. The Worker program checks each file of server/.",
+  "module": "surfaces/whatsapp",
+  "target": "surfaces/whatsapp",
+  "workspaceEntry": "surfaces/*",
+  "sourcePrefixes": {
+    "services/platform/src/whatsapp/": "server/",
+    "services/platform/src/": "server/"
+  },
+  "files": {
+    "services/platform/src/actors/connector-whatsapp-proposal.ts": "server/actors/connector-whatsapp-proposal.ts",
+    "services/platform/src/actors/connector-whatsapp-rpc.ts": "server/actors/connector-whatsapp-rpc.ts",
+    "services/platform/src/actors/connector/connector-whatsapp-actor.ts": "server/actors/connector/connector-whatsapp-actor.ts",
+    "services/platform/src/actors/connector/whatsapp-parsers.ts": "server/actors/connector/whatsapp-parsers.ts",
+    "services/platform/src/whatsapp/control.ts": "server/control.ts",
+    "services/platform/src/whatsapp/credential.ts": "server/credential.ts",
+    "services/platform/src/whatsapp/webhook-route.ts": "server/webhook-route.ts",
+    "services/platform/src/whatsapp/webhook.ts": "server/webhook.ts"
+  },
+  "package": {
+    "name": "@purin-labs/surface-whatsapp",
+    "exports": {
+      "./server/*": {
+        "types": "./server/*.ts",
+        "default": "./server/*.ts"
+      }
+    },
+    "dependencies": {
+      "@purin-labs/actor-runtime": "workspace:*",
+      "@purin-labs/area-inbox": "workspace:*",
+      "@purin-labs/authority": "workspace:*",
+      "@purin-labs/connections": "workspace:*",
+      "@purin-labs/contracts": "workspace:*",
+      "@purin-labs/control": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/conversation": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/type-utils": "workspace:*"
+    },
+    "devDependencies": ["@cloudflare/workers-types", "tsrs"],
+    "versionsFrom": "services/platform/package.json",
+    "tsconfig": {
+      "extends": "../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": ["ESNext"],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": ["@cloudflare/workers-types"],
+        "allowImportingTsExtensions": true
+      },
+      "include": ["server/**/*.ts"]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints that walk the product source read the new root folder surfaces",
+      "find": "export const SOURCE_ROOTS = [\n  \"apps\",\n  \"areas\",\n  \"foundation\",\n  \"packages\",\n  \"services\",\n];",
+      "replace": "export const SOURCE_ROOTS = [\n  \"apps\",\n  \"areas\",\n  \"foundation\",\n  \"packages\",\n  \"services\",\n  \"surfaces\",\n];"
+    },
+    {
+      "file": ".jscpd.json",
+      "why": "the clone scan reads the new root folder surfaces",
+      "find": "\"path\": [\"apps\", \"areas\", \"foundation\", \"packages\", \"services\", \"crates\"]",
+      "replace": "\"path\": [\n    \"apps\",\n    \"areas\",\n    \"foundation\",\n    \"packages\",\n    \"services\",\n    \"surfaces\",\n    \"crates\"\n  ]"
+    },
+    {
+      "file": "knip.json",
+      "why": "knip reads each surface package and judges each of its exports (includeEntryExports), as it judged them in the Worker and the Portal: a surface package is a module of the Worker and the Portal, not an entry for others",
+      "find": "    \"areas/kitchen\": {\n",
+      "replace": "    \"surfaces/*\": {\n      \"entry\": [\n        \"server/**/*.fixtures.ts\",\n        \"server/**/*.type-fixtures.ts\",\n        \"ui/**/*.type-fixtures.ts\",\n        \"ui/**/*.typecheck.ts\"\n      ],\n      \"project\": [\"**/*.{ts,tsx}\"],\n      \"includeEntryExports\": true\n    },\n    \"areas/kitchen\": {\n"
+    },
+    {
+      "file": "knip.json",
+      "why": "knip does not judge the exports of a fixture file or a declaration file of a surface package, as for an area package: the Worker and the Portal workspaces did not judge them",
+      "find": "    \"areas/*/**/*.d.ts\": [\"exports\", \"types\"]\n  },",
+      "replace": "    \"areas/*/**/*.d.ts\": [\"exports\", \"types\"],\n    \"surfaces/*/**/*.fixtures.ts\": [\"exports\", \"types\"],\n    \"surfaces/*/**/*.type-fixtures.ts\": [\"exports\", \"types\"],\n    \"surfaces/*/**/*.typecheck.ts\": [\"exports\", \"types\"],\n    \"surfaces/*/**/*.d.ts\": [\"exports\", \"types\"]\n  },"
+    },
+    {
+      "file": "package.json",
+      "why": "ESLint reads the new root folder surfaces in pnpm lint:ifc-boundaries",
+      "find": "eslint services/platform/src foundation areas apps/portal/src",
+      "replace": "eslint services/platform/src foundation areas surfaces apps/portal/src"
+    },
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Worker files of the package",
+      "find": "PLATFORM_SOURCE.push(\"areas/kitchen/server\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"areas/kitchen/server\");\n// The Worker side of the surface whatsapp (Refactor 17, Stage B).\nPLATFORM_SOURCE.push(\"surfaces/whatsapp/server\");\n"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": ["node", "scripts/check-layers.mjs", "--areas", "--write"],
+      "writes": ["docs/layers.md"]
+    }
+  ]
+}
