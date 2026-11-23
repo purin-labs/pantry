@@ -59,7 +59,9 @@
   display: inline-flex;
   flex: none;
   align-items: center;
-  gap: 2.5px;
+  /* Whole pixels: the browser rounds each animated bar on its own, so a
+     half-pixel gap shows as 2 and 3 pixels in turn. */
+  gap: 3px;
   height: 26px;
   color: var(--pantry-accent);
 }
