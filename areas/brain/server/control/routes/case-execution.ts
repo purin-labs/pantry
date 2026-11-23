@@ -166,7 +166,8 @@ export async function handleCaseExecutionRoute(
       }
       case "timeline":
       case "schedule_runs": {
-        // A window of at most a week, in epoch milliseconds.
+        // A window of at most 32 days (MAX_CASE_TIMELINE_WINDOW), in epoch
+        // milliseconds.
         const query = new URL(request.url).searchParams;
         const from = Number(query.get("from"));
         const to = Number(query.get("to"));
