@@ -246,6 +246,8 @@ const plansHere = [
   {
     module: plan.module,
     name: plan.package.name,
+    target: plan.target,
+    package: plan.package,
     files: planFiles,
     edits: plan.edits ?? [],
   },
@@ -262,6 +264,8 @@ for (const name of readdirSync(dirname(planPath))) {
   plansHere.push({
     module: otherPlan.module,
     name: otherPlan.package?.name,
+    target: otherPlan.target,
+    package: otherPlan.package,
     files,
     edits: otherPlan.edits ?? [],
   });
@@ -519,6 +523,21 @@ if (plan.package.existing === true) {
   for (const [name, version] of kept) {
     dependencies = withDependency(dependencies, name, version);
   }
+  // A later plan with package.existing can move the files of another module
+  // into this package (areas/shopify into areas/integrations). After its
+  // move, a second run keeps its export entries and its dependencies.
+  let exportEntries = plan.package.exports;
+  for (const joined of plansHere) {
+    if (joined.name !== packageName || joined.target !== plan.target) continue;
+    if (joined.package?.existing !== true) continue;
+    if (![...joined.files.values()].some((to) => known.has(to))) continue;
+    exportEntries = { ...exportEntries, ...joined.package.exports };
+    for (const [name, version] of Object.entries(
+      joined.package.dependencies ?? {},
+    )) {
+      dependencies = withDependency(dependencies, name, version);
+    }
+  }
   await putJson(
     manifestPath,
     {
@@ -526,7 +545,7 @@ if (plan.package.existing === true) {
       version: "0.1.0",
       private: true,
       type: "module",
-      exports: plan.package.exports,
+      exports: exportEntries,
       // A package that reads an `Env` key that another module merges fails a
       // type check of its own; the Worker program checks its files.
       scripts:
@@ -1039,9 +1058,15 @@ for (const path of tree) {
     // A rule of a folder that moved whole is now inside the rule of the
     // target. A rule of another module can come with it: an earlier move
     // took the files of that module from the folder and left the rule, and
-    // each file that the rule selects now is a file of this plan.
+    // each file that the rule selects now is a file of this plan. A rule that
+    // selects a file of another module stays: a later plan moved that module
+    // into this package (areas/integrations/shopify/ of areas/shopify).
     for (const key of Object.keys(map.rules)) {
-      if (key !== rule && key.startsWith(rule)) delete map.rules[key];
+      if (key === rule || !key.startsWith(rule)) continue;
+      const others = tree.some(
+        (path) => path.startsWith(key) && !oldPathOf.has(path),
+      );
+      if (!others) delete map.rules[key];
     }
     if (map.rules[rule] === undefined) {
       map.rules = { [rule]: plan.module, ...map.rules };
