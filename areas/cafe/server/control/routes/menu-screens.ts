@@ -33,6 +33,7 @@ import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-exe
 import { createCommerceClient } from "@purin-labs/area-commerce/server/contract/client";
 import {
   countOpenScreenPairings,
+  deleteCollectedScreenPairing,
   deleteExpiredScreenPairings,
   insertScreenPairing,
   readScreenPairingState,
@@ -42,8 +43,8 @@ import {
  * The routes of a shop screen (Plan 40B phase 1), with no Portal session:
  *
  *   POST /v1/screens/pairings              a new code for a screen to show
- *   GET  /v1/screens/pairings/:pairingId   the screen's token, once a member
- *                                          paired it (Bearer: the secret)
+ *   GET  /v1/screens/pairings/:pairingId   the screen's token, one time, once a
+ *                                          member paired it (Bearer: the secret)
  *   GET  /v1/screens/feed                  the board release and the live
  *                                          menu facts (Bearer: the token)
  *   GET  /v1/screens/pickup                the order codes of a pickup board
@@ -226,11 +227,21 @@ async function readPairing(
     return controlError("menu_screen_pairing_expired", 404);
   if (!timingSafeEqualText(await sha256Hex(secret), row.secret_hash))
     return controlError("menu_screen_refused", 401);
-  const state: MenuScreenPairingState =
-    row.screen_token === null
-      ? { state: "waiting", expiresAt: row.expires_at }
-      : { state: "paired", token: row.screen_token };
-  return controlJson(state);
+  if (row.screen_token === null) {
+    const waiting: MenuScreenPairingState = {
+      state: "waiting",
+      expiresAt: row.expires_at,
+    };
+    return controlJson(waiting);
+  }
+  // The screen takes its token one time; the row and the token go with it.
+  if (!(await deleteCollectedScreenPairing(env.DB, pairingId)))
+    return controlError("menu_screen_pairing_expired", 404);
+  const paired: MenuScreenPairingState = {
+    state: "paired",
+    token: row.screen_token,
+  };
+  return controlJson(paired);
 }
 
 type ScreenFeedCommand = Readonly<{

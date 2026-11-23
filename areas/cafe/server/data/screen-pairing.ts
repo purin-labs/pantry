@@ -44,6 +44,25 @@ export async function claimScreenPairing(
   return claimed.meta.changes !== 0;
 }
 
+/**
+ * Removes a claimed pairing as its screen collects the token, so that the
+ * token leaves the database at its first read. False when another read
+ * took it first.
+ */
+export async function deleteCollectedScreenPairing(
+  db: Database,
+  pairingId: string,
+): Promise<boolean> {
+  const deleted = await db
+    .prepare(
+      `DELETE FROM screen_pairing
+     WHERE pairing_id = ? AND screen_token IS NOT NULL`,
+    )
+    .bind(pairingId)
+    .run();
+  return deleted.meta.changes === 1;
+}
+
 /** Removes the pairings whose codes have expired. */
 export async function deleteExpiredScreenPairings(
   db: Database,

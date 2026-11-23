@@ -140,12 +140,13 @@ orders through the order queue and mark items "sold out today" on one Portal pag
 2. A member with the operator role enters the code in **Screens** and picks a board. The
    Actor keeps the new screen with the SHA-256 of its secret. The pairing row takes the
    token `scr1.<organisationId>.<screenId>.<secret>` one time, and keeps it until the
-   row expires. An unknown code gets 404 `menu_screen_code_unknown`, and a code that
-   another member took gets 409 `menu_screen_code_used`. A pairing over 40 screens gets
-   409 `menu_screen_limit`.
+   TV collects it: the TV's first read of the token deletes the row. An unknown code
+   gets 404 `menu_screen_code_unknown`, and a code that another member took gets 409
+   `menu_screen_code_used`. A pairing over 40 screens gets 409 `menu_screen_limit`.
 3. The TV asks every 3 s (`POLL_PAIRING_MS`) until it gets the token. After the code
-   expires, the poll gets 404 `menu_screen_pairing_expired`, and the TV asks for a new
-   code. After it gets the token, the TV reads
+   expires or the token was collected, the poll gets 404 `menu_screen_pairing_expired`,
+   and the TV asks for a new code. A TV that loses the answer with its token therefore
+   needs a new pairing. After it gets the token, the TV reads
    `/v1/screens/feed`, keeps one signal socket open, and reads again at each signal and
    every 60 s (`READ_EVERY_MS`).
 4. The TV keeps the last feed in `localStorage`. When the shop cannot be reached, it shows

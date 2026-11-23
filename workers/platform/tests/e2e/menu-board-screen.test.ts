@@ -320,8 +320,9 @@ async function menuBoardScreenJourney({ task }: TestContext): Promise<void> {
   expect(stale.body).toMatchObject({ error: "menu_board_changed" });
 
   // 5. A TV opens the screen page and shows its code. A viewer cannot pair
-  //    it; staff pair it with the drinks board. Only the TV's own secret
-  //    collects the token, and the code cannot pair a second screen.
+  //    it; staff pair it with the drinks board, and the code cannot pair a
+  //    second screen. Only the TV's own secret collects the token, one
+  //    time: after the TV took it, Pantry's database no longer holds it.
   const started = await exports.default.fetch(
     `${PUBLIC_ORIGIN}/v1/screens/pairings`,
     { method: "POST" },
@@ -353,18 +354,32 @@ async function menuBoardScreenJourney({ task }: TestContext): Promise<void> {
     pairBody,
   );
   expect(paired.status, JSON.stringify(paired.body)).toBe(201);
-  expect(
-    (await pairingResponse(pairing.pairingId, "x".repeat(43))).status,
-  ).toBe(401);
-  const collected = await pairingState(pairing.pairingId, pairing.secret);
-  if (collected?.state !== "paired") throw new Error("Screen not paired");
-  const token = collected.token;
   const second = await send(`${base}/menu-screens`, staff.session, "POST", {
     ...pairBody,
     name: "Second TV",
   });
   expect(second.status).toBe(409);
   expect(second.body).toMatchObject({ error: "menu_screen_code_used" });
+  expect(
+    (await pairingResponse(pairing.pairingId, "x".repeat(43))).status,
+  ).toBe(401);
+  const collected = await pairingState(pairing.pairingId, pairing.secret);
+  if (collected?.state !== "paired") throw new Error("Screen not paired");
+  const token = collected.token;
+  const collectedAgain = await pairingResponse(
+    pairing.pairingId,
+    pairing.secret,
+  );
+  expect(collectedAgain.status).toBe(404);
+  await expect(collectedAgain.json()).resolves.toMatchObject({
+    error: "menu_screen_pairing_expired",
+  });
+  const keptTokens = await env.DB.prepare(
+    "SELECT count(*) AS count FROM screen_pairing WHERE screen_token = ?",
+  )
+    .bind(token)
+    .first<{ count: number }>();
+  expect(keptTokens?.count, "pairing rows that keep the token").toBe(0);
 
   //    One client cannot hold the codes of every shop: an address holds at
   //    most 50 open codes, the hosts of one IPv6 /64 count as one address,
