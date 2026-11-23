@@ -543,6 +543,7 @@
     "services/platform/src/model-exit/worker.ts": "workers/platform",
     "services/platform/src/chatgpt-exit/worker.ts": "workers/platform",
     "services/platform/src/code-mode-sandbox/worker.ts": "workers/platform",
+    "services/platform/src/slack-ingress/worker.ts": "workers/platform",
     "services/platform/src/worker-ports.ts": "workers/platform"
   }
 }

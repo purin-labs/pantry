@@ -462,7 +462,7 @@ import. A module with no line for one of these has none.
 
 ## workers/platform
 
-- Folders: 10
+- Folders: 11
   - `services/platform/src/`
   - `services/platform/src/actors/`
   - `services/platform/src/actors/organisation/`
@@ -472,6 +472,7 @@ import. A module with no line for one of these has none.
   - `services/platform/src/control/`
   - `services/platform/src/control/routes/`
   - `services/platform/src/model-exit/`
+  - `services/platform/src/slack-ingress/`
   - `services/platform/src/vault-onepassword/`
 - Packages: `services/platform`
 - Tables (5): `connector`, `install`, `thread_binding`, `thread_file_watch`, `tool_call`
