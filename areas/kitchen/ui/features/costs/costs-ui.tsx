@@ -1,8 +1,9 @@
 import React from "react";
 import { SlidersHorizontal } from "lucide-react";
-import type {
-  BakeryCostCalculation,
-  CostValuationBasis,
+import {
+  COST_SCENARIO_LIMITS,
+  type BakeryCostCalculation,
+  type CostValuationBasis,
 } from "@purin-labs/kitchen-control-api";
 import type { ProjectedCostsSheet } from "./costs-sheet-draft";
 
@@ -488,7 +489,7 @@ export function CostsAssumptionsPopover(
               <input
                 type="number"
                 min={0}
-                max={60}
+                max={COST_SCENARIO_LIMITS.bakeShelfWastePct}
                 step={0.5}
                 disabled={!canEdit}
                 aria-label="Default shelf spoilage percent"
@@ -508,7 +509,11 @@ export function CostsAssumptionsPopover(
                   if (!Number.isFinite(num)) return;
                   props.onCommitAssumptions({
                     ...assumptions,
-                    bakeShelfWastePct: clamp(num, 0, 60),
+                    bakeShelfWastePct: clamp(
+                      num,
+                      0,
+                      COST_SCENARIO_LIMITS.bakeShelfWastePct,
+                    ),
                   });
                 }}
               />
@@ -527,7 +532,7 @@ export function CostsAssumptionsPopover(
               <input
                 type="number"
                 min={0}
-                max={50}
+                max={COST_SCENARIO_LIMITS.prepRejectPct}
                 step={0.5}
                 disabled={!canEdit}
                 aria-label="Prep reject percent"
@@ -547,7 +552,11 @@ export function CostsAssumptionsPopover(
                   if (!Number.isFinite(num)) return;
                   props.onCommitAssumptions({
                     ...assumptions,
-                    prepRejectPct: clamp(num, 0, 50),
+                    prepRejectPct: clamp(
+                      num,
+                      0,
+                      COST_SCENARIO_LIMITS.prepRejectPct,
+                    ),
                   });
                 }}
               />
@@ -566,7 +575,7 @@ export function CostsAssumptionsPopover(
               <input
                 type="number"
                 min={0}
-                max={30}
+                max={COST_SCENARIO_LIMITS.channelFeeBps / 100}
                 step={0.1}
                 disabled={!canEdit}
                 aria-label="Payment channel fee percent"
@@ -583,7 +592,9 @@ export function CostsAssumptionsPopover(
                   if (!Number.isFinite(num)) return;
                   props.onCommitAssumptions({
                     ...assumptions,
-                    channelFeeBps: Math.round(clamp(num, 0, 30) * 100),
+                    channelFeeBps: Math.round(
+                      clamp(num * 100, 0, COST_SCENARIO_LIMITS.channelFeeBps),
+                    ),
                   });
                 }}
               />
@@ -602,7 +613,7 @@ export function CostsAssumptionsPopover(
               <input
                 type="number"
                 min={0}
-                max={30}
+                max={COST_SCENARIO_LIMITS.includedTaxBps / 100}
                 step={0.5}
                 disabled={!canEdit}
                 aria-label="Included consumption tax percent"
@@ -622,7 +633,9 @@ export function CostsAssumptionsPopover(
                   if (!Number.isFinite(num)) return;
                   props.onCommitAssumptions({
                     ...assumptions,
-                    includedTaxBps: Math.round(clamp(num, 0, 30) * 100),
+                    includedTaxBps: Math.round(
+                      clamp(num * 100, 0, COST_SCENARIO_LIMITS.includedTaxBps),
+                    ),
                   });
                 }}
               />

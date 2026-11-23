@@ -83,8 +83,8 @@ The default assumptions come from `defaultCostAssumptions`:
 | Assumption       | Default                                                  | Range in the engine                    |
 | ---------------- | -------------------------------------------------------- | -------------------------------------- |
 | Shelf spoilage   | The measured 30-day shelf waste, capped at 45%, else 7%  | 0 to 95%                               |
-| Prep reject loss | The measured 30-day batch reject, capped at 30%, else 2% | 0 to 50%                               |
-| Channel fee      | 320 bps                                                  | 0 to 3,000 bps                         |
+| Prep reject loss | The measured 30-day batch reject, capped at 30%, else 2% | 0 to 95%                               |
+| Channel fee      | 320 bps                                                  | 0 to 5,000 bps                         |
 | Included tax     | `defaultIncludedTaxBps` of the overview                  | 0 to 10,000 bps                        |
 | Bulk tiers       | On                                                       | —                                      |
 | Lot cost basis   | `standing`                                               | `standing`, `fifo_lot`, `weighted_lot` |
@@ -94,8 +94,9 @@ The default assumptions come from `defaultCostAssumptions`:
 (`orders`), then the active checkout profile (`checkout_profile`), then 800 bps for
 `JPY` (`jpy_food_default`). Otherwise it gives 0 (`none`).
 
-The `scenario:channelFeeBps` cell takes 0 to 5,000, but the engine clamps the fee to
-3,000 bps. A larger draft value computes as 3,000.
+`COST_SCENARIO_LIMITS` (`costs-formulas.ts`) holds these ranges. The draft cells,
+`costs_read` and `costs_sheet_edit` accept the same ranges, so a value that a person or
+the agent enters is the value that the margins use.
 
 The measured waste uses the last 30 days (`WINDOW_DAYS`). It reads the `waste` and
 `damage` movements, the expired finished-good lots, and the planned and actual yield of

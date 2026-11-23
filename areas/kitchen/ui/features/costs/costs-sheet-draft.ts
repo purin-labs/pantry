@@ -1,5 +1,6 @@
 import {
   COST_FORMULA_COLUMNS,
+  COST_SCENARIO_LIMITS,
   defaultCostAssumptions,
   defaultWeekUnitsForDaily,
   isValidCostFormulaString,
@@ -448,20 +449,37 @@ export function changesForAssumptions(
   next: CostScenarioAssumptions,
 ): readonly CostsSheetCellChange[] {
   const base = defaultCostAssumptions(overview);
-  const bakePct = clampNumber(next.bakeShelfWastePct, 0, 60);
-  const rejectPct = clampNumber(next.prepRejectPct, 0, 50);
-  const feeBps = clampNumber(Math.round(next.channelFeeBps), 0, 3_000);
-  const taxBps = clampNumber(Math.round(next.includedTaxBps), 0, 3_000);
+  const limits = COST_SCENARIO_LIMITS;
+  const bakePct = clampNumber(
+    next.bakeShelfWastePct,
+    0,
+    limits.bakeShelfWastePct,
+  );
+  const rejectPct = clampNumber(next.prepRejectPct, 0, limits.prepRejectPct);
+  const feeBps = clampNumber(
+    Math.round(next.channelFeeBps),
+    0,
+    limits.channelFeeBps,
+  );
+  const taxBps = clampNumber(
+    Math.round(next.includedTaxBps),
+    0,
+    limits.includedTaxBps,
+  );
   return [
     {
       cellKey: SCENARIO_BAKE_WASTE_CELL_KEY,
       value:
-        bakePct === base.bakeShelfWastePct ? null : formatPctCell(bakePct, 60),
+        bakePct === base.bakeShelfWastePct
+          ? null
+          : formatPctCell(bakePct, limits.bakeShelfWastePct),
     },
     {
       cellKey: SCENARIO_PREP_REJECT_CELL_KEY,
       value:
-        rejectPct === base.prepRejectPct ? null : formatPctCell(rejectPct, 50),
+        rejectPct === base.prepRejectPct
+          ? null
+          : formatPctCell(rejectPct, limits.prepRejectPct),
     },
     {
       cellKey: SCENARIO_CHANNEL_FEE_CELL_KEY,

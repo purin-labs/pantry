@@ -6,6 +6,7 @@ import {
 } from "@purin-labs/contract-schema";
 import { recipeRevisionResourceSchema } from "@purin-labs/commerce-contracts/records/api-food-service";
 import {
+  COST_SCENARIO_LIMITS,
   evaluateCostFormula,
   isCostFormulaColumn,
   isValidCostFormulaString,
@@ -623,8 +624,16 @@ export function backSolveGrossPriceMinorForMargin(input: Readonly<{
   targetNetMarginPct: number;
 }>): number | null {
   const targetPct = clampNumber(input.targetNetMarginPct, -200, 95);
-  const taxBps = clampInteger(input.includedTaxBps, 0, 10_000);
-  const feeBps = clampInteger(input.channelFeeBps, 0, 3_000);
+  const taxBps = clampInteger(
+    input.includedTaxBps,
+    0,
+    COST_SCENARIO_LIMITS.includedTaxBps,
+  );
+  const feeBps = clampInteger(
+    input.channelFeeBps,
+    0,
+    COST_SCENARIO_LIMITS.channelFeeBps,
+  );
   const fixedCost = Math.max(0, input.fixedUnitCostMinor);
   if (fixedCost === 0) {
     return 0;
@@ -961,22 +970,22 @@ export function calculateBakeryCostsAndMargins(
     bakeShelfWastePct: clampNumber(
       input.assumptions?.bakeShelfWastePct ?? defaults.bakeShelfWastePct,
       0,
-      95,
+      COST_SCENARIO_LIMITS.bakeShelfWastePct,
     ),
     prepRejectPct: clampNumber(
       input.assumptions?.prepRejectPct ?? defaults.prepRejectPct,
       0,
-      50,
+      COST_SCENARIO_LIMITS.prepRejectPct,
     ),
     channelFeeBps: clampInteger(
       input.assumptions?.channelFeeBps ?? defaults.channelFeeBps,
       0,
-      3_000,
+      COST_SCENARIO_LIMITS.channelFeeBps,
     ),
     includedTaxBps: clampInteger(
       input.assumptions?.includedTaxBps ?? defaults.includedTaxBps,
       0,
-      10_000,
+      COST_SCENARIO_LIMITS.includedTaxBps,
     ),
     applyBulkTiers:
       input.assumptions?.applyBulkTiers ?? defaults.applyBulkTiers,

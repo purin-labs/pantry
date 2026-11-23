@@ -194,6 +194,18 @@ function scripts(journey: Journey): Readonly<Record<string, Script>> {
         lotCostBasis: null,
       }),
     },
+    RUSHCOSTS: {
+      tool: "costs_read",
+      args: () => ({
+        dailyTargets: null,
+        bakeShelfWastePct: null,
+        prepRejectPct: 60,
+        channelFeeBps: 4_000,
+        includedTaxBps: null,
+        applyBulkTiers: null,
+        lotCostBasis: null,
+      }),
+    },
     FIFOCOSTS: {
       tool: "costs_read",
       args: () => ({
@@ -1049,6 +1061,19 @@ it(
     expect(typeof weekendButter?.usedInProductCount).toBe("number");
     expect(Number(weekendButter?.usedInProductCount ?? 0)).toBeGreaterThan(0);
     expect(typeof weekendButter?.daysOfSupply).toBe("number");
+    // A what-if inside the documented limits keeps its values: the agent's
+    // margins use a 60% prep reject rate and a 4,000 bps channel fee.
+    await chatDirect(fixture, author, "RUSHCOSTS");
+    const rushFirst: unknown = JSON.parse(lastOutput("RUSHCOSTS"));
+    const rushParsed: unknown =
+      typeof rushFirst === "string" ? JSON.parse(rushFirst) : rushFirst;
+    if (!isRecord(rushParsed) || !isRecord(rushParsed.code_mode_value)) {
+      throw new Error("Invalid rush costs_read payload");
+    }
+    expect(rushParsed.code_mode_value.assumptions).toMatchObject({
+      prepRejectPct: 60,
+      channelFeeBps: 4_000,
+    });
     const stockAfterWhatIf = await native.readStockSnapshot(MERCHANT_ID);
     if (!stockAfterWhatIf.ok) {throw new Error("Snapshot unavailable");}
     expect(stockAfterWhatIf.value.commerce.merchantRevision).toBe(

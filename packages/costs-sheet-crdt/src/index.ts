@@ -509,6 +509,8 @@ export function isCostsSheetCellEntry(
       return isIntegerStringInRange(value, 101, 400);
     case SCENARIO_PRESET_CELL_KEY:
       return PRESET_VALUES.has(value);
+    // The margin engine takes the same range (COST_SCENARIO_LIMITS of
+    // kitchen-control-api).
     case SCENARIO_BAKE_WASTE_CELL_KEY:
     case SCENARIO_PREP_REJECT_CELL_KEY:
       return isPctString(value, 95);

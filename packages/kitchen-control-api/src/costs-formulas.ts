@@ -10,6 +10,17 @@
  *    `= INGR + PACK + 15`, `= D4 * 1.08`, or `= CEIL(COGS / (1 - 65% - TAX_RATE - FEE_RATE))`).
  */
 
+/**
+ * The largest scenario value that a margin calculation takes. The draft cells
+ * of costs-sheet-crdt, costs_read and costs_sheet_edit accept the same range.
+ */
+export const COST_SCENARIO_LIMITS = Object.freeze({
+  bakeShelfWastePct: 95,
+  prepRejectPct: 95,
+  channelFeeBps: 5_000,
+  includedTaxBps: 10_000,
+} as const);
+
 export const COST_FORMULA_COLUMNS = [
   "units",
   "spoil",
@@ -797,8 +808,16 @@ export function backSolveGrossPriceMinorForUnitNet(input: Readonly<{
   channelFeeBps: number;
   targetUnitNetMinor: number;
 }>): number | null {
-  const taxBps = clampInt(input.includedTaxBps, 0, 10_000);
-  const feeBps = clampInt(input.channelFeeBps, 0, 3_000);
+  const taxBps = clampInt(
+    input.includedTaxBps,
+    0,
+    COST_SCENARIO_LIMITS.includedTaxBps,
+  );
+  const feeBps = clampInt(
+    input.channelFeeBps,
+    0,
+    COST_SCENARIO_LIMITS.channelFeeBps,
+  );
   const fixedCost = Math.max(0, input.fixedUnitCostMinor);
   const targetNet = clampNum(input.targetUnitNetMinor, -100_000_000, 100_000_000);
   const taxShare = taxBps > 0 ? taxBps / (10_000 + taxBps) : 0;

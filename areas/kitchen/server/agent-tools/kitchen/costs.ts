@@ -7,6 +7,7 @@ import {
 } from "@purin-labs/costs-sheet-crdt";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import {
+  COST_SCENARIO_LIMITS,
   normalizeCostForecastPlan,
   type ActualsWindowDays,
   type BakeryCostCalculation,
@@ -296,22 +297,22 @@ export const costsRead = defineKitchenTool({
       bakeShelfWastePct: {
         type: ["number", "null"],
         minimum: 0,
-        maximum: 95,
+        maximum: COST_SCENARIO_LIMITS.bakeShelfWastePct,
       },
       prepRejectPct: {
         type: ["number", "null"],
         minimum: 0,
-        maximum: 95,
+        maximum: COST_SCENARIO_LIMITS.prepRejectPct,
       },
       channelFeeBps: {
         type: ["integer", "null"],
         minimum: 0,
-        maximum: 5000,
+        maximum: COST_SCENARIO_LIMITS.channelFeeBps,
       },
       includedTaxBps: {
         type: ["integer", "null"],
         minimum: 0,
-        maximum: 10000,
+        maximum: COST_SCENARIO_LIMITS.includedTaxBps,
       },
       applyBulkTiers: {
         type: ["boolean", "null"],
@@ -705,7 +706,7 @@ export const costsSheetEdit = defineKitchenTool({
   description:
     "Edit cells in the Organisation's shared multiplayer Costs & margins workbook draft so open Portal tabs see the changes and your cursor immediately before anyone clicks Save changes. " +
     "Pass changes as [{ cellKey, value }], where value is a string or null to clear the draft override back to the saved baseline. " +
-    "Valid cellKey values: 'overhead:dailyLabor' (minor integer), 'overhead:dailyRent' (minor integer), 'scenario:bakeShelfWastePct' (0-95), 'scenario:prepRejectPct' (0-95), 'scenario:channelFeeBps' (0-5000), 'scenario:includedTaxBps' (0-10000), 'scenario:applyBulkTiers' ('true'|'false'), " +
+    `Valid cellKey values: 'overhead:dailyLabor' (minor integer), 'overhead:dailyRent' (minor integer), 'scenario:bakeShelfWastePct' (0-${COST_SCENARIO_LIMITS.bakeShelfWastePct}), 'scenario:prepRejectPct' (0-${COST_SCENARIO_LIMITS.prepRejectPct}), 'scenario:channelFeeBps' (0-${COST_SCENARIO_LIMITS.channelFeeBps}), 'scenario:includedTaxBps' (0-${COST_SCENARIO_LIMITS.includedTaxBps}), 'scenario:applyBulkTiers' ('true'|'false'), ` +
     "'product:<productId>:daily' (0-100000), 'product:<productId>:day:<0..6>' (Mon=0..Sun=6), 'product:<productId>:spoil' ('default' or 0-9500 bps), 'product:<productId>:price' (minor integer), " +
     "'product:<productId>:cogs' ('default' or minor integer override), 'product:<productId>:waste' ('default' or minor integer override), 'product:<productId>:fx:<units|spoil|price|cogs|waste|unitNet|margin|netDay>' ('default' or '=...' formula), " +
     "'forecast:<opening_cash|demand_curve|supplier_terms|extra_shift_pct|extra_shift_minor|capex_minor>', 'forecast:week_idx:<0..11>' (10-500%), or " +
@@ -834,7 +835,11 @@ function parseCostsReadArgs(input: unknown): CostsReadRequest {
   if (dailyTargets === undefined) {
     throw new TypeError("costs_read dailyTargets are invalid");
   }
-  const parsePct = (value: unknown, field: string): number | null => {
+  const parsePct = (
+    value: unknown,
+    max: number,
+    field: string,
+  ): number | null => {
     if (value === null) {
       return null;
     }
@@ -842,7 +847,7 @@ function parseCostsReadArgs(input: unknown): CostsReadRequest {
       typeof value !== "number" ||
       !Number.isFinite(value) ||
       value < 0 ||
-      value > 95
+      value > max
     ) {
       throw new TypeError(`costs_read ${field} is invalid`);
     }
@@ -960,10 +965,26 @@ function parseCostsReadArgs(input: unknown): CostsReadRequest {
   }
   return {
     dailyTargets,
-    bakeShelfWastePct: parsePct(input.bakeShelfWastePct, "bakeShelfWastePct"),
-    prepRejectPct: parsePct(input.prepRejectPct, "prepRejectPct"),
-    channelFeeBps: parseBps(input.channelFeeBps, 5000, "channelFeeBps"),
-    includedTaxBps: parseBps(input.includedTaxBps, 10000, "includedTaxBps"),
+    bakeShelfWastePct: parsePct(
+      input.bakeShelfWastePct,
+      COST_SCENARIO_LIMITS.bakeShelfWastePct,
+      "bakeShelfWastePct",
+    ),
+    prepRejectPct: parsePct(
+      input.prepRejectPct,
+      COST_SCENARIO_LIMITS.prepRejectPct,
+      "prepRejectPct",
+    ),
+    channelFeeBps: parseBps(
+      input.channelFeeBps,
+      COST_SCENARIO_LIMITS.channelFeeBps,
+      "channelFeeBps",
+    ),
+    includedTaxBps: parseBps(
+      input.includedTaxBps,
+      COST_SCENARIO_LIMITS.includedTaxBps,
+      "includedTaxBps",
+    ),
     applyBulkTiers: input.applyBulkTiers,
     ...(lotCostBasis !== null ? { lotCostBasis } : {}),
     ...(actualsWindowDays !== null ? { actualsWindowDays } : {}),
