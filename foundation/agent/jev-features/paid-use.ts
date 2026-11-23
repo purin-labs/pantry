@@ -1,4 +1,5 @@
 import type { OrganisationId } from "@purin-labs/kernel/ids";
+import { typeSafeMonth } from "../integrations/typesafe/usage-store";
 
 /**
  * Plan 88 section 4: paid Jev use above the free use of the month. The owner
@@ -110,20 +111,12 @@ function readMonthlyPantryJevTokens(
   return row.tokens;
 }
 
-function monthBounds(now: number): Readonly<{ start: number; next: number }> {
-  const date = new Date(now);
-  return {
-    start: Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1),
-    next: Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1),
-  };
-}
-
 export function readJevPaidSpendMinor(
   sql: SqlStorage,
   organisationId: OrganisationId,
   now: number,
 ): number {
-  const month = monthBounds(now);
+  const month = typeSafeMonth(now);
   return jevMonthChargeMinor(
     readMonthlyPantryJevTokens(sql, organisationId, month.start, month.next),
   );

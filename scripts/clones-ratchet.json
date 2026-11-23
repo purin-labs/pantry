@@ -1,5 +1,5 @@
 {
-  "total": {"copies":784,"lines":14026},
+  "total": {"copies":783,"lines":14012},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -261,7 +261,6 @@
     "foundation/agent/data/agent-operations/automation.ts = foundation/agent/data/agent-operations/automation.ts": {"copies":1,"lines":18},
     "foundation/agent/harness-checkpoint.ts = foundation/agent/provider-adapters/dropbox.ts": {"copies":1,"lines":7},
     "foundation/agent/integrations/typesafe/connection.ts = foundation/agent/integrations/typesafe/connection.ts": {"copies":1,"lines":16},
-    "foundation/agent/integrations/typesafe/usage-store.ts = foundation/agent/jev-features/paid-use.ts": {"copies":1,"lines":14},
     "foundation/agent/messages/link-egress.ts = foundation/agent/messages/link-reader.ts": {"copies":1,"lines":23},
     "foundation/agent/models/codex-connection.ts = foundation/agent/models/codex-connection.ts": {"copies":1,"lines":12},
     "foundation/agent/provider-adapters/dropbox.ts = foundation/agent/provider-adapters/dropbox.ts": {"copies":1,"lines":11},
