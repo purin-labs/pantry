@@ -19,7 +19,6 @@ scenario. See [docs/plan.md](docs/plan.md).
 ## Layout
 
 - `src/` — public storefront acceptance scenarios and harness CLI
-- `tests/` — controlled public-API buyer journeys
 - `docs/` — plan
 
 ## Standing rules

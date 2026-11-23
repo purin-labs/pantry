@@ -15,7 +15,6 @@
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
-    "tsrs": "0.18.0-ts7.1.0-dev.20260929",
-    "vitest": "^4.1.0"
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
   }
 }
