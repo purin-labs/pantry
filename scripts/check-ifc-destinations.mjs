@@ -20,7 +20,8 @@ const root = resolve(import.meta.dirname, "..");
 const SINKS = "foundation/authority/policy/information-flow/sinks.ts";
 
 // These files name no capability, because the capability comes from the caller.
-// Each caller that names one is checked.
+// Each caller that names one is checked: a literal tool effect, and each call
+// of a builder in `EFFECT_BUILDERS`.
 const EFFECTS_WITH_A_NAMED_CALLER = new Set([
   "foundation/authority/access-control/decision-explanation.ts",
   "foundation/control/worker/routes/access-control-explain.ts",
@@ -59,6 +60,10 @@ const CLASS_SETS = [
   "OTHER_SERVICE_CAPABILITIES",
   "RECIPIENT_CAPABILITIES",
 ];
+
+// Functions that build a tool effect from the capability that their caller
+// names.
+const EFFECT_BUILDERS = ["proposalFlowEffect"];
 
 const sinks = readFileSync(resolve(root, SINKS), "utf8");
 const classes = CLASS_SETS.map(function classSet(name) {
@@ -103,7 +108,10 @@ for (const path of files) {
     );
   const lines = source.split("\n");
   lines.forEach((line, index) => {
-    if (!line.includes('kind: "tool_effect"')) return;
+    const builds =
+      line.includes('kind: "tool_effect"') ||
+      EFFECT_BUILDERS.some((builder) => line.includes(`${builder}(`));
+    if (!builds || /^\s*(export\s+)?function\s/u.test(line)) return;
     const near = lines.slice(index, index + 8).join("\n");
     const named = /capabilityId:\s*(CAPABILITY_KEYS\.\w+|"[^"]+")/u.exec(
       near,

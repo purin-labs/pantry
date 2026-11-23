@@ -341,6 +341,9 @@ export const INSIDE_CAPABILITIES: ReadonlySet<string> = new Set([
   CAPABILITY_KEYS.customConnectorDraft,
   CAPABILITY_KEYS.marketingEmailDraftEdit,
   CAPABILITY_KEYS.messageLinkRead,
+  // A person reads the proposed Slack message before it posts in the
+  // Organisation's own workspace.
+  CAPABILITY_KEYS.slackMessagePropose,
   "commerce.action.propose",
   "custom_connector.read",
 ]);

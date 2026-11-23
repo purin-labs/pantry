@@ -93,12 +93,12 @@ the exit decides.
 4. Any other `internal` policy passes inside the Organisation. A sink that reaches
    outside returns `approval_required` (`aifc.outside_organisation`).
 
-| Class set in `sinks.ts`      | Capabilities                                                                                                                                                                                                           | Effect on the rule                                                                                           |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `INSIDE_CAPABILITIES`        | The shared draft edits, the workflow canvas move, the order queue, sold out, recipes, supply costs, suppliers, device pause, bake run pause, custom connector draft and read, the link read, `commerce.action.propose` | Internal content passes                                                                                      |
-| `OUTSIDE_CAPABILITIES`       | `whatsapp.support.reply.send`, `commerce.catalog.publish`, `commerce.catalog.update_description`                                                                                                                       | Internal content needs approval                                                                              |
-| `OTHER_SERVICE_CAPABILITIES` | `airtable.api.write`, `custom_connector.write`                                                                                                                                                                         | Internal content needs approval, also when the person's role reads it. Content of the target resource passes |
-| `RECIPIENT_CAPABILITIES`     | `email.reply.propose`, `email.operational.propose`, `whatsapp.support.reply.send`                                                                                                                                      | A label that is bound to a recipient passes only that recipient                                              |
+| Class set in `sinks.ts`      | Capabilities                                                                                                                                                                                                                                       | Effect on the rule                                                                                           |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `INSIDE_CAPABILITIES`        | The shared draft edits, the workflow canvas move, the order queue, sold out, recipes, supply costs, suppliers, device pause, bake run pause, custom connector draft and read, the link read, the Slack message proposal, `commerce.action.propose` | Internal content passes                                                                                      |
+| `OUTSIDE_CAPABILITIES`       | `whatsapp.support.reply.send`, `commerce.catalog.publish`, `commerce.catalog.update_description`                                                                                                                                                   | Internal content needs approval                                                                              |
+| `OTHER_SERVICE_CAPABILITIES` | `airtable.api.write`, `custom_connector.write`                                                                                                                                                                                                     | Internal content needs approval, also when the person's role reads it. Content of the target resource passes |
+| `RECIPIENT_CAPABILITIES`     | `email.reply.propose`, `email.operational.propose`, `whatsapp.support.reply.send`                                                                                                                                                                  | A label that is bound to a recipient passes only that recipient                                              |
 
 - A Slack Connect channel reaches outside. `slackConversationReachesOutside` reads
   `is_ext_shared` from Slack, only when the label holds internal content from another
@@ -337,9 +337,10 @@ The control routes are under `/v1/control/organisations/:id/access-control`, in
 | Jev calls                  | `integrations/typesafe/disclosure.ts`                                                                                      |
 
 `pnpm lint:ifc-boundaries` runs `scripts/check-ifc-destinations.mjs` and ESLint import
-rules. The script refuses a tool effect whose capability is not in the class part of
-`sinks.ts`. It also refuses a new file with a conversation delivery until a person adds
-the file to the script. ESLint lets only the boundary owners import the Portal chat
+rules. The script refuses a tool effect whose capability is in none of the four class
+sets of `sinks.ts`: a literal `tool_effect` and each call of `proposalFlowEffect`.
+`PASSES_AFTER_OUTSIDE_TEXT` is not a class set. It also refuses a new file with a
+conversation delivery until a person adds the file to the script. ESLint lets only the boundary owners import the Portal chat
 audience factory and the disclosure proof. The same rule covers the raw projection
 reader and the raw Memory, Eval and execution stores (`eslint.config.mjs`).
 
