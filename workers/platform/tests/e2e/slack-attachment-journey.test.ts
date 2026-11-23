@@ -425,7 +425,16 @@ it("delivers extracted document text to the model", async () => {
     .toBeGreaterThan(0);
 
   // The document's words reached the model, not merely its filename.
-  expect(JSON.stringify(model.requests[0])).toContain("Espresso 3.50 per unit");
+  const prompt = JSON.stringify(model.requests[0]);
+  expect(prompt).toContain("Espresso 3.50 per unit");
+  // The model read the file, so no line that names it says otherwise.
+  const fileLines = prompt
+    .split("\\n")
+    .filter((line) => line.includes("terms.docx"));
+  expect(fileLines.length).toBeGreaterThan(0);
+  expect(
+    fileLines.filter((line) => line.includes("contents not read")),
+  ).toEqual([]);
 });
 
 /**

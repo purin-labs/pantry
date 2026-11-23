@@ -602,7 +602,7 @@ async function harnessInputsForAttachment(input: {
 }): Promise<readonly Exclude<EmbeddedHarnessUserInput, { kind: "text" }>[]> {
   const { attachment, bytes } = input;
   const descriptor = attachment.descriptor;
-  const manifest = `${attachmentManifestLine(attachment)} contents not read`;
+  const manifest = attachmentManifestLine(attachment);
 
   if (
     descriptor.kind === "image" &&
@@ -700,7 +700,7 @@ async function harnessInputsForAttachment(input: {
   return [
     {
       kind: "attachment_manifest",
-      manifest: `${manifest}; preparation=${prepared.value.reason}`,
+      manifest: `${manifest} contents not read; preparation=${prepared.value.reason}`,
       attachment,
     },
   ];

@@ -37,7 +37,7 @@ opens the Kitchen page in the person's browser only when a command needs that pa
 
 | View            | Content                                                                                                                       |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `modelPrompt`   | One line for each part: the text, `[link] …`, or the manifest line of a file that ends "contents not read"                    |
+| `modelPrompt`   | One line for each part: the text, `[link] …`, or the manifest line of a file, with no claim about a read of its content       |
 | `casePurpose`   | The first text or link label. With files only: `Review attached file: <names>`. With links only: `Review link: <url>`         |
 | `contextQuery`  | The texts, the link labels and the file names, or null when there are none                                                    |
 | `contentDigest` | SHA-256 of the ordered parts: each text, each link and label, and for each file its id, digest, media type, length and source |
@@ -125,14 +125,14 @@ The Session Actor prepares each file of the accepted message before it starts th
 in the inherited history of a fork, under the lease of the new turn. Each read first
 proves the Organisation prefix of the key, the object length and the SHA-256.
 
-| Class                                                             | Preparation                                                                 | What the model gets                                                                                      |
-| ----------------------------------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Image with a verified signature                                   | The verified bytes                                                          | A native image input                                                                                     |
-| Document: plain text, Markdown, CSV, TSV, JSON, XML               | UTF-8 text in the Worker, at most 1 MiB. A larger file goes to the executor | The manifest line and at most 32,768 characters, with `[truncated]` when cut                             |
-| Document: PDF, DOCX, ODT                                          | Extraction in the Worker, at most 1 MiB                                     | The same, or the manifest with `preparation=handler_not_available` or `source_too_large`                 |
-| Audio                                                             | Container facts from the first 64 KiB                                       | The manifest and one line: container, duration, codec, channels, sample rate, "contents not interpreted" |
-| Video                                                             | The same facts and at most 12 still frames                                  | The manifest, the facts and the frames as native image inputs                                            |
-| Opaque, an image with only a declared type, another document type | No interpretation of the bytes                                              | The manifest with `preparation=handler_not_available`                                                    |
+| Class                                                             | Preparation                                                                 | What the model gets                                                                                              |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Image with a verified signature                                   | The verified bytes                                                          | A native image input                                                                                             |
+| Document: plain text, Markdown, CSV, TSV, JSON, XML               | UTF-8 text in the Worker, at most 1 MiB. A larger file goes to the executor | The manifest line and at most 32,768 characters, with `[truncated]` when cut                                     |
+| Document: PDF, DOCX, ODT                                          | Extraction in the Worker, at most 1 MiB                                     | The same, or the manifest with "contents not read" and `preparation=handler_not_available` or `source_too_large` |
+| Audio                                                             | Container facts from the first 64 KiB                                       | The manifest and one line: container, duration, codec, channels, sample rate, "contents not interpreted"         |
+| Video                                                             | The same facts and at most 12 still frames                                  | The manifest, the facts and the frames as native image inputs                                                    |
+| Opaque, an image with only a declared type, another document type | No interpretation of the bytes                                              | The manifest with "contents not read" and `preparation=handler_not_available`                                    |
 
 - The Worker takes the frames of an intra-frame video from the bytes of the file. For
   H.264, the `WorkspaceExecutorContainer` decodes the selected keyframes to JPEG. Each

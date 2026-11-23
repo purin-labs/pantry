@@ -1151,7 +1151,9 @@ function renderPart(part: UserMessagePart): string {
         ? `[link] ${part.link.presentation.label} (${part.link.url})`
         : `[link] ${part.link.url}`;
     case "attachment":
-      return `${attachmentManifestLine(part.attachment)} contents not read`;
+      // The view describes the message, not a read of the file: a turn that
+      // reads the file gives its content beside this line.
+      return attachmentManifestLine(part.attachment);
   }
 }
 
