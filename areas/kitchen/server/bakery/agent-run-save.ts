@@ -7,6 +7,7 @@ import {
 } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { sha256Hex } from "@purin-labs/std";
+import { bakeryRunSnapshotPrefix } from "./saved-runs";
 
 export type AgentRunSaveVerification =
   | Readonly<{ kind: "none" }>
@@ -53,7 +54,7 @@ export async function readLatestAgentRunSave(
   let object: R2ObjectBody | null;
   try {
     object = await input.archive.get(
-      `bakery-runs/${encodeURIComponent(input.organisationId)}/${snapshot.id}`,
+      bakeryRunSnapshotPrefix(input.organisationId) + snapshot.id,
     );
   } catch {
     return { kind: "unavailable", effectId: row.effectId };
