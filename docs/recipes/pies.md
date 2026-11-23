@@ -2,7 +2,7 @@
 
 Version: 1 · Updated: 2026-10-30
 
-The shop at shop.seams.tokyo sells two beef pies. Each pie is 12 cm and about
+The shop at shop.purin.io sells two beef pies. Each pie is 12 cm and about
 450 g: a shortcrust base, a braised filling and a lid of bought-in puff pastry.
 
 | Shop name            | Shop description                         |  Price |

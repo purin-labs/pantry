@@ -1,6 +1,6 @@
 // Kitchen Costs & margins (Plan 86): supplier pack prices and 7-day bulk
 // tiers in Commerce's purchasing preset, deterministic batch and margin math
-// across the 24 shop.seams.tokyo products, 30-day measured waste comparison,
+// across the 24 shop.purin.io products, 30-day measured waste comparison,
 // HTTP control plane role and revision fencing, and Portal chat agent parity.
 import { env, exports } from "cloudflare:workers";
 import { runInDurableObject } from "cloudflare:test";
@@ -288,7 +288,7 @@ function scripts(journey: Journey): Readonly<Record<string, Script>> {
 }
 
 it(
-  "models 24 shop.seams.tokyo recipes, batch yields, 7-day bulk tiers, measured waste and margins across Portal HTTP and the chat agent",
+  "models 24 shop.purin.io recipes, batch yields, 7-day bulk tiers, measured waste and margins across Portal HTTP and the chat agent",
   { timeout: 480_000 },
   async ({ task }: TestContext): Promise<void> => {
     const fixture = await installMemoryFixture();

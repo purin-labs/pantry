@@ -135,7 +135,7 @@ export interface Env {
   COMMERCE_SERVICE_TOKEN?: string;
   /**
    * The origin of a shop's QR order page, with `{name}` for its shop name,
-   * such as `https://{name}.menu.seams.tokyo` (Plan 40B phase 2). Without
+   * such as `https://{name}.menu.example.com` (Plan 40B phase 2). Without
    * it, a shop's QR code opens its hosted page.
    */
   SHOP_ORDER_PAGE_ORIGIN?: string;

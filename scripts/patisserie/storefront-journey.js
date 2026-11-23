@@ -1,5 +1,5 @@
 async (opener) => {
-  // The pâtisserie site (shop.seams.tokyo) against a local Commerce.
+  // The pâtisserie site (shop.purin.io) against a local Commerce.
   //
   // A buyer opens the menu that the setup script published: eight financiers,
   // the hotcake financier, five pies, three pastries and seven drinks, with

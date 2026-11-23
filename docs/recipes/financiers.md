@@ -60,7 +60,7 @@ cake crumb. A paste-like or doughy centre after cooling needs investigation.
 
 ## Shop flavours
 
-The shop at shop.seams.tokyo sells four financiers. Each is "brown butter and
+The shop at shop.purin.io sells four financiers. Each is "brown butter and
 almond financier" with one flavour:
 
 | Shop name | Shop description | Price |

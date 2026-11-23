@@ -60,7 +60,7 @@ async (page) => {
       entry("item_taro_cookie", 495),
       entry("item_ginger_cookie", 495),
     ],
-    orderUrl: "https://shop.seams.tokyo/shops/merchant_screen_journey",
+    orderUrl: "https://shop.purin.io/shops/merchant_screen_journey",
   });
 
   const server = {

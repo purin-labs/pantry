@@ -8,7 +8,7 @@ const siteLinkColor = "1;38;5;214";
 // The shop link opens the live pâtisserie site. The local café and store
 // routes still run for the browser journeys, so they are left off the list.
 const localSites = [
-  { label: "Shop", url: "https://shop.seams.tokyo" },
+  { label: "Shop", url: "https://shop.purin.io" },
   { label: "Portal", url: "https://localhost:3003" },
   { label: "Docs", url: "http://docs.localhost:3005" },
 ];

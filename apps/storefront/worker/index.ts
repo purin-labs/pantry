@@ -1,5 +1,5 @@
 /**
- * The standalone shop site, such as shop.seams.tokyo, and the QR order pages
+ * The standalone shop site, such as shop.purin.io, and the QR order pages
  * at `<shop name>.menu.<domain>` (Plan 40B phase 2). The Worker passes
  * `/v1/*` and `/health` to the Commerce Worker through a service binding,
  * so the page calls Commerce on its own origin, like any operator's site.
@@ -17,7 +17,7 @@ type ServiceBinding = Readonly<{
 type Env = Readonly<{
   COMMERCE: ServiceBinding;
   ASSETS: ServiceBinding;
-  /** The order page domain, such as `menu.seams.tokyo`. */
+  /** The order page domain (`MENU_HOST_SUFFIX` in wrangler.jsonc). */
   MENU_HOST_SUFFIX?: string;
 }>;
 

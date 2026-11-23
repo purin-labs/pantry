@@ -1,5 +1,5 @@
 // The pâtisserie menu, recipes and supplier pack cost baseline of the demo shop
-// at shop.seams.tokyo. Each bake is a finished good with its own stock and
+// at shop.purin.io. Each bake is a finished good with its own stock and
 // batch recipe; each drink is made to order from a recipe whose ingredients and
 // cups are stocked at the café. Every item has a listed offer on the café sales
 // channel and one entry on the café menu.

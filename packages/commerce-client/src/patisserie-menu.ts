@@ -1,5 +1,5 @@
 // The pâtisserie menu, recipes and supplier pack cost baseline of the demo shop
-// at shop.seams.tokyo: 8 financiers, 1 hotcake financier, 5 savoury pies, 3
+// at shop.purin.io: 8 financiers, 1 hotcake financier, 5 savoury pies, 3
 // fruit pastries and 7 made-to-order drinks.
 import {
   CommerceAdminClient,

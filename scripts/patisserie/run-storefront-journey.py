@@ -3,7 +3,7 @@
 The runner starts Commerce on a free port with fresh storage (the storefront
 proxies /v1 there), seeds the local café merchant, runs the pâtisserie menu setup two
 times (a second run must leave one menu of twenty-four items), starts the
-storefront as shop.seams.tokyo builds it, and drives it with the Playwright
+storefront as shop.purin.io builds it, and drives it with the Playwright
 CLI. Screenshots and the result go to output/playwright/patisserie-storefront.
 """
 
@@ -177,7 +177,7 @@ def run_journey(cli: Path, run_id: str, commerce: str) -> None:
         output = run_cli(cli, session, ["run-code", journey], "journey")
         evidence = {
             "backend": "local Commerce Worker with its own storage",
-            "site": "the storefront built as shop.seams.tokyo builds it",
+            "site": "the storefront built as shop.purin.io builds it",
             "menuSetup": runs,
             "journey": result_json(output),
         }

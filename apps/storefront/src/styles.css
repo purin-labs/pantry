@@ -2629,7 +2629,7 @@ main :where(h1, h2, h3)[id] {
   grid-template-columns: minmax(0, 1fr);
 }
 
-/* The pâtisserie site (shop.seams.tokyo): an editorial menu with a flavour
+/* The pâtisserie site (shop.purin.io): an editorial menu with a flavour
    chart of financiers, an arched hotcake band and pie cross-sections. */
 .storefront-patisserie {
   --pat-ground: #fbfaf7;

@@ -842,7 +842,7 @@ type CafeConfiguration = Readonly<{
   showcase: boolean;
   /**
    * The Nuki Café demo has its own menu art; the pâtisserie site at
-   * shop.seams.tokyo has its own menu and look; any other shop shows its
+   * shop.purin.io has its own menu and look; any other shop shows its
    * published menu as it is.
    */
   presentation: "nuki" | "patisserie" | "menu";
@@ -1171,7 +1171,7 @@ export function storefrontConfiguration(
   const shop = /^\/shops\/([A-Za-z0-9_-]+)\/?$/u.exec(pathname);
   if (shop !== null)
     return shopConfiguration(shop[1] ?? "", CAFE_STOREFRONT_ID, "menu");
-  // A site built for one shop, such as shop.seams.tokyo, opens that shop.
+  // A site built for one shop, such as shop.purin.io, opens that shop.
   const homeShop: unknown = import.meta.env.VITE_SHOP_MERCHANT_ID;
   return typeof homeShop === "string" && homeShop.length > 0
     ? shopConfiguration(homeShop, CAFE_STOREFRONT_ID, "patisserie")

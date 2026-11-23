@@ -1,4 +1,4 @@
-// The pâtisserie menu of shop.seams.tokyo: a flavour chart of financiers, the
+// The pâtisserie menu of shop.purin.io: a flavour chart of financiers, the
 // hotcake financier, savoury pies with their cross-section, fruit pastries
 // and a board of drinks. Commerce owns the items, prices and stock; this module owns
 // how they look. Items are drawn in CSS until the shop has photographs.
