@@ -169,10 +169,23 @@ is read, so no background job runs. A schedule belongs to the whole Organisation
 | Session observations     | `prepareSessionInformationFlow`                                   |
 | Slack delivery           | `actors/case-conversation-sink.ts`, `slack/conversation-facts.ts` |
 | Held outputs and effects | `actors/case-output-hold.ts`, `actors/harness-follow-up.ts`       |
+| Side Cases               | `chat/side-cases.ts`, `decideStoredFlowConversationSink`          |
 | Decisions in the Portal  | `control/routes/held-output-requests.ts`                          |
 | Mail sends               | `authorizeEmailReplyReview`, `authorizeEmailProposalFlow`         |
 | Brain reads              | `memory/access.ts`, `evals/access.ts`, `case-execution/access.ts` |
 | Placement                | `OrganisationExecutionScope`                                      |
+
+A side Case (Plan 74) carries the label of the turn that proposed it. The
+proposal stores that turn's `FlowBinding`, and four checks read it.
+`authorizeSideCaseAccess` lets a person start the side Case, or receive its
+brief in another Case, only when the proposing turn could deliver to them, as
+a fork's inherited history must. `admitSideCaseInformationFlow` joins the
+proposal's label into the first turn of the side Case before inference, so
+each output carries it. `authorizeSideCaseChatRead` runs this check again on
+each read of the side Case chat, so a person who loses the source chat loses
+the side Case too. In Slack, `decideStoredFlowConversationSink` checks the
+stored binding against the audience of the channel for the member who clicked
+Start, with that member's authority resolved now.
 
 A screen observation (Plan 87) is the sender's own input, as the message text
 is: the person saw the page, and the composer chip sent it. A private chat
