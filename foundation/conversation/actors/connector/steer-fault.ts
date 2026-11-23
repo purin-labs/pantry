@@ -9,8 +9,10 @@ export const STEER_ANSWER_LOST_FAULT_KEY = "fault:steer_answer_lost";
 
 /**
  * Whether the fault journey ends this steer call now. Only a Worker that has
- * a fault-injection token reads the key, so production never stops here.
- * The key is used once.
+ * a fault-injection token reads the key. `pnpm cloudflare:fault-injection-secret`
+ * can give production that token, but no product code writes the key: only
+ * the fault journey writes it into the Connector's storage. So production
+ * stops here only after a test writes the key there. The key is used once.
  */
 export async function steerAnswerLost(
   env: Pick<Env, "PANTRY_FAULT_INJECTION_TOKEN">,
