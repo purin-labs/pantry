@@ -23,7 +23,7 @@ import { parseCaseId, parseOrganisationId } from "@purin-labs/kernel/ids";
 import {
   parseEmailChangeQueuePayload,
   type EmailChangeQueueMessage,
-} from "./mail/queue-messages";
+} from "@purin-labs/surface-email/server/mail/queue-messages";
 import {
   readRequiredString,
   type IngressQueueMessageError,

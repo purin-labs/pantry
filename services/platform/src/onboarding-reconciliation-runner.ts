@@ -30,7 +30,7 @@ import {
   type VaultKeyVersion,
 } from "@purin-labs/authority/credential-vault/keyring";
 import { sweepVaultAlertSignals } from "@purin-labs/authority/credential-vault/index";
-import { reconcileOrganisationEmailWatches } from "./mail/watch-reconciliation";
+import { reconcileOrganisationEmailWatches } from "@purin-labs/surface-email/server/mail/watch-reconciliation";
 import {
   holdOrganisationPolicyDistribution,
   reconcileOrganisationPolicyPublication,

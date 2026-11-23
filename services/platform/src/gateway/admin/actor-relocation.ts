@@ -2,7 +2,7 @@ import {
   parseRelocationMailReceipt,
   reconcileActorRelocationMailReceipt,
   type RelocationMailReceipt,
-} from "../../actors/actor-relocation-mail";
+} from "@purin-labs/surface-email/server/actors/actor-relocation-mail";
 import { parseCommerceProviderReceipt } from "@purin-labs/area-commerce/server/action-model";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import {

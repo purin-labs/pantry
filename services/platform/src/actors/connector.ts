@@ -87,7 +87,7 @@ import {
 import {
   ConnectorEmail,
   type ConnectorEmailRpc,
-} from "./connector/connector-email-actor";
+} from "@purin-labs/surface-email/server/actors/connector/connector-email-actor";
 import { ConnectorActorBase } from "@purin-labs/conversation/actors/connector/connector-actor-base";
 import {
   ConnectorWhatsApp,

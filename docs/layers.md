@@ -400,10 +400,11 @@ import. A module with no line for one of these has none.
 ## surfaces/email
 
 - Folders: 4
-  - `services/platform/src/actors/`
-  - `services/platform/src/actors/connector/`
-  - `services/platform/src/gateway/`
-  - `services/platform/src/mail/`
+  - `surfaces/email/server/actors/`
+  - `surfaces/email/server/actors/connector/`
+  - `surfaces/email/server/gateway/`
+  - `surfaces/email/server/mail/`
+- Packages: `surfaces/email`
 
 ## surfaces/portal
 

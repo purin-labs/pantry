@@ -73,7 +73,7 @@ import {
   handleIssueIdentityLink,
 } from "./gateway/identity-link";
 import { handleListIntegrationAccounts } from "@purin-labs/area-integrations/server/gateway/integration-accounts";
-import { handleEmailGoogleWebhook } from "./gateway/mail-webhooks";
+import { handleEmailGoogleWebhook } from "@purin-labs/surface-email/server/gateway/mail-webhooks";
 import {
   EVENT_QUEUE_RETRY_DELAY_SECONDS,
   type HealthBody,

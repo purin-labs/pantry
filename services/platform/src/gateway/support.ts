@@ -37,7 +37,7 @@ import {
   type CommerceDeliveryQueueMessage,
   type CommerceOutboxReconcileQueueMessage,
 } from "@purin-labs/area-commerce/server/contract/queue-messages";
-import type { EmailChangeQueueMessage } from "../mail/queue-messages";
+import type { EmailChangeQueueMessage } from "@purin-labs/surface-email/server/mail/queue-messages";
 import type { IngressQueueMessageError } from "@purin-labs/kernel/queue-fields";
 import type { ShopifyCommerceRefreshQueueMessage } from "../shopify/queue-messages";
 import { gmailConnectorIdValue } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";

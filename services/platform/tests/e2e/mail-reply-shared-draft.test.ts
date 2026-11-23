@@ -43,7 +43,7 @@ import {
 import type { ModelRoute } from "@purin-labs/contracts";
 import { readEmailProposalChatContext } from "@purin-labs/area-inbox/server/actors/email-proposal-sources";
 import { CollaborationRoom } from "@purin-labs/collaboration/worker/collaboration-room";
-import { ConnectorEmail } from "../../src/actors/connector/connector-email-actor";
+import { ConnectorEmail } from "@purin-labs/surface-email/server/actors/connector/connector-email-actor";
 import { issueControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { network } from "./network";
 import { pendingDecisionsOf } from "./access-route-support";

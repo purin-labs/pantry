@@ -10,7 +10,7 @@ import {
   expireOperationalEmailProposals,
   isDefinitiveGmailSendRejection,
   revokeOperationalEmailProposals,
-} from "../src/actors/connector-email-operational";
+} from "@purin-labs/surface-email/server/actors/connector-email-operational";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {

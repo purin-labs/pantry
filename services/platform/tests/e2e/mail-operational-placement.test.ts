@@ -20,9 +20,9 @@ import type { ConnectorDO } from "../../src/actors/connector";
 import {
   latestOperationalEmailProposal,
   readOperationalEmailDispatchId,
-} from "../../src/actors/connector-email-operational";
+} from "@purin-labs/surface-email/server/actors/connector-email-operational";
 import { resumeActorRelocation } from "@purin-labs/actor-runtime/actors/actor-relocation";
-import { reconcileActorRelocationMailReceipt } from "../../src/actors/actor-relocation-mail";
+import { reconcileActorRelocationMailReceipt } from "@purin-labs/surface-email/server/actors/actor-relocation-mail";
 import {
   parseVaultHandle,
   storeVaultSecret,

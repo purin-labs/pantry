@@ -29,6 +29,7 @@
     "testing"
   ],
   "packages": {
+    "surfaces/email": "surfaces/email",
     "surfaces/whatsapp": "surfaces/whatsapp",
     "areas/kitchen": "areas/kitchen",
     "areas/commerce": "areas/commerce",
@@ -416,6 +417,7 @@
     "workspace_revision_receipt": "foundation/agent"
   },
   "rules": {
+    "surfaces/email/": "surfaces/email",
     "surfaces/whatsapp/": "surfaces/whatsapp",
     "areas/kitchen/": "areas/kitchen",
     "areas/commerce/": "areas/commerce",
@@ -450,7 +452,6 @@
     "services/platform/src/control/routes/chat/": "surfaces/portal",
     "services/platform/src/gateway-routing/": "surfaces/webhooks",
     "services/platform/src/gateway/admin/": "surfaces/webhooks",
-    "services/platform/src/mail/": "surfaces/email",
     "services/platform/src/model-exit/": "foundation/agent",
     "services/platform/src/shopify/": "areas/shopify",
     "services/platform/src/slack-ingress/": "surfaces/slack",
@@ -463,20 +464,13 @@
   "files": {
     "apps/portal/src/features/integrations/settings-transport.ts": "surfaces/portal",
     "services/platform/src/actors/actor-machines.ts": "workers/platform",
-    "services/platform/src/actors/actor-relocation-mail.ts": "surfaces/email",
     "services/platform/src/actors/agent-session.ts": "workers/platform",
     "services/platform/src/actors/case.ts": "workers/platform",
-    "services/platform/src/actors/connector-email-case-context-discovery.ts": "surfaces/email",
-    "services/platform/src/actors/connector-email-operational.ts": "surfaces/email",
     "services/platform/src/actors/connector-side-case.ts": "surfaces/slack",
     "services/platform/src/actors/connector-slack-case-work.ts": "surfaces/slack",
     "services/platform/src/actors/connector-slack-ingress.ts": "surfaces/slack",
     "services/platform/src/actors/connector-slack-stream.ts": "surfaces/slack",
     "services/platform/src/actors/connector.ts": "workers/platform",
-    "services/platform/src/actors/connector/connector-email-actor.ts": "surfaces/email",
-    "services/platform/src/actors/connector/email-parsers.ts": "surfaces/email",
-    "services/platform/src/actors/connector/email-work.ts": "surfaces/email",
-    "services/platform/src/actors/connector/email.ts": "surfaces/email",
     "services/platform/src/actors/connector/slack-channel.ts": "surfaces/slack",
     "services/platform/src/actors/connector/slack-delivery.ts": "surfaces/slack",
     "services/platform/src/actors/bake-run.ts": "workers/platform",
@@ -530,7 +524,6 @@
     "services/platform/src/gateway/cue-status.ts": "surfaces/webhooks",
     "services/platform/src/gateway/event-queue.ts": "surfaces/webhooks",
     "services/platform/src/gateway/identity-link.ts": "surfaces/webhooks",
-    "services/platform/src/gateway/mail-webhooks.ts": "surfaces/email",
     "services/platform/src/gateway/support.ts": "surfaces/webhooks",
     "services/platform/src/ingress-queue.ts": "surfaces/webhooks",
     "services/platform/src/integration-gateway.ts": "workers/platform",
