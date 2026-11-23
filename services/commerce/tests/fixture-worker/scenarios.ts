@@ -49,6 +49,8 @@ export type FixtureScenarioContext = Readonly<{
   instance: string;
   /** Stops the Durable Object after this answer, as an idle period does. */
   stopAfterAnswer: () => void;
+  /** Runs the object's alarm handler, as the runtime does when it is due. */
+  alarm: () => Promise<void>;
 }>;
 
 type Scenario = (context: FixtureScenarioContext, input: Record<string, unknown>) => unknown | Promise<unknown>;
@@ -134,6 +136,15 @@ const SCENARIOS: Readonly<Record<string, Scenario>> = {
   }),
   /** Stops the object, so that the next request starts it again. */
   stop_object: ({ stopAfterAnswer }) => stopAfterAnswer(),
+  /**
+   * Runs the object's alarm now, and answers the alarm time before and after
+   * it (null when none is set).
+   */
+  run_alarm: async ({ alarm, storage }) => {
+    const alarmBefore = await storage.getAlarm();
+    await alarm();
+    return { alarmBefore, alarmAfter: await storage.getAlarm() };
+  },
   outbox_signing_migration: ({ database, merchantId, env }) =>
     verifyInventoryOutboxMigration(database, merchantId, fixtureSigner(env)),
   /**

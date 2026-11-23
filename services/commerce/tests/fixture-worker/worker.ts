@@ -100,6 +100,7 @@ export class CommerceFixtureMerchantDO extends CommerceMerchantDO {
       instance: this.#instance,
       // The answer leaves first; the next request then starts a new object.
       stopAfterAnswer: () => void setTimeout(() => this.ctx.abort("fixture restart"), 0),
+      alarm: () => this.alarm(),
     };
     return runFixtureScenario(context, body);
   }

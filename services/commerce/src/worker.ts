@@ -313,33 +313,42 @@ export class CommerceMerchantDO extends DurableObject<Env> {
       await api.deliverNotifications().catch(() => 0);
       await this.#deliverWebhooks(api);
       await this.#runDueWork(api);
-      await this.#archiveDaily(api);
+      await this.#archiveDue(api);
     } catch (error) {
       console.warn("commerce.alarm_delivery_failed", errorMessage(error));
     }
   }
 
-  // Moves finished orders and old events to R2 at most once a day, and keeps
-  // a daily alarm so the archive runs without traffic.
-  async #archiveDaily(api: CommerceHttpApi): Promise<void> {
+  // Moves finished orders and old events to R2 when the oldest one is due,
+  // at most once a day, and wakes the object again when the next one is
+  // due. A merchant with nothing due writes nothing; one with nothing left
+  // keeps no alarm for the archive, and its next alarm of any kind arms it.
+  async #archiveDue(api: CommerceHttpApi): Promise<void> {
     if (this.#env.BUCKET === undefined) return;
-    const last = await this.ctx.storage.get<number>(ARCHIVE_LAST_RUN_KEY);
-    if (last === undefined || Date.now() - last >= ARCHIVE_INTERVAL_MS) {
-      const merchantIds = this.#database
-        .prepare("SELECT merchant_id AS merchantId FROM merchant")
-        .all<Readonly<{ merchantId: string }>>()
-        .map((row) => row.merchantId);
-      try {
-        await api.runArchive(merchantIds);
-        await this.ctx.storage.put(ARCHIVE_LAST_RUN_KEY, Date.now());
-      } catch (error) {
-        console.warn("commerce.archive_failed", errorMessage(error));
+    const merchantIds = this.#database
+      .prepare("SELECT merchant_id AS merchantId FROM merchant")
+      .all<Readonly<{ merchantId: string }>>()
+      .map((row) => row.merchantId);
+    let due = api.nextArchiveDueAt(merchantIds);
+    if (due !== null && due <= Date.now()) {
+      let last = await this.ctx.storage.get<number>(ARCHIVE_LAST_RUN_KEY);
+      if (last === undefined || Date.now() - last >= ARCHIVE_INTERVAL_MS) {
+        try {
+          await api.runArchive(merchantIds);
+        } catch (error) {
+          console.warn("commerce.archive_failed", errorMessage(error));
+        }
+        last = Date.now();
+        await this.ctx.storage.put(ARCHIVE_LAST_RUN_KEY, last);
+        due = api.nextArchiveDueAt(merchantIds);
       }
+      // A record that stays due waits a day: a run that failed, one that
+      // its delivery holds, or one whose bound came early.
+      if (due !== null) due = Math.max(due, last + ARCHIVE_INTERVAL_MS);
     }
-    const next = Date.now() + ARCHIVE_INTERVAL_MS;
+    if (due === null) return;
     const current = await this.ctx.storage.getAlarm();
-    if (current === null || current > next)
-      await this.ctx.storage.setAlarm(next);
+    if (current === null || current > due) await this.ctx.storage.setAlarm(due);
   }
 
   // Reads due pending refunds again and releases the stock of lapsed

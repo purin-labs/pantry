@@ -202,6 +202,39 @@ export class ArchiveAuthority {
     };
   }
 
+  /**
+   * The earliest time at which a record of the merchant may move, or null
+   * when none can: its oldest live event after the retention, and its oldest
+   * finished order after the delay. Both are lower bounds, so a run at that
+   * time can still move nothing.
+   */
+  nextDueAt(
+    merchantId: string,
+    options: ArchiveOptions = DEFAULT_ARCHIVE_OPTIONS,
+  ): number | null {
+    const row = this.#database
+      .prepare(
+        `SELECT
+           (SELECT MIN(created_at) FROM observation_outbox
+            WHERE merchant_id = ?) AS oldestEvent,
+           (SELECT MIN(occurred_at) FROM commerce_order
+            WHERE merchant_id = ? AND lifecycle_state IN ('cancelled', 'fulfilled'))
+             AS oldestFinishedOrder`,
+      )
+      .get<
+        Readonly<{ oldestEvent: string | null; oldestFinishedOrder: string | null }>
+      >(merchantId, merchantId);
+    const due = [
+      row?.oldestEvent == null
+        ? null
+        : Date.parse(row.oldestEvent) + options.eventRetentionDays * DAY_MS,
+      row?.oldestFinishedOrder == null
+        ? null
+        : Date.parse(row.oldestFinishedOrder) + options.orderDelayDays * DAY_MS,
+    ].filter((time): time is number => time !== null && Number.isFinite(time));
+    return due.length === 0 ? null : Math.min(...due);
+  }
+
   /** One order, read from the live tables or from its archive entry. */
   async readOrderRecord(
     merchantId: string,

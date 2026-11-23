@@ -26,14 +26,17 @@ scope, event kind and state machine. This spec does not repeat it.
   `shipping`, `total`, `stored_value` and `amount_due`. Pickup and shipping checkouts
   run the same stages. COM-04 gives the payment and tender rules.
 - After each request, the merchant object sends email, posts webhooks and runs due work
-  (`runDueWork` in `src/http.ts`). Its alarm retries what is left and runs the daily
-  archive. The Worker answers catalog reads, search and guest sessions from a snapshot
+  (`runDueWork` in `src/http.ts`). Its alarm retries what is left and runs the archive
+  when a record is due. The Worker answers catalog reads, search and guest sessions from a snapshot
   in the Cache API.
 - The due-work passes are plugin handlers, plugin failure reports, refunds due, terminal
   sales due, online payments due, lapsed checkouts, lot expiry and overdue invoices. A
   pass that fails runs again after at least one minute, and the other passes still run.
-- After its first alarm, a merchant object with the R2 `BUCKET` keeps one alarm each day
-  for the archive, also with no traffic. This is a recurring cost of each tenant.
+- With the R2 `BUCKET`, the alarm arms the next archive run for the time when the oldest
+  live event (after 90 days) or the oldest finished order (after 180 days) may move, and
+  the archive runs at most once a day. When nothing is due, the alarm writes only that
+  next alarm. With nothing left to move, the object keeps no alarm for the archive, and
+  its next alarm of another kind arms one.
 - The merchant object also serves an MCP server (`src/mcp-server.ts`). Its tools call
   the same API, and it lists only the tools of the caller's scopes.
 - `pnpm lint:commerce-spec` refuses a route, scope or event kind that the contract does
@@ -155,15 +158,15 @@ installation with settings. It needs at least one function, handler or action.
 | Install a merchant plugin                                    | `settings:write` and each command's scope | Agent proposal; an owner or admin approves, also from a Slack card |
 | Run a plugin action                                          | `settings:read` and each command's scope  | —                                                                  |
 
-| Limit                                                   | Value                                                    | Constant                                              |
-| ------------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------- |
-| Idempotency key, `Commerce-Actor`                       | 1 to 255, 1 to 200 characters                            | `src/http/admission.ts`                               |
-| Function caps                                           | 1,000 interrupt checks, 16 MiB, 64 KiB output and source | `FUNCTION_CAPS`                                       |
-| Failures before a pause                                 | 3 in a row                                               | `FAILURES_BEFORE_PAUSE`                               |
-| Preview runs, handler runs in a pass, commands in a run | 200, 50, 5                                               | `PREVIEW_RUNS`, `HANDLER_RUNS`, `PLUGIN_RUN_COMMANDS` |
-| Handlers, actions, fields, entity types                 | 10, 10, 20, 8                                            | The list schemas in `records/api-plugins.ts`          |
-| Catalog snapshot                                        | 2 s                                                      | `CATALOG_SNAPSHOT_SECONDS`                            |
-| Archive                                                 | Daily; orders after 180 days, events after 90            | `ARCHIVE_INTERVAL_MS`, `DEFAULT_ARCHIVE_OPTIONS`      |
+| Limit                                                   | Value                                                           | Constant                                              |
+| ------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------- |
+| Idempotency key, `Commerce-Actor`                       | 1 to 255, 1 to 200 characters                                   | `src/http/admission.ts`                               |
+| Function caps                                           | 1,000 interrupt checks, 16 MiB, 64 KiB output and source        | `FUNCTION_CAPS`                                       |
+| Failures before a pause                                 | 3 in a row                                                      | `FAILURES_BEFORE_PAUSE`                               |
+| Preview runs, handler runs in a pass, commands in a run | 200, 50, 5                                                      | `PREVIEW_RUNS`, `HANDLER_RUNS`, `PLUGIN_RUN_COMMANDS` |
+| Handlers, actions, fields, entity types                 | 10, 10, 20, 8                                                   | The list schemas in `records/api-plugins.ts`          |
+| Catalog snapshot                                        | 2 s                                                             | `CATALOG_SNAPSHOT_SECONDS`                            |
+| Archive                                                 | When due, at most daily; orders after 180 days, events after 90 | `ARCHIVE_INTERVAL_MS`, `DEFAULT_ARCHIVE_OPTIONS`      |
 
 - **Boundary.** `pnpm lint:runtime-boundary` refuses an engine import of a Pantry
   package, any other path to the engine than `commerce-contracts`, `commerce-client`,

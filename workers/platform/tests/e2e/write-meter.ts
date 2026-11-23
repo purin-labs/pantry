@@ -108,6 +108,26 @@ export class WriteMeter {
     await scheduler.wait(20);
   }
 
+  /**
+   * Runs the alarm of the Commerce merchant object now, as the runtime does
+   * when it is due, and answers its alarm time before and after the run.
+   */
+  async runCommerceAlarm(): Promise<
+    Readonly<{ alarmBefore: number | null; alarmAfter: number | null }>
+  > {
+    if (this.#merchantId === null)
+      throw new Error("The meter has no Commerce merchant");
+    const answer = await commerceFixtureAnswer(this.#merchantId, {
+      kind: "run_alarm",
+    });
+    const time = (value: unknown): number | null =>
+      typeof value === "number" ? value : null;
+    return {
+      alarmBefore: time(answer.alarmBefore),
+      alarmAfter: time(answer.alarmAfter),
+    };
+  }
+
   /** The objects that hold an alarm, with its time. */
   async armedAlarms(): Promise<Readonly<Record<string, number>>> {
     const alarms: Record<string, number> = {};
@@ -398,6 +418,17 @@ async function commerceFixture(
   merchantId: string,
   body: Readonly<{ kind: string }>,
 ): Promise<{ instance: string; changes: number }> {
+  const answer = await commerceFixtureAnswer(merchantId, body);
+  return {
+    instance: typeof answer.instance === "string" ? answer.instance : "",
+    changes: typeof answer.changes === "number" ? answer.changes : 0,
+  };
+}
+
+async function commerceFixtureAnswer(
+  merchantId: string,
+  body: Readonly<{ kind: string }>,
+): Promise<Readonly<Record<string, unknown>>> {
   const response = await env.COMMERCE.fetch(
     `http://commerce.test/v1/admin/merchants/${merchantId}/test-fixture`,
     {
@@ -414,10 +445,7 @@ async function commerceFixture(
     throw new Error(
       `Commerce fixture ${body.kind}: ${JSON.stringify(answer)}`,
     );
-  return {
-    instance: typeof answer.instance === "string" ? answer.instance : "",
-    changes: typeof answer.changes === "number" ? answer.changes : 0,
-  };
+  return answer;
 }
 
 /** The runtime's class of a binding. A service binding answers every method name, so its methods say nothing. */

@@ -117,7 +117,19 @@ export class CommerceHttpApi {
     };
   }
 
-  /** Archives every merchant in this object; the Worker alarm runs it daily. */
+  /**
+   * When the archive may next move a record of a merchant in this object, or
+   * null when it cannot, or when no archive is bound.
+   */
+  nextArchiveDueAt(merchantIds: readonly string[]): number | null {
+    if (this.#archive === undefined) return null;
+    const due = merchantIds
+      .map((merchantId) => this.#authority.nextArchiveDueAt(merchantId))
+      .filter((time): time is number => time !== null);
+    return due.length === 0 ? null : Math.min(...due);
+  }
+
+  /** Archives every merchant in this object; the Worker alarm runs it when due. */
   async runArchive(merchantIds: readonly string[]): Promise<number> {
     if (this.#archive === undefined) return 0;
     let moved = 0;

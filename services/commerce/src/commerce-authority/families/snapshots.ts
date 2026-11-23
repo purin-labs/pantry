@@ -154,6 +154,11 @@ export abstract class CommerceSnapshotFamily extends CommerceAuthorityBase {
     return this.archive.run(merchantId, store, options);
   }
 
+  /** When the archive may next move a record of the merchant, or null. */
+  nextArchiveDueAt(merchantId: string): number | null {
+    return this.archive.nextDueAt(merchantId);
+  }
+
   readMigrationInventory(
     merchantId: string,
   ): CommerceMigrationInventoryV2 | undefined {

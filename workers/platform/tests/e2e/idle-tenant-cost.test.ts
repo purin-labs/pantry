@@ -173,6 +173,30 @@ async function idleTenantCostJourney({ task }: TestContext): Promise<void> {
     "alarms armed again after their idle run",
   ).toEqual([]);
 
+  // 6. The shop's Commerce object runs its alarm, as it does after a wake
+  //    for a webhook retry or a lapsed checkout. Nothing in the shop is old
+  //    enough for the archive, so the alarm records no archive run. It
+  //    writes only its next alarm, which does not wake the object before
+  //    its oldest event may move, 90 days on.
+  let commerceAlarm:
+    | Readonly<{ alarmBefore: number | null; alarmAfter: number | null }>
+    | undefined;
+  const commerceAlarmWrites = await meter.during(async () => {
+    commerceAlarm = await meter.runCommerceAlarm();
+  });
+  expect(
+    commerceAlarmWrites,
+    "rows written by the Commerce alarm: its next alarm at most",
+  ).toEqual(
+    commerceAlarm?.alarmAfter === null ? {} : { "rows Commerce merchant": 1 },
+  );
+  const nextCommerceWake = commerceAlarm?.alarmAfter ?? null;
+  expect(
+    nextCommerceWake === null ||
+      nextCommerceWake - Date.now() >= 89 * 24 * 60 * 60_000,
+    `the next wake of the Commerce object, ${String(nextCommerceWake)}, is 89 days away or more`,
+  ).toBe(true);
+
   task.meta.idleTenantCost = {
     crons,
     firstHour,
@@ -183,6 +207,7 @@ async function idleTenantCostJourney({ task }: TestContext): Promise<void> {
     slackChecksInIdleHour: slackChecks.length,
     alarmsArmedAfterIdleHour: Object.keys(armed).length,
     alarmWrites,
+    commerceAlarm: { ...commerceAlarm, writes: commerceAlarmWrites },
     sync: stillSynced.ok ? stillSynced.value.kind : stillSynced,
   };
   const artifact = await env.JOURNEY_ARTIFACTS.fetch(
