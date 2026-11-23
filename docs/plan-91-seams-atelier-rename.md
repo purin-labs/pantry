@@ -796,13 +796,19 @@ State on 22 November 2026:
 
 Phase 4 is done, on 22 November 2026. Open items, each outside the switch:
 
-- Meta keeps its old name and URLs until its business verification passes.
-- `satyr-gmail-dev` and `satyr-drive-pilot` go when local development moves
-  to `purin-pantry` (Plan 93 follow-ups).
-- The Dropbox icons: the console opens only a native file picker, which
-  the browser tools cannot fill. The owner picks
-  `docs/brand/purin-logo/icon-pack/mark-64.png` and `mark-256.png` (the
-  exact sizes) on the Branding tab of the app "Purin Pantry" and saves.
+- Meta keeps its old name and URLs. Deferred on 23 November 2026: Meta
+  banned the owner's account, so every WhatsApp integration waits until the
+  owner has a working Meta business account.
+- `satyr-gmail-dev` and `satyr-drive-pilot` are deleted (Plan 93 follow-ups,
+  22 November 2026). On 23 November 2026 Google shows both as
+  `DELETE_REQUESTED`; it removes them for good after 22 December 2026.
+- The Dropbox icons: the Branding buttons open the Dropbox Chooser, a popup
+  that picks a file from the owner's Dropbox; the browser tools cannot reach
+  the popup. On 23 November 2026 the two files went into the owner's Dropbox,
+  folder `Purin Pantry icons` (`purin-pantry-icon-64.png` and
+  `purin-pantry-icon-256.png`, copies of `docs/brand/purin-logo/icon-pack/mark-64.png`
+  and `mark-256.png`). The owner picks them on the Branding tab of the app
+  "Purin Pantry" and saves.
 - The callback page now has the Portal's look (dev `29024dc0`, released in
   `pantry` `5e878705`).
 

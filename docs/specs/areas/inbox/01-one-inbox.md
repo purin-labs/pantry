@@ -413,6 +413,9 @@ in `registry.ts`. The capabilities are in
 - No route moves a Gmail reply to `approved` or `operator_attested_*`. A person cannot
   attest an unconfirmed Gmail reply.
 - `whatsapp_support_reply_send` has no exit check yet (Refactor 17, Appendix C).
+- WhatsApp is deferred since 23 November 2026: Meta banned the owner's account, so no
+  WhatsApp connect, webhook or live check runs until the owner has a working Meta business
+  account.
 
 ## Sources
 
