@@ -12,7 +12,7 @@ export function prepareCueLogEntry(
     cueId: string;
     source: string;
     nativeId: string;
-    decision: string;
+    decision: "matched" | "store_only" | "proposed";
     reason: string | null;
     at: number;
     parentCueId: string | null;
@@ -24,10 +24,8 @@ export function prepareCueLogEntry(
     .prepare(
       `INSERT OR IGNORE INTO cue_log (
          organisation_id, integration_account_id, cue_id, source, native_id,
-         decision, reason, session_id, at,
-         parent_cue_id, surface_kind, surface_thread_id, actor_person_id,
-         response_text
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, NULL, NULL)`,
+         decision, reason, at, parent_cue_id, surface_kind, surface_thread_id
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .bind(
       input.organisationId,

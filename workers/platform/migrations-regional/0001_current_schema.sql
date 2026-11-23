@@ -205,11 +205,10 @@ CREATE TABLE cue_log (
   source TEXT NOT NULL,
   native_id TEXT NOT NULL,
   decision TEXT NOT NULL CHECK (
-    decision IN ('ignore', 'store_only', 'matched', 'proposed', 'triage', 'respond')
+    decision IN ('store_only', 'matched', 'proposed')
   ),
   reason TEXT,
-  session_id TEXT,
-  at INTEGER NOT NULL, parent_cue_id TEXT, surface_kind TEXT, surface_thread_id TEXT, actor_person_id TEXT, response_text TEXT, integration_account_id TEXT REFERENCES integration_account (integration_account_id),
+  at INTEGER NOT NULL, parent_cue_id TEXT, surface_kind TEXT, surface_thread_id TEXT, integration_account_id TEXT REFERENCES integration_account (integration_account_id),
   PRIMARY KEY (organisation_id, cue_id)
 );
 CREATE INDEX idx_cue_dedup ON cue_log (organisation_id, source, native_id);
@@ -249,9 +248,6 @@ CREATE UNIQUE INDEX idx_discord_interaction_application
   ON discord_interaction_install (application_id);
 CREATE INDEX idx_cue_proposal_surface_thread
   ON cue_log (organisation_id, decision, surface_kind, surface_thread_id, at);
-CREATE UNIQUE INDEX idx_cue_response_native
-  ON cue_log (organisation_id, source, native_id)
-  WHERE decision = 'respond';
 CREATE TABLE person_authz_audit (
   organisation_id TEXT NOT NULL,
   audit_id TEXT NOT NULL,
