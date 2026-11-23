@@ -612,7 +612,7 @@ function approvalAuthenticationMessage(
   reason: string | null,
 ): string {
   if (branch === "seams_nep413") {
-    return "Your approval policy asks for a Seams wallet on high-value changes, but no approver wallet is linked yet. Those approvals stay unavailable until a wallet is linked; everything else keeps working.";
+    return "Your approval policy asks for Seams Pay on high-value changes, but no approver has linked Seams Pay yet. Those approvals stay unavailable until an approver links it; everything else keeps working.";
   }
   if (branch === "webauthn_step_up") {
     return "Your approval policy asks for a passkey on high-value changes, but no passkey is registered yet. Those approvals stay unavailable until a passkey is added; everything else keeps working.";

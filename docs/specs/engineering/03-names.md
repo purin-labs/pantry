@@ -310,8 +310,6 @@ exported `PurinMark` and `PurinIcon`.
 - Settings › Billing names a Seams account and the Seams Console, and the Jev paid use
   panel names a Seams account. Pantry has no Console service.
 - The public `/ecommerce` page uses the Seams name, wordmark and `seams.sh` links.
-- The approval toasts say "your Seams identity". The Slack setup text says "Seams
-  wallet". Neither uses the public name Seams Pay.
 
 **Domains:** `MENU_HOST_SUFFIX` of the shop is still `menu.seams.tokyo`, with no route.
 Plan 93 records that the domain of the QR order page is not chosen.

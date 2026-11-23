@@ -1492,7 +1492,7 @@ export class ControlPortalApp extends React.Component<
           return;
         }
       }
-      toast.success("Action approved with your Seams identity.");
+      toast.success("Action approved.");
       // One click approves and applies (the owner, 2026-11-07).
       await this.executeCommerceAction();
     } catch (error) {
@@ -1648,7 +1648,7 @@ export class ControlPortalApp extends React.Component<
     try {
       await this.approveCommerceAction(organisationId, pending.actionNonce);
       clearPendingCommerceApproval(pending);
-      toast.success("Action approved with your Seams identity.");
+      toast.success("Action approved.");
       // On the Operations page the approved change applies at once; a chat
       // card applies its own change.
       if (this.state.kind === "workspace_detail" && this.state.commerceAction?.nonce === pending.actionNonce)
