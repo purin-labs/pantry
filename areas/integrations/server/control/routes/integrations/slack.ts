@@ -139,7 +139,7 @@ export async function handleSlackChannelDefault(
   }
   const configured = await configureSlackChannelDefault(env.DB, change);
   if (!configured.ok) return controlError(configured.error.code, 409);
-  // A channel Café posts in gets the baseline grants of its conversation,
+  // A channel the agent posts in gets the baseline grants of its conversation,
   // as the setup channel does. The binding changes neither the setup nor the
   // workspace's lifecycle, so adding a channel keeps an active workspace on.
   if (configured.value.organisationId === authorized.organisationId) {

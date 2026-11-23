@@ -188,7 +188,7 @@ async function slackChannelAfterDeletionJourney({ task }: TestContext) {
 
   // The new workspace is already active when its owner adds the channel
   // that the deleted Organisation left behind. Adding it keeps the workspace
-  // active and gives the channel the grants of a channel Café posts in.
+  // active and gives the channel the grants of a channel the agent posts in.
   await markActive(fresh);
   const before = await lifecycleState(fresh.organisationId);
   const released = await bindChannel(fresh, connection, RELEASED_CHANNEL);

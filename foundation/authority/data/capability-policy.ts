@@ -446,9 +446,9 @@ export function prepareReadAndProposeAccessDefaults(
 }
 
 /**
- * The baseline grants of a Slack channel that Café posts in: people in the
- * channel let the agent read Case context, inspect message attachments and
- * read message links there. A grant that exists stays as it is.
+ * The baseline grants of a Slack channel that the agent posts in: people in
+ * the channel let the agent read Case context, inspect message attachments
+ * and read message links there. A grant that exists stays as it is.
  */
 export function prepareSlackConversationBaselineGrants(
   input: Readonly<{

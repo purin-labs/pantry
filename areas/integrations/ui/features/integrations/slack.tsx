@@ -255,7 +255,7 @@ export function SlackSetup(props: {
   );
 }
 
-/** The channels Café posts in, one row each, or a quiet empty line. */
+/** The channels the agent posts in, one row each, or a quiet empty line. */
 function SlackChannelList(props: {
   readonly connections: readonly SlackRoutingConnection[];
   readonly accounts: readonly IntegrationAccount[];
