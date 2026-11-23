@@ -3,22 +3,22 @@
 export const PRODUCTION_EXECUTION_MANIFEST = {
   "schemaVersion": 1,
   "bundle": {
-    "id": "53a6456cf69376c5dcefd3d45187f6406d21fe34f2f415f736c78628f890eaa0",
+    "id": "4fbab44884abe929f3276d6e5c8c6fda9b84d81bae4dfee0f4ade14b733b4c2e",
     "backend": "browser",
     "protocolVersion": 5,
     "checkpointSchemaVersion": 4,
     "controllerSourceHash": "e6a03799ef1000b184628ef158b574341e97c515562c3197844f6182285bd794",
-    "controllerHash": "95c75c72e5677a42f0dc5b75b9691c451405718f51609d37ac808389e97a9b27",
-    "runtimeHash": "fc50e49cc0a5de553afbcaaab407b13c0336f7a9cc2581874ff6405cbbab9128",
-    "engineHash": "aed9367d17e923d26ce95a710c7d82384da7381204c557a3320b8f6bed79311d"
+    "controllerHash": "eb13ad909fe50f4bfc482de5f2f22e3c09bc40be7b3f5839c32f381673df8c27",
+    "runtimeHash": "b12df6bd662a4069267ba5e4acee7c4115407d69278c0e873a497704de9ce428",
+    "engineHash": "71b6350782988c2536c1858aa6a05c18369d9c7da22deca4422ea2f4ef0dcd91"
   },
   "engine": {
     "file": "production-engine.mjs",
-    "sha256": "aed9367d17e923d26ce95a710c7d82384da7381204c557a3320b8f6bed79311d",
+    "sha256": "71b6350782988c2536c1858aa6a05c18369d9c7da22deca4422ea2f4ef0dcd91",
     "byteLength": 811714
   },
   "runtime": {
-    "id": "25287727e9f9baa6865af649bd4f4f1f7eff64426caa558cd01ae13069d566d5",
+    "id": "39d11aa0cc3fc75ddf3c6c8f737cc152fe7c495aa358b479204211a117c45609",
     "files": [
       {
         "file": "bakery-native.js",
@@ -27,8 +27,8 @@ export const PRODUCTION_EXECUTION_MANIFEST = {
       },
       {
         "file": "bakery_native.wasm",
-        "sha256": "c11363b25967f0f7341cdb29ebb0bfb4bb2a2321b7a4b5630f10a0c4f21236a7",
-        "byteLength": 6271586
+        "sha256": "e8dd378db298b4cb78dca209d5009d712c07902288ef801475bc3cd31c3c1978",
+        "byteLength": 6271585
       },
       {
         "file": "models.json",
@@ -42,38 +42,38 @@ export const PRODUCTION_EXECUTION_MANIFEST = {
       },
       {
         "file": "models-core.pack",
-        "sha256": "d538a6e13e2172194c8464dd6cbf6bed24de74687a913c894f6edb70fc5a2b1d",
+        "sha256": "1b39bc562064007938b575dea79b6018e035eada22885fe21325538b4203c9aa",
         "byteLength": 908607
       },
       {
         "file": "models-dobot-cr10.pack",
-        "sha256": "65575d5588c4bfa8cf789593dc6b0a19f8e79db678c430beb42895c01f30bb1b",
-        "byteLength": 3766247
+        "sha256": "9bac42a6ccf2be720fdf32cb8e79bae46d2d91d7e62c227d2e79f3833c1803f0",
+        "byteLength": 3766255
       },
       {
         "file": "models-fairino-fr10.pack",
-        "sha256": "e5866e669a0f49800979700762f84fbd4a0a6f32b7475a1bc12bda7893d034e1",
+        "sha256": "be37fb69e65f3085f897d79f1fb81c20f25b6895ea6790f13dfa3e95d021119c",
         "byteLength": 5411738
       },
       {
         "file": "models-fairino-fr5.pack",
-        "sha256": "6b6239a61efe79d6827e17b1c3a1cec2c82e98f1a9ca2ab4447a74e83de856aa",
-        "byteLength": 3839782
+        "sha256": "459ec453d82309a9c658ee9d7e456201be470e3254f181901bdc569d0b2b99a8",
+        "byteLength": 3839784
       },
       {
         "file": "models-fanuc-crx10ial.pack",
-        "sha256": "f47a3f7b2143586fb1c5e25469c8c4c52fb998d2310fa3f732dcee58bf852cd4",
-        "byteLength": 1142294
+        "sha256": "80aafd78ad21699a20000aef77c1f3197f39b84b26c7e34ab5d6283a34deddb7",
+        "byteLength": 1142280
       },
       {
         "file": "models-ufactory-xarm6.pack",
-        "sha256": "dd4f3b3a78c0d2c716183f2a835e1d0a62d0b7123e9a1862f4affa0fead8c02f",
-        "byteLength": 1689105
+        "sha256": "92b1475e084d350f323fe3395f3c787d48894d0b97e21af0518d2661c48e60fc",
+        "byteLength": 1689125
       },
       {
         "file": "models-universal-robots-ur5e.pack",
-        "sha256": "59b8d4cefbb5ce8949ca1d69e26d473ca09ac403327d523f200c2e1f17dc605e",
-        "byteLength": 1392137
+        "sha256": "ac46a118aa606424fbff622b8d68f7036a9b89d9b9b3b4b08a2df5aab10d4e60",
+        "byteLength": 1392110
       },
       {
         "file": "models-hobart-hl200.pack",

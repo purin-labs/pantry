@@ -1,8 +1,8 @@
-{"format":"bakery-model-pack/1","files":[{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-blocked-rack-nominal.json","byteLength":40423},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-blocked-rack-nominal.xml","byteLength":42232},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-blocked.json","byteLength":40455},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-blocked.xml","byteLength":42269},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-closed-door.json","byteLength":39925},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-closed-door.xml","byteLength":41967},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-nominal.json","byteLength":40005},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-nominal.xml","byteLength":42019},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-unreachable-rack-nominal.json","byteLength":40003},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-unreachable-rack-nominal.xml","byteLength":42016},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-unreachable.json","byteLength":40247},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-unreachable.xml","byteLength":42048},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-oven-blocked.json","byteLength":38531},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-oven-blocked.xml","byteLength":41239},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-oven-closed-door.json","byteLength":37957},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-oven-closed-door.xml","byteLength":40937},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-oven-nominal.json","byteLength":38052},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-oven-nominal.xml","byteLength":40989},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-oven-unreachable.json","byteLength":38168},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-oven-unreachable.xml","byteLength":41018},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-rack-blocked.json","byteLength":14378},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-rack-blocked.xml","byteLength":20068},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-rack-nominal.json","byteLength":13976},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-rack-nominal.xml","byteLength":19856},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-rack-unreachable.json","byteLength":13972},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-rack-unreachable.xml","byteLength":19853},{"path":"assets/bakery-robots/vendor/dobot-cr10/dobot_rviz/meshes/cr10/Link1.STL","byteLength":217084},{"path":"assets/bakery-robots/vendor/dobot-cr10/dobot_rviz/meshes/cr10/Link2.STL","byteLength":376084},{"path":"assets/bakery-robots/vendor/dobot-cr10/dobot_rviz/meshes/cr10/Link3.STL","byteLength":194884},{"path":"assets/bakery-robots/vendor/dobot-cr10/dobot_rviz/meshes/cr10/Link4.STL","byteLength":205284},{"path":"assets/bakery-robots/vendor/dobot-cr10/dobot_rviz/meshes/cr10/Link5.STL","byteLength":256184},{"path":"assets/bakery-robots/vendor/dobot-cr10/dobot_rviz/meshes/cr10/Link6.STL","byteLength":426884},{"path":"assets/bakery-robots/vendor/dobot-cr10/dobot_rviz/meshes/cr10/base_link.STL","byteLength":1173584}]}
+{"format":"bakery-model-pack/1","files":[{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-blocked-rack-nominal.json","byteLength":40422},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-blocked-rack-nominal.xml","byteLength":42232},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-blocked.json","byteLength":40454},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-blocked.xml","byteLength":42269},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-closed-door.json","byteLength":39924},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-closed-door.xml","byteLength":41967},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-nominal.json","byteLength":40004},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-nominal.xml","byteLength":42019},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-unreachable-rack-nominal.json","byteLength":40002},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-unreachable-rack-nominal.xml","byteLength":42016},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-unreachable.json","byteLength":40246},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/combined-unreachable.xml","byteLength":42048},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-oven-blocked.json","byteLength":38533},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-oven-blocked.xml","byteLength":41239},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-oven-closed-door.json","byteLength":37959},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-oven-closed-door.xml","byteLength":40937},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-oven-nominal.json","byteLength":38054},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-oven-nominal.xml","byteLength":40989},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-oven-unreachable.json","byteLength":38170},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-oven-unreachable.xml","byteLength":41018},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-rack-blocked.json","byteLength":14380},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-rack-blocked.xml","byteLength":20068},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-rack-nominal.json","byteLength":13978},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-rack-nominal.xml","byteLength":19856},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-rack-unreachable.json","byteLength":13974},{"path":"assets/bakery-mujoco/fr10-workcell/native/dobot-cr10/table-to-rack-unreachable.xml","byteLength":19853},{"path":"assets/bakery-robots/vendor/dobot-cr10/dobot_rviz/meshes/cr10/Link1.STL","byteLength":217084},{"path":"assets/bakery-robots/vendor/dobot-cr10/dobot_rviz/meshes/cr10/Link2.STL","byteLength":376084},{"path":"assets/bakery-robots/vendor/dobot-cr10/dobot_rviz/meshes/cr10/Link3.STL","byteLength":194884},{"path":"assets/bakery-robots/vendor/dobot-cr10/dobot_rviz/meshes/cr10/Link4.STL","byteLength":205284},{"path":"assets/bakery-robots/vendor/dobot-cr10/dobot_rviz/meshes/cr10/Link5.STL","byteLength":256184},{"path":"assets/bakery-robots/vendor/dobot-cr10/dobot_rviz/meshes/cr10/Link6.STL","byteLength":426884},{"path":"assets/bakery-robots/vendor/dobot-cr10/dobot_rviz/meshes/cr10/base_link.STL","byteLength":1173584}]}
 {
   "initialState": [
     0.0,
-    -0.45410828914852613,
+    -0.4541082891485263,
     -0.38472047828175576,
     -2.4366638925824913,
     -0.3202068539486817,
@@ -2640,7 +2640,7 @@
 {
   "initialState": [
     0.0,
-    -0.45410828914852613,
+    -0.4541082891485263,
     -0.38472047828175576,
     -2.4366638925824913,
     -0.3202068539486817,
@@ -5278,7 +5278,7 @@
 {
   "initialState": [
     0.0,
-    -0.45410828914852613,
+    -0.4541082891485263,
     -0.38472047828175576,
     -2.4366638925824913,
     -0.3202068539486817,
@@ -7890,7 +7890,7 @@
 {
   "initialState": [
     0.0,
-    -0.45410828914852613,
+    -0.4541082891485263,
     -0.38472047828175576,
     -2.4366638925824913,
     -0.3202068539486817,
@@ -10502,7 +10502,7 @@
 {
   "initialState": [
     0.0,
-    -0.45410828914852613,
+    -0.4541082891485263,
     -0.38472047828175576,
     -2.4366638925824913,
     -0.3202068539486817,
@@ -13114,7 +13114,7 @@
 {
   "initialState": [
     0.0,
-    -0.45410828914852613,
+    -0.4541082891485263,
     -0.38472047828175576,
     -2.4366638925824913,
     -0.3202068539486817,
@@ -15727,11 +15727,11 @@
   "initialState": [
     0.0,
     -0.7185556491582601,
-    -0.4985945749157194,
+    -0.4985945749157199,
     -2.185546596261147,
-    -0.4574522011315014,
-    -2.289355642395534,
-    -4.712397002411504,
+    -0.45745220113150153,
+    -2.2893556423955337,
+    -4.712397002411505,
     0.035,
     1.05,
     -0.5,
@@ -18200,11 +18200,11 @@
   "initialState": [
     0.0,
     -0.7185556491582601,
-    -0.4985945749157194,
+    -0.4985945749157199,
     -2.185546596261147,
-    -0.4574522011315014,
-    -2.289355642395534,
-    -4.712397002411504,
+    -0.45745220113150153,
+    -2.2893556423955337,
+    -4.712397002411505,
     0.035,
     1.05,
     -0.5,
@@ -20647,11 +20647,11 @@
   "initialState": [
     0.0,
     -0.7185556491582601,
-    -0.4985945749157194,
+    -0.4985945749157199,
     -2.185546596261147,
-    -0.4574522011315014,
-    -2.289355642395534,
-    -4.712397002411504,
+    -0.45745220113150153,
+    -2.2893556423955337,
+    -4.712397002411505,
     0.035,
     1.05,
     -0.5,
@@ -23094,11 +23094,11 @@
   "initialState": [
     0.0,
     -0.7185556491582601,
-    -0.4985945749157194,
+    -0.4985945749157199,
     -2.185546596261147,
-    -0.4574522011315014,
-    -2.289355642395534,
-    -4.712397002411504,
+    -0.45745220113150153,
+    -2.2893556423955337,
+    -4.712397002411505,
     0.035,
     1.05,
     -0.5,
@@ -25541,11 +25541,11 @@
   "initialState": [
     0.0,
     -0.7185556491582601,
-    -0.4985945749157194,
+    -0.4985945749157199,
     -2.185546596261147,
-    -0.4574522011315014,
-    -2.289355642395534,
-    -4.712397002411504,
+    -0.45745220113150153,
+    -2.2893556423955337,
+    -4.712397002411505,
     0.035,
     1.05,
     -0.5,
@@ -26670,11 +26670,11 @@
   "initialState": [
     0.0,
     -0.7185556491582601,
-    -0.4985945749157194,
+    -0.4985945749157199,
     -2.185546596261147,
-    -0.4574522011315014,
-    -2.289355642395534,
-    -4.712397002411504,
+    -0.45745220113150153,
+    -2.2893556423955337,
+    -4.712397002411505,
     0.035,
     1.05,
     -0.5,
@@ -27773,11 +27773,11 @@
   "initialState": [
     0.0,
     -0.7185556491582601,
-    -0.4985945749157194,
+    -0.4985945749157199,
     -2.185546596261147,
-    -0.4574522011315014,
-    -2.289355642395534,
-    -4.712397002411504,
+    -0.45745220113150153,
+    -2.2893556423955337,
+    -4.712397002411505,
     0.035,
     1.05,
     -0.5,
