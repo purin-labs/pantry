@@ -1185,51 +1185,52 @@ def export_visual_meshes(bodies, directory):
             offset = 0
             uv_offset = 0
             normal_offset = 0
-            has_uvs = any(
-                obj.type == "MESH" and obj.data.uv_layers.active is not None
-                for obj in objects
-            )
             for obj in objects:
                 evaluated = obj.evaluated_get(depsgraph)
                 mesh = evaluated.to_mesh()
                 mesh.calc_loop_triangles()
                 transform = body.matrix_world.inverted() @ obj.matrix_world
                 normal_transform = transform.to_3x3().inverted().transposed()
-                for vertex in mesh.vertices:
-                    coordinate = transform @ vertex.co
+                coords = [transform @ vertex.co for vertex in mesh.vertices]
+                for coordinate in coords:
                     lines.append(
                         "v " + " ".join(f"{value:.9f}" for value in coordinate)
                     )
-                if has_uvs:
-                    uv_layer = mesh.uv_layers.active
-                    if uv_layer is not None and len(uv_layer.data) == len(mesh.loops):
-                        for uv_item in uv_layer.data:
-                            lines.append(
-                                f"vt {uv_item.uv.x:.6f} {uv_item.uv.y:.6f}"
-                            )
-                    else:
-                        for _ in range(len(mesh.loops)):
-                            lines.append("vt 0.000000 0.000000")
-                for normal in mesh.corner_normals:
-                    direction = (normal_transform @ normal.vector).normalized()
+                directions = [
+                    (normal_transform @ normal.vector).normalized()
+                    for normal in mesh.corner_normals
+                ]
+                uv_layer = mesh.uv_layers.active
+                if uv_layer is not None and len(uv_layer.data) == len(mesh.loops):
+                    for uv_item in uv_layer.data:
+                        lines.append(
+                            f"vt {uv_item.uv.x:.6f} {uv_item.uv.y:.6f}"
+                        )
+                else:
+                    # Deterministic meter-scale box-projection UV fallback for untextured meshes
+                    for loop_idx, loop_item in enumerate(mesh.loops):
+                        c = coords[loop_item.vertex_index]
+                        n = directions[loop_idx]
+                        ax, ay, az = abs(n.x), abs(n.y), abs(n.z)
+                        if ax >= ay and ax >= az:
+                            u, v = c.y, c.z
+                        elif ay >= az:
+                            u, v = c.x, c.z
+                        else:
+                            u, v = c.x, c.y
+                        lines.append(f"vt {u:.6f} {v:.6f}")
+                for direction in directions:
                     lines.append(
                         "vn " + " ".join(f"{value:.9f}" for value in direction)
                     )
                 for polygon in mesh.loop_triangles:
-                    face = []
-                    for vertex, loop in zip(polygon.vertices, polygon.loops):
-                        if has_uvs:
-                            face.append(
-                                f"{offset + vertex + 1}/{uv_offset + loop + 1}/{normal_offset + loop + 1}"
-                            )
-                        else:
-                            face.append(
-                                f"{offset + vertex + 1}//{normal_offset + loop + 1}"
-                            )
+                    face = [
+                        f"{offset + vertex + 1}/{uv_offset + loop + 1}/{normal_offset + loop + 1}"
+                        for vertex, loop in zip(polygon.vertices, polygon.loops)
+                    ]
                     lines.append("f " + " ".join(face))
                 offset += len(mesh.vertices)
-                if has_uvs:
-                    uv_offset += len(mesh.loops)
+                uv_offset += len(mesh.loops)
                 normal_offset += len(mesh.loops)
                 evaluated.to_mesh_clear()
             (mesh_directory / f"{name}.obj").write_text("\n".join(lines) + "\n")
@@ -1258,8 +1259,40 @@ def export_visual_meshes(bodies, directory):
                         )
                         written_textures.add(tex_name)
                 rgba_vals = rgba_override if rgba_override is not None else surface.diffuse_color
-                metallic_val = 1.0 if (has_orm or has_metallic_map) else float(surface["metallic"])
-                roughness_val = 1.0 if (has_orm or has_roughness_map) else float(surface["roughness"])
+                bsdf = (
+                    surface.node_tree.nodes.get("Principled BSDF")
+                    if (surface.use_nodes and surface.node_tree)
+                    else None
+                )
+                base_metallic = float(
+                    surface["metallic"]
+                    if "metallic" in surface
+                    else (
+                        bsdf.inputs["Metallic"].default_value
+                        if bsdf and "Metallic" in bsdf.inputs
+                        else 0.0
+                    )
+                )
+                base_roughness = float(
+                    surface["roughness"]
+                    if "roughness" in surface
+                    else (
+                        bsdf.inputs["Roughness"].default_value
+                        if bsdf and "Roughness" in bsdf.inputs
+                        else 0.35
+                    )
+                )
+                base_emission = float(
+                    surface["emission"]
+                    if "emission" in surface
+                    else (
+                        bsdf.inputs["Emission Strength"].default_value
+                        if bsdf and "Emission Strength" in bsdf.inputs
+                        else 0.0
+                    )
+                )
+                metallic_val = 1.0 if (has_orm or has_metallic_map) else base_metallic
+                roughness_val = 1.0 if (has_orm or has_roughness_map) else base_roughness
                 mat_el = ET.SubElement(
                     assets,
                     "material",
@@ -1268,8 +1301,8 @@ def export_visual_meshes(bodies, directory):
                     metallic=str(metallic_val),
                     roughness=str(roughness_val),
                     specular="0.5",
-                    shininess=str(1 - float(surface["roughness"])),
-                    emission=str(min(1, surface["emission"])),
+                    shininess=str(max(0.0, 1.0 - base_roughness)),
+                    emission=str(min(1.0, max(0.0, base_emission))),
                 )
                 for tex_name, _fname, _colorspace, role in layers:
                     ET.SubElement(mat_el, "layer", texture=tex_name, role=role)

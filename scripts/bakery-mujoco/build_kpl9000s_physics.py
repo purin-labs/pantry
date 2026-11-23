@@ -11,9 +11,30 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from appliance_physics_kit import (
+    BLENDER_BIN,
+    COL_ACCESSORY_RGBA,
+    COL_ARTIC_RGBA,
+    COL_BASE_RGBA,
+    COL_WALL_RGBA,
+    ROOT,
+    SITE_GRASP_RGBA,
+    SITE_SUPPORT_RGBA,
+    X_AXIS_QUAT,
+    Y_AXIS_QUAT,
+    add_adjacent_excludes,
+    add_standard_defaults,
+    emit_standalone_models,
+    export_and_verify_native_xml as kit_export_native_xml,
+    numbers,
+    prepare_blender_assembly,
+    verify_frames_and_motions as kit_verify_frames_and_motions,
+    write_xml,
+    z_rot_quat,
+)
+
 ASSETS = ROOT / "assets/bakery-mujoco/aicohsha-kpl9000s"
-BLENDER_BIN = Path("/Applications/Blender.app/Contents/MacOS/Blender")
 
 NAMES = (
     "kpl_base",
@@ -68,65 +89,24 @@ VISUAL_MOTIONS = {
 }
 
 
-def numbers(values) -> str:
-    return " ".join(f"{value:.9g}" for value in values)
-
-
-def write_xml(path: Path, element: ET.Element) -> None:
-    ET.indent(element, space="  ")
-    path.write_text(ET.tostring(element, encoding="unicode") + "\n")
-
-
-def z_rot_quat(angle_rad: float) -> tuple[float, float, float, float]:
-    return (math.cos(angle_rad / 2.0), 0.0, 0.0, math.sin(angle_rad / 2.0))
+def quat_mul(
+    q1: tuple[float, float, float, float],
+    q2: tuple[float, float, float, float],
+) -> tuple[float, float, float, float]:
+    w1, x1, y1, z1 = q1
+    w2, x2, y2, z2 = q2
+    return (
+        w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2,
+        w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
+        w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2,
+        w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2,
+    )
 
 
 def export_blender_meshes_and_xml() -> None:
-    """Run inside Blender to export body-local OBJ meshes and author appliance.xml and scene.xml."""
-    import bpy
-
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from build_oven_visuals import export_visual_meshes
-
+    """Run inside Blender to export body-local OBJ meshes and author appliance.xml, scene.xml, and standalone models."""
     source = ASSETS / "aicohsha-kpl9000s.blend"
-    bpy.ops.wm.open_mainfile(filepath=str(source))
-    bpy.context.scene.frame_set(1)
-    for obj in list(bpy.data.objects):
-        obj.animation_data_clear()
-    bpy.context.view_layer.update()
-
-    parts = [bpy.data.objects[name] for name in NAMES]
-    poses = {obj.name: obj.matrix_world.copy() for obj in parts}
-
-    # Reparent every mesh under kpl_base to its nearest articulated ancestor in NAMES while preserving world pose
-    for obj in list(parts[0].children_recursive):
-        if obj.type != "MESH":
-            continue
-        parent = obj.parent
-        while parent is not None and parent not in parts:
-            parent = parent.parent
-        if parent is None:
-            continue
-        pose = obj.matrix_world.copy()
-        obj.animation_data_clear()
-        obj.parent = parent
-        obj.matrix_world = pose
-        if len(obj.data.vertices) >= 3:
-            zs = [v.co.z for v in obj.data.vertices]
-            if max(zs) - min(zs) < 1e-5:
-                obj.data.vertices[0].co.z += 2e-5
-                obj.data.update()
-    bpy.context.view_layer.update()
-
-    for mat in bpy.data.materials:
-        if "metallic" not in mat:
-            mat["metallic"] = 0.0
-        if "roughness" not in mat:
-            mat["roughness"] = 0.30
-        if "emission" not in mat:
-            mat["emission"] = 0.0
-
-    export_visual_meshes(parts, ASSETS)
+    parts, poses = prepare_blender_assembly(source, NAMES, ASSETS)
 
     app = ET.Element(
         "mujoco",
@@ -136,14 +116,7 @@ def export_blender_meshes_and_xml() -> None:
     ET.SubElement(app, "option", timestep="0.002", integrator="implicitfast")
     ET.SubElement(app, "size", nuserdata="8")
 
-    defaults = ET.SubElement(app, "default")
-    ET.SubElement(
-        defaults,
-        "geom",
-        friction="0.50 0.005 0.0001",
-        solref="0.004 1",
-        solimp="0.95 0.99 0.001",
-    )
+    defaults = add_standard_defaults(app)
 
     asset = ET.SubElement(app, "asset")
     ET.SubElement(asset, "include", file="visual_assets.xml")
@@ -157,7 +130,7 @@ def export_blender_meshes_and_xml() -> None:
         size="1.2 1.2 0.05",
         rgba="0.28 0.30 0.33 1",
         contype="1",
-        conaffinity="7",
+        conaffinity="1",
     )
 
     bodies: dict[str, ET.Element] = {}
@@ -218,49 +191,109 @@ def export_blender_meshes_and_xml() -> None:
             type="cylinder",
             pos=numbers((fx, fy, 0.0040)),
             size="0.0145 0.0040",
-            contype="2",
+            contype="1",
             conaffinity="1",
             group="3",
+            rgba=COL_BASE_RGBA,
         )
 
-    # Lower pedestal deck, bayonet bowl seat pad (top face at exact Z = 0.0120 m), 3 radial bayonet lugs, and rear column
+    # Lower pedestal deck: bayonet bowl seat pad (top face at exact Z = 0.0120 m),
+    # 5-sector circular front apron collar around the bowl recess, angled side cheeks,
+    # connecting deck bridge, two-tier rear column, and rear power cord strain relief
     ET.SubElement(
         base,
         "geom",
         name="kpl_seat_pad_col",
         type="cylinder",
-        pos="0 -0.0800 0.0085",
-        size="0.0920 0.0035",
-        contype="2",
+        pos="0 -0.0800 0.0083",
+        size="0.0925 0.0037",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_BASE_RGBA,
     )
-    for lug_idx in range(3):
-        ang = math.radians(30.0 + lug_idx * 120.0)
-        lx = 0.0965 * math.cos(ang)
-        ly = -0.0800 + 0.0965 * math.sin(ang)
+    apron_angles_deg = (-170.0, -130.0, -90.0, -50.0, -10.0)
+    r_apron = 0.1035
+    for a_idx, deg in enumerate(apron_angles_deg):
+        ang = math.radians(deg)
+        ax = r_apron * math.cos(ang)
+        ay = -0.0800 + r_apron * math.sin(ang)
         ET.SubElement(
             base,
             "geom",
-            name=f"kpl_bayonet_lug_{lug_idx + 1}_col",
+            name=f"kpl_apron_{a_idx:02d}_col",
             type="box",
-            pos=numbers((lx, ly, 0.0160)),
+            pos=numbers((ax, ay, 0.0200)),
             quat=numbers(z_rot_quat(ang)),
-            size="0.0030 0.0080 0.0030",
-            contype="2",
+            size="0.0060 0.0410 0.0130",
+            contype="1",
             conaffinity="1",
             group="3",
+            rgba=COL_BASE_RGBA,
         )
+    for side_lbl, sx, sgn in (("left", -0.0940, -1.0), ("right", 0.0940, 1.0)):
+        # Angled deck cheek transitioning from front circular apron (Y=-0.055) to straight rear pedestal (Y=+0.025)
+        ET.SubElement(
+            base,
+            "geom",
+            name=f"kpl_deck_{side_lbl}_col",
+            type="box",
+            pos=numbers((sx, -0.0150, 0.0200)),
+            quat=numbers(z_rot_quat(sgn * 0.16)),
+            size="0.0075 0.0440 0.0130",
+            contype="1",
+            conaffinity="1",
+            group="3",
+            rgba=COL_BASE_RGBA,
+        )
+    ET.SubElement(
+        base,
+        "geom",
+        name="kpl_deck_bridge_col",
+        type="box",
+        pos="0 0.0350 0.0180",
+        size="0.0940 0.0185 0.0110",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_BASE_RGBA,
+    )
     ET.SubElement(
         base,
         "geom",
         name="kpl_pedestal_column_col",
         type="box",
-        pos="0 0.1280 0.0920",
-        size="0.0880 0.0680 0.0800",
-        contype="2",
+        pos="0.0030 0.1235 0.0725",
+        size="0.0975 0.0760 0.0655",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_BASE_RGBA,
+    )
+    ET.SubElement(
+        base,
+        "geom",
+        name="kpl_pedestal_neck_col",
+        type="box",
+        pos="0.0050 0.1180 0.1650",
+        size="0.0975 0.0665 0.0280",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_BASE_RGBA,
+    )
+    ET.SubElement(
+        base,
+        "geom",
+        name="kpl_cord_relief_col",
+        type="cylinder",
+        pos="0.0480 0.2075 0.0260",
+        quat=Y_AXIS_QUAT,
+        size="0.0090 0.0085",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_BASE_RGBA,
     )
     ET.SubElement(
         base,
@@ -268,7 +301,8 @@ def export_blender_meshes_and_xml() -> None:
         name="kpl_bowl_seat_site",
         pos="0 -0.0800 0.0120",
         size="0.008",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         base,
@@ -276,8 +310,9 @@ def export_blender_meshes_and_xml() -> None:
         name="kpl_seat_touch_site",
         type="cylinder",
         pos="0 -0.0800 0.0120",
-        size="0.0880 0.0025",
-        group="3",
+        size="0.0920 0.0025",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
 
     # Tilt-back motor head housing (`kpl_head_tilt`, axis="-1 0 0", range 0 .. 0.68 rad -> lifts top to 0.5200 m)
@@ -291,17 +326,33 @@ def export_blender_meshes_and_xml() -> None:
         range="0 0.68",
         damping="3.2",
         armature="0.018",
+        frictionloss="8.0",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         head,
         "geom",
         name="kpl_head_housing_col",
         type="box",
-        pos="0 -0.1423 0.1063",
-        size="0.0900 0.1900 0.0540",
-        contype="0",
-        conaffinity="0",
+        pos="0.0005 -0.1475 0.1133",
+        size="0.0935 0.1985 0.0520",
+        contype="1",
+        conaffinity="1",
         group="3",
+        rgba=COL_WALL_RGBA,
+    )
+    ET.SubElement(
+        head,
+        "geom",
+        name="kpl_head_skirt_col",
+        type="box",
+        pos="0.0005 -0.0240 0.0320",
+        size="0.0935 0.0748 0.0305",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_WALL_RGBA,
     )
     # Sites tracking closed vs tilted envelope datums (front-top stainless edge and rear-top cap)
     ET.SubElement(
@@ -310,7 +361,8 @@ def export_blender_meshes_and_xml() -> None:
         name="kpl_head_top_front_site",
         pos="0 -0.3288 0.1653",
         size="0.006",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
     ET.SubElement(
         head,
@@ -318,18 +370,18 @@ def export_blender_meshes_and_xml() -> None:
         name="kpl_head_rear_top_site",
         pos="0 0.0512 0.1613",
         size="0.006",
-        group="3",
+        group="4",
+        rgba=SITE_SUPPORT_RGBA,
     )
 
-    # Orbital planetary carrier (`kpl_orbit_spin`, child of `kpl_head`, axis="0 0 1", range -1000 .. 1000 rad)
+    # Orbital planetary carrier (`kpl_orbit_spin`, child of `kpl_head`, continuous unlimited rotation about +Z)
     ET.SubElement(
         planetary,
         "joint",
         name="kpl_orbit_spin",
         type="hinge",
         axis="0 0 1",
-        limited="true",
-        range="-1000 1000",
+        limited="false",
         damping="0.004",
         armature="0.0015",
     )
@@ -338,36 +390,49 @@ def export_blender_meshes_and_xml() -> None:
         "geom",
         name="kpl_planetary_disc_col",
         type="cylinder",
-        pos="0 0 -0.0030",
-        size="0.0540 0.0050",
-        contype="0",
-        conaffinity="0",
+        pos="0 0 -0.0020",
+        size="0.0550 0.0045",
+        contype="1",
+        conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
     )
 
-    # Eccentric counter-rotating 12-wire balloon whip (`kpl_whip_spin`, child of `kpl_planetary`, axis="0 0 -1", range -3000 .. 3000 rad)
-    # Active collision bitmask (contype=4, conaffinity=1) genuinely tests physical clearance against kpl_bowl (contype=1, conaffinity=6)!
+    # Eccentric counter-rotating 12-wire balloon whip (`kpl_whip_spin`, child of `kpl_planetary`, continuous unlimited about -Z)
+    # Active collision (contype=1, conaffinity=1, un-excluded from kpl_bowl) genuinely tests physical whip-to-bowl clearance!
     ET.SubElement(
         whip,
         "joint",
         name="kpl_whip_spin",
         type="hinge",
         axis="0 0 -1",
-        limited="true",
-        range="-3000 3000",
+        limited="false",
         damping="0.002",
         armature="0.0006",
     )
     ET.SubElement(
         whip,
         "geom",
-        name="kpl_whip_cage_col",
-        type="ellipsoid",
-        pos="0 0 -0.0880",
-        size="0.0490 0.0490 0.0600",
-        contype="4",
+        name="kpl_whip_collar_col",
+        type="cylinder",
+        pos="0 0 -0.0200",
+        size="0.0240 0.0200",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
+    )
+    ET.SubElement(
+        whip,
+        "geom",
+        name="kpl_whip_cage_col",
+        type="ellipsoid",
+        pos="0 0 -0.0900",
+        size="0.0550 0.0550 0.0645",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=COL_ARTIC_RGBA,
     )
     ET.SubElement(
         whip,
@@ -375,7 +440,8 @@ def export_blender_meshes_and_xml() -> None:
         name="kpl_whip_tip_site",
         pos="0 0 -0.1500",
         size="0.005",
-        group="3",
+        group="4",
+        rgba=SITE_GRASP_RGBA,
     )
 
     # Stepless rotary speed + pulse knob (`kpl_dial_turn`, child of `kpl_head`, axis="1 0 0", range 0 .. 4.71 rad)
@@ -389,21 +455,26 @@ def export_blender_meshes_and_xml() -> None:
         range="0 4.71",
         damping="0.35",
         armature="0.0020",
+        frictionloss="0.08",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         dial,
         "geom",
         name="kpl_dial_col",
         type="cylinder",
-        pos="0.0110 0 0",
-        quat=numbers((math.cos(math.pi / 4), 0.0, math.sin(math.pi / 4), 0.0)),
-        size="0.0210 0.0100",
-        contype="0",
-        conaffinity="0",
+        pos="0.0117 0 0",
+        quat=X_AXIS_QUAT,
+        size="0.0222 0.0115",
+        contype="1",
+        conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
     )
 
     # Hinged stainless wire safety finger guard (`kpl_guard_hinge`, child of `kpl_head`, axis="1 0 0", range 0 .. 0.35 rad)
+    # Open 12-sector wire ring preserves central opening while covering visual wire guard above bowl rim
     ET.SubElement(
         guard,
         "joint",
@@ -414,55 +485,91 @@ def export_blender_meshes_and_xml() -> None:
         range="0 0.35",
         damping="0.12",
         armature="0.0005",
+        frictionloss="0.30",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         guard,
         "geom",
         name="kpl_guard_col",
-        type="cylinder",
-        pos="0 -0.0950 -0.0040",
-        size="0.1080 0.0030",
-        contype="0",
-        conaffinity="0",
+        type="box",
+        pos="0 0 0.0020",
+        size="0.0310 0.0090 0.0036",
+        contype="1",
+        conaffinity="1",
         group="3",
+        rgba=COL_ARTIC_RGBA,
     )
+    n_guard = 12
+    r_guard = 0.1005
+    for g_idx in range(n_guard):
+        ang = g_idx * math.tau / n_guard
+        gx = r_guard * math.cos(ang)
+        gy = -0.0950 + r_guard * math.sin(ang)
+        ET.SubElement(
+            guard,
+            "geom",
+            name=f"kpl_guard_ring_{g_idx:02d}_col",
+            type="box",
+            pos=numbers((gx, gy, 0.0009)),
+            quat=numbers(z_rot_quat(ang)),
+            size="0.0104 0.0300 0.0046",
+            contype="1",
+            conaffinity="1",
+            group="3",
+            rgba=COL_ARTIC_RGBA,
+        )
 
-    # 6-DOF removable 6.7 L stainless mixing bowl (`kpl_bowl`, 1.100 kg, hollow 24-sector ring + floor resting on Z = 0.0120 m)
+    # 6-DOF removable 6.7 L stainless mixing bowl (`kpl_bowl`, 1.100 kg, hollow two-tier 16-sector flared wall + floor resting on Z = 0.0120 m)
     ET.SubElement(bowl, "freejoint", name="kpl_bowl_free")
     ET.SubElement(
         bowl,
         "geom",
         name="kpl_bowl_floor_col",
         type="cylinder",
-        pos="0 0 0.0030",
-        size="0.0880 0.0030",
+        pos="0 0 0.0035",
+        size="0.0900 0.0035",
         contype="1",
-        conaffinity="6",
+        conaffinity="1",
         group="3",
+        rgba=COL_ACCESSORY_RGBA,
     )
-    n_sectors = 24
-    r_mid = 0.1060
-    for s_idx in range(n_sectors):
-        ang = s_idx * math.tau / n_sectors
-        ET.SubElement(
-            bowl,
-            "geom",
-            name=f"kpl_bowl_wall_{s_idx:02d}_col",
-            type="box",
-            pos=numbers((r_mid * math.cos(ang), r_mid * math.sin(ang), 0.1180)),
-            quat=numbers(z_rot_quat(ang)),
-            size="0.0040 0.0145 0.1040",
-            contype="1",
-            conaffinity="6",
-            group="3",
-        )
+    n_sectors = 16
+    bowl_tiers = (
+        ("lo", 0.0875, 0.0065, 0.1070, 0.1025, 0.0205),
+        ("hi", 0.1068, 0.1005, 0.1174, 0.2266, 0.0245),
+    )
+    for tier_lbl, r_bot, z_bot, r_top, z_top, half_tan in bowl_tiers:
+        wall_tilt = math.atan2(r_top - r_bot, z_top - z_bot)
+        r_mid = 0.5 * (r_bot + r_top)
+        z_mid = 0.5 * (z_bot + z_top)
+        wall_half_h = 0.5 * math.hypot(r_top - r_bot, z_top - z_bot)
+        q_tilt = (math.cos(wall_tilt / 2.0), 0.0, math.sin(wall_tilt / 2.0), 0.0)
+        for s_idx in range(n_sectors):
+            ang = s_idx * math.tau / n_sectors
+            q_stave = quat_mul(z_rot_quat(ang), q_tilt)
+            ET.SubElement(
+                bowl,
+                "geom",
+                name=f"kpl_bowl_wall_{tier_lbl}_{s_idx:02d}_col",
+                type="box",
+                pos=numbers((r_mid * math.cos(ang), r_mid * math.sin(ang), z_mid)),
+                quat=numbers(q_stave),
+                size=numbers((0.0024, half_tan, wall_half_h)),
+                contype="1",
+                conaffinity="1",
+                group="3",
+                rgba=COL_ACCESSORY_RGBA,
+            )
     ET.SubElement(
         bowl,
         "site",
         name="vessel_socket",
         pos="0 -0.1180 0.2220",
         size="0.006",
-        group="3",
+        group="4",
+        rgba=SITE_GRASP_RGBA,
     )
     payload = ET.SubElement(bowl, "body", name="ingredient_payload", pos="0 0 0")
     ET.SubElement(
@@ -486,16 +593,31 @@ def export_blender_meshes_and_xml() -> None:
         mass="0",
     )
 
+    contact = add_adjacent_excludes(
+        app,
+        (
+            ("exclude_base_head", "kpl_base", "kpl_head"),
+            ("exclude_head_planetary", "kpl_head", "kpl_planetary"),
+            ("exclude_head_whip", "kpl_head", "kpl_whip"),
+            ("exclude_head_dial", "kpl_head", "kpl_speed_dial"),
+            ("exclude_head_guard", "kpl_head", "kpl_finger_guard"),
+            ("exclude_planetary_whip", "kpl_planetary", "kpl_whip"),
+            ("exclude_planetary_guard", "kpl_planetary", "kpl_finger_guard"),
+            ("exclude_whip_guard", "kpl_whip", "kpl_finger_guard"),
+            ("exclude_base_guard", "kpl_base", "kpl_finger_guard"),
+        ),
+    )
+
     actuators = ET.SubElement(app, "actuator")
     ET.SubElement(
         actuators,
         "position",
         name="kpl_head_tilt_actuator",
         joint="kpl_head_tilt",
-        kp="550",
-        kv="32.0",
+        kp="2000",
+        kv="60.0",
         ctrlrange="0 0.68",
-        forcerange="-120 120",
+        forcerange="-150 150",
     )
     ET.SubElement(
         actuators,
@@ -530,8 +652,8 @@ def export_blender_meshes_and_xml() -> None:
         "position",
         name="kpl_guard_actuator",
         joint="kpl_guard_hinge",
-        kp="18",
-        kv="0.80",
+        kp="35",
+        kv="1.20",
         ctrlrange="0 0.35",
         forcerange="-25 25",
     )
@@ -561,6 +683,18 @@ def export_blender_meshes_and_xml() -> None:
     write_xml(ASSETS / "appliance.xml", app)
     write_xml(ASSETS / "scene.xml", app)
 
+    emit_standalone_models(
+        ASSETS,
+        model_name="kpl_base",
+        defaults=defaults,
+        asset=asset,
+        root_body=base,
+        contact=contact,
+        sensors=sensors,
+        exclude_sensors=("kpl_bowl_sense",),
+        accessories=(("bowl_model.xml", "kpl_bowl", bowl),),
+    )
+
     (ASSETS / "physics-export.json").write_text(
         json.dumps(
             {
@@ -576,175 +710,28 @@ def export_blender_meshes_and_xml() -> None:
                 "planetary_gear_ratio": PLANETARY_RATIO,
                 "closed_envelope_m": [0.240, 0.400, 0.350],
                 "lifted_envelope_m": [0.240, 0.490, 0.520],
-                "scope": "Articulated MuJoCo 3.13 planetary carrier + counter-rotating 12-wire whip, stepless speed + pulse dial, head-lift 520 mm safety interlock, wire finger guard, and 6-DOF 6.7 L bowl model.",
+                "scope": "Articulated MuJoCo 4.0 Filament PBR planetary carrier + counter-rotating 12-wire whip, stepless speed + pulse dial, head-lift 520 mm safety interlock, wire finger guard, and 6-DOF 6.7 L bowl model.",
             },
             indent=2,
         )
         + "\n"
     )
-
-
-def strip_visual_meshes(root: ET.Element, model) -> None:
-    for parent in root.iter():
-        for geom in list(parent):
-            if geom.tag != "geom" or not geom.get("name"):
-                continue
-            index = model.geom(geom.get("name")).id
-            if (
-                model.geom_contype[index] == 0
-                and model.geom_conaffinity[index] == 0
-                and geom.get("type") == "mesh"
-                and geom.get("mass") == "0"
-            ):
-                parent.remove(geom)
 
 
 def export_and_verify_native_xml(mujoco, np) -> None:
-    spec = mujoco.MjSpec.from_file(str(ASSETS / "scene.xml"))
-    model = spec.compile()
-    data = mujoco.MjData(model)
-    mujoco.mj_forward(model, data)
-
-    root = ET.fromstring(spec.to_xml())
-    strip_visual_meshes(root, model)
-    used_meshes = {geom.get("mesh") for geom in root.iter("geom")}
-    used_materials = {geom.get("material") for geom in root.iter("geom")}
-    assets = root.find("asset")
-    if assets is not None:
-        for asset in list(assets):
-            if (asset.tag == "mesh" and asset.get("name") not in used_meshes) or (
-                asset.tag == "material" and asset.get("name") not in used_materials
-            ):
-                assets.remove(asset)
-    for actuator in root.iter("general"):
-        actuator.attrib.pop("input", None)
-    ET.indent(root, space="  ")
-    native_path = ASSETS / "native.xml"
-    native_path.write_text(ET.tostring(root, encoding="unicode") + "\n")
-
-    rebuilt = mujoco.MjModel.from_xml_path(str(native_path))
-    for field in ("body_mass", "body_inertia", "qpos0", "dof_damping"):
-        if not np.allclose(getattr(model, field), getattr(rebuilt, field), rtol=1e-5, atol=1e-9):
-            raise RuntimeError(f"Export changed native {field} for aicohsha-kpl9000s")
-    if (rebuilt.nq, rebuilt.nv) != (model.nq, model.nv):
-        raise RuntimeError(f"Export changed native DOFs: {(rebuilt.nq, rebuilt.nv)} vs {(model.nq, model.nv)}")
+    kit_export_native_xml(ASSETS, "aicohsha-kpl9000s", mujoco, np)
 
 
 def verify_frames_and_motions(mujoco, evidence_dir: Path) -> tuple[dict, dict]:
-    native_path = ASSETS / "native.xml"
-    glb_path = ASSETS / "aicohsha-kpl9000s.glb"
-    native_sha = hashlib.sha256(native_path.read_bytes()).hexdigest()
-
-    native_model = mujoco.MjModel.from_xml_path(str(native_path))
-    native_data = mujoco.MjData(native_model)
-    mujoco.mj_forward(native_model, native_data)
-
-    body_poses = {}
-    for bname in NAMES:
-        bid = native_model.body(bname).id
-        pos = native_data.xpos[bid]
-        quat = native_data.xquat[bid]
-        body_poses[bname] = [
-            float(pos[0]),
-            float(pos[1]),
-            float(pos[2]),
-            float(quat[0]),
-            float(quat[1]),
-            float(quat[2]),
-            float(quat[3]),
-        ]
-
-    frames_in = evidence_dir / "frames-input.json"
-    frames_out = evidence_dir / "frames-report.json"
-    frames_in.write_text(
-        json.dumps(
-            {
-                "aicohsha-kpl9000s": {
-                    "glb": str(glb_path),
-                    "native_sha256": native_sha,
-                    "bodies": body_poses,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
+    return kit_verify_frames_and_motions(
+        ASSETS, "aicohsha-kpl9000s", NAMES, VISUAL_MOTIONS, mujoco, evidence_dir
     )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(frames_in),
-            str(frames_out),
-        ],
-        check=True,
-    )
-    frames_report = json.loads(frames_out.read_text())
-    assert frames_report["passed"] is True, frames_report
-
-    # Sample 21 scalar-joint poses per joint (including 3-level nested kpl_whip on kpl_planetary on kpl_head)
-    motions = []
-    for joint_name, visual_axis in VISUAL_MOTIONS.items():
-        jid = native_model.joint(joint_name).id
-        jtype = int(native_model.jnt_type[jid])
-        kind = "hinge" if jtype == int(mujoco.mjtJoint.mjJNT_HINGE) else "slide"
-        low, high = native_model.jnt_range[jid]
-        bid = int(native_model.jnt_bodyid[jid])
-        samples = []
-        for idx in range(21):
-            val = float(low + (high - low) * idx / 20.0)
-            mujoco.mj_resetData(native_model, native_data)
-            native_data.qpos[native_model.jnt_qposadr[jid]] = val
-            mujoco.mj_forward(native_model, native_data)
-            samples.append(
-                {
-                    "value": val,
-                    "pose": [*native_data.xpos[bid].tolist(), *native_data.xquat[bid].tolist()],
-                }
-            )
-        motions.append(
-            {
-                "joint": joint_name,
-                "body": native_model.body(bid).name,
-                "kind": kind,
-                "visual_axis": list(visual_axis),
-                "samples": samples,
-            }
-        )
-
-    motion_in = evidence_dir / "motion-input.json"
-    motion_out = evidence_dir / "motion-report.json"
-    motion_in.write_text(
-        json.dumps(
-            {
-                "aicohsha-kpl9000s": {
-                    "glb": str(glb_path),
-                    "native_sha256": native_sha,
-                    "motions": motions,
-                }
-            },
-            indent=2,
-        )
-        + "\n"
-    )
-    subprocess.run(
-        [
-            "node",
-            str(ROOT / "scripts/bakery-mujoco/inspect_appliance_frames.mjs"),
-            str(motion_in),
-            str(motion_out),
-            "--motion",
-        ],
-        check=True,
-    )
-    motion_report = json.loads(motion_out.read_text())
-    assert motion_report["passed"] is True, motion_report
-    return frames_report, motion_report
 
 
 def write_package_docs(summary: dict) -> None:
     readme = f"""# Aicohsha Kenmix Aicoh Chef PRO KPL9000S (`aicohsha-kpl9000s`)
 
-Articulated Blender 5.2 + MuJoCo 3.13 visual, mechanical, planetary-whip, and head-lift safety-interlock asset package for the **Aicohsha Kenmix Aicoh Chef PRO KPL9000S** (`愛工舎製作所 ケンミックス アイコー シェフPRO`) `6.7 L` tabletop planetary mixer.
+Articulated Blender 5.2 + MuJoCo 4.0 Filament PBR visual, mechanical, planetary-whip, and head-lift safety-interlock asset package for the **Aicohsha Kenmix Aicoh Chef PRO KPL9000S** (`愛工舎製作所 ケンミックス アイコー シェフPRO`) `6.7 L` tabletop planetary mixer.
 
 ## Key Specifications
 
@@ -757,12 +744,12 @@ Articulated Blender 5.2 + MuJoCo 3.13 visual, mechanical, planetary-whip, and he
 | Stepless whip speed range | `150 – 676 rpm` (`125 rpm` creep threshold + momentary `P` pulse detent; `3.50 : 1` whip-to-orbit planetary ratio) |
 | Safety protection | Head-lift auto-stop microswitch interlock (`ヘッドリフト安全装置`) + hinged stainless wire finger guard (`フィンガーガード`) |
 
-## Retained Bodies & Joints (`appliance.xml` / `scene.xml` / `native.xml`)
+## Retained Bodies & Joints (`appliance.xml` / `scene.xml` / `model.xml` / `bowl_model.xml` / `native.xml`)
 
-- `kpl_base` (`3.150 kg`) — die-cast L-pedestal base, 5 rubber feet touching `Z = 0.000 m`, recessed stainless bayonet seat (`Z = 0.0260 m`) with 3 locking lugs, rear column & hinge clevis.
+- `kpl_base` (`3.150 kg`) — die-cast L-pedestal base, 5 rubber feet touching `Z = 0.000 m`, recessed stainless bayonet seat (`Z = 0.0120 m`) with 3 locking lugs, circular front apron collar, rear column & hinge clevis.
 - `kpl_head` (`3.420 kg`) — `hinge` `kpl_head_tilt` (`axis="-1 0 0"`, `range="0 .. 0.68"` rad at `(0.0, +0.1488, +0.1847) m`), lifting the top-front stainless edge to `0.5200 m` and tilting the rear cap to `+0.2900 m` (`0.4900 m` depth).
-- `kpl_planetary` (`0.380 kg`, child of `kpl_head`) — `hinge` `kpl_orbit_spin` (`axis="0 0 1"`, `range="-1000 .. 1000"` rad).
-- `kpl_whip` (`0.280 kg`, child of `kpl_planetary`) — `hinge` `kpl_whip_spin` (`axis="0 0 -1"`, `range="-3000 .. 3000"` rad), eccentric (`26 mm`) 12-wire SUS304 balloon whip (`ホイッパー`) counter-rotating at `3.50 ×` orbital speed.
+- `kpl_planetary` (`0.380 kg`, child of `kpl_head`) — `hinge` `kpl_orbit_spin` (`axis="0 0 1"`, continuous `limited="false"`).
+- `kpl_whip` (`0.280 kg`, child of `kpl_planetary`) — `hinge` `kpl_whip_spin` (`axis="0 0 -1"`, continuous `limited="false"`), eccentric (`26 mm`) 12-wire SUS304 balloon whip (`ホイッパー`) counter-rotating at `3.50 ×` orbital speed.
 - `kpl_speed_dial` (`0.060 kg`, child of `kpl_head`) — `hinge` `kpl_dial_turn` (`axis="1 0 0"`, `range="0 .. 4.71"` rad), right-side stepless rotary speed & pulse knob.
 - `kpl_finger_guard` (`0.210 kg`, child of `kpl_head`) — `hinge` `kpl_guard_hinge` (`axis="1 0 0"`, `range="0 .. 0.35"` rad), stainless wire finger guard ring.
 - `kpl_bowl` (`1.100 kg`) — 6-DOF `freejoint` `kpl_bowl_free` `6.7 L` flared stainless bowl (`Ø240 mm` rolled rim, `180 mm` height) with `site name="vessel_socket"` and `body name="ingredient_payload"`.

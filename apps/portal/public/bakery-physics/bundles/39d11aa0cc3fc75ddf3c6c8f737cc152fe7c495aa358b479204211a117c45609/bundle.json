@@ -1,0 +1,71 @@
+{
+  "id": "39d11aa0cc3fc75ddf3c6c8f737cc152fe7c495aa358b479204211a117c45609",
+  "schemaVersion": 2,
+  "files": {
+    "module": {
+      "file": "bakery-native.js",
+      "sha256": "1a1d72dc999626d2be2da9e8651b8fd66c7595b6f486fd3d0bd69e559d05cdb4",
+      "byteLength": 65863
+    },
+    "wasm": {
+      "file": "bakery_native.wasm",
+      "sha256": "e8dd378db298b4cb78dca209d5009d712c07902288ef801475bc3cd31c3c1978",
+      "byteLength": 6271585
+    },
+    "models": {
+      "file": "models.json",
+      "sha256": "7650bc6edf291459961ad1c744ae985d8e8dbf01422ed651bd31aaab3572ff84",
+      "byteLength": 23479
+    },
+    "pack:aicoh-ms-30": {
+      "file": "models-aicoh-ms-30.pack",
+      "sha256": "a288e7bdd6a7a66e5d06996a0054b59b1550fc8e558e7882be76944e2baa4486",
+      "byteLength": 4901622
+    },
+    "pack:core": {
+      "file": "models-core.pack",
+      "sha256": "1b39bc562064007938b575dea79b6018e035eada22885fe21325538b4203c9aa",
+      "byteLength": 908607
+    },
+    "pack:dobot-cr10": {
+      "file": "models-dobot-cr10.pack",
+      "sha256": "9bac42a6ccf2be720fdf32cb8e79bae46d2d91d7e62c227d2e79f3833c1803f0",
+      "byteLength": 3766255
+    },
+    "pack:fairino-fr10": {
+      "file": "models-fairino-fr10.pack",
+      "sha256": "be37fb69e65f3085f897d79f1fb81c20f25b6895ea6790f13dfa3e95d021119c",
+      "byteLength": 5411738
+    },
+    "pack:fairino-fr5": {
+      "file": "models-fairino-fr5.pack",
+      "sha256": "459ec453d82309a9c658ee9d7e456201be470e3254f181901bdc569d0b2b99a8",
+      "byteLength": 3839784
+    },
+    "pack:fanuc-crx10ial": {
+      "file": "models-fanuc-crx10ial.pack",
+      "sha256": "80aafd78ad21699a20000aef77c1f3197f39b84b26c7e34ab5d6283a34deddb7",
+      "byteLength": 1142280
+    },
+    "pack:ufactory-xarm6": {
+      "file": "models-ufactory-xarm6.pack",
+      "sha256": "92b1475e084d350f323fe3395f3c787d48894d0b97e21af0518d2661c48e60fc",
+      "byteLength": 1689125
+    },
+    "pack:universal-robots-ur5e": {
+      "file": "models-universal-robots-ur5e.pack",
+      "sha256": "ac46a118aa606424fbff622b8d68f7036a9b89d9b9b3b4b08a2df5aab10d4e60",
+      "byteLength": 1392110
+    },
+    "pack:hobart-hl200": {
+      "file": "models-hobart-hl200.pack",
+      "sha256": "150349381de20e78fc56e379cc2ecc8f6ccaf4a3cf6bda388c5a977c2a752436",
+      "byteLength": 3248600
+    },
+    "pack:winterhalter-uc-l": {
+      "file": "models-winterhalter-uc-l.pack",
+      "sha256": "8d8c226efa4877349d864606367d1ac573d2e60c461cb7b5529ca9f67995a51f",
+      "byteLength": 205158
+    }
+  }
+}

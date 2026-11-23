@@ -258,33 +258,63 @@ async function s3Request(manifest, method, key, body = new Uint8Array()) {
   });
 }
 
-/** A download fault that a later try can pass: no connection, or an HTTP 429 or 5xx answer. */
-class TransientDownloadError extends Error {}
+/** A transfer fault that a later try can pass: no connection, or an HTTP 429 or 5xx answer. */
+class TransientTransferError extends Error {}
 
 /**
  * The waits before the second, third and fourth try. A GitHub runner lost its
  * connection to R2 for minutes on 19 November 2026, and the CI job failed at
- * the first file.
+ * the first file. Large uploads can hit the same transient disconnect.
  */
-const DOWNLOAD_RETRY_DELAYS_MS = [2_000, 8_000, 30_000];
+const TRANSFER_RETRY_DELAYS_MS = [2_000, 8_000, 30_000];
+
+const TRANSIENT_WRANGLER_FAULT = /\b5\d\d\b|internal server error/i;
+const PERMANENT_WRANGLER_FAULT =
+  /not found|does not exist|\b40[134]\b|authenticat|unauthori[sz]ed/i;
+
+/** Runs one Wrangler R2 transfer and rethrows permanent faults untouched, wrapping transient ones. */
+async function wranglerTransfer(args) {
+  try {
+    await wranglerAsync(args);
+  } catch (error) {
+    if (
+      !TRANSIENT_WRANGLER_FAULT.test(error.message) &&
+      PERMANENT_WRANGLER_FAULT.test(error.message)
+    )
+      throw error;
+    throw new TransientTransferError(error.message);
+  }
+}
+
+/** Retries one transfer on transient faults up to four tries; any other fault stops at once. */
+async function withTransferRetry(task) {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      await task();
+      return;
+    } catch (error) {
+      const wait = TRANSFER_RETRY_DELAYS_MS[attempt];
+      if (!(error instanceof TransientTransferError) || wait === undefined)
+        throw error;
+      console.warn(
+        `${error.message}; try ${attempt + 2} of ${TRANSFER_RETRY_DELAYS_MS.length + 1} in ${wait / 1000} s`,
+      );
+      await new Promise((settle) => setTimeout(settle, wait));
+    }
+  }
+}
 
 async function downloadOnce(manifest, entry, absolute) {
   if (s3 === null) {
-    try {
-      await wranglerAsync([
-        "r2",
-        "object",
-        "get",
-        `${manifest.bucket}/sha256/${entry.sha256}`,
-        "--file",
-        absolute,
-        "--remote",
-      ]);
-    } catch (error) {
-      // A missing object or a refused sign-in does not change on a later try.
-      if (/not found|does not exist|\b40[134]\b|authenticat|unauthori[sz]ed/i.test(error.message)) throw error;
-      throw new TransientDownloadError(error.message);
-    }
+    await wranglerTransfer([
+      "r2",
+      "object",
+      "get",
+      `${manifest.bucket}/sha256/${entry.sha256}`,
+      "--file",
+      absolute,
+      "--remote",
+    ]);
     return;
   }
   let response;
@@ -294,32 +324,22 @@ async function downloadOnce(manifest, entry, absolute) {
     // The body can break in the middle too, so it is read inside the try.
     if (response.ok) body = new Uint8Array(await response.arrayBuffer());
   } catch (error) {
-    throw new TransientDownloadError(
+    throw new TransientTransferError(
       `R2 GET sha256/${entry.sha256}: ${error.cause?.code ?? error.cause?.message ?? error.message}`,
     );
   }
   if (!response.ok) {
     const message = `R2 GET sha256/${entry.sha256}: HTTP ${response.status}`;
     throw response.status === 429 || response.status >= 500
-      ? new TransientDownloadError(message)
+      ? new TransientTransferError(message)
       : new Error(message);
   }
   writeFileSync(absolute, body);
 }
 
 /** Downloads one file. A transient fault gets three more tries; any other fault stops at once. */
-async function download(manifest, entry, absolute) {
-  for (let attempt = 0; ; attempt += 1) {
-    try {
-      await downloadOnce(manifest, entry, absolute);
-      return;
-    } catch (error) {
-      const wait = DOWNLOAD_RETRY_DELAYS_MS[attempt];
-      if (!(error instanceof TransientDownloadError) || wait === undefined) throw error;
-      console.warn(`${error.message}; try ${attempt + 2} of ${DOWNLOAD_RETRY_DELAYS_MS.length + 1} in ${wait / 1000} s`);
-      await new Promise((settle) => setTimeout(settle, wait));
-    }
-  }
+function download(manifest, entry, absolute) {
+  return withTransferRetry(() => downloadOnce(manifest, entry, absolute));
 }
 
 function state(path, entry) {
@@ -367,15 +387,17 @@ async function upload(manifest, args, dryRun, jobs) {
     }
     if (dryRun) continue;
     await inPool(sends, jobs, (file) =>
-      wranglerAsync([
-        "r2",
-        "object",
-        "put",
-        `${manifest.bucket}/sha256/${file.sha256}`,
-        "--file",
-        join(root, file.path),
-        "--remote",
-      ]),
+      withTransferRetry(() =>
+        wranglerTransfer([
+          "r2",
+          "object",
+          "put",
+          `${manifest.bucket}/sha256/${file.sha256}`,
+          "--file",
+          join(root, file.path),
+          "--remote",
+        ]),
+      ),
     );
     for (const file of item.files) remember(join(root, file.path), file.sha256);
     if (item.folder)

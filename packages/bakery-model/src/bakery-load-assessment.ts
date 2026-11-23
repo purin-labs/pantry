@@ -31,7 +31,7 @@ const UR5E_CHART = [
 // docs/evidence/refactor-16/ci-ur5e-mass-check.md and, for the nine appliance
 // entries that Refactor 16 step 9 added, docs/evidence/refactor-16/step-9.md.
 const ASSESSED_ASSETS_SHA256: string =
-  "09a0c0e1682605b327c5066a344bcdb6f94585925ce1e3a10a393abde602d90b";
+  "2a337c96437d8af6f9969d8e870724b988c53ad60f077aebeb460708fbb2986a";
 
 const fixed = tooling.bodies.tool;
 const jaw = tooling.bodies.jaw;
@@ -80,9 +80,9 @@ export async function assessRobotLoad(
     return { kind: "unassessed", reason: "unsupported-robot" };
   if (PHYSICS_ASSETS_SHA256 !== ASSESSED_ASSETS_SHA256)
     return { kind: "unassessed", reason: "unverified-model" };
-  // The engine runs the pan staging fixture with the FR10 only.
+  // The engine runs pan staging and spanner oven fixtures with the FR10 only.
   const cell = await physicsCellOf(request);
-  if (cell === null || cell === "pan-staging")
+  if (cell === null || cell === "pan-staging" || cell === "spanner-oven")
     return { kind: "unassessed", reason: "unverified-model" };
   const properties = ur5eCarriedLoad(request.ingredients);
   const limit = chartLimit(properties.centerOfMassDistanceMm);
