@@ -52,3 +52,15 @@
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+/* A removal asks in the permission row: the question takes the full row. */
+.access35-system-drawer .access35-permission {
+  flex-wrap: wrap;
+}
+.access35-system-drawer .access35-permission > .pantry-remove-confirm {
+  flex-basis: 100%;
+}
+.access35-system-drawer .access35-permission button.pantry-button {
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+}

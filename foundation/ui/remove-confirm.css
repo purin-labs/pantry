@@ -1,0 +1,23 @@
+/* The question of RemoveConfirm takes the full row above its two buttons. */
+
+.pantry-remove-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.pantry-remove-confirm-copy {
+  flex-basis: 100%;
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.pantry-remove-confirm-copy strong {
+  color: var(--ink);
+  font-weight: 500;
+}

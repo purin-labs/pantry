@@ -39,7 +39,7 @@ import {
   renderMutationFeedback,
 } from "./settings-support";
 import type { IntegrationsPageActions } from "./settings-types";
-import { RemoveConfirm } from "./remove-confirm";
+import { RemoveConfirm } from "@purin-labs/ui/index";
 
 /**
  * The email onboarding card, built like the consent sheet: three short points

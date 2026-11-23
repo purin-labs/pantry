@@ -1,0 +1,66 @@
+/* The grant form: in the page-level dialog and in a system's drawer. The
+   fields are one flat column: a label above each choice, no step numbers. */
+
+.access35-grant-dialog {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  padding: 22px;
+  overflow-y: auto;
+  overscroll-behavior: var(--portal-contained-overscroll);
+}
+
+.access35-grant-dialog > p {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.access35-dialog .access35-grant-form,
+.access35-grant-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  padding: 0;
+  overflow: visible;
+}
+
+.access35-grant-form .access35-dialog-steps > div {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.access35-grant-form .access35-dialog-steps > div > :is(label, span) {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.access35-grant-note,
+.access35-grant-form .access35-dialog-steps > div > p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13.5px;
+  overflow-wrap: anywhere;
+}
+
+.access35-grant-form .access35-inline-alert:empty {
+  display: none;
+}
+
+.access35-grant-section {
+  display: grid;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.access35-grant-section > h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14.5px;
+  font-weight: 500;
+}
+
+.access35-grant-section .access35-dialog-actions {
+  justify-content: flex-start;
+}

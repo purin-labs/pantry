@@ -130,6 +130,27 @@ raw `<button>` the same look. They stay for the pages that do not use `Button`
 yet. Do not use them in new code. A toggle in a segmented control, an icon
 button and a row that opens a record are not a `Button`.
 
+### Remove with a confirm in place
+
+`RemoveConfirm` (`remove-confirm.tsx`) is the one action that removes or cuts
+something off: an account, a connector, a grant. The first press replaces the
+button with the question, the consequence and two buttons, in place. Only the
+second press runs `onConfirm`. No dialog opens over the page or the drawer.
+`data` gives the confirm button `data-*` attributes, for a page action that
+reads its record from the button.
+
+```tsx
+<RemoveConfirm
+  label="Remove this Stripe account…"
+  question="Remove Purin Café?"
+  consequence="Purin Pantry stops using it at once and deletes its access."
+  confirmLabel="Remove Purin Café"
+  busy={busy}
+  onConfirm={removeAccount}
+  data={{ "account-id": account.integrationAccountId }}
+/>
+```
+
 ### Grain fields
 
 `GrainField` (`grain-field.tsx` + `grain-field.css`) is a moving, grainy

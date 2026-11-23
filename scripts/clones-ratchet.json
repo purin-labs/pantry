@@ -1,5 +1,5 @@
 {
-  "total": {"copies":795,"lines":14330},
+  "total": {"copies":794,"lines":14321},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -220,7 +220,6 @@
     "areas/organisation/ui/features/access/capability-policy.tsx = areas/organisation/ui/features/access/grant-dialog.tsx": {"copies":1,"lines":9},
     "areas/organisation/ui/features/access/case-screen-observations.tsx = areas/organisation/ui/features/access/related-cases.tsx": {"copies":2,"lines":36},
     "areas/organisation/ui/features/access/permission-required-prompt.tsx = surfaces/voice/ui/features/voice/control.tsx": {"copies":1,"lines":10},
-    "areas/organisation/ui/features/access/route.tsx = areas/organisation/ui/features/access/route.tsx": {"copies":1,"lines":9},
     "areas/organisation/ui/pages/agent-detail.tsx = areas/organisation/ui/pages/agent-detail.tsx": {"copies":1,"lines":25},
     "crates/bakery-native/src/espresso_cell.rs = crates/bakery-native/src/pour_over_cell.rs": {"copies":5,"lines":107},
     "crates/bakery-native/src/pour_over_cell.rs = crates/bakery-native/src/pour_over_cell.rs": {"copies":1,"lines":12},

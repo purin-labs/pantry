@@ -23,7 +23,7 @@ import { customConnectorCollectionPath, customConnectorActionPath, customConnect
 import type { CustomConnectorAccountView, CustomConnectorAction, CustomConnectorWritePreview, CustomConnectorJsonValue, CustomConnectorMutationResult, CustomConnectorRevisionView, CustomConnectorSetupAttempt, CustomConnectorSummary } from "@purin-labs/control-api/portal/custom-connectors";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, errorMessage, isRecord } from "@purin-labs/std";
-import { RemoveConfirm } from "./remove-confirm";
+import { RemoveConfirm } from "@purin-labs/ui/index";
 
 type Loadable<Value> =
   | { readonly kind: "loading" }

@@ -9,7 +9,7 @@ import {
   type Configuration,
   parseConfiguration,
 } from "@purin-labs/control-api/portal/typesafe-connection";
-import { RemoveConfirm } from "./remove-confirm";
+import { RemoveConfirm } from "@purin-labs/ui/index";
 
 export type TypeSafeConnectionState =
   | Readonly<{ kind: "loading" }>

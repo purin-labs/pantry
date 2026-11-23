@@ -1,14 +1,8 @@
 import React from "react";
-import { Button } from "@purin-labs/ui/index";
+import { Button } from "./button";
+import "./remove-confirm.css";
 
-/**
- * The one action that cuts a connection off. It is destructive, so the first
- * press asks in place and names what stops; only the second press runs it.
- * Every drawer of the Integrations page that removes, disables or disconnects
- * something uses this control, so the question always looks and reads the
- * same.
- */
-export function RemoveConfirm(props: {
+export type RemoveConfirmProps = {
   /** The idle button, for example "Remove shop@example.com…". */
   readonly label: string;
   /** The question, for example "Remove shop@example.com?". */
@@ -26,7 +20,14 @@ export function RemoveConfirm(props: {
    * reads the record it changes from them, for example `account-id`.
    */
   readonly data?: Readonly<Record<string, string>>;
-}): React.ReactNode {
+};
+
+/**
+ * The one action that removes or cuts something off. It is destructive, so
+ * the first press asks in place and names what stops; only the second press
+ * runs it. No dialog opens on top of the page or the drawer.
+ */
+export function RemoveConfirm(props: RemoveConfirmProps): React.ReactNode {
   const [confirming, setConfirming] = React.useState(false);
   if (!confirming) {
     return (
@@ -44,11 +45,11 @@ export function RemoveConfirm(props: {
     attributes[`data-${key}`] = value;
   return (
     <div
-      className="connection-actions"
+      className="pantry-remove-confirm"
       role="group"
       aria-label={props.question}
     >
-      <p className="notice-text connection-confirm-copy">
+      <p className="pantry-remove-confirm-copy">
         <strong>{props.question}</strong> {props.consequence}
       </p>
       <Button

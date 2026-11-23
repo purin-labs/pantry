@@ -14,6 +14,6 @@
     "packages/production-simulation/src/recipes/bakery/schedule.ts": 4510,
     "scripts/plan-50/evaluate-pi-durable.mjs": 5289,
     "surfaces/portal/ui/features/chat/route.tsx": 4255,
-    "surfaces/portal/ui/styles.css": 10385
+    "surfaces/portal/ui/styles.css": 10379
   }
 }

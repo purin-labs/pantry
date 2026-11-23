@@ -19,7 +19,7 @@ import { Link } from "react-router";
 
 import { providerLabel, providerTile } from "@purin-labs/area-integrations/ui/integration-catalogue";
 import { ProviderTile } from "@purin-labs/ui/page-components";
-import { SideDrawer } from "@purin-labs/ui/index";
+import { RemoveConfirm, SideDrawer } from "@purin-labs/ui/index";
 import type {
   AccessControlGrantView,
   AccessControlSubjectView,
@@ -43,11 +43,6 @@ const SYSTEM_FILTERS: ReadonlyArray<{ value: SystemFilter; label: string }> = [
   { value: "can_change", label: "Can change data" },
 ];
 
-type ShareSystem = (
-  system: AccessSystem | null,
-  event: React.MouseEvent<HTMLButtonElement>,
-) => void;
-
 /**
  * The access page's main list: one row for each connected system, with the
  * recipients that can use it and the strongest thing each recipient can do.
@@ -61,8 +56,14 @@ export function SystemAccessView(
     closeCheck: () => void;
     checkPanel: React.ReactNode;
     onOpenCheck: () => void;
-    onShare: ShareSystem;
+    /** Opens the page-level grant dialog, for any system. */
+    onShareAny: (event: React.MouseEvent<HTMLButtonElement>) => void;
+    /** The grant form of one system, shown in that system's drawer. */
+    grantForm: (system: AccessSystem) => React.ReactNode;
     onRevoke: (grant: AccessControlGrantView) => void;
+    busy: boolean;
+    /** Clears the last error, so that a drawer opens without an old one. */
+    clearProblem: () => void;
     onApplyDefaults: () => void;
     loadMore: () => void;
     loadingMore: boolean;
@@ -71,6 +72,10 @@ export function SystemAccessView(
   const [search, setSearch] = React.useState("");
   const [filter, setFilter] = React.useState<SystemFilter>("all");
   const [openKey, setOpenKey] = React.useState<string | null>(null);
+  const openSystem = (key: string): void => {
+    props.clearProblem();
+    setOpenKey(key);
+  };
   const systems = buildAccessSystems(props.view);
   const terms = search.toLowerCase().split(/\s+/u).filter(isNotEmpty);
   const visible = systems.filter(matchesSystem.bind(null, terms, filter));
@@ -107,7 +112,7 @@ export function SystemAccessView(
             <button
               type="button"
               className="connection-primary-action"
-              onClick={props.onShare.bind(null, null)}
+              onClick={props.onShareAny}
             >
               <Plus aria-hidden="true" size={16} />
               Share a system
@@ -124,7 +129,7 @@ export function SystemAccessView(
         <div className="side-drawer-body">{props.checkPanel}</div>
       </SideDrawer>
       {canManage && complete
-        ? renderUnsharedNotice(systems, props.onShare)
+        ? renderUnsharedNotice(systems, openSystem)
         : null}
       {props.view.grants.items.length === 0 && complete ? (
         <div className="access35-empty">
@@ -178,8 +183,9 @@ export function SystemAccessView(
             canManage={canManage}
             capabilitiesPath={props.capabilitiesPath}
             integrationsPath={props.integrationsPath}
-            onShare={props.onShare}
+            grantForm={props.grantForm}
             onRevoke={props.onRevoke}
+            busy={props.busy}
             close={setOpenKey.bind(null, null)}
           />
           {visible.length === 0 ? (
@@ -193,7 +199,7 @@ export function SystemAccessView(
                   key={system.key}
                   system={system}
                   complete={complete}
-                  open={setOpenKey}
+                  open={openSystem}
                 />
               ))}
             </ul>
@@ -249,8 +255,9 @@ function SystemRow(
 
 /**
  * Everything about one system: the attention notice, the actions that always
- * ask first, each recipient with its permissions, and the revoked history.
- * The confirm dialogs that open from here stack above the drawer.
+ * ask first, each recipient with its permissions, the form that gives access,
+ * and the revoked history. Nothing opens on top of the drawer: a grant and a
+ * removal both happen in place.
  */
 function SystemDrawer(
   props: Readonly<{
@@ -259,51 +266,38 @@ function SystemDrawer(
     canManage: boolean;
     capabilitiesPath: string;
     integrationsPath: string | null;
-    onShare: ShareSystem;
+    grantForm: (system: AccessSystem) => React.ReactNode;
     onRevoke: (grant: AccessControlGrantView) => void;
+    busy: boolean;
     close: () => void;
   }>,
 ): React.ReactNode {
   const { system } = props;
   const dialog = React.useRef<HTMLDialogElement>(null);
-  const open = system !== undefined;
+  const grants = system === undefined ? 0 : countGrants(system);
+  // A removal takes away the row that held focus; focus stays in the drawer.
   React.useEffect(() => {
-    if (!open) return undefined;
-    const listener = keepFocusInDrawer.bind(null, dialog);
-    document.addEventListener("close", listener, true);
-    return () => document.removeEventListener("close", listener, true);
-  }, [open]);
+    window.requestAnimationFrame(keepFocusInDrawer.bind(null, dialog));
+  }, [grants]);
   const shared = system !== undefined && system.recipients.length > 0;
   return (
     <SideDrawer
-      open={open}
+      open={system !== undefined}
       title={system?.label ?? ""}
       close={props.close}
       className="access35-system-drawer"
       dialogRef={dialog}
       footer={
         system === undefined ? undefined : (
-          <>
-            <Link
-              className="access35-system-drawer-link"
-              to={actionsHref(
-                props.capabilitiesPath,
-                systemActionSearch(system),
-              )}
-            >
-              Edit actions
-            </Link>
-            {props.canManage ? (
-              <button
-                type="button"
-                className="connection-primary-action"
-                onClick={props.onShare.bind(null, system)}
-              >
-                <Plus aria-hidden="true" size={16} />
-                {shared ? "Add a person, channel, or agent" : "Share"}
-              </button>
-            ) : null}
-          </>
+          <Link
+            className="access35-system-drawer-link"
+            to={actionsHref(
+              props.capabilitiesPath,
+              systemActionSearch(system),
+            )}
+          >
+            Edit actions
+          </Link>
         )
       }
     >
@@ -336,7 +330,11 @@ function SystemDrawer(
           {shared ? (
             <ul className="access35-recipient-list">
               {system.recipients.map(
-                renderRecipient.bind(null, props.onRevoke),
+                renderRecipient.bind(
+                  null,
+                  props.canManage ? props.onRevoke : null,
+                  props.busy,
+                ),
               )}
             </ul>
           ) : (
@@ -346,6 +344,15 @@ function SystemDrawer(
                 : "No access in the part of the list that is loaded."}
             </p>
           )}
+          {props.canManage ? (
+            <section
+              className="access35-grant-section"
+              aria-labelledby="access35-grant-title"
+            >
+              <h3 id="access35-grant-title">Give access</h3>
+              {props.grantForm(system)}
+            </section>
+          ) : null}
           {system.revokedGrants.length === 0 ? null : (
             <section className="access35-revoked">
               <h3>Removed earlier</h3>
@@ -360,29 +367,31 @@ function SystemDrawer(
   );
 }
 
+function countGrants(system: AccessSystem): number {
+  let count = 0;
+  for (const recipient of system.recipients) count += recipient.grants.length;
+  return count;
+}
+
 /**
- * A revoke removes the button that opened its confirm dialog, so the browser
- * has no control to give focus back to. Keep focus in the drawer instead.
+ * Gives focus back to the drawer when the control that held it is gone, as
+ * after a removal.
  */
 function keepFocusInDrawer(
   drawer: React.RefObject<HTMLDialogElement | null>,
-  event: Event,
 ): void {
-  if (event.target === drawer.current) return;
-  window.requestAnimationFrame(() => {
-    const dialog = drawer.current;
-    if (dialog === null || !dialog.open) return;
-    const active = document.activeElement;
-    if (active !== null && active !== document.body && active.isConnected)
-      return;
-    dialog.tabIndex = -1;
-    dialog.focus({ preventScroll: true });
-  });
+  const dialog = drawer.current;
+  if (dialog === null || !dialog.open) return;
+  const active = document.activeElement;
+  if (active !== null && active !== document.body && active.isConnected)
+    return;
+  dialog.tabIndex = -1;
+  dialog.focus({ preventScroll: true });
 }
 
 function renderUnsharedNotice(
   systems: readonly AccessSystem[],
-  onShare: ShareSystem,
+  open: (key: string) => void,
 ): React.ReactNode {
   const unshared: AccessSystem[] = [];
   for (const system of systems) {
@@ -397,7 +406,7 @@ function renderUnsharedNotice(
       {unshared.length === 1 ? (
         <>
           <p>{first.label} is connected, but nobody can use it yet.</p>
-          <button type="button" onClick={onShare.bind(null, first)}>
+          <button type="button" onClick={open.bind(null, first.key)}>
             Share {systemShortName(first)}
           </button>
         </>
@@ -477,7 +486,8 @@ function renderSystemSummary(
 }
 
 function renderRecipient(
-  onRevoke: (grant: AccessControlGrantView) => void,
+  onRevoke: ((grant: AccessControlGrantView) => void) | null,
+  busy: boolean,
   recipient: SystemRecipient,
 ): React.ReactNode {
   return (
@@ -496,14 +506,15 @@ function renderRecipient(
         </span>
       </div>
       <ul className="access35-permission-list">
-        {recipient.grants.map(renderPermission.bind(null, onRevoke))}
+        {recipient.grants.map(renderPermission.bind(null, onRevoke, busy))}
       </ul>
     </li>
   );
 }
 
 function renderPermission(
-  onRevoke: (grant: AccessControlGrantView) => void,
+  onRevoke: ((grant: AccessControlGrantView) => void) | null,
+  busy: boolean,
   grant: AccessControlGrantView,
 ): React.ReactNode {
   return (
@@ -513,10 +524,15 @@ function renderPermission(
           {grant.capability.label}
           <small>{permissionDetail(grant)}</small>
         </span>
-        {grant.actions.kind === "revoke_grant" ? (
-          <button type="button" onClick={onRevoke.bind(null, grant)}>
-            Remove…
-          </button>
+        {onRevoke !== null && grant.actions.kind === "revoke_grant" ? (
+          <RemoveConfirm
+            label="Remove…"
+            question={`Remove ${grant.capability.label} for ${grant.subject.label}?`}
+            consequence={`${grant.subject.label} loses it at once. Give the access again to restore it.`}
+            confirmLabel="Remove access"
+            busy={busy}
+            onConfirm={onRevoke.bind(null, grant)}
+          />
         ) : null}
       </div>
     </li>

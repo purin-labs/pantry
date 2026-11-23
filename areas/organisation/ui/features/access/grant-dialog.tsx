@@ -12,6 +12,7 @@ import {
   type CustomOperationSelection,
 } from "./custom-operation-picker";
 import { CircleAlert } from "lucide-react";
+import "./grant-form.css";
 import { Link } from "react-router";
 
 import {
@@ -28,7 +29,6 @@ import {
 } from "./file-resource-picker";
 import type {
   AccessControlCapabilityView,
-  AccessControlGrantView,
   AccessControlOption,
   FileResourceAccount,
   FileResourceSelection,
@@ -84,35 +84,86 @@ export type GrantDraft = StrictUnion<
     }>
 >;
 
+type GrantFormProps = Readonly<{
+  organisationId: string;
+  initialCustomConnector: CustomConnectorAccessHandoff | null;
+  /** The form starts again each time this turns true. */
+  active: boolean;
+  busy: boolean;
+  problem: string | null;
+  initialFileProvider: FileResourceAccount["provider"] | null;
+  initialSubjectRef: string;
+  /**
+   * The connected account of the system that the form shares. The form then
+   * asks for no account, and it chooses the account's only resource.
+   */
+  fixedIntegration: AccessControlOption | null;
+  capabilities: readonly AccessControlCapabilityView[];
+  subjects: readonly AccessControlOption[];
+  integrations: readonly AccessControlOption[];
+  integrationProviders: ReadonlyMap<string, string>;
+  integrationsPath: string | null;
+  resources: readonly AccessControlOption[];
+  fileAccounts: readonly FileResourceAccount[];
+  filePicker: FileResourcePickerTransport;
+  /** Cancel closes a dialog. A form inside a drawer has none. */
+  cancel: (() => void) | null;
+  /**
+   * Loads the options of the chosen action. With an integration, an action on
+   * a provider resource lists that account's resources.
+   */
+  chooseCapability: (
+    capability: AccessControlCapabilityView | null,
+    integration: AccessControlOption | null,
+  ) => void;
+  chooseIntegration: (integration: AccessControlOption | null) => void;
+  submit: (draft: GrantDraft) => void;
+}>;
+
+/**
+ * The page-level grant: a dialog that can share any system. A system's own
+ * drawer shows the same form in place, with the system's account fixed.
+ */
 export function GrantAccessDialog(
-  props: Readonly<{
-    organisationId: string;
-    initialCustomConnector: CustomConnectorAccessHandoff | null;
-    open: boolean;
-    busy: boolean;
-    problem: string | null;
-    initialFileProvider: FileResourceAccount["provider"] | null;
-    initialSubjectRef: string;
-    /** The system the dialog opened from; its actions are the only choices. */
-    scopeLabel: string | null;
-    capabilities: readonly AccessControlCapabilityView[];
-    subjects: readonly AccessControlOption[];
-    integrations: readonly AccessControlOption[];
-    integrationProviders: ReadonlyMap<string, string>;
-    integrationsPath: string | null;
-    resources: readonly AccessControlOption[];
-    fileAccounts: readonly FileResourceAccount[];
-    filePicker: FileResourcePickerTransport;
-    close: () => void;
-    chooseCapability: (capability: AccessControlCapabilityView | null) => void;
-    chooseIntegration: (integration: AccessControlOption | null) => void;
-    submit: (draft: GrantDraft) => void;
-  }>,
+  props: Omit<GrantFormProps, "active" | "cancel" | "fixedIntegration"> &
+    Readonly<{ open: boolean; close: () => void }>,
 ): React.ReactNode {
   const dialog = React.useRef<HTMLDialogElement>(null);
+  React.useEffect(syncDialog.bind(null, dialog, props.open), [props.open]);
+  const fileFlow = props.initialFileProvider !== null;
+  return (
+    <dialog
+      className="access35-dialog"
+      ref={dialog}
+      aria-labelledby="access35-grant-dialog-title"
+      onCancel={cancelDialog.bind(null, props.close)}
+    >
+      <div className="access35-grant-dialog">
+        <DialogHeading
+          id="access35-grant-dialog-title"
+          title={fileFlow ? "Choose files for Purin Pantry" : "Grant access"}
+          close={props.close}
+        />
+        <p>
+          {fileFlow
+            ? "Choose files or folders, then where Pantry can use them. Access is read-only."
+            : "Choose who gets access and what they can do."}
+        </p>
+        <GrantForm
+          {...props}
+          active={props.open}
+          cancel={props.close}
+          fixedIntegration={null}
+        />
+      </div>
+    </dialog>
+  );
+}
+
+export function GrantForm(props: GrantFormProps): React.ReactNode {
   const [subjectRef, setSubjectRef] = React.useState(props.initialSubjectRef);
   const [capabilityId, setCapabilityId] = React.useState(
-    props.initialFileProvider === null ? "" : "file.read",
+    initialCapabilityId(props.initialCustomConnector, props.initialFileProvider),
   );
   const [integrationRef, setIntegrationRef] = React.useState("");
   const [resourceRef, setResourceRef] = React.useState("");
@@ -122,11 +173,10 @@ export function GrantAccessDialog(
   const [customSelection, setCustomSelection] =
     React.useState<CustomOperationSelection | null>(null);
   const [formProblem, setFormProblem] = React.useState("");
-  React.useEffect(syncDialog.bind(null, dialog, props.open), [props.open]);
   React.useEffect(
     syncGrantDefaults.bind(
       null,
-      props.open,
+      props.active,
       props.initialFileProvider,
       props.initialSubjectRef,
       props.initialCustomConnector,
@@ -139,13 +189,13 @@ export function GrantAccessDialog(
       setFormProblem,
     ),
     [
-      props.open,
+      props.active,
       props.initialFileProvider,
       props.initialSubjectRef,
       props.initialCustomConnector,
     ],
   );
-  const initialFileFlow = props.initialFileProvider !== null;
+  const fileFlow = props.initialFileProvider !== null;
   const capability = findCapability(props.capabilities, capabilityId);
   const subject = findOption(props.subjects, subjectRef);
   const needsResource =
@@ -163,189 +213,163 @@ export function GrantAccessDialog(
     !needsPublishedCommerceTarget;
   const needsFile = capability?.definition.target === "file_resource";
   const needsEntityType = capability?.definition.target === "commerce_read";
-  const accounts = compatibleIntegrations(
-    props.integrations,
-    props.integrationProviders,
-    capability,
-  );
+  const accounts =
+    props.fixedIntegration === null
+      ? compatibleIntegrations(
+          props.integrations,
+          props.integrationProviders,
+          capability,
+        )
+      : [props.fixedIntegration];
   const accountMissing = needsAccount && accounts.length === 0;
   const resources = props.resources.filter(
     matchesCapabilityResource.bind(null, capabilityId),
   );
+  // One resource that fits is the choice: the form does not ask for it.
+  const onlyResource =
+    resources.length === 1 && resources[0]?.availability === "available"
+      ? resources[0]
+      : null;
+  const chosenResourceRef =
+    resourceRef !== "" ? resourceRef : (onlyResource?.refId ?? "");
+  const chosenIntegrationRef = props.fixedIntegration?.refId ?? integrationRef;
   return (
-    <dialog
-      className="access35-dialog"
-      ref={dialog}
-      aria-labelledby="access35-grant-dialog-title"
-      onCancel={cancelDialog.bind(null, props.close)}
+    <form
+      className="access35-grant-form"
+      onSubmit={submitGrant.bind(
+        null,
+        props,
+        subjectRef,
+        capabilityId,
+        chosenIntegrationRef,
+        chosenResourceRef,
+        customEntityType,
+        fileSelection,
+        customSelection,
+        setFormProblem,
+      )}
     >
-      <form
-        method="dialog"
-        onSubmit={submitGrant.bind(
-          null,
-          props,
-          subjectRef,
-          capabilityId,
-          integrationRef,
-          resourceRef,
-          customEntityType,
-          fileSelection,
-          customSelection,
-          setFormProblem,
-        )}
-      >
-        <DialogHeading
-          id="access35-grant-dialog-title"
-          title={
-            initialFileFlow
-              ? "Choose files for Purin Pantry"
-              : props.scopeLabel === null
-                ? "Grant access"
-                : `Share ${props.scopeLabel}`
-          }
-          close={props.close}
-        />
-        <p>
-          {initialFileFlow
-            ? "Choose files or folders, then confirm where Pantry can use them. Access is read-only."
-            : "Choose who gets access, then the exact action and resource."}
-        </p>
-        <ol className="access35-dialog-steps" aria-label="Grant access steps">
-          {initialFileFlow ? (
-            <>
-              <li>
-                <span>1. Files or folders</span>
-                <FileResourcePicker
-                  accounts={props.fileAccounts}
-                  selection={fileSelection}
-                  change={setFileSelection}
-                  transport={props.filePicker}
-                />
-              </li>
-              <li>
-                <label htmlFor="access35-grant-subject">2. Available in</label>
-                <Select.Root
-                  required
-                  items={props.subjects.map(optionItem)}
-                  value={subjectRef === "" ? null : subjectRef}
-                  onValueChange={(value) => setSubjectRef(value ?? "")}
-                >
-                  <Select.Trigger id="access35-grant-subject">
-                    <Select.Value placeholder="Choose where Pantry can use these files" />
-                  </Select.Trigger>
-                  <Select.Popup>
-                    {props.subjects.map(renderOption)}
-                  </Select.Popup>
-                </Select.Root>
-              </li>
-              <li className="access35-dialog-review">
-                <span>3. Review</span>
-                <p>
-                  Pantry can read the selected files in{" "}
-                  {subject?.label ?? "the conversation or workflow you choose"}.
-                  You can remove access at any time from this page.
-                </p>
-              </li>
-            </>
-          ) : (
-            <>
-              <li>
-                <label htmlFor="access35-grant-subject">
-                  1. Who gets access
-                </label>
-                <Select.Root
-                  required
-                  items={props.subjects.map(optionItem)}
-                  value={subjectRef === "" ? null : subjectRef}
-                  onValueChange={(value) => setSubjectRef(value ?? "")}
-                >
-                  <Select.Trigger id="access35-grant-subject" autoFocus>
-                    <Select.Value placeholder="Select a person, channel, or agent" />
-                  </Select.Trigger>
-                  <Select.Popup>
-                    {props.subjects.map(renderOption)}
-                  </Select.Popup>
-                </Select.Root>
-              </li>
-              <li>
-                <label htmlFor="access35-grant-capability">
-                  2. What they can do
-                </label>
-                <Select.Root
-                  required
-                  items={props.capabilities.map(capabilityItem)}
-                  value={capabilityId === "" ? null : capabilityId}
-                  onValueChange={changeCapability.bind(
-                    null,
-                    setCapabilityId,
-                    setIntegrationRef,
-                    setResourceRef,
-                    props.capabilities,
-                    props.chooseCapability,
-                    props.chooseIntegration,
-                    setFileSelection,
-                    setFormProblem,
+      <div className="access35-dialog-steps">
+        {fileFlow ? (
+          <>
+            <div>
+              <span>Files or folders</span>
+              <FileResourcePicker
+                accounts={props.fileAccounts}
+                selection={fileSelection}
+                change={setFileSelection}
+                transport={props.filePicker}
+              />
+            </div>
+            <div>
+              <label htmlFor="access35-grant-subject">Available in</label>
+              <Select.Root
+                required
+                items={props.subjects.map(optionItem)}
+                value={subjectRef === "" ? null : subjectRef}
+                onValueChange={(value) => setSubjectRef(value ?? "")}
+              >
+                <Select.Trigger id="access35-grant-subject">
+                  <Select.Value placeholder="Choose where Pantry can use these files" />
+                </Select.Trigger>
+                <Select.Popup>{props.subjects.map(renderOption)}</Select.Popup>
+              </Select.Root>
+            </div>
+            <p className="access35-grant-note">
+              Pantry can read the selected files in{" "}
+              {subject?.label ?? "the conversation or workflow you choose"}.
+              Remove the access at any time.
+            </p>
+          </>
+        ) : (
+          <>
+            <div>
+              <label htmlFor="access35-grant-subject">Who</label>
+              <Select.Root
+                required
+                items={props.subjects.map(optionItem)}
+                value={subjectRef === "" ? null : subjectRef}
+                onValueChange={(value) => setSubjectRef(value ?? "")}
+              >
+                <Select.Trigger id="access35-grant-subject">
+                  <Select.Value placeholder="Select a person, channel, or agent" />
+                </Select.Trigger>
+                <Select.Popup>{props.subjects.map(renderOption)}</Select.Popup>
+              </Select.Root>
+            </div>
+            <div>
+              <label htmlFor="access35-grant-capability">What they can do</label>
+              <Select.Root
+                required
+                items={props.capabilities.map(capabilityItem)}
+                value={capabilityId === "" ? null : capabilityId}
+                onValueChange={changeCapability.bind(
+                  null,
+                  setCapabilityId,
+                  setIntegrationRef,
+                  setResourceRef,
+                  props.capabilities,
+                  props.fixedIntegration,
+                  props.chooseCapability,
+                  setFileSelection,
+                  setFormProblem,
+                )}
+              >
+                <Select.Trigger id="access35-grant-capability">
+                  <Select.Value placeholder="Select an action" />
+                </Select.Trigger>
+                <Select.Popup>
+                  {groupCapabilityOptions(props.capabilities).map(
+                    renderCapabilityGroup,
                   )}
-                >
-                  <Select.Trigger id="access35-grant-capability">
-                    <Select.Value placeholder="Select an action" />
-                  </Select.Trigger>
-                  <Select.Popup>
-                    {groupCapabilityOptions(props.capabilities).map(
-                      renderCapabilityGroup,
+                </Select.Popup>
+              </Select.Root>
+              {capability?.definition.risk === "external_effect" ? (
+                <p className="access35-inline-alert">
+                  <CircleAlert aria-hidden="true" size={18} />
+                  {capability.definition.target === "custom_connector_operation"
+                    ? "Allows real changes through the selected API operation. Every write requires approval."
+                    : `Allows real changes at ${providerDependencyLabel(capability.definition.providerDependency)}. Capability policy can require an approval for each use.`}
+                </p>
+              ) : null}
+            </div>
+            {props.active &&
+            capability?.definition.target === "custom_connector_operation" &&
+            (capabilityId === "custom_connector.read" ||
+              capabilityId === "custom_connector.write") ? (
+              <div>
+                <CustomOperationPicker
+                  key={capabilityId}
+                  organisationId={props.organisationId}
+                  capabilityId={capabilityId}
+                  initial={props.initialCustomConnector}
+                  selection={customSelection}
+                  change={setCustomSelection}
+                />
+              </div>
+            ) : accountMissing ? (
+              <p className="access35-inline-alert" role="status">
+                <CircleAlert aria-hidden="true" size={18} />
+                {capability === null
+                  ? "No connected account is available for this capability."
+                  : `No ${providerDependencyLabel(capability.definition.providerDependency)} account is connected yet.`}
+                {props.integrationsPath === null || capability === null ? null : (
+                  <Link
+                    to={connectIntegrationHref(
+                      props.integrationsPath,
+                      capability.definition.providerDependency,
                     )}
-                  </Select.Popup>
-                </Select.Root>
-                {capability?.definition.risk === "external_effect" ? (
-                  <p className="access35-inline-alert">
-                    <CircleAlert aria-hidden="true" size={18} />
-                    {capability.definition.target ===
-                    "custom_connector_operation"
-                      ? "Allows real changes through the selected API operation. Every write requires approval."
-                      : `Allows real changes at ${providerDependencyLabel(capability.definition.providerDependency)}. Capability policy can require an approval for each use.`}
-                  </p>
-                ) : null}
-              </li>
-              {props.open &&
-              capability?.definition.target === "custom_connector_operation" &&
-              (capabilityId === "custom_connector.read" ||
-                capabilityId === "custom_connector.write") ? (
-                <li>
-                  <CustomOperationPicker
-                    key={capabilityId}
-                    organisationId={props.organisationId}
-                    capabilityId={capabilityId}
-                    initial={props.initialCustomConnector}
-                    selection={customSelection}
-                    change={setCustomSelection}
-                  />
-                </li>
-              ) : accountMissing ? (
-                <li>
-                  <span>3. Connected account</span>
-                  <p className="access35-inline-alert" role="status">
-                    <CircleAlert aria-hidden="true" size={18} />
-                    {capability === null
-                      ? "No connected account is available for this capability."
-                      : `No ${providerDependencyLabel(capability.definition.providerDependency)} account is connected yet.`}
-                    {props.integrationsPath === null ||
-                    capability === null ? null : (
-                      <Link
-                        to={connectIntegrationHref(
-                          props.integrationsPath,
-                          capability.definition.providerDependency,
-                        )}
-                      >
-                        Connect it in Integrations
-                      </Link>
-                    )}
-                  </p>
-                </li>
-              ) : needsAccount ? (
-                <>
-                  <li>
+                  >
+                    Connect it in Integrations
+                  </Link>
+                )}
+              </p>
+            ) : needsAccount ? (
+              <>
+                {props.fixedIntegration === null ? (
+                  <div>
                     <label htmlFor="access35-grant-account">
-                      3. Connected account
+                      Connected account
                     </label>
                     <Select.Root
                       required
@@ -362,177 +386,199 @@ export function GrantAccessDialog(
                       <Select.Trigger id="access35-grant-account">
                         <Select.Value placeholder="Select an account" />
                       </Select.Trigger>
-                      <Select.Popup>
-                        {accounts.map(renderOption)}
-                      </Select.Popup>
+                      <Select.Popup>{accounts.map(renderOption)}</Select.Popup>
                     </Select.Root>
-                  </li>
-                  <li>
-                    <label htmlFor="access35-grant-resource">4. Resource</label>
-                    <Select.Root
-                      required
-                      items={resources.map(optionItem)}
-                      value={resourceRef === "" ? null : resourceRef}
-                      onValueChange={(value) => setResourceRef(value ?? "")}
-                    >
-                      <Select.Trigger id="access35-grant-resource">
-                        <Select.Value placeholder="Select a resource" />
-                      </Select.Trigger>
-                      <Select.Popup>
-                        {resources.map(renderOption)}
-                      </Select.Popup>
-                    </Select.Root>
-                  </li>
-                </>
-              ) : needsFile ? (
-                <li>
-                  <span>3. File or folder</span>
-                  <FileResourcePicker
-                    accounts={props.fileAccounts}
-                    selection={fileSelection}
-                    change={setFileSelection}
-                    transport={props.filePicker}
-                  />
-                </li>
-              ) : needsEntityType ? (
-                <li>
-                  <label htmlFor="access35-grant-resource">
-                    3. Commerce scope
-                  </label>
-                  <Select.Root
-                    required
-                    items={[
-                      ...COMMERCE_SCOPE_ITEMS,
-                      ...resources.map(optionItem),
-                    ]}
-                    value={resourceRef === "" ? null : resourceRef}
-                    onValueChange={(value) => setResourceRef(value ?? "")}
-                  >
-                    <Select.Trigger id="access35-grant-resource">
-                      <Select.Value placeholder="Select a commerce scope" />
-                    </Select.Trigger>
-                    <Select.Popup>
-                      <Select.Item value="custom_entity_type">
-                        Custom record type
-                      </Select.Item>
+                  </div>
+                ) : null}
+                {renderResourceField(
+                  "Resource",
+                  "Select a resource",
+                  resources,
+                  onlyResource,
+                  resourceRef,
+                  setResourceRef,
+                )}
+              </>
+            ) : needsFile ? (
+              <div>
+                <span>File or folder</span>
+                <FileResourcePicker
+                  accounts={props.fileAccounts}
+                  selection={fileSelection}
+                  change={setFileSelection}
+                  transport={props.filePicker}
+                />
+              </div>
+            ) : needsEntityType ? (
+              <div>
+                <label htmlFor="access35-grant-resource">Commerce scope</label>
+                <Select.Root
+                  required
+                  items={[...COMMERCE_SCOPE_ITEMS, ...resources.map(optionItem)]}
+                  value={resourceRef === "" ? null : resourceRef}
+                  onValueChange={(value) => setResourceRef(value ?? "")}
+                >
+                  <Select.Trigger id="access35-grant-resource">
+                    <Select.Value placeholder="Select a commerce scope" />
+                  </Select.Trigger>
+                  <Select.Popup>
+                    <Select.Item value="custom_entity_type">
+                      Custom record type
+                    </Select.Item>
+                    <Select.Group>
+                      <Select.GroupLabel>Record types</Select.GroupLabel>
+                      {SYSTEM_KINDS.map(renderEntityTypeOption)}
+                    </Select.Group>
+                    {resources.length === 0 ? null : (
                       <Select.Group>
-                        <Select.GroupLabel>Record types</Select.GroupLabel>
-                        {SYSTEM_KINDS.map(renderEntityTypeOption)}
+                        <Select.GroupLabel>Existing exact scopes</Select.GroupLabel>
+                        {resources.map(renderOption)}
                       </Select.Group>
-                      {resources.length === 0 ? null : (
-                        <Select.Group>
-                          <Select.GroupLabel>Existing exact scopes</Select.GroupLabel>
-                          {resources.map(renderOption)}
-                        </Select.Group>
+                    )}
+                  </Select.Popup>
+                </Select.Root>
+                {resourceRef === "custom_entity_type" && (
+                  <label>
+                    Custom record type ID
+                    <input
+                      value={customEntityType}
+                      onChange={changeCustomEntityType.bind(
+                        null,
+                        setCustomEntityType,
                       )}
-                    </Select.Popup>
-                  </Select.Root>
-                  {resourceRef === "custom_entity_type" && (
-                    <label>
-                      Custom record type ID
-                      <input
-                        value={customEntityType}
-                        onChange={changeCustomEntityType.bind(
-                          null,
-                          setCustomEntityType,
-                        )}
-                        required
-                        placeholder="bakery_procedure"
-                      />
-                    </label>
-                  )}
-                  <p>
-                    Read access covers records of this type in the current
-                    connected shop.
-                  </p>
-                </li>
-              ) : needsResource ? (
-                <li>
-                  <label htmlFor="access35-grant-resource">
-                    {needsPublishedCommerceTarget
-                      ? "3. Published commerce list entry"
-                      : "3. Existing exact scope"}
+                      required
+                      placeholder="bakery_procedure"
+                    />
                   </label>
-                  <Select.Root
-                    required
-                    items={resources.map(optionItem)}
-                    value={resourceRef === "" ? null : resourceRef}
-                    onValueChange={(value) => setResourceRef(value ?? "")}
-                  >
-                    <Select.Trigger id="access35-grant-resource">
-                      <Select.Value
-                        placeholder={
-                          needsPublishedCommerceTarget
-                            ? "Select a published list entry"
-                            : "Select an existing scope"
-                        }
-                      />
-                    </Select.Trigger>
-                    <Select.Popup>{resources.map(renderOption)}</Select.Popup>
-                  </Select.Root>
-                  {props.resources.length === 0 ? (
-                    <p className="access35-inline-alert" role="status">
-                      <CircleAlert aria-hidden="true" size={18} />
-                      {needsPublishedCommerceTarget
-                        ? "No published commerce list entry is available for this capability."
-                        : "No current scope is available for this capability."}
-                    </p>
-                  ) : null}
-                </li>
-              ) : capability === null ? null : (
-                <li className="access35-dialog-review">
-                  <span>3. Review</span>
-                  <p>{capability.definition.description}</p>
-                </li>
-              )}
-            </>
-          )}
-        </ol>
-        <p
-          className="access35-inline-alert"
-          role={formProblem.length === 0 ? undefined : "alert"}
-        >
-          {formProblem}
-        </p>
-        {props.problem === null ? null : (
-          <p className="access35-inline-alert" role="alert">
-            {props.problem}
-          </p>
+                )}
+                <p>
+                  Read access covers records of this type in the current
+                  connected shop.
+                </p>
+              </div>
+            ) : needsResource ? (
+              <>
+                {renderResourceField(
+                  needsPublishedCommerceTarget
+                    ? "Published commerce list entry"
+                    : "Existing exact scope",
+                  needsPublishedCommerceTarget
+                    ? "Select a published list entry"
+                    : "Select an existing scope",
+                  resources,
+                  onlyResource,
+                  resourceRef,
+                  setResourceRef,
+                )}
+                {props.resources.length === 0 ? (
+                  <p className="access35-inline-alert" role="status">
+                    <CircleAlert aria-hidden="true" size={18} />
+                    {needsPublishedCommerceTarget
+                      ? "No published commerce list entry is available for this capability."
+                      : "No current scope is available for this capability."}
+                  </p>
+                ) : null}
+              </>
+            ) : capability === null ? null : (
+              <p className="access35-grant-note">
+                {capability.definition.description}
+              </p>
+            )}
+          </>
         )}
-        <div className="access35-dialog-actions">
-          <button type="button" className="secondary" onClick={props.close}>
+      </div>
+      <p
+        className="access35-inline-alert"
+        role={formProblem.length === 0 ? undefined : "alert"}
+      >
+        {formProblem}
+      </p>
+      {props.problem === null ? null : (
+        <p className="access35-inline-alert" role="alert">
+          {props.problem}
+        </p>
+      )}
+      <div className="access35-dialog-actions">
+        {props.cancel === null ? null : (
+          <button type="button" className="secondary" onClick={props.cancel}>
             Cancel
           </button>
-          <button
-            type="submit"
-            className="connection-primary-action"
-            disabled={
-              props.busy ||
-              accountMissing ||
-              ((initialFileFlow ||
-                capability?.definition.target === "file_resource") &&
-                fileSelection === null) ||
-              (capability?.definition.target === "custom_connector_operation" &&
-                (customSelection === null ||
-                  customSelection.capabilityId !== capabilityId))
-            }
-          >
-            {props.busy
-              ? initialFileFlow
-                ? "Adding files…"
-                : "Granting access…"
-              : initialFileFlow
-                ? "Add files to Pantry"
-                : "Grant access"}
-          </button>
-        </div>
-      </form>
-    </dialog>
+        )}
+        <button
+          type="submit"
+          className="connection-primary-action"
+          disabled={
+            props.busy ||
+            accountMissing ||
+            ((fileFlow || capability?.definition.target === "file_resource") &&
+              fileSelection === null) ||
+            (capability?.definition.target === "custom_connector_operation" &&
+              (customSelection === null ||
+                customSelection.capabilityId !== capabilityId))
+          }
+        >
+          {props.busy
+            ? fileFlow
+              ? "Adding files…"
+              : "Granting access…"
+            : fileFlow
+              ? "Add files to Pantry"
+              : "Grant access"}
+        </button>
+      </div>
+    </form>
   );
 }
 
+/**
+ * The resource choice of an action. One resource that fits shows as a line,
+ * not as a choice of one.
+ */
+function renderResourceField(
+  label: string,
+  placeholder: string,
+  resources: readonly AccessControlOption[],
+  onlyResource: AccessControlOption | null,
+  resourceRef: string,
+  setResourceRef: React.Dispatch<React.SetStateAction<string>>,
+): React.ReactNode {
+  if (onlyResource !== null)
+    return (
+      <p className="access35-grant-note">
+        On {onlyResource.label} · {onlyResource.detail}
+      </p>
+    );
+  return (
+    <div>
+      <label htmlFor="access35-grant-resource">{label}</label>
+      <Select.Root
+        required
+        items={resources.map(optionItem)}
+        value={resourceRef === "" ? null : resourceRef}
+        onValueChange={(value) => setResourceRef(value ?? "")}
+      >
+        <Select.Trigger id="access35-grant-resource">
+          <Select.Value placeholder={placeholder} />
+        </Select.Trigger>
+        <Select.Popup>{resources.map(renderOption)}</Select.Popup>
+      </Select.Root>
+    </div>
+  );
+}
+
+function initialCapabilityId(
+  customHandoff: CustomConnectorAccessHandoff | null,
+  provider: FileResourceAccount["provider"] | null,
+): string {
+  return customHandoff !== null
+    ? "custom_connector.read"
+    : provider === null
+      ? ""
+      : "file.read";
+}
+
 function syncGrantDefaults(
-  open: boolean,
+  active: boolean,
   provider: FileResourceAccount["provider"] | null,
   subjectRef: string,
   customHandoff: CustomConnectorAccessHandoff | null,
@@ -548,89 +594,18 @@ function syncGrantDefaults(
   >,
   setFormProblem: React.Dispatch<React.SetStateAction<string>>,
 ): void {
-  if (!open) return;
+  if (!active) return;
   setSubjectRef(subjectRef);
   setCustomSelection(null);
-  setCapabilityId(
-    customHandoff !== null
-      ? "custom_connector.read"
-      : provider === null
-        ? ""
-        : "file.read",
-  );
+  setCapabilityId(initialCapabilityId(customHandoff, provider));
   setIntegrationRef("");
   setResourceRef("");
   setFileSelection(null);
   setFormProblem("");
 }
 
-export function RevokeGrantDialog(
-  props: Readonly<{
-    grant: AccessControlGrantView | null;
-    busy: boolean;
-    close: () => void;
-    revoke: (grant: AccessControlGrantView) => void;
-  }>,
-): React.ReactNode {
-  const dialog = React.useRef<HTMLDialogElement>(null);
-  React.useEffect(syncDialog.bind(null, dialog, props.grant !== null), [
-    props.grant,
-  ]);
-  if (props.grant === null) return <dialog ref={dialog} />;
-  return (
-    <dialog
-      className="access35-dialog"
-      ref={dialog}
-      aria-labelledby="access35-revoke-dialog-title"
-      onCancel={cancelDialog.bind(null, props.close)}
-    >
-      <form
-        method="dialog"
-        onSubmit={submitRevoke.bind(null, props.revoke, props.grant)}
-      >
-        <DialogHeading
-          id="access35-revoke-dialog-title"
-          title="Remove access"
-          close={props.close}
-        />
-        <p>
-          {props.grant.subject.label} will lose {props.grant.capability.label}{" "}
-          for {props.grant.resource.label} at once.
-        </p>
-        <dl className="access35-dialog-review">
-          <div>
-            <dt>Who</dt>
-            <dd>{props.grant.subject.label}</dd>
-          </div>
-          <div>
-            <dt>Action</dt>
-            <dd>{props.grant.capability.label}</dd>
-          </div>
-          <div>
-            <dt>On</dt>
-            <dd>{props.grant.resource.label}</dd>
-          </div>
-        </dl>
-        <div className="access35-dialog-actions">
-          <button
-            type="button"
-            className="secondary"
-            autoFocus
-            onClick={props.close}
-          >
-            Keep access
-          </button>
-          <button type="submit" className="danger" disabled={props.busy}>
-            {props.busy ? "Removing access…" : "Remove access"}
-          </button>
-        </div>
-      </form>
-    </dialog>
-  );
-}
-
 function submitGrant(
-  props: Parameters<typeof GrantAccessDialog>[0],
+  props: GrantFormProps,
   subjectRef: string,
   capabilityId: string,
   integrationRef: string,
@@ -814,22 +789,20 @@ function isCommerceTargetOption(option: AccessControlOption): boolean {
   return option.kind === "commerce_target";
 }
 
-function submitRevoke(
-  revoke: (grant: AccessControlGrantView) => void,
-  grant: AccessControlGrantView,
-  event: React.FormEvent<HTMLFormElement>,
-): void {
-  event.preventDefault();
-  revoke(grant);
-}
-
+/**
+ * One loader fills the option list of the chosen action, so that two loads
+ * never race for the same list.
+ */
 function changeCapability(
   setCapability: React.Dispatch<React.SetStateAction<string>>,
   setIntegration: React.Dispatch<React.SetStateAction<string>>,
   setResource: React.Dispatch<React.SetStateAction<string>>,
   capabilities: readonly AccessControlCapabilityView[],
-  chooseCapability: (capability: AccessControlCapabilityView | null) => void,
-  chooseIntegration: (integration: AccessControlOption | null) => void,
+  fixedIntegration: AccessControlOption | null,
+  chooseCapability: (
+    capability: AccessControlCapabilityView | null,
+    integration: AccessControlOption | null,
+  ) => void,
   setFileSelection: React.Dispatch<
     React.SetStateAction<FileResourceSelection | null>
   >,
@@ -842,8 +815,7 @@ function changeCapability(
   setResource("");
   setFileSelection(null);
   setFormProblem("");
-  chooseCapability(findCapability(capabilities, capabilityId));
-  chooseIntegration(null);
+  chooseCapability(findCapability(capabilities, capabilityId), fixedIntegration);
 }
 
 function changeIntegration(

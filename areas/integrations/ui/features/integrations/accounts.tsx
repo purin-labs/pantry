@@ -21,7 +21,7 @@ import {
 import type { CredentialActionOutcome, IntegrationsPageActions, PendingProviderAuthorization, SettingsMutationFeedback } from "./settings-types";
 import type { IntegrationAccount } from "@purin-labs/control-api/portal/settings";
 import { ConfirmButton } from "./workspace";
-import { RemoveConfirm } from "./remove-confirm";
+import { RemoveConfirm } from "@purin-labs/ui/index";
 
 type IntegrationAccountControls = {
   readonly mutations: MutationLedger;
