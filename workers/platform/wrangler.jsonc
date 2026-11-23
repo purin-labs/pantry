@@ -302,8 +302,6 @@
         // regional database, the archive bucket and the Actors are in Tokyo.
         "PANTRY_ORGANISATION_PLACEMENT_PROFILE": "{\"kind\":\"affinity\",\"placementCellId\":\"production-apac\",\"locationHint\":\"apac\",\"databaseBinding\":\"ORGANISATION_DB_APAC\"}",
         "PANTRY_VAULT_ACTIVE_KEY_VERSION": "v1",
-        "SEAMS_RELAYER_URL": "https://seams-sdk-d1-gateway.n6378056.workers.dev",
-        "SEAMS_WALLET_ORIGIN": "https://sign.seams.sh",
         // The Purin Pantry OAuth integrations at Airtable and Notion (Plan 91).
         "AIRTABLE_OAUTH_CLIENT_ID": "7abda7cf-c1eb-40f8-b5fa-2efb85d9edc3",
         "NOTION_OAUTH_CLIENT_ID": "420d872b-594c-8155-af3d-003739e7cf01",

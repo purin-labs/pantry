@@ -69,7 +69,6 @@ import {
 import {
   handleCompleteIdentityLink,
   handleIdentityLinkChallenge,
-  handleIdentityUiConfig,
   handleIssueIdentityLink,
 } from "@purin-labs/surface-webhooks/server/gateway/identity-link";
 import { handleListIntegrationAccounts } from "@purin-labs/area-integrations/server/gateway/integration-accounts";
@@ -286,8 +285,6 @@ async function handleRequest(
         return handleEmailGoogleWebhook(request, env);
       case "whatsappWebhook":
         return handleWhatsAppWebhook(request, env);
-      case "identityUiConfig":
-        return handleIdentityUiConfig(request, env);
       case "identityLinkChallenge":
         return handleIdentityLinkChallenge(request, env, route.tokenRaw);
       case "completeIdentityLink":

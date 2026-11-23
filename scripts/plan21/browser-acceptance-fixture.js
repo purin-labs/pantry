@@ -1005,16 +1005,6 @@ async function browserAcceptanceFixture(page) {
         summary: { memoriesToReview: 0, evalsToReview: 0 },
       });
     }
-    if (pathname === "/v1/identity/config") {
-      return json(route, {
-        ok: true,
-        walletOrigin: "https://wallet.example.test",
-        relayerUrl: "https://relayer.example.test",
-        nearNetwork: "near-testnet",
-        nearRpcUrl: "https://rpc.testnet.near.org",
-        nearExplorerUrl: "https://testnet.nearblocks.io",
-      });
-    }
     if (
       pathname ===
         `/v1/control/organisations/${organisationId}/inference/codex` &&

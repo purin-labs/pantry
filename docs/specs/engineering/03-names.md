@@ -313,10 +313,6 @@ Plan 93 records that the domain of the QR order page is not chosen.
 The local `PANTRY_PROVIDER_INGRESS_ORIGIN` is still the Square sandbox tunnel
 `square-sandbox-webhook.seams.sh`. The shop site is `shop.purin.io`.
 
-**Wallet relayer:** the production `SEAMS_RELAYER_URL` names `seams-sdk-d1-gateway`, and
-the identity link returns this address. Plan 93 records the deletion of the
-`seams-sdk-d1-*` Workers. If that record is correct, the address is dead.
-
 ## Sources
 
 - [Plan 91](../../plan-91-seams-atelier-rename.md) and

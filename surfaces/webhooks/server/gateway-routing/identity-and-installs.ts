@@ -3,10 +3,6 @@ import type { GatewayIdentityRoute } from "./domain";
 export function matchIdentityRoute(
   pathname: string,
 ): GatewayIdentityRoute | null {
-  if (pathname === "/v1/identity/config") {
-    return { kind: "identityUiConfig" };
-  }
-
   const segments = pathname.split("/");
   if (segments[0] !== "" || segments[1] !== "v1") {
     return null;

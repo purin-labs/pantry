@@ -36,7 +36,6 @@ import {
   isAuthorizedOrganisationAdminRequest,
   isLocalDebugRequest,
   jsonBodyErrorResponse,
-  parsePublicServiceUrl,
 } from "@purin-labs/control/worker/gateway/request-helpers";
 
 export async function handleIssueIdentityLink(
@@ -173,35 +172,6 @@ export async function handleIdentityLinkChallenge(
     workspaceId: invitation.value.workspaceId,
     externalUserId: invitation.value.externalUserId,
     expiresAt: invitation.value.expiresAt,
-  });
-}
-
-export async function handleIdentityUiConfig(
-  request: Request,
-  env: Env,
-): Promise<Response> {
-  if (request.method !== "GET") {
-    return methodNotAllowed(["GET"]);
-  }
-
-  const walletOrigin = parsePublicServiceUrl(env.SEAMS_WALLET_ORIGIN);
-  const relayerUrl = parsePublicServiceUrl(env.SEAMS_RELAYER_URL);
-
-  if (walletOrigin === null || relayerUrl === null) {
-    return errorResponse(
-      "identity_ui_unconfigured",
-      "Identity linking is temporarily unavailable.",
-      503,
-    );
-  }
-
-  return jsonResponse({
-    ok: true,
-    walletOrigin,
-    relayerUrl,
-    nearNetwork: "near-testnet",
-    nearRpcUrl: "https://rpc.testnet.near.org",
-    nearExplorerUrl: "https://testnet.nearblocks.io",
   });
 }
 

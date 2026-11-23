@@ -48,7 +48,6 @@ export type GatewayWebhookRoute =
   | Readonly<{ kind: "discordInteraction"; organisationIdRaw: string }>;
 
 export type GatewayIdentityRoute =
-  | Readonly<{ kind: "identityUiConfig" }>
   | Readonly<{ kind: "identityLinkChallenge"; tokenRaw: string }>
   | Readonly<{ kind: "completeIdentityLink"; tokenRaw: string }>
   | Readonly<{

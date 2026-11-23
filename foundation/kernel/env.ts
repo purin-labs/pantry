@@ -72,8 +72,6 @@ export interface Env {
    */
   ORGANISATION_ADMIN_TOKEN?: string;
   COMMERCE_LAB_SIGNING_SECRET?: string;
-  SEAMS_WALLET_ORIGIN?: string;
-  SEAMS_RELAYER_URL?: string;
   E13_PROBE_TOKEN?: string;
   SESSION_TOKEN_SECRET?: string;
   SLACK_SIGNING_SECRET?: string;
