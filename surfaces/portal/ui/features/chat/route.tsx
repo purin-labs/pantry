@@ -46,17 +46,29 @@ import React from "react";
 import { toast } from "sonner";
 import { ThreadTitle } from "./thread-title";
 import {
-  X,
-  History,
-  Folder,
-  FileText,
-  MessageSquare,
-  Search,
+  Archive,
+  ArrowUp,
+  Check,
+  ChevronDown,
   ChevronRight,
+  Circle,
+  CornerDownRight,
+  FileText,
+  Folder,
   GitBranch,
-  Split,
+  History,
   ListTodo,
+  LoaderCircle,
+  MessageSquare,
+  MessageSquareWarning,
+  Paperclip,
+  Plug,
+  Plus,
+  Search,
+  ShieldCheck,
+  Split,
   SquarePen,
+  X,
 } from "lucide-react";
 import { ChatDisplayContext, ChatFullscreenButton } from "./underlay";
 import { DashboardSidebarToggleIcon } from "@purin-labs/ui/dashboard-sidebar-toggle-icon";
@@ -68,27 +80,11 @@ import {
   type ChatWorkspaceContext,
 } from "./context";
 import { ChatResponseIndicator, renderChatTimeline } from "./activity";
-import { ChatWorkGlow } from "./work-glow";
+import { ComposerGlow } from "./composer-glow";
 import { ChatSelectedFile } from "./selected-file";
 import { ChatPermissionPrompt } from "./permission-prompt";
 import { ChatHeldStepPrompt } from "@purin-labs/area-organisation/ui/features/access/chat-held-step-prompt";
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
-import {
-  Archive,
-  Check,
-  ChevronDown,
-  Circle,
-  LoaderCircle,
-  MessageSquareWarning,
-  Paperclip,
-} from "lucide-react";
-import {
-  ArrowUp,
-  CornerDownRight,
-  Plus,
-  Plug,
-  ShieldCheck,
-} from "lucide-react";
 import { DialogHeading, syncDialog, cancelDialog } from "@purin-labs/ui/dialog";
 import { soundsLikeStop, type VoiceCommand } from "@purin-labs/surface-voice/ui/features/voice/command";
 import {
@@ -3746,10 +3742,11 @@ export class ChatPage extends React.Component<Props, State> {
                 </section>
               ) : null}
               <div className="chat-composer-surface">
-                <ChatWorkGlow
+                <ComposerGlow
                   work={archived ? null : (conversation?.work ?? null)}
                   stream={this.state.stream}
                   sending={!archived && this.state.sending}
+                  voice={this.voice}
                 />
                 <VoiceControl
                   session={this.voice}

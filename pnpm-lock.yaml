@@ -193,9 +193,6 @@ importers:
       three:
         specifier: 0.180.0
         version: 0.180.0
-      voice-glow:
-        specifier: 0.2.1
-        version: 0.2.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
     devDependencies:
       '@types/react':
         specifier: ^19.1.12
@@ -2186,9 +2183,6 @@ importers:
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      voice-glow:
-        specifier: 0.2.1
-        version: 0.2.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
     devDependencies:
       '@cloudflare/workers-types':
         specifier: 5.20260707.1

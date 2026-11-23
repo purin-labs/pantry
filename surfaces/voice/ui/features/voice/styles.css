@@ -30,7 +30,7 @@
   background: var(--surface);
 }
 .chat-composer .voice-toggle[data-state="capturing"] {
-  color: #c2410c;
+  color: var(--pantry-accent-text);
 }
 .voice-status {
   display: flex;
@@ -41,7 +41,7 @@
   color: var(--ink-2);
 }
 .voice-status[data-state="capturing"] {
-  color: #c2410c;
+  color: var(--pantry-accent-text);
 }
 .voice-cloud {
   padding: 1px 6px;
@@ -483,19 +483,33 @@ button:not(:where(.pantry-select-trigger)).voice-page-mark:focus-visible {
 button:not(
     :where(.pantry-select-trigger)
   ).voice-page-mark[data-state="capturing"] {
-  color: #c2410c;
+  color: var(--pantry-accent-text);
+}
+/* A ring around the mark while it hears a command. It pulses on opacity only. */
+button:not(:where(.pantry-select-trigger)).voice-page-mark::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  box-shadow: 0 0 0 4px
+    color-mix(in oklch, var(--pantry-accent) 24%, transparent);
+  opacity: 0;
+  pointer-events: none;
+}
+button:not(
+    :where(.pantry-select-trigger)
+  ).voice-page-mark[data-state="capturing"]::after {
+  opacity: 1;
 }
 @media (prefers-reduced-motion: no-preference) {
   button:not(
       :where(.pantry-select-trigger)
-    ).voice-page-mark[data-state="capturing"] {
+    ).voice-page-mark[data-state="capturing"]::after {
     animation: voice-page-mark-pulse 1.2s ease-in-out infinite;
   }
 }
 @keyframes voice-page-mark-pulse {
   50% {
-    box-shadow:
-      var(--shadow-card),
-      0 0 0 4px color-mix(in srgb, #c2410c 18%, transparent);
+    opacity: 0.3;
   }
 }
