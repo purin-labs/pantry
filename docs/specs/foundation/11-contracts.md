@@ -249,7 +249,7 @@ Rules for a contract writer:
 | Integer range                                  | `Number.MIN_SAFE_INTEGER` to `Number.MAX_SAFE_INTEGER`       | `SafeInteger`                                                                            |
 | Commerce cursor                                | 16 KiB of UTF-8                                              | `MAX_COMMERCE_CURSOR_LENGTH`                                                             |
 | Query traversal                                | `maxDepth` 0 to 8, `resultLimit` 1 to 500, 64 seeds, 8 sorts | `query-limits.ts`, `graph-query-schema.ts`                                               |
-| Message text, URL, object key                  | 65,536 code points; 2,048 bytes; 1,024 bytes                 | `NON_EMPTY_TEXT_MAX_CHARS`, `HTTP_URL_MAX_CHARS`, `OBJECT_KEY_MAX_CHARS` in `message.ts` |
+| Message text, URL, object key                  | 65,536 code points; 2,048 bytes; 1,024 bytes                 | `NON_EMPTY_TEXT_MAX_CHARS`, `HTTP_URL_MAX_BYTES`, `OBJECT_KEY_MAX_BYTES` in `message.ts` |
 | Session identity, Session object key           | 256 bytes; 1,024 bytes                                       | `applyTextRule` in `session-reducer.ts` (no constant)                                    |
 | Session backend id                             | `picocodex`, `pi` or `codex`                                 | `normalize` in `session-reducer.ts`                                                      |
 | Goal counter, goal id, goal text               | `0xffff_ffff`; 256 UTF-16 units; 4,000 UTF-16 units          | `counter`, `identifier` and `text` in `goal.ts` (no constant)                            |

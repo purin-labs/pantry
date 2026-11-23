@@ -240,11 +240,11 @@ export type UserMessageViews = Static<typeof userMessageViewsSchema>;
 // ---------------------------------------------------------------------------
 
 const NON_EMPTY_TEXT_MAX_CHARS = 65_536;
-const HTTP_URL_MAX_CHARS = 2_048;
-const MEDIA_TYPE_MAX_CHARS = 255;
+const HTTP_URL_MAX_BYTES = 2_048;
+const MEDIA_TYPE_MAX_BYTES = 255;
 const EXTENSION_MAX_CHARS = 24;
 const DISPLAY_FILENAME_MAX_CHARS = 255;
-const OBJECT_KEY_MAX_CHARS = 1_024;
+const OBJECT_KEY_MAX_BYTES = 1_024;
 const OBJECT_KEY_ROOT = "attachments/";
 const OCTET_STREAM = "application/octet-stream";
 const CASE_PURPOSE_MAX_CHARS = 160;
@@ -284,7 +284,7 @@ export function parseHttpUrl(value: string): Checked<HttpUrl> {
 function normalizeHttpUrl(value: string): string | null {
   if (
     value.length === 0 ||
-    utf8ByteLength(value) > HTTP_URL_MAX_CHARS ||
+    utf8ByteLength(value) > HTTP_URL_MAX_BYTES ||
     hasRustControl(value) ||
     hasRustWhitespace(value)
   )
@@ -357,7 +357,7 @@ export function parseNormalizedMediaType(
   const essence = rustTrim(value.split(";")[0] ?? "");
   const slash = essence.indexOf("/");
   if (
-    utf8ByteLength(essence) > MEDIA_TYPE_MAX_CHARS ||
+    utf8ByteLength(essence) > MEDIA_TYPE_MAX_BYTES ||
     slash < 0 ||
     !isMediaToken(essence.slice(0, slash)) ||
     !isMediaToken(essence.slice(slash + 1))
@@ -424,7 +424,7 @@ export function parseOrganisationAttachmentObjectKey(
   value: string,
 ): Checked<OrganisationAttachmentObjectKey> {
   if (
-    utf8ByteLength(value) > OBJECT_KEY_MAX_CHARS ||
+    utf8ByteLength(value) > OBJECT_KEY_MAX_BYTES ||
     !value.startsWith(OBJECT_KEY_ROOT)
   )
     return invalid("invalid_object_key", "OrganisationAttachmentObjectKey");
