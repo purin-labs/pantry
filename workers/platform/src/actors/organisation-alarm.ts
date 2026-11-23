@@ -42,7 +42,7 @@ export function organisationAlarmReconcilers(
   ];
 }
 
-/** Plan 88: the next closed hour of Jev use to seal, or a record to retry. */
+/** Plan 88: the next closed hour of Jev use to seal, or null. */
 function jevUsageDueAt(sql: SqlStorage): number | null {
   const row = sql
     .exec<{ organisation_id: string }>(
