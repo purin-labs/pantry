@@ -161,6 +161,9 @@ to the spec of its area.
 - The room reads the product again for each `sync_request` and for each agent edit. A
   reconnect thus fails with `source_unavailable` while no source answers. A product
   that the shop does not have also shows on the socket as `source_unavailable`.
+- The read of the current product (`GET …/description-draft`) asks the commerce engine.
+  It answers 503 `source_unavailable` while no source answers, and 404
+  `product_not_found` when the shop answered and has no such product.
 - The page shows the current product description beside the draft, the character
   count, the sync status and the participants. It has no Save button.
 - When the product revision differs from the revision at the start of the draft, the

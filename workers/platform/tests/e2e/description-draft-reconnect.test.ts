@@ -36,7 +36,9 @@ declare module "vitest" {
  * does not stop. The owner's client reconnects, syncs and sends its unsent
  * edit again; the edit is accepted, and the draft holds both edits. A refused
  * access check still ends a socket with a final failure; the draft safety
- * journey covers that.
+ * journey covers that. Last, the page asks for the current product of an id
+ * that the shop does not have: the shop answered, so Pantry says that the
+ * product is not found, not that the read failed for a time.
  */
 it(
   "keeps the description editor live through Access changes and reconnects it after an access check that could not run",
@@ -45,6 +47,7 @@ it(
 );
 
 const PRODUCT_ID = "product_draft_reconnect_e2e";
+const MISSING_PRODUCT_ID = "product_not_in_shop_e2e";
 const MERCHANT_ID = "merchant_bakery_c3_draft_reconnect";
 const INITIAL = "Freshly baked croissant.";
 const AFTER_ACCESS = "Freshly baked croissant. Baked at dawn.";
@@ -105,11 +108,35 @@ async function draftReconnectJourney({ task }: TestContext): Promise<void> {
     .toBe(UNSENT);
   expect(admin.received.filter(isFailure)).toEqual([]);
 
+  // 4. The page reads the current product of an id that the shop does not
+  // have. The shop answered, so the answer is "not found", not a failure
+  // to try again.
+  const missingProduct = await exports.default.fetch(
+    `https://localhost/v1/control/organisations/${author.organisationId}/commerce/products/${MISSING_PRODUCT_ID}/description-draft`,
+    {
+      headers: {
+        Cookie: `pantry_session=${encodeURIComponent(author.session.token)}`,
+      },
+    },
+  );
+  const missingProductBody: unknown = await missingProduct.json();
+  expect({
+    status: missingProduct.status,
+    body: missingProductBody,
+  }).toMatchObject({
+    status: 404,
+    body: { ok: false, error: "product_not_found" },
+  });
+
   task.meta.descriptionDraftReconnect = {
     ownerFirstSocket: owner.received.map(kindOf),
     ownerReconnected: reconnected.received.map(kindOf),
     adminClosedByUnavailableCheck: admin.closed,
     draft,
+    missingProduct: {
+      status: missingProduct.status,
+      body: missingProductBody,
+    },
   };
 }
 

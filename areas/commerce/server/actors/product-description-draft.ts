@@ -167,9 +167,13 @@ export class ProductDescriptionDraftRooms {
     productId: string,
   ): Promise<Response> {
     const result = await this.#read(scope, productId, "authoritative");
-    return result.ok
-      ? Response.json({ ok: true, ...result.value })
-      : controlError(result.error.code, 503);
+    if (result.ok) return Response.json({ ok: true, ...result.value });
+    // The shop answered and has no such product: that is not a failure to
+    // try again.
+    return controlError(
+      result.error.code,
+      result.error.code === "product_not_found" ? 404 : 503,
+    );
   }
 
   /** The products whose drafts are connected to this Case's Slack thread. */
