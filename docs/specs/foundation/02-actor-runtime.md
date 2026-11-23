@@ -356,6 +356,7 @@ registry row.
 | Stale reservation                                                              | 15 minutes                           | `ACTOR_RESERVATION_STALE_MS`                                        |
 | Organisations in one sweep, for each database                                  | 50                                   | `ORGANISATION_PAGE`                                                 |
 | Alarm retry after a failed step                                                | 15 s to 15 minutes                   | `ALARM_RETRY_FIRST_MS`, `ALARM_RETRY_MAX_MS`                        |
+| Alarm of a `deferred` Actor                                                    | 15 s                                 | `ACTOR_RECOVERY_DEFERRED_RETRY_MS`                                  |
 | Case retry of stored work                                                      | 15 s                                 | `CASE_RECOVERY_INTERVAL_MS`                                         |
 | Case read of a waiting approval                                                | 60 s for 10 minutes, then 15 minutes | `APPROVAL_READ_FIRST_MS`, `APPROVAL_READ_LATER_MS`                  |
 | Undelivered Case output                                                        | Dropped after 24 hours               | `UNDELIVERED_OUTPUT_TTL_MS`                                         |

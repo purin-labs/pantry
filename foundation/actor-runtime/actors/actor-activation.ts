@@ -47,6 +47,11 @@ type ActivationRow = Record<string, SqlStorageValue> & {
 };
 
 const INITIAL_STATE_VERSION = 1;
+/**
+ * How long a deferred Actor waits before its alarm tries again: a placement
+ * that is reserved or frozen, or a registry row that is not published yet.
+ */
+const ACTOR_RECOVERY_DEFERRED_RETRY_MS = 15_000;
 
 export type ActorRecoveryAdmission = StrictUnion<
   | { readonly kind: "admitted"; readonly scope: OrganisationExecutionScope }
@@ -64,7 +69,7 @@ export async function admitActorRecovery(
       return admission;
     case "deferred":
       // Imported alarms can fire before placement publication; retain their wakeup.
-      await storage.setAlarm(Date.now() + 15_000);
+      await storage.setAlarm(Date.now() + ACTOR_RECOVERY_DEFERRED_RETRY_MS);
       return admission;
     case "inactive":
       await storage.deleteAlarm();

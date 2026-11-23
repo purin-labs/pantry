@@ -6,8 +6,14 @@ import { traceWarn } from "@purin-labs/kernel/observability";
  * next time it has work, read from its own durable rows, so the stored rows
  * are the one source of truth. `rearm` sets the alarm to the earliest of those
  * times, or deletes it when no reconciler has work. Code that stores new work
- * calls `rearm`; no other code sets or deletes the alarm, so no path can
- * remove an alarm that another path needs.
+ * calls `rearm`.
+ *
+ * Three other paths set the alarm. The Session has no reconciler list: it
+ * moves its alarm earlier with `armAlarmBy` when it stores work, and to now
+ * when a read finds work that waits. `admitActorRecovery` moves the alarm of
+ * a deferred Actor later and deletes the alarm of an inactive one. The import
+ * of an Actor export restores the alarm that the export holds. The Actors
+ * that extend `DurableObject` directly keep their own alarm.
  */
 export interface AlarmReconciler {
   readonly name: string;
