@@ -942,7 +942,7 @@ function KeyDetails(props: {
       </dl>
       <p className="vault-secret-note">
         Never shown to agents or people. Purin Pantry uses it only for actions
-        on {item.service}. Add, replace or revoke it in Integrations.
+        on {item.service}.
       </p>
       {href === null ? null : (
         <div className="vault-actions">

@@ -74,7 +74,7 @@ export function SlackSetup(props: {
       <>
         {props.connecting ? null : (
           <p className="notice-text">
-            Connect Slack first, then choose the channel Purin Pantry should post to.
+            Then choose the channel where Pantry posts.
           </p>
         )}
         {renderSetupFeedback(props.setupFeedback)}

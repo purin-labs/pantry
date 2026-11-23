@@ -158,11 +158,12 @@ export function GrantAccessDialog(
           title={fileFlow ? "Choose files for Purin Pantry" : "Grant access"}
           close={props.close}
         />
-        <p>
-          {fileFlow
-            ? "Choose files or folders, then where Pantry can use them. Access is read-only."
-            : "Choose who gets access and what they can do."}
-        </p>
+        {fileFlow ? (
+          <p>
+            Choose files or folders, then where Pantry can use them. Access is
+            read-only.
+          </p>
+        ) : null}
         <GrantForm
           {...props}
           active={props.open}

@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowRight, MessageSquare } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router";
 
 export function ConnectorAuthoringAssistant(props: {
@@ -22,10 +22,6 @@ export function ConnectorAuthoringAssistant(props: {
       />
       <p className="field-hint">
         Add the app name and what you want it to do. An API docs link helps.
-      </p>
-      <p className="connector-method-hint">
-        <MessageSquare size={18} aria-hidden="true" />
-        You’ll continue in chat to build and test the connector.
       </p>
       <div className="connector-method-footer">
         <a href={props.basePath}>Cancel</a>

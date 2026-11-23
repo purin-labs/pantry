@@ -217,9 +217,6 @@ function CustomConnectorAuthoring(props: {
       className="custom-connector-editor"
       aria-label="Custom connector definition"
     >
-      <p className="connector-modal-description">
-        Connect an app that isn’t on the list.
-      </p>
       <div className="connector-method-tabs" aria-label="Connection method">
         <button
           type="button"
@@ -468,7 +465,6 @@ function CustomConnectorReview(props: {
     <>
       <header className="custom-connector-review-heading">
         <div>
-          <p className="eyebrow">Custom connector</p>
           <h3 id="custom-connector-detail-title">
             {props.detail.summary.name ?? "Untitled connector"}
           </h3>
@@ -802,8 +798,8 @@ function CustomConnectorSetup(input: {
       <h4 id="custom-connector-setup-title">Accounts and agent access</h4>
       {input.detail.accounts.length > 0 ? (
         <p>
-          Choose which agents and operations can use each connected account.
-          Connection setup does not grant agent access.
+          A connected account gives agents no access until you choose the
+          agents and operations for it.
         </p>
       ) : null}
       {input.detail.accounts.length === 0 ? (

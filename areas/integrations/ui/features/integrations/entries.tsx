@@ -502,20 +502,24 @@ function integrationEntries(
         <>
           {list(airtable)}
           {props.canManage ? (
-            <IntegrationSetup title="Connect Airtable">
-              <div className="provider-buttons">
-                <ProviderConnectButton
-                  provider="airtable"
-                  label="Sign in with Airtable"
-                  onClick={props.actions.connectAirtable}
-                  busy={providerConnectionBusy(
-                    props.mutations,
-                    props.pendingAuthorization,
-                    "airtable",
-                  )}
-                  feedback={props.feedback}
-                />
-              </div>
+            <IntegrationSetup
+              title={
+                airtable.length === 0
+                  ? null
+                  : "Connect another Airtable account"
+              }
+            >
+              <ProviderConnectButton
+                provider="airtable"
+                label="Connect Airtable"
+                onClick={props.actions.connectAirtable}
+                busy={providerConnectionBusy(
+                  props.mutations,
+                  props.pendingAuthorization,
+                  "airtable",
+                )}
+                feedback={props.feedback}
+              />
             </IntegrationSetup>
           ) : null}
         </>
@@ -633,20 +637,22 @@ function integrationEntries(
         <>
           {list(notion)}
           {props.canManage ? (
-            <IntegrationSetup title="Connect Notion">
-              <div className="provider-buttons">
-                <ProviderConnectButton
-                  provider="notion"
-                  label="Sign in with Notion"
-                  onClick={props.actions.connectNotion}
-                  busy={providerConnectionBusy(
-                    props.mutations,
-                    props.pendingAuthorization,
-                    "notion",
-                  )}
-                  feedback={props.feedback}
-                />
-              </div>
+            <IntegrationSetup
+              title={
+                notion.length === 0 ? null : "Connect another Notion workspace"
+              }
+            >
+              <ProviderConnectButton
+                provider="notion"
+                label="Connect Notion"
+                onClick={props.actions.connectNotion}
+                busy={providerConnectionBusy(
+                  props.mutations,
+                  props.pendingAuthorization,
+                  "notion",
+                )}
+                feedback={props.feedback}
+              />
             </IntegrationSetup>
           ) : null}
         </>

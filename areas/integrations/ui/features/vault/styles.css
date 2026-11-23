@@ -226,12 +226,10 @@
   list-style: none;
 }
 
+/* A plain note, not a box. */
 .vault-secret-note {
   margin: 0;
-  padding: 10px 12px;
-  border-radius: 10px;
   color: var(--ink-2);
-  background: var(--surface);
   font-size: 13px;
 }
 

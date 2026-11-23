@@ -97,16 +97,12 @@ export function LoginForm(props: {
         <>
           <fieldset className="vault-field-group">
             <legend>Websites</legend>
-            <p className="vault-field-hint" id={`${idPrefix}-origins-hint`}>
-              Agents fill this login only on these exact websites.
-            </p>
             {draft.origins.map((origin, index) => (
               <div className="vault-origin-row" key={index}>
                 <Field
                   id={`${idPrefix}-origin-${index}`}
                   label={index === 0 ? "Website" : `Website ${index + 1}`}
                   hiddenLabel
-                  describedBy={`${idPrefix}-origins-hint`}
                   error={errors[`origin-${index}`]}
                 >
                   {(a11y) => (
@@ -159,7 +155,7 @@ export function LoginForm(props: {
             id={`${idPrefix}-label`}
             label="Name"
             optional
-            hint="Shown in the Vault. Leave it empty to use the website."
+            hint="Leave it empty to use the website."
             error={errors.label}
           >
             {(a11y) => (
@@ -430,16 +426,16 @@ export function ContactForm(props: {
   return (
     <div className="vault-form-fields">
       <fieldset className="vault-field-group">
-        <legend>Identity</legend>
+        <legend className="visually-hidden">Identity</legend>
         {text("label", "Name", {
-          hint: "Shown in the Vault, such as Shop or Head office.",
+          hint: "Such as Shop or Head office.",
           maxLength: 80,
         })}
         {text("fullName", "Full name", { maxLength: 120 })}
         {text("company", "Company", { optional: true, maxLength: 120 })}
       </fieldset>
       <fieldset className="vault-field-group">
-        <legend>Contact details</legend>
+        <legend className="visually-hidden">Contact details</legend>
         {text("email", "Email", {
           optional: true,
           maxLength: 254,
@@ -492,7 +488,7 @@ export function ContactForm(props: {
       </fieldset>
       {text("taxRegistrationNumber", "Tax or invoice registration number", {
         optional: true,
-        hint: "For example, a Japanese invoice number such as T1234567890123.",
+        hint: "Such as T1234567890123.",
         maxLength: 40,
       })}
     </div>
@@ -512,13 +508,12 @@ function Field(props: {
   readonly hiddenLabel?: boolean;
   readonly optional?: boolean | undefined;
   readonly hint?: string | undefined;
-  readonly describedBy?: string;
   readonly error?: string | undefined;
   readonly children: (a11y: FieldA11y) => React.ReactNode;
 }): React.ReactNode {
   const hintId = props.hint === undefined ? undefined : `${props.id}-hint`;
   const errorId = props.error === undefined ? undefined : `${props.id}-error`;
-  const describedBy = [props.describedBy, hintId, errorId]
+  const describedBy = [hintId, errorId]
     .filter((id) => id !== undefined)
     .join(" ");
   return (

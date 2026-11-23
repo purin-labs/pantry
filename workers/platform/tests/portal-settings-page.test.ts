@@ -565,13 +565,11 @@ describe("Café settings page ownership", () => {
     const markup = renderIntegrationsPage({ initialIntegrationId: "slack" });
 
     expect(markup).toContain(">Connect Slack</button>");
-    expect(markup).toContain(
-      "Connect Slack first, then choose the channel Purin Pantry should post to.",
-    );
+    expect(markup).toContain("Then choose the channel where Pantry posts.");
     expect(markup).not.toContain('name="channelId"');
     expect(markup).toContain("Close slack");
     expect(markup).not.toContain("Back to apps</a>");
-    expect(markup).not.toContain(">Sign in with Airtable</button>");
+    expect(markup).not.toContain(">Connect Airtable</button>");
     expect(markup).not.toContain('name="airtableBaseId"');
     expect(markup).not.toContain('type="password"');
   });

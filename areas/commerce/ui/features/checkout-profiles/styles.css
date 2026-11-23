@@ -215,23 +215,22 @@
   text-underline-offset: 3px;
 }
 
+/* The same label/value rows as the profile above it. */
 .checkout-profile-review dl div {
   display: grid;
-  grid-template-columns: minmax(110px, 0.45fr) minmax(0, 1fr);
+  grid-template-columns: 162px minmax(0, 1fr);
   gap: 12px;
-  padding: 7px 0;
+  padding: 3px 0;
 }
 
 .checkout-profile-review dt {
-  color: var(--ink-3);
-  font-size: 12px;
+  color: var(--ink-2);
 }
 
 .checkout-profile-review dd {
   min-width: 0;
   margin: 0;
-  color: var(--ink-2);
-  font-size: 12px;
+  color: var(--ink);
   overflow-wrap: anywhere;
 }
 
@@ -276,8 +275,6 @@
 
 .checkout-profile-review dl {
   margin: 0;
-  padding-block-start: 12px;
-  border-block-start: 1px solid var(--hairline);
 }
 
 .checkout-profile-danger {
@@ -286,12 +283,11 @@
   background: var(--danger-bg) !important;
 }
 
+/* The review is a plain section under a rule, not a box. */
 .checkout-profile-review {
   margin: 0 24px 24px;
-  padding: 20px;
-  border: 1px solid var(--border);
-  border-radius: var(--pantry-radius-card);
-  background: var(--surface);
+  padding-block-start: 20px;
+  border-block-start: 1px solid var(--hairline);
   scroll-margin-block-start: var(--pantry-space-4);
 }
 
@@ -302,7 +298,7 @@
 
 .checkout-profile-review > div:first-child p:last-child {
   max-width: 68ch;
-  margin: 7px 0 18px;
+  margin: 6px 0 10px;
   color: var(--ink-2);
   line-height: 1.55;
 }

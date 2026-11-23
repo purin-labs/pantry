@@ -29,10 +29,6 @@ export function ApplyDefaultsDialog(
           title="Apply recommended access"
           close={props.close}
         />
-        <p>
-          The recommended profile sets the safe baseline for ordinary agent
-          work:
-        </p>
         <ul className="access35-defaults-effects">
           <li>
             Owners and admins may read Case context and discover connected
@@ -47,9 +43,7 @@ export function ApplyDefaultsDialog(
             until granted exactly.
           </li>
         </ul>
-        <p>
-          Reapplying is safe. It never restores access you deliberately revoked.
-        </p>
+        <p>Applying it again never restores access that you removed.</p>
         <div className="access35-dialog-actions">
           <button
             type="button"

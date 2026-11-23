@@ -3326,7 +3326,7 @@ export class ChatPage extends React.Component<Props, State> {
                 Fork in this workspace
               </strong>
               <span id="chat-fork-description">
-                Continue in a new chat with the history up to this response.
+                A new chat with the history up to this response.
               </span>
             </span>
           </button>
@@ -3797,14 +3797,11 @@ export class ChatPage extends React.Component<Props, State> {
                       <Plus size={20} aria-hidden="true" />
                     </summary>
                     <div className="chat-composer-menu">
-                      <p className="chat-menu-title">Add context</p>
                       <label className="chat-file-option">
                         <Paperclip size={18} aria-hidden="true" />
                         <span>
                           Kitchen file
-                          <small>
-                            Run, request, recording or handoff for review
-                          </small>
+                          <small>Run, request, recording or handoff</small>
                         </span>
                         <input
                           type="file"
@@ -3816,9 +3813,7 @@ export class ChatPage extends React.Component<Props, State> {
                       </label>
                       <label className="chat-file-option">
                         <Paperclip size={18} aria-hidden="true" />
-                        <span>
-                          Files<small>Documents, images, audio, video</small>
-                        </span>
+                        <span>Files</span>
                         <input
                           type="file"
                           multiple
@@ -3834,9 +3829,7 @@ export class ChatPage extends React.Component<Props, State> {
                       </label>
                       <a href={this.props.integrationsPath}>
                         <Plug size={18} aria-hidden="true" />
-                        <span>
-                          Connected apps<small>Manage your integrations</small>
-                        </span>
+                        <span>Integrations</span>
                       </a>
                     </div>
                   </details>
@@ -3851,13 +3844,10 @@ export class ChatPage extends React.Component<Props, State> {
                       <ShieldCheck size={17} aria-hidden="true" />
                     </summary>
                     <div className="chat-composer-menu">
-                      <p className="chat-menu-title">Workspace access</p>
                       <p>
                         Workspace grants and approval rules apply to this chat.
                       </p>
-                      <a href={this.props.accessPath}>
-                        Manage access permissions
-                      </a>
+                      <a href={this.props.accessPath}>Access and data flow</a>
                     </div>
                   </details>
                   <details name="composer-menu" className="chat-context-menu">
@@ -3865,7 +3855,6 @@ export class ChatPage extends React.Component<Props, State> {
                       <Circle size={17} aria-hidden="true" />
                     </summary>
                     <div className="chat-composer-menu">
-                      <p className="chat-menu-title">Context estimate</p>
                       <strong>
                         ~
                         {estimatedContextTokens(
@@ -3874,10 +3863,7 @@ export class ChatPage extends React.Component<Props, State> {
                         ).toLocaleString()}{" "}
                         tokens
                       </strong>
-                      <p>
-                        Visible conversation and draft. Full model context usage
-                        is unavailable.
-                      </p>
+                      <p>An estimate for this chat and the draft.</p>
                     </div>
                   </details>
                   <details name="composer-menu" className="chat-model-menu">
@@ -3886,7 +3872,6 @@ export class ChatPage extends React.Component<Props, State> {
                       <ChevronDown size={14} aria-hidden="true" />
                     </summary>
                     <div className="chat-composer-menu">
-                      <p className="chat-menu-title">Choose model</p>
                       {data.model.kind === "ready"
                         ? data.model.options.map(
                             this.renderModelOption.bind(this),

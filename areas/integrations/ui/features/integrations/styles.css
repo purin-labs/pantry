@@ -62,30 +62,27 @@
   text-transform: capitalize;
 }
 
+/* Facts are plain label/value rows. */
 .custom-connector-review-facts {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
   margin: 0;
 }
 
 .custom-connector-review-facts > div {
   display: grid;
-  gap: 4px;
-  padding: 14px;
-  border-radius: 10px;
-  background: var(--surface);
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 12px;
+  padding: 6px 0;
 }
 
 .custom-connector-review-facts dt {
-  color: var(--muted);
-  font-size: 12px;
+  color: var(--ink-2);
+  font-size: 14px;
 }
 
 .custom-connector-review-facts dd {
   margin: 0;
   overflow-wrap: anywhere;
-  font-weight: 600;
 }
 
 .custom-connector-operations {
@@ -98,12 +95,16 @@
   margin: 0;
 }
 
-.custom-connector-operations ul {
+/* The operations and the accounts are each one framed list of rows. */
+.custom-connector-operations ul,
+.custom-connector-account-list {
   display: grid;
-  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .custom-connector-operations li,
@@ -112,9 +113,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 14px;
-  border-radius: 10px;
-  background: var(--surface);
+  padding: 12px 14px;
+}
+
+.custom-connector-operations li + li,
+.custom-connector-account + .custom-connector-account {
+  border-block-start: 1px solid var(--border);
 }
 
 .custom-connector-operations li span,
@@ -147,9 +151,13 @@
 .custom-connector-setup {
   display: grid;
   gap: 18px;
-  padding: 20px;
-  border-radius: 12px;
-  background: var(--surface);
+  padding-block-start: 20px;
+  border-block-start: 1px solid var(--border);
+}
+
+.custom-connector-setup > h4,
+.custom-connector-setup > p {
+  margin: 0;
 }
 
 .custom-connector-write-review {
@@ -174,11 +182,6 @@
   align-items: flex-start;
 }
 
-.custom-connector-account-list {
-  display: grid;
-  gap: 10px;
-}
-
 .custom-connector-account > div:first-child {
   display: grid;
   gap: 3px;
@@ -196,6 +199,16 @@
   .custom-connector-account {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .custom-connector-state {
+    align-self: flex-start;
+  }
+
+  /* On a narrow screen the label goes over its value. */
+  .custom-connector-review-facts > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
   }
 }
 
@@ -236,8 +249,7 @@
   color: var(--ink);
   font-weight: 500;
 }
-.connector-surface,
-.connector-review-content {
+.connector-surface {
   padding: 24px;
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -256,7 +268,7 @@
   overflow-wrap: anywhere;
 }
 .connector-review-content > .custom-connector-operations {
-  margin-block: 24px;
+  margin-block: 20px 0;
 }
 .connector-surface .custom-connector-technical label,
 .connector-surface .custom-connector-technical textarea {
@@ -308,10 +320,6 @@
 .custom-connector-editor {
   width: 100%;
 }
-.custom-connector-editor .custom-connector-setup {
-  background: var(--paper);
-  border: 1px solid var(--border);
-}
 .custom-connector-editor button:not(:where(.pantry-select-trigger)),
 .custom-connector-editor .button-link {
   min-height: 40px;
@@ -321,8 +329,7 @@
   text-transform: none;
 }
 @media (max-width: 42rem) {
-  .connector-surface,
-  .connector-review-content {
+  .connector-surface {
     padding: 18px;
   }
   .connector-write-fields dl > div {
@@ -727,6 +734,12 @@ label.mailbox-model-consent input[type="checkbox"] {
   background: none;
   box-shadow: 0 0 0 1px var(--border) inset;
 }
+/* The plan and the last check are plain facts of the card, not a box in it. */
+.connection-dialog .codex-connection-details {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
 .connection-dialog
   .connection-card
   button:not(:where(.pantry-select-trigger)):not(.connection-primary-action) {
@@ -809,10 +822,6 @@ label.mailbox-model-consent input[type="checkbox"] {
   grid-template-columns: minmax(0, 1fr);
   gap: 20px;
 }
-.connector-modal-description {
-  margin: 0;
-  color: var(--ink-2);
-}
 .connector-method-tabs {
   display: flex;
   gap: 4px;
@@ -855,17 +864,6 @@ label.mailbox-model-consent input[type="checkbox"] {
 }
 .connector-chat-start .field-hint {
   margin: 0;
-}
-.connector-method-hint {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin: 14px 0;
-  color: var(--ink-2);
-}
-.connector-method-hint svg {
-  flex: none;
-  margin-top: 2px;
 }
 .connector-method-footer,
 .custom-connector-editor:has(.connector-method-tabs) .connector-step-footer {

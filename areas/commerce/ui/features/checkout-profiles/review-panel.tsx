@@ -22,7 +22,6 @@ export function ReviewPanel(props: {
       aria-labelledby="checkout-profile-review-title"
     >
       <div>
-        <p className="checkout-profile-eyebrow">Confirm exact revision</p>
         <h3 id="checkout-profile-review-title" ref={heading} tabIndex={-1}>
           {reviewTitle(props.review)}
         </h3>
@@ -96,11 +95,11 @@ function reviewTitle(review: ReviewAction): string {
 function reviewDescription(review: ReviewAction): string {
   switch (review.kind) {
     case "publish":
-      return "Publishing locks this revision so a storefront can activate it.";
+      return "Publishing locks this revision. Then a storefront can use it.";
     case "activate":
-      return "New buyer sessions will pin this exact revision. Existing carts and checkouts keep their current revision.";
+      return "New checkouts use this revision. Open carts and checkouts keep their revision.";
     case "retire":
-      return "Retired profiles cannot be activated again. In-flight checkouts remain valid.";
+      return "A retired profile cannot be activated again. Open checkouts stay valid.";
     default:
       return assertNever(review, "Unexpected checkout profile review");
   }

@@ -1285,7 +1285,7 @@ function NewAgentModal(
   return (
     <AgentModal
       title="Create agent"
-      description="The agent starts at once, with the access that you choose below. Add an event or a schedule to run it on its own."
+      description="The agent starts at once, with the access that you choose."
       close={close}
       footer={
         <>
@@ -1385,8 +1385,8 @@ function NewSkillModal(
   const close = showDraft.bind(null, props.setDraft, NO_DRAFT);
   return (
     <AgentModal
-      title="New skill"
-      description="Reusable instructions any agent can follow alongside its own."
+      title="Create skill"
+      description={null}
       close={close}
       footer={
         <>

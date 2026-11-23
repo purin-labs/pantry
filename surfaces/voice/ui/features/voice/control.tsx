@@ -10,15 +10,12 @@ import {
 } from "@purin-labs/control-api";
 import {
   ArrowLeft,
-  AudioLines,
   Check,
   ChevronDown,
   ChevronRight,
   Copy,
-  HardDriveDownload,
   Laptop,
   Mic,
-  Trash2,
   X,
 } from "lucide-react";
 import React from "react";
@@ -371,9 +368,8 @@ function VoiceDialog(
           <VoiceDialogStatus status={status} on={on} />
           <p className="voice-lead">
             {talkKey === null
-              ? `Say "${WAKE_PHRASE}", then your command.`
-              : `Say "${WAKE_PHRASE}", then your command. Or hold ${talkKey}, speak and release. This works while this page is in front.`}{" "}
-            Voice control takes English commands.
+              ? `Say "${WAKE_PHRASE}", then your command in English.`
+              : `Say "${WAKE_PHRASE}", then your command in English. Or hold ${talkKey} while you speak. This works while this page is in front.`}
           </p>
           {on ? (
             <details className="voice-terms-fold">
@@ -513,33 +509,21 @@ function VoiceTerms(): React.ReactNode {
   return (
     <ul className="voice-terms">
       <li>
-        <Mic aria-hidden="true" size={16} />
-        <span>
-          The microphone stays open while voice control is on. Audio stays on
-          this device until you say the wake phrase or hold the talk key.
-        </span>
+        The microphone stays open while voice control is on. Audio stays on this
+        device until you say the wake phrase or hold the talk key.
       </li>
       <li>
-        <AudioLines aria-hidden="true" size={16} />
-        <span>
-          A command's audio goes to the Mac in the shop. If the Mac does not
-          answer, the audio goes to the transcription service, and it can be
-          processed outside the country. The text of a spoken answer also goes
-          to the Mac, which reads it aloud and keeps nothing.
-        </span>
+        A command's audio goes to the Mac in the shop. If the Mac does not
+        answer, the audio goes to the transcription service, and it can be
+        processed outside the country. The text of a spoken answer also goes to
+        the Mac, which reads it aloud and keeps nothing.
       </li>
       <li>
-        <Trash2 aria-hidden="true" size={16} />
-        <span>
-          Purin keeps no audio. The chat shows the text that the agent received.
-        </span>
+        Purin keeps no audio. The chat shows the text that the agent received.
       </li>
       <li>
-        <HardDriveDownload aria-hidden="true" size={16} />
-        <span>
-          This setting is for you on this device. Voice control downloads about
-          17 MB of files to this device, and turning it off deletes them.
-        </span>
+        This setting is for you on this device. Voice control downloads about 17
+        MB of files to this device, and turning it off deletes them.
       </li>
     </ul>
   );

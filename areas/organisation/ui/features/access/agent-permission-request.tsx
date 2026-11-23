@@ -166,6 +166,10 @@ export function AgentPermissionRequestPrompt(props: Props): React.ReactNode {
 
   const view = load.view;
   const labels = joinLabels(view.items.map(itemLabel));
+  // Who gets the grants is said once when every item goes to the same subject.
+  const subject = sharedGrantSubject(view);
+  const grants =
+    subject === null ? "adds the grants above" : `grants it to ${subject}`;
   return (
     <PermissionRequestDialog
       open={open}
@@ -193,7 +197,10 @@ export function AgentPermissionRequestPrompt(props: Props): React.ReactNode {
       items={view.items.map((item) => ({
         id: item.itemId,
         label: item.label,
-        description: `${item.description} Granted to ${item.grant.subjectLabel}.`,
+        description:
+          subject === null
+            ? `${item.description} Granted to ${item.grant.subjectLabel}.`
+            : item.description,
         required: true,
       }))}
       selectedIds={view.items.map((item) => item.itemId)}
@@ -214,21 +221,32 @@ export function AgentPermissionRequestPrompt(props: Props): React.ReactNode {
       footnote={
         view.origin === "slack_thread" ? (
           <>
-            Allow turns each item on for the whole workspace and adds the grants
-            above. A Slack channel needs its own grant to read records, because
-            everyone in the channel sees the answer. You can change both in
-            Access.
+            Allow turns each item on for the whole workspace and {grants}. A
+            Slack channel needs its own grant to read records, because everyone
+            in the channel sees the answer. You can change both in Access.
           </>
         ) : (
           <>
-            Allow turns each item on for the whole workspace and adds the grants
-            above. You can change both in Access.
+            Allow turns each item on for the whole workspace and {grants}. You
+            can change both in Access.
           </>
         )
       }
       signedInAs={null}
     />
   );
+}
+
+function sharedGrantSubject(view: AgentPermissionRequestView): string | null {
+  const subjects = new Set(view.items.map(grantSubjectLabel));
+  const [only] = subjects;
+  return subjects.size === 1 && only !== undefined ? only : null;
+}
+
+function grantSubjectLabel(
+  item: AgentPermissionRequestView["items"][number],
+): string {
+  return item.grant.subjectLabel;
 }
 
 function decisionFor(

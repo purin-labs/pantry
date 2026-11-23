@@ -48,7 +48,6 @@ export function AccessCheckPanel(
         <p>No shared data to check yet. Share a system first.</p>
       ) : (
         <>
-          <p>Can data from one system reach one place?</p>
           <div className="access35-check-fields">
             <label>
               <span>Data from</span>

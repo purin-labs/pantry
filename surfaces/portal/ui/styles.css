@@ -694,9 +694,7 @@ h1[tabindex="-1"]:focus {
   display: grid;
   gap: 8px;
   margin: 0;
-  padding: 12px 12px 12px 30px;
-  border-radius: 10px;
-  background: var(--surface);
+  padding-inline-start: 18px;
   font-size: 14px;
 }
 
@@ -4710,12 +4708,6 @@ a.commerce-count:hover {
   --provider-tile-bg: var(--surface);
 
   color: var(--ink);
-}
-
-.provider-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
 }
 
 /* The temporary active-Case transcript. It is rendered from a no-store read
