@@ -44,8 +44,10 @@ import { execFileSync, spawnSync } from "node:child_process";
 import {
   existsSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
   renameSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
 import { dirname, join, posix, resolve } from "node:path";
@@ -328,11 +330,14 @@ for (const [path, text] of [...pending]) {
 
 // ---------------------------------------------------------------------------
 // The local files that git ignores in an old folder. A checkout that pulls
-// the rename keeps them there: `--move-local` moves them.
+// the rename keeps them there: `--move-local` moves them. `.dev.vars*` holds
+// the local secrets and `.wrangler/` the local D1 and Durable Object state,
+// so they move. pnpm install and the prepare step of the 1Password Worker
+// write `node_modules/` and `.generated/` again in the new folder.
 
 function localFiles() {
   const found = [];
-  for (const { from, to } of FOLDER_RENAMES) {
+  for (const { from } of FOLDER_RENAMES) {
     if (!existsSync(join(root, from))) continue;
     const entries = git(
       "ls-files",
@@ -344,9 +349,9 @@ function localFiles() {
       from,
     )
       .split("\n")
-      .filter((entry) => entry !== "");
+      .filter((entry) => entry !== "" && entry !== `${from}/`);
     for (const entry of entries) {
-      found.push({ entry, target: renamedPath(entry.replace(/\/$/, "")), to });
+      found.push({ entry, target: renamedPath(entry.replace(/\/$/, "")) });
     }
   }
   return found;
@@ -357,24 +362,36 @@ if (flag("--local-files") || flag("--move-local")) {
     console.log("No local file is left in an old folder.");
   for (const { entry, target } of found) {
     const name = posix.basename(entry.replace(/\/$/, ""));
-    const rebuilt = ["node_modules", ".wrangler", ".generated"].includes(name);
+    const rebuilt = ["node_modules", ".generated"].includes(name);
     if (!flag("--move-local") || rebuilt) {
       console.log(
         `${entry}${rebuilt ? "  (a tool writes it again: delete it)" : `  -> ${target}`}`,
       );
       continue;
     }
-    if (existsSync(join(root, target))) {
-      console.log(
-        `${entry}: ${target} exists, so it stays. Join the two by hand.`,
-      );
-      continue;
-    }
-    mkdirSync(join(root, posix.dirname(target)), { recursive: true });
-    renameSync(join(root, entry), join(root, target));
-    console.log(`moved ${entry} -> ${target}`);
+    moveLocal(entry.replace(/\/$/, ""), target);
   }
   process.exit(0);
+}
+
+/** Moves a local file or folder; a folder joins a folder that exists. */
+function moveLocal(from, to) {
+  if (!existsSync(join(root, to))) {
+    mkdirSync(join(root, posix.dirname(to)), { recursive: true });
+    renameSync(join(root, from), join(root, to));
+    console.log(`moved ${from} -> ${to}`);
+    return;
+  }
+  const bothFolders =
+    statSync(join(root, from)).isDirectory() &&
+    statSync(join(root, to)).isDirectory();
+  if (!bothFolders) {
+    console.log(`${from}: ${to} exists, so it stays. Join the two by hand.`);
+    return;
+  }
+  for (const name of readdirSync(join(root, from))) {
+    moveLocal(`${from}/${name}`, `${to}/${name}`);
+  }
 }
 
 // ---------------------------------------------------------------------------
