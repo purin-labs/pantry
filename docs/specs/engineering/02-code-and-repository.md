@@ -309,7 +309,6 @@ acceptance before Stage B moves its files.
 
 **Gaps in the lints.**
 
-- `lint:plan-numbers` does not read a mention just before a period, such as "Plan 97."
 - `lint:file-size` does not read `.ts` or `.cjs` files under `scripts/`.
 - `lint:layers` finds a package by its folder name, so it does not see an import of
   `@purin-labs/commerce-worker`. `lint:runtime-boundary` refuses that import outside

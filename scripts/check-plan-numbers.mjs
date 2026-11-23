@@ -25,10 +25,11 @@ const EXCLUDED = [
   /^scripts\/[^/]+-ratchet\.json$/,
 ];
 // "plan-9" in a path such as tests/plan9-lab is a mention too. A version such
-// as "Plan 2026" is not: a plan number has at most three digits.
-// A word such as "floor-plan-2d" is not a mention: no letter or hyphen stands
-// before "plan".
-const MENTION = /(?<![\w-])(plan|refactor)[ -]?(\d{1,3}[A-Z]?)(?![\w.])/gi;
+// as "Plan 2026" or "plan-2.1" is not: a plan number has at most three digits,
+// and no digit follows its period. A mention at the end of a sentence, such as
+// "See Plan 92.", is one. A word such as "floor-plan-2d" is not a mention: no
+// letter or hyphen stands before "plan".
+const MENTION = /(?<![\w-])(plan|refactor)[ -]?(\d{1,3}[A-Z]?)(?!\w|\.\d)/gi;
 // Text that has the form of a mention and is not one. Give each its reason.
 const NOT_A_PLAN = new Map([
   [
