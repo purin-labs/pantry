@@ -88,6 +88,7 @@ import {
   TEXT,
   UNREAD,
 } from "../lib/tree-rewrite.mjs";
+import { FOLDER_RENAMES, inFolder, renamedPath } from "./folder-renames.mjs";
 
 const started = Date.now();
 const args = process.argv.slice(2);
@@ -114,6 +115,15 @@ const checkOnly = flag("--check");
 const LAYER_MAP = "scripts/layers.json";
 const CLONES_RATCHET = "scripts/clones-ratchet.json";
 const WORKSPACE_FILE = "pnpm-workspace.yaml";
+// The folder of the Platform Worker, by its old and its new name: a plan of a
+// move before the rename names the old one.
+const WORKER_FOLDER = "services/platform";
+const workerFolders = [
+  WORKER_FOLDER,
+  ...FOLDER_RENAMES.filter(({ from }) => from === WORKER_FOLDER).map(
+    ({ to }) => to,
+  ),
+];
 
 const faults = [];
 const notes = [];
@@ -270,7 +280,10 @@ function laterPath(path) {
   while (!known.has(current) && laterMoves.has(current)) {
     current = laterMoves.get(current);
   }
-  return known.has(current) ? current : path;
+  if (known.has(current)) return current;
+  // A file that stayed in a folder that scripts/refactor-17/rename-folder.mjs
+  // renamed (services/platform is workers/platform).
+  return known.has(renamedPath(current)) ? renamedPath(current) : path;
 }
 /** The place now of a folder that a later plan moved whole, or null. */
 const laterFolders = new Map();
@@ -278,7 +291,14 @@ function laterFolder(folder) {
   if (laterFolders.has(folder)) return laterFolders.get(folder);
   const prefix = `${folder}/`;
   let place = null;
-  if (!tree.some((path) => path.startsWith(prefix))) {
+  const renamed = renamedPath(folder);
+  if (
+    renamed !== folder &&
+    tree.some((path) => path.startsWith(`${renamed}/`))
+  ) {
+    // The folder holds files under its new name.
+    place = renamed;
+  } else if (!tree.some((path) => path.startsWith(prefix))) {
     // The last plan in foundationOrder that moved a file of the folder moved
     // the rest of it, and the name of the folder with it. The areas move
     // after the foundation.
@@ -307,7 +327,7 @@ function laterFolder(folder) {
   return place;
 }
 const PATH_IN_TEXT =
-  /(?<![\w./@-])((?:apps|packages|services)\/[\w@.*/{},-]+)/g;
+  /(?<![\w./@-])((?:apps|packages|services|workers)\/[\w@.*/{},-]+)/g;
 /** A text of the plan, with each path that a later plan moved at its place. */
 function laterText(text) {
   return text.replace(PATH_IN_TEXT, (path) => {
@@ -426,7 +446,9 @@ stopOnFaults();
 // the versions of the Worker and of the Portal. The first one that has the
 // name gives its version.
 const versionSources = [plan.package.versionsFrom].flat();
-const versions = versionSources.map((path) => JSON.parse(original(path)));
+const versions = versionSources.map((path) =>
+  JSON.parse(original(laterPath(path))),
+);
 function versionOf(name) {
   const version = versions
     .map((manifest) => ({
@@ -733,7 +755,7 @@ function newSpecifier(path, specifier) {
     // packages/contracts: the moved file names it by its new relative path.
     const built = resolveIn(onDisk, posix.dirname(oldPath), bare);
     if (built === null || built.file.startsWith("../")) return null;
-    if (built.file.startsWith("services/platform/")) {
+    if (workerFolders.some((folder) => inFolder(built.file, folder))) {
       faults.push(
         `${oldPath} imports ${built.file}, a file that the Worker package builds. A package cannot import a file of the Worker.`,
       );
@@ -878,8 +900,10 @@ function movedPath(path) {
 }
 // A glob of the Worker source below its root that selects a moved file, in a
 // folder that does not move whole: the moved file leaves the glob.
-const GLOB =
-  /(?<![\w./@-])(services\/platform\/src\/[\w@./-]*\*[\w@.*/{},-]*)/g;
+const GLOB = new RegExp(
+  `(?<![\\w./@-])((?:${workerFolders.map(escaped).join("|")})\\/src\\/[\\w@./-]*\\*[\\w@.*/{},-]*)`,
+  "g",
+);
 // A path or a glob in the target folder, which can select the moved file.
 const TARGET_PATH = new RegExp(
   `(?<![\\w./@-])(${escaped(plan.target)}/[\\w@.*/{},-]*)`,
@@ -1123,7 +1147,9 @@ function editDone(edit, text, seen = new Set()) {
     return true;
   }
   seen.add(edit);
-  return plansHere.some(({ edits }) =>
+  // The edits of a folder rename (folder-renames.mjs) come after each plan.
+  const renameEdits = FOLDER_RENAMES.flatMap(({ edits = [] }) => edits);
+  return [...plansHere, { edits: renameEdits }].some(({ edits }) =>
     edits.some(
       (next) =>
         !seen.has(next) &&
@@ -1252,9 +1278,11 @@ for (const [path, text] of [...pending]) {
 function groupOf(path) {
   if (oldPathOf.has(path)) return "moved files";
   if (path.startsWith(`${plan.target}/`)) return "new package files";
-  if (/^services\/platform\/tests\/e2e\//.test(path)) return "journeys";
-  if (/^services\/platform\/tests\//.test(path)) return "unit tests";
-  if (/^services\/platform\/src\//.test(path)) return "Worker source";
+  const inWorker = (folder) =>
+    workerFolders.some((worker) => path.startsWith(`${worker}/${folder}/`));
+  if (inWorker("tests/e2e")) return "journeys";
+  if (inWorker("tests")) return "unit tests";
+  if (inWorker("src")) return "Worker source";
   if (
     path === "eslint.config.mjs" ||
     /^scripts\/(check-[^/]+\.mjs|[^/]+-ratchet\.json|layers\.json|lib\/)/.test(
