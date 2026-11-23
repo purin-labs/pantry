@@ -51,13 +51,25 @@ const CONVERSATION_DELIVERIES = new Set([
   "foundation/conversation/projects/references.ts",
 ]);
 
+// The destination classes. `PASSES_AFTER_OUTSIDE_TEXT` is the writer rule,
+// not a class, so a capability that only it names has no destination class.
+const CLASS_SETS = [
+  "INSIDE_CAPABILITIES",
+  "OUTSIDE_CAPABILITIES",
+  "OTHER_SERVICE_CAPABILITIES",
+  "RECIPIENT_CAPABILITIES",
+];
+
 const sinks = readFileSync(resolve(root, SINKS), "utf8");
-const classes = sinks.slice(
-  sinks.indexOf("export const INSIDE_CAPABILITIES"),
-  sinks.indexOf("function sinkSendsToRecipient"),
-);
-if (!sinks.includes("export const INSIDE_CAPABILITIES"))
-  throw new Error(`${SINKS}: the class sets are gone`);
+const classes = CLASS_SETS.map(function classSet(name) {
+  const start = new RegExp(`const ${name}\\b[^=]*= new Set\\(\\[`, "u").exec(
+    sinks,
+  );
+  if (start === null)
+    throw new Error(`${SINKS}: the class set ${name} is gone`);
+  const body = sinks.slice(start.index + start[0].length);
+  return body.slice(0, body.indexOf("]);"));
+}).join("\n");
 
 const files = execFileSync(
   "git",
