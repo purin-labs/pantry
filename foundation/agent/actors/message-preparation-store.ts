@@ -7,7 +7,7 @@ import type {
 import {
   validateMessageAttachmentPreparationReceipt,
   validateMessageAttachmentPreparationState,
-} from "../messages/message-wasm";
+} from "../messages/message-contract";
 import type { Result } from "@purin-labs/kernel/result";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, isRecord } from "@purin-labs/std";

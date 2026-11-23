@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { deriveUserMessageViews } from "@purin-labs/agent/messages/message-wasm";
+import { deriveUserMessageViews } from "@purin-labs/agent/messages/message-contract";
 import type {
   CaseAssignment,
   CaseAssignmentLifecycle,
@@ -605,7 +605,7 @@ function boundedContextExcerpt(content: CaseContent): string | null {
   return bounded.length > 0 ? bounded : null;
 }
 
-/** The same Rust rendering the turn prompt uses, so the two cannot disagree. */
+/** The same rendering that the turn prompt uses, so the two cannot disagree. */
 function caseContentModelText(message: UserMessage): string | null {
   const derived = deriveUserMessageViews(message);
 

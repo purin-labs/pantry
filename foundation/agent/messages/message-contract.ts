@@ -1,3 +1,9 @@
+/**
+ * The Worker's entry to the message and attachment parsers of
+ * `@purin-labs/contracts`. Each call sends the value through JSON first, so a
+ * parser reads only plain data, and maps a refusal to
+ * `message_contract_rejected` with its reason and field.
+ */
 import type {
   MessageAttachmentPreparationReceipt,
   MessageAttachmentPreparationState,
@@ -6,20 +12,20 @@ import type {
   UserMessageViews,
 } from "@purin-labs/contracts";
 import {
-  buildStoredMessageAttachment as buildStoredMessageAttachmentTypescript,
-  deriveUserMessageViews as deriveUserMessageViewsTypescript,
-  parseStoredMessageAttachment as parseStoredMessageAttachmentTypescript,
+  buildStoredMessageAttachment as contractBuildStoredMessageAttachment,
+  deriveUserMessageViews as contractDeriveUserMessageViews,
+  parseStoredMessageAttachment as contractParseStoredMessageAttachment,
 } from "@purin-labs/contracts/message";
-import { parseMessageAttachmentPreparationState as parsePreparationTypescript } from "@purin-labs/contracts/attachment-preparation";
+import { parseMessageAttachmentPreparationState as contractParsePreparationState } from "@purin-labs/contracts/attachment-preparation";
 import type { Result } from "@purin-labs/kernel/result";
 
 /**
  * The untrusted claims a provider adapter collects, plus the facts the transfer
  * established.
  *
- * `header` carries only the leading bytes: identification happens in Lexicon so
- * the signature table has one authoritative definition, without moving the file
- * through the contract parser.
+ * `header` carries only the leading bytes: identification happens in the
+ * contracts, so the signature table has one authoritative definition, without
+ * moving the file through the contract parser.
  */
 type StoredMessageAttachmentCandidate = {
   readonly attachmentId: string;
@@ -58,7 +64,7 @@ const TEXT_ENCODER = new TextEncoder();
 const TEXT_DECODER = new TextDecoder();
 
 /**
- * Mints a committed attachment through Lexicon's own constructors.
+ * Mints a committed attachment through the constructors of the contracts.
  *
  * The Worker never assembles a `StoredMessageAttachment` itself: every branded
  * value, the media classification, and the trust order between signature and
@@ -82,7 +88,7 @@ export function buildStoredMessageAttachment(
     };
   }
 
-  return decideMessage(encoded, buildStoredMessageAttachmentTypescript);
+  return decideMessage(encoded, contractBuildStoredMessageAttachment);
 }
 
 type MessageParser = (
@@ -95,10 +101,10 @@ type MessageParser = (
 /** The message parser's result on the JSON request bytes. */
 function decideMessage<TValue>(
   encoded: Uint8Array,
-  typescript: MessageParser,
+  parse: MessageParser,
 ): Result<TValue, MessageContractRejection> {
   // Bytes that are not JSON refuse as invalid_request.
-  const parsed = typescript(decodeJson(encoded));
+  const parsed = parse(decodeJson(encoded));
   return parsed.ok
     ? { ok: true, value: parsed.value as TValue }
     : rejection(parsed.error.code, parsed.error.reason);
@@ -128,7 +134,7 @@ export function validateMessageAttachmentPreparationState(
 
   return decideMessage<MessageAttachmentPreparationState>(
     encoded,
-    parsePreparationTypescript,
+    contractParsePreparationState,
   );
 }
 
@@ -175,7 +181,7 @@ export function validateStoredMessageAttachment(
     return rejection("invalid_request", "record");
   }
 
-  return decideMessage(encoded, parseStoredMessageAttachmentTypescript);
+  return decideMessage(encoded, contractParseStoredMessageAttachment);
 }
 
 export type DerivedUserMessage = {
@@ -210,7 +216,7 @@ export function deriveUserMessageViews(
 
   const decoded = decideMessage<DerivedUserMessage>(
     encoded,
-    deriveUserMessageViewsTypescript,
+    contractDeriveUserMessageViews,
   );
 
   return decoded.ok

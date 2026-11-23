@@ -20,7 +20,7 @@ import {
   readActiveOrganisationMembershipRevision,
 } from "@purin-labs/tenancy/data/control-plane";
 import { parseRequestId } from "@purin-labs/kernel/ids";
-import { deriveUserMessageViews } from "@purin-labs/agent/messages/message-wasm";
+import { deriveUserMessageViews } from "@purin-labs/agent/messages/message-contract";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

@@ -10,7 +10,7 @@ import {
   buildStoredMessageAttachment,
   deriveUserMessageViews,
   validateStoredMessageAttachment,
-} from "@purin-labs/agent/messages/message-wasm";
+} from "@purin-labs/agent/messages/message-contract";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   parseChatCommand,

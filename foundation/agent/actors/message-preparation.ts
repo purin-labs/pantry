@@ -8,7 +8,7 @@ import type {
 } from "@purin-labs/contracts";
 
 import { newRequestId } from "@purin-labs/kernel/ids";
-import { validateMessageAttachmentPreparationReceipt } from "../messages/message-wasm";
+import { validateMessageAttachmentPreparationReceipt } from "../messages/message-contract";
 import { traceLog } from "@purin-labs/kernel/observability";
 import { MAX_SAMPLED_FRAMES } from "../messages/attachment-inspection";
 import { attachmentManifestLine } from "@purin-labs/contracts/message";

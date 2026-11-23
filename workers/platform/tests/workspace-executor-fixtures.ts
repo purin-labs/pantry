@@ -1,6 +1,6 @@
 import type { AttachmentId } from "@purin-labs/contracts";
 
-import { buildStoredMessageAttachment } from "@purin-labs/agent/messages/message-wasm";
+import { buildStoredMessageAttachment } from "@purin-labs/agent/messages/message-contract";
 
 const SOURCE_SHA256 = "a".repeat(64);
 

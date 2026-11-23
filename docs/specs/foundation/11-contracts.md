@@ -212,7 +212,7 @@ Main files of `packages/contracts/src/`:
 
 Other files: `foundation/agent/actor-wasm.ts` calls the Session reducer,
 `areas/commerce/server/commerce-wasm.ts` calls the commerce functions, and
-`foundation/agent/messages/message-wasm.ts` calls the message and attachment
+`foundation/agent/messages/message-contract.ts` calls the message and attachment
 parsers. The three run TypeScript only.
 `foundation/agent/actors/pi-tool-arguments.ts` holds the tool argument check.
 `packages/contracts/src/boundary.ts` reads plain request fields.
@@ -318,8 +318,8 @@ Neighbours:
 - **Timestamps through `Date`.** The record schemas of checkout profiles, shipment
   operations, food service, plugin outputs and the point of sale write a timestamp
   through `Date`, with milliseconds only.
-- **Names from the Wasm boundary.** `actor-wasm.ts`, `commerce-wasm.ts`,
-  `message-wasm.ts` and the `commerce_wasm_*` error codes remain.
+- **Names from the Wasm boundary.** `actor-wasm.ts`, `commerce-wasm.ts` and the
+  `commerce_wasm_*` error codes remain.
 - **Rust copies.** `crates/workspace-executor/src/contracts.rs` holds Rust copies of
   the identity, digest, attachment id and preparation limit types, written by hand,
   with their parse functions and serde validators. Only `wire.rs` is generated.

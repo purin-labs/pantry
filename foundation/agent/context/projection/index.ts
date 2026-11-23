@@ -19,7 +19,7 @@ import {
 } from "@purin-labs/authority/authorization/access-grants/visibility";
 import type { ContextVisibility } from "@purin-labs/authority/authorization/access-grants/types";
 import { ACTIVE_FILE_GRANT_VISIBILITY_SQL } from "../files/authority-sql";
-import { deriveUserMessageViews } from "../../messages/message-wasm";
+import { deriveUserMessageViews } from "../../messages/message-contract";
 import type { VariantBy } from "@purin-labs/type-utils";
 import {
   isNonBlankString,
@@ -1032,7 +1032,7 @@ function modelTextForContent(content: CaseContent): string | null {
     return boundedTextForContent(content);
   }
 
-  // The same Rust renderer the turn prompt uses, so a replayed entry and a
+  // The same renderer that the turn prompt uses, so a replayed entry and a
   // live one describe the message identically.
   const derived = deriveUserMessageViews(content.message);
 

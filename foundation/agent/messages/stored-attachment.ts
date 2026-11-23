@@ -1,6 +1,6 @@
 import type { StoredMessageAttachment } from "@purin-labs/contracts";
 
-import { validateStoredMessageAttachment } from "./message-wasm";
+import { validateStoredMessageAttachment } from "./message-contract";
 import type { Result } from "@purin-labs/kernel/result";
 
 type StoredAttachmentParseError = { code: "invalid_stored_attachment" };
@@ -8,7 +8,7 @@ type StoredAttachmentParseError = { code: "invalid_stored_attachment" };
 /**
  * Revalidates one persisted attachment.
  *
- * Validation runs in Lexicon rather than here: a second hand-written checker
+ * Validation runs in the contracts rather than here: a second hand-written checker
  * would drift from the contract, and the branded values it produces can only be
  * minted by the contract's own constructors.
  */

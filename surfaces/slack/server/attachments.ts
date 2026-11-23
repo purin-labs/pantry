@@ -8,7 +8,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { MESSAGE_ATTACHMENT_POLICY } from "@purin-labs/control-api";
-import { buildStoredMessageAttachment } from "@purin-labs/agent/messages/message-wasm";
+import { buildStoredMessageAttachment } from "@purin-labs/agent/messages/message-contract";
 import { traceLog } from "@purin-labs/kernel/observability";
 import type { Result } from "@purin-labs/kernel/result";
 import type { SlackHostedFileMetadata, SlackMessageEvent } from "./events";
