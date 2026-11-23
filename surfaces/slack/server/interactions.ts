@@ -2,7 +2,7 @@ import { isSideCaseProposalId } from "@purin-labs/control-api";
 import { errorMessage, isRecord, parseJsonOrNull } from "@purin-labs/std";
 
 import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { SlackSideCaseStartRefusal } from "../actors/connector-side-case";
+import type { SlackSideCaseStartRefusal } from "./actors/connector-side-case";
 import type { Env } from "@purin-labs/kernel/env";
 import { errorResponse, methodNotAllowed } from "@purin-labs/kernel/http";
 import {

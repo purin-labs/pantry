@@ -7,7 +7,7 @@ import {
   it,
 } from "vitest";
 
-import { SLACK_INSTALL_SCOPES } from "../src/slack-ingress/install";
+import { SLACK_INSTALL_SCOPES } from "@purin-labs/surface-slack/server/slack-ingress/install";
 import { SLACK_SCOPES as SLACK_ADAPTER_SCOPES } from "@purin-labs/area-integrations/server/provider-adapters/slack";
 
 const baselineSql = singleDatabaseSchema();

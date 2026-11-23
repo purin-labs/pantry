@@ -75,15 +75,15 @@ import { CARD_ONLY_REPLY_INSTRUCTION } from "@purin-labs/tool-handlers/slack/car
 import {
   readSlackConversationFact,
   slackConversationReachesOutside,
-} from "./slack/conversation-facts";
+} from "@purin-labs/surface-slack/server/conversation-facts";
 import {
   heldEffectNoticeText,
   heldOutputNoticeText,
-} from "./slack/held-output-notice";
-import { releaseHeldOutputDecision } from "./slack/held-output-release";
+} from "@purin-labs/surface-slack/server/held-output-notice";
+import { releaseHeldOutputDecision } from "@purin-labs/surface-slack/server/held-output-release";
 import { slackDmSelection } from "@purin-labs/authority/slack/installation-store";
-import { permissionRequestNoticeText } from "./slack/permission-request-notice";
-import { releaseAgentPermissionDecision } from "./slack/permission-request-release";
+import { permissionRequestNoticeText } from "@purin-labs/surface-slack/server/permission-request-notice";
+import { releaseAgentPermissionDecision } from "@purin-labs/surface-slack/server/permission-request-release";
 import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
 import { shopMacDevices } from "@purin-labs/area-devices/server/contract/shop-mac-devices";
 import { readShopMacDevices } from "./voice/mac-devices";
@@ -95,7 +95,7 @@ import {
   commerceCardSummary,
   commerceChangeSummary,
   commerceWaitingCardText,
-} from "./slack/commerce-approval-card";
+} from "@purin-labs/surface-slack/server/commerce-approval-card";
 import { cafeServices } from "@purin-labs/area-cafe/server/contract/cafe-services";
 import { readCounterSaleView } from "@purin-labs/area-cafe/server/counter-register";
 import { readMenuScreenList } from "@purin-labs/area-cafe/server/control/routes/menu-boards";
@@ -136,7 +136,7 @@ import { resolveNativeChatAudience } from "@purin-labs/conversation/chat/informa
 import {
   prepareRevokedDmSelectionRelease,
   selectSlackDmOrganisation,
-} from "./slack/organisation-routing";
+} from "@purin-labs/surface-slack/server/organisation-routing";
 import { chatSurfaces } from "@purin-labs/conversation/chat/surface-registry";
 import { KITCHEN_CHAT_SURFACES } from "./chat/kitchen-observation";
 

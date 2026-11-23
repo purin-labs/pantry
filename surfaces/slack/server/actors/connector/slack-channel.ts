@@ -15,16 +15,16 @@ import type { Result } from "@purin-labs/kernel/result";
 import {
   createSlackCaseCommand,
   type SlackCaseCommand,
-} from "../../slack/case-command-message";
+} from "../../case-command-message";
 import {
   deliverSlackAttemptsExhaustedNotice,
   processScheduledSlackCaseMessage,
   slackCaseIngressId,
-} from "../../slack/case-processing";
-import { slackAuthoredText } from "../../slack/events";
+} from "../../case-processing";
+import { slackAuthoredText } from "../../events";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
-import { setSlackThreadStatus } from "../../slack/messages";
-import { buildSlackUserMessage } from "../../slack/user-message";
+import { setSlackThreadStatus } from "../../messages";
+import { buildSlackUserMessage } from "../../user-message";
 import { actorExecutionAdmissionOpen } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type { OngoingCaseWalkingConnector } from "@purin-labs/conversation/actors/case-walking-path";

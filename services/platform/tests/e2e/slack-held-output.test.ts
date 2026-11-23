@@ -7,7 +7,7 @@ import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { FlowPolicyInput } from "@purin-labs/authority/policy/information-flow/index";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
-import { reconcileHeldOutputRequests } from "../../src/slack/held-output-release";
+import { reconcileHeldOutputRequests } from "@purin-labs/surface-slack/server/held-output-release";
 import {
   admin,
   decide,

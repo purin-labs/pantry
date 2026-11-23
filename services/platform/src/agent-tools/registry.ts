@@ -99,7 +99,7 @@ import {
   messageAttachmentInspect,
   messageLinkRead,
 } from "@purin-labs/agent-tools/messages/messages";
-import { slackMessageProposal } from "./slack/slack";
+import { slackMessageProposal } from "@purin-labs/surface-slack/server/agent-tools/slack/slack";
 import {
   followUp,
   memoryProposal,

@@ -2155,6 +2155,9 @@ importers:
       '@purin-labs/surface-email':
         specifier: workspace:*
         version: link:../../surfaces/email
+      '@purin-labs/surface-slack':
+        specifier: workspace:*
+        version: link:../../surfaces/slack
       '@purin-labs/surface-whatsapp':
         specifier: workspace:*
         version: link:../../surfaces/whatsapp
@@ -2278,6 +2281,82 @@ importers:
         specifier: 0.18.0-ts7.1.0-dev.20260929
         version: 0.18.0-ts7.1.0-dev.20260929
 
+  surfaces/slack:
+    dependencies:
+      '@purin-labs/actor-runtime':
+        specifier: workspace:*
+        version: link:../../foundation/actor-runtime
+      '@purin-labs/agent':
+        specifier: workspace:*
+        version: link:../../foundation/agent
+      '@purin-labs/agent-tools':
+        specifier: workspace:*
+        version: link:../../foundation/agent-tools
+      '@purin-labs/area-brain':
+        specifier: workspace:*
+        version: link:../../areas/brain
+      '@purin-labs/area-commerce':
+        specifier: workspace:*
+        version: link:../../areas/commerce
+      '@purin-labs/area-devices':
+        specifier: workspace:*
+        version: link:../../areas/devices
+      '@purin-labs/area-inbox':
+        specifier: workspace:*
+        version: link:../../areas/inbox
+      '@purin-labs/area-integrations':
+        specifier: workspace:*
+        version: link:../../areas/integrations
+      '@purin-labs/area-kitchen':
+        specifier: workspace:*
+        version: link:../../areas/kitchen
+      '@purin-labs/area-organisation':
+        specifier: workspace:*
+        version: link:../../areas/organisation
+      '@purin-labs/authority':
+        specifier: workspace:*
+        version: link:../../foundation/authority
+      '@purin-labs/connections':
+        specifier: workspace:*
+        version: link:../../foundation/connections
+      '@purin-labs/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@purin-labs/control':
+        specifier: workspace:*
+        version: link:../../foundation/control
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../packages/control-api
+      '@purin-labs/conversation':
+        specifier: workspace:*
+        version: link:../../foundation/conversation
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../../foundation/kernel
+      '@purin-labs/kitchen-control-api':
+        specifier: workspace:*
+        version: link:../../packages/kitchen-control-api
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../packages/std
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../../foundation/tenancy
+      '@purin-labs/tool-handlers':
+        specifier: workspace:*
+        version: link:../../foundation/tool-handlers
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../packages/type-utils
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
+
   surfaces/whatsapp:
     dependencies:
       '@purin-labs/actor-runtime':
@@ -2310,6 +2389,9 @@ importers:
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../../packages/std
+      '@purin-labs/surface-slack':
+        specifier: workspace:*
+        version: link:../slack
       '@purin-labs/tenancy':
         specifier: workspace:*
         version: link:../../foundation/tenancy

@@ -9,9 +9,9 @@ import {
 import {
   parseSlackCaseCommand,
   type SlackCaseCommand,
-} from "../slack/case-command-message";
+} from "../case-command-message";
 import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
-import type { SlackEventId } from "../slack/events";
+import type { SlackEventId } from "../events";
 import {
   acceptConnectorCaseWork,
   caseWorkPresence,

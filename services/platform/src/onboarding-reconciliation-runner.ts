@@ -1,7 +1,7 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { reconcileHeldOutputRequests } from "./slack/held-output-release";
-import { reconcileHeldPermissionDecisions } from "./slack/permission-request-release";
+import { reconcileHeldOutputRequests } from "@purin-labs/surface-slack/server/held-output-release";
+import { reconcileHeldPermissionDecisions } from "@purin-labs/surface-slack/server/permission-request-release";
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,

@@ -13,11 +13,11 @@ import type {
 import { issueControlSession, upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import { createOrganisationInstall } from "@purin-labs/tenancy/data/organisation";
 import { parseSlackAppId, type OrganisationId } from "@purin-labs/kernel/ids";
-import { parseSlackEnvelope } from "../src/slack/events";
+import { parseSlackEnvelope } from "@purin-labs/surface-slack/server/events";
 import {
   authorizeResolvedSlackCaseIngress,
   resolveSlackCaseIngressRoute,
-} from "../src/slack/ingress-admission";
+} from "@purin-labs/surface-slack/server/ingress-admission";
 import { activateActorFixture } from "./organisation-execution-fixture";
 import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,

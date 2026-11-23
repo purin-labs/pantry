@@ -1,4 +1,4 @@
-import { SLACK_NO_LINK_PREVIEW } from "../slack/messages";
+import { SLACK_NO_LINK_PREVIEW } from "../messages";
 import { isRecord } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";

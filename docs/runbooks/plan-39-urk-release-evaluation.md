@@ -13,7 +13,7 @@ attention, investigate an item, and refresh after resolution. This replaces the
 previous broad merchant-release gates. Refactor 7 removed the superseded
 multi-scenario scorer.
 
-Urk's definitions live in `services/platform/src/data/urk-skills.ts`;
+Urk's definitions live in `surfaces/slack/server/data/urk-skills.ts`;
 installation lives in `urk-preset.ts`. The existing five default skill names
 remain. The shared instructions now define order-attention qualification, and
 the performance skill permits a fresh read when records change. Existing

@@ -2,7 +2,7 @@ import type { ConnectorDeliveryReceipt } from "@purin-labs/contracts";
 import {
   checkPreparedConnectorDelivery,
   streamConnectorCaseTurn,
-} from "../src/actors/connector-slack-stream";
+} from "@purin-labs/surface-slack/server/actors/connector-slack-stream";
 import type { ConnectorCaseTurnStreamInput } from "@purin-labs/conversation/actors/case-turn-stream";
 
 declare const streamInput: Parameters<typeof streamConnectorCaseTurn>[0];

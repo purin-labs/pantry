@@ -3,7 +3,7 @@ import type { SessionToolWiring } from "@purin-labs/agent/actors/session/tool-wi
 import {
   presentConfigurationCommand,
   previewCode,
-} from "../slack/configuration-presentation";
+} from "@purin-labs/surface-slack/server/configuration-presentation";
 import { KITCHEN_PAGE_EFFECTS } from "@purin-labs/area-kitchen/server/agent-tools/bakery/page-effects";
 import { channelToolServices } from "@purin-labs/area-inbox/server/agent-tools/channels/turn-services";
 import {
@@ -24,11 +24,11 @@ import {
 } from "@purin-labs/area-kitchen/server/agent-tools/kitchen/turn-services";
 import { stageConfigurationDraft } from "@purin-labs/area-organisation/server/agent-tools/organisation/configuration-draft";
 import { TOOL_REGISTRY, type ToolServices } from "./registry";
-import { slackThreadSideCase } from "../slack/side-cases";
+import { slackThreadSideCase } from "@purin-labs/surface-slack/server/side-cases";
 import { sessionConversation } from "@purin-labs/conversation/chat/session-conversation";
-import { proposeSlackSideCaseForHarness } from "./slack/side-case-proposal";
+import { proposeSlackSideCaseForHarness } from "@purin-labs/surface-slack/server/agent-tools/slack/side-case-proposal";
 import { proposeMemoryFromInstruction } from "@purin-labs/area-brain/server/memory/access";
-import { slackToolServices } from "./slack/turn-services";
+import { slackToolServices } from "@purin-labs/surface-slack/server/agent-tools/slack/turn-services";
 import { sessionOwnToolServices } from "@purin-labs/tool-handlers/actors/session/own-tool-services";
 import {
   requestPermissionForHarness,

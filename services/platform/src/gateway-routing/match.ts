@@ -2,7 +2,7 @@ import { matchAcceptanceRoute } from "./acceptance";
 import { matchAdminRoute } from "./admin";
 import type { GatewayRoute } from "./domain";
 import { matchIdentityRoute } from "./identity-and-installs";
-import { matchSlackRoute } from "./slack";
+import { matchSlackRoute } from "@purin-labs/surface-slack/server/gateway-routing/slack";
 import { matchWebhookRoute } from "./webhooks";
 
 export function matchGatewayRoute(pathname: string): GatewayRoute {

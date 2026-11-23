@@ -29,7 +29,7 @@ import {
 } from "@purin-labs/area-kitchen/server/bakes/run-records";
 import { bakeRunKitchenPorts, bakeRunStub } from "../bake-run-ports";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { announceBakeProposal } from "../../slack/bake-proposal-announce";
+import { announceBakeProposal } from "@purin-labs/surface-slack/server/bake-proposal-announce";
 import {
   listCountedProducts,
   pieceCount,

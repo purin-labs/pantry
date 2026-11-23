@@ -18,7 +18,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import { parseConnectorId } from "@purin-labs/kernel/ids";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { validateLiveRequestAuthority } from "@purin-labs/authority/request-authority/index";
-import { storeSlackSideCaseProposal } from "../../slack/side-cases";
+import { storeSlackSideCaseProposal } from "../../side-cases";
 import type {
   HarnessSideCaseProposalRequest,
   HarnessSideCaseProposalResult,

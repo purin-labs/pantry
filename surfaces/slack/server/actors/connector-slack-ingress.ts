@@ -11,12 +11,12 @@ import {
   parseSlackOrganisationConnectionId,
   type RequestId,
 } from "@purin-labs/kernel/ids";
-import { parseSlackCaseEventEnvelope } from "../slack/case-command-message";
-import type { SlackMessageEvent } from "../slack/events";
+import { parseSlackCaseEventEnvelope } from "../case-command-message";
+import type { SlackMessageEvent } from "../events";
 import type {
   SlackCaseIngressAdmission,
   SlackCaseIngressRoute,
-} from "../slack/ingress-admission";
+} from "../ingress-admission";
 
 /**
  * A verified Slack message whose admission its Connector decides. The Worker

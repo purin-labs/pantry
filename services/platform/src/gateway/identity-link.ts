@@ -11,7 +11,7 @@ import {
   resolveIdentityLink,
   type ConsumeIdentityLinkError,
   type ResolveIdentityLinkError,
-} from "../data/identity-link";
+} from "@purin-labs/surface-slack/server/data/identity-link";
 import {
   resolveControlSession,
   validateControlCsrf,
@@ -27,7 +27,7 @@ import {
 } from "@purin-labs/kernel/http";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceLog } from "@purin-labs/kernel/observability";
-import { parseSlackUserId } from "../slack/events";
+import { parseSlackUserId } from "@purin-labs/surface-slack/server/events";
 import { assertNever } from "@purin-labs/std";
 import { identityLinkBrowserUrl } from "./support";
 import {

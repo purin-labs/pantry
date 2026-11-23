@@ -23,7 +23,7 @@ import {
 } from "@purin-labs/authority/data/slack-installation-records";
 import {
   directorySlackRecordDeletions,
-} from "./slack/organisation-routing";
+} from "@purin-labs/surface-slack/server/organisation-routing";
 import {
   prepareChatDirectoryRevisionBump,
   prepareReturnPrivateChatsToDefault,

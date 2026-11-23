@@ -11,7 +11,7 @@ import {
   parseSlackAppId,
 } from "@purin-labs/kernel/ids";
 import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
-import { admitSlackInstallOrganisation } from "../src/slack/install-organisation";
+import { admitSlackInstallOrganisation } from "@purin-labs/surface-slack/server/install-organisation";
 import type { SlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { createSlackInstallation } from "@purin-labs/authority/slack/installation-store";
 import { createMigratedDatabase } from "./sqlite-d1";

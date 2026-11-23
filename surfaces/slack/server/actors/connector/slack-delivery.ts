@@ -1,4 +1,4 @@
-import { SLACK_STREAM_TEXT_LIMIT } from "../../slack/stream";
+import { SLACK_STREAM_TEXT_LIMIT } from "../../stream";
 import type { ConnectorDelivery } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";
 import {
@@ -20,7 +20,7 @@ import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connecti
 import {
   commerceActionPortalUrl,
   commerceCardBlocks,
-} from "../../slack/commerce-approval-card";
+} from "../../commerce-approval-card";
 import {
   commerceApprovalNoticeDeliveryId,
   commerceApprovalNoticeNonce,
@@ -34,34 +34,34 @@ import {
   permissionNoticeDeliveryId,
   permissionNoticeRequestId,
   permissionRequestPortalUrl,
-} from "../../slack/permission-request-notice";
+} from "../../permission-request-notice";
 import {
   aiBudgetPortalUrl,
   budgetCardBlocks,
   isBudgetNoticeDelivery,
-} from "../../slack/budget-notice";
+} from "../../budget-notice";
 import {
   heldCardBlocks,
   heldNoticeOfDecision,
   heldNoticeRequestId,
   heldOutputPortalUrl,
-} from "../../slack/held-output-notice";
-import { noticeCardBlocks } from "../../slack/notice-card";
+} from "../../held-output-notice";
+import { noticeCardBlocks } from "../../notice-card";
 import {
   deviceAlertCardBlocks,
   devicesPortalUrl,
-} from "../../slack/device-alert-card";
+} from "../../device-alert-card";
 import {
   BAKE_PROPOSAL_CARD,
   bakeProposalCardBlocks,
   bakeProposalOfNotice,
   bakesPortalUrl,
-} from "../../slack/bake-proposal-card";
+} from "../../bake-proposal-card";
 import {
   BAKE_RUN_CARD,
   bakeRunCardBlocks,
   bakeRunPauseTarget,
-} from "../../slack/bake-run-card";
+} from "../../bake-run-card";
 import {
   deviceAlertNoticeOfUpdate,
   isDeviceAlertDelivery,
@@ -75,7 +75,7 @@ import {
   slackClientMessageId,
   slackRetryAt,
   SLACK_NO_LINK_PREVIEW,
-} from "../../slack/messages";
+} from "../../messages";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, isNonBlankString, isRecord } from "@purin-labs/std";
 import { parseDeliveryState } from "@purin-labs/conversation/actors/connector/ingress-parsers";

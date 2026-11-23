@@ -5,7 +5,7 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { SLACK_PERMISSION_RESUME_TEXT } from "../../src/actors/connector-slack-case-work";
+import { SLACK_PERMISSION_RESUME_TEXT } from "@purin-labs/surface-slack/server/actors/connector-slack-case-work";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import type { FlowPolicyInput } from "@purin-labs/authority/policy/information-flow/index";
 import { lastCalledTool } from "./chat-permission-support";

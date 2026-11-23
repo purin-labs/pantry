@@ -7,7 +7,7 @@ import { isRecord } from "@purin-labs/std";
 
 import { listPlacementActorRegistryEntries } from "@purin-labs/actor-runtime/actors/actor-registry";
 import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
-import { SLACK_PERMISSION_RESUME_TEXT } from "../../src/actors/connector-slack-case-work";
+import { SLACK_PERMISSION_RESUME_TEXT } from "@purin-labs/surface-slack/server/actors/connector-slack-case-work";
 import {
   createGrant,
   enableCapability,

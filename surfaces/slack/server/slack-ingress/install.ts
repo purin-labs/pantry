@@ -31,7 +31,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import {
   admitSlackInstallOrganisation,
   type SlackInstallOrganisationAdmissionError,
-} from "../slack/install-organisation";
+} from "../install-organisation";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import {
   createSlackInstallation,
@@ -48,7 +48,7 @@ import {
   errorMessage,
   isRecord,
 } from "@purin-labs/std";
-import { ensureOrganisationObject } from "../gateway/support";
+import { ensureOrganisationObject } from "../../../../services/platform/src/gateway/support";
 import {
   isLocalDebugRequest,
   parsePublicServiceUrl,

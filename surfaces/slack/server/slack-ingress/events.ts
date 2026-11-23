@@ -7,7 +7,7 @@ import {
   jsonResponse,
   methodNotAllowed,
 } from "@purin-labs/kernel/http";
-import type { SlackCaseCommand } from "../slack/case-command-message";
+import type { SlackCaseCommand } from "../case-command-message";
 import {
   newRequestId,
   type RequestId,
@@ -21,22 +21,22 @@ import {
   parseSlackEnvelope,
   slackAuthoredText,
   type SlackMessageEvent,
-} from "../slack/events";
-import { setSlackThreadStatus } from "../slack/messages";
-import { isSlackStopCommand } from "../slack/stop-command";
+} from "../events";
+import { setSlackThreadStatus } from "../messages";
+import { isSlackStopCommand } from "../stop-command";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import {
   parseSupplierPayoutQuery,
   type SupplierPayoutQuery,
-} from "../slack/supplier-payout-command";
-import { replyToSupplierPayoutQuery } from "../slack/supplier-payout-reply";
+} from "../supplier-payout-command";
+import { replyToSupplierPayoutQuery } from "../supplier-payout-reply";
 import {
   postSlackThreadMessage,
   slackClientMessageId,
-} from "../slack/messages";
-import { isSlackCaseRoutingCandidate } from "../slack/case-routing";
-import { decideSlackCaseAtConnector } from "../slack/connector-ingress";
-import type { ResolvedSlackThreadRoute } from "../slack/organisation-routing";
+} from "../messages";
+import { isSlackCaseRoutingCandidate } from "../case-routing";
+import { decideSlackCaseAtConnector } from "../connector-ingress";
+import type { ResolvedSlackThreadRoute } from "../organisation-routing";
 import {
   authorizeResolvedSlackCaseIngress,
   resolveSlackCaseIngressRoute,
@@ -46,16 +46,16 @@ import {
   type SlackCaseIngress,
   type SlackCaseIngressAdmission,
   type SlackIngressCredential,
-} from "../slack/ingress-admission";
-import { buildAdmittedSlackCaseCommand } from "../slack/case-command";
-import { verifySlackSignature } from "../slack/signature";
+} from "../ingress-admission";
+import { buildAdmittedSlackCaseCommand } from "../case-command";
+import { verifySlackSignature } from "../signature";
 import { resolveActiveSlackPhysicalInstallationCredential } from "@purin-labs/authority/credential-vault/index";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
   isRecord,
 } from "@purin-labs/std";
-import { handleSlackInstallationRevoked, identityLinkBrowserUrl, slackPayloadErrorResponse } from "../gateway/support";
+import { handleSlackInstallationRevoked, identityLinkBrowserUrl, slackPayloadErrorResponse } from "../../../../services/platform/src/gateway/support";
 import { readRuntimeSecret } from "@purin-labs/control/worker/gateway/request-helpers";
 
 type SlackDurableAccept =

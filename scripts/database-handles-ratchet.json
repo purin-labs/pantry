@@ -27,6 +27,6 @@
   "foundation/tenancy/organisation-execution-scope.ts": 1,
   "services/platform/src/chat/thread-read-timing.ts": 2,
   "services/platform/src/gateway/admin/actor-registry.ts": 1,
-  "services/platform/src/slack/ingress-admission.ts": 1,
-  "services/platform/src/slack/install-organisation.ts": 1
+  "surfaces/slack/server/ingress-admission.ts": 1,
+  "surfaces/slack/server/install-organisation.ts": 1
 }

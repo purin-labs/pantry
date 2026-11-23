@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { EmailReviewProjection } from "@purin-labs/area-inbox/server/data/email-review";
-import { buildSlackEmailReviewNotice } from "../src/slack/email-review-notice";
+import { buildSlackEmailReviewNotice } from "@purin-labs/surface-slack/server/email-review-notice";
 
 describe("Slack email review notice", () => {
   it("hands an operational email review to the authenticated Portal", () => {

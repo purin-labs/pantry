@@ -424,14 +424,15 @@ import. A module with no line for one of these has none.
 ## surfaces/slack
 
 - Folders: 8
-  - `services/platform/src/actors/`
-  - `services/platform/src/actors/connector/`
-  - `services/platform/src/agent-tools/slack/`
-  - `services/platform/src/control/routes/`
-  - `services/platform/src/data/`
-  - `services/platform/src/gateway-routing/`
-  - `services/platform/src/slack-ingress/`
-  - `services/platform/src/slack/`
+  - `surfaces/slack/server/`
+  - `surfaces/slack/server/actors/`
+  - `surfaces/slack/server/actors/connector/`
+  - `surfaces/slack/server/agent-tools/slack/`
+  - `surfaces/slack/server/control/routes/`
+  - `surfaces/slack/server/data/`
+  - `surfaces/slack/server/gateway-routing/`
+  - `surfaces/slack/server/slack-ingress/`
+- Packages: `surfaces/slack`
 - Tables (6): `external_identity_link`, `external_identity_link_challenge`, `slack_conversation_fact`, `slack_dm_organisation_selection`, `slack_message_proposal`, `slack_thread_case_pin`
 
 ## surfaces/storefront

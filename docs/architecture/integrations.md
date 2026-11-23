@@ -70,11 +70,11 @@ Slack request to /slack/events
 ```
 
 The Slack ingress Worker
-([`slack-ingress/handler.ts`](../../services/platform/src/slack-ingress/handler.ts))
+([`slack-ingress/handler.ts`](../../surfaces/slack/server/slack-ingress/handler.ts))
 loads only this path, so a message reaches its Connector sooner. It refuses
 nothing; the Platform Worker decides every request that it does not complete.
 Both call `decideSlackCaseAtConnector`
-([`slack/connector-ingress.ts`](../../services/platform/src/slack/connector-ingress.ts)).
+([`slack/connector-ingress.ts`](../../surfaces/slack/server/connector-ingress.ts)).
 A timestamp more than 300 seconds old is rejected. The Worker acknowledges
 only after `ConnectorActor` stores the work; otherwise it answers
 `503 slack_event_not_durable` and Slack retries. The Connector alarm recovers

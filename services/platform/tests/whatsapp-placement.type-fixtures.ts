@@ -1,4 +1,4 @@
-import { deliverWhatsAppOperatorNotice } from "../src/actors/whatsapp-operator-notice";
+import { deliverWhatsAppOperatorNotice } from "@purin-labs/surface-slack/server/actors/whatsapp-operator-notice";
 import {
   dispatchWhatsAppReply,
   previewWhatsAppProposal,

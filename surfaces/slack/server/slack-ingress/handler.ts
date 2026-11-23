@@ -3,30 +3,30 @@ import { errorMessage } from "@purin-labs/std";
 import { errorResponse, jsonResponse } from "@purin-labs/kernel/http";
 import { newRequestId, type RequestId } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
-import { setSlackThreadStatus } from "../slack/messages";
+import { setSlackThreadStatus } from "../messages";
 import { SLACK_INTERACTIONS_PATH } from "../gateway-routing/slack";
-import { isSlackCaseRoutingCandidate } from "../slack/case-routing";
+import { isSlackCaseRoutingCandidate } from "../case-routing";
 import {
   decideSlackCaseAtConnector,
   type ConnectorSlackIngressBindings,
-} from "../slack/connector-ingress";
+} from "../connector-ingress";
 import {
   parseSlackEnvelope,
   slackAuthoredText,
   type SlackMessageEvent,
-} from "../slack/events";
+} from "../events";
 import {
   resolveSlackCaseIngressRoute,
   type PendingSlackIngressCredential,
-} from "../slack/ingress-admission";
+} from "../ingress-admission";
 import {
   resolveConfiguredSlackInstallationIdentity,
   type SlackInstallationIdentity,
 } from "@purin-labs/connections/slack/installation-identity";
-import type { ResolvedSlackThreadRoute } from "../slack/organisation-routing";
-import { verifySlackSignature } from "../slack/signature";
-import { isSlackStopCommand } from "../slack/stop-command";
-import { parseSupplierPayoutQuery } from "../slack/supplier-payout-command";
+import type { ResolvedSlackThreadRoute } from "../organisation-routing";
+import { verifySlackSignature } from "../signature";
+import { isSlackStopCommand } from "../stop-command";
+import { parseSupplierPayoutQuery } from "../supplier-payout-command";
 
 /**
  * The bindings of the Slack ingress Worker. It holds no Actor class and no

@@ -7,7 +7,7 @@ import { isRecord } from "@purin-labs/std";
 import {
   handleSlackIngress,
   type SlackIngressEnv,
-} from "../../src/slack-ingress/handler";
+} from "@purin-labs/surface-slack/server/slack-ingress/handler";
 import { commerceClient } from "./commerce-support";
 import {
   ORGANISATION_ID,

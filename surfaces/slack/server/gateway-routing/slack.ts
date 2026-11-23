@@ -1,4 +1,4 @@
-import type { GatewaySlackRoute } from "./domain";
+import type { GatewaySlackRoute } from "../../../../services/platform/src/gateway-routing/domain";
 
 export const SLACK_INSTALL_REDIRECT_PATH = "/slack/install";
 

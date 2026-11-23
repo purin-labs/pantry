@@ -3,7 +3,7 @@ import type { Track } from "@purin-labs/contracts";
 import { handleControlRequest } from "./control-router";
 import type { GatewayRoute } from "./gateway-routing/domain";
 import { matchGatewayRoute } from "./gateway-routing/match";
-import { handleSlackInteractions } from "./slack/interactions";
+import { handleSlackInteractions } from "@purin-labs/surface-slack/server/interactions";
 import { runScheduledOnboardingReconciliation } from "./onboarding-reconciliation-runner";
 import {
   handleCommerceLabRoute,
@@ -85,12 +85,12 @@ import {
   handleTriggerShopifyTestOrder,
 } from "@purin-labs/area-integrations/shopify/admin";
 import { handleShopifyWebhook } from "@purin-labs/area-integrations/shopify/webhooks";
-import { handleSlackEvents } from "./slack-ingress/events";
+import { handleSlackEvents } from "@purin-labs/surface-slack/server/slack-ingress/events";
 import {
   handleSlackInstall,
   handleSlackInstallLiveness,
   handleSlackInstallStart,
-} from "./slack-ingress/install";
+} from "@purin-labs/surface-slack/server/slack-ingress/install";
 import {
   handleConfigureStripeConnector,
   handleConfigureStripeFailureCues,

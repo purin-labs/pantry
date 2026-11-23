@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { customConnectorSetupHandoff } from "../src/slack/case-processing";
+import { customConnectorSetupHandoff } from "@purin-labs/surface-slack/server/case-processing";
 
 describe("Slack custom connector setup handoff", () => {
   it("keeps viewers out of connector authoring", () => {

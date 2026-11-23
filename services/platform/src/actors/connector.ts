@@ -13,7 +13,7 @@ import {
 import {
   permissionDecisionDeliveryId,
   permissionNoticeDeliveryId,
-} from "../slack/permission-request-notice";
+} from "@purin-labs/surface-slack/server/permission-request-notice";
 import {
   advanceActorActivationSchema,
   pinnedActorDatabase,
@@ -47,30 +47,30 @@ import {
   type SlackFollowUpAcceptance,
   type SlackPermissionParked,
   type SlackSideCaseParked,
-} from "./connector-slack-case-work";
+} from "@purin-labs/surface-slack/server/actors/connector-slack-case-work";
 import {
   parseConnectorSlackIngressRequest,
   type ConnectorSlackIngressOutcome,
-} from "./connector-slack-ingress";
+} from "@purin-labs/surface-slack/server/actors/connector-slack-ingress";
 import {
   parseSlackSideCaseProposalPost,
   parseSlackSideCaseStartRequest,
   postSlackSideCaseProposal,
   type SlackSideCaseStartOutcome,
-} from "./connector-side-case";
-import { buildAdmittedSlackCaseCommand } from "../slack/case-command";
+} from "@purin-labs/surface-slack/server/actors/connector-side-case";
+import { buildAdmittedSlackCaseCommand } from "@purin-labs/surface-slack/server/case-command";
 import {
   authorizeSlackCaseIngressAtScope,
   startSlackCaseIngressRead,
-} from "../slack/ingress-admission";
-import { reopenWithheldConnectorSlackDelivery } from "./connector-slack-stream";
-import { deliverSlackPermissionNotice } from "../slack/case-processing";
+} from "@purin-labs/surface-slack/server/ingress-admission";
+import { reopenWithheldConnectorSlackDelivery } from "@purin-labs/surface-slack/server/actors/connector-slack-stream";
+import { deliverSlackPermissionNotice } from "@purin-labs/surface-slack/server/case-processing";
 import type { Result } from "@purin-labs/kernel/result";
 import { type PlacedActorExportSource } from "@purin-labs/actor-runtime/actors/lifecycle/placed-actor";
 import { armAlarmBy } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import { inspectConnector } from "@purin-labs/conversation/actors/connector/delivery";
 import type { ConnectorChannels } from "@purin-labs/conversation/actors/connector/channel-adapter";
-import { SlackConnectorChannel } from "./connector/slack-channel";
+import { SlackConnectorChannel } from "@purin-labs/surface-slack/server/actors/connector/slack-channel";
 import {
   ensureConnectorIdentity,
   parseDeliveryRequest,

@@ -63,7 +63,7 @@ runs onboarding reconciliation, schedule dispatch, attachment collection,
 payout reconciliation and other bounded passes.
 
 The Slack ingress Worker
-([`handler.ts`](../../services/platform/src/slack-ingress/handler.ts)) binds
+([`handler.ts`](../../surfaces/slack/server/slack-ingress/handler.ts)) binds
 `ConnectorDO` of `pantry` by `script_name`. It completes a signed message
 that its Connector accepts, and forwards every other request to the platform
 Worker. `CODE_MODE_SANDBOX` binds the class of a separate Worker by
@@ -338,7 +338,7 @@ cancellation and terminal result must match the current lease. A late
 result or a replaced runtime loses the fence.
 
 Slack keeps one Case for each thread
-([`case-routing.ts`](../../services/platform/src/slack/case-routing.ts)).
+([`case-routing.ts`](../../surfaces/slack/server/case-routing.ts)).
 The Case, Session and assignment identities derive from the thread root
 timestamp; the Session and assignment also carry the authority partition
 digest. A later message becomes a new turn. A redelivery reuses the
@@ -563,7 +563,7 @@ its Case and Session together. The Session stays empty until the Case admits
 the message, and a refused message retries with the same Session. A message
 that opens no agent turn (a goal message, a settled configuration change, no
 model route) creates only the Case
-([`case-processing.ts`](../../services/platform/src/slack/case-processing.ts)).
+([`case-processing.ts`](../../surfaces/slack/server/case-processing.ts)).
 
 A `CaseTrigger` source is `connector`, `cue` or `api`. APIs, cues and
 schedules may open a Case with no Connector. Such a Case emits no provider

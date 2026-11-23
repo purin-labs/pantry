@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { createCommerceDeliveryQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";
 import { parseIngressQueueMessage } from "../src/ingress-queue";
-import { slackConversationAuthorityKind } from "../src/slack/case-command-message";
+import { slackConversationAuthorityKind } from "@purin-labs/surface-slack/server/case-command-message";
 import {
   parseIntegrationAccountId,
   parseRequestId,

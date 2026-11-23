@@ -8,7 +8,7 @@ import type { ConnectorDO } from "../../src/actors/connector";
 import {
   handleSlackIngress,
   type SlackIngressEnv,
-} from "../../src/slack-ingress/handler";
+} from "@purin-labs/surface-slack/server/slack-ingress/handler";
 import { network } from "./network";
 import {
   CHANNEL_ID,

@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { parseSlackEnvelope, type SlackEnvelope } from "../src/slack/events";
+import {
+  parseSlackEnvelope,
+  type SlackEnvelope,
+} from "@purin-labs/surface-slack/server/events";
 import type { Variant } from "@purin-labs/type-utils";
 
 describe("Slack event boundary", function slackEventBoundarySuite() {

@@ -116,7 +116,7 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "readUserPreferences",
     "updateUserPreferences",
   ],
-  "services/platform/src/slack/install-organisation.ts": [
+  "surfaces/slack/server/install-organisation.ts": [
     "resolveSlackInstallOrganisation",
   ],
   "foundation/authority/slack/installation-store.ts": [
@@ -131,7 +131,7 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "readSlackChannelDefault",
     "resolveSlackInstallation",
   ],
-  "services/platform/src/slack/organisation-routing.ts": [
+  "surfaces/slack/server/organisation-routing.ts": [
     "diagnoseRouteFailure",
     "prepareSlackChannelThreadClaim",
     "prepareSlackDmThreadClaim",

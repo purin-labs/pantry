@@ -6,7 +6,7 @@ import {
   renderPayoutApprovalCard,
   renderPayoutOutcome,
   type PayoutApprovalCard,
-} from "../src/slack/supplier-payout-cards";
+} from "@purin-labs/surface-slack/server/supplier-payout-cards";
 
 function card(overrides: Partial<PayoutApprovalCard> = {}): PayoutApprovalCard {
   return {

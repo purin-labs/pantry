@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isSlackStopCommand } from "../src/slack/stop-command";
+import { isSlackStopCommand } from "@purin-labs/surface-slack/server/stop-command";
 
 type StopCommandCase = {
   trigger: "mention" | "message" | "edit";

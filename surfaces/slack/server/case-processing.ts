@@ -78,7 +78,7 @@ import { refreshSlackRequestAuthority } from "@purin-labs/authority/request-auth
 import {
   isDeferredSlackCaseWork,
   isSlackSideCaseWork,
-} from "../actors/connector-slack-case-work";
+} from "./actors/connector-slack-case-work";
 import {
   parseControlRole,
   roleMayConfigure,

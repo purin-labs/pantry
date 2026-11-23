@@ -10,23 +10,23 @@ import {
   parseOrganisationId,
   parseWorkspaceId,
 } from "@purin-labs/kernel/ids";
-import type { SlackCaseCommand } from "../slack/case-command-message";
+import type { SlackCaseCommand } from "../case-command-message";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { refreshSlackRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import { resolveSlackLinkedMember } from "@purin-labs/conversation/actors/action-mutation-execution";
-import { deriveSlackCaseRouteIdentities } from "../slack/case-routing";
+import { deriveSlackCaseRouteIdentities } from "../case-routing";
 import {
   deriveSlackSessionId,
   deriveSlackThreadKey,
   parseSlackUserId,
   type SlackUserId,
-} from "../slack/events";
+} from "../events";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import {
   postSlackSideCaseMessage,
   readSlackPermalink,
   updateSlackSideCaseMessage,
-} from "../slack/side-case-posts";
+} from "../side-case-posts";
 import {
   claimSlackSideCaseStart,
   readSlackSideCaseProposal,
@@ -37,7 +37,7 @@ import {
   slackSideCaseStartedMessage,
   slackSideCaseThreadMessage,
   type SlackSideCaseProposal,
-} from "../slack/side-cases";
+} from "../side-cases";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { decideStoredFlowConversationSink } from "@purin-labs/conversation/actors/case-conversation-sink";
 import { parseIdentityRecord } from "@purin-labs/conversation/actors/connector-case-work";

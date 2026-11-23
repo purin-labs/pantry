@@ -7,8 +7,8 @@ import {
   parseOrganisationId,
   parseIntegrationAccountId,
 } from "@purin-labs/kernel/ids";
-import { acquireSlackAttachmentBatch } from "../../src/slack/attachments";
-import { parseSlackEnvelope } from "../../src/slack/events";
+import { acquireSlackAttachmentBatch } from "@purin-labs/surface-slack/server/attachments";
+import { parseSlackEnvelope } from "@purin-labs/surface-slack/server/events";
 import {
   collectOrganisationAttachments,
   ATTACHMENT_COLLECTION_GRACE_MS,

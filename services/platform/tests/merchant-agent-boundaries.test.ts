@@ -9,7 +9,7 @@ import {
   confirmOperatorConfigurationDraft,
   createOperatorConfigurationDraft,
 } from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
-import { previewCode } from "../src/slack/configuration-presentation";
+import { previewCode } from "@purin-labs/surface-slack/server/configuration-presentation";
 import {
   installMerchantAgent,
   merchantAgentDefaultSkills,

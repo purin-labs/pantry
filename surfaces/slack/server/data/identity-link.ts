@@ -17,7 +17,7 @@ import {
   parseSlackUserId,
   type SlackEventId,
   type SlackUserId,
-} from "../slack/events";
+} from "../events";
 import { assertNever, encodeBase64Url, sha256Hex } from "@purin-labs/std";
 
 declare const identityLinkChallengeIdBrand: unique symbol;

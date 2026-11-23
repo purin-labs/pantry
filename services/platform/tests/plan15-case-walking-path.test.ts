@@ -98,7 +98,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
-import { parseSlackUserId } from "../src/slack/events";
+import { parseSlackUserId } from "@purin-labs/surface-slack/server/events";
 import {
   fixtureCaseTurnContext,
   fixtureDirectTwoSessionContext,

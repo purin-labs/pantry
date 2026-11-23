@@ -29,7 +29,7 @@ import {
   startSlackStream,
   stopSlackStream,
   type SlackStreamError,
-} from "../slack/stream";
+} from "../stream";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   actorExecutionAdmissionOpen,
@@ -41,11 +41,11 @@ import {
   postSlackThreadMessage,
   slackClientMessageId,
   type SlackMessageError,
-} from "../slack/messages";
+} from "../messages";
 import { CARD_ONLY_REPLY } from "@purin-labs/tool-handlers/slack/card-only-reply";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
-import { heldNoticeOfDecision } from "../slack/held-output-notice";
-import { permissionDecisionRequestId } from "../slack/permission-request-notice";
+import { heldNoticeOfDecision } from "../held-output-notice";
+import { permissionDecisionRequestId } from "../permission-request-notice";
 import { applyAgentMessageAssemblyEvent } from "@purin-labs/agent/actors/agent-message-assembly";
 import type { SessionActor } from "@purin-labs/agent/actors/session/session-actor";
 import {

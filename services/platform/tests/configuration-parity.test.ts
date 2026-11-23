@@ -9,7 +9,7 @@ import {
   renderConfigurationSummary,
   replyAcceptsDraft,
   replyCancelsDraft,
-} from "../src/slack/configuration-presentation";
+} from "@purin-labs/surface-slack/server/configuration-presentation";
 import type { OperatorConfigurationDraft } from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
 import { requireOrganisationId } from "./test-ids";
 

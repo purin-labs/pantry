@@ -6,11 +6,11 @@ import {
   createOperatorConfigurationDraft,
   readPendingOperatorDraft,
 } from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
-import { renderConfigurationPreview } from "../src/slack/configuration-presentation";
+import { renderConfigurationPreview } from "@purin-labs/surface-slack/server/configuration-presentation";
 import {
   resolveSlackConfigurationReply,
   type SlackOperatorIdentity,
-} from "../src/slack/configuration-reply";
+} from "@purin-labs/surface-slack/server/configuration-reply";
 import {
   createAgentOperationsDatabase,
   proposalFixtureAuthority,

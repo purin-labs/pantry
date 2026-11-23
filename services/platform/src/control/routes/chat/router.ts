@@ -15,7 +15,7 @@ import { handlePortalChatStream } from "./stream";
 import {
   handlePortalChatSlackMessage,
   type SlackMessageAction,
-} from "../chat-slack-messages";
+} from "@purin-labs/surface-slack/server/control/routes/chat-slack-messages";
 import {
   handlePortalChatConfigurationDraft,
   type ConfigurationDraftAction,

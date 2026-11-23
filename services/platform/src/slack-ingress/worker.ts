@@ -1,4 +1,7 @@
-import { handleSlackIngress, type SlackIngressEnv } from "./handler";
+import {
+  handleSlackIngress,
+  type SlackIngressEnv,
+} from "@purin-labs/surface-slack/server/slack-ingress/handler";
 
 /**
  * The Slack ingress Worker. Slack sends its events to this Worker. See

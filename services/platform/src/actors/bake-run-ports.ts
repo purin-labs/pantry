@@ -22,7 +22,7 @@ import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisatio
 import {
   announceBakeRun,
   tellBakeRunOverBake,
-} from "../slack/bake-run-announce";
+} from "@purin-labs/surface-slack/server/bake-run-announce";
 import type { BakeRunActor } from "./bake-run";
 import { deviceFleetStub } from "@purin-labs/area-devices/server/contract/fleet-stub";
 

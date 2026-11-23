@@ -15,7 +15,7 @@ import {
   type WhatsAppIngressLimits,
   type WhatsAppPauseReason,
 } from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
-import { deliverWhatsAppOperatorNotice } from "../src/actors/whatsapp-operator-notice";
+import { deliverWhatsAppOperatorNotice } from "@purin-labs/surface-slack/server/actors/whatsapp-operator-notice";
 import {
   WHATSAPP_TEST_NOW,
   createWhatsAppWorld,

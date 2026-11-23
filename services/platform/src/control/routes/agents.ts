@@ -2,7 +2,7 @@ import { decidePendingDecisionWith } from "../pending-decision-parts";
 import type { Env } from "@purin-labs/kernel/env";
 import { handleContactVerification } from "@purin-labs/area-inbox/server/control/routes/contact-verification";
 import { handleAgentMailboxSetup } from "@purin-labs/area-inbox/server/control/routes/mailbox-setup";
-import { handleOrganisationSlackReasoningEffort } from "./slack-reasoning-effort";
+import { handleOrganisationSlackReasoningEffort } from "@purin-labs/surface-slack/server/control/routes/slack-reasoning-effort";
 import { handleAgentMailboxSenderLinks } from "@purin-labs/area-inbox/server/control/routes/mailbox-sender-links";
 import {
   handleWhatsAppAccount,

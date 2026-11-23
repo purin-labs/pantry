@@ -19,11 +19,11 @@ import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisatio
 import {
   presentConfigurationCommand,
   previewCode,
-} from "../../slack/configuration-presentation";
+} from "@purin-labs/surface-slack/server/configuration-presentation";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import { roleMayConfigure } from "@purin-labs/tenancy/data/control-plane";
-import { conversationCase } from "./chat-slack-messages";
+import { conversationCase } from "@purin-labs/surface-slack/server/control/routes/chat-slack-messages";
 
 export type ConfigurationDraftAction = "confirm" | "cancel";
 

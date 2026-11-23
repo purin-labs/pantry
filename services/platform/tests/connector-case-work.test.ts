@@ -14,11 +14,11 @@ import {
 import {
   SLACK_CASE_WORK,
   type SlackCaseWorkRequest,
-} from "../src/actors/connector-slack-case-work";
+} from "@purin-labs/surface-slack/server/actors/connector-slack-case-work";
 import {
   createSlackCaseCommand,
   parseSlackCaseCommand,
-} from "../src/slack/case-command-message";
+} from "@purin-labs/surface-slack/server/case-command-message";
 import { parsePersonId } from "@purin-labs/authority/data/person-authz";
 import {
   parseAssignmentId,
@@ -29,7 +29,7 @@ import {
   parseOrganisationId,
 } from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
-import { parseSlackEnvelope } from "../src/slack/events";
+import { parseSlackEnvelope } from "@purin-labs/surface-slack/server/events";
 import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 

@@ -21,7 +21,8 @@
     "@purin-labs/kernel": "workspace:*",
     "@purin-labs/std": "workspace:*",
     "@purin-labs/tenancy": "workspace:*",
-    "@purin-labs/type-utils": "workspace:*"
+    "@purin-labs/type-utils": "workspace:*",
+    "@purin-labs/surface-slack": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20260707.1",

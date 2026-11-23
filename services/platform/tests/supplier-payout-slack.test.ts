@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { parseSupplierPayoutQuery } from "../src/slack/supplier-payout-command";
+import { parseSupplierPayoutQuery } from "@purin-labs/surface-slack/server/supplier-payout-command";
 
 function message(text: string, trigger: "message" | "edit" = "message") {
   return { trigger, text } as Parameters<typeof parseSupplierPayoutQuery>[0];

@@ -23,12 +23,12 @@ import {
   type WorkspaceId,
 } from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
-import { parseSlackUserId } from "../src/slack/events";
+import { parseSlackUserId } from "@purin-labs/surface-slack/server/events";
 import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import {
   resolveOrClaimSlackThreadRoute,
   selectSlackDmOrganisation,
-} from "../src/slack/organisation-routing";
+} from "@purin-labs/surface-slack/server/organisation-routing";
 import {
   configureSlackChannelDefault,
   userMayDisconnectSlackInstallation,

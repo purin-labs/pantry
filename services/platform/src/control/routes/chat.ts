@@ -52,7 +52,7 @@ import {
   clearSubmittedConversationDraft,
   type ConversationScope,
 } from "@purin-labs/conversation/chat/store";
-import { readConversationSlackDrafts } from "./chat-slack-messages";
+import { readConversationSlackDrafts } from "@purin-labs/surface-slack/server/control/routes/chat-slack-messages";
 import { readConversationConfigurationDrafts } from "./chat-configuration-drafts";
 import { authorizeSideCaseChatRead } from "@purin-labs/conversation/chat/side-cases";
 import {

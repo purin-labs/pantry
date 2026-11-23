@@ -55,7 +55,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import type {
   SlackEnvelope,
   SlackPayloadError,
-} from "../slack/events";
+} from "@purin-labs/surface-slack/server/events";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import {
   disconnectSlackInstallation,

@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { MESSAGE_ATTACHMENT_POLICY } from "@purin-labs/control-api";
-import { acquireSlackAttachmentBatch } from "../src/slack/attachments";
+import { acquireSlackAttachmentBatch } from "@purin-labs/surface-slack/server/attachments";
 import {
   parseSlackEnvelope,
   type SlackMessageEvent,
-} from "../src/slack/events";
+} from "@purin-labs/surface-slack/server/events";
 import { requireIntegrationAccountId, requireOrganisationId } from "./test-ids";
 
 const PNG_BYTES = new Uint8Array([
