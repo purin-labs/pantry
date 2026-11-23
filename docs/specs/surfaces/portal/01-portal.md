@@ -412,8 +412,7 @@ drawer. It shares the theme tokens.
 - The server sends an empty `today` list. Home items have no assignee.
 - On Home, the link to the approvals section changes only the address hash. No code
   scrolls to `#operations-title`, and the section is absent in the setup state.
-- Old names remain on the `/ecommerce` page, the approval toast and the Billing and Jev
-  payment text.
+- Old names remain on the `/ecommerce` page and in the Billing and Jev payment text.
 
 ## Sources
 
