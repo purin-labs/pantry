@@ -21,6 +21,7 @@ import {
   type RecipeMutation,
 } from "./api";
 import { PageSkeleton, RecoverableError } from "@purin-labs/ui/page-components";
+import { SideDrawer } from "@purin-labs/ui/index";
 import { RecipeEditor } from "./editor";
 import "./styles.css";
 import type { Variant } from "@purin-labs/type-utils";
@@ -183,6 +184,7 @@ class RecipesWorkspace extends React.Component<Props, State> {
       this.state.collection.items.find(itemHasId.bind(null, id))?.name ?? id
     );
   }
+  /** One row: the recipe, its batch, its ingredients and its cost. */
   private row(recipe: RecipeRevision): React.ReactNode {
     const selected =
       this.state.kind === "ready" &&
@@ -192,30 +194,52 @@ class RecipesWorkspace extends React.Component<Props, State> {
         ? this.state.recipeCosts.get(recipe.recipeId)
         : undefined;
     const currency = this.state.kind === "ready" ? this.state.currency : "JPY";
+    const facts = [
+      recipe.output.kind === "stocked"
+        ? `${quantityText(recipe.output.yieldQuantity)} ${recipe.output.yieldQuantity.unit} per batch`
+        : "Made to order",
+      `${recipe.inputs.length} ${recipe.inputs.length === 1 ? "ingredient" : "ingredients"}`,
+      ...(cost !== undefined && cost.missingCostItemIds.length === 0
+        ? [
+            `${formatMoneyMinor(cost.totalBatchCostMinor, currency)} a batch`,
+            `${formatMoneyMinor(cost.rawUnitCostMinor, currency)} each`,
+          ]
+        : []),
+    ];
     return (
       <li key={recipe.recipeId}>
         <button
           type="button"
           className="recipe-list-item"
           aria-pressed={selected}
+          aria-haspopup="dialog"
           onClick={this.select.bind(this, recipe)}
         >
-          <strong>{recipe.name}</strong>
-          <span>
-            {recipe.output.kind === "stocked"
-              ? `${quantityText(recipe.output.yieldQuantity)} ${recipe.output.yieldQuantity.unit} per batch`
-              : "Made to order"}{" "}
-            · Revision {recipe.revision}
+          <span className="recipe-list-main">
+            <strong>{recipe.name}</strong>
+            <span>{facts.join(" · ")}</span>
           </span>
-          <small>
-            {recipe.inputs.length} ingredients · {recipe.lifecycle.state}
-            {cost !== undefined && cost.missingCostItemIds.length === 0
-              ? ` · ${formatMoneyMinor(cost.totalBatchCostMinor, currency)} batch · ${formatMoneyMinor(cost.rawUnitCostMinor, currency)} / unit`
-              : ""}
-          </small>
+          {recipe.lifecycle.state === "active" ? null : (
+            <span className="recipe-list-state">
+              {LIFECYCLE_LABELS[recipe.lifecycle.state]}
+            </span>
+          )}
         </button>
       </li>
     );
+  }
+  private closeDetails(): void {
+    if (this.state.kind === "ready")
+      this.setState(
+        readyState(
+          this.state,
+          this.state.collection,
+          this.state.query,
+          null,
+          "closed",
+          this.state.notice,
+        ),
+      );
   }
   private ingredient(input: RecipeRevision["inputs"][number]): React.ReactNode {
     return (
@@ -256,15 +280,16 @@ class RecipesWorkspace extends React.Component<Props, State> {
     const selected = state.selected;
     return (
       <section className="recipes-page" aria-label="Recipes">
-        <header className="recipes-toolbar">
-          <div>
-            <h2>Recipe library</h2>
-            <p>
-              {state.collection.recipes.length}{" "}
-              {state.collection.recipes.length === 1 ? "recipe" : "recipes"}
-            </p>
-          </div>
-          <div className="recipes-actions">
+        <div className="recipes-toolbar">
+          <input
+            className="recipes-search"
+            type="search"
+            aria-label="Search recipes"
+            value={state.query}
+            onChange={this.search.bind(this)}
+            placeholder="Search recipes"
+          />
+          <div className="recipes-toolbar-actions">
             {this.props.costsHref !== undefined && (
               <Link to={this.props.costsHref}>Costs & margins</Link>
             )}
@@ -277,73 +302,74 @@ class RecipesWorkspace extends React.Component<Props, State> {
               </button>
             )}
           </div>
-        </header>
-        <p role="status">{state.notice}</p>
-        <label className="recipe-search">
-          Search recipes
-          <input
-            type="search"
-            value={state.query}
-            onChange={this.search.bind(this)}
-            placeholder="Search by name"
-          />
-        </label>
-        <div className="recipes-workspace">
-          <div>
-            {visible.length === 0 ? (
-              <p>
-                {state.collection.recipes.length === 0
-                  ? "No recipes yet. Create a recipe from your inventory ingredients."
-                  : "No recipes match your search."}
-              </p>
-            ) : (
-              <ul className="recipe-list">
-                {visible.map(this.row.bind(this))}
-              </ul>
-            )}
-          </div>
-          <section className="recipe-detail" aria-label="Recipe details">
-            {selected === null ? (
-              <p>Select a recipe to see its ingredients and output.</p>
-            ) : (
-              <>
-                <header className="recipes-toolbar">
-                  <div>
-                    <h2>{selected.name}</h2>
-                    <p>
-                      Revision {selected.revision} · {selected.lifecycle.state}
-                    </p>
-                  </div>
-                  {this.props.canEdit && (
-                    <button onClick={this.edit.bind(this)}>Edit recipe</button>
-                  )}
-                </header>
-                <h3>Output</h3>
-                <p>
-                  {selected.output.kind === "stocked"
-                    ? `${quantityText(selected.output.yieldQuantity)} ${selected.output.yieldQuantity.unit} of ${this.itemName(selected.output.inventoryItemId)} per batch`
-                    : "Made to order for immediate service"}
-                </p>
-                <h3>Ingredients per batch</h3>
-                <table>
-                  <thead>
-                    <tr>
-                      <th scope="col">Ingredient</th>
-                      <th scope="col">Quantity</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selected.inputs.map(this.ingredient.bind(this))}
-                  </tbody>
-                </table>
-              </>
-            )}
-          </section>
         </div>
+        <p role="status">{state.notice}</p>
+        {visible.length === 0 ? (
+          <p>
+            {state.collection.recipes.length === 0
+              ? "No recipes yet."
+              : "No recipes match your search."}
+          </p>
+        ) : (
+          <ul className="recipe-list">{visible.map(this.row.bind(this))}</ul>
+        )}
+        <SideDrawer
+          open={selected !== null}
+          title={selected?.name ?? ""}
+          close={this.closeDetails.bind(this)}
+          {...(this.props.canEdit
+            ? {
+                footer: (
+                  <button onClick={this.edit.bind(this)}>Edit recipe</button>
+                ),
+              }
+            : {})}
+        >
+          {selected === null ? null : (
+            <div className="side-drawer-body recipe-detail">
+              <dl>
+                <div>
+                  <dt>Revision</dt>
+                  <dd>
+                    {selected.revision}
+                    {selected.lifecycle.state === "active"
+                      ? ""
+                      : ` · ${LIFECYCLE_LABELS[selected.lifecycle.state]}`}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Batch</dt>
+                  <dd>
+                    {selected.output.kind === "stocked"
+                      ? `${quantityText(selected.output.yieldQuantity)} ${selected.output.yieldQuantity.unit} of ${this.itemName(selected.output.inventoryItemId)}`
+                      : "Made to order"}
+                  </dd>
+                </div>
+              </dl>
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Ingredient</th>
+                    <th scope="col">Quantity a batch</th>
+                  </tr>
+                </thead>
+                <tbody>{selected.inputs.map(this.ingredient.bind(this))}</tbody>
+              </table>
+            </div>
+          )}
+        </SideDrawer>
       </section>
     );
   }
 }
+
+const LIFECYCLE_LABELS: Readonly<
+  Record<RecipeRevision["lifecycle"]["state"], string>
+> = {
+  draft: "Draft",
+  active: "Active",
+  retired: "Retired",
+};
 function recipeHasId(id: string, recipe: RecipeRevision): boolean {
   return recipe.recipeId === id;
 }

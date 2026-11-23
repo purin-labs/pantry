@@ -7,7 +7,7 @@
     "areas/kitchen/ui/features/production-run/morning-shift-appliances.ts": 3681,
     "areas/kitchen/ui/features/production-run/recipe-workflow-graph.tsx": 3008,
     "areas/kitchen/ui/features/workflow-simulator/bakery-surface.ts": 3893,
-    "areas/kitchen/ui/features/workflow-simulator/production-workspace.tsx": 5165,
+    "areas/kitchen/ui/features/workflow-simulator/production-workspace.tsx": 5085,
     "packages/bakery-model/src/bakery-surface.ts": 4991,
     "packages/commerce-contracts/src/records/commerce-records.ts": 3253,
     "packages/production-simulation/src/recipes/bakery/appliance-execution.ts": 3815,

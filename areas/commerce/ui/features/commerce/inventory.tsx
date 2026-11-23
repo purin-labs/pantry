@@ -333,18 +333,6 @@ function matches(state: State, row: StockRow): boolean {
       .includes(state.search.toLowerCase())
   );
 }
-function Metric(
-  props: Readonly<{ label: string; value: number; description: string }>,
-) {
-  return (
-    <div className="stock-metric">
-      <span>{props.label}</span>
-      <strong>{props.value}</strong>
-      <small>{props.description}</small>
-    </div>
-  );
-}
-
 /** A filter's count, beside its name; nothing when the view has none. */
 function FilterCount(props: Readonly<{ value: number | undefined }>) {
   // The space keeps the name and the count apart for a screen reader.
@@ -692,50 +680,24 @@ export class InventoryPage extends React.Component<Props, State> {
         : [];
     let selected: StockRow | null = null;
     for (const row of rows) if (row.id === this.state.selected) selected = row;
-    // Products shows each count once, on its filter.
-    const productCounts = products
-      ? {
-          all: rows.length + load.data.untrackedProducts.length,
-          reorder: rows.filter(needsReorder).length,
-          uncounted:
-            rows.filter(needsCount).length +
-            load.data.untrackedProducts.filter(availabilityUnknown).length,
-          archived: load.data.archivedProducts.length,
-        }
-      : null;
+    // Both views show each count once, on its filter, and no count cards.
+    const counts = {
+      all: products ? rows.length + load.data.untrackedProducts.length : undefined,
+      reorder: rows.filter(needsReorder).length,
+      uncounted:
+        rows.filter(needsCount).length +
+        (products
+          ? load.data.untrackedProducts.filter(availabilityUnknown).length
+          : 0),
+      expiring: rows.filter(expiringSoon).length,
+      archived: products ? load.data.archivedProducts.length : undefined,
+    };
     return (
       <div className="stock-page">
-        {products ? null : (
-          <div className="stock-metrics">
-            <Metric
-              label="Needs replenishment"
-              value={rows.filter(needsReorder).length}
-              description="Low or out of stock"
-            />
-            <Metric
-              label="Expiring within 7 days"
-              value={rows.filter(expiringSoon).length}
-              description="Items with recorded expiry"
-            />
-            <Metric
-              label="Not counted yet"
-              value={rows.filter(needsCount).length}
-              description="No balance recorded"
-            />
-          </div>
-        )}
         <section
           className="stock-list"
           aria-label={products ? "Products" : "Stock levels"}
         >
-          {products ? null : (
-            <div className="stock-toolbar">
-              <h2>{timeline ? "Expiry and deliveries" : "Stock levels"}</h2>
-              <a href={this.props.suppliersHref}>
-                Suppliers & purchasing <ArrowUpRight size={16} />
-              </a>
-            </div>
-          )}
           <div className="stock-tools">
             <label className="stock-search">
               <Search size={18} />
@@ -783,6 +745,11 @@ export class InventoryPage extends React.Component<Props, State> {
                 onChange={this.changeDisplay.bind(this)}
               />
             )}
+            {products ? null : (
+              <a className="stock-tools-link" href={this.props.suppliersHref}>
+                Purchasing <ArrowUpRight size={16} aria-hidden="true" />
+              </a>
+            )}
           </div>
           {timeline ? null : (
             <div className="stock-filters" aria-label="Stock filters">
@@ -791,21 +758,21 @@ export class InventoryPage extends React.Component<Props, State> {
                 onClick={this.changeFilter.bind(this, "all")}
               >
                 {products ? "All products" : "All stock"}
-                <FilterCount value={productCounts?.all} />
+                <FilterCount value={counts.all} />
               </button>
               <button
                 aria-pressed={this.state.filter === "reorder"}
                 onClick={this.changeFilter.bind(this, "reorder")}
               >
                 {products ? "Shortages" : "Needs replenishment"}
-                <FilterCount value={productCounts?.reorder} />
+                <FilterCount value={counts.reorder} />
               </button>
               <button
                 aria-pressed={this.state.filter === "uncounted"}
                 onClick={this.changeFilter.bind(this, "uncounted")}
               >
                 {products ? "Availability unknown" : "Not counted"}
-                <FilterCount value={productCounts?.uncounted} />
+                <FilterCount value={counts.uncounted} />
               </button>
               {products && (
                 <button
@@ -813,7 +780,7 @@ export class InventoryPage extends React.Component<Props, State> {
                   onClick={this.changeFilter.bind(this, "archived")}
                 >
                   Archived
-                  <FilterCount value={productCounts?.archived} />
+                  <FilterCount value={counts.archived} />
                 </button>
               )}
               {!products && (
@@ -822,10 +789,8 @@ export class InventoryPage extends React.Component<Props, State> {
                   onClick={this.changeFilter.bind(this, "expiring")}
                 >
                   Expiring within 7 days
+                  <FilterCount value={counts.expiring} />
                 </button>
-              )}
-              {products ? null : (
-                <span>{visible.length} records</span>
               )}
             </div>
           )}
@@ -869,12 +834,6 @@ export class InventoryPage extends React.Component<Props, State> {
                     : "Inventory from your connected commerce system will appear here."
               }
             />
-          )}
-          {timeline || products ? null : (
-            <p className="stock-footnote">
-              Available stock excludes allocations and unusable lots. A dash
-              means that quantity hasn’t been reported.
-            </p>
           )}
         </section>
         <SideDrawer
@@ -1020,10 +979,12 @@ export class InventoryPage extends React.Component<Props, State> {
                   </Link>
                 </li>
               </ul>
-              <p className="stock-footnote">
-                Stock changes are recorded in your connected inventory system.
-                Those balances appear here.
-              </p>
+              {products ? (
+                <p className="stock-footnote">
+                  Stock changes are recorded in your connected inventory
+                  system. Those balances appear here.
+                </p>
+              ) : null}
             </div>
           )}
         </SideDrawer>

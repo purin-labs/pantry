@@ -12,7 +12,8 @@ import type { Variant } from "@purin-labs/type-utils";
 type Tone = "ok" | "busy" | "warn" | "bad" | "muted";
 type DeviceStatus = Readonly<{
   label: string;
-  reason: string;
+  /** A second fact, or null when the label says it all. */
+  reason: string | null;
   tone: Tone;
 }>;
 
@@ -21,7 +22,7 @@ export function deviceStatus(device: DeviceView): DeviceStatus {
     case "menu_screen":
       switch (device.connection.state) {
         case "connected":
-          return { label: "Connected", reason: "Live now", tone: "ok" };
+          return { label: "Connected", reason: null, tone: "ok" };
         case "offline":
           return {
             label: "Offline",
@@ -71,9 +72,7 @@ export function deviceStatus(device: DeviceView): DeviceStatus {
         };
       return {
         label: "Managed by Square",
-        reason: device.simulated
-          ? "A simulated terminal for tests"
-          : "Purin Pantry has no heartbeat for this device",
+        reason: device.simulated ? "A simulated terminal for tests" : null,
         tone: "muted",
       };
     case "gateway":
@@ -113,7 +112,7 @@ function gatewayStatus(device: Variant<DeviceView, "gateway">): DeviceStatus {
     case "offline":
       return {
         label: "Offline",
-        reason: "Its devices show unknown. Check its power and network",
+        reason: "Check its power and network",
         tone: "bad",
       };
     default:
@@ -129,23 +128,15 @@ function kitchenStatus(device: KitchenDeviceView): DeviceStatus {
   const { readiness } = device;
   switch (readiness.kind) {
     case "ready":
-      return {
-        label: "Ready",
-        reason: "It can take a task when a physical run names it",
-        tone: "ok",
-      };
+      return { label: "Ready", reason: null, tone: "ok" };
     case "not_applicable":
-      return { label: "Connected", reason: "Takes no tasks", tone: "muted" };
+      return { label: "Connected", reason: null, tone: "muted" };
     case "busy":
-      return { label: "Busy", reason: "Until this task ends", tone: "busy" };
+      return { label: "Busy", reason: null, tone: "busy" };
     case "blocked":
       switch (readiness.reason) {
         case "pending":
-          return {
-            label: "Pending",
-            reason: "Waiting for a person to confirm it",
-            tone: "warn",
-          };
+          return { label: "Pending", reason: null, tone: "warn" };
         case "restricted":
           return {
             label: "Restricted",

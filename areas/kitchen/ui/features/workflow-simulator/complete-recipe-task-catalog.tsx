@@ -1,4 +1,9 @@
 import React from "react";
+import {
+  CATALOG_TIERS,
+  ProductionCatalogGroup,
+  ProductionCatalogItem,
+} from "./catalog-group";
 import type { CatalogSection } from "./production-workspace";
 
 type CompleteRecipeTaskCard = Readonly<{
@@ -38,7 +43,7 @@ const COMPLETE_RECIPE_TASK_CARDS: readonly CompleteRecipeTaskCard[] = [
     section: "ginger-tea",
     title: "Ginger Black Tea & Two-Pan Milk Tea · FR10 Pan Staging",
     subtitle:
-      "Heat-off steeping & rigid-insert pan-b staging to 78 °C milk finish",
+      "Heat-off steeping & rigid-insert pan staging to 78 °C milk finish",
   },
   {
     section: "financier-batter",
@@ -68,32 +73,15 @@ export function CompleteRecipeTaskCatalog(props: {
   readonly openCatalogSection: (section: CatalogSection) => void;
 }): React.ReactNode {
   return (
-    <section className="production-catalog-group">
-      <header className="production-catalog-group-header">
-        <span className="production-tier-badge" data-tier="task">
-          Tier 2 · Task
-        </span>
-        <h4>Complete recipe tasks</h4>
-        <p>Compositions of actions that make one finished product.</p>
-      </header>
-      <div className="production-menu-list">
-        {COMPLETE_RECIPE_TASK_CARDS.map((card) => (
-          <button
-            key={card.section}
-            type="button"
-            className="production-menu-item production-catalog-card"
-            onClick={() => props.openCatalogSection(card.section)}
-          >
-            <div className="production-catalog-card-body">
-              <strong>{card.title}</strong>
-              <small>{card.subtitle}</small>
-            </div>
-            <span className="production-menu-chevron" aria-hidden="true">
-              ›
-            </span>
-          </button>
-        ))}
-      </div>
-    </section>
+    <ProductionCatalogGroup title={CATALOG_TIERS.task}>
+      {COMPLETE_RECIPE_TASK_CARDS.map((card) => (
+        <ProductionCatalogItem
+          key={card.section}
+          title={card.title}
+          detail={card.subtitle}
+          open={() => props.openCatalogSection(card.section)}
+        />
+      ))}
+    </ProductionCatalogGroup>
   );
 }

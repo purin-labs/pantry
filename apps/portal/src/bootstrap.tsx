@@ -48,7 +48,7 @@ async function renderApplication(pathname: string): Promise<void> {
     if (import.meta.env.DEV)
       (await import("./dev/chat-preview-data")).installChatPreviewFetch();
     showRequestedPhysicsEvidence(window.location.search);
-    document.title = "Workflow simulator · Purin Pantry";
+    document.title = "Production · Purin Pantry";
     portalRoot.render(<WorkflowDemoApp />);
     return;
   }

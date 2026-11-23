@@ -1118,21 +1118,25 @@ export class InventoryProductionRequestsPage extends React.Component<
       }
     }
   }
+  /** One row: the product, the quantity and the date, then its state and actions. */
   renderRequest(request: InventoryProductionRequest): React.ReactNode {
     return (
       <li key={request.id} className="stock-production-request">
-        <header className="stock-production-request-heading">
+        <div className="stock-production-request-main">
           <h3>{request.name}</h3>
+          <p>
+            {[
+              formatProductionQuantity(
+                request.quantity.amount / 10 ** request.quantity.scale,
+                request.quantity.unit,
+              ),
+              `Needed ${formatNeededBy(request.neededBy)}`,
+              ...request.batches.map(completedBatch),
+            ].join(" · ")}
+          </p>
+        </div>
+        <div className="stock-production-request-actions">
           <StatusChip status={productionRequestStatus(request.status)} />
-        </header>
-        <p>
-          {formatProductionQuantity(
-            request.quantity.amount / 10 ** request.quantity.scale,
-            request.quantity.unit,
-          )}{" "}
-          · Needed {formatNeededBy(request.neededBy)}
-        </p>
-        <div className="stock-operation-actions">
           <Link
             to={`${this.props.productsHref}?inventoryItem=${encodeURIComponent(request.itemId)}`}
           >
@@ -1155,9 +1159,6 @@ export class InventoryProductionRequestsPage extends React.Component<
             </button>
           )}
         </div>
-        {request.batches.length > 0 ? (
-          <ul>{request.batches.map(completedBatch)}</ul>
-        ) : null}
       </li>
     );
   }
@@ -1178,9 +1179,6 @@ export class InventoryProductionRequestsPage extends React.Component<
     const locationId = selectedLocation();
     return (
       <section className="stock-page">
-        <p>
-          Requests record demand. Confirmed batches below record actual output.
-        </p>
         {state.demand.kind === "ready" &&
           (locationId === null ? (
             planLocations(requests).length > 0 && (
@@ -1230,7 +1228,7 @@ export class InventoryProductionRequestsPage extends React.Component<
           )}
         {state.demand.kind === "ready" &&
           (requests.length === 0 ? (
-            <p>No production requests. Start from a shortage in Products.</p>
+            <p>No production requests.</p>
           ) : (
             <ul className="stock-production-requests">
               {requests.map(this.renderRequest.bind(this))}
@@ -1332,14 +1330,14 @@ function recipeOption(recipe: InventoryProductionRecipe) {
   );
 }
 
-function completedBatch(batch: InventoryProductionRequest["batches"][number]) {
-  return (
-    <li key={batch.id}>
-      Confirmed batch {batch.id}:{" "}
-      {batch.actualYield.amount / 10 ** batch.actualYield.scale}{" "}
-      {batch.actualYield.unit} produced.
-    </li>
-  );
+/** A confirmed batch and what it made, as the request row shows it. */
+function completedBatch(
+  batch: InventoryProductionRequest["batches"][number],
+): string {
+  return `Batch ${batch.id}: ${formatProductionQuantity(
+    batch.actualYield.amount / 10 ** batch.actualYield.scale,
+    batch.actualYield.unit,
+  )} made`;
 }
 
 function ingredientReview(

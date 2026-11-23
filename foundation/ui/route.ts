@@ -186,6 +186,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Recipes",
     description:
       "Browse recipes, set ingredient quantities, and define each batch yield.",
+    titleOnly: true,
     group: "kitchen",
     resource: { kind: "none" },
   },
@@ -196,6 +197,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Costs & margins",
     description:
       "Model daily production batches, supplier pack prices, waste, and net product margins.",
+    titleOnly: true,
     group: "kitchen",
     resource: { kind: "none" },
   },
@@ -206,6 +208,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Ingredients & supplies",
     description:
       "See what’s available, what’s running low, and what needs replenishing.",
+    titleOnly: true,
     group: "kitchen",
     resource: { kind: "none" },
   },
@@ -270,6 +273,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Production requests",
     description:
       "Accept and schedule product demand and review confirmed output.",
+    titleOnly: true,
     group: "kitchen",
     resource: { kind: "none" },
   },
@@ -277,9 +281,10 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     page: "workflow-simulator",
     segment: "workflow-simulator",
     navigationLabel: "Production",
-    title: "Workflow simulator",
+    title: "Production",
     description:
       "Replay a bakery shift, inspect resource queues, and compare an oven outage.",
+    titleOnly: true,
     group: "kitchen",
     resource: { kind: "none" },
   },
@@ -289,6 +294,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     navigationLabel: "Devices",
     title: "Devices",
     description: "See each device in the shop and which ones need attention.",
+    titleOnly: true,
     group: "kitchen",
     resource: { kind: "none" },
   },
@@ -299,6 +305,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Bakes",
     description:
       "Set the counter stock level of each fresh product, and decide the bake proposals.",
+    titleOnly: true,
     group: "kitchen",
     resource: { kind: "none" },
   },

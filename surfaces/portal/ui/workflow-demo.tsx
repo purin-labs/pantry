@@ -10,7 +10,11 @@ import {
 import { CircleQuestionMark } from "lucide-react";
 import { PortalFrame } from "./shell";
 import { PageHeader } from "@purin-labs/ui/page-components";
-import { readPortalRoute, workspacePageDescriptor } from "@purin-labs/ui/route";
+import {
+  readPortalRoute,
+  workspacePageDescriptor,
+  workspacePageHeader,
+} from "@purin-labs/ui/route";
 import WorkflowSimulatorRoute from "@purin-labs/area-kitchen/ui/features/workflow-simulator/route";
 import { ConnectedChatPage as ChatPage } from "./features/chat/route";
 import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";
@@ -71,6 +75,7 @@ function WorkflowDemo(): React.ReactNode {
   const chatOpen = selectedPage === "chat";
   const page = chatOpen ? "workflow-simulator" : selectedPage;
   const descriptor = workspacePageDescriptor(page);
+  const header = workspacePageHeader(descriptor, null);
   return (
     <PortalFrame
       chat={
@@ -116,16 +121,13 @@ function WorkflowDemo(): React.ReactNode {
         footer: <DevelopmentFixtureNotice />,
       }}
     >
-      <PageHeader
-        title={descriptor.title}
-        description={descriptor.description}
-      />
+      <PageHeader title={header.title} description={header.description} />
       {page === "workflow-simulator" ? (
         <WorkflowSimulatorRoute connection={{ kind: "preview" }} />
       ) : (
         <p>
-          This fixture only implements Workflow simulator. Use Automation →
-          Workflow simulator to return.
+          This fixture shows only Production. Open Kitchen › Production to
+          return.
         </p>
       )}
     </PortalFrame>

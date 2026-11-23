@@ -16,7 +16,7 @@
 .devices-tools {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: center;
   gap: 12px;
 }
 
@@ -38,6 +38,13 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+}
+
+/* The count of the attention filter. */
+.devices-segment-count {
+  margin-inline-start: 2px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
 }
 
 .devices-segment button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {

@@ -1099,13 +1099,9 @@ export class CostsPage extends React.Component<Props, State> {
                 >
                   <LineChart size={15} aria-hidden="true" />
                   <span>12w Cash</span>
-                  <span
-                    className={`costs-tab-count${forecastCalculation.summary.hasCashShortfall ? " is-alert" : ""}`}
-                  >
-                    {forecastCalculation.summary.hasCashShortfall
-                      ? "Shortfall"
-                      : "12w"}
-                  </span>
+                  {forecastCalculation.summary.hasCashShortfall ? (
+                    <span className="costs-tab-count is-alert">Shortfall</span>
+                  ) : null}
                   <CostsTabPresenceDots peers={presence.peersByTab.forecast} />
                 </button>
               </div>
@@ -1575,7 +1571,7 @@ export class CostsPage extends React.Component<Props, State> {
                   <ArrowUpRight size={12} aria-hidden="true" />
                 </Link>
                 <Link to={this.props.suppliesHref}>
-                  <span>Supplies</span>
+                  <span>Ingredients &amp; supplies</span>
                   <ArrowUpRight size={12} aria-hidden="true" />
                 </Link>
               </nav>

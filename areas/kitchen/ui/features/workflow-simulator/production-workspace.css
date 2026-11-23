@@ -224,30 +224,24 @@
   display: grid;
   gap: 14px;
 }
+/* A catalog group: its tier and name, then one framed list of rows. */
 .production-catalog-group {
   display: grid;
-  gap: 7px;
-  padding: 10px;
-  border: 1px solid var(--hairline);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--ground) 55%, var(--paper));
+  gap: 6px;
 }
-.production-catalog-group-header {
-  display: grid;
-  gap: 2px;
-  padding-inline: 2px;
-}
-.production-catalog-group-header h4 {
-  margin: 2px 0 0;
-  font-size: 0.82rem;
-  font-weight: 650;
-  color: var(--ink);
-}
-.production-catalog-group-header p {
+.production-catalog-group h4 {
   margin: 0;
-  font-size: 0.72rem;
-  line-height: 1.35;
+  padding-inline: 2px;
+  font-size: 0.78rem;
+  font-weight: 600;
   color: var(--ink-2, var(--muted));
+}
+.production-catalog-group .production-menu-list {
+  gap: 0;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--paper);
+  overflow: hidden;
 }
 .production-tier-badge {
   display: inline-flex;
@@ -263,25 +257,23 @@
   color: var(--ink-2, var(--muted));
   border: 1px solid var(--hairline);
 }
-.production-tier-badge[data-tier="action"] {
-  background: color-mix(in srgb, #3b82f6 15%, var(--paper));
-  color: color-mix(in srgb, #3b82f6 62%, var(--ink));
-  border-color: color-mix(in srgb, #3b82f6 36%, var(--hairline));
-}
 .production-tier-badge[data-tier="task"] {
   background: color-mix(in srgb, #10b981 15%, var(--paper));
   color: color-mix(in srgb, #10b981 62%, var(--ink));
   border-color: color-mix(in srgb, #10b981 36%, var(--hairline));
 }
-.production-tier-badge[data-tier="loop"] {
-  background: color-mix(in srgb, #f59e0b 16%, var(--paper));
-  color: color-mix(in srgb, #f59e0b 65%, var(--ink));
-  border-color: color-mix(in srgb, #f59e0b 38%, var(--hairline));
-}
 .production-catalog-card {
   padding: 9px 12px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
   background: var(--paper) !important;
-  border-radius: 10px !important;
+}
+.production-catalog-card + .production-catalog-card {
+  border-top: 1px solid var(--hairline) !important;
+}
+.production-catalog-card:hover:not(:disabled) {
+  transform: none;
+  background: color-mix(in srgb, var(--ink) 4%, var(--paper)) !important;
 }
 .production-catalog-card-body {
   display: grid;

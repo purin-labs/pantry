@@ -227,7 +227,7 @@ export function DevicesRoute(
     <div className="devices">
       <div className="devices-head">
         <p className="devices-summary">
-          {summary(devices.length, ready, busy, attention)}
+          {summary(devices.length, ready, busy)}
         </p>
         <div className="devices-head-actions">
           {role === "owner" || role === "admin" ? (
@@ -255,21 +255,22 @@ export function DevicesRoute(
             aria-pressed={filter === "attention"}
             onClick={() => setFilter("attention")}
           >
-            Needs attention ({attention})
+            Needs attention{" "}
+            <span className="devices-segment-count">{attention}</span>
           </button>
         </div>
         <label className="devices-field devices-search">
-          Search
+          <span className="visually-hidden">Search</span>
           <input
             type="search"
             value={query}
-            placeholder="Name, kind or model"
+            placeholder="Search name, kind or model"
             onChange={(event) => setQuery(event.target.value)}
           />
         </label>
         {loaded.value.locations.length > 1 ? (
           <label className="devices-field devices-kind">
-            Location
+            <span className="visually-hidden">Location</span>
             <Select.Root
               items={[
                 { value: "all", label: "All locations" },
@@ -298,7 +299,7 @@ export function DevicesRoute(
           </label>
         ) : null}
         <label className="devices-field devices-kind">
-          Kind
+          <span className="visually-hidden">Kind</span>
           <Select.Root
             items={KIND_ITEMS}
             value={kind}
@@ -428,19 +429,13 @@ function searchText(device: DeviceView): string {
   return `${device.name} ${kindLabel(device.kind)} ${detail}`.toLowerCase();
 }
 
-function summary(
-  total: number,
-  ready: number,
-  busy: number,
-  attention: number,
-): string {
-  const devices = `${total} ${total === 1 ? "device" : "devices"}.`;
-  const work = ready + busy > 0 ? ` ${ready} ready, ${busy} busy.` : "";
-  const need =
-    attention === 0
-      ? " None need attention."
-      : ` ${attention} ${attention === 1 ? "needs" : "need"} attention.`;
-  return `${devices}${work}${need}`;
+/** The count of devices, then the ready and busy kitchen devices. The
+ * attention count is on its filter. */
+function summary(total: number, ready: number, busy: number): string {
+  const devices = `${total} ${total === 1 ? "device" : "devices"}`;
+  return ready + busy > 0
+    ? `${devices} · ${ready} ready · ${busy} busy`
+    : devices;
 }
 
 function kindPlural(kind: DeviceKind): string {

@@ -6,7 +6,10 @@ import { UserPreferencesProvider } from "@purin-labs/ui/preferences/context";
 import "@purin-labs/surface-portal/ui/styles.css";
 import { PortalFrame } from "@purin-labs/surface-portal/ui/shell";
 import { PageHeader } from "@purin-labs/ui/page-components";
-import { workspacePageDescriptor } from "@purin-labs/ui/route";
+import {
+  workspacePageDescriptor,
+  workspacePageHeader,
+} from "@purin-labs/ui/route";
 import {
   controlMutation,
   type ControlMutationIntent,
@@ -29,6 +32,7 @@ if (organisationId === null)
   throw new Error("Open the preview with ?organisation=<id>.");
 const userId = search.get("preferenceUser");
 const descriptor = workspacePageDescriptor("workflow-simulator");
+const header = workspacePageHeader(descriptor, null);
 
 function previewLogout(): Promise<void> {
   return Promise.resolve();
@@ -99,10 +103,7 @@ function KitchenChatPreview(props: {
           ),
         }}
       >
-        <PageHeader
-          title={descriptor.title}
-          description={descriptor.description}
-        />
+        <PageHeader title={header.title} description={header.description} />
         <WorkflowSimulatorRoute
           connection={{
             kind: "workspace",

@@ -14,8 +14,8 @@ no raw motion command. Emergency stop stays on the machine.
 ### The Devices page
 
 - One list holds menu screens, shop Macs, payment terminals, gateways and the kitchen
-  devices behind them. The top line counts the devices, the ready and busy kitchen
-  devices, and the devices that need attention.
+  devices behind them. The top line counts the devices and the ready and busy kitchen
+  devices. The **Needs attention** filter shows the count of devices that need attention.
 - The controls are a search and filters for **Needs attention** and kind. The location
   filter shows only when the Organisation has more than one location.
   Kitchen devices group by station (Bakery, Bar, "No station yet"), the others by kind.

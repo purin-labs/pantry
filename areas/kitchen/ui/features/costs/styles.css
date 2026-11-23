@@ -2559,6 +2559,26 @@ button:where(.pantry-select-trigger).costs-forecast-select {
   }
 }
 
+/* On a phone each daily figure is one row of the strip. */
+@media (max-width: 640px) {
+  .costs-kpi-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .costs-kpi-cell,
+  .costs-kpi-cell:nth-child(3) {
+    border-right: 0;
+  }
+
+  .costs-kpi-cell + .costs-kpi-cell {
+    border-top: 1px solid var(--costs-border-soft);
+  }
+
+  .costs-overhead-chips {
+    flex-wrap: wrap;
+  }
+}
+
 @media (max-width: 960px) {
   .portal-main[data-page="costs"] > .portal-main-inner > .portal-heading {
     padding: 36px 20px 24px;

@@ -50,6 +50,11 @@ import type {
 } from "../simulator-state";
 import { DockHeader, SegmentedControl, taskStatusLabel } from "./shared";
 import { CompleteRecipeTaskCatalog } from "../complete-recipe-task-catalog";
+import {
+  CATALOG_TIERS,
+  ProductionCatalogGroup,
+  ProductionCatalogItem,
+} from "../catalog-group";
 import type { CatalogSection } from "../production-workspace";
 
 type WorkflowInputState = Pick<
@@ -126,168 +131,56 @@ export function WorkflowDock(props: WorkflowProps): React.ReactNode {
         <div className="production-menu-track" data-depth={depth}>
           <div className="production-menu-page" data-active={depth === 0}>
             <div className="production-catalog-groups">
-              <section className="production-catalog-group">
-                <header className="production-catalog-group-header">
-                  <span className="production-tier-badge" data-tier="action">
-                    Tier 1 · Action
-                  </span>
-                  <h4>Isolated actions &amp; calibration</h4>
-                  <p>Refine a single robot transfer or appliance cycle.</p>
-                </header>
-                <div className="production-menu-list">
-                  <button
-                    type="button"
-                    className="production-menu-item production-catalog-card"
-                    onClick={props.openCatalogSection.bind(
-                      null,
-                      "rehearsal-production",
-                    )}
-                  >
-                    <div className="production-catalog-card-body">
-                      <strong>
-                        Multi-tray robot rehearsal (Tray A → Tray B)
-                      </strong>
-                      <small>
-                        Active 3D tray rehearsal &amp; rack handoff calibration
-                      </small>
-                    </div>
-                    <span
-                      className="production-menu-chevron"
-                      aria-hidden="true"
-                    >
-                      ›
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    className="production-menu-item production-catalog-card"
-                    onClick={props.openCatalogSection.bind(
-                      null,
-                      "appliance-rehearsals",
-                    )}
-                  >
-                    <div className="production-catalog-card-body">
-                      <strong>Standalone appliance rehearsals</strong>
-                      <small>
-                        Linea Classic S &amp; Eagle One group head calibration
-                      </small>
-                    </div>
-                    <span
-                      className="production-menu-chevron"
-                      aria-hidden="true"
-                    >
-                      ›
-                    </span>
-                  </button>
-                </div>
-              </section>
+              <ProductionCatalogGroup title={CATALOG_TIERS.action}>
+                <ProductionCatalogItem
+                  title="Multi-tray robot rehearsal (Tray A → Tray B)"
+                  detail="Active 3D tray rehearsal & rack handoff calibration"
+                  open={props.openCatalogSection.bind(
+                    null,
+                    "rehearsal-production",
+                  )}
+                />
+                <ProductionCatalogItem
+                  title="Standalone appliance rehearsals"
+                  detail="Linea Classic S & Eagle One group head calibration"
+                  open={props.openCatalogSection.bind(
+                    null,
+                    "appliance-rehearsals",
+                  )}
+                />
+              </ProductionCatalogGroup>
 
               <CompleteRecipeTaskCatalog
                 openCatalogSection={props.openCatalogSection}
               />
 
-              <section className="production-catalog-group">
-                <header className="production-catalog-group-header">
-                  <span className="production-tier-badge" data-tier="loop">
-                    Tier 3 · Autonomous Loop
-                  </span>
-                  <h4>Multi-task factory loops &amp; shifts</h4>
-                  <p>
-                    Compositions of tasks that loop to test autonomous
-                    throughput.
-                  </p>
-                </header>
-                <div className="production-menu-list">
-                  <button
-                    type="button"
-                    className="production-menu-item production-catalog-card"
-                    onClick={props.onSubviewChange.bind(null, "steps")}
-                  >
-                    <div className="production-catalog-card-body">
-                      <strong>Financier morning · Full 3D workflow</strong>
-                      <small>
-                        Ohaus scale, Maruzen brown butter, Hobart HL200 mix,
-                        Matsunaga 8P bake, sink mould wash &amp; vitrine refill
-                      </small>
-                    </div>
-                    <span
-                      className="production-menu-chevron"
-                      aria-hidden="true"
-                    >
-                      ›
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    className="production-menu-item production-catalog-card"
-                    onClick={props.openCatalogSection.bind(
-                      null,
-                      "active-production",
-                    )}
-                  >
-                    <div className="production-catalog-card-body">
-                      <strong>
-                        Multi-batch production + Robot (Batch A → Batch B →
-                        Batch C)
-                      </strong>
-                      <small>
-                        3-batch autonomous pipeline · 12 process steps &amp;
-                        robot tray handoffs
-                      </small>
-                    </div>
-                    <span
-                      className="production-menu-chevron"
-                      aria-hidden="true"
-                    >
-                      ›
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    className="production-menu-item production-catalog-card"
-                    onClick={props.openCatalogSection.bind(null, "cafe-shift")}
-                  >
-                    <div className="production-catalog-card-body">
-                      <strong>
-                        Combined Café Shift · Financiers &amp; Espresso
-                      </strong>
-                      <small>
-                        Baker FR10 #1 + Barista FR10 #2 · Matsunaga 8P loads
-                        &amp; Linea / Eagle One service
-                      </small>
-                    </div>
-                    <span
-                      className="production-menu-chevron"
-                      aria-hidden="true"
-                    >
-                      ›
-                    </span>
-                  </button>
-                  {props.connection.kind === "workspace" && (
-                    <button
-                      type="button"
-                      className="production-menu-item production-catalog-card"
-                      onClick={props.openCatalogSection.bind(
-                        null,
-                        "shared-runs",
-                      )}
-                    >
-                      <div className="production-catalog-card-body">
-                        <strong>Shared production runs</strong>
-                        <small>
-                          Open or compare saved workspace factory recordings
-                        </small>
-                      </div>
-                      <span
-                        className="production-menu-chevron"
-                        aria-hidden="true"
-                      >
-                        ›
-                      </span>
-                    </button>
+              <ProductionCatalogGroup title={CATALOG_TIERS.loop}>
+                <ProductionCatalogItem
+                  title="Financier morning"
+                  detail="Ohaus scale, Maruzen brown butter, Hobart HL200 mix, Matsunaga 8P bake, sink mould wash & vitrine refill"
+                  open={props.onSubviewChange.bind(null, "steps")}
+                />
+                <ProductionCatalogItem
+                  title="Multi-batch production + Robot (Batch A → Batch B → Batch C)"
+                  detail="3-batch autonomous pipeline · 12 process steps & robot tray handoffs"
+                  open={props.openCatalogSection.bind(
+                    null,
+                    "active-production",
                   )}
-                </div>
-              </section>
+                />
+                <ProductionCatalogItem
+                  title="Combined Café Shift · Financiers & Espresso"
+                  detail="Baker FR10 #1 + Barista FR10 #2 · Matsunaga 8P loads & Linea / Eagle One service"
+                  open={props.openCatalogSection.bind(null, "cafe-shift")}
+                />
+                {props.connection.kind === "workspace" && (
+                  <ProductionCatalogItem
+                    title="Shared production runs"
+                    detail="Open or compare saved workspace factory recordings"
+                    open={props.openCatalogSection.bind(null, "shared-runs")}
+                  />
+                )}
+              </ProductionCatalogGroup>
             </div>
           </div>
           <div className="production-menu-page" data-active={depth === 1}>

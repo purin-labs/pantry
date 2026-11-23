@@ -264,7 +264,9 @@ export function StatusLine(
         <span className="devices-dot" aria-hidden="true" />
         {status.label}
       </span>
-      <span className="devices-reason">{status.reason}</span>
+      {status.reason === null ? null : (
+        <span className="devices-reason">{status.reason}</span>
+      )}
     </span>
   );
 }

@@ -15,7 +15,7 @@ Saves of scenarios and runs stay with the person, who confirms each one on the p
 ### The page
 
 - The descriptor `workflow-simulator` (`foundation/ui/route.ts`) has the navigation
-  label **Production**, the title "Workflow simulator" and the group `kitchen`. The
+  label **Production**, the title "Production" and the group `kitchen`. The
   Kitchen switcher opens this page first. The page code loads on demand, so other pages
   do not load the 3D bundle.
 - The page has three workspace kinds (`simulator-state.ts`): `shift`, `rehearsal` and

@@ -8,6 +8,7 @@ import type {
   KitchenDeviceView,
 } from "@purin-labs/control-api";
 import "@purin-labs/surface-portal/ui/styles.css";
+import { PageHeader } from "@purin-labs/ui/page-components";
 import { DevicesRoute } from "@purin-labs/area-devices/ui/features/devices/route";
 
 // The Devices page with a stand-in list. `?role=viewer` removes the network
@@ -319,16 +320,19 @@ window.fetch = async (input, init) => {
 createRoot(root).render(
   <React.StrictMode>
     <MemoryRouter>
-      <main style={{ padding: 24 }}>
-        <DevicesRoute
-          organisationId="organisation_devices_preview"
-          role={role}
-          pagePaths={{
-            menus: "/menus",
-            terminals: "/terminals",
-            chat: "/chat",
-          }}
-        />
+      <main className="portal-main">
+        <div className="portal-main-inner">
+          <PageHeader title="Devices" description={null} />
+          <DevicesRoute
+            organisationId="organisation_devices_preview"
+            role={role}
+            pagePaths={{
+              menus: "/menus",
+              terminals: "/terminals",
+              chat: "/chat",
+            }}
+          />
+        </div>
       </main>
     </MemoryRouter>
   </React.StrictMode>,

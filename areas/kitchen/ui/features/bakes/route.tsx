@@ -85,10 +85,6 @@ export function BakesRoute(
             </Button>
           ) : null}
         </div>
-        <p className="bakes-note">
-          When the counter stock of a product falls below its level, Purin
-          Pantry proposes one bake.
-        </p>
         <CrmTable
           label="Stock levels"
           rows={board.levels}
@@ -99,7 +95,7 @@ export function BakesRoute(
           emptyTitle="No stock levels"
           emptyDescription={
             mayEditLevels
-              ? "Add a level for each fresh product that the kitchen bakes."
+              ? "Add a level for each fresh product."
               : "An admin sets the level of each fresh product."
           }
         />
@@ -108,10 +104,6 @@ export function BakesRoute(
         <div className="bakes-heading">
           <h2 id="bakes-authority">Authority</h2>
         </div>
-        <p className="bakes-note">
-          In shadow mode an approved bake sends nothing: Purin Pantry only
-          watches the cobots. In approval mode it sends the bake's tasks.
-        </p>
         <BakeAuthorityList
           organisationId={organisationId}
           authority={board.authority}
@@ -190,7 +182,7 @@ const LEVEL_COLUMNS: readonly CrmColumn<BakeStockLevelView>[] = [
   },
   {
     id: "group",
-    label: "Pieces in a mould group",
+    label: "Mould group",
     kind: "number",
     align: "end",
     value: (level) => level.piecesPerGroup,

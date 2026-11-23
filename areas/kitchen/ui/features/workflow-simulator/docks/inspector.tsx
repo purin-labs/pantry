@@ -835,7 +835,7 @@ function renderCustomerOrderRow(
           >
             <Select.Trigger
               aria-label={`Beverage recipe for ${ord.id}`}
-              title={`Select the beverage recipe for ${ord.id}`}
+              title={`Select the drink recipe for ${ord.id}`}
               style={{ maxWidth: "10.5rem" }}
             >
               <Select.Value />
@@ -978,7 +978,7 @@ function Inspection(props: Props): React.ReactNode {
               </dd>
               {context.task.kind === "process" && (
                 <>
-                  <dt>Financier phase</dt>
+                  <dt>Now</dt>
                   <dd>
                     {plan61ASubstepAt(context.task, props.state.time).label}
                   </dd>
@@ -1155,7 +1155,7 @@ function Inspection(props: Props): React.ReactNode {
         ) : null}
         {current.kind === "process" && (
           <>
-            <dt>Financier phase</dt>
+            <dt>Now</dt>
             <dd>{plan61ASubstepAt(current, props.state.time).label}</dd>
             <dt>Mass / mould detail</dt>
             <dd>{plan61ASubstepAt(current, props.state.time).massNote}</dd>
@@ -1246,7 +1246,7 @@ function TaskInspection(
         <>
           <dt>Kitchen zone</dt>
           <dd>{stationZoneLabel(task.station)}</dd>
-          <dt>Financier phase</dt>
+          <dt>Now</dt>
           <dd>{plan61ASubstepAt(task, props.state.time).label}</dd>
           <dt>Mass / mould detail</dt>
           <dd>{plan61ASubstepAt(task, props.state.time).massNote}</dd>

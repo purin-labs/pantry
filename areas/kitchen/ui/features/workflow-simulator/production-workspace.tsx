@@ -46,6 +46,11 @@ import { PastryBenchRecipeAuthor } from "../production-run/pastry-bench/pastry-b
 import type { PastryBenchRecipeConfig } from "../production-run/pastry-bench/pastry-bench-model";
 import { CompleteRecipeTaskCatalog } from "./complete-recipe-task-catalog";
 import {
+  CATALOG_TIERS,
+  ProductionCatalogGroup,
+  ProductionCatalogItem,
+} from "./catalog-group";
+import {
   batchWorkerFlow,
   calibratedHandoffAssignments,
   compactNativeTrayStatus,
@@ -3304,7 +3309,7 @@ export class ProductionWorkspace extends React.Component<
   private catalogSectionTierLabel(): string {
     switch (this.state.catalogSection) {
       case "appliance-rehearsals":
-        return "Isolated action";
+        return CATALOG_TIERS.action;
       case "siphon":
       case "pour-over":
       case "espresso":
@@ -3315,15 +3320,15 @@ export class ProductionWorkspace extends React.Component<
       case "financier-bake":
       case "financier-pack":
       case "pastry-bench":
-        return "Complete task";
+        return CATALOG_TIERS.task;
       case "active-production":
       case "rehearsal-production":
         return this.props.session.procedure === "rehearsal"
-          ? "Isolated action"
-          : "Autonomous loop";
+          ? CATALOG_TIERS.action
+          : CATALOG_TIERS.loop;
       case "cafe-shift":
       case "shared-runs":
-        return "Autonomous loop";
+        return CATALOG_TIERS.loop;
       case null:
         return "Workflow";
     }
@@ -3338,131 +3343,46 @@ export class ProductionWorkspace extends React.Component<
     return (
       <>
         <div className="production-catalog-groups">
-          <section className="production-catalog-group">
-            <header className="production-catalog-group-header">
-              <span className="production-tier-badge" data-tier="action">
-                Tier 1 · Action
-              </span>
-              <h4>Isolated actions &amp; calibration</h4>
-              <p>Refine a single robot transfer or appliance cycle.</p>
-            </header>
-            <div className="production-menu-list">
-              {this.props.session.procedure === "rehearsal" && (
-                <button
-                  type="button"
-                  className="production-menu-item production-catalog-card"
-                  onClick={this.openCatalogSection.bind(
-                    this,
-                    "active-production",
-                  )}
-                >
-                  <div className="production-catalog-card-body">
-                    <strong>Multi-tray robot rehearsal ({batchSummary})</strong>
-                    <small>
-                      Active 3D tray rehearsal &amp; rack handoff calibration
-                    </small>
-                  </div>
-                  <span className="production-menu-chevron" aria-hidden="true">
-                    ›
-                  </span>
-                </button>
-              )}
-              <button
-                type="button"
-                className="production-menu-item production-catalog-card"
-                onClick={this.openCatalogSection.bind(
-                  this,
-                  "appliance-rehearsals",
-                )}
-              >
-                <div className="production-catalog-card-body">
-                  <strong>Standalone appliance rehearsals</strong>
-                  <small>
-                    Linea Classic S &amp; Eagle One group head calibration
-                  </small>
-                </div>
-                <span className="production-menu-chevron" aria-hidden="true">
-                  ›
-                </span>
-              </button>
-            </div>
-          </section>
+          <ProductionCatalogGroup title={CATALOG_TIERS.action}>
+            {this.props.session.procedure === "rehearsal" && (
+              <ProductionCatalogItem
+                title={`Multi-tray robot rehearsal (${batchSummary})`}
+                detail="Active 3D tray rehearsal & rack handoff calibration"
+                open={this.openCatalogSection.bind(this, "active-production")}
+              />
+            )}
+            <ProductionCatalogItem
+              title="Standalone appliance rehearsals"
+              detail="Linea Classic S & Eagle One group head calibration"
+              open={this.openCatalogSection.bind(this, "appliance-rehearsals")}
+            />
+          </ProductionCatalogGroup>
 
           <CompleteRecipeTaskCatalog
             openCatalogSection={this.openCatalogSection.bind(this)}
           />
 
-          <section className="production-catalog-group">
-            <header className="production-catalog-group-header">
-              <span className="production-tier-badge" data-tier="loop">
-                Tier 3 · Autonomous Loop
-              </span>
-              <h4>Multi-task factory loops &amp; shifts</h4>
-              <p>
-                Compositions of tasks that loop to test autonomous throughput.
-              </p>
-            </header>
-            <div className="production-menu-list">
-              {this.props.session.procedure !== "rehearsal" && (
-                <button
-                  type="button"
-                  className="production-menu-item production-catalog-card"
-                  onClick={this.openCatalogSection.bind(
-                    this,
-                    "active-production",
-                  )}
-                >
-                  <div className="production-catalog-card-body">
-                    <strong>
-                      Multi-batch production + Robot ({batchSummary})
-                    </strong>
-                    <small>
-                      3-batch autonomous pipeline · {processStepCount} process
-                      steps &amp; robot tray handoffs
-                    </small>
-                  </div>
-                  <span className="production-menu-chevron" aria-hidden="true">
-                    ›
-                  </span>
-                </button>
-              )}
-              <button
-                type="button"
-                className="production-menu-item production-catalog-card"
-                onClick={this.openCatalogSection.bind(this, "cafe-shift")}
-              >
-                <div className="production-catalog-card-body">
-                  <strong>
-                    Combined Café Shift · Financiers &amp; Espresso
-                  </strong>
-                  <small>
-                    Baker FR10 #1 + Barista FR10 #2 · Matsunaga 8P loads &amp;
-                    Linea / Eagle One service
-                  </small>
-                </div>
-                <span className="production-menu-chevron" aria-hidden="true">
-                  ›
-                </span>
-              </button>
-              {this.props.connection.kind === "workspace" && (
-                <button
-                  type="button"
-                  className="production-menu-item production-catalog-card"
-                  onClick={this.openCatalogSection.bind(this, "shared-runs")}
-                >
-                  <div className="production-catalog-card-body">
-                    <strong>Shared production runs</strong>
-                    <small>
-                      Open or compare saved workspace factory recordings
-                    </small>
-                  </div>
-                  <span className="production-menu-chevron" aria-hidden="true">
-                    ›
-                  </span>
-                </button>
-              )}
-            </div>
-          </section>
+          <ProductionCatalogGroup title={CATALOG_TIERS.loop}>
+            {this.props.session.procedure !== "rehearsal" && (
+              <ProductionCatalogItem
+                title={`Multi-batch production + Robot (${batchSummary})`}
+                detail={`3-batch autonomous pipeline · ${processStepCount} process steps & robot tray handoffs`}
+                open={this.openCatalogSection.bind(this, "active-production")}
+              />
+            )}
+            <ProductionCatalogItem
+              title="Combined Café Shift · Financiers & Espresso"
+              detail="Baker FR10 #1 + Barista FR10 #2 · Matsunaga 8P loads & Linea / Eagle One service"
+              open={this.openCatalogSection.bind(this, "cafe-shift")}
+            />
+            {this.props.connection.kind === "workspace" && (
+              <ProductionCatalogItem
+                title="Shared production runs"
+                detail="Open or compare saved workspace factory recordings"
+                open={this.openCatalogSection.bind(this, "shared-runs")}
+              />
+            )}
+          </ProductionCatalogGroup>
         </div>
         {this.state.comparisons.length > 0 && (
           <FactoryComparison
