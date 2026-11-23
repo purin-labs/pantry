@@ -348,3 +348,91 @@ export function eraseEntryWhere(
 ): string {
   return entry.where ?? "organisation_id = ?";
 }
+
+/**
+ * What the purge deletes in R2 (the `ARCHIVE` bucket). Each key that the
+ * Worker writes for an Organisation starts with `<root>/<Organisation id>/`;
+ * `encoded` says that the writer passes the id through encodeURIComponent.
+ * The purge deletes each object under each prefix, after the Session erasure
+ * and before the D1 rows go. It keeps an export that a relocation or restore
+ * journal of the global database still names.
+ * `pnpm lint:purge-catalogue` refuses a key root, in a template that puts an
+ * Organisation id after it, that this list does not name. A new kind of
+ * object gets one entry here.
+ */
+type PurgeR2Prefix = Readonly<{
+  root: string;
+  encoded: boolean;
+  holds: string;
+}>;
+
+export const PURGE_R2_PREFIXES = [
+  {
+    root: "attachments",
+    encoded: false,
+    holds:
+      "Chat, Slack and email files, their stills and their prepared copies.",
+  },
+  {
+    root: "attachment-collection",
+    encoded: false,
+    holds: "The receipts of the attachment collection.",
+  },
+  {
+    root: "harness-checkpoints",
+    encoded: true,
+    holds: "The harness checkpoints of the Sessions.",
+  },
+  {
+    root: "workspace-revisions",
+    encoded: false,
+    holds: "The manifests and changesets of the workspace revisions.",
+  },
+  {
+    root: "state-object-exports",
+    encoded: false,
+    holds: "The Actor exports of a relocation or a restore.",
+  },
+  {
+    root: "state-object-organisation-data-v1",
+    encoded: false,
+    holds: "The regional rows that a relocation copies.",
+  },
+  {
+    root: "device-snapshots",
+    encoded: false,
+    holds: "The camera snapshots of the devices.",
+  },
+  {
+    root: "bakery-runs",
+    encoded: true,
+    holds: "The saved Kitchen runs.",
+  },
+  {
+    root: "bakery-run-prepared",
+    encoded: true,
+    holds: "The staged Kitchen runs, under the user who staged them.",
+  },
+  {
+    root: "bakery-run-artifacts",
+    encoded: true,
+    holds: "The artifacts of the Kitchen runs, under the user who stored them.",
+  },
+  {
+    root: "bakery-workflows",
+    encoded: true,
+    holds:
+      "The recipe workflow revisions, the proposal documents and the findings.",
+  },
+] as const satisfies readonly PurgeR2Prefix[];
+
+/** The R2 prefix of one entry for one Organisation. */
+export function purgeR2Prefix(
+  entry: Readonly<{ root: string; encoded: boolean }>,
+  organisationId: string,
+): string {
+  const id = entry.encoded
+    ? encodeURIComponent(organisationId)
+    : organisationId;
+  return `${entry.root}/${id}/`;
+}

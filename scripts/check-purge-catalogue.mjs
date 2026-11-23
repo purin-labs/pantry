@@ -8,8 +8,12 @@
 //   to it: a table that the purge deletes from (erase or pseudonymize) comes
 //   before every table that it refers to;
 // - a kept table that refers to an erased one, unless its foreign key
-//   cascades or sets NULL.
-import { readFileSync } from "node:fs";
+//   cascades or sets NULL;
+// - an R2 key root that a source template puts before an Organisation id
+//   (`root/${organisationId}` or `root/${encodeURIComponent(organisationId)}`)
+//   and that PURGE_R2_PREFIXES does not name, or names with the other
+//   encoding.
+import { readdirSync, readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -20,7 +24,9 @@ const baseline = join(
   "services/platform/migrations-regional/0001_current_schema.sql",
 );
 const cataloguePath = join(root, "foundation/tenancy/data/purge-catalogue.ts");
-const { PURGE_CATALOGUE } = await import(pathToFileURL(cataloguePath).href);
+const { PURGE_CATALOGUE, PURGE_R2_PREFIXES } = await import(
+  pathToFileURL(cataloguePath).href
+);
 
 const database = new DatabaseSync(":memory:");
 database.exec(readFileSync(baseline, "utf8"));
@@ -106,9 +112,46 @@ for (const table of tables) {
   }
 }
 
+const r2Roots = new Map(
+  PURGE_R2_PREFIXES.map((entry) => [entry.root, entry.encoded]),
+);
+const r2Key =
+  /`([a-z][a-z0-9-]*)\/\$\{(encodeURIComponent\()?[A-Za-z.]*[oO]rganisationId\b/gu;
+function* sourceFiles(directory) {
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    if (entry.name === "node_modules" || entry.name === "tests") continue;
+    const full = join(directory, entry.name);
+    if (entry.isDirectory()) yield* sourceFiles(full);
+    else if (/\.tsx?$/u.test(entry.name) && !entry.name.endsWith(".d.ts"))
+      yield full;
+  }
+}
+for (const folder of [
+  "foundation",
+  "areas",
+  "surfaces",
+  "services/platform/src",
+])
+  for (const file of sourceFiles(join(root, folder)))
+    for (const [, keyRoot, encoder] of readFileSync(file, "utf8").matchAll(
+      r2Key,
+    )) {
+      const where = file.slice(root.length);
+      if (!r2Roots.has(keyRoot))
+        problems.push(
+          `${where} writes R2 keys under ${keyRoot}/, which PURGE_R2_PREFIXES does not name`,
+        );
+      else if (r2Roots.get(keyRoot) !== (encoder !== undefined))
+        problems.push(
+          `${where} encodes the Organisation id under ${keyRoot}/ unlike its PURGE_R2_PREFIXES entry`,
+        );
+    }
+
 if (problems.length > 0) {
   console.error(`purge catalogue: ${problems.length} problem(s)`);
   for (const problem of problems) console.error(`- ${problem}`);
   process.exit(1);
 }
-console.log(`purge catalogue: ${tables.length} regional tables have an entry`);
+console.log(
+  `purge catalogue: ${tables.length} regional tables and ${PURGE_R2_PREFIXES.length} R2 prefixes have an entry`,
+);

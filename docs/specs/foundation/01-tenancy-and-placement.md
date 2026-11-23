@@ -331,9 +331,13 @@ An admin route answers 404 to a request without the token.
   the grants of one person in each cell. The scheduled runs and the ingress lookups read
   each regional database (`configuredOrganisationDatabases`).
 - **Object keys.** An R2 key starts with the kind of the object and then the
-  Organisation id. The kinds are `attachments`, `harness-checkpoints`,
-  `workspace-revisions`, `state-object-exports`, `device-snapshots`, `bakery-runs`,
+  Organisation id. The kinds are `attachments`, `attachment-collection`,
+  `harness-checkpoints`, `workspace-revisions`, `state-object-exports`,
+  `state-object-organisation-data-v1`, `device-snapshots`, `bakery-runs`,
   `bakery-workflows`, `bakery-run-artifacts` and `bakery-run-prepared`.
+  `PURGE_R2_PREFIXES` (`data/purge-catalogue.ts`) lists each kind, and the purge
+  deletes each object under each kind. `pnpm lint:purge-catalogue` refuses a key
+  kind in the source that the list does not name.
 - **Routing and execution.** Routing reads the global placement. Execution checks the
   regional fence. Control sessions are global records and stay live during a move.
 - **Receipts.** A receipt is written in the batch of its effect. A purge deletes the

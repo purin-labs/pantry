@@ -42,8 +42,6 @@ export const ATTACHMENT_COLLECTION_INTERVAL_MS = 24 * 60 * 60 * 1_000;
 export const ATTACHMENT_COLLECTION_GRACE_MS = 24 * 60 * 60 * 1_000;
 const ATTACHMENT_COLLECTION_ORGANISATIONS_PER_PASS = 4;
 
-const RECEIPT_ROOT = "attachment-collection";
-
 type OrganisationAttachmentCollectionOutcome =
   | {
       readonly kind: "collected";
@@ -266,7 +264,7 @@ export function attachmentCollectionRecordKey(
   organisationId: OrganisationId,
   collectedAt: number | "latest",
 ): string {
-  return `${RECEIPT_ROOT}/${organisationId}/${collectedAt}.json`;
+  return `attachment-collection/${organisationId}/${collectedAt}.json`;
 }
 
 async function reachableKeysOf(

@@ -345,7 +345,9 @@ selection and no capability.
 | Browser engine job                             | 125 s, 2000 steps for each call | `MAX_WALL_MS`, `STEPS_PER_CALL`                                                               |
 
 - **Retention.** Saved runs, staged runs, artifacts and the four D1 tables have no time
-  limit. The Organisation purge erases the four D1 tables (`data/purge-catalogue.ts`).
+  limit. The Organisation purge erases the four D1 tables and the R2 objects under
+  `bakery-runs/`, `bakery-run-prepared/` and `bakery-run-artifacts/`
+  (`data/purge-catalogue.ts`).
   An unsaved draft stays in page memory only.
 - **Information flow.** A saved-run read and a canvas read enter the turn under the
   `saved_bakery_run` label, which all four roles read. A canvas move passes the exit
@@ -390,8 +392,8 @@ selection and no capability.
   an older procedure revision.
 - `bakery_production_task_after` is defined, but no relationship of it is made:
   dependencies stay in the `task_dependencies` attribute.
-- No code deletes the R2 runs, staged runs and artifacts of an Organisation, and a staged
-  run that is never published stays.
+- Only the Organisation purge deletes the R2 runs, staged runs and artifacts. A staged
+  run that is never published stays until then.
 
 ## Sources
 

@@ -303,8 +303,9 @@ Both capabilities are in `authorization/capability-catalogue.ts` and need
 - **Time limits.** A proposal expires after 1 hour (`OPERATOR_DRAFT_TTL_MS` in
   `actors/session/proposal-staging.ts`). A draft merge has a deadline of 30 s. Revisions
   have no time limit.
-- **Retention.** The Organisation purge erases `bakery_workflow` and
-  `bakery_workflow_revision` (`data/purge-catalogue.ts`). The draft lives in the
+- **Retention.** The Organisation purge erases `bakery_workflow`,
+  `bakery_workflow_revision` and the R2 objects under `bakery-workflows/<org>/`
+  (`data/purge-catalogue.ts`). The draft lives in the
   Organisation Actor.
 - **Information flow.** An agent read enters the turn under the `recipe_workflow`
   source label, which every member reads (`policy/information-flow/source-labels.ts`).
@@ -352,8 +353,9 @@ Both capabilities are in `authorization/capability-catalogue.ts` and need
 - **Plan 84 later slices.** Bounded retry, a tray reject route, a typed node reference in
   `AdmissionProblem` and a shared review by a second admin are not built. A failure
   preset (`check`) stays in its animation and does not lower to a scripted decision.
-- **Retention.** No code deletes the objects under `bakery-workflows/<org>/` in R2. A
-  declined or expired proposal keeps its document.
+- **Retention.** Only the Organisation purge deletes the objects under
+  `bakery-workflows/<org>/` in R2. A declined or expired proposal keeps its document
+  until then.
 - **IFC guide.** `foundation/authority/policy/information-flow/README.md` does not list
   the `recipe_workflow` source.
 - **Canvas checks.** No journey checks pan, zoom, Space or the wheel. The wire check is a
