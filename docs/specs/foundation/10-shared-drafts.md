@@ -67,9 +67,11 @@ to the spec of its area.
 - The sweep runs every 90 s while two sockets share a room, and every 5 minutes
   otherwise. With no open socket, no sweep runs.
 - The room also checks access for each `sync_request` and `submit_update`, and for each
-  receiver before a broadcast. Each presence or pointer frame runs the check for each
-  socket of the room. A person who had edit access and now has the viewer role gets
-  `access_revoked`.
+  receiver before a broadcast. A presence or pointer frame changes the state of its
+  socket at once and does not wait in the queue. At most one presence refresh waits in
+  the queue: it runs the check for each socket of the room, then sends presence with
+  the latest state of each socket. A person who had edit access and now has the viewer
+  role gets `access_revoked`.
 - If an access check cannot run, the room closes the socket with no failure frame. The
   client connects again and keeps its unsent changes.
 - When the Organisation moves or its state is erased, the Actor closes each socket with
@@ -345,7 +347,7 @@ prompt (`PERMISSION_REQUESTABLE`).
 | Email update, state, state vector                               | 256 KiB, 512 KiB, 64 KiB                                                                     | `EMAIL_UPDATE_LIMIT`, `EMAIL_STATE_LIMIT`, `EMAIL_STATE_VECTOR_LIMIT`                     |
 | One socket frame                                                | 384 KiB                                                                                      | `COLLABORATION_FRAME_LIMIT`                                                               |
 | Sockets in one room (`room_full`); agent operations in one room | 20; 20                                                                                       | `COLLABORATION_SOCKET_LIMIT`                                                              |
-| Messages of one socket that wait in the queue                   | 8                                                                                            | A number in `CollaborationRoom.receive`                                                   |
+| Sync and update messages of one socket that wait in the queue   | 8                                                                                            | A number in `CollaborationRoom.receive`                                                   |
 | Socket attachment                                               | 16,384 bytes                                                                                 | `ATTACHMENT_LIMIT_BYTES`                                                                  |
 | Client ping; lost socket                                        | 30 s; 75 s                                                                                   | `COLLABORATION_PING_INTERVAL_MS`, `COLLABORATION_PONG_TIMEOUT_MS`                         |
 | Silent socket; sweep                                            | 90 s; 300 s                                                                                  | `SOCKET_SILENCE_LIMIT_MS`, `SOCKET_SWEEP_INTERVAL_MS`                                     |

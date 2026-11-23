@@ -16,6 +16,7 @@ import {
   type EncodedValue,
 } from "@purin-labs/collaboration";
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
+import type { Variant } from "@purin-labs/type-utils";
 import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   listOrganisationMembers,
@@ -308,6 +309,9 @@ export class CollaborationRoom<
   // Messages of one socket that wait in the queue. A wake resets the count,
   // because the queue of the earlier activation is gone with it.
   readonly #queued = new WeakMap<WebSocket, number>();
+  // Set while one presence refresh waits in the queue. Pointer and presence
+  // frames between them only change their socket's own state.
+  #presenceQueued = false;
   #pendingOpens = 0;
   #pendingMutations = 0;
   // Set when the host drops the room. The Organisation's sweep can still hold
@@ -370,6 +374,22 @@ export class CollaborationRoom<
       this.#malformed(socket, "frame_size");
       return;
     }
+    const parsed = this.#protocol.parseClientMessage(data);
+    if (!parsed.ok) {
+      this.#malformed(socket, "frame_shape", parsed.error.code);
+      return;
+    }
+    const message = parsed.value;
+    // A pointer or presence frame changes only its own socket's state. The
+    // room writes it at once and sends presence from one waiting refresh, so
+    // a moving pointer never fills the queue while access checks are slow.
+    if (
+      message.kind === "pointer_update" ||
+      message.kind === "presence_update"
+    ) {
+      this.#notePresence(socket, message);
+      return;
+    }
     const queued = (this.#queued.get(socket) ?? 0) + 1;
     if (queued > 8) {
       this.#malformed(socket, "queue_limit");
@@ -377,8 +397,53 @@ export class CollaborationRoom<
     }
     this.#queued.set(socket, queued);
     void this.#queue
-      .enqueue(this.#message.bind(this, socket, data))
+      .enqueue(this.#message.bind(this, socket, message))
       .catch(this.#unexpected.bind(this, socket));
+  }
+
+  #notePresence(
+    socket: WebSocket,
+    message: Variant<
+      CollaborationRoomClientMessage<Update, StateVector, Selection>,
+      "pointer_update" | "presence_update"
+    >,
+  ): void {
+    const current = this.#attachment(socket);
+    if (current === null) return;
+    const now = Date.now();
+    let next: CollaborationSocketAttachment<Selection>;
+    if (message.kind === "pointer_update") {
+      next = {
+        ...current,
+        lastMessageAt: now,
+        pointer:
+          message.position === null
+            ? null
+            : { position: message.position, updatedAt: now },
+      };
+    } else {
+      const state = current.openedAccess === "read" ? "viewing" : message.state;
+      const changed =
+        current.state !== message.state ||
+        JSON.stringify(current.selection) !== JSON.stringify(message.selection);
+      next = {
+        ...current,
+        lastMessageAt: now,
+        activeAt: changed ? now : current.activeAt,
+        state,
+        selection: state === "editing" ? message.selection : null,
+      };
+    }
+    if (!this.#write(socket, next) || this.#presenceQueued) return;
+    this.#presenceQueued = true;
+    void this.#queue
+      .enqueue(this.#queuedPresence.bind(this))
+      .catch(this.#ignore.bind(this));
+  }
+
+  async #queuedPresence(): Promise<void> {
+    this.#presenceQueued = false;
+    if (!this.#dropped) await this.#refreshPresence();
   }
 
   /** A socket of this room closed or failed, from the Actor's handler. */
@@ -645,19 +710,21 @@ export class CollaborationRoom<
     );
   }
 
-  async #message(socket: WebSocket, frame: string): Promise<void> {
+  async #message(
+    socket: WebSocket,
+    message: Variant<
+      CollaborationRoomClientMessage<Update, StateVector, Selection>,
+      "sync_request" | "submit_update"
+    >,
+  ): Promise<void> {
     this.#queued.set(socket, Math.max(0, (this.#queued.get(socket) ?? 1) - 1));
     const current = this.#attachment(socket);
     if (current === null) {
       return;
     }
-    const parsed = this.#protocol.parseClientMessage(frame);
-    if (!parsed.ok) {
-      this.#malformed(socket, "frame_shape", parsed.error.code);
-      return;
-    }
-    const now = Date.now();
-    const message = parsed.value;
+    // Written before the wait for the scope, so that a presence frame that
+    // arrives meanwhile is not lost under this older copy of the state.
+    if (!this.#write(socket, { ...current, lastMessageAt: Date.now() })) return;
     const admission = await this.#captureScope();
     if (!admission.ok) {
       await this.#closeAll();
@@ -665,50 +732,13 @@ export class CollaborationRoom<
     }
     const scope = admission.value;
     switch (message.kind) {
-      case "pointer_update":
-        if (
-          !this.#write(socket, {
-            ...current,
-            lastMessageAt: now,
-            pointer:
-              message.position === null
-                ? null
-                : { position: message.position, updatedAt: now },
-          })
-        )
-          return;
-        await this.#refreshPresence();
-        return;
-      case "presence_update": {
-        const state =
-          current.openedAccess === "read" ? "viewing" : message.state;
-        const selection = state === "editing" ? message.selection : null;
-        const changed =
-          current.state !== message.state ||
-          JSON.stringify(current.selection) !==
-            JSON.stringify(message.selection);
-        if (
-          !this.#write(socket, {
-            ...current,
-            lastMessageAt: now,
-            activeAt: changed ? now : current.activeAt,
-            state,
-            selection,
-          })
-        )
-          return;
-        await this.#refreshPresence();
-        return;
-      }
       case "sync_request": {
-        if (!this.#write(socket, { ...current, lastMessageAt: now })) return;
         const access = await this.#contentAccess(socket, scope);
         if (access === null) return;
         await this.#sync(socket, scope, access, message.stateVector);
         return;
       }
       case "submit_update": {
-        if (!this.#write(socket, { ...current, lastMessageAt: now })) return;
         const access = await this.#contentAccess(socket, scope);
         if (access === null) return;
         await this.#submit(

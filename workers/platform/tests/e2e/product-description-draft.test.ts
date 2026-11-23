@@ -39,6 +39,8 @@ const PROVIDER_CONNECTION_ID = "provider_description_e2e";
 const COMMERCE_BINDING_ID = "commerce_binding_description_e2e";
 const COMMERCE_MERCHANT_ID = "merchant_description_e2e";
 const INITIAL_DESCRIPTION = "Freshly baked croissant.";
+/** More pointer frames than a socket may have waiting in the room. */
+const POINTER_BURST = 40;
 const TEST_PLACEMENT = requiredPlacement();
 type ControlClient = Readonly<{
   identity: User;
@@ -142,6 +144,35 @@ async function walkingDraftJourney(): Promise<void> {
         }),
       ]),
     });
+    // The owner moves the pointer faster than the room checks access, as a
+    // slow database makes it: the frames wait, and the editor gets the last
+    // position. The owner's socket stays open.
+    const ownerFailures: DraftServerMessage[] = [];
+    const watchOwner = (event: MessageEvent): void => {
+      const parsed = parseDraftServerMessage(event.data);
+      if (parsed.ok && parsed.value.kind === "failure")
+        ownerFailures.push(parsed.value);
+    };
+    ownerSocket.addEventListener("message", watchOwner);
+    const lastPosition = { x: 0.9, y: 0.1 };
+    const lastPointer = nextServerMessage(
+      editorSocket,
+      hasPointerAt.bind(null, lastPosition),
+    );
+    for (let step = 1; step <= POINTER_BURST; step += 1)
+      ownerSocket.send(
+        encodeDraftClientMessage({
+          kind: "pointer_update",
+          position:
+            step === POINTER_BURST
+              ? lastPosition
+              : { x: step / (POINTER_BURST * 2), y: 0.5 },
+        }),
+      );
+    await lastPointer;
+    ownerSocket.removeEventListener("message", watchOwner);
+    expect(ownerFailures).toEqual([]);
+
     const hiddenPointer = nextServerMessage(editorSocket, hasNoMousePointers);
     ownerSocket.send(
       encodeDraftClientMessage({ kind: "pointer_update", position: null }),
@@ -809,6 +840,20 @@ function hasMousePointer(message: DraftServerMessage): boolean {
   return (
     isPresenceChanged(message) &&
     message.participants.some(participantHasPointer)
+  );
+}
+
+function hasPointerAt(
+  position: Readonly<{ x: number; y: number }>,
+  message: DraftServerMessage,
+): boolean {
+  return (
+    isPresenceChanged(message) &&
+    message.participants.some(
+      (participant) =>
+        participant.pointer?.position.x === position.x &&
+        participant.pointer.position.y === position.y,
+    )
   );
 }
 
