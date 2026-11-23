@@ -5,10 +5,13 @@ use std::collections::BTreeSet;
 use crate::{
     artifact::*,
     limits::{Margins, Measured, Overspeed},
-    native::{Contact, Engine, OPEN_JAW_M, Point},
+    native::{Contact, Engine, Point},
 };
 
 const GRASP_OFFSET: [f64; 3] = [-0.25, 0., -0.001];
+// Overhead rim spanner gripper: tray center sits +5 mm along tool +X (+Y world)
+// and -11 mm in Z relative to `cell_grasp` when clamped against the rear blade.
+const SPANNER_GRASP_OFFSET: [f64; 3] = [0., -0.005, 0.011];
 // Bounded proportional correction; simulated tuning, pending physical calibration.
 const OVEN_CENTERING_GAIN: f64 = 0.5;
 const OVEN_CENTERING_LIMIT_M: f64 = 0.015;
@@ -18,6 +21,46 @@ const GRIP: [&str; 4] = [
     "clamp_pad_left",
     "clamp_pad_right",
 ];
+const SPANNER_GRIP: [&str; 2] = [
+    "clamp_spanner_jaw_front_pad_col",
+    "clamp_spanner_jaw_rear_pad_col",
+];
+const SPANNER_OVEN_SUPPORTS: [&str; 2] = [
+    "mbco4_rail_2_left_ledge_col",
+    "mbco4_rail_2_right_ledge_col",
+];
+const SPANNER_OVEN_GUIDES: [&str; 2] = [
+    "mbco4_rail_2_left_guide_col",
+    "mbco4_rail_2_right_guide_col",
+];
+
+fn grasp_offset(is_spanner: bool) -> Point {
+    Point::from(if is_spanner {
+        SPANNER_GRASP_OFFSET
+    } else {
+        GRASP_OFFSET
+    })
+}
+
+fn grip_geoms(is_spanner: bool) -> &'static [&'static str] {
+    if is_spanner { &SPANNER_GRIP } else { &GRIP }
+}
+
+fn task_supports(task: BakeryTask, is_spanner: bool) -> &'static [&'static str] {
+    if is_spanner && task == BakeryTask::Oven {
+        &SPANNER_OVEN_SUPPORTS
+    } else {
+        task.supports()
+    }
+}
+
+fn task_source_supports(task: BakeryTask, is_spanner: bool) -> &'static [&'static str] {
+    if is_spanner && task == BakeryTask::Unload {
+        &SPANNER_OVEN_SUPPORTS
+    } else {
+        task.source_supports()
+    }
+}
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(
@@ -134,7 +177,7 @@ fn validate_completed(
         progress.pickup
             && !progress.grip_disabled
             && progress.lost_steps == 0
-            && engine.jaw_opening() > OPEN_JAW_M - 0.005,
+            && engine.jaw_opening() > engine.open_jaw_m() - 0.005,
         "Handoff requires released tray and open tool"
     );
     ensure!(
@@ -191,11 +234,180 @@ fn phase_event(event: &Event) -> Option<(usize, &str)> {
     }
 }
 
+fn spanner_loading_phases(engine: &Engine) -> Result<Vec<Phase>> {
+    let source_site = engine.site("source_tray_center")?;
+    let dest_site = engine.site(BakeryTask::Oven.destination())?;
+    let source_grasp = source_site + Point::new(0., 0., 0.011);
+    let dest_grip = dest_site + Point::from(SPANNER_GRASP_OFFSET);
+    let slide_z = (dest_site.z + 0.042).max(source_site.z + 0.30);
+    let initial = engine.grasp_site();
+    let mouth_out = Point::new(dest_grip.x, dest_grip.y - 0.48, dest_grip.z + 0.049);
+    Ok(vec![
+        Phase::new("settle", initial, 0.5, false, false),
+        Phase::new(
+            "approach",
+            source_site + Point::new(0., 0., 0.16),
+            2.5,
+            false,
+            false,
+        ),
+        Phase::new("seat", source_grasp, 2.5, false, false),
+        Phase::new("grasp", source_grasp, 1.0, true, false),
+        Phase::new("hold_grasp", source_grasp, 0.5, true, false),
+        Phase::new(
+            "lift",
+            Point::new(source_grasp.x, source_grasp.y, slide_z),
+            2.5,
+            true,
+            true,
+        ),
+        Phase::new(
+            "transfer",
+            Point::new(0.04, -0.48, slide_z),
+            2.5,
+            true,
+            true,
+        ),
+        Phase::new(
+            "align_oven",
+            Point::new(dest_grip.x, dest_grip.y - 0.48, slide_z),
+            2.5,
+            true,
+            true,
+        ),
+        Phase::new(
+            "insert_oven",
+            Point::new(dest_grip.x, dest_grip.y, slide_z),
+            3.0,
+            true,
+            true,
+        ),
+        Phase::new(
+            "place",
+            dest_grip + Point::new(0., 0., 0.004),
+            1.5,
+            true,
+            true,
+        ),
+        Phase::new(
+            "release",
+            dest_grip + Point::new(0., 0., 0.004),
+            1.0,
+            false,
+            false,
+        ),
+        Phase::new(
+            "clear_rear",
+            dest_grip + Point::new(0., 0.004, 0.004),
+            0.8,
+            false,
+            false,
+        ),
+        Phase::new(
+            "lift_clear",
+            dest_grip + Point::new(0., 0.004, 0.049),
+            1.2,
+            false,
+            false,
+        ),
+        Phase::new("clear_oven_front", mouth_out, 2.5, false, false),
+        Phase::new("settled", mouth_out, 2.0, false, false),
+    ])
+}
+
+fn spanner_unloading_phases(
+    engine: &Engine,
+    previous_target: [f64; 3],
+    tray: [f64; 7],
+) -> Result<Vec<Phase>> {
+    let tray_pos = Point::from_column_slice(&tray[..3]);
+    let dest_site = engine.site("source_tray_center")?;
+    let dest_grip = dest_site + Point::from(SPANNER_GRASP_OFFSET);
+    let source_grasp = tray_pos + Point::new(0., 0., 0.011);
+    let enter_z = tray_pos.z + 0.060;
+    let slide_z = tray_pos.z + 0.042;
+    let retract = dest_grip + Point::new(0., 0.004, 0.16);
+    Ok(vec![
+        Phase::new("settle", Point::from(previous_target), 0.5, false, false),
+        Phase::new(
+            "align_oven",
+            Point::new(tray_pos.x, tray_pos.y - 0.48, enter_z),
+            1.0,
+            false,
+            false,
+        ),
+        Phase::new(
+            "enter_oven",
+            Point::new(tray_pos.x, tray_pos.y, enter_z),
+            2.5,
+            false,
+            false,
+        ),
+        Phase::new("seat", source_grasp, 1.5, false, false),
+        Phase::new("grasp", source_grasp, 1.0, true, false),
+        Phase::new("hold_grasp", source_grasp, 0.5, true, false),
+        Phase::new(
+            "lift",
+            Point::new(tray_pos.x, tray_pos.y, slide_z),
+            1.5,
+            true,
+            true,
+        ),
+        Phase::new(
+            "extract_oven",
+            Point::new(tray_pos.x, tray_pos.y - 0.48, slide_z),
+            3.0,
+            true,
+            true,
+        ),
+        Phase::new(
+            "clear_oven_front",
+            Point::new(0.04, -0.48, slide_z),
+            2.5,
+            true,
+            true,
+        ),
+        Phase::new(
+            "transfer",
+            Point::new(dest_grip.x, dest_grip.y, slide_z),
+            3.0,
+            true,
+            true,
+        ),
+        Phase::new(
+            "place",
+            dest_grip + Point::new(0., 0., 0.004),
+            3.0,
+            true,
+            true,
+        ),
+        Phase::new(
+            "release",
+            dest_grip + Point::new(0., 0., 0.004),
+            1.0,
+            false,
+            false,
+        ),
+        Phase::new(
+            "clear_rear",
+            dest_grip + Point::new(0., 0.004, 0.004),
+            0.8,
+            false,
+            false,
+        ),
+        Phase::new("retract", retract, 2.0, false, false),
+        Phase::new("settled", retract, 2.0, false, false),
+    ])
+}
+
 fn unloading_phases(
     engine: &Engine,
     previous_target: [f64; 3],
     tray: [f64; 7],
 ) -> Result<Vec<Phase>> {
+    if engine.is_spanner() {
+        return spanner_unloading_phases(engine, previous_target, tray);
+    }
     let source = Point::from_column_slice(&tray[..3]) + Point::from(GRASP_OFFSET);
     let destination = engine.site("source_tray_center")? + Point::from(GRASP_OFFSET);
     let outside = Point::new(destination.x - 0.37, source.y, source.z);
@@ -295,6 +507,9 @@ impl Phase {
 }
 
 pub fn phases(engine: &Engine, task: BakeryTask) -> Result<Vec<Phase>> {
+    if engine.is_spanner() && task == BakeryTask::Oven {
+        return spanner_loading_phases(engine);
+    }
     let source = engine.site("source_tray_center")? + Point::from(GRASP_OFFSET);
     let clearance = if task == BakeryTask::Oven { 0.50 } else { 0.32 };
     transfer_phases(engine, task, source, engine.grasp_site(), clearance, 0.30)
@@ -411,6 +626,12 @@ fn transfer_phases(
     Ok(phases)
 }
 
+fn is_oven_door(name: &str) -> bool {
+    name.starts_with("mbco_door_")
+        || name.starts_with("mbco4_door_")
+        || name.starts_with("mbco4_handle_")
+}
+
 fn check_contacts(contacts: &[Contact], inspect_tray: bool) -> Result<(), Failure> {
     for contact in contacts {
         let tray_contact = contact.first_is_tray || contact.second_is_tray;
@@ -421,7 +642,7 @@ fn check_contacts(contacts: &[Contact], inspect_tray: bool) -> Result<(), Failur
         {
             return Err(Failure::DestinationBlocked);
         }
-        if contact.first.starts_with("mbco_door_") || contact.second.starts_with("mbco_door_") {
+        if is_oven_door(contact.first) || is_oven_door(contact.second) {
             return Err(Failure::DoorObstructed);
         }
         if contact.involves_arm {
@@ -441,6 +662,8 @@ fn check_contacts(contacts: &[Contact], inspect_tray: bool) -> Result<(), Failur
             if other != "table_top"
                 && !BakeryTask::Rack.supports().contains(&other)
                 && !BakeryTask::Oven.supports().contains(&other)
+                && !SPANNER_OVEN_SUPPORTS.contains(&other)
+                && !SPANNER_OVEN_GUIDES.contains(&other)
                 && !other.starts_with("clamp_")
             {
                 return Err(Failure::Collision);
@@ -469,10 +692,13 @@ fn contains_all(touched: &BTreeSet<&str>, names: &[&str]) -> bool {
     names.iter().all(|name| touched.contains(name))
 }
 
-fn orientation_error(pose: &[f64; 7]) -> f64 {
-    let dot = (pose[3] * std::f64::consts::FRAC_1_SQRT_2
-        - pose[6] * std::f64::consts::FRAC_1_SQRT_2)
-        .abs();
+fn orientation_error(pose: &[f64; 7], is_spanner: bool) -> f64 {
+    let dot = if is_spanner {
+        pose[3].abs()
+    } else {
+        (pose[3] * std::f64::consts::FRAC_1_SQRT_2 - pose[6] * std::f64::consts::FRAC_1_SQRT_2)
+            .abs()
+    };
     2. * dot.clamp(0., 1.).acos()
 }
 
@@ -487,11 +713,12 @@ fn placement_with(
     destination: Point,
     task: BakeryTask,
 ) -> (bool, Evidence) {
+    let is_spanner = engine.is_spanner();
     let sample = engine.sample(0);
     let speed = engine.tray_speed();
     let evidence = Evidence {
         position_error_m: (Point::from_column_slice(&sample.tray[..3]) - destination).norm(),
-        orientation_error_rad: orientation_error(&sample.tray),
+        orientation_error_rad: orientation_error(&sample.tray, is_spanner),
         linear_speed_mps: Point::from_column_slice(&speed[..3]).norm(),
         angular_speed_radps: Point::from_column_slice(&speed[3..]).norm(),
         settled_seconds: 0.,
@@ -500,23 +727,24 @@ fn placement_with(
         && evidence.orientation_error_rad < 5_f64.to_radians()
         && evidence.linear_speed_mps < 0.02
         && evidence.angular_speed_radps < 0.05
-        && contains_all(contacts, task.supports())
+        && contains_all(contacts, task_supports(task, is_spanner))
         && !contacts.iter().any(|name| name.starts_with("clamp_"));
     (accepted, evidence)
 }
 
 fn failure(engine: &Engine, reason: Failure, step: usize, task: BakeryTask) -> Outcome {
+    let is_spanner = engine.is_spanner();
     let scan = engine.live_contacts();
     let contacts = touched(&scan);
     eprintln!(
         "{}",
         serde_json::json!({"kind": "transfer-failure", "step": step, "reason": reason, "contacts": contacts, "tray": engine.sample(step).tray, "placement": placement(engine, engine.site(task.destination()).unwrap(), task).1})
     );
-    let tray_disposition = if contains_all(&contacts, task.source_supports()) {
+    let tray_disposition = if contains_all(&contacts, task_source_supports(task, is_spanner)) {
         Disposition::Source
-    } else if contains_all(&contacts, &GRIP) {
+    } else if contains_all(&contacts, grip_geoms(is_spanner)) {
         Disposition::Gripped
-    } else if contains_all(&contacts, task.supports()) {
+    } else if contains_all(&contacts, task_supports(task, is_spanner)) {
         Disposition::Destination
     } else {
         Disposition::Unknown
@@ -607,7 +835,10 @@ fn choose_start(
     phases: &[Phase],
     limit: u64,
 ) -> Result<Result<[f64; 6], Failure>> {
-    let mut seeds = Vec::with_capacity(40);
+    let mut seeds = Vec::with_capacity(41);
+    if engine.is_spanner() {
+        seeds.push(engine.joints());
+    }
     for shoulder in [-1.5, 1.5, 0.] {
         for yaw in [0., 2.5, -2.5] {
             for elbow in [-2., 2.] {
@@ -1295,6 +1526,10 @@ impl Operation {
         let case = self.binding.request.case;
         let dt = self.binding.request.timestep;
         let destination = self.destination;
+        let is_spanner = engine.is_spanner();
+        let lateral = if is_spanner { 0 } else { 1 };
+        let open_jaw = engine.open_jaw_m();
+        let closed_jaw = engine.closed_jaw_m();
         let sample_stride = (1. / (30. * dt)).round() as usize;
         let control_stride = (0.01 / dt).round() as usize;
         let mut used = 0;
@@ -1310,14 +1545,14 @@ impl Operation {
             let steps = phase_steps(&self.phases[phase_index], dt);
             let previous = Point::from(self.progress.previous_target);
             let previous_jaw = if self.phases[phase_index.saturating_sub(1)].closed {
-                -0.005
+                closed_jaw
             } else {
-                OPEN_JAW_M
+                open_jaw
             };
             if self.within.step == 0 {
-                let tray_y = engine.sample(self.progress.step).tray[1];
-                self.within.release_offset =
-                    tray_y - engine.grasp_site().y + OVEN_CENTERING_GAIN * (tray_y - destination.y);
+                let tray_lat = engine.sample(self.progress.step).tray[lateral];
+                self.within.release_offset = tray_lat - engine.grasp_site()[lateral]
+                    + OVEN_CENTERING_GAIN * (tray_lat - destination[lateral]);
                 capture(engine, self.progress.step, &mut self.samples);
                 self.events.push(Event::Phase {
                     step: self.progress.step,
@@ -1347,11 +1582,13 @@ impl Operation {
                     if task == BakeryTask::Oven {
                         let (offset, fraction) = match name {
                             "align_oven" => (
-                                engine.sample(self.progress.step).tray[1] - engine.grasp_site().y,
+                                engine.sample(self.progress.step).tray[lateral]
+                                    - engine.grasp_site()[lateral],
                                 blend,
                             ),
                             "insert_oven" | "place" => (
-                                engine.sample(self.progress.step).tray[1] - engine.grasp_site().y,
+                                engine.sample(self.progress.step).tray[lateral]
+                                    - engine.grasp_site()[lateral],
                                 1.,
                             ),
                             "release" => (release_offset, 1. - blend),
@@ -1359,24 +1596,25 @@ impl Operation {
                         };
                         let tracking = if closed {
                             OVEN_CENTERING_GAIN
-                                * (engine.sample(self.progress.step).tray[1] - destination.y)
+                                * (engine.sample(self.progress.step).tray[lateral]
+                                    - destination[lateral])
                         } else {
                             0.
                         };
-                        target.y -= fraction
+                        target[lateral] -= fraction
                             * (offset + tracking)
                                 .clamp(-OVEN_CENTERING_LIMIT_M, OVEN_CENTERING_LIMIT_M);
                     } else if task == BakeryTask::Unload && matches!(name, "lift" | "extract_oven")
                     {
-                        let tray_y = engine.sample(self.progress.step).tray[1];
-                        let oven_y = engine.site(BakeryTask::Oven.destination())?.y;
-                        let offset = tray_y - engine.grasp_site().y;
+                        let tray_lat = engine.sample(self.progress.step).tray[lateral];
+                        let oven_lat = engine.site(BakeryTask::Oven.destination())?[lateral];
+                        let offset = tray_lat - engine.grasp_site()[lateral];
                         let fraction = if name == "lift" { blend } else { 1. };
-                        target.y += fraction
-                            * (oven_y
-                                - position.y
+                        target[lateral] += fraction
+                            * (oven_lat
+                                - position[lateral]
                                 - offset
-                                - OVEN_CENTERING_GAIN * (tray_y - oven_y))
+                                - OVEN_CENTERING_GAIN * (tray_lat - oven_lat))
                                 .clamp(-OVEN_CENTERING_LIMIT_M, OVEN_CENTERING_LIMIT_M);
                     }
                     let Some(angles) = engine.solve_ik(target, self.progress.angles) else {
@@ -1393,7 +1631,7 @@ impl Operation {
                     engine.disable_grip();
                     self.progress.grip_disabled = true;
                 }
-                let jaw = if closed { -0.005 } else { OPEN_JAW_M };
+                let jaw = if closed { closed_jaw } else { open_jaw };
                 engine.step(
                     &self.progress.angles,
                     carrying,
@@ -1434,10 +1672,10 @@ impl Operation {
                 if carrying {
                     let sample = engine.sample(self.progress.step);
                     let tray = Point::from_column_slice(&sample.tray[..3]);
-                    let expected = engine.grasp_site() - Point::from(GRASP_OFFSET);
-                    let stable = contains_all(&carried, &GRIP)
+                    let expected = engine.grasp_site() - grasp_offset(is_spanner);
+                    let stable = contains_all(&carried, grip_geoms(is_spanner))
                         && (tray - expected).norm() < 0.025
-                        && orientation_error(&sample.tray) < 5_f64.to_radians();
+                        && orientation_error(&sample.tray, is_spanner) < 5_f64.to_radians();
                     self.progress.lost_steps = if stable {
                         0
                     } else {
@@ -1452,8 +1690,7 @@ impl Operation {
                         )));
                     }
                     if !self.progress.pickup
-                        && !task
-                            .source_supports()
+                        && !task_source_supports(task, is_spanner)
                             .iter()
                             .any(|name| carried.contains(name))
                         && tray.z > self.pickup_height

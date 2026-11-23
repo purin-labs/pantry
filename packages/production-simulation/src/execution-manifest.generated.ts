@@ -3,22 +3,22 @@
 export const PRODUCTION_EXECUTION_MANIFEST = {
   "schemaVersion": 1,
   "bundle": {
-    "id": "55563f1565e199562445f7d1b19d5cd9900e0b738daf48d789561ec2968165ed",
+    "id": "bae80357447dd1760ce88de78a1a3bb28e34f6017f9e346935ad66cea57ba21c",
     "backend": "browser",
     "protocolVersion": 5,
     "checkpointSchemaVersion": 4,
-    "controllerSourceHash": "cd452297febae4d5282644632f0a89e1c982c973418c6c70aea17439e1fe08fa",
-    "controllerHash": "309198252214e06443ca416e8842ae3f3fd591f0a48c69d62fb2bb7687db3369",
-    "runtimeHash": "f15eb077a68221ba5ad6c72390fd7aa504d91b32a81e30f18040f6a79a60cd42",
-    "engineHash": "10602a88ae40b8153bfc01805171da2482c08f551bf1cc479db398310ca948a1"
+    "controllerSourceHash": "cde591e2539d6131e3f288b85be6332999de90a4bb0cc819ac2a6485500ad1ad",
+    "controllerHash": "78df6544de0d7b0a1bf3bdb5c5f240fa3a8240ac55b6e5f60a8f3275db1378d1",
+    "runtimeHash": "f6616e50ec07ae2d951d4d693af0853c935462b1833d94f7fa2957a446f28d35",
+    "engineHash": "5b584ab281cec146b0044c1cfeb5112d4b91c8caa458d1a753864e2341e0fe68"
   },
   "engine": {
     "file": "production-engine.mjs",
-    "sha256": "10602a88ae40b8153bfc01805171da2482c08f551bf1cc479db398310ca948a1",
+    "sha256": "5b584ab281cec146b0044c1cfeb5112d4b91c8caa458d1a753864e2341e0fe68",
     "byteLength": 809959
   },
   "runtime": {
-    "id": "f285511925e4775afe65013b34e327bc36b4c203a05c2c6597bd1ee0dd55d638",
+    "id": "e0d681c26b964f8aa60d2bc54d4b44d8f31eca2b994d5669882e064802a31f3f",
     "files": [
       {
         "file": "bakery-native.js",
@@ -27,13 +27,13 @@ export const PRODUCTION_EXECUTION_MANIFEST = {
       },
       {
         "file": "bakery_native.wasm",
-        "sha256": "6a8e45614cffad8033eb60c227e588f230f9e68142305e62c8afff26135e9f58",
-        "byteLength": 6240487
+        "sha256": "556b63ebe149c8fbce5958d178b2a99dc574c72c678723f6ab38dd2fd6df8360",
+        "byteLength": 6271442
       },
       {
         "file": "models.json",
-        "sha256": "0632c1801b10b0bc8ce048c0db7fae57fde9aa68bbc3e61d804f9ab136654bc6",
-        "byteLength": 22922
+        "sha256": "7650bc6edf291459961ad1c744ae985d8e8dbf01422ed651bd31aaab3572ff84",
+        "byteLength": 23479
       },
       {
         "file": "models-aicoh-ms-30.pack",
@@ -42,8 +42,8 @@ export const PRODUCTION_EXECUTION_MANIFEST = {
       },
       {
         "file": "models-core.pack",
-        "sha256": "54c0a3c2a51952f1c4c642de70bbb88e0701906e05afe7a70750e00d82cccdf1",
-        "byteLength": 907546
+        "sha256": "9c75c273b93c8ef9ef5b454fefe0b1a7b475d2e5f0026b6031f4d4a09acbcf6c",
+        "byteLength": 908607
       },
       {
         "file": "models-dobot-cr10.pack",
@@ -52,8 +52,8 @@ export const PRODUCTION_EXECUTION_MANIFEST = {
       },
       {
         "file": "models-fairino-fr10.pack",
-        "sha256": "976ab133555e6ff72f2f7f6262f5fdd181ec313f3f206af7f29ac3c15b444f64",
-        "byteLength": 5291386
+        "sha256": "cb649e6a4d8f647a88ade0e7ab8c052231d61c2603b596d55bc668225809e7f9",
+        "byteLength": 5502786
       },
       {
         "file": "models-fairino-fr5.pack",
