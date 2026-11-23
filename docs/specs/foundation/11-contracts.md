@@ -108,7 +108,8 @@ The helpers follow the Rust and serde rules that their comments name. For exampl
 - **Unicode.** `normalizeCommerceUnicodeV1` (`commerce-contracts/src/unicode.ts`) does
   NFKC, the full case fold, the removal of default ignorable code points and NFKC again.
   Its tables are Unicode 17.0.0 (`COMMERCE_UNICODE_VERSION`). `generate-unicode.mjs`
-  writes them from data files with pinned SHA-256 values.
+  writes them from data files with pinned SHA-256 values. Its `--check` also runs the
+  NFKC lines of `NormalizationTest.txt` against `normalizeCommerceNfkc`.
 - **Time.** `commerce-timestamp.ts` reads an RFC 3339 timestamp as text and keeps
   nanoseconds.
 - **Digests.** A digest uses an encoder that writes the fields in a fixed order:
@@ -222,7 +223,7 @@ parsers. The three run TypeScript only.
 | Machines and plugins                              | `pnpm --filter @purin-labs/commerce-contracts commerce-data:check` | CI                                                                           |
 | Executor wire files are current                   | `pnpm --filter @purin-labs/contracts executor:check`               | In `media:build`, before the Platform type check, the E2E suite and a deploy |
 | Media Wasm build                                  | `pnpm --filter @purin-labs/platform contracts:media`               | The same places                                                              |
-| Unicode tables are current                        | `pnpm --filter @purin-labs/commerce-contracts unicode:check`       | By hand                                                                      |
+| Unicode tables are current and pass the NFKC test | `pnpm --filter @purin-labs/commerce-contracts unicode:check`       | CI (`commerce-components.yml`)                                               |
 | Machines against the commerce spec and the alarms | `pnpm lint:commerce-spec`, `pnpm lint:state-machines`              | `pnpm lint`                                                                  |
 
 ## Rules and limits
@@ -317,8 +318,6 @@ Neighbours:
 - **Timestamps through `Date`.** The record schemas of checkout profiles, shipment
   operations, food service, plugin outputs and the point of sale write a timestamp
   through `Date`, with milliseconds only.
-- **Unicode proof.** No CI step runs `unicode:check`. The generator pins
-  `NormalizationTest.txt`, but no script runs its lines against `normalizeCommerceNfkc`.
 - **Names from the Wasm boundary.** `actor-wasm.ts`, `commerce-wasm.ts`,
   `message-wasm.ts` and the `commerce_wasm_*` error codes remain.
 - **Rust copies.** `crates/workspace-executor/src/contracts.rs` holds Rust copies of

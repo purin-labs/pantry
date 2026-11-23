@@ -145,9 +145,57 @@ async function generate() {
   if (process.argv.includes("--check")) {
     if ((await readFile(output, "utf8")) !== text)
       throw new Error("Unicode tables are stale");
+    const problems = await nfkcConformanceProblems();
+    if (problems.length > 0)
+      throw new Error(
+        `normalizeCommerceNfkc fails ${problems.length} NormalizationTest.txt checks:\n${problems.slice(0, 20).join("\n")}`,
+      );
   } else {
     await writeFile(output, text);
   }
+}
+
+// The NFKC conformance test of NormalizationTest.txt for the tables that the
+// check just compared: column 4 is the NFKC form of each of the five
+// columns, and a code point that Part 1 does not list is its own NFKC form.
+async function nfkcConformanceProblems() {
+  const { normalizeCommerceNfkc } = await import("../src/unicode.ts");
+  const problems = [];
+  const listed = new Set();
+  let part = "";
+  for (const line of (await readUnicodeSource("NormalizationTest.txt")).split(
+    "\n",
+  )) {
+    if (line.startsWith("@")) {
+      part = line.split("#")[0].trim();
+      continue;
+    }
+    const fields = line.split("#")[0].trim();
+    if (fields.length === 0) continue;
+    const columns = fields.split(";").slice(0, 5).map(columnText);
+    if (part === "@Part1") listed.add(columns[0].codePointAt(0));
+    for (const column of columns)
+      if (normalizeCommerceNfkc(column) !== columns[3])
+        problems.push(`${fields}: NFKC of ${hexCodePoints(column)}`);
+  }
+  for (let codePoint = 0; codePoint <= 0x10ffff; codePoint += 1) {
+    if (listed.has(codePoint) || (codePoint >= 0xd800 && codePoint <= 0xdfff))
+      continue;
+    const character = String.fromCodePoint(codePoint);
+    if (normalizeCommerceNfkc(character) !== character)
+      problems.push(`${hexCodePoints(character)} is not its own NFKC form`);
+  }
+  return problems;
+}
+
+function columnText(field) {
+  return String.fromCodePoint(...codePoints(field));
+}
+
+function hexCodePoints(value) {
+  return [...value]
+    .map((character) => character.codePointAt(0).toString(16).toUpperCase())
+    .join(" ");
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) await generate();

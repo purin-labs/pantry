@@ -61,6 +61,12 @@ jobs:
       - name: Check the commerce machines and plugins
         run: pnpm --filter @purin-labs/commerce-contracts commerce-data:check
 
+      - name: Check the commerce Unicode tables
+        # The tables match the pinned Unicode data, and normalizeCommerceNfkc
+        # passes the NFKC test of NormalizationTest.txt. The data files come
+        # from unicode.org and must match their pinned SHA-256.
+        run: pnpm --filter @purin-labs/commerce-contracts unicode:check
+
       - name: Check Commerce types
         run: pnpm commerce:check
 
