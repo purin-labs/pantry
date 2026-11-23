@@ -1,4 +1,5 @@
 import { Type, type Static, type TSchema } from "typebox";
+import { NonNegativeInteger } from "@purin-labs/contract-schema";
 import { Value } from "typebox/value";
 
 import { VOICE_VOCABULARY_LIMITS, voiceEngineIdSchema } from "./voice-engines.ts";
@@ -21,7 +22,7 @@ export const VOICE_GRANT_TTL_MS = 10 * 60_000;
 export const VOICE_DEVICE_HEADER = "x-pantry-voice-device";
 
 const strict = { additionalProperties: false } as const;
-const timestamp = Type.Integer({ minimum: 0 });
+const timestamp = NonNegativeInteger;
 const deviceId = Type.String({ pattern: "^[A-Za-z0-9_-]{16,64}$" });
 const macId = Type.String({ pattern: "^vmac_[a-f0-9]{24}$" });
 const shortText = Type.String({ minLength: 1, maxLength: 64 });

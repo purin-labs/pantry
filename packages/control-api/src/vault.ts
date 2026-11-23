@@ -1,4 +1,8 @@
 import { Type, type Static, type TSchema } from "typebox";
+import {
+  NonNegativeInteger,
+  PositiveInteger,
+} from "@purin-labs/contract-schema";
 import { Value } from "typebox/value";
 
 /**
@@ -22,8 +26,8 @@ function optionalText(maxLength: number) {
 }
 
 const strict = { additionalProperties: false } as const;
-const timestamp = Type.Integer({ minimum: 0 });
-const revision = Type.Integer({ minimum: 1 });
+const timestamp = NonNegativeInteger;
+const revision = PositiveInteger;
 
 /** A Pantry item ID (32 hex) or a 1Password item ID (26 base32 characters). */
 export const vaultItemIdSchema = Type.String({
@@ -198,7 +202,7 @@ export const vaultStoreResultSchema = Type.Union([
           {
             vaultId: onePasswordVaultIdSchema,
             title: text(200),
-            itemCount: Type.Integer({ minimum: 0 }),
+            itemCount: NonNegativeInteger,
           },
           strict,
         ),
@@ -211,8 +215,8 @@ export const vaultStoreResultSchema = Type.Union([
       ok: Type.Literal(true),
       kind: Type.Literal("moved"),
       store: vaultStoreViewSchema,
-      moved: Type.Integer({ minimum: 0 }),
-      remaining: Type.Integer({ minimum: 0 }),
+      moved: NonNegativeInteger,
+      remaining: NonNegativeInteger,
     },
     strict,
   ),

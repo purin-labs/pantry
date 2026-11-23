@@ -1,4 +1,8 @@
 import { Type, type Static } from "typebox";
+import {
+  NonNegativeInteger,
+  PositiveInteger,
+} from "@purin-labs/contract-schema";
 import { Value } from "typebox/value";
 
 import { voiceMacModelStateSchema } from "./voice.ts";
@@ -21,7 +25,7 @@ import type { Variant } from "@purin-labs/type-utils";
 
 export * from "./device-gateway.ts";
 
-const timestamp = Type.Integer({ minimum: 0 });
+const timestamp = NonNegativeInteger;
 const text = Type.String({ minLength: 1, maxLength: 255 });
 
 /** The stations that a device can stand at. These ids already exist. */
@@ -184,7 +188,7 @@ export const deviceViewSchema = Type.Union([
       ]),
       serviceVersion: Type.Union([Type.Null(), text]),
       versionIsCurrent: Type.Boolean(),
-      deviceCount: Type.Integer({ minimum: 0 }),
+      deviceCount: NonNegativeInteger,
     },
     strict,
   ),
@@ -200,7 +204,7 @@ export const deviceViewSchema = Type.Union([
       serial: Type.Union([Type.Null(), text]),
       firmwareVersion: Type.Union([Type.Null(), text]),
       capabilities: Type.Array(deviceCapabilitySchema),
-      revision: Type.Integer({ minimum: 1 }),
+      revision: PositiveInteger,
       enrollment: Type.Union([
         Type.Literal("pending"),
         Type.Literal("active"),

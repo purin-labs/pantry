@@ -1,5 +1,5 @@
 import { Type, type Static } from "typebox";
-import { recordParser } from "@purin-labs/contract-schema";
+import { recordParser, NonNegativeInteger } from "@purin-labs/contract-schema";
 import {
   surfaceAreaSchema,
   surfaceSourceSchema,
@@ -20,9 +20,9 @@ export const caseScreenObservationSchema = Type.Object({
     Type.String({ minLength: 1, maxLength: 120 }),
     Type.Null(),
   ]),
-  capturedAt: Type.Integer({ minimum: 0 }),
+  capturedAt: NonNegativeInteger,
   /** When the person sent the message that carried the page. */
-  sentAt: Type.Integer({ minimum: 0 }),
+  sentAt: NonNegativeInteger,
   sources: Type.Array(surfaceSourceSchema, { maxItems: 200 }),
 });
 

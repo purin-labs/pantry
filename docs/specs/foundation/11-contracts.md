@@ -232,8 +232,10 @@ Rules for a contract writer:
 
 - Put a new contract type or lifecycle in its TypeScript package. Do not add a Rust
   contract type.
-- Use `StrictObject` for a record that refuses unknown fields. Use `SafeInteger`, or a
-  schema that spreads it, for an integer.
+- Use `StrictObject` for a record that refuses unknown fields. Use `SafeInteger`,
+  `NonNegativeInteger` or `PositiveInteger`, or a schema that spreads one of them, for
+  an integer. Each integer schema in `packages/` has a safe upper limit, except one
+  (see Open work).
 - Call the clean and decode passes through `cleanValue`, `decodeValue` and
   `decodeChecked`. Do not call `Value.Clean` or `Value.Decode`.
 - Do not use `Compile`. Do not write a second schema for a value that has a contract.
@@ -297,12 +299,10 @@ Neighbours:
   `noArguments()`. A custom connector tool builds its `jsonSchema(...)` input at run
   time (`custom-connectors/catalog-tools.ts`). No tool takes its `input` from a
   contract package.
-- **Integers with no upper limit.** 78 integer schemas in `packages/` have a `minimum`
-  and no `maximum`, so the schema accepts `2 ** 53`. They are in `kitchen-control-api`
-  (32), `control-api` (27), `commerce-contracts` (16), `contracts` (2) and
-  `production-simulation` (1). The reducer checks the safe range for the 2 in
-  `contracts`. `amountMinor` of a bank payout (`records/api-bank-payouts.ts`) is
-  `Type.Integer()` with no `minimum` and no `maximum`.
+- **One open integer.** An integer schema in `production-simulation`
+  (`src/native/station-replies.ts`) has a `minimum` and no `maximum`. The file is a
+  source of the pinned physics execution bundle, so a change needs a bundle rebuild
+  (`pnpm lint:physics-bundle`).
 - **Schema length.** 81 `Type.String` schemas in `packages/` set a `maxLength`, 60 of
   them in `control-api`. TypeBox counts grapheme clusters, so they do not limit the
   size of a text. The tool inputs in `agent-tools` hold 99 more `maxLength` limits.

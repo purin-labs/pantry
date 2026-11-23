@@ -1,5 +1,5 @@
 import { Type, type Static } from "typebox";
-import { recordParser } from "@purin-labs/contract-schema";
+import { recordParser, NonNegativeInteger } from "@purin-labs/contract-schema";
 import { KITCHEN_SURFACE } from "./surface-observation.ts";
 
 /**
@@ -156,7 +156,7 @@ const pageCommandBindingSchema = Type.Object({
 
 const pageCommandTargetSchema = Type.Object({
   surfaceSessionId: identifier,
-  epoch: Type.Integer({ minimum: 0 }),
+  epoch: NonNegativeInteger,
 });
 
 export const surfacePageCommandSchema = Type.Union([

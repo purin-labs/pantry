@@ -1,4 +1,5 @@
 import { Type, type Static } from "typebox";
+import { NonNegativeInteger } from "@purin-labs/contract-schema";
 
 import { shortText, sourceKey, strict } from "./device-shapes.ts";
 
@@ -81,7 +82,7 @@ const deviceRunStateSchema = Type.Union([
 ]);
 export type DeviceRunState = Static<typeof deviceRunStateSchema>;
 
-const counter = Type.Integer({ minimum: 0 });
+const counter = NonNegativeInteger;
 
 /** Pantry -> gateway: one task for one cobot or the oven. */
 export const cobotTaskMessageSchema = Type.Object(

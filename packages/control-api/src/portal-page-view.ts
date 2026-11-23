@@ -1,4 +1,5 @@
 import { Type, type Static } from "typebox";
+import { NonNegativeInteger } from "@purin-labs/contract-schema";
 
 /**
  * What a Portal page shows when a person sends a chat message from it. The
@@ -18,7 +19,7 @@ export const portalPageViewTableSchema = Type.Object({
   columns: Type.Array(label, { minItems: 1, maxItems: 24 }),
   rows: Type.Array(Type.Array(cell, { maxItems: 24 }), { maxItems: 200 }),
   /** The number of rows on the page; rows past the limit are left out. */
-  totalRows: Type.Integer({ minimum: 0 }),
+  totalRows: NonNegativeInteger,
 });
 
 export const portalPageViewSectionSchema = Type.Object({
@@ -34,7 +35,7 @@ export const portalPageViewSchema = Type.Object({
   page: Type.String({ minLength: 1, maxLength: 60, pattern: "^[a-z0-9-]+$" }),
   title: label,
   path: Type.String({ minLength: 1, maxLength: 400, pattern: "^/" }),
-  capturedAt: Type.Integer({ minimum: 0 }),
+  capturedAt: NonNegativeInteger,
   sections: Type.Array(portalPageViewSectionSchema, { maxItems: 12 }),
 });
 

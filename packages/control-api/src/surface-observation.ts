@@ -1,5 +1,5 @@
 import { Type, type Static } from "typebox";
-import { recordParser } from "@purin-labs/contract-schema";
+import { recordParser, NonNegativeInteger } from "@purin-labs/contract-schema";
 import { portalPageViewSectionSchema } from "./portal-page-view.ts";
 
 /**
@@ -59,7 +59,7 @@ export const surfaceSourceSchema = Type.Object({
 export const surfaceInstanceSchema = Type.Object({
   browserInstanceId: identifier,
   surfaceSessionId: identifier,
-  epoch: Type.Integer({ minimum: 0 }),
+  epoch: NonNegativeInteger,
 });
 
 /**
@@ -81,7 +81,7 @@ export const surfaceObservationSchema = Type.Object({
   title: label,
   path: Type.String({ minLength: 1, maxLength: 400, pattern: "^/" }),
   record: Type.Union([surfaceRecordSchema, Type.Null()]),
-  capturedAt: Type.Integer({ minimum: 0 }),
+  capturedAt: NonNegativeInteger,
   /** What the model reads. A page with no capture sends none. */
   view: Type.Array(portalPageViewSectionSchema, { maxItems: 12 }),
   /**
@@ -100,7 +100,7 @@ export const chatOriginSchema = Type.Object({
   page: surfaceName,
   title: label,
   record: Type.Union([surfaceRecordSchema, Type.Null()]),
-  startedAt: Type.Integer({ minimum: 0 }),
+  startedAt: NonNegativeInteger,
 });
 
 export type SurfaceArea = Static<typeof surfaceAreaSchema>;

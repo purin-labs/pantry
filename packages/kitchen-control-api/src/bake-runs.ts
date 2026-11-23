@@ -1,5 +1,9 @@
 import { Type, type Static, type TSchema } from "typebox";
-import { recordParser } from "@purin-labs/contract-schema";
+import {
+  recordParser,
+  NonNegativeInteger,
+  PositiveInteger,
+} from "@purin-labs/contract-schema";
 
 /**
  * Plan 24 S4: one approved bake run with two cobots and the oven, as the
@@ -18,7 +22,7 @@ import { recordParser } from "@purin-labs/contract-schema";
  */
 
 const text = Type.String({ minLength: 1 });
-const time = Type.Integer({ minimum: 0 });
+const time = NonNegativeInteger;
 const seconds = Type.Number();
 function nullable<T extends TSchema>(schema: T) {
   return Type.Union([schema, Type.Null()]);
@@ -30,20 +34,20 @@ const placeSchema = Type.Object({
     Type.Literal("oven"),
     Type.Literal("cooling_rack"),
   ]),
-  shelf: Type.Integer({ minimum: 1 }),
+  shelf: PositiveInteger,
 });
 
 const taskSchema = Type.Union([
   Type.Object({
     kind: Type.Literal("move_mould_group"),
-    mouldGroup: Type.Integer({ minimum: 1 }),
+    mouldGroup: PositiveInteger,
     from: placeSchema,
     to: placeSchema,
   }),
   Type.Object({
     kind: Type.Literal("bake"),
-    programSeconds: Type.Integer({ minimum: 1 }),
-    temperatureC: Type.Integer({ minimum: 1 }),
+    programSeconds: PositiveInteger,
+    temperatureC: PositiveInteger,
   }),
 ]);
 
@@ -63,7 +67,7 @@ const stepKind = Type.Union([
 const taskViewSchema = Type.Object({
   key: text,
   kind: stepKind,
-  mouldGroup: nullable(Type.Integer({ minimum: 1 })),
+  mouldGroup: nullable(PositiveInteger),
   sourceKey: text,
   task: taskSchema,
   requestId: nullable(text),
@@ -103,7 +107,7 @@ const viewSchema = Type.Object({
   tasks: Type.Array(taskViewSchema),
   groups: Type.Array(
     Type.Object({
-      mouldGroup: Type.Integer({ minimum: 1 }),
+      mouldGroup: PositiveInteger,
       position: positionSchema,
       basis: Type.Union([
         Type.Literal("declared"),
@@ -250,8 +254,8 @@ const runSchema = Type.Object({
   ),
   oven: nullable(
     Type.Object({
-      programSeconds: Type.Integer({ minimum: 1 }),
-      temperatureC: Type.Integer({ minimum: 1 }),
+      programSeconds: PositiveInteger,
+      temperatureC: PositiveInteger,
     }),
   ),
   startedAt: nullable(time),
@@ -261,7 +265,7 @@ const runSchema = Type.Object({
       by: text,
       role,
       at: time,
-      goodPieces: Type.Integer({ minimum: 0 }),
+      goodPieces: NonNegativeInteger,
       receiptId: text,
     }),
   ),

@@ -4,6 +4,10 @@
 // itself. Staff see the capture and record what they did: a refund on the
 // provider, or an order made by hand.
 import { Type, type Static } from "typebox";
+import {
+  NonNegativeInteger,
+  PositiveInteger,
+} from "@purin-labs/contract-schema";
 import { normalizedTextSchema, utcTimestampSchema } from "./fields.ts";
 import {
   ImmutableArray,
@@ -37,9 +41,9 @@ export type UnplacedCaptureLifecycle = Static<
 export const commerceUnplacedCaptureV1Schema = ReadonlyStrictObject({
   paymentAttemptId: text,
   checkoutId: text,
-  revision: Type.Integer({ minimum: 1 }),
+  revision: PositiveInteger,
   amount: ReadonlyStrictObject({
-    amountMinor: Type.Integer({ minimum: 0 }),
+    amountMinor: NonNegativeInteger,
     currency: text,
   }),
   /** The provider's payment, for a refund on the provider's dashboard. */
@@ -73,7 +77,7 @@ export const parseCommerceUnplacedCaptureV1 = wireRecordParser(
 /** Staff record what they did for a capture with no order. */
 export const resolveCommerceUnplacedCaptureV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.resolve-unplaced-capture.v1"),
-  expectedRevision: Type.Integer({ minimum: 1 }),
+  expectedRevision: PositiveInteger,
   resolution: unplacedCaptureResolutionSchema,
   note: Type.Optional(text),
 });

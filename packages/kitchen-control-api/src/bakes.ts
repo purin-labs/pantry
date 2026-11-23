@@ -1,5 +1,9 @@
 import { Type, type Static } from "typebox";
-import { recordParser } from "@purin-labs/contract-schema";
+import {
+  recordParser,
+  NonNegativeInteger,
+  PositiveInteger,
+} from "@purin-labs/contract-schema";
 
 /**
  * Plan 24 S1: the stock levels of fresh products and the bake proposals that
@@ -14,7 +18,7 @@ const kitchenLocation = Type.String({
   pattern: "^[\\p{L}\\p{N}][\\p{L}\\p{N} _-]{0,63}$",
 });
 const pieces = Type.Integer({ minimum: 1, maximum: 10_000 });
-const time = Type.Integer({ minimum: 0 });
+const time = NonNegativeInteger;
 const role = Type.Union([
   Type.Literal("owner"),
   Type.Literal("admin"),
@@ -30,7 +34,7 @@ const stockLevelInputSchema = Type.Object(
     workflowId,
     kitchenLocation,
     /** The revision that the person saw, or null for a new level. */
-    expectedRevision: Type.Union([Type.Integer({ minimum: 1 }), Type.Null()]),
+    expectedRevision: Type.Union([PositiveInteger, Type.Null()]),
   },
   { additionalProperties: false },
 );
@@ -67,7 +71,7 @@ const authorityInputSchema = Type.Object(
     kitchenLocation,
     mode: authorityMode,
     /** The revision that the person saw, or null for a location with none. */
-    expectedRevision: Type.Union([Type.Integer({ minimum: 1 }), Type.Null()]),
+    expectedRevision: Type.Union([PositiveInteger, Type.Null()]),
   },
   { additionalProperties: false },
 );
@@ -77,7 +81,7 @@ const authoritySchema = Type.Object({
   kitchenLocation: Type.String({ minLength: 1 }),
   mode: authorityMode,
   /** Null while the location keeps the default, shadow mode. */
-  revision: Type.Union([Type.Integer({ minimum: 1 }), Type.Null()]),
+  revision: Type.Union([PositiveInteger, Type.Null()]),
   setBy: Type.Union([Type.String({ minLength: 1 }), Type.Null()]),
   setAt: Type.Union([time, Type.Null()]),
 });
@@ -87,19 +91,19 @@ const stockLevelSchema = Type.Object({
   inventoryItemId: id,
   productName: name,
   levelPieces: pieces,
-  piecesPerGroup: Type.Integer({ minimum: 1 }),
+  piecesPerGroup: PositiveInteger,
   workflowId,
   kitchenLocation: Type.String({ minLength: 1 }),
-  revision: Type.Integer({ minimum: 1 }),
+  revision: PositiveInteger,
   setBy: Type.String({ minLength: 1 }),
   setAt: time,
   /** The counter stock now, or null when Pantry has no position for it. */
-  counterPieces: Type.Union([Type.Integer({ minimum: 0 }), Type.Null()]),
+  counterPieces: Type.Union([NonNegativeInteger, Type.Null()]),
   /** The recipe's applied revision, or null when it has none. */
   recipe: Type.Union([
     Type.Object({
       title: Type.String({ minLength: 1 }),
-      revision: Type.Integer({ minimum: 1 }),
+      revision: PositiveInteger,
     }),
     Type.Null(),
   ]),
@@ -120,11 +124,11 @@ const proposalSchema = Type.Object({
   origin: Type.Union([Type.Literal("stock"), Type.Literal("agent")]),
   caseId: Type.String({ minLength: 1 }),
   workflowId,
-  workflowRevision: Type.Integer({ minimum: 1 }),
+  workflowRevision: PositiveInteger,
   workflowDigest: Type.String({ minLength: 64, maxLength: 64 }),
-  quantityPieces: Type.Integer({ minimum: 1 }),
-  mouldGroups: Type.Integer({ minimum: 1 }),
-  piecesPerGroup: Type.Integer({ minimum: 1 }),
+  quantityPieces: PositiveInteger,
+  mouldGroups: PositiveInteger,
+  piecesPerGroup: PositiveInteger,
   kitchenLocation: Type.String({ minLength: 1 }),
   oven: Type.Union([
     Type.Object({
@@ -134,8 +138,8 @@ const proposalSchema = Type.Object({
     Type.Null(),
   ]),
   stockLocationId: Type.Union([Type.String(), Type.Null()]),
-  stockAvailable: Type.Integer({ minimum: 0 }),
-  stockLevel: Type.Integer({ minimum: 1 }),
+  stockAvailable: NonNegativeInteger,
+  stockLevel: PositiveInteger,
   proposedBy: Type.String({ minLength: 1 }),
   proposedAt: time,
   openedAt: Type.Union([time, Type.Null()]),
@@ -184,7 +188,7 @@ const boardSchema = Type.Object({
       holdCode: Type.Union([Type.String({ minLength: 1 }), Type.Null()]),
       startedAt: Type.Union([time, Type.Null()]),
       endedAt: Type.Union([time, Type.Null()]),
-      goodPieces: Type.Union([Type.Integer({ minimum: 0 }), Type.Null()]),
+      goodPieces: Type.Union([NonNegativeInteger, Type.Null()]),
     }),
   ),
   /** The counted products that a level may name. */
@@ -192,14 +196,14 @@ const boardSchema = Type.Object({
     Type.Object({
       inventoryItemId: id,
       name: Type.String({ minLength: 1 }),
-      counterPieces: Type.Union([Type.Integer({ minimum: 0 }), Type.Null()]),
+      counterPieces: Type.Union([NonNegativeInteger, Type.Null()]),
     }),
   ),
   workflows: Type.Array(
     Type.Object({
       workflowId,
       title: Type.String({ minLength: 1 }),
-      revision: Type.Integer({ minimum: 1 }),
+      revision: PositiveInteger,
     }),
   ),
   /** The locations of the shop's gateways on the Devices page. */

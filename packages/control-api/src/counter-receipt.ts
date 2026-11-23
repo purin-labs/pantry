@@ -1,4 +1,5 @@
 import { Type, type Static } from "typebox";
+import { NonNegativeInteger } from "@purin-labs/contract-schema";
 import { Value } from "typebox/value";
 
 import {
@@ -45,8 +46,8 @@ export const counterPrinterJobSchema = Type.Object(
     task: printerTaskSchema,
     state: counterPrinterJobStateSchema,
     replayed: Type.Boolean(),
-    createdAt: Type.Union([Type.Null(), Type.Integer({ minimum: 0 })]),
-    updatedAt: Type.Union([Type.Null(), Type.Integer({ minimum: 0 })]),
+    createdAt: Type.Union([Type.Null(), NonNegativeInteger]),
+    updatedAt: Type.Union([Type.Null(), NonNegativeInteger]),
   },
   strict,
 );

@@ -4,6 +4,7 @@
 // provider is not listed. It names no buyer: the lines and the amount are
 // enough for staff.
 import { Type, type Static } from "typebox";
+import { NonNegativeInteger } from "@purin-labs/contract-schema";
 import { commerceFailedPaymentStepV1Schema } from "./api-failed-payments.ts";
 import { normalizedTextSchema } from "./fields.ts";
 import {
@@ -21,7 +22,7 @@ export type CommercePaymentStepV1 = Static<
 export const commercePaymentsV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.payments.v1"),
   merchantId: normalizedTextSchema,
-  merchantRevision: Type.Integer({ minimum: 0 }),
+  merchantRevision: NonNegativeInteger,
   /** True when the window held more payments than this read returns. */
   truncated: Type.Boolean(),
   steps: ImmutableArray(commercePaymentStepV1Schema),

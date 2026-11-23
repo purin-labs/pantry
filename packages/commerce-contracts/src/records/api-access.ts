@@ -2,6 +2,7 @@
 // installation that packages/commerce-client reads in
 // src/admin-client.ts. `pnpm lint:commerce-spec` reads the scope list here.
 import { Type, type Static } from "typebox";
+import { NonNegativeInteger } from "@purin-labs/contract-schema";
 import {
   ImmutableArray,
   ReadonlyOpenObject,
@@ -134,9 +135,9 @@ export const commerceMerchantClosureV1Schema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.merchant-closure.v1"),
   merchantId: Type.String(),
   closedAt: Type.String(),
-  revokedCredentials: Type.Integer({ minimum: 0 }),
-  removedWebhookSubscriptions: Type.Integer({ minimum: 0 }),
-  removedStripeAccounts: Type.Integer({ minimum: 0 }),
+  revokedCredentials: NonNegativeInteger,
+  removedWebhookSubscriptions: NonNegativeInteger,
+  removedStripeAccounts: NonNegativeInteger,
   /** `revoked` at Square, `forgotten` here only, or `none`. */
   square: Type.Union([
     Type.Literal("revoked"),

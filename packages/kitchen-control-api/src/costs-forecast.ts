@@ -1,4 +1,5 @@
 import { Type, type Static } from "typebox";
+import { NonNegativeInteger } from "@purin-labs/contract-schema";
 import {
   calculateBakeryCostsAndMargins,
   defaultCostAssumptions,
@@ -8,7 +9,7 @@ import {
   type SupplyLotCost,
 } from "./costs.ts";
 
-const nonNegativeInt = Type.Integer({ minimum: 0 });
+const nonNegativeInt = NonNegativeInteger;
 
 export const FORECAST_HORIZON_WEEKS = 12;
 

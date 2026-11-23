@@ -1,4 +1,5 @@
 import { Type, type Static } from "typebox";
+import { NonNegativeInteger } from "@purin-labs/contract-schema";
 import { Value } from "typebox/value";
 
 /**
@@ -9,7 +10,7 @@ import { Value } from "typebox/value";
  */
 
 const strict = { additionalProperties: false } as const;
-const timestamp = Type.Integer({ minimum: 0 });
+const timestamp = NonNegativeInteger;
 
 export const INBOX_PREVIEW_MAX = 200;
 

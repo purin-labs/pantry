@@ -1,5 +1,9 @@
 import { Type, type Static } from "typebox";
-import { recordParser } from "@purin-labs/contract-schema";
+import {
+  recordParser,
+  NonNegativeInteger,
+  PositiveInteger,
+} from "@purin-labs/contract-schema";
 
 /**
  * Comments pinned to a board's elements (Plan 40B phase 5, slice 6), as
@@ -18,7 +22,7 @@ export const menuBoardCommentSchema = Type.Object({
   }),
   /** The reader wrote this comment, so they may delete it. */
   mine: Type.Boolean(),
-  createdAt: Type.Integer({ minimum: 0 }),
+  createdAt: NonNegativeInteger,
 });
 
 export const menuBoardCommentThreadSchema = Type.Object({
@@ -27,7 +31,7 @@ export const menuBoardCommentThreadSchema = Type.Object({
   elementId: boardId,
   /** False when the draft no longer has the element. */
   onBoard: Type.Boolean(),
-  resolvedAt: Type.Union([Type.Integer({ minimum: 0 }), Type.Null()]),
+  resolvedAt: Type.Union([NonNegativeInteger, Type.Null()]),
   resolvedBy: Type.Union([Type.String({ maxLength: 256 }), Type.Null()]),
   comments: Type.Array(menuBoardCommentSchema, { minItems: 1, maxItems: 300 }),
 });
@@ -64,9 +68,9 @@ export const menuBoardVersionSchema = Type.Object({
   ]),
   /** The name a person gave it; empty for the versions the Portal saves. */
   label: Type.String({ maxLength: 80 }),
-  documentRevision: Type.Integer({ minimum: 1 }),
+  documentRevision: PositiveInteger,
   createdBy: Type.Union([Type.String({ maxLength: 256 }), Type.Null()]),
-  createdAt: Type.Integer({ minimum: 0 }),
+  createdAt: NonNegativeInteger,
 });
 
 export type MenuBoardVersionSummary = Static<typeof menuBoardVersionSchema>;

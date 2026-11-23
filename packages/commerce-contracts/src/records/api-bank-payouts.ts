@@ -1,6 +1,7 @@
 // The money that Stripe and Square send to the merchant's bank: how much, the
 // day that it arrives, and the sales that it pays out. It names no bank account.
 import { Type, type Static } from "typebox";
+import { SafeInteger } from "@purin-labs/contract-schema";
 import {
   currencyCodeTextSchema,
   normalizedTextSchema,
@@ -20,7 +21,7 @@ export const commerceBankPayoutV1Schema = ReadonlyStrictObject({
   payoutId: normalizedTextSchema,
   amount: ReadonlyStrictObject({
     /** Negative when the provider takes money back from the bank account. */
-    amountMinor: Type.Integer(),
+    amountMinor: SafeInteger,
     currency: currencyCodeTextSchema,
   }),
   status: Type.Union([

@@ -1,4 +1,5 @@
 import { Type, type Static } from "typebox";
+import { PositiveInteger } from "@purin-labs/contract-schema";
 import { Value } from "typebox/value";
 
 import {
@@ -150,7 +151,7 @@ export const deviceCapabilitySchema = Type.Object(
   {
     id: shortText,
     label: shortText,
-    revision: Type.Integer({ minimum: 1 }),
+    revision: PositiveInteger,
   },
   strict,
 );
@@ -315,7 +316,7 @@ export const platformGatewayMessageSchema = Type.Union([
       requestId: shortText,
       sourceKey,
       paymentAttemptId: shortText,
-      amountMinor: Type.Integer({ minimum: 1 }),
+      amountMinor: PositiveInteger,
       currency: Type.String({ pattern: "^[A-Z]{3}$" }),
       paymentMethod: terminalPaymentMethodSchema,
       expiresAt: shortText,

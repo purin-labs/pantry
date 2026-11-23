@@ -2,6 +2,10 @@
 // said it would be ready, and when that part of the work finished. It names no
 // buyer: the lines and the pickup code are enough for staff.
 import { Type, type Static } from "typebox";
+import {
+  NonNegativeInteger,
+  PositiveInteger,
+} from "@purin-labs/contract-schema";
 import { normalizedTextSchema, utcTimestampSchema } from "./fields.ts";
 import {
   ImmutableArray,
@@ -17,7 +21,7 @@ export const commerceOrderTimeV1Schema = ReadonlyStrictObject({
   code: text,
   channel: Type.Union([Type.Literal("online"), Type.Literal("counter")]),
   amount: ReadonlyStrictObject({
-    amountMinor: Type.Integer({ minimum: 0 }),
+    amountMinor: NonNegativeInteger,
     currency: text,
   }),
   placedAt: utcTimestampSchema,
@@ -35,7 +39,7 @@ export const commerceOrderTimeV1Schema = ReadonlyStrictObject({
   lines: ImmutableArray(
     ReadonlyStrictObject({
       title: Type.Union([text, Type.Null()]),
-      quantity: Type.Integer({ minimum: 1 }),
+      quantity: PositiveInteger,
     }),
   ),
 });
@@ -44,7 +48,7 @@ export type CommerceOrderTimeV1 = Static<typeof commerceOrderTimeV1Schema>;
 export const commerceOrderTimesV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.order-times.v1"),
   merchantId: text,
-  merchantRevision: Type.Integer({ minimum: 0 }),
+  merchantRevision: NonNegativeInteger,
   /** True when the window held more orders than this read returns. */
   truncated: Type.Boolean(),
   orders: ImmutableArray(commerceOrderTimeV1Schema),

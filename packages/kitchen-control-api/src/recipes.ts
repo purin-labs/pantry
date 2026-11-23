@@ -1,12 +1,12 @@
 import { Type, type Static } from "typebox";
-import { recordParser } from "@purin-labs/contract-schema";
+import { recordParser, PositiveInteger } from "@purin-labs/contract-schema";
 import {
   recipeRevisionInputSchema,
   recipeRevisionResourceSchema,
 } from "@purin-labs/commerce-contracts/records/api-food-service";
 
 const text = Type.String({ minLength: 1 });
-const revision = Type.Integer({ minimum: 1 });
+const revision = PositiveInteger;
 const itemSchema = Type.Object({
   id: text,
   name: text,

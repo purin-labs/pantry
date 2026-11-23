@@ -1,6 +1,6 @@
 import { Type, type TSchema } from "typebox";
 import { isRecord, sameJson, sha256HexSync, utf8ByteLength } from "@purin-labs/std";
-import { StrictObject } from "@purin-labs/contract-schema";
+import { StrictObject, NonNegativeInteger } from "@purin-labs/contract-schema";
 import { encodeHarnessCheckpointRecord } from "./digest-encoders.ts";
 import { encodeModelRoute } from "./model-route.ts";
 import {
@@ -74,7 +74,7 @@ const restoreRequestSchema = StrictObject({
   snapshot: Type.Optional(
     Type.Union([
       StrictObject({
-        lastSequence: Type.Integer({ minimum: 0 }),
+        lastSequence: NonNegativeInteger,
         state: agentSessionLifecycleSchema,
       }),
       Type.Null(),
@@ -82,7 +82,7 @@ const restoreRequestSchema = StrictObject({
   ),
   tail: Type.Array(
     StrictObject({
-      sequence: Type.Integer({ minimum: 0 }),
+      sequence: NonNegativeInteger,
       transition: sessionTransitionSchema,
     }),
   ),

@@ -2,6 +2,10 @@
 // first, as staff work through them and as a pickup board shows them. It
 // names no buyer: an order's code and its lines are enough at the counter.
 import { Type, type Static } from "typebox";
+import {
+  NonNegativeInteger,
+  PositiveInteger,
+} from "@purin-labs/contract-schema";
 import { normalizedTextSchema } from "./fields.ts";
 import {
   ImmutableArray,
@@ -10,7 +14,7 @@ import {
 } from "./wire-objects.ts";
 
 const text = normalizedTextSchema;
-const revision = Type.Integer({ minimum: 1 });
+const revision = PositiveInteger;
 
 /**
  * The code that a buyer sees for an order and that staff call out, such as
@@ -74,7 +78,7 @@ export const commercePickupQueueEntryV1Schema = ReadonlyStrictObject({
   lines: ImmutableArray(
     ReadonlyStrictObject({
       title: text,
-      quantity: Type.Integer({ minimum: 0 }),
+      quantity: NonNegativeInteger,
       modifiers: ImmutableArray(text),
     }),
   ),
@@ -87,7 +91,7 @@ export type CommercePickupQueueEntryV1 = Static<
 export const commercePickupQueueV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.pickup-queue.v1"),
   merchantId: text,
-  merchantRevision: Type.Integer({ minimum: 0 }),
+  merchantRevision: NonNegativeInteger,
   entries: ImmutableArray(commercePickupQueueEntryV1Schema),
 });
 export type CommercePickupQueueV1 = Static<

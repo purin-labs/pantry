@@ -3,6 +3,10 @@
 // a new checkout. The read joins those attempts by buyer session. It names no
 // buyer: the lines and the amount are enough for staff.
 import { Type, type Static } from "typebox";
+import {
+  NonNegativeInteger,
+  PositiveInteger,
+} from "@purin-labs/contract-schema";
 import { normalizedTextSchema, utcTimestampSchema } from "./fields.ts";
 import {
   ImmutableArray,
@@ -18,7 +22,7 @@ export const commerceFailedPaymentStepV1Schema = ReadonlyStrictObject({
   follows: Type.Union([text, Type.Null()]),
   channel: Type.Union([Type.Literal("online"), Type.Literal("counter")]),
   amount: ReadonlyStrictObject({
-    amountMinor: Type.Integer({ minimum: 0 }),
+    amountMinor: NonNegativeInteger,
     currency: text,
   }),
   at: utcTimestampSchema,
@@ -30,7 +34,7 @@ export const commerceFailedPaymentStepV1Schema = ReadonlyStrictObject({
   lines: ImmutableArray(
     ReadonlyStrictObject({
       title: Type.Union([text, Type.Null()]),
-      quantity: Type.Integer({ minimum: 1 }),
+      quantity: PositiveInteger,
     }),
   ),
 });
@@ -41,7 +45,7 @@ export type CommerceFailedPaymentStepV1 = Static<
 export const commerceFailedPaymentsV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.failed-payments.v1"),
   merchantId: text,
-  merchantRevision: Type.Integer({ minimum: 0 }),
+  merchantRevision: NonNegativeInteger,
   /** True when the window held more failed payments than this read returns. */
   truncated: Type.Boolean(),
   steps: ImmutableArray(commerceFailedPaymentStepV1Schema),

@@ -1,5 +1,9 @@
 import { Type, type Static } from "typebox";
-import { recordParser } from "@purin-labs/contract-schema";
+import {
+  recordParser,
+  NonNegativeInteger,
+  PositiveInteger,
+} from "@purin-labs/contract-schema";
 import { recipeRevisionResourceSchema } from "@purin-labs/commerce-contracts/records/api-food-service";
 import {
   evaluateCostFormula,
@@ -11,8 +15,8 @@ export * from "./costs-formulas.ts";
 
 const text = Type.String({ minLength: 1 });
 const nullableText = Type.Union([text, Type.Null()]);
-const revision = Type.Integer({ minimum: 1 });
-const nonNegativeInt = Type.Integer({ minimum: 0 });
+const revision = PositiveInteger;
+const nonNegativeInt = NonNegativeInteger;
 
 export const costUnitSchema = Type.Union([
   Type.Literal("each"),
@@ -69,7 +73,7 @@ export type SupplyCostItem = Static<typeof supplyCostItemSchema>;
 const directPackagingInputSchema = Type.Object({
   inventoryItemId: text,
   quantity: Type.Object({
-    amount: Type.Integer({ minimum: 1 }),
+    amount: PositiveInteger,
     scale: nonNegativeInt,
     unit: costUnitSchema,
   }),
