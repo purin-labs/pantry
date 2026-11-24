@@ -1,0 +1,69 @@
+{
+  "about": "Refactor 17, Stage B: the public files of the area devices (the lines of contracts in scripts/layers.json) are the workspace package @purin-labs/area-devices-contract in areas/devices/contract, the contract of the area. The owner decided on 2026-11-24 that a contract imports only the foundation, outside packages and the contract of another area, and scripts/check-layers.mjs holds that rule. scripts/refactor-17/move-module.mjs reads this plan. moduleFrom: the public files of areas/devices that another area imports, and the public files that they import, belong to the plan, and --sync-plan adds each one; stays names each other public file, which stays public in the area (the scope that the owner approved on 2026-11-24). files: a Worker file goes to server/ and a Portal file to ui/, with its sub-path below server/ or ui/ of the area, less a folder contract/ (sourcePrefixes; movedFolders names each public folder that moves whole under another last name). package: the exports map gives each .ts file of server/ and of ui/, each style sheet of ui/, and each .tsx file, which another module imports; the dependencies are the packages that the files import. package.typeCheck false: the files read Env keys that the Actor files of the Worker merge, as the area package does; the Worker program and the Portal program check each file. edits: the source roots of the lints read the folders of the package.",
+  "module": "areas/devices/contract",
+  "moduleFrom": "areas/devices",
+  "target": "areas/devices/contract",
+  "workspaceEntry": "areas/*/contract",
+  "sourcePrefixes": {
+    "areas/devices/server/contract/": "server/",
+    "areas/devices/server/": "server/",
+    "areas/devices/ui/": "ui/"
+  },
+  "movedFolders": {},
+  "stays": [
+    "areas/devices/server/contract/alert-delivery.ts",
+    "areas/devices/server/contract/shop-mac-devices.ts"
+  ],
+  "package": {
+    "name": "@purin-labs/area-devices-contract",
+    "exports": {
+      "./server/*": {
+        "types": "./server/*.ts",
+        "default": "./server/*.ts"
+      }
+    },
+    "dependencies": {
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*"
+    },
+    "devDependencies": ["@cloudflare/workers-types", "tsrs"],
+    "versionsFrom": [
+      "workers/platform/package.json",
+      "apps/portal/package.json"
+    ],
+    "tsconfig": {
+      "extends": "../../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": ["ESNext"],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": ["@cloudflare/workers-types"],
+        "allowImportingTsExtensions": true
+      },
+      "include": ["server/**/*.ts"]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Worker files of the contract package",
+      "find": "PLATFORM_SOURCE.push(\"areas/inbox/contract/server\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"areas/inbox/contract/server\");\n// The Worker side of the contract of the area devices (Refactor 17, Stage B).\nPLATFORM_SOURCE.push(\"areas/devices/contract/server\");\n"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": ["node", "scripts/check-layers.mjs", "--areas", "--write"],
+      "writes": ["docs/layers.md"]
+    }
+  ],
+  "files": {
+    "areas/devices/server/contract/device-commands.ts": "server/device-commands.ts",
+    "areas/devices/server/contract/fleet-stub.ts": "server/fleet-stub.ts"
+  }
+}
