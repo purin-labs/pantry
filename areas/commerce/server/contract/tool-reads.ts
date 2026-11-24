@@ -1,18 +1,116 @@
-import type { prepareCommerceReadForEmbeddedHarness } from "../agent-tools/commerce/handlers";
+import type { CommerceObservationEntity } from "@purin-labs/agent/actors/agent-session-information-flow";
+import type { SessionExecutionAdmission } from "@purin-labs/agent/actors/session-execution-admission";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
+import type { FlowLabel } from "@purin-labs/authority/policy/index";
+import type { CommerceAdminClient } from "@purin-labs/commerce-client";
 import type {
-  admitCommerceReadObservation,
-  prepareSharedCommerceObservation,
-  prepareStaffPageWork,
-  refreshRecipeProjection,
-  requestableReportRead,
-  selectInternalQuerySourceGrant,
-  selectMerchantReportSourceGrant,
-  supplierDirectoryQuery,
-} from "../agent-tools/commerce/read-support";
-import type { readNamedCommerceQuery } from "../entity-plane/context-read";
-import type { parseCommerceGraphQuery } from "../entity-plane/routes";
+  CommerceEntityPlaneError,
+  CommerceGraphQuery,
+  SystemCommerceEntityKind,
+} from "@purin-labs/commerce-contracts";
+import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
+import type { Env } from "@purin-labs/kernel/env";
+import type { Result } from "@purin-labs/kernel/result";
+import type { OrganisationMember } from "@purin-labs/tenancy/data/control-plane";
+import type {
+  CommerceGraphQueryReader,
+  ReadNamedCommerceQuery,
+} from "./graph-reads";
+import type { CommerceContextAssemblyError } from "./read-errors";
 
-export type { PreparedCommerceRead } from "../agent-tools/commerce/read-support";
+/**
+ * The authorized commerce read boundary one turn shares.
+ *
+ * Every commerce read the harness performs needs the same preparation: an
+ * unexpired turn lease, the organisation's commerce system and merchant binding, the
+ * grant that covers the request, the flow label for that grant, an admission
+ * decision, and a reader over the selected source. Preparing it once keeps a
+ * new read tool from acquiring a weaker boundary than the existing one.
+ */
+export type PreparedCommerceRead = Readonly<{
+  execution: SessionExecutionAdmission;
+  merchantId: string;
+  integrationAccountId: string;
+  resourceScope: string;
+  grants: readonly AccessGrant[];
+  label: FlowLabel;
+  reader: CommerceGraphQueryReader;
+  now: string;
+}>;
+
+/** What the staff page tools need before they read or change anything. */
+export type StaffPageWork = Readonly<{
+  member: OrganisationMember;
+  prepared: PreparedCommerceRead;
+  /** The commerce engine client of the person, for the merchant of the page. */
+  context: Readonly<{ client: CommerceAdminClient; merchantId: string }>;
+}>;
+
+/** The grants of a turn that one commerce read may select from. */
+type CommerceReadGrantScope = Readonly<{
+  organisationId: string;
+  merchantId: string;
+  grants: readonly AccessGrant[];
+  now: string;
+}>;
+
+/** The grant that one commerce read of a turn selects. */
+type CommerceReadGrantSelection = Result<
+  AccessGrant,
+  CommerceContextAssemblyError
+>;
+
+/** Prepares one commerce read of a turn for the grant that is selected. */
+type PrepareCommerceRead = (
+  env: Env,
+  execution: SessionExecutionAdmission,
+  lease: HarnessTurnLease,
+  assignment: CaseAssignment,
+  selectGrant: (input: CommerceReadGrantScope) => CommerceReadGrantSelection,
+  label: string,
+) => Promise<PreparedCommerceRead>;
+
+/** Records one commerce read as observation evidence of the turn. */
+type AdmitCommerceReadObservation = (
+  storage: DurableObjectStorage,
+  lease: HarnessTurnLease,
+  prepared: PreparedCommerceRead,
+  value: unknown,
+  sourceRevision: number,
+  label: string,
+  observedEntities?: readonly CommerceObservationEntity[],
+) => Promise<void>;
+
+/** The member, the read and the client of a tool that acts as a staff page. */
+type PrepareStaffPageWork = (
+  env: Env,
+  execution: SessionExecutionAdmission,
+  lease: HarnessTurnLease,
+  assignment: CaseAssignment,
+  read: "order" | "product" | "recipe_revision" | "supplier_directory",
+  label: string,
+) => Promise<StaffPageWork>;
+
+/** Selects the grant of a merchant report for one entity type. */
+type SelectMerchantReportSourceGrant = (
+  lease: HarnessTurnLease,
+  typeId: SystemCommerceEntityKind,
+  allowedSensitivity: "internal" | "restricted",
+  input: CommerceReadGrantScope,
+) => CommerceReadGrantSelection;
+
+/** Selects the grant of the turn for one graph query, at the internal level. */
+type SelectInternalQuerySourceGrant = (
+  lease: HarnessTurnLease,
+  query: Result<CommerceGraphQuery, CommerceEntityPlaneError>,
+  input: CommerceReadGrantScope,
+) => CommerceReadGrantSelection;
+
+/** A commerce graph query, or why the value is not one. */
+type CommerceGraphQueryParse = Result<
+  CommerceGraphQuery,
+  CommerceEntityPlaneError
+>;
 
 /**
  * The governed commerce reads of a tool handler, as a service interface of
@@ -23,25 +121,31 @@ export type { PreparedCommerceRead } from "../agent-tools/commerce/read-support"
  */
 export type CommerceToolReads = Readonly<{
   /** Prepares one commerce read of a turn for the grant that is selected. */
-  prepareCommerceRead: typeof prepareCommerceReadForEmbeddedHarness;
+  prepareCommerceRead: PrepareCommerceRead;
   /** A prepared read whose label a shared document may show. */
-  prepareSharedCommerceObservation: typeof prepareSharedCommerceObservation;
+  prepareSharedCommerceObservation: (
+    prepared: PreparedCommerceRead,
+  ) => Promise<PreparedCommerceRead>;
   /** Records one commerce read as observation evidence of the turn. */
-  admitCommerceReadObservation: typeof admitCommerceReadObservation;
+  admitCommerceReadObservation: AdmitCommerceReadObservation;
   /** Turns a denied read into a request that a person can allow. */
-  requestableReportRead: typeof requestableReportRead;
+  requestableReportRead: (typeId: unknown, error: unknown) => never;
   /** The member, the read and the client of a tool that acts as a staff page. */
-  prepareStaffPageWork: typeof prepareStaffPageWork;
+  prepareStaffPageWork: PrepareStaffPageWork;
   /** Asks the commerce projection to read a saved recipe now. */
-  refreshRecipeProjection: typeof refreshRecipeProjection;
+  refreshRecipeProjection: (
+    env: Env,
+    execution: SessionExecutionAdmission,
+    work: StaffPageWork,
+  ) => Promise<void>;
   /** Selects the grant of a merchant report for one entity type. */
-  selectMerchantReportSourceGrant: typeof selectMerchantReportSourceGrant;
+  selectMerchantReportSourceGrant: SelectMerchantReportSourceGrant;
   /** Selects the grant of the turn for one graph query, at the internal level. */
-  selectInternalQuerySourceGrant: typeof selectInternalQuerySourceGrant;
+  selectInternalQuerySourceGrant: SelectInternalQuerySourceGrant;
   /** The graph query of the supplier directory. */
-  supplierDirectoryQuery: typeof supplierDirectoryQuery;
+  supplierDirectoryQuery: (limit: number) => CommerceGraphQueryParse;
   /** Runs one named graph query under the grant that the turn selects. */
-  readNamedCommerceQuery: typeof readNamedCommerceQuery;
+  readNamedCommerceQuery: ReadNamedCommerceQuery;
   /** Parses a commerce graph query. */
-  parseCommerceGraphQuery: typeof parseCommerceGraphQuery;
+  parseCommerceGraphQuery: (value: unknown) => CommerceGraphQueryParse;
 }>;

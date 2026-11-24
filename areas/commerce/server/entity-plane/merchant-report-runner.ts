@@ -11,7 +11,7 @@ import {
 } from "./context-read";
 import { normalizeUntrustedCommerceText } from "@purin-labs/agent-tools/context/untrusted-commerce-text";
 import type { Result } from "@purin-labs/kernel/result";
-import type { CommerceGraphReader } from "./graph-reader";
+import type { CommerceGraphQueryReader } from "../contract/graph-reads";
 import {
   merchantReportDefinition,
   type MerchantReportName,
@@ -26,7 +26,7 @@ type MerchantReportRunInput = Readonly<{
   grants: readonly AccessGrant[];
   requestAuthority: RequestAuthority;
   causationId: string;
-  reader: CommerceGraphReader;
+  reader: CommerceGraphQueryReader;
   allowedSensitivity: CommerceSensitivity;
   name: MerchantReportName;
   now: string;

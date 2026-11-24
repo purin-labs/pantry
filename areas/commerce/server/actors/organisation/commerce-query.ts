@@ -8,12 +8,14 @@ import {
 } from "@purin-labs/commerce-client";
 import type { CommerceSqliteRelationshipTraversalPlan } from "@purin-labs/commerce-query-sqlite";
 import type { Result } from "@purin-labs/kernel/result";
-import type { CommerceProjectionKind } from "../../contract/commerce-projection";
 import {
   assertCommerceQueryPlanWithLexicon,
   planCommerceGraphQuery,
 } from "../../commerce-wasm";
-import type { CommerceQueryPlanReadError } from "./commerce-types";
+import type {
+  CommerceProjectionKind,
+  CommerceQueryPlanReadError,
+} from "../../contract/commerce-projection";
 
 export function commerceRelationshipTraversalPlan(
   plan: CommerceQueryPlan,

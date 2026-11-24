@@ -1,7 +1,6 @@
 import { COMMERCE_ENTITY_ATTRIBUTE_RELATION } from "@purin-labs/commerce-query-sqlite";
 import { normalizeCommerceUnicodeV1 } from "@purin-labs/commerce-contracts/unicode";
 import type {
-  CommerceSensitivity,
   SystemCommerceEntityKind,
   SystemRelationshipDefinitionKind,
 } from "@purin-labs/commerce-contracts";
@@ -16,6 +15,12 @@ import {
 import type { Result } from "@purin-labs/kernel/result";
 import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
 import { isCommerceSensitivity } from "../contract/sensitivity";
+import type {
+  CommerceEntityRelationRow,
+  CommerceRelationshipRelationRow,
+} from "../contract/commerce-projection";
+
+export type { CommerceRelationshipRelationRow } from "../contract/commerce-projection";
 const COMMERCE_RELATIONSHIP_INDEX_TABLE =
   "commerce_relationship_relation_index";
 const COMMERCE_ATTRIBUTE_INDEX_TABLE =
@@ -47,41 +52,9 @@ const COMMERCE_QUERY_SCHEMA_PLAN = {
   steps: [],
 } as const;
 
-export type CommerceEntityRelationRow = Readonly<{
-  merchant_id: string;
-  entity_origin: "system";
-  entity_type: string;
-  entity_id: string;
-  revision: number;
-  updated_at: number;
-  display_name: string;
-  display_name_folded: string;
-  search_text_folded: string;
-  payload_json: string;
-}>;
-
 type CommerceEntityRelationRowError = Readonly<{
   readonly code: "commerce_entity_relation_row_invalid";
   readonly field: string;
-}>;
-
-export type CommerceRelationshipRelationRow = Readonly<{
-  merchant_id: string;
-  relationship_origin: "system";
-  relationship_id: string;
-  relationship_revision: number;
-  definition_origin: "system";
-  definition_id: SystemRelationshipDefinitionKind;
-  definition_revision: number;
-  sensitivity: CommerceSensitivity;
-  source_origin: "system";
-  source_type_id: SystemCommerceEntityKind;
-  source_entity_id: string;
-  target_origin: "system";
-  target_type_id: SystemCommerceEntityKind;
-  target_entity_id: string;
-  payload_json: string;
-  provenance_json: string;
 }>;
 
 type CommerceRelationshipRelationRowError = Readonly<{

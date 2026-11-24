@@ -24,7 +24,6 @@ import {
   createCommerceQuerySchema,
   rebuildCommerceRelationshipRelationsForOwner,
 } from "./commerce-query-schema";
-import type { Variant } from "@purin-labs/type-utils";
 import {
   isNonNegativeInteger,
   isPositiveInteger,
@@ -79,14 +78,17 @@ import type {
   ApplyCommerceDeliveryInput,
   CommerceProjectionError,
   CommerceProjectionKind,
+  CommerceProjectionRecord,
   CommerceSystemStorageAuthority,
   PendingCommerceCue,
+  ReadExactCommerceProjectionReferenceInput,
 } from "../contract/commerce-projection";
 import type { CommerceSystemSyncStatus } from "../contract/system-readiness";
 
 export type {
   ApplyCommerceDeliveryInput,
   CommerceProjectionKind,
+  CommerceProjectionRecord,
   CommerceSystemStorageAuthority,
   PendingCommerceCue,
 } from "../contract/commerce-projection";
@@ -118,13 +120,6 @@ export type ReadCurrentCommerceProjectionInput = {
   readonly canonicalId: string;
 };
 
-export type ReadExactCommerceProjectionReferenceInput = {
-  readonly organisationId: OrganisationId;
-  readonly integrationAccountId: IntegrationAccountId;
-  readonly kind: CommerceProjectionKind;
-  readonly canonicalId: string;
-};
-
 export type ReadCommerceProjectionHistoryInput = {
   readonly organisationId: OrganisationId;
   readonly kind: CommerceProjectionKind;
@@ -143,29 +138,6 @@ export type CommerceProjectionHistoryEntry = {
   readonly lastSeenAt: number;
   readonly deliveryCount: number;
 };
-
-type CommerceProjectionRecordBase<
-  TKind extends CommerceProjectionKind,
-  TProjection extends CommerceProjection,
-> = {
-  readonly organisationId: OrganisationId;
-  readonly kind: TKind;
-  readonly canonicalId: string;
-  readonly integrationAccountId: IntegrationAccountId;
-  readonly revision: number;
-  readonly lifecycle: string;
-  readonly projection: TProjection;
-  readonly updatedAt: number;
-  readonly validatedAt: number;
-  readonly labRunId: string | null;
-};
-
-export type CommerceProjectionRecord = {
-  [TKind in CommerceProjectionKind]: CommerceProjectionRecordBase<
-    TKind,
-    Variant<CommerceProjection, TKind>
-  >;
-}[CommerceProjectionKind];
 
 export type CommerceSystemValidationReceipt = {
   readonly validatedResourceCount: number;

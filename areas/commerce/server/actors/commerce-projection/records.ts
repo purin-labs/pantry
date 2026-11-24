@@ -24,7 +24,6 @@ import {
   type CommerceLabProjectionReceipt,
   type CommerceLabRunVerification,
   type CommerceLabTerminalProjectionIdentity,
-  type CommerceProjectionRecord,
   type CueRow,
   type LabActionRow,
   type LabStateRow,
@@ -35,6 +34,7 @@ import {
 import type {
   CommerceProjectionError,
   CommerceProjectionKind,
+  CommerceProjectionRecord,
   PendingCommerceCue,
 } from "../../contract/commerce-projection";
 import { parseCueRows } from "./cues";

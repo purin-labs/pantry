@@ -26,7 +26,6 @@ import { admitSessionInformationFlowObservation } from "@purin-labs/agent/actors
 import {
   createCurrentObservedSourceFlowLabel,
   ObservationEvidence,
-  type FlowLabel,
 } from "@purin-labs/authority/policy/index";
 import { digestCanonical } from "@purin-labs/authority/policy/index";
 import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
@@ -35,31 +34,13 @@ import {
   roleMayOperate,
   type OrganisationMember,
 } from "@purin-labs/tenancy/data/control-plane";
-import { CommerceGraphReader } from "../../entity-plane/graph-reader";
 import { CommerceReadRequestError } from "../../contract/read-errors";
 import { selectNamedCommerceQuerySourceGrant } from "../../entity-plane/context-read";
 import { prepareCommerceReadForEmbeddedHarness } from "./handlers";
-import type { CommerceAdminClient } from "@purin-labs/commerce-client";
-
-/**
- * The authorized commerce read boundary one turn shares.
- *
- * Every commerce read the harness performs needs the same preparation: an
- * unexpired turn lease, the organisation's commerce system and merchant binding, the
- * grant that covers the request, the flow label for that grant, an admission
- * decision, and a reader over the selected source. Preparing it once keeps a
- * new read tool from acquiring a weaker boundary than the existing one.
- */
-export type PreparedCommerceRead = Readonly<{
-  execution: SessionExecutionAdmission;
-  merchantId: string;
-  integrationAccountId: string;
-  resourceScope: string;
-  grants: readonly import("@purin-labs/authority/authorization/access-grants/types").AccessGrant[];
-  label: FlowLabel;
-  reader: CommerceGraphReader;
-  now: string;
-}>;
+import type {
+  PreparedCommerceRead,
+  StaffPageWork,
+} from "../../contract/tool-reads";
 
 /**
  * Records one commerce read as trusted observation evidence for this turn, so
@@ -176,14 +157,6 @@ export async function prepareSharedCommerceObservation(
     now: prepared.now,
   };
 }
-
-/** What the staff page tools need before they read or change anything. */
-export type StaffPageWork = Readonly<{
-  member: OrganisationMember;
-  prepared: PreparedCommerceRead;
-  /** The commerce engine client of the person, for the merchant of the page. */
-  context: Readonly<{ client: CommerceAdminClient; merchantId: string }>;
-}>;
 
 /**
  * The staff page tools (the order queue, sold out today, recipes and suppliers)

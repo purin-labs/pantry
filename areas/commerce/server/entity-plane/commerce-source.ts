@@ -1,135 +1,46 @@
 import type {
   CommerceEntityPlaneClient,
-  CommerceEntityPlanePlannedQueryResponse,
   CommerceEntityPlaneSystemExtensionSidecar,
 } from "@purin-labs/commerce-client";
 import { parseCommerceSnapshotRevision } from "@purin-labs/commerce-client";
 import { isSystemCommerceEntity } from "@purin-labs/commerce-contracts";
 import type {
-  AttributeValueAssignment,
   CommerceEntity,
   CommerceEntityRef,
   SystemCommerceEntityRef,
   CommerceGraphQueryPlanRequest,
   CommerceGraphQueryResult,
   CommerceSnapshotRevision,
-  CommerceSensitivity,
-  MerchantExtensionSchemaRevision,
   CommerceRelationship,
-  CommerceReadWatermark,
   CommerceGraphQuery,
-  CommerceQueryCapabilityProfile,
-  CommerceQueryProjection,
   SourceProvenance,
 } from "@purin-labs/commerce-contracts";
 import type { Result } from "@purin-labs/kernel/result";
 import { errorMessage, isNormalizedText } from "@purin-labs/std";
 import type { CommerceGraphSourceError } from "../contract/read-errors";
+import type {
+  CommerceEngineGraphSource,
+  CommerceGraphCapabilityMetadata,
+  CommerceGraphEntityExtensionSidecar,
+  CommerceGraphHydrationResult,
+  CommerceGraphPlannedSourceResult,
+  CommerceGraphRelationshipStepError,
+  CommerceGraphRelationshipStepInput,
+  CommerceGraphRelationshipStepResult,
+  CommerceGraphSourceQueryOptions,
+  CommerceSourceOptions,
+} from "../contract/graph-reads";
 
-export type CommerceGraphSourceValue = Omit<
-  CommerceGraphQueryResult,
-  "merchantRevision"
-> &
-  Readonly<{
-    /** Commerce owns this cursor. Blotter deliberately returns null. */
-    merchantRevision: CommerceSnapshotRevision | null;
-  }>;
-
-export type CommerceGraphCapabilityMetadata = Readonly<{
-  organisationId: string;
-  merchantId: string;
-  merchantRevision: CommerceSnapshotRevision;
-  watermark: CommerceReadWatermark;
-  capabilities: CommerceQueryCapabilityProfile;
-  projection: CommerceQueryProjection;
-}>;
-
-export type CommerceGraphSourceResult = Result<
-  CommerceGraphSourceValue,
-  CommerceGraphSourceError
->;
-
-export type CommerceGraphRelationshipStepInput = Readonly<{
-  planRequest: CommerceGraphQueryPlanRequest;
-  plan: import("@purin-labs/commerce-contracts").CommerceQueryPlan;
-  frontier: readonly CommerceEntityRef[];
-  remaining: number;
-}>;
-
-export type CommerceGraphRelationshipStepError =
-  | CommerceGraphSourceError
-  | Readonly<{
-      code: "commerce_cursor_mismatch";
-      reason: import("@purin-labs/commerce-contracts").CommerceCursorMismatchReason;
-    }>
-  | Readonly<{
-      code: "commerce_cursor_stale";
-      expected: CommerceReadWatermark;
-      received: CommerceReadWatermark;
-    }>
-  | Readonly<{
-      code: "commerce_query_unsupported";
-      capability: import("@purin-labs/commerce-contracts").CommerceQueryPlanErrorCapability;
-    }>
-  | Readonly<{ code: "invalid_query" }>;
-
-export type CommerceGraphRelationshipStepResult = Result<
-  CommerceGraphSourceValue,
-  CommerceGraphRelationshipStepError
->;
-
-export type CommerceGraphPlannedSourceResult = Result<
-  CommerceEntityPlanePlannedQueryResponse,
-  CommerceGraphSourceError
->;
-
-export type CommerceGraphSourceQueryOptions = Readonly<{
-  sensitivityCeiling: CommerceSensitivity;
-}>;
-
-export type CommerceGraphHydrationResult = Readonly<{
-  merchantRevision: CommerceSnapshotRevision;
-  sidecars: readonly CommerceGraphEntityExtensionSidecar[];
-}>;
-
-export type CommerceGraphEntityExtensionSidecar = Readonly<{
-  entityRef: SystemCommerceEntityRef;
-  attributes: readonly AttributeValueAssignment[];
-  extensionSchemaRevision: MerchantExtensionSchemaRevision | null;
-}>;
-
-export type CommerceGraphSource = Readonly<{
-  readonly source: "commerce" | "blotter";
-  readonly readRelationshipStep?: (
-    input: CommerceGraphRelationshipStepInput,
-    options?: CommerceGraphSourceQueryOptions,
-  ) => Promise<CommerceGraphRelationshipStepResult>;
-  readonly hydrateEntityExtensions?: (
-    references: readonly CommerceEntityRef[],
-    options?: CommerceGraphSourceQueryOptions,
-  ) => Promise<Result<CommerceGraphHydrationResult, CommerceGraphSourceError>>;
-  readonly readSnapshotRevision?: () => Promise<
-    Result<CommerceSnapshotRevision, CommerceGraphSourceError>
-  >;
-  readonly readCapabilityMetadata?: (
-    query: CommerceGraphQuery,
-  ) => Promise<
-    Result<CommerceGraphCapabilityMetadata, CommerceGraphSourceError>
-  >;
-}>;
-
-type CommerceSourceOptions = Readonly<{
-  organisationId: string;
-  merchantId: string;
-  integrationAccountId: string;
-  client: CommerceEntityPlaneClient;
-}>;
+export type {
+  CommerceGraphPlannedSourceResult,
+  CommerceGraphSourceResult,
+} from "../contract/graph-reads";
 
 /**
  * Keeps the Commerce client behind the graph reader's source boundary.
  * The client owns wire parsing; this adapter owns organisation and provenance fencing.
  */
-export class CommerceEngineSource {
+export class CommerceEngineSource implements CommerceEngineGraphSource {
   readonly source = "commerce" as const;
   readonly #organisationId: string;
   readonly #merchantId: string;

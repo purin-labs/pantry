@@ -22,12 +22,12 @@ import {
   assertCommerceGraphQueryWithLexicon,
 } from "../commerce-wasm";
 import type { CommerceActivityReadRequest } from "./activity";
-import {
-  CommerceGraphReader,
-  type CommerceGraphReadInput,
-} from "./graph-reader";
+import type { CommerceGraphReader } from "./graph-reader";
 import type { CommerceGraphReaderError } from "../contract/read-errors";
-import type { CommerceGraphReadAuthority } from "./authority";
+import type {
+  CommerceGraphReadAuthority,
+  CommerceGraphReadInput,
+} from "../contract/graph-reads";
 import type { Variant } from "@purin-labs/type-utils";
 import { isRecord } from "@purin-labs/std";
 import type {

@@ -18,19 +18,21 @@ import { planCommerceGraphQuery } from "../commerce-wasm";
 import {
   enforceCommerceGraphReadAuthority,
   filterCommerceGraphSensitivity,
-  type CommerceGraphReadAuthority,
 } from "./authority";
 import type {
   CommerceGraphCapabilityMetadata,
   CommerceGraphEntityExtensionSidecar,
-  CommerceGraphSource as CommerceGraphQuerySource,
-  CommerceGraphSourceQueryOptions,
-  CommerceGraphSourceValue,
-  CommerceGraphSourceResult,
   CommerceGraphPlannedSourceResult,
+  CommerceGraphQueryReader,
+  CommerceGraphReadAuthority,
+  CommerceGraphReadInput,
   CommerceGraphRelationshipStepInput,
   CommerceGraphRelationshipStepResult,
-} from "./commerce-source";
+  CommerceGraphSource as CommerceGraphQuerySource,
+  CommerceGraphSourceQueryOptions,
+  CommerceGraphSourceResult,
+  CommerceGraphSourceValue,
+} from "../contract/graph-reads";
 import type {
   CommerceGraphReaderError,
   CommerceGraphSourceError,
@@ -107,17 +109,11 @@ export type CommerceGraphHydratingSource = CommerceGraphCommerceSource &
 export type CommerceGraphSource =
   CommerceGraphCommerceSource | CommerceGraphBlotterSource;
 
-export type CommerceGraphReadInput = Readonly<{
-  query: CommerceGraphQuery;
-  authority: CommerceGraphReadAuthority;
-  now: string;
-}>;
-
 /**
  * Composes the merchant extension source with the one selected system source.
  * Callers never choose an adapter or receive an authority-specific DTO.
  */
-export class CommerceGraphReader {
+export class CommerceGraphReader implements CommerceGraphQueryReader {
   readonly #organisationId: string;
   readonly #merchantId: string;
   readonly #commerce: CommerceGraphCommerceSource;
@@ -925,7 +921,7 @@ function staleReaderError(
 
 function relationshipStepReaderFailure(
   query: CommerceGraphQuery,
-  error: import("./commerce-source").CommerceGraphRelationshipStepError,
+  error: import("../contract/graph-reads").CommerceGraphRelationshipStepError,
 ): Result<never, CommerceGraphReaderError> {
   switch (error.code) {
     case "source_unavailable":

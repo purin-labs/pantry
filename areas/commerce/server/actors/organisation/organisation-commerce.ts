@@ -75,25 +75,30 @@ import {
   type CommerceLabSeedInput,
   type CommerceLabVerification,
   type CommerceProjectionHistoryEntry,
-  type CommerceProjectionRecord,
   type CommerceSystemValidationReceipt,
   type ReadCommerceProjectionHistoryInput,
   type ReadCurrentCommerceProjectionInput,
-  type ReadExactCommerceProjectionReferenceInput,
   type ValidateCommerceSystemInput,
 } from "../commerce-projection";
-import type { CommerceSystemSyncStatus } from "../../contract/system-readiness";
 import type {
   AppliedCommerceDeliveryResult,
+  CommerceEntityRelationRow,
   CommerceProjectionError,
+  CommerceProjectionRecord,
+  CommerceQueryPlanReadError,
+  CommerceRelationshipRelationRow,
   InventoryStockChange,
   PendingCommerceCue,
+  ReadCommerceQueryPlanInput,
+  ReadCommerceQueryPlanValue,
+  ReadCommerceRelationshipStepInput,
+  ReadExactCommerceProjectionReferenceInput,
 } from "../../contract/commerce-projection";
+import type { CommerceGraphOrganisationReader } from "../../contract/graph-reads";
+import type { CommerceSystemSyncStatus } from "../../contract/system-readiness";
 import {
   parseCommerceEntityRelationRow,
   parseCommerceRelationshipRelationRow,
-  type CommerceEntityRelationRow,
-  type CommerceRelationshipRelationRow,
 } from "../commerce-query-schema";
 import { admitActorRecovery } from "@purin-labs/actor-runtime/actors/actor-activation";
 import {
@@ -149,11 +154,7 @@ import {
 } from "./commerce-query";
 import type {
   CafeCommerceAcceptanceFaultConsumption,
-  CommerceQueryPlanReadError,
   OrganisationApplyCommerceDeliveryInput,
-  ReadCommerceQueryPlanInput,
-  ReadCommerceQueryPlanValue,
-  ReadCommerceRelationshipStepInput,
 } from "./commerce-types";
 import type { CafeCommerceAcceptanceFaultRecord } from "../../contract/types";
 import type { CodeModeOrganisationActorError } from "@purin-labs/agent/actors/organisation/code-mode-types";
@@ -182,7 +183,7 @@ type StockChangeFollower = Readonly<{
 /**
  * Commerce actions, cues, the commerce lab, Code Mode leases and workspace executor allocation for the Organisation.
  */
-export class OrganisationCommerce {
+export class OrganisationCommerce implements CommerceGraphOrganisationReader {
   constructor(
     private readonly host: OrganisationModuleHost,
     /**

@@ -13,7 +13,6 @@ import type {
   CommerceFreshness,
   CommerceGraphQuery,
   CommerceSensitivity,
-  PantryCommerceReadAuthority,
   CommerceListEntryRef,
   SavedCommerceViewId,
   SavedCommerceViewRevision,
@@ -36,8 +35,9 @@ import {
   isCommerceSensitivity,
   sensitivityAtMost,
 } from "../contract/sensitivity";
+import type { CommerceGraphReadAuthority } from "../contract/graph-reads";
 
-export type CommerceGraphReadAuthority = PantryCommerceReadAuthority;
+export type { CommerceGraphReadAuthority } from "../contract/graph-reads";
 
 type CommerceGraphAuthorityError = CommerceEntityPlaneError;
 

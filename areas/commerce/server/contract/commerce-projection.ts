@@ -5,8 +5,17 @@
 import type { CommerceSystemKind } from "@purin-labs/contracts";
 import type {
   CanonicalCommerceDelivery,
+  CommerceAggregationResult,
   CommerceCueFact,
+  CommerceProjection,
+  CommerceQueryPlanErrorCapability,
+  CommerceReadWatermark,
+  CommerceSensitivity,
+  SystemCommerceEntityKind,
+  SystemCommerceEntityRef,
+  SystemRelationshipDefinitionKind,
 } from "@purin-labs/commerce-contracts";
+import type { Variant } from "@purin-labs/type-utils";
 import type { CommerceCueEvent } from "@purin-labs/agent/cues/engine";
 import type {
   IntegrationAccountId,
@@ -120,4 +129,108 @@ export type InventoryStockChange = Readonly<{
   /** Null when the delivery opened the position. */
   before: InventoryQuantity | null;
   after: InventoryQuantity;
+}>;
+
+export type ReadExactCommerceProjectionReferenceInput = {
+  readonly organisationId: OrganisationId;
+  readonly integrationAccountId: IntegrationAccountId;
+  readonly kind: CommerceProjectionKind;
+  readonly canonicalId: string;
+};
+
+type CommerceProjectionRecordBase<
+  TKind extends CommerceProjectionKind,
+  TProjection extends CommerceProjection,
+> = {
+  readonly organisationId: OrganisationId;
+  readonly kind: TKind;
+  readonly canonicalId: string;
+  readonly integrationAccountId: IntegrationAccountId;
+  readonly revision: number;
+  readonly lifecycle: string;
+  readonly projection: TProjection;
+  readonly updatedAt: number;
+  readonly validatedAt: number;
+  readonly labRunId: string | null;
+};
+
+export type CommerceProjectionRecord = {
+  [TKind in CommerceProjectionKind]: CommerceProjectionRecordBase<
+    TKind,
+    Variant<CommerceProjection, TKind>
+  >;
+}[CommerceProjectionKind];
+
+export type CommerceEntityRelationRow = Readonly<{
+  merchant_id: string;
+  entity_origin: "system";
+  entity_type: string;
+  entity_id: string;
+  revision: number;
+  updated_at: number;
+  display_name: string;
+  display_name_folded: string;
+  search_text_folded: string;
+  payload_json: string;
+}>;
+
+export type CommerceRelationshipRelationRow = Readonly<{
+  merchant_id: string;
+  relationship_origin: "system";
+  relationship_id: string;
+  relationship_revision: number;
+  definition_origin: "system";
+  definition_id: SystemRelationshipDefinitionKind;
+  definition_revision: number;
+  sensitivity: CommerceSensitivity;
+  source_origin: "system";
+  source_type_id: SystemCommerceEntityKind;
+  source_entity_id: string;
+  target_origin: "system";
+  target_type_id: SystemCommerceEntityKind;
+  target_entity_id: string;
+  payload_json: string;
+  provenance_json: string;
+}>;
+
+// The reads of the commerce query relations by the Organisation actor.
+export type CommerceQueryPlanReadError =
+  | {
+      readonly code: "commerce_query_plan_unsupported";
+      readonly capability: CommerceQueryPlanErrorCapability;
+    }
+  | { readonly code: "commerce_query_plan_invalid" }
+  | {
+      readonly code: "commerce_query_plan_stale";
+      readonly expected: CommerceReadWatermark;
+      readonly received: CommerceReadWatermark;
+    }
+  | { readonly code: "commerce_query_relation_corrupt" };
+
+export type ReadCommerceQueryPlanInput = Readonly<{
+  readonly organisationId: OrganisationId;
+  readonly integrationAccountId: IntegrationAccountId;
+  readonly planRequest: unknown;
+  readonly plan: unknown;
+}>;
+
+export type ReadCommerceQueryPlanValue =
+  | Readonly<{
+      readonly kind: "rows";
+      readonly rows: readonly CommerceEntityRelationRow[];
+      readonly records: readonly CommerceProjectionRecord[];
+      readonly hasMore: boolean;
+    }>
+  | Readonly<{
+      readonly kind: "count";
+      readonly aggregation: CommerceAggregationResult;
+    }>;
+
+export type ReadCommerceRelationshipStepInput = Readonly<{
+  readonly organisationId: OrganisationId;
+  readonly integrationAccountId: IntegrationAccountId;
+  readonly planRequest: unknown;
+  readonly plan: unknown;
+  readonly frontier: readonly SystemCommerceEntityRef[];
+  readonly remaining: number;
 }>;

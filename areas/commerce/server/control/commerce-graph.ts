@@ -7,34 +7,19 @@ import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { buildSavedSelectorCommerceReadAuthority } from "../entity-plane/authority";
-import type { CommerceGraphReader } from "../entity-plane/graph-reader";
 import { createCommerceGraphReader } from "../entity-plane/selected-graph-reader";
 import { CommerceEngineSource } from "../entity-plane/commerce-source";
-import {
-  resolveOrganisationCommerceSystem,
-  type CommerceSystemError,
-} from "@purin-labs/connections/data/organisation-commerce-system";
+import { resolveOrganisationCommerceSystem } from "@purin-labs/connections/data/organisation-commerce-system";
 import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
-
-type ControlCommerceGraph = Readonly<{
-  reader: CommerceGraphReader;
-  merchantId: string;
-}>;
-
-type ControlCommerceGraphError = Readonly<{
-  code:
-    | CommerceSystemError["code"]
-    | "organisation_not_found"
-    | "commerce_binding_missing"
-    | "commerce_binding_mismatch"
-    | "commerce_unavailable";
-  status: 404 | 503;
-}>;
+import type {
+  ControlCommerceGraph,
+  ControlCommerceGraphError,
+} from "../contract/graph-reads";
 
 /**
  * The commerce graph of one Organisation, as a person's control request reads

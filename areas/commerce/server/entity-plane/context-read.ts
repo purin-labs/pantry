@@ -22,9 +22,9 @@ import { selectActiveGrants } from "@purin-labs/authority/authorization/access-g
 import { compileCommerceReadAuthorities } from "./grant-authorities";
 import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 import { enforceCommerceGraphReadAuthority } from "./authority";
-import type { CommerceGraphReader } from "./graph-reader";
 import { sensitivityAtMost } from "../contract/sensitivity";
 import type { CommerceContextAssemblyError } from "../contract/read-errors";
+import type { CommerceGraphQueryReader } from "../contract/graph-reads";
 
 export type { CommerceContextAssemblyError } from "../contract/read-errors";
 
@@ -50,7 +50,7 @@ export async function readNamedCommerceQuery(
     readonly causationId: string;
     readonly query: CommerceGraphQuery;
     readonly allowedSensitivity: CommerceSensitivity;
-    readonly reader: CommerceGraphReader;
+    readonly reader: CommerceGraphQueryReader;
     readonly now: string;
   }>,
 ): Promise<Result<CommerceGraphQueryResult, CommerceContextAssemblyError>> {
@@ -72,7 +72,7 @@ export async function assembleCommerceContext(
     readonly requestAuthority: RequestAuthority;
     readonly causationId: string;
     readonly request: CommerceContextRequest;
-    readonly reader: CommerceGraphReader;
+    readonly reader: CommerceGraphQueryReader;
     readonly now: string;
   }>,
 ): Promise<Result<CommerceGraphQueryResult, CommerceContextAssemblyError>> {

@@ -7,7 +7,7 @@ import {
   BlotterSource,
   type BlotterOrganisationReader,
 } from "./blotter-source";
-import type { CommerceEngineSource } from "./commerce-source";
+import type { CommerceEngineGraphSource } from "../contract/graph-reads";
 import { CommerceGraphReader } from "./graph-reader";
 
 export async function createCommerceGraphReader(
@@ -15,7 +15,7 @@ export async function createCommerceGraphReader(
     commerceSystem: CommerceSystem;
     organisationId: OrganisationId;
     merchantId: string;
-    commerce: CommerceEngineSource;
+    commerce: CommerceEngineGraphSource;
     /** The Organisation actor; read only for a provider-backed system. */
     organisation: () => Promise<BlotterOrganisationReader>;
   }>,
