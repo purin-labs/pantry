@@ -1,6 +1,6 @@
 import type { UserId } from "@purin-labs/control-api/ids";
 import { addMissingColumn } from "@purin-labs/actor-runtime/actors/schema-migrations";
-import type { ArchivedMenuBoard } from "../contract/menu-board-commands";
+import type { ArchivedMenuBoard } from "@purin-labs/area-cafe-contract/server/menu-board-commands";
 
 /**
  * Archived menu boards (Plan 40B, board removal). An owner or admin archives
