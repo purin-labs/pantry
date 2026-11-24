@@ -365,7 +365,7 @@ The main code: `workers/platform/src/` with `actors/case/`, `actors/connector/`,
 
 | Action                                                             | Who can do it                                                                                                                            |
 | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Use the Portal chat, the Project routes and the Case command route | Organisation admin and owner; a canvas chat needs operator                                                                               |
+| Use the Portal chat, the Project routes and the Case command route | Organisation admin and owner; a canvas chat needs operator, and an operator sends a private chat message from Café › Register            |
 | Edit the content of a Project                                      | Its personal owner, or an owner or editor of a shared Project                                                                            |
 | Move the Case of a chat                                            | The owner of a private chat, while it is idle. A shared chat moves only through the share command (`case_move_requires_audience_review`) |
 | Move a Case that a source admitted                                 | An Organisation admin, into a shared Project that they own or edit, or to the default                                                    |

@@ -1,6 +1,11 @@
+import { http, type HttpResponseResolver } from "msw";
 import { expect, it } from "vitest";
 import {
+  REGISTER_SURFACE,
   REGISTER_VIEW_COMMANDS,
+  newConversationId,
+  type ConversationId,
+  type SurfaceObservationV2,
   parseOrderQueueEntries,
   type PlatformGatewayMessage,
 } from "@purin-labs/control-api";
@@ -8,10 +13,16 @@ import { parseEnvelope as parseCounterSaleEnvelope } from "@purin-labs/control-a
 import { parseTerminalAssignment } from "@purin-labs/commerce-contracts";
 import { isRecord } from "@purin-labs/std";
 
+import { env } from "cloudflare:workers";
 import { activateTerminalAssignment } from "@purin-labs/area-cafe/server/data/terminal-assignment-store";
-import { parseOrganisationId } from "@purin-labs/kernel/ids";
+import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
+import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { TOOLS } from "../../src/agent-tools/registry";
-import { authorizedBakerySurfaceCommands } from "@purin-labs/area-kitchen/server/agent-tools/bakery/page-effects";
 import {
   COOKIE_ENTRY,
   DRINK_ENTRY,
@@ -32,6 +43,20 @@ import {
   send,
 } from "./device-fleet-support";
 import { organisationDatabase } from "./organisation-database";
+import { createBakerySurfaceReceipt } from "@purin-labs/bakery-model/bakery-surface";
+import {
+  finished,
+  lastToolCallName,
+  pendingPageCommand,
+} from "./chat-journey-support";
+import {
+  installMemoryFixture,
+  joinMember,
+  post,
+  type Member,
+} from "./memory-support";
+import { network } from "./network";
+import { openRouterText, openRouterToolCall } from "./slack-journey-support";
 
 it(
   "runs Café › Register as an operator for cash + modifiers + order queue handover, refuses viewer, and keeps Sous Chef free of money movement",
@@ -40,13 +65,222 @@ it(
 );
 
 it(
+  "lets an operator stage the Register basket from a private Portal chat, and refuses a viewer and a chat without the Register page",
+  { timeout: 240_000 },
+  operatorRegisterChatJourney,
+);
+
+it(
   "collects FeliCa over GMO stera LAN gateway via DeviceFleetActor, enforces terminal exclusivity and result_unknown lock across socket drop/reconnect, refuses to retire or replace the counter until the sale records the payment, and settles manual cash refund",
   { timeout: 180_000 },
   gmoSteraLanGatewayEndToEndJourney,
 );
 
+const REGISTER_BROWSER = "browser-register-operator";
+const REGISTER_SESSION = "register-session-1";
+
+/** Café › Register as the operator's browser sends it with a message. */
+function registerObservation(basket: string): SurfaceObservationV2 {
+  return {
+    kind: "surface-observation",
+    schemaVersion: 2,
+    surface: REGISTER_SURFACE,
+    area: "cafe",
+    instance: {
+      browserInstanceId: REGISTER_BROWSER,
+      surfaceSessionId: REGISTER_SESSION,
+      epoch: 0,
+    },
+    title: "Register",
+    path: "/portal/shop/cafe/register",
+    record: null,
+    capturedAt: Date.now(),
+    view: [
+      {
+        title: "Current basket",
+        facts: [{ label: "Lines", value: basket }],
+        table: null,
+      },
+    ],
+    state: null,
+    commands: [...REGISTER_VIEW_COMMANDS],
+    sources: [],
+  };
+}
+
+/**
+ * Plan 90 D9: a barista at the counter asks the Portal chat to stage an
+ * order. The operator's private chat message carries the Register page, the
+ * agent stages two financiers, and the command reaches the operator's
+ * Register page, which answers with its receipt. A viewer's message is
+ * refused, and so is an operator's message that carries no Register page.
+ */
+async function operatorRegisterChatJourney(): Promise<void> {
+  const { organisationId, route, paths } = await installMemoryFixture();
+  const operator = await joinMember(
+    organisationId,
+    "register-barista",
+    "operator",
+  );
+  const viewer = await joinMember(organisationId, "register-viewer", "viewer");
+  // Each chat turn reads its Case context. The baseline gives that read to
+  // the owner and admin roles, so the owner gives it to the staff in Access.
+  await grantOperatorCaseContext(organisationId);
+  const offered: string[][] = [];
+  network.use(
+    http.post(
+      "https://openrouter.ai/api/v1/chat/completions",
+      stageFinanciers.bind(null, offered),
+    ),
+  );
+  const message = (
+    person: Member,
+    conversationId: ConversationId,
+    observation: SurfaceObservationV2 | undefined,
+  ) =>
+    post(person, paths.chat, {
+      kind: "message",
+      conversationId,
+      requestId: `request_${conversationId}`,
+      model: route.model,
+      text: "Two plain financiers, please.",
+      browserContext: {
+        kind: "available",
+        binding: { browserInstanceId: REGISTER_BROWSER, conversationId },
+      },
+      ...(observation === undefined ? {} : { surfaceObservation: observation }),
+    });
+
+  // A viewer cannot use the chat, also from the Register page.
+  const refusedViewer = await message(
+    viewer,
+    newConversationId(),
+    registerObservation("Empty"),
+  );
+  expect(refusedViewer.status).toBe(404);
+  expect(await refusedViewer.json()).toMatchObject({
+    error: "organisation_role_insufficient",
+  });
+  // An operator's message with no Register page is refused.
+  const refusedOperator = await message(
+    operator,
+    newConversationId(),
+    undefined,
+  );
+  expect(refusedOperator.status).toBe(404);
+  expect(offered).toEqual([]);
+
+  // The operator's private chat message carries the Register page. The agent
+  // stages two financiers, and the command reaches the operator's page.
+  const chat = newConversationId();
+  const sent = await message(operator, chat, registerObservation("Empty"));
+  expect(sent.status, await sent.clone().text()).toBe(200);
+  const effect = await pendingPageCommand(
+    operator,
+    paths.chat,
+    chat,
+    REGISTER_BROWSER,
+  );
+  expect(effect.command).toMatchObject({
+    kind: "page_command",
+    surface: REGISTER_SURFACE,
+    target: { surfaceSessionId: REGISTER_SESSION, epoch: 0 },
+    command: {
+      name: "register_add_item",
+      menuEntryId: "menu_entry_plain_financier",
+      quantity: 2,
+    },
+    binding: { browserInstanceId: REGISTER_BROWSER, conversationId: chat },
+  });
+  // The operator's turn offers the four Register commands and no other page
+  // command.
+  const pageTools = (offered[0] ?? []).filter(
+    (name) => name.startsWith("register_") || name.startsWith("costs_"),
+  );
+  expect(pageTools.sort()).toEqual([...REGISTER_VIEW_COMMANDS].sort());
+
+  // The Register page answers, and the turn ends.
+  const receipt = await createBakerySurfaceReceipt(effect, {
+    kind: "page_completed",
+    observation: registerObservation("2 × Plain financier"),
+  });
+  const settled = await post(
+    operator,
+    `${paths.chat}/surface-effects/${effect.effectId}/receipt`,
+    { receipt },
+  );
+  expect(settled.status, await settled.clone().text()).toBe(200);
+  await finished(operator, chat);
+}
+
+async function grantOperatorCaseContext(
+  organisationId: OrganisationId,
+): Promise<void> {
+  const scope = await requireOrganisationExecutionScope(env, organisationId);
+  const granted = await createAccessGrant({
+    db: scope.database,
+    organisationId,
+    grantId: "grant_register_operator_context",
+    subject: { kind: "organisation_role", role: "operator" },
+    target: {
+      kind: "platform_capability",
+      capabilityId: CONTEXT_CASE_READ_CAPABILITY,
+      capabilityVersion: 1,
+    },
+    provenance: {
+      kind: "baseline",
+      profile: "read_and_propose",
+      profileVersion: 1,
+      materializationReceiptId: "receipt_register_operator_context",
+    },
+    now: Date.now(),
+  });
+  if (!granted.ok) throw new Error(granted.error.code);
+}
+
+/** The scripted model: it stages two financiers in the Register basket. */
+async function stageFinanciers(
+  offered: string[][],
+  { request }: Parameters<HttpResponseResolver>[0],
+): Promise<Response> {
+  const body: unknown = await request.json();
+  if (!isRecord(body) || !Array.isArray(body.messages))
+    throw new Error("Invalid model request");
+  const names = Array.isArray(body.tools)
+    ? body.tools.flatMap((tool: unknown) =>
+        isRecord(tool) &&
+        isRecord(tool.function) &&
+        typeof tool.function.name === "string"
+          ? [tool.function.name]
+          : [],
+      )
+    : [];
+  offered.push(names);
+  const last: unknown = body.messages.at(-1);
+  if (
+    isRecord(last) &&
+    last.role === "tool" &&
+    lastToolCallName(body.messages) === "register_add_item"
+  )
+    return openRouterText(
+      "Two plain financiers are in the basket.",
+      `register_reply_${crypto.randomUUID()}`,
+    );
+  return names.includes("register_add_item")
+    ? openRouterToolCall(
+        "register_add_item",
+        { menuEntryId: "menu_entry_plain_financier", quantity: 2 },
+        `register_call_${crypto.randomUUID()}`,
+      )
+    : openRouterToolCall(
+        "tool_search",
+        { query: "register_add_item", limit: 4 },
+        `register_discover_${crypto.randomUUID()}`,
+      );
+}
+
 async function operatorCashAndRbacJourney(): Promise<void> {
-  const { organisationId, merchantId, locationId, base, owner, staff, viewer } =
+  const { merchantId, locationId, base, owner, staff, viewer } =
     await setupRegisterShop("reg-cash");
 
   // 1. Viewer is refused on Register read and mutations.
@@ -247,26 +481,6 @@ async function operatorCashAndRbacJourney(): Promise<void> {
     ),
   );
   expect(forbiddenMoneyTool).toBeUndefined();
-
-  // Operator receives ONLY Register staging commands (no Kitchen/Costs commands); viewer receives none.
-  const operatorCommands = authorizedBakerySurfaceCommands({
-    kind: "control",
-    organisationId,
-    userId: staff.identity.userId,
-    requesterPersonId: "person_reg-cash_operator",
-    membershipRevision: 1,
-    role: "operator",
-  });
-  expect(operatorCommands).toEqual([...REGISTER_VIEW_COMMANDS]);
-  const viewerCommands = authorizedBakerySurfaceCommands({
-    kind: "control",
-    organisationId,
-    userId: viewer.identity.userId,
-    requesterPersonId: "person_reg-cash_viewer",
-    membershipRevision: 1,
-    role: "viewer",
-  });
-  expect(viewerCommands).toEqual([]);
 
   // Keep owner / merchantId referenced so fixtures stay explicit.
   expect(owner.identity.userId.length).toBeGreaterThan(0);

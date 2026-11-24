@@ -337,7 +337,10 @@ The agent loads more context with its tools, when the task needs it.
   for each location hint, named `public-links:<hint>`) and `WorkspaceExecutorContainer`
   (FND-02).
 - **Routes.** `POST /v1/control/organisations/:id/chat` takes the multipart message. It
-  needs the admin role, or the operator role with the `canvas` query parameter.
+  needs the admin role, or the operator role with the `canvas` query parameter. An
+  operator may also send a message of a private chat that carries Café › Register
+  (`operatorChatPage`, Plan 90 D9); the turn runs while that holds for the latest
+  message (`authorizeConversationExecution`).
   `GET /v1/control/organisations/:id/chat/surface-effects` lists the pending effects of
   one browser id and conversation, and `POST …/chat/surface-effects/:effectId/receipt`
   returns a receipt. These two routes need the operator role. The receipt route checks

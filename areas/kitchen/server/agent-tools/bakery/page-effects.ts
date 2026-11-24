@@ -24,7 +24,7 @@ import { installedBakerySurfaceCommands } from "./surface";
  * admin, whose browser may read the commands. A command checks the page when
  * it runs.
  */
-export function authorizedBakerySurfaceCommands(
+function authorizedBakerySurfaceCommands(
   authority: HarnessTurnLease["requestAuthority"],
 ): readonly string[] {
   if (authority.kind !== "control") return [];

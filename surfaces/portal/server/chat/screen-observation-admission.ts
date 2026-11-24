@@ -1,4 +1,5 @@
 import {
+  REGISTER_SURFACE,
   sharedChatMayCarry,
   type SurfaceObservationV2,
 } from "@purin-labs/control-api";
@@ -89,6 +90,24 @@ export function screenObservationReachesModel(
     observation !== undefined &&
     admitScreenObservation(audience, observation).kind === "admitted"
   );
+}
+
+/**
+ * Whether an operator may send this page to a private chat and run its turn
+ * (Plan 90 D9): Café › Register, whose four commands are the only page
+ * commands of an operator's turn.
+ */
+export function operatorChatPage(
+  observation: SurfaceObservationV2 | undefined,
+): boolean {
+  return observation?.surface === REGISTER_SURFACE;
+}
+
+/** Whether the person's latest message carries the page of an operator. */
+export function latestRequestCarriesOperatorPage(
+  conversation: Conversation,
+): boolean {
+  return operatorChatPage(latestUserObservation(conversation));
 }
 
 function latestUserObservation(

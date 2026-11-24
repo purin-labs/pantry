@@ -9,7 +9,10 @@ import {
   retainChatFiles,
   withChatAttachments,
 } from "@purin-labs/conversation/chat/attachments";
-import { withAdmittedScreenObservation } from "../../chat/screen-observation-admission";
+import {
+  operatorChatPage,
+  withAdmittedScreenObservation,
+} from "../../chat/screen-observation-admission";
 import { checkConversationDisclosure } from "@purin-labs/conversation/chat/conversation-disclosure";
 import {
   authorizeConversation,
@@ -132,14 +135,22 @@ async function handlePortalChatRequest(
   const canvasDocumentId = new URL(request.url).searchParams.get("canvas");
   if (canvasDocumentId !== null && request.method !== "POST")
     return controlError("method_not_allowed", 405);
+  // An operator sends a message of a workspace canvas chat, or of a private
+  // chat that carries Café › Register (Plan 90 D9). The message itself is
+  // checked when it is read.
   const authorized = await authorizeOrganisationRequest(
     request,
     env,
     organisationIdRaw,
-    canvasDocumentId === null ? "admin" : "operator",
+    canvasDocumentId === null && request.method !== "POST"
+      ? "admin"
+      : "operator",
     request.method === "POST",
   );
   if (!authorized.ok) return authorized.response;
+  const operatorOnly =
+    authorized.membership.role !== "owner" &&
+    authorized.membership.role !== "admin";
   const scope: ConversationScope = {
     organisationId: authorized.organisationId,
     userId: authorized.authenticated.session.userId,
@@ -380,6 +391,14 @@ async function handlePortalChatRequest(
       422,
     );
   const command = submission.value.command;
+  if (
+    canvasDocumentId === null &&
+    operatorOnly &&
+    !(
+      command.kind === "message" && operatorChatPage(command.surfaceObservation)
+    )
+  )
+    return controlError("organisation_role_insufficient", 404);
   if (canvasDocumentId !== null) {
     const canvasAccess = await authorizeConversation(
       placement.database,
@@ -418,6 +437,13 @@ async function handlePortalChatRequest(
       stored.conversation.id,
     );
     if (access === null) return controlError("chat_not_found", 404);
+    // The Register page goes only to the operator's own private chat.
+    if (
+      canvasDocumentId === null &&
+      operatorOnly &&
+      access.access.kind !== "private"
+    )
+      return controlError("organisation_role_insufficient", 404);
     if (
       access.access.kind === "workspace_canvas" &&
       (await currentCanvasConversation(

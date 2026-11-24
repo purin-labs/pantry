@@ -125,10 +125,22 @@ export async function installMemoryFixture(): Promise<MemoryFixture> {
   };
 }
 
+/** A new member of the fixture's Organisation with this role. */
+export async function joinMember(
+  organisationId: OrganisationId,
+  subject: string,
+  role: "admin" | "operator" | "viewer",
+): Promise<Member> {
+  return member(
+    organisationId,
+    await nativeMember(organisationId, subject, role),
+  );
+}
+
 async function nativeMember(
   organisationId: OrganisationId,
   subject: string,
-  role: "admin" | "viewer",
+  role: "admin" | "operator" | "viewer",
 ): Promise<OrganisationClient> {
   const client = await commerceClient(subject);
   await addOrganisationMember(organisationId, client, role);

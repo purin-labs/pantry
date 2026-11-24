@@ -164,7 +164,7 @@ export async function runConversation(
           placement,
           scope,
           controlSessionId,
-          conversation.id,
+          conversation,
         ),
         readActiveOrganisationMembershipRevision({
           db: placement.database,
@@ -358,7 +358,7 @@ export async function runConversation(
         placement,
         scope,
         controlSessionId,
-        conversation.id,
+        conversation,
       );
       if (!reauthorized.ok) {
         await interruptConversation(

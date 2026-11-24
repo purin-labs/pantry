@@ -63,6 +63,7 @@ import {
   timelineEventIsCancellation,
 } from "./turn/admission";
 import { failedConversation, settleConversationFailure } from "./turn/failure";
+import { latestRequestCarriesOperatorPage } from "./screen-observation-admission";
 import {
   conversationUsesInferenceSource,
   selectStoredConversationModel,
@@ -237,8 +238,9 @@ export async function authorizeConversationExecution(
   placement: OrganisationExecutionScope,
   scope: ConversationScope,
   controlSessionId: ControlSessionId,
-  conversationId: ConversationId,
+  conversation: Conversation,
 ) {
+  const conversationId = conversation.id;
   if (placement.organisationId !== scope.organisationId)
     return {
       ok: false as const,
@@ -273,10 +275,14 @@ export async function authorizeConversationExecution(
       ok: false as const,
       error: { kind: "authority_invalid" as const },
     };
+  // An operator runs a workspace canvas chat, and a private chat whose
+  // latest message carries Café › Register (Plan 90 D9).
   return membership !== null &&
     (roleMayConfigure(membership.role) ||
-      (access.access.kind === "workspace_canvas" &&
-        membership.role === "operator"))
+      (membership.role === "operator" &&
+        (access.access.kind === "workspace_canvas" ||
+          (access.access.kind === "private" &&
+            latestRequestCarriesOperatorPage(conversation)))))
     ? { ok: true as const, membership, access }
     : {
         ok: false as const,

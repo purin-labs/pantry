@@ -332,15 +332,15 @@ The routes are under `/v1/control/organisations/:id`:
 The role is the role of the person who asked. The agent has no role of its own. A
 proposal tool only stages its proposal. A person approves or confirms it (FND-06).
 
-| What the agent or the person may do                                       | Viewer | Operator                        | Admin and owner |
-| ------------------------------------------------------------------------- | ------ | ------------------------------- | --------------- |
-| Send a message in a Portal chat                                           | No     | In a workspace canvas chat only | Yes             |
-| Give the agent the page on screen                                         | No     | No                              | Yes             |
-| Agent: take a step of a staff page, with the capability                   | No     | Yes, also from Slack            | Yes             |
-| Agent: get the Kitchen, Costs and Pastry Bench commands, in a Portal turn | No     | No                              | Yes             |
-| Agent: get the Register commands, in a Portal turn                        | No     | Offered. See "Open work"        | Yes             |
-| Read the effects that wait, and post a receipt                            | No     | Yes                             | Yes             |
-| Get a relevance suggestion. Read On screen                                | No     | No                              | Yes             |
+| What the agent or the person may do                                       | Viewer | Operator                                                               | Admin and owner |
+| ------------------------------------------------------------------------- | ------ | ---------------------------------------------------------------------- | --------------- |
+| Send a message in a Portal chat                                           | No     | In a workspace canvas chat, and in a private chat from Café › Register | Yes             |
+| Give the agent the page on screen                                         | No     | Café › Register only                                                   | Yes             |
+| Agent: take a step of a staff page, with the capability                   | No     | Yes, also from Slack                                                   | Yes             |
+| Agent: get the Kitchen, Costs and Pastry Bench commands, in a Portal turn | No     | No                                                                     | Yes             |
+| Agent: get the Register commands, in a Portal turn                        | No     | Yes, the only page commands                                            | Yes             |
+| Read the effects that wait, and post a receipt                            | No     | Yes                                                                    | Yes             |
+| Get a relevance suggestion. Read On screen                                | No     | No                                                                     | Yes             |
 
 | Limit                                                                                                                                 | Value                                 | Constant                                                                                                          |
 | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
@@ -401,11 +401,14 @@ erases the D1 rows. The poll of a browser reads only and writes no row.
   The catalog compares only the command name, not the surface.
 - **Old message parts.** The parser reads only `surface_observation`. It refuses a
   stored `page_view` or `surface` part, and a `surfaceContext` key in a message.
-- **Operator and the Register.** An operator turn is offered the four Register
-  commands. The Portal chat needs the admin role, and a canvas chat carries no page.
-  The chat signal socket also needs the admin role, so the page of an operator gets no
-  `surface_effect` signal and uses only the poll. No journey shows an operator who runs
-  a Register command from a chat.
+- **Operator and the Register.** The chat signal socket needs the admin role, so the
+  Register page of an operator gets no `surface_effect` signal and uses only the poll.
+  An operator's chat turn reads its Case context, and the baseline grants
+  `context.case.read` only to the owner and admin roles: an owner grants it to the
+  operator role in Access. A read of a chat (`GET …/chat`) still needs the admin role,
+  so an operator reads no answer of the chat. No browser journey shows the Register
+  page with an operator's chat; `counter-register-journey.test.ts` sends the
+  observation and posts the page receipt.
 - **Pastry Bench in the browser.** `chat-pastry-bench.test.ts` sends the observation
   that the Portal sends for the Pastry Bench. No browser journey proves the two tools.
 - **Origin.** A side Case, a Slack thread and the Case record have no chat origin.
