@@ -1,3 +1,4 @@
+import type { AgentRole } from "@purin-labs/contracts";
 import type {
   CaseExecutionApprovalState,
   CaseExecutionAssignmentState,
@@ -44,7 +45,7 @@ export type CaseTriggerRecord = Readonly<{
 export type CaseAssignmentRecord = Readonly<{
   assignmentId: string;
   sessionId: string;
-  role: "coordinator" | "research" | "specialist";
+  role: AgentRole;
   caseRevision: number;
   state: CaseExecutionAssignmentState;
   startedAt: number | null;

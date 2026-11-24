@@ -74,8 +74,8 @@ import {
   type CommercePublishedCollectionModel,
   type CommerceEntityDossierModel,
 } from "./models";
-import { commerceCollectionQuery, customEntityRef, entityDossierQuery, entityTypePageQuery, readCommerceGraph, readCommerceChanges, searchEntityTypeQuery, systemEntityRef, readCommerceActivity, readPublishedCommerceResources, patchCommerceListEntryStatus, publishCommerceSavedViewPresentation, updateCommerceBoardPresence, type CommerceGraphFetch, type CommerceMutationTransport, type CommercePresenceTransport, type CommerceCollectionSelection, type CommercePublishedResourceMetadata } from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
-import type { CommerceListEntryPatchApprovalAction, CommerceActivityResult } from "@purin-labs/commerce-control-api/portal/entity-plane";
+import { commerceCollectionQuery, customEntityRef, entityDossierQuery, entityTypePageQuery, readCommerceGraph, readCommerceChanges, searchEntityTypeQuery, systemEntityRef, readCommerceActivity, readPublishedCommerceResources, patchCommerceListEntryStatus, publishCommerceSavedViewPresentation, updateCommerceBoardPresence, type CommerceGraphFetch, type CommerceMutationTransport, type CommercePresenceTransport, type CommerceCollectionSelection, type CommercePublishedResourceMetadata } from "./api";
+import type { CommerceListEntryPatchApprovalAction, CommerceActivityCaseState, CommerceActivityResult } from "@purin-labs/commerce-control-api/portal/entity-plane";
 import {
   PurchaseRequestDrawer,
   PurchasingControls,
@@ -3580,22 +3580,16 @@ function commerceActivityEventLabel(
   }
 }
 
-function commerceCaseStateLabel(state: string): string {
+function commerceCaseStateLabel(state: CommerceActivityCaseState): string {
   switch (state) {
     case "open":
       return "opened";
     case "waiting":
       return "waiting";
-    case "completing":
-      return "finishing";
-    case "completed":
-      return "completed";
     case "quarantined":
       return "paused for review";
-    case "archived":
-      return "archived";
     default:
-      return state;
+      return assertNever(state, "Unhandled commerce graph value");
   }
 }
 

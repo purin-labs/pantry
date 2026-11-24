@@ -5,8 +5,9 @@ import {
   isRecord,
 } from "@purin-labs/std";
 
+import { isAgentRole, type AgentRole } from "@purin-labs/contracts";
+
 import {
-  isCaseExecutionAssignmentRole,
   isCaseExecutionAssignmentState,
   type CaseExecutionAssignmentState,
 } from "./case-execution.ts";
@@ -58,7 +59,7 @@ export type CaseTimelineCase = Readonly<{
   source: Readonly<{ at: number; trigger: TimelineTrigger | null }>;
   agent: Readonly<{
     at: number;
-    role: "coordinator" | "research" | "specialist";
+    role: AgentRole;
     state: CaseExecutionAssignmentState;
   }> | null;
   context: Readonly<{
@@ -220,7 +221,7 @@ function parseCase(raw: unknown): CaseTimelineCase | null {
       !isRecord(value) ||
       !hasExactKeys(value, ["at", "role", "state"]) ||
       !isNonNegativeInteger(value.at) ||
-      !isCaseExecutionAssignmentRole(value.role) ||
+      !isAgentRole(value.role) ||
       !isCaseExecutionAssignmentState(value.state)
     )
       return null;

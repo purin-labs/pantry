@@ -40,7 +40,7 @@ const NOW = at(13, 10);
 
 const AGENTS: readonly ScheduledAgent[] = [
   { agentId: "urk", name: "Sous Chef", role: "coordinator" },
-  { agentId: "mailroom", name: "Mailroom", role: "research" },
+  { agentId: "mailroom", name: "Mailroom", role: "specialist" },
   { agentId: "pricing", name: "Pricing", role: "specialist" },
 ];
 
@@ -216,7 +216,7 @@ const SNAPSHOT: AgentOperationsSnapshot = {
   ...EMPTY_AGENT_OPERATIONS_SNAPSHOT,
   definitions: [
     ["agent_urk", "Sous Chef", "coordinator"],
-    ["agent_mailroom", "Mailroom", "research"],
+    ["agent_mailroom", "Mailroom", "specialist"],
   ].map(([agentDefinitionId, displayName, role]) => ({
     agentDefinitionId: agentDefinitionId ?? "",
     displayName: displayName ?? "",

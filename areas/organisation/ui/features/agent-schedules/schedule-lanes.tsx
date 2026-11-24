@@ -1,4 +1,5 @@
 import React from "react";
+import type { AgentRole } from "@purin-labs/contracts";
 
 import {
   duration,
@@ -25,7 +26,7 @@ import {
 export type ScheduledAgent = Readonly<{
   agentId: string;
   name: string;
-  role: "coordinator" | "research" | "specialist";
+  role: AgentRole;
 }>;
 
 export type ScheduleRun = Readonly<{
@@ -59,13 +60,11 @@ type ScheduleLanesProps = Readonly<{
 
 const ROLE_TONE: Record<ScheduledAgent["role"], TimeLanesTone> = {
   coordinator: "violet",
-  research: "blue",
   specialist: "green",
 };
 
 const ROLE_LETTER: Record<ScheduledAgent["role"], string> = {
   coordinator: "A",
-  research: "R",
   specialist: "S",
 };
 

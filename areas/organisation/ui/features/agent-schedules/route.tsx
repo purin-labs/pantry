@@ -138,7 +138,7 @@ function scheduleLanes(
     const agent: ScheduledAgent = {
       agentId: installationId,
       name: definition?.displayName ?? "Agent",
-      role: role === "research" || role === "specialist" ? role : "coordinator",
+      role: role === "specialist" ? role : "coordinator",
     };
     agents.set(installationId, agent);
     return agent;

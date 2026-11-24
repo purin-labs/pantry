@@ -24,7 +24,7 @@ async function verifyChatTraceJourney(page) {
   await page
     .getByRole("button", { name: /^Agent activity Tools and agent runs$/ })
     .click();
-  await page.getByRole("button", { name: /^Research assignment / }).click();
+  await page.getByRole("button", { name: /^Specialist assignment / }).click();
   await page.getByRole("button", { name: /^tool_search / }).click();
   await page.getByText('{"query":"shipment A101"}', { exact: true }).waitFor();
   await page.getByText(/fragile pastry gift/).waitFor({ timeout: 12_000 });

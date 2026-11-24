@@ -1,3 +1,4 @@
+import { isAgentRole } from "@purin-labs/contracts";
 import {
   isNonNegativeInteger,
   isPositiveInteger,
@@ -93,12 +94,6 @@ function sentence(kind: string): string | null {
     ? null
     : clipTitle(`${words[0]?.toUpperCase() ?? ""}${words.slice(1)}`);
 }
-
-const ROLES: readonly CaseAssignmentRecord["role"][] = [
-  "coordinator",
-  "research",
-  "specialist",
-];
 
 /**
  * The execution records of this Case, as its tables hold them. Nothing is
@@ -467,10 +462,10 @@ function assignmentRecord(
   const assignment = isRecord(lifecycle.assignment)
     ? lifecycle.assignment
     : null;
-  const role = ROLES.find((entry) => entry === assignment?.role);
+  const role = assignment?.role;
   if (
     assignment === null ||
-    role === undefined ||
+    !isAgentRole(role) ||
     typeof assignment.assignmentId !== "string" ||
     typeof assignment.sessionId !== "string" ||
     !isNonNegativeInteger(assignment.caseRevision)

@@ -1,3 +1,4 @@
+import { isAgentRole, type AgentRole } from "@purin-labs/contracts";
 import {
   hasExactKeys,
   isNonNegativeInteger,
@@ -135,7 +136,7 @@ export type OpenCaseExecutionNode = Readonly<{ access: "open" }> &
         Readonly<{
           assignmentId: string;
           sessionId: string;
-          role: "coordinator" | "research" | "specialist";
+          role: AgentRole;
           state: CaseExecutionAssignmentState;
           /** The Case revision the assignment was built on. */
           caseRevision: number;
@@ -411,19 +412,10 @@ export function isCaseExecutionNodeKind(
   return oneOf(NODE_KINDS, value);
 }
 
-const ASSIGNMENT_ROLES: readonly ("coordinator" | "research" | "specialist")[] =
-  ["coordinator", "research", "specialist"];
-
 export function isCaseExecutionAssignmentState(
   value: unknown,
 ): value is CaseExecutionAssignmentState {
   return oneOf(ASSIGNMENT_STATES, value);
-}
-
-export function isCaseExecutionAssignmentRole(
-  value: unknown,
-): value is "coordinator" | "research" | "specialist" {
-  return oneOf(ASSIGNMENT_ROLES, value);
 }
 
 export function parseCaseExecutionPage(raw: unknown): CaseExecutionPage | null {
@@ -602,9 +594,7 @@ function parseOpenNode(
       ]) &&
         identifier(raw.assignmentId) &&
         identifier(raw.sessionId) &&
-        (raw.role === "coordinator" ||
-          raw.role === "research" ||
-          raw.role === "specialist") &&
+        isAgentRole(raw.role) &&
         oneOf(ASSIGNMENT_STATES, raw.state) &&
         isNonNegativeInteger(raw.caseRevision) &&
         timeOrNull(raw.startedAt) &&

@@ -166,7 +166,7 @@ function previewNodes(settled: boolean): readonly CaseExecutionNode[] {
     nodeId: "assignment",
     assignmentId: "assignment_preview",
     sessionId,
-    role: "research",
+    role: "specialist",
     state: settled ? "completed" : "running",
     caseRevision: 1,
     startedAt: 1,

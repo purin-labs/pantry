@@ -1,5 +1,6 @@
 import React from "react";
 
+import type { AgentRole } from "@purin-labs/contracts";
 import type {
   CaseTimelineCase,
   CaseTimelineDay,
@@ -128,11 +129,10 @@ const SECTIONS: readonly TimeLanesSection[] = [
   { key: "running", name: "Running", emphasis: false },
   { key: "settled", name: "Settled", emphasis: false },
 ];
-type Holder = "coordinator" | "research" | "specialist" | "person";
+type Holder = AgentRole | "person";
 
 const HOLDER_TONE: Record<Holder, TimeLanesTone> = {
   coordinator: "violet",
-  research: "blue",
   specialist: "green",
   person: "coral",
 };
@@ -140,13 +140,13 @@ const HOLDER_TONE: Record<Holder, TimeLanesTone> = {
 function OwnerKey(): React.ReactNode {
   return (
     <TimeLanesKey
-      owners={(
-        ["coordinator", "research", "specialist", "person"] as const
-      ).map((holder) => ({
-        tone: HOLDER_TONE[holder],
-        letter: holder === "person" ? null : holderInitial(holder),
-        name: holderLabel(holder),
-      }))}
+      owners={(["coordinator", "specialist", "person"] as const).map(
+        (holder) => ({
+          tone: HOLDER_TONE[holder],
+          letter: holder === "person" ? null : holderInitial(holder),
+          name: holderLabel(holder),
+        }),
+      )}
       link="Side Case of"
     />
   );
@@ -320,8 +320,6 @@ function holderLabel(holder: Holder): string {
   switch (holder) {
     case "coordinator":
       return "Agent";
-    case "research":
-      return "Research agent";
     case "specialist":
       return "Specialist agent";
     case "person":
@@ -332,7 +330,7 @@ function holderLabel(holder: Holder): string {
 }
 
 function holderInitial(holder: Holder): string {
-  return holder === "research" ? "R" : holder === "specialist" ? "S" : "A";
+  return holder === "specialist" ? "S" : "A";
 }
 
 function contextLabel(

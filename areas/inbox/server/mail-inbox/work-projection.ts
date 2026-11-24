@@ -14,10 +14,7 @@ export function mailWorkCaseState(lifecycle: CaseLifecycle): MailWorkCaseState {
     case "waiting":
       return { kind: "waiting", reason: lifecycle.wait.kind };
     case "open":
-    case "completing":
-    case "completed":
     case "quarantined":
-    case "archived":
       return { kind: lifecycle.kind };
     default:
       return assertNever(lifecycle);

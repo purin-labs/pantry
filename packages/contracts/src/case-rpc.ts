@@ -281,29 +281,16 @@ export const caseLifecycleSchema = Type.Union([
   Type.Object({ kind: Type.Literal("open"), openedAt: countSchema }),
   Type.Object({
     kind: Type.Literal("waiting"),
-    wait: Type.Union([
-      Type.Object({
-        kind: Type.Literal("input"),
-        triggerId: nonBlankTextSchema,
-      }),
-      Type.Object({
-        kind: Type.Literal("approval"),
-        approvalRequestId: nonBlankTextSchema,
-      }),
-      Type.Object({
-        kind: Type.Literal("schedule"),
-        scheduleId: nonBlankTextSchema,
-      }),
-    ]),
+    wait: Type.Object({
+      kind: Type.Literal("approval"),
+      approvalRequestId: nonBlankTextSchema,
+    }),
   }),
-  Type.Object({ kind: Type.Literal("completing"), startedAt: countSchema }),
-  Type.Object({ kind: Type.Literal("completed"), completedAt: countSchema }),
   Type.Object({
     kind: Type.Literal("quarantined"),
     reason: nonBlankTextSchema,
     quarantinedAt: countSchema,
   }),
-  Type.Object({ kind: Type.Literal("archived"), archivedAt: countSchema }),
 ]);
 
 export const emailProposalEvidenceSchema = Type.Union([

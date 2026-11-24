@@ -845,14 +845,8 @@ function caseStatus(
       return { kind: "neutral", label: "Open" };
     case "waiting":
       return { kind: "warning", label: "Waiting" };
-    case "completing":
-      return { kind: "neutral", label: "Finishing" };
-    case "completed":
-      return { kind: "success", label: "Completed" };
     case "quarantined":
       return { kind: "warning", label: "Needs attention" };
-    case "archived":
-      return { kind: "neutral", label: "Archived" };
     default:
       return assertNever(lifecycle, "Unhandled agent console view");
   }

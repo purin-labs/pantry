@@ -142,7 +142,7 @@ function previewSnapshot(scenario: string | null): AgentOperationsSnapshot {
             pinnedOrganisationId: "organisation_preview",
             purpose: "Check stock for tomorrow’s service",
             revision: 2,
-            lifecycle: "completed",
+            lifecycle: "open",
             assignments: [
               {
                 assignmentId: "assignment_stock",
@@ -182,7 +182,7 @@ function previewSnapshot(scenario: string | null): AgentOperationsSnapshot {
             pinnedOrganisationId: "organisation_preview",
             purpose: "Prepare the weekend menu updates",
             revision: 2,
-            lifecycle: "completed",
+            lifecycle: "open",
             assignments: [],
             outputs: { pending: 0, settled: 1 },
           },

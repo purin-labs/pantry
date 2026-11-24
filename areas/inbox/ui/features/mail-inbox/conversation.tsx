@@ -1339,7 +1339,7 @@ function assignmentLabel(assignment: MailWorkAssignment): string {
 }
 
 function waitsForApproval(state: MailWorkCaseState): boolean {
-  return state.kind === "waiting" && state.reason === "approval";
+  return state.kind === "waiting";
 }
 
 function caseLabel(state: MailWorkCaseState): string {
@@ -1347,24 +1347,9 @@ function caseLabel(state: MailWorkCaseState): string {
     case "open":
       return "Case open";
     case "waiting":
-      switch (state.reason) {
-        case "input":
-          return "Waiting for input";
-        case "approval":
-          return "Waiting for approval";
-        case "schedule":
-          return "Waiting for schedule";
-        default:
-          return assertNever(state);
-      }
-    case "completing":
-      return "Case completing";
-    case "completed":
-      return "Case completed";
+      return "Waiting for approval";
     case "quarantined":
       return "Case quarantined";
-    case "archived":
-      return "Case archived";
     default:
       return assertNever(state);
   }

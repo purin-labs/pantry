@@ -23,6 +23,7 @@ import type {
   SessionProposalDisposition,
   StoredMessageAttachment,
 } from "@purin-labs/contracts";
+import { isAgentRole } from "@purin-labs/contracts";
 import { parseStoredAttachmentList } from "@purin-labs/agent/messages/stored-attachment";
 import { parseStoredAuthorityPartition } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
@@ -244,9 +245,7 @@ export function parseCaseAssignment(value: unknown): CaseAssignment | null {
   const assignment = checked(caseAssignmentSchema, value);
   if (
     assignment === null ||
-    !["coordinator", "research", "specialist"].includes(
-      String(assignment.role),
-    ) ||
+    !isAgentRole(assignment.role) ||
     !["read_and_propose", "approved_provider_writes"].includes(
       String(assignment.authority.capabilityProfile),
     )
@@ -288,12 +287,7 @@ export function parseCaseAssignment(value: unknown): CaseAssignment | null {
     caseId: assignment.caseId,
     caseRevision: assignment.caseRevision,
     sessionId: assignment.sessionId,
-    role:
-      String(assignment.role) === "coordinator"
-        ? "coordinator"
-        : String(assignment.role) === "research"
-          ? "research"
-          : "specialist",
+    role: assignment.role,
     objective: { instruction: assignment.objective.instruction },
     authority: {
       capabilityProfile:
@@ -651,35 +645,20 @@ export function parseLifecycle(value: string): CaseLifecycle | null {
   switch (lifecycle.kind) {
     case "open":
       return { kind: "open", openedAt: lifecycle.openedAt };
-    case "waiting": {
-      const wait = lifecycle.wait;
-      switch (wait.kind) {
-        case "input":
-          return { kind: "waiting", wait: { kind: "input", triggerId: wait.triggerId } };
-        case "approval":
-          return {
-            kind: "waiting",
-            wait: { kind: "approval", approvalRequestId: wait.approvalRequestId },
-          };
-        case "schedule":
-          return {
-            kind: "waiting",
-            wait: { kind: "schedule", scheduleId: wait.scheduleId },
-          };
-      }
-    }
-    case "completing":
-      return { kind: "completing", startedAt: lifecycle.startedAt };
-    case "completed":
-      return { kind: "completed", completedAt: lifecycle.completedAt };
+    case "waiting":
+      return {
+        kind: "waiting",
+        wait: {
+          kind: "approval",
+          approvalRequestId: lifecycle.wait.approvalRequestId,
+        },
+      };
     case "quarantined":
       return {
         kind: "quarantined",
         reason: lifecycle.reason,
         quarantinedAt: lifecycle.quarantinedAt,
       };
-    case "archived":
-      return { kind: "archived", archivedAt: lifecycle.archivedAt };
   }
 }
 

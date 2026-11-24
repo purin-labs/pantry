@@ -7,6 +7,7 @@ import type {
   SessionCommand,
   SessionTransition,
 } from "@purin-labs/contracts";
+import { isAgentRole } from "@purin-labs/contracts";
 import { validateCanonicalSessionAdvance } from "../../actor-wasm";
 import { parseStoredAuthorityPartition } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { Result } from "@purin-labs/kernel/result";
@@ -993,9 +994,7 @@ function isPersistedCaseAssignment(value: unknown): value is CaseAssignment {
     Number.isSafeInteger(value.caseRevision) &&
     Number(value.caseRevision) >= 0 &&
     isNonEmptyString(value.sessionId) &&
-    (value.role === "coordinator" ||
-      value.role === "research" ||
-      value.role === "specialist") &&
+    isAgentRole(value.role) &&
     isNonEmptyString(value.objective.instruction) &&
     hasExactKeys(value.authority, [
       "capabilityProfile",

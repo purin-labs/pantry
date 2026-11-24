@@ -1475,10 +1475,14 @@ async (page) => {
         .waitFor();
       const sideBySide = await sample.evaluate(() => {
         const tops = [...document.querySelectorAll(".brain-canvas-node")]
-          .filter((node) => node.textContent.startsWith("Research assignment"))
+          .filter((node) =>
+            node.textContent.startsWith("Specialist assignment"),
+          )
           .map((node) => Number.parseFloat(node.style.top));
         const lefts = [...document.querySelectorAll(".brain-canvas-node")]
-          .filter((node) => node.textContent.startsWith("Research assignment"))
+          .filter((node) =>
+            node.textContent.startsWith("Specialist assignment"),
+          )
           .map((node) => Number.parseFloat(node.style.left));
         return {
           tops,

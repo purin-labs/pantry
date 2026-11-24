@@ -66,8 +66,8 @@ signed Slack event -> Slack ingress Worker or Platform Worker: verify the signat
 
 ### Assignments, proposals and shared history
 
-- An assignment names the Case revision, the Session, a role (`coordinator`, `research`
-  or `specialist`), an objective, an authority, a budget and a `CaseContextSnapshot`.
+- An assignment names the Case revision, the Session, a role (`coordinator` or
+  `specialist`), an objective, an authority, a budget and a `CaseContextSnapshot`.
 - The snapshot is immutable. Its evidence dependency is `source_only` or one
   `case_context_collection_evidence` revision with its policy revision, its recipient
   digest and its dependency digest.
@@ -92,8 +92,10 @@ signed Slack event -> Slack ingress Worker or Platform Worker: verify the signat
 | `rebase_required`            | A `shared_change` named a revision that is not the current one                                                        |
 | `rejected`                   | `assignment_missing`, `assignment_mismatch`, `session_mismatch`, `empty_proposal`, `invalid_entry` or `case_not_open` |
 
-A commerce proposal that a person must review moves the Case from `open` to `waiting`
-with an `approval` wait. The action nonce is the approval request identity. While the
+A Case lifecycle (`CaseLifecycle`) is `open`, `waiting` or `quarantined`. The only wait
+is an `approval` wait. A stored lifecycle with another value does not parse, and the Case
+reads as corrupt. A commerce proposal that a person must review moves the Case from
+`open` to `waiting` with an `approval` wait. The action nonce is the approval request identity. While the
 Case waits, it accepts only observations with no requested effect. The action ledger of
 the Organisation decides, and the Case returns to `open`. The Case alarm reads the
 ledger if the update is lost. If the caller gives an approval notice, only a Case with
@@ -423,13 +425,8 @@ channel; side Cases for email, WhatsApp, canvas chats and scheduled turns.
 
 ## Open work
 
-- The Case code writes only `open` and `waiting` with an `approval` wait. No code moves
-  a Case to `completing`, `completed` or `archived`, or to an `input` or `schedule`
-  wait. The Case has no `transition` command.
-- Each `assignSession` call is in the code that opens a turn
-  (`actors/case-walking-path.ts`). This code and its callers give only the roles
-  `coordinator` and `specialist`. The role `research` of the contract (`AgentRole`) has
-  no use.
+- The Case has no `transition` command, and no Case completes. A plan that builds Case
+  completion adds its states to `CaseLifecycle`. No Case code writes `quarantined`.
 - No agent holds access to a Project, and a move does not go through the Case Actor.
 - The Project view lists a source-admitted Case with its origin only, with no link to
   its source.

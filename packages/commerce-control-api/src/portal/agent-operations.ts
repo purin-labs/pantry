@@ -124,13 +124,7 @@ type ActiveCaseOperationsView = {
   readonly pinnedOrganisationId: string;
   readonly purpose: string;
   readonly revision: number;
-  readonly lifecycle:
-    | "open"
-    | "waiting"
-    | "completing"
-    | "completed"
-    | "quarantined"
-    | "archived";
+  readonly lifecycle: "open" | "waiting" | "quarantined";
   readonly assignments: readonly {
     readonly assignmentId: string;
     readonly sessionId: string;
@@ -1726,14 +1720,7 @@ function isActionLedgerState(
 function isCaseLifecycle(
   value: unknown,
 ): value is ActiveCaseOperationsView["lifecycle"] {
-  return (
-    value === "open" ||
-    value === "waiting" ||
-    value === "completing" ||
-    value === "completed" ||
-    value === "quarantined" ||
-    value === "archived"
-  );
+  return value === "open" || value === "waiting" || value === "quarantined";
 }
 
 function isCaseAssignmentLifecycle(

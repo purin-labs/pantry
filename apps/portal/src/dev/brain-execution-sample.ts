@@ -38,7 +38,7 @@ const OPEN_NODES: readonly CaseExecutionNode[] = [
     access: "open",
     assignmentId: "assignment_preview_stock",
     sessionId: "session_preview_stock",
-    role: "research",
+    role: "specialist",
     state: "completed",
     caseRevision: 1,
     startedAt: AT + MINUTE,
@@ -51,7 +51,7 @@ const OPEN_NODES: readonly CaseExecutionNode[] = [
     access: "open",
     assignmentId: "assignment_preview_supplier",
     sessionId: "session_preview_supplier",
-    role: "research",
+    role: "specialist",
     state: "completed",
     caseRevision: 1,
     startedAt: AT + MINUTE,
@@ -399,7 +399,7 @@ function longCase(): Readonly<{
         access: "open",
         assignmentId: `assignment_preview_long_${String(lane)}`,
         sessionId,
-        role: "research",
+        role: "specialist",
         state: "completed",
         caseRevision: 1,
         startedAt: AT + MINUTE,
@@ -662,7 +662,7 @@ type TimelineSample = Readonly<{
   caseId: string;
   origin: string;
   title: string | null;
-  role?: "coordinator" | "research" | "specialist";
+  role?: "coordinator" | "specialist";
   /** Hours after the start of the sample day: the agent's work. */
   agent: readonly [number, number | null];
   /** A person's decision, when the Case waited for one. */
@@ -731,7 +731,7 @@ const TIMELINE_SAMPLES: readonly TimelineSample[] = [
     caseId: "case_preview_timeline_reply",
     origin: "inbox_assistant",
     title: null,
-    role: "research",
+    role: "specialist",
     agent: [14.6, null],
     outcome: "running",
   },

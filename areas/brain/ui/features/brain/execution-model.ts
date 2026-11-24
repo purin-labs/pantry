@@ -1,3 +1,4 @@
+import type { AgentRole } from "@purin-labs/contracts";
 import type {
   CaseExecutionCaseRef,
   CaseExecutionContent,
@@ -82,12 +83,10 @@ export function nodeTitle(node: CaseExecutionNode): string {
   }
 }
 
-function roleLabel(role: "coordinator" | "research" | "specialist"): string {
+function roleLabel(role: AgentRole): string {
   switch (role) {
     case "coordinator":
       return "Coordinator assignment";
-    case "research":
-      return "Research assignment";
     case "specialist":
       return "Specialist assignment";
     default:

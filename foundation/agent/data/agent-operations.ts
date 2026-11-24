@@ -364,13 +364,7 @@ export type AgentOperationsSnapshot = {
     readonly pinnedOrganisationId: OrganisationId;
     readonly purpose: string;
     readonly revision: number;
-    readonly lifecycle:
-      | "open"
-      | "waiting"
-      | "completing"
-      | "completed"
-      | "quarantined"
-      | "archived";
+    readonly lifecycle: "open" | "waiting" | "quarantined";
     readonly assignments: readonly {
       readonly assignmentId: string;
       readonly sessionId: string;

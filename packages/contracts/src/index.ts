@@ -6,7 +6,7 @@ export {
 } from "./page-browser-context.ts";
 export type { PortalChatStreamRecord } from "./record-schemas.ts";
 export type { AcceptedInputRef } from "./types/AcceptedInputRef";
-export type { AgentRole } from "./types/AgentRole";
+export { isAgentRole, type AgentRole } from "./types/AgentRole";
 export type { AuthorityPartition } from "./types/AuthorityPartition";
 export type { AuthorityPartitionKey } from "./types/AuthorityPartitionKey";
 export type {

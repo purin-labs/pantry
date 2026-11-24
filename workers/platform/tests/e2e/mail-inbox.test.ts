@@ -5875,7 +5875,7 @@ function workAssignment(
     caseId,
     caseRevision: revision,
     sessionId: "session_work",
-    role: "research",
+    role: "specialist",
     objective: { instruction: "Private assignment objective marker" },
     authority: {
       capabilityProfile: "read_and_propose",
