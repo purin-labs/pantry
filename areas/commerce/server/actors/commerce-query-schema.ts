@@ -14,13 +14,13 @@ import {
 } from "./commerce-schema-baseline";
 import type { Result } from "@purin-labs/kernel/result";
 import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
-import { isCommerceSensitivity } from "../contract/sensitivity";
+import { isCommerceSensitivity } from "@purin-labs/area-commerce-contract/server/sensitivity";
 import type {
   CommerceEntityRelationRow,
   CommerceRelationshipRelationRow,
-} from "../contract/commerce-projection";
+} from "@purin-labs/area-commerce-contract/server/commerce-projection";
 
-export type { CommerceRelationshipRelationRow } from "../contract/commerce-projection";
+export type { CommerceRelationshipRelationRow } from "@purin-labs/area-commerce-contract/server/commerce-projection";
 const COMMERCE_RELATIONSHIP_INDEX_TABLE =
   "commerce_relationship_relation_index";
 const COMMERCE_ATTRIBUTE_INDEX_TABLE =

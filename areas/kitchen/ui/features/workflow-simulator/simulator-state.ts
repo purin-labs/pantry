@@ -41,7 +41,7 @@ import {
   selectionForRun,
   type Selection,
 } from "@purin-labs/production-simulation/simulator/selection";
-import type { CommerceMutationTransport } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/api";
+import type { CommerceMutationTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
 import type {
   RunSnapshotKind,
   RunSnapshotSummary,

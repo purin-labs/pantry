@@ -33,7 +33,7 @@ import {
   type CommerceCollectionSelection,
   type CommerceGraphFetch,
   type CommercePublishedResourceMetadata,
-} from "./api";
+} from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
 import { purchaseRequestRowSummary } from "./purchasing-controls";
 import {
   COMMERCE_VALUE_ABSENT,

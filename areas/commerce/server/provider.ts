@@ -27,7 +27,7 @@ import type {
   ShipmentPackage,
   SourceProvenance,
 } from "@purin-labs/commerce-contracts";
-import type { CommerceCancellationAuthority } from "./contract/action-requests";
+import type { CommerceCancellationAuthority } from "@purin-labs/area-commerce-contract/server/action-requests";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   type InstallCommerceMerchantPluginV1,
@@ -66,7 +66,7 @@ import type { Variant } from "@purin-labs/type-utils";
 import { decodeBase64Url, isPositiveInteger } from "@purin-labs/std";
 import {
   commerceCanonicalResourceId,
-} from "./contract/resource-ids";
+} from "@purin-labs/area-commerce-contract/server/resource-ids";
 
 export interface CommerceDeliveryVerifier {
   verify(

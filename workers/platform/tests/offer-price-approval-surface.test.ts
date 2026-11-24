@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { formatOfferPrice } from "@purin-labs/area-commerce/ui/features/governed-actions/commerce";
+import { formatOfferPrice } from "@purin-labs/area-commerce-contract/ui/features/governed-actions/commerce";
 import { parseCommerceActionRecordResponse } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { parseCommerceActionPath } from "@purin-labs/area-commerce/server/action-model";
 

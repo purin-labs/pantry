@@ -22,11 +22,11 @@ import { selectActiveGrants } from "@purin-labs/authority/authorization/access-g
 import { compileCommerceReadAuthorities } from "./grant-authorities";
 import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 import { enforceCommerceGraphReadAuthority } from "./authority";
-import { sensitivityAtMost } from "../contract/sensitivity";
-import type { CommerceContextAssemblyError } from "../contract/read-errors";
-import type { CommerceGraphQueryReader } from "../contract/graph-reads";
+import { sensitivityAtMost } from "@purin-labs/area-commerce-contract/server/sensitivity";
+import type { CommerceContextAssemblyError } from "@purin-labs/area-commerce-contract/server/read-errors";
+import type { CommerceGraphQueryReader } from "@purin-labs/area-commerce-contract/server/graph-reads";
 
-export type { CommerceContextAssemblyError } from "../contract/read-errors";
+export type { CommerceContextAssemblyError } from "@purin-labs/area-commerce-contract/server/read-errors";
 
 type PreparedCommerceContextRead = Readonly<{
   readonly query: CommerceGraphQuery;

@@ -13,11 +13,11 @@ import {
   readPendingCommerceApproval,
   writePendingCommerceApproval,
 } from "../../portal-commerce-approval";
-import { commerceActionStateLabel, commerceActionTitle } from "./commerce";
+import { commerceActionStateLabel, commerceActionTitle } from "@purin-labs/area-commerce-contract/ui/features/governed-actions/commerce";
 import { commerceActionDetailSummary, renderCommerceActionChange } from "./commerce-action-status";
 import { signInForApproval } from "@purin-labs/control/portal/approval-sign-in-popup";
 import { DecisionButtons } from "@purin-labs/ui/index";
-import { GOVERNED_ACTION_ALLOW, governedActionRefusal } from "./decision-labels";
+import { GOVERNED_ACTION_ALLOW, governedActionRefusal } from "@purin-labs/area-commerce-contract/ui/features/governed-actions/decision-labels";
 import "./chat-commerce-action-card.css";
 
 /**

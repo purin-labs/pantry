@@ -54,8 +54,8 @@ vi.mock("@purin-labs/tenancy/data/control-mutation", async (importOriginal) => (
 vi.mock("@purin-labs/control/worker/mutation-receipt", () => ({
   recordCommerceMutationReceipt: counterSaleMocks.recordCommerceMutationReceipt,
 }));
-vi.mock("@purin-labs/area-commerce/server/contract/client", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@purin-labs/area-commerce/server/contract/client")>()),
+vi.mock("@purin-labs/area-commerce-contract/server/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/area-commerce-contract/server/client")>()),
   createCommerceClient: vi.fn(() => ({
     readSnapshot: counterSaleMocks.readSnapshot,
     readCounterSale: counterSaleMocks.readCounterSale,

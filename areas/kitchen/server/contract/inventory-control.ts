@@ -4,14 +4,14 @@ import type {
   ControlMutationReceiptScope,
 } from "@purin-labs/tenancy/data/control-mutation";
 import type { Env } from "@purin-labs/kernel/env";
-import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";
+import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce-contract/server/queue-messages";
 import {
   newRequestId,
   type IntegrationAccountId,
 } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import { admitUserMutation } from "@purin-labs/control/worker/admission/control-mutation";
-import { resolveMerchantControlContext } from "@purin-labs/area-commerce/server/contract/merchant-control";
+import { resolveMerchantControlContext } from "@purin-labs/area-commerce-contract/server/merchant-control";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,

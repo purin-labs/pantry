@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../../../contract/client";
+import { pantryCommerceAccess } from "@purin-labs/area-commerce-contract/server/client";
 import { ensureCaseProject } from "@purin-labs/conversation/projects/case-project";
 import type { OrganisationPlacementBindings } from "@purin-labs/tenancy/organisation-execution-scope";
 import { controlActionMutationExecution } from "@purin-labs/conversation/actors/action-mutation-execution";
@@ -64,7 +64,7 @@ import {
   type CommerceExportPresetError,
 } from "../../../data/export-preset";
 import { prepareTurnAuthority } from "@purin-labs/agent/context/turn-context";
-import { createCommerceOutboxReconcileQueueMessage } from "../../../contract/queue-messages";
+import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce-contract/server/queue-messages";
 import {
   newRequestId,
   parseCaseId,
@@ -95,7 +95,7 @@ import {
   controlMutationIdentity,
   resolveMutationUser,
 } from "@purin-labs/control/worker/admission/control-mutation";
-import { resolveMerchantBinding } from "../../../contract/merchant-control";
+import { resolveMerchantBinding } from "@purin-labs/area-commerce-contract/server/merchant-control";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   controlError,

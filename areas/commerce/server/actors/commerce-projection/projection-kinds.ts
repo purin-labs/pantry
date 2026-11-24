@@ -1,5 +1,5 @@
 import { exhaustiveList } from "@purin-labs/std";
-import type { CommerceProjectionKind } from "../../contract/commerce-projection";
+import type { CommerceProjectionKind } from "@purin-labs/area-commerce-contract/server/commerce-projection";
 
 export const PROJECTION_KINDS = exhaustiveList<CommerceProjectionKind>()([
   "product",

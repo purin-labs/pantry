@@ -6,6 +6,7 @@
   "include": [
     "src/**/*.ts",
     "../../areas/*/server/**/*.ts",
+    "../../areas/*/contract/server/**/*.ts",
     "../../areas/integrations/shopify/**/*.ts",
     "../../surfaces/*/server/**/*.ts",
     "tests/**/*.ts",

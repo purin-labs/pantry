@@ -30,8 +30,8 @@ import {
   readExactCommerceProjectionReference,
   COMMERCE_PROJECTION_STALE_AFTER_MS,
 } from "./commerce-projection";
-import { createCommerceClient } from "../contract/client";
-import { commerceCanonicalResourceId } from "../contract/resource-ids";
+import { createCommerceClient } from "@purin-labs/area-commerce-contract/server/client";
+import { commerceCanonicalResourceId } from "@purin-labs/area-commerce-contract/server/resource-ids";
 import {
   parseCaseId,
   parseIntegrationAccountId,

@@ -11,7 +11,7 @@ import {
 import { isRecord } from "@purin-labs/std";
 import { readReconciliationContext, reconciliationPath } from "./requests";
 import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
-import type { CommerceMutationTransport } from "./entity-plane/api";
+import type { CommerceMutationTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
 import {
   StockDialogCancel,
   StockDialogContext,

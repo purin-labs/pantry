@@ -11,7 +11,7 @@ import { env, exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import { http, type HttpResponseResolver } from "msw";
 import { isRecord } from "@purin-labs/std";
-import { commerceActionTitle } from "@purin-labs/area-commerce/ui/features/governed-actions/commerce";
+import { commerceActionTitle } from "@purin-labs/area-commerce-contract/ui/features/governed-actions/commerce";
 import {
   parseCommerceActionRecordResponse,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";

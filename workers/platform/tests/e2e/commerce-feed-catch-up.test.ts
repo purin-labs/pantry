@@ -9,7 +9,7 @@ import {
   parseOrganisationId,
   parseRequestId,
 } from "@purin-labs/kernel/ids";
-import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";
+import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce-contract/server/queue-messages";
 import { reconcileCommerceOutbox } from "@purin-labs/area-commerce/server/outbox-worker";
 import {
   commerceClient,

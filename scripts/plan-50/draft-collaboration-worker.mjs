@@ -11,8 +11,8 @@ import {
 } from "../../areas/commerce/server/agent-tools/commerce/description-draft-handlers.ts";
 import { settleToolEffect } from "../../foundation/tool-handlers/agent-tools/session-support.ts";
 import { uncheckedEffect } from "../../foundation/agent-tools/tool-effect.ts";
-import { createCommerceClient } from "../../areas/commerce/server/contract/client.ts";
-import { commerceCanonicalResourceId } from "../../areas/commerce/server/contract/resource-ids.ts";
+import { createCommerceClient } from "../../areas/commerce/contract/server/client.ts";
+import { commerceCanonicalResourceId } from "../../areas/commerce/contract/server/resource-ids.ts";
 import { createAccessGrant } from "../../foundation/authority/data/access-grants.ts";
 import { SessionExecutionAdmission } from "../../foundation/agent/actors/session-execution-admission.ts";
 import { createOrganisationInstall } from "../../foundation/tenancy/data/organisation.ts";

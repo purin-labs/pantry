@@ -27,7 +27,7 @@ import {
   requireSessionExecution,
   admittedSessionOperation,
 } from "@purin-labs/agent/actors/session-execution-admission";
-import { createCommerceEntityPlaneClient } from "@purin-labs/area-commerce/server/contract/client";
+import { createCommerceEntityPlaneClient } from "@purin-labs/area-commerce-contract/server/client";
 import {
   recipeCollectionOf,
   saveRecipeDraft,
@@ -39,8 +39,8 @@ import {
   type SupplierRegistrationError,
 } from "../../purchasing/supplier-creation";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import { CommerceReadRequestError } from "@purin-labs/area-commerce/server/contract/read-errors";
-import type { CommerceToolReads } from "@purin-labs/area-commerce/server/contract/tool-reads";
+import { CommerceReadRequestError } from "@purin-labs/area-commerce-contract/server/read-errors";
+import type { CommerceToolReads } from "@purin-labs/area-commerce-contract/server/tool-reads";
 import { assertNever } from "@purin-labs/std";
 import {
   untrustedDeviceText,

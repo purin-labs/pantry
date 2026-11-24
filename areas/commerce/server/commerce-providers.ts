@@ -11,7 +11,7 @@ import {
   connectedCommerceProviders,
   type CommerceProvider,
   type CommerceProviderPermit,
-} from "./contract/commerce-provider";
+} from "@purin-labs/area-commerce-contract/server/commerce-provider";
 
 type CommerceProviders = { [K in CommerceSystemKind]: CommerceProvider<K> };
 

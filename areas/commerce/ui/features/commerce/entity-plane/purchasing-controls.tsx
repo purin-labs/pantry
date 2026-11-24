@@ -17,7 +17,7 @@ import {
   type CommerceGraphFetch,
   type CommerceMutationTransport,
   type PurchaseRequestUpdate,
-} from "./api";
+} from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
 import type {
   CommerceCollectionRow,
   CommercePublishedCollectionModel,

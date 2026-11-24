@@ -36,7 +36,7 @@ import type {
   CommerceProjectionKind,
   CommerceProjectionRecord,
   PendingCommerceCue,
-} from "../../contract/commerce-projection";
+} from "@purin-labs/area-commerce-contract/server/commerce-projection";
 import { parseCueRows } from "./cues";
 import { PROJECTION_KINDS } from "./projection-kinds";
 import { projectionSelectSql, readProjectionLifecycle } from "./validation";

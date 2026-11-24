@@ -14,8 +14,8 @@ import type { DiscoveredProviderResource } from "@purin-labs/connections/data/pr
 import type {
   SquareDelegation,
   CommerceMerchant,
-} from "@purin-labs/area-commerce/server/contract/square-link";
-import { createCommerceClient } from "@purin-labs/area-commerce/server/contract/client";
+} from "@purin-labs/area-commerce-contract/server/square-link";
+import { createCommerceClient } from "@purin-labs/area-commerce-contract/server/client";
 
 const MANUAL_INSTRUCTION = "revoke_square_access_in_square" as const;
 

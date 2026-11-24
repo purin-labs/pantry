@@ -5,7 +5,7 @@ import {
   resolveCommerceMerchant,
   squareDelegationSecret,
   type SquareDelegation,
-} from "@purin-labs/area-commerce/server/contract/square-link";
+} from "@purin-labs/area-commerce-contract/server/square-link";
 import { storeOrganisationPlacementVaultSecret } from "@purin-labs/authority/credential-vault/service";
 import {
   createConnectedIntegration,

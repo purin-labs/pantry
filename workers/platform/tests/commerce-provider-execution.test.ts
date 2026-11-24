@@ -56,10 +56,10 @@ vi.mock("@purin-labs/connections/data/commerce-merchant-binding", () => ({
     commerceEngineMocks.resolveCommerceMerchantBinding,
 }));
 vi.mock(
-  "@purin-labs/area-commerce/server/contract/client",
+  "@purin-labs/area-commerce-contract/server/client",
   async (importOriginal) => ({
     ...(await importOriginal<
-      typeof import("@purin-labs/area-commerce/server/contract/client")
+      typeof import("@purin-labs/area-commerce-contract/server/client")
     >()),
     createCommerceClient: commerceEngineMocks.createCommerceClient,
   }),

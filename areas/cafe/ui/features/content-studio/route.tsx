@@ -27,7 +27,7 @@ import {
 import { MenuDraftClient, type MenuDraftView } from "./menu-client";
 import { MenuBoardsPanel } from "../menu-boards/boards-panel";
 import { MenuScreensPanel } from "../menu-boards/screens-panel";
-import "@purin-labs/area-commerce/ui/features/commerce/description-draft/styles.css";
+import "@purin-labs/area-commerce-contract/ui/features/commerce/description-draft/styles.css";
 import "./styles.css";
 import {
   assertNever,

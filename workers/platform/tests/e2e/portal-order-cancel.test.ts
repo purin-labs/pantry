@@ -10,7 +10,7 @@ import { advanceOrderQueueEntry } from "@purin-labs/area-cafe/server/contract/or
 import { googleConfig } from "@purin-labs/control/worker/google-oidc-config";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { parseIntegrationAccountId, parseRequestId } from "@purin-labs/kernel/ids";
-import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";
+import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce-contract/server/queue-messages";
 import { reconcileCommerceOutbox } from "@purin-labs/area-commerce/server/outbox-worker";
 import {
   placeCafeOrder,

@@ -1,10 +1,10 @@
 // The types of the commerce methods of the Organisation actor.
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import type { CafeCommerceAcceptanceFaultRecord } from "../../contract/types";
+import type { CafeCommerceAcceptanceFaultRecord } from "@purin-labs/area-commerce-contract/server/types";
 import type {
   ApplyCommerceDeliveryInput,
   CommerceSystemStorageAuthority,
-} from "../../contract/commerce-projection";
+} from "@purin-labs/area-commerce-contract/server/commerce-projection";
 import type {
   CommerceBoardDragPreview,
   CommerceBoardPresenceSelection,

@@ -27,9 +27,9 @@ import { RESPONSIBILITY_SCOPE_COMMERCE } from "@purin-labs/area-commerce/server/
 import { responsibilityScopeCommerce } from "@purin-labs/agent/data/agent-operations/scope-commerce";
 import { commerceGrantTargets } from "@purin-labs/authority/authorization/access-grants/commerce-grant-targets";
 import { COMMERCE_GRANT_TARGETS } from "@purin-labs/area-commerce/server/entity-plane/grant-targets";
-import { connectedCommerceProviders } from "@purin-labs/area-commerce/server/contract/commerce-provider";
+import { connectedCommerceProviders } from "@purin-labs/area-commerce-contract/server/commerce-provider";
 import { COMMERCE_GRANT_SELECTION } from "@purin-labs/area-commerce/server/entity-plane/grant-selection";
-import { commerceGraphReads } from "@purin-labs/area-commerce/server/contract/graph-reads";
+import { commerceGraphReads } from "@purin-labs/area-commerce-contract/server/graph-reads";
 import { parseEntityPlaneObservation } from "@purin-labs/commerce-client";
 import { entityPlaneObservationParser } from "@purin-labs/agent/cues/engine";
 import { CommerceEngineSource } from "@purin-labs/area-commerce/server/entity-plane/commerce-source";
@@ -52,7 +52,7 @@ import {
   controlCommerceSensitivityCeiling,
   openControlCommerceGraph,
 } from "@purin-labs/area-commerce/server/control/commerce-graph";
-import { commerceDeliveryIntake } from "@purin-labs/area-commerce/server/contract/delivery-intake";
+import { commerceDeliveryIntake } from "@purin-labs/area-commerce-contract/server/delivery-intake";
 import { applyCommerceDelivery } from "@purin-labs/area-commerce/server/actors/commerce-projection";
 import { normalizeCommerceDelivery } from "@purin-labs/area-commerce/server/commerce-wasm";
 import { connectionParts } from "@purin-labs/area-integrations/server/contract/connection-parts";

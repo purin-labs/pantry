@@ -3,7 +3,7 @@ import { parseMenuHours } from "@purin-labs/control-api";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Env } from "@purin-labs/kernel/env";
 import { sha256Hex } from "@purin-labs/std";
-import { resolveMerchantControlContext } from "@purin-labs/area-commerce/server/contract/merchant-control";
+import { resolveMerchantControlContext } from "@purin-labs/area-commerce-contract/server/merchant-control";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   controlError,

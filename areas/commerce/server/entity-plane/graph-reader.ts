@@ -10,7 +10,7 @@ import type {
   SystemCommerceEntityRef,
 } from "@purin-labs/commerce-contracts";
 import type { Result } from "@purin-labs/kernel/result";
-import type { CommerceWasmError } from "../contract/delivery-intake";
+import type { CommerceWasmError } from "@purin-labs/area-commerce-contract/server/delivery-intake";
 import { commerceBlotterSystemAttributeIds } from "../actors/commerce-query-schema";
 import type { BlotterQueryPlanResult } from "./blotter-source";
 import { buildCommerceGraphQueryPlanRequest } from "./planner";
@@ -32,11 +32,11 @@ import type {
   CommerceGraphSourceQueryOptions,
   CommerceGraphSourceResult,
   CommerceGraphSourceValue,
-} from "../contract/graph-reads";
+} from "@purin-labs/area-commerce-contract/server/graph-reads";
 import type {
   CommerceGraphReaderError,
   CommerceGraphSourceError,
-} from "../contract/read-errors";
+} from "@purin-labs/area-commerce-contract/server/read-errors";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 
@@ -921,7 +921,7 @@ function staleReaderError(
 
 function relationshipStepReaderFailure(
   query: CommerceGraphQuery,
-  error: import("../contract/graph-reads").CommerceGraphRelationshipStepError,
+  error: import("@purin-labs/area-commerce-contract/server/graph-reads").CommerceGraphRelationshipStepError,
 ): Result<never, CommerceGraphReaderError> {
   switch (error.code) {
     case "source_unavailable":

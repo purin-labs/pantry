@@ -1,6 +1,6 @@
 import * as React from "react";
 import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
-import { formatOfferPrice } from "../governed-actions/commerce";
+import { formatOfferPrice } from "@purin-labs/area-commerce-contract/ui/features/governed-actions/commerce";
 import { isRecord } from "@purin-labs/std";
 import { type OfferPriceAllowanceView, type PricedOffer, parseOfferPriceAllowanceView, parsePricedOffers } from "@purin-labs/control-api/portal/price-allowance";
 

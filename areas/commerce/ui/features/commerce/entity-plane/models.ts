@@ -21,7 +21,7 @@ import type {
 import type {
   CommerceCollectionSelection,
   CommercePublishedResourceMetadata,
-} from "./api";
+} from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 

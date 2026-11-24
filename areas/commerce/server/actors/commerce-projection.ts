@@ -82,8 +82,8 @@ import type {
   CommerceSystemStorageAuthority,
   PendingCommerceCue,
   ReadExactCommerceProjectionReferenceInput,
-} from "../contract/commerce-projection";
-import type { CommerceSystemSyncStatus } from "../contract/system-readiness";
+} from "@purin-labs/area-commerce-contract/server/commerce-projection";
+import type { CommerceSystemSyncStatus } from "@purin-labs/area-commerce-contract/server/system-readiness";
 
 export type {
   ApplyCommerceDeliveryInput,
@@ -91,7 +91,7 @@ export type {
   CommerceProjectionRecord,
   CommerceSystemStorageAuthority,
   PendingCommerceCue,
-} from "../contract/commerce-projection";
+} from "@purin-labs/area-commerce-contract/server/commerce-projection";
 
 export type CommerceLowStockCueFact = {
   readonly kind: "inventory_low_stock";

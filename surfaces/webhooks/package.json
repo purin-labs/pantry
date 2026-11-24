@@ -28,7 +28,8 @@
     "@purin-labs/surface-email": "workspace:*",
     "@purin-labs/surface-slack": "workspace:*",
     "@purin-labs/tenancy": "workspace:*",
-    "@purin-labs/type-utils": "workspace:*"
+    "@purin-labs/type-utils": "workspace:*",
+    "@purin-labs/area-commerce-contract": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20260707.1",

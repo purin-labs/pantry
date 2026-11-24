@@ -1,0 +1,39 @@
+{
+  "name": "@purin-labs/area-commerce-contract",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./server/*": {
+      "types": "./server/*.ts",
+      "default": "./server/*.ts"
+    },
+    "./ui/*.css": "./ui/*.css",
+    "./ui/*": {
+      "types": "./ui/*.ts",
+      "default": "./ui/*.ts"
+    }
+  },
+  "dependencies": {
+    "@purin-labs/actor-runtime": "workspace:*",
+    "@purin-labs/agent": "workspace:*",
+    "@purin-labs/agent-tools": "workspace:*",
+    "@purin-labs/authority": "workspace:*",
+    "@purin-labs/commerce-client": "workspace:*",
+    "@purin-labs/commerce-contracts": "workspace:*",
+    "@purin-labs/commerce-control-api": "workspace:*",
+    "@purin-labs/connections": "workspace:*",
+    "@purin-labs/contracts": "workspace:*",
+    "@purin-labs/control": "workspace:*",
+    "@purin-labs/control-api": "workspace:*",
+    "@purin-labs/kernel": "workspace:*",
+    "@purin-labs/std": "workspace:*",
+    "@purin-labs/tenancy": "workspace:*",
+    "@purin-labs/type-utils": "workspace:*",
+    "@purin-labs/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260707.1",
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

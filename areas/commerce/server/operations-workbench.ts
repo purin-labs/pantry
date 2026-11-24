@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "./contract/client";
+import { pantryCommerceAccess } from "@purin-labs/area-commerce-contract/server/client";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   CommerceCursor,
@@ -13,7 +13,7 @@ import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connecti
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import { commerceCanonicalResourceId } from "./contract/resource-ids";
+import { commerceCanonicalResourceId } from "@purin-labs/area-commerce-contract/server/resource-ids";
 import { buildSavedSelectorCommerceReadAuthority } from "./entity-plane/authority";
 import { CommerceGraphReader } from "./entity-plane/graph-reader";
 import { CommerceEngineSource } from "./entity-plane/commerce-source";

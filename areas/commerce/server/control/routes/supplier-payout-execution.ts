@@ -20,7 +20,7 @@ import {
   readSealedPayoutPlan,
   payoutSourceReference,
 } from "../../data/supplier-payout-plan";
-import type { CommerceActionPath } from "../../contract/action-requests";
+import type { CommerceActionPath } from "@purin-labs/area-commerce-contract/server/action-requests";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**

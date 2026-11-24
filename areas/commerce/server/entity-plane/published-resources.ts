@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../contract/client";
+import { pantryCommerceAccess } from "@purin-labs/area-commerce-contract/server/client";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   parseEntityPlanePublishedResourceMetadataRequest,
@@ -31,10 +31,10 @@ import type { IntegrationAccountId, OrganisationId } from "@purin-labs/kernel/id
 import type { Result } from "@purin-labs/kernel/result";
 import { opaqueAccessTargetReference } from "@purin-labs/authority/access-control/references";
 import type { PublishedCommerceTarget } from "@purin-labs/authority/access-control/commerce-access-targets";
-import { commerceCanonicalResourceId } from "../contract/resource-ids";
+import { commerceCanonicalResourceId } from "@purin-labs/area-commerce-contract/server/resource-ids";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
-import type { PublishedResourceBoundaryError } from "../contract/types";
+import type { PublishedResourceBoundaryError } from "@purin-labs/area-commerce-contract/server/types";
 
 export type { PublishedResourceBoundaryError };
 

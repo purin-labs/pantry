@@ -27,7 +27,7 @@ import { bakeryRunSnapshotPrefix } from "@purin-labs/area-kitchen/server/bakery/
 import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
 import { connectCommerceFixture } from "./commerce-support";
 import { CommerceAdminClient } from "@purin-labs/commerce-client";
-import { commerceCanonicalResourceId } from "@purin-labs/area-commerce/server/contract/resource-ids";
+import { commerceCanonicalResourceId } from "@purin-labs/area-commerce-contract/server/resource-ids";
 import { sampleSettings } from "@purin-labs/bakery-model/bakery";
 import {
   rehearsalFromRecording,

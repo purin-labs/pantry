@@ -1,4 +1,4 @@
-import type { MerchantControlContext } from "@purin-labs/area-commerce/server/contract/merchant-control";
+import type { MerchantControlContext } from "@purin-labs/area-commerce-contract/server/merchant-control";
 import type { CounterSale } from "@purin-labs/control-api/portal/counter-sale";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";

@@ -7,7 +7,7 @@ import {
   BlotterSource,
   type BlotterOrganisationReader,
 } from "./blotter-source";
-import type { CommerceEngineGraphSource } from "../contract/graph-reads";
+import type { CommerceEngineGraphSource } from "@purin-labs/area-commerce-contract/server/graph-reads";
 import { CommerceGraphReader } from "./graph-reader";
 
 export async function createCommerceGraphReader(

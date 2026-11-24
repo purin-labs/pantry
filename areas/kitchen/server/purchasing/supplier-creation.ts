@@ -15,7 +15,7 @@ import {
 } from "@purin-labs/commerce-client";
 
 import { inboxServices } from "@purin-labs/area-inbox/server/mail-inbox/contract/inbox-services";
-import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";
+import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce-contract/server/queue-messages";
 import {
   newRequestId,
   type IntegrationAccountId,

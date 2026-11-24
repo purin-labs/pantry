@@ -7,7 +7,7 @@ import { definePort } from "@purin-labs/kernel/port";
 import type {
   CommerceActionPath,
   CommerceActionRequest,
-} from "./action-requests";
+} from "@purin-labs/area-commerce-contract/server/action-requests";
 
 /** What a proposal knows about the record that it changes. */
 export type CommerceChangeFacts = Readonly<{

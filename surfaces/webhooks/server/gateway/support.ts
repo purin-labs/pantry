@@ -36,7 +36,7 @@ import {
   createCommerceDeliveryQueueMessage,
   type CommerceDeliveryQueueMessage,
   type CommerceOutboxReconcileQueueMessage,
-} from "@purin-labs/area-commerce/server/contract/queue-messages";
+} from "@purin-labs/area-commerce-contract/server/queue-messages";
 import type { EmailChangeQueueMessage } from "@purin-labs/surface-email/server/mail/queue-messages";
 import type { IngressQueueMessageError } from "@purin-labs/kernel/queue-fields";
 import type { ShopifyCommerceRefreshQueueMessage } from "@purin-labs/area-integrations/shopify/queue-messages";
@@ -69,7 +69,7 @@ import {
   parseCanonicalCommerceDelivery,
   parseCommerceCueFacts,
 } from "@purin-labs/area-commerce/server/actors/commerce-projection";
-import { commerceObservationIdentity } from "@purin-labs/area-commerce/server/contract/observation-identity";
+import { commerceObservationIdentity } from "@purin-labs/area-commerce-contract/server/observation-identity";
 import {
   failCommerceLabRun,
   listCommerceLabRuns,

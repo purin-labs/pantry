@@ -9,7 +9,7 @@ import {
 } from "../../actors/commerce-context-tool-result";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { parseCommerceGraphQuery } from "../../entity-plane/routes";
-import { COMMERCE_SENSITIVITIES } from "../../contract/sensitivity";
+import { COMMERCE_SENSITIVITIES } from "@purin-labs/area-commerce-contract/server/sensitivity";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { ToolRequestError } from "@purin-labs/agent-tools/errors";
 import { defineCommerceTool } from "./services";

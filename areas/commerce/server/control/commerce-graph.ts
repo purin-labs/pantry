@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../contract/client";
+import { pantryCommerceAccess } from "@purin-labs/area-commerce-contract/server/client";
 import type {
   CommerceGraphQuery,
   CommerceSensitivity,
@@ -19,7 +19,7 @@ import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisat
 import type {
   ControlCommerceGraph,
   ControlCommerceGraphError,
-} from "../contract/graph-reads";
+} from "@purin-labs/area-commerce-contract/server/graph-reads";
 
 /**
  * The commerce graph of one Organisation, as a person's control request reads

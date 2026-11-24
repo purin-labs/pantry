@@ -7,6 +7,7 @@ packages:
   - foundation/*
   - areas/*
   - surfaces/*
+  - areas/*/contract
 
 allowBuilds:
   esbuild: true

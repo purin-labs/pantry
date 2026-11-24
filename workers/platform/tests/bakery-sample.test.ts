@@ -61,8 +61,8 @@ import {
   type ProductionScenarioRead,
 } from "@purin-labs/area-kitchen/ui/features/workflow-simulator/production-scenario-api";
 import { readScenarioPage } from "@purin-labs/area-kitchen/ui/features/workflow-simulator/scenario-api";
-import type { CommerceGraphFetch } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/api";
-import { customEntityRef } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/api";
+import type { CommerceGraphFetch } from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
+import { customEntityRef } from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
 
 const NOW = "2026-09-08T00:00:00.000Z";
 const ORGANISATION = "organisation_bakery_sample",

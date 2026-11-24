@@ -6,7 +6,7 @@ import type { Settings } from "@purin-labs/bakery-model/bakery";
 import {
   customEntityRef,
   readCommerceGraph,
-} from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/api";
+} from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
 
 export async function readProcedure(
   organisationId: string,

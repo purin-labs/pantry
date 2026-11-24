@@ -38,7 +38,7 @@ import { cueLogIntegrationAccountId } from "@purin-labs/surface-webhooks/server/
 import { handleCommerceDeliveryQueueMessage } from "@purin-labs/surface-webhooks/server/gateway/support";
 import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "@purin-labs/area-commerce/server/commerce-lab/lab-metadata";
 import type { NormalizedCueEvent } from "@purin-labs/agent/cues/engine";
-import { createCommerceDeliveryQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";
+import { createCommerceDeliveryQueueMessage } from "@purin-labs/area-commerce-contract/server/queue-messages";
 import {
   parseIntegrationAccountId,
   parseRequestId,

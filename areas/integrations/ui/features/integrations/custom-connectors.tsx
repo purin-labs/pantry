@@ -2,7 +2,7 @@ import { DecisionButtons } from "@purin-labs/ui/index";
 import {
   GOVERNED_ACTION_ALLOW,
   governedActionRefusal,
-} from "@purin-labs/area-commerce/ui/features/governed-actions/decision-labels";
+} from "@purin-labs/area-commerce-contract/ui/features/governed-actions/decision-labels";
 import {
   PENDING_APPROVAL_MAX_AGE_MS,
   signInForApproval,

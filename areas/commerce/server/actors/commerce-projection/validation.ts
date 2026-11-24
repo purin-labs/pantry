@@ -34,9 +34,9 @@ import type {
   CommerceProjectionKind,
   CommerceSystemStorageAuthority,
   InventoryQuantity,
-} from "../../contract/commerce-projection";
+} from "@purin-labs/area-commerce-contract/server/commerce-projection";
 
-export type { InventoryQuantity } from "../../contract/commerce-projection";
+export type { InventoryQuantity } from "@purin-labs/area-commerce-contract/server/commerce-projection";
 import {
   hasInteger,
   hasNonNegativeInteger,

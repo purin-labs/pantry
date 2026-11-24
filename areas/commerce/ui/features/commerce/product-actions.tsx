@@ -1,7 +1,7 @@
 import React from "react";
 import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
-import type { CommerceMutationTransport } from "./entity-plane/api";
+import type { CommerceMutationTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
 
 /** What the Products page knows about one product when a person acts on it. */
 export type ProductRecord = Readonly<{

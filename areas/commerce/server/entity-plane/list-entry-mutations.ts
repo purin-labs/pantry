@@ -8,7 +8,7 @@ import type { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 
 import type { Result } from "@purin-labs/kernel/result";
 import { resolvePublishedResponsibilityScope } from "./published-resources";
-import { type PublishedResourceBoundaryError } from "../contract/types";
+import { type PublishedResourceBoundaryError } from "@purin-labs/area-commerce-contract/server/types";
 import type { CommerceListEntryPatchCommand } from "./routes";
 import type { Variant } from "@purin-labs/type-utils";
 

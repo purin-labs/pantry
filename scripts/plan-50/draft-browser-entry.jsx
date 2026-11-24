@@ -6,7 +6,7 @@ import { parsePendingInputs } from "../../packages/control-api/src/portal/chat.t
 import DescriptionEditor from "../../areas/commerce/ui/features/commerce/description-draft/editor.tsx";
 import { responseJson } from "../../foundation/control/portal/control-client.ts";
 import { parseCommerceActionRecordResponse } from "../../packages/commerce-control-api/src/portal/commerce-actions.ts";
-import "../../areas/commerce/ui/features/commerce/description-draft/styles.css";
+import "../../areas/commerce/contract/ui/features/commerce/description-draft/styles.css";
 
 const organisationId = "organisation_plan50_seams";
 const productId = "product_financier";

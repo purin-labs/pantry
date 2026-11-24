@@ -10,7 +10,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import type {
   StockOperation,
   StockOperationAction,
-} from "@purin-labs/area-commerce/server/contract/stock-operations";
+} from "@purin-labs/area-commerce-contract/server/stock-operations";
 
 /** A refusal that the agent can act on, returned as the tool's words. */
 export class StockActionRequestError extends ToolRequestError {}

@@ -15,7 +15,7 @@ import {
 } from "@purin-labs/tenancy/organisation-access/invitations";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { commerceSystemReadiness } from "@purin-labs/area-commerce/server/contract/system-readiness";
+import { commerceSystemReadiness } from "@purin-labs/area-commerce-contract/server/system-readiness";
 import {
   ensureCurrentReadiness,
   ensureCurrentReadinessFromSignals,

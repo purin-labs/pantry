@@ -1,4 +1,4 @@
-import { resolveCommerceMerchant } from "@purin-labs/area-commerce/server/contract/square-link";
+import { resolveCommerceMerchant } from "@purin-labs/area-commerce-contract/server/square-link";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   fetchWithOrganisationPlacement,

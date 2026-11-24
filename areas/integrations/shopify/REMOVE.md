@@ -7,14 +7,14 @@ removal is one piece of work with a known end.
 The counts are from 2026-11-21. Run the commands again before a removal.
 
 After step A2.5, the commerce area reaches Shopify through one port,
-`CommerceProvider` (`areas/commerce/server/contract/commerce-provider.ts`). The
+`CommerceProvider` (`areas/commerce/contract/server/commerce-provider.ts`). The
 Shopify implementation is `shopifyCommerceProvider` in `commerce-provider.ts` of
 this folder. The provider catalogue reaches the Shopify entry through the port
 `providerModules` (`areas/integrations/server/contract/provider-modules.ts`), and
 the entry is `SHOPIFY_PROVIDER_MODULE` in `provider-module.ts` of this folder. The
 Worker registers both in `workers/platform/src/worker-ports.ts`, two lines.
 Shopify reaches commerce through the port `commerceDeliveryIntake`
-(`areas/commerce/server/contract/delivery-intake.ts`).
+(`areas/commerce/contract/server/delivery-intake.ts`).
 
 ## 1. This folder
 

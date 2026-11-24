@@ -18,7 +18,7 @@ import { DescriptionDraftRequestError } from "./services";
 import { parseCommerceGraphQuery } from "../../entity-plane/routes";
 import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import { CommerceReadRequestError } from "../../contract/read-errors";
+import { CommerceReadRequestError } from "@purin-labs/area-commerce-contract/server/read-errors";
 import {
   type DraftThreadLink,
   collaborationEditDeadline,

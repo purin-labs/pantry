@@ -27,7 +27,7 @@ import {
 import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
-import { commerceCanonicalResourceId } from "@purin-labs/area-commerce/server/contract/resource-ids";
+import { commerceCanonicalResourceId } from "@purin-labs/area-commerce-contract/server/resource-ids";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Variant } from "@purin-labs/type-utils";
 import { requiredPlacement } from "./slack-journey-support";

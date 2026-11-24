@@ -74,7 +74,7 @@ import {
   type CommercePublishedCollectionModel,
   type CommerceEntityDossierModel,
 } from "./models";
-import { commerceCollectionQuery, customEntityRef, entityDossierQuery, entityTypePageQuery, readCommerceGraph, readCommerceChanges, searchEntityTypeQuery, systemEntityRef, readCommerceActivity, readPublishedCommerceResources, patchCommerceListEntryStatus, publishCommerceSavedViewPresentation, updateCommerceBoardPresence, type CommerceGraphFetch, type CommerceMutationTransport, type CommercePresenceTransport, type CommerceCollectionSelection, type CommercePublishedResourceMetadata } from "./api";
+import { commerceCollectionQuery, customEntityRef, entityDossierQuery, entityTypePageQuery, readCommerceGraph, readCommerceChanges, searchEntityTypeQuery, systemEntityRef, readCommerceActivity, readPublishedCommerceResources, patchCommerceListEntryStatus, publishCommerceSavedViewPresentation, updateCommerceBoardPresence, type CommerceGraphFetch, type CommerceMutationTransport, type CommercePresenceTransport, type CommerceCollectionSelection, type CommercePublishedResourceMetadata } from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
 import type { CommerceListEntryPatchApprovalAction, CommerceActivityResult } from "@purin-labs/commerce-control-api/portal/entity-plane";
 import {
   PurchaseRequestDrawer,
@@ -112,7 +112,7 @@ import {
 import type {
   CommerceOperationsTransport,
   OrderCancellationAction,
-} from "../operations";
+} from "@purin-labs/area-commerce-contract/ui/features/commerce/operations";
 import { parseCommerceActionRecordResponse, type CommerceActionRecord } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";

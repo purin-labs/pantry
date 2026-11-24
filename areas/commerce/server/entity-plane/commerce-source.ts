@@ -17,7 +17,7 @@ import type {
 } from "@purin-labs/commerce-contracts";
 import type { Result } from "@purin-labs/kernel/result";
 import { errorMessage, isNormalizedText } from "@purin-labs/std";
-import type { CommerceGraphSourceError } from "../contract/read-errors";
+import type { CommerceGraphSourceError } from "@purin-labs/area-commerce-contract/server/read-errors";
 import type {
   CommerceEngineGraphSource,
   CommerceGraphCapabilityMetadata,
@@ -29,12 +29,12 @@ import type {
   CommerceGraphRelationshipStepResult,
   CommerceGraphSourceQueryOptions,
   CommerceSourceOptions,
-} from "../contract/graph-reads";
+} from "@purin-labs/area-commerce-contract/server/graph-reads";
 
 export type {
   CommerceGraphPlannedSourceResult,
   CommerceGraphSourceResult,
-} from "../contract/graph-reads";
+} from "@purin-labs/area-commerce-contract/server/graph-reads";
 
 /**
  * Keeps the Commerce client behind the graph reader's source boundary.

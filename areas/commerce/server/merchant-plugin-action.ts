@@ -21,7 +21,7 @@ import type {
   MerchantPluginCommand,
   MerchantPluginSettingKind,
   MerchantPluginSettingProposal,
-} from "./contract/action-requests";
+} from "@purin-labs/area-commerce-contract/server/action-requests";
 
 export const MERCHANT_PLUGIN_INSTALL_VERB = "commerce.plugin.install";
 

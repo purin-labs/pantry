@@ -11,7 +11,7 @@ import {
 } from "./context-read";
 import { normalizeUntrustedCommerceText } from "@purin-labs/agent-tools/context/untrusted-commerce-text";
 import type { Result } from "@purin-labs/kernel/result";
-import type { CommerceGraphQueryReader } from "../contract/graph-reads";
+import type { CommerceGraphQueryReader } from "@purin-labs/area-commerce-contract/server/graph-reads";
 import {
   merchantReportDefinition,
   type MerchantReportName,

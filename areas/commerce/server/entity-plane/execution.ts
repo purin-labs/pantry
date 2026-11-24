@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { CommerceCommandAuthorityContext } from "@purin-labs/commerce-contracts/relationship-authority";
-import { pantryCommerceAccess } from "../contract/client";
+import { pantryCommerceAccess } from "@purin-labs/area-commerce-contract/server/client";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { decideCurrentAuthorityFlowSink } from "@purin-labs/conversation/chat/information-flow";

@@ -16,7 +16,7 @@ import {
   authorizeMerchantRead,
   resolveMerchantControlContext,
   type MerchantControlContext,
-} from "@purin-labs/area-commerce/server/contract/merchant-control";
+} from "@purin-labs/area-commerce-contract/server/merchant-control";
 import {
   controlError,
   controlJson,

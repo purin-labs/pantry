@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import "@purin-labs/surface-portal/ui/styles.css";
 import { CafeMenuPublicationDetails } from "@purin-labs/area-commerce/ui/features/governed-actions/cafe-menu-details";
-import { commerceActionTitle } from "@purin-labs/area-commerce/ui/features/governed-actions/commerce";
+import { commerceActionTitle } from "@purin-labs/area-commerce-contract/ui/features/governed-actions/commerce";
 import { MenuPriceChangeDetails } from "@purin-labs/area-commerce/ui/features/governed-actions/menu-price-card";
 import { ScaledBoard } from "@purin-labs/area-cafe/ui/features/menu-boards/board-view";
 import "@purin-labs/area-cafe/ui/features/menu-boards/board-view.css";

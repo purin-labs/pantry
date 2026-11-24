@@ -29,6 +29,7 @@
     "testing"
   ],
   "packages": {
+    "areas/commerce/contract": "areas/commerce/contract",
     "surfaces/portal": "surfaces/portal",
     "surfaces/voice": "surfaces/voice",
     "surfaces/webhooks": "surfaces/webhooks",
@@ -89,12 +90,6 @@
   "contracts": [
     "packages/commerce-contracts",
     "areas/commerce/server/contract/",
-    "areas/commerce/ui/features/commerce/entity-plane/api.ts",
-    "areas/commerce/ui/features/commerce/stock-status.ts",
-    "areas/commerce/ui/features/commerce/operations.ts",
-    "areas/commerce/ui/features/governed-actions/commerce.ts",
-    "areas/commerce/ui/features/governed-actions/decision-labels.ts",
-    "areas/commerce/ui/features/commerce/description-draft/styles.css",
     "areas/integrations/server/contract/",
     "areas/integrations/server/mail/gmail-oauth.ts",
     "areas/integrations/ui/integration-catalogue.ts",
@@ -420,6 +415,7 @@
     "workspace_revision_receipt": "foundation/agent"
   },
   "rules": {
+    "areas/commerce/contract/": "areas/commerce/contract",
     "surfaces/portal/": "surfaces/portal",
     "surfaces/voice/": "surfaces/voice",
     "surfaces/webhooks/": "surfaces/webhooks",

@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { prepareCueLogEntry } from "@purin-labs/agent/cues/cue-log";
-import { pantryCommerceAccess } from "@purin-labs/area-commerce/server/contract/client";
+import { pantryCommerceAccess } from "@purin-labs/area-commerce-contract/server/client";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   CommerceEntityRef,

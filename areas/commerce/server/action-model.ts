@@ -38,7 +38,7 @@ import {
   stockOperationResourceId,
   stockOperationVerb,
 } from "@purin-labs/area-kitchen/server/contract/stock-action";
-import type { StockOperationAction } from "./contract/stock-operations";
+import type { StockOperationAction } from "@purin-labs/area-commerce-contract/server/stock-operations";
 import {
   CAFE_MENU_PUBLISH_VERB,
   cafeMenuActionPath,
@@ -74,7 +74,7 @@ import type {
   CommerceShopifyProviderReceipt,
   CommerceProviderResource,
 } from "@purin-labs/control-api";
-import { commerceProjectionRevision } from "./contract/commerce-provider";
+import { commerceProjectionRevision } from "@purin-labs/area-commerce-contract/server/commerce-provider";
 import type {
   ChangeMenuPriceAction,
   CommerceActionError,
@@ -85,13 +85,13 @@ import type {
   InstallMerchantPluginAction,
   OrderRefundAction,
   PublishCafeMenuAction,
-} from "./contract/action-requests";
+} from "@purin-labs/area-commerce-contract/server/action-requests";
 
 export type {
   CommerceActionPath,
   CommerceActionRequest,
   CommerceCancellationAuthority,
-} from "./contract/action-requests";
+} from "@purin-labs/area-commerce-contract/server/action-requests";
 
 export async function commerceActionMutationDigest(
   boundary: UnversionedControlMutationBoundary,

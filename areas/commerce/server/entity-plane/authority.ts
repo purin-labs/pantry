@@ -34,10 +34,10 @@ import { assertNever } from "@purin-labs/std";
 import {
   isCommerceSensitivity,
   sensitivityAtMost,
-} from "../contract/sensitivity";
-import type { CommerceGraphReadAuthority } from "../contract/graph-reads";
+} from "@purin-labs/area-commerce-contract/server/sensitivity";
+import type { CommerceGraphReadAuthority } from "@purin-labs/area-commerce-contract/server/graph-reads";
 
-export type { CommerceGraphReadAuthority } from "../contract/graph-reads";
+export type { CommerceGraphReadAuthority } from "@purin-labs/area-commerce-contract/server/graph-reads";
 
 type CommerceGraphAuthorityError = CommerceEntityPlaneError;
 

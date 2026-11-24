@@ -10,12 +10,12 @@ import { commerceActionProjectionTarget, parseCommerceActionPath, parseCommerceE
 import type {
   CommerceActionError,
   CommerceActionPath,
-} from "./contract/action-requests";
+} from "@purin-labs/area-commerce-contract/server/action-requests";
 import { executeCommerceEntityPlaneAction, type CommerceEntityPlaneExecutionOutcome } from "./entity-plane/execution";
 import { admitCommerceCapability } from "./data/commerce-capability-activation";
 import { admitCommerceActionCapability, executeCommerceProviderAction, reconcileCommerceProviderAction, validateCommerceActionAuthorityBeforeExecution } from "./provider-execution";
-import type { CommerceProviderExecutionError } from "./contract/commerce-provider";
-import { createCommerceOutboxReconcileQueueMessage } from "./contract/queue-messages";
+import type { CommerceProviderExecutionError } from "@purin-labs/area-commerce-contract/server/commerce-provider";
+import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce-contract/server/queue-messages";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import { deliverCommerceCaseOutput } from "./case-commerce-delivery";

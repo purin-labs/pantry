@@ -14,5 +14,10 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "../../areas/*/ui", "../../surfaces/*/ui"]
+  "include": [
+    "src",
+    "../../areas/*/ui",
+    "../../areas/*/contract/ui",
+    "../../surfaces/*/ui"
+  ]
 }

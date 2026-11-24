@@ -63,8 +63,8 @@ import type {
   InstallMerchantPluginAction,
   OrderRefundAction,
   PublishCafeMenuAction,
-} from "../contract/action-requests";
-import { commerceProjectionRevision } from "../contract/commerce-provider";
+} from "@purin-labs/area-commerce-contract/server/action-requests";
+import { commerceProjectionRevision } from "@purin-labs/area-commerce-contract/server/commerce-provider";
 import {
   resolveOrganisationCommerceSystemAuthority,
   type CommerceSystemProviderAuthority,
@@ -73,7 +73,7 @@ import { resolveCommerceMerchantBinding } from "@purin-labs/connections/data/com
 import {
   createCommerceClient,
   createCommerceEntityPlaneClient,
-} from "../contract/client";
+} from "@purin-labs/area-commerce-contract/server/client";
 import { deliverCommerceCaseOutput } from "../case-commerce-delivery";
 import {
   CAFE_MENU_ID,
@@ -94,18 +94,18 @@ import {
 import { stockOperationResourceId } from "@purin-labs/area-kitchen/server/contract/stock-action";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import { resolveCommerceCancellationAuthority } from "../provider";
-import { commerceProviderResourceId } from "../contract/resource-ids";
+import { commerceProviderResourceId } from "@purin-labs/area-commerce-contract/server/resource-ids";
 import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { ProviderCapabilityDefinition } from "@purin-labs/authority/authorization/access-grants/capability-key";
 import { readOrganisationDefaultWorkspacePortalAddress } from "@purin-labs/agent/data/organisation-workspace";
-import { readOfferPriceAllowanceView } from "../contract/offer-price-allowance";
+import { readOfferPriceAllowanceView } from "@purin-labs/area-commerce-contract/server/offer-price-allowance";
 import {
   commerceApprovalCardTexts,
   type CommerceChangeFacts,
 } from "../contract/approval-card-texts";
 import { CARD_ONLY_REPLY_INSTRUCTION } from "@purin-labs/tool-handlers/slack/card-only-reply";
 import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
-import type { MenuPriceProposalRequest } from "../contract/types";
+import type { MenuPriceProposalRequest } from "@purin-labs/area-commerce-contract/server/types";
 
 type CommerceCancellationDraftError =
   | { readonly code: "commerce_projection_mismatch" }

@@ -2,7 +2,7 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   createCommerceClient,
   createCommerceEntityPlaneClient,
-} from "./contract/client";
+} from "@purin-labs/area-commerce-contract/server/client";
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
@@ -15,7 +15,7 @@ import type {
 } from "@purin-labs/commerce-client";
 
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { PendingCommerceCue } from "./contract/commerce-projection";
+import type { PendingCommerceCue } from "@purin-labs/area-commerce-contract/server/commerce-projection";
 import { resolveCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
   ensureCommerceWebhookSubscription,
@@ -32,7 +32,7 @@ import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/act
 import {
   createCommerceOutboxReconcileQueueMessage,
   type CommerceOutboxReconcileQueueMessage,
-} from "./contract/queue-messages";
+} from "@purin-labs/area-commerce-contract/server/queue-messages";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import {

@@ -21,7 +21,7 @@ import type {
   OperationalArea,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import type { Skill } from "@purin-labs/control-api";
-import { readPublishedCommerceResources } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/api";
+import { readPublishedCommerceResources } from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
 import {
   EmptyState,
   Notice,

@@ -45,8 +45,8 @@ vi.mock("@purin-labs/connections/data/commerce-merchant-binding", async (importO
   resolveOrganisationCommerceMerchantBinding:
     terminalControlMocks.resolveOrganisationCommerceMerchantBinding,
 }));
-vi.mock("@purin-labs/area-commerce/server/contract/client", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@purin-labs/area-commerce/server/contract/client")>()),
+vi.mock("@purin-labs/area-commerce-contract/server/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/area-commerce-contract/server/client")>()),
   createCommerceClient: terminalControlMocks.createCommerceClient,
 }));
 

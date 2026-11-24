@@ -39,8 +39,8 @@ import {
 import type {
   CommerceActionError,
   CommerceActionRequest,
-} from "../../../contract/action-requests";
-import { commerceProjectionRevision } from "../../../contract/commerce-provider";
+} from "@purin-labs/area-commerce-contract/server/action-requests";
+import { commerceProjectionRevision } from "@purin-labs/area-commerce-contract/server/commerce-provider";
 import { listPublishedCommerceTargets } from "../../../entity-plane/published-resources";
 import type { PermissionRequired } from "@purin-labs/control-api";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
@@ -70,7 +70,7 @@ import {
 } from "@purin-labs/authority/slack/installation-store";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import { previewMerchantPluginAction } from "../../../provider-execution";
-import type { CommerceProviderExecutionError } from "../../../contract/commerce-provider";
+import type { CommerceProviderExecutionError } from "@purin-labs/area-commerce-contract/server/commerce-provider";
 import { prepareTurnAuthority } from "@purin-labs/agent/context/turn-context";
 import {
   parseCaseId,
@@ -90,8 +90,8 @@ import { resolveCommerceCancellationAuthority } from "../../../provider";
 import {
   commerceCanonicalResourceId,
   commerceProviderResourceId,
-} from "../../../contract/resource-ids";
-import { createCommerceClient } from "../../../contract/client";
+} from "@purin-labs/area-commerce-contract/server/resource-ids";
+import { createCommerceClient } from "@purin-labs/area-commerce-contract/server/client";
 import {
   onboardingProjection,
   admitUserMutation,

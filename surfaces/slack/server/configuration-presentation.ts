@@ -12,7 +12,7 @@ import {
 } from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
 
 export { previewCode };
-import type { OfferPriceAllowanceCommand } from "@purin-labs/area-commerce/server/contract/offer-price-allowance";
+import type { OfferPriceAllowanceCommand } from "@purin-labs/area-commerce-contract/server/offer-price-allowance";
 import { presentJevDraftCommand } from "@purin-labs/area-integrations/server/contract/jev-draft";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";

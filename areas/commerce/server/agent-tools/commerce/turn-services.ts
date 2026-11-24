@@ -21,9 +21,9 @@ import {
 import {
   createCommerceClient,
   createCommerceEntityPlaneClient,
-} from "../../contract/client";
+} from "@purin-labs/area-commerce-contract/server/client";
 import { proposeCampaignBrief } from "../../data/campaign-brief";
-import { readOfferPriceAllowanceView } from "../../contract/offer-price-allowance";
+import { readOfferPriceAllowanceView } from "@purin-labs/area-commerce-contract/server/offer-price-allowance";
 import {
   withToolContext,
   type SessionToolContext,
@@ -48,7 +48,7 @@ import type {
   HarnessCampaignBriefRequest,
   HarnessConfigurationProposalRequest,
 } from "./services";
-import type { CommerceToolReads } from "../../contract/tool-reads";
+import type { CommerceToolReads } from "@purin-labs/area-commerce-contract/server/tool-reads";
 import { readNamedCommerceQuery } from "../../entity-plane/context-read";
 import { parseCommerceGraphQuery } from "../../entity-plane/routes";
 import {

@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../../contract/client";
+import { pantryCommerceAccess } from "@purin-labs/area-commerce-contract/server/client";
 import { isSystemCommerceEntity } from "@purin-labs/commerce-contracts";
 import type {
   PaymentsReadRequest,
@@ -22,7 +22,7 @@ import type { CommerceObservationEntity } from "@purin-labs/agent/actors/agent-s
 import { runMerchantReport } from "../../entity-plane/merchant-report-runner";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
-import { createCommerceClient } from "../../contract/client";
+import { createCommerceClient } from "@purin-labs/area-commerce-contract/server/client";
 import {
   advanceOrderQueueEntry,
   presentOrderQueueEntry,
@@ -55,7 +55,7 @@ import {
   readNeedsPrivateChat,
   type RequestableEntityTypeRead,
 } from "@purin-labs/authority/authorization/requestable-capabilities";
-import { commerceCanonicalResourceId } from "../../contract/resource-ids";
+import { commerceCanonicalResourceId } from "@purin-labs/area-commerce-contract/server/resource-ids";
 import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,
@@ -70,7 +70,7 @@ import { createCommerceGraphReader } from "../../entity-plane/selected-graph-rea
 import {
   CommerceReadRequestError,
   type CommerceContextAssemblyError,
-} from "../../contract/read-errors";
+} from "@purin-labs/area-commerce-contract/server/read-errors";
 import {
   assembleCommerceContext,
   selectCommerceContextSourceGrant,
@@ -86,7 +86,7 @@ import {
   requestableReportRead,
   selectMerchantReportSourceGrant,
 } from "./read-support";
-import type { PreparedCommerceRead } from "../../contract/tool-reads";
+import type { PreparedCommerceRead } from "@purin-labs/area-commerce-contract/server/tool-reads";
 
 export async function prepareCommerceReadForEmbeddedHarness(
   env: Env,

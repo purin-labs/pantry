@@ -21,7 +21,7 @@ import {
 import {
   resolveMerchantControlContext,
   type MerchantControlContext,
-} from "../../contract/merchant-control";
+} from "@purin-labs/area-commerce-contract/server/merchant-control";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,

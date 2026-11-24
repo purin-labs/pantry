@@ -23,11 +23,11 @@ import {
 } from "../commerce-wasm";
 import type { CommerceActivityReadRequest } from "./activity";
 import type { CommerceGraphReader } from "./graph-reader";
-import type { CommerceGraphReaderError } from "../contract/read-errors";
+import type { CommerceGraphReaderError } from "@purin-labs/area-commerce-contract/server/read-errors";
 import type {
   CommerceGraphReadAuthority,
   CommerceGraphReadInput,
-} from "../contract/graph-reads";
+} from "@purin-labs/area-commerce-contract/server/graph-reads";
 import type { Variant } from "@purin-labs/type-utils";
 import { isRecord } from "@purin-labs/std";
 import type {

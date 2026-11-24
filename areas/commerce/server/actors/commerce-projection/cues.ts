@@ -44,7 +44,7 @@ import type {
   CommerceSystemStorageAuthority,
   InventoryQuantity,
   PendingCommerceCue,
-} from "../../contract/commerce-projection";
+} from "@purin-labs/area-commerce-contract/server/commerce-projection";
 
 export function upsertProjection(
   sql: SqlStorage,

@@ -37,7 +37,7 @@ import {
   StockDialogDone,
   StockDialogRetry,
 } from "./stock-dialog";
-import type { CommerceMutationTransport } from "./entity-plane/api";
+import type { CommerceMutationTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
 import { ProductionPlanPanel } from "./production-plan";
 import {
   defaultNeededByDate,

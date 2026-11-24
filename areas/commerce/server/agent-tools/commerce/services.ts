@@ -2,7 +2,7 @@ import type {
   CommerceContextRequest,
   CommerceGraphQueryResult,
 } from "@purin-labs/commerce-contracts";
-import type { CommerceActionRequest } from "../../contract/action-requests";
+import type { CommerceActionRequest } from "@purin-labs/area-commerce-contract/server/action-requests";
 import type {
   MerchantReportName,
   MerchantReportResult,

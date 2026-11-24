@@ -11,9 +11,9 @@ import type {
   ChangeMenuPriceAction,
   MenuPriceMoney,
   MenuPriceSide,
-} from "./contract/action-requests";
+} from "@purin-labs/area-commerce-contract/server/action-requests";
 
-export type { MenuPriceSide } from "./contract/action-requests";
+export type { MenuPriceSide } from "@purin-labs/area-commerce-contract/server/action-requests";
 
 export const MENU_PRICE_CHANGE_VERB = "commerce.menu.change_price";
 

@@ -14,7 +14,7 @@ import {
   controlRead,
   ControlApiError,
 } from "@purin-labs/control/portal/control-client";
-import type { CommerceMutationTransport } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/api";
+import type { CommerceMutationTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
 import type { RecipeGraphSource } from "./recipe-graph";
 
 /**

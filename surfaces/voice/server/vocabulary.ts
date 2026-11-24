@@ -12,7 +12,7 @@ import { listDevices } from "@purin-labs/area-devices/server/store";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { createCommerceClient } from "@purin-labs/area-commerce/server/contract/client";
+import { createCommerceClient } from "@purin-labs/area-commerce-contract/server/client";
 
 const CACHE_MS = 5 * 60_000;
 /** A prompt of this length stays well inside Whisper's 224 tokens. */

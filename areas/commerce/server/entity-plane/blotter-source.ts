@@ -52,7 +52,7 @@ import type {
   CommerceEntityRelationRow,
   CommerceQueryPlanReadError,
   CommerceRelationshipRelationRow,
-} from "../contract/commerce-projection";
+} from "@purin-labs/area-commerce-contract/server/commerce-projection";
 import { materializeCommerceRelationText } from "../actors/commerce-query-schema";
 import type { Result } from "@purin-labs/kernel/result";
 import { encodeCommerceCursor } from "../commerce-wasm";
@@ -61,8 +61,8 @@ import type {
   CommerceGraphSourceQueryOptions,
   CommerceGraphSourceResult,
   CommerceGraphSourceValue,
-} from "../contract/graph-reads";
-import type { CommerceGraphSourceError } from "../contract/read-errors";
+} from "@purin-labs/area-commerce-contract/server/graph-reads";
+import type { CommerceGraphSourceError } from "@purin-labs/area-commerce-contract/server/read-errors";
 import { assertNever, errorMessage, isRecord } from "@purin-labs/std";
 export type BlotterOrganisationReader = Pick<
   OrganisationCommerce,

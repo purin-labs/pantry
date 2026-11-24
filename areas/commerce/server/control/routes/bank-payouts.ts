@@ -1,7 +1,7 @@
 import type { BankPayoutsWindow } from "@purin-labs/control-api";
 
 import type { Env } from "@purin-labs/kernel/env";
-import { resolveMerchantControlContext } from "../../contract/merchant-control";
+import { resolveMerchantControlContext } from "@purin-labs/area-commerce-contract/server/merchant-control";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import { controlError, controlJson } from "@purin-labs/control/worker/http";
 

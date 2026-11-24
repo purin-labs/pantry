@@ -16,7 +16,7 @@ import {
 } from "@purin-labs/tenancy/data/control-plane";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
-import { commerceCanonicalResourceId } from "@purin-labs/area-commerce/server/contract/resource-ids";
+import { commerceCanonicalResourceId } from "@purin-labs/area-commerce-contract/server/resource-ids";
 import { requireUserId } from "../test-ids";
 import {
   ORGANISATION_ID,

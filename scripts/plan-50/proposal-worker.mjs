@@ -32,7 +32,7 @@ import {
 } from "../../foundation/authority/data/access-grants.ts";
 import { parseOrganisationPolicySnapshot } from "../../foundation/authority/policy-snapshot.ts";
 import { parseOrganisationId } from "../../foundation/kernel/ids.ts";
-import { commerceCanonicalResourceId } from "../../areas/commerce/server/contract/resource-ids.ts";
+import { commerceCanonicalResourceId } from "../../areas/commerce/contract/server/resource-ids.ts";
 import { preflightHarnessTurnLease } from "../../foundation/agent/actors/agent-session-harness-authority.ts";
 import {
   admitSessionInformationFlowObservation,

@@ -84,7 +84,7 @@ import {
 } from "@purin-labs/commerce-client";
 import type { CommerceGraphQuery } from "@purin-labs/commerce-contracts";
 import { FINANCIER_SAMPLE_ID } from "@purin-labs/area-kitchen/server/bakery/sample";
-import { customEntityRef } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/api";
+import { customEntityRef } from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
 import { parseScenarioCopy } from "@purin-labs/bakery-model/bakery-scenario";
 import {
   parseProductionScenario,

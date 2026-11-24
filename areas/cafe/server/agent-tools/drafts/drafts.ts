@@ -37,7 +37,7 @@ import type {
   MenuBoardStackEdit,
   MenuBoardStackSettings,
 } from "../../actors/menu-boards";
-import type { MenuPriceProposalRequest } from "@purin-labs/area-commerce/server/contract/types";
+import type { MenuPriceProposalRequest } from "@purin-labs/area-commerce-contract/server/types";
 import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";

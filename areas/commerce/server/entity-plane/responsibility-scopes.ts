@@ -6,7 +6,7 @@ import {
   parseCommerceRelationshipRef,
 } from "@purin-labs/commerce-client";
 import type { ResponsibilityScopeCommerce } from "@purin-labs/agent/data/agent-operations/scope-commerce";
-import { pantryCommerceAccess } from "../contract/client";
+import { pantryCommerceAccess } from "@purin-labs/area-commerce-contract/server/client";
 import {
   createPublishedResourceClient,
   publishedResourceEvidenceMatchesScope,

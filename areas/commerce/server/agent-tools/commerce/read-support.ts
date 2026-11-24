@@ -18,8 +18,8 @@ import {
   recordCommerceObservationEntities,
   type CommerceObservationEntity,
 } from "@purin-labs/agent/actors/agent-session-information-flow";
-import { createCommerceOutboxReconcileQueueMessage } from "../../contract/queue-messages";
-import { createCommerceClient } from "../../contract/client";
+import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce-contract/server/queue-messages";
+import { createCommerceClient } from "@purin-labs/area-commerce-contract/server/client";
 import { productSalesGrantProbe } from "../../entity-plane/product-sales-report";
 import { isRequestableEntityTypeRead } from "@purin-labs/authority/authorization/requestable-capabilities";
 import { admitSessionInformationFlowObservation } from "@purin-labs/agent/actors/agent-session-information-flow";
@@ -34,13 +34,13 @@ import {
   roleMayOperate,
   type OrganisationMember,
 } from "@purin-labs/tenancy/data/control-plane";
-import { CommerceReadRequestError } from "../../contract/read-errors";
+import { CommerceReadRequestError } from "@purin-labs/area-commerce-contract/server/read-errors";
 import { selectNamedCommerceQuerySourceGrant } from "../../entity-plane/context-read";
 import { prepareCommerceReadForEmbeddedHarness } from "./handlers";
 import type {
   PreparedCommerceRead,
   StaffPageWork,
-} from "../../contract/tool-reads";
+} from "@purin-labs/area-commerce-contract/server/tool-reads";
 
 /**
  * Records one commerce read as trusted observation evidence for this turn, so

@@ -6,7 +6,7 @@ import type {
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { SlackThreadControl } from "@purin-labs/collaboration/portal/slack-thread-control";
 import type { ProductDescriptionActionTransport, ProductDescriptionSnapshot } from "./editor";
-import "./styles.css";
+import "@purin-labs/area-commerce-contract/ui/features/commerce/description-draft/styles.css";
 import { type ProductDescriptionResponse, parseProductDescriptionResponse } from "@purin-labs/control-api/portal/description-draft";
 
 const DescriptionEditor = React.lazy(loadEditor);

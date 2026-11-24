@@ -10,7 +10,7 @@ import {
   notFound,
   readBoundedText,
 } from "@purin-labs/kernel/http";
-import { createCommerceDeliveryQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";
+import { createCommerceDeliveryQueueMessage } from "@purin-labs/area-commerce-contract/server/queue-messages";
 import { createShopifyCommerceRefreshQueueMessage } from "./queue-messages";
 import {
   newRequestId,
@@ -38,7 +38,7 @@ import {
 } from "./delivery-normalizers";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
-import { commerceObservationIdentity } from "@purin-labs/area-commerce/server/contract/observation-identity";
+import { commerceObservationIdentity } from "@purin-labs/area-commerce-contract/server/observation-identity";
 import { decodePathSegmentValue } from "@purin-labs/control/worker/gateway/request-helpers";
 
 /**

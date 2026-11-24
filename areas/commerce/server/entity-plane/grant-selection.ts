@@ -13,7 +13,7 @@ import {
   type RequestableEntityTypeRead,
 } from "@purin-labs/authority/authorization/requestable-capabilities";
 import type { Result } from "@purin-labs/kernel/result";
-import type { CommerceContextAssemblyError } from "../contract/read-errors";
+import type { CommerceContextAssemblyError } from "@purin-labs/area-commerce-contract/server/read-errors";
 import { selectNamedCommerceQuerySourceGrant } from "./context-read";
 import { parseCommerceGraphQuery } from "./routes";
 

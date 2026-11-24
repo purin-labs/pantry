@@ -10,7 +10,7 @@ import {
   parseCommerceOutboxReconcileQueuePayload,
   type CommerceDeliveryQueueMessage,
   type CommerceOutboxReconcileQueueMessage,
-} from "@purin-labs/area-commerce/server/contract/queue-messages";
+} from "@purin-labs/area-commerce-contract/server/queue-messages";
 import {
   FILE_PROJECTION_COMMAND_TYPE,
   parseFileProjectionCommand,

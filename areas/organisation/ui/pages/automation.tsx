@@ -15,14 +15,14 @@ import {
   type AgentOperationsTransport,
   type AgentRevisionTarget,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
-import { commerceActionTitle, commerceActionStateLabel, formatCommerceActionAmount } from "@purin-labs/area-commerce/ui/features/governed-actions/commerce";
+import { commerceActionTitle, commerceActionStateLabel, formatCommerceActionAmount } from "@purin-labs/area-commerce-contract/ui/features/governed-actions/commerce";
 import {
   parseCommerceActionRecordResponse,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import {
   parseTrackingBatchPreviewResponse,
 } from "@purin-labs/commerce-control-api/portal/commerce-operations";
-import type { CommerceOperationsTransport } from "@purin-labs/area-commerce/ui/features/commerce/operations";
+import type { CommerceOperationsTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/operations";
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import {
   PermissionRequiredPrompt,

@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { installPantryCommerceApp } from "../../../contract/client";
+import { installPantryCommerceApp } from "@purin-labs/area-commerce-contract/server/client";
 import type { Env } from "@purin-labs/kernel/env";
 import type { Result } from "@purin-labs/kernel/result";
 import type {
@@ -7,8 +7,8 @@ import type {
   CommerceDemoProfile,
   CommerceMerchantSnapshotV1,
 } from "@purin-labs/commerce-client";
-import type { CommerceSystemSyncStatus } from "../../../contract/system-readiness";
-import { readCommerceSystemSyncStatus } from "../../../contract/system-readiness";
+import type { CommerceSystemSyncStatus } from "@purin-labs/area-commerce-contract/server/system-readiness";
+import { readCommerceSystemSyncStatus } from "@purin-labs/area-commerce-contract/server/system-readiness";
 import {
   activateCommerceCapability,
   configureCommerceCapability,
@@ -40,7 +40,7 @@ import {
   type CommerceSystem,
   type CommerceSystemSelection,
 } from "@purin-labs/connections/data/organisation-commerce-system";
-import { createCommerceOutboxReconcileQueueMessage } from "../../../contract/queue-messages";
+import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce-contract/server/queue-messages";
 import { commerceProvider } from "../../../commerce-providers";
 import {
   newRequestId,
@@ -49,7 +49,7 @@ import {
   organisationIdUniquePart,
 } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
-import { createCommerceClient } from "../../../contract/client";
+import { createCommerceClient } from "@purin-labs/area-commerce-contract/server/client";
 import {
   admitUserMutation,
   controlMutationScope,

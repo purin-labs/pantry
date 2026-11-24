@@ -16,7 +16,7 @@ import { StockActionRequestError } from "./stock-action";
 import type {
   StockOperation,
   StockOperationAction,
-} from "@purin-labs/area-commerce/server/contract/stock-operations";
+} from "@purin-labs/area-commerce-contract/server/stock-operations";
 
 export type StockProposalRequest = Readonly<{
   kind:

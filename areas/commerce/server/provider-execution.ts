@@ -11,8 +11,8 @@ import {
   commerceActionExpectedRevision,
   parseCommerceActionPath,
 } from "./action-model";
-import type { CommerceActionPath } from "./contract/action-requests";
-import { commerceProjectionRevision } from "./contract/commerce-provider";
+import type { CommerceActionPath } from "@purin-labs/area-commerce-contract/server/action-requests";
+import { commerceProjectionRevision } from "@purin-labs/area-commerce-contract/server/commerce-provider";
 import {
   admitCommerceCapability,
   type CommerceCapability,
@@ -33,7 +33,7 @@ import {
   type CommerceProviderOperation,
   type CommerceProviderReconcileInput,
   type CommerceProviderReconciliation,
-} from "./contract/commerce-provider";
+} from "@purin-labs/area-commerce-contract/server/commerce-provider";
 import {
   commerceProvider,
   commerceProviderOfPermit,
@@ -43,7 +43,7 @@ import { assertNever } from "@purin-labs/std";
 import {
   createCommerceClient,
   createCommerceEntityPlaneClient,
-} from "./contract/client";
+} from "@purin-labs/area-commerce-contract/server/client";
 import {
   cancelOrderThroughCommerce,
   publishCatalogListingThroughCommerce,
@@ -57,7 +57,7 @@ import {
   reconcileCommerceProductDescriptionUpdate,
   reconcileCommerceOrderCancellation,
 } from "./provider";
-import { commerceProviderResourceId } from "./contract/resource-ids";
+import { commerceProviderResourceId } from "@purin-labs/area-commerce-contract/server/resource-ids";
 import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { ProviderCapabilityDefinition } from "@purin-labs/authority/authorization/access-grants/capability-key";
 import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
@@ -87,7 +87,7 @@ import {
   type StockExecution,
 } from "@purin-labs/area-kitchen/server/contract/stock-action-execution";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { createCommerceOutboxReconcileQueueMessage } from "./contract/queue-messages";
+import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce-contract/server/queue-messages";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 

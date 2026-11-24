@@ -38,7 +38,7 @@ import type {
   CommerceLabRunVerification,
   CommerceLabVerification,
 } from "../actors/commerce-projection";
-import type { ApplyCommerceDeliveryInput } from "../contract/commerce-projection";
+import type { ApplyCommerceDeliveryInput } from "@purin-labs/area-commerce-contract/server/commerce-projection";
 import type { Env } from "@purin-labs/kernel/env";
 import { authorizeConfiguredBearer } from "@purin-labs/kernel/fault-injection-auth";
 import {
@@ -53,7 +53,7 @@ import {
   cueSnapshotKey,
   parseCueSnapshot,
 } from "@purin-labs/agent/cues/engine";
-import { createCommerceDeliveryQueueMessage } from "../contract/queue-messages";
+import { createCommerceDeliveryQueueMessage } from "@purin-labs/area-commerce-contract/server/queue-messages";
 import {
   newRequestId,
   parseIntegrationAccountId,

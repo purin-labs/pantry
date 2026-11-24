@@ -16,7 +16,7 @@ import {
 import {
   parseCommerceActionRecordResponse,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
-import type { CommerceOperationsTransport } from "@purin-labs/area-commerce/ui/features/commerce/operations";
+import type { CommerceOperationsTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/operations";
 import {
   AgentOperationsRouteView,
   type AgentOperationsPageContent,

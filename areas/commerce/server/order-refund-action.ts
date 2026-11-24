@@ -13,7 +13,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import type {
   OrderRefundAction,
   OrderRefundLine,
-} from "./contract/action-requests";
+} from "@purin-labs/area-commerce-contract/server/action-requests";
 
 export const ORDER_REFUND_VERB = "commerce.order.refund";
 

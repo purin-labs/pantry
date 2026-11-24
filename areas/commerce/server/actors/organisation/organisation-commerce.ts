@@ -93,9 +93,9 @@ import type {
   ReadCommerceQueryPlanValue,
   ReadCommerceRelationshipStepInput,
   ReadExactCommerceProjectionReferenceInput,
-} from "../../contract/commerce-projection";
-import type { CommerceGraphOrganisationReader } from "../../contract/graph-reads";
-import type { CommerceSystemSyncStatus } from "../../contract/system-readiness";
+} from "@purin-labs/area-commerce-contract/server/commerce-projection";
+import type { CommerceGraphOrganisationReader } from "@purin-labs/area-commerce-contract/server/graph-reads";
+import type { CommerceSystemSyncStatus } from "@purin-labs/area-commerce-contract/server/system-readiness";
 import {
   parseCommerceEntityRelationRow,
   parseCommerceRelationshipRelationRow,
@@ -156,7 +156,7 @@ import type {
   CafeCommerceAcceptanceFaultConsumption,
   OrganisationApplyCommerceDeliveryInput,
 } from "./commerce-types";
-import type { CafeCommerceAcceptanceFaultRecord } from "../../contract/types";
+import type { CafeCommerceAcceptanceFaultRecord } from "@purin-labs/area-commerce-contract/server/types";
 import type { CodeModeOrganisationActorError } from "@purin-labs/agent/actors/organisation/code-mode-types";
 import type {
   OrganisationCutoverCueSettlementError,

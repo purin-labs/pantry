@@ -1,13 +1,13 @@
 import type { CommerceClientError } from "@purin-labs/commerce-client";
 
 import type { Env } from "@purin-labs/kernel/env";
-import { resolveMerchantControlContext } from "../../contract/merchant-control";
+import { resolveMerchantControlContext } from "@purin-labs/area-commerce-contract/server/merchant-control";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   resolveOpenProviderSupportReferences,
 } from "@purin-labs/area-organisation/server/contract/provider-support-references";
 import { controlError, controlJson, readJsonRecord } from "@purin-labs/control/worker/http";
-import { PRIMARY_ONLINE_PAYMENT_BINDING_ID } from "../../contract/stripe-link";
+import { PRIMARY_ONLINE_PAYMENT_BINDING_ID } from "@purin-labs/area-commerce-contract/server/stripe-link";
 
 /**
  * The payment accounts of an organisation's merchant (Plan 80 step 5): an

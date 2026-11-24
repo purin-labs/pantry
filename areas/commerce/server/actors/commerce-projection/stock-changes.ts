@@ -10,9 +10,9 @@ import {
   storedInventoryQuantity,
   type InventoryQuantity,
 } from "./validation";
-import type { InventoryStockChange } from "../../contract/commerce-projection";
+import type { InventoryStockChange } from "@purin-labs/area-commerce-contract/server/commerce-projection";
 
-export type { InventoryStockChange } from "../../contract/commerce-projection";
+export type { InventoryStockChange } from "@purin-labs/area-commerce-contract/server/commerce-projection";
 
 type PositionStock = Readonly<{
   inventoryItemId: string;

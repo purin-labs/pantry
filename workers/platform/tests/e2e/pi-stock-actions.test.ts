@@ -17,7 +17,7 @@ import {
   parseListEntryReadRequest,
   CommerceEntityPlaneClient,
 } from "@purin-labs/commerce-client";
-import { commerceActionTitle } from "@purin-labs/area-commerce/ui/features/governed-actions/commerce";
+import { commerceActionTitle } from "@purin-labs/area-commerce-contract/ui/features/governed-actions/commerce";
 import {
   parseCommerceActionRecordResponse,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";

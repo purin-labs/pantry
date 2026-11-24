@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../../../contract/client";
+import { pantryCommerceAccess } from "@purin-labs/area-commerce-contract/server/client";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   connectedStockOverview,
@@ -9,18 +9,18 @@ import {
   createPublishedResourceClient,
   enumeratePublishedResources,
 } from "../../../entity-plane/published-resources";
-import type { PublishedResourceBoundaryError } from "../../../contract/types";
+import type { PublishedResourceBoundaryError } from "@purin-labs/area-commerce-contract/server/types";
 import { ensureCommerceLowStockCueSnapshot } from "@purin-labs/agent/cues/engine";
 import {
   commerceCanonicalResourceId,
   commerceProviderResourceId,
-} from "../../../contract/resource-ids";
+} from "@purin-labs/area-commerce-contract/server/resource-ids";
 import {
   applyOfferPriceAllowance,
   parseOfferPriceAllowanceCommand,
   type OfferPriceAllowanceCommand,
   type OfferPriceAllowanceError,
-} from "../../../contract/offer-price-allowance";
+} from "@purin-labs/area-commerce-contract/server/offer-price-allowance";
 import type {
   CommerceClientResult,
   CommerceOfferPriceResultV1,
@@ -37,7 +37,7 @@ import {
 import {
   resolveMerchantBinding,
   resolveMerchantControlContext,
-} from "../../../contract/merchant-control";
+} from "@purin-labs/area-commerce-contract/server/merchant-control";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   controlError,

@@ -28,7 +28,7 @@ import { assertNever } from "@purin-labs/std";
 import { formatMoneyMinor } from "@purin-labs/ui/formatting";
 import "./inventory.css";
 import { FilterCount } from "./filter-bar";
-import { needsReorder } from "./stock-status";
+import { needsReorder } from "@purin-labs/area-commerce-contract/ui/features/commerce/stock-status";
 import { InventoryProductionDialog } from "./inventory-production";
 import { InventoryReconciliationDialog } from "./inventory-reconciliation";
 import { InventoryReceiptDialog } from "./inventory-receipt";
@@ -52,7 +52,7 @@ const STOCK_CATEGORIES = [
   { value: "packaging", label: "Packaging" },
   { value: "operating_supply", label: "Operating supplies" },
 ];
-import type { CommerceMutationTransport } from "./entity-plane/api";
+import type { CommerceMutationTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
 
 type LoadState =
   | { kind: "loading" }

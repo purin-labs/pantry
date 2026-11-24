@@ -22,7 +22,7 @@ import {
   parseCommerceActionRequest,
   parseCommerceProviderReceipt,
 } from "./action-model";
-import type { CommerceActionRequest } from "./contract/action-requests";
+import type { CommerceActionRequest } from "@purin-labs/area-commerce-contract/server/action-requests";
 import { parseCommerceEntityPlaneProposal } from "./entity-plane/proposals";
 
 /**

@@ -12,7 +12,7 @@ import type {
   JevDraftCommand,
   JevDraftRefusal,
 } from "@purin-labs/area-integrations/server/contract/jev-draft";
-import type { OfferPriceAllowanceCommand } from "@purin-labs/area-commerce/server/contract/offer-price-allowance";
+import type { OfferPriceAllowanceCommand } from "@purin-labs/area-commerce-contract/server/offer-price-allowance";
 
 // The configuration drafts that an operator or the chat agent asks for and a
 // person confirms, as the Organisation services name them. A part of the

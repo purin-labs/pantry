@@ -15,7 +15,7 @@ import {
 import type {
   CommerceProjectionKind,
   CommerceQueryPlanReadError,
-} from "../../contract/commerce-projection";
+} from "@purin-labs/area-commerce-contract/server/commerce-projection";
 
 export function commerceRelationshipTraversalPlan(
   plan: CommerceQueryPlan,

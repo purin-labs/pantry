@@ -25,7 +25,7 @@ import { buildControlAuthority } from "@purin-labs/authority/request-authority/i
 import { readNamedCommerceQuery } from "@purin-labs/area-commerce/server/entity-plane/context-read";
 import { CommerceGraphReader } from "@purin-labs/area-commerce/server/entity-plane/graph-reader";
 import { CommerceEngineSource } from "@purin-labs/area-commerce/server/entity-plane/commerce-source";
-import { createCommerceEntityPlaneClient } from "@purin-labs/area-commerce/server/contract/client";
+import { createCommerceEntityPlaneClient } from "@purin-labs/area-commerce-contract/server/client";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import { createFinancierSample } from "@purin-labs/area-kitchen/server/bakery/sample";
 

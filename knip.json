@@ -80,6 +80,10 @@
       ],
       "project": ["src/.vitepress/**/*.{ts,vue}", "scripts/*.mjs"]
     },
+    "areas/*/contract": {
+      "project": ["**/*.{ts,tsx}"],
+      "includeEntryExports": true
+    },
     "surfaces/*": {
       "entry": [
         "server/**/*.fixtures.ts",

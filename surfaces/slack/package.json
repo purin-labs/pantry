@@ -32,7 +32,8 @@
     "@purin-labs/tenancy": "workspace:*",
     "@purin-labs/tool-handlers": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
-    "@purin-labs/surface-webhooks": "workspace:*"
+    "@purin-labs/surface-webhooks": "workspace:*",
+    "@purin-labs/area-commerce-contract": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20260707.1",

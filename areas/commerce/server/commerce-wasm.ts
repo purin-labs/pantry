@@ -41,9 +41,9 @@ import {
 import type { Result } from "@purin-labs/kernel/result";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever, isRecord } from "@purin-labs/std";
-import type { CommerceWasmError } from "./contract/delivery-intake";
+import type { CommerceWasmError } from "@purin-labs/area-commerce-contract/server/delivery-intake";
 
-export type { CommerceWasmError } from "./contract/delivery-intake";
+export type { CommerceWasmError } from "@purin-labs/area-commerce-contract/server/delivery-intake";
 
 /** Proves a shared query at the Platform boundary. */
 export function assertCommerceGraphQueryWithLexicon(

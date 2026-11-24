@@ -52,7 +52,7 @@ import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/ac
 import type { PayoutReadAccess } from "@purin-labs/area-commerce/ui/features/payouts/read-permission";
 import type { SupplierPayout } from "@purin-labs/control-api/portal/payouts";
 import type { OfferPriceAllowanceTransport } from "@purin-labs/area-commerce/ui/features/commerce/price-allowance";
-import type { CommerceOperationsTransport } from "@purin-labs/area-commerce/ui/features/commerce/operations";
+import type { CommerceOperationsTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/operations";
 
 const PREVIEW_COMMERCE_OPERATIONS: CommerceOperationsTransport = {
   previewTrackingBatch: refusePreviewOrderProposal,
