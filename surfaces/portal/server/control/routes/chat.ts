@@ -10,6 +10,7 @@ import {
   withChatAttachments,
 } from "@purin-labs/conversation/chat/attachments";
 import {
+  latestRequestCarriesOperatorPage,
   operatorChatPage,
   withAdmittedScreenObservation,
 } from "../../chat/screen-observation-admission";
@@ -135,14 +136,17 @@ async function handlePortalChatRequest(
   const canvasDocumentId = new URL(request.url).searchParams.get("canvas");
   if (canvasDocumentId !== null && request.method !== "POST")
     return controlError("method_not_allowed", 405);
+  const observation = new URL(request.url).searchParams;
   // An operator sends a message of a workspace canvas chat, or of a private
-  // chat that carries Café › Register (Plan 90 D9). The message itself is
-  // checked when it is read.
+  // chat that carries Café › Register, and reads that private chat (Plan 90
+  // D9). The message and the chat are checked when they are read.
   const authorized = await authorizeOrganisationRequest(
     request,
     env,
     organisationIdRaw,
-    canvasDocumentId === null && request.method !== "POST"
+    canvasDocumentId === null &&
+      request.method !== "POST" &&
+      observation.get("conversation") === null
       ? "admin"
       : "operator",
     request.method === "POST",
@@ -156,8 +160,13 @@ async function handlePortalChatRequest(
     userId: authorized.authenticated.session.userId,
   };
   const placement = authorized.executionScope;
+  if (
+    request.method === "GET" &&
+    operatorOnly &&
+    !(await operatorMayReadChat(placement.database, scope, observation))
+  )
+    return controlError("organisation_role_insufficient", 404);
 
-  const observation = new URL(request.url).searchParams;
   if (request.method === "GET" && observation.get("view") === "state") {
     const id = observation.get("conversation");
     if (!isConversationId(id)) return controlError("chat_request_invalid", 422);
@@ -279,25 +288,32 @@ async function handlePortalChatRequest(
           ),
       readOnboardingRow(placement.database, scope.organisationId),
       readActiveRevision,
-      search.length === 0
-        ? listConversationDirectory(placement.database, scope, cursors)
-        : searchConversationDirectory(
-            placement.database,
+      // An operator reads this one chat, and no list of the workspace.
+      operatorOnly
+        ? OPERATOR_DIRECTORY
+        : search.length === 0
+          ? listConversationDirectory(placement.database, scope, cursors)
+          : searchConversationDirectory(
+              placement.database,
+              scope,
+              search,
+              cursors,
+            ),
+      operatorOnly
+        ? []
+        : readAuthorizedProjectDirectory(env, readPlacement, scope),
+      operatorOnly ? [] : listPendingChatDeletions(readPlacement, scope),
+      operatorOnly ? [] : listPinnedConversations(placement.database, scope),
+      operatorOnly
+        ? ([[], [], null] as const)
+        : readConversationLinks(
+            env,
+            readPlacement,
             scope,
-            search,
-            cursors,
+            authorized,
+            stored,
+            readActiveRevision,
           ),
-      readAuthorizedProjectDirectory(env, readPlacement, scope),
-      listPendingChatDeletions(readPlacement, scope),
-      listPinnedConversations(placement.database, scope),
-      readConversationLinks(
-        env,
-        readPlacement,
-        scope,
-        authorized,
-        stored,
-        readActiveRevision,
-      ),
     ]);
     if (!emailReviews.ok) {
       return controlError("chat_email_reviews_unavailable", 500);
@@ -864,6 +880,38 @@ async function handlePortalChatRequest(
  * Joins the message to the running turn when the turn can take it, and
  * answers the conversation; null when the turn cannot take it.
  */
+/** An operator's read lists no chat of the workspace (Plan 90 D9). */
+const OPERATOR_DIRECTORY = {
+  nextActiveCursor: null,
+  nextArchivedCursor: null,
+  active: [],
+  archived: [],
+} as const;
+
+/**
+ * Whether an operator reads this chat: a private chat of their own whose
+ * latest message carries Café › Register, the rule that admits their message
+ * (Plan 90 D9). Another person's chat, a shared chat and a list are refused.
+ */
+async function operatorMayReadChat(
+  db: OrganisationDatabase,
+  scope: ConversationScope,
+  params: URLSearchParams,
+): Promise<boolean> {
+  const id = params.get("conversation");
+  if (!isConversationId(id) || (params.get("search") ?? "") !== "")
+    return false;
+  const [access, stored] = await Promise.all([
+    authorizeConversation(db, scope, id),
+    readConversation(db, scope, id),
+  ]);
+  return (
+    access?.access.kind === "private" &&
+    stored !== null &&
+    latestRequestCarriesOperatorPage(stored.conversation)
+  );
+}
+
 async function steerIntoRunningTurn(
   input: Parameters<typeof steerRunningConversation>[0],
   database: OrganisationDatabase,

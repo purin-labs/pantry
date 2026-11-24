@@ -14,6 +14,7 @@ import { admitChatInput, type ChatDocumentRead } from "../chat/input-admission";
 import {
   authorizeSessionTurnExecution,
   bindOperatorTurnAccess,
+  isOwnPrivateChatTurn,
   type OperatorExecutionOrigin,
 } from "../chat/turn-access";
 import type { ProjectSnapshot } from "@purin-labs/control-api";
@@ -615,6 +616,19 @@ async function prepareDirectCaseContext(
       // With no reader from its surface, the turn has no verified subject,
       // so no Memory scope can match.
       memoryReader: command.memoryReader ?? turnMemoryReaderWithoutSubjects(),
+      // A step of the requester's own private chat reads its own Case.
+      ...(command.requestAuthority.kind === "control"
+        ? {
+            ownChatCase: isOwnPrivateChatTurn.bind(
+              null,
+              resources.scope.database,
+              command.organisationId,
+              identities.sessionId,
+              `turn_trigger_${identities.digest}`,
+              command.requestAuthority.userId,
+            ),
+          }
+        : {}),
     }),
   ]);
   traceDirectCasePreparation(command, "turn_authority", authorityStartedAt);

@@ -4,6 +4,7 @@ import {
   REGISTER_SURFACE,
   REGISTER_VIEW_COMMANDS,
   newConversationId,
+  newProjectId,
   type ConversationId,
   type SurfaceObservationV2,
   parseOrderQueueEntries,
@@ -13,15 +14,9 @@ import { parseEnvelope as parseCounterSaleEnvelope } from "@purin-labs/control-a
 import { parseTerminalAssignment } from "@purin-labs/commerce-contracts";
 import { isRecord } from "@purin-labs/std";
 
-import { env } from "cloudflare:workers";
 import { activateTerminalAssignment } from "@purin-labs/area-cafe/server/data/terminal-assignment-store";
-import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
-import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
-import {
-  parseOrganisationId,
-  type OrganisationId,
-} from "@purin-labs/kernel/ids";
-import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
+import type { ModelRoute } from "@purin-labs/contracts";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { TOOLS } from "../../src/agent-tools/registry";
 import {
   COOKIE_ENTRY,
@@ -50,9 +45,11 @@ import {
   pendingPageCommand,
 } from "./chat-journey-support";
 import {
+  createConversation,
   installMemoryFixture,
   joinMember,
   post,
+  storedConversation,
   type Member,
 } from "./memory-support";
 import { network } from "./network";
@@ -110,22 +107,22 @@ function registerObservation(basket: string): SurfaceObservationV2 {
 
 /**
  * Plan 90 D9: a barista at the counter asks the Portal chat to stage an
- * order. The operator's private chat message carries the Register page, the
- * agent stages two financiers, and the command reaches the operator's
- * Register page, which answers with its receipt. A viewer's message is
- * refused, and so is an operator's message that carries no Register page.
+ * order, with no grant from the owner. The operator's private chat message
+ * carries the Register page, the agent stages two financiers, and the command
+ * reaches the operator's Register page, which answers with its receipt. The
+ * operator reads the agent's answer through the poll of the chat. A viewer's
+ * message is refused, and so is an operator's message that carries no
+ * Register page. The operator reads no other person's chat, no shared chat
+ * and no list of the chats.
  */
 async function operatorRegisterChatJourney(): Promise<void> {
-  const { organisationId, route, paths } = await installMemoryFixture();
+  const { organisationId, author, route, paths } = await installMemoryFixture();
   const operator = await joinMember(
     organisationId,
     "register-barista",
     "operator",
   );
   const viewer = await joinMember(organisationId, "register-viewer", "viewer");
-  // Each chat turn reads its Case context. The baseline gives that read to
-  // the owner and admin roles, so the owner gives it to the staff in Access.
-  await grantOperatorCaseContext(organisationId);
   const offered: string[][] = [];
   network.use(
     http.post(
@@ -211,31 +208,106 @@ async function operatorRegisterChatJourney(): Promise<void> {
   );
   expect(settled.status, await settled.clone().text()).toBe(200);
   await finished(operator, chat);
+
+  // The operator's page polls the chat and reads the agent's answer.
+  const state = await post(
+    operator,
+    `${paths.chat}?view=state&conversation=${chat}`,
+    null,
+  );
+  expect(state.status, await state.clone().text()).toBe(200);
+  expect(await state.json()).toMatchObject({ work: { kind: "ready" } });
+  const read = await post(operator, `${paths.chat}?conversation=${chat}`, null);
+  expect(read.status, await read.clone().text()).toBe(200);
+  const thread = (await read.json()) as {
+    conversation: { timeline: readonly Record<string, unknown>[] };
+    conversations: readonly { id: string }[];
+    projectDirectory: readonly unknown[];
+  };
+  expect(
+    thread.conversation.timeline.flatMap((event) =>
+      event.kind === "assistant" ? [event.text] : [],
+    ),
+  ).toEqual([FINANCIERS_STAGED]);
+  // The read holds this one chat and no list of the workspace.
+  expect(thread.conversations.map((summary) => summary.id)).toEqual([chat]);
+  expect(thread.projectDirectory).toEqual([]);
+
+  // The operator reads no other person's chat, no shared chat and no list.
+  const ownerChat = newConversationId();
+  await createConversation(author, ownerChat, route);
+  const shared = await sharedChat(author, operator, route, paths.chat);
+  for (const path of [
+    `${paths.chat}?conversation=${ownerChat}`,
+    `${paths.chat}?view=state&conversation=${ownerChat}`,
+    `${paths.chat}?conversation=${shared}`,
+    paths.chat,
+  ]) {
+    const refused = await post(operator, path, null);
+    expect(refused.status, path).toBe(404);
+  }
+  // The owner's shared chat is open to the operator as a Project member, so
+  // only the operator rule closes it.
+  const ownerRead = await post(
+    author,
+    `${paths.chat}?conversation=${shared}`,
+    null,
+  );
+  expect(ownerRead.status).toBe(200);
+  const viewerRead = await post(
+    viewer,
+    `${paths.chat}?conversation=${chat}`,
+    null,
+  );
+  expect(viewerRead.status).toBe(404);
 }
 
-async function grantOperatorCaseContext(
-  organisationId: OrganisationId,
-): Promise<void> {
-  const scope = await requireOrganisationExecutionScope(env, organisationId);
-  const granted = await createAccessGrant({
-    db: scope.database,
-    organisationId,
-    grantId: "grant_register_operator_context",
-    subject: { kind: "organisation_role", role: "operator" },
-    target: {
-      kind: "platform_capability",
-      capabilityId: CONTEXT_CASE_READ_CAPABILITY,
-      capabilityVersion: 1,
-    },
-    provenance: {
-      kind: "baseline",
-      profile: "read_and_propose",
-      profileVersion: 1,
-      materializationReceiptId: "receipt_register_operator_context",
-    },
-    now: Date.now(),
+const FINANCIERS_STAGED = "Two plain financiers are in the basket.";
+
+/**
+ * A chat of the owner, shared with a Project of which the operator is an
+ * editor: the operator may open it as a member of that Project.
+ */
+async function sharedChat(
+  owner: Member,
+  member: Member,
+  route: ModelRoute,
+  chatPath: string,
+): Promise<ConversationId> {
+  const projectId = newProjectId();
+  const projects = `/v1/control/organisations/${owner.organisationId}/projects`;
+  const created = await post(owner, projects, {
+    kind: "create_project",
+    operationId: crypto.randomUUID(),
+    projectId,
+    content: { name: "Counter", brief: "The counter team.", references: [] },
   });
-  if (!granted.ok) throw new Error(granted.error.code);
+  expect(created.status, await created.clone().text()).toBe(200);
+  const sharedProject = await post(owner, `${projects}/${projectId}/access`, {
+    kind: "share_project",
+    operationId: crypto.randomUUID(),
+    expectedAccessRevision: 0,
+    members: [{ userId: member.userId, role: "editor" }],
+  });
+  expect(sharedProject.status, await sharedProject.clone().text()).toBe(200);
+  const conversationId = newConversationId();
+  await createConversation(owner, conversationId, route);
+  const stored = await storedConversation(owner, conversationId);
+  if (stored === null) throw new Error("The shared chat is missing");
+  const sharedChat = await post(
+    owner,
+    `${chatPath}/conversations/${conversationId}/access`,
+    {
+      kind: "share_conversation",
+      operationId: crypto.randomUUID(),
+      expectedRevision: stored.revision,
+      projectId,
+      expectedProjectAccessRevision: 1,
+    },
+  );
+  expect(sharedChat.status, await sharedChat.clone().text()).toBe(200);
+  expect(await sharedChat.json()).toMatchObject({ kind: "accepted" });
+  return conversationId;
 }
 
 /** The scripted model: it stages two financiers in the Register basket. */
@@ -263,7 +335,7 @@ async function stageFinanciers(
     lastToolCallName(body.messages) === "register_add_item"
   )
     return openRouterText(
-      "Two plain financiers are in the basket.",
+      FINANCIERS_STAGED,
       `register_reply_${crypto.randomUUID()}`,
     );
   return names.includes("register_add_item")

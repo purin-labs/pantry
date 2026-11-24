@@ -469,7 +469,25 @@ export class SessionHarnessTurns {
             resolvedCatalog.value.authority,
             contextRead,
           );
-    if (!liveContextAuthority.ok) {
+    // A step of the requester's own private Portal chat reads its own Case
+    // with no grant of the Case context read; its context holds that Case
+    // only (`ownChatCase` of the context read).
+    if (
+      !liveContextAuthority.ok &&
+      !(
+        liveContextAuthority.error.code === "capability_not_granted" &&
+        input.lease.requestAuthority.kind === "control" &&
+        (await this.shared
+          .sessionTools()
+          .conversation.ownsPrivateChatTurn(
+            execution.scope.database,
+            input.requestingOrganisationId,
+            String(input.lease.session.sessionId),
+            String(turn.turnId),
+            input.lease.requestAuthority.userId,
+          ))
+      )
+    ) {
       return { ok: false, error: { code: "invalid_persisted_state" } };
     }
     const attachments = readSessionTurnAttachments(

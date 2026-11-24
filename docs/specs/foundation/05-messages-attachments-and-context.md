@@ -241,6 +241,14 @@ The link reader (`messages/link-reader.ts`) works as follows:
 
 - `prepareTurnContext` (`context/turn-context.ts`) compiles the authority of the turn
   and needs the capability `context.case.read`. The assembler gets only this permit.
+- A step of the requester's own private Portal chat needs no grant of
+  `context.case.read` (`ownChatCase`, `isOwnPrivateChatTurn`): the person started the
+  turn, and the chat was private to that person at the turn and is private now. Such a
+  permit reads the tail of its own Case only (scope `case`): no Memory and no workspace
+  search. The Session's check before inference and the read of the chat's own history
+  (`authorizeForkHistoryAccess`, `own_private_chat`) take the same rule. An inherited
+  history of a fork still needs the grant. An owner and an admin hold the grant, so the
+  rule matters for an operator's Register chat (Plan 90 D9).
 - The assembler reads the tail of the Case, the searchable projections (Case entries and
   file segments) and the accepted Memory. It admits a candidate only when its
   visibility and its flow label let this turn read it.
@@ -340,7 +348,11 @@ The agent loads more context with its tools, when the task needs it.
   needs the admin role, or the operator role with the `canvas` query parameter. An
   operator may also send a message of a private chat that carries Café › Register
   (`operatorChatPage`, Plan 90 D9); the turn runs while that holds for the latest
-  message (`authorizeConversationExecution`).
+  message (`authorizeConversationExecution`). `GET …/chat` needs the admin role, except
+  that an operator reads one private chat of their own whose latest message carries
+  Café › Register, with `view=state` or the whole chat (`operatorMayReadChat`). That
+  read holds this chat and no list of chats or Projects. Another person's chat, a
+  shared chat and the list stay refused (`organisation_role_insufficient`).
   `GET /v1/control/organisations/:id/chat/surface-effects` lists the pending effects of
   one browser id and conversation, and `POST …/chat/surface-effects/:effectId/receipt`
   returns a receipt. These two routes need the operator role. The receipt route checks

@@ -340,6 +340,7 @@ proposal tool only stages its proposal. A person approves or confirms it (FND-06
 | Agent: get the Kitchen, Costs and Pastry Bench commands, in a Portal turn | No     | No                                                                     | Yes             |
 | Agent: get the Register commands, in a Portal turn                        | No     | Yes, the only page commands                                            | Yes             |
 | Read the effects that wait, and post a receipt                            | No     | Yes                                                                    | Yes             |
+| Read a Portal chat                                                        | No     | Their own private chat from Café › Register                            | Yes             |
 | Get a relevance suggestion. Read On screen                                | No     | No                                                                     | Yes             |
 
 | Limit                                                                                                                                 | Value                                 | Constant                                                                                                          |
@@ -402,13 +403,10 @@ erases the D1 rows. The poll of a browser reads only and writes no row.
 - **Old message parts.** The parser reads only `surface_observation`. It refuses a
   stored `page_view` or `surface` part, and a `surfaceContext` key in a message.
 - **Operator and the Register.** The chat signal socket needs the admin role, so the
-  Register page of an operator gets no `surface_effect` signal and uses only the poll.
-  An operator's chat turn reads its Case context, and the baseline grants
-  `context.case.read` only to the owner and admin roles: an owner grants it to the
-  operator role in Access. A read of a chat (`GET …/chat`) still needs the admin role,
-  so an operator reads no answer of the chat. No browser journey shows the Register
-  page with an operator's chat; `counter-register-journey.test.ts` sends the
-  observation and posts the page receipt.
+  Register page of an operator gets no `surface_effect` signal and uses only the poll
+  (`GET …/chat?view=state` and the read of that one chat, FND-05). No browser journey
+  shows the Register page with an operator's chat; `counter-register-journey.test.ts`
+  sends the observation, posts the page receipt and reads the answer.
 - **Pastry Bench in the browser.** `chat-pastry-bench.test.ts` sends the observation
   that the Portal sends for the Pastry Bench. No browser journey proves the two tools.
 - **Origin.** A side Case, a Slack thread and the Case record have no chat origin.

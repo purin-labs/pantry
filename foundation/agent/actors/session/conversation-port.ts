@@ -15,6 +15,7 @@ import type {
   FlowBinding,
 } from "@purin-labs/authority/policy/index";
 import type { Result } from "@purin-labs/kernel/result";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 /** What the side Case of a turn needs before inference. */
 type SessionSideCaseAdmission = Readonly<{
@@ -81,6 +82,17 @@ export interface SessionConversation {
     binding: FlowBinding,
     authority: Variant<RequestAuthority, "control">,
   ): Promise<Readonly<{ kind: string }>>;
+  /**
+   * Whether the turn is a step of the requester's own private Portal chat,
+   * which reads its own Case with no grant of the Case context read.
+   */
+  ownsPrivateChatTurn(
+    db: OrganisationDatabase,
+    organisationId: OrganisationId,
+    sessionId: string,
+    turnId: string,
+    userId: string,
+  ): Promise<boolean>;
   /** Whether a streamed turn may reach the conversation of a channel. */
   decideStreamSink(
     authority: Readonly<{

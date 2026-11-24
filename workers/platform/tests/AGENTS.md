@@ -201,9 +201,11 @@ test and any fixture that exists only for the obsolete behavior.
   without the order read gets no order.
 - `e2e/counter-register-journey.test.ts` also follows Plan 90 D9 in a chat:
   an operator's private chat message from Café › Register has the agent
-  stage two financiers, the command reaches the operator's Register page and
-  its receipt ends the turn; a viewer's message and an operator's message
-  with no Register page are refused.
+  stage two financiers with no grant from the owner, the command reaches the
+  operator's Register page and its receipt ends the turn, and the operator
+  reads the answer through `GET …/chat`; a viewer's message, an operator's
+  message with no Register page, and the operator's read of the owner's chat,
+  of a shared chat and of the chat list are refused.
 - `e2e/chat-agent-message-link.test.ts` has the owner paste a link into a
   Portal chat: the agent reads the fake public page through the link read
   under the baseline grant of the owner role, and a link that the owner did

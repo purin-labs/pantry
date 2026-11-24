@@ -430,6 +430,42 @@ async function authorizeRecordedSessionOrigin(
 }
 
 /**
+ * Whether a turn is a step of the requester's own private Portal chat: the
+ * person started it, the chat was private to that person when the turn was
+ * admitted, and it is still private to that person now. Such a turn reads the
+ * Case of its own chat with no grant of `context.case.read` (Plan 90 D9: an
+ * operator's Register chat); it reads nothing else of the workspace.
+ */
+export async function isOwnPrivateChatTurn(
+  db: OrganisationDatabase,
+  organisationId: OrganisationId,
+  sessionId: string,
+  turnId: string,
+  userId: string,
+): Promise<boolean> {
+  const origin = await readSessionTurnOrigin(
+    db,
+    organisationId,
+    sessionId,
+    turnId,
+  );
+  if (
+    origin?.kind !== "conversation_session" ||
+    origin.userId !== userId ||
+    origin.audience.surface !== "private" ||
+    origin.audience.recipients.length !== 1 ||
+    origin.audience.recipients[0] !== userId
+  )
+    return false;
+  const access = await authorizeConversation(
+    db,
+    { organisationId, userId: origin.userId },
+    origin.conversationId,
+  );
+  return access?.access.kind === "private";
+}
+
+/**
  * The person and the Portal sign-in of a turn that a person started in the
  * Portal: a chat step or an operator command. Null for a Slack turn and for
  * a turn with no recorded origin.

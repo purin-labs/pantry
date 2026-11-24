@@ -84,6 +84,12 @@ export async function prepareTurnContext(
      * wait of a turn that a person waits for.
      */
     readonly memoryDeadlineMs?: number;
+    /**
+     * Whether the turn is a step of the requester's own private Portal chat.
+     * Such a turn with no grant of `context.case.read` reads the tail of its
+     * own Case only: no Memory and no workspace search.
+     */
+    readonly ownChatCase?: () => Promise<boolean>;
   }>,
 ): Promise<Result<PreparedTurnContext, PrepareTurnContextError>> {
   const permit = await prepareTurnContextRead(input);
@@ -283,11 +289,15 @@ function hasCapability(
 
 class AuthorizedContextRead {
   readonly #fields: ContextReadFields;
+  /** The permit reads the tail of its own Case only (`ownChatCase`). */
+  readonly #caseOnly: boolean;
   private constructor(
     fields: ContextReadFields,
     readonly turnAuthority: CompiledTurnAuthority,
+    caseOnly = false,
   ) {
     this.#fields = Object.freeze(fields);
+    this.#caseOnly = caseOnly;
   }
   static is(value: unknown): value is AuthorizedContextRead {
     return typeof value === "object" && value !== null && #fields in value;
@@ -297,7 +307,11 @@ class AuthorizedContextRead {
   ): Promise<Result<AuthorizedContextRead, PrepareTurnContextError>> {
     const compiled = await prepareTurnAuthority(input);
     if (!compiled.ok) return compiled;
-    if (!hasCapability(compiled.value, CONTEXT_CASE_READ_CAPABILITY))
+    const caseOnly = !hasCapability(
+      compiled.value,
+      CONTEXT_CASE_READ_CAPABILITY,
+    );
+    if (caseOnly && !((await input.ownChatCase?.()) ?? false))
       return { ok: false, error: { code: "context_capability_missing" } };
     return {
       ok: true,
@@ -308,6 +322,7 @@ class AuthorizedContextRead {
           projectionReader: createContextProjectionReader(input.db),
         }),
         compiled.value,
+        caseOnly,
       ),
     };
   }
@@ -318,7 +333,11 @@ class AuthorizedContextRead {
     // Reads that started early count only for the fields of this permit.
     if (started !== null && started.fields !== this.#fields)
       return { ok: false, error: { code: "context_reads_mismatched" } };
-    const assembled = await assembleAuthorizedContext(this, scope, started);
+    const assembled = await assembleAuthorizedContext(
+      this,
+      this.#caseOnly ? "case" : scope,
+      started,
+    );
     return assembled.ok
       ? { ok: true, value: assembled.value }
       : { ok: false, error: { code: assembled.error.code } };

@@ -851,6 +851,12 @@ export async function authorizeForkHistoryAccess(
   destination: import("./disclosure-evidence").DisclosureDestination = {
     kind: "current",
   },
+  /**
+   * `own_private_chat`: the history is the person's own private chat, with
+   * no inherited history, so the person reads it with no grant of the Case
+   * context read (Plan 90 D9). Each binding still meets the flow check.
+   */
+  caseRead: "grant" | "own_private_chat" = "grant",
 ): Promise<readonly string[]> {
   const organisationId = placement.organisationId;
   const policy = await readCurrentOrganisationPolicySnapshot(
@@ -876,7 +882,8 @@ export async function authorizeForkHistoryAccess(
   });
   if (
     !compiled.ok ||
-    !compiled.value.effectiveGrantSet.capabilities.some(isCaseReadCapability)
+    (caseRead === "grant" &&
+      !compiled.value.effectiveGrantSet.capabilities.some(isCaseReadCapability))
   )
     throw new ForkHistoryAccessError(
       "source_policy_denied",

@@ -11,6 +11,7 @@ import {
   readChatForkHistoryForCase,
 } from "./forks";
 import { decideChatFlowDelivery } from "./information-flow";
+import { isOwnPrivateChatTurn } from "./turn-access";
 import {
   admitSideCaseInformationFlow,
   authorizeSideCaseAccess,
@@ -33,6 +34,7 @@ export function sessionConversation(
     admitForkInformationFlow: admitChatForkInformationFlow,
     readSideCase: (scope, caseId) => readSideCase(scope, caseId, slackThread),
     decideFlowDelivery: decideChatFlowDelivery,
+    ownsPrivateChatTurn: isOwnPrivateChatTurn,
     decideStreamSink: decideCaseConversationSink,
   };
 }

@@ -338,6 +338,14 @@ export async function checkConversationDisclosure(
             history,
             authority,
             destination,
+            // The person's own private chat, with no inherited history.
+            access?.access.kind === "private" &&
+              userId === scope.userId &&
+              conversation.lineage.kind === "original" &&
+              inherited.entries.length === 0 &&
+              inherited.bindings.length === 0
+              ? "own_private_chat"
+              : "grant",
           )),
         );
       if (sideCase !== null)
