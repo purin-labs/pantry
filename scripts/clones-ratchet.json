@@ -1,5 +1,5 @@
 {
-  "total": {"copies":756,"lines":13544},
+  "total": {"copies":753,"lines":13484},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -141,7 +141,6 @@
     "areas/kitchen/server/actors/costs-sheet-draft.ts = areas/kitchen/server/actors/production-plan.ts": {"copies":1,"lines":18},
     "areas/kitchen/server/actors/costs-sheet-draft.ts = areas/kitchen/server/actors/workflow-draft.ts": {"copies":1,"lines":13},
     "areas/kitchen/server/agent-tools/bakery/surface.ts = areas/kitchen/server/agent-tools/bakery/surface.ts": {"copies":2,"lines":61},
-    "areas/kitchen/server/agent-tools/kitchen/costs-handlers.ts = areas/kitchen/server/control/routes/costs.ts": {"copies":1,"lines":14},
     "areas/kitchen/server/agent-tools/kitchen/pastry-bench.ts = packages/control-api/src/surface-command.ts": {"copies":1,"lines":26},
     "areas/kitchen/server/bakery/production-scenario.ts = areas/kitchen/server/bakery/sample.ts": {"copies":1,"lines":20},
     "areas/kitchen/server/bakery/production-scenario.ts = areas/kitchen/server/bakery/scenario.ts": {"copies":1,"lines":21},
@@ -150,7 +149,6 @@
     "areas/kitchen/server/control/routes/inventory-production.ts = areas/kitchen/server/control/routes/recipes.ts": {"copies":1,"lines":8},
     "areas/kitchen/server/control/routes/inventory-receipts.ts = areas/kitchen/server/control/routes/inventory-receipts.ts": {"copies":1,"lines":13},
     "areas/kitchen/server/control/routes/purchasing.ts = areas/kitchen/server/control/routes/purchasing.ts": {"copies":1,"lines":13},
-    "areas/kitchen/server/cost-plan-store.ts = areas/kitchen/server/cost-plan-store.ts": {"copies":2,"lines":46},
     "areas/kitchen/ui/features/costs/costs-sheet-draft.ts = areas/kitchen/ui/features/costs/costs-sheet-draft.ts": {"copies":3,"lines":27},
     "areas/kitchen/ui/features/costs/route.tsx = areas/kitchen/ui/features/costs/route.tsx": {"copies":5,"lines":39},
     "areas/kitchen/ui/features/production-run/black-sesame/black-sesame-physics-view.tsx = areas/kitchen/ui/features/production-run/financier-batter/financier-batter-physics-view.tsx": {"copies":1,"lines":26},

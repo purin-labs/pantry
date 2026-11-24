@@ -230,6 +230,42 @@ export async function readCostsOverview(
   };
 }
 
+/**
+ * Why the pack terms of a stock item cannot be saved, or null when they can:
+ * the item must be active, not a finished good, and in a unit of its base unit.
+ */
+export function supplyCostWriteProblem(
+  snapshot: CommerceStockSnapshot,
+  write: Pick<SupplyCostWrite, "inventoryItemId" | "packUnit">,
+): Extract<SupplyCostSaveResult, { detail: string }> | null {
+  const item = snapshot.commerce.resources.inventoryItems.find(
+    (candidate) => candidate.id === write.inventoryItemId,
+  );
+  if (item === undefined || item.lifecycle !== "active") {
+    return {
+      ok: false,
+      code: "supply_cost_invalid",
+      detail: `Supply item ${write.inventoryItemId} is not active.`,
+    };
+  }
+  if (item.category === "finished_good") {
+    return {
+      ok: false,
+      code: "supply_cost_invalid",
+      detail:
+        "Finished goods derive their cost from recipes rather than supplier pack terms.",
+    };
+  }
+  if (!areCostUnitsCompatible(write.packUnit, item.baseUnit)) {
+    return {
+      ok: false,
+      code: "supply_cost_unit_mismatch",
+      detail: `Pack unit ${write.packUnit} is not compatible with ${item.name} (${item.baseUnit}).`,
+    };
+  }
+  return null;
+}
+
 export async function saveSupplyCostTerms(
   input: Readonly<{
     adminClient: CommerceAdminClient;
@@ -249,32 +285,8 @@ export async function saveSupplyCostTerms(
     {return { ok: false, code: "commerce_unavailable" };}
   if (snapshotResult.value.commerce.merchantId !== input.merchantId)
     {return { ok: false, code: "commerce_scope_mismatch" };}
-
-  const item = snapshotResult.value.commerce.resources.inventoryItems.find(
-    (candidate) => candidate.id === input.write.inventoryItemId,
-  );
-  if (item === undefined || item.lifecycle !== "active") {
-    return {
-      ok: false,
-      code: "supply_cost_invalid",
-      detail: `Supply item ${input.write.inventoryItemId} is not active.`,
-    };
-  }
-  if (item.category === "finished_good") {
-    return {
-      ok: false,
-      code: "supply_cost_invalid",
-      detail:
-        "Finished goods derive their cost from recipes rather than supplier pack terms.",
-    };
-  }
-  if (!areCostUnitsCompatible(input.write.packUnit, item.baseUnit)) {
-    return {
-      ok: false,
-      code: "supply_cost_unit_mismatch",
-      detail: `Pack unit ${input.write.packUnit} is not compatible with ${item.name} (${item.baseUnit}).`,
-    };
-  }
+  const problem = supplyCostWriteProblem(snapshotResult.value, input.write);
+  if (problem !== null) {return problem;}
 
   for (let attempt = 0; attempt < SAVE_ATTEMPT_LIMIT; attempt += 1) {
     const ensured = await ensureSupplyCostList(

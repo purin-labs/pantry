@@ -17,6 +17,7 @@ import {
   calculateBakeryPlanVsActuals,
   isFormulaExpression,
   parseCostsOverview,
+  parseCostsSheetSaved,
   type ActualsWindowDays,
   type CalculatedProductMargin,
   type CostFormulaColumn,
@@ -40,6 +41,7 @@ import {
 } from "@purin-labs/costs-sheet-crdt";
 import {
   controlRead,
+  controlRefusal,
   forgetControlReads,
 } from "@purin-labs/control/portal/control-client";
 import { formatMoneyMinor } from "@purin-labs/ui/formatting";
@@ -50,7 +52,12 @@ import {
   type CrmColumn,
   type CrmRowAction,
 } from "@purin-labs/ui/index";
-import { costsError, costsPath, type CostsMutation } from "./api";
+import {
+  costsError,
+  costsPath,
+  partlySavedNotice,
+  type CostsMutation,
+} from "./api";
 import {
   CostsActualsKpiStrip,
   CostsActualsSheet,
@@ -272,11 +279,14 @@ export class CostsPage extends React.Component<Props, State> {
     }
     if (shouldReloadBaseline && this.state.kind === "ready") {
       forgetControlReads();
-      void this.load(this.state.notice);
+      void this.load(this.state.notice, this.state.noticeIsError);
     }
   };
 
-  private async load(preserveNotice = ""): Promise<void> {
+  private async load(
+    preserveNotice = "",
+    noticeIsError = false,
+  ): Promise<void> {
     if (this.state.kind !== "ready") {
       this.setState({ kind: "loading" });
     }
@@ -302,7 +312,7 @@ export class CostsPage extends React.Component<Props, State> {
         saving: false,
         pendingSaveKey: null,
         notice: preserveNotice,
-        noticeIsError: false,
+        noticeIsError,
       });
     } catch (error) {
       if (this.mounted) {
@@ -724,14 +734,21 @@ export class CostsPage extends React.Component<Props, State> {
       forgetControlReads();
       await this.load(`Saved ${parts.join(", ")}.`);
     } catch (error) {
-      if (this.mounted && this.state.kind === "ready") {
-        this.setState({
-          ...this.state,
-          saving: false,
-          notice: costsError(error),
-          noticeIsError: true,
-        });
+      if (!this.mounted || this.state.kind !== "ready") return;
+      // A refused save can keep the records that saved before the refusal:
+      // the page reads them again, and the next save sends only the rest.
+      const saved = parseCostsSheetSaved(controlRefusal(error)?.body);
+      if (saved !== null) {
+        forgetControlReads();
+        await this.load(partlySavedNotice(saved, costsError(error)), true);
+        return;
       }
+      this.setState({
+        ...this.state,
+        saving: false,
+        notice: costsError(error),
+        noticeIsError: true,
+      });
     }
   }
 

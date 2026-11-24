@@ -401,11 +401,27 @@ export const costsSheetWriteResultSchema = Type.Object({
 
 export type CostsSheetWriteResult = Static<typeof costsSheetWriteResultSchema>;
 
+/** The records of a refused sheet save that saved before the refusal. */
+export const costsSheetSavedSchema = Type.Object({
+  offerIds: Type.Array(text),
+  inventoryItemIds: Type.Array(text),
+});
+
+export type CostsSheetSaved = Static<typeof costsSheetSavedSchema>;
+
+const costsSheetRefusalSchema = Type.Object({
+  ok: Type.Literal(false),
+  error: text,
+  detail: Type.Optional(text),
+  saved: costsSheetSavedSchema,
+});
+
 const decodeOverview = recordParser(costsOverviewSchema);
 const decodeSupplyWrite = recordParser(supplyCostWriteSchema);
 const decodeLotCostWrite = recordParser(lotCostWriteSchema);
 const decodeSheetWrite = recordParser(costsSheetWriteSchema);
 const decodeSheetWriteResult = recordParser(costsSheetWriteResultSchema);
+const decodeSheetRefusal = recordParser(costsSheetRefusalSchema);
 
 const DEFAULT_WEEK_WEIGHTS: readonly [
   number,
@@ -589,6 +605,22 @@ export function parseCostsSheetWriteResult(
     throw new Error("The cost sheet save receipt is invalid.");
   }
   return result.value;
+}
+
+/**
+ * The records that a refused sheet save saved, or null when the refusal saved
+ * none or is not a sheet save refusal.
+ */
+export function parseCostsSheetSaved(value: unknown): CostsSheetSaved | null {
+  const result = decodeSheetRefusal(value);
+  if (
+    !result.ok ||
+    (result.value.saved.offerIds.length === 0 &&
+      result.value.saved.inventoryItemIds.length === 0)
+  ) {
+    return null;
+  }
+  return result.value.saved;
 }
 
 export function defaultWeekUnitsForDaily(dailyUnits: number): WeekUnits {

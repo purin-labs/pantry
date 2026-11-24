@@ -1,4 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { CommerceStockSnapshot } from "@purin-labs/commerce-client";
 import {
   areCostUnitsCompatible,
   isCostFormulaColumn,
@@ -7,15 +8,10 @@ import {
   type CostForecastPlan,
   type CostUnit,
   type LotCostLineWrite,
-  type OfferPriceWrite,
   type OrganisationCostPlan,
   type ProductCostPlanEntry,
   type SupplyLotInvoiceCost,
 } from "@purin-labs/kitchen-control-api";
-import {
-  commerceCommandInput,
-  type CommerceAdminClient,
-} from "@purin-labs/commerce-client";
 
 type PlanHeaderRow = Readonly<{
   revision: number;
@@ -43,17 +39,6 @@ export type CostPlanSaveResult =
   | Readonly<{ ok: true; revision: number; plan: OrganisationCostPlan }>
   | Readonly<{ ok: false; code: "cost_plan_changed" }>
   | Readonly<{ ok: false; code: "cost_plan_invalid"; detail: string }>;
-
-type OfferPriceSaveResult =
-  | Readonly<{ ok: true; merchantRevision: number | null }>
-  | Readonly<{
-      ok: false;
-      code:
-        | "commerce_unavailable"
-        | "commerce_scope_mismatch"
-        | "offer_price_changed";
-    }>
-  | Readonly<{ ok: false; code: "offer_price_invalid"; detail: string }>;
 
 export type LotCostSaveResult =
   | Readonly<{ ok: true; revision: number; invoiceCost: SupplyLotInvoiceCost }>
@@ -157,21 +142,65 @@ export async function readOrganisationCostPlan(
   };
 }
 
+/**
+ * A save of D1 rows that the caller applies in one batch. `saved` means the
+ * rows already hold the values, so a repeat gives the saved result and writes
+ * nothing. `write` holds a guard that fails the whole batch when another save
+ * changed the rows after this read, and the statements that write them.
+ */
+export type PreparedRowSave<T> =
+  | Readonly<{ kind: "saved"; value: T }>
+  | Readonly<{
+      kind: "write";
+      guard: D1PreparedStatement;
+      statements: readonly D1PreparedStatement[];
+      value: T;
+    }>;
+
+type SavedCostPlan = Readonly<{
+  revision: number;
+  plan: OrganisationCostPlan;
+}>;
+
+type CostPlanPrepareResult =
+  | Readonly<{ ok: true; save: PreparedRowSave<SavedCostPlan> }>
+  | Exclude<CostPlanSaveResult, { ok: true }>;
+
+export type CostPlanSaveInput = Readonly<{
+  db: OrganisationDatabase;
+  organisationId: string;
+  updatedBy: string;
+  nowMs: number;
+  expectedPlanRevision: number | null;
+  dailyLaborMinor: number | null;
+  dailyRentMinor: number | null;
+  products: readonly ProductCostPlanEntry[];
+  forecast?: CostForecastPlan | null;
+  replaceAllProducts: boolean;
+  knownProductIds?: ReadonlySet<string>;
+}>;
+
 export async function saveOrganisationCostPlan(
-  input: Readonly<{
-    db: OrganisationDatabase;
-    organisationId: string;
-    updatedBy: string;
-    nowMs: number;
-    expectedPlanRevision: number | null;
-    dailyLaborMinor: number | null;
-    dailyRentMinor: number | null;
-    products: readonly ProductCostPlanEntry[];
-    forecast?: CostForecastPlan | null;
-    replaceAllProducts: boolean;
-    knownProductIds?: ReadonlySet<string>;
-  }>,
+  input: CostPlanSaveInput,
 ): Promise<CostPlanSaveResult> {
+  const prepared = await prepareOrganisationCostPlanSave(input);
+  if (!prepared.ok) {
+    return prepared;
+  }
+  if (prepared.save.kind === "saved") {
+    return { ok: true, ...prepared.save.value };
+  }
+  const batchResults = await input.db.batch([...prepared.save.statements]);
+  if ((batchResults[0]?.meta.changes ?? 0) !== 1) {
+    return { ok: false, code: "cost_plan_changed" };
+  }
+  return { ok: true, ...prepared.save.value };
+}
+
+/** Checks a plan save against the saved plan and builds its statements. */
+export async function prepareOrganisationCostPlanSave(
+  input: CostPlanSaveInput,
+): Promise<CostPlanPrepareResult> {
   if (input.knownProductIds !== undefined) {
     for (const entry of input.products) {
       if (!input.knownProductIds.has(entry.productId)) {
@@ -219,187 +248,135 @@ export async function saveOrganisationCostPlan(
   const nextProducts = [...mergedByProductId.values()].sort((left, right) =>
     left.productId.localeCompare(right.productId),
   );
-
-  if (input.expectedPlanRevision === null) {
-    if (current.revision !== null) {
-      if (
-        current.revision === 1 &&
-        samePlanState(
-          current,
-          nextDailyLaborMinor,
-          nextDailyRentMinor,
-          nextProducts,
-          nextForecastJson,
-        )
-      ) {
-        return { ok: true, revision: 1, plan: current };
-      }
-      return { ok: false, code: "cost_plan_changed" };
-    }
-
-    const nextRevision = 1;
-    const statements: D1PreparedStatement[] = [
-      input.db
-        .prepare(
-          `INSERT INTO bakery_cost_plan (
-             organisation_id, revision, daily_labor_minor, daily_rent_minor, forecast_json, updated_by, updated_at
-           )
-           SELECT ?1, 1, ?2, ?3, ?4, ?5, ?6
-           WHERE NOT EXISTS (
-             SELECT 1 FROM bakery_cost_plan WHERE organisation_id = ?1
-           )`,
-        )
-        .bind(
-          input.organisationId,
-          nextDailyLaborMinor,
-          nextDailyRentMinor,
-          nextForecastJson,
-          input.updatedBy,
-          input.nowMs,
-        ),
-      ...buildGuardedProductStatements(
-        input.db,
-        input.organisationId,
-        nextRevision,
-        nextProducts,
-        input.nowMs,
-      ),
-    ];
-
-    const batchResults = await input.db.batch(statements);
-    if ((batchResults[0]?.meta.changes ?? 0) !== 1) {
-      return { ok: false, code: "cost_plan_changed" };
-    }
-    return {
-      ok: true,
-      revision: nextRevision,
-      plan: {
-        revision: nextRevision,
-        dailyLaborMinor: nextDailyLaborMinor,
-        dailyRentMinor: nextDailyRentMinor,
-        products: nextProducts,
-        ...(nextForecast !== undefined ? { forecast: nextForecast } : {}),
-      },
-    };
-  }
-
-  if (current.revision === null) {
-    return { ok: false, code: "cost_plan_changed" };
-  }
-  if (current.revision !== input.expectedPlanRevision) {
-    if (
-      current.revision === input.expectedPlanRevision + 1 &&
-      samePlanState(
-        current,
-        nextDailyLaborMinor,
-        nextDailyRentMinor,
-        nextProducts,
-        nextForecastJson,
-      )
-    ) {
-      return { ok: true, revision: current.revision, plan: current };
-    }
-    return { ok: false, code: "cost_plan_changed" };
-  }
-
-  const nextRevision = input.expectedPlanRevision + 1;
-  const statements: D1PreparedStatement[] = [
-    input.db
-      .prepare(
-        `UPDATE bakery_cost_plan
-            SET revision = ?2,
-                daily_labor_minor = ?3,
-                daily_rent_minor = ?4,
-                forecast_json = ?5,
-                updated_by = ?6,
-                updated_at = ?7
-          WHERE organisation_id = ?1
-            AND revision = ?8`,
-      )
-      .bind(
-        input.organisationId,
-        nextRevision,
-        nextDailyLaborMinor,
-        nextDailyRentMinor,
-        nextForecastJson,
-        input.updatedBy,
-        input.nowMs,
-        input.expectedPlanRevision,
-      ),
-    ...buildGuardedProductStatements(
-      input.db,
-      input.organisationId,
-      nextRevision,
+  const sameAsSaved = (): boolean =>
+    samePlanState(
+      current,
+      nextDailyLaborMinor,
+      nextDailyRentMinor,
       nextProducts,
-      input.nowMs,
-    ),
-  ];
+      nextForecastJson,
+    );
 
-  const batchResults = await input.db.batch(statements);
-  if ((batchResults[0]?.meta.changes ?? 0) !== 1) {
+  const expected = input.expectedPlanRevision;
+  if (current.revision !== expected) {
+    // A repeat of a save that already applied gives the saved plan.
+    if (
+      current.revision !== null &&
+      current.revision === (expected ?? 0) + 1 &&
+      sameAsSaved()
+    ) {
+      return {
+        ok: true,
+        save: {
+          kind: "saved",
+          value: { revision: current.revision, plan: current },
+        },
+      };
+    }
     return { ok: false, code: "cost_plan_changed" };
   }
+
+  const nextRevision = (expected ?? 0) + 1;
+  const header =
+    expected === null
+      ? input.db
+          .prepare(
+            `INSERT INTO bakery_cost_plan (
+               organisation_id, revision, daily_labor_minor, daily_rent_minor, forecast_json, updated_by, updated_at
+             )
+             SELECT ?1, 1, ?2, ?3, ?4, ?5, ?6
+             WHERE NOT EXISTS (
+               SELECT 1 FROM bakery_cost_plan WHERE organisation_id = ?1
+             )`,
+          )
+          .bind(
+            input.organisationId,
+            nextDailyLaborMinor,
+            nextDailyRentMinor,
+            nextForecastJson,
+            input.updatedBy,
+            input.nowMs,
+          )
+      : input.db
+          .prepare(
+            `UPDATE bakery_cost_plan
+                SET revision = ?2,
+                    daily_labor_minor = ?3,
+                    daily_rent_minor = ?4,
+                    forecast_json = ?5,
+                    updated_by = ?6,
+                    updated_at = ?7
+              WHERE organisation_id = ?1
+                AND revision = ?8`,
+          )
+          .bind(
+            input.organisationId,
+            nextRevision,
+            nextDailyLaborMinor,
+            nextDailyRentMinor,
+            nextForecastJson,
+            input.updatedBy,
+            input.nowMs,
+            expected,
+          );
+  const guard =
+    expected === null
+      ? batchGuard(
+          input.db,
+          "NOT EXISTS (SELECT 1 FROM bakery_cost_plan WHERE organisation_id = ?1)",
+          [input.organisationId],
+          "cost_plan_changed",
+        )
+      : batchGuard(
+          input.db,
+          "EXISTS (SELECT 1 FROM bakery_cost_plan WHERE organisation_id = ?1 AND revision = ?2)",
+          [input.organisationId, expected],
+          "cost_plan_changed",
+        );
   return {
     ok: true,
-    revision: nextRevision,
-    plan: {
-      revision: nextRevision,
-      dailyLaborMinor: nextDailyLaborMinor,
-      dailyRentMinor: nextDailyRentMinor,
-      products: nextProducts,
-      ...(nextForecast !== undefined ? { forecast: nextForecast } : {}),
+    save: {
+      kind: "write",
+      guard,
+      statements: [
+        header,
+        ...buildGuardedProductStatements(
+          input.db,
+          input.organisationId,
+          nextRevision,
+          nextProducts,
+          input.nowMs,
+        ),
+      ],
+      value: {
+        revision: nextRevision,
+        plan: {
+          revision: nextRevision,
+          dailyLaborMinor: nextDailyLaborMinor,
+          dailyRentMinor: nextDailyRentMinor,
+          products: nextProducts,
+          ...(nextForecast !== undefined ? { forecast: nextForecast } : {}),
+        },
+      },
     },
   };
 }
 
-export async function saveOfferPriceWrites(input: Readonly<{
-  adminClient: CommerceAdminClient;
-  merchantId: string;
-  idempotencyKey: string;
-  writes: readonly OfferPriceWrite[];
-}>): Promise<OfferPriceSaveResult> {
-  if (input.writes.length === 0) {
-    return { ok: true, merchantRevision: null };
-  }
-  let latestMerchantRevision: number | null = null;
-  const baseKey = input.idempotencyKey.slice(0, 80);
-
-  for (const offerWrite of input.writes) {
-    const updated = await input.adminClient.updateOffer(
-      commerceCommandInput({
-        merchantId: input.merchantId,
-        idempotencyKey: `${baseKey}:offer:${offerWrite.offerId}`,
-        offerId: offerWrite.offerId,
-        expectedOfferRevision: offerWrite.expectedOfferRevision,
-        changes: {
-          price: {
-            amountMinor: offerWrite.priceMinor,
-            currency: offerWrite.currency,
-          },
-        },
-      }),
-    );
-    if (!updated.ok) {
-      return { ok: false, code: "commerce_unavailable" };
-    }
-    if (updated.value.outcome === "rejected") {
-      const code = updated.value.error.code;
-      if (code === "resource_not_found" || code === "invalid_command") {
-        return {
-          ok: false,
-          code: "offer_price_invalid",
-          detail: `Offer ${offerWrite.offerId} rejected (${code}).`,
-        };
-      }
-      return { ok: false, code: "offer_price_changed" };
-    }
-    if (updated.value.receipt.merchantId !== input.merchantId) {
-      return { ok: false, code: "commerce_scope_mismatch" };
-    }
-    latestMerchantRevision = Number(updated.value.receipt.merchantRevision);
-  }
-
-  return { ok: true, merchantRevision: latestMerchantRevision };
+/**
+ * A statement that fails its batch when `condition` is false, so that no
+ * write of the batch applies. The value of `code` names the reason in a log.
+ */
+function batchGuard(
+  db: OrganisationDatabase,
+  condition: string,
+  values: readonly unknown[],
+  code: string,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `SELECT CASE WHEN ${condition} THEN 1 ELSE json_extract('${code}', '$') END`,
+    )
+    .bind(...values);
 }
 
 function buildGuardedProductStatements(
@@ -700,19 +677,76 @@ export async function readReplenishmentSupplierPayables(
   return out;
 }
 
+export type LotCostSaveInput = Readonly<{
+  db: OrganisationDatabase;
+  organisationId: string;
+  updatedBy: string;
+  nowMs: number;
+  write: LotCostLineWrite;
+  knownLotsById?: KnownLotsById;
+}>;
+
+/** The stock item and the base unit of each lot that can carry an invoice cost. */
+export type KnownLotsById = ReadonlyMap<
+  string,
+  Readonly<{ inventoryItemId: string; baseUnit: CostUnit }>
+>;
+
+/** The lots of the snapshot whose stock item is not a finished good. */
+export function knownLotsOfSnapshot(
+  snapshot: CommerceStockSnapshot,
+): KnownLotsById {
+  const itemsById = new Map(
+    snapshot.commerce.resources.inventoryItems.map((item) => [item.id, item]),
+  );
+  const lots = new Map<
+    string,
+    Readonly<{ inventoryItemId: string; baseUnit: CostUnit }>
+  >();
+  for (const lot of snapshot.lots) {
+    const item = itemsById.get(lot.inventoryItemId);
+    if (item === undefined || item.category === "finished_good") {
+      continue;
+    }
+    lots.set(lot.id, {
+      inventoryItemId: lot.inventoryItemId,
+      baseUnit: item.baseUnit,
+    });
+  }
+  return lots;
+}
+
+type SavedLotCost = Readonly<{
+  revision: number;
+  invoiceCost: SupplyLotInvoiceCost;
+}>;
+
+type LotCostPrepareResult =
+  | Readonly<{ ok: true; save: PreparedRowSave<SavedLotCost> }>
+  | Exclude<LotCostSaveResult, { ok: true }>;
+
 export async function saveOrganisationLotInvoiceCost(
-  input: Readonly<{
-    db: OrganisationDatabase;
-    organisationId: string;
-    updatedBy: string;
-    nowMs: number;
-    write: LotCostLineWrite;
-    knownLotsById?: ReadonlyMap<
-      string,
-      Readonly<{ inventoryItemId: string; baseUnit: CostUnit }>
-    >;
-  }>,
+  input: LotCostSaveInput,
 ): Promise<LotCostSaveResult> {
+  const prepared = await prepareOrganisationLotInvoiceCostSave(input);
+  if (!prepared.ok) {
+    return prepared;
+  }
+  if (prepared.save.kind === "saved") {
+    return { ok: true, ...prepared.save.value };
+  }
+  const [write] = prepared.save.statements;
+  const written = write === undefined ? null : await write.run();
+  if ((written?.meta.changes ?? 0) !== 1) {
+    return { ok: false, code: "lot_cost_changed" };
+  }
+  return { ok: true, ...prepared.save.value };
+}
+
+/** Checks a lot invoice cost against its lot and saved row, and builds its statement. */
+export async function prepareOrganisationLotInvoiceCostSave(
+  input: LotCostSaveInput,
+): Promise<LotCostPrepareResult> {
   const { write } = input;
   if (input.knownLotsById !== undefined) {
     const knownLot = input.knownLotsById.get(write.lotId);
@@ -750,139 +784,123 @@ export async function saveOrganisationLotInvoiceCost(
     )
     .bind(input.organisationId, write.lotId)
     .first<LotInvoiceCostRow>();
-
   const existing =
     existingRow === null ? null : decodeLotInvoiceCostRow(existingRow);
 
-  if (write.expectedRevision === null) {
-    if (existing !== null) {
-      if (existing.revision === 1 && sameLotInvoiceCost(existing, write)) {
-        return {
-          ok: true,
-          revision: 1,
-          invoiceCost: existing,
-        };
-      }
-      return { ok: false, code: "lot_cost_changed" };
-    }
-
-    const nextRevision = 1;
-    const inserted = await input.db
-      .prepare(
-        `INSERT INTO bakery_lot_invoice_cost (
-           organisation_id, lot_id, inventory_item_id, revision,
-           currency, invoiced_quantity, invoiced_unit, invoice_total_minor,
-           invoice_reference, supplier_id, updated_by, updated_at
-         )
-         SELECT ?1, ?2, ?3, 1, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11
-         WHERE NOT EXISTS (
-           SELECT 1 FROM bakery_lot_invoice_cost
-            WHERE organisation_id = ?1 AND lot_id = ?2
-         )`,
-      )
-      .bind(
-        input.organisationId,
-        write.lotId,
-        write.inventoryItemId,
-        write.currency,
-        write.invoicedQuantity,
-        write.invoicedUnit,
-        nonNegInt(write.invoiceTotalMinor),
-        write.invoiceReference,
-        write.supplierId,
-        input.updatedBy,
-        input.nowMs,
-      )
-      .run();
-
-    if ((inserted.meta.changes ?? 0) !== 1) {
-      return { ok: false, code: "lot_cost_changed" };
-    }
-
-    return {
-      ok: true,
-      revision: nextRevision,
-      invoiceCost: {
-        revision: nextRevision,
-        source: "lot_invoice",
-        currency: write.currency,
-        invoicedQuantity: write.invoicedQuantity,
-        invoicedUnit: write.invoicedUnit,
-        invoiceTotalMinor: nonNegInt(write.invoiceTotalMinor),
-        invoiceReference: write.invoiceReference,
-        supplierId: write.supplierId,
-      },
-    };
-  }
-
-  if (existing === null) {
-    return { ok: false, code: "lot_cost_changed" };
-  }
-  if (existing.revision !== write.expectedRevision) {
+  const expected = write.expectedRevision;
+  const currentRevision = existing?.revision ?? null;
+  if (currentRevision !== expected) {
+    // A repeat of a save that already applied gives the saved cost.
     if (
-      existing.revision === write.expectedRevision + 1 &&
+      existing !== null &&
+      existing.revision === (expected ?? 0) + 1 &&
       sameLotInvoiceCost(existing, write)
     ) {
       return {
         ok: true,
-        revision: existing.revision,
-        invoiceCost: existing,
+        save: {
+          kind: "saved",
+          value: { revision: existing.revision, invoiceCost: existing },
+        },
       };
     }
     return { ok: false, code: "lot_cost_changed" };
   }
 
-  const nextRevision = write.expectedRevision + 1;
-  const updated = await input.db
-    .prepare(
-      `UPDATE bakery_lot_invoice_cost
-          SET revision = ?3,
-              inventory_item_id = ?4,
-              currency = ?5,
-              invoiced_quantity = ?6,
-              invoiced_unit = ?7,
-              invoice_total_minor = ?8,
-              invoice_reference = ?9,
-              supplier_id = ?10,
-              updated_by = ?11,
-              updated_at = ?12
-        WHERE organisation_id = ?1
-          AND lot_id = ?2
-          AND revision = ?13`,
-    )
-    .bind(
-      input.organisationId,
-      write.lotId,
-      nextRevision,
-      write.inventoryItemId,
-      write.currency,
-      write.invoicedQuantity,
-      write.invoicedUnit,
-      nonNegInt(write.invoiceTotalMinor),
-      write.invoiceReference,
-      write.supplierId,
-      input.updatedBy,
-      input.nowMs,
-      write.expectedRevision,
-    )
-    .run();
-
-  if ((updated.meta.changes ?? 0) !== 1) {
-    return { ok: false, code: "lot_cost_changed" };
-  }
-
+  const nextRevision = (expected ?? 0) + 1;
+  const statement =
+    expected === null
+      ? input.db
+          .prepare(
+            `INSERT INTO bakery_lot_invoice_cost (
+               organisation_id, lot_id, inventory_item_id, revision,
+               currency, invoiced_quantity, invoiced_unit, invoice_total_minor,
+               invoice_reference, supplier_id, updated_by, updated_at
+             )
+             SELECT ?1, ?2, ?3, 1, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11
+             WHERE NOT EXISTS (
+               SELECT 1 FROM bakery_lot_invoice_cost
+                WHERE organisation_id = ?1 AND lot_id = ?2
+             )`,
+          )
+          .bind(
+            input.organisationId,
+            write.lotId,
+            write.inventoryItemId,
+            write.currency,
+            write.invoicedQuantity,
+            write.invoicedUnit,
+            nonNegInt(write.invoiceTotalMinor),
+            write.invoiceReference,
+            write.supplierId,
+            input.updatedBy,
+            input.nowMs,
+          )
+      : input.db
+          .prepare(
+            `UPDATE bakery_lot_invoice_cost
+                SET revision = ?3,
+                    inventory_item_id = ?4,
+                    currency = ?5,
+                    invoiced_quantity = ?6,
+                    invoiced_unit = ?7,
+                    invoice_total_minor = ?8,
+                    invoice_reference = ?9,
+                    supplier_id = ?10,
+                    updated_by = ?11,
+                    updated_at = ?12
+              WHERE organisation_id = ?1
+                AND lot_id = ?2
+                AND revision = ?13`,
+          )
+          .bind(
+            input.organisationId,
+            write.lotId,
+            nextRevision,
+            write.inventoryItemId,
+            write.currency,
+            write.invoicedQuantity,
+            write.invoicedUnit,
+            nonNegInt(write.invoiceTotalMinor),
+            write.invoiceReference,
+            write.supplierId,
+            input.updatedBy,
+            input.nowMs,
+            expected,
+          );
+  const guard =
+    expected === null
+      ? batchGuard(
+          input.db,
+          "NOT EXISTS (SELECT 1 FROM bakery_lot_invoice_cost WHERE organisation_id = ?1 AND lot_id = ?2)",
+          [input.organisationId, write.lotId],
+          "lot_cost_changed",
+        )
+      : batchGuard(
+          input.db,
+          "EXISTS (SELECT 1 FROM bakery_lot_invoice_cost WHERE organisation_id = ?1 AND lot_id = ?2 AND revision = ?3)",
+          [input.organisationId, write.lotId, expected],
+          "lot_cost_changed",
+        );
   return {
     ok: true,
-    revision: nextRevision,
-    invoiceCost: {
-      revision: nextRevision,
-      source: "lot_invoice",
-      currency: write.currency,
-      invoicedQuantity: write.invoicedQuantity,
-      invoicedUnit: write.invoicedUnit,
-      invoiceTotalMinor: nonNegInt(write.invoiceTotalMinor),
-      invoiceReference: write.invoiceReference,
-      supplierId: write.supplierId,
+    save: {
+      kind: "write",
+      guard,
+      statements: [statement],
+      value: {
+        revision: nextRevision,
+        invoiceCost: {
+          revision: nextRevision,
+          source: "lot_invoice",
+          currency: write.currency,
+          invoicedQuantity: write.invoicedQuantity,
+          invoicedUnit: write.invoicedUnit,
+          invoiceTotalMinor: nonNegInt(write.invoiceTotalMinor),
+          invoiceReference: write.invoiceReference,
+          supplierId: write.supplierId,
+        },
+      },
     },
   };
 }

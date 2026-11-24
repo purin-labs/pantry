@@ -1,4 +1,7 @@
-import type { CostUnit } from "@purin-labs/kitchen-control-api";
+import type {
+  CostUnit,
+  CostsSheetSaved,
+} from "@purin-labs/kitchen-control-api";
 import type { ControlMutationIntent } from "@purin-labs/control/portal/control-client";
 
 export type CostsMutation = (
@@ -15,6 +18,21 @@ export function costsError(error: unknown): string {
   return error instanceof Error
     ? error.message
     : "Costs and margins are unavailable. Try again.";
+}
+
+/** The notice of a sheet save that saved some records before a refusal. */
+export function partlySavedNotice(
+  saved: CostsSheetSaved,
+  reason: string,
+): string {
+  const parts: string[] = [];
+  const prices = saved.offerIds.length;
+  const packs = saved.inventoryItemIds.length;
+  if (prices > 0) parts.push(`${prices} ${prices === 1 ? "price" : "prices"}`);
+  if (packs > 0) {
+    parts.push(`${packs} supplier ${packs === 1 ? "pack" : "packs"}`);
+  }
+  return `Saved ${parts.join(" and ")}. The other changes did not save: ${reason} Save again to send them.`;
 }
 
 export function formatCostQuantity(amount: number, unit: CostUnit): string {

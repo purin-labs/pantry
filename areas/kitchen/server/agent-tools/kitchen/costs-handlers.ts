@@ -1,35 +1,16 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
-  FORECAST_CAPEX_MINOR_CELL_KEY,
-  FORECAST_DEMAND_CURVE_CELL_KEY,
-  FORECAST_EXTRA_SHIFT_THRESHOLD_PCT_CELL_KEY,
-  FORECAST_EXTRA_SHIFT_WEEKLY_MINOR_CELL_KEY,
-  FORECAST_OPENING_CASH_CELL_KEY,
-  FORECAST_SUPPLIER_TERMS_CELL_KEY,
   META_SAVED_AT_CELL_KEY,
   OVERHEAD_LABOR_CELL_KEY,
-  OVERHEAD_RENT_CELL_KEY,
-  SCENARIO_PRESET_CELL_KEY,
-  forecastWeekIndexCellKey,
-  lotInvoiceFieldCellKey,
-  productCogsCellKey,
-  productDailyCellKey,
-  productDayCellKey,
-  productFormulaCellKey,
-  productSpoilCellKey,
-  productWasteCellKey,
-  supplyFieldCellKey,
   type CostsSheetCell,
 } from "@purin-labs/costs-sheet-crdt";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import {
-  COST_FORMULA_COLUMNS,
   calculateBakery12WeekForecast,
   calculateBakeryCostsAndMargins,
   calculateBakeryPlanVsActuals,
   defaultCostAssumptions,
   type CostForecastPlan,
-  type CostUnit,
 } from "@purin-labs/kitchen-control-api";
 import { assertNever } from "@purin-labs/std";
 import type {
@@ -69,11 +50,17 @@ import {
   type SupplyCostSaveResult,
 } from "../../cost-commands";
 import {
+  knownLotsOfSnapshot,
   saveOrganisationCostPlan,
   saveOrganisationLotInvoiceCost,
   type CostPlanSaveResult,
   type LotCostSaveResult,
 } from "../../cost-plan-store";
+import {
+  costPlanCellKeys,
+  lotInvoiceCellKeys,
+  supplyItemCellKeys,
+} from "../../costs-sheet-cells";
 import { CommerceReadRequestError } from "@purin-labs/area-commerce-contract/server/read-errors";
 import type { Env } from "@purin-labs/kernel/env";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
@@ -901,14 +888,7 @@ async function saveSupplyCostForSession(
       const refusal = supplyCostSaveRefusal(saved);
       if (refusal === null) {
         await host.settleSavedCells(
-          [
-            supplyFieldCellKey(request.inventoryItemId, "packQuantity"),
-            supplyFieldCellKey(request.inventoryItemId, "packUnit"),
-            supplyFieldCellKey(request.inventoryItemId, "packPriceMajor"),
-            supplyFieldCellKey(request.inventoryItemId, "bulkMin7dQuantity"),
-            supplyFieldCellKey(request.inventoryItemId, "bulkPackQuantity"),
-            supplyFieldCellKey(request.inventoryItemId, "bulkPackPriceMajor"),
-          ],
+          supplyItemCellKeys(request.inventoryItemId),
           nowMs,
         );
       }
@@ -961,41 +941,17 @@ async function saveCostsPlanForSession(
       });
       const refusal = costPlanSaveRefusal(saved);
       if (refusal === null) {
-        const keys: string[] = [SCENARIO_PRESET_CELL_KEY];
-        if (request.dailyLaborMinor !== null) {
-          keys.push(OVERHEAD_LABOR_CELL_KEY);
-        }
-        if (request.dailyRentMinor !== null) {
-          keys.push(OVERHEAD_RENT_CELL_KEY);
-        }
-        if (request.forecast !== undefined) {
-          keys.push(
-            FORECAST_OPENING_CASH_CELL_KEY,
-            FORECAST_DEMAND_CURVE_CELL_KEY,
-            FORECAST_SUPPLIER_TERMS_CELL_KEY,
-            FORECAST_EXTRA_SHIFT_THRESHOLD_PCT_CELL_KEY,
-            FORECAST_EXTRA_SHIFT_WEEKLY_MINOR_CELL_KEY,
-            FORECAST_CAPEX_MINOR_CELL_KEY,
-          );
-          for (let w = 0; w < 12; w += 1) {
-            keys.push(forecastWeekIndexCellKey(w));
-          }
-        }
-        for (const entry of request.products ?? []) {
-          keys.push(
-            productDailyCellKey(entry.productId),
-            productSpoilCellKey(entry.productId),
-            productCogsCellKey(entry.productId),
-            productWasteCellKey(entry.productId),
-          );
-          for (const col of COST_FORMULA_COLUMNS) {
-            keys.push(productFormulaCellKey(entry.productId, col));
-          }
-          for (let day = 0; day < 7; day += 1) {
-            keys.push(productDayCellKey(entry.productId, day));
-          }
-        }
-        await host.settleSavedCells(keys, nowMs);
+        await host.settleSavedCells(
+          costPlanCellKeys({
+            dailyLaborMinor: request.dailyLaborMinor,
+            dailyRentMinor: request.dailyRentMinor,
+            hasForecast: request.forecast !== undefined,
+            productIds: (request.products ?? []).map(
+              (entry) => entry.productId,
+            ),
+          }),
+          nowMs,
+        );
       }
       return refusal;
     },
@@ -1059,26 +1015,6 @@ async function saveLotCostForSession(
       if (snapshot.value.commerce.merchantId !== work.merchantId) {
         throw new Error("lot cost Commerce scope mismatch");
       }
-      const itemsById = new Map(
-        snapshot.value.commerce.resources.inventoryItems.map((item) => [
-          item.id,
-          item,
-        ]),
-      );
-      const knownLotsById = new Map<
-        string,
-        Readonly<{ inventoryItemId: string; baseUnit: CostUnit }>
-      >();
-      for (const lot of snapshot.value.lots) {
-        const item = itemsById.get(lot.inventoryItemId);
-        if (item === undefined || item.category === "finished_good") {
-          continue;
-        }
-        knownLotsById.set(lot.id, {
-          inventoryItemId: lot.inventoryItemId,
-          baseUnit: item.baseUnit,
-        });
-      }
       const nowMs = Date.now();
       const saved = await saveOrganisationLotInvoiceCost({
         db: host.database,
@@ -1086,17 +1022,11 @@ async function saveLotCostForSession(
         updatedBy: work.userId,
         nowMs,
         write: request,
-        knownLotsById,
+        knownLotsById: knownLotsOfSnapshot(snapshot.value),
       });
       const refusal = lotCostSaveRefusal(saved);
       if (refusal === null) {
-        await host.settleSavedCells(
-          [
-            lotInvoiceFieldCellKey(request.lotId, "invoiceReference"),
-            lotInvoiceFieldCellKey(request.lotId, "invoiceTotalMajor"),
-          ],
-          nowMs,
-        );
+        await host.settleSavedCells(lotInvoiceCellKeys(request.lotId), nowMs);
       }
       return refusal;
     },

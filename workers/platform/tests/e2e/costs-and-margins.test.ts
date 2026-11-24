@@ -15,6 +15,7 @@ import {
   OVERHEAD_RENT_CELL_KEY,
   SCENARIO_CHANNEL_FEE_CELL_KEY,
   forecastWeekIndexCellKey,
+  lotInvoiceFieldCellKey,
   productCogsCellKey,
   productDayCellKey,
   productFormulaCellKey,
@@ -2353,6 +2354,17 @@ it(
       }
     }
 
+    // 9. A sheet save whose lot and plan rows fail after its price write: the
+    //    price stays saved and leaves the draft, the lot and the plan stay as
+    //    they were with their cells in the draft, and the retry sends only them.
+    const partlySaved = await saveSheetThroughPlanFailure(
+      fixture,
+      author,
+      paths.organisation,
+      plainProduct.productId,
+      butterLot2.id,
+    );
+
     task.meta.costsAndMarginsEvidence = {
       patisserieProductsCount: patisserieProducts.length,
       supplyCostsSeededCount: configured.supplyCostsSeeded,
@@ -2398,6 +2410,7 @@ it(
         savedForecastPlan: afterForecastAgentSave.costPlan.forecast,
       },
       agentReceipts: receipts,
+      partlySavedSheet: partlySaved,
       staleRefusal: lastOutput("STALESUPPLYCOST"),
       stalePlanRefusal: lastOutput("STALECOSTSPLAN"),
       wrongUnitRefusal: lastOutput("WRONGUNITSUPPLYCOST"),
@@ -2416,6 +2429,158 @@ it(
     };
   },
 );
+
+/**
+ * Saves a price, a lot invoice cost and the plan from the shared draft while a
+ * trigger fails every write of the plan, then saves the rest. It returns what
+ * the refusal named and the plan revision of the retry.
+ */
+async function saveSheetThroughPlanFailure(
+  fixture: MemoryFixture,
+  author: Member,
+  organisationPath: string,
+  productId: string,
+  lotId: string,
+): Promise<Record<string, unknown>> {
+  const before = await readPortalCosts(author, organisationPath);
+  const product = before.products.find((entry) => entry.productId === productId);
+  const lot = (before.lots ?? []).find((entry) => entry.id === lotId);
+  if (product === undefined || lot?.invoiceCost == null) {
+    throw new Error("Missing the product or the priced lot of the sheet save");
+  }
+  const priceKey = productPriceCellKey(productId);
+  const newPriceMinor = product.priceMinor + 30;
+  const lotWrite = {
+    lotId,
+    inventoryItemId: lot.inventoryItemId,
+    expectedRevision: lot.invoiceCost.revision,
+    currency: "JPY",
+    invoicedQuantity: 450,
+    invoicedUnit: "gram" as const,
+    invoiceTotalMinor: 1_850,
+    invoiceReference: "INV-2026-B2-R",
+    supplierId: "sup_takanashi",
+  };
+  const planWrite = {
+    expectedPlanRevision: before.costPlan.revision,
+    dailyLaborMinor: 21_000,
+    dailyRentMinor: before.costPlan.dailyRentMinor,
+    products: before.costPlan.products,
+    ...(before.costPlan.forecast === undefined
+      ? {}
+      : { forecast: before.costPlan.forecast }),
+  };
+  const room = new CostsSheetRoomClient(
+    await openSocket(
+      `https://localhost${organisationPath}/commerce/costs/sheet/socket`,
+      author.session,
+    ),
+  );
+  const scope = await requireOrganisationExecutionScope(
+    env,
+    fixture.organisationId,
+  );
+  try {
+    await room.sync();
+    await room.submit(
+      "author-partly-saved-1",
+      room.setCells([
+        { cellKey: priceKey, value: String(newPriceMinor) },
+        { cellKey: OVERHEAD_LABOR_CELL_KEY, value: "21000" },
+        { cellKey: lotInvoiceFieldCellKey(lotId, "invoiceTotalMajor"), value: "1850" },
+      ]),
+    );
+
+    await scope.database
+      .prepare(
+        "CREATE TRIGGER costs_e2e_plan_write_fails BEFORE UPDATE ON bakery_cost_plan BEGIN SELECT RAISE(ABORT, 'costs_e2e_plan_write_fails'); END",
+      )
+      .run();
+    let refused: Response;
+    try {
+      refused = await fetchCosts(author, organisationPath, "POST", {
+        kind: "save_sheet",
+        merchantRevision: before.merchantRevision,
+        requestedAt: new Date().toISOString(),
+        priceWrites: [
+          {
+            offerId: product.offerId,
+            expectedOfferRevision: product.offerRevision,
+            currency: product.currency,
+            priceMinor: newPriceMinor,
+          },
+        ],
+        planWrite,
+        supplyWrites: [],
+        lotWrites: [lotWrite],
+      });
+    } finally {
+      await scope.database
+        .prepare("DROP TRIGGER costs_e2e_plan_write_fails")
+        .run();
+    }
+    expect(refused.status).toBe(503);
+    const refusal: unknown = await refused.json();
+    expect(refusal).toEqual({
+      ok: false,
+      error: "cost_sheet_write_failed",
+      saved: { offerIds: [product.offerId], inventoryItemIds: [] },
+    });
+
+    // The page reads the new price, and the lot and the plan as they were.
+    const afterRefusal = await readPortalCosts(author, organisationPath);
+    expect(
+      afterRefusal.products.find((entry) => entry.productId === productId),
+    ).toMatchObject({
+      priceMinor: newPriceMinor,
+      offerRevision: product.offerRevision + 1,
+    });
+    expect(
+      (afterRefusal.lots ?? []).find((entry) => entry.id === lotId)
+        ?.invoiceCost,
+    ).toEqual(lot.invoiceCost);
+    expect(afterRefusal.costPlan).toEqual(before.costPlan);
+    await expect
+      .poll(() => ({
+        price: room.cells()[priceKey],
+        labor: room.cells()[OVERHEAD_LABOR_CELL_KEY],
+        lot: room.cells()[lotInvoiceFieldCellKey(lotId, "invoiceTotalMajor")],
+      }))
+      .toEqual({ price: undefined, labor: "21000", lot: "1850" });
+
+    // The retry sends only the lot and the plan, and both save.
+    const retried = await fetchCosts(author, organisationPath, "POST", {
+      kind: "save_sheet",
+      merchantRevision: afterRefusal.merchantRevision,
+      requestedAt: new Date().toISOString(),
+      priceWrites: [],
+      planWrite,
+      supplyWrites: [],
+      lotWrites: [lotWrite],
+    });
+    expect(retried.status, await retried.clone().text()).toBe(200);
+    const retriedResult = parseCostsSheetWriteResult(await retried.json());
+    expect(retriedResult).toMatchObject({
+      planRevision: (before.costPlan.revision ?? 0) + 1,
+      updatedOfferCount: 0,
+      updatedLotCount: 1,
+    });
+    const afterRetry = await readPortalCosts(author, organisationPath);
+    expect(afterRetry.costPlan.dailyLaborMinor).toBe(21_000);
+    expect(
+      (afterRetry.lots ?? []).find((entry) => entry.id === lotId)?.invoiceCost,
+    ).toMatchObject({ revision: lot.invoiceCost.revision + 1, invoiceTotalMinor: 1_850 });
+    await expect
+      .poll(() => ({
+        labor: room.cells()[OVERHEAD_LABOR_CELL_KEY],
+        lot: room.cells()[lotInvoiceFieldCellKey(lotId, "invoiceTotalMajor")],
+      }))
+      .toEqual({ labor: undefined, lot: undefined });
+    return { refusal, retriedResult };
+  } finally {
+    await room.close();
+  }
+}
 
 async function recordPlainFinancierBatchAndWaste(
   native: ReturnType<typeof providerClient>,

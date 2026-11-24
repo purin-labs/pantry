@@ -188,7 +188,11 @@ The columns that take a formula are `COST_FORMULA_COLUMNS`: `units`, `spoil`, `p
   chips. A pointer hides after 5 s with no move (`COLLABORATION_POINTER_IDLE_MS`).
 - A save removes the cells that it committed. It keeps the other draft cells, such as a
   scenario cell, and stamps `meta:savedAt`. Each open tab then reads the saved baseline
-  again. A save with price writes also removes every draft price cell.
+  again. A save whose price writes all saved also removes every draft price cell.
+- A refused **Save changes** can name the prices and supplier packs that saved before
+  the refusal (`saved` in the answer). The page then reads the saved baseline again and
+  says what saved. The other changes stay in the draft, so the next save sends only
+  them.
 - An agent save settles its own cells as a best effort. It skips the settlement when
   the person is no longer a live member, and it never removes the draft price cells.
 
@@ -282,13 +286,14 @@ The control routes are under `/v1/control/organisations/:id/commerce/costs`
 | `POST /sheet/reset`             | Operator                                   | Clears all draft cells                                                             |
 
 The three `POST` routes of `control/routes/costs.ts` pass `admitUserMutation`, so the
-same `Idempotency-Key` replays the same receipt. `POST /sheet/reset` takes no key: it
-checks the operator role, and a repeat clears the draft again. A stale
+same `Idempotency-Key` replays the same receipt. Each route parses the body, admits the
+mutation and calls one function of `areas/kitchen/server/costs-sheet-save.ts`:
+`saveCostsSheet`, `saveLotCost` or `saveSupplyCost`. `POST /sheet/reset` takes no key:
+it checks the operator role, and a repeat clears the draft again. A stale
 `expectedPlanRevision`, `expectedOfferRevision`, `expectedEntryRevision` or
-`expectedRevision` gives 409 `stale_resource_revision`. If a lot save already applied
-the same values, a repeat with the old expected revision gives the saved result again.
-`costs_plan_save` does the same for a plan. `save_sheet` checks the plan revision before
-it writes, so a repeat of its plan with the old revision gives 409.
+`expectedRevision` gives 409 `stale_resource_revision`. If a lot or plan save already
+applied the same values, a repeat with the old expected revision gives the saved result
+again. This is true for the save routes, `save_sheet` and the agent tools.
 
 `save_sheet` replaces every product row of the plan. It refuses a product that is not
 active with 422 `cost_plan_invalid`. `costs_plan_save` merges its products with the
@@ -317,13 +322,21 @@ saved rows.
 | Room mutation deadline   | 30 s                                     | In `CostsSheetRooms.reset` and `settleSaved`          |
 | Reorder warning          | Below 4 days of supply                   | In `calculateBakeryCostsAndMargins`                   |
 
-- **Save order.** `save_sheet` writes the offer prices, then the pack terms, then the
-  lots, then the plan. It is not one transaction. If a later step fails, the earlier
-  steps stay saved, and the route records no receipt. A retry with the same key runs
-  every step again. It sends each offer price and each pack terms write to the commerce
-  engine with a key from the request key (`…:offer:<offerId>`, `…:supply:<n>`). A lot
-  with the same values gives its saved result.
-- **Settlement.** A failed settlement of the draft does not fail the save. The route
+- **Checks before the first write.** `save_sheet` reads the commerce snapshot and the
+  saved rows, and checks every refusal before it writes: the price role, an unknown
+  offer, the stock item and unit of each pack terms line, the lot owner and unit, an
+  inactive plan product, and the lot and plan revisions.
+- **Save order.** Then `save_sheet` writes the offer prices and the pack terms to the
+  commerce engine, one record at a time, and then the lots and the plan in one D1
+  batch. The batch starts with a revision guard for each row, so a row that changed
+  after the check fails the whole batch, and no lot or plan row of it applies. Pantry
+  does not undo a saved price or pack terms write when a later step fails. The refusal
+  names the saved records in `saved` (`offerIds`, `inventoryItemIds`), the save settles
+  the draft cells of each saved record, and the route records no receipt. A failed
+  batch gives 503 `cost_sheet_write_failed`. A retry with the same key runs every step
+  again: the commerce engine answers each offer price and each pack terms write that it
+  has from its key (`…:offer:<offerId>`, `…:supply:<n>`).
+- **Settlement.** A failed settlement of the draft does not fail the save. The save
   writes `commerce.costs_sheet_settle_deferred` to `traceWarn`.
 - **Idle cost.** The Actor writes no draft row until a person opens or resets the room,
   or an agent edits it. A settlement with no draft row and no open socket writes
@@ -356,6 +369,7 @@ saved rows.
 - [Plan 86](../../../history/plan-86-bakery-costs-and-margins.md). Where it differs from the
   code, this spec follows the code. The plan gives no evidence links in the archive.
 - E2E journeys: `workers/platform/tests/e2e/costs-and-margins.test.ts`, with its
-  helper `costs-sheet-room-support.ts`, and
+  helper `costs-sheet-room-support.ts` (step 9 fails the lot and plan batch after a
+  price write and retries the rest), and
   `services/commerce/tests/purchasing-replenishment.test.ts` for the
   `supply_cost_terms` list.
