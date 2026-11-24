@@ -1,5 +1,5 @@
 {
-  "total": {"copies":778,"lines":13874},
+  "total": {"copies":777,"lines":13866},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -300,7 +300,6 @@
     "packages/bakery-workflow/src/draft.ts = packages/bakery-workflow/src/draft.ts": {"copies":1,"lines":8},
     "packages/collaboration/src/text-collaboration.ts = packages/collaboration/worker/collaboration-room.ts": {"copies":1,"lines":16},
     "packages/collaboration/src/yjs-encoding.ts = packages/collaboration/worker/collaboration-room.ts": {"copies":1,"lines":16},
-    "packages/collaboration/worker/collaboration-room.ts = packages/collaboration/worker/collaboration-room.ts": {"copies":1,"lines":8},
     "packages/commerce-client/src/admin-client.ts = packages/commerce-client/src/storefront-client.ts": {"copies":1,"lines":33},
     "packages/commerce-client/src/entity-plane/primitives.ts = services/commerce/src/entity-plane/parsers.ts": {"copies":1,"lines":10},
     "packages/commerce-client/src/patisserie-menu.ts = packages/commerce-client/src/patisserie-menu.ts": {"copies":2,"lines":44},
