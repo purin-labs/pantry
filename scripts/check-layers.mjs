@@ -27,6 +27,20 @@
 // behind an interface that the Worker wires. --report gives the count of the
 // imports between areas that go through a contract.
 //
+// The contract package of an area (Refactor 17, Stage B): the module that is
+// the folder `contract` of the area folder, with the name of the area folder
+// and `/contract`. Each file of an area may import it, and each of its files
+// is public. By the rule of the owner
+// (2026-11-24, "Contracts may use foundation") a contract imports the
+// foundation, outside packages and the contract of another area. It never
+// imports a file of another area module, also not of its own area and not
+// with `import type`, and never a surface or a Worker; its package.json
+// depends on no such package. The check refuses each such import as a fault.
+// A call at run time from a contract to a foundation module above
+// `contracts` is allowed and counted: the debt `contract-runtime` of
+// scripts/check-layer-debts.mjs. For the D1 tables, a contract is a part of
+// its area.
+//
 // It reads the relative imports and the workspace package imports of each
 // file under `covers`, and the workspace dependencies of each package.json in
 // `packages`. scripts/layers-ratchet.json holds the known crossings by module
@@ -59,11 +73,13 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, posix } from "node:path";
 import {
+  areaOf,
   compareModules,
   coveredSourceFiles,
   crossingKind,
   hasLayer,
   importStatementsOf,
+  isContractModule,
   isPublic,
   keysWithoutReason,
   layerOf,
@@ -155,6 +171,24 @@ const { links, link } = linkCounter();
 /** The imports between two areas that go through a contract. */
 const throughContracts = { files: 0, packages: 0 };
 
+/**
+ * True when the contract module `from` may not import the module `to`: an
+ * area module that is not a contract (its own area too), a surface or a
+ * Worker. `library` is true for a workspace package outside `covers`, such
+ * as `@purin-labs/commerce-client`: it is no `server/` or `ui/` of an area.
+ */
+function contractMayNotImport(from, to, library) {
+  if (!isContractModule(from) || to === from) return false;
+  const layer = layerOf(to);
+  if (layer === "surfaces" || layer === "workers") return true;
+  return layer === "areas" && !isContractModule(to) && !library;
+}
+function contractFault(path, target, to) {
+  faults.push(
+    `${path}: the contract of an area imports ${target} (${to}). A contract imports only the foundation, outside packages and the contract of another area: move the type into the contract, or let the Worker wire the service.`,
+  );
+}
+
 function record(from, to, site) {
   const kind = crossing(from, to);
   if (kind === null) return;
@@ -193,9 +227,12 @@ for (const path of tracked) {
           `${path}: a public file imports ${target}, a file of its area that is not public. Import a public file, use import type, or let the Worker wire the service.`,
         );
       }
+      if (contractMayNotImport(from, to, false)) {
+        contractFault(path, target, to);
+      }
       if (
         targetPublic &&
-        from !== to &&
+        areaOf(from) !== areaOf(to) &&
         layerOf(from) === "areas" &&
         layerOf(to) === "areas"
       ) {
@@ -211,10 +248,13 @@ for (const path of tracked) {
     }
     if (named === null) continue;
     const to = named.entry.module;
+    if (contractMayNotImport(from, to, true)) {
+      contractFault(path, specifier, to);
+    }
     // A workspace package of an area outside `covers` is the contract of that
     // area: its schemas, its model and its client. Another area may import it.
     if (layerOf(from) === "areas" && layerOf(to) === "areas") {
-      if (from !== to) throughContracts.packages += 1;
+      if (areaOf(from) !== areaOf(to)) throughContracts.packages += 1;
       continue;
     }
     record(from, to, `${path} -> ${specifier}`);
@@ -235,6 +275,11 @@ for (const [folder, from] of Object.entries(targets.packages)) {
     const named = workspaceImport(dependency);
     if (named === null) continue;
     const to = named.entry.module;
+    if (contractMayNotImport(from, to, !coveredPackage(named.entry.folder))) {
+      faults.push(
+        `${folder}/package.json: the contract of an area depends on ${dependency} (${to}). A contract package depends only on the foundation, outside packages and the contract of another area.`,
+      );
+    }
     // The files of an area package under `covers` have their own modules,
     // and the import rule above reads each of their imports, as it read them
     // before the move. So such a package may depend on the package of
@@ -300,7 +345,8 @@ for (const database of ["global", "regional"]) {
 const WRITE =
   /\b(?:INSERT\s+(?:OR\s+\w+\s+)?INTO|REPLACE\s+INTO|UPDATE|DELETE\s+FROM)\s+"?([a-z0-9_]+)"?/g;
 for (const path of tracked) {
-  const from = moduleOf(path);
+  // The contract of an area writes the tables of its area as the area does.
+  const from = areaOf(moduleOf(path));
   if (from === null) continue;
   for (const match of readFileSync(join(root, path), "utf8").matchAll(WRITE)) {
     const table = tables.get(match[1].toLowerCase());
@@ -341,9 +387,11 @@ and the Workers ([Refactor 17](refactor-17.md)). "Folders" gives the folders
 that hold the source files of the module. The page gives no file counts, so a
 new file in a known folder does not make it old; \`--areas\` with no option
 prints the counts. "Packages" gives its workspace packages. "Tables" gives the D1
-tables that the module owns; only the owner writes a table. "Public files"
-gives the contract of an area: the files and folders that another area may
-import. A module with no line for one of these has none.
+tables that the module owns; only the owner writes a table, and the contract
+of an area writes the tables of its area. "Public files" gives the public
+files and folders of an area that another area may import. The module
+\`areas/<area>/contract\` is the contract package of an area: another area may
+import each of its files. A module with no line for one of these has none.
 
 `;
 

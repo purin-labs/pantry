@@ -89,6 +89,11 @@ these rules:
 - A package of an area may depend on a package of another area only when `contracts`
   lists that package.
 - A public file imports no non-public file of its own area, except with `import type`.
+- The contract of an area is the module `areas/<area>/contract`, a package of its own.
+  Each area may import it. It imports only the foundation, outside packages and the
+  contract of another area: no file of an area module (also not of its own area, and
+  not with `import type`), no surface and no Worker. Its `package.json` depends on no
+  such package. For the D1 tables, it is a part of its area.
 - Only the owner module of a D1 table writes it. `tables` names each owner.
 - A source file with no module, a tracked file with no place, and a D1 table with no
   owner are faults. A file has a place when it is under `covers`, in a folder of

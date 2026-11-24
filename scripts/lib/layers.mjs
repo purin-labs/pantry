@@ -14,6 +14,28 @@ const rules = Object.entries(targets.rules).sort(
   ([a], [b]) => b.length - a.length,
 );
 
+/**
+ * True for the contract of an area: the module `areas/<area>/contract`, the
+ * package `@purin-labs/area-<area>-contract` in `areas/<area>/contract/`.
+ * Another area may import each of its files. It imports only the
+ * foundation, outside packages and the contract of another area (the rule of
+ * the owner, 2026-11-24: "Contracts may use foundation").
+ */
+export function isContractModule(module) {
+  return /^areas\/[^/]+\/contract$/.test(module ?? "");
+}
+
+/**
+ * The area of a module: `areas/<area>` for the contract of an area, the
+ * module itself for each other module. The D1 tables and the counts of
+ * scripts/check-layer-debts.mjs read a contract as a part of its area.
+ */
+export function areaOf(module) {
+  return isContractModule(module)
+    ? module.slice(0, -"/contract".length)
+    : module;
+}
+
 /** The module of a file: its line in `files`, or the longest rule. */
 export function moduleOf(path) {
   const exact = targets.files[path];
@@ -55,7 +77,8 @@ for (const [folder, module] of Object.entries(targets.packages)) {
     module,
     name: manifest.name ?? folder,
     exports: manifest.exports ?? null,
-    contract: (targets.contracts ?? []).includes(folder),
+    contract:
+      (targets.contracts ?? []).includes(folder) || isContractModule(module),
   };
   workspacePackages.set(entry.name, entry);
   packagesByFolderName.set(posix.basename(folder), entry);
@@ -148,14 +171,19 @@ export function compareModules(a, b) {
 /**
  * The kind of a crossing from one module to another, or null: "upward" to a
  * higher layer, "areas" between two areas, "order" against foundationOrder.
- * `missingOrder` gets a foundation module that foundationOrder lacks.
+ * Each area module may import the contract of an area. A contract that
+ * imports an area module that is not a contract makes an "areas" crossing,
+ * also in its own area. `missingOrder` gets a foundation module that
+ * foundationOrder lacks.
  */
 export function crossingKind(from, to, missingOrder = () => {}) {
   if (from === to) return null;
   const fromLayer = layerOf(from);
   const toLayer = layerOf(to);
   if (layerRank.get(fromLayer) < layerRank.get(toLayer)) return "upward";
-  if (fromLayer === "areas" && toLayer === "areas") return "areas";
+  if (fromLayer === "areas" && toLayer === "areas") {
+    return isContractModule(to) ? null : "areas";
+  }
   if (fromLayer === "foundation" && toLayer === "foundation") {
     const a = orderRank.get(from);
     const b = orderRank.get(to);
@@ -172,9 +200,13 @@ export function crossingKind(from, to, missingOrder = () => {}) {
 export const publicPaths = (targets.contracts ?? []).filter(
   (path) => targets.packages[path] === undefined,
 );
+/** True for a file of the contract of an area, or a public file of `contracts`. */
 export function isPublic(path) {
-  return publicPaths.some((entry) =>
-    entry.endsWith("/") ? path.startsWith(entry) : path === entry,
+  return (
+    isContractModule(moduleOf(path)) ||
+    publicPaths.some((entry) =>
+      entry.endsWith("/") ? path.startsWith(entry) : path === entry,
+    )
   );
 }
 

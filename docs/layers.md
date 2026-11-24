@@ -9,9 +9,11 @@ and the Workers ([Refactor 17](refactor-17.md)). "Folders" gives the folders
 that hold the source files of the module. The page gives no file counts, so a
 new file in a known folder does not make it old; `--areas` with no option
 prints the counts. "Packages" gives its workspace packages. "Tables" gives the D1
-tables that the module owns; only the owner writes a table. "Public files"
-gives the contract of an area: the files and folders that another area may
-import. A module with no line for one of these has none.
+tables that the module owns; only the owner writes a table, and the contract
+of an area writes the tables of its area. "Public files" gives the public
+files and folders of an area that another area may import. The module
+`areas/<area>/contract` is the contract package of an area: another area may
+import each of its files. A module with no line for one of these has none.
 
 ## foundation/std
 
