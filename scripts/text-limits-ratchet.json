@@ -10,7 +10,7 @@
     "areas/inbox/server/agent-tools/channels/mailbox-agent.ts": 2,
     "areas/kitchen/server/agent-tools/costs/view.ts": 2,
     "areas/kitchen/server/agent-tools/kitchen/costs.ts": 6,
-    "foundation/authority/generated/action-registry.ts": 14,
+    "foundation/authority/generated/action-registry.ts": 3,
     "packages/bakery-model/src/bakery-margins.ts": 4,
     "workers/platform/scripts/generate-actions.ts": 2
   }

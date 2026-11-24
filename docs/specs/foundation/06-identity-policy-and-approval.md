@@ -101,13 +101,13 @@ owner can read and restore it. A D1 fault answers `authority_unavailable`.
 
 ### Capabilities, policy and grants
 
-- **Catalogue.** `CAPABILITY_CATALOGUE` has 71 capabilities, each at version 1. A
+- **Catalogue.** `CAPABILITY_CATALOGUE` has 63 capabilities, each at version 1. A
   capability has a label, a description, a category, a risk (`read`, `propose` or
   `external_effect`), a target kind, a provider dependency and its policy modes.
 - **Policy mode.** Each Organisation has one `organisation_capability_policy` row for
   each capability: `enabled`, `approval_required` or `disabled`. The catalogue gives the
   modes that a capability accepts (`capability_policy_mode_unsupported`). 46
-  capabilities accept `enabled` or `disabled`, 18 accept `approval_required` or
+  capabilities accept `enabled` or `disabled`, 10 accept `approval_required` or
   `disabled`, and 7 accept each mode.
 - **Access defaults.** `…/defaults/apply` adds the missing rows of the baseline
   `read_and_propose` version 1: one policy row for each capability (8 `enabled`, the
@@ -156,8 +156,8 @@ owner can read and restore it. A D1 fault answers `authority_unavailable`.
   each page reads again.
 - **Permission request.** With the tool `request_permission`, an agent asks an owner or
   an admin for access. It can name the 23 capabilities of `PERMISSION_REQUESTABLE` and
-  the 11 record reads of `REQUESTABLE_ENTITY_TYPE_READS`. The list has no `stripe.*`
-  capability, no supplier payout capability and no order cancellation capability. Six
+  the 11 record reads of `REQUESTABLE_ENTITY_TYPE_READS`. The list has no supplier payout
+  capability and no order cancellation capability. Six
   of the reads are refused in a shared channel. Allow succeeds only when the access is
   there: the Portal first enables the capabilities and adds the grants
   (`permission_missing`). An owner or an admin reads each request that waits. Another

@@ -81,10 +81,6 @@ const SHOPIFY: CapabilityDefinition["providerDependency"] = {
   kind: "provider",
   providers: ["shopify"],
 };
-const STRIPE: CapabilityDefinition["providerDependency"] = {
-  kind: "provider",
-  providers: ["stripe"],
-};
 const FILES: CapabilityDefinition["providerDependency"] = {
   kind: "provider",
   providers: ["dropbox", "google_drive"],
@@ -280,86 +276,6 @@ const DEFINITIONS: readonly CapabilityDefinition[] = [
     "platform",
     NONE,
     "enabled_disabled",
-  ),
-  seed(
-    "stripe.charge.create",
-    "Create a Stripe charge",
-    "Create an approved charge on the exact connected Stripe account.",
-    "payments",
-    "external_effect",
-    "provider_resource",
-    STRIPE,
-    "approval_required_disabled",
-  ),
-  seed(
-    "stripe.refund.create",
-    "Create a Stripe refund",
-    "Create an approved refund for an exact Stripe charge.",
-    "payments",
-    "external_effect",
-    "provider_resource",
-    STRIPE,
-    "approval_required_disabled",
-  ),
-  seed(
-    "stripe.subscription.cancel",
-    "Cancel a Stripe subscription",
-    "Cancel an approved subscription on the exact connected Stripe account.",
-    "payments",
-    "external_effect",
-    "provider_resource",
-    STRIPE,
-    "approval_required_disabled",
-  ),
-  seed(
-    "stripe.payout.create",
-    "Create a Stripe payout",
-    "Create an approved payout from the exact connected Stripe account.",
-    "payments",
-    "external_effect",
-    "provider_resource",
-    STRIPE,
-    "approval_required_disabled",
-  ),
-  seed(
-    "stripe.transfer.create",
-    "Create a Stripe transfer",
-    "Create an approved transfer to an exact connected account destination.",
-    "payments",
-    "external_effect",
-    "provider_resource",
-    STRIPE,
-    "approval_required_disabled",
-  ),
-  seed(
-    "stripe.payment_intent.capture",
-    "Capture a Stripe payment",
-    "Capture an approved Stripe payment intent.",
-    "payments",
-    "external_effect",
-    "provider_resource",
-    STRIPE,
-    "approval_required_disabled",
-  ),
-  seed(
-    "stripe.payment_intent.confirm",
-    "Confirm a Stripe payment",
-    "Confirm an approved Stripe payment intent.",
-    "payments",
-    "external_effect",
-    "provider_resource",
-    STRIPE,
-    "approval_required_disabled",
-  ),
-  seed(
-    "stripe.subscription.update",
-    "Update a Stripe subscription",
-    "Apply an approved update to an exact Stripe subscription.",
-    "payments",
-    "external_effect",
-    "provider_resource",
-    STRIPE,
-    "approval_required_disabled",
   ),
   seed(
     "shopify.order.cancel",
@@ -576,7 +492,7 @@ function baselineGrants(scenario: Scenario): AccessControlGrantView[] {
 function populatedGrants(scenario: Scenario): AccessControlGrantView[] {
   const fileRead = definitionById("file.read");
   const entityRead = definitionById("commerce.entity.read");
-  const refund = definitionById("stripe.refund.create");
+  const orderCancel = definitionById("shopify.order.cancel");
   const listPatch = definitionById("commerce.list_entry.patch");
   return [
     ...baselineGrants(scenario),
@@ -611,14 +527,14 @@ function populatedGrants(scenario: Scenario): AccessControlGrantView[] {
       scenario,
     ),
     grant(
-      "grant_owner_refund",
+      "grant_owner_order_cancel",
       SUBJECTS.ownerRole,
-      refund,
+      orderCancel,
       {
-        targetRefId: "target:stripe:acct-nuki",
+        targetRefId: "target:shopify:nuki-cafe",
         kind: "integration_resource",
-        label: "Stripe · Nuki Cafe (acct)",
-        integrationAccountId: "intacc_stripe",
+        label: "Shopify · nuki-cafe.myshopify.com",
+        integrationAccountId: "intacc_shopify",
         revision: 1,
       },
       OPERATOR_GRANT,
@@ -686,18 +602,18 @@ function sourcePolicies(scenario: Scenario): AccessControlSourcePolicyView[] {
       actions: { kind: "check_destination" },
     },
     {
-      sourceRefId: "source:stripe-account",
+      sourceRefId: "source:shopify-shop",
       revision: 1,
       capability: {
-        capabilityId: "stripe.refund.create",
+        capabilityId: "shopify.order.cancel",
         capabilityVersion: 1,
-        label: "Create a Stripe refund",
+        label: "Cancel a Shopify order",
       },
       owner: {
-        integrationAccountId: "intacc_stripe",
-        label: "Stripe · Nuki Cafe",
+        integrationAccountId: "intacc_shopify",
+        label: "Shopify · nuki-cafe.myshopify.com",
       },
-      resourceLabel: "Stripe · Nuki Cafe (acct)",
+      resourceLabel: "Shopify · nuki-cafe.myshopify.com",
       readers: [SUBJECTS.ownerRole],
       availability: { kind: "unavailable", reason: "resource_unavailable" },
       actions: { kind: "check_destination" },

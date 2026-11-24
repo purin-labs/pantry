@@ -146,11 +146,12 @@ reason. A later note in the same entry describes the code today.
   Organisation adds at run time. Root keys stay in Secrets Store. Wrangler binds
   `VAULT_ROOT_V1`, and the keyring also accepts an optional `VAULT_ROOT_V2`. Organisation
   ciphertexts stay in regional D1 (`vault_secret`).
-- **AD-017, 2026-07-07, Holds in part: one action registry.** One registry defines 9
-  provider actions, because hand-written copies drift: 8 for Stripe and 1 for Shopify.
-  `actions:generate` builds `generated/action-registry.ts`. Only `shopify_order_cancel`
-  has a runtime caller, and other provider effects do not use the registry. The
-  in-container command shims are removed with the raw path.
+- **AD-017, 2026-07-07, Holds in part: one action registry.** One registry defines the
+  provider actions, because hand-written copies drift. It holds one action,
+  `shopify_order_cancel`, which has a runtime caller. The 8 Stripe actions are removed:
+  no tool ran them. `actions:generate` builds `generated/action-registry.ts`. Other
+  provider effects do not use the registry. The in-container command shims are removed
+  with the raw path.
 - **AD-018, 2026-07-07, Holds in part: action ledger and resource serialization.** An
   idempotency key does not stop two different actions on one resource, such as two
   refunds of one order. `action_ledger` in `OrganisationActor` SQLite tracks `proposed`,

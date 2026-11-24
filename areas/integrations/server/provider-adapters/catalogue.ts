@@ -176,16 +176,7 @@ export const PROVIDER_ADAPTERS = {
   stripe: {
     provider: "stripe",
     dataClasses: PROVIDER_DATA_CLASSES.stripe,
-    capabilityIds: [
-      CAPABILITY_KEYS.stripeChargeCreate,
-      CAPABILITY_KEYS.stripeRefundCreate,
-      CAPABILITY_KEYS.stripeSubscriptionCancel,
-      CAPABILITY_KEYS.stripePayoutCreate,
-      CAPABILITY_KEYS.stripeTransferCreate,
-      CAPABILITY_KEYS.stripePaymentIntentCapture,
-      CAPABILITY_KEYS.stripePaymentIntentConfirm,
-      CAPABILITY_KEYS.stripeSubscriptionUpdate,
-    ],
+    capabilityIds: [],
     connectionFamily: { kind: "oauth_connection", pkce: "none" },
     onboarding: stripeOnboardingAdapter,
     completeConnection: connectStripe,

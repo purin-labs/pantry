@@ -421,7 +421,7 @@ describe("organisation capability policy", function capabilityPolicySuite() {
       CAPABILITY_KEYS.commerceListEntryPatch,
     ]);
     expect(compiled.value.snapshot.authz.deniedTools).toContain(
-      CAPABILITY_KEYS.stripeChargeCreate,
+      CAPABILITY_KEYS.shopifyOrderCancel,
     );
     expect(kv.puts).toEqual([
       `policy:${fixture.organisationId}:v1`,

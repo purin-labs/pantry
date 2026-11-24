@@ -32,7 +32,7 @@ providers:
 | `shopify`      | OAuth           | `commerce`  | From the Shopify module                       | `remove_shopify_app_in_shopify`               |
 | `slack`        | OAuth           | `messaging` | Slack message proposal                        | `remove_slack_app_in_slack`                   |
 | `square`       | OAuth           | `payments`  | None                                          | `revoke_square_access_in_square`              |
-| `stripe`       | OAuth (Connect) | `payments`  | Eight Stripe effect capabilities              | `revoke_stripe_access_in_stripe`              |
+| `stripe`       | OAuth (Connect) | `payments`  | None                                          | `revoke_stripe_access_in_stripe`              |
 | `whatsapp`     | Embedded Signup | `messaging` | WhatsApp support read and reply               | `remove_whatsapp_access_in_meta`              |
 
 Airtable removal always returns `manual_action_required`. Gmail asks for one of two

@@ -57,14 +57,6 @@ export const CAPABILITY_KEYS = {
   commerceSupplierDestinationPropose: "commerce.supplier_destination.propose",
   commerceSupplierDestinationActivate: "commerce.supplier_destination.activate",
   workspaceQuery: "workspace.query",
-  stripeChargeCreate: "stripe.charge.create",
-  stripeRefundCreate: "stripe.refund.create",
-  stripeSubscriptionCancel: "stripe.subscription.cancel",
-  stripePayoutCreate: "stripe.payout.create",
-  stripeTransferCreate: "stripe.transfer.create",
-  stripePaymentIntentCapture: "stripe.payment_intent.capture",
-  stripePaymentIntentConfirm: "stripe.payment_intent.confirm",
-  stripeSubscriptionUpdate: "stripe.subscription.update",
   shopifyOrderCancel: "shopify.order.cancel",
   voiceTranscription: "voice.transcription",
   deviceRead: "device.read",
@@ -110,10 +102,6 @@ const SHOPIFY: CapabilityProviderDependency = {
 const BUILTIN_COMMERCE: CapabilityProviderDependency = {
   kind: "commerce_system",
   systems: ["builtin_commerce"],
-};
-const STRIPE: CapabilityProviderDependency = {
-  kind: "provider",
-  providers: ["stripe"],
 };
 const CONNECTED_FILES: CapabilityProviderDependency = {
   kind: "provider",
@@ -691,35 +679,6 @@ const CAPABILITY_SEEDS = {
     providerDependency: NONE,
     policyModes: "enabled_disabled",
   },
-  [CAPABILITY_KEYS.stripeChargeCreate]: {
-    label: "Create a Stripe charge",
-    description:
-      "Create an approved charge on the exact connected Stripe account.",
-    category: "payments",
-    risk: "external_effect",
-    target: "provider_resource",
-    providerDependency: STRIPE,
-    policyModes: "approval_required_disabled",
-  },
-  [CAPABILITY_KEYS.stripeRefundCreate]: {
-    label: "Create a Stripe refund",
-    description: "Create an approved refund for an exact Stripe charge.",
-    category: "payments",
-    risk: "external_effect",
-    target: "provider_resource",
-    providerDependency: STRIPE,
-    policyModes: "approval_required_disabled",
-  },
-  [CAPABILITY_KEYS.stripeSubscriptionCancel]: {
-    label: "Cancel a Stripe subscription",
-    description:
-      "Cancel an approved subscription on the exact connected Stripe account.",
-    category: "payments",
-    risk: "external_effect",
-    target: "provider_resource",
-    providerDependency: STRIPE,
-    policyModes: "approval_required_disabled",
-  },
   /**
    * Supplier payouts are money leaving the merchant, not money arriving. They
    * are catalogued apart from customer payments because the blast radius
@@ -804,53 +763,6 @@ const CAPABILITY_SEEDS = {
     risk: "external_effect",
     target: "commerce_command",
     providerDependency: BUILTIN_COMMERCE,
-    policyModes: "approval_required_disabled",
-  },
-  [CAPABILITY_KEYS.stripePayoutCreate]: {
-    label: "Create a Stripe payout",
-    description:
-      "Create an approved payout from the exact connected Stripe account.",
-    category: "payments",
-    risk: "external_effect",
-    target: "provider_resource",
-    providerDependency: STRIPE,
-    policyModes: "approval_required_disabled",
-  },
-  [CAPABILITY_KEYS.stripeTransferCreate]: {
-    label: "Create a Stripe transfer",
-    description:
-      "Create an approved transfer to an exact connected account destination.",
-    category: "payments",
-    risk: "external_effect",
-    target: "provider_resource",
-    providerDependency: STRIPE,
-    policyModes: "approval_required_disabled",
-  },
-  [CAPABILITY_KEYS.stripePaymentIntentCapture]: {
-    label: "Capture a Stripe payment",
-    description: "Capture an approved Stripe payment intent.",
-    category: "payments",
-    risk: "external_effect",
-    target: "provider_resource",
-    providerDependency: STRIPE,
-    policyModes: "approval_required_disabled",
-  },
-  [CAPABILITY_KEYS.stripePaymentIntentConfirm]: {
-    label: "Confirm a Stripe payment",
-    description: "Confirm an approved Stripe payment intent.",
-    category: "payments",
-    risk: "external_effect",
-    target: "provider_resource",
-    providerDependency: STRIPE,
-    policyModes: "approval_required_disabled",
-  },
-  [CAPABILITY_KEYS.stripeSubscriptionUpdate]: {
-    label: "Update a Stripe subscription",
-    description: "Apply an approved update to an exact Stripe subscription.",
-    category: "payments",
-    risk: "external_effect",
-    target: "provider_resource",
-    providerDependency: STRIPE,
     policyModes: "approval_required_disabled",
   },
   [CAPABILITY_KEYS.shopifyOrderCancel]: {
