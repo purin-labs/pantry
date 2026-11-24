@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
@@ -28,7 +29,7 @@ export const fileSearch = defineFileTool({
   input: jsonSchema({
     type: "object",
     properties: {
-      query: { type: "string", minLength: 1, maxLength: 256 },
+      query: textLimit({ type: "string", minLength: 1, maxLength: 256 }),
       limit: { type: "integer", minimum: 1, maximum: 20 },
     },
     required: ["query", "limit"],
@@ -87,8 +88,16 @@ export const workspaceQuery = defineFileTool({
     type: "object",
     properties: {
       kind: { type: "string", enum: ["read", "search"] },
-      path: { type: ["string", "null"], minLength: 1, maxLength: 512 },
-      query: { type: ["string", "null"], minLength: 1, maxLength: 128 },
+      path: textLimit({
+        type: ["string", "null"],
+        minLength: 1,
+        maxLength: 512,
+      }),
+      query: textLimit({
+        type: ["string", "null"],
+        minLength: 1,
+        maxLength: 128,
+      }),
       limit: { type: ["integer", "null"], minimum: 1, maximum: 20 },
     },
     required: ["kind", "path", "query", "limit"],

@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import {
   SIDE_CASE_BRIEF_MAX_LENGTH,
@@ -45,13 +46,13 @@ export const memoryProposal = defineTurnTool({
   input: jsonSchema({
     type: "object",
     properties: {
-      statement: {
+      statement: textLimit({
         type: "string",
         minLength: 1,
         maxLength: MAX_MEMORY_PROPOSAL_CHARS,
         description:
           "The rule, fact or preference in one or two plain sentences that stand alone. Keep the person's meaning. Do not mention this chat.",
-      },
+      }),
       kind: {
         type: "string",
         enum: ["fact", "preference"],
@@ -97,13 +98,13 @@ export const followUp = defineTurnTool({
         maximum: MAX_FOLLOW_UP_MINUTES,
         description: "Minutes from now, from 1 to 10080 (seven days).",
       },
-      note: {
+      note: textLimit({
         type: "string",
         minLength: 1,
         maxLength: MAX_FOLLOW_UP_NOTE_CHARS,
         description:
           "What to check or do at that time, in one or two sentences that stand alone.",
-      },
+      }),
     },
     required: ["afterMinutes", "note"],
     additionalProperties: false,
@@ -139,19 +140,19 @@ export const sideCaseProposal = defineTurnTool({
   input: jsonSchema({
     type: "object",
     properties: {
-      title: {
+      title: textLimit({
         type: "string",
         minLength: 1,
         maxLength: SIDE_CASE_TITLE_MAX_LENGTH,
         description: "A short name for the new conversation, in plain words.",
-      },
-      brief: {
+      }),
+      brief: textLimit({
         type: "string",
         minLength: 1,
         maxLength: SIDE_CASE_BRIEF_MAX_LENGTH,
         description:
           "The first message of the new conversation. It must stand alone: what is wrong, the evidence that you saw, and the result to reach.",
-      },
+      }),
     },
     required: ["title", "brief"],
     additionalProperties: false,

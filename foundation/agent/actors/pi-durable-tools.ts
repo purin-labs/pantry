@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import {
   CodeModeResult,
   type PendingCodeModeReceipt,
@@ -182,7 +183,7 @@ export function createDurableHostTools(
       description:
         "Find deferred tools by name or description and enable the matches for subsequent calls.",
       parameters: Type.Object({
-        query: Type.String({ minLength: 1, maxLength: 512 }),
+        query: textLimit(Type.String({ minLength: 1, maxLength: 512 })),
         limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 20 })),
       }),
       // A script finds tools with its own searchTools().
@@ -194,10 +195,13 @@ export function createDurableHostTools(
       name: "codemode",
       description: CODE_MODE_DESCRIPTION,
       parameters: Type.Object({
-        code: Type.String({
-          minLength: 1,
-          maxLength: MAX_CODE_MODE_SOURCE_BYTES,
-        }),
+        code: textLimit(
+          Type.String({
+            minLength: 1,
+            maxLength: MAX_CODE_MODE_SOURCE_BYTES,
+          }),
+          "utf8_bytes",
+        ),
       }),
       // A script cannot start a script.
       callers: ["model"],

@@ -21,6 +21,7 @@
     "@purin-labs/async-control": "workspace:*",
     "@purin-labs/authority": "workspace:*",
     "@purin-labs/connections": "workspace:*",
+    "@purin-labs/contract-schema": "workspace:*",
     "@purin-labs/contracts": "workspace:*",
     "@purin-labs/control": "workspace:*",
     "@purin-labs/control-api": "workspace:*",

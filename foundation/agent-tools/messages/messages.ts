@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type {
@@ -56,7 +57,7 @@ export const messageLinkRead = defineMessageTool({
   input: jsonSchema({
     type: "object",
     properties: {
-      url: { type: "string", pattern: "^https?://", maxLength: 2048 },
+      url: textLimit({ type: "string", pattern: "^https?://", maxLength: 2048 }),
     },
     required: ["url"],
     additionalProperties: false,
