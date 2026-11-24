@@ -1,7 +1,7 @@
 # Refactor 17: the move of a module
 
 Status: Active runbook for Stage B of [Refactor 17](../refactor-17.md)
-Last reviewed: 2026-11-23
+Last reviewed: 2026-11-24
 
 A foundation module of the Platform becomes a workspace package (decision D1).
 One script does the whole move:
@@ -24,7 +24,10 @@ Each foundation module and each product area is a package since 2026-11-23
 ([The group of 2026-11-23](#the-group-of-2026-11-23)). `agent-tools`,
 `contracts`, `control`, `agent`, `conversation`, `tool-handlers`, `ui` and
 `collaboration` moved as the second group
-([The second group](#the-second-group-of-2026-11-23)).
+([The second group](#the-second-group-of-2026-11-23)). Since 2026-11-24 the
+public files that another area imports are the contract package
+`areas/<area>/contract` of their area
+([The contract group](#the-contract-group-of-2026-11-24)).
 
 ## Before the day
 
@@ -158,9 +161,14 @@ pnpm --filter @purin-labs/platform check:types
   `area-commerce` and `area-kitchen`. The surfaces group has the tags
   `refactor-17-surfaces-1-before` and `refactor-17-surfaces-1-after` and the
   plans `surface-whatsapp`, `surface-email`, `shopify`, `surface-slack`,
-  `surface-webhooks`, `surface-voice` and `surface-portal`. A branch that was
-  cut before the groups does the steps for the first group, then for the
-  second, then for the areas, then for the surfaces.
+  `surface-webhooks`, `surface-voice` and `surface-portal`. The contract group
+  has the tags `refactor-17-contracts-1-before` and
+  `refactor-17-contracts-1-after` and the plans `contract-commerce`,
+  `contract-inbox`, `contract-devices`, `contract-kitchen`, `contract-brain`,
+  `contract-cafe`, `contract-integrations` and `contract-organisation`, in
+  that order. A branch that was cut before the groups does the steps for the
+  first group, then for the second, then for the areas, then for the
+  surfaces, then for the contracts.
 - Between the two tags of the second group there are four small commits that
   are not moves: the Portal lints read `PORTAL_SOURCE`, 17 `ui` names lose
   `export`, the layer check reads `packages/collaboration`, and one script
@@ -291,6 +299,87 @@ for the cases so far:
 - A moved surface file keeps a relative import to a surface that has not moved
   yet, as an area file does for a public file of another area.
 - An edit with an empty `replace` removes its `find` text.
+
+## The contract group of 2026-11-24
+
+Branch `r17-contracts`, on `origin/dev` at `cfc38227`. The public files of each
+area that another area imports, with the public files that they import, are
+its contract package `@purin-labs/area-<area>-contract` in
+`areas/<area>/contract/`, the module `areas/<area>/contract`. A Worker file is
+in `server/` and a Portal file in `ui/`, with its sub-path below `server/` or
+`ui/` of the area, less a folder `contract/`: the file `contract/media.ts` below
+`server/` of `cafe` is `areas/cafe/contract/server/media.ts`. 17 public files that only their own
+area, a surface, a Worker or the Shopify module import stay public in the area
+(`stays` in each plan; they keep their lines in `contracts`). The tags
+`refactor-17-contracts-1-before` (the commit before the first plan) and
+`refactor-17-contracts-1-after` (the last move) are made at the landing.
+
+| Area           | Files to `server/` | Files to `ui/` | Public files that stay | Files changed | Imports changed (by name / relative) |
+| -------------- | ------------------ | -------------- | ---------------------- | ------------- | ------------------------------------ |
+| `commerce`     | 21                 | 6              | 1                      | 203           | 293 (289 / 4)                        |
+| `inbox`        | 8                  | 8              | 4                      | 89            | 112 (111 / 1)                        |
+| `devices`      | 2                  | 0              | 2                      | 30            | 26 (26 / 0)                          |
+| `kitchen`      | 12                 | 1              | 0                      | 67            | 78 (73 / 5)                          |
+| `brain`        | 4                  | 3              | 0                      | 47            | 43 (42 / 1)                          |
+| `cafe`         | 7                  | 0              | 0                      | 36            | 37 (37 / 0)                          |
+| `integrations` | 11                 | 9              | 7                      | 104           | 115 (115 / 0)                        |
+| `organisation` | 3                  | 5              | 3                      | 44            | 35 (35 / 0)                          |
+
+- **The rule.** The owner decided on 2026-11-24: a contract imports the
+  foundation, outside packages and the contract of another area, and never
+  the `server/` or `ui/` of an area, a surface or a Worker. The layer check
+  refuses such an import, also with `import type`, and such a package
+  dependency; a temporary probe contract proved each refusal. A run-time call
+  of a public file to a foundation module above `contracts` is the counted
+  debt `contract-runtime` (94 imports in 42 files). Each other debt count
+  reads a contract as a part of its area, and so does the owner rule of the
+  D1 tables.
+- **The scope.** 100 files moved: the 87 source files and 3 style sheets of
+  the approved plan, and 10 public files that the type repairs made. 9 React
+  components moved; they needed no preparation, because each imports only
+  public files.
+- **The order.** A contract imports only contracts that moved before it:
+  `commerce`, `inbox`, `devices`, `kitchen`, `brain`, `cafe`, `integrations`,
+  `organisation`.
+- **Before the moves, in their own commits:** the layer check, the debt kind
+  and the import rule; the 28 old plans match the tree of `dev` again (10
+  files that product commits deleted, 4 export entries, 1 dependency, 1
+  obsolete edit); the script moves files out of the package of an area
+  (`moduleFrom`, `stays`, imports by the old package name, `movedFolders`, the
+  pruning of a dependency that no file uses, a file that a later plan moved
+  again).
+- **Type repairs.** 23 public files of the scope, and `approval-card-texts.ts`,
+  took types from a private file of their area. With type-only changes, each
+  now takes them from a public file: 10 new public files, function types for
+  the service interfaces, and 4 interfaces that their classes implement
+  (`DeviceFleetRpc`, and the graph reader, the engine source and the
+  organisation reader of commerce). The stock operation types moved from the
+  kitchen contract to the commerce contract, so the contracts have no cycle.
+- **The result.** `pnpm` reports no cycle between the area packages; the two
+  cycles between the surfaces stay (`email`, `whatsapp`, `slack`, `webhooks`;
+  `portal`, `voice`). Each move commit is the output of the script, and
+  `--check` prints "Nothing to change." for each of the 36 plans. The layer
+  check finds 0 crossings.
+- **The bundle.** The Worker bundle after the last move has the same bytes as
+  before the first move (10,420,940 bytes). Against `cfc38227` it has the same
+  code, and 26 minified names have other letters. The cause is in
+  `cd487834`: `read-support.ts` lost an import of `CommerceGraphReader` that
+  only a moved type used, and `routes.ts` imports the class with
+  `import type`. esbuild counts an import binding when it gives out the short
+  names, also when it drops the import. Only the unused import gives the same
+  bytes again, and `noUnusedLocals` refuses it. The Portal build has the same
+  5 pages and 574 files.
+- **Ratchets.** The clone baseline fell from 779 copies (13,908 lines) to 778
+  copies (13,874 lines); one 27-line copy moved with its type, and its key
+  follows the file. `env-merge` fell from 83 to 76 methods. Each other count
+  stays.
+- **Checks on the branch:** `pnpm lint:static`, the Worker, test and journey
+  type checks, the Portal type check, `pnpm check:packages`, the five other
+  Workers, `pnpm test:units`, and the E2E files `idle-tenant-cost`,
+  `slack-commerce-approval`, `mailbox-setup`, `chat-agent-permission-request`
+  and `counter-register-journey`.
+- Not run: the full E2E suite, the browser journeys, the Kitchen journeys that
+  need `MUJOCO_DIR`, and a release.
 
 ## The group of 2026-11-23
 
