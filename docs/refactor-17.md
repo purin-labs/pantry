@@ -164,15 +164,15 @@ Wrangler file lives only there. No module imports a Worker.
 
 ### Import rules
 
-| From                             | May import                                                                                                  |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| A foundation module              | A foundation module lower in [the order](#foundation-modules)                                               |
-| The `contract` of an area        | `std`, `kernel`, `contracts`, and the `contract` of another area                                            |
-| The `server` and `ui` of an area | The foundation, its own `contract`, the `contract` of another area (its schemas and its service interfaces) |
-| A surface                        | The foundation and the public entry of an area                                                              |
-| A Worker                         | All three layers                                                                                            |
-| A journey                        | A Worker, and the `testing` entry of a module                                                               |
-| The commerce engine              | Only `std`, `type-utils`, its contracts and its client, as today                                            |
+| From                             | May import                                                                                                                                                                                                                                                                 |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A foundation module              | A foundation module lower in [the order](#foundation-modules)                                                                                                                                                                                                              |
+| The `contract` of an area        | The foundation, outside packages, and the `contract` of another area. Never the `server` or `ui` of an area, a surface or a Worker (decision of the owner, 2026-11-24). A call at run time to a foundation module above `contracts` is the counted debt `contract-runtime` |
+| The `server` and `ui` of an area | The foundation, its own `contract`, the `contract` of another area (its schemas and its service interfaces)                                                                                                                                                                |
+| A surface                        | The foundation and the public entry of an area                                                                                                                                                                                                                             |
+| A Worker                         | All three layers                                                                                                                                                                                                                                                           |
+| A journey                        | A Worker, and the `testing` entry of a module                                                                                                                                                                                                                              |
+| The commerce engine              | Only `std`, `type-utils`, its contracts and its client, as today                                                                                                                                                                                                           |
 
 One pattern replaces each upward import: **the host defines a port, the area gives a
 part, the Worker registers it.** The tool registry already works this way.
