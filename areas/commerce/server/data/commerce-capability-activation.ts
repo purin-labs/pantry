@@ -17,7 +17,6 @@ import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/s
 
 declare const capabilityActivationIdBrand: unique symbol;
 declare const capabilityContractRevisionBrand: unique symbol;
-declare const commerceLocationIdBrand: unique symbol;
 
 type CapabilityActivationId = string & {
   readonly [capabilityActivationIdBrand]: "CapabilityActivationId";
@@ -27,21 +26,14 @@ export type CapabilityContractRevision = string & {
   readonly [capabilityContractRevisionBrand]: "CapabilityContractRevision";
 };
 
-export type CommerceLocationId = string & {
-  readonly [commerceLocationIdBrand]: "CommerceLocationId";
-};
+/**
+ * The commerce capabilities that an admission asks for. A feature that asks
+ * for another capability, or for a scope other than the Organisation, adds it
+ * here and to the CHECK of commerce_capability_activation.
+ */
+export type CommerceCapability = "core" | "online_commerce";
 
-export type CommerceCapability =
-  | "core"
-  | "food_service"
-  | "retail_operations"
-  | "online_commerce"
-  | "returns"
-  | "automation";
-
-export type CapabilityScope =
-  | Readonly<{ kind: "organisation" }>
-  | Readonly<{ kind: "location"; locationId: CommerceLocationId }>;
+export type CapabilityScope = Readonly<{ kind: "organisation" }>;
 
 type CapabilityAuthority = Readonly<{
   kind: CommerceSystemKind;
@@ -138,14 +130,7 @@ type CapabilityActivationRow = Readonly<{
   inactivationReason: unknown;
 }>;
 
-const CAPABILITIES: readonly CommerceCapability[] = [
-  "core",
-  "food_service",
-  "retail_operations",
-  "online_commerce",
-  "returns",
-  "automation",
-];
+const CAPABILITIES: readonly CommerceCapability[] = ["core", "online_commerce"];
 
 const IMPLICIT_CAPABILITIES: ReadonlySet<CommerceCapability> = new Set([
   "core",
@@ -169,14 +154,6 @@ export function parseCapabilityContractRevision(
     : invalid("contractRevision");
 }
 
-export function parseCommerceLocationId(
-  value: unknown,
-): Result<CommerceLocationId, CapabilityActivationError> {
-  return isNormalizedIdentity(value, 200)
-    ? { ok: true, value: value as CommerceLocationId }
-    : invalid("locationId");
-}
-
 export function parseCommerceCapability(
   value: unknown,
 ): Result<CommerceCapability, CapabilityActivationError> {
@@ -190,24 +167,9 @@ export function parseCapabilityScope(
   value: unknown,
 ): Result<CapabilityScope, CapabilityActivationError> {
   if (!isRecord(value)) return invalid("scope");
-  const keys = Object.keys(value);
-  switch (value.kind) {
-    case "organisation":
-      return keys.length === 1
-        ? { ok: true, value: { kind: "organisation" } }
-        : invalid("scope");
-    case "location": {
-      const locationId = parseCommerceLocationId(value.locationId);
-      return keys.length === 2 && locationId.ok
-        ? {
-            ok: true,
-            value: { kind: "location", locationId: locationId.value },
-          }
-        : invalid("scope");
-    }
-    default:
-      return invalid("scope");
-  }
+  return value.kind === "organisation" && Object.keys(value).length === 1
+    ? { ok: true, value: { kind: "organisation" } }
+    : invalid("scope");
 }
 
 export async function configureCommerceCapability(
@@ -775,16 +737,9 @@ function parsePersistedScope(
   scopeKind: unknown,
   locationId: unknown,
 ): Result<CapabilityScope, CapabilityActivationError> {
-  if (scopeKind === "organisation" && locationId === null) {
-    return { ok: true, value: { kind: "organisation" } };
-  }
-  if (scopeKind === "location") {
-    const parsed = parseCommerceLocationId(locationId);
-    return parsed.ok
-      ? { ok: true, value: { kind: "location", locationId: parsed.value } }
-      : parsed;
-  }
-  return invalid("row");
+  return scopeKind === "organisation" && locationId === null
+    ? { ok: true, value: { kind: "organisation" } }
+    : invalid("row");
 }
 
 function parsePersistedAuthority(
@@ -837,15 +792,10 @@ function sameAuthority(
 }
 
 function persistenceScope(scope: CapabilityScope): Readonly<{
-  kind: "organisation" | "location";
-  locationId: CommerceLocationId | null;
+  kind: "organisation";
+  locationId: null;
 }> {
-  switch (scope.kind) {
-    case "organisation":
-      return { kind: "organisation", locationId: null };
-    case "location":
-      return { kind: "location", locationId: scope.locationId };
-  }
+  return { kind: scope.kind, locationId: null };
 }
 
 function matchesCapability(

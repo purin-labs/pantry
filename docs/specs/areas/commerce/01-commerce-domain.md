@@ -181,8 +181,9 @@ The contracts and the engine keep these rules:
 
 ### Capability activation
 
-- The capabilities are `core`, `online_commerce`, `food_service`, `retail_operations`,
-  `returns` and `automation`. A scope is the Organisation or one location.
+- The capabilities are `core` and `online_commerce`, at the Organisation scope. A
+  feature that asks for another capability or a location scope adds it to the type, the
+  control route and the CHECK of `commerce_capability_activation`.
 - An activation is `configured`, `active` or `inactive`. It records the system kind, the
   integration account, the system revision and a contract revision. An `inactive`
   activation has a reason.
@@ -395,9 +396,7 @@ Neighbours:
   production only. A preparation ticket has no `blocked` state.
 - A Plan 24 bake run increases the counter stock with a stock count change
   (`count_stock`). It makes no production batch and no lot.
-- `food_service`, `retail_operations`, `returns` and `automation` can have an
-  activation, but no code asks for them. No admission uses a location scope. The Portal
-  has no page for capability activations.
+- The Portal has no page for capability activations.
 - A change of the commerce system after onboarding has no migration path.
 - The Portal makes only the `cafe_patisserie` demonstration.
 - `apps/storefront/wrangler.jsonc` says that the domain of the QR order pages is not

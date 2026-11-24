@@ -2027,18 +2027,9 @@ WHERE source_event_id IS NOT NULL;
 CREATE TABLE commerce_capability_activation (
   activation_id TEXT PRIMARY KEY,
   organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),
-  capability TEXT NOT NULL CHECK (
-    capability IN (
-      'core',
-      'food_service',
-      'retail_operations',
-      'online_commerce',
-      'returns',
-      'automation'
-    )
-  ),
-  scope_kind TEXT NOT NULL CHECK (scope_kind IN ('organisation', 'location')),
-  location_id TEXT,
+  capability TEXT NOT NULL CHECK (capability IN ('core', 'online_commerce')),
+  scope_kind TEXT NOT NULL CHECK (scope_kind = 'organisation'),
+  location_id TEXT CHECK (location_id IS NULL),
   authority_kind TEXT NOT NULL CHECK (
     authority_kind IN ('builtin_commerce', 'shopify')
   ),
@@ -2056,10 +2047,6 @@ CREATE TABLE commerce_capability_activation (
   inactivated_at INTEGER,
   inactivated_by_user_id TEXT,
   inactivation_reason TEXT,
-  CHECK (
-    (scope_kind = 'organisation' AND location_id IS NULL)
-    OR (scope_kind = 'location' AND location_id IS NOT NULL)
-  ),
   CHECK (
     (lifecycle = 'configured'
       AND activated_at IS NULL

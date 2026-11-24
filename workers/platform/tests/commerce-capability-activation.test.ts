@@ -8,32 +8,30 @@ import {
   inactivateCommerceCapability,
   parseCapabilityActivationId,
   parseCapabilityContractRevision,
-  parseCommerceLocationId,
   requireActiveCommerceCapability,
 } from "@purin-labs/area-commerce/server/data/commerce-capability-activation";
 import { requireUserId, requireOrganisationId } from "./test-ids";
 import { createMigratedDatabase } from "./sqlite-d1";
 
 describe("commerce capability activation", () => {
-  it("binds one location capability to the selected authority and fences its lifecycle", async () => {
+  it("binds one capability to the selected authority and fences its lifecycle", async () => {
     const db = createMigratedDatabase();
     const organisationId = requireOrganisationId("organisation_capability_activation");
     const userId = requireUserId(
       "user_7ad54483-627d-560c-bdf3-e0ee920c1ecb",
     );
     const activationId = requireActivationId(
-      "capability_activation_food_service_cafe",
+      "capability_activation_online_commerce",
     );
-    const locationId = requireLocationId("location_cafe_counter");
-    const contractRevision = requireContractRevision("food_service.v1");
+    const contractRevision = requireContractRevision("online_commerce.v1");
     await seedActivePantryCommerceOrganisation(db, organisationId, userId);
 
     const configured = await configureCommerceCapability({
       db,
       activationId,
       organisationId,
-      capability: "food_service",
-      scope: { kind: "location", locationId },
+      capability: "online_commerce",
+      scope: { kind: "organisation" },
       contractRevision,
       configuredByUserId: userId,
       now: 20,
@@ -45,8 +43,8 @@ describe("commerce capability activation", () => {
         activation: {
           activationId,
           organisationId,
-          capability: "food_service",
-          scope: { kind: "location", locationId },
+          capability: "online_commerce",
+          scope: { kind: "organisation" },
           authority: {
             kind: "builtin_commerce",
             integrationAccountId: "integration_commerce_capability",
@@ -64,8 +62,8 @@ describe("commerce capability activation", () => {
         db,
         activationId: requireActivationId("capability_activation_replayed_id"),
         organisationId,
-        capability: "food_service",
-        scope: { kind: "location", locationId },
+        capability: "online_commerce",
+        scope: { kind: "organisation" },
         contractRevision,
         configuredByUserId: userId,
         now: 21,
@@ -85,9 +83,9 @@ describe("commerce capability activation", () => {
           "capability_activation_conflicting_id",
         ),
         organisationId,
-        capability: "food_service",
-        scope: { kind: "location", locationId },
-        contractRevision: requireContractRevision("food_service.v2"),
+        capability: "online_commerce",
+        scope: { kind: "organisation" },
+        contractRevision: requireContractRevision("online_commerce.v2"),
         configuredByUserId: userId,
         now: 22,
       }),
@@ -122,8 +120,8 @@ describe("commerce capability activation", () => {
       requireActiveCommerceCapability({
         db,
         organisationId,
-        capability: "food_service",
-        scope: { kind: "location", locationId },
+        capability: "online_commerce",
+        scope: { kind: "organisation" },
       }),
     ).resolves.toMatchObject({
       ok: true,
@@ -158,8 +156,8 @@ describe("commerce capability activation", () => {
       requireActiveCommerceCapability({
         db,
         organisationId,
-        capability: "food_service",
-        scope: { kind: "location", locationId },
+        capability: "online_commerce",
+        scope: { kind: "organisation" },
       }),
     ).resolves.toEqual({
       ok: false,
@@ -195,8 +193,8 @@ describe("commerce capability activation", () => {
       requireActiveCommerceCapability({
         db,
         organisationId,
-        capability: "food_service",
-        scope: { kind: "location", locationId },
+        capability: "online_commerce",
+        scope: { kind: "organisation" },
       }),
     ).resolves.toEqual({
       ok: false,
@@ -213,11 +211,11 @@ describe("commerce capability activation", () => {
     const coreActivationId = requireActivationId(
       "capability_activation_core_organisation",
     );
-    const foodActivationId = requireActivationId(
-      "capability_activation_food_service_organisation",
+    const onlineActivationId = requireActivationId(
+      "capability_activation_online_commerce_organisation",
     );
     await seedActivePantryCommerceOrganisation(db, organisationId, userId);
-    const admit = (capability: "core" | "online_commerce" | "food_service") =>
+    const admit = (capability: "core" | "online_commerce") =>
       admitCommerceCapability({
         db,
         organisationId,
@@ -232,10 +230,6 @@ describe("commerce capability activation", () => {
     await expect(admit("online_commerce")).resolves.toEqual({
       ok: true,
       value: { kind: "implicit" },
-    });
-    await expect(admit("food_service")).resolves.toEqual({
-      ok: false,
-      error: { code: "capability_activation_not_found" },
     });
 
     await configureCommerceCapability({
@@ -276,27 +270,27 @@ describe("commerce capability activation", () => {
 
     await configureCommerceCapability({
       db,
-      activationId: foodActivationId,
+      activationId: onlineActivationId,
       organisationId,
-      capability: "food_service",
+      capability: "online_commerce",
       scope: { kind: "organisation" },
-      contractRevision: requireContractRevision("food_service.v1"),
+      contractRevision: requireContractRevision("online_commerce.v1"),
       configuredByUserId: userId,
       now: 30,
     });
     await activateCommerceCapability({
       db,
       organisationId,
-      activationId: foodActivationId,
+      activationId: onlineActivationId,
       expectedRevision: 1,
       activatedByUserId: userId,
       now: 31,
     });
-    await expect(admit("food_service")).resolves.toMatchObject({
+    await expect(admit("online_commerce")).resolves.toMatchObject({
       ok: true,
       value: {
         kind: "activated",
-        activation: { activationId: foodActivationId },
+        activation: { activationId: onlineActivationId },
       },
     });
 
@@ -306,7 +300,7 @@ describe("commerce capability activation", () => {
       )
       .bind(organisationId)
       .run();
-    await expect(admit("food_service")).resolves.toEqual({
+    await expect(admit("online_commerce")).resolves.toEqual({
       ok: false,
       error: { code: "capability_activation_authority_mismatch" },
     });
@@ -398,12 +392,6 @@ function requireActivationId(value: string) {
 
 function requireContractRevision(value: string) {
   const parsed = parseCapabilityContractRevision(value);
-  if (!parsed.ok) throw new Error(parsed.error.code);
-  return parsed.value;
-}
-
-function requireLocationId(value: string) {
-  const parsed = parseCommerceLocationId(value);
   if (!parsed.ok) throw new Error(parsed.error.code);
   return parsed.value;
 }
