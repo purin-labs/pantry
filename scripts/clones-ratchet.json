@@ -1,5 +1,5 @@
 {
-  "total": {"copies":784,"lines":14033},
+  "total": {"copies":784,"lines":14026},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -57,7 +57,7 @@
     "areas/commerce/server/control/routes/agents/merchant-agent.ts = foundation/conversation/control/routes/agents/case-command.ts": {"copies":1,"lines":18},
     "areas/commerce/server/control/routes/agents/merchant-agent.ts = surfaces/portal/server/control/routes/chat/cancel.ts": {"copies":1,"lines":18},
     "areas/commerce/server/control/routes/checkout-profiles.ts = areas/commerce/server/control/routes/checkout-profiles.ts": {"copies":1,"lines":13},
-    "areas/commerce/server/control/routes/commerce/actions.ts = areas/commerce/server/control/routes/commerce/actions.ts": {"copies":4,"lines":72},
+    "areas/commerce/server/control/routes/commerce/actions.ts = areas/commerce/server/control/routes/commerce/actions.ts": {"copies":4,"lines":65},
     "areas/commerce/server/control/routes/commerce/catalog.ts = areas/commerce/server/control/routes/commerce/catalog.ts": {"copies":1,"lines":18},
     "areas/commerce/server/control/routes/commerce/catalog.ts = areas/commerce/server/control/routes/commerce/graph.ts": {"copies":2,"lines":32},
     "areas/commerce/server/control/routes/commerce/catalog.ts = areas/organisation/server/control/routes/onboarding.ts": {"copies":3,"lines":60},
