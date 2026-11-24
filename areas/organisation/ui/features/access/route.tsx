@@ -46,7 +46,7 @@ import type {
   FileResourceAccount,
 } from "@purin-labs/control-api/portal/access-models";
 import { assertNever } from "@purin-labs/std";
-import { AgentPermissionRequestPrompt } from "./agent-permission-request";
+import { AgentPermissionRequestPrompt } from "@purin-labs/area-organisation-contract/ui/features/access/agent-permission-request";
 import { HeldOutputPrompt } from "./held-output-prompt";
 import { PermissionRequestQueue } from "./permission-request-queue";
 import { refreshPermissionRequests } from "./permission-requests-summary";

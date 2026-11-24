@@ -26,7 +26,7 @@
     "areas/kitchen/ui/features/recipes/editor.tsx": 1,
     "areas/kitchen/ui/features/recipes/route.tsx": 2,
     "areas/kitchen/ui/features/workflow-simulator/workspace-runs-panel.tsx": 1,
-    "areas/organisation/ui/features/access/agent-permission-request.tsx": 2,
+    "areas/organisation/contract/ui/features/access/agent-permission-request.tsx": 2,
     "areas/organisation/ui/features/access/held-output-prompt.tsx": 2,
     "areas/organisation/ui/features/access/permission-requests-summary.ts": 1,
     "packages/collaboration/portal/slack-thread-control.tsx": 2,

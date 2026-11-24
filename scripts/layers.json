@@ -29,6 +29,7 @@
     "testing"
   ],
   "packages": {
+    "areas/organisation/contract": "areas/organisation/contract",
     "areas/integrations/contract": "areas/integrations/contract",
     "areas/cafe/contract": "areas/cafe/contract",
     "areas/brain/contract": "areas/brain/contract",
@@ -102,11 +103,6 @@
     "areas/inbox/server/mail-inbox/contract/",
     "areas/inbox/ui/features/mail-setup/",
     "areas/organisation/server/contract/",
-    "areas/organisation/ui/features/access/api.ts",
-    "areas/organisation/ui/features/access/permission-enable.ts",
-    "areas/organisation/ui/features/access/agent-permission-request.tsx",
-    "areas/organisation/ui/features/access/permission-required-prompt.tsx",
-    "areas/organisation/ui/pages/agent-console-shared.tsx",
     "areas/organisation/ui/pages/account-invitation-link.ts",
     "areas/devices/server/contract/"
   ],
@@ -395,6 +391,7 @@
     "workspace_revision_receipt": "foundation/agent"
   },
   "rules": {
+    "areas/organisation/contract/": "areas/organisation/contract",
     "areas/integrations/contract/": "areas/integrations/contract",
     "areas/cafe/contract/": "areas/cafe/contract",
     "areas/brain/contract/": "areas/brain/contract",

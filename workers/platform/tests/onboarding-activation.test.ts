@@ -35,7 +35,7 @@ import { buildOnboardingProjection } from "@purin-labs/area-organisation/server/
 import { readMerchantSupportDiagnostics } from "@purin-labs/area-organisation/server/data/onboarding-support";
 import {
   recordProviderStartFailure,
-} from "@purin-labs/area-organisation/server/contract/provider-support-references";
+} from "@purin-labs/area-organisation-contract/server/provider-support-references";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import { isRecord } from "@purin-labs/std";

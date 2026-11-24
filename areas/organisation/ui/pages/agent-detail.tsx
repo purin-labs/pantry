@@ -45,7 +45,7 @@ import {
   type AgentOperationRunner,
   type AgentOperationStep,
   type AgentOperationSubmitter,
-} from "./agent-console-shared";
+} from "@purin-labs/area-organisation-contract/ui/pages/agent-console-shared";
 import type { AgentSkillRef, ScheduleWeekday } from "@purin-labs/control-api";
 import "./agent-detail.css";
 import "./agent-rows.css";

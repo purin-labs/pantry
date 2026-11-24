@@ -11,7 +11,7 @@ import {
   signalBakeryWorkflowApplied,
   writeWorkflowFindings,
 } from "../../bakery/workflow-revisions";
-import { organisationServices } from "@purin-labs/area-organisation/server/contract/organisation-services";
+import { organisationServices } from "@purin-labs/area-organisation-contract/server/organisation-services";
 import type { Env } from "@purin-labs/kernel/env";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {

@@ -45,7 +45,7 @@ import {
 } from "./onboarding";
 import {
   prepareResolveOpenSupportReferences,
-} from "../contract/provider-support-references";
+} from "@purin-labs/area-organisation-contract/server/provider-support-references";
 import {
   deriveFirstOperationalTask,
   prepareFirstOperationalTask,

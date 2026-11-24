@@ -21,11 +21,11 @@ import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access
 import {
   AgentPermissionRequestPrompt,
   type ChatRun,
-} from "@purin-labs/area-organisation/ui/features/access/agent-permission-request";
+} from "@purin-labs/area-organisation-contract/ui/features/access/agent-permission-request";
 import {
   enableCapabilities,
   mayEnableEvery,
-} from "@purin-labs/area-organisation/ui/features/access/permission-enable";
+} from "@purin-labs/area-organisation-contract/ui/features/access/permission-enable";
 import { decideChatPermission } from "./api";
 import { AGENT_NAME } from "@purin-labs/ui/agent-name";
 import type { Chat } from "@purin-labs/control-api/portal/chat";

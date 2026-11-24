@@ -15,7 +15,7 @@ import {
   AgentsTabs,
   SkillsLibraryPage,
 } from "@purin-labs/area-organisation/ui/pages/agent-console";
-import type { AgentOperationSubmitter } from "@purin-labs/area-organisation/ui/pages/agent-console-shared";
+import type { AgentOperationSubmitter } from "@purin-labs/area-organisation-contract/ui/pages/agent-console-shared";
 import { PortalFrame } from "@purin-labs/surface-portal/ui/shell";
 
 const MERCHANT_AGENT: AgentDefinition = {

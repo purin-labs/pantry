@@ -46,6 +46,7 @@
     "@purin-labs/area-commerce-contract": "workspace:*",
     "@purin-labs/area-brain-contract": "workspace:*",
     "@purin-labs/area-integrations-contract": "workspace:*",
+    "@purin-labs/area-organisation-contract": "workspace:*",
     "lucide-react": "^0.542.0",
     "onnxruntime-web": "1.22.0",
     "qrcode-generator": "^2.0.4",

@@ -99,6 +99,7 @@
     "@purin-labs/area-brain-contract": "workspace:*",
     "@purin-labs/area-cafe-contract": "workspace:*",
     "@purin-labs/area-integrations-contract": "workspace:*",
+    "@purin-labs/area-organisation-contract": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

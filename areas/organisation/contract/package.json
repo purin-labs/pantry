@@ -1,0 +1,41 @@
+{
+  "name": "@purin-labs/area-organisation-contract",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./server/*": {
+      "types": "./server/*.ts",
+      "default": "./server/*.ts"
+    },
+    "./ui/*": {
+      "types": "./ui/*.ts",
+      "default": "./ui/*.ts"
+    },
+    "./ui/features/access/agent-permission-request": "./ui/features/access/agent-permission-request.tsx",
+    "./ui/features/access/permission-required-prompt": "./ui/features/access/permission-required-prompt.tsx",
+    "./ui/pages/agent-console-shared": "./ui/pages/agent-console-shared.tsx"
+  },
+  "dependencies": {
+    "@purin-labs/agent": "workspace:*",
+    "@purin-labs/area-commerce-contract": "workspace:*",
+    "@purin-labs/area-integrations-contract": "workspace:*",
+    "@purin-labs/area-kitchen-contract": "workspace:*",
+    "@purin-labs/commerce-control-api": "workspace:*",
+    "@purin-labs/connections": "workspace:*",
+    "@purin-labs/contracts": "workspace:*",
+    "@purin-labs/control": "workspace:*",
+    "@purin-labs/control-api": "workspace:*",
+    "@purin-labs/kernel": "workspace:*",
+    "@purin-labs/std": "workspace:*",
+    "@purin-labs/tenancy": "workspace:*",
+    "@purin-labs/ui": "workspace:*",
+    "lucide-react": "^0.542.0",
+    "react": "^19.1.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260707.1",
+    "@types/react": "^19.1.12",
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

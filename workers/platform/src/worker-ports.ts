@@ -103,7 +103,7 @@ import { readTerminalOperations } from "@purin-labs/area-cafe/server/data/termin
 import { inboxServices } from "@purin-labs/area-inbox-contract/server/inbox-services";
 import { readGmailPilotBudget } from "@purin-labs/area-inbox/server/data/email-mailbox";
 import { registerSupplierOperationalEmailContact } from "@purin-labs/area-inbox/server/data/email-operational";
-import { organisationServices } from "@purin-labs/area-organisation/server/contract/organisation-services";
+import { organisationServices } from "@purin-labs/area-organisation-contract/server/organisation-services";
 import { removeIntegrationAccount } from "@purin-labs/area-organisation/server/data/account-removal";
 import {
   cancelOperatorConfigurationDraft,
@@ -121,7 +121,7 @@ import { prepareCommunicationDestinationAccount } from "@purin-labs/area-organis
 import {
   prepareProviderAttemptSupportReference,
   prepareResolveOpenSupportReferences,
-} from "@purin-labs/area-organisation/server/contract/provider-support-references";
+} from "@purin-labs/area-organisation-contract/server/provider-support-references";
 import { fileGrantParts } from "@purin-labs/authority/authorization/access-grants/file-grant-parts";
 import {
   prepareChangedFileGrantSync,

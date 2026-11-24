@@ -97,6 +97,9 @@ importers:
       '@purin-labs/area-organisation':
         specifier: workspace:*
         version: link:../../areas/organisation
+      '@purin-labs/area-organisation-contract':
+        specifier: workspace:*
+        version: link:../../areas/organisation/contract
       '@purin-labs/bakery-model':
         specifier: workspace:*
         version: link:../../packages/bakery-model
@@ -574,9 +577,9 @@ importers:
       '@purin-labs/area-kitchen-contract':
         specifier: workspace:*
         version: link:../kitchen/contract
-      '@purin-labs/area-organisation':
+      '@purin-labs/area-organisation-contract':
         specifier: workspace:*
-        version: link:../organisation
+        version: link:../organisation/contract
       '@purin-labs/authority':
         specifier: workspace:*
         version: link:../../foundation/authority
@@ -839,9 +842,9 @@ importers:
       '@purin-labs/area-integrations-contract':
         specifier: workspace:*
         version: link:../integrations/contract
-      '@purin-labs/area-organisation':
+      '@purin-labs/area-organisation-contract':
         specifier: workspace:*
-        version: link:../organisation
+        version: link:../organisation/contract
       '@purin-labs/async-control':
         specifier: workspace:*
         version: link:../../packages/async-control
@@ -997,9 +1000,9 @@ importers:
       '@purin-labs/area-integrations-contract':
         specifier: workspace:*
         version: link:contract
-      '@purin-labs/area-organisation':
+      '@purin-labs/area-organisation-contract':
         specifier: workspace:*
-        version: link:../organisation
+        version: link:../organisation/contract
       '@purin-labs/authority':
         specifier: workspace:*
         version: link:../../foundation/authority
@@ -1149,9 +1152,9 @@ importers:
       '@purin-labs/area-kitchen-contract':
         specifier: workspace:*
         version: link:contract
-      '@purin-labs/area-organisation':
+      '@purin-labs/area-organisation-contract':
         specifier: workspace:*
-        version: link:../organisation
+        version: link:../organisation/contract
       '@purin-labs/authority':
         specifier: workspace:*
         version: link:../../foundation/authority
@@ -1343,6 +1346,9 @@ importers:
       '@purin-labs/area-kitchen-contract':
         specifier: workspace:*
         version: link:../kitchen/contract
+      '@purin-labs/area-organisation-contract':
+        specifier: workspace:*
+        version: link:contract
       '@purin-labs/authority':
         specifier: workspace:*
         version: link:../../foundation/authority
@@ -1403,6 +1409,64 @@ importers:
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      '@types/react':
+        specifier: ^19.1.12
+        version: 19.2.17
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
+
+  areas/organisation/contract:
+    dependencies:
+      '@purin-labs/agent':
+        specifier: workspace:*
+        version: link:../../../foundation/agent
+      '@purin-labs/area-commerce-contract':
+        specifier: workspace:*
+        version: link:../../commerce/contract
+      '@purin-labs/area-integrations-contract':
+        specifier: workspace:*
+        version: link:../../integrations/contract
+      '@purin-labs/area-kitchen-contract':
+        specifier: workspace:*
+        version: link:../../kitchen/contract
+      '@purin-labs/commerce-control-api':
+        specifier: workspace:*
+        version: link:../../../packages/commerce-control-api
+      '@purin-labs/connections':
+        specifier: workspace:*
+        version: link:../../../foundation/connections
+      '@purin-labs/contracts':
+        specifier: workspace:*
+        version: link:../../../packages/contracts
+      '@purin-labs/control':
+        specifier: workspace:*
+        version: link:../../../foundation/control
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../../packages/control-api
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../../../foundation/kernel
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../../packages/std
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../../../foundation/tenancy
+      '@purin-labs/ui':
+        specifier: workspace:*
+        version: link:../../../foundation/ui
+      lucide-react:
+        specifier: ^0.542.0
+        version: 0.542.0(react@19.2.7)
+      react:
+        specifier: ^19.1.1
+        version: 19.2.7
     devDependencies:
       '@cloudflare/workers-types':
         specifier: 5.20260707.1
@@ -2511,6 +2575,9 @@ importers:
       '@purin-labs/area-organisation':
         specifier: workspace:*
         version: link:../../areas/organisation
+      '@purin-labs/area-organisation-contract':
+        specifier: workspace:*
+        version: link:../../areas/organisation/contract
       '@purin-labs/authority':
         specifier: workspace:*
         version: link:../../foundation/authority
@@ -2690,9 +2757,9 @@ importers:
       '@purin-labs/area-devices':
         specifier: workspace:*
         version: link:../../areas/devices
-      '@purin-labs/area-organisation':
+      '@purin-labs/area-organisation-contract':
         specifier: workspace:*
-        version: link:../../areas/organisation
+        version: link:../../areas/organisation/contract
       '@purin-labs/authority':
         specifier: workspace:*
         version: link:../../foundation/authority
@@ -2954,6 +3021,9 @@ importers:
       '@purin-labs/area-organisation':
         specifier: workspace:*
         version: link:../../areas/organisation
+      '@purin-labs/area-organisation-contract':
+        specifier: workspace:*
+        version: link:../../areas/organisation/contract
       '@purin-labs/async-control':
         specifier: workspace:*
         version: link:../../packages/async-control

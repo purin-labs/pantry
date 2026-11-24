@@ -12,7 +12,7 @@ import { MenuDraftRoute } from "@purin-labs/area-cafe/ui/features/content-studio
 import { registerPortalBoardChat } from "@purin-labs/surface-portal/ui/portal-board-chat";
 import PermissionRequestsDrawer from "@purin-labs/area-organisation/ui/features/access/permission-requests-drawer";
 import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";
-import { createAccessRouteTransport } from "@purin-labs/area-organisation/ui/features/access/api";
+import { createAccessRouteTransport } from "@purin-labs/area-organisation-contract/ui/features/access/api";
 import { controlMutation, controlRead } from "@purin-labs/control/portal/control-client";
 
 // The Menus page with the chat beside it, as the Portal shows them, for one

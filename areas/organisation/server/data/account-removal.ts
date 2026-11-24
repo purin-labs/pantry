@@ -48,7 +48,7 @@ import { prepareConfigurationVersionBump } from "@purin-labs/tenancy/data/organi
 import type {
   RemoveIntegrationAccountError,
   RemoveIntegrationAccountResult,
-} from "../contract/organisation-services";
+} from "@purin-labs/area-organisation-contract/server/organisation-services";
 
 type OrganisationStateRow = {
   readonly configurationVersion: unknown;

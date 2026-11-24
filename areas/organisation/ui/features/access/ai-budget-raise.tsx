@@ -6,7 +6,7 @@ import {
   type PermissionRequestItem,
 } from "@purin-labs/ui/index";
 import type { AiBudgetLimits, AiBudgetView } from "@purin-labs/control-api/portal/ai-budget";
-import { workspaceParty } from "./agent-permission-request";
+import { workspaceParty } from "@purin-labs/area-organisation-contract/ui/features/access/agent-permission-request";
 import { AGENT_NAME } from "@purin-labs/ui/agent-name";
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 

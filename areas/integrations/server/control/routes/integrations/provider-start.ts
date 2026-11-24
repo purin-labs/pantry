@@ -10,7 +10,7 @@ import {
 } from "@purin-labs/connections/data/integration-account";
 import {
   recordProviderStartFailure,
-} from "@purin-labs/area-organisation/server/contract/provider-support-references";
+} from "@purin-labs/area-organisation-contract/server/provider-support-references";
 import {
   cancelProviderAttempt,
   expireProviderAttemptIfDue,

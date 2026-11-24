@@ -19,7 +19,7 @@ import {
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import type { CommerceOperationsTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/operations";
 import type { AgentOperationsTransport } from "@purin-labs/commerce-control-api/portal/agent-operations";
-import { createAccessRouteTransport } from "@purin-labs/area-organisation/ui/features/access/api";
+import { createAccessRouteTransport } from "@purin-labs/area-organisation-contract/ui/features/access/api";
 import { pickGoogleDriveFile } from "@purin-labs/area-organisation/ui/features/access/google-drive-picker";
 import {
   readEmailOperationalPreview,

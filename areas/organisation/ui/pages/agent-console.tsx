@@ -53,7 +53,7 @@ import {
   type AgentOperationRunner,
   type AgentOperationStep,
   type AgentOperationSubmitter,
-} from "./agent-console-shared";
+} from "@purin-labs/area-organisation-contract/ui/pages/agent-console-shared";
 import { DocumentEditor, type AgentRevisionLoader } from "./agent-documents";
 import { AgentModal } from "./agent-modal";
 import "./agent-rows.css";

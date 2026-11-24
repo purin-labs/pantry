@@ -27,7 +27,7 @@ import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import {
   PermissionRequiredPrompt,
   permissionRequiredOf,
-} from "../features/access/permission-required-prompt";
+} from "@purin-labs/area-organisation-contract/ui/features/access/permission-required-prompt";
 import type { ControlErrorKind } from "@purin-labs/control-api/portal/errors";
 import type { PageContent } from "@purin-labs/control/portal/page-content";
 import {
@@ -58,7 +58,7 @@ import {
   type AgentOperationRunner,
   type AgentOperationStep,
   type AgentOperationSubmitter,
-} from "./agent-console-shared";
+} from "@purin-labs/area-organisation-contract/ui/pages/agent-console-shared";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import type { TrackingBatchPreview } from "@purin-labs/commerce-control-api";
@@ -71,7 +71,7 @@ export type {
   AgentOperationMutationState,
   AgentOperationRunner,
   AgentOperationSubmitter,
-} from "./agent-console-shared";
+} from "@purin-labs/area-organisation-contract/ui/pages/agent-console-shared";
 
 type AgentOperationsPage =
   | "operations"

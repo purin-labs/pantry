@@ -56,13 +56,13 @@ import type {
   OperatorDraftCommand,
   OperatorDraftError,
   OperatorDraftReceipt,
-} from "../contract/operator-drafts";
+} from "@purin-labs/area-organisation-contract/server/operator-drafts";
 
 export type {
   DeviceDraftCommand,
   OperatorConfigurationDraft,
   OperatorDraftCommand,
-} from "../contract/operator-drafts";
+} from "@purin-labs/area-organisation-contract/server/operator-drafts";
 
 /**
  * A short code identifying the exact change a preview showed.

@@ -10,7 +10,7 @@ import {
   MutationFeedback,
   type AgentOperationMutationState,
   type AgentOperationSubmitter,
-} from "./agent-console-shared";
+} from "@purin-labs/area-organisation-contract/ui/pages/agent-console-shared";
 import { assertNever } from "@purin-labs/std";
 
 export type AgentRevisionLoader = (

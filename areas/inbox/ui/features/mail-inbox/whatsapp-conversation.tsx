@@ -22,7 +22,7 @@ import {
 import {
   PermissionRequiredPrompt,
   permissionRequiredOf,
-} from "@purin-labs/area-organisation/ui/features/access/permission-required-prompt";
+} from "@purin-labs/area-organisation-contract/ui/features/access/permission-required-prompt";
 import { GlideHighlight } from "@purin-labs/ui/glide-highlight";
 import "@purin-labs/ui/action-menu.css";
 import {

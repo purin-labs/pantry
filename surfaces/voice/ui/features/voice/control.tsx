@@ -38,7 +38,7 @@ import {
   enableCapabilities,
   mayEnableEvery,
   type RequestedCapability,
-} from "@purin-labs/area-organisation/ui/features/access/permission-enable";
+} from "@purin-labs/area-organisation-contract/ui/features/access/permission-enable";
 import {
   ControlApiError,
   controlRead,
