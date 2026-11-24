@@ -2,57 +2,12 @@ import type {
   GatewayMessage,
   TerminalPaymentMethod,
 } from "@purin-labs/control-api";
-
-/**
- * Per-terminal exclusive collection state inside DeviceFleetActor (Plan 90 D7).
- * A LAN payment terminal runs at most one collection at a time, and locks in
- * `result_unknown` on an indeterminate LAN timeout or socket drop until
- * inquired or explicitly cleared — never re-charging.
- */
-type TerminalCollectionState =
-  | "collecting"
-  | "result_unknown"
-  | "captured"
-  | "declined"
-  | "cancelled";
-
-export type TerminalCollectionRecord = Readonly<{
-  gatewayId: string;
-  sourceKey: string;
-  requestId: string;
-  paymentAttemptId: string;
-  checkoutId: string;
-  amountMinor: number;
-  currency: string;
-  paymentMethod: TerminalPaymentMethod;
-  state: TerminalCollectionState;
-  providerPaymentReference: string | null;
-  tenderBrand: string | null;
-  providerRefundable: boolean | null;
-  reasonCode: string | null;
-  expiresAt: string;
-  updatedAt: number;
-}>;
-
-export type StartTerminalCollectionInput = Readonly<{
-  gatewayId: string;
-  sourceKey: string;
-  requestId: string;
-  paymentAttemptId: string;
-  checkoutId: string;
-  amountMinor: number;
-  currency: string;
-  paymentMethod: TerminalPaymentMethod;
-  expiresAt: string;
-}>;
-
-export type StartTerminalCollectionResult =
-  | Readonly<{ ok: true; record: TerminalCollectionRecord; replayed: boolean }>
-  | Readonly<{
-      ok: false;
-      reason: "terminal_busy" | "result_unknown" | "gateway_offline";
-      active: TerminalCollectionRecord | null;
-    }>;
+import type {
+  StartTerminalCollectionInput,
+  StartTerminalCollectionResult,
+  TerminalCollectionRecord,
+  TerminalCollectionState,
+} from "../contract/fleet-stub";
 
 type TerminalCollectionRow = Readonly<{
   gateway_id: string;

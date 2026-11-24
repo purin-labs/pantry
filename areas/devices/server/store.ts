@@ -16,6 +16,7 @@ import { encodeBase64Url, sha256Hex } from "@purin-labs/std";
 
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { DeviceEnrollmentState, DeviceWorkState } from "./readiness";
+import type { DeviceActorRef } from "./contract/device-commands";
 
 /**
  * The records of shop gateways and the devices behind them (Plan 85). A found
@@ -23,11 +24,6 @@ import type { DeviceEnrollmentState, DeviceWorkState } from "./readiness";
  * sends is untrusted: it enters through this store with its control characters
  * removed, and it stays data everywhere after that.
  */
-
-export type DeviceActorRef = Readonly<{
-  kind: "person" | "agent" | "gateway" | "platform";
-  id: string | null;
-}>;
 
 export type GatewayRecord = Readonly<{
   gatewayId: string;

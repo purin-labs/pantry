@@ -2,6 +2,7 @@ import { machineTransition } from "@purin-labs/std/state-machine";
 
 import { DEVICE_COMMAND_MACHINE } from "./device-command.machine";
 import { writeActorTransition } from "@purin-labs/actor-runtime/actors/lifecycle/state-transition";
+import type { DeviceCommandKind } from "../contract/fleet-stub";
 
 /**
  * The pauses and resumes that a DeviceFleetActor sends to its gateways
@@ -9,7 +10,6 @@ import { writeActorTransition } from "@purin-labs/actor-runtime/actors/lifecycle
  * `device_command`. Each move goes through `DEVICE_COMMAND_MACHINE`.
  */
 
-export type DeviceCommandKind = "pause" | "resume";
 type DeviceCommandState = keyof typeof DEVICE_COMMAND_MACHINE.states;
 
 type DeviceCommandRow = Readonly<{

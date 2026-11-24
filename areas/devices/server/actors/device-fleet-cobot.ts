@@ -1,8 +1,8 @@
+import type { CobotReport, CobotTaskMessage } from "@purin-labs/control-api";
 import type {
-  CobotReport,
-  CobotTaskMessage,
-  CobotTaskState,
-} from "@purin-labs/control-api";
+  CobotDispatchRecord,
+  CobotDispatchState,
+} from "../contract/fleet-stub";
 
 /**
  * The cobot dispatch ledger of one shop location inside DeviceFleetActor
@@ -22,9 +22,6 @@ import type {
 /** The settled dispatches stay this long, for the run's record. */
 const DISPATCH_RETENTION_MS = 30 * 24 * 60 * 60_000;
 
-export type CobotDispatchState =
-  "sent" | "unsent" | CobotTaskState | "result_unknown";
-
 type DispatchRow = Readonly<{
   request_id: string;
   gateway_id: string;
@@ -38,21 +35,6 @@ type DispatchRow = Readonly<{
   last_report_json: string | null;
   created_at: number;
   updated_at: number;
-}>;
-
-export type CobotDispatchRecord = Readonly<{
-  requestId: string;
-  gatewayId: string;
-  deviceId: string;
-  sourceKey: string;
-  runActorId: string;
-  runId: string;
-  taskId: string;
-  message: CobotTaskMessage;
-  state: CobotDispatchState;
-  lastReport: CobotReport | null;
-  createdAt: number;
-  updatedAt: number;
 }>;
 
 const OPEN_STATES = `('sent', 'accepted', 'running')`;

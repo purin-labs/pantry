@@ -6,7 +6,7 @@ import {
   type KitchenDeviceView,
 } from "@purin-labs/control-api";
 
-import { deviceFleetStub } from "./contract/fleet-stub";
+import { deviceFleetStub, type GatewayPresence } from "./contract/fleet-stub";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
@@ -14,7 +14,6 @@ import {
   deviceReadiness,
   gatewayConnection,
   readinessNeedsAttention,
-  type GatewayPresence,
 } from "./readiness";
 import {
   listDevices,

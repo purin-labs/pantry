@@ -8,9 +8,9 @@ import {
   listDevices,
   listGateways,
   readGateway,
-  type DeviceActorRef,
   type DeviceRecord,
 } from "./store";
+import type { DeviceActorRef } from "./contract/device-commands";
 
 /**
  * Camera snapshots (Plan 85 Phase 5, D5). They are off for each Organisation

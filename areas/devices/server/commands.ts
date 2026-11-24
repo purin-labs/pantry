@@ -1,9 +1,10 @@
-import type { DeviceStationId } from "@purin-labs/control-api";
-
 import { deviceFleetStub } from "./contract/fleet-stub";
+import type {
+  DeviceCommand,
+  DeviceCommandResult,
+  Run,
+} from "./contract/device-commands";
 import type { ControlRole } from "@purin-labs/tenancy/data/control-plane";
-import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { closeResultUnknownAlert, openResultUnknownAlert } from "./alerts";
 import {
   eventStatement,
@@ -11,10 +12,11 @@ import {
   readDevice,
   readEventByIdempotencyKey,
   readGateway,
-  type DeviceActorRef,
   type DeviceRecord,
   type GatewayRecord,
 } from "./store";
+
+export type { DeviceCommand } from "./contract/device-commands";
 
 /**
  * What a person or an agent can do to a gateway or a device (Plan 85). The
@@ -22,17 +24,6 @@ import {
  * same checks, record and receipt. An action that stops work is easy. An action
  * that starts work, widens access or changes a mapping needs more authority.
  */
-
-export type DeviceCommand =
-  | Readonly<{ kind: "confirm"; name: string; stationId: DeviceStationId }>
-  | Readonly<{ kind: "rename"; name: string }>
-  | Readonly<{ kind: "move"; stationId: DeviceStationId }>
-  | Readonly<{ kind: "restrict"; reason: string }>
-  | Readonly<{ kind: "lift" }>
-  | Readonly<{ kind: "pause" }>
-  | Readonly<{ kind: "resume" }>
-  | Readonly<{ kind: "settle" }>
-  | Readonly<{ kind: "revoke" }>;
 
 export const DEVICE_COMMAND_ROLE: Readonly<
   Record<DeviceCommand["kind"], ControlRole>
@@ -47,21 +38,6 @@ export const DEVICE_COMMAND_ROLE: Readonly<
   settle: "operator",
   revoke: "admin",
 };
-
-type DeviceCommandResult =
-  | Readonly<{ ok: true; receiptId: string; replayed: boolean }>
-  | Readonly<{
-      ok: false;
-      code: "device_not_found" | "device_state_conflict";
-    }>;
-
-type Run = Readonly<{
-  env: Env;
-  scope: OrganisationExecutionScope;
-  actor: DeviceActorRef;
-  idempotencyKey: string | null;
-  now: number;
-}>;
 
 export async function runDeviceCommand(
   input: Run &

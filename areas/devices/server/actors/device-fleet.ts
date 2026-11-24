@@ -26,7 +26,7 @@ import {
   syncDeviceFaultAlert,
   syncGatewayAlerts,
 } from "../alerts";
-import { gatewayConnection, type GatewayPresence } from "../readiness";
+import { gatewayConnection } from "../readiness";
 import { pruneDeviceSnapshots, requestFaultSnapshots } from "../snapshots";
 import {
   applyGatewayHello,
@@ -55,7 +55,6 @@ import {
   openDeviceCommands,
   pruneSettledDeviceCommands,
   queueDeviceCommand,
-  type DeviceCommandKind,
 } from "./device-command";
 import {
   deleteGatewayPrinterJobs,
@@ -83,8 +82,6 @@ import {
   unwatchCobotRun,
   watchCobotRun,
   watchingRuns,
-  type CobotDispatchRecord,
-  type CobotDispatchState,
 } from "./device-fleet-cobot";
 import { runDeviceFleetSchemaMigrations } from "./device-fleet-schema";
 import {
@@ -95,16 +92,27 @@ import {
   readTerminalCollection,
   recordTerminalResult,
   reserveTerminalCollection,
-  type StartTerminalCollectionInput,
-  type StartTerminalCollectionResult,
-  type TerminalCollectionRecord,
 } from "./device-fleet-terminal";
+import type {
+  CobotDispatchApproval,
+  CobotDispatchRecord,
+  CobotDispatchState,
+  DeviceCommandKind,
+  DeviceFleetRpc,
+  DeviceSample,
+  GatewayPresence,
+  StartTerminalCollectionInput,
+  StartTerminalCollectionResult,
+  TerminalCollectionRecord,
+} from "../contract/fleet-stub";
 import {
   acceptSocket,
   closeSocket,
   openSockets,
 } from "@purin-labs/actor-runtime/actors/hibernatable-sockets";
 import { eraseUnregisteredActorState } from "@purin-labs/actor-runtime/actors/unregistered-actor-erasure";
+
+export type { DeviceSample } from "../contract/fleet-stub";
 
 /**
  * The connections of one shop location's gateways (Plan 85 D3). A gateway holds
@@ -130,14 +138,6 @@ const PRINTER_ANSWER_MS = 8_000;
 /** A clock read waits this long for the gateway's answer. */
 const CLOCK_ANSWER_MS = 5_000;
 
-/** Who approved a run, as each dispatch of the run names it (Plan 24). */
-export type CobotDispatchApproval = Readonly<{
-  by: string;
-  role: string;
-  via: string;
-  at: number;
-}>;
-
 /** The receipt printer that this location's counter uses. */
 type BoundPrinter = Readonly<{
   view: CounterReceiptPrinter;
@@ -153,18 +153,14 @@ type GatewaySocketAttachment = Readonly<{
 
 type FleetScopeRow = Readonly<{ organisation_id: string }>;
 
-export type DeviceSample = Readonly<{
-  name: string;
-  value: number;
-  unit: string;
-  at: number;
-}>;
-
 /**
  * @public `workers/platform/src/integration-gateway.ts` exports it for the
  * Durable Object binding DEVICE_FLEET of `wrangler.jsonc`.
  */
-export class DeviceFleetActor extends DurableObject<Env> {
+export class DeviceFleetActor
+  extends DurableObject<Env>
+  implements DeviceFleetRpc
+{
   readonly #sql: SqlStorage;
   /** An erased Actor has no tables, so a late socket event does nothing. */
   #erased = false;

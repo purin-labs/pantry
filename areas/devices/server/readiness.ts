@@ -6,18 +6,13 @@ import {
   type DeviceReadiness,
 } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";
+import type { GatewayPresence } from "./contract/fleet-stub";
 
 /**
  * The one answer to "can this device take the next task?" (Plan 85). The
  * Devices page and Plan 24 dispatch both call this function, so they cannot
  * disagree. Telemetry can block work. It can never complete a task.
  */
-
-export type GatewayPresence = Readonly<{
-  gatewayId: string;
-  lastHeardAt: number | null;
-  socketOpen: boolean;
-}>;
 
 /** The state of a gateway's connection, from its last message. */
 export function gatewayConnection(
