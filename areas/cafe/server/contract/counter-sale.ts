@@ -1,10 +1,4 @@
-import type {
-  CommerceAdminClient,
-  CommerceClientError,
-  CommerceOrderV1,
-  CommercePaymentV1,
-  CommercePickupFulfillmentV1,
-} from "@purin-labs/commerce-client";
+import type { MerchantControlContext } from "@purin-labs/area-commerce/server/contract/merchant-control";
 import type { CounterSale } from "@purin-labs/control-api/portal/counter-sale";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
@@ -23,6 +17,23 @@ export type CounterSaleReadback = Readonly<{
   schemaVersion: "pantry.counter-sale.v1";
 }> &
   Omit<CounterSale, "afterSale">;
+
+// The Commerce types of a counter sale, read through the commerce contract.
+type CommerceAdminClient = MerchantControlContext["client"];
+type CommerceClientError = Extract<
+  Awaited<ReturnType<CommerceAdminClient["readCounterSale"]>>,
+  Readonly<{ ok: false }>
+>["error"];
+type CommerceResources = Extract<
+  Awaited<ReturnType<CommerceAdminClient["readSnapshot"]>>,
+  Readonly<{ ok: true }>
+>["value"]["resources"];
+type CommerceOrderV1 = CommerceResources["orders"][number];
+type CommercePaymentV1 = CommerceResources["payments"][number];
+type CommercePickupFulfillmentV1 = Extract<
+  CommerceResources["fulfillments"][number],
+  Readonly<{ kind: "pickup" }>
+>;
 
 type CounterSaleAfterSale = Readonly<{
   order: Readonly<{
