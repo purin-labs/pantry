@@ -671,7 +671,7 @@ async function regionalOnboardingJourney({ task }: TestContext): Promise<void> {
   ).toBe(0);
   await env.ORGANISATION_DB_APAC.prepare(
     `INSERT INTO person_authz_audit VALUES (?, 'unexpected_target_audit', 'person_copy_0',
-      'grant', 'command', 'organisation_admin_token', 'unexpected_target_request', ?)`,
+      'grant', 'approve', 'organisation_admin_token', 'unexpected_target_request', ?)`,
   )
     .bind(west.organisationId, Date.now())
     .run();
