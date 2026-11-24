@@ -97,6 +97,15 @@ export function createTypeSafeConnectionSchema(sql: SqlStorage): void {
     organisation_id TEXT NOT NULL, vault_handle TEXT NOT NULL,
     PRIMARY KEY (organisation_id, vault_handle)
   )`);
+  // A move of the mail switch to a new authority that failed and waits
+  // (`moveMailSwitch` in `authority.ts`).
+  sql.exec(`CREATE TABLE IF NOT EXISTS jev_mail_repin (
+    organisation_id TEXT PRIMARY KEY,
+    from_funding TEXT NOT NULL,
+    from_revision INTEGER NOT NULL,
+    attempts INTEGER NOT NULL CHECK (attempts >= 1),
+    next_attempt_at INTEGER
+  )`);
 }
 
 function readConnection(

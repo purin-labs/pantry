@@ -1,6 +1,10 @@
 import type { ScreenRelevanceCheckInput } from "@purin-labs/area-integrations/server/jev-features/screen-relevance-check";
 import { sealJevUsageHours } from "@purin-labs/area-integrations/server/jev-features/usage-records";
 import {
+  mailSwitchMoveDue,
+  moveMailSwitch,
+} from "@purin-labs/agent/integrations/typesafe/authority";
+import {
   actorMachineCensus,
   type MachineCensus,
 } from "@purin-labs/actor-runtime/actors/lifecycle/machine-census";
@@ -2767,6 +2771,25 @@ export class OrganisationDO
               now,
             ),
           );
+        },
+      },
+      {
+        // Plan 88: a move of the mail switch to a new TypeSafe key that
+        // failed runs again when it is due.
+        name: "jev_mail_repin",
+        run: async () => {
+          if (!mailSwitchMoveDue(this.ctx.storage.sql, now)) return;
+          await moveMailSwitch({
+            sql: this.ctx.storage.sql,
+            transaction: this.ctx.storage.transactionSync.bind(
+              this.ctx.storage,
+            ),
+            db: admission.scope.database,
+            organisationId: organisationId.value,
+            previous: null,
+            repin: JEV_FOR_POLICY.repinMailClassification,
+            now,
+          });
         },
       },
       {

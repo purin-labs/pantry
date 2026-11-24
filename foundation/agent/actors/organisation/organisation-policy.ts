@@ -1,8 +1,8 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
-import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
-import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
 import {
   isOrganisationPolicyPlacementActive,
   parseOrganisationPolicySnapshot,
@@ -19,6 +19,7 @@ import {
 } from "../../integrations/typesafe/connection";
 import {
   currentTypeSafeAuthority,
+  moveMailSwitch,
   resolvePantryTypeSafeKey,
   resolveTypeSafeCredential,
   sameTypeSafeAuthority,
@@ -33,7 +34,7 @@ import {
   integerIn,
 } from "../../case-context-discovery/policy";
 import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
-import { errorMessage, isRecord, sha256Hex } from "@purin-labs/std";
+import { isRecord, sha256Hex } from "@purin-labs/std";
 import type {
   OrganisationActivatePolicyInput,
   OrganisationPolicyActivation,
@@ -306,24 +307,17 @@ export async function admittedManageTypeSafeConnection(
         ),
       );
     }
-    if (!sameTypeSafeAuthority(before, authority)) {
-      // Each mailbox that was on stays on under the new authority.
-      try {
-        await host.jev.repinMailClassification({
-          db: scope.database,
-          organisationId: scope.organisationId,
-          from: before,
-          to: authority,
-          now: Date.now(),
-        });
-      } catch (error) {
-        traceWarn("organisation.jev_mail_repin_failed", {
-          requestId: newRequestId(),
-          organisationId: scope.organisationId,
-          detail: errorMessage(error),
-        });
-      }
-    }
+    // Each mailbox that was on stays on under the new authority. A move
+    // that fails waits, and the alarm tries it again.
+    await moveMailSwitch({
+      sql: host.storage.sql,
+      transaction: host.storage.transactionSync.bind(host.storage),
+      db: scope.database,
+      organisationId: scope.organisationId,
+      previous: before,
+      repin: host.jev.repinMailClassification,
+      now: Date.now(),
+    });
     await host.rearm();
   }
 }

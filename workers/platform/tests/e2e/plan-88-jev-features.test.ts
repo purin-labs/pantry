@@ -581,6 +581,90 @@ async function ownKeyJourney(): Promise<void> {
   expect(calls.at(-1)).toEqual({ key: PANTRY_KEY, purpose: "mail" });
 }
 
+it(
+  "J6: when the move of the mail switch to a new key fails, the Organisation tries it again, and each mailbox stays on",
+  repinRetryJourney,
+  120_000,
+);
+
+async function repinRetryJourney(): Promise<void> {
+  installFakes();
+  const { organisationId, owner, accountId } = await shop("p88-repin");
+  await change(organisationId, owner.session, {
+    feature: "mail_classification",
+    enabled: true,
+  });
+  // The regional database refuses the move of the mailbox to the new key one
+  // time, as a lost write does.
+  await fixtureDatabase()
+    .prepare(
+      `CREATE TRIGGER refuse_mail_repin BEFORE INSERT ON mail_classification_eligibility
+       WHEN NEW.funding = 'organisation_byo'
+       BEGIN SELECT RAISE(ABORT, 'mail_repin_refused'); END`,
+    )
+    .run();
+  const connected = await controlFetch(
+    organisationId,
+    owner.session,
+    "integrations/typesafe",
+    {
+      operation: "connect",
+      expectedRevision: 0,
+      provider: "typesafe",
+      apiKey: OWN_KEY,
+    },
+  );
+  expect(connected.status, await connected.clone().text()).toBe(200);
+  await fixtureDatabase().prepare("DROP TRIGGER refuse_mail_repin").run();
+  // For now the mail switch reads as off: no mailbox is on under the key.
+  expect(await features(organisationId, owner.session)).toMatchObject({
+    funding: "organisation_byo",
+    mailClassification: {
+      enabled: false,
+      mailboxes: [{ integrationAccountId: accountId, covered: false }],
+    },
+  });
+
+  // A minute later the Organisation's alarm moves the mailbox again, with
+  // no admin step: the mailbox reads as on under the Organisation's key.
+  const organisation = await requireActiveOrganisationActor({
+    env,
+    organisationId,
+    now: Date.now(),
+  });
+  await runInDurableObject(organisation, aMinuteLater);
+  expect(await runDurableObjectAlarm(organisation)).toBe(true);
+  expect(await features(organisationId, owner.session)).toMatchObject({
+    funding: "organisation_byo",
+    mailClassification: {
+      enabled: true,
+      mailboxes: [{ integrationAccountId: accountId, covered: true }],
+    },
+  });
+}
+
+/**
+ * A minute passes for the Organisation Actor: work that it set for the
+ * next minute is due, and its alarm is set.
+ */
+async function aMinuteLater(
+  _actor: unknown,
+  state: DurableObjectState,
+): Promise<void> {
+  const queued = state.storage.sql
+    .exec<{ name: string }>(
+      "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'jev_mail_repin'",
+    )
+    .toArray();
+  if (queued.length > 0)
+    state.storage.sql.exec(
+      "UPDATE jev_mail_repin SET next_attempt_at = ? WHERE next_attempt_at <= ?",
+      Date.now() - 1,
+      Date.now() + 60_000,
+    );
+  await state.storage.setAlarm(Date.now() + HOUR_MS);
+}
+
 function installFakes(
   held: Promise<void> = Promise.resolve(),
   mailTokens = 50,

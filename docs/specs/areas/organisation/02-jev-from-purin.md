@@ -24,6 +24,12 @@ Chef reads the settings and proposes a switch change on a card that an admin app
 - A connect or a disconnect of the Organisation's key moves the switches to the new
   authority. Each mailbox that was on stays on, and the related Cases policy gets the
   new route. The switches stay on.
+- The move of the mailboxes is a D1 write (`moveMailSwitch` in
+  `integrations/typesafe/authority.ts`). If it fails, the Organisation Actor keeps
+  the authority that the mailboxes are still pinned to in `jev_mail_repin`, and its
+  alarm tries the move again: after a minute, then a wait that doubles to an hour, at
+  most 24 times. Until then the mailboxes read as not on. A later change of the key
+  starts from the same authority. A failure logs `organisation.jev_mail_repin_failed`.
 - Integrations › TypeSafe stays for an Organisation that wants its own key. Pantry saves
   a key only after a probe passes, and allows one probe in each 30 s.
 - If TypeSafe rejects the key in an own-key test (HTTP 401 or 403), Pantry disconnects
@@ -295,9 +301,6 @@ parser refuses, gives 422. Another refusal gives 409, and a failure of the Actor
 - No journey covers the ledger's fair share of 5 calls a second.
 - A mailbox connected after the switch was turned on is not on until an admin turns the
   switch off and on. A Gmail reconnect gives a new source pin, with the same effect.
-- If the move of the mail switch to a new authority fails, Pantry logs a warning
-  (`organisation.jev_mail_repin_failed`) and does not retry. Those mailboxes then read
-  as not on, until an admin turns the switch off and on.
 - A person who loses the admin role keeps a pending card. Its approval is refused.
 - `jev_screen_relevance_record` has no view that reads it (FND-09).
 

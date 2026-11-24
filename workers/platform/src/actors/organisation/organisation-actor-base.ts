@@ -77,6 +77,7 @@ import { errorMessage, isRecord } from "@purin-labs/std";
 import { PlacedActor } from "@purin-labs/actor-runtime/actors/lifecycle/placed-actor";
 import { rearmActorAlarm } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import { organisationAlarmReconcilers } from "../organisation-alarm";
+import { nextMailSwitchMoveAt } from "@purin-labs/agent/integrations/typesafe/authority";
 import { schemaTransaction } from "./schema";
 import {
   executeOrganisationCommand,
@@ -732,12 +733,17 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
     };
   })();
 
-  /** Sets the alarm from the Organisation's stored work. */
+  /**
+   * Sets the alarm from the Organisation's stored work, and a move of the
+   * mail switch to a new TypeSafe key that waits (Plan 88).
+   */
   protected rearm(): Promise<number | null> {
     const sql = this.ctx.storage.sql;
-    return rearmActorAlarm(
-      this.ctx.storage,
-      organisationAlarmReconcilers(sql, () => readNextOrganisationAlarmAt(sql)),
-    );
+    return rearmActorAlarm(this.ctx.storage, [
+      ...organisationAlarmReconcilers(sql, () =>
+        readNextOrganisationAlarmAt(sql),
+      ),
+      { name: "jev_mail_repin", nextDue: () => nextMailSwitchMoveAt(sql) },
+    ]);
   }
 }
