@@ -845,8 +845,6 @@ function caseStatus(
       return { kind: "neutral", label: "Open" };
     case "waiting":
       return { kind: "warning", label: "Waiting" };
-    case "quarantined":
-      return { kind: "warning", label: "Needs attention" };
     default:
       return assertNever(lifecycle, "Unhandled agent console view");
   }

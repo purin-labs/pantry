@@ -2,7 +2,7 @@ import { isRecord, assertNever } from "@purin-labs/std";
 import { mailIdentifier, mailRevision } from "./mail-organization.ts";
 
 export type MailWorkCaseState =
-  | Readonly<{ kind: "open" | "quarantined"; reason?: never }>
+  | Readonly<{ kind: "open"; reason?: never }>
   | Readonly<{ kind: "waiting"; reason: "approval" }>;
 
 export type MailWorkAssignment =
@@ -187,7 +187,6 @@ function parseCaseState(raw: unknown): MailWorkCaseState | null {
   if (!isRecord(raw)) return null;
   switch (raw.kind) {
     case "open":
-    case "quarantined":
       return { kind: raw.kind };
     case "waiting":
       return raw.reason === "approval"

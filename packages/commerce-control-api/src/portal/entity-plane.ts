@@ -56,7 +56,7 @@ export type CommerceActivityEventKind =
 
 export type CommerceActivityActionState = ActionState;
 
-export type CommerceActivityCaseState = "open" | "waiting" | "quarantined";
+export type CommerceActivityCaseState = "open" | "waiting";
 
 export type CommerceActivityApprovalState = "waiting" | "decided" | "lapsed";
 
@@ -544,8 +544,7 @@ function parseBlotterDisposition(
 }
 
 function parseCaseState(value: unknown): CommerceActivityCaseState {
-  if (value === "open" || value === "waiting" || value === "quarantined")
-    return value;
+  if (value === "open" || value === "waiting") return value;
   throw new Error("Commerce activity Case state is invalid.");
 }
 

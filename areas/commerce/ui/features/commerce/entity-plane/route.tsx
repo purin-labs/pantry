@@ -3574,8 +3574,6 @@ function commerceCaseStateLabel(state: CommerceActivityCaseState): string {
       return "opened";
     case "waiting":
       return "waiting";
-    case "quarantined":
-      return "paused for review";
     default:
       return assertNever(state, "Unhandled commerce graph value");
   }

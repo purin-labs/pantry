@@ -286,11 +286,6 @@ export const caseLifecycleSchema = Type.Union([
       approvalRequestId: nonBlankTextSchema,
     }),
   }),
-  Type.Object({
-    kind: Type.Literal("quarantined"),
-    reason: nonBlankTextSchema,
-    quarantinedAt: countSchema,
-  }),
 ]);
 
 export const emailProposalEvidenceSchema = Type.Union([

@@ -1348,8 +1348,6 @@ function caseLabel(state: MailWorkCaseState): string {
       return "Case open";
     case "waiting":
       return "Waiting for approval";
-    case "quarantined":
-      return "Case quarantined";
     default:
       return assertNever(state);
   }

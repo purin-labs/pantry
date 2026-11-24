@@ -653,12 +653,6 @@ export function parseLifecycle(value: string): CaseLifecycle | null {
           approvalRequestId: lifecycle.wait.approvalRequestId,
         },
       };
-    case "quarantined":
-      return {
-        kind: "quarantined",
-        reason: lifecycle.reason,
-        quarantinedAt: lifecycle.quarantinedAt,
-      };
   }
 }
 

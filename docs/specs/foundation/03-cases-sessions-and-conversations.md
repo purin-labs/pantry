@@ -92,7 +92,7 @@ signed Slack event -> Slack ingress Worker or Platform Worker: verify the signat
 | `rebase_required`            | A `shared_change` named a revision that is not the current one                                                        |
 | `rejected`                   | `assignment_missing`, `assignment_mismatch`, `session_mismatch`, `empty_proposal`, `invalid_entry` or `case_not_open` |
 
-A Case lifecycle (`CaseLifecycle`) is `open`, `waiting` or `quarantined`. The only wait
+A Case lifecycle (`CaseLifecycle`) is `open` or `waiting`. The only wait
 is an `approval` wait. A stored lifecycle with another value does not parse, and the Case
 reads as corrupt. A commerce proposal that a person must review moves the Case from
 `open` to `waiting` with an `approval` wait. The action nonce is the approval request identity. While the
@@ -429,7 +429,7 @@ channel; side Cases for email, WhatsApp, canvas chats and scheduled turns.
 ## Open work
 
 - The Case has no `transition` command, and no Case completes. A plan that builds Case
-  completion adds its states to `CaseLifecycle`. No Case code writes `quarantined`.
+  completion adds its states to `CaseLifecycle`.
 - No agent holds access to a Project, and a move does not go through the Case Actor.
 - The Project view lists a source-admitted Case with its origin only, with no link to
   its source.
