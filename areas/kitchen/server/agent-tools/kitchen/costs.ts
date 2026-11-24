@@ -23,7 +23,7 @@ import {
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { STORED_ACCESS_ENDED_NOTE } from "@purin-labs/agent-tools/tool-effect";
-import { defineKitchenTool } from "./services";
+import { defineKitchenTool } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 import type {
   CostsPlanSaveRequest,
   CostsReadForecastScenario,
