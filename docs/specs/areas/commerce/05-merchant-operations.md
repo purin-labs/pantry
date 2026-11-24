@@ -209,7 +209,13 @@ payouts. Add supplier and Recheck stock sit at the end of the tab row. The Payou
 shows a count and a mark when a payout or an evidence conflict waits on someone. The
 queue is a board view shown as one list: lane filters with counts, one row for each
 entry (the item, its supplier, the amount, the due day, the owner and the lane), and a
-side drawer with the card facts, the lane select and the order fields. The engine
+side drawer with the card facts, the lane select and the order fields. The Supplier
+Directory is the same list: filters by each supplier's open queue requests (Open
+requests, Late), a sort by name, lead time or open requests, one row for each supplier
+(the contact, the email, the lead time and the minimum order), and a drawer with its
+facts, its open requests and a link to its record. The supplier's record page shows the
+same facts and open requests: the Portal reads the directory and the queue for them,
+because the record read carries no list entry. The engine
 keeps entity-plane lists in the preset `purchasing`. A supplier is a `trade_partner`
 with a `supplier_directory` entry: contacts, lead time, minimum order and notes.
 `supplier_inventory_item` links it to each item that it supplies. `supply_cost_terms`

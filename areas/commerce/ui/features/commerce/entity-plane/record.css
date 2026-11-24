@@ -83,6 +83,35 @@
 .commerce-record .commerce-fact-prose dd {
   max-width: 70ch;
 }
+/* The linked records: one framed list, a row for each record. */
+.commerce-relationship-list {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+  list-style: none;
+}
+.commerce-relationship-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+.commerce-relationship-list li + li {
+  border-top: 1px solid var(--border);
+}
+.commerce-relationship-list strong {
+  min-width: 0;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.commerce-relationship-list span {
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
 .product-sale-details {
   display: grid;
   gap: 12px;

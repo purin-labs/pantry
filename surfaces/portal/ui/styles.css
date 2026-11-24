@@ -5745,10 +5745,6 @@ label.checkbox-label {
   text-align: end;
 }
 
-.commerce-entity-reference {
-  font-size: 12.5px;
-}
-
 .commerce-empty-search {
   display: grid;
   justify-items: start;
@@ -5770,12 +5766,6 @@ label.checkbox-label {
   }
 }
 
-.commerce-entity-reference,
-.commerce-relationship-list span {
-  color: var(--ink-2);
-  overflow-wrap: anywhere;
-}
-
 .commerce-dossier-section {
   margin-top: 28px;
 }
@@ -5783,28 +5773,6 @@ label.checkbox-label {
 .commerce-dossier-section h3 {
   margin: 0 0 12px;
   font-size: 17px;
-}
-
-.commerce-relationship-list {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.commerce-relationship-list li {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: var(--surface);
-}
-
-.commerce-relationship-list strong {
-  min-width: 0;
-  overflow-wrap: anywhere;
 }
 
 .commerce-card {
@@ -8752,13 +8720,6 @@ a.agent-work-row:hover .agent-work-title {
   background: var(--danger-bg);
 }
 
-/* Dialog fields keep the sheet's own control styling and just set the grid. */
-.commerce-dialog-fields {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-}
-
 .commerce-dialog-check {
   display: flex;
   align-items: center;
@@ -8769,37 +8730,6 @@ a.agent-work-row:hover .agent-work-title {
   width: 18px;
   min-height: 18px;
   height: 18px;
-}
-
-.commerce-supplier-items {
-  min-width: 0;
-  margin: 0;
-  padding: 12px;
-  border: 1px solid var(--hairline);
-  border-radius: 10px;
-}
-
-.commerce-supplier-items legend {
-  padding-inline: 4px;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.commerce-supplier-items label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  overflow-wrap: anywhere;
-}
-
-.commerce-supplier-items input[type="checkbox"] {
-  flex: 0 0 18px;
-  width: 18px;
-  min-height: 18px;
-  height: 18px;
-  padding: 0;
-  accent-color: var(--ink);
 }
 
 .access35-dialog textarea {
@@ -8830,12 +8760,6 @@ a.agent-work-row:hover .agent-work-title {
 /* The exception panel's own notice needs to clear the fieldset below it. */
 .commerce-exception-workbench > .notice {
   margin-block-end: 14px;
-}
-
-@media (max-width: 760px) {
-  .commerce-dialog-fields {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 /* A pipeline needs room the 920px reading column does not have, so the board

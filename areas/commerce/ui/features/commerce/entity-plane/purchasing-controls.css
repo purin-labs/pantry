@@ -1,0 +1,64 @@
+/* The Add supplier dialog: the fields in a grid, then the items that the
+   supplier supplies as one framed list of rows. Three columns keep the whole
+   dialog inside its height, so it does not scroll. */
+.commerce-dialog-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+/* The minimum order amount and its unit share one field. */
+.commerce-supplier-minimum {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.commerce-supplier-items {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.commerce-supplier-items legend {
+  margin-bottom: 6px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.commerce-supplier-item-rows {
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--paper);
+}
+
+.commerce-supplier-item-rows label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding-inline: 14px;
+  overflow-wrap: anywhere;
+}
+
+.commerce-supplier-item-rows label + label {
+  border-top: 1px solid var(--hairline);
+}
+
+.commerce-supplier-items input[type="checkbox"] {
+  flex: 0 0 18px;
+  width: 18px;
+  min-height: 18px;
+  height: 18px;
+  padding: 0;
+  accent-color: var(--ink);
+}
+
+@media (max-width: 760px) {
+  .commerce-dialog-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

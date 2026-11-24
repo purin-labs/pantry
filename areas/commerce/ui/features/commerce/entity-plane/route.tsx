@@ -100,6 +100,15 @@ import {
   resolveCommerceReferenceName,
   type CommerceBoardLaneOption,
 } from "./board-rows";
+import {
+  NO_PURCHASING_READS,
+  SupplierDirectoryList,
+  SupplierRecordDetails,
+  isSupplierDirectoryList,
+  isSupplierDirectoryModel,
+  loadPurchasingReads,
+  type PurchasingReads,
+} from "./supplier-directory";
 import type {
   CommerceOperationsTransport,
   OrderCancellationAction,
@@ -208,7 +217,7 @@ type CommerceCollectionRouteState =
   | Readonly<{
       kind: "ready";
       model: CommercePublishedCollectionModel;
-      names: ReadonlyMap<string, string>;
+      reads: PurchasingReads;
     }>
   | Readonly<{ kind: "failed"; message: string }>;
 
@@ -544,7 +553,7 @@ async function loadCommerceCollection(
     return {
       kind: "ready",
       model: model.value,
-      names: await loadCommerceReferenceNames(
+      reads: await loadPurchasingReads(
         organisationId,
         model.value,
         metadata,
@@ -554,40 +563,6 @@ async function loadCommerceCollection(
   } catch (error) {
     return { kind: "failed", message: commerceGraphErrorMessage(error) };
   }
-}
-
-/**
- * Some list entries store another record's identifier as text — the
- * Replenishment Queue's `supplier_id`, for instance. That entity is not in the
- * same graph result, so its name is fetched once per collection and looked up
- * at render time. Failing to resolve leaves the identifier showing, which is
- * worse than a name but better than an empty cell.
- */
-async function loadCommerceReferenceNames(
-  organisationId: string,
-  model: CommercePublishedCollectionModel,
-  metadata: CommercePublishedResourceMetadata,
-  fetcher: CommerceGraphFetch | undefined,
-): Promise<ReadonlyMap<string, string>> {
-  const names = new Map<string, string>();
-  if (model.list?.listId !== REPLENISHMENT_QUEUE_LIST_ID) return names;
-  const directory = metadata.lists.find(isSupplierDirectory);
-  if (directory === undefined) return names;
-  try {
-    const result = await readCommerceGraph(
-      organisationId,
-      commerceCollectionQuery({
-        kind: "commerce_list",
-        listId: directory.listId,
-      }),
-      fetcher,
-    );
-    for (const entity of result.entities)
-      names.set(String(entity.reference.entityId), entity.displayName);
-  } catch {
-    // The queue still renders; supplier cells fall back to their identifier.
-  }
-  return names;
 }
 
 /**
@@ -641,12 +616,6 @@ function isPurchasingList(
     list.listId === SUPPLIER_DIRECTORY_LIST_ID ||
     list.listId === REPLENISHMENT_QUEUE_LIST_ID
   );
-}
-
-function isSupplierDirectory(
-  list: CommercePublishedResourceMetadata["lists"][number],
-): boolean {
-  return list.listId === SUPPLIER_DIRECTORY_LIST_ID;
 }
 
 function isPurchasingView(
@@ -901,12 +870,11 @@ function renderCommerceGraphRoute(
   }
 }
 
-const NO_COMMERCE_NAMES: ReadonlyMap<string, string> = new Map();
-
 function commerceCollectionNames(
   collection: CommerceCollectionRouteState,
 ): ReadonlyMap<string, string> {
-  return collection.kind === "ready" ? collection.names : NO_COMMERCE_NAMES;
+  return (collection.kind === "ready" ? collection.reads : NO_PURCHASING_READS)
+    .names;
 }
 
 function CommerceGraphOverview(
@@ -922,7 +890,7 @@ function CommerceGraphOverview(
     boardInteraction: CommerceBoardInteraction;
   }>,
 ): React.ReactNode {
-  const active = props.metadata.lists.some(isSupplierDirectory);
+  const active = props.metadata.lists.some(isSupplierDirectoryList);
   const controls = (
     <PurchasingControls
       organisationId={props.boardInteraction.organisationId}
@@ -1185,7 +1153,15 @@ function CommerceCollectionContent(
         </Notice>
       );
     case "ready":
-      return (
+      // The directory is a list, so the table settings of its view do not apply.
+      return isSupplierDirectoryModel(props.collection.model) ? (
+        <SupplierDirectoryList
+          label={collectionSourceLabel(props.collection.model)}
+          model={props.collection.model}
+          requests={props.collection.reads.supplierRequests}
+          recordHref={entityResourceLink.bind(null, props.resourceHref)}
+        />
+      ) : (
         <>
           <CommerceSavedViewEditor
             key={props.collection.model.view?.viewId ?? "commerce-list"}
@@ -2887,6 +2863,7 @@ function CommerceEntityDossier(
       resourceHref={props.props.resourceHref}
       onBack={props.props.onBack}
       organisationId={props.props.organisationId}
+      fetcher={props.props.fetcher}
       canPropose={props.props.canManage === true}
       commerceOperations={props.props.commerceOperations}
       descriptionDraftActions={props.props.descriptionDraftActions}
@@ -2904,6 +2881,7 @@ function CommerceEntityDossierView(
     resourceHref: CommerceEntityPlaneRouteProps["resourceHref"];
     onBack: () => void;
     organisationId: string;
+    fetcher: CommerceGraphFetch | undefined;
     canPropose: boolean;
     commerceOperations: CommerceOperationsTransport | undefined;
     descriptionDraftActions: ProductDescriptionActionTransport | undefined;
@@ -2915,7 +2893,10 @@ function CommerceEntityDossierView(
   useDossierSurface(props.page, props.model, label);
   const noAttributes = props.model.entity.attributes.length === 0;
   const labelIsDisplayName = label === props.model.entity.displayName;
-  const source = commerceDossierSource(props.model);
+  // A supplier is a record of its own with no source; the first source would
+  // be that of a linked item.
+  const supplier = props.page === "suppliers";
+  const source = supplier ? null : commerceDossierSource(props.model);
   const relationships = seedIncidentRelationships(props.model);
   // A record heads its own page: the record's name is the page title.
   return (
@@ -2943,35 +2924,43 @@ function CommerceEntityDossierView(
         onActionProposed={props.onActionProposed}
         actionBusy={props.actionBusy}
       />
-      <section
-        className="commerce-dossier-section"
-        aria-labelledby="commerce-attributes-title"
-      >
-        <h3 id="commerce-attributes-title">Details</h3>
-        {props.page === "products" ? (
-          <ProductSaleDetails
-            organisationId={props.organisationId}
-            productId={props.model.entity.reference.entityId}
-            canEdit={props.canPropose}
-          />
-        ) : null}
-        {props.page === "products" && noAttributes ? null : noAttributes &&
-          labelIsDisplayName ? (
-          <p className="empty-state commerce-empty">
-            This record has no details yet.
-          </p>
-        ) : (
-          <dl className="commerce-facts">
-            {props.model.entity.attributes.map(renderEntityAttribute)}
-            {labelIsDisplayName ? null : (
-              <div className="commerce-fact-prose">
-                <dt>ID</dt>
-                <dd>{props.model.entity.displayName}</dd>
-              </div>
-            )}
-          </dl>
-        )}
-      </section>
+      {supplier ? (
+        <SupplierRecordDetails
+          organisationId={props.organisationId}
+          fetcher={props.fetcher}
+          entity={props.model.entity}
+        />
+      ) : (
+        <section
+          className="commerce-dossier-section"
+          aria-labelledby="commerce-attributes-title"
+        >
+          <h3 id="commerce-attributes-title">Details</h3>
+          {props.page === "products" ? (
+            <ProductSaleDetails
+              organisationId={props.organisationId}
+              productId={props.model.entity.reference.entityId}
+              canEdit={props.canPropose}
+            />
+          ) : null}
+          {props.page === "products" && noAttributes ? null : noAttributes &&
+            labelIsDisplayName ? (
+            <p className="empty-state commerce-empty">
+              This record has no details yet.
+            </p>
+          ) : (
+            <dl className="commerce-facts">
+              {props.model.entity.attributes.map(renderEntityAttribute)}
+              {labelIsDisplayName ? null : (
+                <div className="commerce-fact-prose">
+                  <dt>ID</dt>
+                  <dd>{props.model.entity.displayName}</dd>
+                </div>
+              )}
+            </dl>
+          )}
+        </section>
+      )}
       <ProductDescriptionDraftControl
         key={`${props.organisationId}:${props.model.entity.reference.entityId}`}
         organisationId={props.organisationId}
@@ -2987,7 +2976,9 @@ function CommerceEntityDossierView(
           className="commerce-dossier-section"
           aria-labelledby="commerce-relationships-title"
         >
-          <h3 id="commerce-relationships-title">Related records</h3>
+          <h3 id="commerce-relationships-title">
+            {supplier ? "Items they supply" : "Related records"}
+          </h3>
           <ul className="commerce-relationship-list">
             {relationships.map(
               renderRelationship.bind(
@@ -2995,6 +2986,7 @@ function CommerceEntityDossierView(
                 props.model.traversal.entities,
                 props.model.entity.reference,
                 props.resourceHref,
+                !supplier,
               ),
             )}
           </ul>
@@ -3632,10 +3624,12 @@ function commerceActionStateLabel(state: string): string {
   }
 }
 
+/** A linked record; `showKind` adds what the link is, when no heading says it. */
 function renderRelationship(
   entities: readonly CommerceEntity[],
   seed: CommerceEntityRef,
   resourceHref: CommerceEntityPlaneRouteProps["resourceHref"],
+  showKind: boolean,
   relationship: CommerceRelationship,
 ): React.ReactNode {
   const related = sameEntityRef(relationship.source, seed)
@@ -3659,11 +3653,13 @@ function renderRelationship(
           <strong>{label}</strong>
         </Link>
       )}
-      <span>
-        {commerceRelationshipLabel(
-          String(relationship.definition.definitionId),
-        )}
-      </span>
+      {showKind ? (
+        <span>
+          {commerceRelationshipLabel(
+            String(relationship.definition.definitionId),
+          )}
+        </span>
+      ) : null}
     </li>
   );
 }

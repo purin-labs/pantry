@@ -1,5 +1,20 @@
-/* A board view as one list: a row for each entry, the lane as a tag, and a
+/* A list of commerce entries: a row for each entry, the lane as a tag, and a
    drawer with the facts and the actions. */
+
+/* The lane filters, then a control such as a sort select at the end. */
+.commerce-board-list-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.commerce-board-list-tools > .commerce-filter-bar {
+  margin-bottom: 0;
+}
+
 .commerce-board-rows {
   display: grid;
   margin: 0;
@@ -50,8 +65,11 @@
   min-width: 0;
 }
 
+/* A long name wraps, so it never runs under the next column or the tag. */
 .commerce-board-row-name strong {
   font-weight: 500;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .commerce-board-row-name span,
@@ -65,6 +83,11 @@
 
 .commerce-board-row-value {
   font-size: 14px;
+}
+
+/* On a wide screen each value is a column of the row. */
+.commerce-board-row-values {
+  display: contents;
 }
 
 .commerce-board-row-value[data-numeric="true"] {
@@ -121,22 +144,45 @@
   text-underline-offset: 3px;
 }
 
-/* On a phone a row is the name, then its values, its lane and the arrow. */
+/* On a phone a row is the name with its lane beside it, then its values on
+   one line that wraps, so a long value such as an email keeps its room. */
 @media (max-width: 760px) {
   .commerce-board-row:where(button) {
-    grid-template-columns: repeat(3, auto) minmax(0, 1fr) 16px;
+    grid-template-columns: minmax(0, 1fr) auto 16px;
     gap: 4px 12px;
   }
 
   .commerce-board-row-name {
-    grid-column: 1 / -1;
-  }
-
-  .commerce-board-row-value {
-    font-size: 13px;
+    grid-row: 1;
+    grid-column: 1;
   }
 
   .commerce-board-row-lane {
-    justify-self: end;
+    grid-row: 1;
+    grid-column: 2;
+    align-self: start;
+  }
+
+  .commerce-board-row-values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 12px;
+    grid-row: 2;
+    grid-column: 1 / 3;
+    min-width: 0;
+  }
+
+  .commerce-board-row-value {
+    max-width: 100%;
+    font-size: 13px;
+  }
+
+  .commerce-board-row-value:empty {
+    display: none;
+  }
+
+  .commerce-board-row > svg {
+    grid-row: 1 / 3;
+    grid-column: 3;
   }
 }

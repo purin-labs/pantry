@@ -6,9 +6,10 @@ import { FilterCount } from "../filter-bar";
 import "./board-list.css";
 
 /**
- * A board view as one list: lane filters with counts, one row for each entry,
- * and a side drawer with every card fact and the actions of the entry. The
- * caller builds the rows, so this module knows no commerce list.
+ * A list of commerce entries: lane filters with counts, one row for each entry,
+ * and a side drawer with every fact and the actions of the entry. The
+ * Replenishment Queue and the Supplier Directory use it. The caller builds the
+ * rows, so this module knows no commerce list.
  */
 
 export type CommerceBoardListFact = Readonly<{
@@ -50,6 +51,8 @@ export function CommerceBoardList(
     label: string;
     lanes: readonly CommerceBoardListLane[];
     rows: readonly CommerceBoardListRow[];
+    /** A control at the end of the filter row, such as a sort select. */
+    controls?: React.ReactNode;
   }>,
 ): React.ReactNode {
   const [filter, setFilter] = React.useState<string | null>(null);
@@ -66,21 +69,24 @@ export function CommerceBoardList(
   const close = closeDrawer.bind(null, setSelection);
   return (
     <div className="commerce-board-list">
-      <div
-        className="commerce-filter-bar"
-        role="group"
-        aria-label={`Show ${props.label} by lane`}
-      >
-        {renderLaneFilter(
-          setFilter,
-          active === null,
-          null,
-          "All",
-          props.rows.length,
-        )}
-        {props.lanes
-          .filter(laneIsShownAsFilter.bind(null, active))
-          .map(renderLaneFilterFor.bind(null, setFilter, active))}
+      <div className="commerce-board-list-tools">
+        <div
+          className="commerce-filter-bar"
+          role="group"
+          aria-label={`Show ${props.label} by lane`}
+        >
+          {renderLaneFilter(
+            setFilter,
+            active === null,
+            null,
+            "All",
+            props.rows.length,
+          )}
+          {props.lanes
+            .filter(laneIsShownAsFilter.bind(null, active))
+            .map(renderLaneFilterFor.bind(null, setFilter, active))}
+        </div>
+        {props.controls}
       </div>
       {shown.length === 0 ? (
         <p className="empty-state commerce-empty">
@@ -150,7 +156,10 @@ function renderBoardRow(
           <strong>{row.name}</strong>
           {row.secondary === null ? null : <span>{row.secondary}</span>}
         </span>
-        {row.columns.map(renderBoardColumn)}
+        {/* Columns on a wide screen; one wrapping line on a phone. */}
+        <span className="commerce-board-row-values">
+          {row.columns.map(renderBoardColumn)}
+        </span>
         <span className="commerce-board-row-lane">{row.laneTag}</span>
         <ChevronRight size={16} aria-hidden="true" />
       </button>
@@ -196,7 +205,7 @@ export function CommerceBoardEntryDrawer(
     >
       <div className="side-drawer-body">
         <dl className="commerce-entry-drawer-facts">
-          {props.facts.map(renderDrawerFact)}
+          {props.facts.map(renderCommerceFact)}
           {props.laneControl === null ? null : (
             <div>
               <dt>Lane</dt>
@@ -215,7 +224,10 @@ export function CommerceBoardEntryDrawer(
   );
 }
 
-function renderDrawerFact(fact: CommerceBoardListFact): React.ReactNode {
+/** One fact as a label and its value, in a drawer or on a record page. */
+export function renderCommerceFact(
+  fact: CommerceBoardListFact,
+): React.ReactNode {
   return (
     <div key={fact.id}>
       <dt>{fact.label}</dt>

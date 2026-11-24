@@ -27,6 +27,7 @@ import {
   type CommerceBoardListColumn,
   type CommerceBoardListFact,
 } from "./board-list";
+import "./purchasing-controls.css";
 import {
   supplierIdFromName,
   type PermissionRequired,
@@ -195,7 +196,7 @@ export function PurchasingControls(
               />
             </label>
             <label>
-              <span>Registered name</span>
+              <span>Legal name</span>
               <input
                 name="legalName"
                 required
@@ -216,7 +217,7 @@ export function PurchasingControls(
               <input name="phone" type="tel" autoComplete="off" />
             </label>
             <label>
-              <span>Country</span>
+              <span>Country code</span>
               <input
                 name="countryCode"
                 maxLength={2}
@@ -235,21 +236,22 @@ export function PurchasingControls(
                 placeholder="5"
               />
             </label>
+            {/* The label names the amount; the unit beside it has its own name. */}
             <label>
               <span>Minimum order</span>
-              <input
-                name="minimumOrderQuantity"
-                inputMode="decimal"
-                placeholder="10"
-              />
-            </label>
-            <label>
-              <span>Minimum order unit</span>
-              <input
-                name="minimumOrderUnit"
-                placeholder="case"
-                autoComplete="off"
-              />
+              <span className="commerce-supplier-minimum">
+                <input
+                  name="minimumOrderQuantity"
+                  inputMode="decimal"
+                  placeholder="10"
+                />
+                <input
+                  name="minimumOrderUnit"
+                  aria-label="Minimum order unit"
+                  placeholder="case"
+                  autoComplete="off"
+                />
+              </span>
             </label>
           </div>
           <fieldset className="commerce-supplier-items">
@@ -271,9 +273,11 @@ export function PurchasingControls(
             {items.kind === "ready" && items.items.length === 0 ? (
               <p>Add inventory items before you add a supplier.</p>
             ) : null}
-            {items.kind === "ready"
-              ? items.items.map(renderInventoryItemChoice)
-              : null}
+            {items.kind === "ready" && items.items.length > 0 ? (
+              <div className="commerce-supplier-item-rows">
+                {items.items.map(renderInventoryItemChoice)}
+              </div>
+            ) : null}
           </fieldset>
           <label>
             <span>Purchasing notes</span>
@@ -741,7 +745,7 @@ function supplierCreationFromForm(form: FormData): SupplierCreation {
     legalName: requiredFormText(
       form,
       "legalName",
-      "Enter the supplier's registered name.",
+      "Enter the supplier's legal name.",
     ),
     countryCode: optionalFormText(form, "countryCode"),
     contactName: optionalFormText(form, "contactName"),

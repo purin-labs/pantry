@@ -1,0 +1,46 @@
+/* A supplier's open requests, in its drawer and on its record page: one
+   framed list, a row for each request with its lane as a tag. */
+.supplier-drawer-requests {
+  display: grid;
+  gap: 8px;
+}
+
+.supplier-drawer-requests h3 {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.supplier-request-rows {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+  list-style: none;
+}
+
+.supplier-request-rows > li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+.supplier-request-rows > li + li {
+  border-top: 1px solid var(--border);
+}
+
+.supplier-request-rows strong {
+  display: block;
+  font-weight: 500;
+}
+
+.supplier-request-rows small {
+  color: var(--ink-2);
+  font-size: 13px;
+}
