@@ -4,7 +4,6 @@
  * decides. Allow sends that one answer, and Deny drops it.
  */
 import React from "react";
-import { Building2 } from "lucide-react";
 import {
   parseHeldOutputView,
   type AgentPermissionDecision,
@@ -19,6 +18,7 @@ import {
 import { heldOutputPath } from "@purin-labs/control/portal/control-paths";
 import { AGENT_NAME } from "@purin-labs/ui/agent-name";
 import { PermissionRequestDialog, PantryMark } from "@purin-labs/ui/index";
+import { workspaceParty } from "@purin-labs/area-organisation-contract/ui/features/access/agent-permission-request";
 
 type Props = Readonly<{
   organisationId: string;
@@ -75,10 +75,7 @@ export function HeldOutputPrompt(props: Props): React.ReactNode {
   if (load.kind === "loading") return null;
   const party = {
     requester: { name: AGENT_NAME, icon: <PantryMark /> },
-    target: {
-      name: props.workspaceName,
-      icon: <Building2 size={22} aria-hidden="true" />,
-    },
+    target: workspaceParty(props.workspaceName),
   };
   if (load.kind === "failed")
     return (

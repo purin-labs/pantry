@@ -405,22 +405,24 @@ with reduced motion the states only fade.
 ### Permission requests
 
 `PermissionRequestCard` is a consent card for a permission request, in the
-style of an OAuth consent screen. It shows the requester and target avatars, a
-title, the account chip and the subtitle, the requested permissions, the
-footnote and the decision buttons. The inline card stacks these in one narrow
-column.
+style of an OAuth consent screen. Its header shows two tiles with arrows
+between them: who asks (`requester`) and what it asks (`target`, usually the
+workspace through `workspaceParty`). Then come the title, the account chip
+and the subtitle, the requested permissions, the footnote and the decision
+buttons. The inline card stacks these in one narrow column.
 
 `PermissionRequestDialog` is the authorization screen, in a native modal
 `<dialog>` (through `syncDialog` and `cancelDialog`). It has two layouts, set
 with `layout`:
 
-- `compact`: a narrow sheet with the app's icon, the question, the points in
-  a filled box, the footnote and full-width actions. This is the default for
+- `compact`: a narrow sheet with the two tiles, the question, the points in
+  a framed list, the footnote and full-width actions. This is the default for
   three items or fewer.
-- `split`: a wide card. The requester, the question, the account chip and the
-  decision are on the left; the permissions are on the right, on a tinted
-  band. Below 760px wide the card stacks. This is the default for a longer
-  request.
+- `split`: a wide card. The two tiles, the question, the account chip and the
+  decision are centred on the left; the permissions are on the right, on the
+  card's own colour with a hairline between rows. Below 760px wide the card
+  stacks, and Deny and Allow come after the list. This is the default for a
+  longer request.
 
 Both layouts are modal cards over the dimmed page, with a close button in the
 corner. Escape and the close button call `onClose`. A click outside the card
@@ -465,11 +467,11 @@ page with no toast stack, Minimize leaves the modal open.
 `AuthorizationScreen` does not minimize: its one action leaves the Portal for
 a provider's sign-in.
 
-The permission list never scrolls. On the split screen it keeps the height of
-the left column; a longer list fades out under a "View all" button that opens
-the rest. The compact sheet and the inline card fold their list at 260px in
-the same way. A keyboard user who tabs to a faded row opens the list. A
-required item shows as a granted line, not as a checkbox; the "Required" mark
+Every permission shows: the list never folds and never scrolls inside the
+card. A longer list makes the card taller, and the dialog scrolls when the
+card is taller than the window. `listHeading` (`asideHeading` on
+`AuthorizationScreen`) names the list for screen readers only, because the
+title says it on screen. A required item shows as a granted line, not as a checkbox; the "Required" mark
 shows only in a list that also has choices. `signedInAs` shows as a chip under
 the question, with a menu mark when it has an action.
 

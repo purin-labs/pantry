@@ -107,7 +107,10 @@ export type PermissionRequestCardProps = {
   readonly target: PermissionRequestParty;
   readonly title: string;
   readonly subtitle: React.ReactNode | null;
-  /** The list header, such as "This will allow Pantry agent to:". */
+  /**
+   * The list's name for screen readers, such as "This will allow Sous Chef
+   * to:". The title already says it on screen.
+   */
   readonly listHeading: string;
   readonly items: readonly PermissionRequestItem[];
   /** Required items are always included, whatever this contains. */
@@ -166,12 +169,7 @@ export function PermissionRequestCard(
       {decision.kind === "result" ? (
         <ResultView ids={ids} heading="h3" decision={decision} />
       ) : (
-        <PermissionRequestContent
-          {...props}
-          ids={ids}
-          heading="h3"
-          layout="stacked"
-        />
+        <PermissionRequestContent {...props} ids={ids} heading="h3" />
       )}
     </section>
   );
@@ -180,8 +178,8 @@ export function PermissionRequestCard(
 /**
  * The consent card as an authorization screen in a modal `<dialog>` over the
  * dimmed page. A short request is a compact sheet. A longer one is a wide
- * split card: the requester, the question and the decision on the left, the
- * permissions on the right. A `result` decision resizes the card to a short
+ * split card: the two parties, the question and the decision centred on the
+ * left, every permission on the right. A `result` decision resizes the card to a short
  * answer. Escape and the close button call `onClose`. A click outside the
  * card does not, because a decision on a consent screen is always an
  * explicit button.
@@ -220,12 +218,7 @@ export function PermissionRequestDialog(
       {decision.kind === "result" ? (
         <ResultView ids={ids} heading="h2" decision={decision} />
       ) : (
-        <PermissionRequestContent
-          {...card}
-          ids={ids}
-          heading="h2"
-          layout={chosen}
-        />
+        <PermissionRequestContent {...card} ids={ids} heading="h2" />
       )}
     </AuthorizationDialog>
   );
@@ -545,7 +538,7 @@ export type AuthorizationScreenProps = {
   readonly target: PermissionRequestParty;
   readonly title: string;
   readonly subtitle: React.ReactNode | null;
-  /** The list heading, such as "What happens next". A compact sheet keeps it for screen readers only. */
+  /** The list's name for screen readers, such as "What happens next". */
   readonly asideHeading: string;
   /** The list content, such as a `<ul>` of consent points. */
   readonly aside: React.ReactNode;
@@ -584,7 +577,6 @@ export function AuthorizationScreen(
       <AuthorizationFrame
         ids={ids}
         heading="h2"
-        layout={layout}
         requester={props.requester}
         target={props.target}
         title={props.title}
@@ -876,16 +868,15 @@ function useContentIds(): ContentIds {
 }
 
 /**
- * The three parts of the card as siblings: the head with the parties, the
+ * The three parts of the card as siblings: the head with the two parties, the
  * question and the account, the right-hand list, and the decision. The layout
- * attribute of the parent places them in one column or in two.
+ * attribute of the parent places them in one column or in two. Every part of
+ * the head and the decision is centred, in each layout.
  */
 function AuthorizationFrame(
   props: Readonly<{
     ids: ContentIds;
     heading: "h2" | "h3";
-    /** A compact sheet shows only the app it asks for, as one large icon. */
-    layout: AuthorizationLayout | "stacked";
     requester: PermissionRequestParty;
     target: PermissionRequestParty;
     title: string;
@@ -900,16 +891,12 @@ function AuthorizationFrame(
     <>
       <div className="permission-request-head">
         <div className="permission-request-parties" aria-hidden="true">
-          {props.layout === "compact" ? null : (
-            <>
-              <span className="permission-request-avatar">
-                {props.requester.icon}
-              </span>
-              <span className="permission-request-connector">
-                <ArrowLeftRight size={18} />
-              </span>
-            </>
-          )}
+          <span className="permission-request-avatar">
+            {props.requester.icon}
+          </span>
+          <span className="permission-request-connector">
+            <ArrowLeftRight size={18} />
+          </span>
           <span className="permission-request-avatar">{props.target.icon}</span>
         </div>
         <Heading id={props.ids.title} className="permission-request-title">
@@ -924,7 +911,7 @@ function AuthorizationFrame(
           </p>
         )}
       </div>
-      <CollapsibleAside>{props.aside}</CollapsibleAside>
+      <div className="permission-request-aside">{props.aside}</div>
       <div className="permission-request-decision">{props.decision}</div>
     </>
   );
@@ -971,78 +958,10 @@ function initialOf(name: string): string {
 }
 
 /**
- * The right-hand list keeps the height of the question beside it. When the
- * list is longer, its end fades out under a "View all" button that shows the
- * rest; nothing scrolls inside the card. A keyboard user who tabs to a hidden
- * row opens the list too.
+ * The permissions, every one in view: the list grows with its items, and the
+ * dialog scrolls when the card is taller than the window. Its heading names
+ * the group for screen readers only, because the title says it on screen.
  */
-function CollapsibleAside(
-  props: Readonly<{ children: React.ReactNode }>,
-): React.ReactNode {
-  const viewport = React.useRef<HTMLDivElement>(null);
-  const viewportId = React.useId();
-  const [expanded, setExpanded] = React.useState(false);
-  const [overflows, setOverflows] = React.useState(false);
-  React.useLayoutEffect(() => {
-    const element = viewport.current;
-    if (element === null || expanded) return;
-    const measure = (): void =>
-      setOverflows(element.scrollHeight > element.clientHeight + 1);
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(element);
-    for (const child of element.children) observer.observe(child);
-    return () => observer.disconnect();
-  }, [expanded]);
-  const folded = overflows && !expanded;
-  return (
-    <div
-      className="permission-request-aside"
-      data-expanded={expanded ? "" : undefined}
-      data-folded={folded ? "" : undefined}
-    >
-      <div
-        ref={viewport}
-        id={viewportId}
-        className="permission-request-aside-viewport"
-        onFocus={revealFocused.bind(null, viewport, folded, setExpanded)}
-      >
-        {props.children}
-      </div>
-      {overflows || expanded ? (
-        <button
-          type="button"
-          className="permission-request-more"
-          aria-expanded={expanded}
-          aria-controls={viewportId}
-          onClick={() => setExpanded(!expanded)}
-        >
-          {expanded ? "Show less" : "View all"}
-          <ChevronDown size={14} aria-hidden="true" />
-        </button>
-      ) : null}
-    </div>
-  );
-}
-
-function revealFocused(
-  viewport: React.RefObject<HTMLDivElement | null>,
-  folded: boolean,
-  setExpanded: (expanded: boolean) => void,
-  event: React.FocusEvent<HTMLDivElement>,
-): void {
-  const element = viewport.current;
-  if (!folded || element === null) return;
-  // The browser has already scrolled the folded list to the focused row.
-  // Its place in the unscrolled list decides, and the faded band at the end
-  // counts as hidden.
-  const target = event.target.getBoundingClientRect();
-  const top = element.getBoundingClientRect().top;
-  const bottom = target.bottom - top + element.scrollTop;
-  if (bottom > element.clientHeight - 48) setExpanded(true);
-  element.scrollTop = 0;
-}
-
 function AsideList(
   props: Readonly<{
     id: string;
@@ -1056,7 +975,7 @@ function AsideList(
       role="group"
       aria-labelledby={props.id}
     >
-      <p id={props.id} className="permission-request-list-heading">
+      <p id={props.id} className="visually-hidden">
         {props.heading}
       </p>
       {props.children}
@@ -1068,7 +987,6 @@ function PermissionRequestContent(
   props: PermissionRequestCardProps & {
     readonly ids: ContentIds;
     readonly heading: "h2" | "h3";
-    readonly layout: AuthorizationLayout | "stacked";
   },
 ): React.ReactNode {
   const decision = props.decision;
@@ -1079,7 +997,6 @@ function PermissionRequestContent(
     <AuthorizationFrame
       ids={props.ids}
       heading={props.heading}
-      layout={props.layout}
       requester={props.requester}
       target={props.target}
       title={props.title}

@@ -1,11 +1,6 @@
 /* Consent card for a permission request. Colors come from the portal theme
    tokens, so the light and dark appearances both follow the active theme. */
 .permission-request {
-  --permission-request-band: color-mix(
-    in oklch,
-    var(--surface) 55%,
-    var(--paper)
-  );
   width: min(100%, 400px);
   min-width: 0;
   overflow: hidden;
@@ -96,103 +91,34 @@ button:not(:where(.pantry-select-trigger)).permission-request-chip:hover {
   color: var(--ink-2);
 }
 
-/* A long list folds. Its end fades out under a "View all" button; nothing
-   scrolls inside the card. */
-.permission-request-aside:not([data-expanded])
-  .permission-request-aside-viewport {
-  max-height: 260px;
-  overflow: hidden;
+/* Every permission shows; nothing folds or scrolls inside the card. The
+   inline card and the compact sheet frame the list, with a hairline between
+   rows. The split card's list has no frame (see below). */
+.permission-request:is([data-layout="stacked"], [data-layout="compact"])
+  .permission-request-list {
+  padding-inline: 16px;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px var(--border);
 }
 
-/* The inline card keeps its list in a box, so the fade is an overlay in
-   the card's colour and the box keeps its edge. */
-.permission-request[data-layout="stacked"] .permission-request-aside-viewport {
-  position: relative;
-  overflow: hidden;
-  border-radius: 12px;
-  /* An outline paints above the rows, so the heading band cannot hide it. */
-  outline: 1px solid var(--border);
-  outline-offset: -1px;
-}
-
-.permission-request[data-layout="stacked"]
-  .permission-request-aside[data-folded]
-  .permission-request-aside-viewport::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0;
-  height: 96px;
-  border-radius: 0 0 12px 12px;
-  background: linear-gradient(to bottom, transparent, var(--paper) 72%);
-  pointer-events: none;
-}
-
-/* The screen's list sits on its own band, so the rows fade into it. */
-.permission-request[data-layout="split"]
-  .permission-request-aside[data-folded]
-  .permission-request-aside-viewport {
-  mask-image: linear-gradient(
-    to bottom,
-    #000 calc(100% - 96px),
-    transparent calc(100% - 12px)
-  );
-}
-
-.permission-request-more {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 32px;
-  margin: 10px auto 0;
-  padding: 0 14px;
-  border: 0;
-  border-radius: var(--pantry-radius-pill);
-  background: var(--paper);
-  box-shadow:
-    0 0 0 1px var(--border),
-    0 2px 10px color-mix(in oklch, var(--pantry-shadow-color) 12%, transparent);
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.permission-request-more:hover {
-  background: var(--surface);
-}
-
-.permission-request-aside[data-folded] .permission-request-more {
-  position: absolute;
-  inset-block-end: 10px;
-  inset-inline-start: 50%;
-  margin: 0;
-  translate: -50% 0;
-}
-
-.permission-request-more > svg {
-  color: var(--ink-2);
-}
-
-.permission-request-more[aria-expanded="true"] > svg {
-  rotate: 180deg;
-}
-
+/* The header: who asks, the arrows, and the workspace that it asks, as two
+   tiles centred over the question. */
 .permission-request-parties {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-block-end: 4px;
+  margin-block-end: 6px;
 }
 
 .permission-request-avatar {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   flex-shrink: 0;
   overflow: hidden;
-  border-radius: 50%;
+  border-radius: 14px;
   background: var(--surface);
   box-shadow: 0 0 0 1px var(--border);
   color: var(--ink);
@@ -238,15 +164,6 @@ button:not(:where(.pantry-select-trigger)).permission-request-chip:hover {
   min-width: 0;
 }
 
-.permission-request-list-heading {
-  padding: 9px 14px;
-  border-block-end: 1px solid var(--border);
-  background: var(--permission-request-band);
-  color: var(--ink-2);
-  font-size: 13px;
-  font-weight: 500;
-}
-
 .permission-request-list ul {
   margin: 0;
   padding: 0;
@@ -261,7 +178,7 @@ button:not(:where(.pantry-select-trigger)).permission-request-chip:hover {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 12px 14px;
+  padding: 12px 0;
   cursor: pointer;
 }
 
@@ -483,7 +400,6 @@ button:not(:where(.pantry-select-trigger)).permission-request-chip:hover {
 
 .permission-request-button:focus-visible,
 .permission-request-chip:focus-visible,
-.permission-request-more:focus-visible,
 .permission-request-select button:where(.pantry-select-trigger):focus-visible {
   outline: 2px solid var(--pantry-focus);
   outline-offset: 2px;
@@ -501,8 +417,8 @@ button:not(:where(.pantry-select-trigger)).permission-request-chip:hover {
 }
 
 /* Split layout: a wide modal card. The question, the account and the
-   decision are on the left; the permissions are on the right. It collapses
-   to the stacked order on a narrow window. */
+   decision are centred on the left; the permissions are on the right. It
+   collapses to the stacked order on a narrow window. */
 .permission-request[data-layout="split"] {
   position: relative;
   width: min(860px, calc(100vw - 32px));
@@ -510,23 +426,6 @@ button:not(:where(.pantry-select-trigger)).permission-request-chip:hover {
   box-shadow:
     0 0 0 1px var(--border),
     var(--shadow-card);
-}
-
-/* The close button sits in the list's corner. */
-.permission-request[data-layout="split"] .permission-request-list-heading {
-  padding-inline-end: 28px;
-}
-
-.permission-request[data-layout="split"] .permission-request-parties {
-  justify-content: flex-start;
-  gap: 10px;
-  margin-block-end: 2px;
-}
-
-.permission-request[data-layout="split"] .permission-request-avatar {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
 }
 
 .permission-request-avatar > .provider-tile {
@@ -544,12 +443,6 @@ button:not(:where(.pantry-select-trigger)).permission-request-chip:hover {
 .permission-request[data-layout="split"] .permission-request-title {
   font-size: 24px;
   line-height: 1.22;
-  text-align: start;
-  text-wrap: balance;
-}
-
-.permission-request[data-layout="split"] .permission-request-chip {
-  justify-self: start;
 }
 
 .permission-request[data-layout="split"] .permission-request-subtitle,
@@ -557,42 +450,11 @@ button:not(:where(.pantry-select-trigger)).permission-request-chip:hover {
   margin-block-start: 0;
   color: var(--ink-2);
   font-size: 13px;
-  text-align: start;
 }
 
-.permission-request[data-layout="split"] .permission-request-explain {
-  border-radius: 12px;
-}
-
+/* The list sits on the card's own colour, with a hairline between rows. */
 .permission-request[data-layout="split"] .permission-request-aside {
-  padding: 16px 20px 0;
-  border-block: 1px solid var(--border);
-  background: var(--permission-request-band);
-}
-
-.permission-request[data-layout="split"] .permission-request-aside-viewport {
-  padding-block-end: 16px;
-}
-
-.permission-request[data-layout="split"]
-  .permission-request-aside[data-expanded] {
-  padding-block-end: 16px;
-}
-
-.permission-request[data-layout="split"] .permission-request-list-heading {
-  padding: 0 0 8px;
-  border-block-end: 0;
-  background: transparent;
-  color: var(--ink-2);
-  font-size: 13px;
-}
-
-.permission-request[data-layout="split"] .permission-request-list li + li {
-  border-block-start: 0;
-}
-
-.permission-request[data-layout="split"] .permission-request-item {
-  padding: 8px 0;
+  padding-block: 4px;
 }
 
 .permission-request[data-layout="split"] .connect-consent-points {
@@ -622,49 +484,17 @@ button:not(:where(.pantry-select-trigger)).permission-request-chip:hover {
     padding: 20px 32px 32px;
   }
 
-  /* The list keeps the height of the left column: its own size does not
-     count until the person opens it with "View all". */
+  /* The list starts under the Minimize and Close buttons and grows with its
+     items; a longer list makes the card taller. */
   .permission-request[data-layout="split"] .permission-request-aside {
     grid-area: aside;
-    display: flex;
-    flex-direction: column;
-    padding: 32px 32px 0;
-    border-block: 0;
+    padding: 64px 32px 28px;
     border-inline-start: 1px solid var(--border);
-  }
-
-  .permission-request[data-layout="split"]
-    .permission-request-aside:not([data-expanded]) {
-    contain: size;
-  }
-
-  .permission-request[data-layout="split"] .permission-request-aside-viewport {
-    flex: 1 1 auto;
-    min-height: 0;
-    max-height: none;
-    padding-block-end: 32px;
-  }
-
-  .permission-request[data-layout="split"]
-    .permission-request-aside[data-expanded] {
-    padding-block-end: 24px;
-  }
-
-  .permission-request[data-layout="split"]
-    .permission-request-aside[data-expanded]
-    .permission-request-aside-viewport {
-    padding-block-end: 4px;
-  }
-
-  .permission-request[data-layout="split"]
-    .permission-request-aside[data-folded]
-    .permission-request-more {
-    inset-block-end: 18px;
   }
 }
 
 /* Compact layout: a short request as a centred sheet over the page, with
-   one large app icon, the points in a filled box and full-width actions. */
+   the two tiles, the points in a framed list and full-width actions. */
 .permission-request[data-layout="compact"] {
   position: relative;
   width: min(440px, calc(100vw - 32px));
@@ -750,25 +580,7 @@ button:not(:where(.pantry-select-trigger)).permission-request-chip:hover {
 
 .permission-request[data-layout="compact"] .permission-request-head {
   gap: 8px;
-  padding: 36px 28px 4px;
-}
-
-.permission-request[data-layout="compact"] .permission-request-parties {
-  margin-block-end: 10px;
-}
-
-.permission-request[data-layout="compact"] .permission-request-avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 20px;
-}
-
-.permission-request[data-layout="compact"]
-  .permission-request-avatar
-  > .provider-tile
-  :is(svg, img) {
-  width: 40px;
-  height: 40px;
+  padding: 32px 28px 4px;
 }
 
 .permission-request[data-layout="compact"] .permission-request-title {
@@ -784,44 +596,6 @@ button:not(:where(.pantry-select-trigger)).permission-request-chip:hover {
 .permission-request[data-layout="compact"] .permission-request-aside {
   margin-block-start: 18px;
   padding-inline: 24px;
-}
-
-.permission-request[data-layout="compact"] .permission-request-aside-viewport {
-  position: relative;
-  overflow: hidden;
-  padding: 4px 20px;
-  border-radius: 16px;
-  background: var(--surface);
-}
-
-.permission-request[data-layout="compact"]
-  .permission-request-aside[data-folded]
-  .permission-request-aside-viewport::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0;
-  height: 96px;
-  background: linear-gradient(to bottom, transparent, var(--surface) 72%);
-  pointer-events: none;
-}
-
-/* The sheet's title already says what is asked; the list heading stays for
-   screen readers. */
-.permission-request[data-layout="compact"] .permission-request-list-heading {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-.permission-request[data-layout="compact"] .permission-request-list li + li {
-  border-block-start: 0;
-}
-
-.permission-request[data-layout="compact"] .permission-request-item {
-  padding: 12px 0;
 }
 
 .permission-request[data-layout="compact"] .connect-consent-points {
@@ -1043,12 +817,10 @@ body:has(.permission-request-dialog[open]) {
 
 @media (prefers-reduced-motion: no-preference) {
   .permission-request-button,
-  .permission-request-check svg,
-  .permission-request-more > svg {
+  .permission-request-check svg {
     transition:
       background-color var(--motion-quick),
       opacity var(--motion-quick),
-      rotate var(--motion-quick),
       scale var(--motion-quick);
   }
 
@@ -1140,6 +912,16 @@ body:has(.permission-request-dialog[open]) {
 
   .permission-request-select button:where(.pantry-select-trigger) {
     font-size: 16px;
+  }
+}
+
+/* On a very narrow phone the centred tiles would reach Minimize and Close,
+   so the head starts under them. */
+@media (max-width: 359px) {
+  .permission-request-dialog
+    .permission-request[data-layout]
+    .permission-request-head {
+    padding-block-start: 60px;
   }
 }
 

@@ -130,7 +130,7 @@ export function AgentPermissionRequestPrompt(props: Props): React.ReactNode {
         open={open}
         onClose={props.onClose}
         requester={{ name: AGENT_NAME, icon: <PantryMark /> }}
-        target={agentParty(props.workspaceName)}
+        target={workspaceParty(props.workspaceName)}
         title="This permission request is unavailable"
         subtitle={load.message}
         listHeading=""
@@ -168,20 +168,19 @@ export function AgentPermissionRequestPrompt(props: Props): React.ReactNode {
   const labels = joinLabels(view.items.map(itemLabel));
   // Who gets the grants is said once when every item goes to the same subject.
   const subject = sharedGrantSubject(view);
-  const grants =
-    subject === null ? "adds the grants above" : `grants it to ${subject}`;
+  const grants = subject === null ? "each grant above" : subject;
   return (
     <PermissionRequestDialog
       open={open}
       onClose={props.onClose}
       requester={{ name: AGENT_NAME, icon: <PantryMark /> }}
-      target={agentParty(props.workspaceName)}
+      target={workspaceParty(props.workspaceName)}
       title={`${AGENT_NAME} would like to ${labels}`}
       subtitle={
         view.threadUrl === null ? (
           <>
             Asked in {props.chat === undefined ? "a Portal chat" : "this chat"}{" "}
-            for a member with the {view.requesterRole} role.
+            for the {view.requesterRole} role.
           </>
         ) : (
           <>
@@ -189,7 +188,7 @@ export function AgentPermissionRequestPrompt(props: Props): React.ReactNode {
             <a href={view.threadUrl} target="_blank" rel="noreferrer">
               Slack thread
             </a>{" "}
-            for a member with the {view.requesterRole} role.
+            for the {view.requesterRole} role.
           </>
         )
       }
@@ -221,14 +220,14 @@ export function AgentPermissionRequestPrompt(props: Props): React.ReactNode {
       footnote={
         view.origin === "slack_thread" ? (
           <>
-            Allow turns each item on for the whole workspace and {grants}. A
-            Slack channel needs its own grant to read records, because everyone
-            in the channel sees the answer. You can change both in Access.
+            Applies to the whole workspace and to {grants}. A Slack channel
+            needs its own grant to read records, because everyone in the channel
+            sees the answer. Change it in Access and data flow.
           </>
         ) : (
           <>
-            Allow turns each item on for the whole workspace and {grants}. You
-            can change both in Access.
+            Applies to the whole workspace and to {grants}. Change it in Access
+            and data flow.
           </>
         )
       }
@@ -303,7 +302,7 @@ function decisionFor(
   if (!view.mayDecide)
     return {
       kind: "explain",
-      message: "An owner or admin of this workspace must allow this request.",
+      message: "An owner or admin must allow this.",
       pending: null,
       error: null,
       primary: closeAction,
@@ -380,8 +379,8 @@ function chatDecisionFor(
       kind: "explain",
       message: (
         <>
-          An owner or admin of this workspace must allow this request. Send them{" "}
-          <a href={chat.requestUrl}>this link</a>, then select Check again.
+          An owner or admin must allow this. Send them{" "}
+          <a href={chat.requestUrl}>this link</a>.
         </>
       ),
       pending: busy,
@@ -475,14 +474,9 @@ function itemLabel(item: AgentPermissionRequestView["items"][number]): string {
 }
 
 /**
- * The workspace that the Pantry agent asks, shown with the agent's mark: the
- * compact prompt shows one icon, and the agent is who asks.
+ * The workspace as the party that a permission request asks: the right tile
+ * of every prompt's header, beside the tile of who asks.
  */
-function agentParty(workspaceName: string) {
-  return { name: workspaceName, icon: <PantryMark /> };
-}
-
-/** The workspace as the party that a permission request asks. */
 export function workspaceParty(name: string) {
   return {
     name,

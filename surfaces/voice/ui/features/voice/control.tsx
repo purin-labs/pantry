@@ -1141,8 +1141,8 @@ function VoiceAccessPrompt(
       footnote={
         authority === "explain" ? null : (
           <>
-            Allow turns this on for the whole workspace. You can turn it off in{" "}
-            <a href={props.accessPath}>Access</a>.
+            Applies to the whole workspace. Turn it off in{" "}
+            <a href={props.accessPath}>Access and data flow</a>.
           </>
         )
       }

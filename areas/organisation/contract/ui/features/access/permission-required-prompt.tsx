@@ -154,8 +154,8 @@ function subtitle(permission: PermissionRequired, grantScope: string): string {
 function footnote(permission: PermissionRequired): string | null {
   if (permission.mode === "enabled") return null;
   return permission.grant === null
-    ? "Every role that holds this permission can then use it. You can turn it off again in Access."
-    : "Allow also turns this on for the whole workspace. You can change both in Access.";
+    ? "Every role that holds this permission can then use it. Turn it off in Access and data flow."
+    : "Allow also turns this on for the whole workspace. Change both in Access and data flow.";
 }
 
 function noGoogleDrivePicker(): Promise<null> {

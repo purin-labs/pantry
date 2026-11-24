@@ -20,6 +20,7 @@ import {
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 import {
   AgentPermissionRequestPrompt,
+  workspaceParty,
   type ChatRun,
 } from "@purin-labs/area-organisation-contract/ui/features/access/agent-permission-request";
 import {
@@ -216,10 +217,7 @@ function ChatCapabilityPermissionPrompt(props: Props): React.ReactNode {
         open={open}
         onClose={() => setOpen(false)}
         requester={{ name: AGENT_NAME, icon: <PantryMark /> }}
-        target={{
-          name: props.workspaceName,
-          icon: <span aria-hidden="true">{initial(props.workspaceName)}</span>,
-        }}
+        target={workspaceParty(props.workspaceName)}
         title={`${AGENT_NAME} would like to ${lowerFirst(permission.action)}`}
         subtitle={
           permission.object === null ? (
@@ -242,8 +240,8 @@ function ChatCapabilityPermissionPrompt(props: Props): React.ReactNode {
         decision={decision}
         footnote={
           <>
-            Allow turns this on for the whole workspace. You can turn it off in{" "}
-            <a href={props.accessPath}>Access</a>.
+            Applies to the whole workspace. Turn it off in{" "}
+            <a href={props.accessPath}>Access and data flow</a>.
           </>
         }
         signedInAs={
@@ -262,10 +260,6 @@ function itemLabel(item: ChatPermissionRequest["items"][number]): string {
 
 function lowerFirst(text: string): string {
   return text.charAt(0).toLowerCase() + text.slice(1);
-}
-
-function initial(name: string): string {
-  return name.trim().charAt(0).toUpperCase() || "W";
 }
 
 function ignoreSelection(): void {

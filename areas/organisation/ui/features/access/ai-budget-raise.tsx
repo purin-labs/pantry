@@ -112,8 +112,8 @@ export function AiBudgetRaisePrompt(props: Props): React.ReactNode {
       footnote={
         <>
           New limits apply to Slack threads and chats that start after this
-          change; a thread that stopped keeps its limits. You can change them
-          in Access.
+          change; a thread that stopped keeps its limits. Change them in Access
+          and data flow.
         </>
       }
       signedInAs={null}

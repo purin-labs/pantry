@@ -90,7 +90,7 @@ function sharedProps(): Omit<
     subtitle: "Only allow this if you trust the request.",
     listHeading: `This will allow ${AGENT_NAME} to:`,
     items,
-    footnote: "You can remove this access later in Settings › Access.",
+    footnote: "Remove it later in Access and data flow.",
     signedInAs,
   };
 }
