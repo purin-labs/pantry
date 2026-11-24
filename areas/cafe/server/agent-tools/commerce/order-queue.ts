@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import { Type } from "typebox";
 import { isIanaTimezone } from "@purin-labs/control-api";
 import type {
@@ -129,10 +130,12 @@ export const soldOutMark = defineCafeTool({
     {
       variantId: Type.String({ pattern: ID_PATTERN }),
       soldOut: Type.Boolean(),
-      timeZone: Type.Unsafe<string | null>({
-        type: ["string", "null"],
-        maxLength: 64,
-      }),
+      timeZone: Type.Unsafe<string | null>(
+        textLimit({
+          type: ["string", "null"],
+          maxLength: 64,
+        }),
+      ),
     },
     { additionalProperties: false },
   ),

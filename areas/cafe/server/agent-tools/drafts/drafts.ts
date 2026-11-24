@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import {
   type MenuDraftEdit,
   type MenuDraftRead,
@@ -169,8 +170,8 @@ export const menuDraftEdit = defineMenuTool({
         type: ["string", "null"],
         pattern: "^[A-Za-z0-9_:-]{1,128}$",
       },
-      title: { type: ["string", "null"], maxLength: 1000 },
-      description: { type: ["string", "null"], maxLength: 1000 },
+      title: textLimit({ type: ["string", "null"], maxLength: 1000 }),
+      description: textLimit({ type: ["string", "null"], maxLength: 1000 }),
       order: { type: ["integer", "null"], minimum: 0, maximum: 1000000 },
     },
     required: [
@@ -300,9 +301,9 @@ export const menuBoardEdit = defineMenuTool({
           null,
         ],
       },
-      before: { type: ["string", "null"], maxLength: 280 },
-      text: { type: ["string", "null"], maxLength: 280 },
-      title: { type: ["string", "null"], maxLength: 280 },
+      before: textLimit({ type: ["string", "null"], maxLength: 280 }),
+      text: textLimit({ type: ["string", "null"], maxLength: 280 }),
+      title: textLimit({ type: ["string", "null"], maxLength: 280 }),
       itemId: {
         type: ["string", "null"],
         pattern: "^[A-Za-z0-9_:-]{1,128}$",
@@ -370,7 +371,7 @@ export const menuBoardComment = defineMenuTool({
         type: ["string", "null"],
         pattern: "^[A-Za-z0-9_:-]{1,128}$",
       },
-      text: { type: ["string", "null"], maxLength: 1000 },
+      text: textLimit({ type: ["string", "null"], maxLength: 1000 }),
     },
     required: ["kind", "boardId", "elementId", "commentId", "text"],
     additionalProperties: false,
@@ -411,7 +412,7 @@ export const menuBoardHistory = defineMenuTool({
         type: ["string", "null"],
         pattern: "^[A-Za-z0-9_:-]{1,128}$",
       },
-      text: { type: ["string", "null"], maxLength: 80 },
+      text: textLimit({ type: ["string", "null"], maxLength: 80 }),
     },
     required: ["kind", "boardId", "versionId", "text"],
     additionalProperties: false,
@@ -498,7 +499,7 @@ export const menuBoardCreate = defineMenuTool({
   input: jsonSchema({
     type: "object",
     properties: {
-      title: { type: "string", minLength: 1, maxLength: 280 },
+      title: textLimit({ type: "string", minLength: 1, maxLength: 280 }),
       layout: { type: "string", enum: Object.keys(MENU_BOARD_LAYOUTS) },
       start: { type: "string", enum: [...MENU_BOARD_STARTS] },
     },
