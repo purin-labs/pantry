@@ -3,9 +3,9 @@
   // QR order pages at `<shop name>.<MENU_HOST_SUFFIX>` (Plan 40B phase 2).
   // Deploy with `pnpm --filter @purin-labs/storefront deploy:shop`, with
   // VITE_SHOP_MERCHANT_ID set to the merchant of the shop.
-  // The order page domain is not chosen yet, so no route sends an order page
-  // host here. Its route needs a proxied wildcard DNS record and a
-  // certificate that covers the wildcard.
+  // The order page domain is not chosen yet, so MENU_HOST_SUFFIX is not set
+  // and no route sends an order page host here. Its route needs a proxied
+  // wildcard DNS record and a certificate that covers the wildcard.
   "$schema": "../../services/commerce/node_modules/wrangler/config-schema.json",
   "name": "purin-shop",
   "main": "worker/index.ts",
@@ -20,9 +20,6 @@
     // An order page host needs the Worker for every request: it checks the
     // shop name before it serves a page.
     "run_worker_first": true,
-  },
-  "vars": {
-    "MENU_HOST_SUFFIX": "menu.seams.tokyo",
   },
   "services": [{ "binding": "COMMERCE", "service": "pantry-commerce" }],
   "routes": [{ "pattern": "shop.purin.io", "custom_domain": true }],

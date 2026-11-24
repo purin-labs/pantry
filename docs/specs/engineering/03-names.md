@@ -310,10 +310,9 @@ exported `PurinMark` and `PurinIcon`.
 **Seams text in the Portal:** the public `/ecommerce` page uses the Seams name, wordmark
 and `seams.sh` links.
 
-**Domains:** `MENU_HOST_SUFFIX` of the shop is still `menu.seams.tokyo`, with no route.
-Plan 93 records that the domain of the QR order page is not chosen.
-The local `PANTRY_PROVIDER_INGRESS_ORIGIN` is still the Square sandbox tunnel
-`square-sandbox-webhook.seams.sh`. The shop site is `shop.purin.io`.
+**Domains:** The shop sets no `MENU_HOST_SUFFIX`: Plan 93 records that the domain of
+the QR order page is not chosen. The local `PANTRY_PROVIDER_INGRESS_ORIGIN` is still the
+Square sandbox tunnel `square-sandbox-webhook.seams.sh`. The shop site is `shop.purin.io`.
 
 ## Sources
 
