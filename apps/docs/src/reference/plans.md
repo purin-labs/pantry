@@ -25,7 +25,7 @@ records what a particular run proved.
 | `docs/history/plan-61A-financier-workflow.md` through `docs/history/plan-61E-combined-cafe-shift.md`                       | Draft recipe preparation and combined service workflows                                  |
 | `docs/plan-24-cafeos-bakery-automation.md`                                                                                 | Planned physical enrollment, dispatch, and reconciliation                                |
 | `docs/history/plan-40-product-description-drafting.md` and `docs/history/plan-40B-collaborative-menu-editor.md`            | Accepted product drafting and the proposed collaborative menu editor                     |
-| `docs/plan-91-seams-atelier-rename.md`                                                                                     | The Purin Pantry rename: display names, code names, and the names that stay              |
+| `docs/history/plan-91-seams-atelier-rename.md`                                                                             | The Purin Pantry rename: display names, code names, and the names that stay              |
 
 `docs/evidence/plan-42-release-readiness.md` separates accepted software,
 deferred conveniences, broader release checks, and physical calibration.

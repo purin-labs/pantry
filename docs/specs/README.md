@@ -3,12 +3,11 @@
 A spec describes what is built, for one subsystem. A plan describes work that is not
 built. [Refactor 17](../refactor-17.md) gives the rules and the reasons.
 
-State on 2026-11-23: each of the 33 specs is written (step S2 of Refactor 17). A
-written spec is the reference for its subsystem, and 56 source plans are in
+State on 2026-11-24: each of the 33 specs is written (step S2 of Refactor 17). A
+written spec is the reference for its subsystem, and 57 source plans are in
 `docs/history/`. A plan that describes work that is not built stays in `docs/` (the
-rows "A plan" in the table of old numbers). Plan 91 also stays until its phase 6 ends,
-because a session still writes its record there. The other source documents of the
-specs (for example `architecture/runtime.md`) stay where they are.
+rows "A plan" in the table of old numbers). The other source documents of the specs
+(for example `architecture/runtime.md`) stay where they are.
 
 How a spec is accepted: a writer makes it from its source plans and the code. A second
 reader checks each statement against the code, and the writer corrects each fault.
@@ -179,7 +178,7 @@ Refactors 1 to 8 are also the numbers of the items of Refactor 15.
 | Plan 88     | ORG-02      | [plan-88-satyr-funded-jev.md](../history/plan-88-satyr-funded-jev.md)                                                     |       65 |
 | Plan 89     | FND-07      | [plan-89-outside-written-content.md](../history/plan-89-outside-written-content.md)                                       |       32 |
 | Plan 90     | A plan      | [plan-90-cafe-pos-checkout.md](../plan-90-cafe-pos-checkout.md)                                                           |       15 |
-| Plan 91     | ENG-03      | [plan-91-seams-atelier-rename.md](../plan-91-seams-atelier-rename.md)                                                     |       39 |
+| Plan 91     | ENG-03      | [plan-91-seams-atelier-rename.md](../history/plan-91-seams-atelier-rename.md)                                             |       39 |
 | Plan 92     | ENG-02      | [plan-92-new-pantry-repository.md](../history/plan-92-new-pantry-repository.md)                                           |       12 |
 | Plan 93     | A plan      | [plan-93-clean-cutover.md](../plan-93-clean-cutover.md)                                                                   |        6 |
 | Plan 94     | A plan      | [plan-94-purin-labs-organisation.md](../plan-94-purin-labs-organisation.md)                                               |        4 |

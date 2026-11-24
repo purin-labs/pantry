@@ -5,7 +5,7 @@ recordings of staff in a shop, and the owner has no shop yet (2026-11-17), so th
 [The voice handover](plan-82-voice-handover.md) lists it with the other open voice steps. This plan changes
 [Plan 82](history/plan-82-portal-voice-control.md) D2 only for a member who turns on a new mode on one
 device. The wake phrase and hold-to-talk (Plan 82 D10) stay as they are. Since
-[Plan 91](plan-91-seams-atelier-rename.md) the agent is "Sous Chef", so the addressee rules
+[Plan 91](history/plan-91-seams-atelier-rename.md) the agent is "Sous Chef", so the addressee rules
 below accept the agent's name and the wake phrase's "Satyr".
 
 ## Result in one paragraph
@@ -111,7 +111,7 @@ asks for speaker enrollment first.
    - The sentence names "Sous Chef": accept.
      "Chef" alone does not count, because a kitchen says "yes chef", and "the sous chef" can be a
      person on the staff. The first "Hey Sous Chef" wake models woke on "hey" + any word + "chef"
-     ([Plan 91](plan-91-seams-atelier-rename.md), phase 6), so G0.2 includes such sentences.
+     ([Plan 91](history/plan-91-seams-atelier-rename.md), phase 6), so G0.2 includes such sentences.
    - The sentence starts in the follow-up window: accept, with no model call.
    - The sentence is only a short thanks or a filler word: drop.
    - Else the model gets the sentence, the last two turns of the chat, the time since the last

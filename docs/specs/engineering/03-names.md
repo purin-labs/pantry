@@ -316,7 +316,7 @@ Square sandbox tunnel `square-sandbox-webhook.seams.sh`. The shop site is `shop.
 
 ## Sources
 
-- [Plan 91](../../plan-91-seams-atelier-rename.md) and
+- [Plan 91](../../history/plan-91-seams-atelier-rename.md) and
   [Plan 93](../../plan-93-clean-cutover.md). Where they differ from the code, this spec
   follows the code. They give no evidence link in the archive.
 - [AGENTS.md](../../../AGENTS.md), sections "Product direction" and "Old and new names".

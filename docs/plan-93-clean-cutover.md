@@ -21,7 +21,7 @@ are Refactor 260 work. The Console items below are history.
   transfer. A clean cutover needs neither, so this version replaces it.
 
 Owner: the deploy procedure and the Cloudflare account.
-Touches: [Plan 91 — names](plan-91-seams-atelier-rename.md) (its rules for
+Touches: [Plan 91 — names](history/plan-91-seams-atelier-rename.md) (its rules for
 the deployed and wire layers end here),
 [Plan 80 — multi-tenant Underclerk](history/plan-80-underclerk-multi-tenant-backend.md),
 the AGENTS.md sections "Old and new names", "Active runtime" and

@@ -408,7 +408,7 @@ Drive token stays bound to its client, so a new client ID needs a reconnect.
   connect shows the "unverified app" screen and counts against the 100-user cap. The
   local Gmail push topic has no subscription. Separate clients for each environment and
   a dedicated administrative Google account do not exist.
-- [Plan 91](../../../plan-91-seams-atelier-rename.md) records that the Meta (WhatsApp)
+- [Plan 91](../../../history/plan-91-seams-atelier-rename.md) records that the Meta (WhatsApp)
   registration keeps its old name and addresses until Meta's business verification
   passes, and that its Graph API answers "API access blocked".
 
@@ -417,7 +417,7 @@ Drive token stays bound to its client, so a new client ID needs a reconnect.
 - [Integration architecture](../../../architecture/integrations.md) and
   [Google OAuth clients](../../../integrations/google-oauth.md). Where they differ from
   the code, this spec follows the code. Background:
-  [Plan 91](../../../plan-91-seams-atelier-rename.md) (the provider registrations) and
+  [Plan 91](../../../history/plan-91-seams-atelier-rename.md) (the provider registrations) and
   [provider callback origins](../../../runbooks/provider-callback-origins.md).
 - Archive plans that the sources name (they give no evidence links):
   [Plan 29](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-29-organisation-agent-email-mailboxes.md)

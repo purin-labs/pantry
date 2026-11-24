@@ -2,7 +2,7 @@
 
 Status: phase 1 and the cutover done on 18 November 2026 (owner: "Yes, start", with the default decisions); phase 2: unused and legacy code done on 18 November 2026 (see "Phase 2 results"); tests done on 19 November 2026 (see "Phase 2 results: tests" and "the fold of the E2E fault cases"); duplicate code done on 19 November 2026 (see "Phase 2 results: duplicate code").
 Owner: the whole repository.
-Touches: [Plan 91 — names](../plan-91-seams-atelier-rename.md),
+Touches: [Plan 91 — names](plan-91-seams-atelier-rename.md),
 [Refactor 16 — Kitchen physics](../refactor-16.md), the deploy procedure and
 every open branch.
 

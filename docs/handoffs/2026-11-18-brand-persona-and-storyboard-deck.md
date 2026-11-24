@@ -2,7 +2,7 @@
 
 Date: 2026-11-18 (rebuilt in `~/Dev/purin-io/pantry` on 2026-11-19)
 Repository: `/Users/pta/Dev/purin-io/pantry`
-Related docs: [Plan 65 — Hairline SVGs](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-65-hairline-svgs.md), [Plan 91 — Seams Atelier Rename](../plan-91-seams-atelier-rename.md), [Voice Handover](../plan-82-voice-handover.md)
+Related docs: [Plan 65 — Hairline SVGs](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-65-hairline-svgs.md), [Plan 91 — Seams Atelier Rename](../history/plan-91-seams-atelier-rename.md), [Voice Handover](../plan-82-voice-handover.md)
 
 ## 1. Completed Deliverables (Saved in Repository Folder)
 
