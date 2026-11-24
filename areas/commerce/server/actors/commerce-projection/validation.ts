@@ -17,10 +17,6 @@ import {
   isRecord,
 } from "@purin-labs/std";
 import {
-  type AppliedCommerceObservationResult,
-  type CommerceProjectionError,
-  type CommerceProjectionKind,
-  type CommerceSystemStorageAuthority,
   type DeliveryReceiptRow,
   type FulfillmentKind,
   type InspectedCommerceDelivery,
@@ -32,6 +28,15 @@ import {
   type UpsertProjectionIdentity,
   isFulfillmentKind,
 } from "../commerce-projection";
+import type {
+  AppliedCommerceObservationResult,
+  CommerceProjectionError,
+  CommerceProjectionKind,
+  CommerceSystemStorageAuthority,
+  InventoryQuantity,
+} from "../../contract/commerce-projection";
+
+export type { InventoryQuantity } from "../../contract/commerce-projection";
 import {
   hasInteger,
   hasNonNegativeInteger,
@@ -1053,12 +1058,6 @@ function isCafeProjectionKind(
     kind === "stock_policy"
   );
 }
-
-export type InventoryQuantity = Readonly<{
-  amount: number;
-  scale: number;
-  unit: string;
-}>;
 
 type StoredInventoryQuantity = InventoryQuantity | null;
 

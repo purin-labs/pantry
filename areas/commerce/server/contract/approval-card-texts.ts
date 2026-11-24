@@ -1,11 +1,13 @@
-import type { ActionLedgerEntry } from "@purin-labs/authority/actors/action-ledger";
+import type {
+  ActionLedgerEntry,
+  LedgerCanonicalAction,
+} from "@purin-labs/authority/actors/action-ledger";
 import type { Env } from "@purin-labs/kernel/env";
 import { definePort } from "@purin-labs/kernel/port";
 import type {
   CommerceActionPath,
   CommerceActionRequest,
-  parseCommerceActionPath,
-} from "../action-model";
+} from "./action-requests";
 
 /** What a proposal knows about the record that it changes. */
 export type CommerceChangeFacts = Readonly<{
@@ -34,7 +36,7 @@ export type CommerceApprovalCardTexts = Readonly<{
     facts: CommerceChangeFacts,
   ): string;
   /** The summary of an action whose approval notice the thread does not hold. */
-  actionSummary(action: Parameters<typeof parseCommerceActionPath>[0]): string;
+  actionSummary(action: Pick<LedgerCanonicalAction, "verb" | "path">): string;
   /** The summary part of a card's text. */
   cardSummary(cardText: string): string;
   /** The text of a card that waits for a decision. */

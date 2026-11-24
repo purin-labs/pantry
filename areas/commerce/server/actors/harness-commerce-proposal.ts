@@ -40,7 +40,6 @@ import {
 } from "@purin-labs/agent/actors/agent-session-information-flow";
 import {
   merchantPluginInstallation,
-  type InstallMerchantPluginAction,
   type MerchantPluginDraft,
 } from "../merchant-plugin-action";
 import {
@@ -55,10 +54,16 @@ import {
   commerceActionProjectionTarget,
   commerceActionProviderSupported,
   commerceTrackingAttachmentTargetMatches,
-  type CommerceActionError,
-  type CommerceActionRequest,
   slackMayApproveAction,
 } from "../action-model";
+import type {
+  ChangeMenuPriceAction,
+  CommerceActionError,
+  CommerceActionRequest,
+  InstallMerchantPluginAction,
+  OrderRefundAction,
+  PublishCafeMenuAction,
+} from "../contract/action-requests";
 import { commerceProjectionRevision } from "../contract/commerce-provider";
 import {
   resolveOrganisationCommerceSystemAuthority,
@@ -75,14 +80,11 @@ import {
   CAFE_STOREFRONT_ID,
   planCafeMenu,
 } from "@purin-labs/area-cafe/server/contract/menu-publication";
-import type { PublishCafeMenuAction } from "../cafe-menu-action";
 import { MenuDraftRequestError } from "@purin-labs/area-cafe/server/contract/request-errors";
 import { MenuBoardRequestError } from "@purin-labs/area-cafe/server/contract/request-errors";
-import type { ChangeMenuPriceAction } from "../menu-price-action";
 import {
   OrderRefundRequestError,
   planOrderRefund,
-  type OrderRefundAction,
   type OrderRefundLineRequest,
 } from "../order-refund-action";
 import {

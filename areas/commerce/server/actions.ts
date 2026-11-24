@@ -6,7 +6,11 @@ import { resolveActiveCaseActor, resolveActiveCaseActorAtPlacement } from "@puri
 import type { ActionLedgerEntry } from "@purin-labs/authority/actors/action-ledger";
 import type { OrganisationCommerce } from "./actors/organisation/organisation-commerce";
 import type { MerchantActionRejectionEvidence } from "@purin-labs/authority/approval-authentication";
-import { commerceActionProjectionTarget, parseCommerceActionPath, parseCommerceEntityPlaneActionPath, parseCommerceProviderReceipt, type CommerceActionError, type CommerceEntityPlaneActionPath, type CommerceActionPath } from "./action-model";
+import { commerceActionProjectionTarget, parseCommerceActionPath, parseCommerceEntityPlaneActionPath, parseCommerceProviderReceipt, type CommerceEntityPlaneActionPath } from "./action-model";
+import type {
+  CommerceActionError,
+  CommerceActionPath,
+} from "./contract/action-requests";
 import { executeCommerceEntityPlaneAction, type CommerceEntityPlaneExecutionOutcome } from "./entity-plane/execution";
 import { admitCommerceCapability } from "./data/commerce-capability-activation";
 import { admitCommerceActionCapability, executeCommerceProviderAction, reconcileCommerceProviderAction, validateCommerceActionAuthorityBeforeExecution } from "./provider-execution";

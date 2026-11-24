@@ -7,21 +7,9 @@ import { parsePublishMenuCommand } from "@purin-labs/commerce-client";
 
 import type { Result } from "@purin-labs/kernel/result";
 import { CAFE_MENU_ID, type CafeMenuDefinition } from "@purin-labs/area-cafe/server/contract/menu-publication";
+import type { PublishCafeMenuAction } from "./contract/action-requests";
 
 export const CAFE_MENU_PUBLISH_VERB = "commerce.menu.publish";
-
-export type PublishCafeMenuAction = Readonly<{
-  kind: "publish_cafe_menu";
-  /** The draft revision that the proposal read, for the approval card. */
-  documentRevision: number;
-  /** The published revision that this menu replaces; null for the first. */
-  expectedMenuRevision: number | null;
-  menu: CafeMenuDefinition;
-  /** Each entry's name in the draft, because a Commerce entry has none. */
-  entryNames: readonly Readonly<{ menuEntryId: string; displayName: string }>[];
-  addedEntryIds: readonly string[];
-  removedNames: readonly string[];
-}>;
 
 type ParseError = Readonly<{ code: "commerce_action_invalid"; field: string }>;
 

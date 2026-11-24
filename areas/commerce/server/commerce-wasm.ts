@@ -41,14 +41,9 @@ import {
 import type { Result } from "@purin-labs/kernel/result";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever, isRecord } from "@purin-labs/std";
+import type { CommerceWasmError } from "./contract/delivery-intake";
 
-export type CommerceWasmError =
-  | { readonly code: "commerce_wasm_input_invalid" }
-  | { readonly code: "commerce_wasm_response_invalid" }
-  | {
-      readonly code: "commerce_wasm_rejected";
-      readonly reason: string;
-    };
+export type { CommerceWasmError } from "./contract/delivery-intake";
 
 /** Proves a shared query at the Platform boundary. */
 export function assertCommerceGraphQueryWithLexicon(

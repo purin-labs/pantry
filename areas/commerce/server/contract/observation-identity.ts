@@ -3,7 +3,7 @@ import type {
   CommerceResourceType,
 } from "@purin-labs/commerce-contracts";
 import { assertNever } from "@purin-labs/std";
-import type { CommerceProjectionKind } from "../actors/commerce-projection";
+import type { CommerceProjectionKind } from "./commerce-projection";
 
 /**
  * The projection kind, the canonical id and the revision of one observation

@@ -31,7 +31,10 @@ import type {
 } from "@purin-labs/kernel/ids";
 import type { FlowDecision } from "@purin-labs/authority/policy/index";
 import type { Result } from "@purin-labs/kernel/result";
-import type { CommerceActionError, CommerceActionPath } from "../action-model";
+import type {
+  CommerceActionError,
+  CommerceActionPath,
+} from "./action-requests";
 
 export type CommerceProviderExecutionError =
   | CommerceActionError

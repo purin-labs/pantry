@@ -16,44 +16,21 @@ import type {
 } from "@purin-labs/commerce-client";
 
 import type { Result } from "@purin-labs/kernel/result";
+import type {
+  InstallMerchantPluginAction,
+  MerchantPluginCommand,
+  MerchantPluginSettingKind,
+  MerchantPluginSettingProposal,
+} from "./contract/action-requests";
 
 export const MERCHANT_PLUGIN_INSTALL_VERB = "commerce.plugin.install";
-
-type MerchantPluginSettingKind =
-  "integer" | "text" | "boolean" | "text_list";
-
-type MerchantPluginSettingProposal = Readonly<{
-  key: string;
-  valueKind: MerchantPluginSettingKind;
-  description: string;
-  value: number | string | boolean | readonly string[];
-}>;
 
 /** The commands that a merchant plugin's handlers and actions may submit. */
 const MERCHANT_PLUGIN_COMMANDS = [
   "create_discount",
   "set_plugin_field_values",
   "credit_store_credit",
-] as const;
-type MerchantPluginCommand = (typeof MERCHANT_PLUGIN_COMMANDS)[number];
-
-export type InstallMerchantPluginAction = Readonly<{
-  kind: "install_merchant_plugin";
-  pluginId: string;
-  version: number;
-  expectedRevision: number | null;
-  title: string;
-  purpose: string;
-  settings: readonly MerchantPluginSettingProposal[];
-  /** The `checkout.validate` function, or null for a plugin without one. */
-  functionSource: string | null;
-  commands: readonly MerchantPluginCommand[];
-  handlers: readonly CommercePluginHandlerV1[];
-  actions: readonly CommercePluginActionV1[];
-  entityTypes: readonly CommercePluginEntityTypeV1[];
-  /** Fields that the plugin keeps on products, variants or customers. */
-  fields: readonly CommercePluginFieldV1[];
-}>;
+] as const satisfies readonly MerchantPluginCommand[];
 
 /** What the agent writes; the version and revision come from Commerce. */
 export type MerchantPluginDraft = Omit<

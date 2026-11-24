@@ -46,9 +46,9 @@ import type { OrganisationStateError } from "@purin-labs/tenancy/actors/organisa
 import type { OrganisationCommerce } from "../actors/organisation/organisation-commerce";
 import {
   COMMERCE_PROJECTION_STALE_AFTER_MS,
-  type CommerceProjectionKind,
   type CommerceProjectionRecord,
 } from "../actors/commerce-projection";
+import type { CommerceProjectionKind } from "../contract/commerce-projection";
 import type {
   CommerceEntityRelationRow,
   CommerceRelationshipRelationRow,
@@ -57,12 +57,12 @@ import { materializeCommerceRelationText } from "../actors/commerce-query-schema
 import type { Result } from "@purin-labs/kernel/result";
 import { encodeCommerceCursor } from "../commerce-wasm";
 import type {
-  CommerceGraphSourceError,
   CommerceGraphSourceValue,
   CommerceGraphSourceResult,
   CommerceGraphSourceQueryOptions,
   CommerceGraphRelationshipStepResult,
 } from "./commerce-source";
+import type { CommerceGraphSourceError } from "../contract/read-errors";
 import { assertNever, errorMessage, isRecord } from "@purin-labs/std";
 export type BlotterOrganisationReader = Pick<
   OrganisationCommerce,

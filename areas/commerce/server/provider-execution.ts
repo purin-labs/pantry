@@ -10,8 +10,8 @@ import {
   buildCommerceLabDelivery,
   commerceActionExpectedRevision,
   parseCommerceActionPath,
-  type CommerceActionPath,
 } from "./action-model";
+import type { CommerceActionPath } from "./contract/action-requests";
 import { commerceProjectionRevision } from "./contract/commerce-provider";
 import {
   admitCommerceCapability,

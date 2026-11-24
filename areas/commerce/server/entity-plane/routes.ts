@@ -25,8 +25,8 @@ import type { CommerceActivityReadRequest } from "./activity";
 import {
   CommerceGraphReader,
   type CommerceGraphReadInput,
-  type CommerceGraphReaderError,
 } from "./graph-reader";
+import type { CommerceGraphReaderError } from "../contract/read-errors";
 import type { CommerceGraphReadAuthority } from "./authority";
 import type { Variant } from "@purin-labs/type-utils";
 import { isRecord } from "@purin-labs/std";

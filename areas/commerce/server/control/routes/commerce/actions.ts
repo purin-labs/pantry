@@ -35,9 +35,11 @@ import {
   commerceTrackingAttachmentTargetMatches,
   parseCommerceActionPath,
   parseCommerceActionRequest,
-  type CommerceActionError,
-  type CommerceActionRequest,
 } from "../../../action-model";
+import type {
+  CommerceActionError,
+  CommerceActionRequest,
+} from "../../../contract/action-requests";
 import { commerceProjectionRevision } from "../../../contract/commerce-provider";
 import { listPublishedCommerceTargets } from "../../../entity-plane/published-resources";
 import type { PermissionRequired } from "@purin-labs/control-api";

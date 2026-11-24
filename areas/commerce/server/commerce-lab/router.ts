@@ -35,10 +35,10 @@ import {
   normalizeLabCommerceDelivery,
 } from "../commerce-wasm";
 import type {
-  ApplyCommerceDeliveryInput,
   CommerceLabRunVerification,
   CommerceLabVerification,
 } from "../actors/commerce-projection";
+import type { ApplyCommerceDeliveryInput } from "../contract/commerce-projection";
 import type { Env } from "@purin-labs/kernel/env";
 import { authorizeConfiguredBearer } from "@purin-labs/kernel/fault-injection-auth";
 import {

@@ -7,33 +7,15 @@
 import { isRecord } from "@purin-labs/std";
 
 import type { Result } from "@purin-labs/kernel/result";
+import type {
+  ChangeMenuPriceAction,
+  MenuPriceMoney,
+  MenuPriceSide,
+} from "./contract/action-requests";
+
+export type { MenuPriceSide } from "./contract/action-requests";
 
 export const MENU_PRICE_CHANGE_VERB = "commerce.menu.change_price";
-
-type MenuPriceMoney = Readonly<{
-  amountMinor: number;
-  currency: string;
-}>;
-
-export type MenuPriceSide = Readonly<{
-  price: MenuPriceMoney;
-  /** The "was" price of a deal; null when the item has no deal. */
-  compareAtPrice: MenuPriceMoney | null;
-}>;
-
-export type ChangeMenuPriceAction = Readonly<{
-  kind: "change_menu_price";
-  /** The plain Commerce offer ID of the menu item. */
-  offerId: string;
-  /** The offer revision that the proposal read; a later one is refused. */
-  expectedOfferRevision: number;
-  /** The menu item (Commerce menu entry) that the boards show. */
-  menuEntryId: string;
-  /** The item's name on the menu, for the card. */
-  itemName: string;
-  before: MenuPriceSide;
-  after: MenuPriceSide;
-}>;
 
 type ParseError = Readonly<{ code: "commerce_action_invalid"; field: string }>;
 

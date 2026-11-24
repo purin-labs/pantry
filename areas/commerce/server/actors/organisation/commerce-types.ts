@@ -10,11 +10,11 @@ import type {
   OrganisationId,
 } from "@purin-labs/kernel/ids";
 import type { CafeCommerceAcceptanceFaultRecord } from "../../contract/types";
+import type { CommerceProjectionRecord } from "../commerce-projection";
 import type {
   ApplyCommerceDeliveryInput,
-  CommerceProjectionRecord,
   CommerceSystemStorageAuthority,
-} from "../commerce-projection";
+} from "../../contract/commerce-projection";
 import type { CommerceEntityRelationRow } from "../commerce-query-schema";
 import type {
   CommerceBoardDragPreview,

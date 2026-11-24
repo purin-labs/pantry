@@ -15,7 +15,7 @@ import type {
 } from "@purin-labs/commerce-client";
 
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { PendingCommerceCue } from "./actors/commerce-projection";
+import type { PendingCommerceCue } from "./contract/commerce-projection";
 import { resolveCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
   ensureCommerceWebhookSubscription,

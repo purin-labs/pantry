@@ -10,21 +10,9 @@ import {
   storedInventoryQuantity,
   type InventoryQuantity,
 } from "./validation";
+import type { InventoryStockChange } from "../../contract/commerce-projection";
 
-/**
- * The available stock of an inventory position before and after one applied
- * change (Plan 24 S1). A café sale lowers `available` when its checkout is
- * made, in a delivery of positions only; a sale's hand-over later changes
- * `onHand` and leaves `available` as it is. So a reader of the counter stock
- * compares the position's `available` before and after the delivery.
- */
-export type InventoryStockChange = Readonly<{
-  inventoryItemId: string;
-  locationId: string;
-  /** Null when the delivery opened the position. */
-  before: InventoryQuantity | null;
-  after: InventoryQuantity;
-}>;
+export type { InventoryStockChange } from "../../contract/commerce-projection";
 
 type PositionStock = Readonly<{
   inventoryItemId: string;

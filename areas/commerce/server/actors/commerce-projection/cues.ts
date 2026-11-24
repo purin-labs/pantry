@@ -17,17 +17,12 @@ import {
 } from "@purin-labs/std";
 import type { CommerceObservationDisposition } from "@purin-labs/commerce-control-api";
 import type {
-  ApplyCommerceDeliveryInput,
   CommerceCueFactForProjection,
   CommerceLowStockCueFact,
-  CommerceProjectionError,
-  CommerceProjectionKind,
-  CommerceSystemStorageAuthority,
   CueRow,
   InspectedCommerceDelete,
   InspectedCommerceDelivery,
   InspectedCommerceObservation,
-  PendingCommerceCue,
   ProjectionIdentity,
   ProjectionRow,
   UpsertProjectionIdentity,
@@ -41,8 +36,15 @@ import {
   projectionSelectSql,
   readProjection,
   storedInventoryQuantity,
-  type InventoryQuantity,
 } from "./validation";
+import type {
+  ApplyCommerceDeliveryInput,
+  CommerceProjectionError,
+  CommerceProjectionKind,
+  CommerceSystemStorageAuthority,
+  InventoryQuantity,
+  PendingCommerceCue,
+} from "../../contract/commerce-projection";
 
 export function upsertProjection(
   sql: SqlStorage,

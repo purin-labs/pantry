@@ -21,8 +21,8 @@ import {
 import {
   parseCommerceActionRequest,
   parseCommerceProviderReceipt,
-  type CommerceActionRequest,
 } from "./action-model";
+import type { CommerceActionRequest } from "./contract/action-requests";
 import { parseCommerceEntityPlaneProposal } from "./entity-plane/proposals";
 
 /**

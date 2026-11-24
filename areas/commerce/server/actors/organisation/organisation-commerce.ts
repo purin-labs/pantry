@@ -71,22 +71,24 @@ import {
   settleCommerceCues,
   validateCommerceSystemProjections,
   verifyCommerceLab,
-  type AppliedCommerceDeliveryResult,
   type CommerceLabResetInput,
   type CommerceLabSeedInput,
   type CommerceLabVerification,
-  type CommerceProjectionError,
   type CommerceProjectionHistoryEntry,
   type CommerceProjectionRecord,
-  type CommerceSystemSyncStatus,
   type CommerceSystemValidationReceipt,
-  type PendingCommerceCue,
   type ReadCommerceProjectionHistoryInput,
   type ReadCurrentCommerceProjectionInput,
   type ReadExactCommerceProjectionReferenceInput,
   type ValidateCommerceSystemInput,
 } from "../commerce-projection";
-import type { InventoryStockChange } from "../commerce-projection/stock-changes";
+import type { CommerceSystemSyncStatus } from "../../contract/system-readiness";
+import type {
+  AppliedCommerceDeliveryResult,
+  CommerceProjectionError,
+  InventoryStockChange,
+  PendingCommerceCue,
+} from "../../contract/commerce-projection";
 import {
   parseCommerceEntityRelationRow,
   parseCommerceRelationshipRelationRow,

@@ -10,34 +10,15 @@ import type {
 
 import { ToolRequestError } from "@purin-labs/agent-tools/errors";
 import type { Result } from "@purin-labs/kernel/result";
+import type {
+  OrderRefundAction,
+  OrderRefundLine,
+} from "./contract/action-requests";
 
 export const ORDER_REFUND_VERB = "commerce.order.refund";
 
 /** A refusal that the agent can act on, returned as the tool's words. */
 export class OrderRefundRequestError extends ToolRequestError {}
-
-type OrderRefundLine = Readonly<{
-  orderLineId: string;
-  title: string;
-  amountMinor: number;
-}>;
-
-export type OrderRefundAction = Readonly<{
-  kind: "refund_order";
-  /** The canonical order id, as the action ledger names a record. */
-  orderId: string;
-  providerOrderId: string;
-  expectedOrderRevision: number;
-  reason: string;
-  paymentId: string;
-  refundPolicyId: string;
-  amountMinor: number;
-  currency: string;
-  wholeOrder: boolean;
-  lines: readonly OrderRefundLine[];
-  taxes: readonly Readonly<{ orderLineId: string; amountMinor: number }>[];
-  shippingMinor: number;
-}>;
 
 export type OrderRefundLineRequest = Readonly<{
   orderLineId: string;

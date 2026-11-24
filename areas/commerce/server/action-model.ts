@@ -23,14 +23,12 @@ import {
   merchantPluginActionPath,
   parseInstallMerchantPluginRequest,
   parseMerchantPluginActionPath,
-  type InstallMerchantPluginAction,
 } from "./merchant-plugin-action";
 import {
   ORDER_REFUND_VERB,
   orderRefundActionPath,
   parseOrderRefundAction,
   parseOrderRefundActionPath,
-  type OrderRefundAction,
 } from "./order-refund-action";
 import {
   parseStockOperationAction,
@@ -46,14 +44,12 @@ import {
   cafeMenuActionPath,
   parseCafeMenuActionPath,
   parsePublishCafeMenuRequest,
-  type PublishCafeMenuAction,
 } from "./cafe-menu-action";
 import {
   MENU_PRICE_CHANGE_VERB,
   menuPriceActionPath,
   parseChangeMenuPriceRequest,
   parseMenuPriceActionPath,
-  type ChangeMenuPriceAction,
 } from "./menu-price-action";
 import { hashOpaqueSecret } from "@purin-labs/tenancy/data/control-plane";
 import type { UnversionedControlMutationBoundary } from "@purin-labs/tenancy/data/control-mutation";
@@ -79,6 +75,23 @@ import type {
   CommerceProviderResource,
 } from "@purin-labs/control-api";
 import { commerceProjectionRevision } from "./contract/commerce-provider";
+import type {
+  ChangeMenuPriceAction,
+  CommerceActionError,
+  CommerceActionPath,
+  CommerceActionRequest,
+  CommerceCancellationAuthority,
+  CommerceCancellationRequest,
+  InstallMerchantPluginAction,
+  OrderRefundAction,
+  PublishCafeMenuAction,
+} from "./contract/action-requests";
+
+export type {
+  CommerceActionPath,
+  CommerceActionRequest,
+  CommerceCancellationAuthority,
+} from "./contract/action-requests";
 
 export async function commerceActionMutationDigest(
   boundary: UnversionedControlMutationBoundary,
@@ -89,91 +102,6 @@ export async function commerceActionMutationDigest(
     )
   ).slice(0, 32);
 }
-
-export type CommerceActionRequest =
-  | InstallMerchantPluginAction
-  | PublishCafeMenuAction
-  | ChangeMenuPriceAction
-  | OrderRefundAction
-  | StockOperationAction
-  | {
-      readonly kind: "publish_catalog_listing";
-      readonly productId: string;
-      readonly productRevision: number;
-      readonly variantId: string;
-      readonly variantRevision: number;
-      readonly offerId: string;
-      readonly offerRevision: number;
-      readonly salesChannelId: string;
-      readonly salesChannelRevision: number;
-    }
-  | {
-      readonly kind: "update_product_description";
-      readonly productId: string;
-      readonly productRevision: number;
-      readonly description: string;
-    }
-  | {
-      readonly kind: "cancel_order";
-      readonly resourceId: string;
-      readonly expectedRevision: number;
-      readonly reason:
-        "customer_requested" | "fraud_suspected" | "inventory_unavailable";
-      readonly refund: "none" | "full";
-      readonly restock: boolean;
-      readonly notifyCustomer: boolean;
-      readonly note: string | null;
-    }
-  | {
-      readonly kind: "attach_tracking";
-      readonly batchId: string;
-      readonly merchantRevision: number;
-      readonly orderId: string;
-      readonly fulfillmentId: string;
-      readonly fulfillmentRevision: number;
-      readonly shipmentId: string;
-      readonly shipmentRevision: number;
-      readonly trackingNumber: string;
-    }
-  | {
-      /**
-       * One immediate price change on a listed Offer.
-       *
-       * Both revisions are bound: the Offer the proposal was built against and
-       * the price policy the approval was given under. A change to either
-       * needs a new proposal, because the allowance the operator approved may
-       * no longer be the one that applies.
-       */
-      readonly kind: "adjust_offer_price";
-      readonly offerId: string;
-      readonly expectedOfferRevision: number;
-      readonly expectedPolicyRevision: number;
-      readonly proposedPriceMinor: number;
-      readonly currency: string;
-    }
-  | {
-      /**
-       * Submitting one approved supplier payout to its provider.
-       *
-       * The payout revision is bound because the approval is single-use: a
-       * payout that has moved on since the proposal was built is not the one
-       * anybody approved, and the economics digest it carries is the proof of
-       * which one they did.
-       */
-      readonly kind: "submit_supplier_payout";
-      readonly payoutId: string;
-      readonly expectedPayoutRevision: number;
-      readonly approvalDigest: string;
-    }
-  | {
-      /** Funding the exact Wise transfer recovered after interrupted creation. */
-      readonly kind: "resume_supplier_payout_funding";
-      readonly payoutId: string;
-      readonly expectedPayoutRevision: number;
-      readonly approvalDigest: string;
-      readonly attemptId: string;
-      readonly providerTransferId: string;
-    };
 
 /**
  * Whether the provider of a projection runs an action of this kind. Shopify
@@ -233,68 +161,6 @@ export function commerceActionProjectionTarget(
       return assertNever(action);
   }
 }
-
-type CommerceCancellationRequest = Variant<
-  CommerceActionRequest,
-  "cancel_order"
->;
-
-export type CommerceCancellationAuthority = Readonly<{
-  readonly kind: "commerce_full_refund";
-  readonly merchantRevision: number;
-  readonly paymentId: string;
-  readonly paymentRevision: number;
-  readonly fulfillmentId: string;
-  readonly fulfillmentRevision: number;
-  readonly checkoutProfileId: string;
-  readonly checkoutProfileRevision: number;
-  readonly refundPolicyId: string;
-  readonly refundAmountMinor: number;
-  readonly refundCurrency: string;
-  readonly refundGovernance: "automatic_eligible" | "approval_required";
-}>;
-
-type CommerceCancellationPathFields = Readonly<{
-  readonly kind: "cancel_order";
-  readonly resourceId: string;
-  readonly expectedRevision: number;
-  readonly reason: CommerceCancellationRequest["reason"];
-  readonly refund: CommerceCancellationRequest["refund"];
-  readonly restock: boolean;
-  readonly notifyCustomer: boolean;
-  readonly note: string | null;
-}>;
-
-export type CommerceActionError =
-  | { readonly code: "commerce_action_invalid"; readonly field: string }
-  | { readonly code: "commerce_action_projection_missing" }
-  | { readonly code: "commerce_action_projection_kind_mismatch" }
-  | {
-      readonly code: "commerce_action_revision_stale";
-      readonly expected: number;
-      readonly actual: number;
-    }
-  | { readonly code: "commerce_action_provider_unsupported" }
-  | {
-      readonly code: "commerce_action_authority_rebase_required";
-      readonly expectedRevision: number;
-      readonly actualRevision: number;
-    }
-  | { readonly code: "commerce_action_path_invalid" }
-  | { readonly code: "commerce_action_event_invalid"; readonly field: string };
-
-/**
- * The path of an approved action: the request, with the execution of a
- * cancellation bound to its provider or to the full Commerce refund.
- */
-export type CommerceActionPath =
-  | Exclude<CommerceActionRequest, CommerceCancellationRequest>
-  | (CommerceCancellationRequest & {
-      readonly execution: Readonly<{ readonly kind: "provider_managed" }>;
-    })
-  | (CommerceCancellationPathFields & {
-      readonly execution: CommerceCancellationAuthority;
-    });
 
 export type CommerceEntityPlaneActionPath = {
   readonly kind: "patch_commerce_list_entry";

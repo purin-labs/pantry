@@ -7,7 +7,7 @@ import type {
   CommerceDemoProfile,
   CommerceMerchantSnapshotV1,
 } from "@purin-labs/commerce-client";
-import type { CommerceSystemSyncStatus } from "../../../actors/commerce-projection";
+import type { CommerceSystemSyncStatus } from "../../../contract/system-readiness";
 import { readCommerceSystemSyncStatus } from "../../../contract/system-readiness";
 import {
   activateCommerceCapability,

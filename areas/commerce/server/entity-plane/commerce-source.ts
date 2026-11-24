@@ -24,15 +24,7 @@ import type {
 } from "@purin-labs/commerce-contracts";
 import type { Result } from "@purin-labs/kernel/result";
 import { errorMessage, isNormalizedText } from "@purin-labs/std";
-
-export type CommerceGraphSourceError = Readonly<{
-  code:
-    | "source_unavailable"
-    | "source_invalid"
-    | "commerce_query_surface_unsupported";
-  source: "commerce" | "blotter";
-  message: string;
-}>;
+import type { CommerceGraphSourceError } from "../contract/read-errors";
 
 export type CommerceGraphSourceValue = Omit<
   CommerceGraphQueryResult,

@@ -1,11 +1,8 @@
 import type {
   CommerceEntity,
-  CommerceEntityPlaneError,
   CommerceEntityRef,
   CommerceGraphQuery,
   CommerceGraphQueryResult,
-  CommerceCursorMismatchReason,
-  CommerceQueryPlanErrorCapability,
   CommerceQueryCapabilityProfile,
   CommerceReadWatermark,
   CommerceRelationship,
@@ -13,7 +10,7 @@ import type {
   SystemCommerceEntityRef,
 } from "@purin-labs/commerce-contracts";
 import type { Result } from "@purin-labs/kernel/result";
-import type { CommerceWasmError } from "../commerce-wasm";
+import type { CommerceWasmError } from "../contract/delivery-intake";
 import { commerceBlotterSystemAttributeIds } from "../actors/commerce-query-schema";
 import type { BlotterQueryPlanResult } from "./blotter-source";
 import { buildCommerceGraphQueryPlanRequest } from "./planner";
@@ -26,7 +23,6 @@ import {
 import type {
   CommerceGraphCapabilityMetadata,
   CommerceGraphEntityExtensionSidecar,
-  CommerceGraphSourceError,
   CommerceGraphSource as CommerceGraphQuerySource,
   CommerceGraphSourceQueryOptions,
   CommerceGraphSourceValue,
@@ -35,44 +31,14 @@ import type {
   CommerceGraphRelationshipStepInput,
   CommerceGraphRelationshipStepResult,
 } from "./commerce-source";
+import type {
+  CommerceGraphReaderError,
+  CommerceGraphSourceError,
+} from "../contract/read-errors";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 
 const SQLITE_TEXT_ENCODER = new TextEncoder();
-
-export type CommerceGraphReaderError =
-  | CommerceEntityPlaneError
-  | CommerceGraphSourceError
-  | Readonly<{
-      code:
-        | "commerce_system_not_found"
-        | "blotter_source_missing"
-        | "commerce_query_surface_unsupported";
-    }>
-  | Readonly<{
-      code: "commerce_cursor_mismatch";
-      reason: CommerceCursorMismatchReason;
-    }>
-  | Readonly<{
-      code: "commerce_cursor_stale";
-      expected: CommerceReadWatermark;
-      received: CommerceReadWatermark;
-    }>
-  | Readonly<{
-      code: "commerce_results_changed";
-      expected: CommerceReadWatermark;
-      received: CommerceReadWatermark;
-    }>
-  | Readonly<{
-      code: "commerce_read_stale";
-      expected: CommerceReadWatermark;
-      received: CommerceReadWatermark;
-      restart: true;
-    }>
-  | Readonly<{
-      code: "commerce_query_unsupported";
-      capability: CommerceQueryPlanErrorCapability;
-    }>;
 
 /**
  * A reader of the built-in engine has one source. A reader of a provider-backed

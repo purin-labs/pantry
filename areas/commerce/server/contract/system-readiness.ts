@@ -1,11 +1,26 @@
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { CommerceSystemSyncStatus } from "../actors/commerce-projection";
 import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
+
+export type CommerceSystemSyncStatus =
+  | Readonly<{
+      kind: "syncing";
+      acceptedResourceCount: 0;
+    }>
+  | Readonly<{
+      kind: "ready";
+      acceptedResourceCount: number;
+      lastSyncedAt: number;
+    }>
+  | Readonly<{
+      kind: "delayed";
+      acceptedResourceCount: number;
+      lastSyncedAt: number;
+    }>;
 
 export async function readCommerceSystemSyncStatus(
   input: Readonly<{

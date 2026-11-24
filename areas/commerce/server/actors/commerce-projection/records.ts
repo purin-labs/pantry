@@ -24,17 +24,19 @@ import {
   type CommerceLabProjectionReceipt,
   type CommerceLabRunVerification,
   type CommerceLabTerminalProjectionIdentity,
-  type CommerceProjectionError,
-  type CommerceProjectionKind,
   type CommerceProjectionRecord,
   type CueRow,
   type LabActionRow,
   type LabStateRow,
-  type PendingCommerceCue,
   type ProjectionRow,
   type ReceiptRow,
   parseCommerceProjection,
 } from "../commerce-projection";
+import type {
+  CommerceProjectionError,
+  CommerceProjectionKind,
+  PendingCommerceCue,
+} from "../../contract/commerce-projection";
 import { parseCueRows } from "./cues";
 import { PROJECTION_KINDS } from "./projection-kinds";
 import { projectionSelectSql, readProjectionLifecycle } from "./validation";

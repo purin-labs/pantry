@@ -1,6 +1,56 @@
 import { ToolRequestError } from "@purin-labs/agent-tools/errors";
 import type { RequestableEntityTypeRead } from "@purin-labs/authority/authorization/requestable-capabilities";
-import type { CommerceGraphReaderError } from "../entity-plane/graph-reader";
+import type {
+  CommerceCursorMismatchReason,
+  CommerceEntityPlaneError,
+  CommerceQueryPlanErrorCapability,
+  CommerceReadWatermark,
+} from "@purin-labs/commerce-contracts";
+
+/** Why a source of the commerce graph (the engine or the blotter) failed. */
+export type CommerceGraphSourceError = Readonly<{
+  code:
+    | "source_unavailable"
+    | "source_invalid"
+    | "commerce_query_surface_unsupported";
+  source: "commerce" | "blotter";
+  message: string;
+}>;
+
+/** Why a read of the commerce graph failed. */
+export type CommerceGraphReaderError =
+  | CommerceEntityPlaneError
+  | CommerceGraphSourceError
+  | Readonly<{
+      code:
+        | "commerce_system_not_found"
+        | "blotter_source_missing"
+        | "commerce_query_surface_unsupported";
+    }>
+  | Readonly<{
+      code: "commerce_cursor_mismatch";
+      reason: CommerceCursorMismatchReason;
+    }>
+  | Readonly<{
+      code: "commerce_cursor_stale";
+      expected: CommerceReadWatermark;
+      received: CommerceReadWatermark;
+    }>
+  | Readonly<{
+      code: "commerce_results_changed";
+      expected: CommerceReadWatermark;
+      received: CommerceReadWatermark;
+    }>
+  | Readonly<{
+      code: "commerce_read_stale";
+      expected: CommerceReadWatermark;
+      received: CommerceReadWatermark;
+      restart: true;
+    }>
+  | Readonly<{
+      code: "commerce_query_unsupported";
+      capability: CommerceQueryPlanErrorCapability;
+    }>;
 
 /**
  * Why a governed commerce read failed. A tool of another area, for example a

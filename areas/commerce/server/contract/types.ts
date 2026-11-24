@@ -3,7 +3,7 @@
 // pulls in no implementation.
 import type { RequestId } from "@purin-labs/kernel/ids";
 
-export type { CommerceActionPath } from "../action-model";
+export type { CommerceActionPath } from "./action-requests";
 
 /** The price change that the agent proposes for a menu item. */
 export type MenuPriceProposalRequest = Readonly<{
