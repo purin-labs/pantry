@@ -1,6 +1,6 @@
 # Plan 91 — Seams Atelier rename
 
-Status: phases 1, 2, 3 and 5 in production (satyr-edge `347178c4`, released from `peitalin/seams-atelier`; the repository is now `seams-tech/pantry`); phase 4 done on 22 November 2026 with the Plan 93 cutover (see "Phase 4 after Plan 93"); phase 6 done on 23 November 2026: the owner switched the wake phrase to "Hey Sous Chef" with the round 3 model, which fails only the macOS voice check; released at 05:51 UTC (`pantry` `9cc4dc3b`), and the owner's first wake in production worked (see "Phase 6: the wake phrase"). See "Built". On 18 November 2026 the owner renamed Atelier to **Pantry** and Commis to **Gantry**: see "Pantry and Gantry". On 22 November 2026 the owner chose the Purin names, and phase 4 now follows [Plan 93](plan-93-clean-cutover.md): see "Purin names" and "Phase 4 after Plan 93".
+Status: phases 1, 2, 3 and 5 in production (satyr-edge `347178c4`, released from `peitalin/seams-atelier`; the repository is now `seams-tech/pantry`); phase 4 done on 22 November 2026 with the Plan 93 cutover (see "Phase 4 after Plan 93"); all phases done on 24 November 2026, with only the deferred Meta item open (see "Built"); phase 6 done on 23 November 2026: the owner switched the wake phrase to "Hey Sous Chef" with the round 3 model, which fails only the macOS voice check; released at 05:51 UTC (`pantry` `9cc4dc3b`), and the owner's first wake in production worked (see "Phase 6: the wake phrase"). See "Built". On 18 November 2026 the owner renamed Atelier to **Pantry** and Commis to **Gantry**: see "Pantry and Gantry". On 22 November 2026 the owner chose the Purin names, and phase 4 now follows [Plan 93](plan-93-clean-cutover.md): see "Purin names" and "Phase 4 after Plan 93".
 Date: 16 November 2026.
 Owner: Portal, Platform, commerce, docs and the seams-site.
 Replaces: the Antigravity draft `seams_product_rename_plan.md` (outside this
@@ -1068,7 +1068,13 @@ State on 17 November 2026:
   `seams-tech/satyr`. Changed on 22 November 2026: phase 4 is done (see
   "Phase 4 after Plan 93"), the mark is the Purin cat, and the company site
   is `purin.io`. Changed on 23 November 2026: phase 6 is done (see "Phase 6:
-  the wake phrase").
+  the wake phrase"). Closed on 24 November 2026 (owner's yes): pull request
+  74 of `seams-tech/seams-console` (the "Seams Atelier" site names) is
+  closed without a merge, because the company site moved to
+  `purin-labs/purin-monorepo` and serves the Purin names on `purin.io`. The
+  archive of `seams-tech/satyr` is not needed: that repository was renamed
+  and is now `purin-labs/pantry`. Plan 91 has no open work; only the Meta
+  item waits (see "Phase 4 after Plan 93").
 
 ## Acceptance
 
