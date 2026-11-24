@@ -1,0 +1,101 @@
+{
+  "about": "Refactor 17, Stage B: the public files of the area organisation (the lines of contracts in scripts/layers.json) are the workspace package @purin-labs/area-organisation-contract in areas/organisation/contract, the contract of the area. The owner decided on 2026-11-24 that a contract imports only the foundation, outside packages and the contract of another area, and scripts/check-layers.mjs holds that rule. scripts/refactor-17/move-module.mjs reads this plan. moduleFrom: the public files of areas/organisation that another area imports, and the public files that they import, belong to the plan, and --sync-plan adds each one; stays names each other public file, which stays public in the area (the scope that the owner approved on 2026-11-24). files: a Worker file goes to server/ and a Portal file to ui/, with its sub-path below server/ or ui/ of the area, less a folder contract/ (sourcePrefixes; movedFolders names each public folder that moves whole under another last name). package: the exports map gives each .ts file of server/ and of ui/, each style sheet of ui/, and each .tsx file, which another module imports; the dependencies are the packages that the files import. package.typeCheck false: the files read Env keys that the Actor files of the Worker merge, as the area package does; the Worker program and the Portal program check each file. edits: the source roots of the lints read the folders of the package.",
+  "module": "areas/organisation/contract",
+  "moduleFrom": "areas/organisation",
+  "target": "areas/organisation/contract",
+  "workspaceEntry": "areas/*/contract",
+  "sourcePrefixes": {
+    "areas/organisation/server/contract/": "server/",
+    "areas/organisation/server/": "server/",
+    "areas/organisation/ui/": "ui/"
+  },
+  "movedFolders": {},
+  "stays": [
+    "areas/organisation/server/contract/activation-types.ts",
+    "areas/organisation/server/contract/onboarding-activation-acceptance-fault.ts",
+    "areas/organisation/ui/pages/account-invitation-link.ts"
+  ],
+  "package": {
+    "name": "@purin-labs/area-organisation-contract",
+    "exports": {
+      "./server/*": {
+        "types": "./server/*.ts",
+        "default": "./server/*.ts"
+      },
+      "./ui/*": {
+        "types": "./ui/*.ts",
+        "default": "./ui/*.ts"
+      },
+      "./ui/features/access/agent-permission-request": "./ui/features/access/agent-permission-request.tsx",
+      "./ui/features/access/permission-required-prompt": "./ui/features/access/permission-required-prompt.tsx",
+      "./ui/pages/agent-console-shared": "./ui/pages/agent-console-shared.tsx"
+    },
+    "dependencies": {
+      "@purin-labs/agent": "workspace:*",
+      "@purin-labs/area-commerce-contract": "workspace:*",
+      "@purin-labs/area-integrations-contract": "workspace:*",
+      "@purin-labs/area-kitchen-contract": "workspace:*",
+      "@purin-labs/commerce-control-api": "workspace:*",
+      "@purin-labs/connections": "workspace:*",
+      "@purin-labs/contracts": "workspace:*",
+      "@purin-labs/control": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/ui": "workspace:*",
+      "lucide-react": "^0.542.0",
+      "react": "^19.1.1"
+    },
+    "devDependencies": ["@cloudflare/workers-types", "@types/react", "tsrs"],
+    "versionsFrom": [
+      "workers/platform/package.json",
+      "apps/portal/package.json"
+    ],
+    "tsconfig": {
+      "extends": "../../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": ["ESNext"],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": ["@cloudflare/workers-types"],
+        "allowImportingTsExtensions": true
+      },
+      "include": ["server/**/*.ts"]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Worker files of the contract package",
+      "find": "PLATFORM_SOURCE.push(\"areas/integrations/contract/server\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"areas/integrations/contract/server\");\n// The Worker side of the contract of the area organisation (Refactor 17, Stage B).\nPLATFORM_SOURCE.push(\"areas/organisation/contract/server\");\n"
+    },
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the Portal lints and the ESLint rules of the Portal source read the Portal files of the contract package",
+      "find": "PORTAL_SOURCE.push(\"areas/integrations/contract/ui\");\n",
+      "replace": "PORTAL_SOURCE.push(\"areas/integrations/contract/ui\");\n// The Portal side of the contract of the area organisation (Refactor 17, Stage B).\nPORTAL_SOURCE.push(\"areas/organisation/contract/ui\");\n"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": ["node", "scripts/check-layers.mjs", "--areas", "--write"],
+      "writes": ["docs/layers.md"]
+    }
+  ],
+  "files": {
+    "areas/organisation/server/contract/operator-drafts.ts": "server/operator-drafts.ts",
+    "areas/organisation/server/contract/organisation-services.ts": "server/organisation-services.ts",
+    "areas/organisation/server/contract/provider-support-references.ts": "server/provider-support-references.ts",
+    "areas/organisation/ui/features/access/agent-permission-request.tsx": "ui/features/access/agent-permission-request.tsx",
+    "areas/organisation/ui/features/access/api.ts": "ui/features/access/api.ts",
+    "areas/organisation/ui/features/access/permission-enable.ts": "ui/features/access/permission-enable.ts",
+    "areas/organisation/ui/features/access/permission-required-prompt.tsx": "ui/features/access/permission-required-prompt.tsx",
+    "areas/organisation/ui/pages/agent-console-shared.tsx": "ui/pages/agent-console-shared.tsx"
+  }
+}
