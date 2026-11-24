@@ -138,8 +138,9 @@ export async function resolveCanonicalEmbeddedHarnessCheckpointBinding(input: {
   );
   const instructionDigest = await sha256Hex(input.harnessInstructions);
   if (
+    !adapter.ok ||
     !embeddedHarnessAdapterSupportsModel(
-      adapter,
+      adapter.value,
       input.state.state.contract.modelRoute.model,
     )
   ) {

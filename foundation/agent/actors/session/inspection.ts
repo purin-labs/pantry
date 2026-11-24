@@ -132,7 +132,8 @@ export async function inspectSessionCheckpoint(
   organisationId: OrganisationId,
   sessionId: SessionId,
   modelRoute: ModelRoute,
-  adapter: EmbeddedHarnessAdapter,
+  /** Null when the pinned model left its list: the next turn takes a new route. */
+  adapter: EmbeddedHarnessAdapter | null,
 ): Promise<Result<SessionCheckpointInspection, HarnessAuthorityError>> {
   const inspected = inspectLatestStoredHarnessCheckpoint(sql, sessionId);
   if (inspected.kind === "missing")
@@ -171,13 +172,19 @@ export async function inspectSessionCheckpoint(
     };
   }
   const modelRouteDigest = await digestModelRoute(modelRoute);
-  const classification = classifyHarnessCheckpoint({
-    checkpoint,
-    backendId: adapter.manifest.backendId,
-    harnessBuild: adapter.manifest.harnessBuild,
-    checkpointFormat: adapter.manifest.checkpointFormat,
-    modelRouteDigest,
-  });
+  const classification =
+    adapter === null
+      ? ({
+          kind: "fresh_lineage_restart",
+          reason: "model_route_digest_mismatch",
+        } as const)
+      : classifyHarnessCheckpoint({
+          checkpoint,
+          backendId: adapter.manifest.backendId,
+          harnessBuild: adapter.manifest.harnessBuild,
+          checkpointFormat: adapter.manifest.checkpointFormat,
+          modelRouteDigest,
+        });
   return classification.kind === "compatible"
     ? {
         ok: true,

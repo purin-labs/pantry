@@ -516,7 +516,13 @@ function decideSessionCommand(
         input: command.input,
         state: {
           identity: state.identity,
-          contract: nextSessionContract(state.contract),
+          contract:
+            command.modelRoute === undefined
+              ? nextSessionContract(state.contract)
+              : {
+                  ...nextSessionContract(state.contract),
+                  modelRoute: command.modelRoute,
+                },
           turnId: command.turnId,
           inputId: command.input.inputId,
           resumePoint: state.resumePoint,

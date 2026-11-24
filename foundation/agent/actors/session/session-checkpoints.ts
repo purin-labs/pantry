@@ -157,13 +157,14 @@ export class SessionCheckpoints {
     const adapter = selectEmbeddedHarnessAdapterForModelRoute(
       session.value.lifecycle.state.contract.modelRoute,
     );
+    if (!adapter.ok) return adapter;
     const started = this.shared.startedCheckpointPayload;
     const restored = await loadCanonicalHarnessCheckpoint({
       bucket: this.shared.env.ARCHIVE,
       root: this.shared.env.DATA_ENCRYPTION_ROOT,
       state: session.value.lifecycle,
       checkpoint: input.checkpoint,
-      manifest: adapter.manifest,
+      manifest: adapter.value.manifest,
       sql: this.shared.ctx.storage.sql,
       payload:
         started !== null &&

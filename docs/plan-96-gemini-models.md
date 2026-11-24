@@ -303,13 +303,12 @@ part B.
 ### A4. One week after A3
 
 - Compare the OpenRouter spend per day with the week before A3.
-- Keep kimi-k3 in `PLATFORM_PI_MODELS`. An open Slack thread pins it for
-  the life of its Session (J2), and a removal fails that thread's next message
-  with `embedded_harness_model_authority_unavailable`.
-- A removal needs its own step first: a Session whose pinned model left the
-  list continues in a new lineage on the current default, with the thread's
-  history. Propose that step only when kimi-k3 must go, for example when
-  OpenRouter stops it.
+- An open Slack thread pins kimi-k3 for the life of its Session (J2). The step
+  that a removal needs is built: a Session whose pinned model left the list
+  continues in a new lineage on the current default, with the thread's history
+  (FND-04, the second journey of `slack-model-change.test.ts`). A transient
+  mail or WhatsApp turn of such a Session still refuses. Remove kimi-k3 only
+  when it must go, for example when OpenRouter stops it.
 
 ### B1. Pi 1.6 upgrade
 

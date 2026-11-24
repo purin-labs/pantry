@@ -130,6 +130,7 @@ import {
   type RelocationSessionSettlementRequest,
 } from "../agent-session-code-mode-settlement";
 import type {
+  EmbeddedHarnessAdapter,
   EmbeddedHarnessUserInput,
   EmbeddedHarnessSteerError,
 } from "../embedded-harness";
@@ -648,8 +649,10 @@ export abstract class SessionActor
       input.organisationId,
       input.sessionId,
       sessionProjection.state.contract.modelRoute,
-      this.harnessTurns.selectEmbeddedHarnessAdapter(
-        sessionProjection.state.contract.modelRoute,
+      adapterOrNull(
+        this.harnessTurns.selectEmbeddedHarnessAdapter(
+          sessionProjection.state.contract.modelRoute,
+        ),
       ),
     );
     if (!checkpoint.ok) return checkpoint;
@@ -1253,12 +1256,13 @@ export abstract class SessionActor
     const adapter = selectEmbeddedHarnessAdapterForModelRoute(
       session.value.lifecycle.state.contract.modelRoute,
     );
+    if (!adapter.ok) return adapter;
     return loadCanonicalHarnessCheckpoint({
       bucket: this.env.ARCHIVE,
       root: this.env.DATA_ENCRYPTION_ROOT,
       state: session.value.lifecycle,
       checkpoint: input.checkpoint,
-      manifest: adapter.manifest,
+      manifest: adapter.value.manifest,
       sql: this.ctx.storage.sql,
     });
   }
@@ -1595,4 +1599,10 @@ export abstract class SessionActor
       exhaustion.exhaustedAt,
     );
   }
+}
+
+function adapterOrNull(
+  selected: ReturnType<SessionHarnessTurns["selectEmbeddedHarnessAdapter"]>,
+): EmbeddedHarnessAdapter | null {
+  return selected.ok ? selected.value : null;
 }

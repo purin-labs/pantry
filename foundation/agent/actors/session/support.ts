@@ -1,3 +1,4 @@
+import type { ModelRoute } from "@purin-labs/contracts";
 import type { TurnPageContext, TurnPageState } from "./tool-wiring";
 import type {
   HarnessTurnLease,
@@ -83,6 +84,12 @@ export type CanonicalTextTurnInput = {
   readonly requestId: RequestId;
   readonly inputDigest: SessionTurnInputDigest;
   readonly start: CanonicalTextTurnStartRequest | CanonicalCaseTurnStartRequest;
+  /**
+   * The route that a new Session of this conversation takes now. A Session
+   * whose pinned model left its list continues on this route, in a new
+   * lineage with its history.
+   */
+  readonly currentModelRoute?: ModelRoute;
   /**
    * The conversation that takes the turn's streamed output. The Session then
    * decides that sink from the turn's flow binding and its live authority,

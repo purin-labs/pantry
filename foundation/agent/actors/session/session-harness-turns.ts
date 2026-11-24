@@ -22,7 +22,8 @@ import {
   turnMayProposeSideCase,
   turnMayScheduleFollowUp,
 } from "./turn-tool-offers";
-import type { HarnessTurnLease } from "@purin-labs/contracts";
+import type { AgentSessionLifecycle, HarnessTurnLease } from "@purin-labs/contracts";
+import type { Variant } from "@purin-labs/type-utils";
 import {
   parseSessionId,
   type RequestId,
@@ -77,7 +78,10 @@ import type {
   EmbeddedHarnessAdapter,
   EmbeddedHarnessUserInput,
 } from "../embedded-harness";
-import { selectEmbeddedHarnessAdapterForModelRoute } from "../embedded-harness-adapter";
+import {
+  selectEmbeddedHarnessAdapterForModelRoute,
+  type EmbeddedHarnessAdapterError,
+} from "../embedded-harness-adapter";
 import type { CanonicalEmbeddedHarnessInput } from "../canonical-embedded-harness-input";
 import {
   buildTextTurnCancellationResolvedCommit,
@@ -192,7 +196,9 @@ export class SessionHarnessTurns {
     private readonly checkpoints: SessionCheckpoints,
   ) {}
 
-  selectEmbeddedHarnessAdapter(modelRoute: ModelRoute): EmbeddedHarnessAdapter {
+  selectEmbeddedHarnessAdapter(
+    modelRoute: ModelRoute,
+  ): Result<EmbeddedHarnessAdapter, EmbeddedHarnessAdapterError> {
     return selectEmbeddedHarnessAdapterForModelRoute(modelRoute);
   }
 
@@ -542,7 +548,14 @@ export class SessionHarnessTurns {
       };
     }
     const modelRoute = session.value.lifecycle.state.contract.modelRoute;
-    const adapter = this.selectEmbeddedHarnessAdapter(modelRoute);
+    const selected = this.selectEmbeddedHarnessAdapter(modelRoute);
+    if (!selected.ok) {
+      return {
+        ok: false,
+        error: { code: "embedded_harness_model_authority_unavailable" },
+      };
+    }
+    const adapter = selected.value;
     const assignment = readCaseSessionAssignment(this.shared.ctx.storage.sql);
     if (assignment === null || input.inheritedHistory === null) {
       return {
@@ -1649,13 +1662,17 @@ export class SessionHarnessTurns {
       Date.now(),
     );
     if (!reconciledBudget.ok) return reconciledBudget;
+    const routed = sessionOnRunnableRoute(
+      current.value.lifecycle,
+      input.currentModelRoute,
+    );
+    if (!routed.ok) return routed;
+    const lifecycle = routed.value.lifecycle;
     phaseStartedAt = Date.now();
     const runtime = await canonicalEmbeddedHarnessRuntimeSource(
       this.shared.ctx.storage.sql,
-      current.value.lifecycle,
-      this.selectEmbeddedHarnessAdapter(
-        current.value.lifecycle.state.contract.modelRoute,
-      ),
+      lifecycle,
+      routed.value.adapter,
     );
     traceSessionHarnessPreparation(
       input,
@@ -1722,7 +1739,7 @@ export class SessionHarnessTurns {
     );
     void sideCaseRead.catch(ignoreUnusedSideCaseOrigin);
     const startReceipt = canonicalTextTurnWorkspaceReceipt(
-      current.value.lifecycle,
+      lifecycle,
       runtime.value,
     );
     const startFenceRead = startReceipt.ok
@@ -1759,7 +1776,7 @@ export class SessionHarnessTurns {
     const runtimePreflight =
       await resolveCanonicalEmbeddedHarnessCheckpointBinding({
         registry: this.shared.sessionTools().registry,
-        state: current.value.lifecycle,
+        state: lifecycle,
         runtime: runtime.value,
         harnessInstructions: sideCaseHarnessInstructions(
           input.harnessInstructions,
@@ -1798,7 +1815,10 @@ export class SessionHarnessTurns {
       request:
         "runtimeLease" in input.start
           ? input.start
-          : withNextRuntimeGeneration(current.value.lifecycle, input.start),
+          : withNextRuntimeGeneration(lifecycle, input.start),
+      ...(lifecycle === current.value.lifecycle
+        ? {}
+        : { modelRoute: lifecycle.state.contract.modelRoute }),
     });
     if (!start.ok) return start;
     phaseStartedAt = Date.now();
@@ -2051,3 +2071,50 @@ export type SessionHarnessTurnsRpc = Pick<
   SessionHarnessTurns,
   "cancelCanonicalEmbeddedHarnessTurn" | "commitCanonicalHarnessCheckpoint"
 >;
+
+/**
+ * The Session as its turn starts, with the adapter of its route. A Session
+ * keeps the route that it started with. When that model left its list, the
+ * turn continues on the current route: the changed route digest makes the
+ * turn start a new lineage that imports the Session's history, and the start
+ * commit keeps the new route for the next turns. The harness build must stay
+ * the same, as the Session contract keeps its runtime revision.
+ */
+function sessionOnRunnableRoute(
+  lifecycle: Variant<AgentSessionLifecycle, "sleeping">,
+  currentModelRoute: ModelRoute | undefined,
+): Result<
+  Readonly<{
+    lifecycle: Variant<AgentSessionLifecycle, "sleeping">;
+    adapter: EmbeddedHarnessAdapter;
+  }>,
+  EmbeddedHarnessAdapterError
+> {
+  const contract = lifecycle.state.contract;
+  const pinned = selectEmbeddedHarnessAdapterForModelRoute(contract.modelRoute);
+  if (pinned.ok) return { ok: true, value: { lifecycle, adapter: pinned.value } };
+  if (
+    pinned.error.code !== "embedded_harness_model_unsupported" ||
+    currentModelRoute === undefined
+  )
+    return pinned;
+  const current = selectEmbeddedHarnessAdapterForModelRoute(currentModelRoute);
+  if (
+    !current.ok ||
+    current.value.manifest.harnessBuild !== contract.runtimeRevision
+  )
+    return pinned;
+  return {
+    ok: true,
+    value: {
+      lifecycle: {
+        ...lifecycle,
+        state: {
+          ...lifecycle.state,
+          contract: { ...contract, modelRoute: currentModelRoute },
+        },
+      },
+      adapter: current.value,
+    },
+  };
+}

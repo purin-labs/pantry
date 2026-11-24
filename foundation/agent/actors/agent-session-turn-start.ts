@@ -5,6 +5,7 @@ import type {
   EventEnvelope,
   EventPrincipal,
   HarnessTurnLease,
+  ModelRoute,
   RequestAuthority,
   RuntimeLease,
   SessionTransition,
@@ -91,9 +92,15 @@ export type CanonicalTextTurnStartError = {
 export function buildCanonicalTextTurnStart(input: {
   readonly current: Variant<AgentSessionLifecycle, "sleeping">;
   readonly request: CanonicalTextTurnStartRequest;
+  /** A new route for the Session, from this turn on. */
+  readonly modelRoute?: ModelRoute;
 }): Result<CanonicalTextTurnStart, CanonicalTextTurnStartError> {
   if (!validStartRequest(input.request)) return startError("invalid_request");
-  const activating = activatingState(input.current, input.request);
+  const activating = activatingState(
+    input.current,
+    input.request,
+    input.modelRoute,
+  );
   const accepted = acceptedInputCommit(activating, input.request);
   const acceptedValidation = validateCanonicalSessionAdvance({
     current: input.current,
@@ -102,6 +109,9 @@ export function buildCanonicalTextTurnStart(input: {
       input: input.request.input,
       turnId: input.request.turnId,
       runtimeGeneration: input.request.runtimeLease.generation,
+      ...(input.modelRoute === undefined
+        ? {}
+        : { modelRoute: input.modelRoute }),
     },
     transition: accepted.event.body,
     state: activating,
@@ -141,12 +151,15 @@ export function buildCanonicalTextTurnStart(input: {
 function activatingState(
   current: Variant<AgentSessionLifecycle, "sleeping">,
   request: CanonicalTextTurnStartRequest,
+  modelRoute: ModelRoute | undefined,
 ): Variant<AgentSessionLifecycle, "activating"> {
+  const contract = nextContract(current.state.contract);
   return {
     kind: "activating",
     state: {
       identity: current.state.identity,
-      contract: nextContract(current.state.contract),
+      contract:
+        modelRoute === undefined ? contract : { ...contract, modelRoute },
       turnId: request.turnId,
       inputId: request.input.inputId,
       resumePoint: current.state.resumePoint,

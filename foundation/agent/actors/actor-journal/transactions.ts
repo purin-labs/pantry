@@ -1723,11 +1723,16 @@ function isValidAcceptedInputTransition(
   );
   if (current === null || current.kind !== "sleeping") return false;
   const transition = input.event.body;
+  const modelRoute = transition.state.contract.modelRoute;
   const command: SessionCommand = {
     kind: "accept_input",
     input: transition.input,
     turnId: transition.state.turnId,
     runtimeGeneration: transition.state.runtimeGeneration,
+    // A Session whose pinned model left its list takes a new route here.
+    ...(JSON.stringify(modelRoute) === JSON.stringify(current.state.contract.modelRoute)
+      ? {}
+      : { modelRoute }),
   };
   const validation = validateCanonicalSessionAdvance({
     current,

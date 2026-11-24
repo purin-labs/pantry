@@ -1,3 +1,4 @@
+import type { EmbeddedHarnessAdapterError } from "../embedded-harness-adapter";
 import type { SteeringRequester } from "../harness-steering";
 import type { Outcome } from "@purin-labs/contracts";
 import type { HarnessTurnContinuation } from "../agent-session-continuation";
@@ -355,6 +356,7 @@ export type CanonicalHarnessCheckpointCommitError =
   | { code: "canonical_session_schema_mismatch" };
 
 export type CanonicalHarnessCheckpointRestoreError =
+  | EmbeddedHarnessAdapterError
   | LiveRequestAuthorityValidationError
   | CanonicalHarnessCheckpointError
   | CanonicalSessionAccessError

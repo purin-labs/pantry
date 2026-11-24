@@ -424,6 +424,11 @@ export const sessionCommandSchema = Type.Union([
     input: acceptedInputRefSchema,
     turnId: actorId(),
     runtimeGeneration: positive(),
+    /**
+     * The route that the Session takes from this turn on, when its pinned
+     * model left its list. The turn then starts a new lineage.
+     */
+    modelRoute: Type.Optional(modelRouteSchema),
   }),
   variant("activate_runtime", {
     runtimeLease: runtimeLeaseSchema,

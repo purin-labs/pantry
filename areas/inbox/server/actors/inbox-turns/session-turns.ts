@@ -767,6 +767,11 @@ async function runTransientWhatsAppTurnLifecycle(
   const adapter = selectEmbeddedHarnessAdapterForModelRoute(
     contract.modelRoute,
   );
+  if (!adapter.ok)
+    return {
+      ok: false,
+      error: transientModelAdmissionError(new Error(adapter.error.code)),
+    };
   const lease = await createEmbeddedHarnessModelRouteLease({
     env: host.env,
     scope: execution.scope,
@@ -848,7 +853,7 @@ async function runTransientWhatsAppTurnLifecycle(
     const result = await runTransientTurn<
       TransientWhatsAppTurnReply["outcome"]
     >({
-      adapter,
+      adapter: adapter.value,
       construction: {
         persistence: { kind: "transient" },
         source: { kind: "fresh" },

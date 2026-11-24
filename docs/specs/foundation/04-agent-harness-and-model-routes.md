@@ -16,10 +16,20 @@ OpenRouter route of Purin AI goes direct.
 - `selectEmbeddedHarnessAdapterForModelRoute` gives one Pi Durable adapter for each
   route and model. An adapter has a manifest: the backend `pi`, the build
   `PI_DURABLE_BUILD`, the checkpoint format and the model.
-- The selection fails with `embedded_harness_model_unsupported` when the list of the
-  route does not have the pinned model. The OpenAI key route has no such check: the
-  selection gives the `gpt-5.6-luna` adapter for each model. The selection fails with
-  `embedded_harness_provider_unsupported` for a pair that is not in the table below.
+- The selection gives a `Result`. It is `embedded_harness_model_unsupported` when the
+  list of the route does not have the pinned model, or the model has no adapter. A
+  stored pin is data, so this is not a programmer error. The OpenAI key route has no
+  such check: the selection gives the `gpt-5.6-luna` adapter for each model. The
+  selection is `embedded_harness_provider_unsupported` for a pair that is not in the
+  table below.
+- A Session whose pinned model left its list continues on the current route. The Case
+  sends the route of the message with each text turn (`currentModelRoute`), and the
+  turn start takes that route when the pinned one has no adapter and the harness build
+  is the same (`sessionOnRunnableRoute`). The `accept_input` command carries the new
+  route, the changed route digest starts a fresh lineage with the Session's history,
+  and the next turns keep the new route. A transient mail or WhatsApp turn of such a
+  Session, a checkpoint restore of it and a new Session on a route with no adapter
+  refuse with `embedded_harness_model_unsupported` and make no model request.
 - The Session reports `embedded_harness_model_authority_unavailable` when the model of
   the adapter is not the pinned model, when it cannot make the route lease (the
   placement is not active), or when the turn is not active.
@@ -82,7 +92,8 @@ OpenRouter route of Purin AI goes direct.
   becomes a failed turn that the person can retry. Steering needs a stored route that
   is equal to the current route. A new chat uses the new source.
 - An open Slack thread keeps the model that its Session pinned. A new thread starts on
-  the current route.
+  the current route. When the pinned model leaves the list, the thread's next message
+  continues on the current route, with the thread's history.
 - An admin sets one effort for Slack answers. It applies to the next Slack turn, also
   in an open thread, when the model of the route offers that effort.
 
@@ -321,7 +332,8 @@ This subsystem has no event kind, no capability and no agent tool.
 | Exit script size                          | 64 KiB, 96 KiB           | `MAXIMUM_SCRIPT_BYTES` in each script                             |
 
 - **No fallback.** A Session uses its pinned route for its lineage. Purin AI needs
-  `OPENROUTER_API_KEY`. No failure selects another funding authority.
+  `OPENROUTER_API_KEY`. No failure selects another funding authority. Only a pinned
+  model with no adapter moves the Session to the current route, in a new lineage.
 - **Credentials.** A key or a token reaches Pi only for one model request, under the
   admission of the turn. It does not enter Actor state, a prompt, the history, a
   checkpoint, generated code or a tool argument. D1 holds Vault handles only.
@@ -369,8 +381,9 @@ Boundaries:
 - OpenAI documents no allowance header for "Sign in with ChatGPT". The Session traces
   the `x-` header names of the first answer (`session.chatgpt_agent_response_headers`).
 - The container forwards a request when its trace read fails, with the colo `unknown`.
-- A Session that pins a model with no adapter cannot run. No step moves such a Session
-  to the current default with its history (Plan 96, step A4).
+- A transient mail or WhatsApp turn of a Session whose pinned model left its list
+  refuses. The mail assistant pins the digest of its route, so a move to the current
+  route needs a new authorization of that pin.
 - Plan 96 has open steps: the live check of a Gemini key turn through the deployed exit
   Worker, and the comparison of the OpenRouter spend after the change of the default.
 - The Wrangler files have a `local` and a `production` profile, and no staging profile.

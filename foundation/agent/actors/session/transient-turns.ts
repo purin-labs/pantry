@@ -68,6 +68,12 @@ export async function runTransientMailHarness(
   const adapter = selectEmbeddedHarnessAdapterForModelRoute(
     contract.modelRoute,
   );
+  // A pinned model that left its list makes no provider request.
+  if (!adapter.ok)
+    return {
+      ok: false,
+      error: { code: adapter.error.code, modelUsage: KNOWN_ZERO_MODEL_USAGE },
+    };
   const lease = await createEmbeddedHarnessModelRouteLease({
     env: env,
     scope: execution.scope,
@@ -133,7 +139,7 @@ export async function runTransientMailHarness(
   }
   try {
     const result = await runTransientEmailTurnWithSinks({
-      adapter,
+      adapter: adapter.value,
       construction: {
         persistence: { kind: "transient" },
         source: { kind: "fresh" },

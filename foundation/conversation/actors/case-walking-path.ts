@@ -634,8 +634,10 @@ export async function prepareTransientEmailAssignment(
       return deferredTransientAssignment();
     if (!assigned.ok) return failure(assigned.error.code);
   }
+  const initialized = initializedSession(sessionInput, emailAssignment);
+  if (!initialized.ok) return initialized;
   const initialization = {
-    initialization: initializedSession(sessionInput, emailAssignment),
+    initialization: initialized.value,
     assignment: emailAssignment,
   };
   let initializationState: { readonly kind: "missing" | "initialized" } = {
@@ -1075,8 +1077,10 @@ export async function runOngoingCaseTurn(
       ? existing.start.startId
       : `start_${slackCaseTurnId(input.ingress.ingressId)}`;
   if (existing === undefined || existing.kind === "assigned") {
+    const initialization = initializedSession(sessionInput, assignment);
+    if (!initialization.ok) return initialization;
     const initialized = await input.session.initializeCaseSession({
-      initialization: initializedSession(sessionInput, assignment),
+      initialization: initialization.value,
       assignment,
     });
     if (!initialized.ok)
@@ -1305,6 +1309,7 @@ async function runOngoingSessionTurn(
     requestingOrganisationId: input.organisationId,
     requestId: input.requestId,
     inputDigest: inputDigest.value,
+    currentModelRoute: input.policy.modelRoute,
     start: {
       startId: `start_${turnId}`,
       correlationId: input.requestId,
@@ -2247,8 +2252,10 @@ async function runAssignedCaseSession(
   assignment: CaseAssignment,
 ): Promise<Result<CompletedCaseParticipant, CaseWalkingPathError>> {
   const initializationStartedAt = Date.now();
+  const initialization = initializedSession(input, assignment);
+  if (!initialization.ok) return initialization;
   const initialized = await input.session.initializeCaseSession({
-    initialization: initializedSession(input, assignment),
+    initialization: initialization.value,
     assignment,
   });
   traceDirectSessionPreparation(
@@ -2282,6 +2289,7 @@ async function runAssignedCaseSession(
     requestingOrganisationId: input.organisationId,
     requestId: input.requestId,
     inputDigest: inputDigest.value,
+    currentModelRoute: input.policy.modelRoute,
     start: {
       startId,
       correlationId: input.requestId,
@@ -2547,13 +2555,16 @@ function boundedSessionBudget(
   };
 }
 
+/** A new Session on the current route of the policy, which must have an adapter. */
 function initializedSession(
   input: AssignedCaseSessionInput,
   assignment: CaseAssignment,
-): InitializedCaseSessionCommit["initialization"] {
-  const adapter = selectEmbeddedHarnessAdapterForModelRoute(
+): Result<InitializedCaseSessionCommit["initialization"], CaseWalkingPathError> {
+  const selected = selectEmbeddedHarnessAdapterForModelRoute(
     input.policy.modelRoute,
   );
+  if (!selected.ok) return failure(selected.error.code);
+  const adapter = selected.value;
   const state: InitializedSessionCommit["state"] = {
     kind: "sleeping",
     state: {
@@ -2577,6 +2588,8 @@ function initializedSession(
   };
   const commandId = `initialize_${input.sessionId}`;
   return {
+    ok: true,
+    value: {
     source: "case_actor",
     commandId,
     event: {
@@ -2603,6 +2616,7 @@ function initializedSession(
       threadKey: `case:${assignment.caseId}`,
       track: "managed-agents",
       startedAt: input.receivedAt,
+    },
     },
   };
 }
