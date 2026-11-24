@@ -59,6 +59,26 @@
 // or a folder with a final /. They keep their module in scripts/layers.json,
 // and --sync-plan does not add them.
 //
+// A move out of the package of an area (the contract packages, 2026-11-24):
+//   - `moduleFrom` names the area whose public files (`contracts` of
+//     scripts/layers.json) go into the module of the plan,
+//     areas/<area>/contract. --sync-plan adds each such file. The entries of
+//     `contracts` that name them go, because the package is the contract.
+//   - An import of a moved file by the name of its old package gets the name
+//     of the new package, or a relative path inside it. The old package
+//     loses the export entry of a moved file.
+//   - `movedFolders` names a folder that moves whole to a folder with
+//     another last name (areas/cafe/server/contract to server/ of the
+//     package), so that a lint, a config or a document that names it
+//     follows it.
+//   - A dependency on the package of an area plan stays only while a file of
+//     the package imports it by name: in each package that depends on the
+//     old package, and in the package of the plan. So no stale dependency
+//     keeps a cycle between the packages.
+//   - A file of an earlier plan that a later plan moved again is done for
+//     the earlier plan, and its export entry of one file leaves the manifest
+//     of the earlier plan.
+//
 // A second run on a moved tree changes nothing. On a branch that was cut
 // before the move, run it after the rebase: it changes each import that the
 // branch added. It reads the old paths from the plan, so it needs no old file.
@@ -147,13 +167,50 @@ function onDisk(path) {
 // The plan and the tree. Each path below is a path after the move: a file
 // that still waits for its `git mv` is read from its old path.
 
-/** old path -> new path, for each file of the plan. */
-const planFiles = new Map(
-  Object.entries(plan.files).map(([from, inside]) => [
-    from,
-    `${plan.target}/${inside}`,
-  ]),
+/** The other plans of the folder. */
+const otherPlans = readdirSync(dirname(planPath))
+  .filter(
+    (name) =>
+      name.endsWith(".json") && join(dirname(planPath), name) !== planPath,
+  )
+  .map((name) =>
+    JSON.parse(readFileSync(join(dirname(planPath), name), "utf8")),
+  );
+/** old path -> new path, for each file that another plan moves. */
+const movesOfOtherPlans = new Map(
+  otherPlans.flatMap((other) =>
+    Object.entries(other.files ?? {}).map(([from, inside]) => [
+      from,
+      `${other.target}/${inside}`,
+    ]),
+  ),
 );
+/**
+ * The place now of a file that a later plan moved again, or null: a public
+ * file of an area went into the contract package of the area after the
+ * move of the area.
+ */
+function movedAgain(path) {
+  let current = path;
+  for (let step = 0; step < 8 && movesOfOtherPlans.has(current); step += 1) {
+    current = movesOfOtherPlans.get(current);
+    if (onDisk(current)) return current;
+  }
+  return null;
+}
+
+/**
+ * old path -> new path, for each file of the plan. A file that a later plan
+ * moved again is done here, and the later plan holds it now.
+ */
+const planFiles = new Map(
+  Object.entries(plan.files)
+    .map(([from, inside]) => [from, `${plan.target}/${inside}`])
+    .filter(
+      ([from, to]) => onDisk(from) || onDisk(to) || movedAgain(to) === null,
+    ),
+);
+const movedOn = Object.keys(plan.files).length - planFiles.size;
 const oldPathOf = new Map([...planFiles].map(([from, to]) => [to, from]));
 const packageName = plan.package.name;
 
@@ -245,7 +302,7 @@ async function putJson(path, value, kind) {
 // A plan names each file at its place on the day of its move. A later move of
 // another module can take a file of keepForm or of an edit, or a folder that
 // the text of an edit names: the plans beside this one give its place now.
-const laterMoves = new Map();
+const laterMoves = movesOfOtherPlans;
 /** Each plan of the folder, this one first: its module and its moves. */
 const plansHere = [
   {
@@ -257,14 +314,10 @@ const plansHere = [
     edits: plan.edits ?? [],
   },
 ];
-for (const name of readdirSync(dirname(planPath))) {
-  const other = join(dirname(planPath), name);
-  if (!name.endsWith(".json") || other === planPath) continue;
-  const otherPlan = JSON.parse(readFileSync(other, "utf8"));
+for (const otherPlan of otherPlans) {
   const files = new Map();
   for (const [from, inside] of Object.entries(otherPlan.files ?? {})) {
     files.set(from, `${otherPlan.target}/${inside}`);
-    laterMoves.set(from, `${otherPlan.target}/${inside}`);
   }
   plansHere.push({
     module: otherPlan.module,
@@ -357,6 +410,27 @@ function moduleAtStart(path) {
     null
   );
 }
+/**
+ * True for a public file of an area at the start: a path or a folder of
+ * `contracts` in scripts/layers.json.
+ */
+function publicAtStart(path) {
+  return (layerMapAtStart.contracts ?? []).some(
+    (entry) =>
+      layerMapAtStart.packages[entry] === undefined &&
+      (entry.endsWith("/") ? path.startsWith(entry) : path === entry),
+  );
+}
+// `moduleFrom` in the plan: the area whose public files the plan moves into
+// the contract package of the area (the module areas/<area>/contract). Each
+// public file of that area belongs to the plan, and each other file stays.
+const moduleFrom = plan.moduleFrom ?? null;
+/** True for a file that the module of the plan holds at the start. */
+const ofThePlan = (path) =>
+  moduleAtStart(path) === plan.module ||
+  (moduleFrom !== null &&
+    moduleAtStart(path) === moduleFrom &&
+    publicAtStart(path));
 // The files of the module that stay where they are: a path, or a folder with
 // a final /. The Portal module keeps its HTML entries in apps/portal/src.
 const stays = plan.stays ?? [];
@@ -381,7 +455,7 @@ const outside = tree
   .map(diskPath)
   .filter(
     (path) =>
-      moduleAtStart(path) === plan.module &&
+      ofThePlan(path) &&
       !path.startsWith(`${plan.target}/`) &&
       !planFiles.has(path) &&
       !staysHere(path),
@@ -431,7 +505,7 @@ for (const path of outside) {
 // its old folder can name another module.
 for (const from of stillOld.keys()) {
   const module = moduleAtStart(from);
-  if (module !== null && module !== plan.module) {
+  if (module !== null && !ofThePlan(from)) {
     faults.push(
       `${from}: ${LAYER_MAP} gives it to ${module}, and the plan moves ${plan.module}.`,
     );
@@ -479,6 +553,21 @@ function withDependency(manifest, name, version) {
   entries.splice(last + 1, 0, [name, version]);
   return { ...manifest, dependencies: Object.fromEntries(entries) };
 }
+/**
+ * The export entries of a plan, less each entry of one file that a later
+ * plan moved out of the package: a public file of an area went into the
+ * contract package of the area.
+ */
+function exportsStillHere(entries) {
+  return Object.fromEntries(
+    Object.entries(entries).filter(([key, value]) => {
+      if (key.includes("*")) return true;
+      const target = typeof value === "string" ? value : value.default;
+      const file = posix.join(plan.target, target);
+      return known.has(file) || movedAgain(file) === null;
+    }),
+  );
+}
 if (plan.package.existing === true) {
   // The module joins a package that exists: the manifest gets the export
   // entries and the dependencies of the plan and keeps the rest. The package
@@ -491,7 +580,9 @@ if (plan.package.existing === true) {
     );
   } else {
     let next = { ...manifest, exports: { ...manifest.exports } };
-    for (const [key, value] of Object.entries(plan.package.exports)) {
+    for (const [key, value] of Object.entries(
+      exportsStillHere(plan.package.exports),
+    )) {
       const now = next.exports[key];
       if (now !== undefined && JSON.stringify(now) !== JSON.stringify(value)) {
         faults.push(
@@ -543,12 +634,15 @@ if (plan.package.existing === true) {
   // A later plan with package.existing can move the files of another module
   // into this package (areas/shopify into areas/integrations). After its
   // move, a second run keeps its export entries and its dependencies.
-  let exportEntries = plan.package.exports;
+  let exportEntries = exportsStillHere(plan.package.exports);
   for (const joined of plansHere) {
     if (joined.name !== packageName || joined.target !== plan.target) continue;
     if (joined.package?.existing !== true) continue;
     if (![...joined.files.values()].some((to) => known.has(to))) continue;
-    exportEntries = { ...exportEntries, ...joined.package.exports };
+    exportEntries = {
+      ...exportEntries,
+      ...exportsStillHere(joined.package.exports),
+    };
     for (const [name, version] of Object.entries(
       joined.package.dependencies ?? {},
     )) {
@@ -781,6 +875,95 @@ function newSpecifier(path, specifier) {
   return byName + query;
 }
 
+// A move out of the package of an area (its public files into its contract
+// package): the other packages import a moved file by the name of its old
+// package, so each such import gets the name of the new package, or a
+// relative path inside it. The old package keeps the rest of its files.
+/** folder -> { folder, name, exports }, for each area package that files leave */
+const sourcePackages = new Map();
+for (const from of planFiles.keys()) {
+  const folder = packageFolderOf(from);
+  if (folder === "" || folder === plan.target || sourcePackages.has(folder)) {
+    continue;
+  }
+  if (!(layerMapAtStart.packages[folder] ?? "").startsWith("areas/")) continue;
+  const manifest = readJson(`${folder}/package.json`);
+  sourcePackages.set(folder, {
+    folder,
+    name: manifest.name,
+    exports: manifest.exports ?? {},
+  });
+}
+const sourceByName = new Map(
+  [...sourcePackages.values()].map((source) => [source.name, source]),
+);
+/** The moved file that a subpath of an old package names, or null. */
+function movedFileOf(source, subpath) {
+  for (const [key, value] of Object.entries(source.exports)) {
+    const target =
+      typeof value === "string"
+        ? value
+        : (value?.default ?? value?.import ?? value?.types);
+    if (typeof target !== "string") continue;
+    let file = null;
+    if (key === subpath) file = target;
+    else if (key.includes("*")) {
+      const [head, tail] = key.split("*");
+      if (
+        subpath.startsWith(head) &&
+        subpath.endsWith(tail) &&
+        subpath.length >= head.length + tail.length
+      ) {
+        file = target.replace(
+          "*",
+          subpath.slice(head.length, subpath.length - tail.length),
+        );
+      }
+    }
+    if (file !== null && planFiles.has(posix.join(source.folder, file))) {
+      return posix.join(source.folder, file);
+    }
+  }
+  return null;
+}
+const BY_OLD_NAME =
+  sourceByName.size === 0
+    ? null
+    : new RegExp(
+        `(${LEADS.join("|")})(["'\`])(${[...sourceByName.keys()]
+          .map((name) => name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+          .join("|")})(/[^"'\`\\n]*)?\\2`,
+        "g",
+      );
+/** The new specifier of an import by the name of an old package, or null. */
+function specifierOfOldName(path, name, rest) {
+  const [bare, query = ""] = rest.split(/(?=[?#])/, 2);
+  const from = movedFileOf(sourceByName.get(name), `.${bare}`);
+  if (from === null) {
+    if (oldPathOf.has(path)) {
+      faults.push(
+        `${oldPathOf.get(path)} imports ${name}${bare}, a file of its old package that does not move. Move that file too, or move its type into the new package.`,
+      );
+    }
+    return null;
+  }
+  const moved = planFiles.get(from);
+  const owner = packageFolderOf(path);
+  if (owner === "" || owner === plan.target) {
+    const style = /\.(css|json)$/.test(moved) ? "exact" : "bare";
+    return relativeSpecifier(posix.dirname(path), moved, style) + query;
+  }
+  const byName = specifierByName(moved.slice(plan.target.length + 1));
+  if (byName === null) {
+    faults.push(
+      `${path} imports ${from}, and the exports map of the plan has no entry for it.`,
+    );
+    return null;
+  }
+  consumers.add(owner);
+  return byName + query;
+}
+
 for (const path of tree) {
   if (!SOURCE.test(path) || UNREAD.some((pattern) => pattern.test(path))) {
     continue;
@@ -788,16 +971,27 @@ for (const path of tree) {
   if (FROZEN.some((pattern) => pattern.test(path))) continue;
   const text = original(path);
   let changed = 0;
-  const next = text.replace(SPECIFIER, (whole, lead, quote, specifier) => {
-    const replacement = newSpecifier(path, specifier);
-    if (replacement === null || replacement === specifier) return whole;
+  const count = (lead, replacement) => {
     changed += 1;
     counts.specifiers += 1;
     if (replacement.startsWith(".")) counts.relative += 1;
     else counts.byName += 1;
     if (/declare\s+module/.test(lead)) counts.declareModule += 1;
+  };
+  let next = text.replace(SPECIFIER, (whole, lead, quote, specifier) => {
+    const replacement = newSpecifier(path, specifier);
+    if (replacement === null || replacement === specifier) return whole;
+    count(lead, replacement);
     return `${lead}${quote}${replacement}${quote}`;
   });
+  if (BY_OLD_NAME !== null) {
+    next = next.replace(BY_OLD_NAME, (whole, lead, quote, name, rest = "") => {
+      const replacement = specifierOfOldName(path, name, rest);
+      if (replacement === null) return whole;
+      count(lead, replacement);
+      return `${lead}${quote}${replacement}${quote}`;
+    });
+  }
   if (changed > 0) put(path, next, "import");
   if (!oldPathOf.has(path)) quotedCandidates.push(path);
   if (next.includes(`${packageName}/`) || next.includes(`"${packageName}"`)) {
@@ -831,6 +1025,86 @@ for (const folder of [...consumers].sort()) {
   // After the last workspace dependency, so that they stay together.
   const next = withDependency(manifest, packageName, "workspace:*");
   if (next !== manifest) await putJson(path, next, "config");
+}
+
+// An export entry of one file follows the file: the old package of a moved
+// file loses the entry.
+for (const source of sourcePackages.values()) {
+  const path = `${source.folder}/package.json`;
+  const manifest = readJson(path);
+  const entries = Object.entries(manifest.exports ?? {});
+  const stay = entries.filter(([key, value]) => {
+    if (key.includes("*")) return true;
+    const target = typeof value === "string" ? value : value.default;
+    return !planFiles.has(posix.join(source.folder, target));
+  });
+  if (stay.length < entries.length) {
+    await putJson(
+      path,
+      { ...manifest, exports: Object.fromEntries(stay) },
+      "config",
+    );
+  }
+}
+
+// A dependency on the package of an area plan stays only while a file of the
+// package imports it by name. A move into a contract package takes the last
+// import of an area package from some packages, and the dependency would keep
+// a cycle between the packages. This holds for each package that depends on
+// a package that files left, and for the package of this plan, so that a
+// second run of an earlier plan gives the same manifest.
+{
+  const areaPackages = new Set(
+    plansHere
+      .filter(({ module, name }) => module?.startsWith("areas/") && name)
+      .map(({ name }) => name),
+  );
+  const leftPackages = new Set(sourceByName.keys());
+  /** package folder -> the source files and style sheets of the package */
+  const filesOf = new Map();
+  for (const path of tree) {
+    if (!SOURCE.test(path) && !path.endsWith(".css")) continue;
+    const folder = packageFolderOf(path);
+    if (folder === "") continue;
+    const list = filesOf.get(folder) ?? [];
+    list.push(path);
+    filesOf.set(folder, list);
+  }
+  const imports = (folder, name) =>
+    (filesOf.get(folder) ?? []).some((path) => {
+      const text = textOf(path) ?? "";
+      return [`"${name}"`, `'${name}'`, `\`${name}\``, `${name}/`].some(
+        (form) => text.includes(form),
+      );
+    });
+  const manifests = [
+    ...new Set([
+      ...tree.filter(
+        (path) =>
+          posix.basename(path) === "package.json" &&
+          !UNREAD.some((pattern) => pattern.test(path)),
+      ),
+      manifestPath,
+    ]),
+  ].filter((path) => filesOf.has(posix.dirname(path)) && known.has(path));
+  for (const path of manifests) {
+    const folder = posix.dirname(path);
+    const names = folder === plan.target ? areaPackages : leftPackages;
+    if (names.size === 0) continue;
+    const manifest = readJson(path);
+    let next = manifest;
+    for (const field of ["dependencies", "devDependencies"]) {
+      const entries = Object.entries(next[field] ?? {});
+      const stay = entries.filter(
+        ([name]) =>
+          name === packageName || !names.has(name) || imports(folder, name),
+      );
+      if (stay.length < entries.length) {
+        next = { ...next, [field]: Object.fromEntries(stay) };
+      }
+    }
+    if (next !== manifest) await putJson(path, next, "config");
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -881,6 +1155,25 @@ for (const [from, to] of planFiles) {
     }
     folder = posix.dirname(folder);
     next = posix.dirname(next);
+  }
+}
+// `movedFolders` in the plan: a folder that moves whole to a folder with
+// another last name (areas/cafe/server/contract to the folder server of the
+// contract package). The plan names it, and each file in it must keep its
+// place below the new folder.
+for (const [from, inside] of Object.entries(plan.movedFolders ?? {})) {
+  const to = `${plan.target}/${inside}`;
+  const prefix = `${from}/`;
+  const whole = treeOnDisk
+    .filter((path) => path.startsWith(prefix))
+    .every(
+      (path) => planFiles.get(path) === `${to}/${path.slice(prefix.length)}`,
+    );
+  if (whole) movedFolders.set(from, to);
+  else {
+    faults.push(
+      `${planArgument}: movedFolders names ${from}, and a file in it does not move to ${to}.`,
+    );
   }
 }
 const FOLDER_FROM_ROOT =
@@ -1024,11 +1317,25 @@ for (const path of tree) {
   for (const [from, to] of planFiles) {
     for (const key of [from, to]) {
       if (map.files[key] === undefined) continue;
-      if (map.files[key] !== plan.module) {
+      if (map.files[key] !== plan.module && map.files[key] !== moduleFrom) {
         faults.push(`${LAYER_MAP}: ${key} is not a file of ${plan.module}`);
       }
       delete map.files[key];
     }
+  }
+  // The public files of `moduleFrom` are the contract package now: an entry
+  // of `contracts` that names a moved file, or a folder whose files all
+  // moved, goes. Step 5 gave each such entry its new path.
+  if (moduleFrom !== null) {
+    map.contracts = (map.contracts ?? []).filter((entry) => {
+      if (map.packages[entry] !== undefined) return true;
+      if (entry === plan.target || entry.startsWith(`${plan.target}/`)) {
+        return false;
+      }
+      if (!entry.endsWith("/")) return !planFiles.has(entry);
+      const held = [...planFiles.keys()].some((from) => from.startsWith(entry));
+      return !held || tree.some((path) => path.startsWith(entry));
+    });
   }
   if (plan.package.existing === true) {
     // The line of the package gives the module each file in it. The layer
