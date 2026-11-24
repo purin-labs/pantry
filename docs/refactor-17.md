@@ -495,6 +495,7 @@ new count with a ratchet, or a written reason to accept it.
 | The Shopify rule of step A2.5 has no check                                                | 5 of 7 importers                                                               | `integration-gateway.ts`                                                 | `shopify-rule`: 10 imports in 6 files                                          |
 | A table name in a template string, and each Actor SQLite table                            | 6 writes                                                                       | `data/organisation-purge.ts`                                             | `interpolated-table`: 17 writes (8 to D1, 9 to Actor SQLite)                   |
 | A new Portal file gets `surfaces/portal` by the folder rule and is never refused          | —                                                                              | —                                                                        | `portal-default`: 26 files                                                     |
+| A contract calls a foundation module above `contracts` at run time (added 2026-11-24)     | 94 imports in 42 public files                                                  | `mail-source-authorization.ts` calls `authority`, `tenancy`              | `contract-runtime`: 94 imports                                                 |
 
 `pnpm lint:layer-debts` (`scripts/check-layer-debts.mjs`, a part of `pnpm lint:source`)
 holds each kind since 2026-11-22: a count in `scripts/layer-debts-ratchet.json` may not

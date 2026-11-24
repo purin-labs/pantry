@@ -38,6 +38,15 @@
 //   portal-default      a file whose module comes only from the rule of a
 //                       whole covered folder, so a new file there is never
 //                       refused
+//   contract-runtime    an import at run time, from a public file of an area
+//                       (its contract), of a foundation module above
+//                       `contracts` in foundationOrder. The owner allows it
+//                       (2026-11-24, "Contracts may use foundation"); the
+//                       count may not grow
+//
+// Each count but contract-runtime reads the contract of an area as a part of
+// its area, so the move of a public file into the contract package keeps its
+// key.
 //
 // The check reads the files, the modules, the packages, the public files and
 // the tables only from scripts/layers.json, through scripts/lib/layers.mjs. It
@@ -58,6 +67,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
+  areaOf,
   coveredSourceFiles,
   crossingKind,
   importStatementsOf,
@@ -65,7 +75,7 @@ import {
   keysWithoutReason,
   layerOf,
   linkCounter,
-  moduleOf,
+  moduleOf as moduleOfFile,
   packageFile,
   relativeResolver,
   root,
@@ -86,7 +96,17 @@ const KINDS = [
   "shopify-rule",
   "interpolated-table",
   "portal-default",
+  "contract-runtime",
 ];
+
+/**
+ * The module of a file for each count: the contract of an area counts as a
+ * part of its area (`areaOf`), so a move of public files into the contract
+ * package keeps each key. Only `contract-runtime` reads the contract itself.
+ */
+function moduleOf(path) {
+  return areaOf(moduleOfFile(path));
+}
 
 const mode = process.argv[2] ?? "check";
 if (!["check", "--update", "--init", "--report"].includes(mode)) {
@@ -128,7 +148,7 @@ function resolveImport(path, specifier) {
   const file = packageFile(entry, subpath, known);
   return {
     file,
-    module: (file === null ? null : moduleOf(file)) ?? entry.module,
+    module: (file === null ? null : moduleOf(file)) ?? areaOf(entry.module),
     package: entry,
   };
 }
@@ -432,7 +452,7 @@ for (const [path, list] of imports) {
       layerOf(from) === "areas" &&
       target.package !== null &&
       layerOf(target.package.module) === "areas" &&
-      target.package.module !== from &&
+      areaOf(target.package.module) !== from &&
       !target.package.contract &&
       !(target.file !== null && isPublic(target.file))
     ) {
@@ -542,6 +562,28 @@ for (const path of tracked) {
   const rule = ruleKeys.find((prefix) => path.startsWith(prefix));
   if (rule === undefined || !targets.covers.includes(rule)) continue;
   record("portal-default", `files ${targets.rules[rule]}`, path);
+}
+
+// contract-runtime: an import at run time (no `import type`) from a public
+// file of an area, the contract of the area, of a foundation module above
+// `contracts` in foundationOrder. The key names the area, so the move of a
+// public file into the contract package keeps it.
+const CONTRACTS_RANK = targets.foundationOrder.indexOf("contracts");
+for (const path of tracked) {
+  const own = moduleOfFile(path);
+  if (own === null || layerOf(own) !== "areas" || !isPublic(path)) continue;
+  for (const { specifier, typeOnly } of importStatementsOf(texts.get(path))) {
+    if (typeOnly) continue;
+    const target = resolveImport(path, specifier);
+    if (target === null || layerOf(target.module) !== "foundation") continue;
+    const name = target.module.slice("foundation/".length);
+    if (targets.foundationOrder.indexOf(name) <= CONTRACTS_RANK) continue;
+    record(
+      "contract-runtime",
+      `imports ${areaOf(own)} -> ${target.module}`,
+      `${path} -> ${specifier}`,
+    );
+  }
 }
 
 // --- The ratchet ------------------------------------------------------

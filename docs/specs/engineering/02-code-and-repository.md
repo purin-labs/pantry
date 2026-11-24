@@ -114,7 +114,10 @@ known crossings is empty. A new entry needs a `reason` and a `fix`.
 `pnpm lint:layer-debts` counts the crossings that `lint:layers` cannot see. A count may
 not grow, and `scripts/layer-debts-ratchet.json` gives the reason and the fix of each
 kind: `env-merge`, `foundation-misfit`, `table-read`, `surface-nonpublic`,
-`area-package`, `worker-logic`, `shopify-rule`, `interpolated-table`, `portal-default`.
+`area-package`, `worker-logic`, `shopify-rule`, `interpolated-table`, `portal-default`,
+`contract-runtime`. The last one counts each import at run time from the contract of an
+area of a foundation module above `contracts`. Each other count reads a contract as a
+part of its area.
 
 ### The lints
 

@@ -29,6 +29,9 @@
     },
     "portal-default": {
       "files": 2
+    },
+    "contract-runtime": {
+      "imports": 94
     }
   },
   "kinds": {
@@ -200,6 +203,44 @@
       "fix": "Give each listed file its own line or a folder rule in the map, then remove the rule of the whole folder. A new Portal file then needs a line, as a new Platform file does.",
       "counts": {
         "files surfaces/portal": 2
+      }
+    },
+    "contract-runtime": {
+      "reason": "The owner decided on 2026-11-24 that the contract of an area may import any foundation module (\"Contracts may use foundation\"), so that the public files of each area can move into its contract package as they are. A public file that calls a foundation module above `contracts` at run time ties the contract to the code of that module: the contract then holds behavior, not only schemas and service interfaces. The foundation imports no area, so these imports make no cycle. The count is by area and foundation module, and a contract counts with its area, so the move into the contract package keeps each key.",
+      "fix": "A port for each call: the contract declares the interface of the call (a type, or a definePort of @purin-labs/kernel/port), the server of the area or the Worker gives the implementation, and the contract then imports only std, kernel, contracts and types. Then lower the count with --update.",
+      "counts": {
+        "imports areas/brain -> foundation/agent": 1,
+        "imports areas/brain -> foundation/control": 3,
+        "imports areas/brain -> foundation/ui": 1,
+        "imports areas/cafe -> foundation/actor-runtime": 1,
+        "imports areas/cafe -> foundation/agent": 1,
+        "imports areas/cafe -> foundation/agent-tools": 1,
+        "imports areas/cafe -> foundation/connections": 1,
+        "imports areas/cafe -> foundation/tenancy": 1,
+        "imports areas/commerce -> foundation/actor-runtime": 1,
+        "imports areas/commerce -> foundation/agent": 3,
+        "imports areas/commerce -> foundation/agent-tools": 1,
+        "imports areas/commerce -> foundation/connections": 4,
+        "imports areas/commerce -> foundation/control": 3,
+        "imports areas/commerce -> foundation/tenancy": 2,
+        "imports areas/inbox -> foundation/agent": 2,
+        "imports areas/inbox -> foundation/authority": 8,
+        "imports areas/inbox -> foundation/connections": 1,
+        "imports areas/inbox -> foundation/control": 2,
+        "imports areas/inbox -> foundation/tenancy": 3,
+        "imports areas/inbox -> foundation/ui": 4,
+        "imports areas/integrations -> foundation/actor-runtime": 2,
+        "imports areas/integrations -> foundation/agent": 1,
+        "imports areas/integrations -> foundation/authority": 9,
+        "imports areas/integrations -> foundation/connections": 9,
+        "imports areas/integrations -> foundation/control": 3,
+        "imports areas/integrations -> foundation/tenancy": 4,
+        "imports areas/integrations -> foundation/ui": 5,
+        "imports areas/kitchen -> foundation/agent-tools": 3,
+        "imports areas/kitchen -> foundation/control": 4,
+        "imports areas/organisation -> foundation/control": 3,
+        "imports areas/organisation -> foundation/tenancy": 1,
+        "imports areas/organisation -> foundation/ui": 6
       }
     }
   }
