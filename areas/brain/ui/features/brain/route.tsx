@@ -25,7 +25,7 @@ import {
   type BrainAddress,
   type BrainSection,
   type BrainView,
-} from "./address";
+} from "@purin-labs/area-brain-contract/ui/features/brain/address";
 import {
   lastBrainRead,
   memoryErrorMessage,
@@ -36,7 +36,7 @@ import {
   readMemories,
   sendMemoryCommand,
   type BrainTransport,
-} from "./api";
+} from "@purin-labs/area-brain-contract/ui/features/brain/api";
 import { ContextView, type ContextLinks } from "./context";
 import { EvalsPanel } from "./evals";
 import { ActivityPanel } from "./execution";

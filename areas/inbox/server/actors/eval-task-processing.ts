@@ -32,8 +32,8 @@ import type {
   EvalTaskEnd,
   EvalTaskServices,
   SettledEvalTask,
-} from "@purin-labs/area-brain/server/evals/contract/eval-task";
-import { scoreEvalScenario } from "@purin-labs/area-brain/server/evals/scorer";
+} from "@purin-labs/area-brain-contract/server/evals/eval-task";
+import { scoreEvalScenario } from "@purin-labs/area-brain-contract/server/evals/scorer";
 import type { GmailMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
 import {
   newRequestId,

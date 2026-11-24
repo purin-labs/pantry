@@ -20,7 +20,7 @@ import type {
   ConnectorEvalRun,
   ConnectorEvalTask,
   SettledEvalTask,
-} from "../evals/contract/eval-task";
+} from "@purin-labs/area-brain-contract/server/evals/eval-task";
 
 /**
  * The eval runs of one mailbox agent while they are in progress.

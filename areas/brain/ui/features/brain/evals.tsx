@@ -36,7 +36,7 @@ import {
   sendEvalRunCommand,
   sendMemoryCommand,
   type BrainTransport,
-} from "./api";
+} from "@purin-labs/area-brain-contract/ui/features/brain/api";
 import { ScenarioEditor, type SenderChoices } from "./eval-editor";
 import {
   scenarioDraft,

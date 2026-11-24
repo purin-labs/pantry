@@ -193,19 +193,25 @@ import each of its files. A module with no line for one of these has none.
 
 ## areas/brain
 
-- Folders: 10
+- Folders: 8
   - `areas/brain/server/actors/`
   - `areas/brain/server/actors/connector/`
   - `areas/brain/server/case-execution/`
   - `areas/brain/server/control/routes/`
   - `areas/brain/server/evals/`
-  - `areas/brain/server/evals/contract/`
   - `areas/brain/server/memory/`
-  - `areas/brain/server/memory/contract/`
   - `areas/brain/ui/`
   - `areas/brain/ui/features/brain/`
 - Packages: `areas/brain`
-- Public files: `areas/brain/server/evals/contract/`, `areas/brain/server/evals/scorer.ts`, `areas/brain/server/memory/contract/`, `areas/brain/ui/execution-client.ts`, `areas/brain/ui/features/brain/address.ts`, `areas/brain/ui/features/brain/api.ts`
+
+## areas/brain/contract
+
+- Folders: 4
+  - `areas/brain/contract/server/evals/`
+  - `areas/brain/contract/server/memory/`
+  - `areas/brain/contract/ui/`
+  - `areas/brain/contract/ui/features/brain/`
+- Packages: `areas/brain/contract`
 
 ## areas/cafe
 

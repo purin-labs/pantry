@@ -1,7 +1,7 @@
 import { mailboxReplyDisposition } from "../mail-inbox/direct-reply";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { memoryService } from "@purin-labs/area-brain/server/memory/contract/memory-service";
+import { memoryService } from "@purin-labs/area-brain-contract/server/memory/memory-service";
 import {
   createMailboxTurnMemoryReader,
   readMailboxSupplierScope,
@@ -75,7 +75,7 @@ import type {
   EmailChatSource,
   EmailReplySources,
 } from "../mail-inbox/reply-sources";
-import type { ShownMemoryRevision } from "@purin-labs/area-brain/server/memory/contract/turn-memory";
+import type { ShownMemoryRevision } from "@purin-labs/area-brain-contract/server/memory/turn-memory";
 import { caseContextCollectionEvidenceDependency } from "@purin-labs/agent/case-context-discovery/evidence";
 import { bindMailboxCaseContextCollectionAuthority } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { SerializedFlowBinding } from "@purin-labs/authority/policy/information-flow/index";

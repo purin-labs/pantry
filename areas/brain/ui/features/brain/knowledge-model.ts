@@ -6,7 +6,7 @@ import type {
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import type { Skill } from "@purin-labs/control-api";
 import type { StatusChipStatus } from "@purin-labs/ui/status-chip";
-import type { KnowledgeState } from "./address";
+import type { KnowledgeState } from "@purin-labs/area-brain-contract/ui/features/brain/address";
 import {
   acceptedEval,
   evalStatuses,

@@ -1,7 +1,7 @@
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { memoryService } from "@purin-labs/area-brain/server/memory/contract/memory-service";
-import { type ShownMemoryRevision } from "@purin-labs/area-brain/server/memory/contract/turn-memory";
+import { memoryService } from "@purin-labs/area-brain-contract/server/memory/memory-service";
+import { type ShownMemoryRevision } from "@purin-labs/area-brain-contract/server/memory/turn-memory";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 /**

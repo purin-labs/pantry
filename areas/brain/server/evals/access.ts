@@ -43,11 +43,11 @@ import type {
   EvalCorrectionProposal,
   EvalCorrectionProposalResult,
   MemoryAccessError,
-} from "../memory/contract/memory-service";
+} from "@purin-labs/area-brain-contract/server/memory/memory-service";
 import type {
   EvalRunFixtureRead,
   EvalRunFixtureRequest,
-} from "./contract/eval-task";
+} from "@purin-labs/area-brain-contract/server/evals/eval-task";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   canonicalFlowLabel,

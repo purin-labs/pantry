@@ -47,7 +47,7 @@ import {
 } from "@purin-labs/area-brain/server/memory/access";
 import {
   turnMemoryReaderWithoutSubjects,
-} from "@purin-labs/area-brain/server/memory/contract/turn-memory";
+} from "@purin-labs/area-brain-contract/server/memory/turn-memory";
 import {
   parseAssignmentId,
   parseSessionId,

@@ -29,6 +29,7 @@
     "testing"
   ],
   "packages": {
+    "areas/brain/contract": "areas/brain/contract",
     "areas/kitchen/contract": "areas/kitchen/contract",
     "areas/devices/contract": "areas/devices/contract",
     "areas/inbox/contract": "areas/inbox/contract",
@@ -116,12 +117,6 @@
     "areas/organisation/ui/pages/agent-console-shared.tsx",
     "areas/organisation/ui/pages/account-invitation-link.ts",
     "areas/cafe/server/contract/",
-    "areas/brain/server/memory/contract/",
-    "areas/brain/server/evals/scorer.ts",
-    "areas/brain/server/evals/contract/",
-    "areas/brain/ui/execution-client.ts",
-    "areas/brain/ui/features/brain/api.ts",
-    "areas/brain/ui/features/brain/address.ts",
     "areas/devices/server/contract/"
   ],
   "mixed": {
@@ -409,6 +404,7 @@
     "workspace_revision_receipt": "foundation/agent"
   },
   "rules": {
+    "areas/brain/contract/": "areas/brain/contract",
     "areas/kitchen/contract/": "areas/kitchen/contract",
     "areas/devices/contract/": "areas/devices/contract",
     "areas/inbox/contract/": "areas/inbox/contract",

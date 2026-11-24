@@ -93,7 +93,7 @@ import type {
   ClaimedEvalTask,
   EvalTaskEnd,
   EvalTaskServices,
-} from "@purin-labs/area-brain/server/evals/contract/eval-task";
+} from "@purin-labs/area-brain-contract/server/evals/eval-task";
 import { runMailboxEvalTask } from "@purin-labs/area-inbox/server/actors/eval-task-processing";
 import {
   establishConnectorEmailWatch,

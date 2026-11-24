@@ -3,8 +3,8 @@ import type { Env } from "@purin-labs/kernel/env";
 import {
   memoryService,
   type MemoryReadScope,
-} from "@purin-labs/area-brain/server/memory/contract/memory-service";
-import { type ShownMemoryRevision } from "@purin-labs/area-brain/server/memory/contract/turn-memory";
+} from "@purin-labs/area-brain-contract/server/memory/memory-service";
+import { type ShownMemoryRevision } from "@purin-labs/area-brain-contract/server/memory/turn-memory";
 import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   projectEmailReplyProposal,

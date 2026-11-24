@@ -61,7 +61,7 @@ import { memberMaySee } from "@purin-labs/conversation/chat/member-view";
 import {
   readNoTurnMemory,
   type ShownMemoryRevision,
-} from "./contract/turn-memory";
+} from "@purin-labs/area-brain-contract/server/memory/turn-memory";
 import {
   entityRefOrNull,
   memoryApplicabilityKey,
@@ -79,12 +79,12 @@ import type {
   MemoryCorrectionProposalResult,
   RecordScope,
   TurnMemoryReaderInput,
-} from "./contract/memory-service";
+} from "@purin-labs/area-brain-contract/server/memory/memory-service";
 
 export type {
   MemoryAccessError,
   TurnMemoryDestination,
-} from "./contract/memory-service";
+} from "@purin-labs/area-brain-contract/server/memory/memory-service";
 
 /**
  * A signed-in person whose live authority may read accepted Case context. It

@@ -31,7 +31,7 @@ import {
   type AgentOperationsSnapshot,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import { useBrainSummary } from "@purin-labs/area-brain/ui/brain-summary";
-import type { BrainTransport } from "@purin-labs/area-brain/ui/features/brain/api";
+import type { BrainTransport } from "@purin-labs/area-brain-contract/ui/features/brain/api";
 import {
   SAMPLE_EXECUTION_CASES,
   sampleCaseTimeline,

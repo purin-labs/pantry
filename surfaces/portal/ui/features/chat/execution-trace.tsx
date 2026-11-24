@@ -21,7 +21,7 @@ import {
   readExecutionNode,
   executionErrorMessage,
   type ReadCaseExecution,
-} from "@purin-labs/area-brain/ui/execution-client";
+} from "@purin-labs/area-brain-contract/ui/execution-client";
 import {
   nodeTitle,
   nodeStatus,

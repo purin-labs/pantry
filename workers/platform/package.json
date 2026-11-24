@@ -96,6 +96,7 @@
     "@purin-labs/area-inbox-contract": "workspace:*",
     "@purin-labs/area-devices-contract": "workspace:*",
     "@purin-labs/area-kitchen-contract": "workspace:*",
+    "@purin-labs/area-brain-contract": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

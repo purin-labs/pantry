@@ -36,7 +36,7 @@ import {
   readExecutionCases,
   readExecutionNode,
   type BrainTransport,
-} from "./api";
+} from "@purin-labs/area-brain-contract/ui/features/brain/api";
 import { ViewSwitch } from "@purin-labs/ui/time-lanes-frame";
 import {
   SideDrawer,

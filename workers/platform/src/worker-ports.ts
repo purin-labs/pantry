@@ -70,7 +70,7 @@ import {
   readMemoryViews,
   readShownMemoryStanding,
 } from "@purin-labs/area-brain/server/memory/access";
-import { memoryService } from "@purin-labs/area-brain/server/memory/contract/memory-service";
+import { memoryService } from "@purin-labs/area-brain-contract/server/memory/memory-service";
 import { CARD_ONLY_REPLY_INSTRUCTION } from "@purin-labs/tool-handlers/slack/card-only-reply";
 import {
   readSlackConversationFact,

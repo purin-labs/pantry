@@ -70,6 +70,9 @@ importers:
       '@purin-labs/area-brain':
         specifier: workspace:*
         version: link:../../areas/brain
+      '@purin-labs/area-brain-contract':
+        specifier: workspace:*
+        version: link:../../areas/brain/contract
       '@purin-labs/area-cafe':
         specifier: workspace:*
         version: link:../../areas/cafe
@@ -255,6 +258,9 @@ importers:
       '@purin-labs/agent':
         specifier: workspace:*
         version: link:../../foundation/agent
+      '@purin-labs/area-brain-contract':
+        specifier: workspace:*
+        version: link:contract
       '@purin-labs/area-inbox-contract':
         specifier: workspace:*
         version: link:../inbox/contract
@@ -300,6 +306,58 @@ importers:
       lucide-react:
         specifier: ^0.542.0
         version: 0.542.0(react@19.2.7)
+      react:
+        specifier: ^19.1.1
+        version: 19.2.7
+      react-router:
+        specifier: ^7.18.2
+        version: 7.18.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      '@types/react':
+        specifier: ^19.1.12
+        version: 19.2.17
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
+
+  areas/brain/contract:
+    dependencies:
+      '@purin-labs/agent':
+        specifier: workspace:*
+        version: link:../../../foundation/agent
+      '@purin-labs/authority':
+        specifier: workspace:*
+        version: link:../../../foundation/authority
+      '@purin-labs/commerce-client':
+        specifier: workspace:*
+        version: link:../../../packages/commerce-client
+      '@purin-labs/commerce-control-api':
+        specifier: workspace:*
+        version: link:../../../packages/commerce-control-api
+      '@purin-labs/control':
+        specifier: workspace:*
+        version: link:../../../foundation/control
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../../packages/control-api
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../../../foundation/kernel
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../../packages/std
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../../../foundation/tenancy
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../../packages/type-utils
+      '@purin-labs/ui':
+        specifier: workspace:*
+        version: link:../../../foundation/ui
       react:
         specifier: ^19.1.1
         version: 19.2.7
@@ -708,9 +766,9 @@ importers:
       '@purin-labs/agent-tools':
         specifier: workspace:*
         version: link:../../foundation/agent-tools
-      '@purin-labs/area-brain':
+      '@purin-labs/area-brain-contract':
         specifier: workspace:*
-        version: link:../brain
+        version: link:../brain/contract
       '@purin-labs/area-commerce-contract':
         specifier: workspace:*
         version: link:../commerce/contract
@@ -1142,9 +1200,9 @@ importers:
       '@purin-labs/agent':
         specifier: workspace:*
         version: link:../../foundation/agent
-      '@purin-labs/area-brain':
+      '@purin-labs/area-brain-contract':
         specifier: workspace:*
-        version: link:../brain
+        version: link:../brain/contract
       '@purin-labs/area-commerce-contract':
         specifier: workspace:*
         version: link:../commerce/contract
@@ -2222,6 +2280,9 @@ importers:
       '@purin-labs/area-brain':
         specifier: workspace:*
         version: link:../../areas/brain
+      '@purin-labs/area-brain-contract':
+        specifier: workspace:*
+        version: link:../../areas/brain/contract
       '@purin-labs/area-inbox':
         specifier: workspace:*
         version: link:../../areas/inbox
@@ -2289,6 +2350,9 @@ importers:
       '@purin-labs/area-brain':
         specifier: workspace:*
         version: link:../../areas/brain
+      '@purin-labs/area-brain-contract':
+        specifier: workspace:*
+        version: link:../../areas/brain/contract
       '@purin-labs/area-cafe':
         specifier: workspace:*
         version: link:../../areas/cafe
@@ -2416,9 +2480,9 @@ importers:
       '@purin-labs/agent-tools':
         specifier: workspace:*
         version: link:../../foundation/agent-tools
-      '@purin-labs/area-brain':
+      '@purin-labs/area-brain-contract':
         specifier: workspace:*
-        version: link:../../areas/brain
+        version: link:../../areas/brain/contract
       '@purin-labs/area-commerce':
         specifier: workspace:*
         version: link:../../areas/commerce
@@ -2717,6 +2781,9 @@ importers:
       '@purin-labs/area-brain':
         specifier: workspace:*
         version: link:../../areas/brain
+      '@purin-labs/area-brain-contract':
+        specifier: workspace:*
+        version: link:../../areas/brain/contract
       '@purin-labs/area-cafe':
         specifier: workspace:*
         version: link:../../areas/cafe

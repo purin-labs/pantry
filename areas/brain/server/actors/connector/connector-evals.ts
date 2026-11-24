@@ -20,7 +20,7 @@ import type {
   ClaimedEvalTask,
   EvalTaskEnd,
   EvalTaskServices,
-} from "../../evals/contract/eval-task";
+} from "@purin-labs/area-brain-contract/server/evals/eval-task";
 import { publishEvalRunResult, readEvalRunFixture } from "../../evals/access";
 import { createEvalTurnMemoryReader } from "../../memory/access";
 import { newRequestId } from "@purin-labs/kernel/ids";

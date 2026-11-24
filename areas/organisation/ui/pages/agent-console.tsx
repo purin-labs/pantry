@@ -3,7 +3,7 @@ import { SideDrawer } from "@purin-labs/ui/index";
 import React from "react";
 import { Link, useLocation } from "react-router";
 import { pageLink } from "@purin-labs/ui/page-address";
-import { brainAddress, brainAddressSearch } from "@purin-labs/area-brain/ui/features/brain/address";
+import { brainAddress, brainAddressSearch } from "@purin-labs/area-brain-contract/ui/features/brain/address";
 import {
   ArrowRight,
   CircleAlert,

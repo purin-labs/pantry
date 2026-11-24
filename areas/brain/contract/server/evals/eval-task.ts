@@ -11,7 +11,7 @@ import type { FlowLabel } from "@purin-labs/authority/policy/information-flow/in
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import type { CreateEvalTurnMemoryReader } from "../../memory/contract/memory-service";
+import type { CreateEvalTurnMemoryReader } from "../memory/memory-service";
 
 export type ConnectorEvalRun = Readonly<{
   runId: string;

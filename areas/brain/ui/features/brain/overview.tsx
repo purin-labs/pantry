@@ -4,7 +4,7 @@ import type { EvalView, MemoryView } from "@purin-labs/control-api";
 
 import { isPrimaryNavigationClick } from "@purin-labs/ui/console-sidebar";
 import { EmptyState } from "@purin-labs/ui/page-components";
-import type { KnowledgeState } from "./address";
+import type { KnowledgeState } from "@purin-labs/area-brain-contract/ui/features/brain/address";
 import { openEvalCandidate } from "./evals-model";
 import { KnowledgeRows, type KnowledgeLinks } from "./knowledge";
 import { evalRow, memoryRow, type KnowledgeRow } from "./knowledge-model";
