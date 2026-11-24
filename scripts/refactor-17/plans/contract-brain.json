@@ -1,0 +1,94 @@
+{
+  "about": "Refactor 17, Stage B: the public files of the area brain (the lines of contracts in scripts/layers.json) are the workspace package @purin-labs/area-brain-contract in areas/brain/contract, the contract of the area. The owner decided on 2026-11-24 that a contract imports only the foundation, outside packages and the contract of another area, and scripts/check-layers.mjs holds that rule. scripts/refactor-17/move-module.mjs reads this plan. moduleFrom: the public files of areas/brain that another area imports, and the public files that they import, belong to the plan, and --sync-plan adds each one; stays names each other public file, which stays public in the area (the scope that the owner approved on 2026-11-24). files: a Worker file goes to server/ and a Portal file to ui/, with its sub-path below server/ or ui/ of the area, less a folder contract/ (sourcePrefixes; movedFolders names each public folder that moves whole under another last name). package: the exports map gives each .ts file of server/ and of ui/, each style sheet of ui/, and each .tsx file, which another module imports; the dependencies are the packages that the files import. package.typeCheck false: the files read Env keys that the Actor files of the Worker merge, as the area package does; the Worker program and the Portal program check each file. edits: the source roots of the lints read the folders of the package.",
+  "module": "areas/brain/contract",
+  "moduleFrom": "areas/brain",
+  "target": "areas/brain/contract",
+  "workspaceEntry": "areas/*/contract",
+  "sourcePrefixes": {
+    "areas/brain/server/memory/contract/": "server/memory/",
+    "areas/brain/server/evals/contract/": "server/evals/",
+    "areas/brain/server/": "server/",
+    "areas/brain/ui/": "ui/"
+  },
+  "movedFolders": {
+    "areas/brain/server/memory/contract": "server/memory",
+    "areas/brain/server/evals/contract": "server/evals"
+  },
+  "package": {
+    "name": "@purin-labs/area-brain-contract",
+    "exports": {
+      "./server/*": {
+        "types": "./server/*.ts",
+        "default": "./server/*.ts"
+      },
+      "./ui/*": {
+        "types": "./ui/*.ts",
+        "default": "./ui/*.ts"
+      }
+    },
+    "dependencies": {
+      "@purin-labs/agent": "workspace:*",
+      "@purin-labs/authority": "workspace:*",
+      "@purin-labs/commerce-client": "workspace:*",
+      "@purin-labs/commerce-control-api": "workspace:*",
+      "@purin-labs/control": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/type-utils": "workspace:*",
+      "@purin-labs/ui": "workspace:*",
+      "react": "^19.1.1",
+      "react-router": "^7.18.2"
+    },
+    "devDependencies": ["@cloudflare/workers-types", "@types/react", "tsrs"],
+    "versionsFrom": [
+      "workers/platform/package.json",
+      "apps/portal/package.json"
+    ],
+    "tsconfig": {
+      "extends": "../../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": ["ESNext"],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": ["@cloudflare/workers-types"],
+        "allowImportingTsExtensions": true
+      },
+      "include": ["server/**/*.ts"]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Worker files of the contract package",
+      "find": "PLATFORM_SOURCE.push(\"areas/kitchen/contract/server\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"areas/kitchen/contract/server\");\n// The Worker side of the contract of the area brain (Refactor 17, Stage B).\nPLATFORM_SOURCE.push(\"areas/brain/contract/server\");\n"
+    },
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the Portal lints and the ESLint rules of the Portal source read the Portal files of the contract package",
+      "find": "PORTAL_SOURCE.push(\"areas/kitchen/contract/ui\");\n",
+      "replace": "PORTAL_SOURCE.push(\"areas/kitchen/contract/ui\");\n// The Portal side of the contract of the area brain (Refactor 17, Stage B).\nPORTAL_SOURCE.push(\"areas/brain/contract/ui\");\n"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": ["node", "scripts/check-layers.mjs", "--areas", "--write"],
+      "writes": ["docs/layers.md"]
+    }
+  ],
+  "files": {
+    "areas/brain/server/evals/contract/eval-task.ts": "server/evals/eval-task.ts",
+    "areas/brain/server/evals/scorer.ts": "server/evals/scorer.ts",
+    "areas/brain/server/memory/contract/memory-service.ts": "server/memory/memory-service.ts",
+    "areas/brain/server/memory/contract/turn-memory.ts": "server/memory/turn-memory.ts",
+    "areas/brain/ui/execution-client.ts": "ui/execution-client.ts",
+    "areas/brain/ui/features/brain/address.ts": "ui/features/brain/address.ts",
+    "areas/brain/ui/features/brain/api.ts": "ui/features/brain/api.ts"
+  }
+}
