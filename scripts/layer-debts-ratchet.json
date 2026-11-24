@@ -12,7 +12,7 @@
       "reads": 91
     },
     "surface-nonpublic": {
-      "imports": 245
+      "imports": 244
     },
     "area-package": {
       "imports": 75
@@ -129,7 +129,7 @@
         "imports surfaces/email -> areas/organisation": 1,
         "imports surfaces/portal -> areas/brain": 6,
         "imports surfaces/portal -> areas/cafe": 12,
-        "imports surfaces/portal -> areas/commerce": 32,
+        "imports surfaces/portal -> areas/commerce": 31,
         "imports surfaces/portal -> areas/devices": 2,
         "imports surfaces/portal -> areas/inbox": 5,
         "imports surfaces/portal -> areas/integrations": 28,

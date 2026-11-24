@@ -37,8 +37,7 @@ in an address is URL-encoded two times, so an id can hold a slash.
 | Entry                                                                                                   | Purpose                                                                               |
 | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
 | `/portal/square-pos-return`                                                                             | Returns from the Square Point of Sale app to the Register, with the answer of the app |
-| `/ecommerce`                                                                                            | A marketing page                                                                      |
-| `/workflow-simulator`, `/bakery`, `/floor-plans`, or an address with `?demo=1` other than the two above | The workflow demo, with no sign-in                                                    |
+| `/workflow-simulator`, `/bakery`, `/floor-plans`, or an address with `?demo=1` other than the one above | The workflow demo, with no sign-in                                                    |
 | `/docs/privacy`, `/docs/terms`, `/docs/deletion`, `/docs/contact`                                       | The public policy pages                                                               |
 | `/identity/link`                                                                                        | The page that links a Slack account to a Pantry person                                |
 
@@ -420,7 +419,6 @@ drawer. It shares the theme tokens.
 - 309 lines in 37 Portal CSS files outside `dev/` hold a hex colour, against the rule
   for raw shades.
 - The server sends an empty `today` list. Home items have no assignee.
-- Old names remain on the `/ecommerce` page.
 
 ## Sources
 

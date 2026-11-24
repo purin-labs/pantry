@@ -9,8 +9,8 @@
     "mitten": "Seams Mitten",
     "host": "seams.sh",
     "tagline": "The bakery operating system for modern pâtisseries & cafés.",
-    "wordmark_svg": "../../../apps/portal/public/ecommerce/seams-wordmark.svg",
-    "fonts_dir": "../../../apps/portal/public/ecommerce/fonts"
+    "wordmark_svg": "seams-wordmark.svg",
+    "fonts_dir": "fonts"
   },
   "deck": {
     "title": "Seams Pantry — Craft Bakery Storyboard Deck",

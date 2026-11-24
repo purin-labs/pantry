@@ -308,9 +308,6 @@ exported `PurinMark` and `PurinIcon`.
 **The commerce engine in Portal text:** `areas/organisation/ui/pages/automation.tsx` and
 `areas/commerce/ui/features/commerce/production-plan.tsx` show these words to people.
 
-**Seams text in the Portal:** the public `/ecommerce` page uses the Seams name, wordmark
-and `seams.sh` links.
-
 **Domains:** The QR order pages are at `<shop name>.menu.purin.io`; the wildcard DNS
 record, its certificate and the release of the route are not done. The local `PANTRY_PROVIDER_INGRESS_ORIGIN` is still the
 Square sandbox tunnel `square-sandbox-webhook.seams.sh`. The shop site is `shop.purin.io`.

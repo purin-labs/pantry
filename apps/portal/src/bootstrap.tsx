@@ -29,13 +29,6 @@ async function renderApplication(pathname: string): Promise<void> {
     );
     return;
   }
-  if (pathname === "/ecommerce" || pathname === "/ecommerce/") {
-    const { EcommercePage } =
-      await import("@purin-labs/area-commerce/ui/features/ecommerce/page");
-    document.title = "Ecommerce Agents · Seams";
-    portalRoot.render(<EcommercePage />);
-    return;
-  }
   const searchParams = new URLSearchParams(window.location.search);
   if (
     /^\/(workflow-simulator|bakery|floor-plans)\/?$/u.test(pathname) ||

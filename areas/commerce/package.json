@@ -23,7 +23,6 @@
     "./ui/features/commerce/inventory": "./ui/features/commerce/inventory.tsx",
     "./ui/features/commerce/price-allowance": "./ui/features/commerce/price-allowance.tsx",
     "./ui/features/commerce/production-plan": "./ui/features/commerce/production-plan.tsx",
-    "./ui/features/ecommerce/page": "./ui/features/ecommerce/page.tsx",
     "./ui/features/governed-actions/cafe-menu-details": "./ui/features/governed-actions/cafe-menu-details.tsx",
     "./ui/features/governed-actions/chat-commerce-action-card": "./ui/features/governed-actions/chat-commerce-action-card.tsx",
     "./ui/features/governed-actions/commerce-action-status": "./ui/features/governed-actions/commerce-action-status.tsx",

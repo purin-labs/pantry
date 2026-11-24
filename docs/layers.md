@@ -227,7 +227,7 @@ import. A module with no line for one of these has none.
 
 ## areas/commerce
 
-- Folders: 30
+- Folders: 29
   - `areas/commerce/server/`
   - `areas/commerce/server/actors/`
   - `areas/commerce/server/actors/commerce-projection/`
@@ -252,7 +252,6 @@ import. A module with no line for one of these has none.
   - `areas/commerce/ui/features/commerce/`
   - `areas/commerce/ui/features/commerce/description-draft/`
   - `areas/commerce/ui/features/commerce/entity-plane/`
-  - `areas/commerce/ui/features/ecommerce/`
   - `areas/commerce/ui/features/governed-actions/`
   - `areas/commerce/ui/features/orders/`
   - `areas/commerce/ui/features/payment-accounts/`

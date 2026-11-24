@@ -84,7 +84,6 @@ async function reviewPortalPages(page) {
       ready: ".invitation-facts",
     },
     { name: "missing-page", path: `${workspace}/missing`, ready: "h1" },
-    { name: "ecommerce", path: "/ecommerce", ready: "#h2-eco-hero-title" },
   ];
   const pages = [...workspacePages, ...previewPages];
   const results = [];
@@ -140,9 +139,7 @@ async function reviewPortalPages(page) {
     .waitFor();
   await page.getByText("Hokkaido Flour Mill", { exact: true }).waitFor();
   await page.screenshot({ path: `${artifacts}/stock-detail-narrow.png` });
-  await page
-    .getByRole("button", { name: "Close", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Close", exact: true }).click();
   if ((await search.inputValue()) !== "Hokkaido")
     throw new Error("Closing stock detail lost the active search.");
 

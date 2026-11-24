@@ -21,10 +21,10 @@ undone. The organisation `purin-io` was never made on GitHub.
 
 ## The split
 
-| Organisation | Brand | Repositories | Local folder |
-|---|---|---|---|
-| `seams-tech` (stays) | Seams | `seams-wallet`, `speak-to-sign`, `seams-sdk` (archived). Also the archived history of Pantry: `pantry-history` and `satyr` | `~/Dev/rust` |
-| `purin-labs` (new) | Purin | `pantry`, `monorepo` (moved from `seams-tech/seams-monorepo`: site, Console, wallet deploy) | `~/Dev/purin-labs` |
+| Organisation         | Brand | Repositories                                                                                                               | Local folder       |
+| -------------------- | ----- | -------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| `seams-tech` (stays) | Seams | `seams-wallet`, `speak-to-sign`, `seams-sdk` (archived). Also the archived history of Pantry: `pantry-history` and `satyr` | `~/Dev/rust`       |
+| `purin-labs` (new)   | Purin | `pantry`, `monorepo` (moved from `seams-tech/seams-monorepo`: site, Console, wallet deploy)                                | `~/Dev/purin-labs` |
 
 The npm organisations follow the same line. The wallet packages keep the
 `@seams` scope. `@purin-labs` is for Purin packages; Pantry publishes none
@@ -210,9 +210,8 @@ empty folder"):
    uses the free minutes of `purin-labs`.
 4. **The legacy `satyr` names in the code:** group A is done; group B
    waits for [Plan 93](plan-93-clean-cutover.md) step 2.
-5. **The Portal shop footer** links to `https://github.com/seams-tech`
-   (`apps/portal/src/features/ecommerce/footer.tsx`). Change it with the
-   brand rename.
+5. **The Portal shop footer** (done): the public `/ecommerce` page and its
+   footer are deleted.
 
 ### The wallet side (done)
 

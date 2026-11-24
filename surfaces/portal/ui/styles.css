@@ -7413,9 +7413,6 @@ textarea:focus-visible {
       .workspace-switcher-group,
       .task-list,
       .chat-composer-toolbar details,
-      .navbar-static__group,
-      .ecommerce-mobile-group,
-      .ecommerce-mobile-navigation,
       .agent-work-row,
       .connection-advanced,
       .workflow-batch-delay
@@ -7462,9 +7459,6 @@ textarea:focus-visible {
           .workspace-switcher-group,
           .task-list,
           .chat-composer-toolbar details,
-          .navbar-static__group,
-          .ecommerce-mobile-group,
-          .ecommerce-mobile-navigation,
           .agent-work-row,
           .connection-advanced,
           .workflow-batch-delay
