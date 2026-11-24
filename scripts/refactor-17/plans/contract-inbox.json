@@ -1,0 +1,107 @@
+{
+  "about": "Refactor 17, Stage B: the public files of the area inbox (the lines of contracts in scripts/layers.json) are the workspace package @purin-labs/area-inbox-contract in areas/inbox/contract, the contract of the area. The owner decided on 2026-11-24 that a contract imports only the foundation, outside packages and the contract of another area, and scripts/check-layers.mjs holds that rule. scripts/refactor-17/move-module.mjs reads this plan. moduleFrom: the public files of areas/inbox that another area imports, and the public files that they import, belong to the plan, and --sync-plan adds each one; stays names each other public file, which stays public in the area (the scope that the owner approved on 2026-11-24). files: a Worker file goes to server/ and a Portal file to ui/, with its sub-path below server/ or ui/ of the area, less a folder contract/ (sourcePrefixes; movedFolders names each public folder that moves whole under another last name). package: the exports map gives each .ts file of server/ and of ui/, each style sheet of ui/, and each .tsx file, which another module imports; the dependencies are the packages that the files import. package.typeCheck false: the files read Env keys that the Actor files of the Worker merge, as the area package does; the Worker program and the Portal program check each file. edits: the source roots of the lints read the folders of the package.",
+  "module": "areas/inbox/contract",
+  "moduleFrom": "areas/inbox",
+  "target": "areas/inbox/contract",
+  "workspaceEntry": "areas/*/contract",
+  "sourcePrefixes": {
+    "areas/inbox/server/mail-inbox/contract/": "server/",
+    "areas/inbox/ui/features/mail-setup/": "ui/features/mail-setup/",
+    "areas/inbox/server/": "server/",
+    "areas/inbox/ui/": "ui/"
+  },
+  "movedFolders": {},
+  "stays": [
+    "areas/inbox/server/mail-inbox/contract/gmail-inference-eligibility.ts",
+    "areas/inbox/server/mail-inbox/contract/gmail-model-reviews.ts",
+    "areas/inbox/ui/features/mail-setup/run.ts",
+    "areas/inbox/ui/features/mail-setup/turn-on.ts"
+  ],
+  "package": {
+    "name": "@purin-labs/area-inbox-contract",
+    "exports": {
+      "./server/*": {
+        "types": "./server/*.ts",
+        "default": "./server/*.ts"
+      },
+      "./ui/*": {
+        "types": "./ui/*.ts",
+        "default": "./ui/*.ts"
+      },
+      "./ui/features/email-review/review": "./ui/features/email-review/review.tsx",
+      "./ui/features/mail-setup/model-consent": "./ui/features/mail-setup/model-consent.tsx"
+    },
+    "dependencies": {
+      "@purin-labs/agent": "workspace:*",
+      "@purin-labs/authority": "workspace:*",
+      "@purin-labs/connections": "workspace:*",
+      "@purin-labs/contracts": "workspace:*",
+      "@purin-labs/control": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/type-utils": "workspace:*",
+      "@purin-labs/ui": "workspace:*",
+      "react": "^19.1.1"
+    },
+    "devDependencies": ["@cloudflare/workers-types", "@types/react", "tsrs"],
+    "versionsFrom": [
+      "workers/platform/package.json",
+      "apps/portal/package.json"
+    ],
+    "tsconfig": {
+      "extends": "../../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": ["ESNext"],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": ["@cloudflare/workers-types"],
+        "allowImportingTsExtensions": true
+      },
+      "include": ["server/**/*.ts"]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Worker files of the contract package",
+      "find": "PLATFORM_SOURCE.push(\"areas/commerce/contract/server\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"areas/commerce/contract/server\");\n// The Worker side of the contract of the area inbox (Refactor 17, Stage B).\nPLATFORM_SOURCE.push(\"areas/inbox/contract/server\");\n"
+    },
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the Portal lints and the ESLint rules of the Portal source read the Portal files of the contract package",
+      "find": "PORTAL_SOURCE.push(\"areas/commerce/contract/ui\");\n",
+      "replace": "PORTAL_SOURCE.push(\"areas/commerce/contract/ui\");\n// The Portal side of the contract of the area inbox (Refactor 17, Stage B).\nPORTAL_SOURCE.push(\"areas/inbox/contract/ui\");\n"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": ["node", "scripts/check-layers.mjs", "--areas", "--write"],
+      "writes": ["docs/layers.md"]
+    }
+  ],
+  "files": {
+    "areas/inbox/server/mail-inbox/contract/account-erasure.ts": "server/account-erasure.ts",
+    "areas/inbox/server/mail-inbox/contract/connection-parts.ts": "server/connection-parts.ts",
+    "areas/inbox/server/mail-inbox/contract/connector-ids.ts": "server/connector-ids.ts",
+    "areas/inbox/server/mail-inbox/contract/control-authority.ts": "server/control-authority.ts",
+    "areas/inbox/server/mail-inbox/contract/inbox-services.ts": "server/inbox-services.ts",
+    "areas/inbox/server/mail-inbox/contract/mail-inference-eligibility.ts": "server/mail-inference-eligibility.ts",
+    "areas/inbox/server/mail-inbox/contract/mail-source-authorization.ts": "server/mail-source-authorization.ts",
+    "areas/inbox/server/mail-inbox/contract/verified-contacts.ts": "server/verified-contacts.ts",
+    "areas/inbox/ui/features/email-review/api.ts": "ui/features/email-review/api.ts",
+    "areas/inbox/ui/features/email-review/decision-labels.ts": "ui/features/email-review/decision-labels.ts",
+    "areas/inbox/ui/features/email-review/review.tsx": "ui/features/email-review/review.tsx",
+    "areas/inbox/ui/features/mail-setup/model-consent.tsx": "ui/features/mail-setup/model-consent.tsx",
+    "areas/inbox/ui/features/mail-setup/model.ts": "ui/features/mail-setup/model.ts",
+    "areas/inbox/ui/features/mail-setup/use-mailbox-setup.ts": "ui/features/mail-setup/use-mailbox-setup.ts",
+    "areas/inbox/ui/pages/agent-mailbox.ts": "ui/pages/agent-mailbox.ts",
+    "areas/inbox/ui/whatsapp.ts": "ui/whatsapp.ts"
+  }
+}
