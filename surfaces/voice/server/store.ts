@@ -6,6 +6,7 @@ import {
   VOICE_REQUEST_LIMIT,
   type VoiceEngineId,
   VOICE_REQUEST_WINDOW_MS,
+  VOICE_MAC_HEARTBEAT_FRESH_MS,
   type VoiceMacHeartbeat,
   type VoiceMacView,
 } from "@purin-labs/control-api";
@@ -20,8 +21,11 @@ import {
 import type { UserId } from "@purin-labs/control-api/ids";
 
 const CODE_TTL_MS = 15 * 60_000;
-/** A Mac sends a heartbeat every 60 s. After three missed, it does not answer. */
-export const MAC_HEARTBEAT_FRESH_MS = 3 * 60_000;
+/**
+ * A heartbeat that changes no reported field writes the row at most this
+ * often (`VOICE_MAC_HEARTBEAT_FRESH_MS` allows for it).
+ */
+const MAC_HEARTBEAT_WRITE_MS = 5 * 60_000;
 /** A call that never finished does not hold the member's one request forever. */
 const IN_FLIGHT_MS = 60_000;
 const USE_RETENTION_MS = 90 * 24 * 60 * 60_000;
@@ -195,7 +199,7 @@ export async function readAnsweringVoiceMac(
           AND private_address IS NOT NULL AND last_heartbeat_at > ?
         ORDER BY last_heartbeat_at DESC, mac_id LIMIT 1`,
     )
-    .bind(organisationId, now - MAC_HEARTBEAT_FRESH_MS)
+    .bind(organisationId, now - VOICE_MAC_HEARTBEAT_FRESH_MS)
     .first<MacRow>();
   return row === null ? null : macFromRow(row);
 }
@@ -283,12 +287,17 @@ export async function readVoiceMacByCredential(
   return row === null ? null : macFromRow(row);
 }
 
-/** It returns the engine that a manager chose for the Mac. */
+/**
+ * It writes the row when a reported field changed, else at most every
+ * `MAC_HEARTBEAT_WRITE_MS`, so an idle Mac writes one row in five minutes.
+ * It returns the engine that a manager chose for the Mac.
+ */
 export async function recordVoiceMacHeartbeat(
   db: OrganisationDatabase,
   input: Readonly<{
     organisationId: OrganisationId;
-    macId: string;
+    /** The row that the Mac's credential read for this request. */
+    mac: VoiceMac;
     heartbeat: VoiceMacHeartbeat;
     /** Null while the DNS record does not yet hold the new address. */
     privateAddress: string | null;
@@ -300,10 +309,14 @@ export async function recordVoiceMacHeartbeat(
   const row = await db
     .prepare(
       `UPDATE voice_mac
-          SET last_heartbeat_at = ?, service_version = ?, model_state = ?,
-              engine = ?, engines = ?,
-              private_address = coalesce(?, private_address)
-        WHERE mac_id = ? AND organisation_id = ? AND state = 'enrolled'
+          SET last_heartbeat_at = ?1, service_version = ?2, model_state = ?3,
+              engine = ?4, engines = ?5,
+              private_address = coalesce(?6, private_address)
+        WHERE mac_id = ?7 AND organisation_id = ?8 AND state = 'enrolled'
+          AND (last_heartbeat_at IS NULL OR last_heartbeat_at <= ?9
+               OR service_version IS NOT ?2 OR model_state IS NOT ?3
+               OR engine IS NOT ?4 OR engines IS NOT ?5
+               OR (?6 IS NOT NULL AND private_address IS NOT ?6))
         RETURNING engine_choice`,
     )
     .bind(
@@ -313,11 +326,14 @@ export async function recordVoiceMacHeartbeat(
       engine,
       JSON.stringify(input.heartbeat.engines ?? [engine]),
       input.privateAddress,
-      input.macId,
+      input.mac.macId,
       input.organisationId,
+      input.now - MAC_HEARTBEAT_WRITE_MS,
     )
     .first<{ engine_choice: string | null }>();
-  return isVoiceEngineId(row?.engine_choice)
+  // No write: the row that the credential read holds the current choice.
+  if (row === null) return input.mac.engineChoice;
+  return isVoiceEngineId(row.engine_choice)
     ? row.engine_choice
     : DEFAULT_MAC_VOICE_ENGINE;
 }

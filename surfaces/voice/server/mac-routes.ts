@@ -148,7 +148,7 @@ async function heartbeat(
     (await putVoiceMacAddress(env, caller.hostname, body.privateAddress));
   const engineChoice = await recordVoiceMacHeartbeat(caller.database, {
     organisationId: caller.organisationId,
-    macId: caller.mac.macId,
+    mac: caller.mac,
     heartbeat: body,
     privateAddress: placed ? body.privateAddress : null,
     now: Date.now(),

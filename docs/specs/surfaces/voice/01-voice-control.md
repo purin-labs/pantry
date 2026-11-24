@@ -157,7 +157,11 @@ administrator.
    key.
 5. Every 60 s, the Mac sends its private address, version, model state and engines. The
    Platform never calls the Mac. If the address changes, the Platform updates the DNS
-   name.
+   name. The Platform writes the Mac's row when a reported field changes, else at most
+   every 5 minutes. The Mac counts as answering for 8 minutes after the last write, so
+   after a Mac stops, the Devices page and a new grant can still name it for up to 8
+   minutes. The Portal's own check of the Mac every 30 s finds the stop first and uses
+   the fallback.
 
 The Portal reaches the Mac at `https://<nameId>.voice.<zone>`. The DNS record holds the
 Mac's private IPv4 address, and the Platform refuses a public address.
@@ -339,7 +343,8 @@ commands.
 | Shortest hold, tail after a release                  | 180 ms, 240 ms                               | `HOLD_MINIMUM_MS`, `HOLD_RELEASE_TAIL_MS`                                                              |
 | Mac check, during a load, its timeout                | 30 s, 3 s, 3 s                               | `CHECK_MS`, `CHECK_WHILE_LOADING_MS`, `CHECK_TIMEOUT_MS`                                               |
 | New grant margin, Mac voice wait, chat open wait     | 2 minutes, 5 s, 10 s                         | `GRANT_MARGIN_MS`, `SPEECH_DEADLINE_MS`, `OPEN_WAIT_MS`                                                |
-| Grant, enrollment code, Mac counts as answering      | 10, 15, 3 minutes                            | `VOICE_GRANT_TTL_MS`, `CODE_TTL_MS`, `MAC_HEARTBEAT_FRESH_MS`                                          |
+| Grant, enrollment code, Mac counts as answering      | 10, 15, 8 minutes                            | `VOICE_GRANT_TTL_MS`, `CODE_TTL_MS`, `VOICE_MAC_HEARTBEAT_FRESH_MS`                                    |
+| Heartbeat write when no reported field changed       | At most every 5 minutes                      | `MAC_HEARTBEAT_WRITE_MS`                                                                               |
 | Audio, fallback body, commands for each member       | 15 s, 481,024 bytes, 60 in 10 minutes        | `VOICE_AUDIO_SECONDS_LIMIT`, `VOICE_BODY_BYTE_LIMIT`, `VOICE_REQUEST_LIMIT`, `VOICE_REQUEST_WINDOW_MS` |
 | Open fallback call, vocabulary wait, Workers AI wait | 60 s, 800 ms, 20 s                           | `IN_FLIGHT_MS`, `VOCABULARY_WAIT_MS`, `CALL_DEADLINE_MS`                                               |
 | Vocabulary cache, DNS record TTL                     | 5 minutes, 60 s                              | `CACHE_MS`, `RECORD_TTL_SECONDS`                                                                       |
@@ -410,7 +415,6 @@ The talk key works only while the page is in front.
 - **Smaller Macs.** Plan 82C measured the engines on an M4 Pro. A Mac with less memory is
   not measured.
 - **Known faults in the code:**
-  - Each Mac heartbeat writes one D1 row, also when nothing changed.
   - A heartbeat 401 does not always mean a revoke. The Platform also answers 401 if the
     Organisation scope does not resolve, for example at a placement conflict, or if a
     `VOICE_DNS_*` setting is missing. After five such answers, an enrolled Mac deletes

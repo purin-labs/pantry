@@ -3,6 +3,7 @@ import {
   parseVoiceMacEnrollmentStart,
   parseVoiceMacList,
   VOICE_ENGINES,
+  VOICE_MAC_HEARTBEAT_FRESH_MS,
   type ChatTranscriptionPath,
   type VoiceEngineId,
   type VoiceMacEnrollmentStart,
@@ -591,7 +592,7 @@ function macStatus(mac: VoiceMacView): MacStatus {
     return { tone: "wait", text: "Waiting for the install" };
   if (mac.lastHeartbeatAt === null)
     return { tone: "wait", text: "Installed. No answer yet." };
-  if (Date.now() - mac.lastHeartbeatAt > 3 * 60_000)
+  if (Date.now() - mac.lastHeartbeatAt > VOICE_MAC_HEARTBEAT_FRESH_MS)
     return { tone: "problem", text: "Does not answer" };
   const engine = VOICE_ENGINES[mac.engine ?? DEFAULT_MAC_VOICE_ENGINE].label;
   if (mac.modelState === "downloading")

@@ -2,7 +2,10 @@ import { Type, type Static, type TSchema } from "typebox";
 import { NonNegativeInteger } from "@purin-labs/contract-schema";
 import { Value } from "typebox/value";
 
-import { VOICE_VOCABULARY_LIMITS, voiceEngineIdSchema } from "./voice-engines.ts";
+import {
+  VOICE_VOCABULARY_LIMITS,
+  voiceEngineIdSchema,
+} from "./voice-engines.ts";
 
 /**
  * Portal voice control (Plan 82): the shapes of the grant and fallback routes
@@ -18,6 +21,13 @@ export const VOICE_REQUEST_WINDOW_MS = 10 * 60_000;
 /** The smallest term limit of the speech engines (`voice-engines.ts`). */
 export const VOICE_VOCABULARY_TERM_LIMIT = VOICE_VOCABULARY_LIMITS.terms;
 export const VOICE_GRANT_TTL_MS = 10 * 60_000;
+/**
+ * A shop Mac counts as answering for this long after its last recorded
+ * heartbeat. The Mac beats every 60 s, and the Platform records a beat that
+ * changes nothing at most every five minutes, so this covers one recording
+ * interval and three missed beats.
+ */
+export const VOICE_MAC_HEARTBEAT_FRESH_MS = 8 * 60_000;
 /** The request header that names the member's device on a fallback call. */
 export const VOICE_DEVICE_HEADER = "x-pantry-voice-device";
 

@@ -1,11 +1,15 @@
-import type { DeviceConnection, DeviceView } from "@purin-labs/control-api";
+import {
+  VOICE_MAC_HEARTBEAT_FRESH_MS,
+  type DeviceConnection,
+  type DeviceView,
+} from "@purin-labs/control-api";
 
 import type { ShopMacDevice } from "@purin-labs/area-devices/server/contract/shop-mac-devices";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { voiceMacHostname } from "./dns";
-import { listVoiceMacs, MAC_HEARTBEAT_FRESH_MS, type VoiceMac } from "./store";
+import { listVoiceMacs, type VoiceMac } from "./store";
 import type { Variant } from "@purin-labs/type-utils";
 
 type ShopMacDeviceView = Variant<DeviceView, "shop_mac">;
@@ -43,7 +47,7 @@ function shopMacView(
   const connection: DeviceConnection =
     mac.lastHeartbeatAt === null
       ? { state: "never_connected" }
-      : now - mac.lastHeartbeatAt <= MAC_HEARTBEAT_FRESH_MS
+      : now - mac.lastHeartbeatAt <= VOICE_MAC_HEARTBEAT_FRESH_MS
         ? { state: "connected", lastHeardAt: mac.lastHeartbeatAt }
         : { state: "offline", lastHeardAt: mac.lastHeartbeatAt };
   const hostname = mayReadNetwork ? voiceMacHostname(env, mac.nameId) : null;

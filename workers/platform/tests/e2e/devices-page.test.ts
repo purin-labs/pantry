@@ -3,6 +3,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { afterEach, beforeEach, expect, it } from "vitest";
 import {
   parseDeviceList,
+  VOICE_MAC_HEARTBEAT_FRESH_MS,
   type DeviceList,
   type DeviceView,
 } from "@purin-labs/control-api";
@@ -19,7 +20,6 @@ import { isRecord } from "@purin-labs/std";
 import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { activateTerminalAssignment } from "@purin-labs/area-cafe/server/data/terminal-assignment-store";
-import { MAC_HEARTBEAT_FRESH_MS } from "@purin-labs/surface-voice/server/store";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {
   commerceClient,
@@ -41,8 +41,10 @@ import {
  * Plan 85 Phase 1, journey J1. A shop has a menu screen, a shop Mac and a Square
  * Terminal, each made through its own product path. All three show in one
  * list. The list says which need attention, and a viewer does not learn where
- * the Mac is on the network. A person outside the Organisation sees nothing,
- * and a revoked Mac leaves the list.
+ * the Mac is on the network. A Mac whose heartbeats change nothing stays
+ * connected between its five-minute records, and goes offline after eight
+ * silent minutes. A person outside the Organisation sees nothing, and a
+ * revoked Mac leaves the list.
  */
 it(
   "shows a shop's screen, Mac and terminal in one list, with the Mac's address for admins only",
@@ -194,11 +196,48 @@ async function devicesJourney(): Promise<void> {
   const refused = await send(`${base}/devices`, outsider.session, "GET");
   expect(refused.status).toBe(404);
 
-  // 9. A silent Mac becomes offline and needs attention.
-  await scope.database
-    .prepare("UPDATE voice_mac SET last_heartbeat_at = ? WHERE mac_id = ?")
-    .bind(Date.now() - MAC_HEARTBEAT_FRESH_MS - 1_000, macId)
-    .run();
+  // 9. A heartbeat that changes nothing records the Mac at most every five
+  // minutes, and the Mac stays connected in between. A changed field shows at
+  // once.
+  const setLastHeard = (at: number) =>
+    scope.database
+      .prepare("UPDATE voice_mac SET last_heartbeat_at = ? WHERE mac_id = ?")
+      .bind(at, macId)
+      .run();
+  const beat = async (modelState: "loaded" | "unloaded") => {
+    const answer = await voiceMacRequest(credential, "heartbeat", "POST", {
+      privateAddress: "192.168.1.20",
+      serviceVersion: "0.2.0",
+      modelState,
+    });
+    expect(answer.status, await answer.clone().text()).toBe(200);
+  };
+  const connectedMac = async () => {
+    const mac = requireDevice(await readList(base, owner.session), macId);
+    if (mac.kind !== "shop_mac" || mac.connection.state !== "connected")
+      throw new Error(JSON.stringify(mac));
+    return { modelState: mac.modelState, heard: mac.connection.lastHeardAt };
+  };
+  const fourMinutesAgo = Date.now() - 4 * 60_000;
+  await setLastHeard(fourMinutesAgo);
+  await beat("loaded");
+  expect(await connectedMac()).toEqual({
+    modelState: "loaded",
+    heard: fourMinutesAgo,
+  });
+  const beforeChange = Date.now();
+  await beat("unloaded");
+  const changed = await connectedMac();
+  expect(changed.modelState).toBe("unloaded");
+  expect(changed.heard).toBeGreaterThanOrEqual(beforeChange);
+  const fiveMinutesAgo = Date.now() - 5 * 60_000 - 1_000;
+  await setLastHeard(fiveMinutesAgo);
+  const beforeInterval = Date.now();
+  await beat("unloaded");
+  expect((await connectedMac()).heard).toBeGreaterThanOrEqual(beforeInterval);
+
+  // 10. A silent Mac becomes offline and needs attention.
+  await setLastHeard(Date.now() - VOICE_MAC_HEARTBEAT_FRESH_MS - 1_000);
   expect(
     requireDevice(await readList(base, owner.session), macId),
   ).toMatchObject({
@@ -206,7 +245,7 @@ async function devicesJourney(): Promise<void> {
     connection: { state: "offline" },
   });
 
-  // 10. A revoked Mac leaves the list.
+  // 11. A revoked Mac leaves the list.
   const revoked = await send(
     `${base}/voice/macs/${macId}/revoke`,
     owner.session,
@@ -220,7 +259,7 @@ async function devicesJourney(): Promise<void> {
   );
   expect(afterRevoke.devices).toHaveLength(2);
 
-  // 11. The list only reads.
+  // 12. The list only reads.
   const write = await send(`${base}/devices`, owner.session, "POST", {});
   expect(write.status).toBe(405);
 }
