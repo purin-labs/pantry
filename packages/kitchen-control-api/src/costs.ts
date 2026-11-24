@@ -3,6 +3,7 @@ import {
   recordParser,
   NonNegativeInteger,
   PositiveInteger,
+  textLimit,
 } from "@purin-labs/contract-schema";
 import { isRecord } from "@purin-labs/std";
 import { recipeRevisionResourceSchema } from "@purin-labs/commerce-contracts/records/api-food-service";
@@ -117,8 +118,8 @@ export const weekUnitsSchema = Type.Tuple([
 export type WeekUnits = Static<typeof weekUnitsSchema>;
 
 export const productCostFormulasSchema = Type.Record(
-  Type.String({ minLength: 1, maxLength: 24 }),
-  Type.String({ minLength: 1, maxLength: 160 }),
+  textLimit(Type.String({ minLength: 1, maxLength: 24 })),
+  textLimit(Type.String({ minLength: 1, maxLength: 160 })),
 );
 
 export const productCostPlanEntrySchema = Type.Object({

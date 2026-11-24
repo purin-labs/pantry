@@ -3,6 +3,7 @@ import {
   recordParser,
   NonNegativeInteger,
   PositiveInteger,
+  textLimit,
 } from "@purin-labs/contract-schema";
 
 /**
@@ -11,8 +12,8 @@ import {
  * these shapes.
  */
 
-const id = Type.String({ minLength: 1, maxLength: 255 });
-const name = Type.String({ minLength: 1, maxLength: 120 });
+const id = textLimit(Type.String({ minLength: 1, maxLength: 255 }));
+const name = textLimit(Type.String({ minLength: 1, maxLength: 120 }));
 const workflowId = Type.String({ pattern: "^[a-z0-9][a-z0-9-]{0,127}$" });
 const kitchenLocation = Type.String({
   pattern: "^[\\p{L}\\p{N}][\\p{L}\\p{N} _-]{0,63}$",
@@ -48,7 +49,7 @@ const decisionInputSchema = Type.Union([
   Type.Object(
     {
       decision: Type.Literal("reject"),
-      reason: Type.String({ minLength: 1, maxLength: 500 }),
+      reason: textLimit(Type.String({ minLength: 1, maxLength: 500 })),
     },
     { additionalProperties: false },
   ),
@@ -125,7 +126,7 @@ const proposalSchema = Type.Object({
   caseId: Type.String({ minLength: 1 }),
   workflowId,
   workflowRevision: PositiveInteger,
-  workflowDigest: Type.String({ minLength: 64, maxLength: 64 }),
+  workflowDigest: textLimit(Type.String({ minLength: 64, maxLength: 64 })),
   quantityPieces: PositiveInteger,
   mouldGroups: PositiveInteger,
   piecesPerGroup: PositiveInteger,
