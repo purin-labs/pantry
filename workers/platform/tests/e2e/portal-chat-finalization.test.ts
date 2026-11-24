@@ -176,7 +176,11 @@ async function sessionOriginJourney(
     await expect
       .poll(originResponsePhase.bind(null, model), { timeout: 15_000 })
       .toBe("paused");
-    const running = await readConversation(fixtureDatabase(), scope, CONVERSATION_ID);
+    const running = await readConversation(
+      fixtureDatabase(),
+      scope,
+      CONVERSATION_ID,
+    );
     if (running?.conversation.work.kind !== "running")
       throw new Error("Expected the origin-bound turn to be running");
     const stream = running.conversation.work.stream;
@@ -216,15 +220,19 @@ async function sessionOriginJourney(
       .toBe("failed");
     const revokedModelRequests = model.discoveries.length + 1;
     expect(model.calls).toBe(revokedModelRequests);
-    const frozen = await readConversation(fixtureDatabase(), scope, CONVERSATION_ID);
+    const frozen = await readConversation(
+      fixtureDatabase(),
+      scope,
+      CONVERSATION_ID,
+    );
     expect(JSON.stringify(frozen?.conversation.timeline)).not.toContain(
       REVOKED_TEXT,
     );
     expect(
       (
-        await fixtureDatabase().prepare(
-          "SELECT effect_id FROM bakery_surface_effect_delivery",
-        ).all()
+        await fixtureDatabase()
+          .prepare("SELECT effect_id FROM bakery_surface_effect_delivery")
+          .all()
       ).results,
     ).toEqual([]);
     const identities = await deriveDirectCaseIdentities(
@@ -265,15 +273,20 @@ async function sessionOriginJourney(
     expect(await readOriginBinding(stream.sessionId, stream.turnId)).toBe(
       origin,
     );
-    const replacement = await fixtureDatabase().prepare(
-      "SELECT control_session_id FROM session_turn_access WHERE organisation_id = ? AND session_id <> ?",
-    )
+    const replacement = await fixtureDatabase()
+      .prepare(
+        "SELECT control_session_id FROM session_turn_access WHERE organisation_id = ? AND session_id <> ?",
+      )
       .bind(ORGANISATION_ID, stream.sessionId)
       .first<{ control_session_id: string }>();
     expect(replacement?.control_session_id).toBe(
       fresh.session.controlSessionId,
     );
-    const completed = await readConversation(fixtureDatabase(), scope, CONVERSATION_ID);
+    const completed = await readConversation(
+      fixtureDatabase(),
+      scope,
+      CONVERSATION_ID,
+    );
     if (completed === null) throw new Error("Missing completed fresh request");
     expect(
       timelineVisibleMessages(completed.conversation)
@@ -331,9 +344,10 @@ async function readOriginBinding(
   sessionId: string,
   turnId: string,
 ): Promise<string | null> {
-  const row = await fixtureDatabase().prepare(
-    "SELECT control_session_id FROM session_turn_access WHERE organisation_id = ? AND session_id = ? AND turn_id = ?",
-  )
+  const row = await fixtureDatabase()
+    .prepare(
+      "SELECT control_session_id FROM session_turn_access WHERE organisation_id = ? AND session_id = ? AND turn_id = ?",
+    )
     .bind(ORGANISATION_ID, sessionId, turnId)
     .first<{ control_session_id: string }>();
   return row?.control_session_id ?? null;
@@ -423,9 +437,10 @@ async function manualSessionOriginJourney(
     await expect
       .poll(originResponsePhase.bind(null, model), { timeout: 15_000 })
       .toBe("paused");
-    const origin = await fixtureDatabase().prepare(
-      "SELECT session_id, turn_id FROM session_turn_access WHERE organisation_id = ? AND control_session_id = ? AND origin_kind = 'operator_session'",
-    )
+    const origin = await fixtureDatabase()
+      .prepare(
+        "SELECT session_id, turn_id FROM session_turn_access WHERE organisation_id = ? AND control_session_id = ? AND origin_kind = 'operator_session'",
+      )
       .bind(ORGANISATION_ID, session.session.controlSessionId)
       .first<{ session_id: string; turn_id: string }>();
     if (origin === null) throw new Error("Missing manual origin binding");
@@ -495,9 +510,10 @@ async function manualSessionOriginJourney(
       expect(slack.ok).toBe(true);
       expect(model.calls).toBe(3);
       expect(
-        await fixtureDatabase().prepare(
-          "SELECT control_session_id FROM session_turn_access WHERE organisation_id = ? AND origin_kind = 'slack_operator'",
-        )
+        await fixtureDatabase()
+          .prepare(
+            "SELECT control_session_id FROM session_turn_access WHERE organisation_id = ? AND origin_kind = 'slack_operator'",
+          )
           .bind(ORGANISATION_ID)
           .first(),
       ).toEqual({ control_session_id: null });
@@ -698,7 +714,11 @@ it(
         ]),
       },
     });
-    const stored = await readConversation(fixtureDatabase(), scope, conversationId);
+    const stored = await readConversation(
+      fixtureDatabase(),
+      scope,
+      conversationId,
+    );
     if (stored?.conversation.work.kind !== "running")
       throw new Error("Expected running request");
     const stream = stored.conversation.work.stream;
@@ -738,11 +758,11 @@ it(
     if (disconnectedReplay.body === null)
       throw new Error("Missing disconnect-test response body");
     await disconnectedReplay.body.cancel();
-    expect(await readConversation(fixtureDatabase(), scope, conversationId)).toMatchObject(
-      {
-        conversation: { work: { kind: "running", requestId } },
-      },
-    );
+    expect(
+      await readConversation(fixtureDatabase(), scope, conversationId),
+    ).toMatchObject({
+      conversation: { work: { kind: "running", requestId } },
+    });
     const interruptedReplay = await readChatEndpoint(
       session,
       `/stream?conversation=${conversationId}&request=${requestId}&after=-1`,
@@ -967,7 +987,11 @@ it(
     expect(counts?.userInputBytes).toBeLessThanOrEqual(11_000);
     // The Case's execution shows the turn as the Session's journal records
     // it. The Pi route records each interruption as its own attempt.
-    const executed = await readConversation(fixtureDatabase(), scope, conversationId);
+    const executed = await readConversation(
+      fixtureDatabase(),
+      scope,
+      conversationId,
+    );
     if (executed === null) throw new Error("Missing executed conversation");
     const resumedExecution = await verifyResumedTurnExecution({
       organisationId: ORGANISATION_ID,
@@ -996,7 +1020,11 @@ it(
       ),
       preparations: 2,
     });
-    const completed = await readConversation(fixtureDatabase(), scope, conversationId);
+    const completed = await readConversation(
+      fixtureDatabase(),
+      scope,
+      conversationId,
+    );
     if (completed === null || draftUpdatedAt === null)
       throw new Error("Missing completed conversation or saved draft");
     expect(completed.conversation.draftText).toBe(AUTOMATIC_CONTEXT_DRAFT);
@@ -1089,9 +1117,11 @@ function isAutomaticContextUser(message: { kind: string }): boolean {
 }
 
 async function preparationCount(): Promise<number> {
-  const count = await fixtureDatabase().prepare(
-    "SELECT COUNT(*) AS count FROM bakery_surface_effect_delivery WHERE json_extract(effect_json, '$.command.kind') = 'prepare_context'",
-  ).first<{ count: number }>();
+  const count = await fixtureDatabase()
+    .prepare(
+      "SELECT COUNT(*) AS count FROM bakery_surface_effect_delivery WHERE json_extract(effect_json, '$.command.kind') = 'prepare_context'",
+    )
+    .first<{ count: number }>();
   if (count === null) throw new Error("Missing preparation count");
   return count.count;
 }
@@ -1489,7 +1519,11 @@ async function liveAutomaticContext({ task }: TestContext): Promise<void> {
       })
     ).status,
   ).toBe(200);
-  const comparing = await readConversation(fixtureDatabase(), scope, conversationId);
+  const comparing = await readConversation(
+    fixtureDatabase(),
+    scope,
+    conversationId,
+  );
   if (comparing?.conversation.work.kind !== "running")
     throw new Error("Missing comparison session");
   const comparisonStream = comparing.conversation.work.stream;
@@ -1498,7 +1532,11 @@ async function liveAutomaticContext({ task }: TestContext): Promise<void> {
       timeout: 100_000,
     })
     .toMatch(/^(ready|failed|cancelled)$/);
-  const comparison = await readConversation(fixtureDatabase(), scope, conversationId);
+  const comparison = await readConversation(
+    fixtureDatabase(),
+    scope,
+    conversationId,
+  );
   if (comparison === null) throw new Error("Missing comparison conversation");
   const comparisonReplies = timelineVisibleMessages(comparison.conversation)
     .filter(isAssistant)
@@ -1515,9 +1553,9 @@ async function liveAutomaticContext({ task }: TestContext): Promise<void> {
     comparisonActor.value,
     readAutomaticComparisonHistory,
   );
-  const beforeReveal = await fixtureDatabase().prepare(
-    "SELECT COUNT(*) AS count FROM bakery_surface_effect_delivery",
-  ).first<{ count: number }>();
+  const beforeReveal = await fixtureDatabase()
+    .prepare("SELECT COUNT(*) AS count FROM bakery_surface_effect_delivery")
+    .first<{ count: number }>();
   Object.assign(task.meta, {
     automaticComparisonEvidence: {
       route: "real_pi",
@@ -1618,7 +1656,11 @@ async function liveAutomaticContext({ task }: TestContext): Promise<void> {
       { timeout: 180_000, interval: 100 },
     )
     .toMatch(/^(ready|failed|cancelled)$/);
-  const stored = await readConversation(fixtureDatabase(), scope, conversationId);
+  const stored = await readConversation(
+    fixtureDatabase(),
+    scope,
+    conversationId,
+  );
   if (stored === null) throw new Error("Missing real Pi conversation");
   const replies = timelineVisibleMessages(stored.conversation)
     .filter(isAssistant)
@@ -1644,9 +1686,9 @@ async function liveAutomaticContext({ task }: TestContext): Promise<void> {
   expect(replies.length).toBeGreaterThan(0);
   expect(receipts.some(isPreparedContextReceipt)).toBe(true);
   expect(receipts.some(isCompletedContextReceipt)).toBe(true);
-  const deliveries = await fixtureDatabase().prepare(
-    "SELECT receipt_json FROM bakery_surface_effect_delivery",
-  ).all<{ receipt_json: string | null }>();
+  const deliveries = await fixtureDatabase()
+    .prepare("SELECT receipt_json FROM bakery_surface_effect_delivery")
+    .all<{ receipt_json: string | null }>();
   for (const delivery of deliveries.results)
     expect(JSON.parse(delivery.receipt_json ?? "null")).not.toMatchObject({
       outcome: { kind: "delivery_failed" },
@@ -1899,9 +1941,11 @@ async function blockedContext(
       timeout: 25_000,
     })
     .toBe("ready");
-  const deliveries = await fixtureDatabase().prepare(
-    "SELECT effect_json, receipt_json FROM bakery_surface_effect_delivery",
-  ).all<{ effect_json: string; receipt_json: string | null }>();
+  const deliveries = await fixtureDatabase()
+    .prepare(
+      "SELECT effect_json, receipt_json FROM bakery_surface_effect_delivery",
+    )
+    .all<{ effect_json: string; receipt_json: string | null }>();
   expect(deliveries.results).toHaveLength(browser === "absent" ? 1 : 0);
   page.close();
   // An excluded browser gets no command, so its page hears none.
@@ -2014,7 +2058,11 @@ it.for(["cancel", "revoke"] as const)(
     );
     if (preparation.command.kind !== "prepare_context")
       throw new Error("Expected preparation");
-    const stored = await readConversation(fixtureDatabase(), scope, conversationId);
+    const stored = await readConversation(
+      fixtureDatabase(),
+      scope,
+      conversationId,
+    );
     if (stored?.conversation.work.kind !== "running")
       throw new Error("Expected running request");
     const stream = stored.conversation.work.stream;
@@ -2042,9 +2090,10 @@ it.for(["cancel", "revoke"] as const)(
       );
       expect(response.status).toBe(200);
     } else
-      await fixtureDatabase().prepare(
-        "UPDATE service_role_grant SET status = 'revoked', revoked_at = ? WHERE organisation_id = ? AND user_id = ?",
-      )
+      await fixtureDatabase()
+        .prepare(
+          "UPDATE service_role_grant SET status = 'revoked', revoked_at = ? WHERE organisation_id = ? AND user_id = ?",
+        )
         .bind(Date.now(), ORGANISATION_ID, SLACK_ACTOR_USER_ID)
         .run();
     const ready = await createBakerySurfaceReceipt(preparation, {
@@ -2054,9 +2103,11 @@ it.for(["cancel", "revoke"] as const)(
     });
     const late = await postSurfaceReceipt(session, ready);
     expect(late.status).toBe(action === "cancel" ? 409 : 404);
-    const commands = await fixtureDatabase().prepare(
-      "SELECT effect_id FROM bakery_surface_effect_delivery WHERE json_extract(effect_json, '$.command.kind') != 'prepare_context'",
-    ).all();
+    const commands = await fixtureDatabase()
+      .prepare(
+        "SELECT effect_id FROM bakery_surface_effect_delivery WHERE json_extract(effect_json, '$.command.kind') != 'prepare_context'",
+      )
+      .all();
     expect(commands.results).toEqual([]);
     Object.assign(task.meta, {
       automaticContextEvidence: {
@@ -2095,11 +2146,13 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
     ),
   );
   const first = command("request_long_root", "Produce a long response.");
-  await fixtureDatabase().prepare(
-    `CREATE TRIGGER fail_session_preparation
+  await fixtureDatabase()
+    .prepare(
+      `CREATE TRIGGER fail_session_preparation
     BEFORE INSERT ON durable_object_registry WHEN NEW.object_kind = 'session'
     BEGIN SELECT RAISE(ABORT, 'e2e_session_preparation_unavailable'); END`,
-  ).run();
+    )
+    .run();
   const admittedAt = Date.now();
   const admitted = await send(session, first);
   expect(admitted.status).toBe(200);
@@ -2142,12 +2195,18 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
   ).toBe(200);
 
   // A real D1 failure after canonical Session/Case completion, before publication.
-  await fixtureDatabase().prepare(
-    `CREATE TRIGGER fail_chat_projection BEFORE UPDATE ON portal_conversation
+  await fixtureDatabase()
+    .prepare(
+      `CREATE TRIGGER fail_chat_projection BEFORE UPDATE ON portal_conversation
     WHEN NEW.conversation_id = '${CONVERSATION_ID}' AND json_extract(NEW.state_json, '$.work.kind') = 'ready'
     BEGIN SELECT RAISE(ABORT, 'e2e_projection_unavailable'); END`,
-  ).run();
-  const running = await readConversation(fixtureDatabase(), scope, CONVERSATION_ID);
+    )
+    .run();
+  const running = await readConversation(
+    fixtureDatabase(),
+    scope,
+    CONVERSATION_ID,
+  );
   if (running?.conversation.work.kind !== "running")
     throw new Error("Turn was not admitted");
   const stream = running.conversation.work.stream;
@@ -2197,8 +2256,8 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
       value: { acceptedProposalIds: [expect.any(String)] },
     });
   expect(
-    (await readConversation(fixtureDatabase(), scope, CONVERSATION_ID))?.conversation.work
-      .kind,
+    (await readConversation(fixtureDatabase(), scope, CONVERSATION_ID))
+      ?.conversation.work.kind,
   ).toBe("running");
   expect(model.calls).toBe(1 + model.discoveries.length);
 
@@ -2206,9 +2265,12 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
   await fixtureDatabase().exec("DROP TRIGGER fail_chat_projection");
   expect(await runDurableObjectAlarm(actorCase.value)).toBe(true);
   await expect
-    .poll(readConversation.bind(null, fixtureDatabase(), scope, CONVERSATION_ID), {
-      timeout: 15_000,
-    })
+    .poll(
+      readConversation.bind(null, fixtureDatabase(), scope, CONVERSATION_ID),
+      {
+        timeout: 15_000,
+      },
+    )
     .toMatchObject({
       conversation: {
         work: { kind: "ready" },
@@ -2216,7 +2278,11 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
         completedRequests: ["request_long_root", "request_long_followup"],
       },
     });
-  const recovered = await readConversation(fixtureDatabase(), scope, CONVERSATION_ID);
+  const recovered = await readConversation(
+    fixtureDatabase(),
+    scope,
+    CONVERSATION_ID,
+  );
   expect(
     (recovered ? timelineVisibleMessages(recovered.conversation) : undefined)
       ?.filter(isAssistant)
@@ -2341,9 +2407,10 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
     error: "chat_projection_capacity",
   });
   expect(model.calls).toBe(3 + model.discoveries.length);
-  const storedCapacity = await fixtureDatabase().prepare(
-    "SELECT state_json FROM portal_conversation WHERE conversation_id = ?",
-  )
+  const storedCapacity = await fixtureDatabase()
+    .prepare(
+      "SELECT state_json FROM portal_conversation WHERE conversation_id = ?",
+    )
     .bind(capacityId)
     .first<{ state_json: string }>();
   expect(storedCapacity?.state_json).not.toContain('"messages":');
@@ -2368,7 +2435,9 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
   await expect
     .poll(modelPhase.bind(null, model), { timeout: 20000 })
     .toBe("second_step");
-  expect(await readConversation(fixtureDatabase(), scope, multistepId)).toMatchObject({
+  expect(
+    await readConversation(fixtureDatabase(), scope, multistepId),
+  ).toMatchObject({
     conversation: { work: { kind: "running", stream: { step: 1 } } },
   });
   const secondStepReplay = await readChatEndpoint(
@@ -2667,7 +2736,11 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
     recapture.context.surfaceSessionId,
   );
   expect(simulationEffect.command.kind).toBe("simulate_workcell");
-  const runningSimulation = await readConversation(fixtureDatabase(), scope, playbackChat);
+  const runningSimulation = await readConversation(
+    fixtureDatabase(),
+    scope,
+    playbackChat,
+  );
   const simulationWork = runningSimulation?.conversation.work;
   if (simulationWork?.kind !== "running")
     throw new Error("Simulation is not running");
@@ -2932,11 +3005,18 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
     .run();
   model.releaseRevoked.resolve();
   await expect
-    .poll(readConversation.bind(null, fixtureDatabase(), scope, CONVERSATION_ID), {
-      timeout: 15_000,
-    })
+    .poll(
+      readConversation.bind(null, fixtureDatabase(), scope, CONVERSATION_ID),
+      {
+        timeout: 15_000,
+      },
+    )
     .toMatchObject({ conversation: { work: { kind: "failed" } } });
-  const revoked = await readConversation(fixtureDatabase(), scope, CONVERSATION_ID);
+  const revoked = await readConversation(
+    fixtureDatabase(),
+    scope,
+    CONVERSATION_ID,
+  );
   expect(
     (revoked ? timelineVisibleMessages(revoked.conversation) : undefined)
       ?.filter(isAssistant)
@@ -3398,12 +3478,16 @@ async function fixture(maxTokens?: number): Promise<{
             )
             .bind(maxTokens, maxTokens, ORGANISATION_ID),
         ]),
-    fixtureDatabase().prepare(
-      "UPDATE service_role_grant SET role = 'admin' WHERE organisation_id = ? AND user_id = ?",
-    ).bind(ORGANISATION_ID, SLACK_ACTOR_USER_ID),
-    fixtureDatabase().prepare(
-      "UPDATE organisation_onboarding SET lifecycle = 'active', activation_attempt_id = NULL, readiness_version = NULL, activation_receipt_id = 'receipt_chat', activated_at = ? WHERE organisation_id = ?",
-    ).bind(now, ORGANISATION_ID),
+    fixtureDatabase()
+      .prepare(
+        "UPDATE service_role_grant SET role = 'admin' WHERE organisation_id = ? AND user_id = ?",
+      )
+      .bind(ORGANISATION_ID, SLACK_ACTOR_USER_ID),
+    fixtureDatabase()
+      .prepare(
+        "UPDATE organisation_onboarding SET lifecycle = 'active', activation_attempt_id = NULL, readiness_version = NULL, activation_receipt_id = 'receipt_chat', activated_at = ? WHERE organisation_id = ?",
+      )
+      .bind(now, ORGANISATION_ID),
   ]);
   const grant = await createAccessGrant({
     db: fixtureDatabase(),
@@ -3610,7 +3694,11 @@ async function moveProjectContextChat(
   projectId: string | null,
 ): Promise<Response> {
   const directory = await readProjectDirectory(fixtureDatabase(), scope);
-  const stored = await readConversation(fixtureDatabase(), scope, conversationId);
+  const stored = await readConversation(
+    fixtureDatabase(),
+    scope,
+    conversationId,
+  );
   if (stored === null) throw new Error("Missing project chat");
   return requestEndpoint(
     session,
@@ -3624,7 +3712,8 @@ async function moveProjectContextChat(
       // Null returns the chat to the Organisation's default Project.
       destination: {
         projectId:
-          projectId ?? (await requireDefaultProjectId(fixtureDatabase(), ORGANISATION_ID)),
+          projectId ??
+          (await requireDefaultProjectId(fixtureDatabase(), ORGANISATION_ID)),
       },
       insertion: { kind: "end" },
     },
@@ -3905,15 +3994,24 @@ async function finishProjectContextJourney(input: {
     input.actor,
   );
   expect(
-    await readConversation(fixtureDatabase(), input.scope, forkEvidence.destinationId),
+    await readConversation(
+      fixtureDatabase(),
+      input.scope,
+      forkEvidence.destinationId,
+    ),
   ).toBeNull();
   expect(
-    await readConversation(fixtureDatabase(), input.scope, forkEvidence.nestedId),
+    await readConversation(
+      fixtureDatabase(),
+      input.scope,
+      forkEvidence.nestedId,
+    ),
   ).toBeNull();
   expect(
-    await fixtureDatabase().prepare(
-      "SELECT COUNT(*) AS count FROM portal_chat_fork WHERE organisation_id = ? AND history_json IS NOT NULL",
-    )
+    await fixtureDatabase()
+      .prepare(
+        "SELECT COUNT(*) AS count FROM portal_chat_fork WHERE organisation_id = ? AND history_json IS NOT NULL",
+      )
       .bind(ORGANISATION_ID)
       .first("count"),
   ).toBe(0);
@@ -3967,12 +4065,27 @@ async function resolveOriginalProjectContext(
 }
 
 function stageLegacyProjectContext(_actor: unknown, state: DurableObjectState) {
-  const leaseRow = state.storage.sql.exec<{lease_projection: string}>("SELECT lease_projection FROM session_harness_lease LIMIT 1").toArray()[0];
-  const continuationRow = state.storage.sql.exec<{request_envelope: string}>("SELECT request_envelope FROM session_turn_continuation").toArray()[0];
-  const lease = leaseRow === undefined ? null : parsePersistedHarnessTurnLease(JSON.parse(leaseRow.lease_projection));
-  const continuation = continuationRow === undefined ? null : parseContinuation(JSON.parse(continuationRow.request_envelope));
-  if (lease === null || continuation === null) throw new Error("Admitted turn missing");
-  const pending = {lease, continuation};
+  const leaseRow = state.storage.sql
+    .exec<{ lease_projection: string }>(
+      "SELECT lease_projection FROM session_harness_lease LIMIT 1",
+    )
+    .toArray()[0];
+  const continuationRow = state.storage.sql
+    .exec<{ request_envelope: string }>(
+      "SELECT request_envelope FROM session_turn_continuation",
+    )
+    .toArray()[0];
+  const lease =
+    leaseRow === undefined
+      ? null
+      : parsePersistedHarnessTurnLease(JSON.parse(leaseRow.lease_projection));
+  const continuation =
+    continuationRow === undefined
+      ? null
+      : parseContinuation(JSON.parse(continuationRow.request_envelope));
+  if (lease === null || continuation === null)
+    throw new Error("Admitted turn missing");
+  const pending = { lease, continuation };
   const row = state.storage.sql
     .exec<{ bundle_json: string }>(
       "SELECT bundle_json FROM session_turn_context WHERE turn_id = ?",
@@ -4071,7 +4184,11 @@ async function verifyProjectChatDeletion(
   conversationId: string,
   actor: DurableObjectStub<SessionDO>,
 ): Promise<void> {
-  const stored = await readConversation(fixtureDatabase(), scope, conversationId);
+  const stored = await readConversation(
+    fixtureDatabase(),
+    scope,
+    conversationId,
+  );
   if (stored === null) throw new Error("Missing deletable chat");
   const identities = await deriveDirectCaseIdentities(
     `${ORGANISATION_ID}:portal-chat:${scope.userId}:${conversationId}`,
@@ -4125,9 +4242,10 @@ async function verifyProjectChatDeletion(
       ]),
     });
     expect(
-      await fixtureDatabase().prepare(
-        "SELECT status FROM portal_chat_deletion WHERE conversation_id = ?",
-      )
+      await fixtureDatabase()
+        .prepare(
+          "SELECT status FROM portal_chat_deletion WHERE conversation_id = ?",
+        )
         .bind(conversationId)
         .first("status"),
     ).toBe("failed");
@@ -4143,7 +4261,9 @@ async function verifyProjectChatDeletion(
   expect(
     (await projectChatMetadata(session, conversationId, deletion)).status,
   ).toBe(200);
-  expect(await readConversation(fixtureDatabase(), scope, conversationId)).toBeNull();
+  expect(
+    await readConversation(fixtureDatabase(), scope, conversationId),
+  ).toBeNull();
   const settled = await readChatEndpoint(session, "");
   expect(await settled.json()).toMatchObject({ pendingDeletions: [] });
   const privateState = await runInDurableObject(
@@ -4357,13 +4477,19 @@ async function proveThreadForking(
     digest: fork.digest,
   });
   expect(
-    (await readConversation(fixtureDatabase(), input.scope, input.conversationId))
-      ?.conversation.work.kind,
+    (
+      await readConversation(
+        fixtureDatabase(),
+        input.scope,
+        input.conversationId,
+      )
+    )?.conversation.work.kind,
   ).toBe("running");
   // Recreate the persisted interruption window after publication, before receipt settlement.
-  await fixtureDatabase().prepare(
-    "UPDATE portal_chat_fork SET status = 'prepared', conversation_json = ? WHERE destination_conversation_id = ?",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE portal_chat_fork SET status = 'prepared', conversation_json = ? WHERE destination_conversation_id = ?",
+    )
     .bind(JSON.stringify(destination.conversation), fork.conversationId)
     .run();
   await evictDurableObject(input.actor);
@@ -4386,9 +4512,10 @@ async function proveThreadForking(
     ).status,
   ).toBe(409);
   expect(
-    await fixtureDatabase().prepare(
-      "SELECT COUNT(*) AS count FROM portal_chat_fork WHERE operation_id = ?",
-    )
+    await fixtureDatabase()
+      .prepare(
+        "SELECT COUNT(*) AS count FROM portal_chat_fork WHERE operation_id = ?",
+      )
       .bind(operation.operationId)
       .first("count"),
   ).toBe(1);
@@ -4599,9 +4726,10 @@ async function proveThreadForking(
     ).status,
   ).toBe(200);
   // Simulate grant revocation after both branches have completed.
-  await fixtureDatabase().prepare(
-    "UPDATE access_grant SET lifecycle = 'revoked', reason = 'fork access test', revision = revision + 1 WHERE organisation_id = ? AND lifecycle = 'active' AND json_extract(target_json, '$.capabilityId') = ?",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE access_grant SET lifecycle = 'revoked', reason = 'fork access test', revision = revision + 1 WHERE organisation_id = ? AND lifecycle = 'active' AND json_extract(target_json, '$.capabilityId') = ?",
+    )
     .bind(ORGANISATION_ID, CONTEXT_CASE_READ_CAPABILITY)
     .run();
   expect(
@@ -4632,9 +4760,10 @@ async function proveThreadForking(
     reason: "source_policy_denied",
   });
   expect(evidence.prompts).toHaveLength(callsBeforeFork + 3);
-  await fixtureDatabase().prepare(
-    "UPDATE access_grant SET lifecycle = 'active', reason = NULL, revision = revision + 1 WHERE organisation_id = ? AND reason = 'fork access test'",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE access_grant SET lifecycle = 'active', reason = NULL, revision = revision + 1 WHERE organisation_id = ? AND reason = 'fork access test'",
+    )
     .bind(ORGANISATION_ID)
     .run();
   expect(
@@ -4666,16 +4795,14 @@ async function proveThreadForking(
   };
 }
 
-type SourceCheckpointEvidence =
-  | Readonly<{
-      kind: "checkpointed";
-      sessionId: string;
-      checkpointKey: string;
-      checkpointDigest: string;
-      historyDigest: string;
-      summaries: number;
-    }>
-;
+type SourceCheckpointEvidence = Readonly<{
+  kind: "checkpointed";
+  sessionId: string;
+  checkpointKey: string;
+  checkpointDigest: string;
+  historyDigest: string;
+  summaries: number;
+}>;
 
 function checkpointSourceBinding(
   binding: import("@purin-labs/agent/chat/fork-history").ChatHistoryBinding,
@@ -4783,14 +4910,19 @@ async function proveUnavailableForkPrefix(
   expect(evidence.prompts).toHaveLength(callsBefore);
   expect(evidence.compactionRequests).toHaveLength(summariesBefore);
   for (const operationId of ["fork_bad_cursor", "fork_missing_prefix"]) {
-    const row = await fixtureDatabase().prepare(
-      "SELECT destination_conversation_id FROM portal_chat_fork WHERE organisation_id = ? AND operation_id = ? AND status = 'failed'",
-    )
+    const row = await fixtureDatabase()
+      .prepare(
+        "SELECT destination_conversation_id FROM portal_chat_fork WHERE organisation_id = ? AND operation_id = ? AND status = 'failed'",
+      )
       .bind(scope.organisationId, operationId)
       .first<{ destination_conversation_id: string }>();
     if (row === null) throw new Error("Missing failed fork receipt");
     expect(
-      await readConversation(fixtureDatabase(), scope, row.destination_conversation_id),
+      await readConversation(
+        fixtureDatabase(),
+        scope,
+        row.destination_conversation_id,
+      ),
     ).toBeNull();
   }
 }
@@ -4817,9 +4949,10 @@ async function replaceSourceHistoryBindings(
   conversationId: string,
   bindings: string,
 ): Promise<void> {
-  await fixtureDatabase().prepare(
-    "UPDATE portal_conversation SET state_json = json_set(state_json, '$.historyBindings', json(?)) WHERE organisation_id = ? AND user_id = ? AND conversation_id = ?",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE portal_conversation SET state_json = json_set(state_json, '$.historyBindings', json(?)) WHERE organisation_id = ? AND user_id = ? AND conversation_id = ?",
+    )
     .bind(bindings, scope.organisationId, scope.userId, conversationId)
     .run();
 }
@@ -4854,7 +4987,11 @@ async function stopForkSource(
   scope: ConversationScope,
   conversationId: string,
 ): Promise<void> {
-  const source = await readConversation(fixtureDatabase(), scope, conversationId);
+  const source = await readConversation(
+    fixtureDatabase(),
+    scope,
+    conversationId,
+  );
   const work = source?.conversation.work;
   if (work?.kind !== "running")
     throw new Error("Fork source must be running before Stop");
@@ -4899,9 +5036,10 @@ async function restoreForkWithTextAttachment(
   scope: ConversationScope,
   conversationId: string,
 ): Promise<string> {
-  const row = await fixtureDatabase().prepare(
-    "SELECT history_json FROM portal_chat_fork WHERE organisation_id = ? AND user_id = ? AND destination_conversation_id = ? AND status = 'ready'",
-  )
+  const row = await fixtureDatabase()
+    .prepare(
+      "SELECT history_json FROM portal_chat_fork WHERE organisation_id = ? AND user_id = ? AND destination_conversation_id = ? AND status = 'ready'",
+    )
     .bind(scope.organisationId, scope.userId, conversationId)
     .first<{ history_json: string }>();
   if (row === null) throw new Error("Missing restored fork fixture");
@@ -4997,18 +5135,22 @@ async function restoreForkWithTextAttachment(
   await env.ARCHIVE.put(image.value.objectKey, imageBytes);
   // Restore a retained-file fixture before its first destination turn; Portal has no file-upload command.
   await fixtureDatabase().batch([
-    fixtureDatabase().prepare(
-      "UPDATE portal_chat_fork SET history_json = ?, digest = ? WHERE organisation_id = ? AND user_id = ? AND destination_conversation_id = ?",
-    ).bind(
-      JSON.stringify(restored),
-      digest,
-      scope.organisationId,
-      scope.userId,
-      conversationId,
-    ),
-    fixtureDatabase().prepare(
-      "UPDATE portal_conversation SET state_json = json_set(state_json, '$.lineage.digest', ?) WHERE organisation_id = ? AND user_id = ? AND conversation_id = ?",
-    ).bind(digest, scope.organisationId, scope.userId, conversationId),
+    fixtureDatabase()
+      .prepare(
+        "UPDATE portal_chat_fork SET history_json = ?, digest = ? WHERE organisation_id = ? AND user_id = ? AND destination_conversation_id = ?",
+      )
+      .bind(
+        JSON.stringify(restored),
+        digest,
+        scope.organisationId,
+        scope.userId,
+        conversationId,
+      ),
+    fixtureDatabase()
+      .prepare(
+        "UPDATE portal_conversation SET state_json = json_set(state_json, '$.lineage.digest', ?) WHERE organisation_id = ? AND user_id = ? AND conversation_id = ?",
+      )
+      .bind(digest, scope.organisationId, scope.userId, conversationId),
   ]);
   return digest;
 }
@@ -5120,7 +5262,11 @@ async function inspectAttachmentOriginJourney(
     await expect
       .poll(attachmentOriginPhase.bind(null, model), { timeout: 15_000 })
       .toBe("paused");
-    const running = await readConversation(fixtureDatabase(), scope, conversationId);
+    const running = await readConversation(
+      fixtureDatabase(),
+      scope,
+      conversationId,
+    );
     if (running?.conversation.work.kind !== "running")
       throw new Error("Missing running attachment turn");
     const stream = running.conversation.work.stream;
@@ -5193,9 +5339,10 @@ async function inspectAttachmentOriginJourney(
         { timeout: 15_000 },
       )
       .toBe("ready");
-    const origin = await fixtureDatabase().prepare(
-      "SELECT session_id FROM session_turn_access WHERE organisation_id = ? AND control_session_id = ? AND conversation_id = ?",
-    )
+    const origin = await fixtureDatabase()
+      .prepare(
+        "SELECT session_id FROM session_turn_access WHERE organisation_id = ? AND control_session_id = ? AND conversation_id = ?",
+      )
       .bind(
         ORGANISATION_ID,
         fresh.session.controlSessionId,
@@ -5404,9 +5551,10 @@ async function capturedReadOriginJourney(
   await installAutomaticContextCommerce(
     `merchant_bakery_c3_origin_${boundary}`,
   );
-  const connection = await fixtureDatabase().prepare(
-    "SELECT integration_account_id FROM commerce_merchant_binding WHERE organisation_id = ?",
-  )
+  const connection = await fixtureDatabase()
+    .prepare(
+      "SELECT integration_account_id FROM commerce_merchant_binding WHERE organisation_id = ?",
+    )
     .bind(ORGANISATION_ID)
     .first<{ integration_account_id: string }>();
   if (connection === null) throw new Error("Missing commerce origin fixture");
@@ -5443,7 +5591,11 @@ async function capturedReadOriginJourney(
     await expect
       .poll(capturedReadOriginPhase.bind(null, model), { timeout: 15_000 })
       .toBe("paused");
-    const running = await readConversation(fixtureDatabase(), scope, conversationId);
+    const running = await readConversation(
+      fixtureDatabase(),
+      scope,
+      conversationId,
+    );
     if (running?.conversation.work.kind !== "running")
       throw new Error("Missing captured read turn");
     const stream = running.conversation.work.stream;
@@ -5498,9 +5650,10 @@ async function capturedReadOriginJourney(
         { timeout: 15_000 },
       )
       .toBe("ready");
-    const origin = await fixtureDatabase().prepare(
-      "SELECT session_id FROM session_turn_access WHERE organisation_id = ? AND control_session_id = ? AND conversation_id = ?",
-    )
+    const origin = await fixtureDatabase()
+      .prepare(
+        "SELECT session_id FROM session_turn_access WHERE organisation_id = ? AND control_session_id = ? AND conversation_id = ?",
+      )
       .bind(
         ORGANISATION_ID,
         fresh.session.controlSessionId,
@@ -5521,9 +5674,10 @@ async function capturedReadOriginJourney(
     // accepted histories: the revoked turn failed with the tool results it
     // had, and the fresh turn completed with its own.
     const chatCase = async (conversation: string) => {
-      const row = await fixtureDatabase().prepare(
-        "SELECT case_id FROM portal_conversation WHERE organisation_id = ? AND conversation_id = ?",
-      )
+      const row = await fixtureDatabase()
+        .prepare(
+          "SELECT case_id FROM portal_conversation WHERE organisation_id = ? AND conversation_id = ?",
+        )
         .bind(ORGANISATION_ID, conversation)
         .first<{ case_id: string }>();
       if (row === null) throw new Error("Missing chat Case");

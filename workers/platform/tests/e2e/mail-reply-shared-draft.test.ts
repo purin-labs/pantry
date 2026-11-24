@@ -6,7 +6,10 @@ import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { newConversationId, newProjectId } from "@purin-labs/control-api";
 import type { CollaborationAgentActivity } from "@purin-labs/collaboration";
 import { encodeBase64Url, isRecord } from "@purin-labs/std";
-import { MailReplyDoc, type MailReplyUpdate } from "@purin-labs/mail-reply-crdt";
+import {
+  MailReplyDoc,
+  type MailReplyUpdate,
+} from "@purin-labs/mail-reply-crdt";
 import {
   encodeDraftClientMessage,
   parseDraftServerMessage,
@@ -23,7 +26,10 @@ import {
   readOrganisationCapabilityPolicies,
   writeOrganisationCapabilityPolicy,
 } from "@purin-labs/authority/data/capability-policy";
-import { type IntegrationAccountId, type OrganisationId } from "@purin-labs/kernel/ids";
+import {
+  type IntegrationAccountId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { readDefaultProjectId } from "@purin-labs/conversation/projects/case-project";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
@@ -113,9 +119,9 @@ async function rejectedReplyJourney({ task }: TestContext): Promise<void> {
     await draftReply();
   const waiting = { kind: "email_review", id: proposalId };
   const rejectPath = `${replyPath(organisationId, proposalId)}/reject`;
-  expect(await pendingDecisionsOf(organisationId, owner.session)).toContainEqual(
-    waiting,
-  );
+  expect(
+    await pendingDecisionsOf(organisationId, owner.session),
+  ).toContainEqual(waiting);
   const ownerRoom = new ReplyRoomClient(
     await openSocket(
       `https://localhost/v1/control/organisations/${organisationId}/email-replies/${proposalId}/draft/socket`,
@@ -138,9 +144,9 @@ async function rejectedReplyJourney({ task }: TestContext): Promise<void> {
     body: { ok: false, error: "email_reply_request_invalid" },
   });
   expect(gmail.deleted).toEqual([]);
-  expect(await pendingDecisionsOf(organisationId, admin.session)).toContainEqual(
-    waiting,
-  );
+  expect(
+    await pendingDecisionsOf(organisationId, admin.session),
+  ).toContainEqual(waiting);
 
   // 2. The administrator rejects. Gmail loses the draft, and the shared
   //    draft of the owner ends.

@@ -2146,10 +2146,12 @@ function isRetiredRecoverySession(entry: ActorRegistryEntry): boolean {
 async function seedRegionalModelCredentials(
   scope: OrganisationExecutionScope,
 ): Promise<void> {
-  const openai = parseModelApiKey("openai",
+  const openai = parseModelApiKey(
+    "openai",
     "sk-project-regional-openai-test-1234567890",
   );
-  const anthropic = parseModelApiKey("anthropic",
+  const anthropic = parseModelApiKey(
+    "anthropic",
     "sk-ant-api03-regional-test-1234567890",
   );
   if (!openai.ok || !anthropic.ok) throw new Error("Invalid model key fixture");
@@ -2208,11 +2210,7 @@ async function verifyClosedCaseAdmission(
   if (!registry.ok) throw new Error(registry.error.code);
   const entry = registry.value.find(isCaseRegistryEntry);
   if (entry === undefined) throw new Error("Missing source Case");
-  const actor = actorStub(
-    env.CASE,
-    entry.physicalObjectName,
-    entry.placement,
-  );
+  const actor = actorStub(env.CASE, entry.physicalObjectName, entry.placement);
   const before = await actor.inspect();
   if (!before.ok) throw new Error(before.error.code);
   const assignment = before.value.assignmentLifecycles[0]?.assignment;

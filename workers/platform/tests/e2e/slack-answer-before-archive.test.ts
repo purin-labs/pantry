@@ -770,11 +770,7 @@ async function connectorOf(connectorId: string, placementEpoch = 1) {
     },
   );
   if (entry === undefined) throw new Error("Connector registry entry missing");
-  return actorStub(
-    env.CONNECTOR,
-    entry.physicalObjectName,
-    entry.placement,
-  );
+  return actorStub(env.CONNECTOR, entry.physicalObjectName, entry.placement);
 }
 
 /** The thread's one Session. */
@@ -787,11 +783,7 @@ async function threadSession(placementEpoch = 1) {
   if (entry === undefined) throw new Error("Session registry entry missing");
   return {
     sessionId: requiredSessionId(entry.identity.logicalObjectId),
-    stub: actorStub(
-      env.SESSION,
-      entry.physicalObjectName,
-      entry.placement,
-    ),
+    stub: actorStub(env.SESSION, entry.physicalObjectName, entry.placement),
   };
 }
 

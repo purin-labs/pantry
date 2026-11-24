@@ -311,7 +311,12 @@ async function prepareMailBudgetJourney() {
     now,
   });
   if (!registered.ok) throw new Error(registered.error.code);
-  await installWorkMailbox(organisationId, accountId, owner.identity.userId, now);
+  await installWorkMailbox(
+    organisationId,
+    accountId,
+    owner.identity.userId,
+    now,
+  );
   const grant = await createAccessGrant({
     db: fixtureDatabase(),
     organisationId,
@@ -773,9 +778,10 @@ async function transientPiGoalJourney(context: TestContext): Promise<void> {
         }),
       ).toMatchObject({ ok: false, error: { code: "goal_usage_pending" } });
     }
-    const row = await fixtureDatabase().prepare(
-      "SELECT physical_object_name AS name FROM durable_object_registry WHERE organisation_id = ? AND object_kind = 'session' AND lifecycle_status = 'active' ORDER BY reserved_at DESC",
-    )
+    const row = await fixtureDatabase()
+      .prepare(
+        "SELECT physical_object_name AS name FROM durable_object_registry WHERE organisation_id = ? AND object_kind = 'session' AND lifecycle_status = 'active' ORDER BY reserved_at DESC",
+      )
       .bind(organisationId)
       .first<{ name: string }>();
     if (row === null) throw new Error("Missing transient Session");
@@ -1505,7 +1511,10 @@ type ProposalPlacementFixture = Readonly<{
   connector: DurableObjectStub<
     import("../../src/actors/connector").ConnectorDO
   >;
-  identity: Readonly<{ organisationId: OrganisationId; connectorId: ConnectorId }>;
+  identity: Readonly<{
+    organisationId: OrganisationId;
+    connectorId: ConnectorId;
+  }>;
   proposalId: string;
   authority: Extract<RequestAuthority, { kind: "control" }>;
   model: DraftModelFixture;
@@ -1690,7 +1699,8 @@ async function verifyProposalPlacement(
       .poll(draftPreparationPhase.bind(null, pause), { timeout: 10_000 })
       .toBe("paused");
     const started =
-      reservedMove ?? (await startProposalReceiptMove(input.identity.organisationId));
+      reservedMove ??
+      (await startProposalReceiptMove(input.identity.organisationId));
     if (!started.ok) throw new Error(started.error.code);
     relocation = resumeActorRelocation({
       env,
@@ -1793,8 +1803,19 @@ async function verifyProposalPlacement(
         relocationId: started.value.relocationId,
         now: Date.now(),
       });
-      expect(await relocation).toMatchObject({ ok: true, value: { status: "retained" } });
-      expect((await settleProposalReceipt(started.value.relocationId, receipt, env.ORGANISATION_ADMIN_TOKEN)).status).toBe(409);
+      expect(await relocation).toMatchObject({
+        ok: true,
+        value: { status: "retained" },
+      });
+      expect(
+        (
+          await settleProposalReceipt(
+            started.value.relocationId,
+            receipt,
+            env.ORGANISATION_ADMIN_TOKEN,
+          )
+        ).status,
+      ).toBe(409);
     }
     const frozen = await runInDurableObject(
       input.connector,
@@ -1816,9 +1837,10 @@ async function verifyProposalPlacement(
       sentMessageId: frozenSendReceipt,
     });
     expect(
-      await fixtureDatabase().prepare(
-        "SELECT current_version AS version, lifecycle_kind AS lifecycle FROM email_reply_proposal WHERE organisation_id = ? AND proposal_id = ?",
-      )
+      await fixtureDatabase()
+        .prepare(
+          "SELECT current_version AS version, lifecycle_kind AS lifecycle FROM email_reply_proposal WHERE organisation_id = ? AND proposal_id = ?",
+        )
         .bind(input.identity.organisationId, input.proposalId)
         .first(),
     ).toEqual({ version: 1, lifecycle: "awaiting_approval" });
@@ -1847,9 +1869,10 @@ async function verifyProposalPlacement(
       );
       await runDurableObjectAlarm(recovered.value);
       expect(
-        await fixtureDatabase().prepare(
-          "SELECT lifecycle_kind AS lifecycle FROM email_reply_proposal WHERE organisation_id = ? AND proposal_id = ?",
-        )
+        await fixtureDatabase()
+          .prepare(
+            "SELECT lifecycle_kind AS lifecycle FROM email_reply_proposal WHERE organisation_id = ? AND proposal_id = ?",
+          )
           .bind(input.identity.organisationId, input.proposalId)
           .first(),
       ).toEqual({ lifecycle: "sent" });
@@ -2250,9 +2273,10 @@ async function verifyDraftAssignmentPlacement(
     );
     expect(budget).toMatchObject({ reserved: 0, consumed: 0 });
     expect(
-      await fixtureDatabase().prepare(
-        "SELECT COUNT(*) AS total FROM email_reply_proposal WHERE organisation_id = ?",
-      )
+      await fixtureDatabase()
+        .prepare(
+          "SELECT COUNT(*) AS total FROM email_reply_proposal WHERE organisation_id = ?",
+        )
         .bind(input.organisationId)
         .first(),
     ).toEqual({ total: 0 });
@@ -2469,9 +2493,10 @@ async function verifyDraftExecutionPlacement(
       state: "awaiting_approval",
     });
     expect(
-      await fixtureDatabase().prepare(
-        "SELECT COUNT(*) AS total FROM email_reply_proposal WHERE organisation_id = ?",
-      )
+      await fixtureDatabase()
+        .prepare(
+          "SELECT COUNT(*) AS total FROM email_reply_proposal WHERE organisation_id = ?",
+        )
         .bind(input.organisationId)
         .first(),
     ).toEqual({ total: 0 });
@@ -2500,7 +2525,10 @@ async function verifyDraftExecutionPlacement(
     );
     if (!recoverySessionId.ok) throw new Error(recoverySessionId.error.code);
     const request = {
-      identity: { organisationId: input.organisationId, connectorId: input.connectorId },
+      identity: {
+        organisationId: input.organisationId,
+        connectorId: input.connectorId,
+      },
       execution: {
         sessionId: recoverySessionId.value,
         turnId: "turn_reply_receipt_recovery",
@@ -2570,9 +2598,10 @@ async function verifyDraftExecutionPlacement(
       await targetCase.value.acceptEmailProposal(reused.value.record),
     ).toMatchObject({ ok: true, value: { kind: "duplicate" } });
     expect(
-      await fixtureDatabase().prepare(
-        "SELECT COUNT(*) AS total FROM email_reply_proposal WHERE organisation_id = ?",
-      )
+      await fixtureDatabase()
+        .prepare(
+          "SELECT COUNT(*) AS total FROM email_reply_proposal WHERE organisation_id = ?",
+        )
         .bind(input.organisationId)
         .first(),
     ).toEqual({ total: 1 });
@@ -2682,9 +2711,10 @@ async function verifyDraftReplyPlacement(
   const head = await runInDurableObject(input.connector, readObservationHead);
   const caseId = parseCaseId(`case_gmail_${head.integrationAccountId}_t1`);
   if (!caseId.ok) throw new Error(caseId.error.code);
-  await fixtureDatabase().prepare(
-    "DELETE FROM organisation_default_workspace WHERE organisation_id = ?",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "DELETE FROM organisation_default_workspace WHERE organisation_id = ?",
+    )
     .bind(input.organisationId)
     .run();
   pauseWorkspaceWriteBatch(
@@ -2739,16 +2769,18 @@ async function verifyDraftReplyPlacement(
       caseId.value,
     );
     expect(
-      await fixtureDatabase().prepare(
-        "SELECT COUNT(*) AS total FROM workspace_revision WHERE organisation_id = ? AND workspace_id = 'workspace_frozen_mail'",
-      )
+      await fixtureDatabase()
+        .prepare(
+          "SELECT COUNT(*) AS total FROM workspace_revision WHERE organisation_id = ? AND workspace_id = 'workspace_frozen_mail'",
+        )
         .bind(input.organisationId)
         .first(),
     ).toMatchObject({ total: 0 });
     expect(
-      await fixtureDatabase().prepare(
-        "SELECT COUNT(*) AS total FROM email_message_receipt WHERE organisation_id = ? AND provider_message_id = 'm1'",
-      )
+      await fixtureDatabase()
+        .prepare(
+          "SELECT COUNT(*) AS total FROM email_message_receipt WHERE organisation_id = ? AND provider_message_id = 'm1'",
+        )
         .bind(input.organisationId)
         .first(),
     ).toMatchObject({ total: 0 });
@@ -2762,16 +2794,18 @@ async function verifyDraftReplyPlacement(
       drafts: input.model.drafts,
       sends: input.model.sends,
     }).toEqual({ calls: 0, drafts: 0, sends: 0 });
-    const frozenCases = await fixtureDatabase().prepare(
-      "SELECT COUNT(*) AS total FROM email_thread_case WHERE organisation_id = ? AND gmail_thread_id = 't1'",
-    )
+    const frozenCases = await fixtureDatabase()
+      .prepare(
+        "SELECT COUNT(*) AS total FROM email_thread_case WHERE organisation_id = ? AND gmail_thread_id = 't1'",
+      )
       .bind(input.organisationId)
       .first<{ total: number }>();
     expect(frozenCases?.total).toBe(0);
     expect(
-      await fixtureDatabase().prepare(
-        "SELECT COUNT(*) AS total FROM organisation_default_workspace WHERE organisation_id = ?",
-      )
+      await fixtureDatabase()
+        .prepare(
+          "SELECT COUNT(*) AS total FROM organisation_default_workspace WHERE organisation_id = ?",
+        )
         .bind(input.organisationId)
         .first(),
     ).toMatchObject({ total: 0 });
@@ -2782,7 +2816,10 @@ async function verifyDraftReplyPlacement(
     await evictDurableObject(input.connector);
     expect(
       await input.connector.readMailOrganization({
-        identity: { organisationId: input.organisationId, connectorId: input.connectorId },
+        identity: {
+          organisationId: input.organisationId,
+          connectorId: input.connectorId,
+        },
         integrationAccountId: head.integrationAccountId,
         authority: head.authority,
         messageIds: ["m1"],
@@ -2871,23 +2908,26 @@ async function verifyDraftReplyPlacement(
       caseId.value,
     );
     expect(
-      await fixtureDatabase().prepare(
-        "SELECT COUNT(*) AS total FROM workspace_revision_receipt WHERE organisation_id = ? AND workspace_id = 'workspace_frozen_mail'",
-      )
+      await fixtureDatabase()
+        .prepare(
+          "SELECT COUNT(*) AS total FROM workspace_revision_receipt WHERE organisation_id = ? AND workspace_id = 'workspace_frozen_mail'",
+        )
         .bind(input.organisationId)
         .first(),
     ).toMatchObject({ total: 1 });
     expect(
-      await fixtureDatabase().prepare(
-        "SELECT COUNT(*) AS total FROM organisation_default_workspace WHERE organisation_id = ?",
-      )
+      await fixtureDatabase()
+        .prepare(
+          "SELECT COUNT(*) AS total FROM organisation_default_workspace WHERE organisation_id = ?",
+        )
         .bind(input.organisationId)
         .first(),
     ).toMatchObject({ total: 1 });
     expect(
-      await fixtureDatabase().prepare(
-        "SELECT COUNT(*) AS total FROM email_message_receipt WHERE organisation_id = ? AND provider_message_id = 'm1'",
-      )
+      await fixtureDatabase()
+        .prepare(
+          "SELECT COUNT(*) AS total FROM email_message_receipt WHERE organisation_id = ? AND provider_message_id = 'm1'",
+        )
         .bind(input.organisationId)
         .first(),
     ).toMatchObject({ total: 1 });
@@ -3032,7 +3072,10 @@ async function verifyFrozenMailAdmissionWrites(
       bindingRevision: 1,
       now: Date.now(),
     }),
-  ).toMatchObject({ ok: false, error: { code: "organisation_placement_conflict" } });
+  ).toMatchObject({
+    ok: false,
+    error: { code: "organisation_placement_conflict" },
+  });
   expect(
     await recordEmailMessageReceipt({
       scope,
@@ -3043,7 +3086,10 @@ async function verifyFrozenMailAdmissionWrites(
       policyVersion: 1,
       now: Date.now(),
     }),
-  ).toMatchObject({ ok: false, error: { code: "organisation_placement_conflict" } });
+  ).toMatchObject({
+    ok: false,
+    error: { code: "organisation_placement_conflict" },
+  });
 }
 
 function pauseActorResponse(
@@ -3152,7 +3198,12 @@ async function runDraftOnlyJourney(
     now,
   });
   if (!registered.ok) throw new Error(registered.error.code);
-  await installWorkMailbox(organisationId, account.value, owner.identity.userId, now);
+  await installWorkMailbox(
+    organisationId,
+    account.value,
+    owner.identity.userId,
+    now,
+  );
   const merchantId = await seedPurchasingContext(
     organisationId,
     owner.identity.userId,
@@ -3186,17 +3237,24 @@ async function runDraftOnlyJourney(
     },
   ];
   for (const command of otherAgentCommands) {
-    const applied = await applyAgentOperation(fixtureDatabase(), organisationId, command);
+    const applied = await applyAgentOperation(
+      fixtureDatabase(),
+      organisationId,
+      command,
+    );
     if (!applied.ok) throw new Error(applied.error.code);
   }
   expect(
-    await resolveCaseTurnAgentProfile(await requireMailFixtureScope(organisationId), {
-      caseId: caseId.value,
-      assignmentId: "assignment_selection_probe",
-      assignment: "new",
-      selection: { kind: "automatic" },
-      now,
-    }),
+    await resolveCaseTurnAgentProfile(
+      await requireMailFixtureScope(organisationId),
+      {
+        caseId: caseId.value,
+        assignmentId: "assignment_selection_probe",
+        assignment: "new",
+        selection: { kind: "automatic" },
+        now,
+      },
+    ),
   ).toEqual({ kind: "unselected" });
   const policy = await publishMailboxIngressPolicy({
     db: fixtureDatabase(),
@@ -3242,9 +3300,10 @@ async function runDraftOnlyJourney(
     now,
   });
   if (!contextGrant.ok) throw new Error(contextGrant.error.code);
-  await fixtureDatabase().prepare(
-    "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'pantry_platform', ?, ?)",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'pantry_platform', ?, ?)",
+    )
     .bind(organisationId, owner.identity.userId, now)
     .run();
   await acceptMailboxModelTerms({
@@ -3315,7 +3374,11 @@ async function runDraftOnlyJourney(
       draftOnlyGmailWrite.bind(null, model),
     ),
   );
-  const organisation = await requireActiveOrganisationActor({ env, organisationId, now });
+  const organisation = await requireActiveOrganisationActor({
+    env,
+    organisationId,
+    now,
+  });
   network.use(
     http.post(
       "https://api.typesafe.ai/v1/systemone",
@@ -3352,11 +3415,12 @@ async function runDraftOnlyJourney(
     authority: context.value.connection.authority,
     updatedAt: context.value.connection.updatedAt,
   });
-  await fixtureDatabase().prepare(
-    `INSERT INTO mail_classification_eligibility
+  await fixtureDatabase()
+    .prepare(
+      `INSERT INTO mail_classification_eligibility
     (organisation_id,integration_account_id,source_pin,connection_revision,model,purpose,evidence_reference,evidence_owner,disclosed_recipient,reviewed_at,review_expires_at,revoked_at)
     VALUES (?, ?, ?, 1, 'jev-1.13.0', 'mail_classification', 'fixture-review', 'fixture-owner', 'typesafe', ?, ?, NULL)`,
-  )
+    )
     .bind(organisationId, account.value, sourcePin, now, now + 3600000)
     .run();
   network.use(
@@ -3474,9 +3538,10 @@ async function runDraftOnlyJourney(
       db: fixtureDatabase(),
       organisationId,
     });
-    const person = await fixtureDatabase().prepare(
-      "SELECT person_id AS personId FROM service_role_grant WHERE organisation_id = ? AND user_id = ?",
-    )
+    const person = await fixtureDatabase()
+      .prepare(
+        "SELECT person_id AS personId FROM service_role_grant WHERE organisation_id = ? AND user_id = ?",
+      )
       .bind(organisationId, owner.identity.userId)
       .first<{ personId: string }>();
     if (membershipRevision === null || person === null)
@@ -3566,9 +3631,10 @@ async function runDraftOnlyJourney(
   )
     throw new Error("Missing purchasing approval snapshot");
   const approvedSnapshotDigest = reviewedBody.proposal.snapshot_digest;
-  await fixtureDatabase().prepare(
-    "UPDATE access_grant SET lifecycle = 'revoked', revision = revision + 1, reason = 'operator purchasing acceptance revocation' WHERE organisation_id = ? AND grant_id = 'grant_mail_operator_supplier_directory'",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE access_grant SET lifecycle = 'revoked', revision = revision + 1, reason = 'operator purchasing acceptance revocation' WHERE organisation_id = ? AND grant_id = 'grant_mail_operator_supplier_directory'",
+    )
     .bind(organisationId)
     .run();
   expect(
@@ -3611,9 +3677,10 @@ async function runDraftOnlyJourney(
   );
   expect(deniedApproval.status).toBe(403);
   expect(model.sends).toBe(0);
-  await fixtureDatabase().prepare(
-    "UPDATE access_grant SET lifecycle = 'active', revision = revision + 1, reason = NULL WHERE organisation_id = ? AND grant_id = 'grant_mail_operator_supplier_directory'",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE access_grant SET lifecycle = 'active', revision = revision + 1, reason = NULL WHERE organisation_id = ? AND grant_id = 'grant_mail_operator_supplier_directory'",
+    )
     .bind(organisationId)
     .run();
   network.use(
@@ -3647,14 +3714,16 @@ async function runDraftOnlyJourney(
   });
   expect(model.revokeOperatorOnDraftRead).toBe(false);
   expect(model.sends).toBe(0);
-  await fixtureDatabase().prepare(
-    "UPDATE access_grant SET lifecycle = 'active', revision = revision + 1, reason = NULL WHERE organisation_id = ? AND grant_id = 'grant_mail_operator_supplier_directory'",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE access_grant SET lifecycle = 'active', revision = revision + 1, reason = NULL WHERE organisation_id = ? AND grant_id = 'grant_mail_operator_supplier_directory'",
+    )
     .bind(organisationId)
     .run();
-  const pin = await fixtureDatabase().prepare(
-    "SELECT installation_id AS installationId, definition_revision AS revision FROM case_assignment_pin WHERE organisation_id = ? AND assignment_id = ?",
-  )
+  const pin = await fixtureDatabase()
+    .prepare(
+      "SELECT installation_id AS installationId, definition_revision AS revision FROM case_assignment_pin WHERE organisation_id = ? AND assignment_id = ?",
+    )
     .bind(organisationId, `assignment_${caseId.value}_m1`)
     .first();
   expect(pin).toEqual({ installationId: "installation_work", revision: 1 });
@@ -3670,24 +3739,31 @@ async function runDraftOnlyJourney(
     skillRefs: [],
   });
   if (!update.ok) throw new Error(update.error.code);
-  const activated = await applyAgentOperation(fixtureDatabase(), organisationId, {
-    kind: "activate_agent_definition_revision",
-    operationId: "draft_agent_activate",
-    actorUserId: owner.identity.userId,
-    now: Date.now(),
-    installationId: "installation_work",
-    expectedDefinitionRevision: 1,
-    definitionRevision: 2,
-    skillRefs: [],
-  });
+  const activated = await applyAgentOperation(
+    fixtureDatabase(),
+    organisationId,
+    {
+      kind: "activate_agent_definition_revision",
+      operationId: "draft_agent_activate",
+      actorUserId: owner.identity.userId,
+      now: Date.now(),
+      installationId: "installation_work",
+      expectedDefinitionRevision: 1,
+      definitionRevision: 2,
+      skillRefs: [],
+    },
+  );
   if (!activated.ok) throw new Error(activated.error.code);
-  const pinned = await resolveCaseTurnAgentProfile(await requireMailFixtureScope(organisationId), {
-    caseId: caseId.value,
-    assignmentId: `assignment_${caseId.value}_m1`,
-    assignment: "existing",
-    selection: { kind: "installed", installationId: "installation_work" },
-    now: Date.now(),
-  });
+  const pinned = await resolveCaseTurnAgentProfile(
+    await requireMailFixtureScope(organisationId),
+    {
+      caseId: caseId.value,
+      assignmentId: `assignment_${caseId.value}_m1`,
+      assignment: "existing",
+      selection: { kind: "installed", installationId: "installation_work" },
+      now: Date.now(),
+    },
+  );
   expect(pinned).toMatchObject({
     kind: "resolved",
     profile: {
@@ -3702,13 +3778,16 @@ async function runDraftOnlyJourney(
   expect(evidence).toHaveLength(2);
   expect(evidence[0]?.merchantId).toBe(merchantId);
   expect(JSON.stringify(evidence)).not.toContain("supplier@example.test");
-  const wrongAgent = await resolveCaseTurnAgentProfile(await requireMailFixtureScope(organisationId), {
-    caseId: caseId.value,
-    assignmentId: `assignment_${caseId.value}_m1`,
-    assignment: "existing",
-    selection: { kind: "installed", installationId: "installation_other" },
-    now: Date.now(),
-  });
+  const wrongAgent = await resolveCaseTurnAgentProfile(
+    await requireMailFixtureScope(organisationId),
+    {
+      caseId: caseId.value,
+      assignmentId: `assignment_${caseId.value}_m1`,
+      assignment: "existing",
+      selection: { kind: "installed", installationId: "installation_other" },
+      now: Date.now(),
+    },
+  );
   expect(wrongAgent).toEqual({
     kind: "unavailable",
     error: { code: "pinned_agent_selection_changed" },
@@ -3805,7 +3884,11 @@ async function runDraftOnlyJourney(
   );
   // Three completed text responses each report 25 tokens.
   expect(accounting).toEqual({ reserved: 0, consumed: 75 });
-  const ambiguous = await purchasingFixture(organisationId, merchantId, "ambiguous");
+  const ambiguous = await purchasingFixture(
+    organisationId,
+    merchantId,
+    "ambiguous",
+  );
   expect(ambiguous.status).toBe(200);
   const content = await gmailGetMessageContent({
     accessToken: "fixture-token",
@@ -3851,9 +3934,10 @@ async function runDraftOnlyJourney(
     ok: false,
     error: { code: "email_commerce_changed" },
   });
-  await fixtureDatabase().prepare(
-    "UPDATE access_grant SET lifecycle = 'revoked', revision = revision + 1, reason = 'purchasing acceptance revocation' WHERE organisation_id = ? AND grant_id = 'grant_mail_supplier_directory'",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE access_grant SET lifecycle = 'revoked', revision = revision + 1, reason = 'purchasing acceptance revocation' WHERE organisation_id = ? AND grant_id = 'grant_mail_supplier_directory'",
+    )
     .bind(organisationId)
     .run();
   expect(
@@ -3863,9 +3947,10 @@ async function runDraftOnlyJourney(
     ),
   ).toEqual({ ok: false, error: { code: "email_commerce_unavailable" } });
   expect(model.sends).toBe(0);
-  await fixtureDatabase().prepare(
-    "UPDATE access_grant SET lifecycle = 'active', revision = revision + 1, reason = NULL WHERE organisation_id = ? AND grant_id = 'grant_mail_supplier_directory'",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE access_grant SET lifecycle = 'active', revision = revision + 1, reason = NULL WHERE organisation_id = ? AND grant_id = 'grant_mail_supplier_directory'",
+    )
     .bind(organisationId)
     .run();
   await acceptPurchasingCorrection(
@@ -3881,13 +3966,14 @@ async function runDraftOnlyJourney(
     "retained-after-exit",
     "full_mailbox_pilot",
   );
-  await fixtureDatabase().prepare(
-    `INSERT INTO mail_classification (
+  await fixtureDatabase()
+    .prepare(
+      `INSERT INTO mail_classification (
       organisation_id, integration_account_id, rule_revision, message_id, thread_id,
       rule_id, outcome, source, evaluated_at, evaluation_id, content_digest
     ) VALUES (?, ?, 1, 'retained-message', 'retained-thread', 'retained-rule',
       'matched', 'operator', ?, 'retained-evaluation', ?)`,
-  )
+    )
     .bind(organisationId, retainedAccount, Date.now(), "a".repeat(64))
     .run();
   const exited = await connector.value.revokeEmailMailbox({
@@ -3907,17 +3993,19 @@ async function runDraftOnlyJourney(
     "mail_assistant_eligibility",
   ]) {
     expect(
-      await fixtureDatabase().prepare(
-        `SELECT COUNT(*) AS count FROM ${table} WHERE organisation_id = ? AND integration_account_id = ?`,
-      )
+      await fixtureDatabase()
+        .prepare(
+          `SELECT COUNT(*) AS count FROM ${table} WHERE organisation_id = ? AND integration_account_id = ?`,
+        )
         .bind(organisationId, account.value)
         .first("count"),
     ).toBe(0);
   }
   expect(
-    await fixtureDatabase().prepare(
-      "SELECT COUNT(*) AS count FROM mail_classification WHERE organisation_id = ? AND integration_account_id = ?",
-    )
+    await fixtureDatabase()
+      .prepare(
+        "SELECT COUNT(*) AS count FROM mail_classification WHERE organisation_id = ? AND integration_account_id = ?",
+      )
       .bind(organisationId, retainedAccount)
       .first("count"),
   ).toBe(1);
@@ -3929,9 +4017,10 @@ async function runDraftOnlyJourney(
       recoveredAfterEviction: true,
     },
   });
-  const placements = await fixtureDatabase().prepare(
-    "SELECT object_kind AS kind, physical_object_name AS name FROM durable_object_registry WHERE organisation_id = ? AND object_kind IN ('case', 'session', 'connector')",
-  )
+  const placements = await fixtureDatabase()
+    .prepare(
+      "SELECT object_kind AS kind, physical_object_name AS name FROM durable_object_registry WHERE organisation_id = ? AND object_kind IN ('case', 'session', 'connector')",
+    )
     .bind(organisationId)
     .all<{ kind: string; name: string }>();
   for (const row of placements.results) {
@@ -4061,31 +4150,53 @@ async function acceptPurchasingCorrection(
     ).status,
   ).toBe(409);
   expect(model.edits).toBe(0);
-  await fixtureDatabase().prepare(
-    "UPDATE access_grant SET lifecycle = 'revoked', revision = revision + 1, reason = 'correction acceptance revocation' WHERE organisation_id = ? AND grant_id = 'grant_mail_operator_replenishment_queue'",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE access_grant SET lifecycle = 'revoked', revision = revision + 1, reason = 'correction acceptance revocation' WHERE organisation_id = ? AND grant_id = 'grant_mail_operator_replenishment_queue'",
+    )
     .bind(organisationId)
     .run();
   expect(
-    (await reviewSend(organisationId, session, proposalId, "correct", correction))
-      .status,
+    (
+      await reviewSend(
+        organisationId,
+        session,
+        proposalId,
+        "correct",
+        correction,
+      )
+    ).status,
   ).toBe(409);
   expect(model.edits).toBe(0);
-  await fixtureDatabase().prepare(
-    "UPDATE access_grant SET lifecycle = 'active', revision = revision + 1, reason = NULL WHERE organisation_id = ? AND grant_id = 'grant_mail_operator_replenishment_queue'",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE access_grant SET lifecycle = 'active', revision = revision + 1, reason = NULL WHERE organisation_id = ? AND grant_id = 'grant_mail_operator_replenishment_queue'",
+    )
     .bind(organisationId)
     .run();
   expect(
     await reviewResult(
-      await reviewSend(organisationId, session, proposalId, "correct", correction),
+      await reviewSend(
+        organisationId,
+        session,
+        proposalId,
+        "correct",
+        correction,
+      ),
     ),
   ).toMatchObject({ kind: "corrected", version: 2 });
   console.log("MAIL_CORRECTION_STEP: replacement saved");
   expect(model.edits).toBe(1);
   expect(
-    (await reviewSend(organisationId, session, proposalId, "correct", correction))
-      .status,
+    (
+      await reviewSend(
+        organisationId,
+        session,
+        proposalId,
+        "correct",
+        correction,
+      )
+    ).status,
   ).toBe(409);
   console.log("MAIL_CORRECTION_STEP: fresh review");
   const approved = await reviewSnapshot(
@@ -4115,12 +4226,24 @@ async function acceptPurchasingCorrection(
   );
   expect(
     await reviewResult(
-      await reviewSend(organisationId, session, proposalId, "approve", approved),
+      await reviewSend(
+        organisationId,
+        session,
+        proposalId,
+        "approve",
+        approved,
+      ),
     ),
   ).toMatchObject({ kind: "send_indeterminate" });
   expect(
     await reviewResult(
-      await reviewSend(organisationId, session, proposalId, "approve", approved),
+      await reviewSend(
+        organisationId,
+        session,
+        proposalId,
+        "approve",
+        approved,
+      ),
     ),
   ).toMatchObject({ kind: "send_indeterminate" });
   // Refactor 15: the uncertain send outlives the reply's expiry. A review
@@ -4253,7 +4376,10 @@ async function reconcileDraftOrganization(
 ) {
   const head = readMailHead(state.storage.sql);
   if (head === null) throw new Error("Missing mail organization");
-  const scope = await OrganisationExecutionScope.resolve(env, head.organisationId);
+  const scope = await OrganisationExecutionScope.resolve(
+    env,
+    head.organisationId,
+  );
   if (!scope.ok) throw new Error(scope.error.code);
   return runMailOrganization({
     env,
@@ -4551,9 +4677,10 @@ async function revokePurchasingDuringDraftRead(
 ): Promise<Response> {
   if (model.revokeOperatorOnDraftRead) {
     model.revokeOperatorOnDraftRead = false;
-    await fixtureDatabase().prepare(
-      "UPDATE access_grant SET lifecycle = 'revoked', revision = revision + 1, reason = 'in-flight purchasing acceptance revocation' WHERE organisation_id = ? AND grant_id = 'grant_mail_operator_supplier_directory'",
-    )
+    await fixtureDatabase()
+      .prepare(
+        "UPDATE access_grant SET lifecycle = 'revoked', revision = revision + 1, reason = 'in-flight purchasing acceptance revocation' WHERE organisation_id = ? AND grant_id = 'grant_mail_operator_supplier_directory'",
+      )
       .bind(organisationId)
       .run();
   }
@@ -4623,14 +4750,16 @@ async function reviewQueueHeadlineJourney(): Promise<void> {
     "work",
     "full_mailbox_pilot",
   );
-  await fixtureDatabase().prepare(
-    "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, 'person_queue_ungranted', 'Ungranted viewer')",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, 'person_queue_ungranted', 'Ungranted viewer')",
+    )
     .bind(organisationId)
     .run();
-  await fixtureDatabase().prepare(
-    "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at, revoked_at) VALUES (?, ?, 'person_queue_ungranted', 'viewer', 'active', ?, NULL)",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at, revoked_at) VALUES (?, ?, 'person_queue_ungranted', 'viewer', 'active', ?, NULL)",
+    )
     .bind(organisationId, ungranted.identity.userId, Date.now())
     .run();
   // The account authority admits both people, so each refusal below comes
@@ -4710,7 +4839,9 @@ async function workJourney(): Promise<void> {
     integrationAccountId: accountId,
     threadId: "t1",
   } as const;
-  expect(await result(await send(organisationId, owner.session, command))).toEqual({
+  expect(
+    await result(await send(organisationId, owner.session, command)),
+  ).toEqual({
     kind: "work",
     threadId: "t1",
     work: { kind: "unlinked" },
@@ -4744,7 +4875,12 @@ async function workJourney(): Promise<void> {
     now,
   });
   if (!registered.ok) throw new Error(registered.error.code);
-  await installWorkMailbox(organisationId, accountId, owner.identity.userId, now);
+  await installWorkMailbox(
+    organisationId,
+    accountId,
+    owner.identity.userId,
+    now,
+  );
   const actor = await resolveActiveCaseActor({
     env,
     namespace: env.CASE,
@@ -4855,7 +4991,13 @@ async function workJourney(): Promise<void> {
     connector.value,
   );
   const beforeEdit = await reviewSnapshot(
-    await reviewSend(organisationId, owner.session, proposal.proposalId, null, {}),
+    await reviewSend(
+      organisationId,
+      owner.session,
+      proposal.proposalId,
+      null,
+      {},
+    ),
   );
   state.body = "Private edited reply: please also confirm the quantity.";
   expect(
@@ -4870,8 +5012,12 @@ async function workJourney(): Promise<void> {
     },
   });
   expect(
-    (await send(organisationId, owner.session, { ...previewCommand, threadId: "t2" }))
-      .status,
+    (
+      await send(organisationId, owner.session, {
+        ...previewCommand,
+        threadId: "t2",
+      })
+    ).status,
   ).toBe(404);
   const otherAccount = await mailbox(
     organisationId,
@@ -4903,7 +5049,12 @@ async function workJourney(): Promise<void> {
   expect((await actor.value.acceptEmailProposal(foreignProposal)).ok).toBe(
     true,
   );
-  await projectWorkReply(organisationId, foreignAccount.value, foreignProposal, now);
+  await projectWorkReply(
+    organisationId,
+    foreignAccount.value,
+    foreignProposal,
+    now,
+  );
   expect(
     (
       await send(organisationId, owner.session, {
@@ -4955,7 +5106,9 @@ async function workJourney(): Promise<void> {
     },
     now,
   );
-  const settled = await result(await send(organisationId, owner.session, command));
+  const settled = await result(
+    await send(organisationId, owner.session, command),
+  );
   expect(settled).toMatchObject({
     kind: "work",
     work: {
@@ -4993,9 +5146,10 @@ async function workJourney(): Promise<void> {
   expect(fenced.status).toBe(404);
   expect(await fenced.text()).not.toContain("Private edited reply");
   expect((await send(organisationId, owner.session, command)).status).toBe(404);
-  const admissions = await fixtureDatabase().prepare(
-    "SELECT COUNT(*) AS count FROM email_message_receipt WHERE organisation_id = ?",
-  )
+  const admissions = await fixtureDatabase()
+    .prepare(
+      "SELECT COUNT(*) AS count FROM email_message_receipt WHERE organisation_id = ?",
+    )
     .bind(organisationId)
     .first<{ count: number }>();
   expect(admissions?.count).toBe(0);
@@ -5050,11 +5204,17 @@ async function previewClarificationPurchasing(
   if (!policy.ok || policy.value.kind !== "enabled")
     throw new Error("Missing clarification mailbox policy");
   const selected = await reviewResult(
-    await reviewSend(organisationId, owner.session, proposalId, "relationship", {
-      kind: "purchase_request",
-      supplierEntryId: "directory_supplier_packaging",
-      purchaseRequestId: "PR-A",
-    }),
+    await reviewSend(
+      organisationId,
+      owner.session,
+      proposalId,
+      "relationship",
+      {
+        kind: "purchase_request",
+        supplierEntryId: "directory_supplier_packaging",
+        purchaseRequestId: "PR-A",
+      },
+    ),
   );
   expect(selected).toMatchObject({
     kind: "purchase_request",
@@ -5150,15 +5310,29 @@ async function reviewWorkReply(
 ): Promise<void> {
   for (const action of [null, "approve", "reject", "resolve", "edit"] as const)
     expect(
-      (await reviewSend(organisationId, session, proposalId, action, beforeEdit))
-        .status,
+      (
+        await reviewSend(
+          organisationId,
+          session,
+          proposalId,
+          action,
+          beforeEdit,
+        )
+      ).status,
     ).toBe(404);
   expect(state.writes).toBe(0);
   await restoreWorkMailboxGrant(organisationId);
   state.revokeDuringRead = false;
   expect(
-    (await reviewSend(organisationId, session, proposalId, "approve", beforeEdit))
-      .status,
+    (
+      await reviewSend(
+        organisationId,
+        session,
+        proposalId,
+        "approve",
+        beforeEdit,
+      )
+    ).status,
   ).toBe(409);
   expect(state.writes).toBe(0);
   const reviewed = await reviewSnapshot(
@@ -5237,7 +5411,13 @@ async function reviewWorkReply(
   );
   expect(
     await reviewResult(
-      await reviewSend(organisationId, session, proposalId, "approve", savedReview),
+      await reviewSend(
+        organisationId,
+        session,
+        proposalId,
+        "approve",
+        savedReview,
+      ),
     ),
   ).toMatchObject({ kind: "send_indeterminate" });
   const bytes = decodeBase64(
@@ -5256,7 +5436,9 @@ async function reviewWorkReply(
   expect(sentMessage).toContain(
     dispatchRfcMessageId(proposalId, 3, "shop@example.test"),
   );
-  const pending = await result(await send(organisationId, session, workCommand));
+  const pending = await result(
+    await send(organisationId, session, workCommand),
+  );
   expect(pending).toMatchObject({
     work: {
       replies: expect.arrayContaining([
@@ -5279,7 +5461,13 @@ async function reviewWorkReply(
   });
   expect(
     await reviewResult(
-      await reviewSend(organisationId, session, proposalId, "approve", savedReview),
+      await reviewSend(
+        organisationId,
+        session,
+        proposalId,
+        "approve",
+        savedReview,
+      ),
     ),
   ).toMatchObject({ kind: "send_indeterminate" });
   expect(
@@ -5299,7 +5487,9 @@ async function reviewWorkReply(
       }),
     ),
   ).toMatchObject({ kind: "sent" });
-  const settled = await result(await send(organisationId, session, workCommand));
+  const settled = await result(
+    await send(organisationId, session, workCommand),
+  );
   expect(settled).toMatchObject({
     work: {
       replies: expect.arrayContaining([
@@ -5318,18 +5508,22 @@ async function reviewWorkReply(
   expect(delivery.sends).toBe(1);
   expect(delivery.deletes).toBe(1);
   await runInDurableObject(connector, assertReviewedReplyStorage);
-  const admissions = await fixtureDatabase().prepare(
-    "SELECT COUNT(*) AS count FROM email_message_receipt WHERE organisation_id = ? AND integration_account_id = ?",
-  )
+  const admissions = await fixtureDatabase()
+    .prepare(
+      "SELECT COUNT(*) AS count FROM email_message_receipt WHERE organisation_id = ? AND integration_account_id = ?",
+    )
     .bind(organisationId, accountId)
     .first<{ count: number }>();
   expect(admissions?.count).toBe(0);
 }
 
-async function restoreWorkMailboxGrant(organisationId: OrganisationId): Promise<void> {
-  await fixtureDatabase().prepare(
-    "UPDATE access_grant SET lifecycle = 'active', revision = revision + 1, reason = NULL WHERE organisation_id = ? AND grant_id = 'grant_mail_work'",
-  )
+async function restoreWorkMailboxGrant(
+  organisationId: OrganisationId,
+): Promise<void> {
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE access_grant SET lifecycle = 'active', revision = revision + 1, reason = NULL WHERE organisation_id = ? AND grant_id = 'grant_mail_work'",
+    )
     .bind(organisationId)
     .run();
 }
@@ -5555,7 +5749,11 @@ async function installWorkMailbox(
     },
   ];
   for (const command of commands) {
-    const applied = await applyAgentOperation(fixtureDatabase(), organisationId, command);
+    const applied = await applyAgentOperation(
+      fixtureDatabase(),
+      organisationId,
+      command,
+    );
     if (!applied.ok) throw new Error(applied.error.code);
   }
   const assigned = await assignAgentMailbox({
@@ -5600,9 +5798,10 @@ async function workGmail(
   if (url.pathname.endsWith("/drafts/draft_work")) {
     state.reads++;
     if (state.revokeDuringRead)
-      await fixtureDatabase().prepare(
-        "UPDATE access_grant SET lifecycle = 'revoked', revision = revision + 1, reason = 'work in-flight revocation' WHERE organisation_id = ?",
-      )
+      await fixtureDatabase()
+        .prepare(
+          "UPDATE access_grant SET lifecycle = 'revoked', revision = revision + 1, reason = 'work in-flight revocation' WHERE organisation_id = ?",
+        )
         .bind(organisationId)
         .run();
     return HttpResponse.json({
@@ -5624,9 +5823,10 @@ async function workGmail(
   if (url.pathname.endsWith("/threads/t1")) {
     state.threadReads = (state.threadReads ?? 0) + 1;
     if (state.revokeDuringThreadRead)
-      await fixtureDatabase().prepare(
-        "UPDATE access_grant SET lifecycle = 'revoked', revision = revision + 1, reason = 'queue in-flight revocation' WHERE organisation_id = ? AND grant_id = 'grant_mail_work'",
-      )
+      await fixtureDatabase()
+        .prepare(
+          "UPDATE access_grant SET lifecycle = 'revoked', revision = revision + 1, reason = 'queue in-flight revocation' WHERE organisation_id = ? AND grant_id = 'grant_mail_work'",
+        )
         .bind(organisationId)
         .run();
     // The mailbox's acknowledgement and its draft come after the mail.
@@ -5835,14 +6035,16 @@ async function inboxJourney(): Promise<void> {
     "full_mailbox_pilot",
   );
   await mailbox(organisationId, owner, "send-only", "send_only");
-  await fixtureDatabase().prepare(
-    "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, 'person_mail_ungranted', 'Ungranted viewer')",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, 'person_mail_ungranted', 'Ungranted viewer')",
+    )
     .bind(organisationId)
     .run();
-  await fixtureDatabase().prepare(
-    "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at, revoked_at) VALUES (?, ?, 'person_mail_ungranted', 'viewer', 'active', ?, NULL)",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at, revoked_at) VALUES (?, ?, 'person_mail_ungranted', 'viewer', 'active', ?, NULL)",
+    )
     .bind(organisationId, ungranted.identity.userId, Date.now())
     .run();
   // The account authority admits the owner and the viewer, so each refusal
@@ -5850,9 +6052,17 @@ async function inboxJourney(): Promise<void> {
   const listed = await result(await send(organisationId, owner.session, null));
   expect(listed).toEqual({
     kind: "accounts",
-    accounts: [{ integrationAccountId: accountId, displayName: "inbox", access: "readable" }],
+    accounts: [
+      {
+        integrationAccountId: accountId,
+        displayName: "inbox",
+        access: "readable",
+      },
+    ],
   });
-  expect(await result(await send(organisationId, ungranted.session, null))).toEqual({
+  expect(
+    await result(await send(organisationId, ungranted.session, null)),
+  ).toEqual({
     kind: "accounts",
     accounts: [],
   });
@@ -5862,12 +6072,12 @@ async function inboxJourney(): Promise<void> {
     query: "",
     cursor: null,
   };
-  expect((await send(organisationId, outsider.session, pageCommand)).status).toBe(
-    404,
-  );
-  expect((await send(organisationId, ungranted.session, pageCommand)).status).toBe(
-    404,
-  );
+  expect(
+    (await send(organisationId, outsider.session, pageCommand)).status,
+  ).toBe(404);
+  expect(
+    (await send(organisationId, ungranted.session, pageCommand)).status,
+  ).toBe(404);
   const pageResponse = await send(organisationId, owner.session, pageCommand);
   expect(pageResponse.headers.get("cache-control")).toBe("no-store");
   const first = await result(pageResponse);
@@ -5989,9 +6199,10 @@ async function inboxJourney(): Promise<void> {
       },
     ],
   });
-  await fixtureDatabase().prepare(
-    "UPDATE access_grant SET lifecycle = 'revoked', revision = revision + 1, reason = 'e2e revocation' WHERE organisation_id = ?",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE access_grant SET lifecycle = 'revoked', revision = revision + 1, reason = 'e2e revocation' WHERE organisation_id = ?",
+    )
     .bind(organisationId)
     .run();
   expect(
@@ -6003,25 +6214,30 @@ async function inboxJourney(): Promise<void> {
       })
     ).status,
   ).toBe(404);
-  expect(await result(await send(organisationId, owner.session, null))).toEqual({
-    kind: "accounts",
-    accounts: [],
-  });
-  const admissions = await fixtureDatabase().prepare(
-    "SELECT COUNT(*) AS count FROM email_message_receipt WHERE organisation_id = ?",
-  )
+  expect(await result(await send(organisationId, owner.session, null))).toEqual(
+    {
+      kind: "accounts",
+      accounts: [],
+    },
+  );
+  const admissions = await fixtureDatabase()
+    .prepare(
+      "SELECT COUNT(*) AS count FROM email_message_receipt WHERE organisation_id = ?",
+    )
     .bind(organisationId)
     .first<{ count: number }>();
   expect(admissions?.count).toBe(0);
-  const cases = await fixtureDatabase().prepare(
-    "SELECT COUNT(*) AS count FROM email_thread_case WHERE organisation_id = ?",
-  )
+  const cases = await fixtureDatabase()
+    .prepare(
+      "SELECT COUNT(*) AS count FROM email_thread_case WHERE organisation_id = ?",
+    )
     .bind(organisationId)
     .first<{ count: number }>();
   expect(cases?.count).toBe(0);
-  const proposals = await fixtureDatabase().prepare(
-    "SELECT COUNT(*) AS count FROM email_reply_proposal WHERE organisation_id = ?",
-  )
+  const proposals = await fixtureDatabase()
+    .prepare(
+      "SELECT COUNT(*) AS count FROM email_reply_proposal WHERE organisation_id = ?",
+    )
     .bind(organisationId)
     .first<{ count: number }>();
   expect(proposals?.count).toBe(0);
@@ -6091,9 +6307,10 @@ async function workspace(
   });
   if (!result.ok) throw new Error(result.error.code);
   const created = result.value;
-  await fixtureDatabase().prepare(
-    "UPDATE organisation_onboarding SET lifecycle = 'active', activation_receipt_id = 'mail-e2e', activated_at = ?, updated_at = ? WHERE organisation_id = ?",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE organisation_onboarding SET lifecycle = 'active', activation_receipt_id = 'mail-e2e', activated_at = ?, updated_at = ? WHERE organisation_id = ?",
+    )
     .bind(now, now, created.organisationId)
     .run();
   const policy = defaultDenyPolicy({ now });
@@ -6108,9 +6325,10 @@ async function workspace(
     maxWallMs: 30000,
     maxToolCalls: 5,
   };
-  await fixtureDatabase().prepare(
-    "INSERT INTO policy_snapshot (organisation_id, version, body, created_at, created_by) VALUES (?, 1, ?, ?, 'mail-e2e')",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "INSERT INTO policy_snapshot (organisation_id, version, body, created_at, created_by) VALUES (?, 1, ?, ?, 'mail-e2e')",
+    )
     .bind(created.organisationId, JSON.stringify(policy), now)
     .run();
   await env.POLICY_KV.put(
@@ -6346,7 +6564,11 @@ async function connectorMailCommandPlacementJourney({
       })
     ).ok,
   ).toBe(true);
-  await organizationView(fixture.organisationId, fixture.owner.session, accountId);
+  await organizationView(
+    fixture.organisationId,
+    fixture.owner.session,
+    accountId,
+  );
   const connectorId = gmailConnectorId(accountId);
   if (!connectorId.ok) throw new Error("Invalid fixture connector");
   const initial = await resolveActiveConnectorActor({
@@ -6386,7 +6608,10 @@ async function connectorMailCommandPlacementJourney({
           }
         : { kind: "classify", expectedRevision: 1, messageIds: ["m1"] };
     const input = {
-      identity: { organisationId: fixture.organisationId, connectorId: connectorId.value },
+      identity: {
+        organisationId: fixture.organisationId,
+        connectorId: connectorId.value,
+      },
       integrationAccountId: accountId,
       authority: fixture.request.authority,
       command,
@@ -6616,11 +6841,17 @@ async function connectorMailObservationPlacementJourney({
     now: Date.now(),
   });
   if (!source.ok) throw new Error(source.error.code);
-  const scope = await OrganisationExecutionScope.resolve(env, fixture.organisationId);
+  const scope = await OrganisationExecutionScope.resolve(
+    env,
+    fixture.organisationId,
+  );
   if (!scope.ok) throw new Error(scope.error.code);
   const head = await runInDurableObject(source.value, readObservationHead);
   const input = {
-    identity: { organisationId: fixture.organisationId, connectorId: connectorId.value },
+    identity: {
+      organisationId: fixture.organisationId,
+      connectorId: connectorId.value,
+    },
     integrationAccountId: accountId,
     authority: fixture.request.authority,
   };
@@ -6668,9 +6899,10 @@ async function connectorMailObservationPlacementJourney({
       .first<{ total: number }>();
     expect(exported?.total).toBe(0);
     await attemptFrozenMailProjection(scope.value, head);
-    const frozenRows = await fixtureDatabase().prepare(
-      "SELECT COUNT(*) AS total FROM mail_classification WHERE organisation_id = ?",
-    )
+    const frozenRows = await fixtureDatabase()
+      .prepare(
+        "SELECT COUNT(*) AS total FROM mail_classification WHERE organisation_id = ?",
+      )
       .bind(fixture.organisationId)
       .first<{ total: number }>();
     expect(frozenRows?.total).toBe(0);
@@ -6791,7 +7023,10 @@ async function connectorMailReadPlacementJourney({
   await runInDurableObject(source.value, expireWorkLease);
   await runDurableObjectAlarm(source.value);
   const input = {
-    identity: { organisationId: fixture.organisationId, connectorId: connectorId.value },
+    identity: {
+      organisationId: fixture.organisationId,
+      connectorId: connectorId.value,
+    },
     integrationAccountId: accountId,
     authority: fixture.request.authority,
   };
@@ -7143,9 +7378,10 @@ async function installMailPlacementFixture() {
     db: fixtureDatabase(),
     organisationId,
   });
-  const person = await fixtureDatabase().prepare(
-    "SELECT person_id AS personId FROM service_role_grant WHERE organisation_id = ? AND user_id = ?",
-  )
+  const person = await fixtureDatabase()
+    .prepare(
+      "SELECT person_id AS personId FROM service_role_grant WHERE organisation_id = ? AND user_id = ?",
+    )
     .bind(organisationId, owner.identity.userId)
     .first<{ personId: string }>();
   if (membershipRevision === null || person === null)
@@ -7163,11 +7399,12 @@ async function installMailPlacementFixture() {
     integrationAccountId,
   );
   if (source === null) throw new Error("Missing fixture mail source");
-  await fixtureDatabase().prepare(
-    `INSERT INTO mail_classification_eligibility
+  await fixtureDatabase()
+    .prepare(
+      `INSERT INTO mail_classification_eligibility
     (organisation_id,integration_account_id,source_pin,connection_revision,model,purpose,evidence_reference,evidence_owner,disclosed_recipient,reviewed_at,review_expires_at,revoked_at)
     VALUES (?, ?, ?, 1, 'jev-1.13.0', 'mail_classification', 'p55-native', 'fixture-owner', 'typesafe', ?, ?, NULL)`,
-  )
+    )
     .bind(
       organisationId,
       integrationAccountId,
@@ -7335,8 +7572,14 @@ async function organizationJourney(): Promise<void> {
     consent: true,
   };
   expect(
-    (await organizationSend(organisationId, owner.session, accountId, previewCommand))
-      .status,
+    (
+      await organizationSend(
+        organisationId,
+        owner.session,
+        accountId,
+        previewCommand,
+      )
+    ).status,
   ).toBe(409);
   const context = await resolveActiveProviderAccountContext({
     db: fixtureDatabase(),
@@ -7349,12 +7592,19 @@ async function organizationJourney(): Promise<void> {
     authority: context.value.connection.authority,
     updatedAt: context.value.connection.updatedAt,
   });
-  await fixtureDatabase().prepare(
-    `INSERT INTO mail_classification_eligibility
+  await fixtureDatabase()
+    .prepare(
+      `INSERT INTO mail_classification_eligibility
     (organisation_id,integration_account_id,source_pin,connection_revision,model,purpose,evidence_reference,evidence_owner,disclosed_recipient,reviewed_at,review_expires_at,revoked_at)
     VALUES (?, ?, ?, 1, 'jev-1.13.0', 'mail_classification', 'fixture-review', 'fixture-owner', 'typesafe', ?, ?, NULL)`,
-  )
-    .bind(organisationId, accountId, sourcePin, Date.now(), Date.now() + 3_600_000)
+    )
+    .bind(
+      organisationId,
+      accountId,
+      sourcePin,
+      Date.now(),
+      Date.now() + 3_600_000,
+    )
     .run();
   const preview = await organizationSend(
     organisationId,
@@ -7369,9 +7619,9 @@ async function organizationJourney(): Promise<void> {
   });
   expect(
     (
-      await fixtureDatabase().prepare(
-        "SELECT COUNT(*) AS count FROM mail_classification",
-      ).first<{ count: number }>()
+      await fixtureDatabase()
+        .prepare("SELECT COUNT(*) AS count FROM mail_classification")
+        .first<{ count: number }>()
     )?.count,
   ).toBe(0);
   expect(
@@ -7425,7 +7675,11 @@ async function organizationJourney(): Promise<void> {
     http.post("https://api.typesafe.ai/v1/systemone", unexpectedInference),
   );
   await runDurableObjectAlarm(connector.value);
-  const classified = await organizationView(organisationId, owner.session, accountId);
+  const classified = await organizationView(
+    organisationId,
+    owner.session,
+    accountId,
+  );
   expect(classified.classifications).toHaveLength(2);
   expect(classified.pending).toBe(0);
   const classifiedCursor = await classifiedViewsJourney(
@@ -7445,7 +7699,11 @@ async function organizationJourney(): Promise<void> {
       })
     ).status,
   ).toBe(200);
-  const corrected = await organizationView(organisationId, owner.session, accountId);
+  const corrected = await organizationView(
+    organisationId,
+    owner.session,
+    accountId,
+  );
   expect(corrected.classifications).toContainEqual(
     expect.objectContaining({
       ruleId: "rule_important",
@@ -7545,7 +7803,11 @@ async function organizationJourney(): Promise<void> {
   ).toBeGreaterThan(Date.now() + 20_000);
   await runInDurableObject(connector.value, advancePendingWorkClock);
   await runDurableObjectAlarm(connector.value);
-  const resumed = await organizationView(organisationId, owner.session, accountId);
+  const resumed = await organizationView(
+    organisationId,
+    owner.session,
+    accountId,
+  );
   expect(resumed.pending).toBe(0);
   expect(resumed.budgetPaused).toBe(0);
   expect(resumed.classifications).toHaveLength(6);
@@ -7562,7 +7824,8 @@ async function organizationJourney(): Promise<void> {
   await runInDurableObject(connector.value, advanceObservationClock);
   await runDurableObjectAlarm(connector.value);
   expect(
-    (await organizationView(organisationId, owner.session, accountId)).readiness,
+    (await organizationView(organisationId, owner.session, accountId))
+      .readiness,
   ).toBe("history_expired");
   expect(
     (
@@ -7572,7 +7835,11 @@ async function organizationJourney(): Promise<void> {
       })
     ).status,
   ).toBe(200);
-  const paused = await organizationView(organisationId, owner.session, accountId);
+  const paused = await organizationView(
+    organisationId,
+    owner.session,
+    accountId,
+  );
   expect(paused.rules.kind).toBe("paused");
   expect(paused.classifications).toHaveLength(6);
   expect(
@@ -7646,7 +7913,11 @@ async function organizationJourney(): Promise<void> {
       })
     ).status,
   ).toBe(200);
-  const automatic = await organizationView(organisationId, owner.session, accountId);
+  const automatic = await organizationView(
+    organisationId,
+    owner.session,
+    accountId,
+  );
   expect(automatic.rules).toMatchObject({
     kind: "published",
     revision: 3,
@@ -7657,7 +7928,11 @@ async function organizationJourney(): Promise<void> {
   await runInDurableObject(organisation, restoreMailBudget);
   await runInDurableObject(connector.value, advanceObservationClock);
   await runDurableObjectAlarm(connector.value);
-  const future = await organizationView(organisationId, owner.session, accountId);
+  const future = await organizationView(
+    organisationId,
+    owner.session,
+    accountId,
+  );
   expect(future.classifications).toHaveLength(8);
   expect(
     future.classifications.filter(classificationForResumedArrival),
@@ -7677,7 +7952,8 @@ async function organizationJourney(): Promise<void> {
   await evictDurableObject(connector.value);
   await runDurableObjectAlarm(connector.value);
   expect(
-    (await organizationView(organisationId, owner.session, accountId)).rules.kind,
+    (await organizationView(organisationId, owner.session, accountId)).rules
+      .kind,
   ).toBe("paused");
   expect(mailInferenceCalls).toBe(5);
   console.log(
@@ -7701,7 +7977,8 @@ async function organizationJourney(): Promise<void> {
     ).status,
   ).toBe(404);
   expect(
-    (await organizationSend(organisationId, owner.session, accountId, null)).status,
+    (await organizationSend(organisationId, owner.session, accountId, null))
+      .status,
   ).toBe(404);
   expect(
     (
@@ -7719,21 +7996,24 @@ async function organizationJourney(): Promise<void> {
     "email_thread_case",
     "email_reply_proposal",
   ]) {
-    const row = await fixtureDatabase().prepare(
-      `SELECT COUNT(*) AS count FROM ${table}`,
-    ).first<{ count: number }>();
+    const row = await fixtureDatabase()
+      .prepare(`SELECT COUNT(*) AS count FROM ${table}`)
+      .first<{ count: number }>();
     expect(row?.count).toBe(0);
   }
-  const metadata = await fixtureDatabase().prepare(
-    "SELECT * FROM mail_classification",
-  ).all();
+  const metadata = await fixtureDatabase()
+    .prepare("SELECT * FROM mail_classification")
+    .all();
   expect(JSON.stringify(metadata)).not.toContain("Private body");
 }
 
-async function revokeDuringHydration(organisationId: OrganisationId): Promise<Response> {
-  await fixtureDatabase().prepare(
-    "UPDATE access_grant SET lifecycle = 'revoked', revision = revision + 1, reason = 'fixture revoked during read' WHERE organisation_id = ?",
-  )
+async function revokeDuringHydration(
+  organisationId: OrganisationId,
+): Promise<Response> {
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE access_grant SET lifecycle = 'revoked', revision = revision + 1, reason = 'fixture revoked during read' WHERE organisation_id = ?",
+    )
     .bind(organisationId)
     .run();
   return HttpResponse.json(gmailMessage("m1", "t1", false));
@@ -7830,12 +8110,14 @@ async function classifiedViewsJourney(
     references.push(`b${String(index).padStart(3, "0")}`);
   for (const id of references)
     statements.push(
-      fixtureDatabase().prepare(
-        `INSERT INTO mail_classification
+      fixtureDatabase()
+        .prepare(
+          `INSERT INTO mail_classification
       (organisation_id, integration_account_id, rule_revision, message_id, thread_id, rule_id, outcome, source, evaluated_at, evaluation_id, content_digest)
       SELECT organisation_id, integration_account_id, rule_revision, ?, ?, rule_id, outcome, source, evaluated_at + 1000, evaluation_id, content_digest
       FROM mail_classification WHERE organisation_id = ? AND integration_account_id = ? AND message_id = 'm1'`,
-      ).bind(id, `t_${id}`, organisationId, accountId),
+        )
+        .bind(id, `t_${id}`, organisationId, accountId),
     );
   await fixtureDatabase().batch(statements);
   network.use(
@@ -7846,7 +8128,8 @@ async function classifiedViewsJourney(
   );
   // Displayed mail keeps its decisions even after hundreds of newer projections.
   expect(
-    (await organizationView(organisationId, session, accountId)).classifications,
+    (await organizationView(organisationId, session, accountId))
+      .classifications,
   ).toHaveLength(2);
   const command = {
     kind: "classifiedPage",
@@ -7920,7 +8203,9 @@ async function classifiedViewsJourney(
     messageId: "m1",
     ruleId: "rule_supplier",
   } as const;
-  const details = await result(await send(organisationId, session, detailCommand));
+  const details = await result(
+    await send(organisationId, session, detailCommand),
+  );
   expect(details).toMatchObject({
     kind: "decision",
     decision: {
@@ -7944,9 +8229,10 @@ async function classifiedViewsJourney(
       organizationGmailFixture,
     ),
   );
-  await fixtureDatabase().prepare(
-    "DELETE FROM mail_classification WHERE organisation_id = ? AND integration_account_id = ? AND message_id NOT IN ('m1', 'm2', 'm3')",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "DELETE FROM mail_classification WHERE organisation_id = ? AND integration_account_id = ? AND message_id NOT IN ('m1', 'm2', 'm3')",
+    )
     .bind(organisationId, accountId)
     .run();
   return first.nextCursor;
@@ -7966,12 +8252,13 @@ async function classifiedGmailFixture(
   const url = new URL(input.request.url);
   const id = url.pathname.split("/").at(-1) ?? "";
   if (id === "b230")
-    await fixtureDatabase().prepare(
-      `INSERT OR IGNORE INTO mail_classification
+    await fixtureDatabase()
+      .prepare(
+        `INSERT OR IGNORE INTO mail_classification
       (organisation_id, integration_account_id, rule_revision, message_id, thread_id, rule_id, outcome, source, evaluated_at, evaluation_id, content_digest)
       SELECT organisation_id, integration_account_id, rule_revision, 'zzarrival', 't_zzarrival', rule_id, outcome, source, evaluated_at, evaluation_id, content_digest
       FROM mail_classification WHERE organisation_id = ? AND integration_account_id = ? AND message_id = 'm1'`,
-    )
+      )
       .bind(organisationId, accountId)
       .run();
   if (id === "zdeleted") return new Response("missing", { status: 404 });
@@ -8208,9 +8495,10 @@ async function assistantJourney(context: TestContext): Promise<void> {
     (await assistantSend(organisationId, accountId, owner.session, command))
       .status,
   ).toBe(409);
-  await fixtureDatabase().prepare(
-    "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'pantry_platform', ?, ?)",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'pantry_platform', ?, ?)",
+    )
     .bind(organisationId, owner.identity.userId, Date.now())
     .run();
   const contextGrant = await createAccessGrant({
@@ -8237,9 +8525,10 @@ async function assistantJourney(context: TestContext): Promise<void> {
     organisationId,
   });
   if (membership === null) throw new Error("Missing owner membership");
-  const person = await fixtureDatabase().prepare(
-    "SELECT person_id AS personId FROM service_role_grant WHERE organisation_id = ? AND user_id = ?",
-  )
+  const person = await fixtureDatabase()
+    .prepare(
+      "SELECT person_id AS personId FROM service_role_grant WHERE organisation_id = ? AND user_id = ?",
+    )
     .bind(organisationId, owner.identity.userId)
     .first<{ personId: string }>();
   if (person === null) throw new Error("Missing owner person");
@@ -8260,9 +8549,10 @@ async function assistantJourney(context: TestContext): Promise<void> {
   });
   if (source === null || !model.ok) throw new Error("Missing assistant route");
   command.modelRouteDigest = await digestModelRoute(model.value);
-  await fixtureDatabase().prepare(
-    `INSERT INTO mail_assistant_eligibility (organisation_id, integration_account_id, source_pin, model_route_digest, purpose, disclosed_recipient, evidence_reference, owner, consent_reference, reviewed_at, review_expires_at, revoked_at) VALUES (?, ?, ?, ?, 'mail_inbox_assistance', 'openrouter', 'synthetic-assistant-e2e', 'synthetic-reviewer', 'synthetic-consent', ?, ?, NULL)`,
-  )
+  await fixtureDatabase()
+    .prepare(
+      `INSERT INTO mail_assistant_eligibility (organisation_id, integration_account_id, source_pin, model_route_digest, purpose, disclosed_recipient, evidence_reference, owner, consent_reference, reviewed_at, review_expires_at, revoked_at) VALUES (?, ?, ?, ?, 'mail_inbox_assistance', 'openrouter', 'synthetic-assistant-e2e', 'synthetic-reviewer', 'synthetic-consent', ?, ?, NULL)`,
+    )
     .bind(
       organisationId,
       accountId,
@@ -8322,9 +8612,10 @@ async function assistantJourney(context: TestContext): Promise<void> {
       sourcePin: source.sourcePin,
     }),
   );
-  await fixtureDatabase().prepare(
-    `INSERT INTO mail_classification (organisation_id, integration_account_id, rule_revision, message_id, thread_id, rule_id, outcome, source, evaluated_at, evaluation_id, content_digest) VALUES (?, ?, 1, 'm1', 't1', 'rule_explain', 'matched', 'operator', ?, 'fixture_explanation', ?)`,
-  )
+  await fixtureDatabase()
+    .prepare(
+      `INSERT INTO mail_classification (organisation_id, integration_account_id, rule_revision, message_id, thread_id, rule_id, outcome, source, evaluated_at, evaluation_id, content_digest) VALUES (?, ?, 1, 'm1', 't1', 'rule_explain', 'matched', 'operator', ?, 'fixture_explanation', ?)`,
+    )
     .bind(organisationId, accountId, Date.now(), "0".repeat(64))
     .run();
   modelState.explanation = true;
@@ -8365,22 +8656,25 @@ async function assistantJourney(context: TestContext): Promise<void> {
   );
   // Proposing does not publish criteria, admit historical mail, draft or send.
   expect(
-    await fixtureDatabase().prepare(
-      "SELECT COUNT(*) AS count FROM email_thread_case WHERE organisation_id = ?",
-    )
+    await fixtureDatabase()
+      .prepare(
+        "SELECT COUNT(*) AS count FROM email_thread_case WHERE organisation_id = ?",
+      )
       .bind(organisationId)
       .first(),
   ).toEqual({ count: 0 });
   expect(
-    await fixtureDatabase().prepare(
-      "SELECT COUNT(*) AS count FROM email_reply_proposal WHERE organisation_id = ?",
-    )
+    await fixtureDatabase()
+      .prepare(
+        "SELECT COUNT(*) AS count FROM email_reply_proposal WHERE organisation_id = ?",
+      )
       .bind(organisationId)
       .first(),
   ).toEqual({ count: 0 });
-  const placements = await fixtureDatabase().prepare(
-    "SELECT object_kind AS kind, physical_object_name AS name FROM durable_object_registry WHERE organisation_id = ? AND object_kind IN ('case', 'session')",
-  )
+  const placements = await fixtureDatabase()
+    .prepare(
+      "SELECT object_kind AS kind, physical_object_name AS name FROM durable_object_registry WHERE organisation_id = ? AND object_kind IN ('case', 'session')",
+    )
     .bind(organisationId)
     .all<{ kind: string; name: string }>();
   expect(placements.results.length).toBe(6);
@@ -8406,9 +8700,10 @@ async function assistantJourney(context: TestContext): Promise<void> {
       .status,
   ).toBe(409);
   expect(modelState.calls).toBe(4);
-  await fixtureDatabase().prepare(
-    "UPDATE mail_assistant_eligibility SET revoked_at = NULL WHERE organisation_id = ?",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE mail_assistant_eligibility SET revoked_at = NULL WHERE organisation_id = ?",
+    )
     .bind(organisationId)
     .run();
   modelState.revoke = false;
@@ -8473,9 +8768,10 @@ async function assistantModel(
       now: Date.now(),
     });
   if (state.revoke)
-    await fixtureDatabase().prepare(
-      "UPDATE mail_assistant_eligibility SET revoked_at = ? WHERE organisation_id = ?",
-    )
+    await fixtureDatabase()
+      .prepare(
+        "UPDATE mail_assistant_eligibility SET revoked_at = ? WHERE organisation_id = ?",
+      )
       .bind(Date.now(), organisationId)
       .run();
   return openRouterText(
@@ -8825,9 +9121,10 @@ async function caseContextCollectionReplyJourney(
     },
   });
   if (!contextGrant.ok) throw new Error(contextGrant.error.code);
-  await fixtureDatabase().prepare(
-    "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'pantry_platform', ?, ?)",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'pantry_platform', ?, ?)",
+    )
     .bind(organisationId, owner.identity.userId, now)
     .run();
   await acceptMailboxModelTerms({
@@ -8849,7 +9146,11 @@ async function caseContextCollectionReplyJourney(
     connector.value,
     seedCaseContextCollectionRuntime.bind(null, fixture),
   );
-  const organisation = await requireActiveOrganisationActor({ env, organisationId, now });
+  const organisation = await requireActiveOrganisationActor({
+    env,
+    organisationId,
+    now,
+  });
   await organisation.ensureOrganisation({
     organisationId,
     name: "CaseContextCollection supplier acceptance",
@@ -8860,7 +9161,10 @@ async function caseContextCollectionReplyJourney(
   const state = new CaseContextCollectionReplyProvider();
   state.loseDraftResponse = scenario === "lost_draft";
   network.use(
-    http.post("https://api.typesafe.ai/v1/systemone", caseContextCollectionConnectionProbe),
+    http.post(
+      "https://api.typesafe.ai/v1/systemone",
+      caseContextCollectionConnectionProbe,
+    ),
   );
   expect(
     await organisation.manageTypeSafeConnection({
@@ -8875,7 +9179,9 @@ async function caseContextCollectionReplyJourney(
     }),
   ).toMatchObject({ ok: true });
   for (const message of ["anchor", "related"]) {
-    const caseId = parseCaseId(`case_gmail_${rawAccount}_case_context_collection_${message}`);
+    const caseId = parseCaseId(
+      `case_gmail_${rawAccount}_case_context_collection_${message}`,
+    );
     if (!caseId.ok) throw new Error(caseId.error.code);
     expect(
       await admitEmailThreadCase(env, {
@@ -8960,7 +9266,13 @@ async function caseContextCollectionReplyJourney(
     }),
   ).toMatchObject({ ok: true, value: { revision: 1 } });
   if (scenario === "metadata") {
-    await verifyCaseContextCollectionInspector(context, owner, fixture, organisation, state);
+    await verifyCaseContextCollectionInspector(
+      context,
+      owner,
+      fixture,
+      organisation,
+      state,
+    );
     return;
   }
   network.use(
@@ -9057,7 +9369,10 @@ async function caseContextCollectionReplyJourney(
     inspectCaseContextCollectionProposalFlow.bind(null, proposalId),
   );
   expect(protectedFlow).toMatchObject({
-    dependency: { kind: "case_context_collection_evidence", caseContextCollectionRevision: 2 },
+    dependency: {
+      kind: "case_context_collection_evidence",
+      caseContextCollectionRevision: 2,
+    },
     binding: {
       flowLabel: {
         policies: expect.arrayContaining([
@@ -9187,7 +9502,12 @@ async function caseContextCollectionReplyJourney(
     expect(
       await organisation.eraseCaseContextCollectionSource({
         organisationId,
-        selection: caseContextCollectionReplySelection(organisationId, rawAccount, "related", now),
+        selection: caseContextCollectionReplySelection(
+          organisationId,
+          rawAccount,
+          "related",
+          now,
+        ),
       }),
     ).toMatchObject({ ok: true });
     await evictDurableObject(organisation);
@@ -9234,7 +9554,10 @@ async function caseContextCollectionReplyJourney(
       readCaseContextCollectionSendAttempt.bind(null, proposalId),
     );
     expect(
-      await organisation.commitCaseContextCollectionEffectFence({ organisationId, attempt }),
+      await organisation.commitCaseContextCollectionEffectFence({
+        organisationId,
+        attempt,
+      }),
     ).toMatchObject({ ok: true, value: { kind: "committed" } });
     expect(
       await organisation.reviewCaseContextCollectionRelationship({
@@ -9283,19 +9606,28 @@ async function caseContextCollectionReplyJourney(
   } else {
     expect(stale).toMatchObject({
       ok: true,
-      value: { kind: "sent", providerMessageId: "sent_case_context_collection_2" },
+      value: {
+        kind: "sent",
+        providerMessageId: "sent_case_context_collection_2",
+      },
     });
     expect(state.sends).toBe(2);
     if (attempt === null) throw new Error("Missing exact send attempt");
     expect(
-      await organisation.commitCaseContextCollectionEffectFence({ organisationId, attempt }),
+      await organisation.commitCaseContextCollectionEffectFence({
+        organisationId,
+        attempt,
+      }),
     ).toMatchObject({ ok: true, value: { kind: "committed" } });
     expect(
       await organisation.commitCaseContextCollectionEffectFence({
         organisationId,
         attempt: { ...attempt, contentDigest: "f".repeat(64) },
       }),
-    ).toMatchObject({ ok: false, error: { code: "case_context_collection_effect_conflict" } });
+    ).toMatchObject({
+      ok: false,
+      error: { code: "case_context_collection_effect_conflict" },
+    });
     expect(
       await runInDurableObject(
         connector.value,
@@ -9329,20 +9661,29 @@ async function verifyCaseContextCollectionInspector(
   provider: CaseContextCollectionReplyProvider,
 ): Promise<void> {
   const organisationIdentity = parseOrganisationId(fixture.organisationId);
-  if (!organisationIdentity.ok) throw new Error(organisationIdentity.error.code);
+  if (!organisationIdentity.ok)
+    throw new Error(organisationIdentity.error.code);
   const base = `/v1/control/organisations/${fixture.organisationId}/case-context-discovery`;
   const caseContextCollectionPath = `${base}/caseContextCollections/case_context_collection_supplier_reply`;
   const casePath = `${base}/cases/${fixture.caseId}`;
-  expect((await caseContextCollectionInspectorRequest(owner.session, casePath)).status).toBe(
-    200,
-  );
+  expect(
+    (await caseContextCollectionInspectorRequest(owner.session, casePath))
+      .status,
+  ).toBe(200);
   expect(
     parseCaseContextCollectionMetadataResponse(
-      await (await caseContextCollectionInspectorRequest(owner.session, casePath)).json(),
+      await (
+        await caseContextCollectionInspectorRequest(owner.session, casePath)
+      ).json(),
     ),
   ).toEqual([]);
   expect(
-    (await caseContextCollectionInspectorRequest(owner.session, caseContextCollectionPath)).status,
+    (
+      await caseContextCollectionInspectorRequest(
+        owner.session,
+        caseContextCollectionPath,
+      )
+    ).status,
   ).toBe(404);
   expect(
     await createAccessGrant({
@@ -9394,7 +9735,12 @@ async function verifyCaseContextCollectionInspector(
     );
   }
   const visible = parseCaseContextCollectionMetadataResponse(
-    await (await caseContextCollectionInspectorRequest(owner.session, caseContextCollectionPath)).json(),
+    await (
+      await caseContextCollectionInspectorRequest(
+        owner.session,
+        caseContextCollectionPath,
+      )
+    ).json(),
   );
   expect(visible).toMatchObject([
     {
@@ -9405,7 +9751,9 @@ async function verifyCaseContextCollectionInspector(
   ]);
   const operatorRead = await exports.default.fetch(
     new Request(`https://localhost${caseContextCollectionPath}`, {
-      headers: { authorization: "Bearer organisation-admin-e2e-token-000000000000" },
+      headers: {
+        authorization: "Bearer organisation-admin-e2e-token-000000000000",
+      },
     }),
   );
   expect(operatorRead.status).toBe(404);
@@ -9429,7 +9777,10 @@ async function verifyCaseContextCollectionInspector(
   expect(
     parseCaseContextCollectionMetadataResponse(
       await (
-        await caseContextCollectionInspectorRequest(owner.session, inspectorPath)
+        await caseContextCollectionInspectorRequest(
+          owner.session,
+          inspectorPath,
+        )
       ).json(),
     ),
   ).toEqual(visible);
@@ -9455,17 +9806,30 @@ async function verifyCaseContextCollectionInspector(
   await evictDurableObject(organisation);
   expect(
     await (
-      await caseContextCollectionInspectorRequest(owner.session, reviewPath, body)
+      await caseContextCollectionInspectorRequest(
+        owner.session,
+        reviewPath,
+        body,
+      )
     ).json(),
   ).toEqual(receipt);
-  const stale = await caseContextCollectionInspectorRequest(secondSession, reviewPath, {
-    ...body,
-    commandId: "inspector_stale",
-  });
+  const stale = await caseContextCollectionInspectorRequest(
+    secondSession,
+    reviewPath,
+    {
+      ...body,
+      commandId: "inspector_stale",
+    },
+  );
   expect(stale.status).toBe(409);
   expect(
     parseCaseContextCollectionMetadataResponse(
-      await (await caseContextCollectionInspectorRequest(owner.session, caseContextCollectionPath)).json(),
+      await (
+        await caseContextCollectionInspectorRequest(
+          owner.session,
+          caseContextCollectionPath,
+        )
+      ).json(),
     ),
   ).toMatchObject([{ revision: 3, relationships: [{ kind: "detached" }] }]);
   expect(
@@ -9480,14 +9844,27 @@ async function verifyCaseContextCollectionInspector(
   ).toMatchObject({ ok: true });
   expect(
     parseCaseContextCollectionMetadataResponse(
-      await (await caseContextCollectionInspectorRequest(owner.session, casePath)).json(),
+      await (
+        await caseContextCollectionInspectorRequest(owner.session, casePath)
+      ).json(),
     ),
   ).toEqual([]);
   expect(
-    (await caseContextCollectionInspectorRequest(owner.session, caseContextCollectionPath)).status,
+    (
+      await caseContextCollectionInspectorRequest(
+        owner.session,
+        caseContextCollectionPath,
+      )
+    ).status,
   ).toBe(404);
   expect(
-    (await caseContextCollectionInspectorRequest(secondSession, reviewPath, body)).status,
+    (
+      await caseContextCollectionInspectorRequest(
+        secondSession,
+        reviewPath,
+        body,
+      )
+    ).status,
   ).toBe(404);
   expect(
     await organisation.readCaseContextCollection({
@@ -9579,9 +9956,10 @@ async function seedPrivateCaseContextCollectionNote(
     db: fixtureDatabase(),
     organisationId,
   });
-  const person = await fixtureDatabase().prepare(
-    "SELECT person_id AS personId FROM service_role_grant WHERE organisation_id = ? AND user_id = ?",
-  )
+  const person = await fixtureDatabase()
+    .prepare(
+      "SELECT person_id AS personId FROM service_role_grant WHERE organisation_id = ? AND user_id = ?",
+    )
     .bind(organisationId, userId)
     .first<{ personId: string }>();
   const caseId = parseCaseId(rawCaseId);
@@ -9776,7 +10154,8 @@ async function previewCaseContextCollectionReply(
   state: DurableObjectState,
 ) {
   const runtime = readEmailRuntime(state.storage.sql);
-  if (runtime === null) throw new Error("Missing CaseContextCollection reply runtime");
+  if (runtime === null)
+    throw new Error("Missing CaseContextCollection reply runtime");
   const organisationId = parseOrganisationId(runtime.organisationId);
   if (!organisationId.ok) throw new Error(organisationId.error.code);
   const scope = await requireMailFixtureScope(organisationId.value);
@@ -9797,7 +10176,8 @@ async function dispatchCaseContextCollectionReply(
   state: DurableObjectState,
 ) {
   const runtime = readEmailRuntime(state.storage.sql);
-  if (runtime === null) throw new Error("Missing CaseContextCollection reply runtime");
+  if (runtime === null)
+    throw new Error("Missing CaseContextCollection reply runtime");
   const organisationId = parseOrganisationId(runtime.organisationId);
   if (!organisationId.ok) throw new Error(organisationId.error.code);
   const scope = await requireMailFixtureScope(organisationId.value);
@@ -9824,9 +10204,13 @@ async function denyContaminatedCaseContextCollectionReply(
 ): Promise<void> {
   const organisationId = parseOrganisationId(fixture.organisationId);
   const accountId = parseIntegrationAccountId(fixture.integrationAccountId);
-  if (!organisationId.ok || !accountId.ok) throw new Error("Invalid mailbox fixture");
+  if (!organisationId.ok || !accountId.ok)
+    throw new Error("Invalid mailbox fixture");
   const stored = readEmailProposalFlow(state.storage.sql, proposalId);
-  if (stored === null || stored.dependency.kind !== "case_context_collection_evidence")
+  if (
+    stored === null ||
+    stored.dependency.kind !== "case_context_collection_evidence"
+  )
     throw new Error("Missing CaseContextCollection flow");
   const binding = await FlowBinding.restore(stored.binding);
   if (!binding.ok) throw new Error(binding.error.code);
@@ -10266,9 +10650,10 @@ async function verifySupplierReplyCorrection(
       version,
       now: Date.now(),
     });
-  const editor = await fixtureDatabase().prepare(
-    "SELECT person_id AS personId FROM service_role_grant WHERE organisation_id = ? AND user_id = ?",
-  )
+  const editor = await fixtureDatabase()
+    .prepare(
+      "SELECT person_id AS personId FROM service_role_grant WHERE organisation_id = ? AND user_id = ?",
+    )
     .bind(organisationId, owner.identity.userId)
     .first<{ personId: string }>();
   const drafted = await review();
@@ -10728,11 +11113,12 @@ function joinDefaultProject(
   userId: string,
   role: "owner" | "viewer",
 ) {
-  return fixtureDatabase().prepare(
-    `INSERT OR IGNORE INTO project_member (organisation_id, project_id, user_id, role)
+  return fixtureDatabase()
+    .prepare(
+      `INSERT OR IGNORE INTO project_member (organisation_id, project_id, user_id, role)
      SELECT organisation_id, project_id, ?, ?
      FROM organisation_default_project WHERE organisation_id = ?`,
-  )
+    )
     .bind(userId, role, organisationId)
     .run();
 }
@@ -10840,14 +11226,16 @@ async function verifyMailTurnMemoryExecution(
 
   // An administrator who may not review this mailbox's replies.
   const member = await client("mail-turn-memory-member");
-  await fixtureDatabase().prepare(
-    "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, 'person_mail_turn_member', 'Project member')",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, 'person_mail_turn_member', 'Project member')",
+    )
     .bind(organisationId)
     .run();
-  await fixtureDatabase().prepare(
-    "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at, revoked_at) VALUES (?, ?, 'person_mail_turn_member', 'admin', 'active', ?, NULL)",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at, revoked_at) VALUES (?, ?, 'person_mail_turn_member', 'admin', 'active', ?, NULL)",
+    )
     .bind(organisationId, member.identity.userId, Date.now())
     .run();
   await joinDefaultProject(organisationId, member.identity.userId, "viewer");
@@ -11836,7 +12224,11 @@ async function verifySupplierEvalRuns(
   const beforeReplacement = state.evalInputs.length;
   const heldForReplacement = state.holdAt("model", evalTurn(2));
   const replaced = receiptOf(
-    await start("eval_run_replaced", ["pantry_platform"], [{ kind: "current" }]),
+    await start(
+      "eval_run_replaced",
+      ["pantry_platform"],
+      [{ kind: "current" }],
+    ),
   );
   await expect
     .poll(() => heldForReplacement.phase, { timeout: 60_000 })
@@ -11925,7 +12317,8 @@ async function verifySupplierEvalRuns(
   expect(evalConfigurationVerdict(afterSpent, "current")).toBe("incomplete");
   expect({
     requests: state.evalInputs.length - beforeSpent.requests,
-    subscriptionStarts: subscriptionStarts.length - beforeSpent.subscriptionStarts,
+    subscriptionStarts:
+      subscriptionStarts.length - beforeSpent.subscriptionStarts,
   }).toEqual({ requests: 4, subscriptionStarts: 0 });
 
   // The operator accepts the passing candidate through the Memory command.
@@ -12042,14 +12435,16 @@ async function verifySupplierEvalRuns(
   // and runs as the owner: the mailbox belongs to the whole Organisation
   // (Plan 27C).
   const stranger = await client("eval-run-stranger");
-  await fixtureDatabase().prepare(
-    "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, 'person_eval_stranger', 'Eval stranger')",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, 'person_eval_stranger', 'Eval stranger')",
+    )
     .bind(organisationId)
     .run();
-  await fixtureDatabase().prepare(
-    "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at, revoked_at) VALUES (?, ?, 'person_eval_stranger', 'admin', 'active', ?, NULL)",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at, revoked_at) VALUES (?, ?, 'person_eval_stranger', 'admin', 'active', ?, NULL)",
+    )
     .bind(organisationId, stranger.identity.userId, Date.now())
     .run();
   const strangerEvals = await send(stranger.session, "", null);
@@ -12294,14 +12689,15 @@ async function verifySupplierAdmissionBinding(
       disposition: null,
     },
   ]);
-  const receipts = await fixtureDatabase().prepare(
-    `SELECT provider_message_id AS messageId, case_id AS caseId,
+  const receipts = await fixtureDatabase()
+    .prepare(
+      `SELECT provider_message_id AS messageId, case_id AS caseId,
             contact_verification_id AS verificationId,
             contact_verification_revision AS verificationRevision
      FROM email_message_receipt
      WHERE organisation_id = ? AND provider_message_id IN ('supplier_followup_message', 'stranger_message')
      ORDER BY provider_message_id`,
-  )
+    )
     .bind(organisationId)
     .all<{
       messageId: string;
@@ -13357,9 +13753,10 @@ async function verifyReplyCapabilityPolicy(
         policy.authz.deniedTools.push(CAPABILITY_KEYS.emailReplyPropose);
       else
         policy.authz.approvalRequired.push(CAPABILITY_KEYS.emailReplyPropose);
-      await fixtureDatabase().prepare(
-        "UPDATE policy_snapshot SET body = ? WHERE organisation_id = ? AND version = ?",
-      )
+      await fixtureDatabase()
+        .prepare(
+          "UPDATE policy_snapshot SET body = ? WHERE organisation_id = ? AND version = ?",
+        )
         .bind(JSON.stringify(policy), input.organisationId, policy.version)
         .run();
       for (const proposal of [
@@ -13404,9 +13801,10 @@ async function verifyReplyCapabilityPolicy(
       }
     }
   } finally {
-    await fixtureDatabase().prepare(
-      "UPDATE policy_snapshot SET body = ? WHERE organisation_id = ? AND version = ?",
-    )
+    await fixtureDatabase()
+      .prepare(
+        "UPDATE policy_snapshot SET body = ? WHERE organisation_id = ? AND version = ?",
+      )
       .bind(
         JSON.stringify(original.value),
         input.organisationId,
@@ -14858,9 +15256,10 @@ async function verifySupplierMemoryTurn(
   });
   // A record the verification rests on that cannot be interpreted leaves the
   // supplier unknown. The read is then unavailable, never empty.
-  await fixtureDatabase().prepare(
-    "UPDATE commerce_merchant_binding SET updated_at = 9223372036854775807 WHERE organisation_id = ?",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE commerce_merchant_binding SET updated_at = 9223372036854775807 WHERE organisation_id = ?",
+    )
     .bind(input.organisationId)
     .run();
   const unreadable = await read();
@@ -15186,7 +15585,11 @@ class CaseContextCollectionReplyProvider {
     this.modelCalls++;
     switch (this.modelCalls) {
       case 1:
-        return openRouterToolCall("read_email_case", {}, "case_context_collection_case");
+        return openRouterToolCall(
+          "read_email_case",
+          {},
+          "case_context_collection_case",
+        );
       case 2:
         return openRouterToolCall(
           "read_email_attachment",
@@ -15215,7 +15618,10 @@ class CaseContextCollectionReplyProvider {
           "case_context_collection_reply",
         );
       default:
-        return openRouterText("Prepared for review.", "case_context_collection_done");
+        return openRouterText(
+          "Prepared for review.",
+          "case_context_collection_done",
+        );
     }
   }
   followUpInputs: string[] = [];
@@ -15354,8 +15760,12 @@ class CaseContextCollectionReplyProvider {
       if (related && this.relatedSourceDeleted)
         return new Response(null, { status: 404 });
       return HttpResponse.json({
-        id: related ? "case_context_collection_related_message" : "case_context_collection_anchor_message",
-        threadId: related ? "case_context_collection_related" : "case_context_collection_anchor",
+        id: related
+          ? "case_context_collection_related_message"
+          : "case_context_collection_anchor_message",
+        threadId: related
+          ? "case_context_collection_related"
+          : "case_context_collection_anchor",
         payload: {
           mimeType: "text/plain",
           headers: [
@@ -15408,7 +15818,12 @@ class CaseContextCollectionReplyProvider {
         query === `rfc822msgid:${this.acceptedRfcMessageId}`;
       return HttpResponse.json({
         messages: found
-          ? [{ id: "sent_case_context_collection_2", threadId: "case_context_collection_anchor" }]
+          ? [
+              {
+                id: "sent_case_context_collection_2",
+                threadId: "case_context_collection_anchor",
+              },
+            ]
           : [],
       });
     }
@@ -15711,31 +16126,29 @@ async function personReplyJourney(): Promise<void> {
     http.get("https://gmail.googleapis.com/gmail/v1/users/me/messages/n7", () =>
       HttpResponse.json(noReply),
     ),
-    http.get(
-      "https://gmail.googleapis.com/gmail/v1/users/me/threads/t1",
-      () =>
-        HttpResponse.json({
-          id: "t1",
-          messages: [
-            gmailMessage("m1", "t1", true),
-            ...(answered
-              ? [
-                  {
-                    ...gmailMessage("m9", "t1", true, ["SENT"]),
-                    internalDate: "1790726500000",
-                    payload: {
-                      mimeType: "text/plain",
-                      headers: [
-                        { name: "From", value: "Shop <shop@example.test>" },
-                        { name: "Subject", value: "Re: delivery" },
-                      ],
-                      body: {},
-                    },
+    http.get("https://gmail.googleapis.com/gmail/v1/users/me/threads/t1", () =>
+      HttpResponse.json({
+        id: "t1",
+        messages: [
+          gmailMessage("m1", "t1", true),
+          ...(answered
+            ? [
+                {
+                  ...gmailMessage("m9", "t1", true, ["SENT"]),
+                  internalDate: "1790726500000",
+                  payload: {
+                    mimeType: "text/plain",
+                    headers: [
+                      { name: "From", value: "Shop <shop@example.test>" },
+                      { name: "Subject", value: "Re: delivery" },
+                    ],
+                    body: {},
                   },
-                ]
-              : []),
-          ],
-        }),
+                },
+              ]
+            : []),
+        ],
+      }),
     ),
     http.get(
       "https://gmail.googleapis.com/gmail/v1/users/me/messages",
@@ -15827,12 +16240,13 @@ async function personReplyJourney(): Promise<void> {
 
   // A draft that waits on the thread decides the reply, and nothing is sent.
   const waitingAt = Date.now();
-  await fixtureDatabase().prepare(
-    `INSERT INTO email_reply_proposal (
+  await fixtureDatabase()
+    .prepare(
+      `INSERT INTO email_reply_proposal (
        proposal_id, organisation_id, integration_account_id, case_id,
        gmail_thread_id, current_version, lifecycle_kind, created_at, updated_at
      ) VALUES ('proposal_p83_waits', ?, ?, 'case_p83_waits', 't1', 1, 'awaiting_approval', ?, ?)`,
-  )
+    )
     .bind(organisationId, accountId.value, waitingAt, waitingAt)
     .run();
   const waits = await reply(crypto.randomUUID(), {
@@ -15842,9 +16256,11 @@ async function personReplyJourney(): Promise<void> {
   expect(waits.status).toBe(409);
   expect(await waits.json()).toMatchObject({ error: "mail_reply_draft_waits" });
   expect(sends).toHaveLength(0);
-  await fixtureDatabase().prepare(
-    "DELETE FROM email_reply_proposal WHERE proposal_id = 'proposal_p83_waits'",
-  ).run();
+  await fixtureDatabase()
+    .prepare(
+      "DELETE FROM email_reply_proposal WHERE proposal_id = 'proposal_p83_waits'",
+    )
+    .run();
 
   // A failed send is looked up by its Message-ID, reported and not repeated.
   sendFails = true;
@@ -15952,9 +16368,7 @@ async function personReplyJourney(): Promise<void> {
     "Friday is fine <script>alert(1)</script>\n1. Pastry boxes\n   1. Two trays",
   );
   expect(parts["text/html"]).toContain("<b>Friday</b>");
-  expect(parts["text/html"]).toContain(
-    "&lt;script&gt;alert(1)&lt;/script&gt;",
-  );
+  expect(parts["text/html"]).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
   expect(parts["text/html"]).not.toContain("<script>");
   expect(parts["text/html"]).toContain(
     '<li><span style="color:#c5221f">Two trays</span></li>',

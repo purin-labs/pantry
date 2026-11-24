@@ -311,9 +311,5 @@ async function connectorOf() {
     return candidate.identity.objectKind === "connector";
   });
   if (entry === undefined) throw new Error("Connector registry entry missing");
-  return actorStub(
-    env.CONNECTOR,
-    entry.physicalObjectName,
-    entry.placement,
-  );
+  return actorStub(env.CONNECTOR, entry.physicalObjectName, entry.placement);
 }
