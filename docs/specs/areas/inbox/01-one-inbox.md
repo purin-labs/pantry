@@ -181,7 +181,11 @@ An owner or admin opens the sheet "How should the agent help?" from the list hea
   (`consent_reference`, `consented_at`, `consented_by_user_id`).
 - Each mail turn reads the row against the list (`readGmailInferenceEligibility`). A new
   model, new terms, a route that leaves the list, an ended review or a withdrawn
-  acceptance stops new mail (`gmail_inference_route_blocked`).
+  acceptance stops new mail (`gmail_inference_route_blocked`). The mailbox setup then
+  asks for the terms of the present model. A reply turn that comes due meanwhile asks no
+  model and tries again after 30 seconds, 2 minutes, 10 minutes, 1 hour and 6 hours;
+  after that it stops, and the email stays in the Inbox for a person. A turn after the
+  acceptance runs on the new model (`mailbox-model-change.test.ts`).
 - **Turn off** and **Remove** set `revoked_at` on each acceptance when no mailbox of
   the Organisation stays on.
 

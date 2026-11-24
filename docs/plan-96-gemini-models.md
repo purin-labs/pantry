@@ -306,9 +306,12 @@ part B.
 - An open Slack thread pins kimi-k3 for the life of its Session (J2). The step
   that a removal needs is built: a Session whose pinned model left the list
   continues in a new lineage on the current default, with the thread's history
-  (FND-04, the second journey of `slack-model-change.test.ts`). A transient
-  mail or WhatsApp turn of such a Session still refuses. Remove kimi-k3 only
-  when it must go, for example when OpenRouter stops it.
+  (FND-04, the second journey of `slack-model-change.test.ts`). A WhatsApp
+  turn answers on the current default at once (`inbox-whatsapp.test.ts`).
+  Gmail mail waits until an owner or admin accepts the terms of the new
+  default, and then gets its draft from it (`mailbox-model-change.test.ts`):
+  tell each Organisation with a mailbox before the removal. Remove kimi-k3
+  only when it must go, for example when OpenRouter stops it.
 
 ### B1. Pi 1.6 upgrade
 

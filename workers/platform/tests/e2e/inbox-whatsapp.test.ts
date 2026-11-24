@@ -1,4 +1,4 @@
-import { exports } from "cloudflare:workers";
+import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse } from "msw";
@@ -28,10 +28,13 @@ import {
   type Fixture,
 } from "./whatsapp-connector-support";
 import { runAlarmHandler } from "./durable-object-alarm-support";
+import { PI_PLATFORM_EMBEDDED_HARNESS_ADAPTERS } from "@purin-labs/agent/actors/pi-embedded-adapter";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 declare module "vitest" {
   interface TaskMeta {
     inboxWhatsAppUnanswered?: Record<string, unknown>;
+    inboxWhatsAppRemovedModel?: Record<string, unknown>;
   }
 }
 
@@ -372,6 +375,92 @@ async function budgetJourney({ task }: TestContext): Promise<void> {
 
   task.meta.inboxWhatsAppUnanswered = {
     budget: { replies: sends.length, notices, modelCalls },
+  };
+}
+
+// A release removes the model that the number's earlier turn ran on. The
+// customer's next message gets its answer from the current default model:
+// each agent turn runs in a Session of its own, on the Organisation's route
+// at the time of the turn.
+it(
+  "answers a customer on the default model after the model of an earlier turn left the list",
+  removedModelJourney,
+  120_000,
+);
+
+const REMOVED_MODEL = "qwen/qwen3.7-flash";
+
+async function removedModelJourney({
+  task,
+  onTestFinished,
+}: TestContext): Promise<void> {
+  const sends: string[] = [];
+  const models: unknown[] = [];
+  env.PANTRY_PLATFORM_PI_MODEL = REMOVED_MODEL;
+  const adapters: Record<string, unknown> =
+    PI_PLATFORM_EMBEDDED_HARNESS_ADAPTERS;
+  const removedAdapter = adapters[REMOVED_MODEL];
+  onTestFinished(() => {
+    delete env.PANTRY_PLATFORM_PI_MODEL;
+    adapters[REMOVED_MODEL] = removedAdapter;
+  });
+  network.use(
+    http.post(
+      "https://openrouter.ai/api/v1/chat/completions",
+      async ({ request }) => {
+        models.push(record(await request.json()).model);
+        // Each turn proposes one reply, then ends.
+        return models.length % 2 === 1
+          ? openRouterToolCall(
+              "whatsapp_reply_propose",
+              { body: `Agent reply ${String((models.length + 1) / 2)}` },
+              `wa_removed_${String(models.length)}`,
+              openRouterUsage(20, 0, 5),
+            )
+          : openRouterText(
+              "Done",
+              `wa_removed_${String(models.length)}`,
+              openRouterUsage(20, 0, 5),
+            );
+      },
+    ),
+    http.post(
+      `https://graph.facebook.com/v23.0/${PHONE_NUMBER_ID}/messages`,
+      async ({ request }) => {
+        sends.push(JSON.stringify(await request.json()));
+        return HttpResponse.json({
+          messages: [{ id: `wamid.P83_REMOVED_${String(sends.length)}` }],
+        });
+      },
+    ),
+  );
+  const fixture = await customerWritesAgain();
+  await runDueTurn(fixture);
+  expect(sends).toHaveLength(1);
+  expect(sends[0]).toContain("Agent reply 1");
+
+  // The release: the model has no adapter any more, and the route runs the
+  // code default.
+  delete adapters[REMOVED_MODEL];
+  delete env.PANTRY_PLATFORM_PI_MODEL;
+  await customerWrites(fixture, "wamid.P83_REMOVED_THIRD", THIRD_TEXT);
+  await runDueTurn(fixture);
+  expect(sends).toHaveLength(2);
+  expect(sends[1]).toContain("Agent reply 2");
+  expect(models).toEqual([
+    REMOVED_MODEL,
+    REMOVED_MODEL,
+    PLATFORM_DEFAULT_PI_MODEL,
+    PLATFORM_DEFAULT_PI_MODEL,
+  ]);
+  expect(conversationOf(await readList(fixture.owner))).toMatchObject({
+    state: "agent_handled",
+  });
+  task.meta.inboxWhatsAppRemovedModel = {
+    pinned: REMOVED_MODEL,
+    continuedOn: PLATFORM_DEFAULT_PI_MODEL,
+    requests: models,
+    replies: sends.length,
   };
 }
 

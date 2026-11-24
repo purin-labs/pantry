@@ -83,6 +83,11 @@ test and any fixture that exists only for the obsolete behavior.
   the direct reply rule: a stranger's direct reply becomes a draft, and a
   verified supplier's goes. `e2e/airtable-exit-support.ts` holds the Airtable
   account that it shares with `e2e/airtable-exit-approval.test.ts`.
+- `e2e/mailbox-model-change.test.ts` follows a mailbox after its model leaves
+  the list: new mail waits until the owner accepts the terms of the new
+  default, a viewer cannot accept, and the waiting mail then gets its draft
+  from the default. The removed-model journey of `e2e/inbox-whatsapp.test.ts`
+  answers a WhatsApp customer on the default at once.
 - `e2e/case-context-discovery-access.test.ts` is the allowed/denied journey of
   the case context policy route: an administrator publishes the policy, and a
   viewer's read, change and relationship review are refused.

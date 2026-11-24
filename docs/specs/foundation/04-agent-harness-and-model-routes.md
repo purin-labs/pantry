@@ -27,9 +27,13 @@ OpenRouter route of Purin AI goes direct.
   turn start takes that route when the pinned one has no adapter and the harness build
   is the same (`sessionOnRunnableRoute`). The `accept_input` command carries the new
   route, the changed route digest starts a fresh lineage with the Session's history,
-  and the next turns keep the new route. A transient mail or WhatsApp turn of such a
-  Session, a checkpoint restore of it and a new Session on a route with no adapter
-  refuse with `embedded_harness_model_unsupported` and make no model request.
+  and the next turns keep the new route. A mail, mail assistant or WhatsApp turn runs
+  in a Session of its own, made for that turn on the Organisation's current route, so
+  it never runs on a model that left the list: a WhatsApp answer comes from the current
+  default at once, and Gmail mail waits until an owner or admin accepts the terms of the
+  new default (INB-01). A checkpoint restore of a Session whose pinned model left its
+  list and a new Session on a route with no adapter refuse with
+  `embedded_harness_model_unsupported` and make no model request.
 - The Session reports `embedded_harness_model_authority_unavailable` when the model of
   the adapter is not the pinned model, when it cannot make the route lease (the
   placement is not active), or when the turn is not active.
@@ -381,9 +385,6 @@ Boundaries:
 - OpenAI documents no allowance header for "Sign in with ChatGPT". The Session traces
   the `x-` header names of the first answer (`session.chatgpt_agent_response_headers`).
 - The container forwards a request when its trace read fails, with the colo `unknown`.
-- A transient mail or WhatsApp turn of a Session whose pinned model left its list
-  refuses. The mail assistant pins the digest of its route, so a move to the current
-  route needs a new authorization of that pin.
 - Plan 96 has open steps: the live check of a Gemini key turn through the deployed exit
   Worker, and the comparison of the OpenRouter spend after the change of the default.
 - The Wrangler files have a `local` and a `production` profile, and no staging profile.
