@@ -1,0 +1,120 @@
+{
+  "about": "Refactor 17, Stage B: the public files of the area integrations (the lines of contracts in scripts/layers.json) are the workspace package @purin-labs/area-integrations-contract in areas/integrations/contract, the contract of the area. The owner decided on 2026-11-24 that a contract imports only the foundation, outside packages and the contract of another area, and scripts/check-layers.mjs holds that rule. scripts/refactor-17/move-module.mjs reads this plan. moduleFrom: the public files of areas/integrations that another area imports, and the public files that they import, belong to the plan, and --sync-plan adds each one; stays names each other public file, which stays public in the area (the scope that the owner approved on 2026-11-24). files: a Worker file goes to server/ and a Portal file to ui/, with its sub-path below server/ or ui/ of the area, less a folder contract/ (sourcePrefixes; movedFolders names each public folder that moves whole under another last name). package: the exports map gives each .ts file of server/ and of ui/, each style sheet of ui/, and each .tsx file, which another module imports; the dependencies are the packages that the files import. package.typeCheck false: the files read Env keys that the Actor files of the Worker merge, as the area package does; the Worker program and the Portal program check each file. edits: the source roots of the lints read the folders of the package.",
+  "module": "areas/integrations/contract",
+  "moduleFrom": "areas/integrations",
+  "target": "areas/integrations/contract",
+  "workspaceEntry": "areas/*/contract",
+  "sourcePrefixes": {
+    "areas/integrations/server/contract/": "server/",
+    "areas/integrations/server/": "server/",
+    "areas/integrations/ui/": "ui/"
+  },
+  "movedFolders": {},
+  "stays": [
+    "areas/integrations/server/contract/connection-parts.ts",
+    "areas/integrations/server/contract/observation-evidence.ts",
+    "areas/integrations/server/contract/provider-ingress.ts",
+    "areas/integrations/server/contract/provider-modules.ts",
+    "areas/integrations/server/contract/provisioning.ts",
+    "areas/integrations/ui/features/integrations/connect-consent-dialog.tsx",
+    "areas/integrations/ui/provider-onboarding.tsx"
+  ],
+  "package": {
+    "name": "@purin-labs/area-integrations-contract",
+    "exports": {
+      "./server/*": {
+        "types": "./server/*.ts",
+        "default": "./server/*.ts"
+      },
+      "./ui/*.css": "./ui/*.css",
+      "./ui/*": {
+        "types": "./ui/*.ts",
+        "default": "./ui/*.ts"
+      },
+      "./ui/features/integrations/archive-confirm": "./ui/features/integrations/archive-confirm.tsx",
+      "./ui/features/integrations/connection-dialog": "./ui/features/integrations/connection-dialog.tsx",
+      "./ui/features/jev-features/facts": "./ui/features/jev-features/facts.tsx",
+      "./ui/features/jev-features/paid-use": "./ui/features/jev-features/paid-use.tsx"
+    },
+    "dependencies": {
+      "@purin-labs/actor-runtime": "workspace:*",
+      "@purin-labs/agent": "workspace:*",
+      "@purin-labs/area-commerce-contract": "workspace:*",
+      "@purin-labs/authority": "workspace:*",
+      "@purin-labs/connections": "workspace:*",
+      "@purin-labs/contracts": "workspace:*",
+      "@purin-labs/control": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/type-utils": "workspace:*",
+      "@purin-labs/ui": "workspace:*",
+      "lucide-react": "^0.542.0",
+      "react": "^19.1.1",
+      "react-router": "^7.18.2"
+    },
+    "devDependencies": ["@cloudflare/workers-types", "@types/react", "tsrs"],
+    "versionsFrom": [
+      "workers/platform/package.json",
+      "apps/portal/package.json"
+    ],
+    "tsconfig": {
+      "extends": "../../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": ["ESNext"],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": ["@cloudflare/workers-types"],
+        "allowImportingTsExtensions": true
+      },
+      "include": ["server/**/*.ts"]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Worker files of the contract package",
+      "find": "PLATFORM_SOURCE.push(\"areas/cafe/contract/server\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"areas/cafe/contract/server\");\n// The Worker side of the contract of the area integrations (Refactor 17, Stage B).\nPLATFORM_SOURCE.push(\"areas/integrations/contract/server\");\n"
+    },
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the Portal lints and the ESLint rules of the Portal source read the Portal files of the contract package",
+      "find": "PORTAL_SOURCE.push(\"areas/brain/contract/ui\");\n",
+      "replace": "PORTAL_SOURCE.push(\"areas/brain/contract/ui\");\n// The Portal side of the contract of the area integrations (Refactor 17, Stage B).\nPORTAL_SOURCE.push(\"areas/integrations/contract/ui\");\n"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": ["node", "scripts/check-layers.mjs", "--areas", "--write"],
+      "writes": ["docs/layers.md"]
+    }
+  ],
+  "files": {
+    "areas/integrations/server/contract/admin-integration.ts": "server/admin-integration.ts",
+    "areas/integrations/server/contract/credential-cutover.ts": "server/credential-cutover.ts",
+    "areas/integrations/server/contract/credential-lifecycle.ts": "server/credential-lifecycle.ts",
+    "areas/integrations/server/contract/google-oauth-revocation.ts": "server/google-oauth-revocation.ts",
+    "areas/integrations/server/contract/jev-draft.ts": "server/jev-draft.ts",
+    "areas/integrations/server/contract/provider-account-cleanup.ts": "server/provider-account-cleanup.ts",
+    "areas/integrations/server/contract/provider-adapter.ts": "server/provider-adapter.ts",
+    "areas/integrations/server/contract/provider-lifecycle.ts": "server/provider-lifecycle.ts",
+    "areas/integrations/server/contract/provider-revocation.ts": "server/provider-revocation.ts",
+    "areas/integrations/server/contract/provider-services.ts": "server/provider-services.ts",
+    "areas/integrations/server/mail/gmail-oauth.ts": "server/mail/gmail-oauth.ts",
+    "areas/integrations/ui/features/integrations/archive-confirm.tsx": "ui/features/integrations/archive-confirm.tsx",
+    "areas/integrations/ui/features/integrations/connection-dialog.tsx": "ui/features/integrations/connection-dialog.tsx",
+    "areas/integrations/ui/features/integrations/custom-connector-api.ts": "ui/features/integrations/custom-connector-api.ts",
+    "areas/integrations/ui/features/jev-features/api.ts": "ui/features/jev-features/api.ts",
+    "areas/integrations/ui/features/jev-features/facts.tsx": "ui/features/jev-features/facts.tsx",
+    "areas/integrations/ui/features/jev-features/paid-use.tsx": "ui/features/jev-features/paid-use.tsx",
+    "areas/integrations/ui/features/jev-features/styles.css": "ui/features/jev-features/styles.css",
+    "areas/integrations/ui/features/vault/styles.css": "ui/features/vault/styles.css",
+    "areas/integrations/ui/integration-catalogue.ts": "ui/integration-catalogue.ts"
+  }
+}
