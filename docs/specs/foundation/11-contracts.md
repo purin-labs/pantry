@@ -104,7 +104,12 @@ The helpers follow the Rust and serde rules that their comments name. For exampl
   `invalid_request`). The Session reducer refuses such a string as `invalid_input`.
 - **Schema length.** `minLength` and `maxLength` in TypeBox 1.3.27 count grapheme
   clusters. A letter with its combining marks counts as one. They are not a limit on
-  code points or bytes.
+  code points or bytes. `textLimit` (`contract-schema/src/text-limit.ts`) wraps a string
+  schema that sets `maxLength`: it keeps `maxLength` as the hint that a model or a form
+  reads, and adds a check of the code points, or of the UTF-8 bytes where a store or a
+  provider limits bytes, against the same number. TypeBox keeps the check under a hidden
+  key, so the JSON of the schema does not change. The check runs where TypeBox checks
+  the value: not for the input of a decode-only tool, whose decoder checks the size.
 - **Unicode.** `normalizeCommerceUnicodeV1` (`commerce-contracts/src/unicode.ts`) does
   NFKC, the full case fold, the removal of default ignorable code points and NFKC again.
   Its tables are Unicode 17.0.0 (`COMMERCE_UNICODE_VERSION`). `generate-unicode.mjs`
@@ -240,8 +245,10 @@ Rules for a contract writer:
   `decodeChecked`. Do not call `Value.Clean` or `Value.Decode`.
 - Do not use `Compile`. Do not write a second schema for a value that has a contract.
 - If a digest covers a record, write an encoder that fixes the field order.
-- Do not use `maxLength` as a size limit. Check the size with a `@purin-labs/std`
-  helper.
+- Do not use a bare `maxLength` as a size limit. Wrap the string schema in `textLimit`,
+  or check the size with a `@purin-labs/std` helper. `pnpm lint:text-limits` refuses a
+  new string schema with a bare `maxLength`; `scripts/text-limits-ratchet.json` lists
+  the files that still have one, and their counts only fall.
 
 | Limit                                          | Value                                                        | Where                                                                                    |
 | ---------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
@@ -303,10 +310,11 @@ Neighbours:
   (`src/native/station-replies.ts`) has a `minimum` and no `maximum`. The file is a
   source of the pinned physics execution bundle, so a change needs a bundle rebuild
   (`pnpm lint:physics-bundle`).
-- **Schema length.** 81 `Type.String` schemas in `packages/` set a `maxLength`, 60 of
-  them in `control-api`. TypeBox counts grapheme clusters, so they do not limit the
-  size of a text. The tool inputs in `agent-tools` hold 99 more `maxLength` limits.
-  TypeBox does not check the input of a decode-only tool, so it does not apply them.
+- **Schema length.** 200 string schemas in 51 files still set a bare `maxLength`
+  (`scripts/text-limits-ratchet.json`), 60 of them in `control-api` and 97 in the tool
+  inputs of the areas and `foundation`. TypeBox counts grapheme clusters, so they do not
+  limit the size of a text. TypeBox does not check the input of a decode-only tool, so
+  its decoder must check the size.
 - **Lone surrogates in the access decoders.** `jsonInput` in `access-control.ts` tests
   the JSON text for a lone surrogate. `JSON.stringify` writes a lone surrogate as an
   escape, so the test finds none.

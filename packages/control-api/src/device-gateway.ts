@@ -1,5 +1,5 @@
 import { Type, type Static } from "typebox";
-import { PositiveInteger } from "@purin-labs/contract-schema";
+import { PositiveInteger, textLimit } from "@purin-labs/contract-schema";
 import { Value } from "typebox/value";
 
 import {
@@ -77,7 +77,7 @@ export const receiptLineSchema = Type.Union([
   Type.Object(
     {
       kind: Type.Literal("text"),
-      text: Type.String({ maxLength: 200 }),
+      text: textLimit(Type.String({ maxLength: 200 })),
       align: Type.Union([
         Type.Literal("left"),
         Type.Literal("center"),
@@ -92,8 +92,8 @@ export const receiptLineSchema = Type.Union([
   Type.Object(
     {
       kind: Type.Literal("columns"),
-      left: Type.String({ maxLength: 200 }),
-      right: Type.String({ maxLength: 60 }),
+      left: textLimit(Type.String({ maxLength: 200 })),
+      right: textLimit(Type.String({ maxLength: 60 })),
       emphasis: Type.Boolean(),
     },
     strict,
@@ -178,11 +178,13 @@ const healthReportSchema = Type.Object(
     health: deviceHealthSchema,
     faultCode: Type.Union([
       Type.Null(),
-      Type.String({ minLength: 1, maxLength: 16, pattern: "^[A-Z0-9_-]+$" }),
+      textLimit(
+        Type.String({ minLength: 1, maxLength: 16, pattern: "^[A-Z0-9_-]+$" }),
+      ),
     ]),
     faultText: Type.Union([
       Type.Null(),
-      Type.String({ minLength: 1, maxLength: 500 }),
+      textLimit(Type.String({ minLength: 1, maxLength: 500 })),
     ]),
   },
   strict,
@@ -192,9 +194,9 @@ export type DeviceHealthReport = Static<typeof healthReportSchema>;
 const sampleSchema = Type.Object(
   {
     sourceKey,
-    name: Type.String({ minLength: 1, maxLength: 40 }),
+    name: textLimit(Type.String({ minLength: 1, maxLength: 40 })),
     value: Type.Number(),
-    unit: Type.String({ minLength: 1, maxLength: 12 }),
+    unit: textLimit(Type.String({ minLength: 1, maxLength: 12 })),
   },
   strict,
 );
@@ -371,9 +373,9 @@ export type PlatformGatewayMessage = Static<
 
 export const deviceGatewayEnrollRequestSchema = Type.Object(
   {
-    organisationId: Type.String({ minLength: 1, maxLength: 128 }),
+    organisationId: textLimit(Type.String({ minLength: 1, maxLength: 128 })),
     gatewayId: Type.String({ pattern: "^dgw_[a-f0-9]{24}$" }),
-    code: Type.String({ minLength: 43, maxLength: 43 }),
+    code: textLimit(Type.String({ minLength: 43, maxLength: 43 })),
   },
   strict,
 );

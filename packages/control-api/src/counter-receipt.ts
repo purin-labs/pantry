@@ -1,5 +1,5 @@
 import { Type, type Static } from "typebox";
-import { NonNegativeInteger } from "@purin-labs/contract-schema";
+import { NonNegativeInteger, textLimit } from "@purin-labs/contract-schema";
 import { Value } from "typebox/value";
 
 import {
@@ -15,7 +15,7 @@ import {
  */
 
 const strict = { additionalProperties: false } as const;
-const text = Type.String({ minLength: 1, maxLength: 200 });
+const text = textLimit(Type.String({ minLength: 1, maxLength: 200 }));
 
 /** A Japanese Qualified Invoice registration number: T and 13 digits. */
 export const INVOICE_REGISTRATION_NUMBER_PATTERN = "^T[0-9]{13}$";

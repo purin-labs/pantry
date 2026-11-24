@@ -1,5 +1,9 @@
 import { Type, type Static } from "typebox";
-import { recordParser, NonNegativeInteger } from "@purin-labs/contract-schema";
+import {
+  recordParser,
+  NonNegativeInteger,
+  textLimit,
+} from "@purin-labs/contract-schema";
 import { portalPageViewSectionSchema } from "./portal-page-view.ts";
 
 /**
@@ -14,18 +18,22 @@ export const SURFACE_OBSERVATION_MAX_BYTES = 24 * 1024;
 /** The Kitchen page: the one surface whose state carries commands. */
 export const KITCHEN_SURFACE = "workflow-simulator";
 
-const label = Type.String({ minLength: 1, maxLength: 120 });
-const surfaceName = Type.String({
-  minLength: 1,
-  maxLength: 60,
-  pattern: "^[a-z0-9-]+$",
-});
-const kindName = Type.String({
-  minLength: 1,
-  maxLength: 60,
-  pattern: "^[a-z][a-z0-9_]*$",
-});
-const identifier = Type.String({ minLength: 1, maxLength: 200 });
+const label = textLimit(Type.String({ minLength: 1, maxLength: 120 }));
+const surfaceName = textLimit(
+  Type.String({
+    minLength: 1,
+    maxLength: 60,
+    pattern: "^[a-z0-9-]+$",
+  }),
+);
+const kindName = textLimit(
+  Type.String({
+    minLength: 1,
+    maxLength: 60,
+    pattern: "^[a-z][a-z0-9_]*$",
+  }),
+);
+const identifier = textLimit(Type.String({ minLength: 1, maxLength: 200 }));
 
 /** The navigation group of a Portal page. `kitchen` shows as Kitchen. */
 export const surfaceAreaSchema = Type.Union([
@@ -50,7 +58,7 @@ export const surfaceSourceSchema = Type.Object({
   id: identifier,
   /** The saved revision on screen; null when the person edits it unsaved. */
   revision: Type.Union([
-    Type.String({ minLength: 1, maxLength: 120 }),
+    textLimit(Type.String({ minLength: 1, maxLength: 120 })),
     Type.Null(),
   ]),
 });
@@ -79,7 +87,7 @@ export const surfaceObservationSchema = Type.Object({
   /** Null for a page view that a message stored before Plan 87. */
   instance: Type.Union([surfaceInstanceSchema, Type.Null()]),
   title: label,
-  path: Type.String({ minLength: 1, maxLength: 400, pattern: "^/" }),
+  path: textLimit(Type.String({ minLength: 1, maxLength: 400, pattern: "^/" })),
   record: Type.Union([surfaceRecordSchema, Type.Null()]),
   capturedAt: NonNegativeInteger,
   /** What the model reads. A page with no capture sends none. */
@@ -138,8 +146,7 @@ export function parseSurfaceObservation(
 ): SurfaceObservationV2 | null {
   const decoded = decodeSurfaceObservation(raw);
   if (!decoded.ok) return null;
-  return surfaceObservationBytes(decoded.value) <=
-    SURFACE_OBSERVATION_MAX_BYTES
+  return surfaceObservationBytes(decoded.value) <= SURFACE_OBSERVATION_MAX_BYTES
     ? decoded.value
     : null;
 }

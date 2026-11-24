@@ -3,6 +3,7 @@ import {
   recordParser,
   NonNegativeInteger,
   PositiveInteger,
+  textLimit,
 } from "@purin-labs/contract-schema";
 
 /**
@@ -15,10 +16,10 @@ const boardId = Type.String({ pattern: "^[A-Za-z0-9_:-]{1,128}$" });
 
 export const menuBoardCommentSchema = Type.Object({
   commentId: boardId,
-  body: Type.String({ minLength: 1, maxLength: 1000 }),
+  body: textLimit(Type.String({ minLength: 1, maxLength: 1000 })),
   author: Type.Object({
     kind: Type.Union([Type.Literal("person"), Type.Literal("agent")]),
-    name: Type.String({ maxLength: 256 }),
+    name: textLimit(Type.String({ maxLength: 256 })),
   }),
   /** The reader wrote this comment, so they may delete it. */
   mine: Type.Boolean(),
@@ -32,7 +33,10 @@ export const menuBoardCommentThreadSchema = Type.Object({
   /** False when the draft no longer has the element. */
   onBoard: Type.Boolean(),
   resolvedAt: Type.Union([NonNegativeInteger, Type.Null()]),
-  resolvedBy: Type.Union([Type.String({ maxLength: 256 }), Type.Null()]),
+  resolvedBy: Type.Union([
+    textLimit(Type.String({ maxLength: 256 })),
+    Type.Null(),
+  ]),
   comments: Type.Array(menuBoardCommentSchema, { minItems: 1, maxItems: 300 }),
 });
 
@@ -41,7 +45,9 @@ export const menuBoardCommentListSchema = Type.Object({
 });
 
 export type MenuBoardComment = Static<typeof menuBoardCommentSchema>;
-export type MenuBoardCommentThread = Static<typeof menuBoardCommentThreadSchema>;
+export type MenuBoardCommentThread = Static<
+  typeof menuBoardCommentThreadSchema
+>;
 
 const decodeCommentList = recordParser(menuBoardCommentListSchema);
 
@@ -67,16 +73,21 @@ export const menuBoardVersionSchema = Type.Object({
     Type.Literal("auto"),
   ]),
   /** The name a person gave it; empty for the versions the Portal saves. */
-  label: Type.String({ maxLength: 80 }),
+  label: textLimit(Type.String({ maxLength: 80 })),
   documentRevision: PositiveInteger,
-  createdBy: Type.Union([Type.String({ maxLength: 256 }), Type.Null()]),
+  createdBy: Type.Union([
+    textLimit(Type.String({ maxLength: 256 })),
+    Type.Null(),
+  ]),
   createdAt: NonNegativeInteger,
 });
 
 export type MenuBoardVersionSummary = Static<typeof menuBoardVersionSchema>;
 
 const decodeVersionList = recordParser(
-  Type.Object({ versions: Type.Array(menuBoardVersionSchema, { maxItems: 40 }) }),
+  Type.Object({
+    versions: Type.Array(menuBoardVersionSchema, { maxItems: 40 }),
+  }),
 );
 
 /** A board's versions from untrusted JSON, or null. */

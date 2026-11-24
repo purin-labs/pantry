@@ -1,5 +1,5 @@
 import { Type, type Static } from "typebox";
-import { NonNegativeInteger } from "@purin-labs/contract-schema";
+import { NonNegativeInteger, textLimit } from "@purin-labs/contract-schema";
 
 /**
  * What a Portal page shows when a person sends a chat message from it. The
@@ -7,8 +7,8 @@ import { NonNegativeInteger } from "@purin-labs/contract-schema";
  * the person has not saved yet. The model reads it as an observation of the
  * screen: it grants no authority and proves no saved record.
  */
-const label = Type.String({ minLength: 1, maxLength: 120 });
-const cell = Type.String({ maxLength: 400 });
+const label = textLimit(Type.String({ minLength: 1, maxLength: 120 }));
+const cell = textLimit(Type.String({ maxLength: 400 }));
 
 export const portalPageViewFactSchema = Type.Object({
   label,
@@ -32,9 +32,11 @@ export const portalPageViewSchema = Type.Object({
   kind: Type.Literal("portal-page-view"),
   schemaVersion: Type.Literal(1),
   /** A stable page name, such as `costs`. */
-  page: Type.String({ minLength: 1, maxLength: 60, pattern: "^[a-z0-9-]+$" }),
+  page: textLimit(
+    Type.String({ minLength: 1, maxLength: 60, pattern: "^[a-z0-9-]+$" }),
+  ),
   title: label,
-  path: Type.String({ minLength: 1, maxLength: 400, pattern: "^/" }),
+  path: textLimit(Type.String({ minLength: 1, maxLength: 400, pattern: "^/" })),
   capturedAt: NonNegativeInteger,
   sections: Type.Array(portalPageViewSectionSchema, { maxItems: 12 }),
 });

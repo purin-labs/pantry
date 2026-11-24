@@ -1,5 +1,5 @@
 import { Type, type Static } from "typebox";
-import { NonNegativeInteger } from "@purin-labs/contract-schema";
+import { NonNegativeInteger, textLimit } from "@purin-labs/contract-schema";
 
 import { shortText, sourceKey, strict } from "./device-shapes.ts";
 
@@ -12,11 +12,13 @@ import { shortText, sourceKey, strict } from "./device-shapes.ts";
 
 /** The dispatch identity that Pantry writes before the gateway sends a task. */
 const dispatchIdSchema = Type.String({ pattern: "^dsp_[a-f0-9]{24}$" });
-const reasonCode = Type.String({
-  minLength: 1,
-  maxLength: 40,
-  pattern: "^[a-z0-9_]+$",
-});
+const reasonCode = textLimit(
+  Type.String({
+    minLength: 1,
+    maxLength: 40,
+    pattern: "^[a-z0-9_]+$",
+  }),
+);
 
 export const cobotStationSchema = Type.Union([
   Type.Literal("cold_rack"),

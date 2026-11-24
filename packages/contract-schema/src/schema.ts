@@ -21,6 +21,7 @@ export {
   type IntegrationAccountId,
   type OrganisationId,
 } from "./ids.ts";
+export { textLimit } from "./text-limit.ts";
 
 export const SafeInteger = Type.Integer({
   minimum: Number.MIN_SAFE_INTEGER,

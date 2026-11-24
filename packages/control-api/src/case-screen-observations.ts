@@ -1,5 +1,9 @@
 import { Type, type Static } from "typebox";
-import { recordParser, NonNegativeInteger } from "@purin-labs/contract-schema";
+import {
+  recordParser,
+  NonNegativeInteger,
+  textLimit,
+} from "@purin-labs/contract-schema";
 import {
   surfaceAreaSchema,
   surfaceSourceSchema,
@@ -13,11 +17,11 @@ import {
  */
 export const caseScreenObservationSchema = Type.Object({
   /** The page title, such as "Costs & margins". */
-  page: Type.String({ minLength: 1, maxLength: 120 }),
+  page: textLimit(Type.String({ minLength: 1, maxLength: 120 })),
   area: surfaceAreaSchema,
   /** The label of the record that the page had open. */
   record: Type.Union([
-    Type.String({ minLength: 1, maxLength: 120 }),
+    textLimit(Type.String({ minLength: 1, maxLength: 120 })),
     Type.Null(),
   ]),
   capturedAt: NonNegativeInteger,

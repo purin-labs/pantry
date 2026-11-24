@@ -156,7 +156,7 @@ revision. These lints guard the repository:
 
 Other lints guard one subsystem. The spec of that subsystem describes these:
 `lint:state-machines` (FND-02), `lint:database-handles` and `lint:d1-patch` (FND-01),
-`lint:ifc-boundaries` (FND-07), `lint:tool-effects` (FND-09), `lint:commerce-spec`
+`lint:ifc-boundaries` (FND-07), `lint:text-limits` (FND-11), `lint:tool-effects` (FND-09), `lint:commerce-spec`
 (COM-02), `lint:physics-bundle`, `lint:appliance-registry` and `lint:journey-index`
 (KIT-02), and `lint:portal-fetch`, `lint:portal-requests` and `lint:portal-select`
 (PRT-01). This spec describes the others:

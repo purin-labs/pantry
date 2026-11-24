@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import { Type } from "typebox";
 import { Value } from "typebox/value";
 
@@ -357,11 +358,13 @@ export function mailReplyAttachmentBlocked(name: string): boolean {
 /** One file of a reply. `data` is its standard, padded base64. */
 export const mailReplyAttachmentSchema = Type.Object(
   {
-    name: Type.String({ minLength: 1, maxLength: 200 }),
-    type: Type.String({
-      maxLength: 120,
-      pattern: "^[A-Za-z0-9.+-]+/[A-Za-z0-9.+-]+$",
-    }),
+    name: textLimit(Type.String({ minLength: 1, maxLength: 200 })),
+    type: textLimit(
+      Type.String({
+        maxLength: 120,
+        pattern: "^[A-Za-z0-9.+-]+/[A-Za-z0-9.+-]+$",
+      }),
+    ),
     data: Type.String({ minLength: 1 }),
   },
   strict,

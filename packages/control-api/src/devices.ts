@@ -2,6 +2,7 @@ import { Type, type Static } from "typebox";
 import {
   NonNegativeInteger,
   PositiveInteger,
+  textLimit,
 } from "@purin-labs/contract-schema";
 import { Value } from "typebox/value";
 
@@ -26,7 +27,7 @@ import type { Variant } from "@purin-labs/type-utils";
 export * from "./device-gateway.ts";
 
 const timestamp = NonNegativeInteger;
-const text = Type.String({ minLength: 1, maxLength: 255 });
+const text = textLimit(Type.String({ minLength: 1, maxLength: 255 }));
 
 /** The stations that a device can stand at. These ids already exist. */
 export const DEVICE_STATIONS = [

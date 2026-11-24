@@ -1,5 +1,5 @@
 import { Type, type Static, type TSchema } from "typebox";
-import { NonNegativeInteger } from "@purin-labs/contract-schema";
+import { NonNegativeInteger, textLimit } from "@purin-labs/contract-schema";
 import { Value } from "typebox/value";
 
 import {
@@ -35,7 +35,7 @@ const strict = { additionalProperties: false } as const;
 const timestamp = NonNegativeInteger;
 const deviceId = Type.String({ pattern: "^[A-Za-z0-9_-]{16,64}$" });
 const macId = Type.String({ pattern: "^vmac_[a-f0-9]{24}$" });
-const shortText = Type.String({ minLength: 1, maxLength: 64 });
+const shortText = textLimit(Type.String({ minLength: 1, maxLength: 64 }));
 
 export const chatTranscriptionPathSchema = Type.Union([
   Type.Literal("shop_mac"),
@@ -76,8 +76,8 @@ export const voiceGrantSchema = Type.Object(
       Type.Object(
         {
           macId,
-          origin: Type.String({ minLength: 1, maxLength: 300 }),
-          grant: Type.String({ minLength: 1, maxLength: 2000 }),
+          origin: textLimit(Type.String({ minLength: 1, maxLength: 300 })),
+          grant: textLimit(Type.String({ minLength: 1, maxLength: 2000 })),
           expiresAt: timestamp,
         },
         strict,
@@ -91,7 +91,7 @@ export type VoiceGrant = Static<typeof voiceGrantSchema>;
 /** A Mac from before Plan 82C and the fallback name no engine. */
 export const voiceTranscriptionSchema = Type.Object(
   {
-    text: Type.String({ maxLength: 8000 }),
+    text: textLimit(Type.String({ maxLength: 8000 })),
     audioSeconds: Type.Number({ minimum: 0 }),
     engine: Type.Optional(voiceEngineIdSchema),
   },
@@ -120,7 +120,7 @@ export const voiceMacModelStateSchema = Type.Union([
 export const voiceMacViewSchema = Type.Object(
   {
     macId,
-    hostname: Type.String({ minLength: 1, maxLength: 253 }),
+    hostname: textLimit(Type.String({ minLength: 1, maxLength: 253 })),
     state: Type.Union([
       Type.Literal("pending"),
       Type.Literal("enrolled"),
@@ -185,9 +185,9 @@ export type VoiceMacEnrollRequest = Static<typeof voiceMacEnrollRequestSchema>;
 /** The credential and the grant key appear here once, for the Mac alone. */
 export const voiceMacEnrollResponseSchema = Type.Object(
   {
-    credential: Type.String({ minLength: 1, maxLength: 400 }),
-    grantKey: Type.String({ minLength: 1, maxLength: 100 }),
-    hostname: Type.String({ minLength: 1, maxLength: 253 }),
+    credential: textLimit(Type.String({ minLength: 1, maxLength: 400 })),
+    grantKey: textLimit(Type.String({ minLength: 1, maxLength: 100 })),
+    hostname: textLimit(Type.String({ minLength: 1, maxLength: 253 })),
   },
   strict,
 );
@@ -197,7 +197,7 @@ export type VoiceMacEnrollResponse = Static<
 
 export const voiceMacHeartbeatSchema = Type.Object(
   {
-    privateAddress: Type.String({ minLength: 7, maxLength: 15 }),
+    privateAddress: textLimit(Type.String({ minLength: 7, maxLength: 15 })),
     serviceVersion: shortText,
     modelState: voiceMacModelStateSchema,
     /** A service from before Plan 82C reports none, and it runs Whisper. */
@@ -225,7 +225,7 @@ export type VoiceMacHeartbeat = Static<typeof voiceMacHeartbeatSchema>;
 export const voiceMacHeartbeatAnswerSchema = Type.Object(
   {
     ok: Type.Literal(true),
-    hostname: Type.String({ minLength: 1, maxLength: 253 }),
+    hostname: textLimit(Type.String({ minLength: 1, maxLength: 253 })),
     engineChoice: voiceEngineIdSchema,
   },
   strict,
@@ -240,7 +240,7 @@ export type VoiceMacHeartbeatAnswer = Static<
  */
 export const voiceVocabularySchema = Type.Object(
   {
-    terms: Type.Array(Type.String({ minLength: 1, maxLength: 80 }), {
+    terms: Type.Array(textLimit(Type.String({ minLength: 1, maxLength: 80 })), {
       maxItems: VOICE_VOCABULARY_TERM_LIMIT,
     }),
   },
@@ -300,7 +300,7 @@ export const voiceConfirmationTargetSchema = Type.Object(
       Type.Literal("slack_draft"),
       Type.Literal("email_draft"),
     ]),
-    id: Type.String({ minLength: 1, maxLength: 200 }),
+    id: textLimit(Type.String({ minLength: 1, maxLength: 200 })),
   },
   strict,
 );
@@ -308,7 +308,7 @@ export type VoiceConfirmationTarget = Static<
   typeof voiceConfirmationTargetSchema
 >;
 
-const conversationId = Type.String({ minLength: 1, maxLength: 200 });
+const conversationId = textLimit(Type.String({ minLength: 1, maxLength: 200 }));
 
 export const voiceConfirmationRequestSchema = Type.Object(
   { conversationId, target: voiceConfirmationTargetSchema },
@@ -321,7 +321,7 @@ export type VoiceConfirmationRequest = Static<
 export const voiceConfirmationSchema = Type.Object(
   {
     confirmationId: shortText,
-    phrase: Type.String({ minLength: 1, maxLength: 100 }),
+    phrase: textLimit(Type.String({ minLength: 1, maxLength: 100 })),
     expiresAt: timestamp,
   },
   strict,
@@ -331,7 +331,7 @@ export type VoiceConfirmation = Static<typeof voiceConfirmationSchema>;
 export const voiceConfirmationCheckRequestSchema = Type.Object(
   {
     conversationId,
-    transcript: Type.String({ maxLength: 8000 }),
+    transcript: textLimit(Type.String({ maxLength: 8000 })),
     transcriptionPath: chatTranscriptionPathSchema,
     transcriptionEngine: Type.Optional(voiceEngineIdSchema),
   },
@@ -362,7 +362,7 @@ export const voiceConfirmationReceiptsSchema = Type.Object(
       Type.Object(
         {
           target: voiceConfirmationTargetSchema,
-          phrase: Type.String({ minLength: 1, maxLength: 100 }),
+          phrase: textLimit(Type.String({ minLength: 1, maxLength: 100 })),
           transcriptionPath: chatTranscriptionPathSchema,
           /** Null for a phrase that matched before Plan 82C. */
           transcriptionEngine: Type.Union([Type.Null(), voiceEngineIdSchema]),

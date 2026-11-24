@@ -1,5 +1,5 @@
 import { Type, type Static } from "typebox";
-import { recordParser } from "@purin-labs/contract-schema";
+import { recordParser, textLimit } from "@purin-labs/contract-schema";
 import {
   surfaceObservationSchema,
   type SurfaceObservationV2,
@@ -19,10 +19,12 @@ export const SCREEN_RELEVANCE_MAX_DRAFT = 4_000;
 export const SCREEN_RELEVANCE_PAUSE_MS = 500;
 
 export const screenRelevanceRequestSchema = Type.Object({
-  draft: Type.String({
-    minLength: SCREEN_RELEVANCE_MIN_DRAFT,
-    maxLength: SCREEN_RELEVANCE_MAX_DRAFT,
-  }),
+  draft: textLimit(
+    Type.String({
+      minLength: SCREEN_RELEVANCE_MIN_DRAFT,
+      maxLength: SCREEN_RELEVANCE_MAX_DRAFT,
+    }),
+  ),
   /**
    * The default observation of the page on screen. Jev gets only its title,
    * its area, its open record and its section titles.

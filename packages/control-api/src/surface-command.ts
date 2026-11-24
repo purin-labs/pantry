@@ -1,5 +1,9 @@
 import { Type, type Static } from "typebox";
-import { recordParser, NonNegativeInteger } from "@purin-labs/contract-schema";
+import {
+  recordParser,
+  NonNegativeInteger,
+  textLimit,
+} from "@purin-labs/contract-schema";
 import { KITCHEN_SURFACE } from "./surface-observation.ts";
 
 /**
@@ -64,11 +68,9 @@ export type PastryBenchViewCommandName =
   (typeof PASTRY_BENCH_VIEW_COMMANDS)[number];
 export type RegisterViewCommandName = (typeof REGISTER_VIEW_COMMANDS)[number];
 export type PageViewCommandName =
-  | CostsViewCommandName
-  | PastryBenchViewCommandName
-  | RegisterViewCommandName;
+  CostsViewCommandName | PastryBenchViewCommandName | RegisterViewCommandName;
 
-const identifier = Type.String({ minLength: 1, maxLength: 200 });
+const identifier = textLimit(Type.String({ minLength: 1, maxLength: 200 }));
 
 export const costsViewCommandSchema = Type.Union([
   Type.Object({
@@ -84,7 +86,7 @@ export const costsViewCommandSchema = Type.Union([
   Type.Object({
     name: Type.Literal("filter_category"),
     /** `all`, or a product type that the page shows as a filter chip. */
-    category: Type.String({ minLength: 1, maxLength: 60 }),
+    category: textLimit(Type.String({ minLength: 1, maxLength: 60 })),
   }),
   Type.Object({
     name: Type.Literal("select_product"),
@@ -130,9 +132,7 @@ export const registerViewCommandSchema = Type.Union([
   Type.Object({
     name: Type.Literal("register_add_item"),
     menuEntryId: identifier,
-    modifierOptionIds: Type.Optional(
-      Type.Array(identifier, { maxItems: 20 }),
-    ),
+    modifierOptionIds: Type.Optional(Type.Array(identifier, { maxItems: 20 })),
     quantity: Type.Optional(Type.Integer({ minimum: 1, maximum: 99 })),
   }),
   Type.Object({
@@ -150,8 +150,8 @@ export const registerViewCommandSchema = Type.Union([
 ]);
 
 const pageCommandBindingSchema = Type.Object({
-  browserInstanceId: Type.String({ minLength: 1, maxLength: 160 }),
-  conversationId: Type.String({ minLength: 1, maxLength: 160 }),
+  browserInstanceId: textLimit(Type.String({ minLength: 1, maxLength: 160 })),
+  conversationId: textLimit(Type.String({ minLength: 1, maxLength: 160 })),
 });
 
 const pageCommandTargetSchema = Type.Object({
@@ -170,7 +170,7 @@ export const surfacePageCommandSchema = Type.Union([
     target: pageCommandTargetSchema,
     command: costsViewCommandSchema,
     /** The name that the label on the page shows, such as the agent's name. */
-    agentLabel: Type.String({ minLength: 1, maxLength: 60 }),
+    agentLabel: textLimit(Type.String({ minLength: 1, maxLength: 60 })),
   }),
   Type.Object({
     kind: Type.Literal("page_command"),
@@ -182,7 +182,7 @@ export const surfacePageCommandSchema = Type.Union([
     target: pageCommandTargetSchema,
     command: pastryBenchViewCommandSchema,
     /** The name that the label on the page shows, such as the agent's name. */
-    agentLabel: Type.String({ minLength: 1, maxLength: 60 }),
+    agentLabel: textLimit(Type.String({ minLength: 1, maxLength: 60 })),
   }),
   Type.Object({
     kind: Type.Literal("page_command"),
@@ -191,17 +191,17 @@ export const surfacePageCommandSchema = Type.Union([
     binding: pageCommandBindingSchema,
     target: pageCommandTargetSchema,
     command: registerViewCommandSchema,
-    agentLabel: Type.String({ minLength: 1, maxLength: 60 }),
+    agentLabel: textLimit(Type.String({ minLength: 1, maxLength: 60 })),
   }),
 ]);
 
 export type CostsViewCommand = Static<typeof costsViewCommandSchema>;
-export type PastryBenchViewCommand = Static<typeof pastryBenchViewCommandSchema>;
+export type PastryBenchViewCommand = Static<
+  typeof pastryBenchViewCommandSchema
+>;
 export type RegisterViewCommand = Static<typeof registerViewCommandSchema>;
 export type PageViewCommand =
-  | CostsViewCommand
-  | PastryBenchViewCommand
-  | RegisterViewCommand;
+  CostsViewCommand | PastryBenchViewCommand | RegisterViewCommand;
 export type SurfacePageCommandV1 = Static<typeof surfacePageCommandSchema>;
 
 const decodeSurfacePageCommand = recordParser(surfacePageCommandSchema);

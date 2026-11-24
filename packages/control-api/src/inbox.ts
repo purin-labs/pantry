@@ -1,5 +1,5 @@
 import { Type, type Static } from "typebox";
-import { NonNegativeInteger } from "@purin-labs/contract-schema";
+import { NonNegativeInteger, textLimit } from "@purin-labs/contract-schema";
 import { Value } from "typebox/value";
 
 /**
@@ -98,7 +98,7 @@ export const inboxWhatsAppConversationSchema = Type.Object(
     proposalId: Type.Union([Type.String({ minLength: 1 }), Type.Null()]),
     /** Null when the Case closed, or the text could not be read. */
     preview: Type.Union([
-      Type.String({ maxLength: INBOX_PREVIEW_MAX }),
+      textLimit(Type.String({ maxLength: INBOX_PREVIEW_MAX })),
       Type.Null(),
     ]),
     ownership: Type.Union([

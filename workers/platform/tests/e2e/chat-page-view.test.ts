@@ -94,7 +94,8 @@ const ORDER_OBSERVATION: SurfaceObservationV2 = {
  * chat shared with a Project carries Costs & margins, which every member may
  * open, and leaves Orders out. The chat keeps the page where it started:
  * a later message from another page does not move it. An observation that
- * breaks the contract refuses the message.
+ * breaks the contract refuses the message, also one whose text passes a
+ * limit only when it is counted in grapheme clusters.
  */
 it(
   "gives the chat agent the page on screen only when the chat's readers may open it",
@@ -144,6 +145,33 @@ it(
     );
     expect(malformed.status).toBe(422);
 
+    // One letter with 1,000 combining marks is one grapheme cluster but
+    // 1,001 characters: over the 400 characters of a page cell, so the
+    // message is refused before any model call.
+    const modelCalls = requests.length;
+    const stacked = await send(
+      author,
+      paths.chat,
+      conversationId,
+      route.model,
+      {
+        label: "stacked-marks",
+        text: "And this note?",
+        surfaceObservation: {
+          ...COSTS_OBSERVATION,
+          view: [
+            {
+              title: "Page state",
+              facts: [{ label: "Note", value: `a${"́".repeat(1_000)}` }],
+              table: null,
+            },
+          ],
+        },
+      },
+    );
+    expect(stacked.status).toBe(422);
+    expect(requests.length).toBe(modelCalls);
+
     const shared = await sharedConversation(
       author,
       route,
@@ -190,6 +218,7 @@ it(
     task.meta.chatPageView = {
       privateChatModelInput: privateInput,
       malformedStatus: malformed.status,
+      stackedMarksStatus: stacked.status,
       sharedChatCostsModelInput: sharedCostsInput,
       sharedChatOrdersModelInput: sharedOrderInput,
       answers: await answers(author, conversationId),

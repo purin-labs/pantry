@@ -2,6 +2,7 @@ import { Type, type Static, type TSchema } from "typebox";
 import {
   NonNegativeInteger,
   PositiveInteger,
+  textLimit,
 } from "@purin-labs/contract-schema";
 import { Value } from "typebox/value";
 
@@ -18,7 +19,7 @@ export const VAULT_ITEM_LIMIT = 200;
 export const VAULT_ORIGIN_LIMIT = 5;
 
 function text(maxLength: number) {
-  return Type.String({ minLength: 1, maxLength });
+  return textLimit(Type.String({ minLength: 1, maxLength }));
 }
 
 function optionalText(maxLength: number) {
@@ -42,10 +43,12 @@ export const onePasswordVaultIdSchema = Type.String({
   pattern: "^[0-9a-z]{26}$",
 });
 /** An exact `https` origin, as `normalizeVaultOrigin` writes it. */
-export const vaultOriginSchema = Type.String({
-  pattern: "^https://[a-z0-9.-]+(:[0-9]{1,5})?$",
-  maxLength: 262,
-});
+export const vaultOriginSchema = textLimit(
+  Type.String({
+    pattern: "^https://[a-z0-9.-]+(:[0-9]{1,5})?$",
+    maxLength: 262,
+  }),
+);
 const originsSchema = Type.Array(vaultOriginSchema, {
   minItems: 1,
   maxItems: VAULT_ORIGIN_LIMIT,
