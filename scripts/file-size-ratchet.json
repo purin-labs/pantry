@@ -3,7 +3,7 @@
   "files": {
     "apps/storefront/src/storefront.tsx": 9334,
     "apps/storefront/src/styles.css": 3907,
-    "areas/commerce/ui/features/commerce/entity-plane/route.tsx": 4051,
+    "areas/commerce/ui/features/commerce/entity-plane/route.tsx": 4021,
     "areas/kitchen/ui/features/production-run/morning-shift-appliances.ts": 3681,
     "areas/kitchen/ui/features/production-run/recipe-workflow-graph.tsx": 3008,
     "areas/kitchen/ui/features/workflow-simulator/bakery-surface.ts": 3893,
@@ -13,7 +13,7 @@
     "packages/production-simulation/src/recipes/bakery/appliance-execution.ts": 3815,
     "packages/production-simulation/src/recipes/bakery/schedule.ts": 4509,
     "scripts/plan-50/evaluate-pi-durable.mjs": 5289,
-    "surfaces/portal/ui/features/chat/route.tsx": 4241,
-    "surfaces/portal/ui/styles.css": 10170
+    "surfaces/portal/ui/features/chat/route.tsx": 4226,
+    "surfaces/portal/ui/styles.css": 9592
   }
 }

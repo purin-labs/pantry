@@ -1,5 +1,5 @@
 {
-  "total": {"copies":783,"lines":14011},
+  "total": {"copies":782,"lines":13991},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -216,7 +216,7 @@
     "areas/organisation/server/data/onboarding.ts = foundation/tenancy/data/organisation-lifecycle.ts": {"copies":1,"lines":20},
     "areas/organisation/server/data/operator-configuration-draft.ts = areas/organisation/server/data/operator-configuration-draft.ts": {"copies":4,"lines":117},
     "areas/organisation/ui/features/access/capability-policy.tsx = areas/organisation/ui/features/access/grant-dialog.tsx": {"copies":1,"lines":9},
-    "areas/organisation/ui/features/access/case-screen-observations.tsx = areas/organisation/ui/features/access/related-cases.tsx": {"copies":2,"lines":36},
+    "areas/organisation/ui/features/access/case-screen-observations.tsx = areas/organisation/ui/features/access/related-cases.tsx": {"copies":1,"lines":16},
     "areas/organisation/ui/features/access/permission-required-prompt.tsx = surfaces/voice/ui/features/voice/control.tsx": {"copies":1,"lines":10},
     "areas/organisation/ui/pages/agent-detail.tsx = areas/organisation/ui/pages/agent-detail.tsx": {"copies":1,"lines":25},
     "crates/bakery-native/src/espresso_cell.rs = crates/bakery-native/src/pour_over_cell.rs": {"copies":5,"lines":107},
