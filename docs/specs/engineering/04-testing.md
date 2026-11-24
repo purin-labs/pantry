@@ -278,7 +278,10 @@ behave like the fakes. These journeys use the real service. The Slack reply jour
 refuses to run when a value is missing. The `plan15-connector-delivery` case skips when
 `PANTRY_CAFE_LIVE_SLACK` is not `1`. With the flag, it throws if one of its three Slack
 values is missing or has the wrong prefix. Each other journey skips when its secret is
-missing.
+missing. If no human user token exists, do the Slack reply journey through Computer Use
+in the Slack desktop app, as the owner: mention the app with a fresh code, then check
+that exactly one app reply contains the code and that no second app message comes in
+the next 30 seconds.
 
 | Journey                                                                                                                                                     | Real service                                   | Needs                                                                                                           |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |

@@ -235,6 +235,10 @@ that each kind of change must include. `workers/platform/tests/AGENTS.md` adds r
   customer sees, not an internal step order.
 - When a test breaks because setup drifted, first ask if its outcome still
   matters. If it does not, delete the test.
+- Use Computer Use to test a flow that needs Chrome, Slack or another desktop
+  app. The owner is signed in to these apps. Computer Use only reads a browser
+  window, so drive Chrome with the Claude in Chrome tools. Do these steps
+  yourself. Do not ask the owner to do them.
 
 ## Persistence and deployment
 
