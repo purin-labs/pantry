@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import { commerceSystemKindSchema } from "./commerce-system.ts";
 import { Type } from "typebox";
 import {
@@ -148,12 +149,12 @@ export const droppedOutputSchema = Type.Object({
 });
 
 export const heldOutputSchema = Type.Object({
-  requestId: Type.String({ minLength: 1, maxLength: 128 }),
+  requestId: textLimit(Type.String({ minLength: 1, maxLength: 128 })),
   heldAt: countSchema,
 });
 
 export const rejectedOutputSchema = Type.Object({
-  reason: Type.String({ minLength: 1, maxLength: 256 }),
+  reason: textLimit(Type.String({ minLength: 1, maxLength: 256 })),
   rejectedAt: countSchema,
 });
 
