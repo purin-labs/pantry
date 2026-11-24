@@ -44,6 +44,21 @@ export function controlRequest(
   });
 }
 
+/** An invitation change, which names its own idempotency key. */
+function invitationRequest(
+  session: IssuedControlSession,
+  path: string,
+  body: unknown,
+): Promise<Response> {
+  const headers = commerceHeaders(session);
+  headers.set("idempotency-key", `invitation-${crypto.randomUUID()}`);
+  return exports.default.fetch(`https://localhost${path}`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  });
+}
+
 /**
  * The person joins the organisation with `role`: the owner invites the
  * person's email, and the person accepts with the token of the link.
@@ -70,7 +85,7 @@ export async function addOrganisationMember(
     ttlMs: 600_000,
   });
   const base = `/v1/control/organisations/${organisationId}/invitations`;
-  const invited = await controlRequest({ session: ownerSession }, base, {
+  const invited = await invitationRequest(ownerSession, base, {
     email: client.identity.email,
     role,
   });
@@ -85,8 +100,8 @@ export async function addOrganisationMember(
     throw new Error(
       `Invitation failed: ${invited.status} ${JSON.stringify(invitation)}`,
     );
-  const accepted = await controlRequest(
-    client,
+  const accepted = await invitationRequest(
+    client.session,
     `${base}/${invitation.invitation.organisationInvitationId}/accept`,
     { token: invitation.token },
   );
