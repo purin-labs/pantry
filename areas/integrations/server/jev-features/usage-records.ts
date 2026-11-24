@@ -105,6 +105,9 @@ export function sealJevUsageHours(
     "UPDATE jev_usage_hour SET state = 'not_billed', outcome = 'unpriced' WHERE organisation_id = ? AND state = 'pending'",
     organisationId,
   );
+  // Closed hours with no call need no cursor move: the next seal reads the
+  // same empty hours again. So an idle Organisation writes nothing here.
+  if (groups.length === 0) return;
   sql.exec(
     `INSERT INTO jev_usage_cursor (organisation_id, sealed_before) VALUES (?, ?)
     ON CONFLICT (organisation_id) DO UPDATE SET sealed_before = excluded.sealed_before`,

@@ -33,6 +33,7 @@ import { network } from "./network";
 import { fixtureDatabase } from "./organisation-database";
 import { addOrganisationMember } from "./organisation-fixture";
 import { controlFetch } from "./chat-journey-support";
+import { WriteMeter } from "./write-meter";
 
 const PANTRY_KEY = "typesafe-pantry-e2e-key-0000000000";
 const OWN_KEY = "typesafe-own-e2e-key-00000000000";
@@ -158,7 +159,7 @@ function seedPantryUse(
 }
 
 it(
-  "J4: a closed hour of Jev use on Pantry's key becomes one record for each feature, with the exact token total",
+  "J4: a closed hour of Jev use on Pantry's key becomes one record for each feature, with the exact token total, and a later hour with no use writes nothing",
   recordsJourney,
   120_000,
 );
@@ -188,6 +189,47 @@ async function recordsJourney(): Promise<void> {
     { feature: "mail_classification", inputTokens: 150, state: "not_billed" },
     { feature: "related_cases", inputTokens: 70, state: "not_billed" },
   ]);
+
+  // The Actor's alarm runs again for other work in the same hour: what any
+  // alarm with nothing to seal writes.
+  const meter = new WriteMeter();
+  await runInDurableObject(organisation, armAlarmForOtherWork);
+  const sameHour = await meter.during(async () => {
+    expect(await runDurableObjectAlarm(organisation)).toBe(true);
+  });
+  // An hour passes with no Jev use, and the alarm runs again. The seal step
+  // finds no call in the new closed hour, so it writes no row more.
+  await runInDurableObject(organisation, lastSealAnHourEarlier);
+  const idleHour = await meter.during(async () => {
+    expect(await runDurableObjectAlarm(organisation)).toBe(true);
+  });
+  expect(
+    idleHour,
+    "rows of an alarm in a new hour with no Jev use, against the same hour",
+  ).toEqual(sameHour);
+  expect(await runInDurableObject(organisation, readHours)).toHaveLength(2);
+}
+
+async function armAlarmForOtherWork(
+  _actor: unknown,
+  state: DurableObjectState,
+): Promise<void> {
+  await state.storage.setAlarm(Date.now() + HOUR_MS);
+}
+
+/**
+ * The seal step last ran one hour earlier, and an alarm for other work is
+ * due: what an hour later looks like to the Actor.
+ */
+async function lastSealAnHourEarlier(
+  actor: unknown,
+  state: DurableObjectState,
+): Promise<void> {
+  state.storage.sql.exec(
+    "UPDATE jev_usage_cursor SET sealed_before = sealed_before - ?",
+    HOUR_MS,
+  );
+  await armAlarmForOtherWork(actor, state);
 }
 
 async function seedHourLedger(

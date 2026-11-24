@@ -113,8 +113,9 @@ The byte and token limits of Related Cases alone stop it at 50 calls.
   Pantry sends it to no meter. A repeated seal writes nothing
   (`ON CONFLICT DO NOTHING`, and the cursor `jev_usage_cursor`).
 - Jev asks for an alarm only while an unsealed call on the Purin key exists. The seal
-  step runs on each alarm of the Organisation Actor, also an alarm for other work. In
-  a new closed hour, that step moves `jev_usage_cursor`, even with no Jev use.
+  step runs on each alarm of the Organisation Actor, also an alarm for other work. It
+  moves `jev_usage_cursor` only past closed hours that hold calls, so an hour with no
+  Jev use writes nothing.
 
 ### Paid use
 
@@ -294,8 +295,6 @@ parser refuses, gives 422. Another refusal gives 409, and a failure of the Actor
   as not on, until an admin turns the switch off and on.
 - A person who loses the admin role keeps a pending card. Its approval is refused.
 - `jev_screen_relevance_record` has no view that reads it (FND-09).
-- The seal step writes `jev_usage_cursor` when a closed hour has no Jev use. This breaks
-  the rule that a run with no change writes nothing.
 
 ## Sources
 
