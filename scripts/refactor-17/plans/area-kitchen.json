@@ -132,12 +132,6 @@
       "replace": "src=\"../../areas/kitchen/ui/features/production-run/linea/espresso-rehearsal.ts\""
     },
     {
-      "file": "apps/portal/package.json",
-      "why": "the Portal test script runs the node tests of the workflow simulator, which move to the kitchen package",
-      "find": "node --test src/features/workflow-simulator/schedule.test.mjs src/features/workflow-simulator/task-events.test.mjs src/features/workflow-simulator/procedure.test.mjs src/features/workflow-simulator/equipment-timeline.test.mjs src/features/workflow-simulator/workcell-view.test.mjs",
-      "replace": "node --test ../../areas/kitchen/ui/features/workflow-simulator/schedule.test.mjs ../../areas/kitchen/ui/features/workflow-simulator/task-events.test.mjs ../../areas/kitchen/ui/features/workflow-simulator/procedure.test.mjs ../../areas/kitchen/ui/features/workflow-simulator/equipment-timeline.test.mjs ../../areas/kitchen/ui/features/workflow-simulator/workcell-view.test.mjs"
-    },
-    {
       "file": "knip.json",
       "why": "two Portal entries of knip move with the kitchen package: the rehearsal script that the rehearsal pages start and the execution worker that the execution bundle build starts",
       "find": "        \"src/ui/index.ts\",\n        \"src/features/production-run/linea/espresso-rehearsal.ts\",\n        \"src/features/production-run/execution-worker.ts\",\n        \"src/features/voice/wake-worker.ts\",\n",
@@ -317,7 +311,6 @@
     "apps/portal/src/features/workflow-simulator/browser-production-run.ts": "ui/features/workflow-simulator/browser-production-run.ts",
     "apps/portal/src/features/workflow-simulator/bundled-example.ts": "ui/features/workflow-simulator/bundled-example.ts",
     "apps/portal/src/features/workflow-simulator/canvas-resize.ts": "ui/features/workflow-simulator/canvas-resize.ts",
-    "apps/portal/src/features/workflow-simulator/complete-recipe-task-catalog.tsx": "ui/features/workflow-simulator/complete-recipe-task-catalog.tsx",
     "apps/portal/src/features/workflow-simulator/docks/comparison.tsx": "ui/features/workflow-simulator/docks/comparison.tsx",
     "apps/portal/src/features/workflow-simulator/docks/history-controls.tsx": "ui/features/workflow-simulator/docks/history-controls.tsx",
     "apps/portal/src/features/workflow-simulator/docks/inspector.tsx": "ui/features/workflow-simulator/docks/inspector.tsx",
@@ -453,7 +446,6 @@
     "services/platform/src/agent-tools/bakery/page-effects.ts": "server/agent-tools/bakery/page-effects.ts",
     "services/platform/src/agent-tools/bakery/surface-result.ts": "server/agent-tools/bakery/surface-result.ts",
     "services/platform/src/agent-tools/bakery/surface.ts": "server/agent-tools/bakery/surface.ts",
-    "services/platform/src/agent-tools/costs/view-handler.ts": "server/agent-tools/costs/view-handler.ts",
     "services/platform/src/agent-tools/costs/view.ts": "server/agent-tools/costs/view.ts",
     "services/platform/src/agent-tools/kitchen/bake-handlers.ts": "server/agent-tools/kitchen/bake-handlers.ts",
     "services/platform/src/agent-tools/kitchen/bakes.ts": "server/agent-tools/kitchen/bakes.ts",

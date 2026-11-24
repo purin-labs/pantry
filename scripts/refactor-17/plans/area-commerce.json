@@ -171,7 +171,6 @@
     "apps/portal/src/features/commerce/entity-plane/dossier-surface.ts": "ui/features/commerce/entity-plane/dossier-surface.ts",
     "apps/portal/src/features/commerce/entity-plane/models.ts": "ui/features/commerce/entity-plane/models.ts",
     "apps/portal/src/features/commerce/entity-plane/presentation.ts": "ui/features/commerce/entity-plane/presentation.ts",
-    "apps/portal/src/features/commerce/entity-plane/product-detail.css": "ui/features/commerce/entity-plane/product-detail.css",
     "apps/portal/src/features/commerce/entity-plane/product-sale-details.tsx": "ui/features/commerce/entity-plane/product-sale-details.tsx",
     "apps/portal/src/features/commerce/entity-plane/purchasing-controls.tsx": "ui/features/commerce/entity-plane/purchasing-controls.tsx",
     "apps/portal/src/features/commerce/entity-plane/route.tsx": "ui/features/commerce/entity-plane/route.tsx",

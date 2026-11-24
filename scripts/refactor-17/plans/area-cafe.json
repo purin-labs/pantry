@@ -183,7 +183,6 @@
     "services/platform/src/actors/menu-board-archive.ts": "server/actors/menu-board-archive.ts",
     "services/platform/src/actors/menu-board-commands.ts": "server/actors/menu-board-commands.ts",
     "services/platform/src/actors/menu-board-comments.ts": "server/actors/menu-board-comments.ts",
-    "services/platform/src/actors/menu-board-templates.ts": "server/actors/menu-board-templates.ts",
     "services/platform/src/actors/menu-board-versions.ts": "server/actors/menu-board-versions.ts",
     "services/platform/src/actors/menu-boards.ts": "server/actors/menu-boards.ts",
     "services/platform/src/actors/menu-draft.ts": "server/actors/menu-draft.ts",

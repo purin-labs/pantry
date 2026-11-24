@@ -63,10 +63,7 @@
     "apps/portal/src/features/chat/thread-title.tsx": "ui/features/chat/thread-title.tsx",
     "apps/portal/src/features/chat/underlay.css": "ui/features/chat/underlay.css",
     "apps/portal/src/features/chat/underlay.tsx": "ui/features/chat/underlay.tsx",
-    "apps/portal/src/features/chat/work-glow.css": "ui/features/chat/work-glow.css",
-    "apps/portal/src/features/chat/work-glow.tsx": "ui/features/chat/work-glow.tsx",
     "apps/portal/src/features/integrations/settings-transport.ts": "ui/features/integrations/settings-transport.ts",
-    "apps/portal/src/home.ts": "ui/home.ts",
     "apps/portal/src/identity-copy.ts": "ui/identity-copy.ts",
     "apps/portal/src/main.tsx": "ui/main.tsx",
     "apps/portal/src/page-code.ts": "ui/page-code.ts",
@@ -145,11 +142,14 @@
         "types": "./ui/*.ts",
         "default": "./ui/*.ts"
       },
+      "./ui/features/chat/composer-glow": "./ui/features/chat/composer-glow.tsx",
       "./ui/features/chat/configuration-draft-cards": "./ui/features/chat/configuration-draft-cards.tsx",
       "./ui/features/chat/permission-prompt": "./ui/features/chat/permission-prompt.tsx",
       "./ui/features/chat/route": "./ui/features/chat/route.tsx",
       "./ui/main": "./ui/main.tsx",
+      "./ui/pages/home": "./ui/pages/home.tsx",
       "./ui/portal": "./ui/portal.tsx",
+      "./ui/portal-shell": "./ui/portal-shell.tsx",
       "./ui/public-docs": "./ui/public-docs.tsx",
       "./ui/shell": "./ui/shell.tsx",
       "./ui/tv/player": "./ui/tv/player.tsx",
@@ -190,8 +190,7 @@
       "react": "^19.1.1",
       "react-dom": "^19.1.1",
       "react-router": "^7.18.2",
-      "sonner": "^2.0.7",
-      "voice-glow": "0.2.1"
+      "sonner": "^2.0.7"
     },
     "devDependencies": [
       "@cloudflare/workers-types",

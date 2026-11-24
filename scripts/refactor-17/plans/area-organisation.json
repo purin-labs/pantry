@@ -124,7 +124,6 @@
     }
   ],
   "files": {
-    "apps/portal/src/agent-operations.ts": "ui/agent-operations.ts",
     "apps/portal/src/features/access/access-check.tsx": "ui/features/access/access-check.tsx",
     "apps/portal/src/features/access/agent-permission-request.tsx": "ui/features/access/agent-permission-request.tsx",
     "apps/portal/src/features/access/ai-budget-raise.tsx": "ui/features/access/ai-budget-raise.tsx",
