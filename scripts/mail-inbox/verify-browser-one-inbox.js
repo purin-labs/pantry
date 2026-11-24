@@ -1,6 +1,7 @@
 // Run after mount-browser-fixture.js in the same Playwright CLI session.
 // Plan 83: email and WhatsApp in one list. A member reads what waits for an
-// owner or an admin. A person approves a WhatsApp draft,
+// owner or an admin. A person approves a WhatsApp draft, a send that the
+// window or a change of owner stops says why,
 // the next conversation opens, a composer reply takes the Case, the agent's
 // section and a closed Case in Done show, a refused number asks for a grant, the agent setting
 // saves, and with no agent a person writes the email reply.
@@ -562,6 +563,91 @@ async function verifyOneInbox(page) {
     throw new Error("A decided thread shows again in Other mail");
   await page.screenshot({ path: "output/playwright/one-inbox-other-mail.png" });
 
+  // A send that Pantry stops says why: the 24-hour window ended, or the
+  // conversation changed owner. Neither asks for a retry that cannot work.
+  await page.evaluate(function stoppedSends() {
+    const now = Date.now();
+    const open = now + 20 * 3_600_000;
+    const state = window.mailFixtureWhatsAppState;
+    window.mailFixtureWhatsApp = {
+      kind: "read",
+      truncated: false,
+      refused: null,
+      conversations: [],
+    };
+    const stopped = [
+      ["case-late", "+819000003301", { kind: "service_window_closed" }],
+      [
+        "case-moved",
+        "+819000003302",
+        { kind: "refused", reason: "ownership_conflict" },
+      ],
+    ];
+    for (const [caseId, customerWaId, answer] of stopped) {
+      const text = `Is my order ready? (${caseId})`;
+      window.mailFixtureWhatsApp.conversations.push({
+        integrationAccountId: "wa-account-1",
+        caseId,
+        customerWaId,
+        proposalId: `proposal-${caseId}`,
+        preview: text,
+        ownership: "agent_active",
+        state: "reply_waiting",
+        waitingSince: now - 60_000,
+        serviceWindowExpiresAt: open,
+      });
+      state.cases[caseId] = {
+        caseId,
+        customerWaId,
+        ownership: { kind: "agent_active" },
+        handoffRequestedAt: null,
+        handoffReason: null,
+        serviceWindowExpiresAt: open,
+        messages: [
+          {
+            providerMessageId: `wamid.${caseId}`,
+            direction: "inbound",
+            text,
+            occurredAt: now - 60_000,
+          },
+        ],
+      };
+      state.proposals[`proposal-${caseId}`] = {
+        version: 1,
+        caseId,
+        customerWaId,
+        body: "Yes, it is ready.",
+        serviceWindowExpiresAt: open,
+        answer,
+      };
+    }
+    window.mailInboxRender({ key: "one-inbox-stopped" });
+  });
+  for (const [customer, reason] of [
+    [
+      "+819000003301",
+      "The 24-hour window has ended, so this reply was not sent.",
+    ],
+    [
+      "+819000003302",
+      "This conversation changed owner, so the reply was not sent.",
+    ],
+  ]) {
+    await needs
+      .getByRole("button", { name: new RegExp(`\\${customer}`) })
+      .click();
+    await title.getByText(customer, { exact: true }).waitFor();
+    await bar
+      .getByRole("button", { name: "Approve and send", exact: true })
+      .click();
+    await conversation.getByRole("alert").filter({ hasText: reason }).waitFor();
+    if ((await conversation.getByText(/Try again/).count()) !== 0)
+      throw new Error(`A stopped send asks for a retry: ${customer}`);
+  }
+  await page.screenshot({
+    path: "output/playwright/one-inbox-stopped-send.png",
+  });
+
   return {
     artifact: "ONE_INBOX_BROWSER",
     passed: true,
@@ -575,6 +661,7 @@ async function verifyOneInbox(page) {
       "output/playwright/one-inbox-setting.png",
       "output/playwright/one-inbox-person-reply.png",
       "output/playwright/one-inbox-other-mail.png",
+      "output/playwright/one-inbox-stopped-send.png",
     ],
   };
 }

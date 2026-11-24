@@ -544,19 +544,23 @@ export function WhatsAppConversation(props: Props): React.ReactNode {
   );
 }
 
+function sendResult(answer: unknown): Record<string, unknown> | null {
+  return isRecord(answer) && isRecord(answer.result) ? answer.result : null;
+}
+
 function resultKind(answer: unknown): string | null {
-  return isRecord(answer) &&
-    isRecord(answer.result) &&
-    typeof answer.result.kind === "string"
-    ? answer.result.kind
-    : null;
+  const result = sendResult(answer);
+  return typeof result?.kind === "string" ? result.kind : null;
 }
 
 function wasSent(answer: unknown): boolean {
   return resultKind(answer) === "sent";
 }
 
-/** The send ladder can answer without a send. The person must know why. */
+/**
+ * The send ladder can answer without a send. The person must know why, and
+ * only a send that can still work asks them to try again.
+ */
 function notSentText(answer: unknown): string {
   switch (resultKind(answer)) {
     case "send_indeterminate":
@@ -565,8 +569,31 @@ function notSentText(answer: unknown): string {
       return "This draft changed. Read the new text, then approve it.";
     case "expired":
       return "This draft expired. It was not sent.";
+    case "service_window_closed":
+      return "The 24-hour window has ended, so this reply was not sent. WhatsApp does not allow a free reply now.";
+    case "proposal_missing":
+      return "This draft is gone, so it was not sent.";
+    case "refused":
+      return refusedText(sendResult(answer)?.reason);
+    case "rejected":
+      return "WhatsApp refused this reply. Try again.";
     default:
       return "This reply was not sent. Try again.";
+  }
+}
+
+/** Why Pantry refused a send before it reached WhatsApp. */
+function refusedText(reason: unknown): string {
+  switch (reason) {
+    case "ownership_conflict":
+      return "This conversation changed owner, so the reply was not sent. Read it again before you answer.";
+    case "case_missing":
+    case "case_closed":
+      return "This conversation is closed, so the reply was not sent.";
+    case "authority_moved":
+      return "The setup of this WhatsApp number changed after this draft, so it was not sent. Write a new reply.";
+    default:
+      return "WhatsApp support is not ready on this number, so the reply was not sent. Check the number in Integrations.";
   }
 }
 

@@ -90,6 +90,10 @@ stores nothing of a WhatsApp message. Pantry never sends an unconfirmed reply ag
   conversation is closed. Purin deleted its text. WhatsApp keeps the full history."
 - If another person owns the Case, the send fails with `whatsapp_case_not_owned`, and
   the pane says "Another person owns this conversation. Ask them to return it."
+- A send that Pantry stops says why (`notSentText`): Meta did not confirm it, the draft
+  changed or expired, the 24-hour window ended, the conversation changed owner or
+  closed, or the setup of the number changed. Only a send that can still work says
+  "Try again".
 - If the person cannot read a number, the list says "You cannot read this WhatsApp
   number yet." with **Request access**. That opens the access prompt in the page.
 

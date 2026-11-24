@@ -213,6 +213,10 @@ async function mountMailInbox(page) {
           proposal.version += 1;
           return Response.json({ ok: true, result: { kind: "versioned" } });
         }
+        // A journey sets `answer` for a send that Pantry stops: the Worker's
+        // answer of the send ladder, such as `service_window_closed`.
+        if (action === "approve" && proposal.answer !== undefined)
+          return Response.json({ ok: true, result: proposal.answer });
         if (action === "approve") {
           state.cases[proposal.caseId].messages.push({
             direction: "outbound",
