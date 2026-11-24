@@ -8,17 +8,9 @@ import {
   REPLENISHMENT_QUEUE_VIEW_ID,
   SUPPLIER_DIRECTORY_LIST_ID,
 } from "@purin-labs/commerce-client";
-import { Select } from "@purin-labs/ui/select";
 import { StatusChip } from "@purin-labs/ui/page-components";
 import type { StatusChipStatus } from "@purin-labs/ui/status-chip";
-import {
-  CommerceBoardEntryDrawer,
-  CommerceBoardList,
-  renderCommerceFact,
-  type CommerceBoardListFact,
-  type CommerceBoardListLane,
-  type CommerceBoardListRow,
-} from "./board-list";
+import { renderCommerceFact, type CommerceBoardListFact } from "./board-list";
 import { commerceBoardFactText, listAttributeDefinition } from "./board-rows";
 import {
   buildPublishedCommerceCollectionModel,
@@ -41,80 +33,44 @@ import {
   commerceStatusChip,
   formatCommerceAttributeValue,
 } from "./presentation";
-import { SUPPLIER_SORTS, renderCommerceSelectParts } from "./select-items";
 import "./supplier-directory.css";
 
 /**
- * The Supplier Directory of the Purchasing page, as the same list as the
- * Replenishment Queue: filters by each supplier's open requests, one row for
- * each supplier, a sort, and one drawer with the supplier's facts and its open
- * requests. The supplier's record page shows the same facts. The reads that
- * join the two purchasing lists live here too.
+ * The reads that join the two purchasing lists: the Replenishment Queue shows
+ * each supplier's name from the Supplier Directory, and a supplier's record
+ * page shows its directory entry and its open requests in the queue. The
+ * directory tab itself is the table of its published list.
  */
 
-/** One open purchase request of a supplier, as its drawer and record show it. */
+/** One open purchase request of a supplier, as its record page shows it. */
 type SupplierOpenRequest = Readonly<{
   key: string;
   item: string;
   /** The amount and the due day, such as "12 kg · Due 3 Sep". */
   detail: string;
   status: StatusChipStatus;
-  late: boolean;
 }>;
 
+/** The open requests of each supplier, by supplier id. */
 type SupplierRequests = ReadonlyMap<string, readonly SupplierOpenRequest[]>;
 
-/** What one purchasing list reads from the other. */
-export type PurchasingReads = Readonly<{
-  /** Supplier names for the ids that the queue stores as plain text. */
-  names: ReadonlyMap<string, string>;
-  /** The open requests of each supplier, by supplier id. */
-  supplierRequests: SupplierRequests;
-}>;
-
-const NO_NAMES: ReadonlyMap<string, string> = new Map();
+export const NO_SUPPLIER_NAMES: ReadonlyMap<string, string> = new Map();
 const NO_REQUESTS: SupplierRequests = new Map();
 const NO_SUPPLIER_REQUESTS: readonly SupplierOpenRequest[] = [];
-export const NO_PURCHASING_READS: PurchasingReads = {
-  names: NO_NAMES,
-  supplierRequests: NO_REQUESTS,
-};
 
 /**
- * The queue shows each supplier's name, so it reads the directory; the
- * directory shows each supplier's open requests, so it reads the queue. A
- * failed read leaves the list as it is: an id for a name, no request counts.
+ * The queue stores each supplier as its id in plain text, so it reads the
+ * directory for the names. A failed read leaves the id in the cell, which is
+ * worse than a name but better than an empty cell.
  */
-export async function loadPurchasingReads(
+export async function loadSupplierNames(
   organisationId: string,
   model: CommercePublishedCollectionModel,
   metadata: CommercePublishedResourceMetadata,
   fetcher: CommerceGraphFetch | undefined,
-): Promise<PurchasingReads> {
-  const listId = model.list?.listId;
-  if (listId === REPLENISHMENT_QUEUE_LIST_ID)
-    return {
-      names: await readSupplierNames(organisationId, metadata, fetcher),
-      supplierRequests: NO_REQUESTS,
-    };
-  if (listId === SUPPLIER_DIRECTORY_LIST_ID)
-    return {
-      names: NO_NAMES,
-      supplierRequests: await readSupplierRequests(
-        organisationId,
-        metadata,
-        fetcher,
-      ),
-    };
-  return NO_PURCHASING_READS;
-}
-
-async function readSupplierNames(
-  organisationId: string,
-  metadata: CommercePublishedResourceMetadata,
-  fetcher: CommerceGraphFetch | undefined,
 ): Promise<ReadonlyMap<string, string>> {
   const names = new Map<string, string>();
+  if (model.list?.listId !== REPLENISHMENT_QUEUE_LIST_ID) return names;
   const directory = metadata.lists.find(isSupplierDirectoryList);
   if (directory === undefined) return names;
   try {
@@ -180,7 +136,12 @@ function supplierRequestsOf(
   const statusKind = listAttributeDefinition(model, "status")?.definition.kind;
   for (const row of model.rows) {
     const status = listEntryStatus(row.entry);
-    const text = commerceBoardFactText.bind(null, model, NO_NAMES, row);
+    const text = commerceBoardFactText.bind(
+      null,
+      model,
+      NO_SUPPLIER_NAMES,
+      row,
+    );
     const supplierId = text("supplier_id");
     if (status?.value === "received" || supplierId.length === 0) continue;
     const [amount, due] = purchaseRequestRowSummary(row.entry, text).columns;
@@ -194,7 +155,6 @@ function supplierRequestsOf(
         kind: "neutral",
         label: "Open",
       },
-      late: status?.value === "late",
     };
     const own = requests.get(supplierId);
     if (own === undefined) requests.set(supplierId, [request]);
@@ -211,12 +171,6 @@ function listEntryStatus(entry: CommerceListEntry) {
     )
       return attribute.value;
   return undefined;
-}
-
-export function isSupplierDirectoryModel(
-  model: CommercePublishedCollectionModel,
-): boolean {
-  return model.list?.listId === SUPPLIER_DIRECTORY_LIST_ID;
 }
 
 export function isSupplierDirectoryList(
@@ -236,7 +190,7 @@ function supplierEntryText(
   row: CommerceCollectionRow,
 ): SupplierEntryText {
   return {
-    text: commerceBoardFactText.bind(null, model, NO_NAMES, row),
+    text: commerceBoardFactText.bind(null, model, NO_SUPPLIER_NAMES, row),
     label: publishedAttributeLabel.bind(null, model),
   };
 }
@@ -320,224 +274,17 @@ function minimumOrderText(entry: SupplierEntryText): string | null {
   return `${quantity} ${entry.text("minimum_order_unit")}`.trim();
 }
 
-/** Each supplier with its open requests, for the list, its lanes and sorts. */
-type SupplierListEntry = Readonly<{
-  row: CommerceCollectionRow;
-  entry: SupplierEntryText;
-  requests: readonly SupplierOpenRequest[];
-  laneId: SupplierLaneId;
-}>;
-
-type SupplierLaneId = "open" | "late" | "none";
-
-const SUPPLIER_LANES: readonly Readonly<{
-  id: SupplierLaneId;
-  label: string;
-}>[] = [
-  { id: "open", label: "Open requests" },
-  { id: "late", label: "Late" },
-  { id: "none", label: "No open requests" },
-];
-
-type SupplierSort = "name" | "lead_time" | "open_requests";
-
-export function SupplierDirectoryList(
-  props: Readonly<{
-    label: string;
-    model: CommercePublishedCollectionModel;
-    requests: SupplierRequests;
-    recordHref: (entity: CommerceEntity) => string | null;
-  }>,
-): React.ReactNode {
-  const [sort, setSort] = React.useState<SupplierSort>("name");
-  const suppliers = props.model.rows.map(
-    supplierListEntry.bind(null, props.model, props.requests),
-  );
-  const sorted = [...suppliers].sort(supplierOrder.bind(null, sort));
-  return (
-    <CommerceBoardList
-      label={props.label}
-      lanes={SUPPLIER_LANES.map(supplierLane.bind(null, suppliers))}
-      rows={sorted.map(supplierBoardRow.bind(null, props.recordHref))}
-      controls={
-        <Select.Root
-          items={SUPPLIER_SORTS}
-          value={sort}
-          onValueChange={selectSupplierSort.bind(null, setSort)}
-        >
-          {renderCommerceSelectParts(SUPPLIER_SORTS, "Sort suppliers")}
-        </Select.Root>
-      }
-    />
-  );
-}
-
-function selectSupplierSort(
-  setSort: React.Dispatch<React.SetStateAction<SupplierSort>>,
-  value: string | null,
-): void {
-  if (value === "name" || value === "lead_time" || value === "open_requests")
-    setSort(value);
-}
-
-function supplierListEntry(
-  model: CommercePublishedCollectionModel,
-  requests: SupplierRequests,
-  row: CommerceCollectionRow,
-): SupplierListEntry {
-  const own =
-    requests.get(String(row.entity.reference.entityId)) ?? NO_SUPPLIER_REQUESTS;
-  return {
-    row,
-    entry: supplierEntryText(model, row),
-    requests: own,
-    laneId: own.some(isLateRequest) ? "late" : own.length > 0 ? "open" : "none",
-  };
-}
-
-function supplierLane(
-  suppliers: readonly SupplierListEntry[],
-  lane: (typeof SUPPLIER_LANES)[number],
-): CommerceBoardListLane {
-  return {
-    id: lane.id,
-    label: lane.label,
-    count: suppliers.filter(supplierInLane.bind(null, lane.id)).length,
-  };
-}
-
-function supplierInLane(
-  laneId: SupplierLaneId,
-  supplier: SupplierListEntry,
-): boolean {
-  return supplier.laneId === laneId;
-}
-
-/**
- * By name; by lead time, the shortest first; or by open requests, the
- * suppliers with a late request first, then the most requests. Ties go by
- * name.
- */
-function supplierOrder(
-  sort: SupplierSort,
-  left: SupplierListEntry,
-  right: SupplierListEntry,
-): number {
-  const byName = left.row.entity.displayName.localeCompare(
-    right.row.entity.displayName,
-  );
-  switch (sort) {
-    case "name":
-      return byName;
-    case "lead_time":
-      return leadTimeDays(left) - leadTimeDays(right) || byName;
-    case "open_requests":
-      return (
-        Number(right.laneId === "late") - Number(left.laneId === "late") ||
-        right.requests.length - left.requests.length ||
-        byName
-      );
-  }
-}
-
-function leadTimeDays(supplier: SupplierListEntry): number {
-  const days = Number.parseInt(supplier.entry.text("lead_time_days"), 10);
-  return Number.isNaN(days) ? Number.POSITIVE_INFINITY : days;
-}
-
-function isLateRequest(request: SupplierOpenRequest): boolean {
-  return request.late;
-}
-
-/**
- * One supplier as a list row: the contact under the name, then the email, the
- * lead time and the minimum order, and a tag for its open requests.
- */
-function supplierBoardRow(
-  recordHref: (entity: CommerceEntity) => string | null,
-  supplier: SupplierListEntry,
-): CommerceBoardListRow {
-  const { row, entry, requests } = supplier;
-  const contact = entry.text("contact_name");
-  const email = entry.text("email");
-  const leadTime = leadTimeText(entry.text("lead_time_days"));
-  const minimum = minimumOrderText(entry);
-  return {
-    key: `${String(row.entry.listId)}:${String(row.entry.entryId)}`,
-    laneId: supplier.laneId,
-    name: row.entity.displayName,
-    secondary: contact.length === 0 ? null : contact,
-    columns: [
-      {
-        id: "email",
-        text: email.length === 0 ? "No email" : email,
-        numeric: false,
-      },
-      {
-        id: "lead_time_days",
-        text:
-          leadTime === COMMERCE_VALUE_ABSENT
-            ? leadTime
-            : `${leadTime} lead time`,
-        numeric: true,
-      },
-      {
-        id: "minimum_order",
-        text: minimum === null ? "No minimum set" : `Minimum ${minimum}`,
-        numeric: false,
-      },
-    ],
-    laneTag:
-      requests.length === 0 ? null : (
-        <StatusChip status={supplierRequestsTag(supplier)} />
-      ),
-    drawer: renderSupplierDrawer.bind(null, recordHref, supplier),
-  };
-}
-
-/** "1 late" when a request is late, else "2 open". */
-function supplierRequestsTag(supplier: SupplierListEntry): StatusChipStatus {
-  const late = supplier.requests.filter(isLateRequest).length;
-  return late > 0
-    ? { kind: "danger", label: `${late} late` }
-    : { kind: "neutral", label: `${supplier.requests.length} open` };
-}
-
-function renderSupplierDrawer(
-  recordHref: (entity: CommerceEntity) => string | null,
-  supplier: SupplierListEntry,
-  open: boolean,
-  close: () => void,
-): React.ReactNode {
-  return (
-    <CommerceBoardEntryDrawer
-      open={open}
-      close={close}
-      title={supplier.row.entity.displayName}
-      href={recordHref(supplier.row.entity)}
-      facts={supplierFacts(supplier.row.entity, supplier.entry)}
-      laneControl={null}
-    >
-      <SupplierOpenRequests
-        className="supplier-drawer-requests"
-        requests={supplier.requests}
-      />
-    </CommerceBoardEntryDrawer>
-  );
-}
-
 /** A supplier's open requests: the item, its amount and due day, its lane. */
 function SupplierOpenRequests(
-  props: Readonly<{
-    className: string;
-    requests: readonly SupplierOpenRequest[];
-  }>,
+  props: Readonly<{ requests: readonly SupplierOpenRequest[] }>,
 ): React.ReactNode {
-  const headingId = React.useId();
   if (props.requests.length === 0) return null;
   return (
-    <section className={props.className} aria-labelledby={headingId}>
-      <h3 id={headingId}>Open requests</h3>
+    <section
+      className="commerce-dossier-section"
+      aria-labelledby="supplier-requests-title"
+    >
+      <h3 id="supplier-requests-title">Open requests</h3>
       <ul className="supplier-request-rows">
         {props.requests.map(renderSupplierRequest)}
       </ul>
@@ -606,7 +353,6 @@ export function SupplierRecordDetails(
         </dl>
       </section>
       <SupplierOpenRequests
-        className="commerce-dossier-section"
         requests={
           record.kind === "ready" ? record.requests : NO_SUPPLIER_REQUESTS
         }

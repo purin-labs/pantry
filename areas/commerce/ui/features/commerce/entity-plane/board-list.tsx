@@ -8,8 +8,8 @@ import "./board-list.css";
 /**
  * A list of commerce entries: lane filters with counts, one row for each entry,
  * and a side drawer with every fact and the actions of the entry. The
- * Replenishment Queue and the Supplier Directory use it. The caller builds the
- * rows, so this module knows no commerce list.
+ * Replenishment Queue uses it. The caller builds the rows, so this module
+ * knows no commerce list.
  */
 
 export type CommerceBoardListFact = Readonly<{
@@ -51,8 +51,6 @@ export function CommerceBoardList(
     label: string;
     lanes: readonly CommerceBoardListLane[];
     rows: readonly CommerceBoardListRow[];
-    /** A control at the end of the filter row, such as a sort select. */
-    controls?: React.ReactNode;
   }>,
 ): React.ReactNode {
   const [filter, setFilter] = React.useState<string | null>(null);
@@ -69,24 +67,21 @@ export function CommerceBoardList(
   const close = closeDrawer.bind(null, setSelection);
   return (
     <div className="commerce-board-list">
-      <div className="commerce-board-list-tools">
-        <div
-          className="commerce-filter-bar"
-          role="group"
-          aria-label={`Show ${props.label} by lane`}
-        >
-          {renderLaneFilter(
-            setFilter,
-            active === null,
-            null,
-            "All",
-            props.rows.length,
-          )}
-          {props.lanes
-            .filter(laneIsShownAsFilter.bind(null, active))
-            .map(renderLaneFilterFor.bind(null, setFilter, active))}
-        </div>
-        {props.controls}
+      <div
+        className="commerce-filter-bar"
+        role="group"
+        aria-label={`Show ${props.label} by lane`}
+      >
+        {renderLaneFilter(
+          setFilter,
+          active === null,
+          null,
+          "All",
+          props.rows.length,
+        )}
+        {props.lanes
+          .filter(laneIsShownAsFilter.bind(null, active))
+          .map(renderLaneFilterFor.bind(null, setFilter, active))}
       </div>
       {shown.length === 0 ? (
         <p className="empty-state commerce-empty">

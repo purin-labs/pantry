@@ -27,10 +27,14 @@ Saves of scenarios and runs stay with the person, who confirms each one on the p
 | `production` | "Financier batches with robot" | Financier batches with gated cold-tray operations on one or two FR10 cells         |
 | `rehearsal`  | "Robot tray rehearsal"         | Named trays (A to P) with native operations on the shared cell                     |
 
-- The Workflow panel opens on the catalog (`workflow-catalog.tsx`): filters with
-  counts (All, Actions, Recipe tasks, Loops and shifts), then one list with a row for
-  each workflow: its name, one fact and its kind as a tag. The floor plan's panel and
-  the production workspace share it. A row opens its view as before. The production
+- The Workflow panel opens on the catalog (`workflow-catalog.tsx`): one row of
+  filters with counts ("All", "Tier 1", "Tier 2", "Tier 3"), then a group for each
+  tier under its full name ("Tier 1 · Actions", "Tier 2 · Recipe tasks", "Tier 3 ·
+  Loops and shifts"): a framed list with a row for each workflow, its name and one
+  fact. "All" shows the three groups; a tier filter shows that tier's group. A tier 3
+  row also has a tag (Loop, Shift or Saved), because the tier holds more than one
+  kind. The floor plan's panel and the production workspace share the catalog. A row
+  opens its view. The production
   workspace's top bar shows the name of the view that its panel shows (a recipe form,
   the café shift or the saved runs), or the production's name.
 - Details › Inputs: the Scenario and Orders presets, the auto-scale switch, the four

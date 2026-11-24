@@ -1,20 +1,5 @@
 /* A list of commerce entries: a row for each entry, the lane as a tag, and a
    drawer with the facts and the actions. */
-
-/* The lane filters, then a control such as a sort select at the end. */
-.commerce-board-list-tools {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.commerce-board-list-tools > .commerce-filter-bar {
-  margin-bottom: 0;
-}
-
 .commerce-board-rows {
   display: grid;
   margin: 0;

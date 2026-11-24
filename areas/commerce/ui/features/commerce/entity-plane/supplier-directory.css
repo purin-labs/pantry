@@ -1,17 +1,5 @@
-/* A supplier's open requests, in its drawer and on its record page: one
-   framed list, a row for each request with its lane as a tag. */
-.supplier-drawer-requests {
-  display: grid;
-  gap: 8px;
-}
-
-.supplier-drawer-requests h3 {
-  margin: 0;
-  color: var(--ink-2);
-  font-size: 13px;
-  font-weight: 600;
-}
-
+/* A supplier's open requests on its record page: one framed list, a row for
+   each request with its lane as a tag. */
 .supplier-request-rows {
   margin: 0;
   padding: 0;

@@ -23,10 +23,27 @@ export type CatalogSection =
 /** The tier of a workflow: one action, one recipe task, or a loop or shift. */
 type CatalogTier = "action" | "task" | "loop";
 
+/**
+ * The tiers in the order of the catalog: the short name of each filter, and
+ * the full name of each group heading.
+ */
+const TIERS: readonly Readonly<{
+  tier: CatalogTier;
+  filter: string;
+  heading: string;
+}>[] = [
+  { tier: "action", filter: "Tier 1", heading: "Tier 1 · Actions" },
+  { tier: "task", filter: "Tier 2", heading: "Tier 2 · Recipe tasks" },
+  { tier: "loop", filter: "Tier 3", heading: "Tier 3 · Loops and shifts" },
+];
+
 type CatalogEntry = Readonly<{
   tier: CatalogTier;
-  /** The kind that the row's tag shows. */
-  kind: string;
+  /**
+   * The tag of a tier 3 row, which tells a loop, a shift and the saved runs
+   * apart. The tier names every action and recipe task, so they have none.
+   */
+  tag?: "Loop" | "Shift" | "Saved";
   name: string;
   /** One line under the name: the main equipment, or the size of a shift. */
   fact: string;
@@ -42,97 +59,85 @@ type CatalogEntryId = CatalogSection | "financier-morning";
 const CATALOG: Readonly<Record<CatalogEntryId, CatalogEntry>> = {
   "rehearsal-production": {
     tier: "action",
-    kind: "Action",
     name: "Robot tray rehearsal",
     fact: "Tray A → Tray B · rack handoff",
   },
   "appliance-rehearsals": {
     tier: "action",
-    kind: "Action",
     name: "Appliance rehearsals",
     fact: "Linea Classic S · Eagle One",
   },
   siphon: {
     tier: "task",
-    kind: "Recipe task",
     name: "Siphon coffee",
     fact: "Hario ECA-3-B",
   },
   "pour-over": {
     tier: "task",
-    kind: "Recipe task",
     name: "Pour-over",
     fact: "FR10 · gooseneck kettle",
   },
   espresso: {
     tier: "task",
-    kind: "Recipe task",
     name: "Espresso",
     fact: "Linea Classic S",
   },
   latte: {
     tier: "task",
-    kind: "Recipe task",
     name: "Caffe latte",
     fact: "FR10 · steam wand",
   },
   "black-sesame": {
     tier: "task",
-    kind: "Recipe task",
     name: "Black sesame milk",
     fact: "WSG60 · Vitamix · Severin",
   },
   "ginger-tea": {
     tier: "task",
-    kind: "Recipe task",
     name: "Ginger tea and milk tea",
     fact: "FR10 · two pans",
   },
   "financier-batter": {
     tier: "task",
-    kind: "Recipe task",
     name: "Financier batter",
     fact: "Maruzen hob · Ohaus scale · Hobart HL200",
   },
   "financier-bake": {
     tier: "task",
-    kind: "Recipe task",
     name: "Financier bake",
     fact: "Matsunaga 8P · Maruzen MBCO-5E",
   },
   "financier-pack": {
     tier: "task",
-    kind: "Recipe task",
     name: "Financier pack",
     fact: "Wire grid · gift box",
   },
   "pastry-bench": {
     tier: "task",
-    kind: "Recipe task",
     name: "Pie pastry",
     fact: "Shortcrust · puff lid",
   },
   "financier-morning": {
     tier: "loop",
-    kind: "Shift",
+    tag: "Shift",
     name: "Financier morning",
     fact: "Batter to vitrine refill",
   },
   "active-production": {
     tier: "loop",
-    kind: "Loop",
+    tag: "Loop",
     name: "Financier batches with robot",
     fact: "Batch A → Batch B → Batch C · robot handoffs",
   },
   "cafe-shift": {
     tier: "loop",
-    kind: "Shift",
+    tag: "Shift",
     name: "Café shift",
     fact: "Financiers and espresso · 2 robots",
   },
   "shared-runs": {
     tier: "loop",
-    kind: "Saved",
+    tag: "Saved",
     name: "Shared production runs",
     fact: "Open or compare saved runs",
   },
@@ -171,16 +176,6 @@ export function workspaceTitle(
   return CATALOG[section].name;
 }
 
-const FILTERS: readonly Readonly<{
-  tier: CatalogTier | "all";
-  label: string;
-}>[] = [
-  { tier: "all", label: "All" },
-  { tier: "action", label: "Actions" },
-  { tier: "task", label: "Recipe tasks" },
-  { tier: "loop", label: "Loops and shifts" },
-];
-
 /** One row of the catalog: the workflow, a fact that the caller knows, and what the row opens. */
 export type CatalogRow = Readonly<{
   id: CatalogEntryId;
@@ -190,65 +185,115 @@ export type CatalogRow = Readonly<{
 }>;
 
 /**
- * The Workflow catalog: filters with counts, then one framed list with a row
- * for each workflow (its name, one fact and its kind). The Workflow panel of
- * the floor plan and the production workspace share it.
+ * The Workflow catalog: a filter for each tier with its count, on one row,
+ * then a group for each tier shown: the tier's full name, then a framed list
+ * of rows (a name, one fact and, in tier 3, a tag). All shows every group.
+ * The Workflow panel of the floor plan and the production workspace share it.
  */
 export function WorkflowCatalog(
   props: Readonly<{ rows: readonly CatalogRow[] }>,
 ): React.ReactNode {
   const [tier, setTier] = React.useState<CatalogTier | "all">("all");
-  const shown = props.rows.filter(
-    (row) => tier === "all" || CATALOG[row.id].tier === tier,
-  );
+  const headingPrefix = React.useId();
   return (
     <div className="workflow-catalog">
       <div
         className="workflow-catalog-filters"
         role="group"
-        aria-label="Workflow kinds"
+        aria-label="Workflow tiers"
       >
-        {FILTERS.map((filter) => (
-          <button
-            key={filter.tier}
-            type="button"
-            aria-pressed={tier === filter.tier}
-            onClick={() => setTier(filter.tier)}
-          >
-            {filter.label}{" "}
-            <span className="workflow-catalog-count">
-              {
-                props.rows.filter(
-                  (row) =>
-                    filter.tier === "all" ||
-                    CATALOG[row.id].tier === filter.tier,
-                ).length
-              }
-            </span>
-          </button>
+        <CatalogFilter
+          label="All"
+          count={props.rows.length}
+          pressed={tier === "all"}
+          select={() => setTier("all")}
+        />
+        {TIERS.map((group) => (
+          <CatalogFilter
+            key={group.tier}
+            label={group.filter}
+            count={rowsOfTier(props.rows, group.tier).length}
+            pressed={tier === group.tier}
+            select={() => setTier(group.tier)}
+          />
         ))}
       </div>
-      <ul className="workflow-catalog-rows">
-        {shown.map((row) => {
-          const entry = CATALOG[row.id];
+      {TIERS.filter((group) => tier === "all" || group.tier === tier).map(
+        (group) => {
+          const rows = rowsOfTier(props.rows, group.tier);
+          if (rows.length === 0) return null;
+          const headingId = `${headingPrefix}-${group.tier}`;
           return (
-            <li key={row.id}>
-              <button
-                type="button"
-                className="workflow-catalog-row"
-                onClick={row.open}
-              >
-                <span className="workflow-catalog-name">
-                  <strong>{entry.name}</strong>
-                  <span>{row.fact ?? entry.fact}</span>
-                </span>
-                <span className="workflow-catalog-tag">{entry.kind}</span>
-                <ChevronRight size={16} aria-hidden="true" />
-              </button>
-            </li>
+            <section
+              key={group.tier}
+              className="workflow-catalog-group"
+              aria-labelledby={headingId}
+            >
+              <h4 id={headingId}>{group.heading}</h4>
+              <CatalogRows rows={rows} />
+            </section>
           );
-        })}
-      </ul>
+        },
+      )}
     </div>
+  );
+}
+
+function rowsOfTier(
+  rows: readonly CatalogRow[],
+  tier: CatalogTier,
+): readonly CatalogRow[] {
+  return rows.filter((row) => CATALOG[row.id].tier === tier);
+}
+
+function CatalogFilter(
+  props: Readonly<{
+    label: string;
+    count: number;
+    pressed: boolean;
+    select: () => void;
+  }>,
+): React.ReactNode {
+  // A screen reader hears "Tier 1 2 workflows", not "Tier 1 2".
+  return (
+    <button type="button" aria-pressed={props.pressed} onClick={props.select}>
+      {props.label}{" "}
+      <span className="workflow-catalog-count" aria-hidden="true">
+        {props.count}
+      </span>
+      <span className="visually-hidden">
+        {props.count === 1 ? "1 workflow" : `${props.count} workflows`}
+      </span>
+    </button>
+  );
+}
+
+function CatalogRows(
+  props: Readonly<{ rows: readonly CatalogRow[] }>,
+): React.ReactNode {
+  return (
+    <ul className="workflow-catalog-rows">
+      {props.rows.map((row) => {
+        const entry = CATALOG[row.id];
+        return (
+          <li key={row.id}>
+            <button
+              type="button"
+              className="workflow-catalog-row"
+              onClick={row.open}
+            >
+              <span className="workflow-catalog-name">
+                <strong>{entry.name}</strong>
+                <span>{row.fact ?? entry.fact}</span>
+              </span>
+              {entry.tag === undefined ? null : (
+                <span className="workflow-catalog-tag">{entry.tag}</span>
+              )}
+              <ChevronRight size={16} aria-hidden="true" />
+            </button>
+          </li>
+        );
+      })}
+    </ul>
   );
 }

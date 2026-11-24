@@ -101,13 +101,10 @@ import {
   type CommerceBoardLaneOption,
 } from "./board-rows";
 import {
-  NO_PURCHASING_READS,
-  SupplierDirectoryList,
+  NO_SUPPLIER_NAMES,
   SupplierRecordDetails,
   isSupplierDirectoryList,
-  isSupplierDirectoryModel,
-  loadPurchasingReads,
-  type PurchasingReads,
+  loadSupplierNames,
 } from "./supplier-directory";
 import type {
   CommerceOperationsTransport,
@@ -217,7 +214,7 @@ type CommerceCollectionRouteState =
   | Readonly<{
       kind: "ready";
       model: CommercePublishedCollectionModel;
-      reads: PurchasingReads;
+      names: ReadonlyMap<string, string>;
     }>
   | Readonly<{ kind: "failed"; message: string }>;
 
@@ -553,7 +550,7 @@ async function loadCommerceCollection(
     return {
       kind: "ready",
       model: model.value,
-      reads: await loadPurchasingReads(
+      names: await loadSupplierNames(
         organisationId,
         model.value,
         metadata,
@@ -873,8 +870,7 @@ function renderCommerceGraphRoute(
 function commerceCollectionNames(
   collection: CommerceCollectionRouteState,
 ): ReadonlyMap<string, string> {
-  return (collection.kind === "ready" ? collection.reads : NO_PURCHASING_READS)
-    .names;
+  return collection.kind === "ready" ? collection.names : NO_SUPPLIER_NAMES;
 }
 
 function CommerceGraphOverview(
@@ -1153,15 +1149,7 @@ function CommerceCollectionContent(
         </Notice>
       );
     case "ready":
-      // The directory is a list, so the table settings of its view do not apply.
-      return isSupplierDirectoryModel(props.collection.model) ? (
-        <SupplierDirectoryList
-          label={collectionSourceLabel(props.collection.model)}
-          model={props.collection.model}
-          requests={props.collection.reads.supplierRequests}
-          recordHref={entityResourceLink.bind(null, props.resourceHref)}
-        />
-      ) : (
+      return (
         <>
           <CommerceSavedViewEditor
             key={props.collection.model.view?.viewId ?? "commerce-list"}

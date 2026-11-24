@@ -1,14 +1,31 @@
-/* The Workflow catalog: filters with counts, then one framed list of rows. */
+/* The Workflow catalog: a filter for each tier with its count, on one row,
+   then a framed list of rows under each shown tier's full name. */
 .workflow-catalog {
   display: grid;
   gap: 10px;
+}
+.workflow-catalog-group {
+  display: grid;
+  gap: 6px;
+}
+.workflow-catalog-group + .workflow-catalog-group {
+  margin-top: 6px;
+}
+.workflow-catalog-group h4 {
+  margin: 0;
+  padding-inline: 2px;
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 600;
 }
 .workflow-catalog-filters {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
 }
+/* The button holds the visually hidden count name, so it is its anchor. */
 .workflow-catalog-filters button:not(:where(.pantry-select-trigger)) {
+  position: relative;
   min-height: 0;
   padding: 6px 10px;
   border: 1px solid transparent;
@@ -24,12 +41,11 @@
   background: var(--surface);
   color: var(--ink);
 }
+/* The count as the commerce filter bar shows it: muted, apart from the name. */
 .workflow-catalog-count {
+  margin-inline-start: 2px;
   color: var(--ink-2);
   font-variant-numeric: tabular-nums;
-}
-[aria-pressed="true"] > .workflow-catalog-count {
-  color: var(--ink);
 }
 .workflow-catalog-rows {
   margin: 0;
@@ -66,7 +82,9 @@
   outline: 2px solid var(--focus, var(--ink));
   outline-offset: -2px;
 }
+/* The arrow keeps its column when a row has no tag. */
 .workflow-catalog-row > svg {
+  grid-column: 3;
   color: var(--ink-3, var(--ink-2));
 }
 .workflow-catalog-name {
