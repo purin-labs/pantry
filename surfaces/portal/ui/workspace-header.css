@@ -115,22 +115,26 @@
   stroke-width: 1.7;
 }
 
+/* The top bar holds Ask alone: the sidebar holds the search, the account
+   and the appearance. Ask has its own edge, as it does in the Inbox row. */
 .portal-workspace-header .portal-nav .portal-nav-actions {
   gap: 8px;
   margin-block-start: 4px;
   padding: 3px 4px 3px 6px;
-  border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--paper) 72%, transparent);
-  backdrop-filter: blur(12px) saturate(1.2);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
 }
 
 .portal-workspace-header .portal-nav .portal-chat-link {
   flex-basis: auto;
   width: auto;
+  height: 34px;
   gap: 7px;
   padding-inline: 12px;
+}
+
+:is(.portal-shell-workspace > .portal-workspace-header, .mail-console-dock)
+  .portal-nav
+  .portal-chat-link {
+  border-color: var(--border);
 }
 
 .portal-workspace-header .portal-nav .portal-chat-link {
@@ -191,6 +195,14 @@
   box-shadow: none;
 }
 
+.identity-usage-avatar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
 .identity-usage-ring {
   position: absolute;
   inset: 0;
@@ -210,8 +222,8 @@
   stroke-linecap: round;
 }
 
-.portal-nav .identity-usage-photo,
-.portal-nav .identity-usage-value {
+.identity-usage-photo,
+.identity-usage-value {
   display: grid;
   place-items: center;
   width: 26px;
@@ -231,7 +243,7 @@
   object-fit: cover;
 }
 
-.portal-nav .identity-usage-value {
+.identity-usage-value {
   position: absolute;
   opacity: 0;
   font-variant-numeric: tabular-nums;
@@ -245,7 +257,7 @@
   opacity: 1;
 }
 
-.portal-workspace-header .identity-menu > div {
+:is(.portal-workspace-header, .console-sidebar-foot) .identity-menu > div {
   width: min(320px, calc(100vw - 32px));
   gap: 0;
   padding: 6px 0 0;
@@ -259,7 +271,7 @@
     0 3px 6px rgb(0 0 0 / 8%);
 }
 
-.portal-workspace-header .identity-menu-profile {
+:is(.portal-workspace-header, .console-sidebar-foot) .identity-menu-profile {
   gap: 12px;
   padding: 16px;
   margin: 0 6px 6px;
@@ -269,7 +281,10 @@
   box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
 }
 
-.portal-workspace-header .identity-menu > div .identity-menu-avatar {
+:is(.portal-workspace-header, .console-sidebar-foot)
+  .identity-menu
+  > div
+  .identity-menu-avatar {
   width: 36px;
   height: 36px;
   flex-basis: 36px;
@@ -277,27 +292,32 @@
   font-size: 16px;
 }
 
-.portal-workspace-header .identity-menu-profile-copy {
+:is(.portal-workspace-header, .console-sidebar-foot)
+  .identity-menu-profile-copy {
   gap: 3px;
 }
 
-.portal-workspace-header .identity-menu-profile-copy small {
+:is(.portal-workspace-header, .console-sidebar-foot)
+  .identity-menu-profile-copy
+  small {
   font-size: 13px;
   letter-spacing: normal;
   text-transform: none;
 }
 
-.portal-workspace-header .identity-menu-profile-copy strong {
+:is(.portal-workspace-header, .console-sidebar-foot)
+  .identity-menu-profile-copy
+  strong {
   font-size: 16px;
   font-weight: 500;
 }
 
-.portal-workspace-header .identity-menu-divider {
+:is(.portal-workspace-header, .console-sidebar-foot) .identity-menu-divider {
   margin: 0 0 6px;
   background: color-mix(in srgb, var(--ink) 12%, transparent);
 }
 
-.portal-workspace-header .identity-menu-action {
+:is(.portal-workspace-header, .console-sidebar-foot) .identity-menu-action {
   min-height: 42px;
   margin-inline: 6px;
   padding-inline: 16px;
@@ -306,11 +326,16 @@
   font-weight: 400;
 }
 
-.portal-workspace-header .identity-menu-action span:last-child {
+:is(.portal-workspace-header, .console-sidebar-foot)
+  .identity-menu-action
+  span:last-child {
   font-size: 18px;
 }
 
-.portal-workspace-header .identity-menu > div .identity-menu-signout {
+:is(.portal-workspace-header, .console-sidebar-foot)
+  .identity-menu
+  > div
+  .identity-menu-signout {
   min-height: 48px;
   margin-block-start: 6px;
   padding-inline: 22px;
@@ -344,32 +369,6 @@
   background: var(--surface);
   border-radius: 8px;
   box-shadow: none;
-}
-
-.portal-system-switcher {
-  margin-block-start: 6px;
-}
-
-.portal-system-switcher .console-switcher-trigger:hover,
-.portal-system-switcher .console-switcher-trigger[data-state="open"] {
-  background: var(--console-rail-hover);
-}
-
-.portal-system-icon {
-  display: grid;
-  place-items: center;
-  flex: 0 0 28px;
-  width: 28px;
-  height: 28px;
-}
-
-.console-switcher-menu.portal-system-menu {
-  width: 236px;
-}
-
-.portal-system-menu .console-switcher-menu-item {
-  min-height: 44px;
-  text-decoration: none;
 }
 
 @media (max-width: 700px) {

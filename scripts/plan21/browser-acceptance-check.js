@@ -63,7 +63,7 @@ async (page) => {
     );
   const touchTargets = await page
     .locator(
-      ":is(main a, main button, main summary, nav[aria-label='Workspace pages'] a, aside.console-sidebar a, aside.console-sidebar button, .portal-command-trigger):visible",
+      ":is(main a, main button, main summary, nav[aria-label='Workspace pages'] a, aside.console-sidebar a, aside.console-sidebar button, aside.console-sidebar summary, [data-workspace-search]):visible",
     )
     .evaluateAll((nodes) => {
       const sizes = nodes.map((node) => {

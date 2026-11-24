@@ -3,12 +3,17 @@ import React from "react";
 import type { ToolbarItem } from "./overflow-toolbar";
 
 /**
- * The console's own tools: search, appearance, Ask and the account. A page
- * that draws its own top row can dock them into that row. The shell then
- * draws no top bar of its own.
+ * The console's own tools. A page that draws its own top row can dock them
+ * into that row. The shell then draws no top bar of its own.
  */
 type ConsoleTools = Readonly<{
-  items: readonly ToolbarItem[];
+  /**
+   * The tools of the top bar, for a docked page: Ask. The rail beside the
+   * page keeps the search, the appearance and the account.
+   */
+  dockItems: readonly ToolbarItem[];
+  /** All the tools, for a canvas page: search, appearance, Ask, account. */
+  canvasItems: readonly ToolbarItem[];
   /** Docks the tools in the page. The result undocks them. */
   dock: () => () => void;
   /**
@@ -47,7 +52,7 @@ export function useConsoleDock(): readonly ToolbarItem[] | null {
   const wide = useMediaQuery(CONSOLE_DOCK_QUERY);
   const dock = tools?.dock;
   React.useEffect(dockWhenWide.bind(null, dock ?? null, wide), [dock, wide]);
-  return tools !== null && wide ? tools.items : null;
+  return tools !== null && wide ? tools.dockItems : null;
 }
 
 /**
@@ -65,7 +70,7 @@ export function useCanvasChrome(): CanvasChrome | null {
     wide,
   ]);
   return tools !== null && wide
-    ? { items: tools.items, home: tools.home, search: tools.search }
+    ? { items: tools.canvasItems, home: tools.home, search: tools.search }
     : null;
 }
 

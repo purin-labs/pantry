@@ -10,6 +10,10 @@ import {
 } from "react-router";
 import "@purin-labs/surface-portal/ui/styles.css";
 import { PortalFrame } from "@purin-labs/surface-portal/ui/shell";
+import {
+  readPortalRoute,
+  type WorkspaceDetailPage,
+} from "@purin-labs/ui/route";
 import { ConnectedChatPage as ChatPage } from "@purin-labs/surface-portal/ui/features/chat/route";
 import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";
 import { installChatPreviewFetch } from "./chat-preview-data";
@@ -28,6 +32,21 @@ const organisationId =
 function previewLogout(): Promise<void> {
   return Promise.resolve();
 }
+function openPreviewRequests(): void {}
+// What the full frame shows in a shop: the usage ring, the waiting requests
+// and the counts beside Knowledge and Access.
+const PREVIEW_ATTENTION = {
+  knowledge: { count: 3, label: "3 to review" },
+  access: { count: 2, label: "2 permission requests waiting" },
+};
+// The frame follows the address, as in the Portal: a page link, a product
+// tab or the search marks the page that it opened.
+function previewPage(pathname: string): WorkspaceDetailPage {
+  const route = readPortalRoute(pathname);
+  return route.kind !== "workspace" || route.destination.page === "chat"
+    ? "overview"
+    : route.destination.page;
+}
 function closePreviewChat(navigate: NavigateFunction): void {
   navigate("/portal/nuki/cafe/overview", { replace: true });
 }
@@ -43,7 +62,13 @@ function ChatPreviewContent(): React.ReactNode {
   const close = closePreviewChat.bind(null, navigate);
   return (
     <PortalFrame
-      identity={{ kind: "ready", displayName: "Pta", logout: previewLogout }}
+      identity={{
+        kind: "ready",
+        displayName: "Pta",
+        logout: previewLogout,
+        usagePercent: 34,
+        permissionRequests: { count: 2, open: openPreviewRequests },
+      }}
       organisation={{
         organisationHandle: "nuki",
         name: "Nuki Inc.",
@@ -55,7 +80,12 @@ function ChatPreviewContent(): React.ReactNode {
         name: "Cafe operations",
         choices: [],
       }}
-      sidebar={{ activePage: "overview", chatOpen: open, footer: null }}
+      sidebar={{
+        activePage: previewPage(location.pathname),
+        chatOpen: open,
+        footer: null,
+        attention: PREVIEW_ATTENTION,
+      }}
       chat={
         open
           ? {

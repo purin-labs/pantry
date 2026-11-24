@@ -75,31 +75,44 @@ type check refuses a page without one. Page code loads on demand.
 
 - **Rail.** Above 1160 px, the sidebar is a rail of 252 px that collapses to 57 px over
   200 ms. The browser keeps the choice in `pantry:cafeos:sidebar-expanded`.
-- **Drawer.** At 1160 px and below, the sidebar is a full-width panel under the top bar.
-  It starts closed. A navigation link or the product switcher closes it. The page search
-  and the Organisation and workspace switcher do not close it. A click with a modifier
-  key stays with the browser. The drawer does not change the stored rail choice.
+- **Drawer.** At 1160 px and below, the sidebar fills the screen under the top bar. It
+  starts closed. A navigation link, or a page that the search opens, closes it. A product
+  tab, the opening of the search and the Organisation and workspace switcher do not close
+  it. A click with a modifier key stays with the browser. The drawer does not change the
+  stored rail choice.
 - **Sidebar head.** It holds the Purin Pantry brand, the Organisation and workspace
-  switcher, and the product switcher.
-- **Product switcher.** It offers All organisations (the Organisation list), Commerce
-  (opens Orders), Café (opens Home) and Kitchen (opens Production). "Home" names only the
-  workspace's Home page.
-- **Groups.** The sidebar shows Workspace, the active product, Agents and Settings. The
+  switcher, and the search button ("Search", `⌘ K`). The brand and the workspace switcher
+  open the Organisation list ("All organisations").
+- **Groups.** The sidebar shows three groups, with a thin line between them: Home, Inbox,
+  Agents and Knowledge with no title; the pages of one product under the product tabs;
+  and Settings with its title.
+- **Product tabs.** Commerce (opens Orders), Café (opens Home) and Kitchen (opens
+  Production) are three tabs over the product pages: one click changes the product. The
+  arrow keys, Home and End move the focus; Enter, Space or a click chooses a tab. The
   active product follows the current page. On a page outside the three products, it
-  stays the last product that the person used. It starts as Commerce.
+  stays the last product that the person used. It starts as Commerce. "Home" names only
+  the workspace's Home page.
+- **Sidebar foot.** The account (the avatar with the usage ring, the name and the mark
+  for waiting permission requests) and the appearance control stand at the foot. The
+  foot stays in view while the pages scroll.
+- **Collapsed rail.** The tabs become three icons, the search an icon, and the foot the
+  avatar under the appearance icon. Each control keeps its accessible name, and a tooltip
+  beside it gives the name.
 - **Counts.** Knowledge shows the Brain items to review. Access and data flow adds the
   held outputs to the permission requests that this person may decide. It counts the
   held outputs also for a person who may not decide requests. A count of zero shows no
   number. The list reads again every 60 s while the tab is visible.
-- **Top bar.** It is 48 px high and holds the page search, the appearance control,
-  **Ask** and the account menu. In drawer mode it also holds the sidebar toggle. In rail
-  mode the toggle is in the sidebar head.
-- **Docked and canvas pages.** Above 1160 px, a page can draw the console tools in its
-  own top row. The top bar then goes. A canvas page, such as the board editor, also
-  hides the rail, but full-screen chat keeps the rail. At 1160 px and below, the shell
-  keeps its top bar and its drawer.
-- **Account menu.** It shows the name and a usage ring that reads again every 60 s. It
-  links to permission requests, the Organisation list and the docs, and it signs out.
+- **Top bar.** It is 48 px high and holds **Ask** alone. In drawer mode it also holds the
+  sidebar toggle, which carries the mark for waiting permission requests while the
+  drawer is closed. In rail mode the toggle is in the sidebar head.
+- **Docked and canvas pages.** Above 1160 px, a page can draw **Ask** in its own top row
+  (the Inbox does). The top bar then goes. A canvas page, such as the board editor, also
+  hides the rail and draws all the console tools (search, appearance, **Ask** and the
+  account), but full-screen chat keeps the rail. At 1160 px and below, the shell keeps
+  its top bar and its drawer.
+- **Account menu.** It opens upward from the sidebar foot. It shows the name and a usage
+  ring that reads again every 60 s. It links to permission requests, the Organisation
+  list and the docs, and it signs out. Escape closes it and returns focus to the avatar.
 - **Focus, title and toasts.** A route change moves focus to the page `h1`, or to the
   main element if the page has no `h1`. While the chat is open, a route change does not
   move focus. Each workspace load moves focus, also on the chat route. A workspace page
@@ -123,11 +136,14 @@ type check refuses a page without one. Page code loads on demand.
 
 ### Page search
 
-The search button, `⌘K` and `Ctrl+K` open one modal dialog. It searches the 28 pages of
-the navigation by label, title, segment, description and group. An exact label comes
-first, then a label that starts with the query. It searches no records and no provider
-data. Arrow keys, Home and End move the active option, and Enter opens it. Escape closes
-the dialog and returns focus to the search button.
+The search button in the sidebar head, `⌘K` and `Ctrl+K` open one modal dialog
+(`surfaces/portal/ui/workspace-search.tsx`). It searches the 28 pages of the navigation
+by label, title, segment, description and group. Each group name shows one time, as a
+heading over its pages. An exact label comes first, then a label that starts with the
+query; the group of the best match leads. It searches no records and no provider data.
+Arrow keys, Home and End move the active option, and Enter opens it. Escape or the Esc
+button closes the dialog and returns focus to the control that opened it, or to the
+search button.
 
 ### Chat beside a page
 
@@ -330,7 +346,8 @@ no value writes nothing. An unknown area answers `404`.
 | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | `foundation/ui/route.ts`, `surfaces/portal/ui/pages.tsx`                                     | The page list, the address parser and the render function of each page                           |
 | `surfaces/portal/ui/portal.tsx`                                                              | The router and the `ControlPortalApp` state                                                      |
-| `surfaces/portal/ui/shell.tsx`, `foundation/ui/console-sidebar.tsx`                          | `PortalFrame`, `WorkspaceLayout`, the page search, the product switcher, the rail and the drawer |
+| `surfaces/portal/ui/shell.tsx`, `foundation/ui/console-sidebar.tsx`                          | `PortalFrame`, `WorkspaceLayout`, the product tabs, the sidebar foot, the rail and the drawer    |
+| `surfaces/portal/ui/workspace-search.tsx`                                                    | The page search: its button, its shortcut and its dialog                                         |
 | `areas/organisation/ui/workspace-switcher.tsx`                                               | The Organisation and workspace switcher                                                          |
 | `surfaces/portal/ui/portal-shell.tsx`                                                        | Sign-in, loading, failure and not-found views                                                    |
 | `surfaces/portal/ui/pages/home.tsx`, `areas/organisation/server/control/routes/workspace.ts` | The Home page and its server view                                                                |
@@ -412,8 +429,8 @@ drawer. It shares the theme tokens.
 - If another tab replaces the session, `load()` takes the new identity and does not
   call `forgetControlReads`. The tab keeps the responses of the old person.
 - The Organisation settings keep `MutationLedger` and do not use `useMutation`.
-- `@radix-ui/react-dropdown-menu` remains in 14 files, among them `ActionMenu`, the
-  product switcher and the appearance control.
+- `@radix-ui/react-dropdown-menu` remains in 13 files, among them `ActionMenu` and the
+  appearance control.
 - Nine browser `confirm` calls remain in five files, against the style guide.
 - 205 CSS rules in 53 files outside `dev/` have a font weight above the limit of 500.
 - 309 lines in 37 Portal CSS files outside `dev/` hold a hex colour, against the rule

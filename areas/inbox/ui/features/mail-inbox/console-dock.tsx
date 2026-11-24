@@ -94,8 +94,8 @@ function storeWidth(width: number | null): void {
 }
 
 /**
- * The least width: the handle, the ellipsis and the account. The account
- * never moves, so the dock never becomes narrower than this.
+ * The least width: the handle, the ellipsis and Ask. Ask never moves, so
+ * the dock never becomes narrower than this.
  */
 function minWidth(dock: HTMLElement | null): number {
   const tools = dock?.querySelector<HTMLElement>(".mail-console-tools");
@@ -105,7 +105,7 @@ function minWidth(dock: HTMLElement | null): number {
   const gap = Number.parseFloat(getComputedStyle(tools).columnGap) || 0;
   let pinned = 0;
   for (const item of tools.querySelectorAll<HTMLElement>(
-    ":scope > .overflow-toolbar-item[data-key='account']",
+    ":scope > .overflow-toolbar-item[data-key='ask']",
   )) {
     pinned += item.getBoundingClientRect().width + gap;
   }

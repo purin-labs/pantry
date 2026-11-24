@@ -1,0 +1,332 @@
+/* The workspace sidebar is one column: the search at the top, the pages
+   (the products as tabs over their pages), and the account with the
+   appearance at the foot. The foot stays in view while the pages scroll. */
+
+/* The sidebar does not clip (the account menu opens beside it), so a long
+   name inside it must not widen its column: on a phone the drawer stays as
+   wide as the screen, and the name ends in an ellipsis. */
+.console-sidebar {
+  min-width: 0;
+}
+
+/* The pages scroll between the head and the foot. Its edges match the
+   sidebar's padding, so a focus ring at a row's edge stays in view. */
+.console-sidebar-scroll {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-inline: -8px;
+  padding: 10px 8px 16px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: var(--portal-contained-overscroll);
+}
+
+/* A thin line separates the groups, also while the sidebar is open. */
+.console-sidebar:not([data-state="collapsed"])
+  .console-sidebar-group
+  + .console-sidebar-group::before {
+  top: -9px;
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- search ---------- */
+
+.console-sidebar-search {
+  width: 100%;
+  min-height: 0;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-block: 8px 0;
+  padding: 0 7px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: none;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    background-color 75ms ease-out,
+    border-color 75ms ease-out;
+}
+
+.console-sidebar-search:is(:hover, :focus-visible) {
+  border-color: color-mix(in srgb, var(--ink) 22%, var(--border));
+  color: var(--ink);
+}
+
+.console-sidebar-search .command-search-icon {
+  flex: 0 0 22px;
+}
+
+.console-sidebar-search-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-align: start;
+  white-space: nowrap;
+}
+
+.console-sidebar-search kbd {
+  flex: none;
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--ink-3);
+  font: inherit;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* ---------- product tabs ---------- */
+
+.console-sidebar-tabs {
+  display: flex;
+  gap: 2px;
+  margin-block-end: 6px;
+  padding: 3px;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+/* A tab is never narrower than its name. */
+.console-sidebar-tab {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 75ms ease-out,
+    color 75ms ease-out;
+}
+
+.console-sidebar-tab:hover {
+  color: var(--ink);
+}
+
+.console-sidebar-tab[aria-selected="true"] {
+  background: var(--paper);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 8%),
+    0 0 0 1px color-mix(in srgb, var(--ink) 8%, transparent);
+  color: var(--ink);
+}
+
+.console-sidebar-tab-icon {
+  display: none;
+}
+
+.console-sidebar-tab-label {
+  white-space: nowrap;
+}
+
+/* ---------- foot: the account and the appearance ---------- */
+
+.console-sidebar-foot {
+  position: relative;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0 10px;
+  border-top: 1px solid var(--border);
+  background: var(--console-rail-bg);
+}
+
+.console-sidebar-foot .identity-menu-anchor {
+  flex: 1;
+  min-width: 0;
+}
+
+.console-sidebar-foot .identity-menu > summary {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 6px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--console-rail-ink);
+  font-size: 14px;
+}
+
+.console-sidebar-foot .identity-menu > summary:is(:hover, :focus-visible) {
+  background: var(--console-rail-hover);
+}
+
+.console-sidebar-foot .identity-usage-avatar {
+  flex: 0 0 34px;
+  inline-size: 34px;
+  block-size: 34px;
+}
+
+.console-sidebar-foot :is(.identity-usage-photo, .identity-usage-value) {
+  width: 24px;
+  height: 24px;
+}
+
+.console-sidebar-foot .identity-usage-attention {
+  border-color: var(--console-rail-bg);
+}
+
+.identity-usage-name {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The account menu opens upward from the foot. */
+.console-sidebar .console-sidebar-foot .identity-menu > div {
+  inset-block-start: auto;
+  inset-block-end: calc(100% + 8px);
+  inset-inline-start: 0;
+  inset-inline-end: auto;
+  max-height: calc(100dvh - 96px);
+}
+
+.console-sidebar-appearance .portal-theme-toggle {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--console-rail-ink);
+  cursor: pointer;
+}
+
+.console-sidebar-appearance .portal-theme-toggle:is(:hover, :focus-visible) {
+  background: var(--console-rail-hover);
+}
+
+/* ---------- the collapsed rail: icons only ---------- */
+
+.console-sidebar[data-mode="rail"][data-state="collapsed"]
+  .console-sidebar-search {
+  height: 40px;
+  justify-content: center;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+}
+
+.console-sidebar[data-mode="rail"][data-state="collapsed"]
+  :is(
+    .console-sidebar-search-label,
+    .console-sidebar-search kbd,
+    .identity-usage-name
+  ) {
+  display: none;
+}
+
+.console-sidebar[data-mode="rail"][data-state="collapsed"]
+  .console-sidebar-tabs {
+  flex-direction: column;
+  padding: 2px;
+}
+
+.console-sidebar[data-mode="rail"][data-state="collapsed"]
+  .console-sidebar-tab {
+  flex: none;
+  height: 36px;
+}
+
+.console-sidebar[data-mode="rail"][data-state="collapsed"]
+  .console-sidebar-tab-icon {
+  display: grid;
+}
+
+/* The name stays for a screen reader; the tooltip shows it. */
+.console-sidebar[data-mode="rail"][data-state="collapsed"]
+  .console-sidebar-tab-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.console-sidebar[data-mode="rail"][data-state="collapsed"]
+  .console-sidebar-foot {
+  flex-direction: column-reverse;
+  gap: 4px;
+}
+
+.console-sidebar[data-mode="rail"][data-state="collapsed"]
+  .console-sidebar-foot
+  .identity-menu-anchor {
+  width: 100%;
+}
+
+.console-sidebar[data-mode="rail"][data-state="collapsed"]
+  .console-sidebar-foot
+  .identity-menu
+  > summary {
+  justify-content: center;
+  padding: 0;
+}
+
+/* ---------- the drawer on a narrow screen ---------- */
+
+/* The drawer is as wide as the screen, so the workspace name takes the free
+   width and the chevron sits at the right edge, as on the rail. A long name
+   ends in an ellipsis. The rail keeps its 160 px cap, which its collapse
+   animates. */
+.console-sidebar[data-mode="drawer"] .console-switcher-label {
+  max-inline-size: none;
+}
+
+/* The closed drawer holds the account, so its toggle carries the mark for
+   waiting permission requests. */
+.dashboard-sidebar-toggle[data-attention="true"] {
+  position: relative;
+}
+
+.dashboard-sidebar-toggle[data-attention="true"]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 5px;
+  inset-inline-end: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pantry-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .console-sidebar-search,
+  .console-sidebar-tab {
+    transition: none;
+  }
+}

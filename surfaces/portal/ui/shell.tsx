@@ -1,8 +1,6 @@
 import { AccountAppearanceControl } from "@purin-labs/ui/preferences/appearance-controls";
 import { createPortal } from "react-dom";
 import React, { useEffect } from "react";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { GlideHighlight } from "@purin-labs/ui/glide-highlight";
 import { voiceControlIsOn } from "@purin-labs/surface-voice/ui/features/voice/setting";
 import {
   chatRouteState,
@@ -10,37 +8,10 @@ import {
   pageNavigation,
 } from "@purin-labs/ui/page-address";
 import {
-  Activity,
-  BookOpen,
-  CakeSlice,
-  Calculator,
-  ConciergeBell,
-  Bot,
-  Brain,
-  Check,
-  ChevronDown,
   Coffee,
   Croissant,
-  CreditCard,
-  Cpu,
-  Factory,
-  Landmark,
-  FlaskConical,
-  KeyRound,
-  KeySquare,
-  LayoutDashboard,
-  LayoutGrid,
   LogOut,
-  Mail,
-  Package,
-  Plug,
-  Settings,
-  ShoppingCart,
-  Sparkles,
   Store,
-  Truck,
-  Vault,
-  Warehouse,
   type LucideIcon,
 } from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router";
@@ -52,7 +23,7 @@ import {
   workspacePageDescriptor,
   workspacePagePath,
   type WorkspaceDetailPage,
-  type WorkspaceNavigationGroup,
+  type WorkspaceNavigationGroupName,
   type WorkspaceSystem,
 } from "@purin-labs/ui/route";
 import { useBrainItemsToReview } from "@purin-labs/area-brain/ui/brain-summary";
@@ -60,6 +31,13 @@ import { useRequestsToDecide } from "@purin-labs/area-organisation/ui/features/a
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 import "@purin-labs/area-organisation/ui/features/access/permission-requests-drawer.css";
 import "./portal-brand.css";
+import "./sidebar-frame.css";
+import { workspaceNavigationIcon } from "@purin-labs/ui/page-icons";
+import {
+  WorkspaceSearchButton,
+  WorkspaceSearchDialog,
+  useWorkspaceSearch,
+} from "./workspace-search";
 
 const VoicePageMark = React.lazy(
   () => import("@purin-labs/surface-voice/ui/features/voice/page-mark"),
@@ -79,6 +57,7 @@ import {
   type ConsoleSidebarControl,
   type ConsoleSidebarNavigationGroup,
   type ConsoleSidebarResolvedLink,
+  type ConsoleSidebarTab,
 } from "@purin-labs/ui/console-sidebar";
 import { runLayoutMotion } from "@purin-labs/ui/layout-motion";
 import { DashboardNavigation } from "./dashboard-navigation";
@@ -152,17 +131,6 @@ type NavigationAttention = Partial<
 
 const NO_ATTENTION: NavigationAttention = {};
 
-type WorkspaceCommand = {
-  readonly page: WorkspaceDetailPage;
-  readonly label: string;
-  readonly group: string;
-  readonly searchText: string;
-};
-
-const WORKSPACE_COMMANDS = WORKSPACE_NAVIGATION_GROUPS.flatMap(
-  buildWorkspaceCommands,
-);
-
 export function PortalFrame(props: PortalFrameProps): React.ReactNode {
   const location = useLocation();
   const navigate = useNavigate();
@@ -228,53 +196,32 @@ export function PortalFrame(props: PortalFrameProps): React.ReactNode {
       : preference.railExpanded,
     onToggleRail: toggleRailWithMotion,
   });
-  const [commandPaletteOpen, setCommandPaletteOpen] = React.useState(false);
-  const commandTrigger = React.useRef<HTMLButtonElement>(null);
-  useEffect(
-    bindCommandPaletteShortcut.bind(
-      null,
-      props.workspace !== undefined,
-      setCommandPaletteOpen,
-    ),
-    [props.workspace !== undefined],
-  );
+  const search = useWorkspaceSearch(props.workspace !== undefined);
   const workspaceShell = props.sidebar !== undefined;
   const railCollapsed =
     sidebarController.state.mode === "rail" &&
     sidebarController.state.visibility === "collapsed";
-  const closeCommands = closeCommandPalette.bind(
-    null,
-    setCommandPaletteOpen,
-    commandTrigger,
-  );
+  // A page that the search opens closes the drawer, as a page link does.
+  const openPageFromSearch = (href: string): void => {
+    openPage(href);
+    sidebarController.onNavigate();
+  };
   const navigationGroups =
     props.sidebar !== undefined && props.workspace !== undefined
-      ? buildConsoleNavigationGroups(
-          props.sidebar.activePage,
-          props.workspace.organisationHandle,
-          props.workspace.workspaceHandle,
-          activeSystem,
-          props.sidebar.attention ?? NO_ATTENTION,
-        )
+      ? buildConsoleNavigationGroups({
+          activePage: props.sidebar.activePage,
+          organisationHandle: props.workspace.organisationHandle,
+          workspaceHandle: props.workspace.workspaceHandle,
+          system: activeSystem,
+          attention: props.sidebar.attention ?? NO_ATTENTION,
+          selectSystem: selectWorkspaceSystem.bind(
+            null,
+            setLastSystem,
+            openPage,
+            props.workspace,
+          ),
+        })
       : [];
-  const searchControl =
-    props.workspace === undefined ? (
-      <span className="portal-command-spacer" />
-    ) : (
-      <button
-        className="portal-command-trigger"
-        type="button"
-        aria-haspopup="dialog"
-        aria-label="Search workspace"
-        aria-keyshortcuts="Meta+K Control+K"
-        onClick={openCommandPalette.bind(null, setCommandPaletteOpen)}
-        ref={commandTrigger}
-      >
-        <CommandSearchIcon />
-        <span className="portal-command-label">Search workspace</span>
-        <kbd>⌘ K</kbd>
-      </button>
-    );
   const askControl =
     props.workspace === undefined || props.sidebar === undefined ? null : (
       <Link
@@ -316,15 +263,8 @@ export function PortalFrame(props: PortalFrameProps): React.ReactNode {
         <span>Ask</span>
       </Link>
     );
-  const identityControl = <PortalIdentity identity={props.identity} />;
-  const topbarActions = (
-    <>
-      <HoverLabel label="Appearance">
-        <AccountAppearanceControl />
-      </HoverLabel>
-      {askControl}
-      {identityControl}
-    </>
+  const identityControl = (
+    <PortalIdentity identity={props.identity} placement="topbar" />
   );
   const [dockCount, setDockCount] = React.useState(0);
   const dockConsoleTools = React.useCallback(
@@ -350,8 +290,12 @@ export function PortalFrame(props: PortalFrameProps): React.ReactNode {
           "overview",
         );
   const consoleTools = {
-    items: consoleToolItems(
-      props.workspace === undefined ? null : searchControl,
+    dockItems:
+      askControl === null ? [] : [{ key: "ask", node: askControl, pinned: true }],
+    canvasItems: consoleToolItems(
+      props.workspace === undefined ? null : (
+        <WorkspaceSearchButton variant="toolbar" onClick={search.openSearch} />
+      ),
       askControl,
       identityControl,
     ),
@@ -361,10 +305,7 @@ export function PortalFrame(props: PortalFrameProps): React.ReactNode {
       homePath === null
         ? null
         : { href: homePath, open: openPage.bind(null, homePath) },
-    search:
-      props.workspace === undefined
-        ? null
-        : openCommandPalette.bind(null, setCommandPaletteOpen),
+    search: props.workspace === undefined ? null : search.openSearch,
   };
   const frame = (
     <div
@@ -388,8 +329,13 @@ export function PortalFrame(props: PortalFrameProps): React.ReactNode {
             <div className="portal-nav-lead">
               <PortalBrand className="portal-logo portal-logo-topbar" />
             </div>
-            {searchControl}
-            <div className="portal-nav-actions">{topbarActions}</div>
+            <span className="portal-command-spacer" />
+            <div className="portal-nav-actions">
+              <HoverLabel label="Appearance">
+                <AccountAppearanceControl />
+              </HoverLabel>
+              {identityControl}
+            </div>
           </nav>
           <main className="portal-main" id="portal-content" tabIndex={-1}>
             <div className="portal-main-inner">{props.children}</div>
@@ -405,9 +351,9 @@ export function PortalFrame(props: PortalFrameProps): React.ReactNode {
                     brand: (
                       <PortalBrand className="portal-logo portal-logo-topbar" />
                     ),
-                    search: searchControl,
-                    actions: topbarActions,
+                    actions: askControl,
                     sidebarControl: sidebarController.control,
+                    attention: waitingRequestsText(props.identity) ?? undefined,
                   }
             }
             sidebar={{
@@ -421,14 +367,18 @@ export function PortalFrame(props: PortalFrameProps): React.ReactNode {
                 <PortalSidebarHeader
                   organisation={props.organisation}
                   workspace={props.workspace}
-                  activeSystem={activeSystem}
                   collapsed={railCollapsed}
                   control={sidebarController.control}
-                  onNavigate={sidebarController.onNavigate}
-                  onSelectSystem={setLastSystem}
+                  openSearch={search.openSearch}
                 />
               ),
               footer: props.sidebar.footer,
+              foot: (
+                <PortalSidebarFoot
+                  identity={props.identity}
+                  collapsed={railCollapsed}
+                />
+              ),
             }}
           />
           <main
@@ -441,12 +391,12 @@ export function PortalFrame(props: PortalFrameProps): React.ReactNode {
           </main>
         </>
       )}
-      {commandPaletteOpen && props.workspace !== undefined ? (
-        <WorkspaceCommandPalette
+      {search.open && props.workspace !== undefined ? (
+        <WorkspaceSearchDialog
           organisationHandle={props.workspace.organisationHandle}
           workspaceHandle={props.workspace.workspaceHandle}
-          close={closeCommands}
-          openPage={openPage}
+          close={search.close}
+          openPage={openPageFromSearch}
         />
       ) : null}
       {createPortal(
@@ -504,8 +454,8 @@ function takeOne(count: number): number {
 }
 
 /**
- * The console tools in the order that they collapse: search first, the
- * account never.
+ * The console tools of a canvas page, which has no rail, in the order that
+ * they collapse: search first, the account never.
  */
 function consoleToolItems(
   search: React.ReactNode | null,
@@ -694,8 +644,13 @@ function watchCodexUsage(
   return stopUsageSubscription.bind(null, subscription, timer);
 }
 
+/**
+ * The account menu. In the top bar its trigger is the avatar; at the foot of
+ * the sidebar the name follows the avatar, and the menu opens upward.
+ */
 function PortalIdentity(props: {
   readonly identity: PortalFrameIdentity;
+  readonly placement: "topbar" | "sidebar";
 }): React.ReactNode {
   const menuRef = React.useRef<HTMLDetailsElement>(null);
   useEffect(bindIdentityMenuDismissal.bind(null, menuRef), []);
@@ -704,9 +659,10 @@ function PortalIdentity(props: {
       return (
         <span className="portal-identity-placeholder" aria-hidden="true" />
       );
-    case "ready":
+    case "ready": {
+      const usage = usageText(props.identity);
       return (
-        <div>
+        <div className="identity-menu-anchor">
           <details
             ref={menuRef}
             className="identity-menu"
@@ -714,54 +670,60 @@ function PortalIdentity(props: {
           >
             <summary
               className="identity-usage-trigger"
-              aria-label={`Account: ${props.identity.displayName}. ${waitingRequestsLabel(props.identity)}${props.identity.usagePercent === undefined ? "Usage unavailable" : `${props.identity.usageSource ?? "Workspace"} usage: ${props.identity.usagePercent}% used`}`}
-              title={
-                props.identity.usagePercent === undefined
-                  ? "Usage unavailable"
-                  : `${props.identity.usageSource ?? "Workspace"} usage: ${props.identity.usagePercent}% used`
-              }
+              aria-label={`Account: ${props.identity.displayName}. ${waitingRequestsLabel(props.identity)}${usage}`}
+              title={usage}
             >
-              <svg
-                className="identity-usage-ring"
-                viewBox="0 0 40 40"
-                aria-hidden="true"
-              >
-                <circle
-                  className="identity-usage-track"
-                  cx="20"
-                  cy="20"
-                  r="17"
-                />
-                {props.identity.usagePercent === undefined ? null : (
+              <span className="identity-usage-avatar">
+                <svg
+                  className="identity-usage-ring"
+                  viewBox="0 0 40 40"
+                  aria-hidden="true"
+                >
                   <circle
-                    className="identity-usage-progress"
+                    className="identity-usage-track"
                     cx="20"
                     cy="20"
                     r="17"
-                    pathLength="100"
-                    strokeDasharray={`${props.identity.usagePercent} 100`}
+                  />
+                  {props.identity.usagePercent === undefined ? null : (
+                    <circle
+                      className="identity-usage-progress"
+                      cx="20"
+                      cy="20"
+                      r="17"
+                      pathLength="100"
+                      strokeDasharray={`${props.identity.usagePercent} 100`}
+                    />
+                  )}
+                </svg>
+                <span className="identity-usage-photo" aria-hidden="true">
+                  {props.identity.photoUrl ? (
+                    <img
+                      src={props.identity.photoUrl}
+                      alt=""
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    identityInitial(props.identity.displayName)
+                  )}
+                </span>
+                <span className="identity-usage-value" aria-hidden="true">
+                  {props.identity.usagePercent === undefined
+                    ? "—"
+                    : `${props.identity.usagePercent}%`}
+                </span>
+                {waitingRequests(props.identity) === null ? null : (
+                  <span
+                    className="identity-usage-attention"
+                    aria-hidden="true"
                   />
                 )}
-              </svg>
-              <span className="identity-usage-photo" aria-hidden="true">
-                {props.identity.photoUrl ? (
-                  <img
-                    src={props.identity.photoUrl}
-                    alt=""
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  identityInitial(props.identity.displayName)
-                )}
               </span>
-              <span className="identity-usage-value" aria-hidden="true">
-                {props.identity.usagePercent === undefined
-                  ? "—"
-                  : `${props.identity.usagePercent}%`}
-              </span>
-              {waitingRequests(props.identity) === null ? null : (
-                <span className="identity-usage-attention" aria-hidden="true" />
-              )}
+              {props.placement === "sidebar" ? (
+                <span className="identity-usage-name" aria-hidden="true">
+                  {props.identity.displayName}
+                </span>
+              ) : null}
             </summary>
             <div className="identity-menu-popover">
               <div className="identity-menu-profile">
@@ -824,9 +786,16 @@ function PortalIdentity(props: {
           </details>
         </div>
       );
+    }
     default:
       return assertNever(props.identity, "Unexpected value");
   }
+}
+
+function usageText(identity: Variant<PortalFrameIdentity, "ready">): string {
+  return identity.usagePercent === undefined
+    ? "Usage unavailable"
+    : `${identity.usageSource ?? "Workspace"} usage: ${identity.usagePercent}% used`;
 }
 
 function waitingRequests(
@@ -842,6 +811,15 @@ function waitingRequestsLabel(
   return count === null
     ? ""
     : `${count} permission ${count === 1 ? "request waits" : "requests wait"}. `;
+}
+
+/** What the closed drawer's toggle says waits inside: the account's requests. */
+function waitingRequestsText(identity: PortalFrameIdentity): string | null {
+  if (identity.kind !== "ready") return null;
+  const count = waitingRequests(identity);
+  return count === null
+    ? null
+    : `${count} permission ${count === 1 ? "request" : "requests"} waiting`;
 }
 
 function identityInitial(displayName: string): string {
@@ -880,418 +858,12 @@ function closeIdentityMenuOnOutsidePointerDown(
   menu.open = false;
 }
 
-function WorkspaceCommandPalette(props: {
-  readonly organisationHandle: string;
-  readonly workspaceHandle: string;
-  readonly close: () => void;
-  readonly openPage: (href: string) => void;
-}): React.ReactNode {
-  const navigate = props.openPage;
-  const dialog = React.useRef<HTMLDialogElement>(null);
-  const input = React.useRef<HTMLInputElement>(null);
-  const [query, setQuery] = React.useState("");
-  const [activeIndex, setActiveIndex] = React.useState(0);
-  const commands = filterWorkspaceCommands(query);
-  useEffect(openCommandDialog.bind(null, dialog, input), []);
-  useEffect(scrollActiveCommandIntoView.bind(null, commands, activeIndex), [
-    commands,
-    activeIndex,
-  ]);
-  return (
-    <dialog
-      className="workspace-command-dialog"
-      aria-label="Search workspace pages"
-      onCancel={handleCommandDialogCancel.bind(null, props.close)}
-      onClick={closeCommandDialogFromBackdrop.bind(null, props.close)}
-      ref={dialog}
-    >
-      <div className="workspace-command-search">
-        <CommandSearchIcon />
-        <input
-          type="search"
-          value={query}
-          placeholder="Search pages…"
-          aria-label="Search workspace pages"
-          role="combobox"
-          aria-expanded="true"
-          aria-controls="workspace-command-results"
-          aria-activedescendant={activeCommandId(commands, activeIndex)}
-          autoComplete="off"
-          onChange={handleCommandQueryChange.bind(
-            null,
-            setQuery,
-            setActiveIndex,
-          )}
-          onKeyDown={handleCommandInputKeyDown.bind(
-            null,
-            commands,
-            activeIndex,
-            setActiveIndex,
-            navigate,
-            props.organisationHandle,
-            props.workspaceHandle,
-            props.close,
-          )}
-          ref={input}
-        />
-        <button
-          type="button"
-          className="workspace-command-close"
-          onClick={props.close}
-          aria-label="Close search"
-        >
-          Esc
-        </button>
-      </div>
-      <div
-        className="workspace-command-results"
-        id="workspace-command-results"
-        role="listbox"
-        aria-label="Workspace page results"
-      >
-        {commands.length === 0 ? (
-          <p className="workspace-command-empty" role="status">
-            No matching pages. Try another page name.
-          </p>
-        ) : (
-          commands.map(
-            renderWorkspaceCommand.bind(
-              null,
-              activeIndex,
-              setActiveIndex,
-              navigate,
-              props.organisationHandle,
-              props.workspaceHandle,
-              props.close,
-            ),
-          )
-        )}
-      </div>
-      <footer className="workspace-command-footer">
-        <span>
-          <kbd>↑</kbd>
-          <kbd>↓</kbd> Navigate
-        </span>
-        <span>
-          <kbd>↵</kbd> Open
-        </span>
-        <span>
-          <kbd>Esc</kbd> Close
-        </span>
-      </footer>
-    </dialog>
-  );
-}
-
-function renderWorkspaceCommand(
-  activeIndex: number,
-  setActiveIndex: React.Dispatch<React.SetStateAction<number>>,
-  navigate: (href: string) => void,
-  organisationHandle: string,
-  workspaceHandle: string,
-  close: () => void,
-  command: WorkspaceCommand,
-  index: number,
-): React.ReactNode {
-  const active = activeIndex === index;
-  return (
-    <button
-      type="button"
-      className={
-        active
-          ? "workspace-command workspace-command-active"
-          : "workspace-command"
-      }
-      id={workspaceCommandId(command)}
-      role="option"
-      aria-selected={active}
-      tabIndex={-1}
-      onMouseMove={setCommandActiveIndex.bind(null, index, setActiveIndex)}
-      onClick={selectWorkspaceCommand.bind(
-        null,
-        navigate,
-        organisationHandle,
-        workspaceHandle,
-        close,
-        command,
-      )}
-      key={command.page}
-    >
-      <WorkspaceNavigationIcon page={command.page} />
-      <span>{command.label}</span>
-      <small>{command.group}</small>
-    </button>
-  );
-}
-
-function CommandSearchIcon(): React.ReactNode {
-  return (
-    <svg className="command-search-icon" viewBox="0 0 20 20" aria-hidden="true">
-      <circle cx="8.5" cy="8.5" r="5.5" />
-      <path d="m13 13 4 4" />
-    </svg>
-  );
-}
-
-function buildWorkspaceCommands(
-  group: WorkspaceNavigationGroup,
-): readonly WorkspaceCommand[] {
-  return group.pages.map(
-    buildWorkspaceCommand.bind(null, navigationGroupTitle(group.label)),
-  );
-}
-
-function buildWorkspaceCommand(
-  group: string,
-  page: WorkspaceDetailPage,
-): WorkspaceCommand {
-  const descriptor = workspacePageDescriptor(page);
-  return {
-    page,
-    label: descriptor.navigationLabel,
-    group,
-    searchText:
-      `${descriptor.navigationLabel} ${descriptor.title} ${descriptor.segment} ${descriptor.description} ${group}`.toLocaleLowerCase(),
-  };
-}
-
-function filterWorkspaceCommands(query: string): readonly WorkspaceCommand[] {
-  const search = query.trim().toLocaleLowerCase();
-  return search.length === 0
-    ? WORKSPACE_COMMANDS
-    : WORKSPACE_COMMANDS.filter(commandMatchesSearch.bind(null, search)).sort(
-        compareWorkspaceCommandMatches.bind(null, search),
-      );
-}
-
-function compareWorkspaceCommandMatches(
-  query: string,
-  left: WorkspaceCommand,
-  right: WorkspaceCommand,
-): number {
-  return (
-    workspaceCommandMatchRank(query, left) -
-    workspaceCommandMatchRank(query, right)
-  );
-}
-
-function workspaceCommandMatchRank(
-  query: string,
-  command: WorkspaceCommand,
-): number {
-  const label = command.label.toLocaleLowerCase();
-  if (label === query) return 0;
-  if (label.startsWith(query)) return 1;
-  return 2;
-}
-
-function commandMatchesSearch(
-  search: string,
-  command: WorkspaceCommand,
-): boolean {
-  return command.searchText.includes(search);
-}
-
-function workspaceCommandId(command: WorkspaceCommand): string {
-  return `workspace-command-${command.page}`;
-}
-
-function activeCommandId(
-  commands: readonly WorkspaceCommand[],
-  activeIndex: number,
-): string | undefined {
-  const command = commands[activeIndex];
-  return command === undefined ? undefined : workspaceCommandId(command);
-}
-
-function openCommandDialog(
-  dialog: React.RefObject<HTMLDialogElement | null>,
-  input: React.RefObject<HTMLInputElement | null>,
-): () => void {
-  dialog.current?.showModal();
-  input.current?.focus();
-  return closeCommandDialog.bind(null, dialog);
-}
-
-function closeCommandDialog(
-  dialog: React.RefObject<HTMLDialogElement | null>,
-): void {
-  if (dialog.current?.open === true) dialog.current.close();
-}
-
-function openCommandPalette(
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
-): void {
-  setOpen(true);
-}
-
-function closeCommandPalette(
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  trigger: React.RefObject<HTMLButtonElement | null>,
-): void {
-  setOpen(false);
-  window.requestAnimationFrame(focusCommandTrigger.bind(null, trigger));
-}
-
-function focusCommandTrigger(
-  trigger: React.RefObject<HTMLButtonElement | null>,
-): void {
-  trigger.current?.focus();
-}
-
-function bindCommandPaletteShortcut(
-  enabled: boolean,
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
-): () => void {
-  const handler = handleCommandPaletteShortcut.bind(null, enabled, setOpen);
-  window.addEventListener("keydown", handler);
-  return unbindCommandPaletteShortcut.bind(null, handler);
-}
-
-function unbindCommandPaletteShortcut(
-  handler: (event: KeyboardEvent) => void,
-): void {
-  window.removeEventListener("keydown", handler);
-}
-
-function handleCommandPaletteShortcut(
-  enabled: boolean,
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  event: KeyboardEvent,
-): void {
-  if (
-    !enabled ||
-    event.key.toLocaleLowerCase() !== "k" ||
-    (!event.metaKey && !event.ctrlKey)
-  )
-    return;
-  event.preventDefault();
-  setOpen(true);
-}
-
-function handleCommandDialogCancel(
-  close: () => void,
-  event: React.SyntheticEvent<HTMLDialogElement>,
-): void {
-  event.preventDefault();
-  close();
-}
-
-function closeCommandDialogFromBackdrop(
-  close: () => void,
-  event: React.MouseEvent<HTMLDialogElement>,
-): void {
-  if (event.target === event.currentTarget) close();
-}
-
-function handleCommandQueryChange(
-  setQuery: React.Dispatch<React.SetStateAction<string>>,
-  setActiveIndex: React.Dispatch<React.SetStateAction<number>>,
-  event: React.ChangeEvent<HTMLInputElement>,
-): void {
-  setQuery(event.currentTarget.value);
-  setActiveIndex(0);
-}
-
-function handleCommandInputKeyDown(
-  commands: readonly WorkspaceCommand[],
-  activeIndex: number,
-  setActiveIndex: React.Dispatch<React.SetStateAction<number>>,
-  navigate: (href: string) => void,
-  organisationHandle: string,
-  workspaceHandle: string,
-  close: () => void,
-  event: React.KeyboardEvent<HTMLInputElement>,
-): void {
-  if (event.nativeEvent.isComposing) return;
-  switch (event.key) {
-    case "ArrowDown":
-      event.preventDefault();
-      setActiveIndex(nextCommandIndex(commands.length, activeIndex, 1));
-      return;
-    case "ArrowUp":
-      event.preventDefault();
-      setActiveIndex(nextCommandIndex(commands.length, activeIndex, -1));
-      return;
-    case "Home":
-      event.preventDefault();
-      setActiveIndex(0);
-      return;
-    case "End":
-      event.preventDefault();
-      setActiveIndex(Math.max(0, commands.length - 1));
-      return;
-    case "Enter": {
-      event.preventDefault();
-      const command = commands[activeIndex];
-      if (command !== undefined) {
-        selectWorkspaceCommand(
-          navigate,
-          organisationHandle,
-          workspaceHandle,
-          close,
-          command,
-        );
-      }
-      return;
-    }
-    case "Escape":
-      event.preventDefault();
-      close();
-      return;
-    default:
-      return;
-  }
-}
-
-function nextCommandIndex(
-  length: number,
-  current: number,
-  step: -1 | 1,
-): number {
-  if (length === 0) return 0;
-  return (current + step + length) % length;
-}
-
-function setCommandActiveIndex(
-  index: number,
-  setActiveIndex: React.Dispatch<React.SetStateAction<number>>,
-): void {
-  setActiveIndex(index);
-}
-
-function selectWorkspaceCommand(
-  navigate: (href: string) => void,
-  organisationHandle: string,
-  workspaceHandle: string,
-  close: () => void,
-  command: WorkspaceCommand,
-): void {
-  navigate(
-    workspacePagePath(organisationHandle, workspaceHandle, command.page),
-  );
-  close();
-}
-
-function scrollActiveCommandIntoView(
-  commands: readonly WorkspaceCommand[],
-  activeIndex: number,
-): void {
-  const command = commands[activeIndex];
-  if (command === undefined) return;
-  document
-    .getElementById(workspaceCommandId(command))
-    ?.scrollIntoView({ block: "nearest" });
-}
-
 function PortalSidebarHeader(props: {
   readonly organisation: OrganisationShellContext;
   readonly workspace: WorkspaceShellContext;
-  readonly activeSystem: WorkspaceSystem;
   readonly collapsed: boolean;
   readonly control: ConsoleSidebarControl;
-  readonly onNavigate: () => void;
-  readonly onSelectSystem: (system: WorkspaceSystem) => void;
+  readonly openSearch: () => void;
 }): React.ReactNode {
   return (
     <div className="console-sidebar-head">
@@ -1316,14 +888,30 @@ function PortalSidebarHeader(props: {
         workspace={props.workspace}
         collapsed={props.collapsed}
       />
-      <WorkspaceSystemSwitcher
-        workspace={props.workspace}
-        activeSystem={props.activeSystem}
-        collapsed={props.collapsed}
-        onNavigate={props.onNavigate}
-        onSelectSystem={props.onSelectSystem}
-      />
+      <ConsoleSidebarTooltip label="Search" enabled={props.collapsed}>
+        <WorkspaceSearchButton variant="sidebar" onClick={props.openSearch} />
+      </ConsoleSidebarTooltip>
     </div>
+  );
+}
+
+/**
+ * The foot of the sidebar: the account and the appearance. It stays in view
+ * while the pages scroll.
+ */
+function PortalSidebarFoot(props: {
+  readonly identity: PortalFrameIdentity;
+  readonly collapsed: boolean;
+}): React.ReactNode {
+  return (
+    <>
+      <PortalIdentity identity={props.identity} placement="sidebar" />
+      <ConsoleSidebarTooltip label="Appearance" enabled={true}>
+        <span className="console-sidebar-appearance">
+          <AccountAppearanceControl side={props.collapsed ? "right" : "top"} />
+        </span>
+      </ConsoleSidebarTooltip>
+    </>
   );
 }
 
@@ -1382,108 +970,20 @@ const WORKSPACE_SYSTEMS: Readonly<
   },
 };
 
-function WorkspaceSystemSwitcher(props: {
-  readonly workspace: WorkspaceShellContext;
-  readonly activeSystem: WorkspaceSystem;
-  readonly collapsed: boolean;
-  readonly onNavigate: () => void;
-  readonly onSelectSystem: (system: WorkspaceSystem) => void;
-}): React.ReactNode {
-  const Icon = WORKSPACE_SYSTEMS[props.activeSystem].icon;
-  return (
-    <DropdownMenu.Root>
-      <div className="console-switcher portal-system-switcher">
-        <ConsoleSidebarTooltip
-          label={WORKSPACE_SYSTEMS[props.activeSystem].label}
-          enabled={props.collapsed}
-        >
-          <DropdownMenu.Trigger asChild>
-            <button
-              type="button"
-              className="console-switcher-trigger"
-              aria-label={`Switch product: ${WORKSPACE_SYSTEMS[props.activeSystem].label}`}
-            >
-              <span className="portal-system-icon">
-                <Icon aria-hidden="true" size={20} strokeWidth={1.7} />
-              </span>
-              <span className="console-switcher-label">
-                {WORKSPACE_SYSTEMS[props.activeSystem].label}
-              </span>
-              <ChevronDown
-                className="console-switcher-caret"
-                aria-hidden="true"
-              />
-            </button>
-          </DropdownMenu.Trigger>
-        </ConsoleSidebarTooltip>
-        <DropdownMenu.Portal>
-          <DropdownMenu.Content
-            className="console-switcher-menu portal-system-menu"
-            aria-label="Products"
-            side={props.collapsed ? "right" : "bottom"}
-            align="start"
-            sideOffset={8}
-            collisionPadding={12}
-          >
-            <GlideHighlight target="[data-highlighted]" />
-            {/* The Organisation list. "Home" names the workspace's Home page. */}
-            <DropdownMenu.Item asChild onSelect={props.onNavigate}>
-              <Link className="console-switcher-menu-item" to="/portal">
-                <span className="portal-system-icon">
-                  <LayoutGrid aria-hidden="true" size={20} strokeWidth={1.7} />
-                </span>
-                <span className="console-switcher-menu-copy">
-                  <strong>All organisations</strong>
-                </span>
-              </Link>
-            </DropdownMenu.Item>
-            {Object.values(WORKSPACE_SYSTEMS).map(
-              renderWorkspaceSystem.bind(null, props),
-            )}
-          </DropdownMenu.Content>
-        </DropdownMenu.Portal>
-      </div>
-    </DropdownMenu.Root>
-  );
-}
-
-function renderWorkspaceSystem(
-  props: {
-    readonly workspace: WorkspaceShellContext;
-    readonly activeSystem: WorkspaceSystem;
-    readonly onNavigate: () => void;
-    readonly onSelectSystem: (system: WorkspaceSystem) => void;
-  },
-  system: (typeof WORKSPACE_SYSTEMS)[WorkspaceSystem],
-): React.ReactNode {
-  const Icon = system.icon;
-  // A start page outside the system (Home) keeps the chosen system's pages.
-  const select = (): void => {
-    props.onSelectSystem(system.name);
-    props.onNavigate();
-  };
-  return (
-    <DropdownMenu.Item key={system.name} asChild onSelect={select}>
-      <Link
-        className="console-switcher-menu-item"
-        to={workspacePagePath(
-          props.workspace.organisationHandle,
-          props.workspace.workspaceHandle,
-          system.page,
-        )}
-        aria-current={props.activeSystem === system.name ? "true" : undefined}
-      >
-        <span className="portal-system-icon">
-          <Icon aria-hidden="true" size={20} strokeWidth={1.7} />
-        </span>
-        <span className="console-switcher-menu-copy">
-          <strong>{system.label}</strong>
-        </span>
-        {props.activeSystem === system.name ? (
-          <Check size={18} aria-hidden="true" />
-        ) : null}
-      </Link>
-    </DropdownMenu.Item>
+/** A product tab opens the product's first page, as the old menu did. */
+function selectWorkspaceSystem(
+  setLastSystem: React.Dispatch<React.SetStateAction<WorkspaceSystem>>,
+  openPage: (href: string) => void,
+  workspace: WorkspaceShellContext,
+  system: WorkspaceSystem,
+): void {
+  setLastSystem(system);
+  openPage(
+    workspacePagePath(
+      workspace.organisationHandle,
+      workspace.workspaceHandle,
+      WORKSPACE_SYSTEMS[system].page,
+    ),
   );
 }
 
@@ -1524,18 +1024,6 @@ function invertRailExpanded(railExpanded: boolean): boolean {
   return !railExpanded;
 }
 
-function isVisibleNavigationGroup(
-  system: WorkspaceSystem,
-  group: WorkspaceNavigationGroup,
-): boolean {
-  return (
-    group.label === system ||
-    group.label === "Workspace" ||
-    group.label === "Agents" ||
-    group.label === "Settings"
-  );
-}
-
 function resetWorkspaceScroll(
   shell: React.RefObject<HTMLDivElement | null>,
   workspacePath: React.RefObject<string | null>,
@@ -1547,46 +1035,78 @@ function resetWorkspaceScroll(
   if (main) main.scrollTop = 0;
 }
 
+type NavigationGroupsInput = {
+  readonly activePage: WorkspaceDetailPage | null;
+  readonly organisationHandle: string;
+  readonly workspaceHandle: string;
+  readonly system: WorkspaceSystem;
+  readonly attention: NavigationAttention;
+  readonly selectSystem: (system: WorkspaceSystem) => void;
+};
+
+/**
+ * Three groups: the workspace pages (Home, Inbox, Agents, Knowledge) with no
+ * title; the pages of one product under the product tabs; Settings.
+ */
 function buildConsoleNavigationGroups(
-  activePage: WorkspaceDetailPage | null,
-  organisationHandle: string,
-  workspaceHandle: string,
-  system: WorkspaceSystem,
-  attention: NavigationAttention,
+  input: NavigationGroupsInput,
 ): readonly ConsoleSidebarNavigationGroup[] {
-  return WORKSPACE_NAVIGATION_GROUPS.filter(
-    isVisibleNavigationGroup.bind(null, system),
-  ).map(
-    buildConsoleNavigationGroup.bind(
+  const items = navigationItems.bind(null, input);
+  return [
+    {
+      id: "workspace",
+      label: navigationGroupTitle("Workspace"),
+      heading: { kind: "none" },
+      items: [...items("Workspace"), ...items("Agents")],
+    },
+    {
+      id: "products",
+      label: "Products",
+      heading: {
+        kind: "tabs",
+        tabs: Object.values(WORKSPACE_SYSTEMS).map(
+          buildSystemTab.bind(null, input),
+        ),
+      },
+      items: items(input.system),
+    },
+    {
+      id: "settings",
+      label: navigationGroupTitle("Settings"),
+      heading: { kind: "label" },
+      items: items("Settings"),
+    },
+  ];
+}
+
+function navigationItems(
+  input: NavigationGroupsInput,
+  name: WorkspaceNavigationGroupName,
+): ConsoleSidebarNavigationGroup["items"] {
+  const group = WORKSPACE_NAVIGATION_GROUPS.find(
+    (candidate) => candidate.label === name,
+  );
+  return (group?.pages ?? []).map(
+    buildConsoleNavigationItem.bind(
       null,
-      activePage,
-      organisationHandle,
-      workspaceHandle,
-      attention,
+      input.activePage,
+      input.organisationHandle,
+      input.workspaceHandle,
+      input.attention,
     ),
   );
 }
 
-function buildConsoleNavigationGroup(
-  activePage: WorkspaceDetailPage | null,
-  organisationHandle: string,
-  workspaceHandle: string,
-  attention: NavigationAttention,
-  group: WorkspaceNavigationGroup,
-): ConsoleSidebarNavigationGroup {
+function buildSystemTab(
+  input: NavigationGroupsInput,
+  system: (typeof WORKSPACE_SYSTEMS)[WorkspaceSystem],
+): ConsoleSidebarTab {
   return {
-    id: group.label.toLocaleLowerCase().replaceAll(" ", "-"),
-    label: navigationGroupTitle(group.label),
-    labelVisibility: "visible",
-    items: group.pages.map(
-      buildConsoleNavigationItem.bind(
-        null,
-        activePage,
-        organisationHandle,
-        workspaceHandle,
-        attention,
-      ),
-    ),
+    id: system.name,
+    label: system.label,
+    icon: system.icon,
+    selected: input.system === system.name,
+    onSelect: input.selectSystem.bind(null, system.name),
   };
 }
 
@@ -1708,85 +1228,6 @@ function closeDetailsOnEscape(
   const summary = event.currentTarget.querySelector<HTMLElement>("summary");
   event.currentTarget.open = false;
   summary?.focus();
-}
-
-function WorkspaceNavigationIcon(props: {
-  readonly page: WorkspaceDetailPage;
-}): React.ReactNode {
-  const Icon = workspaceNavigationIcon(props.page);
-  return (
-    <Icon
-      className="organisation-nav-icon"
-      strokeWidth={1.75}
-      aria-hidden="true"
-    />
-  );
-}
-
-function workspaceNavigationIcon(page: WorkspaceDetailPage): LucideIcon {
-  switch (page) {
-    case "overview":
-      return LayoutDashboard;
-    case "inbox":
-      return Mail;
-    case "checkout":
-    case "terminals":
-      return CreditCard;
-    case "products":
-      return Package;
-    case "menus":
-    case "recipes":
-      return BookOpen;
-    case "costs":
-      return Calculator;
-    case "order-queue":
-      return ConciergeBell;
-    case "register":
-      return CreditCard;
-    case "inventory":
-      return Warehouse;
-    case "orders":
-      return ShoppingCart;
-    case "payments":
-      return CreditCard;
-    case "payouts":
-      return Landmark;
-    case "suppliers":
-      return Truck;
-    case "workflow-simulator":
-    case "production-requests":
-      return Factory;
-    case "devices":
-      return Cpu;
-    case "bakes":
-      return CakeSlice;
-    case "chat":
-    case "agents":
-      return Bot;
-    case "brain":
-    case "knowledge":
-      return Brain;
-    case "activity":
-      return Activity;
-    case "tests":
-      return FlaskConical;
-    case "integrations":
-      return Plug;
-    case "vault":
-      return Vault;
-    case "api-keys":
-      return KeySquare;
-    case "jev":
-      return Sparkles;
-    case "billing":
-      return CreditCard;
-    case "access":
-      return KeyRound;
-    case "settings":
-      return Settings;
-    default:
-      return assertNever(page, "Unexpected value");
-  }
 }
 
 /** Close the account menu, then open what its entry names. */

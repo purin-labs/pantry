@@ -1,0 +1,164 @@
+/* The workspace search: one dialog that finds a page. Each area name shows
+   one time, as a heading over its pages. */
+
+.workspace-command-dialog {
+  width: min(640px, calc(100vw - 32px));
+  max-height: min(560px, calc(100dvh - 32px));
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow:
+    0 20px 70px rgb(0 0 0 / 18%),
+    0 0 0 1px rgb(0 0 0 / 8%);
+  color: var(--ink);
+  overflow: hidden;
+  overscroll-behavior: var(--portal-contained-overscroll);
+}
+
+.workspace-command-dialog::backdrop {
+  background: color-mix(in oklch, var(--pantry-shadow-color) 28%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+.workspace-command-search {
+  min-height: 60px;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px 0 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.workspace-command-search .command-search-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--ink-3);
+}
+
+.workspace-command-search input {
+  width: 100%;
+  min-height: 56px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.workspace-command-search input:focus-visible {
+  outline: none;
+}
+
+.workspace-command-search:focus-within {
+  box-shadow: inset 0 -1px 0 var(--border);
+}
+
+.workspace-command-close {
+  min-height: 44px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--paper);
+  box-shadow: var(--ring);
+  color: var(--ink-2);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.workspace-command-results {
+  max-height: min(480px, calc(100dvh - 120px));
+  overflow-y: auto;
+  overscroll-behavior: var(--portal-contained-overscroll);
+  padding: 4px 8px 8px;
+  scrollbar-gutter: stable;
+  display: grid;
+  gap: 2px;
+}
+
+.workspace-command-group {
+  display: grid;
+  gap: 2px;
+}
+
+.workspace-command-group-title {
+  padding: 10px 12px 4px;
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.workspace-command {
+  width: 100%;
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: none;
+  font-size: 14px;
+  text-align: start;
+}
+
+.workspace-command:hover {
+  background: var(--surface);
+}
+
+.workspace-command-active,
+.workspace-command-active:hover {
+  color: var(--pantry-on-selected);
+  background: var(--pantry-selected);
+}
+
+.workspace-command > svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.workspace-command > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.workspace-command-empty {
+  margin: 0;
+  padding: 32px 16px;
+  color: var(--ink-3);
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .workspace-command-dialog {
+    width: calc(100vw - 20px);
+    max-height: calc(100dvh - 20px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .workspace-command-dialog[open] {
+    animation: workspace-command-enter var(--motion-quick);
+  }
+}
+
+@keyframes workspace-command-enter {
+  from {
+    opacity: 0;
+    scale: 0.98;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}

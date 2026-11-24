@@ -26,7 +26,14 @@ const PALETTES: readonly PaletteChoice[] = [
   { value: "espresso", label: "Espresso" },
   { value: "paper", label: "Paper" },
 ];
-export function AccountAppearanceControl(): React.ReactNode {
+/**
+ * The appearance button and its menu. `side` says where the menu opens: under
+ * the button in a top bar, over it at the foot of the sidebar, and beside it
+ * on the collapsed rail.
+ */
+export function AccountAppearanceControl(
+  props: Readonly<{ side?: "bottom" | "top" | "right" }>,
+): React.ReactNode {
   const appearance = usePortalTheme("appearance", false);
   return (
     <DropdownMenu.Root>
@@ -46,6 +53,7 @@ export function AccountAppearanceControl(): React.ReactNode {
       <DropdownMenu.Portal>
         <DropdownMenu.Content
           className="preference-appearance-menu"
+          side={props.side ?? "bottom"}
           sideOffset={8}
           align="end"
           collisionPadding={12}

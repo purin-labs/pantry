@@ -13,9 +13,10 @@ type DashboardNavigationProps = {
   /** Null when the page draws the console tools in its own top row. */
   readonly topbar: {
     readonly brand: React.ReactNode;
-    readonly search: React.ReactNode;
     readonly actions: React.ReactNode;
     readonly sidebarControl: ConsoleSidebarControl;
+    /** What waits inside the closed drawer, said on its toggle. */
+    readonly attention?: string;
   } | null;
   readonly sidebar: {
     readonly id: string;
@@ -26,10 +27,14 @@ type DashboardNavigationProps = {
     readonly onNavigate: () => void;
     readonly header: React.ReactNode;
     readonly footer: React.ReactNode;
+    readonly foot: React.ReactNode;
   };
 };
 
-/** Shared dashboard chrome for the persistent topbar and workspace rail. */
+/**
+ * Shared dashboard chrome: the top bar with Ask, and the workspace sidebar
+ * with the search, the pages and the account.
+ */
 export function DashboardNavigation({
   topbar,
   sidebar,
@@ -46,13 +51,11 @@ export function DashboardNavigation({
                 <ConsoleSidebarToggle
                   {...topbar.sidebarControl}
                   placement="topbar"
+                  attention={topbar.attention}
                 />
               ) : null}
             </div>
-            <div className="portal-nav-actions">
-              {topbar.search}
-              {topbar.actions}
-            </div>
+            <div className="portal-nav-actions">{topbar.actions}</div>
           </div>
         </header>
       )}
@@ -65,6 +68,7 @@ export function DashboardNavigation({
         onNavigate={sidebar.onNavigate}
         header={sidebar.header}
         footer={sidebar.footer}
+        foot={sidebar.foot}
       />
     </>
   );
