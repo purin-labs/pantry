@@ -114,8 +114,9 @@ The Agents page (`/portal/<org>/<workspace>/agents`, `pages/agent-console.tsx`) 
 the agents and their recent work. An agent detail shows the name, the state, the role
 and the job at the top, then Suggested changes, Instructions, Skills, Tools and access,
 Triggers, **Run now** and Limits as sections of one column. `?view=schedules` shows the
-runs of each scheduled agent. Workspace settings holds **Operational areas**, and the
-Skills tab of Knowledge lists the skills.
+runs of each scheduled agent, one lane for each agent. The key above the lanes names
+only what no lane says: a person, a planned run and a side Case. Workspace settings
+holds **Operational areas**, and the Skills tab of Knowledge lists the skills.
 
 | Record                        | Meaning                                                                                          |
 | ----------------------------- | ------------------------------------------------------------------------------------------------ |

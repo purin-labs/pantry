@@ -105,32 +105,17 @@ export function CaseTimeline(props: {
   );
 }
 
+/**
+ * The number of Cases in the period. Each lane is a state and shows its own
+ * count, so the summary does not repeat them.
+ */
 function TimelineSummary(props: {
   readonly cases: readonly CaseTimelineCase[];
 }): React.ReactNode {
-  const waiting = props.cases.filter(
-    (event) => stateOf(event) === "waiting",
-  ).length;
-  const running = props.cases.filter(
-    (event) => stateOf(event) === "running",
-  ).length;
   return (
-    <>
-      <span>
-        <b>{props.cases.length}</b>{" "}
-        {props.cases.length === 1 ? "Case" : "Cases"}
-      </span>
-      {waiting > 0 ? (
-        <span className="time-lanes-summary-wait">
-          <b>{waiting}</b> {waiting === 1 ? "waits" : "wait"} for a person
-        </span>
-      ) : null}
-      {running > 0 ? (
-        <span>
-          <b>{running}</b> running
-        </span>
-      ) : null}
-    </>
+    <span>
+      <b>{props.cases.length}</b> {props.cases.length === 1 ? "Case" : "Cases"}
+    </span>
   );
 }
 

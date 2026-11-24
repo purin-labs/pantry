@@ -176,14 +176,11 @@ export function ScheduleLanes(props: ScheduleLanesProps): React.ReactNode {
         now={now}
         range={range}
         onRange={setRange}
+        // Each lane is one agent and names it, and a run carries the badge of
+        // its lane's agent. The key names only what no lane says.
         legend={
           <TimeLanesKey
             owners={[
-              ...props.agents.map((agent) => ({
-                tone: ROLE_TONE[agent.role],
-                letter: ROLE_LETTER[agent.role],
-                name: agent.name,
-              })),
               { tone: "coral", letter: null, name: "A person" },
               { tone: "grey", letter: "·", name: "Planned" },
             ]}

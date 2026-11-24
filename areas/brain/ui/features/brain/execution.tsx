@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  ChevronLeft,
   ChevronRight,
   CircleDot,
   Hash,
@@ -37,18 +38,14 @@ import {
   type BrainTransport,
 } from "./api";
 import { ViewSwitch } from "@purin-labs/ui/time-lanes-frame";
-import { CaseTimeline, type ActivityTimeline } from "./case-timeline";
-
-const CASE_VIEWS = [
-  { view: "list", name: "List" },
-  { view: "timeline", name: "Timeline" },
-] as const;
 import {
+  SideDrawer,
   usePeriod,
   useWiderWhenEmpty,
   type PeriodControl,
 } from "@purin-labs/ui/index";
-import { ExecutionCanvas, ExecutionLegend } from "./execution-canvas";
+import { CaseTimeline, type ActivityTimeline } from "./case-timeline";
+import { ExecutionCanvas } from "./execution-canvas";
 import {
   basisLabel,
   caseLabel,
@@ -63,9 +60,20 @@ import {
   nodeStatus,
   nodeTitle,
   placeExecution,
+  titleNamesKind,
   type CaseExecution,
   type PlacedNode,
 } from "./execution-model";
+
+const CASE_VIEWS = [
+  { view: "list", name: "List" },
+  { view: "timeline", name: "Timeline" },
+] as const;
+
+const LAYOUT_VIEWS = [
+  { view: "graph", name: "Graph" },
+  { view: "list", name: "List" },
+] as const;
 
 type ActivityCases =
   | Readonly<{ kind: "loading" }>
@@ -525,38 +533,34 @@ function OpenCase(
     <div className="brain-execution">
       <header className="brain-execution-head">
         <div className="brain-execution-path">
-          <nav aria-label="Path">
-            <button
-              type="button"
-              className="brain-link-button brain-execution-step"
-              onClick={props.onCloseCase}
-            >
-              Activity
-            </button>
-            <span aria-hidden="true"> / </span>
-            <span>{label === undefined ? "One Case" : caseLabel(label)}</span>
-          </nav>
-          <h3 className="brain-execution-title">Execution of one Case</h3>
+          <button
+            type="button"
+            className="brain-link-button brain-execution-step"
+            onClick={props.onCloseCase}
+          >
+            <ChevronLeft size={14} aria-hidden="true" />
+            Activity
+          </button>
+          <h3 className="brain-execution-title">
+            {label === undefined ? "One Case" : caseLabel(label)}
+          </h3>
           <code className="brain-case-id">{caseId}</code>
         </div>
         <div className="brain-execution-actions">
           {/* A Case that could not be read has one control to try again. */}
           {execution.kind === "failed" ? null : (
-            <>
-              <ExecutionLegend />
-              <button
-                type="button"
-                className="brain-canvas-tool"
-                onClick={props.onRefresh}
-                disabled={
-                  execution.kind === "loading" ||
-                  (execution.kind === "ready" && execution.reading)
-                }
-              >
-                <RefreshCw size={14} strokeWidth={1.6} aria-hidden="true" />
-                Read again
-              </button>
-            </>
+            <button
+              type="button"
+              className="brain-canvas-tool"
+              onClick={props.onRefresh}
+              disabled={
+                execution.kind === "loading" ||
+                (execution.kind === "ready" && execution.reading)
+              }
+            >
+              <RefreshCw size={14} strokeWidth={1.6} aria-hidden="true" />
+              Read again
+            </button>
           )}
           <button
             type="button"
@@ -645,29 +649,24 @@ function ReadyCase(
             : ` ${String(withheld)} are withheld: you may know that they exist, and you may not see what they hold.`}
         </p>
         {narrow ? null : (
-          <div className="brain-layout-switch" role="group" aria-label="Layout">
-            <LayoutButton {...props} target="graph" label="Graph" />
-            <LayoutButton {...props} target="list" label="List" />
-          </div>
-        )}
-      </div>
-      <div
-        className="brain-execution-body"
-        data-detail={selectedId === null ? "closed" : "open"}
-      >
-        {shownLayout === "graph" ? (
-          <ExecutionCanvas
-            execution={read}
-            selectedId={selectedId}
-            onSelect={props.onSelect}
+          <ViewSwitch
+            label="Layout"
+            value={props.layout}
+            views={LAYOUT_VIEWS}
+            onChange={props.onLayout}
           />
-        ) : (
-          <ExecutionList {...props} placed={placed} selectedId={selectedId} />
-        )}
-        {selectedId === null ? null : (
-          <NodeDetail {...props} selectedId={selectedId} />
         )}
       </div>
+      {shownLayout === "graph" ? (
+        <ExecutionCanvas
+          execution={read}
+          selectedId={selectedId}
+          onSelect={props.onSelect}
+        />
+      ) : (
+        <ExecutionList {...props} placed={placed} selectedId={selectedId} />
+      )}
+      <NodeDetail {...props} selectedId={selectedId} />
       {readFailures.length === 0 ? null : (
         <Notice tone="warning" announcement="polite">
           {readFailures.map(limitationSentence).join(" ")}
@@ -697,24 +696,6 @@ function isReadFailure(limitation: CaseExecutionLimitation): boolean {
     default:
       return assertNever(limitation);
   }
-}
-
-function LayoutButton(
-  props: ActivityPanelViewProps & {
-    readonly target: ActivityLayout;
-    readonly label: string;
-  },
-): React.ReactNode {
-  return (
-    <button
-      type="button"
-      className="brain-canvas-tool"
-      aria-pressed={props.layout === props.target}
-      onClick={props.onLayout.bind(null, props.target)}
-    >
-      {props.label}
-    </button>
-  );
 }
 
 function ExecutionList(
@@ -760,13 +741,19 @@ function NodeButton(
       aria-pressed={props.selectedId === node.nodeId}
       onClick={props.onSelect.bind(null, node)}
     >
-      <span className="brain-node-kind">{kindLabel(node.kind)}</span>
+      {titleNamesKind(node) ? null : (
+        <span className="brain-node-kind">{kindLabel(node.kind)}</span>
+      )}
       <span className="brain-node-title">{nodeTitle(node)}</span>
       <StatusChip status={nodeStatus(node)} />
     </button>
   );
 }
 
+/**
+ * The selected record in a side drawer, so the graph keeps its width. A link
+ * into the record selects the record that it comes from, in the same drawer.
+ */
 function NodeDetail(
   props: ActivityPanelViewProps & {
     readonly read: CaseExecution;
@@ -778,62 +765,73 @@ function NodeDetail(
     props.selectedId === null
       ? undefined
       : read.nodes.find((entry) => entry.nodeId === props.selectedId);
-  if (node === undefined)
-    return (
-      <aside className="brain-node-detail" aria-label="Record details">
-        <p className="brain-muted">Select a record to see its details.</p>
-      </aside>
-    );
-  const links = linksInto(read, node.nodeId);
   return (
-    <aside
-      className="brain-node-detail"
-      aria-label="Record details"
-      aria-live="polite"
+    <SideDrawer
+      open={node !== undefined}
+      title={node === undefined ? "" : nodeTitle(node)}
+      close={props.onCloseDetail}
     >
-      <header className="brain-node-detail-head">
-        <h4>{nodeTitle(node)}</h4>
-        <StatusChip status={nodeStatus(node)} />
-        <button
-          type="button"
-          className="brain-canvas-tool brain-node-detail-close"
-          aria-label="Close this record"
-          onClick={props.onCloseDetail}
-        >
-          <X size={16} strokeWidth={1.6} aria-hidden="true" />
-        </button>
-      </header>
-      {node.access === "withheld" ? (
-        <Notice tone="neutral" announcement="polite">
-          You may not see this record. Its content belongs to a source that you
-          cannot read here. Its kind and its recorded links are shown.
-        </Notice>
-      ) : (
-        <dl className="brain-node-facts">
-          {nodeFacts(node).map((fact) => (
-            <div key={fact.label}>
-              <dt>{fact.label}</dt>
-              <dd>
-                {fact.time === undefined ? (
-                  <code>{fact.value}</code>
-                ) : (
-                  formatAbsoluteTime(fact.time)
-                )}
-              </dd>
-            </div>
-          ))}
-        </dl>
+      {node === undefined ? null : (
+        <div className="side-drawer-body brain-case-record">
+          <StatusChip status={nodeStatus(node)} />
+          {node.access === "withheld" ? (
+            <Notice tone="neutral" announcement="polite">
+              You may not see this record. Its content belongs to a source that
+              you cannot read here. Its kind and its recorded links are shown.
+            </Notice>
+          ) : (
+            <dl className="brain-case-record-facts">
+              {nodeFacts(node).map((fact) => (
+                <div key={fact.label}>
+                  <dt>{fact.label}</dt>
+                  <dd>
+                    {fact.time === undefined ? (
+                      <code>{fact.value}</code>
+                    ) : (
+                      formatAbsoluteTime(fact.time)
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
+          {node.access === "open" && node.kind === "turn" ? (
+            <p>{memorySentence(node.memory)}</p>
+          ) : null}
+          <RecordLinks {...props} node={node} />
+          {detail.kind === "loading" ? (
+            <p className="brain-muted" role="status">
+              Reading the content.
+            </p>
+          ) : detail.kind === "failed" ? (
+            <Notice tone="warning" announcement="polite">
+              {detail.message}
+            </Notice>
+          ) : detail.kind === "ready" ? (
+            <NodeContent detail={detail.detail} />
+          ) : null}
+        </div>
       )}
-      {node.access === "open" && node.kind === "turn" ? (
-        <p className="brain-node-memory">{memorySentence(node.memory)}</p>
-      ) : null}
-      <h5>Recorded links into this record</h5>
+    </SideDrawer>
+  );
+}
+
+function RecordLinks(
+  props: ActivityPanelViewProps & {
+    readonly read: CaseExecution;
+    readonly node: CaseExecutionNode;
+  },
+): React.ReactNode {
+  const links = linksInto(props.read, props.node.nodeId);
+  return (
+    <section>
+      <h3>Links into this record</h3>
       {links.length === 0 ? (
         <p className="brain-muted">
           None. No record names what this one came from.
         </p>
       ) : (
-        <ul className="brain-node-links">
+        <ul className="brain-case-record-links">
           {links.map((link) => (
             <li key={`${link.from.nodeId}:${link.basis}`}>
               <button
@@ -850,18 +848,7 @@ function NodeDetail(
           ))}
         </ul>
       )}
-      {detail.kind === "loading" ? (
-        <p className="brain-muted" role="status">
-          Reading the content.
-        </p>
-      ) : detail.kind === "failed" ? (
-        <Notice tone="warning" announcement="polite">
-          {detail.message}
-        </Notice>
-      ) : detail.kind === "ready" ? (
-        <NodeContent detail={detail.detail} />
-      ) : null}
-    </aside>
+    </section>
   );
 }
 
@@ -873,8 +860,8 @@ function NodeContent(props: {
     <>
       {content.map((part, index) => (
         <section key={`${part.role}:${String(index)}`}>
-          <h5>{contentRoleLabel(part.role)}</h5>
-          <pre className="brain-node-content">{part.text}</pre>
+          <h3>{contentRoleLabel(part.role)}</h3>
+          <pre className="brain-case-record-content">{part.text}</pre>
           {part.truncated ? (
             <p className="brain-muted">The stored text is longer than this.</p>
           ) : null}

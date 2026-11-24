@@ -27,6 +27,7 @@ import {
   kindLabel,
   nodeStatus,
   nodeTitle,
+  titleNamesKind,
   type CaseExecution,
 } from "./execution-model";
 
@@ -65,8 +66,11 @@ const LEGEND: readonly Readonly<{ mark: StateMark; label: string }>[] = [
   { mark: "withheld", label: "Withheld" },
 ];
 
-/** What each state mark of the canvas means, in words. */
-export function ExecutionLegend(): React.ReactNode {
+/**
+ * What each state mark of the canvas means, in words. It sits in the canvas,
+ * at the lower left, beside the zoom tools.
+ */
+function ExecutionLegend(): React.ReactNode {
   return (
     <ul className="brain-legend" aria-label="State marks">
       {LEGEND.map((entry) => {
@@ -205,6 +209,7 @@ export function ExecutionCanvas(props: {
 
   return (
     <div className="brain-canvas">
+      <ExecutionLegend />
       <div className="brain-canvas-tools" role="group" aria-label="Zoom">
         <button
           type="button"
@@ -389,6 +394,16 @@ function foldLabel(fold: ExecutionFold): string {
   return `${String(fold.hidden)} more ${fold.hidden === 1 ? kind : `${kind}s`}`;
 }
 
+/**
+ * The line under a box's title: its state, and its kind when the title does
+ * not say it. A withheld box shows "Withheld" as its title and its kind here.
+ */
+function nodeMeta(node: CaseExecutionNode): string {
+  if (node.access === "withheld") return kindLabel(node.kind);
+  const state = nodeStatus(node).label;
+  return titleNamesKind(node) ? state : `${kindLabel(node.kind)} · ${state}`;
+}
+
 function CanvasNode(props: {
   readonly node: CaseExecutionNode;
   readonly x: number;
@@ -422,11 +437,7 @@ function CanvasNode(props: {
         strokeWidth={1.8}
         aria-hidden="true"
       />
-      <span className="brain-canvas-node-meta">
-        {node.access === "withheld"
-          ? kindLabel(node.kind)
-          : `${kindLabel(node.kind)} · ${nodeStatus(node).label}`}
-      </span>
+      <span className="brain-canvas-node-meta">{nodeMeta(node)}</span>
     </button>
   );
 }

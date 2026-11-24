@@ -240,8 +240,13 @@ records one Memory outcome.
 - The canvas (`execution-canvas.tsx`, layout in `execution-layout.ts`) puts nodes in
   columns by stage (request, assignment, work, proposal, decision, delivery), with one
   lane for each assignment. It uses only recorded edges. It has pan, zoom (0.25 to
-  1.5), "Fit to view", a legend and a path back. A stack of more than 6 records
-  (`EXECUTION_STACK_LIMIT`) folds. At 760 px or less, the list replaces the canvas.
+  1.5), "Fit to view" and, at the lower left, the key of the state marks. A box
+  writes its kind only when its name does not say it (a tool operation). A stack of
+  more than 6 records (`EXECUTION_STACK_LIMIT`) folds. At 760 px or less, the list
+  replaces the canvas. The head of an open Case has a link back to Activity, the Case
+  name and its identity. A selected record opens in a side drawer, so the canvas
+  keeps its width. The timeline summary gives the number of Cases; each state lane
+  gives its own count.
 - The Portal chat reads the execution of its own Case through the chat route. The
   read adds no copied payload to the conversation timeline.
 

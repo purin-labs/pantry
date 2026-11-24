@@ -806,8 +806,9 @@ async (page) => {
       await runCard
         .getByRole("link", { name: "Open its execution", exact: true })
         .click();
+      // An open Case has a control to read it again.
       await this.owner
-        .getByRole("heading", { name: "Execution of one Case", exact: true })
+        .getByRole("button", { name: "Read again", exact: true })
         .waitFor();
       const runAddress = new URL(this.owner.url()).searchParams;
       const runRecords = await this.execution(this.owner, run.caseId);
@@ -1090,7 +1091,7 @@ async (page) => {
         .getByRole("link", { name: "Open the Case", exact: true })
         .click();
       await this.owner
-        .getByRole("heading", { name: "Execution of one Case", exact: true })
+        .getByRole("button", { name: "Read again", exact: true })
         .waitFor();
       const graph = this.owner.getByRole("group", {
         name: /^Execution graph/u,
@@ -1198,8 +1199,9 @@ async (page) => {
         .first();
       await firstRequest.focus();
       await this.owner.keyboard.press("Enter");
-      const details = this.owner.getByRole("complementary", {
-        name: "Record details",
+      // The record opens in a side drawer, named by the record.
+      const details = this.owner.getByRole("dialog", {
+        name: "Request from a connected channel",
       });
       await details
         .getByRole("heading", {
@@ -1235,6 +1237,9 @@ async (page) => {
           (selected.get("record") ?? "").length > 0,
         Object.fromEntries(selected),
       );
+      // Escape closes the record's drawer, and the layout switch is in reach.
+      await this.owner.keyboard.press("Escape");
+      await details.waitFor({ state: "hidden" });
       await this.owner
         .getByRole("button", { name: "List", exact: true })
         .click();
@@ -1487,7 +1492,7 @@ async (page) => {
       await turn.focus();
       await sample.keyboard.press("Enter");
       await sample
-        .getByRole("complementary", { name: "Record details" })
+        .getByRole("dialog", { name: "Turn" })
         .getByRole("heading", { name: "Turn", exact: true })
         .waitFor();
       this.check(

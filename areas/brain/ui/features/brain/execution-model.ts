@@ -46,6 +46,15 @@ export function kindLabel(kind: CaseExecutionNodeKind): string {
   }
 }
 
+/**
+ * Whether the name of a node already says its kind ("Turn", "Attempt 2",
+ * "Research assignment", "Tool operation (withheld)"), so that the kind is not
+ * written again beside it. Only an open tool operation is named by its tool.
+ */
+export function titleNamesKind(node: CaseExecutionNode): boolean {
+  return node.access === "withheld" || node.kind !== "tool_operation";
+}
+
 /** The short name of one node. A withheld node has no name of its own. */
 export function nodeTitle(node: CaseExecutionNode): string {
   if (node.access === "withheld") return `${kindLabel(node.kind)} (withheld)`;

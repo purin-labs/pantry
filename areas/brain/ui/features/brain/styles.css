@@ -991,7 +991,7 @@ a.brain-row:focus-visible,
 }
 
 .brain-execution-list,
-.brain-node-links {
+.brain-case-record-links {
   display: grid;
   gap: var(--pantry-space-2);
   margin: 0;
@@ -1104,8 +1104,8 @@ a.brain-row:focus-visible,
   font-variant-numeric: tabular-nums;
 }
 
-/* The head of an open Case: the path back at the left, and the legend, the
-   read control and the close control at the right. */
+/* The head of an open Case: the way back, the Case name and its identity at
+   the left, and the read control and the close control at the right. */
 .brain-execution-head {
   display: flex;
   flex-wrap: wrap;
@@ -1123,6 +1123,10 @@ a.brain-row:focus-visible,
 }
 
 .brain-execution-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  justify-self: start;
   color: var(--ink-2);
   text-decoration: none;
 }
@@ -1134,7 +1138,7 @@ a.brain-row:focus-visible,
 
 .brain-execution-title {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: 500;
   color: var(--ink-strong);
 }
@@ -1154,15 +1158,25 @@ a.brain-row:focus-visible,
   gap: var(--pantry-space-2) var(--pantry-space-4);
 }
 
+/* The state key sits in the canvas at the lower left, as the zoom tools sit
+   at the lower right. */
 .brain-legend {
+  position: absolute;
+  left: var(--pantry-space-3);
+  bottom: var(--pantry-space-3);
+  z-index: 2;
   display: flex;
   flex-wrap: wrap;
   gap: var(--pantry-space-1) var(--pantry-space-3);
+  max-width: calc(100% - 300px);
   margin: 0;
-  padding: 0;
+  padding: var(--pantry-space-2) var(--pantry-space-3);
   list-style: none;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 10px;
   color: var(--ink-2);
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
 }
 
 .brain-legend li {
@@ -1171,24 +1185,8 @@ a.brain-row:focus-visible,
   gap: var(--pantry-space-1);
 }
 
-.brain-layout-switch {
-  display: flex;
-  gap: var(--pantry-space-1);
-}
-
-/* The canvas has the whole width until a record is selected. */
-.brain-execution-body {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--pantry-space-4);
-  align-items: start;
-}
-
-.brain-execution-body[data-detail="open"] {
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
-}
-
-/* The canvas: a dotted plane that scrolls like a page. */
+/* The canvas: a dotted plane that scrolls like a page. It has the whole
+   width; the selected record opens in a side drawer. */
 
 .brain-canvas {
   position: relative;
@@ -1487,65 +1485,62 @@ a.brain-row:focus-visible,
   color: var(--ink-2);
 }
 
-.brain-node-detail {
-  display: grid;
-  gap: var(--pantry-space-3);
-  border: 1px solid var(--hairline);
-  border-radius: 8px;
-  padding: var(--pantry-space-4);
-  min-width: 0;
+/* One record of a Case, in the side drawer: its state, its facts as rows,
+   the links into it and its content. */
+.brain-case-record {
+  justify-items: start;
 }
 
-.brain-node-detail h4,
-.brain-node-detail h5 {
+.brain-case-record > *,
+.brain-case-record section {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.brain-case-record section {
+  display: grid;
+  gap: var(--pantry-space-2);
+  justify-self: stretch;
+}
+
+.brain-case-record h3 {
   margin: 0;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--ink-strong);
 }
 
-.brain-node-detail h4 {
-  font-size: 1rem;
+.brain-case-record p {
+  margin: 0;
   overflow-wrap: anywhere;
 }
 
-.brain-node-detail h5 {
-  font-size: 0.875rem;
-  color: var(--ink-2);
-}
-
-.brain-node-detail-head {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--pantry-space-2);
-  align-items: center;
-}
-
-.brain-node-detail-head h4 {
-  flex: 1 1 8rem;
-}
-
-.brain-node-facts {
+.brain-case-record-facts {
   display: grid;
-  gap: var(--pantry-space-2);
+  justify-self: stretch;
   margin: 0;
+  font-size: 0.875rem;
 }
 
-.brain-node-facts dt {
+.brain-case-record-facts > div {
+  display: grid;
+  grid-template-columns: minmax(100px, 35%) minmax(0, 1fr);
+  gap: var(--pantry-space-3);
+  align-items: baseline;
+  padding-block: 9px;
+  border-top: 1px solid var(--border);
+}
+
+.brain-case-record-facts dt {
   color: var(--ink-2);
-  font-size: 0.8125rem;
 }
 
-.brain-node-facts dd {
+.brain-case-record-facts dd {
   margin: 0;
   overflow-wrap: anywhere;
 }
 
-.brain-node-memory {
-  margin: 0;
-  overflow-wrap: anywhere;
-}
-
-.brain-node-content {
+.brain-case-record-content {
   margin: var(--pantry-space-1) 0 0;
   max-height: 16rem;
   overflow: auto;
@@ -1569,13 +1564,6 @@ a.brain-row:focus-visible,
   text-align: left;
   text-decoration: underline;
   cursor: pointer;
-}
-
-/* The record beside the canvas goes below it when the page has no room. */
-@container brain (max-width: 900px) {
-  .brain-execution-body[data-detail="open"] {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 /* The Case Timeline sits under the switch that chooses it. */
