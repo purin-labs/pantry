@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import {
   parseIntegrationAccountReference,
 } from "@purin-labs/authority/access-control/integration-discovery";
@@ -54,8 +55,8 @@ export const slackMessageProposal = defineSlackTool({
         type: "string",
         pattern: "^integration_ref_[0-9a-f]{64}$",
       },
-      channel: { type: ["string", "null"], maxLength: 200 },
-      text: { type: "string", minLength: 1, maxLength: 8000 },
+      channel: textLimit({ type: ["string", "null"], maxLength: 200 }),
+      text: textLimit({ type: "string", minLength: 1, maxLength: 8000 }),
     },
     required: ["accountRef", "channel", "text"],
     additionalProperties: false,

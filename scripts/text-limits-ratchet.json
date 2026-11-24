@@ -19,13 +19,8 @@
     "areas/kitchen/server/agent-tools/kitchen/recipes.ts": 1,
     "areas/kitchen/server/agent-tools/kitchen/suppliers.ts": 9,
     "areas/kitchen/server/agent-tools/kitchen/workflow-canvas.ts": 2,
-    "foundation/agent-tools/files/files.ts": 3,
-    "foundation/agent-tools/messages/messages.ts": 1,
-    "foundation/agent-tools/turn/turn.ts": 4,
-    "foundation/agent/actors/pi-durable-tools.ts": 2,
     "foundation/authority/generated/action-registry.ts": 14,
     "packages/bakery-model/src/bakery-margins.ts": 4,
-    "surfaces/slack/server/agent-tools/slack/slack.ts": 2,
     "workers/platform/scripts/generate-actions.ts": 2
   }
 }
