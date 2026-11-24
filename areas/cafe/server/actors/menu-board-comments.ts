@@ -3,6 +3,7 @@ import { normalizePlainText } from "@purin-labs/collaboration";
 
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "@purin-labs/kernel/result";
+import type { MenuBoardCommentError } from "../contract/menu-board-commands";
 
 /**
  * Comments pinned to a board's elements (Plan 40B phase 5, slice 6). A
@@ -22,14 +23,6 @@ export type MenuBoardCommentAuthor = Readonly<{
   /** The person, or the person for whom the agent works. */
   userId: UserId;
   name: string;
-}>;
-
-export type MenuBoardCommentError = Readonly<{
-  code:
-    | "menu_board_comment_missing"
-    | "menu_board_comment_limit"
-    | "menu_board_comment_invalid"
-    | "menu_board_comment_not_author";
 }>;
 
 type CommentRow = Readonly<{

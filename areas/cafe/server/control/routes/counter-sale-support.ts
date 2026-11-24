@@ -1,7 +1,7 @@
 import type {
   CounterRegisterDeps,
   CounterRegisterFailure,
-} from "../../counter-register";
+} from "../../contract/counter-sale";
 import type {
   ControlMutationReceiptScope,
   UnversionedControlMutationBoundary,

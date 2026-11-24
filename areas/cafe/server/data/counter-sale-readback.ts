@@ -10,47 +10,7 @@ import type {
   CounterRegisterPaymentMethod,
   CounterSaleState,
 } from "@purin-labs/control-api";
-
-export type CounterSaleReadback = Readonly<{
-  schemaVersion: "pantry.counter-sale.v1";
-  checkoutId: string;
-  pantryLocationId: string;
-  revision: number;
-  state: CounterSaleState;
-  /**
-   * Whether the till may present this sale on the terminal. False whenever the
-   * payment's outcome is unknown or already settled: an unresolved payment is
-   * recovered, never re-collected.
-   */
-  collectable: boolean;
-  /**
-   * The attempt an operator recovers. Present exactly when there is something
-   * to reconcile, so a surface cannot offer recovery with nothing to recover.
-   */
-  recoverable: Readonly<{
-    paymentAttemptId: string;
-    reasonCode: string;
-    reconcileAfter: string;
-  }> | null;
-  /** The quote as rung up, for the receipt and for the amount to present. */
-  quote: Readonly<{
-    quoteDigest: string;
-    checkoutRevision: number;
-    lineCount: number;
-    amount: Readonly<{ amountMinor: number; currency: string }>;
-  }> | null;
-  orderId: string | null;
-  capturedPaymentReference: string | null;
-  pickupCode?: string | null;
-  paymentMethod?: CounterRegisterPaymentMethod | null;
-  tenderBrand?: string | null;
-  providerRefundable?: boolean | null;
-  manualTender?: Readonly<{
-    cashReceivedMinor: number | null;
-    changeDueMinor: number | null;
-    currency: string;
-  }> | null;
-}>;
+import type { CounterSaleReadback } from "../contract/counter-sale";
 
 /**
  * Classify one counter sale.

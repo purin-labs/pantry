@@ -2,175 +2,26 @@ import type {
   MenuBoardCommentThread,
   MenuBoardVersionSummary,
 } from "@purin-labs/control-api";
-import type {
-  MenuBoardRelease,
-  MenuBoardSummary,
-  MenuScreenSummary,
-} from "@purin-labs/cafe-control-api";
-import type { MenuBoardLayout, MenuBoardStart } from "@purin-labs/menu-board-crdt";
 import type { MenuDraftSnapshot } from "@purin-labs/menu-draft-crdt";
 
-import type { ControlSessionId } from "@purin-labs/kernel/ids";
-import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
-import type { ArchivedMenuBoard } from "./menu-board-archive";
-import type {
-  MenuBoardArchiveResult,
-  MenuBoardEditError,
-  MenuBoardPublication,
-  MenuBoardRooms,
-} from "./menu-boards";
+import type { MenuBoardRooms } from "./menu-boards";
 import type { MenuDraftRooms } from "./menu-draft";
 import type { MenuScreens } from "./menu-screens";
+import type {
+  MenuBoardCommand,
+  MenuBoardCommandResult,
+  MenuBoardCommandResults,
+  MenuBoardCommentsResult,
+  MenuBoardEditError,
+  MenuBoardVersionsResult,
+} from "../contract/menu-board-commands";
 
-/**
- * The board and screen commands that the Organisation Actor runs for its
- * control routes and its screens (Plan 40B phase 1). The routes check the
- * caller's role; a screen command checks the screen's own secret here.
- */
-export type MenuBoardCommand =
-  | Readonly<{ kind: "list_boards" }>
-  | Readonly<{
-      kind: "create_board";
-      title: string;
-      layout: MenuBoardLayout;
-      start?: MenuBoardStart;
-      userId: UserId;
-    }>
-  | Readonly<{
-      kind: "publish_board";
-      boardId: string;
-      documentRevision: number;
-      expectedReleaseRevision: number | null;
-      userId: UserId;
-    }>
-  | Readonly<{ kind: "list_screens" }>
-  | Readonly<{
-      kind: "pair_screen";
-      screenId: string;
-      secret: string;
-      name: string;
-      boardId: string;
-      userId: UserId;
-    }>
-  | Readonly<{ kind: "assign_screen"; screenId: string; boardId: string }>
-  | Readonly<{ kind: "remove_screen"; screenId: string }>
-  | Readonly<{ kind: "screen_feed"; screenId: string; secret: string }>
-  | Readonly<{ kind: "published_media"; mediaId: string }>
-  // Plan 40B, board removal: archive or restore, and the boards that show
-  // a library image before a person deletes it.
-  | Readonly<{
-      kind: "set_board_archived";
-      boardId: string;
-      archived: boolean;
-      userId: UserId;
-    }>
-  | Readonly<{ kind: "media_on_boards"; mediaId: string }>
-  // Plan 40B phase 5, slice 6: comments pinned to a board's elements.
-  | Readonly<{ kind: "list_comments"; boardId: string; userId: UserId }>
-  | Readonly<{
-      kind: "add_comment";
-      boardId: string;
-      elementId: string | null;
-      threadId: string | null;
-      body: string;
-      operationId: string;
-      userId: UserId;
-    }>
-  | Readonly<{
-      kind: "resolve_comment";
-      boardId: string;
-      threadId: string;
-      resolved: boolean;
-      userId: UserId;
-    }>
-  | Readonly<{
-      kind: "delete_comment";
-      boardId: string;
-      commentId: string;
-      userId: UserId;
-    }>
-  // Plan 40B phase 5, slice 7: the board's versions.
-  | Readonly<{ kind: "list_versions"; boardId: string }>
-  | Readonly<{
-      kind: "save_version" | "restore_version";
-      boardId: string;
-      /** The name of a new version, or the version to restore. */
-      value: string;
-      operationId: string;
-      userId: UserId;
-      controlSessionId: ControlSessionId;
-    }>;
-
-type MenuBoardVersionsResult = Result<
-  Readonly<{ versions: readonly MenuBoardVersionSummary[] }>,
-  MenuBoardEditError
->;
-
-type MenuBoardCommentsResult = Result<
-  Readonly<{ threads: readonly MenuBoardCommentThread[] }>,
-  MenuBoardEditError
->;
-
-type MenuScreenFeedRead = Readonly<{
-  screen: Readonly<{ screenId: string; name: string }>;
-  release: MenuBoardRelease | null;
-}>;
-
-/** The result of each command kind. */
-type MenuBoardCommandResults = Readonly<{
-  list_boards: Result<
-    Readonly<{
-      boards: readonly MenuBoardSummary[];
-      archivedBoards: readonly ArchivedMenuBoard[];
-    }>,
-    never
-  >;
-  set_board_archived: MenuBoardArchiveResult;
-  media_on_boards: Result<Readonly<{ boards: readonly string[] }>, never>;
-  create_board: Result<
-    MenuBoardSummary,
-    Readonly<{ code: "menu_board_limit" | "menu_board_unavailable" }>
-  >;
-  publish_board: MenuBoardPublication;
-  published_media: Result<Readonly<{ named: boolean }>, never>;
-  list_screens: Result<
-    Readonly<{ screens: readonly MenuScreenSummary[] }>,
-    never
-  >;
-  pair_screen: Result<
-    Readonly<{ screenId: string }>,
-    Readonly<{ code: "menu_board_missing" | "menu_screen_limit" }>
-  >;
-  assign_screen: Result<
-    Readonly<{ screenId: string }>,
-    Readonly<{ code: "menu_board_missing" | "menu_screen_missing" }>
-  >;
-  remove_screen: Result<
-    Readonly<{ screenId: string }>,
-    Readonly<{ code: "menu_screen_missing" }>
-  >;
-  screen_feed: Result<
-    MenuScreenFeedRead,
-    Readonly<{ code: "menu_screen_refused" }>
-  >;
-  list_comments: MenuBoardCommentsResult;
-  add_comment: MenuBoardCommentsResult;
-  resolve_comment: MenuBoardCommentsResult;
-  delete_comment: MenuBoardCommentsResult;
-  list_versions: MenuBoardVersionsResult;
-  save_version: MenuBoardVersionsResult;
-  restore_version: MenuBoardVersionsResult;
-}>;
-
-export type MenuBoardCommandResult<C extends MenuBoardCommand> =
-  MenuBoardCommandResults[C["kind"]];
-
-/** What the Actor answers: the result, or a refusal before the command ran. */
-export type MenuBoardCommandReply<C extends MenuBoardCommand> =
-  | MenuBoardCommandResult<C>
-  | Result<never, Readonly<{ code: "organisation_placement_conflict" }>>;
+export type {
+  MenuBoardCommand,
+  MenuBoardCommandReply,
+} from "../contract/menu-board-commands";
 
 type Parts = Readonly<{
   boards: MenuBoardRooms;

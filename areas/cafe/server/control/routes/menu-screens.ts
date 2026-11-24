@@ -10,7 +10,7 @@ import { encodeBase64Url, sha256Hex } from "@purin-labs/std";
 import { CommerceStorefrontClient } from "@purin-labs/commerce-client";
 
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { MenuBoardCommandReply } from "../../actors/menu-board-commands";
+import type { MenuBoardCommandReply } from "../../contract/menu-board-commands";
 import {
   menuScreenSocketToken,
   parseMenuScreenToken,

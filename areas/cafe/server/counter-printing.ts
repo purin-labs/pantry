@@ -16,11 +16,13 @@ import {
   executeCounterSaleAfterSale,
   readCounterSaleView,
   recordCounterSaleCash,
-  type CounterRegisterDeps,
-  type CounterRegisterResult,
   type CounterSaleAfterSaleAction,
-  type CounterSaleView,
 } from "./counter-register";
+import type {
+  CounterRegisterDeps,
+  CounterRegisterResult,
+  CounterSaleView,
+} from "./contract/counter-sale";
 
 /**
  * The receipt printer and the cash drawer of a café counter (Plan 90 Phase

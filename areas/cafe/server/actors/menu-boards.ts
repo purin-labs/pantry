@@ -84,7 +84,6 @@ import {
   boardArchiveState,
   listArchivedBoards,
   writeBoardArchived,
-  type ArchivedMenuBoard,
 } from "./menu-board-archive";
 import {
   addMenuBoardComment,
@@ -93,7 +92,6 @@ import {
   listMenuBoardComments,
   resolveMenuBoardComment,
   type MenuBoardCommentAuthor,
-  type MenuBoardCommentError,
 } from "./menu-board-comments";
 import {
   createMenuBoardVersionSchema,
@@ -111,6 +109,12 @@ import {
   type CollaborationSocketRoom,
 } from "@purin-labs/collaboration/worker/collaboration-room";
 import type { Variant } from "@purin-labs/type-utils";
+import type {
+  ArchivedMenuBoard,
+  MenuBoardArchiveResult,
+  MenuBoardEditError,
+  MenuBoardPublication,
+} from "../contract/menu-board-commands";
 
 /**
  * The menu boards of an Organisation (Plan 40B phase 1). Each board is a
@@ -132,22 +136,6 @@ type BoardRoom = CollaborationRoom<
   MenuBoardRoomMetadata,
   MenuBoardFailureCode,
   MenuBoardDoc
->;
-
-export type MenuBoardPublication = Result<
-  Readonly<{ release: MenuBoardRelease; replayed: boolean }>,
-  | Readonly<{ code: "menu_board_missing" | "menu_board_unavailable" }>
-  | Readonly<{ code: "menu_board_changed"; documentRevision: number }>
-  | Readonly<{
-      code: "menu_board_release_conflict";
-      releaseRevision: number | null;
-    }>
-  | Readonly<{ code: "menu_board_empty" | "menu_board_unplaced" }>
-  | Readonly<{ code: "menu_board_media_unavailable" }>
-  | Readonly<{
-      code: "menu_board_binding_missing";
-      elementIds: readonly string[];
-    }>
 >;
 
 type MenuBoardCreation = Result<
@@ -346,36 +334,6 @@ type MenuBoardChangeSide =
 
 export type MenuBoardEditResult = MenuBoardRead &
   Readonly<{ change: MenuBoardChange }>;
-
-export type MenuBoardEditError = Readonly<{
-  code:
-    | "menu_board_missing"
-    | "menu_board_unavailable"
-    | "menu_board_element_missing"
-    | "menu_board_text_changed"
-    | "menu_board_edit_invalid"
-    | MenuBoardCommentError["code"]
-    | "menu_board_version_missing"
-    | "menu_board_version_invalid"
-    | "organisation_placement_conflict"
-    | "access_revoked"
-    | "room_full";
-  current?: string;
-}>;
-
-export type MenuBoardArchiveResult = Result<
-  Readonly<{
-    boardId: string;
-    archived: boolean;
-    /** The active boards after the change. */
-    boards: number;
-    archivedBoards: readonly ArchivedMenuBoard[];
-  }>,
-  Readonly<
-    | { code: "menu_board_missing" | "menu_board_limit"; screens?: never }
-    | { code: "menu_board_on_screen"; screens: number }
-  >
->;
 
 export class MenuBoardRooms {
   readonly #rooms = new Map<string, BoardRoom>();

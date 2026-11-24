@@ -1,4 +1,5 @@
 import type { UserId } from "@purin-labs/control-api/ids";
+import type { ArchivedMenuBoard } from "../contract/menu-board-commands";
 
 /**
  * Archived menu boards (Plan 40B, board removal). An owner or admin archives
@@ -49,12 +50,6 @@ export function writeBoardArchived(
     boardId,
   );
 }
-
-export type ArchivedMenuBoard = Readonly<{
-  boardId: string;
-  title: string;
-  archivedAt: number;
-}>;
 
 /** The archived boards, newest archive first. */
 export function listArchivedBoards(sql: SqlStorage): ArchivedMenuBoard[] {

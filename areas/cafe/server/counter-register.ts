@@ -4,7 +4,6 @@ import {
   type TerminalAssignment,
 } from "@purin-labs/commerce-contracts";
 import type {
-  CommerceAdminClient,
   CommerceClientError,
   CommerceCounterSaleV1,
   CommerceMerchantSnapshotV1,
@@ -28,67 +27,24 @@ import type {
 import { assertNever } from "@purin-labs/std";
 
 import { deviceFleetStub } from "@purin-labs/area-devices/server/contract/fleet-stub";
-import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
+// prettier-ignore
 import {
   readCounterSale as readCounterSaleState,
-  type CounterSaleReadback,
 } from "./data/counter-sale-readback";
 import { readActiveTerminalAssignment } from "./data/terminal-assignment-store";
-import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { CAFE_MENU_ID } from "./contract/menu-publication";
 import { presentOrderQueueEntry } from "./contract/order-queue-commands";
+import type {
+  CounterRegisterDeps,
+  CounterRegisterResult,
+  CounterSaleView,
+} from "./contract/counter-sale";
 
 const ALL_JAPAN_METHODS: readonly CounterRegisterPaymentMethod[] = [
   "card",
   "felica",
   "qr_code",
 ];
-
-type CounterSaleAfterSale = Readonly<{
-  order: Readonly<{
-    id: string;
-    revision: number;
-    state: CommerceOrderV1["lifecycle"]["state"];
-  }>;
-  payment: Readonly<{
-    id: string;
-    revision: number;
-    state: CommercePaymentV1["lifecycle"]["state"];
-  }>;
-  fulfillment: Readonly<{
-    id: string;
-    revision: number;
-    state: CommercePickupFulfillmentV1["lifecycle"]["state"];
-  }>;
-  refundState: "none" | "pending" | "completed" | "failed";
-}>;
-
-export type CounterSaleView = CounterSaleReadback &
-  Readonly<{
-    afterSale: CounterSaleAfterSale | null;
-  }>;
-
-export type CounterRegisterDeps = Readonly<{
-  env: Env;
-  scope: OrganisationExecutionScope;
-  organisationId: OrganisationId;
-  merchantId: string;
-  client: CommerceAdminClient;
-}>;
-
-export type CounterRegisterFailure =
-  | Readonly<{ kind: "commerce"; error: CommerceClientError }>
-  | Readonly<{
-      kind: "error";
-      code: string;
-      status: number;
-      extra?: Record<string, unknown>;
-    }>;
-
-export type CounterRegisterResult<T> =
-  | Readonly<{ ok: true; value: T }>
-  | Readonly<{ ok: false; failure: CounterRegisterFailure }>;
 
 function ok<T>(value: T): CounterRegisterResult<T> {
   return { ok: true, value };

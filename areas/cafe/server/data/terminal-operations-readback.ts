@@ -9,27 +9,10 @@ import {
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { listActiveTerminalAssignments } from "./terminal-assignment-store";
 import type { TerminalCounterReadback } from "@purin-labs/control-api";
-/**
- * What an operator needs in order to answer "can this counter take a payment
- * right now, and if not, why".
- *
- * Every field is a fact Pantry already holds. Nothing is inferred from elapsed
- * time, and device health is reported beside collection eligibility rather than
- * folded into it: a device Square has not heard from is a provider-time
- * collection failure, not a loss of authority.
- */
-type TerminalOperationsReadback = Readonly<{
-  schemaVersion: "pantry.terminal-operations.v2";
-  organisationId: OrganisationId;
-  generatedAt: string;
-  counters: readonly TerminalCounterReadback[];
-  /**
-   * Rows that could not be parsed. Surfaced as a count rather than dropped,
-   * because a counter Pantry cannot describe is still a counter that exists.
-   */
-  unreadableAssignments: number;
-}>;
-
+import type {
+  TerminalOperationsReadback,
+  TerminalOperationsRequest,
+} from "../contract/cafe-services";
 /**
  * Read every card-present counter for one organisation.
  *
@@ -37,13 +20,7 @@ type TerminalOperationsReadback = Readonly<{
  * a terminal in a bad state, it is a location that does not sell this way.
  */
 export async function readTerminalOperations(
-  input: Readonly<{
-    db: OrganisationDatabase;
-    organisationId: OrganisationId;
-    now: number;
-    /** The Square locations whose payments Commerce takes (Plan 80). */
-    linkedLocationIds: ReadonlySet<string>;
-  }>,
+  input: TerminalOperationsRequest,
 ): Promise<TerminalOperationsReadback> {
   const assignments = await listActiveTerminalAssignments(
     input.db,

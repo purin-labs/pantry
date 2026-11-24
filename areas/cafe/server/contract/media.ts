@@ -12,7 +12,10 @@ import { createCommerceClient } from "@purin-labs/area-commerce/server/contract/
 import { commerceCommandInput, type CommerceAdminClient } from "@purin-labs/commerce-client";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Result } from "@purin-labs/kernel/result";
-import type { MenuBoardCommand, MenuBoardCommandReply } from "../actors/menu-board-commands";
+import type {
+  MenuBoardCommand,
+  MenuBoardCommandReply,
+} from "./menu-board-commands";
 import { CAFE_STOREFRONT_ID } from "./menu-publication";
 import type { Variant } from "@purin-labs/type-utils";
 
