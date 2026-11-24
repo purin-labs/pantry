@@ -253,13 +253,15 @@ async function rejectsHttpFailure(status: number): Promise<void> {
     signal: new AbortController().signal,
     fetcher,
   });
-  const code =
+  const error =
     status === 401 || status === 403
-      ? "jev_credential_rejected"
+      ? { code: "jev_credential_rejected" }
       : status === 402
-        ? "jev_budget_exhausted"
-        : "jev_unavailable";
-  expect(result).toEqual({ ok: false, error: { code } });
+        ? { code: "jev_budget_exhausted" }
+        : status === 429
+          ? { code: "jev_rate_limited", retryAfterMs: 60_000 }
+          : { code: "jev_unavailable" };
+  expect(result).toEqual({ ok: false, error });
   expect(fetcher).toHaveBeenCalledTimes(1);
 }
 

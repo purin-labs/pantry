@@ -4,7 +4,7 @@ import {
 } from "@purin-labs/kernel/lenient-base64";
 import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
 import type { Result } from "@purin-labs/kernel/result";
-import { decodeBase64, isRecord } from "@purin-labs/std";
+import { decodeBase64, isRecord, retryAfterMs } from "@purin-labs/std";
 import type {
   MailInboxMessage,
   MailInboxThreadMessage,
@@ -550,18 +550,11 @@ async function gmailFetch(
     return { ok: false, error: { code: "gmail_unauthorized" } };
   }
   if (response.status === 429) {
-    const retryAfter = Number.parseInt(
-      response.headers.get("retry-after") ?? "",
-      10,
-    );
     return {
       ok: false,
       error: {
         code: "gmail_rate_limited",
-        retryAfterMs:
-          Number.isFinite(retryAfter) && retryAfter > 0
-            ? retryAfter * 1000
-            : 60_000,
+        retryAfterMs: retryAfterMs(response.headers.get("retry-after"), 60_000),
       },
     };
   }

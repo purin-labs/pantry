@@ -7515,6 +7515,35 @@ async function organizationJourney(): Promise<void> {
   await evictDurableObject(connector.value);
   await runInDurableObject(organisation, restoreMailBudget);
   await runInDurableObject(connector.value, advanceBudgetClock);
+  // TypeSafe's shared rate limit answers the next call with 429. The work
+  // waits for the time that retry-after names, and it is not blocked.
+  let rateLimitedCalls = 0;
+  network.use(
+    http.post(
+      "https://api.typesafe.ai/v1/systemone",
+      () => {
+        rateLimitedCalls += 1;
+        return new HttpResponse(null, {
+          status: 429,
+          headers: { "retry-after": "30" },
+        });
+      },
+      { once: true },
+    ),
+  );
+  await runDurableObjectAlarm(connector.value);
+  expect(rateLimitedCalls).toBe(1);
+  const rateLimited = await organizationView(
+    organisationId,
+    owner.session,
+    accountId,
+  );
+  expect(rateLimited).toMatchObject({ pending: 1, failed: 0, budgetPaused: 0 });
+  expect(rateLimited.classifications).toHaveLength(4);
+  expect(
+    await runInDurableObject(connector.value, nextPendingWorkDue),
+  ).toBeGreaterThan(Date.now() + 20_000);
+  await runInDurableObject(connector.value, advancePendingWorkClock);
   await runDurableObjectAlarm(connector.value);
   const resumed = await organizationView(organisationId, owner.session, accountId);
   expect(resumed.pending).toBe(0);
@@ -8005,6 +8034,27 @@ function exhaustMailBudget(_actor: unknown, state: DurableObjectState): void {
 function restoreMailBudget(_actor: unknown, state: DurableObjectState): void {
   state.storage.sql.exec(
     "UPDATE typesafe_evaluation SET estimated_cost_microusd = 3 WHERE purpose = 'mail_classification'",
+  );
+}
+/** When the next waiting classification work is due. */
+function nextPendingWorkDue(
+  _actor: unknown,
+  state: DurableObjectState,
+): number | null {
+  return (
+    state.storage.sql
+      .exec<{ due: number | null }>(
+        "SELECT MIN(due_at) AS due FROM mail_classification_work WHERE state = 'pending'",
+      )
+      .toArray()[0]?.due ?? null
+  );
+}
+function advancePendingWorkClock(
+  _actor: unknown,
+  state: DurableObjectState,
+): void {
+  state.storage.sql.exec(
+    "UPDATE mail_classification_work SET due_at = 0 WHERE state = 'pending'",
   );
 }
 function advanceBudgetClock(_actor: unknown, state: DurableObjectState): void {

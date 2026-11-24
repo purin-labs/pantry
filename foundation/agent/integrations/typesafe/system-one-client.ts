@@ -1,5 +1,6 @@
 import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
 import type { Result } from "@purin-labs/kernel/result";
+import { retryAfterMs } from "@purin-labs/std";
 import { parseSystemOneJson } from "./response-json";
 
 const SYSTEM_ONE_URL = "https://api.typesafe.ai/v1/systemone";
@@ -14,6 +15,9 @@ export function jevInputCostMicrousd(inputTokens: number): number {
   return Math.ceil(inputTokens * 0.042);
 }
 
+/** The wait after a TypeSafe 429 with no usable `Retry-After` header. */
+const RATE_LIMIT_RETRY_MS = 60_000;
+
 export type JevError = Readonly<{
   code:
     | "jev_credential_unavailable"
@@ -22,7 +26,10 @@ export type JevError = Readonly<{
     | "jev_input_invalid"
     | "jev_cancelled"
     | "jev_unavailable"
+    | "jev_rate_limited"
     | "jev_response_invalid";
+  /** With `jev_rate_limited`: the wait that TypeSafe asked for. */
+  retryAfterMs?: number;
 }>;
 
 /** Transport only. The owning feature authorizes egress and builds/parses its contract. */
@@ -67,6 +74,18 @@ export async function postSystemOne(input: {
         return failure("jev_credential_rejected");
       }
       if (response.status === 402) return failure("jev_budget_exhausted");
+      // TypeSafe did not run the call: the caller may try it again later.
+      if (response.status === 429)
+        return {
+          ok: false,
+          error: {
+            code: "jev_rate_limited",
+            retryAfterMs: retryAfterMs(
+              response.headers.get("retry-after"),
+              RATE_LIMIT_RETRY_MS,
+            ),
+          },
+        };
       return failure("jev_unavailable");
     }
     return await readResponse(response, signal);

@@ -254,7 +254,12 @@ export async function runMailOrganization(
           evaluated.error.code === "mail_classification_source_unavailable" ||
           evaluated.error.code === "organisation_placement_conflict"
         )
-          retryMailWork(input.storage.sql, work, Date.now());
+          retryMailWork(
+            input.storage.sql,
+            work,
+            Date.now(),
+            evaluated.error.retryAfterMs,
+          );
         else finishMailWork(input.storage.sql, work, "blocked");
         continue;
       }

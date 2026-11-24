@@ -85,6 +85,12 @@ The ledger refuses a sixth call on the Purin key in one second for one Organisat
 with `rate_limited`. Mail work then retries after 60 s, and becomes `blocked` after 5
 attempts. Related Cases retries. The relevance check drops.
 
+TypeSafe's own limit answers HTTP 429, which gives `jev_rate_limited` with the wait of
+its `retry-after` header (60 s without one). Mail work ends the reservation of that call
+(`releaseTypeSafeEvaluation`), so the call counts no use, and it retries after that wait,
+within the same 5 attempts. Related Cases and the relevance check record the call as
+failed.
+
 ### Daily limits under the allowance
 
 | Feature             | Constant                                                             | Calls a day        | Cost a day | Reservation | Timeout |
@@ -286,8 +292,7 @@ parser refuses, gives 422. Another refusal gives 409, and a failure of the Actor
   started. The Paid use section on Settings › Jev says the same under "How you pay".
 - Pantry has no Portal notification at 80 % or 100 % of the free use. No chat sentence
   tells a person that a Jev feature stopped.
-- A TypeSafe HTTP 429 gives `jev_unavailable`, and the mail work ends `blocked`. Pantry
-  does not read `retry-after`. No journey covers the fair share.
+- No journey covers the ledger's fair share of 5 calls a second.
 - A mailbox connected after the switch was turned on is not on until an admin turns the
   switch off and on. A Gmail reconnect gives a new source pin, with the same effect.
 - If the move of the mail switch to a new authority fails, Pantry logs a warning

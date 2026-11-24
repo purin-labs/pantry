@@ -306,6 +306,10 @@ function readResponse(raw: unknown): unknown {
         throw new Error(
           "TypeSafe could not be reached. Check its availability and try again.",
         );
+      case "jev_rate_limited":
+        throw new Error(
+          "TypeSafe is busy. Wait a minute, then test the key again.",
+        );
       case "jev_response_invalid":
         throw new Error(
           "TypeSafe returned an invalid response. Try again or check its service status.",

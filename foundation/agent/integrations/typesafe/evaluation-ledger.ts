@@ -358,6 +358,26 @@ export function settleTypeSafeEvaluation(
   };
 }
 
+/**
+ * Ends a reservation that TypeSafe did not run, such as a call that it
+ * refused with 429. The call counts no use, and the same evaluation can be
+ * reserved again.
+ */
+export function releaseTypeSafeEvaluation(
+  sql: SqlStorage,
+  key: TypeSafeEvaluationKey,
+): void {
+  sql.exec(
+    `DELETE FROM typesafe_evaluation
+    WHERE organisation_id = ? AND purpose = ? AND evaluation_id = ? AND request_digest = ?
+      AND settlement_state = 'pending'`,
+    key.organisationId,
+    key.purpose,
+    key.evaluationId,
+    key.requestDigest,
+  );
+}
+
 export function invalidateTypeSafeEvaluations(
   sql: SqlStorage,
   organisationId: OrganisationId,
@@ -551,6 +571,7 @@ function parseFailureCode(raw: unknown): JevError["code"] | null {
     case "jev_input_invalid":
     case "jev_cancelled":
     case "jev_unavailable":
+    case "jev_rate_limited":
     case "jev_response_invalid":
       return raw;
     default:

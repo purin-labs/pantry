@@ -1,7 +1,7 @@
 import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
 import type { ChannelId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import { errorMessage, isRecord } from "@purin-labs/std";
+import { errorMessage, isRecord, retryAfterMs } from "@purin-labs/std";
 
 const SLACK_THREAD_STATUS_TIMEOUT_MS = 2_000;
 
@@ -262,12 +262,5 @@ export function slackRetryAt(
   now: number,
   fallbackMs = 1_000,
 ): number {
-  if (raw === null) {
-    return now + fallbackMs;
-  }
-
-  const seconds = Number(raw);
-  return Number.isFinite(seconds) && seconds > 0
-    ? now + Math.ceil(seconds * 1_000)
-    : now + fallbackMs;
+  return now + retryAfterMs(raw, fallbackMs);
 }

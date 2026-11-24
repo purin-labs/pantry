@@ -225,6 +225,18 @@ export function backoffDelay(
   return Math.min(baseMs * 2 ** Math.max(0, retry), maxMs);
 }
 
+/**
+ * The wait that an HTTP `Retry-After` header names in seconds, in
+ * milliseconds. A missing header, or one that is not a positive number of
+ * seconds, gives `fallbackMs`.
+ */
+export function retryAfterMs(raw: string | null, fallbackMs: number): number {
+  const seconds = raw === null ? Number.NaN : Number(raw);
+  return Number.isFinite(seconds) && seconds > 0
+    ? Math.ceil(seconds * 1_000)
+    : fallbackMs;
+}
+
 // Encoding
 
 /** Lowercase hexadecimal, two digits per byte. */

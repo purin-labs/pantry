@@ -262,14 +262,16 @@ export function finishMailWork(
     work.workId,
   );
 }
+/** The work tries again after `waitMs` (a minute by default), at most 5 times. */
 export function retryMailWork(
   sql: SqlStorage,
   work: MailWork,
   now: number,
+  waitMs = 60_000,
 ): void {
   sql.exec(
     "UPDATE mail_classification_work SET state = CASE WHEN attempts >= 5 THEN 'blocked' ELSE 'pending' END, due_at = ? WHERE work_id = ? AND state = 'evaluating'",
-    now + 60_000,
+    now + waitMs,
     work.workId,
   );
 }

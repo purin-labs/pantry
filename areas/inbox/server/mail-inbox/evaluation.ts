@@ -15,6 +15,7 @@ import type {
 } from "@purin-labs/kernel/ids";
 import type { TypeSafeCredential } from "@purin-labs/agent/integrations/typesafe/credential";
 import {
+  releaseTypeSafeEvaluation,
   reserveTypeSafeEvaluation,
   settleTypeSafeEvaluation,
   type TypeSafeUsageAuthority,
@@ -42,7 +43,11 @@ type MailEvaluationResult = Readonly<{
   classifications: readonly MailClassification[];
   contentDigest: string;
 }>;
-type MailEvaluationError = Readonly<{ code: string }>;
+type MailEvaluationError = Readonly<{
+  code: string;
+  /** With `rate_limited` from TypeSafe: the wait that it asked for. */
+  retryAfterMs?: number;
+}>;
 const MAIL_USAGE_LIMITS = {
   maxEvaluations: 100,
   maxConcurrentEvaluations: 4,
@@ -205,6 +210,18 @@ export async function evaluateMail(
     signal: new AbortController().signal,
     fetcher,
   });
+  if (!evaluated.ok && evaluated.error.code === "jev_rate_limited") {
+    // TypeSafe's shared limit refused the call (Plan 88 D8): it ran nothing,
+    // so the reservation ends, and the work tries again after the wait.
+    input.transaction(releaseTypeSafeEvaluation.bind(null, input.sql, key));
+    return {
+      ok: false,
+      error: {
+        code: "rate_limited",
+        retryAfterMs: evaluated.error.retryAfterMs,
+      },
+    };
+  }
   const current = await authorizeMailSource(
     input.env,
     request.authority,
