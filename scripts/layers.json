@@ -460,6 +460,7 @@
     "workers/platform/src/control/routes/commerce.ts": "workers/platform",
     "workers/platform/src/integration-gateway.ts": "workers/platform",
     "workers/platform/src/onboarding-reconciliation-runner.ts": "workers/platform",
+    "workers/platform/src/organisation-daily-steps.ts": "workers/platform",
     "workers/platform/src/organisation-lifecycle-parts.ts": "workers/platform",
     "workers/platform/src/vault-onepassword/core-wasm.d.ts": "workers/platform",
     "workers/platform/src/vault-onepassword/worker.ts": "workers/platform",
