@@ -45,7 +45,7 @@ const invalidDocument: UserPreferenceDocument = {
 };
 // @ts-expect-error A chat command cannot address Kitchen.
 const invalidCommand: UserPreferenceEdit = {
-  area: "bakeryos",
+  area: "kitchen",
   command: { kind: "set_docked_chat_width", widthPx: 800 },
 };
 const invalidOwner: UserPreferenceDocument = {

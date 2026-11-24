@@ -335,7 +335,7 @@ export default class WorkflowSimulatorRoute extends React.Component<
     this.unsubscribePreferences =
       this.context?.subscribe(this.syncViewPreferences.bind(this)) ?? null;
     this.syncViewPreferences();
-    void this.context?.load("bakeryos");
+    void this.context?.load("kitchen");
     this.mounted = true;
     this.playback.synced();
     this.unsubscribeTime = this.playback.time.subscribe(
@@ -2489,22 +2489,22 @@ export default class WorkflowSimulatorRoute extends React.Component<
   }
   private persistViewPreferences(): void {
     const owner = this.context;
-    const document = owner?.document("bakeryos");
-    if (document?.area !== "bakeryos" || owner === null) return;
+    const document = owner?.document("kitchen");
+    if (document?.area !== "kitchen" || owner === null) return;
     if (document.values.scene.labels !== this.state.view.labels)
       owner.edit({
-        area: "bakeryos",
+        area: "kitchen",
         command: { kind: "set_scene_labels", labels: this.state.view.labels },
       });
     if (document.values.scene.minimap !== this.state.view.minimap)
       owner.edit({
-        area: "bakeryos",
+        area: "kitchen",
         command: { kind: "set_minimap", visible: this.state.view.minimap },
       });
   }
   private syncViewPreferences(): void {
-    const document = this.context?.document("bakeryos");
-    if (document?.area !== "bakeryos") return;
+    const document = this.context?.document("kitchen");
+    if (document?.area !== "kitchen") return;
     const scene = document.values.scene;
     if (
       scene.labels === this.state.view.labels &&

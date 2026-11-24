@@ -18,7 +18,7 @@ import type {
 } from "@purin-labs/contracts";
 
 export type HomeSnapshot = {
-  readonly schemaVersion: "pantry.cafeos.home.v1";
+  readonly schemaVersion: "pantry.home.v1";
   readonly generatedAt: number;
   readonly workspace: {
     readonly organisationId: string;
@@ -53,7 +53,7 @@ export function parseHomeResponse(raw: unknown): HomeSnapshot {
   if (
     !isRecord(raw) ||
     raw.ok !== true ||
-    raw.schemaVersion !== "pantry.cafeos.home.v1" ||
+    raw.schemaVersion !== "pantry.home.v1" ||
     !isNonNegativeInteger(raw.generatedAt) ||
     !isRecord(raw.home)
   ) {
@@ -92,7 +92,7 @@ export function parseHomeResponse(raw: unknown): HomeSnapshot {
     throw new Error("Home response exceeds its bounded view limits.");
   }
   return {
-    schemaVersion: "pantry.cafeos.home.v1",
+    schemaVersion: "pantry.home.v1",
     generatedAt: raw.generatedAt,
     workspace,
     attention,

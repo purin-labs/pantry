@@ -6,7 +6,7 @@ import {
 } from "@purin-labs/std";
 import { isUserId, type UserId } from "./ids.ts";
 
-export type PreferenceArea = "appearance" | "chat" | "bakeryos";
+export type PreferenceArea = "appearance" | "chat" | "kitchen";
 /** Each palette is a data-pantry-theme value in packages/frontend-themes. */
 export const PORTAL_PALETTES = ["slate-coral", "espresso", "paper"] as const;
 export type PortalPalette = (typeof PORTAL_PALETTES)[number];
@@ -28,7 +28,7 @@ export type PreferenceValues = {
     dockedPanelWidthPx: number;
     fullscreenSidebarWidthPx: number;
   }>;
-  bakeryos: Readonly<{
+  kitchen: Readonly<{
     appearance: AppearanceOverride;
     scene: Readonly<{ labels: "auto" | "all" | "off"; minimap: boolean }>;
   }>;
@@ -60,7 +60,7 @@ export type BakeryPreferenceCommand =
 export type PreferenceCommands = {
   appearance: AppearanceCommand;
   chat: ChatPreferenceCommand;
-  bakeryos: BakeryPreferenceCommand;
+  kitchen: BakeryPreferenceCommand;
 };
 export type UserPreferenceEdit = {
   [A in PreferenceArea]: Readonly<{ area: A; command: PreferenceCommands[A] }>;
@@ -83,14 +83,14 @@ export const DEFAULT_CHAT_PREFERENCES: PreferenceValues["chat"] = {
   dockedPanelWidthPx: 600,
   fullscreenSidebarWidthPx: 360,
 };
-export const DEFAULT_BAKERY_PREFERENCES: PreferenceValues["bakeryos"] = {
+export const DEFAULT_BAKERY_PREFERENCES: PreferenceValues["kitchen"] = {
   appearance: { kind: "inherit" },
   scene: { labels: "auto", minimap: false },
 };
 export const MAX_PREFERENCE_BYTES = 8192;
 
 export function isPreferenceArea(raw: unknown): raw is PreferenceArea {
-  return raw === "appearance" || raw === "chat" || raw === "bakeryos";
+  return raw === "appearance" || raw === "chat" || raw === "kitchen";
 }
 export function isDockedChatWidth(raw: unknown): raw is number {
   return isPositiveInteger(raw) && raw >= 340;
@@ -210,7 +210,7 @@ export function parseUserPreferenceDocument(
         },
       };
     }
-    case "bakeryos": {
+    case "kitchen": {
       const values = raw.values;
       if (
         !isRecord(values) ||
@@ -228,7 +228,7 @@ export function parseUserPreferenceDocument(
         ok: true,
         value: {
           ...envelope,
-          area: "bakeryos",
+          area: "kitchen",
           values: {
             appearance,
             scene: {
@@ -267,7 +267,7 @@ export function defaultPreferenceDocument(
         updatedAt: now,
         values: DEFAULT_CHAT_PREFERENCES,
       };
-    case "bakeryos":
+    case "kitchen":
       return {
         userId,
         area,
@@ -310,7 +310,7 @@ export function parsePreferenceEdit(
         return { area, command: { kind: raw.kind, widthPx: raw.widthPx } };
       }
       return null;
-    case "bakeryos":
+    case "kitchen":
       if (
         raw.kind === "set_scene_labels" &&
         hasExactKeys(raw, ["kind", "labels"]) &&
@@ -376,8 +376,8 @@ export function applyPreferenceEdit(
           return assertNever(edit.command);
       }
     }
-    case "bakeryos": {
-      if (document.area !== "bakeryos")
+    case "kitchen": {
+      if (document.area !== "kitchen")
         throw new Error("preferences_area_mismatch");
       switch (edit.command.kind) {
         case "reset":

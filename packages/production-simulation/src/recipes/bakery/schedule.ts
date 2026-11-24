@@ -50,6 +50,10 @@ import {
 import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever, compareCodePoints } from "@purin-labs/std";
 import {
+  readStoredVitrineOrders,
+  writeStoredVitrineOrders,
+} from "./vitrine-order-storage.ts";
+import {
   along,
   route,
   resolveScheduleLayout,
@@ -3209,9 +3213,6 @@ export type VitrineOrderOverride = Readonly<{
   beverageCount?: number;
 }>;
 
-const VITRINE_CUSTOM_ORDERS_STORAGE_KEY =
-  "pantry.bakeryos.vitrineCustomOrders.v1";
-
 const customOrderOverridesByPreset: Readonly<
   Record<VitrineRushPresetId, Map<string, VitrineOrderOverride>>
 > = {
@@ -3231,7 +3232,6 @@ const customAddedOrdersByPreset: Record<
 
 function saveCustomVitrineOrdersToStorage(): void {
   try {
-    if (typeof globalThis.localStorage === "undefined") return;
     const presets: readonly VitrineRushPresetId[] = [
       "quiet",
       "normal",
@@ -3253,14 +3253,7 @@ function saveCustomVitrineOrdersToStorage(): void {
       }
       payload[p] = { overrides, added };
     }
-    if (!hasAny) {
-      globalThis.localStorage.removeItem(VITRINE_CUSTOM_ORDERS_STORAGE_KEY);
-    } else {
-      globalThis.localStorage.setItem(
-        VITRINE_CUSTOM_ORDERS_STORAGE_KEY,
-        JSON.stringify(payload),
-      );
-    }
+    writeStoredVitrineOrders(hasAny ? JSON.stringify(payload) : null);
   } catch {
     // Ignore storage quota or access errors in restricted environments
   }
@@ -3268,10 +3261,7 @@ function saveCustomVitrineOrdersToStorage(): void {
 
 function loadCustomVitrineOrdersFromStorage(): void {
   try {
-    if (typeof globalThis.localStorage === "undefined") return;
-    const raw = globalThis.localStorage.getItem(
-      VITRINE_CUSTOM_ORDERS_STORAGE_KEY,
-    );
+    const raw = readStoredVitrineOrders();
     if (!raw) return;
     const parsed = JSON.parse(raw) as Record<
       string,

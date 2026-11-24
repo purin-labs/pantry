@@ -140,7 +140,7 @@ export function PortalFrame(props: PortalFrameProps): React.ReactNode {
     React.useState<WorkspaceSystem>("commerce");
   const routeSystem = workspaceSystem(props.sidebar?.activePage ?? null);
   const activeSystem = routeSystem ?? lastSystem;
-  usePortalTheme(routeSystem === "kitchen" ? "bakeryos" : "appearance");
+  usePortalTheme(routeSystem === "kitchen" ? "kitchen" : "appearance");
   useSurfaceOnScreen();
   useEffect(rememberWorkspaceSystem.bind(null, routeSystem, setLastSystem), [
     routeSystem,

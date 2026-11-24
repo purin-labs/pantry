@@ -63,7 +63,7 @@ function accountAppearance(
   return document?.area === "appearance" ? document.values : DEFAULT_APPEARANCE;
 }
 export function usePortalTheme(
-  area: "appearance" | "bakeryos" = "appearance",
+  area: "appearance" | "kitchen" = "appearance",
   apply: boolean = true,
 ) {
   const owner = useUserPreferences(area);
@@ -73,8 +73,8 @@ export function usePortalTheme(
   React.useEffect(observeSystem.bind(null, setSystem), []);
   const account = owner === null ? unsigned : accountAppearance(owner);
   let appearance = account;
-  const surface = area === "bakeryos" ? owner?.document("bakeryos") : null;
-  if (surface?.area === "bakeryos")
+  const surface = area === "kitchen" ? owner?.document("kitchen") : null;
+  if (surface?.area === "kitchen")
     appearance = resolveSurfaceAppearance(
       appearance,
       surface.values.appearance,

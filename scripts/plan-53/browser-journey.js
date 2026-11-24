@@ -105,7 +105,7 @@ async (page) => {
       return cookie.name === "pantry_csrf";
     }
     async reset(target = this.page) {
-      for (const area of ["appearance", "chat", "bakeryos"])
+      for (const area of ["appearance", "chat", "kitchen"])
         await this.edit(area, { kind: "reset" }, target);
     }
     async open(userId, target = this.page) {
@@ -314,21 +314,21 @@ async (page) => {
         }
         labels(labels) {
           this.owner.edit({
-            area: "bakeryos",
+            area: "kitchen",
             command: { kind: "set_scene_labels", labels },
           });
         }
         reset() {
-          this.owner.edit({ area: "bakeryos", command: { kind: "reset" } });
+          this.owner.edit({ area: "kitchen", command: { kind: "reset" } });
         }
         render() {
           document.getElementById("queue-values").textContent = JSON.stringify(
-            this.owner.document("bakeryos").values.scene,
+            this.owner.document("kitchen").values.scene,
           );
         }
         async start() {
           this.owner.start();
-          await this.owner.load("bakeryos");
+          await this.owner.load("kitchen");
           this.render();
         }
       }
@@ -339,14 +339,14 @@ async (page) => {
       window.plan53FailBakeryReads = false;
     }
     async queuedResetJourney(alice, second) {
-      await this.edit("bakeryos", { kind: "reset" });
+      await this.edit("kitchen", { kind: "reset" });
       await this.page.goto(
         `http://127.0.0.1:3115/chat-preview.html?preferenceUser=${alice}`,
       );
       await this.page.evaluate(Journey.mountQueueControls, alice);
       await this.login("alice", second);
       await this.edit(
-        "bakeryos",
+        "kitchen",
         { kind: "set_minimap", visible: true },
         second,
       );
@@ -370,7 +370,7 @@ async (page) => {
       if (optimistic.labels !== "off" || optimistic.minimap !== false)
         throw new Error("Reset erased the newer local choice before saving");
       await this.page.evaluate(Journey.releaseWrites);
-      const accepted = await this.waitValue("bakeryos", "scene", {
+      const accepted = await this.waitValue("kitchen", "scene", {
         labels: "off",
         minimap: false,
       });
@@ -381,7 +381,7 @@ async (page) => {
         );
       const cached = await this.page.evaluate(
         Journey.cacheStateForArea,
-        "bakeryos",
+        "kitchen",
       );
       if (JSON.stringify(cached) !== JSON.stringify(accepted))
         throw new Error(
@@ -420,12 +420,12 @@ async (page) => {
       await overview.click();
       if ((await overview.getAttribute("aria-pressed")) !== "true")
         throw new Error("Failed read erased the newer minimap choice");
-      const duringFailure = await this.read("bakeryos");
+      const duringFailure = await this.read("kitchen");
       if (duringFailure.revision !== accepted.revision)
         throw new Error("Failed initial reads wrote pending choices");
       if (
         JSON.stringify(
-          await this.page.evaluate(Journey.cacheStateForArea, "bakeryos"),
+          await this.page.evaluate(Journey.cacheStateForArea, "kitchen"),
         ) !== JSON.stringify(accepted)
       )
         throw new Error("Unsaved choices replaced the accepted scene cache");
@@ -439,7 +439,7 @@ async (page) => {
       });
       await retry.focus();
       await retry.press("Enter");
-      const recovered = await this.waitValue("bakeryos", "scene", {
+      const recovered = await this.waitValue("kitchen", "scene", {
         labels: "all",
         minimap: true,
       });
@@ -452,7 +452,7 @@ async (page) => {
         .waitFor();
       if ((await overview.getAttribute("aria-pressed")) !== "true")
         throw new Error("Recovered minimap choice did not restore");
-      const restored = await this.read("bakeryos");
+      const restored = await this.read("kitchen");
       if (restored.revision !== recovered.revision)
         throw new Error("Reload wrote restored scene preferences");
       await this.page.screenshot({
@@ -721,12 +721,12 @@ async (page) => {
       await this.page
         .getByRole("button", { name: "Floor plan overview", exact: true })
         .click();
-      const scene = await this.waitValue("bakeryos", "scene", {
+      const scene = await this.waitValue("kitchen", "scene", {
         labels: "all",
         minimap: true,
       });
       await this.chooseBakery("Light");
-      await this.waitValue("bakeryos", "appearance", {
+      await this.waitValue("kitchen", "appearance", {
         kind: "custom",
         value: { mode: "light", palette: "sage" },
       });
@@ -740,7 +740,7 @@ async (page) => {
         path: "output/playwright/plan-53/bakery-custom.png",
       });
       await this.chooseBakery("Use account appearance");
-      await this.waitValue("bakeryos", "appearance", { kind: "inherit" });
+      await this.waitValue("kitchen", "appearance", { kind: "inherit" });
       if ((await this.page.evaluate(Journey.theme)) !== "dark")
         throw new Error("Surface did not resume inheritance");
       await this.chooseAccount("Use device appearance");

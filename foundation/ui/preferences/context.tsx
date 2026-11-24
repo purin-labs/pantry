@@ -5,7 +5,7 @@ import { UserPreferenceOwner } from "./owner";
 
 export const UserPreferencesContext =
   React.createContext<UserPreferenceOwner | null>(null);
-const AREAS: readonly PreferenceArea[] = ["appearance", "chat", "bakeryos"];
+const AREAS: readonly PreferenceArea[] = ["appearance", "chat", "kitchen"];
 
 export function UserPreferencesProvider(
   props: Readonly<{ userId: UserId; children: React.ReactNode }>,

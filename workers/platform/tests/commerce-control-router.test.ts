@@ -698,7 +698,7 @@ describe("commerce control query routes", () => {
       expect(body, path).toMatchObject({ ok: true });
       if (path.endsWith("/home")) {
         expect(body).toMatchObject({
-          schemaVersion: "pantry.cafeos.home.v1",
+          schemaVersion: "pantry.home.v1",
           home: {
             workspace: {
               organisationId: ORGANISATION_ID,

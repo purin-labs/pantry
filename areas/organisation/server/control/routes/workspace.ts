@@ -60,7 +60,7 @@ type HomeActionActivity = Pick<
       }>;
   }>;
 
-const HOME_VIEW_SCHEMA_VERSION = "pantry.cafeos.home.v1" as const;
+const HOME_VIEW_SCHEMA_VERSION = "pantry.home.v1" as const;
 const HOME_ATTENTION_LIMIT = 5;
 const HOME_BLOCKER_LIMIT = 8;
 

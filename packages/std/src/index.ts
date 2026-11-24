@@ -582,3 +582,26 @@ function compareUtf16(left: string, right: string): number {
   if (left > right) return 1;
   return 0;
 }
+
+/** The part of a Web Storage object that `moveStoredValue` uses. */
+export type KeyValueStorage = Readonly<{
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+  removeItem(key: string): void;
+}>;
+
+/**
+ * Moves the value of a renamed storage key, one time. When `from` holds a
+ * value and `to` holds none, the value goes to `to`. Then `from` is removed,
+ * so a second call changes nothing.
+ */
+export function moveStoredValue(
+  storage: KeyValueStorage,
+  from: string,
+  to: string,
+): void {
+  const value = storage.getItem(from);
+  if (value === null) return;
+  if (storage.getItem(to) === null) storage.setItem(to, value);
+  storage.removeItem(from);
+}

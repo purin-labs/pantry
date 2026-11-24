@@ -37,7 +37,7 @@ async function plan53Fetch(input, init) {
   if (
     (method === "PATCH" && window.plan53FailSaves) ||
     (method === "GET" &&
-      url.pathname.endsWith("/bakeryos") &&
+      url.pathname.endsWith("/kitchen") &&
       window.plan53FailBakeryReads)
   ) {
     window.plan53PreferenceRequests.push({

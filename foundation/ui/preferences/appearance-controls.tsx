@@ -121,10 +121,10 @@ function renderPalette(
   );
 }
 export function BakeryAppearanceControl(): React.ReactNode {
-  const owner = useUserPreferences("bakeryos");
+  const owner = useUserPreferences("kitchen");
   if (owner === null) return null;
-  const document = owner.document("bakeryos");
-  if (document.area !== "bakeryos") return null;
+  const document = owner.document("kitchen");
+  if (document.area !== "kitchen") return null;
   const override = document.values.appearance;
   const mode = override.kind === "inherit" ? "inherit" : override.value.mode;
   return (
@@ -171,7 +171,7 @@ export function BakeryAppearanceControl(): React.ReactNode {
 }
 function inheritAppearance(owner: UserPreferenceOwner): void {
   owner.edit({
-    area: "bakeryos",
+    area: "kitchen",
     command: { kind: "set_surface_appearance", value: { kind: "inherit" } },
   });
 }
@@ -180,7 +180,7 @@ function customizeAppearance(
   mode: AppearancePreferences["mode"],
 ): void {
   owner.edit({
-    area: "bakeryos",
+    area: "kitchen",
     command: {
       kind: "set_surface_appearance",
       // The surface keeps only the mode; the account theme always applies.

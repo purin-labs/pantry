@@ -579,7 +579,7 @@ async function main() {
     "workspace switcher supports Arrow, Home, End, and Escape with focus restoration",
   );
   const compactPreference = runCli("run-code", [
-    "async (page) => { const key = 'pantry:cafeos:sidebar-expanded'; await page.evaluate((storageKey) => localStorage.setItem(storageKey, 'false'), key); const before = await page.evaluate((storageKey) => localStorage.getItem(storageKey), key); const toggle = page.getByRole('button', { name: /sidebar/ }); await toggle.focus(); await page.keyboard.press('Enter'); const closed = await page.locator('aside.console-sidebar').getAttribute('hidden') !== null; await page.keyboard.press('Enter'); const reopened = await page.locator('aside.console-sidebar').getAttribute('hidden') === null; const after = await page.evaluate((storageKey) => localStorage.getItem(storageKey), key); return { before, after, closed, reopened }; }",
+    "async (page) => { const key = 'pantry:sidebar-expanded'; await page.evaluate((storageKey) => localStorage.setItem(storageKey, 'false'), key); const before = await page.evaluate((storageKey) => localStorage.getItem(storageKey), key); const toggle = page.getByRole('button', { name: /sidebar/ }); await toggle.focus(); await page.keyboard.press('Enter'); const closed = await page.locator('aside.console-sidebar').getAttribute('hidden') !== null; await page.keyboard.press('Enter'); const reopened = await page.locator('aside.console-sidebar').getAttribute('hidden') === null; const after = await page.evaluate((storageKey) => localStorage.getItem(storageKey), key); return { before, after, closed, reopened }; }",
   ]);
   assertCheck(
     compactPreference.closed &&

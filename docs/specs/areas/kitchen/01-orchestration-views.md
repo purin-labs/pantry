@@ -103,7 +103,7 @@ Saves of scenarios and runs stay with the person, who confirms each one on the p
 - The café order demand has the rush presets `quiet`, `normal` and `weekend-rush`. On
   the order track a person drags, adds and removes customer orders, and imports or
   exports them as JSON. The custom orders stay in browser `localStorage`
-  (`pantry.bakeryos.vitrineCustomOrders.v1`).
+  (`pantry.kitchen.vitrineCustomOrders.v1`).
 - The **Scenarios** dock also takes a measured-shift JSON file
   (`docks/measured-shift-import.tsx`). It previews the observed durations. For the
   built-in sample shift only, it stages rounded values in the input draft. An incomplete

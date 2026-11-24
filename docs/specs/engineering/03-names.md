@@ -246,7 +246,12 @@ privacy page `https://pantry.purin.io/docs/privacy` and the terms page
   resource. `run-worker.mjs` also refuses resource creation options and target overrides.
   The docs site and the shop use plain `wrangler deploy`, and they bind no such resource.
 - **Old names.** Do not add an old Worker name to `WORKER_NAMES`. Do not add a reader, a
-  redirect or an adapter for an old cookie, header, storage key or provider id.
+  redirect or an adapter for an old cookie, header, storage key or provider id. One
+  exception: the browser keys `pantry:cafeos:sidebar-expanded` and
+  `pantry.bakeryos.vitrineCustomOrders.v1` move one time to `pantry:sidebar-expanded`
+  and `pantry.kitchen.vitrineCustomOrders.v1` (`moveStoredValue` of
+  `@purin-labs/std`): if the new key is empty, the old value moves, and the old key is
+  removed.
 - **Name changes.** A change of a Worker name, a public origin or an OAuth callback path
   is a release of its own. Add each new callback at each provider first.
 - **Time limits and information flow.** Names have no time limit or retention. This spec
@@ -296,14 +301,10 @@ owner's first wake in production worked; no recording of real voices has scored 
 `PantryMark`). Only the provider callback page shows the Purin cat. No feature uses the
 exported `PurinMark` and `PurinIcon`.
 
-**Old names in the code, with no reason to stay:**
-
-- The stored preference area `bakeryos` (`packages/control-api/src/user-preferences.ts`,
-  the `area` column of `user_preferences`).
-- The home view version `pantry.cafeos.home.v1` (`packages/control-api/src/portal/home.ts`,
-  `areas/organisation/server/control/routes/workspace.ts`).
-- The browser storage keys `pantry:cafeos:sidebar-expanded` and
-  `pantry.bakeryos.vitrineCustomOrders.v1`.
+**Stored names renamed in November 2026:** the preference area `bakeryos` is `kitchen`
+(a global D1 patch moves the rows of `user_preferences`), the home view version
+`pantry.cafeos.home.v1` is `pantry.home.v1`, and the two browser keys move as the rule
+above says. An open Portal tab of the release before must reload.
 
 **The commerce engine in Portal text:** `areas/organisation/ui/pages/automation.tsx` and
 `areas/commerce/ui/features/commerce/production-plan.tsx` show these words to people.

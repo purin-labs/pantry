@@ -235,7 +235,7 @@ async function browserAcceptanceFixture(page) {
 
   const home = {
     ok: true,
-    schemaVersion: "pantry.cafeos.home.v1",
+    schemaVersion: "pantry.home.v1",
     generatedAt: 1_800_000_000_000,
     home: {
       workspace: {
@@ -783,7 +783,7 @@ async function browserAcceptanceFixture(page) {
       const values = {
         appearance: { mode: "system", palette: "sage" },
         chat: { dockedPanelWidthPx: 600, fullscreenSidebarWidthPx: 360 },
-        bakeryos: {
+        kitchen: {
           appearance: { kind: "inherit" },
           scene: { labels: "auto", minimap: false },
         },

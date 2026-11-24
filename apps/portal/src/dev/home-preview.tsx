@@ -22,7 +22,7 @@ const OBSERVED_AT = "2026-11-23T03:00:00.000Z";
 function homeResponse(): unknown {
   return {
     ok: true,
-    schemaVersion: "pantry.cafeos.home.v1",
+    schemaVersion: "pantry.home.v1",
     generatedAt: Date.parse(OBSERVED_AT),
     home: {
       workspace: {

@@ -74,7 +74,7 @@ type check refuses a page without one. Page code loads on demand.
 ### The workspace shell
 
 - **Rail.** Above 1160 px, the sidebar is a rail of 252 px that collapses to 57 px over
-  200 ms. The browser keeps the choice in `pantry:cafeos:sidebar-expanded`.
+  200 ms. The browser keeps the choice in `pantry:sidebar-expanded`.
 - **Drawer.** At 1160 px and below, the sidebar fills the screen under the top bar. It
   starts closed. A navigation link, or a page that the search opens, closes it. A product
   tab, the opening of the search and the Organisation and workspace switcher do not close
@@ -190,7 +190,7 @@ keeps the last answer and shows an updating notice.
   (`slate-coral`, shown as Slate, `espresso` or `paper`). The default is `system` and
   `slate-coral`.
 - Preferences belong to the person and follow the person to another browser. The areas
-  are `appearance`, `chat` and `bakeryos` (the Kitchen scene).
+  are `appearance`, `chat` and `kitchen` (the Kitchen scene).
 - Kitchen pages can have their own light or dark mode. The palette stays the account
   palette.
 - A script in `apps/portal/index.html` sets the theme before the first paint, from the
@@ -327,12 +327,12 @@ no value writes nothing. An unknown area answers `404`.
   `schema_version`, `revision`, `values_json` and `updated_at`, with the key
   `(user_id, area)`. `scripts/layers.json` gives it to `areas/organisation`.
 - `packages/control-api/src/user-preferences.ts` holds the preference contract.
-  `packages/control-api/src/portal/home.ts` parses the view `pantry.cafeos.home.v1`.
+  `packages/control-api/src/portal/home.ts` parses the view `pantry.home.v1`.
   The Portal adds no Actor SQLite table.
 
 | Browser key                                         | Store            | Holds                                  |
 | --------------------------------------------------- | ---------------- | -------------------------------------- |
-| `pantry:cafeos:sidebar-expanded`                    | `localStorage`   | The rail choice                        |
+| `pantry:sidebar-expanded`                           | `localStorage`   | The rail choice                        |
 | `pantry:portal-appearance`, `pantry:portal-palette` | `localStorage`   | The first-paint copy of the appearance |
 | `pantry:preferences:<userId>:<area>`                | `localStorage`   | The last accepted preference document  |
 | `pantry:organisation-id:<handle>`                   | `localStorage`   | The id for early reads                 |
