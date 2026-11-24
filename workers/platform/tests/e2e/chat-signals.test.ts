@@ -1,10 +1,6 @@
 import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
-import {
-  evictDurableObject,
-  runDurableObjectAlarm,
-  runInDurableObject,
-} from "cloudflare:test";
+import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { expect, it } from "vitest";
 import { COLLABORATION_PONG } from "@purin-labs/collaboration";
 import {
@@ -42,6 +38,7 @@ import {
 } from "./hibernatable-socket-support";
 import { control, platformConversation } from "./chat-journey-support";
 import { requiredPlacement } from "./slack-journey-support";
+import { runArmedAlarm } from "./durable-object-alarm-support";
 
 // A signal that has not come within this time does not come.
 const QUIET_MS = 750;
@@ -215,7 +212,7 @@ async function chatSignalJourney(): Promise<void> {
       .run();
     const closed = nextCloseCode(teammatePage);
     await runInDurableObject(scenario.organisation, dueSocketSweepNow);
-    expect(await runDurableObjectAlarm(scenario.organisation)).toBe(true);
+    await runArmedAlarm(scenario.organisation);
     expect(await closed).toBe(4403);
     await expectPong(ownerPage);
 

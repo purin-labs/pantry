@@ -1,4 +1,4 @@
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { fixtureDatabase } from "./organisation-database";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
@@ -23,6 +23,7 @@ import {
   slackSimulator,
   postMention,
 } from "./slack-journey-support";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 
 /**
  * A follow-up outlives an Access change, and not its requester.
@@ -84,7 +85,7 @@ async function followUpAuthorityJourney(test: TestContext): Promise<void> {
 
   // 2. At its time the follow-up runs once, for the same person.
   await runInDurableObject(connector, makeFollowUpsDue);
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
   await expect.poll(slack.visibleMessageCount, { timeout: 30_000 }).toBe(2);
   expect(recorded.requests).toHaveLength(3);
   expect(slack.messages.map(threadAndText)).toEqual([
@@ -115,7 +116,7 @@ async function followUpAuthorityJourney(test: TestContext): Promise<void> {
     .bind(Date.now(), ORGANISATION_ID, OPERATOR)
     .run();
   await runInDurableObject(connector, makeFollowUpsDue);
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
   await expect
     .poll(() => runInDurableObject(connector, readFollowUps), {
       timeout: 30_000,

@@ -1,10 +1,6 @@
 import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
-import {
-  evictDurableObject,
-  runDurableObjectAlarm,
-  runInDurableObject,
-} from "cloudflare:test";
+import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, vi, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
@@ -25,6 +21,7 @@ import {
   openRouterStream,
 } from "./slack-journey-support";
 import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
+import { runArmedAlarm } from "./durable-object-alarm-support";
 
 it(
   "checkpoints goal stops, resumes only by explicit command after eviction, and preserves unknown-usage fences",
@@ -108,7 +105,7 @@ async function goalDispatchJourney(context: TestContext): Promise<void> {
   const rows = await runInDurableObject(session, loseUsageReceipt);
   expect(rows).toBe(1);
   await evictDurableObject(session);
-  expect(await runDurableObjectAlarm(session)).toBe(true);
+  await runArmedAlarm(session);
   expect(await owner.readGoal(identity)).toEqual(before);
   expect(await runInDurableObject(session, pendingUsage)).toBe(0);
   expect(provider.calls).toBe(2);
@@ -385,9 +382,7 @@ async function unknownUsageJourney(context: TestContext): Promise<void> {
     .spyOn(Date, "now")
     .mockReturnValue(interrupted.expiresAt + 1);
   try {
-    expect(
-      await runDurableObjectAlarm(env.SESSION.getByName(sessionRow.name)),
-    ).toBe(true);
+    await runArmedAlarm(env.SESSION.getByName(sessionRow.name));
   } finally {
     clock.mockRestore();
   }
@@ -449,7 +444,7 @@ async function unknownUsageJourney(context: TestContext): Promise<void> {
     });
   expect(cancelled).toMatchObject({ ok: true, value: { kind: "interrupted" } });
   await evictDurableObject(recoveredSession);
-  await runDurableObjectAlarm(env.SESSION.getByName(sessionRow.name));
+  await runArmedAlarm(env.SESSION.getByName(sessionRow.name));
   expect(provider.calls).toBe(2);
   expect(await owner.readGoal(identity)).toEqual(before);
   Object.assign(context.task.meta, {

@@ -3,7 +3,7 @@
 // the purpose of each request and answers; product code chooses the key, writes
 // the switch records and refuses the requests that the journeys assert.
 import { env } from "cloudflare:workers";
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse } from "msw";
 import { expect, it } from "vitest";
 import {
@@ -34,6 +34,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { addOrganisationMember } from "./organisation-fixture";
 import { controlFetch } from "./chat-journey-support";
 import { WriteMeter } from "./write-meter";
+import { runArmedAlarm } from "./durable-object-alarm-support";
 
 const PANTRY_KEY = "typesafe-pantry-e2e-key-0000000000";
 const OWN_KEY = "typesafe-own-e2e-key-00000000000";
@@ -180,7 +181,7 @@ async function recordsJourney(): Promise<void> {
     organisation,
     seedHourLedger.bind(null, organisationId, closedHour),
   );
-  expect(await runDurableObjectAlarm(organisation)).toBe(true);
+  await runArmedAlarm(organisation);
 
   // One record for each feature: mail 120 + 30, related Cases 70. The call on
   // the Organisation's own key in the same hour is not Pantry's use. Pantry
@@ -195,13 +196,13 @@ async function recordsJourney(): Promise<void> {
   const meter = new WriteMeter();
   await runInDurableObject(organisation, armAlarmForOtherWork);
   const sameHour = await meter.during(async () => {
-    expect(await runDurableObjectAlarm(organisation)).toBe(true);
+    await runArmedAlarm(organisation);
   });
   // An hour passes with no Jev use, and the alarm runs again. The seal step
   // finds no call in the new closed hour, so it writes no row more.
   await runInDurableObject(organisation, lastSealAnHourEarlier);
   const idleHour = await meter.during(async () => {
-    expect(await runDurableObjectAlarm(organisation)).toBe(true);
+    await runArmedAlarm(organisation);
   });
   expect(
     idleHour,
@@ -633,7 +634,7 @@ async function repinRetryJourney(): Promise<void> {
     now: Date.now(),
   });
   await runInDurableObject(organisation, aMinuteLater);
-  expect(await runDurableObjectAlarm(organisation)).toBe(true);
+  await runArmedAlarm(organisation);
   expect(await features(organisationId, owner.session)).toMatchObject({
     funding: "organisation_byo",
     mailClassification: {

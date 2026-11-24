@@ -4,11 +4,7 @@ import type {
 } from "@purin-labs/kernel/database-handles";
 import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
-import {
-  evictDurableObject,
-  runInDurableObject,
-  runDurableObjectAlarm,
-} from "cloudflare:test";
+import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, vi, type TestContext } from "vitest";
 import { isRecord, assertNever } from "@purin-labs/std";
@@ -82,6 +78,7 @@ import {
   readBarrier,
   startMove,
 } from "./placement-move-support";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 
 const PROPOSAL_ID = "proposal_p55_operational";
 const BODY = "Please prepare the bakery delivery for Friday.";
@@ -544,7 +541,7 @@ async function operationalJourney(
           "CREATE TRIGGER p55_operational_cleanup_failure BEFORE DELETE ON email_self_test BEGIN SELECT RAISE(ABORT, 'cleanup_failed'); END",
         )
         .run();
-      await runDurableObjectAlarm(target);
+      await runAlarmHandler(target);
       expect((await projection())?.lifecycleKind).toBe("awaiting_approval");
       expect(await selfTestCount(ORGANISATION_ID)).toBe(1);
       await fixtureDatabase()
@@ -552,7 +549,7 @@ async function operationalJourney(
         .run();
       await evictDurableObject(target);
     }
-    await runDurableObjectAlarm(target);
+    await runAlarmHandler(target);
     if (boundary === "expiry")
       expect(await selfTestCount(ORGANISATION_ID)).toBe(0);
     const restored = await runInDurableObject(target, readProposal);
@@ -623,7 +620,7 @@ async function operationalJourney(
       expect((await projection())?.lifecycleKind).toBe("sent");
     }
     await evictDurableObject(target);
-    await runDurableObjectAlarm(target);
+    await runAlarmHandler(target);
     if (terminal === null) {
       const replayApproval =
         boundary === "ambiguous" || boundary === "sent"
@@ -687,7 +684,7 @@ function startWork(
     case "rejection":
       return fixture.connector.dispatchEmailOperational(approval);
     case "expiry":
-      return runDurableObjectAlarm(fixture.connector);
+      return runAlarmHandler(fixture.connector);
     case "revoke":
       return fixture.connector.revokeEmailOperationalProposals({
         identity: fixture.identity,

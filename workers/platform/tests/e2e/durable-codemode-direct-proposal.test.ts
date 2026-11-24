@@ -1,4 +1,4 @@
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import { OrganisationDO } from "../../src/actors/organisation";
@@ -16,6 +16,7 @@ import {
   listingProposalRequest,
   listingReadCode,
 } from "./pi-sdk-effect-support";
+import { runArmedAlarm } from "./durable-object-alarm-support";
 
 // Plan 50A, Phase E. A script may repeat an interrupted proposal. A direct
 // call of the model keeps the rule that it had: an operator resolves it. Pi
@@ -64,7 +65,7 @@ it("keeps a turn stopped, when a direct proposal of the model was in flight at t
       action: { kind: "blocked", reason: "implementation" },
     },
   });
-  expect(await runDurableObjectAlarm(session)).toBe(true);
+  await runArmedAlarm(session);
   expect(await runInDurableObject(session, readLifecycle)).toEqual(held);
   expect(ledgerCalls).toHaveLength(1);
   expect(journey.requests).toHaveLength(4);

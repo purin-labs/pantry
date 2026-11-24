@@ -152,11 +152,7 @@ import {
 } from "@purin-labs/agent/models/route";
 import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { env, exports } from "cloudflare:workers";
-import {
-  runInDurableObject,
-  runDurableObjectAlarm,
-  evictDurableObject,
-} from "cloudflare:test";
+import { runInDurableObject, evictDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { bypass, http, HttpResponse, type HttpResponseResolver } from "msw";
 import {
@@ -273,6 +269,7 @@ import { decodeRaw } from "./gmail-mailbox-support";
 import { controlFetch, modelToolResults } from "./chat-journey-support";
 import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
+import { runAlarmHandler, runArmedAlarm } from "./durable-object-alarm-support";
 
 async function prepareMailBudgetJourney() {
   const owner = await client("mail-budget-pi-owner");
@@ -793,7 +790,7 @@ async function transientPiGoalJourney(context: TestContext): Promise<void> {
         1,
       );
       await evictDurableObject(session);
-      expect(await runDurableObjectAlarm(session)).toBe(true);
+      await runArmedAlarm(session);
       expect(await goal.value.readGoal(identity)).toEqual(snapshot);
     }
     await evictDurableObject(goal.value);
@@ -821,7 +818,7 @@ async function transientPiGoalJourney(context: TestContext): Promise<void> {
         abandonTransientGoalExecution.bind(null, caseId.value, "tracked"),
       );
       await evictDurableObject(session);
-      expect(await runDurableObjectAlarm(session)).toBe(true);
+      await runArmedAlarm(session);
       const recovered = await goal.value.readGoal(identity);
       expect(recovered).toMatchObject({
         ok: true,
@@ -867,7 +864,7 @@ async function transientPiGoalJourney(context: TestContext): Promise<void> {
         error: { code: "goal_execution_running" },
       });
       await evictDurableObject(session);
-      expect(await runDurableObjectAlarm(session)).toBe(true);
+      await runArmedAlarm(session);
       const enrolled = await goal.value.applyGoalCommand(replacement);
       expect(enrolled).toMatchObject({
         ok: true,
@@ -1206,7 +1203,7 @@ async function verifyMailboxPlacement(
         error: { code: "connector_email_watch_cleanup_pending" },
       });
       await runInDurableObject(recovered.value, advanceWatchCleanupClock);
-      await runDurableObjectAlarm(recovered.value);
+      await runAlarmHandler(recovered.value);
     } else if (boundary === "mailbox_search") {
       expect(
         await runMailboxPlacementCommand(
@@ -1250,8 +1247,8 @@ async function verifyMailboxPlacement(
     }
     await verifyRetiredMailbox(input, runtime);
     await evictDurableObject(recovered.value);
-    await runDurableObjectAlarm(recovered.value);
-    await runDurableObjectAlarm(input.connector);
+    await runAlarmHandler(recovered.value);
+    await runAlarmHandler(input.connector);
     const expectedStops =
       boundary === "watch_retry" ? 2 : boundary === "watch_stop" ? 1 : 0;
     const expectedDeletes =
@@ -1867,7 +1864,7 @@ async function verifyProposalPlacement(
         recovered.value,
         advanceProposalMaintenance.bind(null, input.proposalId),
       );
-      await runDurableObjectAlarm(recovered.value);
+      await runAlarmHandler(recovered.value);
       expect(
         await fixtureDatabase()
           .prepare(
@@ -1979,7 +1976,7 @@ async function verifyProposalPlacement(
     });
     await evictDurableObject(recovered.value);
     await runProposalPlacementCommand(command, recovered.value, input);
-    await runDurableObjectAlarm(input.connector);
+    await runAlarmHandler(input.connector);
     expect({
       sends: input.model.sends,
       deletes: delivery.deletes,
@@ -2206,7 +2203,7 @@ async function verifyDraftAssignmentPlacement(
       pauseActorResponse.bind(null, pause, "beginAssignment"),
     );
   await runInDurableObject(input.connector, advanceObservationClock);
-  const work = runDurableObjectAlarm(input.connector);
+  const work = runAlarmHandler(input.connector);
   let relocation: Promise<unknown> | null = null;
   try {
     await expect
@@ -2292,7 +2289,7 @@ async function verifyDraftAssignmentPlacement(
     if (!recovered.ok) throw new Error(recovered.error.code);
     await runInDurableObject(recovered.value, inspectDraftOwner);
     await evictDurableObject(recovered.value);
-    await runDurableObjectAlarm(recovered.value);
+    await runAlarmHandler(recovered.value);
     const targetCase = await resolveActiveCaseActor({
       env,
       namespace: env.CASE,
@@ -2331,8 +2328,8 @@ async function verifyDraftAssignmentPlacement(
       sends: input.model.sends,
     }).toEqual(expected);
     await evictDurableObject(recovered.value);
-    await runDurableObjectAlarm(recovered.value);
-    await runDurableObjectAlarm(input.connector);
+    await runAlarmHandler(recovered.value);
+    await runAlarmHandler(input.connector);
     expect({
       calls: input.model.calls,
       drafts: input.model.drafts,
@@ -2410,7 +2407,7 @@ async function verifyDraftExecutionPlacement(
     ),
   );
   await runInDurableObject(input.connector, advanceObservationClock);
-  const work = runDurableObjectAlarm(input.connector);
+  const work = runAlarmHandler(input.connector);
   let relocation: Promise<unknown> | null = null;
   try {
     await expect
@@ -2512,7 +2509,7 @@ async function verifyDraftExecutionPlacement(
     if (!recovered.ok) throw new Error(recovered.error.code);
     await runInDurableObject(recovered.value, inspectIssuedReplyReceipt);
     await evictDurableObject(recovered.value);
-    await runDurableObjectAlarm(recovered.value);
+    await runAlarmHandler(recovered.value);
     expect(
       await runInDurableObject(recovered.value, inspectIssuedReplyReceipt),
     ).toEqual({
@@ -2723,7 +2720,7 @@ async function verifyDraftReplyPlacement(
     "INSERT OR IGNORE INTO organisation_workspace",
   );
   await runInDurableObject(input.connector, advanceObservationClock);
-  const work = runDurableObjectAlarm(input.connector);
+  const work = runAlarmHandler(input.connector);
   let completion: Promise<unknown> | null = null;
   try {
     await expect
@@ -2839,8 +2836,7 @@ async function verifyDraftReplyPlacement(
     if (!recovered.ok) throw new Error(recovered.error.code);
     await runInDurableObject(recovered.value, inspectDraftOwner);
     await evictDurableObject(recovered.value);
-    const alarmRan = await runDurableObjectAlarm(recovered.value);
-    expect(alarmRan).toBe(true);
+    await runArmedAlarm(recovered.value);
     const recoveredOwner = await runInDurableObject(
       recovered.value,
       inspectDraftOwner,
@@ -2849,7 +2845,6 @@ async function verifyDraftReplyPlacement(
       recoveredOwner,
       JSON.stringify({
         recoveredOwner,
-        alarmRan,
         modelCalls: input.model.calls,
         drafts: input.model.drafts,
       }),
@@ -2874,7 +2869,7 @@ async function verifyDraftReplyPlacement(
       await runInDurableObject(targetCase.value, admittedMailTriggerCount),
     ).toBe(1);
     await evictDurableObject(recovered.value);
-    await runDurableObjectAlarm(recovered.value);
+    await runAlarmHandler(recovered.value);
     expect(input.model.drafts).toBe(1);
     const targetScope = await requireMailFixtureScope(input.organisationId);
     const prepared = await prepareWorkspaceRevisionMutation(
@@ -6863,7 +6858,7 @@ async function connectorMailObservationPlacementJourney({
     ),
   );
   await runInDurableObject(source.value, advanceObservationClock);
-  const work = runDurableObjectAlarm(source.value);
+  const work = runAlarmHandler(source.value);
   let completion: Promise<unknown> | null = null;
   try {
     await expect
@@ -6928,7 +6923,7 @@ async function connectorMailObservationPlacementJourney({
     if (!recovered.ok) throw new Error(recovered.error.code);
     await runInDurableObject(recovered.value, advanceObservationClock);
     await evictDurableObject(recovered.value);
-    await runDurableObjectAlarm(recovered.value);
+    await runAlarmHandler(recovered.value);
     await attemptFrozenMailProjection(scope.value, head);
     await verifyMailReadPlacement(recovered.value, input, true);
     const outcome = await recovered.value.readMailOrganization({
@@ -7021,7 +7016,7 @@ async function connectorMailReadPlacementJourney({
     await fixture.organisation.evaluateMailClassification(evaluation),
   ).toMatchObject({ ok: true });
   await runInDurableObject(source.value, expireWorkLease);
-  await runDurableObjectAlarm(source.value);
+  await runAlarmHandler(source.value);
   const input = {
     identity: {
       organisationId: fixture.organisationId,
@@ -7674,7 +7669,7 @@ async function organizationJourney(): Promise<void> {
   network.use(
     http.post("https://api.typesafe.ai/v1/systemone", unexpectedInference),
   );
-  await runDurableObjectAlarm(connector.value);
+  await runAlarmHandler(connector.value);
   const classified = await organizationView(
     organisationId,
     owner.session,
@@ -7744,7 +7739,7 @@ async function organizationJourney(): Promise<void> {
   expect((await connector.value.acceptEmailChange(hint)).ok).toBe(true);
   expect((await connector.value.acceptEmailChange(hint)).ok).toBe(true);
   await runInDurableObject(connector.value, advanceObservationClock);
-  await runDurableObjectAlarm(connector.value);
+  await runAlarmHandler(connector.value);
   const firstArrival = await organizationView(
     organisationId,
     owner.session,
@@ -7755,7 +7750,7 @@ async function organizationJourney(): Promise<void> {
   // Simulate the shared ledger's daily cost ceiling before the second history page.
   await runInDurableObject(organisation, exhaustMailBudget);
   await runInDurableObject(connector.value, advanceObservationClock);
-  await runDurableObjectAlarm(connector.value);
+  await runAlarmHandler(connector.value);
   const budgetPaused = await organizationView(
     organisationId,
     owner.session,
@@ -7789,7 +7784,7 @@ async function organizationJourney(): Promise<void> {
       { once: true },
     ),
   );
-  await runDurableObjectAlarm(connector.value);
+  await runAlarmHandler(connector.value);
   expect(rateLimitedCalls).toBe(1);
   const rateLimited = await organizationView(
     organisationId,
@@ -7802,7 +7797,7 @@ async function organizationJourney(): Promise<void> {
     await runInDurableObject(connector.value, nextPendingWorkDue),
   ).toBeGreaterThan(Date.now() + 20_000);
   await runInDurableObject(connector.value, advancePendingWorkClock);
-  await runDurableObjectAlarm(connector.value);
+  await runAlarmHandler(connector.value);
   const resumed = await organizationView(
     organisationId,
     owner.session,
@@ -7813,7 +7808,7 @@ async function organizationJourney(): Promise<void> {
   expect(resumed.classifications).toHaveLength(6);
   expect(mailInferenceCalls).toBe(4);
   await runInDurableObject(connector.value, advanceObservationClock);
-  await runDurableObjectAlarm(connector.value);
+  await runAlarmHandler(connector.value);
   expect(mailInferenceCalls).toBe(4);
   network.use(
     http.get(
@@ -7822,7 +7817,7 @@ async function organizationJourney(): Promise<void> {
     ),
   );
   await runInDurableObject(connector.value, advanceObservationClock);
-  await runDurableObjectAlarm(connector.value);
+  await runAlarmHandler(connector.value);
   expect(
     (await organizationView(organisationId, owner.session, accountId))
       .readiness,
@@ -7927,7 +7922,7 @@ async function organizationJourney(): Promise<void> {
   expect(mailInferenceCalls).toBe(4);
   await runInDurableObject(organisation, restoreMailBudget);
   await runInDurableObject(connector.value, advanceObservationClock);
-  await runDurableObjectAlarm(connector.value);
+  await runAlarmHandler(connector.value);
   const future = await organizationView(
     organisationId,
     owner.session,
@@ -7950,7 +7945,7 @@ async function organizationJourney(): Promise<void> {
     ).status,
   ).toBe(200);
   await evictDurableObject(connector.value);
-  await runDurableObjectAlarm(connector.value);
+  await runAlarmHandler(connector.value);
   expect(
     (await organizationView(organisationId, owner.session, accountId)).rules
       .kind,
@@ -9512,8 +9507,8 @@ async function caseContextCollectionReplyJourney(
     ).toMatchObject({ ok: true });
     await evictDurableObject(organisation);
     await evictDurableObject(connector.value);
-    await runDurableObjectAlarm(organisation);
-    await runDurableObjectAlarm(connector.value);
+    await runAlarmHandler(organisation);
+    await runAlarmHandler(connector.value);
     expect(state.drafts.size).toBe(0);
     expect(state.draftCreates).toBe(1);
     expect(state.sends).toBe(0);
@@ -9600,8 +9595,8 @@ async function caseContextCollectionReplyJourney(
       ok: false,
       error: { code: "case_context_collection_evidence_stale" },
     });
-    await runDurableObjectAlarm(organisation);
-    await runDurableObjectAlarm(connector.value);
+    await runAlarmHandler(organisation);
+    await runAlarmHandler(connector.value);
     expect(state.drafts.size).toBe(1);
   } else {
     expect(stale).toMatchObject({

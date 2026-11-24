@@ -64,7 +64,8 @@ async function turnCompletionJourney(test: TestContext): Promise<void> {
   );
   expect(admitted.status).toBe(200);
   // The Session completes the turn from its alarm; the journey runs the
-  // alarm in place of the wait.
+  // alarm in place of the wait. A poll can find no alarm: the answer in Slack
+  // is the check.
   await expect
     .poll(
       async () => {

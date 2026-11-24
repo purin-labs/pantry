@@ -1,4 +1,4 @@
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { exports } from "cloudflare:workers";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
@@ -24,6 +24,7 @@ import {
   slackSimulator,
   threadAndText,
 } from "./slack-journey-support";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 
 /**
  * An agent in a Slack thread can come back later.
@@ -93,13 +94,13 @@ async function followUpJourney(test: TestContext): Promise<void> {
   const dueAt = waiting[0]?.dueAt ?? 0;
   expect(dueAt).toBeGreaterThan(scheduledAt + 39 * 60_000);
   expect(dueAt).toBeLessThan(scheduledAt + 41 * 60_000);
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
   expect(recorded.requests).toHaveLength(2);
   expect(slack.messages).toHaveLength(1);
 
   // At its time, one turn runs in the same thread and answers there.
   await runInDurableObject(connector, makeFollowUpsDue);
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
   await expect.poll(slack.visibleMessageCount, { timeout: 30_000 }).toBe(2);
   await expect
     .poll(() => runInDurableObject(connector, readFollowUps), {
@@ -119,7 +120,7 @@ async function followUpJourney(test: TestContext): Promise<void> {
   ]);
 
   // The alarm runs at least once: a second run starts no second turn.
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
   expect(recorded.requests).toHaveLength(3);
   expect(slack.messages).toHaveLength(2);
 

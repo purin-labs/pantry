@@ -1,6 +1,6 @@
 import { exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import {
@@ -27,6 +27,7 @@ import {
   limits,
   type Fixture,
 } from "./whatsapp-connector-support";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -361,7 +362,7 @@ async function budgetJourney({ task }: TestContext): Promise<void> {
   // The UTC day ends. The pause ends with it, and the agent answers the
   // waiting customer. No operator resumed the number.
   await runInDurableObject(fixture.connector, endBudgetDay);
-  await runDurableObjectAlarm(fixture.connector);
+  await runAlarmHandler(fixture.connector);
   expect(sends).toHaveLength(2);
   expect(sends[1]).toContain("Agent reply 2");
   expect(notices).toHaveLength(1);
@@ -380,7 +381,7 @@ async function runDueTurn(fixture: Fixture): Promise<void> {
     fixture.connector,
     makeTurnDue.bind(null, fixture.caseId),
   );
-  await runDurableObjectAlarm(fixture.connector);
+  await runAlarmHandler(fixture.connector);
 }
 
 /**

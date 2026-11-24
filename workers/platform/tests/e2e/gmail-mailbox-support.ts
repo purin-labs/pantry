@@ -34,6 +34,7 @@ import {
 import { acceptMailboxModelTerms } from "../mailbox-model-consent-fixture";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceHeaders } from "./commerce-support";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 import type { Member } from "./memory-support";
 import { network } from "./network";
 import { openRouterText, openRouterToolCall } from "./slack-journey-support";
@@ -368,21 +369,17 @@ export async function acceptMailboxModel(
 
 /**
  * Makes the Connector's held reply turns due now and runs one alarm of the
- * Connector to its end. The alarm runs here, not through the alarm slot:
- * the Connector's own work in the background can fire, move or delete a
- * stored alarm first, and `runDurableObjectAlarm` then runs nothing.
+ * Connector to its end.
  */
 export async function runDueMailWork(
   connector: MailboxConnector,
 ): Promise<void> {
-  await runInDurableObject(connector, async (actor, state) => {
+  await runInDurableObject(connector, (_actor, state) => {
     state.storage.sql.exec(
       "UPDATE connector_email_reply_turn SET available_at = 0",
     );
-    if (actor.alarm === undefined)
-      throw new Error("The Connector has no alarm handler");
-    await actor.alarm();
   });
+  await runAlarmHandler(connector);
 }
 
 /** The one kind of mail that arrives in a fake Gmail mailbox. */

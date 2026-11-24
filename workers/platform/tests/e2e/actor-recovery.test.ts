@@ -46,6 +46,7 @@ import {
   requireWorkspaceId,
 } from "../test-ids";
 import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 
 const ORGANISATION_ID = requireOrganisationId(
   "organisation_e2e_actor_recovery",
@@ -513,7 +514,7 @@ async function recoversActorDelivery(
     for (const actor of [...sourceActors, ...targetActors]) {
       await evictDurableObject(actor);
       await runInDurableObject(actor, armRecoveryAlarm);
-      await runDurableObjectAlarm(actor);
+      await runAlarmHandler(actor);
       expect(
         await runInDurableObject(actor, readRecoveryAlarm),
       ).toBeGreaterThan(Date.now());
@@ -533,7 +534,7 @@ async function recoversActorDelivery(
     ).toMatchObject({ ok: true, value: { status: "retained" } });
     for (const actor of sourceActors) {
       await runInDurableObject(actor, armRecoveryAlarm);
-      await runDurableObjectAlarm(actor);
+      await runAlarmHandler(actor);
       expect(await runInDurableObject(actor, readRecoveryAlarm)).toBeNull();
     }
     expect(slack.deliveryAttempts).toHaveLength(1);
@@ -553,6 +554,7 @@ async function recoversActorDelivery(
 
   await runInDurableObject(stubs.connector, makeConnectorRecoveryDue);
   // Miniflare may dispatch the past-due alarm as the storage callback exits.
+  // This call then finds no alarm, and the poll below checks the outcome.
   await runDurableObjectAlarm(stubs.connector);
   await expect
     .poll(readRecoveryMilestone.bind(null, stubs), { timeout: 15_000 })

@@ -1,5 +1,5 @@
 import { env, exports } from "cloudflare:workers";
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { http } from "msw";
 import { expect, it, type TestContext } from "vitest";
 
@@ -22,6 +22,7 @@ import {
 import { createBakerySurfaceEffect } from "@purin-labs/bakery-model/bakery-surface";
 import { listBakerySurfaceTimelineEvents } from "@purin-labs/area-kitchen/server/actors/bakery-surface-effect";
 import { requireOrganisationId } from "../test-ids";
+import { runAlarmHandler, runArmedAlarm } from "./durable-object-alarm-support";
 
 /**
  * Refactor 15: damaged Kitchen effects do not hold the Session's
@@ -93,19 +94,19 @@ async function damagedSurfaceEffectJourney(test: TestContext): Promise<void> {
 
   // A recovery pass ends one full page of damaged effects and comes back for
   // the rest; the next pass ends them and arms no retry for them.
-  expect(await runDurableObjectAlarm(session)).toBe(true);
+  await runArmedAlarm(session);
   expect(await runInDurableObject(session, readDamagedSurfaceEffects)).toEqual({
     candidates: 1,
     quarantined: 32,
   });
-  expect(await runDurableObjectAlarm(session)).toBe(true);
+  await runArmedAlarm(session);
   const settled = await runInDurableObject(session, readDamagedSurfaceEffects);
   expect(settled).toEqual({ candidates: 0, quarantined: DAMAGED_EFFECTS });
   const alarmAt = await runInDurableObject(session, readAlarm);
   expect(alarmAt === null || alarmAt > Date.now() + 5_000).toBe(true);
 
   // A later pass reads none of them again.
-  await runDurableObjectAlarm(session);
+  await runAlarmHandler(session);
   expect(await runInDurableObject(session, readDamagedSurfaceEffects)).toEqual(
     settled,
   );

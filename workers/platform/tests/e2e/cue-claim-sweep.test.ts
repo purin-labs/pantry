@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 
 import { inspectOrganisationCutoverQuiescence } from "@purin-labs/tenancy/actors/organisation-cutover-quiescence";
@@ -10,6 +10,7 @@ import {
   ORGANISATION_ID,
   installSlackActorFixture,
 } from "./slack-journey-support";
+import { runArmedAlarm } from "./durable-object-alarm-support";
 
 /**
  * Refactor 15: a Cue claim whose queue message went to the dead-letter queue
@@ -70,7 +71,7 @@ async function abandonedCueClaimJourney(test: TestContext): Promise<void> {
   });
 
   // The Organisation's alarm ends the claim as a failed delivery.
-  expect(await runDurableObjectAlarm(organisation)).toBe(true);
+  await runArmedAlarm(organisation);
   const after = await runInDurableObject(organisation, readCueState);
   expect(after).toEqual({
     claimedCues: 0,

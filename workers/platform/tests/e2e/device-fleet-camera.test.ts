@@ -1,4 +1,4 @@
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { fixtureDatabase } from "./organisation-database";
 import { env, exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
@@ -33,6 +33,7 @@ import {
   type SimulatedGateway,
 } from "./device-fleet-support";
 import { PUBLIC_ORIGIN } from "./hibernatable-socket-support";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 
 /**
  * Plan 85 Phase 5, journey J6: camera snapshots. They are off until an admin
@@ -412,7 +413,7 @@ it(
     await runInDurableObject(stub, (_instance, state) => {
       state.storage.sql.exec("UPDATE fleet_upkeep SET pruned_at = 0");
     });
-    await runDurableObjectAlarm(stub);
+    await runAlarmHandler(stub);
     await expect
       .poll(async () =>
         fixtureDatabase()

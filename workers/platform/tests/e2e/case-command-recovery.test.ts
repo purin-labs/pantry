@@ -90,6 +90,7 @@ async function stuckCommandJourney(test: TestContext): Promise<void> {
     .poll(
       async () => {
         const resumed = await sessionOf(identities.value.sessionId);
+        // A poll can find no alarm. The turn state below is the check.
         await runDurableObjectAlarm(resumed).catch(ignoreLostProcess);
         return turnState(resumed, turnId);
       },

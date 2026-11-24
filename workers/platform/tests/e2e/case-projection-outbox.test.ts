@@ -1,10 +1,6 @@
 import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
-import {
-  evictDurableObject,
-  runDurableObjectAlarm,
-  runInDurableObject,
-} from "cloudflare:test";
+import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import {
   BindingObservation,
@@ -24,6 +20,7 @@ import {
   installDiscoveryActorFixture,
   ORGANISATION_ID,
 } from "./slack-journey-support";
+import { runArmedAlarm } from "./durable-object-alarm-support";
 
 it(
   "recovers a trigger projection after interrupted acknowledgment, eviction, relocation and duplicate admission",
@@ -168,7 +165,7 @@ async function projectionRecovery({ task }: TestContext): Promise<void> {
     observeProjectionQueue.bind(null, queueObservation),
   );
   try {
-    expect(await runDurableObjectAlarm(actor)).toBe(true);
+    await runArmedAlarm(actor);
     expect(await actor.acceptTrigger(trigger)).toMatchObject({
       ok: true,
       value: { kind: "duplicate" },
@@ -188,7 +185,7 @@ async function projectionRecovery({ task }: TestContext): Promise<void> {
   });
 
   await evictDurableObject(actor);
-  await runDurableObjectAlarm(actor);
+  await runArmedAlarm(actor);
   const recovered = await runInDurableObject(actor, readProjectionState);
   expect(recovered).toMatchObject({
     triggers: 1,

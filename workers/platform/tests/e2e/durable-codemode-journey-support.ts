@@ -1,6 +1,6 @@
 import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
@@ -32,6 +32,7 @@ import {
   slackSimulator,
   isApprovalCard,
 } from "./slack-journey-support";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 
 // The journeys of Plan 50A that run a Code Mode script through the Slack
 // Actor path share these steps. The Session, Organisation, and governor
@@ -221,7 +222,7 @@ export async function deliverAfterConnectorLease(
   expect(journey.slack.messages).toHaveLength(notices);
   const connector = await connectorActor();
   await runInDurableObject(connector, endCaseWorkLease);
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
   await expect
     .poll(journey.slack.visibleMessageCount, { timeout: 20_000 })
     .toBe(notices + 1);

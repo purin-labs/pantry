@@ -121,6 +121,7 @@ import {
 import { runAgentOperation } from "@purin-labs/conversation/data/agent-operation-runner";
 import { readPortalOutput } from "./full-worker";
 import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
+import { runArmedAlarm } from "./durable-object-alarm-support";
 
 const CONVERSATION_ID = "conv_cc97400f-2eb9-52d3-b35e-56a9ef3e6085";
 const LONG_TEXT = 'Canonical long response: café, 焼き菓子, "quoted". '
@@ -248,7 +249,7 @@ async function sessionOriginJourney(
     });
     if (!caseActor.ok) throw new Error(caseActor.error.code);
     await evictDurableObject(caseActor.value);
-    await runDurableObjectAlarm(caseActor.value);
+    await runArmedAlarm(caseActor.value);
     expect(await readOriginBinding(stream.sessionId, stream.turnId)).toBe(
       origin,
     );
@@ -309,7 +310,7 @@ async function sessionOriginJourney(
         turnId: stream.turnId,
       }),
     ).toEqual({ ok: true, value: { kind: "present", state: "failed" } });
-    await runDurableObjectAlarm(retiredSession.value);
+    await runArmedAlarm(retiredSession.value);
     expect(model.calls).toBe(revokedModelRequests + 1);
     expect(await readOriginBinding(stream.sessionId, stream.turnId)).toBe(
       origin,
@@ -819,6 +820,7 @@ it(
       now: Date.now(),
     });
     if (!resumedActor.ok) throw new Error(resumedActor.error.code);
+    // The journey stops this alarm below, so only the second run must end.
     let recovery = runDurableObjectAlarm(resumedActor.value).then(
       automaticAlarmSucceeded,
       automaticAlarmFailed,
@@ -961,6 +963,7 @@ it(
     );
     const recoveryResult = await recovery;
     if (!recoveryResult.ok) throw new Error(JSON.stringify(recoveryResult));
+    expect(recoveryResult.value).toBe(true);
     expect(await preparationCount()).toBe(2);
     await expect
       .poll(
@@ -1476,10 +1479,10 @@ function interruptAutomaticContextActor(
   state.abort("Automatic context acceptance interruption");
 }
 function automaticAlarmSucceeded(value: boolean) {
-  return { ok: true, value };
+  return { ok: true as const, value };
 }
 function automaticAlarmFailed(error: unknown) {
-  return { ok: false, error };
+  return { ok: false as const, error };
 }
 
 it.skipIf(env.OPENROUTER_API_KEY === "openrouter-e2e-key")(
@@ -2263,7 +2266,7 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
 
   await evictDurableObject(actorCase.value);
   await fixtureDatabase().exec("DROP TRIGGER fail_chat_projection");
-  expect(await runDurableObjectAlarm(actorCase.value)).toBe(true);
+  await runArmedAlarm(actorCase.value);
   await expect
     .poll(
       readConversation.bind(null, fixtureDatabase(), scope, CONVERSATION_ID),
@@ -2392,6 +2395,7 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
     now: Date.now(),
   });
   if (!capacityCase.ok) throw new Error(capacityCase.error.code);
+  // The Case ends its wakeups during these passes, so a pass can find no alarm.
   for (let count = 0; count < 3; count += 1)
     await runDurableObjectAlarm(capacityCase.value);
   expect(await runInDurableObject(capacityCase.value, readWake)).toBeNull();

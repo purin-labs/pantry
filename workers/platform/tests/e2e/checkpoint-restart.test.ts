@@ -1,7 +1,7 @@
 import { sessionModule } from "./session-module-support";
 import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
-import { runInDurableObject, runDurableObjectAlarm } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { expect, it, vi, type TestContext } from "vitest";
 import {
   BindingObservation,
@@ -25,6 +25,7 @@ import {
   answerTurn,
 } from "./chat-journey-support";
 import { FakeChatGpt } from "./chatgpt-subscription-support";
+import { runArmedAlarm } from "./durable-object-alarm-support";
 
 type RestartTrial = {
   readonly admission: "open" | "closing";
@@ -133,7 +134,7 @@ async function restartFinalization(
     bindings: BindingObservationSnapshot;
   };
   try {
-    expect(await runDurableObjectAlarm(actor)).toBe(true);
+    await runArmedAlarm(actor);
   } finally {
     usage = await runInDurableObject(actor, finishRecoveryObservation);
   }

@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { expect, it } from "vitest";
 import { readImportedCanonicalSession } from "@purin-labs/agent/actors/agent-session-canonical";
 import { readLatestHarnessCheckpoint } from "@purin-labs/agent/actors/agent-session-harness-authority";
@@ -32,6 +32,7 @@ import {
 } from "./durable-codemode-journey-support";
 import { ORGANISATION_ID } from "./slack-journey-support";
 import { moveTarget } from "./placement-move-support";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 
 // Plan 50A, Phase D. These journeys run through the Slack Actor path with
 // the real Session, Organisation, and governor Actors, the Pi harness, and
@@ -193,7 +194,7 @@ it("releases a script that the freeze of a relocation ended, and completes the r
   // and tells the operator.
   const connector = await connectorActor();
   await runInDurableObject(connector, makeCaseWorkDue);
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
   await expect
     .poll(journey.slack.visibleMessageCount, { timeout: 20_000 })
     .toBe(1);

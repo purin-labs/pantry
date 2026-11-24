@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { http, HttpResponse } from "msw";
 import {
@@ -20,6 +20,7 @@ import {
   scheduledAt,
   mailProcessing,
 } from "./gmail-mailbox-support";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 
 const ADDRESS = "orders@example.test";
 const GMAIL = "https://gmail.googleapis.com/gmail/v1/users/me";
@@ -120,7 +121,7 @@ async function spamRescueJourney({ task }: TestContext): Promise<void> {
   });
   expect(on).toMatchObject({ status: 200, body: { ok: true } });
   const connector = await mailboxConnector(organisationId, account);
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
   await expect
     .poll(mailProcessing.bind(null, connector), { timeout: 10_000 })
     .toEqual({ kind: "waiting" });

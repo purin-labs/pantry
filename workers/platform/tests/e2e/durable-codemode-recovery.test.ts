@@ -1,4 +1,4 @@
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import { deriveCodeModeLeaseBinding } from "@purin-labs/agent/actors/code-mode-execution-record";
@@ -46,6 +46,7 @@ import {
   type Passage,
 } from "./durable-codemode-journey-support";
 import { ORGANISATION_ID } from "./slack-journey-support";
+import { runAlarmHandler, runArmedAlarm } from "./durable-object-alarm-support";
 
 // Plan 50A, Phases B and C. Each journey sends a Slack message whose turn
 // runs a Code Mode script of two reads, and stops the script at a chosen
@@ -207,7 +208,7 @@ it("resumes a script only after every owner holds the lease of the new runtime g
   // Admission opens, and the Organisation Actor fails once: a partial handoff.
   await controlAdmission(governor, "open_admission");
   await runInDurableObject(organisation, failFirstRebind);
-  expect(await runDurableObjectAlarm(session)).toBe(true);
+  await runArmedAlarm(session);
   const partial = await runInDurableObject(session, readSessionState);
   const partialGovernor = await runInDurableObject(
     governor,
@@ -233,7 +234,7 @@ it("resumes a script only after every owner holds the lease of the new runtime g
   expect(journey.completed).toEqual([interrupted.call_id]);
 
   // The same rebind again completes the handoff, and the script continues.
-  expect(await runDurableObjectAlarm(session)).toBe(true);
+  await runArmedAlarm(session);
   await deliverAfterConnectorLease(journey, session);
   expect(journey.slack.messages.map(messageText)).toEqual([FINAL_ANSWER]);
   // The interrupted read ran again under its first call ID.
@@ -390,7 +391,7 @@ it("ends the turn when the reservation expired while the Session Actor was lost"
   ).toMatchObject([{ state: "expired", lease_id: first.binding.leaseId }]);
 
   // The recovery finds no owner that will hold the reservation. The turn ends.
-  expect(await runDurableObjectAlarm(session)).toBe(true);
+  await runArmedAlarm(session);
   await expect
     .poll(readLifecycleKind.bind(null, session), { timeout: 15_000 })
     .toBe("sleeping");
@@ -412,7 +413,7 @@ it("ends the turn when the reservation expired while the Session Actor was lost"
   // its lease ends, and finds the cause.
   const connector = await connectorActor();
   await runInDurableObject(connector, endCaseWorkLease);
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
   await expect
     .poll(readCaseWorkOutcome.bind(null, connector), { timeout: 20_000 })
     .toEqual({
@@ -482,7 +483,7 @@ it("keeps a script stopped, when a call whose repeat is not proven safe was in f
   });
   // A later recovery changes nothing: no lease, no second call, and no
   // model request.
-  expect(await runDurableObjectAlarm(session)).toBe(true);
+  await runArmedAlarm(session);
   expect(
     (await runInDurableObject(session, readSessionState)).lifecycle,
   ).toEqual(held.lifecycle);
@@ -590,7 +591,7 @@ it("ends the turn before the script resumes, when a grant was revoked during the
   ).toBe("resumable_script");
   await revokeDiscoveryGrant();
   await controlAdmission(governor, "open_admission");
-  expect(await runDurableObjectAlarm(session)).toBe(true);
+  await runArmedAlarm(session);
 
   // The resumed turn checks its authority before the harness opens. The
   // turn ends there: no VM starts, and Pi replays nothing.
@@ -628,7 +629,7 @@ it("ends the turn before the script resumes, when a grant was revoked during the
   // attempt runs under the new authority, and holds nothing of the reads.
   const connector = await connectorActor();
   await runInDurableObject(connector, endCaseWorkLease);
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
   await expect
     .poll(readCaseWorkOutcome.bind(null, connector), { timeout: 20_000 })
     .toMatchObject({ outcome: "retryable" });

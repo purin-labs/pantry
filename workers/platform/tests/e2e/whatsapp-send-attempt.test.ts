@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
@@ -21,6 +21,7 @@ import {
   REPLY,
   type Fixture,
 } from "./whatsapp-connector-support";
+import { runAlarmHandler, runArmedAlarm } from "./durable-object-alarm-support";
 
 /**
  * Refactor 15, refactor 13: the WhatsApp reply proposal after its approval.
@@ -75,7 +76,7 @@ async function stoppedConnectorJourney({ task }: TestContext): Promise<void> {
     const connector = await nextConnector(fixture);
     // Two hours pass, so the proposal's approval time has ended.
     await runInDurableObject(connector, ageProposals);
-    expect(await runDurableObjectAlarm(connector)).toBe(true);
+    await runArmedAlarm(connector);
     const fenced = await runInDurableObject(connector, readConnector);
     expect(fenced.proposalState).toBe("send_indeterminate");
     expect(fenced.processing).toMatchObject({
@@ -164,10 +165,7 @@ async function movedDuringSendJourney(
         fixture.connector,
         endApprovalTime.bind(null, fixture.now),
       );
-      // An alarm that is due at once can run before this call; then the call
-      // finds no alarm, and the sweep has run all the same.
-      await runInDurableObject(fixture.connector, armAlarm);
-      await runDurableObjectAlarm(fixture.connector);
+      await runAlarmHandler(fixture.connector);
     }
     meta.phase = "released";
     const settled = await sending;

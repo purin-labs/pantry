@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { newConversationId, newProjectId } from "@purin-labs/control-api";
@@ -67,6 +67,7 @@ import {
   openRouterText,
   openRouterToolCall,
 } from "./slack-journey-support";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -740,7 +741,7 @@ async function draftReply() {
   expect(policy).toMatchObject({ status: 200, body: { ok: true } });
   await acceptMailboxModel(organisationId, owner);
   const connector = await mailboxConnector(organisationId, account);
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
   await grantOwnerReplyTools(organisationId, account);
   // A member who accepts an invitation joins the Base Project (Plan 95).
   const baseProjectId = await readDefaultProjectId(

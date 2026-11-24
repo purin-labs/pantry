@@ -1,5 +1,5 @@
 import { env, exports } from "cloudflare:workers";
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { http } from "msw";
 import { expect, it, type TestContext } from "vitest";
 
@@ -20,6 +20,7 @@ import {
   readDamagedSurfaceEffects,
   seedDamagedSurfaceEffects,
 } from "./case-execution-support";
+import { runArmedAlarm } from "./durable-object-alarm-support";
 
 /**
  * One failing alarm step does not stop the Session's other work (Refactor
@@ -80,7 +81,7 @@ async function failingAlarmStepJourney(test: TestContext): Promise<void> {
   test.onTestFinished(failCheckpointCompletion());
 
   const ranAt = Date.now();
-  await runDurableObjectAlarm(session).catch(ignoreAlarmFailure);
+  await runArmedAlarm(session);
   expect(await runInDurableObject(session, readDamagedSurfaceEffects)).toEqual({
     candidates: 0,
     quarantined: DAMAGED_EFFECTS,
@@ -97,10 +98,6 @@ async function failingAlarmStepJourney(test: TestContext): Promise<void> {
 }
 
 /** The old alarm stops with the step's error; the journey reads what ran. */
-function ignoreAlarmFailure(): boolean {
-  return false;
-}
-
 /** The completion of accepted checkpoints fails on every alarm pass. */
 function failCheckpointCompletion(): () => void {
   // The recovery module of the Session completes accepted checkpoints.

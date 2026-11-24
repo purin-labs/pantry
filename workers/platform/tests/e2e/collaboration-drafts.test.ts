@@ -2,11 +2,7 @@ import { requireOrganisationBootstrap } from "../organisation-execution-fixture"
 import { fixtureDatabase } from "./organisation-database";
 import { admitOperatorControlTurnFixture } from "../organisation-execution-fixture";
 import { env, exports } from "cloudflare:workers";
-import {
-  evictDurableObject,
-  runDurableObjectAlarm,
-  runInDurableObject,
-} from "cloudflare:test";
+import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import * as Y from "yjs";
 import {
@@ -54,6 +50,7 @@ import {
 } from "./hibernatable-socket-support";
 import { requiredPlacement } from "./slack-journey-support";
 import type { Variant } from "@purin-labs/type-utils";
+import { runArmedAlarm } from "./durable-object-alarm-support";
 
 const TEST_PLACEMENT = requiredPlacement();
 
@@ -702,7 +699,7 @@ async function menuRoomHibernationJourney(): Promise<void> {
         message.kind === "presence_changed" &&
         message.participants.length === 1,
     );
-    expect(await runDurableObjectAlarm(scenario.organisation)).toBe(true);
+    await runArmedAlarm(scenario.organisation);
     await expect(revoked).resolves.toMatchObject({
       kind: "failure",
       code: "access_revoked",
@@ -723,7 +720,7 @@ async function menuRoomHibernationJourney(): Promise<void> {
     // With no socket open, the next sweep ends the sweeps.
     await closeSocket(owner);
     await runInDurableObject(scenario.organisation, dueSocketSweepNow);
-    expect(await runDurableObjectAlarm(scenario.organisation)).toBe(true);
+    await runArmedAlarm(scenario.organisation);
     await expect(
       runInDurableObject(scenario.organisation, readSocketSweep),
     ).resolves.toMatchObject({ dueAt: null });

@@ -42,11 +42,7 @@ import {
 } from "./regional-execution-support";
 import { resolveWhatsAppOrganisationCredential } from "@purin-labs/surface-whatsapp/server/credential";
 import { env, exports } from "cloudflare:workers";
-import {
-  evictDurableObject,
-  runDurableObjectAlarm,
-  runInDurableObject,
-} from "cloudflare:test";
+import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import {
   bootstrapOrganisation,
@@ -96,6 +92,7 @@ import {
 } from "@purin-labs/actor-runtime/data/organisation-regional-copy";
 import type { ActorImportRequest } from "@purin-labs/actor-runtime/actors/actor-export";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
+import { runArmedAlarm } from "./durable-object-alarm-support";
 
 it(
   "onboards isolated regional organisations and recovers their Actors after eviction",
@@ -175,7 +172,7 @@ async function regionalOnboardingJourney({ task }: TestContext): Promise<void> {
     ).toMatchObject({ ok: false, error: { code: "organisation_mismatch" } });
     await runInDurableObject(actor, scheduleRecovery);
     await evictDurableObject(actor);
-    expect(await runDurableObjectAlarm(actor)).toBe(true);
+    await runArmedAlarm(actor);
     expect(
       (
         await actor.readCaseContextDiscoveryConfiguration({

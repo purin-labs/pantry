@@ -79,6 +79,7 @@ import {
   ORGANISATION_ID,
 } from "./slack-journey-support";
 import { seedPurchasingContext } from "./mail-purchasing-support";
+import { runAlarmHandler, runArmedAlarm } from "./durable-object-alarm-support";
 
 type ConfigurationBoundary =
   "credential" | "store" | "source_access" | "disconnect";
@@ -967,7 +968,7 @@ async function connectorDiscoveryJourney(
     // The evicted retired Connector cannot consume the retained work.
     await evictDurableObject(connector);
     await runInDurableObject(connector, armDiscoveryAlarm);
-    await runDurableObjectAlarm(connector);
+    await runAlarmHandler(connector);
     expect(await runInDurableObject(connector, readDiscoveryWork)).toEqual(
       retained,
     );
@@ -984,7 +985,7 @@ async function connectorDiscoveryJourney(
     await evictDurableObject(target);
     await runInDurableObject(target, advanceDiscoveryClock);
     await runInDurableObject(target, armDiscoveryAlarm);
-    expect(await runDurableObjectAlarm(target)).toBe(true);
+    await runArmedAlarm(target);
     expect(await runInDurableObject(target, readDiscoveryWork)).toBeNull();
     expect(pause.modelCalls).toBe(1);
     const organisation = await requireActiveOrganisationActor({
@@ -997,7 +998,7 @@ async function connectorDiscoveryJourney(
     expect(settled.evaluations).toHaveLength(1);
     await evictDurableObject(target);
     await runInDurableObject(target, armDiscoveryAlarm);
-    await runDurableObjectAlarm(target);
+    await runAlarmHandler(target);
     expect(pause.modelCalls).toBe(1);
     Object.assign(task.meta, {
       connectorCaseContextCollectionPlacement: {

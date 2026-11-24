@@ -692,7 +692,10 @@ function turnIdOf(row: { turn_id: string }): string {
   return row.turn_id;
 }
 
-/** Run the Session's alarm, then read whether its checkpoint is published. */
+/**
+ * Run the Session's alarm if it holds one, then read whether its checkpoint is
+ * published. The caller polls this outcome.
+ */
 async function publicationAfterAlarm(
   session: Awaited<ReturnType<typeof threadSession>>["stub"],
 ): Promise<string> {
@@ -800,7 +803,10 @@ function countCaseWork(_actor: unknown, ctx: DurableObjectState): number {
     .one().n;
 }
 
-/** Run the Connector's alarm, which claims a retry once it is due. */
+/**
+ * Run the Connector's alarm if it holds one; it claims a retry once it is due.
+ * The caller polls the outcome.
+ */
 async function caseWorkAfterAlarm(
   connector: Awaited<ReturnType<typeof connectorOf>>,
 ): Promise<number> {

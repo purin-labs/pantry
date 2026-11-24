@@ -18,6 +18,7 @@ import {
   slackEnvelope,
   shownSlackPost,
 } from "./slack-journey-support";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 
 /**
  * A Slack message that fails on every attempt must not end in silence. When
@@ -134,6 +135,7 @@ async function attemptsExhaustedJourney(test: TestContext): Promise<void> {
   await expect
     .poll(
       async () => {
+        // A poll can find no alarm. The receipt below is the check.
         await runDurableObjectAlarm(connector);
         return record(REFUSED_EVENT);
       },
@@ -154,7 +156,7 @@ async function attemptsExhaustedJourney(test: TestContext): Promise<void> {
 
   // Slack sends the same event again. The thread gets no second notice.
   await sendSlack(reply.eventId, reply.messageTs, reply.text);
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
   expect(await record(REFUSED_EVENT)).toEqual({
     kind: "receipt",
     outcome: "rejected",
@@ -239,7 +241,7 @@ async function claimAgain(
   eventId: string,
 ): Promise<void> {
   await runInDurableObject(connector, makeRetryDue.bind(null, eventId));
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
 }
 
 function makeRetryDue(

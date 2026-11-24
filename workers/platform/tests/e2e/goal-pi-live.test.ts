@@ -1,10 +1,6 @@
 import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
-import {
-  evictDurableObject,
-  runDurableObjectAlarm,
-  runInDurableObject,
-} from "cloudflare:test";
+import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { bypass, http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
@@ -20,6 +16,7 @@ import {
   signedSlackRequest,
   openRouterText,
 } from "./slack-journey-support";
+import { runArmedAlarm } from "./durable-object-alarm-support";
 
 it.skipIf(env.OPENROUTER_API_KEY === "openrouter-e2e-key")(
   "stops real Pi calls at a goal budget and resumes accepted history after Actor eviction without duplicate usage",
@@ -100,7 +97,7 @@ async function nativeGoalJourney(context: TestContext): Promise<void> {
   expect(replayed).toBe(1);
   await evictDurableObject(session);
   await evictDurableObject(owner);
-  expect(await runDurableObjectAlarm(session)).toBe(true);
+  await runArmedAlarm(session);
   expect(await owner.readGoal(identity)).toEqual(stopped);
   expect(
     await owner.applyGoalCommand({

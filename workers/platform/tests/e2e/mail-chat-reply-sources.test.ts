@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import {
@@ -70,6 +70,7 @@ import {
   openRouterText,
   openRouterToolCall,
 } from "./slack-journey-support";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -191,7 +192,7 @@ async function chatReplySourcesJourney({ task }: TestContext): Promise<void> {
   expect(on).toMatchObject({ status: 200, body: { ok: true } });
   await acceptMailboxModel(organisationId, owner);
   const connector = await mailboxConnector(organisationId, account);
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
   const merchantId = await seedOrder(organisationId, owner.userId);
   // The owner may read orders and draft replies in a chat. The
   // administrator reads the mailbox through its setup, and not orders.

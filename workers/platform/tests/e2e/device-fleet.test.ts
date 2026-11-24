@@ -1,4 +1,4 @@
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { env } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import {
@@ -29,6 +29,7 @@ import {
   installSlackActorFixture,
 } from "./slack-journey-support";
 import { sideCaseSlack } from "./slack-side-case-support";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 
 /**
  * Plan 85, journeys J2, J3 and J4, with a simulated gateway that speaks the real
@@ -374,7 +375,7 @@ async function faultJourney(): Promise<void> {
     (await send(`${base}/devices/alert-settings`, session, "PUT", closed))
       .status,
   ).toBe(200);
-  await runDurableObjectAlarm(stub);
+  await runAlarmHandler(stub);
   await expect
     .poll(async () =>
       requireGatewayRow(
@@ -391,21 +392,12 @@ async function faultJourney(): Promise<void> {
   };
   await send(`${base}/devices/alert-settings`, session, "PUT", open);
   await runInDurableObject(stub, () => undefined);
-  await runDurableObjectAlarmSet(stub);
+  await runAlarmHandler(stub);
   await expect
     .poll(() => slack.posts().map((post) => post.text), { timeout: 20_000 })
     .toHaveLength(1);
   expect(slack.posts()[0]?.text).toContain("Bar gateway");
   await gateway.close();
-}
-
-async function runDurableObjectAlarmSet(
-  stub: Parameters<typeof runDurableObjectAlarm>[0],
-): Promise<void> {
-  await runInDurableObject(stub, async (_instance, state) => {
-    await state.storage.setAlarm(Date.now() + 60_000);
-  });
-  await runDurableObjectAlarm(stub);
 }
 
 async function revokeJourney(): Promise<void> {

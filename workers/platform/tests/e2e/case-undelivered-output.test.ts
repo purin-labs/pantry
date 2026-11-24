@@ -1,5 +1,5 @@
 import { env, exports } from "cloudflare:workers";
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { http } from "msw";
 import { expect, it, type TestContext } from "vitest";
 
@@ -14,6 +14,7 @@ import {
   slackEnvelope,
   slackSimulator,
 } from "./slack-journey-support";
+import { runArmedAlarm } from "./durable-object-alarm-support";
 
 /**
  * An answer that nothing delivered ends (Refactor 15, refactor 2).
@@ -83,7 +84,7 @@ async function undeliveredOutputJourney(test: TestContext): Promise<void> {
   // The census of Actor states counts it (Refactor 15, S5).
   expect(await pendingOutputCount()).toBe(1);
 
-  await runDurableObjectAlarm(caseActor);
+  await runArmedAlarm(caseActor);
   expect(await pendingOutputCount()).toBe(0);
   const outputs = await runInDurableObject(caseActor, readOutputs);
   expect(outputs).toEqual([

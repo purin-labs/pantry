@@ -1,10 +1,6 @@
 import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
-import {
-  evictDurableObject,
-  runDurableObjectAlarm,
-  runInDurableObject,
-} from "cloudflare:test";
+import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
@@ -39,6 +35,7 @@ import {
 import { storedContent } from "./case-execution-support";
 import { exportedItemCount } from "./placement-move-support";
 import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
+import { runArmedAlarm } from "./durable-object-alarm-support";
 
 it(
   "fences transient WhatsApp proposals at goal stops and timeout, preserves usage after restart, and retains no transcript",
@@ -149,7 +146,7 @@ async function whatsappGoalJourney(context: TestContext): Promise<void> {
       "WA_PRIVATE_REPLY",
     );
     await evictDurableObject(session);
-    await runDurableObjectAlarm(session);
+    await runArmedAlarm(session);
     expect(await owner.readGoal(identity)).toEqual(goal);
     if (phase === "timeout") {
       if (!goal.ok) throw new Error(goal.error.code);

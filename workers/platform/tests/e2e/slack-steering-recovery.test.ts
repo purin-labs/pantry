@@ -1,4 +1,4 @@
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { fixtureDatabase } from "./organisation-database";
 import { env } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
@@ -26,6 +26,7 @@ import {
   userMessageContaining,
   userMessageIs,
 } from "./slack-journey-support";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 
 /**
  * A steering reply survives the loss of the Session Actor (Plan 71,
@@ -209,7 +210,7 @@ async function unresumableSteeringJourney(test: TestContext): Promise<void> {
     .poll(readLifecycleKind.bind(null, session), { timeout: 20_000 })
     .toBe("sleeping");
   await runInDurableObject(connector, endCaseWorkLease);
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
 
   // The first message's attempts read its failed turn again; each one is
   // made due at once instead of after its wait.
@@ -217,7 +218,7 @@ async function unresumableSteeringJourney(test: TestContext): Promise<void> {
     .poll(
       async () => {
         await runInDurableObject(connector, makeCaseWorkDue);
-        await runDurableObjectAlarm(connector);
+        await runAlarmHandler(connector);
         return runInDurableObject(
           connector,
           readReceipt.bind(null, REPLY_EVENT),

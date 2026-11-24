@@ -1,6 +1,6 @@
 import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { http, type HttpResponseResolver } from "msw";
 import { isRecord } from "@purin-labs/std";
@@ -28,6 +28,7 @@ import {
 } from "./gmail-mailbox-support";
 import { openRouterText, openRouterToolCall } from "./slack-journey-support";
 import { modelToolResults } from "./chat-journey-support";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 
 const ADDRESS = "orders@example.test";
 const SENDER = "supplier@example.test";
@@ -93,7 +94,7 @@ async function senderSupplierLinkJourney({ task }: TestContext): Promise<void> {
   expect(on).toMatchObject({ status: 200, body: { ok: true } });
   await acceptMailboxModel(organisationId, owner);
   const connector = await mailboxConnector(organisationId, account);
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
   const scope = await requireOrganisationExecutionScope(env, organisationId);
   const senderOf = async (threadId: string, messageId: string) => {
     const caseId = parseCaseId(`case_gmail_${account}_${threadId}`);
@@ -511,14 +512,13 @@ async function holdDiscovery(connector: MailboxConnector): Promise<void> {
 async function releaseDiscovery(connector: MailboxConnector): Promise<void> {
   await runInDurableObject(
     connector,
-    async (_actor: unknown, state: DurableObjectState) => {
+    (_actor: unknown, state: DurableObjectState) => {
       state.storage.sql.exec(
         "UPDATE connector_email_case_context_discovery SET available_at = 0",
       );
-      await state.storage.setAlarm(Date.now());
     },
   );
-  await runDurableObjectAlarm(connector);
+  await runAlarmHandler(connector);
 }
 
 function pendingDiscovery(_actor: unknown, state: DurableObjectState) {

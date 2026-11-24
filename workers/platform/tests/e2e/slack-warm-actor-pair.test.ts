@@ -378,7 +378,10 @@ function readCaseWork(
     .map((row) => ({ state: row.state_kind, attempt: row.attempt }));
 }
 
-/** Run the Connector's alarm, which claims the retry once it is due. */
+/**
+ * Run the Connector's alarm if it holds one; it claims the retry once it is
+ * due. The caller polls the outcome.
+ */
 async function deliveriesAfterAlarm(
   connector: Awaited<ReturnType<typeof connectorOf>>,
   recorded: Recorded,

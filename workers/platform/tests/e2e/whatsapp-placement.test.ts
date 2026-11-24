@@ -5,11 +5,7 @@ import {
 import { fixtureDatabase } from "./organisation-database";
 import { parsePersistedHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import { env, exports } from "cloudflare:workers";
-import {
-  evictDurableObject,
-  runInDurableObject,
-  runDurableObjectAlarm,
-} from "cloudflare:test";
+import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
@@ -60,6 +56,7 @@ import {
   readBarrier,
   startMove,
 } from "./placement-move-support";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 
 type SendBoundary = "credential" | "response";
 type ReplyBoundary = "panel" | SendBoundary;
@@ -672,14 +669,14 @@ async function noticeJourney(
     await evictDurableObject(target);
     // Advance the persisted retry deadline without changing the runtime clock.
     await runInDurableObject(target, makeNoticeDue);
-    await runDurableObjectAlarm(target);
+    await runAlarmHandler(target);
     expect(await runInDurableObject(target, readNoticeDelivered)).toBe(true);
     await evictDurableObject(target);
     expect(await target.acceptWhatsAppEvent(event)).toMatchObject({
       ok: true,
       value: { kind: "unsupported" },
     });
-    await runDurableObjectAlarm(target);
+    await runAlarmHandler(target);
     expect(pause.providerAttempts).toBe(1);
     Object.assign(task.meta, {
       whatsappNoticePlacement: {
