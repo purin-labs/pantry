@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import { parseReplyCitations } from "../../mail-inbox/reply-sources";
 import {
   parseIntegrationAccountReference,
@@ -34,7 +35,7 @@ export const emailMailboxSearch = defineChannelTool({
     type: "object",
     properties: {
       integrationAccountId: { type: "string", minLength: 1 },
-      query: { type: "string", minLength: 1, maxLength: 256 },
+      query: textLimit({ type: "string", minLength: 1, maxLength: 256 }),
       limit: { type: "integer", minimum: 1, maximum: 10 },
     },
     required: ["integrationAccountId", "query", "limit"],
@@ -66,9 +67,9 @@ export const emailReplyProposal = defineChannelTool({
     type: "object",
     properties: {
       integrationAccountId: { type: "string", minLength: 1 },
-      messageId: { type: "string", minLength: 1, maxLength: 256 },
-      threadId: { type: "string", minLength: 1, maxLength: 256 },
-      body: { type: "string", minLength: 1, maxLength: 20000 },
+      messageId: textLimit({ type: "string", minLength: 1, maxLength: 256 }),
+      threadId: textLimit({ type: "string", minLength: 1, maxLength: 256 }),
+      body: textLimit({ type: "string", minLength: 1, maxLength: 20000 }),
       sources: {
         type: ["array", "null"],
         items: {
@@ -150,8 +151,8 @@ export const emailReplyDraftEdit = defineChannelTool({
         type: "string",
         pattern: "^proposal_[A-Za-z0-9_:.-]{1,500}$",
       },
-      oldText: { type: "string", maxLength: 20000 },
-      newText: { type: "string", maxLength: 20000 },
+      oldText: textLimit({ type: "string", maxLength: 20000 }),
+      newText: textLimit({ type: "string", maxLength: 20000 }),
     },
     required: ["integrationAccountId", "proposalId", "oldText", "newText"],
     additionalProperties: false,
@@ -212,15 +213,15 @@ export const emailOperationalProposal = defineChannelTool({
             type: "object",
             properties: {
               kind: { type: "string", enum: ["self_test"] },
-              address: { type: "string", minLength: 3, maxLength: 320 },
+              address: textLimit({ type: "string", minLength: 3, maxLength: 320 }),
             },
             required: ["kind", "address"],
             additionalProperties: false,
           },
         ],
       },
-      subject: { type: "string", minLength: 1, maxLength: 998 },
-      body: { type: "string", minLength: 1, maxLength: 20000 },
+      subject: textLimit({ type: "string", minLength: 1, maxLength: 998 }),
+      body: textLimit({ type: "string", minLength: 1, maxLength: 20000 }),
     },
     required: ["accountRef", "target", "subject", "body"],
     additionalProperties: false,
@@ -275,7 +276,7 @@ export const whatsAppSupportReplySend = defineChannelTool({
     type: "object",
     properties: {
       caseId: { type: "string", minLength: 1 },
-      body: { type: "string", minLength: 1, maxLength: 4000 },
+      body: textLimit({ type: "string", minLength: 1, maxLength: 4000 }),
     },
     required: ["caseId", "body"],
     additionalProperties: false,

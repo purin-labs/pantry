@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import type { AuthorizedHarnessToolResult } from "@purin-labs/contracts";
 import {
   defineToolFamily,
@@ -248,13 +249,13 @@ export const mailboxNoReply = defineMailboxAgentTool({
 const READ_ORDER_PARAMETERS = {
   type: "object",
   properties: {
-    orderId: {
+    orderId: textLimit({
       type: "string",
       minLength: 1,
       maxLength: 256,
       description:
         "The exact order reference as it appears in an admitted message.",
-    },
+    }),
   },
   required: ["orderId"],
   additionalProperties: false,
@@ -276,13 +277,13 @@ export const mailboxOrderRead = defineMailboxAgentTool({
 const SUPPLIER_CONTEXT_PARAMETERS = {
   type: "object",
   properties: {
-    purchaseRequestId: {
+    purchaseRequestId: textLimit({
       type: "string",
       minLength: 1,
       maxLength: 256,
       description:
         "The exact purchase request reference present in the admitted triggering message.",
-    },
+    }),
   },
   required: ["purchaseRequestId"],
   additionalProperties: false,

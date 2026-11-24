@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import type { EmailDraftEditRequest } from "../../actors/email-draft";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
@@ -39,8 +40,8 @@ export const emailDraftEdit = defineChannelTool({
     type: "object",
     properties: {
       field: { type: "string", enum: ["subject", "preview", "body"] },
-      oldText: { type: "string", maxLength: 50000 },
-      newText: { type: "string", maxLength: 50000 },
+      oldText: textLimit({ type: "string", maxLength: 50000 }),
+      newText: textLimit({ type: "string", maxLength: 50000 }),
       expectedRevision: { type: "integer", minimum: 0 },
     },
     required: ["field", "oldText", "newText", "expectedRevision"],
