@@ -2416,10 +2416,12 @@ function summaryLine(
   if (replies === null) return "Reading what needs you…";
   const count = items.length + whatsapp.length + unanswered.length;
   if (count === 0) return "No decisions wait for you.";
+  // A member cannot decide: the count names what waits for an owner or an
+  // admin, also the WhatsApp conversations and the mail with no reply.
   if (!canManage)
     return count === 1
-      ? "1 reply draft waits for approval."
-      : `${count} reply drafts wait for approval.`;
+      ? "1 conversation waits for an owner or an admin."
+      : `${count} conversations wait for an owner or an admin.`;
   let oldest = Date.now();
   for (const item of items) oldest = Math.min(oldest, item.since);
   for (const conversation of whatsapp)

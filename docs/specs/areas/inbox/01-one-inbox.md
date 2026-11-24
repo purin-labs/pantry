@@ -34,8 +34,9 @@ stores nothing of a WhatsApp message. Pantry never sends an unconfirmed reply ag
   mail and Spam are pages of Gmail's own folders; a search shows its results in All
   mail. The agent reads nothing in Spam.
 - The summary line counts what waits: "3 decisions need you. The oldest has waited …".
-  A member who is not an owner or admin reads "3 reply drafts wait for approval." That
-  count also holds the waiting WhatsApp conversations and the mail with no reply.
+  A member who is not an owner or admin reads "3 conversations wait for an owner or an
+  admin." Both counts hold the drafts, the waiting WhatsApp conversations and the mail
+  with no reply.
 - A row shows the sender, the wait time, one line of text, the channel and one state. An
   email row with no headline shows the thread's message from the loaded page, or "Reply
   draft".

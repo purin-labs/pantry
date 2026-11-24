@@ -1,5 +1,6 @@
 // Run after mount-browser-fixture.js in the same Playwright CLI session.
-// Plan 83: email and WhatsApp in one list. A person approves a WhatsApp draft,
+// Plan 83: email and WhatsApp in one list. A member reads what waits for an
+// owner or an admin. A person approves a WhatsApp draft,
 // the next conversation opens, a composer reply takes the Case, the agent's
 // section and a closed Case in Done show, a refused number asks for a grant, the agent setting
 // saves, and with no agent a person writes the email reply.
@@ -224,6 +225,22 @@ async function verifyOneInbox(page) {
     throw new Error(`The list does not merge the channels: ${merged}`);
   await inbox.getByText(/^5 decisions need you\./).waitFor();
   await page.screenshot({ path: "output/playwright/one-inbox-list.png" });
+
+  // A member who is not an owner or admin reads the same count. It names
+  // what waits: drafts, WhatsApp conversations and mail with no reply.
+  await page.evaluate(function asMember() {
+    window.mailInboxRender({ key: "one-inbox-member", canManage: false });
+  });
+  await inbox
+    .getByText("5 conversations wait for an owner or an admin.", {
+      exact: true,
+    })
+    .waitFor();
+  await page.screenshot({ path: "output/playwright/one-inbox-member.png" });
+  await page.evaluate(function asOwner() {
+    window.mailInboxRender({ key: "one-inbox" });
+  });
+  await needs.getByRole("button").nth(4).waitFor();
 
   // The channel filter narrows the same list.
   const channel = page.getByRole("combobox", { name: "Channel", exact: true });
@@ -553,6 +570,7 @@ async function verifyOneInbox(page) {
     personReplies,
     screenshots: [
       "output/playwright/one-inbox-list.png",
+      "output/playwright/one-inbox-member.png",
       "output/playwright/one-inbox-whatsapp.png",
       "output/playwright/one-inbox-setting.png",
       "output/playwright/one-inbox-person-reply.png",
