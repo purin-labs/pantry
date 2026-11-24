@@ -140,6 +140,32 @@ export async function beginGoogleOidc(input: {
   return { state, authorizationUrl: url.toString(), expiresAt };
 }
 
+/** A sign-in state stays this long after it ends, used or not. */
+const ENDED_OIDC_STATE_RETENTION_MS = 24 * 60 * 60 * 1000;
+/** One run deletes at most this many states. */
+const ENDED_OIDC_STATE_PAGE = 500;
+
+/**
+ * Deletes the sign-in states that ended more than one day ago, oldest first,
+ * a page at a time. A state ends `OIDC_STATE_TTL_MS` after its start, and a
+ * callback uses it before that or never, so this takes used and unused states
+ * alike. The 15-minute onboarding run calls it. With nothing that old, it
+ * reads one index and writes nothing.
+ */
+export async function deleteEndedGoogleOidcStates(
+  db: GlobalDatabase,
+  now: number,
+): Promise<void> {
+  await db
+    .prepare(
+      `DELETE FROM control_oidc_state WHERE state_hash IN (
+         SELECT state_hash FROM control_oidc_state
+         WHERE expires_at < ? ORDER BY expires_at LIMIT ?)`,
+    )
+    .bind(now - ENDED_OIDC_STATE_RETENTION_MS, ENDED_OIDC_STATE_PAGE)
+    .run();
+}
+
 export async function completeGoogleOidc(input: {
   readonly db: GlobalDatabase;
   readonly config: GoogleOidcConfig;
@@ -543,7 +569,9 @@ function parseRsaJwk(
 
 function decodeJson(encoded: string): unknown {
   try {
-    return JSON.parse(new TextDecoder().decode(decodeLenientBase64Url(encoded)));
+    return JSON.parse(
+      new TextDecoder().decode(decodeLenientBase64Url(encoded)),
+    );
   } catch {
     return null;
   }

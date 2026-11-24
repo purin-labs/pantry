@@ -33,6 +33,27 @@ export function readOnboardingRow(
     .first<OnboardingRow>();
 }
 
+/** Whether the organisation is active and its onboarding is active. */
+export async function hasActiveOrganisationOnboarding(
+  db: Database,
+  organisationId: string,
+): Promise<boolean> {
+  const row = await db
+    .prepare(
+      `SELECT 1 AS present
+         FROM organisation
+         JOIN organisation_onboarding AS onboarding
+           ON onboarding.organisation_id = organisation.organisation_id
+        WHERE organisation.organisation_id = ?
+          AND organisation.status = 'active'
+          AND onboarding.lifecycle = 'active'
+        LIMIT 1`,
+    )
+    .bind(organisationId)
+    .first<{ readonly present: number }>();
+  return row !== null;
+}
+
 /**
  * Advances the configuration version from `expected` to `next`. A row at
  * another version gets a NULL version, which the batch's receipt then refuses.

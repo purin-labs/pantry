@@ -58,6 +58,7 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "beginGoogleOidc",
     "completeGoogleOidc",
     "consumeGoogleApprovalCeremony",
+    "deleteEndedGoogleOidcStates",
   ],
   "foundation/authority/credential-vault/root-rotation.ts": [
     "failVaultRootRotation",
@@ -70,6 +71,7 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "startVaultRootRotation",
   ],
   "foundation/tenancy/data/control-plane.ts": [
+    "deleteEndedControlSessions",
     "issueControlSession",
     "renewControlSession",
     "resolveControlSession",

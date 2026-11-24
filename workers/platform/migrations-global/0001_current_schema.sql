@@ -187,6 +187,10 @@ CREATE TABLE control_session (
 );
 CREATE INDEX idx_control_session_identity
   ON control_session (user_id, expires_at);
+CREATE INDEX idx_control_session_expiry
+  ON control_session (expires_at);
+CREATE INDEX idx_control_session_revoked
+  ON control_session (revoked_at) WHERE revoked_at IS NOT NULL;
 CREATE TABLE control_oidc_state (
   state_hash TEXT PRIMARY KEY,
   provider TEXT NOT NULL CHECK (provider = 'google'),
@@ -199,6 +203,8 @@ CREATE TABLE control_oidc_state (
   CHECK (expires_at > created_at),
   CHECK (consumed_at IS NULL OR consumed_at >= created_at)
 );
+CREATE INDEX idx_control_oidc_state_expiry
+  ON control_oidc_state (expires_at);
 CREATE TABLE slack_installation (
   installation_id TEXT PRIMARY KEY,
   environment TEXT NOT NULL CHECK (environment IN ('development', 'production')),

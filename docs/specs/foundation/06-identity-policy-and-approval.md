@@ -26,6 +26,9 @@ records each answer.
 - A session ends 7 days after its last extension and 30 days after its sign-in. Only
   `GET /v1/control/session` and `POST /session/rotate` extend it. The session read
   extends it at most one time an hour, so most reads write nothing.
+- The 15-minute onboarding run deletes a session row 30 days after the session ended or
+  was revoked, and a sign-in state one day after it ended, used or not. Each delete
+  reads an index, takes at most 500 rows, and writes nothing when no row is that old.
 - A mutation needs an `Origin` header equal to `PANTRY_PUBLIC_ORIGIN`. Its
   `x-pantry-csrf` header must equal the `pantry_csrf` cookie and the stored CSRF hash.
 - `GET /v1/control/session` gives the identity, the support role and the memberships
@@ -205,6 +208,7 @@ proposed -> approval_requested -> signed -> executing
 - A retry from `indeterminate` needs evidence: `provider_idempotency_absent`,
   `provider_idempotent_replay` or `local_effect_absent`. A custom connector write
   retries only on a replay, if its definition declares provider idempotency.
+- An ended entry stays in the ledger. It is the approval evidence of its action.
 
 ### Approval and the step-up sign-in
 
@@ -367,6 +371,7 @@ prompts), `features/integrations/workspace.tsx` (members and invitations),
 | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | Session: from its last extension, from its sign-in, renewal step           | 7 days, 30 days, 1 hour                                                             | `CONTROL_SESSION_TTL_MS`, `CONTROL_SESSION_MAX_AGE_MS`, `CONTROL_SESSION_RENEWAL_STEP_MS` |
 | OIDC state; clock difference of an ID token                                | 10 minutes; 60 s                                                                    | `OIDC_STATE_TTL_MS`, `CLOCK_SKEW_SECONDS`                                                 |
+| Row kept after its end: session, OIDC state                                | 30 days, 1 day                                                                      | `ENDED_SESSION_RETENTION_MS`, `ENDED_OIDC_STATE_RETENTION_MS`                             |
 | Step-up sign-in and its challenge; Slack approval                          | 10 minutes; 60 s                                                                    | `APPROVAL_STEP_UP_MAX_AGE_MS`, `SLACK_APPROVAL_WINDOW_MS`                                 |
 | Action expiry                                                              | 15 minutes. A supplier payout: the earlier of 15 minutes and its execution deadline | `ACTION_PROPOSAL_EXPIRY_MS`; the payout proposer adds `Math.min`                          |
 | Execution lease                                                            | 5 minutes                                                                           | `ACTION_EXECUTION_LEASE_DURATION_MS`                                                      |
@@ -434,8 +439,8 @@ The boundaries:
   keeps its own store, route and card.
 - **Invitations.** Issue, revoke and accept write no mutation receipt and no audit
   event. The row keeps the person who invited, but not the person who revoked.
-- **Retention.** No job deletes ended `control_session` rows, used `control_oidc_state`
-  rows or ended ledger entries. A person cannot select the cell of a new Organisation.
+- **Cell of a new Organisation.** A person cannot select the cell of a new
+  Organisation.
 
 ## Sources
 
@@ -447,7 +452,8 @@ The boundaries:
   "A2.1: the decisions", and Appendix E. They give no archive link for this subsystem.
 - Where a source differs from the code, this spec follows the code. E2E journeys in
   `workers/platform/tests/e2e/`. Accounts:
-  `organisation-setup.test.ts`, `organisation-invitation.test.ts`,
+  `organisation-setup.test.ts`, `sign-in-retention.test.ts`,
+  `organisation-invitation.test.ts`,
   `member-removal-access.test.ts`, `organisation-archive-access.test.ts`,
   `slack-viewer-refusal.test.ts` and `bakery-agent-canvas.test.ts`. Grants and policy:
   `grant-placement.test.ts`, `grant-writers-placement.test.ts`,

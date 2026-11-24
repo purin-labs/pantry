@@ -1,4 +1,3 @@
-import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { reconcileHeldOutputRequests } from "@purin-labs/surface-slack/server/held-output-release";
 import { reconcileHeldPermissionDecisions } from "@purin-labs/surface-slack/server/permission-request-release";
@@ -6,7 +5,8 @@ import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
 } from "@purin-labs/tenancy/organisation-execution-scope";
-import { hashOpaqueSecret, resolveUser } from "@purin-labs/tenancy/data/control-plane";
+import { deleteEndedControlSessions, hashOpaqueSecret, resolveUser } from "@purin-labs/tenancy/data/control-plane";
+import { deleteEndedGoogleOidcStates } from "@purin-labs/control/worker/oidc";
 import {
   hashPortalSubject,
   newControlMutationIdentity,
@@ -20,8 +20,9 @@ import { archiveOrganisation } from "@purin-labs/tenancy/data/organisation-lifec
 import { publishOrganisationDirectoryRow } from "@purin-labs/tenancy/data/shared-rows/organisation-row";
 import { publishStoppedInitialPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import { deleteExpiredMutationReceipts } from "@purin-labs/tenancy/data/shared-rows/mutation-receipt";
+import { hasActiveOrganisationOnboarding } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 import type { Env } from "@purin-labs/kernel/env";
-import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { reconcileProviderManifestObservations } from "@purin-labs/area-integrations/server/provider-lifecycle/observation";
@@ -142,27 +143,9 @@ export async function runScheduledOnboardingReconciliation(
     }
   }
   await deleteExpiredMutationReceipts(env, now);
+  await deleteEndedControlSessions(env.DB, now);
+  await deleteEndedGoogleOidcStates(env.DB, now);
   await sweepVaultAlerts(env, now);
-}
-
-async function hasActiveOrganisationOnboarding(
-  db: Pick<OrganisationDatabase, "prepare">,
-  organisationId: OrganisationId,
-): Promise<boolean> {
-  const row = await db
-    .prepare(
-      `SELECT 1 AS present
-       FROM organisation
-       JOIN organisation_onboarding AS onboarding
-         ON onboarding.organisation_id = organisation.organisation_id
-      WHERE organisation.organisation_id = ?
-        AND organisation.status = 'active'
-        AND onboarding.lifecycle = 'active'
-      LIMIT 1`,
-    )
-    .bind(organisationId)
-    .first<{ readonly present: number }>();
-  return row !== null;
 }
 
 async function archiveIdleConfiguringOrganisations(

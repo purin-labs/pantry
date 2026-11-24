@@ -634,6 +634,39 @@ export async function revokeControlSession(input: {
     .run();
 }
 
+/** A session row stays this long after its end or its revoke. */
+const ENDED_SESSION_RETENTION_MS = 30 * 24 * 60 * 60 * 1_000;
+/** One run deletes at most this many ended and this many revoked sessions. */
+const ENDED_SESSION_PAGE = 500;
+
+/**
+ * Deletes the sessions that ended or were revoked more than 30 days ago,
+ * oldest first, a page at a time. The 15-minute onboarding run calls it. With
+ * nothing that old, it reads two indexes and writes nothing.
+ */
+export async function deleteEndedControlSessions(
+  db: GlobalDatabase,
+  now: number,
+): Promise<void> {
+  const endedBefore = now - ENDED_SESSION_RETENTION_MS;
+  await db.batch([
+    db
+      .prepare(
+        `DELETE FROM control_session WHERE control_session_id IN (
+           SELECT control_session_id FROM control_session
+           WHERE expires_at < ? ORDER BY expires_at LIMIT ?)`,
+      )
+      .bind(endedBefore, ENDED_SESSION_PAGE),
+    db
+      .prepare(
+        `DELETE FROM control_session WHERE control_session_id IN (
+           SELECT control_session_id FROM control_session
+           WHERE revoked_at < ? ORDER BY revoked_at LIMIT ?)`,
+      )
+      .bind(endedBefore, ENDED_SESSION_PAGE),
+  ]);
+}
+
 export async function validateControlCsrf(input: {
   readonly db: GlobalQuerySource;
   readonly session: ActiveControlSession;
