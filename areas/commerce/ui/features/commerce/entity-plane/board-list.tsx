@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { ChevronRight } from "lucide-react";
 import { SideDrawer } from "@purin-labs/ui/index";
 import { FilterCount } from "../filter-bar";
+import { COMMERCE_VALUE_ABSENT } from "./presentation";
 import "./board-list.css";
 
 /**
@@ -226,7 +227,12 @@ export function renderCommerceFact(
   return (
     <div key={fact.id}>
       <dt>{fact.label}</dt>
-      <dd data-numeric={fact.numeric ? "true" : undefined}>{fact.value}</dd>
+      <dd
+        data-numeric={fact.numeric ? "true" : undefined}
+        data-absent={fact.value === COMMERCE_VALUE_ABSENT ? "true" : undefined}
+      >
+        {fact.value}
+      </dd>
     </div>
   );
 }

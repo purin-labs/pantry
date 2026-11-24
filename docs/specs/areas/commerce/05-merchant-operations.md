@@ -213,13 +213,17 @@ side drawer with the card facts, the lane select and the order fields. The Suppl
 Directory is the table of its list (`CrmTable`): the supplier, then a column for each
 directory field (contact, email, phone, lead time, minimum order and its unit, notes),
 with a sort on each column, the first column pinned, a resize handle and a Calculate
-footer on each column, and the count of records. A view of the directory adds Display
-options for an admin. The supplier's name opens its record page. A cell does not
-change in the table: only a status column takes a select, and the directory has none.
-The supplier's record page shows its facts (contact, email, phone, lead time, minimum
-order, notes, legal name and country code), its open queue requests and the items that
-it supplies: the Portal reads the directory and the queue for them, because the record
-read carries no list entry. The engine
+footer on each column, and the count of records. The table spans the page under the
+tab row, as on Products and Orders. A view of the directory adds Display options for
+an admin. The supplier's name opens its record page. A cell does not change in the
+table: only a status column takes a select, and the directory has none. The supplier's
+record page shows, in this order: Ordering (lead time, minimum order, notes), its open
+queue requests, the items that it supplies (each row opens the item), Company
+(contact, email, phone, legal name and country) and Activity. Each group of facts is
+one framed list of label and value rows, and each list is framed too; an empty fact
+shows "—". The Portal reads the directory and the queue for the record page, because
+the record read carries no list entry. Back to Purchasing opens the Supplier Directory
+tab (`?tab=supplier_directory`). The engine
 keeps entity-plane lists in the preset `purchasing`. A supplier is a `trade_partner`
 with a `supplier_directory` entry: contacts, lead time, minimum order and notes.
 `supplier_inventory_item` links it to each item that it supplies. `supply_cost_terms`

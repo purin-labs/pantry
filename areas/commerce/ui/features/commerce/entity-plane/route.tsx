@@ -2,7 +2,13 @@ import { OrdersDisplay } from "../../orders/order-time-lanes";
 import { Select } from "@purin-labs/ui/select";
 import { COMMERCE_CANCELLATION_REASONS, COMMERCE_CANCELLATION_REFUNDS, COMMERCE_TABLE_DENSITIES, commerceOptionItem, renderCommerceSelectParts, type CommerceSelectItem } from "./select-items";
 import React from "react";
-import { ArrowLeft, Package, Search, ShoppingCart } from "lucide-react";
+import {
+  ArrowLeft,
+  ChevronRight,
+  Package,
+  Search,
+  ShoppingCart,
+} from "lucide-react";
 import { workspacePageDescriptor } from "@purin-labs/ui/route";
 import "./record.css";
 import "./collection.css";
@@ -75,7 +81,7 @@ import {
   type CommerceEntityDossierModel,
 } from "./models";
 import { commerceCollectionQuery, customEntityRef, entityDossierQuery, entityTypePageQuery, readCommerceGraph, readCommerceChanges, searchEntityTypeQuery, systemEntityRef, readCommerceActivity, readPublishedCommerceResources, patchCommerceListEntryStatus, publishCommerceSavedViewPresentation, updateCommerceBoardPresence, type CommerceGraphFetch, type CommerceMutationTransport, type CommercePresenceTransport, type CommerceCollectionSelection, type CommercePublishedResourceMetadata } from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
-import type { CommerceListEntryPatchApprovalAction, CommerceActivityCaseState, CommerceActivityResult } from "@purin-labs/commerce-control-api/portal/entity-plane";
+import type { CommerceListEntryPatchApprovalAction } from "@purin-labs/commerce-control-api/portal/entity-plane";
 import {
   PurchaseRequestDrawer,
   PurchasingControls,
@@ -114,6 +120,10 @@ import { parseCommerceActionRecordResponse, type CommerceActionRecord } from "@p
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { useDossierSurface } from "./dossier-surface";
+import {
+  CommerceActivityPanel,
+  type CommerceActivityRouteState,
+} from "./activity-panel";
 import { CrmIdentity, CrmTable, type CrmColumn } from "@purin-labs/ui/index";
 import type { CommerceBoardDragPreview, CommerceBoardPresenceEntry, CommerceBoardPresenceSelection } from "@purin-labs/commerce-control-api";
 import type { PermissionRequired } from "@purin-labs/control-api";
@@ -128,7 +138,12 @@ type CommerceEntityPlaneRouteProps = Readonly<{
     resourceId: string,
     kind: "product" | "order" | "supplier",
   ) => string;
-  onBack: () => void;
+  /**
+   * Opens the page's collection again. `search` is the query without its "?"
+   * that opens the tab where the record is listed, such as
+   * "tab=supplier_directory", or "".
+   */
+  onBack: (search: string) => void;
   fetcher?: CommerceGraphFetch;
   mutate?: CommerceMutationTransport;
   presence?: CommercePresenceTransport;
@@ -194,11 +209,6 @@ type CommerceGraphRouteState =
         | Readonly<{ kind: "ready" }>
         | Readonly<{ kind: "failed"; message: string }>;
     }>;
-
-type CommerceActivityRouteState =
-  | Readonly<{ kind: "loading" }>
-  | Readonly<{ kind: "ready"; result: CommerceActivityResult }>
-  | Readonly<{ kind: "unavailable" }>;
 
 type CommerceGraphRequestRevision = { current: number };
 type CommerceChangeWatch = {
@@ -563,20 +573,49 @@ async function loadCommerceCollection(
 }
 
 /**
+ * The query parameter that opens the tab of a list, by the list's id, such
+ * as `tab=supplier_directory`. The tab is the view that presents the list, or
+ * the list itself when no view presents it.
+ */
+const COMMERCE_TAB_PARAMETER = "tab";
+
+/**
+ * Back from a record to its page. A supplier goes back to the Supplier
+ * Directory, the tab that lists it, and not to the first tab of Purchasing.
+ */
+function backToCommerceCollection(
+  onBack: CommerceEntityPlaneRouteProps["onBack"],
+  page: CommerceGraphPage,
+): void {
+  onBack(
+    page === "suppliers"
+      ? `${COMMERCE_TAB_PARAMETER}=${SUPPLIER_DIRECTORY_LIST_ID}`
+      : "",
+  );
+}
+
+/**
  * A published view is the curated presentation of a list, so it opens first.
- * A list is only the landing place when nothing presents it.
+ * A list is only the landing place when nothing presents it. The query can
+ * name the list to open; an inventory item opens the Replenishment Queue.
  */
 function initialCommerceCollectionSelection(
   metadata: CommercePublishedResourceMetadata,
 ): CommerceCollectionSelection | null {
-  const requestedItem = new URLSearchParams(window.location.search).get(
-    "inventoryItem",
-  );
-  if (requestedItem !== null) {
-    for (const view of metadata.views)
-      if (view.viewId === REPLENISHMENT_QUEUE_VIEW_ID)
-        return { kind: "saved_commerce_view", viewId: view.viewId };
-  }
+  const query = new URLSearchParams(window.location.search);
+  const requestedList =
+    query.get("inventoryItem") === null
+      ? query.get(COMMERCE_TAB_PARAMETER)
+      : REPLENISHMENT_QUEUE_LIST_ID;
+  for (const view of metadata.views)
+    if (
+      view.source.kind === "commerce_list" &&
+      view.source.listId === requestedList
+    )
+      return { kind: "saved_commerce_view", viewId: view.viewId };
+  for (const list of unpresentedCommerceLists(metadata))
+    if (list.listId === requestedList)
+      return { kind: "commerce_list", listId: list.listId };
   const view = metadata.views[0];
   if (view !== undefined)
     return { kind: "saved_commerce_view", viewId: view.viewId };
@@ -2826,7 +2865,14 @@ function CommerceEntityDossier(
         title="Record not found"
         detail="This commerce record is no longer available."
         action={
-          <button type="button" onClick={props.props.onBack}>
+          <button
+            type="button"
+            onClick={backToCommerceCollection.bind(
+              null,
+              props.props.onBack,
+              props.page,
+            )}
+          >
             Back
           </button>
         }
@@ -2849,7 +2895,11 @@ function CommerceEntityDossier(
       page={props.page}
       activity={props.activity}
       resourceHref={props.props.resourceHref}
-      onBack={props.props.onBack}
+      onBack={backToCommerceCollection.bind(
+        null,
+        props.props.onBack,
+        props.page,
+      )}
       organisationId={props.props.organisationId}
       fetcher={props.props.fetcher}
       canPropose={props.props.canManage === true}
@@ -2886,6 +2936,47 @@ function CommerceEntityDossierView(
   const supplier = props.page === "suppliers";
   const source = supplier ? null : commerceDossierSource(props.model);
   const relationships = seedIncidentRelationships(props.model);
+  // A section with nothing in it is left out.
+  const items =
+    relationships.length === 0 ? null : (
+      <section
+        className="commerce-dossier-section"
+        aria-labelledby="commerce-relationships-title"
+      >
+        <h3 id="commerce-relationships-title">
+          {supplier ? "Items they supply" : "Related records"}
+        </h3>
+        <ul className="commerce-relationship-list">
+          {relationships.map(
+            renderRelationship.bind(
+              null,
+              props.model.traversal.entities,
+              props.model.entity.reference,
+              props.resourceHref,
+              !supplier,
+            ),
+          )}
+        </ul>
+      </section>
+    );
+  const history = (
+    <>
+      {props.model.contextualListEntries.length === 0 ? null : (
+        <section
+          className="commerce-dossier-section"
+          aria-labelledby="commerce-list-context-title"
+        >
+          <h3 id="commerce-list-context-title">Operational details</h3>
+          <dl className="commerce-facts">
+            {props.model.contextualListEntries.flatMap(
+              renderContextualListEntry,
+            )}
+          </dl>
+        </section>
+      )}
+      <CommerceActivityPanel activity={props.activity} />
+    </>
+  );
   // A record heads its own page: the record's name is the page title.
   return (
     <section
@@ -2917,83 +3008,53 @@ function CommerceEntityDossierView(
           organisationId={props.organisationId}
           fetcher={props.fetcher}
           entity={props.model.entity}
+          items={items}
+          history={history}
         />
       ) : (
-        <section
-          className="commerce-dossier-section"
-          aria-labelledby="commerce-attributes-title"
-        >
-          <h3 id="commerce-attributes-title">Details</h3>
-          {props.page === "products" ? (
-            <ProductSaleDetails
-              organisationId={props.organisationId}
-              productId={props.model.entity.reference.entityId}
-              canEdit={props.canPropose}
-            />
-          ) : null}
-          {props.page === "products" && noAttributes ? null : noAttributes &&
-            labelIsDisplayName ? (
-            <p className="empty-state commerce-empty">
-              This record has no details yet.
-            </p>
-          ) : (
-            <dl className="commerce-facts">
-              {props.model.entity.attributes.map(renderEntityAttribute)}
-              {labelIsDisplayName ? null : (
-                <div className="commerce-fact-prose">
-                  <dt>ID</dt>
-                  <dd>{props.model.entity.displayName}</dd>
-                </div>
-              )}
-            </dl>
-          )}
-        </section>
-      )}
-      <ProductDescriptionDraftControl
-        key={`${props.organisationId}:${props.model.entity.reference.entityId}`}
-        organisationId={props.organisationId}
-        entity={props.model.entity}
-        canPropose={props.canPropose}
-        actionTransport={props.descriptionDraftActions}
-        onActionProposed={props.onActionProposed}
-        actionBusy={props.actionBusy}
-      />
-      {/* A section with nothing in it is left out. */}
-      {relationships.length === 0 ? null : (
-        <section
-          className="commerce-dossier-section"
-          aria-labelledby="commerce-relationships-title"
-        >
-          <h3 id="commerce-relationships-title">
-            {supplier ? "Items they supply" : "Related records"}
-          </h3>
-          <ul className="commerce-relationship-list">
-            {relationships.map(
-              renderRelationship.bind(
-                null,
-                props.model.traversal.entities,
-                props.model.entity.reference,
-                props.resourceHref,
-                !supplier,
-              ),
+        <>
+          <section
+            className="commerce-dossier-section"
+            aria-labelledby="commerce-attributes-title"
+          >
+            <h3 id="commerce-attributes-title">Details</h3>
+            {props.page === "products" ? (
+              <ProductSaleDetails
+                organisationId={props.organisationId}
+                productId={props.model.entity.reference.entityId}
+                canEdit={props.canPropose}
+              />
+            ) : null}
+            {props.page === "products" && noAttributes ? null : noAttributes &&
+              labelIsDisplayName ? (
+              <p className="empty-state commerce-empty">
+                This record has no details yet.
+              </p>
+            ) : (
+              <dl className="commerce-facts">
+                {props.model.entity.attributes.map(renderEntityAttribute)}
+                {labelIsDisplayName ? null : (
+                  <div className="commerce-fact-prose">
+                    <dt>ID</dt>
+                    <dd>{props.model.entity.displayName}</dd>
+                  </div>
+                )}
+              </dl>
             )}
-          </ul>
-        </section>
+          </section>
+          <ProductDescriptionDraftControl
+            key={`${props.organisationId}:${props.model.entity.reference.entityId}`}
+            organisationId={props.organisationId}
+            entity={props.model.entity}
+            canPropose={props.canPropose}
+            actionTransport={props.descriptionDraftActions}
+            onActionProposed={props.onActionProposed}
+            actionBusy={props.actionBusy}
+          />
+          {items}
+          {history}
+        </>
       )}
-      {props.model.contextualListEntries.length === 0 ? null : (
-        <section
-          className="commerce-dossier-section"
-          aria-labelledby="commerce-list-context-title"
-        >
-          <h3 id="commerce-list-context-title">Operational details</h3>
-          <dl className="commerce-facts">
-            {props.model.contextualListEntries.flatMap(
-              renderContextualListEntry,
-            )}
-          </dl>
-        </section>
-      )}
-      <CommerceActivityPanel activity={props.activity} />
     </section>
   );
 }
@@ -3449,162 +3510,10 @@ function formText(formData: FormData, field: string): string | null {
   return typeof value === "string" ? value : null;
 }
 
-function CommerceActivityPanel(
-  props: Readonly<{
-    activity: CommerceActivityRouteState;
-  }>,
-): React.ReactNode {
-  return (
-    <section
-      className="commerce-dossier-section"
-      aria-labelledby="commerce-activity-title"
-    >
-      <h3 id="commerce-activity-title">Activity</h3>
-      {renderCommerceActivityContent(props.activity)}
-    </section>
-  );
-}
-
-function renderCommerceActivityContent(
-  activity: CommerceActivityRouteState,
-): React.ReactNode {
-  switch (activity.kind) {
-    case "loading":
-      return <p className="empty-state commerce-empty">Loading activity…</p>;
-    case "unavailable":
-      return (
-        <p className="empty-state commerce-empty">Activity is unavailable.</p>
-      );
-    case "ready":
-      return (
-        <>
-          {activity.result.events.length === 0 ? (
-            <p className="empty-state commerce-empty">No activity yet.</p>
-          ) : (
-            <ol className="commerce-activity-list">
-              {activity.result.events.map(renderCommerceActivityEvent)}
-            </ol>
-          )}
-          {activity.result.unsupportedSources.length === 0 ? null : (
-            <p className="commerce-activity-note">
-              Some history could not be loaded, so this list may be incomplete.
-            </p>
-          )}
-        </>
-      );
-    default:
-      return assertNever(activity, "Unhandled commerce graph value");
-  }
-}
-
-function renderCommerceActivityEvent(
-  event: CommerceActivityResult["events"][number],
-): React.ReactNode {
-  return (
-    <li key={commerceActivityEventKey(event)}>
-      <div className="commerce-activity-line">
-        <strong>{commerceActivityEventLabel(event)}</strong>
-        <time dateTime={event.occurredAt}>
-          {formatCommerceTimestamp(event.occurredAt)}
-        </time>
-      </div>
-    </li>
-  );
-}
-
-function commerceActivityEventKey(
-  event: CommerceActivityResult["events"][number],
-): string {
-  switch (event.kind) {
-    case "blotter_history":
-      return `${event.kind}:${event.eventId}`;
-    case "case":
-      return `${event.kind}:${event.caseId}`;
-    case "proposal":
-      return `${event.kind}:${event.proposalId}`;
-    case "approval":
-      return `${event.kind}:${event.approvalId}`;
-    case "entity_plane_effect":
-      return `${event.kind}:${event.effect.receipt.commandId}`;
-    case "commerce_observation":
-      return `${event.kind}:${event.deliveryId}`;
-    case "commerce_receipt":
-      return `${event.kind}:${event.receiptId}`;
-    case "action_ledger":
-      return `${event.kind}:${event.actionNonce}`;
-    default:
-      return assertNever(event, "Unhandled commerce graph value");
-  }
-}
-
 /**
- * What happened, said the way an operator would say it. The identifiers and
- * receipts that prove it live in each row's technical details.
+ * A linked record; `showKind` adds what the link is, when no heading says it.
+ * Without it, as under "Items they supply", a link row ends in a chevron.
  */
-function commerceActivityEventLabel(
-  event: CommerceActivityResult["events"][number],
-): string {
-  switch (event.kind) {
-    case "blotter_history":
-      return "Update received from the connected system";
-    case "case":
-      return `Conversation ${commerceCaseStateLabel(event.state)}`;
-    case "proposal":
-      return `Change ${commerceActionStateLabel(event.state)}`;
-    case "approval":
-      return event.state === "waiting"
-        ? "Waiting for approval"
-        : "Approval decided";
-    case "entity_plane_effect":
-      return "Record changed";
-    case "commerce_observation":
-      return "Change recorded";
-    case "commerce_receipt":
-      return "Change confirmed";
-    case "action_ledger":
-      return `Governed change ${commerceActionStateLabel(event.state)}`;
-    default:
-      return assertNever(event, "Unhandled commerce graph value");
-  }
-}
-
-function commerceCaseStateLabel(state: CommerceActivityCaseState): string {
-  switch (state) {
-    case "open":
-      return "opened";
-    case "waiting":
-      return "waiting";
-    default:
-      return assertNever(state, "Unhandled commerce graph value");
-  }
-}
-
-function commerceActionStateLabel(state: string): string {
-  switch (state) {
-    case "proposed":
-      return "proposed";
-    case "approval_requested":
-      return "waiting for approval";
-    case "signed":
-      return "approved";
-    case "executing":
-      return "being applied";
-    case "confirmed":
-      return "applied";
-    case "failed":
-      return "failed";
-    case "rejected":
-      return "rejected";
-    case "expired":
-      return "expired";
-    case "indeterminate":
-      return "needs review";
-    default:
-      return state;
-  }
-}
-
-/** A linked record; `showKind` adds what the link is, when no heading says it. */
 function renderRelationship(
   entities: readonly CommerceEntity[],
   seed: CommerceEntityRef,
@@ -3639,7 +3548,9 @@ function renderRelationship(
             String(relationship.definition.definitionId),
           )}
         </span>
-      ) : null}
+      ) : link === null ? null : (
+        <ChevronRight size={16} aria-hidden="true" />
+      )}
     </li>
   );
 }

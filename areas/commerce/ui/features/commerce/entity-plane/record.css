@@ -83,6 +83,66 @@
 .commerce-record .commerce-fact-prose dd {
   max-width: 70ch;
 }
+/* A supplier's page: the facts in framed groups and each list framed, with
+   space and no rule between the sections. */
+.supplier-record {
+  display: grid;
+  gap: 28px;
+  min-width: 0;
+  padding-top: 4px;
+}
+.supplier-record > .commerce-dossier-section {
+  min-width: 0;
+  margin: 0;
+}
+/* A group of facts: one framed list, a label and a value in each row. */
+.commerce-fact-rows {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.commerce-fact-rows > div {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 16px;
+  align-items: baseline;
+  padding: 11px 14px;
+}
+.commerce-fact-rows > div + div {
+  border-top: 1px solid var(--border);
+}
+.commerce-fact-rows dt {
+  color: var(--ink-2);
+}
+.commerce-fact-rows dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.commerce-fact-rows dd[data-numeric="true"] {
+  font-variant-numeric: tabular-nums;
+}
+.commerce-fact-rows dd[data-absent="true"] {
+  color: var(--ink-3);
+}
+/* On a phone each label sits above its value, so a long value keeps a line. */
+@media (max-width: 760px) {
+  .supplier-record {
+    gap: 24px;
+  }
+  .commerce-fact-rows > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+    padding: 10px 14px;
+  }
+  .commerce-fact-rows dt {
+    font-size: 13px;
+  }
+}
 /* The linked records: one framed list, a row for each record. */
 .commerce-relationship-list {
   margin: 0;
@@ -111,6 +171,31 @@
 .commerce-relationship-list span {
   color: var(--ink-2);
   overflow-wrap: anywhere;
+}
+/* A row that ends in a chevron opens its record: the link covers the row. */
+.commerce-relationship-list li:has(> svg) {
+  position: relative;
+  box-sizing: border-box;
+  min-height: 44px;
+  align-items: center;
+}
+.commerce-relationship-list li:has(> svg) > a {
+  min-width: 0;
+  color: var(--ink);
+  text-decoration: none;
+}
+.commerce-relationship-list li:has(> svg) > a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.commerce-relationship-list li:has(> svg):hover strong {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.commerce-relationship-list li > svg {
+  flex: none;
+  color: var(--ink-3);
 }
 .product-sale-details {
   display: grid;

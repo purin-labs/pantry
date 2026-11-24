@@ -1460,8 +1460,11 @@ function previewResourceHref(
 function backToPreviewCollection(
   navigate: NavigateFunction,
   page: PreviewPage,
+  search: string,
 ): void {
-  void navigate(`/commerce-preview.html?page=${page}`);
+  void navigate(
+    `/commerce-preview.html?page=${page}${search.length === 0 ? "" : `&${search}`}`,
+  );
 }
 
 function mount(): void {

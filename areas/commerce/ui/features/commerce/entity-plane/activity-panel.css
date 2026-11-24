@@ -1,0 +1,45 @@
+/* The Activity of a record page: one framed list, a row for each event with
+   its time at the end. */
+.commerce-activity-list {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+  list-style: none;
+}
+
+.commerce-activity-list > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.commerce-activity-list > li + li {
+  border-top: 1px solid var(--border);
+}
+
+.commerce-activity-list strong {
+  min-width: 0;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.commerce-activity-list time {
+  color: var(--ink-2);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.commerce-activity-note {
+  margin: 10px 0 0;
+  color: var(--ink-3);
+  font-size: 12px;
+}

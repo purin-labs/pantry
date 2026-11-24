@@ -217,7 +217,7 @@ export function PurchasingControls(
               <input name="phone" type="tel" autoComplete="off" />
             </label>
             <label>
-              <span>Country code</span>
+              <span>Country</span>
               <input
                 name="countryCode"
                 maxLength={2}

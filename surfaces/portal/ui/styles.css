@@ -8163,41 +8163,6 @@ a.agent-work-row:hover .agent-work-title {
   font-size: 12px;
 }
 
-.commerce-activity-list {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.commerce-activity-list li {
-  display: grid;
-  gap: 6px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: var(--surface);
-}
-
-.commerce-activity-line {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.commerce-activity-line time {
-  color: var(--ink-3);
-  font-size: 12px;
-}
-
-.commerce-activity-note {
-  margin: 10px 0 0;
-  color: var(--ink-3);
-  font-size: 12px;
-}
-
 /* Purchasing actions sit above the directory they act on. */
 .commerce-actions {
   display: grid;
@@ -8294,14 +8259,13 @@ a.agent-work-row:hover .agent-work-title {
   margin-block-end: 14px;
 }
 
-/* A pipeline needs room the 920px reading column does not have, so the board
-   spans the page while the prose above it stays measured. */
+/* A table needs room the 920px reading column does not have, so it spans the
+   page under its tab row; the Display options form stays measured. */
 .commerce-purchasing,
 .commerce-collection {
   max-width: none;
 }
 
-.commerce-collection .commerce-collection-grid,
 .commerce-collection .commerce-display-options {
   max-width: 920px;
 }

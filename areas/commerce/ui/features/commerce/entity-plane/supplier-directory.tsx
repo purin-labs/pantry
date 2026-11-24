@@ -205,41 +205,51 @@ function publishedAttributeLabel(
   );
 }
 
+/** The terms of the directory entry: lead time, minimum order and notes. */
+function supplierOrderingFacts(
+  entry: SupplierEntryText,
+): readonly CommerceBoardListFact[] {
+  return [
+    {
+      id: "lead_time_days",
+      label: "Lead time",
+      value: leadTimeText(entry.text("lead_time_days")),
+      numeric: true,
+    },
+    {
+      id: "minimum_order_quantity",
+      label: entry.label("minimum_order_quantity"),
+      value: minimumOrderText(entry) ?? COMMERCE_VALUE_ABSENT,
+      numeric: true,
+    },
+    supplierTextFact(entry, "purchasing_notes"),
+  ];
+}
+
 /**
- * A supplier's facts: its directory entry (contact, terms and notes), then its
- * own record facts (legal name, country code). Without an entry, only the
- * record facts.
+ * Who the supplier is: the contact of its directory entry, then its own
+ * record facts (legal name, country). Without an entry, only the record facts.
  */
-function supplierFacts(
+function supplierCompanyFacts(
   entity: CommerceEntity,
   entry: SupplierEntryText | null,
 ): readonly CommerceBoardListFact[] {
   const facts: CommerceBoardListFact[] =
     entry === null
       ? []
-      : [
-          ...["contact_name", "email", "phone"].map(
-            supplierTextFact.bind(null, entry),
-          ),
-          {
-            id: "lead_time_days",
-            label: "Lead time",
-            value: leadTimeText(entry.text("lead_time_days")),
-            numeric: true,
-          },
-          {
-            id: "minimum_order_quantity",
-            label: entry.label("minimum_order_quantity"),
-            value: minimumOrderText(entry) ?? COMMERCE_VALUE_ABSENT,
-            numeric: true,
-          },
-          supplierTextFact(entry, "purchasing_notes"),
-        ];
+      : ["contact_name", "email", "phone"].map(
+          supplierTextFact.bind(null, entry),
+        );
   for (const attribute of entity.attributes) {
     const id = String(attribute.attributeId);
     facts.push({
       id,
-      label: commerceAttributeLabel(id, undefined),
+      // The record stores a country code; the page names it "Country", as
+      // the Add supplier dialog does.
+      label:
+        id === "country_code"
+          ? "Country"
+          : commerceAttributeLabel(id, undefined),
       value:
         formatCommerceAttributeValue(attribute.value, undefined) ||
         COMMERCE_VALUE_ABSENT,
@@ -247,6 +257,25 @@ function supplierFacts(
     });
   }
   return facts;
+}
+
+/** A titled group of facts: one framed list, a label and a value in each row. */
+function SupplierFactGroup(
+  props: Readonly<{
+    id: string;
+    title: string;
+    facts: readonly CommerceBoardListFact[];
+  }>,
+): React.ReactNode {
+  if (props.facts.length === 0) return null;
+  return (
+    <section className="commerce-dossier-section" aria-labelledby={props.id}>
+      <h3 id={props.id}>{props.title}</h3>
+      <dl className="commerce-fact-rows">
+        {props.facts.map(renderCommerceFact)}
+      </dl>
+    </section>
+  );
 }
 
 function supplierTextFact(
@@ -313,15 +342,20 @@ type SupplierRecordRead =
     }>;
 
 /**
- * The Details and the open requests of a supplier's record page. The record
- * read carries no directory entry, so this reads the directory and the queue.
- * Until they answer, or when they fail, Details shows the record's own facts.
+ * The body of a supplier's record page: Ordering, the open requests, the items
+ * they supply, Company, then the history. The record read carries no directory
+ * entry, so this reads the directory and the queue. Until they answer, or when
+ * they fail, the page shows the record's own facts and no Ordering group.
  */
 export function SupplierRecordDetails(
   props: Readonly<{
     organisationId: string;
     fetcher: CommerceGraphFetch | undefined;
     entity: CommerceEntity;
+    /** The "Items they supply" section, or null when no item is linked. */
+    items: React.ReactNode;
+    /** The sections that close the page, Activity last. */
+    history: React.ReactNode;
   }>,
 ): React.ReactNode {
   const supplierId = String(props.entity.reference.entityId);
@@ -338,26 +372,29 @@ export function SupplierRecordDetails(
     ),
     [props.organisationId, supplierId, props.fetcher],
   );
+  const entry = record.kind === "ready" ? record.entry : null;
   return (
-    <>
-      <section
-        className="commerce-dossier-section"
-        aria-labelledby="commerce-attributes-title"
-      >
-        <h3 id="commerce-attributes-title">Details</h3>
-        <dl className="commerce-facts">
-          {supplierFacts(
-            props.entity,
-            record.kind === "ready" ? record.entry : null,
-          ).map(renderCommerceFact)}
-        </dl>
-      </section>
+    <div className="supplier-record">
+      {entry === null ? null : (
+        <SupplierFactGroup
+          id="supplier-ordering-title"
+          title="Ordering"
+          facts={supplierOrderingFacts(entry)}
+        />
+      )}
       <SupplierOpenRequests
         requests={
           record.kind === "ready" ? record.requests : NO_SUPPLIER_REQUESTS
         }
       />
-    </>
+      {props.items}
+      <SupplierFactGroup
+        id="supplier-company-title"
+        title="Company"
+        facts={supplierCompanyFacts(props.entity, entry)}
+      />
+      {props.history}
+    </div>
   );
 }
 

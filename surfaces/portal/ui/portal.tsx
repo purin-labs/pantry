@@ -1747,12 +1747,15 @@ export class ControlPortalApp extends React.Component<
     );
   }
 
-  backCommercePage(page: "products" | "orders" | "suppliers"): void {
+  /** `search` opens the tab of the page that lists the record, or is "". */
+  backCommercePage(
+    page: "products" | "orders" | "suppliers",
+    search: string,
+  ): void {
     const organisationHandle = this.currentOrganisationHandle();
     const workspaceHandle = this.currentWorkspaceHandle();
     if (organisationHandle === null || workspaceHandle === null) return;
-    this.props.navigate(
-      workspacePagePath(organisationHandle, workspaceHandle, page),
-    );
+    const path = workspacePagePath(organisationHandle, workspaceHandle, page);
+    this.props.navigate(search.length === 0 ? path : `${path}?${search}`);
   }
 }
