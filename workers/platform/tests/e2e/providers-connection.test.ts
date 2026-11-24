@@ -233,6 +233,11 @@ it(
   shopifyOrderUpdateWebhookRefused,
 );
 
+it(
+  "shopify keeps its account and the commerce selection through archive, cleanup, restore and reconnect",
+  shopifyReconnectAfterArchiveCleanup,
+);
+
 async function providerConnectionContract(row: ProviderCase): Promise<void> {
   providerCalls = [];
   network.use(...PROVIDER_HANDLERS);
@@ -351,6 +356,179 @@ async function shopifyOrderUpdateWebhookRefused(): Promise<void> {
       },
     ],
   });
+}
+
+/**
+ * An owner connects a shop and selects it as the commerce system, then
+ * archives the Organisation. The archive cleanup revokes the shop's
+ * connection, and the owner restores the Organisation. A reconnect of the
+ * same account gives it a new connection and credential, with no removal:
+ * the account keeps its id, and the commerce system still selects the shop.
+ * The revoked connection stays as history.
+ */
+async function shopifyReconnectAfterArchiveCleanup(): Promise<void> {
+  const row = PROVIDERS.find((candidate) => candidate.provider === "shopify");
+  if (row === undefined) throw new Error("The Shopify row is missing");
+  providerCalls = [];
+  network.use(...PROVIDER_HANDLERS);
+  const scenario = await createControlScenario(row.provider);
+  const started = await startProviderConnection(row, scenario);
+  const connected = await exports.default.fetch(
+    await providerCallbackUrl(row, started.authorizationUrl),
+  );
+  expect(connected.status).toBe(200);
+  const account = await readConnectedAccount(row, scenario.organisationId);
+  const selected = await exports.default.fetch(
+    `${PUBLIC_ORIGIN}/v1/control/organisations/${scenario.organisationId}/commerce-system`,
+    {
+      method: "PUT",
+      headers: controlMutationHeaders(scenario.session, "shopify-select"),
+      body: JSON.stringify({
+        kind: "select_shopify",
+        expected_revision: 0,
+        integration_account_id: account.integrationAccountId,
+      }),
+    },
+  );
+  expect(selected.status, await selected.clone().text()).toBe(200);
+  const firstConnection = await accountConnection(
+    scenario.organisationId,
+    account.integrationAccountId,
+  );
+  expect(firstConnection.connectionLifecycle).toBe("active");
+
+  const archived = await lifecycleCommand(scenario, "archive");
+  expect(archived.status, await archived.clone().text()).toBe(200);
+  await runScheduledOnboardingReconciliation(env, Date.now());
+  const restored = await lifecycleCommand(scenario, "restore");
+  expect(restored.status, await restored.clone().text()).toBe(200);
+  expect(
+    await accountConnection(scenario.organisationId, account.integrationAccountId),
+  ).toEqual({ ...firstConnection, accountLifecycle: "disabled", connectionLifecycle: "revoked" });
+
+  // The reconnect of the disabled account starts, and the shop's callback
+  // completes it through a new connection.
+  const reconnect = await exports.default.fetch(
+    `${PUBLIC_ORIGIN}/v1/control/organisations/${scenario.organisationId}/accounts/${account.integrationAccountId}/reconnect`,
+    {
+      method: "POST",
+      headers: await currentVersionHeaders(scenario, "shopify-reconnect"),
+      body: JSON.stringify({ returnPath: `/portal/${scenario.organisationId}` }),
+    },
+  );
+  expect(reconnect.status, await reconnect.clone().text()).toBe(201);
+  const reconnectStart = parseProviderStart(await reconnect.json());
+  const reconnected = await exports.default.fetch(
+    await providerCallbackUrl(row, reconnectStart.authorizationUrl),
+  );
+  expect(reconnected.status).toBe(200);
+  const attempt = await readProviderAttempt(scenario, reconnectStart.attemptId);
+  await expect(attempt.json()).resolves.toMatchObject({
+    kind: "success",
+    attempt: { state: { kind: "connected" } },
+  });
+
+  const after = await accountConnection(
+    scenario.organisationId,
+    account.integrationAccountId,
+  );
+  expect(after).toMatchObject({
+    accountLifecycle: "active",
+    connectionLifecycle: "active",
+    credentialGeneration: 1,
+  });
+  expect(after.providerConnectionId).not.toBe(firstConnection.providerConnectionId);
+  const history = await fixtureDatabase()
+    .prepare(
+      "SELECT lifecycle FROM provider_connection WHERE organisation_id = ? AND provider_connection_id = ?",
+    )
+    .bind(scenario.organisationId, firstConnection.providerConnectionId)
+    .first<string>("lifecycle");
+  expect(history).toBe("revoked");
+
+  // The owner's pages read the same account and the same commerce system.
+  const accounts = await exports.default.fetch(
+    `${PUBLIC_ORIGIN}/v1/control/organisations/${scenario.organisationId}/accounts`,
+    { headers: controlReadHeaders(scenario.session) },
+  );
+  await expect(accounts.json()).resolves.toMatchObject({
+    ok: true,
+    accounts: [
+      {
+        integrationAccountId: account.integrationAccountId,
+        provider: "shopify",
+        lifecycle: { kind: "active" },
+      },
+    ],
+  });
+  const commerceSystem = await exports.default.fetch(
+    `${PUBLIC_ORIGIN}/v1/control/organisations/${scenario.organisationId}/commerce-system`,
+    { headers: controlReadHeaders(scenario.session) },
+  );
+  expect(commerceSystem.status, await commerceSystem.clone().text()).toBe(200);
+  expect(JSON.stringify(await commerceSystem.json())).toContain(
+    account.integrationAccountId,
+  );
+}
+
+type AccountConnection = Readonly<{
+  providerConnectionId: string;
+  accountLifecycle: string;
+  connectionLifecycle: string;
+  credentialGeneration: number;
+}>;
+
+async function accountConnection(
+  organisationId: OrganisationId,
+  integrationAccountId: string,
+): Promise<AccountConnection> {
+  const record = await fixtureDatabase()
+    .prepare(
+      `SELECT account.provider_connection_id AS providerConnectionId,
+              account.lifecycle AS accountLifecycle,
+              connection.lifecycle AS connectionLifecycle,
+              connection.credential_generation AS credentialGeneration
+       FROM integration_account AS account
+       JOIN provider_connection AS connection
+         ON connection.provider_connection_id = account.provider_connection_id
+       WHERE account.organisation_id = ? AND account.integration_account_id = ?`,
+    )
+    .bind(organisationId, integrationAccountId)
+    .first<AccountConnection>();
+  if (record === null) throw new Error("The account connection is missing");
+  return record;
+}
+
+async function lifecycleCommand(
+  scenario: ControlScenario,
+  command: "archive" | "restore",
+): Promise<Response> {
+  return exports.default.fetch(
+    `${PUBLIC_ORIGIN}/v1/control/organisations/${scenario.organisationId}/${command}`,
+    {
+      method: "POST",
+      headers: await currentVersionHeaders(scenario, `shopify-${command}`),
+      body: "{}",
+    },
+  );
+}
+
+/** The mutation headers with the Organisation's current configuration version. */
+async function currentVersionHeaders(
+  scenario: ControlScenario,
+  idempotencyKey: string,
+): Promise<HeadersInit> {
+  const version = await fixtureDatabase()
+    .prepare(
+      "SELECT configuration_version FROM organisation_onboarding WHERE organisation_id = ?",
+    )
+    .bind(scenario.organisationId)
+    .first<number>("configuration_version");
+  if (version === null) throw new Error("The configuration version is missing");
+  return {
+    ...controlMutationHeaders(scenario.session, idempotencyKey),
+    "x-pantry-configuration-version": String(version),
+  };
 }
 
 async function createControlScenario(

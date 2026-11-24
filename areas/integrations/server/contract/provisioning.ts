@@ -13,8 +13,7 @@ import {
 } from "@purin-labs/connections/data/provider-attempt";
 import {
   finalizeConnectedIntegrationAccount,
-  integrationAccountAllowsCredentialMutation,
-  providerConnectionAllowsCredentialMutation,
+  accountAllowsCredentialMutation,
   requireConnectionCredentialAuthority,
   resolveIntegrationAccount,
   resolveProviderConnection,
@@ -336,12 +335,9 @@ export async function verifyExistingAccountIdentity(
   return account.value.provider === provider &&
     account.value.environment === attempt.environment &&
     account.value.providerAccountId === providerAccountId &&
-    integrationAccountAllowsCredentialMutation(
-      account.value.lifecycle,
-      attempt.purpose,
-    ) &&
     connection.ok &&
-    providerConnectionAllowsCredentialMutation(
+    accountAllowsCredentialMutation(
+      account.value.lifecycle,
       connection.value.lifecycle,
       attempt.purpose,
     )

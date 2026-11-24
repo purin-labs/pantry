@@ -3,8 +3,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import { parseGmailAuthorizationProduct } from "@purin-labs/connections/mail/gmail-authorization";
 import { hashPortalSubject } from "@purin-labs/tenancy/data/control-mutation";
 import {
-  integrationAccountAllowsCredentialMutation,
-  providerConnectionAllowsCredentialMutation,
+  accountAllowsCredentialMutation,
   resolveIntegrationAccount,
   resolveProviderConnection,
 } from "@purin-labs/connections/data/integration-account";
@@ -76,14 +75,6 @@ export async function handleExistingAccountProviderStart(
   if (!account.ok) {
     return controlError(account.error.code, 404);
   }
-  if (
-    !integrationAccountAllowsCredentialMutation(
-      account.value.lifecycle,
-      purpose,
-    )
-  ) {
-    return controlError("provider_account_ineligible", 409);
-  }
   const connection = await resolveProviderConnection({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
@@ -91,7 +82,8 @@ export async function handleExistingAccountProviderStart(
   });
   if (
     !connection.ok ||
-    !providerConnectionAllowsCredentialMutation(
+    !accountAllowsCredentialMutation(
+      account.value.lifecycle,
       connection.value.lifecycle,
       purpose,
     )

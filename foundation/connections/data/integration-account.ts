@@ -252,6 +252,35 @@ export function providerConnectionAllowsCredentialMutation(
   }
 }
 
+/**
+ * Whether an account and its connection can take a new credential. A
+ * disabled account whose connection a cleanup revoked, as after the restore
+ * of an archived Organisation, reconnects through a new connection.
+ */
+export function accountAllowsCredentialMutation(
+  account: IntegrationAccountLifecycle,
+  connection: ProviderConnectionLifecycle,
+  mutation: ProviderCredentialMutation,
+): boolean {
+  return (
+    integrationAccountAllowsCredentialMutation(account, mutation) &&
+    (providerConnectionAllowsCredentialMutation(connection, mutation) ||
+      replacesRevokedConnection(account, connection, mutation))
+  );
+}
+
+function replacesRevokedConnection(
+  account: IntegrationAccountLifecycle,
+  connection: ProviderConnectionLifecycle,
+  mutation: ProviderCredentialMutation,
+): boolean {
+  return (
+    mutation === "reconnect" &&
+    account.kind === "disabled" &&
+    connection.kind === "revoked"
+  );
+}
+
 export type IntegrationAccountMutation = {
   readonly boundary: Variant<
     ControlMutationBoundary,
@@ -378,8 +407,9 @@ export async function createConnectedIntegration(
     existing.ok && existing.value.lifecycle.kind !== "revoked"
       ? await requireReconnectableConnection(session, existing.value)
       : null;
+  // A revoked connection stays as history: the account takes a new one.
   const providerConnectionId =
-    previousConnection === null
+    previousConnection === null || previousConnection.lifecycle.kind === "revoked"
       ? newProviderConnectionId()
       : previousConnection.providerConnectionId;
   const integrationAccountId = existing.ok
@@ -387,7 +417,17 @@ export async function createConnectedIntegration(
     : newIntegrationAccountId();
   const statements =
     existing.ok && previousConnection !== null
-      ? reconnectStatements(session, seed, existing.value, previousConnection)
+      ? previousConnection.lifecycle.kind === "revoked"
+        ? [
+            ...connectionInsertStatements(session, seed, providerConnectionId),
+            ...reconnectAccountStatements(
+              session,
+              seed,
+              existing.value,
+              providerConnectionId,
+            ),
+          ]
+        : reconnectStatements(session, seed, existing.value, previousConnection)
       : newConnectionStatements(
           session,
           seed,
@@ -591,27 +631,24 @@ function recoverRevokedIntegrationAccountStatement(
     );
 }
 
+/**
+ * The connection of an account that reconnects: a live one, or a revoked one
+ * that a new connection replaces when the account is disabled.
+ */
 async function requireReconnectableConnection(
   db: OrganisationQuerySource,
   account: IntegrationAccount,
 ): Promise<ProviderConnection> {
   const discriminator = await db
     .prepare(
-      `SELECT provider, lifecycle
+      `SELECT provider
      FROM provider_connection
      WHERE organisation_id = ? AND provider_connection_id = ?
        AND source_kind = 'built_in'`,
     )
     .bind(account.organisationId, account.providerConnectionId)
-    .first<{
-      readonly provider: unknown;
-      readonly lifecycle: unknown;
-    }>();
-  if (
-    discriminator === null ||
-    discriminator.provider !== account.provider ||
-    discriminator.lifecycle === "revoked"
-  ) {
+    .first<{ readonly provider: unknown }>();
+  if (discriminator === null || discriminator.provider !== account.provider) {
     throw new Error("integration account connection cannot reconnect");
   }
   const connection = await resolveProviderConnection({
@@ -619,7 +656,14 @@ async function requireReconnectableConnection(
     organisationId: account.organisationId,
     providerConnectionId: account.providerConnectionId,
   });
-  if (!connection.ok || connection.value.lifecycle.kind === "revoked") {
+  if (
+    !connection.ok ||
+    !accountAllowsCredentialMutation(
+      account.lifecycle,
+      connection.value.lifecycle,
+      "reconnect",
+    )
+  ) {
     throw new Error("integration account connection cannot reconnect");
   }
   if (connection.value.provider !== account.provider) {
@@ -635,33 +679,7 @@ function newConnectionStatements(
   integrationAccountId: IntegrationAccountId,
 ): D1PreparedStatement[] {
   return [
-    session
-      .prepare(
-        `INSERT INTO provider_connection (
-         provider_connection_id, organisation_id, provider, auth_mode, authority_kind,
-         credential_generation, credential_ref,
-         lifecycle, granted_scopes, created_by_user_id,
-         created_at, updated_at, disabled_at, revoked_at, environment,
-         provider_subject_id, authorization_product
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, NULL, NULL, ?, ?, ?)`,
-      )
-      .bind(
-        providerConnectionId,
-        seed.organisationId,
-        seed.provider,
-        seed.authMode,
-        seed.authority.kind,
-        1,
-        seed.authority.credentialRef,
-        JSON.stringify(seed.grantedScopes),
-        seed.createdByUserId,
-        seed.now,
-        seed.now,
-        seed.environment,
-        seed.providerSubjectId,
-        authorizationProductValue(seed),
-      ),
-    ...credentialGenerationInsert(session, seed, providerConnectionId, 1),
+    ...connectionInsertStatements(session, seed, providerConnectionId),
     session
       .prepare(
         `INSERT INTO integration_account (
@@ -703,6 +721,43 @@ function newConnectionStatements(
         seed.now,
         seed.environment,
       ),
+  ];
+}
+
+/** A new active connection with its first credential generation. */
+function connectionInsertStatements(
+  session: OrganisationDatabaseSession,
+  seed: ConnectedIntegrationSeed,
+  providerConnectionId: ProviderConnectionId,
+): D1PreparedStatement[] {
+  return [
+    session
+      .prepare(
+        `INSERT INTO provider_connection (
+         provider_connection_id, organisation_id, provider, auth_mode, authority_kind,
+         credential_generation, credential_ref,
+         lifecycle, granted_scopes, created_by_user_id,
+         created_at, updated_at, disabled_at, revoked_at, environment,
+         provider_subject_id, authorization_product
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, NULL, NULL, ?, ?, ?)`,
+      )
+      .bind(
+        providerConnectionId,
+        seed.organisationId,
+        seed.provider,
+        seed.authMode,
+        seed.authority.kind,
+        1,
+        seed.authority.credentialRef,
+        JSON.stringify(seed.grantedScopes),
+        seed.createdByUserId,
+        seed.now,
+        seed.now,
+        seed.environment,
+        seed.providerSubjectId,
+        authorizationProductValue(seed),
+      ),
+    ...credentialGenerationInsert(session, seed, providerConnectionId, 1),
   ];
 }
 
@@ -805,27 +860,36 @@ function reconnectStatements(
 ): D1PreparedStatement[] {
   return [
     ...reconnectAuthorityStatements(session, seed, connection),
-    ...reconnectAccountStatements(session, seed, account),
+    ...reconnectAccountStatements(
+      session,
+      seed,
+      account,
+      connection.providerConnectionId,
+    ),
   ];
 }
 
+/** The account under its connection, `providerConnectionId`, after a reconnect. */
 function reconnectAccountStatements(
   session: OrganisationDatabaseSession,
   seed: ConnectedIntegrationSeed,
   account: IntegrationAccount,
+  providerConnectionId: ProviderConnectionId,
 ): D1PreparedStatement[] {
   const lifecycle = reconnectAccountLifecycle(account.lifecycle);
   return [
     session
       .prepare(
         `UPDATE integration_account
-       SET display_name = ?, lifecycle = ?, lifecycle_reason_code = NULL,
+       SET provider_connection_id = ?, display_name = ?, lifecycle = ?,
+           lifecycle_reason_code = NULL,
            capability_set = ?, audience_policy = ?, retention_policy = ?,
            updated_at = ?, disabled_by_user_id = NULL,
            disabled_at = NULL, revoked_at = NULL
        WHERE organisation_id = ? AND integration_account_id = ? AND lifecycle != 'revoked'`,
       )
       .bind(
+        providerConnectionId,
         seed.displayName,
         lifecycle,
         JSON.stringify(seed.capabilities),

@@ -220,11 +220,11 @@ provider attempt for an `active`, `disabled`, `degraded` or `reauth_required` ac
   version and `organisation.status` `active`. It deletes the cleanup row and the
   tombstone. It does not enable the accounts and does not set their default flag again,
   so a former default account can be removed. Before the cleanup, an admin can
-  reconnect a `disabled` account. After the cleanup, its connection is `revoked`:
-  reconnect answers `provider_account_ineligible`, and a new connection of the same
-  provider account fails. An admin removes the account, which frees its identity, and
-  connects it again. A selected Shopify account refuses the removal
-  (`integration_account_in_use`). After `purge_after`, after the cleanup reaches
+  reconnect a `disabled` account on its connection. After the cleanup, its connection
+  is `revoked`: a reconnect, or a new connect of the same provider account, gives the
+  account a new connection and credential generation (INT-01). The account keeps its
+  `integration_account_id`, its settings and the Shopify selection of the commerce
+  system, and needs no removal. After `purge_after`, after the cleanup reaches
   `purged`, or after the harness erasure starts, restore answers
   `organisation_purge_started`.
 - **Delete** (`DELETE /v1/control/organisations/:id`, owner) accepts only an `archived`
@@ -426,8 +426,6 @@ The routes are in `control/routes/onboarding.ts` and `control/routes/operators.t
 
 ## Open work
 
-- **A restore after the cleanup.** Reconnect refuses a `revoked` connection, and
-  `createConnectedIntegration` throws for its `disabled` account.
 - **No failed cleanup.** No code writes `organisation_archive_cleanup.status = 'failed'`.
 - **Labels that differ.** The tombstone names the first active owner, also when an admin
   archives. `OrganisationOnboardingLifecycle` has no `purging` or `purged`.

@@ -101,7 +101,14 @@ any open state -> cancelled | failed | expired
 ### Reconnect, rotation, disable and removal
 
 - **Reconnect** and **rotate** start a new attempt for the same account. The old
-  credential stays in use until the new generation is proven. A supplied secret works
+  credential stays in use until the new generation is proven.
+- A `disabled` account whose connection is `revoked`, as after the archive cleanup and
+  a restore (ORG-01), reconnects through a new `provider_connection` with credential
+  generation 1 (`accountAllowsCredentialMutation`, `createConnectedIntegration`). A new
+  connect of the same provider account does the same. The account keeps its
+  `integration_account_id`, so its settings and a commerce system selection stay. The
+  revoked connection stays as history. Any other `revoked` connection does not
+  reconnect. A supplied secret works
   only for `airtable`, `notion`, `stripe` and `shopify`; another provider gets
   `422 credential_rotation_provider_unsupported`. It stores a new
   `provider_credential_generation`, verifies it, switches the one `active` generation
@@ -423,7 +430,8 @@ Drive token stays bound to its client, so a new client ID needs a reconnect.
   [Plan 29](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-29-organisation-agent-email-mailboxes.md)
   and
   [Plan 32](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-32-whatsapp-customer-support.md).
-- E2E journeys in `workers/platform/tests/e2e/`: `providers-connection.test.ts`,
+- E2E journeys in `workers/platform/tests/e2e/`: `providers-connection.test.ts`
+  (with the archive, cleanup, restore and reconnect of a selected shop),
   `providers-webhooks.test.ts`, `provider-removed-access.test.ts`,
   `custom-connector-review.test.ts`, `custom-connector-fetch-placement.test.ts`,
   `remote-mcp.test.ts` (REST and MCP reads, approved writes, the refusal route and the
