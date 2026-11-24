@@ -1,7 +1,5 @@
 {
   "files": {
-    "areas/cafe/server/agent-tools/commerce/register-view.ts": 1,
-    "areas/kitchen/server/agent-tools/costs/view.ts": 2,
     "packages/bakery-model/src/bakery-margins.ts": 4
   }
 }

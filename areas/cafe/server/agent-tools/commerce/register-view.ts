@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import { Type } from "typebox";
 import {
   REGISTER_SURFACE,
@@ -21,7 +22,7 @@ const UNAVAILABLE =
 const SCREEN_RULE =
   "Use it only while the person's current message carries Café › Register from their screen. It stages the local basket only and never charges a terminal or records cash.";
 
-const ID_FIELD = Type.String({ minLength: 1, maxLength: 200 });
+const ID_FIELD = textLimit(Type.String({ minLength: 1, maxLength: 200 }));
 
 const registerAddItem = defineCafeTool({
   name: "register_add_item",

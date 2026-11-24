@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import { Type } from "typebox";
 import {
   COSTS_SURFACE,
@@ -52,7 +53,7 @@ const costsViewFilterCategory = defineKitchenTool({
   name: "costs_view_filter_category",
   description: `Filter the Costs & margins product tables by a category that the page shows, or by "all". ${SCREEN_RULE} It saves nothing.`,
   input: Type.Object(
-    { category: Type.String({ minLength: 1, maxLength: 60 }) },
+    { category: textLimit(Type.String({ minLength: 1, maxLength: 60 })) },
     { additionalProperties: false },
   ),
   decode: (input): CostsViewCommand => ({
@@ -77,7 +78,7 @@ const costsViewSelectProduct = defineKitchenTool({
   name: "costs_view_select_product",
   description: `Show one product of Costs & margins on the person's screen: the page selects its row and the agent's label stays on it for 5 seconds. Give the product id that the page view lists. ${SCREEN_RULE} It saves nothing.`,
   input: Type.Object(
-    { productId: Type.String({ minLength: 1, maxLength: 200 }) },
+    { productId: textLimit(Type.String({ minLength: 1, maxLength: 200 })) },
     { additionalProperties: false },
   ),
   decode: (input): CostsViewCommand => ({

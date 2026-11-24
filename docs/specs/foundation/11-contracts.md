@@ -312,10 +312,10 @@ Neighbours:
   (`src/native/station-replies.ts`) has a `minimum` and no `maximum`. The file is a
   source of the pinned physics execution bundle, so a change needs a bundle rebuild
   (`pnpm lint:physics-bundle`).
-- **Schema length.** 200 string schemas in 51 files still set a bare `maxLength`
-  (`scripts/text-limits-ratchet.json`), 60 of them in `control-api` and 97 in the tool
-  inputs of the areas and `foundation`. TypeBox counts grapheme clusters, so they do not
-  limit the size of a text.
+- **Schema length.** Four string schemas of `bakery-model/src/bakery-margins.ts` still
+  set a bare `maxLength` (`scripts/text-limits-ratchet.json`). The file is a source of
+  the pinned physics execution bundle, so a change needs a bundle rebuild
+  (`pnpm lint:physics-bundle`).
 - **Lone surrogates in the access decoders.** `jsonInput` in `access-control.ts` tests
   the JSON text for a lone surrogate. `JSON.stringify` writes a lone surrogate as an
   escape, so the test finds none.
