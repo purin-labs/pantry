@@ -615,6 +615,8 @@ function commentStatus(code: string): number {
       return 409;
     case "menu_board_comment_not_author":
     case "access_revoked":
+    // The change is stored, and the person's access ended while it saved.
+    case "stored_access_ended":
       return 403;
     default:
       return 503;

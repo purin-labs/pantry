@@ -123,8 +123,16 @@ to the spec of its area.
 - The room admits the edit only for a current member with a role above viewer, who is
   the requester of the turn. The Organisation must be active in this Actor, the turn
   must still be authorized and the deadline must not be past.
-- After the write, the room checks the Organisation, the turn and the deadline again.
-  If a check fails then, the tool gets an error and the stored change stays.
+- After the write and the broadcast, the room checks the Organisation, the turn and the
+  deadline again. If a check fails then, the change stays stored and the room returns
+  `stored_access_ended` with no document content. Each agent edit tool (the description,
+  email, reply, menu, menu board, costs, production plan and canvas tools) then returns
+  `{kind: "stored_access_ended", result}` (`storedAccessEnded`). The result tells the
+  agent that the edit is saved and holds no text of the draft. A retry meets the
+  admission and is refused, so the tool descriptions tell the agent not to read the
+  draft again. When the turn's own authority ended too, such as a lost membership, the
+  turn stops at its next step and the thread says that the request could not complete.
+  A person's own server change answers 403.
 - One transaction of Actor storage holds the change and its receipt. The receipt key is
   the Session, the turn and the tool operation. The same operation again returns the
   first result and changes nothing. The same key with other input fails with
@@ -456,7 +464,9 @@ Boundaries:
   `description-draft-reconnect.test.ts`, `collaboration-drafts.test.ts`,
   `slack-draft-permission.test.ts`, `slack-email-draft-label.test.ts`,
   `pi-commerce-description.test.ts`, `commerce-propose-permission.test.ts` and
-  `commerce-propose-unbound-channel.test.ts`.
+  `commerce-propose-unbound-channel.test.ts`. In `collaboration-drafts.test.ts`, an
+  agent's menu edit whose person loses the membership while it commits stays stored and
+  returns `stored_access_ended`.
 - Scripts: `scripts/plan40/` (a protocol peer, a browser fixture and a local Worker)
   and `scripts/plan-50/draft-collaboration-worker.mjs` with
   `scripts/plan-50/draft-browser-acceptance.js`.

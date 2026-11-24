@@ -22,7 +22,8 @@ import {
 } from "@purin-labs/kitchen-control-api";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
-import { defineKitchenTool } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
+import { STORED_ACCESS_ENDED_NOTE } from "@purin-labs/agent-tools/tool-effect";
+import { defineKitchenTool } from "./services";
 import type {
   CostsPlanSaveRequest,
   CostsReadForecastScenario,
@@ -492,7 +493,8 @@ export const costsSheetEdit = defineKitchenTool({
     "'product:<productId>:cogs' ('default' or minor integer override), 'product:<productId>:waste' ('default' or minor integer override), 'product:<productId>:fx:<units|spoil|price|cogs|waste|unitNet|margin|netDay>' ('default' or '=...' formula), " +
     "'forecast:<opening_cash|demand_curve|supplier_terms|extra_shift_pct|extra_shift_minor|capex_minor>', 'forecast:week_idx:<0..11>' (10-500%), or " +
     "'supply:<inventoryItemId>:<packQuantity|packUnit|packPriceMajor|bulkMin7dQuantity|bulkPackQuantity|bulkPackPriceMajor>'. " +
-    "This edits the shared working draft only; live Offer prices and saved plans change only when staff click Save changes or when you call costs_plan_save / supply_cost_save.",
+    "This edits the shared working draft only; live Offer prices and saved plans change only when staff click Save changes or when you call costs_plan_save / supply_cost_save." +
+    STORED_ACCESS_ENDED_NOTE,
   input: jsonSchema({
     type: "object",
     properties: {

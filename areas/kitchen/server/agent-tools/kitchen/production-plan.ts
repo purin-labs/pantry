@@ -6,7 +6,8 @@ import type {
 } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
-import { defineKitchenTool } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
+import { STORED_ACCESS_ENDED_NOTE } from "@purin-labs/agent-tools/tool-effect";
+import { defineKitchenTool } from "./services";
 
 export const productionPlanRead = defineKitchenTool({
   name: "production_plan_read",
@@ -39,7 +40,8 @@ export const productionPlanEdit = defineKitchenTool({
   description:
     "Set the planned quantity of one production request in a location's shared plan. Use a requestId from production_plan_read. " +
     "The quantity is a positive decimal in the request's unit; pieces take whole numbers. " +
-    "This changes the shared draft only: a person reviews the plan and accepts it.",
+    "This changes the shared draft only: a person reviews the plan and accepts it." +
+    STORED_ACCESS_ENDED_NOTE,
   input: jsonSchema({
     type: "object",
     properties: {

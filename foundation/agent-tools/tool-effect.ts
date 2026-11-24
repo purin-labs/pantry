@@ -21,6 +21,14 @@ export function uncheckedEffect<Result>(
   return { kind: "none", run };
 }
 
+/**
+ * The sentence of a shared draft edit tool's description about an edit that
+ * the room stored while the person's access ended. The result then holds no
+ * text of the draft.
+ */
+export const STORED_ACCESS_ENDED_NOTE =
+  " A result of kind stored_access_ended means that the edit is saved but your access ended while it saved: tell the person, and do not read the draft again.";
+
 /** Runs the exit checks of a prepared effect, then the effect. */
 export type EffectSettle = (effect: PreparedEffect) => Promise<unknown>;
 

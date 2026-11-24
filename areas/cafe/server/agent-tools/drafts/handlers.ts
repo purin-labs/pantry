@@ -35,6 +35,8 @@ import {
 import {
   collaborationEditDeadline,
   collaborationMember,
+  storedAccessEnded,
+  type StoredAccessEnded,
   type ToolEffect,
 } from "@purin-labs/tool-handlers/agent-tools/session-support";
 import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
@@ -71,7 +73,7 @@ export async function editMenuDraftForEmbeddedHarness(
   edit: MenuDraftEdit,
   operationId: string,
   boundary: CatalogExecutionContext,
-): Promise<ToolEffect<MenuDraftRead>> {
+): Promise<ToolEffect<MenuDraftRead | StoredAccessEnded>> {
   const { env, storage, execution, lease, assignment } = context;
   const deadlineAt = collaborationEditDeadline(
     storage,
@@ -128,6 +130,8 @@ export async function editMenuDraftForEmbeddedHarness(
         deadlineAt,
       });
       if (!result.ok) {
+        if (result.error.code === "stored_access_ended")
+          return storedAccessEnded("menu draft");
         if (result.error.code === "record_conflict") {
           throw new MenuDraftRequestError(
             "That section or item is not in the menu now. Read the menu again before you choose a new edit.",
@@ -271,7 +275,7 @@ export async function editMenuBoardForEmbeddedHarness(
   request: Readonly<{ boardId: string; edit: MenuBoardEdit }>,
   operationId: string,
   boundary: CatalogExecutionContext,
-): Promise<ToolEffect<MenuBoardEditResult>> {
+): Promise<ToolEffect<MenuBoardEditResult | StoredAccessEnded>> {
   const { env, storage, execution, lease, assignment } = context;
   const deadlineAt = collaborationEditDeadline(
     storage,
@@ -381,6 +385,8 @@ export async function editMenuBoardForEmbeddedHarness(
             throw new MenuBoardRequestError(
               "A version name needs 1 to 80 characters.",
             );
+          case "stored_access_ended":
+            return storedAccessEnded("menu board");
           default:
             throw new Error(`Menu board edit failed: ${result.error.code}`);
         }

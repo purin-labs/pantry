@@ -106,7 +106,8 @@ type DraftOperationError = Readonly<{
     | "product_not_found"
     | "passage_conflict"
     | "operation_conflict"
-    | "organisation_placement_conflict";
+    | "organisation_placement_conflict"
+    | "stored_access_ended";
 }>;
 type DraftAgentResult = Result<DraftAgentSnapshot, DraftOperationError>;
 type DraftRoomResult<T> = Result<T, Readonly<{ code: DraftFailureCode }>>;

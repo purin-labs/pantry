@@ -25,6 +25,8 @@ import {
   type SharedDraftChat,
   collaborationEditDeadline,
   collaborationMember,
+  storedAccessEnded,
+  type StoredAccessEnded,
   type ToolEffect,
 } from "@purin-labs/tool-handlers/agent-tools/session-support";
 import type {
@@ -246,7 +248,7 @@ export async function editProductionPlanForEmbeddedHarness(
   request: HarnessProductionPlanEdit,
   operationId: string,
   boundary: CatalogExecutionContext,
-): Promise<ToolEffect<HarnessProductionPlan>> {
+): Promise<ToolEffect<HarnessProductionPlan | StoredAccessEnded>> {
   const { env, storage, execution, lease, assignment } = context;
   const deadlineAt = collaborationEditDeadline(
     storage,
@@ -353,6 +355,8 @@ export async function editProductionPlanForEmbeddedHarness(
         deadlineAt,
       });
       if (!result.ok) {
+        if (result.error.code === "stored_access_ended")
+          return storedAccessEnded("production plan");
         throw new Error(
           `Production plan edit failed: ${result.error.code}. Read the plan again before choosing a new edit.`,
         );

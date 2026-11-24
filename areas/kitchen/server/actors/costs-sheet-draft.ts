@@ -198,7 +198,10 @@ export class CostsSheetRooms {
     if (!cleared.ok) {
       return controlError(
         cleared.error.code,
-        cleared.error.code === "access_revoked" ? 403 : 409,
+        cleared.error.code === "access_revoked" ||
+          cleared.error.code === "stored_access_ended"
+          ? 403
+          : 409,
       );
     }
     return this.snapshot();
@@ -215,7 +218,8 @@ export class CostsSheetRooms {
           | CostsSheetFailureCode
           | "organisation_placement_conflict"
           | "access_revoked"
-          | "room_full";
+          | "room_full"
+          | "stored_access_ended";
       }>
     >
   > {

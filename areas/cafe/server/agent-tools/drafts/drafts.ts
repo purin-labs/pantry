@@ -43,6 +43,7 @@ import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-
 import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
 import type { CommerceActionProposalOrigin } from "@purin-labs/agent-tools/catalog/types";
 import { defineToolFamily, jsonSchema } from "@purin-labs/agent-tools/define-tool";
+import { STORED_ACCESS_ENDED_NOTE } from "@purin-labs/agent-tools/tool-effect";
 import { uncheckedEffect } from "@purin-labs/agent-tools/tool-effect";
 import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
 
@@ -139,7 +140,8 @@ export const menuDraftEdit = defineMenuTool({
     "kind rename_menu: give title. add_section: give title. add_item: give productId, title (the display name), description and sectionId. " +
     "rename_item: give itemId and title. describe_item: give itemId and description. move_item: give itemId, sectionId and order. remove_item: give itemId. " +
     "Set every other field to null. Use ids from menu_draft_read. A productId comes from commerce_entity_context. " +
-    "This changes the draft only, and it never changes a price or the live menu. To put the draft live, call commerce_propose_menu_publication.",
+    "This changes the draft only, and it never changes a price or the live menu. To put the draft live, call commerce_propose_menu_publication." +
+    STORED_ACCESS_ENDED_NOTE,
   input: jsonSchema({
     type: "object",
     properties: {
@@ -239,7 +241,8 @@ export const menuBoardEdit = defineMenuTool({
     "add_item: give boardId, frameId, itemId (a menu draft item from menu_board_read) and text, its look: card, row, tile or price (the name and a big price); on a free canvas board give frameId canvas and also x, y, width and height. set_look: give boardId, elementId of a featured element and text, its look. A product shows its live price and sold-out mark; an item that is not on the published menu shows no price until a person publishes the menu. " +
     "add_image (free canvas boards): give boardId, itemId (the mediaId of an image in menu_board_read images), text (what the image shows, for people who cannot see it), x, y, width and height; the image fills its rect. set_fit: give boardId, elementId of an image and text, cover (fill the rect, cropped) or contain (the whole image inside the rect). " +
     "Set every other field to null. Use ids from menu_board_read. Text is at most 280 characters. " +
-    "This changes the draft only. Screens keep the published release until a person publishes the board. It never changes a price: to change a price or set a deal, call menu_board_propose_price.",
+    "This changes the draft only. Screens keep the published release until a person publishes the board. It never changes a price: to change a price or set a deal, call menu_board_propose_price." +
+    STORED_ACCESS_ENDED_NOTE,
   // The rect comes before the text: a model writes the fields in this
   // order, so the board shows the box before its text (Plan 40B phase 7).
   input: jsonSchema({

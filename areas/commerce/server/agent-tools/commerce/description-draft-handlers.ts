@@ -23,6 +23,8 @@ import {
   type DraftThreadLink,
   collaborationEditDeadline,
   collaborationMember,
+  type StoredAccessEnded,
+  storedAccessEnded,
   type ToolEffect,
 } from "@purin-labs/tool-handlers/agent-tools/session-support";
 import { prepareCommerceReadForEmbeddedHarness } from "./handlers";
@@ -167,7 +169,7 @@ export async function editProductDescriptionDraftForEmbeddedHarness(
   request: DraftAgentEditRequest,
   operationId: string,
   boundary: CatalogExecutionContext,
-): Promise<ToolEffect<DraftAgentSnapshot>> {
+): Promise<ToolEffect<DraftAgentSnapshot | StoredAccessEnded>> {
   const { env, storage, execution, lease, assignment } = context;
   const deadlineAt = collaborationEditDeadline(
     storage,
@@ -261,6 +263,8 @@ export async function editProductDescriptionDraftForEmbeddedHarness(
         deadlineAt,
       });
       if (!result.ok) {
+        if (result.error.code === "stored_access_ended")
+          return storedAccessEnded("description draft");
         throw new Error(
           `Description draft edit failed: ${result.error.code}. Read the draft again before choosing a new edit.`,
         );

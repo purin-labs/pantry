@@ -2,6 +2,7 @@ import type { EmailDraftEditRequest } from "../../actors/email-draft";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
+import { STORED_ACCESS_ENDED_NOTE } from "@purin-labs/agent-tools/tool-effect";
 import { defineChannelTool } from "./services";
 
 export const emailDraftRead = defineChannelTool({
@@ -32,7 +33,8 @@ export const emailDraftEdit = defineChannelTool({
   name: "email_draft_edit",
   description:
     "Replace one exact, unique passage in one field of the shared email draft. " +
-    "Use the field text and expectedRevision returned by email_draft_read.",
+    "Use the field text and expectedRevision returned by email_draft_read." +
+    STORED_ACCESS_ENDED_NOTE,
   input: jsonSchema({
     type: "object",
     properties: {

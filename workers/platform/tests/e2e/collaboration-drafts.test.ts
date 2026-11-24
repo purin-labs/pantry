@@ -78,6 +78,95 @@ it(
   "keeps menu sockets open while the Organisation sleeps, and sweeps revoked and silent sockets",
   menuRoomHibernationJourney,
 );
+it(
+  "keeps an agent's menu edit whose person loses access while it commits, and returns no menu text",
+  storedAfterAccessEndedJourney,
+);
+
+/** The owner's open tabs of the menu. The room sends an edit to each in turn. */
+const OWNER_TABS = 10;
+
+/**
+ * The editor's agent renames the shared menu while the owner has the menu open
+ * in several tabs. The room writes the edit and sends it to each tab, and then
+ * checks the agent's person again. The editor loses the membership when the
+ * first tab gets the edit. The edit stays: each tab and the stored draft show
+ * it. The agent's result says only that the edit is stored, with no menu text,
+ * and the same edit again is refused before the room reads its receipt.
+ */
+async function storedAfterAccessEndedJourney({
+  task,
+}: TestContext): Promise<void> {
+  const scenario = await installCollaborationScenario("menu-stored");
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE organisation_onboarding SET lifecycle = 'active', activation_receipt_id = 'draft-origin-fixture', activated_at = ? WHERE organisation_id = ?",
+    )
+    .bind(Date.now(), scenario.organisationId)
+    .run();
+  const execution = await admitOperatorControlTurnFixture(
+    env,
+    scenario.organisationId,
+    scenario.editor.identity.userId,
+    scenario.editor.session.session.controlSessionId,
+  );
+  const sockets: WebSocket[] = [];
+  try {
+    for (let tab = 0; tab < OWNER_TABS; tab++) {
+      const socket = await openSocket(
+        menuSocketUrl(scenario.organisationId),
+        scenario.owner.session,
+      );
+      sockets.push(socket);
+      await requestMenuSync(socket, requiredMenuDocument());
+    }
+    const broadcasts = sockets.map((socket) =>
+      nextMenuMessage(socket, isMenuBroadcast),
+    );
+    const revoked = Promise.any(broadcasts).then(
+      revokeMembership.bind(
+        null,
+        scenario.organisationId,
+        scenario.editor.identity.userId,
+      ),
+    );
+    const edit = {
+      agent: { sessionId: execution.sessionId, displayName: "Menu editor" },
+      execution,
+      organisationId: scenario.organisationId,
+      edit: { kind: "rename_menu" as const, title: "Harvest menu" },
+      operationId: "menu-agent-stored",
+      userId: scenario.editor.identity.userId,
+      deadlineAt: Date.now() + 60_000,
+    };
+    const result = await scenario.organisation.editMenuDraft(edit);
+    await revoked;
+    const received = await Promise.all(broadcasts);
+    expect(result).toEqual({
+      ok: false,
+      error: { code: "stored_access_ended" },
+    });
+    expect(received).toHaveLength(OWNER_TABS);
+    const response = await exports.default.fetch(
+      menuSnapshotUrl(scenario.organisationId),
+      { headers: controlReadHeaders(scenario.owner.session) },
+    );
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      ok: true,
+      value: { draft: { title: "Harvest menu" } },
+    });
+    await expect(scenario.organisation.editMenuDraft(edit)).resolves.toEqual({
+      ok: false,
+      error: { code: "access_revoked" },
+    });
+    Object.assign(task.meta, {
+      storedAfterAccessEnded: { result, tabs: received.length },
+    });
+  } finally {
+    for (const socket of sockets) await closeSocket(socket);
+  }
+}
 
 /** Rounds of typing at the start of the body, and the characters of each. */
 const LONG_HISTORY_ROUNDS = 6;

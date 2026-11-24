@@ -478,6 +478,12 @@ export class CollaborationRoom<
     for (const peer of await this.#peers()) this.#fail(peer.socket, code);
   }
 
+  /**
+   * Runs one change of the document for a person or an agent, after the same
+   * admission as an edit. `stored_access_ended`: the change is stored and the
+   * other sockets have it, but the editor's access ended while it committed,
+   * so the result holds no document content.
+   */
   async mutate<Value, Error extends Readonly<{ code: string }>>(
     authority: CollaborationMutationAuthority,
     mutation: CollaborationMutation<Update, Value, Error>,
@@ -488,7 +494,10 @@ export class CollaborationRoom<
       | Error
       | Readonly<{
           code:
-            "access_revoked" | "organisation_placement_conflict" | "room_full";
+            | "access_revoked"
+            | "organisation_placement_conflict"
+            | "room_full"
+            | "stored_access_ended";
         }>
     >
   > {
@@ -923,7 +932,12 @@ export class CollaborationRoom<
     Result<
       Value,
       | Error
-      | Readonly<{ code: "access_revoked" | "organisation_placement_conflict" }>
+      | Readonly<{
+          code:
+            | "access_revoked"
+            | "organisation_placement_conflict"
+            | "stored_access_ended";
+        }>
     >
   > {
     const admitted = await this.#admitMutation(authority);
@@ -945,11 +959,14 @@ export class CollaborationRoom<
       if (result.value.update !== null) {
         await this.#broadcastUpdate(null, result.value.update, scope);
       }
-      if (!(await authorizeCollaborationMutation(this.#env, authority)))
-        return accessRevoked();
-      if (!(await isOrganisationExecutionActive(this.#storage.sql, scope)))
-        return placementConflict();
-      if (Date.now() >= authority.deadlineAt) return accessRevoked();
+      // The change is stored. An editor whose access ended meanwhile gets
+      // no document content back, and a retry meets the admission above.
+      if (
+        !(await authorizeCollaborationMutation(this.#env, authority)) ||
+        !(await isOrganisationExecutionActive(this.#storage.sql, scope)) ||
+        Date.now() >= authority.deadlineAt
+      )
+        return { ok: false, error: { code: "stored_access_ended" } };
       return { ok: true, value: result.value.value };
     } finally {
       await this.#refreshPresence();

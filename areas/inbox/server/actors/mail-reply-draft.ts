@@ -102,7 +102,8 @@ type MailReplyDraftError = Readonly<{
     | "passage_conflict"
     | "operation_conflict"
     | "organisation_placement_conflict"
-    | "email_reply_draft_unsaved";
+    | "email_reply_draft_unsaved"
+    | "stored_access_ended";
 }>;
 
 type DraftResult<T> = Result<T, MailReplyDraftError>;
@@ -514,6 +515,7 @@ class MailReplyRoomBacking implements CollaborationRoomBacking<
       case "email_reply_draft_unsaved":
         return { ok: false, error: { code: "invalid_state" } };
       case "organisation_placement_conflict":
+      case "stored_access_ended":
         return { ok: false, error: { code: "access_revoked" } };
       default:
         return { ok: false, error: { code: initialized.error.code } };

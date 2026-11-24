@@ -183,7 +183,8 @@ export type MenuBoardEditError = Readonly<{
     | "menu_board_version_invalid"
     | "organisation_placement_conflict"
     | "access_revoked"
-    | "room_full";
+    | "room_full"
+    | "stored_access_ended";
   current?: string;
 }>;
 

@@ -5,6 +5,7 @@ import type {
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
+import { STORED_ACCESS_ENDED_NOTE } from "@purin-labs/agent-tools/tool-effect";
 import { defineCommerceTool } from "./services";
 
 const PRODUCT_ID_PATTERN = /^[A-Za-z0-9_:-]{1,256}$/;
@@ -46,7 +47,8 @@ export const productDescriptionDraftEdit = defineCommerceTool({
   description:
     "Replace one exact, unique passage in a product description draft. " +
     "Use the exact text returned by product_description_draft_read; the draft actor rejects " +
-    "missing or ambiguous passages and preserves all other text.",
+    "missing or ambiguous passages and preserves all other text." +
+    STORED_ACCESS_ENDED_NOTE,
   input: jsonSchema({
     type: "object",
     properties: {

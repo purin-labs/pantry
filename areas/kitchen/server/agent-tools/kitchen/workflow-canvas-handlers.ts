@@ -35,6 +35,7 @@ import {
   collaborationEditDeadline,
   collaborationMember,
   requireLiveBakeryReadAuthority,
+  storedAccessEnded,
   type ToolEffect,
 } from "@purin-labs/tool-handlers/agent-tools/session-support";
 import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
@@ -330,6 +331,8 @@ export async function moveWorkflowCanvasForEmbeddedHarness(
         },
       });
       if (!result.ok) {
+        if (result.error.code === "stored_access_ended")
+          return storedAccessEnded("workflow canvas");
         throw new Error(`Workflow canvas move denied: ${result.error.code}`);
       }
       const revision =

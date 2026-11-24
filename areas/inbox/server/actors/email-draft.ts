@@ -98,7 +98,8 @@ type EmailDraftOperationError = Readonly<{
     | "passage_conflict"
     | "operation_conflict"
     | "revision_conflict"
-    | "organisation_placement_conflict";
+    | "organisation_placement_conflict"
+    | "stored_access_ended";
 }>;
 type EmailDraftRoom = CollaborationRoom<
   EmailDraftUpdate,

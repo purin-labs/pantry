@@ -6,7 +6,8 @@ import {
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { CANVAS_BOUNDS } from "@purin-labs/workflow-canvas-crdt";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
-import { defineKitchenTool } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
+import { STORED_ACCESS_ENDED_NOTE } from "@purin-labs/agent-tools/tool-effect";
+import { defineKitchenTool } from "./services";
 
 export const workflowCanvasRead = defineKitchenTool({
   name: "workflow_canvas_read",
@@ -34,7 +35,8 @@ export const workflowCanvasRead = defineKitchenTool({
 export const workflowCanvasMove = defineKitchenTool({
   name: "move_object",
   description:
-    "Move one existing workflow object to an absolute canvas position. Use the revision from workflow_canvas_read. If a human changes an object, leave that object unchanged for the rest of this request. A position change preserves operational settings and relationships.",
+    "Move one existing workflow object to an absolute canvas position. Use the revision from workflow_canvas_read. If a human changes an object, leave that object unchanged for the rest of this request. A position change preserves operational settings and relationships." +
+    STORED_ACCESS_ENDED_NOTE,
   input: jsonSchema({
     type: "object",
     properties: {

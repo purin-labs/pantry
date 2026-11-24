@@ -20,6 +20,7 @@ import type {
 } from "./services";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
+import { STORED_ACCESS_ENDED_NOTE } from "@purin-labs/agent-tools/tool-effect";
 import { defineChannelTool } from "./services";
 
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;
@@ -139,7 +140,8 @@ export const emailReplyDraftEdit = defineChannelTool({
   description:
     "Replace one exact, unique passage in the shared draft of a Gmail reply. Use the exact text returned by " +
     "email_reply_draft_read; people may change other passages at the same time, and the draft rejects a passage " +
-    "that is missing or not unique. The edit is not saved to Gmail and never sends: a person saves and approves the reply.",
+    "that is missing or not unique. The edit is not saved to Gmail and never sends: a person saves and approves the reply." +
+    STORED_ACCESS_ENDED_NOTE,
   input: jsonSchema({
     type: "object",
     properties: {

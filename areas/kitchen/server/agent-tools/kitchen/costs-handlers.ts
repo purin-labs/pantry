@@ -57,6 +57,8 @@ import {
   collaborationEditDeadline,
   collaborationMember,
   liveDeviceMember,
+  storedAccessEnded,
+  type StoredAccessEnded,
   type ToolEffect,
 } from "@purin-labs/tool-handlers/agent-tools/session-support";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
@@ -129,7 +131,7 @@ type SessionCostsHost = Readonly<{
     request: CostsSheetEditRequest,
     operationId: string,
     boundary: CatalogExecutionContext,
-  ) => Promise<ToolEffect<CostsSheetEditResult>>;
+  ) => Promise<ToolEffect<CostsSheetEditResult | StoredAccessEnded>>;
   settleSavedCells: (cellKeys: readonly string[], nowMs: number) => Promise<void>;
   prepareCostsReads: (includeActuals?: boolean) => Promise<
     Readonly<{
@@ -255,6 +257,8 @@ export function embeddedHarnessCostsTools(
             deadlineAt,
           });
           if (!result.ok) {
+            if (result.error.code === "stored_access_ended")
+              return storedAccessEnded("costs sheet");
             throw new Error(`Costs sheet edit failed: ${result.error.code}`);
           }
           await requireSessionExecution(execution, lease);

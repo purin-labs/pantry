@@ -266,6 +266,25 @@ async function settleStaffPageEffect(
   return { receiptId, result: effect.result };
 }
 
+/**
+ * What an agent edit of a shared draft returns when the room stored the edit
+ * but the person's access ended while it saved (`stored_access_ended` of the
+ * collaboration room). It holds no text of the draft: the agent may no longer
+ * read it. A retry meets the room's admission and is refused.
+ */
+export type StoredAccessEnded = Readonly<{
+  kind: "stored_access_ended";
+  result: string;
+}>;
+
+/** The result of a stored edit whose access ended, for `draft` ("menu draft"). */
+export function storedAccessEnded(draft: string): StoredAccessEnded {
+  return {
+    kind: "stored_access_ended",
+    result: `The edit is saved in the ${draft}, but your access to the ${draft} ended while it saved. Tell the person that the edit is saved. Do not read, quote or edit the ${draft} again.`,
+  };
+}
+
 /** The Slack thread that an owner or admin connected to a shared draft. */
 export type DraftThreadLink = Readonly<{
   caseId: CaseId;

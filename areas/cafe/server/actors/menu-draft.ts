@@ -159,7 +159,8 @@ export class MenuDraftRooms {
           | MenuDraftCrdtError["code"]
           | "organisation_placement_conflict"
           | "access_revoked"
-          | "room_full";
+          | "room_full"
+          | "stored_access_ended";
       }>
     >
   > {

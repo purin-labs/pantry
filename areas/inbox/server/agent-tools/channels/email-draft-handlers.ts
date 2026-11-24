@@ -21,6 +21,8 @@ import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-
 import {
   type DraftThreadLink,
   collaborationEditDeadline,
+  storedAccessEnded,
+  type StoredAccessEnded,
   type ToolEffect,
 } from "@purin-labs/tool-handlers/agent-tools/session-support";
 import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
@@ -59,7 +61,7 @@ export async function editEmailDraftForEmbeddedHarness(
   request: EmailDraftEditRequest,
   operationId: string,
   boundary: CatalogExecutionContext,
-): Promise<ToolEffect<EmailDraftRead>> {
+): Promise<ToolEffect<EmailDraftRead | StoredAccessEnded>> {
   const { env, storage, execution, lease, assignment } = context;
   const deadlineAt = collaborationEditDeadline(
     storage,
@@ -115,6 +117,8 @@ export async function editEmailDraftForEmbeddedHarness(
         userId: access.member.userId,
         deadlineAt,
       });
+      if (!result.ok && result.error.code === "stored_access_ended")
+        return storedAccessEnded("email draft");
       await requireSessionExecution(execution, lease);
       if (!result.ok) {
         throw new Error(

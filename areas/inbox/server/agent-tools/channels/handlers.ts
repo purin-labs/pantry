@@ -87,6 +87,8 @@ import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
 import {
   type EmailMailboxReadScope,
   proposalFlowEffect,
+  storedAccessEnded,
+  type StoredAccessEnded,
   type ToolEffect,
   collaborationEditDeadline,
   collaborationMember,
@@ -402,7 +404,7 @@ export async function editEmailReplyDraftForEmbeddedHarness(
   request: HarnessEmailReplyDraftEdit,
   operationId: string,
   boundary: CatalogExecutionContext,
-): Promise<ToolEffect<HarnessEmailReplyDraft>> {
+): Promise<ToolEffect<HarnessEmailReplyDraft | StoredAccessEnded>> {
   const { env, storage, execution, lease, assignment } = context;
   const deadlineAt = collaborationEditDeadline(
     storage,
@@ -521,6 +523,8 @@ export async function editEmailReplyDraftForEmbeddedHarness(
         deadlineAt,
       });
       if (!result.ok) {
+        if (result.error.code === "stored_access_ended")
+          return storedAccessEnded("reply draft");
         throw new EmailReplyDraftRequestError(
           `Email reply draft edit failed: ${result.error.code}. Read the draft again before choosing a new edit.`,
         );
