@@ -184,7 +184,7 @@ async function main() {
   ]);
   runCli("resize", ["320", "800"]);
   const narrowestSignIn = runCli("run-code", [
-    "async (page) => page.evaluate(() => { const heading = document.querySelector('#signin-title'); if (!(heading instanceof HTMLElement)) return null; return { viewport: innerWidth, documentFits: document.documentElement.scrollWidth <= document.documentElement.clientWidth, headingFits: heading.scrollWidth <= heading.clientWidth }; })",
+    "async (page) => page.evaluate(() => { const heading = document.querySelector('.signin-story-body h2'); if (!(heading instanceof HTMLElement)) return null; const style = getComputedStyle(heading); return { viewport: innerWidth, documentFits: document.documentElement.scrollWidth <= document.documentElement.clientWidth, headingFits: heading.scrollWidth <= heading.clientWidth, whiteSpace: style.whiteSpace }; })",
   ]);
   assertCheck(
     narrowestSignIn !== null &&
@@ -192,7 +192,10 @@ async function main() {
       narrowestSignIn.documentFits,
     "sign-in reflows without horizontal overflow at 320px",
   );
-  assertCheck(narrowestSignIn.headingFits, "sign-in heading fits at 320px");
+  assertCheck(
+    narrowestSignIn.headingFits && narrowestSignIn.whiteSpace === "nowrap",
+    "sign-in story remains one line and fits at 320px",
+  );
   runCli("resize", ["390", "844"]);
 
   const directPath = "/portal/direct-route-check";

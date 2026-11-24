@@ -1,23 +1,83 @@
-/* The sign-in page: one centred panel, the layout of the load failure page
-   (.auth-status-shell and .auth-status-panel). */
-.signin-panel {
+/* The sign-in page: the sign-in column and the story column with the
+   theme texture. One column below 760px. */
+#signin-title[tabindex="-1"]:focus,
+#signin-title[tabindex="-1"]:focus-visible {
+  outline: none;
+}
+
+.signin-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
   display: grid;
-  gap: 20px;
+  grid-template-columns: minmax(360px, 36%) minmax(0, 1fr);
+  background: var(--ground);
 }
 
-.signin-panel h1 {
-  margin: 0;
+.signin-access,
+.signin-story {
+  min-width: 0;
+  padding: clamp(28px, 4vw, 64px);
 }
 
-.signin-mark {
+.signin-access {
+  display: flex;
+  flex-direction: column;
+  border-inline-end: 1px solid var(--border);
+  background: var(--paper);
+}
+
+.signin-brand {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+}
+
+.signin-brand-mark {
+  width: 28px;
+  height: 28px;
   display: block;
-  width: 32px;
-  height: 32px;
+  flex: 0 0 auto;
   object-fit: contain;
 }
 
-.signin-panel .signin-button {
-  width: 100%;
+.signin-brand strong {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.signin-brand > span[aria-hidden="true"] {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+}
+
+.signin-brand > span:last-child {
+  color: var(--ink-strong);
+  font-weight: 500;
+}
+
+.signin-access-body {
+  width: min(100%, 34rem);
+  margin-block: auto;
+  padding-block: clamp(56px, 10vh, 120px);
+}
+
+.signin-access-body h1 {
+  font-size: clamp(2.1rem, 3vw, 3rem);
+}
+
+.signin-intro {
+  margin: 8px 0 24px;
+  color: var(--ink-2);
+  font-size: 16px;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.signin-access .signin-button {
+  width: min(100%, 26rem);
   min-height: 50px;
   gap: 12px;
   border-radius: 10px;
@@ -30,9 +90,105 @@
   flex: 0 0 auto;
 }
 
-.signin-note {
+.signin-access-note {
   margin: 0;
   color: var(--ink-2);
   font-size: 14px;
   line-height: 1.5;
+}
+
+.signin-story {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+}
+
+/* The theme texture: one cloud in the lower right, clear of the text. */
+.signin-story::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--pantry-texture-ink);
+  mask: var(--pantry-texture) right -300px bottom -260px / 1000px 750px
+    no-repeat;
+  pointer-events: none;
+}
+
+.signin-story-body {
+  width: min(100%, 60rem);
+  margin-block: auto;
+  padding-block: clamp(64px, 12vh, 140px);
+}
+
+.signin-story-body h2 {
+  margin: 0;
+  font-size: clamp(2.4rem, 4vw, 3.75rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+}
+
+.signin-story-body p {
+  max-width: 54ch;
+  margin: 22px 0 0;
+  color: var(--ink-2);
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+@media (max-width: 760px) {
+  .signin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .signin-access {
+    min-height: min(720px, 100dvh);
+    border-inline-end: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .signin-access-body {
+    padding-block: 64px;
+  }
+
+  .signin-story {
+    min-height: 440px;
+  }
+
+  .signin-story-body {
+    padding-block: 72px 28px;
+  }
+}
+
+@media (max-width: 560px) {
+  .signin-access,
+  .signin-story {
+    padding: 24px 20px;
+  }
+
+  .signin-access {
+    min-height: 100dvh;
+  }
+
+  .signin-access-body {
+    padding-block: 48px;
+  }
+
+  .signin-story {
+    min-height: 380px;
+  }
+
+  .signin-story-body h2 {
+    font-size: clamp(1.75rem, 7.5vw, 2.25rem);
+  }
+}
+
+@media (max-width: 360px) {
+  .signin-story-body h2 {
+    font-size: 6.8vw;
+  }
 }

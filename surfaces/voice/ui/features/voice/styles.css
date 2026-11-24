@@ -258,6 +258,15 @@
   font-size: 13px;
   line-height: 1.45;
 }
+.voice-terms li {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 12px;
+}
+.voice-terms svg {
+  margin-top: 1px;
+  color: var(--ink-3);
+}
 .voice-terms-fold {
   margin: -10px 0 12px;
   color: var(--ink-2);

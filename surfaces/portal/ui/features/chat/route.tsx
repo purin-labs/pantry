@@ -51,7 +51,6 @@ import {
   Check,
   ChevronDown,
   ChevronRight,
-  Circle,
   CornerDownRight,
   FileText,
   Folder,
@@ -95,6 +94,7 @@ import {
 import { VoiceControl, VoiceHeaderMark } from "@purin-labs/surface-voice/ui/features/voice/control";
 import { UserMessageMarks } from "./message-marks";
 import { holdSendForScreenQuestion, ScreenChip } from "./screen-chip";
+import { ContextEstimateMenu, WorkspaceAccessMenu } from "./composer-menus";
 import { mergeDirectoryResult, updateSavedDraft, type PageState } from "./page-state";
 import { VoiceApprovalContext } from "@purin-labs/surface-voice/ui/features/voice/approvals";
 import {
@@ -3797,11 +3797,14 @@ export class ChatPage extends React.Component<Props, State> {
                       <Plus size={20} aria-hidden="true" />
                     </summary>
                     <div className="chat-composer-menu">
+                      <p className="chat-menu-title">Add context</p>
                       <label className="chat-file-option">
                         <Paperclip size={18} aria-hidden="true" />
                         <span>
                           Kitchen file
-                          <small>Run, request, recording or handoff</small>
+                          <small>
+                            Run, request, recording or handoff for review
+                          </small>
                         </span>
                         <input
                           type="file"
@@ -3813,7 +3816,9 @@ export class ChatPage extends React.Component<Props, State> {
                       </label>
                       <label className="chat-file-option">
                         <Paperclip size={18} aria-hidden="true" />
-                        <span>Files</span>
+                        <span>
+                          Files<small>Documents, images, audio, video</small>
+                        </span>
                         <input
                           type="file"
                           multiple
@@ -3829,7 +3834,9 @@ export class ChatPage extends React.Component<Props, State> {
                       </label>
                       <a href={this.props.integrationsPath}>
                         <Plug size={18} aria-hidden="true" />
-                        <span>Integrations</span>
+                        <span>
+                          Connected apps<small>Manage your integrations</small>
+                        </span>
                       </a>
                     </div>
                   </details>
@@ -3839,39 +3846,15 @@ export class ChatPage extends React.Component<Props, State> {
                     draft={this.state.draft}
                     onNewChat={this.moveDraftToNewChat.bind(this)}
                   />
-                  <details name="composer-menu" className="chat-access-menu">
-                    <summary aria-label="Workspace access" title="Workspace access">
-                      <ShieldCheck size={17} aria-hidden="true" />
-                    </summary>
-                    <div className="chat-composer-menu">
-                      <p>
-                        Workspace grants and approval rules apply to this chat.
-                      </p>
-                      <a href={this.props.accessPath}>Access and data flow</a>
-                    </div>
-                  </details>
-                  <details name="composer-menu" className="chat-context-menu">
-                    <summary aria-label="Context usage">
-                      <Circle size={17} aria-hidden="true" />
-                    </summary>
-                    <div className="chat-composer-menu">
-                      <strong>
-                        ~
-                        {estimatedContextTokens(
-                          data,
-                          this.state.draft,
-                        ).toLocaleString()}{" "}
-                        tokens
-                      </strong>
-                      <p>An estimate for this chat and the draft.</p>
-                    </div>
-                  </details>
+                  <WorkspaceAccessMenu accessPath={this.props.accessPath} />
+                  <ContextEstimateMenu data={data} draft={this.state.draft} />
                   <details name="composer-menu" className="chat-model-menu">
                     <summary>
                       {selectedModelName ?? "Choose model"}
                       <ChevronDown size={14} aria-hidden="true" />
                     </summary>
                     <div className="chat-composer-menu">
+                      <p className="chat-menu-title">Choose model</p>
                       {data.model.kind === "ready"
                         ? data.model.options.map(
                             this.renderModelOption.bind(this),
@@ -4104,12 +4087,6 @@ function applyConversationRead(
   };
 }
 
-function estimatedContextTokens(data: ChatPageData, draft: string): number {
-  let characters = draft.length;
-  for (const message of data.conversation?.messages ?? [])
-    characters += message.text.length;
-  return Math.ceil(characters / 4);
-}
 
 function chatWorkIsActive(work: Chat["work"] | undefined): boolean {
   return (
