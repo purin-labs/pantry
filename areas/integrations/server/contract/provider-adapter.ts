@@ -26,7 +26,6 @@ import type { ActiveCapabilityId } from "@purin-labs/authority/authorization/cap
 import type { IntegrationDiscoveryDataClass } from "@purin-labs/contracts";
 import type { GmailAuthorizationProduct } from "@purin-labs/connections/mail/gmail-authorization";
 import type { Variant } from "@purin-labs/type-utils";
-import type { SquareApplication } from "../provider-adapters/square";
 import type {
   MailIntegrationProvider,
   MailProviderAdapter,
@@ -102,6 +101,17 @@ export type ProviderAdapterBindings = Pick<
   | "WHATSAPP_APP_SECRET"
   | "WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID"
 >;
+
+/**
+ * A Square application that `readSquareConfiguration` validated. The file
+ * `provider-adapters/square.ts` adds its private marker to this interface, so
+ * that a raw object is not a Square application.
+ */
+export interface SquareApplication {
+  readonly environment: "development" | "production";
+  readonly clientId: string;
+  readonly clientSecret: string;
+}
 
 export type ProviderStartContextByProvider = {
   readonly airtable: { readonly provider: "airtable" };
