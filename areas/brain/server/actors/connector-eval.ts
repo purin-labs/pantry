@@ -11,11 +11,16 @@ import {
   type EvalRunProgress,
   type EvalRunResult,
   type EvalTaskKey,
-  type EvalTaskOutcome,
   type EvalTaskResult,
 } from "@purin-labs/control-api";
 import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
+import type {
+  ClaimedEvalTask,
+  ConnectorEvalRun,
+  ConnectorEvalTask,
+  SettledEvalTask,
+} from "../evals/contract/eval-task";
 
 /**
  * The eval runs of one mailbox agent while they are in progress.
@@ -39,48 +44,6 @@ export const EVAL_TASK_MAX_CLAIMS = 6;
 
 const MAX_OPEN_EVAL_RUNS = 4;
 const PUBLISHED_RUN_RETENTION_MS = 7 * 86_400_000;
-
-export type ConnectorEvalRun = Readonly<{
-  runId: string;
-  commandId: string;
-  eval: EvalRevisionRef;
-  caseId: string;
-  startedByPersonId: string;
-  startedAt: number;
-  routes: readonly EvalRoute[];
-  configurations: readonly EvalConfiguration[];
-  cancelledAt: number | null;
-}>;
-
-type ConnectorEvalTask = EvalTaskKey & Readonly<{ position: number }>;
-
-export type ClaimedEvalTask = Readonly<{
-  run: ConnectorEvalRun;
-  task: ConnectorEvalTask;
-  /** How many times this task has been claimed, this claim included. */
-  attempt: number;
-}>;
-
-/** What one task ended with, and the label of what its turn observed. */
-export type SettledEvalTask = Readonly<{
-  result: Omit<EvalTaskResult, keyof EvalTaskKey>;
-  flowLabel: unknown;
-}>;
-
-/**
- * How one claim of a task ended. `settled` is recorded already. `deferred`
- * leaves the task claimed for another try, and names what it ends with if no
- * tries are left.
- */
-export type EvalTaskEnd =
-  | Readonly<{ kind: "settled"; outcome: EvalTaskOutcome }>
-  | Readonly<{
-      kind: "deferred";
-      retryAt: number;
-      exhausted: EvalTaskOutcome;
-    }>
-  /** The Connector stopped being the active instance. Nothing was changed. */
-  | Readonly<{ kind: "inactive" }>;
 
 type EvalRunAdmission =
   | Readonly<{ kind: "admitted"; run: ConnectorEvalRun }>

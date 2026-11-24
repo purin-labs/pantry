@@ -12,13 +12,15 @@ import {
   readEvalRunProgress,
   readSettledEvalRun,
   settleEvalTask,
-  type ClaimedEvalTask,
-  type EvalTaskEnd,
   EVAL_RUN_TOKEN_BUDGET,
   EVAL_TASK_TOKEN_ALLOWANCE,
   evalRunTokensUsed,
 } from "../connector-eval";
-import type { EvalTaskServices } from "../../evals/contract/eval-task";
+import type {
+  ClaimedEvalTask,
+  EvalTaskEnd,
+  EvalTaskServices,
+} from "../../evals/contract/eval-task";
 import { publishEvalRunResult, readEvalRunFixture } from "../../evals/access";
 import { createEvalTurnMemoryReader } from "../../memory/access";
 import { newRequestId } from "@purin-labs/kernel/ids";

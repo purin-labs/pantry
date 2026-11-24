@@ -4,7 +4,6 @@ import {
 } from "@purin-labs/tenancy/organisation-access/access";
 import { parseMemoryCommand } from "@purin-labs/control-api";
 import type {
-  MemoryApplicability,
   MemoryCommand,
   MemoryCommandErrorCode,
   MemoryCommandReceipt,
@@ -38,7 +37,10 @@ import type {
 } from "@purin-labs/agent/context/assembly/index";
 import { gmailConnectorId } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
 import type { Env } from "@purin-labs/kernel/env";
-import type { CaseActorStub, OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type {
+  CaseActorStub,
+  OrganisationActorStub,
+} from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   parseCaseId,
   parseIntegrationAccountId,
@@ -70,13 +72,19 @@ import {
   type MemoryRevision,
   type SerializedAcceptedMemory,
 } from "./store";
+import type {
+  EvalTurnMemoryReaderInput,
+  MemoryAccessError,
+  MemoryCorrectionProposal,
+  MemoryCorrectionProposalResult,
+  RecordScope,
+  TurnMemoryReaderInput,
+} from "./contract/memory-service";
 
-export type MemoryAccessError = Readonly<{
-  code:
-    | MemoryCommandErrorCode
-    /** A cited record has no recorded provenance this boundary can verify. */
-    | "memory_evidence_unsupported";
-}>;
+export type {
+  MemoryAccessError,
+  TurnMemoryDestination,
+} from "./contract/memory-service";
 
 /**
  * A signed-in person whose live authority may read accepted Case context. It
@@ -89,22 +97,6 @@ export type MemoryViewer = RecordScope &
     scope: AuthorizedConversationScope;
     authority: Variant<RequestAuthority, "control">;
   }>;
-
-/** Where a cited record is read from. */
-export type RecordScope = Readonly<{
-  env: Env;
-  organisationId: OrganisationId;
-  execution: OrganisationExecutionScope;
-}>;
-
-/**
- * What one turn concerns. A Memory applies only when its scope names one of
- * these exactly: a skill the turn loaded, a commerce resource class it reads,
- * or the commerce entity it is about.
- */
-type TurnMemorySubjects = Readonly<{
-  applicability: readonly MemoryApplicability[];
-}>;
 
 /** One cited record as its owner recorded it. */
 type CitedRecord = Readonly<{
@@ -121,11 +113,6 @@ type CitedRecord = Readonly<{
 type CitedRecordError = Readonly<{
   code: "invalid" | "missing" | "unreadable" | "unsupported";
 }>;
-
-/** Whether a turn's destination audience may receive content under a label. */
-export type TurnMemoryDestination = (
-  label: FlowLabel,
-) => Promise<"allow" | "deny" | "unavailable">;
 
 /** How many accepted revisions one Actor read returns. */
 export const TURN_MEMORY_PAGE = 32;
@@ -260,14 +247,7 @@ export async function reviewTogether<Stored, View>(
  * completed turn still passes its delivery check.
  */
 export function createTurnMemoryReader(
-  input: Readonly<{
-    env: Env;
-    execution: OrganisationExecutionScope;
-    organisationId: OrganisationId;
-    subjects: TurnMemorySubjects;
-    destinationMayReceive: TurnMemoryDestination;
-    now: number;
-  }>,
+  input: TurnMemoryReaderInput,
 ): TurnMemoryReader {
   return { read: readTurnMemory.bind(null, input) };
 }
@@ -435,15 +415,7 @@ async function offerStoredRevision(
  * later turn still see the accepted revision.
  */
 export function createEvalTurnMemoryReader(
-  input: Parameters<typeof createTurnMemoryReader>[0] &
-    Readonly<{
-      candidate: ShownMemoryRevision | null;
-      /**
-       * Called when the candidate applies to this turn: `true` when it was
-       * offered, `false` when this turn may not be shown it.
-       */
-      onCandidateDecided?: (offered: boolean) => void;
-    }>,
+  input: EvalTurnMemoryReaderInput,
 ): TurnMemoryReader {
   return { read: readEvalTurnMemory.bind(null, input) };
 }
@@ -976,31 +948,8 @@ export async function citedRecord(
  * cannot decide a candidate.
  */
 export async function proposeMemoryFromCorrection(
-  input: Readonly<{
-    env: Env;
-    execution: OrganisationExecutionScope;
-    organisationId: OrganisationId;
-    agent: Readonly<{
-      caseId: string;
-      assignmentId: string;
-      sessionId: string;
-    }>;
-    correction: Variant<MemoryEvidence, "proposal_correction">;
-    turnLabel: FlowLabel;
-    statement: string;
-    applicability: MemoryApplicability;
-    now: number;
-  }>,
-): Promise<
-  Result<
-    Readonly<{
-      kind: "proposed" | "already_proposed";
-      memoryId: string;
-      revision: number;
-    }>,
-    Readonly<{ code: "memory_evidence_unavailable" | "memory_unavailable" }>
-  >
-> {
+  input: MemoryCorrectionProposal,
+): Promise<MemoryCorrectionProposalResult> {
   const cited = await citedRecord(input, input.correction);
   if (!cited.ok)
     return {

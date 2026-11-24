@@ -10,10 +10,8 @@ import type {
   EvalRunResult,
   EvalRunView,
   EvalView,
-  MemoryEvidence,
 } from "@purin-labs/control-api";
 import { assertNever, sameJson } from "@purin-labs/std";
-import type { Variant } from "@purin-labs/type-utils";
 
 import {
   requireActiveOrganisationActorAtPlacement,
@@ -39,9 +37,17 @@ import {
   resolveMemoryViewer,
   viewerMayInspectRevisions,
   viewerMayRead,
-  type MemoryAccessError,
   type MemoryViewer,
 } from "../memory/access";
+import type {
+  EvalCorrectionProposal,
+  EvalCorrectionProposalResult,
+  MemoryAccessError,
+} from "../memory/contract/memory-service";
+import type {
+  EvalRunFixtureRead,
+  EvalRunFixtureRequest,
+} from "./contract/eval-task";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   canonicalFlowLabel,
@@ -225,30 +231,8 @@ export async function commandEvalAsOperator(
  * cannot revise or decide an Eval.
  */
 export async function proposeEvalFromCorrection(
-  input: Readonly<{
-    env: Env;
-    execution: OrganisationExecutionScope;
-    organisationId: OrganisationId;
-    agent: Readonly<{
-      caseId: string;
-      assignmentId: string;
-      sessionId: string;
-    }>;
-    correction: Variant<MemoryEvidence, "proposal_correction">;
-    turnLabel: FlowLabel;
-    title: string;
-    scenario: EvalContent["scenarios"][number];
-  }>,
-): Promise<
-  Result<
-    Readonly<{
-      kind: "proposed" | "already_proposed";
-      evalId: string;
-      revision: number;
-    }>,
-    Readonly<{ code: "eval_evidence_unavailable" | "eval_unavailable" }>
-  >
-> {
+  input: EvalCorrectionProposal,
+): Promise<EvalCorrectionProposalResult> {
   const cited = await citedRecord(input, input.correction);
   if (!cited.ok)
     return {
@@ -612,13 +596,6 @@ export async function publishEvalRunResult(
     : "unavailable";
 }
 
-/** One scenario of one Eval revision as a run reads it, with its label. */
-type EvalRunFixture = Readonly<{
-  subject: EvalContent["subject"];
-  scenario: EvalContent["scenarios"][number];
-  flowLabel: FlowLabel;
-}>;
-
 /**
  * The scenario one eval task tries, read for the run itself. The run names
  * an exact revision, so the scenario and its label are what was reviewed.
@@ -626,18 +603,8 @@ type EvalRunFixture = Readonly<{
  * `unreadable` is a failed lookup, which establishes nothing.
  */
 export async function readEvalRunFixture(
-  input: Readonly<{
-    env: Env;
-    execution: OrganisationExecutionScope;
-    organisationId: OrganisationId;
-    eval: Readonly<{ evalId: string; revision: number }>;
-    scenarioId: string;
-  }>,
-): Promise<
-  | Readonly<{ kind: "read"; fixture: EvalRunFixture }>
-  | Readonly<{ kind: "missing"; fixture?: never }>
-  | Readonly<{ kind: "unreadable"; fixture?: never }>
-> {
+  input: EvalRunFixtureRequest,
+): Promise<EvalRunFixtureRead> {
   const organisation = await requireActiveOrganisationActorAtPlacement({
     env: input.env,
     organisationId: input.organisationId,
