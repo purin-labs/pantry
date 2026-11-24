@@ -72,7 +72,8 @@ answers with a receipt. An observation grants no authority and proves no saved r
 3. The turn must give a handler. If not, the call fails. The `unavailable` text of the
    tool goes only to the log line `embedded_harness.capability_failed`.
 4. `parse` checks the input against the schema, and then `decode` makes the request.
-   A `decodeOnly` tool has no schema check: `decode` is its only check.
+   A `decodeOnly` tool has no full schema check: only the `textLimit` checks of its
+   schema run (FND-11), and then `decode` is its check.
 5. A capability tool claims its capability. The claim checks the turn lease, the Case
    assignment and the live authority. It also takes one call from the run budget.
 6. An effect tool runs `prepare`. Then `settleToolEffect` reads the flow label, runs

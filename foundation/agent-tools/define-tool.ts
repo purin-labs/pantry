@@ -6,6 +6,7 @@ import type {
   HarnessCapabilityName,
   HarnessToolDefinition,
 } from "./catalog/types";
+import { holdsTextLimits } from "@purin-labs/contract-schema";
 import { isRecord } from "@purin-labs/std";
 import type { PreparedEffect } from "./tool-effect";
 
@@ -118,10 +119,11 @@ type ToolSpec<Name extends string, Input extends TSchema, Request, Services> = {
    */
   readonly decode: (input: Static<Input>) => Request;
   /**
-   * Decode is the only check of a call. Give it for a decode that is a full
-   * parser with its own messages for the agent. The schema is then only what
-   * the model sees: strict mode makes the model send each field, and a Code
-   * Mode script may leave out the fields that the parser lets it omit.
+   * Decode is the check of a call. Give it for a decode that is a full
+   * parser with its own messages for the agent. The schema is then what the
+   * model sees: strict mode makes the model send each field, and a Code Mode
+   * script may leave out the fields that the parser lets it omit. Only the
+   * `textLimit` checks of the schema run before decode (FND-11).
    */
   readonly decodeOnly?: true;
   readonly effect: ToolEffect;
@@ -264,6 +266,9 @@ export function defineToolFamily<Services>() {
       const parse = (input: unknown): Request => {
         // The schema of a decode-only tool is a JSON schema: decode takes unknown.
         if (spec.decodeOnly === true) {
+          if (!holdsTextLimits(spec.input, input)) {
+            throw new TypeError(`${spec.name} arguments are invalid`);
+          }
           return spec.decode(input as Static<Input>);
         }
         if (!Value.Check(spec.input, input)) {

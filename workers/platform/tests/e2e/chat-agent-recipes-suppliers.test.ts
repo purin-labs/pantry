@@ -135,6 +135,10 @@ function scripts(journey: Journey): Readonly<Record<string, Script>> {
     READSUPPLIERS: { tool: "supplier_read", args: () => ({}) },
     ADDSUPPLIER: create(),
     SUPPLIERAGAIN: create(),
+    STACKEDNAME: {
+      tool: "supplier_create",
+      args: () => supplier(`K${"\u0301".repeat(400)}`, journey.itemId),
+    },
     // The later message's prompt also holds the first message of its chat,
     // so its word comes first here.
     LATERRECIPE: {
@@ -400,6 +404,20 @@ it(
     // 9. The same name again is refused, and the agent sees why.
     await chatApproved(fixture, "SUPPLIERAGAIN");
     expect(lastOutput("SUPPLIERAGAIN")).toContain("may exist");
+    expect(
+      await agentReceipts(fixture, `${paths.organisation}/commerce/suppliers`),
+    ).toEqual([{ operation: "commerce.supplier.create", n: 1 }]);
+
+    // 9b. A name of one letter and 400 combining marks is one grapheme
+    //     cluster but 401 characters, over the 200 of the tool's schema. The
+    //     tool refuses the call before any approval, and the directory and
+    //     the receipts stay as they were.
+    await chatDirect(fixture, fixture.author, "STACKEDNAME");
+    evidence.stackedNameOutput = lastOutput("STACKEDNAME");
+    expect(lastOutput("STACKEDNAME")).toContain("Validation failed for tool");
+    expect(lastOutput("STACKEDNAME")).toContain(
+      "displayName: expected at most 200 characters",
+    );
     expect(
       await agentReceipts(fixture, `${paths.organisation}/commerce/suppliers`),
     ).toEqual([{ operation: "commerce.supplier.create", n: 1 }]);

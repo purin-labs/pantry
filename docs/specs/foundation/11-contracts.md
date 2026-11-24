@@ -108,8 +108,10 @@ The helpers follow the Rust and serde rules that their comments name. For exampl
   schema that sets `maxLength`: it keeps `maxLength` as the hint that a model or a form
   reads, and adds a check of the code points, or of the UTF-8 bytes where a store or a
   provider limits bytes, against the same number. TypeBox keeps the check under a hidden
-  key, so the JSON of the schema does not change. The check runs where TypeBox checks
-  the value: not for the input of a decode-only tool, whose decoder checks the size.
+  key, so the JSON of the schema does not change. TypeBox does not check the input of a
+  decode-only agent tool, so `defineTool` runs the `textLimit` checks of its schema
+  (`holdsTextLimits`) before the decoder, and refuses a longer text as invalid
+  arguments.
 - **Unicode.** `normalizeCommerceUnicodeV1` (`commerce-contracts/src/unicode.ts`) does
   NFKC, the full case fold, the removal of default ignorable code points and NFKC again.
   Its tables are Unicode 17.0.0 (`COMMERCE_UNICODE_VERSION`). `generate-unicode.mjs`
@@ -313,8 +315,7 @@ Neighbours:
 - **Schema length.** 200 string schemas in 51 files still set a bare `maxLength`
   (`scripts/text-limits-ratchet.json`), 60 of them in `control-api` and 97 in the tool
   inputs of the areas and `foundation`. TypeBox counts grapheme clusters, so they do not
-  limit the size of a text. TypeBox does not check the input of a decode-only tool, so
-  its decoder must check the size.
+  limit the size of a text.
 - **Lone surrogates in the access decoders.** `jsonInput` in `access-control.ts` tests
   the JSON text for a lone surrogate. `JSON.stringify` writes a lone surrogate as an
   escape, so the test finds none.
