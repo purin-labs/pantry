@@ -19,6 +19,9 @@ import {
   readDamagedSurfaceEffects,
   seedDamagedSurfaceEffects,
 } from "./case-execution-support";
+import { createBakerySurfaceEffect } from "@purin-labs/bakery-model/bakery-surface";
+import { listBakerySurfaceTimelineEvents } from "@purin-labs/area-kitchen/server/actors/bakery-surface-effect";
+import { requireOrganisationId } from "../test-ids";
 
 /**
  * Refactor 15: damaged Kitchen effects do not hold the Session's
@@ -30,6 +33,11 @@ import {
  * row stayed a recovery candidate for good, and a full page of them armed
  * the Session's alarm every second. Now recovery ends each of them as
  * quarantined, one page for each pass, and then reads none of them again.
+ *
+ * One of them was published to the page: its delivery waits as dispatching,
+ * with a started event on the chat's timeline. Its quarantine ends that
+ * delivery as uncertain, so the timeline shows its end and the page is not
+ * offered it again.
  */
 it(
   "quarantines damaged Kitchen effects so that Session recovery stops reading them",
@@ -77,6 +85,7 @@ async function damagedSurfaceEffectJourney(test: TestContext): Promise<void> {
     session,
     seedDamagedSurfaceEffects(ORGANISATION_ID, DAMAGED_EFFECTS),
   );
+  const published = await publishedDelivery("surface-damaged-01");
   expect(await runInDurableObject(session, readDamagedSurfaceEffects)).toEqual({
     candidates: DAMAGED_EFFECTS,
     quarantined: 0,
@@ -100,6 +109,28 @@ async function damagedSurfaceEffectJourney(test: TestContext): Promise<void> {
   expect(await runInDurableObject(session, readDamagedSurfaceEffects)).toEqual(
     settled,
   );
+
+  // The published effect ends as uncertain on the chat's timeline, and its
+  // delivery no longer waits for the page.
+  const timeline = await listBakerySurfaceTimelineEvents({
+    db: fixtureDatabase(),
+    organisationId: requireOrganisationId(ORGANISATION_ID),
+    userId: published.userId,
+    requestIds: [published.requestId],
+    afterSequence: 0,
+  });
+  expect(timeline.map((event) => event.terminal.kind)).toEqual([
+    "started",
+    "indeterminate",
+  ]);
+  expect(
+    await fixtureDatabase()
+      .prepare(
+        "SELECT state_kind AS state FROM bakery_surface_effect_delivery WHERE effect_id = ?",
+      )
+      .bind(published.effectId)
+      .first<{ state: string }>(),
+  ).toEqual({ state: "indeterminate" });
   Object.assign(test.task.meta, {
     bakerySurfaceQuarantine: {
       damaged: DAMAGED_EFFECTS,
@@ -107,4 +138,78 @@ async function damagedSurfaceEffectJourney(test: TestContext): Promise<void> {
       alarmAt,
     },
   });
+}
+
+/**
+ * The page delivery of one damaged effect, as the Session published it: a
+ * valid effect that waits as dispatching, with its started timeline event.
+ */
+async function publishedDelivery(effectId: string): Promise<{
+  effectId: string;
+  userId: string;
+  requestId: string;
+}> {
+  const now = Date.now();
+  const effect = await createBakerySurfaceEffect({
+    effectId,
+    dispatchId: "damaged_dispatch",
+    deadlineAt: now + 10 * 60_000,
+    command: {
+      schemaVersion: 1,
+      kind: "prepare_run_save",
+      target: { surfaceSessionId: crypto.randomUUID(), surfaceEpoch: 0 },
+      name: "Damaged save",
+    },
+  });
+  const ids = {
+    userId: "user_damaged_surface",
+    sessionId: "session_damaged_surface",
+    turnId: "turn_damaged_surface",
+    requestId: "request_damaged_surface",
+  };
+  const db = fixtureDatabase();
+  await db.batch([
+    db
+      .prepare(
+        `INSERT INTO bakery_surface_effect_delivery (
+          effect_id, organisation_id, user_id, session_id, turn_id,
+          request_id, surface_session_id, surface_epoch, command_digest,
+          effect_json, state_kind, receipt_json, deadline_at, created_at,
+          updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, 'dispatching', NULL, ?, ?, ?)`,
+      )
+      .bind(
+        effectId,
+        ORGANISATION_ID,
+        ids.userId,
+        ids.sessionId,
+        ids.turnId,
+        ids.requestId,
+        effect.command.kind === "prepare_run_save"
+          ? effect.command.target.surfaceSessionId
+          : "",
+        effect.commandDigest,
+        JSON.stringify(effect),
+        effect.deadlineAt,
+        now - 60_000,
+        now - 60_000,
+      ),
+    db
+      .prepare(
+        `INSERT INTO bakery_surface_timeline_event (
+          organisation_id, user_id, session_id, turn_id, request_id,
+          effect_id, event_kind, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, 'started', ?)`,
+      )
+      .bind(
+        ORGANISATION_ID,
+        ids.userId,
+        ids.sessionId,
+        ids.turnId,
+        ids.requestId,
+        effectId,
+        now - 60_000,
+      ),
+  ]);
+  return { effectId, userId: ids.userId, requestId: ids.requestId };
 }

@@ -504,7 +504,13 @@ export async function reconcileBakerySurfaceEffects(input: {
       stored === null ||
       !(await verifyBakerySurfaceEffect(stored.request.effect))
     ) {
-      quarantineSurfaceEffect(input.storage.sql, row, now, "corrupt");
+      await quarantineSurfaceEffect(
+        input.storage.sql,
+        input.db,
+        row,
+        now,
+        "corrupt",
+      );
       continue;
     }
     try {
@@ -554,7 +560,8 @@ export async function reconcileBakerySurfaceEffects(input: {
       // uncertain effect counts the failed repair and backs off.
       if (row.stateKind === "dispatching")
         retryAt = Math.min(retryAt ?? Infinity, now + SURFACE_EFFECT_RETRY_MS);
-      else recordSurfaceRepairFailure(input.storage.sql, row, now);
+      else
+        await recordSurfaceRepairFailure(input.storage.sql, input.db, row, now);
     }
   }
   const deadline = nextSurfaceEffectDeadline(input.storage.sql);
@@ -1262,14 +1269,17 @@ const SURFACE_REPAIR_DUE = `(CASE WHEN recovery_attempts = 0 THEN 0
  * Moves a surface effect that recovery cannot use to the terminal
  * `quarantined` state. A pending or dispatching effect reads as uncertain, so
  * a turn that waits for it ends; a settled or uncertain effect keeps its
- * evidence. The write compares the state that recovery read.
+ * evidence. The write compares the state that recovery read. A page delivery
+ * that still waits as dispatching ends as uncertain too, with its timeline
+ * event, so the page is not offered it again.
  */
-function quarantineSurfaceEffect(
+async function quarantineSurfaceEffect(
   sql: SqlStorage,
+  db: OrganisationDatabase,
   row: SurfaceOutboxRow,
   now: number,
   reason: "corrupt" | "repair_failed",
-): void {
+): Promise<void> {
   const written = sql.exec(
     `UPDATE actor_outbox
      SET state_kind = 'quarantined', recovery_attempts = recovery_attempts + 1,
@@ -1285,24 +1295,69 @@ function quarantineSurfaceEffect(
     row.effectId,
     row.stateKind,
   );
-  if (written.rowsWritten === 1)
-    traceWarn("bakery_surface_effect.quarantined", {
+  if (written.rowsWritten !== 1) return;
+  traceWarn("bakery_surface_effect.quarantined", {
+    requestId: newRequestId(),
+    effect_id: row.effectId,
+    from: row.stateKind,
+    reason,
+  });
+  await endQuarantinedSurfaceDelivery(db, row, now);
+}
+
+/**
+ * Ends the page delivery of a quarantined effect as uncertain when it still
+ * waits as dispatching. The Session's quarantine stands when D1 refuses: a
+ * delivery whose deadline passed is no longer offered to the page.
+ */
+async function endQuarantinedSurfaceDelivery(
+  db: OrganisationDatabase,
+  row: SurfaceOutboxRow,
+  now: number,
+): Promise<void> {
+  try {
+    await db.batch([
+      db
+        .prepare(
+          `UPDATE bakery_surface_effect_delivery
+           SET state_kind = 'indeterminate', receipt_json = NULL,
+               updated_at = max(created_at, ?)
+           WHERE organisation_id = ? AND effect_id = ?
+             AND state_kind = 'dispatching'`,
+        )
+        .bind(now, row.organisationId, row.effectId),
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO bakery_surface_timeline_event (
+             organisation_id, user_id, session_id, turn_id, request_id,
+             effect_id, event_kind, created_at
+           )
+           SELECT organisation_id, user_id, session_id, turn_id, request_id,
+                  effect_id, 'indeterminate', ?
+           FROM bakery_surface_effect_delivery
+           WHERE organisation_id = ? AND effect_id = ?
+             AND state_kind = 'indeterminate'`,
+        )
+        .bind(now, row.organisationId, row.effectId),
+    ]);
+  } catch {
+    traceWarn("bakery_surface_effect.quarantine_delivery_failed", {
       requestId: newRequestId(),
       effect_id: row.effectId,
-      from: row.stateKind,
-      reason,
     });
+  }
 }
 
 /**
  * Counts one failed repair of a settled or uncertain effect. The row moves to
  * the end of the recovery order, and the last allowed failure quarantines it.
  */
-function recordSurfaceRepairFailure(
+async function recordSurfaceRepairFailure(
   sql: SqlStorage,
+  db: OrganisationDatabase,
   row: SurfaceOutboxRow,
   now: number,
-): void {
+): Promise<void> {
   const attempts =
     sql
       .exec<{ attempts: number }>(
@@ -1313,7 +1368,7 @@ function recordSurfaceRepairFailure(
       .toArray()[0]?.attempts ?? null;
   if (attempts === null) return;
   if (attempts + 1 >= SURFACE_EFFECT_REPAIR_ATTEMPTS) {
-    quarantineSurfaceEffect(sql, row, now, "repair_failed");
+    await quarantineSurfaceEffect(sql, db, row, now, "repair_failed");
     return;
   }
   sql.exec(
