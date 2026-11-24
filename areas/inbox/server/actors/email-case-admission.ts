@@ -1,5 +1,5 @@
 import { ensureCaseProject } from "@purin-labs/conversation/projects/case-project";
-import { gmailConnectorIdValue } from "../mail-inbox/contract/connector-ids";
+import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseCaseId,

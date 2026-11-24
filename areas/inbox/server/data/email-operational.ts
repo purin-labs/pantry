@@ -14,11 +14,11 @@ import type {
   EmailIdentityClaimant,
   EmailIdentityClaimQuery,
   EmailOperationalDirectoryError,
-} from "../mail-inbox/contract/connection-parts";
-import type { SupplierEmailContactRegistration } from "../mail-inbox/contract/inbox-services";
-import type { OperationalEmailTarget } from "../mail-inbox/contract/verified-contacts";
+} from "@purin-labs/area-inbox-contract/server/connection-parts";
+import type { SupplierEmailContactRegistration } from "@purin-labs/area-inbox-contract/server/inbox-services";
+import type { OperationalEmailTarget } from "@purin-labs/area-inbox-contract/server/verified-contacts";
 
-export type { OperationalEmailTarget } from "../mail-inbox/contract/verified-contacts";
+export type { OperationalEmailTarget } from "@purin-labs/area-inbox-contract/server/verified-contacts";
 
 export type EmailSelfTestTarget = Readonly<{
   kind: "self_test";

@@ -3,7 +3,7 @@ import {
   parseAgentOperationsResponse,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import type { AgentMailboxView, EmailReplyPreviewResult, EmailReplyQueueItem, EmailOperationalPreviewResult, EmailOperationalQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
-import type { MailboxInstallationOption } from "@purin-labs/area-inbox/ui/pages/agent-mailbox";
+import type { MailboxInstallationOption } from "@purin-labs/area-inbox-contract/ui/pages/agent-mailbox";
 import type { IntegrationAccount } from "@purin-labs/control-api/portal/settings";
 import { parseEmailOperationalPreviewResponse, parseEmailReplyPreviewResponse, parseEmailReviewQueue } from "@purin-labs/control-api/portal/email-review";
 import { isRecord } from "@purin-labs/std";

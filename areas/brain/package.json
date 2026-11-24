@@ -31,7 +31,7 @@
     "@purin-labs/tenancy": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
     "@purin-labs/ui": "workspace:*",
-    "@purin-labs/area-inbox": "workspace:*",
+    "@purin-labs/area-inbox-contract": "workspace:*",
     "lucide-react": "^0.542.0",
     "react": "^19.1.1",
     "react-router": "^7.18.2"

@@ -1,0 +1,37 @@
+{
+  "name": "@purin-labs/area-inbox-contract",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./server/*": {
+      "types": "./server/*.ts",
+      "default": "./server/*.ts"
+    },
+    "./ui/*": {
+      "types": "./ui/*.ts",
+      "default": "./ui/*.ts"
+    },
+    "./ui/features/email-review/review": "./ui/features/email-review/review.tsx",
+    "./ui/features/mail-setup/model-consent": "./ui/features/mail-setup/model-consent.tsx"
+  },
+  "dependencies": {
+    "@purin-labs/agent": "workspace:*",
+    "@purin-labs/authority": "workspace:*",
+    "@purin-labs/connections": "workspace:*",
+    "@purin-labs/contracts": "workspace:*",
+    "@purin-labs/control": "workspace:*",
+    "@purin-labs/control-api": "workspace:*",
+    "@purin-labs/kernel": "workspace:*",
+    "@purin-labs/std": "workspace:*",
+    "@purin-labs/tenancy": "workspace:*",
+    "@purin-labs/type-utils": "workspace:*",
+    "@purin-labs/ui": "workspace:*",
+    "react": "^19.1.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260707.1",
+    "@types/react": "^19.1.12",
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

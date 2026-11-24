@@ -23,7 +23,7 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { authorizeMailSource } from "@purin-labs/area-inbox/server/mail-inbox/contract/mail-source-authorization";
+import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
 import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
 import {
   buildAgentMailboxAuthority,

@@ -15,7 +15,7 @@ import type { UserId } from "@purin-labs/control-api/ids";
 import {
   prepareAccountContactVerificationsDelete,
   whatsappErasureStatements,
-} from "@purin-labs/area-inbox/server/mail-inbox/contract/account-erasure";
+} from "@purin-labs/area-inbox-contract/server/account-erasure";
 import { prepareProviderAccountCleanup } from "@purin-labs/area-integrations/server/contract/provider-account-cleanup";
 import type { Result } from "@purin-labs/kernel/result";
 import {

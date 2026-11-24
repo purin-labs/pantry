@@ -7,7 +7,7 @@ import {
 import type { Env } from "@purin-labs/kernel/env";
 import type { MailAssistantStatus } from "@purin-labs/control-api";
 import type { MailOrganizationActorInput } from "./commands";
-import { authorizeMailSource } from "./contract/mail-source-authorization";
+import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
 import type { Result } from "@purin-labs/kernel/result";
 import type { Variant } from "@purin-labs/type-utils";
 

@@ -13,7 +13,6 @@
     "@purin-labs/actor-runtime": "workspace:*",
     "@purin-labs/agent": "workspace:*",
     "@purin-labs/area-commerce": "workspace:*",
-    "@purin-labs/area-inbox": "workspace:*",
     "@purin-labs/area-integrations": "workspace:*",
     "@purin-labs/authority": "workspace:*",
     "@purin-labs/commerce-client": "workspace:*",
@@ -29,7 +28,8 @@
     "@purin-labs/surface-slack": "workspace:*",
     "@purin-labs/tenancy": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
-    "@purin-labs/area-commerce-contract": "workspace:*"
+    "@purin-labs/area-commerce-contract": "workspace:*",
+    "@purin-labs/area-inbox-contract": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20260707.1",

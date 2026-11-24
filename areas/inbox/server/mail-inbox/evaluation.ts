@@ -21,8 +21,8 @@ import {
   type TypeSafeUsageAuthority,
 } from "@purin-labs/agent/integrations/typesafe/evaluation-ledger";
 import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
-import { authorizeMailSource } from "./contract/mail-source-authorization";
-import { mailInferenceEligible } from "./contract/mail-inference-eligibility";
+import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
+import { mailInferenceEligible } from "@purin-labs/area-inbox-contract/server/mail-inference-eligibility";
 import { JevMailRequest } from "./jev";
 import { mailClassificationEvidence } from "./evidence";
 import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";

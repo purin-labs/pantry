@@ -12,7 +12,7 @@ import {
   readEmailThreadCase,
   readEmailReplyProposalProjection,
 } from "../data/email-mailbox";
-import { gmailConnectorId } from "./contract/connector-ids";
+import { gmailConnectorId } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import type { Env } from "@purin-labs/kernel/env";
 import type {
   IntegrationAccountId,

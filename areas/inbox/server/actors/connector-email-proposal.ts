@@ -49,7 +49,7 @@ import type {
   MailReplyCorrection,
   MailRelationshipLookup,
 } from "@purin-labs/control-api";
-import { authorizeMailSource } from "../mail-inbox/contract/mail-source-authorization";
+import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
 import {
   claimEmailMaintenancePass,
   emailMaintenanceCandidates,

@@ -82,9 +82,6 @@ importers:
       '@purin-labs/area-devices':
         specifier: workspace:*
         version: link:../../areas/devices
-      '@purin-labs/area-inbox':
-        specifier: workspace:*
-        version: link:../../areas/inbox
       '@purin-labs/area-integrations':
         specifier: workspace:*
         version: link:../../areas/integrations
@@ -258,9 +255,9 @@ importers:
       '@purin-labs/agent':
         specifier: workspace:*
         version: link:../../foundation/agent
-      '@purin-labs/area-inbox':
+      '@purin-labs/area-inbox-contract':
         specifier: workspace:*
-        version: link:../inbox
+        version: link:../inbox/contract
       '@purin-labs/authority':
         specifier: workspace:*
         version: link:../../foundation/authority
@@ -449,9 +446,9 @@ importers:
       '@purin-labs/area-commerce-contract':
         specifier: workspace:*
         version: link:contract
-      '@purin-labs/area-inbox':
+      '@purin-labs/area-inbox-contract':
         specifier: workspace:*
-        version: link:../inbox
+        version: link:../inbox/contract
       '@purin-labs/area-integrations':
         specifier: workspace:*
         version: link:../integrations
@@ -628,9 +625,9 @@ importers:
       '@purin-labs/area-cafe':
         specifier: workspace:*
         version: link:../cafe
-      '@purin-labs/area-inbox':
+      '@purin-labs/area-inbox-contract':
         specifier: workspace:*
-        version: link:../inbox
+        version: link:../inbox/contract
       '@purin-labs/authority':
         specifier: workspace:*
         version: link:../../foundation/authority
@@ -695,6 +692,9 @@ importers:
       '@purin-labs/area-commerce-contract':
         specifier: workspace:*
         version: link:../commerce/contract
+      '@purin-labs/area-inbox-contract':
+        specifier: workspace:*
+        version: link:contract
       '@purin-labs/area-integrations':
         specifier: workspace:*
         version: link:../integrations
@@ -781,6 +781,55 @@ importers:
         specifier: 0.18.0-ts7.1.0-dev.20260929
         version: 0.18.0-ts7.1.0-dev.20260929
 
+  areas/inbox/contract:
+    dependencies:
+      '@purin-labs/agent':
+        specifier: workspace:*
+        version: link:../../../foundation/agent
+      '@purin-labs/authority':
+        specifier: workspace:*
+        version: link:../../../foundation/authority
+      '@purin-labs/connections':
+        specifier: workspace:*
+        version: link:../../../foundation/connections
+      '@purin-labs/contracts':
+        specifier: workspace:*
+        version: link:../../../packages/contracts
+      '@purin-labs/control':
+        specifier: workspace:*
+        version: link:../../../foundation/control
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../../packages/control-api
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../../../foundation/kernel
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../../packages/std
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../../../foundation/tenancy
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../../packages/type-utils
+      '@purin-labs/ui':
+        specifier: workspace:*
+        version: link:../../../foundation/ui
+      react:
+        specifier: ^19.1.1
+        version: 19.2.7
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      '@types/react':
+        specifier: ^19.1.12
+        version: 19.2.17
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
+
   areas/integrations:
     dependencies:
       '@cloudflare/containers':
@@ -801,9 +850,9 @@ importers:
       '@purin-labs/area-commerce-contract':
         specifier: workspace:*
         version: link:../commerce/contract
-      '@purin-labs/area-inbox':
+      '@purin-labs/area-inbox-contract':
         specifier: workspace:*
-        version: link:../inbox
+        version: link:../inbox/contract
       '@purin-labs/area-organisation':
         specifier: workspace:*
         version: link:../organisation
@@ -889,9 +938,9 @@ importers:
       '@purin-labs/area-commerce-contract':
         specifier: workspace:*
         version: link:../commerce/contract
-      '@purin-labs/area-inbox':
+      '@purin-labs/area-inbox-contract':
         specifier: workspace:*
-        version: link:../inbox
+        version: link:../inbox/contract
       '@purin-labs/area-organisation':
         specifier: workspace:*
         version: link:../organisation
@@ -1019,9 +1068,9 @@ importers:
       '@purin-labs/area-devices':
         specifier: workspace:*
         version: link:../devices
-      '@purin-labs/area-inbox':
+      '@purin-labs/area-inbox-contract':
         specifier: workspace:*
-        version: link:../inbox
+        version: link:../inbox/contract
       '@purin-labs/area-integrations':
         specifier: workspace:*
         version: link:../integrations
@@ -2093,6 +2142,9 @@ importers:
       '@purin-labs/area-inbox':
         specifier: workspace:*
         version: link:../../areas/inbox
+      '@purin-labs/area-inbox-contract':
+        specifier: workspace:*
+        version: link:../../areas/inbox/contract
       '@purin-labs/area-integrations':
         specifier: workspace:*
         version: link:../../areas/integrations
@@ -2169,6 +2221,9 @@ importers:
       '@purin-labs/area-inbox':
         specifier: workspace:*
         version: link:../../areas/inbox
+      '@purin-labs/area-inbox-contract':
+        specifier: workspace:*
+        version: link:../../areas/inbox/contract
       '@purin-labs/area-integrations':
         specifier: workspace:*
         version: link:../../areas/integrations
@@ -2430,9 +2485,9 @@ importers:
       '@purin-labs/area-commerce-contract':
         specifier: workspace:*
         version: link:../../areas/commerce/contract
-      '@purin-labs/area-inbox':
+      '@purin-labs/area-inbox-contract':
         specifier: workspace:*
-        version: link:../../areas/inbox
+        version: link:../../areas/inbox/contract
       '@purin-labs/area-integrations':
         specifier: workspace:*
         version: link:../../areas/integrations
@@ -2494,6 +2549,9 @@ importers:
       '@purin-labs/area-inbox':
         specifier: workspace:*
         version: link:../../areas/inbox
+      '@purin-labs/area-inbox-contract':
+        specifier: workspace:*
+        version: link:../../areas/inbox/contract
       '@purin-labs/authority':
         specifier: workspace:*
         version: link:../../foundation/authority
@@ -2588,6 +2646,9 @@ importers:
       '@purin-labs/area-inbox':
         specifier: workspace:*
         version: link:../../areas/inbox
+      '@purin-labs/area-inbox-contract':
+        specifier: workspace:*
+        version: link:../../areas/inbox/contract
       '@purin-labs/area-integrations':
         specifier: workspace:*
         version: link:../../areas/integrations

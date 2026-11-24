@@ -29,7 +29,7 @@ import {
   resolveUser,
 } from "@purin-labs/tenancy/data/control-plane";
 import { readEmailReplyProposalProjection } from "../data/email-mailbox";
-import { gmailConnectorId } from "../mail-inbox/contract/connector-ids";
+import { gmailConnectorId } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseIntegrationAccountId,
@@ -38,7 +38,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
-import { authorizeMailSource } from "../mail-inbox/contract/mail-source-authorization";
+import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import type { Result } from "@purin-labs/kernel/result";

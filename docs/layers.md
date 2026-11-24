@@ -287,7 +287,7 @@ import each of its files. A module with no line for one of these has none.
 
 ## areas/inbox
 
-- Folders: 19
+- Folders: 16
   - `areas/inbox/server/actors/`
   - `areas/inbox/server/actors/case-inbox/`
   - `areas/inbox/server/actors/inbox-turns/`
@@ -302,14 +302,21 @@ import each of its files. A module with no line for one of these has none.
   - `areas/inbox/server/mail-inbox/`
   - `areas/inbox/server/mail-inbox/contract/`
   - `areas/inbox/server/whatsapp/`
-  - `areas/inbox/ui/`
-  - `areas/inbox/ui/features/email-review/`
   - `areas/inbox/ui/features/mail-inbox/`
   - `areas/inbox/ui/features/mail-setup/`
-  - `areas/inbox/ui/pages/`
 - Packages: `areas/inbox`, `packages/email-draft-crdt`, `packages/inbox-control-api`, `packages/mail-reply-crdt`
 - Tables (26): `agent_mailbox_binding`, `agent_mailbox_binding_revision`, `contact_endpoint_verification`, `email_mailbox_account`, `email_message_receipt`, `email_operational_attestation`, `email_operational_contact`, `email_operational_proposal_projection`, `email_reply_proposal`, `email_self_test`, `email_sender_account`, `email_thread_case`, `gmail_inference_eligibility`, `mail_assistant_eligibility`, `mail_classification`, `mailbox_ingress_policy`, `mailbox_ingress_policy_revision`, `whatsapp_case_conversation_window`, `whatsapp_delivery_status`, `whatsapp_ingress_policy`, `whatsapp_ingress_policy_revision`, `whatsapp_message_receipt`, `whatsapp_phone_number_account`, `whatsapp_reply_proposal`, `whatsapp_support_binding`, `whatsapp_support_binding_revision`
-- Public files: `areas/inbox/server/mail-inbox/contract/`, `areas/inbox/ui/features/email-review/api.ts`, `areas/inbox/ui/features/email-review/decision-labels.ts`, `areas/inbox/ui/features/email-review/review.tsx`, `areas/inbox/ui/features/mail-setup/`, `areas/inbox/ui/pages/agent-mailbox.ts`, `areas/inbox/ui/whatsapp.ts`
+- Public files: `areas/inbox/server/mail-inbox/contract/`, `areas/inbox/ui/features/mail-setup/`
+
+## areas/inbox/contract
+
+- Folders: 5
+  - `areas/inbox/contract/server/`
+  - `areas/inbox/contract/ui/`
+  - `areas/inbox/contract/ui/features/email-review/`
+  - `areas/inbox/contract/ui/features/mail-setup/`
+  - `areas/inbox/contract/ui/pages/`
+- Packages: `areas/inbox/contract`
 
 ## areas/integrations
 

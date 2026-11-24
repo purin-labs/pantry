@@ -3,7 +3,7 @@ import {
   WhatsAppIntegrationPanel,
   type WhatsAppInstallationOption,
 } from "../../pages/whatsapp";
-import type { MailboxInstallationOption } from "@purin-labs/area-inbox/ui/pages/agent-mailbox";
+import type { MailboxInstallationOption } from "@purin-labs/area-inbox-contract/ui/pages/agent-mailbox";
 
 /**
  * The WhatsApp panel with the agents that can be assigned now. The list is

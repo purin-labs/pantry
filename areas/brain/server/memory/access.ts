@@ -35,7 +35,7 @@ import type {
   TurnMemoryReader,
   TurnMemoryReadRequest,
 } from "@purin-labs/agent/context/assembly/index";
-import { gmailConnectorId } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
+import { gmailConnectorId } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import type { Env } from "@purin-labs/kernel/env";
 import type {
   CaseActorStub,

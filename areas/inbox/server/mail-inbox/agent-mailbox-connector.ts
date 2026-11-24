@@ -3,7 +3,7 @@ import type { ConnectorActorStub } from "@purin-labs/actor-runtime/actors/actor-
 import type { Result } from "@purin-labs/kernel/result";
 import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { type MailboxIngressPolicy } from "../data/email-mailbox";
-import { gmailConnectorIdValue } from "./contract/connector-ids";
+import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import { whatsappConnectorIdValue } from "../data/whatsapp";
 import {
   parseConnectorId,

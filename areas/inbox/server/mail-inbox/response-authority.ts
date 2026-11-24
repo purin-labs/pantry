@@ -1,5 +1,5 @@
 import type { Env } from "@purin-labs/kernel/env";
-import { authorizeMailSource } from "./contract/mail-source-authorization";
+import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
 import { readMailHead } from "./store";
 import { readMailResponseOwner } from "./response-store";
 

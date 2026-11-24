@@ -66,7 +66,7 @@ import {
   revokeWhatsAppConnection,
   routeWhatsAppWebhookAccount,
 } from "@purin-labs/area-inbox/server/data/whatsapp";
-import { whatsappErasureStatements } from "@purin-labs/area-inbox/server/mail-inbox/contract/account-erasure";
+import { whatsappErasureStatements } from "@purin-labs/area-inbox-contract/server/account-erasure";
 import { reconcileOrganisationOnboarding } from "@purin-labs/area-organisation/server/data/onboarding-reconciliation";
 import type { SessionDO } from "../src/actors/agent-session";
 import {

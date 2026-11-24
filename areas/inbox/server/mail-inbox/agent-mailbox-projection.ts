@@ -6,7 +6,7 @@ import {
   readEmailMailboxAccount,
   readMailboxIngressPolicy,
 } from "../data/email-mailbox";
-import { gmailConnectorIdValue } from "./contract/connector-ids";
+import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import { resolveIntegrationAccount } from "@purin-labs/connections/data/integration-account";
 import {
   parseConnectorId,

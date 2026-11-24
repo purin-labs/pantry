@@ -18,7 +18,7 @@ import {
   type ProviderAttemptFailureCopy,
   type ProviderConnectionState,
 } from "../provider-onboarding";
-import { WHATSAPP_DEFAULT_POLICY_DRAFT } from "@purin-labs/area-inbox/ui/whatsapp";
+import { WHATSAPP_DEFAULT_POLICY_DRAFT } from "@purin-labs/area-inbox-contract/ui/whatsapp";
 import {
   type WhatsAppSurface,
   parseWhatsAppPolicyDraft,

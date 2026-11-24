@@ -41,7 +41,7 @@ import {
 } from "@purin-labs/area-inbox/server/data/whatsapp";
 import type { Env } from "@purin-labs/kernel/env";
 import { permissionRequiredResponse } from "@purin-labs/control/worker/permission-required";
-import { mailControlAuthority } from "@purin-labs/area-inbox/server/mail-inbox/contract/control-authority";
+import { mailControlAuthority } from "@purin-labs/area-inbox-contract/server/control-authority";
 import { whatsappConnector } from "@purin-labs/area-inbox/server/mail-inbox/agent-mailbox-connector";
 import {
   authorizeWhatsAppSupportRead,

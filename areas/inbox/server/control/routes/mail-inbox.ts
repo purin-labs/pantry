@@ -3,7 +3,7 @@ import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import {
   authorizeMailSource,
   mailboxAwaitsReconnect,
-} from "../../mail-inbox/contract/mail-source-authorization";
+} from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
 import { readMailThreadWork, readMailThreadReply } from "../../mail-inbox/work";
 import {
   parseMailInboxCommand,
@@ -17,14 +17,14 @@ import {
 import { listIntegrationAccounts } from "@purin-labs/connections/data/integration-account";
 import { resolveConnectorGmailAccess } from "../../actors/connector-email-evaluation";
 import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";
+import { gmailConnectorId } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { mailControlAuthority } from "../../mail-inbox/contract/control-authority";
+import { mailControlAuthority } from "@purin-labs/area-inbox-contract/server/control-authority";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,

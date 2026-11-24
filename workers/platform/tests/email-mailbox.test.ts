@@ -19,7 +19,7 @@ import {
   recordEmailThreadCase,
   registerEmailMailboxAccount,
 } from "@purin-labs/area-inbox/server/data/email-mailbox";
-import { gmailConnectorIdValue } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
+import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,

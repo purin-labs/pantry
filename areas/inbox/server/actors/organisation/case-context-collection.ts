@@ -13,7 +13,7 @@ import {
 } from "../../data/contact-verification";
 import type { Result } from "@purin-labs/kernel/result";
 import { readCaseContextDiscoveryPolicy } from "@purin-labs/agent/case-context-discovery/evaluation-store";
-import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";
+import { gmailConnectorId } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   decideCaseContextCollectionRelationship,

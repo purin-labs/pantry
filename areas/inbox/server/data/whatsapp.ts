@@ -50,9 +50,9 @@ import type {
   WhatsAppPhoneNumber,
   WhatsAppPhoneNumberRegistration,
   WhatsAppProviderHealthUpdate,
-} from "../mail-inbox/contract/connection-parts";
+} from "@purin-labs/area-inbox-contract/server/connection-parts";
 
-export type { WhatsAppPhoneNumber } from "../mail-inbox/contract/connection-parts";
+export type { WhatsAppPhoneNumber } from "@purin-labs/area-inbox-contract/server/connection-parts";
 
 /**
  * Durable WhatsApp metadata. Every row here holds identifiers, digests,

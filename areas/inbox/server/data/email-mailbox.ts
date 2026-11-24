@@ -34,11 +34,11 @@ import type {
   EmailIdentityClaimQuery,
   EmailMailboxAccount,
   EmailMailboxAccountError,
-} from "../mail-inbox/contract/connection-parts";
+} from "@purin-labs/area-inbox-contract/server/connection-parts";
 import type {
   GmailPilotBudget,
   GmailPilotBudgetQuery,
-} from "../mail-inbox/contract/inbox-services";
+} from "@purin-labs/area-inbox-contract/server/inbox-services";
 
 type AgentMailboxBinding = {
   readonly mailboxBindingId: string;

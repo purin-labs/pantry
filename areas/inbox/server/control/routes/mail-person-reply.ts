@@ -20,7 +20,7 @@ import {
 import { extractMailbox } from "@purin-labs/connections/mail/gmail-adapter";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
-import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
+import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
 import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
@@ -39,7 +39,7 @@ import {
 import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 import {
   mailControlAuthority,
-} from "../../mail-inbox/contract/control-authority";
+} from "@purin-labs/area-inbox-contract/server/control-authority";
 
 export type MailPersonReplyRoute = Readonly<{
   kind: "mailPersonReply";

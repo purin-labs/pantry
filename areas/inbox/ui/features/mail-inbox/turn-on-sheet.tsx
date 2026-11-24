@@ -6,17 +6,20 @@ import {
 } from "@purin-labs/control/portal/control-client";
 import { ProviderTile } from "@purin-labs/ui/page-components";
 import { ConnectionDialog } from "@purin-labs/area-integrations/ui/features/integrations/connection-dialog";
-import { mailboxCanTurnOn, turnOnHint } from "../mail-setup/model";
+import {
+  mailboxCanTurnOn,
+  turnOnHint,
+} from "@purin-labs/area-inbox-contract/ui/features/mail-setup/model";
 import {
   MailboxModelConsent,
   useMailboxModelConsent,
-} from "../mail-setup/model-consent";
+} from "@purin-labs/area-inbox-contract/ui/features/mail-setup/model-consent";
 import {
   readMailboxSetup,
   type MailboxSetupTransport,
 } from "../mail-setup/run";
 import { setUpMailbox } from "../mail-setup/turn-on";
-import { useMailboxSetup } from "../mail-setup/use-mailbox-setup";
+import { useMailboxSetup } from "@purin-labs/area-inbox-contract/ui/features/mail-setup/use-mailbox-setup";
 
 const TRANSPORT: MailboxSetupTransport = {
   read: controlRead,

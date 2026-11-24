@@ -17,10 +17,10 @@ import type { Result } from "@purin-labs/kernel/result";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { establishConnectorEmailWatch } from "../actors/connector-email-evaluation";
 import { readEmailMailboxAccount } from "../data/email-mailbox";
-import { gmailConnectorIdValue } from "./contract/connector-ids";
+import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
-import { authorizeMailSource } from "./contract/mail-source-authorization";
-import { mailInferenceEligible } from "./contract/mail-inference-eligibility";
+import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
+import { mailInferenceEligible } from "@purin-labs/area-inbox-contract/server/mail-inference-eligibility";
 import {
   mailOrganizationReadiness,
   queueSelectedMail,

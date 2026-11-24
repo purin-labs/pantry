@@ -15,7 +15,7 @@ import {
   organisationRecordPath,
 } from "@purin-labs/control/portal/control-paths";
 import { parseWhatsAppSurface, type WhatsAppSurface } from "@purin-labs/control-api/portal/whatsapp";
-import { whatsappAccountActionPath, whatsappAccountsPath } from "@purin-labs/area-inbox/ui/whatsapp";
+import { whatsappAccountActionPath, whatsappAccountsPath } from "@purin-labs/area-inbox-contract/ui/whatsapp";
 import { parseCredentialRotationReceiptResponse } from "@purin-labs/control-api/portal/credential-inventory";
 import {
   assertNever,

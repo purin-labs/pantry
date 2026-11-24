@@ -13,7 +13,7 @@ import {
 import {
   whatsappAccountActionPath,
   whatsappAccountsPath,
-} from "../../whatsapp";
+} from "@purin-labs/area-inbox-contract/ui/whatsapp";
 import { ConnectionDialog } from "@purin-labs/area-integrations/ui/features/integrations/connection-dialog";
 import { disableMailAgent } from "./api";
 import type { MailAgentState } from "@purin-labs/control-api/portal/mail-agent";

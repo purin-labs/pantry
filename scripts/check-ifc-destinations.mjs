@@ -44,7 +44,7 @@ const CONVERSATION_DELIVERIES = new Set([
   "foundation/conversation/chat/information-flow.ts",
   "foundation/control/worker/routes/access-control-explain.ts",
   "areas/commerce/server/control/routes/supplier-payouts.ts",
-  "areas/inbox/server/mail-inbox/contract/mail-source-authorization.ts",
+  "areas/inbox/contract/server/mail-source-authorization.ts",
   "areas/inbox/server/mail-inbox/chat-source-access.ts",
   "areas/inbox/server/mail-inbox/supplier-context.ts",
   "areas/inbox/server/whatsapp/read-authorization.ts",

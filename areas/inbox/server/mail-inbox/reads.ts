@@ -5,10 +5,10 @@ import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import { assertNever } from "@purin-labs/std";
 import type { MailDecision } from "@purin-labs/control-api";
 import { resolveConnectorGmailAccess } from "../actors/connector-email-evaluation";
-import { gmailConnectorIdValue } from "./contract/connector-ids";
+import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import type { Result } from "@purin-labs/kernel/result";
 import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
-import { authorizeMailSource } from "./contract/mail-source-authorization";
+import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
 import type {
   MailClassifiedPageInput,
   MailDecisionInput,

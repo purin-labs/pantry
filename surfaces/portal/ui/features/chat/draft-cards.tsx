@@ -18,8 +18,8 @@ import {
 import {
   EMAIL_REPLY_DECISION,
   SELF_TEST_SEND_LABEL,
-} from "@purin-labs/area-inbox/ui/features/email-review/decision-labels";
-import type { EmailReviewActions } from "@purin-labs/area-inbox/ui/features/email-review/api";
+} from "@purin-labs/area-inbox-contract/ui/features/email-review/decision-labels";
+import type { EmailReviewActions } from "@purin-labs/area-inbox-contract/ui/features/email-review/api";
 import type { EmailReviewQueue } from "@purin-labs/control-api/portal/email-review";
 import {
   ClaimSummary,

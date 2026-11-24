@@ -142,7 +142,7 @@ import {
   type EmailThreadTurnInput,
 } from "@purin-labs/area-inbox/server/actors/email-case-processing";
 import { resolveCaseTurnAgentProfile } from "@purin-labs/agent/data/pinned-agent-profile";
-import { authorizeMailSource } from "@purin-labs/area-inbox/server/mail-inbox/contract/mail-source-authorization";
+import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import {
@@ -207,7 +207,7 @@ import {
   resolveActiveConnectorActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import { registerEmailMailboxAccount } from "@purin-labs/area-inbox/server/data/email-mailbox";
-import { gmailConnectorId } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
+import { gmailConnectorId } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import { resolveActiveProviderAccountContext } from "@purin-labs/connections/data/integration-account";
 import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import {

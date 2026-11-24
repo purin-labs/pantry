@@ -11,11 +11,11 @@ import {
   type OrganisationMutation,
 } from "@purin-labs/control/portal/mutation-state";
 import type { ProviderAttemptDiagnostics } from "../../provider-onboarding";
-import { emailReplyIsOpenable, gmailMailboxStatus, gmailMailboxSummary, type MailboxInstallationOption } from "@purin-labs/area-inbox/ui/pages/agent-mailbox";
+import { emailReplyIsOpenable, gmailMailboxStatus, gmailMailboxSummary, type MailboxInstallationOption } from "@purin-labs/area-inbox-contract/ui/pages/agent-mailbox";
 import type { AgentMailboxView, EmailReplyQueueItem, EmailOperationalQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import { PROVIDER_PRESENTATION } from "../../integration-catalogue";
 import { ConnectionDialog } from "./connection-dialog";
-import type { EmailReviewMutation } from "@purin-labs/area-inbox/ui/features/email-review/review";
+import type { EmailReviewMutation } from "@purin-labs/area-inbox-contract/ui/features/email-review/review";
 import { assertNever } from "@purin-labs/std";
 import { matchesRequestedIntegrationAccountId } from "./integrations-page";
 import {

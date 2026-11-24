@@ -7,7 +7,7 @@ import type {
 } from "@purin-labs/control-api";
 import { Check, MessageCircle } from "lucide-react";
 import { formatListDate, formatMailDate, senderParts } from "./thread";
-import { emailReplyIsOpenable, emailReplyLifecycleLabel } from "../../pages/agent-mailbox";
+import { emailReplyIsOpenable, emailReplyLifecycleLabel } from "@purin-labs/area-inbox-contract/ui/pages/agent-mailbox";
 import type { EmailReplyQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import { readMailAgent, resumeMailAgent } from "./api";
 import type {

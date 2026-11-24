@@ -8,7 +8,7 @@ import {
   parseRequestId,
   type IntegrationAccountId,
 } from "@purin-labs/kernel/ids";
-import { gmailConnectorIdValue } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
+import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import { parseEmailProposalTarget } from "@purin-labs/area-inbox/server/data/email-operational";
 import {
   CAPABILITY_KEYS,

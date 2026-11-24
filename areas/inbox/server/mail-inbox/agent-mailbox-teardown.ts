@@ -4,7 +4,7 @@ import { readEmailMailboxAccount } from "../data/email-mailbox";
 import { resolveEmailSenderAccount } from "../data/email-operational";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import { agentMailboxConnector } from "./agent-mailbox-connector";
-import type { AgentMailboxTeardown } from "./contract/connection-parts";
+import type { AgentMailboxTeardown } from "@purin-labs/area-inbox-contract/server/connection-parts";
 
 /**
  * Stands a Gmail mailbox down before its connection is removed.

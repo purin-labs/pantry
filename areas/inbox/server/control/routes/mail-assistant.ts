@@ -11,9 +11,9 @@ import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authori
 import { controlError, controlJson, readBoundedJsonRecord } from "@purin-labs/control/worker/http";
 import {
   mailControlAuthority,
-} from "../../mail-inbox/contract/control-authority";
-import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
-import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";
+} from "@purin-labs/area-inbox-contract/server/control-authority";
+import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
+import { gmailConnectorId } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
 
 export type MailAssistantRoute = Readonly<{

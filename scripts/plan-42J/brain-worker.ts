@@ -38,7 +38,7 @@ import {
 } from "../../areas/inbox/server/data/email-mailbox";
 import {
   gmailConnectorId,
-} from "../../areas/inbox/server/mail-inbox/contract/connector-ids";
+} from "../../areas/inbox/contract/server/connector-ids";
 import { registerOperationalEmailContact } from "../../areas/inbox/server/data/email-operational";
 import { createActiveConnectedIntegration } from "../../foundation/connections/data/integration-account";
 import type { Env } from "../../foundation/kernel/env";

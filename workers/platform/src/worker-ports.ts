@@ -63,7 +63,7 @@ import { reconcileProviderManifestObservations } from "@purin-labs/area-integrat
 import { shopifyCommerceProvider } from "@purin-labs/area-integrations/shopify/commerce-provider";
 import { SHOPIFY_PROVIDER_MODULE } from "@purin-labs/area-integrations/shopify/provider-module";
 import { tearDownAgentMailboxForRemoval } from "@purin-labs/area-inbox/server/mail-inbox/agent-mailbox-teardown";
-import { verifiedContacts } from "@purin-labs/area-inbox/server/mail-inbox/contract/verified-contacts";
+import { verifiedContacts } from "@purin-labs/area-inbox-contract/server/verified-contacts";
 import {
   createTurnMemoryReader,
   proposeMemoryFromCorrection,
@@ -100,7 +100,7 @@ import { cafeServices } from "@purin-labs/area-cafe/server/contract/cafe-service
 import { readCounterSaleView } from "@purin-labs/area-cafe/server/counter-register";
 import { readMenuScreenList } from "@purin-labs/area-cafe/server/control/routes/menu-boards";
 import { readTerminalOperations } from "@purin-labs/area-cafe/server/data/terminal-operations-readback";
-import { inboxServices } from "@purin-labs/area-inbox/server/mail-inbox/contract/inbox-services";
+import { inboxServices } from "@purin-labs/area-inbox-contract/server/inbox-services";
 import { readGmailPilotBudget } from "@purin-labs/area-inbox/server/data/email-mailbox";
 import { registerSupplierOperationalEmailContact } from "@purin-labs/area-inbox/server/data/email-operational";
 import { organisationServices } from "@purin-labs/area-organisation/server/contract/organisation-services";

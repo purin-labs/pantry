@@ -66,7 +66,7 @@ import {
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import type { SessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import { selfTestCount } from "./gmail-mailbox-support";
-import { gmailConnectorIdValue } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
+import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import { commerceClient } from "./commerce-support";
 import {
   addOrganisationMember,

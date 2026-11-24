@@ -18,8 +18,8 @@ import {
   resolveActiveConnectorActorAtPlacement,
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { AuthorizedConversationScope as ConversationScope } from "@purin-labs/tenancy/organisation-access/access";
-import { verifiedContacts } from "@purin-labs/area-inbox/server/mail-inbox/contract/verified-contacts";
-import { gmailConnectorId } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
+import { verifiedContacts } from "@purin-labs/area-inbox-contract/server/verified-contacts";
+import { gmailConnectorId } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {

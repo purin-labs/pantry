@@ -76,7 +76,7 @@ import {
   projectEmailReplyProposal,
   readEmailReplyProposalProjection,
 } from "../../data/email-mailbox";
-import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";
+import { gmailConnectorId } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import {
   readWhatsAppCaseConversationWindowByCaseId,
   readWhatsAppReplyProposalProjection,

@@ -1,4 +1,4 @@
-import { gmailConnectorIdValue } from "../../mail-inbox/contract/connector-ids";
+import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import { whatsappConnectorIdValue } from "../../data/whatsapp";
 import type { CaseInboxPart } from "@purin-labs/conversation/actors/case/parts";
 

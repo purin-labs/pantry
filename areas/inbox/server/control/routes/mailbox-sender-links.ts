@@ -33,10 +33,10 @@ import {
   readBoundedJsonRecord,
   readJsonRecord,
 } from "@purin-labs/control/worker/http";
-import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
+import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
 import {
   mailControlAuthority,
-} from "../../mail-inbox/contract/control-authority";
+} from "@purin-labs/area-inbox-contract/server/control-authority";
 import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 
 /**

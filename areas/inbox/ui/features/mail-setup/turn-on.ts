@@ -8,7 +8,7 @@ import {
 import { isRecord } from "@purin-labs/std";
 
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
-import { sameModelReview } from "./model";
+import { sameModelReview } from "@purin-labs/area-inbox-contract/ui/features/mail-setup/model";
 import {
   agentMailboxPath,
   runMailboxSetup,

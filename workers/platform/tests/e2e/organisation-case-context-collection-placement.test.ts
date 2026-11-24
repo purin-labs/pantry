@@ -40,7 +40,7 @@ import {
   recordEmailMessageReceipt,
   bindEmailMessageReceiptContact,
 } from "@purin-labs/area-inbox/server/data/email-mailbox";
-import { gmailConnectorId } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
+import { gmailConnectorId } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import {
   applyAgentOperation,
   type AgentOperationCommand,

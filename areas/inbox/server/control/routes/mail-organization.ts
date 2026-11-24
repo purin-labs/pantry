@@ -6,10 +6,10 @@ import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authori
 import { controlError, controlJson, readBoundedJsonRecord } from "@purin-labs/control/worker/http";
 import {
   mailControlAuthority,
-} from "../../mail-inbox/contract/control-authority";
-import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
+} from "@purin-labs/area-inbox-contract/server/control-authority";
+import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
 import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";
+import { gmailConnectorId } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,

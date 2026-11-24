@@ -53,7 +53,7 @@ import {
   waitingMailDrafts,
   type MailDraftItem,
 } from "./agent";
-import { emailReplyIsOpenable } from "../../pages/agent-mailbox";
+import { emailReplyIsOpenable } from "@purin-labs/area-inbox-contract/ui/pages/agent-mailbox";
 import type { EmailReplyQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import {
   whatsappConversationTab,

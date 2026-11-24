@@ -3,9 +3,9 @@ import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-exe
 import type { Env } from "@purin-labs/kernel/env";
 import {
   mailControlAuthority,
-} from "../../../mail-inbox/contract/control-authority";
+} from "@purin-labs/area-inbox-contract/server/control-authority";
 import { readReplySourceViews } from "../../../mail-inbox/reply-source-views";
-import { authorizeMailSource } from "../../../mail-inbox/contract/mail-source-authorization";
+import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
 import {
   parseMailReplyEdit,
   parseMailReplyCorrection,

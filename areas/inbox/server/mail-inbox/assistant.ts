@@ -27,7 +27,7 @@ import {
 } from "@purin-labs/authority/policy-snapshot";
 import { ensureOrganisationDefaultWorkspace } from "@purin-labs/agent/data/organisation-workspace";
 import { readMailboxIngressPolicy } from "../data/email-mailbox";
-import { gmailConnectorIdValue } from "./contract/connector-ids";
+import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import {
   resolveActiveCaseActor,
   resolveActiveSessionActor,

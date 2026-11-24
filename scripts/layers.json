@@ -29,6 +29,7 @@
     "testing"
   ],
   "packages": {
+    "areas/inbox/contract": "areas/inbox/contract",
     "areas/commerce/contract": "areas/commerce/contract",
     "surfaces/portal": "surfaces/portal",
     "surfaces/voice": "surfaces/voice",
@@ -104,11 +105,6 @@
     "areas/integrations/ui/features/jev-features/styles.css",
     "areas/integrations/ui/features/vault/styles.css",
     "areas/inbox/server/mail-inbox/contract/",
-    "areas/inbox/ui/pages/agent-mailbox.ts",
-    "areas/inbox/ui/whatsapp.ts",
-    "areas/inbox/ui/features/email-review/api.ts",
-    "areas/inbox/ui/features/email-review/review.tsx",
-    "areas/inbox/ui/features/email-review/decision-labels.ts",
     "areas/inbox/ui/features/mail-setup/",
     "areas/organisation/server/contract/",
     "areas/organisation/ui/features/access/api.ts",
@@ -415,6 +411,7 @@
     "workspace_revision_receipt": "foundation/agent"
   },
   "rules": {
+    "areas/inbox/contract/": "areas/inbox/contract",
     "areas/commerce/contract/": "areas/commerce/contract",
     "surfaces/portal/": "surfaces/portal",
     "surfaces/voice/": "surfaces/voice",

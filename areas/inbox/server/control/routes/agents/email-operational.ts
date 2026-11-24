@@ -21,8 +21,8 @@ import {
 import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 import { hasExactKeys, isPositiveInteger } from "@purin-labs/std";
 import { agentMailboxConnector } from "../../../mail-inbox/agent-mailbox-connector";
-import { mailControlAuthority } from "../../../mail-inbox/contract/control-authority";
-import { mayReadOperationalEmailDraft } from "../../../mail-inbox/contract/mail-source-authorization";
+import { mailControlAuthority } from "@purin-labs/area-inbox-contract/server/control-authority";
+import { mayReadOperationalEmailDraft } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
 import {
   emailApprovalChallenge,
   emailApprovalSecret,

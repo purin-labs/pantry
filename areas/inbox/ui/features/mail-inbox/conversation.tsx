@@ -1,5 +1,5 @@
 import { DecisionButtons } from "@purin-labs/ui/index";
-import { EMAIL_REPLY_DECISION } from "../email-review/decision-labels";
+import { EMAIL_REPLY_DECISION } from "@purin-labs/area-inbox-contract/ui/features/email-review/decision-labels";
 import React from "react";
 import { assertNever } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
@@ -15,13 +15,13 @@ import {
   type MailWorkReplyState,
 } from "@purin-labs/control-api";
 import { formatAbsoluteTime } from "@purin-labs/ui/formatting";
-import { emailReplyIsOpenable, emailReplyLifecycleLabel } from "../../pages/agent-mailbox";
+import { emailReplyIsOpenable, emailReplyLifecycleLabel } from "@purin-labs/area-inbox-contract/ui/pages/agent-mailbox";
 import type { EmailReplyPreviewResult } from "@purin-labs/control-api/portal/agent-mailbox";
 import {
   createEmailReviewActions,
   EmailReplyDraftStaleError,
   readEmailReplyPreview,
-} from "../email-review/api";
+} from "@purin-labs/area-inbox-contract/ui/features/email-review/api";
 import { ReplyDraftEditor } from "./reply-draft-editor";
 import { MailDraftBody, MailDraftSources } from "./draft-sources";
 import {

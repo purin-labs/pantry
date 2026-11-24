@@ -15,7 +15,10 @@ import {
   type WhatsAppCaseView,
   type WhatsAppReplyPreview,
 } from "@purin-labs/control-api/portal/whatsapp";
-import { whatsappCasePath, whatsappReplyPath } from "../../whatsapp";
+import {
+  whatsappCasePath,
+  whatsappReplyPath,
+} from "@purin-labs/area-inbox-contract/ui/whatsapp";
 import {
   PermissionRequiredPrompt,
   permissionRequiredOf,

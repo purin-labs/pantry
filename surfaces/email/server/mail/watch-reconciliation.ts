@@ -1,7 +1,7 @@
 import { prepareEmailWatchReconciliationRun } from "@purin-labs/area-organisation/server/data/onboarding-reconciliation-run";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
-import { gmailConnectorIdValue } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
+import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   newRequestId,

@@ -12,9 +12,9 @@ import {
   type OrganisationMutation,
 } from "@purin-labs/control/portal/mutation-state";
 import type { AgentMailboxView, EmailReplyPreviewResult, EmailReplyQueueItem, EmailOperationalPreviewResult, EmailOperationalQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
-import type { MailboxInstallationOption } from "@purin-labs/area-inbox/ui/pages/agent-mailbox";
+import type { MailboxInstallationOption } from "@purin-labs/area-inbox-contract/ui/pages/agent-mailbox";
 import type { IntegrationRouteId } from "./model";
-import type { EmailReviewActions } from "@purin-labs/area-inbox/ui/features/email-review/api";
+import type { EmailReviewActions } from "@purin-labs/area-inbox-contract/ui/features/email-review/api";
 import type { Variant } from "@purin-labs/type-utils";
 import type {
   MailboxModelReview,
@@ -22,7 +22,7 @@ import type {
   MailboxSetupPlan,
 } from "@purin-labs/control-api";
 import type { MailboxSetupRequest } from "./mailbox-actions";
-import type { ReadMailboxSetup } from "@purin-labs/area-inbox/ui/features/mail-setup/use-mailbox-setup";
+import type { ReadMailboxSetup } from "@purin-labs/area-inbox-contract/ui/features/mail-setup/use-mailbox-setup";
 import type { CapabilityProfile, ControlRole, IntegrationAccount, OrganisationCodexConnection, OrganisationInferenceSelection, OrganisationInvitation, OrganisationMember, ProviderResource, ReadinessAssessment, SelectInferenceCommand, SetupSelection, SlackRoutingConnection, SupportDiagnostics } from "@purin-labs/control-api/portal/settings";
 
 type OrganisationLifecycle = OrganisationOnboardingLifecycle["kind"];

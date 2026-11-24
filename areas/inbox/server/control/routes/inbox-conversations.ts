@@ -23,11 +23,11 @@ import {
   type WhatsAppCaseConversationWindow,
   type WhatsAppReplyProposalProjection,
 } from "../../data/whatsapp";
-import type { WhatsAppPhoneNumber } from "../../mail-inbox/contract/connection-parts";
+import type { WhatsAppPhoneNumber } from "@purin-labs/area-inbox-contract/server/connection-parts";
 import { whatsappConnector } from "../../mail-inbox/agent-mailbox-connector";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, parseIntegrationAccountId } from "@purin-labs/kernel/ids";
-import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
+import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import {
   authorizeWhatsAppSupportRead,
@@ -42,7 +42,7 @@ import { emailReviewQueueItemWire } from "../email-review";
 import { controlError, noStoreJson } from "@purin-labs/control/worker/http";
 import {
   mailControlAuthority,
-} from "../../mail-inbox/contract/control-authority";
+} from "@purin-labs/area-inbox-contract/server/control-authority";
 
 export type InboxConversationsRoute = Readonly<{
   kind: "inboxConversations";

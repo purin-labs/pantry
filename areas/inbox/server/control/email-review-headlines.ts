@@ -12,14 +12,14 @@ import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
 } from "@purin-labs/kernel/ids";
-import { authorizeMailSource } from "../mail-inbox/contract/mail-source-authorization";
+import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
 import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
 } from "@purin-labs/control/worker/authorization";
-import { mailControlAuthority } from "../mail-inbox/contract/control-authority";
+import { mailControlAuthority } from "@purin-labs/area-inbox-contract/server/control-authority";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**

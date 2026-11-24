@@ -18,12 +18,12 @@ import type {
   OperationalEmailTarget,
   VerifiedContactEndpoint,
   VerifiedContactQuery,
-} from "../mail-inbox/contract/verified-contacts";
+} from "@purin-labs/area-inbox-contract/server/verified-contacts";
 
 export type {
   ContactEndpoint,
   VerifiedContactEndpoint,
-} from "../mail-inbox/contract/verified-contacts";
+} from "@purin-labs/area-inbox-contract/server/verified-contacts";
 
 export type ContactVerificationCommand = Readonly<{
   commandId: string;

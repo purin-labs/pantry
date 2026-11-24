@@ -1,7 +1,7 @@
 import type {
   MailboxConnectionPart,
   WhatsAppConnectionPart,
-} from "@purin-labs/area-inbox/server/mail-inbox/contract/connection-parts";
+} from "@purin-labs/area-inbox-contract/server/connection-parts";
 import { definePort } from "@purin-labs/kernel/port";
 
 /**
