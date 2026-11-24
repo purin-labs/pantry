@@ -31,6 +31,7 @@ import { commerceCanonicalResourceId } from "@purin-labs/area-commerce-contract/
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Variant } from "@purin-labs/type-utils";
 import { requiredPlacement } from "./slack-journey-support";
+import { admitOperatorControlTurnFixture } from "../organisation-execution-fixture";
 
 const PUBLIC_ORIGIN = "https://localhost";
 const PRODUCT_ID = "product_description_e2e";
@@ -62,6 +63,10 @@ it(
 it(
   "enforces origin, organisation, viewer, revocation, and persistence-failure boundaries",
   draftSafetyJourney,
+);
+it(
+  "answers a retried agent edit from its receipt for 7 days, then runs it as a new edit",
+  agentReceiptJourney,
 );
 async function walkingDraftJourney(): Promise<void> {
   const scenario = await installDraftScenario("walking");
@@ -403,6 +408,85 @@ async function draftSafetyJourney(): Promise<void> {
     await closeSocket(ownerSocket);
     await closeSocket(peerSocket);
   }
+}
+
+/**
+ * An agent edits the description, and a retry of the same operation returns
+ * the first answer. Eight days later the same retry runs as a new edit: its
+ * passage is gone, so it is refused and the draft does not change. The next
+ * edit deletes the old receipt and keeps its own.
+ */
+async function agentReceiptJourney(): Promise<void> {
+  const scenario = await installDraftScenario("receipts");
+  await fixtureDatabase()
+    .prepare(
+      "UPDATE organisation_onboarding SET lifecycle = 'active', activation_receipt_id = 'description-receipt-fixture', activated_at = ? WHERE organisation_id = ?",
+    )
+    .bind(Date.now(), scenario.organisationId)
+    .run();
+  const execution = await admitOperatorControlTurnFixture(
+    env,
+    scenario.organisationId,
+    scenario.editor.identity.userId,
+    scenario.editor.session.session.controlSessionId,
+  );
+  const edit = (operationId: string, oldText: string, newText: string) => ({
+    agent: { sessionId: execution.sessionId, displayName: "Copy editor" },
+    execution,
+    organisationId: scenario.organisationId,
+    request: { productId: PRODUCT_ID, oldText, newText },
+    operationId,
+    userId: scenario.editor.identity.userId,
+    deadlineAt: Date.now() + 60_000,
+  });
+  const first = edit("description-agent-first", "Freshly baked", "Warm");
+  const edited = await scenario.organisation.editProductDescriptionDraft(first);
+  expect(edited).toMatchObject({
+    ok: true,
+    value: { draft: { kind: "active", description: "Warm croissant." } },
+  });
+  await expect(
+    scenario.organisation.editProductDescriptionDraft(first),
+  ).resolves.toEqual(edited);
+
+  await runInDurableObject(
+    scenario.organisation,
+    (_actor: OrganisationDO, state: DurableObjectState) => {
+      state.storage.sql.exec(
+        "UPDATE product_description_draft_operation SET created_at = ? WHERE operation_id = ?",
+        Date.now() - 8 * 24 * 60 * 60 * 1_000,
+        first.operationId,
+      );
+    },
+  );
+  await expect(
+    scenario.organisation.editProductDescriptionDraft({
+      ...first,
+      deadlineAt: Date.now() + 60_000,
+    }),
+  ).resolves.toMatchObject({
+    ok: false,
+    error: { code: "passage_conflict" },
+  });
+
+  const later = edit("description-agent-later", "Warm", "Golden");
+  await expect(
+    scenario.organisation.editProductDescriptionDraft(later),
+  ).resolves.toMatchObject({
+    ok: true,
+    value: { draft: { kind: "active", description: "Golden croissant." } },
+  });
+  const receipts = await runInDurableObject(
+    scenario.organisation,
+    (_actor: OrganisationDO, state: DurableObjectState) =>
+      state.storage.sql
+        .exec<{ id: string }>(
+          "SELECT operation_id AS id FROM product_description_draft_operation",
+        )
+        .toArray()
+        .map((row) => row.id),
+  );
+  expect(receipts).toEqual([later.operationId]);
 }
 
 async function installDraftScenario(label: string): Promise<DraftScenario> {

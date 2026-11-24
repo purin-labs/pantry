@@ -5,6 +5,7 @@ import { env, exports } from "cloudflare:workers";
 import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import * as Y from "yjs";
+import { isRecord } from "@purin-labs/std";
 import {
   EmailDraftDoc,
   parseEmailDraftUpdate,
@@ -535,12 +536,122 @@ async function emailDraftJourney({ task }: TestContext): Promise<void> {
         },
       },
     });
+    Object.assign(task.meta, {
+      receiptRetention: await receiptRetentionSteps(
+        scenario,
+        editRequest,
+        review,
+      ),
+    });
   } finally {
     ownerDoc.destroy();
     editorDoc.destroy();
     await closeSocket(ownerSocket);
     await closeSocket(editorSocket);
   }
+}
+
+/**
+ * A receipt answers a retry of an agent edit for 7 days. Eight days later the
+ * same retry runs as a new edit, which its old revision refuses, and the next
+ * edit deletes the old receipt and keeps its own. Only the latest review
+ * snapshot stays.
+ */
+async function receiptRetentionSteps(
+  scenario: CollaborationScenario,
+  firstEdit: Parameters<OrganisationDO["editEmailDraft"]>[0],
+  firstReview: unknown,
+): Promise<Record<string, unknown>> {
+  const eightDaysAgo = Date.now() - 8 * 24 * 60 * 60 * 1_000;
+  await runInDurableObject(
+    scenario.organisation,
+    (_actor: OrganisationDO, state: DurableObjectState) => {
+      state.storage.sql.exec(
+        "UPDATE email_draft_operation SET created_at = ? WHERE operation_id = ?",
+        eightDaysAgo,
+        firstEdit.operationId,
+      );
+    },
+  );
+  const lateRetry = await scenario.organisation.editEmailDraft({
+    ...firstEdit,
+    deadlineAt: Date.now() + 60_000,
+  });
+  expect(lateRetry).toMatchObject({
+    ok: false,
+    error: { code: "revision_conflict" },
+  });
+
+  const current = await scenario.organisation.readEmailDraft({
+    organisationId: scenario.organisationId,
+  });
+  if (!current.ok || current.value.kind !== "active")
+    throw new Error("email draft was not active");
+  const session = await issueControlSession({
+    db: env.DB,
+    userId: scenario.editor.identity.userId,
+    now: Date.now(),
+    ttlMs: 60_000,
+  });
+  const later = {
+    ...emailAgentRequest(
+      scenario,
+      await admitEmailAgent(scenario, session),
+      "Menu editor",
+      "subject",
+      "Weekend",
+      "Holiday",
+      current.value.revision,
+    ),
+    operationId: "email-agent-week-later",
+  };
+  const edited = await scenario.organisation.editEmailDraft(later);
+  expect(edited).toMatchObject({
+    ok: true,
+    value: { draft: { subject: "Holiday menu" } },
+  });
+  await expect(scenario.organisation.editEmailDraft(later)).resolves.toEqual(
+    edited,
+  );
+
+  const secondReview = await postReview(
+    emailReviewUrl(scenario.organisationId),
+    scenario.owner.session,
+  );
+  expect(secondReview).toMatchObject({
+    ok: true,
+    value: { draft: { subject: "Holiday menu" } },
+  });
+  const stored = await runInDurableObject(
+    scenario.organisation,
+    (_actor: OrganisationDO, state: DurableObjectState) => ({
+      receipts: state.storage.sql
+        .exec<{ id: string }>(
+          "SELECT operation_id AS id FROM email_draft_operation ORDER BY operation_id",
+        )
+        .toArray()
+        .map((row) => row.id),
+      reviews: state.storage.sql
+        .exec<{ id: string }>("SELECT review_id AS id FROM email_draft_review")
+        .toArray()
+        .map((row) => row.id),
+    }),
+  );
+  expect(stored.receipts).toContain("email-agent-week-later");
+  expect(stored.receipts).not.toContain(firstEdit.operationId);
+  expect(stored.reviews).toEqual([reviewId(secondReview)]);
+  expect(stored.reviews).not.toContain(reviewId(firstReview));
+  return {
+    retryAfterEightDays: "ran again and was refused",
+    receipts: stored.receipts,
+    reviewsKept: stored.reviews.length,
+  };
+}
+
+function reviewId(review: unknown): string {
+  if (!isRecord(review) || !isRecord(review.value))
+    throw new Error("No review");
+  return String(review.value.reviewId);
 }
 
 async function expectSharedThreadFailure(

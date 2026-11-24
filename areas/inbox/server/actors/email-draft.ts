@@ -22,7 +22,10 @@ import {
 } from "@purin-labs/email-draft-crdt/protocol";
 import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import { controlError, readJsonRecord } from "@purin-labs/control/worker/http";
-import { listOrganisationMembers, resolveUser } from "@purin-labs/tenancy/data/control-plane";
+import {
+  listOrganisationMembers,
+  resolveUser,
+} from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseCaseId,
@@ -41,6 +44,10 @@ import {
   type CollaborationSocketRoom,
 } from "@purin-labs/collaboration/worker/collaboration-room";
 import { resolveCollaborationSlackThread } from "@purin-labs/collaboration/worker/collaboration-slack-thread";
+import {
+  addAgentEditReceiptTime,
+  oldestAnsweringReceiptAt,
+} from "@purin-labs/collaboration/worker/agent-edit-receipts";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
@@ -172,6 +179,8 @@ export class EmailDraftRooms {
         reviewedAt: Date.now(),
         draft: stored.value.document.read(),
       };
+      // Only the latest review snapshot stays.
+      this.#storage.sql.exec("DELETE FROM email_draft_review");
       this.#storage.sql.exec(
         `INSERT INTO email_draft_review
           (review_id, document_revision, snapshot_json, reviewed_by_app_user, reviewed_at)
@@ -317,7 +326,11 @@ export class EmailDraftRooms {
         deadlineAt: input.deadlineAt,
       },
       editEmailDraftPassage.bind(null, this.#storage.sql, input),
-      { agent: input.agent, operationId: await sha256Hex(input.operationId), target: input.request.field },
+      {
+        agent: input.agent,
+        operationId: await sha256Hex(input.operationId),
+        target: input.request.field,
+      },
     );
   }
 
@@ -470,8 +483,10 @@ function createEmailDraftSchema(sql: SqlStorage): void {
     operation_id TEXT PRIMARY KEY,
     request_json TEXT NOT NULL,
     revision INTEGER NOT NULL,
-    snapshot_json TEXT NOT NULL
+    snapshot_json TEXT NOT NULL,
+    created_at INTEGER
   )`);
+  addAgentEditReceiptTime(sql, "email_draft_operation");
   sql.exec(`CREATE TABLE IF NOT EXISTS email_draft_review (
     review_id TEXT PRIMARY KEY,
     document_revision INTEGER NOT NULL,
@@ -621,10 +636,12 @@ function editEmailDraftPassage(
     input.request.expectedRevision,
     input.userId,
   ]);
+  const now = Date.now();
   const prior = sql
     .exec(
-      "SELECT request_json, revision, snapshot_json FROM email_draft_operation WHERE operation_id = ?",
+      "SELECT request_json, revision, snapshot_json FROM email_draft_operation WHERE operation_id = ? AND created_at >= ?",
       input.operationId,
+      oldestAnsweringReceiptAt(now),
     )
     .toArray()[0];
   if (prior !== undefined) return replayEmailOperation(prior, requestJson);
@@ -674,11 +691,16 @@ function editEmailDraftPassage(
       draft: stored.value.document.read(),
     };
     sql.exec(
-      "INSERT INTO email_draft_operation (operation_id, request_json, revision, snapshot_json) VALUES (?, ?, ?, ?)",
+      "DELETE FROM email_draft_operation WHERE created_at IS NULL OR created_at < ?",
+      oldestAnsweringReceiptAt(now),
+    );
+    sql.exec(
+      "INSERT INTO email_draft_operation (operation_id, request_json, revision, snapshot_json, created_at) VALUES (?, ?, ?, ?, ?)",
       input.operationId,
       requestJson,
       value.revision,
       JSON.stringify(value),
+      now,
     );
     return { ok: true, value: { value, update: update.value } };
   } finally {

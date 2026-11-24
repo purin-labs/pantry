@@ -1,5 +1,6 @@
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { ArchivedMenuBoard } from "@purin-labs/area-cafe-contract/server/menu-board-commands";
+import { addMissingColumn } from "@purin-labs/actor-runtime/actors/schema-migrations";
+import type { ArchivedMenuBoard } from "../contract/menu-board-commands";
 
 /**
  * Archived menu boards (Plan 40B, board removal). An owner or admin archives
@@ -11,16 +12,8 @@ import type { ArchivedMenuBoard } from "@purin-labs/area-cafe-contract/server/me
 
 /** Adds the archive columns to a board table from before board removal. */
 export function addMenuBoardArchiveColumns(sql: SqlStorage): void {
-  const columns = new Set(
-    sql
-      .exec<{ name: string }>("PRAGMA table_info(menu_board)")
-      .toArray()
-      .map((column) => column.name),
-  );
-  if (!columns.has("archived_at"))
-    sql.exec("ALTER TABLE menu_board ADD COLUMN archived_at INTEGER");
-  if (!columns.has("archived_by_app_user"))
-    sql.exec("ALTER TABLE menu_board ADD COLUMN archived_by_app_user TEXT");
+  addMissingColumn(sql, "menu_board", "archived_at", "INTEGER");
+  addMissingColumn(sql, "menu_board", "archived_by_app_user", "TEXT");
 }
 
 /** Whether a board row exists, and whether it is archived. */

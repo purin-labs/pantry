@@ -18,7 +18,10 @@ import {
   type DraftFailureCode,
   type ProductDescriptionRoomMetadata,
 } from "@purin-labs/product-description-crdt/protocol";
-import { listOrganisationMembers, resolveUser } from "@purin-labs/tenancy/data/control-plane";
+import {
+  listOrganisationMembers,
+  resolveUser,
+} from "@purin-labs/tenancy/data/control-plane";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import { controlError } from "@purin-labs/control/worker/http";
@@ -48,6 +51,10 @@ import {
   type CollaborationSocketRoom,
 } from "@purin-labs/collaboration/worker/collaboration-room";
 import { resolveCollaborationSlackThread } from "@purin-labs/collaboration/worker/collaboration-slack-thread";
+import {
+  addAgentEditReceiptTime,
+  oldestAnsweringReceiptAt,
+} from "@purin-labs/collaboration/worker/agent-edit-receipts";
 import { assertNever, hasExactKeys } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
@@ -398,7 +405,11 @@ export class ProductDescriptionDraftRooms {
         input,
         source.value.product,
       ),
-      { agent: input.agent, operationId: await sha256Hex(input.operationId), target: "description" },
+      {
+        agent: input.agent,
+        operationId: await sha256Hex(input.operationId),
+        target: "description",
+      },
     );
   }
 
@@ -606,7 +617,10 @@ async function readDraftSource(
   productId: string,
   sourceKind: "projection" | "authoritative",
 ): Promise<
-  Result<ResolvedDraftSource, { code: "source_unavailable" | "product_not_found" }>
+  Result<
+    ResolvedDraftSource,
+    { code: "source_unavailable" | "product_not_found" }
+  >
 > {
   const organisationId = scope.organisationId;
   if (!(await isOrganisationExecutionActive(sql, scope)))
@@ -624,10 +638,7 @@ async function readDraftSource(
   )
     return sourceUnavailable();
   const merchantId = authority.value.commerceSystem.merchantId;
-  const canonicalProductId = commerceCanonicalResourceId(
-    merchantId,
-    productId,
-  );
+  const canonicalProductId = commerceCanonicalResourceId(merchantId, productId);
   if (sourceKind === "projection") {
     const record = readExactCommerceProjectionReference(sql, {
       organisationId,
@@ -736,8 +747,10 @@ function createProductDescriptionDraftSchema(sql: SqlStorage): void {
     product_description TEXT NOT NULL,
     product_revision INTEGER NOT NULL,
     draft_description TEXT NOT NULL,
-    initialized_revision INTEGER NOT NULL
+    initialized_revision INTEGER NOT NULL,
+    created_at INTEGER
   )`);
+  addAgentEditReceiptTime(sql, "product_description_draft_operation");
 }
 
 function editDraftPassage(
@@ -757,10 +770,12 @@ function editDraftPassage(
     input.request.newText,
     input.userId,
   ]);
+  const now = Date.now();
   const prior = sql
     .exec(
-      "SELECT * FROM product_description_draft_operation WHERE operation_id = ?",
+      "SELECT * FROM product_description_draft_operation WHERE operation_id = ? AND created_at >= ?",
       input.operationId,
+      oldestAnsweringReceiptAt(now),
     )
     .toArray()[0];
   if (prior !== undefined) {
@@ -820,9 +835,13 @@ function editDraftPassage(
     if (!state.ok) return state;
     persistDraft(sql, source.productId, state.value.encode(), input.userId);
     sql.exec(
+      "DELETE FROM product_description_draft_operation WHERE created_at IS NULL OR created_at < ?",
+      oldestAnsweringReceiptAt(now),
+    );
+    sql.exec(
       `INSERT INTO product_description_draft_operation
-      (operation_id, request_json, product_id, product_title, product_description, product_revision, draft_description, initialized_revision)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      (operation_id, request_json, product_id, product_title, product_description, product_revision, draft_description, initialized_revision, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       input.operationId,
       requestJson,
       source.productId,
@@ -831,6 +850,7 @@ function editDraftPassage(
       source.revision,
       description,
       stored.value.initializedRevision,
+      now,
     );
     return {
       ok: true,

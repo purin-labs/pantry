@@ -125,6 +125,20 @@ function tableHasColumn(
   return false;
 }
 
+/**
+ * Adds a column to a table from before the column. A table that has it
+ * changes nothing, so a start of the Actor writes nothing.
+ */
+export function addMissingColumn(
+  sql: SqlStorage,
+  table: string,
+  column: string,
+  definition: "INTEGER" | "TEXT",
+): void {
+  if (!tableHasColumn(sql, table, column))
+    sql.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+}
+
 export function assertRequiredColumns(
   sql: SqlStorage,
   table: string,

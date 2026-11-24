@@ -134,9 +134,9 @@ to the spec of its area.
   turn stops at its next step and the thread says that the request could not complete.
   A person's own server change answers 403.
 - One transaction of Actor storage holds the change and its receipt. The receipt key is
-  the Session, the turn and the tool operation. The same operation again returns the
-  first result and changes nothing. The same key with other input fails with
-  `operation_conflict`.
+  the Session, the turn and the tool operation. For 7 days, the same operation again
+  returns the first result and changes nothing. After that, it runs as a new edit. The
+  same key with other input fails with `operation_conflict`.
 - A text edit replaces one exact passage that occurs one time. A passage that is absent
   or occurs more than one time fails with `passage_conflict`, and the agent reads the
   draft again. An empty `oldText` is correct only for an empty text. No tool replaces a
@@ -314,11 +314,11 @@ Portal origin (`PANTRY_PUBLIC_ORIGIN`). The role "Admin" includes the owner.
 | Actor SQLite table                    | Holds                                                                                                                                          |
 | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | `product_description_draft`           | One row for each product: `schema_version`, `encoded_state`, `initialized_from_product_revision`, `updated_by_app_user` and the times          |
-| `product_description_draft_operation` | The receipt of each agent edit: the request, the product at the edit and the draft text after it                                               |
+| `product_description_draft_operation` | The receipt of each agent edit of the last 7 days: the request, the product at the edit, the draft text after it and the time                  |
 | `product_description_draft_thread`    | The connected Slack thread of a product: the Case, the Slack account, the channel, the link, `approved_by` and the state `shared` or `revoked` |
 | `email_draft`                         | The one row: `schema_version`, `encoded_state`, `revision`, `updated_by_app_user` and the times                                                |
-| `email_draft_operation`               | The receipt of each agent edit: the request, the revision and the result                                                                       |
-| `email_draft_review`                  | Each frozen review: the revision, the three texts, the person and the time                                                                     |
+| `email_draft_operation`               | The receipt of each agent edit of the last 7 days: the request, the revision, the result and the time                                          |
+| `email_draft_review`                  | The latest frozen review: the revision, the three texts, the person and the time                                                               |
 | `email_draft_thread`                  | The connected Slack thread, as for a product                                                                                                   |
 
 `hibernatable_socket_sweep` holds the time of the next sweep (FND-02).
@@ -364,14 +364,16 @@ prompt (`PERMISSION_REQUESTABLE`).
 | Preview of an agent edit: life, new admission                   | 6 s, 2 s                                                                                                        | `AGENT_PREVIEW_LIFETIME_MS`, `AGENT_PREVIEW_ADMISSION_MS`                                 |
 | Product projection as the draft source                          | 15 minutes                                                                                                      | `COMMERCE_PROJECTION_STALE_AFTER_MS`                                                      |
 | Agent edit                                                      | The turn lease, or 30 s if that is sooner. In a Code Mode script: the deadline of the script                    | `CODE_MODE_PILOT_BUDGET.maxDurationMs`                                                    |
+| Receipt of an agent edit                                        | 7 days                                                                                                          | `AGENT_EDIT_RECEIPT_RETENTION_MS`                                                         |
 
 - The limits are constants, not Organisation settings. A document that reaches a limit
   fails with its code, for example `state_too_large`. No code resets or compacts a
   description draft or an email draft. The costs sheet room has a reset route and a
   compaction (KIT-04).
-- **Retention.** No code deletes a draft, an operation receipt or a review snapshot.
-  They stay in the Actor storage of the Organisation until that storage is erased
-  (FND-02).
+- **Retention.** The write of a new receipt deletes each receipt that is older than 7
+  days, and a new email review deletes the review before it. No alarm runs, so a draft
+  that nobody edits writes nothing. No code deletes a draft. It stays in the Actor
+  storage of the Organisation until that storage is erased (FND-02).
 - **Identity.** A Yjs client id and a Yjs clock give no identity, right or author. The
   control session gives them. A stored change names the user who made it. An agent edit
   names the person who asked.
@@ -435,8 +437,7 @@ Boundaries:
   `expectedRevision`.
 - A browser store for unsent changes, a cached Portal and an offline start are not
   built. A reload loses each change that the server did not accept.
-- The description draft and the email draft have no reset, archive or delete, and no
-  retention time for receipts.
+- The description draft and the email draft have no reset, archive or delete.
 - A draft with another `schema_version` fails with `invalid_state`. No upgrade path for
   a stored draft exists.
 - A Rust document core with Yrs is not built. The sources name it as a later option.
