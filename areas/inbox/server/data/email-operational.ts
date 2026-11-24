@@ -9,26 +9,16 @@ import {
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import { isSha256Hex } from "@purin-labs/std";
+import type {
+  EmailAccountRegistration,
+  EmailIdentityClaimant,
+  EmailIdentityClaimQuery,
+  EmailOperationalDirectoryError,
+} from "../mail-inbox/contract/connection-parts";
+import type { SupplierEmailContactRegistration } from "../mail-inbox/contract/inbox-services";
+import type { OperationalEmailTarget } from "../mail-inbox/contract/verified-contacts";
 
-export type OperationalEmailTarget =
-  | Readonly<{
-      readonly kind: "customer_contact";
-      readonly customerId: string;
-      readonly contactId: string;
-      readonly contactRevision: number;
-      readonly selfTestId?: never;
-      readonly address?: never;
-      readonly supplierId?: never;
-    }>
-  | Readonly<{
-      readonly kind: "supplier_contact";
-      readonly supplierId: string;
-      readonly contactId: string;
-      readonly contactRevision: number;
-      readonly selfTestId?: never;
-      readonly address?: never;
-      readonly customerId?: never;
-    }>;
+export type { OperationalEmailTarget } from "../mail-inbox/contract/verified-contacts";
 
 export type EmailSelfTestTarget = Readonly<{
   kind: "self_test";
@@ -59,18 +49,6 @@ type EmailSenderAccount = Readonly<{
   readonly googleSubject: string;
   readonly observedAddress: string;
   readonly addressObservedAt: number;
-}>;
-
-type EmailOperationalDirectoryError = Readonly<{
-  readonly code:
-    | "email_operational_contact_not_found"
-    | "email_operational_contact_suppressed"
-    | "email_operational_contact_inactive"
-    | "email_operational_contact_invalid"
-    | "email_sender_account_not_found"
-    | "email_sender_account_invalid"
-    | "email_sender_identity_claimed"
-    | "email_operational_directory_write_failed";
 }>;
 
 export type EmailOperationalProposalProjectionLifecycle =
@@ -405,15 +383,7 @@ export async function readLatestEmailOperationalProposalProjectionForCase(input:
 }
 
 export async function registerEmailSenderAccount(
-  input: Readonly<{
-    readonly db: OrganisationDatabase;
-    readonly integrationAccountId: IntegrationAccountId;
-    readonly organisationId: OrganisationId;
-    readonly environment: "development" | "production";
-    readonly googleSubject: string;
-    readonly observedAddress: string;
-    readonly now: number;
-  }>,
+  input: EmailAccountRegistration,
 ): Promise<Result<null, EmailOperationalDirectoryError>> {
   if (
     input.googleSubject.trim().length === 0 ||
@@ -462,15 +432,8 @@ export async function registerEmailSenderAccount(
 }
 
 export async function readEmailSenderIdentityClaimant(
-  input: Readonly<{
-    readonly db: OrganisationDatabase;
-    readonly environment: "development" | "production";
-    readonly googleSubject: string;
-  }>,
-): Promise<{
-  readonly organisationId: string;
-  readonly integrationAccountId: string;
-} | null> {
+  input: EmailIdentityClaimQuery,
+): Promise<EmailIdentityClaimant | null> {
   return input.db
     .prepare(
       `SELECT organisation_id AS organisationId, integration_account_id AS integrationAccountId
@@ -651,15 +614,7 @@ export async function registerOperationalEmailContact(
 }
 
 export async function registerSupplierOperationalEmailContact(
-  input: Readonly<{
-    readonly db: OrganisationDatabase;
-    readonly organisationId: OrganisationId;
-    readonly supplierId: string;
-    readonly contactRevision: number;
-    readonly address: string;
-    readonly displayName: string;
-    readonly now: number;
-  }>,
+  input: SupplierEmailContactRegistration,
 ): Promise<Result<null, EmailOperationalDirectoryError>> {
   return registerOperationalEmailContact({
     db: input.db,

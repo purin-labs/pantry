@@ -30,9 +30,6 @@ import {
   parseWhatsAppBusinessAccountId,
   parseWhatsAppCustomerId,
   parseWhatsAppPhoneNumberId,
-  type E164PhoneNumber,
-  type MetaBusinessPortfolioId,
-  type WhatsAppBusinessAccountId,
   type WhatsAppCustomerId,
   type WhatsAppPhoneNumberId,
 } from "@purin-labs/connections/whatsapp/identifiers";
@@ -48,6 +45,14 @@ import {
 } from "@purin-labs/std";
 import type { WhatsAppProviderHealth } from "@purin-labs/control-api";
 import type { Env } from "@purin-labs/kernel/env";
+import type {
+  WhatsAppAccountError,
+  WhatsAppPhoneNumber,
+  WhatsAppPhoneNumberRegistration,
+  WhatsAppProviderHealthUpdate,
+} from "../mail-inbox/contract/connection-parts";
+
+export type { WhatsAppPhoneNumber } from "../mail-inbox/contract/connection-parts";
 
 /**
  * Durable WhatsApp metadata. Every row here holds identifiers, digests,
@@ -55,21 +60,6 @@ import type { Env } from "@purin-labs/kernel/env";
  * prompts, and model output never reach D1: the active envelope lives
  * application-encrypted in `ConnectorActor` storage for the open Case only.
  */
-
-export type WhatsAppPhoneNumber = {
-  readonly integrationAccountId: IntegrationAccountId;
-  readonly organisationId: OrganisationId;
-  readonly providerConnectionId: ProviderConnectionId;
-  readonly environment: OrganisationEnvironment;
-  readonly businessPortfolioId: MetaBusinessPortfolioId;
-  readonly wabaId: WhatsAppBusinessAccountId;
-  readonly phoneNumberId: WhatsAppPhoneNumberId;
-  readonly displayPhoneNumber: E164PhoneNumber;
-  readonly verifiedName: string;
-  readonly providerHealth: WhatsAppProviderHealth;
-  /** Null until the owner selects this discovered number. */
-  readonly selectedAt: number | null;
-};
 
 type WhatsAppSupportBinding = {
   readonly supportBindingId: string;
@@ -234,11 +224,6 @@ type WhatsAppFieldError = {
   readonly field: string;
 };
 
-type WhatsAppAccountError =
-  | { readonly code: "whatsapp_phone_number_claimed" }
-  | { readonly code: "whatsapp_account_missing" }
-  | { readonly code: "whatsapp_account_write_failed" };
-
 type WhatsAppSupportAssignmentError =
   | { readonly code: "organisation_placement_conflict" }
   | { readonly code: "whatsapp_account_missing" }
@@ -369,19 +354,9 @@ type WhatsAppWebhookRoute = {
   readonly credentialGeneration: number;
 };
 
-export async function registerWhatsAppPhoneNumberAccount(input: {
-  readonly db: OrganisationDatabase;
-  readonly organisationId: OrganisationId;
-  readonly integrationAccountId: IntegrationAccountId;
-  readonly providerConnectionId: ProviderConnectionId;
-  readonly environment: OrganisationEnvironment;
-  readonly businessPortfolioId: MetaBusinessPortfolioId;
-  readonly wabaId: WhatsAppBusinessAccountId;
-  readonly phoneNumberId: WhatsAppPhoneNumberId;
-  readonly displayPhoneNumber: E164PhoneNumber;
-  readonly verifiedName: string;
-  readonly now: number;
-}): Promise<Result<WhatsAppPhoneNumber, WhatsAppAccountError>> {
+export async function registerWhatsAppPhoneNumberAccount(
+  input: WhatsAppPhoneNumberRegistration,
+): Promise<Result<WhatsAppPhoneNumber, WhatsAppAccountError>> {
   try {
     await input.db
       .prepare(
@@ -479,13 +454,9 @@ export async function selectWhatsAppPhoneNumberAccount(input: {
   });
 }
 
-export async function setWhatsAppProviderHealth(input: {
-  readonly db: OrganisationDatabase;
-  readonly organisationId: OrganisationId;
-  readonly integrationAccountId: IntegrationAccountId;
-  readonly health: WhatsAppProviderHealth;
-  readonly now: number;
-}): Promise<Result<null, WhatsAppAccountError>> {
+export async function setWhatsAppProviderHealth(
+  input: WhatsAppProviderHealthUpdate,
+): Promise<Result<null, WhatsAppAccountError>> {
   const columns = providerHealthColumns(input.health);
   const updated = await input.db
     .prepare(

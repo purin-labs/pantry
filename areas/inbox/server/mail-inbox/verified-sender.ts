@@ -5,7 +5,7 @@ import {
   type VerifiedContactEndpoint,
 } from "../data/contact-verification";
 import { readEmailMessageReceiptContact } from "../data/email-mailbox";
-import type { OperationalEmailTarget } from "../data/email-operational";
+import type { OperationalEmailTarget } from "./contract/verified-contacts";
 import type {
   CaseId,
   IntegrationAccountId,

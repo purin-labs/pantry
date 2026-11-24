@@ -21,9 +21,9 @@ import {
   listWhatsAppReplyProposalProjections,
   readWhatsAppIngressPolicy,
   type WhatsAppCaseConversationWindow,
-  type WhatsAppPhoneNumber,
   type WhatsAppReplyProposalProjection,
 } from "../../data/whatsapp";
+import type { WhatsAppPhoneNumber } from "../../mail-inbox/contract/connection-parts";
 import { whatsappConnector } from "../../mail-inbox/agent-mailbox-connector";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, parseIntegrationAccountId } from "@purin-labs/kernel/ids";

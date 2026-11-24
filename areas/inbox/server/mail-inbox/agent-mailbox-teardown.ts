@@ -4,19 +4,7 @@ import { readEmailMailboxAccount } from "../data/email-mailbox";
 import { resolveEmailSenderAccount } from "../data/email-operational";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import { agentMailboxConnector } from "./agent-mailbox-connector";
-
-type AgentMailboxTeardown =
-  | { readonly kind: "not_a_mailbox" }
-  | { readonly kind: "connector_unavailable" }
-  | {
-      readonly kind: "torn_down";
-      readonly watchStopped: boolean;
-      readonly cleanupNeeded: readonly {
-        readonly proposalId: string;
-        readonly version: number;
-        readonly state: string;
-      }[];
-    };
+import type { AgentMailboxTeardown } from "./contract/connection-parts";
 
 /**
  * Stands a Gmail mailbox down before its connection is removed.

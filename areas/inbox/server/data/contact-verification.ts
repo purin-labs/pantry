@@ -9,15 +9,21 @@ import type { Result } from "@purin-labs/kernel/result";
 import {
   parseOperationalEmailTarget,
   resolveOperationalEmailContact,
-  type OperationalEmailTarget,
 } from "./email-operational";
 import { resolveActiveProviderAccountContext } from "@purin-labs/connections/data/integration-account";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import { isRecord, parseJsonOrNull } from "@purin-labs/std";
+import type {
+  ContactEndpoint,
+  OperationalEmailTarget,
+  VerifiedContactEndpoint,
+  VerifiedContactQuery,
+} from "../mail-inbox/contract/verified-contacts";
 
-export type ContactEndpoint =
-  | Readonly<{ channel: "gmail"; address: string; waId?: never }>
-  | Readonly<{ channel: "whatsapp"; waId: string; address?: never }>;
+export type {
+  ContactEndpoint,
+  VerifiedContactEndpoint,
+} from "../mail-inbox/contract/verified-contacts";
 
 export type ContactVerificationCommand = Readonly<{
   commandId: string;
@@ -40,16 +46,6 @@ export type ContactVerificationCommand = Readonly<{
         evidenceRef?: never;
       }>
   );
-
-export type VerifiedContactEndpoint = Readonly<{
-  verificationId: string;
-  revision: number;
-  organisationId: OrganisationId;
-  merchantId: string;
-  integrationAccountId: IntegrationAccountId;
-  target: OperationalEmailTarget;
-  endpoint: ContactEndpoint;
-}>;
 
 type VerificationError = Readonly<{
   code:
@@ -249,11 +245,7 @@ const MAX_VERIFIED_CONTACTS = 50;
  * contact is absent. Null is a failed read, which decides nothing.
  */
 export async function listVerifiedContactEndpoints(
-  input: Readonly<{
-    db: OrganisationDatabase;
-    organisationId: OrganisationId;
-    integrationAccountId: IntegrationAccountId;
-  }>,
+  input: VerifiedContactQuery,
 ): Promise<readonly VerifiedContactEndpoint[] | null> {
   const rows = await input.db
     .prepare(

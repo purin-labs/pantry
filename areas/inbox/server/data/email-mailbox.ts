@@ -27,17 +27,18 @@ import {
   nonNegativeIntegerOrNull,
   positiveIntegerOrNull,
 } from "@purin-labs/std";
-
-type EmailEnvironment = "development" | "production";
-
-type EmailMailboxAccount = {
-  readonly integrationAccountId: IntegrationAccountId;
-  readonly organisationId: OrganisationId;
-  readonly environment: EmailEnvironment;
-  readonly googleSubject: string;
-  readonly observedAddress: string;
-  readonly addressObservedAt: number;
-};
+import type {
+  EmailAccountRegistration,
+  EmailEnvironment,
+  EmailIdentityClaimant,
+  EmailIdentityClaimQuery,
+  EmailMailboxAccount,
+  EmailMailboxAccountError,
+} from "../mail-inbox/contract/connection-parts";
+import type {
+  GmailPilotBudget,
+  GmailPilotBudgetQuery,
+} from "../mail-inbox/contract/inbox-services";
 
 type AgentMailboxBinding = {
   readonly mailboxBindingId: string;
@@ -216,11 +217,6 @@ type EmailFieldError = {
   readonly field: string;
 };
 
-type EmailMailboxAccountError =
-  | { readonly code: "email_mailbox_identity_claimed" }
-  | { readonly code: "email_mailbox_account_missing" }
-  | { readonly code: "email_mailbox_write_failed" };
-
 type AgentMailboxAssignmentError =
   | { readonly code: "email_mailbox_account_missing" }
   | { readonly code: "mailbox_installation_inactive" }
@@ -245,15 +241,6 @@ export function gmailThreadCaseIdValue(
     : { ok: false, error: { code: "invalid_field", field: "gmailThreadId" } };
 }
 
-type GmailPilotBudget = {
-  readonly environment: string;
-  readonly consumed: number;
-  readonly operatingCap: number;
-  readonly submissionTrigger: number;
-  readonly remaining: number;
-  readonly status: "healthy" | "submit_verification" | "exhausted";
-};
-
 /**
  * Google's test-user allowance counts unique Google accounts that have ever
  * granted consent to the project, and removing a user is not assumed to give
@@ -262,12 +249,9 @@ type GmailPilotBudget = {
  * cost one slot, a re-authorization costs nothing, and a revoked mailbox does
  * not refund one.
  */
-export async function readGmailPilotBudget(input: {
-  readonly databases: readonly OrganisationDatabase[];
-  readonly environment: string;
-  readonly operatingCap: number;
-  readonly submissionTrigger: number;
-}): Promise<GmailPilotBudget> {
+export async function readGmailPilotBudget(
+  input: GmailPilotBudgetQuery,
+): Promise<GmailPilotBudget> {
   const subjects = new Set<string>();
   for (const database of input.databases) {
     const rows = await database
@@ -295,14 +279,9 @@ export async function readGmailPilotBudget(input: {
   };
 }
 
-export async function readEmailMailboxIdentityClaimant(input: {
-  readonly db: OrganisationDatabase;
-  readonly environment: EmailEnvironment;
-  readonly googleSubject: string;
-}): Promise<{
-  readonly organisationId: string;
-  readonly integrationAccountId: string;
-} | null> {
+export async function readEmailMailboxIdentityClaimant(
+  input: EmailIdentityClaimQuery,
+): Promise<EmailIdentityClaimant | null> {
   return input.db
     .prepare(
       `SELECT integration_account_id AS integrationAccountId, organisation_id AS organisationId
@@ -370,15 +349,9 @@ export async function findEmailMailboxByAddress(input: {
   return match;
 }
 
-export async function registerEmailMailboxAccount(input: {
-  readonly db: OrganisationDatabase;
-  readonly organisationId: OrganisationId;
-  readonly integrationAccountId: IntegrationAccountId;
-  readonly environment: EmailEnvironment;
-  readonly googleSubject: string;
-  readonly observedAddress: string;
-  readonly now: number;
-}): Promise<Result<EmailMailboxAccount, EmailMailboxAccountError>> {
+export async function registerEmailMailboxAccount(
+  input: EmailAccountRegistration,
+): Promise<Result<EmailMailboxAccount, EmailMailboxAccountError>> {
   const claimed = await readEmailMailboxIdentityClaimant(input);
   if (
     claimed !== null &&
