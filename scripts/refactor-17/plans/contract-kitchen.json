@@ -1,0 +1,101 @@
+{
+  "about": "Refactor 17, Stage B: the public files of the area kitchen (the lines of contracts in scripts/layers.json) are the workspace package @purin-labs/area-kitchen-contract in areas/kitchen/contract, the contract of the area. The owner decided on 2026-11-24 that a contract imports only the foundation, outside packages and the contract of another area, and scripts/check-layers.mjs holds that rule. scripts/refactor-17/move-module.mjs reads this plan. moduleFrom: the public files of areas/kitchen that another area imports, and the public files that they import, belong to the plan, and --sync-plan adds each one; stays names each other public file, which stays public in the area (the scope that the owner approved on 2026-11-24). files: a Worker file goes to server/ and a Portal file to ui/, with its sub-path below server/ or ui/ of the area, less a folder contract/ (sourcePrefixes; movedFolders names each public folder that moves whole under another last name). package: the exports map gives each .ts file of server/ and of ui/, each style sheet of ui/, and each .tsx file, which another module imports; the dependencies are the packages that the files import. package.typeCheck false: the files read Env keys that the Actor files of the Worker merge, as the area package does; the Worker program and the Portal program check each file. edits: the source roots of the lints read the folders of the package.",
+  "module": "areas/kitchen/contract",
+  "moduleFrom": "areas/kitchen",
+  "target": "areas/kitchen/contract",
+  "workspaceEntry": "areas/*/contract",
+  "sourcePrefixes": {
+    "areas/kitchen/server/contract/": "server/",
+    "areas/kitchen/server/": "server/",
+    "areas/kitchen/ui/": "ui/"
+  },
+  "movedFolders": {
+    "areas/kitchen/server/contract": "server"
+  },
+  "package": {
+    "name": "@purin-labs/area-kitchen-contract",
+    "exports": {
+      "./server/*": {
+        "types": "./server/*.ts",
+        "default": "./server/*.ts"
+      },
+      "./ui/*": {
+        "types": "./ui/*.ts",
+        "default": "./ui/*.ts"
+      }
+    },
+    "dependencies": {
+      "@purin-labs/agent": "workspace:*",
+      "@purin-labs/agent-tools": "workspace:*",
+      "@purin-labs/area-commerce-contract": "workspace:*",
+      "@purin-labs/bakery-model": "workspace:*",
+      "@purin-labs/bakery-workflow": "workspace:*",
+      "@purin-labs/commerce-client": "workspace:*",
+      "@purin-labs/commerce-contracts": "workspace:*",
+      "@purin-labs/control": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/costs-sheet-crdt": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/kitchen-control-api": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/type-utils": "workspace:*",
+      "@purin-labs/workflow-canvas-crdt": "workspace:*"
+    },
+    "devDependencies": ["@cloudflare/workers-types", "tsrs"],
+    "versionsFrom": [
+      "workers/platform/package.json",
+      "apps/portal/package.json"
+    ],
+    "tsconfig": {
+      "extends": "../../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": ["ESNext"],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": ["@cloudflare/workers-types"],
+        "allowImportingTsExtensions": true
+      },
+      "include": ["server/**/*.ts"]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Worker files of the contract package",
+      "find": "PLATFORM_SOURCE.push(\"areas/devices/contract/server\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"areas/devices/contract/server\");\n// The Worker side of the contract of the area kitchen (Refactor 17, Stage B).\nPLATFORM_SOURCE.push(\"areas/kitchen/contract/server\");\n"
+    },
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the Portal lints and the ESLint rules of the Portal source read the Portal files of the contract package",
+      "find": "PORTAL_SOURCE.push(\"areas/inbox/contract/ui\");\n",
+      "replace": "PORTAL_SOURCE.push(\"areas/inbox/contract/ui\");\n// The Portal side of the contract of the area kitchen (Refactor 17, Stage B).\nPORTAL_SOURCE.push(\"areas/kitchen/contract/ui\");\n"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": ["node", "scripts/check-layers.mjs", "--areas", "--write"],
+      "writes": ["docs/layers.md"]
+    }
+  ],
+  "files": {
+    "areas/kitchen/server/agent-tools/bakery/surface-result.ts": "server/agent-tools/bakery/surface-result.ts",
+    "areas/kitchen/server/agent-tools/kitchen/services.ts": "server/agent-tools/kitchen/services.ts",
+    "areas/kitchen/server/contract/costs-tools.ts": "server/costs-tools.ts",
+    "areas/kitchen/server/contract/inventory-control.ts": "server/inventory-control.ts",
+    "areas/kitchen/server/contract/inventory-overview.ts": "server/inventory-overview.ts",
+    "areas/kitchen/server/contract/recipe-draft.ts": "server/recipe-draft.ts",
+    "areas/kitchen/server/contract/saved-bakery-runs.ts": "server/saved-bakery-runs.ts",
+    "areas/kitchen/server/contract/stock-action-execution.ts": "server/stock-action-execution.ts",
+    "areas/kitchen/server/contract/stock-action-plan.ts": "server/stock-action-plan.ts",
+    "areas/kitchen/server/contract/stock-action.ts": "server/stock-action.ts",
+    "areas/kitchen/server/contract/workflow-canvas.ts": "server/workflow-canvas.ts",
+    "areas/kitchen/server/contract/workflow-changes.ts": "server/workflow-changes.ts",
+    "areas/kitchen/ui/features/bakery-browser-context.ts": "ui/features/bakery-browser-context.ts"
+  }
+}
