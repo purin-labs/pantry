@@ -18,8 +18,11 @@ import {
   FlowBinding,
   labelAllowsAudiences,
   type FlowLabel,
+  type FlowSource,
 } from "@purin-labs/authority/policy/information-flow/index";
+import { readCaseProject } from "../projects/case-moves";
 import type { ConversationId, UserId } from "@purin-labs/control-api";
+import { parseSessionId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { listProjectMembers } from "../projects/access";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import {
@@ -49,6 +52,72 @@ import {
   readSideCaseOriginForCase,
 } from "./side-cases";
 import type { Variant } from "@purin-labs/type-utils";
+
+/**
+ * Whether every source that the chat's turns read is the chat itself: its
+ * own Case, the chat, and the chat's Project, whose flow label names its
+ * readers and is checked again at each read. Content of another source
+ * (Memory, a saved record, a connected resource, another Case or chat) came
+ * into the chat under the grant of the Case context read, so its replay
+ * needs that grant now. A Session that cannot be read counts as another
+ * source.
+ */
+async function readsOnlyOwnCase(
+  env: Env,
+  history: Readonly<{ bindings: readonly Readonly<{ sessionId: string }>[] }>,
+  own: Readonly<{
+    organisationId: OrganisationId;
+    caseId: string;
+    conversationId: ConversationId;
+    projectId: string | null;
+  }>,
+): Promise<boolean> {
+  const organisationId = own.organisationId;
+  const sessions = new Set(history.bindings.map(bindingSessionId));
+  for (const raw of sessions) {
+    const sessionId = parseSessionId(raw);
+    if (!sessionId.ok) return false;
+    const actor = await resolveActiveSessionActor({
+      env,
+      namespace: env.SESSION,
+      organisationId,
+      sessionId: sessionId.value,
+      now: Date.now(),
+    });
+    if (!actor.ok) return false;
+    const sources = await actor.value.readSessionObservedSources({
+      requestingOrganisationId: organisationId,
+      sessionId: sessionId.value,
+    });
+    if (sources === null || !sources.every(isOwnSource.bind(null, own)))
+      return false;
+  }
+  return true;
+}
+
+function bindingSessionId(binding: Readonly<{ sessionId: string }>): string {
+  return binding.sessionId;
+}
+
+function isOwnSource(
+  own: Readonly<{
+    caseId: string;
+    conversationId: ConversationId;
+    projectId: string | null;
+  }>,
+  source: FlowSource,
+): boolean {
+  switch (source.kind) {
+    case "case_entry":
+      return source.caseId === own.caseId;
+    case "chat_conversation":
+      return source.conversationId === own.conversationId;
+    case "project":
+      return source.projectId === own.projectId;
+    default:
+      return false;
+  }
+}
 
 /**
  * Whether every current reader of a conversation may be shown content under
@@ -250,6 +319,22 @@ export async function checkConversationDisclosure(
         organisationId: scope.organisationId,
       }),
     ]);
+    // The person's own private chat, with no inherited history, whose turns
+    // read only its own Case: the person reads it with no grant of the Case
+    // context read.
+    const ownPrivateChat =
+      access?.access.kind === "private" &&
+      conversation.lineage.kind === "original" &&
+      inherited.entries.length === 0 &&
+      inherited.bindings.length === 0 &&
+      (await readsOnlyOwnCase(env, history, {
+        organisationId: scope.organisationId,
+        caseId: identity.value.caseId,
+        conversationId: conversation.id,
+        projectId:
+          (await readCaseProject(placement, scope, identity.value.caseId))
+            ?.projectId ?? null,
+      }));
     if (access?.access.kind === "workspace_canvas") {
       for (const serialized of history.bindings) {
         const binding = await FlowBinding.restore(serialized);
@@ -338,12 +423,7 @@ export async function checkConversationDisclosure(
             history,
             authority,
             destination,
-            // The person's own private chat, with no inherited history.
-            access?.access.kind === "private" &&
-              userId === scope.userId &&
-              conversation.lineage.kind === "original" &&
-              inherited.entries.length === 0 &&
-              inherited.bindings.length === 0
+            ownPrivateChat && userId === scope.userId
               ? "own_private_chat"
               : "grant",
           )),

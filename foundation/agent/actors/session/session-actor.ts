@@ -162,6 +162,10 @@ import {
   readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding,
 } from "../agent-session-information-flow";
 import { sameJson, sha256Hex } from "@purin-labs/std";
+import type {
+  FlowSource,
+  ObservationEvidence,
+} from "@purin-labs/authority/policy/information-flow/index";
 import type { ActorImportSqlMigration } from "@purin-labs/actor-runtime/actors/actor-export";
 import { type PlacedActorExportSource } from "@purin-labs/actor-runtime/actors/lifecycle/placed-actor";
 import { sessionReachableAttachmentObjectKeys } from "./attachments";
@@ -1290,6 +1294,34 @@ export abstract class SessionActor
     });
   }
 
+  /**
+   * The source of each observation of the Session's information flow: what
+   * its turns read. Null when the Session or its flow cannot be read.
+   */
+  async readSessionObservedSources(input: {
+    readonly requestingOrganisationId: OrganisationId;
+    readonly sessionId: SessionId;
+  }): Promise<readonly FlowSource[] | null> {
+    const session = await readCanonicalSessionForPersistence(
+      this.shared.persistence,
+      this.ctx.storage.sql,
+      input.requestingOrganisationId,
+    );
+    if (
+      !session.ok ||
+      session.value.lifecycle.state.identity.sessionId !== input.sessionId
+    )
+      return null;
+    const flow = await readSessionInformationFlow(this.ctx.storage.sql, {
+      organisationId: input.requestingOrganisationId,
+      sessionId: input.sessionId,
+    });
+    if (!flow.ok) return null;
+    return flow.value === null
+      ? []
+      : flow.value.observations.map(observedSource);
+  }
+
   async readConfirmedContextObservations(input: {
     readonly requestingOrganisationId: OrganisationId;
     readonly sessionId: SessionId;
@@ -1605,4 +1637,8 @@ function adapterOrNull(
   selected: ReturnType<SessionHarnessTurns["selectEmbeddedHarnessAdapter"]>,
 ): EmbeddedHarnessAdapter | null {
   return selected.ok ? selected.value : null;
+}
+
+function observedSource(evidence: ObservationEvidence): FlowSource {
+  return evidence.source;
 }

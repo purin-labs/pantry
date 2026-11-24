@@ -246,7 +246,13 @@ The link reader (`messages/link-reader.ts`) works as follows:
   turn, and the chat was private to that person at the turn and is private now. Such a
   permit reads the tail of its own Case only (scope `case`): no Memory and no workspace
   search. The Session's check before inference and the read of the chat's own history
-  (`authorizeForkHistoryAccess`, `own_private_chat`) take the same rule. An inherited
+  (`authorizeForkHistoryAccess`, `own_private_chat`) take the same rule. The history
+  read asks one more thing: each source that the chat's Sessions observed is the chat's
+  own Case, the chat itself or the chat's Project (`readsOnlyOwnCase`,
+  `readSessionObservedSources`); the Project's flow label names its readers, and the
+  flow check reads it again. A chat that read Memory, a saved record, a connected
+  resource, another Case or another chat while the person held the grant needs the
+  grant to show that history again. An inherited
   history of a fork still needs the grant. An owner and an admin hold the grant, so the
   rule matters for an operator's Register chat (Plan 90 D9).
 - The assembler reads the tail of the Case, the searchable projections (Case entries and
