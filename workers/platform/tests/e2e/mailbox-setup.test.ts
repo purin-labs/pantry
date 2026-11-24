@@ -6,7 +6,6 @@ import { http, type HttpResponseResolver } from "msw";
 import {
   encodeMailboxSetupAgentChoice,
   mailboxModelConsentRequest,
-  parseMailboxSetupPlan,
   type MailboxModelReview,
   type MailboxSetupPlan,
 } from "@purin-labs/control-api";
@@ -43,6 +42,8 @@ import {
   mailboxConnector,
   portalSetupTransport,
   runDueMailWork,
+  readPlan,
+  reviewOf,
   scheduledAt,
   sendAs,
   type MailboxConnector,
@@ -415,12 +416,6 @@ async function acceptances(organisationId: OrganisationId) {
   }));
 }
 
-function reviewOf(plan: MailboxSetupPlan | null): MailboxModelReview {
-  if (plan === null || plan.model.kind !== "consent_needed")
-    throw new Error(`No review to accept: ${JSON.stringify(plan?.model)}`);
-  return plan.model.review;
-}
-
 /**
  * One press of Turn on, or of Continue, with the checkbox as `accepted`
  * leaves it: the Portal's own action, with the session of one person. It
@@ -490,21 +485,6 @@ function states(plan: MailboxSetupPlan | null): Record<string, string> {
   return Object.fromEntries(
     plan.requirements.map((requirement) => [requirement.id, requirement.state]),
   );
-}
-
-async function readPlan(
-  person: Member,
-  path: string,
-): Promise<Readonly<{ status: number; plan: MailboxSetupPlan | null }>> {
-  const response = await exports.default.fetch(`https://localhost${path}`, {
-    headers: commerceHeaders(person.session),
-  });
-  const body: unknown = await response.json();
-  return {
-    status: response.status,
-    plan:
-      response.ok && isRecord(body) ? parseMailboxSetupPlan(body.setup) : null,
-  };
 }
 
 /** The authority that a turn of the mailbox's agent compiles. */

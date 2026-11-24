@@ -1,28 +1,25 @@
 import { exports } from "cloudflare:workers";
 import { runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
-import { http, type HttpResponseResolver } from "msw";
+import { http } from "msw";
 import { isRecord } from "@purin-labs/std";
-import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { setUpMailbox } from "@purin-labs/area-inbox/ui/features/mail-setup/turn-on";
-import { modelToolResults } from "./chat-journey-support";
 import { commerceHeaders } from "./commerce-support";
 import { installMemoryFixture, type Member } from "./memory-support";
 import { network } from "./network";
 import {
   acceptMailboxModel,
+  arriveAndEvaluate,
   connectGmailMailbox,
-  draftReplyTurn,
-  evaluateAt,
+  DraftingAgent,
   FakeGmailMailbox,
+  finishReplyTurns,
   mailboxConnector,
   mailProcessing,
   portalSetupTransport,
   readReplyTurns,
   runDueMailWork,
-  scheduledAt,
   sendAs,
-  type MailboxConnector,
 } from "./gmail-mailbox-support";
 
 const ADDRESS = "hello@example.test";
@@ -47,7 +44,7 @@ async function emailsInProgressJourney({ task }: TestContext): Promise<void> {
     text: "Can I order a birthday cake for Saturday?",
   });
   gmail.serve();
-  const model = new DraftingAgent();
+  const model = new DraftingAgent(DRAFT);
   network.use(
     http.post(
       "https://openrouter.ai/api/v1/chat/completions",
@@ -158,39 +155,6 @@ async function emailsInProgressJourney({ task }: TestContext): Promise<void> {
   });
 }
 
-/**
- * New mail arrives in Gmail, the owner checks the mailbox, and the
- * Connector's evaluation runs at the time that the check scheduled.
- */
-async function arriveAndEvaluate(
-  gmail: FakeGmailMailbox,
-  owner: Member,
-  organisationId: OrganisationId,
-  mailboxPath: string,
-  connector: MailboxConnector,
-  threads: readonly string[],
-) {
-  for (const thread of threads) gmail.arrive(`${thread}_message`, thread);
-  const checked = await sendAs(owner, `${mailboxPath}/check`, {});
-  return runInDurableObject(
-    connector,
-    evaluateAt.bind(null, organisationId, scheduledAt(checked)),
-  );
-}
-
-/** Runs the Connector's due work until no reply turn waits. */
-async function finishReplyTurns(connector: MailboxConnector): Promise<void> {
-  await expect
-    .poll(
-      async () => {
-        await runDueMailWork(connector);
-        return (await runInDurableObject(connector, readReplyTurns)).length;
-      },
-      { timeout: 60_000, interval: 200 },
-    )
-    .toBe(0);
-}
-
 /** The mailbox's policy as the Portal reads it. */
 async function mailboxPolicy(
   person: Member,
@@ -209,16 +173,4 @@ async function mailboxPolicy(
   )
     throw new Error(JSON.stringify(body));
   return body.mailbox.policy;
-}
-
-/** The mailbox agent: each reply turn reads its Case and drafts a reply. */
-class DraftingAgent {
-  replyTurns = 0;
-  async answer({
-    request,
-  }: Parameters<HttpResponseResolver>[0]): Promise<Response> {
-    const results = modelToolResults(await request.json());
-    if (results === 0) this.replyTurns += 1;
-    return draftReplyTurn(results, DRAFT);
-  }
 }

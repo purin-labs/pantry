@@ -1,8 +1,13 @@
 import { env, exports } from "cloudflare:workers";
 import { runInDurableObject } from "cloudflare:test";
-import { http, HttpResponse } from "msw";
+import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect } from "vitest";
 import { decodeBase64, encodeBase64Url, isRecord } from "@purin-labs/std";
+import {
+  parseMailboxSetupPlan,
+  type MailboxModelReview,
+  type MailboxSetupPlan,
+} from "@purin-labs/control-api";
 import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { ConnectorDO } from "../../src/actors/connector";
 import {
@@ -38,6 +43,7 @@ import { runAlarmHandler } from "./durable-object-alarm-support";
 import type { Member } from "./memory-support";
 import { network } from "./network";
 import { openRouterText, openRouterToolCall } from "./slack-journey-support";
+import { modelToolResults } from "./chat-journey-support";
 import { fixtureDatabase } from "./organisation-database";
 
 const GMAIL = "https://gmail.googleapis.com/gmail/v1/users/me";
@@ -588,4 +594,81 @@ export function draftReplyTurn(results: number, body: string): Response {
         "reply_draft",
       )
     : openRouterText("Prepared for review.", "reply_done");
+}
+
+/**
+ * New mail arrives in Gmail, the owner checks the mailbox, and the
+ * Connector's evaluation runs at the time that the check scheduled.
+ */
+export async function arriveAndEvaluate(
+  gmail: FakeGmailMailbox,
+  owner: Member,
+  organisationId: OrganisationId,
+  mailboxPath: string,
+  connector: MailboxConnector,
+  threads: readonly string[],
+) {
+  for (const thread of threads) gmail.arrive(`${thread}_message`, thread);
+  const checked = await sendAs(owner, `${mailboxPath}/check`, {});
+  return runInDurableObject(
+    connector,
+    evaluateAt.bind(null, organisationId, scheduledAt(checked)),
+  );
+}
+
+/** Runs the Connector's due work until no reply turn waits. */
+export async function finishReplyTurns(
+  connector: MailboxConnector,
+): Promise<void> {
+  await expect
+    .poll(
+      async () => {
+        await runDueMailWork(connector);
+        return (await runInDurableObject(connector, readReplyTurns)).length;
+      },
+      { timeout: 60_000, interval: 200 },
+    )
+    .toBe(0);
+}
+
+/** The review that a setup plan asks a person to accept. */
+export function reviewOf(plan: MailboxSetupPlan | null): MailboxModelReview {
+  if (plan === null || plan.model.kind !== "consent_needed")
+    throw new Error(`No review to accept: ${JSON.stringify(plan?.model)}`);
+  return plan.model.review;
+}
+
+/** The mailbox setup plan as a person reads it in the Portal. */
+export async function readPlan(
+  person: Member,
+  path: string,
+): Promise<Readonly<{ status: number; plan: MailboxSetupPlan | null }>> {
+  const response = await exports.default.fetch(`https://localhost${path}`, {
+    headers: commerceHeaders(person.session),
+  });
+  const body: unknown = await response.json();
+  return {
+    status: response.status,
+    plan:
+      response.ok && isRecord(body) ? parseMailboxSetupPlan(body.setup) : null,
+  };
+}
+
+/**
+ * The mailbox agent: each reply turn reads its Case and drafts `draft`. It
+ * keeps the model that each request named.
+ */
+export class DraftingAgent {
+  replyTurns = 0;
+  readonly models: unknown[] = [];
+  constructor(private readonly draft: string) {}
+  async answer({
+    request,
+  }: Parameters<HttpResponseResolver>[0]): Promise<Response> {
+    const body: unknown = await request.json();
+    if (isRecord(body)) this.models.push(body.model);
+    const results = modelToolResults(body);
+    if (results === 0) this.replyTurns += 1;
+    return draftReplyTurn(results, this.draft);
+  }
 }
