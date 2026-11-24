@@ -46,6 +46,9 @@ import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
 import type { CommerceToolReads } from "@purin-labs/area-commerce/server/contract/tool-reads";
 import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 
+/** The bake stock level that a person or the agent sets, for the drafts of another area. */
+export type { BakeStockLevelInput } from "@purin-labs/kitchen-control-api";
+
 export type HarnessBakerySurfaceToolRequest =
   | Readonly<{ kind: "file_action"; action: BakeryFileAction }>
   | Readonly<{ kind: "inspect_scenario_save" }>

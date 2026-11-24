@@ -45,21 +45,10 @@ import {
   revokeDisabledSlackOrganisationConnection,
 } from "@purin-labs/authority/slack/installation-store";
 import { prepareConfigurationVersionBump } from "@purin-labs/tenancy/data/organisation-onboarding-row";
-
-type RemoveIntegrationAccountError =
-  | { readonly code: "integration_account_not_found" }
-  | { readonly code: "integration_account_not_disabled" }
-  | { readonly code: "integration_account_is_default_for_provider" }
-  | { readonly code: "integration_account_in_use" }
-  | { readonly code: "provider_attempt_in_progress" }
-  | { readonly code: "configuration_version_conflict" }
-  | { readonly code: "provider_connection_corrupt" };
-
-type RemoveIntegrationAccountResult = {
-  readonly receiptId: string;
-  readonly configurationVersion: number;
-  readonly projectionRevision: number;
-};
+import type {
+  RemoveIntegrationAccountError,
+  RemoveIntegrationAccountResult,
+} from "../contract/organisation-services";
 
 type OrganisationStateRow = {
   readonly configurationVersion: unknown;

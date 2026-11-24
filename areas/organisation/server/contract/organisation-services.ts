@@ -1,11 +1,72 @@
-import type { removeIntegrationAccount } from "../data/account-removal";
 import type {
-  cancelOperatorConfigurationDraft,
-  confirmOperatorConfigurationDraft,
-  previewCode,
-  readOperatorDraft,
-} from "../data/operator-configuration-draft";
+  GlobalDatabase,
+  OrganisationDatabase,
+} from "@purin-labs/kernel/database-handles";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { UserId } from "@purin-labs/control-api/ids";
+import type { Result } from "@purin-labs/kernel/result";
+import type { IntegrationAccountMutation } from "@purin-labs/connections/data/integration-account";
+import type { AgentOperationsError } from "@purin-labs/agent/data/agent-operations";
 import { definePort } from "@purin-labs/kernel/port";
+import type {
+  ConfirmOperatorDraftInput,
+  OperatorConfigurationDraft,
+  OperatorDraftError,
+  OperatorDraftReceipt,
+} from "./operator-drafts";
+
+export type RemoveIntegrationAccountError =
+  | { readonly code: "integration_account_not_found" }
+  | { readonly code: "integration_account_not_disabled" }
+  | { readonly code: "integration_account_is_default_for_provider" }
+  | { readonly code: "integration_account_in_use" }
+  | { readonly code: "provider_attempt_in_progress" }
+  | { readonly code: "configuration_version_conflict" }
+  | { readonly code: "provider_connection_corrupt" };
+
+export type RemoveIntegrationAccountResult = {
+  readonly receiptId: string;
+  readonly configurationVersion: number;
+  readonly projectionRevision: number;
+};
+
+type RemoveIntegrationAccount = (input: {
+  readonly db: OrganisationDatabase;
+  // The global directory, which holds the Slack connection records.
+  readonly directory: GlobalDatabase;
+  readonly organisationId: OrganisationId;
+  readonly integrationAccountId: IntegrationAccountId;
+  readonly removedByUserId: UserId;
+  readonly mutation: IntegrationAccountMutation;
+  readonly now: number;
+}) => Promise<
+  Result<RemoveIntegrationAccountResult, RemoveIntegrationAccountError>
+>;
+
+type ReadOperatorDraft = (
+  db: OrganisationDatabase,
+  organisationId: OrganisationId,
+  draftId: string,
+) => Promise<OperatorConfigurationDraft | null>;
+
+type CancelOperatorConfigurationDraft = (
+  input: Readonly<{
+    db: OrganisationDatabase;
+    organisationId: OrganisationId;
+    draftId: string;
+    actorUserId: string;
+    now: number;
+  }>,
+) => Promise<Result<true, OperatorDraftError>>;
+
+type ConfirmOperatorConfigurationDraft = (
+  input: ConfirmOperatorDraftInput,
+) => Promise<
+  Result<OperatorDraftReceipt, OperatorDraftError | AgentOperationsError>
+>;
 
 /**
  * The Organisation records that other areas use: the removal of an
@@ -14,12 +75,12 @@ import { definePort } from "@purin-labs/kernel/port";
  * registers the implementation (`worker-ports.ts`).
  */
 export type OrganisationServices = Readonly<{
-  removeIntegrationAccount: typeof removeIntegrationAccount;
-  readOperatorDraft: typeof readOperatorDraft;
-  cancelOperatorConfigurationDraft: typeof cancelOperatorConfigurationDraft;
-  confirmOperatorConfigurationDraft: typeof confirmOperatorConfigurationDraft;
+  removeIntegrationAccount: RemoveIntegrationAccount;
+  readOperatorDraft: ReadOperatorDraft;
+  cancelOperatorConfigurationDraft: CancelOperatorConfigurationDraft;
+  confirmOperatorConfigurationDraft: ConfirmOperatorConfigurationDraft;
   /** The short code that a person compares before a confirmation. */
-  previewCode: typeof previewCode;
+  previewCode: (commandDigest: string) => string;
 }>;
 
 export const organisationServices = definePort<OrganisationServices>(
