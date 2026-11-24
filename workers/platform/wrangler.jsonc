@@ -313,8 +313,11 @@
         "GMAIL_PUBSUB_TOPIC": "projects/purin-pantry/topics/pantry-gmail-push",
         "GMAIL_PUBSUB_SERVICE_ACCOUNT": "pantry-gmail-push@purin-pantry.iam.gserviceaccount.com",
         "COMMERCE_BASE_URL": "https://commerce.pantry.purin.io",
-        // No SHOP_ORDER_PAGE_ORIGIN yet: the order page domain is not chosen,
-        // so QR codes keep the shop.purin.io/shops/<merchant> address.
+        // No SHOP_ORDER_PAGE_ORIGIN yet. The order page domain is
+        // menu.purin.io, and its value is "https://{name}.menu.purin.io".
+        // Set it in a release of its own, after purin-shop answers on
+        // *.menu.purin.io; until then QR codes keep the
+        // shop.purin.io/shops/<merchant> address.
         "WHATSAPP_APP_ID": "3167174123466651",
         "WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID": "1758815688595131",
         "PANTRY_DEPLOYMENT_PROFILE": "production",

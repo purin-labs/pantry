@@ -51,6 +51,16 @@ export const WORKER_DOMAINS = {
   "purin-shop": "shop.purin.io",
 };
 
+/**
+ * The zone routes that a Worker has beside its custom domain. The shop
+ * serves the QR order pages at `<shop name>.menu.purin.io`: one wildcard
+ * route, which needs a proxied wildcard DNS record and a certificate that
+ * covers the wildcard.
+ */
+export const WORKER_ZONE_ROUTES = {
+  "purin-shop": ["*.menu.purin.io/* (zone purin.io)"],
+};
+
 const PRODUCTION_WORKER_NAMES = new Set(
   Object.values(WORKER_NAMES).map((names) => names.production),
 );
@@ -64,10 +74,13 @@ export function releaseTargetProblems(config) {
   if (config.preview_urls !== false) problems.push("preview addresses");
   const domain = WORKER_DOMAINS[config.name];
   const routes = (config.routes ?? []).map(routeTarget);
-  const expected = domain === undefined ? [] : [`${domain} (custom domain)`];
+  const expected = [
+    ...(domain === undefined ? [] : [`${domain} (custom domain)`]),
+    ...(WORKER_ZONE_ROUTES[config.name] ?? []),
+  ];
   if (!sameValue(routes, expected))
     problems.push(
-      `routes other than ${expected.length === 0 ? "none" : expected[0]}`,
+      `routes other than ${expected.length === 0 ? "none" : expected.join(", ")}`,
     );
   return problems;
 }
@@ -83,8 +96,9 @@ export function requireReleaseTarget(config) {
 
 function routeTarget(route) {
   if (typeof route === "string") return route;
-  return route.custom_domain === true
-    ? `${route.pattern} (custom domain)`
+  if (route.custom_domain === true) return `${route.pattern} (custom domain)`;
+  return typeof route.zone_name === "string"
+    ? `${route.pattern} (zone ${route.zone_name})`
     : route.pattern;
 }
 

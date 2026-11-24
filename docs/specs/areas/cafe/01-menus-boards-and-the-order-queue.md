@@ -222,7 +222,8 @@ the order page read the new price live, with no new release.
 The shop Worker `purin-shop` (`apps/storefront`) serves the demo shop at `shop.purin.io`
 and the page `/shops/<merchantId>`. It shows the shop's published menu in its own
 sections, with each listing's title, description and first image. For a host
-`<shop name>.<MENU_HOST_SUFFIX>`, it answers 404 for an unknown name, moves an earlier
+`<shop name>.<MENU_HOST_SUFFIX>` (`menu.purin.io`, through the wildcard route
+`*.menu.purin.io/*`), it answers 404 for an unknown name, moves an earlier
 name to the current one with 301, and passes on only that storefront's buyer routes. An
 owner or an admin sets the shop name through `PUT …/commerce/shop-name`. The commerce
 engine keeps the names (COM-02).
@@ -387,9 +388,11 @@ retention: an archive deletes nothing, and no route deletes a board.
 
 ## Open work
 
-- The order page domain is not chosen. Production sets no `SHOP_ORDER_PAGE_ORIGIN`,
-  `apps/storefront/wrangler.jsonc` sets no `MENU_HOST_SUFFIX`, and `purin-shop` has no
-  route for an order page host. The Menus page then shows no shop name form.
+- The order page domain `menu.purin.io` is not live. `purin.io` has no wildcard DNS
+  record and no certificate for `*.menu.purin.io`, the released `purin-shop` has no
+  route for an order page host, and production sets no `SHOP_ORDER_PAGE_ORIGIN`
+  (`https://{name}.menu.purin.io` after the shop answers). The Menus page then shows no
+  shop name form.
 - With no order page origin, `hostedShopUrl` names `<COMMERCE_BASE_URL>/shops/<merchant>`
   (`areas/cafe/server/control/routes/commerce-menu-publication.ts`). The commerce
   Worker serves no page: it redirects a `GET` outside `/v1/` to `SHOP_SITE_ORIGIN`

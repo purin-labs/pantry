@@ -13,6 +13,9 @@ export declare const WORKER_NAMES: Readonly<
   Record<string, Readonly<{ local?: string; production: string }>>
 >;
 export declare const WORKER_DOMAINS: Readonly<Record<string, string>>;
+export declare const WORKER_ZONE_ROUTES: Readonly<
+  Record<string, readonly string[]>
+>;
 export declare function releaseTargetProblems(
   config: ReleaseTargetConfig,
 ): string[];

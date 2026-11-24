@@ -17,7 +17,7 @@ type ServiceBinding = Readonly<{
 type Env = Readonly<{
   COMMERCE: ServiceBinding;
   ASSETS: ServiceBinding;
-  /** The order page domain; unset until one is chosen. */
+  /** The order page domain, `menu.purin.io` in production. */
   MENU_HOST_SUFFIX?: string;
 }>;
 
