@@ -22,7 +22,7 @@ import type {
 } from "@purin-labs/contracts";
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import { signInPath } from "@purin-labs/control/portal/control-paths";
-import { ArchiveConfirm } from "@purin-labs/area-integrations/ui/features/integrations/archive-confirm";
+import { ArchiveConfirm } from "@purin-labs/area-integrations-contract/ui/features/integrations/archive-confirm";
 import {
   EmptyState,
   Notice,

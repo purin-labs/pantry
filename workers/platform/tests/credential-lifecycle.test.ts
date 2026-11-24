@@ -12,7 +12,7 @@ import {
   markCredentialRotationFailed,
   markCredentialRotationVerified,
   recordCredentialRevocationMutation,
-} from "@purin-labs/area-integrations/server/contract/credential-lifecycle";
+} from "@purin-labs/area-integrations-contract/server/credential-lifecycle";
 import type { IntegrationProvider } from "@purin-labs/connections/data/integration-account";
 import { d1Database } from "./sqlite-d1";
 import {

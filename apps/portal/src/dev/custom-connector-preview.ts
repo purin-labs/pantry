@@ -3,7 +3,7 @@ import type {
   CustomConnectorRevisionView,
   CustomConnectorSetupAttempt,
 } from "@purin-labs/control-api/portal/custom-connectors";
-import type { CustomConnectorDetail } from "@purin-labs/area-integrations/ui/features/integrations/custom-connector-api";
+import type { CustomConnectorDetail } from "@purin-labs/area-integrations-contract/ui/features/integrations/custom-connector-api";
 
 const NOW = Date.parse("2026-09-13T09:00:00Z");
 const definition = {

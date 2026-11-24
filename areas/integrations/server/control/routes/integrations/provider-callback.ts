@@ -11,7 +11,7 @@ import {
 import type {
   OnboardingProvider,
   ProviderOnboardingError,
-} from "../../../contract/provider-lifecycle";
+} from "@purin-labs/area-integrations-contract/server/provider-lifecycle";
 import { requirePublicOrigin as requireConfiguredPublicOrigin } from "@purin-labs/kernel/public-origin";
 import { controlError } from "@purin-labs/control/worker/http";
 import { assertNever } from "@purin-labs/std";

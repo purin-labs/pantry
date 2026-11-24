@@ -26,7 +26,7 @@ import type {
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../contract/provider-lifecycle";
+} from "@purin-labs/area-integrations-contract/server/provider-lifecycle";
 import {
   advanceProviderPhase,
   completeProviderCredentialCutover,

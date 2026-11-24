@@ -3,7 +3,7 @@ import type { AccessControlAvailability } from "@purin-labs/control-api";
 import {
   providerLabel,
   providerPresentation,
-} from "@purin-labs/area-integrations/ui/integration-catalogue";
+} from "@purin-labs/area-integrations-contract/ui/integration-catalogue";
 import type {
   AccessControlCapabilityView,
   AccessControlGrantView,

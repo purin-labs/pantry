@@ -2,7 +2,7 @@ import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-exe
 import { createCueQueueMessage } from "@purin-labs/agent/cues/engine";
 import type { Env } from "@purin-labs/kernel/env";
 import type { JsonObject } from "@purin-labs/kernel/http";
-import { revokeAccountRemovedAtProvider } from "@purin-labs/area-integrations/server/contract/provider-revocation";
+import { revokeAccountRemovedAtProvider } from "@purin-labs/area-integrations-contract/server/provider-revocation";
 import {
   errorResponse,
   jsonResponse,

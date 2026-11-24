@@ -26,7 +26,7 @@ import {
 } from "./connector";
 import type { Result } from "@purin-labs/kernel/result";
 import { assertNever, isRecord } from "@purin-labs/std";
-import { revokeAccountRemovedAtProvider } from "@purin-labs/area-integrations/server/contract/provider-revocation";
+import { revokeAccountRemovedAtProvider } from "@purin-labs/area-integrations-contract/server/provider-revocation";
 import { decodePathSegmentValue } from "@purin-labs/control/worker/gateway/request-helpers";
 
 export async function handleStripeConnectWebhook(

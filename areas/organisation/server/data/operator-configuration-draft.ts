@@ -31,7 +31,7 @@ import {
   jevDraftOperation,
   parseJevDraftCommand,
   type JevDraftCommand,
-} from "@purin-labs/area-integrations/server/contract/jev-draft";
+} from "@purin-labs/area-integrations-contract/server/jev-draft";
 import {
   applyOfferPriceAllowance,
   offerPriceAllowanceAlreadyApplied,

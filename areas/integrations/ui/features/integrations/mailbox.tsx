@@ -1,6 +1,6 @@
 import React from "react";
 import { ProviderTile, formatRelativeTime } from "@purin-labs/ui/page-components";
-import { PROVIDER_PRESENTATION } from "../../integration-catalogue";
+import { PROVIDER_PRESENTATION } from "@purin-labs/area-integrations-contract/ui/integration-catalogue";
 import {
   LastAttemptNotice,
   ProviderConnectAction,

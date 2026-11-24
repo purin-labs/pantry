@@ -29,7 +29,7 @@ import {
   assertNever,
   isRecord,
 } from "@purin-labs/std";
-import { createActiveAdminIntegration } from "@purin-labs/area-integrations/server/contract/admin-integration";
+import { createActiveAdminIntegration } from "@purin-labs/area-integrations-contract/server/admin-integration";
 import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse, readJsonFailure } from "@purin-labs/control/worker/gateway/request-helpers";
 
 export async function handleConfigureStripeTestCredential(

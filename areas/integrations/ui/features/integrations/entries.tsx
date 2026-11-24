@@ -5,7 +5,7 @@ import {
   type TypeSafeConnectionState,
 } from "./typesafe-connection";
 import { workspacePagePath } from "@purin-labs/ui/route";
-import { PROVIDER_PRESENTATION } from "../../integration-catalogue";
+import { PROVIDER_PRESENTATION } from "@purin-labs/area-integrations-contract/ui/integration-catalogue";
 import {
   onePasswordStatusLabel,
   type OnePasswordStatus,

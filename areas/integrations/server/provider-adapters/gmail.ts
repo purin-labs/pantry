@@ -8,7 +8,7 @@ import {
   type ProviderCleanupAdapter,
   type ProviderCleanupResult,
   type ProviderOnboardingAdapter,
-} from "../contract/provider-adapter";
+} from "@purin-labs/area-integrations-contract/server/provider-adapter";
 import {
   gmailScopesForProduct,
   parseGmailAuthorizationProduct,
@@ -17,7 +17,7 @@ import {
 import {
   GMAIL_MANUAL_INSTRUCTION as MANUAL_INSTRUCTION,
   revokeGoogleOAuthToken,
-} from "../contract/google-oauth-revocation";
+} from "@purin-labs/area-integrations-contract/server/google-oauth-revocation";
 // Google grants the OpenID shorthand "email" under its canonical identifier
 // (".../auth/userinfo.email"), so the shorthand never appears in the token
 // response's scope field and an exact granted-scope comparison against it

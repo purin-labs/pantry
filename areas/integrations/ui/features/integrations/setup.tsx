@@ -9,7 +9,7 @@ import {
   providerAttemptFailureCopy,
   type ProviderAttemptDiagnostics,
 } from "../../provider-onboarding";
-import { providerLabel } from "../../integration-catalogue";
+import { providerLabel } from "@purin-labs/area-integrations-contract/ui/integration-catalogue";
 import { ConsentPoint } from "./connect-consent-dialog";
 import { connectionNeedsAttention } from "./accounts";
 import {

@@ -38,7 +38,7 @@ import {
   StoreLine,
   type OnePasswordVaultChoice,
 } from "./store-panel";
-import "./styles.css";
+import "@purin-labs/area-integrations-contract/ui/features/vault/styles.css";
 
 type Tab = "all" | VaultItemKind | "api_key";
 

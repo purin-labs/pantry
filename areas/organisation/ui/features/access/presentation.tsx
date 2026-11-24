@@ -1,4 +1,4 @@
-import { providerLabel } from "@purin-labs/area-integrations/ui/integration-catalogue";
+import { providerLabel } from "@purin-labs/area-integrations-contract/ui/integration-catalogue";
 import type {
   AccessControlCapabilityView,
   AccessControlGrantView,

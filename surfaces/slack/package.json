@@ -16,7 +16,6 @@
     "@purin-labs/area-commerce": "workspace:*",
     "@purin-labs/area-devices": "workspace:*",
     "@purin-labs/area-inbox": "workspace:*",
-    "@purin-labs/area-integrations": "workspace:*",
     "@purin-labs/area-kitchen": "workspace:*",
     "@purin-labs/area-organisation": "workspace:*",
     "@purin-labs/authority": "workspace:*",
@@ -33,7 +32,8 @@
     "@purin-labs/type-utils": "workspace:*",
     "@purin-labs/surface-webhooks": "workspace:*",
     "@purin-labs/area-commerce-contract": "workspace:*",
-    "@purin-labs/area-brain-contract": "workspace:*"
+    "@purin-labs/area-brain-contract": "workspace:*",
+    "@purin-labs/area-integrations-contract": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20260707.1",

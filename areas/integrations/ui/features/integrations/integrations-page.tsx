@@ -24,7 +24,7 @@ import {
   providerLabel,
   providerSearchAliases,
   providerTile,
-} from "../../integration-catalogue";
+} from "@purin-labs/area-integrations-contract/ui/integration-catalogue";
 import {
   announceSupportDiagnostics,
   ownSupportDiagnostics,

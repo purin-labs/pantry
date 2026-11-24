@@ -37,7 +37,7 @@ import type {
   ProviderCleanupCredentials,
   ProviderCleanupReason,
   ProviderManualActionInstruction,
-} from "../contract/provider-adapter";
+} from "@purin-labs/area-integrations-contract/server/provider-adapter";
 import type { Variant } from "@purin-labs/type-utils";
 import { backoffDelay, isString } from "@purin-labs/std";
 import {

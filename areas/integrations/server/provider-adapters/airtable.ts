@@ -9,7 +9,7 @@ import type {
   ProviderCleanupAdapter,
   ProviderCleanupResult,
   ProviderOnboardingAdapter,
-} from "../contract/provider-adapter";
+} from "@purin-labs/area-integrations-contract/server/provider-adapter";
 
 const AIRTABLE_SCOPES = [
   "data.records:read",

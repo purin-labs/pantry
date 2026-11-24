@@ -336,7 +336,7 @@ import each of its files. A module with no line for one of these has none.
 
 ## areas/integrations
 
-- Folders: 22
+- Folders: 21
   - `areas/integrations/server/`
   - `areas/integrations/server/actors/`
   - `areas/integrations/server/agent-tools/integrations/`
@@ -350,7 +350,6 @@ import each of its files. A module with no line for one of these has none.
   - `areas/integrations/server/external-records/`
   - `areas/integrations/server/gateway/`
   - `areas/integrations/server/jev-features/`
-  - `areas/integrations/server/mail/`
   - `areas/integrations/server/provider-adapters/`
   - `areas/integrations/server/provider-lifecycle/`
   - `areas/integrations/server/provider-workflows/`
@@ -361,7 +360,17 @@ import each of its files. A module with no line for one of these has none.
   - `areas/integrations/ui/pages/`
 - Packages: `areas/integrations`
 - Tables (8): `credential_rotation`, `custom_connector`, `custom_connector_account_binding`, `custom_connector_revision`, `custom_connector_setup_attempt`, `discord_interaction_install`, `mail_classification_eligibility`, `provider_account_cleanup`
-- Public files: `areas/integrations/server/contract/`, `areas/integrations/server/mail/gmail-oauth.ts`, `areas/integrations/ui/features/integrations/archive-confirm.tsx`, `areas/integrations/ui/features/integrations/connect-consent-dialog.tsx`, `areas/integrations/ui/features/integrations/connection-dialog.tsx`, `areas/integrations/ui/features/integrations/custom-connector-api.ts`, `areas/integrations/ui/features/jev-features/api.ts`, `areas/integrations/ui/features/jev-features/facts.tsx`, `areas/integrations/ui/features/jev-features/paid-use.tsx`, `areas/integrations/ui/features/jev-features/styles.css`, `areas/integrations/ui/features/vault/styles.css`, `areas/integrations/ui/integration-catalogue.ts`, `areas/integrations/ui/provider-onboarding.tsx`
+- Public files: `areas/integrations/server/contract/`, `areas/integrations/ui/features/integrations/connect-consent-dialog.tsx`, `areas/integrations/ui/provider-onboarding.tsx`
+
+## areas/integrations/contract
+
+- Folders: 5
+  - `areas/integrations/contract/server/`
+  - `areas/integrations/contract/server/mail/`
+  - `areas/integrations/contract/ui/`
+  - `areas/integrations/contract/ui/features/integrations/`
+  - `areas/integrations/contract/ui/features/jev-features/`
+- Packages: `areas/integrations/contract`
 
 ## areas/kitchen
 

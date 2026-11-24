@@ -9,7 +9,7 @@ import {
   type ProviderCleanupAdapter,
   type ProviderCleanupResult,
   type ProviderOnboardingAdapter,
-} from "../contract/provider-adapter";
+} from "@purin-labs/area-integrations-contract/server/provider-adapter";
 import {
   newRequestId,
   parseSlackAppId,

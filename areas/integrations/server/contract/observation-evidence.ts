@@ -1,6 +1,6 @@
 import { resolveProviderManifestCredential } from "@purin-labs/authority/credential-vault/index";
 import type { ProviderManifestEvidence } from "@purin-labs/connections/data/provider-attempt";
-import type { ProviderObservationRequest } from "./provider-adapter";
+import type { ProviderObservationRequest } from "@purin-labs/area-integrations-contract/server/provider-adapter";
 
 /**
  * The bearer token of a provider whose credential is in the Vault, for a

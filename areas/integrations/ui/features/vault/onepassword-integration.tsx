@@ -7,7 +7,7 @@ import {
   StoreDetails,
   type OnePasswordVaultChoice,
 } from "./store-panel";
-import "./styles.css";
+import "@purin-labs/area-integrations-contract/ui/features/vault/styles.css";
 
 /**
  * The panel of the 1Password card on Integrations (Plan 79). Integrations

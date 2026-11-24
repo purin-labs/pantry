@@ -2,8 +2,8 @@ import { definePort } from "@purin-labs/kernel/port";
 import type {
   BegunCredentialRotation,
   CredentialRotationFailureCode,
-} from "./credential-lifecycle";
-import type { ProviderAdapterByProvider } from "./provider-adapter";
+} from "@purin-labs/area-integrations-contract/server/credential-lifecycle";
+import type { ProviderAdapterByProvider } from "@purin-labs/area-integrations-contract/server/provider-adapter";
 
 /**
  * A provider whose code is a module of its own, so that a removal deletes

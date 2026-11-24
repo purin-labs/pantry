@@ -18,7 +18,7 @@ import {
   parseProviderStartContext,
 } from "../provider-adapters/catalogue";
 import { parseActiveIntegrationProvider } from "@purin-labs/connections/data/integration-provider-directory";
-import type { ProviderStartContext } from "../contract/provider-adapter";
+import type { ProviderStartContext } from "@purin-labs/area-integrations-contract/server/provider-adapter";
 import type { Result } from "@purin-labs/kernel/result";
 import type {
   CompleteProviderInput,
@@ -26,7 +26,7 @@ import type {
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../contract/provider-lifecycle";
+} from "@purin-labs/area-integrations-contract/server/provider-lifecycle";
 import { assertNever, isRecord } from "@purin-labs/std";
 
 export async function completeProviderOAuth(input: {

@@ -9,7 +9,7 @@ import {
 } from "@purin-labs/connections/data/integration-account";
 import type { ProvisioningProviderConnectionAttempt } from "@purin-labs/connections/data/provider-attempt";
 import { persistProviderResourceSnapshot } from "@purin-labs/connections/data/provider-resource";
-import { exchangeGmailOAuthCode } from "../mail/gmail-oauth";
+import { exchangeGmailOAuthCode } from "@purin-labs/area-integrations-contract/server/mail/gmail-oauth";
 import { gmailRequiredScopesForProduct } from "../provider-adapters/gmail";
 import {
   gmailProductFromScopes,
@@ -21,7 +21,7 @@ import type {
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../contract/provider-lifecycle";
+} from "@purin-labs/area-integrations-contract/server/provider-lifecycle";
 import {
   advanceProviderPhase,
   failProviderCompletion,

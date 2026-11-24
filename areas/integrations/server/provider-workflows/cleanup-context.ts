@@ -1,6 +1,6 @@
 import type { OrganisationDatabaseSession } from "@purin-labs/kernel/database-handles";
 import type { VaultHandle } from "@purin-labs/authority/credential-vault/index";
-import type { ProviderCleanupByProvider } from "../contract/provider-adapter";
+import type { ProviderCleanupByProvider } from "@purin-labs/area-integrations-contract/server/provider-adapter";
 import type {
   IntegrationAccountId,
   OrganisationId,

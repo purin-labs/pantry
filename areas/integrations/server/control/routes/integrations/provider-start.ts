@@ -26,8 +26,8 @@ import {
   beginProviderOAuth,
   providerAuthorizationUrlForMutation,
 } from "../../../provider-lifecycle/authorization";
-import type { OnboardingProvider } from "../../../contract/provider-lifecycle";
-import type { ProviderStartContext } from "../../../contract/provider-adapter";
+import type { OnboardingProvider } from "@purin-labs/area-integrations-contract/server/provider-lifecycle";
+import type { ProviderStartContext } from "@purin-labs/area-integrations-contract/server/provider-adapter";
 import {
   type AdmittedMutation,
   admitUserMutation,

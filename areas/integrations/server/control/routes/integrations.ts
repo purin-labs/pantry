@@ -1,5 +1,5 @@
 import type { Env } from "@purin-labs/kernel/env";
-import type { OnboardingProvider } from "../../contract/provider-lifecycle";
+import type { OnboardingProvider } from "@purin-labs/area-integrations-contract/server/provider-lifecycle";
 import { assertNever } from "@purin-labs/std";
 import {
   handleAccounts,

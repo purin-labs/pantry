@@ -11,13 +11,13 @@ import {
   stripeCredentialEnvironment,
   verifyStripeConnectWebhook,
 } from "../provider-adapters/stripe";
-import type { ProviderObservationRequest } from "../contract/provider-adapter";
+import type { ProviderObservationRequest } from "@purin-labs/area-integrations-contract/server/provider-adapter";
 import { blockedEvidence } from "../contract/observation-evidence";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { linkStripePaymentAccount } from "@purin-labs/area-commerce-contract/server/stripe-link";
 import { resolveCommerceMerchant } from "@purin-labs/area-commerce-contract/server/square-link";
 
-export type { ProviderObservationRequest } from "../contract/provider-adapter";
+export type { ProviderObservationRequest } from "@purin-labs/area-integrations-contract/server/provider-adapter";
 
 export async function observeSlackConnection(
   input: ProviderObservationRequest,

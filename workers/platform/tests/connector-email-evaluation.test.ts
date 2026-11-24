@@ -45,10 +45,10 @@ vi.mock(
   }),
 );
 vi.mock(
-  "@purin-labs/area-integrations/server/mail/gmail-oauth",
+  "@purin-labs/area-integrations-contract/server/mail/gmail-oauth",
   async (importOriginal) => ({
     ...(await importOriginal<
-      typeof import("@purin-labs/area-integrations/server/mail/gmail-oauth")
+      typeof import("@purin-labs/area-integrations-contract/server/mail/gmail-oauth")
     >()),
     resolveGmailAccessToken: credentialMocks.resolveGmailAccessToken,
   }),

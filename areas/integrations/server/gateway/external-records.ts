@@ -28,7 +28,7 @@ import {
 import { resolveActiveProviderConnectionCredential } from "@purin-labs/authority/credential-vault/provider-connection-resolution";
 import { connectExternalRecordsIntegration } from "../external-records/connection";
 import { resolveExternalRecordsAccessToken } from "../external-records/oauth";
-import { requireOrganisationEnvironment } from "../contract/admin-integration";
+import { requireOrganisationEnvironment } from "@purin-labs/area-integrations-contract/server/admin-integration";
 import {
   fieldErrorResponse,
   isAuthorizedOrganisationAdminRequest,

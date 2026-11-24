@@ -7,7 +7,7 @@ import { shopifyCleanupAdapter } from "@purin-labs/area-integrations/shopify/pro
 import { slackCleanupAdapter } from "@purin-labs/area-integrations/server/provider-adapters/slack";
 import { stripeCleanupAdapter } from "@purin-labs/area-integrations/server/provider-adapters/stripe";
 import { whatsappCleanupAdapter } from "@purin-labs/area-integrations/server/provider-adapters/whatsapp";
-import type { ProviderCleanupCredentials } from "@purin-labs/area-integrations/server/contract/provider-adapter";
+import type { ProviderCleanupCredentials } from "@purin-labs/area-integrations-contract/server/provider-adapter";
 import { requireIntegrationAccountId, requireOrganisationId } from "./test-ids";
 
 const ORGANISATION_ID = requireOrganisationId("organisation_cleanup_adapters");

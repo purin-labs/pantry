@@ -60,7 +60,7 @@ import type {
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../contract/provider-lifecycle";
+} from "@purin-labs/area-integrations-contract/server/provider-lifecycle";
 import type { Result } from "@purin-labs/kernel/result";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
@@ -75,7 +75,7 @@ import {
   type ProviderManualActionInstruction,
   type ProviderStartContext,
   type ProviderStartContextByProvider,
-} from "../contract/provider-adapter";
+} from "@purin-labs/area-integrations-contract/server/provider-adapter";
 import { providerModules } from "../contract/provider-modules";
 import {
   PROVIDER_DATA_CLASSES,

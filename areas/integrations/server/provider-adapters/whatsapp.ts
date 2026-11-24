@@ -16,7 +16,7 @@ import type {
   ProviderCleanupAdapter,
   ProviderCleanupResult,
   ProviderOnboardingAdapter,
-} from "../contract/provider-adapter";
+} from "@purin-labs/area-integrations-contract/server/provider-adapter";
 
 const MANUAL_INSTRUCTION = "remove_whatsapp_access_in_meta" as const;
 const WHATSAPP_SCOPES = [

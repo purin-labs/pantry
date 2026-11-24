@@ -9,7 +9,7 @@ import {
   type ProviderCleanupResult,
   type ProviderOnboardingAdapter,
   type SquareApplication,
-} from "../contract/provider-adapter";
+} from "@purin-labs/area-integrations-contract/server/provider-adapter";
 import type { DiscoveredProviderResource } from "@purin-labs/connections/data/provider-resource";
 import type {
   SquareDelegation,
@@ -39,12 +39,12 @@ const SQUARE_SCOPES = [
 ] as const;
 
 const squareApplication = Symbol("SquareApplication");
-declare module "../contract/provider-adapter" {
+declare module "@purin-labs/area-integrations-contract/server/provider-adapter" {
   interface SquareApplication {
     readonly [squareApplication]: true;
   }
 }
-export type { SquareApplication } from "../contract/provider-adapter";
+export type { SquareApplication } from "@purin-labs/area-integrations-contract/server/provider-adapter";
 
 type SquareConfiguration =
   | { readonly kind: "unconfigured" }

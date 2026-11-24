@@ -25,7 +25,7 @@ import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { reconcileProviderManifestObservations } from "@purin-labs/area-integrations/server/provider-lifecycle/observation";
-import { reconcileInterruptedProviderCredentialCutovers } from "@purin-labs/area-integrations/server/contract/credential-cutover";
+import { reconcileInterruptedProviderCredentialCutovers } from "@purin-labs/area-integrations-contract/server/credential-cutover";
 import { sweepVaultAlerts } from "@purin-labs/authority/credential-vault/alerts";
 import { reconcileOrganisationEmailWatches } from "@purin-labs/surface-email/server/mail/watch-reconciliation";
 import {

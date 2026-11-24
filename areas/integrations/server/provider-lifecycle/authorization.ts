@@ -17,7 +17,7 @@ import {
   providerStateTtlMs,
   providerUsesPkce,
 } from "../provider-adapters/catalogue";
-import type { ProviderStartContext } from "../contract/provider-adapter";
+import type { ProviderStartContext } from "@purin-labs/area-integrations-contract/server/provider-adapter";
 import type { Result } from "@purin-labs/kernel/result";
 import { requirePublicOrigin } from "@purin-labs/kernel/public-origin";
 import { readSquareConfiguration } from "../provider-adapters/square";
@@ -25,9 +25,9 @@ import type {
   OnboardingProvider,
   ProviderOnboardingError,
   ProviderOAuthStartEnv,
-} from "../contract/provider-lifecycle";
+} from "@purin-labs/area-integrations-contract/server/provider-lifecycle";
 import { encodeBase64Url } from "@purin-labs/std";
-export type { ProviderOAuthStartEnv } from "../contract/provider-lifecycle";
+export type { ProviderOAuthStartEnv } from "@purin-labs/area-integrations-contract/server/provider-lifecycle";
 
 type ProviderAuthorizationMutationFence = Pick<
   ProviderAttemptMutation,

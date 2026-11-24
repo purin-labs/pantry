@@ -1,7 +1,10 @@
 import React from "react";
 import { Check, Circle, CircleAlert } from "lucide-react";
 
-import { providerLabel, providerTile } from "../../integration-catalogue";
+import {
+  providerLabel,
+  providerTile,
+} from "@purin-labs/area-integrations-contract/ui/integration-catalogue";
 import { ProviderTile } from "@purin-labs/ui/page-components";
 import { AuthorizationScreen } from "@purin-labs/ui/index";
 

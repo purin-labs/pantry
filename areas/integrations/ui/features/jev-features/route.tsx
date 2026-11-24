@@ -13,16 +13,19 @@ import {
   changeJevFeature,
   jevFeatureErrorMessage,
   readJevFeatures,
-} from "./api";
+} from "@purin-labs/area-integrations-contract/ui/features/jev-features/api";
 import {
   JEV_PAID_USE_ID,
   JevUsePrompt,
   PaidUseSection,
   microDollars,
   resetDate,
-} from "./paid-use";
-import { JevFacts, type JevFact } from "./facts";
-import "./styles.css";
+} from "@purin-labs/area-integrations-contract/ui/features/jev-features/paid-use";
+import {
+  JevFacts,
+  type JevFact,
+} from "@purin-labs/area-integrations-contract/ui/features/jev-features/facts";
+import "@purin-labs/area-integrations-contract/ui/features/jev-features/styles.css";
 
 /**
  * Settings › Jev (Plan 88 section 2): one switch for each Pantry feature that

@@ -57,7 +57,7 @@ import { applyCommerceDelivery } from "@purin-labs/area-commerce/server/actors/c
 import { normalizeCommerceDelivery } from "@purin-labs/area-commerce/server/commerce-wasm";
 import { connectionParts } from "@purin-labs/area-integrations/server/contract/connection-parts";
 import { providerModules } from "@purin-labs/area-integrations/server/contract/provider-modules";
-import { providerServices } from "@purin-labs/area-integrations/server/contract/provider-services";
+import { providerServices } from "@purin-labs/area-integrations-contract/server/provider-services";
 import { readProviderCleanupContext } from "@purin-labs/area-integrations/server/provider-adapters/catalogue";
 import { reconcileProviderManifestObservations } from "@purin-labs/area-integrations/server/provider-lifecycle/observation";
 import { shopifyCommerceProvider } from "@purin-labs/area-integrations/shopify/commerce-provider";

@@ -1,7 +1,7 @@
 import { isRecord } from "@purin-labs/std";
 
 import type { CredentialAccountRecord } from "@purin-labs/control-api/portal/credential-inventory";
-import { providerLabel } from "../../integration-catalogue";
+import { providerLabel } from "@purin-labs/area-integrations-contract/ui/integration-catalogue";
 import type { IntegrationRouteId } from "../integrations/model";
 
 /**

@@ -28,7 +28,7 @@ import type {
 import {
   activateProviderCredentialCutover,
   type ProviderCredentialCutoverError,
-} from "./credential-cutover";
+} from "@purin-labs/area-integrations-contract/server/credential-cutover";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   parseVaultHandle,
@@ -42,7 +42,7 @@ import type {
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "./provider-lifecycle";
+} from "@purin-labs/area-integrations-contract/server/provider-lifecycle";
 import { encodeBase64Url } from "@purin-labs/std";
 
 export async function advanceProviderPhase(

@@ -12,14 +12,14 @@ import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { MessageCircle, FileCode2 } from "lucide-react";
 import { useNavigate, type NavigateFunction } from "react-router";
-import { ConnectionDialog } from "./connection-dialog";
+import { ConnectionDialog } from "@purin-labs/area-integrations-contract/ui/features/integrations/connection-dialog";
 import { ConnectorAuthoringAssistant } from "./connector-authoring";
 import {
   IntegrationsOverview,
   type IntegrationDirectoryContent,
 } from "./overview";
 
-import { customConnectorCollectionPath, customConnectorActionPath, customConnectorPath, customConnectorRevisionPath, customConnectorSetupCollectionPath, customConnectorSetupPath, mutateCustomConnector, mutateCustomConnectorAction, readCustomConnectorCatalog, readCustomConnectorAction, readCustomConnectorDetail, readCustomConnectorSetup, type CustomConnectorDetail, type CustomConnectorRevisionAction } from "./custom-connector-api";
+import { customConnectorCollectionPath, customConnectorActionPath, customConnectorPath, customConnectorRevisionPath, customConnectorSetupCollectionPath, customConnectorSetupPath, mutateCustomConnector, mutateCustomConnectorAction, readCustomConnectorCatalog, readCustomConnectorAction, readCustomConnectorDetail, readCustomConnectorSetup, type CustomConnectorDetail, type CustomConnectorRevisionAction } from "@purin-labs/area-integrations-contract/ui/features/integrations/custom-connector-api";
 import type { CustomConnectorAccountView, CustomConnectorAction, CustomConnectorWritePreview, CustomConnectorJsonValue, CustomConnectorMutationResult, CustomConnectorRevisionView, CustomConnectorSetupAttempt, CustomConnectorSummary } from "@purin-labs/control-api/portal/custom-connectors";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, errorMessage, isRecord } from "@purin-labs/std";

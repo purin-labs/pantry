@@ -10,7 +10,7 @@ import {
 } from "@purin-labs/control/portal/mutation-state";
 import type { ProviderConnectionState } from "../../provider-onboarding";
 import { formatLifecycle } from "@purin-labs/ui/formatting";
-import type { Provider } from "../../integration-catalogue";
+import type { Provider } from "@purin-labs/area-integrations-contract/ui/integration-catalogue";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { loadOnePasswordIntegrationPanel } from "./integrations-page";

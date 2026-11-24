@@ -108,7 +108,7 @@ import {
   customConnectorPath,
   customConnectorRevisionPath,
   mutateCustomConnector,
-} from "@purin-labs/area-integrations/ui/features/integrations/custom-connector-api";
+} from "@purin-labs/area-integrations-contract/ui/features/integrations/custom-connector-api";
 import { createProjectChat, forkChatThread, makeDefaultProject, cancelChat, ChatDraftConflictError, ChatNotRunningError, ChatAccessError, markChatRead, rateChatResponse, readChat, saveChatDraft, updateChatConversation } from "./api";
 import { sendChat } from "./screen-send";
 import type { Chat, ChatConversationSummary, ChatMessage, ChatModelOption, ChatPageData, ChatTimelineView, ChatAttachmentView } from "@purin-labs/control-api/portal/chat";

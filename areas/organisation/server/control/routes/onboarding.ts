@@ -54,7 +54,7 @@ import {
   resolveOrganisationModelRoute,
 } from "@purin-labs/agent/models/route";
 import { holdOrganisationPolicyDistribution } from "@purin-labs/authority/policy-snapshot";
-import { providerServices } from "@purin-labs/area-integrations/server/contract/provider-services";
+import { providerServices } from "@purin-labs/area-integrations-contract/server/provider-services";
 import {
   admitUserMutation,
   controlMutationIdentity,

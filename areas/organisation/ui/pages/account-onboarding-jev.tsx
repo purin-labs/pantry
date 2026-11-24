@@ -7,7 +7,7 @@ import {
 import {
   changeJevFeature,
   jevFeatureErrorMessage,
-} from "@purin-labs/area-integrations/ui/features/jev-features/api";
+} from "@purin-labs/area-integrations-contract/ui/features/jev-features/api";
 import { organisationPath, workspacePagePath } from "@purin-labs/ui/route";
 
 /**

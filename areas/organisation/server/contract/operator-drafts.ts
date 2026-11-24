@@ -11,7 +11,7 @@ import type { WorkflowChangeCommand } from "@purin-labs/area-kitchen-contract/se
 import type {
   JevDraftCommand,
   JevDraftRefusal,
-} from "@purin-labs/area-integrations/server/contract/jev-draft";
+} from "@purin-labs/area-integrations-contract/server/jev-draft";
 import type { OfferPriceAllowanceCommand } from "@purin-labs/area-commerce-contract/server/offer-price-allowance";
 
 // The configuration drafts that an operator or the chat agent asks for and a

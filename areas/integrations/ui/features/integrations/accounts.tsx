@@ -6,7 +6,7 @@ import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import {
   providerDisconnectedConsequence,
   providerLabel,
-} from "../../integration-catalogue";
+} from "@purin-labs/area-integrations-contract/ui/integration-catalogue";
 import { assertNever } from "@purin-labs/std";
 import { authorizationServiceName } from "./provider-authorization";
 import {

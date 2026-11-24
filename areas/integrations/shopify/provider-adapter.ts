@@ -6,7 +6,7 @@ import {
   type ProviderCleanupAdapter,
   type ProviderCleanupResult,
   type ProviderOnboardingAdapter,
-} from "@purin-labs/area-integrations/server/contract/provider-adapter";
+} from "@purin-labs/area-integrations-contract/server/provider-adapter";
 import { bytesToHex, isRecord } from "@purin-labs/std";
 
 const MANUAL_INSTRUCTION = "remove_shopify_app_in_shopify" as const;

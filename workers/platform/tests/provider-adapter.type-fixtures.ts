@@ -1,7 +1,7 @@
 import type {
   ProviderAdapterByProvider,
   ProviderCleanupByProvider,
-} from "@purin-labs/area-integrations/server/contract/provider-adapter";
+} from "@purin-labs/area-integrations-contract/server/provider-adapter";
 import { PROVIDER_ADAPTERS } from "@purin-labs/area-integrations/server/provider-adapters/catalogue";
 
 // @ts-expect-error A compiled catalogue must contain every active provider.

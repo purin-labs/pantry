@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 
-import { providerLabel } from "../integration-catalogue";
+import { providerLabel } from "@purin-labs/area-integrations-contract/ui/integration-catalogue";
 import type { SupportDiagnostics } from "@purin-labs/control-api/portal/settings";
 
 /**

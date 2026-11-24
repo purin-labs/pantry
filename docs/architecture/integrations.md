@@ -782,7 +782,7 @@ test and the commit stay human steps. Keys never enter chat or prompts.
 Paths are under `/v1/control/organisations/:organisationId/custom-connectors`
 ([`control/routes/custom-connectors.ts`](../../areas/integrations/server/control/routes/custom-connectors.ts);
 portal client
-[`custom-connector-api.ts`](../../areas/integrations/ui/features/integrations/custom-connector-api.ts)).
+[`custom-connector-api.ts`](../../areas/integrations/contract/ui/features/integrations/custom-connector-api.ts)).
 Mutations use the control session, CSRF, idempotency, the configuration version
 fence and the mutation receipt. Reads are `no-store`. Viewers read metadata.
 Owners and admins make every change.

@@ -10,7 +10,7 @@ import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mut
 import { createAuthorizingProviderAttempt } from "@purin-labs/connections/data/provider-attempt";
 import { gmailProductFromScopes } from "@purin-labs/connections/mail/gmail-authorization";
 import { parseWorkspaceId, type WorkspaceId } from "@purin-labs/kernel/ids";
-import type { ProviderStartContext } from "@purin-labs/area-integrations/server/contract/provider-adapter";
+import type { ProviderStartContext } from "@purin-labs/area-integrations-contract/server/provider-adapter";
 import {
   discoverSlackChannels,
   parseSlackChannelPage,

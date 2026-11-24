@@ -34,7 +34,7 @@ import type {
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "@purin-labs/area-integrations/server/contract/provider-lifecycle";
+} from "@purin-labs/area-integrations-contract/server/provider-lifecycle";
 import {
   advanceProviderPhase,
   failProviderCompletion,

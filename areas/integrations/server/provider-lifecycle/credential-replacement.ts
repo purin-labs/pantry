@@ -3,7 +3,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import type {
   BegunCredentialRotation,
   CredentialRotationFailureCode,
-} from "../contract/credential-lifecycle";
+} from "@purin-labs/area-integrations-contract/server/credential-lifecycle";
 import { validateExternalProviderToken } from "@purin-labs/connections/external-records/records";
 import { providerModules } from "../contract/provider-modules";
 import {

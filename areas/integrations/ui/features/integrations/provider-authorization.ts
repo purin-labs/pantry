@@ -4,7 +4,7 @@ import React from "react";
 import { toast } from "sonner";
 import { initialFileAccessPath } from "@purin-labs/ui/route";
 import type { OrganisationMutation } from "@purin-labs/control/portal/mutation-state";
-import { providerLabel } from "../../integration-catalogue";
+import { providerLabel } from "@purin-labs/area-integrations-contract/ui/integration-catalogue";
 import type { VariantBy } from "@purin-labs/type-utils";
 import {
   assertNever,

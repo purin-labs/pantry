@@ -28,14 +28,14 @@ import {
   type ProviderCleanupResult,
   type ProviderObservationRequest,
   type ProviderOnboardingAdapter,
-} from "../contract/provider-adapter";
+} from "@purin-labs/area-integrations-contract/server/provider-adapter";
 import { providerCallbackUri } from "../provider-lifecycle/authorization";
 import type {
   CompleteProviderInput,
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../contract/provider-lifecycle";
+} from "@purin-labs/area-integrations-contract/server/provider-lifecycle";
 import {
   advanceProviderPhase,
   failProviderCompletion,

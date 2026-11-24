@@ -34,12 +34,12 @@ import type {
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../contract/provider-lifecycle";
+} from "@purin-labs/area-integrations-contract/server/provider-lifecycle";
 import {
   readSquareConfiguration,
   squareOnboardingAdapter,
 } from "../provider-adapters/square";
-import type { ProviderObservationRequest } from "../contract/provider-adapter";
+import type { ProviderObservationRequest } from "@purin-labs/area-integrations-contract/server/provider-adapter";
 import type { Result } from "@purin-labs/kernel/result";
 
 /**

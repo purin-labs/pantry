@@ -54,7 +54,7 @@ import {
   inventoryCasePurpose,
   pinnedAgentForAutomation,
 } from "./support";
-import { requireOrganisationEnvironment } from "@purin-labs/area-integrations/server/contract/admin-integration";
+import { requireOrganisationEnvironment } from "@purin-labs/area-integrations-contract/server/admin-integration";
 
 export const CUE_DELIVERY_LEASE_MS = 30_000;
 
