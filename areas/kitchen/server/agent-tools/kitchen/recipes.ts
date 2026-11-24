@@ -1,7 +1,7 @@
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { RecipeSaveRequest } from "./services";
-import type { RecipeDraft } from "../../recipe-commands";
+import type { RecipeDraft } from "../../contract/recipe-draft";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { defineKitchenTool } from "./services";
 import { ProposalArgumentError } from "@purin-labs/agent-tools/errors";

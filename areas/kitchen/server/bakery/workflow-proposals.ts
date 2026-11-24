@@ -5,10 +5,8 @@ import {
   proposalChangeSummary,
   proposalDraftMerge,
   proposalOverlap,
-  type ProposalChangeSummary,
   type WorkflowChange,
 } from "@purin-labs/bakery-workflow/changes";
-import type { RunFinding } from "@purin-labs/bakery-workflow/findings";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ControlSessionId, OrganisationId } from "@purin-labs/kernel/ids";
@@ -21,28 +19,14 @@ import {
   readWorkflowFindings,
   signalBakeryWorkflowApplied,
   storeWorkflowDocument,
-  type WorkflowRevisionReceipt,
 } from "./workflow-revisions";
+import type {
+  ApprovedWorkflowChange,
+  WorkflowChangeCommand,
+  WorkflowRevisionReceipt,
+} from "../contract/workflow-changes";
 
-/**
- * Plan 84: an agent's proposed change to a recipe. It lives as a configuration draft
- * with the exact digests, in a layer apart from the shared draft. Only the approval
- * of the person who asked writes a revision.
- */
-export type WorkflowChangeCommand = Readonly<{
-  workflowId: string;
-  title: string;
-  baseDigest: string;
-  proposedDigest: string;
-  /** Model text from a private chat, which only the person who asked reads. */
-  reason: string;
-  /** Copied from the run, so a later run does not change what the person reads. */
-  findings: readonly RunFinding[];
-  change: ProposalChangeSummary;
-  sessionId: string;
-  turnId: string;
-  operationId: string;
-}>;
+export type { WorkflowChangeCommand } from "../contract/workflow-changes";
 
 type PreparedWorkflowProposal =
   | Readonly<{ kind: "ready"; command: WorkflowChangeCommand }>
@@ -155,14 +139,6 @@ function problemText(
     .map((problem) => problem.message)
     .join(" ");
 }
-
-type ApprovedWorkflowChange =
-  | Readonly<{ kind: "applied"; receipt: WorkflowRevisionReceipt }>
-  | Readonly<{ kind: "revision_conflict" }>
-  | Readonly<{ kind: "human_intervention"; steps: readonly string[] }>
-  | Readonly<{ kind: "invalid" }>
-  /** The revision is applied and the draft is not updated. A retry finishes it. */
-  | Readonly<{ kind: "draft_unavailable" }>;
 
 /**
  * Applies an approved proposal. A retry after a lost process reaches the first check

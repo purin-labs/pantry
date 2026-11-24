@@ -52,7 +52,7 @@ import type {
   LotCostSaveTool,
   SupplyCostSaveRequest,
   SupplyCostSaveTool,
-} from "./costs";
+} from "../../contract/costs-tools";
 import {
   collaborationEditDeadline,
   collaborationMember,

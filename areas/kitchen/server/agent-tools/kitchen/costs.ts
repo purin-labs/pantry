@@ -2,7 +2,6 @@ import {
   META_SAVED_AT_CELL_KEY,
   isCostsSheetCellEntry,
   isCostsSheetCellKey,
-  type CostsSheetCell,
   type CostsSheetCellChange,
 } from "@purin-labs/costs-sheet-crdt";
 import { ProposalArgumentError } from "@purin-labs/agent-tools/errors";
@@ -12,31 +11,26 @@ import {
   LOT_INVOICE_LIMITS,
   lotCostLineProblem,
   normalizeCostForecastPlan,
-  type ActualsWindowDays,
-  type BakeryCostCalculation,
-  type CalculatedSupplyUsage,
   type CostForecastPlan,
   type CostUnit,
   type CostValuationBasis,
-  type CostsOverview,
   type ForecastDemandCurve,
-  type ForecastSummary,
   type ForecastSupplierTerms,
-  type OrganisationCostPlan,
-  type PlanVsActualStatusTone,
-  type PlanVsActualSummary,
-  type PlanVsActualVarianceDriver,
   type ProductCostPlanEntry,
   type SupplyCostBulkTier,
-  type SupplyCostItem,
-  type SupplyLotCost,
   type WeekUnits,
 } from "@purin-labs/kitchen-control-api";
-import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { defineKitchenTool } from "./services";
-import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
+import type {
+  CostsPlanSaveRequest,
+  CostsReadForecastScenario,
+  CostsReadRequest,
+  CostsSheetEditRequest,
+  LotCostSaveRequest,
+  SupplyCostSaveRequest,
+} from "../../contract/costs-tools";
 
 const COST_UNITS: ReadonlySet<string> = new Set([
   "each",
@@ -51,223 +45,6 @@ const LOT_COST_BASES: ReadonlySet<string> = new Set([
   "fifo_lot",
   "weighted_lot",
 ]);
-
-type CostsReadTarget = Readonly<{
-  targetId: string;
-  unitsPerDay: number;
-}>;
-
-type CostsReadForecastScenario = Readonly<{
-  openingCashMinor?: number | null;
-  demandCurve?: ForecastDemandCurve | null;
-  supplierTerms?: ForecastSupplierTerms | null;
-  extraShiftThresholdPct?: number | null;
-  extraShiftWeeklyMinor?: number | null;
-  capexMinor?: number | null;
-}>;
-
-export type CostsReadRequest = Readonly<{
-  dailyTargets: readonly CostsReadTarget[] | null;
-  bakeShelfWastePct: number | null;
-  prepRejectPct: number | null;
-  channelFeeBps: number | null;
-  includedTaxBps: number | null;
-  applyBulkTiers: boolean | null;
-  lotCostBasis?: CostValuationBasis | null;
-  actualsWindowDays?: ActualsWindowDays | null;
-  forecast?: CostsReadForecastScenario | null;
-}>;
-
-export type CostsToolRead = Readonly<{
-  currency: string;
-  merchantRevision: number;
-  defaultIncludedTaxBps: number;
-  includedTaxSource: CostsOverview["includedTaxSource"];
-  measuredWaste: CostsOverview["measuredWaste"];
-  costPlan: OrganisationCostPlan;
-  assumptions: BakeryCostCalculation["assumptions"];
-  summary: BakeryCostCalculation["summary"] &
-    Readonly<{ reorderSupplyCount?: number }>;
-  supplies: readonly Readonly<{
-    id: string;
-    name: string;
-    category: SupplyCostItem["category"];
-    baseUnit: CostUnit;
-    expectedEntryRevision: number | null;
-    packQty?: number | null;
-    packUnit?: CostUnit | null;
-    packPriceMinor?: number | null;
-    bulkTier?: SupplyCostBulkTier;
-    dailyQty: number;
-    sevenDayQty: number;
-    dailyCostMinor: number;
-    daysOfSupply?: number;
-    reorderSuggested?: true;
-    usedInProductCount?: number;
-    bulkUnlocked?: true;
-    costSource?: CalculatedSupplyUsage["costSource"];
-    activeLotCount?: number;
-    pricedLotCount?: number;
-    fifoEquivalentPackPriceMinor?: number | null;
-    weightedEquivalentPackPriceMinor?: number | null;
-    lotCostVariancePct?: number | null;
-    weeklyLotVarianceImpactMinor?: number;
-  }>[];
-  lots?: readonly Readonly<{
-    id: SupplyLotCost["id"];
-    inventoryItemId: SupplyLotCost["inventoryItemId"];
-    lotCode: SupplyLotCost["lotCode"];
-    receivedAt: SupplyLotCost["receivedAt"];
-    remainingQuantity: SupplyLotCost["remainingQuantity"];
-    baseUnit: SupplyLotCost["baseUnit"];
-    lifecycle: SupplyLotCost["lifecycle"];
-    invoiceCost: Readonly<{
-      revision: number;
-      currency: string;
-      invoicedQuantity: number;
-      invoicedUnit: CostUnit;
-      invoiceTotalMinor: number;
-      invoiceReference: string | null;
-      supplierId: string | null;
-    }> | null;
-  }>[];
-  products: readonly Readonly<{
-    productId: string;
-    title: string;
-    kind: "stocked" | "prepared";
-    batchYield?: number;
-    spoilPct?: number;
-    weekUnits: WeekUnits;
-    targetUnits: number;
-    batchesPerDay?: number;
-    producedUnits: number;
-    priceMinor: number;
-    bomUnitCostMinor?: number;
-    unitCostMinor: number;
-    marginPct: number;
-    dailyMarginMinor: number;
-    bomLines?: readonly Readonly<{
-      itemId: string;
-      qtyPerUnit: number;
-      unit: CostUnit;
-      unitCostMinor: number;
-    }>[];
-    missingCosts?: readonly string[];
-  }>[];
-  unlinkedRecipes: readonly Readonly<{
-    recipeId: string;
-    name: string;
-    outputKind: "stocked" | "immediate";
-    batchYield: number;
-    totalBatchCostMinor: number;
-    rawUnitCostMinor: number;
-  }>[];
-  actuals?: Readonly<{
-    windowDays: ActualsWindowDays;
-    summary: PlanVsActualSummary;
-    drivers: readonly PlanVsActualVarianceDriver[];
-    products: readonly Readonly<{
-      productId: string;
-      title: string;
-      plannedUnits: number;
-      actualUnitsSold: number;
-      volumeDeltaUnits: number;
-      theoreticalUnitCogsMinor: number;
-      actualUnitCogsMinor: number;
-      plannedWastePct: number;
-      actualWastePct: number | null;
-      plannedMarginPct: number;
-      actualMarginPct: number | null;
-      profitDeltaMinor: number;
-      statusTone: PlanVsActualStatusTone;
-      primaryNote: string;
-    }>[];
-  }>;
-  forecast?: Readonly<{
-    summary: ForecastSummary;
-    weeks: readonly Readonly<{
-      weekCode: string;
-      demandIndexPct: number;
-      grossSalesMinor: number;
-      cogsMinor: number;
-      laborMinor: number;
-      extraShiftActive?: true;
-      extraBulkTiersUnlocked?: number;
-      operatingProfitMinor: number;
-      lumpOutflowMinor: number;
-      endingCashMinor: number;
-    }>[];
-  }>;
-  draftCells?: readonly CostsSheetCell[];
-}>;
-
-export type CostsReadTool = (
-  request: CostsReadRequest,
-) => Promise<CostsToolRead>;
-
-export type SupplyCostSaveRequest = Readonly<{
-  inventoryItemId: string;
-  expectedEntryRevision: number | null;
-  currency: string;
-  packQuantity: number;
-  packUnit: CostUnit;
-  packPriceMinor: number;
-  supplierId: string | null;
-  bulkTier: SupplyCostBulkTier | null;
-  notes: string | null;
-}>;
-
-export type SupplyCostSaveTool = (
-  request: SupplyCostSaveRequest,
-  operationId: string,
-) => Promise<PreparedEffect>;
-
-export type LotCostSaveRequest = Readonly<{
-  lotId: string;
-  inventoryItemId: string;
-  expectedRevision: number | null;
-  currency: string;
-  invoicedQuantity: number;
-  invoicedUnit: CostUnit;
-  invoiceTotalMinor: number;
-  invoiceReference: string;
-  supplierId: string | null;
-}>;
-
-export type LotCostSaveTool = (
-  request: LotCostSaveRequest,
-  operationId: string,
-) => Promise<PreparedEffect>;
-
-export type CostsPlanSaveRequest = Readonly<{
-  expectedPlanRevision: number | null;
-  dailyLaborMinor: number | null;
-  dailyRentMinor: number | null;
-  products: readonly ProductCostPlanEntry[] | null;
-  forecast?: CostForecastPlan | null;
-}>;
-
-export type CostsPlanSaveTool = (
-  request: CostsPlanSaveRequest,
-  operationId: string,
-) => Promise<PreparedEffect>;
-
-export type CostsSheetEditRequest = Readonly<{
-  changes: readonly CostsSheetCellChange[];
-}>;
-
-export type CostsSheetEditResult = Readonly<{
-  documentId: "costs-sheet";
-  revision: number;
-  generation: number;
-  cells: readonly CostsSheetCell[];
-}>;
-
-export type CostsSheetEditTool = (
-  request: CostsSheetEditRequest,
-  operationId: string,
-  execution: CatalogExecutionContext,
-) => Promise<PreparedEffect>;
 
 export const costsRead = defineKitchenTool({
   name: "costs_read",

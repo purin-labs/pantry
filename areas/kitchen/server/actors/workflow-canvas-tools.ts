@@ -1,29 +1,10 @@
-import {
-  parseWorkflowCanvasSource,
-  type WorkflowCanvasSource,
-} from "@purin-labs/bakery-model/bakery-canvas-source";
+import { parseWorkflowCanvasSource } from "@purin-labs/bakery-model/bakery-canvas-source";
 import { CanvasMove } from "@purin-labs/workflow-canvas-crdt";
 import { hasExactKeys, isPositiveInteger, isRecord } from "@purin-labs/std";
-import type { WorkflowCanvasRead } from "./workflow-canvas";
-import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
-import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
-
-export type WorkflowCanvasReadRequest = Readonly<{
-  reference: WorkflowCanvasSource;
-}>;
-export type WorkflowCanvasMoveRequest = Readonly<{
-  reference: WorkflowCanvasSource;
-  destination: CanvasMove;
-  expectedRevision: number;
-}>;
-export type WorkflowCanvasReadTool = (
-  request: WorkflowCanvasReadRequest,
-) => Promise<WorkflowCanvasRead>;
-export type WorkflowCanvasMoveTool = (
-  request: WorkflowCanvasMoveRequest,
-  operationId: string,
-  boundary: CatalogExecutionContext,
-) => Promise<PreparedEffect>;
+import type {
+  WorkflowCanvasMoveRequest,
+  WorkflowCanvasReadRequest,
+} from "../contract/workflow-canvas";
 
 export function parseWorkflowCanvasReadArgs(
   args: readonly unknown[],

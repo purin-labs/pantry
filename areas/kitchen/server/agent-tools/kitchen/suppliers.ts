@@ -1,10 +1,10 @@
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import type { SupplierCreateRequest } from "./services";
+import type { SupplierCreateField, SupplierCreateRequest } from "./services";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import { defineKitchenTool } from "./services";
 
-export const SUPPLIER_CREATE_FIELDS = [
+const SUPPLIER_CREATE_FIELDS = [
   "displayName",
   "legalName",
   "countryCode",
@@ -16,7 +16,7 @@ export const SUPPLIER_CREATE_FIELDS = [
   "minimumOrderUnit",
   "purchasingNotes",
   "inventoryItemIds",
-] as const;
+] as const satisfies readonly SupplierCreateField[];
 
 export const supplierRead = defineKitchenTool({
   name: "supplier_read",

@@ -9,6 +9,7 @@ import type {
 } from "@purin-labs/commerce-client";
 import type { RecipeRevision } from "@purin-labs/commerce-contracts";
 import { canonicalJson } from "@purin-labs/std";
+import type { RecipeDraft } from "./contract/recipe-draft";
 
 /**
  * The recipe library (Kitchen › Recipes). A person's page and the Portal
@@ -19,15 +20,6 @@ import { canonicalJson } from "@purin-labs/std";
 type RecipeContext = Readonly<{
   client: CommerceAdminClient;
   merchantId: string;
-}>;
-
-/** What a save asks for. A null recipe revision means a new recipe. */
-export type RecipeDraft = Readonly<{
-  recipeId: string;
-  expectedRecipeRevision: number | null;
-  name: string;
-  inputs: RecipeRevision["inputs"];
-  output: RecipeRevision["output"];
 }>;
 
 export type RecipeSaveResult =

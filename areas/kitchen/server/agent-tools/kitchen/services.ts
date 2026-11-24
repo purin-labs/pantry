@@ -21,17 +21,17 @@ import type {
   BakeStockLevelInput,
   RecipeItem,
 } from "@purin-labs/kitchen-control-api";
-import type { AgentRunSaveVerification } from "../../bakery/agent-run-save";
-import type { AgentScenarioSaveResult } from "../../bakery/agent-scenario-save";
 import type {
+  AgentRunSaveVerification,
+  AgentScenarioSaveResult,
   SavedBakeryRunQuery,
   SavedBakeryRunResult,
-} from "../../bakery/saved-runs";
-import type { RecipeDraft } from "../../recipe-commands";
+} from "../../contract/saved-bakery-runs";
+import type { RecipeDraft } from "../../contract/recipe-draft";
 import type {
   WorkflowCanvasMoveTool,
   WorkflowCanvasReadTool,
-} from "../../actors/workflow-canvas-tools";
+} from "../../contract/workflow-canvas";
 import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
 import { defineToolFamily } from "@purin-labs/agent-tools/define-tool";
 import { ToolRequestError } from "@purin-labs/agent-tools/errors";
@@ -41,8 +41,7 @@ import type {
   CostsSheetEditTool,
   LotCostSaveTool,
   SupplyCostSaveTool,
-} from "./costs";
-import type { SUPPLIER_CREATE_FIELDS } from "./suppliers";
+} from "../../contract/costs-tools";
 import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
 import type { CommerceToolReads } from "@purin-labs/area-commerce/server/contract/tool-reads";
 import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
@@ -206,9 +205,23 @@ export type SupplierToolRead = Readonly<{
 
 type SupplierReadTool = () => Promise<SupplierToolRead>;
 
+/** One field of the Add supplier form. */
+export type SupplierCreateField =
+  | "displayName"
+  | "legalName"
+  | "countryCode"
+  | "contactName"
+  | "email"
+  | "phone"
+  | "leadTimeDays"
+  | "minimumOrderQuantity"
+  | "minimumOrderUnit"
+  | "purchasingNotes"
+  | "inventoryItemIds";
+
 /** The fields of the Add supplier form. The name gives the supplier's id. */
 export type SupplierCreateRequest = Readonly<
-  Record<(typeof SUPPLIER_CREATE_FIELDS)[number], unknown>
+  Record<SupplierCreateField, unknown>
 >;
 
 type SupplierCreateTool = (

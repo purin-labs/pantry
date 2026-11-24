@@ -4,7 +4,7 @@ import { workflowCanvasDocumentId } from "@purin-labs/bakery-model/bakery-canvas
 import type {
   WorkflowCanvasReadRequest,
   WorkflowCanvasMoveRequest,
-} from "../../actors/workflow-canvas-tools";
+} from "../../contract/workflow-canvas";
 import {
   authorizeCanvasTurnDocument,
   sessionTurnExecution,

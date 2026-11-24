@@ -15,6 +15,7 @@ import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { UserId } from "@purin-labs/control-api/ids";
+import type { WorkflowRevisionReceipt } from "../contract/workflow-changes";
 
 /**
  * Plan 84: a recipe's applied workflow. Each revision is immutable in R2 under its
@@ -32,21 +33,6 @@ export function isBakeryWorkflowId(raw: string): boolean {
 export function bakeryWorkflowPrefix(organisationId: OrganisationId): string {
   return `bakery-workflows/${encodeURIComponent(organisationId)}/`;
 }
-
-export type WorkflowRevisionReceipt = Readonly<{
-  workflowId: string;
-  revision: number;
-  digest: string;
-  baseDigest: string | null;
-  scenarioDigest: string;
-  appliedBy: string;
-  appliedAt: number;
-  /** Set when a person approved an agent's proposal. A person's own apply has none. */
-  proposalId: string | null;
-  sessionId: string | null;
-  turnId: string | null;
-  operationId: string | null;
-}>;
 
 /** What an approved proposal adds to the receipt of its revision. */
 type WorkflowRevisionOrigin = Readonly<{

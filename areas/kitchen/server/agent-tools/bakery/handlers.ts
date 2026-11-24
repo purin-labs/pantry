@@ -7,8 +7,12 @@ import { validateLiveRequestAuthority } from "@purin-labs/authority/request-auth
 import {
   readSavedBakeryRun,
   type SavedBakeryRunQuery,
-  type SavedBakeryRunResult,
 } from "../../bakery/saved-runs";
+import type {
+  AgentRunSaveVerification,
+  AgentScenarioSaveResult,
+  SavedBakeryRunResult,
+} from "../../contract/saved-bakery-runs";
 import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import type {
   BakerySurfaceAttachmentV1,
@@ -256,11 +260,11 @@ function requireSupportedBakeryCommand(
   }
 }
 
-function readFailedRunSave(): import("../../bakery/agent-run-save").AgentRunSaveVerification {
+function readFailedRunSave(): AgentRunSaveVerification {
   return { kind: "read_failed" };
 }
 
-function readFailedScenarioSave(): import("../../bakery/agent-scenario-save").AgentScenarioSaveResult {
+function readFailedScenarioSave(): AgentScenarioSaveResult {
   return { kind: "read_failed" };
 }
 

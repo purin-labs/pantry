@@ -35,23 +35,12 @@ import type {
   CollaborationRoomProtocol,
   CollaborationRoomServerMessage,
 } from "@purin-labs/collaboration/worker/collaboration-room";
+import type { WorkflowCanvasRead } from "../contract/workflow-canvas";
 
 type CanvasUpdate = CanvasEncoding<"update">;
 type CanvasStateVector = CanvasEncoding<"state_vector">;
 type CanvasStorageFailure = Readonly<{ code: CanvasProtocolFailureCode }>;
 type StoredCanvas = Readonly<{ document: WorkflowCanvasDoc; revision: number }>;
-export type WorkflowCanvasRead = Readonly<{
-  documentId: string;
-  documentRevision: number;
-  bounds: typeof CANVAS_BOUNDS;
-  objects: readonly Readonly<{
-    objectId: string;
-    label: string;
-    x: number;
-    y: number;
-  }>[];
-}>;
-
 export function createWorkflowCanvasProtocol(
   backing: WorkflowCanvasBacking,
 ): CollaborationRoomProtocol<

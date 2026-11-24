@@ -1,4 +1,4 @@
-import type { SavedBakeryRunQuery } from "../../bakery/saved-runs";
+import type { SavedBakeryRunQuery } from "../../contract/saved-bakery-runs";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";

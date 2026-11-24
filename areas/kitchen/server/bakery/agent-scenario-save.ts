@@ -14,6 +14,7 @@ import {
 } from "@purin-labs/bakery-model/bakery-surface";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { isRecord } from "@purin-labs/std";
+import type { AgentScenarioSaveResult } from "../contract/saved-bakery-runs";
 
 const PROPOSAL_TTL_MS = 15 * 60_000;
 
@@ -199,17 +200,6 @@ function matchesSave(
     row.manifestJson === JSON.stringify(manifest)
   );
 }
-
-export type AgentScenarioSaveResult =
-  | Readonly<{ kind: "none" }>
-  | Readonly<{ kind: "read_failed" }>
-  | Readonly<{ kind: "unavailable"; effectId: string }>
-  | Readonly<{
-      kind: "saved";
-      effectId: string;
-      manifest: AgentScenarioSaveManifest;
-      scenarioId: string;
-    }>;
 
 type LatestSaveRow = SaveRow & Readonly<{ effectId: string }>;
 

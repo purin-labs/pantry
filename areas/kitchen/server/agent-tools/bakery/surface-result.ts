@@ -4,8 +4,10 @@ import {
 } from "@purin-labs/bakery-model/bakery-surface";
 import { parseRunSnapshotSummary } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import { isRecord } from "@purin-labs/std";
-import type { AgentRunSaveVerification } from "../../bakery/agent-run-save";
-import type { AgentScenarioSaveResult } from "../../bakery/agent-scenario-save";
+import type {
+  AgentRunSaveVerification,
+  AgentScenarioSaveResult,
+} from "../../contract/saved-bakery-runs";
 import type { HarnessBakerySurfaceToolResult } from "../kitchen/services";
 
 // The result of a Kitchen surface tool, as the Kitchen and the Register tools
