@@ -8,7 +8,11 @@ import type {
   CheckoutPaymentAttempt,
   Storefront,
 } from "../commerce-domain.ts";
-import { NonNegativeInteger, PositiveInteger } from "@purin-labs/contract-schema";
+import {
+  NonNegativeInteger,
+  PositiveInteger,
+  textLimit,
+} from "@purin-labs/contract-schema";
 import {
   currencyCodeTextSchema,
   normalizedTextSchema,
@@ -631,7 +635,9 @@ export const inventoryReconciliationTargetSchema = Type.Union([
   }),
 ]);
 
-const explanation = Type.String({ ...normalizedTextSchema, maxLength: 1000 });
+const explanation = textLimit(
+  Type.String({ ...normalizedTextSchema, maxLength: 1000 }),
+);
 
 export const inventoryReconciliationChangeSchema = Type.Union([
   ReadonlyStrictObject({
@@ -867,7 +873,7 @@ export type CommerceSquareDevicesV1 = Static<
 export const commerceSquareDeviceCodeV1Schema = ReadonlyStrictObject({
   deviceCodeId: text,
   code: text,
-  name: Type.String({ maxLength: 128 }),
+  name: textLimit(Type.String({ maxLength: 128 })),
   locationId: text,
   status: text,
   pairBy: nullableText,

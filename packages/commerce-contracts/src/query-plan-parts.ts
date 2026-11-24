@@ -2,6 +2,7 @@ import {
   OpenObject,
   parseContract,
   type ContractDecodeResult,
+  textLimit,
 } from "@purin-labs/contract-schema";
 import { relationshipDefinitionWireSchema } from "./query-wire.ts";
 import { Type, type Static, type StaticDecode } from "typebox";
@@ -187,7 +188,7 @@ export const commerceNormalizedPredicateSchema = Type.Cyclic(
       }),
       OpenObject({
         kind: Type.Literal("search"),
-        foldedText: Type.String({ minLength: 1, maxLength: 256 }),
+        foldedText: textLimit(Type.String({ minLength: 1, maxLength: 256 })),
       }),
       OpenObject({
         kind: Type.Literal("any"),

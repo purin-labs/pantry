@@ -1,4 +1,8 @@
-import { OpenObject, PositiveInteger } from "@purin-labs/contract-schema";
+import {
+  OpenObject,
+  PositiveInteger,
+  textLimit,
+} from "@purin-labs/contract-schema";
 import { Type, type StaticDecode } from "typebox";
 import type { StrictUnion } from "@purin-labs/type-utils";
 import { commerceEntityRefSchema } from "./entity-reference.ts";
@@ -101,7 +105,9 @@ const commerceSelectorQuerySchema = Type.Union([
   }),
   OpenObject({
     kind: Type.Literal("search"),
-    text: Type.String({ ...trimmedIdentityTextSchema, maxLength: 256 }),
+    text: textLimit(
+      Type.String({ ...trimmedIdentityTextSchema, maxLength: 256 }),
+    ),
     entityTypeId: Type.Union([commerceEntityTypeIdSchema, Type.Null()]),
     pagination: commercePaginationSchema,
     traversal: commerceTraversalLimitsSchema,

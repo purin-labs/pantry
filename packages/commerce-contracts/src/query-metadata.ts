@@ -4,6 +4,7 @@ import {
   parseContract,
   type ContractDecodeResult,
   type ContractRejection,
+  textLimit,
 } from "@purin-labs/contract-schema";
 import { Type, type Static } from "typebox";
 import type { StrictUnion } from "@purin-labs/type-utils";
@@ -15,7 +16,11 @@ export const commerceSnapshotRevisionSchema = Type.Unsafe<
 >(NonNegativeInteger);
 export const commerceQueryFingerprintSchema = Type.Unsafe<
   string & { readonly __brand: "CommerceQueryFingerprint" }
->(Type.String({ minLength: 64, maxLength: 64, pattern: "^[0-9a-fA-F]{64}$" }));
+>(
+  textLimit(
+    Type.String({ minLength: 64, maxLength: 64, pattern: "^[0-9a-fA-F]{64}$" }),
+  ),
+);
 export const commerceQuerySemanticsVersionSchema = Type.Literal("v1");
 export const commerceOrderingVersionSchema = Type.Literal("v1");
 const commerceReadWatermarkKindSchema = Type.Enum([

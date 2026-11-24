@@ -2,6 +2,7 @@
 // as `nuki`, and a shop site serves it at `nuki.menu.<domain>`. A name
 // belongs to one storefront for good: a storefront that takes a new name
 // keeps its earlier ones, so a printed QR code never opens another shop.
+import { textLimit } from "@purin-labs/contract-schema";
 import { Type, type Static } from "typebox";
 import { normalizedTextSchema } from "./fields.ts";
 import {
@@ -124,7 +125,7 @@ export type CommerceStorefrontShopNameV1 = Static<
 
 /** The body of `PUT .../storefronts/:storefrontId/shop-name`. */
 export const setCommerceStorefrontShopNameV1Schema = ReadonlyStrictObject({
-  name: Type.String({ maxLength: 64 }),
+  name: textLimit(Type.String({ maxLength: 64 })),
 });
 export type SetCommerceStorefrontShopNameV1 = Static<
   typeof setCommerceStorefrontShopNameV1Schema

@@ -25,15 +25,6 @@
     "foundation/agent/actors/pi-durable-tools.ts": 2,
     "foundation/authority/generated/action-registry.ts": 14,
     "packages/bakery-model/src/bakery-margins.ts": 4,
-    "packages/bakery-workflow/src/index.ts": 3,
-    "packages/commerce-contracts/src/graph-query-schema.ts": 1,
-    "packages/commerce-contracts/src/query-metadata.ts": 1,
-    "packages/commerce-contracts/src/query-plan-parts.ts": 1,
-    "packages/commerce-contracts/src/records/api-admin.ts": 2,
-    "packages/commerce-contracts/src/records/api-shop-names.ts": 1,
-    "packages/contracts/src/case-rpc.ts": 2,
-    "packages/kitchen-control-api/src/bakes.ts": 4,
-    "packages/kitchen-control-api/src/costs.ts": 2,
     "surfaces/slack/server/agent-tools/slack/slack.ts": 2,
     "workers/platform/scripts/generate-actions.ts": 2
   }
