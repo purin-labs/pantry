@@ -1,0 +1,145 @@
+{
+  "about": "Refactor 17, Stage B: the public files of the area commerce (the lines of contracts in scripts/layers.json) are the workspace package @purin-labs/area-commerce-contract in areas/commerce/contract, the contract of the area. The owner decided on 2026-11-24 that a contract imports only the foundation, outside packages and the contract of another area, and scripts/check-layers.mjs holds that rule. scripts/refactor-17/move-module.mjs reads this plan. moduleFrom: the public files of areas/commerce that another area imports, and the public files that they import, belong to the plan, and --sync-plan adds each one; stays names each other public file, which stays public in the area (the scope that the owner approved on 2026-11-24). files: a Worker file goes to server/ and a Portal file to ui/, with its sub-path below server/ or ui/ of the area, less a folder contract/ (sourcePrefixes; movedFolders names each public folder that moves whole under another last name). package: the exports map gives each .ts file of server/ and of ui/, each style sheet of ui/, and each .tsx file, which another module imports; the dependencies are the packages that the files import. package.typeCheck false: the files read Env keys that the Actor files of the Worker merge, as the area package does; the Worker program and the Portal program check each file. edits: the source roots of the lints read the folders of the package; the first contract plan also adds areas/*/contract/server to the three Worker programs, areas/*/contract/ui to the Portal program, and the contract packages to knip.",
+  "module": "areas/commerce/contract",
+  "moduleFrom": "areas/commerce",
+  "target": "areas/commerce/contract",
+  "workspaceEntry": "areas/*/contract",
+  "sourcePrefixes": {
+    "areas/commerce/server/contract/": "server/",
+    "areas/commerce/server/": "server/",
+    "areas/commerce/ui/": "ui/"
+  },
+  "movedFolders": {},
+  "stays": ["areas/commerce/server/contract/approval-card-texts.ts"],
+  "package": {
+    "name": "@purin-labs/area-commerce-contract",
+    "exports": {
+      "./server/*": {
+        "types": "./server/*.ts",
+        "default": "./server/*.ts"
+      },
+      "./ui/*.css": "./ui/*.css",
+      "./ui/*": {
+        "types": "./ui/*.ts",
+        "default": "./ui/*.ts"
+      }
+    },
+    "dependencies": {
+      "@purin-labs/actor-runtime": "workspace:*",
+      "@purin-labs/agent": "workspace:*",
+      "@purin-labs/agent-tools": "workspace:*",
+      "@purin-labs/authority": "workspace:*",
+      "@purin-labs/commerce-client": "workspace:*",
+      "@purin-labs/commerce-contracts": "workspace:*",
+      "@purin-labs/commerce-control-api": "workspace:*",
+      "@purin-labs/connections": "workspace:*",
+      "@purin-labs/contracts": "workspace:*",
+      "@purin-labs/control": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/type-utils": "workspace:*",
+      "@purin-labs/ui": "workspace:*"
+    },
+    "devDependencies": ["@cloudflare/workers-types", "tsrs"],
+    "versionsFrom": [
+      "workers/platform/package.json",
+      "apps/portal/package.json"
+    ],
+    "tsconfig": {
+      "extends": "../../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": ["ESNext"],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": ["@cloudflare/workers-types"],
+        "allowImportingTsExtensions": true
+      },
+      "include": ["server/**/*.ts"]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Worker files of the contract package",
+      "find": "PLATFORM_SOURCE.push(\"surfaces/portal/server\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"surfaces/portal/server\");\n// The Worker side of the contract of the area commerce (Refactor 17, Stage B).\nPLATFORM_SOURCE.push(\"areas/commerce/contract/server\");\n"
+    },
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the Portal lints and the ESLint rules of the Portal source read the Portal files of the contract package",
+      "find": "PORTAL_SOURCE.push(\"surfaces/portal/ui\");\n",
+      "replace": "PORTAL_SOURCE.push(\"surfaces/portal/ui\");\n// The Portal side of the contract of the area commerce (Refactor 17, Stage B).\nPORTAL_SOURCE.push(\"areas/commerce/contract/ui\");\n"
+    },
+    {
+      "file": "workers/platform/tsconfig.json",
+      "why": "the Worker program checks each Worker file of a contract package",
+      "find": "    \"../../areas/*/server/**/*.ts\",\n",
+      "replace": "    \"../../areas/*/server/**/*.ts\",\n    \"../../areas/*/contract/server/**/*.ts\",\n"
+    },
+    {
+      "file": "workers/platform/tsconfig.tests.json",
+      "why": "the Worker program checks each Worker file of a contract package",
+      "find": "    \"../../areas/*/server/**/*.ts\",\n",
+      "replace": "    \"../../areas/*/server/**/*.ts\",\n    \"../../areas/*/contract/server/**/*.ts\",\n"
+    },
+    {
+      "file": "workers/platform/tsconfig.e2e.json",
+      "why": "the Worker program checks each Worker file of a contract package",
+      "find": "    \"../../areas/*/server/**/*.ts\",\n",
+      "replace": "    \"../../areas/*/server/**/*.ts\",\n    \"../../areas/*/contract/server/**/*.ts\",\n"
+    },
+    {
+      "file": "apps/portal/tsconfig.json",
+      "why": "the Portal program checks each Portal file of a contract package",
+      "find": "\"include\": [\"src\", \"../../areas/*/ui\", \"../../surfaces/*/ui\"]",
+      "replace": "\"include\": [\n    \"src\",\n    \"../../areas/*/ui\",\n    \"../../areas/*/contract/ui\",\n    \"../../surfaces/*/ui\"\n  ]"
+    },
+    {
+      "file": "knip.json",
+      "why": "knip judges each export of a contract package, as it does for an area package",
+      "find": "    \"surfaces/*\": {\n",
+      "replace": "    \"areas/*/contract\": {\n      \"project\": [\"**/*.{ts,tsx}\"],\n      \"includeEntryExports\": true\n    },\n    \"surfaces/*\": {\n"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": ["node", "scripts/check-layers.mjs", "--areas", "--write"],
+      "writes": ["docs/layers.md"]
+    }
+  ],
+  "files": {
+    "areas/commerce/server/contract/action-requests.ts": "server/action-requests.ts",
+    "areas/commerce/server/contract/client.ts": "server/client.ts",
+    "areas/commerce/server/contract/commerce-projection.ts": "server/commerce-projection.ts",
+    "areas/commerce/server/contract/commerce-provider.ts": "server/commerce-provider.ts",
+    "areas/commerce/server/contract/delivery-intake.ts": "server/delivery-intake.ts",
+    "areas/commerce/server/contract/graph-reads.ts": "server/graph-reads.ts",
+    "areas/commerce/server/contract/list-entry-commands.ts": "server/list-entry-commands.ts",
+    "areas/commerce/server/contract/merchant-closure.ts": "server/merchant-closure.ts",
+    "areas/commerce/server/contract/merchant-control.ts": "server/merchant-control.ts",
+    "areas/commerce/server/contract/observation-identity.ts": "server/observation-identity.ts",
+    "areas/commerce/server/contract/offer-price-allowance.ts": "server/offer-price-allowance.ts",
+    "areas/commerce/server/contract/queue-messages.ts": "server/queue-messages.ts",
+    "areas/commerce/server/contract/read-errors.ts": "server/read-errors.ts",
+    "areas/commerce/server/contract/resource-ids.ts": "server/resource-ids.ts",
+    "areas/commerce/server/contract/sensitivity.ts": "server/sensitivity.ts",
+    "areas/commerce/server/contract/square-link.ts": "server/square-link.ts",
+    "areas/commerce/server/contract/stock-operations.ts": "server/stock-operations.ts",
+    "areas/commerce/server/contract/stripe-link.ts": "server/stripe-link.ts",
+    "areas/commerce/server/contract/system-readiness.ts": "server/system-readiness.ts",
+    "areas/commerce/server/contract/tool-reads.ts": "server/tool-reads.ts",
+    "areas/commerce/server/contract/types.ts": "server/types.ts",
+    "areas/commerce/ui/features/commerce/description-draft/styles.css": "ui/features/commerce/description-draft/styles.css",
+    "areas/commerce/ui/features/commerce/entity-plane/api.ts": "ui/features/commerce/entity-plane/api.ts",
+    "areas/commerce/ui/features/commerce/operations.ts": "ui/features/commerce/operations.ts",
+    "areas/commerce/ui/features/commerce/stock-status.ts": "ui/features/commerce/stock-status.ts",
+    "areas/commerce/ui/features/governed-actions/commerce.ts": "ui/features/governed-actions/commerce.ts",
+    "areas/commerce/ui/features/governed-actions/decision-labels.ts": "ui/features/governed-actions/decision-labels.ts"
+  }
+}
