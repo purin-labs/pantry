@@ -1,4 +1,5 @@
 import type { ScreenRelevanceCheckInput } from "@purin-labs/area-integrations/server/jev-features/screen-relevance-check";
+import { deleteOldScreenRelevanceRecords } from "@purin-labs/area-integrations/server/jev-features/screen-relevance";
 import { sealJevUsageHours } from "@purin-labs/area-integrations/server/jev-features/usage-records";
 import {
   mailSwitchMoveDue,
@@ -1744,6 +1745,28 @@ export class OrganisationDO
       input.organisationId,
       this.admittedDecideScreenRelevance.bind(this, input),
     );
+  }
+
+  /** The daily pass of the Organisation deletes its old relevance records. */
+  async deleteOldScreenRelevanceRecords(
+    input: Readonly<{ organisationId: OrganisationId; now: number }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      this.admittedDeleteOldScreenRelevanceRecords.bind(this, input),
+    );
+  }
+
+  private async admittedDeleteOldScreenRelevanceRecords(
+    input: Readonly<{ organisationId: OrganisationId; now: number }>,
+  ) {
+    const organisation = validateActionOrganisation(
+      this.ctx.storage.sql,
+      input.organisationId,
+    );
+    if (!organisation.ok) return organisation;
+    deleteOldScreenRelevanceRecords(this.ctx.storage.sql, input.now);
+    return { ok: true as const, value: null };
   }
 
   async evaluateMailClassification(input: MailEvaluationInput) {

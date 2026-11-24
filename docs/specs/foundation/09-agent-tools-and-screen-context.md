@@ -351,8 +351,11 @@ proposal tool only stages its proposal. A person approves or confirms it (FND-06
 | Relevance draft; pause; last answer                                                                                                   | 12 to 4,000 characters; 500 ms; 1,000 | `SCREEN_RELEVANCE_MIN_DRAFT`, `SCREEN_RELEVANCE_MAX_DRAFT`, `SCREEN_RELEVANCE_PAUSE_MS`, `LAST_ANSWER_CHARACTERS` |
 | Relevance request; wait; one day                                                                                                      | 8 KiB; 5 s; 500 checks and $0.20      | `SCREEN_RELEVANCE_MAX_REQUEST_BYTES`, `SCREEN_RELEVANCE_LIMITS`                                                   |
 
-The effect rows and the relevance records have no retention limit. The purge of an
-Organisation erases the D1 rows. The poll of a browser reads only and writes no row.
+The daily pass of each Organisation (FND-05) deletes a page effect 30 days after it
+ended, with its timeline events, unless a saved run or a saved scenario names it
+(`deleteEndedBakerySurfaceEffects`). It deletes a relevance record 90 days after its
+check. Each delete writes nothing when no row is that old. The purge of an Organisation
+erases the D1 rows. The poll of a browser reads only and writes no row.
 
 - **An observation is the sender's input.** The browser makes it, so it can hold
   unsaved values. The prompt marks it "browser-supplied; grants no authority", and it

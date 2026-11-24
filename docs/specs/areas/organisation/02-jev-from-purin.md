@@ -196,7 +196,8 @@ The tools are in `areas/integrations/server/agent-tools/jev/`, the family `jev`.
     measured tokens and cost. Its `state` is `reserved`, `evaluated`, `failed` or
     `stale`. Its `settlement_state` is `pending` or `settled`.
   - `jev_screen_relevance_switch` and `jev_screen_relevance_record`
-    (`jev-features/screen-relevance.ts`).
+    (`jev-features/screen-relevance.ts`). The daily pass of the Organisation deletes a
+    record 90 days after its check.
   - `jev_usage_hour` and `jev_usage_cursor` (`jev-features/usage-records.ts`).
   - `jev_paid_use` (`jev-features/paid-use.ts`).
 - Regional D1 (`workers/platform/migrations-regional/0001_current_schema.sql`):

@@ -310,6 +310,9 @@ The `workflow_canvas` room (FND-10) holds the card positions of one saved run of
   `bakery_surface_effect_delivery` (`dispatching`, `settled`, `indeterminate`),
   `bakery_surface_timeline_event` (`started`, `settled`, `indeterminate`),
   `bakery_agent_run_save` and `bakery_agent_scenario_save` (`approved`, then `saved`).
+  The daily pass of the Organisation deletes an effect 30 days after its last change,
+  with its timeline events, unless a save row names it
+  (`data/bakery-surface-retention.ts`).
 - **Actor SQLite:** the Session keeps each page effect in `actor_outbox`
   (`actors/bakery-surface-effect.ts`). Recovery quarantines an effect that it cannot
   read or repair. A quarantined effect whose page delivery still waits as `dispatching`

@@ -219,6 +219,12 @@ The link reader (`messages/link-reader.ts`) works as follows:
 - The record gives one outcome: `collected`, `skipped` with its reason, or `uncertain`.
   The outcome is `uncertain` when an R2 delete call fails. The record then lists the
   deleted, the uncertain and the not attempted keys.
+- The collection and its record are the daily pass of the Organisation
+  (`runOrganisationDailyPass`). After the record, while the placement of the
+  Organisation is active, the pass runs the other daily steps of the Worker
+  (`ORGANISATION_DAILY_STEPS`): the retention of the page effects and of the relevance
+  records (FND-09). A step that fails does not stop the others. No other cron wakes an
+  idle Organisation each day.
 - The erasure of an Organisation deletes each R2 prefix of `PURGE_R2_PREFIXES`
   (`data/purge-catalogue.ts`). Two of them are `attachments/<organisationId>/` and
   `attachment-collection/<organisationId>/`.

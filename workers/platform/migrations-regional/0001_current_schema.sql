@@ -4266,6 +4266,8 @@ CREATE INDEX idx_bakery_surface_effect_delivery_pending
   ON bakery_surface_effect_delivery (
     organisation_id, user_id, surface_session_id, state_kind, created_at
   );
+CREATE INDEX idx_bakery_surface_effect_delivery_age
+  ON bakery_surface_effect_delivery (organisation_id, updated_at);
 
 CREATE TABLE bakery_agent_run_save (
   effect_id TEXT PRIMARY KEY REFERENCES bakery_surface_effect_delivery (effect_id),

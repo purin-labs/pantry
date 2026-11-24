@@ -3,7 +3,12 @@
 // code builds what Jev reads, refuses the requests that the journey asserts,
 // picks the band and keeps the page out of a message that the person sent
 // without it.
+import { env } from "cloudflare:workers";
 import { runInDurableObject } from "cloudflare:test";
+import { runOrganisationDailyPass } from "@purin-labs/conversation/messages/attachment-collection";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
+import { ORGANISATION_DAILY_STEPS } from "../../src/organisation-daily-steps";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import {
@@ -291,6 +296,31 @@ it(
     expect(JSON.stringify(records)).not.toContain("latte");
     const ledger = await relevanceLedger(fixture);
     expect(ledger).toEqual({ evaluated: 4, funding: "pantry_platform" });
+
+    // 91 days after the hint, the daily pass of the Organisation deletes its
+    // record. The two newer records stay.
+    await runInDurableObject(fixture.organisation, (_instance, state) => {
+      state.storage.sql.exec(
+        "UPDATE jev_screen_relevance_record SET created_at = created_at - ? WHERE organisation_id = ? AND band = 'hint'",
+        91 * 24 * 60 * 60 * 1_000,
+        fixture.organisationId,
+      );
+    });
+    await runOrganisationDailyPass({
+      env,
+      scope: await requireOrganisationExecutionScope(
+        env,
+        fixture.organisationId,
+      ),
+      now: Date.now(),
+      dailySteps: ORGANISATION_DAILY_STEPS,
+      requestId: newRequestId(),
+    });
+    const kept = await relevanceRecords(fixture);
+    expect(kept.map((record) => [record.band, record.choice])).toEqual([
+      ["ask", "attached"],
+      ["ask", "sent_without"],
+    ]);
 
     task.meta.chatScreenRelevance = {
       jevRequest: typeSafe.requests[0],

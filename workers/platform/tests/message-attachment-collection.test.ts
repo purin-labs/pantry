@@ -187,7 +187,7 @@ describe("scheduled attachment collection", function collectionSuite() {
       [`attachments/${fixture.organisationId}/slack/${DEAD}`, OLD],
     ]);
 
-    await runAttachmentCollection(fixture.env, NOW);
+    await runAttachmentCollection(fixture.env, NOW, []);
 
     const latest = fixture.bucket.json(
       attachmentCollectionRecordKey(fixture.organisationId, "latest"),
@@ -214,7 +214,7 @@ describe("scheduled attachment collection", function collectionSuite() {
     fixture.bucket.seed([
       [`attachments/${fixture.organisationId}/slack/${"c".repeat(64)}`, OLD],
     ]);
-    await runAttachmentCollection(fixture.env, NOW + 60_000);
+    await runAttachmentCollection(fixture.env, NOW + 60_000, []);
     expect(fixture.bucket.keys()).toContain(
       `attachments/${fixture.organisationId}/slack/${"c".repeat(64)}`,
     );
@@ -223,6 +223,7 @@ describe("scheduled attachment collection", function collectionSuite() {
     await runAttachmentCollection(
       fixture.env,
       NOW + ATTACHMENT_COLLECTION_INTERVAL_MS,
+      [],
     );
     expect(fixture.bucket.keys()).not.toContain(
       `attachments/${fixture.organisationId}/slack/${"c".repeat(64)}`,
@@ -233,7 +234,7 @@ describe("scheduled attachment collection", function collectionSuite() {
     const fixture = await createFixture("organisation_collect_f");
     await registerActor(fixture, "case", "case_silent", "active");
 
-    await runAttachmentCollection(fixture.env, NOW);
+    await runAttachmentCollection(fixture.env, NOW, []);
 
     expect(
       fixture.bucket.json(
@@ -266,7 +267,7 @@ describe("scheduled attachment collection", function collectionSuite() {
       }),
     );
 
-    await runAttachmentCollection(fixture.env, NOW);
+    await runAttachmentCollection(fixture.env, NOW, []);
 
     expect(
       fixture.bucket.json(

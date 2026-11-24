@@ -26,6 +26,7 @@ import { runScheduledCommerceOutboxReconciliation } from "@purin-labs/area-comme
 import { runScheduledPaidReceiptDelivery } from "@purin-labs/area-commerce/server/paid-receipt";
 import { runFileContextReconciliation } from "@purin-labs/agent/context/files/index";
 import { runAttachmentCollection } from "@purin-labs/conversation/messages/attachment-collection";
+import { ORGANISATION_DAILY_STEPS } from "./organisation-daily-steps";
 import { runWeeklyChatGptLoginRefresh } from "@purin-labs/agent/models/codex-connection";
 import { runScheduledActorRegistryReconciliation } from "@purin-labs/actor-runtime/actors/actor-registry-sweep";
 import { handleCommerceWebhook } from "@purin-labs/area-commerce/server/webhooks";
@@ -174,7 +175,13 @@ export default {
       }),
     );
     ctx.waitUntil(runFileContextReconciliation(env, controller.scheduledTime));
-    ctx.waitUntil(runAttachmentCollection(env, controller.scheduledTime));
+    ctx.waitUntil(
+      runAttachmentCollection(
+        env,
+        controller.scheduledTime,
+        ORGANISATION_DAILY_STEPS,
+      ),
+    );
     ctx.waitUntil(
       runScheduledPayoutReconciliation(env, controller.scheduledTime),
     );

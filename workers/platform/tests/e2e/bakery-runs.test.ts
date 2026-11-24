@@ -1,4 +1,7 @@
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
+import { runOrganisationDailyPass } from "@purin-labs/conversation/messages/attachment-collection";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { ORGANISATION_DAILY_STEPS } from "../../src/organisation-daily-steps";
 import { fixtureDatabase } from "./organisation-database";
 import { requireConversationId } from "../test-ids";
 import {
@@ -929,6 +932,79 @@ async function chatRehearsalSave(): Promise<void> {
       requestIds: ["historical-chat-request"],
     }),
   ).rejects.toThrow("surface_effect_timeline_invalid");
+
+  // A month later, the daily pass of the Organisation deletes the page
+  // effects that no save names, with their timeline events. The saved run
+  // keeps its effect, the chat still shows its tool call, and a newer effect
+  // stays.
+  const month = 31 * 24 * 60 * 60 * 1_000;
+  await fixtureDatabase().batch([
+    fixtureDatabase()
+      .prepare(
+        "UPDATE bakery_surface_effect_delivery SET created_at = created_at - ?1, updated_at = updated_at - ?1, deadline_at = deadline_at - ?1 WHERE organisation_id = ?2",
+      )
+      .bind(month, organisation),
+    fixtureDatabase()
+      .prepare(
+        "UPDATE bakery_surface_timeline_event SET created_at = created_at - ?1 WHERE organisation_id = ?2",
+      )
+      .bind(month, organisation),
+  ]);
+  const recentEffectId = `recent_${effectId}`;
+  const recentAt = Date.now();
+  await fixtureDatabase()
+    .prepare(
+      `INSERT INTO bakery_surface_effect_delivery (
+         effect_id, organisation_id, user_id, session_id, turn_id,
+         request_id, surface_session_id, surface_epoch, command_digest,
+         effect_json, state_kind, receipt_json, deadline_at, created_at, updated_at
+       ) SELECT ?, organisation_id, user_id, session_id, turn_id,
+         'recent-chat-request', surface_session_id, surface_epoch, command_digest,
+         effect_json, state_kind, receipt_json, ?, ?, ?
+         FROM bakery_surface_effect_delivery WHERE effect_id = ?`,
+    )
+    .bind(recentEffectId, recentAt, recentAt, recentAt, preparation.effectId)
+    .run();
+  await runOrganisationDailyPass({
+    env,
+    scope: await requireOrganisationExecutionScope(env, organisation),
+    now: Date.now(),
+    dailySteps: ORGANISATION_DAILY_STEPS,
+    requestId: newRequestId(),
+  });
+  const kept = await fixtureDatabase()
+    .prepare(
+      "SELECT effect_id AS id FROM bakery_surface_effect_delivery WHERE organisation_id = ?",
+    )
+    .bind(organisation)
+    .all<{ id: string }>();
+  expect(kept.results.map((row) => row.id).sort()).toEqual(
+    [effectId, recentEffectId].sort(),
+  );
+  const keptEvents = await fixtureDatabase()
+    .prepare(
+      "SELECT effect_id AS id FROM bakery_surface_timeline_event WHERE organisation_id = ?",
+    )
+    .bind(organisation)
+    .all<{ id: string }>();
+  expect(keptEvents.results.map((row) => row.id)).toEqual([effectId]);
+  expect(await listBakerySurfaceTimelineEvents(timelineScope)).toHaveLength(1);
+  expect(
+    await readLatestAgentRunSave({
+      db: fixtureDatabase(),
+      archive: env.ARCHIVE,
+      organisationId: organisation,
+      userId: owner.identity.userId,
+      surfaceSessionId,
+    }),
+  ).toMatchObject({ kind: "verified", effectId });
+  const reopenedLater = await openRehearsalRunWorkspace(
+    organisation,
+    prepared.id,
+    readAs.bind(null, owner.session),
+    rehearsalSettings(sampleSettings()),
+  );
+  expect(reopenedLater.plan.fingerprint).toBe(rehearsals.pending.fingerprint);
 }
 
 async function readAs(

@@ -18,7 +18,8 @@ export function createJevScreenRelevanceSchema(sql: SqlStorage): void {
   )`);
   // Plan 87 section 3A: one row for each hint or question that a person saw.
   // It holds the scores, the band, the model and the choice, and no draft
-  // text and no page content. No view reads it yet (Plan 87 section 3A).
+  // text and no page content. No view reads it yet (Plan 87 section 3A). A
+  // row stays 90 days.
   sql.exec(`CREATE TABLE IF NOT EXISTS jev_screen_relevance_record (
     organisation_id TEXT NOT NULL,
     check_id TEXT NOT NULL,
@@ -66,6 +67,23 @@ type ScreenRelevanceRecord = Readonly<{
   model: string;
   now: number;
 }>;
+
+/** A relevance record stays this long after the check. */
+const SCREEN_RELEVANCE_RECORD_RETENTION_MS = 90 * 24 * 60 * 60 * 1_000;
+
+/**
+ * Deletes the relevance records older than 90 days. The daily pass of the
+ * Organisation calls it; with none that old, it writes nothing.
+ */
+export function deleteOldScreenRelevanceRecords(
+  sql: SqlStorage,
+  now: number,
+): void {
+  sql.exec(
+    "DELETE FROM jev_screen_relevance_record WHERE created_at < ?",
+    now - SCREEN_RELEVANCE_RECORD_RETENTION_MS,
+  );
+}
 
 export function insertScreenRelevanceRecord(
   sql: SqlStorage,

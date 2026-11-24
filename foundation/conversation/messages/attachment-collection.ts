@@ -172,9 +172,21 @@ export async function collectOrganisationAttachments(input: {
   return organisationCollectionErrorOutcome(collected.error);
 }
 
+/**
+ * Other daily work of one Organisation. It runs in the Organisation's daily
+ * pass after the collection, so that no other cron wakes an idle
+ * Organisation. A step that has nothing to do writes nothing.
+ */
+export type OrganisationDailyStep = (
+  env: Env,
+  scope: OrganisationExecutionScope,
+  now: number,
+) => Promise<void>;
+
 export async function runAttachmentCollection(
   env: Env,
   now: number,
+  dailySteps: readonly OrganisationDailyStep[],
 ): Promise<void> {
   const requestId = crypto.randomUUID() as RequestId;
   let organisations: readonly OrganisationId[];
@@ -212,35 +224,73 @@ export async function runAttachmentCollection(
       organisationId,
     );
     if (!execution.ok) continue;
-    const outcome = await collectOrganisationAttachments({
+    await runOrganisationDailyPass({
+      env,
       scope: execution.value,
-      archive: env.ARCHIVE,
-      namespaces: env,
       now,
+      dailySteps,
+      requestId,
     });
-    const record: OrganisationAttachmentCollectionRecord = {
-      schemaVersion: "plan37.attachment-collection-pass.v1",
+  }
+}
+
+/**
+ * The daily pass of one Organisation: the attachment collection, its record,
+ * which paces the next pass, and then each daily step.
+ */
+export async function runOrganisationDailyPass(
+  input: Readonly<{
+    env: Env;
+    scope: OrganisationExecutionScope;
+    now: number;
+    dailySteps: readonly OrganisationDailyStep[];
+    requestId: RequestId;
+  }>,
+): Promise<void> {
+  const { env, scope, now, requestId } = input;
+  const organisationId = scope.organisationId;
+  const outcome = await collectOrganisationAttachments({
+    scope,
+    archive: env.ARCHIVE,
+    namespaces: env,
+    now,
+  });
+  const record: OrganisationAttachmentCollectionRecord = {
+    schemaVersion: "plan37.attachment-collection-pass.v1",
+    organisationId,
+    collectedAt: now,
+    outcome,
+  };
+
+  await writeRecord(env.ARCHIVE, record);
+
+  if (outcome.kind === "uncertain") {
+    traceWarn("attachment_collection_uncertain", {
+      requestId,
       organisationId,
-      collectedAt: now,
-      outcome,
-    };
+      reason: outcome.reason,
+      deletedCount: outcome.receipt.deleted.length,
+      uncertainCount: outcome.receipt.uncertain.length,
+    });
+  } else if (outcome.kind === "skipped") {
+    traceWarn("attachment_collection_skipped", {
+      requestId,
+      organisationId,
+      reason: outcome.reason,
+      actors: outcome.actors,
+    });
+  }
 
-    await writeRecord(env.ARCHIVE, record);
-
-    if (outcome.kind === "uncertain") {
-      traceWarn("attachment_collection_uncertain", {
+  // A step writes only in the active placement of the Organisation.
+  if (!(await scope.isActive())) return;
+  for (const step of input.dailySteps) {
+    try {
+      await step(env, scope, now);
+    } catch (error) {
+      traceWarn("organisation_daily_step_failed", {
         requestId,
         organisationId,
-        reason: outcome.reason,
-        deletedCount: outcome.receipt.deleted.length,
-        uncertainCount: outcome.receipt.uncertain.length,
-      });
-    } else if (outcome.kind === "skipped") {
-      traceWarn("attachment_collection_skipped", {
-        requestId,
-        organisationId,
-        reason: outcome.reason,
-        actors: outcome.actors,
+        reason: error instanceof Error ? error.message : "unknown",
       });
     }
   }
