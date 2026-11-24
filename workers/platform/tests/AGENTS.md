@@ -86,8 +86,9 @@ test and any fixture that exists only for the obsolete behavior.
 - `e2e/mailbox-model-change.test.ts` follows a mailbox after its model leaves
   the list: new mail waits until the owner accepts the terms of the new
   default, the Inbox says that the agent waits, one card goes to the
-  operations channel, a viewer cannot accept, and the waiting mail then gets
-  its draft from the default. The removed-model journey of `e2e/inbox-whatsapp.test.ts`
+  operations channel, a viewer cannot accept, and the owner's acceptance
+  changes the card and wakes the waiting mail, which gets its draft from the
+  default at once. The removed-model journey of `e2e/inbox-whatsapp.test.ts`
   answers a WhatsApp customer on the default at once.
 - `e2e/case-context-discovery-access.test.ts` is the allowed/denied journey of
   the case context policy route: an administrator publishes the policy, and a

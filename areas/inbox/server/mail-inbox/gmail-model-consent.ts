@@ -27,6 +27,7 @@ import {
   findGmailModelReview,
   type GmailModelReview,
 } from "./contract/gmail-model-reviews";
+import { wakeMailboxesAfterModelAcceptance } from "./agent-mailbox-connector";
 
 /**
  * Whether new mail may go to the workspace's present model: Purin reviewed
@@ -138,11 +139,15 @@ export async function consentToGmailModel(
       now: input.now,
     }),
   ]);
-  return recorded?.meta.changes === 1 &&
-    accepted?.meta.changes === 1 &&
-    (await input.scope.isActive())
-    ? { ok: true, value: receipt }
-    : { ok: false, error: { code: "organisation_placement_conflict" } };
+  if (
+    recorded?.meta.changes !== 1 ||
+    accepted?.meta.changes !== 1 ||
+    !(await input.scope.isActive())
+  )
+    return { ok: false, error: { code: "organisation_placement_conflict" } };
+  // The mail that waited for this acceptance runs now.
+  await wakeMailboxesAfterModelAcceptance(input.env, input.scope, input.now);
+  return { ok: true, value: receipt };
 }
 
 /** The person read this route and these terms. */

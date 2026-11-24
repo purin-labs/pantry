@@ -713,6 +713,21 @@ export function completeEmailReplyTurn(
   );
 }
 
+/**
+ * Makes each reply turn that waits due now, as after an owner or admin
+ * accepted the terms of the mail model: the mail that waited for them runs
+ * at once, not at its next retry time. A turn that runs keeps its claim.
+ * Returns how many turns it woke.
+ */
+export function wakeEmailReplyTurns(sql: SqlStorage, now: number): number {
+  return sql.exec(
+    `UPDATE connector_email_reply_turn SET available_at = ?
+     WHERE claimed_by IS NULL AND available_at > ?`,
+    now,
+    now,
+  ).rowsWritten;
+}
+
 /** Schedules another attempt, or drops the turn once its attempts are spent. */
 export function retryEmailReplyTurn(
   sql: SqlStorage,

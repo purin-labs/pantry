@@ -111,6 +111,10 @@ import {
 import type { Result } from "@purin-labs/kernel/result";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import {
+  noticeMailModelWait,
+  settleMailModelNotices,
+} from "../mail-inbox/mail-model-notice";
+import {
   resolveActiveCaseActor,
   resolveActiveSessionActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
@@ -2213,7 +2217,10 @@ async function projectProposalLifecycle(
 
 async function loadEmailTurnPolicy(
   env: Env,
-  input: Pick<EmailThreadTurnInput, "scope" | "connectorSql" | "now">,
+  input: Pick<
+    EmailThreadTurnInput,
+    "scope" | "connectorSql" | "integrationAccountId" | "now"
+  >,
 ): Promise<Result<PinnedSessionPolicy, EmailThreadTurnError>> {
   const organisationId = input.scope.organisationId;
   const now = input.now;
@@ -2234,9 +2241,25 @@ async function loadEmailTurnPolicy(
   });
   if (!(await isEmailTurnActive(input)))
     return { ok: false, error: { code: "connector_placement_conflict" } };
+  // New mail waits until an owner or admin accepts the model's terms. The
+  // operations channel hears of each wait once, and its card says when mail
+  // goes to the model again.
+  const notice = {
+    sql: input.connectorSql,
+    integrationAccountId: input.integrationAccountId,
+    now,
+  };
   if (eligibility.kind === "blocked") {
+    await noticeMailModelWait(env, input.scope, notice).catch(
+      traceMailModelNoticeFailure,
+    );
     return { ok: false, error: { code: "gmail_inference_route_blocked" } };
   }
+  await settleMailModelNotices(env, input.scope, notice).catch(
+    traceMailModelNoticeFailure,
+  );
+  if (!(await isEmailTurnActive(input)))
+    return { ok: false, error: { code: "connector_placement_conflict" } };
   const loaded = await loadOrganisationPolicyOrDefaultDeny({
     bindings: { db: input.scope.database, kv: env.POLICY_KV },
     organisationId,
@@ -2254,6 +2277,12 @@ async function loadEmailTurnPolicy(
       modelRoute: modelRoute.value,
     },
   };
+}
+
+function traceMailModelNoticeFailure(): void {
+  traceWarn("connector.email_model_notice_failed", {
+    requestId: newRequestId(),
+  });
 }
 
 function isEmailDraftActive(

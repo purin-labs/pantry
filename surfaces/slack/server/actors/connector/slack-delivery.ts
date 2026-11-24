@@ -48,7 +48,10 @@ import {
 } from "../../held-output-notice";
 import { noticeCardBlocks } from "../../notice-card";
 import { workspacePortalUrl } from "../../portal-links";
-import { mailModelNoticeMailbox } from "@purin-labs/area-inbox/server/mail-inbox/contract/mail-model-notice-delivery";
+import {
+  mailModelNoticeMailbox,
+  mailModelNoticeOfUpdate,
+} from "@purin-labs/area-inbox/server/mail-inbox/contract/mail-model-notice-delivery";
 import {
   deviceAlertCardBlocks,
   devicesPortalUrl,
@@ -504,7 +507,12 @@ async function noticeCardDeliveryBlocks(
   deliveryId: string,
   text: string,
 ): Promise<readonly Record<string, unknown>[] | null> {
-  if (heldNoticeOfDecision(deliveryId) !== null)
+  // A decision on a held card and the end of a mail model wait change the
+  // card, which then has nothing left to do.
+  if (
+    heldNoticeOfDecision(deliveryId) !== null ||
+    mailModelNoticeOfUpdate(deliveryId) !== null
+  )
     return noticeCardBlocks(text, null);
   const requestId = heldNoticeRequestId(deliveryId);
   const budget = isBudgetNoticeDelivery(deliveryId);
@@ -611,6 +619,7 @@ function cardMessageTs(sql: SqlStorage, deliveryId: string): string | null {
       : requestId !== null
         ? permissionNoticeDeliveryId(requestId)
         : (heldNoticeOfDecision(deliveryId) ??
+          mailModelNoticeOfUpdate(deliveryId) ??
           deviceAlertNoticeOfUpdate(deliveryId) ??
           BAKE_PROPOSAL_CARD.noticeOfUpdate(deliveryId) ??
           BAKE_RUN_CARD.noticeOfUpdate(deliveryId));

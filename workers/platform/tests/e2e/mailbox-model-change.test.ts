@@ -4,9 +4,10 @@
 // mailbox setup asks for the terms of the new default model, and a reply turn
 // that comes due drafts nothing and asks no model. The Inbox says that the
 // agent waits, and the first waiting turn posts one card in the operations
-// channel, with no mail content. After the owner accepts, the waiting mail
-// gets its draft from the new default: each reply turn runs in a Session of
-// its own, on the Organisation's route at the time of the turn.
+// channel, with no mail content. The owner's acceptance wakes the waiting
+// mail, which gets its draft from the new default at once and changes the
+// card: each reply turn runs in a Session of its own, on the Organisation's
+// route at the time of the turn.
 import { env } from "cloudflare:workers";
 import { runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
@@ -20,6 +21,7 @@ import { isRecord } from "@purin-labs/std";
 import { PI_PLATFORM_EMBEDDED_HARNESS_ADAPTERS } from "@purin-labs/agent/actors/pi-embedded-adapter";
 import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 import { setUpMailbox } from "@purin-labs/area-inbox/ui/features/mail-setup/turn-on";
+import { runAlarmHandler } from "./durable-object-alarm-support";
 import { installMemoryFixture, type Member } from "./memory-support";
 import { network } from "./network";
 import {
@@ -173,12 +175,16 @@ async function mailboxModelChangeJourney({
   expect(card?.text).not.toContain(CUSTOMER_TEXT);
   expect(card?.text).not.toContain("A tart order");
   expect(cardButtons(card)).toEqual(["mail_model_open"]);
+  const waitingCard = { text: card?.text, url: buttonUrl(card) };
   expect(buttonUrl(card)).toMatch(
     new RegExp(`/inbox\\?settings=${encodeURIComponent(account)}$`, "u"),
   );
 
   // 4. A member without the right cannot accept. The owner accepts the new
-  //    default's terms, and the waiting thread gets its draft from it.
+  //    default's terms. The acceptance wakes the waiting thread: it gets its
+  //    draft from the new default at the Connector's next alarm, not at its
+  //    retry time, and its turn changes the card to say that mail gets
+  //    replies again, with no button.
   const review = reviewOf(changed.plan);
   expect(
     await sendAs(
@@ -193,13 +199,25 @@ async function mailboxModelChangeJourney({
     mailboxModelConsentRequest(review),
   );
   expect(accepted, JSON.stringify(accepted)).toMatchObject({ status: 200 });
-  await finishReplyTurns(connector);
-  expect(gmail.drafts.size).toBe(2);
+  await expect
+    .poll(
+      async () => {
+        await runAlarmHandler(connector);
+        return gmail.drafts.size;
+      },
+      { timeout: 30_000, interval: 200 },
+    )
+    .toBe(2);
+  expect(await runInDurableObject(connector, readReplyTurns)).toHaveLength(0);
+  expect(cards()).toHaveLength(1);
+  expect(card?.text).toBe(
+    `Mail to ${ADDRESS} gets agent replies again. The data terms of Gemini 4 Hydrogen are accepted.`,
+  );
+  expect(cardButtons(card)).toEqual([]);
   expect(new Set(model.models.slice(callsBefore))).toEqual(
     new Set([PLATFORM_DEFAULT_PI_MODEL]),
   );
   expect(await agentOf(owner)).toEqual({ kind: "on", address: ADDRESS });
-  expect(cards()).toHaveLength(1);
   expect(gmail.unexpected).toEqual([]);
 
   Object.assign(task.meta, {
@@ -207,7 +225,8 @@ async function mailboxModelChangeJourney({
       removedModel: REMOVED_MODEL,
       setupAfterRelease: changed.plan?.model,
       inboxWhileWaiting: held,
-      slackCard: { text: card?.text, url: buttonUrl(card) },
+      slackCard: waitingCard,
+      slackCardAfterAcceptance: card?.text,
       draftsWhileWaiting: 1,
       ownerAcceptance: accepted.status,
       draftsAfterAcceptance: gmail.drafts.size,

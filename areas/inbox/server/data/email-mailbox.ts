@@ -683,6 +683,29 @@ export async function readMailboxIngressPolicy(input: {
   };
 }
 
+/** The mailboxes of the Organisation whose agent is on. */
+export async function listEnabledMailboxAccounts(input: {
+  readonly db: OrganisationDatabase;
+  readonly organisationId: OrganisationId;
+}): Promise<readonly IntegrationAccountId[]> {
+  const rows = await input.db
+    .prepare(
+      `SELECT policy.integration_account_id AS integrationAccountId
+       FROM mailbox_ingress_policy AS policy
+       JOIN mailbox_ingress_policy_revision AS revision
+         ON revision.integration_account_id = policy.integration_account_id
+        AND revision.policy_version = policy.current_version
+       WHERE policy.organisation_id = ? AND revision.kind = 'enabled'
+       ORDER BY policy.integration_account_id`,
+    )
+    .bind(input.organisationId)
+    .all<{ readonly integrationAccountId: string }>();
+  return rows.results.flatMap((row) => {
+    const account = parseIntegrationAccountId(row.integrationAccountId);
+    return account.ok ? [account.value] : [];
+  });
+}
+
 export async function publishMailboxIngressPolicy(input: {
   readonly db: OrganisationDatabase;
   readonly organisationId: OrganisationId;

@@ -195,6 +195,11 @@ An owner or admin opens the sheet "How should the agent help?" from the list hea
   Connector records each card (`connector_email_model_notice`), so the channel hears of
   each wait once; a new model or a new review is a new wait. A shop with no operations
   channel sees the Inbox line only.
+- An acceptance wakes each mailbox that is on (`wakeEmailReplyTurns`): its waiting
+  reply turns run at once, not at their retry times. The first reply turn that may go
+  to the model changes each open card of its mailbox to say that mail gets agent
+  replies again, with no button. That is also true when the workspace went back to a
+  model whose terms are accepted. With no waiting turn, the next mail changes the card.
 - **Turn off** and **Remove** set `revoked_at` on each acceptance when no mailbox of
   the Organisation stays on.
 

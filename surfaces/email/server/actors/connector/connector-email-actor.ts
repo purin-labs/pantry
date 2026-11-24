@@ -7,7 +7,6 @@ import {
   createKeyedContinueSerialQueue,
 } from "@purin-labs/async-control/serial-queue";
 import { runMailOrganization } from "@purin-labs/area-inbox/server/mail-inbox/connector-runtime";
-import { noticeMailModelWait } from "@purin-labs/area-inbox/server/mail-inbox/mail-model-notice";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import {
@@ -69,6 +68,7 @@ import {
   dueEmailCaseContextDiscovery,
   retryEmailCorrectionLearning,
   retryEmailReplyTurn,
+  wakeEmailReplyTurns,
   type EmailCorrectionLearningWork,
   type EmailReplyTurnWork,
   countEmailAdmissionsSince,
@@ -578,6 +578,36 @@ export class ConnectorEmail {
     if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     return disabled;
+  }
+
+  /**
+   * An owner or admin accepted the terms of the mail model. The reply turns
+   * that wait run at once, and the first of them changes the card of the
+   * wait to say that mail goes to the model again.
+   */
+  async wakeEmailReplyTurns(
+    raw: unknown,
+  ): Promise<ConnectorResult<Readonly<{ woken: number }>>> {
+    return this.host.trackExecution(
+      this.wakeAdmittedEmailReplyTurns.bind(this, raw),
+    );
+  }
+
+  private async wakeAdmittedEmailReplyTurns(
+    raw: unknown,
+  ): Promise<ConnectorResult<Readonly<{ woken: number }>>> {
+    const input = parseEmailIdentityRequest(raw);
+    if (input === null) return invalid("connector_email_wake_invalid");
+    const scope = await this.host.admitExecution(input.identity);
+    if (scope === null) return invalid("connector_placement_conflict");
+    const sql = this.host.ctx.storage.sql;
+    const woken = this.host.ctx.storage.transactionSync(
+      wakeEmailReplyTurns.bind(null, sql, input.now),
+    );
+    if (woken > 0) await this.host.armAlarm();
+    if (!(await isActorExecutionActive(sql, scope)))
+      return invalid("connector_placement_conflict");
+    return { ok: true, value: { woken } };
   }
 
   async resumeEmailProcessing(
@@ -1921,19 +1951,6 @@ export class ConnectorEmail {
             ? "email_turn_retries_exhausted"
             : outcome.reason,
       });
-      // New mail waits until an owner or admin accepts the model's terms.
-      // The operations channel hears of each wait once.
-      if (outcome.reason === "gmail_inference_route_blocked")
-        await noticeMailModelWait(this.host.env, scope, {
-          sql,
-          integrationAccountId: runtime.integrationAccountId,
-          now: Date.now(),
-        }).catch(() => {
-          traceWarn("connector.email_model_notice_failed", {
-            requestId: newRequestId(),
-            thread_id: work.threadId,
-          });
-        });
     }
   }
 
@@ -2205,6 +2222,7 @@ export type ConnectorEmailRpc = Pick<
   | "activateEmailProcessing"
   | "disableEmailProcessing"
   | "resumeEmailProcessing"
+  | "wakeEmailReplyTurns"
   | "reconnectEmailProcessing"
   | "renewEmailWatch"
   | "inspectEmailRuntime"

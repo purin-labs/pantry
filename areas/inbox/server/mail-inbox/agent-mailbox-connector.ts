@@ -2,10 +2,16 @@ import type { Env } from "@purin-labs/kernel/env";
 import type { ConnectorActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type { Result } from "@purin-labs/kernel/result";
 import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { type MailboxIngressPolicy } from "../data/email-mailbox";
+import {
+  listEnabledMailboxAccounts,
+  type MailboxIngressPolicy,
+} from "../data/email-mailbox";
+import { traceWarn } from "@purin-labs/kernel/observability";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import { whatsappConnectorIdValue } from "../data/whatsapp";
 import {
+  newRequestId,
   parseConnectorId,
   type IntegrationAccountId,
   type OrganisationId,
@@ -88,5 +94,43 @@ export function whatsappConnector(
     organisationId,
     whatsappConnectorIdValue(integrationAccountId),
     "whatsapp_connector_invalid",
+  );
+}
+
+/**
+ * Wakes the waiting reply turns of each mailbox whose agent is on, after an
+ * owner or admin accepted the terms of the mail model, and changes the card
+ * of each wait. A mailbox that cannot be reached runs its turns at their
+ * retry times.
+ */
+export async function wakeMailboxesAfterModelAcceptance(
+  env: Env,
+  scope: OrganisationExecutionScope,
+  now: number,
+): Promise<void> {
+  const accounts = await listEnabledMailboxAccounts({
+    db: scope.database,
+    organisationId: scope.organisationId,
+  });
+  await Promise.all(
+    accounts.map(async (account) => {
+      const connector = await agentMailboxConnector(
+        env,
+        scope.organisationId,
+        account,
+      );
+      const woken = connector.ok
+        ? await connector.value.stub.wakeEmailReplyTurns({
+            identity: connector.value.identity,
+            now,
+          })
+        : connector;
+      if (!woken.ok)
+        traceWarn("inbox.mailbox_wake_failed", {
+          requestId: newRequestId(),
+          organisationId: scope.organisationId,
+          code: woken.error.code,
+        });
+    }),
   );
 }

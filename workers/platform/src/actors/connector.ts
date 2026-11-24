@@ -156,6 +156,12 @@ export class ConnectorDO
     return this.email.checkEmailChange(...input);
   }
 
+  wakeEmailReplyTurns(
+    ...input: Parameters<ConnectorEmail["wakeEmailReplyTurns"]>
+  ) {
+    return this.email.wakeEmailReplyTurns(...input);
+  }
+
   activateEmailProcessing(
     ...input: Parameters<ConnectorEmail["activateEmailProcessing"]>
   ) {
