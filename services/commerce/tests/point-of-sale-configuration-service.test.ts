@@ -156,7 +156,7 @@ describe("point of sale configuration publication", function publicationSuite() 
     });
   });
 
-  it("rejects an automatic refund threshold in another currency", function refundThreshold() {
+  it("refuses a counter policy that lets a refund run without approval", function refundThreshold() {
     expect(function parseInvalidConfiguration() {
       parsePointOfSaleConfiguration(
         publishedConfiguration({
@@ -165,7 +165,7 @@ describe("point of sale configuration publication", function publicationSuite() 
             refundPolicyId: "refund_counter",
             refundGovernance: {
               kind: "automatic_up_to",
-              threshold: { amountMinor: 500, currency: "USD" },
+              threshold: { amountMinor: 500, currency: "JPY" },
             },
           },
         }),

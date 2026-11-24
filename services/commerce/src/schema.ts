@@ -14,7 +14,30 @@ import { MEDIA_SCHEMA } from "./plugins/media/index.ts";
 import { STORED_VALUE_SCHEMA } from "./plugins/stored-value/index.ts";
 import { FOOD_SERVICE_SCHEMA } from "./plugins/food-service/index.ts";
 
-const SCHEMA_VERSION = 92;
+const SCHEMA_VERSION = 93;
+
+// Schema 93: every refund waits for a merchant approval. A checkout profile
+// revision or a counter policy that let refunds up to a threshold run without
+// one now names `approval_required`. The rule only narrows what a revision
+// allows, so each revision keeps its number. Frozen data step.
+const REFUND_APPROVAL_ONLY_V93 = `
+UPDATE checkout_profile_revision
+SET configuration_json = json_set(
+  configuration_json,
+  '$.afterSalePolicy.refundGovernance',
+  json('{"kind":"approval_required"}')
+)
+WHERE json_extract(configuration_json, '$.afterSalePolicy.refundGovernance.kind')
+  = 'automatic_up_to';
+UPDATE point_of_sale_configuration
+SET configuration_json = json_set(
+  configuration_json,
+  '$.afterSalePolicy.refundGovernance',
+  json('{"kind":"approval_required"}')
+)
+WHERE json_extract(configuration_json, '$.afterSalePolicy.refundGovernance.kind')
+  = 'automatic_up_to';
+`;
 
 // Schema 86: a delivery whose event was archived is `gone` (Refactor 15).
 // SQLite cannot change a CHECK, so the delivery table is rebuilt with its
@@ -1815,7 +1838,8 @@ export function initializeCommerceSchema(
       if (from < 89) applySchemaV89(database, appliedAt);
       if (from < 90) applySchemaV90(database, appliedAt);
       if (from < 91) applySchemaV91(database, appliedAt);
-      applySchemaV92(database, appliedAt);
+      if (from < 92) applySchemaV92(database, appliedAt);
+      applySchemaV93(database, appliedAt);
     });
   } else if (row.version !== SCHEMA_VERSION) {
     throw new Error(`Unsupported Commerce schema version: ${row.version}`);
@@ -2108,6 +2132,13 @@ CREATE INDEX checkout_payment_attempt_state
 
 // Schema 92 (Plan 90 Phase 3B) only adds a table and its indexes, so no
 // existing row moves.
+function applySchemaV93(database: CommerceDatabase, appliedAt: string): void {
+  database.exec(REFUND_APPROVAL_ONLY_V93);
+  database
+    .prepare("INSERT INTO schema_migration (version, applied_at) VALUES (?, ?)")
+    .run(93, appliedAt);
+}
+
 function applySchemaV92(database: CommerceDatabase, appliedAt: string): void {
   database.exec(SQUARE_POS_HANDOFF_SCHEMA_V92);
   database

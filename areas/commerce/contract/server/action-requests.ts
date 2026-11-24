@@ -207,7 +207,6 @@ export type CommerceCancellationAuthority = Readonly<{
   readonly refundPolicyId: string;
   readonly refundAmountMinor: number;
   readonly refundCurrency: string;
-  readonly refundGovernance: "automatic_eligible" | "approval_required";
 }>;
 
 type CommerceCancellationPathFields = Readonly<{

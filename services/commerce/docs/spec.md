@@ -241,6 +241,10 @@ configuration of a counter.
   after-sale (cancellation and refund policies and refund governance) and
   presentation. Staff edit a draft, publish it, and activate one published
   revision on a storefront.
+- Refund governance, in a checkout profile and in a counter policy, is
+  `approval_required` only: every refund waits for a merchant approval.
+  Schema 93 rewrote each stored `automatic_up_to` (a threshold under which a
+  refund could run without approval) to `approval_required`.
 - A point-of-sale configuration publishes a counter's terminal and payment
   binding for one location.
 - A storefront's tax is a percentage or a provider quote.

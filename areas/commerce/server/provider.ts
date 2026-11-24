@@ -507,16 +507,6 @@ export async function resolveCommerceCancellationAuthority(
       refundPolicyId: profile.configuration.afterSalePolicy.refundPolicyId,
       refundAmountMinor: order.totals.total.amountMinor,
       refundCurrency: order.totals.total.currency,
-      refundGovernance:
-        profile.configuration.afterSalePolicy.refundGovernance.kind ===
-          "automatic_up_to" &&
-        profile.configuration.afterSalePolicy.refundGovernance.threshold
-          .currency === order.totals.total.currency &&
-        order.totals.total.amountMinor <=
-          profile.configuration.afterSalePolicy.refundGovernance.threshold
-            .amountMinor
-          ? "automatic_eligible"
-          : "approval_required",
     },
   };
 }

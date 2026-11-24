@@ -13,7 +13,6 @@ import type {
   CheckoutTaxPolicy,
   SavedAddressPolicy,
 } from "./commerce-domain";
-import type { Money } from "./records/money.ts";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 
 const IDENTITY_MAX_LENGTH = 255;
@@ -68,7 +67,6 @@ export function parseCheckoutProfileConfiguration(
   if (!paymentPolicy.ok) return paymentPolicy;
   const afterSalePolicy = parseCheckoutAfterSalePolicy(
     configuration.value.afterSalePolicy,
-    currencyPolicy.value.currency,
   );
   if (!afterSalePolicy.ok) return afterSalePolicy;
   const presentationPolicy = parseCheckoutPresentationPolicy(
@@ -406,7 +404,6 @@ function parsePaymentPolicy(
 
 export function parseCheckoutAfterSalePolicy(
   raw: unknown,
-  checkoutCurrency: string,
 ): CheckoutProfileParseResult<CheckoutAfterSalePolicy> {
   const policy = readObject(raw, "configuration.afterSalePolicy");
   if (!policy.ok) return policy;
@@ -431,7 +428,6 @@ export function parseCheckoutAfterSalePolicy(
   if (!refundPolicyId.ok) return refundPolicyId;
   const refundGovernance = parseRefundGovernancePolicy(
     policy.value.refundGovernance,
-    checkoutCurrency,
   );
   return refundGovernance.ok
     ? {
@@ -445,41 +441,22 @@ export function parseCheckoutAfterSalePolicy(
     : refundGovernance;
 }
 
+/** Every refund waits for a merchant approval. */
 function parseRefundGovernancePolicy(
   raw: unknown,
-  checkoutCurrency: string,
 ): CheckoutProfileParseResult<CheckoutRefundGovernancePolicy> {
   const policy = readTaggedObject(
     raw,
     "configuration.afterSalePolicy.refundGovernance",
   );
   if (!policy.ok) return policy;
-  switch (policy.value.kind) {
-    case "approval_required":
-      return hasExactKeys(policy.value, ["kind"])
-        ? { ok: true, value: { kind: "approval_required" } }
-        : invalidProfile("configuration.afterSalePolicy.refundGovernance");
-    case "automatic_up_to": {
-      if (!hasExactKeys(policy.value, ["kind", "threshold"])) {
-        return invalidProfile("configuration.afterSalePolicy.refundGovernance");
-      }
-      const threshold = parseMoney(
-        policy.value.threshold,
-        "configuration.afterSalePolicy.refundGovernance.threshold",
-        checkoutCurrency,
-      );
-      return threshold.ok
-        ? {
-            ok: true,
-            value: { kind: "automatic_up_to", threshold: threshold.value },
-          }
-        : threshold;
-    }
-    default:
-      return invalidProfile(
-        "configuration.afterSalePolicy.refundGovernance.kind",
-      );
-  }
+  if (policy.value.kind !== "approval_required")
+    return invalidProfile(
+      "configuration.afterSalePolicy.refundGovernance.kind",
+    );
+  return hasExactKeys(policy.value, ["kind"])
+    ? { ok: true, value: { kind: "approval_required" } }
+    : invalidProfile("configuration.afterSalePolicy.refundGovernance");
 }
 
 export function parseCheckoutPresentationPolicy(
@@ -570,30 +547,6 @@ function readCurrency(
   return typeof raw === "string" && CURRENCY_PATTERN.test(raw)
     ? { ok: true, value: raw }
     : invalidProfile(field);
-}
-
-function parseMoney(
-  raw: unknown,
-  field: string,
-  expectedCurrency: string,
-): CheckoutProfileParseResult<Money> {
-  const money = readObject(raw, field);
-  if (!money.ok) return money;
-  if (!hasExactKeys(money.value, ["amountMinor", "currency"]))
-    return invalidProfile(field);
-  const amountMinor = readPositiveInteger(
-    money.value.amountMinor,
-    `${field}.amountMinor`,
-  );
-  if (!amountMinor.ok) return amountMinor;
-  const currency = readCurrency(money.value.currency, `${field}.currency`);
-  if (!currency.ok) return currency;
-  if (currency.value !== expectedCurrency)
-    return invalidProfile(`${field}.currency`);
-  return {
-    ok: true,
-    value: { amountMinor: amountMinor.value, currency: currency.value },
-  };
 }
 
 function readPositiveInteger(

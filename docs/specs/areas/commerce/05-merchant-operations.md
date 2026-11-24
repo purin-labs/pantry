@@ -406,7 +406,6 @@ Neighbours:
 - Only a test calls `submitAgentConfigurationProposal`: the agent tool makes a draft.
 - No command archives an area, a definition or an installation, changes the grants of
   an installation or adds a second area. A skill binds only to an area.
-- `cancel_order` records `refundGovernance`, but no code acts on it.
 - Of the step-up policies, only the Google step-up makes approval evidence. A
   `webauthn_step_up` or `seams_nep413` policy is always reported as not ready.
 - The commerce query routes `commerce/summary`, `products` and `orders` are not built.

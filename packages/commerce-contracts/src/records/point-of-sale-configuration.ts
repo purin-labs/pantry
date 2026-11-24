@@ -45,16 +45,10 @@ export type PointOfSaleCatalogScope = Static<
 // the checkout profile readers' rules (`parseCheckoutAfterSalePolicy`,
 // `parseCheckoutPresentationPolicy` and the client's
 // `parseCheckoutProfileLifecycle`).
-const refundGovernanceSchema = Type.Union([
-  StrictObject({ kind: Type.Literal("approval_required") }),
-  StrictObject({
-    kind: Type.Literal("automatic_up_to"),
-    threshold: StrictObject({
-      amountMinor: PositiveInteger,
-      currency: Type.String({ pattern: "^[A-Z]{3}$" }),
-    }),
-  }),
-]);
+// Every refund waits for a merchant approval.
+const refundGovernanceSchema = StrictObject({
+  kind: Type.Literal("approval_required"),
+});
 
 const afterSalePolicySchema = StrictObject({
   cancellationPolicyId: identityTextSchema,
@@ -117,30 +111,26 @@ const lifecycleSchema = Type.Union([
  * item list is not a partial policy, it is an unsellable one.
  */
 export const pointOfSaleConfigurationSchema = Type.Refine(
-  Type.Refine(
-    StrictObject({
-      configurationId: normalizedTextSchema,
-      organisationId: normalizedTextSchema,
-      merchantId: Type.Unsafe<CommerceMerchantId>(normalizedTextSchema),
-      pantryLocationId: normalizedTextSchema,
-      salesChannelId: normalizedTextSchema,
-      currency: currencyCodeTextSchema,
-      supportedItems: Type.Array(pointOfSaleItemPolicySchema),
-      catalogScope: Type.Optional(pointOfSaleCatalogScopeSchema),
-      cashEnabled: Type.Optional(Type.Boolean()),
-      quoteTtlSeconds: PositiveInteger,
-      tax: storefrontTaxConfigurationSchema,
-      pickupReadyLeadTimeSeconds: NonNegativeInteger,
-      afterSalePolicy: afterSalePolicySchema,
-      presentationPolicy: presentationPolicySchema,
-      revision: PositiveInteger,
-      lifecycle: lifecycleSchema,
-    }),
-    hasSellableCatalogScope,
-    sellableCatalogScopeError,
-  ),
-  refundThresholdInCurrency,
-  refundThresholdCurrencyError,
+  StrictObject({
+    configurationId: normalizedTextSchema,
+    organisationId: normalizedTextSchema,
+    merchantId: Type.Unsafe<CommerceMerchantId>(normalizedTextSchema),
+    pantryLocationId: normalizedTextSchema,
+    salesChannelId: normalizedTextSchema,
+    currency: currencyCodeTextSchema,
+    supportedItems: Type.Array(pointOfSaleItemPolicySchema),
+    catalogScope: Type.Optional(pointOfSaleCatalogScopeSchema),
+    cashEnabled: Type.Optional(Type.Boolean()),
+    quoteTtlSeconds: PositiveInteger,
+    tax: storefrontTaxConfigurationSchema,
+    pickupReadyLeadTimeSeconds: NonNegativeInteger,
+    afterSalePolicy: afterSalePolicySchema,
+    presentationPolicy: presentationPolicySchema,
+    revision: PositiveInteger,
+    lifecycle: lifecycleSchema,
+  }),
+  hasSellableCatalogScope,
+  sellableCatalogScopeError,
 );
 export type PointOfSaleConfiguration = Static<
   typeof pointOfSaleConfigurationSchema
@@ -176,31 +166,6 @@ function retiredTimestampsInOrder(
 
 function timestampOrderError(): string {
   return "lifecycle timestamps are out of order";
-}
-
-/** An automatic refund threshold is money in the counter's currency. */
-function refundThresholdInCurrency(
-  configuration: Readonly<{
-    currency: string;
-    afterSalePolicy: Readonly<{
-      refundGovernance:
-        | Readonly<{ kind: "approval_required" }>
-        | Readonly<{
-            kind: "automatic_up_to";
-            threshold: Readonly<{ currency: string }>;
-          }>;
-    }>;
-  }>,
-): boolean {
-  const governance = configuration.afterSalePolicy.refundGovernance;
-  return (
-    governance.kind !== "automatic_up_to" ||
-    governance.threshold.currency === configuration.currency
-  );
-}
-
-function refundThresholdCurrencyError(): string {
-  return "afterSalePolicy.refundGovernance.threshold must use the configuration currency";
 }
 
 function hasSellableCatalogScope(

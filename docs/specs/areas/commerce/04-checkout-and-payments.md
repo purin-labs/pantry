@@ -25,7 +25,7 @@ outside the engine. A `gmo_stera` collection runs through the Platform `DeviceFl
   | `fulfillmentPolicy`  | `pickup_only`, `shipping_only` or `buyer_choice`, each with policy ids                                                                                                              |
   | `taxPolicy`          | `merchant_inclusive` or `provider_quoted`                                                                                                                                           |
   | `paymentPolicy`      | `external_provider`, with one `paymentProviderBindingId`                                                                                                                            |
-  | `afterSalePolicy`    | A cancellation policy, a refund policy, and refund governance: `approval_required` or `automatic_up_to` a threshold                                                                 |
+  | `afterSalePolicy`    | A cancellation policy, a refund policy, and refund governance: `approval_required`, so every refund waits for a merchant approval                                                   |
   | `presentationPolicy` | Locale, merchant display name, terms and privacy policy ids, support contact                                                                                                        |
 
 - The parser (`parseCheckoutProfileConfiguration`) refuses an unknown key and a cart
@@ -99,9 +99,9 @@ outside the engine. A `gmo_stera` collection runs through the Platform `DeviceFl
   attempt again after its `reconcileAfter`, 20 at a time. It replays the cancel or
   refund command that reserved the attempt, so it gets the receipt of a retry.
 - The governed cancellation (`cancel_order`) of Pantry reads the profile that the order
-  pinned. If the profile has `automatic_up_to` and the order total is at most the
-  threshold in the same currency, the action is `automatic_eligible`. Otherwise it is
-  `approval_required`. COM-05 owns the action flow.
+  pinned and refunds the order total. It always waits for a merchant approval. A
+  cancellation signed before this rule carries `refund_governance` in its path: the
+  parser reads that key and drops it. COM-05 owns the action flow.
 
 ### Payment accounts
 

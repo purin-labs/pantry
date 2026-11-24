@@ -4,7 +4,6 @@ import type { CheckoutProfileCollection, DraftCheckoutProfileSummary, PublishedC
 import type {
   CheckoutProfileSummary,
 } from "@purin-labs/commerce-control-api/portal/checkout-profiles";
-import { formatMoneyMinor } from "@purin-labs/ui/formatting";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 
@@ -184,9 +183,6 @@ export function profileReadiness(draft: ProfileDraft): Readiness {
   const referencesReady = requiredPolicyReferences(config).every(nonEmptyText);
   const currencyReady = /^[A-Z]{3}$/u.test(config.currencyPolicy.currency);
   const paymentReady = config.paymentPolicy.kind === "external_provider";
-  const refundGovernanceReady =
-    automaticRefundThresholdReady(config) ||
-    config.afterSalePolicy.refundGovernance.kind === "approval_required";
   const items = [
     {
       label: "Profile fields",
@@ -205,13 +201,6 @@ export function profileReadiness(draft: ProfileDraft): Readiness {
         ? "Provider selected. Activation needs an active payment account."
         : "Select one external provider binding.",
     },
-    {
-      label: "Refund governance",
-      ready: refundGovernanceReady,
-      detail: refundGovernanceReady
-        ? refundGovernanceDescription(config)
-        : `Enter a positive whole-number threshold in ${config.currencyPolicy.currency} minor units.`,
-    },
   ];
   return {
     items,
@@ -219,34 +208,9 @@ export function profileReadiness(draft: ProfileDraft): Readiness {
   };
 }
 
-export function automaticRefundThresholdReady(
-  config: CheckoutProfile["configuration"],
-): boolean {
-  const governance = config.afterSalePolicy.refundGovernance;
-  return (
-    governance.kind === "automatic_up_to" &&
-    Number.isSafeInteger(governance.threshold.amountMinor) &&
-    governance.threshold.amountMinor > 0 &&
-    governance.threshold.currency === config.currencyPolicy.currency
-  );
-}
-
-export function refundGovernanceDescription(
-  config: CheckoutProfile["configuration"],
-): string {
-  const governance = config.afterSalePolicy.refundGovernance;
-  switch (governance.kind) {
-    case "approval_required":
-      return "Every refund requires merchant approval.";
-    case "automatic_up_to":
-      if (automaticRefundThresholdReady(config)) {
-        return `Refunds up to ${formatMoneyMinor(governance.threshold.amountMinor, config.currencyPolicy.currency)} are eligible for automatic processing when platform controls permit it; higher amounts require approval.`;
-      }
-      return `Enter a positive whole-number threshold in ${config.currencyPolicy.currency} minor units.`;
-    default:
-      return assertNever(governance, "Unexpected checkout profile action");
-  }
-}
+/** Every refund of a checkout profile waits for a merchant approval. */
+export const REFUND_GOVERNANCE_DESCRIPTION =
+  "Every refund requires merchant approval.";
 
 export function selectedProfile(
   state: CheckoutProfilesReadyState,

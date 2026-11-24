@@ -7,7 +7,7 @@ import {
   recordParser,
 } from "@purin-labs/contract-schema";
 import { resourceIdSchema } from "./identifiers.ts";
-import { currencyCodeSchema, moneySchema } from "./money.ts";
+import { currencyCodeSchema } from "./money.ts";
 import { commerceTimestampSchema } from "./provenance.ts";
 
 export const buyerContactPolicySchema = Type.Union([
@@ -17,10 +17,11 @@ export const buyerContactPolicySchema = Type.Union([
 ]);
 export type BuyerContactPolicy = Static<typeof buyerContactPolicySchema>;
 
-export const checkoutRefundGovernancePolicySchema = Type.Union([
-  OpenObject({ kind: Type.Literal("approval_required") }),
-  OpenObject({ kind: Type.Literal("automatic_up_to"), threshold: moneySchema }),
-]);
+// Every refund waits for a merchant approval. A profile names that rule, so
+// that a later rule is a new kind and not a change of meaning.
+export const checkoutRefundGovernancePolicySchema = OpenObject({
+  kind: Type.Literal("approval_required"),
+});
 export type CheckoutRefundGovernancePolicy = Static<
   typeof checkoutRefundGovernancePolicySchema
 >;

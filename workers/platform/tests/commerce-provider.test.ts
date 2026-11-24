@@ -587,7 +587,7 @@ it("canonicalizes production-batch inventory decrease reasons", async () => {
   });
 });
 
-it("resolves approval-required cancellation authority from exact provider resources", async () => {
+it("resolves cancellation authority from exact provider resources", async () => {
   const result = await resolveCommerceCancellationAuthority({
     client: createCancellationAuthorityClient(),
     organisationId: "organisation_demo",
@@ -611,71 +611,7 @@ it("resolves approval-required cancellation authority from exact provider resour
       refundPolicyId: "refund_policy_cancel",
       refundAmountMinor: 900,
       refundCurrency: "JPY",
-      refundGovernance: "approval_required",
     },
-  });
-});
-
-it("marks a cancellation automatically eligible only below the same-currency threshold", async () => {
-  const eligible = await resolveCommerceCancellationAuthority({
-    client: createCancellationAuthorityClient({
-      profile: cancellationProfile({
-        refundGovernance: {
-          kind: "automatic_up_to",
-          threshold: { amountMinor: 900, currency: "JPY" },
-        },
-      }),
-    }),
-    organisationId: "organisation_demo",
-    merchantId: "merchant_demo",
-    orderId: "order_cancel_1",
-    orderRevision: 4,
-    requestedAt: NOW,
-  });
-  expect(eligible).toMatchObject({
-    ok: true,
-    value: { refundGovernance: "automatic_eligible" },
-  });
-
-  const exceeded = await resolveCommerceCancellationAuthority({
-    client: createCancellationAuthorityClient({
-      profile: cancellationProfile({
-        refundGovernance: {
-          kind: "automatic_up_to",
-          threshold: { amountMinor: 899, currency: "JPY" },
-        },
-      }),
-    }),
-    organisationId: "organisation_demo",
-    merchantId: "merchant_demo",
-    orderId: "order_cancel_1",
-    orderRevision: 4,
-    requestedAt: NOW,
-  });
-  expect(exceeded).toMatchObject({
-    ok: true,
-    value: { refundGovernance: "approval_required" },
-  });
-
-  const mismatchedCurrency = await resolveCommerceCancellationAuthority({
-    client: createCancellationAuthorityClient({
-      profile: cancellationProfile({
-        currencyPolicy: { kind: "fixed", currency: "USD" },
-        refundGovernance: {
-          kind: "automatic_up_to",
-          threshold: { amountMinor: 900, currency: "USD" },
-        },
-      }),
-    }),
-    organisationId: "organisation_demo",
-    merchantId: "merchant_demo",
-    orderId: "order_cancel_1",
-    orderRevision: 4,
-    requestedAt: NOW,
-  });
-  expect(mismatchedCurrency).toMatchObject({
-    ok: true,
-    value: { refundGovernance: "approval_required" },
   });
 });
 

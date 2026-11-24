@@ -466,9 +466,7 @@ describe("commerce action contracts", () => {
     );
     expect(url.searchParams.get("refund_amount_minor")).toBe("990");
     expect(url.searchParams.get("refund_currency")).toBe("JPY");
-    expect(url.searchParams.get("refund_governance")).toBe(
-      "automatic_eligible",
-    );
+    expect(url.searchParams.has("refund_governance")).toBe(false);
     expect(draft.value.amount).toEqual({ value: 990, currency: "JPY" });
     expect(draft.value.argsHash).toBe(
       await sha256HexForTest(JSON.stringify(draft.value.path)),
@@ -621,14 +619,9 @@ describe("commerce action contracts", () => {
       refundAmountMinor: 990,
       refundCurrency: "JPY",
     });
-    expect(
-      parseCommerceCancellationAuthority({
-        ...authority,
-        refundGovernance: "approval_required",
-      }),
-    ).toEqual({
+    expect(parseCommerceCancellationAuthority(authority)).toEqual({
       ok: true,
-      value: { ...authority, refundGovernance: "approval_required" },
+      value: authority,
     });
     expect(
       parseCommerceCancellationAuthority({
@@ -1077,7 +1070,6 @@ function commerceCancellationAuthority(
     refundPolicyId: "refund_policy_standard",
     refundAmountMinor: 990,
     refundCurrency: "JPY",
-    refundGovernance: "automatic_eligible",
     ...overrides,
   };
 }

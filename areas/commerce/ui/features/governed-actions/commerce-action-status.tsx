@@ -475,9 +475,7 @@ function commerceCancellationApprovalGuidance(
     case "provider_managed":
       return "Merchant approval status is provider-managed; automatic eligibility is not asserted.";
     case "commerce_full_refund":
-      return execution.refundGovernance === "approval_required"
-        ? "Merchant approval is required before this full refund can run."
-        : "This full refund is automatic-eligible under the pinned refund policy. Platform controls may still require merchant approval.";
+      return "Merchant approval is required before this full refund can run.";
     default:
       return assertNever(execution, "Unexpected portal state");
   }

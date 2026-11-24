@@ -231,7 +231,6 @@ type CommerceCancellationExecution =
       readonly refundPolicyId: string;
       readonly refundAmountMinor: number;
       readonly refundCurrency: string;
-      readonly refundGovernance: "automatic_eligible" | "approval_required";
     }>;
 
 export function parseCommerceActionFollowUpResponse(
@@ -959,7 +958,6 @@ function parseCommerceCancellationExecution(
           "refundPolicyId",
           "refundAmountMinor",
           "refundCurrency",
-          "refundGovernance",
         ]) ||
         typeof raw.paymentId !== "string" ||
         raw.paymentId.length === 0 ||
@@ -975,9 +973,7 @@ function parseCommerceCancellationExecution(
         !isPositiveInteger(raw.checkoutProfileRevision) ||
         !isPositiveInteger(raw.refundAmountMinor) ||
         typeof raw.refundCurrency !== "string" ||
-        raw.refundCurrency.length === 0 ||
-        (raw.refundGovernance !== "automatic_eligible" &&
-          raw.refundGovernance !== "approval_required")
+        raw.refundCurrency.length === 0
       ) {
         throw new Error("Order cancellation execution is invalid.");
       }
@@ -993,7 +989,6 @@ function parseCommerceCancellationExecution(
         refundPolicyId: raw.refundPolicyId,
         refundAmountMinor: raw.refundAmountMinor,
         refundCurrency: raw.refundCurrency,
-        refundGovernance: raw.refundGovernance,
       };
     default:
       throw new Error("Order cancellation execution is invalid.");

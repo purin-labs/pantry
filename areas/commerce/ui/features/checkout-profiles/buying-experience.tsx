@@ -1,6 +1,6 @@
 import type { CheckoutProfileConfiguration } from "@purin-labs/commerce-contracts";
 import React from "react";
-import { refundGovernanceDescription } from "./model";
+import { REFUND_GOVERNANCE_DESCRIPTION } from "./model";
 
 type Fact = readonly [label: string, value: string];
 
@@ -88,7 +88,7 @@ export function BuyingExperience(props: {
           title="After the purchase"
           wide
           facts={[
-            ["Refunds", refundGovernanceDescription(config)],
+            ["Refunds", REFUND_GOVERNANCE_DESCRIPTION],
             [
               "Customer support",
               config.presentationPolicy.supportContact ||

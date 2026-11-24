@@ -982,10 +982,7 @@ function checkoutConfiguration(): CheckoutProfileConfiguration {
     afterSalePolicy: {
       cancellationPolicyId: "cancel_24h",
       refundPolicyId: "refund_standard",
-      refundGovernance: {
-        kind: "automatic_up_to",
-        threshold: { amountMinor: 5000, currency: "JPY" },
-      },
+      refundGovernance: { kind: "approval_required" },
     },
     presentationPolicy: {
       locale: "ja-JP",

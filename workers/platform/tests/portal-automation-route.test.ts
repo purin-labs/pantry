@@ -155,7 +155,6 @@ describe("Café automation route ownership", () => {
             refundPolicyId: "refund_policy_1",
             refundAmountMinor: 4250,
             refundCurrency: "USD",
-            refundGovernance: "automatic_eligible",
           },
         },
         providerResult,

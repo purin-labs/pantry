@@ -506,7 +506,6 @@ export function parseCommerceCancellationAuthority(
       "refundPolicyId",
       "refundAmountMinor",
       "refundCurrency",
-      "refundGovernance",
     ])
   ) {
     return invalid("authority");
@@ -538,12 +537,6 @@ export function parseCommerceCancellationAuthority(
   if (refundAmountMinor === null) return invalid("authority.refundAmountMinor");
   if (!currencyCode(raw.refundCurrency))
     return invalid("authority.refundCurrency");
-  if (
-    raw.refundGovernance !== "automatic_eligible" &&
-    raw.refundGovernance !== "approval_required"
-  ) {
-    return invalid("authority.refundGovernance");
-  }
   return {
     ok: true,
     value: {
@@ -558,7 +551,6 @@ export function parseCommerceCancellationAuthority(
       refundPolicyId,
       refundAmountMinor,
       refundCurrency: raw.refundCurrency,
-      refundGovernance: raw.refundGovernance,
     },
   };
 }
@@ -981,7 +973,7 @@ export function parseCommerceActionPath(
       "refund_policy_id",
       "refund_amount_minor",
       "refund_currency",
-      "refund_governance",
+      SIGNED_REFUND_GOVERNANCE_KEY,
     ])
   ) {
     return { ok: false, error: { code: "commerce_action_path_invalid" } };
@@ -1014,11 +1006,10 @@ export function parseCommerceActionPath(
     "refund_policy_id",
     "refund_amount_minor",
     "refund_currency",
-    "refund_governance",
   ] as const;
-  const hasCommerceAuthorityField = commerceAuthorityKeys.some((key) =>
-    url.searchParams.has(key),
-  );
+  const hasCommerceAuthorityField =
+    commerceAuthorityKeys.some((key) => url.searchParams.has(key)) ||
+    url.searchParams.has(SIGNED_REFUND_GOVERNANCE_KEY);
   if (execution === null || execution === "provider_managed") {
     if (hasCommerceAuthorityField) {
       return { ok: false, error: { code: "commerce_action_path_invalid" } };
@@ -1044,7 +1035,8 @@ export function parseCommerceActionPath(
     restock !== "true" ||
     notifyCustomer !== "false" ||
     note.length !== 0 ||
-    !commerceAuthorityKeys.every((key) => url.searchParams.has(key))
+    !commerceAuthorityKeys.every((key) => url.searchParams.has(key)) ||
+    !signedRefundGovernanceIsKnown(url.searchParams)
   ) {
     return { ok: false, error: { code: "commerce_action_path_invalid" } };
   }
@@ -1070,7 +1062,6 @@ export function parseCommerceActionPath(
       url.searchParams.get("refund_amount_minor"),
     ),
     refundCurrency: url.searchParams.get("refund_currency"),
-    refundGovernance: url.searchParams.get("refund_governance"),
   });
   if (!authority.ok)
     return { ok: false, error: { code: "commerce_action_path_invalid" } };
@@ -1713,10 +1704,25 @@ function cancellationPath(
         String(path.execution.refundAmountMinor),
       );
       params.set("refund_currency", path.execution.refundCurrency);
-      params.set("refund_governance", path.execution.refundGovernance);
       break;
   }
   return `/orders/${encodeURIComponent(path.resourceId)}/cancel?${params.toString()}`;
+}
+
+/**
+ * A cancellation with a full refund that was signed before every refund
+ * needed an approval carries `refund_governance`. A signed action never
+ * changes, so its history still parses: the key is read, checked and dropped.
+ */
+const SIGNED_REFUND_GOVERNANCE_KEY = "refund_governance";
+
+function signedRefundGovernanceIsKnown(searchParams: URLSearchParams): boolean {
+  const value = searchParams.get(SIGNED_REFUND_GOVERNANCE_KEY);
+  return (
+    value === null ||
+    value === "approval_required" ||
+    value === "automatic_eligible"
+  );
 }
 
 function hasUniqueQueryKeys(

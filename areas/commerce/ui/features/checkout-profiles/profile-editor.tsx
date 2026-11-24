@@ -1,27 +1,17 @@
 import { Select } from "@purin-labs/ui/select";
-import type {
-  CheckoutProfileConfiguration,
-} from "@purin-labs/commerce-contracts";
 import React from "react";
 
-import { formatMoneyMinor } from "@purin-labs/ui/formatting";
 import type {
   CheckoutProfileSummary,
 } from "@purin-labs/commerce-control-api/portal/checkout-profiles";
 import {
-  automaticRefundThresholdReady,
-  refundGovernanceDescription,
+  REFUND_GOVERNANCE_DESCRIPTION,
   type BusyAction,
   type CheckoutProfilesAction,
   type ProfileDraft,
   type Readiness,
 } from "./model";
 import type { Variant } from "@purin-labs/type-utils";
-
-type RefundGovernance =
-  CheckoutProfileConfiguration["afterSalePolicy"]["refundGovernance"];
-
-type RefundGovernanceKind = RefundGovernance["kind"];
 
 type ProfileEditorAction = Variant<CheckoutProfilesAction, "replaceDraft">;
 
@@ -46,10 +36,6 @@ const FULFILLMENT_KINDS = [
 const TAX_KINDS = [
   { value: "merchant_inclusive", label: "Merchant-inclusive tax" },
   { value: "provider_quoted", label: "Provider-quoted tax" },
-];
-const REFUND_GOVERNANCE_KINDS = [
-  { value: "approval_required", label: "Approval required" },
-  { value: "automatic_up_to", label: "Automatic up to a threshold" },
 ];
 
 function renderChoice(
@@ -402,7 +388,7 @@ export function ProfileEditor(props: {
               required
             />
           </label>
-          {renderRefundGovernanceFields(editorDraft, props.dispatch)}
+          <small>{REFUND_GOVERNANCE_DESCRIPTION}</small>
         </div>
       </fieldset>
 
@@ -447,13 +433,6 @@ function handleCurrencyChange(
     configuration: {
       ...draft.configuration,
       currencyPolicy: { kind: "fixed", currency },
-      afterSalePolicy: {
-        ...draft.configuration.afterSalePolicy,
-        refundGovernance: refundGovernanceWithCurrency(
-          draft.configuration.afterSalePolicy.refundGovernance,
-          currency,
-        ),
-      },
     },
   });
 }
@@ -687,155 +666,6 @@ function handleAfterSaleChange(
       },
     },
   });
-}
-
-function handleRefundGovernanceKindChange(
-  draft: ProfileDraft,
-  write: ProfileEditorDispatch,
-  value: string | null,
-): void {
-  const kind = value;
-  if (kind !== "approval_required" && kind !== "automatic_up_to") {
-    return;
-  }
-  replaceDraft(write, {
-    ...draft,
-    configuration: {
-      ...draft.configuration,
-      afterSalePolicy: {
-        ...draft.configuration.afterSalePolicy,
-        refundGovernance: refundGovernanceForKind(
-          draft.configuration.afterSalePolicy.refundGovernance,
-          kind,
-          draft.configuration.currencyPolicy.currency,
-        ),
-      },
-    },
-  });
-}
-
-function handleRefundThresholdChange(
-  draft: ProfileDraft,
-  write: ProfileEditorDispatch,
-  event: React.ChangeEvent<HTMLInputElement>,
-): void {
-  const current = draft.configuration.afterSalePolicy.refundGovernance;
-  if (current.kind !== "automatic_up_to") {
-    return;
-  }
-  replaceDraft(write, {
-    ...draft,
-    configuration: {
-      ...draft.configuration,
-      afterSalePolicy: {
-        ...draft.configuration.afterSalePolicy,
-        refundGovernance: {
-          kind: "automatic_up_to",
-          threshold: {
-            amountMinor: refundThresholdAmount(event),
-            currency: draft.configuration.currencyPolicy.currency,
-          },
-        },
-      },
-    },
-  });
-}
-
-function refundThresholdAmount(
-  event: React.ChangeEvent<HTMLInputElement>,
-): number {
-  const amount = event.currentTarget.valueAsNumber;
-  return Number.isFinite(amount) ? amount : 0;
-}
-
-function refundGovernanceForKind(
-  current: RefundGovernance,
-  kind: RefundGovernanceKind,
-  currency: string,
-): RefundGovernance {
-  switch (kind) {
-    case "approval_required":
-      return { kind: "approval_required" };
-    case "automatic_up_to":
-      return {
-        kind: "automatic_up_to",
-        threshold:
-          current.kind === "automatic_up_to"
-            ? { amountMinor: current.threshold.amountMinor, currency }
-            : { amountMinor: 0, currency },
-      };
-  }
-}
-
-function refundGovernanceWithCurrency(
-  current: RefundGovernance,
-  currency: string,
-): RefundGovernance {
-  switch (current.kind) {
-    case "approval_required":
-      return { kind: "approval_required" };
-    case "automatic_up_to":
-      return {
-        kind: "automatic_up_to",
-        threshold: { amountMinor: current.threshold.amountMinor, currency },
-      };
-  }
-}
-
-function renderRefundGovernanceFields(
-  draft: ProfileDraft,
-  write: ProfileEditorDispatch,
-): React.ReactNode {
-  const governance = draft.configuration.afterSalePolicy.refundGovernance;
-  const currency = draft.configuration.currencyPolicy.currency;
-  return (
-    <>
-      <label>
-        <span>Refund governance</span>
-        <Select.Root
-          items={REFUND_GOVERNANCE_KINDS}
-          value={governance.kind}
-          onValueChange={handleRefundGovernanceKindChange.bind(
-            null,
-            draft,
-            write,
-          )}
-        >
-          <Select.Trigger aria-describedby="checkout-refund-governance-help">
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Popup>
-            {REFUND_GOVERNANCE_KINDS.map(renderChoice)}
-          </Select.Popup>
-        </Select.Root>
-        <small id="checkout-refund-governance-help">
-          {refundGovernanceDescription(draft.configuration)}
-        </small>
-      </label>
-      {governance.kind === "approval_required" ? null : (
-        <label>
-          <span>Automatic refund threshold ({currency} minor units)</span>
-          <input
-            type="number"
-            min={1}
-            step={1}
-            inputMode="numeric"
-            value={governance.threshold.amountMinor}
-            onChange={handleRefundThresholdChange.bind(null, draft, write)}
-            aria-describedby="checkout-refund-governance-help"
-            aria-invalid={!automaticRefundThresholdReady(draft.configuration)}
-            required
-          />
-          {automaticRefundThresholdReady(draft.configuration) ? (
-            <small>
-              Equals{" "}
-              {formatMoneyMinor(governance.threshold.amountMinor, currency)}.
-            </small>
-          ) : null}
-        </label>
-      )}
-    </>
-  );
 }
 
 function renderFulfillmentFields(

@@ -761,7 +761,6 @@ async function proposedCancellationResponse(): Promise<unknown> {
           refundPolicyId: "refund_policy_order_1",
           refundAmountMinor: 1250,
           refundCurrency: "USD",
-          refundGovernance: "approval_required",
         },
       },
       providerResult: null,
