@@ -806,11 +806,13 @@ export async function executeWorkspaceSettingsRoute(
         !isRecord(raw) ||
         raw.ok !== true ||
         !isRecord(raw.invitation) ||
-        !isNonEmptyString(raw.invitation.organisationInvitationId) ||
-        !isNonEmptyString(raw.token)
+        !isNonEmptyString(raw.invitation.organisationInvitationId)
       ) {
         throw new Error("Pantry did not return an invitation link.");
       }
+      // Pantry shows a link one time. An open invitation of the email
+      // answers without it, and a revoke makes a new link possible.
+      if (!isNonEmptyString(raw.token)) return { kind: "invitation_open" };
       return {
         kind: "invitation_created",
         acceptanceHref: accountInvitationHref(

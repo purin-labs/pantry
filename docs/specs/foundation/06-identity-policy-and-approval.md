@@ -55,8 +55,12 @@ records each answer.
 - **Invitations.** An admin or an owner invites an email with the role `admin`,
   `operator` or `viewer`. Pantry answers one time with a random 32-byte token and keeps
   only its SHA-256 hash. The Portal shows a link, and the person who invites copies
-  it. Pantry sends no email. A new invitation for the same email revokes the open one.
-  An invitation ends after 7 days.
+  it. Pantry sends no email. While the email has an open invitation, a new invite
+  answers that invitation without its link and changes nothing. The first link stays
+  valid, and the members section says that a link exists and that a revoke makes a new
+  one. An invitation of the email that expired closes with the next invite. An
+  invitation ends after 7 days. A revoke keeps the person who revoked
+  (`revoked_by_user_id`).
 - **Accept.** The person signs in and sends the token. The verified Google email must
   equal the invitation email. A wrong token answers as a missing invitation. One batch
   writes the person, the role, the membership of the default Project and the state
@@ -301,7 +305,11 @@ decision.
 - **Receipts and audit.** A mutation with a receipt carries an `Idempotency-Key`
   header, and a member change also `x-pantry-configuration-version`.
   `control_mutation_receipt` keeps the answer for a replay. A role change and a removal
-  write an `onboarding_audit_event`.
+  write an `onboarding_audit_event`. An invitation issue, revoke and accept take only
+  the `Idempotency-Key`, and each writes its receipt and one `onboarding_audit_event`
+  (`target_kind` `invitation`) in the batch of its change. The receipt of an issue
+  keeps the invitation without its token, so a replay answers without the link. A
+  replay of an accept answers the person's membership as it is now.
 
 The control routes are under `/v1/control`. `…` is `/v1/control/organisations/:id`.
 
@@ -440,8 +448,6 @@ The boundaries:
 - **Other decisions** are not in the one read. Examples are configuration drafts, side
   Case proposals, memory candidates, Slack message drafts and WhatsApp replies. Each
   keeps its own store, route and card.
-- **Invitations.** Issue, revoke and accept write no mutation receipt and no audit
-  event. The row keeps the person who invited, but not the person who revoked.
 - **Cell of a new Organisation.** A person cannot select the cell of a new
   Organisation. Pantry takes the deployed cell nearest to the person (FND-01).
 

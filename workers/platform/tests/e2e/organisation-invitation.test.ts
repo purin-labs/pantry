@@ -28,9 +28,11 @@ const BASE = `/v1/control/organisations/${ORGANISATION_ID}/invitations`;
 
 // Plan 95 step 2, journey J5. Pantry keeps its own invitations. The link
 // works only for the invited Google email, only once for one person, and not
-// after it expires, after a revoke or after a newer invitation replaces it.
+// after it expires or after a revoke. A second invitation of an email keeps
+// the first link, and only a revoke makes a new one. Each issue, revoke and
+// accept keeps a receipt with no link token and one audit row.
 it(
-  "admits only the invited email, makes one membership for a repeated accept, and refuses an expired, revoked or replaced invitation",
+  "admits only the invited email, makes one membership for a repeated accept, keeps the first link of a double invite, names who revoked, and refuses an expired or revoked invitation and a viewer",
   invitationJourney,
   90_000,
 );
@@ -132,37 +134,136 @@ async function invitationJourney(context: TestContext): Promise<void> {
     code: "organisation_invitation_expired",
   });
 
-  // Denied: an invitation that the owner revoked.
+  // A double invite keeps the first link: the second issue and a replay of
+  // the first answer the same invitation, and neither shows a link again.
+  const twice = await commerceClient(`invite-d-${crypto.randomUUID()}`);
+  const firstKey = `invite-first-${crypto.randomUUID()}`;
+  const first = await invite(ownerSession, twice.identity.email, "operator", firstKey);
+  expect(first.status).toBe(201);
+  const firstLink = invitationLink(first);
+  const second = await invite(ownerSession, twice.identity.email, "operator");
+  const replayed = await invite(
+    ownerSession,
+    twice.identity.email,
+    "operator",
+    firstKey,
+  );
+  for (const answer of [second, replayed]) {
+    expect(answer.body).toMatchObject({
+      ok: true,
+      invitation: { organisationInvitationId: firstLink.invitationId },
+    });
+    expect(answer.body).not.toHaveProperty("token");
+  }
+  expect([second.status, replayed.status]).toEqual([200, 201]);
+  const twiceAccepted = await accept(twice.session, firstLink);
+  expect(twiceAccepted.status, JSON.stringify(twiceAccepted.body)).toBe(200);
+  expect(twiceAccepted.body).toMatchObject({ member: { role: "operator" } });
+
+  // The new admin revokes an invitation, and the answer names the admin. A
+  // replay of the revoke answers the same.
   const revokedPerson = await commerceClient(`invite-c-${crypto.randomUUID()}`);
   const toRevoke = invitationLink(
     await invite(ownerSession, revokedPerson.identity.email, "viewer"),
   );
+  const revokeKey = `revoke-${crypto.randomUUID()}`;
   const revoked = await send(
-    ownerSession,
+    invited.session,
     `${BASE}/${toRevoke.invitationId}/revoke`,
     {},
+    revokeKey,
   );
-  expect(revoked.status).toBe(200);
+  expect(revoked.status, JSON.stringify(revoked.body)).toBe(200);
+  expect(revoked.body).toMatchObject({
+    invitation: {
+      organisationInvitationId: toRevoke.invitationId,
+      kind: "revoked",
+      revokedByUserId: invited.identity.userId,
+    },
+  });
+  expect(
+    await send(
+      invited.session,
+      `${BASE}/${toRevoke.invitationId}/revoke`,
+      {},
+      revokeKey,
+    ),
+  ).toEqual(revoked);
   expect(await accept(revokedPerson.session, toRevoke)).toMatchObject({
     status: 409,
     code: "organisation_invitation_closed",
   });
 
-  // A newer invitation for the same email replaces the older link.
-  const replaced = await commerceClient(`invite-d-${crypto.randomUUID()}`);
-  const older = invitationLink(
-    await invite(ownerSession, replaced.identity.email, "operator"),
+  // After the revoke, a new invitation of the email makes a new link.
+  const renewed = invitationLink(
+    await invite(ownerSession, revokedPerson.identity.email, "viewer"),
   );
-  const newer = invitationLink(
-    await invite(ownerSession, replaced.identity.email, "operator"),
+  expect(renewed.invitationId).not.toBe(toRevoke.invitationId);
+  const viewerJoined = await accept(revokedPerson.session, renewed);
+  expect(viewerJoined.body).toMatchObject({ member: { role: "viewer" } });
+
+  // Denied: the viewer can neither invite nor revoke, and nothing changes.
+  const pendingBeforeViewer = await send(ownerSession, BASE, null);
+  const viewerInvite = await invite(
+    revokedPerson.session,
+    `viewer-pick-${crypto.randomUUID()}@example.test`,
+    "admin",
   );
-  expect(await accept(replaced.session, older)).toMatchObject({
-    status: 409,
-    code: "organisation_invitation_closed",
+  expect(viewerInvite.status).toBe(404);
+  const viewerRevoke = await send(
+    revokedPerson.session,
+    `${BASE}/${expired.invitationId}/revoke`,
+    {},
+  );
+  expect(viewerRevoke.status).toBe(404);
+  expect(await send(ownerSession, BASE, null)).toEqual(pendingBeforeViewer);
+
+  // Each issue, revoke and accept wrote one audit row, and no receipt holds
+  // a link token.
+  const audit = await fixtureDatabase()
+    .prepare(
+      `SELECT operation, actor_user_id AS actor, target_id AS target
+       FROM onboarding_audit_event
+       WHERE organisation_id = ? AND target_kind = 'invitation'`,
+    )
+    .bind(ORGANISATION_ID)
+    .all<{ operation: string; actor: string; target: string }>();
+  const owner = ownerSession.session.userId;
+  const row = (operation: string, actor: string, target: string) => ({
+    operation: `organisation.invitation.${operation}`,
+    actor,
+    target,
   });
-  const newerAccepted = await accept(replaced.session, newer);
-  expect(newerAccepted.status).toBe(200);
-  expect(newerAccepted.body).toMatchObject({ member: { role: "operator" } });
+  const byTarget = (
+    left: { operation: string; target: string },
+    right: { operation: string; target: string },
+  ): number =>
+    `${left.target}:${left.operation}`.localeCompare(
+      `${right.target}:${right.operation}`,
+    );
+  expect([...audit.results].sort(byTarget)).toEqual(
+    [
+      row("issue", owner, link.invitationId),
+      row("accept", invited.identity.userId, link.invitationId),
+      row("issue", owner, firstLink.invitationId),
+      row("accept", twice.identity.userId, firstLink.invitationId),
+      row("issue", owner, toRevoke.invitationId),
+      row("revoke", invited.identity.userId, toRevoke.invitationId),
+      row("issue", owner, renewed.invitationId),
+      row("accept", revokedPerson.identity.userId, renewed.invitationId),
+    ].sort(byTarget),
+  );
+  const receipts = await fixtureDatabase()
+    .prepare(
+      `SELECT response_body AS body FROM control_mutation_receipt
+       WHERE organisation_scope = ? AND operation LIKE 'organisation.invitation.%'`,
+    )
+    .bind(ORGANISATION_ID)
+    .all<{ body: string }>();
+  expect(receipts.results.length).toBe(9);
+  for (const token of [link, firstLink, toRevoke, renewed].map((l) => l.token))
+    for (const receipt of receipts.results)
+      expect(receipt.body).not.toContain(token);
 
   // Nobody whom a refused link names became a member.
   const members = await fixtureDatabase()
@@ -172,7 +273,7 @@ async function invitationJourney(context: TestContext): Promise<void> {
     .bind(ORGANISATION_ID)
     .all<{ userId: string }>();
   const memberIds = members.results.map((row) => row.userId);
-  for (const refused of [stranger, late, revokedPerson])
+  for (const refused of [stranger, late])
     expect(memberIds).not.toContain(refused.identity.userId);
 
   context.task.meta.organisationInvitation = {
@@ -186,9 +287,10 @@ async function invitationJourney(context: TestContext): Promise<void> {
     chatTurn: message.status,
     modelCalls: model.calls(),
     expired: "organisation_invitation_expired",
-    revoked: "organisation_invitation_closed",
-    replacedOlderLink: "organisation_invitation_closed",
-    newerAccepted: newerAccepted.status,
+    doubleInvite: { first: first.status, second: second.status },
+    revokedBy: revoked.body,
+    viewerRefused: [viewerInvite, viewerRevoke],
+    auditRows: audit.results,
   };
 }
 
@@ -213,8 +315,9 @@ function invite(
   owner: IssuedControlSession,
   email: string,
   role: "admin" | "operator" | "viewer",
+  idempotencyKey?: string,
 ): Promise<Answer> {
-  return send(owner, BASE, { email, role });
+  return send(owner, BASE, { email, role }, idempotencyKey);
 }
 
 function accept(session: IssuedControlSession, link: Link): Promise<Answer> {
@@ -249,14 +352,18 @@ async function seedExpiredInvitation(
   return { invitationId, token };
 }
 
+/** A GET when `body` is null, else a POST with its own idempotency key. */
 async function send(
   session: IssuedControlSession,
   path: string,
   body: unknown,
+  idempotencyKey: string = `invitation-${crypto.randomUUID()}`,
 ): Promise<Answer> {
+  const headers = commerceHeaders(session);
+  if (body !== null) headers.set("idempotency-key", idempotencyKey);
   const response = await exports.default.fetch(`https://localhost${path}`, {
     method: body === null ? "GET" : "POST",
-    headers: commerceHeaders(session),
+    headers,
     ...(body === null ? {} : { body: JSON.stringify(body) }),
   });
   const parsed: unknown = await response.json();

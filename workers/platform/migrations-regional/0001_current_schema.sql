@@ -4421,9 +4421,11 @@ CREATE TABLE organisation_invitation (
   accepted_user_id TEXT,
   accepted_at INTEGER,
   revoked_at INTEGER,
+  revoked_by_user_id TEXT,
   PRIMARY KEY (organisation_id, invitation_id),
   CHECK ((state = 'accepted') = (accepted_user_id IS NOT NULL AND accepted_at IS NOT NULL)),
-  CHECK ((state = 'revoked') = (revoked_at IS NOT NULL))
+  CHECK ((state = 'revoked') = (revoked_at IS NOT NULL)),
+  CHECK (revoked_by_user_id IS NULL OR state = 'revoked')
 );
 CREATE UNIQUE INDEX organisation_invitation_pending_email
   ON organisation_invitation (organisation_id, email) WHERE state = 'pending';

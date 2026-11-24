@@ -549,7 +549,8 @@ export type WorkspaceSettingsRouteData = {
 
 export type WorkspaceSettingsCommandResult =
   | Readonly<{ kind: "applied"; acceptanceHref?: never }>
-  | Readonly<{ kind: "invitation_created"; acceptanceHref: string }>;
+  | Readonly<{ kind: "invitation_created"; acceptanceHref: string }>
+  | Readonly<{ kind: "invitation_open"; acceptanceHref?: never }>;
 
 export type WorkspaceSettingsRouteTransport = {
   readonly read: (

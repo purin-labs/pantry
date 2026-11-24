@@ -12,6 +12,7 @@ import {
   issueInvitation,
   listPendingInvitations,
   revokeInvitation,
+  type InvitationMutation,
 } from "@purin-labs/tenancy/organisation-access/invitations";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
@@ -35,6 +36,7 @@ import {
   parseAssignableControlRole,
   parseControlRole,
   parseOrganisationInvitationEmail,
+  readActiveOrganisationMembership,
   revokeOrganisationMembership,
 } from "@purin-labs/tenancy/data/control-plane";
 import type { StoredControlMutationReceipt } from "@purin-labs/tenancy/data/control-mutation";
@@ -48,7 +50,7 @@ import {
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { parseUserId } from "@purin-labs/control-api/ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   activationModelRouteError,
   resolveOrganisationModelRoute,
@@ -59,8 +61,10 @@ import {
   admitUserMutation,
   controlMutationIdentity,
   mutationProjection,
+  parseMutationBoundary,
   projectionReplay,
   projectionResponse,
+  replayControlMutation,
   resolveMutationUser,
 } from "@purin-labs/control/worker/admission/control-mutation";
 import {
@@ -677,15 +681,68 @@ async function handleInvitations(
   const email = parseOrganisationInvitationEmail(body.value.email);
   if (!role.ok || !email.ok)
     return controlError("organisation_invitation_invalid", 422);
+  const admitted = await admitInvitationMutation(
+    request,
+    env,
+    authorized,
+    body.value,
+    "organisation.invitation.issue",
+  );
+  if (admitted instanceof Response) return admitted;
   const issued = await issueInvitation(authorized.executionScope, {
     email: email.value.value,
     role: role.value,
-    invitedBy: authorized.authenticated.session.userId,
-    now: Date.now(),
+    invitedBy: admitted.userId,
+    now: admitted.now,
+    mutation: admitted.mutation,
   });
-  return issued.ok
-    ? controlJson({ ok: true, ...issued.value }, 201)
-    : invitationError(issued.error.code);
+  if (!issued.ok) return invitationError(issued.error.code);
+  // The link token is in this answer only: the receipt keeps the invitation
+  // without it, and an open invitation of the email answers without it.
+  return issued.value.kind === "issued"
+    ? controlJson(
+        {
+          ok: true,
+          invitation: issued.value.invitation,
+          token: issued.value.token,
+        },
+        201,
+      )
+    : controlJson({ ok: true, invitation: issued.value.invitation });
+}
+
+/** The idempotency boundary, the receipt scope and the audit identity of an invitation change by an admin. */
+async function admitInvitationMutation(
+  request: Request,
+  env: Env,
+  authorized: AuthorizedOrganisationRequest,
+  body: Readonly<Record<string, unknown>>,
+  operation: string,
+): Promise<
+  | Response
+  | Readonly<{ userId: UserId; now: number; mutation: InvitationMutation }>
+> {
+  const admitted = await admitUserMutation({
+    request,
+    env,
+    authorized,
+    body,
+    boundary: "unversioned",
+    user: "before_replay",
+    route: new URL(request.url).pathname,
+    operation,
+  });
+  if (admitted instanceof Response) return admitted;
+  const now = Date.now();
+  return {
+    userId: admitted.user.userId,
+    now,
+    mutation: {
+      boundary: admitted.boundary,
+      scope: admitted.scope,
+      identity: await controlMutationIdentity(request, admitted.user, now),
+    },
+  };
 }
 
 async function handleRevokeInvitation(
@@ -710,11 +767,20 @@ async function handleRevokeInvitation(
     invitationId.trim() !== invitationId
   )
     return controlError("organisation_invitation_revoke_invalid", 422);
-  const revoked = await revokeInvitation(
-    authorized.executionScope,
-    invitationId,
-    Date.now(),
+  const admitted = await admitInvitationMutation(
+    request,
+    env,
+    authorized,
+    body,
+    "organisation.invitation.revoke",
   );
+  if (admitted instanceof Response) return admitted;
+  const revoked = await revokeInvitation(authorized.executionScope, {
+    invitationId,
+    revokedBy: admitted.userId,
+    now: admitted.now,
+    mutation: admitted.mutation,
+  });
   return revoked.ok
     ? controlJson({ ok: true, invitation: revoked.value })
     : invitationError(revoked.error.code);
@@ -748,6 +814,12 @@ async function handleAcceptInvitation(
     invitationId.length === 0
   )
     return controlError("organisation_invitation_accept_invalid", 422);
+  const boundary = await parseMutationBoundary(
+    request,
+    body.value,
+    "unversioned",
+  );
+  if (boundary instanceof Response) return boundary;
   const execution = await OrganisationExecutionScope.resolve(
     env,
     organisation.value,
@@ -759,11 +831,40 @@ async function handleAcceptInvitation(
     authenticated.value.session.userId,
   );
   if (user instanceof Response) return user;
+  const scope = {
+    userId: user.userId,
+    organisationScope: organisation.value,
+    route: new URL(request.url).pathname,
+    operation: "organisation.invitation.accept",
+  };
+  // A replay answers the membership of the person as it is now.
+  const replayed = await replayControlMutation({
+    boundary,
+    scope,
+    db: execution.value.database,
+    replay: async () => {
+      const member = await readActiveOrganisationMembership(
+        execution.value.database,
+        organisation.value,
+        user.userId,
+      );
+      return member === null
+        ? invitationError("organisation_invitation_closed")
+        : controlJson({ ok: true, member });
+    },
+  });
+  if (replayed !== null) return replayed;
+  const now = Date.now();
   const accepted = await acceptInvitation(execution.value, {
     invitationId,
     token: body.value.token,
     user,
-    now: Date.now(),
+    now,
+    mutation: {
+      boundary,
+      scope,
+      identity: await controlMutationIdentity(request, user, now),
+    },
   });
   return accepted.ok
     ? controlJson({ ok: true, member: accepted.value })

@@ -859,6 +859,10 @@ async function saveIntegrationsSetup(
   }
 }
 
+/** Pantry shows an invitation link one time, so an open invitation has no link to show. */
+const INVITATION_OPEN_MESSAGE =
+  "This email already has an invitation link. Revoke the invitation to make a new link.";
+
 function createWorkspaceMutation(
   context: WorkspaceSettingsRouteMutationContext,
   command: WorkspaceSettingsCommand,
@@ -892,6 +896,10 @@ async function runWorkspaceCommand(
       context.setContent,
     );
     completeSettingsMutation(context.setMutations, mutation);
+    if (result.kind === "invitation_open") {
+      context.setFeedback({ mutation, message: INVITATION_OPEN_MESSAGE });
+      return;
+    }
     context.setFeedback(
       result.kind === "invitation_created"
         ? {

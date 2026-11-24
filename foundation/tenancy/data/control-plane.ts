@@ -1851,7 +1851,8 @@ async function countActiveOrganisationOwners(
   return row.count;
 }
 
-async function readOrganisationMembershipMutationState(
+/** The environment, lifecycle and versions that an audit row of the organisation records. */
+export async function readOrganisationMembershipMutationState(
   db: OrganisationQuerySource,
   organisationId: OrganisationId,
 ): Promise<{
