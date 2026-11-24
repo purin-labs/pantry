@@ -1,5 +1,5 @@
 import { resolveCommerceMerchant } from "@purin-labs/area-commerce-contract/server/square-link";
-import { deviceFleetStub } from "@purin-labs/area-devices/server/contract/fleet-stub";
+import { deviceFleetStub } from "@purin-labs/area-devices-contract/server/fleet-stub";
 import type { TerminalAssignment } from "@purin-labs/commerce-contracts";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";

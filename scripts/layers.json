@@ -29,6 +29,7 @@
     "testing"
   ],
   "packages": {
+    "areas/devices/contract": "areas/devices/contract",
     "areas/inbox/contract": "areas/inbox/contract",
     "areas/commerce/contract": "areas/commerce/contract",
     "surfaces/portal": "surfaces/portal",
@@ -411,6 +412,7 @@
     "workspace_revision_receipt": "foundation/agent"
   },
   "rules": {
+    "areas/devices/contract/": "areas/devices/contract",
     "areas/inbox/contract/": "areas/inbox/contract",
     "areas/commerce/contract/": "areas/commerce/contract",
     "surfaces/portal/": "surfaces/portal",

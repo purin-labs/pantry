@@ -6,7 +6,7 @@ import {
   type DeviceAlertSetting,
 } from "@purin-labs/control-api";
 
-import { deviceFleetStub } from "@purin-labs/area-devices/server/contract/fleet-stub";
+import { deviceFleetStub } from "@purin-labs/area-devices-contract/server/fleet-stub";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {
   connectGateway,

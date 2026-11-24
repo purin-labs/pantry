@@ -20,7 +20,7 @@ import {
   workflowChanges,
   type WorkflowChangeCommand,
 } from "@purin-labs/area-kitchen/server/contract/workflow-changes";
-import { deviceCommands } from "@purin-labs/area-devices/server/contract/device-commands";
+import { deviceCommands } from "@purin-labs/area-devices-contract/server/device-commands";
 import {
   parseBakeStockLevelInput,
   type BakeStockLevelInput,

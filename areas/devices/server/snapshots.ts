@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { deviceFleetStub } from "./contract/fleet-stub";
+import { deviceFleetStub } from "@purin-labs/area-devices-contract/server/fleet-stub";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
@@ -10,7 +10,7 @@ import {
   readGateway,
   type DeviceRecord,
 } from "./store";
-import type { DeviceActorRef } from "./contract/device-commands";
+import type { DeviceActorRef } from "@purin-labs/area-devices-contract/server/device-commands";
 
 /**
  * Camera snapshots (Plan 85 Phase 5, D5). They are off for each Organisation

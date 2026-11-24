@@ -16,7 +16,7 @@ import { encodeBase64Url, sha256Hex } from "@purin-labs/std";
 
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { DeviceEnrollmentState, DeviceWorkState } from "./readiness";
-import type { DeviceActorRef } from "./contract/device-commands";
+import type { DeviceActorRef } from "@purin-labs/area-devices-contract/server/device-commands";
 
 /**
  * The records of shop gateways and the devices behind them (Plan 85). A found

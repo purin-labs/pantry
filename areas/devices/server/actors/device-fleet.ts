@@ -104,7 +104,7 @@ import type {
   StartTerminalCollectionInput,
   StartTerminalCollectionResult,
   TerminalCollectionRecord,
-} from "../contract/fleet-stub";
+} from "@purin-labs/area-devices-contract/server/fleet-stub";
 import {
   acceptSocket,
   closeSocket,
@@ -112,7 +112,7 @@ import {
 } from "@purin-labs/actor-runtime/actors/hibernatable-sockets";
 import { eraseUnregisteredActorState } from "@purin-labs/actor-runtime/actors/unregistered-actor-erasure";
 
-export type { DeviceSample } from "../contract/fleet-stub";
+export type { DeviceSample } from "@purin-labs/area-devices-contract/server/fleet-stub";
 
 /**
  * The connections of one shop location's gateways (Plan 85 D3). A gateway holds

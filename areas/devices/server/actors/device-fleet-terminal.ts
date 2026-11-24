@@ -7,7 +7,7 @@ import type {
   StartTerminalCollectionResult,
   TerminalCollectionRecord,
   TerminalCollectionState,
-} from "../contract/fleet-stub";
+} from "@purin-labs/area-devices-contract/server/fleet-stub";
 
 type TerminalCollectionRow = Readonly<{
   gateway_id: string;

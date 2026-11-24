@@ -1,9 +1,9 @@
-import { deviceFleetStub } from "./contract/fleet-stub";
+import { deviceFleetStub } from "@purin-labs/area-devices-contract/server/fleet-stub";
 import type {
   DeviceCommand,
   DeviceCommandResult,
   Run,
-} from "./contract/device-commands";
+} from "@purin-labs/area-devices-contract/server/device-commands";
 import type { ControlRole } from "@purin-labs/tenancy/data/control-plane";
 import { closeResultUnknownAlert, openResultUnknownAlert } from "./alerts";
 import {
@@ -16,7 +16,7 @@ import {
   type GatewayRecord,
 } from "./store";
 
-export type { DeviceCommand } from "./contract/device-commands";
+export type { DeviceCommand } from "@purin-labs/area-devices-contract/server/device-commands";
 
 /**
  * What a person or an agent can do to a gateway or a device (Plan 85). The

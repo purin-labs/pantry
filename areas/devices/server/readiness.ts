@@ -6,7 +6,7 @@ import {
   type DeviceReadiness,
 } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";
-import type { GatewayPresence } from "./contract/fleet-stub";
+import type { GatewayPresence } from "@purin-labs/area-devices-contract/server/fleet-stub";
 
 /**
  * The one answer to "can this device take the next task?" (Plan 85). The

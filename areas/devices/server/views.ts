@@ -6,7 +6,10 @@ import {
   type KitchenDeviceView,
 } from "@purin-labs/control-api";
 
-import { deviceFleetStub, type GatewayPresence } from "./contract/fleet-stub";
+import {
+  deviceFleetStub,
+  type GatewayPresence,
+} from "@purin-labs/area-devices-contract/server/fleet-stub";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {

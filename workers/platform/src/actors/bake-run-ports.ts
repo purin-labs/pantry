@@ -24,7 +24,7 @@ import {
   tellBakeRunOverBake,
 } from "@purin-labs/surface-slack/server/bake-run-announce";
 import type { BakeRunActor } from "./bake-run";
-import { deviceFleetStub } from "@purin-labs/area-devices/server/contract/fleet-stub";
+import { deviceFleetStub } from "@purin-labs/area-devices-contract/server/fleet-stub";
 
 /**
  * The Worker's side of a bake run (Plan 24 S4). Kitchen owns the run and

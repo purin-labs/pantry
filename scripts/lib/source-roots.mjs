@@ -58,6 +58,8 @@ PLATFORM_SOURCE.push("surfaces/portal/server");
 PLATFORM_SOURCE.push("areas/commerce/contract/server");
 // The Worker side of the contract of the area inbox (Refactor 17, Stage B).
 PLATFORM_SOURCE.push("areas/inbox/contract/server");
+// The Worker side of the contract of the area devices (Refactor 17, Stage B).
+PLATFORM_SOURCE.push("areas/devices/contract/server");
 
 /**
  * The folders that hold the source of the Portal, in the browser. The package

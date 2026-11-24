@@ -94,6 +94,7 @@
     "@purin-labs/surface-portal": "workspace:*",
     "@purin-labs/area-commerce-contract": "workspace:*",
     "@purin-labs/area-inbox-contract": "workspace:*",
+    "@purin-labs/area-devices-contract": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

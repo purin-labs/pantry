@@ -1,0 +1,21 @@
+{
+  "name": "@purin-labs/area-devices-contract",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./server/*": {
+      "types": "./server/*.ts",
+      "default": "./server/*.ts"
+    }
+  },
+  "dependencies": {
+    "@purin-labs/control-api": "workspace:*",
+    "@purin-labs/kernel": "workspace:*",
+    "@purin-labs/tenancy": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260707.1",
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

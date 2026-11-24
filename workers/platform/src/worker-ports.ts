@@ -113,7 +113,7 @@ import {
 } from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
 import { workflowChanges } from "@purin-labs/area-kitchen/server/contract/workflow-changes";
 import { applyApprovedWorkflowChange } from "@purin-labs/area-kitchen/server/bakery/workflow-proposals";
-import { deviceCommands } from "@purin-labs/area-devices/server/contract/device-commands";
+import { deviceCommands } from "@purin-labs/area-devices-contract/server/device-commands";
 import { runDeviceCommand } from "@purin-labs/area-devices/server/commands";
 import { connectionFlowParts } from "@purin-labs/connections/data/connection-flow-parts";
 import { prepareCredentialRefReplacement } from "@purin-labs/authority/credential-vault/service";

@@ -26,7 +26,7 @@ import type {
 } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
 
-import { deviceFleetStub } from "@purin-labs/area-devices/server/contract/fleet-stub";
+import { deviceFleetStub } from "@purin-labs/area-devices-contract/server/fleet-stub";
 // prettier-ignore
 import {
   readCounterSale as readCounterSaleState,

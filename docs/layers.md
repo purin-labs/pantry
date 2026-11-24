@@ -285,6 +285,12 @@ import each of its files. A module with no line for one of these has none.
 - Tables (7): `device_alert`, `device_alert_setting`, `device_camera_policy`, `device_enrollment`, `device_event`, `device_gateway`, `device_snapshot`
 - Public files: `areas/devices/server/contract/`
 
+## areas/devices/contract
+
+- Folders: 1
+  - `areas/devices/contract/server/`
+- Packages: `areas/devices/contract`
+
 ## areas/inbox
 
 - Folders: 16

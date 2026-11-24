@@ -2,7 +2,7 @@ import type { CobotReport, CobotTaskMessage } from "@purin-labs/control-api";
 import type {
   CobotDispatchRecord,
   CobotDispatchState,
-} from "../contract/fleet-stub";
+} from "@purin-labs/area-devices-contract/server/fleet-stub";
 
 /**
  * The cobot dispatch ledger of one shop location inside DeviceFleetActor
