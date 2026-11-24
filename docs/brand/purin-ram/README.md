@@ -66,21 +66,33 @@ tab icon keeps the solid lines, because the brush does not show at 32 px.
 
 ## Motion
 
-The ram uses the motion classes of the cat:
+The ram uses the motion classes of the cat. Its horns are hard, so no motion
+bends, stretches or squeezes a horn. The soft parts (the fur, the ears and the
+pudding) give:
 
-- The head sways and leans about the neck.
+- The head turns as one piece about the neck: it sways, and it turns to the
+  pointer.
+- The chest leans to the pointer about the tips of the paws (`paws`) and
+  carries the head. The head takes the lean back out, so it only moves with
+  the top of the chest.
+- The ears hang: when the head turns, they turn back a little, late, and
+  swing past before they settle.
+- The face looks a short way to the pointer. The mouth and the beard move
+  with the muzzle as one piece.
 - An ear flick turns the ear up about its root, because the ears hang out
   from the head.
 - The eyes are closed, so a blink is a small squeeze of each line.
-- The ram and the pudding do not wobble at rest.
+- The ram and the pudding do not wobble at rest. A poke makes the pudding
+  wobble, and the chest rides on it; the head only bobs with the neck.
 - In the stamp, the pudding lands first. The ram climbs up behind it, then it
   puts its paws on the pudding: the pudding gives a little under them, the
   ears flick and the eyes squeeze. `grab` in `ram-paths.json` holds the rim
   (`above`, `below`) and the part of the chest that is in front of the
   pudding (`region`).
-- In a croissant pose, the whole ram sways about its feet. When it eats, the
+- In a croissant pose, the whole ram rocks about its feet. When it eats, the
   croissant and the paws go up to the mouth three times, then rest. When it
-  hugs, it gives one small squeeze, then rests.
+  hugs, its body gives one small squeeze, then rests. The horns move with
+  the point between their roots (`horns`) and keep their shape.
 
 On the concept front page, the ram eats while a tool connects, and it hugs the
 croissant at the end of the page.

@@ -374,7 +374,13 @@ def trace(pose):
     for part, under, steps in pose["under"]:
         base = np.zeros((H, W), bool)
         for u in under:
-            base |= walls if u == "walls" else regions[u]
+            if u == "walls":
+                base |= walls
+            elif u.startswith("line:"):
+                # the outline of a part, so no gap opens where that part turns away
+                base |= line & (near == names.index(u[5:]) + 1)
+            else:
+                base |= regions[u]
         fills[part] = fills[part] | (
             ndi.binary_dilation(regions[part], iterations=steps) & base
         )
@@ -521,8 +527,11 @@ def pudding_extras(out, st):
         "region": paths(ndi.binary_dilation(arm, iterations=int(lw)) & below),
     }
     cys, cxs = np.nonzero(fills["custard"])
+    # The chest is soft: it leans about the tips of the paws on the pudding (`paws`), and it
+    # carries the head, which turns about the neck and stays rigid.
     out["pivots"] = {
         "neck": [512, 600],
+        "paws": [512, int(np.nonzero(fills["chest"])[0].max())],
         "earL": [350, 318],
         "earR": [682, 332],
         "pudding": [round(float(cxs.mean()), 1), int(cys.max())],
@@ -583,7 +592,7 @@ PUDDING = {
     "under": [
         ("earL", ["head", "muzzle", "walls"], 16),
         ("earR", ["head", "muzzle", "walls"], 16),
-        ("chest", ["head", "muzzle", "walls"], 34),
+        ("chest", ["head", "muzzle", "walls", "line:head"], 34),
     ],
     "front": [
         "muzzle",
@@ -650,6 +659,18 @@ def croissant_extras(pivots):
         fills = st["fills"]
         ys, xs = np.nonzero(fills["body"])
         out["pivots"] = dict(pivots, feet=[round(float(xs.mean()), 1), int(ys.max())])
+        # The horns are hard and sit on one skull: when the soft body squeezes, both horns move
+        # with the point between their roots (where each horn meets the head), and they keep
+        # their shape. One point for both, so the tips that touch stay together.
+        roots = []
+        for horn in ("hornL", "hornR"):
+            band = ndi.binary_dilation(fills[horn], iterations=int(st["lw"])) & fills["body"]
+            ys, xs = np.nonzero(band if band.any() else fills[horn])
+            roots.append((float(xs.mean()), float(ys.mean())))
+        out["pivots"]["horns"] = [
+            round((roots[0][0] + roots[1][0]) / 2, 1),
+            round((roots[0][1] + roots[1][1]) / 2, 1),
+        ]
         allf = np.zeros(st["line"].shape, bool)
         for f in fills.values():
             allf |= f
