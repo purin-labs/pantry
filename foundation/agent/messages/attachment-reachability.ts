@@ -110,6 +110,29 @@ export function attachmentObjectReachable(
   return false;
 }
 
+/**
+ * Whether one list of the organisation's prefix finds an object past the
+ * grace period, or more objects than one page holds. With neither, no object
+ * can be deleted, so the collection needs no inventory.
+ */
+export async function hasAttachmentsPastGrace(input: {
+  readonly archive: R2Bucket;
+  readonly organisationId: OrganisationId;
+  /** Objects uploaded after this instant are kept whatever they reference. */
+  readonly retainUploadedAfter: number;
+}): Promise<boolean> {
+  const page = await input.archive.list({
+    prefix: `attachments/${input.organisationId}/`,
+    limit: 1_000,
+  });
+  return (
+    page.truncated ||
+    page.objects.some(function pastGrace(object) {
+      return !insideGrace(object, input.retainUploadedAfter);
+    })
+  );
+}
+
 export async function collectMessageAttachments(input: {
   readonly archive: R2Bucket;
   readonly organisationId: OrganisationId;

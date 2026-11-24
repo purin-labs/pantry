@@ -205,10 +205,13 @@ The link reader (`messages/link-reader.ts`) works as follows:
   conversation or a retained fork names its key. A derived object is reachable when a
   reachable source has its digest. A Slack pointer is reachable when its content is.
 - `runAttachmentCollection` runs on the `*/15 * * * *` cron. One run takes at most four
-  active Organisations whose last record is older than one day. For each, it asks each
-  Case and Session Actor for its keys (`listReachableAttachmentObjectKeys`) and reads
-  the Portal conversations and the forks. It lists the whole prefix, keeps each
-  reachable object and each object younger than one day, and deletes the others.
+  active Organisations whose last record is older than one day. For each, one list of
+  the prefix comes first (`hasAttachmentsPastGrace`). If it finds no object older than
+  one day and no second page, the outcome is `nothing_old`, and no Actor is asked.
+  Otherwise the run asks each Case and Session Actor for its keys
+  (`listReachableAttachmentObjectKeys`) and reads the Portal conversations and the
+  forks. It lists the whole prefix, keeps each reachable object and each object younger
+  than one day, and deletes the others.
 - It deletes nothing without a complete inventory. A `retired` Actor is left out of the
   inventory and causes no skip. The run skips the Organisation when another Case or
   Session Actor is not `active` (`actor_not_active`) or does not answer
@@ -216,7 +219,8 @@ The link reader (`messages/link-reader.ts`) works as follows:
   the active one (`organisation_placement_conflict`), when the registry or the fork
   history cannot be read, when the list of R2 does not advance, or when the collection
   fails (`attachment_collection_failed`).
-- The record gives one outcome: `collected`, `skipped` with its reason, or `uncertain`.
+- The record gives one outcome: `collected`, `nothing_old`, `skipped` with its reason,
+  or `uncertain`.
   The outcome is `uncertain` when an R2 delete call fails. The record then lists the
   deleted, the uncertain and the not attempted keys.
 - The collection and its record are the daily pass of the Organisation
@@ -378,9 +382,10 @@ The agent loads more context with its tools, when the task needs it.
 
 - **Retention.** A stored file has the class `session`. It stays while a retained
   record names it and goes at the next collection after that. No code deletes a
-  collection record. One collection of one Organisation calls each of its Case and
-  Session Actors that is not retired. It writes two R2 objects, also when it deletes
-  nothing.
+  collection record. Each daily collection writes two R2 objects, the record and
+  `latest.json`, which pace the next pass. An Organisation with no file older than one
+  day costs one R2 list and these two writes a day and wakes no Actor. Otherwise one
+  collection calls each of its Case and Session Actors that is not retired.
 - **Untrusted content.** The text of a file, a frame, the facts of a media file and the
   text of a link are message input. They give no tool, no capability and no authority.
   Pantry never runs a file. It reads one entry of a DOCX or ODT file and expands no

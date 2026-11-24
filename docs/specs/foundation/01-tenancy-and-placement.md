@@ -230,11 +230,11 @@ Durable Object and of D1, each queue message, each KV write and each R2 write.
 The production Worker has three cron triggers (`workers/platform/wrangler.jsonc`,
 `integration-gateway.ts`):
 
-| Trigger        | Work                                                                                                                                                                                                            |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `* * * * *`    | Delivery of paid receipts                                                                                                                                                                                       |
-| `*/5 * * * *`  | Reconciliation of the commerce outbox, the backstop for a lost event                                                                                                                                            |
-| `*/15 * * * *` | Onboarding reconciliation with the deletion of expired mutation receipts, schedule dispatch, file context, attachment collection, payout reconciliation, the weekly ChatGPT sign-in refresh, the Actor registry |
+| Trigger        | Work                                                                                                                                                                                                                                                                                                                                  |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `* * * * *`    | Delivery of paid receipts                                                                                                                                                                                                                                                                                                             |
+| `*/5 * * * *`  | Reconciliation of the commerce outbox, the backstop for a lost event                                                                                                                                                                                                                                                                  |
+| `*/15 * * * *` | Onboarding reconciliation with the deletion of expired mutation receipts, of ended sessions and of ended sign-in states, schedule dispatch, file context, the daily pass of each Organisation (attachment collection, page effects, relevance records), payout reconciliation, the weekly ChatGPT sign-in refresh, the Actor registry |
 
 ## Contracts
 

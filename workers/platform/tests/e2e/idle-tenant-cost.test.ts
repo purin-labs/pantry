@@ -9,6 +9,13 @@ import {
   connectCommerceFixture,
 } from "./commerce-support";
 import { network } from "./network";
+import {
+  attachmentCollectionRecordKey,
+  runOrganisationDailyPass,
+} from "@purin-labs/conversation/messages/attachment-collection";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
+import { ORGANISATION_DAILY_STEPS } from "../../src/organisation-daily-steps";
 import { PlanJourney } from "./production-plan-support";
 import {
   seedSlackWorkspace,
@@ -42,6 +49,17 @@ const IDLE_HOUR_BUDGET: WriteCounts = {
   "rows ORGANISATION": 12,
 };
 
+/**
+ * What the daily pass of one idle shop may write. One list of its attachments
+ * finds no object older than a day, so it wakes no Case or Session Actor. It
+ * writes its collection record and the latest copy, which pace the next
+ * pass, and its daily steps write nothing: 60 R2 writes and 30 R2 lists for
+ * one shop for 30 days, $0.0004.
+ */
+const IDLE_DAILY_PASS_BUDGET: WriteCounts = {
+  "r2 writes ARCHIVE": 2,
+};
+
 /** The café's Slack workspace; Slack's `auth.test` checks its bot token. */
 const CAFE_SLACK: SharedSlackWorkspace = {
   key: "idle-cafe",
@@ -68,7 +86,8 @@ it(
  * Slack about the bot token, and a result that stays the same writes
  * nothing. The shop stays inside the budget above, still reads as in sync,
  * and its Slack still reads as healthy. No alarm that ran in the idle hour
- * is armed again.
+ * is armed again. A day later, the shop's daily pass wakes no Actor and
+ * writes only its record.
  */
 async function idleTenantCostJourney({ task }: TestContext): Promise<void> {
   const owner = await commerceClient(`idle-owner-${crypto.randomUUID()}`);
@@ -197,6 +216,30 @@ async function idleTenantCostJourney({ task }: TestContext): Promise<void> {
     `the next wake of the Commerce object, ${String(nextCommerceWake)}, is 89 days away or more`,
   ).toBe(true);
 
+  // 7. The daily pass of the shop, one day after its first hour. The shop
+  //    has no file, so its record says that nothing was old enough.
+  const dayAt = firstHourAt + 24 * hour;
+  await meter.stopObjects();
+  const dailyPass = await meter.during(async () => {
+    await runOrganisationDailyPass({
+      env: meter.env,
+      scope: await requireOrganisationExecutionScope(meter.env, organisationId),
+      now: dayAt,
+      dailySteps: ORGANISATION_DAILY_STEPS,
+      requestId: newRequestId(),
+    });
+  });
+  expect(dailyPass, "writes of the daily pass of an idle shop").toEqual(
+    IDLE_DAILY_PASS_BUDGET,
+  );
+  const dailyRecord = await env.ARCHIVE.get(
+    attachmentCollectionRecordKey(organisationId, "latest"),
+  );
+  expect(await dailyRecord?.json()).toMatchObject({
+    collectedAt: dayAt,
+    outcome: { kind: "nothing_old" },
+  });
+
   task.meta.idleTenantCost = {
     crons,
     firstHour,
@@ -208,6 +251,8 @@ async function idleTenantCostJourney({ task }: TestContext): Promise<void> {
     alarmsArmedAfterIdleHour: Object.keys(armed).length,
     alarmWrites,
     commerceAlarm: { ...commerceAlarm, writes: commerceAlarmWrites },
+    dailyPass,
+    dailyPassBudget: IDLE_DAILY_PASS_BUDGET,
     sync: stillSynced.ok ? stillSynced.value.kind : stillSynced,
   };
   const artifact = await env.JOURNEY_ARTIFACTS.fetch(

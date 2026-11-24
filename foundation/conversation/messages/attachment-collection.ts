@@ -14,6 +14,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import {
   collectMessageAttachments,
+  hasAttachmentsPastGrace,
   type AttachmentCollectionError,
   type AttachmentCollectionReceipt,
   type AttachmentCollectionUncertainReceipt,
@@ -24,10 +25,11 @@ import { assertNever } from "@purin-labs/std";
  * The scheduled attachment collection pass.
  *
  * Runs from the Worker's cron. Each pass takes a bounded number of active
- * organisations whose last collection is older than the interval, asks every live
- * Case and Session actor which attachment objects it still names, adds retained
- * fork references from D1, and hands
- * the union to the collector. The receipt — deletions, or the reason nothing
+ * organisations whose last collection is older than the interval. One list of
+ * the organisation's attachments comes first: with no object past the grace
+ * period, the pass asks no actor. Otherwise it asks every live Case and
+ * Session actor which attachment objects it still names, adds retained fork
+ * references from D1, and hands the union to the collector. The receipt — deletions, or the reason nothing
  * was deleted — is written to R2 outside the attachment prefix, and the
  * latest one is what paces the next pass. No D1 schema is involved.
  *
@@ -46,6 +48,10 @@ type OrganisationAttachmentCollectionOutcome =
   | {
       readonly kind: "collected";
       readonly receipt: AttachmentCollectionReceipt;
+    }
+  | {
+      /** One list found no object past the grace period: no inventory. */
+      readonly kind: "nothing_old";
     }
   | {
       readonly kind: "uncertain";
@@ -87,6 +93,17 @@ export async function collectOrganisationAttachments(input: {
       reason: "organisation_placement_conflict",
       actors: [],
     };
+  // One list first. With no object past the grace period, nothing can be
+  // deleted, so no Case or Session Actor is woken for an inventory. A list
+  // that fails leaves the decision to the collection, which reports it.
+  const pastGrace = await hasAttachmentsPastGrace({
+    archive: input.archive,
+    organisationId: input.scope.organisationId,
+    retainUploadedAfter: input.now - ATTACHMENT_COLLECTION_GRACE_MS,
+  }).catch(function mayBePastGrace() {
+    return true;
+  });
+  if (!pastGrace) return { kind: "nothing_old" };
   const entries = await listOrganisationActorRegistryEntries({
     db: input.scope.database,
     organisationId: input.scope.organisationId,

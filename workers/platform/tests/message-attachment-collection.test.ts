@@ -165,6 +165,9 @@ describe("scheduled attachment collection", function collectionSuite() {
     );
     await registerActor(fixture, "case", "case_old", "retired");
     fixture.answers.set(successor, []);
+    fixture.bucket.seed([
+      [`attachments/${fixture.organisationId}/slack/${DEAD}`, OLD],
+    ]);
 
     expect(
       await collectOrganisationAttachments({
@@ -233,6 +236,9 @@ describe("scheduled attachment collection", function collectionSuite() {
   it("records why an organisation was skipped", async function recordsSkip() {
     const fixture = await createFixture("organisation_collect_f");
     await registerActor(fixture, "case", "case_silent", "active");
+    fixture.bucket.seed([
+      [`attachments/${fixture.organisationId}/slack/${DEAD}`, OLD],
+    ]);
 
     await runAttachmentCollection(fixture.env, NOW, []);
 
