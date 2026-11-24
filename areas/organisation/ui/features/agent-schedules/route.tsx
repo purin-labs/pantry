@@ -4,9 +4,9 @@ import type { CaseTimelineCase, ScheduleRunsDay } from "@purin-labs/control-api"
 import {
   parseAgentOperationsResponse,
   type AgentOperationsSnapshot,
+  type AgentOperationsTransport,
   type ScheduleBinding,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
-import type { AgentOperationsTransport } from "../../agent-operations";
 import { scheduleTriggerLabel } from "../../pages/agent-console";
 import {
   nowIn,

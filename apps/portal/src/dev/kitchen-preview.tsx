@@ -3,11 +3,13 @@ import { createRoot } from "react-dom/client";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import "@purin-labs/surface-portal/ui/styles.css";
 import { PageHeader } from "@purin-labs/ui/page-components";
-import { RecipesPage } from "@purin-labs/area-kitchen/ui/features/recipes/route";
-import { CostsPage } from "@purin-labs/area-kitchen/ui/features/costs/route";
-import { BakesRoute } from "@purin-labs/area-kitchen/ui/features/bakes/route";
-import { InventoryPage } from "@purin-labs/area-commerce/ui/features/commerce/inventory";
-import { InventoryProductionRequestsPage } from "@purin-labs/area-commerce/ui/features/commerce/inventory-production";
+import {
+  BakesRoute,
+  CostsPage,
+  InventoryPage,
+  InventoryProductionRequestsPage,
+  RecipesPage,
+} from "@purin-labs/surface-portal/ui/page-code";
 import {
   bakeBoard,
   costsOverview,
@@ -136,7 +138,7 @@ function KitchenPreview(): React.ReactNode {
       <main className="portal-main">
         <div className="portal-main-inner">
           <PageHeader title={TITLES[page]} description={null} />
-          {pageContent(page)}
+          <React.Suspense fallback={null}>{pageContent(page)}</React.Suspense>
         </div>
       </main>
     </div>

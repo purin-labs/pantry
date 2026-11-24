@@ -9,10 +9,13 @@ import {
   workspacePageHeader,
   type WorkspaceDetailPage,
 } from "@purin-labs/ui/route";
-import { MenuDraftRoute } from "@purin-labs/area-cafe/ui/features/content-studio/route";
-import { OrderQueueRoute } from "@purin-labs/area-cafe/ui/features/order-queue/route";
-import { RegisterRoute } from "@purin-labs/area-cafe/ui/features/register/route";
-import { TerminalOperationsPanel } from "@purin-labs/area-cafe/ui/features/terminals/route";
+// The pages come through page-code, as the Portal loads them.
+import {
+  MenuDraftRoute,
+  OrderQueueRoute,
+  RegisterRoute,
+  TerminalOperationsPanel,
+} from "@purin-labs/surface-portal/ui/page-code";
 import {
   MENU_ITEMS,
   installPreviewRooms,
@@ -564,6 +567,7 @@ function CafePage(): React.ReactNode {
       }}
     >
       <PageHeader title={header.title} description={header.description} />
+      <React.Suspense fallback={null}>
       {page === "menus" ? (
         <MenuDraftRoute organisationId={ORGANISATION} />
       ) : null}
@@ -580,6 +584,7 @@ function CafePage(): React.ReactNode {
           mutate={refused}
         />
       ) : null}
+      </React.Suspense>
     </PortalFrame>
   );
 }

@@ -26,8 +26,10 @@ import {
   controlMutation,
   controlRead,
 } from "@purin-labs/control/portal/control-client";
-import { EMPTY_AGENT_OPERATIONS_SNAPSHOT } from "@purin-labs/area-organisation/ui/agent-operations";
-import type { AgentOperationsSnapshot } from "@purin-labs/commerce-control-api/portal/agent-operations";
+import {
+  EMPTY_AGENT_OPERATIONS_SNAPSHOT,
+  type AgentOperationsSnapshot,
+} from "@purin-labs/commerce-control-api/portal/agent-operations";
 import { useBrainSummary } from "@purin-labs/area-brain/ui/brain-summary";
 import type { BrainTransport } from "@purin-labs/area-brain/ui/features/brain/api";
 import {

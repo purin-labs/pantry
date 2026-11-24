@@ -2,16 +2,20 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import "@purin-labs/surface-portal/ui/styles.css";
-import type { AgentOperationsSnapshot } from "@purin-labs/commerce-control-api/portal/agent-operations";
+import {
+  EMPTY_AGENT_OPERATIONS_SNAPSHOT,
+  type AgentOperationsSnapshot,
+} from "@purin-labs/commerce-control-api/portal/agent-operations";
 import type { CommerceApiKey } from "@purin-labs/control-api/portal/api-keys";
 import type {
   OrganisationInvitation,
   OrganisationMember,
 } from "@purin-labs/control-api/portal/settings";
-import { CommerceApiKeysRoute } from "@purin-labs/area-commerce/ui/features/api-keys/route";
-import { WorkspaceSettingsRoute } from "@purin-labs/area-integrations/ui/features/integrations/settings-routes";
-import { EMPTY_AGENT_OPERATIONS_SNAPSHOT } from "@purin-labs/area-organisation/ui/agent-operations";
-import { OperationalAreasSection } from "@purin-labs/area-organisation/ui/pages/agent-console";
+import {
+  AgentOperationsRoute,
+  CommerceApiKeysRoute,
+  WorkspaceSettingsRoute,
+} from "@purin-labs/surface-portal/ui/page-code";
 import { PageHeader } from "@purin-labs/ui/page-components";
 import { SignIn } from "@purin-labs/surface-portal/ui/portal-shell";
 import { PortalFrame } from "@purin-labs/surface-portal/ui/shell";
@@ -176,14 +180,22 @@ window.fetch = async function previewFetch(
   });
 };
 
-async function previewSubmit(
-  _formKey: string,
-  _kind: string,
-  event: React.FormEvent<HTMLFormElement>,
-): Promise<boolean> {
-  event.preventDefault();
-  return false;
+type AreasProps = React.ComponentProps<typeof AgentOperationsRoute>;
+
+async function refuseInPreview(): Promise<never> {
+  throw new Error("Changes are not saved in the preview.");
 }
+
+const AREAS_TRANSPORT: AreasProps["transport"] = {
+  read: async () => ({ ok: true, operations: AREAS }),
+  mutate: refuseInPreview,
+  readRevisions: refuseInPreview,
+};
+
+const COMMERCE_OPERATIONS: AreasProps["commerceOperations"] = {
+  previewTrackingBatch: refuseInPreview,
+  proposeAction: refuseInPreview,
+};
 
 const SETTINGS_TRANSPORT = {
   read: async () => ({
@@ -227,7 +239,7 @@ function Frame(props: {
       sidebar={{ activePage: props.page, chatOpen: false, footer: null }}
     >
       <PageHeader title={header.title} description={header.description} />
-      {props.children}
+      <React.Suspense fallback={null}>{props.children}</React.Suspense>
     </PortalFrame>
   );
 }
@@ -254,12 +266,15 @@ function PreviewPage(): React.ReactNode {
             transport={SETTINGS_TRANSPORT}
             operationalAreas={
               canManage ? (
-                <OperationalAreasSection
+                <AgentOperationsRoute
                   organisationId="organisation_preview"
-                  snapshot={AREAS}
-                  submit={previewSubmit}
-                  mutation={{ kind: "idle" }}
-                  canConfigure
+                  page="areas"
+                  canManage
+                  commerceActionBusy={false}
+                  refreshKey="preview"
+                  loadAction={refuseInPreview}
+                  transport={AREAS_TRANSPORT}
+                  commerceOperations={COMMERCE_OPERATIONS}
                 />
               ) : null
             }

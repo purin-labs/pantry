@@ -12,9 +12,10 @@ import {
 } from "@purin-labs/area-commerce/ui/features/payments/payment-lanes";
 import { nowIn, startOfDay, usePeriod, useWiderWhenEmpty } from "@purin-labs/ui/index";
 import type { CaseTimelineCase, ScheduleRunsDay } from "@purin-labs/control-api";
-import { EMPTY_AGENT_OPERATIONS_SNAPSHOT, type AgentOperationsTransport } from "@purin-labs/area-organisation/ui/agent-operations";
-import type {
-  AgentOperationsSnapshot,
+import {
+  EMPTY_AGENT_OPERATIONS_SNAPSHOT,
+  type AgentOperationsSnapshot,
+  type AgentOperationsTransport,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import { AgentSchedulesPanel } from "@purin-labs/area-organisation/ui/features/agent-schedules/route";
 import type { BrainTransport } from "@purin-labs/area-brain/ui/features/brain/api";

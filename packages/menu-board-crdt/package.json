@@ -6,13 +6,15 @@
   "exports": {
     ".": "./src/index.ts",
     "./board": "./src/board.ts",
-    "./protocol": "./src/protocol.ts"
+    "./protocol": "./src/protocol.ts",
+    "./templates": "./src/templates.ts"
   },
   "scripts": {
     "check:types": "tsrs --noEmit"
   },
   "dependencies": {
     "@purin-labs/collaboration": "workspace:*",
+    "@purin-labs/menu-draft-crdt": "workspace:*",
     "@purin-labs/std": "workspace:*",
     "yjs": "13.6.32"
   },

@@ -6,11 +6,12 @@ import { renderToStaticMarkup } from "../../../apps/portal/node_modules/react-do
 import { StaticRouter } from "../../../apps/portal/node_modules/react-router";
 import { describe, expect, it } from "vitest";
 
-import { EMPTY_AGENT_OPERATIONS_SNAPSHOT, type AgentOperationsTransport } from "@purin-labs/area-organisation/ui/agent-operations";
 import {
+  EMPTY_AGENT_OPERATIONS_SNAPSHOT,
   parseAgentOperationForm,
   parseAgentOperationsResponse,
   type AgentOperationsSnapshot,
+  type AgentOperationsTransport,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import {
   parseCommerceActionRecordResponse,

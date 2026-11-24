@@ -3,12 +3,12 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 
 import "@purin-labs/surface-portal/ui/styles.css";
-import { EMPTY_AGENT_OPERATIONS_SNAPSHOT } from "@purin-labs/area-organisation/ui/agent-operations";
-import type {
-  AgentDefinition,
-  AgentDocumentRevision,
-  AgentOperationsSnapshot,
-  AgentRevisionTarget,
+import {
+  EMPTY_AGENT_OPERATIONS_SNAPSHOT,
+  type AgentDefinition,
+  type AgentDocumentRevision,
+  type AgentOperationsSnapshot,
+  type AgentRevisionTarget,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import {
   AgentsPage,

@@ -16,7 +16,7 @@ import {
   encodeMenuDraftServerMessage,
   parseMenuDraftClientMessage,
 } from "@purin-labs/menu-draft-crdt/protocol";
-import { templateElements } from "@purin-labs/area-cafe/server/actors/menu-board-templates";
+import { templateElements } from "@purin-labs/menu-board-crdt/templates";
 
 /*
  * The shared rooms of the café preview: the menu draft and each board. A

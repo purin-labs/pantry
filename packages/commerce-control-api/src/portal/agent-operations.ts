@@ -48,6 +48,27 @@ export type AgentOperationsSnapshot = {
   readonly commerceExceptions: CommerceExceptionInbox;
 };
 
+/** The snapshot of an Organisation with no agent work. */
+export const EMPTY_AGENT_OPERATIONS_SNAPSHOT: AgentOperationsSnapshot = {
+  areas: [],
+  responsibilityScopes: [],
+  definitions: [],
+  installations: [],
+  skills: [],
+  bindings: [],
+  cueBindings: [],
+  scheduleBindings: [],
+  governance: [],
+  escalationPolicies: [],
+  configurationProposals: [],
+  activeCases: [],
+  actionLedger: [],
+  commerceExceptions: {
+    kind: "unavailable",
+    reason: "commerce_system_unavailable",
+  },
+};
+
 export type CueBinding = {
   readonly bindingId: string;
   readonly areaId: string;
@@ -241,6 +262,20 @@ type AgentOperationFormResult =
 export type AgentRevisionTarget = {
   readonly kind: "agent_definition" | "skill";
   readonly id: string;
+};
+
+/** The reads and changes of the agent operations pages. */
+export type AgentOperationsTransport = {
+  readonly read: (organisationId: string) => Promise<unknown>;
+  readonly mutate: (
+    organisationId: string,
+    command: AgentOperationCommand,
+    mutationIntent: string,
+  ) => Promise<unknown>;
+  readonly readRevisions: (
+    organisationId: string,
+    target: AgentRevisionTarget,
+  ) => Promise<unknown>;
 };
 
 /** One historical revision of an agent's instructions or a skill's body. */

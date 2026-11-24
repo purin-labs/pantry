@@ -1,23 +1,19 @@
 import React from "react";
 import { toast } from "sonner";
 
-import type {
-  AgentOperationCommand,
-  AgentOperationFormContext,
-  AgentOperationKind,
-  AgentOperationsSnapshot,
-  ActionLedgerActivity,
-} from "@purin-labs/commerce-control-api/portal/agent-operations";
-import type { AgentOperationsTransport } from "../agent-operations";
-import type {
-  AgentDocumentRevision,
-  AgentRevisionTarget,
-} from "@purin-labs/commerce-control-api/portal/agent-operations";
-import { EMPTY_AGENT_OPERATIONS_SNAPSHOT } from "../agent-operations";
 import {
+  EMPTY_AGENT_OPERATIONS_SNAPSHOT,
   parseAgentOperationsResponse,
   parseAgentRevisionsResponse,
   parseAgentOperationForm as parseOperationForm,
+  type ActionLedgerActivity,
+  type AgentDocumentRevision,
+  type AgentOperationCommand,
+  type AgentOperationFormContext,
+  type AgentOperationKind,
+  type AgentOperationsSnapshot,
+  type AgentOperationsTransport,
+  type AgentRevisionTarget,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import { commerceActionTitle, commerceActionStateLabel, formatCommerceActionAmount } from "@purin-labs/area-commerce/ui/features/governed-actions/commerce";
 import {
@@ -71,7 +67,6 @@ import type {
   TrackingActionTarget,
 } from "@purin-labs/control-api";
 import type { PermissionRequired } from "@purin-labs/control-api";
-export type { AgentOperationsTransport } from "../agent-operations";
 export type {
   AgentOperationMutationState,
   AgentOperationRunner,

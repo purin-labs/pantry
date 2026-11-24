@@ -18,7 +18,7 @@ import {
   parseCommerceActionRecordResponse,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import type { CommerceOperationsTransport } from "@purin-labs/area-commerce/ui/features/commerce/operations";
-import type { AgentOperationsTransport } from "@purin-labs/area-organisation/ui/pages/automation";
+import type { AgentOperationsTransport } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import { createAccessRouteTransport } from "@purin-labs/area-organisation/ui/features/access/api";
 import { pickGoogleDriveFile } from "@purin-labs/area-organisation/ui/features/access/google-drive-picker";
 import {

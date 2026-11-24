@@ -1826,6 +1826,9 @@ importers:
       '@purin-labs/collaboration':
         specifier: workspace:*
         version: link:../collaboration
+      '@purin-labs/menu-draft-crdt':
+        specifier: workspace:*
+        version: link:../menu-draft-crdt
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../std

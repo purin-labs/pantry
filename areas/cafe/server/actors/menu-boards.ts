@@ -73,7 +73,7 @@ import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
-import { templateElements } from "./menu-board-templates";
+import { templateElements } from "@purin-labs/menu-board-crdt/templates";
 import {
   boardDraftAction,
   boardEditAction,

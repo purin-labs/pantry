@@ -10,7 +10,7 @@ import {
   type MenuBoardRect,
   type MenuBoardStart,
   MENU_BOARD_DESIGNS,
-} from "@purin-labs/menu-board-crdt";
+} from "./index.ts";
 import type { MenuDraftSnapshot } from "@purin-labs/menu-draft-crdt";
 
 /**

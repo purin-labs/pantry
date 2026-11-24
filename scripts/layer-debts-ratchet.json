@@ -12,10 +12,10 @@
       "reads": 91
     },
     "surface-nonpublic": {
-      "imports": 249
+      "imports": 245
     },
     "area-package": {
-      "imports": 78
+      "imports": 75
     },
     "worker-logic": {
       "files": 10,
@@ -134,7 +134,7 @@
         "imports surfaces/portal -> areas/inbox": 5,
         "imports surfaces/portal -> areas/integrations": 28,
         "imports surfaces/portal -> areas/kitchen": 29,
-        "imports surfaces/portal -> areas/organisation": 35,
+        "imports surfaces/portal -> areas/organisation": 31,
         "imports surfaces/slack -> areas/commerce": 9,
         "imports surfaces/slack -> areas/inbox": 4,
         "imports surfaces/slack -> areas/kitchen": 4,
@@ -164,7 +164,7 @@
         "imports areas/kitchen -> @purin-labs/commerce-control-api": 1,
         "imports areas/organisation -> @purin-labs/bakery-workflow": 2,
         "imports areas/organisation -> @purin-labs/commerce-client": 1,
-        "imports areas/organisation -> @purin-labs/commerce-control-api": 12,
+        "imports areas/organisation -> @purin-labs/commerce-control-api": 9,
         "imports areas/organisation -> @purin-labs/kitchen-control-api": 1
       }
     },

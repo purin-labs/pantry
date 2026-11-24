@@ -286,7 +286,7 @@ who asked.
   `screen_pairing`, written only by `data/screen-pairing.ts`. The regional D1 has no
   table of this subsystem.
 - The Actor's commands are in `actors/menu-board-commands.ts`. The templates, the agent
-  actions and the archive columns are in `menu-board-templates.ts`,
+  actions and the archive columns are in `templates.ts` of `@purin-labs/menu-board-crdt`,
   `menu-board-agent-action.ts` and `menu-board-archive.ts`.
 - Shared code for routes and tools is in `areas/cafe/server/contract/`:
   `menu-publication.ts` (`planCafeMenu`), `order-queue-commands.ts`, `media.ts` and
