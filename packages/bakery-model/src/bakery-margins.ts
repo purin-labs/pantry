@@ -13,15 +13,19 @@
  */
 import { Type, type Static, type TSchema } from "typebox";
 import { Value } from "typebox/value";
+import { textLimit } from "@purin-labs/contract-schema";
 
 const Closed = { additionalProperties: false } as const;
 const Measure = Type.Number({ minimum: 0 });
-const Joint = Type.String({ minLength: 1, maxLength: 80 });
+const Joint = textLimit(Type.String({ minLength: 1, maxLength: 80 }));
 /** The two geometries of a contact, by their model names. */
-const ContactPair = Type.Array(Type.String({ minLength: 1, maxLength: 120 }), {
-  minItems: 2,
-  maxItems: 2,
-});
+const ContactPair = Type.Array(
+  textLimit(Type.String({ minLength: 1, maxLength: 120 })),
+  {
+    minItems: 2,
+    maxItems: 2,
+  },
+);
 const Nullable = <T extends TSchema>(schema: T) =>
   Type.Union([schema, Type.Null()]);
 
@@ -78,7 +82,7 @@ const Overspeed = Type.Object(
 export const OperationMargins = Type.Object(
   {
     schemaVersion: Type.Literal(1),
-    ratingSource: Type.String({ minLength: 1, maxLength: 200 }),
+    ratingSource: textLimit(Type.String({ minLength: 1, maxLength: 200 })),
     measuredSeconds: Measure,
     joints: Type.Array(JointMargin, { minItems: 6, maxItems: 6 }),
     peakPenetrationM: Measure,
@@ -141,7 +145,9 @@ export const MarginSummary = Type.Union([
       peakSlipM: Measure,
       // One speed failure, a clamp warning for each of six joints, one
       // penetration and one slip warning.
-      lines: Type.Array(Type.String({ maxLength: 400 }), { maxItems: 9 }),
+      lines: Type.Array(textLimit(Type.String({ maxLength: 400 })), {
+        maxItems: 9,
+      }),
     },
     Closed,
   ),

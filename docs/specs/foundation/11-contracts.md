@@ -249,8 +249,8 @@ Rules for a contract writer:
 - If a digest covers a record, write an encoder that fixes the field order.
 - Do not use a bare `maxLength` as a size limit. Wrap the string schema in `textLimit`,
   or check the size with a `@purin-labs/std` helper. `pnpm lint:text-limits` refuses a
-  new string schema with a bare `maxLength`; `scripts/text-limits-ratchet.json` lists
-  the files that still have one, and their counts only fall.
+  string schema with a bare `maxLength`; its ratchet file
+  (`scripts/text-limits-ratchet.json`) lists no file.
 
 | Limit                                          | Value                                                        | Where                                                                                    |
 | ---------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
@@ -311,10 +311,6 @@ Neighbours:
 - **One open integer.** An integer schema in `production-simulation`
   (`src/native/station-replies.ts`) has a `minimum` and no `maximum`. The file is a
   source of the pinned physics execution bundle, so a change needs a bundle rebuild
-  (`pnpm lint:physics-bundle`).
-- **Schema length.** Four string schemas of `bakery-model/src/bakery-margins.ts` still
-  set a bare `maxLength` (`scripts/text-limits-ratchet.json`). The file is a source of
-  the pinned physics execution bundle, so a change needs a bundle rebuild
   (`pnpm lint:physics-bundle`).
 - **Lone surrogates in the access decoders.** `jsonInput` in `access-control.ts` tests
   the JSON text for a lone surrogate. `JSON.stringify` writes a lone surrogate as an
