@@ -642,14 +642,6 @@ h1[tabindex="-1"]:focus {
   text-underline-offset: 3px;
 }
 
-.access35-defaults-effects {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding-inline-start: 18px;
-  font-size: 14px;
-}
-
 .access35-explanation {
   position: sticky;
   bottom: 12px;

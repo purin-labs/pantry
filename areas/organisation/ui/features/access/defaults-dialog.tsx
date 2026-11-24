@@ -1,6 +1,8 @@
 import React from "react";
+import { Check, Lock } from "lucide-react";
 
 import { cancelDialog, DialogHeading, syncDialog } from "./dialog-elements";
+import "./defaults-dialog.css";
 
 /**
  * Confirms the baseline materializer before it runs, naming exactly what the
@@ -29,21 +31,45 @@ export function ApplyDefaultsDialog(
           title="Apply recommended access"
           close={props.close}
         />
-        <ul className="access35-defaults-effects">
-          <li>
-            Owners and admins may read Case context and discover connected
-            integrations.
-          </li>
-          <li>
-            Each selected Slack agent conversation keeps the capabilities for
-            ordinary Case work.
-          </li>
-          <li>
-            Provider data, files, payments, and outside effects stay closed
-            until granted exactly.
-          </li>
-        </ul>
-        <p>Applying it again never restores access that you removed.</p>
+        <div className="access35-defaults-groups">
+          <section
+            className="access35-defaults-on"
+            aria-labelledby="access35-defaults-on-title"
+          >
+            <h3 id="access35-defaults-on-title">Turns on</h3>
+            <ul>
+              <li>
+                <Check aria-hidden="true" size={18} />
+                <span>
+                  Owners and admins can read Case context and see connected
+                  integrations.
+                </span>
+              </li>
+              <li>
+                <Check aria-hidden="true" size={18} />
+                <span>
+                  The Slack agent conversations that you selected keep ordinary
+                  Case work.
+                </span>
+              </li>
+            </ul>
+          </section>
+          <section aria-labelledby="access35-defaults-off-title">
+            <h3 id="access35-defaults-off-title">Stays off</h3>
+            <ul>
+              <li>
+                <Lock aria-hidden="true" size={18} />
+                <span>
+                  Provider data, files, payments and outside effects, until you
+                  grant each one.
+                </span>
+              </li>
+            </ul>
+          </section>
+        </div>
+        <p className="access35-defaults-note">
+          Applying it again never restores access that you removed.
+        </p>
         <div className="access35-dialog-actions">
           <button
             type="button"

@@ -1,0 +1,51 @@
+/* Apply recommended access: what turns on, then what stays off. */
+.access35-defaults-groups {
+  display: grid;
+  gap: 22px;
+  margin: 4px 0 20px;
+}
+
+.access35-defaults-groups section {
+  display: grid;
+  gap: 10px;
+}
+
+.access35-defaults-groups h3 {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.access35-defaults-groups ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+}
+
+.access35-defaults-groups li {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.access35-defaults-groups svg {
+  margin-top: 2px;
+  color: var(--ink-2);
+}
+
+.access35-defaults-on svg {
+  color: var(--ok-text);
+}
+
+.access35-defaults-note {
+  margin: 0 0 4px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
