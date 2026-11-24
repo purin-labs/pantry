@@ -2,13 +2,13 @@
 // kind, the path of an approved action and its errors. The action modules of
 // commerce parse and build them; another area names them through the
 // contract.
-import type { CafeMenuDefinition } from "@purin-labs/area-cafe/server/contract/menu-publication";
-import type { StockOperationAction } from "@purin-labs/area-kitchen/server/contract/stock-action";
+import type { StockOperationAction } from "./stock-operations";
 import type {
   CommercePluginActionV1,
   CommercePluginEntityTypeV1,
   CommercePluginFieldV1,
   CommercePluginHandlerV1,
+  PublishMenuCommand,
 } from "@purin-labs/commerce-client";
 import type { Variant } from "@purin-labs/type-utils";
 
@@ -98,7 +98,7 @@ export type PublishCafeMenuAction = Readonly<{
   documentRevision: number;
   /** The published revision that this menu replaces; null for the first. */
   expectedMenuRevision: number | null;
-  menu: CafeMenuDefinition;
+  menu: PublishMenuCommand["menu"];
   /** Each entry's name in the draft, because a Commerce entry has none. */
   entryNames: readonly Readonly<{ menuEntryId: string; displayName: string }>[];
   addedEntryIds: readonly string[];

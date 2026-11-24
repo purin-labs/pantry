@@ -37,8 +37,8 @@ import {
   stockOperationExpectedRevision,
   stockOperationResourceId,
   stockOperationVerb,
-  type StockOperationAction,
 } from "@purin-labs/area-kitchen/server/contract/stock-action";
+import type { StockOperationAction } from "./contract/stock-operations";
 import {
   CAFE_MENU_PUBLISH_VERB,
   cafeMenuActionPath,

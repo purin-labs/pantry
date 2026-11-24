@@ -12,11 +12,11 @@ import {
 } from "@purin-labs/commerce-client";
 import type { CommerceListEntry } from "@purin-labs/commerce-contracts";
 
-import {
-  StockActionRequestError,
-  type StockOperation,
-  type StockOperationAction,
-} from "./stock-action";
+import { StockActionRequestError } from "./stock-action";
+import type {
+  StockOperation,
+  StockOperationAction,
+} from "@purin-labs/area-commerce/server/contract/stock-operations";
 
 export type StockProposalRequest = Readonly<{
   kind:

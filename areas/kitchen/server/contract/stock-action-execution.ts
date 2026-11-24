@@ -24,7 +24,7 @@ import type {
   StockPurchaseRequestOperation,
   StockReceiveOperation,
   StockCountOperation,
-} from "./stock-action";
+} from "@purin-labs/area-commerce/server/contract/stock-operations";
 
 type StockReceiptFields = Readonly<{
   receiptId: string;
