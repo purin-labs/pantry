@@ -16,6 +16,7 @@
     "@purin-labs/authority": "workspace:*",
     "@purin-labs/connections": "workspace:*",
     "@purin-labs/contracts": "workspace:*",
+    "@purin-labs/control": "workspace:*",
     "@purin-labs/control-api": "workspace:*",
     "@purin-labs/conversation": "workspace:*",
     "@purin-labs/kernel": "workspace:*",

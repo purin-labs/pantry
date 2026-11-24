@@ -199,6 +199,11 @@ test and any fixture that exists only for the obsolete behavior.
   and one in the queue: the agent's order read names no `lifecycle` field and
   still gets each order's state as the Orders page shows it. An administrator
   without the order read gets no order.
+- `e2e/chat-agent-pending-decisions.test.ts` follows the Portal chat agent's
+  `pending_decisions_read`: a step of the owner's private chat waits for the
+  owner, the owner's agent lists the decisions that the owner's Portal read
+  shows, and an administrator's agent lists their own Portal's, without that
+  step.
 - `e2e/chat-agent-recipes-suppliers.test.ts` follows the Portal chat agent through
   recipes and suppliers (Plan 81): a prompt for each missing read and capability,
   the exit check of a private chat, a save that the person's page shows, a stale

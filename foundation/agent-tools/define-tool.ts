@@ -38,7 +38,11 @@ type ToolRerun =
   | { readonly kind: "none" };
 
 /** A tool that the turn offers by its origin, not by a capability grant. */
-type TurnToolFlag = "memoryProposal" | "followUp" | "sideCaseProposal";
+type TurnToolFlag =
+  | "memoryProposal"
+  | "followUp"
+  | "sideCaseProposal"
+  | "permissionRequest";
 
 /**
  * When a turn offers the tool.

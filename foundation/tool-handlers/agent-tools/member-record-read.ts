@@ -12,14 +12,20 @@ import { liveDeviceMember } from "./session-support";
 
 /**
  * One agent read of an Organisation record that every member may read, such
- * as the Jev settings or the Bakes page. The person who asked must be a
- * member now. The value enters the turn only after the information-flow
- * boundary admits it, under the record's source label.
+ * as the Jev settings or the Bakes page, or of a record that only the person
+ * who asked reads (`ingress`: the label of the person's own message). The
+ * person who asked must be a member now. The value enters the turn only after
+ * the information-flow boundary admits it, under the record's source label.
  */
 export async function readMemberRecord<Value>(
   context: SessionToolContext,
   input: Readonly<{
-    source: "device_fleet" | "recipe_workflow" | "jev_settings" | "bake_board";
+    source:
+      | "device_fleet"
+      | "recipe_workflow"
+      | "jev_settings"
+      | "bake_board"
+      | "ingress";
     recordId: string;
     /**
      * Whether the member may read the record. A read that every member may

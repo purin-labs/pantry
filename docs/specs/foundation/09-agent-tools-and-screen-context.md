@@ -21,12 +21,12 @@ answers with a receipt. An observation grants no authority and proves no saved r
 - The mailbox agent and the WhatsApp agent have their own registries (INB-01). A turn
   can also add tools from data: the operations of a custom connector (INT-01).
 
-| Selection    | A turn offers the tool when                                                    | Tools in the list                                                       |
-| ------------ | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
-| `capability` | The turn holds the capability. The call claims it                              | 72                                                                      |
-| `surface`    | The turn is a Portal turn, and the role of the person may use the page command | 47: Kitchen workspace 38, Costs & margins 3, Pastry Bench 2, Register 4 |
-| `turn`       | The origin of the turn sets a flag                                             | `propose_memory`, `schedule_follow_up`, `propose_side_case`             |
-| `host`       | The turn runs in the named host                                                | None. The two agent registries hold them                                |
+| Selection    | A turn offers the tool when                                                    | Tools in the list                                                                     |
+| ------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| `capability` | The turn holds the capability. The call claims it                              | 72                                                                                    |
+| `surface`    | The turn is a Portal turn, and the role of the person may use the page command | 47: Kitchen workspace 38, Costs & margins 3, Pastry Bench 2, Register 4               |
+| `turn`       | The origin of the turn sets a flag                                             | `propose_memory`, `schedule_follow_up`, `propose_side_case`, `pending_decisions_read` |
+| `host`       | The turn runs in the named host                                                | None. The two agent registries hold them                                              |
 
 | Effect      | A successful call proves                                            | Result to the harness                     |
 | ----------- | ------------------------------------------------------------------- | ----------------------------------------- |
@@ -46,7 +46,14 @@ answers with a receipt. An observation grants no authority and proves no saved r
   typed value.
 - The turn flags come from `actors/session/turn-tool-offers.ts`. An owner or admin in
   the Portal gets `propose_memory`. A Slack thread turn gets `schedule_follow_up`. A
-  Slack thread turn, or a step of a Portal chat, gets `propose_side_case`.
+  Slack thread turn, or a step of a Portal chat, gets `propose_side_case`. A turn that
+  may ask a person (the flag `permissionRequest`) gets `pending_decisions_read`.
+- `pending_decisions_read` (family `decisions`, `agent-tools/decisions/`) lists what
+  waits for the person who asks through the one read of FND-06. It reads as the
+  person's Portal sign-in of the turn (`readTurnControlSession`,
+  `authorizeOrganisationSession`), so each store applies the check of its own page. The
+  list enters the turn with the label of the person's own message. A Slack turn has no
+  Portal sign-in and gets a refusal.
 
 ### The catalog of one turn
 
@@ -278,6 +285,7 @@ state or path. The list reads only the Portal chats of the Case that the reader 
   always one family. `commerce/` also holds the family `cafe`, and `drafts/` holds
   `menu`. `channels/` also holds `mailbox_agent` and `whatsapp_agent`. `bakery/` and
   `costs/` hold tools of the family `kitchen`, and `organisation/` holds no tool.
+  `decisions/` holds the family `decisions`.
 - **The catalog** in `agent-tools/catalog/`: `selection.ts`, `execute.ts`,
   `permission.ts`, `code-mode.ts`, `tool-registry.ts` and `types.ts`. The Session side
   is `actors/session/tool-wiring.ts` and `actors/pi-durable-tools.ts`.

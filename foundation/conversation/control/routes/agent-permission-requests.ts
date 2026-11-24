@@ -45,7 +45,7 @@ import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisatio
 import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
 import {
   authorizeOrganisationRequest,
-  type AuthorizedOrganisationRequest,
+  type OrganisationReader,
 } from "@purin-labs/control/worker/authorization";
 import { heldOutputSummaries } from "./held-output-requests";
 import {
@@ -561,7 +561,7 @@ function readGrantTarget(
 
 /** An owner or admin decides a permission request. */
 export function mayDecideAgentPermissionRequests(
-  authorized: AuthorizedOrganisationRequest,
+  authorized: OrganisationReader,
 ): boolean {
   return (
     authorized.membership.role === "owner" ||
@@ -575,7 +575,7 @@ export function mayDecideAgentPermissionRequests(
  * their own.
  */
 export async function agentPermissionRequestSummaries(
-  authorized: AuthorizedOrganisationRequest,
+  authorized: OrganisationReader,
 ): Promise<readonly AgentPermissionRequestSummary[]> {
   const pending = await listPendingAgentPermissionRequests(
     authorized.executionScope.database,

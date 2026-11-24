@@ -99,6 +99,7 @@ import {
   messageLinkRead,
 } from "@purin-labs/agent-tools/messages/messages";
 import { slackMessageProposal } from "@purin-labs/surface-slack/server/agent-tools/slack/slack";
+import { pendingDecisionsRead } from "@purin-labs/agent-tools/decisions/decisions";
 import {
   followUp,
   memoryProposal,
@@ -198,6 +199,7 @@ export const TOOLS = [
   memoryProposal,
   followUp,
   sideCaseProposal,
+  pendingDecisionsRead,
 ] as const;
 
 export const TOOL_REGISTRY = createToolRegistry(TOOLS);

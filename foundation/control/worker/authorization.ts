@@ -5,6 +5,7 @@ import {
   authorizeOrganisationControl,
   parseFencedOrganisationMembership,
   resolveControlSession,
+  resolveControlSessionById,
   validateControlCsrf,
   type ActiveControlSession,
   type ActiveOrganisationMembership,
@@ -15,8 +16,10 @@ import {
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,
+  type ControlSessionId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import { requirePublicOrigin } from "@purin-labs/kernel/public-origin";
 import { controlError, readJsonRecord, type JsonRecord } from "./http";
 
@@ -37,6 +40,58 @@ export type AuthorizedOrganisationRequest = {
   readonly authenticated: AuthenticatedControlRequest;
   readonly membership: ActiveOrganisationMembership;
 };
+
+/**
+ * The person behind a read of the stores of a page: the Organisation, its
+ * scope, the person's membership and live control session. A request gives
+ * it, and so does a Portal chat turn of that person
+ * (`authorizeOrganisationSession`).
+ */
+export type OrganisationReader = Readonly<{
+  organisationId: OrganisationId;
+  executionScope: OrganisationExecutionScope;
+  authenticated: Readonly<{ session: ActiveControlSession }>;
+  membership: ActiveOrganisationMembership;
+}>;
+
+/**
+ * The reader of one control session of the person, with the checks of a
+ * request: the session is live and belongs to the user, and the person holds
+ * `role` for `action` now. Null when a check refuses or cannot run.
+ */
+export async function authorizeOrganisationSession(
+  input: Readonly<{
+    env: Env;
+    scope: OrganisationExecutionScope;
+    controlSessionId: ControlSessionId;
+    userId: UserId;
+    role: ControlRole;
+    action: OrganisationAdmissionAction;
+  }>,
+): Promise<OrganisationReader | null> {
+  const session = await resolveControlSessionById({
+    db: input.env.DB,
+    controlSessionId: input.controlSessionId,
+    now: Date.now(),
+  });
+  if (!session.ok || session.value.userId !== input.userId) return null;
+  const allowed = await authorizeOrganisationControl({
+    db: input.scope.database,
+    accountAccess: input.scope.accountAccess,
+    action: input.action,
+    session: session.value,
+    organisationId: input.scope.organisationId,
+    requiredRole: input.role,
+  });
+  return allowed.ok
+    ? {
+        organisationId: input.scope.organisationId,
+        executionScope: input.scope,
+        authenticated: { session: session.value },
+        membership: allowed.value.membership,
+      }
+    : null;
+}
 
 type AuthenticatedControlResult =
   | { readonly ok: true; readonly value: AuthenticatedControlRequest }

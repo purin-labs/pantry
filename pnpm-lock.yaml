@@ -1819,6 +1819,9 @@ importers:
       '@purin-labs/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@purin-labs/control':
+        specifier: workspace:*
+        version: link:../control
       '@purin-labs/control-api':
         specifier: workspace:*
         version: link:../../packages/control-api

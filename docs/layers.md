@@ -109,10 +109,11 @@ import each of its files. A module with no line for one of these has none.
 
 ## foundation/agent-tools
 
-- Folders: 6
+- Folders: 7
   - `foundation/agent-tools/`
   - `foundation/agent-tools/catalog/`
   - `foundation/agent-tools/context/`
+  - `foundation/agent-tools/decisions/`
   - `foundation/agent-tools/files/`
   - `foundation/agent-tools/messages/`
   - `foundation/agent-tools/turn/`

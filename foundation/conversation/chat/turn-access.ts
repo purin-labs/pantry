@@ -429,6 +429,31 @@ async function authorizeRecordedSessionOrigin(
   }
 }
 
+/**
+ * The person and the Portal sign-in of a turn that a person started in the
+ * Portal: a chat step or an operator command. Null for a Slack turn and for
+ * a turn with no recorded origin.
+ */
+export async function readTurnControlSession(
+  database: OrganisationDatabase,
+  organisationId: OrganisationId,
+  sessionId: string,
+  turnId: string,
+): Promise<Readonly<{
+  userId: UserId;
+  controlSessionId: ControlSessionId;
+}> | null> {
+  const origin = await readSessionTurnOrigin(
+    database,
+    organisationId,
+    sessionId,
+    turnId,
+  );
+  return origin === null || origin.kind === "slack_operator"
+    ? null
+    : { userId: origin.userId, controlSessionId: origin.controlSessionId };
+}
+
 async function readSessionTurnOrigin(
   database: OrganisationDatabase,
   organisationId: OrganisationId,

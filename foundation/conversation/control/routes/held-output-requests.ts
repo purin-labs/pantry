@@ -31,6 +31,7 @@ import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
+  type OrganisationReader,
 } from "@purin-labs/control/worker/authorization";
 import {
   controlError,
@@ -163,7 +164,7 @@ export async function decideHeldOutput(
 /** The held answers that wait for this member, for the pending list. */
 export async function heldOutputSummaries(
   env: Env,
-  authorized: AuthorizedOrganisationRequest,
+  authorized: OrganisationReader,
 ): Promise<readonly HeldOutputSummary[]> {
   const now = Date.now();
   const pending = await listPendingHeldOutputRequests(
@@ -209,7 +210,7 @@ async function readDecidable(
 
 async function memberViewer(
   env: Env,
-  authorized: AuthorizedOrganisationRequest,
+  authorized: OrganisationReader,
 ): Promise<MemberViewer | null> {
   const scope = authenticatedConversationScope(
     authorized.organisationId,
@@ -239,7 +240,7 @@ async function restoredLabel(
 
 async function mayDecide(
   viewer: MemberViewer,
-  authorized: AuthorizedOrganisationRequest,
+  authorized: OrganisationReader,
   stored: HeldOutputRequest,
 ): Promise<boolean> {
   const label = await restoredLabel(stored);
@@ -319,7 +320,7 @@ function effectLabel(stored: HeldOutputRequest): string | null {
  * the chat opens its prompt. Null for a Slack thread.
  */
 async function chatConversationId(
-  authorized: AuthorizedOrganisationRequest,
+  authorized: OrganisationReader,
   stored: HeldOutputRequest,
 ): Promise<string | null> {
   if (stored.effect === null || stored.requestAuthority.kind !== "control")
@@ -333,7 +334,7 @@ async function chatConversationId(
 
 /** The channel's name from the newest discovery, when Pantry knows it. */
 async function destinationName(
-  authorized: AuthorizedOrganisationRequest,
+  authorized: OrganisationReader,
   stored: HeldOutputRequest,
 ): Promise<string | null> {
   if (stored.channelId === null) return null;

@@ -430,8 +430,10 @@ The boundaries:
 - **Other ceremonies.** `webauthn_step_up` and `seams_nep413` parse, but no route makes
   them. `/v1/admin/person-roles` writes the `approve` role, and no approval reads it.
   The policy binding of an approval is always `unversioned_default`.
-- **The one read and the one decide call.** No Portal page and no agent tool calls
-  `GET …/decisions`. Each page reads the list of its own store. The Slack buttons of a
+- **The one read and the one decide call.** No Portal page calls `GET …/decisions`.
+  Each page reads the list of its own store. The Portal chat agent reads the list with
+  `pending_decisions_read` (FND-09): `listPendingDecisions` takes an
+  `OrganisationReader`, which a request and a Portal chat turn of the person both give. The Slack buttons of a
   commerce action and the Deny of a permission request call their stores directly. Each
   store answers with a `Response`, not a `Result`.
 - **Other decisions** are not in the one read. Examples are configuration drafts, side

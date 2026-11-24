@@ -38,6 +38,9 @@ import {
   settleToolEffect,
   type ToolEffect,
 } from "@purin-labs/tool-handlers/agent-tools/session-support";
+import { readPendingDecisionsForEmbeddedHarness } from "@purin-labs/tool-handlers/agent-tools/pending-decisions";
+import { withToolContext } from "@purin-labs/agent/agent-tools/context";
+import { pendingDecisionSources } from "../control/pending-decision-parts";
 
 /**
  * The services of the families that an area owns. With the families of the
@@ -86,6 +89,16 @@ export const SESSION_TOOL_WIRING: SessionToolWiring = {
       menu: {
         ...menuToolServices(turn),
         proposeMenuPrice: commerce.proposeMenuPrice,
+      },
+      // The decisions that wait for the person, through the Portal's one
+      // read with the stores of this Worker.
+      decisions: {
+        readPendingDecisions: withToolContext(turn)(
+          readPendingDecisionsForEmbeddedHarness.bind(
+            null,
+            pendingDecisionSources(turn.env),
+          ),
+        ),
       },
     };
   },

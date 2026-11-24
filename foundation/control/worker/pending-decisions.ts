@@ -6,7 +6,7 @@ import type {
   PendingHeldOutput,
   PendingPermissionRequest,
 } from "@purin-labs/control-api";
-import type { AuthorizedOrganisationRequest } from "./authorization";
+import type { OrganisationReader } from "./authorization";
 
 /**
  * The stores of the decisions that wait for a person. Each store gives the
@@ -16,19 +16,19 @@ import type { AuthorizedOrganisationRequest } from "./authorization";
 export type PendingDecisionSources = Readonly<{
   /** The action ledger of the Organisation actor. Null when it does not answer. */
   governedActions(
-    authorized: AuthorizedOrganisationRequest,
+    authorized: OrganisationReader,
   ): Promise<readonly PendingGovernedAction[] | null>;
   /** The held outputs in regional D1. */
   heldOutputs(
-    authorized: AuthorizedOrganisationRequest,
+    authorized: OrganisationReader,
   ): Promise<readonly PendingHeldOutput[]>;
   /** The permission requests in regional D1. */
   permissionRequests(
-    authorized: AuthorizedOrganisationRequest,
+    authorized: OrganisationReader,
   ): Promise<readonly PendingPermissionRequest[]>;
   /** The email proposals that wait for an approval. */
   emailReviews(
-    authorized: AuthorizedOrganisationRequest,
+    authorized: OrganisationReader,
   ): Promise<readonly PendingEmailReview[]>;
 }>;
 
@@ -41,7 +41,7 @@ export type PendingDecisionSources = Readonly<{
  */
 export async function listPendingDecisions(
   sources: PendingDecisionSources,
-  authorized: AuthorizedOrganisationRequest,
+  authorized: OrganisationReader,
 ): Promise<PendingDecisionList | null> {
   const [actions, held, permissions, emails] = await Promise.all([
     sources.governedActions(authorized),
