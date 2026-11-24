@@ -1519,10 +1519,12 @@ export default class WorkflowSimulatorRoute extends React.Component<
     trigger?.focus();
   }
   private dockKeyDown(event: React.KeyboardEvent): void {
+    // Escape in a drawer of the panel closes the drawer, not the panel.
     if (
       event.key === "Escape" &&
       !event.defaultPrevented &&
-      this.state.view.dock !== "closed"
+      this.state.view.dock !== "closed" &&
+      !(event.target instanceof Element && event.target.closest("dialog"))
     ) {
       event.preventDefault();
       this.closeDock();

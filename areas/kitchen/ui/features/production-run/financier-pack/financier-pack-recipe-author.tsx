@@ -113,16 +113,8 @@ export class FinancierPackRecipeAuthor extends React.Component<Props, State> {
         onSubmit={this.submit.bind(this)}
         aria-label="Financier pack Cobot recipe"
       >
-        <h3>
-          Financier Pack · Wire-Grid Demoulding, Crumb Check &amp; Gift Box
-        </h3>
         <p>
-          FAIRINO FR10 Cobot cools baked financiers in the Matsunaga 8P
-          silicone-coated mould for 2–3 minutes, inverts and releases{" "}
-          {demoulded} golden-amber <em>bosse</em> financiers (23.5 g/piece) onto
-          the wire cooling grid, stages the mould in the manual-care wash basin,
-          performs the 10-minute crumb check on the Ohaus Ranger 3000 scale, and
-          packs {packed} financiers ({netG} g net) into a gold-ribbon patisserie
+          Demoulds {demoulded} financiers and packs {packed} ({netG} g) into a
           gift box.
         </p>
         <RecipeChoice

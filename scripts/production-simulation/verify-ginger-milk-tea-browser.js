@@ -7,7 +7,7 @@ async function verifyGingerMilkTeaBrowser(page) {
   await page.evaluate(mountWorkflowSimulator, { kind: "preview" });
   await page.setViewportSize({ width: 1440, height: 1000 });
   // The tea card holds the ginger tea, black tea and mixed tea forms.
-  await openWorkflowCard(page, /^Ginger Black Tea & Two-Pan Milk Tea/);
+  await openWorkflowCard(page, /^Ginger tea and milk tea/);
   await page
     .getByLabel("Milk tea ginger simmer seconds", { exact: true })
     .fill("360");

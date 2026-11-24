@@ -407,7 +407,6 @@ export class CafeShiftWorkspace extends React.Component<
         seek={this.scrubToTime.bind(this)}
         animation={this.animation}
         scene={<CafeShiftPhysicsView frames={frames} />}
-        kicker="Tier 3 · Combined Café Shift"
         title={
           <>
             Financiers ({config.financierLoads} load
@@ -434,10 +433,6 @@ export class CafeShiftWorkspace extends React.Component<
             </>
           ) : null
         }
-        headings={{
-          scenario: "Scenario and staffing controls",
-          results: "Café shift results",
-        }}
         scenario={
           <CafeShiftScenarioForm
             recipe={config}
@@ -700,10 +695,6 @@ function CafeShiftScenarioForm(props: {
         })
       }
     >
-      <p>
-        Head Baker #1 operates the Financier patisserie line while Lead Barista
-        #2 operates the preheated espresso bar under one shared logical clock.
-      </p>
       <RecipeChoice
         label="Espresso machine"
         triggerLabel="Espresso machine"

@@ -7,12 +7,7 @@ async function verifyBlackSesameBrowser(page) {
   await page.evaluate(mountWorkflowSimulator, { kind: "preview" });
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.getByRole("button", { name: "Workflow", exact: true }).click();
-  await page
-    .getByText(
-      "Black Sesame Milk · WSG60, Vitamix Quiet One & Severin SM 3587",
-      { exact: true },
-    )
-    .click();
+  await page.getByText("Black sesame milk", { exact: true }).click();
   await page
     .getByLabel("Cooling minutes per sesame batch", { exact: true })
     .fill("30");

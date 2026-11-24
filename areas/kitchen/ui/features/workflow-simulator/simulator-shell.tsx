@@ -16,7 +16,7 @@ import {
   SquareDashed,
 } from "lucide-react";
 import { PhysicsReplay } from "./physics-replay";
-import type { CatalogSection } from "./production-workspace";
+import type { CatalogSection } from "./workflow-catalog";
 
 import { ComparisonDock } from "./docks/comparison";
 import { InspectorDock } from "./docks/inspector";
@@ -24,7 +24,8 @@ import { SimulatorHistoryControls } from "./docks/history-controls";
 import { PlaybackDock } from "./docks/playback";
 import { SceneViewControls } from "./docks/scene-view";
 import { ScenariosDock } from "./docks/scenarios";
-import { InputsDock, WorkflowDock } from "./docks/workflow-inputs";
+import { InputsDock } from "./docks/workflow-inputs";
+import { WorkflowDock } from "./docks/workflow-dock";
 import {
   clock,
   metrics,
@@ -216,7 +217,6 @@ export class WorkflowSimulatorShell extends React.Component<Props, ShellState> {
               selectBatch={this.props.actions.inspector.select}
             />
             <InputsDock
-              connection={this.props.connection}
               state={this.props.view.workflowInput}
               actions={this.props.actions.workflowInput}
               form={this.props.form}

@@ -1,5 +1,5 @@
 {
-  "total": {"copies":782,"lines":13991},
+  "total": {"copies":779,"lines":13908},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -194,7 +194,6 @@
     "areas/kitchen/ui/features/production-run/production-recovery-controls.tsx = areas/kitchen/ui/features/production-run/production-scenario-controls.tsx": {"copies":1,"lines":19},
     "areas/kitchen/ui/features/production-run/shared/recipe-station.tsx = areas/kitchen/ui/features/production-run/siphon/siphon-physics-view.tsx": {"copies":1,"lines":16},
     "areas/kitchen/ui/features/workflow-simulator/bakery-appliance-layout.ts = areas/kitchen/ui/features/workflow-simulator/bakery-appliance-layout.ts": {"copies":1,"lines":10},
-    "areas/kitchen/ui/features/workflow-simulator/docks/inspector.tsx = areas/kitchen/ui/features/workflow-simulator/docks/workflow-inputs.tsx": {"copies":3,"lines":83},
     "areas/kitchen/ui/features/workflow-simulator/docks/playback.tsx = areas/kitchen/ui/features/workflow-simulator/equipment-lanes.tsx": {"copies":3,"lines":110},
     "areas/kitchen/ui/features/workflow-simulator/docks/playback.tsx = areas/kitchen/ui/features/workflow-simulator/physics-replay.tsx": {"copies":1,"lines":20},
     "areas/kitchen/ui/features/workflow-simulator/production-workspace.tsx = areas/kitchen/ui/features/workflow-simulator/production-workspace.tsx": {"copies":3,"lines":63},

@@ -7,13 +7,11 @@ import {
   CAFE_BEVERAGE_ROTATION,
   VITRINE_ORDER_CHANNELS,
   VITRINE_RUSH_PRESETS,
-  addCustomVitrineOrder,
   applyRecommendedVitrineCapacity,
   batchAt,
   clock,
   describe,
   distance,
-  exportCustomVitrineOrdersJson,
   exportVitrineShiftServiceCsv,
   exportVitrineShiftServiceJson,
   getActiveVitrineChannelFilter,
@@ -22,19 +20,16 @@ import {
   getSnapVitrineOrdersToWaves,
   getVitrineDemandRevision,
   humanResource,
-  importCustomVitrineOrdersJson,
   machineAt,
   outageAt,
   plan61ASubstepAt,
   removeCustomVitrineOrder,
-  resetCustomVitrineOrders,
   setActiveVitrineChannelFilter,
   setActiveVitrineRushPreset,
   setAutoScaleVitrineBatches,
   setSnapVitrineOrdersToWaves,
   setVitrineOrderArrivalMinutes,
   setVitrineOrderItems,
-  shiftAllVitrineOrderArrivals,
   station,
   stationLabel,
   stationZoneLabel,
@@ -62,6 +57,7 @@ import { downloadBakeryFile } from "../file-download";
 import { selectionContext } from "@purin-labs/production-simulation/simulator/selection";
 import type { WorkflowSimulatorActions } from "../simulator-actions";
 import type { InspectorView, SimulatorConnection } from "../simulator-state";
+import { OrderScheduleControls } from "./order-arrivals";
 import { DockHeader, SegmentedControl, taskStatusLabel } from "./shared";
 
 type InspectorState = Pick<
@@ -237,10 +233,7 @@ function OvenDetails(props: Props): React.ReactNode {
 }
 
 function VitrineDetails(props: Props): React.ReactNode {
-  const [jsonPanelOpen, setJsonPanelOpen] = React.useState(false);
-  const [jsonDraft, setJsonDraft] = React.useState("");
-  const [jsonNotice, setJsonNotice] = React.useState<string | null>(null);
-  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+  const [reportNotice, setReportNotice] = React.useState<string | null>(null);
   const channelFilter = getActiveVitrineChannelFilter();
   const snapToWaves = getSnapVitrineOrdersToWaves();
   const stock = vitrineStockAt(props.run, props.state.time);
@@ -342,7 +335,7 @@ function VitrineDetails(props: Props): React.ReactNode {
                 `shift-customer-report-${stock.rushPreset}.json`,
                 payload,
               );
-              setJsonNotice(
+              setReportNotice(
                 `Downloaded shift-customer-report-${stock.rushPreset}.json (${shiftServiceReport.fulfillmentRatePercent}% fulfilled).`,
               );
             }}
@@ -364,7 +357,7 @@ function VitrineDetails(props: Props): React.ReactNode {
                 csv,
                 "text/csv;charset=utf-8",
               );
-              setJsonNotice(
+              setReportNotice(
                 `Downloaded shift-customer-report-${stock.rushPreset}.csv (${shiftServiceReport.totalOrders} orders).`,
               );
             }}
@@ -372,6 +365,7 @@ function VitrineDetails(props: Props): React.ReactNode {
             Report CSV
           </button>
         </div>
+        {reportNotice !== null && <p role="status">{reportNotice}</p>}
       </section>
       <section className="portal-band" aria-label="Vitrine refill waves">
         <h3>
@@ -403,127 +397,20 @@ function VitrineDetails(props: Props): React.ReactNode {
             : ""}
           )
         </h3>
-        <div
-          className="workflow-presets"
-          aria-label="Customer order arrival controls"
-        >
-          <button
-            type="button"
-            title="Add a custom customer order arrival to this shift"
-            onClick={() => addCustomVitrineOrder()}
-          >
-            + Add order
-          </button>
-          <button
-            type="button"
-            title="Move all customer order arrivals 5 minutes earlier"
-            onClick={() => shiftAllVitrineOrderArrivals(-5)}
-          >
-            Shift -5m
-          </button>
-          <button
-            type="button"
-            title="Move all customer order arrivals 5 minutes later"
-            onClick={() => shiftAllVitrineOrderArrivals(5)}
-          >
-            Shift +5m
-          </button>
-          <button
-            type="button"
-            disabled={!stock.hasCustomArrivals}
-            title="Restore default customer order arrival times for this preset"
-            onClick={() => resetCustomVitrineOrders()}
-          >
-            Reset arrivals
-          </button>
-          <button
-            type="button"
-            aria-pressed={snapToWaves}
-            aria-label="Snap dragged order markers to refill waves"
-            title="Snap dragged timeline order markers to the nearest refill wave completion (or hold Alt while dragging)"
-            onClick={() => setSnapVitrineOrdersToWaves(!snapToWaves)}
-          >
-            Snap to waves
-          </button>
-          <button
-            type="button"
-            title="Export custom customer order schedule to JSON"
-            onClick={() => {
-              const exported = exportCustomVitrineOrdersJson(stock.rushPreset);
-              setJsonDraft(exported);
-              setJsonPanelOpen(true);
-              setJsonNotice(
-                `Exported ${stock.orders.length} orders (${stock.rushPreset}) to JSON.`,
-              );
-            }}
-          >
-            Export JSON
-          </button>
-          <button
-            type="button"
-            aria-expanded={jsonPanelOpen}
-            title="Import custom customer order schedule from JSON"
-            onClick={() => {
-              if (!jsonPanelOpen && jsonDraft.trim().length === 0) {
-                setJsonDraft(exportCustomVitrineOrdersJson(stock.rushPreset));
-              }
-              setJsonPanelOpen(!jsonPanelOpen);
-              setJsonNotice(null);
-            }}
-          >
-            Import JSON
-          </button>
-          <button
-            type="button"
-            aria-label="Download customer order schedule JSON"
-            title="Download customer order schedule as a .json file"
-            onClick={() => {
-              const exported = exportCustomVitrineOrdersJson(stock.rushPreset);
-              setJsonDraft(exported);
-              downloadBakeryFile(
-                `vitrine-orders-${stock.rushPreset}.json`,
-                exported,
-              );
-              setJsonNotice(
-                `Downloaded vitrine-orders-${stock.rushPreset}.json (${stock.orders.length} orders).`,
-              );
-            }}
-          >
-            Download .json
-          </button>
-          <button
-            type="button"
-            aria-label="Upload customer order schedule JSON button"
-            title="Upload customer order schedule from a .json file"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            Upload .json
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json,application/json"
-            aria-label="Upload customer order schedule JSON"
-            hidden
-            onChange={async (e) => {
-              const file = e.currentTarget.files?.[0];
-              e.currentTarget.value = "";
-              if (!file) return;
-              const text = await file.text();
-              setJsonDraft(text);
-              setJsonPanelOpen(true);
-              const res = importCustomVitrineOrdersJson(text);
-              if (res.ok) {
-                setJsonDraft(exportCustomVitrineOrdersJson(res.preset));
-                setJsonNotice(
-                  `Uploaded ${file.name}: ${res.orderCount} orders (${res.customCount} custom) for ${res.preset}.`,
-                );
-              } else {
-                setJsonNotice(res.error);
-              }
-            }}
-          />
-          {stock.orders
+        <OrderScheduleControls
+          vitrine={stock}
+          afterReset={
+            <button
+              type="button"
+              aria-pressed={snapToWaves}
+              aria-label="Snap dragged order markers to refill waves"
+              title="Snap dragged timeline order markers to the nearest refill wave completion (or hold Alt while dragging)"
+              onClick={() => setSnapVitrineOrdersToWaves(!snapToWaves)}
+            >
+              Snap to waves
+            </button>
+          }
+          end={stock.orders
             .filter((o) => o.isCustomOrder)
             .map((o) => (
               <button
@@ -536,62 +423,7 @@ function VitrineDetails(props: Props): React.ReactNode {
                 Remove {o.id}
               </button>
             ))}
-        </div>
-        {jsonPanelOpen && (
-          <div
-            className="workflow-plan61a-summary"
-            aria-label="Customer order schedule JSON panel"
-          >
-            <label htmlFor="vitrine-order-schedule-json">
-              Customer order schedule JSON
-            </label>
-            <textarea
-              id="vitrine-order-schedule-json"
-              aria-label="Customer order schedule JSON"
-              rows={6}
-              value={jsonDraft}
-              style={{
-                width: "100%",
-                fontFamily: "var(--font-mono, monospace)",
-                fontSize: "11px",
-                marginTop: "0.35rem",
-              }}
-              onChange={(e) => setJsonDraft(e.currentTarget.value)}
-            />
-            <div className="workflow-presets" style={{ marginTop: "0.35rem" }}>
-              <button
-                type="button"
-                onClick={() => {
-                  const res = importCustomVitrineOrdersJson(jsonDraft);
-                  if (res.ok) {
-                    setJsonDraft(exportCustomVitrineOrdersJson(res.preset));
-                    setJsonNotice(
-                      `Imported ${res.orderCount} orders (${res.customCount} custom) for ${res.preset}.`,
-                    );
-                  } else {
-                    setJsonNotice(res.error);
-                  }
-                }}
-              >
-                Apply JSON
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setJsonPanelOpen(false);
-                  setJsonNotice(null);
-                }}
-              >
-                Close JSON
-              </button>
-            </div>
-            {jsonNotice !== null && (
-              <p role="status" style={{ marginTop: "0.35rem" }}>
-                {jsonNotice}
-              </p>
-            )}
-          </div>
-        )}
+        />
         <div
           className="workflow-presets"
           aria-label="Filter customer orders by channel"
@@ -1101,9 +933,9 @@ function Inspection(props: Props): React.ReactNode {
   return (
     <>
       <dl>
-        <dt>Batch</dt>
+        <dt>Size</dt>
         <dd>
-          {batch.id} · {batch.quantity} financiers · {batch.trays} trays
+          {batch.quantity} financiers · {batch.trays} trays
         </dd>
         <dt>Current step</dt>
         <dd>
@@ -1157,14 +989,16 @@ function Inspection(props: Props): React.ReactNode {
           <>
             <dt>Now</dt>
             <dd>{plan61ASubstepAt(current, props.state.time).label}</dd>
-            <dt>Mass / mould detail</dt>
+            <dt>Mass</dt>
             <dd>{plan61ASubstepAt(current, props.state.time).massNote}</dd>
           </>
         )}
       </dl>
       {waits.length > 0 && (
-        <section aria-label="Wait bottlenecks">
-          <h3>Wait bottlenecks ({waits.length})</h3>
+        <section aria-label="Waits">
+          <h3>
+            Waits <span className="workflow-count">{waits.length}</span>
+          </h3>
           <div className="workflow-wait-links">
             {waits.map(renderWaitButton.bind(null, props))}
           </div>
@@ -1248,7 +1082,7 @@ function TaskInspection(
           <dd>{stationZoneLabel(task.station)}</dd>
           <dt>Now</dt>
           <dd>{plan61ASubstepAt(task, props.state.time).label}</dd>
-          <dt>Mass / mould detail</dt>
+          <dt>Mass</dt>
           <dd>{plan61ASubstepAt(task, props.state.time).massNote}</dd>
           {task.operation === "pack" && (
             <>

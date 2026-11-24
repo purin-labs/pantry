@@ -171,7 +171,7 @@ const FINANCIER_BAKE_RUN: RecipeRun<
       ? outcome.reason
       : "Financiers baked, inspected, and staged on wire grid for 2–3 min in-mould cooling.",
   resetNotice: "Workcell reset to t = 0.00 s.",
-  notice: "Workcell prepared at t = 0.00 s. Press Start production to run.",
+  notice: "Workcell prepared at t = 0.00 s.",
   endS: 60,
 };
 
@@ -373,11 +373,6 @@ function FinancierBakeScenarioForm(props: {
         })
       }
     >
-      <p>
-        FAIRINO FR10 Cobot dosing 25 g financier batter portions into Matsunaga
-        8P silicone-coated moulds on the Ohaus Ranger 3000 scale and baking on a
-        600 × 400 mm carrier in the Maruzen MBCO-5E 5-tray oven.
-      </p>
       <RecipeChoice
         label="Maruzen MBCO-5E oven mode"
         items={MODE_ITEMS}

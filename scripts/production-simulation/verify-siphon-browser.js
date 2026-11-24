@@ -198,7 +198,7 @@ async function openSiphonRecipeForm(page) {
   });
   if (await form.isVisible()) return;
   // The Workflow panel's catalog card opens the recipe form.
-  await openWorkflowCard(page, /^Siphon coffee physics/);
+  await openWorkflowCard(page, /^Siphon coffee/);
   await form.waitFor({ state: "visible", timeout: 15000 });
 }
 

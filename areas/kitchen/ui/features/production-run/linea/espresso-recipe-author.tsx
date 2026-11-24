@@ -73,14 +73,7 @@ export class EspressoRecipeAuthor extends React.Component<Props, State> {
         aria-label="Espresso service recipe"
         onSubmit={this.prepare.bind(this)}
       >
-        <h3>Espresso service · FAIRINO FR10 Cobot</h3>
-        <p>
-          Orders share one preheated dual-group espresso machine and one FAIRINO
-          FR10 Cobot arm at the barista station. Each cycle places a porcelain
-          demitasse cup on the drip grate, triggers an 18-second 9-bar
-          extraction, and transfers the served shot onto the brass service
-          coasters.
-        </p>
+        <p>Pulls an 18-second, 9-bar espresso for each order.</p>
         <p>
           The recipe doses 18 g coffee and yields 36 g espresso per order.
           Completed cups stay on the front service mat and spent pucks collect

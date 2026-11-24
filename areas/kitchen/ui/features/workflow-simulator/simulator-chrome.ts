@@ -59,7 +59,7 @@ export function shortcutTarget(target: EventTarget | null): boolean {
   return (
     !target.isContentEditable &&
     target.closest(
-      "input, textarea, select, [role='menu'], [role='dialog'], [role='listbox'], [role='combobox']",
+      "input, textarea, select, dialog, [role='menu'], [role='dialog'], [role='listbox'], [role='combobox']",
     ) === null
   );
 }

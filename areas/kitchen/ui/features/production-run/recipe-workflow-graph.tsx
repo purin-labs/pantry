@@ -1312,7 +1312,7 @@ export class RecipeWorkflowGraph extends React.Component<Props, State> {
                     </label>
                   )}
                 <label className="recipe-graph-filter recipe-graph-run">
-                  Reviews
+                  Review answer
                   <GraphSelect
                     variant="ghost"
                     items={[
@@ -1563,9 +1563,13 @@ export class RecipeWorkflowGraph extends React.Component<Props, State> {
     });
     const place = (): void => {
       const paneWidth = canvas.offsetWidth || workspace.offsetWidth;
+      // In the Portal the page's own buttons hold the top end of the pane.
+      const clearance = getComputedStyle(workspace).getPropertyValue(
+        "--workflow-header-clearance",
+      );
       for (const [name, value] of chromeOffsets(
         parts(),
-        paneWidth,
+        paneWidth - (Number.parseFloat(clearance) || 0),
         workspace.offsetWidth,
       ))
         workspace.style.setProperty(name, `${value}px`);
@@ -2010,13 +2014,6 @@ export class RecipeWorkflowGraph extends React.Component<Props, State> {
         }
         style={{ left: node.x, top: node.y, width: WIDTH, height: HEIGHT }}
       >
-        <span className="recipe-graph-label" aria-hidden="true">
-          <span>
-            {portIcon(node.role, 11)}
-            {roleLabel(node.role)}
-          </span>
-          {doer !== "" && <span>{doer}</span>}
-        </span>
         {incoming !== undefined && port("in", edgeKind(nodes, incoming))}
         <button
           type="button"
@@ -2040,12 +2037,14 @@ export class RecipeWorkflowGraph extends React.Component<Props, State> {
           <strong>{node.label}</strong>
           <span className="recipe-graph-line">
             <span className="recipe-graph-meta">
-              {seconds === null ? "" : secondsText(seconds)}
+              {[seconds === null ? "" : secondsText(seconds), doer]
+                .filter(Boolean)
+                .join(" · ")}
               {shown.state === "not-started" || shown.stateLabel === "" ? (
                 ""
               ) : (
                 <>
-                  {seconds === null ? "" : " · "}
+                  {seconds === null && doer === "" ? "" : " · "}
                   <b>{shown.stateLabel}</b>
                 </>
               )}

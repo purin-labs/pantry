@@ -166,7 +166,7 @@ const LATTE_RUN: RecipeRun<LatteSample, LatteRecipeConfig> = {
       ? outcome.reason
       : "Caffe Latte completed with Rosetta microfoam art.",
   resetNotice: "Station reset to t = 0.00 s.",
-  notice: "Station prepared at t = 0.00 s. Press Start production to run.",
+  notice: "Station prepared at t = 0.00 s.",
   endS: 56,
 };
 

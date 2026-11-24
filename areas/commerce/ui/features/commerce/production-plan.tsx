@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@purin-labs/ui/index";
 import {
   parseInventoryProductionPlanResult,
   PRODUCTION_PLAN_ACCEPT_LIMIT,
@@ -20,6 +21,7 @@ import {
   type ProductionPlanView,
 } from "./production-plan-client";
 import "./inventory.css";
+import "./production-plan.css";
 import {
   type PlanSharing,
   parseSharing,
@@ -210,6 +212,20 @@ export class ProductionPlanPanel extends React.Component<Props, State> {
         <header className="production-plan-header">
           <h2>Plan for {this.props.locationId}</h2>
           <p role="status">{planStatus(view)}</p>
+          {this.props.canOperate && (
+            <Button
+              variant="primary"
+              disabled={
+                !editable ||
+                view?.kind !== "synced" ||
+                work.kind === "accepting" ||
+                this.props.requests.length === 0
+              }
+              onClick={this.#accept.bind(this)}
+            >
+              {work.kind === "accepting" ? "Accepting plan…" : "Accept plan"}
+            </Button>
+          )}
         </header>
         {others.length > 0 && (
           <p className="production-plan-people">
@@ -225,39 +241,15 @@ export class ProductionPlanPanel extends React.Component<Props, State> {
         {this.props.requests.length === 0 ? (
           <p>No requests at this location wait for acceptance.</p>
         ) : (
-          <table className="production-plan-lines">
-            <thead>
-              <tr>
-                <th scope="col">Product</th>
-                <th scope="col">Requested</th>
-                <th scope="col">Planned</th>
-                <th scope="col">Needed by</th>
-              </tr>
-            </thead>
-            <tbody>
-              {this.props.requests.map(this.#renderLine.bind(this, editable))}
-            </tbody>
-          </table>
+          <ul className="production-plan-lines">
+            {this.props.requests.map(this.#renderLine.bind(this, editable))}
+          </ul>
         )}
         {this.props.requests.length > PRODUCTION_PLAN_ACCEPT_LIMIT && (
           <p>
             Accept plan takes the first {PRODUCTION_PLAN_ACCEPT_LIMIT} requests.
             Accept again for the rest.
           </p>
-        )}
-        {this.props.canOperate && (
-          <button
-            type="button"
-            disabled={
-              !editable ||
-              view?.kind !== "synced" ||
-              work.kind === "accepting" ||
-              this.props.requests.length === 0
-            }
-            onClick={this.#accept.bind(this)}
-          >
-            {work.kind === "accepting" ? "Accepting plan…" : "Accept plan"}
-          </button>
         )}
         {work.kind === "failed" && <p role="alert">{work.message}</p>}
         {this.props.canManage && (
@@ -293,23 +285,29 @@ export class ProductionPlanPanel extends React.Component<Props, State> {
     const invalid =
       editing !== null && !validQuantity(editing.text, request.quantity.unit);
     return (
-      <tr key={request.id} data-request={request.id}>
-        <th scope="row">{request.name}</th>
-        <td>
-          {current} {unitLabel(request.quantity.unit)}
-        </td>
-        <td>
-          <input
-            inputMode="decimal"
-            aria-label={`Planned quantity for ${request.name}`}
-            aria-invalid={invalid}
-            readOnly={!editable}
-            value={value}
-            onFocus={this.#focus.bind(this, request.id)}
-            onBlur={this.#blur.bind(this)}
-            onChange={this.#change.bind(this, request)}
-          />{" "}
-          {unitLabel(request.quantity.unit)}
+      <li key={request.id} data-request={request.id}>
+        <span className="production-plan-name">
+          <strong>{request.name}</strong>
+          <span>
+            {current} {unitLabel(request.quantity.unit)} requested · Needed{" "}
+            {formatNeededBy(request.neededBy)}
+          </span>
+        </span>
+        <span className="production-plan-planned">
+          <label>
+            Planned{" "}
+            <input
+              inputMode="decimal"
+              aria-label={`Planned quantity for ${request.name}`}
+              aria-invalid={invalid}
+              readOnly={!editable}
+              value={value}
+              onFocus={this.#focus.bind(this, request.id)}
+              onBlur={this.#blur.bind(this)}
+              onChange={this.#change.bind(this, request)}
+            />{" "}
+            {unitLabel(request.quantity.unit)}
+          </label>
           {value !== current && !invalid && (
             <small className="production-plan-changed">
               Changed from {current}
@@ -320,9 +318,8 @@ export class ProductionPlanPanel extends React.Component<Props, State> {
               {editors.join(", ")} editing
             </small>
           )}
-        </td>
-        <td>{formatNeededBy(request.neededBy)}</td>
-      </tr>
+        </span>
+      </li>
     );
   }
 }

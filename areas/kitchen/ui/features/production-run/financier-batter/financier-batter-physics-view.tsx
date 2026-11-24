@@ -187,7 +187,7 @@ const FINANCIER_BATTER_RUN: RecipeRun<
       ? outcome.reason
       : "Financier batter homogenized and ready for mould depositing.",
   resetNotice: "Workcell reset to t = 0.00 s.",
-  notice: "Workcell prepared at t = 0.00 s. Press Start production to run.",
+  notice: "Workcell prepared at t = 0.00 s.",
   endS: 60,
 };
 
@@ -316,11 +316,6 @@ function FinancierBatterScenarioForm(props: {
       notice={props.notice}
       apply={() => props.apply({ ...props.recipe, hob, tool, check })}
     >
-      <p>
-        FAIRINO FR10 Cobot operating the patisserie prep bench: Ohaus Ranger
-        3000 weighing pan, 152 °C induction beurre noisette pan, and Hobart
-        HL200 20 qt planetary mixer.
-      </p>
       <RecipeChoice
         label="Induction hob"
         items={INDUCTION_HOB_ITEMS}

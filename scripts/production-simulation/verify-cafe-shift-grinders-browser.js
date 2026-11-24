@@ -28,7 +28,7 @@ async function verifyCafeShiftGrindersBrowser(page) {
   }
   if (!(await cafeForm.isVisible())) {
     const cafeCard = page.getByRole("button", {
-      name: /Combined Café Shift · Financiers & Espresso/,
+      name: /^Café shift/,
     });
     if (await cafeCard.isVisible()) await cafeCard.click();
   }

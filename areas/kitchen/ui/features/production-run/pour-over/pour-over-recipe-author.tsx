@@ -65,12 +65,7 @@ export class PourOverRecipeAuthor extends React.Component<Props, State> {
   render(): React.ReactNode {
     return (
       <form aria-label="Pour-over recipe" onSubmit={this.prepare.bind(this)}>
-        <h3>Pour-over · FR10 and gooseneck kettle</h3>
-        <p>
-          The Blue Bottle method: 27 g blend coffee and four spiral pours to 50,
-          150, 250 and 350 g, starting at 0:00, 0:40, 1:10 and 1:40. The scale
-          is tared before the first pour and controls each pour.
-        </p>
+        <p>Brews 27 g coffee to 350 g in four timed pours.</p>
         <p>
           A person prepares the filter, the ground bed, the server and the hot
           kettle at 93 °C. The robot pours and returns the kettle. The beverage

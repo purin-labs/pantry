@@ -21,11 +21,21 @@ Saves of scenarios and runs stay with the person, who confirms each one on the p
 - The page has three workspace kinds (`simulator-state.ts`): `shift`, `rehearsal` and
   `production`.
 
-| Workspace    | Heading                          | What it runs                                                                       |
-| ------------ | -------------------------------- | ---------------------------------------------------------------------------------- |
-| `shift`      | "Financier morning"              | The financier finishing shift: batches, bakers, stations, a shared oven and a rack |
-| `production` | "Multi-batch production + Robot" | Financier batches with gated cold-tray operations on one or two FR10 cells         |
-| `rehearsal`  | "Multi-tray rehearsal + Robot"   | Named trays (A to P) with native operations on the shared cell                     |
+| Workspace    | Heading                        | What it runs                                                                       |
+| ------------ | ------------------------------ | ---------------------------------------------------------------------------------- |
+| `shift`      | "Financier morning"            | The financier finishing shift: batches, bakers, stations, a shared oven and a rack |
+| `production` | "Financier batches with robot" | Financier batches with gated cold-tray operations on one or two FR10 cells         |
+| `rehearsal`  | "Robot tray rehearsal"         | Named trays (A to P) with native operations on the shared cell                     |
+
+- The Workflow panel opens on the catalog (`workflow-catalog.tsx`): filters with
+  counts (All, Actions, Recipe tasks, Loops and shifts), then one list with a row for
+  each workflow: its name, one fact and its kind as a tag. The floor plan's panel and
+  the production workspace share it. A row opens its view as before. The production
+  workspace's top bar shows the name of the view that its panel shows (a recipe form,
+  the café shift or the saved runs), or the production's name.
+- Details › Inputs: the Scenario and Orders presets, the auto-scale switch, the four
+  main fields, and two rows that open a side drawer each: "Order arrivals" (the order
+  editor and its JSON) and "More settings" (the other fields of the shift).
 
 - The **Robot rehearsal** item of the **More** menu opens the recording view
   (`physics-replay.tsx`). It plays a native recording alone, with its own recording time.

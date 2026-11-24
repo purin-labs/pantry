@@ -82,6 +82,7 @@ import { physicsEvidenceVisible } from "@purin-labs/production-simulation/runs/p
 import { OvenTaskViews } from "./oven-task-views";
 import type { RecipeGraphSource } from "./recipe-graph";
 import { RecipeWorkflowGraph } from "./recipe-workflow-graph";
+import { FactoryDrawerHeading } from "./shared/recipe-workspace";
 import { OvenPhysicsView } from "./oven-physics-view";
 import {
   OvenRecordings,
@@ -2056,14 +2057,11 @@ export class OvenWorkspace extends React.Component<Props, State> {
         <header className="factory-toolbar">
           <RecipeBackButton close={this.backToRecipes.bind(this)} />
           <div className="factory-title">
-            <div>
-              <span>Factory simulation</span>
-              <h2>
-                {source.kind === "definition"
-                  ? source.definition.name
-                  : source.name}
-              </h2>
-            </div>
+            <h2>
+              {source.kind === "definition"
+                ? source.definition.name
+                : source.name}
+            </h2>
           </div>
           <nav aria-label="Factory workspace">
             <RecipeSurfaceSwitch
@@ -2123,10 +2121,10 @@ export class OvenWorkspace extends React.Component<Props, State> {
           aria-label="Factory details"
           hidden={panel === null}
         >
-          <div className="factory-drawer-heading">
-            <h3>{panel === null ? "Details" : panelTitle(panel)}</h3>
-            <button onClick={this.closePanel.bind(this)}>Close details</button>
-          </div>
+          <FactoryDrawerHeading
+            title={panel === null ? "Details" : panelTitle(panel)}
+            close={this.closePanel.bind(this)}
+          />
           <div hidden={panel !== "save"}>
             <p>Pause the run before saving. Save before leaving this page.</p>
             <p role="status">{notice}</p>
@@ -2737,17 +2735,17 @@ function matchesTask(selected: string | null, task: { id: string }): boolean {
 function panelTitle(panel: Panel): string {
   switch (panel) {
     case "scenario":
-      return "Scenario and run controls";
+      return "Scenario";
     case "logistics":
-      return "Queues and transfers";
+      return "Logistics";
     case "results":
-      return "Production results";
+      return "Results";
     case "inspector":
-      return "Selected work";
+      return "Inspector";
     case "save":
-      return "Save production run";
+      return "Save";
     case "history":
-      return "Recorded history";
+      return "History";
     default:
       return assertNever(panel);
   }

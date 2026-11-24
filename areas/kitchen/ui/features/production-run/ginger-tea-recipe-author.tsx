@@ -81,11 +81,7 @@ export class GingerTeaRecipeAuthor extends React.Component<Props, State> {
         onSubmit={this.prepare.bind(this)}
       >
         <h3>Ginger black tea: extraction to service</h3>
-        <p>
-          Two batches share one hob, two pans, one heatproof rest position, one
-          strainer and one worker. Each batch supplies two servings. The pan
-          occupies the hob until the worker moves it.
-        </p>
+        <p>Makes two batches of ginger black tea, two servings each.</p>
         <p>
           Straining is due immediately after the selected steep time. Every
           batch requires a recorded release or discard decision. Review shows

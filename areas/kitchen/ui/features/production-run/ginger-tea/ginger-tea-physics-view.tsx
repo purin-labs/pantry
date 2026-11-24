@@ -175,8 +175,7 @@ const GINGER_TEA_RUN: RecipeRun<
       ? outcome.reason
       : `Served ${outcome.servings} cups (${outcome.servedMassG} g at ${outcome.finalTempC.toFixed(1)} °C).`,
   resetNotice: "Workcell reset to t = 0.00 s.",
-  notice:
-    "Ginger Tea MuJoCo pan-staging workcell prepared at t = 0.00 s. Press Start production to run.",
+  notice: "Ginger Tea MuJoCo pan-staging workcell prepared at t = 0.00 s.",
   endS: 60,
 };
 
@@ -315,12 +314,6 @@ function GingerTeaScenarioForm(props: {
       notice={props.notice}
       apply={() => props.apply({ ...props.recipe, mode, hob, tea, check })}
     >
-      <p>
-        FAIRINO FR10 Cobot operating the Ginger Black Tea and Two-Pan Ginger
-        Milk Tea bench: wash sink, rigid pan-staging insert, Ohaus Ranger 3000
-        scale, Maruzen / Vollrath induction hob, heatproof rest, and fine mesh
-        strainer.
-      </p>
       <RecipeChoice
         label="Tea workflow mode"
         items={MODES}

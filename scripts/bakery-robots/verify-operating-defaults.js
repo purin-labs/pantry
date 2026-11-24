@@ -16,9 +16,7 @@ async function verifyOperatingDefaults(page) {
   });
   if (await sidebar.isVisible()) await sidebar.click();
   await openSimulatorInputs(page);
-  await page
-    .getByRole("button", { name: "Normal morning", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Normal", exact: true }).click();
   const initialFinish = await simulatorFinish(page);
   if (
     (await page
@@ -26,7 +24,12 @@ async function verifyOperatingDefaults(page) {
       .inputValue()) !== "2"
   )
     throw new Error("Morning shift must start with two workers");
-  await page.getByText("More settings", { exact: true }).click();
+  // More settings opens a side drawer; Done closes it.
+  const moreSettings = async () =>
+    page.getByText("More settings", { exact: true }).click();
+  const closeMoreSettings = async () =>
+    page.getByRole("button", { name: "Done", exact: true }).click();
+  await moreSettings();
   const cooling = page.getByRole("spinbutton", {
     name: "Cooling after demoulding (minutes)",
     exact: true,
@@ -34,6 +37,7 @@ async function verifyOperatingDefaults(page) {
   if ((await cooling.inputValue()) !== "20")
     throw new Error("Missing post-demould cooling default");
   await cooling.fill("30");
+  await closeMoreSettings();
   if ((await simulatorFinish(page)) !== initialFinish)
     throw new Error("Editing a draft changed the applied schedule");
   await page
@@ -68,8 +72,10 @@ async function verifyOperatingDefaults(page) {
     .getByRole("button", { name: "Put suggested values in draft", exact: true })
     .click();
   await openSimulatorInputs(page);
+  await moreSettings();
   if ((await cooling.inputValue()) !== "20")
     throw new Error("Measured cooling did not enter the draft");
+  await closeMoreSettings();
   if ((await simulatorFinish(page)) !== longerCoolingFinish)
     throw new Error("Import bypassed Apply");
   await page
@@ -95,9 +101,7 @@ async function verifyOperatingDefaults(page) {
   )
     throw new Error("One-worker comparison is missing");
   const oneWorkerFinish = await simulatorFinish(page);
-  await page
-    .getByRole("button", { name: "Normal morning", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Normal", exact: true }).click();
   await page
     .getByRole("button", { name: "Close Edit inputs", exact: true })
     .click();

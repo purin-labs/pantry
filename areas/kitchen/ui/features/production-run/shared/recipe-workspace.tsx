@@ -1,4 +1,5 @@
 import React from "react";
+import { X } from "lucide-react";
 import {
   RecipeAnimationNotice,
   RecipeBackButton,
@@ -55,8 +56,6 @@ type LayoutProps = Readonly<{
   /** The animation of a draft, for the scene notice. A replay has none. */
   animation?: AnimationPlan;
   scene: React.ReactNode;
-  /** The line above the title. */
-  kicker?: React.ReactNode;
   title: React.ReactNode;
   /** More buttons after Scenario and Results. */
   pills?: React.ReactNode;
@@ -67,7 +66,6 @@ type LayoutProps = Readonly<{
   summaryType?: "button";
   /** An error of the run, under the summary. */
   alert?: React.ReactNode;
-  headings?: Readonly<{ scenario: string; results: string }>;
   scenario: React.ReactNode;
   results: React.ReactNode;
   graph: RecipeGraphSource;
@@ -111,10 +109,7 @@ export function RecipeWorkspaceLayout(props: LayoutProps): React.ReactNode {
       <header className="factory-toolbar">
         <RecipeBackButton close={props.close} />
         <div className="factory-title">
-          <div>
-            <span>{props.kicker ?? "Factory simulation"}</span>
-            <h2>{props.title}</h2>
-          </div>
+          <h2>{props.title}</h2>
         </div>
         <nav aria-label="Factory workspace">
           <RecipeSurfaceSwitch
@@ -160,19 +155,10 @@ export function RecipeWorkspaceLayout(props: LayoutProps): React.ReactNode {
         aria-label="Factory details"
         hidden={panel === null}
       >
-        <div className="factory-drawer-heading">
-          <h3>
-            {panel === "results"
-              ? (props.headings?.results ?? "Production results")
-              : (props.headings?.scenario ?? "Scenario and run controls")}
-          </h3>
-          <button
-            type="button"
-            onClick={() => change({ ...view, panel: null })}
-          >
-            Close details
-          </button>
-        </div>
+        <FactoryDrawerHeading
+          title={panel === "results" ? "Results" : "Scenario"}
+          close={() => change({ ...view, panel: null })}
+        />
         <div hidden={panel !== "scenario"}>{props.scenario}</div>
         <div hidden={panel !== "results"}>{props.results}</div>
       </aside>
@@ -204,6 +190,25 @@ export function RecipeWorkspaceLayout(props: LayoutProps): React.ReactNode {
         seek={props.seek}
       />
     </section>
+  );
+}
+
+/** The heading of a factory drawer: the name of its button and a close icon. */
+export function FactoryDrawerHeading(
+  props: Readonly<{ title: string; close(): void }>,
+): React.ReactNode {
+  return (
+    <div className="factory-drawer-heading">
+      <h3>{props.title}</h3>
+      <button
+        type="button"
+        className="factory-drawer-close"
+        aria-label="Close details"
+        onClick={props.close}
+      >
+        <X size={18} aria-hidden="true" />
+      </button>
+    </div>
   );
 }
 

@@ -1,6 +1,10 @@
 import React from "react";
 import { X } from "lucide-react";
-import type { TaskSnapshot } from "@purin-labs/production-simulation/recipes/bakery/schedule";
+import type {
+  Run,
+  TaskSnapshot,
+} from "@purin-labs/production-simulation/recipes/bakery/schedule";
+import type { SimulatorShift } from "../simulator-state";
 
 export function taskStatusLabel(kind: TaskSnapshot["kind"]): string {
   switch (kind) {
@@ -106,4 +110,18 @@ export function DockHeader(props: {
       </button>
     </div>
   );
+}
+
+/** The schedule of the shift as applied, before an experiment. */
+export function normalSchedule(shift: SimulatorShift): Run {
+  return shift.kind === "sample" ? shift.normal : shift.normal.schedule;
+}
+
+/** The schedule of the shift for the normal run or the oven outage. */
+export function scheduleForVariant(
+  shift: SimulatorShift,
+  variant: "normal" | "outage",
+): Run {
+  if (variant === "normal") return normalSchedule(shift);
+  return shift.kind === "sample" ? shift.outage : shift.outage.schedule;
 }

@@ -82,24 +82,21 @@ async function openWorkflowCard(page, name) {
   await dock.getByRole("button", { name }).click();
 }
 
-// Multi-tray robot rehearsal: the production with procedure "rehearsal".
+// Robot tray rehearsal: the production with procedure "rehearsal".
 async function openRobotRehearsal(page) {
-  await openWorkflowCard(
-    page,
-    /^Multi-tray robot rehearsal \(Tray A → Tray B\)/,
-  );
+  await openWorkflowCard(page, /^Robot tray rehearsal/);
   await waitForProductionScene(page);
 }
 
-// Multi-batch production + Robot: the Financier production.
+// Financier batches with robot: the Financier production.
 async function openMultiBatchProduction(page) {
-  await openWorkflowCard(page, /^Multi-batch production \+ Robot \(Batch A/);
+  await openWorkflowCard(page, /^Financier batches with robot/);
   await waitForProductionScene(page);
 }
 
-// Combined Café Shift: the bakery shift, café shift and two-cell route authors.
+// Café shift: the bakery shift, café shift and two-cell route authors.
 async function openRecipeAuthors(page) {
-  await openWorkflowCard(page, /^Combined Café Shift · Financiers & Espresso/);
+  await openWorkflowCard(page, /^Café shift/);
   await waitForProductionScene(page);
 }
 

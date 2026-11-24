@@ -69,13 +69,7 @@ export class GingerMilkTeaRecipeAuthor extends React.Component<Props, State> {
         onSubmit={this.prepare.bind(this)}
       >
         <h3>Ginger milk tea: two-pan preparation to service</h3>
-        <p>
-          Two batches share two pans, one hob, one strainer and one worker. One
-          pan starts dirty. Both pans must be clean and staged before
-          extraction. The FR10 stages the empty receiving pan in a fixed tray
-          insert. A worker removes it from the insert at the receiving station.
-          Tea simmers for three minutes, then passes into the receiving pan.
-        </p>
+        <p>Makes two batches of ginger milk tea with two pans.</p>
         <p>
           Review each extract before adding milk. Rejection skips milk, sugar
           and heating. Accepted batches warm cups with 300 ml water in the

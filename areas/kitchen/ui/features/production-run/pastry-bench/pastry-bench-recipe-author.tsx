@@ -46,16 +46,9 @@ export class PastryBenchRecipeAuthor extends React.Component<Props, State> {
         onSubmit={this.submit.bind(this)}
         aria-label="Pie pastry bench deformable recipe"
       >
-        <h3>
-          Pie Pastry Bench · Deformable Shortcrust &amp; Puff Lid (MuJoCo 4.0.0)
-        </h3>
         <p>
-          Sheets 330 g of rested 8 °C butter shortcrust to{" "}
-          {this.state.targetThicknessMm.toFixed(1)} mm on a floured 16 °C marble
-          slab, drapes the 81-vertex / 128-triangle{" "}
-          <code>flexcomp elastic2d</code> shell into 12 cm fluted aluminium pie
-          tins (28 mm cavity depth), and crimps 240 g of 6 °C laminated puff
-          pastry at {this.state.crimpForceN} N.
+          Rolls shortcrust to {this.state.targetThicknessMm.toFixed(1)} mm,
+          lines 12 cm pie tins and crimps a puff lid.
         </p>
         <RecipeChoice
           label="Savoury pie variety"

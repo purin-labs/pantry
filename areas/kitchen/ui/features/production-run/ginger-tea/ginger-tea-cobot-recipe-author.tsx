@@ -118,13 +118,8 @@ export class GingerTeaCobotRecipeAuthor extends React.Component<Props, State> {
           Service
         </h3>
         <p>
-          FAIRINO FR10 Cobot stages the clean 200 mm receiving saucepan in its
-          rigid 600 × 400 mm tray insert (`persistent-pan-staging/1`), weighs 15
-          g sliced ginger on the Ohaus Ranger 3000 scale, simmers ginger on the
-          Maruzen MIH-02C or Vollrath 59500P induction hob, executes either
-          heat-off steeping on the heatproof rest or two-pan straining into
-          `pan-b` with 180 g milk + 25 g sugar finishing to 78 °C (75–80 °C),
-          and washes used utensils at the sink.
+          Makes ginger tea, or ginger milk tea finished at 78 °C in a second
+          pan.
         </p>
         <RecipeChoice
           label="Workflow mode"

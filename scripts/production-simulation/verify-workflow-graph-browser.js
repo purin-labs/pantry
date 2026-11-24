@@ -12,7 +12,7 @@ async function verifyWorkflowGraphBrowser(page) {
   const recipes = [
     {
       id: "siphon",
-      card: /^Siphon coffee physics/,
+      card: /^Siphon coffee/,
       form: "Siphon coffee recipe",
       prepare: "Prepare siphon coffee",
       edges: [
@@ -123,7 +123,7 @@ async function verifyWorkflowGraphBrowser(page) {
     },
     {
       id: "cafe-shift",
-      card: /^Combined Café Shift/,
+      card: /^Café shift/,
       form: "Combined café shift recipe",
       prepare: "Prepare combined café shift",
       edges: [

@@ -40,7 +40,7 @@ async function verifyWorkflowEngineEditBrowser(page) {
     .getByRole("button", { name: "← Back", exact: true })
     .first()
     .click();
-  await page.getByRole("button", { name: /^Pour-over station/u }).click();
+  await page.getByRole("button", { name: /^Pour-over/u }).click();
   await page
     .getByRole("form", { name: "Pour-over recipe", exact: true })
     .getByRole("button", { name: "Prepare pour-over", exact: true })
@@ -105,7 +105,7 @@ async function verifyWorkflowEngineEditBrowser(page) {
     .getByRole("button", { name: "← Back", exact: true })
     .first()
     .click();
-  await page.getByRole("button", { name: /^Combined Café Shift/u }).click();
+  await page.getByRole("button", { name: /^Café shift/u }).click();
   await page
     .getByRole("form", { name: "Bakery shift", exact: true })
     .getByRole("button", { name: "Prepare bakery shift", exact: true })

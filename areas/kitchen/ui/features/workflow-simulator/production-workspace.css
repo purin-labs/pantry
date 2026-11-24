@@ -156,63 +156,6 @@
 .production-menu-page[data-active="true"] {
   opacity: 1;
 }
-.production-menu-list {
-  display: grid;
-  gap: 6px;
-}
-.production-menu-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  width: 100%;
-  min-height: 38px;
-  padding: 8px 12px;
-  border: 1px solid var(--hairline);
-  border-radius: 10px;
-  background: var(--ground);
-  color: var(--ink);
-  font-size: 0.82rem;
-  font-weight: 600;
-  text-align: left;
-  transition:
-    background-color 150ms ease,
-    border-color 150ms ease,
-    transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-.production-menu-item:hover:not(:disabled) {
-  border-color: var(--pantry-link);
-  transform: translateX(2px);
-}
-.production-menu-item-main {
-  min-width: 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 4px 10px;
-  flex: 1;
-}
-.production-menu-item-main strong {
-  font-size: 0.82rem;
-}
-.production-menu-item-meta {
-  font-size: 0.74rem;
-  font-weight: 400;
-  color: var(--ink-2, var(--muted));
-}
-.production-menu-chevron {
-  font-size: 1rem;
-  line-height: 1;
-  color: var(--ink-2, var(--muted));
-  transition:
-    transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
-    color 160ms ease;
-}
-.production-menu-item:hover:not(:disabled) .production-menu-chevron {
-  transform: translateX(3px);
-  color: var(--ink);
-}
 .production-menu-back:hover:not(:disabled) {
   transform: translateX(-2px);
 }
@@ -220,86 +163,16 @@
   display: grid;
   gap: 14px;
 }
-.production-catalog-groups {
-  display: grid;
-  gap: 14px;
-}
-/* A catalog group: its tier and name, then one framed list of rows. */
-.production-catalog-group {
-  display: grid;
-  gap: 6px;
-}
-.production-catalog-group h4 {
-  margin: 0;
-  padding-inline: 2px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--ink-2, var(--muted));
-}
-.production-catalog-group .production-menu-list {
-  gap: 0;
-  border: 1px solid var(--hairline);
-  border-radius: 10px;
-  background: var(--paper);
-  overflow: hidden;
-}
-.production-tier-badge {
-  display: inline-flex;
-  align-items: center;
-  width: fit-content;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  background: color-mix(in srgb, var(--ink) 8%, var(--paper));
-  color: var(--ink-2, var(--muted));
-  border: 1px solid var(--hairline);
-}
-.production-tier-badge[data-tier="task"] {
-  background: color-mix(in srgb, #10b981 15%, var(--paper));
-  color: color-mix(in srgb, #10b981 62%, var(--ink));
-  border-color: color-mix(in srgb, #10b981 36%, var(--hairline));
-}
-.production-catalog-card {
-  padding: 9px 12px !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: var(--paper) !important;
-}
-.production-catalog-card + .production-catalog-card {
-  border-top: 1px solid var(--hairline) !important;
-}
-.production-catalog-card:hover:not(:disabled) {
-  transform: none;
-  background: color-mix(in srgb, var(--ink) 4%, var(--paper)) !important;
-}
-.production-catalog-card-body {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-.production-catalog-card-body strong {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--ink);
-  line-height: 1.25;
-}
-.production-catalog-card-body small {
-  font-size: 0.71rem;
-  font-weight: 450;
-  color: var(--ink-2, var(--muted));
-  line-height: 1.3;
-}
 .production-menu-subview form,
 .production-menu-subview section {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
+/* A recipe form: its name (when a view holds several forms) and one sentence
+   that says what it makes, then the fields. */
 .production-menu-subview h3 {
-  order: 1;
+  order: -2;
   margin: 0 0 2px;
   font-size: 0.96rem;
   font-weight: 650;
@@ -360,13 +233,9 @@
 }
 .production-menu-subview form > p:not([role="status"]),
 .production-menu-subview section > p:not([role="status"]) {
-  order: 3;
-  margin: 0;
-  padding: 8px 10px;
-  border-radius: 9px;
-  background: color-mix(in srgb, var(--ground) 50%, transparent);
-  border: 1px solid color-mix(in srgb, var(--hairline) 70%, transparent);
-  font-size: 0.74rem;
+  order: -1;
+  margin: 0 0 4px;
+  font-size: 0.8rem;
   line-height: 1.42;
   color: var(--ink-2, var(--muted));
 }
@@ -401,25 +270,23 @@
 }
 .production-hybrid-list {
   display: grid;
-  gap: 8px;
+  gap: 12px;
   margin-top: 4px;
 }
-.production-hybrid-connector {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: -2px 0;
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: var(--ink-2, var(--muted));
-}
+/* The preset card, then each batch: one framed list with a header row and a
+   row for each step and each robot tray. */
 .production-hybrid-card {
   display: grid;
-  gap: 7px;
-  padding: 10px 11px;
+  gap: 8px;
+  padding: 12px;
   border: 1px solid var(--hairline);
   border-radius: 10px;
-  background: color-mix(in srgb, var(--ground) 55%, var(--paper));
+  background: var(--paper);
+}
+.production-hybrid-card[data-state] {
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
 }
 .production-hybrid-card-header {
   display: flex;
@@ -427,6 +294,10 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 6px 8px;
+}
+.production-hybrid-card[data-state] > .production-hybrid-card-header {
+  padding: 8px 12px;
+  background: color-mix(in srgb, var(--ink) 3%, var(--paper));
 }
 .production-hybrid-card-title {
   display: flex;
@@ -450,25 +321,9 @@
   color: color-mix(in srgb, #f59e0b 68%, var(--ink));
 }
 .production-hybrid-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  background: color-mix(in srgb, var(--ink) 8%, var(--paper));
+  font-size: 0.8rem;
+  font-weight: 650;
   color: var(--ink);
-  border: 1px solid var(--hairline);
-}
-.production-hybrid-badge[data-state="running"] {
-  background: color-mix(in srgb, #10b981 16%, var(--paper));
-  color: color-mix(in srgb, #10b981 62%, var(--ink));
-  border-color: color-mix(in srgb, #10b981 36%, var(--hairline));
-}
-.production-hybrid-badge[data-state="waiting"] {
-  background: color-mix(in srgb, #f59e0b 16%, var(--paper));
-  color: color-mix(in srgb, #f59e0b 65%, var(--ink));
-  border-color: color-mix(in srgb, #f59e0b 38%, var(--hairline));
 }
 .production-hybrid-status {
   font-size: 0.73rem;
@@ -484,96 +339,59 @@
   flex-shrink: 0;
   color: var(--ink-2, var(--muted));
 }
-.production-hybrid-steps {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 4px;
-}
-.production-hybrid-step {
-  min-height: 0 !important;
-  width: 100%;
-  display: grid !important;
-  gap: 2px;
-  text-align: left;
-  justify-content: flex-start !important;
-  padding: 5px 7px !important;
-  border-radius: 7px !important;
-  border: 1px solid var(--hairline);
-  background: var(--paper);
-  white-space: nowrap !important;
-  overflow: hidden;
-}
-.production-hybrid-step[data-state="running"] {
-  border-color: color-mix(in srgb, #10b981 60%, var(--hairline));
-  background: color-mix(in srgb, #10b981 11%, var(--paper));
-}
-.production-hybrid-step[data-state="completed"] {
-  border-color: color-mix(in srgb, #10b981 38%, var(--hairline));
-  background: color-mix(in srgb, #10b981 6%, var(--paper));
-}
-.production-hybrid-step[data-state="waiting"] {
-  border-color: color-mix(in srgb, #f59e0b 45%, var(--hairline));
-  background: color-mix(in srgb, #f59e0b 7%, var(--paper));
-}
-.production-hybrid-step strong {
-  font-size: 0.72rem;
-  font-weight: 650;
-  line-height: 1.25;
-  color: var(--ink);
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.production-hybrid-step span {
-  font-size: 0.67rem;
-  line-height: 1.25;
-  color: var(--ink-2, var(--muted));
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.production-hybrid-step[data-state="waiting"] span {
-  color: color-mix(in srgb, #f59e0b 70%, var(--ink));
-  font-weight: 550;
-}
+.production-hybrid-steps,
 .production-hybrid-trays {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
-  padding-top: 1px;
 }
+.production-hybrid-step,
 .production-hybrid-trays .production-canvas-node {
-  min-height: 29px !important;
-  padding: 4px 10px !important;
-  border-radius: 7px;
-  background: var(--paper);
   display: flex !important;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  justify-content: space-between !important;
+  gap: 12px;
+  width: 100%;
+  min-height: 0 !important;
+  padding: 7px 12px !important;
+  border: 0 !important;
+  border-top: 1px solid var(--hairline) !important;
+  border-radius: 0 !important;
+  background: transparent;
+  box-shadow: none;
+  text-align: left;
+  white-space: nowrap !important;
 }
-.production-hybrid-trays .production-canvas-node[data-tray-state="ready"] {
-  border-color: color-mix(in srgb, #3b82f6 48%, var(--hairline));
-  background: color-mix(in srgb, #3b82f6 11%, var(--paper));
-}
+.production-hybrid-step[data-state="running"],
 .production-hybrid-trays .production-canvas-node[data-tray-state="running"],
 .production-hybrid-trays .production-canvas-node[data-tray-state="completed"] {
-  border-color: color-mix(in srgb, #10b981 45%, var(--hairline));
-  background: color-mix(in srgb, #10b981 9%, var(--paper));
+  background: color-mix(in srgb, #10b981 8%, var(--paper));
+}
+.production-hybrid-trays .production-canvas-node[data-tray-state="ready"] {
+  background: color-mix(in srgb, #3b82f6 7%, var(--paper));
 }
 .production-hybrid-trays .production-canvas-node[data-tray-state="failed"] {
-  border-color: color-mix(in srgb, #ef4444 50%, var(--hairline));
-  background: color-mix(in srgb, #ef4444 10%, var(--paper));
+  background: color-mix(in srgb, #ef4444 8%, var(--paper));
 }
+.production-hybrid-step strong,
 .production-hybrid-trays .production-canvas-node strong {
-  font-size: 0.72rem;
-  font-weight: 650;
-  white-space: nowrap;
-}
-.production-hybrid-trays .production-canvas-node span {
-  font-size: 0.68rem;
-  color: var(--ink-2, var(--muted));
-  white-space: nowrap;
   overflow: hidden;
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 500;
   text-overflow: ellipsis;
+}
+.production-hybrid-step span,
+.production-hybrid-trays .production-canvas-node span {
+  overflow: hidden;
+  color: var(--ink-2, var(--muted));
+  font-size: 0.76rem;
+  text-overflow: ellipsis;
+}
+.production-hybrid-step[data-state="running"] span {
+  color: color-mix(in srgb, #10b981 60%, var(--ink));
+}
+.production-hybrid-step[data-state="waiting"] span {
+  color: color-mix(in srgb, #d97706 75%, var(--ink));
+  font-weight: 550;
 }
 .production-canvas-scroll {
   overflow: visible;
@@ -624,11 +442,14 @@
 .production-panel {
   position: relative;
   width: min(440px, 100%);
-  padding: 0 !important;
   overflow: hidden;
   min-height: 0;
   display: flex;
   flex-direction: column;
+}
+/* The panel's pages set their own padding; a recipe view's drawer keeps its own. */
+.production-panel:not(.factory-drawer) {
+  padding: 0 !important;
 }
 .production-panel[data-panel="workflow"],
 .production-panel[data-catalog="true"] {

@@ -99,13 +99,9 @@ export class FinancierBatterRecipeAuthor extends React.Component<Props, State> {
         onSubmit={this.submit.bind(this)}
         aria-label="Financier batter Cobot recipe"
       >
-        <h3>Financier Batter · Beurre Noisette &amp; Hobart HL200 Mix</h3>
         <p>
-          FAIRINO FR10 Cobot tares the Ohaus Ranger 3000 bench scale, browns{" "}
-          {this.state.butterG} g of Normandy butter on the induction hob to{" "}
-          {this.state.targetButterC} °C hazelnut beurre noisette, charges 395 g
-          sifted almond-sugar tant-pour-tant and 181 g egg whites into the
-          Hobart HL200 20 qt planetary mixer, and folds a 726 g golden batter.
+          Browns {this.state.butterG} g butter to {this.state.targetButterC} °C
+          and mixes 726 g batter.
         </p>
         <RecipeChoice
           label="Induction hob model"

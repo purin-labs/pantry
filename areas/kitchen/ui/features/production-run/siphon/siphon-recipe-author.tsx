@@ -91,14 +91,7 @@ export class SiphonRecipeAuthor extends React.Component<Props, State> {
         aria-label="Siphon coffee recipe"
         onSubmit={this.prepare.bind(this)}
       >
-        <h3>Siphon coffee · Hario ECA-3-B Electric Coffee Syphon</h3>
-        <p>
-          The Hario 3-cup electric vacuum method: 350 g hot water in the conical
-          BL-ECA-3 lower server, 24 g medium-fine coffee in the cylindrical
-          BU-ECA-3 upper bowl over an F-103S flannel cloth filter, and the
-          integrated ECA-3-B electric heater base (350 W max upflow, 110 W mid
-          steep hold, 0 W off vacuum drawdown).
-        </p>
+        <p>Makes one siphon coffee from 24 g coffee and 350 g water.</p>
         <p>
           The FR10 seats the upper bowl silicone gasket at 94 °C, folds the
           grounds in with 3 circular revolutions of the BA-15 bamboo paddle,

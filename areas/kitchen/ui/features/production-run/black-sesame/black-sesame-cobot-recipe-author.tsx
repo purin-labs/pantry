@@ -125,15 +125,10 @@ export class BlackSesameCobotRecipeAuthor extends React.Component<
           3587
         </h3>
         <p>
-          FAIRINO FR10 Cobot mills {this.state.sesameG} g black sesame in 4
-          pulse loads on the Waring WSG60 spice grinder, cooks 542 g sweet
-          rice-flour slurry on the induction hob, blends and standardizes 760 g
-          concentrate on the Vitamix The Quiet One and Ohaus Ranger 3000 scale,
-          transfers the covered cold-container carrier (2 × 380 g bottles) into
-          the Hoshizaki RT-120SNJ refrigerated worktop (3.0 °C), and serves a{" "}
+          Makes 760 g black sesame concentrate and serves a{" "}
           {Number(this.state.concentratePerDrinkG) +
             Number(this.state.milkPerDrinkG)}{" "}
-          g heated drink in the Severin SM 3587 milk mixer.
+          g hot drink.
         </p>
         <RecipeChoice
           label="Induction slurry hob model"

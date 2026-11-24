@@ -175,7 +175,7 @@ const FINANCIER_PACK_RUN: RecipeRun<
       ? outcome.reason
       : "Financiers demoulded, crumb-checked, and sealed in gold-ribbon patisserie gift box.",
   resetNotice: "Workcell reset to t = 0.00 s.",
-  notice: "Workcell prepared at t = 0.00 s. Press Start production to run.",
+  notice: "Workcell prepared at t = 0.00 s.",
   endS: 56,
 };
 
@@ -341,12 +341,6 @@ function FinancierPackScenarioForm(props: {
         })
       }
     >
-      <p>
-        FAIRINO FR10 Cobot inverting the Matsunaga 8P silicone-coated mould onto
-        the wire cooling grid, sampling 1 × 23.5 g piece for the 10-minute crumb
-        check, and packing the accepted golden financiers into a gold-ribbon
-        patisserie gift box on the Ohaus Ranger 3000 scale.
-      </p>
       <RecipeChoice
         label="Accepted baked load"
         items={LOAD_PRESET_ITEMS}

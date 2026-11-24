@@ -759,7 +759,6 @@ export class PastryBenchWorkspace extends React.Component<
             }
           />
         }
-        kicker="Factory simulation · MuJoCo 4.0.0 flexcomp + Maruzen MBCO-5E"
         title={
           <>
             Pie Pastry Bench ·{" "}
@@ -791,10 +790,6 @@ export class PastryBenchWorkspace extends React.Component<
             </p>
           )
         }
-        headings={{
-          scenario: "Pastry bench scenario controls",
-          results: "MuJoCo 4.0.0 deformable shell & oven results",
-        }}
         scenario={
           <PastryBenchScenarioForm
             recipe={recipe}
@@ -954,10 +949,6 @@ function PastryBenchScenarioForm(props: {
         })
       }
     >
-      <p>
-        16 °C tempered marble pastry slab with stainless rolling pin, 12 cm
-        fluted aluminium pie tin (28 mm cavity), and fluted rim crimping ring.
-      </p>
       <RecipeChoice
         label="Savoury pie variety"
         items={PIE_TYPE_ITEMS}

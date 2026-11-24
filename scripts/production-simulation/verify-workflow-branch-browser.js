@@ -33,7 +33,7 @@ async function verifyWorkflowBranchBrowser(page) {
       page,
       page
         .locator(".recipe-graph-filter")
-        .filter({ hasText: "Reviews" })
+        .filter({ hasText: "Review answer" })
         .locator('.pantry-select-trigger'),
       { value: review },
     );
@@ -201,7 +201,7 @@ async function verifyWorkflowBranchBrowser(page) {
   await close();
   await page
     .locator(".recipe-graph-filter")
-    .filter({ hasText: "Reviews" })
+    .filter({ hasText: "Review answer" })
     .waitFor();
   const jumped = await runDraft("reject");
   if (jumped.status !== "completed") fail("the jump did not complete", jumped);

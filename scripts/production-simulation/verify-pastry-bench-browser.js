@@ -322,7 +322,7 @@ async function openPastryBenchRecipeForm(page) {
   if (await form.isVisible()) return;
   const pastryButton = page
     .getByRole("button", {
-      name: /Pie Pastry Bench · Deformable Shortcrust & Puff Lid/i,
+      name: /^Pie pastry/i,
     })
     .first();
   if (!(await pastryButton.isVisible())) {

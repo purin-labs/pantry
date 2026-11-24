@@ -46,7 +46,7 @@ function nextAction(view: HostView): string {
     case "stopped-at-limit":
       return "The run reached its execution limit. Save the run and review unfinished tasks before preparing another shift.";
     case "ready":
-      return "The bakery shift is ready. Start production to begin the recipes.";
+      return "The bakery shift is ready.";
     case "pause-requested":
       return "Production is stopping at a safe simulation boundary. Wait for the pause before saving.";
     case "advancing":

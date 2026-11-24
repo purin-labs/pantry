@@ -600,10 +600,9 @@
   gap: 12px;
   margin-bottom: 0;
 }
-.factory-title > div {
+.factory-title > h2 {
   min-width: 0;
 }
-.factory-title span,
 .factory-save-status,
 .factory-clock > span {
   color: var(--muted);
@@ -666,9 +665,11 @@
   font-size: 0.8rem;
   padding: 8px 12px;
 }
+/* The Scenario and Results drawer starts where the stage readout starts, so
+   that it covers the readout while it is open. */
 .persistent-production > .production-panel.factory-drawer {
   position: absolute;
-  inset: calc(var(--factory-toolbar-bottom, 68px) + 92px) 12px 132px auto;
+  inset: var(--chrome-status-top, 64px) 12px 132px auto;
   width: min(520px, 48%);
   z-index: 5;
   overflow-x: hidden;
@@ -690,6 +691,17 @@
 .factory-drawer-heading button:not(:where(.pantry-select-trigger)) {
   flex: none;
   font-size: 0.75rem;
+}
+.factory-drawer-heading .factory-drawer-close:where(button) {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
 }
 .factory-drawer section,
 .factory-drawer table,

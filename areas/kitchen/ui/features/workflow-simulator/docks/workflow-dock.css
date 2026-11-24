@@ -1,0 +1,34 @@
+/* A flat list of facts under the steps: the vitrine and the mass balance. */
+.workflow-fact-section {
+  margin-top: 14px;
+}
+.workflow-fact-section h4 {
+  margin: 0 2px 6px;
+  color: var(--ink-2);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.workflow-fact-list {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 14px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--hairline, var(--border));
+  border-radius: 10px;
+  background: var(--paper);
+  font-size: 13px;
+}
+.workflow-fact-list dt {
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.workflow-fact-list dd {
+  margin: 0;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.workflow-overview .production-section-header h3 {
+  margin-inline-start: auto;
+  font-size: 14px;
+}

@@ -86,11 +86,7 @@ export class BlackSesameRecipeAuthor extends React.Component<Props, State> {
         onSubmit={this.prepare.bind(this)}
       >
         <h3>Black sesame milk: concentrate to service</h3>
-        <p>
-          Twelve orders share one heated mixer, one reusable jug, two 380 g
-          bottles and one worker. Each batch supplies ten 76 g portions. Each
-          drink adds 210 g milk.
-        </p>
+        <p>Serves twelve drinks of 76 g concentrate and 210 g milk.</p>
         <p>
           This rehearsal assumes 12 g evaporation, 8 g residue, 2 g spills and
           20 g added water per 762 g batch. Cooling releases on its declared

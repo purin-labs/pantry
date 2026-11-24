@@ -44,12 +44,12 @@ import type { LatteRecipeConfig } from "@purin-labs/production-simulation/recipe
 import { PourOverRecipeAuthor } from "../production-run/pour-over/pour-over-recipe-author";
 import { PastryBenchRecipeAuthor } from "../production-run/pastry-bench/pastry-bench-recipe-author";
 import type { PastryBenchRecipeConfig } from "../production-run/pastry-bench/pastry-bench-model";
-import { CompleteRecipeTaskCatalog } from "./complete-recipe-task-catalog";
 import {
-  CATALOG_TIERS,
-  ProductionCatalogGroup,
-  ProductionCatalogItem,
-} from "./catalog-group";
+  RECIPE_TASKS,
+  WorkflowCatalog,
+  workspaceTitle,
+  type CatalogSection,
+} from "./workflow-catalog";
 import {
   batchWorkerFlow,
   calibratedHandoffAssignments,
@@ -325,23 +325,6 @@ type Props = Readonly<{
   openFinancierMorning?: () => void;
   returnToCatalog?: () => void;
 }>;
-
-export type CatalogSection =
-  | "active-production"
-  | "rehearsal-production"
-  | "cafe-shift"
-  | "siphon"
-  | "espresso"
-  | "latte"
-  | "black-sesame"
-  | "ginger-tea"
-  | "financier-batter"
-  | "financier-bake"
-  | "financier-pack"
-  | "pastry-bench"
-  | "pour-over"
-  | "appliance-rehearsals"
-  | "shared-runs";
 
 type MenuSnapshot = Readonly<{
   panel: "workflow" | "author" | "details" | "files";
@@ -2876,9 +2859,10 @@ export class ProductionWorkspace extends React.Component<
         <header className="production-topbar">
           <div className="production-topbar-row">
             <h2 ref={this.heading} tabIndex={-1}>
-              {this.props.session.procedure === "rehearsal"
-                ? "Multi-tray rehearsal + Robot"
-                : "Multi-batch production + Robot"}
+              {workspaceTitle(
+                this.state.catalogSection,
+                this.props.session.procedure === "rehearsal",
+              )}
             </h2>
             <nav aria-label="Production workcell views">
               <button
@@ -3306,33 +3290,6 @@ export class ProductionWorkspace extends React.Component<
         ) : null;
     }
   }
-  private catalogSectionTierLabel(): string {
-    switch (this.state.catalogSection) {
-      case "appliance-rehearsals":
-        return CATALOG_TIERS.action;
-      case "siphon":
-      case "pour-over":
-      case "espresso":
-      case "latte":
-      case "black-sesame":
-      case "ginger-tea":
-      case "financier-batter":
-      case "financier-bake":
-      case "financier-pack":
-      case "pastry-bench":
-        return CATALOG_TIERS.task;
-      case "active-production":
-      case "rehearsal-production":
-        return this.props.session.procedure === "rehearsal"
-          ? CATALOG_TIERS.action
-          : CATALOG_TIERS.loop;
-      case "cafe-shift":
-      case "shared-runs":
-        return CATALOG_TIERS.loop;
-      case null:
-        return "Workflow";
-    }
-  }
   private catalogMenuList(data: Ready): React.ReactNode {
     const batchSummary = data.run.batches
       .map((batch) => workName(data.run, batch.id))
@@ -3342,48 +3299,54 @@ export class ProductionWorkspace extends React.Component<
     ).length;
     return (
       <>
-        <div className="production-catalog-groups">
-          <ProductionCatalogGroup title={CATALOG_TIERS.action}>
-            {this.props.session.procedure === "rehearsal" && (
-              <ProductionCatalogItem
-                title={`Multi-tray robot rehearsal (${batchSummary})`}
-                detail="Active 3D tray rehearsal & rack handoff calibration"
-                open={this.openCatalogSection.bind(this, "active-production")}
-              />
-            )}
-            <ProductionCatalogItem
-              title="Standalone appliance rehearsals"
-              detail="Linea Classic S & Eagle One group head calibration"
-              open={this.openCatalogSection.bind(this, "appliance-rehearsals")}
-            />
-          </ProductionCatalogGroup>
-
-          <CompleteRecipeTaskCatalog
-            openCatalogSection={this.openCatalogSection.bind(this)}
-          />
-
-          <ProductionCatalogGroup title={CATALOG_TIERS.loop}>
-            {this.props.session.procedure !== "rehearsal" && (
-              <ProductionCatalogItem
-                title={`Multi-batch production + Robot (${batchSummary})`}
-                detail={`3-batch autonomous pipeline · ${processStepCount} process steps & robot tray handoffs`}
-                open={this.openCatalogSection.bind(this, "active-production")}
-              />
-            )}
-            <ProductionCatalogItem
-              title="Combined Café Shift · Financiers & Espresso"
-              detail="Baker FR10 #1 + Barista FR10 #2 · Matsunaga 8P loads & Linea / Eagle One service"
-              open={this.openCatalogSection.bind(this, "cafe-shift")}
-            />
-            {this.props.connection.kind === "workspace" && (
-              <ProductionCatalogItem
-                title="Shared production runs"
-                detail="Open or compare saved workspace factory recordings"
-                open={this.openCatalogSection.bind(this, "shared-runs")}
-              />
-            )}
-          </ProductionCatalogGroup>
-        </div>
+        <WorkflowCatalog
+          rows={[
+            ...(this.props.session.procedure === "rehearsal"
+              ? [
+                  {
+                    id: "rehearsal-production" as const,
+                    fact: `${batchSummary} · rack handoff`,
+                    open: this.openCatalogSection.bind(
+                      this,
+                      "active-production",
+                    ),
+                  },
+                ]
+              : []),
+            {
+              id: "appliance-rehearsals",
+              open: this.openCatalogSection.bind(this, "appliance-rehearsals"),
+            },
+            ...RECIPE_TASKS.map((id) => ({
+              id,
+              open: this.openCatalogSection.bind(this, id),
+            })),
+            ...(this.props.session.procedure !== "rehearsal"
+              ? [
+                  {
+                    id: "active-production" as const,
+                    fact: `${batchSummary} · ${processStepCount} steps · robot handoffs`,
+                    open: this.openCatalogSection.bind(
+                      this,
+                      "active-production",
+                    ),
+                  },
+                ]
+              : []),
+            {
+              id: "cafe-shift",
+              open: this.openCatalogSection.bind(this, "cafe-shift"),
+            },
+            ...(this.props.connection.kind === "workspace"
+              ? [
+                  {
+                    id: "shared-runs" as const,
+                    open: this.openCatalogSection.bind(this, "shared-runs"),
+                  },
+                ]
+              : []),
+          ]}
+        />
         {this.state.comparisons.length > 0 && (
           <FactoryComparison
             results={this.state.comparisons}
@@ -3441,9 +3404,6 @@ export class ProductionWorkspace extends React.Component<
               <div className="production-menu-page" data-active={depth === 0}>
                 <div className="production-section-header">
                   <h3>Workflow</h3>
-                  <span className="production-section-hint">
-                    Choose a workflow
-                  </span>
                 </div>
                 {this.catalogMenuList(data)}
               </div>
@@ -3456,13 +3416,6 @@ export class ProductionWorkspace extends React.Component<
                   >
                     ← Back
                   </button>
-                  <span className="production-tier-badge">
-                    {showActiveProduction
-                      ? data.run.batches
-                          .map((batch) => workName(data.run, batch.id))
-                          .join(" → ")
-                      : this.catalogSectionTierLabel()}
-                  </span>
                 </div>
                 {showActiveProduction ? (
                   this.hybridBatchChain(data)
@@ -3685,7 +3638,6 @@ export class ProductionWorkspace extends React.Component<
       calibratedPack !== null ||
       handoffRecoveryPreset !== "nominal-handoff";
     const activeSettings = data.plan.settings;
-    const activeHandoff = buildFinancierHandoffRecovery(handoffRecoveryPreset);
     const gatedHandoffCount = data.plan.operations.filter(
       (op) => op.dependsOn.length > 0 || op.earliestStartSeconds > 0,
     ).length;
@@ -3703,17 +3655,13 @@ export class ProductionWorkspace extends React.Component<
         >
           <header className="production-hybrid-card-header">
             <div className="production-hybrid-card-title">
-              <span className="production-tier-badge" data-tier="task">
-                {hasTier2Calibration
-                  ? "Tier 2 → Tier 3 Calibrated"
-                  : "Tier 2 ↔ Tier 3 Handoff Preset"}
-              </span>
               <span className="production-hybrid-status">
-                {activeSettings.traysPerBatch} trays/batch ·{" "}
-                {activeSettings.piecesPerTray} pcs/tray · Stage{" "}
-                {activeSettings.stage}m · Portion {activeSettings.portion}m ·
-                Bake {activeSettings.bake}m · Cool {activeSettings.cool}m · Pack{" "}
-                {activeSettings.pack}m
+                {activeSettings.traysPerBatch} trays a batch ·{" "}
+                {activeSettings.piecesPerTray} pieces a tray · Stage{" "}
+                {activeSettings.stage} · Portion {activeSettings.portion} · Bake{" "}
+                {activeSettings.bake} · Cool {activeSettings.cool} · Pack{" "}
+                {activeSettings.pack} min
+                {hasTier2Calibration ? " · calibrated" : ""}
               </span>
             </div>
           </header>
@@ -3749,15 +3697,11 @@ export class ProductionWorkspace extends React.Component<
                 </dd>
               </>
             )}
-            <dt>Cell Handoff Recovery</dt>
-            <dd>
-              {activeHandoff.summary} ({gatedHandoffCount} gated robot cell
-              handoff{gatedHandoffCount === 1 ? "" : "s"})
-            </dd>
+            <dt>Held handoffs</dt>
+            <dd>{gatedHandoffCount}</dd>
           </dl>
           <label className="production-handoff-preset-control">
-            Fault-recovery calibration preset (Tier 2 Bake ↔ Tier 3 robot cell
-            handoffs)
+            Handoff
             <Select.Root
               items={HANDOFF_PRESETS}
               value={handoffRecoveryPreset}
@@ -3771,7 +3715,7 @@ export class ProductionWorkspace extends React.Component<
                 this.applyHandoffRecoveryPreset(next);
               }}
             >
-              <Select.Trigger aria-label="Tier 2 to Tier 3 handoff fault-recovery preset">
+              <Select.Trigger>
                 <Select.Value />
               </Select.Trigger>
               <Select.Popup>{HANDOFF_PRESETS.map(renderItem)}</Select.Popup>
@@ -3780,14 +3724,6 @@ export class ProductionWorkspace extends React.Component<
         </section>
         {data.run.batches.map((batch, index) => (
           <React.Fragment key={batch.id}>
-            {index === 1 && (
-              <div className="production-hybrid-connector" aria-hidden="true">
-                <span>
-                  ↓ Hand-off &amp; shared station queue (Portioning, Oven, Robot
-                  cell)
-                </span>
-              </div>
-            )}
             {this.hybridBatchCard(data, batch, index)}
           </React.Fragment>
         ))}
@@ -3846,14 +3782,14 @@ export class ProductionWorkspace extends React.Component<
       waits.length === 0
         ? null
         : waits.length === 1
-          ? `1 wait (${totalWaitSeconds} s at ${shortStationName(waits[0]!.first.station)})`
-          : `${waits.length} waits (${totalWaitSeconds} s total)`;
+          ? `1 wait · ${totalWaitSeconds} s at ${shortStationName(waits[0]!.first.station)}`
+          : `${waits.length} waits · ${totalWaitSeconds} s`;
     return (
       <section className="production-hybrid-card" data-state={badgeState}>
         <header className="production-hybrid-card-header">
           <div className="production-hybrid-card-title">
             <span className="production-hybrid-badge" data-state={badgeState}>
-              {index + 1} · {workName(run, batch.id)}
+              {workName(run, batch.id)}
             </span>
             <span className="production-hybrid-status">{headerStatus}</span>
           </div>

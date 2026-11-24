@@ -72,10 +72,8 @@ import {
 } from "@purin-labs/production-simulation/simulator/rehearsal-file";
 import { readExample } from "./rehearsal-examples";
 import "./physics-replay.css";
-import {
-  ProductionWorkspace,
-  type CatalogSection,
-} from "./production-workspace";
+import { ProductionWorkspace } from "./production-workspace";
+import type { CatalogSection } from "./workflow-catalog";
 import type { ProductionSession } from "./production-session";
 import type { PreparedRehearsalEdit } from "./rehearsal-edits";
 import type { Variant } from "@purin-labs/type-utils";

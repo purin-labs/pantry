@@ -146,15 +146,9 @@ export class FinancierBakeRecipeAuthor extends React.Component<Props, State> {
         onSubmit={this.submit.bind(this)}
         aria-label="Financier bake Cobot recipe"
       >
-        <h3>Financier Bake · Mould Depositing &amp; Maruzen MBCO-5E Oven</h3>
         <p>
-          FAIRINO FR10 Cobot tares the Ohaus Ranger 3000 bench scale, doses{" "}
-          {this.state.portionG} g of golden financier batter per cavity (75–80%
-          fill depth, {totalFillG} g total) into the Matsunaga 220 × 300 mm
-          8-cavity silicone-coated silver mould, slides the 600 × 400 mm carrier
-          into Maruzen MBCO-5E Slot {this.state.rackSlot}, and bakes at{" "}
-          {this.state.targetOvenTempC} °C before unloading onto the cooling wire
-          grid.
+          Fills each cavity with {this.state.portionG} g batter ({totalFillG} g
+          in all) and bakes at {this.state.targetOvenTempC} °C.
         </p>
         <RecipeChoice
           label="Tier 2 → Tier 3 handoff calibration preset"

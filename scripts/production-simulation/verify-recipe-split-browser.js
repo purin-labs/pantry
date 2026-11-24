@@ -262,7 +262,7 @@ async function verifyRecipeSplitBrowser(page) {
   const otherDedicatedRecipes = [
     {
       id: "siphon",
-      card: /^Siphon coffee physics/,
+      card: /^Siphon coffee/,
       form: "Siphon coffee recipe",
       prepare: "Prepare siphon coffee",
     },
@@ -298,7 +298,7 @@ async function verifyRecipeSplitBrowser(page) {
     },
     {
       id: "cafe-shift",
-      card: /^Combined Café Shift/,
+      card: /^Café shift/,
       form: "Combined café shift recipe",
       prepare: "Prepare combined café shift",
     },

@@ -134,12 +134,8 @@ export class CafeShiftRecipeAuthor extends React.Component<Props, State> {
           Combined Café Shift · Financier Patisserie &amp; Espresso Service
         </h3>
         <p>
-          The shift composes Financier production (152 °C beurre noisette on
-          Maruzen MIH-02C, Hobart HL200 726.0 g batter, Matsunaga 8P mould
-          dosing, Maruzen MBCO-5E 170 °C bake, 16-rack cooling, 23.5 g Ohaus
-          crumb sample, and gold-ribbon ballotin packing) with preheated
-          espresso bar service ({servedEspressoG} g served across{" "}
-          {this.state.espressoOrders} orders) under one shared logical clock.
+          Bakes financiers and serves {servedEspressoG} g espresso across{" "}
+          {this.state.espressoOrders} orders.
         </p>
         <p>
           Expected saleable output: <strong>{packedPieces}</strong> packed

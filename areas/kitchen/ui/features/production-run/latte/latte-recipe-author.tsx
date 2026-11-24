@@ -101,12 +101,7 @@ export class LatteRecipeAuthor extends React.Component<Props, State> {
   render(): React.ReactNode {
     return (
       <form aria-label="Caffe latte recipe" onSubmit={this.prepare.bind(this)}>
-        <h3>Caffe Latte · Milk steaming &amp; Rosetta pour</h3>
-        <p>
-          Composes espresso extraction, pressurized steam aeration, whirlpool
-          microfoam texturing, and free-pour Rosetta latte art on one FAIRINO
-          FR10 Cobot station.
-        </p>
+        <p>Makes a caffe latte with steamed milk and Rosetta latte art.</p>
         <p>
           The FR10 extracts a 36 g 9-bar double espresso into a 240 mL porcelain
           latte bowl, grasps the 600 mL stainless pitcher (4 °C milk), stretches

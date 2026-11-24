@@ -185,8 +185,7 @@ const BLACK_SESAME_RUN: RecipeRun<
       ? outcome.reason
       : "Black Sesame Milk concentrate refrigerated in Hoshizaki RT-120SNJ and 286 g heated drink served.",
   resetNotice: "Workcell reset to t = 0.00 s.",
-  notice:
-    "Black Sesame Milk workcell prepared at t = 0.00 s. Press Start production to run.",
+  notice: "Black Sesame Milk workcell prepared at t = 0.00 s.",
   endS: 60,
 };
 
@@ -318,12 +317,6 @@ function BlackSesameScenarioForm(props: {
       notice={props.notice}
       apply={() => props.apply({ ...props.recipe, hob, roast, check })}
     >
-      <p>
-        FAIRINO FR10 Cobot operating the Black Sesame Milk bench: Waring WSG60
-        spice grinder, induction slurry cooker, Vitamix The Quiet One blender,
-        Ohaus Ranger 3000 scale, Hoshizaki RT-120SNJ cold-carrier transfer, and
-        Severin SM 3587 heated drink service.
-      </p>
       <RecipeChoice
         label="Induction hob"
         items={INDUCTION_HOB_ITEMS}
