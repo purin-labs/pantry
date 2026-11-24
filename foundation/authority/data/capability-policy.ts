@@ -42,11 +42,16 @@ const BASELINE_OWNER_DISCOVERY_GRANT_ID =
   "grant_baseline_owner_integration_discovery_read";
 const BASELINE_ADMIN_DISCOVERY_GRANT_ID =
   "grant_baseline_admin_integration_discovery_read";
+// A Portal chat reads a link that the person pasted, as a Slack channel does.
+const BASELINE_OWNER_LINK_GRANT_ID = "grant_baseline_owner_message_link_read";
+const BASELINE_ADMIN_LINK_GRANT_ID = "grant_baseline_admin_message_link_read";
 export const READ_AND_PROPOSE_ORGANISATION_GRANT_IDS = [
   BASELINE_OWNER_CONTEXT_GRANT_ID,
   BASELINE_ADMIN_CONTEXT_GRANT_ID,
   BASELINE_OWNER_DISCOVERY_GRANT_ID,
   BASELINE_ADMIN_DISCOVERY_GRANT_ID,
+  BASELINE_OWNER_LINK_GRANT_ID,
+  BASELINE_ADMIN_LINK_GRANT_ID,
 ] as const;
 const BASELINE_ENABLED_CAPABILITIES = new Set<ActiveCapabilityId>([
   CAPABILITY_KEYS.contextCaseRead,
@@ -422,6 +427,22 @@ export function prepareReadAndProposeAccessDefaults(
       grantId: BASELINE_ADMIN_DISCOVERY_GRANT_ID,
       subject: { kind: "organisation_role", role: "admin" },
       capabilityId: CAPABILITY_KEYS.integrationDiscoveryRead,
+      provenance,
+      now: input.now,
+    }),
+    baselinePlatformGrantStatement(input.source, {
+      admission: input.admission,
+      grantId: BASELINE_OWNER_LINK_GRANT_ID,
+      subject: { kind: "organisation_role", role: "owner" },
+      capabilityId: CAPABILITY_KEYS.messageLinkRead,
+      provenance,
+      now: input.now,
+    }),
+    baselinePlatformGrantStatement(input.source, {
+      admission: input.admission,
+      grantId: BASELINE_ADMIN_LINK_GRANT_ID,
+      subject: { kind: "organisation_role", role: "admin" },
+      capabilityId: CAPABILITY_KEYS.messageLinkRead,
       provenance,
       now: input.now,
     }),

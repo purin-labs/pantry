@@ -111,8 +111,9 @@ owner can read and restore it. A D1 fault answers `authority_unavailable`.
   `disabled`, and 7 accept each mode.
 - **Access defaults.** `…/defaults/apply` adds the missing rows of the baseline
   `read_and_propose` version 1: one policy row for each capability (8 `enabled`, the
-  others `disabled`) and four grants for the owner role and the admin role. It changes
-  no policy row and no grant that exists.
+  others `disabled`) and six grants for the owner role and the admin role
+  (`context.case.read`, `integration.discovery.read` and `message.link.read`). It
+  changes no policy row and no grant that exists.
 - **Policy snapshot.** `policy-snapshot.ts` compiles one versioned snapshot: the egress
   rules, the rules `allowedTools`, `deniedTools`, `approvalRequired` and `maxBudget`,
   and the output check mode (`hold` or `stream`). An `enabled` capability goes to

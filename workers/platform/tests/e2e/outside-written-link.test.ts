@@ -20,7 +20,11 @@ import { accessControlPath, enableCapability } from "./access-route-support";
 import { BASE_ID, connectAirtable, pending } from "./airtable-exit-support";
 import { commerceHeaders } from "./commerce-support";
 import { registeredActors } from "./held-exit-support";
-import { bindLinkFetch, resolvePublicAddress } from "./link-fetch-support";
+import {
+  bindLinkFetch,
+  PublicPage,
+  resolvePublicAddress,
+} from "./link-fetch-support";
 import { network } from "./network";
 import { fixtureDatabase } from "./organisation-database";
 import { givePortalHandles } from "./permission-request-support";
@@ -101,28 +105,6 @@ const SECOND_ROOT_TS = "1787500400.000001";
 
 type Step = (body: Record<string, unknown>) => Response | Promise<Response>;
 
-/** Stands in for the link-fetch Actor: it answers the page and records it. */
-class SupplierPage {
-  readonly fetched: string[] = [];
-
-  getByName(): this {
-    return this;
-  }
-
-  async fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
-    const raw: unknown = await new Request(input, init).json();
-    if (!isRecord(raw) || typeof raw.url !== "string")
-      throw new Error("The fetch request has no link");
-    this.fetched.push(raw.url);
-    return HttpResponse.json({
-      status: 200,
-      contentType: "text/plain",
-      location: null,
-      bodyBase64: btoa(PAGE_TEXT),
-    });
-  }
-}
-
 async function outsideWrittenLink({ task }: TestContext): Promise<void> {
   const fixture = await installSlackActorFixture();
   const owner = fixture.ownerSession;
@@ -135,7 +117,7 @@ async function outsideWrittenLink({ task }: TestContext): Promise<void> {
   await discoverSlackChannel("public_channel", Date.now() - 60_000);
   const asker = await askerSession();
 
-  const page = new SupplierPage();
+  const page = new PublicPage(PAGE_TEXT);
   const steps: Step[] = [];
   const toolOutputs: string[] = [];
   const writes: string[] = [];
@@ -278,7 +260,7 @@ async function whatsAppReplyAfterLink({ task }: TestContext): Promise<void> {
   await discoverSlackChannel("public_channel", Date.now() - 60_000);
   const asker = await askerSession();
 
-  const page = new SupplierPage();
+  const page = new PublicPage(PAGE_TEXT);
   const steps: Step[] = [];
   const toolOutputs: string[] = [];
   const customer: string[] = [];

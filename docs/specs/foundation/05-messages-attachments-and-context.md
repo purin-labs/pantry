@@ -63,6 +63,10 @@ message with a commerce source provenance.
   `needs_info`. The adapter reads the exact message again to complete them.
 - `buildSlackUserMessage` gives the order of the parts. The authored text and links come
   first, then the links of remote files, then the stored files in `files[]` order.
+- A Portal chat message (`chatUserMessage`) is the person's text, then a link part for
+  each distinct http(s) URL in that text, at most 10, then the files. A URL that the
+  message contract refuses stays text only. The link read then reads these links as it
+  reads the links of a Slack message.
 - A reply with a file does not steer a running turn. It waits for the next turn
   (FND-03).
 
@@ -340,7 +344,9 @@ The agent loads more context with its tools, when the task needs it.
   the person and the effect id.
 - **Capabilities** (`authorization/capability-catalogue.ts`):
   `message.attachment.inspect`, `message.link.read`, `context.case.read` and
-  `workspace.query`. The first three are on in the baseline policy.
+  `workspace.query`. The first three are on in the baseline policy. A Slack channel
+  holds a baseline grant of the first three, and the owner and admin roles hold one of
+  `message.link.read`, so a Portal chat reads a pasted link.
 - **Agent tools.** The two message tools are in `agent-tools/messages/messages.ts`, and
   `bakery_saved_run_read` is in `agent-tools/kitchen/saved-runs.ts`.
 - **Versions.** `plan37.m1.v1` (file policy), `plan37.link.v1` (link policy),
@@ -395,8 +401,9 @@ The agent loads more context with its tools, when the task needs it.
   its information-flow record, and FND-07 owns the exit check that reads this record.
   `message.link.read` is an inside capability that
   passes after outside-written text, because it fetches only a link that the message of
-  the person holds. A link read records no observation. A saved Kitchen read enters
-  under the `saved_bakery_run` label.
+  the person holds. A link read records the page text under the message's `ingress`
+  label with the writer `outside` (FND-07). A saved Kitchen read enters under the
+  `saved_bakery_run` label.
 - **No full URL in a record.** A link receipt holds no path and no query. The exact URL
   stays in the message. A collection record holds object keys and no message text.
 - **Scope of the browser.** The saved read takes the Organisation from the admitted
@@ -430,13 +437,11 @@ The agent loads more context with its tools, when the task needs it.
   pages gives no text. DOC, spreadsheets and slides are opaque.
 - Video frames come only from intra-frame video and H.264. VP9 and AV1 have no decoder.
   Audio gives technical facts only.
-- A Portal message has no link part, so `read_message_link` finds no link in it. Only
-  Slack messages make link parts.
 - A person cannot download a stored file. A file part of the Portal chat holds the id,
   the name, the media type and the preparation state of the file, and no link to its
   bytes. The preparation, the reuse check of a Slack file and the check of a fork are
   the code that reads the bytes of a content object.
-- The text of a link or of a file does not set the writer `outside` of Plan 89 (FND-07).
+- The text of a file does not set the writer `outside` of Plan 89 (FND-07).
 - Only the Kitchen page has a `prepare_context` effect. The `preparing` and `ready`
   events have the area `kitchen` only.
 - The `latest` read lists each saved run of the Organisation to find the newest. Plan

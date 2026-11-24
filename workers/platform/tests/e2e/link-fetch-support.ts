@@ -18,6 +18,36 @@ export function resolvePublicAddress({
   });
 }
 
+/**
+ * Stands in for the link-fetch Actor of a fake public page: it answers each
+ * fetch with the page's text and records the link.
+ */
+export class PublicPage {
+  readonly fetched: string[] = [];
+  readonly #text: string;
+
+  constructor(text: string) {
+    this.#text = text;
+  }
+
+  getByName(): this {
+    return this;
+  }
+
+  async fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+    const raw: unknown = await new Request(input, init).json();
+    if (!isRecord(raw) || typeof raw.url !== "string")
+      throw new Error("The fetch request has no link");
+    this.fetched.push(raw.url);
+    return HttpResponse.json({
+      status: 200,
+      contentType: "text/plain",
+      location: null,
+      bodyBase64: btoa(this.#text),
+    });
+  }
+}
+
 /** Points the Actor's link-fetch binding at `linkFetch`. */
 export function bindLinkFetch(linkFetch: object, actor: object): void {
   const bindings = Reflect.get(actor, "env");

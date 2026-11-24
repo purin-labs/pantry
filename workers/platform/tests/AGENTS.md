@@ -199,6 +199,11 @@ test and any fixture that exists only for the obsolete behavior.
   and one in the queue: the agent's order read names no `lifecycle` field and
   still gets each order's state as the Orders page shows it. An administrator
   without the order read gets no order.
+- `e2e/chat-agent-message-link.test.ts` has the owner paste a link into a
+  Portal chat: the agent reads the fake public page through the link read
+  under the baseline grant of the owner role, and a link that the owner did
+  not write is refused and never fetched. `e2e/link-fetch-support.ts` holds
+  the fake page (`PublicPage`) that the link journeys share.
 - `e2e/chat-agent-pending-decisions.test.ts` follows the Portal chat agent's
   `pending_decisions_read`: a step of the owner's private chat waits for the
   owner, the owner's agent lists the decisions that the owner's Portal read

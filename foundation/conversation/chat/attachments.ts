@@ -199,6 +199,24 @@ async function readChatAttachment(
   return parsed.value;
 }
 
+/** The most links of one Portal message that become link parts. */
+const PORTAL_MESSAGE_LINK_LIMIT = 10;
+
+/**
+ * Each distinct http(s) URL that the person wrote in the text, in order, as
+ * the person wrote it without the punctuation that closes a sentence. The
+ * link read (FND-05) then reads only these links, as for a Slack message.
+ */
+function portalMessageLinks(text: string): readonly string[] {
+  const links: string[] = [];
+  for (const match of text.matchAll(/https?:\/\/[^\s<>"'`]+/giu)) {
+    const url = match[0].replace(/[.,;:!?)\]}]+$/u, "");
+    if (!links.includes(url)) links.push(url);
+    if (links.length === PORTAL_MESSAGE_LINK_LIMIT) break;
+  }
+  return links;
+}
+
 export async function chatUserMessage(
   bucket: R2Bucket,
   organisationId: OrganisationId,
@@ -206,6 +224,17 @@ export async function chatUserMessage(
   parts: readonly ChatAttachmentPart[],
 ): Promise<UserMessage> {
   const remainingParts = [];
+  for (const url of portalMessageLinks(text)) {
+    // A URL that the message contract refuses stays text only.
+    const link = {
+      kind: "link" as const,
+      link: { url, presentation: { kind: "url" as const } },
+    };
+    if (
+      deriveUserMessageViews({ firstPart: link, remainingParts: [] }).ok
+    )
+      remainingParts.push(link);
+  }
   for (const part of parts)
     remainingParts.push({
       kind: "attachment",

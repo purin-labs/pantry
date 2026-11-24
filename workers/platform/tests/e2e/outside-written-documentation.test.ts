@@ -20,7 +20,11 @@ import {
   preparePortalChatJourney,
 } from "./chat-journey-support";
 import { commerceHeaders } from "./commerce-support";
-import { bindLinkFetch, resolvePublicAddress } from "./link-fetch-support";
+import {
+  bindLinkFetch,
+  PublicPage,
+  resolvePublicAddress,
+} from "./link-fetch-support";
 import { network } from "./network";
 import { givePortalHandles } from "./permission-request-support";
 import {
@@ -67,28 +71,6 @@ const STOPPED = "Purin Pantry stopped this step";
 
 type Step = (body: Record<string, unknown>) => Response | Promise<Response>;
 
-/** Stands in for the link-fetch Actor: it answers the page and records it. */
-class SupplierPage {
-  readonly fetched: string[] = [];
-
-  getByName(): this {
-    return this;
-  }
-
-  async fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
-    const raw: unknown = await new Request(input, init).json();
-    if (!isRecord(raw) || typeof raw.url !== "string")
-      throw new Error("The fetch request has no link");
-    this.fetched.push(raw.url);
-    return HttpResponse.json({
-      status: 200,
-      contentType: "text/plain",
-      location: null,
-      bodyBase64: btoa(PAGE_TEXT),
-    });
-  }
-}
-
 async function outsideWrittenDocumentation({
   task,
 }: TestContext): Promise<void> {
@@ -105,7 +87,7 @@ async function outsideWrittenDocumentation({
   if (!userId.ok) throw new Error("Invalid member");
   const person = { organisationId: ORGANISATION_ID, userId: userId.value };
 
-  const page = new SupplierPage();
+  const page = new PublicPage(PAGE_TEXT);
   const steps: Step[] = [];
   const toolOutputs: string[] = [];
   const pageInPrompt: boolean[] = [];
