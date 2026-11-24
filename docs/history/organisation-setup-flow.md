@@ -2,7 +2,7 @@
 
 This spec covers the Organisations page when a person has no Purin Pantry
 organisation, and the **Set up Purin Pantry** dialog. Pantry makes the
-organisation itself ([Plan 95](plan-95-pantry-own-accounts.md) step 2); no
+organisation itself ([Plan 95](../plan-95-pantry-own-accounts.md) step 2); no
 outside account takes part.
 
 1. `POST /v1/control/organisations` with `{ operationId, name }` makes the

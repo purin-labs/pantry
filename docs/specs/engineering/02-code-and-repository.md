@@ -199,6 +199,10 @@ Other lints guard one subsystem. The spec of that subsystem describes these:
   `runtimeFetch` from `foundation/kernel/runtime-fetch.ts`.
 - For a file that you edit, run `pnpm exec eslint --fix <file>`, then
   `pnpm exec prettier --write <file>`.
+- Files outside the ESLint style folder can have old style faults, so give explicit
+  paths. To make the folder list larger, add one ownership area after that area is green.
+- In VS Code, install the ESLint and Prettier extensions. Select Prettier as the
+  formatter, and turn on format on save and `source.fixAll.eslint` on save.
 
 ### One definition for each concern
 
@@ -321,7 +325,7 @@ acceptance before Stage B moves its files.
 
 ## Sources
 
-- [Code style](../../code-style.md), [Refactor 10](../../history/refactor-10.md) and
+- [Code style](../../history/code-style.md), [Refactor 10](../../history/refactor-10.md) and
   [Plan 92](../../history/plan-92-new-pantry-repository.md). Where they differ from the code,
   this spec follows the code.
 - Background: [Refactor 17](../../refactor-17.md), [the module list](../../layers.md),

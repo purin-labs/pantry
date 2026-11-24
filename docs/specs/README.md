@@ -4,10 +4,11 @@ A spec describes what is built, for one subsystem. A plan describes work that is
 built. [Refactor 17](../refactor-17.md) gives the rules and the reasons.
 
 State on 2026-11-24: each of the 33 specs is written (step S2 of Refactor 17). A
-written spec is the reference for its subsystem, and 57 source plans are in
-`docs/history/`. A plan that describes work that is not built stays in `docs/` (the
-rows "A plan" in the table of old numbers). The other source documents of the specs
-(for example `architecture/runtime.md`) stay where they are.
+written spec is the reference for its subsystem. 57 source plans and 3 other source
+documents are in `docs/history/`. A plan that describes work that is not built stays in
+`docs/` (the rows "A plan" in the table of old numbers). A source document stays where
+it is while live guidance tells a reader to follow it (for example
+`architecture/runtime.md`).
 
 How a spec is accepted: a writer makes it from its source plans and the code. A second
 reader checks each statement against the code, and the writer corrects each fault.
@@ -65,12 +66,12 @@ each source file its module.
 | BRN-01  | [Brain](areas/brain/01-brain.md)                                                       | `areas/brain/`        | Plans 42J and 42K                                                                     | Written 2026-11-23 |
 | INT-01  | [Integrations and connectors](areas/integrations/01-integrations-and-connectors.md)    | `areas/integrations/` | `architecture/integrations.md`, `integrations/google-oauth.md`                        | Written 2026-11-23 |
 | DEV-01  | [Devices](areas/devices/01-devices.md)                                                 | `areas/devices/`      | Plan 85                                                                               | Written 2026-11-22 |
-| ORG-01  | [Onboarding and lifecycle](areas/organisation/01-onboarding-and-lifecycle.md)          | `areas/organisation/` | `architecture/onboarding.md`, `organisation-setup-flow.md`                            | Written 2026-11-23 |
+| ORG-01  | [Onboarding and lifecycle](areas/organisation/01-onboarding-and-lifecycle.md)          | `areas/organisation/` | `architecture/onboarding.md`, `history/organisation-setup-flow.md`                    | Written 2026-11-23 |
 | ORG-02  | [Jev from Seams](areas/organisation/02-jev-from-purin.md)                              | `areas/organisation/` | Plan 88                                                                               | Written 2026-11-23 |
-| PRT-01  | [The Portal](surfaces/portal/01-portal.md)                                             | `surfaces/portal/`    | Plan 21, `portal-ui-inventory.md`, `style-guide.md`                                   | Written 2026-11-23 |
+| PRT-01  | [The Portal](surfaces/portal/01-portal.md)                                             | `surfaces/portal/`    | Plan 21, `history/portal-ui-inventory.md`, `style-guide.md`                           | Written 2026-11-23 |
 | VOX-01  | [Voice control](surfaces/voice/01-voice-control.md)                                    | `surfaces/voice/`     | Plans 82 and 82C, the voice handover                                                  | Written 2026-11-23 |
 | ENG-01  | [Decision log](engineering/01-decision-log.md)                                         | `engineering/`        | Plan 3                                                                                | Written 2026-11-23 |
-| ENG-02  | [Code and repository](engineering/02-code-and-repository.md)                           | `engineering/`        | `code-style.md`, Refactor 10, Plan 92                                                 | Written 2026-11-23 |
+| ENG-02  | [Code and repository](engineering/02-code-and-repository.md)                           | `engineering/`        | `history/code-style.md`, Refactor 10, Plan 92                                         | Written 2026-11-23 |
 | ENG-03  | [Names](engineering/03-names.md)                                                       | `engineering/`        | Plan 91, the names table of `AGENTS.md`                                               | Written 2026-11-23 |
 | ENG-04  | [Testing](engineering/04-testing.md)                                                   | `engineering/`        | `test-coverage-e2e.md`                                                                | Written 2026-11-23 |
 

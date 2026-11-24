@@ -16,7 +16,7 @@ Owner: the Platform accounts, the Portal setup and Pantry billing.
 Touches: [Plan 88 — Jev](history/plan-88-satyr-funded-jev.md) (paid use),
 [Plan 93 — clean cutover](plan-93-clean-cutover.md) (the new stack),
 [onboarding architecture](architecture/onboarding.md),
-[organisation setup flow](organisation-setup-flow.md), and the AGENTS.md
+[organisation setup flow](history/organisation-setup-flow.md), and the AGENTS.md
 sections "Current request flow" and "Testing".
 
 ## Goal

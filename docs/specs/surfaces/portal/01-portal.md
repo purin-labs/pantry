@@ -205,6 +205,9 @@ keeps the last answer and shows an updating notice.
   another session changed it.
 - After a release, a tab that asks for an old code file reloads one time for each
   release (`stale-release.ts`).
+- A review of a page checks its populated, empty, loading, failed and restricted states
+  where they exist. It also checks the keyboard, a narrow width, the dark theme and
+  reduced motion.
 
 ### Design system
 
@@ -422,7 +425,7 @@ drawer. It shares the theme tokens.
 ## Sources
 
 - [Plan 21](../../../history/plan-21-cafeos-ux-foundation.md),
-  [the Portal UI inventory](../../../portal-ui-inventory.md) and
+  [the Portal UI inventory](../../../history/portal-ui-inventory.md) and
   [the style guide](../../../style-guide.md). Where they differ from the code, this spec
   follows the code.
 - Evidence in the archive:

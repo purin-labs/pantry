@@ -36,11 +36,26 @@ current segment. The step names are text for screen readers only:
 The Portal keeps the request in `sessionStorage` under
 `pantry:account-onboarding:<userId>`. While this record exists, a reload, a retry or a
 new sign-in sends the same `operationId`, the idempotency key of the route. A repeat
-answers with the first Organisation, also after the person reached the owner limit. A
-refusal replaces the body of its step with a heading, a reason, an action and the error
-code. Examples are `organisation_limit_reached`, `idempotency_key_conflict` ("Start
-again" with a new operation id) and `authority_unavailable` ("Try again" with the same
-operation id).
+answers with the first Organisation, also after the person reached the owner limit.
+
+A failure replaces the body of its step with a heading, a reason, an action and the
+error code, if the server sent one:
+
+| Cause                                               | Heading                                   | Action                                |
+| --------------------------------------------------- | ----------------------------------------- | ------------------------------------- |
+| The session ended                                   | Your session has ended                    | Sign in again                         |
+| The browser cannot keep the setup record            | Pantry cannot keep this setup             | Try again                             |
+| `organisation_owner_unverified`                     | Pantry needs a verified email             | Sign in with another account          |
+| `organisation_limit_reached`                        | You cannot own more organisations         | Close                                 |
+| `idempotency_key_conflict`                          | This setup changed                        | Start again, with a new operation id  |
+| `authority_unavailable`, another error or no answer | The setup stopped                         | Try again, with the same operation id |
+| The session does not list the Organisation          | Your organisation is not in your list     | Check again                           |
+| The session read failed                             | Pantry cannot read your organisation list | Check again                           |
+
+`organisation_create_invalid` returns to the name field and shows its message. This
+refusal, `organisation_owner_unverified`, `organisation_limit_reached` and
+`idempotency_key_conflict` remove the setup record, because the same request cannot
+succeed.
 
 ### Creation
 
@@ -421,7 +436,7 @@ The routes are in `control/routes/onboarding.ts` and `control/routes/operators.t
 ## Sources
 
 - [Onboarding architecture](../../../architecture/onboarding.md) and
-  [Organisation setup flow](../../../organisation-setup-flow.md). Where they differ
+  [Organisation setup flow](../../../history/organisation-setup-flow.md). Where they differ
   from the code, this spec follows the code. These two documents and Plan 95 name no
   evidence link in the archive, so this spec has none.
 - Background: [Plan 95](../../../plan-95-pantry-own-accounts.md). The procedures are in
