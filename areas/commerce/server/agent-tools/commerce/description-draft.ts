@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import type {
   DraftAgentEditRequest,
   DraftAgentReadArgs,
@@ -53,8 +54,8 @@ export const productDescriptionDraftEdit = defineCommerceTool({
     type: "object",
     properties: {
       productId: { type: "string", pattern: "^[A-Za-z0-9_:-]{1,256}$" },
-      oldText: { type: "string", maxLength: 10000 },
-      newText: { type: "string", maxLength: 10000 },
+      oldText: textLimit({ type: "string", maxLength: 10000 }),
+      newText: textLimit({ type: "string", maxLength: 10000 }),
     },
     required: ["productId", "oldText", "newText"],
     additionalProperties: false,

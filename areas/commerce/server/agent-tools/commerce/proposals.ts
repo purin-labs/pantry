@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import { type OrderRefundLineRequest } from "../../order-refund-action";
 import type { StockProposalRequest } from "@purin-labs/area-kitchen-contract/server/stock-action-plan";
 import {
@@ -108,17 +109,28 @@ export const commerceActionProposal = defineCommerceTool({
           expectedOfferRevision: { type: ["integer", "null"], minimum: 1 },
           expectedPolicyRevision: { type: ["integer", "null"], minimum: 1 },
           proposedPriceMinor: { type: ["integer", "null"], minimum: 1 },
-          currency: { type: ["string", "null"], minLength: 3, maxLength: 3 },
+          currency: textLimit({
+            type: ["string", "null"],
+            minLength: 3,
+            maxLength: 3,
+          }),
           salesChannelId: { type: ["string", "null"], minLength: 1 },
           salesChannelRevision: { type: ["integer", "null"], minimum: 1 },
           resourceId: { type: ["string", "null"], minLength: 1 },
           expectedRevision: { type: ["integer", "null"], minimum: 1 },
-          reason: { type: ["string", "null"], minLength: 1, maxLength: 256 },
+          reason: textLimit({
+            type: ["string", "null"],
+            minLength: 1,
+            maxLength: 256,
+          }),
           refund: { type: ["string", "null"], enum: ["none", "full", null] },
           restock: { type: ["boolean", "null"] },
           notifyCustomer: { type: ["boolean", "null"] },
-          note: { type: ["string", "null"], maxLength: 256 },
-          description: { type: ["string", "null"], maxLength: 10000 },
+          note: textLimit({ type: ["string", "null"], maxLength: 256 }),
+          description: textLimit({
+            type: ["string", "null"],
+            maxLength: 10000,
+          }),
           fulfillmentId: { type: ["string", "null"], minLength: 1 },
           fulfillmentRevision: { type: ["integer", "null"], minimum: 1 },
           shipmentId: { type: ["string", "null"], minLength: 1 },
@@ -229,7 +241,7 @@ export const orderRefundProposal = defineCommerceTool({
     properties: {
       orderId: { type: "string", minLength: 1 },
       expectedRevision: { type: "integer", minimum: 1 },
-      reason: { type: "string", minLength: 1, maxLength: 256 },
+      reason: textLimit({ type: "string", minLength: 1, maxLength: 256 }),
       refundLines: {
         type: ["array", "null"],
         minItems: 1,
@@ -301,13 +313,21 @@ export const stockActionProposal = defineCommerceTool({
               "update_purchase_request",
             ],
           },
-          reason: { type: "string", minLength: 1, maxLength: 256 },
+          reason: textLimit({ type: "string", minLength: 1, maxLength: 256 }),
           expectedRevision: { type: "integer", minimum: 1 },
           inventoryPositionId: { type: ["string", "null"], minLength: 1 },
           entryId: { type: ["string", "null"], minLength: 1 },
-          quantity: { type: ["string", "null"], minLength: 1, maxLength: 32 },
+          quantity: textLimit({
+            type: ["string", "null"],
+            minLength: 1,
+            maxLength: 32,
+          }),
           lotId: { type: ["string", "null"], minLength: 1 },
-          lotCode: { type: ["string", "null"], minLength: 1, maxLength: 128 },
+          lotCode: textLimit({
+            type: ["string", "null"],
+            minLength: 1,
+            maxLength: 128,
+          }),
           lotExpiresAt: { type: ["string", "null"], minLength: 1 },
           receivedAt: { type: ["string", "null"], minLength: 1 },
           purchaseRequestEntryId: { type: ["string", "null"], minLength: 1 },
@@ -325,14 +345,18 @@ export const stockActionProposal = defineCommerceTool({
             type: ["string", "null"],
             enum: ["accepted", "scheduled", null],
           },
-          owner: { type: ["string", "null"], minLength: 1, maxLength: 256 },
-          purchaseRequestId: {
+          owner: textLimit({
             type: ["string", "null"],
             minLength: 1,
             maxLength: 256,
-          },
+          }),
+          purchaseRequestId: textLimit({
+            type: ["string", "null"],
+            minLength: 1,
+            maxLength: 256,
+          }),
           expectedDeliveryAt: { type: ["string", "null"], minLength: 1 },
-          notes: { type: ["string", "null"], maxLength: 1000 },
+          notes: textLimit({ type: ["string", "null"], maxLength: 1000 }),
         },
         required: [
           "kind",
