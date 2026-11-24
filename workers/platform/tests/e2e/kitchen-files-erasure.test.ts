@@ -145,20 +145,27 @@ async function runBody(): Promise<
   };
 }
 
-async function stageRun(owner: Owner): Promise<void> {
+/** Stages a run, and returns the artifacts that the page must still send. */
+async function stageRun(owner: Owner): Promise<readonly string[]> {
   const { id, body } = await runBody();
   const staged = await controlRequest(
     owner.client,
     `${runsPath(owner.organisationId)}/prepared/${id}`,
     body,
   );
-  expect(staged.status, await staged.clone().text()).toBe(200);
+  const reply: unknown = await staged.json();
+  expect(staged.status, JSON.stringify(reply)).toBe(200);
+  if (!isRecord(reply) || !Array.isArray(reply.missing))
+    throw new Error("The stage gave no missing list");
+  return reply.missing;
 }
 
 async function stageAndSaveRun(owner: Owner): Promise<void> {
   const { id, body } = await runBody();
   const path = runsPath(owner.organisationId);
-  await stageRun(owner);
+  const digests = failed.artifacts.map((artifact) => artifact.digest);
+  expect([...(await stageRun(owner))].sort()).toEqual([...digests].sort());
+  const [first, ...rest] = failed.artifacts;
   for (const artifact of failed.artifacts) {
     const stored = await controlRequest(
       owner.client,
@@ -166,7 +173,13 @@ async function stageAndSaveRun(owner: Owner): Promise<void> {
       { content: artifact.content },
     );
     expect(stored.status, await stored.clone().text()).toBe(200);
+    // After the first artifact, the stage asks only for the others.
+    if (artifact === first)
+      expect([...(await stageRun(owner))].sort()).toEqual(
+        rest.map((other) => other.digest).sort(),
+      );
   }
+  expect(await stageRun(owner)).toEqual([]);
   const saved = await controlRequest(owner.client, path, body);
   expect(saved.status, await saved.clone().text()).toBe(201);
 }

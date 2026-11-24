@@ -172,6 +172,11 @@ async function parseStoredRun(
   return prepared;
 }
 
+/**
+ * The artifacts of a prepared run that are not stored with their exact size
+ * and digest. One listing of the run's artifact folder answers for all of
+ * them, so a run of up to 512 artifacts asks R2 once, not once per artifact.
+ */
 async function missingArtifacts(
   env: Env,
   organisationId: OrganisationId,
@@ -179,13 +184,24 @@ async function missingArtifacts(
   id: string,
   prepared: PreparedRun,
 ): Promise<string[]> {
+  const prefix = artifactKey(organisationId, userId, id, "");
+  const stored = new Map<string, R2Object>();
+  let cursor: string | undefined;
+  do {
+    const page = await env.ARCHIVE.list({
+      prefix,
+      include: ["customMetadata"],
+      ...(cursor === undefined ? {} : { cursor }),
+    });
+    for (const object of page.objects)
+      stored.set(object.key.slice(prefix.length), object);
+    cursor = page.truncated ? page.cursor : undefined;
+  } while (cursor !== undefined);
   const missing = [];
   for (const entry of prepared.document.artifacts) {
-    const object = await env.ARCHIVE.head(
-      artifactKey(organisationId, userId, id, entry.digest),
-    );
+    const object = stored.get(entry.digest);
     if (
-      object === null ||
+      object === undefined ||
       object.size !== entry.byteLength ||
       object.customMetadata?.sha256 !== entry.digest
     )

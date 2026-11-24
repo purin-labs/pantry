@@ -200,7 +200,9 @@ or `injected-failure`. The scheduler has no physical source.
   current setup and its accepted results only after the person selects **Use saved
   production run**. A save of a known id returns the stored summary.
 - A run with native artifacts is staged first, private to the admin who uploads it.
-  Publication needs each staged artifact and the retained execution bundle.
+  Publication needs each staged artifact and the retained execution bundle. The stage
+  and the publication read the stored artifacts with one R2 listing of the run's
+  artifact folder.
 - Local files: a production file is `bakery-production-workcells` version 9 on export,
   and an import accepts versions 7, 8 and 9. A rehearsal file is `bakery-rehearsal-run`
   version 4. A file is validated at one boundary and rebuilt through the compiler, so
