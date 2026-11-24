@@ -28,6 +28,12 @@ lto = "fat"
 name = "cobot-controller"
 path = "controller/main.rs"
 
+# The out-of-process robosim_gauntlet controller bridge (Plan 24). Stays outside
+# src/, so the engine identity and the pinned browser bundle do not change.
+[[bin]]
+name = "bakery-gauntlet"
+path = "gauntlet/main.rs"
+
 # Declare a standalone workspace boundary so nested git worktrees under
 # `.claude/worktrees/` do not inherit the outer checkout's workspace.
 [workspace]
