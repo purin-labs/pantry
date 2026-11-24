@@ -66,8 +66,8 @@ succeed.
   `development` on every other deployment. A request with `purpose: "test"` makes a
   `development` Organisation on any deployment. Only an email on the Worker secret
   `PANTRY_TEST_ORGANISATION_OWNERS` may send it. The Portal has no control for it.
-- The Organisation goes to the root cell of `PANTRY_ORGANISATION_PLACEMENT_PROFILE`
-  (FND-01). A person cannot select a cell.
+- The Organisation goes to the deployed cell nearest to the person, as at a Slack
+  install (`selectOrganisationHomePlacement`, FND-01). A person cannot select a cell.
 - A person owns at most 5 Organisations whose status is `active`, in all cells. An
   archived Organisation does not count. A test Organisation counts.
 

@@ -8,7 +8,7 @@ import {
 import { readControlMutationReplay } from "../data/shared-rows/mutation-receipt";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { configuredOrganisationDatabases } from "../organisation-execution-scope";
-import { parseOrganisationPlacementCells } from "../placement";
+import type { InitialOrganisationPlacement } from "../placement";
 import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationCreationRequest } from "@purin-labs/control-api";
 
@@ -38,7 +38,10 @@ export type OrganisationCreationError = Readonly<{
  * deployment profile.
  */
 function organisationEnvironment(
-  env: Pick<Env, "PANTRY_DEPLOYMENT_PROFILE" | "PANTRY_TEST_ORGANISATION_OWNERS">,
+  env: Pick<
+    Env,
+    "PANTRY_DEPLOYMENT_PROFILE" | "PANTRY_TEST_ORGANISATION_OWNERS"
+  >,
   owner: User,
   request: OrganisationCreationRequest,
 ): "development" | "production" | null {
@@ -71,21 +74,16 @@ export async function createOwnedOrganisation(
     env: Env;
     owner: User;
     request: OrganisationCreationRequest;
+    /** The deployed cell nearest to the person (`selectOrganisationHomePlacement`). */
+    placement: InitialOrganisationPlacement;
     now: number;
   }>,
 ): Promise<Result<CreatedOrganisation, OrganisationCreationError>> {
-  const { env, owner, request, now } = input;
+  const { env, owner, request, placement, now } = input;
   if (owner.issuer !== "https://accounts.google.com" || !owner.emailVerified)
     return failure("organisation_owner_unverified");
   const environment = organisationEnvironment(env, owner, request);
   if (environment === null) return failure("organisation_test_not_allowed");
-  const cells = parseOrganisationPlacementCells(
-    env.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
-  );
-  if (!cells.ok) return failure("authority_unavailable");
-  // The root cell is the onboarding default (`parseOrganisationPlacementCells`).
-  const cell = cells.value[0];
-  if (cell === undefined) return failure("authority_unavailable");
   const mutation = {
     boundary: {
       kind: "unversioned" as const,
@@ -93,7 +91,7 @@ export async function createOwnedOrganisation(
       requestHash: await sha256Hex(
         canonicalJson({
           name: request.name,
-          placementCellId: cell.placement.placementCellId,
+          placementCellId: placement.placementCellId,
           // A business request keeps the hash that it had before tests.
           ...(request.purpose === "test" ? { purpose: "test" } : {}),
         }),
@@ -124,7 +122,7 @@ export async function createOwnedOrganisation(
       owner,
       organisationName: request.name,
       environment,
-      placement: cell.placement,
+      placement,
       mutation: {
         ...mutation,
         identity: newControlMutationIdentity({

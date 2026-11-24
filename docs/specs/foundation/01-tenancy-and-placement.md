@@ -87,9 +87,10 @@ A rename, an archive, a restore, a deletion and a purge write the regional
 - Production has one cell: `production-apac`, kind `affinity`, hint `apac`, database
   `ORGANISATION_DB_APAC`. The local profile has three cells: `local-wnam`, `local-eu`
   and `multi-region-preview`, which uses `DB`.
-- An Organisation that a signed-in person makes goes to the root cell
-  (`organisation-access/creation.ts`). An Organisation that a Slack install makes goes
-  to the deployed cell nearest to the request (`control/home-region.ts`).
+- A new Organisation goes to the deployed cell nearest to the request
+  (`selectOrganisationHomePlacement` in `control/home-region.ts`). The Portal sign-up
+  (`organisation-access/creation.ts`) and the Slack install both use it, and the
+  person's browser sends each of the two requests.
 - `readRequestLocation` (`control/home-region.ts`) reads the coordinates or the
   continent of `request.cf`. `nearestOrganisationPlacementCell` (`placement.ts`) orders
   the deployed cells by distance over the globe. The first deployed cell of the profile
@@ -306,7 +307,7 @@ table, a column, an index or a trigger of its baseline.
 | Action                                                                   | Signed-in person | Sous Chef agent | Platform operator                                                                                                                                                                                                                          |
 | ------------------------------------------------------------------------ | ---------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Read the home regions                                                    | Yes              | No              | —                                                                                                                                                                                                                                          |
-| Choose the cell of a new Organisation                                    | No               | No              | Only through the profile: the root cell for an Organisation that a person makes, the nearest deployed cell for a Slack install                                                                                                             |
+| Choose the cell of a new Organisation                                    | No               | No              | Only through the profile: the deployed cell nearest to the person, at a sign-up and at a Slack install                                                                                                                                     |
 | Start, resume or abandon a relocation or a restore                       | No               | No              | Yes, with `ORGANISATION_ADMIN_TOKEN` as a bearer token                                                                                                                                                                                     |
 | Waive the retention of a relocation                                      | No               | No              | Yes                                                                                                                                                                                                                                        |
 | Read or write the records of an Organisation where the actor has no role | No               | No              | Yes, with the same token, through the admin routes of other specs for one named Organisation: for example `/v1/admin/person-roles`, `/v1/admin/integration-accounts`, `/v1/admin/external-records-read` and `/v1/admin/shopify-credential` |
@@ -373,6 +374,7 @@ The boundaries:
   profile has no `residency` cell.
 - A person cannot choose the home region. The creation request carries only
   `operationId` and `name`, and no Portal page reads `GET /v1/control/home-regions`.
+  A choice waits for a second production cell.
 - A move has no Portal page, no capability and no agent tool. Only the admin routes
   start and continue it.
 - No code writes the status `suspended` to the `organisation` row. The plan is always

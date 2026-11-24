@@ -40,7 +40,7 @@ records each answer.
   `{ operationId, name }` and becomes the owner. The operation id is the idempotency
   key: a repeat answers with the first Organisation. A person owns at most 5 active
   Organisations (`organisation_limit_reached`). A new Organisation has the plan `beta`
-  and goes to the root cell of the placement profile.
+  and goes to the deployed cell nearest to the person (FND-01).
 - **Members.** Each member has one `service_role_grant` row and one `person` row. An
   admin changes a role below `owner` or removes a member who is not an owner. Only an
   owner gives the role `owner`, takes it away, or removes an owner. An admin who tries
@@ -440,7 +440,7 @@ The boundaries:
 - **Invitations.** Issue, revoke and accept write no mutation receipt and no audit
   event. The row keeps the person who invited, but not the person who revoked.
 - **Cell of a new Organisation.** A person cannot select the cell of a new
-  Organisation.
+  Organisation. Pantry takes the deployed cell nearest to the person (FND-01).
 
 ## Sources
 

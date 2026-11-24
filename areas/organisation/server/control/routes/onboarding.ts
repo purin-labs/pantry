@@ -69,7 +69,10 @@ import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
 } from "@purin-labs/control/worker/authorization";
-import { readOrganisationHomeRegions } from "@purin-labs/control/worker/home-region";
+import {
+  readOrganisationHomeRegions,
+  selectOrganisationHomePlacement,
+} from "@purin-labs/control/worker/home-region";
 import {
   readJsonRecord,
   controlError,
@@ -296,10 +299,14 @@ async function handleCreateOrganisation(
     authenticated.value.session.userId,
   );
   if (owner instanceof Response) return owner;
+  // The person's browser sends this request, so its location is theirs.
+  const placement = selectOrganisationHomePlacement(env, request);
+  if (!placement.ok) return controlError(placement.error.code, 503);
   const created = await createOwnedOrganisation({
     env,
     owner,
     request: input,
+    placement: placement.value,
     now: Date.now(),
   });
   if (created.ok) return controlJson({ ok: true, organisation: created.value });

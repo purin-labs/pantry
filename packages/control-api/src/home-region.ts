@@ -1,8 +1,10 @@
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 
 /**
- * The region that holds an organisation's data and runs its agents. A person
- * chooses it when they create the organisation.
+ * The region that holds an organisation's data and runs its agents. Pantry
+ * places a new organisation in the deployed region nearest to the person who
+ * makes it, at a Portal sign-up and at a Slack install alike. No Portal page
+ * offers a choice.
  */
 export type OrganisationHomeRegionArea =
   "wnam" | "enam" | "sam" | "weur" | "eeur" | "apac" | "oc" | "afr" | "me";

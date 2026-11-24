@@ -12,9 +12,9 @@ import {
 } from "@purin-labs/tenancy/placement";
 import type { Result } from "@purin-labs/kernel/result";
 
-type OrganisationHomeRegionError =
-  | { readonly code: "organisation_placement_configuration_invalid" }
-  | { readonly code: "invalid_organisation_home_region" };
+type OrganisationHomeRegionError = {
+  readonly code: "organisation_placement_configuration_invalid";
+};
 
 type OfferedCells = {
   readonly nearest: OrganisationPlacementCell;
@@ -38,23 +38,17 @@ export function readOrganisationHomeRegions(
 }
 
 /**
- * The placement of a new organisation. A choice in the request wins. With no
- * choice, the organisation lives in the cell nearest to the request.
+ * The placement of a new organisation: the deployed cell nearest to the
+ * person whose browser sent the request. The Portal sign-up and the Slack
+ * install both use it.
  */
 export function selectOrganisationHomePlacement(
   env: OrganisationPlacementBindings,
   request: Request,
-  rawChoice: unknown,
 ): Result<InitialOrganisationPlacement, OrganisationHomeRegionError> {
   const offered = offeredCells(env, request);
   if (!offered.ok) return offered;
-  if (rawChoice === undefined)
-    return { ok: true, value: offered.value.nearest.placement };
-  for (const cell of offered.value.cells) {
-    if (cell.placement.placementCellId === rawChoice)
-      return { ok: true, value: cell.placement };
-  }
-  return { ok: false, error: { code: "invalid_organisation_home_region" } };
+  return { ok: true, value: offered.value.nearest.placement };
 }
 
 function offeredCells(

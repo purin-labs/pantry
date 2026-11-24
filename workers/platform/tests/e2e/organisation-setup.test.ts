@@ -61,6 +61,17 @@ it(
   120_000,
 );
 
+// A sign-up places the new organisation in the deployed cell nearest to the
+// person, as a Slack install does. The two cells of this suite are WNAM and
+// APAC. A person in Tokyo gets the APAC cell, with the organisation's rows in
+// the APAC database, and a repeat from Tokyo answers with the same one. A
+// request that carries no location gets the first cell of the profile.
+it(
+  "places a new organisation in the deployed cell nearest to the person who makes it",
+  placementJourney,
+  120_000,
+);
+
 type Created = Readonly<{
   status: number;
   organisationId: string | null;
@@ -156,6 +167,71 @@ async function setupJourney(context: TestContext): Promise<void> {
     ownedOrganisations: owned.length,
     unverified,
   };
+}
+
+async function placementJourney(context: TestContext): Promise<void> {
+  const tokyo = await commerceClient(`placement-tokyo-${crypto.randomUUID()}`);
+  const elsewhere = await commerceClient(
+    `placement-elsewhere-${crypto.randomUUID()}`,
+  );
+  const inTokyo = {
+    latitude: "35.6762",
+    longitude: "139.6503",
+    continent: "AS",
+  };
+  const east = await create(
+    tokyo.session,
+    "placement_operation_tokyo",
+    "Tokyo bakery",
+    undefined,
+    inTokyo,
+  );
+  expect(east.status, JSON.stringify(east)).toBe(200);
+  const west = await create(
+    elsewhere.session,
+    "placement_operation_elsewhere",
+    "Bakery with no location",
+  );
+  expect(west.status, JSON.stringify(west)).toBe(200);
+  const eastId = parseRequiredOrganisationId(String(east.organisationId));
+  const westId = parseRequiredOrganisationId(String(west.organisationId));
+
+  const cells = {
+    tokyo: (await requireOrganisationExecutionScope(env, eastId)).placement
+      .placementCellId,
+    elsewhere: (await requireOrganisationExecutionScope(env, westId)).placement
+      .placementCellId,
+  };
+  expect(cells).toEqual({ tokyo: "regional-apac", elsewhere: "regional-wnam" });
+  // The Tokyo organisation's rows are in the APAC database, and its owner
+  // reads it.
+  const rows = async (database: D1Database | undefined) =>
+    database
+      ?.prepare(
+        "SELECT COUNT(*) AS total FROM organisation WHERE organisation_id = ?",
+      )
+      .bind(eastId)
+      .first<{ total: number }>();
+  expect(await rows(env.ORGANISATION_DB_APAC)).toEqual({ total: 1 });
+  expect(await rows(env.ORGANISATION_DB_WNAM)).toEqual({ total: 0 });
+  expect(await ownedOrganisations(tokyo.session)).toEqual([eastId]);
+  const read = await exports.default.fetch(
+    `https://localhost/v1/control/organisations/${eastId}`,
+    { headers: commerceHeaders(tokyo.session) },
+  );
+  expect(read.status).toBe(200);
+
+  // A repeat from Tokyo answers with the same organisation.
+  const repeat = await create(
+    tokyo.session,
+    "placement_operation_tokyo",
+    "Tokyo bakery",
+    undefined,
+    inTokyo,
+  );
+  expect(repeat).toEqual(east);
+
+  context.task.meta.organisationSetup = { cells, repeat: repeat.status };
 }
 
 async function nameRuleJourney(context: TestContext): Promise<void> {
@@ -489,6 +565,7 @@ async function create(
   operationId: string,
   name: string,
   purpose?: string,
+  location?: Readonly<Record<string, string>>,
 ): Promise<Created> {
   const response = await exports.default.fetch(
     "https://localhost/v1/control/organisations",
@@ -500,6 +577,8 @@ async function create(
           ? { operationId, name }
           : { operationId, name, purpose },
       ),
+      // Cloudflare gives the Worker the location of the person's browser.
+      ...(location === undefined ? {} : { cf: location }),
     },
   );
   const body: unknown = await response.json();

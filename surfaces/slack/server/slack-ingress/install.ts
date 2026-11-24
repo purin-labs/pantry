@@ -248,7 +248,7 @@ export async function handleSlackInstall(
 
   const now = Date.now();
   // The installer's browser makes this request, so its location is theirs.
-  const placement = selectOrganisationHomePlacement(env, request, undefined);
+  const placement = selectOrganisationHomePlacement(env, request);
 
   if (!placement.ok) {
     traceWarn("integration_gateway.slack_install.placement_invalid", {
