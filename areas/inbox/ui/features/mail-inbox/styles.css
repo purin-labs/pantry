@@ -261,7 +261,8 @@
 .mail-status-trigger[data-agent="on"] .mail-status-dot {
   background: var(--ok-text);
 }
-.mail-status-trigger[data-agent="paused"] .mail-status-dot {
+.mail-status-trigger:is([data-agent="paused"], [data-agent="held"])
+  .mail-status-dot {
   background: var(--warn-text);
 }
 .mail-status-menu {
@@ -324,10 +325,11 @@
   font-size: 13px;
   font-weight: 500;
 }
-.mail-agent-strip[data-agent="paused"] {
+/* A pause and a wait for the model both stop the agent's replies. */
+.mail-agent-strip:is([data-agent="paused"], [data-agent="held"]) {
   background: var(--warn-bg);
 }
-.mail-agent-strip[data-agent="paused"] p {
+.mail-agent-strip:is([data-agent="paused"], [data-agent="held"]) p {
   color: var(--warn-text);
 }
 .mail-agent-strip[data-tone="danger"] {

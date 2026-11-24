@@ -186,6 +186,15 @@ An owner or admin opens the sheet "How should the agent help?" from the list hea
   model and tries again after 30 seconds, 2 minutes, 10 minutes, 1 hour and 6 hours;
   after that it stops, and the email stays in the Inbox for a person. A turn after the
   acceptance runs on the new model (`mailbox-model-change.test.ts`).
+- People learn of the wait in two places. The mailbox read (`GET …/agent-mailboxes/:id`)
+  carries `model`, and the Inbox agent line says **Waiting**: an owner or admin gets a
+  **Mailbox settings** link to the acceptance, and other members read who must accept
+  (`MailAgentState` `held`). The first reply turn that waits posts one card in the
+  operations channel (`mail-model-notice.ts`): it names the mailbox address and the
+  model, holds no mail content, and its button opens the mailbox settings. The email
+  Connector records each card (`connector_email_model_notice`), so the channel hears of
+  each wait once; a new model or a new review is a new wait. A shop with no operations
+  channel sees the Inbox line only.
 - **Turn off** and **Remove** set `revoked_at` on each acceptance when no mailbox of
   the Organisation stays on.
 

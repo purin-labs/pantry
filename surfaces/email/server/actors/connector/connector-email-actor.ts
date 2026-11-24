@@ -7,6 +7,7 @@ import {
   createKeyedContinueSerialQueue,
 } from "@purin-labs/async-control/serial-queue";
 import { runMailOrganization } from "@purin-labs/area-inbox/server/mail-inbox/connector-runtime";
+import { noticeMailModelWait } from "@purin-labs/area-inbox/server/mail-inbox/mail-model-notice";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import {
@@ -1920,6 +1921,19 @@ export class ConnectorEmail {
             ? "email_turn_retries_exhausted"
             : outcome.reason,
       });
+      // New mail waits until an owner or admin accepts the model's terms.
+      // The operations channel hears of each wait once.
+      if (outcome.reason === "gmail_inference_route_blocked")
+        await noticeMailModelWait(this.host.env, scope, {
+          sql,
+          integrationAccountId: runtime.integrationAccountId,
+          now: Date.now(),
+        }).catch(() => {
+          traceWarn("connector.email_model_notice_failed", {
+            requestId: newRequestId(),
+            thread_id: work.threadId,
+          });
+        });
     }
   }
 

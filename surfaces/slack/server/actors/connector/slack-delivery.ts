@@ -47,6 +47,8 @@ import {
   heldOutputPortalUrl,
 } from "../../held-output-notice";
 import { noticeCardBlocks } from "../../notice-card";
+import { workspacePortalUrl } from "../../portal-links";
+import { mailModelNoticeMailbox } from "@purin-labs/area-inbox/server/mail-inbox/contract/mail-model-notice-delivery";
 import {
   deviceAlertCardBlocks,
   devicesPortalUrl,
@@ -491,7 +493,10 @@ async function permissionCardDeliveryBlocks(
   return permissionCardBlocks(text, requestId, portalUrl);
 }
 
-/** The blocks of a held card or a budget card; null for other deliveries. */
+/**
+ * The blocks of a held card, a budget card or a mail model card; null for
+ * other deliveries.
+ */
 async function noticeCardDeliveryBlocks(
   env: Env,
   scope: OrganisationExecutionScope,
@@ -503,7 +508,8 @@ async function noticeCardDeliveryBlocks(
     return noticeCardBlocks(text, null);
   const requestId = heldNoticeRequestId(deliveryId);
   const budget = isBudgetNoticeDelivery(deliveryId);
-  if (requestId === null && !budget) return null;
+  const mailbox = mailModelNoticeMailbox(deliveryId);
+  if (requestId === null && !budget && mailbox === null) return null;
   let address: Readonly<{
     organisationHandle: string;
     workspaceHandle: string;
@@ -521,6 +527,22 @@ async function noticeCardDeliveryBlocks(
     return heldCardBlocks(
       text,
       address === null ? null : heldOutputPortalUrl(env, address, requestId),
+    );
+  // New mail waits for the model: the mailbox's settings take the acceptance.
+  if (mailbox !== null)
+    return noticeCardBlocks(
+      text,
+      address === null
+        ? null
+        : {
+            actionId: "mail_model_open",
+            label: "Open mailbox settings",
+            url: workspacePortalUrl(
+              env,
+              address,
+              `inbox?settings=${encodeURIComponent(mailbox)}`,
+            ),
+          },
     );
   return budgetCardBlocks(
     text,

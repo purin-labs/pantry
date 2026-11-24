@@ -1054,7 +1054,7 @@ export class MailInboxRoute extends React.Component<InboxProps, InboxState> {
     if (
       accountId === null ||
       !this.props.canManage ||
-      (agent !== null && agent.kind !== "on")
+      (agent !== null && agent.kind !== "on" && agent.kind !== "held")
     )
       return;
     let check: MailboxCheck;

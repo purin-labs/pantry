@@ -8,6 +8,8 @@ import {
 } from "../data/email-mailbox";
 import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import { resolveIntegrationAccount } from "@purin-labs/connections/data/integration-account";
+import type { MailboxSetupModel } from "@purin-labs/control-api";
+import { readGmailModelState } from "./gmail-model-consent";
 import {
   parseConnectorId,
   type IntegrationAccountId,
@@ -31,12 +33,13 @@ export async function readAgentMailboxProjection(
   ]);
   if (!mailbox.ok || !account.ok) return null;
   // The Connector is addressed only for a mailbox that is connected.
-  const [policy, runtime] = await Promise.all([
+  const [policy, runtime, model] = await Promise.all([
     readMailboxIngressPolicy({
       ...target,
       connectedAt: account.value.createdAt,
     }),
     readAgentMailboxRuntime(env, scope, integrationAccountId),
+    readGmailModelState({ env, scope, now: Date.now() }),
   ]);
   return {
     integration_account_id: integrationAccountId,
@@ -54,7 +57,24 @@ export async function readAgentMailboxProjection(
       : null,
     policy,
     runtime,
+    model: modelProjection(model),
   };
+}
+
+/**
+ * Whether new mail may go to the workspace's model. New mail waits while an
+ * acceptance is needed or Purin has not reviewed the model.
+ */
+function modelProjection(model: MailboxSetupModel): Record<string, unknown> {
+  switch (model.kind) {
+    case "approved":
+    case "consent_needed":
+      return { kind: model.kind, name: model.review.name };
+    case "not_reviewed":
+      return { kind: model.kind, name: model.name };
+    case "unavailable":
+      return { kind: model.kind };
+  }
 }
 
 /**

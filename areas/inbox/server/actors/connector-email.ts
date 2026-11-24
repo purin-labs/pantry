@@ -10,6 +10,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import { assertNever } from "@purin-labs/std";
 import { createMailOrganizationSchema } from "../mail-inbox/store";
 import { createEmailCommerceSchema } from "../mail-inbox/supplier-context";
+import { createMailModelNoticeSchema } from "../mail-inbox/mail-model-notice";
 import {
   createEmailProposalFlowSchema,
   nextEmailCaseContextCollectionDraftCleanupAt,
@@ -98,6 +99,7 @@ export function createConnectorEmailSchema(
   createEvalSchema(sql);
   createMailOrganizationSchema(sql);
   createEmailCommerceSchema(sql);
+  createMailModelNoticeSchema(sql);
   sql.exec(`CREATE TABLE IF NOT EXISTS connector_email_runtime (
     singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
     organisation_id TEXT NOT NULL,

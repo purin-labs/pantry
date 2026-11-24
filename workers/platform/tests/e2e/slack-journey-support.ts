@@ -80,50 +80,6 @@ export async function installSlackActorFixture(): Promise<{
   readonly ownerSession: IssuedControlSession;
 }> {
   const now = Date.now();
-  const tokenHandle = requiredVaultHandle("vault:slack:bot:e2e-actor");
-  const install = await createOrganisationInstall(
-    organisationDatabase(ORGANISATION_ID),
-    env.DB,
-    {
-      organisationId: ORGANISATION_ID,
-      name: "E2E Slack actor",
-      surfaceKind: "slack",
-      workspaceId: WORKSPACE_ID,
-      installModel: "unlisted",
-      botTokenRef: tokenHandle,
-      scopes: [
-        "app_mentions:read",
-        "assistant:write",
-        "channels:history",
-        "channels:read",
-        "chat:write",
-      ],
-      placement: requiredPlacement(),
-      createdAt: now - 2_000,
-      installedAt: now - 1_000,
-    },
-  );
-  const connection = await fixtureDatabase()
-    .prepare(
-      `SELECT provider_connection_id AS providerConnectionId
-     FROM integration_account
-     WHERE integration_account_id = ?`,
-    )
-    .bind(install.integrationAccountId)
-    .first<{ readonly providerConnectionId: string }>();
-  if (connection === null) throw new Error("E2E Slack connection missing");
-
-  const stored = await storeVaultSecret({
-    db: fixtureDatabase(),
-    keys: env,
-    organisationId: ORGANISATION_ID,
-    handle: tokenHandle,
-    secret: { kind: "bearer", value: SLACK_BOT_TOKEN },
-    now,
-  });
-  if (!stored.ok) throw new Error(stored.error.code);
-
-  await publishGlobalOrganisation(ORGANISATION_ID);
   await env.DB.batch([
     env.DB.prepare(
       `INSERT INTO app_user (
@@ -136,6 +92,11 @@ export async function installSlackActorFixture(): Promise<{
        )`,
     ).bind(now - 1_000, now - 1_000),
   ]);
+  const install = await installOperationsChannel(
+    ORGANISATION_ID,
+    SLACK_ACTOR_USER_ID,
+    now,
+  );
   await fixtureDatabase().batch([
     fixtureDatabase()
       .prepare(
@@ -175,38 +136,10 @@ export async function installSlackActorFixture(): Promise<{
       )
       .bind(
         ORGANISATION_ID,
-        connection.providerConnectionId,
+        install.providerConnectionId,
         WORKSPACE_ID,
         USER_ID,
         now - 900,
-      ),
-    fixtureDatabase()
-      .prepare(
-        `INSERT INTO organisation_communication_destination (
-         organisation_id, integration_account_id, workspace_id, channel_id,
-         provider_revision, selected_at
-       ) VALUES (?, ?, ?, ?, 'channel-e2e-1', ?)`,
-      )
-      .bind(
-        ORGANISATION_ID,
-        install.integrationAccountId,
-        WORKSPACE_ID,
-        CHANNEL_ID,
-        now - 800,
-      ),
-    fixtureDatabase()
-      .prepare(
-        `INSERT INTO organisation_slack_channel (
-         organisation_id, integration_account_id, workspace_id, channel_id,
-         provider_revision, connected_at
-       ) VALUES (?, ?, ?, ?, 'channel-e2e-1', ?)`,
-      )
-      .bind(
-        ORGANISATION_ID,
-        install.integrationAccountId,
-        WORKSPACE_ID,
-        CHANNEL_ID,
-        now - 800,
       ),
     fixtureDatabase()
       .prepare(
@@ -215,29 +148,6 @@ export async function installSlackActorFixture(): Promise<{
        ) VALUES (?, 'pantry_platform', 'user_ddea8ec2-b424-5505-a2f4-8f66b89b13ab', ?)`,
       )
       .bind(ORGANISATION_ID, now - 700),
-  ]);
-
-  await env.DB.batch([
-    env.DB.prepare(
-      `INSERT INTO slack_installation (
-      installation_id, environment, app_id, workspace_id, credential_organisation_id,
-      bot_token_ref, install_model, scopes_json, lifecycle, installed_at, updated_at,
-      disabled_at, revoked_at
-    ) VALUES ('installation_e2e_slack', 'development', 'A12345678', ?, ?, ?,
-      'unlisted', '["chat:write"]', 'active', ?, ?, NULL, NULL)`,
-    ).bind(WORKSPACE_ID, ORGANISATION_ID, tokenHandle, now, now),
-    env.DB.prepare(
-      `INSERT INTO slack_organisation_connection (
-      connection_id, installation_id, organisation_id, integration_account_id,
-      lifecycle, revision, connected_at, updated_at, disabled_at, revoked_at
-    ) VALUES ('connection_e2e_slack_org', 'installation_e2e_slack', ?, ?,
-      'active', 1, ?, ?, NULL, NULL)`,
-    ).bind(ORGANISATION_ID, install.integrationAccountId, now, now),
-    env.DB.prepare(
-      `INSERT INTO slack_channel_default (
-      installation_id, channel_id, connection_id, revision, bound_by_user_id, bound_at
-    ) VALUES ('installation_e2e_slack', ?, 'connection_e2e_slack_org', 1, 'user_ddea8ec2-b424-5505-a2f4-8f66b89b13ab', ?)`,
-    ).bind(CHANNEL_ID, now),
   ]);
 
   const contextGrant = await createAccessGrant({
@@ -291,8 +201,108 @@ export async function installSlackActorFixture(): Promise<{
   return {
     connectorId: `connector_slack_${install.integrationAccountId}`,
     selectedIntegrationAccountId: install.integrationAccountId,
-    selectedConnectionId: connection.providerConnectionId,
+    selectedConnectionId: install.providerConnectionId,
     ownerSession: owner.session,
+  };
+}
+
+/**
+ * The fixture's Slack workspace, installed for one Organisation, with its
+ * channel selected as the operations channel: the channel of the cards that
+ * no agent turn writes, such as device alerts. `slackSimulator` is Slack.
+ * `boundBy` is the user who selected the channel.
+ */
+export async function installOperationsChannel(
+  organisationId: OrganisationId,
+  boundBy: string,
+  now: number = Date.now(),
+): Promise<
+  Readonly<{ integrationAccountId: string; providerConnectionId: string }>
+> {
+  const tokenHandle = requiredVaultHandle("vault:slack:bot:e2e-actor");
+  const install = await createOrganisationInstall(
+    organisationDatabase(organisationId),
+    env.DB,
+    {
+      organisationId,
+      name: "E2E Slack actor",
+      surfaceKind: "slack",
+      workspaceId: WORKSPACE_ID,
+      installModel: "unlisted",
+      botTokenRef: tokenHandle,
+      scopes: [
+        "app_mentions:read",
+        "assistant:write",
+        "channels:history",
+        "channels:read",
+        "chat:write",
+      ],
+      placement: requiredPlacement(),
+      createdAt: now - 2_000,
+      installedAt: now - 1_000,
+    },
+  );
+  const database = organisationDatabase(organisationId);
+  const connection = await database
+    .prepare(
+      `SELECT provider_connection_id AS providerConnectionId
+     FROM integration_account
+     WHERE integration_account_id = ?`,
+    )
+    .bind(install.integrationAccountId)
+    .first<{ readonly providerConnectionId: string }>();
+  if (connection === null) throw new Error("E2E Slack connection missing");
+  const stored = await storeVaultSecret({
+    db: database,
+    keys: env,
+    organisationId,
+    handle: tokenHandle,
+    secret: { kind: "bearer", value: SLACK_BOT_TOKEN },
+    now,
+  });
+  if (!stored.ok) throw new Error(stored.error.code);
+  await publishGlobalOrganisation(organisationId);
+  await database.batch(
+    [
+      "organisation_communication_destination (organisation_id, integration_account_id, workspace_id, channel_id, provider_revision, selected_at)",
+      "organisation_slack_channel (organisation_id, integration_account_id, workspace_id, channel_id, provider_revision, connected_at)",
+    ].map((table) =>
+      database
+        .prepare(`INSERT INTO ${table} VALUES (?, ?, ?, ?, 'channel-e2e-1', ?)`)
+        .bind(
+          organisationId,
+          install.integrationAccountId,
+          WORKSPACE_ID,
+          CHANNEL_ID,
+          now - 800,
+        ),
+    ),
+  );
+  await env.DB.batch([
+    env.DB.prepare(
+      `INSERT INTO slack_installation (
+      installation_id, environment, app_id, workspace_id, credential_organisation_id,
+      bot_token_ref, install_model, scopes_json, lifecycle, installed_at, updated_at,
+      disabled_at, revoked_at
+    ) VALUES ('installation_e2e_slack', 'development', 'A12345678', ?, ?, ?,
+      'unlisted', '["chat:write"]', 'active', ?, ?, NULL, NULL)`,
+    ).bind(WORKSPACE_ID, organisationId, tokenHandle, now, now),
+    env.DB.prepare(
+      `INSERT INTO slack_organisation_connection (
+      connection_id, installation_id, organisation_id, integration_account_id,
+      lifecycle, revision, connected_at, updated_at, disabled_at, revoked_at
+    ) VALUES ('connection_e2e_slack_org', 'installation_e2e_slack', ?, ?,
+      'active', 1, ?, ?, NULL, NULL)`,
+    ).bind(organisationId, install.integrationAccountId, now, now),
+    env.DB.prepare(
+      `INSERT INTO slack_channel_default (
+      installation_id, channel_id, connection_id, revision, bound_by_user_id, bound_at
+    ) VALUES ('installation_e2e_slack', ?, 'connection_e2e_slack_org', 1, ?, ?)`,
+    ).bind(CHANNEL_ID, boundBy, now),
+  ]);
+  return {
+    integrationAccountId: install.integrationAccountId,
+    providerConnectionId: connection.providerConnectionId,
   };
 }
 

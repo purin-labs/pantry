@@ -140,6 +140,8 @@ function agentState(agent: MailAgentState | null): string | null {
       return "Agent on";
     case "paused":
       return "Agent paused";
+    case "held":
+      return "Agent waiting";
     case "off":
       return "Agent off";
     default:

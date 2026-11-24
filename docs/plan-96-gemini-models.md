@@ -309,9 +309,11 @@ part B.
   (FND-04, the second journey of `slack-model-change.test.ts`). A WhatsApp
   turn answers on the current default at once (`inbox-whatsapp.test.ts`).
   Gmail mail waits until an owner or admin accepts the terms of the new
-  default, and then gets its draft from it (`mailbox-model-change.test.ts`):
-  tell each Organisation with a mailbox before the removal. Remove kimi-k3
-  only when it must go, for example when OpenRouter stops it.
+  default, and then gets its draft from it (`mailbox-model-change.test.ts`).
+  The Inbox says that the agent waits, and the first waiting turn posts one
+  card in the operations channel, but tell each Organisation with a mailbox
+  before the removal too. Remove kimi-k3 only when it must go, for example
+  when OpenRouter stops it.
 
 ### B1. Pi 1.6 upgrade
 

@@ -11,6 +11,7 @@ import { emailReplyIsOpenable, emailReplyLifecycleLabel } from "@purin-labs/area
 import type { EmailReplyQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import { readMailAgent, resumeMailAgent } from "./api";
 import type {
+  MailAgentHold,
   MailAgentPause,
   MailAgentState,
 } from "@purin-labs/control-api/portal/mail-agent";
@@ -104,7 +105,9 @@ export class MailAgentStrip extends React.Component<StripProps, StripState> {
         <p ref={this.sentence} tabIndex={-1}>
           {agent.kind === "off"
             ? "Agent off"
-            : `Paused: ${mailAgentPauseReason(agent.reason)}.`}
+            : agent.kind === "held"
+              ? `Waiting: ${mailAgentHoldReason(agent.reason, this.props.canManage)}.`
+              : `Paused: ${mailAgentPauseReason(agent.reason)}.`}
         </p>
         {agent.kind === "off" && this.props.canManage ? (
           <button type="button" onClick={this.props.onTurnOn}>
@@ -120,8 +123,10 @@ export class MailAgentStrip extends React.Component<StripProps, StripState> {
             Resume processing
           </button>
         ) : null}
-        {/* A paused mailbox can also need new limits, as a spent budget. */}
-        {agent.kind === "paused" ? (
+        {/* A paused mailbox can also need new limits, as a spent budget. The
+            settings take the acceptance of the model's terms. */}
+        {agent.kind === "paused" ||
+        (agent.kind === "held" && this.props.canManage) ? (
           <a href={this.props.settingsHref}>Mailbox settings</a>
         ) : null}
         {agent.kind === "paused" && resume === "failed" ? (
@@ -129,6 +134,23 @@ export class MailAgentStrip extends React.Component<StripProps, StripState> {
         ) : null}
       </div>
     );
+  }
+}
+
+/** Why new mail waits for the model, and who ends the wait. */
+function mailAgentHoldReason(
+  reason: MailAgentHold,
+  canManage: boolean,
+): string {
+  switch (reason.kind) {
+    case "model_terms":
+      return canManage
+        ? `the agent answers no new mail until you accept the data terms of ${reason.model}`
+        : `the agent answers no new mail until an owner or admin accepts the data terms of ${reason.model}`;
+    case "model_not_reviewed":
+      return `Purin has not reviewed ${reason.model} for email, so the agent answers no new mail`;
+    default:
+      return assertNever(reason);
   }
 }
 
