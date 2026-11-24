@@ -246,7 +246,11 @@ export class BakeryScene {
   private stationDeselected = false;
   private readonly onWindowKeyDown: (event: KeyboardEvent) => void;
 
-  /** `details` hosts the floor plan's selection and fit details for the shell. */
+  /**
+   * `details` hosts the floor plan's selection and fit details for the shell.
+   * `unavailable` tells the page that the browser took the WebGL context, so
+   * the page shows the scene as unavailable and does not keep a stopped view.
+   */
   constructor(
     host: HTMLElement,
     frame: SceneFrame,
@@ -256,6 +260,7 @@ export class BakeryScene {
     ) => void,
     private readonly view?: SceneViewListener,
     details?: HTMLElement,
+    private readonly unavailable?: () => void,
   ) {
     this.frame = frame;
     this.activeGizmoId =
@@ -541,6 +546,10 @@ export class BakeryScene {
       this.pointerLeave,
     );
     this.renderer.domElement.addEventListener("dblclick", this.doubleClick);
+    this.renderer.domElement.addEventListener(
+      "webglcontextlost",
+      this.contextLost,
+    );
     this.reduced.addEventListener("change", this.motionChanged);
     this.observer = new ResizeObserver(this.resize);
     this.observer.observe(this.floorPlan.viewport);
@@ -1366,6 +1375,11 @@ export class BakeryScene {
     this.rotationGizmo.root.visible = true;
     this.rotationGizmo.root.updateMatrixWorld(true);
   }
+  private readonly contextLost = (event: Event): void => {
+    event.preventDefault();
+    if (this.life === "disposed") return;
+    this.unavailable?.();
+  };
   private doubleClick(event: MouseEvent): void {
     const draggableId = this.draggableHitAt(event.clientX, event.clientY);
     if (draggableId === null) return;
@@ -1821,6 +1835,10 @@ export class BakeryScene {
     this.controls.dispose();
     this.reduced.removeEventListener("change", this.motionChanged);
     this.renderer.domElement.removeEventListener("dblclick", this.doubleClick);
+    this.renderer.domElement.removeEventListener(
+      "webglcontextlost",
+      this.contextLost,
+    );
     this.renderer.domElement.removeEventListener(
       "pointerdown",
       this.pointerDown,

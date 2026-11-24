@@ -8,13 +8,17 @@ type ScenePort = Readonly<{
   dispose(): void;
 }>;
 
-/** `details` is a shell panel that hosts the floor plan's details. */
+/**
+ * `details` is a shell panel that hosts the floor plan's details.
+ * `unavailable` ends a scene whose WebGL context the browser took.
+ */
 type SceneFactory = (
   host: HTMLDivElement,
   frame: SceneFrame,
   select: (selection: Selection, focus: "inspector" | "unchanged") => void,
-  view?: SceneViewListener,
-  details?: HTMLElement,
+  view: SceneViewListener | undefined,
+  details: HTMLElement | undefined,
+  unavailable: () => void,
 ) => ScenePort;
 
 type SceneFactoryLoader = () => Promise<SceneFactory>;
@@ -94,7 +98,14 @@ export class SceneController {
     if (!this.active(generation)) {
       return;
     }
-    const scene = factory(host, frame, select, view, details);
+    const scene = factory(
+      host,
+      frame,
+      select,
+      view,
+      details,
+      this.failed.bind(this, generation, status),
+    );
     this.scene = scene;
     void scene
       .load()
@@ -132,10 +143,18 @@ function createBakeryScene(
   host: HTMLDivElement,
   frame: SceneFrame,
   select: (selection: Selection, focus: "inspector" | "unchanged") => void,
-  view?: SceneViewListener,
-  details?: HTMLElement,
+  view: SceneViewListener | undefined,
+  details: HTMLElement | undefined,
+  unavailable: () => void,
 ): ScenePort {
-  return new module.BakeryScene(host, frame, select, view, details);
+  return new module.BakeryScene(
+    host,
+    frame,
+    select,
+    view,
+    details,
+    unavailable,
+  );
 }
 
 function sameFrame(a: SceneFrame | null, b: SceneFrame): boolean {

@@ -1361,6 +1361,23 @@
       }
     },
     {
+      "id": "shift-scene-context-loss-browser",
+      "file": "scripts/bakery-robots/verify-shift-scene-context-loss-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "KIT-01",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html"
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 11.7,
+        "date": "2026-11-24",
+        "commit": "e94f9a812"
+      }
+    },
+    {
       "id": "spatial-events-browser",
       "file": "scripts/bakery-robots/verify-spatial-events.js",
       "tier": "browser",

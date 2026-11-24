@@ -58,7 +58,7 @@ one file with one case deleted, and deletes no file.
 | Platform unit          | `workers/platform/tests/`                                  | 300 files                      | Vitest in Node                                | `pnpm --filter @purin-labs/platform test`             |
 | Platform type fixtures | `workers/platform/tests/`                                  | 90 files                       | The type check                                | `pnpm --filter @purin-labs/platform check:test-types` |
 | Commerce               | `services/commerce/tests/`                                 | 86 files, 69 named `*-journey` | Vitest in Node                                | `pnpm commerce:test`                                  |
-| Kitchen journeys       | `scripts/production-simulation/`, `scripts/bakery-robots/` | 128 rows, 122 files            | `run-journeys.mjs`                            | See "The Kitchen journey index"                       |
+| Kitchen journeys       | `scripts/production-simulation/`, `scripts/bakery-robots/` | 129 rows, 123 files            | `run-journeys.mjs`                            | See "The Kitchen journey index"                       |
 | Portal                 | `areas/kitchen/ui/features/workflow-simulator/`            | 5 files                        | `node --test`                                 | `pnpm --filter @purin-labs/portal test`               |
 | Storefront             | `apps/storefront/`                                         | 1 file                         | Vitest                                        | `pnpm --filter @purin-labs/storefront test`           |
 | Shared packages        | 7 packages in `packages/`                                  | 12 files                       | Vitest                                        | `pnpm test:units`                                     |
@@ -230,14 +230,14 @@ result and the time of each journey.
 
 | Field      | Values                                                                                              |
 | ---------- | --------------------------------------------------------------------------------------------------- |
-| `tier`     | `fast` (62 rows, under 300 s), `slow` (2 rows, 300 s or more, or a large heap), `browser` (64 rows) |
+| `tier`     | `fast` (62 rows, under 300 s), `slow` (2 rows, 300 s or more, or a large heap), `browser` (65 rows) |
 | `backend`  | `native`, `wasm`, `both`, `browser`, `none`                                                         |
-| `run.tool` | `node` (47), `tsx` (22), `python` (6), `browser` (53)                                               |
+| `run.tool` | `node` (47), `tsx` (22), `python` (6), `browser` (54)                                               |
 | `status`   | `passes`, `fails`, `not run`                                                                        |
 | `lastRun`  | The seconds, the date and the commit of the last recorded run                                       |
 | `failure`  | The reason, for a row that does not pass                                                            |
 
-In the `browser` tier, 53 rows drive a Portal page. The other 11 rows use `tsx` to read
+In the `browser` tier, 54 rows drive a Portal page. The other 11 rows use `tsx` to read
 the output of a browser journey. The `status` field is a recorded result, and a run
 changes it only with `--record`.
 
