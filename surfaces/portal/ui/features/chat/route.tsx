@@ -3306,7 +3306,7 @@ export class ChatPage extends React.Component<Props, State> {
         >
           <DialogHeading
             id="chat-fork-title"
-            title="Fork chat from here"
+            title="Branch in new chat"
             close={this.closeForkConfirmation.bind(this)}
           />
           <button
@@ -3322,9 +3322,7 @@ export class ChatPage extends React.Component<Props, State> {
               aria-hidden="true"
             />
             <span>
-              <strong id="chat-fork-choice-title">
-                Fork in this workspace
-              </strong>
+              <strong id="chat-fork-choice-title">In this workspace</strong>
               <span id="chat-fork-description">
                 A new chat with the history up to this response.
               </span>

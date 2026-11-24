@@ -73,15 +73,14 @@
   color: var(--ink-2);
   font-size: 12px;
 }
+/* The question sits on the composer itself: the off chip above it shows the
+   state, so it needs no box of its own. */
 .chat-composer .chat-screen-question {
   display: flex;
   flex-direction: column;
   gap: 6px;
   width: 100%;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--ground);
+  padding: 2px 2px 0;
   color: var(--ink);
   font-size: 13px;
   line-height: 1.4;

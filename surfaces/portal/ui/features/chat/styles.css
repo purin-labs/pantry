@@ -1231,15 +1231,6 @@
   background: var(--pantry-accent-text);
 }
 
-.chat-thread-section-title {
-  margin: 8px 10px 4px;
-  color: var(--ink-3);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
 .chat-archived-banner {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;

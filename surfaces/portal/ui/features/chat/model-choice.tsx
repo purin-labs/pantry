@@ -85,7 +85,7 @@ export function renderEffortOption(
     >
       <span>
         {effortLabel(effort)}
-        <small>{effortDescription(effort)}</small>
+        <small>{effortDescription(effort, "chat")}</small>
       </span>
       {selectedOption ? <Check size={17} aria-hidden="true" /> : null}
       <span className="sr-only">Option {index + 1}</span>

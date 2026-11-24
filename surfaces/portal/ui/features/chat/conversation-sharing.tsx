@@ -210,7 +210,7 @@ export class ConversationSharingDialog extends React.Component<
             </p>
             {!alreadyShared && intent?.kind === "move" ? (
               <fieldset className="chat-sharing-choices">
-                <legend>Who can see this chat?</legend>
+                <legend className="sr-only">Who can see this chat?</legend>
                 <label>
                   <input
                     type="radio"
@@ -253,9 +253,8 @@ export class ConversationSharingDialog extends React.Component<
               {panel.members.map(renderAudienceMember)}
             </ul>
             <p className="chat-sharing-hint">
-              Owners and editors can contribute. Viewers can read. New members
-              also receive shared history. Viewed information cannot be
-              retracted.
+              New members also see the shared history. Viewed history cannot be
+              taken back.
             </p>
             {panel.error === null ? null : <p role="alert">{panel.error}</p>}
             <div className="project-dialog-actions">

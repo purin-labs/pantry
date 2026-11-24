@@ -801,15 +801,21 @@ export class ChatOrganizer extends React.Component<Props, State> {
       ?.querySelector(".chat-insertion-line")
       ?.scrollIntoView({ block: "nearest" });
   }
-  private rowsFor(
+  /** Every active chat of a Project, pinned ones too, newest first. */
+  private chatsIn(
     destination: ChatDestination,
   ): readonly ChatConversationSummary[] {
-    return nestSideCases(
-      mergeChats(this.state.extraActive, this.props.data.conversations)
-        .filter(inDestination.bind(null, destination))
-        .slice()
-        .sort(compareRecent),
-    );
+    return mergeChats(this.state.extraActive, this.props.data.conversations)
+      .filter(inDestination.bind(null, destination))
+      .slice()
+      .sort(compareRecent);
+  }
+  /** A pinned chat shows one time, under its pin, so its Project leaves it out. */
+  private rowsFor(
+    chats: readonly ChatConversationSummary[],
+  ): readonly ChatConversationSummary[] {
+    const pinned = new Set(this.props.data.pinnedConversations.map(chatId));
+    return nestSideCases(chats.filter(notIn.bind(null, pinned)));
   }
   /** One drop per Project: chats show newest first inside it. */
   private dropPositions(): DropPosition[] {
@@ -1080,11 +1086,13 @@ export class ChatOrganizer extends React.Component<Props, State> {
     const id = destination.projectId;
     const isDefault =
       id === this.props.data.projectDirectory.defaultProjectId;
-    const rows = this.rowsFor(destination);
+    const chats = this.chatsIn(destination);
+    const rows = this.rowsFor(chats);
     const collapsed = project !== null && this.state.collapsed.has(id);
+    // A Project whose only chat is pinned is not empty.
     const showEmptyState =
       !collapsed &&
-      rows.length === 0 &&
+      chats.length === 0 &&
       (project !== null || this.props.data.projectDirectory.projects.length === 0);
     return (
       <section
@@ -1394,8 +1402,7 @@ export class ChatOrganizer extends React.Component<Props, State> {
           {this.state.tab === "chats" ? (
             <>
               {pinned.length === 0 ? null : (
-                <section aria-label="Pinned chats">
-                  <h3 className="chat-thread-section-title">Pinned</h3>
+                <section className="chat-pinned-rows" aria-label="Pinned chats">
                   {pinned.map(renderPinnedRow.bind(null, this))}
                 </section>
               )}
@@ -1592,6 +1599,15 @@ function inDestination(
   conversation: ChatConversationSummary,
 ): boolean {
   return conversation.placement.projectId === destination.projectId;
+}
+function chatId(conversation: ChatConversationSummary): string {
+  return conversation.id;
+}
+function notIn(
+  ids: ReadonlySet<string>,
+  conversation: ChatConversationSummary,
+): boolean {
+  return !ids.has(conversation.id);
 }
 /**
  * Places each side Case right under the top chat that it came from, when that

@@ -231,8 +231,7 @@ export function ScreenChip({
       {chip}
       <span className="chat-screen-question" role="alert">
         <span>
-          Your message seems to be about {name}. {startedOn(chat)}, so the page
-          is not attached.
+          Your message looks related to {name}, which is not attached.
         </span>
         <span className="chat-screen-question-actions">
           <button
@@ -262,17 +261,6 @@ function chipLabel(name: string, attached: boolean): string {
   return attached
     ? `${name} goes with your message. Remove it.`
     : `Send ${name} with your message.`;
-}
-
-function startedOn(chat: Chat | null): string {
-  const origin = chat?.origin;
-  if (origin === undefined || origin === null)
-    return "This chat started without a page";
-  const page =
-    origin.record === null
-      ? origin.title
-      : `${origin.title} › ${origin.record.label}`;
-  return `This chat started on ${page}`;
 }
 
 function sendWithPage(

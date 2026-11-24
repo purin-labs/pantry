@@ -244,6 +244,11 @@
   flex-shrink: 0;
   color: var(--ink-3);
 }
+/* The pin on each row names the group; a hairline ends it. */
+.chat-pinned-rows {
+  padding-block-end: 6px;
+  border-block-end: 1px solid var(--border);
+}
 .project-heading button:not(:where(.pantry-select-trigger)):hover {
   background: var(--surface);
 }
@@ -340,13 +345,15 @@
 .project-dialog .access35-dialog-heading {
   margin-block-end: 20px;
 }
-.project-dialog label {
+/* A field of a project dialog is a label right in the form, with its text
+   control inside. A choice in a fieldset (the radios of Chat visibility) is
+   not a field: project-sharing.css lays it out. */
+.project-dialog form > label {
   display: grid;
   gap: 6px;
   font-size: 14px;
 }
-.project-dialog input,
-.project-dialog textarea {
+.project-dialog form > label > :is(input, textarea) {
   width: 100%;
   box-sizing: border-box;
   padding: 9px;
@@ -357,7 +364,7 @@
   font: inherit;
   line-height: 1.5;
 }
-.project-dialog textarea {
+.project-dialog form > label > textarea {
   resize: vertical;
   min-block-size: 100px;
 }
@@ -367,7 +374,7 @@
   margin: 0;
   line-height: 1.5;
 }
-.project-dialog label + .project-hint {
+.project-dialog form > label + .project-hint {
   margin-block-start: -10px;
 }
 .chat-delete-description {
@@ -646,8 +653,7 @@
   .project-edit {
     min-inline-size: 44px;
   }
-  .project-dialog input,
-  .project-dialog textarea {
+  .project-dialog form > label > :is(input, textarea) {
     font-size: 16px;
   }
 }

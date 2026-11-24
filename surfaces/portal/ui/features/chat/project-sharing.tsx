@@ -29,6 +29,13 @@ const SHARE_ROLES: ReadonlyArray<{ value: ProjectRole; label: string }> = [
   { value: "editor", label: "Editor — contribute to shared work" },
   { value: "owner", label: "Owner — manage access and deletion" },
 ];
+/** What members read, for the owner who adds them and for each member. */
+const PROJECT_ACCESS_NOTE = (
+  <p className="muted">
+    Members read the brief, the references and shared chats. Other chats stay
+    private.
+  </p>
+);
 
 type Props = Readonly<{
   organisationId: string;
@@ -265,10 +272,6 @@ export class ProjectSharing extends React.Component<
             close={this.close.bind(this)}
           />
           <p className="project-sharing-name">{this.props.project.name}</p>
-          <p>
-            Share the project brief and references. Existing private chats stay
-            private.
-          </p>
           {panel.kind === "loading" ? (
             <p role="status">Loading members…</p>
           ) : null}
@@ -320,10 +323,7 @@ export class ProjectSharing extends React.Component<
                       </Select.Popup>
                     </Select.Root>
                   </label>
-                  <p className="muted">
-                    Members can read the project’s shared history. New chats
-                    remain private until explicitly shared.
-                  </p>
+                  {PROJECT_ACCESS_NOTE}
                   {panel.error === null ? null : (
                     <p role="alert">{panel.error}</p>
                   )}
@@ -345,9 +345,12 @@ export class ProjectSharing extends React.Component<
                   </div>
                 </form>
               ) : (
-                <button type="button" onClick={this.close.bind(this)}>
-                  Done
-                </button>
+                <>
+                  {PROJECT_ACCESS_NOTE}
+                  <button type="button" onClick={this.close.bind(this)}>
+                    Done
+                  </button>
+                </>
               )}
             </>
           ) : null}

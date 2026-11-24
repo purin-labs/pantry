@@ -251,7 +251,7 @@ function renderSourceObservation(
 function bakeryContextDescription(context: ChatBakeryContext): string {
   switch (context) {
     case "included":
-      return "Kitchen may load on demand for this workspace";
+      return "Kitchen loads when needed";
     case "excluded":
       return "Kitchen context excluded from your next message";
     default:
@@ -342,10 +342,7 @@ function renderProjectContext(
             : `Your next message will use ${state.desired.name}’s brief and references in place of the previous project’s context.`}
         </p>
       ) : null}
-      <p>
-        Messages, attachments, and findings stay with this chat. Linked sources
-        are read when needed, with your workspace permissions.
-      </p>
+      <p>Messages, attachments and findings stay with this chat.</p>
     </section>
   );
 }

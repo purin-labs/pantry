@@ -161,7 +161,7 @@ function renderEffortChoice(
   return renderChoice(saved, draft, setDraft, {
     value: effort,
     label: effortLabel(effort),
-    detail: effortDescription(effort),
+    detail: effortDescription(effort, "slack"),
   });
 }
 

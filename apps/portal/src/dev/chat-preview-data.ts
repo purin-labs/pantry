@@ -10,6 +10,7 @@ import {
   sideCasesPreviewEnabled,
   withSideCasePreview,
 } from "./chat-preview-side-cases";
+import { previewPinResponse, withPreviewPins } from "./chat-preview-pins";
 import {
   executionPreviewEnabled,
   executionPreviewEvents,
@@ -96,6 +97,8 @@ async function previewFetch(
   }
   if (!url.pathname.includes("/chat/") && !url.pathname.endsWith("/chat"))
     return previewProjectsResponse(url, init);
+  const pin = await previewPinResponse(url, init, previewFetch);
+  if (pin !== null) return pin;
   if (init?.method === "PATCH") return previewFeedback(init);
   if (init?.method === "POST" && url.pathname.endsWith("/read")) {
     const body = typeof init.body === "string" ? JSON.parse(init.body) : null;
@@ -946,6 +949,7 @@ function chatPreviewResponse(
   data: Omit<ChatPageData, "emailReview"> & { emailReviews: [] },
 ): Response {
   if (sideCasesPreviewEnabled()) data = withSideCasePreview(data);
+  data = withPreviewPins(data);
   if (sidebarActivityPreview) {
     sidebarPreviewFinishesAt ??= Date.now() + 30_000;
     data = {

@@ -180,14 +180,17 @@ then reports its usage (`actors/session-goal-usage.ts`).
   960,000 bytes, or 1,000,000 bytes while its work is `failed`.
 - A member's sidebar order, pin, archive state, read position and draft are personal
   records (`portal_conversation_user` and the `portal_chat_directory` tables).
+- The chat list shows a pinned chat one time, in the pinned rows at the top, and not
+  again in its Project. A pinned chat moves only through **Move to project** in its menu.
 - A chat with a failed turn that can run again, or with queued messages, does not change
   Project (`chat_work_unfinished`, `case_work_unfinished`). A person can delete only an
   archived chat. The delete also erases each fork of it.
 
 ### Thread forks
 
-1. A person selects **Branch in new chat** on a completed answer and confirms **Fork in
-   this workspace**. The client sends the message id and an operation id.
+1. A person selects **Branch in new chat** on a completed answer. The dialog of the
+   same name asks for **In this workspace**. The client sends the message id and an
+   operation id.
 2. The server finds the accepted history up to that answer and makes its digest. It does
    not trust a message list from the browser.
 3. The fork gets a new conversation, a new Case and the title "Fork of …". It is private

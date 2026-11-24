@@ -13,7 +13,7 @@
     "packages/production-simulation/src/recipes/bakery/appliance-execution.ts": 3815,
     "packages/production-simulation/src/recipes/bakery/schedule.ts": 4509,
     "scripts/plan-50/evaluate-pi-durable.mjs": 5289,
-    "surfaces/portal/ui/features/chat/route.tsx": 4203,
+    "surfaces/portal/ui/features/chat/route.tsx": 4201,
     "surfaces/portal/ui/styles.css": 9321
   }
 }
