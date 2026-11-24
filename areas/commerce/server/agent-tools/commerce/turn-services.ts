@@ -18,8 +18,8 @@ import {
 import {
   createCommerceClient,
   createCommerceEntityPlaneClient,
-} from "../../contract/client";
-import { readOfferPriceAllowanceView } from "../../contract/offer-price-allowance";
+} from "@purin-labs/area-commerce-contract/server/client";
+import { readOfferPriceAllowanceView } from "@purin-labs/area-commerce-contract/server/offer-price-allowance";
 import {
   withToolContext,
   type SessionToolContext,

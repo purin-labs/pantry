@@ -37,7 +37,7 @@ import {
 import {
   resolveMerchantBinding,
   resolveMerchantControlContext,
-} from "../../../contract/merchant-control";
+} from "@purin-labs/area-commerce-contract/server/merchant-control";
 import {
   authorizeOrganisationJsonPost,
   authorizeOrganisationRequest,

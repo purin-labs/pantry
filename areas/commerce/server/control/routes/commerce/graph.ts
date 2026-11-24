@@ -95,7 +95,7 @@ import {
   controlMutationIdentity,
   resolveMutationUser,
 } from "@purin-labs/control/worker/admission/control-mutation";
-import { resolveMerchantBinding } from "../../../contract/merchant-control";
+import { resolveMerchantBinding } from "@purin-labs/area-commerce-contract/server/merchant-control";
 import {
   authorizeOrganisationJsonPost,
   authorizeOrganisationRequest,

@@ -29,7 +29,7 @@ import {
   replayControlMutation,
   resolveMutationUser,
 } from "@purin-labs/control/worker/admission/control-mutation";
-import { resolveMerchantBinding } from "@purin-labs/area-commerce/server/contract/merchant-control";
+import { resolveMerchantBinding } from "@purin-labs/area-commerce-contract/server/merchant-control";
 import { authorizeOrganisationJsonPost } from "@purin-labs/control/worker/authorization";
 import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
