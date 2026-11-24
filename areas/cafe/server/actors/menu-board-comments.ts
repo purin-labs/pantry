@@ -3,7 +3,7 @@ import { normalizePlainText } from "@purin-labs/collaboration";
 
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import type { MenuBoardCommentError } from "../contract/menu-board-commands";
+import type { MenuBoardCommentError } from "@purin-labs/area-cafe-contract/server/menu-board-commands";
 
 /**
  * Comments pinned to a board's elements (Plan 40B phase 5, slice 6). A

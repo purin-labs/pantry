@@ -29,6 +29,7 @@
     "testing"
   ],
   "packages": {
+    "areas/cafe/contract": "areas/cafe/contract",
     "areas/brain/contract": "areas/brain/contract",
     "areas/kitchen/contract": "areas/kitchen/contract",
     "areas/devices/contract": "areas/devices/contract",
@@ -116,7 +117,6 @@
     "areas/organisation/ui/features/access/permission-required-prompt.tsx",
     "areas/organisation/ui/pages/agent-console-shared.tsx",
     "areas/organisation/ui/pages/account-invitation-link.ts",
-    "areas/cafe/server/contract/",
     "areas/devices/server/contract/"
   ],
   "mixed": {
@@ -404,6 +404,7 @@
     "workspace_revision_receipt": "foundation/agent"
   },
   "rules": {
+    "areas/cafe/contract/": "areas/cafe/contract",
     "areas/brain/contract/": "areas/brain/contract",
     "areas/kitchen/contract/": "areas/kitchen/contract",
     "areas/devices/contract/": "areas/devices/contract",

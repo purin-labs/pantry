@@ -1,0 +1,33 @@
+{
+  "name": "@purin-labs/area-cafe-contract",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./server/*": {
+      "types": "./server/*.ts",
+      "default": "./server/*.ts"
+    }
+  },
+  "dependencies": {
+    "@purin-labs/actor-runtime": "workspace:*",
+    "@purin-labs/agent": "workspace:*",
+    "@purin-labs/agent-tools": "workspace:*",
+    "@purin-labs/area-commerce-contract": "workspace:*",
+    "@purin-labs/area-kitchen-contract": "workspace:*",
+    "@purin-labs/cafe-control-api": "workspace:*",
+    "@purin-labs/commerce-client": "workspace:*",
+    "@purin-labs/connections": "workspace:*",
+    "@purin-labs/control": "workspace:*",
+    "@purin-labs/control-api": "workspace:*",
+    "@purin-labs/kernel": "workspace:*",
+    "@purin-labs/menu-board-crdt": "workspace:*",
+    "@purin-labs/menu-draft-crdt": "workspace:*",
+    "@purin-labs/tenancy": "workspace:*",
+    "@purin-labs/type-utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260707.1",
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

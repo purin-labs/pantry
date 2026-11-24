@@ -16,12 +16,12 @@ import type {
   MenuBoardCommentsResult,
   MenuBoardEditError,
   MenuBoardVersionsResult,
-} from "../contract/menu-board-commands";
+} from "@purin-labs/area-cafe-contract/server/menu-board-commands";
 
 export type {
   MenuBoardCommand,
   MenuBoardCommandReply,
-} from "../contract/menu-board-commands";
+} from "@purin-labs/area-cafe-contract/server/menu-board-commands";
 
 type Parts = Readonly<{
   boards: MenuBoardRooms;

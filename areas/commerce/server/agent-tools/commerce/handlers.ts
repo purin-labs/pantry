@@ -36,12 +36,12 @@ import {
   type SoldOutMarkRequest,
   type SoldOutMarkResult,
   type SoldOutToolRead,
-} from "@purin-labs/area-cafe/server/contract/order-queue-commands";
+} from "@purin-labs/area-cafe-contract/server/order-queue-commands";
 import {
   presentPayments,
   type PaymentsToolRead,
 } from "../../payments-read";
-import { cafeServices } from "@purin-labs/area-cafe/server/contract/cafe-services";
+import { cafeServices } from "@purin-labs/area-cafe-contract/server/cafe-services";
 import {
   PRODUCT_SALES_SOURCE_TYPES,
   readBoundProductSales,

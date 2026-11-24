@@ -1,7 +1,7 @@
 import type {
   CounterRegisterDeps,
   CounterRegisterFailure,
-} from "../../contract/counter-sale";
+} from "@purin-labs/area-cafe-contract/server/counter-sale";
 import type {
   ControlMutationReceiptScope,
   UnversionedControlMutationBoundary,

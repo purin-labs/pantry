@@ -79,9 +79,9 @@ import {
   CAFE_MENU_ID,
   CAFE_STOREFRONT_ID,
   planCafeMenu,
-} from "@purin-labs/area-cafe/server/contract/menu-publication";
-import { MenuDraftRequestError } from "@purin-labs/area-cafe/server/contract/request-errors";
-import { MenuBoardRequestError } from "@purin-labs/area-cafe/server/contract/request-errors";
+} from "@purin-labs/area-cafe-contract/server/menu-publication";
+import { MenuDraftRequestError } from "@purin-labs/area-cafe-contract/server/request-errors";
+import { MenuBoardRequestError } from "@purin-labs/area-cafe-contract/server/request-errors";
 import {
   OrderRefundRequestError,
   planOrderRefund,

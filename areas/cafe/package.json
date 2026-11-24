@@ -46,6 +46,7 @@
     "@purin-labs/area-commerce-contract": "workspace:*",
     "@purin-labs/area-devices-contract": "workspace:*",
     "@purin-labs/area-kitchen-contract": "workspace:*",
+    "@purin-labs/area-cafe-contract": "workspace:*",
     "lucide-react": "^0.542.0",
     "qrcode-generator": "^2.0.4",
     "react": "^19.1.1",

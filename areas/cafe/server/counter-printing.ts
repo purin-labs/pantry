@@ -22,7 +22,7 @@ import type {
   CounterRegisterDeps,
   CounterRegisterResult,
   CounterSaleView,
-} from "./contract/counter-sale";
+} from "@purin-labs/area-cafe-contract/server/counter-sale";
 
 /**
  * The receipt printer and the cash drawer of a café counter (Plan 90 Phase

@@ -9,7 +9,7 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
 import { OrganisationDO } from "../../src/actors/organisation";
-import { advanceOrderQueueEntry } from "@purin-labs/area-cafe/server/contract/order-queue-commands";
+import { advanceOrderQueueEntry } from "@purin-labs/area-cafe-contract/server/order-queue-commands";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { enableCapability } from "./access-route-support";
 import {

@@ -12,7 +12,7 @@ import type { TerminalCounterReadback } from "@purin-labs/control-api";
 import type {
   TerminalOperationsReadback,
   TerminalOperationsRequest,
-} from "../contract/cafe-services";
+} from "@purin-labs/area-cafe-contract/server/cafe-services";
 /**
  * Read every card-present counter for one organisation.
  *

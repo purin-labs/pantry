@@ -289,7 +289,7 @@ who asked.
 - The Actor's commands are in `actors/menu-board-commands.ts`. The templates, the agent
   actions and the archive columns are in `templates.ts` of `@purin-labs/menu-board-crdt`,
   `menu-board-agent-action.ts` and `menu-board-archive.ts`.
-- Shared code for routes and tools is in `areas/cafe/server/contract/`:
+- Shared code for routes and tools is in `areas/cafe/contract/server/`:
   `menu-publication.ts` (`planCafeMenu`), `order-queue-commands.ts`, `media.ts` and
   `request-errors.ts`. The price action is `commerce/menu-price-action.ts`, and the menu
   action is `commerce/cafe-menu-action.ts`.

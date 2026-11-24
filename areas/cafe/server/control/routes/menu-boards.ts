@@ -13,7 +13,7 @@ import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors
 import type {
   MenuBoardCommand,
   MenuBoardCommandReply,
-} from "../../contract/menu-board-commands";
+} from "@purin-labs/area-cafe-contract/server/menu-board-commands";
 import { menuScreenToken } from "../../actors/menu-screens";
 import { readMenuScreenFacts } from "./menu-screens";
 import type { Env } from "@purin-labs/kernel/env";

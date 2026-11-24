@@ -64,6 +64,8 @@ PLATFORM_SOURCE.push("areas/devices/contract/server");
 PLATFORM_SOURCE.push("areas/kitchen/contract/server");
 // The Worker side of the contract of the area brain (Refactor 17, Stage B).
 PLATFORM_SOURCE.push("areas/brain/contract/server");
+// The Worker side of the contract of the area cafe (Refactor 17, Stage B).
+PLATFORM_SOURCE.push("areas/cafe/contract/server");
 
 /**
  * The folders that hold the source of the Portal, in the browser. The package

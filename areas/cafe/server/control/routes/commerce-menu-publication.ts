@@ -17,12 +17,12 @@ import {
   cafeProductPhotos,
   planCafeMenu,
   publishedCafeMenu,
-} from "../../contract/menu-publication";
+} from "@purin-labs/area-cafe-contract/server/menu-publication";
 
 export {
   CAFE_MENU_ID,
   CAFE_STOREFRONT_ID,
-} from "../../contract/menu-publication";
+} from "@purin-labs/area-cafe-contract/server/menu-publication";
 
 /**
  * Publishes the shop's café menu from the Portal's shared menu draft. An

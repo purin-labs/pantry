@@ -114,7 +114,7 @@ import type {
   MenuBoardArchiveResult,
   MenuBoardEditError,
   MenuBoardPublication,
-} from "../contract/menu-board-commands";
+} from "@purin-labs/area-cafe-contract/server/menu-board-commands";
 
 /**
  * The menu boards of an Organisation (Plan 40B phase 1). Each board is a

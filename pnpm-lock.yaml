@@ -386,6 +386,9 @@ importers:
       '@purin-labs/agent-tools':
         specifier: workspace:*
         version: link:../../foundation/agent-tools
+      '@purin-labs/area-cafe-contract':
+        specifier: workspace:*
+        version: link:contract
       '@purin-labs/area-commerce-contract':
         specifier: workspace:*
         version: link:../commerce/contract
@@ -487,6 +490,61 @@ importers:
         specifier: 0.18.0-ts7.1.0-dev.20260929
         version: 0.18.0-ts7.1.0-dev.20260929
 
+  areas/cafe/contract:
+    dependencies:
+      '@purin-labs/actor-runtime':
+        specifier: workspace:*
+        version: link:../../../foundation/actor-runtime
+      '@purin-labs/agent':
+        specifier: workspace:*
+        version: link:../../../foundation/agent
+      '@purin-labs/agent-tools':
+        specifier: workspace:*
+        version: link:../../../foundation/agent-tools
+      '@purin-labs/area-commerce-contract':
+        specifier: workspace:*
+        version: link:../../commerce/contract
+      '@purin-labs/area-kitchen-contract':
+        specifier: workspace:*
+        version: link:../../kitchen/contract
+      '@purin-labs/cafe-control-api':
+        specifier: workspace:*
+        version: link:../../../packages/cafe-control-api
+      '@purin-labs/commerce-client':
+        specifier: workspace:*
+        version: link:../../../packages/commerce-client
+      '@purin-labs/connections':
+        specifier: workspace:*
+        version: link:../../../foundation/connections
+      '@purin-labs/control':
+        specifier: workspace:*
+        version: link:../../../foundation/control
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../../packages/control-api
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../../../foundation/kernel
+      '@purin-labs/menu-board-crdt':
+        specifier: workspace:*
+        version: link:../../../packages/menu-board-crdt
+      '@purin-labs/menu-draft-crdt':
+        specifier: workspace:*
+        version: link:../../../packages/menu-draft-crdt
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../../../foundation/tenancy
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../../packages/type-utils
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
+
   areas/commerce:
     dependencies:
       '@purin-labs/actor-runtime':
@@ -498,9 +556,9 @@ importers:
       '@purin-labs/agent-tools':
         specifier: workspace:*
         version: link:../../foundation/agent-tools
-      '@purin-labs/area-cafe':
+      '@purin-labs/area-cafe-contract':
         specifier: workspace:*
-        version: link:../cafe
+        version: link:../cafe/contract
       '@purin-labs/area-commerce-contract':
         specifier: workspace:*
         version: link:contract
@@ -680,9 +738,9 @@ importers:
       '@purin-labs/agent-tools':
         specifier: workspace:*
         version: link:../../foundation/agent-tools
-      '@purin-labs/area-cafe':
+      '@purin-labs/area-cafe-contract':
         specifier: workspace:*
-        version: link:../cafe
+        version: link:../cafe/contract
       '@purin-labs/area-devices-contract':
         specifier: workspace:*
         version: link:contract
@@ -2787,6 +2845,9 @@ importers:
       '@purin-labs/area-cafe':
         specifier: workspace:*
         version: link:../../areas/cafe
+      '@purin-labs/area-cafe-contract':
+        specifier: workspace:*
+        version: link:../../areas/cafe/contract
       '@purin-labs/area-commerce':
         specifier: workspace:*
         version: link:../../areas/commerce

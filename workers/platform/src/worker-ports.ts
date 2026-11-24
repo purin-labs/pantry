@@ -96,7 +96,7 @@ import {
   commerceChangeSummary,
   commerceWaitingCardText,
 } from "@purin-labs/surface-slack/server/commerce-approval-card";
-import { cafeServices } from "@purin-labs/area-cafe/server/contract/cafe-services";
+import { cafeServices } from "@purin-labs/area-cafe-contract/server/cafe-services";
 import { readCounterSaleView } from "@purin-labs/area-cafe/server/counter-register";
 import { readMenuScreenList } from "@purin-labs/area-cafe/server/control/routes/menu-boards";
 import { readTerminalOperations } from "@purin-labs/area-cafe/server/data/terminal-operations-readback";

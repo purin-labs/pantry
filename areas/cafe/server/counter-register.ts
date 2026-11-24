@@ -32,13 +32,13 @@ import {
   readCounterSale as readCounterSaleState,
 } from "./data/counter-sale-readback";
 import { readActiveTerminalAssignment } from "./data/terminal-assignment-store";
-import { CAFE_MENU_ID } from "./contract/menu-publication";
-import { presentOrderQueueEntry } from "./contract/order-queue-commands";
+import { CAFE_MENU_ID } from "@purin-labs/area-cafe-contract/server/menu-publication";
+import { presentOrderQueueEntry } from "@purin-labs/area-cafe-contract/server/order-queue-commands";
 import type {
   CounterRegisterDeps,
   CounterRegisterResult,
   CounterSaleView,
-} from "./contract/counter-sale";
+} from "@purin-labs/area-cafe-contract/server/counter-sale";
 
 const ALL_JAPAN_METHODS: readonly CounterRegisterPaymentMethod[] = [
   "card",

@@ -14,7 +14,7 @@ import {
   runAlarmSteps,
 } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import type { CollaborationAgent } from "@purin-labs/collaboration";
-import { screenMediaBase } from "@purin-labs/area-cafe/server/contract/media";
+import { screenMediaBase } from "@purin-labs/area-cafe-contract/server/media";
 import {
   CHAT_SIGNAL_SOCKET_HANDLER,
   isChatSignalSocket,

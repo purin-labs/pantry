@@ -2,7 +2,7 @@ import {
   type MenuDraftEdit,
   type MenuDraftRead,
 } from "../../actors/menu-draft";
-import { MenuDraftRequestError } from "../../contract/request-errors";
+import { MenuDraftRequestError } from "@purin-labs/area-cafe-contract/server/request-errors";
 import {
   isMenuBoardFrameId,
   isMenuBoardItemRow,

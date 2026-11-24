@@ -9,7 +9,7 @@ import {
   type CommerceMutationResultV1,
   type CommerceProductMediaV1,
 } from "@purin-labs/commerce-client";
-import { controlMediaBase, deleteCafeImage } from "@purin-labs/area-cafe/server/contract/media";
+import { controlMediaBase, deleteCafeImage } from "@purin-labs/area-cafe-contract/server/media";
 import type { Env } from "@purin-labs/kernel/env";
 import { controlError, controlJson, readJsonRecord } from "@purin-labs/control/worker/http";
 import {

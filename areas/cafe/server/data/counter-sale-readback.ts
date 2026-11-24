@@ -10,7 +10,7 @@ import type {
   CounterRegisterPaymentMethod,
   CounterSaleState,
 } from "@purin-labs/control-api";
-import type { CounterSaleReadback } from "../contract/counter-sale";
+import type { CounterSaleReadback } from "@purin-labs/area-cafe-contract/server/counter-sale";
 
 /**
  * Classify one counter sale.

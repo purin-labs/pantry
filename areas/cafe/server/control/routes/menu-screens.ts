@@ -10,7 +10,7 @@ import { encodeBase64Url, sha256Hex } from "@purin-labs/std";
 import { CommerceStorefrontClient } from "@purin-labs/commerce-client";
 
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { MenuBoardCommandReply } from "../../contract/menu-board-commands";
+import type { MenuBoardCommandReply } from "@purin-labs/area-cafe-contract/server/menu-board-commands";
 import {
   menuScreenSocketToken,
   parseMenuScreenToken,
@@ -23,7 +23,7 @@ import {
 import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
 import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
-import { readCafeImageContent } from "../../contract/media";
+import { readCafeImageContent } from "@purin-labs/area-cafe-contract/server/media";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,

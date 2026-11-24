@@ -2,7 +2,7 @@ import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors
 import {
   readCafeSoldOutMenu,
   setSoldOutMark,
-} from "../../contract/order-queue-commands";
+} from "@purin-labs/area-cafe-contract/server/order-queue-commands";
 import type { Env } from "@purin-labs/kernel/env";
 import { admitUserMutation } from "@purin-labs/control/worker/admission/control-mutation";
 import {

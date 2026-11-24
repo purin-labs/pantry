@@ -215,12 +215,11 @@ import each of its files. A module with no line for one of these has none.
 
 ## areas/cafe
 
-- Folders: 13
+- Folders: 12
   - `areas/cafe/server/`
   - `areas/cafe/server/actors/`
   - `areas/cafe/server/agent-tools/commerce/`
   - `areas/cafe/server/agent-tools/drafts/`
-  - `areas/cafe/server/contract/`
   - `areas/cafe/server/control/admission/`
   - `areas/cafe/server/control/routes/`
   - `areas/cafe/server/data/`
@@ -231,7 +230,12 @@ import each of its files. A module with no line for one of these has none.
   - `areas/cafe/ui/features/terminals/`
 - Packages: `areas/cafe`, `packages/cafe-control-api`, `packages/menu-board-crdt`, `packages/menu-draft-crdt`
 - Tables (3): `cafe_counter_receipt_setting`, `cafe_terminal_assignment`, `screen_pairing`
-- Public files: `areas/cafe/server/contract/`
+
+## areas/cafe/contract
+
+- Folders: 1
+  - `areas/cafe/contract/server/`
+- Packages: `areas/cafe/contract`
 
 ## areas/commerce
 

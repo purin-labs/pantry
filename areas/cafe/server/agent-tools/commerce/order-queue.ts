@@ -7,7 +7,7 @@ import type {
   OrderQueueToolRead,
   SoldOutMarkRequest,
   SoldOutToolRead,
-} from "../../contract/order-queue-commands";
+} from "@purin-labs/area-cafe-contract/server/order-queue-commands";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   defineToolFamily,
