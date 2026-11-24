@@ -1,9 +1,9 @@
 import {
-  COLLABORATION_FRAME_LIMIT,
   COLLABORATION_POINTER_IDLE_MS,
   COLLABORATION_PRESENCE_EXPIRY_MS,
   COLLABORATION_SOCKET_LIMIT,
   isTextPresenceSelection,
+  snapshotFrameLimit,
   type CollaborationParticipant,
   type CollaborationPointer,
   type CollaborationPointerPosition,
@@ -11,6 +11,7 @@ import {
   type SyncFailureCode,
   type SyncServerMessage,
 } from "@purin-labs/collaboration";
+import { STATE_VECTOR_LIMIT, UPDATE_LIMIT } from "./limits.ts";
 import {
   mailReplyDocument,
   type MailReplyUpdate,
@@ -21,7 +22,8 @@ import {
 import { exhaustiveList, isPositiveInteger } from "@purin-labs/std";
 
 export const MAIL_REPLY_PROTOCOL = "mail_reply_sync.v1";
-export const FRAME_LIMIT = COLLABORATION_FRAME_LIMIT;
+/** A sync response carries the whole state and a state vector in base64. */
+export const FRAME_LIMIT = snapshotFrameLimit(UPDATE_LIMIT, STATE_VECTOR_LIMIT);
 export const SOCKET_LIMIT = COLLABORATION_SOCKET_LIMIT;
 export const PRESENCE_EXPIRY_MS = COLLABORATION_PRESENCE_EXPIRY_MS;
 export const POINTER_IDLE_MS = COLLABORATION_POINTER_IDLE_MS;

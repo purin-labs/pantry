@@ -8,8 +8,10 @@ import {
   runInDurableObject,
 } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
+import * as Y from "yjs";
 import {
   EmailDraftDoc,
+  parseEmailDraftUpdate,
   type EmailDraftStateVector,
   type EmailDraftUpdate,
 } from "@purin-labs/email-draft-crdt";
@@ -67,6 +69,11 @@ it(
   emailDraftJourney,
 );
 it(
+  "loads an email draft whose edit history is larger than one update for a person who opens it",
+  { timeout: 120_000 },
+  longEmailHistoryJourney,
+);
+it(
   "persists a structured menu snapshot after synchronized editing",
   menuDraftJourney,
 );
@@ -74,6 +81,129 @@ it(
   "keeps menu sockets open while the Organisation sleeps, and sweeps revoked and silent sockets",
   menuRoomHibernationJourney,
 );
+
+/** Rounds of typing at the start of the body, and the characters of each. */
+const LONG_HISTORY_ROUNDS = 6;
+const LONG_HISTORY_ROUND_CHARACTERS = 8_000;
+
+/**
+ * The owner writes a long email body one character at a time at its start,
+ * in six accepted updates, so the stored draft grows past 256 KiB while the
+ * body stays inside its 50,000 characters. Then the editor opens the draft
+ * with an empty document: the sync sends the whole stored state, and the
+ * editor reads the same body.
+ */
+async function longEmailHistoryJourney({ task }: TestContext): Promise<void> {
+  const scenario = await installCollaborationScenario("email-history");
+  const ownerSocket = await openSocket(
+    emailSocketUrl(scenario.organisationId),
+    scenario.owner.session,
+  );
+  const typed = new Y.Doc();
+  try {
+    const ownerSync = await requestEmailSync(
+      ownerSocket,
+      requiredEmailDocument(),
+    );
+    Y.applyUpdate(typed, ownerSync.missingUpdate.encode());
+    const body = typed.getText("body");
+    const updateBytes: number[] = [];
+    for (let round = 1; round <= LONG_HISTORY_ROUNDS; round += 1) {
+      const before = Y.encodeStateVector(typed);
+      for (let index = 0; index < LONG_HISTORY_ROUND_CHARACTERS; index += 1)
+        body.insert(0, index % 2 === 0 ? "a" : "b");
+      const encoded = Y.encodeStateAsUpdate(typed, before);
+      updateBytes.push(encoded.byteLength);
+      const update = parseEmailDraftUpdate(encoded);
+      if (!update.ok) throw new Error(update.error.code);
+      const accepted = nextEmailMessage(ownerSocket, isEmailAccepted);
+      ownerSocket.send(
+        encodeEmailDraftClientMessage({
+          kind: "submit_update",
+          updateId: `long-history-${round}`,
+          update: update.value,
+        }),
+      );
+      await expect(accepted).resolves.toMatchObject({
+        updateId: `long-history-${round}`,
+      });
+    }
+    const storedBytes = Y.encodeStateAsUpdate(typed).byteLength;
+    expect(storedBytes).toBeGreaterThan(256 * 1024);
+
+    const editorSocket = await openSocket(
+      emailSocketUrl(scenario.organisationId),
+      scenario.editor.session,
+    );
+    const editorDoc = requiredEmailDocument();
+    try {
+      const opened = await firstEmailSyncOutcome(editorSocket, editorDoc);
+      expect(opened.kind).toBe("sync_response");
+      if (opened.kind !== "sync_response") return;
+      applyEmailUpdate(editorDoc, opened.message.missingUpdate);
+      expect(editorDoc.readField("body")).toBe(body.toString());
+      expect(editorDoc.readField("body")).toHaveLength(
+        LONG_HISTORY_ROUNDS * LONG_HISTORY_ROUND_CHARACTERS,
+      );
+      const artifact = {
+        updateBytes,
+        storedBytes,
+        editorBodyCharacters: editorDoc.readField("body").length,
+      };
+      Object.assign(task.meta, { longEmailHistory: artifact });
+      const written = await env.JOURNEY_ARTIFACTS.fetch(
+        "http://artifacts/collaboration/long-email-history.json",
+        { method: "PUT", body: JSON.stringify(artifact) },
+      );
+      expect(written.status, await written.text()).toBe(200);
+    } finally {
+      editorDoc.destroy();
+      await closeSocket(editorSocket);
+    }
+  } finally {
+    typed.destroy();
+    await closeSocket(ownerSocket);
+  }
+}
+
+/** The answer to a sync request: the sync, a failure, or a closed socket. */
+function firstEmailSyncOutcome(
+  socket: WebSocket,
+  document: EmailDraftDoc,
+): Promise<
+  | Readonly<{
+      kind: "sync_response";
+      message: Variant<EmailDraftServerMessage, "sync_response">;
+    }>
+  | Readonly<{ kind: "failure"; code: string }>
+  | Readonly<{ kind: "closed" }>
+> {
+  return new Promise((resolve) => {
+    const onMessage = (event: MessageEvent): void => {
+      const parsed = parseEmailDraftServerMessage(event.data);
+      if (!parsed.ok) return;
+      if (parsed.value.kind === "sync_response") {
+        socket.removeEventListener("close", onClose);
+        resolve({ kind: "sync_response", message: parsed.value });
+      } else if (parsed.value.kind === "failure") {
+        socket.removeEventListener("close", onClose);
+        resolve({ kind: "failure", code: parsed.value.code });
+      }
+    };
+    const onClose = (): void => {
+      socket.removeEventListener("message", onMessage);
+      resolve({ kind: "closed" });
+    };
+    socket.addEventListener("message", onMessage);
+    socket.addEventListener("close", onClose, { once: true });
+    socket.send(
+      encodeEmailDraftClientMessage({
+        kind: "sync_request",
+        stateVector: requiredEmailVector(document),
+      }),
+    );
+  });
+}
 
 async function emailDraftJourney({ task }: TestContext): Promise<void> {
   const scenario = await installCollaborationScenario("email");
