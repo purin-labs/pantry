@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import { parseBakeryProductionControl } from "@purin-labs/bakery-model/bakery-surface";
 import {
   isBakeryFloorPlanResetAction,
@@ -142,7 +143,7 @@ const surfaceQueryTasks = defineKitchenTool({
   input: jsonSchema({
     type: "object",
     properties: {
-      text: { type: "string", minLength: 1, maxLength: 160 },
+      text: textLimit({ type: "string", minLength: 1, maxLength: 160 }),
       limit: { type: "integer", minimum: 1, maximum: 8 },
     },
     required: ["text", "limit"],
@@ -606,7 +607,7 @@ const surfaceSetView = defineKitchenTool({
             type: "string",
             enum: ["batch", "station", "task", "resource", "operation"],
           },
-          id: { type: "string", minLength: 1, maxLength: 160 },
+          id: textLimit({ type: "string", minLength: 1, maxLength: 160 }),
         },
         required: ["kind", "id"],
         additionalProperties: false,
@@ -1564,7 +1565,7 @@ const surfaceSelect = defineKitchenTool({
             type: "string",
             enum: ["batch", "station", "task", "resource"],
           },
-          id: { type: "string", minLength: 1, maxLength: 160 },
+          id: textLimit({ type: "string", minLength: 1, maxLength: 160 }),
         },
         required: ["kind", "id"],
         additionalProperties: false,
@@ -1604,7 +1605,7 @@ const surfaceRotateEquipment = defineKitchenTool({
   input: jsonSchema({
     type: "object",
     properties: {
-      applianceId: { type: "string", minLength: 1, maxLength: 160 },
+      applianceId: textLimit({ type: "string", minLength: 1, maxLength: 160 }),
     },
     required: ["applianceId"],
     additionalProperties: false,
@@ -1640,7 +1641,7 @@ const surfaceMoveEquipment = defineKitchenTool({
   input: jsonSchema({
     type: "object",
     properties: {
-      applianceId: { type: "string", minLength: 1, maxLength: 160 },
+      applianceId: textLimit({ type: "string", minLength: 1, maxLength: 160 }),
       xMm: { type: "integer", minimum: -20000, maximum: 20000 },
       zMm: { type: "integer", minimum: -20000, maximum: 20000 },
     },
@@ -1678,7 +1679,7 @@ const surfaceToggleOpening = defineKitchenTool({
   input: jsonSchema({
     type: "object",
     properties: {
-      openingId: { type: "string", minLength: 1, maxLength: 160 },
+      openingId: textLimit({ type: "string", minLength: 1, maxLength: 160 }),
       open: { type: "boolean" },
     },
     required: ["openingId", "open"],
@@ -1760,7 +1761,7 @@ const surfaceSetEquipmentAngle = defineKitchenTool({
   input: jsonSchema({
     type: "object",
     properties: {
-      applianceId: { type: "string", minLength: 1, maxLength: 160 },
+      applianceId: textLimit({ type: "string", minLength: 1, maxLength: 160 }),
       yawDegrees: { type: "integer", minimum: -180, maximum: 180 },
     },
     required: ["applianceId", "yawDegrees"],
@@ -2178,7 +2179,7 @@ const surfaceListSavedRuns = defineKitchenTool({
     type: "object",
     properties: {
       runKind: { type: "string", enum: ["rehearsal", "production"] },
-      cursor: { type: ["string", "null"], minLength: 1, maxLength: 2048 },
+      cursor: textLimit({ type: ["string", "null"], minLength: 1, maxLength: 2048 }),
     },
     required: ["runKind", "cursor"],
     additionalProperties: false,
@@ -2251,7 +2252,7 @@ const surfacePrepareRunSave = defineKitchenTool({
   input: jsonSchema({
     type: "object",
     properties: {
-      name: { type: "string", minLength: 1, maxLength: 80 },
+      name: textLimit({ type: "string", minLength: 1, maxLength: 80 }),
     },
     required: ["name"],
     additionalProperties: false,
@@ -2287,8 +2288,8 @@ const surfacePrepareScenarioSave = defineKitchenTool({
   input: jsonSchema({
     type: "object",
     properties: {
-      name: { type: "string", minLength: 1, maxLength: 80 },
-      note: { type: "string", minLength: 1, maxLength: 2000 },
+      name: textLimit({ type: "string", minLength: 1, maxLength: 80 }),
+      note: textLimit({ type: "string", minLength: 1, maxLength: 2000 }),
     },
     required: ["name", "note"],
     additionalProperties: false,

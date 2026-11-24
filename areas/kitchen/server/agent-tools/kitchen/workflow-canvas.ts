@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import {
   parseWorkflowCanvasMoveArgs,
   parseWorkflowCanvasReadArgs,
@@ -13,7 +14,7 @@ export const workflowCanvasRead = defineKitchenTool({
     "Read shared workflow object IDs, step labels, positions, bounds, and the current document revision. Match named steps by label. documentId is run:<saved-run snapshot ID> from bakery_saved_run_read. Read again after a position conflict.",
   input: jsonSchema({
     type: "object",
-    properties: { documentId: { type: "string", maxLength: 256 } },
+    properties: { documentId: textLimit({ type: "string", maxLength: 256 }) },
     required: ["documentId"],
     additionalProperties: false,
   }),
@@ -37,7 +38,7 @@ export const workflowCanvasMove = defineKitchenTool({
   input: jsonSchema({
     type: "object",
     properties: {
-      documentId: { type: "string", maxLength: 256 },
+      documentId: textLimit({ type: "string", maxLength: 256 }),
       objectId: { type: "string", pattern: "^[A-Za-z][A-Za-z0-9_-]{0,99}$" },
       expectedRevision: { type: "integer", minimum: 1 },
       x: {

@@ -759,6 +759,9 @@ importers:
       '@purin-labs/cafe-control-api':
         specifier: workspace:*
         version: link:../../packages/cafe-control-api
+      '@purin-labs/contract-schema':
+        specifier: workspace:*
+        version: link:../../packages/contract-schema
       '@purin-labs/control':
         specifier: workspace:*
         version: link:../../foundation/control
@@ -1015,6 +1018,9 @@ importers:
       '@purin-labs/connections':
         specifier: workspace:*
         version: link:../../foundation/connections
+      '@purin-labs/contract-schema':
+        specifier: workspace:*
+        version: link:../../packages/contract-schema
       '@purin-labs/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
@@ -1176,6 +1182,9 @@ importers:
       '@purin-labs/commerce-control-api':
         specifier: workspace:*
         version: link:../../packages/commerce-control-api
+      '@purin-labs/contract-schema':
+        specifier: workspace:*
+        version: link:../../packages/contract-schema
       '@purin-labs/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts

@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import type { JsonRecord } from "@purin-labs/control/worker/http";
 import {
   readMessageLink,
@@ -84,8 +85,8 @@ const AUTHORING_FORMAT_EXAMPLE = {
         outputSchema: {
           type: "object",
           properties: {
-            id: { type: "string", minLength: 1, maxLength: 128 },
-            name: { type: "string", minLength: 1, maxLength: 256 },
+            id: textLimit({ type: "string", minLength: 1, maxLength: 128 }),
+            name: textLimit({ type: "string", minLength: 1, maxLength: 256 }),
           },
           required: ["id", "name"],
           additionalProperties: false,

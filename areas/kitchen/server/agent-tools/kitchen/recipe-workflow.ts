@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import { parseWorkflowChanges } from "@purin-labs/bakery-workflow/changes";
 import { ProposalArgumentError } from "@purin-labs/agent-tools/errors";
 import { hasExactKeys, isRecord, isString } from "@purin-labs/std";
@@ -54,11 +55,11 @@ export const recipeWorkflowProposal = defineKitchenTool({
     properties: {
       workflowId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]{0,127}$" },
       baseDigest: { type: "string", pattern: "^[a-f0-9]{64}$" },
-      reason: { type: "string", maxLength: MAX_PROPOSAL_TEXT },
+      reason: textLimit({ type: "string", maxLength: MAX_PROPOSAL_TEXT }),
       findingIds: {
         type: "array",
         maxItems: MAX_PROPOSAL_FINDINGS,
-        items: { type: "string", maxLength: MAX_PROPOSAL_TEXT },
+        items: textLimit({ type: "string", maxLength: MAX_PROPOSAL_TEXT }),
       },
       changes: {
         type: "array",
@@ -77,9 +78,9 @@ export const recipeWorkflowProposal = defineKitchenTool({
                 "set_step",
               ],
             },
-            workflow: { type: "string", maxLength: 128 },
-            step: { type: ["string", "null"], maxLength: 100 },
-            label: { type: ["string", "null"], maxLength: 200 },
+            workflow: textLimit({ type: "string", maxLength: 128 }),
+            step: textLimit({ type: ["string", "null"], maxLength: 100 }),
+            label: textLimit({ type: ["string", "null"], maxLength: 200 }),
             stepKind: {
               type: ["string", "null"],
               enum: ["work", "wait", null],
@@ -88,10 +89,10 @@ export const recipeWorkflowProposal = defineKitchenTool({
             workers: {
               type: ["array", "null"],
               maxItems: 16,
-              items: { type: "string", maxLength: 128 },
+              items: textLimit({ type: "string", maxLength: 128 }),
             },
-            from: { type: ["string", "null"], maxLength: 100 },
-            to: { type: ["string", "null"], maxLength: 100 },
+            from: textLimit({ type: ["string", "null"], maxLength: 100 }),
+            to: textLimit({ type: ["string", "null"], maxLength: 100 }),
             outcome: {
               type: ["string", "null"],
               enum: ["accept", "reject", null],

@@ -16,6 +16,7 @@
     "./ui/features/devices/route": "./ui/features/devices/route.tsx"
   },
   "dependencies": {
+    "@purin-labs/contract-schema": "workspace:*",
     "@purin-labs/actor-runtime": "workspace:*",
     "@purin-labs/agent": "workspace:*",
     "@purin-labs/agent-tools": "workspace:*",

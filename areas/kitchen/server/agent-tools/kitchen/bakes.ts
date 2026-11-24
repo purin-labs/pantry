@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import { parseBakeStockLevelInput } from "@purin-labs/kitchen-control-api";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
@@ -22,7 +23,11 @@ import {
 
 const PROPOSAL_ID = { type: "string", pattern: "^bake_[a-f0-9]{24}$" };
 
-const INVENTORY_ITEM_ID = { type: "string", minLength: 1, maxLength: 255 };
+const INVENTORY_ITEM_ID = textLimit({
+  type: "string",
+  minLength: 1,
+  maxLength: 255,
+});
 
 export const bakeRead = defineKitchenTool({
   name: "bake_read",
@@ -77,11 +82,15 @@ export const bakeStockLevelProposal = defineKitchenTool({
     type: "object",
     properties: {
       inventoryItemId: INVENTORY_ITEM_ID,
-      productName: { type: "string", minLength: 1, maxLength: 120 },
+      productName: textLimit({ type: "string", minLength: 1, maxLength: 120 }),
       levelPieces: { type: "integer", minimum: 1, maximum: 10000 },
       piecesPerGroup: { type: "integer", minimum: 1, maximum: 1000 },
       workflowId: { type: "string", pattern: "^[a-z0-9][a-z0-9-]{0,127}$" },
-      kitchenLocation: { type: "string", minLength: 1, maxLength: 64 },
+      kitchenLocation: textLimit({
+        type: "string",
+        minLength: 1,
+        maxLength: 64,
+      }),
       expectedRevision: { type: ["integer", "null"], minimum: 1 },
     },
     required: [

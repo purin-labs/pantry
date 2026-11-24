@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type {
@@ -52,16 +53,19 @@ export const supplierCreate = defineKitchenTool({
   input: jsonSchema({
     type: "object",
     properties: {
-      displayName: { type: "string", minLength: 1, maxLength: 200 },
-      legalName: { type: "string", minLength: 1, maxLength: 200 },
-      countryCode: { type: ["string", "null"], maxLength: 2 },
-      contactName: { type: ["string", "null"], maxLength: 200 },
-      email: { type: ["string", "null"], maxLength: 320 },
-      phone: { type: ["string", "null"], maxLength: 64 },
+      displayName: textLimit({ type: "string", minLength: 1, maxLength: 200 }),
+      legalName: textLimit({ type: "string", minLength: 1, maxLength: 200 }),
+      countryCode: textLimit({ type: ["string", "null"], maxLength: 2 }),
+      contactName: textLimit({ type: ["string", "null"], maxLength: 200 }),
+      email: textLimit({ type: ["string", "null"], maxLength: 320 }),
+      phone: textLimit({ type: ["string", "null"], maxLength: 64 }),
       leadTimeDays: { type: "integer", minimum: 0, maximum: 365 },
-      minimumOrderQuantity: { type: ["string", "null"], maxLength: 32 },
-      minimumOrderUnit: { type: ["string", "null"], maxLength: 32 },
-      purchasingNotes: { type: ["string", "null"], maxLength: 2000 },
+      minimumOrderQuantity: textLimit({
+        type: ["string", "null"],
+        maxLength: 32,
+      }),
+      minimumOrderUnit: textLimit({ type: ["string", "null"], maxLength: 32 }),
+      purchasingNotes: textLimit({ type: ["string", "null"], maxLength: 2000 }),
       inventoryItemIds: {
         type: "array",
         minItems: 1,

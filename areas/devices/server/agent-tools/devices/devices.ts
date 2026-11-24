@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type {
   DevicePauseRequest,
@@ -90,7 +91,7 @@ export const deviceProposal = defineDeviceTool({
     properties: {
       deviceId: { type: "string", pattern: "^dev_[a-f0-9]{24}$" },
       action: { type: "string", enum: ["restrict", "resume"] },
-      reason: { type: ["string", "null"], maxLength: 200 },
+      reason: textLimit({ type: ["string", "null"], maxLength: 200 }),
     },
     required: ["deviceId", "action", "reason"],
     additionalProperties: false,

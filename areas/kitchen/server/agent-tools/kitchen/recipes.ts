@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { RecipeSaveRequest } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
@@ -59,7 +60,7 @@ export const recipeSave = defineKitchenTool({
         pattern: "^[A-Za-z0-9_:-]{1,128}$",
       },
       expectedRecipeRevision: { type: ["integer", "null"], minimum: 1 },
-      name: { type: "string", minLength: 1, maxLength: 200 },
+      name: textLimit({ type: "string", minLength: 1, maxLength: 200 }),
       inputs: {
         type: "array",
         minItems: 1,
