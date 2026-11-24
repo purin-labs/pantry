@@ -1,10 +1,12 @@
 """Run the pâtisserie storefront journey against a local Commerce.
 
 The runner starts Commerce on a free port with fresh storage (the storefront
-proxies /v1 there), seeds the local café merchant, runs the pâtisserie menu setup two
-times (a second run must leave one menu of twenty-four items), starts the
-storefront as shop.purin.io builds it, and drives it with the Playwright
-CLI. Screenshots and the result go to output/playwright/patisserie-storefront.
+proxies /v1 there) and provisions a café shop as Pantry provisions one: it has
+products but no menu yet, like the live shop on shop.purin.io. It runs the
+pâtisserie menu setup two times (the first run publishes the shop's first menu;
+a second run must leave one menu of twenty-four items), starts the storefront
+as shop.purin.io builds it, and drives it with the Playwright CLI. Screenshots
+and the result go to output/playwright/patisserie-storefront.
 """
 
 import argparse
@@ -23,7 +25,8 @@ import uuid
 ROOT = Path(__file__).resolve().parents[2]
 COMMERCE = ROOT / "services/commerce"
 ARTIFACTS = ROOT / "output/playwright/patisserie-storefront"
-MERCHANT = "merchant_nuki_cafe_demo"
+ORGANISATION = "organisation_patisserie_journey"
+MERCHANT = "merchant_pantry_patisserie_journey"
 
 def free_port() -> int:
     # Another session may run this journey at the same time, so each run
@@ -129,7 +132,12 @@ def main() -> None:
 
 def run_journey(cli: Path, run_id: str, commerce: str) -> None:
     env = {**os.environ, "COMMERCE_BASE_URL": commerce}
-    node_script("seed-local-commerce.ts", [], env)
+    # The same provisioning as the Platform's shop setup: no menu.
+    node_script(
+        "rebuild-plan22-phase3-cafe.ts",
+        ["--organisation", ORGANISATION, "--merchant", MERCHANT],
+        env,
+    )
     # The first run also makes the listed prices include 8% tax.
     runs = [
         json.loads(

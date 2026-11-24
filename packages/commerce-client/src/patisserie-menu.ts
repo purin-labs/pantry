@@ -1074,7 +1074,8 @@ type Snapshot = Readonly<{
 }>;
 
 type CafeMenu = Readonly<{
-  revision: number;
+  /** Undefined until the shop publishes its first café menu. */
+  revision: number | undefined;
   salesChannelId: string;
   locationId: string;
   recipeIds: ReadonlySet<string>;
@@ -1257,6 +1258,7 @@ export async function configurePatisserieMenu(
   const after = await readCafeMenu(client, merchantId);
   if (
     snapshot.merchantRevision !== revision ||
+    after.revision === undefined ||
     after.menu.entries.length !== PATISSERIE_ITEMS.length
   ) {
     throw new Error("The pâtisserie menu did not read back as published");
@@ -1677,12 +1679,13 @@ async function readCafeMenu(
 ): Promise<CafeMenu> {
   const result = await client.readFoodServiceSnapshot(merchantId);
   if (!result.ok) throw clientFailure("food-service read", result);
+  const recipeIds = new Set(
+    result.value.resources.recipeRevisions.map((recipe) => recipe.recipeId),
+  );
   const menu = result.value.resources.menus.find(
     (candidate) => candidate.menuId === MENU_ID,
   );
-  if (menu === undefined) {
-    throw new Error(`The merchant has no published ${MENU_ID}`);
-  }
+  if (menu === undefined) return firstCafeMenu(client, merchantId, recipeIds);
   if (menu.scope.kind !== "location") {
     throw new Error(`${MENU_ID} must be scoped to one location`);
   }
@@ -1690,9 +1693,7 @@ async function readCafeMenu(
     revision: menu.revision,
     salesChannelId: menu.salesChannelId,
     locationId: menu.scope.locationId,
-    recipeIds: new Set(
-      result.value.resources.recipeRevisions.map((recipe) => recipe.recipeId),
-    ),
+    recipeIds,
     menu: {
       menuId: menu.menuId,
       name: menu.name,
@@ -1709,6 +1710,39 @@ async function readCafeMenu(
         consumptionPlanRevision: entry.consumptionPlanRevision,
         modifierGroupRevisions: entry.modifierGroupRevisions,
       })),
+    },
+  };
+}
+
+/**
+ * A shop that Pantry provisions has no café menu until its first publication.
+ * The new menu sells in the sales channel of the café storefront, at its
+ * pickup location, at all hours, as the Portal's first publication does.
+ */
+async function firstCafeMenu(
+  client: CommerceAdminClient,
+  merchantId: string,
+  recipeIds: ReadonlySet<string>,
+): Promise<CafeMenu> {
+  const storefront = await client.readStorefront(merchantId, STOREFRONT_ID);
+  if (!storefront.ok) throw clientFailure("café storefront read", storefront);
+  const { salesChannelId, fulfillment } = storefront.value;
+  if (fulfillment.kind !== "pickup") {
+    throw new Error(`${STOREFRONT_ID} must be a pickup storefront`);
+  }
+  return {
+    revision: undefined,
+    salesChannelId,
+    locationId: fulfillment.locationId,
+    recipeIds,
+    menu: {
+      menuId: MENU_ID,
+      name: "Café main menu",
+      salesChannelId,
+      scope: { kind: "location", locationId: fulfillment.locationId },
+      validity: { kind: "always" },
+      sections: [],
+      entries: [],
     },
   };
 }
@@ -1926,8 +1960,11 @@ function patisserieMenu(
   return {
     merchantId,
     expectedMerchantRevision,
-    idempotencyKey: `${run}:menu:${cafe.revision}`,
-    expectedMenuRevision: cafe.revision,
+    idempotencyKey: `${run}:menu:${cafe.revision ?? "first"}`,
+    // A first publication names no revision.
+    ...(cafe.revision === undefined
+      ? {}
+      : { expectedMenuRevision: cafe.revision }),
     menu: {
       ...cafe.menu,
       sections: SECTIONS.map((section, position) => ({

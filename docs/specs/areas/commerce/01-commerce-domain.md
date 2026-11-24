@@ -218,6 +218,12 @@ kind. The action kinds are:
   `/store/shipping`. Both demonstrations name the merchant `merchant_nuki_cafe_demo`.
 - A build for one shop (`VITE_SHOP_MERCHANT_ID`) opens the café storefront of that shop.
   The path `/shops/<merchantId>` opens the published menu of a shop.
+- That build shows the pâtisserie menu: the entries `menu_entry_patisserie_<slug>` of
+  the shop's `menu_cafe_main`. With no such entry, the page shows "Today's selection is
+  unavailable". `configure:patisserie-menu` in `services/commerce` makes the 24 items,
+  their stock and recipes, and publishes that menu. A shop that the Portal provisions has
+  no menu, so the script then publishes the first one, for the sales channel and the
+  pickup location of `storefront_cafe`, at all hours.
 - The Worker `purin-shop` serves the application at `shop.purin.io`. It sends `/v1/*`
   and `/health` to the engine through a service binding.
 - Punter (`scripts/punter`) is a buyer with no admin credential. `scenario:pickup` buys
