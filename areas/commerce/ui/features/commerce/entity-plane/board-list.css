@@ -1,0 +1,142 @@
+/* A board view as one list: a row for each entry, the lane as a tag, and a
+   drawer with the facts and the actions. */
+.commerce-board-rows {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+  list-style: none;
+}
+
+.commerce-board-rows > li + li {
+  border-top: 1px solid var(--border);
+}
+
+.commerce-board-row:where(button) {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 2.2fr) repeat(3, minmax(0, 1fr)) minmax(120px, auto)
+    16px;
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+  min-height: 0;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.commerce-board-row:hover {
+  background: var(--surface);
+}
+
+.commerce-board-row:focus-visible {
+  outline: 2px solid var(--focus, var(--ink));
+  outline-offset: -2px;
+}
+
+.commerce-board-row-name {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.commerce-board-row-name strong {
+  font-weight: 500;
+}
+
+.commerce-board-row-name span,
+.commerce-board-row-value {
+  overflow: hidden;
+  color: var(--ink-2);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commerce-board-row-value {
+  font-size: 14px;
+}
+
+.commerce-board-row-value[data-numeric="true"] {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.commerce-board-row > svg {
+  color: var(--ink-3);
+}
+
+.commerce-entry-drawer-facts {
+  display: grid;
+  margin: 0;
+  font-size: 14px;
+}
+
+.commerce-entry-drawer-facts > div {
+  display: grid;
+  grid-template-columns: minmax(120px, 40%) minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding-block: 9px;
+  border-top: 1px solid var(--border);
+}
+
+.commerce-entry-drawer-facts dt {
+  color: var(--ink-2);
+}
+
+.commerce-entry-drawer-facts dd {
+  margin: 0;
+  min-width: 0;
+}
+
+.commerce-entry-drawer-facts dd[data-numeric="true"] {
+  font-variant-numeric: tabular-nums;
+}
+
+.commerce-entry-drawer-facts button:where(.pantry-select-trigger) {
+  width: 100%;
+}
+
+/* The order fields of a purchase request, under its facts. */
+.commerce-entry-drawer .commerce-order-form {
+  display: grid;
+  gap: 16px;
+}
+
+.commerce-entry-drawer-link {
+  color: var(--ink);
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* On a phone a row is the name, then its values, its lane and the arrow. */
+@media (max-width: 760px) {
+  .commerce-board-row:where(button) {
+    grid-template-columns: repeat(3, auto) minmax(0, 1fr) 16px;
+    gap: 4px 12px;
+  }
+
+  .commerce-board-row-name {
+    grid-column: 1 / -1;
+  }
+
+  .commerce-board-row-value {
+    font-size: 13px;
+  }
+
+  .commerce-board-row-lane {
+    justify-self: end;
+  }
+}

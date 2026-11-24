@@ -5,6 +5,7 @@ import React from "react";
 import { ArrowLeft, Package, Search, ShoppingCart } from "lucide-react";
 import { workspacePageDescriptor } from "@purin-labs/ui/route";
 import "./record.css";
+import "./collection.css";
 import { ProductDescriptionDraftControl } from "../description-draft/control";
 import { ProductSaleDetails } from "./product-sale-details";
 import type { ProductDescriptionActionTransport } from "../description-draft/editor";
@@ -76,9 +77,29 @@ import {
 import { commerceCollectionQuery, customEntityRef, entityDossierQuery, entityTypePageQuery, readCommerceGraph, readCommerceChanges, searchEntityTypeQuery, systemEntityRef, readCommerceActivity, readPublishedCommerceResources, patchCommerceListEntryStatus, publishCommerceSavedViewPresentation, updateCommerceBoardPresence, type CommerceGraphFetch, type CommerceMutationTransport, type CommercePresenceTransport, type CommerceCollectionSelection, type CommercePublishedResourceMetadata } from "./api";
 import type { CommerceListEntryPatchApprovalAction, CommerceActivityResult } from "@purin-labs/commerce-control-api/portal/entity-plane";
 import {
-  PurchaseRequestCardEditor,
+  PurchaseRequestDrawer,
   PurchasingControls,
+  purchaseRequestRowSummary,
 } from "./purchasing-controls";
+import {
+  CommerceBoardEntryDrawer,
+  CommerceBoardList,
+  type CommerceBoardListFact,
+  type CommerceBoardListRow,
+} from "./board-list";
+import {
+  boardRowSummary,
+  commerceBoardFact,
+  commerceBoardFactText,
+  commerceBoardLaneChip,
+  commerceBoardLaneOptions,
+  commerceBoardListLane,
+  findListEntryDefinition,
+  listAttributeDefinition,
+  renderCommerceBoardLaneOption,
+  resolveCommerceReferenceName,
+  type CommerceBoardLaneOption,
+} from "./board-rows";
 import type {
   CommerceOperationsTransport,
   OrderCancellationAction,
@@ -118,6 +139,17 @@ type CommerceEntityPlaneRouteProps = Readonly<{
    * out of a page that could only show it broken.
    */
   priceAllowances?: OfferPriceAllowanceInteraction;
+  /**
+   * The supplier payouts, as a tab beside the views of the Purchasing page.
+   * The panel reports whether this person may read them, and how many wait on
+   * someone, for the tab and its mark.
+   */
+  payouts?: (report: (status: CommercePayoutsTabStatus) => void) => React.ReactNode;
+}>;
+
+type CommercePayoutsTabStatus = Readonly<{
+  readable: boolean;
+  attention: number;
 }>;
 
 /** What the allowance section needs, kept out of the board interaction. */
@@ -802,6 +834,7 @@ function renderCommerceGraphRoute(
           collectionSelection={state.collectionSelection}
           setCollectionSelection={setCollectionSelection}
           resourceHref={props.resourceHref}
+          payouts={props.payouts}
           boardInteraction={{
             organisationId: props.organisationId,
             canOperate: props.canOperate === true,
@@ -885,24 +918,35 @@ function CommerceGraphOverview(
       React.SetStateAction<CommerceCollectionSelection | null>
     >;
     resourceHref: CommerceEntityPlaneRouteProps["resourceHref"];
+    payouts: CommerceEntityPlaneRouteProps["payouts"];
     boardInteraction: CommerceBoardInteraction;
   }>,
 ): React.ReactNode {
+  const active = props.metadata.lists.some(isSupplierDirectory);
+  const controls = (
+    <PurchasingControls
+      organisationId={props.boardInteraction.organisationId}
+      active={active}
+      canManage={props.boardInteraction.canAdminister}
+      canOperate={props.boardInteraction.canOperate}
+      mutate={props.boardInteraction.mutate}
+      fetcher={props.boardInteraction.fetcher}
+      refresh={props.boardInteraction.refresh}
+    />
+  );
+  // Add supplier and Recheck stock sit on the tab row. A set-up step or a
+  // notice for a viewer stays above the tabs, where it reads as a message.
+  const inTabRow =
+    active &&
+    props.boardInteraction.canOperate &&
+    props.boardInteraction.mutate !== undefined;
   // The page title already names this section: Purchasing.
   return (
     <section
       className="portal-band commerce-panel commerce-purchasing"
       aria-label="Suppliers"
     >
-      <PurchasingControls
-        organisationId={props.boardInteraction.organisationId}
-        active={props.metadata.lists.some(isSupplierDirectory)}
-        canManage={props.boardInteraction.canAdminister}
-        canOperate={props.boardInteraction.canOperate}
-        mutate={props.boardInteraction.mutate}
-        fetcher={props.boardInteraction.fetcher}
-        refresh={props.boardInteraction.refresh}
-      />
+      {inTabRow ? null : controls}
       <CommerceCollectionPanel
         metadata={props.metadata}
         collection={props.collection}
@@ -910,6 +954,8 @@ function CommerceGraphOverview(
         setSelection={props.setCollectionSelection}
         resourceHref={props.resourceHref}
         boardInteraction={props.boardInteraction}
+        payouts={props.payouts}
+        actions={inTabRow ? controls : null}
       />
     </section>
   );
@@ -925,10 +971,25 @@ function CommerceCollectionPanel(
     >;
     resourceHref: CommerceEntityPlaneRouteProps["resourceHref"];
     boardInteraction: CommerceBoardInteraction;
+    payouts: CommerceEntityPlaneRouteProps["payouts"];
+    actions: React.ReactNode;
   }>,
 ): React.ReactNode {
+  const [payoutsShown, setPayoutsShown] = React.useState(false);
+  const [payoutStatus, setPayoutStatus] =
+    React.useState<CommercePayoutsTabStatus>({ readable: true, attention: 0 });
+  const attention = payoutStatus.attention;
   if (props.metadata.lists.length === 0 && props.metadata.views.length === 0)
     return null;
+  const payoutsTab = props.payouts !== undefined && payoutStatus.readable;
+  const showPayouts = payoutsShown && payoutsTab;
+  const selection = showPayouts ? null : props.selection;
+  const choose = chooseCommerceCollection.bind(
+    null,
+    setPayoutsShown,
+    props.selection,
+    props.setSelection,
+  );
   return (
     <section
       className="commerce-collection"
@@ -937,21 +998,80 @@ function CommerceCollectionPanel(
       <h3 id="commerce-collection-title" className="visually-hidden">
         Views
       </h3>
-      <div className="commerce-tabs" role="group" aria-label="Views">
-        {props.metadata.views.map(
-          renderCommerceViewTab.bind(null, props.selection, props.setSelection),
-        )}
-        {unpresentedCommerceLists(props.metadata).map(
-          renderCommerceListTab.bind(null, props.selection, props.setSelection),
-        )}
+      <div className="commerce-collection-bar">
+        <div className="commerce-tabs" role="group" aria-label="Views">
+          {props.metadata.views.map(
+            renderCommerceViewTab.bind(null, selection, choose),
+          )}
+          {unpresentedCommerceLists(props.metadata).map(
+            renderCommerceListTab.bind(null, selection, choose),
+          )}
+          {!payoutsTab ? null : (
+            <button
+              type="button"
+              className={
+                showPayouts ? "commerce-tab commerce-tab-active" : "commerce-tab"
+              }
+              aria-pressed={showPayouts}
+              onClick={setPayoutsShown.bind(null, true)}
+            >
+              Payouts
+              {attention === 0 ? null : (
+                <span className="commerce-tab-attention">
+                  {" "}
+                  {attention}
+                  <span className="visually-hidden"> need attention</span>
+                  <span className="commerce-tab-dot" aria-hidden="true" />
+                </span>
+              )}
+            </button>
+          )}
+        </div>
+        {props.actions}
       </div>
-      <CommerceCollectionContent
-        collection={props.collection}
-        resourceHref={props.resourceHref}
-        boardInteraction={props.boardInteraction}
-      />
+      <div hidden={showPayouts}>
+        <CommerceCollectionContent
+          collection={props.collection}
+          resourceHref={props.resourceHref}
+          boardInteraction={props.boardInteraction}
+        />
+      </div>
+      {/* Mounted while hidden, so the tab's mark reads the payouts too. */}
+      {props.payouts === undefined ? null : (
+        <div hidden={!showPayouts}>{props.payouts(setPayoutStatus)}</div>
+      )}
     </section>
   );
+}
+
+/**
+ * A view tab closes the Payouts tab and selects its view. The view that is
+ * already selected stays loaded, so going back from Payouts reads nothing.
+ */
+function chooseCommerceCollection(
+  setPayoutsShown: React.Dispatch<React.SetStateAction<boolean>>,
+  current: CommerceCollectionSelection | null,
+  setSelection: React.Dispatch<
+    React.SetStateAction<CommerceCollectionSelection | null>
+  >,
+  value: React.SetStateAction<CommerceCollectionSelection | null>,
+): void {
+  setPayoutsShown(false);
+  if (typeof value !== "function" && sameCommerceCollection(current, value))
+    return;
+  setSelection(value);
+}
+
+function sameCommerceCollection(
+  left: CommerceCollectionSelection | null,
+  right: CommerceCollectionSelection | null,
+): boolean {
+  if (left === null || right === null) return left === right;
+  if (left.kind === "saved_commerce_view" && right.kind === "saved_commerce_view")
+    return left.viewId === right.viewId;
+  if (left.kind === "commerce_list" && right.kind === "commerce_list")
+    return left.listId === right.listId;
+  return false;
 }
 
 /**
@@ -1924,12 +2044,11 @@ function renderCommerceCollectionBoard(
   return (
     <>
       <CommerceBoardPresence model={model} interaction={interaction} />
-      <div
-        className="commerce-board"
-        aria-label={model.view?.name ?? "Commerce board"}
-      >
-        {laneOptions.map(
-          renderCommerceBoardLane.bind(
+      <CommerceBoardList
+        label={model.view?.name ?? "Commerce board"}
+        lanes={laneOptions.map(commerceBoardListLane)}
+        rows={laneOptions.flatMap(
+          commerceBoardListRows.bind(
             null,
             model,
             resourceHref,
@@ -1938,205 +2057,146 @@ function renderCommerceCollectionBoard(
             cardAttributeIds,
           ),
         )}
-      </div>
+      />
     </>
   );
 }
 
-function renderCommerceBoardLane(
+function commerceBoardListRows(
   model: CommercePublishedCollectionModel,
   resourceHref: CommerceEntityPlaneRouteProps["resourceHref"],
   interaction: CommerceBoardInteraction,
   laneOptions: readonly CommerceBoardLaneOption[],
   cardAttributeIds: readonly AttributeDefinitionId[],
   lane: CommerceBoardLaneOption,
-): React.ReactNode {
-  return (
-    <section
-      className="commerce-board-lane"
-      key={lane.id}
-      data-empty={lane.rows.length === 0 ? "true" : undefined}
-      aria-labelledby={`commerce-board-lane-${lane.id}`}
-      onDragOver={lane.acceptsMoves ? allowCommerceBoardDrop : undefined}
-      onDrop={
-        lane.acceptsMoves
-          ? dropCommerceBoardEntry.bind(null, model, interaction, lane.id)
-          : undefined
-      }
-    >
-      <div className="commerce-board-lane-heading">
-        <h4 id={`commerce-board-lane-${lane.id}`}>{lane.label}</h4>
-        <span className="commerce-board-lane-count">{lane.rows.length}</span>
-      </div>
-      <div className="commerce-board-cards">
-        {lane.rows.map(
-          renderCommerceBoardCard.bind(
-            null,
-            model,
-            resourceHref,
-            interaction,
-            laneOptions,
-            cardAttributeIds,
-            lane.id,
-          ),
-        )}
-      </div>
-    </section>
+): readonly CommerceBoardListRow[] {
+  return lane.rows.map(
+    commerceBoardListRow.bind(
+      null,
+      model,
+      resourceHref,
+      interaction,
+      laneOptions,
+      cardAttributeIds,
+      lane,
+    ),
   );
 }
 
-function renderCommerceBoardCard(
+/**
+ * One entry of a board view as a list row. A purchase request shows its
+ * supplier, amount, due day and owner; another board shows its first card
+ * fact under the name and the next three as columns.
+ */
+function commerceBoardListRow(
   model: CommercePublishedCollectionModel,
   resourceHref: CommerceEntityPlaneRouteProps["resourceHref"],
   interaction: CommerceBoardInteraction,
   laneOptions: readonly CommerceBoardLaneOption[],
   cardAttributeIds: readonly AttributeDefinitionId[],
+  lane: CommerceBoardLaneOption,
+  row: CommerceCollectionRow,
+): CommerceBoardListRow {
+  const text = commerceBoardFactText.bind(null, model, interaction.names, row);
+  const purchasing = model.list?.listId === REPLENISHMENT_QUEUE_LIST_ID;
+  const summary = purchasing
+    ? purchaseRequestRowSummary(row.entry, text)
+    : boardRowSummary(cardAttributeIds, text);
+  return {
+    key: `${String(row.entry.listId)}:${String(row.entry.entryId)}`,
+    laneId: lane.id,
+    name: row.entity.displayName,
+    secondary: summary.secondary,
+    columns: summary.columns,
+    laneTag: <StatusChip status={commerceBoardLaneChip(model, row, lane)} />,
+    drawer: renderCommerceBoardEntryDrawer.bind(
+      null,
+      model,
+      resourceHref,
+      interaction,
+      laneOptions,
+      cardAttributeIds.map(
+        commerceBoardFact.bind(null, model, interaction.names, row),
+      ),
+      purchasing,
+      lane.id,
+      row,
+    ),
+  };
+}
+
+function renderCommerceBoardEntryDrawer(
+  model: CommercePublishedCollectionModel,
+  resourceHref: CommerceEntityPlaneRouteProps["resourceHref"],
+  interaction: CommerceBoardInteraction,
+  laneOptions: readonly CommerceBoardLaneOption[],
+  facts: readonly CommerceBoardListFact[],
+  purchasing: boolean,
   laneId: string,
   row: CommerceCollectionRow,
+  open: boolean,
+  close: () => void,
 ): React.ReactNode {
-  const link = entityResourceLink(resourceHref, row.entity);
-  return (
-    <article
-      className="commerce-board-card"
-      key={`${row.entry.listId}:${row.entry.entryId}:${row.entry.revision}`}
-      draggable={
-        interaction.canOperate &&
-        interaction.mutate !== undefined &&
-        !commerceBoardIntentBlocksMutation(interaction.intent)
-      }
-      onDragStart={beginCommerceBoardDrag.bind(
-        null,
-        model.merchantRevision,
-        interaction,
-        row.entry,
-        row.entity.displayName,
-      )}
-      onDragEnd={endCommerceBoardDrag.bind(null, interaction)}
-    >
-      <h5>
-        {link === null ? (
-          row.entity.displayName
-        ) : (
-          <Link to={link}>{row.entity.displayName}</Link>
+  const href = entityResourceLink(resourceHref, row.entity);
+  const laneControl =
+    interaction.canOperate && interaction.mutate !== undefined ? (
+      <Select.Root
+        items={laneOptions.map(commerceOptionItem)}
+        value={laneId}
+        disabled={commerceBoardIntentBlocksMutation(interaction.intent)}
+        onValueChange={moveCommerceBoardEntryFromDrawer.bind(
+          null,
+          close,
+          model,
+          interaction,
+          row.entry,
+          row.entity.displayName,
         )}
-      </h5>
-      <dl className="commerce-board-card-facts">
-        {cardAttributeIds.map(
-          renderCommerceBoardCardFact.bind(null, model, interaction.names, row),
-        )}
-      </dl>
-      {interaction.canOperate && interaction.mutate !== undefined ? (
-        <div className="commerce-board-move-control">
-          <Select.Root
-            items={laneOptions.map(commerceOptionItem)}
-            value={laneId}
-            disabled={commerceBoardIntentBlocksMutation(interaction.intent)}
-            onValueChange={selectCommerceBoardLane.bind(
-              null,
-              model,
-              interaction,
-              row.entry,
-              row.entity.displayName,
-            )}
-          >
-            <Select.Trigger
-              aria-label={`Move ${row.entity.displayName} to lane`}
-            >
-              <Select.Value />
-            </Select.Trigger>
-            <Select.Popup>
-              {laneOptions.map(renderCommerceBoardLaneOption)}
-            </Select.Popup>
-          </Select.Root>
-        </div>
-      ) : null}
-      {model.list?.listId === REPLENISHMENT_QUEUE_LIST_ID ? (
-        <PurchaseRequestCardEditor
-          model={model}
-          row={row}
-          ownerAndDeliveryShown={
-            cardAttributeIds.some(isAttributeId.bind(null, "owner")) &&
-            cardAttributeIds.some(
-              isAttributeId.bind(null, "expected_delivery_at"),
-            )
-          }
-          organisationId={interaction.organisationId}
-          canOperate={interaction.canOperate}
-          mutate={interaction.mutate}
-          refresh={interaction.refresh}
-        />
-      ) : null}
-    </article>
-  );
-}
-
-function isAttributeId(
-  wanted: string,
-  attributeId: AttributeDefinitionId,
-): boolean {
-  return String(attributeId) === wanted;
-}
-
-function renderCommerceBoardCardFact(
-  model: CommercePublishedCollectionModel,
-  names: ReadonlyMap<string, string>,
-  row: CommerceCollectionRow,
-  attributeId: AttributeDefinitionId,
-): React.ReactNode {
-  const attribute = findListEntryAttribute(row.entry, attributeId);
-  const definition = listAttributeDefinition(model, String(attributeId));
-  const label = commerceAttributeLabel(String(attributeId), definition);
-  if (attribute === undefined) {
-    return (
-      <div key={attributeId}>
-        <dt>{label}</dt>
-        <dd>{COMMERCE_VALUE_ABSENT}</dd>
-      </div>
-    );
-  }
-  const chip = commerceStatusChip(attribute.value, definition?.definition.kind);
-  return (
-    <div key={attributeId}>
-      <dt>{label}</dt>
-      <dd
-        className={
-          isNumericCommerceValue(attribute.value)
-            ? "commerce-numeric"
-            : undefined
-        }
       >
-        {chip === null ? (
-          resolveCommerceReferenceName(
-            names,
-            formatCommerceAttributeValue(
-              attribute.value,
-              definition?.definition.kind,
-            ),
-          )
-        ) : (
-          <StatusChip status={chip} />
-        )}
-      </dd>
-    </div>
+        <Select.Trigger aria-label={`Move ${row.entity.displayName} to lane`}>
+          <Select.Value />
+        </Select.Trigger>
+        <Select.Popup>{laneOptions.map(renderCommerceBoardLaneOption)}</Select.Popup>
+      </Select.Root>
+    ) : null;
+  return purchasing ? (
+    <PurchaseRequestDrawer
+      open={open}
+      close={close}
+      model={model}
+      row={row}
+      href={href}
+      facts={facts}
+      laneControl={laneControl}
+      organisationId={interaction.organisationId}
+      canOperate={interaction.canOperate}
+      mutate={interaction.mutate}
+      refresh={interaction.refresh}
+    />
+  ) : (
+    <CommerceBoardEntryDrawer
+      open={open}
+      close={close}
+      title={row.entity.displayName}
+      href={href}
+      facts={facts}
+      laneControl={laneControl}
+    />
   );
 }
 
-/** A stored identifier shows as the record's name once that name is known. */
-function resolveCommerceReferenceName(
-  names: ReadonlyMap<string, string>,
-  value: string,
-): string {
-  return names.get(value) ?? value;
-}
-
-function findListEntryAttribute(
+/** A lane change closes the drawer, so its outcome shows above the list. */
+function moveCommerceBoardEntryFromDrawer(
+  close: () => void,
+  model: CommercePublishedCollectionModel,
+  interaction: CommerceBoardInteraction,
   entry: CommerceListEntry,
-  attributeId: AttributeDefinitionId,
-) {
-  for (const attribute of entry.attributeValues) {
-    if (attribute.attributeId === attributeId) return attribute;
-  }
-  return undefined;
+  label: string,
+  value: string | null,
+): void {
+  if (value === null) return;
+  close();
+  selectCommerceBoardLane(model, interaction, entry, label, value);
 }
 
 function CommerceBoardPresence(
@@ -2288,7 +2348,7 @@ function renderCommerceBoardPresenceEntry(
   entry: CommerceBoardPresenceEntry,
 ): React.ReactNode {
   const activity =
-    entry.dragPreview.kind === "moving" ? "moving a card" : "viewing";
+    entry.dragPreview.kind === "moving" ? "changing a lane" : "viewing";
   return (
     <li key={entry.userId}>
       <span aria-hidden="true">
@@ -2301,58 +2361,6 @@ function renderCommerceBoardPresenceEntry(
 
 function commercePresenceInitial(displayName: string): string {
   return Array.from(displayName)[0]?.toUpperCase() ?? "?";
-}
-
-type CommerceBoardLaneOption = Readonly<{
-  id: string;
-  label: string;
-  acceptsMoves: boolean;
-  rows: readonly CommerceCollectionRow[];
-}>;
-
-function commerceBoardLaneOptions(
-  model: CommercePublishedCollectionModel,
-): readonly CommerceBoardLaneOption[] {
-  if (model.board === null || model.list === null) return [];
-  const laneAttributeId = model.board.configuration.laneAttributeId;
-  const definition = findListEntryDefinition(
-    model.list.entryAttributeDefinitions,
-    laneAttributeId,
-  );
-  if (definition === undefined || definition.definition.kind.kind !== "status")
-    return [];
-  const rowsByLane = new Map<string, readonly CommerceCollectionRow[]>();
-  for (const lane of model.board.lanes) rowsByLane.set(lane.key, lane.rows);
-  const lanes: CommerceBoardLaneOption[] = [];
-  for (const option of definition.definition.kind.options) {
-    const id = String(option.id);
-    lanes.push({
-      id,
-      label: option.label,
-      acceptsMoves: true,
-      rows: rowsByLane.get(id) ?? [],
-    });
-    rowsByLane.delete(id);
-  }
-  for (const [id, rows] of rowsByLane) {
-    lanes.push({
-      id,
-      label: id === "unassigned" ? "Unassigned" : `Unavailable value (${id})`,
-      acceptsMoves: false,
-      rows,
-    });
-  }
-  return lanes;
-}
-
-function findListEntryDefinition(
-  definitions: readonly ListEntryAttributeDefinition[],
-  attributeId: AttributeDefinitionId,
-): ListEntryAttributeDefinition | undefined {
-  for (const definition of definitions) {
-    if (definition.attributeId === attributeId) return definition;
-  }
-  return undefined;
 }
 
 function commerceStatusOptionLabel(
@@ -2388,82 +2396,6 @@ function selectCommerceTableStatus(
     label,
     statusAttributeId,
     value,
-    false,
-  );
-}
-
-function renderCommerceBoardLaneOption(
-  option: CommerceBoardLaneOption,
-): React.ReactNode {
-  return option.acceptsMoves ? (
-    <Select.Item key={option.id} value={option.id}>
-      {option.label}
-    </Select.Item>
-  ) : null;
-}
-
-function beginCommerceBoardDrag(
-  merchantRevision: CommerceSnapshotRevision,
-  interaction: CommerceBoardInteraction,
-  entry: CommerceListEntry,
-  label: string,
-  event: React.DragEvent<HTMLElement>,
-): void {
-  if (
-    !interaction.canOperate ||
-    interaction.mutate === undefined ||
-    commerceBoardIntentBlocksMutation(interaction.intent)
-  ) {
-    event.preventDefault();
-    return;
-  }
-  event.dataTransfer.effectAllowed = "move";
-  event.dataTransfer.setData("text/plain", String(entry.entryId));
-  interaction.setIntent({
-    kind: "dragging",
-    entryId: String(entry.entryId),
-    listId: String(entry.listId),
-    entryRevision: entry.revision,
-    merchantRevision,
-    desiredStatus: null,
-    desiredStatusLabel: null,
-    label,
-  });
-}
-
-function endCommerceBoardDrag(interaction: CommerceBoardInteraction): void {
-  interaction.setIntent(clearDraggingCommerceBoardIntent);
-}
-
-function clearDraggingCommerceBoardIntent(
-  intent: CommerceBoardMoveIntent,
-): CommerceBoardMoveIntent {
-  return intent.kind === "dragging" ? { kind: "idle" } : intent;
-}
-
-function allowCommerceBoardDrop(event: React.DragEvent<HTMLElement>): void {
-  event.preventDefault();
-  event.dataTransfer.dropEffect = "move";
-}
-
-function dropCommerceBoardEntry(
-  model: CommercePublishedCollectionModel,
-  interaction: CommerceBoardInteraction,
-  desiredStatus: string,
-  event: React.DragEvent<HTMLElement>,
-): void {
-  event.preventDefault();
-  const entryId = event.dataTransfer.getData("text/plain");
-  const row = model.rows.find(
-    (candidate) => String(candidate.entry.entryId) === entryId,
-  );
-  if (row === undefined) return;
-  void moveCommerceBoardEntry(
-    model,
-    interaction,
-    row.entry,
-    row.entity.displayName,
-    desiredStatus,
     false,
   );
 }
@@ -3916,21 +3848,6 @@ function entityResourceLink(
   if (entity.reference.typeId === "order")
     return resourceHref(entity.reference.entityId, "order");
   return null;
-}
-
-/**
- * The published definition for one of a list's entry attributes, which carries
- * the label a merchant reads and the option labels a status resolves through.
- */
-function listAttributeDefinition(
-  model: CommercePublishedCollectionModel,
-  attributeId: string,
-): ListEntryAttributeDefinition | undefined {
-  if (model.list === null) return undefined;
-  for (const definition of model.list.entryAttributeDefinitions) {
-    if (String(definition.attributeId) === attributeId) return definition;
-  }
-  return undefined;
 }
 
 function entityReferenceKey(reference: CommerceEntityRef): string {

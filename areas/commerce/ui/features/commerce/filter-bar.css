@@ -1,0 +1,33 @@
+/* One row of filter buttons, each with its count: Products, Ingredients &
+   supplies, and the lanes of a board view such as the Replenishment Queue. */
+.commerce-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.commerce-filter-bar button:not(:where(.pantry-select-trigger)) {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.commerce-filter-bar
+  button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--ink);
+}
+.commerce-filter-bar button:not(:where(.pantry-select-trigger)):hover {
+  background: var(--surface);
+}
+.commerce-filter-count {
+  margin-inline-start: 2px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.commerce-filter-bar [aria-pressed="true"] .commerce-filter-count {
+  color: var(--ink);
+}

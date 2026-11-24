@@ -597,20 +597,6 @@ function renderOrders(page: PageContext): React.ReactNode {
   if (!isCommercePage(state.page)) return null;
   return (
     <>
-      {/*
-       * Supplier payouts are the money side of the supplier
-       * relationship, so they belong with suppliers rather than on a
-       * page of their own that nobody would think to open.
-       */}
-      {state.page === "suppliers" && routeSelection.resourceId === null ? (
-        <SupplierPayoutsPanel
-          organisationId={state.organisation.organisation.organisationId}
-          workspaceName={state.organisation.organisation.name}
-          accessRole={payoutReadRole(state.organisation.membership.role)}
-          access={ACCESS_ROUTE_TRANSPORT}
-          mutate={supplierPayoutControlMutation}
-        />
-      ) : null}
       <CommerceEntityPlaneRoute
         organisationId={state.organisation.organisation.organisationId}
         page={state.page}
@@ -639,8 +625,36 @@ function renderOrders(page: PageContext): React.ReactNode {
         priceAllowances={offerPriceAllowanceInteraction(
           state.organisation.membership.role === "owner",
         )}
+        payouts={
+          state.page === "suppliers" && routeSelection.resourceId === null
+            ? renderSupplierPayouts.bind(null, page)
+            : undefined
+        }
       />
     </>
+  );
+}
+
+/**
+ * Supplier payouts are the money side of the supplier relationship, so they
+ * are a tab of Purchasing rather than a page of their own that nobody would
+ * think to open.
+ */
+function renderSupplierPayouts(
+  page: PageContext,
+  report: (status: Readonly<{ readable: boolean; attention: number }>) => void,
+): React.ReactNode {
+  const { state } = page;
+  return (
+    <SupplierPayoutsPanel
+      organisationId={state.organisation.organisation.organisationId}
+      workspaceName={state.organisation.organisation.name}
+      accessRole={payoutReadRole(state.organisation.membership.role)}
+      access={ACCESS_ROUTE_TRANSPORT}
+      mutate={supplierPayoutControlMutation}
+      inTab
+      onStatus={report}
+    />
   );
 }
 

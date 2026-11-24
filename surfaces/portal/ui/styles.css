@@ -5385,16 +5385,9 @@ label.checkbox-label {
 }
 
 /* Figures a reader compares down a column align and share a width. */
-.commerce-board-card-facts dd.commerce-numeric,
 .commerce-facts dd.commerce-numeric,
 .commerce-count strong {
   font-variant-numeric: tabular-nums;
-}
-
-.commerce-board-card h5 a {
-  color: var(--ink);
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
 .commerce-collection-grid[data-density="compact"] .crm-table :is(th, td) {
@@ -5455,17 +5448,6 @@ label.checkbox-label {
 
 .commerce-view-editor-disclosure[open] > summary {
   margin-bottom: 8px;
-}
-
-.commerce-purchasing-actions {
-  display: grid;
-  gap: 10px;
-  justify-items: start;
-}
-
-.commerce-purchasing-actions-row {
-  display: flex;
-  gap: 10px;
 }
 
 .commerce-view-editor h4,
@@ -5558,113 +5540,18 @@ label.checkbox-label {
   margin: 0;
 }
 
-.commerce-board {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-  align-items: start;
-}
-
-.commerce-board-lane {
-  display: grid;
-  gap: 12px;
-  min-width: 0;
-  padding: 14px;
-  border-radius: 16px;
-  background: var(--surface);
-}
-
-.commerce-board-lane h4 {
-  margin: 0;
-  font-size: 14px;
-}
-
-.commerce-board-cards {
-  display: grid;
-  gap: 10px;
-}
-
-.commerce-board-card {
-  display: grid;
-  gap: 8px;
-  padding: 14px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--paper);
-  box-shadow: 0 1px 2px oklch(0 0 0 / 0.04);
-}
-
-.commerce-board-card h5,
-.commerce-board-card p {
-  margin: 0;
-}
-
-.commerce-board-card h5 {
-  font-size: 14px;
-}
-
-.commerce-board-card-facts {
-  display: grid;
-  gap: 6px;
-  margin: 0;
-  font-size: 13px;
-}
-
-/* A card is narrow, so a field name sits above its value rather than beside
-   it — a two-column split at this width breaks labels mid-word. */
-.commerce-board-card-facts div {
-  display: grid;
-  gap: 1px;
-}
-
-.commerce-board-card-facts dt {
-  color: var(--ink-3);
-  font-size: 11px;
-}
-
-.commerce-board-card-facts dd {
-  margin: 0;
-  overflow-wrap: anywhere;
-}
-
-.commerce-board-move-control {
-  display: grid;
-  font-size: 12px;
-}
-
 .commerce-table-status-control {
   display: block;
   min-width: 10rem;
 }
 
-.commerce-table-status-control button:where(.pantry-select-trigger),
-.commerce-board-move-control button:where(.pantry-select-trigger) {
+.commerce-table-status-control button:where(.pantry-select-trigger) {
   min-height: 40px;
   width: 100%;
   border: 1px solid var(--hairline);
   border-radius: 9px;
   background: var(--paper);
   color: var(--ink);
-}
-
-.commerce-board-card-order {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  border-top: 1px solid var(--hairline);
-  padding-top: 8px;
-}
-
-.commerce-board-card-order p {
-  margin: 0;
-  color: var(--ink-2);
-  font-size: 12px;
-}
-
-.commerce-board-card-order button:not(:where(.pantry-select-trigger)) {
-  min-height: 44px;
 }
 
 .commerce-order-form label {
@@ -8743,39 +8630,6 @@ a.agent-work-row:hover .agent-work-title {
  * existing tokens; the dialogs reuse the .access35-dialog sheet.
  * ------------------------------------------------------------------------ */
 
-.commerce-tabs {
-  display: flex;
-  gap: 4px;
-  padding: 4px;
-  border-radius: 12px;
-  background: var(--surface);
-  overflow-x: auto;
-}
-
-.commerce-tab {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: 9px;
-  color: var(--ink-2);
-  background: transparent;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.commerce-tab:hover {
-  color: var(--ink);
-}
-
-.commerce-tab-active {
-  color: var(--ink-strong);
-  background: var(--paper);
-  box-shadow: var(--shadow-card);
-}
-
 /* Display options recede until asked for; the view itself is the content. */
 .commerce-display-options {
   margin-block: 4px;
@@ -8807,36 +8661,6 @@ a.agent-work-row:hover .agent-work-title {
   margin: 0;
   color: var(--ink-2);
   font-size: 12px;
-}
-
-/* A board is a pipeline: one horizontal track, scrolled rather than wrapped. */
-.commerce-board {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(248px, 1fr);
-  gap: 14px;
-  align-items: start;
-  overflow-x: auto;
-  padding-block-end: 6px;
-}
-
-.commerce-board-lane-heading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.commerce-board-lane-count {
-  color: var(--ink-3);
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-}
-
-/* An empty lane is a destination, not a card well. */
-.commerce-board-lane[data-empty="true"] {
-  background: transparent;
-  box-shadow: var(--ring);
 }
 
 .commerce-activity-list {
@@ -9009,10 +8833,6 @@ a.agent-work-row:hover .agent-work-title {
 }
 
 @media (max-width: 760px) {
-  .commerce-board {
-    grid-auto-columns: minmax(232px, 88%);
-  }
-
   .commerce-dialog-fields {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -9026,7 +8846,6 @@ a.agent-work-row:hover .agent-work-title {
 }
 
 .commerce-collection .commerce-collection-grid,
-.commerce-collection .commerce-tabs,
 .commerce-collection .commerce-display-options {
   max-width: 920px;
 }

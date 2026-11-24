@@ -1,5 +1,4 @@
 import React from "react";
-import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import type {
   CommerceEntity,
@@ -7,7 +6,6 @@ import type {
 } from "@purin-labs/commerce-contracts";
 
 import { Notice } from "@purin-labs/ui/page-components";
-import { SideDrawer } from "@purin-labs/ui/index";
 import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 import {
   activatePurchasing,
@@ -24,6 +22,11 @@ import type {
   CommerceCollectionRow,
   CommercePublishedCollectionModel,
 } from "./models";
+import {
+  CommerceBoardEntryDrawer,
+  type CommerceBoardListColumn,
+  type CommerceBoardListFact,
+} from "./board-list";
 import {
   supplierIdFromName,
   type PermissionRequired,
@@ -384,12 +387,78 @@ function closeSupplierDialog(
   setOpen(false);
 }
 
-export function PurchaseRequestCardEditor(
+/**
+ * The list row of one purchase request: the supplier under the item, then the
+ * amount, the due day and who orders it.
+ */
+export function purchaseRequestRowSummary(
+  entry: CommerceListEntry,
+  /** The value as the board shows it, or "" when the entry has none. */
+  text: (attributeId: string) => string,
+): Readonly<{
+  secondary: string | null;
+  columns: readonly CommerceBoardListColumn[];
+}> {
+  const supplier = text("supplier_id");
+  const required = text("required_quantity");
+  const owner = text("owner");
+  return {
+    secondary: supplier.length === 0 ? null : supplier,
+    columns: [
+      {
+        id: "required_quantity",
+        text:
+          required.length === 0
+            ? "—"
+            : `${required} ${text("quantity_unit")}`.trim(),
+        numeric: true,
+      },
+      {
+        id: "expected_delivery_at",
+        text: purchaseRequestDue(entry),
+        numeric: false,
+      },
+      {
+        id: "owner",
+        text: owner.length === 0 ? "No owner yet" : owner,
+        numeric: false,
+      },
+    ],
+  };
+}
+
+/** "Due 3 Sep", or that the request has no date yet. */
+function purchaseRequestDue(entry: CommerceListEntry): string {
+  const delivery = listEntryLocalTimestamp(entry, "expected_delivery_at");
+  if (delivery.length === 0) return "No date yet";
+  const day = new Date(delivery).toLocaleDateString(undefined, {
+    day: "numeric",
+    month: "short",
+  });
+  return `Due ${day}`;
+}
+
+/** The facts that the order form edits, so the drawer shows them one time. */
+const ORDER_FORM_FACTS: ReadonlySet<string> = new Set([
+  "owner",
+  "expected_delivery_at",
+  "notes",
+]);
+
+/**
+ * One purchase request in a drawer: its facts, its lane and, for a person who
+ * may operate purchasing, the order: who orders it, the expected delivery and
+ * notes, saved from the footer.
+ */
+export function PurchaseRequestDrawer(
   props: Readonly<{
+    open: boolean;
+    close: () => void;
     model: CommercePublishedCollectionModel;
     row: CommerceCollectionRow;
-    /** The card's facts already name who orders and the delivery day. */
-    ownerAndDeliveryShown: boolean;
+    href: string | null;
+    facts: readonly CommerceBoardListFact[];
+    laneControl: React.ReactNode;
     organisationId: string;
     canOperate: boolean;
     mutate: CommerceMutationTransport | undefined;
@@ -399,124 +468,83 @@ export function PurchaseRequestCardEditor(
   const [intent, setIntent] = React.useState<PurchasingControlIntent>({
     kind: "idle",
   });
-  const [open, setOpen] = React.useState(false);
   const formId = React.useId();
-  if (props.model.list === null) return null;
-  const summary = props.ownerAndDeliveryShown
-    ? null
-    : purchaseRequestSummary(props.row.entry);
-  const canOrder = props.canOperate && props.mutate !== undefined;
-  if (summary === null && !canOrder) return null;
-  const name = props.row.entity.displayName;
-  const close = setOpen.bind(null, false);
+  const canOrder =
+    props.model.list !== null && props.canOperate && props.mutate !== undefined;
   const saving = intent.kind === "saving";
   return (
-    <div className="commerce-board-card-order">
-      {summary === null ? null : <p>{summary}</p>}
+    <CommerceBoardEntryDrawer
+      open={props.open}
+      close={props.close}
+      title={props.row.entity.displayName}
+      href={props.href}
+      facts={
+        canOrder
+          ? props.facts.filter(isNotOrderFormFact)
+          : props.facts
+      }
+      laneControl={props.laneControl}
+      footer={
+        canOrder ? (
+          <button
+            type="submit"
+            form={formId}
+            className="connection-primary-action"
+            disabled={saving}
+          >
+            {saving ? "Saving…" : "Save order"}
+          </button>
+        ) : undefined
+      }
+    >
       {canOrder ? (
-        <button
-          type="button"
-          className="secondary"
-          aria-label={`Order ${name}`}
-          onClick={openPurchaseRequestDrawer.bind(null, setOpen, setIntent)}
+        <form
+          id={formId}
+          className="commerce-order-form"
+          aria-label={`Order ${props.row.entity.displayName}`}
+          onSubmit={submitPurchaseRequestCard.bind(
+            null,
+            { ...props, saved: props.close },
+            setIntent,
+          )}
         >
-          Order
-        </button>
+          <label>
+            <span>Who is ordering</span>
+            <input
+              name="owner"
+              required
+              autoComplete="off"
+              defaultValue={listEntryText(props.row.entry, "owner")}
+            />
+          </label>
+          <label>
+            <span>Expected delivery</span>
+            <input
+              name="expectedDeliveryAt"
+              type="datetime-local"
+              defaultValue={listEntryLocalTimestamp(
+                props.row.entry,
+                "expected_delivery_at",
+              )}
+            />
+          </label>
+          <label>
+            <span>Notes</span>
+            <textarea
+              name="notes"
+              rows={3}
+              defaultValue={listEntryText(props.row.entry, "notes")}
+            />
+          </label>
+          {renderPurchasingIntent(intent, props.organisationId, setIntent)}
+        </form>
       ) : null}
-      {/* The card is draggable; the drawer lives outside it so its fields
-          take the caret and text selection as usual. */}
-      {canOrder
-        ? createPortal(
-            <SideDrawer
-              open={open}
-              title={`Order ${name}`}
-              close={close}
-              className="commerce-order-drawer"
-              footer={
-                <button
-                  type="submit"
-                  form={formId}
-                  className="connection-primary-action"
-                  disabled={saving}
-                >
-                  {saving ? "Saving…" : "Save"}
-                </button>
-              }
-            >
-              <form
-                id={formId}
-                className="side-drawer-body commerce-order-form"
-                onSubmit={submitPurchaseRequestCard.bind(
-                  null,
-                  { ...props, saved: close },
-                  setIntent,
-                )}
-              >
-                <label>
-                  <span>Who is ordering</span>
-                  <input
-                    name="owner"
-                    required
-                    autoComplete="off"
-                    defaultValue={listEntryText(props.row.entry, "owner")}
-                  />
-                </label>
-                <label>
-                  <span>Expected delivery</span>
-                  <input
-                    name="expectedDeliveryAt"
-                    type="datetime-local"
-                    defaultValue={listEntryLocalTimestamp(
-                      props.row.entry,
-                      "expected_delivery_at",
-                    )}
-                  />
-                </label>
-                <label>
-                  <span>Notes</span>
-                  <textarea
-                    name="notes"
-                    rows={3}
-                    defaultValue={listEntryText(props.row.entry, "notes")}
-                  />
-                </label>
-                {renderPurchasingIntent(
-                  intent,
-                  props.organisationId,
-                  setIntent,
-                )}
-              </form>
-            </SideDrawer>,
-            document.body,
-          )
-        : null}
-    </div>
+    </CommerceBoardEntryDrawer>
   );
 }
 
-function openPurchaseRequestDrawer(
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  setIntent: React.Dispatch<React.SetStateAction<PurchasingControlIntent>>,
-): void {
-  setIntent({ kind: "idle" });
-  setOpen(true);
-}
-
-/**
- * One line from the queue entry that the board already read, for example
- * "Ordered by Ana · Fri 31 Oct". No owner means nobody has ordered yet.
- */
-function purchaseRequestSummary(entry: CommerceListEntry): string | null {
-  const owner = listEntryText(entry, "owner");
-  if (owner.length === 0) return null;
-  const delivery = listEntryLocalTimestamp(entry, "expected_delivery_at");
-  if (delivery.length === 0) return `Ordered by ${owner}`;
-  const day = new Date(delivery).toLocaleDateString(undefined, {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
-  return `Ordered by ${owner} · ${day}`;
+function isNotOrderFormFact(fact: CommerceBoardListFact): boolean {
+  return !ORDER_FORM_FACTS.has(fact.id);
 }
 
 /**

@@ -1,0 +1,85 @@
+/* The views of a commerce page as tabs, with the page's actions at the end of
+   the row. On Purchasing a Payouts tab joins them, marked when a payout waits
+   on someone. The tab row opens the page, right under its title. */
+.commerce-purchasing:where(.portal-band) {
+  padding-top: 8px;
+  border-top: 0;
+}
+
+.commerce-purchasing .commerce-collection {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* The column never grows past the screen; the tab row scrolls instead. */
+.commerce-collection {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.commerce-collection-bar {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.commerce-collection-bar .commerce-actions {
+  margin: 0 0 8px;
+}
+
+.commerce-tabs {
+  display: flex;
+  gap: 22px;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Positioned, so its screen-reader text stays inside the scrolling row. */
+.commerce-tab:where(button) {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 0;
+  padding: 10px 2px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 15px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.commerce-tab:hover {
+  color: var(--ink);
+}
+
+.commerce-tab-active:where(button) {
+  border-bottom-color: var(--ink);
+  color: var(--ink-strong);
+  font-weight: 600;
+}
+
+.commerce-tab-attention {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--ink-2);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.commerce-tab-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pantry-warning-text);
+}

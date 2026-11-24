@@ -46,7 +46,7 @@ async function reviewPortalPages(page) {
     {
       name: "supplier-board",
       path: "/commerce-preview.html?page=suppliers",
-      ready: ".commerce-board-card",
+      ready: ".commerce-board-row",
     },
     {
       name: "product-detail",

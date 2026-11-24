@@ -29,8 +29,7 @@
   min-width: 0;
 }
 .stock-toolbar,
-.stock-tools,
-.stock-filters {
+.stock-tools {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -89,39 +88,6 @@
   background: var(--paper);
   color: var(--ink);
   max-width: 220px;
-}
-.stock-filters {
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.stock-filters button:not(:where(.pantry-select-trigger)) {
-  border: 1px solid transparent;
-  border-radius: 8px;
-  padding: 8px 12px;
-  background: transparent;
-  color: var(--ink-2);
-  font-size: 13px;
-}
-.stock-filters button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
-  background: var(--surface);
-  color: var(--ink);
-}
-.stock-filters button:not(:where(.pantry-select-trigger)):hover {
-  background: var(--surface);
-}
-.stock-filters > span {
-  margin-left: auto;
-  font-size: 12px;
-  color: var(--ink-2);
-}
-/* The count of a filter, on Products and on Ingredients & supplies. */
-.stock-filter-count {
-  margin-inline-start: 2px;
-  color: var(--ink-2);
-  font-variant-numeric: tabular-nums;
-}
-.stock-filters [aria-pressed="true"] .stock-filter-count {
-  color: var(--ink);
 }
 .stock-detail-photo {
   display: block;

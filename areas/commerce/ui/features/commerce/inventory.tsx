@@ -27,6 +27,7 @@ import {
 import { assertNever } from "@purin-labs/std";
 import { formatMoneyMinor } from "@purin-labs/ui/formatting";
 import "./inventory.css";
+import { FilterCount } from "./filter-bar";
 import { needsReorder } from "./stock-status";
 import { InventoryProductionDialog } from "./inventory-production";
 import { InventoryReconciliationDialog } from "./inventory-reconciliation";
@@ -331,16 +332,6 @@ function matches(state: State, row: StockRow): boolean {
     `${row.name} ${row.category}`
       .toLowerCase()
       .includes(state.search.toLowerCase())
-  );
-}
-/** A filter's count, beside its name; nothing when the view has none. */
-function FilterCount(props: Readonly<{ value: number | undefined }>) {
-  // The space keeps the name and the count apart for a screen reader.
-  return props.value === undefined ? null : (
-    <>
-      {" "}
-      <span className="stock-filter-count">{props.value}</span>
-    </>
   );
 }
 
@@ -752,7 +743,7 @@ export class InventoryPage extends React.Component<Props, State> {
             )}
           </div>
           {timeline ? null : (
-            <div className="stock-filters" aria-label="Stock filters">
+            <div className="commerce-filter-bar" aria-label="Stock filters">
               <button
                 aria-pressed={this.state.filter === "all"}
                 onClick={this.changeFilter.bind(this, "all")}

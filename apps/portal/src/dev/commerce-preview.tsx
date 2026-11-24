@@ -1396,15 +1396,6 @@ function PreviewApp(): React.ReactNode {
             />
           ) : (
             <>
-              {page === "suppliers" && resourceId === null ? (
-                <SupplierPayoutsPanel
-                  organisationId="organisation_preview"
-                  workspaceName="Nuki Cafe"
-                  accessRole={params.get("role") === "viewer" ? null : "owner"}
-                  access={PREVIEW_PAYOUT_ACCESS}
-                  mutate={checkoutMutation}
-                />
-              ) : null}
               <CommerceEntityPlaneRoute
                 organisationId="organisation_preview"
                 page={page}
@@ -1424,6 +1415,23 @@ function PreviewApp(): React.ReactNode {
                   proposeAction: refusePreviewDescriptionProposal,
                 }}
                 onActionProposed={ignorePreviewProposal}
+                payouts={
+                  page === "suppliers" && resourceId === null
+                    ? (report) => (
+                        <SupplierPayoutsPanel
+                          organisationId="organisation_preview"
+                          workspaceName="Nuki Cafe"
+                          accessRole={
+                            params.get("role") === "viewer" ? null : "owner"
+                          }
+                          access={PREVIEW_PAYOUT_ACCESS}
+                          mutate={checkoutMutation}
+                          inTab
+                          onStatus={report}
+                        />
+                      )
+                    : undefined
+                }
               />
             </>
           )}

@@ -60,8 +60,18 @@ export function SupplierPayoutsPanel(props: {
   readonly accessRole: PayoutReadRole | null;
   readonly access: PayoutReadAccess;
   readonly mutate: PayoutMutationTransport;
+  /** In a tab that names it: the heading is for screen readers only. */
+  readonly inTab?: boolean;
+  /** Whether this person may read payouts, and how many wait on someone. */
+  readonly onStatus?: (
+    status: Readonly<{ readable: boolean; attention: number }>,
+  ) => void;
 }): React.ReactNode {
   const [state, setState] = React.useState<PayoutsState>({ kind: "loading" });
+  const { onStatus } = props;
+  React.useEffect(() => {
+    onStatus?.(payoutPanelStatus(state, props.accessRole !== null));
+  }, [onStatus, state, props.accessRole]);
   const [asking, setAsking] = React.useState(false);
   const [reads, setReads] = React.useState(0);
   const [display, setDisplay] = React.useState<"queue" | "timeline">("queue");
@@ -148,7 +158,9 @@ export function SupplierPayoutsPanel(props: {
   // These stay in both views: a person on the timeline still needs to know.
   const heading = (
     <header className="payout-panel-heading">
-      <h2>Supplier payouts</h2>
+      <h2 className={props.inTab === true ? "visually-hidden" : undefined}>
+        Supplier payouts
+      </h2>
       <div className="payout-panel-badges">
         {displaySwitch}
         {state.exceptions.length === 0 ? null : (
@@ -368,5 +380,24 @@ function loadPayoutsEffect(
   );
   return () => {
     cancelled = true;
+  };
+}
+
+/**
+ * A person who may not read payouts and cannot allow the reads has nothing
+ * to see in the Payouts tab. A payout waits on someone when it needs an
+ * operator, and an evidence conflict always does.
+ */
+function payoutPanelStatus(
+  state: PayoutsState,
+  canAllowReads: boolean,
+): Readonly<{ readable: boolean; attention: number }> {
+  if (state.kind === "not_permitted")
+    return { readable: canAllowReads, attention: 0 };
+  if (state.kind !== "ready") return { readable: true, attention: 0 };
+  return {
+    readable: true,
+    attention:
+      state.payouts.filter(needsOperator).length + state.exceptions.length,
   };
 }
