@@ -7,13 +7,7 @@ import {
   pageAddress,
   pageNavigation,
 } from "@purin-labs/ui/page-address";
-import {
-  Coffee,
-  Croissant,
-  LogOut,
-  Store,
-  type LucideIcon,
-} from "lucide-react";
+import { Coffee, Croissant, Store, type LucideIcon } from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router";
 import { Toaster } from "sonner";
 
@@ -75,28 +69,11 @@ import { assertNever } from "@purin-labs/std";
 import { ConsoleToolsProvider } from "@purin-labs/ui/console-tools";
 import type { ToolbarItem } from "@purin-labs/ui/overflow-toolbar";
 import { HoverLabel } from "@purin-labs/ui/hover-label";
-import type { Variant } from "@purin-labs/type-utils";
-
-const DOCS_ORIGIN = (
-  import.meta.env.VITE_DOCS_ORIGIN || "http://docs.localhost:3005"
-).replace(/\/$/, "");
-
-type PortalFrameIdentity =
-  | {
-      readonly kind: "ready";
-      readonly displayName: string;
-      readonly photoUrl?: string;
-      readonly usagePercent?: number;
-      readonly usageSource?: "Workspace" | "Codex";
-      readonly logout: () => Promise<void>;
-      /** The workspace's waiting permission requests, in a drawer. */
-      readonly permissionRequests?: {
-        /** Requests that wait for this person's decision; null for none. */
-        readonly count: number | null;
-        readonly open: () => void;
-      };
-    }
-  | { readonly kind: "loading" };
+import {
+  AccountMenu,
+  waitingRequestsText,
+  type PortalFrameIdentity,
+} from "./account-menu";
 
 type PortalFrameProps =
   | {
@@ -264,7 +241,7 @@ export function PortalFrame(props: PortalFrameProps): React.ReactNode {
       </Link>
     );
   const identityControl = (
-    <PortalIdentity identity={props.identity} placement="topbar" />
+    <AccountMenu identity={props.identity} placement="topbar" />
   );
   const [dockCount, setDockCount] = React.useState(0);
   const dockConsoleTools = React.useCallback(
@@ -291,7 +268,9 @@ export function PortalFrame(props: PortalFrameProps): React.ReactNode {
         );
   const consoleTools = {
     dockItems:
-      askControl === null ? [] : [{ key: "ask", node: askControl, pinned: true }],
+      askControl === null
+        ? []
+        : [{ key: "ask", node: askControl, pinned: true }],
     canvasItems: consoleToolItems(
       props.workspace === undefined ? null : (
         <WorkspaceSearchButton variant="toolbar" onClick={search.openSearch} />
@@ -644,220 +623,6 @@ function watchCodexUsage(
   return stopUsageSubscription.bind(null, subscription, timer);
 }
 
-/**
- * The account menu. In the top bar its trigger is the avatar; at the foot of
- * the sidebar the name follows the avatar, and the menu opens upward.
- */
-function PortalIdentity(props: {
-  readonly identity: PortalFrameIdentity;
-  readonly placement: "topbar" | "sidebar";
-}): React.ReactNode {
-  const menuRef = React.useRef<HTMLDetailsElement>(null);
-  useEffect(bindIdentityMenuDismissal.bind(null, menuRef), []);
-  switch (props.identity.kind) {
-    case "loading":
-      return (
-        <span className="portal-identity-placeholder" aria-hidden="true" />
-      );
-    case "ready": {
-      const usage = usageText(props.identity);
-      return (
-        <div className="identity-menu-anchor">
-          <details
-            ref={menuRef}
-            className="identity-menu"
-            onKeyDown={closeDetailsOnEscape}
-          >
-            <summary
-              className="identity-usage-trigger"
-              aria-label={`Account: ${props.identity.displayName}. ${waitingRequestsLabel(props.identity)}${usage}`}
-              title={usage}
-            >
-              <span className="identity-usage-avatar">
-                <svg
-                  className="identity-usage-ring"
-                  viewBox="0 0 40 40"
-                  aria-hidden="true"
-                >
-                  <circle
-                    className="identity-usage-track"
-                    cx="20"
-                    cy="20"
-                    r="17"
-                  />
-                  {props.identity.usagePercent === undefined ? null : (
-                    <circle
-                      className="identity-usage-progress"
-                      cx="20"
-                      cy="20"
-                      r="17"
-                      pathLength="100"
-                      strokeDasharray={`${props.identity.usagePercent} 100`}
-                    />
-                  )}
-                </svg>
-                <span className="identity-usage-photo" aria-hidden="true">
-                  {props.identity.photoUrl ? (
-                    <img
-                      src={props.identity.photoUrl}
-                      alt=""
-                      referrerPolicy="no-referrer"
-                    />
-                  ) : (
-                    identityInitial(props.identity.displayName)
-                  )}
-                </span>
-                <span className="identity-usage-value" aria-hidden="true">
-                  {props.identity.usagePercent === undefined
-                    ? "—"
-                    : `${props.identity.usagePercent}%`}
-                </span>
-                {waitingRequests(props.identity) === null ? null : (
-                  <span
-                    className="identity-usage-attention"
-                    aria-hidden="true"
-                  />
-                )}
-              </span>
-              {props.placement === "sidebar" ? (
-                <span className="identity-usage-name" aria-hidden="true">
-                  {props.identity.displayName}
-                </span>
-              ) : null}
-            </summary>
-            <div className="identity-menu-popover">
-              <div className="identity-menu-profile">
-                <span className="identity-menu-avatar" aria-hidden="true">
-                  {identityInitial(props.identity.displayName)}
-                </span>
-                <span className="identity-menu-profile-copy">
-                  <small>Signed in as</small>
-                  <strong>{props.identity.displayName}</strong>
-                </span>
-              </div>
-              <div className="identity-menu-divider" aria-hidden="true" />
-              {props.identity.permissionRequests === undefined ? null : (
-                <button
-                  className="identity-menu-action"
-                  type="button"
-                  onClick={openFromMenu.bind(
-                    null,
-                    props.identity.permissionRequests.open,
-                  )}
-                >
-                  <span>Permission requests</span>
-                  {props.identity.permissionRequests.count === null ? (
-                    <span aria-hidden="true">→</span>
-                  ) : (
-                    <span className="identity-menu-count">
-                      {props.identity.permissionRequests.count}
-                      <span className="visually-hidden"> waiting</span>
-                    </span>
-                  )}
-                </button>
-              )}
-              <Link
-                className="identity-menu-action"
-                to="/portal"
-                onClick={closeContainingDetails}
-              >
-                <span>Switch organisation</span>
-                <span aria-hidden="true">→</span>
-              </Link>
-              <a
-                className="identity-menu-action"
-                href={DOCS_ORIGIN}
-                target="_blank"
-                rel="noreferrer"
-                onClick={closeContainingDetails}
-              >
-                <span>Docs and resources</span>
-                <span aria-hidden="true">↗</span>
-              </a>
-              <button
-                className="identity-menu-signout"
-                type="button"
-                onClick={props.identity.logout}
-              >
-                <LogOut size={16} aria-hidden="true" />
-                Sign out
-              </button>
-            </div>
-          </details>
-        </div>
-      );
-    }
-    default:
-      return assertNever(props.identity, "Unexpected value");
-  }
-}
-
-function usageText(identity: Variant<PortalFrameIdentity, "ready">): string {
-  return identity.usagePercent === undefined
-    ? "Usage unavailable"
-    : `${identity.usageSource ?? "Workspace"} usage: ${identity.usagePercent}% used`;
-}
-
-function waitingRequests(
-  identity: Variant<PortalFrameIdentity, "ready">,
-): number | null {
-  return identity.permissionRequests?.count ?? null;
-}
-
-function waitingRequestsLabel(
-  identity: Variant<PortalFrameIdentity, "ready">,
-): string {
-  const count = waitingRequests(identity);
-  return count === null
-    ? ""
-    : `${count} permission ${count === 1 ? "request waits" : "requests wait"}. `;
-}
-
-/** What the closed drawer's toggle says waits inside: the account's requests. */
-function waitingRequestsText(identity: PortalFrameIdentity): string | null {
-  if (identity.kind !== "ready") return null;
-  const count = waitingRequests(identity);
-  return count === null
-    ? null
-    : `${count} permission ${count === 1 ? "request" : "requests"} waiting`;
-}
-
-function identityInitial(displayName: string): string {
-  const initial = Array.from(displayName.trim())[0];
-  return initial === undefined ? "P" : initial.toLocaleUpperCase();
-}
-
-function bindIdentityMenuDismissal(
-  menuRef: React.RefObject<HTMLDetailsElement | null>,
-): () => void {
-  const listener = closeIdentityMenuOnOutsidePointerDown.bind(null, menuRef);
-  document.addEventListener("pointerdown", listener);
-  return removeIdentityMenuDismissal.bind(null, listener);
-}
-
-function removeIdentityMenuDismissal(
-  listener: (event: PointerEvent) => void,
-): void {
-  document.removeEventListener("pointerdown", listener);
-}
-
-function closeIdentityMenuOnOutsidePointerDown(
-  menuRef: React.RefObject<HTMLDetailsElement | null>,
-  event: PointerEvent,
-): void {
-  const menu = menuRef.current;
-  const target = event.target;
-  if (
-    menu === null ||
-    !menu.open ||
-    !(target instanceof Node) ||
-    menu.contains(target)
-  ) {
-    return;
-  }
-  menu.open = false;
-}
-
 function PortalSidebarHeader(props: {
   readonly organisation: OrganisationShellContext;
   readonly workspace: WorkspaceShellContext;
@@ -905,7 +670,7 @@ function PortalSidebarFoot(props: {
 }): React.ReactNode {
   return (
     <>
-      <PortalIdentity identity={props.identity} placement="sidebar" />
+      <AccountMenu identity={props.identity} placement="sidebar" />
       <ConsoleSidebarTooltip label="Appearance" enabled={true}>
         <span className="console-sidebar-appearance">
           <AccountAppearanceControl side={props.collapsed ? "right" : "top"} />
@@ -931,9 +696,7 @@ function PortalBrand(props: {
         src="/brand/pantry-mark-dark-32.png"
         alt=""
       />
-      <span className="portal-brand-copy">
-        Purin Pantry
-      </span>
+      <span className="portal-brand-copy">Purin Pantry</span>
     </Link>
   );
 }
@@ -1218,33 +981,6 @@ function cancelScheduledPortalFocus(
 ): void {
   window.cancelAnimationFrame(frame);
   observer.disconnect();
-}
-
-function closeDetailsOnEscape(
-  event: React.KeyboardEvent<HTMLDetailsElement>,
-): void {
-  if (event.key !== "Escape" || !event.currentTarget.open) return;
-  event.preventDefault();
-  const summary = event.currentTarget.querySelector<HTMLElement>("summary");
-  event.currentTarget.open = false;
-  summary?.focus();
-}
-
-/** Close the account menu, then open what its entry names. */
-function openFromMenu(
-  open: () => void,
-  event: React.MouseEvent<HTMLButtonElement>,
-): void {
-  const disclosure = event.currentTarget.closest<HTMLDetailsElement>("details");
-  if (disclosure !== null) disclosure.open = false;
-  open();
-}
-
-function closeContainingDetails(
-  event: React.MouseEvent<HTMLAnchorElement>,
-): void {
-  const disclosure = event.currentTarget.closest<HTMLDetailsElement>("details");
-  if (disclosure !== null) disclosure.open = false;
 }
 
 function closeChatFromTrigger(

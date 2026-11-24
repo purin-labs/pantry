@@ -55,10 +55,9 @@
   box-shadow: inset 0 -1px 0 var(--border);
 }
 
-.workspace-command-close {
-  min-height: 44px;
-  padding: 0 9px;
-  border: 0;
+/* The keys draw as small keycaps: the Esc button and the footer hints. */
+.workspace-command-close,
+.workspace-command-footer kbd {
   border-radius: 7px;
   background: var(--paper);
   box-shadow: var(--ring);
@@ -66,11 +65,17 @@
   font-family: inherit;
   font-size: 11px;
   font-weight: 500;
+}
+
+.workspace-command-close {
+  min-height: 44px;
+  padding: 0 9px;
+  border: 0;
   cursor: pointer;
 }
 
 .workspace-command-results {
-  max-height: min(480px, calc(100dvh - 120px));
+  max-height: min(440px, calc(100dvh - 160px));
   overflow-y: auto;
   overscroll-behavior: var(--portal-contained-overscroll);
   padding: 4px 8px 8px;
@@ -138,10 +143,40 @@
   text-align: center;
 }
 
+/* The keys that move, open and close. */
+.workspace-command-footer {
+  min-height: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--border);
+  color: var(--ink-3);
+  font-size: 11px;
+}
+
+.workspace-command-footer span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.workspace-command-footer kbd {
+  min-width: 22px;
+  padding: 3px 5px;
+  text-align: center;
+}
+
 @media (max-width: 760px) {
   .workspace-command-dialog {
     width: calc(100vw - 20px);
     max-height: calc(100dvh - 20px);
+  }
+
+  .workspace-command-footer {
+    justify-content: center;
   }
 }
 

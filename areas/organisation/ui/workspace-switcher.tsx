@@ -37,6 +37,8 @@ type SwitcherProps = {
   readonly collapsed: boolean;
 };
 
+type MenuProps = SwitcherProps & { readonly close: () => void };
+
 export function WorkspaceSwitcher(props: SwitcherProps): React.ReactNode {
   const [open, setOpen] = React.useState(false);
   return (
@@ -64,8 +66,8 @@ export function WorkspaceSwitcher(props: SwitcherProps): React.ReactNode {
         <Popover.Positioner
           side={props.collapsed ? "right" : "bottom"}
           align="start"
-          sideOffset={8}
-          collisionPadding={12}
+          sideOffset={6}
+          collisionPadding={8}
           className="workspace-switcher-positioner"
         >
           <Popover.Popup
@@ -83,23 +85,18 @@ export function WorkspaceSwitcher(props: SwitcherProps): React.ReactNode {
   );
 }
 
-function WorkspaceSwitcherMenu(
-  props: SwitcherProps & { readonly close: () => void },
-): React.ReactNode {
+/**
+ * One list: the workspaces of the current organisation under its name, then
+ * one row for each other organisation. The find field finds a workspace in
+ * any organisation, and each result names its organisation.
+ */
+function WorkspaceSwitcherMenu(props: MenuProps): React.ReactNode {
   const [query, setQuery] = React.useState("");
   const normalisedQuery = query.trim().toLocaleLowerCase();
-  const choices = props.organisation.choices
-    .filter(matchesOrganisation.bind(null, normalisedQuery))
-    .sort(
-      currentOrganisationFirst.bind(
-        null,
-        props.organisation.organisationHandle,
-      ),
-    );
   return (
     <>
       <label className="workspace-switcher-search">
-        <Search size={18} aria-hidden="true" />
+        <Search size={16} aria-hidden="true" />
         <input
           type="search"
           aria-label="Find a workspace"
@@ -108,27 +105,124 @@ function WorkspaceSwitcherMenu(
           onChange={changeQuery.bind(null, setQuery)}
         />
       </label>
-      <div className="workspace-switcher-groups">
-        {choices.map(renderOrganisation.bind(null, props, normalisedQuery))}
-        {choices.length === 0 ? (
-          <p className="workspace-switcher-empty" role="status">
-            No organisations or workspaces found.
-          </p>
-        ) : null}
-      </div>
+      {normalisedQuery === "" ? (
+        <OrganisationList {...props} />
+      ) : (
+        <FoundWorkspaces {...props} query={normalisedQuery} />
+      )}
+      <div className="workspace-switcher-rule" aria-hidden="true" />
       <Link
-        className="workspace-switcher-footer"
+        className="workspace-switcher-row workspace-switcher-all"
         to="/portal"
         onClick={props.close}
       >
-        <LayoutGrid size={20} aria-hidden="true" />
-        <span>
+        <span className="workspace-switcher-row-icon" aria-hidden="true">
+          <LayoutGrid size={18} />
+        </span>
+        <span className="workspace-switcher-row-text">
           <strong>All organisations</strong>
           <small>View and manage organisations</small>
         </span>
       </Link>
     </>
   );
+}
+
+function OrganisationList(props: MenuProps): React.ReactNode {
+  const headingId = React.useId();
+  const current = currentOrganisation(props);
+  const others = props.organisation.choices.filter(
+    isOtherOrganisation.bind(null, current.organisationHandle),
+  );
+  return (
+    <>
+      <div role="group" aria-labelledby={headingId}>
+        <p className="workspace-switcher-heading" id={headingId}>
+          {current.name}
+        </p>
+        {current.workspaces.map(
+          renderWorkspace.bind(null, props.workspace, props.close, null),
+        )}
+      </div>
+      {others.length === 0 ? null : (
+        <>
+          <div className="workspace-switcher-rule" aria-hidden="true" />
+          {others.map(renderOrganisation.bind(null, props.close))}
+        </>
+      )}
+    </>
+  );
+}
+
+function FoundWorkspaces(
+  props: MenuProps & { readonly query: string },
+): React.ReactNode {
+  const rows = [...props.organisation.choices]
+    .sort(
+      currentOrganisationFirst.bind(
+        null,
+        props.organisation.organisationHandle,
+      ),
+    )
+    .flatMap(foundRows.bind(null, props.query, props.workspace, props.close));
+  return rows.length === 0 ? (
+    <p className="workspace-switcher-empty" role="status">
+      No organisations or workspaces found.
+    </p>
+  ) : (
+    rows
+  );
+}
+
+/**
+ * The rows that one organisation adds to a find. An organisation name that
+ * matches brings all its workspaces; an organisation with no workspace is one
+ * row that opens the organisation.
+ */
+function foundRows(
+  query: string,
+  current: WorkspaceShellContext,
+  close: () => void,
+  organisation: OrganisationChoice,
+): React.ReactNode[] {
+  const organisationMatches = organisation.name
+    .toLocaleLowerCase()
+    .includes(query);
+  if (organisation.workspaces.length === 0)
+    return organisationMatches ? [renderOrganisation(close, organisation)] : [];
+  const workspaces = organisationMatches
+    ? organisation.workspaces
+    : organisation.workspaces.filter(matchesWorkspace.bind(null, query));
+  return workspaces.map(
+    renderWorkspace.bind(null, current, close, organisation.name),
+  );
+}
+
+/** The current organisation, also when the choices do not name it. */
+function currentOrganisation(props: MenuProps): OrganisationChoice {
+  return (
+    props.organisation.choices.find(
+      isOrganisation.bind(null, props.organisation.organisationHandle),
+    ) ?? {
+      organisationHandle: props.organisation.organisationHandle,
+      name: props.organisation.name,
+      workspaces: props.workspace.choices,
+    }
+  );
+}
+
+function isOrganisation(
+  handle: string,
+  organisation: OrganisationChoice,
+): boolean {
+  return organisation.organisationHandle === handle;
+}
+
+function isOtherOrganisation(
+  handle: string,
+  organisation: OrganisationChoice,
+): boolean {
+  return organisation.organisationHandle !== handle;
 }
 
 function changeQuery(
@@ -153,85 +247,48 @@ function currentOrganisationFirst(
   );
 }
 
-function matchesOrganisation(
-  query: string,
-  organisation: OrganisationChoice,
-): boolean {
-  return (
-    organisation.name.toLocaleLowerCase().includes(query) ||
-    organisation.workspaces.some(matchesWorkspace.bind(null, query))
-  );
-}
-
+/**
+ * Another organisation is one row: its name, and its workspaces in the hint.
+ * The row opens the organisation, and the Portal opens the workspace that the
+ * person used last there.
+ */
 function renderOrganisation(
-  props: SwitcherProps & { readonly close: () => void },
-  query: string,
+  close: () => void,
   organisation: OrganisationChoice,
 ): React.ReactNode {
+  const first = organisation.workspaces[0];
   return (
-    <OrganisationGroup
-      key={`${organisation.organisationHandle}:${query}`}
-      organisation={organisation}
-      current={props.workspace}
-      query={query}
-      close={props.close}
-    />
-  );
-}
-
-function OrganisationGroup(props: {
-  readonly organisation: OrganisationChoice;
-  readonly current: WorkspaceShellContext;
-  readonly query: string;
-  readonly close: () => void;
-}): React.ReactNode {
-  const isCurrent =
-    props.organisation.organisationHandle === props.current.organisationHandle;
-  const workspaces = props.organisation.name
-    .toLocaleLowerCase()
-    .includes(props.query)
-    ? props.organisation.workspaces
-    : props.organisation.workspaces.filter(
-        matchesWorkspace.bind(null, props.query),
-      );
-  return (
-    <details
-      className="workspace-switcher-group"
-      open={isCurrent || props.query.length > 0}
+    <Link
+      key={organisation.organisationHandle}
+      className="workspace-switcher-row"
+      to={organisationPath(organisation.organisationHandle)}
+      onClick={close}
     >
-      <summary>
-        <span
-          className="console-switcher-avatar console-switcher-organisation-avatar"
-          aria-hidden="true"
-        />
-        <span>
-          <strong>{props.organisation.name}</strong>
-          {isCurrent ? <small>Current organisation</small> : null}
-        </span>
-        <ChevronDown
-          size={16}
-          className="workspace-switcher-chevron"
-          aria-hidden="true"
-        />
-      </summary>
-      <div className="workspace-switcher-workspaces">
-        {workspaces.map(renderWorkspace.bind(null, props.current, props.close))}
-        {props.organisation.workspaces.length === 0 ? (
-          <Link
-            to={organisationPath(props.organisation.organisationHandle)}
-            onClick={props.close}
-          >
-            Open organisation to create a workspace
-          </Link>
-        ) : null}
-      </div>
-    </details>
+      <span
+        className="console-switcher-avatar console-switcher-organisation-avatar"
+        aria-hidden="true"
+      />
+      <span className="workspace-switcher-row-text">
+        <strong>{organisation.name}</strong>
+        <small>
+          {first === undefined
+            ? "Open organisation to create a workspace"
+            : organisation.workspaces.map(workspaceName).join(", ")}
+        </small>
+      </span>
+    </Link>
   );
 }
 
+function workspaceName(workspace: WorkspaceChoice): string {
+  return workspace.name;
+}
+
+/** A workspace row. In a find, the hint names its organisation. */
 function renderWorkspace(
   current: WorkspaceShellContext,
   close: () => void,
+  organisationName: string | null,
   workspace: WorkspaceChoice,
 ): React.ReactNode {
   const selected =
@@ -239,22 +296,31 @@ function renderWorkspace(
     workspace.workspaceHandle === current.workspaceHandle;
   return (
     <Link
-      key={workspace.workspaceHandle}
+      key={`${workspace.organisationHandle}/${workspace.workspaceHandle}`}
       to={workspacePagePath(
         workspace.organisationHandle,
         workspace.workspaceHandle,
         "overview",
       )}
       onClick={close}
-      className="workspace-switcher-workspace"
+      className="workspace-switcher-row"
       aria-current={selected ? "page" : undefined}
     >
       <span
         className="console-switcher-avatar console-switcher-workspace-avatar"
         aria-hidden="true"
       />
-      <span>{workspace.name}</span>
-      {selected ? <Check size={18} aria-hidden="true" /> : null}
+      <span className="workspace-switcher-row-text">
+        <span>{workspace.name}</span>
+        {organisationName === null ? null : <small>{organisationName}</small>}
+      </span>
+      {selected ? (
+        <Check
+          size={16}
+          className="workspace-switcher-check"
+          aria-hidden="true"
+        />
+      ) : null}
     </Link>
   );
 }

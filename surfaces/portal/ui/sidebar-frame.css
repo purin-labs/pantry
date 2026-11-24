@@ -201,12 +201,21 @@
   white-space: nowrap;
 }
 
-/* The account menu opens upward from the foot. */
+.console-sidebar-foot .identity-menu[open] > summary {
+  background: var(--console-rail-hover);
+}
+
+/* The account menu opens upward from the foot, with the width of the foot:
+   the foot, not the account row, places it. */
+.console-sidebar-foot .identity-menu {
+  position: static;
+}
+
 .console-sidebar .console-sidebar-foot .identity-menu > div {
   inset-block-start: auto;
-  inset-block-end: calc(100% + 8px);
-  inset-inline-start: 0;
-  inset-inline-end: auto;
+  inset-block-end: calc(100% + 6px);
+  inset-inline: 0;
+  width: auto;
   max-height: calc(100dvh - 96px);
 }
 
@@ -295,6 +304,15 @@
   > summary {
   justify-content: center;
   padding: 0;
+}
+
+/* The collapsed foot is narrow: the menu keeps its own width. */
+.console-sidebar[data-mode="rail"][data-state="collapsed"]
+  .console-sidebar-foot
+  .identity-menu
+  > div {
+  inset-inline-end: auto;
+  width: 288px;
 }
 
 /* ---------- the drawer on a narrow screen ---------- */

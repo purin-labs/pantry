@@ -264,6 +264,18 @@ export function WorkspaceSearchDialog(props: {
           )
         )}
       </div>
+      <footer className="workspace-command-footer">
+        <span>
+          <kbd>↑</kbd>
+          <kbd>↓</kbd> Navigate
+        </span>
+        <span>
+          <kbd>↵</kbd> Open
+        </span>
+        <span>
+          <kbd>Esc</kbd> Close
+        </span>
+      </footer>
     </dialog>
   );
 }

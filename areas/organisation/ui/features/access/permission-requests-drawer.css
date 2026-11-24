@@ -76,39 +76,3 @@
   grid-column: 2;
   justify-self: start;
 }
-
-/* The account menu's entry is a button among links: it keeps their look. */
-.identity-menu button.identity-menu-action {
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-  text-align: start;
-}
-
-.identity-menu button:not(:where(.pantry-select-trigger)).identity-menu-action:hover,
-.identity-menu button:not(:where(.pantry-select-trigger)).identity-menu-action:focus-visible {
-  background: var(--surface);
-}
-
-.identity-menu .identity-menu-action > span.identity-menu-count:last-child {
-  min-inline-size: 22px;
-  padding: 1px 7px;
-  border-radius: 999px;
-  color: var(--pantry-on-primary);
-  background: var(--pantry-primary);
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 18px;
-  text-align: center;
-}
-
-.identity-usage-attention {
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline-end: 0;
-  inline-size: 10px;
-  block-size: 10px;
-  border: 2px solid var(--ground);
-  border-radius: 50%;
-  background: var(--pantry-primary);
-}

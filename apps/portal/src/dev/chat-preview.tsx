@@ -29,6 +29,34 @@ installChatPreviewFetch();
 const organisationId =
   new URL(window.location.href).searchParams.get("organisation") ??
   "organisation_chat_preview";
+// Two organisations, so the workspace menu shows the current one's
+// workspaces and one row for the other.
+const PREVIEW_WORKSPACES = [
+  {
+    organisationHandle: "nuki",
+    workspaceHandle: "cafe",
+    name: "Cafe operations",
+  },
+  {
+    organisationHandle: "nuki",
+    workspaceHandle: "central",
+    name: "Central kitchen",
+  },
+];
+const PREVIEW_ORGANISATIONS = [
+  {
+    organisationHandle: "nuki",
+    name: "Nuki Inc.",
+    workspaces: PREVIEW_WORKSPACES,
+  },
+  {
+    organisationHandle: "noix",
+    name: "Noix test shop",
+    workspaces: [
+      { organisationHandle: "noix", workspaceHandle: "shop", name: "Shop" },
+    ],
+  },
+];
 function previewLogout(): Promise<void> {
   return Promise.resolve();
 }
@@ -72,13 +100,13 @@ function ChatPreviewContent(): React.ReactNode {
       organisation={{
         organisationHandle: "nuki",
         name: "Nuki Inc.",
-        choices: [],
+        choices: PREVIEW_ORGANISATIONS,
       }}
       workspace={{
         organisationHandle: "nuki",
         workspaceHandle: "cafe",
         name: "Cafe operations",
-        choices: [],
+        choices: PREVIEW_WORKSPACES,
       }}
       sidebar={{
         activePage: previewPage(location.pathname),

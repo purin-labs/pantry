@@ -1104,173 +1104,6 @@ h2 {
   flex: 0 0 18px;
 }
 
-.identity-menu {
-  position: relative;
-}
-
-.portal-identity-placeholder {
-  display: block;
-  inline-size: 44px;
-  block-size: 44px;
-  justify-self: end;
-  border-radius: 9999px;
-  background: var(--surface);
-}
-
-.identity-menu > summary {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  padding: 0 14px;
-  border-radius: 9999px;
-  background: var(--paper);
-  box-shadow: var(--ring);
-  color: var(--ink);
-  font-size: 13px;
-  cursor: pointer;
-  list-style: none;
-}
-
-.identity-menu > summary::-webkit-details-marker {
-  display: none;
-}
-
-.identity-menu > div {
-  position: absolute;
-  z-index: 10;
-  inset-block-start: calc(100% + 8px);
-  inset-inline-end: 0;
-  width: min(304px, calc(100vw - 32px));
-  display: grid;
-  gap: 10px;
-  padding: 10px;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  background: var(--paper);
-  box-shadow:
-    0 20px 40px color-mix(in oklch, var(--pantry-shadow-color) 12%, transparent),
-    0 4px 12px color-mix(in oklch, var(--pantry-shadow-color) 8%, transparent);
-}
-
-.identity-menu-profile {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px;
-}
-
-:is(.portal-workspace-header, .console-sidebar-foot) .identity-menu-avatar {
-  display: inline-grid;
-  width: 36px;
-  height: 36px;
-  flex: 0 0 36px;
-  place-items: center;
-  border-radius: 11px;
-  background: var(--portal-selected);
-  color: var(--ink-strong);
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.identity-menu-profile-copy {
-  min-width: 0;
-  display: grid;
-  gap: 2px;
-}
-
-.identity-menu-profile-copy small,
-.identity-menu-profile-copy strong {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.identity-menu-profile-copy small {
-  color: var(--ink-2);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.identity-menu-profile-copy strong {
-  color: var(--ink);
-  font-size: 15px;
-  font-weight: 500;
-}
-
-.identity-menu-divider {
-  height: 1px;
-  margin-inline: 8px;
-  background: var(--hairline);
-}
-
-.identity-menu-action,
-.identity-menu-signout {
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-inline: 12px;
-  border-radius: 11px;
-  color: var(--ink);
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.identity-menu-action {
-  text-decoration: none;
-  transition:
-    background-color 150ms ease,
-    color 150ms ease;
-}
-
-.identity-menu-action:hover,
-.identity-menu-action:focus-visible {
-  background: var(--surface);
-}
-
-.identity-menu-action span:last-child {
-  color: var(--ink-2);
-  font-size: 18px;
-  line-height: 1;
-}
-
-.identity-menu-action > span:first-child {
-  max-width: none;
-  color: inherit;
-  font-size: inherit;
-}
-
-.identity-menu-signout {
-  width: 100%;
-  justify-content: center;
-  border: 1px solid var(--border);
-  background: transparent;
-  box-shadow: none;
-  cursor: pointer;
-  transition:
-    background-color 150ms ease,
-    border-color 150ms ease,
-    color 150ms ease;
-}
-
-:is(.portal-workspace-header, .console-sidebar-foot) .identity-menu-signout {
-  min-height: 42px;
-  padding: 0 12px;
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  background: transparent;
-  box-shadow: none;
-  font-size: 14px;
-}
-
-:is(.portal-workspace-header, .console-sidebar-foot) .identity-menu-signout:is(:hover, :focus-visible) {
-  border-color: var(--border);
-  background: var(--surface);
-  color: var(--ink);
-}
-
 .portal-nav span {
   overflow: hidden;
   max-width: 260px;
@@ -6380,12 +6213,6 @@ button:not(:where(.pantry-select-trigger)).danger-button:disabled {
   box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%);
 }
 
-.console-switcher-all-avatar {
-  background: var(--surface);
-  color: var(--ink-2);
-  letter-spacing: 1px;
-}
-
 .console-switcher-label {
   min-width: 0;
   max-inline-size: 160px;
@@ -6424,98 +6251,6 @@ button:not(:where(.pantry-select-trigger)).danger-button:disabled {
     max-inline-size var(--portal-sidebar-motion)
       var(--portal-sidebar-layout-ease),
     opacity var(--portal-sidebar-fast-motion) ease;
-}
-
-.console-switcher-menu {
-  --glide-highlight-background: var(--portal-selected);
-  --glide-highlight-radius: 12px;
-  z-index: 100;
-  box-sizing: border-box;
-  width: 320px;
-  max-width: calc(100vw - 24px);
-  max-height: var(--radix-dropdown-menu-content-available-height);
-  overflow-y: auto;
-  overscroll-behavior: var(--portal-contained-overscroll);
-  display: grid;
-  gap: 4px;
-  padding: 8px;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  background: var(--paper);
-  box-shadow: 0 24px 34px -28px
-    color-mix(in oklch, var(--pantry-shadow-color) 34%, transparent);
-}
-
-.console-switcher-menu-item {
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 10px;
-  border: 0;
-  border-radius: 12px;
-  background: transparent;
-  color: var(--ink);
-  font: inherit;
-  text-align: start;
-  cursor: pointer;
-}
-
-.console-switcher-menu-item:focus-visible {
-  outline: none;
-}
-
-@media (forced-colors: active) {
-  .console-switcher-menu-item:focus-visible {
-    outline: 2px solid Highlight;
-  }
-}
-
-.console-switcher-menu-item .console-switcher-avatar {
-  width: 34px;
-  height: 34px;
-  flex-basis: 34px;
-}
-
-.console-switcher-menu-item.is-active {
-  background: var(--portal-selected);
-}
-
-.console-switcher-menu-item.is-disabled {
-  opacity: 0.48;
-  cursor: not-allowed;
-}
-
-.console-switcher-menu-copy {
-  min-width: 0;
-  flex: 1;
-  display: grid;
-  gap: 1px;
-}
-
-.console-switcher-menu-copy strong,
-.console-switcher-menu-copy small {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.console-switcher-menu-copy strong {
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.console-switcher-menu-copy small {
-  color: var(--ink-2);
-  font-size: 12px;
-}
-
-.console-switcher-check {
-  flex: 0 0 20px;
-  text-align: center;
-  color: var(--ok-text);
 }
 
 .console-sidebar-navigation {
@@ -7215,7 +6950,6 @@ textarea:focus-visible {
     details:not(
       .identity-menu,
       .organisation-menu,
-      .workspace-switcher-group,
       .task-list,
       .chat-composer-toolbar details,
       .agent-work-row,
@@ -7261,8 +6995,7 @@ textarea:focus-visible {
       details[open]:not(
           .identity-menu,
           .organisation-menu,
-          .workspace-switcher-group,
-          .task-list,
+              .task-list,
           .chat-composer-toolbar details,
           .agent-work-row,
           .connection-advanced,

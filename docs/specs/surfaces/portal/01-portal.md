@@ -83,6 +83,12 @@ type check refuses a page without one. Page code loads on demand.
 - **Sidebar head.** It holds the Purin Pantry brand, the Organisation and workspace
   switcher, and the search button ("Search", `⌘ K`). The brand and the workspace switcher
   open the Organisation list ("All organisations").
+- **Workspace menu.** The switcher opens one list, a little wider than the sidebar: a
+  find field, the workspaces of the current Organisation under its name, one row for each
+  other Organisation, and "All organisations". The row of another Organisation names its
+  workspaces and opens the Organisation, which opens the workspace that the person used
+  last there. The find field finds a workspace in any Organisation, and each result
+  names its Organisation.
 - **Groups.** The sidebar shows three groups, with a thin line between them: Home, Inbox,
   Agents and Knowledge with no title; the pages of one product under the product tabs;
   and Settings with its title.
@@ -110,9 +116,10 @@ type check refuses a page without one. Page code loads on demand.
   hides the rail and draws all the console tools (search, appearance, **Ask** and the
   account), but full-screen chat keeps the rail. At 1160 px and below, the shell keeps
   its top bar and its drawer.
-- **Account menu.** It opens upward from the sidebar foot. It shows the name and a usage
-  ring that reads again every 60 s. It links to permission requests, the Organisation
-  list and the docs, and it signs out. Escape closes it and returns focus to the avatar.
+- **Account menu.** It opens upward from the sidebar foot, with the width of the foot.
+  Its title is the name, the usage line and a bar for the same percent; the usage reads
+  again every 60 s. Under it are permission requests with their count, the docs (a new
+  tab) and sign out, each with an icon. Escape closes it and returns focus to the avatar.
 - **Focus, title and toasts.** A route change moves focus to the page `h1`, or to the
   main element if the page has no `h1`. While the chat is open, a route change does not
   move focus. Each workspace load moves focus, also on the chat route. A workspace page
@@ -143,7 +150,7 @@ heading over its pages. An exact label comes first, then a label that starts wit
 query; the group of the best match leads. It searches no records and no provider data.
 Arrow keys, Home and End move the active option, and Enter opens it. Escape or the Esc
 button closes the dialog and returns focus to the control that opened it, or to the
-search button.
+search button. A footer shows these keys: ↑ ↓ Navigate, ↵ Open and Esc Close.
 
 ### Chat beside a page
 
@@ -342,17 +349,18 @@ no value writes nothing. An unknown area answers `404`.
 
 ### Main files
 
-| File                                                                                         | Owns                                                                                             |
-| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `foundation/ui/route.ts`, `surfaces/portal/ui/pages.tsx`                                     | The page list, the address parser and the render function of each page                           |
-| `surfaces/portal/ui/portal.tsx`                                                              | The router and the `ControlPortalApp` state                                                      |
-| `surfaces/portal/ui/shell.tsx`, `foundation/ui/console-sidebar.tsx`                          | `PortalFrame`, `WorkspaceLayout`, the product tabs, the sidebar foot, the rail and the drawer    |
-| `surfaces/portal/ui/workspace-search.tsx`                                                    | The page search: its button, its shortcut and its dialog                                         |
-| `areas/organisation/ui/workspace-switcher.tsx`                                               | The Organisation and workspace switcher                                                          |
-| `surfaces/portal/ui/portal-shell.tsx`                                                        | Sign-in, loading, failure and not-found views                                                    |
-| `surfaces/portal/ui/pages/home.tsx`, `areas/organisation/server/control/routes/workspace.ts` | The Home page and its server view                                                                |
-| `foundation/ui/preferences/`                                                                 | The preference owner and the appearance control                                                  |
-| `surfaces/portal/ui/styles.css`, `packages/frontend-theme.css`                               | The Portal styles and the shared tokens                                                          |
+| File                                                                                         | Owns                                                                                          |
+| -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `foundation/ui/route.ts`, `surfaces/portal/ui/pages.tsx`                                     | The page list, the address parser and the render function of each page                        |
+| `surfaces/portal/ui/portal.tsx`                                                              | The router and the `ControlPortalApp` state                                                   |
+| `surfaces/portal/ui/shell.tsx`, `foundation/ui/console-sidebar.tsx`                          | `PortalFrame`, `WorkspaceLayout`, the product tabs, the sidebar foot, the rail and the drawer |
+| `surfaces/portal/ui/workspace-search.tsx`                                                    | The page search: its button, its shortcut and its dialog                                      |
+| `areas/organisation/ui/workspace-switcher.tsx`                                               | The Organisation and workspace switcher                                                       |
+| `surfaces/portal/ui/account-menu.tsx`                                                        | The account menu: the avatar with the usage ring and its menu                                 |
+| `surfaces/portal/ui/portal-shell.tsx`                                                        | Sign-in, loading, failure and not-found views                                                 |
+| `surfaces/portal/ui/pages/home.tsx`, `areas/organisation/server/control/routes/workspace.ts` | The Home page and its server view                                                             |
+| `foundation/ui/preferences/`                                                                 | The preference owner and the appearance control                                               |
+| `surfaces/portal/ui/styles.css`, `packages/frontend-theme.css`                               | The Portal styles and the shared tokens                                                       |
 
 In `scripts/layers.json`, `portal.tsx`, `shell.tsx`, `portal-shell.tsx` and the chat are
 `surfaces/portal`. `console-sidebar.tsx`, `console-tools.tsx`, `route.ts`,
