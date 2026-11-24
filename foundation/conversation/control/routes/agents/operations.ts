@@ -181,7 +181,7 @@ function operationIdFor(
   return `${prefix}_${requestHash.slice(0, 32)}`;
 }
 
-export function agentOperationsErrorResponse(
+function agentOperationsErrorResponse(
   error: import("@purin-labs/agent/data/agent-operations").AgentOperationsError,
 ): Response {
   switch (error.code) {

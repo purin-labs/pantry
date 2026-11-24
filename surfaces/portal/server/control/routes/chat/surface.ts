@@ -4,12 +4,11 @@ import { parseBakeryBrowserBinding } from "@purin-labs/bakery-model/bakery-conte
 import type { Env } from "@purin-labs/kernel/env";
 import { parseSessionId } from "@purin-labs/kernel/ids";
 import { resolveActiveSessionActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
-  controlError,
-  controlJson,
-  readJsonRecord,
-} from "@purin-labs/control/worker/http";
+  authorizeOrganisationJsonPost,
+  authorizeOrganisationRequest,
+} from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import { parseBakerySurfaceReceipt } from "@purin-labs/bakery-model/bakery-surface";
 import {
   listPendingBakerySurfaceEffects,
@@ -57,23 +56,19 @@ export async function handlePortalChatSurfaceReceipt(
   organisationIdRaw: string,
   effectId: string,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const started = await authorizeOrganisationJsonPost(
     request,
     env,
     organisationIdRaw,
     "operator",
     true,
+    "chat_surface_receipt_invalid",
   );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
-  if (
-    !body.ok ||
-    Object.keys(body.value).length !== 1 ||
-    !Object.hasOwn(body.value, "receipt")
-  )
+  if (!started.ok) return started.response;
+  const { authorized, body } = started;
+  if (Object.keys(body).length !== 1 || !Object.hasOwn(body, "receipt"))
     return controlError("chat_surface_receipt_invalid", 422);
-  const receipt = parseBakerySurfaceReceipt(body.value.receipt);
+  const receipt = parseBakerySurfaceReceipt(body.receipt);
   if (receipt.kind === "invalid" || receipt.value.effectId !== effectId)
     return controlError("chat_surface_receipt_invalid", 422);
   const target = await readBakerySurfaceDeliveryTarget({

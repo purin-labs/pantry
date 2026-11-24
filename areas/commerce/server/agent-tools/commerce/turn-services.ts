@@ -1,5 +1,3 @@
-import { sha256Hex } from "@purin-labs/std";
-import { sessionObservedCommerceEntity } from "@purin-labs/agent/actors/agent-session-information-flow";
 import {
   proposeCafeMenuPublicationForHarness,
   proposeCommerceActionForHarness,
@@ -10,7 +8,6 @@ import {
 } from "../../actors/harness-commerce-proposal";
 import {
   beginProposalStaging,
-  OPERATOR_DRAFT_TTL_MS,
   type StageConfigurationDraft,
 } from "@purin-labs/agent/actors/session/proposal-staging";
 import type { ToolTurnContext } from "@purin-labs/agent/actors/session/tool-wiring";
@@ -21,9 +18,8 @@ import {
 import {
   createCommerceClient,
   createCommerceEntityPlaneClient,
-} from "@purin-labs/area-commerce-contract/server/client";
-import { proposeCampaignBrief } from "../../data/campaign-brief";
-import { readOfferPriceAllowanceView } from "@purin-labs/area-commerce-contract/server/offer-price-allowance";
+} from "../../contract/client";
+import { readOfferPriceAllowanceView } from "../../contract/offer-price-allowance";
 import {
   withToolContext,
   type SessionToolContext,
@@ -45,7 +41,6 @@ import {
 } from "./handlers";
 import type {
   CommerceToolServices,
-  HarnessCampaignBriefRequest,
   HarnessConfigurationProposalRequest,
 } from "./services";
 import type { CommerceToolReads } from "@purin-labs/area-commerce-contract/server/tool-reads";
@@ -87,7 +82,6 @@ export function commerceToolServices(
     proposeOrderRefund: tool(proposeOrderRefundForHarness),
     proposeStockAction: tool(proposeStockActionForHarness),
     proposeCafeMenuPublication: tool(proposeCafeMenuPublicationForHarness),
-    proposeCampaignBrief: tool(proposeCampaignBriefForEmbeddedHarness),
     proposeConfiguration: proposeConfigurationForEmbeddedHarness.bind(
       null,
       turn,
@@ -140,70 +134,6 @@ function costsCommerce(turn: ToolTurnContext) {
         caller(actor),
       ),
   };
-}
-
-/**
- * Stages one campaign brief for a person to decide on.
- *
- * The brief names commerce records, so every one it names must be a record
- * this Case actually read, at the revision it read. Without that check a
- * plausible-looking identifier the model invented would enter a brief that
- * an operator then approves on the strength of its detail.
- */
-async function proposeCampaignBriefForEmbeddedHarness(
-  context: SessionToolContext,
-  request: HarnessCampaignBriefRequest,
-): Promise<unknown> {
-  const staging = await beginProposalStaging(context, "campaign brief");
-  // A brief spends a merchant's budget against a merchant's catalogue; with
-  // no merchant bound there is nothing for it to be a brief about.
-  if (staging.merchantId === null) {
-    throw new Error("campaign brief has no bound merchant");
-  }
-  for (const target of request.targets) {
-    if (
-      !sessionObservedCommerceEntity({
-        sql: context.storage.sql,
-        organisationId: String(context.execution.scope.organisationId),
-        sessionId: String(context.assignment.sessionId),
-        entityType: target.entityType,
-        entityId: target.entityId,
-        revision: target.revision,
-      })
-    ) {
-      throw new Error("campaign brief target was not observed in this Case");
-    }
-  }
-  const digest = await sha256Hex(JSON.stringify(request));
-  const briefId = `brief_agent_${context.assignment.assignmentId}_${digest.slice(0, 24)}`;
-  const proposed = await proposeCampaignBrief({
-    scope: context.execution.scope,
-    authorizeCommit: requireSessionExecution.bind(
-      null,
-      context.execution,
-      context.lease,
-    ),
-    briefId,
-    merchantId: staging.merchantId,
-    caseId: staging.caseId,
-    objective: request.objective,
-    targets: request.targets,
-    channel: request.channel,
-    audienceDescription: request.audienceDescription,
-    messageVariants: request.messageVariants,
-    requestedBudgetMinor: request.requestedBudgetMinor,
-    currency: request.currency,
-    windowStart: request.windowStart,
-    windowEnd: request.windowEnd,
-    disclosures: request.disclosures,
-    supportingEvidence: request.supportingEvidence,
-    expiresAt: staging.now + OPERATOR_DRAFT_TTL_MS,
-    now: staging.now,
-  });
-  if (!proposed.ok)
-    throw new Error(`campaign brief refused: ${proposed.error.code}`);
-  await requireSessionExecution(context.execution, context.lease);
-  return { kind: "campaign_brief_drafted", briefId, caseId: staging.caseId };
 }
 
 /**

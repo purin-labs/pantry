@@ -95,8 +95,11 @@ import {
   controlMutationIdentity,
   resolveMutationUser,
 } from "@purin-labs/control/worker/admission/control-mutation";
-import { resolveMerchantBinding } from "@purin-labs/area-commerce-contract/server/merchant-control";
-import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { resolveMerchantBinding } from "../../../contract/merchant-control";
+import {
+  authorizeOrganisationJsonPost,
+  authorizeOrganisationRequest,
+} from "@purin-labs/control/worker/authorization";
 import {
   controlError,
   controlJson,
@@ -119,24 +122,23 @@ export async function handleCommerceExportPreset(
   env: Env,
   organisationIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const started = await authorizeOrganisationJsonPost(
     request,
     env,
     organisationIdRaw,
     "admin",
     true,
+    "commerce_export_preset_invalid",
   );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
-  if (!body.ok) return controlError("commerce_export_preset_invalid", 422);
-  const parsed = parseCommerceExportPresetPublishRequest(body.value);
+  if (!started.ok) return started.response;
+  const { authorized, body } = started;
+  const parsed = parseCommerceExportPresetPublishRequest(body);
   if (!parsed.ok) return controlError(parsed.error.code, 422);
   const admitted = await admitUserMutation({
     request,
     env,
     authorized,
-    body: body.value,
+    body,
     boundary: "configuration_versioned",
     user: "after_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/export-preset`,
@@ -240,20 +242,19 @@ export async function handleCommerceGraph(
   env: Env,
   organisationIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const started = await authorizeOrganisationJsonPost(
     request,
     env,
     organisationIdRaw,
     "viewer",
     false,
+    "invalid_query",
   );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
-  if (!body.ok) return controlError("invalid_query", 422);
+  if (!started.ok) return started.response;
+  const { authorized, body } = started;
   // A page that needs several results sends its queries together. Each one
   // is parsed, authorized and answered as if it had arrived alone.
-  const together = "queries" in body.value ? body.value.queries : undefined;
+  const together = "queries" in body ? body.queries : undefined;
   if (
     together !== undefined &&
     (!Array.isArray(together) ||
@@ -263,7 +264,7 @@ export async function handleCommerceGraph(
     return controlError("invalid_query", 422);
   const queries: CommerceGraphQuery[] = [];
   for (const one of together === undefined
-    ? [body.value]
+    ? [body]
     : together.map(asGraphRouteBody)) {
     const query = parseCommerceGraphRouteBody(one);
     if (!query.ok)
@@ -442,25 +443,24 @@ export async function handleCommerceListEntryPatch(
   organisationIdRaw: string,
   entryIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const started = await authorizeOrganisationJsonPost(
     request,
     env,
     organisationIdRaw,
     "operator",
     true,
+    "commerce_list_entry_patch_invalid",
   );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
-  if (!body.ok) return controlError("commerce_list_entry_patch_invalid", 422);
-  const command = parseCommerceListEntryPatchRouteBody(body.value, entryIdRaw);
+  if (!started.ok) return started.response;
+  const { authorized, body } = started;
+  const command = parseCommerceListEntryPatchRouteBody(body, entryIdRaw);
   if (!command.ok)
     return controlError("commerce_list_entry_patch_invalid", 422);
   const admitted = await admitUserMutation({
     request,
     env,
     authorized,
-    body: body.value,
+    body,
     boundary: "unversioned",
     user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/list-entries/${entryIdRaw}/patch`,
@@ -1042,19 +1042,18 @@ export async function handleCommerceSavedViewPresentationPatch(
   organisationIdRaw: string,
   viewIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const started = await authorizeOrganisationJsonPost(
     request,
     env,
     organisationIdRaw,
     "admin",
     true,
+    "commerce_saved_view_patch_invalid",
   );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
-  if (!body.ok) return controlError("commerce_saved_view_patch_invalid", 422);
+  if (!started.ok) return started.response;
+  const { authorized, body } = started;
   const patch = parseSavedCommerceViewPresentationPatchRouteBody(
-    body.value,
+    body,
     viewIdRaw,
   );
   if (!patch.ok) return controlError("commerce_saved_view_patch_invalid", 422);
@@ -1062,7 +1061,7 @@ export async function handleCommerceSavedViewPresentationPatch(
     request,
     env,
     authorized,
-    body: body.value,
+    body,
     boundary: "unversioned",
     user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce/saved-views/${viewIdRaw}/presentation`,
@@ -1210,18 +1209,17 @@ export async function handleCommerceGraphActivity(
   env: Env,
   organisationIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const started = await authorizeOrganisationJsonPost(
     request,
     env,
     organisationIdRaw,
     "viewer",
     false,
+    "invalid_query",
   );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
-  if (!body.ok) return controlError("invalid_query", 422);
-  const parsed = parseCommerceActivityRouteBody(body.value);
+  if (!started.ok) return started.response;
+  const { authorized, body } = started;
+  const parsed = parseCommerceActivityRouteBody(body);
   if (!parsed.ok)
     return controlError(
       parsed.error.code,

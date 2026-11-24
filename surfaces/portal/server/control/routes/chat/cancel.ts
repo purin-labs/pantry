@@ -2,12 +2,8 @@ import { isConversationId, type ConversationId } from "@purin-labs/control-api";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseRequestId, parseSessionId } from "@purin-labs/kernel/ids";
 import { resolveOrganisationModelRoute } from "@purin-labs/agent/models/route";
-import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
-import {
-  controlError,
-  controlJson,
-  readJsonRecord,
-} from "@purin-labs/control/worker/http";
+import { authorizeOrganisationJsonPost } from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import {
   isChatId,
   conversationTimeline,
@@ -37,20 +33,20 @@ export async function handlePortalChatCancel(
   env: Env,
   organisationIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const started = await authorizeOrganisationJsonPost(
     request,
     env,
     organisationIdRaw,
     "admin",
     true,
+    "chat_cancel_request_invalid",
   );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
-  if (!body.ok || !isExactCancelBody(body.value))
+  if (!started.ok) return started.response;
+  const { authorized, body } = started;
+  if (!isExactCancelBody(body))
     return controlError("chat_cancel_request_invalid", 422);
-  const requestId = parseRequestId(body.value.requestId);
-  const sessionId = parseSessionId(body.value.sessionId);
+  const requestId = parseRequestId(body.requestId);
+  const sessionId = parseSessionId(body.sessionId);
   if (!requestId.ok || !sessionId.ok)
     return controlError("chat_cancel_request_invalid", 422);
   const scope: ConversationScope = {
@@ -62,22 +58,22 @@ export async function handlePortalChatCancel(
   await reconcileRevokedConversationRun(
     placement,
     scope.userId,
-    body.value.conversationId,
+    body.conversationId,
   );
   const stored = await readConversation(
     authorized.executionScope.database,
     scope,
-    body.value.conversationId,
+    body.conversationId,
   );
   if (stored === null)
     return chatError("chat_not_found", "This chat no longer exists.", 404);
   const priorCancellation = conversationTimeline(stored.conversation).find(
-    timelineEventHasId.bind(null, body.value.cancellationId),
+    timelineEventHasId.bind(null, body.cancellationId),
   );
   if (priorCancellation !== undefined)
     return timelineEventIsCancellation(
-      body.value.cancellationId,
-      body.value.requestId,
+      body.cancellationId,
+      body.requestId,
       priorCancellation,
     )
       ? controlJson({
@@ -95,11 +91,10 @@ export async function handlePortalChatCancel(
   const work = stored.conversation.work;
   if (
     (work.kind !== "running" && work.kind !== "cancelling") ||
-    work.requestId !== body.value.requestId ||
+    work.requestId !== body.requestId ||
     work.stream.sessionId !== sessionId.value ||
-    work.stream.turnId !== body.value.turnId ||
-    (work.kind === "cancelling" &&
-      work.cancellationId !== body.value.cancellationId)
+    work.stream.turnId !== body.turnId ||
+    (work.kind === "cancelling" && work.cancellationId !== body.cancellationId)
   )
     return chatError(
       "chat_cancel_conflict",
@@ -114,7 +109,7 @@ export async function handlePortalChatCancel(
           work: {
             kind: "cancelling",
             requestId: work.requestId,
-            cancellationId: body.value.cancellationId,
+            cancellationId: body.cancellationId,
             lease: work.lease,
             expiresAt: work.expiresAt,
             stream: work.stream,

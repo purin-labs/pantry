@@ -239,7 +239,7 @@ import each of its files. A module with no line for one of these has none.
 
 ## areas/commerce
 
-- Folders: 29
+- Folders: 28
   - `areas/commerce/server/`
   - `areas/commerce/server/actors/`
   - `areas/commerce/server/actors/commerce-projection/`
@@ -250,7 +250,6 @@ import each of its files. A module with no line for one of these has none.
   - `areas/commerce/server/control/`
   - `areas/commerce/server/control/admission/`
   - `areas/commerce/server/control/routes/`
-  - `areas/commerce/server/control/routes/agents/`
   - `areas/commerce/server/control/routes/commerce/`
   - `areas/commerce/server/data/`
   - `areas/commerce/server/entity-plane/`
@@ -270,17 +269,8 @@ import each of its files. A module with no line for one of these has none.
   - `areas/commerce/ui/features/payments/`
   - `areas/commerce/ui/features/payouts/`
 - Packages: `areas/commerce`, `packages/commerce-client`, `packages/commerce-contracts`, `packages/commerce-control-api`, `packages/commerce-query-sqlite`, `packages/product-description-crdt`, `services/commerce`
-- Tables (13): `campaign_brief`, `commerce_capability_activation`, `commerce_export_preset_publication`, `commerce_lab_organisation`, `commerce_lab_run`, `commerce_webhook_subscription`, `paid_receipt`, `supplier_destination_revision`, `supplier_payable`, `supplier_payout`, `supplier_payout_attempt`, `supplier_payout_certification`, `supplier_payout_event`
-- Public files: `areas/commerce/server/contract/`, `packages/commerce-contracts`
-
-## areas/commerce/contract
-
-- Folders: 4
-  - `areas/commerce/contract/server/`
-  - `areas/commerce/contract/ui/features/commerce/`
-  - `areas/commerce/contract/ui/features/commerce/entity-plane/`
-  - `areas/commerce/contract/ui/features/governed-actions/`
-- Packages: `areas/commerce/contract`
+- Tables (12): `commerce_capability_activation`, `commerce_export_preset_publication`, `commerce_lab_organisation`, `commerce_lab_run`, `commerce_webhook_subscription`, `paid_receipt`, `supplier_destination_revision`, `supplier_payable`, `supplier_payout`, `supplier_payout_attempt`, `supplier_payout_certification`, `supplier_payout_event`
+- Public files: `areas/commerce/server/contract/`, `areas/commerce/ui/features/commerce/description-draft/styles.css`, `areas/commerce/ui/features/commerce/entity-plane/api.ts`, `areas/commerce/ui/features/commerce/operations.ts`, `areas/commerce/ui/features/commerce/stock-status.ts`, `areas/commerce/ui/features/governed-actions/commerce.ts`, `areas/commerce/ui/features/governed-actions/decision-labels.ts`, `packages/commerce-contracts`
 
 ## areas/devices
 

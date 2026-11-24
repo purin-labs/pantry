@@ -133,7 +133,7 @@ approval and the receipt of the person's own action on that page.
 - `commerce_propose_stock_action` covers deliveries, counts, production requests and
   purchase requests with one action kind, `stock_operation`.
 - `configuration_propose` works in a Portal chat: the draft shows as a card, and the
-  person who asked confirms it. `commerce_propose_campaign_brief` refuses a Portal chat.
+  person who asked confirms it.
 
 ### The screen observation
 

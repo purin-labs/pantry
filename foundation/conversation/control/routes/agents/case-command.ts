@@ -8,32 +8,27 @@ import {
   admitUserMutation,
   controlMutationIdentity,
 } from "@purin-labs/control/worker/admission/control-mutation";
-import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
-import {
-  controlError,
-  controlJson,
-  readJsonRecord,
-} from "@purin-labs/control/worker/http";
+import { authorizeOrganisationJsonPost } from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson } from "@purin-labs/control/worker/http";
 
 export async function handleCaseCommand(
   request: Request,
   env: Env,
   organisationIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const started = await authorizeOrganisationJsonPost(
     request,
     env,
     organisationIdRaw,
     "admin",
     true,
+    "case_command_invalid",
   );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
-  if (!body.ok || typeof body.value.instruction !== "string") {
+  if (!started.ok) return started.response;
+  const { authorized, body } = started;
+  if (typeof body.instruction !== "string")
     return controlError("case_command_invalid", 422);
-  }
-  const instruction = body.value.instruction.trim();
+  const instruction = body.instruction.trim();
   if (instruction.length === 0 || instruction.length > 8_000) {
     return controlError("case_command_invalid", 422);
   }
@@ -41,7 +36,7 @@ export async function handleCaseCommand(
     request,
     env,
     authorized,
-    body: body.value,
+    body,
     boundary: "unversioned",
     user: "after_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/cases/commands`,

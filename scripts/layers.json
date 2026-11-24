@@ -200,7 +200,6 @@
     "bakery_workflow_revision": "areas/kitchen",
     "cafe_counter_receipt_setting": "areas/cafe",
     "cafe_terminal_assignment": "areas/cafe",
-    "campaign_brief": "areas/commerce",
     "case_assignment_pin": "foundation/agent",
     "case_project": "foundation/conversation",
     "commerce_capability_activation": "areas/commerce",

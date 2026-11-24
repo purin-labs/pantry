@@ -2347,33 +2347,6 @@ CREATE TABLE agent_configuration_proposal (
 );
 CREATE INDEX idx_agent_configuration_proposal_organisation_status
   ON agent_configuration_proposal (organisation_id, status, created_at);
-CREATE TABLE campaign_brief (
-  brief_id TEXT PRIMARY KEY,
-  organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),
-  merchant_id TEXT NOT NULL,
-  case_id TEXT NOT NULL,
-  objective TEXT NOT NULL CHECK (length(objective) > 0),
-  targets_json TEXT NOT NULL CHECK (json_valid(targets_json)),
-  channel TEXT NOT NULL CHECK (length(channel) > 0),
-  audience_description TEXT NOT NULL CHECK (length(audience_description) > 0),
-  message_variants_json TEXT NOT NULL CHECK (json_valid(message_variants_json)),
-  requested_budget_minor INTEGER NOT NULL CHECK (requested_budget_minor >= 0),
-  currency TEXT NOT NULL CHECK (length(currency) = 3),
-  window_start TEXT NOT NULL,
-  window_end TEXT NOT NULL,
-  disclosures_json TEXT NOT NULL CHECK (json_valid(disclosures_json)),
-  supporting_evidence TEXT NOT NULL CHECK (length(supporting_evidence) > 0),
-  lifecycle TEXT NOT NULL CHECK (lifecycle IN ('draft', 'accepted', 'dismissed', 'expired')),
-  proposed_at INTEGER NOT NULL,
-  decided_at INTEGER,
-  decided_by_person_id TEXT,
-  expires_at INTEGER NOT NULL,
-  revision INTEGER NOT NULL DEFAULT 1 CHECK (revision > 0),
-  CHECK ((lifecycle = 'draft') = (decided_at IS NULL)),
-  CHECK ((decided_at IS NULL) = (decided_by_person_id IS NULL))
-);
-CREATE INDEX idx_campaign_brief_case
-  ON campaign_brief (organisation_id, case_id, proposed_at);
 CREATE TABLE operator_configuration_draft (
   draft_id TEXT PRIMARY KEY,
   organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),

@@ -10,7 +10,10 @@ import {
   type IntegrationAccountId,
 } from "@purin-labs/kernel/ids";
 import { admitUserMutation } from "@purin-labs/control/worker/admission/control-mutation";
-import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  authorizeOrganisationJsonPost,
+  authorizeOrganisationRequest,
+} from "@purin-labs/control/worker/authorization";
 import {
   controlError,
   controlJson,
@@ -38,37 +41,34 @@ export async function handleEmailOperationalContactSync(
   env: Env,
   organisationIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const started = await authorizeOrganisationJsonPost(
     request,
     env,
     organisationIdRaw,
     "admin",
     true,
+    "email_operational_contact_request_invalid",
   );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
+  if (!started.ok) return started.response;
+  const { authorized, body } = started;
   if (
-    !body.ok ||
-    !hasExactKeys(body.value, [
+    !hasExactKeys(body, [
       "target",
       "address",
       "displayName",
       "state",
       "relationshipState",
     ])
-  ) {
+  )
     return controlError("email_operational_contact_request_invalid", 422);
-  }
-  const target = parseOperationalEmailTarget(body.value.target);
+  const target = parseOperationalEmailTarget(body.target);
   if (
     target === null ||
-    typeof body.value.address !== "string" ||
-    (body.value.displayName !== null &&
-      typeof body.value.displayName !== "string") ||
-    (body.value.state !== "active" && body.value.state !== "suppressed") ||
-    (body.value.relationshipState !== "active" &&
-      body.value.relationshipState !== "inactive")
+    typeof body.address !== "string" ||
+    (body.displayName !== null && typeof body.displayName !== "string") ||
+    (body.state !== "active" && body.state !== "suppressed") ||
+    (body.relationshipState !== "active" &&
+      body.relationshipState !== "inactive")
   ) {
     return controlError("email_operational_contact_request_invalid", 422);
   }
@@ -76,7 +76,7 @@ export async function handleEmailOperationalContactSync(
     request,
     env,
     authorized,
-    body: body.value,
+    body,
     boundary: "unversioned",
     user: "before_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/email-operational-contacts`,
@@ -89,10 +89,10 @@ export async function handleEmailOperationalContactSync(
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
     target,
-    address: body.value.address,
-    displayName: body.value.displayName,
-    state: body.value.state,
-    relationshipState: body.value.relationshipState,
+    address: body.address,
+    displayName: body.displayName,
+    state: body.state,
+    relationshipState: body.relationshipState,
     now,
   });
   if (!registered.ok) return operationalControlError(registered.error.code);

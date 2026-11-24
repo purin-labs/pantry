@@ -37,8 +37,11 @@ import {
 import {
   resolveMerchantBinding,
   resolveMerchantControlContext,
-} from "@purin-labs/area-commerce-contract/server/merchant-control";
-import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+} from "../../../contract/merchant-control";
+import {
+  authorizeOrganisationJsonPost,
+  authorizeOrganisationRequest,
+} from "@purin-labs/control/worker/authorization";
 import {
   controlError,
   controlJson,
@@ -275,18 +278,17 @@ export async function handleCommerceTrackingBatchPreview(
   env: Env,
   organisationIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const started = await authorizeOrganisationJsonPost(
     request,
     env,
     organisationIdRaw,
     "viewer",
     false,
+    "tracking_batch_invalid",
   );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
-  if (!body.ok) return controlError("tracking_batch_invalid", 422);
-  const parsed = parseTrackingBatchPreviewRequest(body.value);
+  if (!started.ok) return started.response;
+  const { authorized, body } = started;
+  const parsed = parseTrackingBatchPreviewRequest(body);
   if (!parsed.ok) return controlError(parsed.error.code, 422);
   const inbox = await readCommerceExceptionInbox(
     env,

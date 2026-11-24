@@ -66,6 +66,7 @@ import {
 import {
   authenticateControlMutation,
   authenticateControlRead,
+  authorizeOrganisationJsonPost,
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
 } from "@purin-labs/control/worker/authorization";
@@ -693,19 +694,18 @@ async function handleRevokeInvitation(
   organisationIdRaw: string,
   invitationId: string,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const started = await authorizeOrganisationJsonPost(
     request,
     env,
     organisationIdRaw,
     "admin",
     true,
+    "organisation_invitation_revoke_invalid",
   );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
+  if (!started.ok) return started.response;
+  const { authorized, body } = started;
   if (
-    !body.ok ||
-    !hasExactKeys(body.value, []) ||
+    !hasExactKeys(body, []) ||
     invitationId.length === 0 ||
     invitationId.trim() !== invitationId
   )

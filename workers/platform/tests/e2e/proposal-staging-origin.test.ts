@@ -9,7 +9,6 @@ import {
 import { issueControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { authorizeSessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
-import { proposeCampaignBrief } from "@purin-labs/area-commerce/server/data/campaign-brief";
 import { createOperatorConfigurationDraft } from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
 import {
   admitOperatorControlTurnFixture,
@@ -17,7 +16,6 @@ import {
 } from "../organisation-execution-fixture";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
-type Proposal = "campaign" | "configuration";
 type Boundary = "origin" | "placement" | "release";
 type Probe = {
   phase: "armed" | "paused" | "released";
@@ -26,23 +24,13 @@ type Probe = {
   boundary: Boundary;
 };
 
-it.for([
-  ["campaign", "origin"],
-  ["campaign", "placement"],
-  ["campaign", "release"],
-  ["configuration", "origin"],
-  ["configuration", "placement"],
-  ["configuration", "release"],
-] as const)(
-  "fences %s proposal at %s and preserves committed evidence",
+it.for(["origin", "placement", "release"] as const)(
+  "fences a configuration proposal at %s and preserves committed evidence",
   { timeout: 45_000 },
   proposalJourney,
 );
 
-async function proposalJourney(
-  [proposal, boundary]: readonly [Proposal, Boundary],
-  { task }: TestContext,
-) {
+async function proposalJourney(boundary: Boundary, { task }: TestContext) {
   await installSlackActorFixture();
   const userId = parseUserId("user_ddea8ec2-b424-5505-a2f4-8f66b89b13ab");
   if (!userId.ok) throw new Error(userId.error.code);
@@ -87,7 +75,6 @@ async function proposalJourney(
     scope.accountAccess,
   );
   const work = createProposal(
-    proposal,
     scope,
     authorizeProposal.bind(null, probe, authorize),
     `denied_${boundary}`,
@@ -117,7 +104,7 @@ async function proposalJourney(
     const result = await outcome;
     if (boundary === "placement") expect(result).toMatchObject({ ok: false });
     else expect(result).toEqual({ error: "proposal_origin_inactive" });
-    expect(await proposalCount(proposal)).toBe(boundary === "release" ? 1 : 0);
+    expect(await proposalCount()).toBe(boundary === "release" ? 1 : 0);
     if (boundary === "placement") {
       for (const database of [env.DB, fixtureDatabase()])
         await database
@@ -155,7 +142,6 @@ async function proposalJourney(
     };
     expect(
       await createProposal(
-        proposal,
         scope,
         authorizeProposal.bind(null, freshProbe, freshAuthorize),
         "fresh",
@@ -163,10 +149,10 @@ async function proposalJourney(
         now + 1,
       ),
     ).toMatchObject({ ok: true });
-    expect(await proposalCount(proposal)).toBe(boundary === "release" ? 2 : 1);
+    expect(await proposalCount()).toBe(boundary === "release" ? 2 : 1);
     Object.assign(task.meta, {
       proposalOrigin: {
-        proposal,
+        proposal: "configuration",
         boundary,
         protectedResultReleased: false,
         retainedIssuedDrafts: boundary === "release" ? 1 : 0,
@@ -204,60 +190,36 @@ function proposalRejection(error: unknown) {
   if (!(error instanceof Error)) throw error;
   return { error: error.message };
 }
-async function proposalCount(proposal: Proposal): Promise<number> {
-  const table =
-    proposal === "campaign" ? "campaign_brief" : "operator_configuration_draft";
+async function proposalCount(): Promise<number> {
   const row = await fixtureDatabase()
-    .prepare(`SELECT COUNT(*) AS count FROM ${table} WHERE organisation_id = ?`)
+    .prepare(
+      "SELECT COUNT(*) AS count FROM operator_configuration_draft WHERE organisation_id = ?",
+    )
     .bind(ORGANISATION_ID)
     .first<{ count: number }>();
   if (row === null) throw new Error("Missing proposal count");
   return row.count;
 }
 function createProposal(
-  proposal: Proposal,
   scope: OrganisationExecutionScope,
   authorizeCommit: () => Promise<void>,
   id: string,
   actorUserId: string,
   now: number,
 ) {
-  if (proposal === "configuration")
-    return createOperatorConfigurationDraft({
-      scope,
-      authorizeCommit,
-      draftId: id,
-      caseId: `case_${id}`,
-      actorUserId,
-      actorPersonId: "person_fixture",
-      rawCommand: {
-        kind: "create_area",
-        name: "Operations",
-        purpose: "Review the bakery workload.",
-      },
-      mutationId: `mutation_${id}`,
-      now,
-      expiresAt: now + 600_000,
-    });
-  return proposeCampaignBrief({
+  return createOperatorConfigurationDraft({
     scope,
     authorizeCommit,
-    briefId: id,
-    merchantId: "merchant_fixture",
+    draftId: id,
     caseId: `case_${id}`,
-    objective: "Review the seasonal offer.",
-    targets: [{ entityType: "offer", entityId: "offer_fixture", revision: 1 }],
-    channel: "Storefront",
-    audienceDescription: "Current customers",
-    messageVariants: [
-      { variantId: "v1", headline: "Autumn offer", body: "Seasonal pastries." },
-    ],
-    requestedBudgetMinor: 0,
-    currency: "JPY",
-    windowStart: "2026-10-05T00:00:00Z",
-    windowEnd: "2026-10-10T00:00:00Z",
-    disclosures: [],
-    supportingEvidence: "Observed the current offer.",
+    actorUserId,
+    actorPersonId: "person_fixture",
+    rawCommand: {
+      kind: "create_area",
+      name: "Operations",
+      purpose: "Review the bakery workload.",
+    },
+    mutationId: `mutation_${id}`,
     now,
     expiresAt: now + 600_000,
   });

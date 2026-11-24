@@ -19,10 +19,6 @@ import {
 } from "@purin-labs/surface-whatsapp/server/control";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
-import {
-  handleCampaignBriefDecision,
-  handleCampaignBriefQueue,
-} from "@purin-labs/area-commerce/server/control/routes/agents/campaign-briefs";
 import { handleCaseCommand } from "@purin-labs/conversation/control/routes/agents/case-command";
 import {
   handleCancelOrganisationCodexAuthorization,
@@ -46,7 +42,6 @@ import {
   handleAgentOperationRevisions,
   handleAgentOperations,
 } from "@purin-labs/conversation/control/routes/agents/operations";
-import { handleMerchantAgentInstallation } from "@purin-labs/area-commerce/server/control/routes/agents/merchant-agent";
 
 export type AgentControlRoute =
   | Readonly<{ kind: "organisationCodex"; organisationIdRaw: string }>
@@ -150,15 +145,7 @@ export type AgentControlRoute =
       targetKind: "agent_definition" | "skill";
       targetId: string;
     }>
-  | Readonly<{ kind: "caseCommand"; organisationIdRaw: string }>
-  | Readonly<{ kind: "urkInstallation"; organisationIdRaw: string }>
-  | Readonly<{ kind: "campaignBriefQueue"; organisationIdRaw: string }>
-  | Readonly<{
-      kind: "campaignBrief";
-      organisationIdRaw: string;
-      briefIdRaw: string;
-      action: "accept" | "dismiss";
-    }>;
+  | Readonly<{ kind: "caseCommand"; organisationIdRaw: string }>;
 
 export function matchAgentControlRoute(
   pathname: string,
@@ -329,23 +316,6 @@ export function matchAgentControlRoute(
   const operations = organisation(pathname, "operations");
   if (operations !== null)
     return { kind: "agentOperations", organisationIdRaw: operations };
-  const merchantAgent = organisation(pathname, "agents/urk");
-  if (merchantAgent !== null) return { kind: "urkInstallation", organisationIdRaw: merchantAgent };
-  const briefDecision = captures(
-    pathname,
-    /^\/v1\/control\/organisations\/([^/]+)\/campaign-briefs\/([^/]+)\/(accept|dismiss)$/u,
-  );
-  if (briefDecision !== null) {
-    return {
-      kind: "campaignBrief",
-      organisationIdRaw: decode(briefDecision[0]),
-      briefIdRaw: decode(briefDecision[1]),
-      action: briefDecision[2] === "accept" ? "accept" : "dismiss",
-    };
-  }
-  const briefQueue = organisation(pathname, "campaign-briefs");
-  if (briefQueue !== null)
-    return { kind: "campaignBriefQueue", organisationIdRaw: briefQueue };
   const caseCommand = organisation(pathname, "cases/commands");
   if (caseCommand !== null)
     return { kind: "caseCommand", organisationIdRaw: caseCommand };
@@ -680,18 +650,6 @@ export function handleAgentControlRoute(
       );
     case "caseCommand":
       return handleCaseCommand(request, env, route.organisationIdRaw);
-    case "urkInstallation":
-      return handleMerchantAgentInstallation(request, env, route.organisationIdRaw);
-    case "campaignBriefQueue":
-      return handleCampaignBriefQueue(request, env, route.organisationIdRaw);
-    case "campaignBrief":
-      return handleCampaignBriefDecision(
-        request,
-        env,
-        route.organisationIdRaw,
-        route.briefIdRaw,
-        route.action,
-      );
     default:
       return assertNever(route);
   }

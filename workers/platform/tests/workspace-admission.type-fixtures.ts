@@ -65,13 +65,6 @@ const spreadAuthority: WorkspaceRevisionAuthority = {
 };
 void spreadAuthority;
 
-declare const campaignDraft: import("@purin-labs/area-commerce/server/data/campaign-brief").ProposeCampaignBriefInput;
-const { authorizeCommit: campaignAuthority, ...unboundCampaign } =
-  campaignDraft;
-void campaignAuthority;
-// @ts-expect-error A campaign draft cannot omit origin authorization through a spread.
-const invalidCampaign: typeof campaignDraft = unboundCampaign;
-void invalidCampaign;
 declare const configurationDraft: import("@purin-labs/area-organisation/server/data/operator-configuration-draft").CreateOperatorDraftInput;
 const { scope: configurationScope, ...unplacedConfiguration } =
   configurationDraft;

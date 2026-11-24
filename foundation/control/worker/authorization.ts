@@ -18,7 +18,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { requirePublicOrigin } from "@purin-labs/kernel/public-origin";
-import { controlError } from "./http";
+import { controlError, readJsonRecord, type JsonRecord } from "./http";
 
 export const SESSION_COOKIE = "pantry_session";
 export const CSRF_COOKIE = "pantry_csrf";
@@ -41,6 +41,42 @@ export type AuthorizedOrganisationRequest = {
 type AuthenticatedControlResult =
   | { readonly ok: true; readonly value: AuthenticatedControlRequest }
   | { readonly ok: false; readonly response: Response };
+
+/**
+ * The start of a POST route with a JSON body: the method, the caller's
+ * authorization at the role, then the body. A refusal is the response to
+ * return; a body that is not a JSON object answers 422 with `invalidCode`.
+ */
+export async function authorizeOrganisationJsonPost(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+  role: ControlRole,
+  mutation: boolean,
+  invalidCode: string,
+): Promise<
+  | {
+      readonly ok: true;
+      readonly authorized: AuthorizedOrganisationRequest;
+      readonly body: JsonRecord;
+    }
+  | { readonly ok: false; readonly response: Response }
+> {
+  if (request.method !== "POST")
+    return { ok: false, response: controlError("method_not_allowed", 405) };
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    organisationIdRaw,
+    role,
+    mutation,
+  );
+  if (!authorized.ok) return authorized;
+  const body = await readJsonRecord(request);
+  return body.ok
+    ? { ok: true, authorized, body: body.value }
+    : { ok: false, response: controlError(invalidCode, 422) };
+}
 
 /**
  * A mutation asks the access check for `execute` unless it names another

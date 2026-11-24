@@ -503,9 +503,6 @@ export async function handleControlRequest(
     case "restore":
       return handleOnboardingControlRoute(request, env, route);
     case "caseCommand":
-    case "urkInstallation":
-    case "campaignBriefQueue":
-    case "campaignBrief":
     case "organisationInference":
     case "organisationSlackReasoningEffort":
     case "organisationCodex":

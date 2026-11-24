@@ -441,9 +441,9 @@ it("ends the turn when the reservation expired while the Session Actor was lost"
 }, 60_000);
 
 it("keeps a script stopped, when a call whose repeat is not proven safe was in flight at the loss", async (test) => {
-  // The script drafts a campaign brief. No owner answers a repeated draft
-  // from the first one. The Tool Host has run that call, and its completion
-  // is in flight when the process is lost.
+  // The script stages a setup change. Nothing tells a repeated draft from
+  // the first one. The Tool Host has run that call, and its completion is in
+  // flight when the process is lost.
   const journey = await startScriptTurn(test, {
     eventId: "EvDurableCodemodeEffect",
     install: installListingAuthority,
@@ -451,10 +451,10 @@ it("keeps a script stopped, when a call whose repeat is not proven safe was in f
     replies: [
       {
         tool: "tool_search",
-        args: { query: "commerce_propose_campaign_brief", limit: 1 },
+        args: { query: "configuration_propose", limit: 1 },
       },
       scriptReply(
-        `await tools.commerce_propose_campaign_brief({ request: ${JSON.stringify(CAMPAIGN_BRIEF)} }); text('drafted');`,
+        `await tools.configuration_propose({ request: ${JSON.stringify(SETUP_CHANGE)} }); text('drafted');`,
       ),
       FINAL,
     ],
@@ -500,7 +500,7 @@ it("keeps a script stopped, when a call whose repeat is not proven safe was in f
   Object.assign(test.task.meta, {
     evidence: {
       executionId: record.executionId,
-      tool: "commerce_propose_campaign_brief",
+      tool: "configuration_propose",
       action: { kind: "blocked", reason: "implementation" },
       capabilityCompletions: journey.completed.length,
       modelRequests: journey.requests.length,
@@ -741,20 +741,12 @@ it("stops a script and admits no later call, when the turn is cancelled during a
 
 const FINAL: ModelReply = { text: FINAL_ANSWER };
 
-const CAMPAIGN_BRIEF = {
-  objective: "Sell the cookie box before the holiday.",
-  targets: [],
-  channel: "Shop newsletter",
-  audienceDescription: "Customers who bought a gift box last year.",
-  messageVariants: [
-    { variantId: "a", headline: "Cookie box", body: "Six assorted cookies." },
-  ],
-  requestedBudgetMinor: 0,
-  currency: "JPY",
-  windowStart: "2026-12-01",
-  windowEnd: "2026-12-24",
-  disclosures: [],
-  supportingEvidence: "The cookie box is prepared for the online channel.",
+const SETUP_CHANGE = {
+  command: {
+    kind: "create_area",
+    name: "Operations",
+    purpose: "Review the bakery workload.",
+  },
 };
 const SECOND_SCRIPT = scriptReply("text('second attempt');");
 

@@ -1,5 +1,4 @@
 import type { SessionToolContext } from "../../agent-tools/context";
-import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
   listOrganisationMembers,
   parseControlRole,
@@ -23,7 +22,6 @@ export type ProposalTurn = Pick<
 /** Who stages a proposal, and for which Case. */
 export type ProposalStaging = Readonly<{
   caseId: string;
-  merchantId: string | null;
   actorPersonId: string;
   actorUserId: string;
   now: number;
@@ -85,14 +83,9 @@ export async function beginProposalStaging(
   );
   if (member === undefined)
     throw new Error(`${label} requester is not a current member`);
-  const binding = await resolveCurrentOrganisationCommerceMerchantBinding({
-    db: input.execution.scope.database,
-    organisationId: input.execution.scope.organisationId,
-  });
   await requireSessionExecution(input.execution, input.lease);
   return {
     caseId: String(input.assignment.caseId),
-    merchantId: binding.ok ? String(binding.value.merchantId) : null,
     actorPersonId: authority.requesterPersonId,
     actorUserId: member.userId,
     now,

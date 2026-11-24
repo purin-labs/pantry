@@ -28,7 +28,6 @@ import {
 } from "@purin-labs/area-cafe/server/agent-tools/commerce/order-queue";
 import { paymentsRead } from "@purin-labs/area-commerce/server/agent-tools/commerce/payments";
 import {
-  campaignBriefProposal,
   commerceActionProposal,
   configurationProposal,
   menuPublicationProposal,
@@ -173,7 +172,6 @@ export const TOOLS = [
   menuPriceProposal,
   emailDraftRead,
   emailDraftEdit,
-  campaignBriefProposal,
   configurationProposal,
   commerceActionProposal,
   menuPublicationProposal,

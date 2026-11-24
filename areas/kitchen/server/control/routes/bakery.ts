@@ -29,13 +29,9 @@ import {
   replayControlMutation,
   resolveMutationUser,
 } from "@purin-labs/control/worker/admission/control-mutation";
-import { resolveMerchantBinding } from "@purin-labs/area-commerce-contract/server/merchant-control";
-import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
-import {
-  controlError,
-  controlJson,
-  readJsonRecord,
-} from "@purin-labs/control/worker/http";
+import { resolveMerchantBinding } from "@purin-labs/area-commerce/server/contract/merchant-control";
+import { authorizeOrganisationJsonPost } from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 import { assertNever } from "@purin-labs/std";
 
@@ -53,27 +49,22 @@ export async function handleBakeryControl(
   organisationIdRaw: string,
   action: BakeryAction,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const started = await authorizeOrganisationJsonPost(
     request,
     env,
     organisationIdRaw,
     "admin",
     true,
+    "bakery_request_invalid",
   );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
-  if (!body.ok) return controlError("bakery_request_invalid", 422);
-  const { agentEffectId, ...mutationBody } = body.value;
+  if (!started.ok) return started.response;
+  const { authorized, body } = started;
+  const { agentEffectId, ...mutationBody } = body;
   const mutation = parseBakeryMutation(action, mutationBody);
   if (mutation === null) return controlError("bakery_request_invalid", 422);
   const agentSave = parseAgentScenarioOrigin(agentEffectId, mutation);
   if (agentSave === null) return controlError("bakery_request_invalid", 422);
-  const boundary = await parseMutationBoundary(
-    request,
-    body.value,
-    "unversioned",
-  );
+  const boundary = await parseMutationBoundary(request, body, "unversioned");
   if (boundary instanceof Response) return boundary;
   const scope = controlMutationScope(
     authorized,

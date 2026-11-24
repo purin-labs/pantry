@@ -58,33 +58,6 @@ type EntityContextRead = (
   request: CommerceContextRequest,
 ) => Promise<CommerceGraphQueryResult>;
 
-/** One drafted campaign, staged for review. Nothing here sends or spends. */
-export type HarnessCampaignBriefRequest = Readonly<{
-  objective: string;
-  targets: readonly Readonly<{
-    entityType: "product" | "sellable_variant" | "offer";
-    entityId: string;
-    revision: number;
-  }>[];
-  channel: string;
-  audienceDescription: string;
-  messageVariants: readonly Readonly<{
-    variantId: string;
-    headline: string;
-    body: string;
-  }>[];
-  requestedBudgetMinor: number;
-  currency: string;
-  windowStart: string;
-  windowEnd: string;
-  disclosures: readonly string[];
-  supportingEvidence: string;
-}>;
-
-type CampaignBriefPropose = (
-  request: HarnessCampaignBriefRequest,
-) => Promise<unknown>;
-
 /** One proposed configuration change for operator confirmation. */
 export type HarnessConfigurationProposalRequest = Readonly<{
   command: unknown;
@@ -132,11 +105,10 @@ export type CommerceToolServices = {
   readonly proposeStockAction: StockActionProposal;
   readonly proposeCafeMenuPublication: CafeMenuPublicationProposal;
   /**
-   * The staging tools. Required on purpose: they shipped advertised to the
-   * model but never wired, because an optional field lets a host omit one
+   * The staging tool. Required on purpose: it shipped advertised to the
+   * model but never wired, because an optional field lets a host omit it
    * with no error.
    */
-  readonly proposeCampaignBrief: CampaignBriefPropose;
   readonly proposeConfiguration: ConfigurationPropose;
 };
 

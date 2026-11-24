@@ -161,11 +161,12 @@ change has its own applier (`data/operator-configuration-draft.ts`).
 
 ### Sous Chef, the merchant agent
 
-`POST …/agents/urk` (admin) installs Sous Chef (`data/merchant-agent-preset.ts`) with
+`installMerchantAgent` (`data/merchant-agent-preset.ts`) installs Sous Chef with
 ordinary commands: the area "Merchant operations", one definition, one installation
-and the skills `performance_insights`, `catalog_listings`, `inventory_operations`,
-`pricing_and_promotions` and `marketing_campaigns`. A second call completes a half-made
-install. The role is `merchant_operator`, and the only grant is
+and the skills `performance_insights`, `catalog_listings`, `inventory_operations` and
+`pricing_and_promotions`. A second call completes a half-made install. No route calls
+it: the journeys install Sous Chef with it, and a person can make the same agent on
+the Agent page. The role is `merchant_operator`, and the only grant is
 `commerce.entity_plane.context`. The ids keep the old name, for example
 `installation_urk_<suffix>`.
 
@@ -281,11 +282,6 @@ above 0. Each box also needs one `inventory_shipping_carton` in stock
 (`checkout-planning.ts`). So the other boxes stay on sale only while cartons remain.
 The checkout takes more than one line (COM-04).
 
-### Campaign briefs
-
-`commerce_propose_campaign_brief` stages a marketing brief for a Case. An admin accepts
-or dismisses it. An accepted brief sends nothing and changes nothing.
-
 ## Contracts
 
 - **OrganisationActor SQLite:** `action_ledger` (`actors/action-ledger.ts`, FND-06).
@@ -296,8 +292,8 @@ or dismisses it. An accepted brief sends nothing and changes nothing.
   `agent_definition_revision`, `agent_installation`, `agent_area_assignment`, `skill`,
   `skill_revision`, `skill_binding`, `cue_binding`, `schedule_binding`,
   `schedule_dispatch_receipt`, `agent_installation_governance`,
-  `agent_configuration_proposal`, `case_assignment_pin`, `operator_configuration_draft`
-  and `campaign_brief`.
+  `agent_configuration_proposal`, `case_assignment_pin` and
+  `operator_configuration_draft`.
 - **Engine** (`services/commerce/src/plugins/purchasing/`): the preset, the
   reconcile and the receipt check. The routes `…/entity-plane/purchasing-preset` and
   `…/purchasing-reconcile` need `entity_plane:write`. The public ids are in
@@ -310,26 +306,23 @@ or dismisses it. An accepted brief sends nothing and changes nothing.
 The control routes are under `/v1/control/organisations/:id/`. An "admin" route also
 admits an owner.
 
-| Route                                                                       | Role          | Purpose                                                                     |
-| --------------------------------------------------------------------------- | ------------- | --------------------------------------------------------------------------- |
-| `GET commerce/actions/:nonce`                                               | Viewer        | Read one action                                                             |
-| `POST commerce/actions`                                                     | Admin         | Propose a Portal kind or a payout                                           |
-| `POST commerce/actions/:nonce/approval`, `/rejection`, `/execute`           | Admin         | Decide and run (FND-06)                                                     |
-| `GET commerce/actions/:nonce/plugin-preview`                                | Admin         | Preview a plugin while it waits                                             |
-| `POST commerce/operations/tracking-batches/preview`                         | Viewer        | Freeze a tracking batch                                                     |
-| `GET operations`                                                            | Viewer        | The configuration, the active Cases, the ledger and the commerce exceptions |
-| `POST operations`                                                           | Admin         | One of 17 agent operation commands                                          |
-| `GET operations/(definitions\|skills)/:id/revisions`                        | Viewer        | At most 50 revisions, newest first                                          |
-| `POST agents/urk`                                                           | Admin         | Install Sous Chef                                                           |
-| `GET campaign-briefs?caseId=`, `POST campaign-briefs/:id/(accept\|dismiss)` | Viewer, admin | Read or decide briefs                                                       |
-| `POST commerce/purchasing/activate`                                         | Admin         | Publish the purchasing preset                                               |
-| `POST commerce/purchasing/reconcile`, `POST commerce/suppliers`             | Operator      | Recheck stock, add a supplier                                               |
-| `POST commerce/list-entries/:id/patch`                                      | Operator      | Change a purchase request (COM-03)                                          |
+| Route                                                             | Role     | Purpose                                                                     |
+| ----------------------------------------------------------------- | -------- | --------------------------------------------------------------------------- |
+| `GET commerce/actions/:nonce`                                     | Viewer   | Read one action                                                             |
+| `POST commerce/actions`                                           | Admin    | Propose a Portal kind or a payout                                           |
+| `POST commerce/actions/:nonce/approval`, `/rejection`, `/execute` | Admin    | Decide and run (FND-06)                                                     |
+| `GET commerce/actions/:nonce/plugin-preview`                      | Admin    | Preview a plugin while it waits                                             |
+| `POST commerce/operations/tracking-batches/preview`               | Viewer   | Freeze a tracking batch                                                     |
+| `GET operations`                                                  | Viewer   | The configuration, the active Cases, the ledger and the commerce exceptions |
+| `POST operations`                                                 | Admin    | One of 17 agent operation commands                                          |
+| `GET operations/(definitions\|skills)/:id/revisions`              | Viewer   | At most 50 revisions, newest first                                          |
+| `POST commerce/purchasing/activate`                               | Admin    | Publish the purchasing preset                                               |
+| `POST commerce/purchasing/reconcile`, `POST commerce/suppliers`   | Operator | Recheck stock, add a supplier                                               |
+| `POST commerce/list-entries/:id/patch`                            | Operator | Change a purchase request (COM-03)                                          |
 
 A mutation route needs an `Idempotency-Key`. A replay gives the stored answer, and the
-same key with another body gives 409 `idempotency_key_conflict`. The campaign brief
-decision is the exception: it takes `expectedRevision` in the body, and a stale
-revision gives 409 `campaign_brief_conflict`. The 17 agent operation commands are in
+same key with another body gives 409 `idempotency_key_conflict`. The 17 agent operation
+commands are in
 `packages/control-api/src/agent-operation-commands.ts`.
 
 The proposal tools are in `areas/commerce/server/agent-tools/commerce/proposals.ts`,
@@ -346,7 +339,6 @@ and has the effect `proposal`. `supplier_create` needs `commerce.supplier.create
 | Propose a commerce change                                | No     | No       | Yes             | Proposal tools                                |
 | Approve, reject or run a change                          | No     | No       | Yes             | No                                            |
 | Change agents, skills, triggers and limits               | No     | No       | Yes             | `configuration_propose`                       |
-| Install Sous Chef, accept a campaign brief               | No     | No       | Yes             | Proposes a brief                              |
 | Activate Purchasing                                      | No     | No       | Yes             | No                                            |
 | Add a supplier, recheck stock, change a purchase request | No     | Yes      | Yes             | `supplier_create`; a proposal for the request |
 
@@ -357,7 +349,7 @@ and has the effect `proposal`. `supplier_create` needs `commerce.supplier.create
 | Execution lease                     | 5 minutes                                   | `ACTION_EXECUTION_LEASE_DURATION_MS`                                                |
 | Case wait check                     | 1 minute for 10 minutes, then 15 minutes    | `APPROVAL_READ_FIRST_MS`, `APPROVAL_READ_FIRST_WINDOW_MS`, `APPROVAL_READ_LATER_MS` |
 | Ledger entries that Home reads      | 50                                          | A literal in `control/agent-operation-activity.ts`                                  |
-| Configuration draft, campaign brief | 1 hour                                      | `OPERATOR_DRAFT_TTL_MS`                                                             |
+| Configuration draft                 | 1 hour                                      | `OPERATOR_DRAFT_TTL_MS`                                                             |
 | Report records                      | 25                                          | `POPULATION_LIMIT`                                                                  |
 | Revision list                       | 50                                          | `REVISION_HISTORY_LIMIT`                                                            |
 | Commerce exceptions                 | 500 records, 100 a page; 1 to 50 in a batch | `INBOX_RESULT_LIMIT`, `INBOX_PAGE_LIMIT`; a literal                                 |
@@ -410,7 +402,6 @@ Neighbours:
 - Only a test calls `submitAgentConfigurationProposal`: the agent tool makes a draft.
 - No command archives an area, a definition or an installation, changes the grants of
   an installation or adds a second area. A skill binds only to an area.
-- The Portal does not call `agents/urk` or the campaign brief routes.
 - `cancel_order` records `refundGovernance`, but no code acts on it.
 - Of the step-up policies, only the Google step-up makes approval evidence. A
   `webauthn_step_up` or `seams_nep413` policy is always reported as not ready.

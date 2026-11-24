@@ -57,7 +57,10 @@ import {
   replayControlMutation,
   resolveMutationUser,
 } from "@purin-labs/control/worker/admission/control-mutation";
-import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  authorizeOrganisationJsonPost,
+  authorizeOrganisationRequest,
+} from "@purin-labs/control/worker/authorization";
 import {
   controlError,
   controlJson,
@@ -562,24 +565,23 @@ export async function handleCommerceSystemSync(
   env: Env,
   organisationIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const started = await authorizeOrganisationJsonPost(
     request,
     env,
     organisationIdRaw,
     "admin",
     true,
+    "commerce_system_sync_invalid",
   );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
-  if (!body.ok || Object.keys(body.value).length !== 0) {
+  if (!started.ok) return started.response;
+  const { authorized, body } = started;
+  if (Object.keys(body).length !== 0)
     return controlError("commerce_system_sync_invalid", 422);
-  }
   const admitted = await admitUserMutation({
     request,
     env,
     authorized,
-    body: body.value,
+    body,
     boundary: "unversioned",
     user: "after_replay",
     route: `/v1/control/organisations/${authorized.organisationId}/commerce-system/sync`,
@@ -698,22 +700,21 @@ export async function handlePantryCommerceDemo(
   env: Env,
   organisationIdRaw: string,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
+  const started = await authorizeOrganisationJsonPost(
     request,
     env,
     organisationIdRaw,
     "admin",
     true,
+    "builtin_commerce_setup_invalid",
   );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
-  if (!body.ok) return controlError("builtin_commerce_setup_invalid", 422);
-  const demo = parsePantryCommerceDemoRequest(body.value);
+  if (!started.ok) return started.response;
+  const { authorized, body } = started;
+  const demo = parsePantryCommerceDemoRequest(body);
   if (demo === null) return controlError("builtin_commerce_setup_invalid", 422);
   const boundary = await parseMutationBoundary(
     request,
-    body.value,
+    body,
     "unversioned",
   );
   if (boundary instanceof Response) return boundary;

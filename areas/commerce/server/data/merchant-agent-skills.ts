@@ -103,15 +103,13 @@ export type MerchantAgentSkillName =
   | "performance_insights"
   | "catalog_listings"
   | "inventory_operations"
-  | "pricing_and_promotions"
-  | "marketing_campaigns";
+  | "pricing_and_promotions";
 
 export const MERCHANT_AGENT_SKILL_NAMES: readonly MerchantAgentSkillName[] = [
   "performance_insights",
   "catalog_listings",
   "inventory_operations",
   "pricing_and_promotions",
-  "marketing_campaigns",
 ];
 
 type MerchantAgentSkill = Readonly<{
@@ -239,21 +237,6 @@ export function merchantAgentSkill(name: MerchantAgentSkillName): MerchantAgentS
           "deletes one in the board editor's Images panel, and that cannot be undone.",
           "Mark",
           "an item sold out today with `sold_out_mark`; that needs no approval.",
-        ].join("\n"),
-      };
-    case "marketing_campaigns":
-      return {
-        name,
-        title: "Marketing campaigns",
-        markdownBody: [
-          "# Marketing campaigns",
-          "",
-          "Draft a campaign brief for a proposed or approved price change: objective, the exact products,",
-          "variants, and offers with the revisions you observed, intended channel and audience, message",
-          "variants, requested budget and window, and any required disclosures.",
-          "",
-          "A brief is a document for a person to review. Accepting one sends nothing, selects no audience,",
-          "spends no budget, and changes no commerce fact. Say so if asked to launch it.",
         ].join("\n"),
       };
   }
