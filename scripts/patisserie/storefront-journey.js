@@ -112,7 +112,7 @@ async (opener) => {
     check("twenty-four items carry a price", prices.length === 24, prices);
     check(
       "each section shows its price",
-      prices[0] === "¥330" &&
+      prices[0] === "¥300" &&
         prices[8] === "¥1,200" &&
         prices[9] === "¥1,600" &&
         prices[16] === "¥780" &&
@@ -219,10 +219,10 @@ async (opener) => {
     // 4. The navbar cart opens a drawer with the order and its total.
     await cartButton.click();
     const drawer = page.getByRole("dialog", { name: "Cart" });
-    await drawer.getByText("¥2,860").waitFor();
+    await drawer.getByText("¥2,800").waitFor();
     check(
-      "the cart drawer totals ¥2,860",
-      (await drawer.innerText()).includes("¥2,860"),
+      "the cart drawer totals ¥2,800",
+      (await drawer.innerText()).includes("¥2,800"),
     );
     await capture("03-cart-drawer");
     // 5. Commerce quotes the order.
@@ -243,14 +243,14 @@ async (opener) => {
         review.includes("Caffè latte"),
     );
     check(
-      "the quote prices the items at ¥2,860",
-      /Items\s+¥2,860/u.test(review),
+      "the quote prices the items at ¥2,800",
+      /Items\s+¥2,800/u.test(review),
       review.slice(0, 600),
     );
-    // 8% inside ¥2,860 is ¥2,860 × 8 / 108 = ¥211.85, so ¥212.
+    // 8% inside ¥2,800 is ¥2,800 × 8 / 108 = ¥207.41, so ¥207.
     check(
-      "the listed prices include 8% tax, so the total stays ¥2,860",
-      /Includes tax\s+¥212/u.test(review) && /Total\s+¥2,860/u.test(review),
+      "the listed prices include 8% tax, so the total stays ¥2,800",
+      /Includes tax\s+¥207/u.test(review) && /Total\s+¥2,800/u.test(review),
       review.slice(0, 600),
     );
     await capture("04-quote");

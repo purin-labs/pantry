@@ -755,7 +755,7 @@ export const PATISSERIE_ITEMS: readonly PatisserieItem[] = [
     "black_sesame",
     "Black sesame financier",
     "toasted black sesame",
-    330,
+    300,
     [
       [CULTURED_BUTTER, 500],
       [EGG_WHITE, 560],
@@ -766,7 +766,7 @@ export const PATISSERIE_ITEMS: readonly PatisserieItem[] = [
       [BLACK_SESAME, 110],
     ],
   ),
-  financier("hazelnut", "Hazelnut financier", "roasted hazelnut", 350, [
+  financier("hazelnut", "Hazelnut financier", "roasted hazelnut", 320, [
     [CULTURED_BUTTER, 500],
     [EGG_WHITE, 560],
     [SUGAR, 450],
@@ -775,7 +775,7 @@ export const PATISSERIE_ITEMS: readonly PatisserieItem[] = [
     [PASTRY_FLOUR, 140],
     [HONEY_MAPLE, 60],
   ]),
-  financier("maple", "Maple financier", "a maple glaze", 320, [
+  financier("maple", "Maple financier", "a maple glaze", 280, [
     [CULTURED_BUTTER, 500],
     [EGG_WHITE, 560],
     [SUGAR, 380],
@@ -783,7 +783,7 @@ export const PATISSERIE_ITEMS: readonly PatisserieItem[] = [
     [PASTRY_FLOUR, 140],
     [HONEY_MAPLE, 180],
   ]),
-  financier("matcha", "Matcha financier", "matcha", 350, [
+  financier("matcha", "Matcha financier", "matcha", 320, [
     [CULTURED_BUTTER, 500],
     [EGG_WHITE, 560],
     [SUGAR, 460],
@@ -796,7 +796,7 @@ export const PATISSERIE_ITEMS: readonly PatisserieItem[] = [
     "ginger_citrus",
     "Ginger citrus financier",
     "fresh ginger and candied citrus peel",
-    330,
+    380,
     [
       [CULTURED_BUTTER, 500],
       [EGG_WHITE, 560],
@@ -811,7 +811,7 @@ export const PATISSERIE_ITEMS: readonly PatisserieItem[] = [
     "apple_cinnamon",
     "Apple cinnamon financier",
     "apple and cinnamon",
-    350,
+    380,
     [
       [CULTURED_BUTTER, 500],
       [EGG_WHITE, 560],
@@ -822,7 +822,7 @@ export const PATISSERIE_ITEMS: readonly PatisserieItem[] = [
       [HONEY_MAPLE, 60],
     ],
   ),
-  financier("coffee", "Coffee financier", "espresso", 330, [
+  financier("coffee", "Coffee financier", "espresso", 250, [
     [CULTURED_BUTTER, 500],
     [EGG_WHITE, 560],
     [SUGAR, 450],
@@ -831,7 +831,7 @@ export const PATISSERIE_ITEMS: readonly PatisserieItem[] = [
     [ESPRESSO_BEANS, 65],
     [HONEY_MAPLE, 50],
   ]),
-  financier("houjicha", "Houjicha financier", "roasted houjicha tea", 330, [
+  financier("houjicha", "Houjicha financier", "roasted houjicha tea", 300, [
     [CULTURED_BUTTER, 500],
     [EGG_WHITE, 560],
     [SUGAR, 450],

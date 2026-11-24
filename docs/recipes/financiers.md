@@ -60,15 +60,15 @@ cake crumb. A paste-like or doughy centre after cooling needs investigation.
 
 ## Shop flavours
 
-The shop at shop.purin.io sells four financiers. Each is "brown butter and
-almond financier" with one flavour:
+The shop at shop.purin.io sells eight financiers. This guide covers four of
+them. Each is "brown butter and almond financier" with one flavour:
 
 | Shop name | Shop description | Price |
 | --- | --- | ---: |
-| Hazelnut financier | with roasted hazelnut | ¥350 |
-| Coffee financier | with espresso | ¥330 |
-| Matcha financier | with matcha | ¥350 |
-| Black sesame financier | with toasted black sesame | ¥330 |
+| Hazelnut financier | with roasted hazelnut | ¥320 |
+| Coffee financier | with espresso | ¥250 |
+| Matcha financier | with matcha | ¥320 |
+| Black sesame financier | with toasted black sesame | ¥300 |
 
 Each flavour is its own batter batch. The base is the formula above without
 the vanilla. Weigh the mix-ins on the scale with the other dry ingredients;

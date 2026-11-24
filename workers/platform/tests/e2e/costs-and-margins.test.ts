@@ -496,10 +496,10 @@ it(
     expect(plainRow.batchYield).toBe(24);
     expect(plainRow.batchesPerDay).toBe(2);
     expect(plainRow.producedUnits).toBe(48);
-    // 8% included consumption tax on ¥330 extracts ¥24 tax -> ¥306 net ex-tax sale.
-    expect(plainRow.grossPriceMinor).toBe(330);
-    expect(plainRow.includedTaxMinor).toBe(24);
-    expect(plainRow.netExTaxPriceMinor).toBe(306);
+    // 8% included consumption tax on ¥300 extracts ¥22 tax -> ¥278 net ex-tax sale.
+    expect(plainRow.grossPriceMinor).toBe(300);
+    expect(plainRow.includedTaxMinor).toBe(22);
+    expect(plainRow.netExTaxPriceMinor).toBe(278);
 
     // Forward BOM wholesale cost chain connects supplier packs -> recipe batch -> unit COGS.
     expect(plainRow.recipeRevision).toBeGreaterThanOrEqual(1);
@@ -665,7 +665,7 @@ it(
       plainUnitCostBefore,
     );
     // Live offer price stays untouched.
-    expect(plainRowAfterButter?.grossPriceMinor).toBe(330);
+    expect(plainRowAfterButter?.grossPriceMinor).toBe(300);
 
     // 3b. Phase 2 spreadsheet save_sheet: Margin % -> Price ¥ back-solve, live Offer
     //     price writes, regional D1 Labor/Rent/Mon-Sun plan writes, supply writes,
@@ -685,7 +685,7 @@ it(
     if (solvedGrossPriceMinor === null) {
       throw new Error("Back-solve failed for 45% target margin");
     }
-    expect(solvedGrossPriceMinor).toBeGreaterThan(330);
+    expect(solvedGrossPriceMinor).toBeGreaterThan(300);
 
     const plainBeforeSheet = afterButterOverview.products.find(
       (product) => product.productId === plainProduct.productId,
