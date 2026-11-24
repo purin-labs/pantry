@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import {
   META_SAVED_AT_CELL_KEY,
   isCostsSheetCellEntry,
@@ -204,10 +205,10 @@ export const supplyCostSave = defineKitchenTool({
         type: "integer",
         minimum: 0,
       },
-      supplierId: {
+      supplierId: textLimit({
         type: ["string", "null"],
         maxLength: 128,
-      },
+      }),
       bulkTier: {
         type: ["object", "null"],
         properties: {
@@ -227,10 +228,10 @@ export const supplyCostSave = defineKitchenTool({
         required: ["min7dQuantity", "packQuantity", "packPriceMinor"],
         additionalProperties: false,
       },
-      notes: {
+      notes: textLimit({
         type: ["string", "null"],
         maxLength: 500,
-      },
+      }),
     },
     required: [
       "inventoryItemId",
@@ -301,15 +302,15 @@ export const lotCostSave = defineKitchenTool({
         type: "integer",
         minimum: 0,
       },
-      invoiceReference: {
+      invoiceReference: textLimit({
         type: "string",
         minLength: 1,
         maxLength: LOT_INVOICE_LIMITS.invoiceReference,
-      },
-      supplierId: {
+      }),
+      supplierId: textLimit({
         type: ["string", "null"],
         maxLength: LOT_INVOICE_LIMITS.supplierId,
-      },
+      }),
     },
     required: [
       "lotId",
@@ -505,15 +506,15 @@ export const costsSheetEdit = defineKitchenTool({
         items: {
           type: "object",
           properties: {
-            cellKey: {
+            cellKey: textLimit({
               type: "string",
               minLength: 1,
               maxLength: 220,
-            },
-            value: {
+            }),
+            value: textLimit({
               type: ["string", "null"],
               maxLength: 160,
-            },
+            }),
           },
           required: ["cellKey", "value"],
           additionalProperties: false,

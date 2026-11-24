@@ -1,17 +1,7 @@
 {
   "files": {
-    "areas/cafe/server/agent-tools/commerce/order-queue.ts": 1,
     "areas/cafe/server/agent-tools/commerce/register-view.ts": 1,
-    "areas/cafe/server/agent-tools/drafts/drafts.ts": 8,
-    "areas/commerce/server/agent-tools/commerce/description-draft.ts": 2,
-    "areas/commerce/server/agent-tools/commerce/proposals.ts": 11,
-    "areas/inbox/server/agent-tools/channels/channels.ts": 10,
-    "areas/inbox/server/agent-tools/channels/email-draft.ts": 2,
-    "areas/inbox/server/agent-tools/channels/mailbox-agent.ts": 2,
     "areas/kitchen/server/agent-tools/costs/view.ts": 2,
-    "areas/kitchen/server/agent-tools/kitchen/costs.ts": 6,
-    "foundation/authority/generated/action-registry.ts": 3,
-    "packages/bakery-model/src/bakery-margins.ts": 4,
-    "workers/platform/scripts/generate-actions.ts": 2
+    "packages/bakery-model/src/bakery-margins.ts": 4
   }
 }
