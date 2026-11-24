@@ -31,6 +31,10 @@ const EXCLUDED = [
   /\.d\.(ts|mts)$/,
   /\.test\.[a-z]+$/,
   /\.type-fixtures\.ts$/,
+  // The generated action registry's argsSchema is a JSON description of the
+  // arguments; its generated parser checks each size with `.length`.
+  /^foundation\/authority\/generated\/action-registry\.ts$/,
+  /^workers\/platform\/scripts\/generate-actions\.ts$/,
 ];
 const LIMIT_CALL = "textLimit";
 
