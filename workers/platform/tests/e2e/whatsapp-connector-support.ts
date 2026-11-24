@@ -71,6 +71,8 @@ export type Fixture = {
   readonly policyVersion: number;
   /** The Organisation's owner, signed in to the Portal. */
   readonly owner: IssuedControlSession;
+  /** The Slack workspace account of the Organisation. */
+  readonly slackAccountId: string;
   /** The customer's message in the open Case. */
   readonly customerText: string;
 };
@@ -91,7 +93,8 @@ export type FixtureOptions = Readonly<{
 export async function installFixture(
   options: FixtureOptions = {},
 ): Promise<Fixture> {
-  const { ownerSession } = await installSlackActorFixture();
+  const { ownerSession, selectedIntegrationAccountId } =
+    await installSlackActorFixture();
   await requireActiveOrganisationActor({
     env,
     organisationId: ORGANISATION_ID,
@@ -263,6 +266,7 @@ export async function installFixture(
     now,
     policyVersion: policy.policyVersion,
     owner: ownerSession,
+    slackAccountId: selectedIntegrationAccountId,
     customerText: options.customerText ?? "Is my order ready?",
   };
   const reply = options.reply ?? REPLY;

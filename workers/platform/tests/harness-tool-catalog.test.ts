@@ -987,14 +987,18 @@ function recordWhatsAppSupportReplySend(
   sends: unknown[],
   request: import("@purin-labs/area-inbox/server/agent-tools/channels/services").HarnessWhatsAppSupportReplySend,
 ): Promise<
-  import("@purin-labs/area-inbox/server/agent-tools/channels/services").HarnessWhatsAppSupportReplyReceipt
+  import("@purin-labs/agent-tools/tool-effect").UncheckedEffect<
+    import("@purin-labs/area-inbox/server/agent-tools/channels/services").HarnessWhatsAppSupportReplyReceipt
+  >
 > {
   sends.push(request);
-  return Promise.resolve({
-    kind: "sent",
-    caseId: request.caseId,
-    receiptId: "wamid.reply_1",
-  });
+  return Promise.resolve(
+    uncheckedEffect(async () => ({
+      kind: "sent" as const,
+      caseId: request.caseId,
+      receiptId: "wamid.reply_1",
+    })),
+  );
 }
 
 function queryWorkspace(

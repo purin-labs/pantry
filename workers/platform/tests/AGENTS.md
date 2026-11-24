@@ -72,7 +72,9 @@ test and any fixture that exists only for the obsolete behavior.
   for another record. `e2e/outside-written-link.test.ts` reads a fake public
   page through the link read of a Slack thread: after the channel's Allow the
   Airtable write asks again with the exact record, and a thread with no link
-  writes. `e2e/outside-written-documentation.test.ts` reads a fake public
+  writes. Its second journey sends a WhatsApp reply to a fake Meta from a
+  thread with no link, and a reply after the page read waits for the member
+  who asked, with the exact Case and text. `e2e/outside-written-documentation.test.ts` reads a fake public
   page through the documentation read of a Portal chat: the next step's
   Airtable write asks with the exact record, a later message of that chat asks
   too, and a chat with no page writes. Step 10 of `e2e/chat-agent-recipes-suppliers.test.ts`

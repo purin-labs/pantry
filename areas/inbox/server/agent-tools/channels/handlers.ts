@@ -1098,7 +1098,7 @@ export async function sendWhatsAppSupportReplyForEmbeddedHarness(
   assignment: CaseAssignment,
   currentInstruction: string,
   request: HarnessWhatsAppSupportReplySend,
-): Promise<HarnessWhatsAppSupportReplyReceipt> {
+): Promise<ToolEffect<HarnessWhatsAppSupportReplyReceipt>> {
   await requireSessionExecution(execution, lease);
   const organisationId = execution.scope.organisationId;
   if (assignment.sessionId !== lease.session.sessionId) {
@@ -1162,56 +1162,85 @@ export async function sendWhatsAppSupportReplyForEmbeddedHarness(
     );
   }
   const automaticProposalId = `proposal_${caseId.value}_${conversationWindow.conversationWindowSequence}`;
-  const projection = await readWhatsAppReplyProposalProjection({
-    db: execution.scope.database,
-    organisationId,
-    proposalId: automaticProposalId,
-  });
-  const approval =
-    projection?.author === "agent" &&
-    projection.lifecycleKind === "awaiting_approval"
-      ? await editDirectedWhatsAppAgentProposal(
-          connector.value,
-          execution,
-          lease,
-          connectorId.value,
-          automaticProposalId,
-          request.body,
-          now,
-        )
-      : await composeDirectedWhatsAppHumanReply(
-          connector.value,
-          execution,
-          lease,
-          connectorId.value,
-          caseId.value,
-          requesterUserId,
-          `proposal_slack_${lease.turn.turnId}`,
-          request.body,
-          conversationWindow.serviceWindowExpiresAt,
-          now,
-        );
-  await requireSessionExecution(execution, lease);
-  const sent = await connector.value.dispatchWhatsAppReply({
-    identity: { organisationId, connectorId: connectorId.value },
-    origin: { kind: "session_turn", execution: sessionTurnExecution(lease) },
-    proposalId: approval.proposalId,
-    approvedVersion: approval.version,
-    approvedBodyDigest: approval.bodyDigest,
-    approvedBy: requesterUserId,
-    now: Date.now(),
-  });
-  await requireSessionExecution(execution, lease);
-  if (!sent.ok) {
-    throw new Error(`WhatsApp support reply failed: ${sent.error.code}`);
-  }
-  if (sent.value.kind !== "sent") {
-    throw new Error(`WhatsApp support reply was not sent: ${sent.value.kind}`);
-  }
+  const send = async (): Promise<HarnessWhatsAppSupportReplyReceipt> => {
+    const projection = await readWhatsAppReplyProposalProjection({
+      db: execution.scope.database,
+      organisationId,
+      proposalId: automaticProposalId,
+    });
+    const approval =
+      projection?.author === "agent" &&
+      projection.lifecycleKind === "awaiting_approval"
+        ? await editDirectedWhatsAppAgentProposal(
+            connector.value,
+            execution,
+            lease,
+            connectorId.value,
+            automaticProposalId,
+            request.body,
+            Date.now(),
+          )
+        : await composeDirectedWhatsAppHumanReply(
+            connector.value,
+            execution,
+            lease,
+            connectorId.value,
+            caseId.value,
+            requesterUserId,
+            `proposal_slack_${lease.turn.turnId}`,
+            request.body,
+            conversationWindow.serviceWindowExpiresAt,
+            Date.now(),
+          );
+    await requireSessionExecution(execution, lease);
+    const sent = await connector.value.dispatchWhatsAppReply({
+      identity: { organisationId, connectorId: connectorId.value },
+      origin: { kind: "session_turn", execution: sessionTurnExecution(lease) },
+      proposalId: approval.proposalId,
+      approvedVersion: approval.version,
+      approvedBodyDigest: approval.bodyDigest,
+      approvedBy: requesterUserId,
+      now: Date.now(),
+    });
+    await requireSessionExecution(execution, lease);
+    if (!sent.ok) {
+      throw new Error(`WhatsApp support reply failed: ${sent.error.code}`);
+    }
+    if (sent.value.kind !== "sent") {
+      throw new Error(
+        `WhatsApp support reply was not sent: ${sent.value.kind}`,
+      );
+    }
+    return {
+      kind: "sent",
+      caseId: caseId.value,
+      receiptId: sent.value.whatsappMessageId,
+    };
+  };
+  // The reply leaves the Organisation for the Case's customer. The turn's
+  // label meets the exit check of a send to an outside person, and a turn
+  // that read text of another outside person asks the requester first, with
+  // the exact Case and body (Plan 89).
   return {
-    kind: "sent",
-    caseId: caseId.value,
-    receiptId: sent.value.whatsappMessageId,
+    kind: "effect",
+    label: {
+      source: "turn",
+      unavailable: "WhatsApp reply information-flow authority unavailable",
+    },
+    sink: {
+      kind: "tool_effect",
+      destinationAuthority: lease.requestAuthority,
+      capabilityId: CAPABILITY_KEYS.whatsappSupportReplySend,
+      integrationAccountId: conversationWindow.integrationAccountId,
+      resourceScope: WHATSAPP_SUPPORT_ACTIVE_CASES_SCOPE,
+      approvalSatisfied: false,
+    },
+    action: {
+      operation: "whatsapp.reply.send",
+      arguments: { caseId: caseId.value, body: request.body },
+    },
+    refusal: (decision) => `WhatsApp reply is not authorized: ${decision}`,
+    run: send,
   };
 }
 

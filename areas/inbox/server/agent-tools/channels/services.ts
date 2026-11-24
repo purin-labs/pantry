@@ -154,7 +154,7 @@ type WhatsAppSupportRead = (
 
 type WhatsAppSupportReplySend = (
   request: HarnessWhatsAppSupportReplySend,
-) => Promise<HarnessWhatsAppSupportReplyReceipt>;
+) => Promise<PreparedEffect>;
 
 type EmailDraftReadTool = () => Promise<EmailDraftRead>;
 

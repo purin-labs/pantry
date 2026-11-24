@@ -345,6 +345,11 @@ in `registry.ts`. The capabilities are in
 `foundation/authority/authorization/capability-catalogue.ts`; each needs
 `scripts/capability-policy-backfill-sql.mjs`.
 
+`whatsapp_support_reply_send` meets the exit check of a send to an outside person, with
+the turn's label (FND-07). A turn that read text of another outside person, such as a
+shared page, an email or another Case, asks the requester first. The request shows the
+exact Case and body, and the customer gets nothing before the Allow.
+
 ## Rules and limits
 
 | Action                                   | Viewer, operator                                    | Admin and owner             | Chat agent                          |
@@ -428,7 +433,6 @@ in `registry.ts`. The capabilities are in
   writes one. Only patch scripts and a journey do.
 - No route moves a Gmail reply to `approved` or `operator_attested_*`. A person cannot
   attest an unconfirmed Gmail reply.
-- `whatsapp_support_reply_send` has no exit check yet (Refactor 17, Appendix C).
 - WhatsApp is deferred since 23 November 2026: Meta banned the owner's account, so no
   WhatsApp connect, webhook or live check runs until the owner has a working Meta business
   account.

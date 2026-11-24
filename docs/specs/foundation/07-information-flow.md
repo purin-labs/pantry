@@ -136,12 +136,12 @@ the exit decides.
 - An effect passes when its capability is in `PASSES_AFTER_OUTSIDE_TEXT`, or when its
   approval is satisfied. A new capability asks until a person adds it to that set.
 
-| Effect in a Session with the writer `outside`                                                                                                                                        | Result                                                                 |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| The answer to the turn's own conversation                                                                                                                                            | Passes. The rule reads tool effects only                               |
-| A custom connector read, the link read                                                                                                                                               | Passes                                                                 |
-| An email or Slack message proposal, a marketing email draft edit, a commerce proposal, a custom connector draft or write                                                             | Passes. A person reviews the exact content before it changes something |
-| Each other tool effect with an exit check: the order queue, sold out, recipes, costs, suppliers, device pause, bake run pause, an Airtable write, a shared draft edit, a canvas move | Asks the person who asked                                              |
+| Effect in a Session with the writer `outside`                                                                                                                                                          | Result                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| The answer to the turn's own conversation                                                                                                                                                              | Passes. The rule reads tool effects only                               |
+| A custom connector read, the link read                                                                                                                                                                 | Passes                                                                 |
+| An email or Slack message proposal, a marketing email draft edit, a commerce proposal, a custom connector draft or write                                                                               | Passes. A person reviews the exact content before it changes something |
+| Each other tool effect with an exit check: the order queue, sold out, recipes, costs, suppliers, device pause, bake run pause, an Airtable write, a WhatsApp reply, a shared draft edit, a canvas move | Asks the person who asked                                              |
 
 - The mailbox agent chooses a direct reply, and trusted code decides
   (`mailboxReplyDisposition`). A direct reply goes only when the sender is a verified
@@ -400,11 +400,10 @@ planner and interpreter; a second policy engine.
 
 ## Open work
 
-- No sink names a capability of `OUTSIDE_CAPABILITIES`. `whatsapp_support_reply_send`
-  runs no exit check, and commerce execution names `commerce.action.propose`. Thus a
-  catalogue publish and a WhatsApp reply do not meet rule 4.
-- `schedule_follow_up`, `menu_board_archive` and `whatsapp_support_reply_send` run no
-  exit check. The proposal tools and the surface tools also run none
+- No sink names `commerce.catalog.publish` or `commerce.catalog.update_description`.
+  Commerce execution names `commerce.action.propose`, so a catalogue publish does not
+  meet rule 4.
+- `schedule_follow_up` and `menu_board_archive` run no exit check. The proposal tools and the surface tools also run none
   ([Refactor 17](../../refactor-17.md), Appendix C). Plan 89 says that a follow-up asks.
 - No source adapter makes a public label for a published menu, a fetched page or
   documentation. The link read gives a page the message's ingress label, and a
@@ -429,8 +428,8 @@ planner and interpreter; a second policy engine.
   level at each read, so no background conversion runs.
 - `outside-written-effect.test.ts` adds the outside read to the running turn directly
   (`raiseLabel` in `tests/e2e/held-exit-support.ts`). `outside-written-link.test.ts`
-  reads a fake public page through the link read of a Slack thread.
-  `outside-written-documentation.test.ts` reads one through the documentation read of a
+  reads a fake public page through the link read of a Slack thread, before an Airtable
+  write and before a WhatsApp reply to a fake Meta. `outside-written-documentation.test.ts` reads one through the documentation read of a
   Portal chat. All three use fake services, and they read no mailbox. No file in `workers/platform/tests/` holds the
   reason code `aifc.other_recipient`.
 - The Slack stream calls and `chat.update` send no preview flag. Their link preview
