@@ -1927,6 +1927,9 @@ importers:
 
   packages/bakery-workflow:
     dependencies:
+      '@purin-labs/contract-schema':
+        specifier: workspace:*
+        version: link:../contract-schema
       '@purin-labs/production-simulation':
         specifier: workspace:*
         version: link:../production-simulation

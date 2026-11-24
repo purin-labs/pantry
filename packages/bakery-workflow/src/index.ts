@@ -1,3 +1,4 @@
+import { textLimit } from "@purin-labs/contract-schema";
 import type {
   CompiledScenario,
   Sha256Hex,
@@ -193,7 +194,7 @@ const NODE = Type.Object(
   {
     kind: Type.Literal("step"),
     id: Type.String(),
-    label: Type.String({ minLength: 1, maxLength: 200 }),
+    label: textLimit(Type.String({ minLength: 1, maxLength: 200 })),
     body: Type.Record(Type.String(), Type.Unknown()),
   },
   { additionalProperties: false },
@@ -213,8 +214,8 @@ const EDGE = Type.Object(
 const DOCUMENT = Type.Object(
   {
     schema: Type.Literal(WORKFLOW_DOCUMENT_SCHEMA),
-    title: Type.String({ minLength: 1, maxLength: 200 }),
-    recipe: Type.String({ minLength: 1, maxLength: 100 }),
+    title: textLimit(Type.String({ minLength: 1, maxLength: 200 })),
+    recipe: textLimit(Type.String({ minLength: 1, maxLength: 100 })),
     scenario: Type.Record(Type.String(), Type.Unknown()),
     world: Type.Record(Type.String(), Type.Unknown()),
     demand: Type.Record(Type.String(), Type.Unknown()),
