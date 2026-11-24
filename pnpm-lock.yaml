@@ -334,9 +334,9 @@ importers:
       '@purin-labs/area-devices-contract':
         specifier: workspace:*
         version: link:../devices/contract
-      '@purin-labs/area-kitchen':
+      '@purin-labs/area-kitchen-contract':
         specifier: workspace:*
-        version: link:../kitchen
+        version: link:../kitchen/contract
       '@purin-labs/authority':
         specifier: workspace:*
         version: link:../../foundation/authority
@@ -452,9 +452,9 @@ importers:
       '@purin-labs/area-integrations':
         specifier: workspace:*
         version: link:../integrations
-      '@purin-labs/area-kitchen':
+      '@purin-labs/area-kitchen-contract':
         specifier: workspace:*
-        version: link:../kitchen
+        version: link:../kitchen/contract
       '@purin-labs/area-organisation':
         specifier: workspace:*
         version: link:../organisation
@@ -963,6 +963,9 @@ importers:
       '@purin-labs/area-inbox-contract':
         specifier: workspace:*
         version: link:../inbox/contract
+      '@purin-labs/area-kitchen-contract':
+        specifier: workspace:*
+        version: link:contract
       '@purin-labs/area-organisation':
         specifier: workspace:*
         version: link:../organisation
@@ -1070,6 +1073,64 @@ importers:
         specifier: 0.18.0-ts7.1.0-dev.20260929
         version: 0.18.0-ts7.1.0-dev.20260929
 
+  areas/kitchen/contract:
+    dependencies:
+      '@purin-labs/agent':
+        specifier: workspace:*
+        version: link:../../../foundation/agent
+      '@purin-labs/agent-tools':
+        specifier: workspace:*
+        version: link:../../../foundation/agent-tools
+      '@purin-labs/area-commerce-contract':
+        specifier: workspace:*
+        version: link:../../commerce/contract
+      '@purin-labs/bakery-model':
+        specifier: workspace:*
+        version: link:../../../packages/bakery-model
+      '@purin-labs/bakery-workflow':
+        specifier: workspace:*
+        version: link:../../../packages/bakery-workflow
+      '@purin-labs/commerce-client':
+        specifier: workspace:*
+        version: link:../../../packages/commerce-client
+      '@purin-labs/commerce-contracts':
+        specifier: workspace:*
+        version: link:../../../packages/commerce-contracts
+      '@purin-labs/control':
+        specifier: workspace:*
+        version: link:../../../foundation/control
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../../packages/control-api
+      '@purin-labs/costs-sheet-crdt':
+        specifier: workspace:*
+        version: link:../../../packages/costs-sheet-crdt
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../../../foundation/kernel
+      '@purin-labs/kitchen-control-api':
+        specifier: workspace:*
+        version: link:../../../packages/kitchen-control-api
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../../packages/std
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../../../foundation/tenancy
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../../packages/type-utils
+      '@purin-labs/workflow-canvas-crdt':
+        specifier: workspace:*
+        version: link:../../../packages/workflow-canvas-crdt
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
+
   areas/organisation:
     dependencies:
       '@base-ui/react':
@@ -1096,9 +1157,9 @@ importers:
       '@purin-labs/area-integrations':
         specifier: workspace:*
         version: link:../integrations
-      '@purin-labs/area-kitchen':
+      '@purin-labs/area-kitchen-contract':
         specifier: workspace:*
-        version: link:../kitchen
+        version: link:../kitchen/contract
       '@purin-labs/authority':
         specifier: workspace:*
         version: link:../../foundation/authority
@@ -2252,6 +2313,9 @@ importers:
       '@purin-labs/area-kitchen':
         specifier: workspace:*
         version: link:../../areas/kitchen
+      '@purin-labs/area-kitchen-contract':
+        specifier: workspace:*
+        version: link:../../areas/kitchen/contract
       '@purin-labs/area-organisation':
         specifier: workspace:*
         version: link:../../areas/organisation
@@ -2680,6 +2744,9 @@ importers:
       '@purin-labs/area-kitchen':
         specifier: workspace:*
         version: link:../../areas/kitchen
+      '@purin-labs/area-kitchen-contract':
+        specifier: workspace:*
+        version: link:../../areas/kitchen/contract
       '@purin-labs/area-organisation':
         specifier: workspace:*
         version: link:../../areas/organisation

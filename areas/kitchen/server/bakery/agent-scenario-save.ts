@@ -14,7 +14,7 @@ import {
 } from "@purin-labs/bakery-model/bakery-surface";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { isRecord } from "@purin-labs/std";
-import type { AgentScenarioSaveResult } from "../contract/saved-bakery-runs";
+import type { AgentScenarioSaveResult } from "@purin-labs/area-kitchen-contract/server/saved-bakery-runs";
 
 const PROPOSAL_TTL_MS = 15 * 60_000;
 

@@ -1,5 +1,5 @@
 import { type OrderRefundLineRequest } from "../../order-refund-action";
-import type { StockProposalRequest } from "@purin-labs/area-kitchen/server/contract/stock-action-plan";
+import type { StockProposalRequest } from "@purin-labs/area-kitchen-contract/server/stock-action-plan";
 import {
   parseCommerceActionRequest,
   type CommerceActionRequest,

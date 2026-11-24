@@ -80,12 +80,12 @@ import {
   ORDER_REFUND_VERB,
   orderRefundAllocation,
 } from "./order-refund-action";
-import { isStockOperationVerb, stockOperationResourceId } from "@purin-labs/area-kitchen/server/contract/stock-action";
+import { isStockOperationVerb, stockOperationResourceId } from "@purin-labs/area-kitchen-contract/server/stock-action";
 import {
   executeStockOperation,
   reconcileStockOperation,
   type StockExecution,
-} from "@purin-labs/area-kitchen/server/contract/stock-action-execution";
+} from "@purin-labs/area-kitchen-contract/server/stock-action-execution";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce-contract/server/queue-messages";
 import { newRequestId } from "@purin-labs/kernel/ids";

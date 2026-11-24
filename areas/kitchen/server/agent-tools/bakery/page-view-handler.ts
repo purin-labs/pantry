@@ -17,7 +17,7 @@ import type { OrganisationAccess } from "@purin-labs/tenancy/organisation-access
 import { dispatchBakerySurfaceEffect } from "../../actors/bakery-surface-effect";
 import { timelineVisibleMessages } from "@purin-labs/conversation/chat/conversation";
 import { readConversation } from "@purin-labs/conversation/chat/store";
-import { BakeryContextRequestError } from "../kitchen/services";
+import { BakeryContextRequestError } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 import { requireLiveBakeryAuthority } from "./handlers";
 
 /**

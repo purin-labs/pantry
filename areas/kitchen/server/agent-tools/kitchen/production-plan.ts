@@ -3,10 +3,10 @@ import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type {
   HarnessProductionPlanEdit,
   HarnessProductionPlanRead,
-} from "./services";
+} from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
-import { defineKitchenTool } from "./services";
+import { defineKitchenTool } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 
 export const productionPlanRead = defineKitchenTool({
   name: "production_plan_read",

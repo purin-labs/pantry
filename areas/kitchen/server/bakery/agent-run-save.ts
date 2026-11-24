@@ -8,7 +8,7 @@ import {
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { sha256Hex } from "@purin-labs/std";
 import { bakeryRunSnapshotPrefix } from "./saved-runs";
-import type { AgentRunSaveVerification } from "../contract/saved-bakery-runs";
+import type { AgentRunSaveVerification } from "@purin-labs/area-kitchen-contract/server/saved-bakery-runs";
 
 type SavedAgentRunRow = Readonly<{
   effectId: string;

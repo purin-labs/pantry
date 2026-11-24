@@ -11,7 +11,7 @@ import {
   resolveInventoryAccess,
   resolveInventoryMutation,
   finishInventoryOperation,
-} from "../../contract/inventory-control";
+} from "@purin-labs/area-kitchen-contract/server/inventory-control";
 
 export async function handleRecipes(
   request: Request,

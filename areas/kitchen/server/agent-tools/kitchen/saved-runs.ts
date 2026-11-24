@@ -1,8 +1,8 @@
-import type { SavedBakeryRunQuery } from "../../contract/saved-bakery-runs";
+import type { SavedBakeryRunQuery } from "@purin-labs/area-kitchen-contract/server/saved-bakery-runs";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
-import { defineKitchenTool } from "./services";
+import { defineKitchenTool } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 
 export const savedBakeryRunRead = defineKitchenTool({
   name: "bakery_saved_run_read",

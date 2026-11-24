@@ -1,8 +1,11 @@
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import type { SupplierCreateField, SupplierCreateRequest } from "./services";
+import type {
+  SupplierCreateField,
+  SupplierCreateRequest,
+} from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
-import { defineKitchenTool } from "./services";
+import { defineKitchenTool } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 
 const SUPPLIER_CREATE_FIELDS = [
   "displayName",

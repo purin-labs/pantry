@@ -5,7 +5,7 @@ import {
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { CANVAS_BOUNDS } from "@purin-labs/workflow-canvas-crdt";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
-import { defineKitchenTool } from "./services";
+import { defineKitchenTool } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 
 export const workflowCanvasRead = defineKitchenTool({
   name: "workflow_canvas_read",

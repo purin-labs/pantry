@@ -60,6 +60,8 @@ PLATFORM_SOURCE.push("areas/commerce/contract/server");
 PLATFORM_SOURCE.push("areas/inbox/contract/server");
 // The Worker side of the contract of the area devices (Refactor 17, Stage B).
 PLATFORM_SOURCE.push("areas/devices/contract/server");
+// The Worker side of the contract of the area kitchen (Refactor 17, Stage B).
+PLATFORM_SOURCE.push("areas/kitchen/contract/server");
 
 /**
  * The folders that hold the source of the Portal, in the browser. The package
@@ -98,6 +100,8 @@ PORTAL_SOURCE.push("surfaces/portal/ui");
 PORTAL_SOURCE.push("areas/commerce/contract/ui");
 // The Portal side of the contract of the area inbox (Refactor 17, Stage B).
 PORTAL_SOURCE.push("areas/inbox/contract/ui");
+// The Portal side of the contract of the area kitchen (Refactor 17, Stage B).
+PORTAL_SOURCE.push("areas/kitchen/contract/ui");
 
 /** True when a repository path is in one of `folders`. */
 export function inFolders(path, folders) {

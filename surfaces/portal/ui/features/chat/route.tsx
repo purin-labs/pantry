@@ -21,7 +21,7 @@ import {
   toQueuedInput,
   withoutOutgoing,
 } from "./submission";
-import { captureBakeryBrowserContext } from "@purin-labs/area-kitchen/ui/features/bakery-browser-context";
+import { captureBakeryBrowserContext } from "@purin-labs/area-kitchen-contract/ui/features/bakery-browser-context";
 import { type BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import {
   QuestionCard,

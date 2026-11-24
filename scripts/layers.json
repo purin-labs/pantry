@@ -29,6 +29,7 @@
     "testing"
   ],
   "packages": {
+    "areas/kitchen/contract": "areas/kitchen/contract",
     "areas/devices/contract": "areas/devices/contract",
     "areas/inbox/contract": "areas/inbox/contract",
     "areas/commerce/contract": "areas/commerce/contract",
@@ -114,10 +115,6 @@
     "areas/organisation/ui/features/access/permission-required-prompt.tsx",
     "areas/organisation/ui/pages/agent-console-shared.tsx",
     "areas/organisation/ui/pages/account-invitation-link.ts",
-    "areas/kitchen/server/contract/",
-    "areas/kitchen/server/agent-tools/kitchen/services.ts",
-    "areas/kitchen/server/agent-tools/bakery/surface-result.ts",
-    "areas/kitchen/ui/features/bakery-browser-context.ts",
     "areas/cafe/server/contract/",
     "areas/brain/server/memory/contract/",
     "areas/brain/server/evals/scorer.ts",
@@ -412,6 +409,7 @@
     "workspace_revision_receipt": "foundation/agent"
   },
   "rules": {
+    "areas/kitchen/contract/": "areas/kitchen/contract",
     "areas/devices/contract/": "areas/devices/contract",
     "areas/inbox/contract/": "areas/inbox/contract",
     "areas/commerce/contract/": "areas/commerce/contract",

@@ -6,8 +6,8 @@ import type {
   AgentOperationInput,
   AgentOperationsSnapshot,
 } from "@purin-labs/agent/data/agent-operations";
-import type { BakeStockLevelInput } from "@purin-labs/area-kitchen/server/agent-tools/kitchen/services";
-import type { WorkflowChangeCommand } from "@purin-labs/area-kitchen/server/contract/workflow-changes";
+import type { BakeStockLevelInput } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
+import type { WorkflowChangeCommand } from "@purin-labs/area-kitchen-contract/server/workflow-changes";
 import type {
   JevDraftCommand,
   JevDraftRefusal,

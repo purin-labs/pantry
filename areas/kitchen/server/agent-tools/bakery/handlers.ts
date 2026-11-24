@@ -12,7 +12,7 @@ import type {
   AgentRunSaveVerification,
   AgentScenarioSaveResult,
   SavedBakeryRunResult,
-} from "../../contract/saved-bakery-runs";
+} from "@purin-labs/area-kitchen-contract/server/saved-bakery-runs";
 import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import type {
   BakerySurfaceAttachmentV1,
@@ -40,8 +40,8 @@ import { readLatestAgentScenarioSave } from "../../bakery/agent-scenario-save";
 import type {
   HarnessBakerySurfaceToolRequest,
   HarnessBakerySurfaceToolResult,
-} from "../kitchen/services";
-import { BakeryContextRequestError } from "../kitchen/services";
+} from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
+import { BakeryContextRequestError } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 import { admitSessionInformationFlowObservation } from "@purin-labs/agent/actors/agent-session-information-flow";
 import {
   createCurrentSourceFlowLabel,

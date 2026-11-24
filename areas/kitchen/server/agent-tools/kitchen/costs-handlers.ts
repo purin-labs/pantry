@@ -52,7 +52,7 @@ import type {
   LotCostSaveTool,
   SupplyCostSaveRequest,
   SupplyCostSaveTool,
-} from "../../contract/costs-tools";
+} from "@purin-labs/area-kitchen-contract/server/costs-tools";
 import {
   collaborationEditDeadline,
   collaborationMember,

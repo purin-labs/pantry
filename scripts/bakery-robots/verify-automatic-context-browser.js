@@ -566,7 +566,7 @@ async function duplicateBrowserIdentity(id) {
   const { sourceUrl } = await import("/source-url.js");
   sessionStorage.setItem("pantry:bakery-browser-instance", id);
   const browser = await import(
-    sourceUrl("areas/kitchen/ui/features/bakery-browser-context.ts")
+    sourceUrl("areas/kitchen/contract/ui/features/bakery-browser-context.ts")
   );
   return browser.bakeryBrowserInstanceId();
 }

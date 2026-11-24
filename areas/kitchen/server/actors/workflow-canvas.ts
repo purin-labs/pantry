@@ -35,7 +35,7 @@ import type {
   CollaborationRoomProtocol,
   CollaborationRoomServerMessage,
 } from "@purin-labs/collaboration/worker/collaboration-room";
-import type { WorkflowCanvasRead } from "../contract/workflow-canvas";
+import type { WorkflowCanvasRead } from "@purin-labs/area-kitchen-contract/server/workflow-canvas";
 
 type CanvasUpdate = CanvasEncoding<"update">;
 type CanvasStateVector = CanvasEncoding<"state_vector">;

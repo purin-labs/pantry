@@ -3,7 +3,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import {
   connectedStockOverview,
   productPhotos,
-} from "@purin-labs/area-kitchen/server/contract/inventory-overview";
+} from "@purin-labs/area-kitchen-contract/server/inventory-overview";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   createPublishedResourceClient,

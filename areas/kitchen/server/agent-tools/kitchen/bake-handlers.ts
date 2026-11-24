@@ -13,7 +13,7 @@ import {
   BakeRequestError,
   type BakeProposeRequest,
   type BakeRunRequest,
-} from "./services";
+} from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 
 /**
  * Plan 24 S1: the Bakes page for the Portal chat agent. The read admits the

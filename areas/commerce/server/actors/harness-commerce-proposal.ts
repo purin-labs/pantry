@@ -90,8 +90,8 @@ import {
 import {
   planStockOperation,
   type StockProposalRequest,
-} from "@purin-labs/area-kitchen/server/contract/stock-action-plan";
-import { stockOperationResourceId } from "@purin-labs/area-kitchen/server/contract/stock-action";
+} from "@purin-labs/area-kitchen-contract/server/stock-action-plan";
+import { stockOperationResourceId } from "@purin-labs/area-kitchen-contract/server/stock-action";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import { resolveCommerceCancellationAuthority } from "../provider";
 import { commerceProviderResourceId } from "@purin-labs/area-commerce-contract/server/resource-ids";

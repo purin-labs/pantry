@@ -19,7 +19,7 @@ import { parseRunFindings } from "@purin-labs/bakery-workflow/findings";
 import {
   workflowChanges,
   type WorkflowChangeCommand,
-} from "@purin-labs/area-kitchen/server/contract/workflow-changes";
+} from "@purin-labs/area-kitchen-contract/server/workflow-changes";
 import { deviceCommands } from "@purin-labs/area-devices-contract/server/device-commands";
 import {
   parseBakeStockLevelInput,

@@ -9,7 +9,7 @@ import type {
 } from "@purin-labs/commerce-client";
 import type { RecipeRevision } from "@purin-labs/commerce-contracts";
 import { canonicalJson } from "@purin-labs/std";
-import type { RecipeDraft } from "./contract/recipe-draft";
+import type { RecipeDraft } from "@purin-labs/area-kitchen-contract/server/recipe-draft";
 
 /**
  * The recipe library (Kitchen › Recipes). A person's page and the Portal

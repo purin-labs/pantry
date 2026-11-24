@@ -22,7 +22,7 @@ import {
 } from "@purin-labs/kitchen-control-api";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
-import { defineKitchenTool } from "./services";
+import { defineKitchenTool } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 import type {
   CostsPlanSaveRequest,
   CostsReadForecastScenario,
@@ -30,7 +30,7 @@ import type {
   CostsSheetEditRequest,
   LotCostSaveRequest,
   SupplyCostSaveRequest,
-} from "../../contract/costs-tools";
+} from "@purin-labs/area-kitchen-contract/server/costs-tools";
 
 const COST_UNITS: ReadonlySet<string> = new Set([
   "each",

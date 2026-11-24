@@ -1,4 +1,4 @@
-import { bakeryBrowserInstanceId } from "./bakery-browser-context";
+import { bakeryBrowserInstanceId } from "@purin-labs/area-kitchen-contract/ui/features/bakery-browser-context";
 import React from "react";
 import {
   parseBakerySurfaceEffect,

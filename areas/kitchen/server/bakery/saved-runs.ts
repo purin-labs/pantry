@@ -10,9 +10,9 @@ import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type {
   SavedBakeryRunQuery,
   SavedBakeryRunResult,
-} from "../contract/saved-bakery-runs";
+} from "@purin-labs/area-kitchen-contract/server/saved-bakery-runs";
 
-export type { SavedBakeryRunQuery } from "../contract/saved-bakery-runs";
+export type { SavedBakeryRunQuery } from "@purin-labs/area-kitchen-contract/server/saved-bakery-runs";
 
 export function bakeryRunSnapshotPrefix(
   organisationId: OrganisationId,

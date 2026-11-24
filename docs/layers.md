@@ -355,7 +355,7 @@ import each of its files. A module with no line for one of these has none.
 
 ## areas/kitchen
 
-- Folders: 32
+- Folders: 31
   - `areas/kitchen/server/`
   - `areas/kitchen/server/actors/`
   - `areas/kitchen/server/agent-tools/bakery/`
@@ -363,7 +363,6 @@ import each of its files. A module with no line for one of these has none.
   - `areas/kitchen/server/agent-tools/kitchen/`
   - `areas/kitchen/server/bakery/`
   - `areas/kitchen/server/bakes/`
-  - `areas/kitchen/server/contract/`
   - `areas/kitchen/server/control/admission/`
   - `areas/kitchen/server/control/routes/`
   - `areas/kitchen/server/data/`
@@ -390,7 +389,15 @@ import each of its files. A module with no line for one of these has none.
   - `areas/kitchen/ui/features/workflow-simulator/spatial/`
 - Packages: `areas/kitchen`, `packages/bakery-model`, `packages/bakery-workflow`, `packages/costs-sheet-crdt`, `packages/kitchen-control-api`, `packages/production-plan-crdt`, `packages/production-simulation`, `packages/workflow-canvas-crdt`
 - Tables (13): `bake_authority`, `bake_proposal`, `bake_run`, `bake_stock_level`, `bakery_agent_run_save`, `bakery_agent_scenario_save`, `bakery_cost_plan`, `bakery_cost_product_plan`, `bakery_lot_invoice_cost`, `bakery_surface_effect_delivery`, `bakery_surface_timeline_event`, `bakery_workflow`, `bakery_workflow_revision`
-- Public files: `areas/kitchen/server/agent-tools/bakery/surface-result.ts`, `areas/kitchen/server/agent-tools/kitchen/services.ts`, `areas/kitchen/server/contract/`, `areas/kitchen/ui/features/bakery-browser-context.ts`
+
+## areas/kitchen/contract
+
+- Folders: 4
+  - `areas/kitchen/contract/server/`
+  - `areas/kitchen/contract/server/agent-tools/bakery/`
+  - `areas/kitchen/contract/server/agent-tools/kitchen/`
+  - `areas/kitchen/contract/ui/features/`
+- Packages: `areas/kitchen/contract`
 
 ## areas/organisation
 

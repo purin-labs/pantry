@@ -5,7 +5,7 @@ import {
 import { readWorkflowDocument } from "@purin-labs/area-kitchen/server/bakery/workflow-revisions";
 import { commerceProviderResourceId } from "@purin-labs/area-commerce-contract/server/resource-ids";
 import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce-contract/server/queue-messages";
-import { executeStockOperation } from "@purin-labs/area-kitchen/server/contract/stock-action-execution";
+import { executeStockOperation } from "@purin-labs/area-kitchen-contract/server/stock-action-execution";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import { runDeviceCommand } from "@purin-labs/area-devices/server/commands";
 import { listDevices, listGateways } from "@purin-labs/area-devices/server/store";

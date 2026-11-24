@@ -26,12 +26,12 @@ import type {
   AgentScenarioSaveResult,
   SavedBakeryRunQuery,
   SavedBakeryRunResult,
-} from "../../contract/saved-bakery-runs";
-import type { RecipeDraft } from "../../contract/recipe-draft";
+} from "../../saved-bakery-runs";
+import type { RecipeDraft } from "../../recipe-draft";
 import type {
   WorkflowCanvasMoveTool,
   WorkflowCanvasReadTool,
-} from "../../contract/workflow-canvas";
+} from "../../workflow-canvas";
 import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
 import { defineToolFamily } from "@purin-labs/agent-tools/define-tool";
 import { ToolRequestError } from "@purin-labs/agent-tools/errors";
@@ -41,7 +41,7 @@ import type {
   CostsSheetEditTool,
   LotCostSaveTool,
   SupplyCostSaveTool,
-} from "../../contract/costs-tools";
+} from "../../costs-tools";
 import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
 import type { CommerceToolReads } from "@purin-labs/area-commerce-contract/server/tool-reads";
 import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";

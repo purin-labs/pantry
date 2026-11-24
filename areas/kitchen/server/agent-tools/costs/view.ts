@@ -7,11 +7,11 @@ import {
 import {
   defineKitchenTool,
   type KitchenToolServices,
-} from "../kitchen/services";
+} from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 import {
   bakerySurfaceToolSucceeded,
   readBakerySurfaceReceiptId,
-} from "../bakery/surface-result";
+} from "@purin-labs/area-kitchen-contract/server/agent-tools/bakery/surface-result";
 
 /**
  * The agent's view commands on Costs & margins (Plan 87 phase 4). Each one

@@ -38,7 +38,7 @@ import {
   readReplenishmentSupplierPayables,
   type ReplenishmentPayableSummary,
 } from "./cost-plan-store";
-import { productPhotos, saleOffers } from "./contract/inventory-overview";
+import { productPhotos, saleOffers } from "@purin-labs/area-kitchen-contract/server/inventory-overview";
 
 const WINDOW_DAYS = 30;
 const DAY_MS = 86_400_000;

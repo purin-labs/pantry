@@ -15,7 +15,7 @@ import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { WorkflowRevisionReceipt } from "../contract/workflow-changes";
+import type { WorkflowRevisionReceipt } from "@purin-labs/area-kitchen-contract/server/workflow-changes";
 
 /**
  * Plan 84: a recipe's applied workflow. Each revision is immutable in R2 under its

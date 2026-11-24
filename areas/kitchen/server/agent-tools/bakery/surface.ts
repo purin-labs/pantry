@@ -15,13 +15,13 @@ import {
 } from "@purin-labs/bakery-model/bakery-surface";
 import { KITCHEN_SURFACE } from "@purin-labs/control-api";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
-import type { HarnessBakerySurfaceToolRequest } from "../kitchen/services";
+import type { HarnessBakerySurfaceToolRequest } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
 import {
   bakerySurfaceToolSucceeded,
   readBakerySurfaceReceiptId,
-} from "./surface-result";
-import { defineKitchenTool } from "../kitchen/services";
+} from "@purin-labs/area-kitchen-contract/server/agent-tools/bakery/surface-result";
+import { defineKitchenTool } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 
 const BAKERY_DIRECT_CALL_GUIDANCE =
   "Call Kitchen browser tools directly after tool discovery, outside Code Mode. Their accepted call owns durable preparation and recovery.";

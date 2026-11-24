@@ -24,9 +24,9 @@ import type {
   ApprovedWorkflowChange,
   WorkflowChangeCommand,
   WorkflowRevisionReceipt,
-} from "../contract/workflow-changes";
+} from "@purin-labs/area-kitchen-contract/server/workflow-changes";
 
-export type { WorkflowChangeCommand } from "../contract/workflow-changes";
+export type { WorkflowChangeCommand } from "@purin-labs/area-kitchen-contract/server/workflow-changes";
 
 type PreparedWorkflowProposal =
   | Readonly<{ kind: "ready"; command: WorkflowChangeCommand }>

@@ -39,7 +39,7 @@ import {
   editProductionPlanForEmbeddedHarness,
   readProductionPlanForEmbeddedHarness,
 } from "./production-plan-handlers";
-import type { KitchenToolServices } from "./services";
+import type { KitchenToolServices } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 import {
   moveWorkflowCanvasForEmbeddedHarness,
   readWorkflowCanvasForEmbeddedHarness,

@@ -15,7 +15,7 @@ import {
   type HarnessProductionPlan,
   type HarnessProductionPlanEdit,
   type HarnessProductionPlanRead,
-} from "./services";
+} from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { CommerceReadRequestError } from "@purin-labs/area-commerce-contract/server/read-errors";
@@ -31,7 +31,7 @@ import type {
   CommerceToolReads,
   PreparedCommerceRead,
 } from "@purin-labs/area-commerce-contract/server/tool-reads";
-import type { KitchenToolContext } from "./services";
+import type { KitchenToolContext } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 
 /**
  * Plan 40D: the production requests of a location, read under a read grant

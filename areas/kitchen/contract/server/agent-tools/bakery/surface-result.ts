@@ -7,7 +7,7 @@ import { isRecord } from "@purin-labs/std";
 import type {
   AgentRunSaveVerification,
   AgentScenarioSaveResult,
-} from "../../contract/saved-bakery-runs";
+} from "../../saved-bakery-runs";
 import type { HarnessBakerySurfaceToolResult } from "../kitchen/services";
 
 // The result of a Kitchen surface tool, as the Kitchen and the Register tools

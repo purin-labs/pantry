@@ -20,7 +20,7 @@ import {
   type RecipeToolRead,
   type SupplierCreateRequest,
   type SupplierToolRead,
-} from "./services";
+} from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 import type { StaffPageToolReceipt } from "@purin-labs/agent-tools/catalog/types";
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import {
@@ -46,7 +46,7 @@ import {
   untrustedDeviceText,
   type ToolEffect,
 } from "@purin-labs/tool-handlers/agent-tools/session-support";
-import type { KitchenToolContext } from "./services";
+import type { KitchenToolContext } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 import { readMemberRecord } from "@purin-labs/tool-handlers/agent-tools/member-record-read";
 
 function stepFacts(document: BakeryWorkflowDocument) {

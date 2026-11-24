@@ -4,7 +4,7 @@ import { hasExactKeys, isPositiveInteger, isRecord } from "@purin-labs/std";
 import type {
   WorkflowCanvasMoveRequest,
   WorkflowCanvasReadRequest,
-} from "../contract/workflow-canvas";
+} from "@purin-labs/area-kitchen-contract/server/workflow-canvas";
 
 export function parseWorkflowCanvasReadArgs(
   args: readonly unknown[],

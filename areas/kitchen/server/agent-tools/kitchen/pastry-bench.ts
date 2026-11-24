@@ -3,8 +3,8 @@ import { KITCHEN_SURFACE, type PastryBenchViewCommand } from "@purin-labs/contro
 import {
   bakerySurfaceToolSucceeded,
   readBakerySurfaceReceiptId,
-} from "../bakery/surface-result";
-import { defineKitchenTool, type KitchenToolServices } from "./services";
+} from "@purin-labs/area-kitchen-contract/server/agent-tools/bakery/surface-result";
+import { defineKitchenTool, type KitchenToolServices } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 import { ProposalArgumentError } from "@purin-labs/agent-tools/errors";
 
 const RERUN = {

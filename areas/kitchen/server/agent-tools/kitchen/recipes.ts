@@ -1,9 +1,9 @@
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import type { RecipeSaveRequest } from "./services";
-import type { RecipeDraft } from "../../contract/recipe-draft";
+import type { RecipeSaveRequest } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
+import type { RecipeDraft } from "@purin-labs/area-kitchen-contract/server/recipe-draft";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
-import { defineKitchenTool } from "./services";
+import { defineKitchenTool } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 import { ProposalArgumentError } from "@purin-labs/agent-tools/errors";
 
 type RecipeQuantity = RecipeDraft["inputs"][number]["quantity"];

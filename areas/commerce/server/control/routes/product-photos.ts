@@ -17,7 +17,7 @@ import {
   resolveInventoryAccess,
   resolveInventoryMutation,
   type InventoryControlAccess,
-} from "@purin-labs/area-kitchen/server/contract/inventory-control";
+} from "@purin-labs/area-kitchen-contract/server/inventory-control";
 
 /**
  * `add` and `arrange` change one product's photos; `library` lists the

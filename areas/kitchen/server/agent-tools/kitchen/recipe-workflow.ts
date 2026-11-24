@@ -4,10 +4,10 @@ import { hasExactKeys, isRecord, isString } from "@purin-labs/std";
 import type {
   RecipeWorkflowProposeRequest,
   RecipeWorkflowReadRequest,
-} from "./services";
+} from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { jsonSchema } from "@purin-labs/agent-tools/define-tool";
-import { defineKitchenTool } from "./services";
+import { defineKitchenTool } from "@purin-labs/area-kitchen-contract/server/agent-tools/kitchen/services";
 
 /** The finding ids of one proposal, and the length of its reason and of each id. */
 const MAX_PROPOSAL_FINDINGS = 16;

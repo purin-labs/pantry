@@ -27,7 +27,7 @@ import {
   resolveInventoryAccess,
   resolveInventoryMutation,
   type InventoryControlMutation,
-} from "../../contract/inventory-control";
+} from "@purin-labs/area-kitchen-contract/server/inventory-control";
 import { productionClient } from "./inventory-production";
 import {
   type ProductionPlanRoute,

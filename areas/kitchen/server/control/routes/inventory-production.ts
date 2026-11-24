@@ -32,7 +32,7 @@ import {
   resolveInventoryAccess,
   resolveInventoryMutation,
   type InventoryControlMutation,
-} from "../../contract/inventory-control";
+} from "@purin-labs/area-kitchen-contract/server/inventory-control";
 import type { Variant } from "@purin-labs/type-utils";
 
 type ProductionAction =

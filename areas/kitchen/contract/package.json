@@ -1,0 +1,38 @@
+{
+  "name": "@purin-labs/area-kitchen-contract",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./server/*": {
+      "types": "./server/*.ts",
+      "default": "./server/*.ts"
+    },
+    "./ui/*": {
+      "types": "./ui/*.ts",
+      "default": "./ui/*.ts"
+    }
+  },
+  "dependencies": {
+    "@purin-labs/agent": "workspace:*",
+    "@purin-labs/agent-tools": "workspace:*",
+    "@purin-labs/area-commerce-contract": "workspace:*",
+    "@purin-labs/bakery-model": "workspace:*",
+    "@purin-labs/bakery-workflow": "workspace:*",
+    "@purin-labs/commerce-client": "workspace:*",
+    "@purin-labs/commerce-contracts": "workspace:*",
+    "@purin-labs/control": "workspace:*",
+    "@purin-labs/control-api": "workspace:*",
+    "@purin-labs/costs-sheet-crdt": "workspace:*",
+    "@purin-labs/kernel": "workspace:*",
+    "@purin-labs/kitchen-control-api": "workspace:*",
+    "@purin-labs/std": "workspace:*",
+    "@purin-labs/tenancy": "workspace:*",
+    "@purin-labs/type-utils": "workspace:*",
+    "@purin-labs/workflow-canvas-crdt": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260707.1",
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

@@ -14,7 +14,7 @@ import {
   type ReceiveCommerceInventoryV3,
   type CommerceStockSnapshot,
 } from "@purin-labs/commerce-client";
-import { inventoryQuantity } from "../../contract/inventory-overview";
+import { inventoryQuantity } from "@purin-labs/area-kitchen-contract/server/inventory-overview";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   controlError,
@@ -25,7 +25,7 @@ import {
   resolveInventoryAccess,
   resolveInventoryMutation,
   finishInventoryOperation,
-} from "../../contract/inventory-control";
+} from "@purin-labs/area-kitchen-contract/server/inventory-control";
 
 export async function handleInventoryReceipt(
   request: Request,
