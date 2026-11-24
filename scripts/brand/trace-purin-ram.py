@@ -86,6 +86,24 @@ def paths(mask):
     return "".join(outlines(mask, 1.0, TOL))
 
 
+# The owner asked for horns a little smaller and more compact than in the images (24 November
+# 2026): each horn is drawn this many times its size, about the point where it meets the head.
+HORN_SCALE = 0.9
+
+
+def shrink(mask, root, line=False):
+    """`mask` made HORN_SCALE times its size about `root` (x, y). A drawn line keeps its width:
+    the soft edge of the smaller line is cut low, so each side of it grows by about half a pixel."""
+    k = 1 / HORN_SCALE
+    soft = ndi.affine_transform(
+        mask.astype(np.float32),
+        np.diag([k, k]),
+        offset=(root[1] * (1 - k), root[0] * (1 - k)),
+        order=1,
+    )
+    return soft > (0.1 if line else 0.5)
+
+
 # ---------- the centre lines, for the brushed lines ----------
 def thin(img):
     """Zhang-Suen thinning: the mask as lines one pixel wide."""
@@ -429,6 +447,12 @@ def trace(pose):
     spill = line & (owner == -1)
     owner[spill] = owner[oy[spill], ox[spill]]
 
+    # the frame of the drawing as the images have it, so the frames keep their size
+    ys, xs = np.nonzero(np.any([fills[n] for n in names], axis=0) | line)
+    extent = (int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max()))
+    horns_before = [paths(fills[h]) for h in ("hornL", "hornR")]
+    roots, skull = smaller_horns(pose, regions, fills, line, owner, details, lw)
+
     out = {"size": [W, H], "lineWidth": round(lw, 1), "fills": {}, "lines": {}}
     for n in names:
         out["fills"][n] = paths(fills[n])
@@ -455,8 +479,73 @@ def trace(pose):
         "details": details,
         "lw": lw,
         "names": names,
+        "extent": extent,
+        "hornsBefore": horns_before,
+        "roots": roots,
+        "skull": skull,
     }
     return out, state
+
+
+def smaller_horns(pose, regions, fills, line, owner, details, lw):
+    """Draw both horns HORN_SCALE times their size, in place; return the roots and the skull.
+
+    The root of a horn is the middle of the band where it meets the head. Both horns get
+    smaller about one point, the skull between the two roots, so the tips that touch stay
+    together and the horns come closer to the head. A horn is behind the head, so its fill
+    first reaches under the head and its outline: the smaller horn still meets the head with no
+    gap, and the hidden part stays inside the head. The lines and the ridges of the horns go
+    only where no part in front of them is; where a part in front hid an edge of a horn, the
+    smaller horn draws that edge itself."""
+    host = pose["head"]
+    front = pose["front"]
+    head = regions[host] | (line & (owner == front.index(host)))
+    roots = {}
+    for horn in ("hornL", "hornR"):
+        band = ndi.binary_dilation(regions[horn], iterations=int(lw)) & regions[host]
+        ys, xs = np.nonzero(band if band.any() else regions[horn])
+        roots[horn] = (float(xs.mean()), float(ys.mean()))
+    skull = tuple((roots["hornL"][i] + roots["hornR"][i]) / 2 for i in (0, 1))
+    if HORN_SCALE == 1:
+        return roots, skull
+    before = {}
+    for horn, side in (("hornL", "ridgeL"), ("hornR", "ridgeR")):
+        k = front.index(horn)
+        under = ndi.binary_dilation(regions[horn], iterations=int(2 * lw)) & head
+        own = line & (owner == k)
+        before[horn] = (k, side, fills[horn], under, own, details[side])
+        gone = own | (np.any(details[side], axis=0) if details[side] else False)
+        line &= ~gone
+        owner[gone] = -1
+    for horn, (k, side, fill, under, own, ridges) in before.items():
+        regions[horn] = shrink(regions[horn], skull)
+        fills[horn] = shrink(fill, skull) | (shrink(under, skull) & head)
+    # where the two horns touch, each fill reaches a little under the other, so no seam shows
+    left, right = fills["hornL"], fills["hornR"]
+    fills["hornL"] = left | (ndi.binary_dilation(left, iterations=3) & right)
+    fills["hornR"] = right | (ndi.binary_dilation(right, iterations=3) & left)
+    r = lw / 2
+    for horn, (k, side, fill, under, own, ridges) in before.items():
+        cover = line & (owner >= 0) & (owner < k)
+        for n in front[:k]:
+            if n in fills and n not in before:
+                cover |= fills[n]
+        # An edge that a part in front hid in the image, and that now shows, gets an outline too;
+        # not where the two horns touch, which the image draws as one line.
+        other = fills["hornR" if horn == "hornL" else "hornL"]
+        edge = (
+            (ndi.distance_transform_edt(~fills[horn]) <= r)
+            & (ndi.distance_transform_edt(fills[horn]) <= r)
+            & (ndi.distance_transform_edt(~other) > r)
+        )
+        new_own = (shrink(own, skull, line=True) | edge) & ~cover
+        details[side] = [m for m in (shrink(r, skull, line=True) & ~cover for r in ridges) if m.any()]
+        line |= new_own
+        owner[new_own] = k
+        for m in details[side]:
+            line |= m
+            owner[m] = -2
+    return roots, skull
 
 
 # ---------- the pudding pose: the logo ----------
@@ -662,23 +751,10 @@ def croissant_extras(pivots):
         # The horns are hard and sit on one skull: when the soft body squeezes, both horns move
         # with the point between their roots (where each horn meets the head), and they keep
         # their shape. One point for both, so the tips that touch stay together.
-        roots = []
-        for horn in ("hornL", "hornR"):
-            band = ndi.binary_dilation(fills[horn], iterations=int(st["lw"])) & fills["body"]
-            ys, xs = np.nonzero(band if band.any() else fills[horn])
-            roots.append((float(xs.mean()), float(ys.mean())))
-        out["pivots"]["horns"] = [
-            round((roots[0][0] + roots[1][0]) / 2, 1),
-            round((roots[0][1] + roots[1][1]) / 2, 1),
-        ]
-        allf = np.zeros(st["line"].shape, bool)
-        for f in fills.values():
-            allf |= f
-        ys, xs = np.nonzero(allf | st["line"])
+        out["pivots"]["horns"] = [round(v, 1) for v in st["skull"]]
+        x0, y0, x1, y1 = st["extent"]
         m = 24
-        out["box"] = (
-            f"{xs.min() - m} {ys.min() - m} {xs.max() - xs.min() + 2 * m} {ys.max() - ys.min() + 2 * m}"
-        )
+        out["box"] = f"{x0 - m} {y0 - m} {x1 - x0 + 2 * m} {y1 - y0 + 2 * m}"
 
     return extras
 
@@ -831,7 +907,8 @@ def main():
         return min(xs), min(ys), max(xs), max(ys)
 
     F, L = R["fills"], R["lines"]
-    x0, y0, x1, y1 = box(*F.values())
+    # the frame of the drawing before the horns were made smaller, so every frame keeps its size
+    x0, y0, x1, y1 = box(*F.values(), *states["pudding"][1]["hornsBefore"])
     cx = (x0 + x1) / 2
     side = max(x1 - x0, y1 - y0) + 70
     hx0, hy0, hx1, hy1 = box(R["puddingHull"])
@@ -842,6 +919,28 @@ def main():
         "167 137 660 668": f"{cx - 415:.0f} {y0 - 22:.0f} 830 660",
         "246 612 480 296": f"{hx0 - 24:.0f} {hy0 - 24:.0f} {hx1 - hx0 + 48:.0f} {hy1 - hy0 + 44:.0f}",
     }
+    # the wordmark: the ram in one colour beside the letters of the cat wordmark
+    WD = re.search(
+        r' d="([^"]+)"', (ROOT / "docs/brand/purin-logo/purin-wordmark.svg").read_text()
+    ).group(1)
+    letters = "".join(
+        "M" + s
+        for s in WD.split("M")[1:]
+        if float(re.match(r"\s*(-?[\d.]+)", s).group(1)) > 480
+    )
+    lx0, _, lx1, _ = box(letters)
+    mx0, my0, mx1, my1 = box(R["mono"])
+    h = 554 * 0.98
+    k = h / (my1 - my0)
+    wx0 = lx0 - 26 - (mx1 - mx0) * k
+    tx, ty = wx0 - mx0 * k, 554 - h - my0 * k
+    WW = lx1 - wx0
+    Path(SITE, "ram-wordmark.svg").write_text(
+        f'<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Purin" viewBox="{wx0:.1f} 0 {WW:.1f} 554"><g fill="#000">'
+        f'<path fill-rule="evenodd" transform="translate({tx:.1f} {ty:.1f}) scale({k:.4f})" d="{R["mono"]}"/>'
+        f'<path fill-rule="evenodd" d="{letters}"/></g></svg>'
+    )
+
     keys = (
         "fills",
         "lines",
@@ -856,6 +955,8 @@ def main():
     )
     data = {k: R[k] for k in keys if k in R}
     data["boxes"] = boxes
+    # the width of the wordmark for each unit of its height
+    data["wordmarkRatio"] = round(WW / 554, 4)
     HEADER = [
         "   Generated by scripts/brand/trace-purin-ram.py in purin-labs/pantry. Units: the 1024 box of the drawing.",
         "   Each fill reaches the middle of its drawn line; the lines are their own shapes, owned by the part in front. */",
@@ -899,28 +1000,6 @@ def main():
         "",
     ]
     Path(SITE, "ram-poses.ts").write_text("\n".join(ts))
-
-    # the wordmark: the ram in one colour beside the letters of the cat wordmark
-    WD = re.search(
-        r' d="([^"]+)"', (ROOT / "docs/brand/purin-logo/purin-wordmark.svg").read_text()
-    ).group(1)
-    letters = "".join(
-        "M" + s
-        for s in WD.split("M")[1:]
-        if float(re.match(r"\s*(-?[\d.]+)", s).group(1)) > 480
-    )
-    lx0, _, lx1, _ = box(letters)
-    mx0, my0, mx1, my1 = box(R["mono"])
-    h = 554 * 0.98
-    k = h / (my1 - my0)
-    wx0 = lx0 - 26 - (mx1 - mx0) * k
-    tx, ty = wx0 - mx0 * k, 554 - h - my0 * k
-    WW = lx1 - wx0
-    Path(SITE, "ram-wordmark.svg").write_text(
-        f'<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Purin" viewBox="{wx0:.1f} 0 {WW:.1f} 554"><g fill="#000">'
-        f'<path fill-rule="evenodd" transform="translate({tx:.1f} {ty:.1f}) scale({k:.4f})" d="{R["mono"]}"/>'
-        f'<path fill-rule="evenodd" d="{letters}"/></g></svg>'
-    )
 
     # the icon: the colour ram on the cream tile
     def colour():

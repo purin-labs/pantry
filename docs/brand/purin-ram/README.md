@@ -27,6 +27,10 @@ pudding stays on the floor.
 | Bread   | `#EAAE5C` | The light side of the croissant          |
 | Crust   | `#C47F3C` | The shade of the croissant               |
 
+On 24 November 2026 the owner also tried the oat colours of the palette
+`charcoal-horns-oat-fur` (fur `#D6CEC2`, horns `#8C8986`) on the traced ram,
+and kept mocha.
+
 ## The parts
 
 The ram is drawn with lines, so a part is a fill and the lines that the part
@@ -109,6 +113,14 @@ files. With `--site DIR`, it also writes `ram-paths.ts`, `ram-poses.ts`,
 company site (`apps/seams-site/home-cat/`). The walls between the parts and
 the pivots are measured on the three traced images. A new image needs new
 values.
+
+The horns are smaller than in the images. The owner asked for horns about 10%
+smaller and more compact (24 November 2026), so the script draws both horns
+0.9 times their size (`HORN_SCALE`). Both get smaller about one point on the
+skull, between their roots, so the horns stay joined and come closer to the
+head. The lines keep their width. Where a part in front hid an edge of a horn
+in the image, the smaller horn draws that edge itself. The frames keep the
+size of the images, so the ram does not grow.
 
 For the brushed lines, the script finds the middle of each line and runs
 `scripts/brand/brush-purin-ram.mjs` with Node 24. That file imports the brush
