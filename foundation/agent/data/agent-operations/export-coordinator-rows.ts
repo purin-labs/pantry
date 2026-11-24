@@ -97,7 +97,7 @@ export function prepareExportResponsibilityScope(
  * The skill, the agent definition, the installation and its bindings of the
  * export coordinator, in the order of the batch: skill, skill revision,
  * definition, definition revision, installation, area assignment, skill
- * binding, cue binding, governance and escalation policy.
+ * binding, cue binding and governance.
  */
 export function prepareExportCoordinatorInstallation(
   db: Database,
@@ -269,22 +269,6 @@ export function prepareExportCoordinatorInstallation(
       .bind(
         input.installationId,
         input.organisationId,
-        input.userId,
-        input.now,
-        ...guard,
-      ),
-    db
-      .prepare(
-        `INSERT INTO escalation_policy (
-         area_id, organisation_id, scope_ids_json, approval_reminder_after_ms,
-         escalate_after_ms, escalate_to, revision,
-         updated_by_user_id, updated_at
-       ) SELECT ?, ?, ?, 900000, 3600000, 'organisation_owner', 1, ?, ? WHERE ${input.guard.condition}`,
-      )
-      .bind(
-        input.areaId,
-        input.organisationId,
-        input.scopeIdsJson,
         input.userId,
         input.now,
         ...guard,

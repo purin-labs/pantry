@@ -300,18 +300,6 @@ function presentAgentOperation(
           "A run that reaches the limit stops and reports what it had done.",
         portalSection: "limits",
       };
-    case "configure_escalation_policy":
-      return {
-        summary:
-          "Change when approvals are chased and escalated.\n\n" +
-          `Remind after ${formatDuration(command.approvalReminderAfterMs)}, ` +
-          `escalate after ${formatDuration(command.escalateAfterMs)}.`,
-        // Distinct from the budget limit, which also reads as "Save limits".
-        actionLabel: "Save escalation timing",
-        consequence:
-          "Only reminder timing changes. Who may approve is unchanged.",
-        portalSection: "limits",
-      };
     case "accept_configuration_proposal":
       return {
         summary:
@@ -512,17 +500,6 @@ function describeSchedule(
 function excerpt(body: string): string {
   const collapsed = body.replace(/\s+/gu, " ").trim();
   return collapsed.length <= 280 ? collapsed : `${collapsed.slice(0, 277)}...`;
-}
-
-function formatDuration(milliseconds: number): string {
-  const minutes = Math.round(milliseconds / 60_000);
-  if (minutes < 60) {
-    return `${minutes} minutes`;
-  }
-  const hours = minutes / 60;
-  return Number.isInteger(hours)
-    ? `${hours} hours`
-    : `${hours.toFixed(1)} hours`;
 }
 
 function formatCount(value: number): string {

@@ -499,7 +499,6 @@ async function browserAcceptanceFixture(page) {
         cueBindings: [],
         scheduleBindings: [],
         governance: [],
-        escalationPolicies: [],
         configurationProposals: [],
         merchantMemories: [],
         commerceExceptions: {

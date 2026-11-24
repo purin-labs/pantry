@@ -600,7 +600,7 @@ describe("Plan 16 agent operations", () => {
     });
   });
 
-  it("configures cue bindings, schedules, budgets, and escalation through typed commands", async () => {
+  it("configures cue bindings, schedules and budgets through typed commands", async () => {
     const db = createDatabase();
     await seedInstalledAgent(db);
 
@@ -735,42 +735,6 @@ describe("Plan 16 agent operations", () => {
         updatedAt: 203,
       },
     ]);
-
-    const escalation = await apply(db, {
-      kind: "configure_escalation_policy",
-      areaId: "area_inventory",
-      scopeIds: [],
-      approvalReminderAfterMs: 30 * 60_000,
-      escalateAfterMs: 4 * 60 * 60_000,
-      operationId: "escalation_inventory",
-      actorUserId: "user_fbe449f6-7995-538c-a3a8-81b0623a641e",
-      now: 204,
-    });
-    expect(escalation.escalationPolicies).toEqual([
-      {
-        areaId: "area_inventory",
-        organisationId: ORGANISATION,
-        scopeIds: [],
-        approvalReminderAfterMs: 30 * 60_000,
-        escalateAfterMs: 4 * 60 * 60_000,
-        escalateTo: "organisation_owner",
-        revision: 1,
-        updatedAt: 204,
-      },
-    ]);
-
-    expect(
-      parseAgentOperationInput({
-        kind: "configure_escalation_policy",
-        areaId: "area_inventory",
-        scopeIds: ["scope_inventory"],
-        approvalReminderAfterMs: 60_000,
-        escalateAfterMs: 30_000,
-      }),
-    ).toEqual({
-      ok: false,
-      error: { code: "agent_operation_invalid", field: "escalateAfterMs" },
-    });
   });
 
   it("resolves cue automation and records exact assignment pins", async () => {

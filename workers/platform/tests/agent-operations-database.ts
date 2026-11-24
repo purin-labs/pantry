@@ -255,17 +255,6 @@ CREATE UNIQUE INDEX idx_organisation_placement_active
       updated_by_user_id TEXT NOT NULL,
       updated_at INTEGER NOT NULL
     );
-    CREATE TABLE escalation_policy (
-      area_id TEXT PRIMARY KEY,
-      organisation_id TEXT NOT NULL,
-      scope_ids_json TEXT NOT NULL DEFAULT '[]',
-      approval_reminder_after_ms INTEGER NOT NULL,
-      escalate_after_ms INTEGER NOT NULL,
-      escalate_to TEXT NOT NULL,
-      revision INTEGER NOT NULL DEFAULT 1,
-      updated_by_user_id TEXT NOT NULL,
-      updated_at INTEGER NOT NULL
-    );
     CREATE TABLE agent_configuration_proposal (
       proposal_id TEXT PRIMARY KEY,
       organisation_id TEXT NOT NULL,

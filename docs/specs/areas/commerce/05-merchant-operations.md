@@ -129,7 +129,6 @@ holds **Operational areas**, and the Skills tab of Knowledge lists the skills.
 | Cue binding                   | The installation and instructions for one cue source and event type                              |
 | Schedule binding              | An `hourly` window at a minute, or a `daily` or `weekly` window at a time in a time zone         |
 | Governance                    | A token cap for each session of the installation                                                 |
-| Escalation policy             | A reminder delay and an escalation delay to `organisation_owner`                                 |
 | Configuration proposal        | New instructions or skill Markdown from an installation, `open`, `accepted` or `dismissed`       |
 | Case assignment pin           | The exact definition revision, policy revision, skills, grants and token cap of one assignment   |
 
@@ -153,7 +152,7 @@ holds **Operational areas**, and the Skills tab of Knowledge lists the skills.
 
 An agent proposes a setup change with `configuration_propose`. It stages an
 `operator_configuration_draft`, not a configuration proposal record. The draft can
-carry each of the 18 agent operation commands, a price allowance, a device command, a
+carry each of the 17 agent operation commands, a price allowance, a device command, a
 workflow change, a Jev switch or a stock level. Only the person who asked confirms it,
 in the chat or in Slack. In a Portal chat, each change except a device command needs
 an admin. In Slack, each change needs an admin. An agent operation command runs
@@ -296,7 +295,7 @@ or dismisses it. An accepted brief sends nothing and changes nothing.
   `operational_area`, `agent_responsibility_scope`, `agent_definition`,
   `agent_definition_revision`, `agent_installation`, `agent_area_assignment`, `skill`,
   `skill_revision`, `skill_binding`, `cue_binding`, `schedule_binding`,
-  `schedule_dispatch_receipt`, `agent_installation_governance`, `escalation_policy`,
+  `schedule_dispatch_receipt`, `agent_installation_governance`,
   `agent_configuration_proposal`, `case_assignment_pin`, `operator_configuration_draft`
   and `campaign_brief`.
 - **Engine** (`services/commerce/src/plugins/purchasing/`): the preset, the
@@ -319,7 +318,7 @@ admits an owner.
 | `GET commerce/actions/:nonce/plugin-preview`                                | Admin         | Preview a plugin while it waits                                             |
 | `POST commerce/operations/tracking-batches/preview`                         | Viewer        | Freeze a tracking batch                                                     |
 | `GET operations`                                                            | Viewer        | The configuration, the active Cases, the ledger and the commerce exceptions |
-| `POST operations`                                                           | Admin         | One of 18 agent operation commands                                          |
+| `POST operations`                                                           | Admin         | One of 17 agent operation commands                                          |
 | `GET operations/(definitions\|skills)/:id/revisions`                        | Viewer        | At most 50 revisions, newest first                                          |
 | `POST agents/urk`                                                           | Admin         | Install Sous Chef                                                           |
 | `GET campaign-briefs?caseId=`, `POST campaign-briefs/:id/(accept\|dismiss)` | Viewer, admin | Read or decide briefs                                                       |
@@ -330,7 +329,7 @@ admits an owner.
 A mutation route needs an `Idempotency-Key`. A replay gives the stored answer, and the
 same key with another body gives 409 `idempotency_key_conflict`. The campaign brief
 decision is the exception: it takes `expectedRevision` in the body, and a stale
-revision gives 409 `campaign_brief_conflict`. The 18 agent operation commands are in
+revision gives 409 `campaign_brief_conflict`. The 17 agent operation commands are in
 `packages/control-api/src/agent-operation-commands.ts`.
 
 The proposal tools are in `areas/commerce/server/agent-tools/commerce/proposals.ts`,
@@ -409,7 +408,6 @@ Neighbours:
 ## Open work
 
 - Only a test calls `submitAgentConfigurationProposal`: the agent tool makes a draft.
-- No code acts on an escalation policy. It sends no reminder and no escalation.
 - No command archives an area, a definition or an installation, changes the grants of
   an installation or adds a second area. A skill binds only to an area.
 - The Portal does not call `agents/urk` or the campaign brief routes.

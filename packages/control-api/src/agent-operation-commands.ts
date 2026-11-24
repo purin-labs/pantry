@@ -116,13 +116,6 @@ type AgentOperationBaseCommand =
       readonly maxSessionBudgetTokens: number;
     }
   | {
-      readonly kind: "configure_escalation_policy";
-      readonly areaId: string;
-      readonly scopeIds: readonly string[];
-      readonly approvalReminderAfterMs: number;
-      readonly escalateAfterMs: number;
-    }
-  | {
       readonly kind: "accept_configuration_proposal";
       readonly proposalId: string;
     }

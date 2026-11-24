@@ -55,7 +55,6 @@ describe("portal agent responsibility-scope boundary", () => {
         cueBindings: [],
         scheduleBindings: [],
         governance: [],
-        escalationPolicies: [],
         configurationProposals: [],
         activeCases: [],
         commerceExceptions: {
@@ -94,7 +93,6 @@ describe("portal agent responsibility-scope boundary", () => {
           cueBindings: [],
           scheduleBindings: [],
           governance: [],
-          escalationPolicies: [],
           configurationProposals: [],
           activeCases: [],
           commerceExceptions: {

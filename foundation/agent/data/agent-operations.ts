@@ -13,7 +13,6 @@ import {
 } from "./agent-operations/areas";
 import {
   configureCueBinding,
-  configureEscalationPolicy,
   configureInstallationGovernance,
   configureScheduleBinding,
   updateCueBinding,
@@ -39,7 +38,6 @@ import {
   parseCueBindingInput,
   parseDefinitionInput,
   parseDefinitionRevisionInput,
-  parseEscalationInput,
   parseGovernanceInput,
   parseInstallationInput,
   parseManualRunInput,
@@ -61,7 +59,6 @@ import {
   type RawConfigurationProposal,
   type RawCueBinding,
   type RawDefinition,
-  type RawEscalationPolicy,
   type RawGovernance,
   type RawInstallation,
   type RawResponsibilityScope,
@@ -72,7 +69,6 @@ import {
   parseConfigurationProposalRow,
   parseCueBindingRow,
   parseDefinitionRow,
-  parseEscalationPolicyRow,
   parseGovernanceRow,
   parseInstallationRow,
   parseResponsibilityScopeRow,
@@ -267,17 +263,6 @@ export type InstallationGovernance = {
   readonly updatedAt: number;
 };
 
-export type EscalationPolicy = {
-  readonly areaId: string;
-  readonly scopeIds: readonly string[];
-  readonly organisationId: OrganisationId;
-  readonly approvalReminderAfterMs: number;
-  readonly escalateAfterMs: number;
-  readonly escalateTo: "organisation_owner";
-  readonly revision: number;
-  readonly updatedAt: number;
-};
-
 type ConfigurationProposalTargetKind = "agent_instructions" | "skill_markdown";
 
 export type AgentConfigurationProposal = {
@@ -357,7 +342,6 @@ export type AgentOperationsSnapshot = {
   readonly cueBindings: readonly CueBinding[];
   readonly scheduleBindings: readonly ScheduleBinding[];
   readonly governance: readonly InstallationGovernance[];
-  readonly escalationPolicies: readonly EscalationPolicy[];
   readonly configurationProposals: readonly AgentConfigurationProposal[];
   readonly activeCases: readonly {
     readonly caseId: string;
@@ -454,8 +438,6 @@ export function parseAgentOperationInput(
       return parseBindingUpdateInput(raw, "update_schedule_binding");
     case "configure_installation_governance":
       return parseGovernanceInput(raw);
-    case "configure_escalation_policy":
-      return parseEscalationInput(raw);
     case "accept_configuration_proposal":
       return parseProposalDecisionInput(raw, "accept_configuration_proposal");
     case "dismiss_configuration_proposal":
@@ -527,9 +509,6 @@ export async function applyAgentOperation(
           command,
           trailing,
         );
-        break;
-      case "configure_escalation_policy":
-        await configureEscalationPolicy(db, organisationId, command, trailing);
         break;
       case "accept_configuration_proposal":
         await acceptConfigurationProposal(
@@ -731,20 +710,6 @@ export async function readAgentOperations(
       .all<RawGovernance>()
   ).results.map(parseGovernanceRow);
 
-  const escalationPolicies = (
-    await db
-      .prepare(
-        `SELECT area_id AS areaId, organisation_id AS organisationId,
-            scope_ids_json AS scopeIds,
-            approval_reminder_after_ms AS approvalReminderAfterMs,
-            escalate_after_ms AS escalateAfterMs, escalate_to AS escalateTo,
-            revision, updated_at AS updatedAt
-     FROM escalation_policy WHERE organisation_id = ? ORDER BY area_id`,
-      )
-      .bind(organisationId)
-      .all<RawEscalationPolicy>()
-  ).results.map(parseEscalationPolicyRow);
-
   const configurationProposals = (
     await db
       .prepare(
@@ -771,7 +736,6 @@ export async function readAgentOperations(
     cueBindings,
     scheduleBindings,
     governance,
-    escalationPolicies,
     configurationProposals,
     activeCases: [],
   };

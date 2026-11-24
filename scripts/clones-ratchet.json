@@ -1,5 +1,5 @@
 {
-  "total": {"copies":776,"lines":13849},
+  "total": {"copies":776,"lines":13848},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -255,7 +255,7 @@
     "foundation/agent/control/routes/agents/codex.ts = foundation/agent/control/routes/agents/codex.ts": {"copies":1,"lines":18},
     "foundation/agent/control/routes/agents/inference.ts = surfaces/slack/server/control/routes/slack-reasoning-effort.ts": {"copies":1,"lines":22},
     "foundation/agent/cues/engine.ts = foundation/agent/cues/engine.ts": {"copies":3,"lines":74},
-    "foundation/agent/data/agent-operations.ts = packages/commerce-control-api/src/portal/agent-operations.ts": {"copies":1,"lines":15},
+    "foundation/agent/data/agent-operations.ts = packages/commerce-control-api/src/portal/agent-operations.ts": {"copies":1,"lines":14},
     "foundation/agent/data/agent-operations/automation.ts = foundation/agent/data/agent-operations/automation.ts": {"copies":1,"lines":18},
     "foundation/agent/harness-checkpoint.ts = foundation/agent/provider-adapters/dropbox.ts": {"copies":1,"lines":7},
     "foundation/agent/integrations/typesafe/connection.ts = foundation/agent/integrations/typesafe/connection.ts": {"copies":1,"lines":16},

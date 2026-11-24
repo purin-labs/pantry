@@ -2320,19 +2320,6 @@ CREATE TABLE agent_installation_governance (
   updated_by_user_id TEXT NOT NULL,
   updated_at INTEGER NOT NULL
 );
-CREATE TABLE escalation_policy (
-  area_id TEXT PRIMARY KEY REFERENCES operational_area (area_id),
-  organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),
-  scope_ids_json TEXT NOT NULL CHECK (json_valid(scope_ids_json)),
-  approval_reminder_after_ms INTEGER NOT NULL
-    CHECK (approval_reminder_after_ms > 0),
-  escalate_after_ms INTEGER NOT NULL
-    CHECK (escalate_after_ms >= approval_reminder_after_ms),
-  escalate_to TEXT NOT NULL CHECK (escalate_to IN ('organisation_owner')),
-  revision INTEGER NOT NULL DEFAULT 1 CHECK (revision > 0),
-  updated_by_user_id TEXT NOT NULL,
-  updated_at INTEGER NOT NULL
-);
 CREATE TABLE agent_configuration_proposal (
   proposal_id TEXT PRIMARY KEY,
   organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),

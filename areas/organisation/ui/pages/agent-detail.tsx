@@ -8,7 +8,6 @@ import type {
   AgentInstallation,
   AgentOperationsSnapshot,
   CueBinding,
-  OperationalArea,
   ScheduleBinding,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import type { Skill } from "@purin-labs/control-api";
@@ -40,7 +39,6 @@ import {
   skillById,
   readFormList,
   readFormText,
-  setMillisecondField,
   type AgentOperationMutationState,
   type AgentOperationRunner,
   type AgentOperationStep,
@@ -1386,23 +1384,13 @@ function LimitsSection(props: SectionProps): React.ReactNode {
     props.snapshot,
     props.definition.agentDefinitionId,
   );
-  const areaIds = [
-    ...new Set(
-      installations.flatMap((installation) =>
-        installation.areaAssignments.map((assignment) => assignment.areaId),
-      ),
-    ),
-  ];
   return (
     <section className="agent-section" aria-labelledby="agent-limits-title">
       <h3 id="agent-limits-title">Limits</h3>
       {installations.length === 0 ? (
         <p className="empty-state">Assign this agent to configure limits.</p>
       ) : (
-        <>
-          {installations.map(renderBudgetForm.bind(null, props))}
-          {areaIds.map((areaId) => renderEscalationForm(props, areaId))}
-        </>
+        installations.map(renderBudgetForm.bind(null, props))
       )}
     </section>
   );
@@ -1457,91 +1445,6 @@ function renderBudgetForm(
       </label>
       <button type="submit" disabled={props.busy}>
         Save budget
-      </button>
-      <MutationFeedback mutation={props.mutation} formKey={formKey} />
-    </form>
-  );
-}
-
-function renderEscalationForm(
-  props: SectionProps,
-  areaId: string,
-): React.ReactNode {
-  const policy =
-    props.snapshot.escalationPolicies.find(
-      (entry) => entry.areaId === areaId,
-    ) ?? null;
-  const area: OperationalArea | null = areaById(props.snapshot, areaId);
-  const formKey = `escalation:${areaId}`;
-  const scopeIds = props.snapshot.responsibilityScopes
-    .filter(
-      (scope) => scope.areaId === areaId && scope.lifecycle === "published",
-    )
-    .map((scope) => scope.scopeId);
-  if (!props.canConfigure) {
-    return (
-      <p key={areaId}>
-        {area?.name ?? humanizeIdentifier(areaId)}:{" "}
-        {policy === null
-          ? "no escalation rule yet."
-          : `remind after ${Math.round(policy.approvalReminderAfterMs / 60_000)} min, escalate after ${Math.round(policy.escalateAfterMs / 60_000)} min.`}
-      </p>
-    );
-  }
-  return (
-    <form
-      className="inline-form"
-      key={`${areaId}-${policy?.revision ?? 0}`}
-      onSubmit={props.submit.bind(null, formKey, "configure_escalation_policy")}
-    >
-      <input type="hidden" name="areaId" value={areaId} />
-      {scopeIds.map((scopeId) => (
-        <input key={scopeId} type="hidden" name="scopeIds" value={scopeId} />
-      ))}
-      <input
-        name="approvalReminderAfterMs"
-        type="hidden"
-        defaultValue={
-          policy === null ? "" : String(policy.approvalReminderAfterMs)
-        }
-      />
-      <label>
-        <span>
-          Remind after (minutes): {area?.name ?? humanizeIdentifier(areaId)}
-        </span>
-        <input
-          type="number"
-          min={1}
-          required
-          defaultValue={
-            policy === null
-              ? ""
-              : String(Math.round(policy.approvalReminderAfterMs / 60_000))
-          }
-          onChange={setMillisecondField("approvalReminderAfterMs")}
-        />
-      </label>
-      <input
-        name="escalateAfterMs"
-        type="hidden"
-        defaultValue={policy === null ? "" : String(policy.escalateAfterMs)}
-      />
-      <label>
-        <span>Escalate to owner after (minutes)</span>
-        <input
-          type="number"
-          min={1}
-          required
-          defaultValue={
-            policy === null
-              ? ""
-              : String(Math.round(policy.escalateAfterMs / 60_000))
-          }
-          onChange={setMillisecondField("escalateAfterMs")}
-        />
-      </label>
-      <button type="submit" disabled={props.busy}>
-        Save escalation
       </button>
       <MutationFeedback mutation={props.mutation} formKey={formKey} />
     </form>

@@ -104,7 +104,6 @@ const CONFIRMABLE_COMMANDS: ReadonlySet<AgentOperationInput["kind"]> = new Set([
   "update_cue_binding",
   "update_schedule_binding",
   "configure_installation_governance",
-  "configure_escalation_policy",
   "accept_configuration_proposal",
   "dismiss_configuration_proposal",
   "dispatch_manual_run",

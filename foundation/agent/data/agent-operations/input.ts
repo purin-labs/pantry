@@ -673,39 +673,6 @@ export function parseGovernanceInput(
   };
 }
 
-export function parseEscalationInput(
-  raw: Record<string, unknown>,
-): Result<AgentOperationInput, AgentOperationsError> {
-  const areaId = boundedString(raw.areaId, "areaId", 1, 200);
-  const scopeIds = nonEmptyStringArray(raw.scopeIds, "scopeIds", 64);
-  const approvalReminderAfterMs = positiveIntegerOrNull(
-    raw.approvalReminderAfterMs,
-  );
-  const escalateAfterMs = positiveIntegerOrNull(raw.escalateAfterMs);
-  if (areaId === null) {
-    return invalid("areaId");
-  }
-  if (scopeIds === null) {
-    return invalid("scopeIds");
-  }
-  if (approvalReminderAfterMs === null) {
-    return invalid("approvalReminderAfterMs");
-  }
-  if (escalateAfterMs === null || escalateAfterMs < approvalReminderAfterMs) {
-    return invalid("escalateAfterMs");
-  }
-  return {
-    ok: true,
-    value: {
-      kind: "configure_escalation_policy",
-      areaId,
-      scopeIds,
-      approvalReminderAfterMs,
-      escalateAfterMs,
-    },
-  };
-}
-
 export function parseManualRunInput(
   raw: Record<string, unknown>,
 ): Result<AgentOperationInput, AgentOperationsError> {

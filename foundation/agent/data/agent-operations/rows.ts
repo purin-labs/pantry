@@ -19,7 +19,6 @@ import type {
   AgentResponsibilityScopeRecord,
   CaseAssignmentPin,
   CueBinding,
-  EscalationPolicy,
   InstallationGovernance,
   InstallationLifecycle,
   OperationalArea,
@@ -168,17 +167,6 @@ export type RawGovernance = Record<string, unknown> & {
   installationId: unknown;
   organisationId: unknown;
   maxSessionBudgetTokens: unknown;
-  revision: unknown;
-  updatedAt: unknown;
-};
-
-export type RawEscalationPolicy = Record<string, unknown> & {
-  areaId: unknown;
-  organisationId: unknown;
-  scopeIds: unknown;
-  approvalReminderAfterMs: unknown;
-  escalateAfterMs: unknown;
-  escalateTo: unknown;
   revision: unknown;
   updatedAt: unknown;
 };
@@ -410,24 +398,6 @@ export function parseGovernanceRow(row: RawGovernance): InstallationGovernance {
     installationId: text(row.installationId),
     organisationId: organisation(row.organisationId),
     maxSessionBudgetTokens: positive(row.maxSessionBudgetTokens),
-    revision: positive(row.revision),
-    updatedAt: integer(row.updatedAt),
-  };
-}
-
-export function parseEscalationPolicyRow(
-  row: RawEscalationPolicy,
-): EscalationPolicy {
-  if (row.escalateTo !== "organisation_owner") {
-    fail("escalate target");
-  }
-  return {
-    areaId: text(row.areaId),
-    scopeIds: jsonStrings(row.scopeIds),
-    organisationId: organisation(row.organisationId),
-    approvalReminderAfterMs: positive(row.approvalReminderAfterMs),
-    escalateAfterMs: positive(row.escalateAfterMs),
-    escalateTo: "organisation_owner",
     revision: positive(row.revision),
     updatedAt: integer(row.updatedAt),
   };

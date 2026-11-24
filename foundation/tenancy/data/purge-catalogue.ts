@@ -208,7 +208,6 @@ export const PURGE_CATALOGUE = [
       "The Actor registry, which the placement owns. The harness erasure empties the Actors that it names.",
   },
   { table: "email_operational_contact", action: "erase" },
-  { table: "escalation_policy", action: "erase" },
   { table: "external_vault_import", action: "erase" },
   { table: "gmail_inference_eligibility", action: "erase" },
   { table: "held_output_request", action: "erase" },

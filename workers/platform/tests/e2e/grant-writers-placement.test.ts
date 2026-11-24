@@ -552,7 +552,6 @@ async function grantRows(organisationId: OrganisationId) {
     "agent_installation_governance",
     "cue_binding",
     "agent_responsibility_scope",
-    "escalation_policy",
     "whatsapp_support_binding",
     "whatsapp_support_binding_revision",
   ]) {

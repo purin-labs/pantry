@@ -571,8 +571,6 @@ function agentOperationSuccessMessage(kind: AgentOperationKind): string {
       return "Trigger updated.";
     case "configure_installation_governance":
       return "Session budget saved.";
-    case "configure_escalation_policy":
-      return "Escalation saved.";
     case "accept_configuration_proposal":
       return "Suggestion accepted and published.";
     case "dismiss_configuration_proposal":

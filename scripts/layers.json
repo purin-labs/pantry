@@ -242,7 +242,6 @@
     "email_self_test": "areas/inbox",
     "email_sender_account": "areas/inbox",
     "email_thread_case": "areas/inbox",
-    "escalation_policy": "foundation/agent",
     "external_identity_link": "surfaces/slack",
     "external_identity_link_challenge": "surfaces/slack",
     "external_vault_import": "foundation/authority",

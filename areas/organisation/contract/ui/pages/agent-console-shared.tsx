@@ -376,22 +376,6 @@ export function readFormList(
     .filter((value) => value.length > 0);
 }
 
-export function setMillisecondField(
-  name: string,
-): React.ChangeEventHandler<HTMLInputElement> {
-  return (event) => {
-    const form = event.currentTarget.form;
-    const hidden = form?.elements.namedItem(name);
-    const minutes = Number(event.currentTarget.value);
-    if (hidden instanceof HTMLInputElement) {
-      hidden.value =
-        Number.isSafeInteger(minutes) && minutes > 0
-          ? String(minutes * 60_000)
-          : "";
-    }
-  };
-}
-
 export { humanizeIdentifier } from "@purin-labs/ui/formatting";
 
 export function runAsync(operation: () => Promise<void>): void {

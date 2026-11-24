@@ -128,13 +128,6 @@ const EVERY_COMMAND: Readonly<
     installationId: "installation_urk",
     maxSessionBudgetTokens: 30_000,
   },
-  configure_escalation_policy: {
-    kind: "configure_escalation_policy",
-    areaId: "area_1",
-    scopeIds: ["scope_1"],
-    approvalReminderAfterMs: 3_600_000,
-    escalateAfterMs: 7_200_000,
-  },
   accept_configuration_proposal: {
     kind: "accept_configuration_proposal",
     proposalId: "proposal_1",
@@ -223,16 +216,18 @@ describe("configuration surface parity", () => {
     const budget = pendingDraft(
       operation(EVERY_COMMAND.configure_installation_governance),
     );
-    const escalation = {
-      ...pendingDraft(operation(EVERY_COMMAND.configure_escalation_policy)),
+    const other = {
+      ...pendingDraft(
+        operation(EVERY_COMMAND.configure_installation_governance),
+      ),
       commandDigest: "c".repeat(64),
     };
     expect(previewCode(budget.commandDigest)).not.toBe(
-      previewCode(escalation.commandDigest),
+      previewCode(other.commandDigest),
     );
     expect(
       replyAcceptsDraft(
-        `${presentConfigurationCommand(escalation.command).actionLabel} ${previewCode(escalation.commandDigest)}`,
+        `${presentConfigurationCommand(other.command).actionLabel} ${previewCode(other.commandDigest)}`,
         budget,
       ),
     ).toBe(false);
@@ -259,7 +254,6 @@ describe("configuration surface parity", () => {
         cueBindings: [],
         scheduleBindings: [],
         governance: [],
-        escalationPolicies: [],
         configurationProposals: [],
         activeCases: [],
         definitions: [

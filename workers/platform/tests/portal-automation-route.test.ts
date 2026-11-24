@@ -197,7 +197,6 @@ describe("Café automation route ownership", () => {
         cueBindings: [],
         scheduleBindings: [],
         governance: [],
-        escalationPolicies: [],
         configurationProposals: [],
         activeCases: [],
         commerceExceptions: {

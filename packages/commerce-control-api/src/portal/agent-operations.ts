@@ -41,7 +41,6 @@ export type AgentOperationsSnapshot = {
   readonly cueBindings: readonly CueBinding[];
   readonly scheduleBindings: readonly ScheduleBinding[];
   readonly governance: readonly InstallationGovernance[];
-  readonly escalationPolicies: readonly EscalationPolicy[];
   readonly configurationProposals: readonly AgentConfigurationProposal[];
   readonly activeCases: readonly ActiveCaseOperationsView[];
   readonly actionLedger: readonly ActionLedgerActivity[];
@@ -59,7 +58,6 @@ export const EMPTY_AGENT_OPERATIONS_SNAPSHOT: AgentOperationsSnapshot = {
   cueBindings: [],
   scheduleBindings: [],
   governance: [],
-  escalationPolicies: [],
   configurationProposals: [],
   activeCases: [],
   actionLedger: [],
@@ -95,15 +93,6 @@ export type ScheduleBinding = {
 type InstallationGovernance = {
   readonly installationId: string;
   readonly maxSessionBudgetTokens: number;
-  readonly revision: number;
-};
-
-type EscalationPolicy = {
-  readonly areaId: string;
-  readonly scopeIds: readonly string[];
-  readonly approvalReminderAfterMs: number;
-  readonly escalateAfterMs: number;
-  readonly escalateTo: "organisation_owner";
   readonly revision: number;
 };
 
@@ -240,7 +229,6 @@ export type AgentOperationKind =
   | "update_cue_binding"
   | "update_schedule_binding"
   | "configure_installation_governance"
-  | "configure_escalation_policy"
   | "accept_configuration_proposal"
   | "dismiss_configuration_proposal"
   | "dispatch_manual_run"
@@ -345,8 +333,6 @@ export function parseAgentOperationForm(
       return parseBindingUpdateForm(values, "update_schedule_binding");
     case "configure_installation_governance":
       return parseGovernanceForm(values);
-    case "configure_escalation_policy":
-      return parseEscalationForm(values);
     case "accept_configuration_proposal":
       return parseProposalDecisionForm(values, "accept_configuration_proposal");
     case "dismiss_configuration_proposal":
@@ -380,7 +366,6 @@ export function parseAgentOperationsResponse(
     !Array.isArray(raw.operations.cueBindings) ||
     !Array.isArray(raw.operations.scheduleBindings) ||
     !Array.isArray(raw.operations.governance) ||
-    !Array.isArray(raw.operations.escalationPolicies) ||
     !Array.isArray(raw.operations.configurationProposals)
   ) {
     throw new Error(apiError(raw));
@@ -397,9 +382,6 @@ export function parseAgentOperationsResponse(
     cueBindings: raw.operations.cueBindings.map(parseCueBinding),
     scheduleBindings: raw.operations.scheduleBindings.map(parseScheduleBinding),
     governance: raw.operations.governance.map(parseGovernance),
-    escalationPolicies: raw.operations.escalationPolicies.map(
-      parseEscalationPolicy,
-    ),
     configurationProposals: raw.operations.configurationProposals.map(
       parseConfigurationProposal,
     ),
@@ -891,35 +873,6 @@ function parseGovernanceForm(values: FormData): AgentOperationFormResult {
       kind: "configure_installation_governance",
       installationId,
       maxSessionBudgetTokens,
-    },
-  };
-}
-
-function parseEscalationForm(values: FormData): AgentOperationFormResult {
-  const areaId = formText(values, "areaId");
-  const approvalReminderAfterMs = formPositiveInteger(
-    values,
-    "approvalReminderAfterMs",
-  );
-  const escalateAfterMs = formPositiveInteger(values, "escalateAfterMs");
-  const scopeIds = formList(values, "scopeIds");
-  if (
-    areaId === null ||
-    scopeIds.length === 0 ||
-    approvalReminderAfterMs === null ||
-    escalateAfterMs === null ||
-    escalateAfterMs < approvalReminderAfterMs
-  ) {
-    return invalidForm();
-  }
-  return {
-    ok: true,
-    command: {
-      kind: "configure_escalation_policy",
-      areaId,
-      scopeIds,
-      approvalReminderAfterMs,
-      escalateAfterMs,
     },
   };
 }
@@ -1609,28 +1562,6 @@ function parseGovernance(raw: unknown): InstallationGovernance {
   return {
     installationId: raw.installationId,
     maxSessionBudgetTokens: raw.maxSessionBudgetTokens,
-    revision: raw.revision,
-  };
-}
-
-function parseEscalationPolicy(raw: unknown): EscalationPolicy {
-  if (
-    !isRecord(raw) ||
-    typeof raw.areaId !== "string" ||
-    !stringArray(raw.scopeIds) ||
-    typeof raw.approvalReminderAfterMs !== "number" ||
-    typeof raw.escalateAfterMs !== "number" ||
-    raw.escalateTo !== "organisation_owner" ||
-    typeof raw.revision !== "number"
-  ) {
-    throw new Error("Escalation policy response is invalid.");
-  }
-  return {
-    areaId: raw.areaId,
-    scopeIds: raw.scopeIds,
-    approvalReminderAfterMs: raw.approvalReminderAfterMs,
-    escalateAfterMs: raw.escalateAfterMs,
-    escalateTo: "organisation_owner",
     revision: raw.revision,
   };
 }
