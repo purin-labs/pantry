@@ -138,6 +138,8 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
+let keys = KEYS;
+
 window.fetch = async function previewFetch(
   input: RequestInfo | URL,
   init?: RequestInit,
@@ -160,10 +162,24 @@ window.fetch = async function previewFetch(
         },
         key: "pk_live_preview_0123456789abcdef",
       });
-    return json({ ok: true, apiKeys: scenario === "empty" ? [] : KEYS });
+    return json({ ok: true, apiKeys: scenario === "empty" ? [] : keys });
   }
-  if (url.pathname.includes("/commerce/api-keys/"))
-    return json({ ok: true, apiKey: KEYS[0] });
+  // A revoke marks the key as revoked, as on the server.
+  const revoked = /\/commerce\/api-keys\/([^/]+)\/revocation$/u.exec(
+    url.pathname,
+  );
+  if (revoked !== null && post) {
+    const credentialId = decodeURIComponent(revoked[1] ?? "");
+    keys = keys.map((key) =>
+      key.credentialId === credentialId
+        ? { ...key, revokedAt: new Date().toISOString() }
+        : key,
+    );
+    return json({
+      ok: true,
+      apiKey: keys.find((key) => key.credentialId === credentialId),
+    });
+  }
   // The areas section reads the published commerce resources for its drawer.
   return json({
     ok: true,

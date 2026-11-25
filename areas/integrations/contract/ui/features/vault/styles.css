@@ -55,8 +55,9 @@
   gap: 8px;
 }
 
+/* Two links that look like buttons. Each button is the shared Button. */
 :is(.vault-page, .vault-drawer, .vault-integration)
-  :is(.vault-primary, .vault-secondary, .vault-danger, .vault-text-button) {
+  a:is(.vault-primary, .vault-secondary) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -66,40 +67,19 @@
   font-weight: 500;
 }
 
-:is(.vault-page, .vault-drawer, .vault-integration) .vault-primary {
+:is(.vault-page, .vault-drawer, .vault-integration) a.vault-primary {
   color: var(--pantry-on-primary);
   background: var(--pantry-primary);
   box-shadow: none;
 }
 
-:is(.vault-page, .vault-drawer, .vault-integration)
-  .vault-primary:hover:not(:disabled) {
+:is(.vault-page, .vault-drawer, .vault-integration) a.vault-primary:hover {
   background: var(--pantry-primary-hover);
 }
 
-:is(.vault-page, .vault-drawer, .vault-integration) .vault-danger {
-  color: var(--pantry-on-primary);
-  background: var(--danger-text);
-  box-shadow: none;
-}
-
-:is(.vault-page, .vault-drawer, .vault-integration) .vault-text-button {
-  padding: 0 12px;
-  color: var(--ink-2);
-  background: transparent;
-  box-shadow: none;
-  font-weight: 400;
-}
-
-:is(.vault-page, .vault-drawer, .vault-integration)
-  .vault-text-button:hover:not(:disabled) {
-  color: var(--ink-strong);
-  background: var(--surface);
-}
-
-:is(.vault-drawer, .vault-integration) .vault-remove {
-  margin-inline-start: auto;
-  color: var(--danger-text);
+/* An open question takes the full row, under the other buttons. */
+.vault-actions > .pantry-confirm {
+  flex-basis: 100%;
 }
 
 .vault-notice:empty {
@@ -233,17 +213,8 @@
   font-size: 13px;
 }
 
-.vault-remove-confirm {
-  display: grid;
-  gap: var(--pantry-space-2);
-}
-
-.vault-remove-confirm p,
 .vault-failure {
   margin: 0;
-}
-
-.vault-failure {
   color: var(--danger-text);
   font-size: 14px;
 }
@@ -335,9 +306,8 @@
   margin-block-start: 2px;
 }
 
-.vault-form-fields .vault-text-button {
+.vault-form-fields .pantry-button {
   justify-self: start;
-  margin-inline-start: -12px;
 }
 
 .vault-password {
@@ -568,8 +538,4 @@
 }
 .vault-discard::backdrop {
   background: rgb(0 0 0 / 25%);
-}
-.vault-discard .vault-discard-confirm {
-  color: var(--pantry-on-primary);
-  background: var(--danger-text);
 }

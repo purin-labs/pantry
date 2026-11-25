@@ -1,7 +1,12 @@
 import React from "react";
 import { Copy, Plus } from "lucide-react";
 
-import { EmptyState, SideDrawer } from "@purin-labs/ui/index";
+import {
+  Button,
+  ConfirmInPlace,
+  EmptyState,
+  SideDrawer,
+} from "@purin-labs/ui/index";
 import { apiKeyErrorMessage, GRANTABLE_SCOPE_LABELS, GRANTABLE_SCOPES, issueCommerceApiKey, readCommerceApiKeys, revokeCommerceApiKey, type GrantableScope } from "./api";
 import type { CommerceApiKey } from "@purin-labs/control-api/portal/api-keys";
 import "@purin-labs/area-integrations-contract/ui/features/vault/styles.css";
@@ -20,7 +25,7 @@ type LoadState =
 
 /** What the drawer shows. A new key's secret lives only in this state. */
 type Drawer =
-  | Readonly<{ kind: "view"; credentialId: string; confirmingRevoke: boolean }>
+  | Readonly<{ kind: "view"; credentialId: string }>
   | Readonly<{
       kind: "create";
       label: string;
@@ -92,7 +97,7 @@ export function CommerceApiKeysRoute(props: {
     setFailure(null);
     try {
       await revokeCommerceApiKey(organisationId, credentialId);
-      setDrawer({ kind: "view", credentialId, confirmingRevoke: false });
+      setDrawer({ kind: "view", credentialId });
       await reload();
     } catch (error) {
       setFailure(apiKeyErrorMessage(error));
@@ -121,14 +126,13 @@ export function CommerceApiKeysRoute(props: {
       <div className="vault-toolbar">
         {load.kind === "ready" && keys.length > 0 ? (
           <div className="vault-add">
-            <button
-              type="button"
-              className="vault-primary"
+            <Button
+              variant="primary"
               onClick={startCreate}
             >
               <Plus size={16} aria-hidden="true" />
               New key
-            </button>
+            </Button>
           </div>
         ) : null}
       </div>
@@ -137,29 +141,27 @@ export function CommerceApiKeysRoute(props: {
       ) : load.kind === "failed" ? (
         <div className="vault-load-failed" role="alert">
           <p>{load.message}</p>
-          <button
-            type="button"
-            className="vault-secondary"
+          <Button
+            variant="secondary"
             onClick={() => {
               setLoad({ kind: "loading" });
               void reload();
             }}
           >
             Try again
-          </button>
+          </Button>
         </div>
       ) : keys.length === 0 ? (
         <EmptyState
           title="No API keys"
           actions={
-            <button
-              type="button"
-              className="vault-primary"
+            <Button
+              variant="primary"
               onClick={startCreate}
             >
               <Plus size={16} aria-hidden="true" />
               New key
-            </button>
+            </Button>
           }
         />
       ) : (
@@ -176,11 +178,7 @@ export function CommerceApiKeysRoute(props: {
                     : undefined
                 }
                 onClick={() =>
-                  open({
-                    kind: "view",
-                    credentialId: key.credentialId,
-                    confirmingRevoke: false,
-                  })
+                  open({ kind: "view", credentialId: key.credentialId })
                 }
               >
                 <span className="vault-row-text">
@@ -273,20 +271,19 @@ export function CommerceApiKeysRoute(props: {
                   )}
                 </div>
                 <div className="vault-actions vault-form-footer">
-                  <button
+                  <Button
+                    variant="primary"
                     type="submit"
-                    className="vault-primary"
                     disabled={busy}
                   >
                     {busy ? "Creating…" : "Create key"}
-                  </button>
-                  <button
-                    type="button"
-                    className="vault-text-button"
+                  </Button>
+                  <Button
+                    variant="secondary"
                     onClick={close}
                   >
                     Cancel
-                  </button>
+                  </Button>
                 </div>
               </form>
             ) : drawer.kind === "issued" ? (
@@ -304,9 +301,8 @@ export function CommerceApiKeysRoute(props: {
                     </p>
                     <div className="api-keys-secret">
                       <code aria-label="API key">{drawer.key}</code>
-                      <button
-                        type="button"
-                        className="vault-secondary"
+                      <Button
+                        variant="secondary"
                         onClick={() => {
                           const key = drawer.key;
                           if (key === null) return;
@@ -322,7 +318,7 @@ export function CommerceApiKeysRoute(props: {
                       >
                         <Copy size={16} aria-hidden="true" />
                         {copied ? "Copied" : "Copy"}
-                      </button>
+                      </Button>
                     </div>
                   </>
                 )}
@@ -333,13 +329,12 @@ export function CommerceApiKeysRoute(props: {
                   </p>
                 )}
                 <div className="vault-actions">
-                  <button
-                    type="button"
-                    className="vault-primary"
+                  <Button
+                    variant="primary"
                     onClick={() => open(null)}
                   >
                     Done
-                  </button>
+                  </Button>
                 </div>
               </div>
             ) : viewed === null ? (
@@ -352,44 +347,17 @@ export function CommerceApiKeysRoute(props: {
                     {failure}
                   </p>
                 )}
-                {viewed.revokedAt !== null ? null : drawer.confirmingRevoke ? (
-                  <div
-                    className="vault-remove-confirm"
-                    role="group"
-                    aria-label="Revoke"
-                  >
-                    <p>Revoke this key? Systems that use it stop at once.</p>
-                    <div className="vault-actions">
-                      <button
-                        type="button"
-                        className="vault-danger"
-                        disabled={busy}
-                        onClick={() => void revoke(viewed.credentialId)}
-                      >
-                        {busy ? "Revoking…" : "Revoke"}
-                      </button>
-                      <button
-                        type="button"
-                        className="vault-text-button"
-                        onClick={() =>
-                          setDrawer({ ...drawer, confirmingRevoke: false })
-                        }
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
+                {viewed.revokedAt !== null ? null : (
                   <div className="vault-actions">
-                    <button
-                      type="button"
-                      className="vault-secondary"
-                      onClick={() =>
-                        setDrawer({ ...drawer, confirmingRevoke: true })
-                      }
-                    >
-                      Revoke key
-                    </button>
+                    <ConfirmInPlace
+                      key={viewed.credentialId}
+                      label="Revoke key…"
+                      question="Revoke this key?"
+                      consequence="Systems that use it stop at once."
+                      confirmLabel={busy ? "Revoking…" : "Revoke key"}
+                      busy={busy}
+                      onConfirm={() => revoke(viewed.credentialId)}
+                    />
                   </div>
                 )}
               </div>
