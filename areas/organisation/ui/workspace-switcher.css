@@ -102,7 +102,7 @@
   color: var(--ink);
   text-decoration: none;
 }
-.workspace-switcher-row .console-switcher-avatar {
+.workspace-switcher-row .console-switcher-avatar.identity-tile {
   width: 24px;
   height: 24px;
   flex-basis: 24px;

@@ -3004,12 +3004,18 @@ CREATE TABLE organisation_workspace (
   status TEXT NOT NULL CHECK (status IN ('active', 'archived')),
   created_at INTEGER NOT NULL CHECK (created_at >= 0),
   archived_at INTEGER,
+  logo_sha256 TEXT CHECK (logo_sha256 IS NULL OR (length(logo_sha256) = 64 AND logo_sha256 NOT GLOB '*[^0-9a-f]*')),
   UNIQUE (organisation_id, workspace_handle),
   UNIQUE (organisation_id, workspace_id),
   CHECK (
     (status = 'active' AND archived_at IS NULL) OR
     (status = 'archived' AND archived_at IS NOT NULL)
   )
+);
+CREATE TABLE organisation_logo (
+  organisation_id TEXT PRIMARY KEY REFERENCES organisation (organisation_id) ON DELETE CASCADE,
+  logo_sha256 TEXT NOT NULL CHECK (length(logo_sha256) = 64 AND logo_sha256 NOT GLOB '*[^0-9a-f]*'),
+  updated_at INTEGER NOT NULL CHECK (updated_at >= 0)
 );
 CREATE TABLE organisation_default_workspace (
   organisation_id TEXT PRIMARY KEY REFERENCES organisation (organisation_id) ON DELETE CASCADE,

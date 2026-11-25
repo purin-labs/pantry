@@ -314,10 +314,7 @@ export function renderRouteNotFound(
         workspaceHandle: workspace.workspaceHandle,
         name: workspace.name,
         choices: organisation.membership.workspaces.map(
-          toWorkspaceChoice.bind(
-            null,
-            organisation.membership.organisationHandle,
-          ),
+          toWorkspaceChoice.bind(null, organisation.membership),
         ),
       }}
       sidebar={{
@@ -432,6 +429,7 @@ function toOrganisationListItem(
     plan: item.organisation.plan,
     lifecycle: item.organisation.lifecycle,
     configurationVersion: item.configurationVersion,
+    organisationLogo: item.membership.organisationLogo,
     workspaces: item.membership.workspaces,
   };
 }

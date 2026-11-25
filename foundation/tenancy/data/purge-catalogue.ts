@@ -277,6 +277,7 @@ export const PURGE_CATALOGUE = [
   },
   { table: "organisation_inference_selection", action: "erase" },
   { table: "organisation_invitation", action: "erase" },
+  { table: "organisation_logo", action: "erase" },
   {
     table: "organisation_onboarding",
     action: "keep",
@@ -373,6 +374,11 @@ export const PURGE_R2_PREFIXES = [
     root: "attachment-collection",
     encoded: false,
     holds: "The receipts of the attachment collection.",
+  },
+  {
+    root: "organisation-logos",
+    encoded: false,
+    holds: "The logos of the Organisation and of its workspaces.",
   },
   {
     root: "harness-checkpoints",

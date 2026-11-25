@@ -36,24 +36,33 @@ const PREVIEW_WORKSPACES = [
     organisationHandle: "nuki",
     workspaceHandle: "cafe",
     name: "Cafe operations",
+    tile: { seed: "workspace_preview_cafe", logoUrl: null },
   },
   {
     organisationHandle: "nuki",
     workspaceHandle: "central",
     name: "Central kitchen",
+    tile: { seed: "workspace_preview_central", logoUrl: null },
   },
 ];
 const PREVIEW_ORGANISATIONS = [
   {
     organisationHandle: "nuki",
     name: "Nuki Inc.",
+    tile: { seed: "organisation_preview_nuki", logoUrl: null },
     workspaces: PREVIEW_WORKSPACES,
   },
   {
     organisationHandle: "noix",
     name: "Noix test shop",
+    tile: { seed: "organisation_preview_noix", logoUrl: null },
     workspaces: [
-      { organisationHandle: "noix", workspaceHandle: "shop", name: "Shop" },
+      {
+        organisationHandle: "noix",
+        workspaceHandle: "shop",
+        name: "Shop",
+        tile: { seed: "workspace_preview_shop", logoUrl: null },
+      },
     ],
   },
 ];

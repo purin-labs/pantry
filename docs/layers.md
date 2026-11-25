@@ -43,7 +43,7 @@ import each of its files. A module with no line for one of these has none.
   - `foundation/tenancy/data/shared-rows/`
   - `foundation/tenancy/organisation-access/`
 - Packages: `foundation/tenancy`
-- Tables (17): `app_user`, `control_mutation_receipt`, `control_session`, `onboarding_audit_event`, `onboarding_event`, `organisation`, `organisation_archive_cleanup`, `organisation_archive_tombstone`, `organisation_invitation`, `organisation_onboarding`, `organisation_placement`, `person`, `service_role_grant`, `state_object_relocation`, `state_object_restore`, `surface_installation`, `workspace_ai_budget`
+- Tables (18): `app_user`, `control_mutation_receipt`, `control_session`, `onboarding_audit_event`, `onboarding_event`, `organisation`, `organisation_archive_cleanup`, `organisation_archive_tombstone`, `organisation_invitation`, `organisation_logo`, `organisation_onboarding`, `organisation_placement`, `person`, `service_role_grant`, `state_object_relocation`, `state_object_restore`, `surface_installation`, `workspace_ai_budget`
 
 ## foundation/actor-runtime
 

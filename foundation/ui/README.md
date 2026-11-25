@@ -594,6 +594,22 @@ and run it. [The Purin logo folder](../../docs/brand/purin-logo/README.md)
 holds the SVG files and the icon pack. `PantryMark` still draws the goat mark
 on every Portal surface, until the brand switch.
 
+### Identity tiles
+
+`IdentityTile` is the tile of an organisation or a workspace: its uploaded
+logo, or a gradient that comes from its id. The same id gives the same
+gradient on every screen, and a rename keeps it, so people can tell
+organisations apart at a glance.
+
+```tsx
+<IdentityTile seed={organisation.organisationId} logoUrl={logoUrl} />
+<IdentityTile seed={workspace.workspaceId} logoUrl={null} size="sm" />
+```
+
+- `logoUrl` is the address of the logo, or null for the gradient.
+- `size="sm"` is the 22px tile for a workspace under its organisation.
+- The tile is decoration: the name beside it is the accessible name.
+
 ### Motion
 
 State changes use the spring shorthands from `styles.css`: `--motion-quick`

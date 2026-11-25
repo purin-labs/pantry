@@ -12,6 +12,11 @@ import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { readCommerceActionLedger } from "@purin-labs/agent/control/agent-operation-activity";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  handleOrganisationLogoRoute,
+  matchOrganisationLogoRoute,
+  type OrganisationLogoRoute,
+} from "./logos";
 import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationOnboardingLifecycle } from "@purin-labs/contracts";
@@ -25,25 +30,40 @@ import type {
   HomeTodayFact,
 } from "@purin-labs/control-api";
 
+/** The Home page and the logos of an organisation and its workspaces. */
 export type WorkspaceControlRoute = Readonly<{
-  kind: "home";
-  organisationIdRaw: string;
+  kind: "organisationWorkspace";
+  resource:
+    | Readonly<{ kind: "home"; organisationIdRaw: string }>
+    | OrganisationLogoRoute;
 }>;
 
 export function matchWorkspaceControlRoute(
   pathname: string,
 ): WorkspaceControlRoute | null {
   const match = /^\/v1\/control\/organisations\/([^/]+)\/home$/u.exec(pathname);
-  return match?.[1] === undefined
+  if (match?.[1] !== undefined)
+    return {
+      kind: "organisationWorkspace",
+      resource: {
+        kind: "home",
+        organisationIdRaw: decodeURIComponent(match[1]),
+      },
+    };
+  const logo = matchOrganisationLogoRoute(pathname);
+  return logo === null
     ? null
-    : { kind: "home", organisationIdRaw: decodeURIComponent(match[1]) };
+    : { kind: "organisationWorkspace", resource: logo };
 }
+
 export function handleWorkspaceControlRoute(
   request: Request,
   env: Env,
   route: WorkspaceControlRoute,
 ): Promise<Response> {
-  return handleHome(request, env, route.organisationIdRaw);
+  return route.resource.kind === "home"
+    ? handleHome(request, env, route.resource.organisationIdRaw)
+    : handleOrganisationLogoRoute(request, env, route.resource);
 }
 
 type HomeActionActivity = Pick<

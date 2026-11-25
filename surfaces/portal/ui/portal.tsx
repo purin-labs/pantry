@@ -1322,10 +1322,7 @@ export class ControlPortalApp extends React.Component<
             workspaceHandle: state.workspace.workspaceHandle,
             name: state.workspace.name,
             choices: state.organisation.membership.workspaces.map(
-              toWorkspaceChoice.bind(
-                null,
-                state.organisation.membership.organisationHandle,
-              ),
+              toWorkspaceChoice.bind(null, state.organisation.membership),
             ),
           }}
           activePage={state.page}

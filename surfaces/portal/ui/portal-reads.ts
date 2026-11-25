@@ -18,6 +18,7 @@ import {
   initialFileAccessPath,
   workspacePagePath,
 } from "@purin-labs/ui/route";
+import { logoPath } from "@purin-labs/control/portal/control-paths";
 import type {
   OrganisationChoice,
   WorkspaceChoice,
@@ -114,23 +115,38 @@ export async function loadOrganisationChoices(
 export function toOrganisationChoice(
   organisation: PortalOrganisation,
 ): OrganisationChoice {
+  const { membership } = organisation;
   return {
-    organisationHandle: organisation.membership.organisationHandle,
+    organisationHandle: membership.organisationHandle,
     name: organisation.organisation.name,
-    workspaces: organisation.membership.workspaces.map(
-      toWorkspaceChoice.bind(null, organisation.membership.organisationHandle),
+    tile: {
+      seed: membership.organisationId,
+      logoUrl:
+        membership.organisationLogo === null
+          ? null
+          : logoPath(membership.organisationId, null, membership.organisationLogo),
+    },
+    workspaces: membership.workspaces.map(
+      toWorkspaceChoice.bind(null, membership),
     ),
   };
 }
 
 export function toWorkspaceChoice(
-  organisationHandle: string,
+  membership: Pick<Membership, "organisationId" | "organisationHandle">,
   workspace: OrganisationWorkspace,
 ): WorkspaceChoice {
   return {
-    organisationHandle,
+    organisationHandle: membership.organisationHandle,
     workspaceHandle: workspace.workspaceHandle,
     name: workspace.name,
+    tile: {
+      seed: workspace.workspaceId,
+      logoUrl:
+        workspace.logo === null
+          ? null
+          : logoPath(membership.organisationId, workspace.workspaceId, workspace.logo),
+    },
   };
 }
 

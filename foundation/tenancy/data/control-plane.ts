@@ -151,10 +151,14 @@ type OrganisationWorkspace = {
   readonly workspaceHandle: WorkspaceHandle;
   readonly name: string;
   readonly createdAt: number;
+  /** The SHA-256 of the workspace's logo, or null for the gradient tile. */
+  readonly logo: string | null;
 };
 
 type OrganisationMembership = ActiveOrganisationMembership & {
   readonly organisationHandle: OrganisationHandle;
+  /** The SHA-256 of the organisation's logo, or null for the gradient tile. */
+  readonly organisationLogo: string | null;
   readonly workspaces: readonly [
     OrganisationWorkspace,
     ...OrganisationWorkspace[],
@@ -259,7 +263,9 @@ export type OrganisationMembershipRow = {
 
 type OrganisationWorkspaceMembershipRow = OrganisationMembershipRow & {
   organisationHandle: unknown;
+  organisationLogo: unknown;
   workspaceId: unknown;
+  workspaceLogo: unknown;
   workspaceHandle: unknown;
   workspaceName: unknown;
   workspaceCreatedAt: unknown;
@@ -1152,6 +1158,7 @@ function parseOrganisationBootstrapReservation(
       workspaceHandle: workspaceHandle.value,
       name: row.workspace.name,
       createdAt: requireInteger(row.workspace.createdAt),
+      logo: null,
     },
     placement: placement.value,
     fenceToken: row.fenceToken,
@@ -1233,13 +1240,16 @@ async function listRegionalControlMemberships(input: {
          service_role_grant.status,
          service_role_grant.created_at AS createdAt,
          organisation.organisation_handle AS organisationHandle,
+         organisation_logo.logo_sha256 AS organisationLogo,
          organisation_workspace.workspace_id AS workspaceId,
+         organisation_workspace.logo_sha256 AS workspaceLogo,
          organisation_workspace.workspace_handle AS workspaceHandle,
          organisation_workspace.name AS workspaceName,
          organisation_workspace.created_at AS workspaceCreatedAt
        FROM service_role_grant
        JOIN organisation ON organisation.organisation_id = service_role_grant.organisation_id
        JOIN organisation_workspace ON organisation_workspace.organisation_id = organisation.organisation_id
+       LEFT JOIN organisation_logo ON organisation_logo.organisation_id = organisation.organisation_id
        WHERE service_role_grant.user_id = ?
          AND service_role_grant.status = 'active'
          AND organisation_workspace.status = 'active'
@@ -1319,6 +1329,7 @@ async function checkControlMembershipEligibility(
         role: grant.role,
         createdAt: grant.createdAt,
         organisationHandle: candidate.membership.organisationHandle,
+        organisationLogo: candidate.membership.organisationLogo,
         workspaces: candidate.membership.workspaces,
       },
     };
@@ -1889,6 +1900,7 @@ export async function readOrganisationMembershipMutationState(
 type OrganisationMembershipGroup = {
   readonly membership: ActiveOrganisationMembership;
   readonly organisationHandle: OrganisationHandle;
+  readonly organisationLogo: string | null;
   readonly workspaces: OrganisationWorkspace[];
 };
 
@@ -1904,6 +1916,7 @@ function parseOrganisationMemberships(
       groups.set(parsed.membership.organisationId, {
         membership: parsed.membership,
         organisationHandle: parsed.organisationHandle,
+        organisationLogo: parsed.organisationLogo,
         workspaces: [parsed.workspace],
       });
       continue;
@@ -1920,6 +1933,7 @@ function parseOrganisationWorkspaceMembershipRow(
 ): {
   readonly membership: ActiveOrganisationMembership;
   readonly organisationHandle: OrganisationHandle;
+  readonly organisationLogo: string | null;
   readonly workspace: OrganisationWorkspace;
 } | null {
   const membership = parseActiveOrganisationMembership(row);
@@ -1954,13 +1968,20 @@ function parseOrganisationWorkspaceMembershipRow(
   return {
     membership,
     organisationHandle: organisationHandle.value,
+    organisationLogo: logoDigest(row.organisationLogo),
     workspace: {
       workspaceId: workspaceId.value,
       workspaceHandle: workspaceHandle.value,
       name: row.workspaceName,
       createdAt: row.workspaceCreatedAt,
+      logo: logoDigest(row.workspaceLogo),
     },
   };
+}
+
+/** A stored logo digest; the table's CHECK keeps it 64 lower-case hex. */
+function logoDigest(raw: unknown): string | null {
+  return typeof raw === "string" && /^[0-9a-f]{64}$/u.test(raw) ? raw : null;
 }
 
 function finalizeOrganisationMembership(
@@ -1973,6 +1994,7 @@ function finalizeOrganisationMembership(
         {
           ...group.membership,
           organisationHandle: group.organisationHandle,
+          organisationLogo: group.organisationLogo,
           workspaces: [first, ...rest],
         },
       ];
@@ -2108,6 +2130,7 @@ function initialOrganisationWorkspace(
     workspaceHandle: workspaceHandle.value,
     name: "Cafe operations",
     createdAt,
+    logo: null,
   };
 }
 

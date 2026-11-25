@@ -8,6 +8,7 @@ import React from "react";
 import {
   Archive,
   ArrowRight,
+  ImageIcon,
   MoreHorizontal,
   PencilLine,
   RotateCcw,
@@ -21,7 +22,8 @@ import type {
   OrganisationOnboardingLifecycle,
 } from "@purin-labs/contracts";
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
-import { signInPath } from "@purin-labs/control/portal/control-paths";
+import { logoPath, signInPath } from "@purin-labs/control/portal/control-paths";
+import { IdentityTile } from "@purin-labs/ui/index";
 import { ArchiveConfirm } from "@purin-labs/area-integrations-contract/ui/features/integrations/archive-confirm";
 import {
   EmptyState,
@@ -33,6 +35,11 @@ import {
 import type { PageContent } from "@purin-labs/control/portal/page-content";
 import { organisationPath, workspacePagePath } from "@purin-labs/ui/route";
 import { AgentModal } from "./agent-modal";
+import {
+  OrganisationLogosDialog,
+  type LogoActions,
+} from "./organisation-logos-dialog";
+import { ORGANISATION_LOGO_ACTIONS } from "./organisation-logo-transport";
 import { AccountSetup, type AccountSetupListing } from "./account-onboarding";
 import { assertNever } from "@purin-labs/std";
 import "./organisations.css";
@@ -42,6 +49,8 @@ type OrganisationWorkspaceListItem = {
   readonly workspaceHandle: string;
   readonly name: string;
   readonly createdAt: number;
+  /** The SHA-256 of the workspace's logo, or null for the gradient tile. */
+  readonly logo: string | null;
 };
 
 export type OrganisationListItem = {
@@ -52,6 +61,8 @@ export type OrganisationListItem = {
   readonly plan: string;
   readonly lifecycle: OrganisationOnboardingLifecycle["kind"];
   readonly configurationVersion: number;
+  /** The SHA-256 of the organisation's logo, or null for the gradient tile. */
+  readonly organisationLogo: string | null;
   readonly workspaces: readonly OrganisationWorkspaceListItem[];
 };
 
@@ -63,6 +74,8 @@ export type OrganisationActions = {
   readonly archive: (organisation: OrganisationListItem) => Promise<void>;
   readonly restore: (organisation: OrganisationListItem) => Promise<void>;
   readonly delete: (organisation: OrganisationListItem) => Promise<void>;
+  /** The logo calls; the control API when absent. A preview gives its own. */
+  readonly logos?: LogoActions;
 };
 
 export type WorkspaceRouteTarget = {
@@ -472,6 +485,7 @@ function renderOrganisationListItem(
 type OrganisationRowState =
   | { readonly kind: "idle" }
   | { readonly kind: "renaming"; readonly request: OrganisationDialogRequest }
+  | { readonly kind: "logos" }
   | {
       readonly kind: "confirming_delete";
       readonly request: OrganisationDialogRequest;
@@ -506,6 +520,18 @@ function OrganisationListRow(props: {
           className="organisation-row-link"
           to={organisationPath(props.item.organisationHandle)}
         >
+          <IdentityTile
+            seed={props.item.organisationId}
+            logoUrl={
+              props.item.organisationLogo === null
+                ? null
+                : logoPath(
+                    props.item.organisationId,
+                    null,
+                    props.item.organisationLogo,
+                  )
+            }
+          />
           <span className="organisation-row-copy">
             <strong>{props.item.name}</strong>
             <small>{facts.join(" · ")}</small>
@@ -526,6 +552,13 @@ function OrganisationListRow(props: {
               >
                 <PencilLine size={16} strokeWidth={1.5} aria-hidden="true" />
                 Rename
+              </button>
+              <button
+                type="button"
+                onClick={showOrganisationLogos.bind(null, setState)}
+              >
+                <ImageIcon size={16} strokeWidth={1.5} aria-hidden="true" />
+                Change logo
               </button>
               <button
                 type="button"
@@ -597,6 +630,30 @@ function renderOrganisationActionDialog(
           refresh={props.refresh}
           request={state.request}
           setState={setState}
+        />
+      );
+    case "logos":
+      return (
+        <OrganisationLogosDialog
+          organisationId={props.item.organisationId}
+          organisationName={props.item.name}
+          subjects={[
+            {
+              workspaceId: null,
+              seed: props.item.organisationId,
+              name: props.item.name,
+              logo: props.item.organisationLogo,
+            },
+            ...props.item.workspaces.map((workspace) => ({
+              workspaceId: workspace.workspaceId,
+              seed: workspace.workspaceId,
+              name: workspace.name,
+              logo: workspace.logo,
+            })),
+          ]}
+          actions={props.actions.logos ?? ORGANISATION_LOGO_ACTIONS}
+          refresh={props.refresh}
+          close={resetOrganisationRow.bind(null, setState)}
         />
       );
     case "confirming_delete":
@@ -743,6 +800,14 @@ function DeleteOrganisationDialog(props: {
   );
 }
 
+function showOrganisationLogos(
+  setState: React.Dispatch<React.SetStateAction<OrganisationRowState>>,
+  event: React.MouseEvent<HTMLButtonElement>,
+): void {
+  closeOrganisationMenu(event);
+  setState({ kind: "logos" });
+}
+
 function showOrganisationRename(
   setState: React.Dispatch<React.SetStateAction<OrganisationRowState>>,
   event: React.MouseEvent<HTMLButtonElement>,
@@ -876,27 +941,40 @@ function renderOrganisationWorkspaces(
       className="organisation-row-workspaces"
       aria-label={`Workspaces of ${item.name}`}
     >
-      {item.workspaces.map(
-        renderOrganisationWorkspace.bind(null, item.organisationHandle),
-      )}
+      {item.workspaces.map(renderOrganisationWorkspace.bind(null, item))}
     </ul>
   );
 }
 
 function renderOrganisationWorkspace(
-  organisationHandle: string,
+  organisation: OrganisationListItem,
   workspace: OrganisationWorkspaceListItem,
 ): React.ReactNode {
   return (
     <li key={workspace.workspaceId}>
       <Link
         to={workspacePagePath(
-          organisationHandle,
+          organisation.organisationHandle,
           workspace.workspaceHandle,
           "overview",
         )}
       >
-        <span>{workspace.name}</span>
+        <IdentityTile
+          size="sm"
+          seed={workspace.workspaceId}
+          logoUrl={
+            workspace.logo === null
+              ? null
+              : logoPath(
+                  organisation.organisationId,
+                  workspace.workspaceId,
+                  workspace.logo,
+                )
+          }
+        />
+        <span className="organisation-row-workspace-name">
+          {workspace.name}
+        </span>
         <ArrowRight size={16} strokeWidth={1.5} aria-hidden="true" />
       </Link>
     </li>

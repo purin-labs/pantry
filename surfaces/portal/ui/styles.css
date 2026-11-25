@@ -6175,42 +6175,11 @@ button:not(:where(.pantry-select-trigger)).danger-button:disabled {
   background: var(--console-rail-hover);
 }
 
-.console-switcher-avatar {
+/* The organisation and workspace tiles of the switcher (IdentityTile). */
+.console-switcher-avatar.identity-tile {
   width: 28px;
   height: 28px;
   flex: 0 0 28px;
-  display: inline-grid;
-  place-items: center;
-  border-radius: 8px;
-  overflow: hidden;
-  color: var(--paper);
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.console-switcher-avatar img {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
-}
-
-.console-switcher-organisation-avatar,
-.console-switcher-workspace-avatar {
-  background-size: cover;
-  background-position: center;
-  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%);
-}
-
-.console-switcher-organisation-avatar {
-  background-image: url("./assets/gradients/aqua-evergreen.jpg");
-}
-
-.console-switcher-workspace-avatar {
-  background-image: url("./assets/gradients/sky-sand.jpg");
-}
-
-[data-portal-theme="dark"] .console-switcher-avatar {
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%);
 }
 
 .console-switcher-label {

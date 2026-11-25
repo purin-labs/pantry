@@ -12,6 +12,7 @@ export {
 export { Button, type ButtonProps, type ButtonVariant } from "./button";
 export { ConfirmInPlace, type ConfirmInPlaceProps } from "./confirm-in-place";
 export { EmptyState, type EmptyStateProps } from "./empty-state";
+export { IdentityTile } from "./identity-tile";
 export {
   CrmTable,
   type CrmColumn,

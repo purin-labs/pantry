@@ -550,7 +550,7 @@ export async function handleControlRequest(
         route,
         decidePendingDecisionWith(env),
       );
-    case "home":
+    case "organisationWorkspace":
       return handleWorkspaceControlRoute(request, env, route);
     case "commercePublishedResources":
     case "checkoutProfiles":

@@ -280,6 +280,7 @@
     "organisation_communication_destination": "areas/organisation",
     "organisation_default_project": "foundation/conversation",
     "organisation_default_workspace": "foundation/agent",
+    "organisation_logo": "foundation/tenancy",
     "organisation_first_operational_task": "areas/organisation",
     "organisation_harness_erasure": "areas/organisation",
     "organisation_harness_erasure_object": "areas/organisation",

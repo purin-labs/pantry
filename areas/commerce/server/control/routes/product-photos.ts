@@ -1,4 +1,4 @@
-import { isNormalizedText, sha256Hex } from "@purin-labs/std";
+import { isNormalizedText } from "@purin-labs/std";
 import {
   MEDIA_CONTENT_TYPES,
   MEDIA_MAX_BYTES,
@@ -12,6 +12,7 @@ import {
 import { controlMediaBase, deleteCafeImage } from "@purin-labs/area-cafe-contract/server/media";
 import type { Env } from "@purin-labs/kernel/env";
 import { controlError, controlJson, readJsonRecord } from "@purin-labs/control/worker/http";
+import { readImageForm } from "@purin-labs/control/worker/image-form";
 import {
   finishInventoryOperation,
   resolveInventoryAccess,
@@ -48,8 +49,6 @@ type Arrangement = Readonly<{
   mediaIds: readonly string[];
 }>;
 
-/** Room for the form's other fields and boundaries around one photo. */
-const FORM_OVERHEAD_BYTES = 64 * 1024;
 const ALT_TEXT_MAX = 512;
 
 /**
@@ -409,49 +408,31 @@ async function readPhotoUpload(
   request: Request,
   forProduct: boolean,
 ): Promise<PhotoUpload | null> {
-  if (
-    request.body === null ||
-    !request.headers.get("content-type")?.startsWith("multipart/form-data")
-  )
-    return null;
-  const limit = new PhotoBodyLimit();
-  let form: FormData;
-  try {
-    form = await new Response(
-      request.body.pipeThrough(
-        new TransformStream({ transform: limit.transform.bind(limit) }),
-      ),
-      { headers: request.headers },
-    ).formData();
-  } catch {
-    return null;
-  }
-  const productId = forProduct ? form.get("productId") : "";
-  const revision = forProduct ? Number(form.get("expectedPhotoRevision")) : 0;
-  const altText = form.get("altText");
-  const photo = form.get("photo");
+  const read = await readImageForm(request, {
+    field: "photo",
+    maxBytes: MEDIA_MAX_BYTES,
+    contentTypes: MEDIA_CONTENT_TYPES,
+  });
+  if (read === null) return null;
+  const productId = forProduct ? read.form.get("productId") : "";
+  const revision = forProduct
+    ? Number(read.form.get("expectedPhotoRevision"))
+    : 0;
+  const altText = read.form.get("altText");
   if (
     (forProduct ? !isNormalizedText(productId) : productId !== "") ||
     typeof productId !== "string" ||
     !Number.isSafeInteger(revision) ||
     revision < 0 ||
     typeof altText !== "string" ||
-    altText.length > ALT_TEXT_MAX ||
-    photo === null ||
-    typeof photo === "string" ||
-    !isMediaContentType(photo.type) ||
-    photo.size === 0 ||
-    photo.size > MEDIA_MAX_BYTES
+    altText.length > ALT_TEXT_MAX
   )
     return null;
-  const bytes = new Uint8Array(await photo.arrayBuffer());
   return {
     productId,
     expectedPhotoRevision: revision,
     altText: altText.trim(),
-    contentType: photo.type,
-    bytes,
-    sha256: await sha256Hex(bytes),
+    ...read.image,
   };
 }
 
@@ -490,12 +471,6 @@ function productMedia(
   );
 }
 
-function isMediaContentType(
-  value: string,
-): value is CommerceMediaContentType {
-  return (MEDIA_CONTENT_TYPES as readonly string[]).includes(value);
-}
-
 function stale(): Response {
   return controlJson({ ok: false, error: "stale_resource_revision" }, 409);
 }
@@ -513,18 +488,4 @@ function refusal(
   if (outcome.value.receipt.merchantId !== merchantId)
     return controlError("commerce_scope_mismatch", 502);
   return null;
-}
-
-class PhotoBodyLimit {
-  private bytes = 0;
-
-  transform(
-    chunk: Uint8Array,
-    controller: TransformStreamDefaultController<Uint8Array>,
-  ): void {
-    this.bytes += chunk.byteLength;
-    if (this.bytes > MEDIA_MAX_BYTES + FORM_OVERHEAD_BYTES)
-      throw new Error("product_photo_too_large");
-    controller.enqueue(chunk);
-  }
 }

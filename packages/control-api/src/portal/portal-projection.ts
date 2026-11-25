@@ -73,6 +73,7 @@ function parseMembership(raw: unknown): Membership {
   return {
     organisationId: raw.organisationId,
     organisationHandle: raw.organisationHandle,
+    organisationLogo: parseLogoDigest(raw.organisationLogo),
     role: raw.role,
     workspaces: [first, ...rest],
   };
@@ -96,7 +97,18 @@ function parseOrganisationWorkspace(raw: unknown): OrganisationWorkspace {
     workspaceHandle: raw.workspaceHandle,
     name: raw.name,
     createdAt: raw.createdAt,
+    logo: parseLogoDigest(raw.logo),
   };
+}
+
+/**
+ * A logo digest of the session. A Worker from before logos sends none, which
+ * reads as no logo; any other value that is not a SHA-256 is refused.
+ */
+function parseLogoDigest(raw: unknown): string | null {
+  if (raw === undefined || raw === null) return null;
+  if (typeof raw === "string" && /^[0-9a-f]{64}$/u.test(raw)) return raw;
+  throw new Error("Organisation logo response is invalid.");
 }
 
 export function isPortalHandle(value: unknown): value is string {

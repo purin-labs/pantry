@@ -34,12 +34,14 @@ const NUKI: OrganisationListItem = {
   plan: "beta",
   lifecycle: "active",
   configurationVersion: 7,
+  organisationLogo: null,
   workspaces: [
     {
       workspaceId: "workspace_preview_cafe",
       workspaceHandle: "cafe-operations",
       name: "Cafe operations",
       createdAt: 1791473900000,
+      logo: null,
     },
   ],
 };
@@ -52,12 +54,14 @@ const NINI: OrganisationListItem = {
   plan: "beta",
   lifecycle: "active",
   configurationVersion: 1,
+  organisationLogo: null,
   workspaces: [
     {
       workspaceId: "workspace_preview_nini",
       workspaceHandle: "main",
       name: "Main",
       createdAt: 1791473900000,
+      logo: null,
     },
   ],
 };
@@ -75,18 +79,21 @@ const SCENARIOS: Record<string, readonly OrganisationListItem[]> = {
       plan: "beta",
       lifecycle: "configuring",
       configurationVersion: 3,
+      organisationLogo: null,
       workspaces: [
         {
           workspaceId: "workspace_preview_atelier",
           workspaceHandle: "atelier",
           name: "Atelier",
           createdAt: 1791473900000,
+          logo: null,
         },
         {
           workspaceId: "workspace_preview_boutique",
           workspaceHandle: "boutique",
           name: "Boutique Saint-Honoré",
           createdAt: 1791473950000,
+          logo: null,
         },
       ],
     },
@@ -98,6 +105,7 @@ const SCENARIOS: Record<string, readonly OrganisationListItem[]> = {
       plan: "beta",
       lifecycle: "active",
       configurationVersion: 12,
+      organisationLogo: null,
       workspaces: [],
     },
     {
@@ -108,15 +116,26 @@ const SCENARIOS: Record<string, readonly OrganisationListItem[]> = {
       plan: "beta",
       lifecycle: "archived",
       configurationVersion: 111,
+      organisationLogo: null,
       workspaces: [
         {
           workspaceId: "workspace_preview_old",
           workspaceHandle: "cafe-operations",
           name: "Cafe operations",
           createdAt: 1788969067137,
+          logo: null,
         },
       ],
     },
+  ],
+  // An organisation with its own logo next to one with the gradient tile.
+  // A capture answers the logo address with an image of its own.
+  logos: [
+    {
+      ...NUKI,
+      organisationLogo: "4c6f676f".padEnd(64, "0"),
+    },
+    NINI,
   ],
 };
 
@@ -249,6 +268,7 @@ const ACTIONS: OrganisationActions = {
   archive: previewSettled,
   restore: previewSettled,
   delete: previewSettled,
+  logos: { set: previewSettled, remove: previewSettled },
 };
 
 const SETUP_ACTIONS: AccountSetupActions = {

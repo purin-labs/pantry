@@ -28,6 +28,8 @@ export type User = {
 export type Membership = {
   readonly organisationId: string;
   readonly organisationHandle: string;
+  /** The SHA-256 of the organisation's logo, or null for the gradient tile. */
+  readonly organisationLogo: string | null;
   readonly role: ControlRole;
   readonly workspaces: readonly [
     OrganisationWorkspace,
@@ -40,6 +42,8 @@ export type OrganisationWorkspace = {
   readonly workspaceHandle: string;
   readonly name: string;
   readonly createdAt: number;
+  /** The SHA-256 of the workspace's logo, or null for the gradient tile. */
+  readonly logo: string | null;
 };
 
 export type SupportRole = "support_agent" | "support_admin";

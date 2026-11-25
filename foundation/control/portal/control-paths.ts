@@ -32,6 +32,23 @@ export function periodPath(
   return `${controlPath(organisationId, suffix)}?${params.toString()}`;
 }
 
+/**
+ * The logo of an organisation, or of one of its workspaces. With the digest,
+ * the address names one image, so the browser keeps it.
+ */
+export function logoPath(
+  organisationId: string,
+  workspaceId: string | null,
+  sha256: string | null = null,
+): string {
+  const subject =
+    workspaceId === null
+      ? "logo"
+      : `workspaces/${encodeURIComponent(workspaceId)}/logo`;
+  const path = controlPath(organisationId, subject);
+  return sha256 === null ? path : `${path}?v=${sha256}`;
+}
+
 export function homePath(organisationId: string): string {
   return `${organisationRecordPath(organisationId)}/home`;
 }

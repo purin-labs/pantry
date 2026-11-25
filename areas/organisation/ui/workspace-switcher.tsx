@@ -3,12 +3,20 @@ import { Popover } from "@base-ui/react/popover";
 import { Check, ChevronDown, LayoutGrid, Search } from "lucide-react";
 import { Link } from "react-router";
 import { ConsoleSidebarTooltip } from "@purin-labs/ui/console-sidebar";
+import { IdentityTile } from "@purin-labs/ui/index";
 import { organisationPath, workspacePagePath } from "@purin-labs/ui/route";
 import "./workspace-switcher.css";
+
+/** What a tile shows: the logo, or the gradient of the seed. */
+type ChoiceTile = {
+  readonly seed: string;
+  readonly logoUrl: string | null;
+};
 
 export type OrganisationChoice = {
   readonly organisationHandle: string;
   readonly name: string;
+  readonly tile: ChoiceTile;
   readonly workspaces: readonly WorkspaceChoice[];
 };
 
@@ -16,6 +24,7 @@ export type WorkspaceChoice = {
   readonly organisationHandle: string;
   readonly workspaceHandle: string;
   readonly name: string;
+  readonly tile: ChoiceTile;
 };
 
 export type OrganisationShellContext = {
@@ -41,6 +50,11 @@ type MenuProps = SwitcherProps & { readonly close: () => void };
 
 export function WorkspaceSwitcher(props: SwitcherProps): React.ReactNode {
   const [open, setOpen] = React.useState(false);
+  const current = props.workspace.choices.find(
+    (choice) =>
+      choice.organisationHandle === props.workspace.organisationHandle &&
+      choice.workspaceHandle === props.workspace.workspaceHandle,
+  );
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <ConsoleSidebarTooltip
@@ -51,9 +65,10 @@ export function WorkspaceSwitcher(props: SwitcherProps): React.ReactNode {
           className="console-switcher-trigger workspace-switcher-trigger"
           aria-label={`Switch workspace: ${props.organisation.name}, ${props.workspace.name}`}
         >
-          <span
-            className="console-switcher-avatar console-switcher-workspace-avatar"
-            aria-hidden="true"
+          <IdentityTile
+            className="console-switcher-avatar"
+            seed={current?.tile.seed ?? props.workspace.workspaceHandle}
+            logoUrl={current?.tile.logoUrl ?? null}
           />
           <span className="console-switcher-label workspace-switcher-label">
             <small>{props.organisation.name}</small>
@@ -206,6 +221,7 @@ function currentOrganisation(props: MenuProps): OrganisationChoice {
     ) ?? {
       organisationHandle: props.organisation.organisationHandle,
       name: props.organisation.name,
+      tile: { seed: props.organisation.organisationHandle, logoUrl: null },
       workspaces: props.workspace.choices,
     }
   );
@@ -264,9 +280,10 @@ function renderOrganisation(
       to={organisationPath(organisation.organisationHandle)}
       onClick={close}
     >
-      <span
-        className="console-switcher-avatar console-switcher-organisation-avatar"
-        aria-hidden="true"
+      <IdentityTile
+        className="console-switcher-avatar"
+        seed={organisation.tile.seed}
+        logoUrl={organisation.tile.logoUrl}
       />
       <span className="workspace-switcher-row-text">
         <strong>{organisation.name}</strong>
@@ -306,9 +323,10 @@ function renderWorkspace(
       className="workspace-switcher-row"
       aria-current={selected ? "page" : undefined}
     >
-      <span
-        className="console-switcher-avatar console-switcher-workspace-avatar"
-        aria-hidden="true"
+      <IdentityTile
+        className="console-switcher-avatar"
+        seed={workspace.tile.seed}
+        logoUrl={workspace.tile.logoUrl}
       />
       <span className="workspace-switcher-row-text">
         <span>{workspace.name}</span>
