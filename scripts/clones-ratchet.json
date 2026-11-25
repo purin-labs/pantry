@@ -1,5 +1,5 @@
 {
-  "total": {"copies":750,"lines":13444},
+  "total": {"copies":750,"lines":13443},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -78,7 +78,7 @@
     "areas/commerce/server/stripe/test-admin.ts = areas/integrations/shopify/admin.ts": {"copies":1,"lines":16},
     "areas/commerce/server/stripe/test-admin.ts = surfaces/webhooks/server/gateway/cue-status.ts": {"copies":1,"lines":16},
     "areas/commerce/server/stripe/webhooks.ts = areas/integrations/shopify/webhooks.ts": {"copies":1,"lines":30},
-    "areas/commerce/ui/features/api-keys/route.tsx = areas/integrations/ui/features/vault/route.tsx": {"copies":1,"lines":16},
+    "areas/commerce/ui/features/api-keys/route.tsx = areas/integrations/ui/features/vault/route.tsx": {"copies":1,"lines":15},
     "areas/commerce/ui/features/commerce/entity-plane/route.tsx = areas/commerce/ui/features/commerce/entity-plane/route.tsx": {"copies":3,"lines":64},
     "areas/commerce/ui/features/commerce/inventory-production.tsx = areas/commerce/ui/features/commerce/inventory-receipt.tsx": {"copies":1,"lines":14},
     "areas/commerce/ui/features/commerce/inventory-receipt.tsx = areas/commerce/ui/features/commerce/inventory-reconciliation.tsx": {"copies":2,"lines":34},

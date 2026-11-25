@@ -12,7 +12,12 @@ import { assertNever } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 
 import { cancelDialog, syncDialog } from "@purin-labs/ui/dialog";
-import { EmptyState, SideDrawer } from "@purin-labs/ui/index";
+import {
+  Button,
+  ConfirmInPlace,
+  EmptyState,
+  SideDrawer,
+} from "@purin-labs/ui/index";
 import { VAULT_TRANSPORT, vaultErrorMessage, type VaultTransport } from "./api";
 import {
   checkContactDraft,
@@ -45,7 +50,6 @@ type Tab = "all" | VaultItemKind | "api_key";
 /** What the drawer shows. Forms keep their draft until saved or closed. */
 type Drawer =
   | Readonly<{ kind: "view"; itemId: string }>
-  | Readonly<{ kind: "remove"; itemId: string }>
   | Readonly<{
       kind: "login_form";
       itemId: string | null;
@@ -58,7 +62,7 @@ type Drawer =
       draft: ContactDraft;
     }>
   | Readonly<{ kind: "key"; itemId: null; keyId: string }>
-  | Readonly<{ kind: "store"; itemId: null; confirmingDisconnect: boolean }>
+  | Readonly<{ kind: "store"; itemId: null }>
   | Readonly<{
       kind: "connect";
       itemId: null;
@@ -300,7 +304,7 @@ export function VaultRoute(props: {
       }
       setNotice("1Password connected. New items now go to 1Password.");
       await reload();
-      open({ kind: "store", itemId: null, confirmingDisconnect: false });
+      open({ kind: "store", itemId: null });
     } catch (error) {
       setFailure(vaultErrorMessage(error));
     } finally {
@@ -384,7 +388,7 @@ export function VaultRoute(props: {
                   vaults: null,
                   vaultId: null,
                 }
-              : { kind: "store", itemId: null, confirmingDisconnect: false },
+              : { kind: "store", itemId: null },
           );
         }}
       />
@@ -440,16 +444,15 @@ export function VaultRoute(props: {
       ) : load.kind === "failed" ? (
         <div className="vault-load-failed" role="alert">
           <p>{load.message}</p>
-          <button
-            type="button"
-            className="vault-secondary"
+          <Button
+            variant="secondary"
             onClick={() => {
               setLoad({ kind: "loading" });
               void reload();
             }}
           >
             Try again
-          </button>
+          </Button>
         </div>
       ) : tab === "api_key" && keys.kind !== "ready" ? (
         keys.kind === "loading" ? (
@@ -457,16 +460,15 @@ export function VaultRoute(props: {
         ) : keys.kind === "failed" ? (
           <div className="vault-load-failed" role="alert">
             <p>{keys.message}</p>
-            <button
-              type="button"
-              className="vault-secondary"
+            <Button
+              variant="secondary"
               onClick={() => {
                 setKeys({ kind: "loading" });
                 void reloadKeys();
               }}
             >
               Try again
-            </button>
+            </Button>
           </div>
         ) : (
           <EmptyState
@@ -482,13 +484,9 @@ export function VaultRoute(props: {
           }
           actions={
             query.trim() ? (
-              <button
-                type="button"
-                className="vault-secondary"
-                onClick={() => setQuery("")}
-              >
+              <Button variant="secondary" onClick={() => setQuery("")}>
                 Clear search
-              </button>
+              </Button>
             ) : (
               <VaultAddActions
                 tab={tab}
@@ -614,11 +612,7 @@ export function VaultRoute(props: {
                   items={items}
                   busy={busy}
                   failure={failure}
-                  confirmingDisconnect={drawer.confirmingDisconnect}
                   move={(to) => void changeStore({ kind: "move_items", to })}
-                  askDisconnect={(asking) =>
-                    setDrawer({ ...drawer, confirmingDisconnect: asking })
-                  }
                   disconnect={() =>
                     void changeStore({ kind: "disconnect_onepassword" })
                   }
@@ -639,7 +633,7 @@ export function VaultRoute(props: {
                   integrationsHref={props.integrationsHref ?? null}
                 />
               )
-            ) : drawer.kind === "view" || drawer.kind === "remove" ? (
+            ) : drawer.kind === "view" ? (
               selected === null ? (
                 <p className="side-drawer-body">This item was removed.</p>
               ) : (
@@ -648,7 +642,6 @@ export function VaultRoute(props: {
                   transport={transport}
                   item={selected}
                   canManage={props.canManage}
-                  confirmingRemove={drawer.kind === "remove"}
                   busy={busy}
                   failure={failure}
                   open={open}
@@ -681,20 +674,12 @@ export function VaultRoute(props: {
                   )}
                 </div>
                 <div className="vault-actions vault-form-footer">
-                  <button
-                    type="submit"
-                    className="vault-primary"
-                    disabled={busy}
-                  >
+                  <Button variant="primary" type="submit" disabled={busy}>
                     {busy ? "Saving…" : "Save"}
-                  </button>
-                  <button
-                    type="button"
-                    className="vault-text-button"
-                    onClick={close}
-                  >
+                  </Button>
+                  <Button variant="secondary" onClick={close}>
                     Cancel
-                  </button>
+                  </Button>
                 </div>
               </form>
             )}
@@ -711,7 +696,6 @@ function ItemDetails(props: {
   readonly transport: VaultTransport;
   readonly item: VaultItemView;
   readonly canManage: boolean;
-  readonly confirmingRemove: boolean;
   readonly busy: boolean;
   readonly failure: string | null;
   readonly open: (drawer: Drawer) => void;
@@ -733,36 +717,11 @@ function ItemDetails(props: {
           {props.failure}
         </p>
       )}
-      {!props.canManage ? null : props.confirmingRemove ? (
-        <div className="vault-remove-confirm" role="group" aria-label="Remove">
-          <p>
-            {item.kind === "website_login"
-              ? "Remove this login? Agents can no longer sign in with it."
-              : "Remove this contact info? Agents can no longer use it."}
-          </p>
-          <div className="vault-actions">
-            <button
-              type="button"
-              className="vault-danger"
-              disabled={props.busy}
-              onClick={() => props.remove(item)}
-            >
-              {props.busy ? "Removing…" : "Remove"}
-            </button>
-            <button
-              type="button"
-              className="vault-text-button"
-              onClick={() => props.open({ kind: "view", itemId: item.itemId })}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      ) : (
+      {!props.canManage ? null : (
         <div className="vault-actions">
-          <button
-            type="button"
-            className="vault-secondary"
+          <Button
+            variant="secondary"
+            disabled={props.busy}
             onClick={() =>
               props.open(
                 item.kind === "website_login"
@@ -781,11 +740,11 @@ function ItemDetails(props: {
             }
           >
             Edit
-          </button>
+          </Button>
           {item.kind === "website_login" ? (
-            <button
-              type="button"
-              className="vault-secondary"
+            <Button
+              variant="secondary"
+              disabled={props.busy}
               onClick={() =>
                 props.open({
                   kind: "login_form",
@@ -796,15 +755,29 @@ function ItemDetails(props: {
               }
             >
               Replace sign-in
-            </button>
+            </Button>
           ) : null}
-          <button
-            type="button"
-            className="vault-text-button vault-remove"
-            onClick={() => props.open({ kind: "remove", itemId: item.itemId })}
-          >
-            Remove
-          </button>
+          <ConfirmInPlace
+            key={item.itemId}
+            label={
+              item.kind === "website_login"
+                ? "Remove login…"
+                : "Remove contact info…"
+            }
+            question={
+              item.kind === "website_login"
+                ? "Remove this login?"
+                : "Remove this contact info?"
+            }
+            consequence={
+              item.kind === "website_login"
+                ? "Agents can no longer sign in with it."
+                : "Agents can no longer use it."
+            }
+            confirmLabel={props.busy ? "Removing…" : "Remove"}
+            busy={props.busy}
+            onConfirm={() => props.remove(item)}
+          />
         </div>
       )}
       <History
@@ -961,7 +934,6 @@ function drawerTitle(
 ): string {
   switch (drawer.kind) {
     case "view":
-    case "remove":
       return item?.label ?? "Vault item";
     case "login_form":
       return drawer.itemId === null
@@ -1112,27 +1084,18 @@ function VaultAddActions(props: {
   return (
     <div className="vault-add">
       {props.tab === "contact_profile" ? null : (
-        <button
-          type="button"
-          className="vault-primary"
-          onClick={openLogin.bind(null, props.open)}
-        >
+        <Button variant="primary" onClick={openLogin.bind(null, props.open)}>
           <Plus size={16} aria-hidden="true" />
           Add login
-        </button>
+        </Button>
       )}
       {props.tab === "website_login" ? null : (
-        <button
-          type="button"
-          className={
-            props.tab === "contact_profile"
-              ? "vault-primary"
-              : "vault-secondary"
-          }
+        <Button
+          variant={props.tab === "contact_profile" ? "primary" : "secondary"}
           onClick={openContact.bind(null, props.open)}
         >
           Add contact info
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -1175,16 +1138,18 @@ function DiscardDialog(props: {
       <h2 id={title}>Discard unsaved changes?</h2>
       <p>Your changes will be lost.</p>
       <div className="vault-actions">
-        <button type="button" onClick={keepDraft.bind(null, props.setState)}>
+        <Button
+          variant="secondary"
+          onClick={keepDraft.bind(null, props.setState)}
+        >
           Keep editing
-        </button>
-        <button
-          type="button"
-          className="vault-discard-confirm"
+        </Button>
+        <Button
+          variant="danger"
           onClick={discardDraft.bind(null, props.setState, props.open)}
         >
           Discard changes
-        </button>
+        </Button>
       </div>
     </dialog>
   );

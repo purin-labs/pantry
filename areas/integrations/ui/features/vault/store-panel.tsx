@@ -7,6 +7,7 @@ import type {
   VaultStoreView,
 } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
+import { Button, ConfirmInPlace } from "@purin-labs/ui/index";
 
 import type { VaultTransport } from "./api";
 import type { Variant } from "@purin-labs/type-utils";
@@ -43,13 +44,9 @@ export function StoreLine(props: {
         )}
       </p>
       {props.canManage ? (
-        <button
-          type="button"
-          className="vault-text-button"
-          onClick={props.openStore}
-        >
+        <Button variant="link" onClick={props.openStore}>
           Manage storage
-        </button>
+        </Button>
       ) : null}
     </div>
   );
@@ -148,9 +145,9 @@ export function ConnectForm(props: {
         </p>
       )}
       <div className="vault-actions">
-        <button
+        <Button
+          variant="primary"
           type="submit"
-          className="vault-primary"
           disabled={
             props.busy ||
             props.token.trim() === "" ||
@@ -158,14 +155,10 @@ export function ConnectForm(props: {
           }
         >
           {props.busy ? "Connecting…" : "Connect"}
-        </button>
-        <button
-          type="button"
-          className="vault-text-button"
-          onClick={props.cancel}
-        >
+        </Button>
+        <Button variant="secondary" onClick={props.cancel}>
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
   );
@@ -177,9 +170,7 @@ export function StoreDetails(props: {
   readonly items: readonly VaultItemView[];
   readonly busy: boolean;
   readonly failure: string | null;
-  readonly confirmingDisconnect: boolean;
   readonly move: (to: "onepassword" | "pantry") => void;
-  readonly askDisconnect: (asking: boolean) => void;
   readonly disconnect: () => void;
   readonly organisationId: string;
   readonly transport: VaultTransport;
@@ -211,67 +202,36 @@ export function StoreDetails(props: {
           {props.failure}
         </p>
       )}
-      {props.confirmingDisconnect ? (
-        <div
-          className="vault-remove-confirm"
-          role="group"
-          aria-label="Disconnect"
-        >
-          <p>
-            Disconnect 1Password? Its items stay in 1Password, and agents can no
-            longer use them. New items go to Purin Vault again.
-          </p>
-          <div className="vault-actions">
-            <button
-              type="button"
-              className="vault-danger"
-              disabled={props.busy}
-              onClick={props.disconnect}
-            >
-              {props.busy ? "Disconnecting…" : "Disconnect"}
-            </button>
-            <button
-              type="button"
-              className="vault-text-button"
-              onClick={() => props.askDisconnect(false)}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="vault-actions">
-          {pantryCount > 0 ? (
-            <button
-              type="button"
-              className="vault-primary"
-              disabled={props.busy}
-              onClick={() => props.move("onepassword")}
-            >
-              {props.busy
-                ? "Moving…"
-                : `Move ${pantryCount === 1 ? "1 item" : `${pantryCount} items`} to 1Password`}
-            </button>
-          ) : null}
-          {onePasswordCount > 0 ? (
-            <button
-              type="button"
-              className="vault-secondary"
-              disabled={props.busy}
-              onClick={() => props.move("pantry")}
-            >
-              Move items to Purin Vault
-            </button>
-          ) : null}
-          <button
-            type="button"
-            className="vault-text-button vault-remove"
-            onClick={() => props.askDisconnect(true)}
+      <div className="vault-actions">
+        {pantryCount > 0 ? (
+          <Button
+            variant="primary"
+            disabled={props.busy}
+            onClick={() => props.move("onepassword")}
           >
-            Disconnect
-          </button>
-        </div>
-      )}
+            {props.busy
+              ? "Moving…"
+              : `Move ${pantryCount === 1 ? "1 item" : `${pantryCount} items`} to 1Password`}
+          </Button>
+        ) : null}
+        {onePasswordCount > 0 ? (
+          <Button
+            variant="secondary"
+            disabled={props.busy}
+            onClick={() => props.move("pantry")}
+          >
+            Move items to Purin Vault
+          </Button>
+        ) : null}
+        <ConfirmInPlace
+          label="Disconnect 1Password…"
+          question="Disconnect 1Password?"
+          consequence="Its items stay in 1Password, and agents can no longer use them. New items go to Purin Vault again."
+          confirmLabel={props.busy ? "Disconnecting…" : "Disconnect"}
+          busy={props.busy}
+          onConfirm={props.disconnect}
+        />
+      </div>
       <History
         organisationId={props.organisationId}
         transport={props.transport}

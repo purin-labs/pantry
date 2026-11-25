@@ -8,7 +8,7 @@ import {
 } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";
 
-import { Select } from "@purin-labs/ui/index";
+import { Button, Select } from "@purin-labs/ui/index";
 
 type LoginView = Variant<VaultItemView, "website_login">;
 type ContactView = Variant<VaultItemView, "contact_profile">;
@@ -141,14 +141,13 @@ export function LoginForm(props: {
               </div>
             ))}
             {draft.origins.length < VAULT_ORIGIN_LIMIT ? (
-              <button
-                type="button"
-                className="vault-text-button"
+              <Button
+                variant="link"
                 onClick={() => set({ origins: [...draft.origins, ""] })}
               >
                 <Plus size={16} aria-hidden="true" />
                 Add another website
-              </button>
+              </Button>
             ) : null}
           </fieldset>
           <Field

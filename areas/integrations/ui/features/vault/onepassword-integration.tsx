@@ -1,6 +1,7 @@
 import React from "react";
 import type { VaultItemList } from "@purin-labs/control-api";
 
+import { Button } from "@purin-labs/ui/index";
 import { VAULT_TRANSPORT, vaultErrorMessage, type VaultTransport } from "./api";
 import {
   ConnectForm,
@@ -60,7 +61,6 @@ export function OnePasswordIntegrationPanel(props: {
   const [busy, setBusy] = React.useState(false);
   const [failure, setFailure] = React.useState<string | null>(null);
   const [notice, setNotice] = React.useState<string | null>(null);
-  const [confirmingDisconnect, setConfirmingDisconnect] = React.useState(false);
 
   const run = async (work: () => Promise<string | null>): Promise<void> => {
     if (busy) return;
@@ -113,7 +113,6 @@ export function OnePasswordIntegrationPanel(props: {
       await transport.store(props.organisationId, {
         kind: "disconnect_onepassword",
       });
-      setConfirmingDisconnect(false);
       await changed();
       return "1Password disconnected. Its items stay in 1Password.";
     });
@@ -131,13 +130,9 @@ export function OnePasswordIntegrationPanel(props: {
       ) : state.kind === "failed" ? (
         <div className="vault-load-failed" role="alert">
           <p>{state.message}</p>
-          <button
-            type="button"
-            className="vault-secondary"
-            onClick={() => void reload()}
-          >
+          <Button variant="secondary" onClick={() => void reload()}>
             Try again
-          </button>
+          </Button>
         </div>
       ) : !props.canManage ? (
         <p className="vault-field-hint">
@@ -163,9 +158,7 @@ export function OnePasswordIntegrationPanel(props: {
           items={state.list.items}
           busy={busy}
           failure={failure}
-          confirmingDisconnect={confirmingDisconnect}
           move={move}
-          askDisconnect={setConfirmingDisconnect}
           disconnect={disconnect}
           organisationId={props.organisationId}
           transport={transport}
