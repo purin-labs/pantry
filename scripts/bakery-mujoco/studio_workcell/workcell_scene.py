@@ -53,8 +53,10 @@ GRIPPER_CLOSE_M = -0.015
 
 # FR10 joint home pose (base rotated -90 deg about Z so neutral -X reach points along +Y).
 # Elbow-up wrist-forward manifold: j2+j3+j4 = 0, j5 = 90 + j1 - yaw, j6 = 90 deg.
-# High, retracted standby pose well clear of both prep table and oven!
-FR10_HOME_Q = np.radians([-22.0, -96.0, 124.0, -28.0, 68.0, 90.0])
+# Retracted standby pose putting `cell_grasp` at [+0.1588, -0.4500, +1.1819]:
+# >165 mm clear of the MBCO-4ME oven cabinet/fascia (>85 mm even under T2 +/-80 mm dest_xy)
+# and >308 mm clear above the prep table/tray, with zero overhead camera occlusion.
+FR10_HOME_Q = np.radians([-50.0, -106.0, 136.0, -30.0, 40.0, 90.0])
 ARM_BASE_QUAT = (0.7071067811865476, 0.0, 0.0, -0.7071067811865476)
 FR10_SERVO_PARAMS = (
     # (kp, kv, forcerange_abs) — critically damped even under T2 damping_scale=0.75 / gain_scale=0.80

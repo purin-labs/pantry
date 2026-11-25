@@ -341,30 +341,25 @@ def render_rollout_sheet(
   r = mujoco.Renderer(m, height=240, width=320)
   cam_hero = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_CAMERA, 'hero_3_4')
   cam_oven = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_CAMERA, 'oven_closeup')
-  frames: list[tuple[str, np.ndarray]] = []
+  frames_hero: list[np.ndarray] = []
+  frames_oven: list[np.ndarray] = []
   orig_step = dl.step
   tick = [0]
-  total_est = max(200, int(round(task.init_info['nominalDurationS'] / task.control_dt_s)))
-  snaps = {
-      int(total_est * 0.25): ('02_grasp', cam_hero),
-      int(total_est * 0.45): ('03_carry', cam_hero),
-      int(total_est * 0.62): ('04_approach', cam_oven),
-      int(total_est * 0.78): ('05_insert', cam_oven),
-  }
 
-  def snap(label: str, cam_id: int) -> None:
+  def snap_both() -> None:
     r.disable_depth_rendering()
-    r.update_scene(d, camera=cam_id, scene_option=opt)
-    frames.append((label, r.render().copy()))
+    r.update_scene(d, camera=cam_hero, scene_option=opt)
+    frames_hero.append(r.render().copy())
+    r.update_scene(d, camera=cam_oven, scene_option=opt)
+    frames_oven.append(r.render().copy())
 
-  snap('01_start', cam_hero)
+  snap_both()
 
   def hook_step(cmd):
     out = orig_step(cmd)
     tick[0] += 1
-    if tick[0] in snaps:
-      lbl, cid = snaps[tick[0]]
-      snap(lbl, cid)
+    if tick[0] % 25 == 0:
+      snap_both()
     return out
 
   dl.step = hook_step
@@ -374,19 +369,28 @@ def render_rollout_sheet(
       task.controller_cmd(mode),
       allow=allow,
       max_ticks=round(task.episode_s / task.control_dt_s),
-      wall_timeout_s=120.0,
+      wall_timeout_s=10.0 * task.episode_s + 60.0,
       prompt=task.prompt,
   )
-  while len(frames) < 5:
-    snap(f'0{len(frames) + 1}_mid', cam_oven)
-  snap('06_end', cam_hero)
+  snap_both()
   r.close()
   close()
 
-  rows = []
-  for r_i in range(2):
-    row = np.concatenate([frames[r_i * 3 + c_i][1] for c_i in range(3)], axis=1)
-    rows.append(row)
+  n = len(frames_hero)
+  fracs = (
+      (0.0, 0.16, 0.34, 0.54, 0.78, 1.0)
+      if task.preset.door_op == 'cycle'
+      else (0.0, 0.22, 0.42, 0.62, 0.80, 1.0)
+  )
+  use_oven = (False, True, False, True, True, False)
+  panels = []
+  for frac, oven_cam in zip(fracs, use_oven):
+    idx = min(n - 1, int(round(frac * (n - 1))))
+    panels.append(frames_oven[idx] if oven_cam else frames_hero[idx])
+  rows = [
+      np.concatenate(panels[0:3], axis=1),
+      np.concatenate(panels[3:6], axis=1),
+  ]
   grid = np.concatenate(rows, axis=0)
   grid[238:242, :, :] = 24
   grid[:, 318:322, :] = 24

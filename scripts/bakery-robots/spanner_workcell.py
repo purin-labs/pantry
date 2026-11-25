@@ -137,6 +137,46 @@ def _build_spanner_gripper_spec() -> mujoco.MjSpec:
         rgba=[0.14, 0.44, 0.48, 1.0],
     )
 
+    # Compact dual-action door-handle pinch anvil tucked behind the flange (`x <= 0.024`),
+    # 66 mm clear behind the tray front rim (`x = 0.090`) and clear of `cell_upper_jaw`
+    # across the entire `clamp_opening` stroke (`[-0.015, +0.045]`).
+    base.add_geom(
+        name="clamp_spanner_handle_anvil_stem_col",
+        type=mujoco.mjtGeom.mjGEOM_BOX,
+        pos=[0.020, 0.036, -0.0265],
+        size=[0.004, 0.026, 0.018],
+        contype=1,
+        conaffinity=1,
+        condim=4,
+        friction=[0.6, 0.015, 0.003],
+        solref=[0.004, 1.0],
+        solimp=[0.95, 0.99, 0.001, 0.5, 2.0],
+        mass=0.0,
+        group=3,
+        rgba=[0.72, 0.76, 0.77, 1.0],
+    )
+    base.add_geom(
+        name="clamp_spanner_handle_anvil_col",
+        type=mujoco.mjtGeom.mjGEOM_BOX,
+        pos=[0.020, 0.054, -0.054],
+        size=[0.004, 0.014, 0.009],
+        contype=1,
+        conaffinity=1,
+        condim=4,
+        friction=[1.50, 0.030, 0.006],
+        solref=[0.006, 1.0],
+        solimp=[0.94, 0.99, 0.002, 0.5, 2.0],
+        mass=0.0,
+        group=3,
+        rgba=[0.14, 0.44, 0.48, 1.0],
+    )
+    base.add_site(
+        name="cell_handle_grasp",
+        pos=[0.068, 0.054, -0.054],
+        size=[0.008, 0.0, 0.0],
+        group=3,
+    )
+
     # Sliding front clamp (`cell_upper_jaw`, joint `clamp_opening`, actuator `clamp_servo`)
     front = base.add_body(name="cell_upper_jaw", pos=[0.0, 0.0, 0.0])
     front.mass = 0.16
@@ -183,6 +223,37 @@ def _build_spanner_gripper_spec() -> mujoco.MjSpec:
         group=3,
         rgba=[0.14, 0.44, 0.48, 1.0],
     )
+    # Rear-facing silicone handle pinch pad + form-closure pull hook on `cell_upper_jaw`
+    front.add_geom(
+        name="clamp_spanner_handle_pad_col",
+        type=mujoco.mjtGeom.mjGEOM_BOX,
+        pos=[0.079, 0.054, -0.054],
+        size=[0.0015, 0.014, 0.009],
+        contype=1,
+        conaffinity=1,
+        condim=4,
+        friction=[1.50, 0.030, 0.006],
+        solref=[0.006, 1.0],
+        solimp=[0.94, 0.99, 0.002, 0.5, 2.0],
+        mass=0.0,
+        group=3,
+        rgba=[0.14, 0.44, 0.48, 1.0],
+    )
+    front.add_geom(
+        name="clamp_spanner_handle_hook_col",
+        type=mujoco.mjtGeom.mjGEOM_BOX,
+        pos=[0.078, 0.075, -0.0395],
+        size=[0.005, 0.0025, 0.006],
+        contype=1,
+        conaffinity=1,
+        condim=4,
+        friction=[1.50, 0.030, 0.006],
+        solref=[0.006, 1.0],
+        solimp=[0.94, 0.99, 0.002, 0.5, 2.0],
+        mass=0.0,
+        group=3,
+        rgba=[0.14, 0.44, 0.48, 1.0],
+    )
 
     act = gs.add_actuator(name="clamp_servo", target="clamp_opening")
     act.set_to_position(kp=1650.0, kv=65.0)
@@ -211,7 +282,12 @@ def _strip_visuals_from_spec(spec: mujoco.MjSpec) -> None:
         spec.delete(tex)
 
 
-def compose_spanner_oven_cell(*, blocked: bool = False, door_closed: bool = False) -> mujoco.MjSpec:
+def compose_spanner_oven_cell(
+    *,
+    blocked: bool = False,
+    door_closed: bool = False,
+    articulated_door: bool = False,
+) -> mujoco.MjSpec:
     """Build the Plan 24 FR10 + Maruzen MBCO-4ME spanner-gripper workcell (MuJoCo 4.0.0)."""
     if mujoco.__version__ != "4.0.0":
         raise RuntimeError("Use the pinned MuJoCo 4.0.0 environment.")
@@ -310,24 +386,68 @@ def compose_spanner_oven_cell(*, blocked: bool = False, door_closed: bool = Fals
     _strip_visuals_from_spec(oven)
     for sensor in list(oven.sensors):
         oven.delete(sensor)
-    # Lock oven joints to clean static poses for the transfer workcell (matches add_oven)
-    for jname in (
-        "mbco4_door_hinge",
-        "mbco4_handle_turn",
-        "mbco4_fan_spin",
-        "mbco4_damper_slide",
-    ):
-        try:
-            oven.delete(oven.joint(jname))
-        except Exception:
-            pass
-    door_angle = 0.0 if door_closed else 1.90
-    oven.body("mbco4_door").quat = [
-        math.cos(door_angle / 2.0),
-        0.0,
-        0.0,
-        -math.sin(door_angle / 2.0),
-    ]
+    if articulated_door:
+        # Keep `mbco4_door_hinge` and `mbco4_handle_latch` live and model a physical
+        # one-way rotary cam latch (`contype=2, conaffinity=2` pawl on `mbco4_handle`
+        # colliding strictly with the strike catch on `mbco4_oven`).
+        for jname in ("mbco4_fan_spin", "mbco4_damper_hinge"):
+            try:
+                oven.delete(oven.joint(jname))
+            except Exception:
+                pass
+        for exc in list(oven.excludes):
+            if exc.name == "exclude_oven_handle":
+                oven.delete(exc)
+        oven.joint("mbco4_door_hinge").frictionloss = 0.35
+        oven.body("mbco4_handle").add_geom(
+            name="mbco4_latch_pawl_col",
+            type=mujoco.mjtGeom.mjGEOM_BOX,
+            pos=[0.0, 0.025, 0.055],
+            size=[0.008, 0.006, 0.008],
+            contype=2,
+            conaffinity=2,
+            condim=3,
+            friction=[0.15, 0.005, 0.001],
+            solref=[0.004, 1.0],
+            solimp=[0.95, 0.99, 0.001, 0.5, 2.0],
+            mass=0.0,
+            group=3,
+            rgba=[0.85, 0.22, 0.18, 1.0],
+        )
+        oven.body("mbco4_oven").add_geom(
+            name="mbco4_latch_catch_col",
+            type=mujoco.mjtGeom.mjGEOM_BOX,
+            pos=[0.157, -0.340, 0.361],
+            size=[0.015, 0.006, 0.012],
+            contype=2,
+            conaffinity=2,
+            condim=3,
+            friction=[0.15, 0.005, 0.001],
+            solref=[0.004, 1.0],
+            solimp=[0.95, 0.99, 0.001, 0.5, 2.0],
+            mass=0.0,
+            group=3,
+            rgba=[0.18, 0.32, 0.85, 1.0],
+        )
+    else:
+        # Lock oven joints to clean static poses for the transfer workcell (matches add_oven)
+        for jname in (
+            "mbco4_door_hinge",
+            "mbco4_handle_turn",
+            "mbco4_fan_spin",
+            "mbco4_damper_slide",
+        ):
+            try:
+                oven.delete(oven.joint(jname))
+            except Exception:
+                pass
+        door_angle = 0.0 if door_closed else 1.90
+        oven.body("mbco4_door").quat = [
+            math.cos(door_angle / 2.0),
+            0.0,
+            0.0,
+            -math.sin(door_angle / 2.0),
+        ]
     # Add canonical destination site `mbco_slot_3` right at Rail #2 center
     oven.body("mbco4_oven").add_site(
         name="mbco_slot_3",

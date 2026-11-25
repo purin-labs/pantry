@@ -150,12 +150,17 @@ def export_pour_over(destination: Path, dependencies: set) -> None:
 
 def export_spanner_oven(destination: Path, dependencies: set) -> None:
     """Serialize the Plan 24 FR10 + Maruzen MBCO-4ME spanner-gripper workcell fixtures."""
-    for case, blocked, door_closed in (
-        ("nominal", False, False),
-        ("closed-door", False, True),
-        ("blocked", True, False),
+    for stem, blocked, door_closed, articulated_door in (
+        ("spanner-oven-nominal", False, False, False),
+        ("spanner-oven-closed-door", False, True, False),
+        ("spanner-oven-blocked", True, False, False),
+        ("spanner-oven-door-nominal", False, True, True),
     ):
-        spec = compose_spanner_oven_cell(blocked=blocked, door_closed=door_closed)
+        spec = compose_spanner_oven_cell(
+            blocked=blocked,
+            door_closed=door_closed,
+            articulated_door=articulated_door,
+        )
         original = spec.compile()
         xml = ET.fromstring(spec.to_xml())
         strip_visual_meshes(xml, original)
@@ -189,7 +194,6 @@ def export_spanner_oven(destination: Path, dependencies: set) -> None:
             attributes = sorted(element.attrib.items())
             element.attrib.clear()
             element.attrib.update(attributes)
-        stem = f"spanner-oven-{case}"
         xml_path = destination / f"{stem}.xml"
         ET.indent(xml)
         xml_path.write_text(ET.tostring(xml, encoding="unicode") + "\n")
@@ -198,7 +202,7 @@ def export_spanner_oven(destination: Path, dependencies: set) -> None:
             if not np.allclose(
                 getattr(original, field), getattr(model, field), rtol=1e-10, atol=1e-12
             ):
-                raise RuntimeError(f"Spanner oven export changed {field}: {case}")
+                raise RuntimeError(f"Spanner oven export changed {field}: {stem}")
         data = mujoco.MjData(model)
         mujoco.mj_resetData(model, data)
         data.qpos[arm_addresses(model)[0]] = SPANNER_HOME_Q

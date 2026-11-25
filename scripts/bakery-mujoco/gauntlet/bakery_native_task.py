@@ -72,6 +72,8 @@ class NativeTaskPreset:
   max_impact_force_n: float = 300.0
   max_joint_speed: float = 4.0
   goal_tol_xyz: tuple[float, float, float] = (0.022, 0.045, 0.012)
+  door_op: str | None = None
+  initial_door_rad: float = 0.0
 
 
 PRESETS: dict[str, NativeTaskPreset] = {
@@ -114,6 +116,72 @@ PRESETS: dict[str, NativeTaskPreset] = {
         max_grasp_force_n=35.0,
         max_contact_force_n=60.0,
         goal_tol_xyz=(0.035, 0.035, 0.015),
+    ),
+    'fr10_spanner_door_open': NativeTaskPreset(
+        task_id='fr10_spanner_door_open',
+        robot='fairino-fr10',
+        cell='spanner-oven-door',
+        task='table-to-oven',
+        support_body='mbco4_oven',
+        prompt=(
+            'Grasp the rotary latch handle on the closed Maruzen MBCO-4ME convection oven, '
+            'twist past the mechanical strike catch, and swing the door open (>= 90 deg).'
+        ),
+        ingredient_mass_kg=1.0,
+        clamp_force_n=100.0,
+        control_dt_s=0.02,
+        episode_s=36.0,
+        cam_pos=(0.02, -0.02, 2.72),
+        cam_fovy_deg=56.0,
+        max_grasp_force_n=35.0,
+        max_contact_force_n=60.0,
+        goal_tol_xyz=(0.022, 0.045, 0.012),
+        door_op='open',
+        initial_door_rad=0.0,
+    ),
+    'fr10_spanner_door_close': NativeTaskPreset(
+        task_id='fr10_spanner_door_close',
+        robot='fairino-fr10',
+        cell='spanner-oven-door',
+        task='table-to-oven',
+        support_body='mbco4_oven',
+        prompt=(
+            'Grasp the open Maruzen MBCO-4ME oven door handle, swing the door flush closed '
+            'with the latch cleared, and release so the handle physically re-latches.'
+        ),
+        ingredient_mass_kg=1.0,
+        clamp_force_n=100.0,
+        control_dt_s=0.02,
+        episode_s=36.0,
+        cam_pos=(0.02, -0.02, 2.72),
+        cam_fovy_deg=56.0,
+        max_grasp_force_n=35.0,
+        max_contact_force_n=60.0,
+        goal_tol_xyz=(0.022, 0.045, 0.012),
+        door_op='close',
+        initial_door_rad=1.76,
+    ),
+    'fr10_spanner_closed_oven_load': NativeTaskPreset(
+        task_id='fr10_spanner_closed_oven_load',
+        robot='fairino-fr10',
+        cell='spanner-oven-door',
+        task='table-to-oven',
+        support_body='mbco4_oven',
+        prompt=(
+            'Unlatch and open the closed Maruzen MBCO-4ME door, load the 400x300 mm tray '
+            'from the prep table onto Rail #2, then close and physically re-latch the door.'
+        ),
+        ingredient_mass_kg=1.0,
+        clamp_force_n=100.0,
+        control_dt_s=0.02,
+        episode_s=84.0,
+        cam_pos=(0.02, -0.02, 2.72),
+        cam_fovy_deg=56.0,
+        max_grasp_force_n=35.0,
+        max_contact_force_n=60.0,
+        goal_tol_xyz=(0.022, 0.045, 0.012),
+        door_op='cycle',
+        initial_door_rad=0.0,
     ),
     'ur5e_combined_oven_load': NativeTaskPreset(
         task_id='ur5e_combined_oven_load',
@@ -240,6 +308,7 @@ def dump_native_init(
     task: str,
     ingredient_mass_kg: float,
     clamp_force_n: float,
+    initial_door_rad: float = 0.0,
 ) -> dict[str, Any]:
   """Query `bakery-gauntlet --dump-init` for the exact production initial state."""
   cmd = [
@@ -256,6 +325,8 @@ def dump_native_init(
       f'{ingredient_mass_kg}',
       '--clamp-force-n',
       f'{clamp_force_n}',
+      '--initial-door-rad',
+      f'{initial_door_rad}',
       '--dump-init',
   ]
   out = subprocess.check_output(cmd, cwd=str(REPO_ROOT), text=True)
@@ -309,6 +380,7 @@ class BakeryNativeTask:
         preset.task,
         preset.ingredient_mass_kg,
         preset.clamp_force_n,
+        preset.initial_door_rad,
     )
     self._dest_site_world = np.array(self.init_info['destSite'], dtype=np.float64)
     self._is_spanner = bool(self.init_info['isSpanner'])
@@ -364,10 +436,10 @@ class BakeryNativeTask:
         goal_setter=self._place_tray_at_goal,
     )
 
-  def controller_cmd(self, mode: str) -> list[str]:
+  def controller_cmd(self, mode: str, *, door_op_override: str | None = None) -> list[str]:
     """Return the out-of-process CLI invocation for `bakery-gauntlet`."""
     cx, cy, cz = self.preset.cam_pos
-    return [
+    cmd = [
         str(self.binary),
         '--root',
         str(REPO_ROOT),
@@ -390,6 +462,10 @@ class BakeryNativeTask:
         '--cam-fovy-deg',
         f'{self.preset.cam_fovy_deg}',
     ]
+    door_op = door_op_override if door_op_override is not None else self.preset.door_op
+    if door_op is not None:
+      cmd.extend(['--door-op', door_op, '--initial-door-rad', f'{self.preset.initial_door_rad}'])
+    return cmd
 
   def _build_spec(self) -> mujoco.MjSpec:
     xml_path = REPO_ROOT / self.init_info['xmlPath']
@@ -529,6 +605,18 @@ class BakeryNativeTask:
     del p0
     m, d = sim.mj_model, sim.mj_data
     mujoco.mj_forward(m, d)
+    if self.preset.door_op in ('open', 'close', 'cycle'):
+      dj = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, 'mbco4_door_hinge')
+      hj = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, 'mbco4_handle_latch')
+      if dj >= 0:
+        d.qpos[m.jnt_qposadr[dj]] = 1.76 if self.preset.door_op == 'open' else 0.0
+        d.qvel[m.jnt_dofadr[dj]] = 0.0
+      if hj >= 0:
+        d.qpos[m.jnt_qposadr[hj]] = 0.0
+        d.qvel[m.jnt_dofadr[hj]] = 0.0
+      if self.preset.door_op in ('open', 'close'):
+        mujoco.mj_forward(m, d)
+        return
     sup_bid = m.body(self.support_body).id
     tray_bid = m.body(self.target_body).id
     sup_pos = np.asarray(d.xpos[sup_bid], dtype=np.float64)
@@ -579,6 +667,25 @@ class BakeryNativeTask:
     })
     return frozenset(meas_keys), cmd_keys
 
+  def door_angles(self, poses: Mapping[str, np.ndarray]) -> tuple[float, float]:
+    """Return `(door_rad, handle_rad)` from recorded body poses (`mbco4_oven/door/handle`)."""
+    if 'mbco4_oven' not in poses or 'mbco4_door' not in poses:
+      return 0.0, 0.0
+    q_oven = np.asarray(poses['mbco4_oven'][3:7], dtype=np.float64)
+    q_door = np.asarray(poses['mbco4_door'][3:7], dtype=np.float64)
+    q_rel = _quat_mul(_quat_inv(q_oven), q_door)
+    if q_rel[0] < 0.0:
+      q_rel = -q_rel
+    door_rad = 2.0 * math.atan2(-float(q_rel[3]), float(q_rel[0]))
+    handle_rad = 0.0
+    if 'mbco4_handle' in poses:
+      q_hand = np.asarray(poses['mbco4_handle'][3:7], dtype=np.float64)
+      q_hrel = _quat_mul(_quat_inv(q_door), q_hand)
+      if q_hrel[0] < 0.0:
+        q_hrel = -q_hrel
+      handle_rad = 2.0 * math.atan2(float(q_hrel[2]), float(q_hrel[0]))
+    return door_rad, handle_rad
+
   def placement_error(
       self, poses: Mapping[str, np.ndarray]
   ) -> dict[str, float]:
@@ -589,26 +696,41 @@ class BakeryNativeTask:
     tray_up = _quat_rot(tray_p[3:7], np.array([0.0, 0.0, 1.0]))
     sup_up = _quat_rot(sup_p[3:7], np.array([0.0, 0.0, 1.0]))
     tilt_deg = math.degrees(math.acos(float(np.clip(np.dot(tray_up, sup_up), -1.0, 1.0))))
+    door_rad, handle_rad = self.door_angles(poses)
     return {
         'dx_m': float(diff[0]),
         'dy_m': float(diff[1]),
         'dz_m': float(diff[2]),
         'pos_err_m': float(np.linalg.norm(diff)),
         'tilt_deg': float(tilt_deg),
+        'door_rad': float(door_rad),
+        'handle_rad': float(handle_rad),
     }
 
   def success(
       self, poses: Mapping[str, np.ndarray], poses0: Mapping[str, np.ndarray]
   ) -> bool:
-    del poses0
     err = self.placement_error(poses)
+    if self.preset.door_op == 'open':
+      tray_drift = float(
+          np.linalg.norm(
+              np.asarray(poses[self.target_body][:3], dtype=np.float64)
+              - np.asarray(poses0[self.target_body][:3], dtype=np.float64)
+          )
+      )
+      return err['door_rad'] >= 1.55 and tray_drift < 0.04
+    if self.preset.door_op == 'close':
+      return err['door_rad'] <= 0.05 and abs(err['handle_rad']) <= 0.12
     tx, ty, tz = self.preset.goal_tol_xyz
-    return (
+    tray_ok = (
         abs(err['dx_m']) < tx
         and abs(err['dy_m']) < ty
         and abs(err['dz_m']) < tz
         and err['tilt_deg'] < 5.0
     )
+    if self.preset.door_op == 'cycle':
+      return tray_ok and err['door_rad'] <= 0.05 and abs(err['handle_rad']) <= 0.12
+    return tray_ok
 
 
 def make_task(task_id: str, **kwargs: Any) -> BakeryNativeTask:
