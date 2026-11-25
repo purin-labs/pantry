@@ -238,6 +238,7 @@ export type HarnessCapabilityName =
   | typeof CAPABILITY_KEYS.deviceCameraRead
   | typeof CAPABILITY_KEYS.jevFeaturesRead
   | typeof CAPABILITY_KEYS.jevFeaturesManage
+  | typeof CAPABILITY_KEYS.organisationLogoChange
   | typeof CAPABILITY_KEYS.bakeRead
   | typeof CAPABILITY_KEYS.bakePropose
   | typeof CAPABILITY_KEYS.bakeRunPause

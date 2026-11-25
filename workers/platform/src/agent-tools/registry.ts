@@ -70,6 +70,7 @@ import {
   jevFeaturesManage,
   jevFeaturesRead,
 } from "@purin-labs/area-integrations/server/agent-tools/jev/jev";
+import { organisationLogoChange } from "@purin-labs/area-organisation/server/agent-tools/organisation/logo";
 import {
   bakeProposal,
   bakeRead,
@@ -156,6 +157,7 @@ export const TOOLS = [
   deviceProposal,
   jevFeaturesRead,
   jevFeaturesManage,
+  organisationLogoChange,
   merchantReport,
   workflowCanvasRead,
   workflowCanvasMove,

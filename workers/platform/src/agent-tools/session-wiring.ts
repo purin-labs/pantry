@@ -23,6 +23,7 @@ import {
   pageViewCommandExecutor,
 } from "@purin-labs/area-kitchen/server/agent-tools/kitchen/turn-services";
 import { stageConfigurationDraft } from "@purin-labs/area-organisation/server/agent-tools/organisation/configuration-draft";
+import { organisationToolServices } from "@purin-labs/area-organisation/server/agent-tools/organisation/turn-services";
 import { TOOL_REGISTRY, type ToolServices } from "./registry";
 import { slackThreadSideCase } from "@purin-labs/surface-slack/server/side-cases";
 import { sessionConversation } from "@purin-labs/conversation/chat/session-conversation";
@@ -86,6 +87,7 @@ export const SESSION_TOOL_WIRING: SessionToolWiring = {
       ),
       devices: deviceToolServices(turn, stage),
       jev: jevToolServices(turn, stage),
+      organisation: organisationToolServices(turn),
       menu: {
         ...menuToolServices(turn),
         proposeMenuPrice: commerce.proposeMenuPrice,

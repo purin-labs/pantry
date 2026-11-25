@@ -108,6 +108,8 @@ export interface ToolTurnContext extends SessionToolContext {
   readonly browserContext: TurnPageContext;
   /** The grants of the turn's authority partition, for a custom connector. */
   readonly effectiveGrantSet: EffectiveGrantSet;
+  /** The files of the turn's own message, for a tool that takes one. */
+  readonly attachments: readonly StoredMessageAttachment[];
 }
 
 /**

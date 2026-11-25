@@ -1343,6 +1343,9 @@ importers:
       '@purin-labs/agent':
         specifier: workspace:*
         version: link:../../foundation/agent
+      '@purin-labs/agent-tools':
+        specifier: workspace:*
+        version: link:../../foundation/agent-tools
       '@purin-labs/area-brain-contract':
         specifier: workspace:*
         version: link:../brain/contract
@@ -1406,6 +1409,9 @@ importers:
       '@purin-labs/tenancy':
         specifier: workspace:*
         version: link:../../foundation/tenancy
+      '@purin-labs/tool-handlers':
+        specifier: workspace:*
+        version: link:../../foundation/tool-handlers
       '@purin-labs/type-utils':
         specifier: workspace:*
         version: link:../../packages/type-utils

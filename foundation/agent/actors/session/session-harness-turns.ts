@@ -867,6 +867,7 @@ export class SessionHarnessTurns {
       turnPrompt: input.turnPrompt,
       browserContext: input.browserContext,
       effectiveGrantSet: acceptedTurnTools.value.authority.effectiveGrantSet,
+      attachments: canonicalInput.value.attachments,
     };
     const tools = this.shared.sessionTools();
     const toolArguments = tools.argumentObserver(toolTurn);

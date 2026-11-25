@@ -196,6 +196,33 @@ emits `readiness_invalidated`. **Reconnect** (`…/reconnect`, admin) starts a n
 provider attempt for an `active`, `disabled`, `degraded` or `reauth_required` account.
 **Rotate** (`…/rotate`, admin) starts one for an `active` account.
 
+### Logos and tiles
+
+Each organisation and each workspace has a tile on the Organisations page and in the
+workspace switcher (`IdentityTile`). The tile shows the logo that the owner uploaded. With
+no logo, it shows a gradient whose two hues come from the organisation or workspace id,
+so a rename keeps the colours and two organisations almost never look alike.
+
+- **Change.** The owner opens **··· › Change logo** on the Organisations page. The dialog
+  has one row for the organisation and one for each workspace, with **Choose image…** and
+  **Remove**. `POST …/logo` and `POST …/workspaces/:workspaceId/logo` take a multipart form
+  with the field `logo`; `DELETE` on the same path removes it. Only the owner changes a
+  logo, as only the owner renames the organisation; another role gets 404.
+- **Images.** PNG, JPEG or WebP of 1 MB or less. SVG is refused, because it can carry
+  script. The same image again writes nothing.
+- **Storage.** R2 (`ARCHIVE`) keeps the bytes under
+  `organisation-logos/<organisation>/organisation/<sha256>` and
+  `…/workspace/<workspace>/<sha256>`. The regional table `organisation_logo` keeps the
+  organisation's digest, and `organisation_workspace.logo_sha256` each workspace's. A new
+  logo deletes the old bytes after the row names the new ones. A purge erases both.
+- **Read.** The session gives `organisationLogo` with each membership and `logo` with each
+  workspace. Each member reads `GET …/logo?v=<sha256>`; with the current digest the answer
+  may stay in the browser cache for a year. The answer has `nosniff` and a sandbox policy.
+- **Agent.** `organisation_logo_change` (capability `organisation.logo.change`) sets the
+  one image of the current chat message as a logo, or removes a logo, through the owner's
+  own check. The model sees an image with no file id, so the tool takes the message's only
+  image and refuses a message with none or with two.
+
 ### Archive, restore, delete and purge
 
 | Transition                                  | Trigger                                               |

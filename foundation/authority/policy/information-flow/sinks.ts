@@ -338,6 +338,8 @@ export const INSIDE_CAPABILITIES: ReadonlySet<string> = new Set([
   CAPABILITY_KEYS.commerceSupplierCreate,
   CAPABILITY_KEYS.devicePause,
   CAPABILITY_KEYS.bakeRunPause,
+  // Only the members see a logo, in the Portal.
+  CAPABILITY_KEYS.organisationLogoChange,
   CAPABILITY_KEYS.customConnectorDraft,
   CAPABILITY_KEYS.marketingEmailDraftEdit,
   CAPABILITY_KEYS.messageLinkRead,
