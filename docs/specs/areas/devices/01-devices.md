@@ -20,10 +20,18 @@ no raw motion command. Emergency stop stays on the machine.
   filter shows only when the Organisation has more than one location.
   Kitchen devices group by station (Bakery, Bar, "No station yet"), the others by kind.
   The page reads the list every 15 s. If one kind cannot be read, a notice names it.
-- The drawer of a gateway or a kitchen device shows its state, the current work (the task
-  label and the run reference, with no link), the actions, the facts, the capabilities,
-  the activity and the snapshots of a camera. It says "Emergency stop stays on the
-  machine." The drawer of another kind links to the page that manages it.
+- The drawer of a gateway or a kitchen device is the shared `SideDrawer`, and nothing in
+  it folds. From the top, it shows:
+  - the state and the current work (the task label and the run reference, with no link)
+  - the one action that the state asks for: **Mark as checked** for an unknown result,
+    the confirm form for a new device, **Resume** after a pause, or **Request pause**
+  - the facts, with the capabilities
+  - one form for the name and the station, with one **Save**
+  - the snapshots of a camera, the latest reading of each sample, and the activity
+  - access: **Restrict** or **Lift restriction**, and **Revoke access**
+- Resume, Mark as checked, Revoke and turning on snapshots ask in place before they run.
+  The drawer says "Emergency stop stays on the machine." The drawer of another kind links
+  to the page that manages it.
 - If a person does not have the role for an action, a dialog in place names the role and
   tells the person to ask an owner. It sends no request.
 
@@ -249,7 +257,8 @@ at least one time a day for this work. A heartbeat writes only the 5-minute D1 s
 - Only `station_bakery` and `station_bar` exist. A location is a name of at most 64
   letters, digits, spaces, `_` and `-`, with no location table.
 - The drawer names the run with no link, and the `task_result_unknown` card links only
-  to the Devices page. The drawer lists the samples with no chart.
+  to the Devices page. The drawer shows only the latest value of each sample, with no
+  chart.
 - The role dialog sends no request. Pantry has no record for a request to change a role.
 - Roles are Organisation roles. Grants for one location (Plan 85 D8) are not built.
 

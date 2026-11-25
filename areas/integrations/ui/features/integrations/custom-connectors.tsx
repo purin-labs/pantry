@@ -23,7 +23,7 @@ import { customConnectorCollectionPath, customConnectorActionPath, customConnect
 import type { CustomConnectorAccountView, CustomConnectorAction, CustomConnectorWritePreview, CustomConnectorJsonValue, CustomConnectorMutationResult, CustomConnectorRevisionView, CustomConnectorSetupAttempt, CustomConnectorSummary } from "@purin-labs/control-api/portal/custom-connectors";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, errorMessage, isRecord } from "@purin-labs/std";
-import { RemoveConfirm } from "@purin-labs/ui/index";
+import { ConfirmInPlace } from "@purin-labs/ui/index";
 
 type Loadable<Value> =
   | { readonly kind: "loading" }
@@ -560,7 +560,7 @@ function CustomConnectorReview(props: {
           ) : null}
           {props.detail.summary.lifecycle === "disabled" ? (
             props.detail.accounts.length === 0 ? (
-              <RemoveConfirm
+              <ConfirmInPlace
                 label="Remove connector…"
                 question={`Remove ${connectorName}?`}
                 consequence="Its definition and revisions are deleted. To use this API again, add the connector again."
@@ -570,7 +570,7 @@ function CustomConnectorReview(props: {
               />
             ) : null
           ) : (
-            <RemoveConfirm
+            <ConfirmInPlace
               label="Disable connector…"
               question={`Disable ${connectorName}?`}
               consequence="Agents stop using it and its accounts at once. Resume it to use it again."

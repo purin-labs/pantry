@@ -1,16 +1,22 @@
 import React from "react";
 import { Button } from "./button";
-import "./remove-confirm.css";
+import "./confirm-in-place.css";
 
-export type RemoveConfirmProps = {
+export type ConfirmInPlaceProps = {
   /** The idle button, for example "Remove shop@example.com…". */
   readonly label: string;
   /** The question, for example "Remove shop@example.com?". */
   readonly question: string;
-  /** What stops, and how to get it back. */
+  /** What changes, and how to undo it. */
   readonly consequence: string;
   /** The button that runs the action, for example "Remove". */
   readonly confirmLabel: string;
+  /**
+   * `danger` (the default) for an action that removes or cuts something off.
+   * `primary` or `secondary` for one that only needs a check first, such as
+   * a resume after a pause.
+   */
+  readonly variant?: "danger" | "primary" | "secondary";
   readonly busy: boolean;
   readonly onConfirm: (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -23,16 +29,17 @@ export type RemoveConfirmProps = {
 };
 
 /**
- * The one action that removes or cuts something off. It is destructive, so
- * the first press asks in place and names what stops; only the second press
- * runs it. No dialog opens on top of the page or the drawer.
+ * An action that must be checked before it runs. The first press asks in
+ * place and names what changes; only the second press runs it. No dialog
+ * opens on top of the page or the drawer.
  */
-export function RemoveConfirm(props: RemoveConfirmProps): React.ReactNode {
+export function ConfirmInPlace(props: ConfirmInPlaceProps): React.ReactNode {
   const [confirming, setConfirming] = React.useState(false);
+  const variant = props.variant ?? "danger";
   if (!confirming) {
     return (
       <Button
-        variant="danger"
+        variant={variant}
         disabled={props.busy}
         onClick={setFlag.bind(null, setConfirming, true)}
       >
@@ -44,16 +51,12 @@ export function RemoveConfirm(props: RemoveConfirmProps): React.ReactNode {
   for (const [key, value] of Object.entries(props.data ?? {}))
     attributes[`data-${key}`] = value;
   return (
-    <div
-      className="pantry-remove-confirm"
-      role="group"
-      aria-label={props.question}
-    >
-      <p className="pantry-remove-confirm-copy">
+    <div className="pantry-confirm" role="group" aria-label={props.question}>
+      <p className="pantry-confirm-copy">
         <strong>{props.question}</strong> {props.consequence}
       </p>
       <Button
-        variant="danger"
+        variant={variant === "secondary" ? "primary" : variant}
         {...attributes}
         disabled={props.busy}
         onClick={runConfirmed.bind(null, props.onConfirm)}

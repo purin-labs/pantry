@@ -1,13 +1,13 @@
-/* The question of RemoveConfirm takes the full row above its two buttons. */
+/* The question of ConfirmInPlace takes the full row above its two buttons. */
 
-.pantry-remove-confirm {
+.pantry-confirm {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
 }
 
-.pantry-remove-confirm-copy {
+.pantry-confirm-copy {
   flex-basis: 100%;
   display: grid;
   gap: 6px;
@@ -17,7 +17,7 @@
   line-height: 1.45;
 }
 
-.pantry-remove-confirm-copy strong {
+.pantry-confirm-copy strong {
   color: var(--ink);
   font-weight: 500;
 }

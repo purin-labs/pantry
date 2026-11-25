@@ -311,6 +311,31 @@ window.fetch = async (input, init) => {
           needsAttention: true,
           readiness: { kind: "blocked", reason: "paused" },
         };
+      if (verb === "resume" || verb === "lift")
+        return {
+          ...device,
+          paused: false,
+          enrollment: "active",
+          restrictReason: null,
+          needsAttention: false,
+          readiness: { kind: "ready" },
+        };
+      if (verb === "rename") return { ...device, name: body.name ?? "" };
+      if (verb === "move")
+        return { ...device, stationId: body.stationId ?? null };
+      if (verb === "settle") return { ...device, work: { state: "idle" } };
+      // A task that runs at a revoke becomes result unknown, as on the server.
+      if (verb === "revoke")
+        return {
+          ...device,
+          work:
+            device.work.state === "idle"
+              ? device.work
+              : { ...device.work, state: "result_unknown" },
+          enrollment: "revoked",
+          connection: { state: "closed" },
+          readiness: { kind: "blocked", reason: "revoked" },
+        };
       return device;
     });
     return Response.json({ ok: true, receiptId: "devt_x", replayed: false });

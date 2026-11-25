@@ -3,17 +3,19 @@ import { Link } from "react-router";
 import {
   DEVICE_STATIONS,
   VOICE_ENGINES,
+  type DeviceActivity,
   type DeviceView,
   type KitchenDeviceView,
 } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
 
-import { DialogHeading, cancelDialog, syncDialog } from "@purin-labs/ui/dialog";
 import {
   Button,
+  ConfirmInPlace,
+  SideDrawer,
   useLatestRead,
   useMutation,
-  type ButtonVariant,
+  type ConfirmInPlaceProps,
 } from "@purin-labs/ui/index";
 import { Select } from "@purin-labs/ui/select";
 import {
@@ -39,7 +41,11 @@ import {
 } from "./status";
 import type { DevicePagePaths, MemberRole } from "./route";
 
-/** A device's facts and actions, in a side drawer beside the list. */
+/**
+ * A device's facts and actions, in a side drawer beside the list. From the
+ * top: the state, the one action that the state asks for, the facts, the
+ * name and station, the activity, and access (restrict and revoke).
+ */
 
 const ROLE_RANK: Readonly<Record<MemberRole, number>> = {
   viewer: 1,
@@ -50,75 +56,57 @@ const ROLE_RANK: Readonly<Record<MemberRole, number>> = {
 
 type NeededRole = "operator" | "admin";
 
-type Panel =
-  | Readonly<{ kind: "none" }>
-  | Readonly<{ kind: "restrict"; reason: string }>
-  | Readonly<{ kind: "rename"; name: string }>
-  | Readonly<{ kind: "move"; stationId: string }>
-  | Readonly<{ kind: "confirm"; name: string; stationId: string }>
-  | Readonly<{ kind: "revoke" }>
-  | Readonly<{ kind: "resume" }>
-  | Readonly<{ kind: "settle" }>;
-
 type Command = Readonly<{
   command: string;
   body: Readonly<Record<string, unknown>>;
 }>;
 
-type Action = Readonly<{
-  label: string;
-  need: NeededRole;
-  tone: ButtonVariant;
-  run: () => void;
+type DrawerProps = Readonly<{
+  device: DeviceView | null;
+  organisationId: string;
+  role: MemberRole;
+  snapshotsEnabled: boolean;
+  pagePaths: DevicePagePaths;
+  close: () => void;
+  changed: (message: string) => void;
+  askRole: (action: string, need: NeededRole) => void;
 }>;
 
-export function DeviceDrawer(
-  props: Readonly<{
-    device: DeviceView | null;
-    organisationId: string;
-    role: MemberRole;
-    snapshotsEnabled: boolean;
-    pagePaths: DevicePagePaths;
-    close: () => void;
-    changed: (message: string) => void;
-    askRole: (action: string, need: NeededRole) => void;
-  }>,
-): React.ReactNode {
-  const { device, close } = props;
-  const dialog = React.useRef<HTMLDialogElement>(null);
-  const open = device !== null;
-  React.useEffect(() => syncDialog(dialog, open), [open]);
+/** What the parts of the drawer need to send a command for one device. */
+type DeviceTools = Readonly<{
+  device: DeviceView;
+  busy: boolean;
+  /** Runs `then` if the person has the role, or names the role it needs. */
+  gate: (action: string, need: NeededRole, then: () => void) => () => void;
+  allowed: (need: NeededRole) => boolean;
+  /** Sends one command. It is true when the command saved. */
+  send: (
+    command: string,
+    body: Readonly<Record<string, unknown>>,
+  ) => Promise<boolean>;
+  changed: (message: string) => void;
+}>;
+
+export function DeviceDrawer(props: DrawerProps): React.ReactNode {
+  const { device } = props;
   return (
-    <dialog
-      ref={dialog}
+    <SideDrawer
+      open={device !== null}
+      title={device?.name ?? ""}
+      close={props.close}
       className="devices-drawer"
-      aria-labelledby="device-drawer-title"
-      onCancel={cancelDialog.bind(null, close)}
-      onClick={(event) => {
-        if (event.target === dialog.current) close();
-      }}
     >
       {device === null ? null : (
         <DrawerBody key={device.deviceId} {...props} device={device} />
       )}
-    </dialog>
+    </SideDrawer>
   );
 }
 
 function DrawerBody(
-  props: Readonly<{
-    device: DeviceView;
-    organisationId: string;
-    role: MemberRole;
-    snapshotsEnabled: boolean;
-    pagePaths: DevicePagePaths;
-    close: () => void;
-    changed: (message: string) => void;
-    askRole: (action: string, need: NeededRole) => void;
-  }>,
+  props: DrawerProps & Readonly<{ device: DeviceView }>,
 ): React.ReactNode {
   const { device, organisationId, role } = props;
-  const [panel, setPanel] = React.useState<Panel>({ kind: "none" });
   // One command for this device at a time.
   const command = useMutation((sent: Command, idempotencyKey: string) =>
     sendDeviceCommand(
@@ -130,67 +118,40 @@ function DrawerBody(
     ),
   );
   const sending = command.state(device.deviceId);
-  const busy = sending.kind === "running";
-  const failed = sending.kind === "failed";
+  const allowed = (need: NeededRole): boolean =>
+    ROLE_RANK[role] >= ROLE_RANK[need];
+  const tools: DeviceTools = {
+    device,
+    busy: sending.kind === "running",
+    allowed,
+    gate: (action, need, then) => () => {
+      if (allowed(need)) then();
+      else props.askRole(action, need);
+    },
+    send: async (name, body) =>
+      (await command.run(device.deviceId, { command: name, body })).kind ===
+      "done",
+    changed: props.changed,
+  };
   const managed = device.kind === "gateway" || device.kind === "kitchen_device";
-  const mayRead = ROLE_RANK[role] >= ROLE_RANK.operator;
-  const run = async (
-    name: string,
-    body: Readonly<Record<string, unknown>>,
-    message: string,
-  ): Promise<void> => {
-    const outcome = await command.run(device.deviceId, { command: name, body });
-    if (outcome.kind !== "done") return;
-    setPanel({ kind: "none" });
-    props.changed(message);
-  };
-  const gated = (label: string, need: NeededRole, then: () => void) => () => {
-    if (ROLE_RANK[role] < ROLE_RANK[need]) props.askRole(label, need);
-    else then();
-  };
-  const actions = managed ? deviceActions(device, gated, setPanel, run) : [];
+  const enrolled = managed && device.enrollment !== "revoked";
+  const pending =
+    device.kind === "kitchen_device" && device.enrollment === "pending";
+  const work = currentWork(device);
   return (
-    <div className="devices-drawer-body">
-      <DialogHeading
-        id="device-drawer-title"
-        title={device.name}
-        close={props.close}
-      />
+    <div className="side-drawer-body devices-drawer-body">
       <p className="devices-drawer-kind">{subtitle(device)}</p>
       <div className="devices-answer">
         <StatusLine device={device} />
         {device.kind === "kitchen_device" ? (
           <p>{kitchenAnswer(device)}</p>
         ) : null}
+        {work === "" ? null : <p>Current work: {work}</p>}
       </div>
-      {currentWork(device) === "" ? null : (
-        <div>
-          <p className="devices-drawer-kind">Current work</p>
-          <p className="devices-work-line">{currentWork(device)}</p>
-        </div>
-      )}
-      {actions.length === 0 ? null : (
-        <div className="devices-actions">
-          {actions.map((action) => (
-            <Button
-              variant={action.tone}
-              key={action.label}
-              disabled={busy}
-              onClick={action.run}
-            >
-              {action.label}
-            </Button>
-          ))}
-        </div>
-      )}
-      <ActionPanel
-        panel={panel}
-        device={device}
-        busy={busy}
-        setPanel={setPanel}
-        run={run}
-      />
-      {failed ? (
+      {device.kind === "kitchen_device" ? (
+        <MainAction tools={tools} device={device} />
+      ) : null}
+      {sending.kind === "failed" ? (
         <p className="error-text" role="alert">
           The change did not save. Read the device again and try again.
         </p>
@@ -203,50 +164,41 @@ function DrawerBody(
           </div>
         ))}
       </dl>
-      {device.kind === "kitchen_device" && device.capabilities.length > 0 ? (
-        <details className="devices-fold">
-          <summary>Capabilities</summary>
-          <ul>
-            {device.capabilities.map((capability) => (
-              <li key={capability.id}>
-                {capability.label} (revision {capability.revision})
-              </li>
-            ))}
-          </ul>
-        </details>
+      {enrolled && !pending ? (
+        <EditForm
+          key={`${device.name}:${stationOf(device) ?? ""}`}
+          tools={tools}
+        />
       ) : null}
       {device.kind === "kitchen_device" && device.hardware === "camera" ? (
         <CameraSnapshots
           deviceId={device.deviceId}
           organisationId={organisationId}
-          role={role}
           enabled={props.snapshotsEnabled}
-          gated={gated}
-          changed={props.changed}
+          tools={tools}
           askRole={props.askRole}
         />
       ) : null}
-      {managed ? (
-        mayRead ? (
-          <ActivityList
-            organisationId={organisationId}
-            subjectId={device.deviceId}
-            refreshKey={JSON.stringify(device)}
-          />
-        ) : (
-          <div className="devices-fold">
-            <p className="devices-fold-title">Activity</p>
-            <Button
-              variant="link"
-              onClick={() => props.askRole("read activity", "operator")}
-            >
-              Ask for access to activity
-            </Button>
-          </div>
-        )
-      ) : (
+      {!managed ? (
         <ManageLink device={device} pagePaths={props.pagePaths} />
+      ) : allowed("operator") ? (
+        <ActivityList
+          organisationId={organisationId}
+          subjectId={device.deviceId}
+          refreshKey={JSON.stringify(device)}
+        />
+      ) : (
+        <section className="devices-section">
+          <h3>Activity</h3>
+          <Button
+            variant="link"
+            onClick={() => props.askRole("read activity", "operator")}
+          >
+            Ask for access to activity
+          </Button>
+        </section>
       )}
+      {enrolled ? <AccessSection tools={tools} /> : null}
       {managed ? (
         <p className="devices-safety">Emergency stop stays on the machine.</p>
       ) : null}
@@ -277,189 +229,311 @@ function subtitle(device: DeviceView): string {
     : kindLabel(device.kind);
 }
 
-type Gated = (label: string, need: NeededRole, then: () => void) => () => void;
-
-function deviceActions(
-  device: DeviceView,
-  gated: Gated,
-  setPanel: (panel: Panel) => void,
-  run: (
-    command: string,
-    body: Readonly<Record<string, unknown>>,
-    message: string,
-  ) => Promise<void>,
-): readonly Action[] {
-  if (device.kind === "gateway") {
-    if (device.enrollment === "revoked") return [];
-    return [
-      {
-        label: "Rename",
-        need: "operator",
-        tone: "secondary",
-        run: gated("rename a gateway", "operator", () =>
-          setPanel({ kind: "rename", name: device.name }),
-        ),
-      },
-      {
-        label: "Revoke",
-        need: "admin",
-        tone: "danger",
-        run: gated("revoke a gateway", "admin", () =>
-          setPanel({ kind: "revoke" }),
-        ),
-      },
-    ];
-  }
-  if (device.kind !== "kitchen_device") return [];
-  const actions: Action[] = [];
-  if (device.work.state === "result_unknown")
-    actions.push({
-      label: "Mark as checked",
-      need: "operator",
-      tone: "primary",
-      run: gated("mark a task result as checked", "operator", () =>
-        setPanel({ kind: "settle" }),
-      ),
-    });
-  if (device.enrollment === "revoked") return actions;
-  if (device.enrollment === "pending")
-    actions.push({
-      label: "Confirm device",
-      need: "admin",
-      tone: "primary",
-      run: gated("confirm a device", "admin", () =>
-        setPanel({
-          kind: "confirm",
-          name: device.name,
-          stationId: DEVICE_STATIONS[0].stationId,
-        }),
-      ),
-    });
-  else if (device.paused)
-    actions.push({
-      label: "Resume",
-      need: "operator",
-      tone: "primary",
-      run: gated("resume a device", "operator", () =>
-        setPanel({ kind: "resume" }),
-      ),
-    });
-  else
-    actions.push({
-      label: "Request pause",
-      need: "operator",
-      tone: device.work.state === "idle" ? "secondary" : "primary",
-      run: gated("request a pause", "operator", () => {
-        void run(
-          "pause",
-          {},
-          "Pause requested. New work on this device stopped.",
-        );
-      }),
-    });
-  if (device.enrollment === "restricted")
-    actions.push({
-      label: "Lift restriction",
-      need: "admin",
-      tone: "secondary",
-      run: gated("lift a restriction", "admin", () => {
-        void run("lift", {}, "Restriction lifted.");
-      }),
-    });
-  else if (device.enrollment === "active")
-    actions.push({
-      label: "Restrict",
-      need: "operator",
-      tone: "secondary",
-      run: gated("restrict a device", "operator", () =>
-        setPanel({ kind: "restrict", reason: "" }),
-      ),
-    });
-  actions.push({
-    label: "Rename",
-    need: "operator",
-    tone: "secondary",
-    run: gated("rename a device", "operator", () =>
-      setPanel({ kind: "rename", name: device.name }),
-    ),
-  });
-  if (device.enrollment !== "pending")
-    actions.push({
-      label: "Move",
-      need: "admin",
-      tone: "secondary",
-      run: gated("move a device", "admin", () =>
-        setPanel({
-          kind: "move",
-          stationId: device.stationId ?? DEVICE_STATIONS[0].stationId,
-        }),
-      ),
-    });
-  actions.push({
-    label: "Revoke",
-    need: "admin",
-    tone: "danger",
-    run: gated("revoke a device", "admin", () => setPanel({ kind: "revoke" })),
-  });
-  return actions;
+function stationOf(device: DeviceView): string | null {
+  return device.kind === "kitchen_device" ? device.stationId : null;
 }
 
-function ActionPanel(
-  props: Readonly<{
-    panel: Panel;
-    device: DeviceView;
-    busy: boolean;
-    setPanel: (panel: Panel) => void;
-    run: (
-      command: string,
-      body: Readonly<Record<string, unknown>>,
-      message: string,
-    ) => Promise<void>;
-  }>,
+/** Sends a command, and on success tells the page what changed. */
+async function run(
+  tools: DeviceTools,
+  command: string,
+  body: Readonly<Record<string, unknown>>,
+  message: string,
+): Promise<boolean> {
+  const saved = await tools.send(command, body);
+  if (saved) tools.changed(message);
+  return saved;
+}
+
+/**
+ * A confirm in place for a person with the role. For a person without it,
+ * the same button names the role that the action needs.
+ */
+function GatedConfirm(
+  props: ConfirmInPlaceProps &
+    Readonly<{ tools: DeviceTools; action: string; need: NeededRole }>,
 ): React.ReactNode {
-  const { panel, device, busy, setPanel, run } = props;
-  const cancel = (
-    <Button variant="link" onClick={() => setPanel({ kind: "none" })}>
-      Cancel
+  const { tools, action, need, ...confirm } = props;
+  if (tools.allowed(need)) return <ConfirmInPlace {...confirm} />;
+  return (
+    <Button
+      variant={confirm.variant ?? "danger"}
+      disabled={confirm.busy}
+      onClick={tools.gate(action, need, () => undefined)}
+    >
+      {confirm.label}
     </Button>
   );
-  const stationItems = DEVICE_STATIONS.map((station) => ({
+}
+
+/**
+ * The one action that the state of a kitchen device asks for: check an
+ * unknown task result, confirm a new device, resume after a pause, or
+ * request a pause. A person can pause a device with an unknown result too.
+ */
+function MainAction(
+  props: Readonly<{ tools: DeviceTools; device: KitchenDeviceView }>,
+): React.ReactNode {
+  const { tools, device } = props;
+  if (device.enrollment === "pending")
+    return <ConfirmDeviceForm tools={tools} device={device} />;
+  const unknown = device.work.state === "result_unknown";
+  const actions: React.ReactNode[] = [];
+  if (unknown)
+    actions.push(
+      <GatedConfirm
+        key="settle"
+        tools={tools}
+        action="mark a task result as checked"
+        need="operator"
+        variant="primary"
+        label="Mark as checked…"
+        question={`Did a person check ${device.name} in the shop?`}
+        consequence="Purin Pantry then treats its last task as closed. Pantry repeats nothing."
+        confirmLabel="Mark as checked"
+        busy={tools.busy}
+        onConfirm={() => {
+          void run(tools, "settle", {}, "Task result marked as checked.");
+        }}
+      />,
+    );
+  if (device.enrollment !== "revoked" && device.paused)
+    actions.push(
+      <GatedConfirm
+        key="resume"
+        tools={tools}
+        action="resume a device"
+        need="operator"
+        variant={unknown ? "secondary" : "primary"}
+        label="Resume…"
+        question={`Resume ${device.name}?`}
+        consequence="Check that the area around it is clear. Purin Pantry can send it new tasks after this."
+        confirmLabel="Resume"
+        busy={tools.busy}
+        onConfirm={() => {
+          void run(tools, "resume", {}, `${device.name} resumed.`);
+        }}
+      />,
+    );
+  else if (device.enrollment !== "revoked")
+    actions.push(
+      <Button
+        key="pause"
+        variant={
+          unknown || device.work.state === "idle" ? "secondary" : "primary"
+        }
+        disabled={tools.busy}
+        onClick={tools.gate("request a pause", "operator", () => {
+          void run(
+            tools,
+            "pause",
+            {},
+            "Pause requested. New work on this device stopped.",
+          );
+        })}
+      >
+        Request pause
+      </Button>,
+    );
+  if (actions.length === 0) return null;
+  return <div className="devices-actions">{actions}</div>;
+}
+
+function stationItems(): { value: string; label: string }[] {
+  return DEVICE_STATIONS.map((station) => ({
     value: station.stationId,
     label: station.label,
   }));
-  const stations = (
-    <>
-      <Select.Trigger>
-        <Select.Value />
-      </Select.Trigger>
-      <Select.Popup>
-        {stationItems.map((station) => (
-          <Select.Item key={station.value} value={station.value}>
-            {station.label}
-          </Select.Item>
-        ))}
-      </Select.Popup>
-    </>
+}
+
+function StationField(
+  props: Readonly<{
+    value: string | null;
+    change: (stationId: string) => void;
+  }>,
+): React.ReactNode {
+  const items = stationItems();
+  return (
+    <label className="devices-field">
+      Station
+      <Select.Root
+        items={items}
+        value={props.value}
+        onValueChange={(stationId) => {
+          if (stationId !== null) props.change(stationId);
+        }}
+      >
+        <Select.Trigger>
+          <Select.Value placeholder="Choose a station" />
+        </Select.Trigger>
+        <Select.Popup>
+          {items.map((station) => (
+            <Select.Item key={station.value} value={station.value}>
+              {station.label}
+            </Select.Item>
+          ))}
+        </Select.Popup>
+      </Select.Root>
+      <span className="devices-field-hint">
+        The station decides which runs can use this device.
+      </span>
+    </label>
   );
-  switch (panel.kind) {
-    case "none":
-      return null;
-    case "restrict":
-      return (
+}
+
+function NameField(
+  props: Readonly<{ value: string; change: (name: string) => void }>,
+): React.ReactNode {
+  return (
+    <label className="devices-field">
+      Name
+      <input
+        required
+        maxLength={120}
+        value={props.value}
+        onChange={(event) => props.change(event.target.value)}
+      />
+    </label>
+  );
+}
+
+/** A new device: check its serial number, then name it and give a station. */
+function ConfirmDeviceForm(
+  props: Readonly<{ tools: DeviceTools; device: KitchenDeviceView }>,
+): React.ReactNode {
+  const { tools, device } = props;
+  const [name, setName] = React.useState(device.name);
+  const [stationId, setStationId] = React.useState<string>(
+    DEVICE_STATIONS[0].stationId,
+  );
+  return (
+    <form
+      className="devices-panel"
+      onSubmit={(event) => {
+        event.preventDefault();
+        tools.gate("confirm a device", "admin", () => {
+          void run(
+            tools,
+            "confirm",
+            { name: name.trim(), stationId },
+            `${name.trim()} is active.`,
+          );
+        })();
+      }}
+    >
+      <p>
+        Check the serial number on the machine before you confirm it.
+        {device.serial === null ? "" : ` It should read ${device.serial}.`}
+      </p>
+      <NameField value={name} change={setName} />
+      <StationField value={stationId} change={setStationId} />
+      <div className="devices-panel-actions">
+        <Button variant="primary" type="submit" disabled={tools.busy}>
+          Confirm device
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+/** The name, and the station of a kitchen device, saved with one press. */
+function EditForm(props: Readonly<{ tools: DeviceTools }>): React.ReactNode {
+  const { tools } = props;
+  const { device } = tools;
+  const kitchen = device.kind === "kitchen_device";
+  const station = stationOf(device);
+  const [name, setName] = React.useState(device.name);
+  const [stationId, setStationId] = React.useState(station);
+  const renamed = name.trim() !== "" && name.trim() !== device.name;
+  const moved = stationId !== null && stationId !== station;
+  const save = async (): Promise<void> => {
+    if (renamed && !(await tools.send("rename", { name: name.trim() }))) return;
+    if (moved && !(await tools.send("move", { stationId }))) return;
+    tools.changed(
+      moved
+        ? `${name.trim()} is at ${stationLabel(stationId)} now.`
+        : "Name saved.",
+    );
+  };
+  return (
+    <form
+      className="devices-section"
+      onSubmit={(event) => {
+        event.preventDefault();
+        const action = moved
+          ? "move a device"
+          : `rename a ${kitchen ? "device" : "gateway"}`;
+        tools.gate(action, moved ? "admin" : "operator", () => {
+          void save();
+        })();
+      }}
+    >
+      <h3>{kitchen ? "Name and station" : "Name"}</h3>
+      <NameField value={name} change={setName} />
+      {kitchen ? (
+        <StationField value={stationId} change={setStationId} />
+      ) : null}
+      <div className="devices-panel-actions">
+        <Button
+          variant="secondary"
+          type="submit"
+          disabled={tools.busy || !(renamed || moved)}
+        >
+          Save
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+/** Restrict or lift, and revoke: the actions that change access. */
+function AccessSection(
+  props: Readonly<{ tools: DeviceTools }>,
+): React.ReactNode {
+  const { tools } = props;
+  const { device } = tools;
+  const [reason, setReason] = React.useState<string | null>(null);
+  const kitchen = device.kind === "kitchen_device" ? device : null;
+  const revoke = (
+    <GatedConfirm
+      tools={tools}
+      action={kitchen === null ? "revoke a gateway" : "revoke a device"}
+      need="admin"
+      label="Revoke access…"
+      question={`Revoke ${device.name}?`}
+      consequence={
+        kitchen === null
+          ? "Its connection closes and Purin Pantry refuses its credential within 5 seconds. Its devices lose access too."
+          : "Purin Pantry sends it no more work. A task that runs now becomes result unknown."
+      }
+      confirmLabel="Revoke access"
+      busy={tools.busy}
+      onConfirm={() => {
+        void run(tools, "revoke", {}, `${device.name} has no access now.`);
+      }}
+    />
+  );
+  if (reason !== null && kitchen !== null)
+    return (
+      <section className="devices-section">
+        <h3>Access</h3>
         <form
           className="devices-panel"
           onSubmit={(event) => {
             event.preventDefault();
             void run(
+              tools,
               "restrict",
-              { reason: panel.reason.trim() },
+              { reason: reason.trim() },
               `${device.name} is restricted. Purin Pantry sends it no new task.`,
-            );
+            ).then((saved) => {
+              if (saved) setReason(null);
+            });
           }}
         >
           <p>
-            Restrict {device.name}? Purin Pantry sends it no new task. A task
-            that runs now continues.
+            <strong>Restrict {device.name}?</strong> Purin Pantry sends it no
+            new task. A task that runs now continues.
           </p>
           <label className="devices-field">
             Reason
@@ -467,219 +541,63 @@ function ActionPanel(
               autoFocus
               required
               maxLength={200}
-              value={panel.reason}
-              onChange={(event) =>
-                setPanel({ kind: "restrict", reason: event.target.value })
-              }
+              value={reason}
+              onChange={(event) => setReason(event.target.value)}
             />
           </label>
           <div className="devices-panel-actions">
-            {cancel}
-            <Button variant="primary" size="lg" type="submit" disabled={busy}>
+            <Button variant="primary" type="submit" disabled={tools.busy}>
               Restrict device
             </Button>
-          </div>
-        </form>
-      );
-    case "rename":
-      return (
-        <form
-          className="devices-panel"
-          onSubmit={(event) => {
-            event.preventDefault();
-            void run("rename", { name: panel.name.trim() }, "Name saved.");
-          }}
-        >
-          <label className="devices-field">
-            New name
-            <input
-              autoFocus
-              required
-              maxLength={120}
-              value={panel.name}
-              onChange={(event) =>
-                setPanel({ kind: "rename", name: event.target.value })
-              }
-            />
-          </label>
-          <div className="devices-panel-actions">
-            {cancel}
-            <Button variant="primary" size="lg" type="submit" disabled={busy}>
-              Save name
+            <Button variant="secondary" onClick={() => setReason(null)}>
+              Cancel
             </Button>
           </div>
         </form>
-      );
-    case "move":
-      return (
-        <form
-          className="devices-panel"
-          onSubmit={(event) => {
-            event.preventDefault();
-            void run(
-              "move",
-              { stationId: panel.stationId },
-              `${device.name} moved to ${stationLabel(panel.stationId)}.`,
-            );
-          }}
-        >
-          <p>A move changes which runs can use this device.</p>
-          <label className="devices-field">
-            Station
-            <Select.Root
-              items={stationItems}
-              value={panel.stationId}
-              onValueChange={(stationId) => {
-                if (stationId !== null) setPanel({ kind: "move", stationId });
-              }}
-            >
-              {stations}
-            </Select.Root>
-          </label>
-          <div className="devices-panel-actions">
-            {cancel}
-            <Button variant="primary" size="lg" type="submit" disabled={busy}>
-              Move device
-            </Button>
-          </div>
-        </form>
-      );
-    case "confirm":
-      return (
-        <form
-          className="devices-panel"
-          onSubmit={(event) => {
-            event.preventDefault();
-            void run(
-              "confirm",
-              { name: panel.name.trim(), stationId: panel.stationId },
-              `${panel.name.trim()} is active.`,
-            );
-          }}
-        >
-          <p>
-            Check the serial number on the machine before you confirm it.
-            {device.kind === "kitchen_device" && device.serial !== null
-              ? ` It should read ${device.serial}.`
-              : ""}
-          </p>
-          <label className="devices-field">
-            Name
-            <input
-              autoFocus
-              required
-              maxLength={120}
-              value={panel.name}
-              onChange={(event) =>
-                setPanel({ ...panel, name: event.target.value })
-              }
-            />
-          </label>
-          <label className="devices-field">
-            Station
-            <Select.Root
-              items={stationItems}
-              value={panel.stationId}
-              onValueChange={(stationId) => {
-                if (stationId !== null) setPanel({ ...panel, stationId });
-              }}
-            >
-              {stations}
-            </Select.Root>
-          </label>
-          <div className="devices-panel-actions">
-            {cancel}
-            <Button variant="primary" size="lg" type="submit" disabled={busy}>
-              Confirm device
-            </Button>
-          </div>
-        </form>
-      );
-    case "revoke":
-      return (
-        <div className="devices-panel">
-          <p>
-            {device.kind === "gateway"
-              ? `Revoke ${device.name}? Its connection closes and Purin Pantry refuses its credential within 5 seconds. Its devices lose access too.`
-              : `Revoke ${device.name}? Purin Pantry sends it no more work. A task that runs now becomes result unknown.`}
-          </p>
-          <div className="devices-panel-actions">
-            {cancel}
-            <Button
-              variant="danger"
-              disabled={busy}
-              onClick={() => {
-                void run("revoke", {}, `${device.name} has no access now.`);
-              }}
-            >
-              Revoke access
-            </Button>
-          </div>
-        </div>
-      );
-    case "resume":
-      return (
-        <div className="devices-panel">
-          <p>
-            Resume {device.name}? Check that the area around it is clear. Purin
-            Pantry can send it new tasks after this.
-          </p>
-          <div className="devices-panel-actions">
-            {cancel}
-            <Button
-              variant="primary"
-              size="lg"
-              disabled={busy}
-              onClick={() => {
-                void run("resume", {}, `${device.name} resumed.`);
-              }}
-            >
-              Resume
-            </Button>
-          </div>
-        </div>
-      );
-    case "settle":
-      return (
-        <div className="devices-panel">
-          <p>
-            Did a person check {device.name} in the shop? Purin Pantry then
-            treats its last task as closed. Pantry repeats nothing.
-          </p>
-          <div className="devices-panel-actions">
-            {cancel}
-            <Button
-              variant="primary"
-              size="lg"
-              disabled={busy}
-              onClick={() => {
-                void run("settle", {}, "Task result marked as checked.");
-              }}
-            >
-              Mark as checked
-            </Button>
-          </div>
-        </div>
-      );
-    default:
-      return assertNever(panel, "Unexpected panel");
-  }
+      </section>
+    );
+  return (
+    <section className="devices-section">
+      <h3>Access</h3>
+      <div className="devices-actions">
+        {kitchen === null ? null : kitchen.enrollment === "restricted" ? (
+          <Button
+            variant="secondary"
+            disabled={tools.busy}
+            onClick={tools.gate("lift a restriction", "admin", () => {
+              void run(tools, "lift", {}, "Restriction lifted.");
+            })}
+          >
+            Lift restriction
+          </Button>
+        ) : kitchen.enrollment === "active" ? (
+          <Button
+            variant="secondary"
+            disabled={tools.busy}
+            onClick={tools.gate("restrict a device", "operator", () =>
+              setReason(""),
+            )}
+          >
+            Restrict…
+          </Button>
+        ) : null}
+        {revoke}
+      </div>
+    </section>
+  );
 }
 
 function CameraSnapshots(
   props: Readonly<{
     deviceId: string;
     organisationId: string;
-    role: MemberRole;
     enabled: boolean;
-    gated: Gated;
-    changed: (message: string) => void;
+    tools: DeviceTools;
     askRole: (action: string, need: NeededRole) => void;
   }>,
 ): React.ReactNode {
-  const { deviceId, organisationId, enabled, gated, askRole } = props;
-  const mayAsk = ROLE_RANK[props.role] >= ROLE_RANK.operator;
-  const [confirming, setConfirming] = React.useState(false);
+  const { deviceId, organisationId, enabled, tools, askRole } = props;
+  const mayAsk = tools.allowed("operator");
   const [busy, setBusy] = React.useState(false);
   const [note, setNote] = React.useState("");
   const [read, setRead] = React.useState<SnapshotRead | null>(null);
@@ -701,9 +619,8 @@ function CameraSnapshots(
       setNote("The change did not save. Try again.");
       return;
     }
-    setConfirming(false);
     setNote("");
-    props.changed(next ? "Snapshots are on." : "Snapshots are off.");
+    tools.changed(next ? "Snapshots are on." : "Snapshots are off.");
   };
   const take = async (): Promise<void> => {
     setBusy(true);
@@ -732,70 +649,47 @@ function CameraSnapshots(
     }
     setBusy(false);
   };
+  const status = note === "" ? null : <p role="status">{note}</p>;
   if (!enabled)
     return (
-      <div className="devices-fold">
-        <p className="devices-fold-title">Snapshots</p>
+      <section className="devices-section">
+        <h3>Snapshots</h3>
         <p>Snapshots are off. This camera sends no image to Purin.</p>
-        {confirming ? (
-          <div className="devices-panel devices-snapshot-confirm">
-            <p>
-              Turn on snapshots for this workspace? An image of staff is
-              personal data. Check your privacy duties and tell your staff
-              first.
-            </p>
-            <p>
-              A camera sends one still image on a fault or when a person asks.
-              Purin deletes each image after seven days and keeps no video.
-            </p>
-            <div className="devices-panel-actions">
-              <Button variant="link" onClick={() => setConfirming(false)}>
-                Cancel
-              </Button>
-              <Button
-                variant="primary"
-                size="lg"
-                disabled={busy}
-                onClick={() => {
-                  void setEnabled(true);
-                }}
-              >
-                Turn on snapshots
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <Button
-            variant="link"
-            onClick={gated("turn on snapshots", "admin", () =>
-              setConfirming(true),
-            )}
-          >
-            Turn on snapshots
-          </Button>
-        )}
-        {note === "" ? null : <p role="status">{note}</p>}
-      </div>
+        <GatedConfirm
+          tools={tools}
+          action="turn on snapshots"
+          need="admin"
+          variant="secondary"
+          label="Turn on snapshots…"
+          question="Turn on snapshots for this workspace?"
+          consequence="An image of staff is personal data. Check your privacy duties and tell your staff first. A camera sends one still image on a fault or when a person asks. Purin deletes each image after seven days and keeps no video."
+          confirmLabel="Turn on snapshots"
+          busy={busy}
+          onConfirm={() => setEnabled(true)}
+        />
+        {status}
+      </section>
     );
   if (!mayAsk || read?.kind === "no_access")
     return (
-      <div className="devices-fold">
-        <p className="devices-fold-title">Snapshots</p>
+      <section className="devices-section">
+        <h3>Snapshots</h3>
         <Button
           variant="link"
           onClick={() => askRole("see camera snapshots", "admin")}
         >
           Ask for access to snapshots
         </Button>
-      </div>
+      </section>
     );
   const snapshots = read?.kind === "read" ? read.snapshots : [];
   return (
-    <div className="devices-fold">
-      <p className="devices-fold-title">Snapshots</p>
+    <section className="devices-section">
+      <h3>Snapshots</h3>
       <p>Purin deletes each image after seven days and keeps no video.</p>
-      <div className="devices-snapshot-actions">
+      <div className="devices-actions">
         <Button
+          variant="secondary"
           disabled={busy}
           onClick={() => {
             void take();
@@ -806,14 +700,14 @@ function CameraSnapshots(
         <Button
           variant="link"
           disabled={busy}
-          onClick={gated("turn off snapshots", "admin", () => {
+          onClick={tools.gate("turn off snapshots", "admin", () => {
             void setEnabled(false);
           })}
         >
           Turn off snapshots
         </Button>
       </div>
-      {note === "" ? null : <p role="status">{note}</p>}
+      {status}
       {read?.kind === "failed" ? (
         <p role="alert">The snapshots could not be read.</p>
       ) : null}
@@ -836,8 +730,20 @@ function CameraSnapshots(
           ))}
         </ul>
       )}
-    </div>
+    </section>
   );
+}
+
+type Sample = DeviceActivity["samples"][number];
+
+/** The newest sample of each name. The samples come newest first. */
+function latestSamples(samples: readonly Sample[]): readonly Sample[] {
+  const seen = new Set<string>();
+  return samples.filter((sample) => {
+    if (seen.has(sample.name)) return false;
+    seen.add(sample.name);
+    return true;
+  });
 }
 
 function ActivityList(
@@ -856,17 +762,23 @@ function ActivityList(
   // The activity can change when the device does, so it reads again then.
   const { read } = useLatestRead(readActivity, { reloadOn: refreshKey });
   if (read.kind === "failed" || (read.kind === "ready" && read.stale))
-    return <p className="devices-fold-title">Activity could not be read.</p>;
+    return (
+      <section className="devices-section">
+        <h3>Activity</h3>
+        <p>Activity could not be read.</p>
+      </section>
+    );
   if (read.kind === "loading") return null;
   const activity = read.value;
+  const samples = latestSamples(activity.samples);
   return (
     <>
-      {activity.samples.length === 0 ? null : (
-        <details className="devices-fold">
-          <summary>Samples, one a minute</summary>
+      {samples.length === 0 ? null : (
+        <section className="devices-section">
+          <h3>Latest readings</h3>
           <ul>
-            {activity.samples.map((sample) => (
-              <li key={`${sample.name}:${sample.at}`}>
+            {samples.map((sample) => (
+              <li key={sample.name}>
                 <span className="devices-time">{dateTime(sample.at)}</span>
                 <span>
                   {sample.name}: {sample.value} {sample.unit}
@@ -874,10 +786,10 @@ function ActivityList(
               </li>
             ))}
           </ul>
-        </details>
+        </section>
       )}
-      <details className="devices-fold" open>
-        <summary>Activity</summary>
+      <section className="devices-section">
+        <h3>Activity</h3>
         {activity.events.length === 0 ? (
           <p>Nothing is recorded yet.</p>
         ) : (
@@ -892,7 +804,7 @@ function ActivityList(
             ))}
           </ul>
         )}
-      </details>
+      </section>
     </>
   );
 }
@@ -1014,6 +926,14 @@ function kitchenFacts(
     ...(device.firmwareVersion === null
       ? []
       : [{ term: "Firmware", value: device.firmwareVersion }]),
+    ...(device.capabilities.length === 0
+      ? []
+      : [
+          {
+            term: "Capabilities",
+            value: `${device.capabilities.map((capability) => capability.label).join(", ")} (revision ${device.revision})`,
+          },
+        ]),
     ...(device.faultText === null
       ? []
       : [{ term: "The device said", value: `"${device.faultText}"` }]),

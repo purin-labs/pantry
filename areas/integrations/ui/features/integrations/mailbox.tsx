@@ -39,7 +39,7 @@ import {
   renderMutationFeedback,
 } from "./settings-support";
 import type { IntegrationsPageActions } from "./settings-types";
-import { RemoveConfirm } from "@purin-labs/ui/index";
+import { ConfirmInPlace } from "@purin-labs/ui/index";
 
 /**
  * The email onboarding card, built like the consent sheet: three short points
@@ -547,7 +547,7 @@ function GmailRemoveSection(props: {
   }
   return (
     <section className="mailbox-section mailbox-danger" aria-label="Remove">
-      <RemoveConfirm
+      <ConfirmInPlace
         label={`Remove ${props.address}…`}
         question={`Remove ${props.address}?`}
         consequence="Purin Pantry stops reading mail, cancels emails waiting to send, deletes the drafts it made and its Google sign-in. To use this mailbox again, connect it again."

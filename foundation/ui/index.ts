@@ -10,7 +10,7 @@ export {
   type AttachmentState,
 } from "./attachment";
 export { Button, type ButtonProps, type ButtonVariant } from "./button";
-export { RemoveConfirm, type RemoveConfirmProps } from "./remove-confirm";
+export { ConfirmInPlace, type ConfirmInPlaceProps } from "./confirm-in-place";
 export { EmptyState, type EmptyStateProps } from "./empty-state";
 export {
   CrmTable,

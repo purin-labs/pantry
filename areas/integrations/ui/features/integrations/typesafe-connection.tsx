@@ -9,7 +9,7 @@ import {
   type Configuration,
   parseConfiguration,
 } from "@purin-labs/control-api/portal/typesafe-connection";
-import { RemoveConfirm } from "@purin-labs/ui/index";
+import { ConfirmInPlace } from "@purin-labs/ui/index";
 
 export type TypeSafeConnectionState =
   | Readonly<{ kind: "loading" }>
@@ -158,7 +158,7 @@ export function TypeSafeConnectionPanel(props: {
                 </div>
               )}
               {connection.kind === "connected" && (
-                <RemoveConfirm
+                <ConfirmInPlace
                   label="Disconnect TypeSafe…"
                   question="Disconnect TypeSafe?"
                   consequence="Every feature that uses TypeSafe turns off at once, and Purin Pantry deletes the key. To use them again, save a key again."
