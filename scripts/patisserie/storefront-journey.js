@@ -8,8 +8,9 @@ async (opener) => {
   // financiers, a steak and pepper pie and a caffè latte, reads the menu in
   // Japanese, and asks for a quote. The latte is made to order: Commerce
   // can quote it only from its recipe's stocked ingredients. Commerce
-  // prices the order with 8% tax inside the listed prices; the journey stops
-  // before payment. On a phone the page has no sideways scroll, and on a
+  // prices the order with 8% tax inside the listed prices. The shop has no
+  // payment account yet, so Commerce refuses the payment, and the buyer reads
+  // under the pay button that no order was placed. On a phone the page has no sideways scroll, and on a
   // 320px phone every item name stays on the screen.
   //
   // Run: python3 scripts/patisserie/run-storefront-journey.py
@@ -290,6 +291,68 @@ async (opener) => {
       review.slice(0, 600),
     );
     await capture("04-quote");
+
+    // 5b. The shop has no payment account, as shop.purin.io had none on 25
+    // November 2026: Commerce refuses the payment session. The buyer reads
+    // why, under the button, and that no order was placed.
+    // The local site runs on http, and Commerce takes only an https return
+    // address; the request keeps every other field.
+    await page.route("**/payment-sessions", async (route) => {
+      const body = JSON.parse(route.request().postData() ?? "{}");
+      await route.continue({
+        postData: JSON.stringify({
+          ...body,
+          returnUrl: "https://shop.purin.io/",
+        }),
+      });
+    });
+    await page.getByRole("button", { name: /Pay securely/u }).click();
+    const refusal = page.getByRole("alert");
+    await refusal.waitFor({ timeout: 20_000 });
+    const refusalText = await refusal.innerText();
+    check(
+      "a refused payment tells the buyer that no order was placed",
+      refusalText.includes("cannot take card payments right now") &&
+        refusalText.includes("Your order was not placed"),
+      refusalText,
+    );
+    check(
+      "the refusal shows on the screen under the pay button",
+      await refusal.evaluate((node) => {
+        const box = node.getBoundingClientRect();
+        const button = [...document.querySelectorAll("button")].find((item) =>
+          item.textContent.includes("Pay securely"),
+        );
+        return (
+          button !== undefined &&
+          box.top >= button.getBoundingClientRect().bottom &&
+          box.bottom <= window.innerHeight
+        );
+      }),
+    );
+    check(
+      "Commerce refused the payment binding",
+      failedResponses.some(
+        (line) =>
+          line.includes("/payment-sessions") &&
+          line.includes("buyerCheckout.paymentBinding"),
+      ),
+      [...failedResponses],
+    );
+    failedResponses.length = 0;
+    // The review card fades in again after the refusal; a looping motion
+    // never ends and a replaced one is cancelled, so neither is waited for.
+    await page.evaluate(() =>
+      Promise.all(
+        document
+          .getAnimations()
+          .filter(
+            (motion) => motion.effect?.getTiming().iterations !== Infinity,
+          )
+          .map((motion) => motion.finished.catch(() => null)),
+      ),
+    );
+    await capture("04b-payment-refused");
 
     // 6. On a phone (a new tab, so no open checkout) the page fits the screen.
     const phone = await opener.context().newPage();

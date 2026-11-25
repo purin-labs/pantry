@@ -12,6 +12,7 @@ import type {
   OnlinePaymentBinding,
 } from "@purin-labs/commerce-contracts";
 import type { VariantBy } from "@purin-labs/type-utils";
+import { TEMPLATE_PAYMENT_BINDING_ID } from "../working-payment-bindings.ts";
 
 type MerchantPaymentRequestBase<
   TBinding extends CheckoutPaymentProviderBinding,
@@ -174,7 +175,7 @@ export class DeterministicPaymentGateway
   constructor(
     now: () => string = currentTimestamp,
     paymentBinding: OnlinePaymentBinding = deterministicStripeBinding(),
-    paymentProviderBindingId = "payment_binding_primary_online",
+    paymentProviderBindingId = TEMPLATE_PAYMENT_BINDING_ID,
   ) {
     this.#now = now;
     this.#paymentBinding = paymentBinding;

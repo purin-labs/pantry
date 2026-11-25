@@ -16,6 +16,7 @@ import {
   type PointOfSaleConfigurationResult,
   type PublishPointOfSaleConfiguration,
 } from "../../point-of-sale-configuration-service.ts";
+import { workingPaymentBindingIds } from "../../working-payment-bindings.ts";
 import { OrderFamily } from "./orders.ts";
 
 /**
@@ -78,6 +79,22 @@ export abstract class CheckoutProfileFamily extends OrderFamily {
     input: ActivateCheckoutProfile,
   ): CheckoutProfileCommandResult<ActiveStorefrontCheckoutProfile> {
     return this.checkoutProfiles.activate(input);
+  }
+
+  /**
+   * After a payment account links: each storefront that still sells on the
+   * template's profile and cannot charge moves to the account (spec §4).
+   */
+  followWorkingPaymentBinding(
+    merchantId: string,
+    paymentProviderBindingId: string,
+  ): readonly string[] {
+    return this.checkoutProfiles.followWorkingPaymentBinding({
+      merchantId,
+      paymentProviderBindingId,
+      workingBindingIds: workingPaymentBindingIds(this.database, merchantId),
+      at: this.now(),
+    });
   }
 
   readCheckoutProfile(

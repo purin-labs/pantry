@@ -245,6 +245,15 @@ configuration of a counter.
   `approval_required` only: every refund waits for a merchant approval.
   Schema 93 rewrote each stored `automatic_up_to` (a threshold under which a
   refund could run without approval) to `approval_required`.
+- The first storefront of a merchant gets a template profile, published and
+  activated by `system_storefront_template`. Its payment binding is that of
+  a working account (an active Stripe account or a linked Square location),
+  or `payment_binding_primary_online` when there is none yet.
+- When a payment account links and is active (`link_square_account`,
+  `link_stripe_account`), each storefront whose active profile the template
+  published, and whose binding no working account charges, moves to a new
+  template profile `checkout_profile_<storefront>_<binding>` on the linked
+  binding, in one transaction. A profile that staff published does not move.
 - A point-of-sale configuration publishes a counter's terminal and payment
   binding for one location.
 - A storefront's tax is a percentage or a provider quote.
@@ -287,7 +296,7 @@ shop's own domain for its shop name; giving a name back so another shop may
 take it.
 
 Proof: `checkout-profile-http.test.ts`, `punter-acceptance.test.ts`,
-`included-tax-journey.test.ts`.
+`included-tax-journey.test.ts`, `template-payment-follow-journey.test.ts`.
 
 ## 5. Catalog: products, variants, offers and media
 

@@ -59,6 +59,13 @@ import {
   orderStatusStorageKey,
   type StorageShop,
 } from "./shop-storage.ts";
+import {
+  buyerClientError,
+  isQuoteExpiredError,
+  paymentSessionError,
+  shippingCheckoutError,
+  type CafeLanguage,
+} from "./checkout-errors.ts";
 
 type ProviderUiError = Readonly<{ message?: string }>;
 
@@ -148,7 +155,6 @@ const DEFAULT_SHIPPING_LISTING_IMAGE: ShippingListingImage = {
   imageAlt: "Open kraft box of six square butter cookies",
 };
 
-type CafeLanguage = "en" | "ja";
 
 type NukiCafeProductId =
   | "menu_entry_sesame_latte"
@@ -2875,7 +2881,10 @@ export class StorefrontApp extends React.Component<
         this.restoreExpiredQuote(context);
         return undefined;
       }
-      this.restoreQuoteWithError(context, buyerClientError(result.error));
+      this.restoreQuoteWithError(
+        context,
+        paymentSessionError(result.error, this.#cafeLanguage),
+      );
       return undefined;
     }
     if (result.value.state === "unavailable") {
@@ -5543,6 +5552,7 @@ function CheckoutView(
             {props.copy.pay}
           </button>
         )}
+        <FeedbackView feedback={props.feedback} />
         {props.expired ? null : (
           <QuoteCountdown expiresAt={props.expiresAt} label={props.holdLabel} />
         )}
@@ -5550,7 +5560,6 @@ function CheckoutView(
           {props.copy.edit}
         </button>
         <p className="payment-note">{props.copy.paymentNote}</p>
-        <FeedbackView feedback={props.feedback} />
       </section>
     </div>
   );
@@ -9306,24 +9315,3 @@ function statusMessage(state: StorefrontState): string {
 }
 
 /** An unreadable reply shows a fixed sentence, not the parser's reason. */
-function buyerClientError(error: CommerceClientError): string {
-  if (error.kind === "invalid_response")
-    return "The store's reply could not be read. Try again.";
-  return error.message.length === 0
-    ? "Something went wrong. Try again."
-    : `${error.message} Try again.`;
-}
-
-function shippingCheckoutError(error: CommerceClientError): string {
-  return error.kind === "rejected" &&
-    error.error.code === "resource_relationship_invalid" &&
-    error.error.field === "buyerCheckout.shippingServiceAvailability"
-    ? "Delivery is temporarily unavailable. Try again later."
-    : buyerClientError(error);
-}
-
-function isQuoteExpiredError(error: CommerceClientError): boolean {
-  return (
-    error.kind === "rejected" && error.error.code === "checkout_quote_expired"
-  );
-}

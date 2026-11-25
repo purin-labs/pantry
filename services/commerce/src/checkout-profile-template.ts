@@ -4,6 +4,8 @@ import type {
 } from "@purin-labs/commerce-contracts";
 import { assertNever } from "@purin-labs/std";
 
+import { TEMPLATE_PAYMENT_BINDING_ID } from "./working-payment-bindings.ts";
+
 type CheckoutProfileTemplate = Readonly<{
   checkoutProfileId: string;
   name: string;
@@ -14,6 +16,8 @@ export function buildStorefrontCheckoutProfileTemplate(
   input: Readonly<{
     storefront: Storefront;
     currency: string;
+    /** A working account's binding; the lab binding when there is none. */
+    paymentProviderBindingId?: string;
   }>,
 ): CheckoutProfileTemplate {
   return {
@@ -40,7 +44,8 @@ export function buildStorefrontCheckoutProfileTemplate(
       taxPolicy: templateTaxPolicy(input.storefront),
       paymentPolicy: {
         kind: "external_provider",
-        paymentProviderBindingId: "payment_binding_primary_online",
+        paymentProviderBindingId:
+          input.paymentProviderBindingId ?? TEMPLATE_PAYMENT_BINDING_ID,
       },
       afterSalePolicy: {
         cancellationPolicyId: "cancellation_policy_standard",

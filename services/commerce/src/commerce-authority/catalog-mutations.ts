@@ -10,6 +10,10 @@ import { CheckoutProfileService } from "../checkout-profile-service.ts";
 import type { CommerceDatabase } from "../database.ts";
 import { buildStorefrontCheckoutProfileTemplate } from "../checkout-profile-template.ts";
 import {
+  STOREFRONT_TEMPLATE_IDENTITY,
+  workingPaymentBindingIds,
+} from "../working-payment-bindings.ts";
+import {
   writeLocation,
   writeOffer,
   writeProduct,
@@ -213,6 +217,7 @@ function writeStorefrontConfiguration(
     command.merchantId,
     command.storefront,
     command.offer.price.currency,
+    workingPaymentBindingIds(database, command.merchantId)[0],
     committedAt,
   );
   writeConsumptionPlan(database, command.merchantId, command.consumptionPlan);
@@ -397,6 +402,7 @@ function ensureStorefrontCheckoutProfile(
   merchantId: string,
   storefront: Storefront,
   currency: string,
+  paymentProviderBindingId: string | undefined,
   activatedAt: string,
 ): void {
   if (
@@ -410,6 +416,7 @@ function ensureStorefrontCheckoutProfile(
   const template = buildStorefrontCheckoutProfileTemplate({
     storefront,
     currency,
+    paymentProviderBindingId,
   });
   const installed = checkoutProfiles.installPublishedTemplateWithinTransaction({
     merchantId,
@@ -418,7 +425,7 @@ function ensureStorefrontCheckoutProfile(
     name: template.name,
     configuration: template.configuration,
     installedAt: activatedAt,
-    installedBy: "system_storefront_template",
+    installedBy: STOREFRONT_TEMPLATE_IDENTITY,
   });
   if (!installed.ok)
     throw new Error(

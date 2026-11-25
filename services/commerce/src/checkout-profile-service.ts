@@ -26,6 +26,7 @@ import {
   type CheckoutProfileActivation,
 } from "./checkout-profile-persistence.ts";
 import { isPositiveInteger } from "@purin-labs/std";
+import { STOREFRONT_TEMPLATE_IDENTITY } from "./working-payment-bindings.ts";
 
 export type {
   ActiveStorefrontCheckoutProfile,
@@ -222,37 +223,29 @@ export class CheckoutProfileService {
   installPublishedTemplateWithinTransaction(
     input: InstallPublishedCheckoutProfileTemplate,
   ): CheckoutProfileCommandResult<ActiveStorefrontCheckoutProfile> {
-    const created = normalizeCreateDraft({
-      merchantId: input.merchantId,
-      checkoutProfileId: input.checkoutProfileId,
-      name: input.name,
-      configuration: input.configuration,
-      createdAt: input.installedAt,
-    });
-    if (!created.ok) return created;
-    const draft = createDraftTransaction(this.#database, created.value);
-    if (!draft.ok) return draft;
-    const publication = normalizePublish({
-      merchantId: draft.value.merchantId,
-      checkoutProfileId: draft.value.checkoutProfileId,
-      expectedRevision: draft.value.revision,
-      publishedAt: input.installedAt,
-      publishedBy: input.installedBy,
-    });
-    if (!publication.ok) return publication;
-    const published = publishTransaction(this.#database, publication.value);
-    if (!published.ok) return published;
-    const activation = normalizeActivation({
-      merchantId: published.value.merchantId,
-      storefrontId: input.storefrontId,
-      checkoutProfileId: published.value.checkoutProfileId,
-      checkoutProfileRevision: published.value.revision,
-      activatedAt: input.installedAt,
-      activatedBy: input.installedBy,
-    });
-    return activation.ok
-      ? activateTransaction(this.#database, activation.value)
-      : activation;
+    return installTemplateTransaction(this.#database, input);
+  }
+
+  /**
+   * Moves each storefront whose active profile the storefront template
+   * published, and whose payment binding no working account charges, to a
+   * template profile on `paymentProviderBindingId`, in one transaction. A
+   * profile that staff published stays: staff chose its binding. Returns the
+   * storefronts that moved.
+   */
+  followWorkingPaymentBinding(
+    input: Readonly<{
+      merchantId: string;
+      paymentProviderBindingId: string;
+      workingBindingIds: readonly string[];
+      at: string;
+    }>,
+  ): readonly string[] {
+    if (!input.workingBindingIds.includes(input.paymentProviderBindingId))
+      return [];
+    return this.#database.transaction(() =>
+      followWorkingPaymentBindingTransaction(this.#database, input),
+    );
   }
 
   read(
@@ -748,4 +741,110 @@ function invalidLifecycle(
     ok: false,
     error: { code: "invalid_lifecycle", requiredState, actualState },
   };
+}
+
+function followWorkingPaymentBindingTransaction(
+  database: CommerceDatabase,
+  input: Readonly<{
+    merchantId: string;
+    paymentProviderBindingId: string;
+    workingBindingIds: readonly string[];
+    at: string;
+  }>,
+): readonly string[] {
+  const moved: string[] = [];
+  for (const storefrontId of listStorefrontIds(database, input.merchantId)) {
+    const active = readActiveProfile(database, input.merchantId, storefrontId);
+    if (
+      active === undefined ||
+      active.profile.lifecycle.state !== "published" ||
+      active.profile.lifecycle.publishedBy !== STOREFRONT_TEMPLATE_IDENTITY ||
+      input.workingBindingIds.includes(
+        active.profile.configuration.paymentPolicy.paymentProviderBindingId,
+      )
+    )
+      continue;
+    const checkoutProfileId = followingProfileId(
+      storefrontId,
+      input.paymentProviderBindingId,
+    );
+    const existing = readLatestProfile(
+      database,
+      input.merchantId,
+      checkoutProfileId,
+    );
+    const result =
+      existing === undefined
+        ? installTemplateTransaction(database, {
+            merchantId: input.merchantId,
+            storefrontId,
+            checkoutProfileId,
+            name: active.profile.name,
+            configuration: {
+              ...active.profile.configuration,
+              paymentPolicy: {
+                ...active.profile.configuration.paymentPolicy,
+                paymentProviderBindingId: input.paymentProviderBindingId,
+              },
+            },
+            installedAt: input.at,
+            installedBy: STOREFRONT_TEMPLATE_IDENTITY,
+          })
+        : existing.lifecycle.state === "published"
+          ? activateTransaction(database, {
+              merchantId: input.merchantId,
+              storefrontId,
+              checkoutProfileId,
+              checkoutProfileRevision: existing.revision,
+              activatedAt: input.at,
+              activatedBy: STOREFRONT_TEMPLATE_IDENTITY,
+            })
+          : undefined;
+    if (result?.ok === true) moved.push(storefrontId);
+  }
+  return moved;
+}
+
+/** The template profile of a storefront on one payment binding. */
+function followingProfileId(storefrontId: string, bindingId: string): string {
+  return `checkout_profile_${storefrontId}_${bindingId}`
+    .replace(/[^A-Za-z0-9_-]/gu, "_")
+    .slice(0, 128);
+}
+
+function installTemplateTransaction(
+  database: CommerceDatabase,
+  input: InstallPublishedCheckoutProfileTemplate,
+): CheckoutProfileCommandResult<ActiveStorefrontCheckoutProfile> {
+  const created = normalizeCreateDraft({
+    merchantId: input.merchantId,
+    checkoutProfileId: input.checkoutProfileId,
+    name: input.name,
+    configuration: input.configuration,
+    createdAt: input.installedAt,
+  });
+  if (!created.ok) return created;
+  const draft = createDraftTransaction(database, created.value);
+  if (!draft.ok) return draft;
+  const publication = normalizePublish({
+    merchantId: draft.value.merchantId,
+    checkoutProfileId: draft.value.checkoutProfileId,
+    expectedRevision: draft.value.revision,
+    publishedAt: input.installedAt,
+    publishedBy: input.installedBy,
+  });
+  if (!publication.ok) return publication;
+  const published = publishTransaction(database, publication.value);
+  if (!published.ok) return published;
+  const activation = normalizeActivation({
+    merchantId: published.value.merchantId,
+    storefrontId: input.storefrontId,
+    checkoutProfileId: published.value.checkoutProfileId,
+    checkoutProfileRevision: published.value.revision,
+    activatedAt: input.installedAt,
+    activatedBy: input.installedBy,
+  });
+  return activation.ok
+    ? activateTransaction(database, activation.value)
+    : activation;
 }

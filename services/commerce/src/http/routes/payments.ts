@@ -107,9 +107,10 @@ export async function linkSquareAccountRoute(
   const body = await readJsonBody(request);
   if (!body.ok) return body.response;
   const result = await accounts.link(route.merchantId, body.value);
-  return result.kind === "ok"
-    ? jsonResponse(200, result.value)
-    : jsonResponse(result.status, { message: result.message });
+  if (result.kind !== "ok")
+    return jsonResponse(result.status, { message: result.message });
+  followLinkedAccount(ctx, route.merchantId, result.value);
+  return jsonResponse(200, result.value);
 }
 
 export async function stripeAccountRoute(
@@ -129,9 +130,24 @@ export async function stripeAccountRoute(
     route.kind === "link_stripe_account"
       ? await accounts.link(route.merchantId, body.value)
       : await accounts.startOnboarding(route.merchantId, body.value);
-  return result.kind === "ok"
-    ? jsonResponse(200, result.value)
-    : jsonResponse(result.status, { message: result.message });
+  if (result.kind !== "ok")
+    return jsonResponse(result.status, { message: result.message });
+  if (route.kind === "link_stripe_account" && "state" in result.value)
+    followLinkedAccount(ctx, route.merchantId, result.value);
+  return jsonResponse(200, result.value);
+}
+
+/** A storefront that cannot charge starts to sell on an account that can. */
+function followLinkedAccount(
+  ctx: HttpRouteContext,
+  merchantId: string,
+  account: Readonly<{ paymentProviderBindingId: string; state: string }>,
+): void {
+  if (account.state === "active")
+    ctx.authority.followWorkingPaymentBinding(
+      merchantId,
+      account.paymentProviderBindingId,
+    );
 }
 
 export async function settleOnlinePaymentRoute(
