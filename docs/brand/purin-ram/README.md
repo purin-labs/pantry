@@ -46,9 +46,17 @@ and the chest owns the lines of the paws over the pudding.
   the pudding, so the ram and the pudding move as one.
 
 The two croissant poses have no neck: the head and the body are one part.
-The ears, the paws, the muzzle (and the chin when it eats) and the croissant
-are the other parts. When the ram eats, the croissant and its paws move, so
-the body, the muzzle and the chin reach under them.
+The ears, the paws, the muzzle and the croissant are the other parts. When the
+ram eats, the croissant and its paws move, and the croissant goes away bite by
+bite. So the parts behind them are whole: the cream of the muzzle and the chin
+is one egg, with no line round it, as in the image, and the body has its
+outline where the left paw hid its edge.
+
+`ram-eat.json` also holds the bites. `cuts` holds the part of the croissant
+that is gone after each of the first three bites, and `bites` holds the line
+on the edge of each cut. The first bite takes the top of the middle, the
+second leaves half, and the third leaves the two ends. The fourth bite takes
+the rest. `pivots.bite` is the point where the bites start.
 
 `ram-paths.json` also holds the pudding alone (`puddingHull`, with the parts
 under the paws filled), the pivots and the ram in one colour (`mono`).
@@ -93,10 +101,15 @@ pudding) give:
   ears flick and the eyes squeeze. `grab` in `ram-paths.json` holds the rim
   (`above`, `below`) and the part of the chest that is in front of the
   pudding (`region`).
-- In a croissant pose, the whole ram rocks about its feet. When it eats, the
-  croissant and the paws go up to the mouth three times, then rest. When it
-  hugs, its body gives one small squeeze, then rests. The horns move with
-  the point between their roots (`horns`) and keep their shape.
+- In a croissant pose, the whole ram rocks about its feet. When it hugs, its
+  body gives one small squeeze, then rests. The horns move with the point
+  between their roots (`horns`) and keep their shape.
+- In the loader, the bites fill the bar. The ram comes up with a whole
+  croissant and takes four bites. At the top of each bite, a piece of the
+  croissant is gone, two crumbs fly, the eyes squeeze and the bar takes its
+  step. The last bite takes the rest and fills the bar: the ram gives one
+  happy squeeze and flicks its ears. Then it goes down and gets a new
+  croissant.
 
 On the concept front page, the ram eats while a tool connects, and it hugs the
 croissant at the end of the page.

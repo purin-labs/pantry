@@ -286,9 +286,11 @@ def brush(states):
 
     items = {}
     for key, (pose, st) in states.items():
-        line, owner, details, lw = st["line"], st["owner"], st["details"], st["lw"]
+        details, lw = st["details"], st["lw"]
         for k, n in enumerate(pose["front"]):
-            items[f"{key}/lines/{n}"] = spines(line & (owner == k), lw, "line")
+            items[f"{key}/lines/{n}"] = spines(owned(st, k, n), lw, "line")
+        for i, m in enumerate(st.get("bites", [])):
+            items[f"{key}/bites/{i}"] = spines(m, lw, "line")
         eyes = sorted(details["eyes"], key=lambda m: np.nonzero(m)[1].mean())
         for i, m in enumerate(eyes):
             items[f"{key}/eyes/{i}"] = spines(m, lw, "detail")
@@ -332,8 +334,9 @@ def brush(states):
             "eyes": [],
             "ridges": {"hornL": "", "hornR": ""},
             "mouth": "",
+            **({"bites": [""] * len(st["bites"])} if "bites" in st else {}),
         }
-        for key in states
+        for key, (_, st) in states.items()
     }
     for item, mark in painted.items():
         key, *where = item.split("/")
@@ -355,6 +358,8 @@ def brush(states):
             out[key]["eyes"].append(d)
         elif where[0] == "ridges":
             out[key]["ridges"][where[1]] = d
+        elif where[0] == "bites":
+            out[key]["bites"][int(where[1])] = d
         else:
             out[key][where[0]] = d
     return out
@@ -453,23 +458,7 @@ def trace(pose):
     horns_before = [paths(fills[h]) for h in ("hornL", "hornR")]
     roots, skull = smaller_horns(pose, regions, fills, line, owner, details, lw)
 
-    out = {"size": [W, H], "lineWidth": round(lw, 1), "fills": {}, "lines": {}}
-    for n in names:
-        out["fills"][n] = paths(fills[n])
-    for k, n in enumerate(front):
-        msk = line & (owner == k)
-        # overlap the neighbour line pieces by a little, so the seams between owners do not open
-        msk = msk | (ndi.binary_dilation(msk, iterations=3) & line)
-        if msk.sum() > 30:
-            out["lines"][n] = paths(msk)
-    out["eyes"] = [
-        paths(s) for s in sorted(details["eyes"], key=lambda s: np.nonzero(s)[1].mean())
-    ]
-    out["mouth"] = paths(np.any(details["mouth"], axis=0)) if details["mouth"] else ""
-    out["ridges"] = {
-        "hornL": paths(np.any(details["ridgeL"], axis=0)) if details["ridgeL"] else "",
-        "hornR": paths(np.any(details["ridgeR"], axis=0)) if details["ridgeR"] else "",
-    }
+    out = {"size": [W, H], "lineWidth": round(lw, 1)}
     state = {
         "lab": lab,
         "regions": regions,
@@ -483,8 +472,38 @@ def trace(pose):
         "hornsBefore": horns_before,
         "roots": roots,
         "skull": skull,
+        "front": front,
+        # lines that a part owns besides its share of the drawn lines (see eat_extras)
+        "more": {},
     }
     return out, state
+
+
+def owned(st, k, n):
+    """The line mask of the part `n`, at the index `k` of the front list."""
+    m = st["line"] & (st["owner"] == k)
+    return m | st["more"][n] if n in st["more"] else m
+
+
+def draw(out, st):
+    """The fills, the lines and the face strokes of a traced pose, as SVG paths."""
+    line, details = st["line"], st["details"]
+    out["fills"] = {n: paths(st["fills"][n]) for n in st["names"] if n in st["fills"]}
+    out["lines"] = {}
+    for k, n in enumerate(st["front"]):
+        msk = owned(st, k, n)
+        # overlap the neighbour line pieces by a little, so the seams between owners do not open
+        msk = msk | (ndi.binary_dilation(msk, iterations=3) & line)
+        if msk.sum() > 30:
+            out["lines"][n] = paths(msk)
+    out["eyes"] = [
+        paths(s) for s in sorted(details["eyes"], key=lambda s: np.nonzero(s)[1].mean())
+    ]
+    out["mouth"] = paths(np.any(details["mouth"], axis=0)) if details["mouth"] else ""
+    out["ridges"] = {
+        "hornL": paths(np.any(details["ridgeL"], axis=0)) if details["ridgeL"] else "",
+        "hornR": paths(np.any(details["ridgeR"], axis=0)) if details["ridgeR"] else "",
+    }
 
 
 def smaller_horns(pose, regions, fills, line, owner, details, lw):
@@ -759,6 +778,88 @@ def croissant_extras(pivots):
     return extras
 
 
+def disc_mask(shape, cx, cy, r):
+    yy, xx = np.mgrid[0 : shape[0], 0 : shape[1]]
+    return (xx - cx) ** 2 + (yy - cy) ** 2 <= r * r
+
+
+def bite_mask(shape, cx, cy, radius):
+    """A bite: a disc with a ring of tooth marks on its edge, so the edge reads as bitten."""
+    tooth = radius * 0.3
+    ring = radius - tooth
+    out = disc_mask(shape, cx, cy, ring)
+    for a in np.linspace(0, 2 * np.pi, 9, endpoint=False):
+        out |= disc_mask(shape, cx + ring * np.sin(a), cy + ring * np.cos(a), tooth)
+    return out
+
+
+# The loader: the ram eats the croissant in four bites, one for each step of the bar. Each of the
+# first three bites takes a scalloped disc out of the croissant (x, y, radius, in the frame of the
+# croissant at rest), and holds the bites before it: the first takes the top of the middle, the
+# second leaves half, the third cuts through and leaves the two ends. The fourth takes the rest.
+BITES = [(478, 586, 46), (478, 590, 86), (478, 660, 96)]
+CLOSE = 90
+
+
+def eat_extras(out, st):
+    """The bites of the croissant, and the parts that the croissant hid, drawn whole."""
+    croissant_extras({"earL": [334, 324], "earR": [685, 355]})(out, st)
+    fills, line, owner, lw = st["fills"], st["line"], st["owner"], st["lw"]
+    front = st["front"]
+    food = fills["bread"] | fills["crust"]
+    food |= line & np.isin(owner, [front.index("bread"), front.index("crust")])
+    r = lw / 2
+
+    def band(mask):
+        """A line one line wide along the edge of `mask`, with the edge in its middle."""
+        return (ndi.distance_transform_edt(~mask) <= r) & (ndi.distance_transform_edt(mask) <= r)
+
+    # The croissant and the paws hide the middle of the face and of the body, and they go up to
+    # the mouth, so the parts behind them show: those parts are whole there. The cream of the
+    # muzzle and of the chin is one egg (the image draws no line round it); the chin becomes part
+    # of the muzzle. The body is its part of the image closed over the bays that the paws hid
+    # (a disc of CLOSE rolls round it), with its outline where the left paw hid its edge. The
+    # lines of the body and the muzzle at the edges of the held parts were slivers of their
+    # outlines, so they go, and the new outline takes their place.
+    held = np.zeros(food.shape, bool)
+    for n in ("pawL", "pawR", "bread", "crust"):
+        held |= fills[n] | (line & (owner == front.index(n)))
+    m, b = front.index("muzzle"), front.index("body")
+    owner[line & (owner == front.index("chin"))] = m
+    cream = (fills["muzzle"] | fills["chin"]) & ~held
+    ys, xs = np.nonzero(cream)
+    hull = ConvexHull(np.c_[xs, ys])
+    shape = Image.new("L", cream.shape[::-1], 0)
+    ImageDraw.Draw(shape).polygon(
+        [(float(xs[i]), float(ys[i])) for i in hull.vertices], fill=1
+    )
+    egg = cream | (np.asarray(shape).astype(bool) & held)
+    # no points where the hull meets the edge of the muzzle
+    fills["muzzle"] = cream | (ndi.binary_opening(egg, iterations=6) & held)
+    del fills["chin"]
+    solid = st["regions"]["body"] | (line & (owner == b)) | fills["muzzle"]
+    grown = ndi.distance_transform_edt(~solid) <= CLOSE
+    whole = ndi.binary_fill_holes(solid | (ndi.distance_transform_edt(grown) > CLOSE))
+    near = ndi.binary_dilation(held, iterations=4)
+    for k in (b, m):
+        owner[line & (owner == k) & near] = -1
+    st["more"]["body"] = whole & (ndi.distance_transform_edt(whole) <= lw) & near
+    fills["body"] = (fills["body"] & ~(held & ~whole)) | (whole & held)
+
+    # the bites, each with its own edge line where it cuts the croissant
+    cuts, edges = [], []
+    bitten = np.zeros(food.shape, bool)
+    for cx, cy, radius in BITES:
+        bitten = bitten | bite_mask(food.shape, cx, cy, radius)
+        cuts.append(paths(bitten & ndi.binary_dilation(food, iterations=int(lw))))
+        edges.append(band(bitten) & food)
+    out["cuts"] = cuts
+    out["bites"] = [paths(e) for e in edges]
+    st["bites"] = edges
+    # the top of the middle of the croissant, where the bites start and the crumbs fly from
+    out["pivots"]["bite"] = list(BITES[0][:2])
+
+
 GREY_SEEDS = [
     (200, 200, 200),
     (76, 76, 76),
@@ -854,7 +955,7 @@ EAT = {
     "face": ["muzzle", "chin", "crumbs"],
     "eyeRows": (430, 510),
     "mouthRows": (460, 780),
-    "extras": croissant_extras({"earL": [334, 324], "earR": [685, 355]}),
+    "extras": eat_extras,
 }
 
 POSES = {"pudding": PUDDING, "hug": HUG, "eat": EAT}
@@ -866,7 +967,11 @@ def main():
     for key, pose in POSES.items():
         out, st = trace(pose)
         pose["extras"](out, st)
-        out["order"] = list(reversed([n for n in pose["front"] if n in out["fills"]]))
+        draw(out, st)
+        # the drawn parts first, as before the extras
+        first = ("size", "lineWidth", "fills", "lines", "eyes", "mouth", "ridges")
+        out = {**{k: out[k] for k in first}, **out}
+        out["order"] =list(reversed([n for n in pose["front"] if n in out["fills"]]))
         if key == "pudding":
             del out["order"]
         results[key] = out
@@ -981,6 +1086,8 @@ def main():
         "box",
         "lineWidth",
         "brush",
+        "cuts",
+        "bites",
     )
     ts = [
         "/* The Purin ram with a croissant: it hugs one, and it eats one (concept poses). Traced from",
