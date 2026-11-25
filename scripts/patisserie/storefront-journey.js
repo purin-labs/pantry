@@ -3,12 +3,14 @@ async (opener) => {
   //
   // A buyer opens the menu that the setup script published: eight financiers,
   // the hotcake financier, five pies, three pastries and seven drinks, with
-  // the prices that Commerce sells them at. The buyer adds two black sesame
+  // the prices that Commerce sells them at and the allergens of each item, as
+  // the footer promises. The buyer adds two black sesame
   // financiers, a steak and pepper pie and a caffè latte, reads the menu in
   // Japanese, and asks for a quote. The latte is made to order: Commerce
   // can quote it only from its recipe's stocked ingredients. Commerce
   // prices the order with 8% tax inside the listed prices; the journey stops
-  // before payment. On a phone the page has no sideways scroll.
+  // before payment. On a phone the page has no sideways scroll, and on a
+  // 320px phone every item name stays on the screen.
   //
   // Run: python3 scripts/patisserie/run-storefront-journey.py
   const SITE = JOURNEY_SITE;
@@ -133,6 +135,13 @@ async (opener) => {
     check(
       "five pies show a cross-section",
       (await page.locator(".patisserie-cross-section").count()) === 5,
+    );
+    const allergenLines = await text(".patisserie-allergens");
+    check(
+      "each item lists its allergens, as the footer says",
+      allergenLines.length === 24 &&
+        allergenLines.every((line) => /^Allergens: \S/u.test(line)),
+      allergenLines,
     );
     await capture("01-menu-desktop");
 
@@ -295,6 +304,20 @@ async (opener) => {
     captures.push("06-pies-phone.png");
     await capturePastries(phone, "06b-pastries-phone");
     await captureSection(phone, "#patisserie-drinks", "06c-drinks-phone");
+
+    // 7. The page keeps "overflow-x: clip", so a name too wide for a small
+    // phone is cut off without a sideways scroll. On a 320px phone every
+    // item name stays on the screen.
+    await phone.setViewportSize({ width: 320, height: 700 });
+    const cutOff = await phone.evaluate(() =>
+      [...document.querySelectorAll(".patisserie-menu :is(h3, h4)")]
+        .filter(
+          (node) => node.getBoundingClientRect().right > window.innerWidth,
+        )
+        .map((node) => node.textContent),
+    );
+    check("every item name fits a 320px screen", cutOff.length === 0, cutOff);
+    await captureSection(phone, "#patisserie-pies", "07-pies-320");
 
     return { result: "passed", checks, captures };
   }

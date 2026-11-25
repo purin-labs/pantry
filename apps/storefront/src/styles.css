@@ -2775,6 +2775,28 @@ main :where(h1, h2, h3)[id] {
     flex: 1 0 auto;
     padding-inline: 1rem;
   }
+  /* A link past the edge of the scrolling row shows as a fade at that
+     edge (patisserie.tsx marks the edges), so the last link is never out
+     of view without a sign. */
+  .patisserie-sections-links[data-more-after] {
+    mask-image: linear-gradient(
+      to right,
+      #000 calc(100% - 2.5rem),
+      transparent
+    );
+  }
+  .patisserie-sections-links[data-more-before] {
+    mask-image: linear-gradient(to right, transparent, #000 2.5rem);
+  }
+  .patisserie-sections-links[data-more-before][data-more-after] {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 2.5rem,
+      #000 calc(100% - 2.5rem),
+      transparent
+    );
+  }
   .patisserie-sections-cart {
     flex: none;
     padding-inline: 1rem;
@@ -2808,6 +2830,14 @@ main :where(h1, h2, h3)[id] {
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
+}
+/* Each item's allergens, under its name or its description. */
+.storefront-patisserie .patisserie-allergens {
+  margin: 0;
+  color: var(--pat-muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  text-wrap: pretty;
 }
 
 /* Flavour chart */
@@ -3282,6 +3312,15 @@ main :where(h1, h2, h3)[id] {
   }
   .patisserie-pie-japanese {
     font-size: 1rem;
+  }
+  /* The pie name shares its row with the photograph, so it scales with
+     its column: "Beef bourguignon" fits a 320px screen. */
+  .patisserie-pie-copy {
+    container-type: inline-size;
+  }
+  .storefront-patisserie .patisserie-pie-copy h3 {
+    font-size: clamp(1.125rem, 12.5cqi, 1.5rem);
+    overflow-wrap: anywhere;
   }
   .patisserie-pie-disc {
     width: 6.25rem;

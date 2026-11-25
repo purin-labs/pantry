@@ -222,6 +222,8 @@ const NO_ALLERGENS: LocalText = { en: "none", ja: "なし" };
 const DAIRY: LocalText = { en: "dairy", ja: "乳" };
 const BEEF: LocalText = { en: "beef", ja: "牛肉" };
 const CHICKEN: LocalText = { en: "chicken", ja: "鶏肉" };
+// The bourguignon braises bacon lardons with the beef (docs/recipes/pies.md).
+const BEEF_AND_PORK: LocalText = { en: "beef, pork", ja: "牛肉・豚肉" };
 
 export const PATISSERIE_PRODUCTS: readonly PatisserieProduct[] = [
   financier(
@@ -240,6 +242,7 @@ export const PATISSERIE_PRODUCTS: readonly PatisserieProduct[] = [
     "ヘーゼルナッツ",
     "Brown butter and roasted hazelnut.",
     "焦がしバターとローストしたヘーゼルナッツ。",
+    { en: "hazelnut", ja: "ヘーゼルナッツ" },
   ),
   financier(
     "financier_maple",
@@ -338,7 +341,7 @@ export const PATISSERIE_PRODUCTS: readonly PatisserieProduct[] = [
       en: "Beef, red wine, mushroom, pearl onion",
       ja: "牛肉、赤ワイン、マッシュルーム、小玉ねぎ",
     },
-    BEEF,
+    BEEF_AND_PORK,
   ),
   pie(
     "pie_curry_chicken",
@@ -483,6 +486,7 @@ type MenuCopy = Readonly<{
   drinks: string;
   madeToOrder: string;
   drinkGroups: Readonly<Record<DrinkGroup, string>>;
+  allergens: string;
   add: string;
   addToOrder: string;
   soldOut: string;
@@ -503,6 +507,7 @@ const MENU_COPY: Readonly<Record<PatisserieLanguage, MenuCopy>> = {
     drinks: "Drinks",
     madeToOrder: "Made to order",
     drinkGroups: { coffee: "Coffee", latte: "Tea and lattes" },
+    allergens: "Allergens",
     add: "Add",
     addToOrder: "Add to order",
     soldOut: "Sold out",
@@ -521,6 +526,7 @@ const MENU_COPY: Readonly<Record<PatisserieLanguage, MenuCopy>> = {
     drinks: "Drinks",
     madeToOrder: "ご注文を受けてからお作りします",
     drinkGroups: { coffee: "コーヒー", latte: "ティーとラテ" },
+    allergens: "アレルギー",
     add: "追加",
     addToOrder: "カートに入れる",
     soldOut: "売り切れ",
@@ -583,6 +589,11 @@ export function PatisserieMenu(props: PatisserieMenuProps): React.ReactNode {
       ),
     }))
     .filter((group) => group.drinks.length > 0);
+  const sectionLinks = useScrollEdges<HTMLDivElement>(
+    [financiers, pies, pastries, drinkGroups].filter(
+      (section) => section.length > 0,
+    ).length,
+  );
   const control = (
     entry: Entry,
     variant: "link" | "pill" | "solid",
@@ -595,12 +606,18 @@ export function PatisserieMenu(props: PatisserieMenuProps): React.ReactNode {
       onDecrease={props.onDecrease}
     />
   );
+  // The footer says that each item lists its allergens, so each one does.
+  const allergens = (entry: Entry): React.ReactNode => (
+    <p className="patisserie-allergens">
+      {`${copy.allergens}: ${entry.product.copy[props.language].allergens}`}
+    </p>
+  );
   return (
     <div className="patisserie-menu">
       {/* The section bar stays at the top of the screen once the masthead
           scrolls away, with the cart at its end. */}
       <nav className="patisserie-sections" aria-label={copy.sections}>
-        <div className="patisserie-sections-links">
+        <div className="patisserie-sections-links" ref={sectionLinks}>
           {financiers.length === 0 ? null : (
             <a href="#patisserie-financiers">Financiers</a>
           )}
@@ -655,6 +672,7 @@ export function PatisserieMenu(props: PatisserieMenuProps): React.ReactNode {
                 <div className="patisserie-chart-copy">
                   <h3>{entry.product.chartName}</h3>
                   <span lang="ja">{entry.product.japaneseName}</span>
+                  {allergens(entry)}
                   <div className="patisserie-price-row">
                     <span className="patisserie-price">{entry.item.price}</span>
                     {control(entry, "link")}
@@ -687,6 +705,7 @@ export function PatisserieMenu(props: PatisserieMenuProps): React.ReactNode {
               financier
             </h2>
             <p>{hotcake.product.copy[props.language].description}</p>
+            {allergens(hotcake)}
             <div className="patisserie-price-row">
               <span className="patisserie-price">{hotcake.item.price}</span>
               {control(hotcake, "solid")}
@@ -725,6 +744,7 @@ export function PatisserieMenu(props: PatisserieMenuProps): React.ReactNode {
               />
               <div className="patisserie-pie-copy">
                 <h3>{entry.product.copy[props.language].title}</h3>
+                {allergens(entry)}
                 <div className="patisserie-price-row">
                   <span className="patisserie-price">{entry.item.price}</span>
                   {control(entry, "pill")}
@@ -762,6 +782,7 @@ export function PatisserieMenu(props: PatisserieMenuProps): React.ReactNode {
                     <span lang="ja">{entry.product.japaneseName}</span>
                   )}
                   <p>{entry.product.copy[props.language].description}</p>
+                  {allergens(entry)}
                   <div className="patisserie-price-row">
                     <span className="patisserie-price">{entry.item.price}</span>
                     {control(entry, "pill")}
@@ -806,6 +827,7 @@ export function PatisserieMenu(props: PatisserieMenuProps): React.ReactNode {
                           <span lang="ja">{entry.product.japaneseName}</span>
                         )}
                         <p>{entry.product.copy[props.language].description}</p>
+                        {allergens(entry)}
                       </div>
                       <div className="patisserie-price-row">
                         <span className="patisserie-price">
@@ -823,6 +845,37 @@ export function PatisserieMenu(props: PatisserieMenuProps): React.ReactNode {
       )}
     </div>
   );
+}
+
+/**
+ * Marks a scrolling row with `data-more-before` and `data-more-after` while
+ * content lies past that edge. On a phone the section links scroll under the
+ * cart button, and the stylesheet fades each marked edge, so a link that is
+ * out of view still shows that it is there. `itemCount` re-measures the row
+ * when a section appears or goes.
+ */
+function useScrollEdges<T extends HTMLElement>(
+  itemCount: number,
+): React.RefObject<T | null> {
+  const row = React.useRef<T>(null);
+  React.useEffect(() => {
+    const element = row.current;
+    if (element === null) return;
+    const mark = (): void => {
+      const end = element.scrollWidth - element.clientWidth;
+      element.toggleAttribute("data-more-before", element.scrollLeft > 1);
+      element.toggleAttribute("data-more-after", element.scrollLeft < end - 1);
+    };
+    mark();
+    element.addEventListener("scroll", mark, { passive: true });
+    const resize = new ResizeObserver(mark);
+    resize.observe(element);
+    return () => {
+      element.removeEventListener("scroll", mark);
+      resize.disconnect();
+    };
+  }, [itemCount]);
+  return row;
 }
 
 function PatisserieAddControl(
