@@ -2,8 +2,8 @@
   "bucket": "pantry-repo-binaries-apac",
   "files": {
     "docs/brand/storyboard-deck/seams_storyboard_deck.pdf": {
-      "sha256": "7eecfb3addd6d7de5b877fe5f14364259ff04e264fd5a18d0a7c4e7fcace4e94",
-      "bytes": 5977949
+      "sha256": "ab7a90fa084080b09b390e90a1adb764d0c067e2e3cf003f7d90910e84dcc51a",
+      "bytes": 5977952
     },
     "docs/evidence/experiment-1/sdk-adoption/actor-recovery-results.json": {
       "sha256": "2b6ae00ad78cc05e7fe084cbdab396cb08f0ab85d7bf94dae8670c12567a2ab4",
