@@ -21,7 +21,7 @@ import {
 import type { CredentialActionOutcome, IntegrationsPageActions, PendingProviderAuthorization, SettingsMutationFeedback } from "./settings-types";
 import type { IntegrationAccount } from "@purin-labs/control-api/portal/settings";
 import { ConfirmButton } from "./workspace";
-import { RemoveConfirm } from "@purin-labs/ui/index";
+import { ConfirmInPlace } from "@purin-labs/ui/index";
 
 type IntegrationAccountControls = {
   readonly mutations: MutationLedger;
@@ -429,7 +429,7 @@ export function integrationAccountCommands(
   // sign-in or key and erases what the account held, so a softer
   // "Disconnect" beside it would only leave a second, weaker way out.
   const remove = (
-    <RemoveConfirm
+    <ConfirmInPlace
       key="remove"
       label={subject === null ? `Remove ${accountNoun(account)}…` : `Remove ${subject}…`}
       question={`Remove ${subject ?? account.displayName}?`}

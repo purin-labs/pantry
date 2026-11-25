@@ -214,50 +214,13 @@
   text-decoration: underline;
 }
 
-.devices-drawer {
-  inset: 0 0 0 auto;
-  width: 460px;
-  max-width: 100%;
-  height: 100dvh;
-  max-height: none;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  color: var(--ink);
-  background: var(--paper);
-  box-shadow: var(--pantry-shadow-card);
-}
-
-.devices-drawer::backdrop {
-  background: color-mix(in oklch, var(--pantry-shadow-color) 28%, transparent);
-}
-
+/* The drawer is the shared SideDrawer, a little wider for the facts. */
 .devices-drawer[open] {
-  animation: devices-drawer-in var(--pantry-spring-smooth-duration)
-    var(--pantry-spring-smooth-ease);
-}
-
-@keyframes devices-drawer-in {
-  from {
-    transform: translateX(32px);
-    opacity: 0;
-  }
-}
-
-.devices-drawer-body {
-  display: grid;
-  align-content: start;
-  gap: 16px;
-  min-height: 100%;
-  padding: 24px;
-}
-
-.devices-drawer-body h2 {
-  overflow-wrap: anywhere;
+  inline-size: min(460px, 100vw);
 }
 
 .devices-drawer-kind {
-  margin: -12px 0 0;
+  margin: -8px 0 0;
   color: var(--pantry-ink-subtle);
 }
 
@@ -300,16 +263,6 @@
     grid-template-columns: minmax(0, 1fr);
     gap: 4px;
   }
-
-  .devices-drawer-body {
-    padding: 16px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .devices-drawer[open] {
-    animation: none;
-  }
 }
 
 .devices-head {
@@ -342,11 +295,6 @@
   font-size: 13px;
 }
 
-.devices-work-line {
-  margin: 0;
-  font-weight: 500;
-}
-
 .devices-state[data-tone="busy"] {
   color: var(--pantry-info-text);
 }
@@ -359,7 +307,13 @@
 .devices-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
+}
+
+/* An open question takes the full row, under the other buttons. */
+.devices-actions > .pantry-confirm {
+  flex-basis: 100%;
 }
 
 .devices-panel {
@@ -383,54 +337,55 @@
   gap: 12px;
 }
 
-.devices-fold {
-  padding-top: 12px;
+/* A flat part of the drawer, under a thin line. Nothing folds. */
+.devices-section {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-top: 14px;
   border-top: 1px solid var(--pantry-border);
 }
 
-.devices-fold summary,
-.devices-fold-title {
+.devices-section h3 {
   margin: 0;
+  font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
 }
 
-.devices-fold ul {
+.devices-section ul {
   display: grid;
   gap: 8px;
-  margin: 8px 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.devices-fold li {
+.devices-section li {
   display: flex;
   gap: 12px;
 }
 
-.devices-fold p {
-  margin: 8px 0 0;
+.devices-section p {
+  margin: 0;
   color: var(--ink-2);
 }
 
-.devices-snapshot-confirm {
-  margin-top: 8px;
+.devices-section .devices-panel-actions {
+  justify-content: flex-start;
 }
 
-.devices-snapshot-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 16px;
-  margin-top: 8px;
+.devices-field-hint {
+  color: var(--pantry-ink-subtle);
+  font-size: 12px;
+  font-weight: 400;
 }
 
-.devices-fold .devices-snapshots {
+.devices-section .devices-snapshots {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
-.devices-fold .devices-snapshots li {
+.devices-section .devices-snapshots li {
   display: grid;
   align-content: start;
   gap: 4px;

@@ -130,17 +130,19 @@ raw `<button>` the same look. They stay for the pages that do not use `Button`
 yet. Do not use them in new code. A toggle in a segmented control, an icon
 button and a row that opens a record are not a `Button`.
 
-### Remove with a confirm in place
+### Confirm in place
 
-`RemoveConfirm` (`remove-confirm.tsx`) is the one action that removes or cuts
-something off: an account, a connector, a grant. The first press replaces the
-button with the question, the consequence and two buttons, in place. Only the
-second press runs `onConfirm`. No dialog opens over the page or the drawer.
-`data` gives the confirm button `data-*` attributes, for a page action that
-reads its record from the button.
+`ConfirmInPlace` (`confirm-in-place.tsx`) is an action that must be checked
+before it runs: a remove of an account, a connector or a grant, or a resume
+after a pause. The first press replaces the button with the question, the
+consequence and two buttons, in place. Only the second press runs
+`onConfirm`. No dialog opens over the page or the drawer. `variant` is
+`danger` by default; use `primary` or `secondary` for an action that removes
+nothing. `data` gives the confirm button `data-*` attributes, for a page
+action that reads its record from the button.
 
 ```tsx
-<RemoveConfirm
+<ConfirmInPlace
   label="Remove this Stripe account…"
   question="Remove Purin Café?"
   consequence="Purin Pantry stops using it at once and deletes its access."

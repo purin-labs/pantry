@@ -19,7 +19,7 @@ import { Link } from "react-router";
 
 import { providerLabel, providerTile } from "@purin-labs/area-integrations-contract/ui/integration-catalogue";
 import { ProviderTile } from "@purin-labs/ui/page-components";
-import { RemoveConfirm, SideDrawer } from "@purin-labs/ui/index";
+import { ConfirmInPlace, SideDrawer } from "@purin-labs/ui/index";
 import type {
   AccessControlGrantView,
   AccessControlSubjectView,
@@ -512,7 +512,7 @@ function renderPermission(
           <small>{permissionDetail(grant)}</small>
         </span>
         {onRevoke !== null && grant.actions.kind === "revoke_grant" ? (
-          <RemoveConfirm
+          <ConfirmInPlace
             label="Remove…"
             question={`Remove ${grant.capability.label} for ${grant.subject.label}?`}
             consequence={`${grant.subject.label} loses it at once. Give the access again to restore it.`}

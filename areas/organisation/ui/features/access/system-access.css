@@ -56,7 +56,7 @@
 .access35-system-drawer .access35-permission {
   flex-wrap: wrap;
 }
-.access35-system-drawer .access35-permission > .pantry-remove-confirm {
+.access35-system-drawer .access35-permission > .pantry-confirm {
   flex-basis: 100%;
 }
 .access35-system-drawer .access35-permission button.pantry-button {
