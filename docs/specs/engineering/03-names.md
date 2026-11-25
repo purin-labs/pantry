@@ -238,9 +238,8 @@ privacy page `https://pantry.purin.io/docs/privacy` and the terms page
   `scripts/check-release-target.mjs`. It refuses a name that is not a production name in
   `WORKER_NAMES`, so it also refuses a local name such as `pantry-model-exit-local`. It
   refuses a `workers_dev` or `preview_urls` value other than `false`, also a missing
-  key. It refuses a route other than the custom domain in `WORKER_DOMAINS` and the zone
-  routes in `WORKER_ZONE_ROUTES` (the shop's `*.menu.purin.io/*`). It does not check a D1
-  or KV id.
+  key. It refuses a route other than the custom domains in `WORKER_DOMAINS` (the shop
+  has two: `shop.purin.io` and `menu.purin.io`). It does not check a D1 or KV id.
 - **No new resources.** `run-worker.mjs` and `side-worker.mjs` deploy with
   `--experimental-provision=false`, so Wrangler cannot create a missing D1, KV or R2
   resource. `run-worker.mjs` also refuses resource creation options and target overrides.
@@ -309,8 +308,8 @@ above says. An open Portal tab of the release before must reload.
 **The commerce engine in Portal text:** `areas/organisation/ui/pages/automation.tsx` and
 `areas/commerce/ui/features/commerce/production-plan.tsx` show these words to people.
 
-**Domains:** The QR order pages are at `<shop name>.menu.purin.io`; the wildcard DNS
-record, its certificate and the release of the route are not done. The local `PANTRY_PROVIDER_INGRESS_ORIGIN` is still the
+**Domains:** The QR order pages are at `menu.purin.io/<shop name>/`; the release of
+that custom domain is not done. The local `PANTRY_PROVIDER_INGRESS_ORIGIN` is still the
 Square sandbox tunnel `square-sandbox-webhook.seams.sh`. The shop site is `shop.purin.io`.
 
 ## Sources

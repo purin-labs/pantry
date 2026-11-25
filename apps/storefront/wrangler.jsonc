@@ -1,13 +1,11 @@
 {
   // The standalone demo shop on Commerce (Plan 40B, decision 8), and the
-  // QR order pages at `<shop name>.<MENU_HOST_SUFFIX>` (Plan 40B phase 2).
+  // QR order pages at `<MENU_HOST>/<shop name>/` (Plan 40B phase 2).
   // Deploy with `pnpm --filter @purin-labs/storefront deploy:shop`, with
   // VITE_SHOP_MERCHANT_ID set to the merchant of the shop.
-  // The order pages are at `<shop name>.menu.purin.io`. The wildcard route
-  // needs a proxied wildcard DNS record `*.menu.purin.io` and a certificate
-  // that covers `*.menu.purin.io`; the release guard
-  // (`WORKER_ZONE_ROUTES` in scripts/worker-environment.mjs) allows this
-  // route only.
+  // Both addresses are custom domains, so Cloudflare makes their DNS records
+  // and certificates; the release guard (`WORKER_DOMAINS` in
+  // scripts/worker-environment.mjs) allows these two routes only.
   "$schema": "../../services/commerce/node_modules/wrangler/config-schema.json",
   "name": "purin-shop",
   "main": "worker/index.ts",
@@ -24,10 +22,10 @@
     "run_worker_first": true,
   },
   "services": [{ "binding": "COMMERCE", "service": "pantry-commerce" }],
-  "vars": { "MENU_HOST_SUFFIX": "menu.purin.io" },
+  "vars": { "MENU_HOST": "menu.purin.io" },
   "routes": [
     { "pattern": "shop.purin.io", "custom_domain": true },
-    { "pattern": "*.menu.purin.io/*", "zone_name": "purin.io" },
+    { "pattern": "menu.purin.io", "custom_domain": true },
   ],
   "workers_dev": false,
   "preview_urls": false,

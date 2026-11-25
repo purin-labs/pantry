@@ -12,8 +12,7 @@ export type ReleaseTargetConfig = {
 export declare const WORKER_NAMES: Readonly<
   Record<string, Readonly<{ local?: string; production: string }>>
 >;
-export declare const WORKER_DOMAINS: Readonly<Record<string, string>>;
-export declare const WORKER_ZONE_ROUTES: Readonly<
+export declare const WORKER_DOMAINS: Readonly<
   Record<string, readonly string[]>
 >;
 export declare function releaseTargetProblems(

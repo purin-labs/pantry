@@ -40,25 +40,17 @@ export const WORKER_NAMES = {
 };
 
 /**
- * The one address of each public Worker: a custom domain on purin.io. A
- * production Worker has no workers.dev address and no preview address.
+ * The addresses of each public Worker: custom domains on purin.io. A
+ * production Worker has no other route, no workers.dev address and no
+ * preview address. The shop serves its site at shop.purin.io and the QR
+ * order pages at `menu.purin.io/<shop name>/`.
  */
 export const WORKER_DOMAINS = {
-  pantry: "pantry.purin.io",
-  "pantry-commerce": "commerce.pantry.purin.io",
-  "pantry-slack-ingress": "slack.pantry.purin.io",
-  "pantry-docs": "docs.pantry.purin.io",
-  "purin-shop": "shop.purin.io",
-};
-
-/**
- * The zone routes that a Worker has beside its custom domain. The shop
- * serves the QR order pages at `<shop name>.menu.purin.io`: one wildcard
- * route, which needs a proxied wildcard DNS record and a certificate that
- * covers the wildcard.
- */
-export const WORKER_ZONE_ROUTES = {
-  "purin-shop": ["*.menu.purin.io/* (zone purin.io)"],
+  pantry: ["pantry.purin.io"],
+  "pantry-commerce": ["commerce.pantry.purin.io"],
+  "pantry-slack-ingress": ["slack.pantry.purin.io"],
+  "pantry-docs": ["docs.pantry.purin.io"],
+  "purin-shop": ["shop.purin.io", "menu.purin.io"],
 };
 
 const PRODUCTION_WORKER_NAMES = new Set(
@@ -72,12 +64,10 @@ export function releaseTargetProblems(config) {
     problems.push(`the Worker name ${config.name} is not a Pantry Worker`);
   if (config.workers_dev !== false) problems.push("a workers.dev address");
   if (config.preview_urls !== false) problems.push("preview addresses");
-  const domain = WORKER_DOMAINS[config.name];
   const routes = (config.routes ?? []).map(routeTarget);
-  const expected = [
-    ...(domain === undefined ? [] : [`${domain} (custom domain)`]),
-    ...(WORKER_ZONE_ROUTES[config.name] ?? []),
-  ];
+  const expected = (WORKER_DOMAINS[config.name] ?? []).map(
+    (domain) => `${domain} (custom domain)`,
+  );
   if (!sameValue(routes, expected))
     problems.push(
       `routes other than ${expected.length === 0 ? "none" : expected.join(", ")}`,

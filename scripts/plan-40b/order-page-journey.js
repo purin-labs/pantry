@@ -1,8 +1,8 @@
 async (opener) => {
   // Plan 40B phase 2: two QR order pages on one shop Worker.
   //
-  // nuki-cafe.menu.localhost is the café demo merchant; petit-four is a
-  // second merchant with the pâtisserie menu. Each page shows its own shop's
+  // menu.localhost/nuki-cafe/ is the café demo merchant; /petit-four/ is a
+  // second merchant with the pâtisserie menu, on the same origin. Each page shows its own shop's
   // published menu, in the menu's own sections, and none of the demo copy.
   // A buyer adds two items on the café page and asks for a quote; Commerce
   // prices it, and the journey stops before payment. The second page never

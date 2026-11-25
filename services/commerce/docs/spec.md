@@ -271,7 +271,8 @@ Rules:
    session made before a storefront change is refused.
 3. A shop name has 3 to 30 lowercase letters, digits and single hyphens. It
    starts with a letter and ends with a letter or a digit. Names of the
-   services themselves, such as `www`, `api` and `menu`, are reserved.
+   services themselves, such as `www`, `api` and `menu`, and the folders of the
+   order page site, `assets`, `products` and `health`, are reserved.
 4. One object holds each name, so one name has one storefront. A name never
    leaves its storefront: after a change, an earlier name opens the same
    storefront with `current: false` and names the current one, so a printed

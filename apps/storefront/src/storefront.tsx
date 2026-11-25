@@ -53,6 +53,12 @@ import {
   CheckoutSkeleton,
   PatisserieMenuSkeleton,
 } from "./skeletons.tsx";
+import {
+  checkoutStorageKey,
+  kioskStorageKey,
+  orderStatusStorageKey,
+  type StorageShop,
+} from "./shop-storage.ts";
 
 type ProviderUiError = Readonly<{ message?: string }>;
 
@@ -830,7 +836,7 @@ const CAFE_PRODUCT_COPY: Readonly<
 
 /**
  * A café storefront. The Nuki Café demo is the showcase, with its own name
- * and menu art. A QR order page (`<shop name>.menu.<domain>`, or
+ * and menu art. A QR order page (`menu.<domain>/<shop name>/`, or
  * `/shops/<merchantId>`) shows the shop's published menu under the name
  * that its checkout profile presents.
  */
@@ -1153,13 +1159,13 @@ type BuyerFulfillment = CommerceBuyerCatalogV1["storefront"]["fulfillment"];
 /**
  * The shop of a page. `orderPageMeta` is the content of the
  * `commerce-shop` meta tag, which the shop Worker adds to an order page
- * after it looks up the host's shop name.
+ * after it looks up the shop name in the page's path.
  */
 export function storefrontConfiguration(
   pathname: string,
   orderPageMeta: string | null = null,
 ): StorefrontConfiguration {
-  // An order page host names its storefront; the path cannot open another.
+  // An order page names its storefront; the path cannot open another.
   const orderPage = orderPageShop(orderPageMeta);
   if (orderPage !== undefined)
     return shopConfiguration(
@@ -1249,7 +1255,7 @@ export class StorefrontApp extends React.Component<
         ? cafeInterfaceCopy(this.#cafeLanguage).htmlLanguage
         : "en";
     this.#kioskMode = readKioskMode(
-      this.props.config.storefrontId,
+      this.props.config,
       window.location,
     );
     window.addEventListener("hashchange", this.handleHashChange);
@@ -1327,7 +1333,7 @@ export class StorefrontApp extends React.Component<
       recovery === undefined &&
       locationHasOrderAccessIntent(window.location)
     ) {
-      clearOrderStatusUrl(config.storefrontId);
+      clearOrderStatusUrl(config);
       this.setState({
         kind: "failed",
         failure: {
@@ -1350,7 +1356,7 @@ export class StorefrontApp extends React.Component<
       );
       if (!order.ok) {
         if (isTerminalOrderAccessError(order.error)) {
-          clearOrderStatusUrl(config.storefrontId);
+          clearOrderStatusUrl(config);
           this.setState({
             kind: "failed",
             failure: {
@@ -1374,7 +1380,7 @@ export class StorefrontApp extends React.Component<
         return;
       }
       if (order.value.fulfillment !== configurationFulfillment(config)) {
-        clearOrderStatusUrl(config.storefrontId);
+        clearOrderStatusUrl(config);
         this.setState({
           kind: "failed",
           failure: {
@@ -1388,7 +1394,7 @@ export class StorefrontApp extends React.Component<
         });
         return;
       }
-      saveOrderStatusUrl(config.storefrontId, recovery.returnUrl);
+      saveOrderStatusUrl(config, recovery.returnUrl);
       this.showOrder(recovery, order.value);
       return;
     }
@@ -1565,7 +1571,7 @@ export class StorefrontApp extends React.Component<
     );
     if (!catalog.ok) {
       if (isUnavailableBuyerSession(catalog.error)) {
-        clearStoredCheckoutContext(config.storefrontId);
+        clearStoredCheckoutContext(config);
         return { kind: "new_session" };
       }
       return { kind: "failed", message: buyerClientError(catalog.error) };
@@ -1574,7 +1580,7 @@ export class StorefrontApp extends React.Component<
       catalog.value.storefront.storefrontId !== config.storefrontId ||
       catalog.value.storefront.fulfillment !== configurationFulfillment(config)
     ) {
-      clearStoredCheckoutContext(config.storefrontId);
+      clearStoredCheckoutContext(config);
       return { kind: "new_session" };
     }
     if (
@@ -1606,7 +1612,7 @@ export class StorefrontApp extends React.Component<
         stored.session.token,
       );
       if (!recoveredCart.ok && isUnavailableBuyerSession(recoveredCart.error)) {
-        clearStoredCheckoutContext(config.storefrontId);
+        clearStoredCheckoutContext(config);
         return { kind: "new_session" };
       }
       if (!recoveredCart.ok && !isMissingBuyerCart(recoveredCart.error)) {
@@ -1625,7 +1631,7 @@ export class StorefrontApp extends React.Component<
             stored.cart.revision,
           );
           if (submitted === undefined) {
-            clearStoredCheckoutContext(config.storefrontId);
+            clearStoredCheckoutContext(config);
             return { kind: "new_session" };
           }
           return this.recoverSubmittedCheckout(
@@ -1678,14 +1684,14 @@ export class StorefrontApp extends React.Component<
         isUnavailableBuyerSession(checkout.error) ||
         isMissingBuyerCheckout(checkout.error)
       ) {
-        clearStoredCheckoutContext(config.storefrontId);
+        clearStoredCheckoutContext(config);
         return { kind: "new_session" };
       }
       return { kind: "failed", message: buyerClientError(checkout.error) };
     }
     const quote = checkout.value.checkout;
     if (quote.checkoutId !== cart.checkoutId) {
-      clearStoredCheckoutContext(config.storefrontId);
+      clearStoredCheckoutContext(config);
       return { kind: "new_session" };
     }
     const context: BuyerContext = {
@@ -1706,7 +1712,7 @@ export class StorefrontApp extends React.Component<
       (config.kind === "shipping" &&
         quote.schemaVersion !== "commerce.buyer-quoted-shipping-checkout.v1")
     ) {
-      clearStoredCheckoutContext(config.storefrontId);
+      clearStoredCheckoutContext(config);
       return { kind: "new_session" };
     }
     saveStoredCheckoutContext(config, context);
@@ -2129,7 +2135,7 @@ export class StorefrontApp extends React.Component<
   };
 
   returnToStore = (): void => {
-    clearOrderStatusUrl(this.props.config.storefrontId);
+    clearOrderStatusUrl(this.props.config);
     window.history.replaceState(
       null,
       "",
@@ -3069,8 +3075,8 @@ export class StorefrontApp extends React.Component<
       return;
     }
     window.history.replaceState(null, "", access.returnUrl);
-    saveOrderStatusUrl(config.storefrontId, access.returnUrl);
-    clearStoredCheckoutContext(config.storefrontId);
+    saveOrderStatusUrl(config, access.returnUrl);
+    clearStoredCheckoutContext(config);
     this.showOrder(access, result.value);
   }
 
@@ -3142,7 +3148,7 @@ export class StorefrontApp extends React.Component<
     if (this.state.kind !== "pickup_order" || this.props.config.kind !== "cafe")
       return;
     this.cancelPoll();
-    clearOrderStatusUrl(this.props.config.storefrontId);
+    clearOrderStatusUrl(this.props.config);
     window.history.replaceState(null, "", window.location.pathname);
     void this.bootstrap();
   };
@@ -3267,11 +3273,12 @@ export class StorefrontApp extends React.Component<
       this.props.config.presentation === "menu";
     // The cart drawer belongs to the menu; a checkout or an order closes it.
     if (this.state.kind !== "catalog") this.#cartOpen = false;
-    const homeHref =
-      patisserie || orderPage
-        ? window.location.pathname.startsWith("/shops/")
-          ? window.location.pathname
-          : "/"
+    // An order page (`menu.<domain>/<shop name>/` or `/shops/<merchantId>`)
+    // links to its own path.
+    const homeHref = orderPage
+      ? window.location.pathname
+      : patisserie
+        ? "/"
         : this.props.config.kind === "cafe"
           ? "/store/cafe"
           : "/store/shipping";
@@ -3382,7 +3389,7 @@ export class StorefrontApp extends React.Component<
     if (current.kind === "pickup_order" || current.kind === "shipping_order") {
       return current.access.returnUrl;
     }
-    return readOrderStatusUrl(this.props.config.storefrontId);
+    return readOrderStatusUrl(this.props.config);
   }
 
   renderState(): React.ReactNode {
@@ -7670,10 +7677,6 @@ function normalizedText(value: string | null): string | undefined {
     : value;
 }
 
-function orderStatusStorageKey(storefrontId: string): string {
-  return `pantry.order-status.${storefrontId}`;
-}
-
 const ORDER_QR_SVG_CACHE = new Map<string, string>();
 
 function orderQrSvg(url: string): string {
@@ -7981,17 +7984,13 @@ type StoredShippingBasket = Readonly<{
   address: ShippingAddressDraft;
 }>;
 
-function checkoutStorageKey(storefrontId: string): string {
-  return `pantry.checkout.${storefrontId}`;
-}
-
 function saveStoredCheckoutContext(
   config: StorefrontConfiguration,
   context: BuyerContext,
 ): void {
   try {
     window.sessionStorage.setItem(
-      checkoutStorageKey(config.storefrontId),
+      checkoutStorageKey(config),
       JSON.stringify({
         schemaVersion: "pantry.storefront-checkout-session.v7",
         merchantId: config.merchantId,
@@ -8048,9 +8047,9 @@ function storedBasket(
   };
 }
 
-function clearStoredCheckoutContext(storefrontId: string): void {
+function clearStoredCheckoutContext(shop: StorageShop): void {
   try {
-    window.sessionStorage.removeItem(checkoutStorageKey(storefrontId));
+    window.sessionStorage.removeItem(checkoutStorageKey(shop));
   } catch {
     // Nothing to clear when storage is unavailable.
   }
@@ -8061,15 +8060,15 @@ function readStoredCheckoutRecovery(
 ): StoredCheckoutRecovery | undefined {
   try {
     const raw = window.sessionStorage.getItem(
-      checkoutStorageKey(config.storefrontId),
+      checkoutStorageKey(config),
     );
     if (raw === null) return undefined;
     const parsed = parseStoredCheckoutRecovery(JSON.parse(raw), config);
     if (parsed !== undefined) return parsed;
-    clearStoredCheckoutContext(config.storefrontId);
+    clearStoredCheckoutContext(config);
     return undefined;
   } catch {
-    clearStoredCheckoutContext(config.storefrontId);
+    clearStoredCheckoutContext(config);
     return undefined;
   }
 }
@@ -8398,22 +8397,18 @@ function recordHasKey(keys: readonly string[], field: string): boolean {
   return keys.includes(field);
 }
 
-function kioskStorageKey(storefrontId: string): string {
-  return `pantry.kiosk.${storefrontId}`;
-}
-
-function readKioskMode(storefrontId: string, location: Location): boolean {
+function readKioskMode(shop: StorageShop, location: Location): boolean {
   const requested = new URLSearchParams(location.search).get("kiosk");
   try {
     if (requested === "1") {
-      window.localStorage.setItem(kioskStorageKey(storefrontId), "1");
+      window.localStorage.setItem(kioskStorageKey(shop), "1");
       return true;
     }
     if (requested === "0") {
-      window.localStorage.removeItem(kioskStorageKey(storefrontId));
+      window.localStorage.removeItem(kioskStorageKey(shop));
       return false;
     }
-    return window.localStorage.getItem(kioskStorageKey(storefrontId)) === "1";
+    return window.localStorage.getItem(kioskStorageKey(shop)) === "1";
   } catch {
     return requested === "1";
   }
@@ -8448,18 +8443,18 @@ function saveCafeLanguage(language: CafeLanguage): void {
   }
 }
 
-function saveOrderStatusUrl(storefrontId: string, returnUrl: string): void {
+function saveOrderStatusUrl(shop: StorageShop, returnUrl: string): void {
   try {
-    window.localStorage.setItem(orderStatusStorageKey(storefrontId), returnUrl);
+    window.localStorage.setItem(orderStatusStorageKey(shop), returnUrl);
   } catch {
     // The return URL remains usable when browser storage is unavailable.
   }
 }
 
-function readOrderStatusUrl(storefrontId: string): string | undefined {
+function readOrderStatusUrl(shop: StorageShop): string | undefined {
   try {
     const stored = normalizedText(
-      window.localStorage.getItem(orderStatusStorageKey(storefrontId)),
+      window.localStorage.getItem(orderStatusStorageKey(shop)),
     );
     if (stored === undefined) return undefined;
     const url = new URL(stored);
@@ -8471,17 +8466,17 @@ function readOrderStatusUrl(storefrontId: string): string | undefined {
     ) {
       return access.returnUrl;
     }
-    clearOrderStatusUrl(storefrontId);
+    clearOrderStatusUrl(shop);
     return undefined;
   } catch {
-    clearOrderStatusUrl(storefrontId);
+    clearOrderStatusUrl(shop);
     return undefined;
   }
 }
 
-function clearOrderStatusUrl(storefrontId: string): void {
+function clearOrderStatusUrl(shop: StorageShop): void {
   try {
-    window.localStorage.removeItem(orderStatusStorageKey(storefrontId));
+    window.localStorage.removeItem(orderStatusStorageKey(shop));
   } catch {
     // The URL fragment is still cleared when browser storage is unavailable.
   }

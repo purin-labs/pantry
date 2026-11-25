@@ -201,8 +201,8 @@ async function menuBoardScreenJourney({ task }: TestContext): Promise<void> {
   });
   expect(named.status, JSON.stringify(named.body)).toBe(200);
   expect(named.body).toMatchObject({
-    shopName: { name: "nuki-board", suffix: ".menu.test" },
-    shopUrl: "https://nuki-board.menu.test/",
+    shopName: { name: "nuki-board", prefix: "https://menu.test/", suffix: "" },
+    shopUrl: "https://menu.test/nuki-board/",
   });
 
   // 2. Staff make a drinks board from the three-column layout. A viewer may
@@ -423,7 +423,7 @@ async function menuBoardScreenJourney({ task }: TestContext): Promise<void> {
     },
   ]);
   // The board's QR code opens the shop's order page under its new name.
-  expect(first.facts?.orderUrl).toBe("https://nuki-board.menu.test/");
+  expect(first.facts?.orderUrl).toBe("https://menu.test/nuki-board/");
   expect(availability(first, "Taro Milk Tea")).toEqual({
     availability: "available",
     price: { amountMinor: 700, currency: "JPY" },

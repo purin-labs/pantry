@@ -1,14 +1,14 @@
-"""Run the Plan 40B phase 2 journey: QR order pages at <name>.menu.<domain>.
+"""Run the Plan 40B phase 2 journey: QR order pages at menu.<domain>/<name>/.
 
 The runner starts a local Commerce with fresh storage and seeds two shops:
 the Nuki café demo merchant and a second café merchant with the pâtisserie
 menu. It gives each storefront a shop name through Commerce's admin API
 and checks the refusals (a taken name, a reserved name, a name of the wrong
 form). Then it builds the storefront, runs the shop Worker with wrangler dev
-(`menu.localhost` as the order page domain, Commerce through a service
-binding), and checks each host over HTTP: the right shop for each name, 404
-for an unknown name, a redirect from an earlier name, and no Commerce route
-of another shop. Last, it drives both order pages in Chromium with the
+(`menu.localhost` as the order page host, Commerce through a service
+binding), and checks each path over HTTP: the right shop for each name, 404
+for an unknown or reserved name, a redirect from an earlier name, and no
+Commerce route other than a storefront's buyer routes. Last, it drives both order pages in Chromium with the
 Playwright CLI. Results and screenshots go to output/playwright/plan-40b-order-page.
 """
 
@@ -33,7 +33,7 @@ ROOT = Path(__file__).resolve().parents[2]
 COMMERCE = ROOT / "services/commerce"
 STOREFRONT = ROOT / "apps/storefront"
 ARTIFACTS = ROOT / "output/playwright/plan-40b-order-page"
-SUFFIX = "menu.localhost"
+MENU_HOST = "menu.localhost"
 CAFE = "merchant_nuki_cafe_demo"
 PATISSERIE = "merchant_order_page_patisserie"
 STOREFRONT_ID = "storefront_cafe"
@@ -243,7 +243,7 @@ def run_journey(
                     "not_found_handling": "single-page-application",
                     "run_worker_first": True,
                 },
-                "vars": {"MENU_HOST_SUFFIX": SUFFIX},
+                "vars": {"MENU_HOST": MENU_HOST},
                 "services": [{"binding": "COMMERCE", "service": commerce_name}],
             }
         )
@@ -264,10 +264,10 @@ def run_journey(
     session = "order-page-" + run_id
     opened = False
     try:
-        wait_ready(f"http://127.0.0.1:{shop_port}/health", shop, f"nuki-cafe.{SUFFIX}")
+        wait_ready(f"http://127.0.0.1:{shop_port}/health", shop, MENU_HOST)
         http_checks(checks, shop_port)
-        cafe_site = f"http://nuki-cafe.{SUFFIX}:{shop_port}/"
-        patisserie_site = f"http://petit-four.{SUFFIX}:{shop_port}/"
+        cafe_site = f"http://{MENU_HOST}:{shop_port}/nuki-cafe/"
+        patisserie_site = f"http://{MENU_HOST}:{shop_port}/petit-four/"
         run_cli(cli, session, ["open", cafe_site], "open")
         opened = True
         journey = (ROOT / "scripts/plan-40b/order-page-journey.js").read_text()
@@ -281,7 +281,7 @@ def run_journey(
             raise RuntimeError("The browser journey did not pass")
         evidence = {
             "backend": "local Commerce Worker with its own storage",
-            "site": "the shop Worker under wrangler dev, order page domain menu.localhost",
+            "site": "the shop Worker under wrangler dev, order page host menu.localhost",
             "shops": {
                 "nuki-cafe": CAFE,
                 "petit-four": PATISSERIE,
@@ -308,50 +308,58 @@ def run_journey(
 
 
 def http_checks(checks: Checks, port: int) -> None:
-    status, _, body = get(port, f"nuki-cafe.{SUFFIX}", "/")
+    status, _, body = get(port, MENU_HOST, "/nuki-cafe/")
     meta = shop_meta(body)
     checks.check(
-        "nuki-cafe opens the café's storefront",
+        "/nuki-cafe/ opens the café's storefront",
         status == 200 and meta == {"name": "nuki-cafe", "merchantId": CAFE, "storefrontId": STOREFRONT_ID},
         {"status": status, "meta": meta},
     )
-    status, _, body = get(port, f"petit-four.{SUFFIX}", "/shops/" + CAFE)
+    status, _, body = get(port, MENU_HOST, "/petit-four/")
     meta = shop_meta(body)
     checks.check(
-        "petit-four opens the second shop, also on a path that names the café",
+        "/petit-four/ opens the second shop",
         status == 200 and meta == {"name": "petit-four", "merchantId": PATISSERIE, "storefrontId": STOREFRONT_ID},
         {"status": status, "meta": meta},
     )
-    status, headers, _ = get(port, f"nuki.{SUFFIX}", "/?table=4")
-    checks.check(
-        "the earlier name nuki moves to nuki-cafe and keeps the path",
-        status == 301 and headers.get("location", "").startswith(f"http://nuki-cafe.{SUFFIX}") and headers.get("location", "").endswith("/?table=4"),
-        {"status": status, "location": headers.get("location")},
-    )
-    for host in (f"nobody.{SUFFIX}", f"www.{SUFFIX}", f"a.b.{SUFFIX}"):
-        status, headers, body = get(port, host, "/")
+    for path, target in (
+        ("/nuki/?table=4", "/nuki-cafe/?table=4"),
+        ("/Nuki-Cafe/?table=4", "/nuki-cafe/?table=4"),
+        ("/nuki-cafe?table=4", "/nuki-cafe/?table=4"),
+        ("/petit-four/shops/" + CAFE, "/petit-four/"),
+    ):
+        status, headers, _ = get(port, MENU_HOST, path)
+        location = headers.get("location", "")
         checks.check(
-            f"{host} answers 404 with no shop",
+            f"{path} moves to {target}",
+            status == 301 and location.endswith(f"{MENU_HOST}{target}"),
+            {"status": status, "location": location},
+        )
+    for path in ("/", "/nobody/", "/www/", "/shops/" + CAFE):
+        status, _, body = get(port, MENU_HOST, path)
+        checks.check(
+            f"{path} answers 404 with no shop",
             status == 404 and shop_meta(body) is None and "No shop at this address" in body,
             {"status": status},
         )
-    own = f"/v1/public/merchants/{PATISSERIE}/storefronts/{STOREFRONT_ID}/catalog"
-    status, _, _ = get(port, f"petit-four.{SUFFIX}", own)
-    checks.check(
-        "an order page passes its own storefront's routes to Commerce",
-        status == 401,
-        {"status": status, "detail": "401: a catalog read needs a buyer session"},
-    )
+    status, _, _ = get(port, MENU_HOST, "/health")
+    checks.check("/health reaches Commerce", status == 200, {"status": status})
+    for merchant in (CAFE, PATISSERIE):
+        path = f"/v1/public/merchants/{merchant}/storefronts/{STOREFRONT_ID}/catalog"
+        status, _, _ = get(port, MENU_HOST, path)
+        checks.check(
+            f"the order page host passes {merchant}'s buyer routes to Commerce",
+            status == 401,
+            {"status": status, "detail": "401: a catalog read needs a buyer session"},
+        )
     for path in (
-        f"/v1/public/merchants/{CAFE}/storefronts/{STOREFRONT_ID}/catalog",
-        f"/v1/public/merchants/{CAFE}/storefronts/{STOREFRONT_ID}/sessions",
         f"/v1/admin/merchants/{PATISSERIE}/storefronts/{STOREFRONT_ID}/shop-name",
         "/v1/public/shop-names/nuki-cafe",
-        f"/v1/public/merchants/{PATISSERIE}/storefronts/storefront_cookie_store_sg/catalog",
+        f"/v1/public/merchants/{PATISSERIE}",
     ):
-        status, _, body = get(port, f"petit-four.{SUFFIX}", path)
+        status, _, body = get(port, MENU_HOST, path)
         checks.check(
-            f"petit-four refuses {path}",
+            f"the order page host refuses {path}",
             status == 404 and "Route not found" in body,
             {"status": status, "body": body[:200]},
         )

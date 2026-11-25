@@ -289,7 +289,8 @@ function hostedShopUrl(env: Env, merchantId: string): string | null {
 
 /**
  * The address of a shop's QR order page (Plan 40B phase 2): its shop name
- * under the order page domain, or the hosted page while it has no name.
+ * in the order page address (`https://menu.purin.io/{name}`), or the hosted
+ * page while it has no name.
  */
 export function orderPageUrl(
   env: Env,

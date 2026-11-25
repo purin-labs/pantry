@@ -135,7 +135,7 @@ it("fails closed when a recovered profile disallows the static fulfillment", asy
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store");
   storage.setItem(
-    `pantry.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.merchantId}.${config.storefrontId}`,
     JSON.stringify({
       ...storedCheckout(),
       session: {
@@ -293,7 +293,7 @@ it("recovers and replaces the latest active Cart revision after reload", async (
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store");
   storage.setItem(
-    `pantry.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.merchantId}.${config.storefrontId}`,
     JSON.stringify(storedCheckout()),
   );
   Object.defineProperty(globalThis, "window", {
@@ -330,7 +330,9 @@ it("recovers and replaces the latest active Cart revision after reload", async (
     expect(capturedRequests.every(hasRecoveredSessionAuthorization)).toBe(true);
     expect(
       JSON.parse(
-        storage.getItem(`pantry.checkout.${config.storefrontId}`) ?? "null",
+        storage.getItem(
+          `pantry.checkout.${config.merchantId}.${config.storefrontId}`,
+        ) ?? "null",
       ),
     ).toMatchObject({
       schemaVersion: "pantry.storefront-checkout-session.v7",
@@ -366,7 +368,9 @@ it("recovers and replaces the latest active Cart revision after reload", async (
     });
     expect(
       JSON.parse(
-        storage.getItem(`pantry.checkout.${config.storefrontId}`) ?? "null",
+        storage.getItem(
+          `pantry.checkout.${config.merchantId}.${config.storefrontId}`,
+        ) ?? "null",
       ),
     ).toMatchObject({ cart: { kind: "active", cartId: CART_ID, revision: 5 } });
   } finally {
@@ -384,7 +388,7 @@ it("recovers and submits the buyer-selected shipping service", async () => {
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store/shipping");
   storage.setItem(
-    `pantry.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.merchantId}.${config.storefrontId}`,
     JSON.stringify(storedShippingCheckout()),
   );
   Object.defineProperty(globalThis, "window", {
@@ -424,7 +428,9 @@ it("recovers and submits the buyer-selected shipping service", async () => {
     });
     expect(
       JSON.parse(
-        storage.getItem(`pantry.checkout.${config.storefrontId}`) ?? "null",
+        storage.getItem(
+          `pantry.checkout.${config.merchantId}.${config.storefrontId}`,
+        ) ?? "null",
       ),
     ).toMatchObject({
       schemaVersion: "pantry.storefront-checkout-session.v7",
@@ -499,7 +505,7 @@ it("recovers a Japan destination and sends every selected shipping line and addr
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store/shipping");
   storage.setItem(
-    `pantry.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.merchantId}.${config.storefrontId}`,
     JSON.stringify(storedJapanShippingCheckout()),
   );
   Object.defineProperty(globalThis, "window", {
@@ -601,7 +607,7 @@ it("recovers an expired quote when the Cart reached submitted state before the r
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store");
   storage.setItem(
-    `pantry.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.merchantId}.${config.storefrontId}`,
     JSON.stringify(storedCheckout()),
   );
   Object.defineProperty(globalThis, "window", {
@@ -643,7 +649,9 @@ it("recovers an expired quote when the Cart reached submitted state before the r
     ]);
     expect(
       JSON.parse(
-        storage.getItem(`pantry.checkout.${config.storefrontId}`) ?? "null",
+        storage.getItem(
+          `pantry.checkout.${config.merchantId}.${config.storefrontId}`,
+        ) ?? "null",
       ),
     ).toMatchObject({
       cart: {
@@ -669,7 +677,7 @@ it("recovers a quote directly from a persisted submitted Cart reference", async 
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store");
   storage.setItem(
-    `pantry.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.merchantId}.${config.storefrontId}`,
     JSON.stringify({
       ...storedCheckout(),
       cart: {
@@ -717,7 +725,7 @@ it("reopens the same pending provider payment session after reload", async () =>
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store");
   storage.setItem(
-    `pantry.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.merchantId}.${config.storefrontId}`,
     JSON.stringify({
       ...storedCheckout(),
       cart: {
@@ -783,7 +791,7 @@ it("restores indeterminate and declined payment outcomes without reopening colle
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store");
   storage.setItem(
-    `pantry.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.merchantId}.${config.storefrontId}`,
     JSON.stringify({
       ...storedCheckout(),
       cart: {
@@ -883,7 +891,7 @@ it("rejects a recovered quote with fields outside the public response union", as
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store");
   storage.setItem(
-    `pantry.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.merchantId}.${config.storefrontId}`,
     JSON.stringify({
       ...storedCheckout(),
       cart: {
