@@ -135,9 +135,14 @@ function record(task: TestContext["task"], evidence: object) {
   Object.assign(task.meta, { evidence });
 }
 
-it("bounds the journal, discovery calls, arguments, computation, and output", async ({
-  task,
-}) => {
+// The compute case alone takes 15 to 21 s on a loaded CI runner.
+it(
+  "bounds the journal, discovery calls, arguments, computation, and output",
+  { timeout: 90_000 },
+  boundsJourney,
+);
+
+async function boundsJourney({ task }: TestContext) {
   const discovery = `
 let count = 0;
 for (let index = 0; index < 60; index += 1) {
@@ -209,10 +214,12 @@ text("COUNT " + count);
   ]);
   expect(argument.outcome.text).not.toContain("SENT");
 
-  // A script that only computes ends by the sandbox's interrupt budget.
+  // A script that only computes ends by the sandbox's interrupt budget, far
+  // before the admitted deadline of one hour. The budget counts interrupt
+  // polls, not time, so the bound leaves room for a slow runner.
   expect(compute.outcome.isError).toBe(true);
   expect(compute.outcome.text).not.toContain("NEVER");
-  expect(compute.elapsedMs).toBeLessThan(20_000);
+  expect(compute.elapsedMs).toBeLessThan(60_000);
 
   // No execution environment exists. Pi cuts the output to its budget and
   // names no file.
@@ -220,4 +227,4 @@ text("COUNT " + count);
   expect(evidence.outputBytes).toBeLessThan(100_000);
   expect(output.outcome.text).toContain("HEAD");
   expect(output.outcome.text).not.toMatch(/pi-codemode-|\/tmp\//u);
-});
+}
