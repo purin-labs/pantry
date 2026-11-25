@@ -13,7 +13,7 @@ use std::{
 
 const DIRECTORY: &str = "assets/bakery-mujoco/fr10-workcell/native";
 
-#[derive(Clone, Copy, PartialEq, Deserialize, clap::ValueEnum)]
+#[derive(Clone, Copy, Debug, PartialEq, Deserialize, clap::ValueEnum)]
 #[serde(rename_all = "kebab-case")]
 pub enum Cell {
     Separate,
@@ -22,6 +22,7 @@ pub enum Cell {
     UnreachableRack,
     PanStaging,
     SpannerOven,
+    SpannerOvenDoor,
 }
 
 impl Cell {
@@ -33,6 +34,7 @@ impl Cell {
             Self::UnreachableRack => "combined-unreachable-rack",
             Self::PanStaging => "pan-staging",
             Self::SpannerOven => "spanner-oven",
+            Self::SpannerOvenDoor => "spanner-oven-door",
         }
     }
 }
@@ -229,6 +231,7 @@ impl Assets {
             Cell::UnreachableRack,
             Cell::PanStaging,
             Cell::SpannerOven,
+            Cell::SpannerOvenDoor,
         ] {
             if request.model_hash == self.model_hash(request.robot, cell) {
                 return Ok(cell);
@@ -269,6 +272,17 @@ impl Assets {
                         Case::Nominal | Case::Slip | Case::ClosedDoor | Case::Blocked
                     ),
                 "Spanner oven requires the FR10 MBCO-4ME spanner-gripper fixture"
+            );
+        }
+        if cell == Cell::SpannerOvenDoor {
+            ensure!(
+                request.robot == Robot::FairinoFr10
+                    && matches!(
+                        request.bakery_task_id,
+                        BakeryTask::Oven | BakeryTask::Unload
+                    )
+                    && request.case == Case::Nominal,
+                "Spanner oven door requires the FR10 MBCO-4ME articulated-door fixture"
             );
         }
         ensure!(

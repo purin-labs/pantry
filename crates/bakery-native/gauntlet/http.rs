@@ -5,6 +5,7 @@
 //! privileged simulator access.
 
 use anyhow::{Context, Result, bail, ensure};
+use bakery_native::closed_loop::{ClosedLoopPlant, PlantMeas, PlantStep};
 use serde_json::{Map, Value, json};
 use std::{
     env,
@@ -186,6 +187,47 @@ impl GauntletClient {
             serde_json::from_slice(body_bytes).context("Invalid JSON in HTTP body")?
         };
         Ok((code, doc))
+    }
+}
+
+impl ClosedLoopPlant for GauntletClient {
+    fn begin(&mut self) -> Result<PlantMeas> {
+        let m = GauntletClient::begin(self)?;
+        Ok(PlantMeas {
+            q: m.q,
+            gripper: m.gripper,
+            cam_timestamp: m.cam_timestamp,
+        })
+    }
+
+    fn step(&mut self, arm_ctrl: &[f64; 6], jaw_ctrl: f64) -> Result<PlantStep> {
+        match GauntletClient::step(self, arm_ctrl, jaw_ctrl)? {
+            StepReply::Meas(m) => Ok(PlantStep::Meas(PlantMeas {
+                q: m.q,
+                gripper: m.gripper,
+                cam_timestamp: m.cam_timestamp,
+            })),
+            StepReply::EpisodeOver => Ok(PlantStep::EpisodeOver),
+        }
+    }
+
+    fn read_rgb(&mut self) -> Result<(usize, usize, Vec<u8>)> {
+        let Some(key) = self.cam_key.as_deref() else {
+            return Ok((0, 0, Vec::new()));
+        };
+        GauntletClient::read_rgb(self, key)
+    }
+
+    fn read_depth(&mut self) -> Result<(usize, usize, Vec<f32>)> {
+        let Some(cam) = self.cam_key.as_deref() else {
+            return Ok((0, 0, Vec::new()));
+        };
+        let key = format!("{cam}_depth");
+        GauntletClient::read_depth(self, &key)
+    }
+
+    fn end(&mut self) -> Result<()> {
+        GauntletClient::end(self)
     }
 }
 

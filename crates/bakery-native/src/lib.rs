@@ -9,6 +9,8 @@ pub mod artifact;
 pub mod assets;
 pub mod cell;
 pub mod checkpoint;
+pub mod closed_loop;
+pub mod door;
 pub mod espresso_cell;
 pub mod handoff;
 pub mod host;
@@ -17,6 +19,7 @@ pub mod limits;
 #[allow(unsafe_code)]
 pub mod mj;
 pub mod native;
+pub mod perception;
 pub mod pour_over_cell;
 pub mod pour_over_control;
 pub mod pour_over_water;

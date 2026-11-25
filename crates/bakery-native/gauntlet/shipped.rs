@@ -1,9 +1,8 @@
-//! Shipped `bakery-native` controller bridge (`--mode shipped`) and nominal
-//! dynamics / initialization helpers shared across modes.
+//! Shipped `bakery-native` controller bridge (`--mode shipped`) and init-state dump.
 //!
 //! Runs the exact production `bakery_native::transfer::Operation`,
-//! `bakery_native::ik::solve`, and `bakery_native::servo::command` without
-//! modifying any file under `crates/bakery-native/src/`.
+//! `bakery_native::closed_loop::NominalDynamics`, and `bakery_native::servo::command`
+//! with zero duplicated dynamics or perception code.
 
 use anyhow::{Context, Result, bail, ensure};
 use bakery_native::{
@@ -12,258 +11,19 @@ use bakery_native::{
         Within,
     },
     assets::{Assets, Cell},
+    closed_loop::{ClosedLoopConfig, NominalDynamics},
     handoff::Handoff,
-    ik::{self, Orientation},
-    mj::{Data, Model, Object, Spec},
+    mj::Object,
     native::Engine,
     program::{self, Preparation},
     rack,
     recording::Recording,
-    robot::Robot,
-    servo::{self, Arm, Payload},
     transfer::{self, Operation, Start, Stop},
 };
-use nalgebra::Vector3;
 use serde::Serialize;
 use std::path::Path;
 
 use crate::http::{GauntletClient, StepReply};
-
-#[derive(Clone)]
-pub struct TaskConfig {
-    pub root: std::path::PathBuf,
-    pub robot: Robot,
-    pub cell: Cell,
-    pub task: BakeryTask,
-    pub ingredient_mass_kg: f64,
-    pub clamp_force_n: f64,
-    pub control_dt_s: f64,
-}
-
-impl TaskConfig {
-    pub fn xml_rel_path(&self) -> String {
-        let stem = match self.cell {
-            Cell::Separate => match self.task {
-                BakeryTask::Rack => "table-to-rack",
-                BakeryTask::Oven | BakeryTask::Unload => "table-to-oven",
-            },
-            Cell::Combined => "combined",
-            Cell::BlockedRack => "combined-blocked-rack",
-            Cell::UnreachableRack => "combined-unreachable-rack",
-            Cell::PanStaging => "pan-staging",
-            Cell::SpannerOven => "spanner-oven",
-        };
-        format!(
-            "assets/bakery-mujoco/fr10-workcell/native/{}/{stem}-nominal.xml",
-            self.robot.slug()
-        )
-    }
-
-    pub fn substeps(&self) -> usize {
-        (self.control_dt_s / 0.002).round().max(1.0) as usize
-    }
-}
-
-/// Nominal CAD/dynamics model compiled strictly from the verified production XML.
-/// Used ONLY with unprivileged measured joint angles (`q_meas`) to compute
-/// `servo::command` gravity + nominal-payload feedforward and `ik::solve`.
-pub struct NominalDynamics {
-    pub model: Model,
-    pub data: Data,
-    pub ik_data: Data,
-    pub arm: Arm,
-    pub grasp_site: usize,
-    pub tool_body: usize,
-    pub clamp_qpos: usize,
-    pub is_spanner: bool,
-    pub open_jaw_m: f64,
-    pub closed_jaw_m: f64,
-    pub nominal_tray_mass: f64,
-    pub nominal_tray_com_in_grasp: [f64; 3],
-    pub source_site: [f64; 3],
-    pub dest_site: [f64; 3],
-    pub robot_mount: [f64; 3],
-    pub work: u64,
-}
-
-impl NominalDynamics {
-    pub fn load(cfg: &TaskConfig) -> Result<Self> {
-        let xml_path = cfg.root.join(cfg.xml_rel_path());
-        let mut spec = Spec::parse(&xml_path)
-            .with_context(|| format!("Parse nominal XML {}", xml_path.display()))?;
-        if let Some(mut contents) = spec.geom(c"cold_contents") {
-            contents.set_mass(cfg.ingredient_mass_kg);
-            if cfg.ingredient_mass_kg == 0.0 {
-                contents.set_collisions(0, 0);
-            }
-        }
-        if let Some(mut table_top) = spec.geom(c"table_top") {
-            table_top.set_contact(1, [0.004, 1.0], [0.99, 0.999, 0.001, 0.5, 2.0]);
-        }
-        let mut model = spec.compile()?;
-        let mut data = model.make_data()?;
-        let ik_data = model.make_data()?;
-        let lookup = |m: &Model, kind: Object, name: &str| -> Result<usize> {
-            m.id(kind, name)?
-                .with_context(|| format!("Nominal model missing {kind:?} {name:?}"))
-        };
-        let arm = Arm::bind(&model, cfg.robot, |k, n| lookup(&model, k, n))?;
-        let grasp_site = lookup(&model, Object::Site, "cell_grasp")?;
-        let tool_body = lookup(&model, Object::Body, "cell_gripper")?;
-        let tray_body = lookup(&model, Object::Body, "mbco_tray")?;
-        let clamp_jnt = lookup(&model, Object::Joint, "clamp_opening")?;
-        let clamp_qpos = model.jnt_qposadr()[clamp_jnt] as usize;
-        let clamp_actuator = lookup(&model, Object::Actuator, "clamp_servo")?;
-        let is_spanner = model
-            .id(Object::Geom, "clamp_spanner_jaw_front_pad_col")?
-            .is_some();
-        let open_jaw_m = if is_spanner { 0.045 } else { 0.025 };
-        let closed_jaw_m = if is_spanner { -0.015 } else { -0.005 };
-        let clamp_limit = if is_spanner {
-            cfg.clamp_force_n.min(15.5)
-        } else {
-            cfg.clamp_force_n
-        };
-        {
-            let range = model.actuator_forcerange_mut();
-            range[clamp_actuator * 2] = -clamp_limit;
-            range[clamp_actuator * 2 + 1] = clamp_limit;
-        }
-        model.set_const(&mut data);
-        model.forward(&mut data);
-
-        let nominal_tray_mass = model.body_mass()[tray_body];
-        let ipos = &model.body_ipos()[tray_body * 3..tray_body * 3 + 3];
-        let nominal_tray_com_in_grasp = if is_spanner {
-            [ipos[0], 0.005 + ipos[1], -0.011 + ipos[2]]
-        } else {
-            // Nominal fork-clamp tray is rotated -90 deg about Z relative to world.
-            [0.25 + ipos[1], -ipos[0], 0.001 + ipos[2]]
-        };
-
-        let site_pos = |name: &str| -> Result<[f64; 3]> {
-            let sid = lookup(&model, Object::Site, name)?;
-            let s = &data.site_xpos()[sid * 3..sid * 3 + 3];
-            Ok([s[0], s[1], s[2]])
-        };
-        let source_site = site_pos("source_tray_center")?;
-        let dest_site = site_pos(cfg.task.destination())?;
-        let robot_mount = site_pos("robot_mount")?;
-
-        Ok(Self {
-            model,
-            data,
-            ik_data,
-            arm,
-            grasp_site,
-            tool_body,
-            clamp_qpos,
-            is_spanner,
-            open_jaw_m,
-            closed_jaw_m,
-            nominal_tray_mass,
-            nominal_tray_com_in_grasp,
-            source_site,
-            dest_site,
-            robot_mount,
-            work: 0,
-        })
-    }
-
-    /// Compute actuator `ctrl` via `bakery_native::servo::command` using ONLY
-    /// unprivileged `q_meas` and the nominal model.
-    pub fn servo_ctrl(&mut self, q_meas: &[f64; 6], q_cmd: &[f64; 6], carrying: bool) -> [f64; 6] {
-        self.model.reset(&mut self.data);
-        self.arm.set_joints(&mut self.data, q_meas);
-        self.data.qpos_mut()[self.clamp_qpos] = if carrying {
-            self.closed_jaw_m
-        } else {
-            self.open_jaw_m
-        };
-        self.model.forward(&mut self.data);
-        let payload = carrying.then(|| {
-            let site = &self.data.site_xpos()[self.grasp_site * 3..self.grasp_site * 3 + 3];
-            let rot = &self.data.site_xmat()[self.grasp_site * 9..self.grasp_site * 9 + 9];
-            let local = self.nominal_tray_com_in_grasp;
-            let mut point = [site[0], site[1], site[2]];
-            for axis in 0..3 {
-                for col in 0..3 {
-                    point[axis] += rot[axis * 3 + col] * local[col];
-                }
-            }
-            Payload {
-                body: self.tool_body,
-                point,
-                mass: self.nominal_tray_mass,
-            }
-        });
-        servo::command(&self.model, &mut self.data, &self.arm, q_cmd, payload);
-        let ctrl = self.data.ctrl();
-        std::array::from_fn(|i| {
-            let (lo, hi) = self.arm.limits[i];
-            ctrl[self.arm.actuators[i]].clamp(lo, hi)
-        })
-    }
-
-    /// Forward kinematics of `cell_grasp` on the nominal CAD model.
-    pub fn fk_grasp(&mut self, q: &[f64; 6]) -> [f64; 3] {
-        self.arm.set_joints(&mut self.ik_data, q);
-        self.model.kinematics(&mut self.ik_data);
-        let s = &self.ik_data.site_xpos()[self.grasp_site * 3..self.grasp_site * 3 + 3];
-        [s[0], s[1], s[2]]
-    }
-
-    /// Solve 6-DOF DLS IK via `bakery_native::ik::solve` with yaw rotation around +Z.
-    pub fn solve_ik_yaw(
-        &mut self,
-        target: [f64; 3],
-        yaw_rad: f64,
-        seed: [f64; 6],
-    ) -> Option<[f64; 6]> {
-        let limits = ik::Limits {
-            iterations: 350,
-            tolerance: 1e-5,
-            damping: 1e-4,
-        };
-        let pos = Vector3::new(target[0], target[1], target[2]);
-        let (s, c) = yaw_rad.sin_cos();
-        let rot = [c, -s, 0.0, s, c, 0.0, 0.0, 0.0, 1.0];
-        let orient = if yaw_rad.abs() < 1e-9 {
-            Orientation::World
-        } else {
-            Orientation::Rows(&rot)
-        };
-        ik::solve(
-            &self.model,
-            &mut self.ik_data,
-            &self.arm,
-            self.grasp_site,
-            pos,
-            orient,
-            seed,
-            &limits,
-            &mut self.work,
-        )
-    }
-
-    pub fn arm_joint_names(&self) -> [String; 6] {
-        std::array::from_fn(|i| self.model_joint_name(i))
-    }
-
-    fn model_joint_name(&self, idx: usize) -> String {
-        let adr = self.arm.positions[idx] as i32;
-        for j in 0..self.model.jnt_qposadr().len() {
-            if self.model.jnt_qposadr()[j] == adr {
-                return self
-                    .model
-                    .name(Object::Joint, j)
-                    .unwrap_or_default()
-                    .to_owned();
-            }
-        }
-        String::new()
-    }
-}
 
 pub struct PreparedShipped {
     pub engine: Engine,
@@ -271,7 +31,11 @@ pub struct PreparedShipped {
     pub start_angles: [f64; 6],
 }
 
-fn prepare_nominal_request(assets: &Assets, cfg: &TaskConfig, task: BakeryTask) -> Result<Request> {
+fn prepare_nominal_request(
+    assets: &Assets,
+    cfg: &ClosedLoopConfig,
+    task: BakeryTask,
+) -> Result<Request> {
     program::prepare(
         assets,
         &Preparation {
@@ -290,19 +54,33 @@ fn prepare_nominal_request(assets: &Assets, cfg: &TaskConfig, task: BakeryTask) 
     )
 }
 
+fn run_loading_handoff(assets: &Assets, cfg: &ClosedLoopConfig) -> Result<(Engine, Handoff)> {
+    let load_req = prepare_nominal_request(assets, cfg, BakeryTask::Oven)?;
+    let (mut engine, setup) = assets.open(&load_req)?;
+    let load_binding = Binding::new(load_req, Completion::LoadingHandoff)?;
+    let load_art = transfer::run(&mut engine, load_binding, None, None, Start::Prepared)?;
+    ensure!(
+        matches!(
+            &load_art,
+            Artifact::BakeryNativeResult {
+                outcome: Outcome::Completed { .. },
+                ..
+            }
+        ),
+        "Nominal loading prerequisite did not complete"
+    );
+    let load_rec = Recording::from_result(&load_art, &setup, assets)?;
+    let handoff = Handoff::new(load_art, load_rec, &engine)?;
+    Ok((engine, handoff))
+}
+
 /// Open the exact shipped `bakery_native::transfer::Operation` at the start of
 /// `cfg.task` (running any nominal preceding oven-load / unload handoff legs
 /// cleanly inside `bakery_native` first).
-pub fn open_shipped_operation(assets: &Assets, cfg: &TaskConfig) -> Result<PreparedShipped> {
+pub fn open_shipped_operation(assets: &Assets, cfg: &ClosedLoopConfig) -> Result<PreparedShipped> {
     match (cfg.cell, cfg.task) {
         (Cell::Combined, BakeryTask::Rack) => {
-            // Combined cell: table-to-oven -> oven-to-table (for rack) -> Start::Returned rack transfer.
-            let load_req = prepare_nominal_request(assets, cfg, BakeryTask::Oven)?;
-            let (mut engine, setup) = assets.open(&load_req)?;
-            let load_binding = Binding::new(load_req, Completion::LoadingHandoff)?;
-            let load_art = transfer::run(&mut engine, load_binding, None, None, Start::Prepared)?;
-            let load_rec = Recording::from_result(&load_art, &setup, assets)?;
-            let load_handoff = Handoff::new(load_art, load_rec, &engine)?;
+            let (mut engine, load_handoff) = run_loading_handoff(assets, cfg)?;
             let unload_start = load_handoff.loaded_start(&engine)?;
             let (ret_stage, unload_binding) = bakery_native::handoff::Return::begin(
                 load_handoff,
@@ -346,22 +124,7 @@ pub fn open_shipped_operation(assets: &Assets, cfg: &TaskConfig) -> Result<Prepa
             })
         }
         (_, BakeryTask::Unload) => {
-            let load_req = prepare_nominal_request(assets, cfg, BakeryTask::Oven)?;
-            let (mut engine, setup) = assets.open(&load_req)?;
-            let load_binding = Binding::new(load_req, Completion::LoadingHandoff)?;
-            let load_art = transfer::run(&mut engine, load_binding, None, None, Start::Prepared)?;
-            ensure!(
-                matches!(
-                    &load_art,
-                    Artifact::BakeryNativeResult {
-                        outcome: Outcome::Completed { .. },
-                        ..
-                    }
-                ),
-                "Nominal loading prerequisite did not complete"
-            );
-            let load_rec = Recording::from_result(&load_art, &setup, assets)?;
-            let handoff = Handoff::new(load_art, load_rec, &engine)?;
+            let (mut engine, handoff) = run_loading_handoff(assets, cfg)?;
             let start = handoff.loaded_start(&engine)?;
             let unload_binding = Binding::new(handoff.return_request(), Completion::Recording)?;
             let (operation, failed) = Operation::open(&mut engine, unload_binding, None, start)?;
@@ -377,6 +140,17 @@ pub fn open_shipped_operation(assets: &Assets, cfg: &TaskConfig) -> Result<Prepa
             })
         }
     }
+}
+
+/// Read the verified home joint angles for `cfg` (handling both standard cells
+/// and articulated-door cells where `Operation::open` isn't needed).
+pub fn start_angles_for(assets: &Assets, cfg: &ClosedLoopConfig) -> Result<[f64; 6]> {
+    if cfg.cell == Cell::SpannerOvenDoor {
+        let request = prepare_nominal_request(assets, cfg, BakeryTask::Oven)?;
+        let (engine, _setup) = assets.open(&request)?;
+        return Ok(engine.sample(0).joints);
+    }
+    Ok(open_shipped_operation(assets, cfg)?.start_angles)
 }
 
 #[derive(Serialize)]
@@ -399,13 +173,50 @@ pub struct InitDump {
     pub phases: Vec<PhasePlan>,
 }
 
-pub fn dump_init(assets: &Assets, cfg: &TaskConfig) -> Result<InitDump> {
-    let prepared = open_shipped_operation(assets, cfg)?;
+pub fn dump_init(
+    assets: &Assets,
+    cfg: &ClosedLoopConfig,
+    initial_door_rad: f64,
+) -> Result<InitDump> {
     let nom = NominalDynamics::load(cfg)?;
-    let (phases, _progress, _within) = prepared.operation.saved();
-    let sample = prepared.engine.sample(0);
     let arm_joint_names = nom.arm_joint_names();
     let arm_actuator_names = std::array::from_fn(|i| format!("{}__servo", arm_joint_names[i]));
+
+    if cfg.cell == Cell::SpannerOvenDoor {
+        let request = prepare_nominal_request(assets, cfg, BakeryTask::Oven)?;
+        let (engine, _setup) = assets.open(&request)?;
+        let sample = engine.sample(0);
+        let mut state = engine.state();
+        if initial_door_rad > 0.0
+            && let Some(door_jnt) = nom.model.id(Object::Joint, "mbco4_door_hinge")?
+        {
+            let qadr = nom.model.jnt_qposadr()[door_jnt] as usize;
+            if 1 + qadr < state.len() {
+                state[1 + qadr] = initial_door_rad;
+            }
+        }
+        return Ok(InitDump {
+            xml_path: cfg.xml_rel_path(),
+            integration_state: state,
+            arm_joint_names,
+            arm_actuator_names,
+            gripper_joint_name: "clamp_opening".into(),
+            gripper_actuator_name: "clamp_servo".into(),
+            start_angles: sample.joints,
+            start_jaw: engine.jaw_opening(),
+            start_tray: sample.tray,
+            source_site: nom.source_site,
+            dest_site: nom.dest_site,
+            is_spanner: nom.is_spanner,
+            tray_mass_kg: nom.nominal_tray_mass,
+            nominal_duration_s: 28.0,
+            phases: Vec::new(),
+        });
+    }
+
+    let prepared = open_shipped_operation(assets, cfg)?;
+    let (phases, _progress, _within) = prepared.operation.saved();
+    let sample = prepared.engine.sample(0);
     let nominal_duration_s: f64 = phases.iter().map(|p| p.seconds).sum();
     Ok(InitDump {
         xml_path: cfg.xml_rel_path(),
@@ -427,7 +238,7 @@ pub fn dump_init(assets: &Assets, cfg: &TaskConfig) -> Result<InitDump> {
 }
 
 /// Compute exact jaw command and carrying flag for the current `(phases, progress, within)`
-/// matching `crates/bakery-native/src/transfer.rs` lines 1528-1619.
+/// matching `crates/bakery-native/src/transfer.rs`.
 fn jaw_and_carrying(
     phases: &[PhasePlan],
     progress: &Progress,
@@ -461,7 +272,7 @@ fn jaw_and_carrying(
 }
 
 /// Run the exact shipped `bakery-native` controller over `GAUNTLET_URL`.
-pub fn run_shipped(assets: &Assets, cfg: &TaskConfig, client: &GauntletClient) -> Result<()> {
+pub fn run_shipped(assets: &Assets, cfg: &ClosedLoopConfig, client: &GauntletClient) -> Result<()> {
     let mut prepared = open_shipped_operation(assets, cfg)?;
     let mut nom = NominalDynamics::load(cfg)?;
     let substeps = cfg.substeps();

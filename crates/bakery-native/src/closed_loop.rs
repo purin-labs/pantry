@@ -1,53 +1,408 @@
-//! Hardened unprivileged closed-loop Rust controller (`--mode hardened`).
+//! Unprivileged closed-loop RGB-D + IK + servo controller for `bakery-native`.
 //!
-//! Built directly on `bakery_native::ik::solve`, `bakery_native::servo::command`,
-//! and the verified production nominal `bakery_native` MJCF model.
-//! Reads ONLY allowlisted deployment keys (`joint_position/*`, `overhead_cam`,
-//! `overhead_cam_depth`, `overhead_cam_timestamp`) over `GAUNTLET_URL`.
-//!
-//! Handles:
-//! - T1/T2 tray XY/yaw, oven/rack/table XY, table Z/tilt, mass/friction/gain/gravcomp
-//! - T3 mid-approach push & lift slip re-perception + re-grasp recovery
-//! - T4 `camera_freeze` (frozen or restamped) & `dead_gripper` safe abort
+//! Built directly on `crate::ik::solve`, `crate::servo::command`, and
+//! `crate::perception`, reading ONLY deployment-visible joint positions and
+//! overhead RGB-D images through the [`ClosedLoopPlant`] trait. Zero `unsafe`
+//! code; compiles for both native targets and `wasm32-unknown-emscripten`.
 
-use anyhow::{Result, bail};
-use bakery_native::{
-    artifact::BakeryTask,
-    assets::{Assets, Cell},
-    robot::Robot,
-};
+use anyhow::{Context, Result, bail};
+use nalgebra::Vector3;
+use std::path::{Path, PathBuf};
 
 use crate::{
-    http::{GauntletClient, StepMeas, StepReply},
+    artifact::BakeryTask,
+    assets::Cell,
+    ik::{self, Orientation},
+    mj::{Data, Model, Object, Spec},
     perception::{
-        CameraModel, Cloud, FaultMonitor, PlaneCal, RoiBox, calibrate_table_plane,
-        measure_ee_z_offset, perceive_fixture_target, perceive_table_target, perceive_tray,
+        CameraModel, Cloud, FaultMonitor, MBCO4_OVEN_ROOF_CENTER, MBCO4_OVEN_ROOF_ROI, PlaneCal,
+        RoiBox, calibrate_table_plane, measure_ee_z_offset, perceive_fixture_target,
+        perceive_table_target, perceive_tray, spanner_table_roi,
     },
-    shipped::{NominalDynamics, TaskConfig, open_shipped_operation},
+    robot::Robot,
+    servo::{self, Arm, Payload},
 };
 
+/// Scalar joint measurements returned on episode start and every control tick.
+#[derive(Clone, Debug)]
+pub struct PlantMeas {
+    pub q: [f64; 6],
+    pub gripper: f64,
+    pub cam_timestamp: Option<f64>,
+}
+
+/// Reply from advancing the controlled plant by one control tick.
+#[derive(Clone, Debug)]
+pub enum PlantStep {
+    Meas(PlantMeas),
+    EpisodeOver,
+}
+
+/// Abstract unprivileged deployment boundary (implemented by `bakery-gauntlet`'s
+/// HTTP proxy client and by in-process verification harnesses).
+pub trait ClosedLoopPlant {
+    fn begin(&mut self) -> Result<PlantMeas>;
+    fn step(&mut self, arm_ctrl: &[f64; 6], jaw_ctrl: f64) -> Result<PlantStep>;
+    fn read_rgb(&mut self) -> Result<(usize, usize, Vec<u8>)>;
+    fn read_depth(&mut self) -> Result<(usize, usize, Vec<f32>)>;
+    fn end(&mut self) -> Result<()>;
+}
+
+/// Configuration for one closed-loop task execution.
+#[derive(Clone, Debug)]
+pub struct ClosedLoopConfig {
+    pub root: PathBuf,
+    pub robot: Robot,
+    pub cell: Cell,
+    pub task: BakeryTask,
+    pub ingredient_mass_kg: f64,
+    pub clamp_force_n: f64,
+    pub control_dt_s: f64,
+}
+
+impl ClosedLoopConfig {
+    pub fn xml_rel_path(&self) -> String {
+        let stem = match self.cell {
+            Cell::Separate => match self.task {
+                BakeryTask::Rack => "table-to-rack",
+                BakeryTask::Oven | BakeryTask::Unload => "table-to-oven",
+            },
+            Cell::Combined => "combined",
+            Cell::BlockedRack => "combined-blocked-rack",
+            Cell::UnreachableRack => "combined-unreachable-rack",
+            Cell::PanStaging => "pan-staging",
+            Cell::SpannerOven => "spanner-oven",
+            Cell::SpannerOvenDoor => "spanner-oven-door",
+        };
+        format!(
+            "assets/bakery-mujoco/fr10-workcell/native/{}/{stem}-nominal.xml",
+            self.robot.slug()
+        )
+    }
+
+    pub fn substeps(&self) -> usize {
+        (self.control_dt_s / 0.002).round().max(1.0) as usize
+    }
+}
+
+/// Nominal CAD/dynamics model compiled strictly from the verified production XML.
+/// Used ONLY with unprivileged measured joint angles (`q_meas`) to compute
+/// `servo::command` gravity + nominal-payload feedforward and `ik::solve`.
+pub struct NominalDynamics {
+    pub model: Model,
+    pub data: Data,
+    pub ik_data: Data,
+    pub arm: Arm,
+    pub grasp_site: usize,
+    pub handle_grasp_site: Option<usize>,
+    pub tool_body: usize,
+    pub clamp_qpos: usize,
+    pub is_spanner: bool,
+    pub open_jaw_m: f64,
+    pub closed_jaw_m: f64,
+    pub nominal_tray_mass: f64,
+    pub nominal_tray_com_in_grasp: [f64; 3],
+    pub source_site: [f64; 3],
+    pub dest_site: [f64; 3],
+    pub robot_mount: [f64; 3],
+    pub work: u64,
+}
+
+impl NominalDynamics {
+    pub fn load(cfg: &ClosedLoopConfig) -> Result<Self> {
+        let xml_path = cfg.root.join(cfg.xml_rel_path());
+        Self::load_from_xml(
+            &xml_path,
+            cfg.robot,
+            cfg.task,
+            cfg.ingredient_mass_kg,
+            cfg.clamp_force_n,
+        )
+    }
+
+    pub fn load_from_xml(
+        xml_path: &Path,
+        robot: Robot,
+        task: BakeryTask,
+        ingredient_mass_kg: f64,
+        clamp_force_n: f64,
+    ) -> Result<Self> {
+        let mut spec = Spec::parse(xml_path)
+            .with_context(|| format!("Parse nominal XML {}", xml_path.display()))?;
+        if let Some(mut contents) = spec.geom(c"cold_contents") {
+            contents.set_mass(ingredient_mass_kg);
+            if ingredient_mass_kg == 0.0 {
+                contents.set_collisions(0, 0);
+            }
+        }
+        if let Some(mut table_top) = spec.geom(c"table_top") {
+            table_top.set_contact(1, [0.004, 1.0], [0.99, 0.999, 0.001, 0.5, 2.0]);
+        }
+        let mut model = spec.compile()?;
+        let mut data = model.make_data()?;
+        let ik_data = model.make_data()?;
+        let lookup = |m: &Model, kind: Object, name: &str| -> Result<usize> {
+            m.id(kind, name)?
+                .with_context(|| format!("Nominal model missing {kind:?} {name:?}"))
+        };
+        let arm = Arm::bind(&model, robot, |k, n| lookup(&model, k, n))?;
+        let grasp_site = lookup(&model, Object::Site, "cell_grasp")?;
+        let handle_grasp_site = model.id(Object::Site, "cell_handle_grasp")?;
+        let tool_body = lookup(&model, Object::Body, "cell_gripper")?;
+        let tray_body = lookup(&model, Object::Body, "mbco_tray")?;
+        let clamp_jnt = lookup(&model, Object::Joint, "clamp_opening")?;
+        let clamp_qpos = model.jnt_qposadr()[clamp_jnt] as usize;
+        let clamp_actuator = lookup(&model, Object::Actuator, "clamp_servo")?;
+        let is_spanner = model
+            .id(Object::Geom, "clamp_spanner_jaw_front_pad_col")?
+            .is_some();
+        let open_jaw_m = if is_spanner { 0.045 } else { 0.025 };
+        let closed_jaw_m = if is_spanner { -0.015 } else { -0.005 };
+        let clamp_limit = if is_spanner {
+            clamp_force_n.min(15.5)
+        } else {
+            clamp_force_n
+        };
+        {
+            let range = model.actuator_forcerange_mut();
+            range[clamp_actuator * 2] = -clamp_limit;
+            range[clamp_actuator * 2 + 1] = clamp_limit;
+        }
+        model.set_const(&mut data);
+        model.forward(&mut data);
+
+        let nominal_tray_mass = model.body_mass()[tray_body];
+        let ipos = &model.body_ipos()[tray_body * 3..tray_body * 3 + 3];
+        let nominal_tray_com_in_grasp = if is_spanner {
+            [ipos[0], 0.005 + ipos[1], -0.011 + ipos[2]]
+        } else {
+            // Nominal fork-clamp tray is rotated -90 deg about Z relative to world.
+            [0.25 + ipos[1], -ipos[0], 0.001 + ipos[2]]
+        };
+
+        let site_pos = |name: &str| -> Result<[f64; 3]> {
+            let sid = lookup(&model, Object::Site, name)?;
+            let s = &data.site_xpos()[sid * 3..sid * 3 + 3];
+            Ok([s[0], s[1], s[2]])
+        };
+        let source_site = site_pos("source_tray_center")?;
+        let dest_site = site_pos(task.destination())?;
+        let robot_mount = site_pos("robot_mount")?;
+
+        Ok(Self {
+            model,
+            data,
+            ik_data,
+            arm,
+            grasp_site,
+            handle_grasp_site,
+            tool_body,
+            clamp_qpos,
+            is_spanner,
+            open_jaw_m,
+            closed_jaw_m,
+            nominal_tray_mass,
+            nominal_tray_com_in_grasp,
+            source_site,
+            dest_site,
+            robot_mount,
+            work: 0,
+        })
+    }
+
+    /// Compute actuator `ctrl` via `crate::servo::command` using ONLY
+    /// unprivileged `q_meas` and the nominal model.
+    pub fn servo_ctrl(&mut self, q_meas: &[f64; 6], q_cmd: &[f64; 6], carrying: bool) -> [f64; 6] {
+        self.model.reset(&mut self.data);
+        self.arm.set_joints(&mut self.data, q_meas);
+        self.data.qpos_mut()[self.clamp_qpos] = if carrying {
+            self.closed_jaw_m
+        } else {
+            self.open_jaw_m
+        };
+        self.model.forward(&mut self.data);
+        let payload = carrying.then(|| {
+            let site = &self.data.site_xpos()[self.grasp_site * 3..self.grasp_site * 3 + 3];
+            let rot = &self.data.site_xmat()[self.grasp_site * 9..self.grasp_site * 9 + 9];
+            let local = self.nominal_tray_com_in_grasp;
+            let mut point = [site[0], site[1], site[2]];
+            for axis in 0..3 {
+                for col in 0..3 {
+                    point[axis] += rot[axis * 3 + col] * local[col];
+                }
+            }
+            Payload {
+                body: self.tool_body,
+                point,
+                mass: self.nominal_tray_mass,
+            }
+        });
+        servo::command(&self.model, &mut self.data, &self.arm, q_cmd, payload);
+        let ctrl = self.data.ctrl();
+        std::array::from_fn(|i| {
+            let (lo, hi) = self.arm.limits[i];
+            ctrl[self.arm.actuators[i]].clamp(lo, hi)
+        })
+    }
+
+    /// Forward kinematics of `cell_grasp` on the nominal CAD model.
+    pub fn fk_grasp(&mut self, q: &[f64; 6]) -> [f64; 3] {
+        self.fk_site(self.grasp_site, q)
+    }
+
+    /// Forward kinematics of an arbitrary named site on the nominal CAD model.
+    pub fn fk_site(&mut self, site: usize, q: &[f64; 6]) -> [f64; 3] {
+        self.arm.set_joints(&mut self.ik_data, q);
+        self.model.kinematics(&mut self.ik_data);
+        let s = &self.ik_data.site_xpos()[site * 3..site * 3 + 3];
+        [s[0], s[1], s[2]]
+    }
+
+    /// Solve 6-DOF DLS IK via `crate::ik::solve` with yaw rotation around +Z.
+    pub fn solve_ik_yaw(
+        &mut self,
+        target: [f64; 3],
+        yaw_rad: f64,
+        seed: [f64; 6],
+    ) -> Option<[f64; 6]> {
+        let (s, c) = yaw_rad.sin_cos();
+        let rot = [c, -s, 0.0, s, c, 0.0, 0.0, 0.0, 1.0];
+        if yaw_rad.abs() < 1e-9 {
+            let limits = ik::Limits {
+                iterations: 350,
+                tolerance: 1e-5,
+                damping: 1e-4,
+            };
+            ik::solve(
+                &self.model,
+                &mut self.ik_data,
+                &self.arm,
+                self.grasp_site,
+                Vector3::new(target[0], target[1], target[2]),
+                Orientation::World,
+                seed,
+                &limits,
+                &mut self.work,
+            )
+        } else {
+            self.solve_ik_site_rot(self.grasp_site, target, &rot, seed)
+        }
+    }
+
+    /// Solve 6-DOF DLS IK for an arbitrary site and row-major rotation matrix.
+    pub fn solve_ik_site_rot(
+        &mut self,
+        site: usize,
+        target: [f64; 3],
+        rot_row_major: &[f64; 9],
+        seed: [f64; 6],
+    ) -> Option<[f64; 6]> {
+        let limits = ik::Limits {
+            iterations: 350,
+            tolerance: 1e-5,
+            damping: 1e-4,
+        };
+        ik::solve(
+            &self.model,
+            &mut self.ik_data,
+            &self.arm,
+            site,
+            Vector3::new(target[0], target[1], target[2]),
+            Orientation::Rows(rot_row_major),
+            seed,
+            &limits,
+            &mut self.work,
+        )
+    }
+
+    pub fn arm_joint_names(&self) -> [String; 6] {
+        std::array::from_fn(|i| self.model_joint_name(i))
+    }
+
+    fn model_joint_name(&self, idx: usize) -> String {
+        let adr = self.arm.positions[idx] as i32;
+        for j in 0..self.model.jnt_qposadr().len() {
+            if self.model.jnt_qposadr()[j] == adr {
+                return self
+                    .model
+                    .name(Object::Joint, j)
+                    .unwrap_or_default()
+                    .to_owned();
+            }
+        }
+        String::new()
+    }
+}
+
 #[derive(Debug)]
-enum EpisodeStop {
+pub(crate) enum EpisodeStop {
     EpisodeOver,
     Abort(&'static str),
 }
 
-struct ControllerState<'a> {
-    cfg: &'a TaskConfig,
-    nom: &'a mut NominalDynamics,
-    client: &'a GauntletClient,
-    cam: CameraModel,
-    meas: StepMeas,
-    last_rgb: Vec<u8>,
-    cmd_q: [f64; 6],
-    cmd_g: f64,
-    carrying: bool,
-    tick: usize,
-    monitor: FaultMonitor,
+pub(crate) struct ControllerState<'a, P: ClosedLoopPlant + ?Sized> {
+    pub cfg: &'a ClosedLoopConfig,
+    pub nom: &'a mut NominalDynamics,
+    pub plant: &'a mut P,
+    pub cam: CameraModel,
+    pub meas: PlantMeas,
+    pub last_rgb: Vec<u8>,
+    pub has_camera: bool,
+    pub cmd_q: [f64; 6],
+    pub cmd_g: f64,
+    pub carrying: bool,
+    pub tick: usize,
+    pub monitor: FaultMonitor,
 }
 
-impl<'a> ControllerState<'a> {
-    fn step_to(
+impl<'a, P: ClosedLoopPlant + ?Sized> ControllerState<'a, P> {
+    pub fn new(
+        cfg: &'a ClosedLoopConfig,
+        nom: &'a mut NominalDynamics,
+        plant: &'a mut P,
+        cam: CameraModel,
+    ) -> Result<Self> {
+        let meas0 = plant.begin()?;
+        let (_, _, rgb0) = plant.read_rgb()?;
+        let has_camera = !rgb0.is_empty();
+        let ts0 = meas0.cam_timestamp.unwrap_or(0.0);
+        let monitor = FaultMonitor::new(ts0, rgb0.clone(), meas0.q, meas0.gripper, nom.is_spanner);
+        Ok(Self {
+            cfg,
+            nom,
+            plant,
+            cam,
+            last_rgb: rgb0,
+            has_camera,
+            cmd_q: meas0.q,
+            cmd_g: meas0.gripper,
+            meas: meas0,
+            carrying: false,
+            tick: 0,
+            monitor,
+        })
+    }
+
+    pub fn finish(&mut self, res: Result<(), EpisodeStop>) -> (&'static str, &'static str) {
+        let outcome = match res {
+            Ok(()) | Err(EpisodeStop::EpisodeOver) => ("done", ""),
+            Err(EpisodeStop::Abort(fault)) => {
+                // Hold current pose for 3 ticks so post-onset settle starts cleanly
+                let q_hold = self.cmd_q;
+                let g_hold = self.cmd_g;
+                let carry = self.carrying;
+                for _ in 0..3 {
+                    let ctrl = self.nom.servo_ctrl(&self.meas.q, &q_hold, carry);
+                    let _ = self.plant.step(&ctrl, g_hold);
+                }
+                ("abort", fault)
+            }
+        };
+        let _ = self.plant.end();
+        outcome
+    }
+
+    pub fn step_to(
         &mut self,
         q_cmd: [f64; 6],
         g_cmd: f64,
@@ -55,13 +410,13 @@ impl<'a> ControllerState<'a> {
         check_grip: Option<&str>,
     ) -> Result<(), EpisodeStop> {
         let ctrl = self.nom.servo_ctrl(&self.meas.q, &q_cmd, carrying);
-        let reply = match self.client.step(&ctrl, g_cmd) {
+        let reply = match self.plant.step(&ctrl, g_cmd) {
             Ok(r) => r,
             Err(_) => return Err(EpisodeStop::EpisodeOver),
         };
         let next = match reply {
-            StepReply::Meas(m) => m,
-            StepReply::EpisodeOver => return Err(EpisodeStop::EpisodeOver),
+            PlantStep::Meas(m) => m,
+            PlantStep::EpisodeOver => return Err(EpisodeStop::EpisodeOver),
         };
         self.meas = next;
         self.cmd_q = q_cmd;
@@ -69,33 +424,43 @@ impl<'a> ControllerState<'a> {
         self.carrying = carrying;
         self.tick += 1;
 
-        let ts = self
-            .meas
-            .cam_timestamp
-            .unwrap_or(self.tick as f64 * self.cfg.control_dt_s);
-        let rgb = match self.client.read_rgb("overhead_cam") {
-            Ok((_, _, buf)) => buf,
-            Err(_) => return Err(EpisodeStop::EpisodeOver),
-        };
-        let fault = self
-            .monitor
-            .update(ts, &rgb, &self.meas.q, self.meas.gripper, check_grip);
-        self.last_rgb = rgb;
-        if let Some(fault) = fault {
-            return Err(EpisodeStop::Abort(fault));
+        if self.has_camera {
+            let ts = self
+                .meas
+                .cam_timestamp
+                .unwrap_or(self.tick as f64 * self.cfg.control_dt_s);
+            let rgb = match self.plant.read_rgb() {
+                Ok((_, _, buf)) => buf,
+                Err(_) => return Err(EpisodeStop::EpisodeOver),
+            };
+            let fault = self
+                .monitor
+                .update(ts, &rgb, &self.meas.q, self.meas.gripper, check_grip);
+            self.last_rgb = rgb;
+            if let Some(fault) = fault {
+                return Err(EpisodeStop::Abort(fault));
+            }
         }
         Ok(())
     }
 
-    fn read_rgbd_cloud(&self) -> Result<Cloud, EpisodeStop> {
-        let (h, w, depth) = match self.client.read_depth("overhead_cam_depth") {
+    pub fn read_rgbd_cloud(&mut self) -> Result<Cloud, EpisodeStop> {
+        if !self.has_camera {
+            return Ok(Cloud {
+                x: Vec::new(),
+                y: Vec::new(),
+                z: Vec::new(),
+                rgb: Vec::new(),
+            });
+        }
+        let (h, w, depth) = match self.plant.read_depth() {
             Ok(d) => d,
             Err(_) => return Err(EpisodeStop::EpisodeOver),
         };
         Ok(self.cam.deproject(&depth, &self.last_rgb, h, w))
     }
 
-    fn solve_ik(&mut self, target: [f64; 3], yaw_rad: f64, q_seed: [f64; 6]) -> [f64; 6] {
+    pub fn solve_ik(&mut self, target: [f64; 3], yaw_rad: f64, q_seed: [f64; 6]) -> [f64; 6] {
         let is_fr10_spanner = self.nom.is_spanner && self.cfg.robot == Robot::FairinoFr10;
         let branch_ok = |q: &[f64; 6]| -> bool {
             if !is_fr10_spanner {
@@ -124,11 +489,11 @@ impl<'a> ControllerState<'a> {
                 [j1, -0.85, 1.55, -0.70, j5, std::f64::consts::FRAC_PI_2],
                 [j1, -1.45, 2.25, -0.80, j5, std::f64::consts::FRAC_PI_2],
                 [
-                    -22.0_f64.to_radians(),
-                    -96.0_f64.to_radians(),
-                    124.0_f64.to_radians(),
-                    -28.0_f64.to_radians(),
-                    68.0_f64.to_radians(),
+                    -50.0_f64.to_radians(),
+                    -106.0_f64.to_radians(),
+                    136.0_f64.to_radians(),
+                    -30.0_f64.to_radians(),
+                    40.0_f64.to_radians(),
                     90.0_f64.to_radians(),
                 ],
             ];
@@ -145,7 +510,7 @@ impl<'a> ControllerState<'a> {
             .unwrap_or(q_seed)
     }
 
-    fn move_joints(
+    pub fn move_joints(
         &mut self,
         q_target: [f64; 6],
         g_target: f64,
@@ -179,7 +544,7 @@ impl<'a> ControllerState<'a> {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn move_cartesian(
+    pub fn move_cartesian(
         &mut self,
         p_start: [f64; 3],
         p_end: [f64; 3],
@@ -228,7 +593,7 @@ impl<'a> ControllerState<'a> {
         Ok(())
     }
 
-    fn actuate_gripper(
+    pub fn actuate_gripper(
         &mut self,
         g_target: f64,
         carrying: bool,
@@ -251,12 +616,15 @@ impl<'a> ControllerState<'a> {
         Ok(())
     }
 
-    fn measure_spanner_z(
+    pub fn measure_spanner_z(
         &mut self,
         cal: PlaneCal,
         target_xy: [f64; 2],
         yaw_rad: f64,
     ) -> Result<f64, EpisodeStop> {
+        if !self.has_camera {
+            return Ok(0.0);
+        }
         let cloud = self.read_rgbd_cloud()?;
         let site_fk = self.nom.fk_grasp(&self.cmd_q);
         // Spanner beam top sits +0.064 + 0.0085 = +0.0725 m above `cell_grasp`
@@ -273,6 +641,9 @@ impl<'a> ControllerState<'a> {
         grasp_xy: [f64; 2],
         yaw_rad: f64,
     ) -> Result<f64, EpisodeStop> {
+        if !self.has_camera {
+            return Ok(0.0);
+        }
         let cloud = self.read_rgbd_cloud()?;
         let site_fk = self.nom.fk_grasp(&self.cmd_q);
         // `clamp_bridge` rides on `cell_upper_jaw`: top is +0.045 + clamp_opening above `cell_grasp`
@@ -297,21 +668,17 @@ impl<'a> ControllerState<'a> {
 }
 
 /// Hardened FR10 + Maruzen MBCO-4ME spanner-oven tray loading (`table-to-oven`).
-fn run_spanner_load(st: &mut ControllerState<'_>, home_q: [f64; 6]) -> Result<(), EpisodeStop> {
+pub(crate) fn run_spanner_load<P: ClosedLoopPlant + ?Sized>(
+    st: &mut ControllerState<'_, P>,
+    home_q: [f64; 6],
+) -> Result<(), EpisodeStop> {
     let open_g = st.nom.open_jaw_m;
     let close_g = st.nom.closed_jaw_m;
     let nom_src = st.nom.source_site;
     let nom_dest = st.nom.dest_site;
     let table_z_nom = nom_src[2] - 0.0005;
 
-    let table_roi = RoiBox {
-        x_min: 0.06,
-        x_max: 0.88,
-        y_min: -0.50,
-        y_max: 0.14,
-        z_min: table_z_nom - 0.06,
-        z_max: table_z_nom + 0.06,
-    };
+    let table_roi = spanner_table_roi(table_z_nom);
     let tray_roi = RoiBox {
         x_min: 0.04,
         x_max: 0.82,
@@ -319,14 +686,6 @@ fn run_spanner_load(st: &mut ControllerState<'_>, home_q: [f64; 6]) -> Result<()
         y_max: 0.14,
         z_min: 0.008,
         z_max: 0.050,
-    };
-    let oven_roi = RoiBox {
-        x_min: -0.92,
-        x_max: 0.08,
-        y_min: -0.32,
-        y_max: 0.65,
-        z_min: 1.418,
-        z_max: 1.460,
     };
 
     let cloud0 = st.read_rgbd_cloud()?;
@@ -340,8 +699,8 @@ fn run_spanner_load(st: &mut ControllerState<'_>, home_q: [f64; 6]) -> Result<()
         &st.cam,
         &cloud0,
         cal,
-        oven_roi,
-        [-0.4001, 0.1400, 1.4300],
+        MBCO4_OVEN_ROOF_ROI,
+        MBCO4_OVEN_ROOF_CENTER,
         nom_dest,
         0.012,
     );
@@ -351,10 +710,9 @@ fn run_spanner_load(st: &mut ControllerState<'_>, home_q: [f64; 6]) -> Result<()
     let slide_z_off = 0.042;
     let mut p_corridor = [0.04, -0.52, (rail2_target[2] + slide_z_off).max(tz + 0.30)];
 
-    // Step away from `mbco4_right_cabinet_col` (+X, -Y) first so perturbed oven
-    // poses never scrape the rear jaw when leaving the production ready pose.
+    // Lift smoothly clear of standby before crossing toward the prep table.
     let cur_p0 = st.nom.fk_grasp(&st.cmd_q);
-    let p_clear0 = [cur_p0[0] + 0.10, cur_p0[1] - 0.14, cur_p0[2] + 0.02];
+    let p_clear0 = [cur_p0[0] + 0.04, cur_p0[1] - 0.04, cur_p0[2] + 0.06];
     st.move_cartesian(cur_p0, p_clear0, 0.0, 0.0, open_g, false, 0.020, 1.0, 0.04)?;
 
     for attempt in 0..2 {
@@ -392,7 +750,7 @@ fn run_spanner_load(st: &mut ControllerState<'_>, home_q: [f64; 6]) -> Result<()
         x_prep_cal = gx;
 
         // Two-stage gentle touch-down to calibrated grasp height (`+13 mm` above table:
-        // clears `table_top` at ±1.5 deg tilt while engaging 8.5 mm of the 20.5 mm rim).
+        // clears `table_top` at +/-1.5 deg tilt while engaging 8.5 mm of the 20.5 mm rim).
         let p_pre_grasp = [gx, gy, tz + 0.045 - dz_prep];
         let p_grasp = [gx, gy, tz + 0.0130 - dz_prep];
         st.move_cartesian(
@@ -571,7 +929,9 @@ fn run_spanner_load(st: &mut ControllerState<'_>, home_q: [f64; 6]) -> Result<()
 }
 
 /// Hardened FR10 + Maruzen MBCO-4ME tray retrieval (`oven-to-table`).
-fn run_spanner_unload(st: &mut ControllerState<'_>) -> Result<(), EpisodeStop> {
+fn run_spanner_unload<P: ClosedLoopPlant + ?Sized>(
+    st: &mut ControllerState<'_, P>,
+) -> Result<(), EpisodeStop> {
     let open_g = st.nom.open_jaw_m;
     let close_g = st.nom.closed_jaw_m;
     let nom_src_table = st.nom.source_site;
@@ -586,23 +946,14 @@ fn run_spanner_unload(st: &mut ControllerState<'_>) -> Result<(), EpisodeStop> {
         z_min: table_z_nom - 0.06,
         z_max: table_z_nom + 0.06,
     };
-    let oven_roi = RoiBox {
-        x_min: -0.92,
-        x_max: 0.08,
-        y_min: -0.32,
-        y_max: 0.65,
-        z_min: 1.418,
-        z_max: 1.460,
-    };
-
     let cloud0 = st.read_rgbd_cloud()?;
     let cal = calibrate_table_plane(&cloud0, table_roi, table_z_nom);
     let rail2_pos = perceive_fixture_target(
         &st.cam,
         &cloud0,
         cal,
-        oven_roi,
-        [-0.4001, 0.1400, 1.4300],
+        MBCO4_OVEN_ROOF_ROI,
+        MBCO4_OVEN_ROOF_CENTER,
         nom_rail2,
         0.012,
     );
@@ -691,7 +1042,9 @@ fn run_spanner_unload(st: &mut ControllerState<'_>) -> Result<(), EpisodeStop> {
 
 /// Hardened fork-clamp controller for `combined` (`table-to-oven`, `table-to-rack`),
 /// `separate` (`table-to-rack`), and `pan-staging` (UR5e, CRX-10iA/L, FR10).
-fn run_fork_transfer(st: &mut ControllerState<'_>) -> Result<(), EpisodeStop> {
+fn run_fork_transfer<P: ClosedLoopPlant + ?Sized>(
+    st: &mut ControllerState<'_, P>,
+) -> Result<(), EpisodeStop> {
     let open_g = st.nom.open_jaw_m;
     let close_g = st.nom.closed_jaw_m;
     let nom_src = st.nom.source_site;
@@ -725,7 +1078,6 @@ fn run_fork_transfer(st: &mut ControllerState<'_>) -> Result<(), EpisodeStop> {
         };
 
     let dest_target = if is_oven {
-        // Measured `mbco_oven` roof OBB sits at `dest_site + [0.038, -0.064, 0.348]`
         let nom_roof = [
             nom_dest[0] + 0.038,
             nom_dest[1] - 0.064,
@@ -766,7 +1118,7 @@ fn run_fork_transfer(st: &mut ControllerState<'_>) -> Result<(), EpisodeStop> {
     };
 
     let clearance = if is_oven { 0.50 } else { 0.32 };
-    let table_left_x = nom_src[0] - 0.06; // `table_top` left vertical edge (`0.99 m`)
+    let table_left_x = nom_src[0] - 0.06;
     let mut cur_p = st.nom.fk_grasp(&st.cmd_q);
     let mut dz_prep = 0.0;
     let mut seat_off = 0.25;
@@ -775,20 +1127,16 @@ fn run_fork_transfer(st: &mut ControllerState<'_>) -> Result<(), EpisodeStop> {
     for attempt in 0..2 {
         let ux = tyaw.cos();
         let uy = tyaw.sin();
-        // Start from current pose: open jaw and calibrate Z while clear of the tray!
         let p_cal = [tx - 0.50 * ux, ty - 0.50 * uy, tz + 0.024];
         st.move_cartesian(cur_p, p_cal, 0.0, tyaw, open_g, false, 0.018, 0.85, 0.24)?;
         dz_prep = st.measure_fork_z(cal, [p_cal[0], p_cal[1]], tyaw)?;
 
-        // Drop vertically to 3 mm BELOW tray underside (`tz - 0.003`) while 25 cm clear,
-        // then slide horizontally into T3 `push` trigger zone (never colliding with tray front rim!)
         let p_low = [tx - 0.50 * ux, ty - 0.50 * uy, tz - 0.003 - dz_prep];
         st.move_cartesian(p_cal, p_low, tyaw, tyaw, open_g, false, 0.010, 0.80, 0.08)?;
         let p_probe = [tx - 0.40 * ux, ty - 0.40 * uy, tz - 0.003 - dz_prep];
         st.move_cartesian(p_low, p_probe, tyaw, tyaw, open_g, false, 0.012, 0.80, 0.22)?;
         st.move_cartesian(p_probe, p_low, tyaw, tyaw, open_g, false, 0.015, 0.85, 0.12)?;
 
-        // Re-perceive tray after T3 `push` window
         let cloud_re = st.read_rgbd_cloud()?;
         if let Some(p) = perceive_tray(&st.cam, &cloud_re, cal, tray_roi, table_z_nom, 0.38, true) {
             tx = p.cx;
@@ -798,8 +1146,6 @@ fn run_fork_transfer(st: &mut ControllerState<'_>) -> Result<(), EpisodeStop> {
         }
         let ux = tyaw.cos();
         let uy = tyaw.sin();
-        // Keep both rotated fork tips (`+0.15` along fork, `±0.14` lateral) at least 15 mm
-        // clear of `table_top`'s vertical left edge (`table_left_x`) on shifted/rotated trays!
         let max_tip_x_nom = (tx - 0.25 * ux) + 0.15 * ux + 0.14 * uy.abs();
         let backoff = (max_tip_x_nom - (table_left_x - 0.015)).clamp(0.0, 0.085);
         seat_off = 0.25 + backoff;
@@ -811,7 +1157,6 @@ fn run_fork_transfer(st: &mut ControllerState<'_>) -> Result<(), EpisodeStop> {
         ];
         st.move_cartesian(p_low, p_pre, tyaw, tyaw, open_g, false, 0.014, 0.85, 0.10)?;
 
-        // Slide forks cleanly under tray overhang, lift +3 mm to seat, clamp!
         let p_ins = [p_seat[0], p_seat[1], tz - 0.003 - dz_prep];
         st.move_cartesian(p_pre, p_ins, tyaw, tyaw, open_g, false, 0.010, 0.75, 0.10)?;
         st.move_cartesian(p_ins, p_seat, tyaw, tyaw, open_g, false, 0.003, 0.65, 0.12)?;
@@ -822,7 +1167,6 @@ fn run_fork_transfer(st: &mut ControllerState<'_>) -> Result<(), EpisodeStop> {
             p_seat, p_lifted, tyaw, tyaw, close_g, true, 0.014, 0.75, 0.24,
         )?;
 
-        // Clear prep table along -X (matches `transfer.rs:540`) to check T3 `slip`
         let p_clear_src = [p_lifted[0] - 0.25, p_lifted[1], p_lifted[2]];
         st.move_cartesian(
             p_lifted,
@@ -974,7 +1318,9 @@ fn run_fork_transfer(st: &mut ControllerState<'_>) -> Result<(), EpisodeStop> {
 }
 
 /// Hardened fork-clamp oven retrieval (`oven-to-table` on `combined` cell).
-fn run_fork_unload(st: &mut ControllerState<'_>) -> Result<(), EpisodeStop> {
+fn run_fork_unload<P: ClosedLoopPlant + ?Sized>(
+    st: &mut ControllerState<'_, P>,
+) -> Result<(), EpisodeStop> {
     let open_g = st.nom.open_jaw_m;
     let close_g = st.nom.closed_jaw_m;
     let nom_src_table = st.nom.source_site;
@@ -1103,42 +1449,23 @@ fn run_fork_unload(st: &mut ControllerState<'_>) -> Result<(), EpisodeStop> {
     Ok(())
 }
 
-/// Run the hardened closed-loop Rust controller over `GAUNTLET_URL`.
-/// Returns `(status, fault)` for the final JSON status line.
-pub fn run_hardened(
-    assets: &Assets,
-    cfg: &TaskConfig,
+/// Run the hardened closed-loop Rust transfer controller on any [`ClosedLoopPlant`].
+/// Returns `(status, fault)` (`("done", "")` or `("abort", "<fault>")`).
+pub fn run_hardened_transfer<P: ClosedLoopPlant + ?Sized>(
+    cfg: &ClosedLoopConfig,
+    home_q: [f64; 6],
     cam: CameraModel,
-    client: &GauntletClient,
+    plant: &mut P,
 ) -> Result<(&'static str, &'static str)> {
-    let prepared = open_shipped_operation(assets, cfg)?;
-    let home_q = prepared.start_angles;
     let mut nom = NominalDynamics::load(cfg)?;
-
-    let meas0 = client.begin()?;
-    let (_, _, rgb0) = client.read_rgb("overhead_cam")?;
-    let ts0 = meas0.cam_timestamp.unwrap_or(0.0);
-    let monitor = FaultMonitor::new(ts0, rgb0.clone(), meas0.q, meas0.gripper, nom.is_spanner);
-
-    let mut st = ControllerState {
-        cfg,
-        nom: &mut nom,
-        client,
-        cam,
-        last_rgb: rgb0,
-        cmd_q: meas0.q,
-        cmd_g: meas0.gripper,
-        meas: meas0,
-        carrying: false,
-        tick: 0,
-        monitor,
-    };
-
+    let mut st = ControllerState::new(cfg, &mut nom, plant, cam)?;
     let res = if st.nom.is_spanner {
         match cfg.task {
             BakeryTask::Oven => run_spanner_load(&mut st, home_q),
             BakeryTask::Unload => run_spanner_unload(&mut st),
-            BakeryTask::Rack => bail!("Spanner cell supports table-to-oven and oven-to-table only"),
+            BakeryTask::Rack => {
+                bail!("Spanner cell supports table-to-oven and oven-to-table only")
+            }
         }
     } else {
         match cfg.task {
@@ -1146,22 +1473,5 @@ pub fn run_hardened(
             BakeryTask::Unload => run_fork_unload(&mut st),
         }
     };
-
-    let outcome = match res {
-        Ok(()) => ("done", ""),
-        Err(EpisodeStop::EpisodeOver) => ("done", ""),
-        Err(EpisodeStop::Abort(fault)) => {
-            // Hold current pose for 3 ticks so post-onset settle starts cleanly
-            let q_hold = st.cmd_q;
-            let g_hold = st.cmd_g;
-            let carry = st.carrying;
-            for _ in 0..3 {
-                let ctrl = st.nom.servo_ctrl(&st.meas.q, &q_hold, carry);
-                let _ = st.client.step(&ctrl, g_hold);
-            }
-            ("abort", fault)
-        }
-    };
-    let _ = client.end();
-    Ok(outcome)
+    Ok(st.finish(res))
 }

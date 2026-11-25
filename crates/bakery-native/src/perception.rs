@@ -1,7 +1,8 @@
-//! Unprivileged RGB-D perception and T4 terminal fault detection in Rust.
+//! Unprivileged RGB-D perception and T4 terminal fault detection.
 //!
-//! Reads ONLY allowlisted deployment keys (`overhead_cam`, `overhead_cam_depth`,
-//! `overhead_cam_timestamp`, `joint_position/*`). Zero privileged simulator access.
+//! Reads ONLY deployment-visible overhead RGB-D and joint-encoder measurements.
+//! Zero privileged simulator access; zero `unsafe` code; compiles for both
+//! native targets and `wasm32-unknown-emscripten`.
 
 use nalgebra::{Matrix3, Vector3};
 use std::collections::VecDeque;
@@ -27,6 +28,39 @@ pub struct RoiBox {
     pub y_max: f64,
     pub z_min: f64,
     pub z_max: f64,
+}
+
+impl RoiBox {
+    pub fn contains_xy(&self, x: f64, y: f64) -> bool {
+        x > self.x_min && x < self.x_max && y > self.y_min && y < self.y_max
+    }
+
+    pub fn contains(&self, x: f64, y: f64, z: f64) -> bool {
+        self.contains_xy(x, y) && z > self.z_min && z < self.z_max
+    }
+}
+
+/// Shared overhead ROI and nominal roof center for the Maruzen MBCO-4ME oven cell.
+pub const MBCO4_OVEN_ROOF_CENTER: [f64; 3] = [-0.4001, 0.1400, 1.4300];
+pub const MBCO4_OVEN_ROOF_ROI: RoiBox = RoiBox {
+    x_min: -0.92,
+    x_max: 0.08,
+    y_min: -0.32,
+    y_max: 0.65,
+    z_min: 1.418,
+    z_max: 1.460,
+};
+
+/// Shared prep-table calibration ROI for the FR10 spanner-oven cell.
+pub fn spanner_table_roi(table_z_nom: f64) -> RoiBox {
+    RoiBox {
+        x_min: 0.06,
+        x_max: 0.88,
+        y_min: -0.50,
+        y_max: 0.14,
+        z_min: table_z_nom - 0.06,
+        z_max: table_z_nom + 0.06,
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -113,39 +147,48 @@ fn is_warm_tray_pixel(c: [u8; 3]) -> bool {
     (r + g) / 2 - b > 20 && r > 60 && g > 60
 }
 
+fn collect_roi_z(cloud: &Cloud, roi: RoiBox, neutral_only: bool) -> Vec<f64> {
+    let mut zs = Vec::new();
+    for i in 0..cloud.x.len() {
+        let (x, y, z) = (cloud.x[i], cloud.y[i], cloud.z[i]);
+        if roi.contains(x, y, z) && (!neutral_only || is_neutral_table_pixel(cloud.rgb[i])) {
+            zs.push(z);
+        }
+    }
+    zs
+}
+
+fn collect_shifted_band(
+    cloud: &Cloud,
+    shift_xy: (f64, f64),
+    roi: RoiBox,
+    z_center: f64,
+    z_band: f64,
+    neutral_only: bool,
+) -> (Vec<f64>, Vec<f64>, Vec<f64>) {
+    let (mut fx, mut fy, mut fz) = (Vec::new(), Vec::new(), Vec::new());
+    for i in 0..cloud.x.len() {
+        let (x, y, z) = (cloud.x[i] - shift_xy.0, cloud.y[i] - shift_xy.1, cloud.z[i]);
+        if roi.contains_xy(x, y)
+            && (z - z_center).abs() < z_band
+            && (!neutral_only || is_neutral_table_pixel(cloud.rgb[i]))
+        {
+            fx.push(x);
+            fy.push(y);
+            fz.push(z);
+        }
+    }
+    (fx, fy, fz)
+}
+
 /// Fit the static prep-table plane (`z = c0*x + c1*y + c2`) from bare neutral
 /// stainless-table pixels so its slope directly measures overhead camera tilt
 /// `(ax, ay)` with zero bias even when the tray covers much of the table.
 pub fn calibrate_table_plane(cloud: &Cloud, roi: RoiBox, nom_table_z: f64) -> PlaneCal {
-    let mut zs = Vec::new();
-    for i in 0..cloud.x.len() {
-        let (x, y, z) = (cloud.x[i], cloud.y[i], cloud.z[i]);
-        if x > roi.x_min
-            && x < roi.x_max
-            && y > roi.y_min
-            && y < roi.y_max
-            && z > roi.z_min
-            && z < roi.z_max
-            && is_neutral_table_pixel(cloud.rgb[i])
-        {
-            zs.push(z);
-        }
-    }
+    let mut zs = collect_roi_z(cloud, roi, true);
     let use_neutral = zs.len() >= 80;
     if !use_neutral {
-        zs.clear();
-        for i in 0..cloud.x.len() {
-            let (x, y, z) = (cloud.x[i], cloud.y[i], cloud.z[i]);
-            if x > roi.x_min
-                && x < roi.x_max
-                && y > roi.y_min
-                && y < roi.y_max
-                && z > roi.z_min
-                && z < roi.z_max
-            {
-                zs.push(z);
-            }
-        }
+        zs = collect_roi_z(cloud, roi, false);
     }
     if zs.len() < 60 {
         return PlaneCal {
@@ -160,10 +203,7 @@ pub fn calibrate_table_plane(cloud: &Cloud, roi: RoiBox, nom_table_z: f64) -> Pl
     let mut count = 0usize;
     for i in 0..cloud.x.len() {
         let (x, y, z) = (cloud.x[i], cloud.y[i], cloud.z[i]);
-        if x > roi.x_min
-            && x < roi.x_max
-            && y > roi.y_min
-            && y < roi.y_max
+        if roi.contains_xy(x, y)
             && (z - z_med).abs() <= 0.010
             && (!use_neutral || is_neutral_table_pixel(cloud.rgb[i]))
         {
@@ -203,24 +243,9 @@ pub fn perceive_table_target(
     nom_table_center: [f64; 3],
     nom_dest_world: [f64; 3],
 ) -> [f64; 3] {
-    let (dx_cam, dy_cam) = cam.cam_xy_shift(cal, nom_table_center[2]);
-    let mut fx = Vec::new();
-    let mut fy = Vec::new();
-    let mut fz = Vec::new();
-    for i in 0..cloud.x.len() {
-        let (x, y, z) = (cloud.x[i] - dx_cam, cloud.y[i] - dy_cam, cloud.z[i]);
-        if x > roi.x_min
-            && x < roi.x_max
-            && y > roi.y_min
-            && y < roi.y_max
-            && (z - nom_table_center[2]).abs() < 0.04
-            && is_neutral_table_pixel(cloud.rgb[i])
-        {
-            fx.push(x);
-            fy.push(y);
-            fz.push(z);
-        }
-    }
+    let shift = cam.cam_xy_shift(cal, nom_table_center[2]);
+    let (mut fx, mut fy, mut fz) =
+        collect_shifted_band(cloud, shift, roi, nom_table_center[2], 0.04, true);
     if fx.len() < 120 {
         return nom_dest_world;
     }
@@ -367,17 +392,11 @@ pub fn perceive_fixture_target(
     nom_target_world: [f64; 3],
     z_band: f64,
 ) -> [f64; 3] {
-    let (dx_cam, dy_cam) = cam.cam_xy_shift(cal, nom_feature_center[2]);
+    let shift = cam.cam_xy_shift(cal, nom_feature_center[2]);
     let mut zs = Vec::new();
     for i in 0..cloud.x.len() {
-        let (x, y, z) = (cloud.x[i] - dx_cam, cloud.y[i] - dy_cam, cloud.z[i]);
-        if x > roi.x_min
-            && x < roi.x_max
-            && y > roi.y_min
-            && y < roi.y_max
-            && z > roi.z_min
-            && z < roi.z_max
-        {
+        let (x, y, z) = (cloud.x[i] - shift.0, cloud.y[i] - shift.1, cloud.z[i]);
+        if roi.contains(x, y, z) {
             zs.push(z);
         }
     }
@@ -385,36 +404,61 @@ pub fn perceive_fixture_target(
         return nom_target_world;
     }
     let z_med = percentile(&mut zs, 50.0);
-    let mut fx = Vec::new();
-    let mut fy = Vec::new();
-    let mut fz = Vec::new();
-    for i in 0..cloud.x.len() {
-        let (x, y, z) = (cloud.x[i] - dx_cam, cloud.y[i] - dy_cam, cloud.z[i]);
-        if x > roi.x_min
-            && x < roi.x_max
-            && y > roi.y_min
-            && y < roi.y_max
-            && (z - z_med).abs() < z_band
-        {
-            fx.push(x);
-            fy.push(y);
-            fz.push(z);
-        }
-    }
+    let (mut fx, mut fy, mut fz) = collect_shifted_band(cloud, shift, roi, z_med, z_band, false);
     if fx.len() < 40 {
         return nom_target_world;
     }
     let ocx = 0.5 * (percentile(&mut fx, 2.0) + percentile(&mut fx, 98.0));
     let ocy = 0.5 * (percentile(&mut fy, 2.0) + percentile(&mut fy, 98.0));
     let ocz = percentile(&mut fz, 50.0);
-    let dx = (ocx - nom_feature_center[0]).clamp(-0.05, 0.05);
-    let dy = (ocy - nom_feature_center[1]).clamp(-0.05, 0.05);
-    let dz = (ocz - nom_feature_center[2]).clamp(-0.03, 0.03);
+    let dx = (ocx - nom_feature_center[0]).clamp(-0.08, 0.08);
+    let dy = (ocy - nom_feature_center[1]).clamp(-0.08, 0.08);
+    let dz = (ocz - nom_feature_center[2]).clamp(-0.04, 0.04);
     [
         nom_target_world[0] + dx,
         nom_target_world[1] + dy,
         nom_target_world[2] + dz,
     ]
+}
+
+/// Perceive the open angle (`theta in [0.4, 1.92]` rad) of the left-hinged
+/// Maruzen MBCO-4ME door panel from overhead RGB-D using the warm orange door
+/// top edge (`z ~ hinge.z + 0.244`) radiating from `hinge_world`.
+pub fn perceive_open_door_angle(
+    cam: &CameraModel,
+    cloud: &Cloud,
+    cal: PlaneCal,
+    hinge_world: [f64; 3],
+    fallback_rad: f64,
+) -> f64 {
+    let z_door_top = hinge_world[2] + 0.244;
+    let (dx_cam, dy_cam) = cam.cam_xy_shift(cal, z_door_top);
+    let mut angles = Vec::new();
+    for i in 0..cloud.x.len() {
+        let x = cloud.x[i] - dx_cam;
+        let y = cloud.y[i] - dy_cam;
+        let z = cloud.z[i];
+        if (z - z_door_top).abs() > 0.045 {
+            continue;
+        }
+        let dx = x - hinge_world[0];
+        let dy = y - hinge_world[1];
+        let r = (dx * dx + dy * dy).sqrt();
+        // Sample the outer half of the 0.54 m door leaf (avoids oven cabinet roof at y >= -0.20)
+        if r > 0.16 && r < 0.58 && dy < -0.08 && is_warm_tray_pixel(cloud.rgb[i]) {
+            // Door +X axis rotates clockwise from +X_world: (cos theta, -sin theta)
+            let th = (-dy).atan2(dx);
+            if (0.35..=1.95).contains(&th) {
+                angles.push(th);
+            }
+        }
+    }
+    if angles.len() < 15 {
+        return fallback_rad;
+    }
+    // Compensate the constant +0.034 rad CAD offset between the hinge axis and the
+    // visible center of the 68 mm thick door top edge (< 0.6 mm error across 1.4-1.85 rad).
+    (percentile(&mut angles, 50.0) + 0.034).clamp(0.40, 1.90)
 }
 
 /// Eye-to-hand gripper beam Z-offset measurement from overhead depth.
@@ -544,6 +588,12 @@ impl FaultMonitor {
                 return Some("dead_gripper");
             }
             if mode == "open" && g_now < self.open_stuck_thresh && (g_now - g_prev).abs() < 0.0018 {
+                return Some("dead_gripper");
+            }
+            if mode == "handle_close" && g_now < -0.013 && (g_now - g_prev).abs() < 0.0006 {
+                return Some("dead_gripper");
+            }
+            if mode == "handle_open" && g_now > 0.001 && (g_now - g_prev).abs() < 0.0006 {
                 return Some("dead_gripper");
             }
         }
