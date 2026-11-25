@@ -42,9 +42,14 @@ with the person's role checks and receipts. One deterministic engine in
 - The lots drawer (`CostsLotsDrawer`, a `SideDrawer`) shows the lots of one stock item,
   their invoice costs, the on-hand coverage, the lot variance and the price
   sensitivity. Its product rows open the Margins tab with that product.
-- **Reset** clears all draft cells. **Save changes** shows only to a person who can
-  edit. If a person who is not an owner or an admin changes a price, the page marks the
-  price as what-if and does not save it.
+- **Reset** clears all draft cells. **Undo** (`Ctrl+Z` or `Cmd+Z`) and **Redo**
+  (`Ctrl+Shift+Z`, `Cmd+Shift+Z`, or `Ctrl+Y`) step back and forward through this
+  person's own unsaved draft edits, including **Reset**. Keystroke edits within one
+  focused cell coalesce into one step; pressing undo while typing an uncommitted
+  formula or back-solve cancels that text before undoing earlier committed steps.
+  **Save changes** shows only to a person who can edit. If a person who is not an
+  owner or an admin changes a price, the page marks the price as what-if and does not
+  save it.
 
 ### The cost model
 
@@ -182,7 +187,11 @@ The columns that take a formula are `COST_FORMULA_COLUMNS`: `units`, `spoil`, `p
   cell at the same time, the Yjs map keeps one value, the same on each replica.
 - `CostsSheetClient` (`costs-sheet-client.ts`) opens the socket. It sends the pointer
   and the selected `{ sheet, cellKey }` of the person. It sends the selection only when
-  the socket has `edit` access, and the room shows a reader as viewing.
+  the socket has `edit` access, and the room shows a reader as viewing. It also keeps
+  at most 100 local undo and redo steps (`HISTORY_LIMIT`) as inverse cell updates, so
+  undo reverses only this person's own draft edits and syncs the reversal to the room.
+  A saved baseline (`meta:savedAt` change or completed **Save changes**) or a room
+  generation replacement clears both stacks.
 - `costs-sheet-presence.tsx` shows the pointer and name of each other person, a colored
   border on the cell that each person selected, dots on the tabs and the collaborator
   chips. A pointer hides after 5 s with no move (`COLLABORATION_POINTER_IDLE_MS`).

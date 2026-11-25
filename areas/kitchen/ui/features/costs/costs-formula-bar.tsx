@@ -579,9 +579,11 @@ export function CostsFormulaBar(props: {
   readonly onChangeDraft: (next: string) => void;
   readonly onFocusBar: (seed: string) => void;
   readonly onCommit: (raw: string) => void;
+  readonly onCancel: () => void;
   readonly onResetColumn: () => void;
   readonly onOpenBom: () => void;
 }): React.ReactNode {
+  const skipBlurCommitRef = React.useRef(false);
   const {
     row,
     rowNumber1Based,
@@ -705,21 +707,29 @@ export function CostsFormulaBar(props: {
             aria-label={`Formula or value for ${row.productTitle} ${COLUMN_LABELS[column]}`}
             placeholder={`${defaultFormula} or enter a target value…`}
             value={displayedFormula}
-            onFocus={() =>
-              props.onFocusBar(activeCustomFormula ?? defaultFormula)
-            }
+            onFocus={() => {
+              skipBlurCommitRef.current = false;
+              props.onFocusBar(activeCustomFormula ?? defaultFormula);
+            }}
             onChange={(event) => props.onChangeDraft(event.currentTarget.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
+                skipBlurCommitRef.current = true;
                 event.preventDefault();
                 props.onCommit(event.currentTarget.value);
                 event.currentTarget.blur();
               } else if (event.key === "Escape") {
+                skipBlurCommitRef.current = true;
                 event.preventDefault();
+                props.onCancel();
                 event.currentTarget.blur();
               }
             }}
             onBlur={(event) => {
+              if (skipBlurCommitRef.current) {
+                skipBlurCommitRef.current = false;
+                return;
+              }
               if (isEditing) {
                 props.onCommit(event.currentTarget.value);
               }

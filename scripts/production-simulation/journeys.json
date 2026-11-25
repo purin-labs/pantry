@@ -1486,6 +1486,23 @@
       }
     },
     {
+      "id": "costs-undo-redo-browser",
+      "file": "scripts/bakery-robots/verify-costs-undo-redo-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "KIT-04",
+      "run": {
+        "tool": "browser",
+        "url": "/kitchen-preview.html?page=costs"
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 9.7,
+        "date": "2026-11-25",
+        "commit": "19ca8fdb"
+      }
+    },
+    {
       "id": "store-layout-browser",
       "file": "scripts/bakery-robots/verify-store-layout-browser.js",
       "tier": "browser",

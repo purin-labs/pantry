@@ -6,8 +6,10 @@ import {
   LineChart,
   Package,
   PanelRight,
+  Redo2,
   Search,
   TrendingUp,
+  Undo2,
   Zap,
 } from "lucide-react";
 import { Link } from "react-router";
@@ -33,6 +35,10 @@ import {
   FORECAST_OPENING_CASH_CELL_KEY,
   OVERHEAD_LABOR_CELL_KEY,
   OVERHEAD_RENT_CELL_KEY,
+  SCENARIO_BAKE_WASTE_CELL_KEY,
+  SCENARIO_CHANNEL_FEE_CELL_KEY,
+  SCENARIO_INCLUDED_TAX_CELL_KEY,
+  SCENARIO_PREP_REJECT_CELL_KEY,
   forecastWeekIndexCellKey,
   productDayCellKey,
   productFormulaCellKey,
@@ -88,6 +94,8 @@ import {
   handleCellBoxMouseDown,
   handleSheetKeyDown,
   inspectDirtyCells,
+  isCostsUndoRedoTarget,
+  selectInputSafely,
   type DirtyInspection,
 } from "./costs-sheet-grid";
 import { CostsPageViewSource } from "./costs-page-view";
@@ -201,6 +209,13 @@ const SCENARIO_SELECT_ITEMS: readonly Readonly<{
   { value: "custom", label: PRESET_LABELS.custom },
 ];
 
+const ASSUMPTION_INPUT_CELL_KEYS: ReadonlySet<string> = new Set([
+  SCENARIO_BAKE_WASTE_CELL_KEY,
+  SCENARIO_PREP_REJECT_CELL_KEY,
+  SCENARIO_CHANNEL_FEE_CELL_KEY,
+  SCENARIO_INCLUDED_TAX_CELL_KEY,
+]);
+
 // A PureComponent: opening or closing the chat beside the page renders the
 // Portal again with the same props, and rendering the 36-row sheet again cost
 // about 70 ms before the chat could move.
@@ -211,17 +226,22 @@ export class CostsPage extends React.PureComponent<Props, State> {
   private sheetClient: CostsSheetClient | null = null;
   private initialSyncSeen = false;
   private lastObservedSavedAt: string | null = null;
+  private focusEditSeq = 0;
+  private activeFocusMergeKey: string | null = null;
+  private activeFocusCommittedLive = false;
   private readonly pageView = new CostsPageViewSource(this);
 
   componentDidMount(): void {
     this.mounted = true;
     this.pageView.register();
+    window.addEventListener("keydown", this.handleWindowKeyDown);
     void this.load();
   }
 
   componentDidUpdate(prevProps: Props): void {
     if (prevProps.organisationId !== this.props.organisationId) {
       this.disposeSheetClient();
+      this.clearFocusSession();
       this.setState({ kind: "loading" });
       void this.load();
       return;
@@ -231,6 +251,7 @@ export class CostsPage extends React.PureComponent<Props, State> {
 
   componentWillUnmount(): void {
     this.mounted = false;
+    window.removeEventListener("keydown", this.handleWindowKeyDown);
     this.pageView.unregister();
     this.disposeSheetClient();
   }
@@ -273,18 +294,109 @@ export class CostsPage extends React.PureComponent<Props, State> {
       shouldReloadBaseline = this.state.kind === "ready" && !this.state.saving;
     }
 
-    if (this.state.kind === "ready") {
-      this.setState({
-        ...this.state,
-        sheetView,
-        pendingSaveKey: null,
-      });
-    }
+    this.setState((prev) =>
+      prev.kind === "ready"
+        ? {
+            ...prev,
+            sheetView,
+            pendingSaveKey: null,
+          }
+        : prev,
+    );
     if (shouldReloadBaseline && this.state.kind === "ready") {
       forgetControlReads();
       void this.load(this.state.notice, this.state.noticeIsError);
     }
   };
+
+  private readonly handleWindowKeyDown = (event: KeyboardEvent): void => {
+    if (
+      event.defaultPrevented ||
+      event.isComposing ||
+      event.altKey ||
+      !(event.ctrlKey || event.metaKey)
+    ) {
+      return;
+    }
+    const state = this.state;
+    if (state.kind !== "ready" || state.saving || !this.canEditSheet(state)) {
+      return;
+    }
+    const key = event.key.toLowerCase();
+    const isUndo = key === "z" && !event.shiftKey;
+    const isRedo =
+      (key === "z" && event.shiftKey) || (key === "y" && !event.shiftKey);
+    if (!isUndo && !isRedo) {
+      return;
+    }
+    if (!isCostsUndoRedoTarget(this.surfaceRef.current, event.target)) {
+      return;
+    }
+    event.preventDefault();
+    this.applyHistoryStep(isUndo ? "undo" : "redo");
+  };
+
+  private beginFocusSession(cellKey: string): void {
+    this.focusEditSeq += 1;
+    this.activeFocusMergeKey = `cell:${this.focusEditSeq}:${cellKey}`;
+    this.activeFocusCommittedLive = false;
+  }
+
+  private clearFocusSession(): void {
+    this.activeFocusMergeKey = null;
+    this.activeFocusCommittedLive = false;
+  }
+
+  private hasUncommittedFocusEdit(state: Variant<State, "ready">): boolean {
+    return (
+      state.focusedCell !== null &&
+      state.focusedCell.raw !== state.focusedCell.seed &&
+      !this.activeFocusCommittedLive
+    );
+  }
+
+  private applyHistoryStep(direction: "undo" | "redo"): void {
+    const state = this.state;
+    if (state.kind !== "ready" || state.saving || !this.canEditSheet(state)) {
+      return;
+    }
+    const cancelOnly =
+      direction === "undo" && this.hasUncommittedFocusEdit(state);
+    this.clearFocusSession();
+    this.setState((prev) =>
+      prev.kind === "ready"
+        ? {
+            ...prev,
+            focusedCell: null,
+            pendingSaveKey: null,
+            notice: "",
+            noticeIsError: false,
+          }
+        : prev,
+    );
+    if (!cancelOnly) {
+      if (direction === "undo") {
+        this.sheetClient?.undo();
+      } else {
+        this.sheetClient?.redo();
+      }
+    }
+    this.reselectActiveWorkbookInput();
+  }
+
+  private reselectActiveWorkbookInput(): void {
+    const active = document.activeElement;
+    if (
+      active instanceof HTMLInputElement &&
+      isCostsUndoRedoTarget(this.surfaceRef.current, active)
+    ) {
+      requestAnimationFrame(() => {
+        if (document.activeElement === active) {
+          selectInputSafely(active);
+        }
+      });
+    }
+  }
 
   private async load(
     preserveNotice = "",
@@ -335,10 +447,18 @@ export class CostsPage extends React.PureComponent<Props, State> {
     return true;
   }
 
-  private applyCellChanges(changes: readonly CostsSheetCellChange[]): void {
+  private applyCellChanges(
+    changes: readonly CostsSheetCellChange[],
+    options?: Readonly<{ mergeKey?: string | null; live?: boolean }>,
+  ): void {
     if (this.state.kind !== "ready" || changes.length === 0) return;
+    if (options?.live === true) {
+      this.activeFocusCommittedLive = true;
+    }
     if (this.sheetClient !== null) {
-      this.sheetClient.setCells(changes);
+      this.sheetClient.setCells(changes, {
+        mergeKey: options?.mergeKey ?? null,
+      });
       return;
     }
     this.setState((prev) => {
@@ -382,6 +502,7 @@ export class CostsPage extends React.PureComponent<Props, State> {
 
   private selectTab(tab: CostsSheetTab): void {
     if (this.state.kind !== "ready") return;
+    this.clearFocusSession();
     this.setState({
       ...this.state,
       tab,
@@ -439,11 +560,12 @@ export class CostsPage extends React.PureComponent<Props, State> {
     selectElement?: HTMLInputElement,
   ): void {
     if (this.state.kind !== "ready") return;
+    this.beginFocusSession(cellKey);
     if (selectElement !== undefined) {
-      selectElement.select();
+      selectInputSafely(selectElement);
       requestAnimationFrame(() => {
         if (document.activeElement === selectElement) {
-          selectElement.select();
+          selectInputSafely(selectElement);
         }
       });
     }
@@ -467,42 +589,63 @@ export class CostsPage extends React.PureComponent<Props, State> {
 
   private updateFocusedRaw(cellKey: string, raw: string): void {
     if (this.state.kind !== "ready") return;
-    this.setState((prev) =>
-      prev.kind === "ready" && prev.focusedCell?.cellKey === cellKey
-        ? {
-            ...prev,
-            focusedCell: { ...prev.focusedCell, raw },
-            pendingSaveKey: null,
-          }
-        : prev,
-    );
+    if (
+      this.state.focusedCell === null ||
+      this.state.focusedCell.cellKey !== cellKey
+    ) {
+      this.beginFocusSession(cellKey);
+    }
+    this.setState((prev) => {
+      if (prev.kind !== "ready") return prev;
+      if (prev.focusedCell?.cellKey === cellKey) {
+        return {
+          ...prev,
+          focusedCell: { ...prev.focusedCell, raw },
+          pendingSaveKey: null,
+        };
+      }
+      if (prev.focusedCell === null) {
+        return {
+          ...prev,
+          focusedCell: { cellKey, raw, seed: raw === "" ? "\0" : "" },
+          pendingSaveKey: null,
+        };
+      }
+      return prev;
+    });
   }
 
   private blurCell(cellKey: string, onCommit?: () => void): void {
     onCommit?.();
+    if (
+      this.state.kind === "ready" &&
+      this.state.focusedCell?.cellKey === cellKey
+    ) {
+      this.clearFocusSession();
+      this.sheetClient?.select(this.state.tab, null);
+    }
     this.setState((prev) =>
       prev.kind === "ready" && prev.focusedCell?.cellKey === cellKey
         ? { ...prev, focusedCell: null }
         : prev,
     );
-    if (
-      this.state.kind === "ready" &&
-      this.state.focusedCell?.cellKey === cellKey
-    ) {
-      this.sheetClient?.select(this.state.tab, null);
-    }
   }
 
   private resetSheet(): void {
     if (this.state.kind !== "ready") return;
+    this.clearFocusSession();
+    this.setState((prev) =>
+      prev.kind === "ready"
+        ? {
+            ...prev,
+            focusedCell: null,
+            pendingSaveKey: null,
+            notice: "",
+            noticeIsError: false,
+          }
+        : prev,
+    );
     this.sheetClient?.clearAll();
-    this.setState({
-      ...this.state,
-      focusedCell: null,
-      pendingSaveKey: null,
-      notice: "",
-      noticeIsError: false,
-    });
     this.sheetClient?.select(this.state.tab, null);
   }
 
@@ -545,7 +688,10 @@ export class CostsPage extends React.PureComponent<Props, State> {
         raw,
       });
       if (outcome.ok && outcome.changes.length > 0) {
-        this.applyCellChanges(outcome.changes);
+        this.applyCellChanges(outcome.changes, {
+          mergeKey: this.activeFocusMergeKey,
+          live: true,
+        });
       }
     }
   }
@@ -586,6 +732,8 @@ export class CostsPage extends React.PureComponent<Props, State> {
       column,
       raw: rawToCommit,
     });
+    const mergeKey = this.activeFocusMergeKey;
+    this.clearFocusSession();
     if (!outcome.ok) {
       this.setState((prev) =>
         prev.kind === "ready"
@@ -613,7 +761,7 @@ export class CostsPage extends React.PureComponent<Props, State> {
     );
     this.sheetClient?.select(this.state.tab, null);
     if (outcome.changes.length > 0) {
-      this.applyCellChanges(outcome.changes);
+      this.applyCellChanges(outcome.changes, { mergeKey });
     }
   }
 
@@ -636,6 +784,7 @@ export class CostsPage extends React.PureComponent<Props, State> {
         dayIndex,
         parsed,
       ),
+      { mergeKey: this.activeFocusMergeKey, live: true },
     );
   }
 
@@ -648,7 +797,12 @@ export class CostsPage extends React.PureComponent<Props, State> {
   ): void {
     if (this.state.kind !== "ready") return;
     this.updateFocusedRaw(cellKey, raw);
-    this.applyCellChanges(changesForSupplyPatch(item, defaultCurrency, patch));
+    this.applyCellChanges(
+      changesForSupplyPatch(item, defaultCurrency, patch),
+      patch.packUnit === undefined
+        ? { mergeKey: this.activeFocusMergeKey, live: true }
+        : undefined,
+    );
   }
 
   private updateLotField(
@@ -662,6 +816,7 @@ export class CostsPage extends React.PureComponent<Props, State> {
     this.updateFocusedRaw(cellKey, raw);
     this.applyCellChanges(
       changesForLotInvoicePatch(lot, defaultCurrency, patch),
+      { mergeKey: this.activeFocusMergeKey, live: true },
     );
   }
 
@@ -734,6 +889,7 @@ export class CostsPage extends React.PureComponent<Props, State> {
           `${built.lotWrites.length} lot ${built.lotWrites.length === 1 ? "invoice" : "invoices"}`,
         );
       }
+      this.sheetClient?.clearHistory();
       forgetControlReads();
       await this.load(`Saved ${parts.join(", ")}.`);
     } catch (error) {
@@ -969,11 +1125,45 @@ export class CostsPage extends React.PureComponent<Props, State> {
     );
     const rentFormatted = minorToMajorString(projected.dailyRentMinor, digits);
 
+    const hasUncommittedFocusEdit = this.hasUncommittedFocusEdit(state);
     const headerActions = (
       <>
         {dirtyInfo.whatIfPriceCount > 0 && !state.overview.canEditPrices && (
           <span className="costs-whatif-pill">
             Price {currencySymbol} is what-if
+          </span>
+        )}
+        {canEdit && (
+          <span
+            className="costs-history-group"
+            role="group"
+            aria-label="Undo and redo"
+          >
+            <button
+              type="button"
+              className="costs-icon-btn"
+              aria-label="Undo"
+              title="Undo (Ctrl+Z)"
+              disabled={
+                state.saving ||
+                (!state.sheetView.canUndo && !hasUncommittedFocusEdit)
+              }
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => this.applyHistoryStep("undo")}
+            >
+              <Undo2 size={15} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="costs-icon-btn"
+              aria-label="Redo"
+              title="Redo (Ctrl+Shift+Z)"
+              disabled={state.saving || !state.sheetView.canRedo}
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => this.applyHistoryStep("redo")}
+            >
+              <Redo2 size={15} aria-hidden="true" />
+            </button>
           </span>
         )}
         <button
@@ -1168,6 +1358,7 @@ export class CostsPage extends React.PureComponent<Props, State> {
                   const minor = Math.max(0, Math.round(num * 10 ** digits));
                   this.applyCellChanges(
                     changesForLaborMinor(state.overview, minor),
+                    { mergeKey: this.activeFocusMergeKey, live: true },
                   );
                 }}
                 onChangeRentRaw={(raw) => {
@@ -1179,6 +1370,7 @@ export class CostsPage extends React.PureComponent<Props, State> {
                   const minor = Math.max(0, Math.round(num * 10 ** digits));
                   this.applyCellChanges(
                     changesForRentMinor(state.overview, minor),
+                    { mergeKey: this.activeFocusMergeKey, live: true },
                   );
                 }}
               />
@@ -1217,6 +1409,7 @@ export class CostsPage extends React.PureComponent<Props, State> {
                     const minor = Math.max(0, Math.round(num * 10 ** digits));
                     this.applyCellChanges(
                       changesForForecastOpeningCashMinor(state.overview, minor),
+                      { mergeKey: this.activeFocusMergeKey, live: true },
                     );
                   }}
                   onChangeExtraShiftThresholdRaw={(raw) => {
@@ -1233,6 +1426,7 @@ export class CostsPage extends React.PureComponent<Props, State> {
                         state.overview,
                         Math.round(num),
                       ),
+                      { mergeKey: this.activeFocusMergeKey, live: true },
                     );
                   }}
                   onChangeExtraShiftWeeklyRaw={(raw) => {
@@ -1250,6 +1444,7 @@ export class CostsPage extends React.PureComponent<Props, State> {
                         state.overview,
                         minor,
                       ),
+                      { mergeKey: this.activeFocusMergeKey, live: true },
                     );
                   }}
                   onChangeCapexRaw={(raw) => {
@@ -1261,6 +1456,7 @@ export class CostsPage extends React.PureComponent<Props, State> {
                     const minor = Math.max(0, Math.round(num * 10 ** digits));
                     this.applyCellChanges(
                       changesForForecastCapexMinor(state.overview, minor),
+                      { mergeKey: this.activeFocusMergeKey, live: true },
                     );
                   }}
                 />
@@ -1422,11 +1618,21 @@ export class CostsPage extends React.PureComponent<Props, State> {
                     onFocusCell={(key, raw) => this.focusCell(key, raw)}
                     onBlurCell={(key) => this.blurCell(key)}
                     onUpdateRaw={(key, raw) => this.updateFocusedRaw(key, raw)}
-                    onCommitAssumptions={(next) =>
+                    onCommitAssumptions={(next) => {
+                      const focusedKey =
+                        this.state.kind === "ready"
+                          ? (this.state.focusedCell?.cellKey ?? null)
+                          : null;
+                      const isLiveInput =
+                        focusedKey !== null &&
+                        ASSUMPTION_INPUT_CELL_KEYS.has(focusedKey);
                       this.applyCellChanges(
                         changesForAssumptions(state.overview, next),
-                      )
-                    }
+                        isLiveInput
+                          ? { mergeKey: this.activeFocusMergeKey, live: true }
+                          : undefined,
+                      );
+                    }}
                   />
                 )}
 
@@ -1543,6 +1749,7 @@ export class CostsPage extends React.PureComponent<Props, State> {
                         weekIndex,
                         Math.round(num),
                       ),
+                      { mergeKey: this.activeFocusMergeKey, live: true },
                     );
                   }}
                 />
@@ -1687,6 +1894,7 @@ export class CostsPage extends React.PureComponent<Props, State> {
         canEdit={canEdit}
         formatMoney={fmtMoney}
         onFocusBar={(seed) => {
+          this.beginFocusSession(fxBarKey);
           this.setState((prev) =>
             prev.kind === "ready"
               ? {
@@ -1698,11 +1906,15 @@ export class CostsPage extends React.PureComponent<Props, State> {
           this.sheetClient?.select(state.tab, cellKey);
         }}
         onChangeDraft={(next) => {
+          if (this.state.kind === "ready" && this.state.focusedCell === null) {
+            this.beginFocusSession(fxBarKey);
+          }
           this.setState((prev) => {
             if (prev.kind !== "ready") return prev;
             const activeKey =
               prev.focusedCell?.cellKey === cellKey ? cellKey : fxBarKey;
-            const prevSeed = prev.focusedCell?.seed ?? "";
+            const prevSeed =
+              prev.focusedCell?.seed ?? (next === "" ? "\0" : "");
             return {
               ...prev,
               focusedCell: { cellKey: activeKey, raw: next, seed: prevSeed },
@@ -1720,6 +1932,13 @@ export class CostsPage extends React.PureComponent<Props, State> {
             column,
             raw,
           );
+        }}
+        onCancel={() => {
+          this.clearFocusSession();
+          this.setState((prev) =>
+            prev.kind === "ready" ? { ...prev, focusedCell: null } : prev,
+          );
+          this.sheetClient?.select(state.tab, null);
         }}
         onResetColumn={() => {
           if (column === "taxFee") return;

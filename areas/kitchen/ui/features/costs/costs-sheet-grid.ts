@@ -13,10 +13,7 @@ import {
   type SupplyCostLineWrite,
   type SupplyCostTerms,
 } from "@purin-labs/kitchen-control-api";
-import {
-  buildLotWritesForSheet,
-  inspectDirtyLots,
-} from "./costs-lots-drawer";
+import { buildLotWritesForSheet, inspectDirtyLots } from "./costs-lots-drawer";
 import {
   currencyDigits,
   hydrateFromOverview,
@@ -29,10 +26,7 @@ import {
   type SupplyRowDraft,
 } from "./costs-sheet-draft";
 
-type SheetCellElement =
-  | HTMLInputElement
-  | HTMLButtonElement
-  | HTMLElement;
+type SheetCellElement = HTMLInputElement | HTMLButtonElement | HTMLElement;
 
 /**
  * Handles Excel-style 2D keyboard navigation across spreadsheet cells:
@@ -180,17 +174,74 @@ function findFocusableCell(
   return target;
 }
 
+const WORKBOOK_INPUT_SELECTOR =
+  ".costs-cell-box, .costs-overhead-chip, .costs-fx-bar, .costs-forecast-inline-field, .costs-pop-field";
+const WORKBOOK_OVERLAY_SELECTOR =
+  ".costs-assumptions-popover, .costs-bom-side-drawer";
+
+/**
+ * Selects all text in an input without throwing on input types (such as
+ * `number` in some browsers) that do not support selection ranges.
+ */
+export function selectInputSafely(input: HTMLInputElement): void {
+  try {
+    input.select();
+  } catch {
+    // number inputs do not support select() in some browsers
+  }
+}
+
+/**
+ * Returns true when Cmd/Ctrl+Z and Cmd/Ctrl+Shift+Z belong to the Costs &
+ * margins workbook rather than an unrelated text input (search, chat, modal).
+ */
+export function isCostsUndoRedoTarget(
+  surface: HTMLElement | null,
+  target: EventTarget | null,
+): boolean {
+  if (
+    surface === null ||
+    surface.closest("[hidden]") !== null ||
+    surface.getClientRects().length === 0
+  ) {
+    return false;
+  }
+  const blocks = (element: Element | null): boolean => {
+    if (element === null) return false;
+    if (element.closest(".costs-search-box") !== null) return true;
+    if (
+      (element instanceof HTMLElement && element.isContentEditable) ||
+      element.closest("textarea, [contenteditable='true']") !== null
+    ) {
+      return true;
+    }
+    if (element.closest("input, select") !== null) {
+      return element.closest(WORKBOOK_INPUT_SELECTOR) === null;
+    }
+    const dialog = element.closest(
+      "dialog, [role='dialog'], [aria-modal='true']",
+    );
+    if (
+      dialog !== null &&
+      !dialog.matches(WORKBOOK_OVERLAY_SELECTOR) &&
+      element.closest(WORKBOOK_OVERLAY_SELECTOR) === null
+    ) {
+      return true;
+    }
+    return false;
+  };
+  if (target instanceof Element && blocks(target)) return false;
+  if (blocks(document.activeElement)) return false;
+  return true;
+}
+
 function activateSheetCell(target: HTMLElement): void {
   target.focus();
   if (typeof target.scrollIntoView === "function") {
     target.scrollIntoView({ block: "nearest", inline: "nearest" });
   }
   if (target instanceof HTMLInputElement) {
-    try {
-      target.select();
-    } catch {
-      // number inputs do not support select() in some browsers
-    }
+    selectInputSafely(target);
   }
 }
 
@@ -401,9 +452,7 @@ export function inspectDirtyCells(
   const saveablePriceCount = overview.canEditPrices
     ? dirtyPriceProducts.size
     : 0;
-  const whatIfPriceCount = overview.canEditPrices
-    ? 0
-    : dirtyPriceProducts.size;
+  const whatIfPriceCount = overview.canEditPrices ? 0 : dirtyPriceProducts.size;
   const saveableDirtyCount =
     planCellCount + saveablePriceCount + dirtySupplies.size + dirtyLots.size;
   const totalDirtyCount = saveableDirtyCount + whatIfPriceCount;
@@ -440,7 +489,10 @@ function countDirtyForecastFields(
   if (
     cur.demandCurve !== "custom" &&
     cur.demandCurve !== base.demandCurve &&
-    sameWeekDemandPct(cur.weekDemandPct, presetDemandCurveValues(cur.demandCurve))
+    sameWeekDemandPct(
+      cur.weekDemandPct,
+      presetDemandCurveValues(cur.demandCurve),
+    )
   ) {
     count += 1;
   } else {
@@ -499,25 +551,23 @@ export function buildSheetWritePayload(
     dirty.dirtyWasteProducts.size > 0 ||
     dirty.dirtyFormulaCellKeys.size > 0
   ) {
-    const entries: ProductCostPlanEntry[] = overview.products.map(
-      (product) => {
-        const fx = projected.productFormulas[product.productId];
-        return {
-          productId: product.productId,
-          weekUnits:
-            projected.weeklyTargets[product.productId] ??
-            defaultWeekUnitsForDaily(product.defaultDailyUnits),
-          spoilBps: projected.spoilBpsOverrides[product.productId] ?? null,
-          cogsOverrideMinor:
-            projected.cogsOverridesMinor[product.productId] ?? null,
-          wasteOverrideMinor:
-            projected.wasteOverridesMinor[product.productId] ?? null,
-          ...(fx !== undefined && Object.keys(fx).length > 0
-            ? { formulas: fx }
-            : {}),
-        };
-      },
-    );
+    const entries: ProductCostPlanEntry[] = overview.products.map((product) => {
+      const fx = projected.productFormulas[product.productId];
+      return {
+        productId: product.productId,
+        weekUnits:
+          projected.weeklyTargets[product.productId] ??
+          defaultWeekUnitsForDaily(product.defaultDailyUnits),
+        spoilBps: projected.spoilBpsOverrides[product.productId] ?? null,
+        cogsOverrideMinor:
+          projected.cogsOverridesMinor[product.productId] ?? null,
+        wasteOverrideMinor:
+          projected.wasteOverridesMinor[product.productId] ?? null,
+        ...(fx !== undefined && Object.keys(fx).length > 0
+          ? { formulas: fx }
+          : {}),
+      };
+    });
     const includeForecast =
       dirty.forecastDirty || overview.costPlan.forecast !== undefined;
     planWrite = {
@@ -590,7 +640,11 @@ export function buildSheetWritePayload(
     });
   }
 
-  const builtLots = buildLotWritesForSheet(overview, projected, dirty.dirtyLots);
+  const builtLots = buildLotWritesForSheet(
+    overview,
+    projected,
+    dirty.dirtyLots,
+  );
   if (!builtLots.ok) {
     return builtLots;
   }
