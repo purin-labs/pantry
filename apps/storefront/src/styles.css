@@ -2637,9 +2637,27 @@ main :where(h1, h2, h3)[id] {
   --pat-ink: #1e1b18;
   --pat-muted: #5e5850;
   --pat-rule: #dcd7cf;
+  /* A line that must stand out from the ground: 3.5:1 on it (WCAG 1.4.11
+     asks 3:1 for the edge of a field). */
+  --pat-edge: #8c857b;
   --pat-serif: "Cormorant Garamond", Georgia, serif;
   --pat-japanese: "Noto Serif JP", serif;
   --pat-hand: Caveat, cursive;
+  /* Two small text steps: tracked capitals and notes, and running text. */
+  --pat-label: 0.75rem;
+  --pat-small: 0.875rem;
+  /* The shared storefront tokens in the site's warm ink and cream, so the
+     header line, the footer and the cart drawer match the menu. */
+  --ink: var(--pat-ink);
+  --muted: var(--pat-muted);
+  --cocoa: var(--pat-ink);
+  --border: var(--pat-rule);
+  --hairline: var(--pat-rule);
+  --paper: var(--pat-ground);
+  --cream: var(--pat-ground);
+  --surface: var(--pat-band);
+  --latte: var(--pat-band);
+  --display: var(--pat-serif);
   background: var(--pat-ground);
   color: var(--pat-ink);
 }
@@ -2694,7 +2712,7 @@ main :where(h1, h2, h3)[id] {
 .patisserie-masthead p {
   margin: 0;
   color: var(--pat-muted);
-  font-size: 0.72rem;
+  font-size: var(--pat-label);
   letter-spacing: 0.2em;
   text-transform: uppercase;
 }
@@ -2735,7 +2753,7 @@ main :where(h1, h2, h3)[id] {
   justify-content: center;
   border-inline-end: 1px solid var(--pat-rule);
   color: var(--pat-ink);
-  font-size: 0.7rem;
+  font-size: var(--pat-label);
   letter-spacing: 0.16em;
   text-decoration: none;
   text-transform: uppercase;
@@ -2748,7 +2766,7 @@ main :where(h1, h2, h3)[id] {
   background: transparent;
   cursor: pointer;
   font: inherit;
-  font-size: 0.7rem;
+  font-size: var(--pat-label);
   font-variant-numeric: tabular-nums;
 }
 .patisserie-sections > :last-child {
@@ -2831,7 +2849,7 @@ main :where(h1, h2, h3)[id] {
 .storefront-patisserie .patisserie-allergens {
   margin: 0;
   color: var(--pat-muted);
-  font-size: 0.75rem;
+  font-size: var(--pat-label);
   line-height: 1.4;
   text-wrap: pretty;
 }
@@ -2902,7 +2920,7 @@ main :where(h1, h2, h3)[id] {
 .patisserie-chart-copy span[lang="ja"] {
   color: var(--pat-muted);
   font-family: var(--pat-japanese);
-  font-size: 0.75rem;
+  font-size: var(--pat-label);
 }
 .patisserie-chart-note {
   margin: 0;
@@ -2920,7 +2938,7 @@ main :where(h1, h2, h3)[id] {
   background: transparent;
   color: var(--pat-ink);
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: var(--pat-label);
   letter-spacing: 0.08em;
   padding-inline: 1.1rem;
 }
@@ -2928,23 +2946,12 @@ main :where(h1, h2, h3)[id] {
   background: var(--pat-ink);
   color: var(--pat-ground);
 }
-.patisserie-add-link {
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  font-size: 0.82rem;
-  letter-spacing: 0;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-.patisserie-add:hover {
-  background: var(--pat-ink);
-  color: var(--pat-ground);
-}
-.patisserie-add-link:hover {
-  background: transparent;
-  color: var(--pat-ink);
-  text-decoration-thickness: 2px;
+/* A touch screen keeps :hover after a tap, so only a mouse fills the pill. */
+@media (hover: hover) {
+  .patisserie-add:hover {
+    background: var(--pat-ink);
+    color: var(--pat-ground);
+  }
 }
 .patisserie-stepper {
   display: inline-flex;
@@ -2972,7 +2979,7 @@ main :where(h1, h2, h3)[id] {
 }
 .patisserie-sold-out {
   color: var(--pat-muted);
-  font-size: 0.75rem;
+  font-size: var(--pat-label);
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -3033,7 +3040,7 @@ main :where(h1, h2, h3)[id] {
 }
 .patisserie-section-heading span {
   color: var(--pat-muted);
-  font-size: 0.72rem;
+  font-size: var(--pat-label);
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -3093,7 +3100,7 @@ main :where(h1, h2, h3)[id] {
   margin: 0;
   padding: 0;
   color: #4a453e;
-  font-size: 0.72rem;
+  font-size: var(--pat-label);
   line-height: 1.25;
   list-style: none;
 }
@@ -3107,7 +3114,7 @@ main :where(h1, h2, h3)[id] {
   width: 1.5rem;
   height: 1px;
   flex: none;
-  background: #8c857b;
+  background: var(--pat-edge);
   content: "";
 }
 .patisserie-pie-copy {
@@ -3163,12 +3170,12 @@ main :where(h1, h2, h3)[id] {
 .patisserie-pastry-copy > span[lang="ja"] {
   color: var(--pat-muted);
   font-family: var(--pat-japanese);
-  font-size: 0.8rem;
+  font-size: var(--pat-label);
 }
 .patisserie-pastry-copy p {
   margin: 0;
   color: var(--pat-muted);
-  font-size: 0.82rem;
+  font-size: var(--pat-small);
 }
 .patisserie-pastry-copy .patisserie-price-row {
   justify-content: center;
@@ -3190,7 +3197,7 @@ main :where(h1, h2, h3)[id] {
 .storefront-patisserie .patisserie-drink-group h3 {
   margin: 0 0 0.5rem;
   color: var(--pat-muted);
-  font-size: 0.72rem;
+  font-size: var(--pat-label);
   font-weight: 400;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -3234,12 +3241,12 @@ main :where(h1, h2, h3)[id] {
 .patisserie-drink-copy span[lang="ja"] {
   color: var(--pat-muted);
   font-family: var(--pat-japanese);
-  font-size: 0.75rem;
+  font-size: var(--pat-label);
 }
 .patisserie-drink-copy p {
   margin: 0;
   color: var(--pat-muted);
-  font-size: 0.82rem;
+  font-size: var(--pat-small);
 }
 .patisserie-drink .patisserie-price-row {
   flex: none;
@@ -3254,6 +3261,18 @@ main :where(h1, h2, h3)[id] {
   }
   .patisserie-drink-art {
     width: 4.75rem;
+  }
+  /* A phone has no room for the Add pill beside the name, so the price
+     and the pill go under the description. */
+  .patisserie-drink {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    column-gap: 0.85rem;
+    row-gap: 0.6rem;
+  }
+  .patisserie-drink .patisserie-price-row {
+    grid-column: 2;
   }
 }
 
@@ -3370,7 +3389,7 @@ main :where(h1, h2, h3)[id] {
   background: transparent;
   box-shadow: none;
   color: var(--pat-ink);
-  font-size: 0.7rem;
+  font-size: var(--pat-label);
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -3389,7 +3408,7 @@ main :where(h1, h2, h3)[id] {
   background: transparent;
   box-shadow: none;
   color: var(--pat-ink);
-  font-size: 0.7rem;
+  font-size: var(--pat-label);
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -3482,7 +3501,7 @@ main :where(h1, h2, h3)[id] {
 /* The basket, its fields and buttons in the site's cream and ink. */
 .storefront-patisserie .cafe-basket .eyebrow {
   color: var(--pat-muted);
-  font-size: 0.68rem;
+  font-size: var(--pat-label);
   letter-spacing: 0.18em;
 }
 .storefront-patisserie .cafe-basket h2 {
@@ -3526,13 +3545,13 @@ main :where(h1, h2, h3)[id] {
   color: var(--pat-muted);
 }
 .storefront-patisserie .field {
-  font-size: 0.72rem;
+  font-size: var(--pat-label);
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 .storefront-patisserie .field input {
   min-height: 3rem;
-  border: 1px solid var(--pat-rule);
+  border: 1px solid var(--pat-edge);
   border-radius: 6px;
   background: #fff;
   color: var(--pat-ink);
@@ -3554,7 +3573,7 @@ main :where(h1, h2, h3)[id] {
   background: var(--pat-ink);
   color: var(--pat-ground);
   box-shadow: none;
-  font-size: 0.75rem;
+  font-size: var(--pat-label);
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -3888,7 +3907,7 @@ main :where(h1, h2, h3)[id] {
     border-radius: 9px;
     color: var(--pat-ink);
     cursor: pointer;
-    font-size: 0.72rem;
+    font-size: var(--pat-label);
     letter-spacing: 0.16em;
     text-transform: uppercase;
   }

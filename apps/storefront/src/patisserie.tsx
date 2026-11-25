@@ -488,7 +488,6 @@ type MenuCopy = Readonly<{
   drinkGroups: Readonly<Record<DrinkGroup, string>>;
   allergens: string;
   add: string;
-  addToOrder: string;
   soldOut: string;
   remove: string;
   quantity: string;
@@ -509,7 +508,6 @@ const MENU_COPY: Readonly<Record<PatisserieLanguage, MenuCopy>> = {
     drinkGroups: { coffee: "Coffee", latte: "Tea and lattes" },
     allergens: "Allergens",
     add: "Add",
-    addToOrder: "Add to order",
     soldOut: "Sold out",
     remove: "Remove one",
     quantity: "in your order",
@@ -528,7 +526,6 @@ const MENU_COPY: Readonly<Record<PatisserieLanguage, MenuCopy>> = {
     drinkGroups: { coffee: "コーヒー", latte: "ティーとラテ" },
     allergens: "アレルギー",
     add: "追加",
-    addToOrder: "カートに入れる",
     soldOut: "売り切れ",
     remove: "1つ減らす",
     quantity: "点をカートに",
@@ -596,7 +593,7 @@ export function PatisserieMenu(props: PatisserieMenuProps): React.ReactNode {
   );
   const control = (
     entry: Entry,
-    variant: "link" | "pill" | "solid",
+    variant: "outline" | "solid",
   ): React.ReactNode => (
     <PatisserieAddControl
       entry={entry}
@@ -678,7 +675,7 @@ export function PatisserieMenu(props: PatisserieMenuProps): React.ReactNode {
                   {allergens(entry)}
                   <div className="patisserie-price-row">
                     <span className="patisserie-price">{entry.item.price}</span>
-                    {control(entry, "link")}
+                    {control(entry, "outline")}
                   </div>
                 </div>
               </article>
@@ -750,7 +747,7 @@ export function PatisserieMenu(props: PatisserieMenuProps): React.ReactNode {
                 {allergens(entry)}
                 <div className="patisserie-price-row">
                   <span className="patisserie-price">{entry.item.price}</span>
-                  {control(entry, "pill")}
+                  {control(entry, "outline")}
                 </div>
               </div>
             </article>
@@ -788,7 +785,7 @@ export function PatisserieMenu(props: PatisserieMenuProps): React.ReactNode {
                   {allergens(entry)}
                   <div className="patisserie-price-row">
                     <span className="patisserie-price">{entry.item.price}</span>
-                    {control(entry, "pill")}
+                    {control(entry, "outline")}
                   </div>
                 </div>
               </article>
@@ -836,7 +833,7 @@ export function PatisserieMenu(props: PatisserieMenuProps): React.ReactNode {
                         <span className="patisserie-price">
                           {entry.item.price}
                         </span>
-                        {control(entry, "link")}
+                        {control(entry, "outline")}
                       </div>
                     </li>
                   ))}
@@ -884,7 +881,7 @@ function useScrollEdges<T extends HTMLElement>(
 function PatisserieAddControl(
   props: Readonly<{
     entry: Entry;
-    variant: "link" | "pill" | "solid";
+    variant: "outline" | "solid";
     language: PatisserieLanguage;
     onIncrease: React.MouseEventHandler<HTMLButtonElement>;
     onDecrease: React.MouseEventHandler<HTMLButtonElement>;
@@ -905,7 +902,7 @@ function PatisserieAddControl(
         aria-label={`${copy.add} ${title}`}
         onClick={props.onIncrease}
       >
-        {props.variant === "link" ? copy.add : copy.addToOrder}
+        {copy.add}
       </button>
     );
   }
@@ -1022,6 +1019,36 @@ type CartDrawerProps = Readonly<{
  * the close button or a click on the shade closes it, and focus goes back
  * to the control that opened it.
  */
+/**
+ * Makes everything outside `element` inert: each sibling of `element` and of
+ * each of its ancestors up to <body>. Live regions stay as they are, so a
+ * status message still reaches a screen reader. Returns the undo.
+ */
+function inertOutside(element: HTMLElement): () => void {
+  const made: HTMLElement[] = [];
+  for (
+    let node: HTMLElement | null = element;
+    node !== null && node !== document.body;
+    node = node.parentElement
+  ) {
+    for (const sibling of node.parentElement?.children ?? []) {
+      if (
+        sibling === node ||
+        !(sibling instanceof HTMLElement) ||
+        sibling.inert ||
+        sibling.matches("[role='status'], [aria-live]")
+      ) {
+        continue;
+      }
+      sibling.inert = true;
+      made.push(sibling);
+    }
+  }
+  return () => {
+    for (const sibling of made) sibling.inert = false;
+  };
+}
+
 export function CartDrawer(props: CartDrawerProps): React.ReactNode {
   const panel = React.useRef<HTMLDivElement>(null);
   const { open, onClose } = props;
@@ -1032,6 +1059,11 @@ export function CartDrawer(props: CartDrawerProps): React.ReactNode {
         ? document.activeElement
         : null;
     panel.current?.focus();
+    // aria-modal alone leaves the page focusable: Tab walked out of the
+    // drawer to the links behind the shade. The page goes inert instead.
+    // The drawer's own root holds the shade, which must stay clickable.
+    const drawer = panel.current?.parentElement ?? null;
+    const restorePage = drawer === null ? () => {} : inertOutside(drawer);
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const onKey = (event: KeyboardEvent): void => {
@@ -1041,6 +1073,7 @@ export function CartDrawer(props: CartDrawerProps): React.ReactNode {
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = previousOverflow;
+      restorePage();
       opener?.focus();
     };
   }, [open, onClose]);

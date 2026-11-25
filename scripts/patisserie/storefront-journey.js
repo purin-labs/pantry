@@ -233,7 +233,34 @@ async (opener) => {
       "the cart drawer totals ¥2,800",
       (await drawer.innerText()).includes("¥2,800"),
     );
+    // The panel slides in for 320 ms; the capture waits until it rests.
+    await page.waitForFunction(
+      () =>
+        getComputedStyle(document.querySelector(".patisserie-drawer-panel"))
+          .transform === "none",
+    );
     await capture("03-cart-drawer");
+    // A keyboard buyer stays in the open drawer: Tab never reaches the menu
+    // behind the shade. (Past the last field focus may leave the page for
+    // the browser, where the active element is <body>.)
+    const outside = [];
+    for (let press = 0; press < 25; press += 1) {
+      await page.keyboard.press("Tab");
+      const escaped = await page.evaluate(() => {
+        const active = document.activeElement;
+        return active === null ||
+          active === document.body ||
+          active.closest(".patisserie-drawer-panel") !== null
+          ? null
+          : active.outerHTML.slice(0, 80);
+      });
+      if (escaped !== null) outside.push(escaped);
+    }
+    check(
+      "Tab stays inside the open cart drawer",
+      outside.length === 0,
+      outside,
+    );
     // 5. Commerce quotes the order.
     await drawer.getByPlaceholder("name@example.com").fill("buyer@example.com");
     slowCommerce = true;
