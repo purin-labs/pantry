@@ -188,28 +188,31 @@ export class CrmTable<Row> extends React.Component<
       }
     }
   }
+  // The table's viewport observer runs in every frame while the page around
+  // it resizes, such as when the chat opens beside it. All reads come before
+  // the writes, and only a changed value is written, so a frame does not lay
+  // the page out a second time or restyle the table for nothing.
   private updateScrollLayers(): void {
     const root = this.scroll.current;
     const viewport = root?.parentElement;
     if (!root || !viewport) return;
-    viewport.dataset.scrolledInline = String(Math.abs(root.scrollLeft) > 1);
+    const scrolledInline = String(Math.abs(root.scrollLeft) > 1);
     const edge = root.querySelector('thead [data-pinned-edge="true"]');
     const bounds = root.getBoundingClientRect();
     const frozen = edge?.getBoundingClientRect();
     const rtl = getComputedStyle(root).direction === "rtl";
+    const height = `${root.clientHeight}px`;
     const direction = rtl ? "rtl" : "ltr";
-    if (direction !== this.state.direction) this.setState({ direction });
     const width = frozen
       ? rtl
         ? bounds.right - frozen.left
         : frozen.right - bounds.left
       : 0;
-    viewport.style.setProperty("--crm-frozen-edge", `${width}px`);
-    viewport.style.setProperty(
-      "--crm-viewport-height",
-      `${root.clientHeight}px`,
-    );
-    viewport.dataset.hasFrozen = String(width > 0);
+    if (direction !== this.state.direction) this.setState({ direction });
+    writeDataset(viewport, "scrolledInline", scrolledInline);
+    writeProperty(viewport, "--crm-frozen-edge", `${width}px`);
+    writeProperty(viewport, "--crm-viewport-height", height);
+    writeDataset(viewport, "hasFrozen", String(width > 0));
   }
   private lastPinnedId(): string | null {
     let last: string | null = null;
@@ -743,6 +746,20 @@ function clampWidth(value: number, minWidth = 100): number {
   return Number.isFinite(value)
     ? Math.max(minWidth, Math.min(600, value))
     : 180;
+}
+
+/** A write of the same value still restyles the element; skip it. */
+function writeDataset(element: HTMLElement, key: string, value: string): void {
+  if (element.dataset[key] !== value) element.dataset[key] = value;
+}
+
+function writeProperty(
+  element: HTMLElement,
+  name: string,
+  value: string,
+): void {
+  if (element.style.getPropertyValue(name) !== value)
+    element.style.setProperty(name, value);
 }
 function compareRows<Row>(
   column: Exclude<CrmColumn<Row>, { kind: "display" }>,

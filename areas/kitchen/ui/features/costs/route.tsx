@@ -201,7 +201,10 @@ const SCENARIO_SELECT_ITEMS: readonly Readonly<{
   { value: "custom", label: PRESET_LABELS.custom },
 ];
 
-export class CostsPage extends React.Component<Props, State> {
+// A PureComponent: opening or closing the chat beside the page renders the
+// Portal again with the same props, and rendering the 36-row sheet again cost
+// about 70 ms before the chat could move.
+export class CostsPage extends React.PureComponent<Props, State> {
   state: State = { kind: "loading" };
   private mounted = false;
   private readonly surfaceRef = React.createRef<HTMLDivElement>();
