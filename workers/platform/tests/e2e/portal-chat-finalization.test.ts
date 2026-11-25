@@ -121,7 +121,7 @@ import {
 import { runAgentOperation } from "@purin-labs/conversation/data/agent-operation-runner";
 import { readPortalOutput } from "./full-worker";
 import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
-import { runArmedAlarm } from "./durable-object-alarm-support";
+import { runAlarmHandler, runArmedAlarm } from "./durable-object-alarm-support";
 
 const CONVERSATION_ID = "conv_cc97400f-2eb9-52d3-b35e-56a9ef3e6085";
 const LONG_TEXT = 'Canonical long response: café, 焼き菓子, "quoted". '
@@ -310,7 +310,9 @@ async function sessionOriginJourney(
         turnId: stream.turnId,
       }),
     ).toEqual({ ok: true, value: { kind: "present", state: "failed" } });
-    await runArmedAlarm(retiredSession.value);
+    // The woken Session arms its checkpoint finalization 1 s ahead, so the
+    // runtime can take that alarm before this call on a slow runner.
+    await runAlarmHandler(retiredSession.value);
     expect(model.calls).toBe(revokedModelRequests + 1);
     expect(await readOriginBinding(stream.sessionId, stream.turnId)).toBe(
       origin,
