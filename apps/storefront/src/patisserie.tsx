@@ -667,7 +667,10 @@ export function PatisserieMenu(props: PatisserieMenuProps): React.ReactNode {
                 id={patisserieProductId(entry.product.slug)}
               >
                 <div className="patisserie-chart-art">
-                  <PatisseriePhoto product={entry.product} sizes="10rem" />
+                  <PatisseriePhoto
+                    product={entry.product}
+                    sizes="(max-width: 47rem) 50vw, 18rem"
+                  />
                 </div>
                 <div className="patisserie-chart-copy">
                   <h3>{entry.product.chartName}</h3>
