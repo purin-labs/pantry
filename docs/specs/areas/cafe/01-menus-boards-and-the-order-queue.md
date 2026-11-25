@@ -391,10 +391,9 @@ retention: an archive deletes nothing, and no route deletes a board.
 
 ## Open work
 
-- The order page address `menu.purin.io/<shop name>/` is not live. The released
-  `purin-shop` has no `menu.purin.io` custom domain yet, and production sets no
-  `SHOP_ORDER_PAGE_ORIGIN` (`https://menu.purin.io/{name}` after the shop answers). The
-  Menus page then shows no shop name form. The owner chose this path form over
+- `purin-shop` serves `menu.purin.io` since 2026-11-25. The Platform sets
+  `SHOP_ORDER_PAGE_ORIGIN` (`https://menu.purin.io/{name}`) from its next release; until
+  then the Menus page shows no shop name form. The owner chose this path form over
   `<shop name>.menu.purin.io` on 2026-11-24: one custom domain needs no wildcard
   certificate (Advanced Certificate Manager).
 - With no order page origin, `hostedShopUrl` names `<COMMERCE_BASE_URL>/shops/<merchant>`

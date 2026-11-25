@@ -308,8 +308,8 @@ above says. An open Portal tab of the release before must reload.
 **The commerce engine in Portal text:** `areas/organisation/ui/pages/automation.tsx` and
 `areas/commerce/ui/features/commerce/production-plan.tsx` show these words to people.
 
-**Domains:** The QR order pages are at `menu.purin.io/<shop name>/`; the release of
-that custom domain is not done. The local `PANTRY_PROVIDER_INGRESS_ORIGIN` is still the
+**Domains:** The QR order pages are at `menu.purin.io/<shop name>/`, a custom domain
+of `purin-shop`. The local `PANTRY_PROVIDER_INGRESS_ORIGIN` is still the
 Square sandbox tunnel `square-sandbox-webhook.seams.sh`. The shop site is `shop.purin.io`.
 
 ## Sources

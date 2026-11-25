@@ -335,7 +335,7 @@ def http_checks(checks: Checks, port: int) -> None:
             status == 301 and location.endswith(f"{MENU_HOST}{target}"),
             {"status": status, "location": location},
         )
-    for path in ("/", "/nobody/", "/www/", "/shops/" + CAFE):
+    for path in ("/", "/nobody/", "/www/", "/shops/" + CAFE, "/assets/", "/products/none.webp", "/none.svg"):
         status, _, body = get(port, MENU_HOST, path)
         checks.check(
             f"{path} answers 404 with no shop",

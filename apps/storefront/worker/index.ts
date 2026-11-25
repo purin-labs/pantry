@@ -86,7 +86,7 @@ async function orderPageResponse(
   const segment = url.pathname.split("/")[1] ?? "";
   // A built file: a site folder, or a file such as /favicon.svg.
   if (SITE_FOLDERS.has(segment) || segment.includes("."))
-    return env.ASSETS.fetch(request);
+    return builtFile(request, env);
   if (segment.length === 0) return missingShop();
   let shop: ShopName | null;
   try {
@@ -107,6 +107,17 @@ async function orderPageResponse(
   }
   const index = new Request(new URL("/", url).toString(), request);
   return withShopMeta(await env.ASSETS.fetch(index), shop);
+}
+
+/**
+ * A built file of the site. For a missing file the assets answer with the
+ * shop site's page, which is no order page: the Worker answers 404.
+ */
+async function builtFile(request: Request, env: Env): Promise<Response> {
+  const response = await env.ASSETS.fetch(request);
+  return (response.headers.get("content-type") ?? "").startsWith("text/html")
+    ? missingShop()
+    : response;
 }
 
 function siteResponse(request: Request, url: URL, env: Env): Promise<Response> {
