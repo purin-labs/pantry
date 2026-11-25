@@ -379,7 +379,14 @@ export const commerceOrderV1Schema = ReadonlyOpenObject({
   totals: commerceOrderTotalsV1Schema,
   adjustments: ImmutableArray(commerceOrderAdjustmentV1Schema),
   lifecycle: commerceOrderLifecycleV1Schema,
+  /** When this revision of the order happened; an edit moves it. */
   occurredAt: utcTimestampSchema,
+  /**
+   * When the buyer placed the order: the time that its checkout was accepted.
+   * Every later revision keeps it. An order that the engine stored before the
+   * field existed has none.
+   */
+  placedAt: Type.Optional(utcTimestampSchema),
   /** For an order in a market currency: the shop currency and the rate. */
   market: Type.Optional(commerceOrderMarketV1Schema),
 });

@@ -5338,8 +5338,8 @@ label.checkbox-label {
   min-height: 44px;
 }
 
+/* Few columns: keep the 920px width of .commerce-panel near the record name. */
 .commerce-entity-list {
-  max-width: none;
   margin-top: 28px;
   padding-top: 0;
   border-top: 0;

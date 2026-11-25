@@ -33,6 +33,7 @@ import {
 } from "../plugins/food-service/index.ts";
 import { assertNever, isRecord, parseJson } from "@purin-labs/std";
 import { allowedPriceRange } from "../commerce-authority/offer-pricing.ts";
+import { ORDER_PLACED_AT_SQL } from "../commerce-authority/order-times.ts";
 
 const ATTRIBUTE_RELATION_SCHEMA_VERSION = 7;
 
@@ -372,7 +373,7 @@ export function readCommerceCanonicalSystemAttributeAssignments(
         AND entity_origin = 'system' AND entity_type = ? AND entity_id = ?
         AND list_id = '' AND entry_id = ''
         AND attribute_id IN (
-          'lifecycle', 'low_stock', 'order_id', 'expected_by',
+          'lifecycle', 'low_stock', 'order_id', 'expected_by', 'placed_at', 'total',
           'fulfillment_id', 'tracking_number', 'failed_at', 'failure_reason',
           'captured_at', 'price', 'price_policy', 'price_policy_revision',
           'price_minimum', 'price_maximum'
@@ -438,6 +439,12 @@ export function canonicalSystemAttributeDefinitions(
       kind: { kind: "boolean" },
       revision: 1,
     });
+  }
+  if (typeId === "order") {
+    definitions.push(
+      canonicalTextDefinition(typeId, "placed_at", "Placed", "timestamp"),
+      canonicalMoneyDefinition(typeId, "total", "Total"),
+    );
   }
   if (typeId === "payment") {
     definitions.push(
@@ -867,6 +874,15 @@ function canonicalSystemAttributeRows(
   );
   const rows: EntityAttributeRow[] =
     lifecycle === null ? [] : [statusAttributeRow(lifecycle)];
+  if (reference.typeId === "order") {
+    rows.push(
+      ...readOrderAttributeRows(
+        database,
+        entity.merchantId,
+        reference.entityId,
+      ),
+    );
+  }
   if (reference.typeId === "payment") {
     rows.push(
       ...readPaymentAttributeRows(
@@ -923,6 +939,36 @@ function canonicalSystemAttributeRows(
       }
     }
   }
+  return rows;
+}
+
+/** When the buyer placed the order and its total, for the order list. */
+function readOrderAttributeRows(
+  database: CommerceDatabase,
+  merchantId: string,
+  orderId: string,
+): readonly EntityAttributeRow[] {
+  const row = database
+    .prepare(
+      `SELECT ${ORDER_PLACED_AT_SQL} AS placedAt,
+            json_extract(o.order_snapshot_json, '$.totals.total.amountMinor') AS amountMinor,
+            json_extract(o.order_snapshot_json, '$.totals.total.currency') AS currency
+       FROM commerce_order o
+      WHERE o.merchant_id = ? AND o.resource_id = ?`,
+    )
+    .get<
+      Readonly<{
+        placedAt: string | null;
+        amountMinor: number | null;
+        currency: string | null;
+      }>
+    >(merchantId, orderId);
+  if (row === undefined) return [];
+  const rows: EntityAttributeRow[] = [];
+  if (row.placedAt !== null)
+    rows.push(timestampAttributeRow("placed_at", row.placedAt));
+  if (row.amountMinor !== null && row.currency !== null)
+    rows.push(moneyAttributeRow("total", row.amountMinor, row.currency));
   return rows;
 }
 

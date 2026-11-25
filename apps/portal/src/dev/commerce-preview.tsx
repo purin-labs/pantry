@@ -247,6 +247,8 @@ const orderEntity = (
   entityId: string,
   displayName: string,
   lifecycle: string,
+  placedAt: string,
+  totalYen: number,
   freshness: unknown = {
     state: "current",
     observedAt: "2026-08-31T08:58:00.000Z",
@@ -256,27 +258,66 @@ const orderEntity = (
   revision: 3,
   displayName,
   attributes: [
+    systemAttribute("order", "placed_at", { kind: "timestamp", value: placedAt }),
+    systemAttribute("order", "total", {
+      kind: "money",
+      value: { amountMinor: totalYen, currency: "JPY" },
+    }),
     systemAttribute("order", "lifecycle", { kind: "status", value: lifecycle }),
   ],
   provenance: PROVENANCE("commerce_order", entityId),
   freshness,
 });
 
+// Totals are the prices of the products page: a financier is ¥420.
 const ORDER_ENTITIES = [
-  orderEntity("ord_1041", "Order #1041 · Aiko Sato", "pending_confirmation"),
-  orderEntity("ord_1040", "Order #1040 · Kenji Watanabe", "confirmed"),
-  orderEntity("ord_1039", "Order #1039 · Mei Lin", "fulfillment_pending"),
+  orderEntity(
+    "ord_1041",
+    "Order #1041 · Aiko Sato",
+    "pending_confirmation",
+    "2026-08-31T00:42:00.000Z",
+    1100,
+  ),
+  orderEntity(
+    "ord_1040",
+    "Order #1040 · Kenji Watanabe",
+    "confirmed",
+    "2026-08-31T00:15:00.000Z",
+    3280,
+  ),
+  orderEntity(
+    "ord_1039",
+    "Order #1039 · Mei Lin",
+    "fulfillment_pending",
+    "2026-08-30T23:51:00.000Z",
+    2400,
+  ),
   orderEntity(
     "ord_1038",
     "Order #1038 · Hana Kobayashi",
     "partially_fulfilled",
+    "2026-08-30T08:30:00.000Z",
+    7000,
   ),
-  orderEntity("ord_1037", "Order #1037 · Taro Yamada", "fulfilled", {
-    state: "stale",
-    observedAt: "2026-08-30T20:00:00.000Z",
-    staleSince: "2026-08-31T02:00:00.000Z",
-  }),
-  orderEntity("ord_1036", "Order #1036 · Sofia Marques", "cancelled"),
+  orderEntity(
+    "ord_1037",
+    "Order #1037 · Taro Yamada",
+    "fulfilled",
+    "2026-08-30T06:02:00.000Z",
+    1440,
+    {
+      state: "stale",
+      observedAt: "2026-08-30T20:00:00.000Z",
+      staleSince: "2026-08-31T02:00:00.000Z",
+    },
+  ),
+  orderEntity(
+    "ord_1036",
+    "Order #1036 · Sofia Marques",
+    "cancelled",
+    "2026-08-30T02:20:00.000Z",
+    3620,
+  ),
 ];
 
 const PRODUCT_ENTITIES = [

@@ -82,6 +82,12 @@ The commerce lab runs six deterministic scenarios with no provider credential.
   aggregations, the next cursor, a provenance and a freshness for each record. The
   freshness is `current`, `stale` (15 minutes after the later of `observedAt` and
   `validatedAt`) or `unavailable`.
+- An order record has `total` (money) and `lifecycle`. The engine also gives
+  `placed_at`: the order's `placedAt`, or for an older order the time that its checkout
+  was accepted. A Shopify order has no `placed_at` and has `buyer`.
+- The Orders page (`entity-attribute-columns.tsx`) shows one column for each attribute,
+  with `lifecycle` last, in the 920 px reading width. A money column in one currency
+  sorts and sums by its amount. A time column sorts by the time, not by its text.
 
 ### The inventory views
 

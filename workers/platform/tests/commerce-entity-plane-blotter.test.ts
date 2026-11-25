@@ -42,7 +42,11 @@ describe("commerce entity-plane Blotter source", () => {
     const record = recordFor(
       fixture(
         "commerce_order",
-        { buyer: { kind: "guest" }, lifecycle: { state: "open" } },
+        {
+          buyer: { kind: "guest" },
+          totals: { total: { amountMinor: 1200, currency: "JPY" } },
+          lifecycle: { state: "open" },
+        },
         "order_cursor",
       ),
       "order_cursor",
@@ -226,7 +230,11 @@ describe("commerce entity-plane Blotter source", () => {
       recordFor(
         fixture(
           "commerce_order",
-          { buyer: { kind: "guest" }, lifecycle: { state: "open" } },
+          {
+            buyer: { kind: "guest" },
+            totals: { total: { amountMinor: 1200, currency: "JPY" } },
+            lifecycle: { state: "open" },
+          },
           "order_1",
         ),
         "order_1",
@@ -649,7 +657,11 @@ function projectionFixtures(): readonly CommerceProjectionRecord[] {
     }),
     fixture(
       "commerce_order",
-      { buyer: { kind: "guest" }, lifecycle: { state: "open" } },
+      {
+        buyer: { kind: "guest" },
+        totals: { total: { amountMinor: 1200, currency: "JPY" } },
+        lifecycle: { state: "open" },
+      },
       "order_1",
     ),
     fixture("payment", {

@@ -8,6 +8,7 @@ import {
 import type {
   CommerceMutationErrorV1,
   CommerceOrderOriginV1,
+  CommerceOrderV1,
 } from "@purin-labs/commerce-client";
 import type {
   CheckoutQuoteSnapshot,
@@ -149,6 +150,20 @@ export function orderLineIdFor(
   checkoutLineId: string,
 ): string {
   return `order_line_${sha256(`${orderId}:${checkoutLineId}`)}`;
+}
+
+/**
+ * The optional order facts that no later revision changes: the market of a
+ * market-currency order and the time that the buyer placed it. A builder that
+ * lists the order's fields one by one spreads these, so that none is lost.
+ */
+export function orderFactsKept(
+  order: CommerceOrderV1,
+): Pick<CommerceOrderV1, "market" | "placedAt"> {
+  return {
+    ...(order.market === undefined ? {} : { market: order.market }),
+    ...(order.placedAt === undefined ? {} : { placedAt: order.placedAt }),
+  };
 }
 
 /** A storefront sells a variant only while it and its product are active. */

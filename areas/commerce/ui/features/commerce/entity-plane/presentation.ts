@@ -34,12 +34,21 @@ export function commerceAttributeLabel(
   attributeId: string,
   definition: ListEntryAttributeDefinition | undefined,
 ): string {
-  return definition?.definition.label ?? sentenceCaseIdentifier(attributeId);
+  return (
+    definition?.definition.label ??
+    SYSTEM_ATTRIBUTE_LABELS.get(attributeId) ??
+    sentenceCaseIdentifier(attributeId)
+  );
 }
+
+/** System attributes whose derived label reads worse than a short word. */
+const SYSTEM_ATTRIBUTE_LABELS: ReadonlyMap<string, string> = new Map([
+  ["placed_at", "Placed"],
+]);
 
 /**
  * Console labels are sentence case, so a derived label capitalises only its
- * first word: `placed_at` reads as "Placed at", not "Placed At".
+ * first word: `expected_by` reads as "Expected by", not "Expected By".
  */
 function sentenceCaseIdentifier(value: string): string {
   const humanized = humanizeIdentifier(value);
@@ -354,7 +363,7 @@ function formatInteger(value: bigint): string {
  * — JPY has none, USD two, BHD three — so it is read from the currency itself
  * rather than assumed to be 100.
  */
-function formatMoney(amountMinor: number, currency: string): string {
+export function formatMoney(amountMinor: number, currency: string): string {
   const exponent = currencyExponent(currency);
   const major = amountMinor / 10 ** exponent;
   try {

@@ -92,7 +92,8 @@ export function orderSubject(
   return {
     kind: "order",
     id: order.id,
-    placedAt: order.occurredAt,
+    // An edit moves `occurredAt`; `placedAt` stays. Old orders have only the first.
+    placedAt: order.placedAt ?? order.occurredAt,
     currency: order.totals.total.currency,
     totalMinor: order.totals.total.amountMinor,
     lines: order.lineItems.map((line) => {

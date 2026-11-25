@@ -790,7 +790,7 @@ refund and cancel-to-cash switch).
 Shopify: orders, order editing and draft orders. Status: **Partial**.
 
 Records: `commerce_order` (origin, buyer, lines with their tax and discount,
-totals, adjustments and lifecycle), `payment` (one or more for each order),
+totals, adjustments, lifecycle and `placedAt`), `payment` (one or more for each order),
 `order_change` (each edit, exchange and later payment; no two changes start
 from the same order revision) and `draft_order`.
 
@@ -798,6 +798,11 @@ from the same order revision) and `draft_order`.
   everything, or a manual tender that staff record, turns an accepted
   checkout into an order, its payments, a fulfillment and allocated stock in
   one transaction. The order copies the quote, never the live catalog.
+- Placed time: `placedAt` is the time that the checkout was accepted. Every
+  later revision keeps it, while `occurredAt` moves with each edit. An order
+  stored before 25 November 2026 has no `placedAt`.
+  The entity plane gives each order `placed_at` (for an older order, the time
+  that its checkout was accepted) and `total` beside `lifecycle`.
 - Lifecycle: `fulfillment_pending`, then `fulfilled` or `cancelled`; an
   exchange opens a fulfilled order again (Appendix D.4).
 - Edits of pickup orders: change the quantity of a line, remove a line or
@@ -864,7 +869,8 @@ rates; food import rules.
 
 - Order times: `GET …/reports/order-times?start=&end=` lists the orders placed
   in a window, the most recent first and at most 200. Each order has its pickup
-  code, its lines, its total, when its checkout was accepted, the earliest time
+  code, its lines, its total, when it was placed (`placedAt`; for an older order,
+  when its checkout was accepted), the earliest time
   that a fulfillment promised, and its stage: preparing, ready, finished or
   cancelled, with when that stage began. A pickup that is handed over keeps only
   the hand-over time, so a finished pickup does not say when it was ready. It

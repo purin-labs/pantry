@@ -1,17 +1,15 @@
-// How long the orders of a window took (spec section 14). The order keeps when
-// it was last changed, so the time that it was placed comes from its checkout.
+// How long the orders of a window took (spec section 14). An order keeps when
+// it was placed (`placedAt`); an older order takes that time from its checkout.
 // Rows come newest first by insertion, so the scan stops at the first order that
 // is older than the window, and the read stays small however many orders the
 // merchant has sold.
 import {
-  orderOriginCheckoutId,
   parseFulfillment,
   parseOrder,
   commercePickupCode,
   type CommerceOrderTimeV1,
   type CommerceOrderTimesV1,
 } from "@purin-labs/commerce-client";
-import { readCheckout } from "../checkout-persistence.ts";
 import type { CommerceDatabase } from "../database.ts";
 
 export type OrderTimesWindow = Readonly<{ start: string; end: string }>;
@@ -24,6 +22,21 @@ const SCAN_LIMIT = 2_000;
 type Order = ReturnType<typeof parseOrder>;
 type Fulfillment = ReturnType<typeof parseFulfillment>;
 
+/**
+ * When the buyer placed the order `o` (a `commerce_order` row): its
+ * `placedAt`; for an order stored before that field existed, the time that
+ * its checkout was accepted, then the order's own time. The order times report
+ * and the order list (`placed_at`) both read this one rule.
+ */
+export const ORDER_PLACED_AT_SQL = `COALESCE(
+  json_extract(o.order_snapshot_json, '$.placedAt'),
+  (SELECT json_extract(c.checkout_json, '$.lifecycle.acceptedAt')
+     FROM buyer_checkout c
+    WHERE c.merchant_id = o.merchant_id
+      AND c.checkout_id = json_extract(o.order_snapshot_json, '$.origin.checkoutId')
+      AND json_extract(c.checkout_json, '$.lifecycle.state') = 'accepted'),
+  json_extract(o.order_snapshot_json, '$.occurredAt'))`;
+
 export function readOrderTimes(
   database: CommerceDatabase,
   merchantId: string,
@@ -34,15 +47,19 @@ export function readOrderTimes(
   const end = Date.parse(window.end);
   const rows = database
     .prepare(
-      `SELECT order_snapshot_json AS orderJson FROM commerce_order
-       WHERE merchant_id = ? ORDER BY rowid DESC LIMIT ?`,
+      `SELECT o.order_snapshot_json AS orderJson, ${ORDER_PLACED_AT_SQL} AS placedAt
+       FROM commerce_order o
+       WHERE o.merchant_id = ? ORDER BY o.rowid DESC LIMIT ?`,
     )
-    .all<Readonly<{ orderJson: string }>>(merchantId, SCAN_LIMIT);
+    .all<Readonly<{ orderJson: string; placedAt: string }>>(
+      merchantId,
+      SCAN_LIMIT,
+    );
   const orders: CommerceOrderTimeV1[] = [];
   let ended = false;
   for (const row of rows) {
     const order = parseOrder(JSON.parse(row.orderJson));
-    const placedAt = placedTime(database, merchantId, order);
+    const placedAt = row.placedAt;
     const at = Date.parse(placedAt);
     if (at < start) {
       ended = true;
@@ -75,21 +92,6 @@ function result(
     truncated,
     orders,
   };
-}
-
-function placedTime(
-  database: CommerceDatabase,
-  merchantId: string,
-  order: Order,
-): string {
-  const checkoutId = orderOriginCheckoutId(order.origin);
-  const checkout =
-    checkoutId === undefined
-      ? undefined
-      : readCheckout(database, merchantId, checkoutId);
-  return checkout?.lifecycle.state === "accepted"
-    ? checkout.lifecycle.acceptedAt
-    : order.occurredAt;
 }
 
 function orderTime(

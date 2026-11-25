@@ -121,6 +121,11 @@ import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { useDossierSurface } from "./dossier-surface";
 import {
+  commerceEntityAttributeColumn,
+  entityTableAttributeIds,
+  findEntityAttribute,
+} from "./entity-attribute-columns";
+import {
   CommerceActivityPanel,
   type CommerceActivityRouteState,
 } from "./activity-panel";
@@ -1392,66 +1397,6 @@ function renderCommerceEntityName(
     />
   );
   return link === null ? identity : <Link to={link}>{identity}</Link>;
-}
-
-function commerceEntityAttributeValue(
-  attributeId: string,
-  entity: CommerceEntity,
-): string | null {
-  const attribute = findEntityAttribute(entity, attributeId);
-  return attribute === undefined
-    ? null
-    : formatCommerceAttributeValue(attribute.value, undefined);
-}
-
-function renderCommerceEntityAttribute(
-  attributeId: string,
-  entity: CommerceEntity,
-): React.ReactNode {
-  const attribute = findEntityAttribute(entity, attributeId);
-  const chip =
-    attribute === undefined
-      ? null
-      : commerceStatusChip(attribute.value, undefined);
-  if (chip !== null) return <StatusChip status={chip} />;
-  return (
-    commerceEntityAttributeValue(attributeId, entity) ?? COMMERCE_VALUE_ABSENT
-  );
-}
-
-function commerceEntityAttributeColumn(
-  entities: readonly CommerceEntity[],
-  attributeId: string,
-): CrmColumn<CommerceEntity> {
-  let numeric = false;
-  for (const entity of entities) {
-    const attribute = findEntityAttribute(entity, attributeId);
-    if (attribute !== undefined) {
-      numeric = isNumericCommerceValue(attribute.value);
-      break;
-    }
-  }
-  const align: "start" | "end" = numeric ? "end" : "start";
-  const column = {
-    id: `attribute-${attributeId}`,
-    label: commerceAttributeLabel(attributeId, undefined),
-    width: 180,
-    align,
-    render: renderCommerceEntityAttribute.bind(null, attributeId),
-  };
-  if (numeric) return { ...column, kind: "display" };
-  return {
-    ...column,
-    kind: "text",
-    value: commerceEntityAttributeValue.bind(null, attributeId),
-  };
-}
-
-function findEntityAttribute(entity: CommerceEntity, attributeId: string) {
-  for (const attribute of entity.attributes) {
-    if (attribute.attributeId === attributeId) return attribute;
-  }
-  return undefined;
 }
 
 function commerceCollectionAttributeColumn(
@@ -2792,13 +2737,13 @@ function renderCommerceEntityColumnTable(
   emptyTitle: string,
   emptyDescription: string,
 ): React.ReactNode {
-  const attributeIds = entityTableAttributeIds(rows);
   const entities = rows.map(commerceTableEntity);
+  const attributeIds = entityTableAttributeIds(entities);
   const columns: CrmColumn<CommerceEntity>[] = [
     {
       id: "name",
       label: title.replace(/s$/u, ""),
-      width: 280,
+      width: 260,
       kind: "text",
       value: commerceEntityName,
       render: renderCommerceEntityName.bind(null, props.resourceHref),
@@ -2823,20 +2768,6 @@ function commerceTableEntity(
   row: ReturnType<typeof buildEntityTypeTableModel>["rows"][number],
 ): CommerceEntity {
   return row.entity;
-}
-
-/** The attributes present on this page, in the order the records declare them. */
-function entityTableAttributeIds(
-  rows: ReturnType<typeof buildEntityTypeTableModel>["rows"],
-): readonly string[] {
-  const ids: string[] = [];
-  for (const row of rows) {
-    for (const attribute of row.entity.attributes) {
-      const id = String(attribute.attributeId);
-      if (!ids.includes(id)) ids.push(id);
-    }
-  }
-  return ids;
 }
 
 function CommerceEntityDossier(

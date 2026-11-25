@@ -1,5 +1,5 @@
 {
-  "total": {"copies":752,"lines":13468},
+  "total": {"copies":750,"lines":13444},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -329,7 +329,7 @@
     "packages/production-simulation/src/state-document.ts = packages/production-simulation/src/state-document.ts": {"copies":2,"lines":20},
     "services/commerce/src/checkout-charge-attempt.ts = services/commerce/src/shipping-quote-attempt.ts": {"copies":2,"lines":48},
     "services/commerce/src/checkout-profile-resolution.ts = services/commerce/src/checkout-profile-resolution.ts": {"copies":1,"lines":12},
-    "services/commerce/src/commerce-authority/after-sale-cancellation.ts = services/commerce/src/commerce-authority/after-sale-cancellation.ts": {"copies":9,"lines":178},
+    "services/commerce/src/commerce-authority/after-sale-cancellation.ts = services/commerce/src/commerce-authority/after-sale-cancellation.ts": {"copies":7,"lines":154},
     "services/commerce/src/commerce-authority/buyer-checkout/payment-stage.ts = services/commerce/src/commerce-authority/buyer-checkout/reconcile-stage.ts": {"copies":1,"lines":25},
     "services/commerce/src/commerce-authority/buyer-checkout/reconcile-stage.ts = services/commerce/src/commerce-authority/buyer-checkout/reconcile-stage.ts": {"copies":2,"lines":34},
     "services/commerce/src/commerce-authority/buyer-checkout/refresh-stage.ts = services/commerce/src/commerce-authority/buyer-checkout/refresh-stage.ts": {"copies":1,"lines":11},

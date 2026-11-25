@@ -50,6 +50,7 @@ import {
   checkoutOrderMatchesCheckout,
   checkoutOrderProfileMatches,
   findResource,
+  orderFactsKept,
   orderLineIdFor,
   sha256,
 } from "./checkout-shared.ts";
@@ -684,7 +685,7 @@ function fulfilledOrder(
     revision: order.revision + 1,
     origin: order.origin,
     buyer: order.buyer,
-    ...(order.market === undefined ? {} : { market: order.market }),
+    ...orderFactsKept(order),
     lineItems,
     totals: order.totals,
     adjustments: order.adjustments,

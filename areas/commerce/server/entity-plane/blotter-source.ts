@@ -498,6 +498,16 @@ function attributes(record: BlotterRecord): AttributeValueAssignment[] {
       );
       break;
     case "commerce_order":
+      // A provider order has no placed time; the engine's order list has one.
+      result.push(
+        attribute(entityTypeId, "total", {
+          kind: "money",
+          value: {
+            amountMinor: projection.projection.totals.total.amountMinor,
+            currency: String(projection.projection.totals.total.currency),
+          },
+        }),
+      );
       result.push(
         attribute(entityTypeId, "buyer", {
           kind: "short_text",

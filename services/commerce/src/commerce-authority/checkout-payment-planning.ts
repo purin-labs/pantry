@@ -932,6 +932,7 @@ function planOrderPlacement(
     adjustments: [],
     lifecycle: { state: "fulfillment_pending", since: command.requestedAt },
     occurredAt: command.requestedAt,
+    placedAt: command.requestedAt,
     ...(quote.market === undefined ? {} : { market: quote.market }),
   });
   const storedValuePayments = (quote.storedValue?.tenders ?? []).map((tender) =>
