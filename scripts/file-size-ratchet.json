@@ -2,7 +2,6 @@
   "limit": 3000,
   "files": {
     "apps/storefront/src/storefront.tsx": 9329,
-    "apps/storefront/src/styles.css": 3907,
     "areas/commerce/ui/features/commerce/entity-plane/route.tsx": 3756,
     "areas/kitchen/ui/features/production-run/morning-shift-appliances.ts": 3681,
     "areas/kitchen/ui/features/production-run/recipe-workflow-graph.tsx": 3007,
