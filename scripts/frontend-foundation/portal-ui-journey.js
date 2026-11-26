@@ -48,7 +48,7 @@ async function verifyPortalInterface(page) {
   await page.screenshot({ path: `${evidence}/access-budget-after.png` });
   await page.setViewportSize({ width: 320, height: 800 });
   const share = page.getByRole("button", {
-    name: "Share Shopify",
+    name: "Share a system",
     exact: true,
   });
   await share.scrollIntoViewIfNeeded();
