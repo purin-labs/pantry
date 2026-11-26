@@ -1,5 +1,6 @@
 import React from "react";
 import { ArrowRight } from "lucide-react";
+import { Button } from "@purin-labs/ui/index";
 import { useNavigate } from "react-router";
 
 export function ConnectorAuthoringAssistant(props: {
@@ -25,9 +26,9 @@ export function ConnectorAuthoringAssistant(props: {
       </p>
       <div className="connector-method-footer">
         <a href={props.basePath}>Cancel</a>
-        <button type="submit" className="connector-primary-action">
+        <Button type="submit" variant="primary">
           Continue in chat <ArrowRight size={16} aria-hidden="true" />
-        </button>
+        </Button>
       </div>
     </form>
   );

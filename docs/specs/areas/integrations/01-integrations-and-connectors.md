@@ -206,6 +206,16 @@ any open state -> cancelled | expired
   a `resume_account` setup commits. **Remove** needs a disabled connector with no
   unrevoked binding (`custom_connector_cleanup_required`).
 
+**The Portal drawer** (`features/integrations/custom-connectors.tsx` and
+`custom-connector-connect.tsx`) has no steps. **Review definition** saves a draft and
+validates it. The drawer then shows the destination, each operation and the API key
+field together. One **Approve** press sends the routes in order: `validate` for a
+draft, `approve` with the origin and the effects that the drawer showed, and, with a
+key, the setup, `credential`, `test` and `commit`. Each route keeps its own check, and
+the first refusal stops the press. A setup that stops stays in the address
+(`setupAttempt`), and the next press finishes it. **Replace API key**, **Reconnect** and
+**Use reviewed version** run the same setup with the key in place.
+
 **Reads.** A grant on a `custom_connector_operation` names the account, connector,
 revision, digest and operation. `grants.ts` makes one tool for each granted operation:
 `cc_` and 60 characters of a digest of the capability key, so a definition cannot

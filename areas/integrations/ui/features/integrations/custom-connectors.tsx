@@ -1,4 +1,4 @@
-import { DecisionButtons } from "@purin-labs/ui/index";
+import { Button, ConfirmInPlace, DecisionButtons } from "@purin-labs/ui/index";
 import {
   GOVERNED_ACTION_ALLOW,
   governedActionRefusal,
@@ -11,26 +11,54 @@ import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import { Select } from "@purin-labs/ui/select";
 import React from "react";
 import { MessageCircle, FileCode2 } from "lucide-react";
-import { useNavigate, type NavigateFunction } from "react-router";
+import { useNavigate } from "react-router";
 import { ConnectionDialog } from "@purin-labs/area-integrations-contract/ui/features/integrations/connection-dialog";
 import { ConnectorAuthoringAssistant } from "./connector-authoring";
+import { CustomConnectorSetup } from "./custom-connector-connect";
+import {
+  customConnectorHref,
+  mutationKey,
+  readOperationReviews,
+  refreshDetail,
+  requireRevision,
+  runPress,
+  sendMutation,
+  shownDefinition,
+  validateStep,
+  type ConnectorDetailProps,
+  type Loadable,
+  type MutationChain,
+  type MutationKeys,
+  type PressOwner,
+} from "./custom-connector-press";
 import {
   IntegrationsOverview,
   type IntegrationDirectoryContent,
 } from "./overview";
 
-import { customConnectorCollectionPath, customConnectorActionPath, customConnectorPath, customConnectorRevisionPath, customConnectorSetupCollectionPath, customConnectorSetupPath, mutateCustomConnector, mutateCustomConnectorAction, readCustomConnectorCatalog, readCustomConnectorAction, readCustomConnectorDetail, readCustomConnectorSetup, type CustomConnectorDetail, type CustomConnectorRevisionAction } from "@purin-labs/area-integrations-contract/ui/features/integrations/custom-connector-api";
-import type { CustomConnectorAccountView, CustomConnectorAction, CustomConnectorWritePreview, CustomConnectorJsonValue, CustomConnectorMutationResult, CustomConnectorRevisionView, CustomConnectorSetupAttempt, CustomConnectorSummary } from "@purin-labs/control-api/portal/custom-connectors";
+import {
+  customConnectorCollectionPath,
+  customConnectorActionPath,
+  customConnectorPath,
+  customConnectorRevisionPath,
+  mutateCustomConnectorAction,
+  readCustomConnectorCatalog,
+  readCustomConnectorAction,
+  readCustomConnectorDetail,
+  readCustomConnectorSetup,
+  type CustomConnectorDetail,
+} from "@purin-labs/area-integrations-contract/ui/features/integrations/custom-connector-api";
+import type {
+  CustomConnectorAccountView,
+  CustomConnectorAction,
+  CustomConnectorWritePreview,
+  CustomConnectorJsonValue,
+  CustomConnectorRevisionView,
+  CustomConnectorSetupAttempt,
+  CustomConnectorSummary,
+} from "@purin-labs/control-api/portal/custom-connectors";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, errorMessage, isRecord } from "@purin-labs/std";
-import { ConfirmInPlace } from "@purin-labs/ui/index";
-
-type Loadable<Value> =
-  | { readonly kind: "loading" }
-  | { readonly kind: "ready"; readonly value: Value }
-  | { readonly kind: "failed"; readonly message: string };
-
-type MutationKeys = React.MutableRefObject<Map<string, string>>;
 
 const RECONCILIATION_OUTCOMES = [
   { value: "indeterminate", label: "I can’t confirm yet" },
@@ -125,7 +153,6 @@ export function CustomConnectorsWorkspace(props: {
   if (selection.connectorId === "new") {
     selectedContent = props.canManage ? (
       <CustomConnectorAuthoring
-        navigate={navigate}
         key={props.organisationId}
         organisationId={props.organisationId}
         configurationVersion={configurationVersion}
@@ -168,9 +195,7 @@ export function CustomConnectorsWorkspace(props: {
   if (props.presentation.kind === "embedded") return selectedContent;
   const title =
     props.presentation.title ??
-    (selection.connectorId === "new"
-      ? "Connect another app"
-      : "Another app");
+    (selection.connectorId === "new" ? "Connect another app" : "Another app");
   return (
     <>
       <IntegrationsOverview
@@ -195,20 +220,10 @@ export function CustomConnectorsWorkspace(props: {
   );
 }
 
-function CustomConnectorAuthoring(props: {
-  readonly navigate: NavigateFunction;
-  readonly organisationId: string;
-  readonly configurationVersion: number;
-  readonly basePath: string;
-  readonly busy: boolean;
-  readonly feedback: string | null;
-  readonly mutationKeys: MutationKeys;
-  readonly setBusy: React.Dispatch<React.SetStateAction<boolean>>;
-  readonly setFeedback: React.Dispatch<React.SetStateAction<string | null>>;
-  readonly setConfigurationVersion: React.Dispatch<
-    React.SetStateAction<number>
-  >;
-}): React.ReactNode {
+function CustomConnectorAuthoring(
+  props: PressOwner &
+    Readonly<{ basePath: string; busy: boolean; feedback: string | null }>,
+): React.ReactNode {
   const [method, setMethod] = React.useState<"chat" | "import">("chat");
   const [source, setSource] = React.useState("");
   const [filename, setFilename] = React.useState<string | null>(null);
@@ -263,62 +278,25 @@ function CustomConnectorAuthoring(props: {
             name="definition"
             rows={8}
             spellCheck={false}
-            placeholder="Paste your complete definition here"
+            placeholder="Paste the complete definition"
             value={source}
             onChange={changeDefinitionSource.bind(null, setSource)}
             aria-describedby="custom-connector-source-hint custom-connector-feedback"
             aria-invalid={props.feedback === null ? undefined : true}
           />
           <p id="custom-connector-source-hint" className="field-hint">
-            Keep API keys separate. You’ll add a key after reviewing the
-            destination and operations.
+            Keep API keys out of the definition.
           </p>
           <MutationFeedback message={props.feedback} />
           <div className="connector-step-footer">
             <a href={props.basePath}>Cancel</a>
-            <button type="submit" disabled={props.busy}>
-              {props.busy ? "Saving definition…" : "Review definition"}
-            </button>
+            <Button type="submit" variant="primary" disabled={props.busy}>
+              {props.busy ? "Checking definition…" : "Review definition"}
+            </Button>
           </div>
         </form>
       </div>
     </section>
-  );
-}
-
-type ConnectorSetupStep =
-  "definition" | "review" | "connect" | "test" | "access";
-
-function ConnectorSetupSteps(props: {
-  readonly current: ConnectorSetupStep;
-}): React.ReactNode {
-  const steps: readonly {
-    readonly id: ConnectorSetupStep;
-    readonly label: string;
-  }[] = [
-    { id: "definition", label: "Definition" },
-    { id: "review", label: "Review" },
-    { id: "connect", label: "Connect" },
-    { id: "test", label: "Test" },
-    { id: "access", label: "Access" },
-  ];
-  return (
-    <ol className="connector-setup-steps" aria-label="Connector setup progress">
-      {steps.map(renderSetupStep.bind(null, props.current))}
-    </ol>
-  );
-}
-
-function renderSetupStep(
-  current: ConnectorSetupStep,
-  step: { readonly id: ConnectorSetupStep; readonly label: string },
-  index: number,
-): React.ReactNode {
-  return (
-    <li key={step.id} aria-current={current === step.id ? "step" : undefined}>
-      <span>{index + 1}</span>
-      {step.label}
-    </li>
   );
 }
 
@@ -353,37 +331,9 @@ function changeDefinitionSource(
   setSource(event.currentTarget.value);
 }
 
-function CustomConnectorDetailView(props: {
-  readonly navigate: NavigateFunction;
-  readonly organisationId: string;
-  readonly configurationVersion: number;
-  readonly canManage: boolean;
-  readonly basePath: string;
-  readonly accessPath: string;
-  readonly detail: Loadable<CustomConnectorDetail>;
-  readonly attempt: CustomConnectorSetupAttempt | null;
-  readonly action: Loadable<CustomConnectorAction> | null;
-  readonly busy: boolean;
-  readonly feedback: string | null;
-  readonly mutationKeys: MutationKeys;
-  readonly setBusy: React.Dispatch<React.SetStateAction<boolean>>;
-  readonly setFeedback: React.Dispatch<React.SetStateAction<string | null>>;
-  readonly setAttempt: React.Dispatch<
-    React.SetStateAction<CustomConnectorSetupAttempt | null>
-  >;
-  readonly setAction: React.Dispatch<
-    React.SetStateAction<Loadable<CustomConnectorAction> | null>
-  >;
-  readonly setDetail: React.Dispatch<
-    React.SetStateAction<Loadable<CustomConnectorDetail>>
-  >;
-  readonly setCatalog: React.Dispatch<
-    React.SetStateAction<Loadable<readonly CustomConnectorSummary[]>>
-  >;
-  readonly setConfigurationVersion: React.Dispatch<
-    React.SetStateAction<number>
-  >;
-}): React.ReactNode {
+function CustomConnectorDetailView(
+  props: ConnectorDetailProps,
+): React.ReactNode {
   if (props.detail.kind === "loading") {
     return <p role="status">Loading custom connector…</p>;
   }
@@ -408,59 +358,43 @@ function CustomConnectorDetailView(props: {
       }
     >
       {props.action === null ? (
-        <ConnectorSetupSteps
-          current={currentSetupStep(
-            head,
-            props.attempt,
-            props.detail.value.accounts.length,
-          )}
-        />
-      ) : null}
-      {props.action === null ? (
-        <CustomConnectorReview
-          detail={props.detail.value}
-          head={head}
-          canManage={props.canManage}
-          busy={props.busy}
-          runRevisionAction={runRevisionAction.bind(null, props, head)}
-          rejectRevision={runRevisionAction.bind(null, props, head, "reject")}
-          runLifecycleAction={runLifecycleAction.bind(null, props)}
-        />
-      ) : null}
-      {props.canManage && props.attempt === null && props.action === null ? (
-        <ConnectorRevisionEditor props={props} head={head} />
-      ) : null}
-      {props.action === null ? null : (
+        <>
+          <CustomConnectorReview detail={props.detail.value} head={head} />
+          {props.canManage ? (
+            <CustomConnectorSetup
+              props={props}
+              detail={props.detail.value}
+              head={head}
+            />
+          ) : null}
+          {props.canManage && props.attempt === null ? (
+            <ConnectorManagement
+              props={props}
+              detail={props.detail.value}
+              head={head}
+            />
+          ) : null}
+        </>
+      ) : (
         <CustomConnectorWriteReview props={props} action={props.action} />
       )}
-      {props.canManage && props.action === null ? (
-        <CustomConnectorSetup
-          props={props}
-          detail={props.detail.value}
-          head={head}
-        />
-      ) : null}
       <MutationFeedback message={props.feedback} />
     </section>
   );
 }
 
+/** What the person approves: the destination and each operation. */
 function CustomConnectorReview(props: {
   readonly detail: CustomConnectorDetail;
   readonly head: CustomConnectorRevisionView;
-  readonly canManage: boolean;
-  readonly busy: boolean;
-  readonly runRevisionAction: (
-    action: Exclude<CustomConnectorRevisionAction, "reject">,
-  ) => void;
-  readonly rejectRevision: (reason: string) => void;
-  readonly runLifecycleAction: (
-    action: "disable" | "remove" | "resume",
-  ) => void;
 }): React.ReactNode {
-  const definition = props.head.definition ?? props.head.authoringDocument;
+  const definition = shownDefinition(props.head);
   const operations = readOperationReviews(definition);
-  const connectorName = props.detail.summary.name ?? "this connector";
+  // The destination of the head revision, which an approval names.
+  const origin =
+    typeof definition.origin === "string"
+      ? definition.origin
+      : props.detail.summary.origin;
   return (
     <>
       <header className="custom-connector-review-heading">
@@ -468,10 +402,9 @@ function CustomConnectorReview(props: {
           <h3 id="custom-connector-detail-title">
             {props.detail.summary.name ?? "Untitled connector"}
           </h3>
-          <p>
-            {props.detail.summary.description ??
-              "Review this draft before connecting an account."}
-          </p>
+          {props.detail.summary.description === null ? null : (
+            <p>{props.detail.summary.description}</p>
+          )}
         </div>
         <span className="custom-connector-state">
           {reviewStateLabel(props.head.reviewState)}
@@ -481,24 +414,20 @@ function CustomConnectorReview(props: {
         className="connector-review-content"
         aria-label="Destination and operations"
       >
-        <dl className="custom-connector-review-facts">
-          <div>
-            <dt>API destination</dt>
-            <dd>{props.detail.summary.origin ?? "Waiting for validation"}</dd>
-          </div>
-          <div>
-            <dt>Connected accounts</dt>
-            <dd>{props.detail.accounts.length}</dd>
-          </div>
-        </dl>
-        <div className="custom-connector-operations">
-          <h4>What this connector can do</h4>
-          {operations.length === 0 ? (
-            <p>Validate the draft to see its operations.</p>
-          ) : (
+        {origin === null ? null : (
+          <dl className="custom-connector-review-facts">
+            <div>
+              <dt>API destination</dt>
+              <dd>{origin}</dd>
+            </div>
+          </dl>
+        )}
+        {operations.length === 0 ? null : (
+          <div className="custom-connector-operations">
+            <h4>What this connector can do</h4>
             <ul>{operations.map(renderOperationReview)}</ul>
-          )}
-        </div>
+          </div>
+        )}
         {props.head.validationFailure === null ? null : (
           <p className="notice notice-danger" role="alert">
             {validationFailureMessage(props.head.validationFailure)}
@@ -506,87 +435,131 @@ function CustomConnectorReview(props: {
         )}
         {props.head.rejectionReason === null ? null : (
           <p className="notice notice-danger">
-            Rejected: {props.head.rejectionReason}. Edit the definition to send
-            a new revision for review.
+            Rejected: {props.head.rejectionReason}
           </p>
         )}
       </section>
-      {props.canManage ? (
-        <div className="custom-connector-actions">
-          {props.head.reviewState === "draft" ? (
-            <button
-              type="button"
-              disabled={props.busy}
-              className="connector-primary-action"
-              onClick={props.runRevisionAction.bind(null, "validate")}
-            >
-              Validate definition
-            </button>
-          ) : null}
-          {props.head.reviewState === "validated" ? (
-            <button
-              type="button"
-              disabled={props.busy}
-              className="connector-primary-action"
-              onClick={props.runRevisionAction.bind(null, "approve")}
-            >
-              Approve connector access
-            </button>
-          ) : null}
-          {props.head.reviewState === "validated" ? (
-            <RejectRevisionForm
-              busy={props.busy}
-              reject={props.rejectRevision}
-            />
-          ) : null}
-          {props.detail.summary.lifecycle === "disabled" ? (
-            <button
-              type="button"
-              disabled={props.busy}
-              onClick={props.runLifecycleAction.bind(null, "resume")}
-            >
-              Resume connector
-            </button>
-          ) : null}
-          {props.head.reviewState === "approved" ? (
-            <button
-              type="button"
-              className="button-secondary"
-              disabled={props.busy}
-              onClick={props.runRevisionAction.bind(null, "retire")}
-            >
-              Retire revision
-            </button>
-          ) : null}
-          {props.detail.summary.lifecycle === "disabled" ? (
-            props.detail.accounts.length === 0 ? (
-              <ConfirmInPlace
-                label="Remove connector…"
-                question={`Remove ${connectorName}?`}
-                consequence="Its definition and revisions are deleted. To use this API again, add the connector again."
-                confirmLabel="Remove connector"
-                busy={props.busy}
-                onConfirm={props.runLifecycleAction.bind(null, "remove")}
-              />
-            ) : null
-          ) : (
-            <ConfirmInPlace
-              label="Disable connector…"
-              question={`Disable ${connectorName}?`}
-              consequence="Agents stop using it and its accounts at once. Resume it to use it again."
-              confirmLabel="Disable connector"
-              busy={props.busy}
-              onConfirm={props.runLifecycleAction.bind(null, "disable")}
-            />
-          )}
-        </div>
-      ) : null}
     </>
   );
 }
 
+/**
+ * Edit, retire, resume, disable and remove. The definition is technical, so
+ * it stays behind one button. A definition that failed its check opens by
+ * itself.
+ */
+function ConnectorManagement(input: {
+  readonly props: ConnectorDetailProps;
+  readonly detail: CustomConnectorDetail;
+  readonly head: CustomConnectorRevisionView;
+}): React.ReactNode {
+  const [editing, setEditing] = React.useState(false);
+  const { props, detail, head } = input;
+  const connectorName = detail.summary.name ?? "this connector";
+  const disabled = detail.summary.lifecycle === "disabled";
+  const editorOpen = editing || head.validationFailure !== null;
+  return (
+    <>
+      {editorOpen ? (
+        <ConnectorRevisionEditor
+          props={props}
+          head={head}
+          close={setEditing.bind(null, false)}
+        />
+      ) : null}
+      <div className="custom-connector-actions">
+        {editorOpen ? null : (
+          <Button disabled={props.busy} onClick={setEditing.bind(null, true)}>
+            Edit the definition
+          </Button>
+        )}
+        {head.reviewState === "approved" ? (
+          <ConfirmInPlace
+            label="Retire revision…"
+            question={`Retire version ${head.revision}?`}
+            consequence="Agents stop using it. Its accounts need a newer reviewed version."
+            confirmLabel="Retire revision"
+            busy={props.busy}
+            onConfirm={retireRevision.bind(null, props, head)}
+          />
+        ) : null}
+        {disabled ? (
+          <Button
+            disabled={props.busy}
+            onClick={runLifecycleAction.bind(null, props, "resume")}
+          >
+            Resume connector
+          </Button>
+        ) : null}
+        {disabled ? (
+          detail.accounts.length === 0 ? (
+            <ConfirmInPlace
+              label="Remove connector…"
+              question={`Remove ${connectorName}?`}
+              consequence="Its definition and revisions are deleted. To use this API again, add the connector again."
+              confirmLabel="Remove connector"
+              busy={props.busy}
+              onConfirm={runLifecycleAction.bind(null, props, "remove")}
+            />
+          ) : null
+        ) : (
+          <ConfirmInPlace
+            label="Disable connector…"
+            question={`Disable ${connectorName}?`}
+            consequence="Agents stop using it and its accounts at once. Resume it to use it again."
+            confirmLabel="Disable connector"
+            busy={props.busy}
+            onConfirm={runLifecycleAction.bind(null, props, "disable")}
+          />
+        )}
+      </div>
+    </>
+  );
+}
+
+function ConnectorRevisionEditor(input: {
+  readonly props: ConnectorDetailProps;
+  readonly head: CustomConnectorRevisionView;
+  readonly close: () => void;
+}): React.ReactNode {
+  return (
+    <div className="custom-connector-technical connector-revision-editor">
+      <form
+        className="stacked-form"
+        onSubmit={submitConnectorRevision.bind(
+          null,
+          input.props,
+          input.head,
+          input.close,
+        )}
+      >
+        <label htmlFor="custom-connector-revision-document">
+          Definition JSON
+        </label>
+        <textarea
+          id="custom-connector-revision-document"
+          name="definition"
+          rows={8}
+          defaultValue={JSON.stringify(input.head.authoringDocument, null, 2)}
+          key={input.head.revision}
+          spellCheck={false}
+          required
+        />
+        <div className="custom-connector-actions">
+          <Button type="submit" variant="primary" disabled={input.props.busy}>
+            {input.props.busy ? "Checking definition…" : "Save the definition"}
+          </Button>
+          {input.head.validationFailure === null ? (
+            <Button onClick={input.close}>Cancel</Button>
+          ) : null}
+        </div>
+      </form>
+    </div>
+  );
+}
+
 function CustomConnectorWriteReview(input: {
-  readonly props: Parameters<typeof CustomConnectorDetailView>[0];
+  readonly props: ConnectorDetailProps;
   readonly action: Loadable<CustomConnectorAction>;
 }): React.ReactNode {
   if (input.action.kind === "loading") {
@@ -708,13 +681,13 @@ function CustomConnectorWriteReview(input: {
       action.state === "indeterminate" &&
       action.idempotencyHeader !== null ? (
         <div className="custom-connector-actions">
-          <button
-            type="button"
+          <Button
+            variant="primary"
             disabled={input.props.busy}
             onClick={retryCustomWriteExecution.bind(null, input.props, action)}
           >
             Retry with the same key
-          </button>
+          </Button>
         </div>
       ) : null}
       {input.props.canManage && action.state === "indeterminate" ? (
@@ -755,252 +728,182 @@ function CustomConnectorWriteReview(input: {
             maxLength={2000}
             required
           />
-          <button type="submit" disabled={input.props.busy}>
+          <Button type="submit" variant="primary" disabled={input.props.busy}>
             Save outcome
-          </button>
+          </Button>
         </form>
       ) : null}
     </section>
   );
 }
 
-function CustomConnectorSetup(input: {
-  readonly props: Parameters<typeof CustomConnectorDetailView>[0];
-  readonly detail: CustomConnectorDetail;
-  readonly head: CustomConnectorRevisionView;
-}): React.ReactNode {
-  if (input.props.attempt !== null) {
-    const revision = input.detail.revisions.find(
-      matchesRevisionNumber.bind(null, input.props.attempt.connectorRevision),
-    );
-    if (revision === undefined)
-      return (
-        <p role="alert">
-          The definition for this setup is unavailable. Return to apps and
-          review the connector.
-        </p>
-      );
-    return (
-      <SetupAttemptPanel
-        props={input.props}
-        detail={input.detail}
-        head={revision}
-        attempt={input.props.attempt}
-      />
-    );
-  }
-  const setupReady = input.head.reviewState === "approved";
-  return (
-    <section
-      className="custom-connector-setup"
-      aria-labelledby="custom-connector-setup-title"
-    >
-      <h4 id="custom-connector-setup-title">Accounts and agent access</h4>
-      {input.detail.accounts.length > 0 ? (
-        <p>
-          A connected account gives agents no access until you choose the
-          agents and operations for it.
-        </p>
-      ) : null}
-      {input.detail.accounts.length === 0 ? (
-        <p>
-          Connect an account, test its API key, then choose the operations
-          agents can use.
-        </p>
-      ) : (
-        <div className="custom-connector-account-list">
-          {input.detail.accounts.map(
-            renderCustomAccount.bind(
-              null,
-              input.props,
-              input.detail,
-              input.head,
-            ),
-          )}
-        </div>
-      )}
-      {setupReady && input.detail.summary.lifecycle !== "disabled" ? (
-        <button
-          type="button"
-          disabled={input.props.busy}
-          onClick={startNewAccountSetup.bind(null, input.props, input.head)}
-        >
-          Connect account
-        </button>
-      ) : null}
-    </section>
-  );
-}
-
-function SetupAttemptPanel(input: {
-  readonly props: Parameters<typeof CustomConnectorDetailView>[0];
-  readonly detail: CustomConnectorDetail;
-  readonly head: CustomConnectorRevisionView;
-  readonly attempt: CustomConnectorSetupAttempt;
-}): React.ReactNode {
-  const attempt = input.attempt;
-  return (
-    <section
-      className="custom-connector-setup"
-      aria-labelledby="custom-connector-setup-title"
-    >
-      <div className="custom-connector-setup-heading">
-        <div>
-          <h4 id="custom-connector-setup-title">{setupTitle(attempt)}</h4>
-          <p>{setupGuidance(attempt)}</p>
-        </div>
-        <span className="custom-connector-state">
-          {setupStateLabel(attempt.lifecycle)}
-        </span>
-      </div>
-      {attempt.lifecycle === "awaiting_credential" ? (
-        <form
-          className="stacked-form custom-connector-credential-form"
-          onSubmit={submitCredential.bind(null, input.props, attempt)}
-        >
-          <label htmlFor="custom-connector-api-key">API key</label>
-          <p id="connector-authentication-hint" className="field-hint">
-            {connectorCredentialGuidance(input.head)}
-          </p>
-          <input
-            id="custom-connector-api-key"
-            name="credential"
-            type="password"
-            autoComplete="off"
-            aria-describedby="connector-authentication-hint"
-            required
-          />
-          <p className="field-hint">
-            Your key is stored encrypted and stays out of agent conversations.
-            Create a key in your service’s account settings for the operations
-            you reviewed.
-          </p>
-          <button type="submit" disabled={input.props.busy}>
-            {input.props.busy ? "Saving key…" : "Save key and test connection"}
-          </button>
-        </form>
-      ) : null}
-      {attempt.lifecycle === "credential_stored" ? (
-        <button
-          type="button"
-          disabled={input.props.busy}
-          onClick={runSetupAction.bind(null, input.props, attempt, "test")}
-        >
-          {input.props.busy ? "Testing connection…" : "Test connection"}
-        </button>
-      ) : null}
-      {attempt.lifecycle === "verified" ? (
-        <>
-          <dl className="custom-connector-review-facts">
-            <div>
-              <dt>Verified account</dt>
-              <dd>{attempt.verification?.displayName ?? "Verified"}</dd>
-            </div>
-            <div>
-              <dt>Tested</dt>
-              <dd>
-                {attempt.verification === null
-                  ? "Now"
-                  : new Date(attempt.verification.testedAt).toLocaleString()}
-              </dd>
-            </div>
-          </dl>
-          {input.head.reviewState === "approved" ? (
-            <button
-              type="button"
-              disabled={input.props.busy}
-              onClick={runSetupAction.bind(
-                null,
-                input.props,
-                attempt,
-                "commit",
-              )}
-            >
-              {input.props.busy ? "Enabling account…" : "Enable account"}
-            </button>
-          ) : null}
-        </>
-      ) : null}
-      {!isOpenSetup(attempt.lifecycle) ? (
-        <div className="custom-connector-actions">
-          <button
-            type="button"
-            disabled={input.props.busy}
-            onClick={restartConnectorSetup.bind(
-              null,
-              input.props,
-              input.head,
-              attempt,
-            )}
-          >
-            Start setup again
-          </button>
-          <button
-            type="button"
-            className="button-secondary"
-            onClick={returnToConnectorAccounts.bind(null, input.props)}
-          >
-            Return to accounts
-          </button>
-        </div>
-      ) : null}
-      {isOpenSetup(attempt.lifecycle) ? (
-        <button
-          type="button"
-          className="button-secondary"
-          disabled={input.props.busy}
-          onClick={runSetupAction.bind(null, input.props, attempt, "cancel")}
-        >
-          Cancel setup
-        </button>
-      ) : null}
-    </section>
-  );
-}
-
+/**
+ * Saves a new connector and checks its definition in the same press. A
+ * definition that fails its check stays a draft that names the fault.
+ */
 async function submitConnectorDraft(
   props: Parameters<typeof CustomConnectorAuthoring>[0],
   event: React.FormEvent<HTMLFormElement>,
 ): Promise<void> {
   event.preventDefault();
-  const form = new FormData(event.currentTarget);
-  const source = form.get("definition");
+  const source = new FormData(event.currentTarget).get("definition");
   if (typeof source !== "string" || source.trim().length === 0) {
     props.setFeedback(
       "Import a definition JSON file or paste the complete definition.",
     );
     return;
   }
+  const document = parseDefinitionSource(source, props.setFeedback);
+  if (document === null) return;
+  const saved: { connectorId: string | null } = { connectorId: null };
+  await runPress(props, async (chain) => {
+    const created = await sendMutation(chain, {
+      path: customConnectorCollectionPath(props.organisationId),
+      method: "POST",
+      body: { document },
+      intent: `custom-connector-create:${source}`,
+    });
+    saved.connectorId = created.connectorId;
+    if (created.connectorId !== null)
+      await validateSavedDraft(chain, created.connectorId, created);
+    return "Saved.";
+  });
+  if (saved.connectorId !== null)
+    window.location.assign(
+      customConnectorHref(props.basePath, saved.connectorId, null),
+    );
+}
+
+/** Saves an edit as a new revision and checks it in the same press. */
+async function submitConnectorRevision(
+  props: ConnectorDetailProps,
+  head: CustomConnectorRevisionView,
+  close: () => void,
+  event: React.FormEvent<HTMLFormElement>,
+): Promise<void> {
+  event.preventDefault();
+  if (props.detail.kind !== "ready") return;
+  const source = new FormData(event.currentTarget).get("definition");
+  if (typeof source !== "string") return;
+  const document = parseDefinitionSource(source, props.setFeedback);
+  if (document === null) return;
+  const connectorId = props.detail.value.summary.connectorId;
+  const done = await runPress(props, async (chain) => {
+    const created = await sendMutation(chain, {
+      path: `${customConnectorPath(props.organisationId, connectorId)}/revisions`,
+      method: "POST",
+      body: { document, expectedHeadRevision: head.revision },
+      intent: `custom-connector-revision-create:${connectorId}:${head.revision}:${source}`,
+    });
+    await validateSavedDraft(chain, connectorId, created);
+    return "Saved.";
+  });
+  if (!done) return;
+  close();
+  await refreshDetail(props, connectorId);
+}
+
+/**
+ * A refused check is not a failed save: Pantry records the fault on the
+ * draft, and the drawer shows it. An approval checks a draft again first.
+ */
+async function validateSavedDraft(
+  chain: MutationChain,
+  connectorId: string,
+  created: Parameters<typeof requireRevision>[0],
+): Promise<void> {
+  try {
+    await sendMutation(
+      chain,
+      validateStep(
+        chain.owner.organisationId,
+        connectorId,
+        requireRevision(created),
+      ),
+    );
+  } catch {
+    // The draft keeps its fault for the drawer.
+  }
+}
+
+function parseDefinitionSource(
+  source: string,
+  setFeedback: (message: string) => void,
+): Readonly<Record<string, unknown>> | null {
   let document: unknown;
   try {
     document = JSON.parse(source);
   } catch {
-    props.setFeedback("Use valid JSON for the connector definition.");
-    return;
+    setFeedback("Use valid JSON for the connector definition.");
+    return null;
   }
   if (!isRecord(document)) {
-    props.setFeedback("The connector definition must be a JSON object.");
+    setFeedback("The connector definition must be a JSON object.");
+    return null;
+  }
+  return document;
+}
+
+async function retireRevision(
+  props: ConnectorDetailProps,
+  revision: CustomConnectorRevisionView,
+): Promise<void> {
+  if (props.detail.kind !== "ready" || revision.definitionDigest === null)
+    return;
+  const detail = props.detail.value;
+  const connectorId = detail.summary.connectorId;
+  const definitionDigest = revision.definitionDigest;
+  const done = await runPress(props, async (chain) => {
+    await sendMutation(chain, {
+      path: customConnectorRevisionPath(
+        props.organisationId,
+        connectorId,
+        revision.revision,
+        "retire",
+      ),
+      method: "POST",
+      body: {
+        definitionDigest,
+        affectedIntegrationAccountIds: detail.accounts
+          .filter(matchesAcceptedRevision.bind(null, revision.revision))
+          .map(accountId),
+      },
+      intent: `custom-connector-revision:${connectorId}:${revision.revision}:retire`,
+    });
+    return "Revision retired.";
+  });
+  if (done) await refreshDetail(props, connectorId);
+}
+
+async function runLifecycleAction(
+  props: ConnectorDetailProps,
+  action: "disable" | "remove" | "resume",
+): Promise<void> {
+  if (props.detail.kind !== "ready") return;
+  const summary = props.detail.value.summary;
+  const path =
+    action === "remove"
+      ? customConnectorPath(props.organisationId, summary.connectorId)
+      : `${customConnectorPath(props.organisationId, summary.connectorId)}/${action}`;
+  const done = await runPress(props, async (chain) => {
+    await sendMutation(chain, {
+      path,
+      method: action === "remove" ? "DELETE" : "POST",
+      body: { expectedHeadRevision: summary.headRevision },
+      intent: `custom-connector-lifecycle:${summary.connectorId}:${action}:${summary.headRevision}`,
+    });
+    return "Saved.";
+  });
+  if (!done) return;
+  if (action === "remove") {
+    void props.navigate(props.basePath, { preventScrollReset: true });
     return;
   }
-  const result = await runMutation({
-    path: customConnectorCollectionPath(props.organisationId),
-    method: "POST",
-    body: { document },
-    intent: `custom-connector-create:${source}`,
-    configurationVersion: props.configurationVersion,
-    mutationKeys: props.mutationKeys,
-    setBusy: props.setBusy,
-    setFeedback: props.setFeedback,
-  });
-  if (result === null || result.connectorId === null) return;
-  props.setConfigurationVersion(result.configurationVersion);
-  window.location.assign(
-    customConnectorHref(props.basePath, result.connectorId, null),
-  );
+  await refreshDetail(props, summary.connectorId);
 }
 
 function beginCustomApprovalStepUp(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
+  props: ConnectorDetailProps,
   action: CustomConnectorAction,
 ): void {
   const returnPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
@@ -1030,7 +933,7 @@ function beginCustomApprovalStepUp(
  * instead, and the page applies the write when it comes back.
  */
 async function approveAndApplyCustomWrite(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
+  props: ConnectorDetailProps,
   action: CustomConnectorAction,
 ): Promise<void> {
   // Busy before the sign-in, so that a second click cannot start a second
@@ -1061,7 +964,7 @@ async function approveAndApplyCustomWrite(
 }
 
 async function rejectCustomWrite(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
+  props: ConnectorDetailProps,
   action: CustomConnectorAction,
 ): Promise<void> {
   await updateCustomWriteAction(props, action, "rejection", {
@@ -1070,21 +973,21 @@ async function rejectCustomWrite(
 }
 
 async function runCustomWriteExecution(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
+  props: ConnectorDetailProps,
   action: CustomConnectorAction,
 ): Promise<void> {
   await updateCustomWriteAction(props, action, "execute", {});
 }
 
 async function retryCustomWriteExecution(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
+  props: ConnectorDetailProps,
   action: CustomConnectorAction,
 ): Promise<void> {
   await updateCustomWriteAction(props, action, "retry", {});
 }
 
 async function submitCustomWriteReconciliation(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
+  props: ConnectorDetailProps,
   action: CustomConnectorAction,
   event: React.FormEvent<HTMLFormElement>,
 ): Promise<void> {
@@ -1112,11 +1015,7 @@ async function submitCustomWriteReconciliation(
 }
 
 type CustomWriteOperation =
-  | "approval"
-  | "rejection"
-  | "execute"
-  | "retry"
-  | "reconcile";
+  "approval" | "rejection" | "execute" | "retry" | "reconcile";
 
 /** Sends one operation of a write, with one mutation key for each intent. */
 async function sendCustomWriteAction(
@@ -1148,7 +1047,7 @@ function customWriteFeedback(next: CustomConnectorAction): string {
 }
 
 async function updateCustomWriteAction(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
+  props: ConnectorDetailProps,
   action: CustomConnectorAction,
   operation: CustomWriteOperation,
   body: Readonly<Record<string, unknown>>,
@@ -1270,386 +1169,6 @@ function readPendingCustomApproval(): {
 }
 
 function noop(): void {}
-
-function RejectRevisionForm(props: {
-  readonly busy: boolean;
-  readonly reject: (reason: string) => void;
-}): React.ReactNode {
-  const [open, setOpen] = React.useState(false);
-  const [reason, setReason] = React.useState("");
-  if (!open) {
-    return (
-      <button
-        type="button"
-        className="button-secondary"
-        disabled={props.busy}
-        onClick={setOpen.bind(null, true)}
-      >
-        Reject
-      </button>
-    );
-  }
-  return (
-    <form
-      className="stacked-form custom-connector-rejection-form"
-      onSubmit={submitRejection.bind(null, reason, props.reject)}
-    >
-      <label htmlFor="custom-connector-rejection-reason">
-        Reason for the author
-      </label>
-      <textarea
-        id="custom-connector-rejection-reason"
-        name="reason"
-        rows={3}
-        maxLength={500}
-        required
-        autoFocus
-        value={reason}
-        onChange={updateRejectionReason.bind(null, setReason)}
-      />
-      <div className="custom-connector-actions">
-        <button
-          type="submit"
-          className="button-danger"
-          disabled={props.busy || reason.trim().length === 0}
-        >
-          Reject revision
-        </button>
-        <button
-          type="button"
-          className="button-secondary"
-          onClick={closeRejection.bind(null, setOpen, setReason)}
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
-  );
-}
-
-function closeRejection(
-  setOpen: (value: boolean) => void,
-  setReason: (value: string) => void,
-): void {
-  setOpen(false);
-  setReason("");
-}
-
-function updateRejectionReason(
-  setReason: (value: string) => void,
-  event: React.ChangeEvent<HTMLTextAreaElement>,
-): void {
-  setReason(event.currentTarget.value);
-}
-
-function submitRejection(
-  reason: string,
-  reject: (reason: string) => void,
-  event: React.FormEvent<HTMLFormElement>,
-): void {
-  event.preventDefault();
-  const trimmed = reason.trim();
-  if (trimmed.length > 0) reject(trimmed);
-}
-
-async function runRevisionAction(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
-  revision: CustomConnectorRevisionView,
-  action: CustomConnectorRevisionAction,
-  reason = "",
-): Promise<void> {
-  if (props.detail.kind !== "ready") return;
-  let body: Readonly<Record<string, unknown>>;
-  switch (action) {
-    case "validate":
-      body = { authoringDigest: revision.authoringDigest };
-      break;
-    case "approve":
-      if (revision.definitionDigest === null || revision.definition === null) {
-        props.setFeedback("Validate this definition before approving it.");
-        return;
-      }
-      body = {
-        definitionDigest: revision.definitionDigest,
-        review: {
-          origin: readString(revision.definition.origin),
-          effects: readOperationReviews(revision.definition).map(
-            operationApproval,
-          ),
-        },
-      };
-      break;
-    case "reject":
-      if (revision.definitionDigest === null) return;
-      body = { definitionDigest: revision.definitionDigest, reason };
-      break;
-    case "retire":
-      if (revision.definitionDigest === null) return;
-      body = {
-        definitionDigest: revision.definitionDigest,
-        affectedIntegrationAccountIds: props.detail.value.accounts
-          .filter(matchesAcceptedRevision.bind(null, revision.revision))
-          .map(accountId),
-      };
-      break;
-    default:
-      return assertNever(action, "Unexpected custom connector state");
-  }
-  const result = await runMutation({
-    path: customConnectorRevisionPath(
-      props.organisationId,
-      props.detail.value.summary.connectorId,
-      revision.revision,
-      action,
-    ),
-    method: "POST",
-    body,
-    intent: `custom-connector-revision:${props.detail.value.summary.connectorId}:${revision.revision}:${action}`,
-    configurationVersion: props.configurationVersion,
-    mutationKeys: props.mutationKeys,
-    setBusy: props.setBusy,
-    setFeedback: props.setFeedback,
-  });
-  if (result === null) return;
-  props.setConfigurationVersion(result.configurationVersion);
-  await refreshDetail(props, props.detail.value.summary.connectorId);
-}
-
-async function runLifecycleAction(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
-  action: "disable" | "remove" | "resume",
-): Promise<void> {
-  if (props.detail.kind !== "ready") return;
-  const summary = props.detail.value.summary;
-  const path =
-    action === "remove"
-      ? customConnectorPath(props.organisationId, summary.connectorId)
-      : `${customConnectorPath(props.organisationId, summary.connectorId)}/${action}`;
-  const result = await runMutation({
-    path,
-    method: action === "remove" ? "DELETE" : "POST",
-    body: { expectedHeadRevision: summary.headRevision },
-    intent: `custom-connector-lifecycle:${summary.connectorId}:${action}:${summary.headRevision}`,
-    configurationVersion: props.configurationVersion,
-    mutationKeys: props.mutationKeys,
-    setBusy: props.setBusy,
-    setFeedback: props.setFeedback,
-  });
-  if (result === null) return;
-  props.setConfigurationVersion(result.configurationVersion);
-  if (action === "remove") {
-    void props.navigate(props.basePath, { preventScrollReset: true });
-    return;
-  }
-  await refreshDetail(props, summary.connectorId);
-}
-
-async function startNewAccountSetup(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
-  revision: CustomConnectorRevisionView,
-): Promise<void> {
-  await startSetup(props, revision, {
-    kind: "new_account",
-    environment: "production",
-  });
-}
-
-async function startExistingAccountSetup(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
-  revision: CustomConnectorRevisionView,
-  account: CustomConnectorAccountView,
-  kind: "resume_account" | "rotate_account" | "upgrade_account",
-): Promise<void> {
-  await startSetup(props, revision, {
-    kind,
-    integrationAccountId: account.integrationAccountId,
-    expectedBindingRevision: account.bindingRevision,
-  });
-}
-
-async function startSetup(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
-  revision: CustomConnectorRevisionView,
-  target: CustomConnectorSetupAttempt["target"],
-): Promise<void> {
-  if (props.detail.kind !== "ready" || revision.definitionDigest === null) {
-    props.setFeedback("Validate this revision before setting up an account.");
-    return;
-  }
-  const connectorId = props.detail.value.summary.connectorId;
-  const result = await runMutation({
-    path: customConnectorSetupCollectionPath(props.organisationId, connectorId),
-    method: "POST",
-    body: {
-      connectorRevision: revision.revision,
-      definitionDigest: revision.definitionDigest,
-      target,
-    },
-    intent: `custom-connector-setup:${connectorId}:${JSON.stringify(target)}`,
-    configurationVersion: props.configurationVersion,
-    mutationKeys: props.mutationKeys,
-    setBusy: props.setBusy,
-    setFeedback: props.setFeedback,
-  });
-  if (result === null || result.attempt === null) return;
-  props.setConfigurationVersion(result.configurationVersion);
-  props.setAttempt(result.attempt);
-  replaceCustomConnectorLocation(
-    props.navigate,
-    props.basePath,
-    connectorId,
-    result.attempt.attemptId,
-  );
-}
-
-async function submitCredential(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
-  attempt: CustomConnectorSetupAttempt,
-  event: React.FormEvent<HTMLFormElement>,
-): Promise<void> {
-  event.preventDefault();
-  const formElement = event.currentTarget;
-  const form = new FormData(formElement);
-  const credentialValue = form.get("credential");
-  if (typeof credentialValue !== "string" || credentialValue.length === 0) {
-    props.setFeedback("Enter the API key.");
-    return;
-  }
-  const result = await runSetupMutation(
-    props,
-    attempt,
-    "credential",
-    {
-      credentialValue,
-      expectedAttemptRevision: attempt.attemptRevision,
-    },
-    props.configurationVersion,
-  );
-  formElement.reset();
-  if (result !== null && result.attempt !== null) {
-    props.setAttempt(result.attempt);
-    const tested = await runSetupMutation(
-      props,
-      result.attempt,
-      "test",
-      {
-        expectedAttemptRevision: result.attempt.attemptRevision,
-      },
-      result.configurationVersion,
-    );
-    if (tested !== null && tested.attempt !== null)
-      props.setAttempt(tested.attempt);
-  }
-}
-
-async function runSetupAction(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
-  attempt: CustomConnectorSetupAttempt,
-  action: "cancel" | "commit" | "test",
-): Promise<void> {
-  const result = await runSetupMutation(
-    props,
-    attempt,
-    action,
-    {
-      expectedAttemptRevision: attempt.attemptRevision,
-    },
-    props.configurationVersion,
-  );
-  if (result === null) return;
-  if (result.attempt !== null) props.setAttempt(result.attempt);
-  if (action === "commit" && props.detail.kind === "ready") {
-    props.setAttempt(null);
-    replaceCustomConnectorLocation(
-      props.navigate,
-      props.basePath,
-      props.detail.value.summary.connectorId,
-      null,
-    );
-    await refreshDetail(props, props.detail.value.summary.connectorId);
-  }
-}
-
-async function runSetupMutation(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
-  attempt: CustomConnectorSetupAttempt,
-  action: "cancel" | "commit" | "credential" | "test",
-  body: Readonly<Record<string, unknown>>,
-  configurationVersion: number,
-): Promise<CustomConnectorMutationResult | null> {
-  const result = await runMutation({
-    path: `${customConnectorSetupPath(
-      props.organisationId,
-      attempt.connectorId,
-      attempt.attemptId,
-    )}/${action}`,
-    method: "POST",
-    body,
-    intent: `custom-connector-attempt:${attempt.attemptId}:${attempt.attemptRevision}:${action}`,
-    configurationVersion,
-    mutationKeys: props.mutationKeys,
-    setBusy: props.setBusy,
-    setFeedback: props.setFeedback,
-  });
-  if (result !== null) {
-    props.setConfigurationVersion(result.configurationVersion);
-  }
-  return result;
-}
-
-async function runMutation(input: {
-  readonly path: string;
-  readonly method: "DELETE" | "POST";
-  readonly body: Readonly<Record<string, unknown>>;
-  readonly intent: string;
-  readonly configurationVersion: number;
-  readonly mutationKeys: MutationKeys;
-  readonly setBusy: React.Dispatch<React.SetStateAction<boolean>>;
-  readonly setFeedback: React.Dispatch<React.SetStateAction<string | null>>;
-}): Promise<CustomConnectorMutationResult | null> {
-  input.setBusy(true);
-  input.setFeedback(null);
-  const key = mutationKey(input.mutationKeys.current, input.intent);
-  try {
-    const result = await mutateCustomConnector(
-      input.path,
-      input.method,
-      input.body,
-      input.configurationVersion,
-      key,
-    );
-    input.mutationKeys.current.delete(input.intent);
-    input.setFeedback("Saved.");
-    return result;
-  } catch (error) {
-    input.setFeedback(
-      error instanceof Error
-        ? error.message
-        : "Unable to save. Check your connection and try again.",
-    );
-    return null;
-  } finally {
-    input.setBusy(false);
-  }
-}
-
-async function refreshDetail(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
-  connectorId: string,
-): Promise<void> {
-  try {
-    const [detail, catalog] = await Promise.all([
-      readCustomConnectorDetail(props.organisationId, connectorId),
-      readCustomConnectorCatalog(props.organisationId),
-    ]);
-    props.setDetail({ kind: "ready", value: detail });
-    props.setCatalog({ kind: "ready", value: catalog });
-  } catch (error) {
-    props.setFeedback(
-      errorMessage(error, "Unable to load custom connectors. Try again."),
-    );
-  }
-}
 
 function loadCatalogEffect(
   organisationId: string,
@@ -1807,38 +1326,6 @@ function readSelection(): {
   };
 }
 
-function customConnectorHref(
-  basePath: string,
-  connectorId: string,
-  attemptId: string | null,
-): string {
-  const origin =
-    typeof window === "undefined"
-      ? "https://portal.invalid"
-      : window.location.origin;
-  const url = new URL(basePath, origin);
-  url.searchParams.set("customConnector", connectorId);
-  if (attemptId !== null) url.searchParams.set("setupAttempt", attemptId);
-  return `${url.pathname}${url.search}`;
-}
-
-function replaceCustomConnectorLocation(
-  navigate: NavigateFunction,
-  basePath: string,
-  connectorId: string,
-  attemptId: string | null,
-): void {
-  const path = customConnectorHref(basePath, connectorId, attemptId);
-  const current = new URLSearchParams(window.location.search);
-  const url = new URL(path, window.location.origin);
-  const query = current.get("q");
-  if (query !== null) url.searchParams.set("q", query);
-  void navigate(`${url.pathname}${url.search}`, {
-    replace: true,
-    preventScrollReset: true,
-  });
-}
-
 function renderOperationReview(operation: {
   readonly id: string;
   readonly description: string;
@@ -1858,150 +1345,6 @@ function renderOperationReview(operation: {
   );
 }
 
-function renderCustomAccount(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
-  detail: CustomConnectorDetail,
-  head: CustomConnectorRevisionView,
-  account: CustomConnectorAccountView,
-): React.ReactNode {
-  const accepted = detail.revisions.find(
-    matchesRevisionNumber.bind(null, account.acceptedRevision),
-  );
-  return (
-    <article
-      className="custom-connector-account"
-      key={account.integrationAccountId}
-      id={`custom-account-${account.integrationAccountId}`}
-    >
-      <div>
-        <strong>{account.displayName}</strong>
-        <span>{account.lifecycle === "active" ? "Connected" : "Disabled"}</span>
-      </div>
-      <div className="custom-connector-account-actions">
-        {account.lifecycle === "active" ? (
-          <a
-            className="button-link"
-            href={connectorAccessHref(
-              props.accessPath,
-              detail.summary.connectorId,
-              account.integrationAccountId,
-            )}
-          >
-            Manage agent access
-          </a>
-        ) : null}
-        {account.lifecycle === "active" && accepted !== undefined ? (
-          <button
-            type="button"
-            disabled={props.busy}
-            onClick={startExistingAccountSetup.bind(
-              null,
-              props,
-              accepted,
-              account,
-              "rotate_account",
-            )}
-          >
-            Replace API key
-          </button>
-        ) : null}
-        {account.lifecycle === "disabled" && accepted !== undefined ? (
-          <button
-            type="button"
-            disabled={props.busy}
-            onClick={startExistingAccountSetup.bind(
-              null,
-              props,
-              accepted,
-              account,
-              "resume_account",
-            )}
-          >
-            Reconnect account
-          </button>
-        ) : null}
-        {account.lifecycle === "active" &&
-        head.reviewState === "approved" &&
-        head.revision !== account.acceptedRevision ? (
-          <button
-            type="button"
-            disabled={props.busy}
-            onClick={startExistingAccountSetup.bind(
-              null,
-              props,
-              head,
-              account,
-              "upgrade_account",
-            )}
-          >
-            Use reviewed version {head.revision}
-          </button>
-        ) : null}
-      </div>
-    </article>
-  );
-}
-
-function readOperationReviews(
-  definition: Readonly<Record<string, unknown>>,
-): readonly {
-  readonly id: string;
-  readonly description: string;
-  readonly effect: "read" | "external_record_create" | "external_record_update";
-  readonly idempotencyHeader: string | null;
-}[] {
-  if (!Array.isArray(definition.operations)) return [];
-  const operations: {
-    id: string;
-    description: string;
-    effect: "read" | "external_record_create" | "external_record_update";
-    idempotencyHeader: string | null;
-  }[] = [];
-  for (const raw of definition.operations) {
-    if (!isRecord(raw) || typeof raw.id !== "string") continue;
-    const effect = readEffect(raw.effect);
-    if (effect === null) continue;
-    operations.push({
-      id: raw.id,
-      description:
-        typeof raw.description === "string" ? raw.description : raw.id,
-      effect,
-      idempotencyHeader: readIdempotencyHeader(raw.effect),
-    });
-  }
-  return operations;
-}
-
-function readEffect(
-  raw: unknown,
-): "read" | "external_record_create" | "external_record_update" | null {
-  if (!isRecord(raw) || typeof raw.kind !== "string") return null;
-  if (
-    raw.kind === "read" ||
-    raw.kind === "external_record_create" ||
-    raw.kind === "external_record_update"
-  ) {
-    return raw.kind;
-  }
-  return null;
-}
-
-function readIdempotencyHeader(effect: unknown): string | null {
-  return isRecord(effect) &&
-    isRecord(effect.retryPolicy) &&
-    effect.retryPolicy.kind === "provider_idempotent" &&
-    typeof effect.retryPolicy.header === "string"
-    ? effect.retryPolicy.header
-    : null;
-}
-
-function operationApproval(operation: {
-  readonly id: string;
-  readonly effect: "read" | "external_record_create" | "external_record_update";
-}): Readonly<{ operationId: string; effect: string }> {
-  return { operationId: operation.id, effect: operation.effect };
-}
-
 function accountId(account: CustomConnectorAccountView): string {
   return account.integrationAccountId;
 }
@@ -2011,25 +1354,6 @@ function matchesAcceptedRevision(
   account: CustomConnectorAccountView,
 ): boolean {
   return account.acceptedRevision === revision;
-}
-
-function matchesRevisionNumber(
-  revision: number,
-  value: CustomConnectorRevisionView,
-): boolean {
-  return value.revision === revision;
-}
-
-function readString(value: unknown): string {
-  return typeof value === "string" ? value : "";
-}
-
-function mutationKey(keys: Map<string, string>, intent: string): string {
-  const current = keys.get(intent);
-  if (current !== undefined) return current;
-  const created = `portal-${crypto.randomUUID()}`;
-  keys.set(intent, created);
-  return created;
 }
 
 function effectLabel(
@@ -2066,31 +1390,6 @@ function reviewStateLabel(
   }
 }
 
-function setupStateLabel(
-  state: CustomConnectorSetupAttempt["lifecycle"],
-): string {
-  switch (state) {
-    case "awaiting_credential":
-      return "API key needed";
-    case "credential_stored":
-      return "Ready to test";
-    case "testing":
-      return "Testing connection";
-    case "verified":
-      return "Connection verified";
-    case "committed":
-      return "Connected";
-    case "failed":
-      return "Test failed";
-    case "cancelled":
-      return "Setup cancelled";
-    case "expired":
-      return "Setup expired";
-    default:
-      return assertNever(state, "Unexpected custom connector state");
-  }
-}
-
 function actionStateLabel(state: CustomConnectorAction["state"]): string {
   switch (state) {
     case "proposed":
@@ -2113,58 +1412,6 @@ function actionStateLabel(state: CustomConnectorAction["state"]): string {
     default:
       return assertNever(state, "Unexpected custom connector state");
   }
-}
-
-function connectorCredentialGuidance(
-  revision: CustomConnectorRevisionView,
-): string {
-  const definition = revision.definition;
-  const authentication = definition?.authentication;
-  if (!isRecord(authentication))
-    return "Use the key for the account you want to connect.";
-  if (authentication.kind === "basic_api_key")
-    return "Paste the API key only. Purin Pantry supplies Basic authentication with an empty password.";
-  if (
-    authentication.kind === "header" &&
-    typeof authentication.name === "string" &&
-    authentication.name.toLowerCase() === "authorization"
-  )
-    return "Paste the complete Authorization header value, including the service’s required prefix.";
-  return "Paste the API key only, without a header name or Bearer prefix.";
-}
-
-function setupGuidance(attempt: CustomConnectorSetupAttempt): string {
-  switch (attempt.lifecycle) {
-    case "awaiting_credential":
-      return "Add the API key for this destination.";
-    case "credential_stored":
-      return "Check that this key connects to the expected account before enabling access.";
-    case "testing":
-      return "Testing the connection…";
-    case "verified":
-      return "The account identity is verified.";
-    case "committed":
-      return "This account is connected.";
-    case "failed":
-      return "The connection test failed. Check the API key and its permissions, then start setup again.";
-    case "cancelled":
-      return "This setup was cancelled.";
-    case "expired":
-      return "This setup expired. Start again with a fresh API key.";
-    default:
-      return assertNever(attempt.lifecycle, "Unexpected custom connector state");
-  }
-}
-
-function isOpenSetup(
-  lifecycle: CustomConnectorSetupAttempt["lifecycle"],
-): boolean {
-  return (
-    lifecycle === "awaiting_credential" ||
-    lifecycle === "credential_stored" ||
-    lifecycle === "testing" ||
-    lifecycle === "verified"
-  );
 }
 
 function validationFailureMessage(
@@ -2191,206 +1438,6 @@ function MutationFeedback(props: {
       {props.message ?? ""}
     </p>
   );
-}
-
-function currentSetupStep(
-  head: CustomConnectorRevisionView,
-  attempt: CustomConnectorSetupAttempt | null,
-  accountCount: number,
-): ConnectorSetupStep {
-  if (attempt !== null) {
-    switch (attempt.lifecycle) {
-      case "awaiting_credential":
-        return "connect";
-      case "credential_stored":
-      case "testing":
-      case "verified":
-        return "test";
-      case "committed":
-        return "access";
-      case "failed":
-      case "cancelled":
-      case "expired":
-        return "connect";
-      default:
-        return assertNever(attempt.lifecycle, "Unexpected custom connector state");
-    }
-  }
-  if (head.reviewState !== "approved") return "review";
-  return accountCount > 0 ? "access" : "connect";
-}
-
-/**
- * The definition is technical, so it stays out of the way behind one plain
- * button. A definition that failed its check opens by itself.
- */
-function ConnectorRevisionEditor(input: {
-  readonly props: Parameters<typeof CustomConnectorDetailView>[0];
-  readonly head: CustomConnectorRevisionView;
-}): React.ReactNode {
-  const [editing, setEditing] = React.useState(false);
-  if (!editing && input.head.validationFailure === null)
-    return (
-      <div className="custom-connector-actions">
-        <button type="button" onClick={setEditing.bind(null, true)}>
-          Edit the definition
-        </button>
-      </div>
-    );
-  return (
-    <div className="custom-connector-technical connector-revision-editor">
-      <form
-        className="stacked-form"
-        onSubmit={submitConnectorRevision.bind(null, input.props, input.head)}
-      >
-        <label htmlFor="custom-connector-revision-document">
-          Definition JSON
-        </label>
-        <textarea
-          id="custom-connector-revision-document"
-          name="definition"
-          rows={8}
-          defaultValue={JSON.stringify(input.head.authoringDocument, null, 2)}
-          key={input.head.revision}
-          spellCheck={false}
-          required
-        />
-        <p className="field-hint">
-          Save a new version, review its operations, then update connected
-          accounts.
-        </p>
-        <div className="custom-connector-actions">
-          <button type="submit" disabled={input.props.busy}>
-            Save the definition
-          </button>
-          {input.head.validationFailure === null ? (
-            <button type="button" onClick={setEditing.bind(null, false)}>
-              Cancel
-            </button>
-          ) : null}
-        </div>
-      </form>
-    </div>
-  );
-}
-
-async function submitConnectorRevision(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
-  head: CustomConnectorRevisionView,
-  event: React.FormEvent<HTMLFormElement>,
-): Promise<void> {
-  event.preventDefault();
-  if (props.detail.kind !== "ready") return;
-  const source = new FormData(event.currentTarget).get("definition");
-  if (typeof source !== "string") return;
-  let document: unknown;
-  try {
-    document = JSON.parse(source);
-  } catch {
-    props.setFeedback("Use valid JSON for the connector definition.");
-    return;
-  }
-  if (!isRecord(document)) {
-    props.setFeedback("Use a JSON object for the connector definition.");
-    return;
-  }
-  const connectorId = props.detail.value.summary.connectorId;
-  const result = await runMutation({
-    path: `${customConnectorPath(props.organisationId, connectorId)}/revisions`,
-    method: "POST",
-    body: { document, expectedHeadRevision: head.revision },
-    intent: `custom-connector-revision-create:${connectorId}:${head.revision}:${source}`,
-    configurationVersion: props.configurationVersion,
-    mutationKeys: props.mutationKeys,
-    setBusy: props.setBusy,
-    setFeedback: props.setFeedback,
-  });
-  if (result === null) return;
-  props.setConfigurationVersion(result.configurationVersion);
-  await refreshDetail(props, connectorId);
-}
-
-function returnToConnectorAccounts(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
-): void {
-  if (props.detail.kind !== "ready") return;
-  props.setAttempt(null);
-  props.setFeedback(null);
-  replaceCustomConnectorLocation(
-    props.navigate,
-    props.basePath,
-    props.detail.value.summary.connectorId,
-    null,
-  );
-}
-
-function connectorAccessHref(
-  accessPath: string,
-  connectorId: string,
-  integrationAccountId: string,
-): string {
-  const query = new URLSearchParams({
-    customConnector: connectorId,
-    integrationAccount: integrationAccountId,
-  });
-  return `${accessPath}?${query.toString()}`;
-}
-
-function setupTitle(attempt: CustomConnectorSetupAttempt): string {
-  switch (attempt.target.kind) {
-    case "rotate_account":
-      return "Replace API key";
-    case "upgrade_account":
-      return "Update account connection";
-    case "resume_account":
-      return "Reconnect account";
-    case "new_account":
-      return "Connect your account";
-    default:
-      return assertNever(attempt.target, "Unexpected custom connector state");
-  }
-}
-
-async function restartConnectorSetup(
-  props: Parameters<typeof CustomConnectorDetailView>[0],
-  head: CustomConnectorRevisionView,
-  attempt: CustomConnectorSetupAttempt,
-): Promise<void> {
-  if (props.detail.kind !== "ready") return;
-  const revision = props.detail.value.revisions.find(
-    matchesRevisionNumber.bind(null, attempt.connectorRevision),
-  );
-  if (revision === undefined) {
-    props.setFeedback(
-      "This definition is no longer available. Return to accounts to review the current connector.",
-    );
-    return;
-  }
-  const target = attempt.target;
-  if (target.kind === "new_account") {
-    await startSetup(props, revision, {
-      kind: "new_account",
-      environment: target.environment,
-    });
-    return;
-  }
-  const account = props.detail.value.accounts.find(
-    matchesCustomAccountId.bind(null, target.integrationAccountId),
-  );
-  if (account === undefined) {
-    props.setFeedback(
-      "This account is no longer available. Return to accounts to choose a connection.",
-    );
-    return;
-  }
-  await startExistingAccountSetup(props, revision, account, target.kind);
-}
-
-function matchesCustomAccountId(
-  integrationAccountId: string,
-  account: CustomConnectorAccountView,
-): boolean {
-  return account.integrationAccountId === integrationAccountId;
 }
 
 export function CustomConnectorWriteFields(props: {

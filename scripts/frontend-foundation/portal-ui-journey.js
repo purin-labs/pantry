@@ -40,9 +40,7 @@ async function verifyPortalInterface(page) {
   await tokens.waitFor();
   const originalTokens = await tokens.inputValue();
   await tokens.fill("12345");
-  await page
-    .getByRole("button", { name: "Cancel", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
   if ((await tokens.inputValue()) !== originalTokens) {
     throw new Error("Budget reset did not restore the current token limit.");
   }
@@ -145,6 +143,32 @@ async function verifyPortalInterface(page) {
   }
   checks.push(
     "Brain uses two summary columns at 320 pixels and retains keyboard view navigation with reduced motion.",
+  );
+
+  // The preview answers every connector route and keeps its state in the tab.
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  const connector = `${origin}/integrations-preview.html?customConnector=preview_connector&connectorState=review`;
+  await page.goto(connector);
+  await page.evaluate("sessionStorage.clear()");
+  await page.goto(connector);
+  const drawer = page.locator("dialog[open]");
+  const key = drawer.getByLabel("API key", { exact: true });
+  await key.fill("wrong");
+  await drawer
+    .getByRole("button", { name: "Approve and connect", exact: true })
+    .click();
+  await drawer.getByText("Test failed", { exact: true }).waitFor();
+  await key.fill("preview-key");
+  await drawer.getByRole("button", { name: "Try again", exact: true }).click();
+  await drawer.getByText("Kyoto bakery", { exact: true }).waitFor();
+  if (
+    await drawer.getByRole("button", { name: "Approve", exact: true }).count()
+  ) {
+    throw new Error("The approved connector still asks for its approval.");
+  }
+  await drawer.screenshot({ path: `${evidence}/custom-connector-after.png` });
+  checks.push(
+    "One press approves a custom connector and tests its key; a key that fails is named in place, and one more press connects the account.",
   );
 
   return { status: "passed", checks, screenshots: evidence };

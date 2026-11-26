@@ -219,36 +219,6 @@
   gap: 12px;
   flex-wrap: wrap;
 }
-/* The steps as a thin segmented bar with small labels. */
-.connector-setup-steps {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  gap: 6px;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-.connector-setup-steps li {
-  display: grid;
-  gap: 6px;
-  padding-block-start: 8px;
-  border-block-start: 2px solid var(--border);
-  color: var(--ink-2);
-  font-size: 12px;
-}
-.connector-setup-steps li > span {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-}
-.connector-setup-steps li[aria-current="step"] {
-  border-block-start-color: var(--ink);
-  color: var(--ink);
-  font-weight: 500;
-}
 .connector-surface {
   padding: 24px;
   border: 1px solid var(--border);
@@ -356,16 +326,7 @@
 .custom-connector-editor .button-link:hover {
   background: var(--pantry-primary-hover);
 }
-.custom-connector-editor .connector-primary-action,
-.custom-connector-editor
-  .connector-step-footer
-  > button:not(:where(.pantry-select-trigger)),
-.custom-connector-editor
-  .custom-connector-credential-form
-  > button:not(:where(.pantry-select-trigger)),
-.custom-connector-editor
-  .custom-connector-setup
-  > button:not(:where(.pantry-select-trigger)):not(.button-secondary),
+/* The write decision draws its own buttons. */
 .custom-connector-editor
   .custom-connector-write-review
   > .custom-connector-actions
@@ -373,11 +334,6 @@
   background: var(--pantry-primary);
   color: var(--pantry-on-primary);
   box-shadow: var(--pantry-primary-ring);
-}
-.custom-connector-editor
-  .custom-connector-setup
-  > button:not(:where(.pantry-select-trigger)) {
-  justify-self: start;
 }
 /* A connection opens as a sheet like the consent sheet: compact, as tall as
    its content, with the provider centred above the controls. */
@@ -881,27 +837,6 @@ label.mailbox-model-consent input[type="checkbox"] {
   border-radius: 999px;
   color: var(--ink-2);
   text-decoration: none;
-}
-.custom-connector-editor:has(.connector-method-tabs)
-  :is(
-    .connector-primary-action,
-    .connector-step-footer > button:not(:where(.pantry-select-trigger))
-  ) {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  border-radius: 999px;
-  background: var(--pantry-primary);
-  color: var(--pantry-on-primary);
-  box-shadow: var(--pantry-primary-ring);
-  padding: 10px 16px;
-}
-.custom-connector-editor:has(.connector-method-tabs)
-  :is(
-    .connector-primary-action,
-    .connector-step-footer > button:not(:where(.pantry-select-trigger))
-  ):hover:not(:disabled) {
-  background: var(--pantry-primary-hover);
 }
 .custom-connector-editor:has(.connector-method-tabs)
   .custom-connector-definition-form {

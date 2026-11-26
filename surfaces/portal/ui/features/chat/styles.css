@@ -586,9 +586,6 @@
 .chat-message {
   scroll-margin-block-end: 180px;
 }
-.chat-setup-dialog .connector-setup-steps {
-  display: none;
-}
 
 .chat-layout {
   display: grid;
