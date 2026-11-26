@@ -3,6 +3,7 @@ import { formatRelativeTime } from "@purin-labs/ui/page-components";
 import { formatAbsoluteTime } from "@purin-labs/ui/formatting";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
+import { Button, ConfirmInPlace } from "@purin-labs/ui/index";
 import type { CodexAllowance } from "@purin-labs/control-api";
 import {
   InferenceIntegrationPanel,
@@ -31,9 +32,10 @@ export function renderCodexConnection(
             { provider: "codex", label: "ChatGPT" },
           )}
           <p>
+            Sign in with the ChatGPT account that pays for Purin Pantry.
             {inUse
-              ? "Sign in with the ChatGPT account that pays for Purin Pantry. Agents can start after OpenAI confirms the sign-in."
-              : "Sign in with the ChatGPT account that pays for Purin Pantry, then use this source."}
+              ? " Agents can start after OpenAI confirms the sign-in."
+              : ""}
           </p>
           {props.canConnect ? (
             <div className="connection-actions">
@@ -393,27 +395,23 @@ function formatClockTime(value: number): string {
 function renderCodexConnectedActions(
   props: Parameters<typeof InferenceIntegrationPanel>[0],
 ): React.ReactNode {
-  const confirming = props.pendingConfirm === "codex_disconnect";
   return (
     <div className="connection-actions">
-      <button
-        type="button"
-        onClick={props.actions.reconnectCodex}
-        disabled={props.busy}
-      >
+      <Button onClick={props.actions.reconnectCodex} disabled={props.busy}>
         Reconnect
-      </button>
-      <button
-        type="button"
-        onClick={
-          confirming
-            ? props.actions.disconnectCodex
-            : props.requestConfirm.bind(null, "codex_disconnect")
+      </Button>
+      <ConfirmInPlace
+        label="Disconnect"
+        question="Disconnect ChatGPT?"
+        consequence={
+          props.selection.kind === "codex_subscription"
+            ? "Agents stop until you sign in again."
+            : "You can sign in again later."
         }
-        disabled={props.busy}
-      >
-        {confirming ? "Confirm disconnect" : "Disconnect"}
-      </button>
+        confirmLabel="Disconnect"
+        busy={props.busy}
+        onConfirm={props.actions.disconnectCodex}
+      />
     </div>
   );
 }

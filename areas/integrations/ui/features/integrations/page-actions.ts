@@ -12,7 +12,10 @@ import {
 } from "@purin-labs/area-inbox-contract/ui/features/email-review/api";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
-import { saveInferenceSelection } from "./inference-actions";
+import {
+  saveInferenceSelection,
+  selectSignedInAccount,
+} from "./inference-actions";
 import {
   approveEmailOperational,
   approveEmailReply,
@@ -130,6 +133,7 @@ export function createIntegrationsPageActions(
       "ChatGPT disconnected.",
     ),
     saveInferenceSelection: saveInferenceSelection.bind(null, context),
+    selectSignedInAccount: selectSignedInAccount.bind(null, context),
     disableAccount: disableIntegrationAccount.bind(null, context),
     reconnectAccount: reconnectIntegrationAccount.bind(null, context),
     rotateAccount: rotateIntegrationAccount.bind(null, context),

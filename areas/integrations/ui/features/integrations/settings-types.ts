@@ -92,6 +92,12 @@ export type ProviderAuthorizationWatch = {
   readonly popup: Window;
 };
 
+/** An inference source that a sign-in connects, not a pasted key. */
+export type SignedInInferenceSelection = Variant<
+  OrganisationInferenceSelection,
+  "claude_oauth" | "codex_subscription"
+>;
+
 export type IntegrationsPageActions = EmailReviewActions & {
   readonly activate: () => Promise<void>;
   readonly syncCommerceSystem: () => Promise<void>;
@@ -123,6 +129,10 @@ export type IntegrationsPageActions = EmailReviewActions & {
   ) => Promise<void>;
   readonly disconnectCodex: () => Promise<void>;
   readonly saveInferenceSelection: SettingsFormHandler;
+  /** Selects the account that a sign-in has just connected. */
+  readonly selectSignedInAccount: (
+    selection: SignedInInferenceSelection,
+  ) => Promise<void>;
   readonly disableAccount: SettingsMouseHandler;
   readonly reconnectAccount: SettingsMouseHandler;
   readonly rotateAccount: SettingsMouseHandler;

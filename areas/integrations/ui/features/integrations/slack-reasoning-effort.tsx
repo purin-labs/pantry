@@ -28,10 +28,10 @@ type Draft = ChatEffort | "standard";
 const EFFORTS: readonly ChatEffort[] = ["low", "medium", "high"];
 
 /**
- * The reasoning effort of Slack answers. Portal chat keeps its own choice in
- * each chat; Slack has one choice for the organisation. The panel reads and
- * saves its own record, so a save does not change the configuration version
- * that the other settings on the page hold.
+ * The reasoning effort of Slack answers, in the Slack drawer. Portal chat
+ * keeps its own choice in each chat; Slack has one choice for the
+ * organisation. The panel reads and saves its own record, so a save does not
+ * change the configuration version that the other settings on the page hold.
  */
 export function SlackReasoningEffortPanel(props: {
   readonly organisationId: string;
@@ -53,7 +53,7 @@ export function SlackReasoningEffortPanel(props: {
   if (state.kind === "failed")
     return (
       <div className="integration-setup">
-        <h4>Thinking level for Slack answers</h4>
+        <h4>Thinking level</h4>
         <p className="error-text">Unable to read the thinking level. Close this window and open it again.</p>
       </div>
     );
@@ -61,7 +61,7 @@ export function SlackReasoningEffortPanel(props: {
   if (!props.canManage)
     return (
       <div className="integration-setup">
-        <h4>Thinking level for Slack answers</h4>
+        <h4>Thinking level</h4>
         <p>
           Slack answers use {draftLabel(saved, props.source)}. An owner or admin
           can change it.
@@ -86,7 +86,7 @@ export function SlackReasoningEffortPanel(props: {
           disabled={busy}
           aria-describedby="slack-reasoning-effort-help"
         >
-          <legend>Thinking level for Slack answers</legend>
+          <legend>Thinking level</legend>
           {renderChoice(saved, draft, setDraft, {
             value: "standard",
             label: "Standard",
@@ -95,8 +95,7 @@ export function SlackReasoningEffortPanel(props: {
           {EFFORTS.map(renderEffortChoice.bind(null, saved, draft, setDraft))}
         </fieldset>
         <p id="slack-reasoning-effort-help" className="field-hint">
-          A change applies to the next Slack answer. Each Portal chat keeps its
-          own choice.
+          Each Portal chat keeps its own choice.
         </p>
         {notice?.kind === "failed" ? (
           <p className="error-text" role="alert">
@@ -110,9 +109,7 @@ export function SlackReasoningEffortPanel(props: {
               className="connection-primary-action"
               disabled={busy}
             >
-              {busy
-                ? "Saving…"
-                : `Use ${draftLabel(draft, props.source)} in Slack`}
+              {busy ? "Saving…" : `Use ${draftLabel(draft, props.source)}`}
             </button>
           </div>
         ) : null}

@@ -16,6 +16,9 @@
  * `&scenario=viewer` shows it to a member who cannot change it.
  * `&claude=disconnected | authorizing | connected` selects Claude instead,
  * over a stand-in for its connection route (add `&codex=disconnected`).
+ * `&source=pantry_platform` (or another source) sets the saved source, for
+ * example `?mode=route&integration=codex&source=pantry_platform`: choose
+ * Claude, sign in and paste `code#state`, and the sign-in selects Claude.
  *
  * Email has two views. `?integration=gmail&scenario=connected` lists five
  * connections: one on, one off, one paused, one with no agent and one that
@@ -54,7 +57,12 @@ import {
   IntegrationsRoute,
   MailboxSettingsRoute,
 } from "@purin-labs/area-integrations/ui/features/integrations/settings-routes";
-import type { IntegrationAccount, SupportDiagnostics } from "@purin-labs/control-api/portal/settings";
+import type {
+  IntegrationAccount,
+  OrganisationInferenceSelection,
+  SupportDiagnostics,
+} from "@purin-labs/control-api/portal/settings";
+import { parseInferenceSelection } from "@purin-labs/control-api/portal/inference";
 import type { IntegrationsCommand, IntegrationsCommandResult, IntegrationsPageActions, IntegrationsPageProps, IntegrationDetailRouteData, IntegrationsRouteData, IntegrationsRouteTransport, SettingsMutationFeedback } from "@purin-labs/area-integrations/ui/features/integrations/settings-types";
 import type { WhatsAppPanelActions } from "@purin-labs/area-integrations/ui/pages/whatsapp";
 import type {
@@ -130,6 +138,7 @@ const ACTIONS: IntegrationsPageActions = {
   completeCodexAuthorization: settle,
   disconnectCodex: settle,
   saveInferenceSelection: settle,
+  selectSignedInAccount: settle,
   disableAccount: settle,
   reconnectAccount: settle,
   rotateAccount: settle,
@@ -753,6 +762,19 @@ function previewParam(name: string): string | null {
   return new URLSearchParams(window.location.search).get(name);
 }
 
+function previewInferenceSelection(
+  integration: string,
+): OrganisationInferenceSelection {
+  return (
+    parseInferenceSelection(previewParam("source")) ??
+    (previewParam("claude") !== null
+      ? { kind: "claude_oauth" }
+      : integration === "codex" || previewParam("codex") !== null
+        ? { kind: "codex_subscription" }
+        : { kind: "pantry_platform" })
+  );
+}
+
 function previewCodexConnection(
   integration: string,
 ): IntegrationsPageProps["codexConnection"] {
@@ -905,12 +927,7 @@ function buildProps(
     commerceSystem: previewCommerceSystem(),
     commerceSyncProblem: null,
     codexConnection: previewCodexConnection(integration),
-    inferenceSelection:
-      previewParam("claude") !== null
-        ? { kind: "claude_oauth" }
-        : integration === "codex" || previewParam("codex") !== null
-          ? { kind: "codex_subscription" }
-          : { kind: "pantry_platform" },
+    inferenceSelection: previewInferenceSelection(integration),
     accounts: [...scenarioAccounts(scenario), ...previewSlack().accounts],
     credentialInventory: null,
     destinations: previewSlack().destinations,
@@ -1153,7 +1170,7 @@ function buildRouteTransport(
 ): IntegrationsRouteTransport {
   const data = buildRouteData(scenario, provider);
   const detailData = buildRouteDetailData(scenario, provider);
-  const readState = { overviewCount: 0 };
+  const readState: PreviewReadState = { overviewCount: 0, selection: null };
   return {
     readOverview: readPreviewOverview.bind(null, scenario, data, readState),
     stripeSetup: StripePaymentAccountSetup,
@@ -1172,6 +1189,9 @@ function buildRouteTransport(
     ) => {
       console.log("[preview] execute", command);
       await new Promise((resolve) => setTimeout(resolve, 300));
+      // A saved source shows in the reads that follow.
+      if (command.kind === "select_inference")
+        readState.selection = command.selection;
       return executePreviewCommand(data, command);
     },
     readEmailReply: unavailable,
@@ -1183,18 +1203,28 @@ function buildRouteTransport(
   };
 }
 
+type PreviewReadState = {
+  overviewCount: number;
+  /** The source that the page saved, or null before a save. */
+  selection: OrganisationInferenceSelection | null;
+};
+
 function readPreviewOverview(
   scenario: Scenario,
   data: IntegrationsRouteData,
-  state: { overviewCount: number },
+  state: PreviewReadState,
 ): Promise<IntegrationsRouteData> {
   state.overviewCount += 1;
   if (scenario === "stale-refresh" && state.overviewCount > 1) {
     return Promise.reject(new Error("Preview refresh failed."));
   }
+  const saved =
+    state.selection === null
+      ? data
+      : { ...data, inferenceSelection: state.selection };
   if (previewParam("codex") === "authorizing" && state.overviewCount >= 3)
-    return Promise.resolve(signedInPreviewOverview(data, state.overviewCount));
-  return Promise.resolve(withApprovedSlack(data));
+    return Promise.resolve(signedInPreviewOverview(saved, state.overviewCount));
+  return Promise.resolve(withApprovedSlack(saved));
 }
 
 /**

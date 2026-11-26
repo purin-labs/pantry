@@ -14,6 +14,7 @@ import { renderIntegrationAccounts } from "./accounts";
 import { renderCommerceSystemCard } from "./commerce-system";
 import { GmailIntegrationPanel } from "./gmail";
 import { InferenceIntegrationPanel } from "./inference";
+import { SlackReasoningEffortPanel } from "./slack-reasoning-effort";
 import {
   type IntegrationEntry,
   type IntegrationRailStatus,
@@ -189,8 +190,6 @@ function integrationEntries(
           selectionBusy={mutationBlocked(props.mutations, {
             kind: "inference_selection",
           })}
-          pendingConfirm={props.pendingConfirm}
-          requestConfirm={props.requestConfirm}
           actions={props.actions}
           feedback={props.feedback}
         />
@@ -486,6 +485,13 @@ function integrationEntries(
             actions={props.actions}
             mutationFeedback={props.feedback}
           />
+          {slack.length === 0 ? null : (
+            <SlackReasoningEffortPanel
+              organisationId={props.organisationId}
+              source={props.inferenceSelection.kind}
+              canManage={props.canManage}
+            />
+          )}
           {list(slack)}
           {slack.length === 0 ? null : renderSlackConnectAction(props)}
         </>

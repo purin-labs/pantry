@@ -91,6 +91,9 @@ OpenRouter route of Purin AI goes direct.
 - A stored chat on the Purin AI route follows the model of the route. A message that
   names a model of `PLATFORM_PI_MODELS` runs on the model of the route. Another model
   name is refused with `chat_model_invalid`, before a model request.
+- In the AI account drawer, a Claude or ChatGPT source whose account is not connected
+  has no save button. When an admin chooses it and its sign-in connects the account,
+  the drawer selects the source with the same `PUT` and the same checks.
 - When an admin changes the inference source, an open Portal chat does not move to the
   new source. Its next message gets HTTP 409 `chat_model_changed`, and a queued message
   becomes a failed turn that the person can retry. Steering needs a stored route that
@@ -98,8 +101,9 @@ OpenRouter route of Purin AI goes direct.
 - An open Slack thread keeps the model that its Session pinned. A new thread starts on
   the current route. When the pinned model leaves the list, the thread's next message
   continues on the current route, with the thread's history.
-- An admin sets one effort for Slack answers. It applies to the next Slack turn, also
-  in an open thread, when the model of the route offers that effort.
+- An admin sets one effort for Slack answers, in the Slack drawer of the Portal. It
+  applies to the next Slack turn, also in an open thread, when the model of the route
+  offers that effort.
 
 ### The ChatGPT sign-in
 

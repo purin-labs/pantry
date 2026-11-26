@@ -6,6 +6,7 @@ import {
   controlRead,
   controlSecretMutation,
 } from "@purin-labs/control/portal/control-client";
+import { Button, ConfirmInPlace } from "@purin-labs/ui/index";
 import { StatusChip } from "@purin-labs/ui/page-components";
 import type { StatusChipStatus } from "@purin-labs/ui/status-chip";
 import { openAuthorizationPopup } from "./authorization-popup";
@@ -331,15 +332,20 @@ function renderStartButton(
 
 function renderDisconnectButton(context: StageContext): React.ReactNode {
   return (
-    <button
-      type="button"
-      className="claude-sign-in-text-action"
-      disabled={context.busy !== null}
-      data-busy={context.busy === "disconnect" ? "true" : undefined}
-      onClick={disconnect.bind(null, context.controls)}
-    >
-      {context.busy === "disconnect" ? "Disconnecting…" : "Disconnect"}
-    </button>
+    <ConfirmInPlace
+      label="Disconnect"
+      question="Disconnect Claude?"
+      consequence={
+        context.props.inUse
+          ? "Agents stop until you sign in again."
+          : "You can sign in again later."
+      }
+      confirmLabel={
+        context.busy === "disconnect" ? "Disconnecting…" : "Disconnect"
+      }
+      busy={context.busy !== null}
+      onConfirm={disconnect.bind(null, context.controls)}
+    />
   );
 }
 
@@ -485,22 +491,20 @@ function renderRestart(
 function renderConnected(context: StageContext): React.ReactNode {
   return (
     <>
-      <p className="claude-sign-in-lead">
-        {context.props.inUse
-          ? "New agent conversations use this Claude account."
-          : "Select Use Claude to run new agent conversations on this account."}
-      </p>
+      {context.props.inUse ? (
+        <p className="claude-sign-in-lead">
+          New agent conversations use this Claude account.
+        </p>
+      ) : null}
       {context.props.canManage ? (
         <div className="claude-sign-in-actions">
-          <button
-            type="button"
-            className="claude-sign-in-text-action"
+          <Button
             disabled={context.busy !== null}
             data-busy={context.busy === "start" ? "true" : undefined}
             onClick={startAuthorization.bind(null, context.controls)}
           >
             {context.busy === "start" ? "Opening Claude…" : "Reconnect"}
-          </button>
+          </Button>
           {renderDisconnectButton(context)}
         </div>
       ) : null}

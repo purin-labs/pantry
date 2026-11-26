@@ -1,4 +1,3 @@
-import { SlackReasoningEffortPanel } from "./slack-reasoning-effort";
 import {
   ClaudeConnectionPanel,
   type ClaudeConnectionState,
@@ -32,8 +31,6 @@ export function InferenceIntegrationPanel(props: {
   readonly canConnect: boolean;
   readonly busy: boolean;
   readonly selectionBusy: boolean;
-  readonly pendingConfirm: string | null;
-  readonly requestConfirm: (key: string) => void;
   readonly actions: IntegrationsPageActions;
   readonly feedback: SettingsMutationFeedback;
 }): React.ReactNode {
@@ -41,9 +38,14 @@ export function InferenceIntegrationPanel(props: {
   const [draft, setDraft] = React.useState<
     OrganisationInferenceSelection["kind"]
   >(props.selection.kind);
-  // A source change that waits to be saved is the one filled action; the
-  // connection below it then offers its action as a quiet one.
-  const sourceChange = props.canManage && draft !== props.selection.kind;
+  const accounts = signInAccounts(props.claudeState, props.connection);
+  useSignInSelects(props, draft, accounts);
+  // A chosen account that is not connected has no save button: its sign-in
+  // selects it. Otherwise a source change that waits to be saved is the one
+  // filled action, and the connection below offers its action as a quiet one.
+  const signInFirst = props.canManage && !accountReady(draft, accounts);
+  const sourceChange =
+    props.canManage && draft !== props.selection.kind && !signInFirst;
   return (
     <div className="codex-integration">
       <InferenceSourceChoice
@@ -52,6 +54,7 @@ export function InferenceIntegrationPanel(props: {
         setDraft={setDraft}
         canManage={props.canManage}
         busy={props.selectionBusy}
+        signInFirst={signInFirst}
         actions={props.actions}
         feedback={props.feedback}
       />
@@ -75,17 +78,77 @@ export function InferenceIntegrationPanel(props: {
             setCopyStatus,
           )
         : null}
-      <SlackReasoningEffortPanel
-        organisationId={props.organisationId}
-        source={props.selection.kind}
-        canManage={props.canManage}
-      />
       <p className="visually-hidden" aria-live="polite">
         {copyStatus}
       </p>
       {renderMutationFeedback(props.feedback, { kind: "codex_connection" })}
     </div>
   );
+}
+
+type InferencePanelProps = Parameters<typeof InferenceIntegrationPanel>[0];
+
+/** Whether each account that signs in is connected; null while unknown. */
+type SignInAccounts = Readonly<{ claude: boolean | null; chatgpt: boolean }>;
+
+function signInAccounts(
+  claudeState: ClaudeConnectionState,
+  connection: OrganisationCodexConnection,
+): SignInAccounts {
+  return {
+    claude:
+      claudeState.kind === "ready"
+        ? claudeState.view.connection.kind === "connected"
+        : null,
+    chatgpt: connection.kind === "connected",
+  };
+}
+
+/** A source that needs no sign-in, or whose account is connected. */
+function accountReady(
+  kind: OrganisationInferenceSelection["kind"],
+  accounts: SignInAccounts,
+): boolean {
+  switch (kind) {
+    case "claude_oauth":
+      return accounts.claude === true;
+    case "codex_subscription":
+      return accounts.chatgpt;
+    default:
+      return true;
+  }
+}
+
+/**
+ * The sign-in of the chosen account selects that account, so no second press
+ * follows it. Only a change from not connected to connected counts: the choice
+ * of an account that was connected before waits for its save button.
+ */
+function useSignInSelects(
+  props: InferencePanelProps,
+  draft: OrganisationInferenceSelection["kind"],
+  accounts: SignInAccounts,
+): void {
+  const previous = React.useRef(accounts);
+  React.useEffect(
+    selectAfterSignIn.bind(null, previous, accounts, draft, props),
+    [accounts.claude, accounts.chatgpt],
+  );
+}
+
+function selectAfterSignIn(
+  previous: React.RefObject<SignInAccounts>,
+  accounts: SignInAccounts,
+  draft: OrganisationInferenceSelection["kind"],
+  props: InferencePanelProps,
+): void {
+  const before = previous.current;
+  previous.current = accounts;
+  if (!props.canManage || draft === props.selection.kind) return;
+  if (draft === "claude_oauth" && before.claude === false && accounts.claude)
+    void props.actions.selectSignedInAccount({ kind: "claude_oauth" });
+  if (draft === "codex_subscription" && !before.chatgpt && accounts.chatgpt)
+    void props.actions.selectSignedInAccount({ kind: "codex_subscription" });
 }
 
 /**
@@ -209,6 +272,8 @@ function InferenceSourceChoice(props: {
   >;
   readonly canManage: boolean;
   readonly busy: boolean;
+  /** The chosen account is not connected: its sign-in selects it. */
+  readonly signInFirst: boolean;
   readonly actions: IntegrationsPageActions;
   readonly feedback: SettingsMutationFeedback;
 }): React.ReactNode {
@@ -289,7 +354,7 @@ function InferenceSourceChoice(props: {
             {error}
           </p>
         )}
-        {changed || apiKey !== null ? (
+        {(changed && !props.signInFirst) || apiKey !== null ? (
           <div className="connection-actions">
             <button
               type="submit"
