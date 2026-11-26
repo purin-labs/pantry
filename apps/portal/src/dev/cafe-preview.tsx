@@ -21,6 +21,10 @@ import {
   installPreviewRooms,
   savedMenu,
 } from "./cafe-preview-rooms";
+import {
+  terminalPreviewMutation,
+  terminalPreviewRead,
+} from "./cafe-preview-terminals";
 
 /*
  * The Café pages with example data, in the Portal frame. The page answers
@@ -31,7 +35,8 @@ import {
  *   ?page=menus&tab=items  or &tab=screens: a sheet over the canvas
  *   ?page=order-queue
  *   ?page=register         &sale=card or &sale=cash: a paid sale
- *   ?page=terminals        &counterSale=card: one counter sale below
+ *   ?page=terminals        &counterSale=card: one counter sale below;
+ *                          &scenario=… (see cafe-preview-terminals.ts)
  */
 const root = document.getElementById("root");
 if (root === null || !import.meta.env.DEV)
@@ -405,83 +410,6 @@ function counterSale(kind: string): unknown {
   };
 }
 
-function terminalOperations(): unknown {
-  const assignment = (targetKind: string, healthIsObservable: boolean) => ({
-    assignmentId: `assignment_${targetKind}`,
-    revision: 1,
-    merchantId: "merchant_preview",
-    integrationAccountId: "integration_square",
-    capabilityRevision: 1,
-    capabilityCurrent: true,
-    providerLocationId: "square_location_tokyo",
-    targetKind,
-    deviceId: `device_${targetKind}`,
-    adapterVersion: "1",
-    environment: "production",
-    healthIsObservable,
-  });
-  return {
-    ok: true,
-    terminalOperations: {
-      schemaVersion: "pantry.terminal-operations.v2",
-      organisationId: ORGANISATION,
-      generatedAt: new Date(NOW).toISOString(),
-      counters: [
-        {
-          pantryLocationId: "Front counter",
-          blockedReason: null,
-          assignment: assignment("paired_physical", true),
-          credentialHealth: "active",
-          webhook: { kind: "unconfigured" },
-          paymentsLinked: true,
-        },
-        {
-          pantryLocationId: "Window counter",
-          blockedReason: null,
-          assignment: assignment("square_pos_app", false),
-          credentialHealth: "active",
-          webhook: { kind: "unconfigured" },
-          paymentsLinked: false,
-        },
-      ],
-      unreadableAssignments: 0,
-    },
-    configuration: {
-      kind: "ready",
-      merchantId: "merchant_preview",
-      environment: "production",
-      pantryLocations: [
-        {
-          pantryLocationId: "Front counter",
-          currency: "JPY",
-          supportedItems: [],
-        },
-        {
-          pantryLocationId: "Window counter",
-          currency: "JPY",
-          supportedItems: [],
-        },
-      ],
-      squareAccounts: [
-        {
-          integrationAccountId: "integration_square",
-          providerAccountId: "square_merchant",
-          displayName: "Kissa Purin",
-          locations: [
-            {
-              providerLocationId: "square_location_tokyo",
-              displayName: "Kissa Purin Tokyo",
-              country: "JP",
-              currency: "JPY",
-            },
-          ],
-        },
-      ],
-      testDevices: [],
-    },
-  };
-}
-
 function json(body: unknown, status = 200): Promise<Response> {
   return Promise.resolve(
     new Response(JSON.stringify(body), {
@@ -505,7 +433,6 @@ const ANSWERS: readonly (readonly [RegExp, () => unknown])[] = [
   [/\/commerce\/order-queue$/u, orderQueue],
   [/\/commerce\/sold-out$/u, soldOut],
   [/\/commerce\/counter-register(\?.*)?$/u, registerSnapshot],
-  [/\/commerce\/terminal-operations$/u, terminalOperations],
 ];
 
 window.fetch = function previewFetch(
@@ -520,6 +447,9 @@ window.fetch = function previewFetch(
   const sale = /\/commerce\/counter-sales\/([^/]+)$/u.exec(url.pathname)?.[1];
   if (sale !== undefined && (init?.method ?? "GET") === "GET")
     return json(counterSale(decodeURIComponent(sale)));
+  const terminals = terminalPreviewRead(url.pathname);
+  if (terminals !== undefined && (init?.method ?? "GET") === "GET")
+    return json(terminals);
   for (const [pattern, answer] of ANSWERS)
     if (pattern.test(path) && (init?.method ?? "GET") === "GET")
       return json(answer());
@@ -534,9 +464,6 @@ function previewLogout(): Promise<void> {
   return Promise.resolve();
 }
 function ignore(): void {}
-function refused(): Promise<unknown> {
-  return Promise.reject(new Error("Changes are off in this preview."));
-}
 
 function CafePage(): React.ReactNode {
   const descriptor = workspacePageDescriptor(page);
@@ -568,22 +495,22 @@ function CafePage(): React.ReactNode {
     >
       <PageHeader title={header.title} description={header.description} />
       <React.Suspense fallback={null}>
-      {page === "menus" ? (
-        <MenuDraftRoute organisationId={ORGANISATION} />
-      ) : null}
-      {page === "order-queue" ? (
-        <OrderQueueRoute organisationId={ORGANISATION} />
-      ) : null}
-      {page === "register" ? (
-        <RegisterRoute organisationId={ORGANISATION} />
-      ) : null}
-      {page === "terminals" ? (
-        <TerminalOperationsPanel
-          organisationId={ORGANISATION}
-          canManage
-          mutate={refused}
-        />
-      ) : null}
+        {page === "menus" ? (
+          <MenuDraftRoute organisationId={ORGANISATION} />
+        ) : null}
+        {page === "order-queue" ? (
+          <OrderQueueRoute organisationId={ORGANISATION} />
+        ) : null}
+        {page === "register" ? (
+          <RegisterRoute organisationId={ORGANISATION} />
+        ) : null}
+        {page === "terminals" ? (
+          <TerminalOperationsPanel
+            organisationId={ORGANISATION}
+            canManage
+            mutate={terminalPreviewMutation}
+          />
+        ) : null}
       </React.Suspense>
     </PortalFrame>
   );

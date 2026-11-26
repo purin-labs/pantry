@@ -1,11 +1,15 @@
 import { Select } from "@purin-labs/ui/select";
+import { Plus } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";
-import { Button } from "@purin-labs/ui/index";
+import {
+  Button,
+  ConfirmInPlace,
+  EmptyState,
+  SideDrawer,
+} from "@purin-labs/ui/index";
 import { PageSkeleton, RecoverableError } from "@purin-labs/ui/page-components";
-import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 
-import { SQUARE_POS_CALLBACK_PATH } from "../register/square-pos-handoff";
 import {
   activateTerminalPairing,
   assignSquarePosApp,
@@ -24,9 +28,9 @@ import type {
 import { CounterSaleRoute } from "./counter-sale-route";
 import "./styles.css";
 import type {
-  TerminalConfigurationRequest,
   TerminalCounterReadback,
   TerminalPairingReadback,
+  TerminalPairingRequest,
 } from "@purin-labs/control-api";
 
 type TerminalState =
@@ -46,7 +50,8 @@ type TerminalOperationsPanelProps = Readonly<{
  * The panel states what Pantry knows and nothing more. A counter is shown as
  * blocked only for a recorded reason — a retired assignment — never because
  * a device has been quiet, and a counter whose location Commerce has not
- * linked for payments is labelled rather than hidden.
+ * linked for payments is labelled rather than hidden. An admin adds or
+ * replaces a counter in one drawer.
  */
 export function TerminalOperationsPanel(
   props: TerminalOperationsPanelProps,
@@ -54,8 +59,7 @@ export function TerminalOperationsPanel(
   const [state, setState] = React.useState<TerminalState>({ kind: "loading" });
   const [readRevision, setReadRevision] = React.useState(0);
   const [busy, setBusy] = React.useState<string | null>(null);
-  const [confirming, setConfirming] =
-    React.useState<TerminalCounterReadback | null>(null);
+  const [adding, setAdding] = React.useState(false);
   const [activeCheckoutId] = React.useState<string | null>(
     readCounterSaleFromLocation,
   );
@@ -73,29 +77,48 @@ export function TerminalOperationsPanel(
       <RecoverableError
         message={state.message}
         action={
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             onClick={setReadRevision.bind(null, incrementTerminalReadRevision)}
           >
             Try again
-          </button>
+          </Button>
         }
       />
     );
   }
-  const operations = state.view.operations;
+  const { operations, configuration } = state.view;
+  const block = props.canManage ? addCounterBlock(configuration) : null;
+  const addButton =
+    props.canManage && block === null ? (
+      <Button variant="primary" onClick={setAdding.bind(null, true)}>
+        <Plus size={16} aria-hidden="true" />
+        Add a counter
+      </Button>
+    ) : null;
+  const empty =
+    operations.counters.length === 0 && operations.unreadableAssignments === 0;
 
   return (
     <section className="terminal-page" aria-label="Counters">
-      <p className="terminal-panel-timestamp">
-        As of {new Date(operations.generatedAt).toLocaleString()}
-      </p>
-      {operations.counters.length === 0 &&
-      operations.unreadableAssignments === 0 ? (
-        <p className="terminal-panel-warning">
-          No counter takes card-present payments yet.
-        </p>
-      ) : null}
+      {empty ? (
+        <EmptyState
+          title="No counters"
+          description={block ?? undefined}
+          actions={addButton}
+        />
+      ) : (
+        <div className="terminal-toolbar">
+          <p className="terminal-panel-timestamp">
+            As of {new Date(operations.generatedAt).toLocaleString()}
+          </p>
+          {block === null ? (
+            addButton
+          ) : (
+            <p className="terminal-panel-warning">{block}</p>
+          )}
+        </div>
+      )}
       {operations.unreadableAssignments > 0 ? (
         <p className="terminal-panel-warning">
           {operations.unreadableAssignments} assignment
@@ -107,28 +130,23 @@ export function TerminalOperationsPanel(
         <ul className="terminal-list">
           {operations.counters.map(
             renderTerminalCounter.bind(null, {
-              organisationId: props.organisationId,
               canManage: props.canManage,
               busy,
-              setConfirming,
+              retire: retireCounter.bind(null, props, state, setState, setBusy),
             }),
           )}
         </ul>
       )}
-      {props.canManage ? (
-        <details
-          className="terminal-settings"
-          open={operations.counters.length === 0}
-        >
-          <summary>Terminal setup</summary>
-          <TerminalSetup
-            organisationId={props.organisationId}
-            configuration={state.view.configuration}
-            mutate={props.mutate}
-            replace={operations.counters.length > 0}
-            setView={setTerminalView.bind(null, setState)}
-          />
-        </details>
+      {props.canManage && configuration.kind === "ready" ? (
+        <AddCounter
+          open={adding}
+          close={setAdding.bind(null, false)}
+          organisationId={props.organisationId}
+          configuration={configuration}
+          counters={operations.counters}
+          mutate={props.mutate}
+          setView={setTerminalView.bind(null, setState)}
+        />
       ) : null}
       {activeCheckoutId === null ? null : (
         <CounterSaleRoute
@@ -143,98 +161,40 @@ export function TerminalOperationsPanel(
           )}
         />
       )}
-      {confirming === null ? null : (
-        <RetireCounterDialog
-          counter={confirming}
-          busy={busy === confirming.pantryLocationId}
-          close={setConfirming.bind(null, null)}
-          confirm={retireCounter.bind(
-            null,
-            props,
-            state,
-            setState,
-            setBusy,
-            setConfirming,
-            confirming,
-          )}
-        />
-      )}
     </section>
   );
 }
 
-function RetireCounterDialog(
-  props: Readonly<{
-    counter: TerminalCounterReadback;
-    busy: boolean;
-    close: () => void;
-    confirm: () => Promise<void>;
-  }>,
-): React.ReactNode {
-  const dialog = React.useRef<HTMLDialogElement>(null);
-  const keep = React.useRef<HTMLButtonElement>(null);
-  React.useLayoutEffect(openRetireCounterDialog.bind(null, dialog, keep), []);
-  return (
-    <dialog
-      ref={dialog}
-      className="access35-dialog terminal-confirm"
-      aria-labelledby="terminal-retire-title"
-      aria-describedby="terminal-retire-description"
-      onCancel={cancelDialog.bind(null, props.close)}
-    >
-      <div className="terminal-confirm-content">
-        <DialogHeading
-          id="terminal-retire-title"
-          title="Retire counter"
-          close={props.close}
-        />
-        <p id="terminal-retire-description">
-          <strong>{props.counter.pantryLocationId}</strong> will stop taking card
-          payments. Payments it has already taken are unaffected, and pairing it
-          again needs the device in hand.
-        </p>
-        <div className="terminal-confirm-actions">
-          <button ref={keep} type="button" onClick={props.close}>
-            Keep it running
-          </button>
-          <button
-            type="button"
-            className="terminal-confirm-proceed"
-            disabled={props.busy}
-            onClick={props.confirm}
-          >
-            Stop taking payments
-          </button>
-        </div>
-      </div>
-    </dialog>
-  );
-}
-
-function openRetireCounterDialog(
-  dialog: React.RefObject<HTMLDialogElement | null>,
-  keep: React.RefObject<HTMLButtonElement | null>,
-): () => void {
-  syncDialog(dialog, true);
-  keep.current?.focus();
-  return syncDialog.bind(null, dialog, false);
+/** Why an admin cannot add a counter yet, or null when they can. */
+function addCounterBlock(configuration: TerminalConfiguration): string | null {
+  if (configuration.kind === "blocked")
+    return "To add a counter, set up Purin Checkout first.";
+  if (configuration.pantryLocations.length === 0)
+    return "To add a counter, publish a counter policy first.";
+  if (squareLocationOptions(configuration).length === 0)
+    return "To add a counter, connect a Square account and refresh its locations.";
+  if (
+    configuration.environment === "development" &&
+    configuration.testDevices.length === 0
+  )
+    return "To add a counter, Square Sandbox needs a test device.";
+  return null;
 }
 
 function renderTerminalCounter(
   context: Readonly<{
-    organisationId: string;
     canManage: boolean;
     busy: string | null;
-    setConfirming: React.Dispatch<
-      React.SetStateAction<TerminalCounterReadback | null>
-    >;
+    retire: (counter: TerminalCounterReadback) => Promise<void>;
   }>,
   counter: TerminalCounterReadback,
 ): React.ReactNode {
   return (
     <li key={counter.pantryLocationId} className="terminal-row">
       <div className="terminal-row-identity">
-        <span className="terminal-row-location">{counter.pantryLocationId}</span>
+        <span className="terminal-row-location">
+          {counter.pantryLocationId}
+        </span>
         <span className="terminal-row-device">
           {targetLabel(counter.assignment.targetKind)} · Credentials{" "}
           {credentialHealthLabel(counter.credentialHealth)}
@@ -255,13 +215,18 @@ function renderTerminalCounter(
         )}
       </div>
       {context.canManage && counter.blockedReason !== "assignment_retired" ? (
-        <Button
-          variant="danger"
-          disabled={context.busy === counter.pantryLocationId}
-          onClick={context.setConfirming.bind(null, counter)}
-        >
-          Stop taking payments
-        </Button>
+        <ConfirmInPlace
+          label="Stop taking payments"
+          question={`Stop card payments at ${counter.pantryLocationId}?`}
+          consequence={
+            counter.assignment.targetKind === "paired_physical"
+              ? "Payments that it took stay as they are. To use it again, pair the Terminal again."
+              : "Payments that it took stay as they are."
+          }
+          confirmLabel="Stop taking payments"
+          busy={context.busy === counter.pantryLocationId}
+          onConfirm={context.retire.bind(null, counter)}
+        />
       ) : null}
     </li>
   );
@@ -272,9 +237,6 @@ async function retireCounter(
   state: TerminalState,
   setState: React.Dispatch<React.SetStateAction<TerminalState>>,
   setBusy: React.Dispatch<React.SetStateAction<string | null>>,
-  setConfirming: React.Dispatch<
-    React.SetStateAction<TerminalCounterReadback | null>
-  >,
   counter: TerminalCounterReadback,
 ): Promise<void> {
   setBusy(counter.pantryLocationId);
@@ -290,7 +252,6 @@ async function retireCounter(
         view: { operations, configuration: state.view.configuration },
       });
     }
-    setConfirming(null);
     toast.success(`${counter.pantryLocationId} no longer takes card payments.`);
   } catch (cause) {
     toast.error(
@@ -396,395 +357,407 @@ function readCounterSaleFromLocation(): string | null {
   return checkoutId === null || checkoutId.length === 0 ? null : checkoutId;
 }
 
-function TerminalSetup(
-  props: Readonly<{
-    organisationId: string;
-    configuration: TerminalConfiguration;
-    mutate: TerminalMutationTransport;
-    replace: boolean;
-    setView: (view: TerminalOperationsView) => void;
-  }>,
-): React.ReactNode {
-  const [busy, setBusy] = React.useState(false);
-  if (props.configuration.kind === "blocked") {
-    return (
-      <div className="terminal-setup terminal-panel-quiet">
-        Set up Purin Checkout before assigning a Square terminal.
-      </div>
-    );
-  }
-  if (props.configuration.environment === "production") {
-    return (
-      <>
-        <TerminalPairingSetup
-          organisationId={props.organisationId}
-          configuration={props.configuration}
-          mutate={props.mutate}
-          replace={props.replace}
-          setView={props.setView}
-        />
-        <SquarePosAppSetup
-          organisationId={props.organisationId}
-          configuration={props.configuration}
-          mutate={props.mutate}
-          setView={props.setView}
-        />
-      </>
-    );
-  }
-  const locations = squareLocationOptions(props.configuration);
-  const canConfigure =
-    props.configuration.pantryLocations.length > 0 &&
-    locations.length > 0 &&
-    props.configuration.testDevices.length > 0;
-  return (
-    <form
-      className="terminal-setup"
-      onSubmit={submitTerminalConfiguration.bind(null, props, setBusy)}
-    >
-      <div className="terminal-setup-heading">
-        <h3>
-          {props.replace
-            ? "Replace Sandbox terminal"
-            : "Set up Sandbox terminal"}
-        </h3>
-      </div>
-      <div className="terminal-setup-fields">
-        <label>
-          <span>Purin Checkout location</span>
-          <TerminalSelect
-            name="pantryLocationId"
-            items={props.configuration.pantryLocations.map(pantryLocationItem)}
-            disabled={!canConfigure || busy}
-            required
-          />
-        </label>
-        <label>
-          <span>Square account and location</span>
-          <TerminalSelect
-            name="squareLocation"
-            items={locations}
-            disabled={!canConfigure || busy}
-            required
-          />
-        </label>
-        <label>
-          <span>Sandbox test device</span>
-          <TerminalSelect
-            name="testDeviceId"
-            items={props.configuration.testDevices.map(testDeviceItem)}
-            disabled={!canConfigure || busy}
-            required
-          />
-        </label>
-      </div>
-      {canConfigure ? (
-        <Button
-          variant="secondary"
-          type="submit"
-          className="terminal-setup-submit"
-          disabled={busy}
-        >
-          {busy
-            ? "Saving…"
-            : props.replace
-              ? "Replace terminal"
-              : "Activate terminal"}
-        </Button>
-      ) : (
-        <p className="terminal-panel-warning">
-          Publish a counter policy and refresh an active Square account’s
-          locations first.
-        </p>
-      )}
-    </form>
-  );
-}
+/** What takes the payments of a new counter. */
+type CounterKind = "terminal" | "ipad" | "sandbox";
+
+const COUNTER_KINDS: readonly Readonly<{
+  kind: CounterKind;
+  title: string;
+  detail: string;
+}>[] = [
+  {
+    kind: "terminal",
+    title: "Square Terminal",
+    detail: "Pair it with a code.",
+  },
+  {
+    kind: "ipad",
+    title: "Square app on an iPad",
+    detail: "With a Square Reader.",
+  },
+];
+
+type AddCounterProps = Readonly<{
+  open: boolean;
+  close: () => void;
+  organisationId: string;
+  configuration: ReadyTerminalConfiguration;
+  counters: readonly TerminalCounterReadback[];
+  mutate: TerminalMutationTransport;
+  setView: (view: TerminalOperationsView) => void;
+}>;
 
 type PairingInProgress = Readonly<{
   pairing: TerminalPairingReadback;
-  pantryLocationId: string;
-  integrationAccountId: string;
+  request: TerminalPairingRequest;
+  replacing: boolean;
+}>;
+
+type AddCounterControls = Readonly<{
+  setBusy: (busy: boolean) => void;
+  setFailure: (failure: string | null) => void;
+  setProgress: (progress: PairingInProgress | null) => void;
+  /** Closes the drawer, which starts again on a free counter next time. */
+  close: () => void;
 }>;
 
 /**
- * Pairs a physical Square Terminal (production). Pantry asks Square for a
- * code; the owner types it on the signed-out Terminal; once Square names the
- * device, the counter takes it. The code is checked every five seconds.
+ * The drawer that gives a counter its card payments, or replaces what it has.
+ * Production pairs a Square Terminal or uses the Square app on an iPad;
+ * development uses a Square Sandbox test device. A pairing stays open while
+ * the drawer is closed: Pantry checks the code every five seconds, and once
+ * Square names the device, the counter takes it.
  */
-function TerminalPairingSetup(
-  props: Readonly<{
-    organisationId: string;
-    configuration: ReadyTerminalConfiguration;
-    mutate: TerminalMutationTransport;
-    replace: boolean;
-    setView: (view: TerminalOperationsView) => void;
-  }>,
-): React.ReactNode {
+function AddCounter(props: AddCounterProps): React.ReactNode {
+  const production = props.configuration.environment === "production";
+  const [kind, setKind] = React.useState<CounterKind>(
+    production ? "terminal" : "sandbox",
+  );
+  // Null until the admin chooses: then the drawer starts on the first counter
+  // that takes no payments yet.
+  const [counterId, setCounterId] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
+  const [failure, setFailure] = React.useState<string | null>(null);
   const [progress, setProgress] = React.useState<PairingInProgress | null>(
     null,
   );
-  React.useEffect(
-    watchTerminalPairing.bind(null, props, progress, setProgress),
-    [props.organisationId, progress],
+  const close = closeAddCounter.bind(
+    null,
+    props.close,
+    setFailure,
+    setCounterId,
   );
+  const controls: AddCounterControls = {
+    setBusy,
+    setFailure,
+    setProgress,
+    close,
+  };
+  React.useEffect(watchTerminalPairing.bind(null, props, controls, progress), [
+    props.organisationId,
+    progress,
+  ]);
+  const formId = React.useId();
+  const chosenId = chooseCounter(props, counterId);
+  const existing = activeCounter(props.counters, chosenId);
   const locations = squareLocationOptions(props.configuration);
-  const canPair =
-    props.configuration.pantryLocations.length > 0 && locations.length > 0;
-  if (progress !== null)
+
+  if (progress !== null) {
+    const expired = progress.pairing.status === "expired";
     return (
-      <section className="terminal-setup">
-        <div className="terminal-setup-heading">
-          <h3>Pair the Square Terminal</h3>
-          {progress.pairing.status === "expired" ? (
-            <p>This code has expired. Get a new code to try again.</p>
+      <SideDrawer
+        open={props.open}
+        title="Pair the Square Terminal"
+        close={close}
+        className="terminal-drawer"
+        footer={
+          <>
+            {expired ? (
+              <Button
+                variant="primary"
+                disabled={busy}
+                onClick={requestPairingCode.bind(
+                  null,
+                  props,
+                  controls,
+                  progress.request,
+                  progress.replacing,
+                )}
+              >
+                {busy ? "Asking Square…" : "Get a new code"}
+              </Button>
+            ) : null}
+            <Button
+              variant="secondary"
+              disabled={busy}
+              onClick={setProgress.bind(null, null)}
+            >
+              Cancel
+            </Button>
+          </>
+        }
+      >
+        <div className="side-drawer-body">
+          {expired ? (
+            <p className="terminal-drawer-note">This code has expired.</p>
           ) : (
-            <p>
-              On the Square Terminal, sign out, tap “Use a device code” on the
-              sign-in screen, and type this code
-              {progress.pairing.pairBy === null
-                ? "."
-                : ` before ${new Date(progress.pairing.pairBy).toLocaleTimeString()}.`}
+            <>
+              <p className="terminal-drawer-note">
+                On the Square Terminal, sign out, tap “Use a device code” and
+                type this code
+                {progress.pairing.pairBy === null
+                  ? "."
+                  : ` before ${new Date(progress.pairing.pairBy).toLocaleTimeString()}.`}
+              </p>
+              <p className="terminal-pairing-code">{progress.pairing.code}</p>
+            </>
+          )}
+          {failure === null ? null : (
+            <p className="error-text" role="alert">
+              {failure}
             </p>
           )}
         </div>
-        {progress.pairing.status === "expired" ? null : (
-          <p className="terminal-pairing-code">{progress.pairing.code}</p>
+      </SideDrawer>
+    );
+  }
+
+  return (
+    <SideDrawer
+      open={props.open}
+      title="Add a counter"
+      close={close}
+      className="terminal-drawer"
+      footer={
+        <Button variant="primary" type="submit" form={formId} disabled={busy}>
+          {busy
+            ? kind === "terminal"
+              ? "Asking Square…"
+              : "Saving…"
+            : kind === "terminal"
+              ? "Get a pairing code"
+              : existing === null
+                ? "Add counter"
+                : "Replace"}
+        </Button>
+      }
+    >
+      <form
+        id={formId}
+        className="side-drawer-body terminal-drawer-form"
+        onSubmit={submitAddCounter.bind(
+          null,
+          props,
+          controls,
+          kind,
+          existing !== null,
         )}
-        <Button
-          variant="secondary"
-          className="terminal-setup-submit"
-          disabled={busy}
-          onClick={setProgress.bind(null, null)}
-        >
-          {progress.pairing.status === "expired" ? "Get a new code" : "Cancel"}
-        </Button>
-      </section>
-    );
-  return (
-    <form
-      className="terminal-setup"
-      onSubmit={submitTerminalPairing.bind(null, props, setBusy, setProgress)}
-    >
-      <div className="terminal-setup-heading">
-        <h3>
-          {props.replace ? "Replace Square Terminal" : "Pair a Square Terminal"}
-        </h3>
-      </div>
-      <div className="terminal-setup-fields">
-        <label>
-          <span>Purin Checkout location</span>
-          <TerminalSelect
-            name="pantryLocationId"
-            items={props.configuration.pantryLocations.map(pantryLocationItem)}
-            disabled={!canPair || busy}
-            required
-          />
-        </label>
-        <label>
-          <span>Square account and location</span>
-          <TerminalSelect
-            name="squareLocation"
-            items={locations}
-            disabled={!canPair || busy}
-            required
-          />
-        </label>
-        <label>
-          <span>Terminal name</span>
-          <input
-            name="deviceName"
-            defaultValue="Front counter"
-            maxLength={128}
-            disabled={!canPair || busy}
-            required
-          />
-        </label>
-      </div>
-      {canPair ? (
-        <Button
-          variant="secondary"
-          type="submit"
-          className="terminal-setup-submit"
-          disabled={busy}
-        >
-          {busy ? "Asking Square…" : "Get a pairing code"}
-        </Button>
-      ) : (
-        <p className="terminal-panel-warning">
-          Publish a counter policy and refresh an active Square account’s
-          locations first.
-        </p>
-      )}
-    </form>
-  );
-}
-
-/**
- * Lets the Square Point of Sale app on the counter iPad take the counter's
- * payments on a Square Reader (Plan 90 Phase 3B). The Square app must list
- * the Portal's callback page, so the form shows that address.
- */
-function SquarePosAppSetup(
-  props: Readonly<{
-    organisationId: string;
-    configuration: ReadyTerminalConfiguration;
-    mutate: TerminalMutationTransport;
-    setView: (view: TerminalOperationsView) => void;
-  }>,
-): React.ReactNode {
-  const [busy, setBusy] = React.useState(false);
-  const locations = squareLocationOptions(props.configuration);
-  const canAssign =
-    props.configuration.pantryLocations.length > 0 && locations.length > 0;
-  if (!canAssign) return null;
-  return (
-    <form
-      className="terminal-setup"
-      onSubmit={submitSquarePosApp.bind(null, props, setBusy)}
-    >
-      <div className="terminal-setup-heading">
-        <h3>Use the Square app on an iPad</h3>
-        <p>
-          For a counter with a Square Reader and no Square Terminal. In the
-          Square Developer Console, add this web callback URL to the Point of
-          Sale API:{" "}
-          <code>{`${window.location.origin}${SQUARE_POS_CALLBACK_PATH}`}</code>
-        </p>
-      </div>
-      <div className="terminal-setup-fields">
-        <label>
-          <span>Purin Checkout location</span>
-          <TerminalSelect
-            name="pantryLocationId"
-            items={props.configuration.pantryLocations.map(pantryLocationItem)}
-            disabled={busy}
-            required
-          />
-        </label>
-        <label>
-          <span>Square account and location</span>
-          <TerminalSelect
-            name="squareLocation"
-            items={locations}
-            disabled={busy}
-            required
-          />
-        </label>
-      </div>
-      <Button
-        variant="secondary"
-        type="submit"
-        className="terminal-setup-submit"
-        disabled={busy}
       >
-        {busy ? "Saving…" : "Use the Square app"}
-      </Button>
-    </form>
+        {production ? (
+          <fieldset className="terminal-choices">
+            <legend>Takes payments with</legend>
+            {COUNTER_KINDS.map(
+              renderCounterKind.bind(null, kind, setKind, busy),
+            )}
+          </fieldset>
+        ) : null}
+        <label className="terminal-field">
+          <span>Counter</span>
+          <TerminalSelect
+            name="pantryLocationId"
+            items={props.configuration.pantryLocations.map(pantryLocationItem)}
+            value={chosenId}
+            onValueChange={setCounterId}
+            disabled={busy}
+          />
+        </label>
+        {locations.length > 1 ? (
+          <label className="terminal-field">
+            <span>Square location</span>
+            <TerminalSelect
+              name="squareLocation"
+              items={locations}
+              disabled={busy}
+            />
+          </label>
+        ) : (
+          <input
+            type="hidden"
+            name="squareLocation"
+            value={locations[0]?.value ?? ""}
+          />
+        )}
+        {kind === "terminal" ? (
+          <label className="terminal-field">
+            <span>Terminal name</span>
+            <input
+              key={chosenId}
+              name="deviceName"
+              defaultValue={chosenId}
+              maxLength={128}
+              disabled={busy}
+              required
+            />
+          </label>
+        ) : null}
+        {kind === "sandbox" ? (
+          <label className="terminal-field">
+            <span>Test device</span>
+            <TerminalSelect
+              name="testDeviceId"
+              items={props.configuration.testDevices.map(testDeviceItem)}
+              disabled={busy}
+            />
+          </label>
+        ) : null}
+        {existing === null ? null : (
+          <p className="terminal-drawer-note">
+            This replaces the {targetLabel(existing.assignment.targetKind)} at{" "}
+            {chosenId}.
+          </p>
+        )}
+        {failure === null ? null : (
+          <p className="error-text" role="alert">
+            {failure}
+          </p>
+        )}
+      </form>
+    </SideDrawer>
   );
 }
 
-async function submitSquarePosApp(
-  props: Readonly<{
-    organisationId: string;
-    mutate: TerminalMutationTransport;
-    setView: (view: TerminalOperationsView) => void;
-  }>,
-  setBusy: (busy: boolean) => void,
-  event: React.FormEvent<HTMLFormElement>,
-): Promise<void> {
-  event.preventDefault();
-  const selection = parseTerminalSelection(
-    withSandboxPlaceholder(new FormData(event.currentTarget)),
-  );
-  if (selection === null) {
-    toast.error("Choose a Purin Checkout location and a Square location.");
-    return;
-  }
-  setBusy(true);
-  try {
-    props.setView(
-      await assignSquarePosApp(
-        props.organisationId,
-        {
-          pantryLocationId: selection.pantryLocationId,
-          integrationAccountId: selection.integrationAccountId,
-          providerLocationId: selection.providerLocationId,
-        },
-        props.mutate,
-      ),
-    );
-    toast.success("The counter now uses the Square app on the iPad.");
-  } catch (cause) {
-    toast.error(
-      cause instanceof Error ? cause.message : "The counter was not changed.",
-    );
-  } finally {
-    setBusy(false);
-  }
+function closeAddCounter(
+  close: () => void,
+  setFailure: (failure: string | null) => void,
+  setCounterId: (counterId: string | null) => void,
+): void {
+  setFailure(null);
+  setCounterId(null);
+  close();
 }
 
-async function submitTerminalPairing(
-  props: Readonly<{
-    organisationId: string;
-    mutate: TerminalMutationTransport;
-  }>,
-  setBusy: (busy: boolean) => void,
-  setProgress: (progress: PairingInProgress) => void,
+/** The chosen counter, or the first one that takes no payments yet. */
+function chooseCounter(
+  props: AddCounterProps,
+  counterId: string | null,
+): string {
+  const ids = props.configuration.pantryLocations.map(
+    (location) => location.pantryLocationId,
+  );
+  if (counterId !== null && ids.includes(counterId)) return counterId;
+  return (
+    ids.find((id) => activeCounter(props.counters, id) === null) ?? ids[0] ?? ""
+  );
+}
+
+function activeCounter(
+  counters: readonly TerminalCounterReadback[],
+  pantryLocationId: string,
+): TerminalCounterReadback | null {
+  return (
+    counters.find(
+      (counter) =>
+        counter.pantryLocationId === pantryLocationId &&
+        counter.blockedReason === null,
+    ) ?? null
+  );
+}
+
+function renderCounterKind(
+  chosen: CounterKind,
+  setKind: (kind: CounterKind) => void,
+  busy: boolean,
+  option: (typeof COUNTER_KINDS)[number],
+): React.ReactNode {
+  return (
+    <label key={option.kind} className="terminal-choice">
+      <input
+        type="radio"
+        name="counterKind"
+        value={option.kind}
+        checked={chosen === option.kind}
+        disabled={busy}
+        onChange={setKind.bind(null, option.kind)}
+      />
+      <span>
+        <span className="terminal-choice-title">{option.title}</span>
+        <span className="terminal-choice-detail">{option.detail}</span>
+      </span>
+    </label>
+  );
+}
+
+async function submitAddCounter(
+  props: AddCounterProps,
+  controls: AddCounterControls,
+  kind: CounterKind,
+  replacing: boolean,
   event: React.FormEvent<HTMLFormElement>,
 ): Promise<void> {
   event.preventDefault();
   const form = new FormData(event.currentTarget);
-  const deviceName = form.get("deviceName");
-  const selection = parseTerminalSelection(withSandboxPlaceholder(form));
-  if (selection === null || typeof deviceName !== "string") {
-    toast.error("Choose a Purin Checkout location and a Square location.");
+  const place = parseCounterPlace(form);
+  if (place === null) {
+    controls.setFailure("Choose a counter and a Square location.");
     return;
   }
-  setBusy(true);
+  if (kind === "terminal") {
+    const name = form.get("deviceName");
+    const deviceName = typeof name === "string" ? name.trim() : "";
+    await requestPairingCode(
+      props,
+      controls,
+      {
+        ...place,
+        deviceName: deviceName.length > 0 ? deviceName : place.pantryLocationId,
+      },
+      replacing,
+    );
+    return;
+  }
+  const testDeviceId = form.get("testDeviceId");
+  if (kind === "sandbox" && typeof testDeviceId !== "string") {
+    controls.setFailure("Choose a Square Sandbox test device.");
+    return;
+  }
+  controls.setBusy(true);
+  controls.setFailure(null);
+  try {
+    const view =
+      kind === "ipad"
+        ? await assignSquarePosApp(props.organisationId, place, props.mutate)
+        : await configureSandboxTerminal(
+            props.organisationId,
+            { ...place, testDeviceId: String(testDeviceId) },
+            props.mutate,
+          );
+    props.setView(view);
+    controls.close();
+    toast.success(
+      kind === "ipad"
+        ? `${place.pantryLocationId} now uses the Square app on the iPad.`
+        : replacing
+          ? "Sandbox terminal replaced."
+          : "Sandbox terminal activated.",
+    );
+  } catch (cause) {
+    controls.setFailure(
+      cause instanceof Error ? cause.message : "The counter was not changed.",
+    );
+  } finally {
+    controls.setBusy(false);
+  }
+}
+
+/** Asks Square for a code that pairs a physical Terminal (production). */
+async function requestPairingCode(
+  props: AddCounterProps,
+  controls: AddCounterControls,
+  request: TerminalPairingRequest,
+  replacing: boolean,
+): Promise<void> {
+  controls.setBusy(true);
+  controls.setFailure(null);
   try {
     const pairing = await startTerminalPairing(
       props.organisationId,
-      {
-        pantryLocationId: selection.pantryLocationId,
-        integrationAccountId: selection.integrationAccountId,
-        providerLocationId: selection.providerLocationId,
-        deviceName: deviceName.trim(),
-      },
+      request,
       props.mutate,
     );
-    setProgress({
-      pairing,
-      pantryLocationId: selection.pantryLocationId,
-      integrationAccountId: selection.integrationAccountId,
-    });
+    controls.setProgress({ pairing, request, replacing });
   } catch (cause) {
-    toast.error(
+    controls.setFailure(
       cause instanceof Error ? cause.message : "Square gave no pairing code.",
     );
   } finally {
-    setBusy(false);
+    controls.setBusy(false);
   }
 }
 
-/** The sandbox selection parser needs a test device; pairing has none. */
-function withSandboxPlaceholder(form: FormData): FormData {
-  const copy = new FormData();
-  for (const [key, value] of form.entries()) copy.append(key, value);
-  copy.set("testDeviceId", "paired_physical");
-  return copy;
-}
-
 function watchTerminalPairing(
-  props: Readonly<{
-    organisationId: string;
-    mutate: TerminalMutationTransport;
-    replace: boolean;
-    setView: (view: TerminalOperationsView) => void;
-  }>,
+  props: AddCounterProps,
+  controls: AddCounterControls,
   progress: PairingInProgress | null,
-  setProgress: (progress: PairingInProgress | null) => void,
 ): (() => void) | undefined {
   if (progress === null || progress.pairing.status !== "open") return undefined;
   let stopped = false;
@@ -793,11 +766,11 @@ function watchTerminalPairing(
       const pairing = await readTerminalPairing(
         props.organisationId,
         progress.pairing.deviceCodeId,
-        progress.integrationAccountId,
+        progress.request.integrationAccountId,
       );
       if (stopped) return;
       if (pairing.status !== "paired") {
-        setProgress({ ...progress, pairing });
+        controls.setProgress({ ...progress, pairing });
         return;
       }
       props.setView(
@@ -805,20 +778,23 @@ function watchTerminalPairing(
           props.organisationId,
           pairing.deviceCodeId,
           {
-            pantryLocationId: progress.pantryLocationId,
-            integrationAccountId: progress.integrationAccountId,
+            pantryLocationId: progress.request.pantryLocationId,
+            integrationAccountId: progress.request.integrationAccountId,
           },
           props.mutate,
         ),
       );
-      setProgress(null);
+      controls.setProgress(null);
+      controls.close();
       toast.success(
-        props.replace ? "Square Terminal replaced." : "Square Terminal paired.",
+        progress.replacing
+          ? "Square Terminal replaced."
+          : "Square Terminal paired.",
       );
     } catch (cause) {
       if (stopped) return;
-      // The check stops here; Cancel gives the owner a new code.
-      toast.error(
+      // The check stops here; Cancel goes back to the form for a new code.
+      controls.setFailure(
         cause instanceof Error
           ? cause.message
           : "Pairing could not be checked.",
@@ -863,22 +839,31 @@ function squareLocationValue(
 
 type TerminalSelectItem = Readonly<{ value: string; label: string }>;
 
-/** A form Select that starts on its first item, as a native select does. */
+/**
+ * A form Select. Without `value` it starts on its first item, as a native
+ * select does.
+ */
 function TerminalSelect(
   props: Readonly<{
     name: string;
     items: readonly TerminalSelectItem[];
     disabled: boolean;
-    required?: boolean;
+    value?: string;
+    onValueChange?: (value: string) => void;
   }>,
 ): React.ReactNode {
   return (
     <Select.Root
       name={props.name}
       items={props.items}
-      defaultValue={props.items[0]?.value ?? null}
+      {...(props.value === undefined
+        ? { defaultValue: props.items[0]?.value ?? null }
+        : {
+            value: props.value,
+            onValueChange: chooseTerminalItem.bind(null, props.onValueChange),
+          })}
       disabled={props.disabled}
-      required={props.required}
+      required
     >
       <Select.Trigger>
         <Select.Value />
@@ -886,6 +871,13 @@ function TerminalSelect(
       <Select.Popup>{props.items.map(renderTerminalSelectItem)}</Select.Popup>
     </Select.Root>
   );
+}
+
+function chooseTerminalItem(
+  choose: ((value: string) => void) | undefined,
+  value: string | null,
+): void {
+  if (value !== null) choose?.(value);
 }
 
 function renderTerminalSelectItem(item: TerminalSelectItem): React.ReactNode {
@@ -911,60 +903,17 @@ function testDeviceItem(
   return { value: device.testDeviceId, label: device.label };
 }
 
-async function submitTerminalConfiguration(
-  props: Readonly<{
-    organisationId: string;
-    configuration: TerminalConfiguration;
-    mutate: TerminalMutationTransport;
-    replace: boolean;
-    setView: (view: TerminalOperationsView) => void;
-  }>,
-  setBusy: (busy: boolean) => void,
-  event: React.FormEvent<HTMLFormElement>,
-): Promise<void> {
-  event.preventDefault();
-  const selection = parseTerminalSelection(new FormData(event.currentTarget));
-  if (selection === null) {
-    toast.error(
-      "Choose a Purin Checkout location, Square location, and Sandbox test device.",
-    );
-    return;
-  }
-  setBusy(true);
-  try {
-    props.setView(
-      await configureSandboxTerminal(
-        props.organisationId,
-        selection,
-        props.mutate,
-      ),
-    );
-    toast.success(
-      props.replace
-        ? "Sandbox terminal replaced."
-        : "Sandbox terminal activated.",
-    );
-  } catch (cause) {
-    toast.error(
-      cause instanceof Error
-        ? cause.message
-        : "The Sandbox terminal could not be saved.",
-    );
-  } finally {
-    setBusy(false);
-  }
-}
-
-function parseTerminalSelection(
-  form: FormData,
-): TerminalConfigurationRequest | null {
+/** The counter and the Square location that a new assignment binds. */
+function parseCounterPlace(form: FormData): Readonly<{
+  pantryLocationId: string;
+  integrationAccountId: string;
+  providerLocationId: string;
+}> | null {
   const pantryLocationId = form.get("pantryLocationId");
   const squareLocation = form.get("squareLocation");
-  const testDeviceId = form.get("testDeviceId");
   if (
     typeof pantryLocationId !== "string" ||
-    typeof squareLocation !== "string" ||
-    typeof testDeviceId !== "string"
+    typeof squareLocation !== "string"
   )
     return null;
   const separator = squareLocation.indexOf("|");
@@ -978,14 +927,8 @@ function parseTerminalSelection(
     );
     return integrationAccountId.length > 0 &&
       providerLocationId.length > 0 &&
-      pantryLocationId.length > 0 &&
-      testDeviceId.length > 0
-      ? {
-          pantryLocationId: pantryLocationId,
-          integrationAccountId,
-          providerLocationId,
-          testDeviceId,
-        }
+      pantryLocationId.length > 0
+      ? { pantryLocationId, integrationAccountId, providerLocationId }
       : null;
   } catch {
     return null;

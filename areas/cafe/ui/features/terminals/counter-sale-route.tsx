@@ -67,12 +67,12 @@ export function CounterSaleRoute(
       <RecoverableError
         message={state.message}
         action={
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             onClick={setReadRevision.bind(null, nextReadRevision)}
           >
             Try again
-          </button>
+          </Button>
         }
       />
     );
@@ -248,16 +248,12 @@ function CounterRefundReview(
           ]}
         />
         <div className="terminal-confirm-actions">
-          <button ref={cancel} type="button" onClick={props.close}>
+          <Button ref={cancel} variant="secondary" onClick={props.close}>
             Keep payment
-          </button>
-          <button
-            type="button"
-            className="terminal-confirm-proceed"
-            onClick={props.confirm}
-          >
+          </Button>
+          <Button variant="danger" onClick={props.confirm}>
             Refund full amount
-          </button>
+          </Button>
         </div>
       </div>
     </dialog>

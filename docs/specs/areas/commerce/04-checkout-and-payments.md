@@ -177,9 +177,18 @@ outside the engine. A `gmo_stera` collection runs through the Platform `DeviceFl
   writes nothing.
 - The **Counters & payments** page shows each counter as one row: its target, the
   credential health, Ready or Retired, and a warning when the counter is not linked for
-  payments, does not report its health or has an old configuration. The terminal setup
-  and one counter sale (`?counterSale=`) are under the list. The page does not show the
-  Square location, the assignment revision or the webhook state.
+  payments, does not report its health or has an old configuration. "Stop taking
+  payments" asks in place. One counter sale (`?counterSale=`) is under the list. The
+  page does not show the Square location, the assignment revision or the webhook state.
+- An admin adds a counter, or replaces what a counter uses, in the **Add a counter**
+  drawer. Its one choice is the target: a Square Terminal or the Square app on an iPad
+  in `production`, a Square Sandbox test device in `development`. It starts on the
+  first counter that takes no payments, asks for the Square location only when there
+  are several, and fills in the counter name as the name of a new Terminal. A pairing
+  code stays open while the drawer is closed. When Purin Checkout, a counter policy, a
+  Square location or a Sandbox test device is missing, the page says so in place of the
+  button. The Point of Sale callback URL belongs to Purin's Square application, so the
+  page does not show it to the shop.
 
 ### Receipts and payment reads
 

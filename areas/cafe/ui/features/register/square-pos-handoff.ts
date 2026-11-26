@@ -6,8 +6,11 @@
 // https://developer.squareup.com/docs/pos-api/web-technical-reference
 import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 
-/** The one callback URL path that the Square Developer Console must list. */
-export const SQUARE_POS_CALLBACK_PATH = "/portal/square-pos-return";
+/**
+ * The one callback URL path that Purin's Square application must list. The
+ * Purin operator sets it in the Square Developer Console; the shop cannot.
+ */
+const SQUARE_POS_CALLBACK_PATH = "/portal/square-pos-return";
 
 const REGISTER_PATH = /^\/portal\/[^/?#]+\/[^/?#]+\/register$/u;
 const ID = /^[A-Za-z0-9_-]{1,255}$/u;

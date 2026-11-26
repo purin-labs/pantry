@@ -1,5 +1,5 @@
-/* Counters & payments: the counters as one framed list of rows, the
-   terminal setup under them, and one counter sale in its own panel. */
+/* Counters & payments: a toolbar, the counters as one framed list of rows,
+   the "Add a counter" drawer, and one counter sale in its own panel. */
 
 .terminal-page {
   display: grid;
@@ -49,53 +49,77 @@
   color: var(--ink-2);
 }
 
-.terminal-setup {
+.terminal-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+/* The drawer that adds a counter: one choice, then the fields it needs. */
+.terminal-drawer-form {
+  gap: 20px;
+}
+
+.terminal-field {
   display: grid;
-  gap: 18px;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
-.terminal-settings > .terminal-setup + .terminal-setup {
-  margin-top: 28px;
-  padding-top: 24px;
-  border-top: 1px solid var(--hairline);
-}
-
-.terminal-setup-heading {
+.terminal-choices {
   display: grid;
-  gap: 4px;
-}
-
-.terminal-setup-heading h3,
-.terminal-setup-heading p {
-  margin: 0;
-}
-
-.terminal-setup-heading h3 {
-  font-size: 16px;
-}
-
-.terminal-setup-heading p {
-  color: var(--ink-2);
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.terminal-setup-fields {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: 12px;
-}
-
-.terminal-setup-fields label {
-  display: grid;
-  align-content: start;
   gap: 8px;
-  font-size: 12px;
-  color: var(--ink-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
-.terminal-setup-submit {
-  justify-self: start;
+.terminal-choices legend {
+  margin-bottom: 6px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.terminal-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--pantry-radius-control);
+  background: var(--paper);
+  cursor: pointer;
+}
+
+.terminal-choice:has(input:checked) {
+  border-color: var(--ink);
+}
+
+.terminal-choice input {
+  margin: 3px 0 0;
+  accent-color: var(--ink);
+}
+
+.terminal-choice > span {
+  display: grid;
+  gap: 2px;
+}
+
+.terminal-choice-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.terminal-choice-detail,
+.terminal-drawer-note {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 /* The counters: one framed list. */
@@ -206,12 +230,6 @@
   white-space: normal;
 }
 
-.terminal-confirm .terminal-confirm-proceed {
-  color: var(--pantry-danger-text);
-  background: var(--pantry-danger-surface);
-  border-color: var(--pantry-danger-text);
-}
-
 .counter-sale {
   grid-template-columns: minmax(0, 1fr);
 }
@@ -274,22 +292,12 @@
   }
 }
 
-.terminal-settings {
-  border-top: 1px solid var(--hairline);
-  padding-top: 16px;
+/* The question of "Stop taking payments" takes the full row. */
+.terminal-row > .pantry-confirm {
+  grid-column: 1 / -1;
 }
-.terminal-settings > summary {
-  cursor: pointer;
-  min-height: 40px;
-  padding-block: 10px;
-  font-size: 13px;
-  color: var(--ink-2);
-}
-.terminal-settings > summary + * {
-  margin-top: 16px;
-}
-.terminal-setup-fields input,
-.terminal-setup-fields button:where(.pantry-select-trigger) {
+.terminal-field input,
+.terminal-field button:where(.pantry-select-trigger) {
   width: 100%;
   min-width: 0;
   min-height: 44px;
@@ -300,10 +308,10 @@
   background: var(--paper);
   font: inherit;
   font-size: 14px;
+  font-weight: 400;
 }
 :is(.terminal-page, .terminal-panel)
   button:not(:where(.pantry-select-trigger)):focus-visible,
-:is(.terminal-page, .terminal-panel) summary:focus-visible,
 :is(.terminal-page, .terminal-panel) input:focus-visible,
 :is(.terminal-page, .terminal-panel)
   button:where(.pantry-select-trigger):focus-visible {
@@ -321,11 +329,8 @@
   .terminal-row > button.pantry-button {
     justify-self: start;
   }
-  .terminal-setup-fields {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .terminal-setup-fields input,
-  .terminal-setup-fields button:where(.pantry-select-trigger) {
+  .terminal-field input,
+  .terminal-field button:where(.pantry-select-trigger) {
     font-size: 16px;
   }
 }

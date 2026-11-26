@@ -20,16 +20,16 @@ payment id, the tender, the refund and what the Register showed.
 Square's Sandbox has no Point of Sale API, so the first real check is a live
 sale.
 
-1. In the Square Developer Console, open the production application that
-   Pantry uses. Under Point of Sale API, add the web callback URL that
-   Café › Counters & payments shows in "Use the Square app on an iPad". It is
-   `<Portal origin>/portal/square-pos-return`.
+1. The Purin operator, not the shop: in the Square Developer Console, open
+   Purin's production application (`SQUARE_OAUTH_CLIENT_ID` of
+   `pantry-commerce`). Under Point of Sale API, add the web callback URL
+   `<Portal origin>/portal/square-pos-return`. The Portal does not show it.
 2. In Square, apply for e-money and PayPay for the location. Square must
    approve these tenders before the app offers them.
 3. On the iPad, install Square Point of Sale, sign in to the café location
    and pair the Square Reader.
-4. In Café › Counters & payments, choose the counter and the Square location,
-   then select "Use the Square app".
+4. In Café › Counters & payments, select "Add a counter", choose "Square app
+   on an iPad" and the counter, then select "Add counter".
 5. On the same iPad, open the Register in Safari and do these sales:
    1. Card: "Card or e-money", pay with a card. The Register shows the
       pickup code. Refund the order in Pantry; Square shows the refund.
@@ -56,14 +56,15 @@ by the user", item 2) on the commerce engine.
 
 1. Activate the Japan Square location for live payments, with e-money and
    PayPay.
-2. Buy one Square Terminal. In Café › Counters & payments, pair it with the
-   code that Pantry shows.
+2. Buy one Square Terminal. In Café › Counters & payments, select "Add a
+   counter" and "Get a pairing code", then type the code on the Terminal.
 3. Do these sales on the Register: card, FeliCa (Suica, then a cash refund),
    QR (PayPay, then a refund), a cancel on the Terminal, and a network cut
    during a payment (unplug the Terminal's network, reconnect, then "Check
    terminal").
 4. Check that each Pantry receipt agrees with the Square receipt.
-5. Retire the Terminal in Counters & payments and pair it again.
+5. Select "Stop taking payments" for the Terminal in Counters & payments,
+   then pair it again.
 
 ## C. GMO `stera` (Phase 4B)
 
