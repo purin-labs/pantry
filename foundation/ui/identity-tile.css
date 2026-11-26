@@ -8,6 +8,7 @@
   overflow: hidden;
   border-radius: 8px;
   box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%);
+  container-type: size;
 }
 
 .identity-tile-sm {
@@ -31,6 +32,18 @@
       oklch(0.72 0.11 var(--identity-hue-a)),
       oklch(0.56 0.12 var(--identity-hue-b))
     );
+}
+
+/* The initials scale with the tile: 13px on the 32px tile, 9px on the
+   22px tile. */
+.identity-tile-initials {
+  color: #fff;
+  font-size: 40cqi;
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 22%);
+  user-select: none;
 }
 
 .identity-tile[data-kind="logo"] {

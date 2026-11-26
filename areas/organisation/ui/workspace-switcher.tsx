@@ -68,6 +68,7 @@ export function WorkspaceSwitcher(props: SwitcherProps): React.ReactNode {
           <IdentityTile
             className="console-switcher-avatar"
             seed={current?.tile.seed ?? props.workspace.workspaceHandle}
+            name={props.workspace.name}
             logoUrl={current?.tile.logoUrl ?? null}
           />
           <span className="console-switcher-label workspace-switcher-label">
@@ -283,6 +284,7 @@ function renderOrganisation(
       <IdentityTile
         className="console-switcher-avatar"
         seed={organisation.tile.seed}
+        name={organisation.name}
         logoUrl={organisation.tile.logoUrl}
       />
       <span className="workspace-switcher-row-text">
@@ -326,6 +328,7 @@ function renderWorkspace(
       <IdentityTile
         className="console-switcher-avatar"
         seed={workspace.tile.seed}
+        name={workspace.name}
         logoUrl={workspace.tile.logoUrl}
       />
       <span className="workspace-switcher-row-text">

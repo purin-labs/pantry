@@ -522,6 +522,7 @@ function OrganisationListRow(props: {
         >
           <IdentityTile
             seed={props.item.organisationId}
+            name={props.item.name}
             logoUrl={
               props.item.organisationLogo === null
                 ? null
@@ -962,6 +963,7 @@ function renderOrganisationWorkspace(
         <IdentityTile
           size="sm"
           seed={workspace.workspaceId}
+          name={workspace.name}
           logoUrl={
             workspace.logo === null
               ? null

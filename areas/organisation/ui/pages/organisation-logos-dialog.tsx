@@ -121,6 +121,7 @@ function LogoRow(props: {
     <li className="organisation-logo-row">
       <IdentityTile
         seed={props.subject.seed}
+        name={props.subject.name}
         logoUrl={
           props.subject.logo === null
             ? null

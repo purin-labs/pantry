@@ -8,6 +8,11 @@ export type IdentityTileProps = Readonly<{
    * from it, so a rename keeps the colours.
    */
   seed: string;
+  /**
+   * The name of the organisation or workspace. A gradient tile shows its
+   * initials, so two tiles in one colour family still look different.
+   */
+  name: string;
   /** The uploaded logo, or null for the gradient. */
   logoUrl: string | null;
   size?: "md" | "sm";
@@ -18,7 +23,8 @@ export type IdentityTileProps = Readonly<{
  * The tile of an organisation or a workspace: its own logo, or a gradient
  * that comes from its id. The same id gives the same gradient on every
  * screen. Two ids get one colour family each, from eight that are 45
- * degrees apart, so two different tiles never look almost the same.
+ * degrees apart, and the gradient carries the initials of the name, so two
+ * different tiles never look almost the same.
  */
 export function IdentityTile(props: IdentityTileProps): React.ReactNode {
   const className = [
@@ -40,8 +46,31 @@ export function IdentityTile(props: IdentityTileProps): React.ReactNode {
       data-kind="gradient"
       aria-hidden="true"
       style={identityGradient(props.seed)}
-    />
+    >
+      <span className="identity-tile-initials">
+        {identityInitials(props.name)}
+      </span>
+    </span>
   );
+}
+
+/**
+ * The first letter of the first two words of a name, in capitals: "Nuki
+ * Inc." gives "NI" and "Atelier" gives "A". A word with no letter or digit,
+ * such as "&", gives nothing.
+ */
+function identityInitials(name: string): string {
+  return name
+    .split(/\s+/u)
+    .map(firstLetter)
+    .filter((letter) => letter !== "")
+    .slice(0, 2)
+    .join("")
+    .toLocaleUpperCase();
+}
+
+function firstLetter(word: string): string {
+  return /[\p{L}\p{N}]/u.exec(word)?.[0] ?? "";
 }
 
 /**

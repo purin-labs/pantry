@@ -597,15 +597,27 @@ on every Portal surface, until the brand switch.
 ### Identity tiles
 
 `IdentityTile` is the tile of an organisation or a workspace: its uploaded
-logo, or a gradient that comes from its id. The same id gives the same
-gradient on every screen, and a rename keeps it, so people can tell
+logo, or a gradient that comes from its id with the initials of its name.
+The same id gives the same gradient on every screen, and a rename keeps it.
+The initials tell two tiles in one colour family apart, so people can tell
 organisations apart at a glance.
 
 ```tsx
-<IdentityTile seed={organisation.organisationId} logoUrl={logoUrl} />
-<IdentityTile seed={workspace.workspaceId} logoUrl={null} size="sm" />
+<IdentityTile
+  seed={organisation.organisationId}
+  name={organisation.name}
+  logoUrl={logoUrl}
+/>
+<IdentityTile
+  seed={workspace.workspaceId}
+  name={workspace.name}
+  logoUrl={null}
+  size="sm"
+/>
 ```
 
+- `name` gives the initials: the first letter of the first two words, so
+  "Nuki Inc." shows NI.
 - `logoUrl` is the address of the logo, or null for the gradient.
 - `size="sm"` is the 22px tile for a workspace under its organisation.
 - The tile is decoration: the name beside it is the accessible name.
