@@ -2586,8 +2586,8 @@
           "bytes": 228286
         },
         "fr10-workcell/native/assets.json": {
-          "sha256": "2a337c96437d8af6f9969d8e870724b988c53ad60f077aebeb460708fbb2986a",
-          "bytes": 38589
+          "sha256": "33acd2e8c3b0bd5bf48bac662ec9084824a114bf2ead677e718581f197234fba",
+          "bytes": 38906
         },
         "fr10-workcell/native/dobot-cr10/combined-blocked-rack-nominal.json": {
           "sha256": "4e4a7e286b4f32a23ba4ed6f42e9b6e64a7f7484422a9334a33c762563f61561",
@@ -2774,28 +2774,36 @@
           "bytes": 24256
         },
         "fr10-workcell/native/fairino-fr10/spanner-oven-blocked.json": {
-          "sha256": "4be7617a49f57b9663b58256be996d187aca0b53ec36dd18f80f6fbff9f21b00",
-          "bytes": 27996
+          "sha256": "46a75bebbbc8dfa590bfd1c5fecb1628d20ce36ee1b17d0f8d1ba42852ab3bd5",
+          "bytes": 29668
         },
         "fr10-workcell/native/fairino-fr10/spanner-oven-blocked.xml": {
-          "sha256": "9e89e5c7c42091c9ebfdbd284a985e3b4736a332ee3e9a93f106dac0c9c8f233",
-          "bytes": 42732
+          "sha256": "91e88c23b12196033c4619acb1fd9bc0ba47fabc75c59bd52a116520491a8751",
+          "bytes": 44687
         },
         "fr10-workcell/native/fairino-fr10/spanner-oven-closed-door.json": {
-          "sha256": "c58ce2de46dfdc6af44d7166b6a70c9012c3898da70eeab91e53e9b3acf450d5",
-          "bytes": 27512
+          "sha256": "934796f4f372a5038bb265bb915e0f813020506249015a02eb65d24b4281dab2",
+          "bytes": 29184
         },
         "fr10-workcell/native/fairino-fr10/spanner-oven-closed-door.xml": {
-          "sha256": "836d9e881d0bb7005588131503d80a2c9775c120496bbff66ee3fc4c3633aa99",
-          "bytes": 42423
+          "sha256": "4c4f4aeda6ff85dcda8ac8b4e9f122fa026fac44995b6205649fdc7b001f6fb0",
+          "bytes": 44378
+        },
+        "fr10-workcell/native/fairino-fr10/spanner-oven-door-nominal.json": {
+          "sha256": "d666f490bd4632bd9cfe57e2eb0c2fe29466b63de545e9d6824a251872b17c60",
+          "bytes": 30068
+        },
+        "fr10-workcell/native/fairino-fr10/spanner-oven-door-nominal.xml": {
+          "sha256": "5206aa486c36429946ade4ac0eaf41a14726720e87830204593641a87dd57f9f",
+          "bytes": 45031
         },
         "fr10-workcell/native/fairino-fr10/spanner-oven-nominal.json": {
-          "sha256": "1849b8136a8fdc11ce704c3c9c97444823a8ee74ce74149073d4794cf4170369",
-          "bytes": 27591
+          "sha256": "f581d8c220ac224306c851d2571ed116109a0d2d9c407d2e86b5615dbcff59d4",
+          "bytes": 29263
         },
         "fr10-workcell/native/fairino-fr10/spanner-oven-nominal.xml": {
-          "sha256": "1293172577c9276355c0638fee37a12c038ea97d9069abca8cd2f9db9b83a71b",
-          "bytes": 42475
+          "sha256": "2e446b67168ab5f8a8fa2b35d676cfc03f46fb93d5c6321fa4a6035df672ce84",
+          "bytes": 44430
         },
         "fr10-workcell/native/fairino-fr10/table-to-oven-blocked.json": {
           "sha256": "52815815fa1c1601557e363570737cc2a4e2590a5f37aeb250f24679b5bbf54e",
@@ -3274,19 +3282,19 @@
           "bytes": 227697
         },
         "fr10-workcell/recordings/nominal.json": {
-          "sha256": "4e7256f2d202695d28e73d1b9e7bb8acc26f95c0969fa1921f2a5718bf5d6f87",
+          "sha256": "bb94859d801d98bdded641a972e6e5c5fa7a995c55e9a306427e64b4454c5b31",
           "bytes": 537459
         },
         "fr10-workcell/recordings/oven-cycle.json": {
-          "sha256": "3194c493f4ee2f53aeff938ab7258774b9db8ede71ce8f8fe9013c344a2a5862",
+          "sha256": "35d50f46d9db652e0a7bfd99e9f0b338b6adf3a0e122c7557ea968d067cfef74",
           "bytes": 1454776
         },
         "fr10-workcell/recordings/oven-loading.json": {
-          "sha256": "114cb7d0ef7defbf647cb740a467e88c5d4557c239ddf9b15689a06038b6732b",
+          "sha256": "f7289855e0c2d0b437233113d4a4a5a652bb4d1c4df4ebc6dfe861b43ed3627f",
           "bytes": 714895
         },
         "fr10-workcell/recordings/oven-rack-cycle.json": {
-          "sha256": "3fcca54e246903ff8cd5fcfd437ad53201f06572f8b99e8dacb78cc61c7e1ec1",
+          "sha256": "23ce2ef05d683676eb8f5cafdee1c284f87eb6975d23e2eb6c3b5b0b9b367d4b",
           "bytes": 2011263
         },
         "fr10-workcell/source.png": {
