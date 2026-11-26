@@ -1061,17 +1061,20 @@ function discoveryState(_actor: unknown, state: DurableObjectState) {
       settlement_state: string;
       input_tokens: number | null;
       estimated_cost_microusd: number | null;
+      reserved_at: number;
     }>(
-      "SELECT state, settlement_state, input_tokens, estimated_cost_microusd FROM typesafe_evaluation WHERE purpose = 'case_context_discovery_relationship'",
+      "SELECT state, settlement_state, input_tokens, estimated_cost_microusd, reserved_at FROM typesafe_evaluation WHERE purpose = 'case_context_discovery_relationship'",
     )
     .toArray();
   return {
     evaluations,
+    // The usage of the UTC day of the call, also when the journey crosses
+    // midnight and the daily budget starts again.
     usage: readDailyTypeSafeUsage(
       sql,
       ORGANISATION_ID,
       "case_context_discovery_relationship",
-      Date.now(),
+      evaluations[0]?.reserved_at ?? Date.now(),
     ),
     relationships: sql
       .exec<{ total: number }>(

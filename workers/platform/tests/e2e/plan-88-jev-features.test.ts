@@ -175,8 +175,11 @@ async function recordsJourney(): Promise<void> {
     organisationId,
     now: Date.now(),
   });
-  // Seed: the ledger rows of a closed hour, as the Jev calls of that hour wrote them.
-  const closedHour = Math.floor(Date.now() / HOUR_MS) * HOUR_MS - 2 * HOUR_MS;
+  // Seed: the ledger rows of a closed hour, as the Jev calls of that hour wrote
+  // them. An hour closes 5 minutes after its end, so in the first 5 minutes of
+  // an hour the newest closed hour is two hours back. The seed sits three hours
+  // back: the hour that the idle alarm below opens again never holds it.
+  const closedHour = Math.floor(Date.now() / HOUR_MS) * HOUR_MS - 3 * HOUR_MS;
   await runInDurableObject(
     organisation,
     seedHourLedger.bind(null, organisationId, closedHour),
