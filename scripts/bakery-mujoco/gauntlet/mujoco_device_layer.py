@@ -211,6 +211,7 @@ class MuJoCoDeviceLayer:
       camera_names: Sequence[str] = ('overhead_cam',),
       depth_cameras: Sequence[str] = ('overhead_cam',),
       camera_hw: tuple[int, int] = (240, 320),
+      render_geomgroup_3: bool = False,
       extra_devices: Mapping[str, Any] | None = None,
       reset_fn: Callable[[MuJoCoSim], None] | None = None,
   ):
@@ -221,6 +222,11 @@ class MuJoCoDeviceLayer:
     self._camera_names = tuple(camera_names)
     self._depth_cameras = frozenset(depth_cameras)
     self._cam_h, self._cam_w = int(camera_hw[0]), int(camera_hw[1])
+    self._render_geomgroup_3 = bool(render_geomgroup_3)
+    self._scene_option: mujoco.MjvOption | None = None
+    if self._render_geomgroup_3:
+      self._scene_option = mujoco.MjvOption()
+      self._scene_option.geomgroup[3] = 1
     self._renderers: dict[tuple[int, int], mujoco.Renderer] = {}
     self._frame_cache_time: float = -1.0
     self._frame_cache: dict[str, np.ndarray] = {}
@@ -239,7 +245,10 @@ class MuJoCoDeviceLayer:
     gjid = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, gripper_joint_name)
     gaid = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_ACTUATOR, gripper_actuator_name)
     assert gjid >= 0 and gaid >= 0, f'Missing gripper {gripper_joint_name}/{gripper_actuator_name}'
-    glo, ghi = float(m.jnt_range[gjid, 0]), float(m.jnt_range[gjid, 1])
+    if bool(m.actuator_ctrllimited[gaid]):
+      glo, ghi = float(m.actuator_ctrlrange[gaid, 0]), float(m.actuator_ctrlrange[gaid, 1])
+    else:
+      glo, ghi = float(m.jnt_range[gjid, 0]), float(m.jnt_range[gjid, 1])
     self._joint_keys.append(('joint_position/gripper', int(m.jnt_qposadr[gjid]), gjid))
     self._cmd_keys.append(('goal_position/gripper', gaid, (glo, ghi)))
 
@@ -360,7 +369,10 @@ class MuJoCoDeviceLayer:
       r.enable_depth_rendering()
     else:
       r.disable_depth_rendering()
-    r.update_scene(self.sim.mj_data, camera=self._cam_ids[cname])
+    if self._scene_option is not None:
+      r.update_scene(self.sim.mj_data, camera=self._cam_ids[cname], scene_option=self._scene_option)
+    else:
+      r.update_scene(self.sim.mj_data, camera=self._cam_ids[cname])
     img = r.render().copy()
     if depth:
       r.disable_depth_rendering()
