@@ -18,7 +18,7 @@
 }
 
 /* A soft light at the top left over two hues, like the old gradient
-   pictures, but one pair of hues for each name. */
+   pictures, in one colour family for each id. */
 .identity-tile[data-kind="gradient"] {
   background:
     radial-gradient(

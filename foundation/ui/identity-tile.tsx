@@ -17,7 +17,8 @@ export type IdentityTileProps = Readonly<{
 /**
  * The tile of an organisation or a workspace: its own logo, or a gradient
  * that comes from its id. The same id gives the same gradient on every
- * screen, and two ids almost always give two different gradients.
+ * screen. Two ids get one colour family each, from eight that are 45
+ * degrees apart, so two different tiles never look almost the same.
  */
 export function IdentityTile(props: IdentityTileProps): React.ReactNode {
   const className = [
@@ -43,12 +44,25 @@ export function IdentityTile(props: IdentityTileProps): React.ReactNode {
   );
 }
 
+/**
+ * The colour families of the gradient tiles: coral, gold, lime, emerald,
+ * cyan, blue, violet and pink. A free hue from the hash let two
+ * organisations land 11 degrees apart and look the same; a family is
+ * either the same or at least 45 degrees away.
+ */
+const IDENTITY_FAMILIES = 8;
+const IDENTITY_FIRST_CENTRE = 40;
+const IDENTITY_FAMILY_STEP = 360 / IDENTITY_FAMILIES;
+/** Half the hue spread inside one tile, so a tile reads as one family. */
+const IDENTITY_HALF_SPREAD = 18;
+
 /** Two hues and an angle from the seed, as CSS custom properties. */
 function identityGradient(seed: string): React.CSSProperties {
   const hash = fnv1a(seed);
-  const first = hash % 360;
-  // The second hue sits 40 to 110 degrees away, so the two never clash.
-  const second = (first + 40 + ((hash >>> 9) % 71)) % 360;
+  const centre =
+    IDENTITY_FIRST_CENTRE + (hash % IDENTITY_FAMILIES) * IDENTITY_FAMILY_STEP;
+  const first = (centre - IDENTITY_HALF_SPREAD + 360) % 360;
+  const second = (centre + IDENTITY_HALF_SPREAD) % 360;
   const angle = 100 + ((hash >>> 17) % 120);
   return {
     "--identity-hue-a": String(first),
