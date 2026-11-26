@@ -9,7 +9,7 @@ use crate::{
     artifact::*,
     assets::{Assets, Cell as Fixture},
     checkpoint::{self, Kind},
-    native::{Engine, OPEN_JAW_M, PARKED_TRAY},
+    native::{Engine, PARKED_TRAY},
     robot::Robot,
     transfer::{self, Operation, Start, Stop},
 };
@@ -20,6 +20,8 @@ pub enum CellFixture {
     Rack,
     #[serde(rename = "persistent-oven-rack/1")]
     OvenRack,
+    #[serde(rename = "persistent-spanner-oven-rack/1")]
+    SpannerOvenRack,
     #[serde(rename = "persistent-pan-staging/1")]
     PanStaging,
 }
@@ -29,13 +31,14 @@ impl CellFixture {
         match self {
             Self::Rack => Fixture::Separate,
             Self::OvenRack => Fixture::Combined,
+            Self::SpannerOvenRack => Fixture::SpannerOvenCombined,
             Self::PanStaging => Fixture::PanStaging,
         }
     }
     fn initial_task(self) -> BakeryTask {
         match self {
             Self::Rack | Self::PanStaging => BakeryTask::Rack,
-            Self::OvenRack => BakeryTask::Oven,
+            Self::OvenRack | Self::SpannerOvenRack => BakeryTask::Oven,
         }
     }
 }
@@ -216,9 +219,21 @@ impl CarrierLocation {
             (fixture, self, task),
             (CellFixture::Rack, Self::Source, BakeryTask::Rack)
                 | (CellFixture::PanStaging, Self::Source, BakeryTask::Rack)
-                | (CellFixture::OvenRack, Self::Source, BakeryTask::Oven)
-                | (CellFixture::OvenRack, Self::Oven, BakeryTask::Unload)
-                | (CellFixture::OvenRack, Self::Returned, BakeryTask::Rack)
+                | (
+                    CellFixture::OvenRack | CellFixture::SpannerOvenRack,
+                    Self::Source,
+                    BakeryTask::Oven
+                )
+                | (
+                    CellFixture::OvenRack | CellFixture::SpannerOvenRack,
+                    Self::Oven,
+                    BakeryTask::Unload
+                )
+                | (
+                    CellFixture::OvenRack | CellFixture::SpannerOvenRack,
+                    Self::Returned,
+                    BakeryTask::Rack
+                )
         )
     }
     fn site(self) -> &'static str {
@@ -591,14 +606,13 @@ pub struct Cell {
 /// handoff places it.
 fn source_pose(engine: &Engine) -> Result<[f64; 7]> {
     let center = engine.site("source_tray_center")?;
+    let quat = if engine.is_spanner() {
+        [1., 0., 0., 0.]
+    } else {
+        [FRAC_1_SQRT_2, 0., 0., -FRAC_1_SQRT_2]
+    };
     Ok([
-        center.x,
-        center.y,
-        center.z,
-        FRAC_1_SQRT_2,
-        0.,
-        0.,
-        -FRAC_1_SQRT_2,
+        center.x, center.y, center.z, quat[0], quat[1], quat[2], quat[3],
     ])
 }
 
@@ -666,6 +680,7 @@ impl Cell {
             };
         engine.set_start(&angles);
         engine.park_tray();
+        let jaw = engine.open_jaw_m();
         Ok(Ok(Self {
             definition,
             engine,
@@ -674,7 +689,7 @@ impl Cell {
                 angles,
                 target,
                 posture: Posture::Ready,
-                jaw: OPEN_JAW_M,
+                jaw,
             },
             steps: 0,
             held: false,
@@ -736,7 +751,7 @@ impl Cell {
             );
         }
         ensure!(
-            checkpoint.servo.jaw.is_finite() && (-0.01..=0.06).contains(&checkpoint.servo.jaw),
+            checkpoint.servo.jaw.is_finite() && (-0.02..=0.06).contains(&checkpoint.servo.jaw),
             "Invalid jaw servo target"
         );
         let running = match checkpoint.operation {
@@ -1005,7 +1020,7 @@ impl Cell {
         let untouched = self.observe();
         let speed = self.engine.tray_speed();
         ensure!(
-            self.engine.jaw_opening() > OPEN_JAW_M - 0.005
+            self.engine.jaw_opening() > self.engine.open_jaw_m() - 0.005
                 && !untouched
                     .tray_contacts
                     .iter()
@@ -1191,7 +1206,7 @@ impl Cell {
             } else {
                 continue;
             };
-            if !other.starts_with("mbco_tray") {
+            if !other.starts_with("mbco_tray") && !other.starts_with("mbco4_tray") {
                 supports.push(other.to_owned());
             }
         }
@@ -1253,9 +1268,11 @@ impl Cell {
     pub fn hold(&self) -> Option<HoldOffer> {
         // Pan staging qualifies only the empty cell. A supported pan continues
         // ordinary physics until its worker handoff; the oven is unqualified.
-        if self.definition.fixture == CellFixture::OvenRack
-            || (self.definition.fixture == CellFixture::PanStaging
-                && !matches!(self.slot, Slot::Inactive { .. }))
+        if matches!(
+            self.definition.fixture,
+            CellFixture::OvenRack | CellFixture::SpannerOvenRack
+        ) || (self.definition.fixture == CellFixture::PanStaging
+            && !matches!(self.slot, Slot::Inactive { .. }))
         {
             return None;
         }
@@ -1398,7 +1415,7 @@ impl Cell {
             jaw: if self.held {
                 self.engine.jaw_opening()
             } else {
-                OPEN_JAW_M
+                self.engine.open_jaw_m()
             },
             posture: if matches!(outcome, Outcome::Recovered { .. }) {
                 Posture::Ready

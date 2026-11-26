@@ -6,6 +6,8 @@
       "batch-cycles",
       "oven-native",
       "oven-wasm",
+      "spanner-oven-native",
+      "spanner-oven-wasm",
       "oven-engine",
       "financier",
       "schedule-layout",
@@ -42,7 +44,8 @@
       "recovery-browser",
       "recovery-browser-artifact",
       "two-cell-workspace-browser",
-      "persistent-chat-browser"
+      "persistent-chat-browser",
+      "spanner-oven-browser"
     ]
   },
   "journeys": [
@@ -95,9 +98,9 @@
       "dir": "oven-native",
       "status": "passes",
       "lastRun": {
-        "seconds": 10.8,
-        "date": "2026-11-19",
-        "commit": "2e48dac6e"
+        "seconds": 12.4,
+        "date": "2026-11-27",
+        "commit": "35291d017"
       }
     },
     {
@@ -116,9 +119,100 @@
       "dir": "oven-wasm",
       "status": "passes",
       "lastRun": {
-        "seconds": 10.6,
-        "date": "2026-11-19",
-        "commit": "2e48dac6e"
+        "seconds": 12.5,
+        "date": "2026-11-27",
+        "commit": "35291d017"
+      }
+    },
+    {
+      "id": "spanner-oven-native",
+      "file": "scripts/production-simulation/verify-persistent-oven-cell.mjs",
+      "tier": "fast",
+      "backend": "native",
+      "owner": "Plan 24",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"],
+        "env": {
+          "PLAN_70_OVEN_FIXTURE": "spanner-oven-rack",
+          "PLAN_70_OVEN_ROBOT": "fairino-fr10"
+        }
+      },
+      "dir": "spanner-oven-native",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 11.5,
+        "date": "2026-11-27",
+        "commit": "35291d017"
+      }
+    },
+    {
+      "id": "spanner-oven-wasm",
+      "file": "scripts/production-simulation/verify-persistent-oven-cell.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 24",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"],
+        "env": {
+          "PLAN_70_OVEN_FIXTURE": "spanner-oven-rack",
+          "PLAN_70_OVEN_ROBOT": "fairino-fr10",
+          "PLAN_70_BROWSER_BUNDLE": "{runtime}"
+        }
+      },
+      "dir": "spanner-oven-wasm",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 11.3,
+        "date": "2026-11-27",
+        "commit": "35291d017"
+      }
+    },
+    {
+      "id": "spanner-oven-ur5e-wasm",
+      "file": "scripts/production-simulation/verify-persistent-oven-cell.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 24",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"],
+        "env": {
+          "PLAN_70_OVEN_FIXTURE": "spanner-oven-rack",
+          "PLAN_70_OVEN_ROBOT": "universal-robots-ur5e",
+          "PLAN_70_BROWSER_BUNDLE": "{runtime}"
+        }
+      },
+      "dir": "spanner-oven-ur5e-wasm",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 10,
+        "date": "2026-11-27",
+        "commit": "35291d017"
+      }
+    },
+    {
+      "id": "spanner-oven-crx10-wasm",
+      "file": "scripts/production-simulation/verify-persistent-oven-cell.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Plan 24",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"],
+        "env": {
+          "PLAN_70_OVEN_FIXTURE": "spanner-oven-rack",
+          "PLAN_70_OVEN_ROBOT": "fanuc-crx10ial",
+          "PLAN_70_BROWSER_BUNDLE": "{runtime}"
+        }
+      },
+      "dir": "spanner-oven-crx10-wasm",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 11,
+        "date": "2026-11-27",
+        "commit": "35291d017"
       }
     },
     {
@@ -1324,6 +1418,25 @@
         "seconds": 23.6,
         "date": "2026-11-19",
         "commit": "2e48dac6e"
+      }
+    },
+    {
+      "id": "spanner-oven-browser",
+      "file": "scripts/bakery-robots/verify-spanner-oven-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Plan 24",
+      "run": {
+        "tool": "browser",
+        "url": "/workflow-preview.html",
+        "timeoutMs": 900000
+      },
+      "status": "passes",
+      "dir": "spanner-oven-browser",
+      "lastRun": {
+        "seconds": 18.1,
+        "date": "2026-11-27",
+        "commit": "35291d017"
       }
     },
     {

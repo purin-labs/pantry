@@ -105,6 +105,7 @@ export type NativeCell = Readonly<{
         fixture:
           | "persistent-rack/1"
           | "persistent-oven-rack/1"
+          | "persistent-spanner-oven-rack/1"
           | "persistent-pan-staging/1";
         appliance?: never;
         station?: never;
@@ -201,6 +202,7 @@ export function parseNativeCell(raw: unknown): Result<NativeCell, string> {
     if (
       fixture !== "persistent-rack/1" &&
       fixture !== "persistent-oven-rack/1" &&
+      fixture !== "persistent-spanner-oven-rack/1" &&
       fixture !== "persistent-pan-staging/1" &&
       fixture !== "persistent-espresso/1" &&
       fixture !== "persistent-pour-over/1"
@@ -346,9 +348,15 @@ function nativeTask(
     case "rack-transfer":
       return "table-to-rack";
     case "oven-loading":
-      return fixture === "persistent-oven-rack/1" ? "table-to-oven" : null;
+      return fixture === "persistent-oven-rack/1" ||
+        fixture === "persistent-spanner-oven-rack/1"
+        ? "table-to-oven"
+        : null;
     case "oven-retrieval":
-      return fixture === "persistent-oven-rack/1" ? "oven-to-table" : null;
+      return fixture === "persistent-oven-rack/1" ||
+        fixture === "persistent-spanner-oven-rack/1"
+        ? "oven-to-table"
+        : null;
     default:
       return null;
   }

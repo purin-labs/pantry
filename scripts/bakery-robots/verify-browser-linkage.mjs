@@ -79,6 +79,38 @@ const fixtures = [
     timestep: 0.002,
     cell: "unreachable-rack",
   },
+  ...["fairino-fr10", "universal-robots-ur5e", "fanuc-crx10ial"].flatMap(
+    (robot) => [
+      {
+        robot,
+        task: "table-to-oven",
+        scenario: "nominal",
+        timestep: 0.002,
+        cell: "spanner-oven",
+      },
+      {
+        robot,
+        task: "table-to-oven",
+        scenario: "nominal",
+        timestep: 0.002,
+        cell: "spanner-oven-combined",
+      },
+    ],
+  ),
+  {
+    robot: "fairino-fr10",
+    task: "table-to-oven",
+    scenario: "nominal",
+    timestep: 0.002,
+    cell: "spanner-blocked-rack",
+  },
+  {
+    robot: "fairino-fr10",
+    task: "table-to-oven",
+    scenario: "nominal",
+    timestep: 0.002,
+    cell: "spanner-unreachable-rack",
+  },
 ];
 
 if (
@@ -161,8 +193,12 @@ function compare(native, browser) {
   return nativeLegs.map((leg, index) => compareLeg(leg, browserLegs[index]));
 }
 
+function isSingleSkill(fixture) {
+  return fixture.cell === "separate" || fixture.cell === "spanner-oven";
+}
+
 function commandFor(fixture, requestPath) {
-  if (fixture.cell === "separate") return ["run", requestPath];
+  if (isSingleSkill(fixture)) return ["run", requestPath];
   return [
     "cycle",
     "--to-rack",
@@ -175,12 +211,14 @@ function commandFor(fixture, requestPath) {
 function prepareArgs(fixture) {
   return [
     "prepare",
+    "--robot",
+    fixture.robot ?? "fairino-fr10",
     "--task",
     fixture.task,
     "--cell",
     fixture.cell,
     "--case",
-    fixture.cell === "separate" ? fixture.scenario : "nominal",
+    isSingleSkill(fixture) ? fixture.scenario : "nominal",
     "--timestep",
     String(fixture.timestep),
     "--rack-x-mm",
@@ -221,9 +259,10 @@ function runNative(directory, fixture) {
 /** The fixture on the Wasm module, through the host's one-shot programs. */
 function preparationFor(fixture) {
   return {
+    robot: fixture.robot ?? "fairino-fr10",
     task: fixture.task,
     cell: fixture.cell,
-    case: fixture.cell === "separate" ? fixture.scenario : "nominal",
+    case: isSingleSkill(fixture) ? fixture.scenario : "nominal",
     timestep: fixture.timestep,
     rackXMm: fixture.rackX ?? 0,
     rackYMm: fixture.rackY ?? 0,
@@ -239,7 +278,7 @@ async function runBrowser(fixture) {
   const { output: recordingText } = await runProgram(
     host,
     "parity",
-    fixture.cell === "separate"
+    isSingleSkill(fixture)
       ? { kind: "run", request }
       : {
           kind: "cycle",

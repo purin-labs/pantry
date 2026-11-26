@@ -31,7 +31,7 @@ const UR5E_CHART = [
 // docs/evidence/refactor-16/ci-ur5e-mass-check.md and, for the nine appliance
 // entries that Refactor 16 step 9 added, docs/evidence/refactor-16/step-9.md.
 const ASSESSED_ASSETS_SHA256: string =
-  "33acd2e8c3b0bd5bf48bac662ec9084824a114bf2ead677e718581f197234fba";
+  "6013974cbdaf0702d0d85092673c960f2a5e1155fc4b9bcf31cca75ad9847885";
 
 const fixed = tooling.bodies.tool;
 const jaw = tooling.bodies.jaw;
@@ -73,6 +73,13 @@ export type RobotLoadAssessment = StrictUnion<
     }>
 >;
 
+const SPANNER_CELLS: ReadonlySet<string> = new Set([
+  "spanner-oven",
+  "spanner-oven-combined",
+  "spanner-oven-blocked-rack",
+  "spanner-oven-unreachable-rack",
+]);
+
 export async function assessRobotLoad(
   request: PhysicsRequest,
 ): Promise<RobotLoadAssessment> {
@@ -80,11 +87,13 @@ export async function assessRobotLoad(
     return { kind: "unassessed", reason: "unsupported-robot" };
   if (PHYSICS_ASSETS_SHA256 !== ASSESSED_ASSETS_SHA256)
     return { kind: "unassessed", reason: "unverified-model" };
-  // The engine runs pan staging and spanner oven fixtures with the FR10 only.
+  // The engine runs pan staging with the FR10 only.
   const cell = await physicsCellOf(request);
-  if (cell === null || cell === "pan-staging" || cell === "spanner-oven")
+  if (cell === null || cell === "pan-staging")
     return { kind: "unassessed", reason: "unverified-model" };
-  const properties = ur5eCarriedLoad(request.ingredients);
+  const properties = SPANNER_CELLS.has(cell)
+    ? spannerCarriedLoad(request.ingredients)
+    : ur5eCarriedLoad(request.ingredients);
   const limit = chartLimit(properties.centerOfMassDistanceMm);
   if (limit === null)
     return { kind: "unassessed", reason: "outside-chart-distance" };
@@ -107,6 +116,37 @@ export async function assessRobotLoad(
     chartMarginKg: margin,
     readingAllowanceKg: UR5E_PAYLOAD_SOURCE.readingAllowanceKg,
     massBasis: "unmeasured-prototype",
+  };
+}
+
+function spannerCarriedLoad(ingredients: IngredientLoad) {
+  // Plan 24 overhead rim spanner (cell_gripper 0.85 kg + cell_upper_jaw 0.16 kg)
+  // carrying the 400x300 mm MBCO-4ME tray (0.85 kg shell, CoM +6 mm above deck).
+  // Gripper rotates local (x,y,z) to flange (z,-y,x) with zero mount spacer.
+  const fixedMassKg = 0.85;
+  const jawMassKg = 0.16;
+  const toolMassKg = fixedMassKg + jawMassKg;
+  const trayMassKg = 0.85;
+  const totalMassKg = toolMassKg + trayMassKg + ingredients.massKg;
+  const flangeCenterOfMassM: readonly [number, number, number] = [
+    (fixedMassKg * -0.005 +
+      jawMassKg * -0.035 +
+      trayMassKg * -0.069 +
+      ingredients.massKg * -0.056) /
+      totalMassKg,
+    (-ingredients.massKg * ingredients.lateralMm) / 1000 / totalMassKg,
+    (fixedMassKg * 0.16 +
+      jawMassKg * 0.085 +
+      trayMassKg * 0.245 +
+      ingredients.massKg * (0.245 + ingredients.forwardMm / 1000)) /
+      totalMassKg,
+  ];
+  return {
+    toolMassKg,
+    trayMassKg,
+    totalMassKg,
+    flangeCenterOfMassM,
+    centerOfMassDistanceMm: Math.hypot(...flangeCenterOfMassM) * 1000,
   };
 }
 

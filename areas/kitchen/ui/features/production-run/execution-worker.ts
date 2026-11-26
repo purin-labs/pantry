@@ -383,6 +383,8 @@ function sceneStem(
   switch (fixture) {
     case "persistent-oven-rack/1":
       return "combined";
+    case "persistent-spanner-oven-rack/1":
+      return "spanner-oven-combined";
     case "persistent-pan-staging/1":
       return "pan-staging";
     case "persistent-rack/1":
@@ -405,6 +407,7 @@ async function define(
   if (
     (fixture !== "rack" &&
       fixture !== "oven-rack" &&
+      fixture !== "spanner-oven-rack" &&
       fixture !== "pan-staging" &&
       fixture !== "espresso" &&
       fixture !== "pour-over") ||

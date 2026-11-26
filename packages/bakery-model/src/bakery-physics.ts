@@ -142,7 +142,7 @@ export type PhysicsLayout =
   | Readonly<{ kind: "rack-translation"; xMm: number; yMm: number }>;
 
 export const PHYSICS_ASSETS_SHA256 =
-  "33acd2e8c3b0bd5bf48bac662ec9084824a114bf2ead677e718581f197234fba";
+  "6013974cbdaf0702d0d85092673c960f2a5e1155fc4b9bcf31cca75ad9847885";
 
 export function parsePhysicsLayout(value: unknown): PhysicsLayout {
   const raw = object(value);
@@ -180,6 +180,9 @@ export const PHYSICS_CELLS = [
   "combined-unreachable-rack",
   "pan-staging",
   "spanner-oven",
+  "spanner-oven-combined",
+  "spanner-oven-blocked-rack",
+  "spanner-oven-unreachable-rack",
 ] as const;
 
 export type PhysicsCell = (typeof PHYSICS_CELLS)[number];
@@ -263,6 +266,12 @@ export type PersistentOvenCell = PersistentCellBase &
     robot: RobotModel;
     ingredients: IngredientLoad;
   }>;
+type PersistentSpannerOvenCell = PersistentCellBase &
+  Readonly<{
+    fixture: "persistent-spanner-oven-rack/1";
+    robot: RobotModel;
+    ingredients: IngredientLoad;
+  }>;
 export type PersistentRackCell = PersistentCellBase &
   Readonly<{
     fixture: "persistent-rack/1";
@@ -337,6 +346,7 @@ export type PersistentPourOverCell = Omit<PersistentCellBase, "clampForceN"> &
   }>;
 export type PersistentCell =
   | PersistentOvenCell
+  | PersistentSpannerOvenCell
   | PersistentPanCell
   | PersistentRackCell
   | PersistentEspressoCell
@@ -488,6 +498,7 @@ export function parsePersistentCell(value: unknown): PersistentCell | null {
     if (
       raw.schemaVersion !== 1 ||
       (raw.fixture !== "persistent-oven-rack/1" &&
+        raw.fixture !== "persistent-spanner-oven-rack/1" &&
         raw.fixture !== "persistent-rack/1" &&
         raw.fixture !== "persistent-pan-staging/1") ||
       raw.timestep !== 0.002
@@ -524,7 +535,9 @@ export function parsePersistentCell(value: unknown): PersistentCell | null {
         }),
       });
     }
-    return Object.freeze<PersistentOvenCell | PersistentRackCell>({
+    return Object.freeze<
+      PersistentOvenCell | PersistentSpannerOvenCell | PersistentRackCell
+    >({
       fixture: raw.fixture,
       [validatedCell]: true,
       schemaVersion: 1,
@@ -734,17 +747,14 @@ export function parsePersistentPhysicsScene(
   if (robotGlbSha256 !== ROBOTS[cell.robot].glbSha256)
     throw new Error("This Portal cannot display the retained robot visual.");
   const raw = object(setup);
+  const isOvenCell =
+    cell.fixture === "persistent-oven-rack/1" ||
+    cell.fixture === "persistent-spanner-oven-rack/1";
   const fixture = parseFixture(raw.fixture, {
-    bakeryTaskId:
-      cell.fixture === "persistent-oven-rack/1"
-        ? "table-to-oven"
-        : "table-to-rack",
+    bakeryTaskId: isOvenCell ? "table-to-oven" : "table-to-rack",
     case: "nominal",
   });
-  if (
-    cell.fixture === "persistent-oven-rack/1" &&
-    fixture.kind !== "oven-and-rack"
-  )
+  if (isOvenCell && fixture.kind !== "oven-and-rack")
     throw new Error("The oven cell requires the combined fixture.");
   const geometry: PhysicsGeometry[] = [];
   for (const item of list(raw.geometry, 1, 128)) {
@@ -939,11 +949,14 @@ function parseRecording<Request extends NativeRequest>(
   if (fixture.kind === "oven-and-rack") {
     if (request.execution.controller !== "bakery-native")
       throw new Error("Combined fixtures require native execution provenance.");
+    const ovenRails =
+      fixture.glbSha256 === MARUZEN_MBCO4_GLB_SHA256
+        ? ["mbco4_rail_2_left_ledge_col", "mbco4_rail_2_right_ledge_col"]
+        : ["mbco_rail_3_left", "mbco_rail_3_right"];
     for (const name of [
       "rack_rail_left",
       "rack_rail_right",
-      "mbco_rail_3_left",
-      "mbco_rail_3_right",
+      ...ovenRails,
       "table_top",
     ])
       if (!names.has(name))
@@ -1597,7 +1610,7 @@ function parseFixture(
   }
   keys(raw, ["kind", "pose", "doorAngle", "glbSha256"]);
   if (
-    raw.kind === "maruzen-oven" &&
+    (raw.kind === "maruzen-oven" || raw.kind === "oven-and-rack") &&
     raw.glbSha256 === MARUZEN_MBCO4_GLB_SHA256
   ) {
     const doorAngle = request.case === "closed-door" ? 0 : 1.9;

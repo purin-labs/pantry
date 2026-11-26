@@ -72,6 +72,9 @@ impl ClosedLoopConfig {
             Cell::UnreachableRack => "combined-unreachable-rack",
             Cell::PanStaging => "pan-staging",
             Cell::SpannerOven => "spanner-oven",
+            Cell::SpannerOvenCombined => "spanner-oven-combined",
+            Cell::SpannerBlockedRack => "spanner-oven-blocked-rack",
+            Cell::SpannerUnreachableRack => "spanner-oven-unreachable-rack",
             Cell::SpannerOvenDoor => "spanner-oven-door",
         };
         format!(

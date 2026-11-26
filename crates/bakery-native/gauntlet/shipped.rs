@@ -79,7 +79,7 @@ fn run_loading_handoff(assets: &Assets, cfg: &ClosedLoopConfig) -> Result<(Engin
 /// cleanly inside `bakery_native` first).
 pub fn open_shipped_operation(assets: &Assets, cfg: &ClosedLoopConfig) -> Result<PreparedShipped> {
     match (cfg.cell, cfg.task) {
-        (Cell::Combined, BakeryTask::Rack) => {
+        (Cell::Combined | Cell::SpannerOvenCombined, BakeryTask::Rack) => {
             let (mut engine, load_handoff) = run_loading_handoff(assets, cfg)?;
             let unload_start = load_handoff.loaded_start(&engine)?;
             let (ret_stage, unload_binding) = bakery_native::handoff::Return::begin(

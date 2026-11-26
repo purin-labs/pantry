@@ -11,6 +11,7 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { resolve, join } from "node:path";
 import {
   OVEN_CELL,
+  SPANNER_OVEN_CELL,
   defineCell,
   runtimeModule,
 } from "./build-execution-bundle.mjs";
@@ -26,6 +27,18 @@ const binary = resolve(
     "crates/bakery-native/target/release/bakery-native",
 );
 const runtime = process.env.PLAN_70_BROWSER_BUNDLE;
+const fixtureName = process.env.PLAN_70_OVEN_FIXTURE ?? OVEN_CELL.fixture;
+const cellSpec =
+  fixtureName === "spanner-oven-rack"
+    ? {
+        ...SPANNER_OVEN_CELL,
+        robot: process.env.PLAN_70_OVEN_ROBOT ?? SPANNER_OVEN_CELL.robot,
+      }
+    : {
+        ...OVEN_CELL,
+        robot: process.env.PLAN_70_OVEN_ROBOT ?? OVEN_CELL.robot,
+      };
+const isSpanner = cellSpec.fixture === "spanner-oven-rack";
 let sequence = 0;
 
 /** A new native `serve` process or a new Wasm module: nothing carries over. */
@@ -85,7 +98,7 @@ function completed(result) {
       const id = outcome.attemptId;
       assertAcceptedMargins(
         outcome.outcome,
-        id.endsWith("-retrieve") ? ["penetration"] : [],
+        !isSpanner && id.endsWith("-retrieve") ? ["penetration"] : [],
         id,
       );
       // The second run of an attempt pauses and resumes in a new process.
@@ -102,10 +115,10 @@ const definition =
     ? (
         await definitionHost.send({
           op: "define",
-          definition: { ...OVEN_CELL, cell: "cold-cell-1" },
+          definition: { ...cellSpec, cell: "cold-cell-1" },
         })
       ).definition
-    : defineCell(definitionHost.module, "cold-cell-1", OVEN_CELL);
+    : defineCell(definitionHost.module, "cold-cell-1", cellSpec);
 await definitionHost.close();
 writeFileSync(join(output, "0-definition.json"), JSON.stringify(definition));
 // The uninterrupted reference runs each carrier's three operations in one

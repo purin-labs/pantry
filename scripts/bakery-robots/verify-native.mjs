@@ -110,13 +110,26 @@ function phaseCampaign(directory, expected, mode, prefix = "phase") {
   return phases.length - 1;
 }
 
-function verifyCase(task, scenario, timestep, cell = "separate") {
-  const label = cell === "separate" ? task : `${cell}-${task}`;
+function verifyCase(
+  task,
+  scenario,
+  timestep,
+  cell = "separate",
+  robot = "fairino-fr10",
+) {
+  const label =
+    cell === "separate"
+      ? task
+      : robot === "fairino-fr10"
+        ? `${cell}-${task}`
+        : `${robot}-${cell}-${task}`;
   const directory = join(output, `${label}-${scenario}-${timestep}`);
   mkdirSync(directory);
   console.log(`Verifying ${label} ${scenario} at ${timestep}s`);
   const request = run(directory, "request", [
     "prepare",
+    "--robot",
+    robot,
     "--task",
     task,
     "--cell",
@@ -234,16 +247,26 @@ function successfulPlacement(recording) {
   return evidence;
 }
 
-function verifyCombined(cell, scenario, timestep) {
-  const directory = join(output, `${cell}-${scenario}-${timestep}`);
+function verifyCombined(
+  cell,
+  scenario,
+  timestep,
+  robot = "universal-robots-ur5e",
+) {
+  const tag =
+    robot === "universal-robots-ur5e" && !cell.startsWith("spanner-")
+      ? cell
+      : `${robot}-${cell}`;
+  const directory = join(output, `${tag}-${scenario}-${timestep}`);
   mkdirSync(directory);
-  console.log(`Verifying ${cell} ${scenario} at ${timestep}s`);
-  // The FR10 cannot hold the tray in every pose of the combined cell
-  // (actuator-limit at step 0); the UR5e completes it.
+  console.log(`Verifying ${tag} ${scenario} at ${timestep}s`);
+  // The FR10 cannot hold the tray in every pose of the legacy combined cell
+  // (actuator-limit at step 0); UR5e completes it, while FR10, UR5e and
+  // CRX-10iA/L all complete the Plan 24 spanner-oven-combined cell.
   const request = run(directory, "request", [
     "prepare",
     "--robot",
-    "universal-robots-ur5e",
+    robot,
     "--task",
     "table-to-oven",
     "--cell",
@@ -306,7 +329,10 @@ function verifyCombined(cell, scenario, timestep) {
     racking: continuous.racking.outcome,
     continuousAndHandoffExact: true,
   };
-  if (cell === "combined" && scenario === "nominal") {
+  if (
+    (cell === "combined" || cell === "spanner-oven-combined") &&
+    scenario === "nominal"
+  ) {
     successfulPlacement(continuous.racking);
     report.phaseBoundaryCheckpoints =
       phaseCampaign(directory, loading, ["load", requestPath], "load-phase") +
@@ -340,7 +366,7 @@ function verifyCombined(cell, scenario, timestep) {
     const expected =
       scenario === "slip"
         ? "lost-grasp"
-        : cell === "blocked-rack"
+        : cell === "blocked-rack" || cell === "spanner-blocked-rack"
           ? "destination-blocked"
           : "unreachable";
     assert.equal(continuous.racking.outcome.kind, "failed");
@@ -378,8 +404,16 @@ for (const task of ["table-to-rack", "table-to-oven"]) {
   if (task === "table-to-oven")
     results.push(verifyCase(task, "closed-door", 0.002));
 }
-for (const scenario of ["nominal", "blocked", "slip", "closed-door"])
-  results.push(verifyCase("table-to-oven", scenario, 0.002, "spanner-oven"));
+for (const robot of [
+  "fairino-fr10",
+  "universal-robots-ur5e",
+  "fanuc-crx10ial",
+]) {
+  for (const scenario of ["nominal", "blocked", "slip", "closed-door"])
+    results.push(
+      verifyCase("table-to-oven", scenario, 0.002, "spanner-oven", robot),
+    );
+}
 results.push(verifyCase("table-to-oven", "nominal", 0.001, "spanner-oven"));
 const combined = [
   verifyCombined("combined", "nominal", 0.002),
@@ -387,6 +421,17 @@ const combined = [
   verifyCombined("combined", "slip", 0.002),
   verifyCombined("blocked-rack", "nominal", 0.002),
   verifyCombined("unreachable-rack", "nominal", 0.002),
+  verifyCombined("spanner-oven-combined", "nominal", 0.002, "fairino-fr10"),
+  verifyCombined("spanner-oven-combined", "slip", 0.002, "fairino-fr10"),
+  verifyCombined("spanner-blocked-rack", "nominal", 0.002, "fairino-fr10"),
+  verifyCombined("spanner-unreachable-rack", "nominal", 0.002, "fairino-fr10"),
+  verifyCombined(
+    "spanner-oven-combined",
+    "nominal",
+    0.002,
+    "universal-robots-ur5e",
+  ),
+  verifyCombined("spanner-oven-combined", "nominal", 0.002, "fanuc-crx10ial"),
 ];
 writeFileSync(
   join(output, "comparison.json"),

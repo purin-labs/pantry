@@ -22,11 +22,15 @@ import numpy as np
 import yaml
 
 from ur5e_payload_envelope import SOURCE, build_study_model
-from workcell import initialize_pose
+from workcell import arm_addresses, initialize_pose, orientation_error
 
 ROOT = Path(__file__).resolve().parents[2]
 VENDOR = ROOT / "assets/bakery-robots/vendor/universal-robots-ur5e/config/ur5e"
 ROBOT = ROOT / "assets/bakery-robots/universal-robots-ur5e"
+SPANNER_SOURCE = (
+    ROOT
+    / "assets/bakery-mujoco/fr10-workcell/native/universal-robots-ur5e/spanner-oven-combined-nominal.xml"
+)
 JOINTS = ["shoulder_pan", "shoulder_lift", "elbow", "wrist_1", "wrist_2", "wrist_3"]
 LINKS = ["shoulder", "upper_arm", "forearm", "wrist_1", "wrist_2", "wrist_3"]
 # Handbook densities that bound the unmeasured tray material.
@@ -326,6 +330,84 @@ def check_any_pose_torque(samples=200000):
     return bound
 
 
+def check_spanner_model():
+    """Verify UR5e MBCO-4ME spanner-gripper mass, CoM, and flange load formula."""
+    xml = ET.parse(SPANNER_SOURCE)
+    for mesh in xml.findall("./asset/mesh"):
+        mesh.set("file", str((SPANNER_SOURCE.parent / mesh.get("file")).resolve()))
+    checks = []
+    for mass, fwd_mm, lat_mm in (
+        (0.0, 0, 0),
+        (1.0, 0, 0),
+        (1.0, 100, 60),
+        (1.5, -100, -60),
+    ):
+        root_copy = ET.fromstring(ET.tostring(xml.getroot(), encoding="unicode"))
+        contents = root_copy.find(".//geom[@name='cold_contents']")
+        contents.set("mass", str(mass))
+        contents.set("pos", f"{-lat_mm / 1000.0} {fwd_mm / 1000.0} 0.019")
+        model = mujoco.MjModel.from_xml_string(ET.tostring(root_copy, encoding="unicode"))
+        data = mujoco.MjData(model)
+        pos_adr, vel_adr = arm_addresses(model)
+        limits = np.array(
+            [
+                model.joint(model.joint(i).name).range
+                for i in range(model.njnt)
+                if "__" in model.joint(i).name
+            ]
+        )
+        data.qpos[pos_adr] = [-0.6065, -2.2979, -1.5543, -2.431, -2.1773, 1.5708]
+        data.joint("clamp_opening").qpos[0] = 0.0
+        target = np.array([0.38, -0.22, 1.01])
+        jp = np.zeros((3, model.nv))
+        jr = np.zeros((3, model.nv))
+        for _ in range(350):
+            mujoco.mj_forward(model, data)
+            site = data.site("cell_grasp")
+            ep = target - site.xpos
+            er = orientation_error(site.xmat)
+            if np.linalg.norm(ep) < 1e-10 and np.linalg.norm(er) < 1e-10:
+                break
+            mujoco.mj_jacSite(model, data, jp, jr, site.id)
+            jac = np.vstack((jp[:, vel_adr], jr[:, vel_adr]))
+            dq = jac.T @ np.linalg.solve(jac @ jac.T + np.eye(6) * 1e-6, np.concatenate((ep, er)))
+            data.qpos[pos_adr] = np.clip(data.qpos[pos_adr] + dq, limits[:, 0] + 1e-5, limits[:, 1] - 1e-5)
+        mujoco.mj_forward(model, data)
+        data.joint("mbco_tray_free").qpos[:3] = data.site("cell_grasp").xpos + [0.0, 0.005, -0.011]
+        data.joint("mbco_tray_free").qpos[3:] = [1.0, 0.0, 0.0, 0.0]
+        mujoco.mj_forward(model, data)
+        flange = data.site("cell_nominal_flange")
+        masses = [float(model.body(n).mass[0]) for n in ("cell_gripper", "cell_upper_jaw", "mbco_tray")]
+        centers = [data.body(n).xipos.copy() for n in ("cell_gripper", "cell_upper_jaw", "mbco_tray")]
+        total = sum(masses)
+        rel = flange.xmat.reshape(3, 3).T @ (np.average(centers, axis=0, weights=masses) - flange.xpos)
+        expected_total = 0.85 + 0.16 + 0.85 + mass
+        expected_rel = np.array(
+            [
+                (0.85 * -0.005 + 0.16 * -0.035 + 0.85 * -0.069 + mass * -0.056) / expected_total,
+                (-mass * lat_mm / 1000.0) / expected_total,
+                (0.85 * 0.16 + 0.16 * 0.085 + 0.85 * 0.245 + mass * (0.245 + fwd_mm / 1000.0))
+                / expected_total,
+            ]
+        )
+        checks.append(
+            dict(
+                contentsKg=mass,
+                forwardMm=fwd_mm,
+                lateralMm=lat_mm,
+                totalMassKg=total,
+                flangeCenterOfMassM=rel.tolist(),
+                centerOfMassDistanceMm=float(np.linalg.norm(rel) * 1000.0),
+                maxComponentErrorM=float(np.max(np.abs(rel - expected_rel))),
+                agrees=bool(
+                    abs(total - expected_total) < 1e-12
+                    and np.allclose(rel, expected_rel, atol=1e-9)
+                ),
+            )
+        )
+    return checks
+
+
 def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("study", type=Path)
@@ -336,6 +418,7 @@ def main():
     parts, bodies = check_tool(model, xml)
     tray = check_tray(model, xml)
     actuators = check_actuators(model)
+    spanner_loads = check_spanner_model()
     force = np.array([a["modelForceRangeNm"][1] for a in actuators])
     workflow, cases = check_workflow_torque(args.study)
     any_pose = check_any_pose_torque()
@@ -353,6 +436,7 @@ def main():
         toolMassKg=sum(b["modelMassKg"] for b in bodies),
         tray=tray,
         actuators=actuators,
+        spannerLoads=spanner_loads,
         joints=JOINTS,
         workflowMaxGravityTorqueNm=workflow.round(3).tolist(),
         workflowShareOfRange=(workflow / force).round(3).tolist(),
@@ -361,7 +445,7 @@ def main():
         cases=cases,
     )
     passed = (
-        all(row["agrees"] for row in links + parts + bodies + actuators)
+        all(row["agrees"] for row in links + parts + bodies + actuators + spanner_loads)
         and tray["withinMetalRange"]
         and bool(np.all(workflow < force))
     )

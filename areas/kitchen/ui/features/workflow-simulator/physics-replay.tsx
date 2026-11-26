@@ -304,7 +304,9 @@ export class PhysicsReplay extends React.Component<Props, State> {
     await this.readFile(readExample(task));
   }
 
-  private async runSpanner(mode: "transfer" | "oven-cycle"): Promise<void> {
+  private async runSpanner(
+    mode: "transfer" | "oven-cycle" | "rack-cycle",
+  ): Promise<void> {
     if (this.props.robotRunner.running) return;
     this.props.actions.pause();
     const generation = ++this.importGeneration;
@@ -312,16 +314,19 @@ export class PhysicsReplay extends React.Component<Props, State> {
       importing: { kind: "reading" },
       rehearsing: { kind: "idle" },
       notice:
-        mode === "oven-cycle"
-          ? "Running FR10 spanner oven cycle in browser MuJoCo…"
-          : "Running FR10 spanner oven load in browser MuJoCo…",
+        mode === "rack-cycle"
+          ? "Running FR10 spanner oven → table → rack cycle in browser MuJoCo…"
+          : mode === "oven-cycle"
+            ? "Running FR10 spanner oven cycle in browser MuJoCo…"
+            : "Running FR10 spanner oven load in browser MuJoCo…",
     });
     try {
       const result = await this.props.robotRunner.execute(
         {
           kind: "selection",
           robot: "fairino-fr10",
-          cell: "spanner-oven",
+          cell:
+            mode === "rack-cycle" ? "spanner-oven-combined" : "spanner-oven",
           task: "table-to-oven",
           scenario: "nominal",
           mode,
@@ -853,6 +858,21 @@ export class PhysicsReplay extends React.Component<Props, State> {
                   <small>
                     FR10 · Load and retrieve on MBCO-4ME · 52.3 sec · Browser
                     MuJoCo
+                  </small>
+                </span>
+                <ArrowRight size={16} aria-hidden="true" />
+              </button>
+              <button
+                className="physics-example"
+                disabled={busy || this.props.robotRunner.running}
+                onClick={this.runSpanner.bind(this, "rack-cycle")}
+              >
+                <Box size={20} aria-hidden="true" />
+                <span>
+                  <strong>Spanner oven → table → rack (MBCO-4ME)</strong>
+                  <small>
+                    FR10 · Load, retrieve and rack on MBCO-4ME · 70.1 sec ·
+                    Browser MuJoCo
                   </small>
                 </span>
                 <ArrowRight size={16} aria-hidden="true" />

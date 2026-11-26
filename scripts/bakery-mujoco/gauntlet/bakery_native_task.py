@@ -117,6 +117,106 @@ PRESETS: dict[str, NativeTaskPreset] = {
         max_contact_force_n=60.0,
         goal_tol_xyz=(0.035, 0.035, 0.015),
     ),
+    'fr10_spanner_combined_rack': NativeTaskPreset(
+        task_id='fr10_spanner_combined_rack',
+        robot='fairino-fr10',
+        cell='spanner-oven-combined',
+        task='table-to-rack',
+        support_body='cell_rack',
+        prompt=(
+            'Transfer the retrieved 400x300 mm tray from the prep table onto '
+            'the cooling rack in the FR10 MBCO-4ME spanner-oven cell.'
+        ),
+        ingredient_mass_kg=1.0,
+        clamp_force_n=100.0,
+        control_dt_s=0.02,
+        episode_s=36.0,
+        cam_pos=(0.35, -0.45, 2.72),
+        cam_fovy_deg=56.0,
+        max_grasp_force_n=35.0,
+        max_contact_force_n=60.0,
+        goal_tol_xyz=(0.035, 0.035, 0.015),
+    ),
+    'ur5e_spanner_oven_load': NativeTaskPreset(
+        task_id='ur5e_spanner_oven_load',
+        robot='universal-robots-ur5e',
+        cell='spanner-oven',
+        task='table-to-oven',
+        support_body='mbco4_oven',
+        prompt=(
+            'Load the 400x300 mm tray from the prep table onto Rail #2 of the '
+            'Maruzen MBCO-4ME convection oven using the UR5e spanner gripper.'
+        ),
+        ingredient_mass_kg=1.0,
+        clamp_force_n=100.0,
+        control_dt_s=0.02,
+        episode_s=44.0,
+        cam_pos=(0.02, -0.02, 2.72),
+        cam_fovy_deg=56.0,
+        max_grasp_force_n=35.0,
+        max_contact_force_n=60.0,
+        goal_tol_xyz=(0.022, 0.045, 0.012),
+    ),
+    'ur5e_spanner_combined_rack': NativeTaskPreset(
+        task_id='ur5e_spanner_combined_rack',
+        robot='universal-robots-ur5e',
+        cell='spanner-oven-combined',
+        task='table-to-rack',
+        support_body='cell_rack',
+        prompt=(
+            'Transfer the retrieved 400x300 mm tray from the prep table onto '
+            'the cooling rack in the UR5e MBCO-4ME spanner-oven cell.'
+        ),
+        ingredient_mass_kg=1.0,
+        clamp_force_n=100.0,
+        control_dt_s=0.02,
+        episode_s=36.0,
+        cam_pos=(0.25, -0.45, 2.72),
+        cam_fovy_deg=56.0,
+        max_grasp_force_n=35.0,
+        max_contact_force_n=60.0,
+        goal_tol_xyz=(0.035, 0.035, 0.015),
+    ),
+    'crx10_spanner_oven_load': NativeTaskPreset(
+        task_id='crx10_spanner_oven_load',
+        robot='fanuc-crx10ial',
+        cell='spanner-oven',
+        task='table-to-oven',
+        support_body='mbco4_oven',
+        prompt=(
+            'Load the 400x300 mm tray from the prep table onto Rail #2 of the '
+            'Maruzen MBCO-4ME convection oven using the FANUC CRX-10iA/L spanner gripper.'
+        ),
+        ingredient_mass_kg=1.0,
+        clamp_force_n=100.0,
+        control_dt_s=0.02,
+        episode_s=44.0,
+        cam_pos=(0.02, -0.02, 2.72),
+        cam_fovy_deg=56.0,
+        max_grasp_force_n=35.0,
+        max_contact_force_n=60.0,
+        goal_tol_xyz=(0.022, 0.045, 0.012),
+    ),
+    'crx10_spanner_combined_rack': NativeTaskPreset(
+        task_id='crx10_spanner_combined_rack',
+        robot='fanuc-crx10ial',
+        cell='spanner-oven-combined',
+        task='table-to-rack',
+        support_body='cell_rack',
+        prompt=(
+            'Transfer the retrieved 400x300 mm tray from the prep table onto '
+            'the cooling rack in the FANUC CRX-10iA/L MBCO-4ME spanner-oven cell.'
+        ),
+        ingredient_mass_kg=1.0,
+        clamp_force_n=100.0,
+        control_dt_s=0.02,
+        episode_s=36.0,
+        cam_pos=(0.35, -0.45, 2.72),
+        cam_fovy_deg=56.0,
+        max_grasp_force_n=35.0,
+        max_contact_force_n=60.0,
+        goal_tol_xyz=(0.035, 0.035, 0.015),
+    ),
     'fr10_spanner_door_open': NativeTaskPreset(
         task_id='fr10_spanner_door_open',
         robot='fairino-fr10',
@@ -500,15 +600,17 @@ class BakeryNativeTask:
     limit = min(self.preset.clamp_force_n, 15.5) if self._is_spanner else self.preset.clamp_force_n
     clamp_act.forcerange = [-limit, limit]
 
-    # Remove the non-colliding, invisible, 1e-9 kg `ingredient_payload` placeholder
-    # body so `MonitorDevice`'s `gauntlet/poses` stays <= 9 non-robot bodies (63 <= 64)
-    # for unmodified `robosim_gauntlet.wrappers.Recorder(max_size=64)`.
-    try:
-      ip_body = spec.body('ingredient_payload')
-      if ip_body is not None:
-        spec.delete(ip_body)
-    except Exception:
-      pass
+    # Remove non-task static internal/placeholder bodies (`ingredient_payload`,
+    # sealed rear-baffle `mbco4_fan` with 0 DOFs) so `MonitorDevice`'s
+    # `gauntlet/poses` stays <= 9 non-robot bodies (63 <= 64) for unmodified
+    # `robosim_gauntlet.wrappers.Recorder(max_size=64)` even in combined cells.
+    for body_name in ('ingredient_payload', 'mbco4_fan'):
+      try:
+        extra_body = spec.body(body_name)
+        if extra_body is not None:
+          spec.delete(extra_body)
+      except Exception:
+        pass
 
     # Make visible collision geoms (`group == 3`) opaque so MuJoCo's OpenGL depth
     # buffer renders solid steel trays, ovens, racks, and arms accurately without

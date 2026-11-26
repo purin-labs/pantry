@@ -1,5 +1,5 @@
 {
-  "total": {"copies":745,"lines":12996},
+  "total": {"copies":744,"lines":12956},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -324,7 +324,6 @@
     "packages/production-simulation/src/recipes/financier-pack/model.ts = packages/production-simulation/src/recipes/latte/model.ts": {"copies":1,"lines":32},
     "packages/production-simulation/src/resource-history-view.ts = packages/production-simulation/src/scheduling-history-document.ts": {"copies":1,"lines":9},
     "packages/production-simulation/src/resource-history-view.ts = packages/production-simulation/src/storage-history-view.ts": {"copies":1,"lines":9},
-    "packages/production-simulation/src/simulator/browser-physics-asset.ts = packages/production-simulation/src/simulator/browser-physics-asset.ts": {"copies":1,"lines":40},
     "packages/production-simulation/src/state-document.ts = packages/production-simulation/src/state-document.ts": {"copies":2,"lines":20},
     "services/commerce/src/checkout-charge-attempt.ts = services/commerce/src/shipping-quote-attempt.ts": {"copies":2,"lines":48},
     "services/commerce/src/checkout-profile-resolution.ts = services/commerce/src/checkout-profile-resolution.ts": {"copies":1,"lines":12},

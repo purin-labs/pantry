@@ -12,6 +12,11 @@ use std::{
 };
 
 const DIRECTORY: &str = "assets/bakery-mujoco/fr10-workcell/native";
+const SPANNER_ROBOTS: [Robot; 3] = [
+    Robot::FairinoFr10,
+    Robot::UniversalRobotsUr5e,
+    Robot::FanucCrx10ial,
+];
 
 #[derive(Clone, Copy, Debug, PartialEq, Deserialize, clap::ValueEnum)]
 #[serde(rename_all = "kebab-case")]
@@ -22,6 +27,9 @@ pub enum Cell {
     UnreachableRack,
     PanStaging,
     SpannerOven,
+    SpannerOvenCombined,
+    SpannerBlockedRack,
+    SpannerUnreachableRack,
     SpannerOvenDoor,
 }
 
@@ -34,6 +42,9 @@ impl Cell {
             Self::UnreachableRack => "combined-unreachable-rack",
             Self::PanStaging => "pan-staging",
             Self::SpannerOven => "spanner-oven",
+            Self::SpannerOvenCombined => "spanner-oven-combined",
+            Self::SpannerBlockedRack => "spanner-oven-blocked-rack",
+            Self::SpannerUnreachableRack => "spanner-oven-unreachable-rack",
             Self::SpannerOvenDoor => "spanner-oven-door",
         }
     }
@@ -231,6 +242,9 @@ impl Assets {
             Cell::UnreachableRack,
             Cell::PanStaging,
             Cell::SpannerOven,
+            Cell::SpannerOvenCombined,
+            Cell::SpannerBlockedRack,
+            Cell::SpannerUnreachableRack,
             Cell::SpannerOvenDoor,
         ] {
             if request.model_hash == self.model_hash(request.robot, cell) {
@@ -243,7 +257,12 @@ impl Assets {
     pub fn is_combined(&self, request: &Request) -> bool {
         matches!(
             self.cell(request),
-            Ok(Cell::Combined | Cell::BlockedRack | Cell::UnreachableRack)
+            Ok(Cell::Combined
+                | Cell::BlockedRack
+                | Cell::UnreachableRack
+                | Cell::SpannerOvenCombined
+                | Cell::SpannerBlockedRack
+                | Cell::SpannerUnreachableRack)
         )
     }
 
@@ -262,7 +281,7 @@ impl Assets {
         }
         if cell == Cell::SpannerOven {
             ensure!(
-                request.robot == Robot::FairinoFr10
+                SPANNER_ROBOTS.contains(&request.robot)
                     && matches!(
                         request.bakery_task_id,
                         BakeryTask::Oven | BakeryTask::Unload
@@ -271,7 +290,17 @@ impl Assets {
                         request.case,
                         Case::Nominal | Case::Slip | Case::ClosedDoor | Case::Blocked
                     ),
-                "Spanner oven requires the FR10 MBCO-4ME spanner-gripper fixture"
+                "Spanner oven requires an MBCO-4ME spanner-gripper fixture (FR10, UR5e or CRX-10iA/L)"
+            );
+        }
+        if matches!(
+            cell,
+            Cell::SpannerOvenCombined | Cell::SpannerBlockedRack | Cell::SpannerUnreachableRack
+        ) {
+            ensure!(
+                SPANNER_ROBOTS.contains(&request.robot)
+                    && matches!(request.case, Case::Nominal | Case::Slip),
+                "Combined spanner oven requires FR10, UR5e or CRX-10iA/L with nominal or slip case"
             );
         }
         if cell == Cell::SpannerOvenDoor {
@@ -286,8 +315,13 @@ impl Assets {
             );
         }
         ensure!(
-            !matches!(cell, Cell::BlockedRack | Cell::UnreachableRack)
-                || matches!(request.case, Case::Nominal | Case::Slip),
+            !matches!(
+                cell,
+                Cell::BlockedRack
+                    | Cell::UnreachableRack
+                    | Cell::SpannerBlockedRack
+                    | Cell::SpannerUnreachableRack
+            ) || matches!(request.case, Case::Nominal | Case::Slip),
             "Rack fault fixtures require nominal loading"
         );
         Ok(cell)

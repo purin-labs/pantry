@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import math
 import sys
+import xml.etree.ElementTree as ET
+from dataclasses import dataclass
 from pathlib import Path
 
 import mujoco
@@ -30,12 +32,88 @@ MBCO4_MODEL_XML = MBCO4_DIR / "model.xml"
 MBCO4_TRAY_XML = MBCO4_DIR / "tray_model.xml"
 MBCO4_GLB = MBCO4_DIR / "maruzen-mbco-4me.glb"
 FR10_SPEC: RobotSpec = next(robot for robot in ROBOTS if robot.slug == "fairino-fr10")
+SPANNER_ROBOT_SLUGS = (
+    "fairino-fr10",
+    "universal-robots-ur5e",
+    "fanuc-crx10ial",
+)
+SPANNER_ROBOTS: tuple[RobotSpec, ...] = tuple(
+    next(robot for robot in ROBOTS if robot.slug == slug)
+    for slug in SPANNER_ROBOT_SLUGS
+)
+
+# Empty 400x300 mm MBCO-4ME tray shell mass split across collision boxes so
+# total mass is 0.85 kg with CoM at (0, 0, 0.006 m) AND MuJoCo recomputes mass,
+# CoM and inertia automatically when Rust mutates `cold_contents`.
+TRAY_SHELL_MASSES = {
+    "mbco4_tray_deck_col": 0.4675,
+    "mbco4_tray_front_rim_col": 0.11,
+    "mbco4_tray_rear_rim_col": 0.11,
+    "mbco4_tray_left_rim_col": 0.08125,
+    "mbco4_tray_right_rim_col": 0.08125,
+}
+
+
+@dataclass(frozen=True)
+class SpannerLayout:
+    base_pos: tuple[float, float, float]
+    pedestal_col_half: float
+    pedestal_plate_half: float
+    table_pos: tuple[float, float, float]
+    table_size: tuple[float, float, float]
+    tray_pos: tuple[float, float, float]
+    rack_pos: tuple[float, float]
+    rack_z: float
+    home_q: tuple[float, ...]
+
+
+_STANDARD_LAYOUT = SpannerLayout(
+    base_pos=ws.ARM_BASE_POS,
+    pedestal_col_half=0.10,
+    pedestal_plate_half=0.16,
+    table_pos=ws.PREP_TABLE_POS,
+    table_size=(0.46, 0.34, 0.020),
+    tray_pos=ws.PREP_TRAY_WORLD,
+    rack_pos=(0.78, -0.86),
+    rack_z=0.850,
+    home_q=tuple(float(v) for v in ws.FR10_HOME_Q),
+)
+
+SPANNER_LAYOUTS: dict[str, SpannerLayout] = {
+    "fairino-fr10": _STANDARD_LAYOUT,
+    "fanuc-crx10ial": SpannerLayout(
+        base_pos=_STANDARD_LAYOUT.base_pos,
+        pedestal_col_half=_STANDARD_LAYOUT.pedestal_col_half,
+        pedestal_plate_half=_STANDARD_LAYOUT.pedestal_plate_half,
+        table_pos=_STANDARD_LAYOUT.table_pos,
+        table_size=_STANDARD_LAYOUT.table_size,
+        tray_pos=_STANDARD_LAYOUT.tray_pos,
+        rack_pos=_STANDARD_LAYOUT.rack_pos,
+        rack_z=_STANDARD_LAYOUT.rack_z,
+        home_q=(-0.798, -0.710, 3.389, 0.898, -1.157, 2.675),
+    ),
+    "universal-robots-ur5e": SpannerLayout(
+        base_pos=(-0.06, -0.96, 0.95),
+        pedestal_col_half=0.09,
+        pedestal_plate_half=0.11,
+        table_pos=(0.48, -0.14, 0.0),
+        table_size=(0.34, 0.20, 0.020),
+        tray_pos=(0.38, -0.22, ws.PREP_TABLE_TOP_Z + 0.0005),
+        rack_pos=(0.48, -0.78),
+        rack_z=0.760,
+        home_q=(-0.6065, -2.2979, -1.5543, -2.431, -2.1773, 1.5708),
+    ),
+}
 
 # Re-export verified constants for build_native_assets.py
 SPANNER_HOME_Q = ws.FR10_HOME_Q
 SPANNER_OPEN_M = ws.GRIPPER_OPEN_M
 SPANNER_TRAY_WORLD = ws.PREP_TRAY_WORLD
 SPANNER_TRAY_QUAT = (1.0, 0.0, 0.0, 0.0)
+
+
+def spanner_home_q(robot_slug: str) -> tuple[float, ...]:
+    return SPANNER_LAYOUTS[robot_slug].home_q
 
 
 def _build_spanner_gripper_spec() -> mujoco.MjSpec:
@@ -282,18 +360,118 @@ def _strip_visuals_from_spec(spec: mujoco.MjSpec) -> None:
         spec.delete(tex)
 
 
+def _build_spanner_tray_spec() -> mujoco.MjSpec:
+    """Build the 400x300 mm MBCO-4ME tray with geom-derived inertia so ingredient edits take effect."""
+    tray_root = ET.parse(MBCO4_TRAY_XML).getroot()
+    mbco4_el = tray_root.find(".//body[@name='mbco4_tray']")
+    if mbco4_el is None:
+        raise RuntimeError("Missing mbco4_tray body in tray_model.xml")
+    for tag in ("inertial", "include", "body"):
+        for child in list(mbco4_el.findall(tag)):
+            mbco4_el.remove(child)
+    for asset_el in list(tray_root.findall("asset")):
+        tray_root.remove(asset_el)
+    tray = mujoco.MjSpec.from_string(ET.tostring(tray_root, encoding="unicode"))
+    tray.default.name = "tray_defaults"
+    tray_body = tray.body("mbco4_tray")
+    tray_body.name = "mbco_tray"
+    for gname, gmass in TRAY_SHELL_MASSES.items():
+        tray.geom(gname).mass = gmass
+    tray_body.add_freejoint(name="mbco_tray_free")
+    # Default 0.45 kg dough/pastry load (overridden by Request.ingredients in Rust)
+    tray_body.add_geom(
+        name="cold_contents",
+        type=mujoco.mjtGeom.mjGEOM_BOX,
+        pos=[0.0, 0.0, 0.019],
+        size=[0.14, 0.095, 0.012],
+        mass=0.45,
+        contype=1,
+        conaffinity=1,
+        condim=4,
+        friction=[0.5, 0.005, 0.0001],
+        rgba=[0.84, 0.57, 0.22, 1.0],
+    )
+    return tray
+
+
+def _add_cooling_rack(
+    cell: mujoco.MjSpec,
+    layout: SpannerLayout,
+    *,
+    rack_blocked: bool,
+    rack_unreachable: bool,
+) -> None:
+    """Add a 400x300 mm cooling rack supporting the left and right tray rails."""
+    rx, ry = layout.rack_pos
+    rz = layout.rack_z
+    rack = cell.worldbody.add_body(
+        name="cell_rack",
+        pos=[8.0 if rack_unreachable else rx, ry, 0.0],
+    )
+    for name, x_off in (("rack_rail_left", -0.185), ("rack_rail_right", 0.185)):
+        rack.add_geom(
+            name=name,
+            type=mujoco.mjtGeom.mjGEOM_BOX,
+            pos=[x_off, 0.0, rz - 0.010],
+            size=[0.015, 0.165, 0.010],
+            rgba=[0.55, 0.62, 0.64, 1.0],
+            contype=1,
+            conaffinity=1,
+            condim=4,
+            friction=[0.55, 0.012, 0.003],
+        )
+    post_h = (rz - 0.020) * 0.5
+    for idx, (px, py) in enumerate(
+        ((-0.215, -0.175), (-0.215, 0.175), (0.215, -0.175), (0.215, 0.175)), 1
+    ):
+        rack.add_geom(
+            name=f"rack_post_{idx}",
+            type=mujoco.mjtGeom.mjGEOM_BOX,
+            pos=[px, py, post_h],
+            size=[0.018, 0.018, post_h],
+            rgba=[0.55, 0.62, 0.64, 1.0],
+            contype=1,
+            conaffinity=1,
+            condim=4,
+        )
+    rack.add_site(
+        name="rack_tray_center",
+        pos=[0.0, 0.0, rz + 0.0005],
+        size=[0.008, 0.0, 0.0],
+        group=3,
+    )
+    if rack_blocked:
+        rack.add_geom(
+            name="destination_obstruction",
+            type=mujoco.mjtGeom.mjGEOM_BOX,
+            pos=[0.0, 0.0, rz + 0.045],
+            size=[0.17, 0.12, 0.045],
+            contype=1,
+            conaffinity=1,
+            condim=4,
+            rgba=[0.8, 0.15, 0.1, 1.0],
+        )
+
+
 def compose_spanner_oven_cell(
     *,
     blocked: bool = False,
     door_closed: bool = False,
     articulated_door: bool = False,
+    include_rack: bool = False,
+    rack_blocked: bool = False,
+    rack_unreachable: bool = False,
+    robot_spec: RobotSpec = FR10_SPEC,
 ) -> mujoco.MjSpec:
-    """Build the Plan 24 FR10 + Maruzen MBCO-4ME spanner-gripper workcell (MuJoCo 4.0.0)."""
+    """Build the Plan 24 cobot + Maruzen MBCO-4ME spanner-gripper workcell (MuJoCo 4.0.0)."""
     if mujoco.__version__ != "4.0.0":
         raise RuntimeError("Use the pinned MuJoCo 4.0.0 environment.")
+    layout = SPANNER_LAYOUTS[robot_spec.slug]
 
     cell = mujoco.MjSpec()
-    cell.modelname = "FR10 Maruzen MBCO-4ME spanner-gripper workcell (Plan 24)"
+    cell.modelname = (
+        f"{robot_spec.title} Maruzen MBCO-4ME spanner-gripper workcell (Plan 24)"
+    )
     cell.compiler.degree = False
     cell.compiler.autolimits = True
     cell.option.timestep = 0.002
@@ -313,16 +491,18 @@ def compose_spanner_oven_cell(
         condim=4,
     )
 
-    # FR10 pedestal & mount rotated -90 deg about Z so neutral reach points along +Y
+    # Robot pedestal & mount rotated -90 deg about Z so neutral reach points along +Y
+    bx, by, bz = layout.base_pos
     ped = cell.worldbody.add_body(
         name="cell_pedestal",
-        pos=[ws.ARM_BASE_POS[0], ws.ARM_BASE_POS[1], 0.0],
+        pos=[bx, by, 0.0],
     )
+    col_h = (bz - 0.050) * 0.5
     ped.add_geom(
         name="pedestal_column",
         type=mujoco.mjtGeom.mjGEOM_BOX,
-        pos=[0.0, 0.0, 0.375],
-        size=[0.10, 0.10, 0.375],
+        pos=[0.0, 0.0, col_h],
+        size=[layout.pedestal_col_half, layout.pedestal_col_half, col_h],
         rgba=[0.55, 0.62, 0.64, 1.0],
         contype=1,
         conaffinity=1,
@@ -331,8 +511,8 @@ def compose_spanner_oven_cell(
     ped.add_geom(
         name="pedestal_plate",
         type=mujoco.mjtGeom.mjGEOM_BOX,
-        pos=[0.0, 0.0, 0.775],
-        size=[0.16, 0.16, 0.025],
+        pos=[0.0, 0.0, bz - 0.025],
+        size=[layout.pedestal_plate_half, layout.pedestal_plate_half, 0.025],
         rgba=[0.55, 0.62, 0.64, 1.0],
         contype=1,
         conaffinity=1,
@@ -340,34 +520,38 @@ def compose_spanner_oven_cell(
     )
     ped.add_site(
         name="robot_mount",
-        pos=[0.0, 0.0, ws.ARM_BASE_POS[2]],
+        pos=[0.0, 0.0, bz],
         quat=list(ws.ARM_BASE_QUAT),
         size=[0.008, 0.0, 0.0],
         group=3,
     )
 
     # Prep table (stainless tabletop at Z = 0.850 m)
-    tx, ty, _ = ws.PREP_TABLE_POS
+    tx, ty, _ = layout.table_pos
+    tsx, tsy, tsz = layout.table_size
     tbl = cell.worldbody.add_body(name="cell_table", pos=[tx, ty, 0.0])
     tbl.add_geom(
         name="table_top",
         type=mujoco.mjtGeom.mjGEOM_BOX,
-        pos=[0.0, 0.0, ws.PREP_TABLE_TOP_Z - 0.020],
-        size=[0.46, 0.34, 0.020],
+        pos=[0.0, 0.0, ws.PREP_TABLE_TOP_Z - tsz],
+        size=[tsx, tsy, tsz],
         rgba=[0.62, 0.65, 0.68, 1.0],
         contype=1,
         conaffinity=1,
         condim=4,
         friction=[0.55, 0.012, 0.003],
     )
+    lx_off = tsx - 0.04
+    ly_off = tsy - 0.04
+    leg_h = (ws.PREP_TABLE_TOP_Z - 2.0 * tsz) * 0.5
     for idx, (lx, ly) in enumerate(
-        ((-0.42, -0.30), (-0.42, 0.30), (0.42, -0.30), (0.42, 0.30)), 1
+        ((-lx_off, -ly_off), (-lx_off, ly_off), (lx_off, -ly_off), (lx_off, ly_off)), 1
     ):
         tbl.add_geom(
             name=f"table_leg_{idx}",
             type=mujoco.mjtGeom.mjGEOM_BOX,
-            pos=[lx, ly, (ws.PREP_TABLE_TOP_Z - 0.040) * 0.5],
-            size=[0.022, 0.022, (ws.PREP_TABLE_TOP_Z - 0.040) * 0.5],
+            pos=[lx, ly, leg_h],
+            size=[0.022, 0.022, leg_h],
             rgba=[0.55, 0.62, 0.64, 1.0],
             contype=1,
             conaffinity=1,
@@ -375,10 +559,18 @@ def compose_spanner_oven_cell(
         )
     cell.worldbody.add_site(
         name="source_tray_center",
-        pos=list(ws.PREP_TRAY_WORLD),
+        pos=list(layout.tray_pos),
         size=[0.008, 0.0, 0.0],
         group=3,
     )
+
+    if include_rack:
+        _add_cooling_rack(
+            cell,
+            layout,
+            rack_blocked=rack_blocked,
+            rack_unreachable=rack_unreachable,
+        )
 
     # Left-side Maruzen MBCO-4ME convection oven (left-hinged door swings outward!)
     oven = mujoco.MjSpec.from_file(str(MBCO4_MODEL_XML))
@@ -487,31 +679,12 @@ def compose_spanner_oven_cell(
         condim=4,
     )
 
-    # FAIRINO FR10 arm + overhead spanner gripper
-    attach_robot(cell, FR10_SPEC)
+    # Cobot arm + overhead spanner gripper
+    attach_robot(cell, robot_spec)
     gripper = _build_spanner_gripper_spec()
     gripper.default.name = "gripper_defaults"
     cell.attach(gripper, site=cell.site("cell_nominal_flange"), prefix="")
 
     # 400x300 mm Maruzen MBCO-4ME baking tray (`mbco_tray` + `mbco_tray_free` + `cold_contents`)
-    tray = mujoco.MjSpec.from_file(str(MBCO4_TRAY_XML))
-    tray.default.name = "tray_defaults"
-    _strip_visuals_from_spec(tray)
-    tray_body = tray.body("mbco4_tray")
-    tray_body.name = "mbco_tray"
-    tray_body.add_freejoint(name="mbco_tray_free")
-    # Default 0.45 kg dough/pastry load (overridden by Request.ingredients in Rust)
-    tray_body.add_geom(
-        name="cold_contents",
-        type=mujoco.mjtGeom.mjGEOM_BOX,
-        pos=[0.0, 0.0, 0.019],
-        size=[0.14, 0.095, 0.012],
-        mass=0.45,
-        contype=1,
-        conaffinity=1,
-        condim=4,
-        friction=[0.5, 0.005, 0.0001],
-        rgba=[0.84, 0.57, 0.22, 1.0],
-    )
-    cell.attach(tray, frame=cell.worldbody.add_frame(), prefix="")
+    cell.attach(_build_spanner_tray_spec(), frame=cell.worldbody.add_frame(), prefix="")
     return cell
