@@ -1,5 +1,6 @@
 import { Select } from "@purin-labs/ui/select";
 import React from "react";
+import { Button } from "@purin-labs/ui/index";
 import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import { ArchiveConfirm } from "@purin-labs/area-integrations-contract/ui/features/integrations/archive-confirm";
 import type { Variant } from "@purin-labs/type-utils";
@@ -48,15 +49,14 @@ export function WorkspaceSettingsPage(
           </p>
         </div>
         {props.organisation.lifecycle === "archived" ? (
-          <button
-            type="button"
+          <Button
             onClick={props.actions.restoreOrganisation}
             disabled={mutationBlocked(props.mutations, {
               kind: "workspace_lifecycle",
             })}
           >
             Restore workspace
-          </button>
+          </Button>
         ) : (
           <ArchiveConfirm
             organisationName={props.organisation.name}
@@ -118,15 +118,15 @@ export function WorkspaceSettingsPage(
                 <Select.Popup>{INVITE_ROLES.map(renderRoleItem)}</Select.Popup>
               </Select.Root>
             </label>
-            <button
+            <Button
               type="submit"
-              className="connection-primary-action"
+              variant="primary"
               disabled={mutationBlocked(props.mutations, {
                 kind: "invite_member",
               })}
             >
               Invite
-            </button>
+            </Button>
             {renderMutationFeedback(props.feedback, { kind: "invite_member" })}
             <p className="notice-text">
               Share the invitation link. It works for 7 days, for this Google
@@ -320,10 +320,9 @@ export function ConfirmButton(props: {
   for (const [key, value] of Object.entries(props.data))
     attributes[`data-${key}`] = value;
   return (
-    <button
-      type="button"
+    <Button
       {...attributes}
-      className={confirming ? "confirming" : undefined}
+      variant={confirming ? "danger" : "secondary"}
       aria-pressed={confirming}
       aria-label={
         props.name === undefined ? undefined : `${label} ${props.name}`
@@ -340,7 +339,7 @@ export function ConfirmButton(props: {
       }
     >
       {label}
-    </button>
+    </Button>
   );
 }
 

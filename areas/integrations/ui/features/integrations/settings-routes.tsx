@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@purin-labs/ui/index";
 import {
   useLocation,
   useNavigate,
@@ -335,9 +336,9 @@ export function MailboxSettingsRoute(
         <RecoverableError
           message={route.content.problem}
           action={
-            <button type="button" onClick={route.retry}>
+            <Button onClick={route.retry}>
               Try again
-            </button>
+            </Button>
           }
         />
       );
@@ -398,9 +399,9 @@ function mailboxSettingsBody(
       <RecoverableError
         message={detail.problem}
         action={
-          <button type="button" onClick={route.retryDetail}>
+          <Button onClick={route.retryDetail}>
             Try again
-          </button>
+          </Button>
         }
       />
     );
@@ -687,9 +688,9 @@ export function IntegrationsRouteView(props: {
             <RecoverableError
               message={props.content.freshness.explanation}
               action={
-                <button type="button" onClick={props.retry}>
+                <Button onClick={props.retry}>
                   Refresh connected systems
-                </button>
+                </Button>
               }
             />
           ) : null}
@@ -926,9 +927,9 @@ function SettingsRouteError(props: {
     <RecoverableError
       message={props.problem}
       action={
-        <button type="button" onClick={props.retry}>
+        <Button onClick={props.retry}>
           Try again
-        </button>
+        </Button>
       }
     />
   );

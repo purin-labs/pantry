@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@purin-labs/ui/index";
 import {
   StatusChip,
   formatRelativeTime,
@@ -58,8 +59,7 @@ export function renderCommerceSystemCard(
           )}
           {shopify || !canManage ? null : (
             <div className="connection-command">
-              <button
-                type="button"
+              <Button
                 onClick={sync}
                 aria-describedby={
                   problem === null ? undefined : "commerce-sync-error"
@@ -67,7 +67,7 @@ export function renderCommerceSystemCard(
                 disabled={syncing || system.sync.kind === "syncing"}
               >
                 Sync now
-              </button>
+              </Button>
             </div>
           )}
         </div>

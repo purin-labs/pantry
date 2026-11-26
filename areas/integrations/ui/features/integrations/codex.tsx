@@ -20,7 +20,6 @@ export function renderCodexConnection(
   copyStatus: string,
   setCopyStatus: React.Dispatch<React.SetStateAction<string>>,
 ): React.ReactNode {
-  const actionClass = primary ? "connection-primary-action" : undefined;
   const inUse = props.selection.kind === "codex_subscription";
   switch (props.connection.kind) {
     case "disconnected":
@@ -39,14 +38,13 @@ export function renderCodexConnection(
           </p>
           {props.canConnect ? (
             <div className="connection-actions">
-              <button
-                type="button"
-                className={actionClass}
+              <Button
+                variant={primary ? "primary" : "secondary"}
                 onClick={props.actions.connectCodex}
                 disabled={props.busy}
               >
                 Connect ChatGPT
-              </button>
+              </Button>
             </div>
           ) : (
             <p className="field-hint">A workspace owner can connect ChatGPT.</p>
@@ -122,14 +120,13 @@ export function renderCodexConnection(
           {renderCodexAllowance(props.connection.allowance)}
           {props.canConnect ? (
             <div className="connection-actions">
-              <button
-                type="button"
-                className={actionClass}
+              <Button
+                variant={primary ? "primary" : "secondary"}
                 onClick={props.actions.reconnectCodex}
                 disabled={props.busy}
               >
                 Reconnect ChatGPT
-              </button>
+              </Button>
             </div>
           ) : null}
         </div>
@@ -181,12 +178,11 @@ function CodexSignIn(props: {
               aria-label={`One-time code ${code}`}
             >
               <code>{code}</code>
-              <button
-                type="button"
+              <Button
                 onClick={copyCodexCode.bind(null, code, props.setCopyStatus)}
               >
                 {copied ? "Copied" : "Copy"}
-              </button>
+              </Button>
             </div>
           </li>
         )}
@@ -224,8 +220,7 @@ function CodexSignIn(props: {
           {code === null ? "Open OpenAI" : "Copy code and open OpenAI"}
         </a>
         {props.canConnect ? (
-          <button
-            type="button"
+          <Button
             onClick={cancelCodexFromPanel.bind(
               null,
               props.actions,
@@ -234,7 +229,7 @@ function CodexSignIn(props: {
             disabled={props.busy}
           >
             Cancel sign-in
-          </button>
+          </Button>
         ) : null}
       </div>
     </div>
@@ -311,13 +306,13 @@ function ChatGptPastedSignIn(props: {
                 {formatClockTime(props.attempt.expiresAt)}.
               </small>
               <div className="connection-actions">
-                <button
+                <Button
                   type="submit"
-                  className="connection-primary-action"
+                  variant="primary"
                   disabled={props.busy}
                 >
                   {props.busy ? "Connecting…" : "Connect ChatGPT"}
-                </button>
+                </Button>
               </div>
             </form>
           ) : (
@@ -335,8 +330,7 @@ function ChatGptPastedSignIn(props: {
           Open ChatGPT
         </a>
         {props.canConnect ? (
-          <button
-            type="button"
+          <Button
             onClick={cancelCodexFromPanel.bind(
               null,
               props.actions,
@@ -345,7 +339,7 @@ function ChatGptPastedSignIn(props: {
             disabled={props.busy}
           >
             Cancel sign-in
-          </button>
+          </Button>
         ) : null}
       </div>
     </div>

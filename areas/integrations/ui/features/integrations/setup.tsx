@@ -1,5 +1,6 @@
 import type { FileContextProvider } from "@purin-labs/contracts";
 import React from "react";
+import { Button } from "@purin-labs/ui/index";
 import { toast } from "sonner";
 import { EmptyState } from "@purin-labs/ui/page-components";
 import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
@@ -78,16 +79,15 @@ export function ProviderConnectButton(props: {
   const errorId = `${props.provider}-connection-error`;
   return (
     <div className="provider-connect">
-      <button
-        type="button"
-        className="connection-primary-action"
+      <Button
+        variant="primary"
         aria-label={`${props.label} in a popup`}
         onClick={props.onClick}
         disabled={props.busy}
         aria-describedby={error === null ? undefined : errorId}
       >
         {props.label}
-      </button>
+      </Button>
       {error === null ? null : (
         <p id={errorId} className="error-text" role="alert">
           {error}

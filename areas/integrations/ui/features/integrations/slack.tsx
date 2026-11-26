@@ -5,6 +5,7 @@ import type {
   OnboardingActivation,
 } from "@purin-labs/contracts";
 import React from "react";
+import { Button } from "@purin-labs/ui/index";
 import { Link } from "react-router";
 import {
   Combobox,
@@ -195,9 +196,9 @@ export function SlackSetup(props: {
               disabled={false}
               onSelect={null}
             />
-            <button
+            <Button
               type="submit"
-              className="connection-primary-action slack-add-submit"
+              variant="primary"
               aria-describedby={
                 setupFormHasError(props.setupFeedback)
                   ? "setup-form-error"
@@ -209,7 +210,7 @@ export function SlackSetup(props: {
               }
             >
               Add
-            </button>
+            </Button>
           </div>
           {renderSetupFieldError(
             props.setupFeedback,
@@ -218,9 +219,8 @@ export function SlackSetup(props: {
           )}
           <p id="slack-add-hint" className="slack-add-hint">
             <span>Not in the list? Invite the {SLACK_APP_NAME} app to the channel in Slack.</span>
-            <button
-              type="button"
-              className="slack-text-action"
+            <Button
+              variant="link"
               data-account-id={selectedAccount?.integrationAccountId}
               onClick={props.actions.refreshAccountResources}
               disabled={
@@ -233,7 +233,7 @@ export function SlackSetup(props: {
               }
             >
               Refresh list
-            </button>
+            </Button>
           </p>
         </form>
       ) : (
@@ -344,9 +344,8 @@ function renderSlackDmSelection(
     accountMatchesIntegrationId.bind(null, connection.integrationAccountId),
   );
   return (
-    <button
+    <Button
       key={connection.installationId}
-      type="button"
       data-installation-id={connection.installationId}
       data-account-id={connection.integrationAccountId}
       onClick={actions.selectSlackDmOrganisation}
@@ -359,7 +358,7 @@ function renderSlackDmSelection(
       {nameWorkspace
         ? ` (${account?.displayName ?? connection.workspaceId})`
         : ""}
-    </button>
+    </Button>
   );
 }
 
@@ -499,9 +498,8 @@ export function renderSlackConnectAction(
     : "Connect Slack in a popup";
   return (
     <div className="connection-actions">
-      <button
-        type="button"
-        className={hasSlack ? undefined : "connection-primary-action"}
+      <Button
+        variant={hasSlack ? "secondary" : "primary"}
         aria-label={popupLabel}
         onClick={props.actions.connectSlack}
         disabled={providerConnectionBusy(
@@ -511,7 +509,7 @@ export function renderSlackConnectAction(
         )}
       >
         {label}
-      </button>
+      </Button>
       {renderMutationFeedback(props.feedback, {
         kind: "connect_provider",
         provider: "slack",

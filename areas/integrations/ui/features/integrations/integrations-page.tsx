@@ -3,6 +3,7 @@ import {
   type ClaudeConnectionState,
 } from "./claude-connection";
 import React from "react";
+import { Button } from "@purin-labs/ui/index";
 import {
   useTypeSafeConnection,
   type TypeSafeConnectionState,
@@ -475,9 +476,9 @@ function renderSelectedIntegrationDetail(
           message={content.problem}
           action={
             retry === undefined ? null : (
-              <button type="button" onClick={retry}>
+              <Button onClick={retry}>
                 Try again
-              </button>
+              </Button>
             )
           }
         />

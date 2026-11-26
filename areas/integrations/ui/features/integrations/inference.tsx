@@ -3,6 +3,7 @@ import {
   type ClaudeConnectionState,
 } from "./claude-connection";
 import React from "react";
+import { Button } from "@purin-labs/ui/index";
 import {
   ProviderTile,
   StatusChip,
@@ -356,9 +357,9 @@ function InferenceSourceChoice(props: {
         )}
         {(changed && !props.signInFirst) || apiKey !== null ? (
           <div className="connection-actions">
-            <button
+            <Button
               type="submit"
-              className="connection-primary-action"
+              variant="primary"
               disabled={props.busy}
             >
               {props.busy
@@ -366,7 +367,7 @@ function InferenceSourceChoice(props: {
                 : changed
                   ? (source?.use ?? "Use this source")
                   : "Replace key"}
-            </button>
+            </Button>
           </div>
         ) : null}
       </form>

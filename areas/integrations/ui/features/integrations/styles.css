@@ -548,7 +548,7 @@ body:has(.connection-dialog[open]) {
    actions beside it stack under it at the same width. */
 .connection-dialog
   :is(.connection-actions, .setup-form-actions):has(
-    > .connection-primary-action
+    > :is(.connection-primary-action, .pantry-button[data-variant="primary"])
   ) {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -556,7 +556,7 @@ body:has(.connection-dialog[open]) {
 }
 .connection-dialog
   :is(.connection-actions, .setup-form-actions):has(
-    > .connection-primary-action
+    > :is(.connection-primary-action, .pantry-button[data-variant="primary"])
   )
   > :is(button:not(:where(.pantry-select-trigger)), a) {
   width: 100%;
@@ -696,12 +696,12 @@ label.mailbox-model-consent input[type="checkbox"] {
   border-radius: 0;
   background: none;
 }
-.connection-dialog
-  .connection-card
-  button:not(:where(.pantry-select-trigger)):not(.connection-primary-action) {
-  min-height: 36px;
-  padding-inline: 14px;
-  font-size: 13px;
+/* A link in an action row is as high as the Button beside it. */
+.connection-dialog .connection-actions .button-link {
+  min-height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 400;
 }
 .connection-dialog .connection-command:empty {
   display: none;

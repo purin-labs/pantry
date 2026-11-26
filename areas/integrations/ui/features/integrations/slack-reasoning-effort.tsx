@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@purin-labs/ui/index";
 import { isRecord } from "@purin-labs/std";
 import {
   isChatEffort,
@@ -104,13 +105,13 @@ export function SlackReasoningEffortPanel(props: {
         ) : null}
         {draft !== saved ? (
           <div className="connection-actions">
-            <button
+            <Button
               type="submit"
-              className="connection-primary-action"
+              variant="primary"
               disabled={busy}
             >
               {busy ? "Saving…" : `Use ${draftLabel(draft, props.source)}`}
-            </button>
+            </Button>
           </div>
         ) : null}
         <p className="visually-hidden" aria-live="polite">

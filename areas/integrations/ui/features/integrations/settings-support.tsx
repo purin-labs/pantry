@@ -1,5 +1,6 @@
 import type { OnboardingSelectedResource } from "@purin-labs/contracts";
 import React from "react";
+import { Button } from "@purin-labs/ui/index";
 import { type StatusChipStatus } from "@purin-labs/ui/page-components";
 import type { WhatsAppConnectionActionState } from "../../pages/whatsapp";
 import {
@@ -81,15 +82,14 @@ export function renderShopifyCommerceChoice(
     integrationAccountId: account.integrationAccountId,
   };
   return (
-    <button
-      type="button"
+    <Button
       key={account.integrationAccountId}
       data-account-id={account.integrationAccountId}
       onClick={select}
       disabled={mutationBlocked(mutations, mutation)}
     >
       Use {account.displayName}
-    </button>
+    </Button>
   );
 }
 

@@ -21,7 +21,7 @@ import {
 import type { CredentialActionOutcome, IntegrationsPageActions, PendingProviderAuthorization, SettingsMutationFeedback } from "./settings-types";
 import type { IntegrationAccount } from "@purin-labs/control-api/portal/settings";
 import { ConfirmButton } from "./workspace";
-import { ConfirmInPlace } from "@purin-labs/ui/index";
+import { Button, ConfirmInPlace } from "@purin-labs/ui/index";
 
 type IntegrationAccountControls = {
   readonly mutations: MutationLedger;
@@ -389,10 +389,9 @@ export function integrationAccountCommands(
   // Reconnect is a repair: it shows only when the account needs one.
   const reconnectButton = (): React.ReactNode =>
     provider === null ? null : (
-      <button
+      <Button
         key="reconnect"
-        type="button"
-        className="connection-primary-action"
+        variant="primary"
         data-provider={provider}
         data-account-id={account.integrationAccountId}
         onClick={actions.reconnectAccount}
@@ -402,28 +401,26 @@ export function integrationAccountCommands(
         {waiting
           ? `Waiting for ${authorizationServiceName(account.provider)}…`
           : `Reconnect ${service}`}
-      </button>
+      </Button>
     );
   const refreshResources =
     account.provider === "square" ? (
-      <button
+      <Button
         key="refresh-resources"
-        type="button"
         data-account-id={account.integrationAccountId}
         onClick={actions.refreshAccountResources}
         disabled={rowBusy}
       >
         Refresh locations and devices
-      </button>
+      </Button>
     ) : null;
   const cancelAuthorization = waiting ? (
-    <button
+    <Button
       key="cancel-authorization"
-      type="button"
       onClick={actions.cancelProviderAuthorization}
     >
       Cancel
-    </button>
+    </Button>
   ) : null;
   // The one action that cuts the account off. Removal revokes the stored
   // sign-in or key and erases what the account held, so a softer
@@ -478,15 +475,14 @@ export function integrationAccountCommands(
         cancel: cancelAuthorization,
         secondary: [
           account.isDefaultForProvider ? null : (
-            <button
+            <Button
               key="default"
-              type="button"
               data-account-id={account.integrationAccountId}
               onClick={actions.setDefaultAccount}
               disabled={rowBusy}
             >
               Make default
-            </button>
+            </Button>
           ),
           refreshResources,
         ].filter(Boolean),
@@ -556,13 +552,12 @@ function CredentialRotateAction(props: {
   if (!state.open) {
     return (
       <div className="credential-action">
-        <button
-          type="button"
+        <Button
           onClick={openCredentialRotateForm.bind(null, setState)}
           disabled={props.busy}
         >
           Replace key…
-        </button>
+        </Button>
         {renderCredentialRotateOutcome(state.outcome)}
       </div>
     );
@@ -583,21 +578,20 @@ function CredentialRotateAction(props: {
           required
         />
       </label>
-      <button
+      <Button
         type="submit"
         disabled={
           props.busy || state.pending || state.secret.trim().length === 0
         }
       >
         Save new key
-      </button>
-      <button
-        type="button"
+      </Button>
+      <Button
         onClick={closeCredentialRotateForm.bind(null, setState)}
         disabled={state.pending}
       >
         Cancel
-      </button>
+      </Button>
       {renderCredentialRotateOutcome(state.outcome)}
     </form>
   );

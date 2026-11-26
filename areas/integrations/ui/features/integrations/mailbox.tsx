@@ -39,7 +39,7 @@ import {
   renderMutationFeedback,
 } from "./settings-support";
 import type { IntegrationsPageActions } from "./settings-types";
-import { ConfirmInPlace } from "@purin-labs/ui/index";
+import { Button, ConfirmInPlace } from "@purin-labs/ui/index";
 
 /**
  * The email onboarding card, built like the consent sheet: three short points
@@ -101,8 +101,7 @@ export function GmailConnectionSetup(props: {
         terms.
       </p>
       <div className="connection-actions provider-onboarding-actions">
-        <button
-          type="button"
+        <Button
           onClick={props.actions.connectGmailSendOnly}
           disabled={
             props.state.kind === "opening" || props.state.kind === "waiting"
@@ -112,7 +111,7 @@ export function GmailConnectionSetup(props: {
           {props.sendOnlyConnected
             ? "Add another send-only Gmail"
             : "Connect send-only Gmail"}
-        </button>
+        </Button>
         <p id="gmail-send-only-help" className="notice-text">
           Only to send the messages you approve. Purin Pantry reads no mail.
         </p>
@@ -306,23 +305,21 @@ function GmailMailboxSwitch(props: {
     return (
       <div className="mailbox-switch">
         <div className="connection-actions">
-          <button
-            type="button"
+          <Button
             data-account-id={mailbox.integrationAccountId}
             onClick={props.actions.disableMailbox}
             disabled={props.busy}
           >
             Turn off
-          </button>
+          </Button>
           {consent.review === null && unfinished ? (
-            <button
-              type="button"
+            <Button
               aria-describedby={hintId}
               onClick={press(false)}
               disabled={settling}
             >
               Finish setup
-            </button>
+            </Button>
           ) : null}
         </div>
         {consent.review !== null ? (
@@ -334,14 +331,13 @@ function GmailMailboxSwitch(props: {
             </p>
             {consentField}
             <div className="connection-actions">
-              <button
-                type="button"
-                className="connection-primary-action"
+              <Button
+                variant="primary"
                 onClick={press(false)}
                 disabled={consent.accepted === null || settling}
               >
                 Continue
-              </button>
+              </Button>
             </div>
           </>
         ) : plan !== null && plan.model.kind === "not_reviewed" ? (
@@ -360,9 +356,8 @@ function GmailMailboxSwitch(props: {
   return (
     <div className="mailbox-switch">
       {consentField}
-      <button
-        type="button"
-        className="connection-primary-action"
+      <Button
+        variant="primary"
         aria-describedby={hintId}
         onClick={press(true)}
         disabled={
@@ -370,7 +365,7 @@ function GmailMailboxSwitch(props: {
         }
       >
         Turn on
-      </button>
+      </Button>
       <p className="notice-text" id={hintId}>
         {plan !== null
           ? turnOnHint(plan)
@@ -382,9 +377,9 @@ function GmailMailboxSwitch(props: {
       </p>
       {setup.kind === "failed" ? (
         <div className="connection-actions">
-          <button type="button" onClick={props.setup.retry}>
+          <Button onClick={props.setup.retry}>
             Try again
-          </button>
+          </Button>
         </div>
       ) : null}
     </div>
@@ -424,14 +419,13 @@ function GmailMailboxRepair(props: {
         </p>
         {props.canManage ? (
           <div className="connection-actions">
-            <button
-              type="button"
+            <Button
               data-account-id={mailbox.integrationAccountId}
               onClick={props.actions.reconnectMailbox}
               disabled={props.busy}
             >
               Restart mail sync
-            </button>
+            </Button>
           </div>
         ) : null}
       </div>
@@ -467,14 +461,13 @@ function GmailMailboxRepair(props: {
         </p>
         {props.canManage ? (
           <div className="connection-actions">
-            <button
-              type="button"
+            <Button
               data-account-id={mailbox.integrationAccountId}
               onClick={props.actions.reconnectMailbox}
               disabled={props.busy}
             >
               Resume
-            </button>
+            </Button>
           </div>
         ) : null}
       </div>
@@ -488,24 +481,22 @@ function GmailMailboxRepair(props: {
       </p>
       {props.canManage ? (
         <div className="connection-actions">
-          <button
-            type="button"
+          <Button
             data-account-id={mailbox.integrationAccountId}
             onClick={props.actions.resumeMailbox}
             disabled={props.busy}
           >
             Resume
-          </button>
+          </Button>
           {reason.providerMessageId === null ? null : (
-            <button
-              type="button"
+            <Button
               data-account-id={mailbox.integrationAccountId}
               data-message-id={reason.providerMessageId}
               onClick={props.actions.skipAndResumeMailbox}
               disabled={props.busy}
             >
               Skip this message and resume
-            </button>
+            </Button>
           )}
         </div>
       ) : null}

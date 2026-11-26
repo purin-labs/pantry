@@ -1970,19 +1970,6 @@ a.commerce-count:hover {
   font-weight: 500;
 }
 
-.integration-clear-search {
-  min-height: 40px;
-  padding-inline: 14px;
-  border: 0;
-  border-radius: 9999px;
-  color: var(--ink);
-  background: var(--paper);
-  box-shadow: var(--ring);
-  font: inherit;
-  font-weight: 500;
-  cursor: pointer;
-}
-
 .integration-app-group {
   min-width: 0;
   display: grid;
@@ -2580,14 +2567,10 @@ a.commerce-count:hover {
   margin: 0;
 }
 
-.mailbox-switch button:not(:where(.pantry-select-trigger)):disabled {
-  cursor: not-allowed;
-}
-
 /* These labels carry a mailbox address, so on a narrow screen they wrap
    instead of pushing the dialog sideways. */
-.mailbox-switch button:not(:where(.pantry-select-trigger)),
-.mailbox-danger .connection-actions button:not(:where(.pantry-select-trigger)) {
+.mailbox-switch button.pantry-button,
+.mailbox-danger button.pantry-button {
   max-width: 100%;
   padding-block: 10px;
   overflow-wrap: anywhere;
@@ -2779,7 +2762,6 @@ a.commerce-count:hover {
   letter-spacing: 0.12em;
 }
 
-.codex-device-code button:not(:where(.pantry-select-trigger)),
 .connection-actions .button-link {
   display: inline-flex;
   min-height: 44px;
@@ -3138,61 +3120,23 @@ a.commerce-count:hover {
   gap: 8px;
 }
 
-.claude-sign-in-actions :is(button:not(:where(.pantry-select-trigger)), a) {
+/* The link that opens Claude again steps back: text on the card, as high
+   as the button beside it, a surface on hover. */
+.claude-sign-in-actions a {
   display: inline-flex;
-  min-height: 44px;
+  min-height: 40px;
   align-items: center;
-  justify-content: center;
-  padding: 0 22px;
-  border: 0;
+  padding: 0 14px;
   border-radius: 9999px;
-  font: inherit;
+  color: var(--ink-2);
   font-size: 14px;
-  font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
-  cursor: pointer;
 }
 
-/* The start action while a source change waits to be saved above: the save
-   button is the one filled action, so this one stays an outlined pill. */
-.claude-sign-in-actions .claude-sign-in-quiet-action {
-  color: var(--ink);
-  background: var(--paper);
-  box-shadow: var(--ring);
-}
-
-.claude-sign-in-actions .claude-sign-in-quiet-action:hover:not(:disabled) {
-  background: var(--surface);
-}
-
-/* Secondary actions step back: text on the card, a surface on hover. */
-.claude-sign-in-actions .claude-sign-in-text-action {
-  padding: 0 14px;
-  color: var(--ink-2);
-  background: transparent;
-  box-shadow: none;
-  font-weight: 400;
-}
-
-.claude-sign-in-actions .claude-sign-in-text-action:hover:not(:disabled) {
+.claude-sign-in-actions a:hover {
   color: var(--ink-strong);
   background: var(--surface);
-}
-
-/* A row that starts with text lines its words up with the lead above. */
-.claude-sign-in-actions > .claude-sign-in-text-action:first-child {
-  margin-left: -14px;
-}
-
-.claude-sign-in-actions button:not(:where(.pantry-select-trigger)):disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-}
-
-.claude-sign-in-actions button:not(:where(.pantry-select-trigger))[data-busy="true"] {
-  cursor: wait;
-  opacity: 0.7;
 }
 
 /* On a phone the action of the stage takes the full width, and the text
@@ -3204,10 +3148,6 @@ a.commerce-count:hover {
 
   .claude-sign-in-actions > :first-child {
     flex: 1 1 100%;
-  }
-
-  .claude-sign-in-actions > .claude-sign-in-text-action:first-child {
-    margin-left: 0;
   }
 }
 
@@ -3656,16 +3596,10 @@ a.commerce-count:hover {
   min-width: 0;
 }
 
-.slack-add-row > .slack-add-submit {
+.slack-add-row > button.pantry-button {
   flex-shrink: 0;
-  min-height: 44px;
-  padding: 0 24px;
-  border: 0;
-  border-radius: 9999px;
 }
 
-/* The text action's padding hangs outside the line, so a wrapped action
-   lines up with the words above it. */
 .slack-add-hint {
   display: flex;
   flex-wrap: wrap;
@@ -3673,32 +3607,9 @@ a.commerce-count:hover {
   gap: 0 6px;
 }
 
-.slack-add-hint > .slack-text-action {
-  margin-inline-start: -6px;
-}
-
-.slack-text-action {
+/* The text action sits in the line of the hint. */
+.slack-add-hint > button.pantry-button {
   min-height: 0;
-  padding: 2px 6px;
-  border: 0;
-  border-radius: 6px;
-  color: var(--ink);
-  background: none;
-  box-shadow: none;
-  font: inherit;
-  font-weight: 500;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
-}
-
-.slack-text-action:hover:not(:disabled) {
-  background: var(--paper);
-}
-
-.slack-text-action:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
 }
 
 .connection-dialog-content:has(.slack-setup) .connection-card .connection-body {
@@ -4176,23 +4087,6 @@ label.checkbox-label {
 
 .setup-step-meta-done {
   color: var(--ok-text);
-}
-
-.setup-step-action {
-  border: 0;
-  border-radius: var(--pantry-radius-pill);
-  padding: 9px 18px;
-  font-weight: 500;
-  font-size: 13.5px;
-  color: var(--pantry-on-primary);
-  background: var(--pantry-primary);
-  box-shadow: var(--pantry-primary-ring);
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.setup-step-action:hover {
-  background: var(--pantry-primary-hover);
 }
 
 .setup-issues {

@@ -258,13 +258,12 @@ function renderStage(stage: Stage, context: StageContext): React.ReactNode {
         <>
           <p className="claude-sign-in-lead">{stage.message}</p>
           <div className="claude-sign-in-actions">
-            <button
-              type="button"
-              className="claude-sign-in-text-action"
+            <Button
+              variant="link"
               onClick={retryRead.bind(null, context.controls)}
             >
               Try again
-            </button>
+            </Button>
           </div>
         </>
       );
@@ -314,19 +313,13 @@ function renderStartButton(
   label: string,
 ): React.ReactNode {
   return (
-    <button
-      type="button"
-      className={
-        context.props.primary
-          ? "connection-primary-action"
-          : "claude-sign-in-quiet-action"
-      }
+    <Button
+      variant={context.props.primary ? "primary" : "secondary"}
       disabled={context.busy !== null}
-      data-busy={context.busy === "start" ? "true" : undefined}
       onClick={startAuthorization.bind(null, context.controls)}
     >
       {context.busy === "start" ? "Opening Claude…" : label}
-    </button>
+    </Button>
   );
 }
 
@@ -437,16 +430,14 @@ function ClaudeCodeForm(
         </p>
       </div>
       <div className="claude-sign-in-actions">
-        <button
+        <Button
           type="submit"
-          className="connection-primary-action"
+          variant="primary"
           disabled={context.busy !== null || context.code.trim() === ""}
-          data-busy={context.busy === "connect" ? "true" : undefined}
         >
           {context.busy === "connect" ? "Connecting…" : "Connect Claude"}
-        </button>
+        </Button>
         <a
-          className="claude-sign-in-text-action"
           href={authorization.authorizationUrl}
           target="_blank"
           rel="noreferrer"
@@ -500,7 +491,6 @@ function renderConnected(context: StageContext): React.ReactNode {
         <div className="claude-sign-in-actions">
           <Button
             disabled={context.busy !== null}
-            data-busy={context.busy === "start" ? "true" : undefined}
             onClick={startAuthorization.bind(null, context.controls)}
           >
             {context.busy === "start" ? "Opening Claude…" : "Reconnect"}

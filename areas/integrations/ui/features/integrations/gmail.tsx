@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@purin-labs/ui/index";
 import { useLocation } from "react-router";
 import {
   EmptyState,
@@ -350,13 +351,12 @@ function GmailMailboxList(props: {
     seenMailboxCount.current = mailboxCount;
   }, [mailboxCount]);
   const addMailbox = panel.canManage ? (
-    <button
-      type="button"
-      className="connection-primary-action"
+    <Button
+      variant="primary"
       onClick={() => setAdding(true)}
     >
       Add mailbox
-    </button>
+    </Button>
   ) : null;
   return (
     <>

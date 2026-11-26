@@ -4,6 +4,7 @@ import type {
   OnboardingActivation,
 } from "@purin-labs/contracts";
 import React from "react";
+import { Button } from "@purin-labs/ui/index";
 import { Link } from "react-router";
 import { toast } from "sonner";
 import { workspacePagePath } from "@purin-labs/ui/route";
@@ -66,8 +67,7 @@ export function ActivationBand(props: {
           </p>
         ) : null}
         {props.canManage ? (
-          <button
-            type="button"
+          <Button
             onClick={props.onActivate}
             disabled={
               mutationBlocked(props.mutations, { kind: "activation" }) ||
@@ -75,7 +75,7 @@ export function ActivationBand(props: {
             }
           >
             Activate workspace
-          </button>
+          </Button>
         ) : null}
         {renderActivationProjection(
           props.activation,
@@ -417,8 +417,8 @@ function renderSetupStepEnd(
     return <span className="setup-step-meta">{step.waitsFor?.note}</span>;
   if (!canManage) return null;
   return (
-    <button
-      type="button"
+    <Button
+      variant="primary"
       className="setup-step-action"
       onClick={openSetupStepIntegration.bind(
         null,
@@ -427,7 +427,7 @@ function renderSetupStepEnd(
       )}
     >
       {step.actionLabel}
-    </button>
+    </Button>
   );
 }
 

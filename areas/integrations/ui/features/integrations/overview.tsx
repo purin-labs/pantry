@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@purin-labs/ui/index";
 import { ChevronRight, Plus, Search } from "lucide-react";
 import type { CustomConnectorSummary } from "@purin-labs/control-api/portal/custom-connectors";
 import {
@@ -122,13 +123,7 @@ export function IntegrationsOverview(props: {
       {nothingMatches ? (
         <div className="integration-overview-empty" role="status">
           <p>No apps match “{search.trim()}”.</p>
-          <button
-            type="button"
-            className="integration-clear-search"
-            onClick={setSearch.bind(null, "")}
-          >
-            Clear search
-          </button>
+          <Button onClick={setSearch.bind(null, "")}>Clear search</Button>
         </div>
       ) : null}
       <ConnectedApps

@@ -1,5 +1,6 @@
 import type { ClaudeConnectionState } from "./claude-connection";
 import React from "react";
+import { Button } from "@purin-labs/ui/index";
 import {
   TypeSafeConnectionPanel,
   type TypeSafeConnectionState,
@@ -249,15 +250,14 @@ function integrationEntries(
                 export agent, a shipment list and views for export documents.
               </p>
               <div className="connection-actions">
-                <button
-                  type="button"
+                <Button
                   onClick={props.actions.publishExportCoordination}
                   disabled={mutationBlocked(props.mutations, {
                     kind: "provision_commerce",
                   })}
                 >
                   Add export tools
-                </button>
+                </Button>
               </div>
               {renderCommerceConfigurationFeedback(props.feedback)}
             </IntegrationSetup>
@@ -271,16 +271,15 @@ function integrationEntries(
                 You can edit or replace its sample products and orders.
               </p>
               <div className="connection-actions">
-                <button
-                  type="button"
-                  className="connection-primary-action"
+                <Button
+                  variant="primary"
                   onClick={props.actions.setupBuiltInCommerce}
                   disabled={mutationBlocked(props.mutations, {
                     kind: "provision_commerce",
                   })}
                 >
                   Set up Purin Checkout
-                </button>
+                </Button>
                 {activeShopify.map(
                   renderShopifyCommerceChoice.bind(
                     null,
@@ -328,9 +327,9 @@ function integrationEntries(
                     }
                   />
                 </label>
-                <button
+                <Button
                   type="submit"
-                  className="connection-primary-action"
+                  variant="primary"
                   aria-label="Connect Shopify in a popup"
                   disabled={providerConnectionBusy(
                     props.mutations,
@@ -339,7 +338,7 @@ function integrationEntries(
                   )}
                 >
                   Connect Shopify
-                </button>
+                </Button>
                 {shopifyError === null ? null : (
                   <p
                     id="shopify-store-error"
@@ -391,9 +390,8 @@ function integrationEntries(
           ) : props.canManage ? (
             <IntegrationSetup title={null}>
               <div className="connection-actions">
-                <button
-                  type="button"
-                  className="connection-primary-action"
+                <Button
+                  variant="primary"
                   aria-label="Connect Stripe in a popup"
                   onClick={props.actions.connectStripe}
                   disabled={providerConnectionBusy(
@@ -403,7 +401,7 @@ function integrationEntries(
                   )}
                 >
                   Connect Stripe
-                </button>
+                </Button>
                 {renderMutationFeedback(props.feedback, {
                   kind: "connect_provider",
                   provider: "stripe",
@@ -431,9 +429,8 @@ function integrationEntries(
               }
             >
               <div className="connection-actions">
-                <button
-                  type="button"
-                  className="connection-primary-action"
+                <Button
+                  variant="primary"
                   aria-label="Connect Square in a popup"
                   onClick={props.actions.connectSquare}
                   disabled={providerConnectionBusy(
@@ -443,7 +440,7 @@ function integrationEntries(
                   )}
                 >
                   Connect Square
-                </button>
+                </Button>
                 {renderMutationFeedback(props.feedback, {
                   kind: "connect_provider",
                   provider: "square",

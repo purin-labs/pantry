@@ -9,7 +9,7 @@ import {
   type Configuration,
   parseConfiguration,
 } from "@purin-labs/control-api/portal/typesafe-connection";
-import { ConfirmInPlace } from "@purin-labs/ui/index";
+import { Button, ConfirmInPlace } from "@purin-labs/ui/index";
 
 export type TypeSafeConnectionState =
   | Readonly<{ kind: "loading" }>
@@ -60,8 +60,7 @@ export function TypeSafeConnectionPanel(props: {
           {state.kind === "failed" && (
             <p role="alert">
               {state.message}{" "}
-              <button
-                type="button"
+              <Button
                 onClick={retryConnection.bind(
                   null,
                   props.organisationId,
@@ -69,7 +68,7 @@ export function TypeSafeConnectionPanel(props: {
                 )}
               >
                 Retry
-              </button>
+              </Button>
             </p>
           )}
           {configuration !== null && connection !== undefined && (
@@ -121,9 +120,9 @@ export function TypeSafeConnectionPanel(props: {
                     Saving runs a small test that TypeSafe bills to you. After
                     you replace a key, turn on each feature again.
                   </p>
-                  <button type="submit" className="connection-primary-action">
+                  <Button type="submit" variant="primary">
                     {busy ? "Working…" : "Test and save key"}
-                  </button>
+                  </Button>
                 </fieldset>
               </form>
               <p className="field-hint">
@@ -138,8 +137,7 @@ export function TypeSafeConnectionPanel(props: {
               </p>
               {connection.kind === "connected" && (
                 <div className="connection-actions">
-                  <button
-                    type="button"
+                  <Button
                     disabled={busy}
                     onClick={runMutation.bind(
                       null,
@@ -154,7 +152,7 @@ export function TypeSafeConnectionPanel(props: {
                     )}
                   >
                     Test connection
-                  </button>
+                  </Button>
                 </div>
               )}
               {connection.kind === "connected" && (
