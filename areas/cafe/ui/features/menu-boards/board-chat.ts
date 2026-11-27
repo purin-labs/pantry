@@ -1,6 +1,6 @@
 import type { ConversationId } from "@purin-labs/control-api";
 import type { ChatPageData } from "@purin-labs/control-api/portal/chat";
-import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
+import type { PageBrowserContext } from "@purin-labs/contracts";
 
 /** A message that the prompt edit sends to the Portal chat. */
 type BoardChatMessage = Readonly<{
@@ -8,7 +8,7 @@ type BoardChatMessage = Readonly<{
   requestId: string;
   model: string;
   text: string;
-  browserContext: BakeryBrowserContext;
+  browserContext: PageBrowserContext;
 }>;
 
 /**

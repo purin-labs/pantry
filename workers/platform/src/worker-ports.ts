@@ -127,7 +127,10 @@ import {
   readOperatorDraft,
 } from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
 import { workflowChanges } from "@purin-labs/area-kitchen-contract/server/workflow-changes";
-import { applyApprovedWorkflowChange } from "@purin-labs/area-kitchen/server/bakery/workflow-proposals";
+import {
+  applyApprovedWorkflowChange,
+  parseWorkflowChangeCommand,
+} from "@purin-labs/area-kitchen/server/bakery/workflow-proposals";
 import { deviceCommands } from "@purin-labs/area-devices-contract/server/device-commands";
 import { runDeviceCommand } from "@purin-labs/area-devices/server/commands";
 import { connectionFlowParts } from "@purin-labs/connections/data/connection-flow-parts";
@@ -360,6 +363,7 @@ operationsDestinationRead.register((...input) =>
 workflowChanges.register({
   applyApprovedWorkflowChange: (...input) =>
     applyApprovedWorkflowChange(...input),
+  parseWorkflowChangeCommand: (raw) => parseWorkflowChangeCommand(raw),
 });
 
 deviceCommands.register({

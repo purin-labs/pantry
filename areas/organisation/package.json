@@ -33,7 +33,6 @@
     "@purin-labs/agent": "workspace:*",
     "@purin-labs/agent-tools": "workspace:*",
     "@purin-labs/authority": "workspace:*",
-    "@purin-labs/bakery-workflow": "workspace:*",
     "@purin-labs/collaboration": "workspace:*",
     "@purin-labs/commerce-client": "workspace:*",
     "@purin-labs/commerce-contracts": "workspace:*",

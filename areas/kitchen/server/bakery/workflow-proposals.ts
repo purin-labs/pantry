@@ -1,11 +1,14 @@
 import { compileDraft, draftSeed } from "@purin-labs/bakery-workflow/draft";
 import {
   applyWorkflowChanges,
+  parseProposalChangeSummary,
   proposalChangeSummary,
   proposalDraftMerge,
   proposalOverlap,
   type WorkflowChange,
 } from "@purin-labs/bakery-workflow/changes";
+import { parseRunFindings } from "@purin-labs/bakery-workflow/findings";
+import { isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ControlSessionId, OrganisationId } from "@purin-labs/kernel/ids";
@@ -218,4 +221,38 @@ export async function applyApprovedWorkflowChange(
   if (!merged.ok) return { kind: "draft_unavailable" };
   await signalBakeryWorkflowApplied(env, organisationId, command.workflowId);
   return { kind: "applied", receipt };
+}
+
+/** Reads a proposed change from a request body or a stored draft row. */
+export function parseWorkflowChangeCommand(
+  raw: unknown,
+): WorkflowChangeCommand | null {
+  if (!isRecord(raw)) return null;
+  const { workflowId, title, baseDigest, proposedDigest, reason } = raw;
+  const { sessionId, turnId, operationId } = raw;
+  const findings = parseRunFindings(raw.findings);
+  const change = parseProposalChangeSummary(raw.change);
+  return typeof workflowId === "string" &&
+    typeof title === "string" &&
+    typeof baseDigest === "string" &&
+    typeof proposedDigest === "string" &&
+    typeof reason === "string" &&
+    typeof sessionId === "string" &&
+    typeof turnId === "string" &&
+    typeof operationId === "string" &&
+    findings !== null &&
+    change !== null
+    ? {
+        workflowId,
+        title,
+        baseDigest,
+        proposedDigest,
+        reason,
+        findings,
+        change,
+        sessionId,
+        turnId,
+        operationId,
+      }
+    : null;
 }

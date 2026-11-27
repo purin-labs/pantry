@@ -63,12 +63,14 @@ type ApplyApprovedWorkflowChange = (
 ) => Promise<ApprovedWorkflowChange>;
 
 /**
- * The approved change of a recipe workflow (Plan 84), for a configuration
- * draft that a person confirms. The Kitchen owns the workflow, and the
+ * The proposed and the approved change of a recipe workflow (Plan 84), for a
+ * configuration draft that a person confirms. The Kitchen owns the workflow, and the
  * Worker registers the implementation (`worker-ports.ts`).
  */
 export type WorkflowChanges = Readonly<{
   applyApprovedWorkflowChange: ApplyApprovedWorkflowChange;
+  /** Reads a proposed change from a request body or a stored draft row. */
+  parseWorkflowChangeCommand: (raw: unknown) => WorkflowChangeCommand | null;
 }>;
 
 export const workflowChanges = definePort<WorkflowChanges>("workflow_changes");

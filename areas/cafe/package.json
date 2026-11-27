@@ -26,7 +26,6 @@
     "@purin-labs/agent": "workspace:*",
     "@purin-labs/agent-tools": "workspace:*",
     "@purin-labs/authority": "workspace:*",
-    "@purin-labs/bakery-model": "workspace:*",
     "@purin-labs/cafe-control-api": "workspace:*",
     "@purin-labs/collaboration": "workspace:*",
     "@purin-labs/commerce-client": "workspace:*",

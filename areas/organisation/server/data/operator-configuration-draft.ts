@@ -14,8 +14,6 @@ import { roleMayConfigure, type ControlRole } from "@purin-labs/tenancy/data/con
 import type { ControlSessionId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { runAgentOperation } from "@purin-labs/conversation/data/agent-operation-runner";
-import { parseProposalChangeSummary } from "@purin-labs/bakery-workflow/changes";
-import { parseRunFindings } from "@purin-labs/bakery-workflow/findings";
 import {
   workflowChanges,
   type WorkflowChangeCommand,
@@ -1262,46 +1260,6 @@ function parseStoredCommand(value: unknown): OperatorDraftCommand | null {
   return parsed.ok ? parsed.value : null;
 }
 
-/**
- * Reads either family from a request body or a stored row.
- *
- * A body naming an allowance kind is read as one; anything else goes to the
- * agent configuration parser, so the Portal's own command shapes reach a draft
- * unchanged and no caller has to label what it is submitting.
- */
-function parseWorkflowChangeCommand(
-  raw: unknown,
-): WorkflowChangeCommand | null {
-  if (!isRecord(raw)) return null;
-  const { workflowId, title, baseDigest, proposedDigest, reason } = raw;
-  const { sessionId, turnId, operationId } = raw;
-  const findings = parseRunFindings(raw.findings);
-  const change = parseProposalChangeSummary(raw.change);
-  return typeof workflowId === "string" &&
-    typeof title === "string" &&
-    typeof baseDigest === "string" &&
-    typeof proposedDigest === "string" &&
-    typeof reason === "string" &&
-    typeof sessionId === "string" &&
-    typeof turnId === "string" &&
-    typeof operationId === "string" &&
-    findings !== null &&
-    change !== null
-    ? {
-        workflowId,
-        title,
-        baseDigest,
-        proposedDigest,
-        reason,
-        findings,
-        change,
-        sessionId,
-        turnId,
-        operationId,
-      }
-    : null;
-}
-
 function parseDeviceDraftCommand(raw: unknown): DeviceDraftCommand | null {
   if (!isRecord(raw)) return null;
   const { kind, deviceId, deviceName, reason } = raw;
@@ -1313,13 +1271,22 @@ function parseDeviceDraftCommand(raw: unknown): DeviceDraftCommand | null {
     : null;
 }
 
+/**
+ * Reads either family from a request body or a stored row.
+ *
+ * A body naming an allowance kind is read as one; anything else goes to the
+ * agent configuration parser, so the Portal's own command shapes reach a draft
+ * unchanged and no caller has to label what it is submitting.
+ */
 function parseDraftCommand(
   raw: unknown,
 ): Result<OperatorDraftCommand, OperatorDraftError | AgentOperationsError> {
   if (typeof raw === "object" && raw !== null && !Array.isArray(raw)) {
     const body = raw as Readonly<Record<string, unknown>>;
     if (body.family === "workflow_change") {
-      const change = parseWorkflowChangeCommand(body.change);
+      const change = workflowChanges
+        .use()
+        .parseWorkflowChangeCommand(body.change);
       return change === null
         ? {
             ok: false,

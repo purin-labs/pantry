@@ -407,9 +407,6 @@ importers:
       '@purin-labs/authority':
         specifier: workspace:*
         version: link:../../foundation/authority
-      '@purin-labs/bakery-model':
-        specifier: workspace:*
-        version: link:../../packages/bakery-model
       '@purin-labs/cafe-control-api':
         specifier: workspace:*
         version: link:../../packages/cafe-control-api
@@ -1376,9 +1373,6 @@ importers:
       '@purin-labs/authority':
         specifier: workspace:*
         version: link:../../foundation/authority
-      '@purin-labs/bakery-workflow':
-        specifier: workspace:*
-        version: link:../../packages/bakery-workflow
       '@purin-labs/collaboration':
         specifier: workspace:*
         version: link:../../packages/collaboration
