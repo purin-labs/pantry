@@ -4,7 +4,7 @@ import {
   parseGmailPushEnvelope,
   readGmailPushBody,
   verifyGooglePushToken,
-} from "@purin-labs/connections/mail/google-pubsub";
+} from "@purin-labs/surface-email/server/gateway/google-pubsub";
 
 const NOW = 1_784_016_325_277;
 const AUDIENCE = "https://pantry.example/hook/email/google";

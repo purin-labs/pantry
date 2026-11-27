@@ -2508,9 +2508,6 @@ importers:
       '@purin-labs/area-inbox-contract':
         specifier: workspace:*
         version: link:../../areas/inbox/contract
-      '@purin-labs/connections':
-        specifier: workspace:*
-        version: link:../../foundation/connections
       '@purin-labs/kernel':
         specifier: workspace:*
         version: link:../../foundation/kernel

@@ -5,7 +5,7 @@ import {
   parseGmailPushEnvelope,
   readGmailPushBody,
   verifyGooglePushToken,
-} from "@purin-labs/connections/mail/google-pubsub";
+} from "./google-pubsub";
 import { channelIngress } from "@purin-labs/area-inbox-contract/server/channel-ingress";
 import {
   newRequestId,
