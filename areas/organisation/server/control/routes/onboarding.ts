@@ -1,3 +1,4 @@
+import { organisationPath } from "@purin-labs/control/worker/path-match";
 import { lifecycleFenceOf } from "@purin-labs/tenancy/data/organisation-lifecycle-moves";
 import { signalChat } from "@purin-labs/conversation/chat/signals";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
@@ -163,39 +164,30 @@ export function matchOnboardingControlRoute(
       organisationInvitationIdRaw: revokeInvitation.valueRaw,
     };
   }
-  const members = organisation(pathname, "members");
+  const members = organisationPath(pathname, "members");
   if (members !== null) return { kind: "members", organisationIdRaw: members };
-  const invitations = organisation(pathname, "invitations");
+  const invitations = organisationPath(pathname, "invitations");
   if (invitations !== null)
     return { kind: "invitations", organisationIdRaw: invitations };
-  const stageViewed = organisation(pathname, "onboarding/stage-viewed");
+  const stageViewed = organisationPath(pathname, "onboarding/stage-viewed");
   if (stageViewed !== null)
     return { kind: "stageViewed", organisationIdRaw: stageViewed };
-  const setup = organisation(pathname, "setup");
+  const setup = organisationPath(pathname, "setup");
   if (setup !== null) return { kind: "setup", organisationIdRaw: setup };
-  const readiness = organisation(pathname, "readiness");
+  const readiness = organisationPath(pathname, "readiness");
   if (readiness !== null)
     return { kind: "readiness", organisationIdRaw: readiness };
-  const activate = organisation(pathname, "activate");
+  const activate = organisationPath(pathname, "activate");
   if (activate !== null)
     return { kind: "activate", organisationIdRaw: activate };
-  const archive = organisation(pathname, "archive");
+  const archive = organisationPath(pathname, "archive");
   if (archive !== null) return { kind: "archive", organisationIdRaw: archive };
-  const restore = organisation(pathname, "restore");
+  const restore = organisationPath(pathname, "restore");
   if (restore !== null) return { kind: "restore", organisationIdRaw: restore };
   const root = /^\/v1\/control\/organisations\/([^/]+)$/u.exec(pathname);
   return root?.[1] === undefined
     ? null
     : { kind: "organisation", organisationIdRaw: decodeURIComponent(root[1]) };
-}
-
-function organisation(pathname: string, suffix: string): string | null {
-  const escaped = suffix.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
-  const result = new RegExp(
-    `^/v1/control/organisations/([^/]+)/${escaped}$`,
-    "u",
-  ).exec(pathname);
-  return result?.[1] === undefined ? null : decodeURIComponent(result[1]);
 }
 
 function two(

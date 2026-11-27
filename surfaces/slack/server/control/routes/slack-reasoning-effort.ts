@@ -7,6 +7,7 @@ import {
   controlMutationIdentity,
 } from "@purin-labs/control/worker/admission/control-mutation";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { organisationPath } from "@purin-labs/control/worker/path-match";
 import {
   controlError,
   controlJson,
@@ -17,6 +18,19 @@ import {
   prepareOrganisationSlackReasoningEffortWrite,
   readOrganisationInferenceSelection,
 } from "@purin-labs/agent/data/organisation-inference-selection";
+
+/** The route of the level of Slack answers of one Organisation. */
+export type SlackReasoningEffortRoute = Readonly<{ organisationIdRaw: string }>;
+
+export function matchSlackReasoningEffortRoute(
+  pathname: string,
+): SlackReasoningEffortRoute | null {
+  const organisationIdRaw = organisationPath(
+    pathname,
+    "inference/slack-reasoning-effort",
+  );
+  return organisationIdRaw === null ? null : { organisationIdRaw };
+}
 
 /**
  * `/v1/control/organisations/:id/inference/slack-reasoning-effort`: the level

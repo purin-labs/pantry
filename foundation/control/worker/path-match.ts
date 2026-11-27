@@ -21,3 +21,37 @@ export function decodeSegment(raw: string): string {
     return "";
   }
 }
+
+/** The capture groups of a pattern, or null when the path does not match. */
+export function pathCaptures(
+  pathname: string,
+  pattern: RegExp,
+): readonly string[] | null {
+  const result = pattern.exec(pathname);
+  return result === null ? null : result.slice(1);
+}
+
+/**
+ * A decoded capture of a pattern that matched. A missing capture is a
+ * programmer error, and a malformed escape throws its URIError.
+ */
+export function decodeCapture(value: string | undefined): string {
+  if (value === undefined) throw new Error("Control route capture is missing");
+  return decodeURIComponent(value);
+}
+
+/**
+ * The decoded Organisation id of `/v1/control/organisations/<id>/<suffix>`,
+ * or null when the path is not that path.
+ */
+export function organisationPath(
+  pathname: string,
+  suffix: string,
+): string | null {
+  const escaped = suffix.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+  const captures = pathCaptures(
+    pathname,
+    new RegExp(`^/v1/control/organisations/([^/]+)/${escaped}$`, "u"),
+  );
+  return captures === null ? null : decodeCapture(captures[0]);
+}

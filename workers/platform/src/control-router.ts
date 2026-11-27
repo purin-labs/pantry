@@ -144,9 +144,25 @@ import {
   matchAgentPermissionRequestRoute,
 } from "@purin-labs/conversation/control/routes/agent-permission-requests";
 import {
-  handleAgentControlRoute,
-  matchAgentControlRoute,
-} from "./control/routes/agents";
+  handleAgentInferenceRoute,
+  matchAgentInferenceRoute,
+} from "@purin-labs/agent/control/routes/inference-routes";
+import {
+  handleOrganisationSlackReasoningEffort,
+  matchSlackReasoningEffortRoute,
+} from "@purin-labs/surface-slack/server/control/routes/slack-reasoning-effort";
+import {
+  handleInboxAgentControlRoute,
+  matchInboxAgentControlRoute,
+} from "@purin-labs/area-inbox/server/control/routes/agent-mail";
+import {
+  handleAgentOperationRoute,
+  matchAgentOperationRoute,
+} from "@purin-labs/conversation/control/routes/agents/operation-routes";
+import {
+  handleWhatsAppControlRoute,
+  matchWhatsAppControlRoute,
+} from "./control/routes/whatsapp";
 import {
   handleCommerceControlRoute,
   matchCommerceControlRoute,
@@ -287,7 +303,25 @@ const CONTROL_ROUTE_FAMILIES: readonly ControlRouteFamily[] = [
     handleInboxConversationsRoute,
   ),
   controlRouteFamily(matchMailPersonReplyRoute, handleMailPersonReplyRoute),
-  controlRouteFamily(matchAgentControlRoute, handleAgentControlRoute),
+  // The agent routes: the paths of these five families do not overlap.
+  controlRouteFamily(matchAgentInferenceRoute, handleAgentInferenceRoute),
+  controlRouteFamily(matchSlackReasoningEffortRoute, (request, env, route) =>
+    handleOrganisationSlackReasoningEffort(
+      request,
+      env,
+      route.organisationIdRaw,
+    ),
+  ),
+  controlRouteFamily(matchInboxAgentControlRoute, (request, env, route) =>
+    handleInboxAgentControlRoute(
+      request,
+      env,
+      route,
+      decidePendingDecisionWith(env),
+    ),
+  ),
+  controlRouteFamily(matchWhatsAppControlRoute, handleWhatsAppControlRoute),
+  controlRouteFamily(matchAgentOperationRoute, handleAgentOperationRoute),
   controlRouteFamilyWith(matchIntegrationControlRoute, (call, route) =>
     handleIntegrationControlRoute(call.request, call.env, route, call.url),
   ),

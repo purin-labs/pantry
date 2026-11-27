@@ -1,3 +1,4 @@
+import { organisationPath } from "@purin-labs/control/worker/path-match";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OnboardingProvider } from "@purin-labs/area-integrations-contract/server/provider-lifecycle";
 import { assertNever } from "@purin-labs/std";
@@ -164,7 +165,7 @@ export function matchIntegrationControlRoute(
       organisationIdRaw: attempt.organisationIdRaw,
       attemptIdRaw: attempt.valueRaw,
     };
-  const credentialInventory = organisation(pathname, "credentials");
+  const credentialInventory = organisationPath(pathname, "credentials");
   if (credentialInventory !== null)
     return {
       kind: "credentialInventory",
@@ -208,7 +209,7 @@ export function matchIntegrationControlRoute(
       channelIdRaw: decodeURIComponent(slackChannelDefault[3]),
     };
   }
-  const slackRouting = organisation(pathname, "slack-routing");
+  const slackRouting = organisationPath(pathname, "slack-routing");
   if (slackRouting !== null) {
     return { kind: "slackRouting", organisationIdRaw: slackRouting };
   }
@@ -241,7 +242,7 @@ export function matchIntegrationControlRoute(
       organisationIdRaw: remove.organisationIdRaw,
       integrationAccountIdRaw: remove.valueRaw,
     };
-  const accounts = organisation(pathname, "accounts");
+  const accounts = organisationPath(pathname, "accounts");
   return accounts === null
     ? null
     : { kind: "accounts", organisationIdRaw: accounts };
@@ -280,15 +281,6 @@ export function account(
         organisationIdRaw: value.organisationIdRaw,
         integrationAccountIdRaw: value.valueRaw,
       };
-}
-
-function organisation(pathname: string, suffix: string): string | null {
-  const escaped = suffix.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
-  const result = new RegExp(
-    `^/v1/control/organisations/([^/]+)/${escaped}$`,
-    "u",
-  ).exec(pathname);
-  return result?.[1] === undefined ? null : decodeURIComponent(result[1]);
 }
 
 function two(

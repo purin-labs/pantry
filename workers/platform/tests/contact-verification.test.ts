@@ -42,7 +42,7 @@ import {
   recordCaseContextCollectionSuggestion,
   type CaseContextCollectionScope,
 } from "@purin-labs/agent/case-context-discovery/relationships";
-import { matchAgentControlRoute } from "../src/control/routes/agents";
+import { matchInboxAgentControlRoute } from "@purin-labs/area-inbox/server/control/routes/agent-mail";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import { d1Database } from "./sqlite-d1";
@@ -511,7 +511,7 @@ async function controlsPublication(): Promise<void> {
     ttlMs: 60_000,
   });
   const url = `https://pantry.example/v1/control/organisations/${f.organisationId}/contact-endpoint-verifications`;
-  expect(matchAgentControlRoute(new URL(url).pathname)).toEqual({
+  expect(matchInboxAgentControlRoute(new URL(url).pathname)).toEqual({
     kind: "contactEndpointVerification",
     organisationIdRaw: f.organisationId,
   });
