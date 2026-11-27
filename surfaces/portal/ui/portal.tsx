@@ -9,8 +9,8 @@ import {
   readAccountInvitationRoute,
 } from "@purin-labs/area-organisation/ui/pages/account-invitation";
 import { UserPreferencesProvider } from "@purin-labs/ui/preferences/context";
-import { BakeryWorkspaceReveal } from "@purin-labs/area-kitchen/ui/features/bakery-workspace-reveal";
-import { revealBakeryWorkspace } from "@purin-labs/area-kitchen/ui/features/bakery-surface-registry";
+import { BakeryWorkspaceReveal } from "@purin-labs/area-kitchen-contract/ui/features/bakery-workspace-reveal";
+import { revealBakeryWorkspace } from "@purin-labs/area-kitchen-contract/ui/features/bakery-surface-registry";
 import React from "react";
 import {
   createBrowserRouter,

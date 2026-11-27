@@ -70,7 +70,7 @@ import {
   promptDocuments,
   workspaceCanvasPrompt,
 } from "../prompt";
-import { readLatestBakerySurfaceOfRequests } from "@purin-labs/area-kitchen/server/actors/bakery-surface-effect";
+import { bakerySurfaceReads } from "@purin-labs/area-kitchen-contract/server/bakery-surface-reads";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   type ConversationExecutionFailure,
@@ -217,7 +217,7 @@ export async function runConversation(
           ? null
           : newerSurface(
               capture,
-              await readLatestBakerySurfaceOfRequests({
+              await bakerySurfaceReads.use().readLatestSurfaceOfRequests({
                 db: placement.database,
                 organisationId: scope.organisationId,
                 userId: scope.userId,

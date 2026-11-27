@@ -13,7 +13,7 @@ import type {
   ChatContextDetails,
 } from "@purin-labs/control-api";
 import type { Chat } from "@purin-labs/control-api/portal/chat";
-import { bakerySurfaceForOrganisation } from "@purin-labs/area-kitchen/ui/features/bakery-surface-registry";
+import { bakerySurfaceForOrganisation } from "@purin-labs/area-kitchen-contract/ui/features/bakery-surface-registry";
 import { useScreenChipDecision } from "./screen-chip";
 import { KITCHEN_SURFACE } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";

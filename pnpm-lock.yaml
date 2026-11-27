@@ -1333,6 +1333,9 @@ importers:
       '@purin-labs/workflow-canvas-crdt':
         specifier: workspace:*
         version: link:../../../packages/workflow-canvas-crdt
+      react:
+        specifier: ^19.1.1
+        version: 19.2.7
     devDependencies:
       '@cloudflare/workers-types':
         specifier: 5.20260707.1

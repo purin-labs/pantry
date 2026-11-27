@@ -39,9 +39,9 @@ import {
   type StoredConversation,
 } from "@purin-labs/conversation/chat/store";
 import {
-  listBakerySurfaceTimelineEvents,
+  bakerySurfaceReads,
   type BakerySurfaceTimelineEvent,
-} from "@purin-labs/area-kitchen/server/actors/bakery-surface-effect";
+} from "@purin-labs/area-kitchen-contract/server/bakery-surface-reads";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { timelineEventHasId } from "./admission";
@@ -257,7 +257,7 @@ export async function appendBakerySurfaceTimelineEvents(input: {
   if (work.kind === "ready" || work.kind === "failed")
     return { timeline, cursor };
   for (let page = 0; page < 10; page += 1) {
-    const events = await listBakerySurfaceTimelineEvents({
+    const events = await bakerySurfaceReads.use().listTimelineEvents({
       db: input.db,
       organisationId: input.scope.organisationId,
       userId: input.scope.userId,

@@ -133,7 +133,7 @@ import type {
   SimulatorConnection,
   WorkspaceRunSaveStatus,
 } from "../workflow-simulator/simulator-state";
-import { notifySurfaceListeners } from "../bakery-surface-registry";
+import { notifySurfaceListeners } from "@purin-labs/area-kitchen-contract/ui/features/bakery-surface-registry";
 import { FloorPlanTravelSync } from "./floor-plan-travel-sync";
 
 type Session = StrictUnion<

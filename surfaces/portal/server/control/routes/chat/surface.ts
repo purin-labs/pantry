@@ -10,10 +10,7 @@ import {
 } from "@purin-labs/control/worker/authorization";
 import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import { parseBakerySurfaceReceipt } from "@purin-labs/bakery-model/bakery-surface";
-import {
-  listPendingBakerySurfaceEffects,
-  readBakerySurfaceDeliveryTarget,
-} from "@purin-labs/area-kitchen/server/actors/bakery-surface-effect";
+import { bakerySurfaceReads } from "@purin-labs/area-kitchen-contract/server/bakery-surface-reads";
 
 export async function handlePortalChatSurfaceEffects(
   request: Request,
@@ -41,7 +38,7 @@ export async function handlePortalChatSurfaceEffects(
     !isConversationId(browserBinding.conversationId)
   )
     return controlError("chat_surface_request_invalid", 422);
-  const effects = await listPendingBakerySurfaceEffects({
+  const effects = await bakerySurfaceReads.use().listPendingEffects({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
     userId: authorized.authenticated.session.userId,
@@ -71,7 +68,7 @@ export async function handlePortalChatSurfaceReceipt(
   const receipt = parseBakerySurfaceReceipt(body.receipt);
   if (receipt.kind === "invalid" || receipt.value.effectId !== effectId)
     return controlError("chat_surface_receipt_invalid", 422);
-  const target = await readBakerySurfaceDeliveryTarget({
+  const target = await bakerySurfaceReads.use().readDeliveryTarget({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
     userId: authorized.authenticated.session.userId,

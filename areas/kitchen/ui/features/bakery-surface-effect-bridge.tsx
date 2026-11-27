@@ -16,7 +16,7 @@ import {
   deliverBakerySurfaceEffect,
   subscribeBakerySurface,
   type MountedBakerySurface,
-} from "./bakery-surface-registry";
+} from "@purin-labs/area-kitchen-contract/ui/features/bakery-surface-registry";
 import {
   subscribeSurfaceEffects,
   surfaceSignalsLive,

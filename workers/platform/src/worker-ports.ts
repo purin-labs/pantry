@@ -196,6 +196,13 @@ import {
   readBakeProposal,
   readBakeProposalCardTs,
 } from "@purin-labs/area-kitchen/server/bakes/records";
+import { bakerySurfaceReads } from "@purin-labs/area-kitchen-contract/server/bakery-surface-reads";
+import {
+  listBakerySurfaceTimelineEvents,
+  listPendingBakerySurfaceEffects,
+  readBakerySurfaceDeliveryTarget,
+  readLatestBakerySurfaceOfRequests,
+} from "@purin-labs/area-kitchen/server/actors/bakery-surface-effect";
 import { deviceReads } from "@purin-labs/area-devices-contract/server/device-reads";
 import { connectionFlowParts } from "@purin-labs/connections/data/connection-flow-parts";
 import { prepareCredentialRefReplacement } from "@purin-labs/authority/credential-vault/service";
@@ -472,6 +479,15 @@ bakeProposalRecords.register({
   readBakeProposal: (...input) => readBakeProposal(...input),
   readBakeProposalCardTs: (...input) => readBakeProposalCardTs(...input),
   markBakeProposalAnnounced: (...input) => markBakeProposalAnnounced(...input),
+});
+
+// The Portal chat reads the Kitchen effect records of its user.
+bakerySurfaceReads.register({
+  listPendingEffects: (input) => listPendingBakerySurfaceEffects(input),
+  listTimelineEvents: (input) => listBakerySurfaceTimelineEvents(input),
+  readLatestSurfaceOfRequests: (input) =>
+    readLatestBakerySurfaceOfRequests(input),
+  readDeliveryTarget: (input) => readBakerySurfaceDeliveryTarget(input),
 });
 
 deviceCommands.register({

@@ -122,7 +122,7 @@ import {
   bakerySurfaceForOrganisation,
   notifySurfaceListeners,
   subscribeBakerySurface,
-} from "@purin-labs/area-kitchen/ui/features/bakery-surface-registry";
+} from "@purin-labs/area-kitchen-contract/ui/features/bakery-surface-registry";
 import { createEmailReviewActions } from "@purin-labs/area-inbox-contract/ui/features/email-review/api";
 import { emailDraftInserts, slackDraftInserts } from "./draft-cards";
 import type { MailSourceLinks } from "@purin-labs/area-inbox/ui/features/mail-inbox/draft-sources";

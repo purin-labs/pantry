@@ -45,6 +45,10 @@ import {
 } from "@purin-labs/std";
 import { armAlarmBy } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import { traceWarn } from "@purin-labs/kernel/observability";
+import type {
+  BakerySurfaceTimelineEvent,
+  PendingBakerySurfaceEffect,
+} from "@purin-labs/area-kitchen-contract/server/bakery-surface-reads";
 
 export const SURFACE_EFFECT_TTL_MS = 20_000;
 const SURFACE_SIMULATION_TTL_MS = 150_000;
@@ -151,10 +155,6 @@ export type BakerySurfaceEffectDispatch = Readonly<{
 /** The Session defines the answer, because its RPC method returns it. */
 export type BakerySurfaceEffectSettlement = PageEffectSettlement;
 
-type PendingBakerySurfaceEffect = Readonly<{
-  effect: BakerySurfaceEffectV1;
-}>;
-
 export async function resumeBakerySurfaceEffect(input: {
   readonly db: OrganisationDatabase;
   readonly storage: DurableObjectStorage;
@@ -249,19 +249,6 @@ function sameSurfaceRecoveryAuthority(
       next.runtimeLease.generation > previous.runtimeLease.generation)
   );
 }
-
-export type BakerySurfaceTimelineEvent = Readonly<{
-  sequence: number;
-  requestId: string;
-  sessionId: string;
-  turnId: string;
-  createdAt: number;
-  effect: BakerySurfaceEffectV1;
-  terminal:
-    | Readonly<{ kind: "started" }>
-    | Readonly<{ kind: "settled"; receipt: BakerySurfaceReceiptV1 }>
-    | Readonly<{ kind: "indeterminate" }>;
-}>;
 
 export async function dispatchBakerySurfaceEffect(input: {
   readonly db: OrganisationDatabase;

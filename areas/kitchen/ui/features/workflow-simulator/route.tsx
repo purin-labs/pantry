@@ -153,7 +153,7 @@ import {
   registerBakerySurface,
   notifySurfaceListeners,
   type MountedBakerySurface,
-} from "../bakery-surface-registry";
+} from "@purin-labs/area-kitchen-contract/ui/features/bakery-surface-registry";
 import { bakerySurfaceEffectIsPending } from "../bakery-surface-effect-bridge";
 import { simulationResult } from "./simulation-result";
 

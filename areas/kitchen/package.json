@@ -14,7 +14,6 @@
       "default": "./ui/*.ts"
     },
     "./ui/features/bakery-surface-effect-bridge": "./ui/features/bakery-surface-effect-bridge.tsx",
-    "./ui/features/bakery-workspace-reveal": "./ui/features/bakery-workspace-reveal.tsx",
     "./ui/features/bakes/route": "./ui/features/bakes/route.tsx",
     "./ui/features/costs/route": "./ui/features/costs/route.tsx",
     "./ui/features/production-run/black-sesame/black-sesame-physics-view": "./ui/features/production-run/black-sesame/black-sesame-physics-view.tsx",
