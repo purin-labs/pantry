@@ -5,8 +5,8 @@
       "methods": 75
     },
     "foundation-misfit": {
-      "links": 14,
-      "names": 44
+      "links": 12,
+      "names": 42
     },
     "table-read": {
       "reads": 50
@@ -57,15 +57,15 @@
       "fix": "Move the file to the area or the surface that it serves, and give the foundation a port for the part that it needs. If the file is general, give it a name with no area word. Then change its line in the map.",
       "counts": {
         "links foundation/authority": 1,
-        "links foundation/connections": 8,
+        "links foundation/connections": 7,
         "links foundation/control": 1,
         "links foundation/conversation": 1,
-        "links foundation/ui": 3,
+        "links foundation/ui": 2,
         "names foundation/agent": 13,
         "names foundation/agent-tools": 1,
         "names foundation/authority": 9,
         "names foundation/collaboration": 2,
-        "names foundation/connections": 12,
+        "names foundation/connections": 10,
         "names foundation/conversation": 2,
         "names foundation/kernel": 1,
         "names foundation/tenancy": 1,
