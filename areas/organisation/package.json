@@ -24,8 +24,7 @@
     "./ui/pages/agent-console": "./ui/pages/agent-console.tsx",
     "./ui/pages/agent-documents": "./ui/pages/agent-documents.tsx",
     "./ui/pages/automation": "./ui/pages/automation.tsx",
-    "./ui/pages/workspaces": "./ui/pages/workspaces.tsx",
-    "./ui/workspace-switcher": "./ui/workspace-switcher.tsx"
+    "./ui/pages/workspaces": "./ui/pages/workspaces.tsx"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

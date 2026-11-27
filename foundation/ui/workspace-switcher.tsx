@@ -2,9 +2,9 @@ import React from "react";
 import { Popover } from "@base-ui/react/popover";
 import { Check, ChevronDown, LayoutGrid, Search } from "lucide-react";
 import { Link } from "react-router";
-import { ConsoleSidebarTooltip } from "@purin-labs/ui/console-sidebar";
-import { IdentityTile } from "@purin-labs/ui/index";
-import { organisationPath, workspacePagePath } from "@purin-labs/ui/route";
+import { ConsoleSidebarTooltip } from "./console-sidebar";
+import { IdentityTile } from "./identity-tile";
+import { organisationPath, workspacePagePath } from "./route";
 import "./workspace-switcher.css";
 
 /** What a tile shows: the logo, or the gradient of the seed. */

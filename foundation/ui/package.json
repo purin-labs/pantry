@@ -27,7 +27,8 @@
     "./time-lanes": "./time-lanes.tsx",
     "./toggle-switch": "./toggle-switch.tsx",
     "./trace": "./trace.tsx",
-    "./voice-assistant-card": "./voice-assistant-card.tsx"
+    "./voice-assistant-card": "./voice-assistant-card.tsx",
+    "./workspace-switcher": "./workspace-switcher.tsx"
   },
   "scripts": {
     "check:types": "tsrs --noEmit"

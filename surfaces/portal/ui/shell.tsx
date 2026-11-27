@@ -61,7 +61,7 @@ import {
   type OrganisationShellContext,
   type WorkspaceChoice,
   type WorkspaceShellContext,
-} from "@purin-labs/area-organisation/ui/workspace-switcher";
+} from "@purin-labs/ui/workspace-switcher";
 
 export type { OrganisationChoice, WorkspaceChoice };
 import { useConsoleSidebarPreference } from "./use-console-sidebar-preference";

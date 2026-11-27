@@ -355,7 +355,7 @@ no value writes nothing. An unknown area answers `404`.
 | `surfaces/portal/ui/portal.tsx`                                                              | The router and the `ControlPortalApp` state                                                   |
 | `surfaces/portal/ui/shell.tsx`, `foundation/ui/console-sidebar.tsx`                          | `PortalFrame`, `WorkspaceLayout`, the product tabs, the sidebar foot, the rail and the drawer |
 | `surfaces/portal/ui/workspace-search.tsx`                                                    | The page search: its button, its shortcut and its dialog                                      |
-| `areas/organisation/ui/workspace-switcher.tsx`                                               | The Organisation and workspace switcher                                                       |
+| `foundation/ui/workspace-switcher.tsx`                                                       | The Organisation and workspace switcher                                                       |
 | `surfaces/portal/ui/account-menu.tsx`                                                        | The account menu: the avatar with the usage ring and its menu                                 |
 | `surfaces/portal/ui/portal-shell.tsx`                                                        | Sign-in, loading, failure and not-found views                                                 |
 | `surfaces/portal/ui/pages/home.tsx`, `areas/organisation/server/control/routes/workspace.ts` | The Home page and its server view                                                             |
@@ -364,8 +364,8 @@ no value writes nothing. An unknown area answers `404`.
 
 In `scripts/layers.json`, `portal.tsx`, `shell.tsx`, `portal-shell.tsx` and the chat are
 `surfaces/portal`. `console-sidebar.tsx`, `console-tools.tsx`, `route.ts`,
-`foundation/ui/` and `foundation/ui/preferences/` are `foundation/ui`.
-`workspace-switcher.tsx` is `areas/organisation`. The feature folders of a product area
+`foundation/ui/` and `foundation/ui/preferences/` are `foundation/ui`, with
+`workspace-switcher.tsx`, a control of the sidebar. The feature folders of a product area
 are in `areas/<area>/ui/features/`.
 
 ## Rules and limits

@@ -429,14 +429,13 @@ import each of its files. A module with no line for one of these has none.
 
 ## areas/organisation
 
-- Folders: 11
+- Folders: 10
   - `areas/organisation/server/actors/organisation/`
   - `areas/organisation/server/agent-tools/organisation/`
   - `areas/organisation/server/contract/`
   - `areas/organisation/server/control/`
   - `areas/organisation/server/control/routes/`
   - `areas/organisation/server/data/`
-  - `areas/organisation/ui/`
   - `areas/organisation/ui/features/access/`
   - `areas/organisation/ui/features/agent-schedules/`
   - `areas/organisation/ui/features/billing/`
