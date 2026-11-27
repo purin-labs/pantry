@@ -10,6 +10,10 @@ import {
   prepareOrganisationPurgeAccounts,
 } from "@purin-labs/connections/data/integration-account-writes";
 import type { OrganisationLifecycleParts } from "@purin-labs/tenancy/data/organisation-lifecycle-port";
+import {
+  prepareOrganisationPurgeMailboxAccounts,
+  prepareOrganisationPurgeSenderAccounts,
+} from "@purin-labs/area-inbox-contract/server/account-erasure";
 import { prepareInitialOrganisationWorkspace } from "@purin-labs/agent/data/organisation-workspace";
 import { prepareReadinessAssessmentDeletion } from "@purin-labs/area-organisation/server/data/onboarding";
 import {
@@ -109,6 +113,10 @@ export const ORGANISATION_LIFECYCLE_PARTS: OrganisationLifecycleParts = {
         prepareOrganisationPurgeCredentialGenerations(context),
       provider_connection: (context) =>
         prepareOrganisationPurgeConnections(context),
+      email_mailbox_account: (context) =>
+        prepareOrganisationPurgeMailboxAccounts(context),
+      email_sender_account: (context) =>
+        prepareOrganisationPurgeSenderAccounts(context),
     },
     directoryRecordDeletions: (directory, organisationId) =>
       directorySlackRecordDeletions(directory, organisationId),

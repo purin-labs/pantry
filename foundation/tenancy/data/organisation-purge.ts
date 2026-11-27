@@ -61,14 +61,6 @@ const TENANCY_PSEUDONYMIZE: Pick<
       guard: context.purged,
     }),
   ],
-  // A Google account can belong to one Organisation at a time. The purge
-  // gives it up, and the erased address stays a valid value.
-  email_mailbox_account: (context) => [
-    googleAccountRelease(context, "email_mailbox_account"),
-  ],
-  email_sender_account: (context) => [
-    googleAccountRelease(context, "email_sender_account"),
-  ],
 };
 
 type EraseEntry = Extract<
@@ -97,20 +89,6 @@ function eraseStatement(
     organisationId,
     `DELETE FROM ${entry.table} WHERE (${eraseEntryWhere(entry)})`,
   );
-}
-
-function googleAccountRelease(
-  context: PurgeContext,
-  table: "email_mailbox_account" | "email_sender_account",
-): D1PreparedStatement {
-  return context.session
-    .prepare(
-      `UPDATE ${table}
-       SET google_subject = 'archived:' || integration_account_id,
-           observed_address = integration_account_id || '@archived.invalid'
-       WHERE organisation_id = ? AND ${context.purged.sql}`,
-    )
-    .bind(context.organisationId, ...context.purged.bindings);
 }
 
 /** The statements of one catalogue entry, in the batch's order. */

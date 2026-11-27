@@ -4,6 +4,7 @@ import type {
   IntegrationAccountId,
   OrganisationId,
 } from "@purin-labs/kernel/ids";
+import type { OrganisationPurgeContext } from "@purin-labs/tenancy/data/organisation-lifecycle-port";
 
 /** The verified contacts of one removed account. */
 export function prepareAccountContactVerificationsDelete(
@@ -16,6 +17,38 @@ export function prepareAccountContactVerificationsDelete(
       "DELETE FROM contact_endpoint_verification WHERE organisation_id = ? AND integration_account_id = ?",
     )
     .bind(organisationId, integrationAccountId);
+}
+
+/** The purge rewrite of the Organisation's mailbox accounts. */
+export function prepareOrganisationPurgeMailboxAccounts(
+  context: OrganisationPurgeContext,
+): readonly D1PreparedStatement[] {
+  return [googleAccountRelease(context, "UPDATE email_mailbox_account")];
+}
+
+/** The purge rewrite of the Organisation's sender accounts. */
+export function prepareOrganisationPurgeSenderAccounts(
+  context: OrganisationPurgeContext,
+): readonly D1PreparedStatement[] {
+  return [googleAccountRelease(context, "UPDATE email_sender_account")];
+}
+
+/**
+ * A Google account can belong to one Organisation at a time. The purge gives
+ * it up, and the erased address stays a valid value.
+ */
+function googleAccountRelease(
+  context: OrganisationPurgeContext,
+  update: "UPDATE email_mailbox_account" | "UPDATE email_sender_account",
+): D1PreparedStatement {
+  return context.session
+    .prepare(
+      `${update}
+       SET google_subject = 'archived:' || integration_account_id,
+           observed_address = integration_account_id || '@archived.invalid'
+       WHERE organisation_id = ? AND ${context.purged.sql}`,
+    )
+    .bind(context.organisationId, ...context.purged.bindings);
 }
 
 export function whatsappErasureStatements(
@@ -36,26 +69,24 @@ export function whatsappErasureStatements(
     scope.kind === "account"
       ? scope.integrationAccountId
       : scope.organisationId;
-  const tables = [
-    "whatsapp_delivery_status",
-    "whatsapp_message_receipt",
-    "whatsapp_reply_proposal",
-    "whatsapp_case_conversation_window",
-    "whatsapp_ingress_policy_revision",
-    "whatsapp_ingress_policy",
-    "whatsapp_support_binding_revision",
-    "whatsapp_support_binding",
-    "whatsapp_phone_number_account",
-  ] as const;
-  return tables.map((table) => {
-    // The binding-revision table is keyed by its binding, not by the account.
-    const where =
-      table === "whatsapp_support_binding_revision" && scope.kind === "account"
-        ? `support_binding_id IN (
+  const where = `${column} = ?`;
+  // The binding-revision table is keyed by its binding, not by the account.
+  const bindingRevisionWhere =
+    scope.kind === "account"
+      ? `support_binding_id IN (
            SELECT support_binding_id FROM whatsapp_support_binding
            WHERE integration_account_id = ?
          )`
-        : `${column} = ?`;
-    return session.prepare(`DELETE FROM ${table} WHERE ${where}`).bind(value);
-  });
+      : where;
+  return [
+    `DELETE FROM whatsapp_delivery_status WHERE ${where}`,
+    `DELETE FROM whatsapp_message_receipt WHERE ${where}`,
+    `DELETE FROM whatsapp_reply_proposal WHERE ${where}`,
+    `DELETE FROM whatsapp_case_conversation_window WHERE ${where}`,
+    `DELETE FROM whatsapp_ingress_policy_revision WHERE ${where}`,
+    `DELETE FROM whatsapp_ingress_policy WHERE ${where}`,
+    `DELETE FROM whatsapp_support_binding_revision WHERE ${bindingRevisionWhere}`,
+    `DELETE FROM whatsapp_support_binding WHERE ${where}`,
+    `DELETE FROM whatsapp_phone_number_account WHERE ${where}`,
+  ].map((sql) => session.prepare(sql).bind(value));
 }

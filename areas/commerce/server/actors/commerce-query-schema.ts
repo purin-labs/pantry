@@ -21,8 +21,6 @@ import type {
 } from "@purin-labs/area-commerce-contract/server/commerce-projection";
 
 export type { CommerceRelationshipRelationRow } from "@purin-labs/area-commerce-contract/server/commerce-projection";
-const COMMERCE_RELATIONSHIP_INDEX_TABLE =
-  "commerce_relationship_relation_index";
 const COMMERCE_ATTRIBUTE_INDEX_TABLE =
   "commerce_entity_attribute_relation_index";
 const COMMERCE_ATTRIBUTE_FILTER_INDEX =
@@ -309,7 +307,7 @@ export function rebuildCommerceRelationshipRelationsForOwner(
   merchantId: string,
 ): void {
   sql.exec(
-    `DELETE FROM ${COMMERCE_RELATIONSHIP_INDEX_TABLE} WHERE merchant_id = ?`,
+    `DELETE FROM commerce_relationship_relation_index WHERE merchant_id = ?`,
     merchantId,
   );
   const projections = sql
@@ -364,7 +362,7 @@ function rebuildCommerceAttributeRelationsForOwner(
   merchantId: string,
 ): void {
   sql.exec(
-    `DELETE FROM ${COMMERCE_ATTRIBUTE_INDEX_TABLE} WHERE merchant_id = ?`,
+    `DELETE FROM commerce_entity_attribute_relation_index WHERE merchant_id = ?`,
     merchantId,
   );
   const projections = sql
@@ -437,7 +435,7 @@ function writeCommerceAttributeRelation(
   attribute: CommerceAttributeRelationWrite,
 ): void {
   sql.exec(
-    `INSERT INTO ${COMMERCE_ATTRIBUTE_INDEX_TABLE} (
+    `INSERT INTO commerce_entity_attribute_relation_index (
        merchant_id, subject_kind, entity_origin, entity_type, entity_id,
        list_id, entry_id, entity_revision, attribute_id, definition_revision,
        value_kind, comparable_text, comparable_integer, comparable_real, comparable_boolean
@@ -698,7 +696,7 @@ function writeCommerceRelationshipRelation(
   relationship: CommerceRelationshipRelationWrite,
 ): void {
   sql.exec(
-    `INSERT INTO ${COMMERCE_RELATIONSHIP_INDEX_TABLE} (
+    `INSERT INTO commerce_relationship_relation_index (
        merchant_id, relationship_origin, relationship_id, relationship_revision,
        definition_origin, definition_id, definition_revision, sensitivity,
        source_origin, source_type_id, source_entity_id,

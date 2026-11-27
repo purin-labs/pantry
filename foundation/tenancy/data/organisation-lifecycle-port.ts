@@ -199,11 +199,16 @@ type PurgeRewrite = (
 
 /** The parts of the purge batch. */
 export type OrganisationPurgeParts = Readonly<{
-  /** The rewrite of each pseudonymized connection table (connections). */
+  /**
+   * The rewrite of each pseudonymized table of another module: the
+   * connection tables (connections) and the Google accounts (inbox).
+   */
   pseudonymize: Readonly<{
     integration_account: PurgeRewrite;
     provider_credential_generation: PurgeRewrite;
     provider_connection: PurgeRewrite;
+    email_mailbox_account: PurgeRewrite;
+    email_sender_account: PurgeRewrite;
   }>;
   /** The directory's Slack records that name the Organisation (Slack). */
   directoryRecordDeletions(

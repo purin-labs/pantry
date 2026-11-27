@@ -15,6 +15,7 @@ import {
   closeSupersededInboxResponses,
   failedInboxResponseCount,
 } from "./response-store";
+import { prepareMailClassificationEligibilityErase } from "@purin-labs/area-integrations-contract/server/mail-classification-eligibility";
 
 export function createMailOrganizationSchema(sql: SqlStorage): void {
   createMailResponseSchema(sql);
@@ -41,31 +42,26 @@ export async function eraseMailClassificationRecords(
   scope: OrganisationExecutionScope,
   integrationAccountId: IntegrationAccountId,
 ): Promise<void> {
-  const statements: D1PreparedStatement[] = [];
-  for (const table of [
-    "mail_classification",
-    "mail_classification_eligibility",
-    "mail_assistant_eligibility",
-  ]) {
-    statements.push(
-      scope.database
-        .prepare(
-          `DELETE FROM ${table} WHERE organisation_id = ? AND integration_account_id = ?
+  const where = `WHERE organisation_id = ? AND integration_account_id = ?
            AND EXISTS (SELECT 1 FROM organisation_placement WHERE organisation_id = ?
              AND placement_epoch = ? AND placement_cell_id = ?
-             AND fence_token = ? AND status = 'active')`,
-        )
-        .bind(
-          scope.organisationId,
-          integrationAccountId,
-          scope.organisationId,
-          scope.placement.placementEpoch,
-          scope.placement.placementCellId,
-          scope.fenceToken,
-        ),
-    );
-  }
-  await scope.database.batch(statements);
+             AND fence_token = ? AND status = 'active')`;
+  const inboxRecord = (sql: string): D1PreparedStatement =>
+    scope.database
+      .prepare(sql)
+      .bind(
+        scope.organisationId,
+        integrationAccountId,
+        scope.organisationId,
+        scope.placement.placementEpoch,
+        scope.placement.placementCellId,
+        scope.fenceToken,
+      );
+  await scope.database.batch([
+    inboxRecord(`DELETE FROM mail_classification ${where}`),
+    prepareMailClassificationEligibilityErase(scope, integrationAccountId),
+    inboxRecord(`DELETE FROM mail_assistant_eligibility ${where}`),
+  ]);
 }
 export function readMailHead(sql: SqlStorage): MailOrganizationHead | null {
   const row = sql
