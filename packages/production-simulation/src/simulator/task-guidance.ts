@@ -8,7 +8,7 @@ import { assertNever } from "@purin-labs/std";
 const SHELF = COLD_CELL.skills["table-to-oven"].destination;
 
 // Why a native task of the attempt has not started at the view's cursor.
-export type TaskWait =
+type TaskWait =
   | Readonly<{
       kind: "dependencies";
       tasks: readonly [WorkcellTask, ...WorkcellTask[]];
@@ -17,7 +17,7 @@ export type TaskWait =
   | Readonly<{ kind: "evidence" | "failure" | "blocked" }>;
 
 // Retrieval continues loading and racking continues retrieval.
-export function taskDependencies(
+function taskDependencies(
   view: ActiveWorkcellView,
   task: WorkcellTask,
 ): readonly WorkcellTask[] {

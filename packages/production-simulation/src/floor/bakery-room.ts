@@ -18,7 +18,7 @@ export type BakeryFloorPlanId =
 
 export type FloorZoneKind = "main" | "wet" | "toilet" | "corridor" | "closet";
 
-export type FloorPlanZone = Readonly<{
+type FloorPlanZone = Readonly<{
   id: string;
   label: string;
   kind: FloorZoneKind;
@@ -28,7 +28,7 @@ export type FloorPlanZone = Readonly<{
   z1: number;
 }>;
 
-export type FloorPlanWall = Readonly<{
+type FloorPlanWall = Readonly<{
   id: string;
   x0: number;
   z0: number;
@@ -39,7 +39,7 @@ export type FloorPlanWall = Readonly<{
   exterior: boolean;
 }>;
 
-export type FloorPlanColumn = Readonly<{
+type FloorPlanColumn = Readonly<{
   id: string;
   label: string;
   x0: number;
@@ -74,7 +74,7 @@ export type FloorPlanWindow = Readonly<{
   storefront: boolean;
 }>;
 
-export type FloorPlanFixture = Readonly<{
+type FloorPlanFixture = Readonly<{
   id: string;
   label: string;
   kind: "sink-counter" | "toilet" | "pipe-shaft";
@@ -86,7 +86,7 @@ export type FloorPlanFixture = Readonly<{
   facing: "north" | "south" | "east" | "west";
 }>;
 
-export type FloorPlanStaircase = Readonly<{
+type FloorPlanStaircase = Readonly<{
   id: string;
   label: string;
   x0: number;

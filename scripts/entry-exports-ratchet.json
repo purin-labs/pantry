@@ -101,7 +101,7 @@
     "@purin-labs/portal": 1,
     "@purin-labs/product-description-crdt": 9,
     "@purin-labs/production-plan-crdt": 8,
-    "@purin-labs/production-simulation": 229,
+    "@purin-labs/production-simulation": 5,
     "@purin-labs/std": 4,
     "@purin-labs/surface-slack": 3,
     "@purin-labs/surface-voice": 1,

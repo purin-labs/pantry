@@ -24,8 +24,6 @@ import {
   batchSpec,
   chillerActions,
   dishwasherActions,
-  executeRecipeApplianceTasks,
-  extractScheduledTasks,
   hobPowerActions,
   hobTemperatureActions,
   ovenBakeActions,
@@ -35,12 +33,8 @@ import {
   planetaryMixActions,
   taskMaterialMassKg,
   weighActions,
-  type ApplianceWasmRuntimeSource,
-  type RecipeApplianceExecutionOptions,
-  type RecipeApplianceExecutionReport,
   type RecipeApplianceTaskBinding,
   type ScheduledTaskDescriptor,
-  type ScheduledTaskSource,
 } from "./appliance-execution.ts";
 
 import {
@@ -50,8 +44,8 @@ import {
   type PieType,
 } from "./pie-products.ts";
 
-export { PIE_PRODUCTS, PIE_TYPES, pieTypeOf } from "./pie-products.ts";
-export type { PieProduct, PieType } from "./pie-products.ts";
+export { PIE_PRODUCTS } from "./pie-products.ts";
+export type { PieType } from "./pie-products.ts";
 
 const SHORTCRUST_INGREDIENTS = [
   "wheat-flour",
@@ -134,7 +128,7 @@ type Filling = Readonly<{
  * from the refrigerator and lines, fills, lids, bakes and packs. "full"
  * does both in one run.
  */
-export type PieStage = "full" | "prep" | "assembly";
+type PieStage = "full" | "prep" | "assembly";
 type Recipe = Readonly<{
   revision: number;
   stage: PieStage;
@@ -155,7 +149,7 @@ type Recipe = Readonly<{
   durations: Readonly<Record<Duration, number>>;
 }>;
 
-export type PieRecipeProblem = Readonly<{
+type PieRecipeProblem = Readonly<{
   code:
     | "invalid_pie_recipe"
     | "shortcrust_mass_balance"
@@ -1368,7 +1362,7 @@ function sum(amounts: Readonly<Record<string, number>>): number {
   return total;
 }
 
-export type PieRecipeOptions = Readonly<{
+type PieRecipeOptions = Readonly<{
   pies?: readonly PieType[];
   /** Pies of each type: 3 or 6, as trays of three. */
   piesPerType?: 3 | 6;
@@ -1715,26 +1709,4 @@ export function pieApplianceTask(
     );
   }
   return null;
-}
-
-export function pieApplianceTasks(
-  source: ScheduledTaskSource,
-): readonly RecipeApplianceTaskBinding[] {
-  const bindings: RecipeApplianceTaskBinding[] = [];
-  for (const task of extractScheduledTasks(source)) {
-    const bound = pieApplianceTask(task);
-    if (bound !== null) bindings.push(bound);
-  }
-  return bindings;
-}
-
-export async function executePieApplianceTasks(
-  source: ScheduledTaskSource,
-  runtime: ApplianceWasmRuntimeSource,
-  options: RecipeApplianceExecutionOptions = {},
-): Promise<RecipeApplianceExecutionReport> {
-  return executeRecipeApplianceTasks(pieApplianceTasks(source), runtime, {
-    runId: options.runId ?? "pie-appliance-wasm",
-    ...options,
-  });
 }

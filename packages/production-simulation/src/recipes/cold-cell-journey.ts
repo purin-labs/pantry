@@ -27,7 +27,7 @@ import {
  */
 
 /** Every value the journey declares. Handling times are assumptions. */
-export type ColdCellJourneyValues = Readonly<{
+type ColdCellJourneyValues = Readonly<{
   horizonSeconds: number;
   orders: number;
   trays: readonly string[];
@@ -54,7 +54,7 @@ export type ColdCellJourneyValues = Readonly<{
 }>;
 
 /** The declared values with the revision and content digest they were read at. */
-export type ColdCellJourneySnapshot = Readonly<{
+type ColdCellJourneySnapshot = Readonly<{
   source: Readonly<{ revision: number; digest: string }>;
   values: ColdCellJourneyValues;
 }>;

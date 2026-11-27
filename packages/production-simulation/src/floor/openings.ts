@@ -59,7 +59,7 @@ export function findFloorPlanOpening(
   return null;
 }
 
-export function openingEase(progress: number): number {
+function openingEase(progress: number): number {
   return progress * progress * (3 - 2 * progress);
 }
 
@@ -72,7 +72,7 @@ export function isDoorOpen(progress: number): boolean {
   return progress >= 0.5;
 }
 
-export function doorLeafHitsBox(
+function doorLeafHitsBox(
   door: FloorPlanDoor,
   progress: number,
   box: Box2D,

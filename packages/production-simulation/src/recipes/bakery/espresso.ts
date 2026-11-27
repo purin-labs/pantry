@@ -18,17 +18,11 @@ import {
 import {
   batchSpec,
   espressoActions,
-  executeRecipeApplianceTasks,
-  extractScheduledTasks,
   grindActions,
   taskMaterialMassKg,
   weighActions,
-  type ApplianceWasmRuntimeSource,
-  type RecipeApplianceExecutionOptions,
-  type RecipeApplianceExecutionReport,
   type RecipeApplianceTaskBinding,
   type ScheduledTaskDescriptor,
-  type ScheduledTaskSource,
 } from "./appliance-execution.ts";
 import { count, input as lotInput, mass, pool, claim } from "./tea-process.ts";
 
@@ -236,7 +230,7 @@ function stock(
   };
 }
 
-export type EspressoShiftInput = Readonly<{
+type EspressoShiftInput = Readonly<{
   revision: number;
   orders: number;
   appliance: "linea" | "eagle-one";
@@ -588,30 +582,4 @@ export function espressoApplianceTask(
   }
 
   return null;
-}
-
-export function espressoApplianceTasks(
-  source: ScheduledTaskSource,
-  appliance: "linea" | "eagle-one" = "linea",
-): readonly RecipeApplianceTaskBinding[] {
-  const bindings: RecipeApplianceTaskBinding[] = [];
-  for (const task of extractScheduledTasks(source)) {
-    const bound = espressoApplianceTask(task, appliance);
-    if (bound !== null) bindings.push(bound);
-  }
-  return bindings;
-}
-
-export async function executeEspressoApplianceTasks(
-  source: ScheduledTaskSource,
-  runtime: ApplianceWasmRuntimeSource,
-  options: RecipeApplianceExecutionOptions & {
-    appliance?: "linea" | "eagle-one";
-  } = {},
-): Promise<RecipeApplianceExecutionReport> {
-  return executeRecipeApplianceTasks(
-    espressoApplianceTasks(source, options.appliance ?? "linea"),
-    runtime,
-    { runId: options.runId ?? "espresso-appliance-wasm", ...options },
-  );
 }

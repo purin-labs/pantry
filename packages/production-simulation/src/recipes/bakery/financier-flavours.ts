@@ -11,7 +11,7 @@ export const FINANCIER_FLAVOURS = [
 ] as const;
 export type FinancierFlavour = (typeof FINANCIER_FLAVOURS)[number];
 
-export const FINANCIER_BASE_INGREDIENTS = [
+const FINANCIER_BASE_INGREDIENTS = [
   "butter",
   "egg-whites",
   "almond-flour",
@@ -30,7 +30,7 @@ export type FinancierIngredient =
   | (typeof FINANCIER_BASE_INGREDIENTS)[number]
   | (typeof FINANCIER_MIX_INS)[number];
 
-export type FinancierFlavourProduct = Readonly<{
+type FinancierFlavourProduct = Readonly<{
   flavour: FinancierFlavour;
   /** Product name as the shop shows it. */
   title: string;
@@ -140,7 +140,7 @@ export function financierIngredients(
   return ingredients;
 }
 
-export type FinancierBatchFormula = Readonly<{
+type FinancierBatchFormula = Readonly<{
   ingredientsMg: Readonly<Partial<Record<FinancierIngredient, number>>>;
   brownedButterMg: number;
   evaporationMg: number;

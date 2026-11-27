@@ -23,8 +23,8 @@ import type { OvenSave } from "./oven-run-file.ts";
 import type { Variant } from "@purin-labs/type-utils";
 
 /** Bounds resident record metadata, independently of the total archive size. */
-export const MAX_OVEN_RECORDING_INDEX_ENTRIES = 65_536;
-export const MAX_OVEN_OPERATION_BYTES = 64 * 1024 * 1024;
+const MAX_OVEN_RECORDING_INDEX_ENTRIES = 65_536;
+const MAX_OVEN_OPERATION_BYTES = 64 * 1024 * 1024;
 
 /** The caller owns file access or live storage authorization for this snapshot. */
 export type RecordingArchive = Readonly<{
@@ -86,7 +86,7 @@ type Candidate = Readonly<{
   through: number;
 }>;
 
-export type OvenRecordingStats = Readonly<{
+type OvenRecordingStats = Readonly<{
   indexedPacks: number;
   indexedRecords: number;
   summaryEntries: number;

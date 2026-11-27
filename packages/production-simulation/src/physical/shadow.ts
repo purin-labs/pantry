@@ -20,7 +20,7 @@ export type ShadowObservation = Readonly<{
   messages: readonly CobotObserved[];
 }>;
 
-export type ShadowMatch = Readonly<{
+type ShadowMatch = Readonly<{
   observationId: string;
   sourceKey: string;
   task: CobotTask;

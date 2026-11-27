@@ -132,7 +132,7 @@ export function task(
   };
 }
 
-export type TeaStrainTiming =
+type TeaStrainTiming =
   | Readonly<{ kind: "unavailable" }>
   | Readonly<{
       kind: "on-time";

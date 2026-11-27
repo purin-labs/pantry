@@ -5,7 +5,7 @@
 // The second independent world uses the same model with distinct instances.
 // Their placement at the shared bakery station remains assumed.
 
-export type Pose = readonly [
+type Pose = readonly [
   x: number,
   y: number,
   z: number,
@@ -14,14 +14,13 @@ export type Pose = readonly [
   qy: number,
   qz: number,
 ];
-export type ResourceRole =
-  "arm" | "tool" | "tray" | "source" | "destination" | "cell";
-export type Provenance = "model" | "measured" | "assumed";
+type ResourceRole = "arm" | "tool" | "tray" | "source" | "destination" | "cell";
+type Provenance = "model" | "measured" | "assumed";
 export type NativeSkill = "table-to-rack" | "table-to-oven";
 
 // How the model names an instance: the moving bodies it owns and the world
 // geometry whose names start with one of its prefixes.
-export type FixtureIdentity = Readonly<{
+type FixtureIdentity = Readonly<{
   bodies: readonly string[];
   geometry: readonly string[];
 }>;
@@ -253,34 +252,6 @@ export function instanceForFixture(
       return instance.id;
   }
   return null;
-}
-
-// A Plan 24 mapping names the simulated instance and the capability revision
-// a physical enrollment must match. It grants no physical authority.
-export type SimulatedInstanceReference = Readonly<{
-  kind: "simulated-instance";
-  instanceId: ResourceInstanceId;
-  role: ResourceRole;
-  capability: NativeSkill;
-  revision: typeof CAPABILITY_REVISION;
-}>;
-export const CAPABILITY_REVISION = "fr10-cold-cell/1";
-
-export function simulatedInstanceReference(
-  id: ResourceInstanceId,
-  capability: NativeSkill,
-): SimulatedInstanceReference {
-  const instance = resourceInstance(id);
-  const binding = coldCell(instance.cellId).skills[capability];
-  if (!Object.values(binding).includes(id))
-    throw new Error(`${instance.name} is not bound by ${capability}.`);
-  return {
-    kind: "simulated-instance",
-    instanceId: instance.id,
-    role: instance.role,
-    capability,
-    revision: CAPABILITY_REVISION,
-  };
 }
 
 function modelInstance(instance: (typeof INSTANCES)[number]): ResourceInstance {

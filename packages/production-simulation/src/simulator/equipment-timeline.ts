@@ -5,7 +5,7 @@ import {
   type Run,
 } from "../recipes/bakery/schedule.ts";
 import { assertNever } from "@purin-labs/std";
-export type EquipmentAllocation = Readonly<{
+type EquipmentAllocation = Readonly<{
   batches: readonly string[];
   capacity: Readonly<{
     unit: "trays" | "batches";

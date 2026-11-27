@@ -12,7 +12,7 @@ import { MAX_RUN_FILE_BYTES } from "@purin-labs/bakery-model/bakery-run-snapshot
 export const SAVED_RUN_MESSAGE =
   "This is a saved rehearsal run. Open it from Multi-tray rehearsal → Files, which also converts earlier formats.";
 
-export type RehearsalFile =
+type RehearsalFile =
   | Readonly<{ kind: "saved-run" }>
   | Readonly<{ kind: "loading-handoff"; recording: PhysicsSequence["loading"] }>
   | Readonly<{ kind: "recording"; recording: PhysicsReplay }>

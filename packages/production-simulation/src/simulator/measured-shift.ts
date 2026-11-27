@@ -69,7 +69,7 @@ export type MeasuredShift = Readonly<{
   batches: readonly [MeasuredBatch, ...MeasuredBatch[]];
 }>;
 
-export type MeasuredShiftImport =
+type MeasuredShiftImport =
   | Readonly<{ kind: "valid"; shift: MeasuredShift; message?: never }>
   | Readonly<{ kind: "invalid"; message: string; shift?: never }>;
 
@@ -81,7 +81,7 @@ export type MeasuredValue = Readonly<{
   recommended: number;
 }>;
 
-export type MeasuredShiftRecommendation =
+type MeasuredShiftRecommendation =
   | Readonly<{
       kind: "valid";
       settings: Settings;

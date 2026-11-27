@@ -92,7 +92,7 @@ function destination(raw: unknown): S.ReportingDestination {
     product: d.authored("product", r.product),
   };
 }
-export function readClaim(raw: unknown): S.ResourceClaim {
+function readClaim(raw: unknown): S.ResourceClaim {
   const r = d.record(raw, ["resource", "units", "configuration"]);
   return {
     resource: d.authored("resource", r.resource),
@@ -262,7 +262,7 @@ function stock(raw: unknown): S.InitialLot {
     storage: d.authored("storage", r.storage),
   };
 }
-export function readOperation(raw: unknown): S.NativeOperation {
+function readOperation(raw: unknown): S.NativeOperation {
   const r = d.record(raw, ["cell", "skill", "parameters"]);
   return {
     cell: d.authored("cell", r.cell),

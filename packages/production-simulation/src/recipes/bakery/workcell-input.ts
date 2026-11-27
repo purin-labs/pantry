@@ -18,7 +18,7 @@ import { assertNever } from "@purin-labs/std";
 
 const compiled: unique symbol = Symbol("compiled cold-tray input");
 
-export const MAX_WORKCELL_DISPATCH_SECONDS = 720 * 60;
+const MAX_WORKCELL_DISPATCH_SECONDS = 720 * 60;
 
 // Requests bind the cell's explicit instances; see workcell-instances.ts.
 const resources = RESOURCE_INSTANCES;
@@ -47,8 +47,8 @@ export const NATIVE_CHAIN = Object.freeze({
   failures: Object.freeze([]),
   recoveries: Object.freeze([]),
 });
-export type NativeChain = typeof NATIVE_CHAIN;
-export type NativeDispatch = Readonly<{ kind: "scheduled"; time: number }>;
+type NativeChain = typeof NATIVE_CHAIN;
+type NativeDispatch = Readonly<{ kind: "scheduled"; time: number }>;
 
 type InputIdentity = Readonly<{
   [compiled]: true;

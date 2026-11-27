@@ -13,7 +13,7 @@ import {
 } from "./financier-production.ts";
 import { sharedRecipeRecords } from "./shared-records.ts";
 
-export type CafeShiftRecipe = Readonly<{
+type CafeShiftRecipe = Readonly<{
   espresso: EspressoRecipe;
   financierLoads: number;
 }>;

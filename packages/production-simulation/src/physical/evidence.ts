@@ -47,7 +47,7 @@ export type EvidenceLedger = Readonly<{
   dispatches: Readonly<Record<string, DispatchRecord>>;
 }>;
 
-export type DispositionReason =
+type DispositionReason =
   | "unknown_device"
   | "unknown_task"
   | "dispatch_differs"

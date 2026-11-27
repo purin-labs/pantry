@@ -21,8 +21,6 @@ import {
 } from "./financier-flavours.ts";
 import {
   computeContinuousWaveCarrierReturnSummary,
-  type CarrierPoolId,
-  type CarrierPoolTurnaroundRecord,
   type ContinuousWaveCarrierReturnSummary,
 } from "./carrier-pool-turnaround.ts";
 import {
@@ -42,11 +40,6 @@ export {
   pastryDrapeActions,
   pastryPressDoughActions,
   pastrySheetActions,
-  type CarrierPoolId,
-  type CarrierPoolTurnaroundRecord,
-  type ContinuousWaveCarrierReturnSummary,
-  type PastryBenchDeformationTelemetry,
-  type PastryBenchSummary,
 };
 
 /**
@@ -73,7 +66,7 @@ export type ApplianceCategory =
   | "dishwasher"
   | "pastry-bench";
 
-export type ApplianceTaskContext = Readonly<{
+type ApplianceTaskContext = Readonly<{
   continuation: ApplianceContinuation | null;
   checkpoint: Record<string, unknown> | null;
   previousInstanceBatchTemperatureC: number | null;
@@ -104,7 +97,7 @@ export type RecipeApplianceTaskBinding = Readonly<{
 }>;
 
 /** The controller's Wasm module; an appliance run is one host command. */
-export type ApplianceWasmRuntime = CellModule;
+type ApplianceWasmRuntime = CellModule;
 
 export type ApplianceWasmRuntimeSource =
   | ApplianceWasmRuntime
@@ -128,7 +121,7 @@ export type ApplianceFaultInjectionSpec = Readonly<{
   ): readonly ApplianceAction[];
 }>;
 
-export type ExecutedApplianceFaultRestoreRecord = Readonly<{
+type ExecutedApplianceFaultRestoreRecord = Readonly<{
   taskId: string;
   instanceId: string;
   workflowId: string;
@@ -155,9 +148,9 @@ export type ExecutedApplianceFaultRestoreRecord = Readonly<{
   transferredCount: number;
 }>;
 
-export type LinkedCellId = "tea-pan-cell" | "espresso-cell" | "pour-over-cell";
+type LinkedCellId = "tea-pan-cell" | "espresso-cell" | "pour-over-cell";
 
-export type LinkedCellCascadeTransferRecord = Readonly<{
+type LinkedCellCascadeTransferRecord = Readonly<{
   cellId: LinkedCellId;
   transferTaskId: string;
   batchInstanceId: string;
@@ -172,7 +165,7 @@ export type LinkedCellCascadeTransferRecord = Readonly<{
   status: "recovered";
 }>;
 
-export type MultiBatchFaultCascadeRecord = Readonly<{
+type MultiBatchFaultCascadeRecord = Readonly<{
   faultTaskId: string;
   faultInstanceId: string;
   appliance: ApplianceName;
@@ -188,7 +181,7 @@ export type MultiBatchFaultCascadeRecord = Readonly<{
   linkedCellTransfers: readonly LinkedCellCascadeTransferRecord[];
 }>;
 
-export type BatchMassAccounting = Readonly<{
+type BatchMassAccounting = Readonly<{
   inputMassGrams: number;
   evaporativeOrByproductLossGrams: number;
   qcSampleGrams: number;
@@ -199,7 +192,7 @@ export type BatchMassAccounting = Readonly<{
   disposition: "accepted" | "rejected-scrap-and-rework" | "in-process-transfer";
 }>;
 
-export type CoupledInspectionDecision = Readonly<{
+type CoupledInspectionDecision = Readonly<{
   recommendedOutcome: "accept" | "reject";
   gateKind:
     | "bake-maillard-gate"
@@ -217,7 +210,7 @@ export type CoupledInspectionDecision = Readonly<{
   rationale: string;
 }>;
 
-export type ChillerColdCellTelemetry = Readonly<{
+type ChillerColdCellTelemetry = Readonly<{
   chillerCycleIndex: number;
   defrostPhase:
     | "refrigerating"
@@ -241,7 +234,7 @@ export type ChillerColdCellTelemetry = Readonly<{
   compressorDutyPercent: number;
 }>;
 
-export type ChillerColdCellSummary = Readonly<{
+type ChillerColdCellSummary = Readonly<{
   totalChillerCycles: number;
   totalDoorOpenings: number;
   totalDoorOpenSeconds: number;
@@ -254,7 +247,7 @@ export type ChillerColdCellSummary = Readonly<{
   peakCompressorPullDownWatts: number;
 }>;
 
-export type DishwasherWarewashTelemetry = Readonly<{
+type DishwasherWarewashTelemetry = Readonly<{
   washCycleIndex: number;
   soilLoadCategory:
     | "brown-butter-mould"
@@ -276,7 +269,7 @@ export type DishwasherWarewashTelemetry = Readonly<{
   heatRecoveryEfficiencyPercent: number;
 }>;
 
-export type DishwasherWarewashSummary = Readonly<{
+type DishwasherWarewashSummary = Readonly<{
   totalWashCycles: number;
   totalDetergentDosedMl: number;
   totalRinseAidDosedMl: number;
@@ -289,7 +282,7 @@ export type DishwasherWarewashSummary = Readonly<{
   maxGreywaterDischargeTempC: number;
 }>;
 
-export type EspressoBoilerGroupheadTelemetry = Readonly<{
+type EspressoBoilerGroupheadTelemetry = Readonly<{
   shotSequenceIndex: number;
   groupheadSide: "left" | "right";
   brewBoilerSetpointC: number;
@@ -307,7 +300,7 @@ export type EspressoBoilerGroupheadTelemetry = Readonly<{
   steamRecoverySeconds: number;
 }>;
 
-export type EspressoBoilerGroupheadSummary = Readonly<{
+type EspressoBoilerGroupheadSummary = Readonly<{
   totalExtractedShots: number;
   minGroupheadTempC: number;
   maxGroupheadThermalDipC: number;
@@ -317,7 +310,7 @@ export type EspressoBoilerGroupheadSummary = Readonly<{
   meanSteamRecoverySeconds: number;
 }>;
 
-export type ConvectionOvenVentingRadiantTelemetry = Readonly<{
+type ConvectionOvenVentingRadiantTelemetry = Readonly<{
   ovenTaskKind: "preheat" | "roast-sesame" | "bake-financier" | "bake-pie";
   deckZone: "front-lower-nominal" | "middle-rear-hotspot" | "upper-roast-deck";
   chamberDryBulbC: number;
@@ -332,7 +325,7 @@ export type ConvectionOvenVentingRadiantTelemetry = Readonly<{
   surfaceWaterActivityAw: number;
 }>;
 
-export type ConvectionOvenVentingRadiantSummary = Readonly<{
+type ConvectionOvenVentingRadiantSummary = Readonly<{
   totalOvenCycles: number;
   nominalDeckHeatFluxKwPerSqM: number;
   hotspotDeckHeatFluxKwPerSqM: number;
@@ -342,7 +335,7 @@ export type ConvectionOvenVentingRadiantSummary = Readonly<{
   minSurfaceWaterActivityAw: number;
 }>;
 
-export type HobCoilPanThermalTelemetry = Readonly<{
+type HobCoilPanThermalTelemetry = Readonly<{
   hobType: "induction-coil" | "atmospheric-gas";
   coilFrequencyKhz: number;
   couplingEfficiencyPercent: number;
@@ -353,7 +346,7 @@ export type HobCoilPanThermalTelemetry = Readonly<{
   cumulativeBoilOffGrams: number;
 }>;
 
-export type HobCoilPanThermalSummary = Readonly<{
+type HobCoilPanThermalSummary = Readonly<{
   totalHobCycles: number;
   meanCouplingEfficiencyPercent: number;
   maxPanBaseRadialGradientC: number;
@@ -362,7 +355,7 @@ export type HobCoilPanThermalSummary = Readonly<{
   totalBoilOffEvaporatedGrams: number;
 }>;
 
-export type PrecisionScaleLoadCellTelemetry = Readonly<{
+type PrecisionScaleLoadCellTelemetry = Readonly<{
   weighIndex: number;
   targetMassGrams: number;
   settledMassGrams: number;
@@ -373,7 +366,7 @@ export type PrecisionScaleLoadCellTelemetry = Readonly<{
   stabilityLockStatus: "locked-stable" | "draft-filtered";
 }>;
 
-export type PrecisionScaleLoadCellSummary = Readonly<{
+type PrecisionScaleLoadCellSummary = Readonly<{
   totalWeighings: number;
   meanSettlingTimeSeconds: number;
   maxSettlingTimeSeconds: number;
@@ -382,7 +375,7 @@ export type PrecisionScaleLoadCellSummary = Readonly<{
   meanFilterRejectionDb: number;
 }>;
 
-export type PlanetaryMixerRheologyTelemetry = Readonly<{
+type PlanetaryMixerRheologyTelemetry = Readonly<{
   mixStage: "dry-blend-speed1" | "batter-emulsify-speed2" | "paste-homogenize";
   agitatorRpm: number;
   specificWorkInputWhPerKg: number;
@@ -393,7 +386,7 @@ export type PlanetaryMixerRheologyTelemetry = Readonly<{
   emulsionDevelopmentIndex: number;
 }>;
 
-export type PlanetaryMixerRheologySummary = Readonly<{
+type PlanetaryMixerRheologySummary = Readonly<{
   totalMixCycles: number;
   totalSpecificWorkWhPerKg: number;
   peakShaftTorqueNm: number;
@@ -402,7 +395,7 @@ export type PlanetaryMixerRheologySummary = Readonly<{
   meanEmulsionIndex: number;
 }>;
 
-export type MilkFrotherMicrofoamTelemetry = Readonly<{
+type MilkFrotherMicrofoamTelemetry = Readonly<{
   frothCycleIndex: number;
   whiskDiscRpm: number;
   vortexShearRateInverseSec: number;
@@ -413,7 +406,7 @@ export type MilkFrotherMicrofoamTelemetry = Readonly<{
   proteinWindowStatus: "optimal-microfoam-window" | "under-aerated" | "scald-risk";
 }>;
 
-export type MilkFrotherMicrofoamSummary = Readonly<{
+type MilkFrotherMicrofoamSummary = Readonly<{
   totalFrothCycles: number;
   meanMicrofoamOverrunPercent: number;
   peakVortexShearRateInverseSec: number;
@@ -422,7 +415,7 @@ export type MilkFrotherMicrofoamSummary = Readonly<{
   maxPitcherExitTempC: number;
 }>;
 
-export type CoupledBatchPhysicsMetrics = Readonly<{
+type CoupledBatchPhysicsMetrics = Readonly<{
   upstreamSourceInstanceId: string | null;
   stagingWaitSeconds: number;
   ambientRoomC: number;
@@ -454,7 +447,7 @@ export type CoupledBatchPhysicsMetrics = Readonly<{
   pastryTelemetry: PastryBenchDeformationTelemetry | null;
 }>;
 
-export type AmbientRoomPsychrometricSummary = Readonly<{
+type AmbientRoomPsychrometricSummary = Readonly<{
   roomVolumeCubicMeters: number;
   baselineDryBulbC: number;
   peakDryBulbC: number;
@@ -469,7 +462,7 @@ export type AmbientRoomPsychrometricSummary = Readonly<{
   peakHvacCoolingLoadWatts: number;
 }>;
 
-export type FacilityAcousticVibrationSummary = Readonly<{
+type FacilityAcousticVibrationSummary = Readonly<{
   baselineRoomNoiseDba: number;
   peakRoomNoiseDba: number;
   peakApplianceNoiseDba: number;
@@ -478,7 +471,7 @@ export type FacilityAcousticVibrationSummary = Readonly<{
   elevatedRotaryVibrationWindows: number;
 }>;
 
-export type FacilityUtilityLoadSummary = Readonly<{
+type FacilityUtilityLoadSummary = Readonly<{
   nominalLineVoltageVolts: number;
   ratedBusCapacityWatts: number;
   peakTotalPowerWatts: number;
@@ -504,7 +497,7 @@ export type FacilityUtilityLoadSummary = Readonly<{
   pastryBench: PastryBenchSummary;
 }>;
 
-export type ExecutedApplianceTaskRecord = Readonly<{
+type ExecutedApplianceTaskRecord = Readonly<{
   index: number;
   taskId: string;
   instanceId: string;
@@ -532,7 +525,7 @@ export type ExecutedApplianceTaskRecord = Readonly<{
   faultRestore?: ExecutedApplianceFaultRestoreRecord;
 }>;
 
-export type QualityGateLotAccountingRecord = Readonly<{
+type QualityGateLotAccountingRecord = Readonly<{
   instanceId: string;
   workflowId: string;
   gateTaskId: string;
@@ -549,7 +542,7 @@ export type QualityGateLotAccountingRecord = Readonly<{
   reworkCarrierTaskKey: string | null;
 }>;
 
-export type QualityGateMassBalanceSummary = Readonly<{
+type QualityGateMassBalanceSummary = Readonly<{
   totalEvaluatedLots: number;
   acceptedLotCount: number;
   rejectedLotCount: number;
@@ -584,7 +577,7 @@ export type RecipeApplianceExecutionOptions = Readonly<{
   scheduledTasks?: readonly ScheduledTaskDescriptor[];
 }>;
 
-export function sanitizeAttemptId(raw: string, index: number): string {
+function sanitizeAttemptId(raw: string, index: number): string {
   const cleaned = raw
     .toLowerCase()
     .replace(/[^a-z0-9-]+/gu, "-")
@@ -1249,7 +1242,7 @@ function parseCheckpointObject(
   }
 }
 
-export function linkedCellForScheduledTask(
+function linkedCellForScheduledTask(
   task: Pick<ScheduledTaskDescriptor, "instanceId" | "workflowId" | "taskKey">,
 ): LinkedCellId | null {
   if (

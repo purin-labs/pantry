@@ -1,13 +1,8 @@
 import { canonicalJson, sha256Hex } from "@purin-labs/std";
 export { compileFinancierPreparation } from "./financier-preparation.ts";
-export type { FinancierPreparationProblem } from "./financier-preparation.ts";
 export {
   compileFinancierRecipe,
   financierRecipeInput,
-} from "./financier-production.ts";
-export type {
-  FinancierRecipeProblem,
-  FinancierRecipeWaveOptions,
 } from "./financier-production.ts";
 import type { StationId } from "@purin-labs/bakery-model/bakery";
 import {
@@ -1238,7 +1233,7 @@ export function financierApplianceTask(
   return null;
 }
 
-export function financierApplianceTasks(
+function financierApplianceTasks(
   source: ScheduledTaskSource,
 ): readonly RecipeApplianceTaskBinding[] {
   const bindings: RecipeApplianceTaskBinding[] = [];

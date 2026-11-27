@@ -65,7 +65,7 @@ import {
  * the cobot's receipts move a mould group or pass logical time.
  */
 
-export type MouldGroupInput = Readonly<{
+type MouldGroupInput = Readonly<{
   mouldGroup: number;
   coldRackShelf: number;
   ovenShelf: number;
@@ -201,7 +201,7 @@ function shelves(
 }
 
 /** Every input value the engine needs, checked before it compiles anything. */
-export function checkBakeRunInput(input: BakeRunInput): BakeRunProblem[] {
+function checkBakeRunInput(input: BakeRunInput): BakeRunProblem[] {
   const problems: BakeRunProblem[] = [];
   if (!parseId("run", input.runId).ok)
     problems.push({ field: "runId", reason: "an authored identifier" });

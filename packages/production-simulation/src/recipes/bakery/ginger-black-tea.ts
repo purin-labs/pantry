@@ -566,11 +566,3 @@ export function gingerBlackTeaRecipeInput() {
     spillMg: 3_000,
   };
 }
-
-export {
-  executeGingerBlackTeaApplianceTasks,
-  executeTeaApplianceTasks,
-  gingerBlackTeaApplianceTasks,
-  teaApplianceTask,
-  teaApplianceTasks,
-} from "./tea.ts";

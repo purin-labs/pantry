@@ -76,14 +76,10 @@ export {
   SIX_HOUR_SHIFT_SECONDS,
   morningShiftRecipeInput,
   sixHourShiftRecipeInput,
-  type BakeryShiftInput,
   type BakeryShiftOptions,
   type BakeryServiceShiftInput,
 } from "./shift-preset.ts";
-export {
-  extractCarryoverMiseEnPlace,
-  type CarryoverMiseEnPlaceLot,
-} from "./mise-en-place.ts";
+export { extractCarryoverMiseEnPlace } from "./mise-en-place.ts";
 
 function shiftInterval(startSec: number, endSec: number) {
   return d.value(
@@ -1532,13 +1528,8 @@ import {
   defaultMorningShiftFaultInjections,
   executeRecipeApplianceTasks,
   extractScheduledTasks,
-  linkedCellForScheduledTask,
   type ApplianceFaultInjectionSpec,
   type ApplianceWasmRuntimeSource,
-  type ExecutedApplianceFaultRestoreRecord,
-  type LinkedCellCascadeTransferRecord,
-  type LinkedCellId,
-  type MultiBatchFaultCascadeRecord,
   type RecipeApplianceExecutionOptions,
   type RecipeApplianceExecutionReport,
   type RecipeApplianceTaskBinding,
@@ -1550,16 +1541,6 @@ import { financierApplianceTask } from "./financier.ts";
 import { pieApplianceTask } from "./pie.ts";
 import { teaApplianceTask } from "./tea.ts";
 import type { Variant } from "@purin-labs/type-utils";
-
-export {
-  defaultMorningShiftFaultInjections,
-  linkedCellForScheduledTask,
-  type ApplianceFaultInjectionSpec,
-  type ExecutedApplianceFaultRestoreRecord,
-  type LinkedCellCascadeTransferRecord,
-  type LinkedCellId,
-  type MultiBatchFaultCascadeRecord,
-};
 
 export function morningShiftApplianceTask(
   task: ScheduledTaskDescriptor,
@@ -1575,7 +1556,7 @@ export function morningShiftApplianceTask(
   );
 }
 
-export function morningShiftApplianceTasks(
+function morningShiftApplianceTasks(
   source: ScheduledTaskSource,
   espressoAppliance: "linea" | "eagle-one" = "linea",
 ): readonly RecipeApplianceTaskBinding[] {

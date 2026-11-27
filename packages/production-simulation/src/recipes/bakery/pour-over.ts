@@ -23,18 +23,12 @@ import {
 import {
   batchSpec,
   dishwasherActions,
-  executeRecipeApplianceTasks,
-  extractScheduledTasks,
   grindActions,
   hobTemperatureActions,
   taskMaterialMassKg,
   weighActions,
-  type ApplianceWasmRuntimeSource,
-  type RecipeApplianceExecutionOptions,
-  type RecipeApplianceExecutionReport,
   type RecipeApplianceTaskBinding,
   type ScheduledTaskDescriptor,
-  type ScheduledTaskSource,
 } from "./appliance-execution.ts";
 import { claim, count, input as lotInput, mass, pool } from "./tea-process.ts";
 
@@ -43,7 +37,7 @@ import { claim, count, input as lotInput, mass, pool } from "./tea-process.ts";
  * US guide's four timed spiral pours to 350 g. A human prepares the filter,
  * the ground bed, the server and a hot kettle; one FR10 pours.
  */
-export type PourOverRecipe = Readonly<{
+type PourOverRecipe = Readonly<{
   revision: number;
   kettleWaterG: number;
   drainage: PourOverStation["drainage"];
@@ -51,7 +45,7 @@ export type PourOverRecipe = Readonly<{
   grinder?: PourOverStation["grinder"];
 }>;
 
-export const POUR_OVER_SOURCES = [
+const POUR_OVER_SOURCES = [
   "https://store.bluebottlecoffee.jp/pages/dripbrew",
   "https://bluebottlecoffee.com/us/eng/brew-guides/pour-over",
 ] as const;
@@ -335,7 +329,7 @@ function stock(
   };
 }
 
-export type PourOverShiftInput = Readonly<{
+type PourOverShiftInput = Readonly<{
   revision: number;
   orders: number;
   grinder: GrinderModel;
@@ -756,25 +750,3 @@ export function pourOverApplianceTask(
   return null;
 }
 
-export function pourOverApplianceTasks(
-  source: ScheduledTaskSource,
-): readonly RecipeApplianceTaskBinding[] {
-  const bindings: RecipeApplianceTaskBinding[] = [];
-  for (const task of extractScheduledTasks(source)) {
-    const bound = pourOverApplianceTask(task);
-    if (bound !== null) bindings.push(bound);
-  }
-  return bindings;
-}
-
-export async function executePourOverApplianceTasks(
-  source: ScheduledTaskSource,
-  runtime: ApplianceWasmRuntimeSource,
-  options: RecipeApplianceExecutionOptions = {},
-): Promise<RecipeApplianceExecutionReport> {
-  return executeRecipeApplianceTasks(
-    pourOverApplianceTasks(source),
-    runtime,
-    { runId: options.runId ?? "pour-over-appliance-wasm", ...options },
-  );
-}

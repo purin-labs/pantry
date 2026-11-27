@@ -9,7 +9,7 @@
  */
 
 export type Vec3 = readonly [number, number, number];
-export type Quat = readonly [number, number, number, number];
+type Quat = readonly [number, number, number, number];
 export type JointVector = readonly [
   number,
   number,
@@ -41,7 +41,7 @@ export function fr10Links(base: Vec3): readonly Fr10Link[] {
   ];
 }
 
-export function quatMul(a: Quat, b: Quat): Quat {
+function quatMul(a: Quat, b: Quat): Quat {
   const [aw, ax, ay, az] = a;
   const [bw, bx, by, bz] = b;
   return [
@@ -52,7 +52,7 @@ export function quatMul(a: Quat, b: Quat): Quat {
   ];
 }
 
-export function quatRotate(q: Quat, v: Vec3): Vec3 {
+function quatRotate(q: Quat, v: Vec3): Vec3 {
   const [w, qx, qy, qz] = q;
   const [vx, vy, vz] = v;
   const tx = 2 * (qy * vz - qz * vy);
@@ -65,7 +65,7 @@ export function quatRotate(q: Quat, v: Vec3): Vec3 {
   ];
 }
 
-export function addVec3(a: Vec3, b: Vec3): Vec3 {
+function addVec3(a: Vec3, b: Vec3): Vec3 {
   return [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
 }
 
@@ -210,7 +210,7 @@ export function fr10PlanarIk(
 }
 
 /** The normalized product of the espresso and siphon arms. */
-export function quatMultiplyNormalized(a: Quat, b: Quat): Quat {
+function quatMultiplyNormalized(a: Quat, b: Quat): Quat {
   const [w1, x1, y1, z1] = a;
   const [w2, x2, y2, z2] = b;
   const w = w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2;

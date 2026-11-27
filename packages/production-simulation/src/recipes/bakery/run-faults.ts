@@ -16,16 +16,16 @@ import { hasExactKeys } from "@purin-labs/std";
 export type OutageResource = `human-${number}` | WorkcellResourceId;
 export type HandlingTaskId =
   `batch:${string}:handoff:${number}-${"stage" | "clear" | "transfer"}`;
-export type ResourceOutage = Readonly<{
+type ResourceOutage = Readonly<{
   resource: OutageResource;
   start: number;
   end: number;
 }>;
-export type InjectedFailure = Readonly<{
+type InjectedFailure = Readonly<{
   bakeryTaskId: HandlingTaskId;
   afterSeconds: number;
 }>;
-export type AssumedRecovery = Readonly<{
+type AssumedRecovery = Readonly<{
   bakeryTaskId: string;
   seconds: number;
 }>;
@@ -40,14 +40,14 @@ export const NO_FAULTS: RunFaults = Object.freeze({
   failure: null,
   recovery: null,
 });
-export const MAX_FAILURE_AFTER_SECONDS = 600;
-export const MAX_RECOVERY_SECONDS = 3600;
+const MAX_FAILURE_AFTER_SECONDS = 600;
+const MAX_RECOVERY_SECONDS = 3600;
 
 // The workcell resources an outage may name. The tray is the material itself.
 export const OUTAGE_WORKCELL_RESOURCES: readonly WorkcellResourceId[] =
   RESOURCE_INSTANCES.filter(isFixedResource).map(instanceId);
 
-export type FaultScope = Readonly<{
+type FaultScope = Readonly<{
   settings: Settings;
   handlingTasks: readonly HandlingTaskId[];
   recoverableTasks: readonly string[];

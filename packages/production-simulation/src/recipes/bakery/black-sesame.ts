@@ -70,7 +70,7 @@ type Recipe = Readonly<{
   jugs: number;
   durations: Readonly<Record<Stage, number>>;
 }>;
-export type BlackSesameProblem = Readonly<{
+type BlackSesameProblem = Readonly<{
   code: "invalid_black_sesame_recipe" | "concentrate_mass_balance";
 }>;
 
@@ -1077,8 +1077,3 @@ export function blackSesameRecipeInput() {
   };
 }
 
-export {
-  blackSesameApplianceTask,
-  blackSesameApplianceTasks,
-  executeBlackSesameApplianceTasks,
-} from "./black-sesame-milk.ts";

@@ -5,7 +5,7 @@
 export const PIE_TYPES = ["steak-and-pepper", "beef-bourguignon"] as const;
 export type PieType = (typeof PIE_TYPES)[number];
 
-export type PieProduct = Readonly<{
+type PieProduct = Readonly<{
   pie: PieType;
   /** Product name as the shop shows it. */
   title: string;

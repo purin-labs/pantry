@@ -38,7 +38,7 @@ export type Box2D = Readonly<{
   z1: number;
 }>;
 
-export function getOrientedExtents(
+function getOrientedExtents(
   id: ApplianceId,
   rotY: number,
 ): Readonly<{ halfWidth: number; halfDepth: number }> {

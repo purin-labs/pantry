@@ -91,7 +91,7 @@ export type WorkcellCapability = Readonly<{
   station: CellInstance["station"];
   capacity: CellInstance["capacity"];
 }>;
-export type StationResource = Readonly<{
+type StationResource = Readonly<{
   kind: "station";
   id: StationId;
   capacity: number;
@@ -134,8 +134,8 @@ export type FinancierRunInput = VariantBy<
 >;
 
 export type HumanId = `human-${number}`;
-export type ProcessTaskId = `batch:${string}:process:${Operation}`;
-export type TransferTaskId =
+type ProcessTaskId = `batch:${string}:process:${Operation}`;
+type TransferTaskId =
   `batch:${string}:transfer:${StationId}:${StationId}`;
 export type BakeryTaskId =
   | ProcessTaskId
@@ -145,9 +145,9 @@ export type BakeryTaskId =
 
 export type KitchenZoneId = "prep-zone" | "hearth-zone" | "finishing-zone";
 
-export type StaffRoleId = "tourier-prep" | "four-finition" | "commis-vitrine";
+type StaffRoleId = "tourier-prep" | "four-finition" | "commis-vitrine";
 
-export type StaffRoleProfile = Readonly<{
+type StaffRoleProfile = Readonly<{
   role: StaffRoleId;
   roleTitle: string;
   shortRole: string;
@@ -158,13 +158,13 @@ export type StaffRoleProfile = Readonly<{
   preferredStations: readonly StationId[];
 }>;
 
-export const KITCHEN_ZONE_LABELS: Readonly<Record<KitchenZoneId, string>> = {
+const KITCHEN_ZONE_LABELS: Readonly<Record<KitchenZoneId, string>> = {
   "prep-zone": "Prep & Portioning Zone",
   "hearth-zone": "Hearth & Cooling Zone",
   "finishing-zone": "Packing & Vitrine Zone",
 };
 
-export const STAFF_ROLE_PROFILES: readonly StaffRoleProfile[] = [
+const STAFF_ROLE_PROFILES: readonly StaffRoleProfile[] = [
   {
     role: "tourier-prep",
     roleTitle: "Chef de Partie — Prep & Portioning",
@@ -210,7 +210,7 @@ export function staffRoleProfileFor(
   );
 }
 
-export function stationZone(id: StationId): KitchenZoneId {
+function stationZone(id: StationId): KitchenZoneId {
   switch (id) {
     case "stage":
     case "portion":
@@ -229,7 +229,7 @@ export function stationZoneLabel(id: StationId): string {
   return KITCHEN_ZONE_LABELS[stationZone(id)];
 }
 
-export type ZoneHandoffInfo = Readonly<{
+type ZoneHandoffInfo = Readonly<{
   fromZone: KitchenZoneId;
   toZone: KitchenZoneId;
   fromZoneLabel: string;
@@ -323,7 +323,7 @@ export type Process = Span &
     readonly arrival: number;
   };
 
-export type Transfer = Span & {
+type Transfer = Span & {
   readonly id: TransferTaskId;
   readonly kind: "transfer";
   readonly attended: true;
@@ -343,7 +343,7 @@ export type Wait = Span & {
     "station" | "worker" | "outage" | "cycle" | "dependency" | "start";
   readonly label: string;
 };
-export type UnresolvedWait = Readonly<{
+type UnresolvedWait = Readonly<{
   batch: string;
   location: StationId | null;
   station: StationId;
@@ -401,12 +401,12 @@ export type NativeHold = Readonly<{
   );
 // An injected staging or clearance failure holds its baker and the cell until
 // an assumed recovery, if any, releases them.
-export type HandlingFailure = Readonly<{
+type HandlingFailure = Readonly<{
   task: Handoff;
   failedAt: number;
   recoveredAt: number | null;
 }>;
-export type InjectedFailureEvidence = Readonly<{
+type InjectedFailureEvidence = Readonly<{
   source: "injected-failure";
   bakeryTaskId: Handoff["id"];
   time: number;
@@ -427,7 +427,7 @@ export type NativeReservation = Readonly<{
     | Readonly<{ kind: "held"; heldAt: number; end?: never }>
   );
 
-export type SimulatedCompletion = Readonly<{
+type SimulatedCompletion = Readonly<{
   source: "assumed-simulation";
   bakeryTaskId: BakeryTaskId;
   time: number;
@@ -504,7 +504,7 @@ export type TaskSnapshot =
       evidence: InjectedFailureEvidence;
     }>;
 
-export type SimulationStep = Readonly<{
+type SimulationStep = Readonly<{
   time: number;
   events: readonly TaskEvent[];
 }>;
@@ -2442,7 +2442,7 @@ export function clock(seconds: number): string {
   return `${String(6 + Math.floor(value / 3600)).padStart(2, "0")}:${String(Math.floor((value % 3600) / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
 }
 
-export type Plan61ASubstepId =
+type Plan61ASubstepId =
   | "pull-cold-ingredients"
   | "weigh-ingredients"
   | "cook-brown-butter"
@@ -2459,7 +2459,7 @@ export type Plan61ASubstepId =
   | "pack-ballotins"
   | "refill-vitrine";
 
-export type Plan61ASubstep = Readonly<{
+type Plan61ASubstep = Readonly<{
   id: Plan61ASubstepId;
   operation: Operation;
   startFraction: number;
@@ -2718,7 +2718,7 @@ export const VITRINE_ORDER_CHANNELS: readonly Readonly<{
   { id: "boutique", label: "Boutique" },
 ];
 
-export type VitrineOrderStatus = "upcoming" | "waiting-refill" | "fulfilled";
+type VitrineOrderStatus = "upcoming" | "waiting-refill" | "fulfilled";
 
 export type CafeBeverageRecipeId =
   | "espresso"
@@ -2727,7 +2727,7 @@ export type CafeBeverageRecipeId =
   | "ginger-black-tea"
   | "ginger-milk-tea";
 
-export type CafeBeverageStatus =
+type CafeBeverageStatus =
   | "upcoming"
   | "queued-bar"
   | "brewing"
@@ -2761,7 +2761,7 @@ export type VitrineCustomerOrder = Readonly<{
   beverageStatus: CafeBeverageStatus;
 }>;
 
-export type VitrineRefillWaveStatus =
+type VitrineRefillWaveStatus =
   | "pending"
   | "packing-ballotins"
   | "restocking-vitrine"
@@ -2780,7 +2780,7 @@ export type VitrineRefillWave = Readonly<{
   status: VitrineRefillWaveStatus;
 }>;
 
-export type VitrineStockStatus =
+type VitrineStockStatus =
   | "stocked"
   | "low-stock"
   | "restocking"
@@ -2788,7 +2788,7 @@ export type VitrineStockStatus =
 
 export type VitrineRushPresetId = "quiet" | "normal" | "weekend-rush";
 
-export type VitrineRushPresetSpec = Readonly<{
+type VitrineRushPresetSpec = Readonly<{
   id: VitrineRushPresetId;
   label: string;
   shortLabel: string;
@@ -2847,7 +2847,7 @@ export type VitrineStockSnapshot = Readonly<{
   customArrivalSummary: string;
 }>;
 
-export const VITRINE_REFILL_YIELD = {
+const VITRINE_REFILL_YIELD = {
   openingLoosePieces: 12,
   openingBallotinBoxes: 3,
   looseCapacity: 24,
@@ -2874,7 +2874,7 @@ type VitrineOrderTemplate = Readonly<{
   brewDurationSeconds?: number;
 }>;
 
-export type CafeBeverageSpec = Readonly<{
+type CafeBeverageSpec = Readonly<{
   recipe: CafeBeverageRecipeId;
   shortName: string;
   label: (cups: number) => string;
@@ -3204,7 +3204,7 @@ let forceApplyRecommendedCapacity = false;
 let vitrineDemandRevision = 0;
 const vitrineRushListeners = new Set<() => void>();
 
-export type VitrineOrderOverride = Readonly<{
+type VitrineOrderOverride = Readonly<{
   orderedAtMinutes?: number;
   channel?: VitrineOrderChannel;
   loosePieces?: number;
@@ -3316,7 +3316,7 @@ export function getVitrineDemandRevision(): number {
   return vitrineDemandRevision;
 }
 
-export type VitrineOrderChannelFilter = "all" | VitrineOrderChannel;
+type VitrineOrderChannelFilter = "all" | VitrineOrderChannel;
 
 let activeVitrineChannelFilter: VitrineOrderChannelFilter = "all";
 let snapVitrineOrdersToWaves = false;
@@ -3443,18 +3443,18 @@ function normalizeOrderOverride(
   }
 }
 
-export type VitrineDemandPresetSnapshot = Readonly<{
+type VitrineDemandPresetSnapshot = Readonly<{
   overrides: readonly (readonly [string, VitrineOrderOverride])[];
   added: readonly VitrineOrderTemplate[];
 }>;
 
-export type VitrineDemandSnapshot = Readonly<{
+type VitrineDemandSnapshot = Readonly<{
   activePreset: VitrineRushPresetId;
   autoScaleBatches: boolean;
   presets: Readonly<Record<VitrineRushPresetId, VitrineDemandPresetSnapshot>>;
 }>;
 
-export type VitrineDemandHistoryEvent = Readonly<{
+type VitrineDemandHistoryEvent = Readonly<{
   label: string;
   coalesceKey?: string;
   before: VitrineDemandSnapshot;
@@ -3466,7 +3466,7 @@ const vitrineDemandHistoryListeners = new Set<
   (event: VitrineDemandHistoryEvent) => void
 >();
 
-export function captureVitrineDemandSnapshot(): VitrineDemandSnapshot {
+function captureVitrineDemandSnapshot(): VitrineDemandSnapshot {
   const presets: readonly VitrineRushPresetId[] = [
     "quiet",
     "normal",
@@ -3762,7 +3762,7 @@ export function resetCustomVitrineOrders(
   emitVitrineDemandHistory("Reset customer orders", before);
 }
 
-export type VitrineOrderSchedulePayload = Readonly<{
+type VitrineOrderSchedulePayload = Readonly<{
   schemaVersion: 1;
   preset: VitrineRushPresetId;
   overrides: Readonly<Record<string, VitrineOrderOverride>>;
@@ -3981,12 +3981,6 @@ export function importCustomVitrineOrdersJson(
     orderCount: totalOrderCount,
     customCount,
   };
-}
-
-export function recommendedBatchCountForRushPreset(
-  preset: VitrineRushPresetId = activeVitrineRushPreset,
-): number {
-  return recommendedCapacityForRushPreset(preset).batchCount;
 }
 
 export function recommendedCapacityForRushPreset(
@@ -4495,5 +4489,4 @@ export {
   summarizeVitrineShiftService,
   exportVitrineShiftServiceJson,
   exportVitrineShiftServiceCsv,
-  type VitrineShiftServiceMetrics,
 } from "./shift-report.ts";

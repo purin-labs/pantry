@@ -22,7 +22,7 @@ export {
   compileGingerMilkTeaRecipe,
   gingerMilkTeaRecipeInput,
 } from "./ginger-milk-tea.ts";
-export { teaStrainTiming, type TeaStrainTiming } from "./tea-process.ts";
+export { teaStrainTiming } from "./tea-process.ts";
 
 function isBlackTeaWorkflow(workflowId: string): boolean {
   return workflowId === "ginger-tea-batch";
@@ -244,7 +244,7 @@ export function teaApplianceTask(
   return null;
 }
 
-export function gingerBlackTeaApplianceTasks(
+function gingerBlackTeaApplianceTasks(
   source: ScheduledTaskSource,
 ): readonly RecipeApplianceTaskBinding[] {
   const bindings: RecipeApplianceTaskBinding[] = [];
@@ -256,23 +256,12 @@ export function gingerBlackTeaApplianceTasks(
   return bindings;
 }
 
-export function gingerMilkTeaApplianceTasks(
+function gingerMilkTeaApplianceTasks(
   source: ScheduledTaskSource,
 ): readonly RecipeApplianceTaskBinding[] {
   const bindings: RecipeApplianceTaskBinding[] = [];
   for (const task of extractScheduledTasks(source)) {
     if (!isMilkTeaWorkflow(task.workflowId)) continue;
-    const bound = teaApplianceTask(task);
-    if (bound !== null) bindings.push(bound);
-  }
-  return bindings;
-}
-
-export function teaApplianceTasks(
-  source: ScheduledTaskSource,
-): readonly RecipeApplianceTaskBinding[] {
-  const bindings: RecipeApplianceTaskBinding[] = [];
-  for (const task of extractScheduledTasks(source)) {
     const bound = teaApplianceTask(task);
     if (bound !== null) bindings.push(bound);
   }
@@ -303,13 +292,3 @@ export async function executeGingerMilkTeaApplianceTasks(
   );
 }
 
-export async function executeTeaApplianceTasks(
-  source: ScheduledTaskSource,
-  runtime: ApplianceWasmRuntimeSource,
-  options: RecipeApplianceExecutionOptions = {},
-): Promise<RecipeApplianceExecutionReport> {
-  return executeRecipeApplianceTasks(teaApplianceTasks(source), runtime, {
-    runId: options.runId ?? "tea-appliance-wasm",
-    ...options,
-  });
-}

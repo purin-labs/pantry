@@ -38,7 +38,7 @@ export type RehearsalConversion = Readonly<{
   notes: readonly string[];
   readOnly: readonly string[];
 }>;
-export type RehearsalConversionResult =
+type RehearsalConversionResult =
   | Readonly<{
       kind: "ready";
       conversion: RehearsalConversion;

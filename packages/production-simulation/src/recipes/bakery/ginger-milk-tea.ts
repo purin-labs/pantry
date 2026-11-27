@@ -764,11 +764,3 @@ export function gingerMilkTeaRecipeInput() {
     ],
   };
 }
-
-export {
-  executeGingerMilkTeaApplianceTasks,
-  executeTeaApplianceTasks,
-  gingerMilkTeaApplianceTasks,
-  teaApplianceTask,
-  teaApplianceTasks,
-} from "./tea.ts";

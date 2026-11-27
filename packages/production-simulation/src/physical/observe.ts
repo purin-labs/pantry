@@ -22,7 +22,7 @@ import type { CarrierAt, CobotPlace, CobotTask } from "./protocol.ts";
  * proves stays `unknown`.
  */
 
-export type ObservedTaskState =
+type ObservedTaskState =
   /** Not yet wanted by the engine. */
   | "planned"
   /** The engine wants it sent; no dispatch record exists. */
@@ -35,7 +35,7 @@ export type ObservedTaskState =
   | "rejected"
   | "failed";
 
-export type BakeTaskView = Readonly<{
+type BakeTaskView = Readonly<{
   key: string;
   kind: BakeStepKind;
   mouldGroup: number | null;
@@ -56,12 +56,12 @@ export type BakeTaskView = Readonly<{
   reason: string | null;
 }>;
 
-export type MouldGroupPosition =
+type MouldGroupPosition =
   | Readonly<{ kind: "place"; place: CobotPlace; sourceKey?: never }>
   | Readonly<{ kind: "tool"; sourceKey: string; place?: never }>
   | Readonly<{ kind: "unknown"; place?: never; sourceKey?: never }>;
 
-export type MouldGroupView = Readonly<{
+type MouldGroupView = Readonly<{
   mouldGroup: number;
   position: MouldGroupPosition;
   /** `declared` before any receipt about the group, then `receipt`. */

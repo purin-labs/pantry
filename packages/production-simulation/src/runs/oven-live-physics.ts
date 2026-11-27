@@ -28,7 +28,7 @@ import {
 import type { StrictUnion } from "@purin-labs/type-utils";
 
 type Frame = Readonly<{ cell: string; committedAt: number; at: number }>;
-export type OvenSlot = StrictUnion<
+type OvenSlot = StrictUnion<
   | Readonly<{ kind: "inactive"; generation: number }>
   | Readonly<{ kind: "active"; generation: number; carrier: string }>
 >;

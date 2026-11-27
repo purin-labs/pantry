@@ -26,7 +26,7 @@ export type WorkcellSelection =
   | Readonly<{ kind: "task"; id: WorkcellTaskId }>
   | Readonly<{ kind: "resource"; id: WorkcellResourceId }>;
 
-export function taskById(run: Run, id: BakeryTaskId): BakeryTask | null {
+function taskById(run: Run, id: BakeryTaskId): BakeryTask | null {
   for (const interval of run.intervals) {
     if (interval.kind !== "wait" && interval.id === id) return interval;
   }

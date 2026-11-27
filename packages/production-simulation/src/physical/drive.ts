@@ -137,7 +137,7 @@ function checkpointAt(
 }
 
 /** The physical protocol, pinned where a simulated run pins its bundle. */
-export const PHYSICAL_BUNDLE_ID: Sha256Hex = digestOf(
+const PHYSICAL_BUNDLE_ID: Sha256Hex = digestOf(
   canonicalJson({ protocol: "plan-24-cobot/1", adapter: "physical/1" }),
 );
 

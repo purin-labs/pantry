@@ -14,7 +14,6 @@ import type {
 
 export type {
   CarrierAt,
-  CobotClock,
   CobotClockEntry,
   CobotObserved,
   CobotPlace,
@@ -22,7 +21,6 @@ export type {
   CobotStation,
   CobotTask,
   CobotTaskMessage,
-  CobotTaskState,
   DeviceRunState,
 } from "@purin-labs/control-api/device-cobot";
 

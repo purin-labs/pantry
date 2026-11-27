@@ -13,7 +13,7 @@ import {
 import { ZERO_DURATION, ZERO_TIME, timeFromSeconds } from "../../time.ts";
 import { claim, count, mass, pool, seconds } from "./tea-process.ts";
 
-export type LatteRecipe = Readonly<{ revision: number; milkG: number }>;
+type LatteRecipe = Readonly<{ revision: number; milkG: number }>;
 
 const COFFEE_MG = 18_000;
 const WATER_MG = 36_000;

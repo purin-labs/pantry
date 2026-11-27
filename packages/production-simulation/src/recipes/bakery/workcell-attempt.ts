@@ -20,7 +20,7 @@ import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 
 const lifecycle: unique symbol = Symbol("workcell attempt lifecycle");
-export type WorkcellResourceStatus =
+type WorkcellResourceStatus =
   AttemptProjection["resources"][WorkcellResource["role"]];
 
 type QueuedResources = Readonly<{
@@ -142,7 +142,7 @@ export type AwaitingReturnAttempt = LoadingEvidence &
   }>;
 export type ActiveAttempt =
   WaitingAttempt | CompletedAttempt | HeldAttempt | AwaitingReturnAttempt;
-export type WorkcellAttempt =
+type WorkcellAttempt =
   | Readonly<{
       kind: "empty";
       input?: never;
@@ -351,7 +351,7 @@ function completeEvidence(
   };
 }
 
-export function recordingMatchesInput(
+function recordingMatchesInput(
   input: WorkcellInput,
   recording: PhysicsReplay,
 ): boolean {
@@ -446,7 +446,7 @@ function failedRecording(
   return recording.outcome.kind !== "completed";
 }
 
-export type AttemptProjection =
+type AttemptProjection =
   | Readonly<{
       kind: "awaiting-return";
       tray: "destination";

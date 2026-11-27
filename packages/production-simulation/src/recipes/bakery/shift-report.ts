@@ -15,7 +15,7 @@ import { measureShift, type ShiftMetrics } from "./shift-metrics.ts";
 import { SIX_HOUR_SHIFT_SECONDS } from "./shift-preset.ts";
 import { buildShiftTaskTrace, type ShiftTrace } from "./shift-trace.ts";
 
-export type VitrineShiftServiceMetrics = Readonly<{
+type VitrineShiftServiceMetrics = Readonly<{
   rushPreset: VitrineRushPresetId;
   rushPresetLabel: string;
   horizonSeconds: number;
@@ -271,12 +271,9 @@ export function reportBakeryShift(
 export type {
   ShiftHour,
   ShiftMetric,
-  MetricId,
   Measurement,
-  MeasuredSixHourCarryover,
   MeasuredSixHourShift,
   MeasuredSixHourMetricComparison,
-  MeasuredSixHourComparison,
 } from "./shift-metrics.ts";
 
 export {

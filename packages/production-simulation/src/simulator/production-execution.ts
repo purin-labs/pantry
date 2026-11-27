@@ -11,7 +11,7 @@ import type { WaitingAttempt } from "../recipes/bakery/workcell-attempt.ts";
 
 export type ExecutableProductionOperation = ProductionWorkcell &
   Readonly<{ attempt: WaitingAttempt }>;
-export type ProductionExecution =
+type ProductionExecution =
   | Readonly<{
       kind: "execute";
       operation: ExecutableProductionOperation;
@@ -92,7 +92,7 @@ export function nextProductionExecution(
 
 // A first skill starts from its prepared fixture; a continuation resumes the
 // exact state its predecessor handed off.
-export function browserTask(
+function browserTask(
   operation: ExecutableProductionOperation,
 ): BrowserPhysicsTask | null {
   const input = operation.attempt.input;
@@ -133,7 +133,7 @@ export function browserTask(
   }
 }
 
-export function operationLabel(
+function operationLabel(
   operation: ProductionWorkcell,
   procedure: ProductionWorkcells["procedure"],
 ): string {

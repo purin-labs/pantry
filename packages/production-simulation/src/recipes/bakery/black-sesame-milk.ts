@@ -21,7 +21,6 @@ import {
 export {
   blackSesameRecipeInput,
   compileBlackSesameRecipe,
-  type BlackSesameProblem,
 } from "./black-sesame.ts";
 
 function isBlackSesameWorkflow(workflowId: string): boolean {
@@ -273,7 +272,7 @@ export function blackSesameApplianceTask(
   return null;
 }
 
-export function blackSesameApplianceTasks(
+function blackSesameApplianceTasks(
   source: ScheduledTaskSource,
 ): readonly RecipeApplianceTaskBinding[] {
   const bindings: RecipeApplianceTaskBinding[] = [];

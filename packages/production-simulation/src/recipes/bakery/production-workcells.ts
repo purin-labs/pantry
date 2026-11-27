@@ -153,7 +153,7 @@ export type PlannedProductionWorkcell = OperationIdentity &
 export type CellRobot =
   | Readonly<{ kind: "unused"; robot?: never }>
   | Readonly<{ kind: "assigned"; robot: RobotModel }>;
-export type CellRobots = Readonly<Record<CellId, CellRobot>>;
+type CellRobots = Readonly<Record<CellId, CellRobot>>;
 
 // Derive the saved cell configuration from roots and reserved human transfers.
 // A cell has one physical arm for the entire run.

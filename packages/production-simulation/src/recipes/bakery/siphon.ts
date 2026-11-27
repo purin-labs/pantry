@@ -13,7 +13,7 @@ import {
 import { ZERO_DURATION, ZERO_TIME, timeFromSeconds } from "../../time.ts";
 import { claim, mass, pool, seconds } from "./tea-process.ts";
 
-export type SiphonRecipe = Readonly<{
+type SiphonRecipe = Readonly<{
   revision: number;
   waterG: number;
   coffeeG: number;

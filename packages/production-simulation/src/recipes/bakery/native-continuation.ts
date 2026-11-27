@@ -163,28 +163,6 @@ export async function continuationInput(
   );
 }
 
-export function continuationMatchesInput(
-  handoff: NativeContinuation,
-  input: WorkcellInput,
-): boolean {
-  if (handoff.kind === "unload" && input.kind === "oven-cycle")
-    return (
-      input.handoffDigest === handoff.digest &&
-      JSON.stringify(input.request) ===
-        JSON.stringify(handoff.predecessor.request)
-    );
-  if (handoff.kind === "rack" && input.kind === "rack-cycle")
-    return (
-      input.rackPlan.rackHandoffDigest === handoff.digest &&
-      input.handoffDigest === handoff.predecessor.handoffDigest &&
-      JSON.stringify(input.request) ===
-        JSON.stringify(handoff.predecessor.loading.request) &&
-      JSON.stringify(input.returnRequest) ===
-        JSON.stringify(handoff.predecessor.unloading.request)
-    );
-  return false;
-}
-
 function object(value: unknown): Record<string, unknown> {
   if (value === null || typeof value !== "object" || Array.isArray(value))
     throw new Error("Expected a native handoff object.");

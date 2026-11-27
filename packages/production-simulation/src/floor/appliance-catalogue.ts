@@ -1,6 +1,6 @@
 import type { BakeryFloorPlanId } from "./bakery-room.ts";
 
-export type ApplianceFootprint = Readonly<{
+type ApplianceFootprint = Readonly<{
   id: string;
   label: string;
   halfWidth: number;
@@ -582,24 +582,3 @@ export const REHEARSAL_APPLIANCE_IDS: readonly ApplianceId[] = [
   "decor-planter",
 ];
 
-export const MORNING_SHIFT_APPLIANCE_IDS: readonly ApplianceId[] = [
-  "station-scale",
-  "station-mixer",
-  "station-sesame-prep",
-  "station-hob",
-  "station-oven",
-  "station-chiller",
-  "station-wash",
-  "station-beverage-bar",
-  "pour-over-cell",
-];
-
-export const FINANCIER_FACTORY_APPLIANCE_IDS: readonly ApplianceId[] = [
-  "station-preparation",
-  "station-hob",
-  "station-oven",
-  "station-mould-cooling",
-  "station-cooling-rack",
-  "station-wash",
-  "station-packing",
-];
