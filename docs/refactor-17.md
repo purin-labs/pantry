@@ -408,6 +408,16 @@ The layer debts, one line for each step that lowers a count:
   join Kitchen, Devices, the commerce projection and Slack; their move needs three
   ports.
 
+- 2026-11-27, `surface-nonpublic`: 244 to 175. The email and WhatsApp surfaces import
+  no Inbox file that is not public. The email and WhatsApp parts of `ConnectorDO`
+  hold the mailbox and WhatsApp agent state, so they moved to
+  `areas/inbox/server/actors/`, with the WhatsApp control route, the watch
+  reconciliation and the reply target. The surfaces keep transport: the Gmail push
+  route, the Meta webhook route, the queue messages and the relocation receipt
+  route. New ports: `channelIngress` and `whatsAppOperatorNotices` (Inbox contract),
+  `connectorEvalStore` (Brain contract). What stays: the Portal (144), Slack (19),
+  the webhooks (9) and voice (3).
+
 The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
 the state of Stage A. Its branches are gone; the work is on `dev`.
