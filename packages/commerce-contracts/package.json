@@ -17,7 +17,6 @@
     },
     "./unicode": "./src/unicode.ts",
     "./commerce-boundary": "./src/commerce-boundary.ts",
-    "./cue-facts": "./src/cue-facts.ts",
     "./lab-normalizer": "./src/lab-normalizer.ts",
     "./shopify-normalizer": "./src/shopify-normalizer.ts",
     "./supplier-payouts": "./src/supplier-payouts.ts",
