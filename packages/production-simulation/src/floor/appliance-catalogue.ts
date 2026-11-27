@@ -581,4 +581,3 @@ export const REHEARSAL_APPLIANCE_IDS: readonly ApplianceId[] = [
   "decor-vitrine",
   "decor-planter",
 ];
-
