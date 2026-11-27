@@ -580,50 +580,18 @@ function sameRaw(left: unknown, right: unknown, schema: TSchema): boolean {
   );
 }
 
-export type CommerceEntityCommandTarget = Static<
-  typeof authorityTargetSchemas.entity_command
->;
-
-export type CustomCommerceEntityCreateTarget = Static<
-  typeof authorityTargetSchemas.entity_create
->;
-
-export type CustomCommerceEntityTypeCreateTarget = Static<
-  typeof authorityTargetSchemas.custom_entity_type_create
->;
-
 export type CustomCommerceEntityTypeCommandTarget = Static<
   typeof authorityTargetSchemas.custom_entity_type_publish
->;
-
-export type SystemEntityExtensionSchemaCreateTarget = Static<
-  typeof authorityTargetSchemas.system_entity_extension_schema_create
 >;
 
 export type SystemEntityExtensionSchemaCommandTarget = Static<
   typeof authorityTargetSchemas.system_entity_extension_schema_publish
 >;
 
-export type CommerceListCommandTarget = Static<
-  typeof authorityTargetSchemas.commerce_list_command
->;
-
-export type CommerceListCreateTarget = Static<
-  typeof authorityTargetSchemas.commerce_list_create
->;
-
-export type CommerceListEntryCommandTarget = Static<
+type CommerceListEntryCommandTarget = Static<
   typeof authorityTargetSchemas.commerce_list_entry_command
 >;
 
-export type CommerceListEntryCreateTarget = Static<
-  typeof authorityTargetSchemas.commerce_list_entry_create
->;
-
-export type SavedCommerceViewCommandTarget = Static<
+type SavedCommerceViewCommandTarget = Static<
   typeof authorityTargetSchemas.saved_view_administration
->;
-
-export type SavedCommerceViewCreateTarget = Static<
-  typeof authorityTargetSchemas.saved_view_create
 >;

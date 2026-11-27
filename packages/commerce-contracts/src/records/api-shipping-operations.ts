@@ -7,7 +7,6 @@ import { Type, type Static } from "typebox";
 import {
   NonNegativeInteger,
   PositiveInteger,
-  ReadonlyRecord,
 } from "@purin-labs/contract-schema";
 import type {
   ShipmentLabelAttempt,
@@ -44,10 +43,7 @@ function sameText(value: string): string {
   return value;
 }
 
-export const jsonObjectSchema = ReadonlyRecord(Type.String(), Type.Unknown());
-export type JsonObject = Static<typeof jsonObjectSchema>;
-
-export const quoteShipmentLabelRateCommandSchema = ReadonlyOpenObject({
+const quoteShipmentLabelRateCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.quote-shipment-label-rate.v1"),
   merchantId: text,
   idempotencyKey: text,
@@ -66,7 +62,7 @@ const mutationBase = {
   requestedAt: timestampSchema,
 };
 
-export const purchaseShippingLabelCommandSchema = ReadonlyOpenObject({
+const purchaseShippingLabelCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.purchase-shipping-label.v1"),
   ...mutationBase,
   shipmentId: text,
@@ -85,7 +81,7 @@ const trackingEvent = {
   signature: text,
 };
 
-export const recordShippingTrackingCommandSchema = ReadonlyOpenObject({
+const recordShippingTrackingCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.record-shipping-tracking.v1"),
   ...mutationBase,
   shipmentId: text,
@@ -99,7 +95,7 @@ export type RecordShippingTrackingCommand = Static<
   typeof recordShippingTrackingCommandSchema
 >;
 
-export const attachFulfillmentTrackingCommandSchema = ReadonlyOpenObject({
+const attachFulfillmentTrackingCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.attach-fulfillment-tracking.v1"),
   ...mutationBase,
   orderId: text,
@@ -113,26 +109,25 @@ export type AttachFulfillmentTrackingCommand = Static<
   typeof attachFulfillmentTrackingCommandSchema
 >;
 
-export const wireShipmentLabelRateSchema =
-  Type.Unsafe<ShipmentLabelRateSnapshot>(
-    ReadonlyOpenObject({
-      labelRateId: text,
-      shipmentId: text,
-      shipmentRevision: PositiveInteger,
-      providerAccountReference: text,
-      rateReference: text,
-      service: ReadonlyOpenObject({ code: text, name: text }),
-      amount: ReadonlyOpenObject({
-        amountMinor: NonNegativeInteger,
-        currency: text,
-      }),
-      packagePlanDigest: text,
-      quotedAt: timestampSchema,
-      expiresAt: timestampSchema,
+const wireShipmentLabelRateSchema = Type.Unsafe<ShipmentLabelRateSnapshot>(
+  ReadonlyOpenObject({
+    labelRateId: text,
+    shipmentId: text,
+    shipmentRevision: PositiveInteger,
+    providerAccountReference: text,
+    rateReference: text,
+    service: ReadonlyOpenObject({ code: text, name: text }),
+    amount: ReadonlyOpenObject({
+      amountMinor: NonNegativeInteger,
+      currency: text,
     }),
-  );
+    packagePlanDigest: text,
+    quotedAt: timestampSchema,
+    expiresAt: timestampSchema,
+  }),
+);
 
-export const shipmentLabelRateResultSchema = ReadonlyOpenObject({
+const shipmentLabelRateResultSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.shipment-label-rate-result.v1"),
   outcome: Type.Union([Type.Literal("quoted"), Type.Literal("replayed")]),
   rate: wireShipmentLabelRateSchema,
@@ -141,40 +136,39 @@ export type ShipmentLabelRateResult = Static<
   typeof shipmentLabelRateResultSchema
 >;
 
-export const commerceShipmentLabelAttemptV1Schema =
-  Type.Unsafe<ShipmentLabelAttempt>(
-    ReadonlyOpenObject({
-      labelAttemptId: text,
-      shipmentId: text,
-      shipmentRevision: PositiveInteger,
-      labelRateId: text,
-      rateReference: text,
-      packagePlanDigest: text,
-      idempotencyKey: text,
-      revision: PositiveInteger,
-      lifecycle: Type.Union([
-        ReadonlyOpenObject({
-          state: Type.Literal("requested"),
-          requestedAt: timestampSchema,
-        }),
-        ReadonlyOpenObject({
-          state: Type.Literal("purchased"),
-          providerLabelReference: text,
-          trackingNumber: text,
-          purchasedAt: timestampSchema,
-        }),
-        ReadonlyOpenObject({
-          state: Type.Literal("rejected"),
-          reason: text,
-          rejectedAt: timestampSchema,
-        }),
-        ReadonlyOpenObject({
-          state: Type.Literal("indeterminate"),
-          lastAttemptAt: timestampSchema,
-        }),
-      ]),
-    }),
-  );
+const commerceShipmentLabelAttemptV1Schema = Type.Unsafe<ShipmentLabelAttempt>(
+  ReadonlyOpenObject({
+    labelAttemptId: text,
+    shipmentId: text,
+    shipmentRevision: PositiveInteger,
+    labelRateId: text,
+    rateReference: text,
+    packagePlanDigest: text,
+    idempotencyKey: text,
+    revision: PositiveInteger,
+    lifecycle: Type.Union([
+      ReadonlyOpenObject({
+        state: Type.Literal("requested"),
+        requestedAt: timestampSchema,
+      }),
+      ReadonlyOpenObject({
+        state: Type.Literal("purchased"),
+        providerLabelReference: text,
+        trackingNumber: text,
+        purchasedAt: timestampSchema,
+      }),
+      ReadonlyOpenObject({
+        state: Type.Literal("rejected"),
+        reason: text,
+        rejectedAt: timestampSchema,
+      }),
+      ReadonlyOpenObject({
+        state: Type.Literal("indeterminate"),
+        lastAttemptAt: timestampSchema,
+      }),
+    ]),
+  }),
+);
 export type CommerceShipmentLabelAttemptV1 = Static<
   typeof commerceShipmentLabelAttemptV1Schema
 >;
@@ -197,7 +191,4 @@ export const parseShipmentLabelRateResult = wireRecordParser(
 );
 export const parseWireShipmentLabelRate = wireRecordParser(
   wireShipmentLabelRateSchema,
-);
-export const parseWireShipmentLabelAttempt = wireRecordParser(
-  commerceShipmentLabelAttemptV1Schema,
 );

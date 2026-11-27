@@ -1,45 +1,14 @@
-// The commerce validators that the Portal and the client call on records they
-// receive. Each one checks with the contract parser and returns the parsed
-// value, with integer values revived as bigint where the record schema holds
-// a bigint; a refusal throws LexiconValidationError.
-import { parseCommerceEntityAuthority } from "./command-authority.ts";
-import { parseCommerceCursorPayload } from "./cursor-payload.ts";
-import { parseCommerceEntity } from "./entity-definition.ts";
-import { validateCommerceEntityPlaneCommandAuthority as validateCommandAuthority } from "./entity-plane-command-authority.ts";
-import { parseCommerceEntityPlaneCommand } from "./entity-plane-commands.ts";
-import { parseCommerceEntityPlaneObservation } from "./entity-plane-observations.ts";
-import { parseCommerceMutationReceipt } from "./entity-plane-receipts.ts";
 import { parseCommerceEntityShape } from "./entity-record.ts";
-import { parseCommerceEntityType } from "./entity-type.ts";
-import {
-  parseCommerceGraphQuery,
-  parsePublishedCommerceSelector,
-} from "./graph-query.ts";
-import {
-  parseCommerceList,
-  parseCommerceListEntry,
-  parseCommerceListEntryShape,
-} from "./list-records.ts";
-import { parseCommerceQueryPlan } from "./query-plan.ts";
-import {
-  parseCommerceRelationship,
-  parseCommerceRelationshipShape,
-  parseRelationshipDefinition,
-} from "./relationships.ts";
+import { parseCommerceRelationshipShape } from "./relationships.ts";
 import {
   jsonSafeInteger,
   UnsafeJsonIntegerError,
   type ContractDecodeResult,
 } from "@purin-labs/contract-schema";
 
-export type {
-  ContractDecodeError,
-  ContractDecodeResult,
-} from "@purin-labs/contract-schema";
-import { parseSavedCommerceView } from "./view-records.ts";
 import { isRecord } from "@purin-labs/std";
 
-export class LexiconValidationError extends TypeError {
+class LexiconValidationError extends TypeError {
   readonly code: string;
   readonly details: unknown;
 
@@ -105,68 +74,9 @@ function validated<T>(
   return reviveIntegers(jsonValue(result.value)) as T;
 }
 
-function definedEntity(input: unknown): ContractDecodeResult<unknown> {
-  return isRecord(input)
-    ? parseCommerceEntity(input.entity, input.attributeDefinitions)
-    : parseCommerceEntity(undefined, undefined);
-}
-
-export function validateCommerceGraphQuery<T>(value: unknown): T {
-  return validated(parseCommerceGraphQuery, value);
-}
-export function validateCommerceEntityPlaneCommand<T>(value: unknown): T {
-  return validated(parseCommerceEntityPlaneCommand, value);
-}
-export function validateCommerceEntityAuthority<T>(value: unknown): T {
-  return validated(parseCommerceEntityAuthority, value);
-}
-export function validateCommerceQueryPlan<T>(value: unknown): T {
-  return validated(parseCommerceQueryPlan, value);
-}
-export function validateCommerceCursorPayload<T>(value: unknown): T {
-  return validated(parseCommerceCursorPayload, value);
-}
-export function validateCommerceEntity<T>(value: unknown): T {
-  return validated(definedEntity, value);
-}
 export function validateCommerceEntityShape<T>(value: unknown): T {
   return validated(parseCommerceEntityShape, value);
 }
-export function validateCommerceEntityType<T>(value: unknown): T {
-  return validated(parseCommerceEntityType, value);
-}
-export function validateCommerceRelationship<T>(value: unknown): T {
-  return validated(parseCommerceRelationship, value);
-}
 export function validateCommerceRelationshipShape<T>(value: unknown): T {
   return validated(parseCommerceRelationshipShape, value);
-}
-export function validateRelationshipDefinition<T>(value: unknown): T {
-  return validated(parseRelationshipDefinition, value);
-}
-export function validateCommerceList<T>(value: unknown): T {
-  return validated(parseCommerceList, value);
-}
-export function validateCommerceListEntry<T>(value: unknown): T {
-  return validated(parseCommerceListEntry, value);
-}
-export function validateCommerceListEntryShape<T>(value: unknown): T {
-  return validated(parseCommerceListEntryShape, value);
-}
-export function validateSavedCommerceView<T>(value: unknown): T {
-  return validated(parseSavedCommerceView, value);
-}
-export function validatePublishedCommerceSelector<T>(value: unknown): T {
-  return validated(parsePublishedCommerceSelector, value);
-}
-export function validateCommerceMutationReceipt<T>(value: unknown): T {
-  return validated(parseCommerceMutationReceipt, value);
-}
-export function validateCommerceEntityPlaneObservation<T>(value: unknown): T {
-  return validated(parseCommerceEntityPlaneObservation, value);
-}
-export function validateCommerceEntityPlaneCommandAuthority<T>(
-  value: unknown,
-): T {
-  return validated(validateCommandAuthority, value);
 }

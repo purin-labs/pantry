@@ -19,9 +19,6 @@ import {
 const text = normalizedTextSchema;
 const exactKeys = { unevaluatedProperties: false } as const;
 
-export const customersMoneySchema = wireMoneySchema;
-export type CustomersMoney = Static<typeof customersMoneySchema>;
-
 /** `normalizeCustomerEmail`: trimmed, in lower case, at most 254 characters. */
 const customerEmailSchema = Type.Codec(
   Type.Refine(Type.String(), isCustomerEmail, customerEmailError),
@@ -61,15 +58,14 @@ function tagsError(): string {
   return "tags must be unique";
 }
 
-export const customerCommandBaseSchema = ReadonlyOpenObject({
+const customerCommandBaseSchema = ReadonlyOpenObject({
   merchantId: text,
   idempotencyKey: text,
   requestedAt: utcTimestampSchema,
   customerId: text,
 });
-export type CustomerCommandBase = Static<typeof customerCommandBaseSchema>;
 
-export const createCommerceCustomerV1Schema = Type.Intersect(
+const createCommerceCustomerV1Schema = Type.Intersect(
   [
     customerCommandBaseSchema,
     ReadonlyOpenObject({
@@ -87,7 +83,7 @@ export type CreateCommerceCustomerV1 = Static<
   typeof createCommerceCustomerV1Schema
 >;
 
-export const commerceMarketingConsentStateSchema = Type.Union([
+const commerceMarketingConsentStateSchema = Type.Union([
   Type.Literal("not_subscribed"),
   Type.Literal("subscribed"),
   Type.Literal("unsubscribed"),
@@ -122,7 +118,7 @@ function noChangeError(): string {
   return "changes must name at least one field";
 }
 
-export const updateCommerceCustomerV1Schema = Type.Intersect(
+const updateCommerceCustomerV1Schema = Type.Intersect(
   [
     customerCommandBaseSchema,
     ReadonlyOpenObject({
@@ -137,7 +133,7 @@ export type UpdateCommerceCustomerV1 = Static<
   typeof updateCommerceCustomerV1Schema
 >;
 
-export const eraseCommerceCustomerV1Schema = Type.Intersect(
+const eraseCommerceCustomerV1Schema = Type.Intersect(
   [
     customerCommandBaseSchema,
     ReadonlyOpenObject({
@@ -152,7 +148,7 @@ export type EraseCommerceCustomerV1 = Static<
   typeof eraseCommerceCustomerV1Schema
 >;
 
-export const commerceCustomerCommandV1Schema = Type.Union([
+const commerceCustomerCommandV1Schema = Type.Union([
   createCommerceCustomerV1Schema,
   updateCommerceCustomerV1Schema,
   eraseCommerceCustomerV1Schema,
@@ -161,7 +157,7 @@ export type CommerceCustomerCommandV1 = Static<
   typeof commerceCustomerCommandV1Schema
 >;
 
-export const requestCommerceCustomerSignInV1Schema = ReadonlyStrictObject({
+const requestCommerceCustomerSignInV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.request-customer-sign-in.v1"),
   email: customerEmailSchema,
 });
@@ -169,7 +165,7 @@ export type RequestCommerceCustomerSignInV1 = Static<
   typeof requestCommerceCustomerSignInV1Schema
 >;
 
-export const verifyCommerceCustomerSignInV1Schema = ReadonlyStrictObject({
+const verifyCommerceCustomerSignInV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.verify-customer-sign-in.v1"),
   code: Type.String({ pattern: "^\\d{6}$" }),
 });
@@ -187,14 +183,14 @@ const addressInputProperties = {
   countryCode: Type.String({ pattern: "^[A-Z]{2}$" }),
 };
 
-export const commerceCustomerAddressInputV1Schema = ReadonlyStrictObject(
+const commerceCustomerAddressInputV1Schema = ReadonlyStrictObject(
   addressInputProperties,
 );
 export type CommerceCustomerAddressInputV1 = Static<
   typeof commerceCustomerAddressInputV1Schema
 >;
 
-export const saveCommerceCustomerAddressV1Schema = ReadonlyStrictObject({
+const saveCommerceCustomerAddressV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.save-customer-address.v1"),
   address: commerceCustomerAddressInputV1Schema,
 });
@@ -202,7 +198,7 @@ export type SaveCommerceCustomerAddressV1 = Static<
   typeof saveCommerceCustomerAddressV1Schema
 >;
 
-export const commerceCustomerAddressV1Schema = Type.Intersect(
+const commerceCustomerAddressV1Schema = Type.Intersect(
   [
     ReadonlyOpenObject(addressInputProperties),
     ReadonlyOpenObject({ addressId: text }),
@@ -213,7 +209,7 @@ export type CommerceCustomerAddressV1 = Static<
   typeof commerceCustomerAddressV1Schema
 >;
 
-export const commerceMarketingConsentV1Schema = ReadonlyStrictObject({
+const commerceMarketingConsentV1Schema = ReadonlyStrictObject({
   state: commerceMarketingConsentStateSchema,
   updatedAt: Nullable(utcTimestampSchema),
   source: Nullable(Type.Union([Type.Literal("buyer"), Type.Literal("staff")])),
@@ -222,7 +218,7 @@ export type CommerceMarketingConsentV1 = Static<
   typeof commerceMarketingConsentV1Schema
 >;
 
-export const commerceCustomerV1Schema = ReadonlyStrictObject({
+const commerceCustomerV1Schema = ReadonlyStrictObject({
   id: text,
   revision: PositiveInteger,
   state: Type.Union([Type.Literal("active"), Type.Literal("erased")]),
@@ -243,7 +239,7 @@ export const commerceCustomerV1Schema = ReadonlyStrictObject({
 });
 export type CommerceCustomerV1 = Static<typeof commerceCustomerV1Schema>;
 
-export const commerceCustomerExportV1Schema = ReadonlyStrictObject({
+const commerceCustomerExportV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.customer-export.v1"),
   customer: commerceCustomerV1Schema,
   exportedAt: utcTimestampSchema,
@@ -252,7 +248,7 @@ export type CommerceCustomerExportV1 = Static<
   typeof commerceCustomerExportV1Schema
 >;
 
-export const commerceCustomerSignInChallengeV1Schema = ReadonlyStrictObject({
+const commerceCustomerSignInChallengeV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.customer-sign-in-challenge.v1"),
   challengeId: text,
   expiresAt: utcTimestampSchema,
@@ -261,7 +257,7 @@ export type CommerceCustomerSignInChallengeV1 = Static<
   typeof commerceCustomerSignInChallengeV1Schema
 >;
 
-export const commerceCustomerAccessV1Schema = ReadonlyStrictObject({
+const commerceCustomerAccessV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.customer-access.v1"),
   customerAccessToken: text,
   expiresAt: utcTimestampSchema,
@@ -270,7 +266,7 @@ export type CommerceCustomerAccessV1 = Static<
   typeof commerceCustomerAccessV1Schema
 >;
 
-export const commerceBuyerCustomerV1Schema = ReadonlyStrictObject({
+const commerceBuyerCustomerV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.buyer-customer.v1"),
   email: text,
   name: Nullable(boundedTextSchema(200)),
@@ -288,7 +284,7 @@ export type CommerceBuyerCustomerV1 = Static<
   typeof commerceBuyerCustomerV1Schema
 >;
 
-export const commerceNotificationV1Schema = ReadonlyStrictObject({
+const commerceNotificationV1Schema = ReadonlyStrictObject({
   notificationId: text,
   kind: Type.Union([
     Type.Literal("order_confirmation"),
@@ -315,7 +311,7 @@ export type CommerceNotificationV1 = Static<
 >;
 
 /** `parseNotifications`: the list of a merchant's buyer messages. */
-export const commerceNotificationsV1Schema = Type.Codec(
+const commerceNotificationsV1Schema = Type.Codec(
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.notifications.v1"),
     notifications: ImmutableArray(commerceNotificationV1Schema),

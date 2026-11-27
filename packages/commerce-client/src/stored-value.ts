@@ -10,17 +10,14 @@ import {
   normalizeGiftCardCode as normalizeGiftCardCodeText,
   parseCommerceStoredValueAccountsV1,
 } from "@purin-labs/commerce-contracts/records/api-stored-value";
-import type { CheckoutStoredValue } from "@purin-labs/commerce-contracts";
 
 import type { CommerceEngineTimestamp } from "./commerce-resources.ts";
 import { requireString } from "./wire-readers.ts";
 import {
-  parseCheckoutStoredValueOfTotal,
   parseCreditCommerceStoreCreditV1 as parseCreditCommerceStoreCreditV1Record,
   parseDisableCommerceStoredValueAccountV1 as parseDisableCommerceStoredValueAccountV1Record,
   parseIssueCommerceGiftCardV1 as parseIssueCommerceGiftCardV1Record,
   parseCommerceGiftCardBalanceV1 as parseCommerceGiftCardBalanceV1Record,
-  parseCommerceStoredValueAccountV1 as parseCommerceStoredValueAccountV1Record,
   parseCommerceStoredValueLiabilityV1 as parseCommerceStoredValueLiabilityV1Record,
 } from "@purin-labs/commerce-contracts/records/api-stored-value";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
@@ -157,12 +154,6 @@ export function parseDisableStoredValueAccountCommand(
   return decodeRecord(parseDisableCommerceStoredValueAccountV1Record, value);
 }
 
-export function parseStoredValueAccount(
-  value: unknown,
-): CommerceStoredValueAccountV1 {
-  return decodeRecord(parseCommerceStoredValueAccountV1Record, value);
-}
-
 export function parseStoredValueAccounts(
   value: unknown,
 ): readonly CommerceStoredValueAccountV1[] {
@@ -179,13 +170,4 @@ export function parseStoredValueLiability(
   value: unknown,
 ): CommerceStoredValueLiabilityV1 {
   return decodeRecord(parseCommerceStoredValueLiabilityV1Record, value);
-}
-
-/** The stored value of a checkout quote; it pays at most the total. */
-export function parseCheckoutStoredValue(
-  value: unknown,
-  total: Money,
-  field: string,
-): CheckoutStoredValue {
-  return decodeRecord(parseCheckoutStoredValueOfTotal.bind(null, total), value);
 }

@@ -21,8 +21,6 @@ export type {
   RecordCommerceInvoicePaymentV1,
   CommerceCompanyCommandV1,
   CommerceCompanyInvoiceV1,
-  CommerceCompanyPaymentTermsV1,
-  CommerceCompanyPricesV1,
   CommerceCompanyV1,
   UpdateCommerceCompanyV1,
 } from "@purin-labs/commerce-contracts/records/api-companies";

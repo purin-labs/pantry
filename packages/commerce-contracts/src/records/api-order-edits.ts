@@ -18,9 +18,6 @@ import {
 
 const text = normalizedTextSchema;
 
-export const orderEditsMoneySchema = wireMoneySchema;
-export type OrderEditsMoney = Static<typeof orderEditsMoneySchema>;
-
 const commandBase = {
   merchantId: text,
   idempotencyKey: text,
@@ -61,7 +58,7 @@ function editLinesError(): string {
   return "an order edit changes or adds lines, each named once";
 }
 
-export const editCommerceOrderV1Schema = Type.Refine(
+const editCommerceOrderV1Schema = Type.Refine(
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.edit-order.v1"),
     ...commandBase,
@@ -91,7 +88,7 @@ function exchangeLinesError(): string {
   return "an exchange adds lines, each variant named once";
 }
 
-export const exchangeCommerceOrderLinesV1Schema = Type.Refine(
+const exchangeCommerceOrderLinesV1Schema = Type.Refine(
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.exchange-order-lines.v1"),
     ...commandBase,
@@ -110,14 +107,14 @@ export type ExchangeCommerceOrderLinesV1 = Static<
   typeof exchangeCommerceOrderLinesV1Schema
 >;
 
-export const openCommerceBuyerOrderBalanceV1Schema = ReadonlyStrictObject({
+const openCommerceBuyerOrderBalanceV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.open-buyer-order-balance.v1"),
 });
 export type OpenCommerceBuyerOrderBalanceV1 = Static<
   typeof openCommerceBuyerOrderBalanceV1Schema
 >;
 
-export const recordCommerceOrderManualPaymentV1Schema = ReadonlyStrictObject({
+const recordCommerceOrderManualPaymentV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.record-order-manual-payment.v1"),
   ...commandBase,
   orderId: text,
@@ -131,11 +128,10 @@ export type RecordCommerceOrderManualPaymentV1 = Static<
 >;
 
 export {
-  commerceOrderBalanceCheckoutV1Schema,
   type CommerceOrderBalanceCheckoutV1,
 } from "./api-storefront-responses.ts";
 
-export const commerceOrderBalanceV1Schema = ReadonlyStrictObject({
+const commerceOrderBalanceV1Schema = ReadonlyStrictObject({
   total: wireMoneySchema,
   captured: wireMoneySchema,
   refunded: wireMoneySchema,
@@ -146,7 +142,7 @@ export type CommerceOrderBalanceV1 = Static<
   typeof commerceOrderBalanceV1Schema
 >;
 
-export const commerceOrderChangeLineV1Schema = ReadonlyStrictObject({
+const commerceOrderChangeLineV1Schema = ReadonlyStrictObject({
   orderLineId: text,
   quantity: PositiveInteger,
   lineTotal: wireMoneySchema,
@@ -188,7 +184,7 @@ const lineChangeFields = {
   linesAfter: ImmutableArray(commerceOrderChangeLineV1Schema),
 };
 
-export const commerceOrderEditV1Schema = ReadonlyStrictObject({
+const commerceOrderEditV1Schema = ReadonlyStrictObject({
   kind: Type.Literal("edit"),
   ...lineChangeFields,
 });
@@ -204,7 +200,7 @@ function exchangeChange<Properties extends TProperties>(
   );
 }
 
-export const commerceOrderExchangeV1Schema = exchangeChange({
+const commerceOrderExchangeV1Schema = exchangeChange({
   kind: Type.Literal("exchange"),
   returnId: text,
   fulfillmentId: text,
@@ -213,7 +209,7 @@ export type CommerceOrderExchangeV1 = Static<
   typeof commerceOrderExchangeV1Schema
 >;
 
-export const commerceOrderPaymentChangeV1Schema = ReadonlyStrictObject({
+const commerceOrderPaymentChangeV1Schema = ReadonlyStrictObject({
   kind: Type.Literal("payment"),
   ...changeBase,
   paymentId: text,
@@ -233,7 +229,7 @@ export type CommerceOrderChangeV1 = Static<
   typeof commerceOrderChangeV1Schema
 >;
 
-export const commerceOrderChangesV1Schema = ReadonlyStrictObject({
+const commerceOrderChangesV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.order-changes.v1"),
   orderId: text,
   orderRevision: PositiveInteger,

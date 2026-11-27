@@ -45,15 +45,10 @@ export const commerceEffectiveOrderingSchema = OpenObject({
   tieBreaker: commerceEntityIdTieBreakerSchema,
 });
 
-export type CommerceSortDirection = Static<typeof commerceSortDirectionSchema>;
-export type CommerceNullPlacement = Static<typeof commerceNullPlacementSchema>;
 export type CommerceSortField = StrictUnion<
   Static<typeof commerceSortFieldSchema>
 >;
 export type CommerceSort = Static<typeof commerceSortSchema>;
-export type CommerceOrderingLeadingField = StrictUnion<
-  Static<typeof commerceOrderingLeadingFieldSchema>
->;
 export type CommerceOrderingLeadingKey = Static<
   typeof commerceOrderingLeadingKeySchema
 >;

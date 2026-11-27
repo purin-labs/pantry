@@ -101,7 +101,7 @@ import {
 } from "./wire-readers.ts";
 import type * as WireStorefront from "@purin-labs/commerce-contracts/records/api-storefront";
 
-export type CreateCommerceBuyerSessionV1 = WireStorefront.CreateCommerceBuyerSessionV1;
+type CreateCommerceBuyerSessionV1 = WireStorefront.CreateCommerceBuyerSessionV1;
 
 export type CommerceBuyerSessionV4 = WireStorefront.CommerceBuyerSessionV4;
 
@@ -269,7 +269,7 @@ export type CommerceBuyerShippingDestinationV1 = WireStorefront.CommerceBuyerShi
 
 export type CommerceBuyerShippingAddressAcceptanceV1 = WireStorefront.CommerceBuyerShippingAddressAcceptanceV1;
 
-export type ValidateCommerceBuyerShippingAddressV1 = WireStorefront.ValidateCommerceBuyerShippingAddressV1;
+type ValidateCommerceBuyerShippingAddressV1 = WireStorefront.ValidateCommerceBuyerShippingAddressV1;
 
 type CommerceBuyerShippingAddressValidationBaseV1 = Readonly<{
   schemaVersion: "commerce.buyer-shipping-address-validation.v1";
@@ -338,18 +338,18 @@ export type CommerceBuyerQuotedCheckoutV1 = Readonly<{
   }>;
 }>;
 
-export type CommerceBuyerShippingChargeAllocationV1 = Readonly<{
+type CommerceBuyerShippingChargeAllocationV1 = Readonly<{
   checkoutLineId: string;
   amount: Readonly<{ amountMinor: number; currency: string }>;
 }>;
 
-export type CommerceBuyerCarrierQuoteV1 = Readonly<{
+type CommerceBuyerCarrierQuoteV1 = Readonly<{
   rateReference: string;
   shippingAmount: Readonly<{ amountMinor: number; currency: string }>;
   lineAllocations: readonly CommerceBuyerShippingChargeAllocationV1[];
 }>;
 
-export type CommerceBuyerTaxQuoteV1 = Readonly<{
+type CommerceBuyerTaxQuoteV1 = Readonly<{
   registrationPolicyReference: string;
   quoteReference: string;
   taxAmount: Readonly<{ amountMinor: number; currency: string }>;
@@ -410,7 +410,7 @@ export type CommerceBuyerQuotedShippingCheckoutV1 = Readonly<{
   }>;
 }>;
 
-export type CommerceBuyerShippingMarketV1 = Readonly<{
+type CommerceBuyerShippingMarketV1 = Readonly<{
   marketId: string;
   currency: string;
   shopCurrency: string;
@@ -418,7 +418,7 @@ export type CommerceBuyerShippingMarketV1 = Readonly<{
   roundingIncrement: number;
 }>;
 
-export type CommerceBuyerRecoverableCheckoutV1 =
+type CommerceBuyerRecoverableCheckoutV1 =
   CommerceBuyerQuotedCheckoutV1 | CommerceBuyerQuotedShippingCheckoutV1;
 
 export type CommerceBuyerCheckoutPaymentProgressV1 =
@@ -746,7 +746,7 @@ export type CommerceBuyerOrderV1 =
         purchasedAt?: never;
       }>);
 
-export type CommerceStorefrontClientConfig = Readonly<{
+type CommerceStorefrontClientConfig = Readonly<{
   baseUrl: string;
   fetch?: CommerceFetch;
 }>;

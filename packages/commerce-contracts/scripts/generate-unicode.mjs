@@ -3,7 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { format } from "prettier";
 
-export const UNICODE_VERSION = "17.0.0";
+const UNICODE_VERSION = "17.0.0";
 const cache = new URL("../generated/unicode/", import.meta.url);
 const output = new URL("../src/unicode-tables.ts", import.meta.url);
 const sources = {
@@ -19,7 +19,7 @@ const sources = {
     "5019ffd530751a741900c849c0e010332f142a3612234639bd200b82138a87db",
 };
 
-export async function readUnicodeSource(name) {
+async function readUnicodeSource(name) {
   const expected = sources[name];
   if (expected === undefined)
     throw new Error(`Unknown Unicode source: ${name}`);

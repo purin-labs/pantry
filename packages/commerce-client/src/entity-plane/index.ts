@@ -4,12 +4,7 @@ export {
   parseEntityTypeId,
   SYSTEM_KINDS,
 } from "./primitives.ts";
-export type {
-  CommerceEntityPlaneClientConfig,
-  CommerceEntityPlaneClientError,
-  CommerceEntityPlaneClientResult,
-  CommerceEntityPlaneFetch,
-} from "./client.ts";
+export type { CommerceEntityPlaneFetch } from "./client.ts";
 export {
   SUPPLIER_DIRECTORY_LIST_ID,
   SUPPLIER_ENTITY_TYPE_ID,
@@ -38,7 +33,6 @@ export {
   parseCommerceRelationshipRef,
   parseCustomCommerceRelationshipRef,
   parseEntityPlaneRelationshipTraversalStepRequest,
-  parseEntityPlaneRelationshipTraversalStepResponse,
   parseCommerceGraphResponse,
   parseCommerceSnapshotRevision,
   parseCommerceCursorValue,
@@ -64,8 +58,6 @@ export {
   parseEntityPlaneSystemExtensionRequest,
   parseEntityPlaneSystemExtensionResponse,
   parseCommerceEntityPlaneCommand,
-  parseCommerceEntityAuthority,
-  parseEntityPlaneQueryRequest,
   parseEntityPlaneCapabilityMetadataRequest,
   parseEntityPlaneCapabilityMetadataResponse,
   parseEntityPlaneExportPresetPublishRequest,
@@ -74,18 +66,13 @@ export {
   parseEntityPlanePublishedResourceMetadataRequest,
   parseEntityPlanePublishedResourceMetadataResponse,
   parsePublishedCommerceSelector,
-  parseCommerceEntityType,
   parseCommerceListEntryRef,
   parseCommerceViewPresentation,
-  parseSavedCommerceView,
   parseEntityPlaneChanges,
   parseEntityPlaneCommand,
   parseEntityPlaneCommandResult,
-  parseCommerceEntityPlaneError,
   parseEntityPlaneObservation,
-  parseCommerceObservationResult,
   parseCommerceQueryPlanOutcome,
-  parseCommerceEntityPlanePlannedQueryResponse,
 } from "./parsers.ts";
 export type {
   CommerceEntityPlaneQueryRequest,

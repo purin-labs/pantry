@@ -1,11 +1,7 @@
 // Plan 78: generated once from the ts-rs bindings of the Rust contracts.
 // TypeScript is now the source; edit these schemas by hand.
 import { Type, type Static } from "typebox";
-import {
-  OpenObject,
-  SafeInteger,
-  recordParser,
-} from "@purin-labs/contract-schema";
+import { OpenObject, SafeInteger } from "@purin-labs/contract-schema";
 import { resourceIdSchema } from "./identifiers.ts";
 import { commerceTimestampSchema } from "./provenance.ts";
 
@@ -13,7 +9,7 @@ import { commerceTimestampSchema } from "./provenance.ts";
  * Which rail a destination is addressed for. A destination is rail-specific:
  * a Japanese bank account and a Wise recipient are not interchangeable.
  */
-export const supplierDestinationRailSchema = Type.Union([
+const supplierDestinationRailSchema = Type.Union([
   OpenObject({ kind: Type.Literal("gmo_aozora_domestic") }),
   OpenObject({
     kind: Type.Literal("wise_recipient"),
@@ -28,7 +24,7 @@ export type SupplierDestinationRail = Static<
 /**
  * Where a destination revision stands. Only `active` can receive money.
  */
-export const supplierDestinationStateSchema = Type.Union([
+const supplierDestinationStateSchema = Type.Union([
   OpenObject({ kind: Type.Literal("draft"), proposedBy: resourceIdSchema }),
   OpenObject({
     kind: Type.Literal("verified"),
@@ -53,7 +49,7 @@ export type SupplierDestinationState = Static<
 /**
  * One immutable revision of a supplier destination.
  */
-export const supplierDestinationRevisionSchema = OpenObject({
+const supplierDestinationRevisionSchema = OpenObject({
   revisionId: resourceIdSchema,
   destinationId: resourceIdSchema,
   supplierId: resourceIdSchema,
@@ -66,14 +62,3 @@ export const supplierDestinationRevisionSchema = OpenObject({
 export type SupplierDestinationRevision = Static<
   typeof supplierDestinationRevisionSchema
 >;
-
-// Parsers of the records above (Plan 78 step 2).
-export const parseSupplierDestinationRail = recordParser(
-  supplierDestinationRailSchema,
-);
-export const parseSupplierDestinationState = recordParser(
-  supplierDestinationStateSchema,
-);
-export const parseSupplierDestinationRevision = recordParser(
-  supplierDestinationRevisionSchema,
-);

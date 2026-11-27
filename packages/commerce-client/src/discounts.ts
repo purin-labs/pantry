@@ -4,9 +4,6 @@
 // on the discounted amounts. A code use is held by the checkout and counted
 // when the order is placed.
 import type { CommerceEngineTimestamp } from "./commerce-resources.ts";
-import {
-  requireString,
-} from "./wire-readers.ts";
 import { parseCreateCommerceDiscountV1 as parseCreateCommerceDiscountV1Record, parseDeactivateCommerceDiscountV1 as parseDeactivateCommerceDiscountV1Record, parseCommerceDiscountV1 as parseCommerceDiscountV1Record, parseCommerceDiscountsV1 as parseCommerceDiscountsV1Record } from "@purin-labs/commerce-contracts/records/api-discounts";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
@@ -77,14 +74,6 @@ export type DeactivateCommerceDiscountV1 = DiscountCommandBase &
 export type CommerceDiscountCommandV1 =
   | CreateCommerceDiscountV1
   | DeactivateCommerceDiscountV1;
-
-/** Codes match without regard to case or surrounding space. */
-export function normalizeDiscountCode(value: unknown, field: string): string {
-  const code = requireString(value, field).trim().toUpperCase();
-  if (!/^[A-Z0-9_-]{3,40}$/.test(code))
-    throw new Error(`${field} must be 3 to 40 letters, digits, - or _`);
-  return code;
-}
 
 export function parseCreateDiscountCommand(value: unknown): CreateCommerceDiscountV1 {
   return decodeRecord(parseCreateCommerceDiscountV1Record, value);

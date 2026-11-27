@@ -95,7 +95,7 @@ function allocationError(): string {
   return "the allocation must be positive, in one currency, each line once";
 }
 
-export const wireRefundAllocationSchema = Type.Unsafe<RefundAllocation>(
+const wireRefundAllocationSchema = Type.Unsafe<RefundAllocation>(
   Type.Refine(
     ReadonlyStrictObject({
       lineAllocations: Type.Array(lineAllocationSchema),
@@ -126,7 +126,7 @@ function allocationMismatch(): string {
   return "allocation must equal amount";
 }
 
-export const cancelCommerceOrderV1Schema = ReadonlyStrictObject({
+const cancelCommerceOrderV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.cancel-order.v1"),
   merchantId: text,
   expectedMerchantRevision: NonNegativeInteger,
@@ -145,7 +145,7 @@ export type CancelCommerceOrderV1 = Static<
   typeof cancelCommerceOrderV1Schema
 >;
 
-export const refundCommerceOrderV1Schema = Type.Refine(
+const refundCommerceOrderV1Schema = Type.Refine(
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.refund-order.v1"),
     merchantId: text,
@@ -170,7 +170,7 @@ export type RefundCommerceOrderV1 = Static<
   typeof refundCommerceOrderV1Schema
 >;
 
-export const recordCounterManualCashRefundV1Schema = Type.Refine(
+const recordCounterManualCashRefundV1Schema = Type.Refine(
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.record-counter-manual-cash-refund.v1"),
     merchantId: text,
@@ -190,9 +190,6 @@ export const recordCounterManualCashRefundV1Schema = Type.Refine(
   allocationMatchesAmount,
   allocationMismatch,
 );
-export type RecordCommerceCounterManualCashRefundV1 = Static<
-  typeof recordCounterManualCashRefundV1Schema
->;
 
 const tenderSchema = ReadonlyStrictObject({
   paymentId: text,
@@ -229,7 +226,7 @@ function tendersMismatch(): string {
   return "tenders must name each payment once and add up to amount";
 }
 
-export const refundCommerceOrderTendersV1Schema = Type.Refine(
+const refundCommerceOrderTendersV1Schema = Type.Refine(
   Type.Refine(
     ReadonlyStrictObject({
       schemaVersion: Type.Literal("commerce.refund-order-tenders.v1"),
@@ -254,7 +251,7 @@ export type RefundCommerceOrderTendersV1 = Static<
   typeof refundCommerceOrderTendersV1Schema
 >;
 
-export const commerceTenderRefundPartV1Schema = ReadonlyStrictObject({
+const commerceTenderRefundPartV1Schema = ReadonlyStrictObject({
   paymentId: text,
   refundAttemptId: text,
   amount: positiveMoneySchema,
@@ -264,7 +261,7 @@ export type CommerceTenderRefundPartV1 = Static<
   typeof commerceTenderRefundPartV1Schema
 >;
 
-export const commerceTenderRefundV1Schema = Type.Union([
+const commerceTenderRefundV1Schema = Type.Union([
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.tender-refund.v1"),
     outcome: Type.Literal("rejected"),

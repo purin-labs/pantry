@@ -60,7 +60,7 @@ export function OpenObject<Properties extends TProperties>(
   return Type.Object(properties, options);
 }
 
-export type ContractDecodeError =
+type ContractDecodeError =
   | Readonly<{
       kind: "validation_rejected";
       code: string;

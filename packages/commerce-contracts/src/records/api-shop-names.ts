@@ -20,7 +20,7 @@ export const COMMERCE_SHOP_NAME_LIMIT = 5;
  * Names that a shop may not take: the hosts of the services themselves and
  * the names that a person would take for one of them.
  */
-export const COMMERCE_RESERVED_SHOP_NAMES: ReadonlySet<string> = new Set([
+const COMMERCE_RESERVED_SHOP_NAMES: ReadonlySet<string> = new Set([
   "about",
   "abuse",
   "account",
@@ -90,10 +90,6 @@ export function commerceShopNameProblem(
   return COMMERCE_RESERVED_SHOP_NAMES.has(name) ? "reserved" : undefined;
 }
 
-export function isCommerceShopName(value: string): boolean {
-  return commerceShopNameProblem(value) === undefined;
-}
-
 function shopNameError(): string {
   return "is not a shop name";
 }
@@ -102,7 +98,7 @@ function shopNameError(): string {
  * A name in a record. The reserved list may grow, so a record accepts a
  * name of the right form that a later list reserves.
  */
-export const commerceShopNameSchema = Type.Refine(
+const commerceShopNameSchema = Type.Refine(
   Type.String(),
   isShopNameForm,
   shopNameError,
@@ -113,7 +109,7 @@ function isShopNameForm(value: string): boolean {
 }
 
 /** A storefront's shop names, for its merchant. */
-export const commerceStorefrontShopNameV1Schema = ReadonlyStrictObject({
+const commerceStorefrontShopNameV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.storefront-shop-name.v1"),
   merchantId: text,
   storefrontId: text,
@@ -126,19 +122,16 @@ export type CommerceStorefrontShopNameV1 = Static<
 >;
 
 /** The body of `PUT .../storefronts/:storefrontId/shop-name`. */
-export const setCommerceStorefrontShopNameV1Schema = ReadonlyStrictObject({
+const setCommerceStorefrontShopNameV1Schema = ReadonlyStrictObject({
   name: textLimit(Type.String({ maxLength: 64 })),
 });
-export type SetCommerceStorefrontShopNameV1 = Static<
-  typeof setCommerceStorefrontShopNameV1Schema
->;
 
 /**
  * What a change answers. A refusal is an answer, not an error: the name is
  * of the wrong form, reserved, another shop's, or one more than the
  * storefront may hold.
  */
-export const commerceStorefrontShopNameChangeV1Schema = Type.Union([
+const commerceStorefrontShopNameChangeV1Schema = Type.Union([
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.storefront-shop-name-change.v1"),
     outcome: Type.Literal("set"),
@@ -160,7 +153,7 @@ export type CommerceStorefrontShopNameChangeV1 = Static<
 >;
 
 /** The public answer for one name: the storefront that a shop site opens. */
-export const commerceShopNameV1Schema = ReadonlyStrictObject({
+const commerceShopNameV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.shop-name.v1"),
   name: commerceShopNameSchema,
   merchantId: text,

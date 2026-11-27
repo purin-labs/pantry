@@ -35,7 +35,6 @@ export type {
 } from "@purin-labs/commerce-contracts/entity-plane-resources";
 import type {
   AttributeDefinitionId,
-  CommerceEntityType,
   CommerceGraphQueryResult,
   CommerceListEntryId,
   CommerceListEntryRef,
@@ -43,12 +42,8 @@ import type {
   CommerceListId,
   CommerceRelationship,
   CommerceViewPresentation,
-  SavedCommerceView,
 } from "@purin-labs/commerce-contracts";
-import {
-  validateCommerceRelationshipShape,
-  validateSavedCommerceView,
-} from "@purin-labs/commerce-contracts/browser-validators";
+import { validateCommerceRelationshipShape } from "@purin-labs/commerce-contracts/browser-validators";
 
 import {
   requireUniqueValues,
@@ -62,7 +57,6 @@ import {
 } from "./primitives.ts";
 import * as metadataContracts from "@purin-labs/commerce-contracts/entity-plane-metadata";
 import * as resourceContracts from "@purin-labs/commerce-contracts/entity-plane-resources";
-import * as entityTypeContracts from "@purin-labs/commerce-contracts/entity-type";
 import { decodeRecord } from "./record-decoding.ts";
 import * as queryResultContracts from "@purin-labs/commerce-contracts/entity-plane-query-results";
 import * as exportContracts from "@purin-labs/commerce-contracts/entity-plane-export";
@@ -123,10 +117,6 @@ export function parseEntityPlanePublishedResourceMetadataResponse(
     metadataContracts.parseEntityPlanePublishedResourceMetadataResponse,
     value,
   );
-}
-
-export function parseCommerceEntityType(value: unknown): CommerceEntityType {
-  return decodeRecord(entityTypeContracts.parseCommerceEntityType, value);
 }
 
 export function parseEntityPlaneRelationshipTraversalStepResponse(
@@ -205,10 +195,6 @@ export function parseEntityPlaneChanges(
   value: unknown,
 ): CommerceEntityPlaneChanges {
   return decodeRecord(resourceContracts.parseEntityPlaneChanges, value);
-}
-
-export function parseSavedCommerceView(value: unknown): SavedCommerceView {
-  return validateSavedCommerceView(value);
 }
 
 export function parseCommerceViewPresentation(

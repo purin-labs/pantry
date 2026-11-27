@@ -50,7 +50,7 @@ const text = normalizedTextSchema;
 
 // The commerce resources of an aggregate observation, each with the rules of
 // its resource reader in commerce-resources.ts.
-export const commerceAggregateObservationV1Schema = Type.Union([
+const commerceAggregateObservationV1Schema = Type.Union([
   aggregateObservation("location", wireLocationSchema),
   aggregateObservation("sales_channel", wireSalesChannelSchema),
   aggregateObservation("product", commerceProductV1Schema),
@@ -292,7 +292,7 @@ export type CommerceMutationErrorV1 = Static<
   typeof commerceMutationErrorV1Schema
 >;
 
-export const commerceClientErrorSchema = Type.Union([
+const commerceClientErrorSchema = Type.Union([
   OpenObject({
     kind: Type.Readonly(Type.Literal("network")),
     message: Type.Readonly(Type.String()),
@@ -351,7 +351,7 @@ function fromEntityPlaneObservation(
   return value;
 }
 
-export const commerceObservationV1Schema = Type.Union([
+const commerceObservationV1Schema = Type.Union([
   commerceAggregateObservationV1Schema,
   entityPlaneObservationSchema,
 ]);
@@ -434,7 +434,7 @@ function fromReceivedDelivery(value: CommerceReceivedDeliveryV1): unknown {
   return { ...delivery, observations: signedObservations };
 }
 
-export const acknowledgeCommerceDeliveryV1Schema = ReadonlyOpenObject({
+const acknowledgeCommerceDeliveryV1Schema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.acknowledge-commerce-delivery.v2"),
   merchantId: text,
   deliveryId: text,
@@ -445,7 +445,7 @@ export type AcknowledgeCommerceDeliveryV1 = Static<
   typeof acknowledgeCommerceDeliveryV1Schema
 >;
 
-export const commerceDeliveryAcknowledgementV1Schema = ReadonlyOpenObject({
+const commerceDeliveryAcknowledgementV1Schema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.delivery-acknowledgement.v2"),
   outcome: Type.Union([
     Type.Literal("acknowledged"),
@@ -461,7 +461,7 @@ export type CommerceDeliveryAcknowledgementV1 = Static<
   typeof commerceDeliveryAcknowledgementV1Schema
 >;
 
-export const commerceMigrationInventoryV2Schema = OpenObject({
+const commerceMigrationInventoryV2Schema = OpenObject({
   schemaVersion: Type.Readonly(
     Type.Literal("commerce.migration-inventory.v2"),
   ),
@@ -546,7 +546,7 @@ export type CommerceMigrationInventoryV2 = Static<
   typeof commerceMigrationInventoryV2Schema
 >;
 
-export const commerceMutationPrincipalV1Schema = ReadonlyOpenObject({
+const commerceMutationPrincipalV1Schema = ReadonlyOpenObject({
   kind: Type.Literal("plugin"),
   pluginId: text,
   version: PositiveInteger,
@@ -562,7 +562,7 @@ export type CommerceMutationPrincipalV1 = Static<
  * operator, one of the merchant's API keys, or an installed app. An app may
  * name the person it acts for with an opaque reference of its own.
  */
-export const commerceMutationActorV1Schema = Type.Union([
+const commerceMutationActorV1Schema = Type.Union([
   ReadonlyOpenObject({ kind: Type.Literal("operator") }),
   ReadonlyOpenObject({ kind: Type.Literal("api_key"), credentialId: text }),
   ReadonlyOpenObject({
@@ -782,9 +782,6 @@ export const parseCommerceMutationReceiptV1 = wireRecordParser(
 );
 export const parseCommerceMutationResultV1 = wireRecordParser(
   commerceMutationResultV1Schema,
-);
-export const parseCommerceReceivedDeliveryV1 = deliveryParser(
-  wireRecordParser(commerceReceivedDeliveryV1Schema),
 );
 
 const ENTITY_PLANE_OBSERVATION_KINDS: ReadonlySet<unknown> = new Set([

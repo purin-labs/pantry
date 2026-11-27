@@ -18,18 +18,18 @@ import type { CommerceMerchantId } from "./identifiers.ts";
  * A counter basket is entered by hand under time pressure, so the quantity
  * ceiling is part of the published policy rather than a UI convention.
  */
-export const pointOfSaleItemPolicySchema = StrictObject({
+const pointOfSaleItemPolicySchema = StrictObject({
   variantId: normalizedTextSchema,
   maxQuantityPerLine: PositiveInteger,
 });
-export type PointOfSaleItemPolicy = Static<typeof pointOfSaleItemPolicySchema>;
+type PointOfSaleItemPolicy = Static<typeof pointOfSaleItemPolicySchema>;
 
 /**
  * What catalog surface a counter rings up from: either an explicit list of
  * `supportedItems` variants, or the location's published café menu with
  * modifiers, serving hours, and sold-out enforcement.
  */
-export const pointOfSaleCatalogScopeSchema = Type.Union([
+const pointOfSaleCatalogScopeSchema = Type.Union([
   StrictObject({ kind: Type.Literal("supported_items") }),
   StrictObject({
     kind: Type.Literal("published_menu"),
@@ -110,7 +110,7 @@ const lifecycleSchema = Type.Union([
  * Every field is required: a counter policy that is missing its tax rate or
  * item list is not a partial policy, it is an unsellable one.
  */
-export const pointOfSaleConfigurationSchema = Type.Refine(
+const pointOfSaleConfigurationSchema = Type.Refine(
   StrictObject({
     configurationId: normalizedTextSchema,
     organisationId: normalizedTextSchema,
@@ -184,10 +184,6 @@ function sellableCatalogScopeError(): string {
   return "supportedItems must list at least one item when catalogScope is supported_items";
 }
 
-// Parsers of the records above (Plan 78 step 2).
-export const parsePointOfSaleItemPolicy = recordParser(
-  pointOfSaleItemPolicySchema,
-);
 export const parsePointOfSaleConfiguration = recordParser(
   pointOfSaleConfigurationSchema,
   "pointOfSaleConfiguration",

@@ -41,7 +41,7 @@ const idsSchema = Type.Refine(
   uniqueItemsError,
 );
 
-export const commerceMarketRateV1Schema = ReadonlyStrictObject({
+const commerceMarketRateV1Schema = ReadonlyStrictObject({
   value: marketRateSchema,
   setAt: utcTimestampSchema,
   source: boundedTextSchema(100),
@@ -60,7 +60,7 @@ function variantIdOf(price: Readonly<{ variantId: string }>): string {
   return price.variantId;
 }
 
-export const commerceMarketPricingV1Schema = Type.Union([
+const commerceMarketPricingV1Schema = Type.Union([
   ReadonlyStrictObject({
     kind: Type.Literal("price_list"),
     prices: Type.Refine(
@@ -81,20 +81,19 @@ export type CommerceMarketPricingV1 = Static<
   typeof commerceMarketPricingV1Schema
 >;
 
-export const marketCommandBaseSchema = ReadonlyOpenObject({
+const marketCommandBaseSchema = ReadonlyOpenObject({
   merchantId: text,
   idempotencyKey: text,
   requestedAt: utcTimestampSchema,
   marketId: text,
 });
-export type MarketCommandBase = Static<typeof marketCommandBaseSchema>;
 
 const statusSchema = Type.Union([
   Type.Literal("active"),
   Type.Literal("inactive"),
 ]);
 
-export const createCommerceMarketV1Schema = Type.Intersect(
+const createCommerceMarketV1Schema = Type.Intersect(
   [
     marketCommandBaseSchema,
     ReadonlyOpenObject({
@@ -120,7 +119,7 @@ function noChangeError(): string {
   return "changes must name at least one field";
 }
 
-export const updateCommerceMarketV1Schema = Type.Intersect(
+const updateCommerceMarketV1Schema = Type.Intersect(
   [
     marketCommandBaseSchema,
     ReadonlyOpenObject({
@@ -145,7 +144,7 @@ export type UpdateCommerceMarketV1 = Static<
   typeof updateCommerceMarketV1Schema
 >;
 
-export const commerceMarketCommandV1Schema = Type.Union([
+const commerceMarketCommandV1Schema = Type.Union([
   createCommerceMarketV1Schema,
   updateCommerceMarketV1Schema,
 ]);
@@ -153,7 +152,7 @@ export type CommerceMarketCommandV1 = Static<
   typeof commerceMarketCommandV1Schema
 >;
 
-export const commerceMarketV1Schema = ReadonlyStrictObject({
+const commerceMarketV1Schema = ReadonlyStrictObject({
   id: text,
   revision: PositiveInteger,
   name: text,
@@ -215,8 +214,5 @@ export const parseCommerceMarketV1 = wireRecordParser(
 );
 export const parseUpdateCommerceMarketV1 = wireRecordParser(
   updateCommerceMarketV1Schema,
-);
-export const parseCommerceOrderMarketV1 = wireRecordParser(
-  commerceOrderMarketV1Schema,
 );
 export const parseCommerceMarketsV1 = wireRecordParser(marketListSchema);

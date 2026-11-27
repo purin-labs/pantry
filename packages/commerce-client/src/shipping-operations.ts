@@ -9,7 +9,6 @@ import {
   parseQuoteShipmentLabelRateCommand as parseQuoteShipmentLabelRateCommandRecord,
   parseRecordShippingTrackingCommand as parseRecordShippingTrackingCommandRecord,
   parseShipmentLabelRateResult as parseShipmentLabelRateResultRecord,
-  parseWireShipmentLabelAttempt as parseShipmentLabelAttemptRecord,
   parseWireShipmentLabelRate as parseShipmentLabelRateSnapshotRecord,
 } from "@purin-labs/commerce-contracts/records/api-shipping-operations";
 
@@ -115,10 +114,4 @@ export function parseShipmentLabelRate(
   value: unknown,
 ): ShipmentLabelRateSnapshot {
   return decodeRecord(parseShipmentLabelRateSnapshotRecord, value);
-}
-
-export function parseShipmentLabelAttempt(
-  value: unknown,
-): ShipmentLabelAttempt {
-  return decodeRecord(parseShipmentLabelAttemptRecord, value);
 }

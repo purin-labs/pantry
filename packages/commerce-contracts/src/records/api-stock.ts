@@ -1,7 +1,7 @@
 // Plan 78 step 2: the stock snapshot that packages/commerce-client
 // reads in src/commerce-resources.ts (`parseStockSnapshot`): the commerce and
 // food-service snapshots of one merchant revision, and its inventory records.
-import { Type, type Static } from "typebox";
+import { Type } from "typebox";
 import {
   inventoryAllocationSchema,
   inventoryConsumptionPlanSchema,
@@ -20,13 +20,13 @@ import {
   wireRecordParser,
 } from "./wire-objects.ts";
 
-export const commerceUsableInventoryV1Schema = ReadonlyOpenObject({
+const commerceUsableInventoryV1Schema = ReadonlyOpenObject({
   positionId: normalizedTextSchema,
   quantity: wireQuantitySchema,
 });
 
 /** Both snapshots must name the same merchant revision. */
-export const commerceStockSnapshotV1Schema = Type.Refine(
+const commerceStockSnapshotV1Schema = Type.Refine(
   ReadonlyOpenObject({
     commerce: commerceMerchantSnapshotV1Schema,
     foodService: commerceFoodServiceSnapshotV1Schema,
@@ -41,9 +41,6 @@ export const commerceStockSnapshotV1Schema = Type.Refine(
   hasOneScope,
   scopeMismatch,
 );
-export type CommerceStockSnapshotV1 = Static<
-  typeof commerceStockSnapshotV1Schema
->;
 
 type SnapshotScope = Readonly<{
   organisationId: string;

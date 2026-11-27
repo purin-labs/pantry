@@ -197,7 +197,7 @@ function readPlan(value: unknown): Raw {
 }
 
 /** Rust `parse_supplier_payout_execution_plan`. */
-export function parseSupplierPayoutExecutionPlan(
+function parseSupplierPayoutExecutionPlan(
   value: unknown,
 ): SupplierPayoutExecutionPlan {
   const raw = decoded(readPlan.bind(null, value), invalid("payoutPlan"));
@@ -504,7 +504,7 @@ function resource(value: string): string {
 }
 
 /** Rust `parse_payout_observation`. */
-export function parsePayoutObservation(value: unknown): SupplierPayoutState {
+function parsePayoutObservation(value: unknown): SupplierPayoutState {
   const raw = decoded(
     readTagged.bind(null, value, "observation", OBSERVATION_FIELDS),
     INVALID_OBSERVATION,
@@ -973,9 +973,7 @@ function releaseState(raw: Raw): void {
 }
 
 /** Rust `apply_supplier_payable_command`. */
-export function applySupplierPayableCommandValue(
-  value: unknown,
-): SupplierPayable {
+function applySupplierPayableCommandValue(value: unknown): SupplierPayable {
   const request = decoded(
     readPayableRequest.bind(null, value),
     invalid("payableCommand"),
@@ -1029,7 +1027,7 @@ const LEGAL_PAYOUT_TRANSITIONS: readonly (readonly [string, string])[] = [
 ];
 
 /** Rust `SupplierPayoutState::accepts_kind`. */
-export function payoutAcceptsKind(from: string, next: string): boolean {
+function payoutAcceptsKind(from: string, next: string): boolean {
   return LEGAL_PAYOUT_TRANSITIONS.some(
     ([left, right]) => left === from && right === next,
   );

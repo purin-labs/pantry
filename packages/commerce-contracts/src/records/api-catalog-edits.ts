@@ -23,12 +23,11 @@ import {
 const text = normalizedTextSchema;
 const exactKeys = { unevaluatedProperties: false } as const;
 
-export const catalogEditBaseSchema = ReadonlyOpenObject({
+const catalogEditBaseSchema = ReadonlyOpenObject({
   merchantId: text,
   idempotencyKey: text,
   requestedAt: utcTimestampSchema,
 });
-export type CatalogEditBase = Static<typeof catalogEditBaseSchema>;
 
 /** `requireChanges`: the allowed fields only, and at least one of them. */
 function changesOf<Properties extends Record<string, TSchema>>(
@@ -72,7 +71,7 @@ const handleSchema = Type.String({
   pattern: "^(?=.{1,255}$)[a-z0-9]+(?:-[a-z0-9]+)*$",
 });
 
-export const commerceProductChangesV1Schema = changesOf({
+const commerceProductChangesV1Schema = changesOf({
   title: Type.Optional(boundedTextSchema(255)),
   description: Type.Optional(Type.String()),
   handle: Type.Optional(Nullable(handleSchema)),
@@ -124,7 +123,7 @@ const mediaSchema = ReadonlyOpenObject({
   altText: Type.String(),
 });
 
-export const commerceVariantChangesV1Schema = changesOf({
+const commerceVariantChangesV1Schema = changesOf({
   title: Type.Optional(boundedTextSchema(255)),
   sku: Type.Optional(boundedTextSchema(255)),
   barcode: Type.Optional(Nullable(boundedTextSchema(64))),
@@ -138,7 +137,7 @@ export type CommerceVariantChangesV1 = Static<
   typeof commerceVariantChangesV1Schema
 >;
 
-export const commerceOfferChangesV1Schema = changesOf({
+const commerceOfferChangesV1Schema = changesOf({
   price: Type.Optional(wireMoneySchema),
   compareAtPrice: Type.Optional(
     Nullable(
@@ -156,7 +155,7 @@ export type CommerceOfferChangesV1 = Static<
   typeof commerceOfferChangesV1Schema
 >;
 
-export const updateCommerceProductV1Schema = Type.Intersect(
+const updateCommerceProductV1Schema = Type.Intersect(
   [
     catalogEditBaseSchema,
     ReadonlyOpenObject({
@@ -173,7 +172,7 @@ export type UpdateCommerceProductV1 = Static<
 >;
 
 /** Removes a product that was never sold, with its variants and offers. */
-export const deleteCommerceProductV1Schema = Type.Intersect(
+const deleteCommerceProductV1Schema = Type.Intersect(
   [
     catalogEditBaseSchema,
     ReadonlyOpenObject({
@@ -184,11 +183,8 @@ export const deleteCommerceProductV1Schema = Type.Intersect(
   ],
   exactKeys,
 );
-export type DeleteCommerceProductV1 = Static<
-  typeof deleteCommerceProductV1Schema
->;
 
-export const updateCommerceVariantV1Schema = Type.Intersect(
+const updateCommerceVariantV1Schema = Type.Intersect(
   [
     catalogEditBaseSchema,
     ReadonlyOpenObject({
@@ -204,7 +200,7 @@ export type UpdateCommerceVariantV1 = Static<
   typeof updateCommerceVariantV1Schema
 >;
 
-export const updateCommerceOfferV1Schema = Type.Intersect(
+const updateCommerceOfferV1Schema = Type.Intersect(
   [
     catalogEditBaseSchema,
     ReadonlyOpenObject({
@@ -221,7 +217,7 @@ export type UpdateCommerceOfferV1 = Static<
 >;
 
 /** Changes the tax rule of a storefront; the storefront gets a new revision. */
-export const updateCommerceStorefrontTaxV1Schema = Type.Intersect(
+const updateCommerceStorefrontTaxV1Schema = Type.Intersect(
   [
     catalogEditBaseSchema,
     ReadonlyOpenObject({
@@ -233,9 +229,6 @@ export const updateCommerceStorefrontTaxV1Schema = Type.Intersect(
   ],
   exactKeys,
 );
-export type UpdateCommerceStorefrontTaxV1 = Static<
-  typeof updateCommerceStorefrontTaxV1Schema
->;
 
 // Parsers of the client API types (Plan 78 step 2).
 export const parseUpdateCommerceStorefrontTaxV1 = wireRecordParser(

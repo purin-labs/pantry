@@ -64,7 +64,7 @@ function quantityScaleError(): string {
 }
 
 /** `parseActiveLifecycle`. */
-export const wireLocationLifecycleSchema = Type.Union([
+const wireLocationLifecycleSchema = Type.Union([
   ReadonlyOpenObject({
     state: Type.Literal("active"),
     activeAt: utcTimestampSchema,

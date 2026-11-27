@@ -11,7 +11,7 @@ import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
 type Money = Readonly<{ amountMinor: number; currency: string }>;
 
-export const MARKETING_CONSENT_STATES = [
+const MARKETING_CONSENT_STATES = [
   "not_subscribed",
   "subscribed",
   "unsubscribed",

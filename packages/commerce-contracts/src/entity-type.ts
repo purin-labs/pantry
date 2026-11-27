@@ -31,7 +31,7 @@ export const systemEntityExtensionSchema = Type.Union([
 export type SystemEntityExtension = StrictUnion<
   Static<typeof systemEntityExtensionSchema>
 >;
-export const systemEntityTypeSchema = OpenObject({
+const systemEntityTypeSchema = OpenObject({
   origin: Type.Literal("system"),
   typeId: systemEntityTypeIdSchema.properties.typeId,
   lexiconSchemaRevision: systemRevision,

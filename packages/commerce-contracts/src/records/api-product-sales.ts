@@ -39,10 +39,10 @@ const lineProperties = {
   acceptedAt: instantSchema,
 };
 
-export const productSalesLineSchema = ReadonlyOpenObject(lineProperties);
+const productSalesLineSchema = ReadonlyOpenObject(lineProperties);
 export type ProductSalesLine = Static<typeof productSalesLineSchema>;
 
-export const productSalesGroupSchema = ReadonlyOpenObject({
+const productSalesGroupSchema = ReadonlyOpenObject({
   productId: text,
   currency,
   merchandiseMinor: NonNegativeInteger,
@@ -50,7 +50,7 @@ export const productSalesGroupSchema = ReadonlyOpenObject({
 });
 export type ProductSalesGroup = Static<typeof productSalesGroupSchema>;
 
-export const productSalesWindowSchema = Type.Refine(
+const productSalesWindowSchema = Type.Refine(
   ReadonlyOpenObject({ start: instantSchema, end: instantSchema }),
   isWindow,
   windowError,
@@ -65,7 +65,7 @@ function windowError(): string {
   return "product sales window invalid";
 }
 
-export const unmatchedProductSalesLineSchema = Type.Intersect([
+const unmatchedProductSalesLineSchema = Type.Intersect([
   ReadonlyOpenObject(lineProperties),
   ReadonlyOpenObject({
     reason: Type.Union([
@@ -138,7 +138,7 @@ function inconsistentReport(): string {
   return "product sales evidence invalid";
 }
 
-export const productSalesReportSchema = Type.Union([
+const productSalesReportSchema = Type.Union([
   Type.Intersect([
     reportBase,
     ReadonlyOpenObject({

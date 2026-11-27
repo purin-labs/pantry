@@ -23,9 +23,6 @@ import {
 const text = normalizedTextSchema;
 const exactKeys = { unevaluatedProperties: false } as const;
 
-export const discountsMoneySchema = wireMoneySchema;
-export type DiscountsMoney = Static<typeof discountsMoneySchema>;
-
 /** `normalizeDiscountCode`: trimmed and in upper case. */
 const discountCodeSchema = Type.Codec(
   Type.Refine(Type.String(), isDiscountCode, discountCodeError),
@@ -64,7 +61,7 @@ function codesError(): string {
   return "method.codes must name unique codes";
 }
 
-export const commerceDiscountMethodV1Schema = Type.Union([
+const commerceDiscountMethodV1Schema = Type.Union([
   ReadonlyStrictObject({ kind: Type.Literal("code"), codes: codesSchema }),
   ReadonlyStrictObject({ kind: Type.Literal("automatic") }),
 ]);
@@ -72,7 +69,7 @@ export type CommerceDiscountMethodV1 = Static<
   typeof commerceDiscountMethodV1Schema
 >;
 
-export const commerceDiscountValueV1Schema = Type.Union([
+const commerceDiscountValueV1Schema = Type.Union([
   ReadonlyStrictObject({
     kind: Type.Literal("percentage"),
     basisPoints: Type.Integer({ minimum: 1, maximum: 10_000 }),
@@ -86,7 +83,7 @@ export type CommerceDiscountValueV1 = Static<
   typeof commerceDiscountValueV1Schema
 >;
 
-export const commerceDiscountRuleV1Schema = Type.Union([
+const commerceDiscountRuleV1Schema = Type.Union([
   ReadonlyStrictObject({
     kind: Type.Literal("amount_off_order"),
     value: commerceDiscountValueV1Schema,
@@ -101,7 +98,7 @@ export type CommerceDiscountRuleV1 = Static<
   typeof commerceDiscountRuleV1Schema
 >;
 
-export const commerceDiscountConditionsV1Schema = ReadonlyStrictObject({
+const commerceDiscountConditionsV1Schema = ReadonlyStrictObject({
   minimumSubtotal: Nullable(wireMoneySchema),
   startsAt: utcTimestampSchema,
   endsAt: Nullable(utcTimestampSchema),
@@ -112,15 +109,14 @@ export type CommerceDiscountConditionsV1 = Static<
   typeof commerceDiscountConditionsV1Schema
 >;
 
-export const discountCommandBaseSchema = ReadonlyOpenObject({
+const discountCommandBaseSchema = ReadonlyOpenObject({
   merchantId: text,
   idempotencyKey: text,
   requestedAt: utcTimestampSchema,
   discountId: text,
 });
-export type DiscountCommandBase = Static<typeof discountCommandBaseSchema>;
 
-export const createCommerceDiscountV1Schema = Type.Intersect(
+const createCommerceDiscountV1Schema = Type.Intersect(
   [
     discountCommandBaseSchema,
     ReadonlyOpenObject({
@@ -137,7 +133,7 @@ export type CreateCommerceDiscountV1 = Static<
   typeof createCommerceDiscountV1Schema
 >;
 
-export const deactivateCommerceDiscountV1Schema = Type.Intersect(
+const deactivateCommerceDiscountV1Schema = Type.Intersect(
   [
     discountCommandBaseSchema,
     ReadonlyOpenObject({
@@ -151,7 +147,7 @@ export type DeactivateCommerceDiscountV1 = Static<
   typeof deactivateCommerceDiscountV1Schema
 >;
 
-export const commerceDiscountCommandV1Schema = Type.Union([
+const commerceDiscountCommandV1Schema = Type.Union([
   createCommerceDiscountV1Schema,
   deactivateCommerceDiscountV1Schema,
 ]);
@@ -159,7 +155,7 @@ export type CommerceDiscountCommandV1 = Static<
   typeof commerceDiscountCommandV1Schema
 >;
 
-export const commerceDiscountV1Schema = ReadonlyStrictObject({
+const commerceDiscountV1Schema = ReadonlyStrictObject({
   id: text,
   revision: PositiveInteger,
   title: text,

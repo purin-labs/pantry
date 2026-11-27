@@ -3,7 +3,7 @@ import { isRecord } from "@purin-labs/std";
 export type StockStatus =
   "uncounted" | "out" | "low" | "healthy" | "unconfigured";
 export type ProductDeleteBlock = "sold" | "on_menu" | null;
-export type ProductPhoto = Readonly<{
+type ProductPhoto = Readonly<{
   mediaId: string;
   url: string;
   altText: string;

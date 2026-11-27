@@ -50,23 +50,23 @@ export const commerceListEntryRefSchema = OpenObject({
   revision: revisionSchema<"CommerceListEntryRevision">(),
 });
 
-export const entityTypeAuthorityScopeWireSchema = OpenObject({
+const entityTypeAuthorityScopeWireSchema = OpenObject({
   kind: Type.Literal("entity_type"),
   entityTypeId: commerceEntityTypeWireSchema,
 });
-export const entityAuthorityScopeWireSchema = OpenObject({
+const entityAuthorityScopeWireSchema = OpenObject({
   kind: Type.Literal("entity"),
   entityRef: commerceEntityRefWireSchema,
 });
-export const relationshipDefinitionAuthorityScopeWireSchema = OpenObject({
+const relationshipDefinitionAuthorityScopeWireSchema = OpenObject({
   kind: Type.Literal("relationship_definition"),
   relationshipDefinition: relationshipDefinitionWireSchema,
 });
-export const relationshipAuthorityScopeWireSchema = OpenObject({
+const relationshipAuthorityScopeWireSchema = OpenObject({
   kind: Type.Literal("relationship"),
   relationship: relationshipRefWireSchema,
 });
-export const commerceListAuthorityScopeWireSchema = OpenObject({
+const commerceListAuthorityScopeWireSchema = OpenObject({
   kind: Type.Literal("commerce_list"),
   listId: Type.String(),
 });
@@ -78,7 +78,7 @@ export const commerceListEntryAuthorityScopeWireSchema = OpenObject({
     revision,
   }),
 });
-export const savedSelectorAuthorityScopeWireSchema = OpenObject({
+const savedSelectorAuthorityScopeWireSchema = OpenObject({
   kind: Type.Literal("saved_selector"),
   selector: OpenObject({
     selectorId: Type.String(),
@@ -86,7 +86,7 @@ export const savedSelectorAuthorityScopeWireSchema = OpenObject({
     query: commerceGraphQueryWireSchema,
   }),
 });
-export const savedViewAuthorityScopeWireSchema = OpenObject({
+const savedViewAuthorityScopeWireSchema = OpenObject({
   kind: Type.Literal("saved_view"),
   viewId: Type.String(),
 });
@@ -100,19 +100,19 @@ export const commerceAuthorityScopeWireSchema = Type.Union([
   savedSelectorAuthorityScopeWireSchema,
   savedViewAuthorityScopeWireSchema,
 ]);
-export const entityTypeAuthorityScopeSchema = OpenObject({
+const entityTypeAuthorityScopeSchema = OpenObject({
   kind: Type.Literal("entity_type"),
   entityTypeId: commerceEntityTypeIdSchema,
 });
-export const entityAuthorityScopeSchema = OpenObject({
+const entityAuthorityScopeSchema = OpenObject({
   kind: Type.Literal("entity"),
   entityRef: commerceEntityRefSchema,
 });
-export const relationshipDefinitionAuthorityScopeSchema = OpenObject({
+const relationshipDefinitionAuthorityScopeSchema = OpenObject({
   kind: Type.Literal("relationship_definition"),
   relationshipDefinition: relationshipDefinitionRefSchema,
 });
-export const relationshipAuthorityScopeSchema = OpenObject({
+const relationshipAuthorityScopeSchema = OpenObject({
   kind: Type.Literal("relationship"),
   relationship: commerceRelationshipRefSchema,
 });
@@ -124,7 +124,7 @@ export const commerceListEntryAuthorityScopeSchema = OpenObject({
   kind: Type.Literal("commerce_list_entry"),
   entry: commerceListEntryRefSchema,
 });
-export const savedSelectorAuthorityScopeSchema = OpenObject({
+const savedSelectorAuthorityScopeSchema = OpenObject({
   kind: Type.Literal("saved_selector"),
   selector: selectorContextSelectionSchema.properties.selector,
 });

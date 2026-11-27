@@ -3,11 +3,7 @@
 // step 2). Each rule is the rule of one hand-written reader; the record
 // schemas apply it where that reader runs.
 import { Type, type TSchema } from "typebox";
-import {
-  NonNegativeInteger,
-  OpenObject,
-  StrictObject,
-} from "@purin-labs/contract-schema";
+import { NonNegativeInteger, OpenObject } from "@purin-labs/contract-schema";
 import {
   boundedTextSchema,
   currencyCodeTextSchema,
@@ -22,12 +18,6 @@ export const identityTextSchema = boundedTextSchema(255);
 
 /** Money with a non-negative amount (`parseMoney`); other fields are dropped. */
 export const nonNegativeMoneySchema = OpenObject({
-  amountMinor: NonNegativeInteger,
-  currency: currencyCodeTextSchema,
-});
-
-/** Money with exactly its two fields (`requireExactObjectKeys`). */
-export const exactNonNegativeMoneySchema = StrictObject({
   amountMinor: NonNegativeInteger,
   currency: currencyCodeTextSchema,
 });

@@ -26,9 +26,6 @@ import type { CheckoutAfterSalePolicy as GeneratedCheckoutAfterSalePolicy } from
 import type { CheckoutPresentationPolicy } from "./records/checkout-profile.ts";
 import type { SavedAddressPolicy } from "./records/checkout-profile.ts";
 import type { CheckoutRefundGovernancePolicy as GeneratedCheckoutRefundGovernancePolicy } from "./records/checkout-profile.ts";
-import type { CartLine as GeneratedCartLine } from "./records/commerce-records.ts";
-import type { CartLineSource as GeneratedCartLineSource } from "./records/commerce-records.ts";
-import type { CheckoutLineSnapshot as GeneratedCheckoutLineSnapshot } from "./records/commerce-records.ts";
 import type { CheckoutLineSource as GeneratedCheckoutLineSource } from "./records/commerce-records.ts";
 import type { CommerceProjection as GeneratedCommerceProjection } from "./records/commerce-records.ts";
 import type { InventoryAllocation as GeneratedInventoryAllocation } from "./records/commerce-records.ts";
@@ -44,9 +41,7 @@ import type { InventoryRequirementAdjustment as GeneratedInventoryRequirementAdj
 import type { InPersonPaymentBinding as GeneratedInPersonPaymentBinding } from "./records/commerce-records.ts";
 import type { MenuScope as GeneratedMenuScope } from "./records/commerce-records.ts";
 import type { MenuValidity as GeneratedMenuValidity } from "./records/commerce-records.ts";
-import type { ModifierGroupRevisionLifecycle as GeneratedModifierGroupRevisionLifecycle } from "./records/commerce-records.ts";
 import type { OrderLineInventory as GeneratedOrderLineInventory } from "./records/commerce-records.ts";
-import type { OrderLineItem as GeneratedOrderLineItem } from "./records/commerce-records.ts";
 import type { OrderLineSource as GeneratedOrderLineSource } from "./records/commerce-records.ts";
 import type { OnlinePaymentBinding as GeneratedOnlinePaymentBinding } from "./records/commerce-records.ts";
 import type { OnlineOrderConfiguration as GeneratedOnlineOrderConfiguration } from "./records/commerce-records.ts";
@@ -55,14 +50,10 @@ import type { PaymentDispute as GeneratedPaymentDispute } from "./records/after-
 import type { PaymentDisputeLifecycle as GeneratedPaymentDisputeLifecycle } from "./records/after-sale.ts";
 import type { PreparationTicketLifecycle as GeneratedPreparationTicketLifecycle } from "./records/commerce-records.ts";
 import type { RecipeOutput as GeneratedRecipeOutput } from "./records/commerce-records.ts";
-import type { RecipeRevisionLifecycle as GeneratedRecipeRevisionLifecycle } from "./records/commerce-records.ts";
 import type { RefundAllocation } from "./records/after-sale.ts";
 import type { RefundAttempt as GeneratedRefundAttempt } from "./records/after-sale.ts";
 import type { RefundAttemptLifecycle as GeneratedRefundAttemptLifecycle } from "./records/after-sale.ts";
-import type { RefundDutyAllocation } from "./records/identifiers.ts";
-import type { RefundLineAllocation } from "./records/identifiers.ts";
 import type { RefundReason as GeneratedRefundReason } from "./records/after-sale.ts";
-import type { RefundTaxAllocation } from "./records/identifiers.ts";
 import type { StrictUnion } from "@purin-labs/type-utils";
 
 export type { BuyerContactPolicy };
@@ -71,9 +62,6 @@ export type { CheckoutPresentationPolicy };
 export type { CheckoutProfileReference };
 export type { SavedAddressPolicy };
 export type { RefundAllocation };
-export type { RefundDutyAllocation };
-export type { RefundLineAllocation };
-export type { RefundTaxAllocation };
 
 export type CheckoutBuyerPolicy = StrictUnion<GeneratedCheckoutBuyerPolicy>;
 
@@ -145,29 +133,14 @@ type OrderOriginBranch<TBranch> =
         }>
     : TBranch;
 
-export type OrderOrigin = StrictUnion<OrderOriginBranch<GeneratedOrderOrigin>>;
+type OrderOrigin = StrictUnion<OrderOriginBranch<GeneratedOrderOrigin>>;
 
 export type CommerceOrder = Omit<GeneratedCommerceOrder, "origin"> &
   Readonly<{
     origin: OrderOrigin;
   }>;
 
-export type CartLineSource = StrictUnion<GeneratedCartLineSource>;
-
-export type CartLine = Omit<GeneratedCartLine, "source"> &
-  Readonly<{
-    source: CartLineSource;
-  }>;
-
 export type CheckoutLineSource = StrictUnion<GeneratedCheckoutLineSource>;
-
-export type CheckoutLineSnapshot = Omit<
-  GeneratedCheckoutLineSnapshot,
-  "source"
-> &
-  Readonly<{
-    source: CheckoutLineSource;
-  }>;
 
 export type InventoryRequirementAdjustment =
   StrictUnion<GeneratedInventoryRequirementAdjustment>;
@@ -180,7 +153,7 @@ export type InPersonPaymentBinding =
 export type CheckoutPaymentProviderBinding =
   StrictUnion<GeneratedCheckoutPaymentProviderBinding>;
 
-export type CheckoutPaymentBinding = Omit<
+type CheckoutPaymentBinding = Omit<
   GeneratedCheckoutPaymentBinding,
   "paymentBinding"
 > &
@@ -192,25 +165,14 @@ export type MenuScope = StrictUnion<GeneratedMenuScope>;
 
 export type MenuValidity = StrictUnion<GeneratedMenuValidity>;
 
-export type ModifierGroupRevisionLifecycle =
-  StrictUnion<GeneratedModifierGroupRevisionLifecycle>;
-
 export type OrderLineInventory = StrictUnion<GeneratedOrderLineInventory>;
 
 export type OrderLineSource = StrictUnion<GeneratedOrderLineSource>;
-
-export type OrderLineItem = Omit<GeneratedOrderLineItem, "source"> &
-  Readonly<{
-    source: OrderLineSource;
-  }>;
 
 export type PreparationTicketLifecycle =
   StrictUnion<GeneratedPreparationTicketLifecycle>;
 
 export type RecipeOutput = StrictUnion<GeneratedRecipeOutput>;
-
-export type RecipeRevisionLifecycle =
-  StrictUnion<GeneratedRecipeRevisionLifecycle>;
 
 type CommerceProjectionBranch<TBranch> =
   TBranch extends Readonly<{ kind: "commerce_order" }>
@@ -223,7 +185,7 @@ export type CommerceProjection = StrictUnion<
 
 export type InventoryBalance = StrictUnion<GeneratedInventoryBalance>;
 
-export type StorefrontLifecycle = StrictUnion<GeneratedStorefrontLifecycle>;
+type StorefrontLifecycle = StrictUnion<GeneratedStorefrontLifecycle>;
 
 export type StorefrontFulfillmentConfiguration =
   StrictUnion<GeneratedStorefrontFulfillmentConfiguration>;
@@ -231,7 +193,7 @@ export type StorefrontFulfillmentConfiguration =
 export type StorefrontTaxConfiguration =
   StrictUnion<GeneratedStorefrontTaxConfiguration>;
 
-export type StorefrontCheckoutConfiguration = Omit<
+type StorefrontCheckoutConfiguration = Omit<
   GeneratedStorefrontCheckoutConfiguration,
   "tax"
 > &
@@ -284,7 +246,7 @@ export type PaymentDispute = Omit<GeneratedPaymentDispute, "lifecycle"> &
     lifecycle: PaymentDisputeLifecycle;
   }>;
 
-export type RefundReason = StrictUnion<GeneratedRefundReason>;
+type RefundReason = StrictUnion<GeneratedRefundReason>;
 
 export type RefundAttemptLifecycle =
   StrictUnion<GeneratedRefundAttemptLifecycle>;

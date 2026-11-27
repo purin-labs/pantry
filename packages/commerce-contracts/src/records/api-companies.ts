@@ -48,7 +48,7 @@ const customerIdsSchema = Type.Refine(
 );
 
 /** The company's unit price of each listed variant, in one currency. */
-export const commerceCompanyPricesV1Schema = ReadonlyStrictObject({
+const commerceCompanyPricesV1Schema = ReadonlyStrictObject({
   currency: marketCurrencySchema,
   items: Type.Refine(
     ImmutableArray(
@@ -59,9 +59,6 @@ export const commerceCompanyPricesV1Schema = ReadonlyStrictObject({
     uniqueItemsError,
   ),
 });
-export type CommerceCompanyPricesV1 = Static<
-  typeof commerceCompanyPricesV1Schema
->;
 
 const statusSchema = Type.Union([
   Type.Literal("active"),
@@ -69,14 +66,11 @@ const statusSchema = Type.Union([
 ]);
 
 /** Invoice terms: an order placed on terms is due this many days later. */
-export const commerceCompanyPaymentTermsV1Schema = ReadonlyStrictObject({
+const commerceCompanyPaymentTermsV1Schema = ReadonlyStrictObject({
   netDays: Type.Integer({ minimum: 0, maximum: 120 }),
 });
-export type CommerceCompanyPaymentTermsV1 = Static<
-  typeof commerceCompanyPaymentTermsV1Schema
->;
 
-export const commerceCompanyV1Schema = ReadonlyStrictObject({
+const commerceCompanyV1Schema = ReadonlyStrictObject({
   id: text,
   revision: PositiveInteger,
   name: text,
@@ -95,7 +89,7 @@ const companyCommandBaseSchema = ReadonlyOpenObject({
   companyId: text,
 });
 
-export const createCommerceCompanyV1Schema = Type.Intersect(
+const createCommerceCompanyV1Schema = Type.Intersect(
   [
     companyCommandBaseSchema,
     ReadonlyOpenObject({
@@ -123,7 +117,7 @@ function noChangeError(): string {
   return "changes must name at least one field";
 }
 
-export const updateCommerceCompanyV1Schema = Type.Intersect(
+const updateCommerceCompanyV1Schema = Type.Intersect(
   [
     companyCommandBaseSchema,
     ReadonlyOpenObject({
@@ -153,11 +147,10 @@ export type UpdateCommerceCompanyV1 = Static<
 export type CommerceCompanyCommandV1 =
   CreateCommerceCompanyV1 | UpdateCommerceCompanyV1;
 
-export const commerceCompaniesV1Schema = ReadonlyStrictObject({
+const commerceCompaniesV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.companies.v1"),
   companies: ImmutableArray(commerceCompanyV1Schema),
 });
-export type CommerceCompaniesV1 = Static<typeof commerceCompaniesV1Schema>;
 
 const moneySchema = ReadonlyStrictObject({
   amountMinor: NonNegativeInteger,
@@ -169,7 +162,7 @@ const moneySchema = ReadonlyStrictObject({
  * amount due, as a paid order does; the invoice says whether the company
  * paid it.
  */
-export const commerceCompanyInvoiceV1Schema = ReadonlyStrictObject({
+const commerceCompanyInvoiceV1Schema = ReadonlyStrictObject({
   id: text,
   revision: PositiveInteger,
   companyId: text,
@@ -204,7 +197,7 @@ const commandBaseSchema = ReadonlyOpenObject({
 });
 
 /** Staff place a draft order for a company's buyer on the company's terms. */
-export const placeCommerceDraftOrderOnTermsV1Schema = Type.Intersect(
+const placeCommerceDraftOrderOnTermsV1Schema = Type.Intersect(
   [
     commandBaseSchema,
     ReadonlyOpenObject({
@@ -224,7 +217,7 @@ export type PlaceCommerceDraftOrderOnTermsV1 = Static<
 >;
 
 /** Staff record the company's bank transfer of an invoice. */
-export const recordCommerceInvoicePaymentV1Schema = Type.Intersect(
+const recordCommerceInvoicePaymentV1Schema = Type.Intersect(
   [
     commandBaseSchema,
     ReadonlyOpenObject({
@@ -240,7 +233,7 @@ export type RecordCommerceInvoicePaymentV1 = Static<
   typeof recordCommerceInvoicePaymentV1Schema
 >;
 
-export const commerceCompanyInvoicesV1Schema = ReadonlyStrictObject({
+const commerceCompanyInvoicesV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.company-invoices.v1"),
   invoices: ImmutableArray(commerceCompanyInvoiceV1Schema),
 });

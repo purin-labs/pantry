@@ -1,7 +1,7 @@
 // Plan 78: generated once from the ts-rs bindings of the Rust contracts.
 // TypeScript is now the source; edit these schemas by hand.
 import { Type, type Static } from "typebox";
-import { OpenObject, recordParser } from "@purin-labs/contract-schema";
+import { OpenObject } from "@purin-labs/contract-schema";
 import { integrationAccountIdSchema, resourceIdSchema } from "./identifiers.ts";
 import { moneySchema } from "./money.ts";
 import { commerceTimestampSchema } from "./provenance.ts";
@@ -22,7 +22,7 @@ import { commerceTimestampSchema } from "./provenance.ts";
  * *that transfer's funding* — creating another would pay the supplier twice
  * for one payable.
  */
-export const payoutIndeterminateOperationSchema = Type.Union([
+const payoutIndeterminateOperationSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("transfer_creation"),
     requestIdentity: Type.String(),
@@ -38,33 +38,16 @@ export type PayoutIndeterminateOperation = Static<
 >;
 
 /**
- * The only action that is safe to take on an unresolved payout.
- */
-export const payoutRecoveryActionSchema = Type.Union([
-  OpenObject({
-    kind: Type.Literal("inquire_transfer_by_request_identity"),
-    requestIdentity: Type.String(),
-  }),
-  OpenObject({
-    kind: Type.Literal("inquire_funding"),
-    providerTransferId: resourceIdSchema,
-    fundingOperationId: resourceIdSchema,
-  }),
-]);
-export type PayoutRecoveryAction = Static<typeof payoutRecoveryActionSchema>;
-
-/**
  * Funding modes that have passed provider certification. Wise personal-token
  * funding is excluded because it cannot fund a payout through the API.
  */
 export const wiseFundingModeSchema = Type.Literal("balance");
-export type WiseFundingMode = Static<typeof wiseFundingModeSchema>;
 
 /**
  * Which rail moves the money. A failed rail never triggers another: a new
  * provider requires a new proposal and approval.
  */
-export const supplierPayoutProviderBindingSchema = Type.Union([
+const supplierPayoutProviderBindingSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("gmo_aozora_private"),
     integrationAccountId: integrationAccountIdSchema,
@@ -89,23 +72,19 @@ export type SupplierPayoutProviderBinding = Static<
  */
 export const supplierPayoutAmountBasisSchema =
   Type.Literal("recipient_receives");
-export type SupplierPayoutAmountBasis = Static<
-  typeof supplierPayoutAmountBasisSchema
->;
 
 /**
  * A normalized terminal failure. Provider-specific status text is parsed once
  * at the provider boundary and never controls the lifecycle.
  */
-export const supplierPayoutFailureSchema = Type.Union([
+const supplierPayoutFailureSchema = Type.Union([
   Type.Literal("insufficient_funds"),
   Type.Literal("destination_rejected"),
   Type.Literal("provider_rejected"),
   Type.Literal("approval_expired"),
 ]);
-export type SupplierPayoutFailure = Static<typeof supplierPayoutFailureSchema>;
 
-export const supplierPayoutStateSchema = Type.Union([
+const supplierPayoutStateSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("approval_pending"),
     proposalId: resourceIdSchema,
@@ -189,7 +168,7 @@ export type SupplierPayoutState = Static<typeof supplierPayoutStateSchema>;
 /**
  * One payout: an allocation against a payable, bound to one rail.
  */
-export const supplierPayoutSchema = OpenObject({
+const supplierPayoutSchema = OpenObject({
   payoutId: resourceIdSchema,
   payableId: resourceIdSchema,
   supplierId: resourceIdSchema,
@@ -202,19 +181,3 @@ export const supplierPayoutSchema = OpenObject({
   state: supplierPayoutStateSchema,
 });
 export type SupplierPayout = Static<typeof supplierPayoutSchema>;
-
-// Parsers of the records above (Plan 78 step 2).
-export const parsePayoutIndeterminateOperation = recordParser(
-  payoutIndeterminateOperationSchema,
-);
-export const parsePayoutRecoveryAction = recordParser(
-  payoutRecoveryActionSchema,
-);
-export const parseSupplierPayoutProviderBinding = recordParser(
-  supplierPayoutProviderBindingSchema,
-);
-export const parseSupplierPayoutFailure = recordParser(
-  supplierPayoutFailureSchema,
-);
-export const parseSupplierPayoutState = recordParser(supplierPayoutStateSchema);
-export const parseSupplierPayout = recordParser(supplierPayoutSchema);

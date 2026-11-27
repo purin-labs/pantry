@@ -25,9 +25,6 @@ import {
 const text = normalizedTextSchema;
 const exactKeys = { unevaluatedProperties: false } as const;
 
-export const collectionsMoneySchema = wireMoneySchema;
-export type CollectionsMoney = Static<typeof collectionsMoneySchema>;
-
 /** `requireDescription`: any text of at most 5,000 characters. */
 const descriptionSchema = Type.Refine(
   Type.String(),
@@ -43,15 +40,14 @@ function descriptionError(): string {
   return "description must be text of 5,000 characters or fewer";
 }
 
-export const collectionCommandBaseSchema = ReadonlyOpenObject({
+const collectionCommandBaseSchema = ReadonlyOpenObject({
   merchantId: text,
   idempotencyKey: text,
   requestedAt: utcTimestampSchema,
   collectionId: text,
 });
-export type CollectionCommandBase = Static<typeof collectionCommandBaseSchema>;
 
-export const commerceCollectionSortOrderSchema = Type.Union([
+const commerceCollectionSortOrderSchema = Type.Union([
   Type.Literal("manual"),
   Type.Literal("title"),
   Type.Literal("price_ascending"),
@@ -62,7 +58,7 @@ export type CommerceCollectionSortOrder = Static<
   typeof commerceCollectionSortOrderSchema
 >;
 
-export const commerceCollectionConditionV1Schema = Type.Union([
+const commerceCollectionConditionV1Schema = Type.Union([
   ReadonlyStrictObject({
     field: Type.Union([
       Type.Literal("tag"),
@@ -85,7 +81,7 @@ export type CommerceCollectionConditionV1 = Static<
   typeof commerceCollectionConditionV1Schema
 >;
 
-export const commerceCollectionRuleV1Schema = ReadonlyStrictObject({
+const commerceCollectionRuleV1Schema = ReadonlyStrictObject({
   match: Type.Union([Type.Literal("all"), Type.Literal("any")]),
   conditions: ImmutableArray(commerceCollectionConditionV1Schema, {
     minItems: 1,
@@ -104,7 +100,7 @@ function uniqueIdsError(): string {
   return "selection.productIds must be unique";
 }
 
-export const commerceCollectionSelectionV1Schema = Type.Union([
+const commerceCollectionSelectionV1Schema = Type.Union([
   ReadonlyStrictObject({
     kind: Type.Literal("manual"),
     productIds: Type.Refine(ImmutableArray(text), hasUniqueIds, uniqueIdsError),
@@ -136,7 +132,7 @@ function manualOrderError(): string {
   return "only a manual collection can keep a manual order";
 }
 
-export const createCommerceCollectionV1Schema = Type.Refine(
+const createCommerceCollectionV1Schema = Type.Refine(
   Type.Intersect(
     [
       collectionCommandBaseSchema,
@@ -170,7 +166,7 @@ function noChangeError(): string {
   return "changes must name at least one field";
 }
 
-export const updateCommerceCollectionV1Schema = Type.Intersect(
+const updateCommerceCollectionV1Schema = Type.Intersect(
   [
     collectionCommandBaseSchema,
     ReadonlyOpenObject({
@@ -195,7 +191,7 @@ export type UpdateCommerceCollectionV1 = Static<
   typeof updateCommerceCollectionV1Schema
 >;
 
-export const deleteCommerceCollectionV1Schema = Type.Intersect(
+const deleteCommerceCollectionV1Schema = Type.Intersect(
   [
     collectionCommandBaseSchema,
     ReadonlyOpenObject({
@@ -209,7 +205,7 @@ export type DeleteCommerceCollectionV1 = Static<
   typeof deleteCommerceCollectionV1Schema
 >;
 
-export const commerceCollectionCommandV1Schema = Type.Union([
+const commerceCollectionCommandV1Schema = Type.Union([
   createCommerceCollectionV1Schema,
   updateCommerceCollectionV1Schema,
   deleteCommerceCollectionV1Schema,
@@ -218,7 +214,7 @@ export type CommerceCollectionCommandV1 = Static<
   typeof commerceCollectionCommandV1Schema
 >;
 
-export const commerceBuyerCollectionSummaryV1Schema = ReadonlyStrictObject({
+const commerceBuyerCollectionSummaryV1Schema = ReadonlyStrictObject({
   handle: text,
   title: text,
   description: descriptionSchema,
@@ -227,7 +223,7 @@ export type CommerceBuyerCollectionSummaryV1 = Static<
   typeof commerceBuyerCollectionSummaryV1Schema
 >;
 
-export const commerceBuyerCollectionProductV1Schema = ReadonlyStrictObject({
+const commerceBuyerCollectionProductV1Schema = ReadonlyStrictObject({
   productId: text,
   title: text,
   handle: Nullable(text),
@@ -239,7 +235,7 @@ export type CommerceBuyerCollectionProductV1 = Static<
   typeof commerceBuyerCollectionProductV1Schema
 >;
 
-export const commerceBuyerCollectionPageV1Schema = ReadonlyStrictObject({
+const commerceBuyerCollectionPageV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.buyer-collection-page.v1"),
   collection: commerceBuyerCollectionSummaryV1Schema,
   products: ImmutableArray(commerceBuyerCollectionProductV1Schema),
@@ -249,7 +245,7 @@ export type CommerceBuyerCollectionPageV1 = Static<
   typeof commerceBuyerCollectionPageV1Schema
 >;
 
-export const commerceBuyerCollectionsV1Schema = ReadonlyStrictObject({
+const commerceBuyerCollectionsV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.buyer-collections.v1"),
   collections: ImmutableArray(commerceBuyerCollectionSummaryV1Schema),
 });
@@ -258,7 +254,7 @@ export type CommerceBuyerCollectionsV1 = Static<
 >;
 
 /** A filter that the client writes; no reader checks it. */
-export const commerceCollectionPageFilterV1Schema = OpenObject({
+const commerceCollectionPageFilterV1Schema = OpenObject({
   after: Type.Optional(Type.Readonly(Type.String())),
   limit: Type.Optional(Type.Readonly(SafeInteger)),
   tag: Type.Optional(Type.Readonly(Type.String())),
@@ -272,7 +268,7 @@ export type CommerceCollectionPageFilterV1 = Static<
   typeof commerceCollectionPageFilterV1Schema
 >;
 
-export const commerceCollectionV1Schema = ReadonlyStrictObject({
+const commerceCollectionV1Schema = ReadonlyStrictObject({
   id: text,
   revision: PositiveInteger,
   handle: text,

@@ -38,6 +38,31 @@
     "execution-bundle": {
       "reason": "The `export *` of the execution worker is the interface of the retained engine bundle for a host that is not a worker. A change of the line changes the bytes and the identity of each new bundle.",
       "files": ["areas/kitchen/ui/features/production-run/execution-worker.ts"]
+    },
+    "commerce-spec": {
+      "reason": "services/commerce/docs/spec.md names these record and lifecycle types. They are public shapes of the commerce engine for an outside client.",
+      "files": ["packages/commerce-contracts/src/**"],
+      "names": [
+        "Buyer",
+        "CheckoutLifecycle",
+        "InventoryAllocationLifecycle",
+        "InventoryLotLifecycle",
+        "Payment",
+        "PaymentLifecycle",
+        "PickupFulfillmentLifecycle",
+        "Product",
+        "ShippingFulfillmentLifecycle"
+      ]
+    },
+    "commerce-engine-reexports": {
+      "reason": "services/commerce/scripts/configure-patisserie-menu.ts imports these names to re-export them. The Refactor 17 rules allow no change in services/commerce but the loss of an import.",
+      "files": ["packages/commerce-client/src/index.ts"],
+      "names": [
+        "PatisserieItem",
+        "PatisserieMenuSetupResult",
+        "patisserieVariantId",
+        "seedPatisserieSupplyCosts"
+      ]
     }
   },
   "counts": {
@@ -58,12 +83,11 @@
     "@purin-labs/bakery-workflow": 12,
     "@purin-labs/cafe-control-api": 3,
     "@purin-labs/collaboration": 3,
-    "@purin-labs/commerce-client": 236,
-    "@purin-labs/commerce-contracts": 1846,
+    "@purin-labs/commerce-contracts": 12,
     "@purin-labs/commerce-control-api": 8,
     "@purin-labs/commerce-query-sqlite": 1,
     "@purin-labs/commerce-worker": 16,
-    "@purin-labs/contract-schema": 3,
+    "@purin-labs/contract-schema": 2,
     "@purin-labs/contracts": 87,
     "@purin-labs/control-api": 242,
     "@purin-labs/costs-sheet-crdt": 7,

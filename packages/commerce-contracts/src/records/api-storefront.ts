@@ -26,7 +26,7 @@ import type { Variant } from "@purin-labs/type-utils";
 
 const text = normalizedTextSchema;
 
-export const createBuyerSessionCommandSchema = Type.Union([
+const createBuyerSessionCommandSchema = Type.Union([
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.create-buyer-session.v1"),
     buyer: ReadonlyStrictObject({
@@ -61,7 +61,7 @@ function invalidConfiguration(): string {
   return "the checkout profile configuration is invalid";
 }
 
-export const buyerSessionSchema = ReadonlyStrictObject({
+const buyerSessionSchema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.buyer-session.v4"),
   token: text,
   expiresAt: utcTimestampSchema,
@@ -98,20 +98,20 @@ const buyerLines = ImmutableArray(buyerPickupCheckoutLineSchema, {
   minItems: 1,
 });
 
-export const createBuyerCartCommandSchema = ReadonlyStrictObject({
+const createBuyerCartCommandSchema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.create-buyer-cart.v1"),
   idempotencyKey: text,
   lines: buyerLines,
 });
 
-export const replaceBuyerCartCommandSchema = ReadonlyStrictObject({
+const replaceBuyerCartCommandSchema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.replace-buyer-cart.v1"),
   idempotencyKey: text,
   cartRevision: PositiveInteger,
   lines: buyerLines,
 });
 
-export const refreshBuyerPickupCheckoutCommandSchema = ReadonlyStrictObject({
+const refreshBuyerPickupCheckoutCommandSchema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.refresh-buyer-pickup-checkout.v1"),
   idempotencyKey: text,
   checkoutRevision: PositiveInteger,
@@ -119,7 +119,7 @@ export const refreshBuyerPickupCheckoutCommandSchema = ReadonlyStrictObject({
   lines: buyerLines,
 });
 
-export const placeBuyerStoredValueCheckoutCommandSchema = ReadonlyStrictObject({
+const placeBuyerStoredValueCheckoutCommandSchema = ReadonlyStrictObject({
   schemaVersion: Type.Literal(
     "commerce.place-buyer-stored-value-checkout.v1",
   ),
@@ -165,7 +165,7 @@ const e164PhoneSchema = Type.String({
   pattern: "^\\+[1-9]\\d{7,14}$",
 });
 
-export const buyerContactSchema = Type.Union([
+const buyerContactSchema = Type.Union([
   ReadonlyStrictObject({
     kind: Type.Literal("email"),
     email: emailAddressSchema,
@@ -178,7 +178,7 @@ export const buyerContactSchema = Type.Union([
   }),
 ]);
 
-export const buyerCheckoutIdentitySchema = Type.Union([
+const buyerCheckoutIdentitySchema = Type.Union([
   ReadonlyStrictObject({
     kind: Type.Literal("guest"),
     contact: buyerContactSchema,
@@ -221,7 +221,7 @@ function withoutStoreCreditFalse<
   return rest as Command;
 }
 
-export const createBuyerPickupCheckoutCommandSchema = Type.Codec(
+const createBuyerPickupCheckoutCommandSchema = Type.Codec(
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.create-buyer-pickup-checkout.v1"),
     idempotencyKey: text,
@@ -245,7 +245,7 @@ const EUROPEAN_UNION_COUNTRIES = [
   "SE", "SI", "SK",
 ] as const; // prettier-ignore
 
-export type WireInternationalShippingCountry =
+type WireInternationalShippingCountry =
   "AU" | "US" | (typeof EUROPEAN_UNION_COUNTRIES)[number];
 
 /** `CommerceInternationalShippingAddressV1`. */
@@ -381,7 +381,7 @@ function japanPostalCodeError(): string {
 }
 
 /** `CommerceBuyerShippingAddressV1`. */
-export type WireBuyerShippingAddress =
+type WireBuyerShippingAddress =
   | Readonly<{
       countryCode: "JP";
       recipientName: string;
@@ -449,7 +449,7 @@ function orderedAddress(
   return ordered as WireBuyerShippingAddress;
 }
 
-export const buyerShippingAddressAcceptanceSchema = Type.Union([
+const buyerShippingAddressAcceptanceSchema = Type.Union([
   ReadonlyStrictObject({
     kind: Type.Literal("accepted_as_entered"),
     addressValidationReference: text,
@@ -460,7 +460,7 @@ export const buyerShippingAddressAcceptanceSchema = Type.Union([
   }),
 ]);
 
-export const buyerShippingDestinationSchema = Type.Union([
+const buyerShippingDestinationSchema = Type.Union([
   ReadonlyStrictObject({
     kind: Type.Literal("provided_address"),
     address: buyerShippingAddressSchema,
@@ -479,7 +479,7 @@ type BuyerCheckoutIdentity = Static<typeof buyerCheckoutIdentitySchema>;
 type BuyerShippingDestination = Static<typeof buyerShippingDestinationSchema>;
 
 /** `CreateCommerceBuyerShippingCheckoutV1`. */
-export type WireCreateBuyerShippingCheckout = Readonly<{
+type WireCreateBuyerShippingCheckout = Readonly<{
   schemaVersion: "commerce.create-buyer-shipping-checkout.v1";
   idempotencyKey: string;
   cartId: string;
@@ -506,7 +506,7 @@ export type WireCreateBuyerShippingCheckout = Readonly<{
   );
 
 /** A guest gives an address; only a customer may use a saved one. */
-export const createBuyerShippingCheckoutCommandSchema =
+const createBuyerShippingCheckoutCommandSchema =
   Type.Unsafe<WireCreateBuyerShippingCheckout>(
     Type.Codec(
       Type.Refine(
@@ -545,13 +545,13 @@ function guestAddressError(): string {
   return "Guest checkout cannot use a saved address";
 }
 
-export const validateBuyerShippingAddressCommandSchema = ReadonlyStrictObject({
+const validateBuyerShippingAddressCommandSchema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.validate-buyer-shipping-address.v1"),
   idempotencyKey: text,
   address: buyerShippingAddressSchema,
 });
 
-export const buyerShippingCheckoutLineSchema = ReadonlyStrictObject({
+const buyerShippingCheckoutLineSchema = ReadonlyStrictObject({
   variantId: text,
   quantity: PositiveInteger,
 });
@@ -577,7 +577,7 @@ function distinctVariantsError(): string {
   return "lines must contain each variant once";
 }
 
-export const refreshBuyerShippingCheckoutCommandSchema = ReadonlyStrictObject({
+const refreshBuyerShippingCheckoutCommandSchema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.refresh-buyer-shipping-checkout.v1"),
   idempotencyKey: text,
   checkoutRevision: PositiveInteger,

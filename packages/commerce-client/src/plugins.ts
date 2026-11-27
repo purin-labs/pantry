@@ -24,10 +24,6 @@ import {
   parseCommercePluginFunctionRunV1 as parseCommercePluginFunctionRunV1Record,
   parseCommercePluginListV1 as parseCommercePluginListV1Record,
   parseCommercePluginPreviewV1 as parseCommercePluginPreviewV1Record,
-  parseWirePluginActions,
-  parseWirePluginDefinition,
-  parseWirePluginFields,
-  parseWirePluginHandlers,
 } from "@purin-labs/commerce-contracts/records/api-plugins";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
@@ -371,34 +367,10 @@ export function parsePluginPreview(value: unknown): CommercePluginPreviewV1 {
   return decodeRecord(parseCommercePluginPreviewV1Record, value);
 }
 
-/** At most 10 handlers with different ids. */
-export function parsePluginHandlers(
-  value: unknown,
-  field = "handlers",
-): readonly CommercePluginHandlerV1[] {
-  return decodeRecord(parseWirePluginHandlers, value);
-}
-
-/** At most 10 actions with different ids and at most 10 inputs each. */
-export function parsePluginActions(
-  value: unknown,
-  field = "actions",
-): readonly CommercePluginActionV1[] {
-  return decodeRecord(parseWirePluginActions, value);
-}
-
 export function parseRunPluginActionCommand(
   value: unknown,
 ): RunCommercePluginActionV1 {
   return decodeRecord(parseRunCommercePluginActionV1Record, value);
-}
-
-/** At most 20 fields with unique keys for each entity type. */
-export function parsePluginFields(
-  value: unknown,
-  field = "fields",
-): readonly CommercePluginFieldV1[] {
-  return decodeRecord(parseWirePluginFields, value);
 }
 
 export function parseSetPluginFieldValuesCommand(
@@ -411,14 +383,6 @@ export function parsePluginFieldValueList(
   value: unknown,
 ): CommercePluginFieldValueListV1 {
   return decodeRecord(parseCommercePluginFieldValueListV1Record, value);
-}
-
-/** A plugin definition, as an agent writes it for a merchant plugin. */
-export function parsePluginDefinition(
-  value: unknown,
-  field = "definition",
-): PluginDefinition {
-  return decodeRecord(parseWirePluginDefinition, value);
 }
 
 export function parseInstallMerchantPluginCommand(

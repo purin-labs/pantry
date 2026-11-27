@@ -18,12 +18,12 @@ import { hasExactKeys, isRecord } from "@purin-labs/std";
 const IDENTITY_MAX_LENGTH = 255;
 const CURRENCY_PATTERN = /^[A-Z]{3}$/u;
 
-export type CheckoutProfileParseError = Readonly<{
+type CheckoutProfileParseError = Readonly<{
   code: "checkout_profile_invalid";
   field: string;
 }>;
 
-export type CheckoutProfileParseResult<TValue> =
+type CheckoutProfileParseResult<TValue> =
   | Readonly<{ ok: true; value: TValue }>
   | Readonly<{ ok: false; error: CheckoutProfileParseError }>;
 
@@ -402,7 +402,7 @@ function parsePaymentPolicy(
   }
 }
 
-export function parseCheckoutAfterSalePolicy(
+function parseCheckoutAfterSalePolicy(
   raw: unknown,
 ): CheckoutProfileParseResult<CheckoutAfterSalePolicy> {
   const policy = readObject(raw, "configuration.afterSalePolicy");
@@ -459,7 +459,7 @@ function parseRefundGovernancePolicy(
     : invalidProfile("configuration.afterSalePolicy.refundGovernance");
 }
 
-export function parseCheckoutPresentationPolicy(
+function parseCheckoutPresentationPolicy(
   raw: unknown,
 ): CheckoutProfileParseResult<CheckoutPresentationPolicy> {
   const policy = readObject(raw, "configuration.presentationPolicy");

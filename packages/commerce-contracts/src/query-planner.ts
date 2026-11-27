@@ -62,7 +62,7 @@ export const commerceGraphQueryPlanRequestSchema = StrictObject({
 export type CommerceGraphQueryPlanRequest = Static<
   typeof commerceGraphQueryPlanRequestSchema
 >;
-export const commerceCursorMismatchReasonSchema = Type.Enum([
+const commerceCursorMismatchReasonSchema = Type.Enum([
   "organisation",
   "merchant",
   "query_fingerprint",
@@ -71,7 +71,7 @@ export const commerceCursorMismatchReasonSchema = Type.Enum([
   "watermark_kind",
   "effective_ordering",
 ]);
-export const commerceQueryPlanErrorCapabilitySchema = Type.Union([
+const commerceQueryPlanErrorCapabilitySchema = Type.Union([
   OpenObject({ kind: Type.Literal("source_mapping") }),
   OpenObject({ kind: Type.Literal("all_entity_types_search") }),
   OpenObject({ kind: Type.Literal("attribute_filter") }),
@@ -99,7 +99,7 @@ export const commerceUnplannedQueryOutcomeSchemas = [
   }),
   OpenObject({ kind: Type.Literal("invalid") }),
 ] as const;
-export const commerceQueryPlanOutcomeSchema = Type.Union([
+const commerceQueryPlanOutcomeSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("planned"),
     plan: Type.Unsafe<CommerceQueryPlan>(commerceQueryPlanSchema),

@@ -17,15 +17,12 @@ import {
 
 const text = normalizedTextSchema;
 
-export const unplacedCaptureResolutionSchema = Type.Union([
+const unplacedCaptureResolutionSchema = Type.Union([
   Type.Literal("refunded"),
   Type.Literal("placed_by_hand"),
 ]);
-export type UnplacedCaptureResolution = Static<
-  typeof unplacedCaptureResolutionSchema
->;
 
-export const unplacedCaptureLifecycleSchema = Type.Union([
+const unplacedCaptureLifecycleSchema = Type.Union([
   ReadonlyStrictObject({ state: Type.Literal("capture_unplaced") }),
   ReadonlyStrictObject({
     state: Type.Literal("resolved"),
@@ -38,7 +35,7 @@ export type UnplacedCaptureLifecycle = Static<
   typeof unplacedCaptureLifecycleSchema
 >;
 
-export const commerceUnplacedCaptureV1Schema = ReadonlyStrictObject({
+const commerceUnplacedCaptureV1Schema = ReadonlyStrictObject({
   paymentAttemptId: text,
   checkoutId: text,
   revision: PositiveInteger,
@@ -57,7 +54,7 @@ export type CommerceUnplacedCaptureV1 = Static<
   typeof commerceUnplacedCaptureV1Schema
 >;
 
-export const commerceUnplacedCapturesV1Schema = ReadonlyStrictObject({
+const commerceUnplacedCapturesV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.unplaced-captures.v1"),
   merchantId: text,
   /** The open captures first, then the resolved ones, the newest first. */
@@ -67,23 +64,17 @@ export type CommerceUnplacedCapturesV1 = Static<
   typeof commerceUnplacedCapturesV1Schema
 >;
 
-export const parseCommerceUnplacedCapturesV1 = wireRecordParser(
-  commerceUnplacedCapturesV1Schema,
-);
 export const parseCommerceUnplacedCaptureV1 = wireRecordParser(
   commerceUnplacedCaptureV1Schema,
 );
 
 /** Staff record what they did for a capture with no order. */
-export const resolveCommerceUnplacedCaptureV1Schema = ReadonlyStrictObject({
+const resolveCommerceUnplacedCaptureV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.resolve-unplaced-capture.v1"),
   expectedRevision: PositiveInteger,
   resolution: unplacedCaptureResolutionSchema,
   note: Type.Optional(text),
 });
-export type ResolveCommerceUnplacedCaptureV1 = Static<
-  typeof resolveCommerceUnplacedCaptureV1Schema
->;
 
 export const parseResolveCommerceUnplacedCaptureV1 = wireRecordParser(
   resolveCommerceUnplacedCaptureV1Schema,

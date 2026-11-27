@@ -30,20 +30,20 @@ const STOREFRONT_ID = "storefront_cafe";
 const DAY_MILLISECONDS = 86_400_000;
 const QUANTITY_SCALE = 6;
 
-export type PatisserieSection =
+type PatisserieSection =
   | "financiers"
   | "hotcake"
   | "pies"
   | "pastries"
   | "drinks";
 
-export type PatisserieSupplyCostTier = Readonly<{
+type PatisserieSupplyCostTier = Readonly<{
   min7dQuantity: number;
   packQuantity: number;
   packPriceMinor: number;
 }>;
 
-export type PatisserieSupplyCostTerms = Readonly<{
+type PatisserieSupplyCostTerms = Readonly<{
   currency: "JPY";
   packQuantity: number;
   packUnit: "gram" | "milliliter" | "each";
@@ -52,7 +52,7 @@ export type PatisserieSupplyCostTerms = Readonly<{
   notes: string | null;
 }>;
 
-export type PatisserieSupplyItem = Readonly<{
+type PatisserieSupplyItem = Readonly<{
   inventoryItemId: string;
   merchantCode: string;
   name: string;
@@ -62,12 +62,12 @@ export type PatisserieSupplyItem = Readonly<{
   costTerms: PatisserieSupplyCostTerms;
 }>;
 
-export type PatisserieRecipeInput = Readonly<{
+type PatisserieRecipeInput = Readonly<{
   ingredient: PatisserieSupplyItem;
   amount: number;
 }>;
 
-export type PatisserieSupply =
+type PatisserieSupply =
   | Readonly<{
       kind: "stocked";
       openingStock: number;
@@ -1082,7 +1082,7 @@ type CafeMenu = Readonly<{
   menu: PublishMenuCommand["menu"];
 }>;
 
-export type PatisserieEntityPlaneContext = Readonly<{
+type PatisserieEntityPlaneContext = Readonly<{
   client: CommerceEntityPlaneClient;
   organisationId: string;
   principalId?: string;

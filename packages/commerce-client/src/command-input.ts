@@ -13,7 +13,7 @@ export type CommerceCommandInput<Command> = Command extends unknown
   : never;
 
 /** The command fields that the server gives, never the caller. */
-export type CommerceServerCommandField =
+type CommerceServerCommandField =
   "schemaVersion" | "organisationId" | "actionNonce" | "requestedAt";
 
 const SERVER_COMMAND_FIELDS: readonly CommerceServerCommandField[] = [

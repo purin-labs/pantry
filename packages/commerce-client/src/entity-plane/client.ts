@@ -67,20 +67,20 @@ export type CommerceEntityPlaneFetch = (
   init?: RequestInit,
 ) => Promise<Response>;
 
-export type CommerceEntityPlaneClientConfig = Readonly<{
+type CommerceEntityPlaneClientConfig = Readonly<{
   baseUrl: string;
   /** The operator token, an API key, or a token for each merchant. */
   serviceToken: CommerceCredential;
   fetch?: CommerceEntityPlaneFetch;
 }>;
 
-export type CommerceEntityPlaneClientError =
+type CommerceEntityPlaneClientError =
   | Readonly<{ kind: "cursor_stale"; message: string }>
   | Readonly<{ kind: "network"; message: string }>
   | Readonly<{ kind: "http"; status: number; message: string }>
   | Readonly<{ kind: "invalid_response"; message: string }>;
 
-export type CommerceEntityPlaneClientResult<T> =
+type CommerceEntityPlaneClientResult<T> =
   | Readonly<{ ok: true; value: T }>
   | Readonly<{ ok: false; error: CommerceEntityPlaneClientError }>;
 

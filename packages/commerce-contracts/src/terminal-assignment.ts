@@ -20,12 +20,12 @@ import { hasExactKeys, isRecord } from "@purin-labs/std";
 const IDENTITY_MAX_LENGTH = 255;
 const CURRENCY_PATTERN = /^[A-Z]{3}$/u;
 
-export type TerminalAssignmentParseError = Readonly<{
+type TerminalAssignmentParseError = Readonly<{
   code: "terminal_assignment_invalid";
   field: string;
 }>;
 
-export type TerminalAuthorityError =
+type TerminalAuthorityError =
   | Readonly<{
       code: "terminal_assignment_retired";
       reason: TerminalRetirementReason;
@@ -136,7 +136,7 @@ export function parseTerminalAssignment(
  * Parse the terminal target. A Sandbox simulation target and a paired physical
  * device are different things and never share an identifier field.
  */
-export function parseTerminalTarget(raw: unknown): ParseResult<TerminalTarget> {
+function parseTerminalTarget(raw: unknown): ParseResult<TerminalTarget> {
   if (!isRecord(raw)) return invalid("terminalAssignment.target");
   const kind = readEnum(raw.kind, "terminalAssignment.target.kind", [
     "sandbox_simulated",
@@ -279,7 +279,7 @@ export function parseTerminalPairingAttempt(
 }
 
 /** Parse the pairing ceremony state. Only a completed pairing names a device. */
-export function parseTerminalPairingAttemptState(
+function parseTerminalPairingAttemptState(
   raw: unknown,
 ): ParseResult<TerminalPairingAttemptState> {
   if (!isRecord(raw)) return invalid("terminalPairingAttempt.state");
@@ -383,7 +383,7 @@ export function terminalPairingAttemptHasExpired(
 }
 
 /** Parse the assignment state. Retirement is an operator or credential fact. */
-export function parseTerminalAssignmentState(
+function parseTerminalAssignmentState(
   raw: unknown,
 ): ParseResult<TerminalAssignmentState> {
   if (!isRecord(raw)) return invalid("terminalAssignment.state");

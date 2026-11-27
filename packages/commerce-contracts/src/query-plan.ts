@@ -38,7 +38,7 @@ import {
   type CommerceCursorBoundary,
 } from "./cursor-payload.ts";
 
-export const commerceQueryLimitSchema = Type.Unsafe<
+const commerceQueryLimitSchema = Type.Unsafe<
   number & { readonly __brand: "CommerceQueryLimit" }
 >(Type.Integer({ minimum: 1, maximum: 500 }));
 export const commerceQueryPlanSchema = StrictObject({
@@ -56,7 +56,6 @@ export const commerceQueryPlanSchema = StrictObject({
   boundary: Type.Union([commerceCursorBoundarySchema, Type.Null()]),
 });
 export type CommerceQueryPlan = StaticDecode<typeof commerceQueryPlanSchema>;
-export type CommerceQueryLimit = StaticDecode<typeof commerceQueryLimitSchema>;
 const planWire = StrictObject({
   operation: Type.Unknown(),
   queryFingerprint: Type.String(),

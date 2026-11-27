@@ -8,7 +8,7 @@ import {
 import { Type, type StaticDecode } from "typebox";
 import { Value } from "typebox/value";
 import { assertNever } from "@purin-labs/std";
-import type { StrictUnion, Variant } from "@purin-labs/type-utils";
+import type { StrictUnion } from "@purin-labs/type-utils";
 import {
   authorityTargetSchemas,
   authorityTargetWireSchemas,
@@ -93,30 +93,6 @@ export const listViewCommandSchema = Type.Union([
 export type ListViewCommand = StrictUnion<
   StaticDecode<typeof listViewCommandSchema>
 >;
-export type CreateCommerceListCommand = Variant<
-  ListViewCommand,
-  "create_commerce_list"
->["command"];
-export type AddCommerceListEntryCommand = Variant<
-  ListViewCommand,
-  "add_commerce_list_entry"
->["command"];
-export type PatchCommerceListEntryCommand = Variant<
-  ListViewCommand,
-  "patch_commerce_list_entry"
->["command"];
-export type RemoveCommerceListEntryCommand = Variant<
-  ListViewCommand,
-  "remove_commerce_list_entry"
->["command"];
-export type PublishSavedCommerceViewCommand = Variant<
-  ListViewCommand,
-  "publish_saved_commerce_view"
->["command"];
-export type ArchiveSavedCommerceViewCommand = Variant<
-  ListViewCommand,
-  "archive_saved_commerce_view"
->["command"];
 
 const commandWire = Type.Union([
   OpenObject({

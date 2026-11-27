@@ -84,14 +84,11 @@ const buyerCatalogListingSchema = Type.Refine(
   compareAtCurrencyError,
 );
 
-export const commerceBuyerCatalogSearchV1Schema = ReadonlyStrictObject({
+const commerceBuyerCatalogSearchV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.buyer-catalog-search.v1"),
   query: Type.String(),
   listings: ImmutableArray(buyerCatalogListingSchema),
 });
-export type CommerceBuyerCatalogSearchV1 = Static<
-  typeof commerceBuyerCatalogSearchV1Schema
->;
 
 const buyerShippingServiceSchema = ReadonlyStrictObject({
   destinationCountry: countryCodeTextSchema,
@@ -170,7 +167,7 @@ const catalogStorefront = {
   name: displayText,
 };
 
-export const commerceBuyerCatalogV1Schema = ReadonlyStrictObject({
+const commerceBuyerCatalogV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.buyer-catalog.v1"),
   storefront: Type.Union([
     ReadonlyStrictObject({
@@ -187,9 +184,6 @@ export const commerceBuyerCatalogV1Schema = ReadonlyStrictObject({
   listings: ImmutableArray(buyerCatalogListingSchema),
   menus: ImmutableArray(buyerMenuSchema),
 });
-export type CommerceBuyerCatalogV1 = Static<
-  typeof commerceBuyerCatalogV1Schema
->;
 
 const buyerCart = {
   schemaVersion: Type.Literal("commerce.buyer-cart.v1"),
@@ -200,7 +194,7 @@ const buyerCart = {
   lines: ImmutableArray(buyerPickupCheckoutLineSchema, { minItems: 1 }),
 };
 
-export const commerceBuyerCartV1Schema = Type.Union([
+const commerceBuyerCartV1Schema = Type.Union([
   ReadonlyStrictObject({
     ...buyerCart,
     state: Type.Literal("active"),
@@ -212,7 +206,6 @@ export const commerceBuyerCartV1Schema = Type.Union([
     checkoutId: text,
   }),
 ]);
-export type CommerceBuyerCartV1 = Static<typeof commerceBuyerCartV1Schema>;
 
 const quotedLineAmounts = {
   checkoutLineId: text,
@@ -275,7 +268,7 @@ const quotedCheckout = {
   state: Type.Literal("quoted"),
 };
 
-export const commerceBuyerQuotedCheckoutV1Schema = ReadonlyStrictObject({
+const commerceBuyerQuotedCheckoutV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.buyer-quoted-checkout.v1"),
   ...quotedCheckout,
   quote: Type.Refine(
@@ -294,9 +287,6 @@ export const commerceBuyerQuotedCheckoutV1Schema = ReadonlyStrictObject({
     quoteTotalsError,
   ),
 });
-export type CommerceBuyerQuotedCheckoutV1 = Static<
-  typeof commerceBuyerQuotedCheckoutV1Schema
->;
 
 const chargeAllocationsSchema = ImmutableArray(
   ReadonlyStrictObject({ checkoutLineId: text, amount: money }),
@@ -344,7 +334,7 @@ const buyerShippingMarketSchema = ReadonlyStrictObject({
 });
 type BuyerShippingMarket = Static<typeof buyerShippingMarketSchema>;
 
-export const commerceBuyerQuotedShippingCheckoutV1Schema =
+const commerceBuyerQuotedShippingCheckoutV1Schema =
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.buyer-quoted-shipping-checkout.v1"),
     ...quotedCheckout,
@@ -362,26 +352,20 @@ export const commerceBuyerQuotedShippingCheckoutV1Schema =
       shippingQuoteError,
     ),
   });
-export type CommerceBuyerQuotedShippingCheckoutV1 = Static<
-  typeof commerceBuyerQuotedShippingCheckoutV1Schema
->;
 
 const checkoutSession = ReadonlyOpenObject({
   token: text,
   expiresAt: utcTimestampSchema,
 });
 
-export const commerceDraftInvoiceCheckoutV1Schema = ReadonlyStrictObject({
+const commerceDraftInvoiceCheckoutV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.draft-invoice-checkout.v1"),
   session: checkoutSession,
   checkout: commerceBuyerQuotedCheckoutV1Schema,
 });
-export type CommerceDraftInvoiceCheckoutV1 = Static<
-  typeof commerceDraftInvoiceCheckoutV1Schema
->;
 
 /** The buyer checkout of an order balance (`parseOrderBalanceCheckout`). */
-export const commerceOrderBalanceCheckoutV1Schema = ReadonlyStrictObject({
+const commerceOrderBalanceCheckoutV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.order-balance-checkout.v1"),
   session: checkoutSession,
   checkout: commerceBuyerQuotedCheckoutV1Schema,
@@ -398,7 +382,7 @@ const addressValidation = {
   expiresAt: utcTimestampSchema,
 };
 
-export const commerceBuyerShippingAddressValidationV1Schema = Type.Union([
+const commerceBuyerShippingAddressValidationV1Schema = Type.Union([
   ReadonlyStrictObject({
     ...addressValidation,
     state: Type.Literal("accepted"),
@@ -420,9 +404,6 @@ export const commerceBuyerShippingAddressValidationV1Schema = Type.Union([
     retryAfter: utcTimestampSchema,
   }),
 ]);
-export type CommerceBuyerShippingAddressValidationV1 = Static<
-  typeof commerceBuyerShippingAddressValidationV1Schema
->;
 
 const buyerCheckoutPaymentProgressSchema = Type.Union([
   ReadonlyStrictObject({
@@ -444,7 +425,7 @@ const buyerCheckoutPaymentProgressSchema = Type.Union([
   }),
 ]);
 
-export const commerceBuyerCheckoutRecoveryV1Schema = ReadonlyStrictObject({
+const commerceBuyerCheckoutRecoveryV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.buyer-checkout-recovery.v1"),
   checkout: Type.Union([
     commerceBuyerQuotedCheckoutV1Schema,
@@ -458,9 +439,6 @@ export const commerceBuyerCheckoutRecoveryV1Schema = ReadonlyStrictObject({
     }),
   ]),
 });
-export type CommerceBuyerCheckoutRecoveryV1 = Static<
-  typeof commerceBuyerCheckoutRecoveryV1Schema
->;
 
 const paymentResult = {
   schemaVersion: Type.Literal("commerce.buyer-payment-result.v1"),
@@ -489,7 +467,7 @@ const buyerShipping = {
 };
 
 /** `parseBuyerPaymentResult`: the reader keeps its own fields and drops the rest. */
-export const commerceBuyerPaymentResultV1Schema = Type.Union([
+const commerceBuyerPaymentResultV1Schema = Type.Union([
   ReadonlyOpenObject({
     ...placedPaymentResult,
     pickup: ReadonlyOpenObject({
@@ -519,9 +497,6 @@ export const commerceBuyerPaymentResultV1Schema = Type.Union([
     reconcileAfter: utcTimestampSchema,
   }),
 ]);
-export type CommerceBuyerPaymentResultV1 = Static<
-  typeof commerceBuyerPaymentResultV1Schema
->;
 
 const buyerPaymentDisputeStatusSchema = Type.Union([
   ReadonlyStrictObject({
@@ -594,7 +569,7 @@ const shippingOrder = {
   }),
 };
 
-export const commerceBuyerOrderV1Schema = Type.Union([
+const commerceBuyerOrderV1Schema = Type.Union([
   ReadonlyStrictObject({ ...pickupOrder, state: Type.Literal("placed") }),
   ReadonlyStrictObject({
     ...pickupOrder,
@@ -633,9 +608,6 @@ export const commerceBuyerOrderV1Schema = Type.Union([
     deliveredAt: utcTimestampSchema,
   }),
 ]);
-export type CommerceBuyerOrderV1 = Static<
-  typeof commerceBuyerOrderV1Schema
->;
 
 function compareAtUsesPriceCurrency(
   listing: Readonly<{

@@ -297,7 +297,6 @@ import {
   parseMigrationInventoryRecord,
   parseOfferPriceResultRecord,
   parseOpenInventoryPositionCommandRecord,
-  parsePaymentCaptureResultRecord,
   parsePlaceChannelListingCommandRecord,
   parsePlacePaidCheckoutCommandRecord,
   parsePrepareCatalogListingCommandRecord,
@@ -326,7 +325,7 @@ import type * as WireAdmin from "@purin-labs/commerce-contracts/records/api-admi
  * Lets a location of the merchant's connected Square account take payments
  * under a payment binding id. Commerce reads the location first.
  */
-export type LinkCommerceSquareAccountV1 = Readonly<{
+type LinkCommerceSquareAccountV1 = Readonly<{
   paymentProviderBindingId: string;
   locationId: string;
 }>;
@@ -336,7 +335,7 @@ export type LinkCommerceSquareAccountV1 = Readonly<{
  * an authorization code of its Square application, or keeps tokens that the
  * same application issued.
  */
-export type ConnectCommerceSquareV1 = Readonly<{
+type ConnectCommerceSquareV1 = Readonly<{
   environment: "development" | "production";
   grant:
     | Readonly<{
@@ -352,17 +351,17 @@ export type ConnectCommerceSquareV1 = Readonly<{
       }>;
 }>;
 
-export type CommerceStripePaymentAccountV1 =
+type CommerceStripePaymentAccountV1 =
   WireAdmin.CommerceStripePaymentAccountV1;
-export type CommerceStripeOnboardingV1 =
+type CommerceStripeOnboardingV1 =
   WireAdmin.CommerceStripeOnboardingV1;
-export type CommercePaymentAccountsV1 = WireAdmin.CommercePaymentAccountsV1;
+type CommercePaymentAccountsV1 = WireAdmin.CommercePaymentAccountsV1;
 export type CommerceSquareConnectionV1 = WireAdmin.CommerceSquareConnectionV1;
-export type CommerceSquareLocationsV1 = WireAdmin.CommerceSquareLocationsV1;
-export type CommerceSquareDevicesV1 = WireAdmin.CommerceSquareDevicesV1;
+type CommerceSquareLocationsV1 = WireAdmin.CommerceSquareLocationsV1;
+type CommerceSquareDevicesV1 = WireAdmin.CommerceSquareDevicesV1;
 export type CommerceSquareDeviceCodeV1 = WireAdmin.CommerceSquareDeviceCodeV1;
 
-export type CommerceSquarePaymentAccountV1 = Readonly<{
+type CommerceSquarePaymentAccountV1 = Readonly<{
   provider: "square";
   paymentProviderBindingId: string;
   providerAccountId: string;
@@ -374,7 +373,7 @@ export type CommerceSquarePaymentAccountV1 = Readonly<{
   updatedAt: CommerceEngineTimestamp;
 }>;
 
-export function parseSquarePaymentAccount(
+function parseSquarePaymentAccount(
   value: unknown,
 ): CommerceSquarePaymentAccountV1 {
   return decodeRecord(parseCommerceSquarePaymentAccountV1Record, value);
@@ -400,8 +399,6 @@ export type ConfigureCommercePickupStorefrontV1 = WireAdmin.ConfigureCommercePic
 
 export type ConfigureCommerceShippingStorefrontV1 = WireAdmin.ConfigureCommerceShippingStorefrontV1;
 
-export type CommerceChannelListingCatalogV1 = WireAdmin.CommerceChannelListingCatalogV1;
-
 export type AdjustCommerceOfferPriceV1 = WireAdmin.AdjustCommerceOfferPriceV1;
 
 /**
@@ -415,7 +412,7 @@ export function parseAdjustOfferPriceCommand(value: unknown): AdjustCommerceOffe
   return decodeRecord(parseAdjustOfferPriceCommandRecord, value);
 }
 
-export type SetCommerceOfferPricePolicyV1 = Readonly<{
+type SetCommerceOfferPricePolicyV1 = Readonly<{
   merchantId: string;
   offerId: string;
   /** Null when no policy exists yet. */
@@ -424,7 +421,7 @@ export type SetCommerceOfferPricePolicyV1 = Readonly<{
   occurredAt: string;
 }>;
 
-export type DisableCommerceOfferPricePolicyV1 = Readonly<{
+type DisableCommerceOfferPricePolicyV1 = Readonly<{
   merchantId: string;
   offerId: string;
   expectedRevision: number;
@@ -467,7 +464,7 @@ export type CreateCommerceInPersonCheckoutV1 = WireAdmin.CreateCommerceInPersonC
  */
 export type CommerceCounterSaleV1 = WireAdmin.CommerceCounterSaleV1;
 
-export function parseCounterSale(value: unknown): CommerceCounterSaleV1 {
+function parseCounterSale(value: unknown): CommerceCounterSaleV1 {
   return decodeRecord(parseCounterSaleRecord, value);
 }
 
@@ -541,17 +538,13 @@ export type CommerceBuyerContactAuthorityV1 = WireAdmin.CommerceBuyerContactAuth
 
 export type CommerceCheckoutBuyerAuthorityV1 = WireAdmin.CommerceCheckoutBuyerAuthorityV1;
 
-export function parseCommercePaymentCaptureResultV1(value: unknown): CommercePaymentCaptureResultV1 {
-  return decodeRecord(parsePaymentCaptureResultRecord, value);
-}
-
 export type {
   CommerceApiCredentialsV1,
   CommerceIssuedApiKeyV1,
   CommerceMerchantClosureV1,
 };
 
-export type CommerceAdminClientConfig = Readonly<{
+type CommerceAdminClientConfig = Readonly<{
   baseUrl: string;
   /** The operator token, an API key, or a token for each merchant. */
   serviceToken: CommerceCredential;
@@ -2745,7 +2738,7 @@ export function parseCommerceDemoProfile(value: unknown): CommerceDemoProfile {
   return decodeRecord(parseDemoProfileRecord, value);
 }
 
-export type CommerceAppInstallationV1 = Readonly<{
+type CommerceAppInstallationV1 = Readonly<{
   credentialId: string;
   appId: string;
   scopes: readonly CommerceApiScope[];
@@ -2760,7 +2753,7 @@ function parseAppInstallation(value: unknown): CommerceAppInstallationV1 {
   return decodeRecord(parseCommerceAppInstallationV1Record, value);
 }
 
-export function parseMerchantProvisioningResult(value: unknown): CommerceMerchantProvisioningResultV1 {
+function parseMerchantProvisioningResult(value: unknown): CommerceMerchantProvisioningResultV1 {
   return decodeRecord(parseMerchantProvisioningResultRecord, value);
 }
 
@@ -2812,7 +2805,7 @@ export function parseRecordCounterCashPaymentCommand(value: unknown): RecordComm
   return decodeRecord(parseRecordCounterCashPaymentCommandRecord, value);
 }
 
-export function parseInPersonCheckoutPaymentCollection(
+function parseInPersonCheckoutPaymentCollection(
   value: unknown,
 ): CommerceInPersonCheckoutPaymentCollectionV1 {
   return decodeRecord(parseCommerceInPersonCheckoutPaymentCollectionV1Record, value);
@@ -2876,7 +2869,7 @@ function webhookSubscriptionPath(
   return `/v1/admin/merchants/${encodeURIComponent(command.merchantId)}/webhook-subscriptions/${encodeURIComponent(command.subscriptionId)}`;
 }
 
-export function parseMigrationInventory(value: unknown): CommerceMigrationInventoryV2 {
+function parseMigrationInventory(value: unknown): CommerceMigrationInventoryV2 {
   return decodeRecord(parseMigrationInventoryRecord, value);
 }
 
@@ -2886,7 +2879,7 @@ export function parseMigrationInventory(value: unknown): CommerceMigrationInvent
  * An unrecognised shape throws rather than reading as accepted: a price change
  * reported as applied when it was not is the worst outcome available here.
  */
-export function parseOfferPriceResult(body: unknown): CommerceOfferPriceResultV1 {
+function parseOfferPriceResult(body: unknown): CommerceOfferPriceResultV1 {
   return decodeRecord(parseOfferPriceResultRecord, body);
 }
 

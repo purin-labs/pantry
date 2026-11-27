@@ -25,14 +25,12 @@ export {
   commerceExportPresetDigestPayload,
   parseEntityPlanePublishedResourceMetadataRequest,
   parseEntityPlanePublishedResourceMetadataResponse,
-  parseCommerceEntityType,
   parseEntityPlaneRelationshipTraversalStepResponse,
   parseEntityPlaneSystemExtensionRequest,
   parseCommerceGraphResponse,
   parseEntityPlaneSystemExtensionResponse,
   parseCommerceListEntryRef,
   parseCommerceRelationship,
-  parseSavedCommerceView,
   parseCommerceViewPresentation,
   parseEntityPlaneChanges,
   parseCommerceEntityPlanePlannedQueryResponse,
@@ -57,20 +55,13 @@ export type {
 
 export {
   parseEntityPlaneCommand,
-  parseCommerceEntityAuthority,
   parseCommerceEntityPlaneCommand,
 } from "./commands.ts";
 export type { CommerceEntityPlaneCommandRequest } from "./commands.ts";
 
-export {
-  parseEntityPlaneCommandResult,
-  parseCommerceEntityPlaneError,
-} from "./receipts.ts";
+export { parseEntityPlaneCommandResult } from "./receipts.ts";
 
-export {
-  parseEntityPlaneObservation,
-  parseCommerceObservationResult,
-} from "./observations.ts";
+export { parseEntityPlaneObservation } from "./observations.ts";
 export type { CommerceEntityPlaneObservationV1 } from "./observations.ts";
 
 export {

@@ -1,18 +1,14 @@
 // Plan 78: generated once from the ts-rs bindings of the Rust contracts.
 // TypeScript is now the source; edit these schemas by hand.
 import { Type, type Static } from "typebox";
-import {
-  OpenObject,
-  SafeInteger,
-  recordParser,
-} from "@purin-labs/contract-schema";
+import { OpenObject, SafeInteger } from "@purin-labs/contract-schema";
 import {
   integrationAccountIdSchema,
   organisationIdSchema,
   resourceIdSchema,
 } from "./identifiers.ts";
 
-export const commerceResourceTypeSchema = Type.Union([
+const commerceResourceTypeSchema = Type.Union([
   Type.Literal("product"),
   Type.Literal("sellable_variant"),
   Type.Literal("inventory_item"),
@@ -60,10 +56,3 @@ export const sourceProvenanceSchema = OpenObject({
   observedAt: commerceTimestampSchema,
 });
 export type SourceProvenance = Static<typeof sourceProvenanceSchema>;
-
-// Parsers of the records above (Plan 78 step 2).
-export const parseCommerceResourceType = recordParser(
-  commerceResourceTypeSchema,
-);
-export const parseCommerceSource = recordParser(commerceSourceSchema);
-export const parseSourceProvenance = recordParser(sourceProvenanceSchema);

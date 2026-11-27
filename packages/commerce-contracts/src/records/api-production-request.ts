@@ -2,11 +2,10 @@
 // declared by hand in src/production-request.ts. Generated once from the client
 // types; the type fixtures in the client prove them equal.
 import { Type, type Static } from "typebox";
-import { wireRecordParser } from "./wire-objects.ts";
 import { OpenObject, SafeInteger } from "@purin-labs/contract-schema";
 import { quantitySchema } from "./commerce-records.ts";
 
-export const productionRequestFieldsSchema = OpenObject({
+const productionRequestFieldsSchema = OpenObject({
   status: Type.Readonly(
     Type.Union([
       Type.Literal("requested"),
@@ -23,8 +22,3 @@ export const productionRequestFieldsSchema = OpenObject({
 export type ProductionRequestFields = Static<
   typeof productionRequestFieldsSchema
 >;
-
-// Parsers of the client API types (Plan 78 step 2).
-export const parseProductionRequestFields = wireRecordParser(
-  productionRequestFieldsSchema,
-);

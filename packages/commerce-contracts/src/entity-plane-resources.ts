@@ -55,37 +55,37 @@ import {
 } from "./entity-type.ts";
 import { cursorRefusal } from "./cursor-values.ts";
 
-export const entityTypeChangeResourceSchema = OpenObject({
+const entityTypeChangeResourceSchema = OpenObject({
   kind: Type.Literal("entity_type"),
   typeId: commerceEntityTypeIdSchema,
 });
-export const entityChangeResourceSchema = OpenObject({
+const entityChangeResourceSchema = OpenObject({
   kind: Type.Literal("entity"),
   ref: customCommerceEntityRefSchema,
 });
-export const relationshipDefinitionChangeResourceSchema = OpenObject({
+const relationshipDefinitionChangeResourceSchema = OpenObject({
   kind: Type.Literal("relationship_definition"),
   definitionId: queryIdentitySchema<"RelationshipDefinitionId">(),
 });
-export const customRelationshipChangeResourceSchema = OpenObject({
+const customRelationshipChangeResourceSchema = OpenObject({
   kind: Type.Literal("custom_relationship"),
   ref: customRelationshipRefSchema,
 });
-export const commerceListChangeResourceSchema = OpenObject({
+const commerceListChangeResourceSchema = OpenObject({
   kind: Type.Literal("commerce_list"),
   listId: commerceListIdSchema,
 });
-export const commerceListEntryChangeResourceSchema = OpenObject({
+const commerceListEntryChangeResourceSchema = OpenObject({
   kind: Type.Literal("commerce_list_entry"),
   ref: Type.Unsafe<Readonly<Static<typeof commerceListEntryRefSchema>>>(
     commerceListEntryRefSchema,
   ),
 });
-export const savedViewChangeResourceSchema = OpenObject({
+const savedViewChangeResourceSchema = OpenObject({
   kind: Type.Literal("saved_view"),
   viewId: savedCommerceViewIdSchema,
 });
-export const entityPlaneChangeResourceSchema = Type.Union([
+const entityPlaneChangeResourceSchema = Type.Union([
   entityTypeChangeResourceSchema,
   entityChangeResourceSchema,
   relationshipDefinitionChangeResourceSchema,
@@ -97,7 +97,7 @@ export const entityPlaneChangeResourceSchema = Type.Union([
 export type CommerceEntityPlaneChangeResource = StrictUnion<
   Readonly<Static<typeof entityPlaneChangeResourceSchema>>
 >;
-export const entityPlaneChangeSchema = OpenObject({
+const entityPlaneChangeSchema = OpenObject({
   changeId: javascriptTrimmedTextSchema,
   merchantRevision: merchantRevisionSchema,
   resource: Type.Unsafe<CommerceEntityPlaneChangeResource>(
@@ -115,7 +115,7 @@ export const entityPlaneChangeSchema = OpenObject({
 export type CommerceEntityPlaneChange = Readonly<
   Static<typeof entityPlaneChangeSchema>
 >;
-export const entityPlaneChangesSchema = OpenObject({
+const entityPlaneChangesSchema = OpenObject({
   merchantId: javascriptTrimmedTextSchema,
   merchantRevision: commerceSnapshotRevisionSchema,
   changes: Type.Unsafe<readonly CommerceEntityPlaneChange[]>(
@@ -127,7 +127,7 @@ export const entityPlaneChangesSchema = OpenObject({
 export type CommerceEntityPlaneChanges = Readonly<
   Static<typeof entityPlaneChangesSchema>
 >;
-export const entityPlaneSystemExtensionRequestSchema = OpenObject({
+const entityPlaneSystemExtensionRequestSchema = OpenObject({
   organisationId: javascriptTrimmedTextSchema,
   merchantId: javascriptTrimmedTextSchema,
   entityRefs: Type.Unsafe<readonly SystemCommerceEntityRef[]>(
@@ -137,7 +137,7 @@ export const entityPlaneSystemExtensionRequestSchema = OpenObject({
 export type CommerceEntityPlaneSystemExtensionRequest = Readonly<
   Static<typeof entityPlaneSystemExtensionRequestSchema>
 >;
-export const entityPlaneSystemExtensionSidecarSchema = OpenObject({
+const entityPlaneSystemExtensionSidecarSchema = OpenObject({
   entityRef: Type.Unsafe<SystemCommerceEntityRef>(
     systemCommerceEntityRefSchema,
   ),
@@ -149,7 +149,7 @@ export const entityPlaneSystemExtensionSidecarSchema = OpenObject({
 export type CommerceEntityPlaneSystemExtensionSidecar = Readonly<
   StaticDecode<typeof entityPlaneSystemExtensionSidecarSchema>
 >;
-export const entityPlaneSystemExtensionResponseSchema = OpenObject({
+const entityPlaneSystemExtensionResponseSchema = OpenObject({
   merchantId: javascriptTrimmedTextSchema,
   merchantRevision: commerceSnapshotRevisionSchema,
   sidecars: Type.Unsafe<readonly CommerceEntityPlaneSystemExtensionSidecar[]>(
@@ -159,7 +159,7 @@ export const entityPlaneSystemExtensionResponseSchema = OpenObject({
 export type CommerceEntityPlaneSystemExtensionResponse = Readonly<
   StaticDecode<typeof entityPlaneSystemExtensionResponseSchema>
 >;
-export const listEntryReadRequestSchema = StrictObject({
+const listEntryReadRequestSchema = StrictObject({
   merchantId: javascriptTrimmedTextSchema,
   listId: commerceListIdSchema,
   entryId: commerceListEntryRefSchema.properties.entryId,
@@ -167,16 +167,16 @@ export const listEntryReadRequestSchema = StrictObject({
 export type CommerceListEntryReadRequest = Readonly<
   Static<typeof listEntryReadRequestSchema>
 >;
-export const missingListEntryReadResultSchema = OpenObject({
+const missingListEntryReadResultSchema = OpenObject({
   kind: Type.Literal("missing"),
 });
-export const foundListEntryReadResultSchema = OpenObject({
+const foundListEntryReadResultSchema = OpenObject({
   kind: Type.Literal("found"),
   merchantRevision: commerceSnapshotRevisionSchema,
   listRevision: revisionSchema<"CommerceListRevision">(),
   entry: Type.Unsafe<CommerceListEntry>(commerceListEntrySchema),
 });
-export const listEntryReadResultSchema = Type.Union([
+const listEntryReadResultSchema = Type.Union([
   missingListEntryReadResultSchema,
   foundListEntryReadResultSchema,
 ]);
@@ -264,7 +264,7 @@ const readResultWire = Type.Union([
   }),
 ]);
 
-export function parseEntityPlaneChangeResource(
+function parseEntityPlaneChangeResource(
   input: unknown,
 ): ContractDecodeResult<CommerceEntityPlaneChangeResource> {
   const parsed = parseContract(changeResourceWire, input, invalidShape);
@@ -312,7 +312,7 @@ export function parseEntityPlaneChangeResource(
       return assertNever(resource);
   }
 }
-export function parseEntityPlaneChange(
+function parseEntityPlaneChange(
   input: unknown,
 ): ContractDecodeResult<CommerceEntityPlaneChange> {
   const parsed = parseContract(changeWire, input, invalidShape);
@@ -378,7 +378,7 @@ function parseSystemEntityRef(
   if (parsed.value.origin !== "system") return cursorRefusal("parse");
   return { ok: true, value: parsed.value };
 }
-export function parseEntityPlaneSystemExtensionSidecar(
+function parseEntityPlaneSystemExtensionSidecar(
   input: unknown,
 ): ContractDecodeResult<CommerceEntityPlaneSystemExtensionSidecar> {
   const parsed = parseContract(sidecarWire, input, invalidShape);

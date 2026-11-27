@@ -102,7 +102,7 @@ function timestampBefore(left: string, right: string): boolean {
   return left < right;
 }
 
-export function currencyCode(value: string): string {
+function currencyCode(value: string): string {
   if (!/^[A-Z]{3}$/.test(value)) rejectCommerce({ code: "invalid_currency" });
   return value;
 }

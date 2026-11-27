@@ -28,17 +28,14 @@ import {
 
 const text = normalizedTextSchema;
 
-export const storedValueMoneySchema = wireMoneySchema;
-export type StoredValueMoney = Static<typeof storedValueMoneySchema>;
+const storedValueMoneySchema = wireMoneySchema;
+type StoredValueMoney = Static<typeof storedValueMoneySchema>;
 
-export const storedValueCommandBaseSchema = ReadonlyOpenObject({
+const storedValueCommandBaseSchema = ReadonlyOpenObject({
   merchantId: text,
   idempotencyKey: text,
   requestedAt: utcTimestampSchema,
 });
-export type StoredValueCommandBase = Static<
-  typeof storedValueCommandBaseSchema
->;
 
 /** A command: the base fields and its own, with no other key. */
 function storedValueCommand<Properties extends TProperties>(
@@ -81,7 +78,7 @@ function sameText(value: string): string {
 
 const noteSchema = Nullable(boundedTextSchema(500));
 
-export const issueCommerceGiftCardV1Schema = storedValueCommand({
+const issueCommerceGiftCardV1Schema = storedValueCommand({
   schemaVersion: Type.Literal("commerce.issue-gift-card.v1"),
   accountId: text,
   code: giftCardCodeSchema,
@@ -93,7 +90,7 @@ export type IssueCommerceGiftCardV1 = Static<
   typeof issueCommerceGiftCardV1Schema
 >;
 
-export const creditCommerceStoreCreditV1Schema = storedValueCommand({
+const creditCommerceStoreCreditV1Schema = storedValueCommand({
   schemaVersion: Type.Literal("commerce.credit-store-credit.v1"),
   customerId: text,
   amount: positiveWireMoneySchema,
@@ -103,7 +100,7 @@ export type CreditCommerceStoreCreditV1 = Static<
   typeof creditCommerceStoreCreditV1Schema
 >;
 
-export const disableCommerceStoredValueAccountV1Schema = storedValueCommand({
+const disableCommerceStoredValueAccountV1Schema = storedValueCommand({
   schemaVersion: Type.Literal("commerce.disable-stored-value-account.v1"),
   accountId: text,
   expectedRevision: PositiveInteger,
@@ -112,7 +109,7 @@ export type DisableCommerceStoredValueAccountV1 = Static<
   typeof disableCommerceStoredValueAccountV1Schema
 >;
 
-export const commerceStoredValueCommandV1Schema = Type.Union([
+const commerceStoredValueCommandV1Schema = Type.Union([
   issueCommerceGiftCardV1Schema,
   creditCommerceStoreCreditV1Schema,
   disableCommerceStoredValueAccountV1Schema,
@@ -121,7 +118,7 @@ export type CommerceStoredValueCommandV1 = Static<
   typeof commerceStoredValueCommandV1Schema
 >;
 
-export const commerceStoredValueKindV1Schema = Type.Union([
+const commerceStoredValueKindV1Schema = Type.Union([
   Type.Literal("gift_card"),
   Type.Literal("store_credit"),
 ]);
@@ -129,7 +126,7 @@ export type CommerceStoredValueKindV1 = Static<
   typeof commerceStoredValueKindV1Schema
 >;
 
-export const commerceStoredValueAccountV1Schema = ReadonlyStrictObject({
+const commerceStoredValueAccountV1Schema = ReadonlyStrictObject({
   id: text,
   revision: PositiveInteger,
   kind: commerceStoredValueKindV1Schema,
@@ -147,7 +144,7 @@ export type CommerceStoredValueAccountV1 = Static<
   typeof commerceStoredValueAccountV1Schema
 >;
 
-export const commerceGiftCardBalanceV1Schema = ReadonlyStrictObject({
+const commerceGiftCardBalanceV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.gift-card-balance.v1"),
   lastCharacters: text,
   balance: wireMoneySchema,
@@ -162,7 +159,7 @@ export type CommerceGiftCardBalanceV1 = Static<
   typeof commerceGiftCardBalanceV1Schema
 >;
 
-export const commerceStoredValueLiabilityV1Schema = ReadonlyStrictObject({
+const commerceStoredValueLiabilityV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.stored-value-liability.v1"),
   at: utcTimestampSchema,
   currencies: ImmutableArray(
@@ -213,7 +210,7 @@ export const wireCheckoutStoredValueSchema = Type.Object(
 );
 
 /** `parseStoredValueAccounts`: the accounts of the list. */
-export const commerceStoredValueAccountsV1Schema = Type.Unsafe<
+const commerceStoredValueAccountsV1Schema = Type.Unsafe<
   readonly CommerceStoredValueAccountV1[]
 >(
   Type.Codec(
@@ -255,18 +252,13 @@ export const parseIssueCommerceGiftCardV1 = wireRecordParser(
 export const parseCommerceGiftCardBalanceV1 = wireRecordParser(
   commerceGiftCardBalanceV1Schema,
 );
-export const parseCommerceStoredValueAccountV1 = wireRecordParser(
-  commerceStoredValueAccountV1Schema,
-);
 export const parseCommerceStoredValueLiabilityV1 = wireRecordParser(
   commerceStoredValueLiabilityV1Schema,
 );
 const parseWireCheckoutStoredValue = wireRecordParser(
   wireCheckoutStoredValueSchema,
 );
-export type WireCheckoutStoredValue = Static<
-  typeof wireCheckoutStoredValueSchema
->;
+type WireCheckoutStoredValue = Static<typeof wireCheckoutStoredValueSchema>;
 
 /**
  * `parseCheckoutStoredValue` for a quote `total`: distinct accounts, one

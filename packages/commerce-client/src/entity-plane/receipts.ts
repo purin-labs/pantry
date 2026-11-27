@@ -1,25 +1,9 @@
-import type {
-  CommerceCommandResult,
-  CommerceEntityPlaneError,
-} from "@purin-labs/commerce-contracts";
-import {
-  parseCommerceCommandResult,
-  parseCommerceEntityPlaneError as parseContractError,
-} from "@purin-labs/commerce-contracts/entity-plane-results";
+import type { CommerceCommandResult } from "@purin-labs/commerce-contracts";
+import { parseCommerceCommandResult } from "@purin-labs/commerce-contracts/entity-plane-results";
 import { decodeRecord } from "./record-decoding.ts";
 
 export function parseEntityPlaneCommandResult(
   value: unknown,
 ): CommerceCommandResult {
   return decodeRecord(parseCommerceCommandResult, value);
-}
-
-export function parseCommerceEntityPlaneError(
-  value: unknown,
-): CommerceEntityPlaneError {
-  return parseError(value);
-}
-
-function parseError(value: unknown): CommerceEntityPlaneError {
-  return decodeRecord(parseContractError, value);
 }

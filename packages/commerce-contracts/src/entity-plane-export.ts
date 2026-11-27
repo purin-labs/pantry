@@ -40,7 +40,7 @@ const preset = {
   presetId: Type.Literal(EXPORT_COORDINATION_PRESET_ID),
   presetVersion: Type.Literal(EXPORT_COORDINATION_PRESET_VERSION),
 };
-export const entityPlaneExportPresetPublishRequestSchema = StrictObject({
+const entityPlaneExportPresetPublishRequestSchema = StrictObject({
   organisationId: javascriptTrimmedTextSchema,
   merchantId: javascriptTrimmedTextSchema,
   ...preset,
@@ -53,7 +53,7 @@ type CustomRelationshipDefinition = Extract<
   RelationshipDefinition,
   { origin: "custom" }
 >;
-export const entityPlaneExportPresetEvidenceSchema = StrictObject({
+const entityPlaneExportPresetEvidenceSchema = StrictObject({
   customEntityTypes: Type.Unsafe<readonly CustomEntityType[]>(
     Type.Array(customEntityTypeSchema),
   ),
@@ -70,7 +70,7 @@ export type CommerceEntityPlaneExportPresetEvidence = Readonly<
 >;
 const merchantIdSchema = queryIdentitySchema<"CommerceMerchantId">();
 const digestSchema = Type.String({ pattern: "^[a-f0-9]{64}(?![\\s\\S])" });
-export const entityPlaneExportPresetPublishResponseSchema = StrictObject({
+const entityPlaneExportPresetPublishResponseSchema = StrictObject({
   kind: Type.Literal("published"),
   organisationId: javascriptTrimmedTextSchema,
   merchantId: Type.Unsafe<Static<typeof merchantIdSchema>>(
@@ -138,7 +138,7 @@ export function parseEntityPlaneExportPresetPublishResponse(
     },
   };
 }
-export function parseEntityPlaneExportPresetEvidence(
+function parseEntityPlaneExportPresetEvidence(
   input: unknown,
 ): ContractDecodeResult<CommerceEntityPlaneExportPresetEvidence> {
   const parsed = checkContract(evidenceWire, input, invalidExportPreset);

@@ -60,7 +60,7 @@ import type {
 } from "./records/provenance.ts";
 
 /** Plan 78: `commerce/shopify.rs`, the Shopify 2026-07 boundary. */
-export const SHOPIFY_API_VERSION_2026_07 = "2026-07";
+const SHOPIFY_API_VERSION_2026_07 = "2026-07";
 
 type Fields = Readonly<Record<string, unknown>>;
 type Reader = (value: unknown, path: string) => unknown;

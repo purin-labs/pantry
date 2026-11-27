@@ -1,17 +1,13 @@
 // Plan 78: generated once from the ts-rs bindings of the Rust contracts.
 // TypeScript is now the source; edit these schemas by hand.
 import { Type, type Static } from "typebox";
-import {
-  SafeInteger,
-  StrictObject,
-  recordParser,
-} from "@purin-labs/contract-schema";
+import { SafeInteger, StrictObject } from "@purin-labs/contract-schema";
 
 /**
  * A stage of the checkout pipeline (step 2) that a built-in plugin adds a
  * step to.
  */
-export const checkoutStageSchema = Type.Union([
+const checkoutStageSchema = Type.Union([
   Type.Literal("lines"),
   Type.Literal("market"),
   Type.Literal("discounts"),
@@ -23,19 +19,18 @@ export const checkoutStageSchema = Type.Union([
 ]);
 export type CheckoutStage = Static<typeof checkoutStageSchema>;
 
-export const pluginSettingSchema = StrictObject({
+const pluginSettingSchema = StrictObject({
   key: Type.String() /**
    * An entity plane value kind, such as `integer` or `text`.
    */,
   valueKind: Type.String(),
   description: Type.String(),
 });
-export type PluginSetting = Static<typeof pluginSettingSchema>;
 
 /**
  * Where a merchant plugin's function runs.
  */
-export const pluginHookPointSchema = Type.Union([
+const pluginHookPointSchema = Type.Union([
   Type.Literal("checkout.validate"),
   Type.Literal("checkout.discount"),
   Type.Literal("checkout.delivery"),
@@ -43,9 +38,8 @@ export const pluginHookPointSchema = Type.Union([
   Type.Literal("checkout.lines"),
   Type.Literal("machine.guard"),
 ]);
-export type PluginHookPoint = Static<typeof pluginHookPointSchema>;
 
-export const pluginFunctionSchema = StrictObject({
+const pluginFunctionSchema = StrictObject({
   functionId: Type.String(),
   hookPoint: pluginHookPointSchema /**
    * A required validation function refuses the checkout when it fails;
@@ -58,7 +52,7 @@ export const pluginFunctionSchema = StrictObject({
 });
 export type PluginFunction = Static<typeof pluginFunctionSchema>;
 
-export const pluginContributionsSchema = StrictObject({
+const pluginContributionsSchema = StrictObject({
   /**
    * The route kinds that a built-in plugin owns.
    */
@@ -72,15 +66,13 @@ export const pluginContributionsSchema = StrictObject({
   settings: Type.Array(pluginSettingSchema),
   functions: Type.Array(pluginFunctionSchema),
 });
-export type PluginContributions = Static<typeof pluginContributionsSchema>;
 
-export const pluginKindSchema = Type.Union([
+const pluginKindSchema = Type.Union([
   Type.Literal("built_in"),
   Type.Literal("merchant"),
 ]);
-export type PluginKind = Static<typeof pluginKindSchema>;
 
-export const pluginRequirementsSchema = StrictObject({
+const pluginRequirementsSchema = StrictObject({
   /**
    * The hook points that the plugin's functions use.
    */
@@ -95,9 +87,8 @@ export const pluginRequirementsSchema = StrictObject({
    */,
   dependsOn: Type.Array(Type.String()),
 });
-export type PluginRequirements = Static<typeof pluginRequirementsSchema>;
 
-export const pluginLimitsSchema = StrictObject({
+const pluginLimitsSchema = StrictObject({
   /**
    * How many times QuickJS may check for an interrupt during one run. It
    * checks about every 10,000 bytecode steps, and the count is the same
@@ -111,7 +102,7 @@ export const pluginLimitsSchema = StrictObject({
 });
 export type PluginLimits = Static<typeof pluginLimitsSchema>;
 
-export const pluginDefinitionSchema = StrictObject({
+const pluginDefinitionSchema = StrictObject({
   /**
    * Lower case letters, digits and underscores; unique in a merchant.
    */
@@ -139,21 +130,9 @@ export type PluginDefinition = Static<typeof pluginDefinitionSchema>;
  * A merchant's state of one plugin. A paused or removed plugin keeps its
  * data; its routes answer 404 and its pipeline steps are skipped.
  */
-export const pluginStateSchema = Type.Union([
+const pluginStateSchema = Type.Union([
   Type.Literal("active"),
   Type.Literal("paused"),
   Type.Literal("removed"),
 ]);
 export type PluginState = Static<typeof pluginStateSchema>;
-
-// Parsers of the records above (Plan 78 step 2).
-export const parseCheckoutStage = recordParser(checkoutStageSchema);
-export const parsePluginSetting = recordParser(pluginSettingSchema);
-export const parsePluginHookPoint = recordParser(pluginHookPointSchema);
-export const parsePluginFunction = recordParser(pluginFunctionSchema);
-export const parsePluginContributions = recordParser(pluginContributionsSchema);
-export const parsePluginKind = recordParser(pluginKindSchema);
-export const parsePluginRequirements = recordParser(pluginRequirementsSchema);
-export const parsePluginLimits = recordParser(pluginLimitsSchema);
-export const parsePluginDefinition = recordParser(pluginDefinitionSchema);
-export const parsePluginState = recordParser(pluginStateSchema);

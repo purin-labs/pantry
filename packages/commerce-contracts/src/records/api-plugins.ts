@@ -105,7 +105,7 @@ const hookPointSchema = Type.Union([
   Type.Literal("machine.guard"),
 ]);
 
-export const commercePluginSettingValueV1Schema = Type.Union([
+const commercePluginSettingValueV1Schema = Type.Union([
   SafeInteger,
   Type.String(),
   Type.Boolean(),
@@ -116,7 +116,7 @@ export type CommercePluginSettingValueV1 = Static<
 >;
 
 /** `parsePluginSettings`: each key is normalized text. */
-export const commercePluginSettingsV1Schema = Type.Refine(
+const commercePluginSettingsV1Schema = Type.Refine(
   ReadonlyRecord(Type.String(), commercePluginSettingValueV1Schema),
   hasNormalizedKeys,
   settingKeyError,
@@ -180,7 +180,7 @@ const definitionProperties = {
   ),
 } satisfies TProperties;
 
-export const wirePluginDefinitionSchema = Type.Unsafe<PluginDefinition>(
+const wirePluginDefinitionSchema = Type.Unsafe<PluginDefinition>(
   ReadonlyStrictObject(definitionProperties),
 );
 
@@ -195,7 +195,7 @@ const pluginFieldEntityTypeSchema = Type.Union([
  * A field on a product, a variant or a customer. A customer field holds an
  * integer or a boolean only, so a plugin keeps no free text about a person.
  */
-export const commercePluginFieldV1Schema = Type.Refine(
+const commercePluginFieldV1Schema = Type.Refine(
   ReadonlyStrictObject({
     entityType: pluginFieldEntityTypeSchema,
     key: partIdSchema,
@@ -235,7 +235,7 @@ const pluginFieldsSchema = distinctList(
   20,
 );
 
-export const commercePluginAttributeV1Schema = ReadonlyStrictObject({
+const commercePluginAttributeV1Schema = ReadonlyStrictObject({
   key: partIdSchema,
   label: boundedTextSchema(120),
   valueKind: Type.Union([
@@ -251,7 +251,7 @@ export type CommercePluginAttributeV1 = Static<
   typeof commercePluginAttributeV1Schema
 >;
 
-export const commercePluginEntityTypeV1Schema = ReadonlyStrictObject({
+const commercePluginEntityTypeV1Schema = ReadonlyStrictObject({
   typeId: entityTypeIdSchema,
   label: boundedTextSchema(120),
   description: boundedTextSchema(1000),
@@ -261,7 +261,7 @@ export type CommercePluginEntityTypeV1 = Static<
   typeof commercePluginEntityTypeV1Schema
 >;
 
-export const commercePluginHandlerV1Schema = ReadonlyStrictObject({
+const commercePluginHandlerV1Schema = ReadonlyStrictObject({
   handlerId: partIdSchema,
   eventKinds: ImmutableArray(eventKindSchema, { minItems: 1 }),
   source: Type.String(),
@@ -277,7 +277,7 @@ const pluginHandlersSchema = distinctList(
   10,
 );
 
-export const commercePluginActionInputV1Schema = ReadonlyStrictObject({
+const commercePluginActionInputV1Schema = ReadonlyStrictObject({
   key: partIdSchema,
   valueKind: Type.Union([
     Type.Literal("integer"),
@@ -292,7 +292,7 @@ export type CommercePluginActionInputV1 = Static<
   typeof commercePluginActionInputV1Schema
 >;
 
-export const commercePluginActionV1Schema = ReadonlyStrictObject({
+const commercePluginActionV1Schema = ReadonlyStrictObject({
   actionId: partIdSchema,
   title: text,
   inputs: distinctList(commercePluginActionInputV1Schema, keyOf, 10),
@@ -309,7 +309,7 @@ const pluginActionsSchema = distinctList(
   10,
 );
 
-export const commercePluginFailureV1Schema = ReadonlyStrictObject({
+const commercePluginFailureV1Schema = ReadonlyStrictObject({
   version: PositiveInteger,
   hookPoint: text,
   functionId: text,
@@ -331,7 +331,7 @@ export type CommercePluginFailureV1 = Static<
 >;
 
 /** `parsePlugin`: the definition's fields and the merchant's, no others. */
-export const commercePluginV1Schema = Type.Intersect(
+const commercePluginV1Schema = Type.Intersect(
   [
     Type.Unsafe<PluginDefinition>(ReadonlyOpenObject(definitionProperties)),
     ReadonlyOpenObject({
@@ -352,7 +352,7 @@ export const commercePluginV1Schema = Type.Intersect(
 );
 export type CommercePluginV1 = Static<typeof commercePluginV1Schema>;
 
-export const commercePluginListV1Schema = ReadonlyStrictObject({
+const commercePluginListV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.plugins.v1"),
   plugins: ImmutableArray(commercePluginV1Schema),
 });
@@ -360,7 +360,7 @@ export type CommercePluginListV1 = Static<
   typeof commercePluginListV1Schema
 >;
 
-export const commercePluginChangeV1Schema = Type.Union([
+const commercePluginChangeV1Schema = Type.Union([
   Type.Literal("pause"),
   Type.Literal("resume"),
 ]);
@@ -368,10 +368,7 @@ export type CommercePluginChangeV1 = Static<
   typeof commercePluginChangeV1Schema
 >;
 
-export const pluginsMoneySchema = wireMoneySchema;
-export type PluginsMoney = Static<typeof pluginsMoneySchema>;
-
-export const commercePluginEffectV1Schema = Type.Union([
+const commercePluginEffectV1Schema = Type.Union([
   ReadonlyStrictObject({
     kind: Type.Literal("routes"),
     available: Type.Boolean(),
@@ -400,7 +397,7 @@ export type CommercePluginEffectV1 = Static<
   typeof commercePluginEffectV1Schema
 >;
 
-export const commercePluginPreviewV1Schema = ReadonlyStrictObject({
+const commercePluginPreviewV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.plugin-preview.v1"),
   pluginId: text,
   change: commercePluginChangeV1Schema,
@@ -411,7 +408,7 @@ export type CommercePluginPreviewV1 = Static<
   typeof commercePluginPreviewV1Schema
 >;
 
-export const previewCommercePluginChangeV1Schema = ReadonlyStrictObject({
+const previewCommercePluginChangeV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.preview-plugin-change.v1"),
   change: commercePluginChangeV1Schema,
 });
@@ -425,12 +422,11 @@ const commandBase = {
   requestedAt: utcTimestampSchema,
 };
 
-export const pluginCommandBaseSchema = ReadonlyOpenObject({
+const pluginCommandBaseSchema = ReadonlyOpenObject({
   ...commandBase,
   pluginId: text,
   expectedRevision: PositiveInteger,
 });
-export type PluginCommandBase = Static<typeof pluginCommandBaseSchema>;
 
 function pluginCommand<Version extends string>(schemaVersion: Version) {
   return Type.Intersect(
@@ -442,21 +438,21 @@ function pluginCommand<Version extends string>(schemaVersion: Version) {
   );
 }
 
-export const pauseCommercePluginV1Schema = pluginCommand(
+const pauseCommercePluginV1Schema = pluginCommand(
   "commerce.pause-plugin.v1",
 );
 export type PauseCommercePluginV1 = Static<
   typeof pauseCommercePluginV1Schema
 >;
 
-export const resumeCommercePluginV1Schema = pluginCommand(
+const resumeCommercePluginV1Schema = pluginCommand(
   "commerce.resume-plugin.v1",
 );
 export type ResumeCommercePluginV1 = Static<
   typeof resumeCommercePluginV1Schema
 >;
 
-export const removeCommercePluginV1Schema = pluginCommand(
+const removeCommercePluginV1Schema = pluginCommand(
   "commerce.remove-plugin.v1",
 );
 export type RemoveCommercePluginV1 = Static<
@@ -464,7 +460,7 @@ export type RemoveCommercePluginV1 = Static<
 >;
 
 /** `parseConfigurePluginCommand`: a built-in plugin's settings, all of them. */
-export const configureCommercePluginV1Schema = Type.Intersect(
+const configureCommercePluginV1Schema = Type.Intersect(
   [
     pluginCommandBaseSchema,
     ReadonlyOpenObject({
@@ -478,7 +474,7 @@ export type ConfigureCommercePluginV1 = Static<
   typeof configureCommercePluginV1Schema
 >;
 
-export const commercePluginCommandV1Schema = Type.Union([
+const commercePluginCommandV1Schema = Type.Union([
   pauseCommercePluginV1Schema,
   resumeCommercePluginV1Schema,
   removeCommercePluginV1Schema,
@@ -498,7 +494,7 @@ function typeIdOf(item: Readonly<{ typeId: string }>): string {
   return item.typeId;
 }
 
-export const installCommerceMerchantPluginV1Schema = ReadonlyStrictObject({
+const installCommerceMerchantPluginV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.install-merchant-plugin.v1"),
   ...commandBase,
   definition: wirePluginDefinitionSchema,
@@ -535,7 +531,7 @@ function fieldValuesError(): string {
   return "values must name at least one field by normalized keys";
 }
 
-export const setCommercePluginFieldValuesV1Schema = ReadonlyStrictObject({
+const setCommercePluginFieldValuesV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.set-plugin-field-values.v1"),
   ...commandBase,
   pluginId: text,
@@ -548,7 +544,7 @@ export type SetCommercePluginFieldValuesV1 = Static<
   typeof setCommercePluginFieldValuesV1Schema
 >;
 
-export const commercePluginFieldValuesV1Schema = ReadonlyStrictObject({
+const commercePluginFieldValuesV1Schema = ReadonlyStrictObject({
   entityType: pluginFieldEntityTypeSchema,
   entityId: text,
   revision: PositiveInteger,
@@ -558,7 +554,7 @@ export type CommercePluginFieldValuesV1 = Static<
   typeof commercePluginFieldValuesV1Schema
 >;
 
-export const commercePluginFieldValueListV1Schema = ReadonlyStrictObject({
+const commercePluginFieldValueListV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.plugin-field-values.v1"),
   pluginId: text,
   fields: pluginFieldsSchema,
@@ -568,7 +564,7 @@ export type CommercePluginFieldValueListV1 = Static<
   typeof commercePluginFieldValueListV1Schema
 >;
 
-export const runCommercePluginActionV1Schema = ReadonlyStrictObject({
+const runCommercePluginActionV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.run-plugin-action.v1"),
   ...commandBase,
   pluginId: text,
@@ -579,7 +575,7 @@ export type RunCommercePluginActionV1 = Static<
   typeof runCommercePluginActionV1Schema
 >;
 
-export const runCommercePluginFunctionV1Schema = ReadonlyStrictObject({
+const runCommercePluginFunctionV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.run-plugin-function.v1"),
   definition: wirePluginDefinitionSchema,
   functionId: text,
@@ -592,7 +588,7 @@ export type RunCommercePluginFunctionV1 = Static<
   typeof runCommercePluginFunctionV1Schema
 >;
 
-export const commercePluginCommandCheckV1Schema = ReadonlyStrictObject({
+const commercePluginCommandCheckV1Schema = ReadonlyStrictObject({
   kind: text,
   accepted: Type.Boolean(),
   reason: Nullable(text),
@@ -626,7 +622,7 @@ const pluginFunctionRunShape = ReadonlyStrictObject({
 type PluginFunctionRun = Static<typeof pluginFunctionRunShape>;
 
 /** `parsePluginFunctionRun` keeps the command checks of a returned run only. */
-export const commercePluginFunctionRunV1Schema = Type.Codec(
+const commercePluginFunctionRunV1Schema = Type.Codec(
   pluginFunctionRunShape,
 )
   .Decode(withoutFailedRunCommands)
@@ -645,7 +641,7 @@ function sameRun(run: PluginFunctionRun): PluginFunctionRun {
   return run;
 }
 
-export const previewCommerceMerchantPluginV1Schema = ReadonlyStrictObject({
+const previewCommerceMerchantPluginV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.preview-merchant-plugin.v1"),
   definition: wirePluginDefinitionSchema,
   settings: commercePluginSettingsV1Schema,
@@ -654,7 +650,7 @@ export type PreviewCommerceMerchantPluginV1 = Static<
   typeof previewCommerceMerchantPluginV1Schema
 >;
 
-export const commerceMerchantPluginPreviewV1Schema = ReadonlyStrictObject({
+const commerceMerchantPluginPreviewV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.merchant-plugin-preview.v1"),
   pluginId: text,
   checkouts: NonNegativeInteger,
@@ -717,12 +713,3 @@ export const parseCommercePluginListV1 = wireRecordParser(
 export const parseCommercePluginPreviewV1 = wireRecordParser(
   commercePluginPreviewV1Schema,
 );
-export const parseWirePluginDefinition = wireRecordParser(
-  wirePluginDefinitionSchema,
-);
-export const parseWirePluginFields = wireRecordParser(pluginFieldsSchema);
-export const parseWirePluginEntityTypes = wireRecordParser(
-  pluginEntityTypesSchema,
-);
-export const parseWirePluginHandlers = wireRecordParser(pluginHandlersSchema);
-export const parseWirePluginActions = wireRecordParser(pluginActionsSchema);

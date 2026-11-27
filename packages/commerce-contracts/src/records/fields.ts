@@ -1,7 +1,7 @@
 // Field rules of the Commerce wire records (Plan 78 step 2). They are the
 // rules of the hand-written client readers in
 // packages/commerce-client/src/wire-readers.ts, written as schemas.
-import { Type, type Static } from "typebox";
+import { Type } from "typebox";
 
 // The runtime global used below; the package compiles with ES types only.
 declare const URL: new (input: string) => { protocol: string };
@@ -11,7 +11,6 @@ export const normalizedTextSchema = Type.String({
   minLength: 1,
   pattern: "^(?!\\s)[\\s\\S]*(?<!\\s)$",
 });
-export type NormalizedText = Static<typeof normalizedTextSchema>;
 
 /**
  * Normalized text of at most `maxLength` UTF-16 code units, as `text.length`

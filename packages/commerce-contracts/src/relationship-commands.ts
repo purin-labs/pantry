@@ -92,7 +92,7 @@ export const relationshipReplacementTargetWire = OpenObject({
   relationship: customRelationshipRefWireSchema,
   replacementTarget: commerceEntityRefWireSchema,
 });
-export const customCommerceRelationshipDefinitionDraftSchema = StrictObject(
+const customCommerceRelationshipDefinitionDraftSchema = StrictObject(
   customRelationshipDefinitionSchema.properties,
 );
 const relationshipDefinitionDraftWire = StrictObject(

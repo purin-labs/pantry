@@ -46,7 +46,7 @@ export const commerceCursorBoundarySchema = OpenObject({
   orderingValues: Type.Array(commerceOrderingValueSchema, { maxItems: 8 }),
   entityRef: commerceEntityRefSchema,
 });
-export const commerceCursorPayloadSchema = StrictObject({
+const commerceCursorPayloadSchema = StrictObject({
   organisationId: trimmedIdentityTextSchema,
   merchantId: merchantSchema,
   queryFingerprint: commerceQueryFingerprintSchema,

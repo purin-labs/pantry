@@ -1,11 +1,7 @@
 // Plan 78: generated once from the ts-rs bindings of the Rust contracts.
 // TypeScript is now the source; edit these schemas by hand.
 import { Type, type Static } from "typebox";
-import {
-  OpenObject,
-  SafeInteger,
-  recordParser,
-} from "@purin-labs/contract-schema";
+import { OpenObject, SafeInteger } from "@purin-labs/contract-schema";
 
 export const currencyCodeSchema = Type.String();
 export type CurrencyCode = Static<typeof currencyCodeSchema>;
@@ -15,6 +11,3 @@ export const moneySchema = OpenObject({
   currency: currencyCodeSchema,
 });
 export type Money = Static<typeof moneySchema>;
-
-// Parsers of the records above (Plan 78 step 2).
-export const parseMoney = recordParser(moneySchema);

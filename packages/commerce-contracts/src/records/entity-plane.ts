@@ -7,10 +7,7 @@ import {
   commerceListEntryIdSchema,
   commerceListEntryRevisionSchema,
   commerceListRevisionSchema,
-  customCommerceEntityIdSchema,
-  customCommerceEntityTypeIdSchema,
   customEntityTypeRevisionSchema,
-  merchantExtensionSchemaRevisionSchema,
   relationshipIdSchema,
   relationshipRevisionSchema,
   resourceIdSchema,
@@ -32,10 +29,6 @@ import {
 import { normalizedTextSchema } from "./fields.ts";
 import { commerceListEntryRefSchema } from "../authority-scope.ts";
 import {
-  customCommerceEntityTypeDraftSchema,
-  systemEntityExtensionSchemaDraftSchema,
-} from "../entity-commands.ts";
-import {
   attributeDefinitionScopeSchema,
   commerceSensitivitySchema,
 } from "../entity-record.ts";
@@ -50,69 +43,39 @@ import {
   sourceProvenanceSchema,
 } from "../entity-state.ts";
 import {
-  commerceAggregationSchema,
-  commerceAggregationSourceSchema,
-} from "../graph-query-schema.ts";
-import {
   customRelationshipDefinitionRefSchema,
   relationshipDefinitionRefSchema,
   relationshipFilterSchema,
   systemRelationshipDefinitionRefSchema,
 } from "../query-filter.ts";
-import { commerceTraversalLimitsSchema } from "../query-limits.ts";
-import { commerceSortSchema } from "../query-ordering.ts";
-import { commercePaginationSchema } from "../query-pagination.ts";
 import {
   attributeDefinitionIdSchema,
-  commerceEntityTypeIdSchema,
   commerceListIdSchema,
-  savedCommerceViewIdSchema,
 } from "../query-parts.ts";
-import {
-  customCommerceRelationshipCommandTargetSchema,
-  customCommerceRelationshipCreateTargetSchema,
-  customCommerceRelationshipDefinitionCommandTargetSchema,
-  customCommerceRelationshipDefinitionDraftSchema,
-  customCommerceRelationshipReplacementTargetSchema,
-} from "../relationship-commands.ts";
 
-export const archiveCustomEntityCommandSchema = OpenObject({
-  entityRef: customCommerceEntityRefSchema,
-  expectedRevision: commerceEntityRevisionSchema,
-  archivedAt: commerceTimestampSchema,
-});
-export type ArchiveCustomEntityCommand = Static<
-  typeof archiveCustomEntityCommandSchema
->;
-
-export const decimalValueSchema = OpenObject({
+const decimalValueSchema = OpenObject({
   unscaled: SafeInteger,
   scale: SafeInteger,
 });
-export type DecimalValue = Static<typeof decimalValueSchema>;
 
-export const commerceDateSchema = Type.String();
-export type CommerceDate = Static<typeof commerceDateSchema>;
+const commerceDateSchema = Type.String();
 
-export const attributeOptionIdSchema = Type.Unsafe<
+const attributeOptionIdSchema = Type.Unsafe<
   string & { readonly __brand: "AttributeOptionId" }
 >(Type.String());
 export type AttributeOptionId = Static<typeof attributeOptionIdSchema>;
 
-export const commercePrincipalIdSchema = Type.Unsafe<
+const commercePrincipalIdSchema = Type.Unsafe<
   string & { readonly __brand: "CommercePrincipalId" }
 >(Type.String());
 export type CommercePrincipalId = Static<typeof commercePrincipalIdSchema>;
 
-export const merchantOperatorReferenceSchema = OpenObject({
+const merchantOperatorReferenceSchema = OpenObject({
   principalId: commercePrincipalIdSchema,
   displayName: Type.String(),
 });
-export type MerchantOperatorReference = Static<
-  typeof merchantOperatorReferenceSchema
->;
 
-export const externalResourceReferenceSchema = OpenObject({
+const externalResourceReferenceSchema = OpenObject({
   source: commerceSourceSchema,
   resourceId: resourceIdSchema,
   label: Type.Union([Type.String(), Type.Null()]),
@@ -121,7 +84,7 @@ export type ExternalResourceReference = Static<
   typeof externalResourceReferenceSchema
 >;
 
-export const attributeValueSchema = Type.Union([
+const attributeValueSchema = Type.Union([
   OpenObject({ kind: Type.Literal("short_text"), value: Type.String() }),
   OpenObject({ kind: Type.Literal("long_text"), value: Type.String() }),
   OpenObject({
@@ -150,9 +113,8 @@ export const attributeValueSchema = Type.Union([
     value: externalResourceReferenceSchema,
   }),
 ]);
-export type AttributeValue = Static<typeof attributeValueSchema>;
 
-export const attributeFilterSchema = Type.Union([
+const attributeFilterSchema = Type.Union([
   OpenObject({
     operator: Type.Literal("equals"),
     attributeId: attributeDefinitionIdSchema,
@@ -199,132 +161,51 @@ export const attributeFilterSchema = Type.Union([
 ]);
 export type AttributeFilter = Static<typeof attributeFilterSchema>;
 
-export const attributeOptionSchema = OpenObject({
+const attributeOptionSchema = OpenObject({
   id: attributeOptionIdSchema,
   label: Type.String(),
 });
 export type AttributeOption = Static<typeof attributeOptionSchema>;
 
-export const attributeValueAssignmentSchema = StrictObject({
+const attributeValueAssignmentSchema = StrictObject({
   attributeId: attributeDefinitionIdSchema,
   scope: attributeDefinitionScopeSchema,
   definitionRevision: attributeDefinitionRevisionSchema,
   sensitivity: commerceSensitivitySchema,
   value: attributeValueSchema,
 });
-export type AttributeValueAssignment = Static<
-  typeof attributeValueAssignmentSchema
->;
 
-export const attributeValueKindSchema = Type.Union([
-  Type.Literal("short_text"),
-  Type.Literal("long_text"),
-  Type.Literal("integer"),
-  Type.Literal("decimal"),
-  Type.Literal("boolean"),
-  Type.Literal("date"),
-  Type.Literal("timestamp"),
-  Type.Literal("status"),
-  Type.Literal("choice"),
-  Type.Literal("money"),
-  Type.Literal("merchant_operator_reference"),
-  Type.Literal("external_resource_reference"),
-]);
-export type AttributeValueKind = Static<typeof attributeValueKindSchema>;
+const customEntityOriginSchema = Type.Literal("custom");
 
-// A recursive schema has no equal static type, so the type is written out.
-export type CommerceFilter =
-  | { kind: "all" }
-  | { kind: "entity"; reference: Static<typeof commerceEntityRefSchema> }
-  | { kind: "any"; filters: Array<CommerceFilter> }
-  | { kind: "not"; filter: CommerceFilter }
-  | { kind: "attribute"; filter: AttributeFilter }
-  | { kind: "relationship"; filter: Static<typeof relationshipFilterSchema> }
-  | { kind: "search"; text: string };
-export const commerceFilterSchema = Type.Unsafe<CommerceFilter>(
-  Type.Cyclic(
-    {
-      CommerceFilter: Type.Union([
-        OpenObject({ kind: Type.Literal("all") }),
-        OpenObject({
-          kind: Type.Literal("entity"),
-          reference: commerceEntityRefSchema,
-        }),
-        OpenObject({
-          kind: Type.Literal("any"),
-          filters: Type.Array(Type.Ref("CommerceFilter")),
-        }),
-        OpenObject({
-          kind: Type.Literal("not"),
-          filter: Type.Ref("CommerceFilter"),
-        }),
-        OpenObject({
-          kind: Type.Literal("attribute"),
-          filter: attributeFilterSchema,
-        }),
-        OpenObject({
-          kind: Type.Literal("relationship"),
-          filter: relationshipFilterSchema,
-        }),
-        OpenObject({ kind: Type.Literal("search"), text: Type.String() }),
-      ]),
-    },
-    "CommerceFilter",
-  ),
-);
-
-export const commerceAggregationQuerySchema = OpenObject({
-  source: commerceAggregationSourceSchema,
-  filter: commerceFilterSchema,
-  aggregation: commerceAggregationSchema,
-});
-export type CommerceAggregationQuery = Static<
-  typeof commerceAggregationQuerySchema
->;
-
-export const commerceCausationIdSchema = Type.Unsafe<
-  string & { readonly __brand: "CommerceCausationId" }
->(Type.String());
-export type CommerceCausationId = Static<typeof commerceCausationIdSchema>;
-
-export const customEntityOriginSchema = Type.Literal("custom");
-export type CustomEntityOrigin = Static<typeof customEntityOriginSchema>;
-
-export const customCommerceRelationshipRefSchema = OpenObject({
+const customCommerceRelationshipRefSchema = OpenObject({
   origin: customEntityOriginSchema,
   relationshipId: relationshipIdSchema,
   definition: customRelationshipDefinitionRefSchema,
   revision: relationshipRevisionSchema,
 });
-export type CustomCommerceRelationshipRef = Static<
+type CustomCommerceRelationshipRef = Static<
   typeof customCommerceRelationshipRefSchema
 >;
 
-export const listEntryAttributeValueSchema = StrictObject({
+const listEntryAttributeValueSchema = StrictObject({
   attributeId: attributeDefinitionIdSchema,
   scope: attributeDefinitionScopeSchema,
   definitionRevision: attributeDefinitionRevisionSchema,
   sensitivity: commerceSensitivitySchema,
   value: attributeValueSchema,
 });
-export type ListEntryAttributeValue = Static<
-  typeof listEntryAttributeValueSchema
->;
 
-export const commerceListEntryCommandTargetSchema = OpenObject({
+const commerceListEntryCommandTargetSchema = OpenObject({
   entry: commerceListEntryRefSchema,
   expectedRevision: commerceListEntryRevisionSchema,
 });
-export type CommerceListEntryCommandTarget = Static<
-  typeof commerceListEntryCommandTargetSchema
->;
 
 /**
  * The mutation intents that can be proposed by a Case. This union deliberately
  * contains only entity-plane mutations that carry an exact resource reference
  * and the revision the command is based on.
  */
-export const commerceEntityPlaneProposalSchema = Type.Union([
+const commerceEntityPlaneProposalSchema = Type.Union([
   StrictObject({
     kind: Type.Literal("patch_custom_entity"),
     entityRef: customCommerceEntityRefSchema,
@@ -373,70 +254,7 @@ export type CommerceEntityPlaneProposal = Static<
   typeof commerceEntityPlaneProposalSchema
 >;
 
-export const commerceListPageQuerySchema = OpenObject({
-  listId: commerceListIdSchema,
-  filter: commerceFilterSchema,
-  sorts: Type.Array(commerceSortSchema),
-  pagination: commercePaginationSchema,
-});
-export type CommerceListPageQuery = Static<typeof commerceListPageQuerySchema>;
-
-export const commerceSearchQuerySchema = OpenObject({
-  text: Type.String(),
-  entityTypeId: Type.Union([commerceEntityTypeIdSchema, Type.Null()]),
-  pagination: commercePaginationSchema,
-  traversal: commerceTraversalLimitsSchema,
-});
-export type CommerceSearchQuery = Static<typeof commerceSearchQuerySchema>;
-
-export const commerceTextNormalizationVersionSchema = Type.Literal(
-  "commerce_unicode_v1",
-);
-export type CommerceTextNormalizationVersion = Static<
-  typeof commerceTextNormalizationVersionSchema
->;
-
-export const createCustomEntityCommandSchema = StrictObject({
-  entityId: customCommerceEntityIdSchema,
-  typeId: customCommerceEntityTypeIdSchema,
-  typeRevision: customEntityTypeRevisionSchema,
-  displayName: Type.String(),
-  attributes: Type.Array(attributeValueAssignmentSchema),
-  sensitivity: commerceSensitivitySchema,
-});
-export type CreateCustomEntityCommand = Static<
-  typeof createCustomEntityCommandSchema
->;
-
-export const createCustomEntityTypeCommandSchema = StrictObject({
-  draft: customCommerceEntityTypeDraftSchema,
-});
-export type CreateCustomEntityTypeCommand = Static<
-  typeof createCustomEntityTypeCommandSchema
->;
-
-export const createCustomRelationshipCommandSchema = OpenObject({
-  target: customCommerceRelationshipCreateTargetSchema,
-});
-export type CreateCustomRelationshipCommand = Static<
-  typeof createCustomRelationshipCommandSchema
->;
-
-export const createCustomRelationshipDefinitionCommandSchema = StrictObject({
-  draft: customCommerceRelationshipDefinitionDraftSchema,
-});
-export type CreateCustomRelationshipDefinitionCommand = Static<
-  typeof createCustomRelationshipDefinitionCommandSchema
->;
-
-export const createSystemEntityExtensionSchemaCommandSchema = StrictObject({
-  draft: systemEntityExtensionSchemaDraftSchema,
-});
-export type CreateSystemEntityExtensionSchemaCommand = Static<
-  typeof createSystemEntityExtensionSchemaCommandSchema
->;
-
-export const customCommerceEntitySchema = OpenObject({
+const customCommerceEntitySchema = OpenObject({
   reference: customCommerceEntityRefSchema,
   revision: commerceEntityRevisionSchema,
   displayName: Type.String(),
@@ -447,63 +265,7 @@ export const customCommerceEntitySchema = OpenObject({
 });
 export type CustomCommerceEntity = Static<typeof customCommerceEntitySchema>;
 
-export const customCommerceEntityTypeCommandTargetSchema = StrictObject({
-  typeId: customCommerceEntityTypeIdSchema,
-  revision: customEntityTypeRevisionSchema,
-});
-export type CustomCommerceEntityTypeCommandTarget = Static<
-  typeof customCommerceEntityTypeCommandTargetSchema
->;
-
-export const deleteCustomRelationshipCommandSchema = OpenObject({
-  target: customCommerceRelationshipCommandTargetSchema,
-});
-export type DeleteCustomRelationshipCommand = Static<
-  typeof deleteCustomRelationshipCommandSchema
->;
-
-export const entityByRefQuerySchema = OpenObject({
-  reference: commerceEntityRefSchema,
-  traversal: commerceTraversalLimitsSchema,
-  filter: Type.Union([commerceFilterSchema, Type.Null()]),
-});
-export type EntityByRefQuery = Static<typeof entityByRefQuerySchema>;
-
-export const entityTypePageQuerySchema = OpenObject({
-  entityTypeId: commerceEntityTypeIdSchema,
-  filter: commerceFilterSchema,
-  sorts: Type.Array(commerceSortSchema),
-  pagination: commercePaginationSchema,
-  traversal: commerceTraversalLimitsSchema,
-});
-export type EntityTypePageQuery = Static<typeof entityTypePageQuerySchema>;
-
-export const patchCustomEntityCommandSchema = StrictObject({
-  entityRef: customCommerceEntityRefSchema,
-  typeRevision: customEntityTypeRevisionSchema,
-  expectedRevision: commerceEntityRevisionSchema,
-  attributes: Type.Array(attributeValueAssignmentSchema),
-  displayName: Type.Union([Type.String(), Type.Null()]),
-});
-export type PatchCustomEntityCommand = Static<
-  typeof patchCustomEntityCommandSchema
->;
-
-export const publishCustomEntityTypeCommandSchema = StrictObject({
-  target: customCommerceEntityTypeCommandTargetSchema,
-});
-export type PublishCustomEntityTypeCommand = Static<
-  typeof publishCustomEntityTypeCommandSchema
->;
-
-export const publishCustomRelationshipDefinitionCommandSchema = StrictObject({
-  target: customCommerceRelationshipDefinitionCommandTargetSchema,
-});
-export type PublishCustomRelationshipDefinitionCommand = Static<
-  typeof publishCustomRelationshipDefinitionCommandSchema
->;
-
-export const systemCommerceEntityKindSchema = Type.Union([
+const systemCommerceEntityKindSchema = Type.Union([
   Type.Literal("location"),
   Type.Literal("product"),
   Type.Literal("sellable_variant"),
@@ -531,58 +293,7 @@ export type SystemCommerceEntityKind = Static<
   typeof systemCommerceEntityKindSchema
 >;
 
-export const systemEntityExtensionSchemaCommandTargetSchema = StrictObject({
-  entityTypeId: systemCommerceEntityKindSchema,
-  revision: merchantExtensionSchemaRevisionSchema,
-});
-export type SystemEntityExtensionSchemaCommandTarget = Static<
-  typeof systemEntityExtensionSchemaCommandTargetSchema
->;
-
-export const publishSystemEntityExtensionSchemaCommandSchema = StrictObject({
-  target: systemEntityExtensionSchemaCommandTargetSchema,
-});
-export type PublishSystemEntityExtensionSchemaCommand = Static<
-  typeof publishSystemEntityExtensionSchemaCommandSchema
->;
-
-export const relationshipFilterOperatorSchema = Type.Union([
-  Type.Literal("exists"),
-  Type.Literal("missing"),
-]);
-export type RelationshipFilterOperator = Static<
-  typeof relationshipFilterOperatorSchema
->;
-
-export const relationshipTraversalQuerySchema = OpenObject({
-  seeds: Type.Array(commerceEntityRefSchema),
-  relationshipDefinition: Type.Union([
-    relationshipDefinitionRefSchema,
-    Type.Null(),
-  ]),
-  traversal: commerceTraversalLimitsSchema,
-  filter: Type.Union([commerceFilterSchema, Type.Null()]),
-});
-export type RelationshipTraversalQuery = Static<
-  typeof relationshipTraversalQuerySchema
->;
-
-export const replaceCustomRelationshipCommandSchema = OpenObject({
-  target: customCommerceRelationshipReplacementTargetSchema,
-});
-export type ReplaceCustomRelationshipCommand = Static<
-  typeof replaceCustomRelationshipCommandSchema
->;
-
-export const savedCommerceViewQuerySchema = OpenObject({
-  viewId: savedCommerceViewIdSchema,
-  pagination: commercePaginationSchema,
-});
-export type SavedCommerceViewQuery = Static<
-  typeof savedCommerceViewQuerySchema
->;
-
-export const systemCommerceEntitySchema = OpenObject({
+const systemCommerceEntitySchema = OpenObject({
   reference: systemCommerceEntityRefSchema,
   revision: commerceEntityRevisionSchema,
   displayName: Type.String(),
@@ -592,10 +303,7 @@ export const systemCommerceEntitySchema = OpenObject({
 });
 export type SystemCommerceEntity = Static<typeof systemCommerceEntitySchema>;
 
-export const systemEntityOriginSchema = Type.Literal("system");
-export type SystemEntityOrigin = Static<typeof systemEntityOriginSchema>;
-
-export const systemRelationshipDefinitionKindSchema = Type.Union([
+const systemRelationshipDefinitionKindSchema = Type.Union([
   Type.Literal("order_shipment"),
   Type.Literal("order_fulfillment"),
   Type.Literal("fulfillment_shipment"),
@@ -638,7 +346,7 @@ const wireCustomRelationshipDefinitionRefSchema = StrictObject({
   revision: PositiveInteger,
 });
 
-export const wireCustomCommerceRelationshipRefSchema = Type.Unsafe<
+const wireCustomCommerceRelationshipRefSchema = Type.Unsafe<
   Static<typeof customCommerceRelationshipRefSchema>
 >(
   Type.Codec(
@@ -685,132 +393,6 @@ function sameRelationshipRef(
 export const parseWireCustomCommerceRelationshipRef = recordParser(
   wireCustomCommerceRelationshipRefSchema,
 );
-export const parseCommerceEntityRevision = recordParser(
-  commerceEntityRevisionSchema,
-);
-export const parseArchiveCustomEntityCommand = recordParser(
-  archiveCustomEntityCommandSchema,
-);
-export const parseAttributeDefinitionRevision = recordParser(
-  attributeDefinitionRevisionSchema,
-);
-export const parseDecimalValue = recordParser(decimalValueSchema);
-export const parseAttributeOptionId = recordParser(attributeOptionIdSchema);
-export const parseCommercePrincipalId = recordParser(commercePrincipalIdSchema);
-export const parseMerchantOperatorReference = recordParser(
-  merchantOperatorReferenceSchema,
-);
-export const parseExternalResourceReference = recordParser(
-  externalResourceReferenceSchema,
-);
-export const parseAttributeValue = recordParser(attributeValueSchema);
-export const parseAttributeFilter = recordParser(attributeFilterSchema);
-export const parseAttributeOption = recordParser(attributeOptionSchema);
-export const parseAttributeValueAssignment = recordParser(
-  attributeValueAssignmentSchema,
-);
-export const parseAttributeValueKind = recordParser(attributeValueKindSchema);
-export const parseCommerceFilter = recordParser(commerceFilterSchema);
-export const parseCommerceAggregationQuery = recordParser(
-  commerceAggregationQuerySchema,
-);
-export const parseCommerceCausationId = recordParser(commerceCausationIdSchema);
-export const parseCustomEntityTypeRevision = recordParser(
-  customEntityTypeRevisionSchema,
-);
-export const parseRelationshipRevision = recordParser(
-  relationshipRevisionSchema,
-);
-export const parseCustomCommerceRelationshipRef = recordParser(
-  customCommerceRelationshipRefSchema,
-);
-export const parseCommerceListRevision = recordParser(
-  commerceListRevisionSchema,
-);
 export const parseListEntryAttributeValue = recordParser(
   listEntryAttributeValueSchema,
-);
-export const parseCommerceListEntryRevision = recordParser(
-  commerceListEntryRevisionSchema,
-);
-export const parseCommerceListEntryCommandTarget = recordParser(
-  commerceListEntryCommandTargetSchema,
-);
-export const parseCommerceEntityPlaneProposal = recordParser(
-  commerceEntityPlaneProposalSchema,
-);
-export const parseCommerceListPageQuery = recordParser(
-  commerceListPageQuerySchema,
-);
-export const parseCommerceSearchQuery = recordParser(commerceSearchQuerySchema);
-export const parseCustomCommerceEntityId = recordParser(
-  customCommerceEntityIdSchema,
-);
-export const parseCustomCommerceEntityTypeId = recordParser(
-  customCommerceEntityTypeIdSchema,
-);
-export const parseCreateCustomEntityCommand = recordParser(
-  createCustomEntityCommandSchema,
-);
-export const parseCreateCustomEntityTypeCommand = recordParser(
-  createCustomEntityTypeCommandSchema,
-);
-export const parseCreateCustomRelationshipCommand = recordParser(
-  createCustomRelationshipCommandSchema,
-);
-export const parseCreateCustomRelationshipDefinitionCommand = recordParser(
-  createCustomRelationshipDefinitionCommandSchema,
-);
-export const parseCreateSystemEntityExtensionSchemaCommand = recordParser(
-  createSystemEntityExtensionSchemaCommandSchema,
-);
-export const parseCustomCommerceEntity = recordParser(
-  customCommerceEntitySchema,
-);
-export const parseCustomCommerceEntityTypeCommandTarget = recordParser(
-  customCommerceEntityTypeCommandTargetSchema,
-);
-export const parseDeleteCustomRelationshipCommand = recordParser(
-  deleteCustomRelationshipCommandSchema,
-);
-export const parseEntityByRefQuery = recordParser(entityByRefQuerySchema);
-export const parseEntityTypePageQuery = recordParser(entityTypePageQuerySchema);
-export const parseMerchantExtensionSchemaRevision = recordParser(
-  merchantExtensionSchemaRevisionSchema,
-);
-export const parsePatchCustomEntityCommand = recordParser(
-  patchCustomEntityCommandSchema,
-);
-export const parsePublishCustomEntityTypeCommand = recordParser(
-  publishCustomEntityTypeCommandSchema,
-);
-export const parsePublishCustomRelationshipDefinitionCommand = recordParser(
-  publishCustomRelationshipDefinitionCommandSchema,
-);
-export const parseSystemCommerceEntityKind = recordParser(
-  systemCommerceEntityKindSchema,
-);
-export const parseSystemEntityExtensionSchemaCommandTarget = recordParser(
-  systemEntityExtensionSchemaCommandTargetSchema,
-);
-export const parsePublishSystemEntityExtensionSchemaCommand = recordParser(
-  publishSystemEntityExtensionSchemaCommandSchema,
-);
-export const parseRelationshipFilterOperator = recordParser(
-  relationshipFilterOperatorSchema,
-);
-export const parseRelationshipTraversalQuery = recordParser(
-  relationshipTraversalQuerySchema,
-);
-export const parseReplaceCustomRelationshipCommand = recordParser(
-  replaceCustomRelationshipCommandSchema,
-);
-export const parseSavedCommerceViewQuery = recordParser(
-  savedCommerceViewQuerySchema,
-);
-export const parseSystemCommerceEntity = recordParser(
-  systemCommerceEntitySchema,
-);
-export const parseSystemRelationshipDefinitionKind = recordParser(
-  systemRelationshipDefinitionKindSchema,
 );

@@ -37,7 +37,7 @@ import { revisionSchema } from "./entity-record.ts";
 import { trimmedIdentityTextSchema } from "./identity-text.ts";
 import { cursorRefusal } from "./cursor-values.ts";
 
-export const savedCommerceViewSourceSchema = Type.Union([
+const savedCommerceViewSourceSchema = Type.Union([
   StrictObject({
     kind: Type.Literal("entity_type"),
     entityTypeId: commerceEntityTypeIdSchema,
@@ -47,24 +47,24 @@ export const savedCommerceViewSourceSchema = Type.Union([
     listId: commerceListIdSchema,
   }),
 ]);
-export const visibleRelationshipColumnSchema = StrictObject({
+const visibleRelationshipColumnSchema = StrictObject({
   relationshipDefinition: relationshipDefinitionRefSchema,
   label: Type.String(),
 });
-export const commerceGroupingSchema = StrictObject({
+const commerceGroupingSchema = StrictObject({
   attributeId: attributeDefinitionIdSchema,
   descending: Type.Boolean(),
 });
-export const commerceTableDensitySchema = Type.Enum([
+const commerceTableDensitySchema = Type.Enum([
   "compact",
   "comfortable",
   "spacious",
 ]);
-export const commerceTableViewConfigurationSchema = StrictObject({
+const commerceTableViewConfigurationSchema = StrictObject({
   density: commerceTableDensitySchema,
   showRowNumbers: Type.Boolean(),
 });
-export const commerceBoardViewConfigurationSchema = StrictObject({
+const commerceBoardViewConfigurationSchema = StrictObject({
   laneAttributeId: attributeDefinitionIdSchema,
   cardAttributeIds: Type.Array(attributeDefinitionIdSchema, {
     minItems: 1,
@@ -72,15 +72,15 @@ export const commerceBoardViewConfigurationSchema = StrictObject({
     uniqueItems: true,
   }),
 });
-export const tableViewPresentationSchema = StrictObject({
+const tableViewPresentationSchema = StrictObject({
   kind: Type.Literal("table"),
   configuration: commerceTableViewConfigurationSchema,
 });
-export const boardViewPresentationSchema = StrictObject({
+const boardViewPresentationSchema = StrictObject({
   kind: Type.Literal("board"),
   configuration: commerceBoardViewConfigurationSchema,
 });
-export const commerceViewPresentationSchema = Type.Union([
+const commerceViewPresentationSchema = Type.Union([
   tableViewPresentationSchema,
   boardViewPresentationSchema,
 ]);
@@ -110,14 +110,9 @@ export type SavedCommerceView = Static<typeof savedCommerceViewSchema>;
 export type SavedCommerceViewSource = StrictUnion<
   Static<typeof savedCommerceViewSourceSchema>
 >;
-export type VisibleRelationshipColumn = Static<
-  typeof visibleRelationshipColumnSchema
->;
-export type CommerceGrouping = Static<typeof commerceGroupingSchema>;
+type VisibleRelationshipColumn = Static<typeof visibleRelationshipColumnSchema>;
+type CommerceGrouping = Static<typeof commerceGroupingSchema>;
 export type CommerceTableDensity = Static<typeof commerceTableDensitySchema>;
-export type CommerceTableViewConfiguration = Static<
-  typeof commerceTableViewConfigurationSchema
->;
 export type CommerceBoardViewConfiguration = Static<
   typeof commerceBoardViewConfigurationSchema
 >;

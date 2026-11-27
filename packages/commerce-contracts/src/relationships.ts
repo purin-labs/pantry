@@ -47,13 +47,13 @@ import { sourceProvenanceWireSchema } from "./entity-wire.ts";
 import { trimmedIdentityTextSchema } from "./identity-text.ts";
 import { cursorRefusal } from "./cursor-values.ts";
 
-export const relationshipCardinalitySchema = Type.Enum([
+const relationshipCardinalitySchema = Type.Enum([
   "one_to_one",
   "one_to_many",
   "many_to_one",
   "many_to_many",
 ]);
-export const relationshipDeletionBehaviorSchema = Type.Enum([
+const relationshipDeletionBehaviorSchema = Type.Enum([
   "restrict",
   "detach",
   "cascade",
@@ -70,7 +70,7 @@ const definitionFields = {
   sensitivity: commerceSensitivitySchema,
   revision: definitionRevision,
 };
-export const systemRelationshipDefinitionSchema = OpenObject({
+const systemRelationshipDefinitionSchema = OpenObject({
   origin: Type.Literal("system"),
   definitionId,
   ...definitionFields,
@@ -89,15 +89,9 @@ export const relationshipDefinitionSchema = Type.Union([
 export type RelationshipDefinition = StrictUnion<
   Static<typeof relationshipDefinitionSchema>
 >;
-export type RelationshipCardinality = Static<
-  typeof relationshipCardinalitySchema
->;
-export type RelationshipDeletionBehavior = Static<
-  typeof relationshipDeletionBehaviorSchema
->;
 
 const definitionWireFields = { ...definitionFields, revision: rawRevision };
-export const systemRelationshipDefinitionRecordWireSchema = OpenObject({
+const systemRelationshipDefinitionRecordWireSchema = OpenObject({
   origin: Type.Literal("system"),
   definitionId,
   ...definitionWireFields,
@@ -214,7 +208,7 @@ function parseRelationshipDefinitionRecord(
 }
 const relationshipId = queryIdentitySchema<"RelationshipId">();
 const relationshipRevision = revisionSchema<"RelationshipRevision">();
-export const systemRelationshipRefSchema = OpenObject({
+const systemRelationshipRefSchema = OpenObject({
   origin: Type.Literal("system"),
   relationshipId,
   definition: systemRelationshipDefinitionRefSchema,
@@ -230,14 +224,14 @@ export const commerceRelationshipRefSchema = Type.Union([
   systemRelationshipRefSchema,
   customRelationshipRefSchema,
 ]);
-export const systemCommerceRelationshipSchema = OpenObject({
+const systemCommerceRelationshipSchema = OpenObject({
   ...systemRelationshipRefSchema.properties,
   sensitivity: commerceSensitivitySchema,
   source: systemCommerceEntityRefSchema,
   target: systemCommerceEntityRefSchema,
   provenance: sourceProvenanceSchema,
 });
-export const customCommerceRelationshipSchema = OpenObject({
+const customCommerceRelationshipSchema = OpenObject({
   ...customRelationshipRefSchema.properties,
   sensitivity: commerceSensitivitySchema,
   source: commerceEntityRefSchema,

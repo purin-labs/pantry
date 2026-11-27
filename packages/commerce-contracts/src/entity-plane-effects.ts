@@ -59,7 +59,7 @@ const entryId = queryIdentitySchema<"CommerceListEntryId">();
 const receiptSchema = Type.Unsafe<CommerceMutationReceiptV1>(
   commerceMutationReceiptV1Schema,
 );
-export const commerceEntityPlaneEffectSchema = Type.Union([
+const commerceEntityPlaneEffectSchema = Type.Union([
   StrictObject({
     kind: Type.Literal("patch_custom_entity"),
     entityRef: customCommerceEntityRefSchema,
@@ -160,7 +160,7 @@ const effectWire = Type.Union([
   }),
 ]);
 
-export function parseCommerceEntityPlaneEffect(
+function parseCommerceEntityPlaneEffect(
   input: unknown,
 ): ContractDecodeResult<CommerceEntityPlaneEffect> {
   const parsed = parseContract(effectWire, input, invalidShape);

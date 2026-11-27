@@ -24,11 +24,11 @@ const identity = {
   organisationId: javascriptTrimmedTextSchema,
   merchantId: javascriptTrimmedTextSchema,
 };
-export const purchasingPresetPublishRequestSchema = StrictObject(identity);
+const purchasingPresetPublishRequestSchema = StrictObject(identity);
 export type CommercePurchasingPresetPublishRequest = Readonly<
   Static<typeof purchasingPresetPublishRequestSchema>
 >;
-export const purchasingPresetPublishResponseSchema = StrictObject({
+const purchasingPresetPublishResponseSchema = StrictObject({
   kind: Type.Literal("published"),
   ...identity,
   merchantRevision: commerceSnapshotRevisionSchema,
@@ -36,8 +36,7 @@ export const purchasingPresetPublishResponseSchema = StrictObject({
 export type CommercePurchasingPresetPublishResponse = Readonly<
   Static<typeof purchasingPresetPublishResponseSchema>
 >;
-export const purchasingReconcileRequestSchema =
-  purchasingPresetPublishRequestSchema;
+const purchasingReconcileRequestSchema = purchasingPresetPublishRequestSchema;
 export type CommercePurchasingReconcileRequest = Readonly<
   Static<typeof purchasingReconcileRequestSchema>
 >;
@@ -46,7 +45,7 @@ const responseIdentity = {
   merchantRevision: commerceSnapshotRevisionSchema,
 };
 
-export const purchasingReconcileResponseSchema = Type.Union([
+const purchasingReconcileResponseSchema = Type.Union([
   StrictObject({ kind: Type.Literal("inactive"), ...responseIdentity }),
   StrictObject({
     kind: Type.Literal("reconciled"),

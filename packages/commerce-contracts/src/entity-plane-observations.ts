@@ -52,15 +52,7 @@ import { cursorRefusal } from "./cursor-values.ts";
 const observationIdSchema = queryIdentitySchema<"CommerceCommandId">();
 const entityRevisionSchema = revisionSchema<"CommerceEntityRevision">();
 const entryRevisionSchema = revisionSchema<"CommerceListEntryRevision">();
-export const commerceObservationOutcomeSchema = Type.Enum([
-  "applied",
-  "replayed",
-  "ignored_stale",
-]);
-export type CommerceObservationOutcome = Static<
-  typeof commerceObservationOutcomeSchema
->;
-export const commerceEntityPlaneObservationV1Schema = Type.Union([
+const commerceEntityPlaneObservationV1Schema = Type.Union([
   OpenObject({
     kind: Type.Literal("system_entity_changed"),
     observationId: observationIdSchema,
@@ -98,7 +90,7 @@ export type CommerceEntityPlaneObservationV1 = StrictUnion<
   Static<typeof commerceEntityPlaneObservationV1Schema>
 >;
 
-export const entityPlaneObservationWireSchema = Type.Union([
+const entityPlaneObservationWireSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("system_entity_changed"),
     observationId: Type.String(),

@@ -42,7 +42,7 @@ export type CommerceFailedPaymentStepV1 = Static<
   typeof commerceFailedPaymentStepV1Schema
 >;
 
-export const commerceFailedPaymentsV1Schema = ReadonlyStrictObject({
+const commerceFailedPaymentsV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.failed-payments.v1"),
   merchantId: text,
   merchantRevision: NonNegativeInteger,

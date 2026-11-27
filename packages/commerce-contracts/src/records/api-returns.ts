@@ -20,7 +20,7 @@ import {
 const text = normalizedTextSchema;
 const exactKeys = { unevaluatedProperties: false } as const;
 
-export const commerceReturnDispositionSchema = Type.Union([
+const commerceReturnDispositionSchema = Type.Union([
   Type.Literal("restock"),
   Type.Literal("quarantine"),
   Type.Literal("damage"),
@@ -31,15 +31,14 @@ export type CommerceReturnDisposition = Static<
   typeof commerceReturnDispositionSchema
 >;
 
-export const returnCommandBaseSchema = ReadonlyOpenObject({
+const returnCommandBaseSchema = ReadonlyOpenObject({
   merchantId: text,
   idempotencyKey: text,
   requestedAt: utcTimestampSchema,
   returnId: text,
 });
-export type ReturnCommandBase = Static<typeof returnCommandBaseSchema>;
 
-export const commerceReturnRequestLineV1Schema = ReadonlyStrictObject({
+const commerceReturnRequestLineV1Schema = ReadonlyStrictObject({
   orderLineId: text,
   quantity: PositiveInteger,
   reason: boundedTextSchema(500),
@@ -69,7 +68,7 @@ function linesError(): string {
   return "lines must name each order line once";
 }
 
-export const requestCommerceReturnV1Schema = Type.Intersect(
+const requestCommerceReturnV1Schema = Type.Intersect(
   [
     returnCommandBaseSchema,
     ReadonlyOpenObject({
@@ -84,7 +83,7 @@ export type RequestCommerceReturnV1 = Static<
   typeof requestCommerceReturnV1Schema
 >;
 
-export const authorizeCommerceReturnV1Schema = Type.Intersect(
+const authorizeCommerceReturnV1Schema = Type.Intersect(
   [
     returnCommandBaseSchema,
     ReadonlyOpenObject({
@@ -107,7 +106,7 @@ export type AuthorizeCommerceReturnV1 = Static<
   typeof authorizeCommerceReturnV1Schema
 >;
 
-export const receiveCommerceReturnV1Schema = Type.Intersect(
+const receiveCommerceReturnV1Schema = Type.Intersect(
   [
     returnCommandBaseSchema,
     ReadonlyOpenObject({
@@ -128,7 +127,7 @@ export type ReceiveCommerceReturnV1 = Static<
   typeof receiveCommerceReturnV1Schema
 >;
 
-export const closeCommerceReturnV1Schema = Type.Intersect(
+const closeCommerceReturnV1Schema = Type.Intersect(
   [
     returnCommandBaseSchema,
     ReadonlyOpenObject({
@@ -143,7 +142,7 @@ export type CloseCommerceReturnV1 = Static<
   typeof closeCommerceReturnV1Schema
 >;
 
-export const commerceReturnCommandV1Schema = Type.Union([
+const commerceReturnCommandV1Schema = Type.Union([
   requestCommerceReturnV1Schema,
   authorizeCommerceReturnV1Schema,
   receiveCommerceReturnV1Schema,
@@ -153,7 +152,7 @@ export type CommerceReturnCommandV1 = Static<
   typeof commerceReturnCommandV1Schema
 >;
 
-export const requestCommerceBuyerReturnV1Schema = ReadonlyStrictObject({
+const requestCommerceBuyerReturnV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.request-buyer-return.v1"),
   idempotencyKey: text,
   lines: requestLinesSchema,
@@ -162,7 +161,7 @@ export type RequestCommerceBuyerReturnV1 = Static<
   typeof requestCommerceBuyerReturnV1Schema
 >;
 
-export const commerceReturnLifecycleV1Schema = Type.Union([
+const commerceReturnLifecycleV1Schema = Type.Union([
   ReadonlyOpenObject({
     state: Type.Literal("requested"),
     requestedAt: utcTimestampSchema,
@@ -191,7 +190,7 @@ export type CommerceReturnLifecycleV1 = Static<
   typeof commerceReturnLifecycleV1Schema
 >;
 
-export const commerceReturnLineV1Schema = ReadonlyStrictObject({
+const commerceReturnLineV1Schema = ReadonlyStrictObject({
   orderLineId: text,
   quantity: PositiveInteger,
   reason: text,

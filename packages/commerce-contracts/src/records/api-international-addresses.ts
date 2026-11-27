@@ -12,7 +12,7 @@ import {
 import { normalizedTextSchema } from "./fields.ts";
 import { wireRecordParser } from "./wire-objects.ts";
 
-export const commerceInternationalShippingCountrySchema = Type.Union([
+const commerceInternationalShippingCountrySchema = Type.Union([
   Type.Literal("AU"),
   Type.Literal("US"),
   Type.Literal("AT"),
@@ -47,7 +47,7 @@ export type CommerceInternationalShippingCountry = Static<
   typeof commerceInternationalShippingCountrySchema
 >;
 
-export const commerceInternationalShippingAddressV1Schema = OpenObject({
+const commerceInternationalShippingAddressV1Schema = OpenObject({
   countryCode: Type.Readonly(commerceInternationalShippingCountrySchema),
   recipientName: Type.Readonly(Type.String()),
   addressLine1: Type.Readonly(Type.String()),

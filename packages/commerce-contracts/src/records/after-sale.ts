@@ -1,11 +1,7 @@
 // Plan 78: generated once from the ts-rs bindings of the Rust contracts.
 // TypeScript is now the source; edit these schemas by hand.
 import { Type, type Static } from "typebox";
-import {
-  OpenObject,
-  SafeInteger,
-  recordParser,
-} from "@purin-labs/contract-schema";
+import { OpenObject, SafeInteger } from "@purin-labs/contract-schema";
 import {
   refundDutyAllocationSchema,
   refundLineAllocationSchema,
@@ -15,7 +11,7 @@ import {
 import { moneySchema } from "./money.ts";
 import { commerceTimestampSchema } from "./provenance.ts";
 
-export const paymentDisputeLifecycleSchema = Type.Union([
+const paymentDisputeLifecycleSchema = Type.Union([
   OpenObject({
     state: Type.Literal("action_required"),
     observedAt: commerceTimestampSchema,
@@ -38,7 +34,7 @@ export type PaymentDisputeLifecycle = Static<
   typeof paymentDisputeLifecycleSchema
 >;
 
-export const paymentDisputeSchema = OpenObject({
+const paymentDisputeSchema = OpenObject({
   disputeId: resourceIdSchema,
   orderId: resourceIdSchema,
   paymentId: resourceIdSchema,
@@ -51,7 +47,7 @@ export const paymentDisputeSchema = OpenObject({
 });
 export type PaymentDispute = Static<typeof paymentDisputeSchema>;
 
-export const refundAllocationSchema = OpenObject({
+const refundAllocationSchema = OpenObject({
   lineAllocations: Type.Array(refundLineAllocationSchema),
   taxAllocations: Type.Array(refundTaxAllocationSchema),
   dutyAllocations: Type.Array(refundDutyAllocationSchema),
@@ -59,7 +55,7 @@ export const refundAllocationSchema = OpenObject({
 });
 export type RefundAllocation = Static<typeof refundAllocationSchema>;
 
-export const refundReasonSchema = Type.Union([
+const refundReasonSchema = Type.Union([
   OpenObject({ kind: Type.Literal("cancellation"), reason: Type.String() }),
   OpenObject({
     kind: Type.Literal("order_refund"),
@@ -69,7 +65,7 @@ export const refundReasonSchema = Type.Union([
 ]);
 export type RefundReason = Static<typeof refundReasonSchema>;
 
-export const refundAttemptLifecycleSchema = Type.Union([
+const refundAttemptLifecycleSchema = Type.Union([
   OpenObject({
     state: Type.Literal("requested"),
     requestedAt: commerceTimestampSchema,
@@ -99,7 +95,7 @@ export type RefundAttemptLifecycle = Static<
   typeof refundAttemptLifecycleSchema
 >;
 
-export const refundAttemptSchema = OpenObject({
+const refundAttemptSchema = OpenObject({
   refundAttemptId: resourceIdSchema,
   orderId: resourceIdSchema,
   paymentId: resourceIdSchema,
@@ -110,15 +106,3 @@ export const refundAttemptSchema = OpenObject({
   lifecycle: refundAttemptLifecycleSchema,
 });
 export type RefundAttempt = Static<typeof refundAttemptSchema>;
-
-// Parsers of the records above (Plan 78 step 2).
-export const parsePaymentDisputeLifecycle = recordParser(
-  paymentDisputeLifecycleSchema,
-);
-export const parsePaymentDispute = recordParser(paymentDisputeSchema);
-export const parseRefundAllocation = recordParser(refundAllocationSchema);
-export const parseRefundReason = recordParser(refundReasonSchema);
-export const parseRefundAttemptLifecycle = recordParser(
-  refundAttemptLifecycleSchema,
-);
-export const parseRefundAttempt = recordParser(refundAttemptSchema);

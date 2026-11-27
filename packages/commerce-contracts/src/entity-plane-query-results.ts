@@ -66,20 +66,20 @@ const freshnessWire = Type.Union([
     reason: javascriptTrimmedTextSchema,
   }),
 ]);
-export const commerceAggregationGroupSchema = OpenObject({
+const commerceAggregationGroupSchema = OpenObject({
   value: Type.Unsafe<AttributeValue>(attributeValueSchema),
   count: commerceIntegerSchema,
 });
 export type CommerceAggregationGroup = StaticDecode<
   typeof commerceAggregationGroupSchema
 >;
-export const commerceAgeBucketSchema = OpenObject({
+const commerceAgeBucketSchema = OpenObject({
   minimumAgeDays: positiveInteger,
   maximumAgeDays: Type.Union([positiveInteger, Type.Null()]),
   count: commerceIntegerSchema,
 });
 export type CommerceAgeBucket = StaticDecode<typeof commerceAgeBucketSchema>;
-export const commerceAggregationResultSchema = Type.Union([
+const commerceAggregationResultSchema = Type.Union([
   OpenObject({ kind: Type.Literal("count"), value: commerceIntegerSchema }),
   OpenObject({
     kind: Type.Literal("grouped_count"),
@@ -101,7 +101,7 @@ export type CommerceAggregationResult = StrictUnion<
 const cursorSchema = Type.Unsafe<
   string & { readonly __brand: "CommerceCursor" }
 >(javascriptTrimmedTextSchema);
-export const commerceGraphQueryResultSchema = OpenObject({
+const commerceGraphQueryResultSchema = OpenObject({
   merchantRevision: commerceSnapshotRevisionSchema,
   entities: Type.Array(Type.Unsafe<CommerceEntity>(commerceEntitySchema)),
   relationships: Type.Array(
@@ -129,14 +129,14 @@ const plannedFields = {
   result: Type.Unsafe<CommerceGraphQueryResult>(commerceGraphQueryResultSchema),
   hasMore: Type.Boolean(),
 };
-export const entityPlanePlannedQueryResponseSchema = Type.Union([
+const entityPlanePlannedQueryResponseSchema = Type.Union([
   OpenObject(plannedFields),
   ...commerceUnplannedQueryOutcomeSchemas,
 ]);
 export type CommerceEntityPlanePlannedQueryResponse = StrictUnion<
   Readonly<StaticDecode<typeof entityPlanePlannedQueryResponseSchema>>
 >;
-export const entityPlaneRelationshipTraversalStepResponseSchema = Type.Union([
+const entityPlaneRelationshipTraversalStepResponseSchema = Type.Union([
   OpenObject({
     ...plannedFields,
     merchantId: javascriptTrimmedTextSchema,
@@ -197,7 +197,7 @@ const responseWire = Type.Union([
   }),
   ...commerceUnplannedQueryOutcomeSchemas,
 ]);
-export function parseCommerceAggregationGroup(
+function parseCommerceAggregationGroup(
   input: unknown,
 ): ContractDecodeResult<CommerceAggregationGroup> {
   const parsed = parseContract(groupWire, input, invalidShape);
@@ -223,7 +223,7 @@ function parseAgeBucket(
     },
   };
 }
-export function parseCommerceAggregationResult(
+function parseCommerceAggregationResult(
   input: unknown,
 ): ContractDecodeResult<CommerceAggregationResult> {
   const parsed = parseContract(aggregationWire, input, invalidShape);

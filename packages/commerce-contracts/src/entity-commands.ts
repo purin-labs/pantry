@@ -51,14 +51,14 @@ const systemKind =
   authorityTargetSchemas.system_entity_extension_schema_create.properties
     .entityTypeId;
 
-export const customCommerceEntityTypeDraftSchema = StrictObject({
+const customCommerceEntityTypeDraftSchema = StrictObject({
   typeId,
   revision: typeRevision,
   label: Type.String(),
   description: Type.String(),
   attributes: Type.Array(attributeDefinitionSchema),
 });
-export const systemEntityExtensionSchemaDraftSchema = StrictObject({
+const systemEntityExtensionSchemaDraftSchema = StrictObject({
   entityTypeId: systemKind,
   schemaRevision: extensionRevision,
   attributes: Type.Array(attributeDefinitionSchema),

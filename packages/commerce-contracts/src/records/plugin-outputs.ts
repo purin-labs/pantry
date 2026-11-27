@@ -71,7 +71,7 @@ function refusalOf(message: string): Readonly<{ message: string }> {
 }
 
 /** The most commands that one handler or action run may return. */
-export const PLUGIN_RUN_COMMANDS = 5;
+const PLUGIN_RUN_COMMANDS = 5;
 
 /**
  * A handler's or an action's output: `{ refusals?, commands? }` with at most
@@ -94,7 +94,7 @@ type RunOutputShape = Static<typeof runOutputShape>;
 export type PluginRunOutputCommand = Readonly<{ kind: string }> &
   Readonly<Record<string, unknown>>;
 
-export type PluginRunOutput = Readonly<{
+type PluginRunOutput = Readonly<{
   refusals: readonly string[];
   commands: readonly PluginRunOutputCommand[];
 }>;
@@ -117,7 +117,7 @@ function runOutputFields(output: PluginRunOutput): RunOutputShape {
   };
 }
 
-export type LinePrice = Readonly<{
+type LinePrice = Readonly<{
   checkoutLineId: string;
   unitPriceMinor: number;
 }>;
@@ -146,7 +146,7 @@ function pricesOutput(prices: LinePrice[]): Readonly<{ prices: LinePrice[] }> {
   return { prices };
 }
 
-export type PluginDiscount = Readonly<{
+type PluginDiscount = Readonly<{
   /** One line, or the whole order when null. */
   checkoutLineId: string | null;
   amountMinor: number;
@@ -201,7 +201,7 @@ function discountFields(
     : discount;
 }
 
-export type TenderRefusal = Readonly<{
+type TenderRefusal = Readonly<{
   tender: "gift_card" | "store_credit";
   message: string;
 }>;
@@ -237,7 +237,7 @@ function tenderRefusalsOutput(
   return { refusals };
 }
 
-export type DeliveryOutput = Readonly<{
+type DeliveryOutput = Readonly<{
   refusals: readonly string[];
   /** For a pickup: the earliest time that the order can be ready. */
   earliestReadyAt: string | null;

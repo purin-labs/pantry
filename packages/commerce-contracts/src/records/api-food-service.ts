@@ -76,7 +76,7 @@ const quantityUnitSchema = As<QuantityUnit>(
   ]),
 );
 
-export const quantityInputSchema = ReadonlyOpenObject({
+const quantityInputSchema = ReadonlyOpenObject({
   amount: PositiveInteger,
   scale: NonNegativeInteger,
   unit: quantityUnitSchema,
@@ -171,7 +171,7 @@ const productionBatchDemandSchema = As<ProductionBatchDemand>(
 );
 
 /** `parseShipmentEntityId`: normalized text. */
-export const shipmentEntityIdSchema = As<ShipmentEntityId>(text);
+const shipmentEntityIdSchema = As<ShipmentEntityId>(text);
 
 const commandBase = {
   merchantId: text,
@@ -180,8 +180,7 @@ const commandBase = {
   requestedAt: timestampSchema,
 };
 
-export const commandBaseSchema = ReadonlyOpenObject(commandBase);
-export type CommandBase = Static<typeof commandBaseSchema>;
+const commandBaseSchema = ReadonlyOpenObject(commandBase);
 
 /** A command: the base fields and its own, read as `command` and `base`. */
 function foodServiceCommand<Properties extends Record<string, TSchema>>(
@@ -190,7 +189,7 @@ function foodServiceCommand<Properties extends Record<string, TSchema>>(
   return Type.Intersect([commandBaseSchema, ReadonlyOpenObject(properties)]);
 }
 
-export const createPreparationStationCommandSchema = foodServiceCommand({
+const createPreparationStationCommandSchema = foodServiceCommand({
   schemaVersion: Type.Literal("commerce.create-preparation-station.v1"),
   station: ReadonlyOpenObject({
     stationId: text,
@@ -202,7 +201,7 @@ export type CreatePreparationStationCommand = Static<
   typeof createPreparationStationCommandSchema
 >;
 
-export const modifierOptionInputSchema = ReadonlyOpenObject({
+const modifierOptionInputSchema = ReadonlyOpenObject({
   modifierOptionId: text,
   name: text,
   priceDelta: moneySchema,
@@ -210,7 +209,7 @@ export const modifierOptionInputSchema = ReadonlyOpenObject({
 });
 export type ModifierOptionInput = Static<typeof modifierOptionInputSchema>;
 
-export const modifierGroupRevisionInputSchema = ReadonlyOpenObject({
+const modifierGroupRevisionInputSchema = ReadonlyOpenObject({
   modifierGroupId: text,
   name: text,
   minimumSelections: NonNegativeInteger,
@@ -221,7 +220,7 @@ export type ModifierGroupRevisionInput = Static<
   typeof modifierGroupRevisionInputSchema
 >;
 
-export const createModifierGroupRevisionCommandSchema = foodServiceCommand({
+const createModifierGroupRevisionCommandSchema = foodServiceCommand({
   schemaVersion: Type.Literal("commerce.create-modifier-group-revision.v1"),
   modifierGroupRevision: modifierGroupRevisionInputSchema,
 });
@@ -237,7 +236,7 @@ export const recipeRevisionInputSchema = ReadonlyOpenObject({
 });
 export type RecipeRevisionInput = Static<typeof recipeRevisionInputSchema>;
 
-export const createRecipeRevisionCommandSchema = foodServiceCommand({
+const createRecipeRevisionCommandSchema = foodServiceCommand({
   schemaVersion: Type.Literal("commerce.create-recipe-revision.v1"),
   recipeRevision: recipeRevisionInputSchema,
 });
@@ -245,7 +244,7 @@ export type CreateRecipeRevisionCommand = Static<
   typeof createRecipeRevisionCommandSchema
 >;
 
-export const stockPolicyInputSchema = ReadonlyOpenObject({
+const stockPolicyInputSchema = ReadonlyOpenObject({
   stockPolicyId: text,
   inventoryItemId: text,
   locationId: text,
@@ -253,7 +252,7 @@ export const stockPolicyInputSchema = ReadonlyOpenObject({
 });
 export type StockPolicyInput = Static<typeof stockPolicyInputSchema>;
 
-export const configureStockPolicyCommandSchema = foodServiceCommand({
+const configureStockPolicyCommandSchema = foodServiceCommand({
   schemaVersion: Type.Literal("commerce.configure-stock-policy.v1"),
   stockPolicy: stockPolicyInputSchema,
 });
@@ -261,7 +260,7 @@ export type ConfigureStockPolicyCommand = Static<
   typeof configureStockPolicyCommandSchema
 >;
 
-export const menuSectionInputSchema = ReadonlyOpenObject({
+const menuSectionInputSchema = ReadonlyOpenObject({
   sectionId: text,
   name: text,
   position: NonNegativeInteger,
@@ -273,7 +272,7 @@ const modifierGroupReferenceSchema = ReadonlyOpenObject({
   revision: PositiveInteger,
 });
 
-export const menuEntryInputSchema = ReadonlyOpenObject({
+const menuEntryInputSchema = ReadonlyOpenObject({
   menuEntryId: text,
   sectionId: text,
   offerId: text,
@@ -284,7 +283,7 @@ export const menuEntryInputSchema = ReadonlyOpenObject({
 });
 export type MenuEntryInput = Static<typeof menuEntryInputSchema>;
 
-export const menuInputSchema = ReadonlyOpenObject({
+const menuInputSchema = ReadonlyOpenObject({
   menuId: text,
   name: text,
   salesChannelId: text,
@@ -299,7 +298,7 @@ export type MenuInput = Static<typeof menuInputSchema>;
  * Publishes a menu, or replaces the published menu of that id: a replacement
  * names the revision it replaces and becomes the next revision.
  */
-export const publishMenuCommandSchema = foodServiceCommand({
+const publishMenuCommandSchema = foodServiceCommand({
   schemaVersion: Type.Literal("commerce.publish-menu.v1"),
   menu: menuInputSchema,
   expectedMenuRevision: Type.Optional(PositiveInteger),
@@ -310,7 +309,7 @@ export type PublishMenuCommand = Static<typeof publishMenuCommandSchema>;
  * Marks one variant sold out at one location until the shop's next midnight,
  * or clears the mark. It holds on every menu of that location.
  */
-export const markSoldOutCommandSchema = foodServiceCommand({
+const markSoldOutCommandSchema = foodServiceCommand({
   schemaVersion: Type.Literal("commerce.mark-sold-out.v1"),
   locationId: text,
   variantId: text,
@@ -321,7 +320,7 @@ export const markSoldOutCommandSchema = foodServiceCommand({
 });
 export type MarkSoldOutCommand = Static<typeof markSoldOutCommandSchema>;
 
-export const commerceSoldOutMarksV1Schema = ReadonlyOpenObject({
+const commerceSoldOutMarksV1Schema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.sold-out-marks.v1"),
   merchantId: text,
   merchantRevision: NonNegativeInteger,
@@ -338,7 +337,7 @@ export type CommerceSoldOutMarksV1 = Static<
   typeof commerceSoldOutMarksV1Schema
 >;
 
-export const managePreparationTicketCommandSchema = foodServiceCommand({
+const managePreparationTicketCommandSchema = foodServiceCommand({
   schemaVersion: Type.Literal("commerce.manage-preparation-ticket.v1"),
   operation: Type.Union([
     ReadonlyOpenObject({
@@ -359,7 +358,7 @@ export type ManagePreparationTicketCommand = Static<
   typeof managePreparationTicketCommandSchema
 >;
 
-export const completeProductionBatchCommandSchema = foodServiceCommand({
+const completeProductionBatchCommandSchema = foodServiceCommand({
   schemaVersion: Type.Literal("commerce.complete-production-batch.v1"),
   productionBatchId: text,
   demand: productionBatchDemandSchema,
@@ -455,7 +454,7 @@ const activeOrInactive = Type.Union([
   Type.Literal("inactive"),
 ]);
 
-export const menuResourceSchema = namedResource<Menu>(
+const menuResourceSchema = namedResource<Menu>(
   "menuId",
   ReadonlyOpenObject({
     provenance: provenanceSchema("menu"),
@@ -501,7 +500,7 @@ export const menuResourceSchema = namedResource<Menu>(
   }),
 );
 
-export const modifierGroupRevisionResourceSchema =
+const modifierGroupRevisionResourceSchema =
   namedResource<ModifierGroupRevision>(
     "modifierGroupId",
     ReadonlyOpenObject({
@@ -529,7 +528,7 @@ export const recipeRevisionResourceSchema = namedResource<RecipeRevision>(
   }),
 );
 
-export const preparationStationResourceSchema =
+const preparationStationResourceSchema =
   namedResource<PreparationStation>(
     "stationId",
     ReadonlyOpenObject({
@@ -542,7 +541,7 @@ export const preparationStationResourceSchema =
     }),
   );
 
-export const preparationTicketResourceSchema = namedResource<PreparationTicket>(
+const preparationTicketResourceSchema = namedResource<PreparationTicket>(
   "ticketId",
   ReadonlyOpenObject({
     provenance: provenanceSchema("preparation_ticket"),
@@ -594,7 +593,7 @@ export const preparationTicketResourceSchema = namedResource<PreparationTicket>(
   }),
 );
 
-export const productionBatchResourceSchema = namedResource<ProductionBatch>(
+const productionBatchResourceSchema = namedResource<ProductionBatch>(
   "productionBatchId",
   ReadonlyOpenObject({
     provenance: provenanceSchema("production_batch"),
@@ -614,7 +613,7 @@ export const productionBatchResourceSchema = namedResource<ProductionBatch>(
   }),
 );
 
-export const stockPolicyResourceSchema = namedResource<StockPolicy>(
+const stockPolicyResourceSchema = namedResource<StockPolicy>(
   "stockPolicyId",
   ReadonlyOpenObject({
     provenance: provenanceSchema("stock_policy"),
@@ -661,7 +660,7 @@ export type CommerceFoodServiceObservationV1 = Static<
   typeof commerceFoodServiceObservationV1Schema
 >;
 
-export const commerceFoodServiceResourcesV1Schema = ReadonlyOpenObject({
+const commerceFoodServiceResourcesV1Schema = ReadonlyOpenObject({
   menus: ImmutableArray(menuResourceSchema),
   modifierGroupRevisions: ImmutableArray(modifierGroupRevisionResourceSchema),
   recipeRevisions: ImmutableArray(recipeRevisionResourceSchema),
@@ -723,7 +722,6 @@ export const parseCommerceFoodServiceObservationV1 = wireRecordParser(
 export const parseCommerceFoodServiceSnapshotV1 = wireRecordParser(
   commerceFoodServiceSnapshotV1Schema,
 );
-export const parseFoodServiceMenu = wireRecordParser(menuResourceSchema);
 export const parseFoodServiceRecipeRevision = wireRecordParser(
   recipeRevisionResourceSchema,
 );

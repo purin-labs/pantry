@@ -6,7 +6,7 @@ import type { CommerceEngineTimestamp } from "./commerce-resources.ts";
 import {
   requireText,
 } from "./wire-readers.ts";
-import { parseCreateCommerceMarketV1 as parseCreateCommerceMarketV1Record, parseCommerceMarketV1 as parseCommerceMarketV1Record, parseUpdateCommerceMarketV1 as parseUpdateCommerceMarketV1Record, parseCommerceMarketsV1 as parseCommerceMarketsV1Record, parseCommerceOrderMarketV1 as parseCommerceOrderMarketV1Record } from "@purin-labs/commerce-contracts/records/api-markets";
+import { parseCreateCommerceMarketV1 as parseCreateCommerceMarketV1Record, parseCommerceMarketV1 as parseCommerceMarketV1Record, parseUpdateCommerceMarketV1 as parseUpdateCommerceMarketV1Record, parseCommerceMarketsV1 as parseCommerceMarketsV1Record } from "@purin-labs/commerce-contracts/records/api-markets";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 import {
   CURRENCY_MINOR_UNITS,
@@ -15,7 +15,7 @@ import {
 
 export { CURRENCY_MINOR_UNITS };
 
-export function currencyMinorUnits(currency: string): number {
+function currencyMinorUnits(currency: string): number {
   const units = CURRENCY_MINOR_UNITS[currency];
   if (units === undefined) throw new Error(`${currency} is not a supported currency`);
   return units;
@@ -113,10 +113,6 @@ export function parseMarket(value: unknown): CommerceMarketV1 {
 
 export function parseMarkets(value: unknown): readonly CommerceMarketV1[] {
   return decodeRecord(parseCommerceMarketsV1Record, value);
-}
-
-export function parseOrderMarket(value: unknown, field: string): CommerceOrderMarketV1 {
-  return decodeRecord(parseCommerceOrderMarketV1Record, value);
 }
 
 /**

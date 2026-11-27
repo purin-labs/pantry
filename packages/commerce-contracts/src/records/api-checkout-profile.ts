@@ -45,7 +45,7 @@ function sameText(value: string): string {
 
 const configurationSchema = ParsedBy(parseCheckoutProfileConfiguration);
 
-export const createCommerceCheckoutProfileDraftV1Schema =
+const createCommerceCheckoutProfileDraftV1Schema =
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.create-checkout-profile-draft.v1"),
     merchantId: text,
@@ -58,7 +58,7 @@ export type CreateCommerceCheckoutProfileDraftV1 = Static<
   typeof createCommerceCheckoutProfileDraftV1Schema
 >;
 
-export const replaceCommerceCheckoutProfileDraftV1Schema =
+const replaceCommerceCheckoutProfileDraftV1Schema =
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.replace-checkout-profile-draft.v1"),
     merchantId: text,
@@ -72,7 +72,7 @@ export type ReplaceCommerceCheckoutProfileDraftV1 = Static<
   typeof replaceCommerceCheckoutProfileDraftV1Schema
 >;
 
-export const publishCommerceCheckoutProfileV1Schema = ReadonlyStrictObject({
+const publishCommerceCheckoutProfileV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.publish-checkout-profile.v1"),
   merchantId: text,
   checkoutProfileId: text,
@@ -84,7 +84,7 @@ export type PublishCommerceCheckoutProfileV1 = Static<
   typeof publishCommerceCheckoutProfileV1Schema
 >;
 
-export const retireCommerceCheckoutProfileV1Schema = ReadonlyStrictObject({
+const retireCommerceCheckoutProfileV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.retire-checkout-profile.v1"),
   merchantId: text,
   checkoutProfileId: text,
@@ -105,7 +105,7 @@ const activationProperties = {
   activatedBy: text,
 };
 
-export const activateCommerceCheckoutProfileV1Schema = ReadonlyStrictObject({
+const activateCommerceCheckoutProfileV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.activate-checkout-profile.v1"),
   ...activationProperties,
 });
@@ -113,7 +113,7 @@ export type ActivateCommerceCheckoutProfileV1 = Static<
   typeof activateCommerceCheckoutProfileV1Schema
 >;
 
-export const commerceCheckoutProfileActivationV1Schema =
+const commerceCheckoutProfileActivationV1Schema =
   ReadonlyStrictObject(activationProperties);
 export type CommerceCheckoutProfileActivationV1 = Static<
   typeof commerceCheckoutProfileActivationV1Schema
@@ -129,7 +129,7 @@ function outOfOrder(): string {
   return "timestamps are out of order";
 }
 
-export const wireCheckoutProfileLifecycleSchema =
+const wireCheckoutProfileLifecycleSchema =
   Type.Unsafe<CheckoutProfileLifecycle>(
     Type.Union([
       Type.Refine(
@@ -159,7 +159,7 @@ export const wireCheckoutProfileLifecycleSchema =
     ]),
   );
 
-export const wireCheckoutProfileSchema = Type.Unsafe<CheckoutProfile>(
+const wireCheckoutProfileSchema = Type.Unsafe<CheckoutProfile>(
   ReadonlyStrictObject({
     checkoutProfileId: text,
     merchantId: text,
@@ -170,7 +170,7 @@ export const wireCheckoutProfileSchema = Type.Unsafe<CheckoutProfile>(
   }),
 );
 
-export const commerceActiveCheckoutProfileV1Schema = ReadonlyStrictObject({
+const commerceActiveCheckoutProfileV1Schema = ReadonlyStrictObject({
   activation: commerceCheckoutProfileActivationV1Schema,
   profile: wireCheckoutProfileSchema,
 });
@@ -179,17 +179,17 @@ export type CommerceActiveCheckoutProfileV1 = Static<
 >;
 
 /** `parseCheckoutProfiles`. */
-export const commerceCheckoutProfilesV1Schema = ImmutableArray(
+const commerceCheckoutProfilesV1Schema = ImmutableArray(
   wireCheckoutProfileSchema,
 );
 
 /** `parseCheckoutProfileActivations`. */
-export const commerceCheckoutProfileActivationsV1Schema = ImmutableArray(
+const commerceCheckoutProfileActivationsV1Schema = ImmutableArray(
   commerceCheckoutProfileActivationV1Schema,
 );
 
 /** `parseStorefrontIds`: each storefront once, in sorted order. */
-export const commerceCheckoutProfileStorefrontIdsV1Schema = Type.Unsafe<
+const commerceCheckoutProfileStorefrontIdsV1Schema = Type.Unsafe<
   readonly string[]
 >(Type.Codec(ImmutableArray(text)).Decode(uniqueSortedIds).Encode(sameIds));
 
@@ -231,7 +231,4 @@ export const parseCommerceActiveCheckoutProfileV1 = wireRecordParser(
 );
 export const parseWireCheckoutProfile = wireRecordParser(
   wireCheckoutProfileSchema,
-);
-export const parseWireCheckoutProfileLifecycle = wireRecordParser(
-  wireCheckoutProfileLifecycleSchema,
 );

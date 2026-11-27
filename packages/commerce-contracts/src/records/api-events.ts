@@ -21,7 +21,7 @@ import {
 const text = normalizedTextSchema;
 const exactKeys = { unevaluatedProperties: false } as const;
 
-export const commerceEventResourceV1Schema = ReadonlyStrictObject({
+const commerceEventResourceV1Schema = ReadonlyStrictObject({
   kind: text,
   id: text,
   revision: PositiveInteger,
@@ -39,20 +39,20 @@ const eventProperties = {
   resources: ImmutableArray(commerceEventResourceV1Schema),
 };
 
-export const commerceEventV1Schema = ReadonlyStrictObject({
+const commerceEventV1Schema = ReadonlyStrictObject({
   ...eventProperties,
   delivery: commerceDeliveryV1Schema,
 });
 export type CommerceEventV1 = Static<typeof commerceEventV1Schema>;
 
-export const commerceEventPageV1Schema = ReadonlyStrictObject({
+const commerceEventPageV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.events.v1"),
   events: ImmutableArray(commerceEventV1Schema),
   nextCursor: Nullable(text),
 });
 export type CommerceEventPageV1 = Static<typeof commerceEventPageV1Schema>;
 
-export const commerceReceivedEventV1Schema = Type.Intersect(
+const commerceReceivedEventV1Schema = Type.Intersect(
   [
     ReadonlyOpenObject(eventProperties),
     ReadonlyOpenObject({ delivery: commerceReceivedDeliveryV1Schema }),
@@ -63,7 +63,7 @@ export type CommerceReceivedEventV1 = Static<
   typeof commerceReceivedEventV1Schema
 >;
 
-export const commerceReceivedEventPageV1Schema = Type.Intersect(
+const commerceReceivedEventPageV1Schema = Type.Intersect(
   [
     ReadonlyOpenObject({
       schemaVersion: Type.Literal("commerce.events.v1"),
@@ -79,7 +79,7 @@ export type CommerceReceivedEventPageV1 = Static<
   typeof commerceReceivedEventPageV1Schema
 >;
 
-export const commerceFeedConsumerV1Schema = ReadonlyStrictObject({
+const commerceFeedConsumerV1Schema = ReadonlyStrictObject({
   consumerId: text,
   cursor: text,
   updatedAt: Nullable(utcTimestampSchema),
@@ -88,7 +88,7 @@ export type CommerceFeedConsumerV1 = Static<
   typeof commerceFeedConsumerV1Schema
 >;
 
-export const commerceWebhookEventV1Schema = ReadonlyStrictObject({
+const commerceWebhookEventV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.webhook-event.v1"),
   eventId: text,
   kind: text,
@@ -125,7 +125,7 @@ const webhookUrlSchema = Type.String({
   pattern: "^https://(?:[\\s\\S]*(?<!\\s))?$",
 });
 
-export const createCommerceWebhookSubscriptionV1Schema = ReadonlyStrictObject(
+const createCommerceWebhookSubscriptionV1Schema = ReadonlyStrictObject(
   {
     schemaVersion: Type.Literal("commerce.create-webhook-subscription.v1"),
     merchantId: text,
@@ -140,18 +140,15 @@ export type CreateCommerceWebhookSubscriptionV1 = Static<
   typeof createCommerceWebhookSubscriptionV1Schema
 >;
 
-export const webhookSubscriptionCommandBaseSchema = ReadonlyOpenObject({
+const webhookSubscriptionCommandBaseSchema = ReadonlyOpenObject({
   merchantId: text,
   idempotencyKey: text,
   requestedAt: utcTimestampSchema,
   subscriptionId: text,
   expectedRevision: PositiveInteger,
 });
-export type WebhookSubscriptionCommandBase = Static<
-  typeof webhookSubscriptionCommandBaseSchema
->;
 
-export const restartCommerceWebhookSubscriptionV1Schema = Type.Intersect(
+const restartCommerceWebhookSubscriptionV1Schema = Type.Intersect(
   [
     webhookSubscriptionCommandBaseSchema,
     ReadonlyOpenObject({
@@ -164,7 +161,7 @@ export type RestartCommerceWebhookSubscriptionV1 = Static<
   typeof restartCommerceWebhookSubscriptionV1Schema
 >;
 
-export const rotateCommerceWebhookSecretV1Schema = Type.Intersect(
+const rotateCommerceWebhookSecretV1Schema = Type.Intersect(
   [
     webhookSubscriptionCommandBaseSchema,
     ReadonlyOpenObject({
@@ -178,7 +175,7 @@ export type RotateCommerceWebhookSecretV1 = Static<
   typeof rotateCommerceWebhookSecretV1Schema
 >;
 
-export const deleteCommerceWebhookSubscriptionV1Schema = Type.Intersect(
+const deleteCommerceWebhookSubscriptionV1Schema = Type.Intersect(
   [
     webhookSubscriptionCommandBaseSchema,
     ReadonlyOpenObject({
@@ -191,7 +188,7 @@ export type DeleteCommerceWebhookSubscriptionV1 = Static<
   typeof deleteCommerceWebhookSubscriptionV1Schema
 >;
 
-export const commerceWebhookSubscriptionCommandV1Schema = Type.Union([
+const commerceWebhookSubscriptionCommandV1Schema = Type.Union([
   restartCommerceWebhookSubscriptionV1Schema,
   rotateCommerceWebhookSecretV1Schema,
   deleteCommerceWebhookSubscriptionV1Schema,
@@ -200,7 +197,7 @@ export type CommerceWebhookSubscriptionCommandV1 = Static<
   typeof commerceWebhookSubscriptionCommandV1Schema
 >;
 
-export const commerceWebhookSubscriptionCreatedV1Schema =
+const commerceWebhookSubscriptionCreatedV1Schema =
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.webhook-subscription-created.v1"),
     mutation: commerceMutationResultV1Schema,
@@ -210,7 +207,7 @@ export type CommerceWebhookSubscriptionCreatedV1 = Static<
   typeof commerceWebhookSubscriptionCreatedV1Schema
 >;
 
-export const commerceWebhookSecretRotatedV1Schema = ReadonlyStrictObject({
+const commerceWebhookSecretRotatedV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.webhook-secret-rotated.v1"),
   mutation: commerceMutationResultV1Schema,
   secret: Nullable(text),
@@ -219,7 +216,7 @@ export type CommerceWebhookSecretRotatedV1 = Static<
   typeof commerceWebhookSecretRotatedV1Schema
 >;
 
-export const commerceWebhookSubscriptionV1Schema = ReadonlyStrictObject({
+const commerceWebhookSubscriptionV1Schema = ReadonlyStrictObject({
   id: text,
   revision: PositiveInteger,
   url: text,

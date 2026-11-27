@@ -26,7 +26,7 @@ import { commerceSnapshotRevisionSchema } from "./query-metadata.ts";
 import { queryIdentitySchema, invalidShape } from "./query-parts.ts";
 import { javascriptTrimmedTextSchema } from "./identity-text.ts";
 
-export const commerceEntityPlaneCommandSchema = Type.Union([
+const commerceEntityPlaneCommandSchema = Type.Union([
   ...entityLifecycleCommandSchema.anyOf,
   ...relationshipLifecycleCommandSchema.anyOf,
   ...listViewCommandSchema.anyOf,
@@ -35,7 +35,7 @@ export type CommerceEntityPlaneCommand = StrictUnion<
   StaticDecode<typeof commerceEntityPlaneCommandSchema>
 >;
 const commandIdSchema = queryIdentitySchema<"CommerceCommandId">();
-export const entityPlaneCommandRequestSchema = OpenObject({
+const entityPlaneCommandRequestSchema = OpenObject({
   organisationId: javascriptTrimmedTextSchema,
   merchantId: javascriptTrimmedTextSchema,
   commandId: Type.Unsafe<Static<typeof commandIdSchema>>(

@@ -40,7 +40,7 @@ export const COMMERCE_API_SCOPES = [
   "payments:record",
 ] as const;
 
-export const commerceApiScopeSchema = Type.Union(
+const commerceApiScopeSchema = Type.Union(
   COMMERCE_API_SCOPES.map(scopeLiteral),
 );
 export type CommerceApiScope = (typeof COMMERCE_API_SCOPES)[number];
@@ -50,15 +50,12 @@ function scopeLiteral(scope: CommerceApiScope) {
 }
 
 /** `parseAppInstallation`: the token of one app on one merchant. */
-export const commerceAppInstallationV1Schema = ReadonlyOpenObject({
+const commerceAppInstallationV1Schema = ReadonlyOpenObject({
   credentialId: Type.String(),
   appId: Type.String(),
   scopes: ImmutableArray(commerceApiScopeSchema),
   token: Type.String(),
 });
-export type CommerceAppInstallationV1 = Static<
-  typeof commerceAppInstallationV1Schema
->;
 
 export const parseCommerceAppInstallationV1Record = wireRecordParser(
   commerceAppInstallationV1Schema,
@@ -72,7 +69,7 @@ export const parseCommerceAppInstallationV1Record = wireRecordParser(
 export type CredentialState = "active" | "revoked" | "expired";
 
 /** One API credential of a merchant: an API key or an app installation. */
-export const commerceApiCredentialV1Schema = ReadonlyOpenObject({
+const commerceApiCredentialV1Schema = ReadonlyOpenObject({
   credentialId: Type.String(),
   kind: Type.Union([Type.Literal("api_key"), Type.Literal("app_installation")]),
   appId: Nullable(Type.String()),
@@ -96,12 +93,9 @@ export const commerceApiCredentialV1Schema = ReadonlyOpenObject({
   /** The app installation that issued this key; null for the operator. */
   parentCredentialId: Type.Optional(Nullable(Type.String())),
 });
-export type CommerceApiCredentialV1 = Static<
-  typeof commerceApiCredentialV1Schema
->;
 
 /** A new API key (Plan 80 step 3); `key` is shown only in this answer. */
-export const commerceIssuedApiKeyV1Schema = ReadonlyOpenObject({
+const commerceIssuedApiKeyV1Schema = ReadonlyOpenObject({
   ...commerceApiCredentialV1Schema.properties,
   key: Type.String(),
 });
@@ -109,7 +103,7 @@ export type CommerceIssuedApiKeyV1 = Static<
   typeof commerceIssuedApiKeyV1Schema
 >;
 
-export const commerceApiCredentialsV1Schema = ReadonlyOpenObject({
+const commerceApiCredentialsV1Schema = ReadonlyOpenObject({
   credentials: ImmutableArray(commerceApiCredentialV1Schema),
 });
 export type CommerceApiCredentialsV1 = Static<
@@ -131,7 +125,7 @@ export const parseCommerceApiCredentialsV1Record = wireRecordParser(
  * credential, every outbound webhook subscription and the provider links.
  * A repeated closure answers the first one.
  */
-export const commerceMerchantClosureV1Schema = ReadonlyOpenObject({
+const commerceMerchantClosureV1Schema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.merchant-closure.v1"),
   merchantId: Type.String(),
   closedAt: Type.String(),

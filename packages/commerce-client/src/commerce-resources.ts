@@ -6,10 +6,8 @@ import {
   type CheckoutSource,
   type InventoryAllocation,
   type InventoryConsumptionPlan,
-  type LocationKind,
   type Menu,
   type ModifierGroupRevision,
-  type PointOfSaleBuyer,
   type PointOfSaleCatalogScope,
   type PointOfSaleConfiguration,
   type PreparationStation,
@@ -18,7 +16,6 @@ import {
   type ProtectedBuyerContact,
   type QuantityUnit,
   type RecipeRevision,
-  type SalesChannelKind,
   type ShippingProfile,
   type ShippingQuoteSnapshot,
   type StockPolicy,
@@ -32,17 +29,12 @@ import {
   parseCart as parseCartRecord,
   parseCheckout as parseCheckoutRecord,
   parseCheckoutPaymentAttempt as parseCheckoutPaymentAttemptRecord,
-  parseCheckoutSource as parseCheckoutSourceRecord,
   parseInventoryAllocation as parseInventoryAllocationRecord,
   parseInventoryConsumptionPlan as parseInventoryConsumptionPlanRecord,
-  parsePointOfSaleBuyer as parsePointOfSaleBuyerRecord,
   parseShippingProfile as parseShippingProfileRecord,
   parseShippingQuoteSnapshot as parseShippingQuoteSnapshotRecord,
   parseStorefront as parseStorefrontRecord,
   parseVariantShippingSpecification as parseVariantShippingSpecificationRecord,
-} from "@purin-labs/commerce-contracts/records/commerce-records";
-import {
-  checkoutProfileRecordReferenceSchema,
 } from "@purin-labs/commerce-contracts/records/commerce-records";
 import { parsePointOfSaleConfiguration as parsePointOfSaleConfigurationRecord } from "@purin-labs/commerce-contracts/records/point-of-sale-configuration";
 import {
@@ -73,24 +65,8 @@ import type * as ApiResourcesB from "@purin-labs/commerce-contracts/records/api-
 
 export type CommerceEngineTimestamp = string;
 
-export type CommerceLocationKind = LocationKind;
-
-export type CommerceSalesChannelKind = SalesChannelKind;
-
 export type CommerceLocationLifecycle =
   ApiResourcesB.CommerceLocationLifecycle;
-
-export type CommerceSalesChannelLifecycle = CommerceLocationLifecycle;
-
-export type CommerceOfferLifecycle =
-  | Readonly<{ state: "prepared"; preparedAt: CommerceEngineTimestamp }>
-  | Readonly<{ state: "listed"; listedAt: CommerceEngineTimestamp }>
-  | Readonly<{ state: "archived"; archivedAt: CommerceEngineTimestamp }>;
-
-export type CommerceVariantAvailability =
-  | Readonly<{ state: "available" }>
-  | Readonly<{ state: "unavailable" }>
-  | Readonly<{ state: "backordered"; expectedAt: CommerceEngineTimestamp }>;
 
 export type CommerceAvailableQuantityV1 =
   ApiResources.CommerceAvailableQuantityV1;
@@ -104,10 +80,10 @@ export type CommerceLocationV1 = ApiResourcesB.CommerceLocationV1;
 
 export type CommerceSalesChannelV1 = ApiResourcesB.CommerceSalesChannelV1;
 
-export const PRODUCT_STATUSES = ["draft", "active", "archived"] as const;
+const PRODUCT_STATUSES = ["draft", "active", "archived"] as const;
 export type CommerceProductStatus = (typeof PRODUCT_STATUSES)[number];
 
-export const VARIANT_STATUSES = ["active", "archived"] as const;
+const VARIANT_STATUSES = ["active", "archived"] as const;
 export type CommerceVariantStatus = (typeof VARIANT_STATUSES)[number];
 
 export type CommerceProductV1 = ApiResources.CommerceProductV1;
@@ -282,9 +258,9 @@ export function parseCart(value: unknown): Cart {
   return decodeRecord(parseCartRecord, value);
 }
 
-export type OnlineCheckoutSource = Variant<CheckoutSource, "online">;
+type OnlineCheckoutSource = Variant<CheckoutSource, "online">;
 
-export type PointOfSaleCheckoutSource = Variant<
+type PointOfSaleCheckoutSource = Variant<
   CheckoutSource,
   "point_of_sale"
 >;
@@ -293,43 +269,11 @@ export function parseCheckout(value: unknown): Checkout {
   return decodeRecord(parseCheckoutRecord, value);
 }
 
-/**
- * Parse where a Checkout came from. The branches share no fields, so an online
- * checkout cannot smuggle a terminal assignment and a counter sale cannot
- * carry a storefront or a fabricated buyer session.
- */
-export function parseCheckoutSource(value: unknown): CheckoutSource {
-  return decodeRecord(parseCheckoutSourceRecord, value);
-}
-
-/**
- * An anonymous counter sale owns no customer identity, so none can be parsed
- * into it.
- */
-export function parsePointOfSaleBuyer(value: unknown): PointOfSaleBuyer {
-  return decodeRecord(parsePointOfSaleBuyerRecord, value);
-}
-
 /** The online facts of a Checkout, or `undefined` for a counter sale. */
 export function checkoutOnlineSource(
   checkout: Checkout,
 ): OnlineCheckoutSource | undefined {
   return checkout.source.kind === "online" ? checkout.source : undefined;
-}
-
-/**
- * The online facts of a Checkout, for paths that only an online checkout can
- * reach. Throwing here is deliberate: a caller that needs a storefront and got
- * a counter sale has a routing bug, not a missing field.
- */
-export function requireCheckoutOnlineSource(
-  checkout: Checkout,
-): OnlineCheckoutSource {
-  const source = checkoutOnlineSource(checkout);
-  if (source === undefined) {
-    throw new Error("checkout.source is not online");
-  }
-  return source;
 }
 
 /**
@@ -367,16 +311,6 @@ export function checkoutPointOfSaleSource(
   checkout: Checkout,
 ): PointOfSaleCheckoutSource | undefined {
   return checkout.source.kind === "point_of_sale" ? checkout.source : undefined;
-}
-
-export function parseCheckoutProfileReference(
-  value: unknown,
-  field = "checkoutProfile",
-): CheckoutProfileReference {
-  return decodeRecord(
-    fieldRecordParser(checkoutProfileRecordReferenceSchema, field),
-    value,
-  );
 }
 
 export function parseCheckoutPaymentAttempt(

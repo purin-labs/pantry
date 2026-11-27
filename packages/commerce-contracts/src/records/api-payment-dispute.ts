@@ -103,7 +103,7 @@ const lifecycleSchema = Type.Unsafe<PaymentDisputeLifecycle>(
   ]),
 );
 
-export const observeCommercePaymentDisputeV1Schema = ReadonlyStrictObject({
+const observeCommercePaymentDisputeV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.observe-payment-dispute.v1"),
   organisationId: text,
   merchantId: text,
@@ -135,7 +135,7 @@ function hasDistinctEvidence(value: {
   return hasDistinctReferences(value.evidenceReferences);
 }
 
-export const wirePaymentDisputeSchema = Type.Unsafe<PaymentDispute>(
+const wirePaymentDisputeSchema = Type.Unsafe<PaymentDispute>(
   ReadonlyStrictObject({
     disputeId: text,
     orderId: text,

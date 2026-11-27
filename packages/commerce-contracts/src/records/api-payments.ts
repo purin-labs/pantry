@@ -13,13 +13,10 @@ import {
   wireRecordParser,
 } from "./wire-objects.ts";
 
-export const commercePaymentStepV1Schema =
+const commercePaymentStepV1Schema =
   commerceFailedPaymentStepV1Schema;
-export type CommercePaymentStepV1 = Static<
-  typeof commercePaymentStepV1Schema
->;
 
-export const commercePaymentsV1Schema = ReadonlyStrictObject({
+const commercePaymentsV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.payments.v1"),
   merchantId: normalizedTextSchema,
   merchantRevision: NonNegativeInteger,

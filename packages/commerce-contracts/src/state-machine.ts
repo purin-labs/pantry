@@ -8,9 +8,8 @@ import {
 
 import { COMMERCE_MACHINES } from "./commerce-machines.ts";
 
-export type CommerceStateKind =
-  "initial" | "intermediate" | "terminal" | "external";
-export type CommerceTransitionActor = "buyer" | "staff" | "provider" | "system";
+type CommerceStateKind = "initial" | "intermediate" | "terminal" | "external";
+type CommerceTransitionActor = "buyer" | "staff" | "provider" | "system";
 
 /** One generated machine. `State` is the `state` tag of its lifecycle type. */
 export type CommerceMachineDefinition<State extends string> = Readonly<{
@@ -36,7 +35,7 @@ export type CommerceMachineDefinition<State extends string> = Readonly<{
 type Machines = typeof COMMERCE_MACHINES;
 
 export type CommerceMachineName = keyof Machines;
-export type CommerceMachineState<Machine extends CommerceMachineName> =
+type CommerceMachineState<Machine extends CommerceMachineName> =
   keyof Machines[Machine]["states"] & string;
 export type CommerceMachineEvent<Machine extends CommerceMachineName> =
   Machines[Machine]["transitions"][number]["event"];
@@ -65,18 +64,18 @@ type TransitionsOf<
 >;
 
 /** The states in which `event` is allowed. */
-export type CommerceTransitionSource<
+type CommerceTransitionSource<
   Machine extends CommerceMachineName,
   Event extends CommerceMachineEvent<Machine>,
 > = TransitionsOf<Machine, Event>["from"][number];
 
 /** The states that `event` can lead to. One for most events. */
-export type CommerceTransitionTarget<
+type CommerceTransitionTarget<
   Machine extends CommerceMachineName,
   Event extends CommerceMachineEvent<Machine>,
 > = TransitionsOf<Machine, Event>["to"];
 
-export type CommerceTransitionResult<
+type CommerceTransitionResult<
   Machine extends CommerceMachineName,
   Event extends CommerceMachineEvent<Machine>,
   Lifecycle extends Readonly<{ state: CommerceMachineState<Machine> }>,

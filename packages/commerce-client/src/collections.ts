@@ -8,7 +8,7 @@ import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
 type Money = Readonly<{ amountMinor: number; currency: string }>;
 
-export const COLLECTION_SORT_ORDERS = [
+const COLLECTION_SORT_ORDERS = [
   "manual",
   "title",
   "price_ascending",

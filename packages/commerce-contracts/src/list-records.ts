@@ -53,11 +53,11 @@ const listNameSchema = queryIdentitySchema<"CommerceListName">();
 const listRevisionSchema = revisionSchema<"CommerceListRevision">();
 const entryRevisionSchema = revisionSchema<"CommerceListEntryRevision">();
 
-export const commerceListMembershipSchema = Type.Enum([
+const commerceListMembershipSchema = Type.Enum([
   "unique_entity",
   "repeatable_entity",
 ]);
-export const listEntryAttributeDefinitionSchema = OpenObject({
+const listEntryAttributeDefinitionSchema = OpenObject({
   attributeId: attributeDefinitionIdSchema,
   definition: attributeDefinitionSchema,
 });
@@ -93,9 +93,6 @@ export const commerceListEntrySchema = OpenObject({
 });
 export type CommerceList = Static<typeof commerceListSchema>;
 export type CommerceListEntry = StaticDecode<typeof commerceListEntrySchema>;
-export type CommerceListMembership = Static<
-  typeof commerceListMembershipSchema
->;
 
 const definitionWire = OpenObject({
   attributeId: Type.String(),
@@ -109,7 +106,7 @@ export const commerceListWireSchema = OpenObject({
   publishedRevision: revisionWire,
   membership: commerceListMembershipSchema,
 });
-export const commerceListEntryWireSchema = OpenObject({
+const commerceListEntryWireSchema = OpenObject({
   entryId: Type.String(),
   listId: Type.String(),
   listRevision: revisionWire,

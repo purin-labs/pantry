@@ -15,7 +15,7 @@ import {
 
 const provider = Type.Union([Type.Literal("stripe"), Type.Literal("square")]);
 
-export const commerceBankPayoutV1Schema = ReadonlyStrictObject({
+const commerceBankPayoutV1Schema = ReadonlyStrictObject({
   provider,
   /** The provider's own id for this payout. */
   payoutId: normalizedTextSchema,
@@ -46,7 +46,7 @@ export type CommerceBankPayoutV1 = Static<
   typeof commerceBankPayoutV1Schema
 >;
 
-export const commerceBankPayoutSourceV1Schema = ReadonlyStrictObject({
+const commerceBankPayoutSourceV1Schema = ReadonlyStrictObject({
   provider,
   /**
    * How this read went for the provider: `read`, a key or a token that the
@@ -68,7 +68,7 @@ export type CommerceBankPayoutSourceV1 = Static<
   typeof commerceBankPayoutSourceV1Schema
 >;
 
-export const commerceBankPayoutsV1Schema = ReadonlyStrictObject({
+const commerceBankPayoutsV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.bank-payouts.v1"),
   merchantId: normalizedTextSchema,
   /** The providers that this merchant connected. */

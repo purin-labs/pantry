@@ -52,31 +52,31 @@ import { cursorRefusal } from "./cursor-values.ts";
 
 const commandId = queryIdentitySchema<"CommerceCommandId">();
 const causationId = queryIdentitySchema<"CommerceCausationId">();
-export const commandAuthorityCausationSchema = OpenObject({
+const commandAuthorityCausationSchema = OpenObject({
   kind: Type.Literal("command"),
   commandId,
 });
-export const eventAuthorityCausationSchema = OpenObject({
+const eventAuthorityCausationSchema = OpenObject({
   kind: Type.Literal("event"),
   eventId: causationId,
 });
-export const ingressAuthorityCausationSchema = OpenObject({
+const ingressAuthorityCausationSchema = OpenObject({
   kind: Type.Literal("ingress"),
   observationId: causationId,
 });
-export const scheduleAuthorityCausationSchema = OpenObject({
+const scheduleAuthorityCausationSchema = OpenObject({
   kind: Type.Literal("schedule"),
   scheduleId: causationId,
 });
-export const effectReceiptAuthorityCausationSchema = OpenObject({
+const effectReceiptAuthorityCausationSchema = OpenObject({
   kind: Type.Literal("effect_receipt"),
   receiptId: causationId,
 });
-export const migrationAuthorityCausationSchema = OpenObject({
+const migrationAuthorityCausationSchema = OpenObject({
   kind: Type.Literal("migration"),
   migrationId: causationId,
 });
-export const commerceAuthorityCausationSchema = Type.Union([
+const commerceAuthorityCausationSchema = Type.Union([
   commandAuthorityCausationSchema,
   eventAuthorityCausationSchema,
   ingressAuthorityCausationSchema,
@@ -92,9 +92,6 @@ export const commerceAuthorityContextSchema = OpenObject({
   expiresAt: Type.String(),
   causation: commerceAuthorityCausationSchema,
 });
-export type CommerceAuthorityCausation = StrictUnion<
-  Static<typeof commerceAuthorityCausationSchema>
->;
 export type CommerceAuthorityContext = Static<
   typeof commerceAuthorityContextSchema
 >;
@@ -144,31 +141,31 @@ const definitionCreateScope = OpenObject({
     >(revision),
   }),
 });
-export const customRelationshipDefinitionCreateAuthoritySchema = OpenObject({
+const customRelationshipDefinitionCreateAuthoritySchema = OpenObject({
   kind: Type.Literal("custom_relationship_definition_create"),
   context: commerceCommandAuthorityContextSchema,
   scope: definitionCreateScope,
   target: customCommerceRelationshipDefinitionCreateTargetSchema,
 });
-export const customRelationshipDefinitionPublishAuthoritySchema = OpenObject({
+const customRelationshipDefinitionPublishAuthoritySchema = OpenObject({
   kind: Type.Literal("custom_relationship_definition_publish"),
   context: commerceCommandAuthorityContextSchema,
   scope: definitionScope,
   target: customCommerceRelationshipDefinitionCommandTargetSchema,
 });
-export const relationshipCreateAuthoritySchema = OpenObject({
+const relationshipCreateAuthoritySchema = OpenObject({
   kind: Type.Literal("relationship_create"),
   context: commerceCommandAuthorityContextSchema,
   scope: definitionScope,
   target: customCommerceRelationshipCreateTargetSchema,
 });
-export const relationshipCommandAuthoritySchema = OpenObject({
+const relationshipCommandAuthoritySchema = OpenObject({
   kind: Type.Literal("relationship_command"),
   context: commerceCommandAuthorityContextSchema,
   scope: relationshipScope,
   target: customCommerceRelationshipCommandTargetSchema,
 });
-export const relationshipReplacementAuthoritySchema = OpenObject({
+const relationshipReplacementAuthoritySchema = OpenObject({
   kind: Type.Literal("relationship_replacement"),
   context: commerceCommandAuthorityContextSchema,
   scope: relationshipScope,
@@ -181,7 +178,7 @@ export const relationshipAuthoritySchema = Type.Union([
   relationshipCommandAuthoritySchema,
   relationshipReplacementAuthoritySchema,
 ]);
-export type RelationshipAuthority = StrictUnion<
+type RelationshipAuthority = StrictUnion<
   Static<typeof relationshipAuthoritySchema>
 >;
 const authorityWire = Type.Union([

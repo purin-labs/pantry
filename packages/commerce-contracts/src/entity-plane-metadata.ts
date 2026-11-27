@@ -57,29 +57,29 @@ import {
 const selectorSchema = Type.Unsafe<PublishedCommerceSelector>(
   publishedCommerceSelectorSchema,
 );
-export const entityTypePublishedResourceReferenceSchema = StrictObject({
+const entityTypePublishedResourceReferenceSchema = StrictObject({
   kind: Type.Literal("entity_type"),
   entityTypeId: commerceEntityTypeIdSchema,
 });
-export const relationshipPublishedResourceReferenceSchema = StrictObject({
+const relationshipPublishedResourceReferenceSchema = StrictObject({
   kind: Type.Literal("relationship"),
   relationship: Type.Unsafe<CommerceRelationshipRef>(
     commerceRelationshipRefSchema,
   ),
 });
-export const commerceListPublishedResourceReferenceSchema = StrictObject({
+const commerceListPublishedResourceReferenceSchema = StrictObject({
   kind: Type.Literal("commerce_list"),
   listId: commerceListIdSchema,
 });
-export const commerceListEntryPublishedResourceReferenceSchema = StrictObject({
+const commerceListEntryPublishedResourceReferenceSchema = StrictObject({
   kind: Type.Literal("commerce_list_entry"),
   entry: commerceListEntryRefSchema,
 });
-export const savedSelectorPublishedResourceReferenceSchema = StrictObject({
+const savedSelectorPublishedResourceReferenceSchema = StrictObject({
   kind: Type.Literal("saved_selector"),
   selector: selectorSchema,
 });
-export const entityPlanePublishedResourceReferenceSchema = Type.Union([
+const entityPlanePublishedResourceReferenceSchema = Type.Union([
   entityTypePublishedResourceReferenceSchema,
   relationshipPublishedResourceReferenceSchema,
   commerceListPublishedResourceReferenceSchema,
@@ -93,18 +93,18 @@ const requestIdentity = {
   organisationId: javascriptTrimmedTextSchema,
   merchantId: javascriptTrimmedTextSchema,
 };
-export const enumeratePublishedResourceRequestSchema = StrictObject({
+const enumeratePublishedResourceRequestSchema = StrictObject({
   kind: Type.Literal("enumerate"),
   ...requestIdentity,
 });
-export const resolvePublishedResourceRequestSchema = StrictObject({
+const resolvePublishedResourceRequestSchema = StrictObject({
   kind: Type.Literal("resolve"),
   ...requestIdentity,
   resource: Type.Unsafe<CommerceEntityPlanePublishedResourceReference>(
     entityPlanePublishedResourceReferenceSchema,
   ),
 });
-export const entityPlanePublishedResourceMetadataRequestSchema = Type.Union([
+const entityPlanePublishedResourceMetadataRequestSchema = Type.Union([
   enumeratePublishedResourceRequestSchema,
   resolvePublishedResourceRequestSchema,
 ]);
@@ -113,31 +113,31 @@ export type CommerceEntityPlanePublishedResourceMetadataRequest = StrictUnion<
     StaticDecode<typeof entityPlanePublishedResourceMetadataRequestSchema>
   >
 >;
-export const entityTypePublishedResourceSchema = StrictObject({
+const entityTypePublishedResourceSchema = StrictObject({
   kind: Type.Literal("entity_type"),
   entityType: Type.Unsafe<CommerceEntityType>(commerceEntityTypeSchema),
 });
-export const relationshipPublishedResourceSchema = StrictObject({
+const relationshipPublishedResourceSchema = StrictObject({
   kind: Type.Literal("relationship"),
   relationship: Type.Unsafe<CommerceRelationship>(commerceRelationshipSchema),
 });
-export const commerceListPublishedResourceSchema = StrictObject({
+const commerceListPublishedResourceSchema = StrictObject({
   kind: Type.Literal("commerce_list"),
   list: Type.Unsafe<CommerceList>(commerceListSchema),
 });
-export const commerceListEntryPublishedResourceSchema = StrictObject({
+const commerceListEntryPublishedResourceSchema = StrictObject({
   kind: Type.Literal("commerce_list_entry"),
   entry: commerceListEntryRefSchema,
   listRevision: revisionSchema<"CommerceListRevision">(),
   entityTypeId: commerceEntityTypeIdSchema,
   entityRef: Type.Unsafe<CommerceEntityRef>(commerceEntityRefSchema),
 });
-export const savedSelectorPublishedResourceSchema = StrictObject({
+const savedSelectorPublishedResourceSchema = StrictObject({
   kind: Type.Literal("saved_selector"),
   selector: selectorSchema,
   view: Type.Unsafe<SavedCommerceView>(savedCommerceViewSchema),
 });
-export const entityPlanePublishedResourceSchema = Type.Union([
+const entityPlanePublishedResourceSchema = Type.Union([
   entityTypePublishedResourceSchema,
   relationshipPublishedResourceSchema,
   commerceListPublishedResourceSchema,
@@ -152,7 +152,7 @@ const responseIdentity = {
   merchantId: queryIdentitySchema<"CommerceMerchantId">(),
   merchantRevision: commerceSnapshotRevisionSchema,
 };
-export const entityPlanePublishedResourceMetadataResponseSchema = Type.Union([
+const entityPlanePublishedResourceMetadataResponseSchema = Type.Union([
   StrictObject({
     kind: Type.Literal("enumerated"),
     ...responseIdentity,
@@ -243,7 +243,7 @@ const responseWire = Type.Union([
 ]);
 const strictEntryRef = StrictObject(commerceListEntryRefSchema.properties);
 
-export function parseEntityPlanePublishedResourceReference(
+function parseEntityPlanePublishedResourceReference(
   input: unknown,
 ): ContractDecodeResult<CommerceEntityPlanePublishedResourceReference> {
   const parsed = parseContract(referenceWire, input, invalidShape);
@@ -321,7 +321,7 @@ export function parseEntityPlanePublishedResourceMetadataRequest(
     },
   };
 }
-export function parseEntityPlanePublishedResource(
+function parseEntityPlanePublishedResource(
   input: unknown,
 ): ContractDecodeResult<CommerceEntityPlanePublishedResource> {
   const parsed = parseContract(resourceWire, input, invalidShape);

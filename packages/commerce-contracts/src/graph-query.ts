@@ -10,7 +10,7 @@ import {
   aggregationSourceWireSchema,
   aggregationWireSchema,
 } from "./query-wire.ts";
-import { Type, type Static } from "typebox";
+import { Type } from "typebox";
 import { Value } from "typebox/value";
 import { assertNever, codePointCount } from "@purin-labs/std";
 import {
@@ -22,8 +22,6 @@ import {
   type CommerceContextSelection,
   type PublishedCommerceSelector,
 } from "./graph-query-schema.ts";
-export { commerceGraphQuerySchema } from "./graph-query-schema.ts";
-export type { CommerceGraphQuery } from "./graph-query-schema.ts";
 import {
   type CommerceEntityRef,
   parseCommerceEntityRef,
@@ -48,10 +46,6 @@ import {
   queryRefusal,
   identityRefusal,
 } from "./query-parts.ts";
-
-export type ParsedGraphQueryKind = Static<
-  typeof commerceGraphQueryWireSchema
->["kind"];
 
 export function parseCommerceGraphQuery(
   input: unknown,

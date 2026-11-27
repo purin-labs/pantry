@@ -20,9 +20,6 @@ import {
 
 const text = normalizedTextSchema;
 
-export const draftOrdersMoneySchema = wireMoneySchema;
-export type DraftOrdersMoney = Static<typeof draftOrdersMoneySchema>;
-
 /** `requireEmail`: text of at most 320 characters around one `@`. */
 const emailSchema = Type.Refine(boundedTextSchema(320), isEmail, emailError);
 
@@ -34,7 +31,7 @@ function emailError(): string {
   return "must be an email address";
 }
 
-export const commerceDraftOrderLineV1Schema = ReadonlyStrictObject({
+const commerceDraftOrderLineV1Schema = ReadonlyStrictObject({
   lineId: text,
   variantId: text,
   quantity: Type.Integer({ minimum: 1, maximum: 999 }),
@@ -94,26 +91,24 @@ function tagsError(): string {
   return "tags must be distinct";
 }
 
-export const draftCommandBaseSchema = ReadonlyOpenObject({
+const draftCommandBaseSchema = ReadonlyOpenObject({
   merchantId: text,
   idempotencyKey: text,
   requestedAt: utcTimestampSchema,
   draftOrderId: text,
 });
-export type DraftCommandBase = Static<typeof draftCommandBaseSchema>;
 
-export const draftContentsSchema = ReadonlyOpenObject({
+const draftContentsSchema = ReadonlyOpenObject({
   lines: linesSchema,
   buyer: ReadonlyStrictObject({ email: emailSchema }),
   note: Type.String(),
   tags: tagsSchema,
 });
-export type DraftContents = Static<typeof draftContentsSchema>;
 
 /** A draft command has its parts' keys and no other key. */
 const exactKeys = { unevaluatedProperties: false } as const;
 
-export const createCommerceDraftOrderV1Schema = Type.Intersect(
+const createCommerceDraftOrderV1Schema = Type.Intersect(
   [
     draftCommandBaseSchema,
     draftContentsSchema,
@@ -128,7 +123,7 @@ export type CreateCommerceDraftOrderV1 = Static<
   typeof createCommerceDraftOrderV1Schema
 >;
 
-export const updateCommerceDraftOrderV1Schema = Type.Intersect(
+const updateCommerceDraftOrderV1Schema = Type.Intersect(
   [
     draftCommandBaseSchema,
     draftContentsSchema,
@@ -143,7 +138,7 @@ export type UpdateCommerceDraftOrderV1 = Static<
   typeof updateCommerceDraftOrderV1Schema
 >;
 
-export const sendCommerceDraftInvoiceV1Schema = Type.Intersect(
+const sendCommerceDraftInvoiceV1Schema = Type.Intersect(
   [
     draftCommandBaseSchema,
     ReadonlyOpenObject({
@@ -158,7 +153,7 @@ export type SendCommerceDraftInvoiceV1 = Static<
   typeof sendCommerceDraftInvoiceV1Schema
 >;
 
-export const cancelCommerceDraftOrderV1Schema = Type.Intersect(
+const cancelCommerceDraftOrderV1Schema = Type.Intersect(
   [
     draftCommandBaseSchema,
     ReadonlyOpenObject({
@@ -184,7 +179,7 @@ export type CommerceManualTenderV1 = Static<
   typeof commerceManualTenderV1Schema
 >;
 
-export const markCommerceDraftOrderPaidV1Schema = Type.Intersect(
+const markCommerceDraftOrderPaidV1Schema = Type.Intersect(
   [
     draftCommandBaseSchema,
     ReadonlyOpenObject({
@@ -202,7 +197,7 @@ export type MarkCommerceDraftOrderPaidV1 = Static<
   typeof markCommerceDraftOrderPaidV1Schema
 >;
 
-export const commerceDraftOrderCommandV1Schema = Type.Union([
+const commerceDraftOrderCommandV1Schema = Type.Union([
   createCommerceDraftOrderV1Schema,
   updateCommerceDraftOrderV1Schema,
   sendCommerceDraftInvoiceV1Schema,
@@ -212,7 +207,7 @@ export type CommerceDraftOrderCommandV1 = Static<
   typeof commerceDraftOrderCommandV1Schema
 >;
 
-export const commerceDraftInvoiceV1Schema = ReadonlyStrictObject({
+const commerceDraftInvoiceV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.draft-invoice.v1"),
   mutation: commerceMutationResultV1Schema,
   invoice: Nullable(
@@ -247,7 +242,7 @@ function withoutCustomer(
   return { email: buyer.email ?? "" };
 }
 
-export const commerceDraftOrderBuyerV1Schema = Type.Union([
+const commerceDraftOrderBuyerV1Schema = Type.Union([
   Type.Unsafe<Static<typeof sealedBuyerSchema>>(legacyBuyerSchema),
   sealedBuyerSchema,
 ]);
@@ -255,7 +250,7 @@ export type CommerceDraftOrderBuyerV1 = Static<
   typeof commerceDraftOrderBuyerV1Schema
 >;
 
-export const commerceDraftOrderLifecycleV1Schema = Type.Union([
+const commerceDraftOrderLifecycleV1Schema = Type.Union([
   ReadonlyStrictObject({ state: Type.Literal("open") }),
   ReadonlyStrictObject({
     state: Type.Literal("invoiced"),
@@ -271,7 +266,7 @@ export type CommerceDraftOrderLifecycleV1 = Static<
   typeof commerceDraftOrderLifecycleV1Schema
 >;
 
-export const commerceDraftOrderV1Schema = ReadonlyStrictObject({
+const commerceDraftOrderV1Schema = ReadonlyStrictObject({
   id: text,
   revision: PositiveInteger,
   storefrontId: text,
@@ -299,7 +294,7 @@ const recordedTenderSchema = Type.Union([
   }),
 ]);
 
-export const commerceDraftOrderViewV1Schema = ReadonlyStrictObject({
+const commerceDraftOrderViewV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.draft-order.v1"),
   draftOrder: commerceDraftOrderV1Schema,
   checkoutIds: ImmutableArray(text),
@@ -343,7 +338,4 @@ export const parseCommerceDraftOrderViewV1 = wireRecordParser(
 );
 export const parseUpdateCommerceDraftOrderV1 = wireRecordParser(
   updateCommerceDraftOrderV1Schema,
-);
-export const parseCommerceManualTenderV1 = wireRecordParser(
-  commerceManualTenderV1Schema,
 );

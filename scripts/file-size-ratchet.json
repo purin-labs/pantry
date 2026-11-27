@@ -8,7 +8,6 @@
     "areas/kitchen/ui/features/workflow-simulator/bakery-surface.ts": 3893,
     "areas/kitchen/ui/features/workflow-simulator/production-workspace.tsx": 5021,
     "packages/bakery-model/src/bakery-surface.ts": 4991,
-    "packages/commerce-contracts/src/records/commerce-records.ts": 3253,
     "packages/production-simulation/src/recipes/bakery/appliance-execution.ts": 3815,
     "packages/production-simulation/src/recipes/bakery/schedule.ts": 4499,
     "scripts/plan-50/evaluate-pi-durable.mjs": 5289,

@@ -15,7 +15,7 @@ import {
 
 const text = normalizedTextSchema;
 
-export const commerceOrderTimeV1Schema = ReadonlyStrictObject({
+const commerceOrderTimeV1Schema = ReadonlyStrictObject({
   orderId: text,
   /** The pickup code that staff and the buyer use for this order. */
   code: text,
@@ -45,7 +45,7 @@ export const commerceOrderTimeV1Schema = ReadonlyStrictObject({
 });
 export type CommerceOrderTimeV1 = Static<typeof commerceOrderTimeV1Schema>;
 
-export const commerceOrderTimesV1Schema = ReadonlyStrictObject({
+const commerceOrderTimesV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.order-times.v1"),
   merchantId: text,
   merchantRevision: NonNegativeInteger,

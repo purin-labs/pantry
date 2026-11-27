@@ -44,21 +44,21 @@ import { parseEntityPlaneEntityReference } from "./entity-plane-resources.ts";
 import { cursorRefusal } from "./cursor-values.ts";
 
 const querySchema = Type.Unsafe<CommerceGraphQuery>(commerceGraphQuerySchema);
-export const entityPlaneQueryRequestSchema = OpenObject({
+const entityPlaneQueryRequestSchema = OpenObject({
   merchantId: javascriptTrimmedTextSchema,
   query: querySchema,
 });
 export type CommerceEntityPlaneQueryRequest = Readonly<
   StaticDecode<typeof entityPlaneQueryRequestSchema>
 >;
-export const entityPlaneCapabilityMetadataRequestSchema = OpenObject({
+const entityPlaneCapabilityMetadataRequestSchema = OpenObject({
   organisationId: javascriptTrimmedTextSchema,
   ...entityPlaneQueryRequestSchema.properties,
 });
 export type CommerceEntityPlaneCapabilityMetadataRequest = Readonly<
   StaticDecode<typeof entityPlaneCapabilityMetadataRequestSchema>
 >;
-export const entityPlaneCapabilityMetadataResponseSchema = OpenObject({
+const entityPlaneCapabilityMetadataResponseSchema = OpenObject({
   kind: Type.Literal("capability_metadata"),
   organisationId: javascriptTrimmedTextSchema,
   merchantId: queryIdentitySchema<"CommerceMerchantId">(),
@@ -72,7 +72,7 @@ export const entityPlaneCapabilityMetadataResponseSchema = OpenObject({
 export type CommerceEntityPlaneCapabilityMetadataResponse = Readonly<
   StaticDecode<typeof entityPlaneCapabilityMetadataResponseSchema>
 >;
-export const entityPlaneRelationshipTraversalStepRequestSchema = OpenObject({
+const entityPlaneRelationshipTraversalStepRequestSchema = OpenObject({
   organisationId: javascriptTrimmedTextSchema,
   merchantId: javascriptTrimmedTextSchema,
   planRequest: Type.Unsafe<CommerceGraphQueryPlanRequest>(

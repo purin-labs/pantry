@@ -157,21 +157,3 @@ export function adjacentTag<T extends string>(
 ): T {
   return name(required(object, key), key, names);
 }
-
-/** serde_json `Value::as_i64` on an object member. */
-export function asI64(value: unknown): number | null {
-  try {
-    return i64(value, "");
-  } catch {
-    return null;
-  }
-}
-
-/** serde_json `Value::as_u64` on an object member. */
-export function asU64(value: unknown): number | null {
-  try {
-    return u64(value, "");
-  } catch {
-    return null;
-  }
-}

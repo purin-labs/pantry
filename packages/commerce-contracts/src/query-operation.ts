@@ -120,7 +120,7 @@ export const commerceQueryPlanOperationSchema = Type.Union([
 export type CommerceQueryPlanOperation = StrictUnion<
   StaticDecode<typeof commerceQueryPlanOperationSchema>
 >;
-export type CommerceRelationshipTraversalSubject = StrictUnion<
+type CommerceRelationshipTraversalSubject = StrictUnion<
   StaticDecode<typeof commerceRelationshipTraversalSubjectSchema>
 >;
 const subjectWire = Type.Union([

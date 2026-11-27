@@ -74,7 +74,7 @@ export const wireCheckoutProfileReferenceSchema = Type.Object(
   { additionalProperties: false },
 );
 
-export const adjustOfferPriceCommandSchema = ReadonlyOpenObject({
+const adjustOfferPriceCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.adjust-offer-price.v1"),
   merchantId: Type.String(),
   idempotencyKey: Type.String(),
@@ -94,14 +94,14 @@ const domainPaymentAttemptSchema = Type.Unsafe<CheckoutPaymentAttempt>(
 );
 const domainStorefrontSchema = Type.Unsafe<Storefront>(storefrontSchema);
 
-export const counterCashTenderSchema = ReadonlyStrictObject({
+const counterCashTenderSchema = ReadonlyStrictObject({
   method: Type.Literal("cash"),
   cashReceivedMinor: NonNegativeInteger,
   changeDueMinor: NonNegativeInteger,
   recordedAt: timestamp,
 });
 
-export const counterSaleSchema = ReadonlyStrictObject({
+const counterSaleSchema = ReadonlyStrictObject({
   checkout: domainCheckoutSchema,
   paymentAttempt: Type.Union([domainPaymentAttemptSchema, Type.Null()]),
   manualTender: Type.Optional(counterCashTenderSchema),
@@ -110,7 +110,7 @@ export const counterSaleSchema = ReadonlyStrictObject({
 const paymentCaptureVersion = Type.Literal(
   "commerce.payment-capture-result.v1",
 );
-export const paymentCaptureResultSchema = Type.Union([
+const paymentCaptureResultSchema = Type.Union([
   ReadonlyOpenObject({
     schemaVersion: paymentCaptureVersion,
     kind: Type.Literal("captured"),
@@ -144,19 +144,19 @@ export const paymentCaptureResultSchema = Type.Union([
  * name for the merchant's owner, kept once; Commerce names the merchant
  * only by `merchantId` everywhere else.
  */
-export const provisionMerchantCommandSchema = ReadonlyOpenObject({
+const provisionMerchantCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.provision-merchant.v2"),
   externalReference: text,
   merchantId: text,
   createdAt: timestamp,
 });
 
-export const demoProfileSchema = Type.Union([
+const demoProfileSchema = Type.Union([
   Type.Literal("cafe_patisserie"),
   Type.Literal("pantry_ecommerce"),
 ]);
 
-export const provisionDemoCommandSchema = ReadonlyOpenObject({
+const provisionDemoCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.provision-demo.v2"),
   externalReference: text,
   merchantId: text,
@@ -164,7 +164,7 @@ export const provisionDemoCommandSchema = ReadonlyOpenObject({
   createdAt: timestamp,
 });
 
-export const merchantProvisioningResultSchema = ReadonlyOpenObject({
+const merchantProvisioningResultSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.merchant-provisioning-result.v2"),
   outcome: Type.Union([
     Type.Literal("provisioned"),
@@ -174,13 +174,13 @@ export const merchantProvisioningResultSchema = ReadonlyOpenObject({
   merchantId: text,
 });
 
-export const createLocationCommandSchema = ReadonlyOpenObject({
+const createLocationCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.create-location.v1"),
   ...commandContext,
   location: wireLocationSchema,
 });
 
-export const prepareCatalogListingCommandSchema = ReadonlyOpenObject({
+const prepareCatalogListingCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.prepare-catalog-listing.v1"),
   ...commandContext,
   salesChannel: wireSalesChannelSchema,
@@ -190,7 +190,7 @@ export const prepareCatalogListingCommandSchema = ReadonlyOpenObject({
   consumptionPlan: inventoryConsumptionPlanSchema,
 });
 
-export const updateProductDescriptionCommandSchema = ReadonlyStrictObject({
+const updateProductDescriptionCommandSchema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.update-product-description.v1"),
   merchantId: text,
   expectedMerchantRevision: NonNegativeInteger,
@@ -212,7 +212,7 @@ const storefrontCommandFields = {
   consumptionPlan: inventoryConsumptionPlanSchema,
 };
 
-export const configurePickupStorefrontCommandSchema = Type.Refine(
+const configurePickupStorefrontCommandSchema = Type.Refine(
   ReadonlyOpenObject({
     schemaVersion: Type.Literal("commerce.configure-pickup-storefront.v1"),
     ...storefrontCommandFields,
@@ -221,7 +221,7 @@ export const configurePickupStorefrontCommandSchema = Type.Refine(
   pickupStorefrontError,
 );
 
-export const configureShippingStorefrontCommandSchema = Type.Refine(
+const configureShippingStorefrontCommandSchema = Type.Refine(
   ReadonlyOpenObject({
     schemaVersion: Type.Literal("commerce.configure-shipping-storefront.v1"),
     ...storefrontCommandFields,
@@ -252,7 +252,7 @@ function shippingStorefrontError(): string {
   return "storefront.fulfillment.kind must be shipping";
 }
 
-export const channelListingCatalogSchema = Type.Union([
+const channelListingCatalogSchema = Type.Union([
   ReadonlyOpenObject({
     kind: Type.Literal("new_product"),
     product: commerceProductV1Schema,
@@ -273,7 +273,7 @@ export const channelListingCatalogSchema = Type.Union([
   }),
 ]);
 
-export const placeChannelListingCommandSchema = ReadonlyOpenObject({
+const placeChannelListingCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.place-channel-listing.v1"),
   ...commandContext,
   salesChannelId: text,
@@ -283,7 +283,7 @@ export const placeChannelListingCommandSchema = ReadonlyOpenObject({
 });
 
 /** `parsePickupCheckoutSelection`: modifier options are distinct. */
-export const pickupCheckoutSelectionSchema = Type.Union([
+const pickupCheckoutSelectionSchema = Type.Union([
   ReadonlyOpenObject({ kind: Type.Literal("catalog"), variantId: text }),
   ReadonlyOpenObject({
     kind: Type.Literal("menu"),
@@ -294,7 +294,7 @@ export const pickupCheckoutSelectionSchema = Type.Union([
 ]);
 
 /** `parsePickupCheckoutLine`: a positive whole quantity of `each`. */
-export const pickupCheckoutLineSchema = ReadonlyOpenObject({
+const pickupCheckoutLineSchema = ReadonlyOpenObject({
   cartLineId: text,
   checkoutLineId: text,
   source: pickupCheckoutSelectionSchema,
@@ -315,7 +315,7 @@ function positiveEachError(): string {
   return "line.quantity must be a positive each quantity";
 }
 
-export const buyerContactAuthoritySchema = Type.Union([
+const buyerContactAuthoritySchema = Type.Union([
   ReadonlyStrictObject({
     kind: Type.Literal("provided"),
     contact: wireProtectedBuyerContactSchema,
@@ -328,7 +328,7 @@ export const buyerContactAuthoritySchema = Type.Union([
   }),
 ]);
 
-export const checkoutBuyerAuthoritySchema = Type.Union([
+const checkoutBuyerAuthoritySchema = Type.Union([
   ReadonlyStrictObject({
     kind: Type.Literal("guest"),
     contactAuthority: buyerContactAuthoritySchema,
@@ -345,7 +345,7 @@ export const checkoutBuyerAuthoritySchema = Type.Union([
 
 const checkoutLines = ImmutableArray(pickupCheckoutLineSchema, { minItems: 1 });
 
-export const createPickupCheckoutCommandSchema = ReadonlyStrictObject({
+const createPickupCheckoutCommandSchema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.create-pickup-checkout.v1"),
   ...commandContext,
   storefrontId: text,
@@ -358,7 +358,7 @@ export const createPickupCheckoutCommandSchema = ReadonlyStrictObject({
   lines: checkoutLines,
 });
 
-export const publishPointOfSaleConfigurationCommandSchema =
+const publishPointOfSaleConfigurationCommandSchema =
   ReadonlyStrictObject({
     schemaVersion: Type.Literal(
       "commerce.publish-point-of-sale-configuration.v1",
@@ -395,7 +395,7 @@ function discountCodeError(): string {
   return "a discount code must be 3 to 40 letters, digits, - or _";
 }
 
-export const createInPersonCheckoutCommandSchema = ReadonlyStrictObject({
+const createInPersonCheckoutCommandSchema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.create-in-person-checkout.v1"),
   ...commandContext,
   pantryLocationId: text,
@@ -420,13 +420,13 @@ const checkoutPaymentFields = {
   amount: wireMoneySchema,
 };
 
-export const beginCheckoutPaymentCommandSchema = ReadonlyStrictObject({
+const beginCheckoutPaymentCommandSchema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.begin-checkout-payment.v1"),
   ...checkoutPaymentFields,
   paymentBinding: wireOnlinePaymentBindingSchema,
 });
 
-export const collectInPersonCheckoutPaymentCommandSchema = ReadonlyStrictObject(
+const collectInPersonCheckoutPaymentCommandSchema = ReadonlyStrictObject(
   {
     schemaVersion: Type.Literal(
       "commerce.collect-in-person-checkout-payment.v1",
@@ -437,7 +437,7 @@ export const collectInPersonCheckoutPaymentCommandSchema = ReadonlyStrictObject(
   },
 );
 
-export const recordCounterCashPaymentCommandSchema = ReadonlyStrictObject({
+const recordCounterCashPaymentCommandSchema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.record-counter-cash-payment.v1"),
   ...commandContext,
   checkoutId: text,
@@ -455,7 +455,7 @@ export const recordCounterCashPaymentCommandSchema = ReadonlyStrictObject({
  * first answer as a hint and settles only after it reads the payment from
  * Square.
  */
-export const commerceCounterSaleHandoffResultV1Schema = ReadonlyStrictObject({
+const commerceCounterSaleHandoffResultV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.counter-sale-handoff-result.v1"),
   paymentAttemptId: text,
   handoffReference: text,
@@ -477,7 +477,7 @@ const paymentAttemptFields = {
   paymentAttemptRevision: PositiveInteger,
 };
 
-export const recordCheckoutPaymentCaptureCommandSchema = ReadonlyOpenObject({
+const recordCheckoutPaymentCaptureCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.record-checkout-payment-capture.v1"),
   ...paymentAttemptFields,
   providerPaymentReference: text,
@@ -487,7 +487,7 @@ export const recordCheckoutPaymentCaptureCommandSchema = ReadonlyOpenObject({
   providerRefundable: Type.Optional(Type.Boolean()),
 });
 
-export const placePaidCheckoutCommandSchema = ReadonlyOpenObject({
+const placePaidCheckoutCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.place-paid-checkout.v1"),
   ...paymentAttemptFields,
   orderId: text,
@@ -500,7 +500,7 @@ export const placePaidCheckoutCommandSchema = ReadonlyOpenObject({
   ]),
 });
 
-export const markPickupReadyCommandSchema = ReadonlyOpenObject({
+const markPickupReadyCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.mark-pickup-ready.v1"),
   ...commandContext,
   orderId: text,
@@ -509,7 +509,7 @@ export const markPickupReadyCommandSchema = ReadonlyOpenObject({
   fulfillmentRevision: PositiveInteger,
 });
 
-export const completePickupCommandSchema = ReadonlyOpenObject({
+const completePickupCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.complete-pickup.v1"),
   ...commandContext,
   orderId: text,
@@ -520,7 +520,7 @@ export const completePickupCommandSchema = ReadonlyOpenObject({
   fulfillmentRevision: PositiveInteger,
 });
 
-export const resolveCheckoutPaymentCommandSchema = ReadonlyOpenObject({
+const resolveCheckoutPaymentCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.resolve-checkout-payment.v1"),
   ...paymentAttemptFields,
   outcome: Type.Union([
@@ -538,7 +538,7 @@ export const resolveCheckoutPaymentCommandSchema = ReadonlyOpenObject({
   ]),
 });
 
-export const expireCheckoutCommandSchema = ReadonlyOpenObject({
+const expireCheckoutCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.expire-checkout.v1"),
   ...commandContext,
   checkoutId: text,
@@ -546,7 +546,7 @@ export const expireCheckoutCommandSchema = ReadonlyOpenObject({
   quoteDigest: text,
 });
 
-export const publishCatalogListingCommandSchema = ReadonlyOpenObject({
+const publishCatalogListingCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.publish-catalog-listing.v1"),
   merchantId: text,
   idempotencyKey: text,
@@ -561,7 +561,7 @@ export const publishCatalogListingCommandSchema = ReadonlyOpenObject({
   salesChannelRevision: PositiveInteger,
 });
 
-export const createInventoryItemCommandSchema = ReadonlyOpenObject({
+const createInventoryItemCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.create-inventory-item.v1"),
   ...commandContext,
   inventoryItemId: text,
@@ -572,7 +572,7 @@ export const createInventoryItemCommandSchema = ReadonlyOpenObject({
   tracking: wireInventoryTrackingSchema,
 });
 
-export const openInventoryPositionCommandSchema = ReadonlyOpenObject({
+const openInventoryPositionCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.open-inventory-position.v1"),
   ...commandContext,
   inventoryPositionId: text,
@@ -596,7 +596,7 @@ function positiveQuantityError(): string {
   return "the quantity amount must be positive";
 }
 
-export const inventoryLotInputSchema = Type.Union([
+const inventoryLotInputSchema = Type.Union([
   ReadonlyStrictObject({ kind: Type.Literal("not_tracked") }),
   ReadonlyOpenObject({
     kind: Type.Literal("tracked"),
@@ -606,7 +606,7 @@ export const inventoryLotInputSchema = Type.Union([
   }),
 ]);
 
-export const receiveInventoryCommandSchema = ReadonlyOpenObject({
+const receiveInventoryCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.receive-inventory.v3"),
   ...commandContext,
   purchase: wireInventoryReceiptPurchaseSchema,
@@ -622,7 +622,7 @@ export const receiveInventoryCommandSchema = ReadonlyOpenObject({
   receivedAt: timestamp,
 });
 
-export const inventoryReconciliationTargetSchema = Type.Union([
+const inventoryReconciliationTargetSchema = Type.Union([
   ReadonlyStrictObject({
     kind: Type.Literal("aggregate"),
     lotId: Absent,
@@ -639,7 +639,7 @@ const explanation = textLimit(
   Type.String({ ...normalizedTextSchema, maxLength: 1000 }),
 );
 
-export const inventoryReconciliationChangeSchema = Type.Union([
+const inventoryReconciliationChangeSchema = Type.Union([
   ReadonlyStrictObject({
     kind: Type.Literal("count"),
     observedQuantity: wireQuantitySchema,
@@ -670,7 +670,7 @@ export const inventoryReconciliationChangeSchema = Type.Union([
   }),
 ]);
 
-export const reconcileInventoryCommandSchema = ReadonlyOpenObject({
+const reconcileInventoryCommandSchema = ReadonlyOpenObject({
   schemaVersion: Type.Literal("commerce.reconcile-inventory.v1"),
   ...commandContext,
   inventoryPositionId: text,
@@ -682,7 +682,7 @@ export const reconcileInventoryCommandSchema = ReadonlyOpenObject({
 const count = NonNegativeInteger;
 
 /** `parseMigrationInventory`: exactly one classification counts as 1. */
-export const migrationInventorySchema = Type.Refine(
+const migrationInventorySchema = Type.Refine(
   ReadonlyOpenObject({
     schemaVersion: Type.Literal("commerce.migration-inventory.v2"),
     organisationId: text,
@@ -766,7 +766,7 @@ function classificationError(): string {
   return "classificationCounts do not match candidateClassification";
 }
 
-export const offerPriceResultSchema = Type.Union([
+const offerPriceResultSchema = Type.Union([
   ReadonlyOpenObject({
     outcome: Type.Literal("accepted"),
     value: Type.Unknown(),
@@ -781,7 +781,7 @@ export const offerPriceResultSchema = Type.Union([
 ]);
 
 /** `parseSquarePaymentAccount`: the Square location linked to a merchant. */
-export const commerceSquarePaymentAccountV1Schema = ReadonlyStrictObject({
+const commerceSquarePaymentAccountV1Schema = ReadonlyStrictObject({
   provider: Type.Literal("square"),
   paymentProviderBindingId: text,
   providerAccountId: text,
@@ -795,9 +795,6 @@ export const commerceSquarePaymentAccountV1Schema = ReadonlyStrictObject({
   state: Type.Literal("active"),
   updatedAt: timestamp,
 });
-export type CommerceSquarePaymentAccountV1 = Static<
-  typeof commerceSquarePaymentAccountV1Schema
->;
 
 const squareEnvironment = Type.Union([
   Type.Literal("development"),
@@ -806,7 +803,7 @@ const squareEnvironment = Type.Union([
 const nullableText = Type.Union([text, Type.Null()]);
 
 /** A merchant's Square connection (Plan 80 step 4); the tokens stay inside. */
-export const commerceSquareConnectionV1Schema = ReadonlyStrictObject({
+const commerceSquareConnectionV1Schema = ReadonlyStrictObject({
   provider: Type.Literal("square"),
   environment: squareEnvironment,
   applicationId: text,
@@ -838,7 +835,7 @@ export type CommerceSquareConnectionV1 = Static<
 >;
 
 /** The locations of the connected Square account. */
-export const commerceSquareLocationsV1Schema = ReadonlyStrictObject({
+const commerceSquareLocationsV1Schema = ReadonlyStrictObject({
   locations: ImmutableArray(
     ReadonlyStrictObject({
       locationId: text,
@@ -855,7 +852,7 @@ export type CommerceSquareLocationsV1 = Static<
 >;
 
 /** The devices of the connected Square account. */
-export const commerceSquareDevicesV1Schema = ReadonlyStrictObject({
+const commerceSquareDevicesV1Schema = ReadonlyStrictObject({
   devices: ImmutableArray(
     ReadonlyStrictObject({
       deviceId: text,
@@ -870,7 +867,7 @@ export type CommerceSquareDevicesV1 = Static<
 >;
 
 /** A code that pairs a Square Terminal for Terminal API checkouts. */
-export const commerceSquareDeviceCodeV1Schema = ReadonlyStrictObject({
+const commerceSquareDeviceCodeV1Schema = ReadonlyStrictObject({
   deviceCodeId: text,
   code: text,
   name: textLimit(Type.String({ maxLength: 128 })),
@@ -884,7 +881,7 @@ export type CommerceSquareDeviceCodeV1 = Static<
 >;
 
 /** A Stripe account connected to a merchant (Plan 76 phase 3). */
-export const commerceStripePaymentAccountV1Schema = ReadonlyStrictObject({
+const commerceStripePaymentAccountV1Schema = ReadonlyStrictObject({
   provider: Type.Literal("stripe"),
   paymentProviderBindingId: text,
   providerAccountId: text,
@@ -903,7 +900,7 @@ export type CommerceStripePaymentAccountV1 = Static<
 >;
 
 /** Stripe's hosted onboarding for a new account of the merchant. */
-export const commerceStripeOnboardingV1Schema = ReadonlyStrictObject({
+const commerceStripeOnboardingV1Schema = ReadonlyStrictObject({
   account: commerceStripePaymentAccountV1Schema,
   url: text,
   expiresAt: timestamp,
@@ -913,7 +910,7 @@ export type CommerceStripeOnboardingV1 = Static<
 >;
 
 /** The merchant's payment accounts at every provider. */
-export const commercePaymentAccountsV1Schema = ReadonlyStrictObject({
+const commercePaymentAccountsV1Schema = ReadonlyStrictObject({
   accounts: ImmutableArray(
     Type.Union([
       commerceStripePaymentAccountV1Schema,
@@ -957,9 +954,6 @@ export const parseAdjustOfferPriceCommandRecord = wireRecordParser(
   adjustOfferPriceCommandSchema,
 );
 export const parseCounterSaleRecord = wireRecordParser(counterSaleSchema);
-export const parsePaymentCaptureResultRecord = wireRecordParser(
-  paymentCaptureResultSchema,
-);
 export const parseProvisionMerchantCommandRecord = wireRecordParser(
   provisionMerchantCommandSchema,
 );
@@ -1082,9 +1076,6 @@ export type ConfigureCommercePickupStorefrontV1 = Static<
 >;
 export type ConfigureCommerceShippingStorefrontV1 = Static<
   typeof configureShippingStorefrontCommandSchema
->;
-export type CommerceChannelListingCatalogV1 = Static<
-  typeof channelListingCatalogSchema
 >;
 export type PlaceCommerceChannelListingV1 = Static<
   typeof placeChannelListingCommandSchema

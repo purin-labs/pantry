@@ -31,7 +31,7 @@ function altTextError(): string {
   return "is too long";
 }
 
-export const commerceMediaContentTypeSchema = Type.Union([
+const commerceMediaContentTypeSchema = Type.Union([
   Type.Literal("image/jpeg"),
   Type.Literal("image/png"),
   Type.Literal("image/webp"),
@@ -42,12 +42,11 @@ export type CommerceMediaContentType = Static<
   typeof commerceMediaContentTypeSchema
 >;
 
-export const mediaCommandBaseSchema = ReadonlyOpenObject({
+const mediaCommandBaseSchema = ReadonlyOpenObject({
   merchantId: text,
   idempotencyKey: text,
   requestedAt: utcTimestampSchema,
 });
-export type MediaCommandBase = Static<typeof mediaCommandBaseSchema>;
 
 function hasUniqueIds(ids: readonly string[]): boolean {
   return new Set(ids).size === ids.length;
@@ -57,7 +56,7 @@ function duplicateError(): string {
   return "names an item twice";
 }
 
-export const commerceProductMediaItemV1Schema = ReadonlyStrictObject({
+const commerceProductMediaItemV1Schema = ReadonlyStrictObject({
   mediaId: text,
   variantIds: Type.Refine(ImmutableArray(text), hasUniqueIds, duplicateError),
 });
@@ -65,7 +64,7 @@ export type CommerceProductMediaItemV1 = Static<
   typeof commerceProductMediaItemV1Schema
 >;
 
-export const createCommerceMediaV1Schema = Type.Intersect(
+const createCommerceMediaV1Schema = Type.Intersect(
   [
     mediaCommandBaseSchema,
     ReadonlyOpenObject({
@@ -81,7 +80,7 @@ export type CreateCommerceMediaV1 = Static<
   typeof createCommerceMediaV1Schema
 >;
 
-export const updateCommerceMediaV1Schema = Type.Intersect(
+const updateCommerceMediaV1Schema = Type.Intersect(
   [
     mediaCommandBaseSchema,
     ReadonlyOpenObject({
@@ -97,7 +96,7 @@ export type UpdateCommerceMediaV1 = Static<
   typeof updateCommerceMediaV1Schema
 >;
 
-export const deleteCommerceMediaV1Schema = Type.Intersect(
+const deleteCommerceMediaV1Schema = Type.Intersect(
   [
     mediaCommandBaseSchema,
     ReadonlyOpenObject({
@@ -122,7 +121,7 @@ function mediaIdOf(item: Readonly<{ mediaId: string }>): string {
   return item.mediaId;
 }
 
-export const setCommerceProductMediaV1Schema = Type.Intersect(
+const setCommerceProductMediaV1Schema = Type.Intersect(
   [
     mediaCommandBaseSchema,
     ReadonlyOpenObject({
@@ -142,7 +141,7 @@ export type SetCommerceProductMediaV1 = Static<
   typeof setCommerceProductMediaV1Schema
 >;
 
-export const commerceMediaCommandV1Schema = Type.Union([
+const commerceMediaCommandV1Schema = Type.Union([
   createCommerceMediaV1Schema,
   updateCommerceMediaV1Schema,
   deleteCommerceMediaV1Schema,
@@ -152,7 +151,7 @@ export type CommerceMediaCommandV1 = Static<
   typeof commerceMediaCommandV1Schema
 >;
 
-export const commerceMediaV1Schema = ReadonlyStrictObject({
+const commerceMediaV1Schema = ReadonlyStrictObject({
   id: text,
   revision: PositiveInteger,
   sha256: sha256HexSchema,
@@ -163,7 +162,7 @@ export const commerceMediaV1Schema = ReadonlyStrictObject({
 });
 export type CommerceMediaV1 = Static<typeof commerceMediaV1Schema>;
 
-export const commerceProductMediaV1Schema = ReadonlyStrictObject({
+const commerceProductMediaV1Schema = ReadonlyStrictObject({
   productId: text,
   revision: PositiveInteger,
   media: ImmutableArray(commerceProductMediaItemV1Schema),
@@ -172,7 +171,7 @@ export type CommerceProductMediaV1 = Static<
   typeof commerceProductMediaV1Schema
 >;
 
-export const commerceMediaLibraryV1Schema = ReadonlyStrictObject({
+const commerceMediaLibraryV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.media.v1"),
   media: ImmutableArray(commerceMediaV1Schema),
   products: ImmutableArray(commerceProductMediaV1Schema),
@@ -181,7 +180,7 @@ export type CommerceMediaLibraryV1 = Static<
   typeof commerceMediaLibraryV1Schema
 >;
 
-export const commerceMediaUploadV1Schema = ReadonlyStrictObject({
+const commerceMediaUploadV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.media-upload.v1"),
   sha256: sha256HexSchema,
   contentType: commerceMediaContentTypeSchema,

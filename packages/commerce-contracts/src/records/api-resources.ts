@@ -65,7 +65,7 @@ const orderLineInventorySchema = Type.Unsafe<OrderLineInventory>(
 );
 
 /** `parseProductDetails`: what an older caller leaves out gets a default. */
-export const commerceProductDetailsV1Schema = ReadonlyOpenObject({
+const commerceProductDetailsV1Schema = ReadonlyOpenObject({
   handle: Type.Union(
     [
       Type.Refine(boundedTextSchema(255), isProductHandle, productHandleError),
@@ -84,9 +84,6 @@ export const commerceProductDetailsV1Schema = ReadonlyOpenObject({
     { default: "active" },
   ),
 });
-export type CommerceProductDetailsV1 = Static<
-  typeof commerceProductDetailsV1Schema
->;
 
 /** `parseProduct`. */
 export const commerceProductV1Schema = ReadonlyOpenObject({
@@ -148,7 +145,7 @@ export type CommerceInventoryItemV1 = Static<
 >;
 
 /** `parseAvailableQuantity`: the amount may be negative. */
-export const commerceAvailableQuantityV1Schema = Type.Refine(
+const commerceAvailableQuantityV1Schema = Type.Refine(
   ReadonlyOpenObject({
     amount: SafeInteger,
     scale: Type.Integer({ minimum: 0, maximum: 6 }),
@@ -162,7 +159,7 @@ export type CommerceAvailableQuantityV1 = Static<
 >;
 
 /** `parseInventoryBalance`: on hand less allocated is available. */
-export const commerceInventoryBalanceV1Schema = Type.Union([
+const commerceInventoryBalanceV1Schema = Type.Union([
   Type.Refine(
     ReadonlyOpenObject({
       kind: Type.Literal("accounted"),
@@ -196,7 +193,7 @@ export type CommerceInventoryPositionV1 = Static<
 >;
 
 /** `parseOnlineOrderConfiguration`: exact keys in each variant. */
-export const commerceOnlineOrderConfigurationV1Schema = Type.Union([
+const commerceOnlineOrderConfigurationV1Schema = Type.Union([
   ReadonlyStrictObject({
     kind: Type.Literal("checkout_profile"),
     checkoutProfile: checkoutProfileRecordReferenceSchema,
@@ -208,7 +205,7 @@ export type CommerceOnlineOrderConfigurationV1 = Static<
 >;
 
 /** `parseOrderOrigin`. */
-export const commerceOrderOriginV1Schema = Type.Union([
+const commerceOrderOriginV1Schema = Type.Union([
   ReadonlyOpenObject({
     kind: Type.Literal("online"),
     salesChannelId: text,
@@ -241,7 +238,7 @@ export type CommerceOrderOriginV1 = Static<
 >;
 
 /** `parseOrderLineSource`. */
-export const commerceOrderLineSourceV1Schema = Type.Union([
+const commerceOrderLineSourceV1Schema = Type.Union([
   ReadonlyOpenObject({
     kind: Type.Literal("catalog"),
     variantId: text,
@@ -285,7 +282,7 @@ export type CommerceOrderLineSourceV1 = Static<
  * `parseOrderLineItem`: a positive quantity, and a fulfilled quantity in its
  * unit that does not exceed it.
  */
-export const commerceOrderLineItemV1Schema = Type.Refine(
+const commerceOrderLineItemV1Schema = Type.Refine(
   ReadonlyOpenObject({
     id: text,
     source: commerceOrderLineSourceV1Schema,
@@ -306,7 +303,7 @@ export type CommerceOrderLineItemV1 = Static<
 >;
 
 /** `parseOrderTotals`. */
-export const commerceOrderTotalsV1Schema = ReadonlyOpenObject({
+const commerceOrderTotalsV1Schema = ReadonlyOpenObject({
   subtotal: wireMoneySchema,
   discount: wireMoneySchema,
   tax: wireMoneySchema,
@@ -324,7 +321,7 @@ export type CommerceOrderTotalsV1 = Static<
 >;
 
 /** `parseOrderLifecycle`. */
-export const commerceOrderLifecycleV1Schema = Type.Union([
+const commerceOrderLifecycleV1Schema = Type.Union([
   ReadonlyOpenObject({
     state: Type.Literal("pending_confirmation"),
     createdAt: utcTimestampSchema,
@@ -357,7 +354,7 @@ export type CommerceOrderLifecycleV1 = Static<
 >;
 
 /** `parseOrderAdjustment`. */
-export const commerceOrderAdjustmentV1Schema = ReadonlyOpenObject({
+const commerceOrderAdjustmentV1Schema = ReadonlyOpenObject({
   id: text,
   kind: orderAdjustmentKindSchema,
   status: orderAdjustmentStatusSchema,
@@ -393,7 +390,7 @@ export const commerceOrderV1Schema = ReadonlyOpenObject({
 export type CommerceOrderV1 = Static<typeof commerceOrderV1Schema>;
 
 /** `parsePaymentLifecycle`. */
-export const commercePaymentLifecycleV1Schema = Type.Union([
+const commercePaymentLifecycleV1Schema = Type.Union([
   ReadonlyOpenObject({
     state: Type.Literal("pending"),
     createdAt: utcTimestampSchema,
@@ -468,7 +465,7 @@ const completedFulfillmentState = ReadonlyOpenObject({
 });
 
 /** `parsePickupFulfillmentLifecycle`. */
-export const commercePickupFulfillmentLifecycleV1Schema = Type.Union([
+const commercePickupFulfillmentLifecycleV1Schema = Type.Union([
   ...preparedFulfillmentStates,
   ReadonlyOpenObject({
     state: Type.Literal("ready_for_pickup"),
@@ -481,7 +478,7 @@ export type CommercePickupFulfillmentLifecycleV1 = Static<
 >;
 
 /** `parseShippingFulfillmentLifecycle`. */
-export const commerceShippingFulfillmentLifecycleV1Schema = Type.Union([
+const commerceShippingFulfillmentLifecycleV1Schema = Type.Union([
   ...preparedFulfillmentStates,
   ReadonlyOpenObject({
     state: Type.Literal("handed_to_carrier"),
@@ -494,7 +491,7 @@ export type CommerceShippingFulfillmentLifecycleV1 = Static<
 >;
 
 /** `parseLocalDeliveryFulfillmentLifecycle` and the on-premise one. */
-export const commerceLocalDeliveryFulfillmentLifecycleV1Schema = Type.Union([
+const commerceLocalDeliveryFulfillmentLifecycleV1Schema = Type.Union([
   ...preparedFulfillmentStates,
   completedFulfillmentState,
 ]);
@@ -505,14 +502,14 @@ export type CommerceOnPremiseFulfillmentLifecycleV1 =
   CommerceLocalDeliveryFulfillmentLifecycleV1;
 
 /** `parseImmediateHandoffFulfillmentLifecycle`. */
-export const commerceImmediateHandoffFulfillmentLifecycleV1Schema =
+const commerceImmediateHandoffFulfillmentLifecycleV1Schema =
   Type.Union([...requestedFulfillmentStates, completedFulfillmentState]);
 export type CommerceImmediateHandoffFulfillmentLifecycleV1 = Static<
   typeof commerceImmediateHandoffFulfillmentLifecycleV1Schema
 >;
 
 /** `parseFulfillmentLineItem`. */
-export const commerceFulfillmentLineItemV1Schema = ReadonlyOpenObject({
+const commerceFulfillmentLineItemV1Schema = ReadonlyOpenObject({
   lineItemId: text,
   quantity: PositiveInteger,
 });
@@ -574,7 +571,7 @@ export type CommerceFulfillmentV1 = Static<
 >;
 
 /** `parseTrackingEventKind`. */
-export const commerceTrackingEventKindV1Schema = Type.Union([
+const commerceTrackingEventKindV1Schema = Type.Union([
   ReadonlyOpenObject({ kind: Type.Literal("label_created") }),
   ReadonlyOpenObject({ kind: Type.Literal("in_transit") }),
   ReadonlyOpenObject({
@@ -589,7 +586,7 @@ export type CommerceTrackingEventKindV1 = Static<
 >;
 
 /** `parseTrackingEvent`. */
-export const commerceTrackingEventV1Schema = ReadonlyOpenObject({
+const commerceTrackingEventV1Schema = ReadonlyOpenObject({
   id: text,
   occurredAt: utcTimestampSchema,
   kind: commerceTrackingEventKindV1Schema,
@@ -632,7 +629,7 @@ export const commerceShipmentV1Schema = Type.Union([
 export type CommerceShipmentV1 = Static<typeof commerceShipmentV1Schema>;
 
 /** `parseResources`: orders and their effects are optional. */
-export const commerceResourcesV1Schema = ReadonlyOpenObject({
+const commerceResourcesV1Schema = ReadonlyOpenObject({
   locations: ImmutableArray(wireLocationSchema),
   salesChannels: ImmutableArray(wireSalesChannelSchema),
   products: ImmutableArray(commerceProductV1Schema),
@@ -696,7 +693,7 @@ export type CommerceInventoryLotV1 = Static<
 >;
 
 /** `parseLotAllocation`. */
-export const commerceLotAllocationV1Schema = ReadonlyOpenObject({
+const commerceLotAllocationV1Schema = ReadonlyOpenObject({
   lotId: text,
   quantity: Type.Refine(wireQuantitySchema, hasPositiveAmount, amountError),
 });
@@ -705,7 +702,7 @@ export type CommerceLotAllocationV1 = Static<
 >;
 
 /** `parseStockCountReason`. */
-export const commerceStockCountReasonSchema = ReadonlyOpenObject({
+const commerceStockCountReasonSchema = ReadonlyOpenObject({
   kind: Type.Literal("stock_count"),
   countId: text,
   explanation: text,
@@ -942,11 +939,6 @@ function lotAllocationError(): string {
   return "the lot allocations must sum to the movement quantity";
 }
 
-// Parsers of the records above (Plan 78 step 2).
-export const parseCommerceProductDetailsV1 = recordParser(
-  commerceProductDetailsV1Schema,
-  "product",
-);
 export const parseCommerceProductV1 = recordParser(
   commerceProductV1Schema,
   "product",
@@ -954,14 +946,6 @@ export const parseCommerceProductV1 = recordParser(
 export const parseCommerceVariantV1 = recordParser(
   commerceVariantV1Schema,
   "variant",
-);
-export const parseCommerceVariantOptionV1 = recordParser(
-  commerceVariantOptionV1Schema,
-  "variant.option",
-);
-export const parseCommerceVariantMediaV1 = recordParser(
-  commerceVariantMediaV1Schema,
-  "variant.media",
 );
 export const parseCommerceLocationV1 = recordParser(
   wireLocationSchema,
@@ -975,10 +959,6 @@ export const parseCommerceInventoryItemV1 = recordParser(
   commerceInventoryItemV1Schema,
   "inventoryItem",
 );
-export const parseCommerceInventoryTrackingV1 = recordParser(
-  wireInventoryTrackingSchema,
-  "inventoryItem.tracking",
-);
 export const parseCommerceOfferV1 = recordParser(wireOfferSchema, "offer");
 export const parseCommerceInventoryPositionV1 = recordParser(
   commerceInventoryPositionV1Schema,
@@ -987,10 +967,6 @@ export const parseCommerceInventoryPositionV1 = recordParser(
 export const parseCommerceOrderV1 = recordParser(
   commerceOrderV1Schema,
   "order",
-);
-export const parseCommerceBuyerV1 = recordParser(
-  wireBuyerSchema,
-  "order.buyer",
 );
 export const parseCommercePaymentV1 = recordParser(
   commercePaymentV1Schema,
@@ -1047,20 +1023,6 @@ const fieldRecordParsers = new WeakMap<
   Map<string, (input: unknown) => ContractDecodeResult<unknown>>
 >();
 
-/** `parseCompareAtPrice`: none, or a positive price in the offer currency. */
-export function compareAtPriceParser(
-  currency: unknown,
-): (input: unknown) => ContractDecodeResult<CommerceCompareAtPriceV1> {
-  return recordParser(
-    Type.Refine(
-      commerceCompareAtPriceV1Schema,
-      usesCurrency.bind(undefined, currency),
-      compareAtCurrencyError,
-    ),
-    "offer.compareAtPrice",
-  );
-}
-
 export const commerceCompareAtPriceV1Schema = Type.Union(
   [
     ReadonlyOpenObject({
@@ -1071,19 +1033,5 @@ export const commerceCompareAtPriceV1Schema = Type.Union(
   ],
   { default: null },
 );
-export type CommerceCompareAtPriceV1 = Static<
-  typeof commerceCompareAtPriceV1Schema
->;
 
-function usesCurrency(
-  currency: unknown,
-  price: CommerceCompareAtPriceV1,
-): boolean {
-  return price === null || price.currency === currency;
-}
-
-function compareAtCurrencyError(): string {
-  return "must use the offer currency";
-}
-
-export { commerceOrderMarketV1Schema, type CommerceOrderMarketV1 };
+export { type CommerceOrderMarketV1 };

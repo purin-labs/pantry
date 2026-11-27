@@ -151,9 +151,6 @@ export type CommerceWebhookSecretRotatedV1 = Readonly<{
   secret: string | null;
 }>;
 
-/** The longest time that a previous secret keeps signing posts. */
-export const WEBHOOK_PREVIOUS_SECRET_MAX_SECONDS = 86_400;
-
 export function parseCreateWebhookSubscriptionCommand(value: unknown): CreateCommerceWebhookSubscriptionV1 {
   return decodeRecord(parseCreateCommerceWebhookSubscriptionV1Record, value);
 }

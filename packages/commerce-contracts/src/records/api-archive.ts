@@ -24,7 +24,7 @@ import {
 
 const text = normalizedTextSchema;
 
-export const commerceArchiveFileV1Schema = ReadonlyStrictObject({
+const commerceArchiveFileV1Schema = ReadonlyStrictObject({
   fileKey: text,
   kind: Type.Union([Type.Literal("orders"), Type.Literal("events")]),
   month: text,
@@ -37,7 +37,7 @@ export type CommerceArchiveFileV1 = Static<
   typeof commerceArchiveFileV1Schema
 >;
 
-export const commerceArchiveLocationV1Schema = ReadonlyStrictObject({
+const commerceArchiveLocationV1Schema = ReadonlyStrictObject({
   fileKey: text,
   offset: NonNegativeInteger,
   length: PositiveInteger,
@@ -47,7 +47,7 @@ export type CommerceArchiveLocationV1 = Static<
   typeof commerceArchiveLocationV1Schema
 >;
 
-export const commerceArchiveRunV1Schema = ReadonlyStrictObject({
+const commerceArchiveRunV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.archive-run.v1"),
   files: ImmutableArray(commerceArchiveFileV1Schema),
   orders: NonNegativeInteger,
@@ -57,7 +57,7 @@ export type CommerceArchiveRunV1 = Static<
   typeof commerceArchiveRunV1Schema
 >;
 
-export const commerceOrderRecordV1Schema = ReadonlyStrictObject({
+const commerceOrderRecordV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.order-record.v1"),
   source: Type.Union([Type.Literal("live"), Type.Literal("archived")]),
   archive: Nullable(commerceArchiveLocationV1Schema),

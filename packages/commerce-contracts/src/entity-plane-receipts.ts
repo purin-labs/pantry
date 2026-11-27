@@ -41,59 +41,58 @@ import { validTimestamp } from "./commerce-timestamp.ts";
 import { cursorRefusal } from "./cursor-values.ts";
 
 export const merchantRevisionSchema = revisionSchema<"MerchantRevision">();
-export const commerceEntityPlaneDeliveryIdSchema =
+const commerceEntityPlaneDeliveryIdSchema =
   queryIdentitySchema<"CommerceEntityPlaneDeliveryId">();
-export const commerceMutationReceiptKeyIdSchema =
+const commerceMutationReceiptKeyIdSchema =
   queryIdentitySchema<"CommerceMutationReceiptKeyId">();
-export const commerceMutationReceiptSignatureSchema =
+const commerceMutationReceiptSignatureSchema =
   queryIdentitySchema<"CommerceMutationReceiptSignature">();
-export const commerceMutationReceiptSignatureAlgorithmSchema =
-  Type.Literal("ed25519");
-export const commerceMutationReceiptOutcomeSchema = Type.Enum([
+const commerceMutationReceiptSignatureAlgorithmSchema = Type.Literal("ed25519");
+const commerceMutationReceiptOutcomeSchema = Type.Enum([
   "applied",
   "already_applied",
 ]);
 const commandIdSchema = queryIdentitySchema<"CommerceCommandId">();
 const entityRevisionSchema = revisionSchema<"CommerceEntityRevision">();
 const entryRevisionSchema = revisionSchema<"CommerceListEntryRevision">();
-export const customEntityMutationTargetSchema = StrictObject({
+const customEntityMutationTargetSchema = StrictObject({
   kind: Type.Literal("custom_entity"),
   entityRef: customCommerceEntityRefSchema,
   revision: entityRevisionSchema,
 });
-export const customRelationshipMutationTargetSchema = StrictObject({
+const customRelationshipMutationTargetSchema = StrictObject({
   kind: Type.Literal("custom_relationship"),
   relationship: customRelationshipRefSchema,
 });
-export const commerceListMutationTargetSchema = StrictObject({
+const commerceListMutationTargetSchema = StrictObject({
   kind: Type.Literal("commerce_list"),
   listId: commerceListIdSchema,
   revision: revisionSchema<"CommerceListRevision">(),
 });
-export const commerceListEntryMutationTargetSchema = StrictObject({
+const commerceListEntryMutationTargetSchema = StrictObject({
   kind: Type.Literal("commerce_list_entry"),
   entry: commerceListEntryRefSchema,
   revision: entryRevisionSchema,
 });
-export const savedCommerceViewMutationTargetSchema = StrictObject({
+const savedCommerceViewMutationTargetSchema = StrictObject({
   kind: Type.Literal("saved_commerce_view"),
   viewId: savedCommerceViewIdSchema,
   revision: revisionSchema<"SavedCommerceViewRevision">(),
 });
-export const customEntityTypeMutationTargetSchema = StrictObject({
+const customEntityTypeMutationTargetSchema = StrictObject({
   kind: Type.Literal("custom_entity_type"),
   ...authorityTargetSchemas.custom_entity_type_publish.properties,
 });
-export const customRelationshipDefinitionMutationTargetSchema = StrictObject({
+const customRelationshipDefinitionMutationTargetSchema = StrictObject({
   kind: Type.Literal("custom_relationship_definition"),
   definitionId: queryIdentitySchema<"RelationshipDefinitionId">(),
   revision: revisionSchema<"RelationshipDefinitionRevision">(),
 });
-export const systemEntityExtensionSchemaMutationTargetSchema = StrictObject({
+const systemEntityExtensionSchemaMutationTargetSchema = StrictObject({
   kind: Type.Literal("system_entity_extension_schema"),
   ...authorityTargetSchemas.system_entity_extension_schema_publish.properties,
 });
-export const commerceMutationTargetSchema = Type.Union([
+const commerceMutationTargetSchema = Type.Union([
   customEntityMutationTargetSchema,
   customRelationshipMutationTargetSchema,
   commerceListMutationTargetSchema,
@@ -106,7 +105,7 @@ export const commerceMutationTargetSchema = Type.Union([
 export type CommerceMutationTarget = StrictUnion<
   Static<typeof commerceMutationTargetSchema>
 >;
-export const commerceMutationReceiptSignerSchema = StrictObject({
+const commerceMutationReceiptSignerSchema = StrictObject({
   keyId: commerceMutationReceiptKeyIdSchema,
   algorithm: commerceMutationReceiptSignatureAlgorithmSchema,
   signature: commerceMutationReceiptSignatureSchema,
@@ -119,10 +118,6 @@ const receiptFields = {
   committedAt: Type.String(),
   deliveryId: Type.Union([commerceEntityPlaneDeliveryIdSchema, Type.Null()]),
 };
-export const commerceMutationReceiptSigningEnvelopeV1Schema = StrictObject({
-  ...receiptFields,
-  signer: Type.Optional(Type.Never()),
-});
 export const commerceMutationReceiptV1Schema = StrictObject({
   ...receiptFields,
   signer: commerceMutationReceiptSignerSchema,
@@ -137,23 +132,17 @@ export type CommerceMutationReceiptKeyId = Static<
 export type CommerceMutationReceiptSignature = Static<
   typeof commerceMutationReceiptSignatureSchema
 >;
-export type CommerceMutationReceiptSignatureAlgorithm = Static<
-  typeof commerceMutationReceiptSignatureAlgorithmSchema
->;
 export type CommerceMutationReceiptOutcome = Static<
   typeof commerceMutationReceiptOutcomeSchema
 >;
 export type CommerceMutationReceiptSigner = Static<
   typeof commerceMutationReceiptSignerSchema
 >;
-export type CommerceMutationReceiptSigningEnvelopeV1 = Static<
-  typeof commerceMutationReceiptSigningEnvelopeV1Schema
->;
 export type CommerceMutationReceiptV1 = Static<
   typeof commerceMutationReceiptV1Schema
 >;
 
-export const commerceMutationTargetWireSchema = Type.Union([
+const commerceMutationTargetWireSchema = Type.Union([
   StrictObject({
     kind: Type.Literal("custom_entity"),
     entityRef: customEntityRefWireSchema,
@@ -208,7 +197,7 @@ export const mutationReceiptWireSchema = StrictObject({
   signer: signerWire,
 });
 
-export function parseCommerceMutationTarget(
+function parseCommerceMutationTarget(
   input: unknown,
 ): ContractDecodeResult<CommerceMutationTarget> {
   const parsed = parseContract(

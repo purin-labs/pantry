@@ -15,7 +15,7 @@ const IDENTITY_MAX_LENGTH = 255;
 const COUNTRY_PATTERN = /^[A-Z]{2}$/u;
 const CURRENCY_PATTERN = /^[A-Z]{3}$/u;
 
-export type PaymentBindingParseError = Readonly<{
+type PaymentBindingParseError = Readonly<{
   code: "payment_binding_invalid";
   field: string;
 }>;
@@ -23,25 +23,6 @@ export type PaymentBindingParseError = Readonly<{
 type PaymentBindingParseResult<TValue> =
   | Readonly<{ ok: true; value: TValue }>
   | Readonly<{ ok: false; error: PaymentBindingParseError }>;
-
-export function parseCheckoutPaymentProviderBinding(
-  raw: unknown,
-): PaymentBindingParseResult<CheckoutPaymentProviderBinding> {
-  if (!isRecord(raw)) return invalidBinding("binding");
-  const provider = readText(raw.provider, "binding.provider");
-  if (!provider.ok) return provider;
-  switch (provider.value) {
-    case "stripe_online":
-    case "gmo_pg_online":
-    case "square_online":
-      return parseOnlinePaymentBinding(raw);
-    case "square_terminal":
-    case "gmo_stera":
-      return parseInPersonPaymentBinding(raw);
-    default:
-      return invalidBinding("binding.provider");
-  }
-}
 
 export function isOnlinePaymentBinding(
   binding: CheckoutPaymentProviderBinding,

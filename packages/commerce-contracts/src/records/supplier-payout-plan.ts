@@ -1,7 +1,7 @@
 // Plan 78: generated once from the ts-rs bindings of the Rust contracts.
 // TypeScript is now the source; edit these schemas by hand.
 import { Type, type Static } from "typebox";
-import { OpenObject, recordParser } from "@purin-labs/contract-schema";
+import { OpenObject } from "@purin-labs/contract-schema";
 import {
   commerceMerchantIdSchema,
   integrationAccountIdSchema,
@@ -19,14 +19,13 @@ import {
  * An exact decimal FX rate. Rates are compared and re-checked against
  * provider responses, so they are never floating point.
  */
-export const decimalRateSchema = Type.String();
-export type DecimalRate = Static<typeof decimalRateSchema>;
+const decimalRateSchema = Type.String();
 
 /**
  * Who the payout is for, shared by both rails. These identities are the same
  * question on every provider, so they are not duplicated per branch.
  */
-export const supplierPayoutSubjectSchema = OpenObject({
+const supplierPayoutSubjectSchema = OpenObject({
   payoutId: resourceIdSchema,
   organisationId: organisationIdSchema,
   merchantId: commerceMerchantIdSchema,
@@ -34,24 +33,22 @@ export const supplierPayoutSubjectSchema = OpenObject({
   payableId: resourceIdSchema,
   purchaseRequestId: resourceIdSchema,
 });
-export type SupplierPayoutSubject = Static<typeof supplierPayoutSubjectSchema>;
 
 /**
  * A fee the provider quoted, and when it was seen. A GMO fee is observed
  * before approval rather than locked by the provider, so the observation time
  * is part of the evidence.
  */
-export const observedProviderFeeSchema = OpenObject({
+const observedProviderFeeSchema = OpenObject({
   amount: moneySchema,
   observedAt: commerceTimestampSchema,
 });
-export type ObservedProviderFee = Static<typeof observedProviderFeeSchema>;
 
 /**
  * What the approval authorized, and until when. A plan whose deadline has
  * passed is not executable and returns to proposal preparation.
  */
-export const supplierPayoutApprovalSealSchema = OpenObject({
+const supplierPayoutApprovalSealSchema = OpenObject({
   approvalDigest: Type.String(),
   executionDeadline: commerceTimestampSchema,
   idempotencyKey: Type.String(),
@@ -63,7 +60,7 @@ export type SupplierPayoutApprovalSeal = Static<
 /**
  * A domestic JPY transfer from the merchant's own GMO Aozora account.
  */
-export const gmoAozoraPayoutPlanSchema = OpenObject({
+const gmoAozoraPayoutPlanSchema = OpenObject({
   subject: supplierPayoutSubjectSchema,
   integrationAccountId: integrationAccountIdSchema,
   sourceAccountId: resourceIdSchema,
@@ -77,12 +74,11 @@ export const gmoAozoraPayoutPlanSchema = OpenObject({
   supplierReference: Type.String(),
   seal: supplierPayoutApprovalSealSchema,
 });
-export type GmoAozoraPayoutPlan = Static<typeof gmoAozoraPayoutPlanSchema>;
 
 /**
  * A cross-border transfer through the merchant's Wise enterprise profile.
  */
-export const wiseBusinessPayoutPlanSchema = OpenObject({
+const wiseBusinessPayoutPlanSchema = OpenObject({
   subject: supplierPayoutSubjectSchema,
   integrationAccountId: integrationAccountIdSchema,
   profileId: resourceIdSchema,
@@ -106,15 +102,12 @@ export const wiseBusinessPayoutPlanSchema = OpenObject({
   supplierReference: Type.String(),
   seal: supplierPayoutApprovalSealSchema,
 });
-export type WiseBusinessPayoutPlan = Static<
-  typeof wiseBusinessPayoutPlanSchema
->;
 
 /**
  * The exact instruction handed to the executor. Adding a rail means adding a
  * branch here, which forces every consumer to handle it.
  */
-export const supplierPayoutExecutionPlanSchema = Type.Union([
+const supplierPayoutExecutionPlanSchema = Type.Union([
   Type.Intersect([
     OpenObject({ kind: Type.Literal("gmo_aozora") }),
     gmoAozoraPayoutPlanSchema,
@@ -127,19 +120,3 @@ export const supplierPayoutExecutionPlanSchema = Type.Union([
 export type SupplierPayoutExecutionPlan = Static<
   typeof supplierPayoutExecutionPlanSchema
 >;
-
-// Parsers of the records above (Plan 78 step 2).
-export const parseSupplierPayoutSubject = recordParser(
-  supplierPayoutSubjectSchema,
-);
-export const parseObservedProviderFee = recordParser(observedProviderFeeSchema);
-export const parseSupplierPayoutApprovalSeal = recordParser(
-  supplierPayoutApprovalSealSchema,
-);
-export const parseGmoAozoraPayoutPlan = recordParser(gmoAozoraPayoutPlanSchema);
-export const parseWiseBusinessPayoutPlan = recordParser(
-  wiseBusinessPayoutPlanSchema,
-);
-export const parseSupplierPayoutExecutionPlan = recordParser(
-  supplierPayoutExecutionPlanSchema,
-);

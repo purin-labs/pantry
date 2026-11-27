@@ -59,7 +59,7 @@ function sameText(value: string): string {
   return value;
 }
 
-export const commercePaymentMoneyV1Schema = ReadonlyStrictObject({
+const commercePaymentMoneyV1Schema = ReadonlyStrictObject({
   amountMinor: PositiveInteger,
   currency: Type.String({ pattern: "^[A-Z]{3}$" }),
 });
@@ -67,7 +67,7 @@ export type CommercePaymentMoneyV1 = Static<
   typeof commercePaymentMoneyV1Schema
 >;
 
-export const commercePaymentClientConfirmationV1Schema = Type.Union([
+const commercePaymentClientConfirmationV1Schema = Type.Union([
   ReadonlyStrictObject({ kind: Type.Literal("provider_ui_completed") }),
   ReadonlyStrictObject({
     kind: Type.Literal("square_source_token"),
@@ -78,7 +78,7 @@ export type CommercePaymentClientConfirmationV1 = Static<
   typeof commercePaymentClientConfirmationV1Schema
 >;
 
-export const commercePaymentPublicConfigurationV1Schema = Type.Union([
+const commercePaymentPublicConfigurationV1Schema = Type.Union([
   ReadonlyStrictObject({
     provider: Type.Literal("stripe_online"),
     clientSecret: boundedTextSchema(512),
@@ -103,7 +103,7 @@ export type CommercePaymentPublicConfigurationV1 = Static<
   typeof commercePaymentPublicConfigurationV1Schema
 >;
 
-export const commercePaymentPublicSessionV1Schema = Type.Union([
+const commercePaymentPublicSessionV1Schema = Type.Union([
   ReadonlyStrictObject({
     kind: Type.Literal("embedded_public_session"),
     providerSessionReference: text,
@@ -122,7 +122,7 @@ export type CommercePaymentPublicSessionV1 = Static<
   typeof commercePaymentPublicSessionV1Schema
 >;
 
-export const commercePaymentSessionResultV1Schema = Type.Union([
+const commercePaymentSessionResultV1Schema = Type.Union([
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.payment-session-result.v1"),
     kind: Type.Literal("ready"),
@@ -140,7 +140,7 @@ export type CommercePaymentSessionResultV1 = Static<
   typeof commercePaymentSessionResultV1Schema
 >;
 
-export const commerceInPersonCollectionSessionV1Schema = Type.Union([
+const commerceInPersonCollectionSessionV1Schema = Type.Union([
   ReadonlyStrictObject({
     kind: Type.Literal("server_terminal_checkout"),
     providerCheckoutReference: text,
@@ -176,7 +176,7 @@ export type CommerceInPersonCollectionSessionV1 = Static<
   typeof commerceInPersonCollectionSessionV1Schema
 >;
 
-export const commerceInPersonCollectionResultV1Schema = Type.Union([
+const commerceInPersonCollectionResultV1Schema = Type.Union([
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.in-person-collection-result.v1"),
     kind: Type.Literal("ready"),
@@ -194,7 +194,7 @@ export type CommerceInPersonCollectionResultV1 = Static<
   typeof commerceInPersonCollectionResultV1Schema
 >;
 
-export const commercePaymentRefundResultV1Schema = Type.Union([
+const commercePaymentRefundResultV1Schema = Type.Union([
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.payment-refund-result.v1"),
     kind: Type.Literal("refunded"),
@@ -224,7 +224,7 @@ export type CommercePaymentRefundResultV1 = Static<
   typeof commercePaymentRefundResultV1Schema
 >;
 
-export const createCommerceBuyerPaymentSessionV1Schema = ReadonlyStrictObject(
+const createCommerceBuyerPaymentSessionV1Schema = ReadonlyStrictObject(
   {
     schemaVersion: Type.Literal("commerce.create-buyer-payment-session.v1"),
     idempotencyKey: text,
@@ -237,7 +237,7 @@ export type CreateCommerceBuyerPaymentSessionV1 = Static<
   typeof createCommerceBuyerPaymentSessionV1Schema
 >;
 
-export const reconcileCommerceBuyerPaymentV1Schema = ReadonlyStrictObject({
+const reconcileCommerceBuyerPaymentV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.reconcile-buyer-payment.v1"),
   idempotencyKey: text,
   checkoutRevision: PositiveInteger,
@@ -248,7 +248,7 @@ export type ReconcileCommerceBuyerPaymentV1 = Static<
   typeof reconcileCommerceBuyerPaymentV1Schema
 >;
 
-export const commerceBuyerPaymentSessionV1Schema = Type.Union([
+const commerceBuyerPaymentSessionV1Schema = Type.Union([
   ReadonlyStrictObject({
     schemaVersion: Type.Literal("commerce.buyer-payment-session.v1"),
     state: Type.Literal("ready"),
@@ -273,7 +273,7 @@ export type CommerceBuyerPaymentSessionV1 = Static<
  * mutation and, when it is ready, the terminal session that collects it.
  * Its text and timestamps follow the admin readers in wire-readers.ts.
  */
-export const commerceInPersonCheckoutPaymentCollectionV1Schema = Type.Union([
+const commerceInPersonCheckoutPaymentCollectionV1Schema = Type.Union([
   ReadonlyStrictObject({
     schemaVersion: Type.Literal(
       "commerce.in-person-checkout-payment-collection.v1",
@@ -307,9 +307,6 @@ export const commerceInPersonCheckoutPaymentCollectionV1Schema = Type.Union([
     error: commerceMutationErrorV1Schema,
   }),
 ]);
-export type CommerceInPersonCheckoutPaymentCollectionV1 = Static<
-  typeof commerceInPersonCheckoutPaymentCollectionV1Schema
->;
 
 // Parsers of the client API types (Plan 78 step 2).
 export const parseCreateCommerceBuyerPaymentSessionV1 = wireRecordParser(
@@ -320,15 +317,6 @@ export const parseReconcileCommerceBuyerPaymentV1 = wireRecordParser(
 );
 export const parseCommerceBuyerPaymentSessionV1 = wireRecordParser(
   commerceBuyerPaymentSessionV1Schema,
-);
-export const parseCommerceInPersonCollectionResultV1 = wireRecordParser(
-  commerceInPersonCollectionResultV1Schema,
-);
-export const parseCommercePaymentRefundResultV1 = wireRecordParser(
-  commercePaymentRefundResultV1Schema,
-);
-export const parseCommercePaymentSessionResultV1 = wireRecordParser(
-  commercePaymentSessionResultV1Schema,
 );
 export const parseCommerceInPersonCheckoutPaymentCollectionV1 =
   wireRecordParser(commerceInPersonCheckoutPaymentCollectionV1Schema);

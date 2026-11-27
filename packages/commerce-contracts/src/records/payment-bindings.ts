@@ -7,7 +7,7 @@ import { currencyCodeSchema } from "./money.ts";
 
 const countryCodeSchema = Type.String();
 
-export const paymentEnvironmentSchema = Type.Union([
+const paymentEnvironmentSchema = Type.Union([
   Type.Literal("development"),
   Type.Literal("production"),
 ]);
@@ -26,7 +26,7 @@ export type PaymentProviderAccountBinding = Static<
 >;
 
 /** The provider account of a checkout payment (`parsePaymentProviderAccountBinding`). */
-export const paymentAccountRecordSchema = StrictObject({
+const paymentAccountRecordSchema = StrictObject({
   integrationAccountId: identityTextSchema,
   providerAccountId: identityTextSchema,
   environment: paymentEnvironmentSchema,
@@ -35,19 +35,15 @@ export const paymentAccountRecordSchema = StrictObject({
   currency: currencyCodeTextSchema,
 });
 
-export const stripeOnlineCollectionSchema = Type.Union([
+const stripeOnlineCollectionSchema = Type.Union([
   Type.Literal("embedded_tokenization"),
   Type.Literal("hosted_redirect"),
 ]);
-export type StripeOnlineCollection = Static<
-  typeof stripeOnlineCollectionSchema
->;
 
-export const gmoPgOnlineCollectionSchema = Type.Union([
+const gmoPgOnlineCollectionSchema = Type.Union([
   Type.Literal("embedded_tokenization"),
   Type.Literal("hosted_redirect"),
 ]);
-export type GmoPgOnlineCollection = Static<typeof gmoPgOnlineCollectionSchema>;
 
 export const onlinePaymentBindingSchema = Type.Union([
   StrictObject({
@@ -76,10 +72,10 @@ export type OnlinePaymentBinding = Static<typeof onlinePaymentBindingSchema>;
  * on a Square Reader (Plan 90 Phase 3B). Both stay the `square_terminal`
  * provider, so a stored payment attempt keeps its provider value.
  */
-export const squareServerTerminalTransportSchema =
+const squareServerTerminalTransportSchema =
   Type.Literal("server_terminal");
-export const squarePosAppTransportSchema = Type.Literal("client_app_handoff");
-export const squareTerminalTransportSchema = Type.Union([
+const squarePosAppTransportSchema = Type.Literal("client_app_handoff");
+const squareTerminalTransportSchema = Type.Union([
   squareServerTerminalTransportSchema,
   squarePosAppTransportSchema,
 ]);
@@ -87,7 +83,7 @@ export type SquareTerminalTransport = Static<
   typeof squareTerminalTransportSchema
 >;
 
-export const gmoSteraTransportSchema = Type.Literal("lan_gateway");
+const gmoSteraTransportSchema = Type.Literal("lan_gateway");
 export type GmoSteraTransport = Static<typeof gmoSteraTransportSchema>;
 
 export const inPersonTerminalTransportSchema = Type.Union([

@@ -23,10 +23,6 @@ export const commerceQueryFingerprintSchema = Type.Unsafe<
 );
 export const commerceQuerySemanticsVersionSchema = Type.Literal("v1");
 export const commerceOrderingVersionSchema = Type.Literal("v1");
-const commerceReadWatermarkKindSchema = Type.Enum([
-  "commerce_native",
-  "provider_backed",
-]);
 export const commerceReadWatermarkSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("commerce_native"),
@@ -42,18 +38,7 @@ export const commerceReadWatermarkSchema = Type.Union([
 export type CommerceSnapshotRevision = Static<
   typeof commerceSnapshotRevisionSchema
 >;
-export type CommerceQueryFingerprint = Static<
-  typeof commerceQueryFingerprintSchema
->;
-export type CommerceQuerySemanticsVersion = Static<
-  typeof commerceQuerySemanticsVersionSchema
->;
-export type CommerceOrderingVersion = Static<
-  typeof commerceOrderingVersionSchema
->;
-export type CommerceReadWatermarkKind = Static<
-  typeof commerceReadWatermarkKindSchema
->;
+type CommerceQueryFingerprint = Static<typeof commerceQueryFingerprintSchema>;
 export type CommerceReadWatermark = StrictUnion<
   Static<typeof commerceReadWatermarkSchema>
 >;

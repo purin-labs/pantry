@@ -59,7 +59,7 @@ const preparationSchema = Type.Union([
   }),
 ]);
 
-export const commercePickupQueueEntryV1Schema = ReadonlyStrictObject({
+const commercePickupQueueEntryV1Schema = ReadonlyStrictObject({
   orderId: text,
   orderRevision: revision,
   fulfillmentId: text,
@@ -88,7 +88,7 @@ export type CommercePickupQueueEntryV1 = Static<
   typeof commercePickupQueueEntryV1Schema
 >;
 
-export const commercePickupQueueV1Schema = ReadonlyStrictObject({
+const commercePickupQueueV1Schema = ReadonlyStrictObject({
   schemaVersion: Type.Literal("commerce.pickup-queue.v1"),
   merchantId: text,
   merchantRevision: NonNegativeInteger,

@@ -3,9 +3,6 @@ import {
   parseCreateCommerceBuyerPaymentSessionV1 as parseCreateCommerceBuyerPaymentSessionV1Record,
   parseReconcileCommerceBuyerPaymentV1 as parseReconcileCommerceBuyerPaymentV1Record,
   parseCommerceBuyerPaymentSessionV1 as parseCommerceBuyerPaymentSessionV1Record,
-  parseCommerceInPersonCollectionResultV1 as parseCommerceInPersonCollectionResultV1Record,
-  parseCommercePaymentRefundResultV1 as parseCommercePaymentRefundResultV1Record,
-  parseCommercePaymentSessionResultV1 as parseCommercePaymentSessionResultV1Record,
 } from "@purin-labs/commerce-contracts/records/api-payment-session";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 
@@ -162,24 +159,6 @@ export type CommerceBuyerPaymentSessionV1 =
       checkoutId: string;
       retryAfter: string;
     }>;
-
-export function parsePaymentSessionResultV1(
-  raw: unknown,
-): CommercePaymentSessionResultV1 {
-  return decodeRecord(parseCommercePaymentSessionResultV1Record, raw);
-}
-
-export function parseInPersonCollectionResultV1(
-  raw: unknown,
-): CommerceInPersonCollectionResultV1 {
-  return decodeRecord(parseCommerceInPersonCollectionResultV1Record, raw);
-}
-
-export function parsePaymentRefundResultV1(
-  raw: unknown,
-): CommercePaymentRefundResultV1 {
-  return decodeRecord(parseCommercePaymentRefundResultV1Record, raw);
-}
 
 export function parseCreateBuyerPaymentSessionCommand(
   raw: unknown,

@@ -43,28 +43,15 @@ import {
 import { moneySchema } from "./money.ts";
 import {
   checkoutPaymentProviderBindingSchema,
-  gmoPgOnlineCollectionSchema,
-  inPersonPaymentBindingSchema,
   inPersonPaymentMethodSchema,
-  onlinePaymentBindingSchema,
-  paymentEnvironmentSchema,
-  paymentProviderAccountBindingSchema,
-  stripeOnlineCollectionSchema,
 } from "./payment-bindings.ts";
 export {
-  checkoutPaymentProviderBindingSchema,
-  gmoPgOnlineCollectionSchema,
-  gmoSteraTransportSchema,
   inPersonPaymentBindingSchema,
   inPersonPaymentMethodSchema,
   inPersonTerminalTransportSchema,
   onlinePaymentBindingSchema,
-  paymentEnvironmentSchema,
   paymentProviderAccountBindingSchema,
-  squareTerminalTransportSchema,
-  stripeOnlineCollectionSchema,
   type CheckoutPaymentProviderBinding,
-  type GmoPgOnlineCollection,
   type GmoSteraTransport,
   type InPersonPaymentBinding,
   type InPersonPaymentMethod,
@@ -73,7 +60,6 @@ export {
   type PaymentEnvironment,
   type PaymentProviderAccountBinding,
   type SquareTerminalTransport,
-  type StripeOnlineCollection,
 } from "./payment-bindings.ts";
 import { preparationTicketLifecycleSchema } from "./preparation-ticket-lifecycle.ts";
 export * from "./preparation-ticket-lifecycle.ts";
@@ -91,14 +77,13 @@ export const quantityUnitSchema = Type.Union([
 ]);
 export type QuantityUnit = Static<typeof quantityUnitSchema>;
 
-export const availableQuantitySchema = OpenObject({
+const availableQuantitySchema = OpenObject({
   amount: SafeInteger,
   scale: SafeInteger,
   unit: quantityUnitSchema,
 });
-export type AvailableQuantity = Static<typeof availableQuantitySchema>;
 
-export const buyerSchema = Type.Union([
+const buyerSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("identified"),
     customerReference: Type.String(),
@@ -107,14 +92,14 @@ export const buyerSchema = Type.Union([
 ]);
 export type Buyer = Static<typeof buyerSchema>;
 
-export const productSchema = OpenObject({
+const productSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   title: Type.String(),
   description: Type.String(),
 });
 export type Product = Static<typeof productSchema>;
 
-export const productOptionSchema = OpenObject({
+const productOptionSchema = OpenObject({
   name: Type.String(),
   value: Type.String(),
 });
@@ -127,14 +112,14 @@ export const productMediaKindSchema = Type.Union([
 ]);
 export type ProductMediaKind = Static<typeof productMediaKindSchema>;
 
-export const productMediaSchema = OpenObject({
+const productMediaSchema = OpenObject({
   kind: productMediaKindSchema,
   url: Type.String(),
   altText: Type.String(),
 });
 export type ProductMedia = Static<typeof productMediaSchema>;
 
-export const sellableVariantSchema = OpenObject({
+const sellableVariantSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   productId: resourceIdSchema,
   variantId: resourceIdSchema,
@@ -143,7 +128,6 @@ export const sellableVariantSchema = OpenObject({
   options: Type.Array(productOptionSchema),
   media: Type.Array(productMediaSchema),
 });
-export type SellableVariant = Static<typeof sellableVariantSchema>;
 
 export const inventoryItemCategorySchema = Type.Union([
   Type.Literal("ingredient"),
@@ -151,17 +135,13 @@ export const inventoryItemCategorySchema = Type.Union([
   Type.Literal("finished_good"),
   Type.Literal("operating_supply"),
 ]);
-export type InventoryItemCategory = Static<typeof inventoryItemCategorySchema>;
 
 export const inventoryExpiryTrackingSchema = Type.Union([
   Type.Literal("required"),
   Type.Literal("optional"),
 ]);
-export type InventoryExpiryTracking = Static<
-  typeof inventoryExpiryTrackingSchema
->;
 
-export const inventoryTrackingPolicySchema = Type.Union([
+const inventoryTrackingPolicySchema = Type.Union([
   OpenObject({ kind: Type.Literal("aggregate") }),
   OpenObject({
     kind: Type.Literal("lot_tracked"),
@@ -176,11 +156,8 @@ export const inventoryItemLifecycleSchema = Type.Union([
   Type.Literal("active"),
   Type.Literal("inactive"),
 ]);
-export type InventoryItemLifecycle = Static<
-  typeof inventoryItemLifecycleSchema
->;
 
-export const inventoryItemSchema = OpenObject({
+const inventoryItemSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   merchantCode: Type.String(),
   name: Type.String(),
@@ -189,7 +166,6 @@ export const inventoryItemSchema = OpenObject({
   tracking: inventoryTrackingPolicySchema,
   lifecycle: inventoryItemLifecycleSchema,
 });
-export type InventoryItem = Static<typeof inventoryItemSchema>;
 
 export const locationKindSchema = Type.Union([
   Type.Literal("store"),
@@ -199,7 +175,7 @@ export const locationKindSchema = Type.Union([
 ]);
 export type LocationKind = Static<typeof locationKindSchema>;
 
-export const locationLifecycleSchema = Type.Union([
+const locationLifecycleSchema = Type.Union([
   OpenObject({
     state: Type.Literal("active"),
     activeAt: commerceTimestampSchema,
@@ -211,13 +187,12 @@ export const locationLifecycleSchema = Type.Union([
 ]);
 export type LocationLifecycle = Static<typeof locationLifecycleSchema>;
 
-export const locationSchema = OpenObject({
+const locationSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   name: Type.String(),
   kind: locationKindSchema,
   lifecycle: locationLifecycleSchema,
 });
-export type Location = Static<typeof locationSchema>;
 
 export const salesChannelKindSchema = Type.Union([
   Type.Literal("online"),
@@ -227,7 +202,7 @@ export const salesChannelKindSchema = Type.Union([
 ]);
 export type SalesChannelKind = Static<typeof salesChannelKindSchema>;
 
-export const salesChannelLifecycleSchema = Type.Union([
+const salesChannelLifecycleSchema = Type.Union([
   OpenObject({
     state: Type.Literal("active"),
     activeAt: commerceTimestampSchema,
@@ -239,15 +214,14 @@ export const salesChannelLifecycleSchema = Type.Union([
 ]);
 export type SalesChannelLifecycle = Static<typeof salesChannelLifecycleSchema>;
 
-export const salesChannelSchema = OpenObject({
+const salesChannelSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   name: Type.String(),
   kind: salesChannelKindSchema,
   lifecycle: salesChannelLifecycleSchema,
 });
-export type SalesChannel = Static<typeof salesChannelSchema>;
 
-export const sellableVariantAvailabilitySchema = Type.Union([
+const sellableVariantAvailabilitySchema = Type.Union([
   OpenObject({ state: Type.Literal("available") }),
   OpenObject({ state: Type.Literal("unavailable") }),
   OpenObject({
@@ -259,7 +233,7 @@ export type SellableVariantAvailability = Static<
   typeof sellableVariantAvailabilitySchema
 >;
 
-export const offerLifecycleSchema = Type.Union([
+const offerLifecycleSchema = Type.Union([
   OpenObject({
     state: Type.Literal("prepared"),
     preparedAt: commerceTimestampSchema,
@@ -275,7 +249,7 @@ export const offerLifecycleSchema = Type.Union([
 ]);
 export type OfferLifecycle = Static<typeof offerLifecycleSchema>;
 
-export const offerSchema = OpenObject({
+const offerSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   variantId: resourceIdSchema,
   salesChannelId: resourceIdSchema,
@@ -292,7 +266,7 @@ export const quantitySchema = OpenObject({
 });
 export type Quantity = Static<typeof quantitySchema>;
 
-export const inventoryBalanceSchema = Type.Union([
+const inventoryBalanceSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("accounted"),
     onHand: quantitySchema,
@@ -306,7 +280,7 @@ export const inventoryBalanceSchema = Type.Union([
 ]);
 export type InventoryBalance = Static<typeof inventoryBalanceSchema>;
 
-export const inventoryPositionSchema = OpenObject({
+const inventoryPositionSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   inventoryItemId: resourceIdSchema,
   locationId: resourceIdSchema,
@@ -314,7 +288,7 @@ export const inventoryPositionSchema = OpenObject({
 });
 export type InventoryPosition = Static<typeof inventoryPositionSchema>;
 
-export const inventoryReceiptPurchaseSchema = Type.Union([
+const inventoryReceiptPurchaseSchema = Type.Union([
   OpenObject({ kind: Type.Literal("unlinked") }),
   OpenObject({
     kind: Type.Literal("replenishment"),
@@ -322,11 +296,8 @@ export const inventoryReceiptPurchaseSchema = Type.Union([
     entryRevision: SafeInteger,
   }),
 ]);
-export type InventoryReceiptPurchase = Static<
-  typeof inventoryReceiptPurchaseSchema
->;
 
-export const inventoryIncreaseReasonSchema = Type.Union([
+const inventoryIncreaseReasonSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("stock_count"),
     countId: resourceIdSchema,
@@ -346,11 +317,8 @@ export const inventoryIncreaseReasonSchema = Type.Union([
     recipeRevision: SafeInteger,
   }),
 ]);
-export type InventoryIncreaseReason = Static<
-  typeof inventoryIncreaseReasonSchema
->;
 
-export const inventoryDecreaseReasonSchema = Type.Union([
+const inventoryDecreaseReasonSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("stock_count"),
     countId: resourceIdSchema,
@@ -376,28 +344,21 @@ export const inventoryDecreaseReasonSchema = Type.Union([
     recipeRevision: SafeInteger,
   }),
 ]);
-export type InventoryDecreaseReason = Static<
-  typeof inventoryDecreaseReasonSchema
->;
 
-export const lotAllocationSchema = OpenObject({
+const lotAllocationSchema = OpenObject({
   lotId: resourceIdSchema,
   quantity: quantitySchema,
 });
-export type LotAllocation = Static<typeof lotAllocationSchema>;
 
-export const inventoryLotAllocationSchema = Type.Union([
+const inventoryLotAllocationSchema = Type.Union([
   OpenObject({ kind: Type.Literal("not_tracked") }),
   OpenObject({
     kind: Type.Literal("allocated"),
     lots: Type.Array(lotAllocationSchema),
   }),
 ]);
-export type InventoryLotAllocation = Static<
-  typeof inventoryLotAllocationSchema
->;
 
-export const inventoryMovementChangeSchema = Type.Union([
+const inventoryMovementChangeSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("increase"),
     quantity: quantitySchema,
@@ -410,31 +371,24 @@ export const inventoryMovementChangeSchema = Type.Union([
     lotAllocation: inventoryLotAllocationSchema,
   }),
 ]);
-export type InventoryMovementChange = Static<
-  typeof inventoryMovementChangeSchema
->;
 
-export const inventoryMovementProjectionSchema = OpenObject({
+const inventoryMovementProjectionSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   inventoryItemId: resourceIdSchema,
   locationId: resourceIdSchema,
   change: inventoryMovementChangeSchema,
   idempotencyKey: Type.String(),
 });
-export type InventoryMovementProjection = Static<
-  typeof inventoryMovementProjectionSchema
->;
 
-export const inventoryLotExpirySchema = Type.Union([
+const inventoryLotExpirySchema = Type.Union([
   OpenObject({ kind: Type.Literal("not_tracked") }),
   OpenObject({
     kind: Type.Literal("expires"),
     expiresAt: commerceTimestampSchema,
   }),
 ]);
-export type InventoryLotExpiry = Static<typeof inventoryLotExpirySchema>;
 
-export const inventoryLotLifecycleSchema = Type.Union([
+const inventoryLotLifecycleSchema = Type.Union([
   OpenObject({ state: Type.Literal("available") }),
   OpenObject({ state: Type.Literal("depleted") }),
   OpenObject({ state: Type.Literal("quarantined"), reason: Type.String() }),
@@ -442,7 +396,7 @@ export const inventoryLotLifecycleSchema = Type.Union([
 ]);
 export type InventoryLotLifecycle = Static<typeof inventoryLotLifecycleSchema>;
 
-export const inventoryLotProjectionSchema = OpenObject({
+const inventoryLotProjectionSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   lotCode: Type.String(),
   inventoryItemId: resourceIdSchema,
@@ -453,11 +407,8 @@ export const inventoryLotProjectionSchema = OpenObject({
   expiry: inventoryLotExpirySchema,
   lifecycle: inventoryLotLifecycleSchema,
 });
-export type InventoryLotProjection = Static<
-  typeof inventoryLotProjectionSchema
->;
 
-export const onlineOrderConfigurationSchema = Type.Union([
+const onlineOrderConfigurationSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("checkout_profile"),
     checkoutProfile: checkoutProfileReferenceSchema,
@@ -468,7 +419,7 @@ export type OnlineOrderConfiguration = Static<
   typeof onlineOrderConfigurationSchema
 >;
 
-export const orderOriginSchema = Type.Union([
+const orderOriginSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("online"),
     salesChannelId: resourceIdSchema,
@@ -498,13 +449,13 @@ export const orderOriginSchema = Type.Union([
 ]);
 export type OrderOrigin = Static<typeof orderOriginSchema>;
 
-export const inventoryRequirementSchema = OpenObject({
+const inventoryRequirementSchema = OpenObject({
   inventoryItemId: resourceIdSchema,
   quantity: quantitySchema,
 });
 export type InventoryRequirement = Static<typeof inventoryRequirementSchema>;
 
-export const orderLineInventorySchema = Type.Union([
+const orderLineInventorySchema = Type.Union([
   OpenObject({ kind: Type.Literal("untracked") }),
   OpenObject({
     kind: Type.Literal("requirements"),
@@ -513,7 +464,7 @@ export const orderLineInventorySchema = Type.Union([
 ]);
 export type OrderLineInventory = Static<typeof orderLineInventorySchema>;
 
-export const foodServicePreparationSchema = Type.Union([
+const foodServicePreparationSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("immediate_recipe"),
     recipeId: recipeIdSchema,
@@ -525,7 +476,7 @@ export type FoodServicePreparation = Static<
   typeof foodServicePreparationSchema
 >;
 
-export const inventoryRequirementAdjustmentSchema = Type.Union([
+const inventoryRequirementAdjustmentSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("add"),
     inventoryItemId: resourceIdSchema,
@@ -541,7 +492,7 @@ export type InventoryRequirementAdjustment = Static<
   typeof inventoryRequirementAdjustmentSchema
 >;
 
-export const modifierSelectionSnapshotSchema = OpenObject({
+const modifierSelectionSnapshotSchema = OpenObject({
   modifierGroupId: modifierGroupIdSchema,
   modifierGroupRevision: SafeInteger,
   modifierOptionId: modifierOptionIdSchema,
@@ -553,7 +504,7 @@ export type ModifierSelectionSnapshot = Static<
   typeof modifierSelectionSnapshotSchema
 >;
 
-export const orderLineSourceSchema = Type.Union([
+const orderLineSourceSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("catalog"),
     variantId: resourceIdSchema,
@@ -591,7 +542,7 @@ export const orderLineSourceSchema = Type.Union([
 ]);
 export type OrderLineSource = Static<typeof orderLineSourceSchema>;
 
-export const orderLineItemSchema = OpenObject({
+const orderLineItemSchema = OpenObject({
   lineItemId: resourceIdSchema,
   source: orderLineSourceSchema,
   sku: Type.String(),
@@ -605,7 +556,7 @@ export const orderLineItemSchema = OpenObject({
 });
 export type OrderLineItem = Static<typeof orderLineItemSchema>;
 
-export const orderTotalsSchema = OpenObject({
+const orderTotalsSchema = OpenObject({
   subtotal: moneySchema,
   discount: moneySchema,
   tax: moneySchema,
@@ -627,16 +578,14 @@ export const orderAdjustmentKindSchema = Type.Union([
   Type.Literal("dispute"),
   Type.Literal("cancellation"),
 ]);
-export type OrderAdjustmentKind = Static<typeof orderAdjustmentKindSchema>;
 
 export const orderAdjustmentStatusSchema = Type.Union([
   Type.Literal("pending"),
   Type.Literal("completed"),
   Type.Literal("failed"),
 ]);
-export type OrderAdjustmentStatus = Static<typeof orderAdjustmentStatusSchema>;
 
-export const orderAdjustmentSchema = OpenObject({
+const orderAdjustmentSchema = OpenObject({
   adjustmentId: resourceIdSchema,
   kind: orderAdjustmentKindSchema,
   status: orderAdjustmentStatusSchema,
@@ -644,9 +593,8 @@ export const orderAdjustmentSchema = OpenObject({
   amount: moneySchema,
   reason: Type.String(),
 });
-export type OrderAdjustment = Static<typeof orderAdjustmentSchema>;
 
-export const orderLifecycleSchema = Type.Union([
+const orderLifecycleSchema = Type.Union([
   OpenObject({
     state: Type.Literal("pending_confirmation"),
     createdAt: commerceTimestampSchema,
@@ -676,7 +624,7 @@ export const orderLifecycleSchema = Type.Union([
 ]);
 export type OrderLifecycle = Static<typeof orderLifecycleSchema>;
 
-export const commerceOrderSchema = OpenObject({
+const commerceOrderSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   origin: orderOriginSchema,
   buyer: buyerSchema,
@@ -687,7 +635,7 @@ export const commerceOrderSchema = OpenObject({
 });
 export type CommerceOrder = Static<typeof commerceOrderSchema>;
 
-export const paymentLifecycleSchema = Type.Union([
+const paymentLifecycleSchema = Type.Union([
   OpenObject({
     state: Type.Literal("pending"),
     createdAt: commerceTimestampSchema,
@@ -718,7 +666,7 @@ export const paymentLifecycleSchema = Type.Union([
 ]);
 export type PaymentLifecycle = Static<typeof paymentLifecycleSchema>;
 
-export const paymentSchema = OpenObject({
+const paymentSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   orderId: resourceIdSchema,
   amount: moneySchema,
@@ -726,13 +674,13 @@ export const paymentSchema = OpenObject({
 });
 export type Payment = Static<typeof paymentSchema>;
 
-export const fulfillmentLineItemSchema = OpenObject({
+const fulfillmentLineItemSchema = OpenObject({
   lineItemId: resourceIdSchema,
   quantity: SafeInteger,
 });
 export type FulfillmentLineItem = Static<typeof fulfillmentLineItemSchema>;
 
-export const internationalDutyIncotermSchema = Type.Union([
+const internationalDutyIncotermSchema = Type.Union([
   Type.Literal("ddp"),
   Type.Literal("dap"),
 ]);
@@ -740,14 +688,14 @@ export type InternationalDutyIncoterm = Static<
   typeof internationalDutyIncotermSchema
 >;
 
-export const countryCodeSchema = Type.String();
+const countryCodeSchema = Type.String();
 export type CountryCode = Static<typeof countryCodeSchema>;
 
 // The client reads the shipping and checkout records below with the rules of
 // commerce-resources.ts (Plan 78 step 2); these local field schemas carry them.
-export const recordTextSchema = normalizedTextSchema;
-export const recordQuantitySchema = quantityRecordSchema(quantityUnitSchema);
-export const recordMoneySchema = nonNegativeMoneySchema;
+const recordTextSchema = normalizedTextSchema;
+const recordQuantitySchema = quantityRecordSchema(quantityUnitSchema);
+const recordMoneySchema = nonNegativeMoneySchema;
 
 const shippingServiceCodesSchema = Type.Refine(
   Type.Array(recordTextSchema, { minItems: 1 }),
@@ -761,7 +709,7 @@ const destinationCountriesSchema = Type.Refine(
   uniqueValuesError,
 );
 
-export const shippingRouteBindingSchema = Type.Union([
+const shippingRouteBindingSchema = Type.Union([
   StrictObject({
     kind: Type.Literal("domestic_japan"),
     routeId: recordTextSchema,
@@ -791,20 +739,17 @@ export const shippingRouteBindingSchema = Type.Union([
 ]);
 export type ShippingRouteBinding = Static<typeof shippingRouteBindingSchema>;
 
-export const carrierServiceSnapshotSchema = OpenObject({
+const carrierServiceSnapshotSchema = OpenObject({
   code: Type.String(),
   name: Type.String(),
 });
-export type CarrierServiceSnapshot = Static<
-  typeof carrierServiceSnapshotSchema
->;
 
 export const carrierServiceRecordSchema = OpenObject({
   code: recordTextSchema,
   name: recordTextSchema,
 });
 
-export const checkoutLineChargeAllocationSchema = OpenObject({
+const checkoutLineChargeAllocationSchema = OpenObject({
   checkoutLineId: recordTextSchema,
   amount: recordMoneySchema,
 });
@@ -817,7 +762,7 @@ const checkoutLineChargeAllocationsSchema = Type.Array(
   { minItems: 1 },
 );
 
-export const carrierRateSnapshotSchema = Type.Refine(
+const carrierRateSnapshotSchema = Type.Refine(
   OpenObject({
     providerAccountReference: recordTextSchema,
     rateReference: recordTextSchema,
@@ -830,7 +775,7 @@ export const carrierRateSnapshotSchema = Type.Refine(
 );
 export type CarrierRateSnapshot = Static<typeof carrierRateSnapshotSchema>;
 
-export const taxQuoteSnapshotSchema = Type.Refine(
+const taxQuoteSnapshotSchema = Type.Refine(
   OpenObject({
     providerAccountReference: recordTextSchema,
     registrationPolicyReference: recordTextSchema,
@@ -850,7 +795,7 @@ export const dutyIncotermSchema = Type.Union([
 ]);
 export type DutyIncoterm = Static<typeof dutyIncotermSchema>;
 
-export const dutyQuoteSnapshotSchema = Type.Refine(
+const dutyQuoteSnapshotSchema = Type.Refine(
   OpenObject({
     providerAccountReference: recordTextSchema,
     quoteReference: recordTextSchema,
@@ -875,33 +820,27 @@ export type EstimatedDeliverySnapshot = Static<
   typeof estimatedDeliverySnapshotSchema
 >;
 
-export const protectedShippingAddressSchema = OpenObject({
+const protectedShippingAddressSchema = OpenObject({
   protectedAddressReference: recordTextSchema,
   destinationCountry: countryCodeTextSchema,
   addressValidationReference: recordTextSchema,
   addressDigest: sha256HexSchema,
 });
-export type ProtectedShippingAddress = Static<
-  typeof protectedShippingAddressSchema
->;
 
-export const shippingWeightSchema = OpenObject({ grams: PositiveInteger });
-export type ShippingWeight = Static<typeof shippingWeightSchema>;
+const shippingWeightSchema = OpenObject({ grams: PositiveInteger });
 
-export const shippingDimensionsSchema = OpenObject({
+const shippingDimensionsSchema = OpenObject({
   lengthMillimeters: PositiveInteger,
   widthMillimeters: PositiveInteger,
   heightMillimeters: PositiveInteger,
 });
-export type ShippingDimensions = Static<typeof shippingDimensionsSchema>;
 
-export const shippingLineQuantitySchema = OpenObject({
+const shippingLineQuantitySchema = OpenObject({
   checkoutLineId: recordTextSchema,
   quantity: recordQuantitySchema,
 });
-export type ShippingLineQuantity = Static<typeof shippingLineQuantitySchema>;
 
-export const customsLineSnapshotSchema = OpenObject({
+const customsLineSnapshotSchema = OpenObject({
   checkoutLineId: recordTextSchema,
   description: recordTextSchema,
   quantity: recordQuantitySchema,
@@ -910,24 +849,21 @@ export const customsLineSnapshotSchema = OpenObject({
   countryOfOrigin: countryCodeTextSchema,
   hsCode: hsCodeSchema,
 });
-export type CustomsLineSnapshot = Static<typeof customsLineSnapshotSchema>;
 
-export const plannedPackageSchema = OpenObject({
+const plannedPackageSchema = OpenObject({
   packageId: recordTextSchema,
   weight: shippingWeightSchema,
   dimensions: shippingDimensionsSchema,
   lineQuantities: Type.Array(shippingLineQuantitySchema),
   customsLines: Type.Array(customsLineSnapshotSchema),
 });
-export type PlannedPackage = Static<typeof plannedPackageSchema>;
 
 export const packagePlanSnapshotSchema = OpenObject({
   packagePlanDigest: sha256HexSchema,
   package: plannedPackageSchema,
 });
-export type PackagePlanSnapshot = Static<typeof packagePlanSnapshotSchema>;
 
-export const shippingQuoteSnapshotSchema = Type.Refine(
+const shippingQuoteSnapshotSchema = Type.Refine(
   OpenObject({
     shippingQuoteId: recordTextSchema,
     routeBinding: shippingRouteBindingSchema,
@@ -1070,143 +1006,83 @@ export type ShippingFulfillmentBinding = Static<
   typeof shippingFulfillmentBindingSchema
 >;
 
-export const shippingFulfillmentLifecycleSchema = Type.Union([
-  OpenObject({
+// The states that the fulfillment lifecycles share.
+const fulfillmentRequestedState = OpenObject({
     state: Type.Literal("requested"),
     requestedAt: commerceTimestampSchema,
-  }),
-  OpenObject({
+  });
+const fulfillmentPreparingState = OpenObject({
     state: Type.Literal("preparing"),
     startedAt: commerceTimestampSchema,
-  }),
-  OpenObject({
+  });
+const fulfillmentBlockedState = OpenObject({
     state: Type.Literal("blocked"),
     blockedAt: commerceTimestampSchema,
     reason: Type.String(),
-  }),
+  });
+const fulfillmentCompletedState = OpenObject({
+    state: Type.Literal("completed"),
+    completedAt: commerceTimestampSchema,
+  });
+const fulfillmentCancelledState = OpenObject({
+    state: Type.Literal("cancelled"),
+    cancelledAt: commerceTimestampSchema,
+    reason: Type.String(),
+  });
+
+const shippingFulfillmentLifecycleSchema = Type.Union([
+  fulfillmentRequestedState,
+  fulfillmentPreparingState,
+  fulfillmentBlockedState,
   OpenObject({
     state: Type.Literal("handed_to_carrier"),
     handedOverAt: commerceTimestampSchema,
     shipmentId: resourceIdSchema,
   }),
-  OpenObject({
-    state: Type.Literal("cancelled"),
-    cancelledAt: commerceTimestampSchema,
-    reason: Type.String(),
-  }),
+  fulfillmentCancelledState,
 ]);
 export type ShippingFulfillmentLifecycle = Static<
   typeof shippingFulfillmentLifecycleSchema
 >;
 
-export const pickupFulfillmentLifecycleSchema = Type.Union([
-  OpenObject({
-    state: Type.Literal("requested"),
-    requestedAt: commerceTimestampSchema,
-  }),
-  OpenObject({
-    state: Type.Literal("preparing"),
-    startedAt: commerceTimestampSchema,
-  }),
-  OpenObject({
-    state: Type.Literal("blocked"),
-    blockedAt: commerceTimestampSchema,
-    reason: Type.String(),
-  }),
+const pickupFulfillmentLifecycleSchema = Type.Union([
+  fulfillmentRequestedState,
+  fulfillmentPreparingState,
+  fulfillmentBlockedState,
   OpenObject({
     state: Type.Literal("ready_for_pickup"),
     readyAt: commerceTimestampSchema,
   }),
-  OpenObject({
-    state: Type.Literal("completed"),
-    completedAt: commerceTimestampSchema,
-  }),
-  OpenObject({
-    state: Type.Literal("cancelled"),
-    cancelledAt: commerceTimestampSchema,
-    reason: Type.String(),
-  }),
+  fulfillmentCompletedState,
+  fulfillmentCancelledState,
 ]);
 export type PickupFulfillmentLifecycle = Static<
   typeof pickupFulfillmentLifecycleSchema
 >;
 
-export const localDeliveryFulfillmentLifecycleSchema = Type.Union([
-  OpenObject({
-    state: Type.Literal("requested"),
-    requestedAt: commerceTimestampSchema,
-  }),
-  OpenObject({
-    state: Type.Literal("preparing"),
-    startedAt: commerceTimestampSchema,
-  }),
-  OpenObject({
-    state: Type.Literal("blocked"),
-    blockedAt: commerceTimestampSchema,
-    reason: Type.String(),
-  }),
-  OpenObject({
-    state: Type.Literal("completed"),
-    completedAt: commerceTimestampSchema,
-  }),
-  OpenObject({
-    state: Type.Literal("cancelled"),
-    cancelledAt: commerceTimestampSchema,
-    reason: Type.String(),
-  }),
+const localDeliveryFulfillmentLifecycleSchema = Type.Union([
+  fulfillmentRequestedState,
+  fulfillmentPreparingState,
+  fulfillmentBlockedState,
+  fulfillmentCompletedState,
+  fulfillmentCancelledState,
 ]);
-export type LocalDeliveryFulfillmentLifecycle = Static<
-  typeof localDeliveryFulfillmentLifecycleSchema
->;
 
-export const immediateHandoffFulfillmentLifecycleSchema = Type.Union([
-  OpenObject({
-    state: Type.Literal("requested"),
-    requestedAt: commerceTimestampSchema,
-  }),
-  OpenObject({
-    state: Type.Literal("completed"),
-    completedAt: commerceTimestampSchema,
-  }),
-  OpenObject({
-    state: Type.Literal("cancelled"),
-    cancelledAt: commerceTimestampSchema,
-    reason: Type.String(),
-  }),
+const immediateHandoffFulfillmentLifecycleSchema = Type.Union([
+  fulfillmentRequestedState,
+  fulfillmentCompletedState,
+  fulfillmentCancelledState,
 ]);
-export type ImmediateHandoffFulfillmentLifecycle = Static<
-  typeof immediateHandoffFulfillmentLifecycleSchema
->;
 
-export const onPremiseFulfillmentLifecycleSchema = Type.Union([
-  OpenObject({
-    state: Type.Literal("requested"),
-    requestedAt: commerceTimestampSchema,
-  }),
-  OpenObject({
-    state: Type.Literal("preparing"),
-    startedAt: commerceTimestampSchema,
-  }),
-  OpenObject({
-    state: Type.Literal("blocked"),
-    blockedAt: commerceTimestampSchema,
-    reason: Type.String(),
-  }),
-  OpenObject({
-    state: Type.Literal("completed"),
-    completedAt: commerceTimestampSchema,
-  }),
-  OpenObject({
-    state: Type.Literal("cancelled"),
-    cancelledAt: commerceTimestampSchema,
-    reason: Type.String(),
-  }),
+const onPremiseFulfillmentLifecycleSchema = Type.Union([
+  fulfillmentRequestedState,
+  fulfillmentPreparingState,
+  fulfillmentBlockedState,
+  fulfillmentCompletedState,
+  fulfillmentCancelledState,
 ]);
-export type OnPremiseFulfillmentLifecycle = Static<
-  typeof onPremiseFulfillmentLifecycleSchema
->;
 
-export const fulfillmentSchema = Type.Intersect([
+const fulfillmentSchema = Type.Intersect([
   OpenObject({
     provenance: sourceProvenanceSchema,
     orderId: resourceIdSchema,
@@ -1240,13 +1116,12 @@ export const fulfillmentSchema = Type.Intersect([
 ]);
 export type Fulfillment = Static<typeof fulfillmentSchema>;
 
-export const orderLineQuantitySchema = OpenObject({
+const orderLineQuantitySchema = OpenObject({
   orderLineId: recordTextSchema,
   quantity: recordQuantitySchema,
 });
-export type OrderLineQuantity = Static<typeof orderLineQuantitySchema>;
 
-export const shipmentCustomsLineSnapshotSchema = OpenObject({
+const shipmentCustomsLineSnapshotSchema = OpenObject({
   orderLineId: recordTextSchema,
   description: recordTextSchema,
   quantity: recordQuantitySchema,
@@ -1255,9 +1130,6 @@ export const shipmentCustomsLineSnapshotSchema = OpenObject({
   countryOfOrigin: countryCodeTextSchema,
   hsCode: hsCodeSchema,
 });
-export type ShipmentCustomsLineSnapshot = Static<
-  typeof shipmentCustomsLineSnapshotSchema
->;
 
 export const shipmentPackageSchema = OpenObject({
   packageId: recordTextSchema,
@@ -1297,7 +1169,7 @@ export type FirstPartyShipmentLifecycle = Static<
   typeof firstPartyShipmentLifecycleSchema
 >;
 
-export const trackingEventKindSchema = Type.Union([
+const trackingEventKindSchema = Type.Union([
   OpenObject({ kind: Type.Literal("label_created") }),
   OpenObject({ kind: Type.Literal("in_transit") }),
   OpenObject({
@@ -1309,7 +1181,7 @@ export const trackingEventKindSchema = Type.Union([
 ]);
 export type TrackingEventKind = Static<typeof trackingEventKindSchema>;
 
-export const trackingEventSchema = OpenObject({
+const trackingEventSchema = OpenObject({
   eventId: resourceIdSchema,
   occurredAt: commerceTimestampSchema,
   kind: trackingEventKindSchema,
@@ -1345,7 +1217,7 @@ export type ExternalShipmentLifecycle = Static<
   typeof externalShipmentLifecycleSchema
 >;
 
-export const shipmentSchema = Type.Union([
+const shipmentSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("first_party"),
     provenance: sourceProvenanceSchema,
@@ -1369,7 +1241,7 @@ export const shipmentSchema = Type.Union([
 ]);
 export type Shipment = Static<typeof shipmentSchema>;
 
-export const menuScopeSchema = Type.Union([
+const menuScopeSchema = Type.Union([
   OpenObject({ kind: Type.Literal("location"), locationId: resourceIdSchema }),
   OpenObject({
     kind: Type.Literal("location_group"),
@@ -1378,7 +1250,7 @@ export const menuScopeSchema = Type.Union([
 ]);
 export type MenuScope = Static<typeof menuScopeSchema>;
 
-export const menuValiditySchema = Type.Union([
+const menuValiditySchema = Type.Union([
   OpenObject({ kind: Type.Literal("always") }),
   OpenObject({
     kind: Type.Literal("window"),
@@ -1403,7 +1275,7 @@ export const menuValiditySchema = Type.Union([
 ]);
 export type MenuValidity = Static<typeof menuValiditySchema>;
 
-export const menuSectionSchema = OpenObject({
+const menuSectionSchema = OpenObject({
   sectionId: menuSectionIdSchema,
   menuId: menuIdSchema,
   revision: SafeInteger,
@@ -1412,21 +1284,17 @@ export const menuSectionSchema = OpenObject({
 });
 export type MenuSection = Static<typeof menuSectionSchema>;
 
-export const modifierGroupRevisionReferenceSchema = OpenObject({
+const modifierGroupRevisionReferenceSchema = OpenObject({
   modifierGroupId: modifierGroupIdSchema,
   revision: SafeInteger,
 });
-export type ModifierGroupRevisionReference = Static<
-  typeof modifierGroupRevisionReferenceSchema
->;
 
-export const menuEntryLifecycleSchema = Type.Union([
+const menuEntryLifecycleSchema = Type.Union([
   Type.Literal("active"),
   Type.Literal("inactive"),
 ]);
-export type MenuEntryLifecycle = Static<typeof menuEntryLifecycleSchema>;
 
-export const menuEntrySchema = OpenObject({
+const menuEntrySchema = OpenObject({
   menuEntryId: menuEntryIdSchema,
   sectionId: menuSectionIdSchema,
   revision: SafeInteger,
@@ -1439,7 +1307,7 @@ export const menuEntrySchema = OpenObject({
 });
 export type MenuEntry = Static<typeof menuEntrySchema>;
 
-export const menuLifecycleSchema = Type.Union([
+const menuLifecycleSchema = Type.Union([
   OpenObject({ state: Type.Literal("draft") }),
   OpenObject({
     state: Type.Literal("published"),
@@ -1450,9 +1318,8 @@ export const menuLifecycleSchema = Type.Union([
     archivedAt: commerceTimestampSchema,
   }),
 ]);
-export type MenuLifecycle = Static<typeof menuLifecycleSchema>;
 
-export const menuSchema = OpenObject({
+const menuSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   menuId: menuIdSchema,
   revision: SafeInteger,
@@ -1466,7 +1333,7 @@ export const menuSchema = OpenObject({
 });
 export type Menu = Static<typeof menuSchema>;
 
-export const modifierOptionSchema = OpenObject({
+const modifierOptionSchema = OpenObject({
   modifierOptionId: modifierOptionIdSchema,
   name: Type.String(),
   priceDelta: moneySchema,
@@ -1474,7 +1341,7 @@ export const modifierOptionSchema = OpenObject({
 });
 export type ModifierOption = Static<typeof modifierOptionSchema>;
 
-export const modifierGroupRevisionLifecycleSchema = Type.Union([
+const modifierGroupRevisionLifecycleSchema = Type.Union([
   OpenObject({ state: Type.Literal("draft") }),
   OpenObject({
     state: Type.Literal("active"),
@@ -1485,11 +1352,8 @@ export const modifierGroupRevisionLifecycleSchema = Type.Union([
     retiredAt: commerceTimestampSchema,
   }),
 ]);
-export type ModifierGroupRevisionLifecycle = Static<
-  typeof modifierGroupRevisionLifecycleSchema
->;
 
-export const modifierGroupRevisionSchema = OpenObject({
+const modifierGroupRevisionSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   modifierGroupId: modifierGroupIdSchema,
   revision: SafeInteger,
@@ -1501,7 +1365,7 @@ export const modifierGroupRevisionSchema = OpenObject({
 });
 export type ModifierGroupRevision = Static<typeof modifierGroupRevisionSchema>;
 
-export const recipeOutputSchema = Type.Union([
+const recipeOutputSchema = Type.Union([
   OpenObject({ kind: Type.Literal("immediate") }),
   OpenObject({
     kind: Type.Literal("stocked"),
@@ -1511,7 +1375,7 @@ export const recipeOutputSchema = Type.Union([
 ]);
 export type RecipeOutput = Static<typeof recipeOutputSchema>;
 
-export const recipeRevisionLifecycleSchema = Type.Union([
+const recipeRevisionLifecycleSchema = Type.Union([
   OpenObject({ state: Type.Literal("draft") }),
   OpenObject({
     state: Type.Literal("active"),
@@ -1522,11 +1386,8 @@ export const recipeRevisionLifecycleSchema = Type.Union([
     retiredAt: commerceTimestampSchema,
   }),
 ]);
-export type RecipeRevisionLifecycle = Static<
-  typeof recipeRevisionLifecycleSchema
->;
 
-export const recipeRevisionSchema = OpenObject({
+const recipeRevisionSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   recipeId: recipeIdSchema,
   revision: SafeInteger,
@@ -1537,15 +1398,12 @@ export const recipeRevisionSchema = OpenObject({
 });
 export type RecipeRevision = Static<typeof recipeRevisionSchema>;
 
-export const preparationStationLifecycleSchema = Type.Union([
+const preparationStationLifecycleSchema = Type.Union([
   Type.Literal("active"),
   Type.Literal("inactive"),
 ]);
-export type PreparationStationLifecycle = Static<
-  typeof preparationStationLifecycleSchema
->;
 
-export const preparationStationSchema = OpenObject({
+const preparationStationSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   stationId: preparationStationIdSchema,
   locationId: resourceIdSchema,
@@ -1555,7 +1413,7 @@ export const preparationStationSchema = OpenObject({
 });
 export type PreparationStation = Static<typeof preparationStationSchema>;
 
-export const preparationTicketLineSnapshotSchema = OpenObject({
+const preparationTicketLineSnapshotSchema = OpenObject({
   orderLineId: resourceIdSchema,
   menuEntryId: menuEntryIdSchema,
   menuEntryRevision: SafeInteger,
@@ -1564,11 +1422,8 @@ export const preparationTicketLineSnapshotSchema = OpenObject({
   modifiers: Type.Array(modifierSelectionSnapshotSchema),
   requirements: Type.Array(inventoryRequirementSchema),
 });
-export type PreparationTicketLineSnapshot = Static<
-  typeof preparationTicketLineSnapshotSchema
->;
 
-export const preparationTicketSchema = OpenObject({
+const preparationTicketSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   ticketId: preparationTicketIdSchema,
   orderId: resourceIdSchema,
@@ -1581,7 +1436,7 @@ export const preparationTicketSchema = OpenObject({
 });
 export type PreparationTicket = Static<typeof preparationTicketSchema>;
 
-export const productionBatchDemandSchema = Type.Union([
+const productionBatchDemandSchema = Type.Union([
   OpenObject({ kind: Type.Literal("stock") }),
   OpenObject({
     kind: Type.Literal("request"),
@@ -1595,7 +1450,7 @@ export const productionBatchDemandSchema = Type.Union([
 ]);
 export type ProductionBatchDemand = Static<typeof productionBatchDemandSchema>;
 
-export const productionBatchSchema = OpenObject({
+const productionBatchSchema = OpenObject({
   provenance: sourceProvenanceSchema,
   productionBatchId: productionBatchIdSchema,
   demand: productionBatchDemandSchema,
@@ -1613,7 +1468,7 @@ export const productionBatchSchema = OpenObject({
 });
 export type ProductionBatch = Static<typeof productionBatchSchema>;
 
-export const inventoryReplenishmentPolicySchema = Type.Union([
+const inventoryReplenishmentPolicySchema = Type.Union([
   OpenObject({ kind: Type.Literal("none") }),
   OpenObject({
     kind: Type.Literal("threshold"),
@@ -1625,13 +1480,12 @@ export type InventoryReplenishmentPolicy = Static<
   typeof inventoryReplenishmentPolicySchema
 >;
 
-export const stockPolicyLifecycleSchema = Type.Union([
+const stockPolicyLifecycleSchema = Type.Union([
   Type.Literal("active"),
   Type.Literal("inactive"),
 ]);
-export type StockPolicyLifecycle = Static<typeof stockPolicyLifecycleSchema>;
 
-export const stockPolicySchema = OpenObject({
+const stockPolicySchema = OpenObject({
   provenance: sourceProvenanceSchema,
   stockPolicyId: resourceIdSchema,
   inventoryItemId: resourceIdSchema,
@@ -1642,7 +1496,7 @@ export const stockPolicySchema = OpenObject({
 });
 export type StockPolicy = Static<typeof stockPolicySchema>;
 
-export const commerceProjectionSchema = Type.Union([
+const commerceProjectionSchema = Type.Union([
   OpenObject({ kind: Type.Literal("product"), projection: productSchema }),
   OpenObject({
     kind: Type.Literal("sellable_variant"),
@@ -1708,7 +1562,7 @@ export const commerceProjectionSchema = Type.Union([
 ]);
 export type CommerceProjection = Static<typeof commerceProjectionSchema>;
 
-export const canonicalCommerceObservationSchema = Type.Union([
+const canonicalCommerceObservationSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("upsert"),
     observationId: resourceIdSchema,
@@ -1724,7 +1578,7 @@ export type CanonicalCommerceObservation = Static<
   typeof canonicalCommerceObservationSchema
 >;
 
-export const canonicalCommerceDeliverySchema = OpenObject({
+const canonicalCommerceDeliverySchema = OpenObject({
   schemaVersion: Type.Literal(1),
   providerDeliveryId: providerDeliveryIdSchema,
   observations: Type.Array(canonicalCommerceObservationSchema),
@@ -1746,7 +1600,7 @@ export const checkoutProfileRecordReferenceSchema = StrictObject({
   revision: PositiveInteger,
 });
 
-export const cartLineSourceSchema = Type.Union([
+const cartLineSourceSchema = Type.Union([
   OpenObject({ kind: Type.Literal("catalog"), variantId: recordTextSchema }),
   OpenObject({
     kind: Type.Literal("food_service"),
@@ -1756,16 +1610,14 @@ export const cartLineSourceSchema = Type.Union([
     modifierOptionIds: Type.Array(recordTextSchema),
   }),
 ]);
-export type CartLineSource = Static<typeof cartLineSourceSchema>;
 
-export const cartLineSchema = OpenObject({
+const cartLineSchema = OpenObject({
   cartLineId: recordTextSchema,
   source: cartLineSourceSchema,
   quantity: eachLineQuantitySchema,
 });
-export type CartLine = Static<typeof cartLineSchema>;
 
-export const cartLifecycleSchema = Type.Union([
+const cartLifecycleSchema = Type.Union([
   OpenObject({
     state: Type.Literal("active"),
     updatedAt: utcTimestampSchema,
@@ -1778,7 +1630,7 @@ export const cartLifecycleSchema = Type.Union([
 ]);
 export type CartLifecycle = Static<typeof cartLifecycleSchema>;
 
-export const cartSchema = OpenObject({
+const cartSchema = OpenObject({
   cartId: recordTextSchema,
   storefrontId: recordTextSchema,
   checkoutProfile: checkoutProfileRecordReferenceSchema,
@@ -1789,7 +1641,7 @@ export const cartSchema = OpenObject({
 });
 export type Cart = Static<typeof cartSchema>;
 
-export const protectedBuyerContactSchema = Type.Union([
+const protectedBuyerContactSchema = Type.Union([
   StrictObject({ kind: Type.Literal("email"), emailDigest: sha256HexSchema }),
   StrictObject({
     kind: Type.Literal("email_and_phone"),
@@ -1803,7 +1655,7 @@ export type ProtectedBuyerContact = Static<typeof protectedBuyerContactSchema>;
  * Who is buying at a terminal. An anonymous sale owns no customer identity,
  * so none can be read from it.
  */
-export const pointOfSaleBuyerSchema = Type.Union([
+const pointOfSaleBuyerSchema = Type.Union([
   StrictObject({ kind: Type.Literal("anonymous") }),
   StrictObject({
     kind: Type.Literal("identified_customer"),
@@ -1818,7 +1670,7 @@ export type PointOfSaleBuyer = Static<typeof pointOfSaleBuyerSchema>;
  * The branches share no fields, so an online checkout cannot carry a terminal
  * assignment and a counter sale cannot carry a storefront.
  */
-export const checkoutSourceSchema = Type.Union([
+const checkoutSourceSchema = Type.Union([
   StrictObject({
     kind: Type.Literal("online"),
     storefrontId: recordTextSchema,
@@ -1839,7 +1691,7 @@ export const checkoutSourceSchema = Type.Union([
 export type CheckoutSource = Static<typeof checkoutSourceSchema>;
 
 /** An inventory item and a positive quantity of it, and nothing else. */
-export const checkoutInventoryRequirementSchema = StrictObject({
+const checkoutInventoryRequirementSchema = StrictObject({
   inventoryItemId: recordTextSchema,
   quantity: Type.Refine(
     recordQuantitySchema,
@@ -1892,7 +1744,7 @@ export const checkoutModifierSelectionSchema = StrictObject({
   requirementAdjustments: Type.Array(checkoutRequirementAdjustmentSchema),
 });
 
-export const checkoutLineSourceSchema = Type.Union([
+const checkoutLineSourceSchema = Type.Union([
   StrictObject({
     kind: Type.Literal("catalog"),
     variantId: recordTextSchema,
@@ -1931,13 +1783,12 @@ export const checkoutLineSourceSchema = Type.Union([
 ]);
 export type CheckoutLineSource = Static<typeof checkoutLineSourceSchema>;
 
-export const checkoutPriceOverrideSchema = StrictObject({
+const checkoutPriceOverrideSchema = StrictObject({
   offerPrice: recordMoneySchema,
   reason: recordTextSchema,
 });
-export type CheckoutPriceOverride = Static<typeof checkoutPriceOverrideSchema>;
 
-export const checkoutLineSnapshotSchema = Type.Refine(
+const checkoutLineSnapshotSchema = Type.Refine(
   StrictObject({
     checkoutLineId: recordTextSchema,
     source: checkoutLineSourceSchema,
@@ -1963,9 +1814,8 @@ export const checkoutLineSnapshotSchema = Type.Refine(
   checkoutLineIsConsistent,
   checkoutLineError,
 );
-export type CheckoutLineSnapshot = Static<typeof checkoutLineSnapshotSchema>;
 
-export const checkoutTotalsSchema = StrictObject({
+const checkoutTotalsSchema = StrictObject({
   /**
    * The sum of the line totals, after line discounts.
    */
@@ -1980,15 +1830,14 @@ export const checkoutTotalsSchema = StrictObject({
   /** The listed prices include the tax, so the total does not add it. */
   taxIncluded: Type.Optional(Type.Literal(true)),
 });
-export type CheckoutTotals = Static<typeof checkoutTotalsSchema>;
+type CheckoutTotals = Static<typeof checkoutTotalsSchema>;
 
-export const pickupPromiseSnapshotSchema = StrictObject({
+const pickupPromiseSnapshotSchema = StrictObject({
   locationId: recordTextSchema,
   readyAt: utcTimestampSchema,
 });
-export type PickupPromiseSnapshot = Static<typeof pickupPromiseSnapshotSchema>;
 
-export const checkoutFulfillmentQuoteSnapshotSchema = Type.Union([
+const checkoutFulfillmentQuoteSnapshotSchema = Type.Union([
   StrictObject({
     kind: Type.Literal("pickup"),
     promise: pickupPromiseSnapshotSchema,
@@ -2002,7 +1851,7 @@ export type CheckoutFulfillmentQuoteSnapshot = Static<
   typeof checkoutFulfillmentQuoteSnapshotSchema
 >;
 
-export const checkoutMarketSnapshotSchema = StrictObject({
+const checkoutMarketSnapshotSchema = StrictObject({
   marketId: recordTextSchema,
   marketRevision: PositiveInteger,
   shopCurrency: marketCurrencySchema /**
@@ -2018,21 +1867,18 @@ export const checkoutMarketSnapshotSchema = StrictObject({
   /** The rounding of a converted rate; quotes from before it have none. */
   roundingIncrement: Type.Optional(PositiveInteger),
 });
-export type CheckoutMarketSnapshot = Static<
-  typeof checkoutMarketSnapshotSchema
->;
 
-export const storedValueKindSchema = Type.Union([
+const storedValueKindSchema = Type.Union([
   Type.Literal("gift_card"),
   Type.Literal("store_credit"),
 ]);
-export type StoredValueKind = Static<typeof storedValueKindSchema>;
+type StoredValueKind = Static<typeof storedValueKindSchema>;
 
 /**
  * One gift card or store credit account and what it pays of a quote. Only a
  * gift card has, and must have, its last characters.
  */
-export const checkoutStoredValueTenderSchema = Type.Refine(
+const checkoutStoredValueTenderSchema = Type.Refine(
   StrictObject({
     accountId: recordTextSchema,
     kind: storedValueKindSchema /**
@@ -2055,7 +1901,7 @@ export type CheckoutStoredValueTender = Static<
  * What gift cards and store credit pay of a quote, and what is left due. The
  * quote checks it against its total.
  */
-export const checkoutStoredValueSchema = StrictObject({
+const checkoutStoredValueSchema = StrictObject({
   tenders: Type.Array(checkoutStoredValueTenderSchema, {
     minItems: 1,
   }) /**
@@ -2072,18 +1918,15 @@ export type CheckoutStoredValue = Static<typeof checkoutStoredValueSchema>;
  * How one merchant plugin function ended for a quote. A function that
  * refuses the checkout leaves no quote, so only these two remain.
  */
-export const checkoutPluginRunOutcomeSchema = Type.Union([
+const checkoutPluginRunOutcomeSchema = Type.Union([
   Type.Literal("passed"),
   Type.Literal("skipped"),
 ]);
-export type CheckoutPluginRunOutcome = Static<
-  typeof checkoutPluginRunOutcomeSchema
->;
 
 /**
  * One run of a merchant plugin function on a quote.
  */
-export const checkoutPluginRunSchema = StrictObject({
+const checkoutPluginRunSchema = StrictObject({
   pluginId: recordTextSchema,
   version: PositiveInteger,
   functionId: recordTextSchema /**
@@ -2097,7 +1940,7 @@ export const checkoutPluginRunSchema = StrictObject({
 });
 export type CheckoutPluginRun = Static<typeof checkoutPluginRunSchema>;
 
-export const checkoutQuoteSnapshotSchema = Type.Refine(
+const checkoutQuoteSnapshotSchema = Type.Refine(
   StrictObject({
     quoteDigest: recordTextSchema,
     checkoutRevision: PositiveInteger,
@@ -2124,7 +1967,7 @@ export const checkoutQuoteSnapshotSchema = Type.Refine(
 );
 export type CheckoutQuoteSnapshot = Static<typeof checkoutQuoteSnapshotSchema>;
 
-export const checkoutLifecycleSchema = Type.Union([
+const checkoutLifecycleSchema = Type.Union([
   StrictObject({
     state: Type.Literal("quoted"),
     quote: checkoutQuoteSnapshotSchema,
@@ -2176,7 +2019,7 @@ export const checkoutSchema = StrictObject({
 });
 export type Checkout = Static<typeof checkoutSchema>;
 
-export const checkoutPaymentBindingSchema = StrictObject({
+const checkoutPaymentBindingSchema = StrictObject({
   checkoutId: recordTextSchema,
   checkoutRevision: PositiveInteger,
   quoteDigest: recordTextSchema,
@@ -2189,7 +2032,7 @@ export type CheckoutPaymentBinding = Static<
   typeof checkoutPaymentBindingSchema
 >;
 
-export const checkoutPaymentAttemptLifecycleSchema = Type.Union([
+const checkoutPaymentAttemptLifecycleSchema = Type.Union([
   OpenObject({
     state: Type.Literal("pending"),
     createdAt: utcTimestampSchema,
@@ -2402,7 +2245,7 @@ function acceptedCheckoutPaymentError(): string {
   return "an accepted checkout needs one way it was paid";
 }
 
-export const commerceValidationErrorSchema = Type.Union([
+const commerceValidationErrorSchema = Type.Union([
   OpenObject({ code: Type.Literal("invalid_currency") }),
   OpenObject({ code: Type.Literal("negative_money") }),
   OpenObject({ code: Type.Literal("invalid_identity"), field: Type.String() }),
@@ -2441,64 +2284,13 @@ export type CommerceValidationError = Static<
   typeof commerceValidationErrorSchema
 >;
 
-export const directConsumptionCommitPointSchema = Type.Union([
+const directConsumptionCommitPointSchema = Type.Union([
   Type.Literal("order_placed"),
   Type.Literal("fulfillment_started"),
   Type.Literal("fulfillment_completed"),
 ]);
-export type DirectConsumptionCommitPoint = Static<
-  typeof directConsumptionCommitPointSchema
->;
 
-export const foodServiceValidationErrorSchema = Type.Union([
-  OpenObject({ code: Type.Literal("invalid_identity"), field: Type.String() }),
-  OpenObject({
-    code: Type.Literal("invalid_revision"),
-    expected: SafeInteger,
-    received: SafeInteger,
-  }),
-  OpenObject({ code: Type.Literal("invalid_quantity"), field: Type.String() }),
-  OpenObject({ code: Type.Literal("empty_collection"), field: Type.String() }),
-  OpenObject({
-    code: Type.Literal("duplicate_identity"),
-    field: Type.String(),
-    id: Type.String(),
-  }),
-  OpenObject({
-    code: Type.Literal("invalid_reference"),
-    field: Type.String(),
-    id: Type.String(),
-  }),
-  OpenObject({
-    code: Type.Literal("resource_type_mismatch"),
-    expected: Type.String(),
-    received: Type.String(),
-  }),
-  OpenObject({ code: Type.Literal("invalid_selection_bounds") }),
-  OpenObject({ code: Type.Literal("invalid_validity") }),
-  OpenObject({
-    code: Type.Literal("invalid_lifecycle"),
-    operation: Type.String(),
-    state: Type.String(),
-  }),
-  OpenObject({
-    code: Type.Literal("requirement_underflow"),
-    inventoryItemId: resourceIdSchema,
-  }),
-  OpenObject({
-    code: Type.Literal("quantity_unit_mismatch"),
-    inventoryItemId: resourceIdSchema,
-  }),
-  OpenObject({
-    code: Type.Literal("invalid_requirement_adjustment"),
-    inventoryItemId: resourceIdSchema,
-  }),
-]);
-export type FoodServiceValidationError = Static<
-  typeof foodServiceValidationErrorSchema
->;
-
-export const inventoryAllocationCommitPointSchema = Type.Union([
+const inventoryAllocationCommitPointSchema = Type.Union([
   Type.Literal("order_placed"),
   Type.Literal("fulfillment_started"),
   Type.Literal("fulfillment_completed"),
@@ -2508,7 +2300,7 @@ export type InventoryAllocationCommitPoint = Static<
   typeof inventoryAllocationCommitPointSchema
 >;
 
-export const inventoryAllocationHeldDemandSchema = OpenObject({
+const inventoryAllocationHeldDemandSchema = OpenObject({
   kind: Type.Literal("checkout"),
   checkoutId: recordTextSchema,
   checkoutLineId: recordTextSchema,
@@ -2518,11 +2310,8 @@ export const inventoryAllocationHeldDemandSchema = OpenObject({
     orderCommitPointError,
   ),
 });
-export type InventoryAllocationHeldDemand = Static<
-  typeof inventoryAllocationHeldDemandSchema
->;
 
-export const inventoryAllocationOrderCommitPointSchema = Type.Union([
+const inventoryAllocationOrderCommitPointSchema = Type.Union([
   Type.Literal("fulfillment_started"),
   Type.Literal("fulfillment_completed"),
   Type.Literal("preparation_completed"),
@@ -2531,16 +2320,13 @@ export type InventoryAllocationOrderCommitPoint = Static<
   typeof inventoryAllocationOrderCommitPointSchema
 >;
 
-export const inventoryAllocationCommittedDemandSchema = OpenObject({
+const inventoryAllocationCommittedDemandSchema = OpenObject({
   kind: Type.Literal("order"),
   orderId: recordTextSchema,
   orderLineId: recordTextSchema,
 });
-export type InventoryAllocationCommittedDemand = Static<
-  typeof inventoryAllocationCommittedDemandSchema
->;
 
-export const inventoryAllocationOwnerSchema = Type.Union([
+const inventoryAllocationOwnerSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("checkout"),
     checkoutId: recordTextSchema,
@@ -2552,11 +2338,8 @@ export const inventoryAllocationOwnerSchema = Type.Union([
     orderLineId: recordTextSchema,
   }),
 ]);
-export type InventoryAllocationOwner = Static<
-  typeof inventoryAllocationOwnerSchema
->;
 
-export const inventoryAllocationLifecycleSchema = Type.Union([
+const inventoryAllocationLifecycleSchema = Type.Union([
   OpenObject({
     state: Type.Literal("held"),
     demand: inventoryAllocationHeldDemandSchema,
@@ -2605,7 +2388,7 @@ export const inventoryAllocationSchema = OpenObject({
 });
 export type InventoryAllocation = Static<typeof inventoryAllocationSchema>;
 
-export const inventoryConsumptionModeSchema = Type.Union([
+const inventoryConsumptionModeSchema = Type.Union([
   OpenObject({ kind: Type.Literal("untracked") }),
   OpenObject({
     kind: Type.Literal("direct"),
@@ -2618,25 +2401,16 @@ export const inventoryConsumptionModeSchema = Type.Union([
     recipeRevision: PositiveInteger,
   }),
 ]);
-export type InventoryConsumptionMode = Static<
-  typeof inventoryConsumptionModeSchema
->;
 
-export const inventoryConsumptionScopeSchema = Type.Union([
+const inventoryConsumptionScopeSchema = Type.Union([
   OpenObject({ kind: Type.Literal("organisation") }),
   OpenObject({ kind: Type.Literal("location"), locationId: recordTextSchema }),
 ]);
-export type InventoryConsumptionScope = Static<
-  typeof inventoryConsumptionScopeSchema
->;
 
-export const inventoryConsumptionPlanLifecycleSchema = Type.Union([
+const inventoryConsumptionPlanLifecycleSchema = Type.Union([
   Type.Literal("active"),
   Type.Literal("inactive"),
 ]);
-export type InventoryConsumptionPlanLifecycle = Static<
-  typeof inventoryConsumptionPlanLifecycleSchema
->;
 
 export const inventoryConsumptionPlanSchema = OpenObject({
   consumptionPlanId: recordTextSchema,
@@ -2658,46 +2432,7 @@ function orderCommitPointError(): string {
   return "a held allocation is consumed after the order";
 }
 
-export const inventoryLotSchema = OpenObject({
-  lotId: resourceIdSchema,
-  lotCode: Type.String(),
-  inventoryItemId: resourceIdSchema,
-  locationId: resourceIdSchema,
-  revision: SafeInteger,
-  sourceMovementId: resourceIdSchema,
-  receivedQuantity: quantitySchema,
-  remainingQuantity: quantitySchema,
-  expiry: inventoryLotExpirySchema,
-  lifecycle: inventoryLotLifecycleSchema,
-});
-export type InventoryLot = Static<typeof inventoryLotSchema>;
-
-export const inventoryMovementSchema = OpenObject({
-  movementId: resourceIdSchema,
-  inventoryItemId: resourceIdSchema,
-  locationId: resourceIdSchema,
-  change: inventoryMovementChangeSchema,
-  occurredAt: commerceTimestampSchema,
-  idempotencyKey: Type.String(),
-});
-export type InventoryMovement = Static<typeof inventoryMovementSchema>;
-
-export const orderTotalComponentKindSchema = Type.Union([
-  Type.Literal("subtotal"),
-  Type.Literal("discount"),
-  Type.Literal("tax"),
-  Type.Literal("duty"),
-  Type.Literal("shipping"),
-  Type.Literal("service_fee"),
-  Type.Literal("tip"),
-  Type.Literal("rounding"),
-  Type.Literal("total"),
-]);
-export type OrderTotalComponentKind = Static<
-  typeof orderTotalComponentKindSchema
->;
-
-export const shipmentLabelAttemptLifecycleSchema = Type.Union([
+const shipmentLabelAttemptLifecycleSchema = Type.Union([
   OpenObject({
     state: Type.Literal("requested"),
     requestedAt: commerceTimestampSchema,
@@ -2718,11 +2453,8 @@ export const shipmentLabelAttemptLifecycleSchema = Type.Union([
     lastAttemptAt: commerceTimestampSchema,
   }),
 ]);
-export type ShipmentLabelAttemptLifecycle = Static<
-  typeof shipmentLabelAttemptLifecycleSchema
->;
 
-export const shipmentLabelAttemptSchema = OpenObject({
+const shipmentLabelAttemptSchema = OpenObject({
   labelAttemptId: resourceIdSchema,
   shipmentId: resourceIdSchema,
   shipmentRevision: SafeInteger,
@@ -2735,7 +2467,7 @@ export const shipmentLabelAttemptSchema = OpenObject({
 });
 export type ShipmentLabelAttempt = Static<typeof shipmentLabelAttemptSchema>;
 
-export const shipmentLabelRateSnapshotSchema = OpenObject({
+const shipmentLabelRateSnapshotSchema = OpenObject({
   labelRateId: resourceIdSchema,
   shipmentId: resourceIdSchema,
   shipmentRevision: SafeInteger,
@@ -2751,7 +2483,7 @@ export type ShipmentLabelRateSnapshot = Static<
   typeof shipmentLabelRateSnapshotSchema
 >;
 
-export const shippingEligibilitySchema = Type.Union([
+const shippingEligibilitySchema = Type.Union([
   OpenObject({ kind: Type.Literal("prohibited"), reason: recordTextSchema }),
   OpenObject({
     kind: Type.Literal("physical"),
@@ -2762,9 +2494,8 @@ export const shippingEligibilitySchema = Type.Union([
     description: recordTextSchema,
   }),
 ]);
-export type ShippingEligibility = Static<typeof shippingEligibilitySchema>;
 
-export const shippingProfileLifecycleSchema = Type.Union([
+const shippingProfileLifecycleSchema = Type.Union([
   OpenObject({
     state: Type.Literal("active"),
     activeAt: utcTimestampSchema,
@@ -2774,9 +2505,6 @@ export const shippingProfileLifecycleSchema = Type.Union([
     inactiveAt: utcTimestampSchema,
   }),
 ]);
-export type ShippingProfileLifecycle = Static<
-  typeof shippingProfileLifecycleSchema
->;
 
 export const shippingProfileSchema = StrictObject({
   shippingProfileId: recordTextSchema,
@@ -2792,7 +2520,7 @@ export const shippingProfileSchema = StrictObject({
 });
 export type ShippingProfile = Static<typeof shippingProfileSchema>;
 
-export const storefrontFulfillmentConfigurationSchema = Type.Union([
+const storefrontFulfillmentConfigurationSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("pickup"),
     locationId: recordTextSchema,
@@ -2827,7 +2555,7 @@ export type StorefrontTaxConfiguration = Static<
   typeof storefrontTaxConfigurationSchema
 >;
 
-export const storefrontCheckoutConfigurationSchema = OpenObject({
+const storefrontCheckoutConfigurationSchema = OpenObject({
   quoteTtlSeconds: PositiveInteger,
   tax: storefrontTaxConfigurationSchema,
 });
@@ -2835,7 +2563,7 @@ export type StorefrontCheckoutConfiguration = Static<
   typeof storefrontCheckoutConfigurationSchema
 >;
 
-export const storefrontLifecycleSchema = Type.Union([
+const storefrontLifecycleSchema = Type.Union([
   OpenObject({
     state: Type.Literal("active"),
     activeAt: utcTimestampSchema,
@@ -2883,369 +2611,28 @@ function uniqueRouteIdsError(): string {
   return "routes must have unique route ids";
 }
 
-// Parsers of the records above (Plan 78 step 2).
-export const parseQuantityUnit = recordParser(quantityUnitSchema);
-export const parseAvailableQuantity = recordParser(availableQuantitySchema);
-export const parseBuyer = recordParser(buyerSchema);
-export const parseProduct = recordParser(productSchema);
-export const parseProductOption = recordParser(productOptionSchema);
-export const parseProductMediaKind = recordParser(productMediaKindSchema);
-export const parseProductMedia = recordParser(productMediaSchema);
-export const parseSellableVariant = recordParser(sellableVariantSchema);
-export const parseInventoryItemCategory = recordParser(
-  inventoryItemCategorySchema,
-);
-export const parseInventoryExpiryTracking = recordParser(
-  inventoryExpiryTrackingSchema,
-);
-export const parseInventoryTrackingPolicy = recordParser(
-  inventoryTrackingPolicySchema,
-);
-export const parseInventoryItemLifecycle = recordParser(
-  inventoryItemLifecycleSchema,
-);
-export const parseInventoryItem = recordParser(inventoryItemSchema);
-export const parseLocationKind = recordParser(locationKindSchema);
-export const parseLocationLifecycle = recordParser(locationLifecycleSchema);
-export const parseLocation = recordParser(locationSchema);
-export const parseSalesChannelKind = recordParser(salesChannelKindSchema);
-export const parseSalesChannelLifecycle = recordParser(
-  salesChannelLifecycleSchema,
-);
-export const parseSalesChannel = recordParser(salesChannelSchema);
-export const parseSellableVariantAvailability = recordParser(
-  sellableVariantAvailabilitySchema,
-);
-export const parseOfferLifecycle = recordParser(offerLifecycleSchema);
-export const parseOffer = recordParser(offerSchema);
-export const parseQuantity = recordParser(quantitySchema);
-export const parseInventoryBalance = recordParser(inventoryBalanceSchema);
-export const parseInventoryPosition = recordParser(inventoryPositionSchema);
-export const parseInventoryReceiptPurchase = recordParser(
-  inventoryReceiptPurchaseSchema,
-);
-export const parseInventoryIncreaseReason = recordParser(
-  inventoryIncreaseReasonSchema,
-);
-export const parseInventoryDecreaseReason = recordParser(
-  inventoryDecreaseReasonSchema,
-);
-export const parseLotAllocation = recordParser(lotAllocationSchema);
-export const parseInventoryLotAllocation = recordParser(
-  inventoryLotAllocationSchema,
-);
-export const parseInventoryMovementChange = recordParser(
-  inventoryMovementChangeSchema,
-);
-export const parseInventoryMovementProjection = recordParser(
-  inventoryMovementProjectionSchema,
-);
-export const parseInventoryLotExpiry = recordParser(inventoryLotExpirySchema);
-export const parseInventoryLotLifecycle = recordParser(
-  inventoryLotLifecycleSchema,
-);
-export const parseInventoryLotProjection = recordParser(
-  inventoryLotProjectionSchema,
-);
-export const parseOnlineOrderConfiguration = recordParser(
-  onlineOrderConfigurationSchema,
-);
-export const parseOrderOrigin = recordParser(orderOriginSchema);
-export const parseInventoryRequirement = recordParser(
-  inventoryRequirementSchema,
-);
-export const parseOrderLineInventory = recordParser(orderLineInventorySchema);
-export const parseFoodServicePreparation = recordParser(
-  foodServicePreparationSchema,
-);
-export const parseInventoryRequirementAdjustment = recordParser(
-  inventoryRequirementAdjustmentSchema,
-);
-export const parseModifierSelectionSnapshot = recordParser(
-  modifierSelectionSnapshotSchema,
-);
-export const parseOrderLineSource = recordParser(orderLineSourceSchema);
-export const parseOrderLineItem = recordParser(orderLineItemSchema);
-export const parseOrderTotals = recordParser(orderTotalsSchema);
-export const parseOrderAdjustmentKind = recordParser(orderAdjustmentKindSchema);
-export const parseOrderAdjustmentStatus = recordParser(
-  orderAdjustmentStatusSchema,
-);
-export const parseOrderAdjustment = recordParser(orderAdjustmentSchema);
-export const parseOrderLifecycle = recordParser(orderLifecycleSchema);
-export const parseCommerceOrder = recordParser(commerceOrderSchema);
-export const parsePaymentLifecycle = recordParser(paymentLifecycleSchema);
-export const parsePayment = recordParser(paymentSchema);
-export const parseFulfillmentLineItem = recordParser(fulfillmentLineItemSchema);
-export const parseInternationalDutyIncoterm = recordParser(
-  internationalDutyIncotermSchema,
-);
-export const parseShippingRouteBinding = recordParser(
-  shippingRouteBindingSchema,
-);
-export const parseCarrierServiceSnapshot = recordParser(
-  carrierServiceSnapshotSchema,
-);
-export const parseCheckoutLineChargeAllocation = recordParser(
-  checkoutLineChargeAllocationSchema,
-);
-export const parseCarrierRateSnapshot = recordParser(carrierRateSnapshotSchema);
-export const parseTaxQuoteSnapshot = recordParser(taxQuoteSnapshotSchema);
-export const parseDutyIncoterm = recordParser(dutyIncotermSchema);
-export const parseDutyQuoteSnapshot = recordParser(dutyQuoteSnapshotSchema);
-export const parseEstimatedDeliverySnapshot = recordParser(
-  estimatedDeliverySnapshotSchema,
-);
-export const parseProtectedShippingAddress = recordParser(
-  protectedShippingAddressSchema,
-);
-export const parseShippingWeight = recordParser(shippingWeightSchema);
-export const parseShippingDimensions = recordParser(shippingDimensionsSchema);
-export const parseShippingLineQuantity = recordParser(
-  shippingLineQuantitySchema,
-);
-export const parseCustomsLineSnapshot = recordParser(customsLineSnapshotSchema);
-export const parsePlannedPackage = recordParser(plannedPackageSchema);
-export const parsePackagePlanSnapshot = recordParser(packagePlanSnapshotSchema);
 export const parseShippingQuoteSnapshot = recordParser(
   shippingQuoteSnapshotSchema,
   "shippingQuote",
 );
-export const parseShippingFulfillmentBinding = recordParser(
-  shippingFulfillmentBindingSchema,
-);
-export const parseShippingFulfillmentLifecycle = recordParser(
-  shippingFulfillmentLifecycleSchema,
-);
-export const parsePickupFulfillmentLifecycle = recordParser(
-  pickupFulfillmentLifecycleSchema,
-);
-export const parseLocalDeliveryFulfillmentLifecycle = recordParser(
-  localDeliveryFulfillmentLifecycleSchema,
-);
-export const parseImmediateHandoffFulfillmentLifecycle = recordParser(
-  immediateHandoffFulfillmentLifecycleSchema,
-);
-export const parseOnPremiseFulfillmentLifecycle = recordParser(
-  onPremiseFulfillmentLifecycleSchema,
-);
-export const parseFulfillment = recordParser(fulfillmentSchema);
-export const parseOrderLineQuantity = recordParser(orderLineQuantitySchema);
-export const parseShipmentCustomsLineSnapshot = recordParser(
-  shipmentCustomsLineSnapshotSchema,
-);
-export const parseShipmentPackage = recordParser(shipmentPackageSchema);
-export const parseFirstPartyShipmentLifecycle = recordParser(
-  firstPartyShipmentLifecycleSchema,
-);
-export const parseTrackingEventKind = recordParser(trackingEventKindSchema);
-export const parseTrackingEvent = recordParser(trackingEventSchema);
-export const parseExternalShipmentLifecycle = recordParser(
-  externalShipmentLifecycleSchema,
-);
-export const parseShipment = recordParser(shipmentSchema);
-export const parseMenuScope = recordParser(menuScopeSchema);
-export const parseMenuValidity = recordParser(menuValiditySchema);
-export const parseMenuSection = recordParser(menuSectionSchema);
-export const parseModifierGroupRevisionReference = recordParser(
-  modifierGroupRevisionReferenceSchema,
-);
-export const parseMenuEntryLifecycle = recordParser(menuEntryLifecycleSchema);
-export const parseMenuEntry = recordParser(menuEntrySchema);
-export const parseMenuLifecycle = recordParser(menuLifecycleSchema);
-export const parseMenu = recordParser(menuSchema);
-export const parseModifierOption = recordParser(modifierOptionSchema);
-export const parseModifierGroupRevisionLifecycle = recordParser(
-  modifierGroupRevisionLifecycleSchema,
-);
-export const parseModifierGroupRevision = recordParser(
-  modifierGroupRevisionSchema,
-);
-export const parseRecipeOutput = recordParser(recipeOutputSchema);
-export const parseRecipeRevisionLifecycle = recordParser(
-  recipeRevisionLifecycleSchema,
-);
-export const parseRecipeRevision = recordParser(recipeRevisionSchema);
-export const parsePreparationStationLifecycle = recordParser(
-  preparationStationLifecycleSchema,
-);
-export const parsePreparationStation = recordParser(preparationStationSchema);
-export const parsePreparationTicketLineSnapshot = recordParser(
-  preparationTicketLineSnapshotSchema,
-);
-export const parsePreparationTicketLifecycle = recordParser(
-  preparationTicketLifecycleSchema,
-);
-export const parsePreparationTicket = recordParser(preparationTicketSchema);
-export const parseProductionBatchDemand = recordParser(
-  productionBatchDemandSchema,
-);
-export const parseProductionBatch = recordParser(productionBatchSchema);
-export const parseInventoryReplenishmentPolicy = recordParser(
-  inventoryReplenishmentPolicySchema,
-);
-export const parseStockPolicyLifecycle = recordParser(
-  stockPolicyLifecycleSchema,
-);
-export const parseStockPolicy = recordParser(stockPolicySchema);
-export const parseCommerceProjection = recordParser(commerceProjectionSchema);
-export const parseCanonicalCommerceObservation = recordParser(
-  canonicalCommerceObservationSchema,
-);
-export const parseCanonicalCommerceDelivery = recordParser(
-  canonicalCommerceDeliverySchema,
-);
-export const parseCartLineSource = recordParser(cartLineSourceSchema);
-export const parseCartLine = recordParser(cartLineSchema);
-export const parseCartLifecycle = recordParser(cartLifecycleSchema);
 export const parseCart = recordParser(cartSchema, "cart");
-export const parseProtectedBuyerContact = recordParser(
-  protectedBuyerContactSchema,
-);
-export const parsePointOfSaleBuyer = recordParser(
-  pointOfSaleBuyerSchema,
-  "checkout.source.buyer",
-);
-export const parseCheckoutSource = recordParser(
-  checkoutSourceSchema,
-  "checkout.source",
-);
-export const parseCheckoutLineSource = recordParser(checkoutLineSourceSchema);
-export const parseCheckoutPriceOverride = recordParser(
-  checkoutPriceOverrideSchema,
-);
-export const parseCheckoutLineSnapshot = recordParser(
-  checkoutLineSnapshotSchema,
-);
-export const parseCheckoutTotals = recordParser(checkoutTotalsSchema);
-export const parsePickupPromiseSnapshot = recordParser(
-  pickupPromiseSnapshotSchema,
-);
-export const parseCheckoutFulfillmentQuoteSnapshot = recordParser(
-  checkoutFulfillmentQuoteSnapshotSchema,
-);
-export const parseCheckoutMarketSnapshot = recordParser(
-  checkoutMarketSnapshotSchema,
-);
-export const parseStoredValueKind = recordParser(storedValueKindSchema);
-export const parseCheckoutStoredValueTender = recordParser(
-  checkoutStoredValueTenderSchema,
-);
-export const parseCheckoutStoredValue = recordParser(checkoutStoredValueSchema);
-export const parseCheckoutPluginRunOutcome = recordParser(
-  checkoutPluginRunOutcomeSchema,
-);
-export const parseCheckoutPluginRun = recordParser(checkoutPluginRunSchema);
-export const parseCheckoutQuoteSnapshot = recordParser(
-  checkoutQuoteSnapshotSchema,
-);
-export const parseCheckoutLifecycle = recordParser(checkoutLifecycleSchema);
 export const parseCheckout = recordParser(checkoutSchema, "checkout");
-export const parsePaymentEnvironment = recordParser(paymentEnvironmentSchema);
-export const parsePaymentProviderAccountBinding = recordParser(
-  paymentProviderAccountBindingSchema,
-);
-export const parseStripeOnlineCollection = recordParser(
-  stripeOnlineCollectionSchema,
-);
-export const parseGmoPgOnlineCollection = recordParser(
-  gmoPgOnlineCollectionSchema,
-);
-export const parseOnlinePaymentBinding = recordParser(
-  onlinePaymentBindingSchema,
-);
-export const parseInPersonPaymentBinding = recordParser(
-  inPersonPaymentBindingSchema,
-);
-export const parseCheckoutPaymentProviderBinding = recordParser(
-  checkoutPaymentProviderBindingSchema,
-);
-export const parseCheckoutPaymentBinding = recordParser(
-  checkoutPaymentBindingSchema,
-);
-export const parseCheckoutPaymentAttemptLifecycle = recordParser(
-  checkoutPaymentAttemptLifecycleSchema,
-);
 export const parseCheckoutPaymentAttempt = recordParser(
   checkoutPaymentAttemptSchema,
   "checkoutPaymentAttempt",
-);
-export const parseCommerceValidationError = recordParser(
-  commerceValidationErrorSchema,
-);
-export const parseDirectConsumptionCommitPoint = recordParser(
-  directConsumptionCommitPointSchema,
-);
-export const parseFoodServiceValidationError = recordParser(
-  foodServiceValidationErrorSchema,
-);
-export const parseInventoryAllocationCommitPoint = recordParser(
-  inventoryAllocationCommitPointSchema,
-);
-export const parseInventoryAllocationHeldDemand = recordParser(
-  inventoryAllocationHeldDemandSchema,
-);
-export const parseInventoryAllocationOrderCommitPoint = recordParser(
-  inventoryAllocationOrderCommitPointSchema,
-);
-export const parseInventoryAllocationCommittedDemand = recordParser(
-  inventoryAllocationCommittedDemandSchema,
-);
-export const parseInventoryAllocationOwner = recordParser(
-  inventoryAllocationOwnerSchema,
-);
-export const parseInventoryAllocationLifecycle = recordParser(
-  inventoryAllocationLifecycleSchema,
 );
 export const parseInventoryAllocation = recordParser(
   inventoryAllocationSchema,
   "inventoryAllocation",
 );
-export const parseInventoryConsumptionMode = recordParser(
-  inventoryConsumptionModeSchema,
-);
-export const parseInventoryConsumptionScope = recordParser(
-  inventoryConsumptionScopeSchema,
-);
-export const parseInventoryConsumptionPlanLifecycle = recordParser(
-  inventoryConsumptionPlanLifecycleSchema,
-);
 export const parseInventoryConsumptionPlan = recordParser(
   inventoryConsumptionPlanSchema,
   "inventoryConsumptionPlan",
-);
-export const parseInventoryLot = recordParser(inventoryLotSchema);
-export const parseInventoryMovement = recordParser(inventoryMovementSchema);
-export const parseOrderTotalComponentKind = recordParser(
-  orderTotalComponentKindSchema,
-);
-export const parseShipmentLabelAttemptLifecycle = recordParser(
-  shipmentLabelAttemptLifecycleSchema,
-);
-export const parseShipmentLabelAttempt = recordParser(
-  shipmentLabelAttemptSchema,
-);
-export const parseShipmentLabelRateSnapshot = recordParser(
-  shipmentLabelRateSnapshotSchema,
-);
-export const parseShippingEligibility = recordParser(shippingEligibilitySchema);
-export const parseShippingProfileLifecycle = recordParser(
-  shippingProfileLifecycleSchema,
 );
 export const parseShippingProfile = recordParser(
   shippingProfileSchema,
   "shippingProfile",
 );
-export const parseStorefrontFulfillmentConfiguration = recordParser(
-  storefrontFulfillmentConfigurationSchema,
-);
-export const parseStorefrontTaxConfiguration = recordParser(
-  storefrontTaxConfigurationSchema,
-);
-export const parseStorefrontCheckoutConfiguration = recordParser(
-  storefrontCheckoutConfigurationSchema,
-);
-export const parseStorefrontLifecycle = recordParser(storefrontLifecycleSchema);
 export const parseStorefront = recordParser(storefrontSchema, "storefront");
 export const parseVariantShippingSpecification = recordParser(
   variantShippingSpecificationSchema,

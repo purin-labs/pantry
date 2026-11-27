@@ -56,7 +56,7 @@ import type {
 import type { CommerceCueFact } from "./records/transitions.ts";
 
 /** Plan 78: `commerce/lab.rs`, the commerce lab event boundary. */
-export const LAB_EVENT_SCHEMA_VERSION = "pantry.commerce.lab.event.v1";
+const LAB_EVENT_SCHEMA_VERSION = "pantry.commerce.lab.event.v1";
 
 const SCENARIOS = [
   "product-listing",
@@ -938,9 +938,7 @@ function labCueFacts(input: unknown): CommerceCueFact[] {
 type Projected = Readonly<Record<string, any>>;
 
 /** Rust `transitions::derive_cue_facts`. */
-export function projectionCueFacts(
-  projection: CommerceProjection,
-): CommerceCueFact[] {
+function projectionCueFacts(projection: CommerceProjection): CommerceCueFact[] {
   const value = projection.projection as unknown as Projected;
   if (projection.kind === "payment") {
     const lifecycle = value.lifecycle as { state: string; reason?: string };

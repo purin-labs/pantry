@@ -21,9 +21,7 @@ import type { RelationshipDefinitionRef } from "./records/entity-plane.ts";
 declare const TextEncoder: new () => { encode(input: string): Uint8Array };
 
 /** Preserve serde's enum tags, declaration order and top-level cursor removal. */
-export function encodeCommerceQueryFingerprint(
-  query: CommerceGraphQuery,
-): string {
+function encodeCommerceQueryFingerprint(query: CommerceGraphQuery): string {
   return JSON.stringify(orderedQuery(query, "fingerprint"));
 }
 
@@ -32,9 +30,7 @@ export function commerceQueryFingerprint(query: CommerceGraphQuery): string {
   return sha256HexSync(encodeCommerceQueryFingerprint(query));
 }
 
-export function encodeCommerceCursorPayload(
-  payload: CommerceCursorPayload,
-): string {
+function encodeCommerceCursorPayload(payload: CommerceCursorPayload): string {
   return JSON.stringify({
     organisationId: payload.organisationId,
     merchantId: payload.merchantId,

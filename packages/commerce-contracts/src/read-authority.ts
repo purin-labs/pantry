@@ -21,7 +21,7 @@ import {
 } from "./authority-scope.ts";
 
 import { invalidShape } from "./query-parts.ts";
-export const pantryCommerceReadAuthoritySchema = OpenObject({
+const pantryCommerceReadAuthoritySchema = OpenObject({
   context: commerceAuthorityContextSchema,
   scope: commerceAuthorityScopeSchema,
 });
@@ -32,7 +32,7 @@ export const commerceEntityReadAuthoritySchema = OpenObject({
 export type PantryCommerceReadAuthority = Static<
   typeof pantryCommerceReadAuthoritySchema
 >;
-export type CommerceEntityReadAuthority = Static<
+type CommerceEntityReadAuthority = Static<
   typeof commerceEntityReadAuthoritySchema
 >;
 const readWire = OpenObject({

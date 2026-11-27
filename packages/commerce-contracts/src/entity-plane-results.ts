@@ -13,17 +13,10 @@ import {
   parseCommerceMutationReceipt,
   type CommerceMutationReceiptV1,
 } from "./entity-plane-receipts.ts";
-import {
-  commerceObservationOutcomeSchema,
-  commerceEntityPlaneObservationV1Schema,
-  entityPlaneObservationWireSchema,
-  parseCommerceEntityPlaneObservation,
-  type CommerceEntityPlaneObservationV1,
-} from "./entity-plane-observations.ts";
 import { invalidShape } from "./query-parts.ts";
 import { javascriptTrimmedTextSchema as diagnosticTextSchema } from "./identity-text.ts";
 
-export const commerceEntityPlaneErrorSchema = Type.Union([
+const commerceEntityPlaneErrorSchema = Type.Union([
   OpenObject({
     code: Type.Literal("invalid_identity"),
     field: diagnosticTextSchema,
@@ -81,7 +74,7 @@ export const commerceEntityPlaneErrorSchema = Type.Union([
 export type CommerceEntityPlaneError = StrictUnion<
   StaticDecode<typeof commerceEntityPlaneErrorSchema>
 >;
-export const commerceCommandResultSchema = Type.Union([
+const commerceCommandResultSchema = Type.Union([
   StrictObject({
     status: Type.Literal("accepted"),
     receipt: Type.Unsafe<CommerceMutationReceiptV1>(
@@ -98,24 +91,6 @@ export const commerceCommandResultSchema = Type.Union([
 export type CommerceCommandResult = StrictUnion<
   StaticDecode<typeof commerceCommandResultSchema>
 >;
-export const commerceObservationResultSchema = Type.Union([
-  OpenObject({
-    status: Type.Literal("accepted"),
-    outcome: commerceObservationOutcomeSchema,
-    observation: Type.Unsafe<CommerceEntityPlaneObservationV1>(
-      commerceEntityPlaneObservationV1Schema,
-    ),
-  }),
-  OpenObject({
-    status: Type.Literal("rejected"),
-    error: Type.Unsafe<CommerceEntityPlaneError>(
-      commerceEntityPlaneErrorSchema,
-    ),
-  }),
-]);
-export type CommerceObservationResult = StrictUnion<
-  StaticDecode<typeof commerceObservationResultSchema>
->;
 const commandResultWire = Type.Union([
   StrictObject({
     status: Type.Literal("accepted"),
@@ -127,19 +102,8 @@ const commandResultWire = Type.Union([
     error: commerceEntityPlaneErrorSchema,
   }),
 ]);
-const observationResultWire = Type.Union([
-  OpenObject({
-    status: Type.Literal("accepted"),
-    outcome: commerceObservationOutcomeSchema,
-    observation: entityPlaneObservationWireSchema,
-  }),
-  OpenObject({
-    status: Type.Literal("rejected"),
-    error: commerceEntityPlaneErrorSchema,
-  }),
-]);
 
-export function parseCommerceEntityPlaneError(
+function parseCommerceEntityPlaneError(
   input: unknown,
 ): ContractDecodeResult<CommerceEntityPlaneError> {
   const parsed = parseContract(
@@ -206,35 +170,6 @@ export function parseCommerceCommandResult(
       return {
         ok: true,
         value: { status: "accepted", receipt: receipt.value },
-      };
-    }
-    case "rejected": {
-      const error = parseCommerceEntityPlaneError(parsed.value.error);
-      if (!error.ok) return error;
-      return { ok: true, value: { status: "rejected", error: error.value } };
-    }
-    default:
-      return assertNever(parsed.value);
-  }
-}
-export function parseCommerceObservationResult(
-  input: unknown,
-): ContractDecodeResult<CommerceObservationResult> {
-  const parsed = parseContract(observationResultWire, input, invalidShape);
-  if (!parsed.ok) return parsed;
-  switch (parsed.value.status) {
-    case "accepted": {
-      const observation = parseCommerceEntityPlaneObservation(
-        parsed.value.observation,
-      );
-      if (!observation.ok) return observation;
-      return {
-        ok: true,
-        value: {
-          status: "accepted",
-          outcome: parsed.value.outcome,
-          observation: observation.value,
-        },
       };
     }
     case "rejected": {
