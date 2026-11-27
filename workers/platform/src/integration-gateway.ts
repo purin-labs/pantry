@@ -79,13 +79,7 @@ import {
   EVENT_QUEUE_RETRY_DELAY_SECONDS,
   type HealthBody,
 } from "@purin-labs/surface-webhooks/server/gateway/support";
-import {
-  handleConfigureShopifyConnector,
-  handleConfigureShopifyCredential,
-  handleConfigureShopifyCues,
-  handleTriggerShopifyTestOrder,
-} from "@purin-labs/area-integrations/shopify/admin";
-import { handleShopifyWebhook } from "@purin-labs/area-integrations/shopify/webhooks";
+import { SHOPIFY_GATEWAY_ROUTES } from "@purin-labs/area-integrations/shopify/gateway-routes";
 import { handleSlackEvents } from "@purin-labs/surface-slack/server/slack-ingress/events";
 import {
   handleSlackInstall,
@@ -259,17 +253,26 @@ async function handleRequest(
       case "cueStatus":
         return handleCueStatus(request, env);
       case "configureShopifyCredential":
-        return handleConfigureShopifyCredential(request, env);
+        return SHOPIFY_GATEWAY_ROUTES.admin.configureShopifyCredential(
+          request,
+          env,
+        );
       case "configureExternalRecordsCredential":
         return handleConfigureExternalRecordsCredential(request, env);
       case "readExternalRecords":
         return handleReadExternalRecords(request, env);
       case "configureShopifyConnector":
-        return handleConfigureShopifyConnector(request, env);
+        return SHOPIFY_GATEWAY_ROUTES.admin.configureShopifyConnector(
+          request,
+          env,
+        );
       case "configureShopifyCues":
-        return handleConfigureShopifyCues(request, env);
+        return SHOPIFY_GATEWAY_ROUTES.admin.configureShopifyCues(request, env);
       case "triggerShopifyTestOrder":
-        return handleTriggerShopifyTestOrder(request, env);
+        return SHOPIFY_GATEWAY_ROUTES.admin.triggerShopifyTestOrder(
+          request,
+          env,
+        );
       case "configureStripeConnector":
         return handleConfigureStripeConnector(request, env);
       case "configureStripeFailureCues":
@@ -285,7 +288,11 @@ async function handleRequest(
       case "stripeWebhook":
         return handleStripeWebhook(request, env, route.organisationIdRaw);
       case "shopifyWebhook":
-        return handleShopifyWebhook(request, env, route.organisationIdRaw);
+        return SHOPIFY_GATEWAY_ROUTES.webhooks.shopifyWebhook(
+          request,
+          env,
+          route.organisationIdRaw,
+        );
       case "dropboxWebhook":
         return handleDropboxWebhook(request, env);
       case "discordInteraction":

@@ -1,6 +1,6 @@
 // The queue message that asks for a fresh read of one Shopify order.
 // This file holds its type, its constructor and its parser.
-// `ingress-queue.ts` calls the parser when it reads the event queue.
+// `refresh-queue.ts` calls the parser when the event queue reads a message.
 
 import { isRecord } from "@purin-labs/std";
 

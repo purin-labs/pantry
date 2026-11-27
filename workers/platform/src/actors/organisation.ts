@@ -189,10 +189,7 @@ import {
   type ActorImportedState,
 } from "@purin-labs/actor-runtime/actors/actor-export";
 import { createCodeModeBudgetSchema } from "@purin-labs/agent/actors/code-mode-budget";
-import {
-  type AssignShopifyLocationClassificationInput,
-  type ShopifyLocationObservationInput,
-} from "@purin-labs/area-integrations/shopify/location-observation";
+import { SHOPIFY_ORGANISATION_PART } from "@purin-labs/area-integrations/shopify/organisation-part";
 import type { CaseExecutionEffectRecords } from "@purin-labs/agent/case-execution/records";
 import { readCaseEffectRecords } from "@purin-labs/area-brain/server/actors/organisation-execution-records";
 import { type AcceptedMemoryCursor } from "@purin-labs/area-brain/server/memory/store";
@@ -291,6 +288,9 @@ import {
 import { setBakeStockLevel } from "@purin-labs/area-kitchen/server/bakes/levels";
 import type { BakeStockLevelInput } from "@purin-labs/kitchen-control-api";
 import type { InventoryStockChange } from "@purin-labs/area-commerce/server/actors/commerce-projection/stock-changes";
+/** The RPC methods of the Shopify part of the Organisation. */
+type ShopifyRpc = ReturnType<(typeof SHOPIFY_ORGANISATION_PART)["open"]>;
+
 export class OrganisationDO
   extends OrganisationActorBase
   implements
@@ -312,6 +312,12 @@ export class OrganisationDO
         this.afterCommerceStockChanges(scope, changes),
     },
   );
+
+  // Shopify (`shopify/organisation-part.ts` of the integrations area): the
+  // observed locations of the selected shop. A removal of Shopify deletes
+  // this part, its two RPC methods and its schema line.
+
+  protected readonly shopify = SHOPIFY_ORGANISATION_PART.open(this.moduleHost);
 
   // Activation (`actors/organisation/activation.ts`): the onboarding
   // activation and its acceptance fault.
@@ -964,6 +970,7 @@ export class OrganisationDO
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env, { executionBarrier: false });
     createOrganisationSchema(this.ctx.storage);
+    SHOPIFY_ORGANISATION_PART.createSchema(this.ctx.storage.sql);
     createCodeModeBudgetSchema(this.ctx.storage);
     createSocketSweepSchema(this.ctx.storage.sql);
     installSocketAutoResponse(this.ctx);
@@ -2652,22 +2659,16 @@ export class OrganisationDO
     };
   }
 
-  async acceptShopifyLocationObservation(
-    input: ShopifyLocationObservationInput,
+  acceptShopifyLocationObservation(
+    ...input: Parameters<ShopifyRpc["acceptShopifyLocationObservation"]>
   ) {
-    return this.command(
-      input.organisationId,
-      this.admittedAcceptShopifyLocationObservation.bind(this, input),
-    );
+    return this.shopify.acceptShopifyLocationObservation(...input);
   }
 
-  async assignShopifyLocationClassification(
-    input: AssignShopifyLocationClassificationInput,
+  assignShopifyLocationClassification(
+    ...input: Parameters<ShopifyRpc["assignShopifyLocationClassification"]>
   ) {
-    return this.command(
-      input.organisationId,
-      this.admittedAssignShopifyLocationClassification.bind(this, input),
-    );
+    return this.shopify.assignShopifyLocationClassification(...input);
   }
 
   async getOrganisation(

@@ -1,6 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { prepareSlackInstallationLifecycleEvent } from "@purin-labs/authority/data/slack-installation-records";
-import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Track } from "@purin-labs/contracts";
 import type {
@@ -32,14 +31,12 @@ import {
   errorResponse,
   jsonResponse,
 } from "@purin-labs/kernel/http";
-import {
-  createCommerceDeliveryQueueMessage,
-  type CommerceDeliveryQueueMessage,
-  type CommerceOutboxReconcileQueueMessage,
+import type {
+  CommerceDeliveryQueueMessage,
+  CommerceOutboxReconcileQueueMessage,
 } from "@purin-labs/area-commerce-contract/server/queue-messages";
 import type { EmailChangeQueueMessage } from "@purin-labs/surface-email/server/mail/queue-messages";
 import type { IngressQueueMessageError } from "@purin-labs/kernel/queue-fields";
-import type { ShopifyCommerceRefreshQueueMessage } from "@purin-labs/area-integrations/shopify/queue-messages";
 import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import {
   parseConnectorId,
@@ -49,8 +46,6 @@ import {
   traceLog,
   traceWarn,
 } from "@purin-labs/kernel/observability";
-import { fetchShopifyOrderCommerceRefresh } from "@purin-labs/area-integrations/shopify/connector/initial-sync";
-import { resolveShopifyWriteCredential } from "@purin-labs/area-integrations/shopify/action-execution";
 import type { Result } from "@purin-labs/kernel/result";
 import type {
   SlackEnvelope,
@@ -61,10 +56,6 @@ import {
   disconnectSlackInstallation,
   resolveSlackInstallation,
 } from "@purin-labs/authority/slack/installation-store";
-import {
-  normalizeShopifyCommerceOrderDelivery,
-  normalizeShopifyCommerceResourceDelivery,
-} from "@purin-labs/area-integrations/shopify/delivery-normalizers";
 import {
   parseCanonicalCommerceDelivery,
   parseCommerceCueFacts,
@@ -289,87 +280,6 @@ export async function handleCommerceOutboxReconcileQueueMessage(
     default:
       return assertNever(result);
   }
-}
-
-export async function handleShopifyCommerceRefreshQueueMessage(
-  message: Message<unknown>,
-  env: Env,
-  body: ShopifyCommerceRefreshQueueMessage,
-): Promise<void> {
-  const credential = await resolveShopifyWriteCredential({
-    env,
-    organisationId: body.organisationId,
-    integrationAccountId: body.integrationAccountId,
-    fetcher: runtimeFetch,
-    now: Date.now(),
-  });
-  if (!credential.ok || credential.value.shopDomain !== body.shopDomain) {
-    traceWarn("event_queue.shopify_refresh_credential_unavailable", {
-      requestId: body.requestId,
-      message_id: message.id,
-      webhook_id: body.webhookId,
-    });
-    message.retry({ delaySeconds: EVENT_QUEUE_RETRY_DELAY_SECONDS });
-    return;
-  }
-
-  const snapshot = await fetchShopifyOrderCommerceRefresh({
-    shopDomain: credential.value.shopDomain,
-    accessToken: credential.value.accessToken,
-    organisationId: body.organisationId,
-    integrationAccountId: body.integrationAccountId,
-    observedAt: body.receivedAt,
-    orderGid: body.target.orderGid,
-    webhookId: body.webhookId,
-    fetcher: runtimeFetch,
-  });
-  if (!snapshot.ok) {
-    traceWarn("event_queue.shopify_refresh_failed", {
-      requestId: body.requestId,
-      message_id: message.id,
-      webhook_id: body.webhookId,
-      reason: snapshot.error.code,
-    });
-    message.retry({ delaySeconds: EVENT_QUEUE_RETRY_DELAY_SECONDS });
-    return;
-  }
-
-  const deliveries: CanonicalCommerceDelivery[] = [];
-  const order = normalizeShopifyCommerceOrderDelivery(snapshot.value.order);
-  if (!order.ok) {
-    message.retry({ delaySeconds: EVENT_QUEUE_RETRY_DELAY_SECONDS });
-    return;
-  }
-  deliveries.push(order.value);
-  for (const resource of snapshot.value.resources) {
-    const normalized = normalizeShopifyCommerceResourceDelivery(resource);
-    if (!normalized.ok) {
-      message.retry({ delaySeconds: EVENT_QUEUE_RETRY_DELAY_SECONDS });
-      return;
-    }
-    deliveries.push(normalized.value);
-  }
-  for (const delivery of deliveries) {
-    await env.EVENT_Q.send(
-      createCommerceDeliveryQueueMessage({
-        requestId: body.requestId,
-        receivedAt: body.receivedAt,
-        organisationId: body.organisationId,
-        integrationAccountId: body.integrationAccountId,
-        labRunId: null,
-        canonicalDeliveryJson: JSON.stringify(delivery),
-        canonicalCueFactsJson: "[]",
-      }),
-      { contentType: "json" },
-    );
-  }
-  traceLog("event_queue.shopify_refresh_queued", {
-    requestId: body.requestId,
-    message_id: message.id,
-    webhook_id: body.webhookId,
-    delivery_count: deliveries.length,
-  });
-  message.ack();
 }
 
 export async function handleCommerceDeliveryQueueMessage(

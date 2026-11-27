@@ -12,9 +12,18 @@ Shopify implementation is `shopifyCommerceProvider` in `commerce-provider.ts` of
 this folder. The provider catalogue reaches the Shopify entry through the port
 `providerModules` (`areas/integrations/server/contract/provider-modules.ts`), and
 the entry is `SHOPIFY_PROVIDER_MODULE` in `provider-module.ts` of this folder. The
-Worker registers both in `workers/platform/src/worker-ports.ts`, two lines.
-Shopify reaches commerce through the port `commerceDeliveryIntake`
+entry also gives the Shopify messages of the event queue (`refresh-queue.ts`): the
+event queue of the webhook surface reads them through the same port. The Worker
+registers both in `workers/platform/src/worker-ports.ts`, two lines. Shopify
+reaches commerce through the port `commerceDeliveryIntake`
 (`areas/commerce/contract/server/delivery-intake.ts`).
+
+Two more values of this folder have a type of the contract
+`areas/integrations/server/contract/provider-modules.ts`: the gateway routes
+(`SHOPIFY_GATEWAY_ROUTES` in `gateway-routes.ts`) and the part of the Organisation
+actor (`SHOPIFY_ORGANISATION_PART` in `organisation-part.ts`). The Worker imports
+each one in one file. The rule `shopify-rule` of `pnpm lint:layer-debts` counts
+each other import of this folder.
 
 ## 1. This folder
 
@@ -25,23 +34,24 @@ the queue message (`queue-messages.ts`), the normalizers of the deliveries
 (`delivery-normalizers.ts`), the module of the catalogue entry (`provider-module.ts`),
 the commerce provider (`commerce-provider.ts`: the credential,
 the execution and the reconciliation of an action, the graph read source and the
-control API shape of the shop), the connection check (`connection-observation.ts`)
-and the credential check (`credential-replacement.ts`).
+control API shape of the shop), the connection check (`connection-observation.ts`),
+the credential check (`credential-replacement.ts`), the messages of the event queue
+(`refresh-queue.ts`), the gateway routes (`gateway-routes.ts`) and the part of the
+Organisation actor (`organisation-part.ts`).
 
 ## 2. The files that import this folder
 
-Seven source files outside the folder import it. Remove the Shopify lines in each one.
+Three source files outside the folder import it. Remove the Shopify lines in each one.
 
-| File                                                                                                                                                                       | What it uses                                                                                                                                                                                                                                                                       |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `workers/platform/src/worker-ports.ts`                                                                                                                                     | The two registration lines: `shopifyCommerceProvider` and `SHOPIFY_PROVIDER_MODULE`. The type check then shows the `shopify` members of `ConnectedCommerceProviders` and `ProviderModules`, and the `shopify` getter of `areas/integrations/server/provider-adapters/catalogue.ts` |
-| `workers/platform/src/integration-gateway.ts`                                                                                                                              | The Shopify routes of the Worker                                                                                                                                                                                                                                                   |
-| `surfaces/webhooks/server/ingress-queue.ts`                                                                                                                                | The queue message type in the union, and its parser                                                                                                                                                                                                                                |
-| `surfaces/webhooks/server/gateway/support.ts`                                                                                                                              | The queue message for a webhook, and the order and resource normalizers                                                                                                                                                                                                            |
-| `workers/platform/src/actors/organisation.ts`, `workers/platform/src/actors/organisation/schema.ts`, `workers/platform/src/actors/organisation/organisation-actor-base.ts` | The location observation that the Organisation actor holds                                                                                                                                                                                                                         |
+| File                                          | What it uses                                                                                                                                                                                                                                                                                                                                             |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `workers/platform/src/worker-ports.ts`        | The two registration lines: `shopifyCommerceProvider` and `SHOPIFY_PROVIDER_MODULE`. The type check then shows the `shopify` members of `ConnectedCommerceProviders` and `ProviderModules`, and the `shopify` getter of `areas/integrations/server/provider-adapters/catalogue.ts`                                                                       |
+| `workers/platform/src/integration-gateway.ts` | `SHOPIFY_GATEWAY_ROUTES`: its five route cases. The route kinds are in the gateway routing of the webhook surface: `domain.ts`, `admin.ts` and `webhooks.ts` of `surfaces/webhooks/server/gateway-routing/`                                                                                                                                              |
+| `workers/platform/src/actors/organisation.ts` | `SHOPIFY_ORGANISATION_PART`: the field `shopify`, the two RPC methods `acceptShopifyLocationObservation` and `assignShopifyLocationClassification`, and the schema line in the constructor. The tables of the part stay in the Actor SQLite of each Organisation that had a shop. The class keeps its RPC method names while a Worker version calls them |
 
 Each of these files holds only call lines or registration lines for Shopify. The
-Shopify code itself is in this folder.
+Shopify code itself is in this folder. The event queue of the webhook surface names
+no Shopify file: its union holds the type `ProviderQueueMessage` of the contract.
 
 Find the importers again:
 

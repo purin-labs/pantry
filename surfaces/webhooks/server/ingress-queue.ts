@@ -34,22 +34,30 @@ import {
   type AgentScheduleDispatchQueueMessage,
 } from "@purin-labs/agent/schedules/queue-messages";
 import {
-  parseShopifyCommerceRefreshQueuePayload,
-  type ShopifyCommerceRefreshQueueMessage,
-} from "@purin-labs/area-integrations/shopify/queue-messages";
+  providerModules,
+  type ProviderQueueMessage,
+  type ProviderQueueWork,
+} from "@purin-labs/area-integrations/server/contract/provider-modules";
 
 export type IngressQueueMessage =
   | CommerceDeliveryQueueMessage
-  | ShopifyCommerceRefreshQueueMessage
+  | ProviderQueueMessage
   | CommerceOutboxReconcileQueueMessage
   | AgentScheduleDispatchQueueMessage
   | EmailChangeQueueMessage
   | FileProjectionCommand
   | ContextProjectionCommand;
 
+/**
+ * A message of the event queue, read. A message of a provider module comes
+ * with its handler from the module.
+ */
+export type ParsedIngressQueueMessage =
+  Exclude<IngressQueueMessage, ProviderQueueMessage> | ProviderQueueWork;
+
 export function parseIngressQueueMessage(
   body: unknown,
-): Result<IngressQueueMessage, IngressQueueMessageError> {
+): Result<ParsedIngressQueueMessage, IngressQueueMessageError> {
   if (!isRecord(body)) {
     return { ok: false, error: { code: "object_required" } };
   }
@@ -63,8 +71,6 @@ export function parseIngressQueueMessage(
   switch (messageType.value) {
     case "commerce.delivery.v1":
       return parseCommerceEventQueuePayload(body);
-    case "shopify.commerce_refresh.v1":
-      return parseShopifyCommerceRefreshQueuePayload(body);
     case "commerce.outbox_reconcile.v1":
       return parseCommerceOutboxReconcileQueuePayload(body);
     case "agent_schedule.dispatch.v1":
@@ -76,8 +82,20 @@ export function parseIngressQueueMessage(
     case FILE_PROJECTION_COMMAND_TYPE:
       return parseFileProjectionQueuePayload(body);
     default:
-      return { ok: false, error: { code: "invalid_field", field: "type" } };
+      return parseProviderQueueMessage(messageType.value, body);
   }
+}
+
+/** A message of a provider module, which the module reads. */
+function parseProviderQueueMessage(
+  type: string,
+  body: JsonObject,
+): Result<ProviderQueueWork, IngressQueueMessageError> {
+  for (const module of Object.values(providerModules.use())) {
+    const parsed = module.queueMessages.parse(type, body);
+    if (parsed !== null) return parsed;
+  }
+  return { ok: false, error: { code: "invalid_field", field: "type" } };
 }
 
 function parseFileProjectionQueuePayload(

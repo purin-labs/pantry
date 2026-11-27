@@ -1,12 +1,13 @@
 // The Shopify provider module (Refactor 17, step A2.5): its entry of the
-// provider catalogue and its check of a replacement credential. The Worker
-// registers it (`worker-ports.ts`).
+// provider catalogue, its check of a replacement credential and its messages
+// of the event queue. The Worker registers it (`worker-ports.ts`).
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { PROVIDER_DATA_CLASSES } from "@purin-labs/connections/data/integration-provider-directory";
 import type { ProviderModule } from "@purin-labs/area-integrations/server/contract/provider-modules";
 import { observeShopifyConnection } from "./connection-observation";
 import { connectShopify } from "./connection-workflow";
 import { validateShopifyReplacementCredential } from "./credential-replacement";
+import { SHOPIFY_QUEUE_MESSAGES } from "./refresh-queue";
 import {
   shopifyCleanupAdapter,
   shopifyOnboardingAdapter,
@@ -40,4 +41,5 @@ export const SHOPIFY_PROVIDER_MODULE: ProviderModule<"shopify"> = {
     manualActionInstruction: shopifyCleanupAdapter.manualActionInstruction,
   },
   validateReplacementCredential: validateShopifyReplacementCredential,
+  queueMessages: SHOPIFY_QUEUE_MESSAGES,
 };

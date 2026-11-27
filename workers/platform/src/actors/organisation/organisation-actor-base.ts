@@ -32,19 +32,6 @@ import type { Result } from "@purin-labs/kernel/result";
 import { admitActorRecovery } from "@purin-labs/actor-runtime/actors/actor-activation";
 import { type ActorExportError } from "@purin-labs/actor-runtime/actors/actor-export";
 import {
-  acceptShopifyLocationObservation,
-  assignShopifyLocationClassification,
-  shopifyLocationClassificationAuthority,
-  shopifyLocationProjectionAuthority,
-  type AssignShopifyLocationClassificationInput,
-  type ShopifyLocationClassificationAssignmentError,
-  type ShopifyLocationClassificationAssignmentResult,
-  type ShopifyLocationObservationAcceptanceError,
-  type ShopifyLocationObservationInput,
-  type ShopifyLocationObservationResult,
-} from "@purin-labs/area-integrations/shopify/location-observation";
-import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
-import {
   applyEvalCommand,
   checkEvalReviewLabel,
   listEvalRunResults,
@@ -87,7 +74,6 @@ import {
 import type {
   OrganisationMeta,
   OrganisationMetaInput,
-  OrganisationStateError,
 } from "@purin-labs/tenancy/actors/organisation/types";
 import {
   organisationPlacementConflict,
@@ -617,83 +603,6 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
         error: { code: "actor_cleanup_failed", detail: errorMessage(error) },
       };
     }
-  }
-
-  protected async admittedAcceptShopifyLocationObservation(
-    input: ShopifyLocationObservationInput,
-    scope: OrganisationExecutionScope,
-  ): Promise<
-    Result<
-      ShopifyLocationObservationResult,
-      | OrganisationStateError
-      | { readonly code: "organisation_placement_conflict" }
-      | ShopifyLocationObservationAcceptanceError
-    >
-  > {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      input.organisationId,
-    );
-    if (!organisation.ok) {
-      return organisation;
-    }
-    const selected = await resolveOrganisationCommerceSystemAuthority({
-      db: scope.database,
-      organisationId: input.organisationId,
-    });
-    const projectionAuthority = shopifyLocationProjectionAuthority(
-      selected,
-      input.integrationAccountId,
-    );
-    if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
-      return organisationPlacementConflict();
-    return this.ctx.storage.transactionSync(
-      acceptShopifyLocationObservation.bind(
-        null,
-        this.ctx.storage.sql,
-        input,
-        projectionAuthority,
-      ),
-    );
-  }
-
-  protected async admittedAssignShopifyLocationClassification(
-    input: AssignShopifyLocationClassificationInput,
-    scope: OrganisationExecutionScope,
-  ): Promise<
-    Result<
-      ShopifyLocationClassificationAssignmentResult,
-      | OrganisationStateError
-      | { readonly code: "organisation_placement_conflict" }
-      | ShopifyLocationClassificationAssignmentError
-    >
-  > {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      input.organisationId,
-    );
-    if (!organisation.ok) {
-      return organisation;
-    }
-    const selected = await resolveOrganisationCommerceSystemAuthority({
-      db: scope.database,
-      organisationId: input.organisationId,
-    });
-    const commerceSystem = shopifyLocationClassificationAuthority(
-      selected,
-      input.integrationAccountId,
-    );
-    if (!commerceSystem.ok) return commerceSystem;
-    if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
-      return organisationPlacementConflict();
-    return this.ctx.storage.transactionSync(
-      assignShopifyLocationClassification.bind(
-        null,
-        this.ctx.storage.sql,
-        input,
-        commerceSystem.value,
-      ),
-    );
   }
 
   async ensureOrganisation(

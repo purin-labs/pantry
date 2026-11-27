@@ -16,6 +16,7 @@ import {
   resolveActiveCaseActorAtPlacement,
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import { parseIngressQueueMessage } from "../ingress-queue";
+import type { ProviderQueueWork } from "@purin-labs/area-integrations/server/contract/provider-modules";
 import type { AgentScheduleDispatchQueueMessage } from "@purin-labs/agent/schedules/queue-messages";
 import {
   newRequestId,
@@ -41,7 +42,6 @@ import {
   EVENT_QUEUE_RETRY_DELAY_SECONDS,
   handleCommerceDeliveryQueueMessage,
   handleEmailChangeQueueMessage,
-  handleShopifyCommerceRefreshQueueMessage,
   handleCommerceOutboxReconcileQueueMessage,
   pinnedAgentForAutomation,
   queueErrorField,
@@ -199,13 +199,6 @@ export async function handleEventQueueMessage(
     case "commerce.delivery.v1":
       await handleCommerceDeliveryQueueMessage(message, env, parsed.value);
       return;
-    case "shopify.commerce_refresh.v1":
-      await handleShopifyCommerceRefreshQueueMessage(
-        message,
-        env,
-        parsed.value,
-      );
-      return;
     case "commerce.outbox_reconcile.v1":
       await handleCommerceOutboxReconcileQueueMessage(
         message,
@@ -226,7 +219,26 @@ export async function handleEventQueueMessage(
       await handleFileContextProjectionQueueMessage(message, env, parsed.value);
       return;
     default:
-      assertNever(parsed.value);
+      await handleProviderQueueWork(message, env, parsed.value);
+  }
+}
+
+/** A message of a provider module: its handler, then the ack or the retry. */
+async function handleProviderQueueWork(
+  message: Message<unknown>,
+  env: Env,
+  work: ProviderQueueWork,
+): Promise<void> {
+  const outcome = await work.run(env, message.id);
+  switch (outcome) {
+    case "ack":
+      message.ack();
+      return;
+    case "retry":
+      message.retry({ delaySeconds: EVENT_QUEUE_RETRY_DELAY_SECONDS });
+      return;
+    default:
+      assertNever(outcome);
   }
 }
 
