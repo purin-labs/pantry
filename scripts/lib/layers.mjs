@@ -256,17 +256,18 @@ export function coveredSourceFiles() {
 }
 
 const IMPORT =
-  /(?:import|export)(\s+type)?\s[^'";]*?from\s*["']([^"']+)["']|import\s*\(\s*["']([^"']+)["']\s*\)/g;
+  /(?:import|export)(\s+type)?\s[^'";]*?from\s*["']([^"']+)["']|import\s*\(\s*["']([^"']+)["']\s*\)|(?<![\w$.])import\s*["']([^"']+)["']/g;
 
 /**
- * The imports of a source text, static and dynamic. `typeOnly` is true for
+ * The imports of a source text: static, dynamic and for a side effect
+ * (`import "…"`). `typeOnly` is true for
  * `import type … from` and `export type … from`, which leave no import in
  * the built code. `dynamic` is true for `import("…")`, which loads the file
  * when the call runs.
  */
 export function importStatementsOf(text) {
   return [...text.matchAll(IMPORT)].map((match) => ({
-    specifier: match[2] ?? match[3],
+    specifier: match[2] ?? match[3] ?? match[4],
     typeOnly: match[1] !== undefined,
     dynamic: match[3] !== undefined,
   }));
