@@ -9,23 +9,23 @@ import {
   type IntegrationAccountId,
 } from "@purin-labs/kernel/ids";
 import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
-import { parseEmailProposalTarget } from "@purin-labs/area-inbox/server/data/email-operational";
+import { parseEmailProposalTarget } from "../../data/email-operational";
 import {
   CAPABILITY_KEYS,
   capabilityDefinitionById,
 } from "@purin-labs/authority/authorization/capability-catalogue";
-import type { EmailIngressLimits } from "@purin-labs/area-inbox/server/actors/connector-email";
+import type { EmailIngressLimits } from "../connector-email";
 import type { GmailMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
 import {
   parseEmailChatContext,
   parseEmailChatSources,
   parseEmailReplySources,
-} from "@purin-labs/area-inbox/server/actors/email-proposal-sources";
+} from "../email-proposal-sources";
 import type {
   EmailChatContext,
   EmailChatSource,
   EmailReplySources,
-} from "@purin-labs/area-inbox/server/mail-inbox/reply-sources";
+} from "../../mail-inbox/reply-sources";
 import {
   checked,
   emailActivationFieldsSchema,
@@ -50,7 +50,7 @@ import {
 import type {
   ConnectorEmailIdentityRequest,
   EmailMailboxRevocationRequest,
-} from "@purin-labs/surface-whatsapp/server/actors/connector/whatsapp-parsers";
+} from "./whatsapp-parsers";
 
 export type EmailReplyProposalCreateRequest = ConnectorEmailIdentityRequest & {
   readonly execution: SessionTurnExecution;
@@ -72,7 +72,7 @@ type EmailOperationalProposalCreateRequest = ConnectorEmailIdentityRequest & {
   readonly integrationAccountId: string;
   readonly caseId: string;
   readonly proposalId: string;
-  readonly target: import("@purin-labs/area-inbox/server/data/email-operational").EmailProposalTarget;
+  readonly target: import("../../data/email-operational").EmailProposalTarget;
   readonly subject: string;
   readonly body: string;
   readonly policyVersion: number;

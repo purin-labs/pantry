@@ -24,6 +24,8 @@ import {
 } from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "@purin-labs/kernel/result";
+import { whatsappConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
+import type { WhatsAppWebhookRoute } from "@purin-labs/area-inbox-contract/server/channel-ingress";
 import {
   parseE164PhoneNumber,
   parseMetaBusinessPortfolioId,
@@ -239,10 +241,6 @@ const WHATSAPP_MAX_DEBOUNCE_SECONDS = 30;
 
 const SHA256_HEX = /^[0-9a-f]{64}$/u;
 
-export function whatsappConnectorIdValue(integrationAccountId: string): string {
-  return `connector_whatsapp_${integrationAccountId}`;
-}
-
 export function whatsappConnectorId(
   integrationAccountId: string,
 ): Result<ConnectorId, WhatsAppFieldError> {
@@ -347,12 +345,6 @@ export async function routeWhatsAppWebhookAccount(input: {
     credentialGeneration: row.credentialGeneration,
   };
 }
-
-type WhatsAppWebhookRoute = {
-  readonly organisationId: string;
-  readonly integrationAccountId: string;
-  readonly credentialGeneration: number;
-};
 
 export async function registerWhatsAppPhoneNumberAccount(
   input: WhatsAppPhoneNumberRegistration,

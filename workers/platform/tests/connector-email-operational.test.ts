@@ -1,4 +1,6 @@
 /// <reference types="@cloudflare/workers-types" />
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 
 import { DatabaseSync } from "node:sqlite";
 
@@ -10,7 +12,7 @@ import {
   expireOperationalEmailProposals,
   isDefinitiveGmailSendRejection,
   revokeOperationalEmailProposals,
-} from "@purin-labs/surface-email/server/actors/connector-email-operational";
+} from "@purin-labs/area-inbox/server/actors/connector-email-operational";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {

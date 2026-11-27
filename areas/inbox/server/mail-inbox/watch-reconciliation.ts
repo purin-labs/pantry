@@ -1,4 +1,4 @@
-import { prepareEmailWatchReconciliationRun } from "@purin-labs/area-organisation/server/data/onboarding-reconciliation-run";
+import { organisationServices } from "@purin-labs/area-organisation-contract/server/organisation-services";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
 import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
@@ -46,15 +46,18 @@ export async function reconcileOrganisationEmailWatches(
   if (repairs === 0 && failure === null) return;
   const environment =
     enabled[0]?.environment === "production" ? "production" : "development";
-  await prepareEmailWatchReconciliationRun(input.scope.database, {
-    reconciliationRunId: `reconciliation_${crypto.randomUUID()}`,
-    organisationId: input.scope.organisationId,
-    environment,
-    lifecycle: failure === null ? "completed" : "failed",
-    repairCount: repairs,
-    reasonCode: failure,
-    now: input.now,
-  }).run();
+  await organisationServices
+    .use()
+    .prepareEmailWatchReconciliationRun(input.scope.database, {
+      reconciliationRunId: `reconciliation_${crypto.randomUUID()}`,
+      organisationId: input.scope.organisationId,
+      environment,
+      lifecycle: failure === null ? "completed" : "failed",
+      repairCount: repairs,
+      reasonCode: failure,
+      now: input.now,
+    })
+    .run();
 }
 
 type EnabledMailboxPolicy = {

@@ -33,16 +33,16 @@ import {
   selectWhatsAppPhoneNumberAccount,
   setWhatsAppCaseOwnership,
   setWhatsAppProviderHealth,
-  whatsappConnectorIdValue,
   whatsappConversationWindowCaseId,
 } from "@purin-labs/area-inbox/server/data/whatsapp";
+import { whatsappConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import { setIntegrationAccountLifecycle } from "@purin-labs/connections/data/integration-account";
 import { providerCredentialHandle } from "@purin-labs/area-integrations/server/contract/provisioning";
 import {
   validateNativeRequestAuthority,
   buildWhatsAppSupportAuthority,
 } from "@purin-labs/authority/request-authority/index";
-import { resolveWhatsAppOrganisationCredential } from "@purin-labs/surface-whatsapp/server/credential";
+import { resolveWhatsAppOrganisationCredential } from "@purin-labs/area-inbox/server/whatsapp/credential";
 import {
   parseE164PhoneNumber,
   parseMetaBusinessPortfolioId,

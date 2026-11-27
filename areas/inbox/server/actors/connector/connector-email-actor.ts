@@ -1,38 +1,33 @@
 import { admitNamedConnector } from "@purin-labs/conversation/actors/connector/module-admission";
 import type { ConnectorModuleHost } from "@purin-labs/conversation/actors/connector/channel-adapter";
-import type { ConnectorEvals } from "@purin-labs/area-brain/server/actors/connector/connector-evals";
+import type { ConnectorEvalWork } from "@purin-labs/area-brain-contract/server/evals/connector-eval-store";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   createContinueSerialQueue,
   createKeyedContinueSerialQueue,
 } from "@purin-labs/async-control/serial-queue";
-import { runMailOrganization } from "@purin-labs/area-inbox/server/mail-inbox/connector-runtime";
+import { runMailOrganization } from "../../mail-inbox/connector-runtime";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
-import {
-  reconcileFrozenMailReceipt,
-  type RelocationMailReceiptRequest,
-} from "../actor-relocation-mail";
+import { reconcileFrozenMailReceipt } from "./relocation-mail-receipt";
+import type { RelocationMailReceiptRequest } from "@purin-labs/area-inbox-contract/server/relocation-mail-receipt";
 import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import {
   fetchSessionConnectorMail,
   isSessionMailExecutionActive,
-} from "@purin-labs/area-inbox/server/mail-inbox/execution";
+} from "../../mail-inbox/execution";
 import {
   readEmailProposalFlow,
   validateEmailCaseContextCollectionDependency,
-} from "@purin-labs/area-inbox/server/actors/email-case-context-collection-evidence";
+} from "../email-case-context-collection-evidence";
 import {
   runMailAssistant,
   readMailAssistantStatus,
   type MailAssistantActorInput,
-} from "@purin-labs/area-inbox/server/mail-inbox/assistant";
-import { eraseMailClassificationRecords } from "@purin-labs/area-inbox/server/mail-inbox/store";
+} from "../../mail-inbox/assistant";
+import { eraseMailClassificationRecords } from "../../mail-inbox/store";
 import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
-import {
-  readClassifiedPage,
-  readDecision,
-} from "@purin-labs/area-inbox/server/mail-inbox/reads";
+import { readClassifiedPage, readDecision } from "../../mail-inbox/reads";
 import {
   readOrganization,
   manageOrganization,
@@ -40,7 +35,7 @@ import {
   type MailOrganizationReadInput,
   type MailClassifiedPageInput,
   type MailDecisionInput,
-} from "@purin-labs/area-inbox/server/mail-inbox/commands";
+} from "../../mail-inbox/commands";
 import type { MailOrganizationCommand } from "@purin-labs/control-api";
 import type { ConnectorIdentity } from "@purin-labs/contracts";
 import {
@@ -48,7 +43,7 @@ import {
   parseIntegrationAccountId,
   parseOrganisationId,
 } from "@purin-labs/kernel/ids";
-import { readAgentMailboxBinding } from "@purin-labs/area-inbox/server/data/email-mailbox";
+import { readAgentMailboxBinding } from "../../data/email-mailbox";
 import {
   connectionCredentialAuthority,
   resolveActiveProviderAccountContext,
@@ -89,13 +84,13 @@ import {
   type EmailHintAcceptance,
   type EmailReplyCorrection,
   type EmailRuntimeSnapshot,
-} from "@purin-labs/area-inbox/server/actors/connector-email";
+} from "../connector-email";
 import type {
   ClaimedEvalTask,
   EvalTaskEnd,
   EvalTaskServices,
 } from "@purin-labs/area-brain-contract/server/evals/eval-task";
-import { runMailboxEvalTask } from "@purin-labs/area-inbox/server/actors/eval-task-processing";
+import { runMailboxEvalTask } from "../eval-task-processing";
 import {
   establishConnectorEmailWatch,
   readConnectorEmailHistoryId,
@@ -103,16 +98,16 @@ import {
   runConnectorEmailEvaluation,
   stopConnectorEmailWatch,
   resolveConnectorGmailAccess,
-} from "@purin-labs/area-inbox/server/actors/connector-email-evaluation";
+} from "../connector-email-evaluation";
 import {
   processEmailCorrectionLearning,
   processEmailThreadTurn,
-} from "@purin-labs/area-inbox/server/actors/email-case-processing";
+} from "../email-case-processing";
 import {
   readEmailProposalChatContext,
   readEmailProposalChatSources,
   recordChatEditProvenance,
-} from "@purin-labs/area-inbox/server/actors/email-proposal-sources";
+} from "../email-proposal-sources";
 import {
   authorizeEmailReplyReview,
   editEmailReplyBody,
@@ -130,7 +125,7 @@ import {
   type EmailDisposalOutcome,
   type EmailProposalPreviewOutcome,
   type EmailProposalResolution,
-} from "@purin-labs/area-inbox/server/actors/connector-email-proposal";
+} from "../connector-email-proposal";
 import {
   createOperationalEmailProposal,
   dispatchOperationalEmail,
@@ -192,7 +187,7 @@ import type { ConnectorResult } from "@purin-labs/conversation/actors/connector/
 import {
   type ConnectorEmailIdentityRequest,
   type EmailReplyProvenance,
-} from "@purin-labs/surface-whatsapp/server/actors/connector/whatsapp-parsers";
+} from "./whatsapp-parsers";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**
@@ -201,7 +196,7 @@ import type { Variant } from "@purin-labs/type-utils";
 export class ConnectorEmail {
   constructor(
     private readonly host: ConnectorModuleHost,
-    private readonly evals: ConnectorEvals,
+    private readonly evals: ConnectorEvalWork,
   ) {}
 
   private activeMailOrganization: Promise<void> | null = null;
@@ -1341,8 +1336,8 @@ export class ConnectorEmail {
     input: ConnectorEmailIdentityRequest &
       Readonly<{
         proposalId: string;
-        chatSources: readonly import("@purin-labs/area-inbox/server/mail-inbox/reply-sources").EmailChatSource[];
-        chatContext: import("@purin-labs/area-inbox/server/mail-inbox/reply-sources").EmailChatContext;
+        chatSources: readonly import("../../mail-inbox/reply-sources").EmailChatSource[];
+        chatContext: import("../../mail-inbox/reply-sources").EmailChatContext;
       }>,
   ): Promise<ConnectorResult<null>> {
     return this.host.trackExecution(

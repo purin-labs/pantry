@@ -1,9 +1,9 @@
-import { isSessionMailExecutionActive } from "@purin-labs/area-inbox/server/mail-inbox/execution";
-import { readEmailProposalEvidence } from "@purin-labs/area-inbox/server/actors/email-case-context-collection-evidence";
+import { isSessionMailExecutionActive } from "../../mail-inbox/execution";
+import { readEmailProposalEvidence } from "../email-case-context-collection-evidence";
 import {
   acceptMailClassificationHint,
   eraseMailOrganization,
-} from "@purin-labs/area-inbox/server/mail-inbox/store";
+} from "../../mail-inbox/store";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
@@ -21,21 +21,18 @@ import {
   readEmailRuntime,
   type EmailHintAcceptance,
   type EmailRuntimeSnapshot,
-} from "@purin-labs/area-inbox/server/actors/connector-email";
+} from "../connector-email";
 import { nextOperationalEmailMaintenanceAt } from "../connector-email-operational";
-import type { EmailDisposalOutcome } from "@purin-labs/area-inbox/server/actors/connector-email-proposal";
-import {
-  createConnectorEvalSchema,
-  nextEvalWorkAt,
-} from "@purin-labs/area-brain/server/actors/connector-eval";
+import type { EmailDisposalOutcome } from "../connector-email-proposal";
+import { connectorEvalStore } from "@purin-labs/area-brain-contract/server/evals/connector-eval-store";
 import type { GmailMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
-import { nextMailOrganizationAt } from "@purin-labs/area-inbox/server/mail-inbox/store";
+import { nextMailOrganizationAt } from "../../mail-inbox/store";
 import type { AlarmReconciler } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
-import { digestEmailBody } from "@purin-labs/connections/mail/reply-target";
+import { digestEmailBody } from "../../mail-inbox/reply-target";
 import {
   createEmailProposalDraft,
   type EmailProposalDraftRecord,
-} from "@purin-labs/area-inbox/server/actors/email-case-processing";
+} from "../email-case-processing";
 import {
   type EmailReplyProposalCreateRequest,
   parseEmailChangeRequest,
@@ -43,7 +40,7 @@ import {
 import { ensureConnectorIdentity } from "@purin-labs/conversation/actors/connector/ingress-parsers";
 import { invalid } from "@purin-labs/conversation/actors/connector/support";
 import type { ConnectorResult } from "@purin-labs/conversation/actors/connector/types";
-import type { EmailMailboxRevocationRequest } from "@purin-labs/surface-whatsapp/server/actors/connector/whatsapp-parsers";
+import type { EmailMailboxRevocationRequest } from "./whatsapp-parsers";
 
 export type EmailMailboxDisposal = {
   readonly proposalId: string;
@@ -77,7 +74,10 @@ export type ConnectorEmailReplyProposal = Readonly<{
 
 /** Creates the tables of the mailbox. */
 export function createEmailChannelSchema(storage: DurableObjectStorage): void {
-  createConnectorEmailSchema(storage.sql, createConnectorEvalSchema);
+  createConnectorEmailSchema(
+    storage.sql,
+    connectorEvalStore.use().createSchema,
+  );
 }
 
 /**
@@ -96,7 +96,10 @@ export function emailAlarmDue(sql: SqlStorage): readonly AlarmReconciler[] {
       name: "email_correction_learning",
       nextDue: () => nextEmailCorrectionLearningAt(sql),
     },
-    { name: "eval_work", nextDue: () => nextEvalWorkAt(sql) },
+    {
+      name: "eval_work",
+      nextDue: () => connectorEvalStore.use().nextWorkAt(sql),
+    },
     { name: "email_reply_turn", nextDue: () => nextEmailReplyTurnAt(sql) },
     {
       name: "email_maintenance",

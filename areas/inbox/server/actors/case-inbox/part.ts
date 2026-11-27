@@ -1,5 +1,5 @@
 import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
-import { whatsappConnectorIdValue } from "../../data/whatsapp";
+import { whatsappConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import type { CaseInboxPart } from "@purin-labs/conversation/actors/case/parts";
 
 /** The Inbox part of the Case: the Connector of a mailbox or a WhatsApp number. */

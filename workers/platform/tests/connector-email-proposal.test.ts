@@ -29,7 +29,7 @@ import {
   digestEmailSnapshot,
   digestGmailReplyTarget,
   deriveGmailReplyTarget,
-} from "@purin-labs/connections/mail/reply-target";
+} from "@purin-labs/area-inbox/server/mail-inbox/reply-target";
 import type { GmailMessageHeaders } from "@purin-labs/connections/mail/gmail-adapter";
 import {
   activateEmailRuntime,

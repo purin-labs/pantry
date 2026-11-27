@@ -38,18 +38,18 @@ import {
   revokeWhatsAppConnection,
   type WhatsAppIngressPolicy,
   type WhatsAppPhoneNumber,
-} from "@purin-labs/area-inbox/server/data/whatsapp";
+} from "../../../data/whatsapp";
 import type { Env } from "@purin-labs/kernel/env";
 import { permissionRequiredResponse } from "@purin-labs/control/worker/permission-required";
 import { mailControlAuthority } from "@purin-labs/area-inbox-contract/server/control-authority";
-import { whatsappConnector } from "@purin-labs/area-inbox/server/mail-inbox/agent-mailbox-connector";
+import { whatsappConnector } from "../../../mail-inbox/agent-mailbox-connector";
 import {
   authorizeWhatsAppSupportRead,
   whatsappSupportReadPermission,
-} from "@purin-labs/area-inbox/server/whatsapp/read-authorization";
+} from "../../../whatsapp/read-authorization";
 import { parseIntegrationAccountId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
 import { resolveWhatsAppApplicationConfiguration } from "@purin-labs/connections/whatsapp/application";
-import { resolveWhatsAppOrganisationCredential } from "./credential";
+import { resolveWhatsAppOrganisationCredential } from "../../../whatsapp/credential";
 import { unsubscribeWhatsAppApp } from "@purin-labs/connections/whatsapp/graph";
 import type { Variant } from "@purin-labs/type-utils";
 import { hasExactKeys, isPositiveInteger, isRecord } from "@purin-labs/std";

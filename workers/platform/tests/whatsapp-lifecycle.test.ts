@@ -47,10 +47,10 @@ import {
   returnWhatsAppCaseToAgent,
   takeOverWhatsAppCase,
   type WhatsAppRpcDeps,
-} from "@purin-labs/surface-whatsapp/server/actors/connector-whatsapp-rpc";
-import { dispatchWhatsAppReply } from "@purin-labs/surface-whatsapp/server/actors/connector-whatsapp-proposal";
+} from "@purin-labs/area-inbox/server/actors/connector-whatsapp-rpc";
+import { dispatchWhatsAppReply } from "@purin-labs/area-inbox/server/actors/connector-whatsapp-proposal";
 import { armConnectorAlarm } from "@purin-labs/conversation/actors/connector/alarm";
-import { emailAlarmDue } from "@purin-labs/surface-email/server/actors/connector/email";
+import { emailAlarmDue } from "@purin-labs/area-inbox/server/actors/connector/email";
 import { whatsAppAlarmDue } from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
 import {
   createWhatsAppContentCipher,

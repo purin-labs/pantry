@@ -17,7 +17,7 @@ import {
   clearWhatsAppCaseHandoff,
   whatsappConversationWindowCaseId,
   type WhatsAppReplyProposalLifecycle,
-} from "@purin-labs/area-inbox/server/data/whatsapp";
+} from "../data/whatsapp";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   newRequestId,
@@ -34,7 +34,7 @@ import {
   parseWhatsAppCustomerId,
   parseWhatsAppMessageId,
 } from "@purin-labs/connections/whatsapp/identifiers";
-import { admitWhatsAppSupportCase } from "@purin-labs/area-inbox/server/actors/whatsapp-case-admission";
+import { admitWhatsAppSupportCase } from "./whatsapp-case-admission";
 import {
   composeWhatsAppHumanReply,
   dispatchWhatsAppReply,
@@ -71,13 +71,14 @@ import {
   type WhatsAppOwnership,
   type WhatsAppPauseReason,
   type WhatsAppRuntimeSnapshot,
-} from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
-import { deliverWhatsAppOperatorNotice } from "@purin-labs/surface-slack/server/actors/whatsapp-operator-notice";
+} from "./connector-whatsapp";
+import { whatsAppOperatorNotices } from "@purin-labs/area-inbox-contract/server/whatsapp-operator-notices";
 import {
   createWhatsAppContentCipher,
   type WhatsAppContentCipher,
-} from "@purin-labs/area-inbox/server/actors/whatsapp-active-content";
+} from "./whatsapp-active-content";
 import type { Variant } from "@purin-labs/type-utils";
+import type { WhatsAppAdmissionRequest } from "@purin-labs/area-inbox-contract/server/channel-ingress";
 import type { WhatsAppCasePanelEntry } from "@purin-labs/control-api";
 
 /**
@@ -233,28 +234,6 @@ function requireRuntime(
     ? { ok: false, error: { code: "connector_whatsapp_runtime_missing" } }
     : { ok: true, value: runtime };
 }
-
-export type WhatsAppAdmissionRequest =
-  | {
-      readonly kind: "text_message";
-      readonly customerWaId: string;
-      readonly providerMessageId: string;
-      readonly providerTimestamp: number;
-      readonly body: string;
-    }
-  | {
-      readonly kind: "unsupported_message";
-      readonly customerWaId: string;
-      readonly providerMessageId: string;
-      readonly messageType: string;
-    }
-  | {
-      readonly kind: "status";
-      readonly whatsappMessageId: string;
-      readonly status: "sent" | "delivered" | "read" | "failed";
-      readonly statusAt: number;
-      readonly failureCode: string | null;
-    };
 
 /**
  * Durably admits one parsed webhook event. Dedupe, envelope append, and
@@ -623,7 +602,7 @@ export async function notifyOperator(
     .bind(runtime.integrationAccountId, runtime.organisationId)
     .first<{ readonly displayPhoneNumber: string }>();
   if (account === null) return;
-  const delivered = await deliverWhatsAppOperatorNotice({
+  const delivered = await whatsAppOperatorNotices.use().deliver({
     env: deps.env,
     sql: deps.storage.sql,
     scope: deps.scope,

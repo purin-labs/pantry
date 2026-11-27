@@ -33,4 +33,8 @@ particular to this area.
   module that the Worker registers with the Session.
 - Content from a person outside the Organisation carries the outside-writer label (FND-06). A
   mailbox agent sends a direct reply only to a verified contact.
+- The email and WhatsApp channels of the Connector actor (`server/actors/connector/`) are Inbox
+  parts. The surfaces `surfaces/email` and `surfaces/whatsapp` keep only the provider webhooks,
+  the queue messages and the relocation admin receipt, and they reach the Inbox through
+  `contract/` (`channel-ingress.ts`).
 - WhatsApp work is deferred: see [the blocked tasks](../../docs/blocked-deferred-tasks.md).

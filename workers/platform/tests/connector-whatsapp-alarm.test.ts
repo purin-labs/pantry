@@ -9,7 +9,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const whatsappRpcMocks = vi.hoisted(createWhatsAppRpcMocks);
 
 vi.mock(
-  "@purin-labs/surface-whatsapp/server/actors/connector-whatsapp-rpc",
+  "@purin-labs/area-inbox/server/actors/connector-whatsapp-rpc",
   connectorWhatsAppRpcMockFactory,
 );
 
@@ -98,7 +98,7 @@ async function connectorWhatsAppRpcMockFactory(
 ): Promise<object> {
   const actual =
     await importOriginal<
-      typeof import("@purin-labs/surface-whatsapp/server/actors/connector-whatsapp-rpc")
+      typeof import("@purin-labs/area-inbox/server/actors/connector-whatsapp-rpc")
     >();
   return {
     ...actual,

@@ -14,6 +14,7 @@ import {
 } from "@purin-labs/area-inbox/server/data/email-operational";
 import {
   registerWhatsAppPhoneNumberAccount,
+  routeWhatsAppWebhookAccount,
   setWhatsAppProviderHealth,
 } from "@purin-labs/area-inbox/server/data/whatsapp";
 import { proposeEvalFromCorrection } from "@purin-labs/area-brain/server/evals/access";
@@ -71,6 +72,11 @@ import {
   readShownMemoryStanding,
 } from "@purin-labs/area-brain/server/memory/access";
 import { memoryService } from "@purin-labs/area-brain-contract/server/memory/memory-service";
+import { connectorEvalStore } from "@purin-labs/area-brain-contract/server/evals/connector-eval-store";
+import {
+  createConnectorEvalSchema,
+  nextEvalWorkAt,
+} from "@purin-labs/area-brain/server/actors/connector-eval";
 import { CARD_ONLY_REPLY_INSTRUCTION } from "@purin-labs/tool-handlers/slack/card-only-reply";
 import {
   readSlackConversationFact,
@@ -101,12 +107,19 @@ import { readCounterSaleView } from "@purin-labs/area-cafe/server/counter-regist
 import { readMenuScreenList } from "@purin-labs/area-cafe/server/control/routes/menu-boards";
 import { readTerminalOperations } from "@purin-labs/area-cafe/server/data/terminal-operations-readback";
 import { inboxServices } from "@purin-labs/area-inbox-contract/server/inbox-services";
-import { readGmailPilotBudget } from "@purin-labs/area-inbox/server/data/email-mailbox";
+import {
+  findEmailMailboxByAddress,
+  readGmailPilotBudget,
+} from "@purin-labs/area-inbox/server/data/email-mailbox";
+import { channelIngress } from "@purin-labs/area-inbox-contract/server/channel-ingress";
+import { whatsAppOperatorNotices } from "@purin-labs/area-inbox-contract/server/whatsapp-operator-notices";
+import { deliverWhatsAppOperatorNotice } from "@purin-labs/surface-slack/server/actors/whatsapp-operator-notice";
 import { registerSupplierOperationalEmailContact } from "@purin-labs/area-inbox/server/data/email-operational";
 import { organisationServices } from "@purin-labs/area-organisation-contract/server/organisation-services";
 import { removeIntegrationAccount } from "@purin-labs/area-organisation/server/data/account-removal";
 import { readOrganisationOperationsDestination } from "@purin-labs/area-organisation/server/data/operations-destination";
 import { operationsDestinationRead } from "@purin-labs/tenancy/data/operations-destination";
+import { prepareEmailWatchReconciliationRun } from "@purin-labs/area-organisation/server/data/onboarding-reconciliation-run";
 import {
   cancelOperatorConfigurationDraft,
   confirmOperatorConfigurationDraft,
@@ -149,6 +162,11 @@ memoryService.register({
   proposeMemoryFromCorrection: (...input) =>
     proposeMemoryFromCorrection(...input),
   proposeEvalFromCorrection: (...input) => proposeEvalFromCorrection(...input),
+});
+
+connectorEvalStore.register({
+  createSchema: (sql) => createConnectorEvalSchema(sql),
+  nextWorkAt: (sql) => nextEvalWorkAt(sql),
 });
 
 verifiedContacts.register({
@@ -295,6 +313,16 @@ inboxServices.register({
     registerSupplierOperationalEmailContact(...input),
 });
 
+channelIngress.register({
+  findEmailMailboxByAddress: (...input) => findEmailMailboxByAddress(...input),
+  routeWhatsAppWebhookAccount: (...input) =>
+    routeWhatsAppWebhookAccount(...input),
+});
+
+whatsAppOperatorNotices.register({
+  deliver: (input) => deliverWhatsAppOperatorNotice(input),
+});
+
 organisationServices.register({
   removeIntegrationAccount: (...input) => removeIntegrationAccount(...input),
   readOperatorDraft: (...input) => readOperatorDraft(...input),
@@ -303,6 +331,8 @@ organisationServices.register({
   confirmOperatorConfigurationDraft: (...input) =>
     confirmOperatorConfigurationDraft(...input),
   previewCode: (...input) => previewCode(...input),
+  prepareEmailWatchReconciliationRun: (...input) =>
+    prepareEmailWatchReconciliationRun(...input),
 });
 
 operationsDestinationRead.register((...input) =>

@@ -1,19 +1,12 @@
 // The writes of the table `onboarding_reconciliation_run` that another module
 // puts into its own batch (Refactor 17: only the owner of a table writes it).
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { EmailWatchReconciliationRun } from "@purin-labs/area-organisation-contract/server/organisation-services";
 
 /** Records a finished run of the email watch reconciliation. */
 export function prepareEmailWatchReconciliationRun(
   db: OrganisationDatabase,
-  input: Readonly<{
-    reconciliationRunId: string;
-    organisationId: string;
-    environment: string;
-    lifecycle: "completed" | "failed";
-    repairCount: number;
-    reasonCode: string | null;
-    now: number;
-  }>,
+  input: EmailWatchReconciliationRun,
 ): D1PreparedStatement {
   return db
     .prepare(

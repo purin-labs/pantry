@@ -1,6 +1,19 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { connectorEvalStore } from "@purin-labs/area-brain-contract/server/evals/connector-eval-store";
+import {
+  createConnectorEvalSchema,
+  nextEvalWorkAt,
+} from "@purin-labs/area-brain/server/actors/connector-eval";
+
+// The eval tables of the Connector, as the Worker registers them
+// (worker-ports.ts). The Slack mocks of this file leave out parts that the
+// other ports read.
+connectorEvalStore.register({
+  createSchema: (sql) => createConnectorEvalSchema(sql),
+  nextWorkAt: (sql) => nextEvalWorkAt(sql),
+});
 
 vi.mock("@purin-labs/tenancy/data/organisation", organisationModuleMock);
 vi.mock("@purin-labs/authority/credential-vault/index", credentialVaultMock);

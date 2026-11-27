@@ -33,7 +33,7 @@ import {
   digestGmailReplyTarget,
   buildGmailReplyRaw,
   proposalRfcMessageId,
-} from "@purin-labs/connections/mail/reply-target";
+} from "../mail-inbox/reply-target";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";

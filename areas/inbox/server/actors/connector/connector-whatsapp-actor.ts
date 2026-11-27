@@ -3,7 +3,7 @@ import type { ConnectorModuleHost } from "@purin-labs/conversation/actors/connec
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { admitActorRecovery } from "@purin-labs/actor-runtime/actors/actor-activation";
-import { readWhatsAppIngressPolicy } from "@purin-labs/area-inbox/server/data/whatsapp";
+import { readWhatsAppIngressPolicy } from "../../data/whatsapp";
 import {
   newRequestId,
   parseIntegrationAccountId,
@@ -31,9 +31,9 @@ import {
   updateWhatsAppRuntimePolicy,
   whatsAppAlarmDue,
   type WhatsAppRuntimeSnapshot,
-} from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
-import { processWhatsAppCaseTurn } from "@purin-labs/area-inbox/server/actors/whatsapp-case-processing";
-import { createWhatsAppContentCipher } from "@purin-labs/area-inbox/server/actors/whatsapp-active-content";
+} from "../connector-whatsapp";
+import { processWhatsAppCaseTurn } from "../whatsapp-case-processing";
+import { createWhatsAppContentCipher } from "../whatsapp-active-content";
 import { fenceAbandonedWhatsAppSends } from "../connector-whatsapp-proposal";
 import type {
   ChannelAdapter,

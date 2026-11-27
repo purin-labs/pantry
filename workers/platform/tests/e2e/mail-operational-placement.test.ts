@@ -16,7 +16,7 @@ import type { ConnectorDO } from "../../src/actors/connector";
 import {
   latestOperationalEmailProposal,
   readOperationalEmailDispatchId,
-} from "@purin-labs/surface-email/server/actors/connector-email-operational";
+} from "@purin-labs/area-inbox/server/actors/connector-email-operational";
 import { resumeActorRelocation } from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { reconcileActorRelocationMailReceipt } from "@purin-labs/surface-email/server/actors/actor-relocation-mail";
 import {

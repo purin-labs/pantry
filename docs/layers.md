@@ -304,9 +304,10 @@ import each of its files. A module with no line for one of these has none.
 
 ## areas/inbox
 
-- Folders: 16
+- Folders: 17
   - `areas/inbox/server/actors/`
   - `areas/inbox/server/actors/case-inbox/`
+  - `areas/inbox/server/actors/connector/`
   - `areas/inbox/server/actors/inbox-turns/`
   - `areas/inbox/server/actors/organisation/`
   - `areas/inbox/server/agent-tools/channels/`
@@ -458,9 +459,8 @@ import each of its files. A module with no line for one of these has none.
 
 ## surfaces/email
 
-- Folders: 4
+- Folders: 3
   - `surfaces/email/server/actors/`
-  - `surfaces/email/server/actors/connector/`
   - `surfaces/email/server/gateway/`
   - `surfaces/email/server/mail/`
 - Packages: `surfaces/email`
@@ -520,10 +520,8 @@ import each of its files. A module with no line for one of these has none.
 
 ## surfaces/whatsapp
 
-- Folders: 3
+- Folders: 1
   - `surfaces/whatsapp/server/`
-  - `surfaces/whatsapp/server/actors/`
-  - `surfaces/whatsapp/server/actors/connector/`
 - Packages: `surfaces/whatsapp`
 
 ## workers/platform

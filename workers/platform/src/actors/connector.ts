@@ -87,12 +87,12 @@ import {
 import {
   ConnectorEmail,
   type ConnectorEmailRpc,
-} from "@purin-labs/surface-email/server/actors/connector/connector-email-actor";
+} from "@purin-labs/area-inbox/server/actors/connector/connector-email-actor";
 import { ConnectorActorBase } from "@purin-labs/conversation/actors/connector/connector-actor-base";
 import {
   ConnectorWhatsApp,
   type ConnectorWhatsAppRpc,
-} from "@purin-labs/surface-whatsapp/server/actors/connector/connector-whatsapp-actor";
+} from "@purin-labs/area-inbox/server/actors/connector/connector-whatsapp-actor";
 import {
   ConnectorEvals,
   type ConnectorEvalsRpc,

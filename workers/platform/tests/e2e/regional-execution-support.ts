@@ -34,7 +34,7 @@ import {
   parseWhatsAppBusinessAccountId,
   parseWhatsAppPhoneNumberId,
 } from "@purin-labs/connections/whatsapp/identifiers";
-import { resolveWhatsAppOrganisationCredential } from "@purin-labs/surface-whatsapp/server/credential";
+import { resolveWhatsAppOrganisationCredential } from "@purin-labs/area-inbox/server/whatsapp/credential";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 

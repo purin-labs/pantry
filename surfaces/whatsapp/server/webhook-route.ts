@@ -3,17 +3,18 @@ import {
   OrganisationExecutionScope,
 } from "@purin-labs/tenancy/organisation-execution-scope";
 import { resolveActiveOrganisationPlacement } from "@purin-labs/tenancy/data/organisation-placement";
+import { whatsappConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import {
-  routeWhatsAppWebhookAccount,
-  whatsappConnectorIdValue,
-} from "@purin-labs/area-inbox/server/data/whatsapp";
+  channelIngress,
+  type WhatsAppAdmissionRequest,
+  type WhatsAppWebhookRoute,
+} from "@purin-labs/area-inbox-contract/server/channel-ingress";
 import {
   parseWhatsAppWebhookBody,
   verifyWhatsAppWebhookChallenge,
   verifyWhatsAppWebhookSignature,
   type WhatsAppWebhookEvent,
 } from "./webhook";
-import type { WhatsAppAdmissionRequest } from "./actors/connector-whatsapp-rpc";
 import type { Env } from "@purin-labs/kernel/env";
 import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
@@ -121,9 +122,9 @@ async function admitWhatsAppWebhookEvent(
     now: number;
   }>,
 ): Promise<WhatsAppWebhookAdmission> {
-  let route: Awaited<ReturnType<typeof routeWhatsAppWebhookAccount>> = null;
+  let route: WhatsAppWebhookRoute | null = null;
   for (const database of configuredOrganisationDatabases(input.env)) {
-    const candidate = await routeWhatsAppWebhookAccount({
+    const candidate = await channelIngress.use().routeWhatsAppWebhookAccount({
       db: database,
       wabaId: input.event.wabaId,
       phoneNumberId: input.event.phoneNumberId,

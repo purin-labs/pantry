@@ -936,6 +936,9 @@ importers:
 
   areas/inbox/contract:
     dependencies:
+      '@purin-labs/actor-runtime':
+        specifier: workspace:*
+        version: link:../../../foundation/actor-runtime
       '@purin-labs/agent':
         specifier: workspace:*
         version: link:../../../foundation/agent
@@ -2496,60 +2499,18 @@ importers:
       '@purin-labs/actor-runtime':
         specifier: workspace:*
         version: link:../../foundation/actor-runtime
-      '@purin-labs/agent':
-        specifier: workspace:*
-        version: link:../../foundation/agent
-      '@purin-labs/area-brain':
-        specifier: workspace:*
-        version: link:../../areas/brain
-      '@purin-labs/area-brain-contract':
-        specifier: workspace:*
-        version: link:../../areas/brain/contract
-      '@purin-labs/area-inbox':
-        specifier: workspace:*
-        version: link:../../areas/inbox
       '@purin-labs/area-inbox-contract':
         specifier: workspace:*
         version: link:../../areas/inbox/contract
-      '@purin-labs/area-integrations-contract':
-        specifier: workspace:*
-        version: link:../../areas/integrations/contract
-      '@purin-labs/area-organisation':
-        specifier: workspace:*
-        version: link:../../areas/organisation
-      '@purin-labs/async-control':
-        specifier: workspace:*
-        version: link:../../packages/async-control
-      '@purin-labs/authority':
-        specifier: workspace:*
-        version: link:../../foundation/authority
       '@purin-labs/connections':
         specifier: workspace:*
         version: link:../../foundation/connections
-      '@purin-labs/contracts':
-        specifier: workspace:*
-        version: link:../../packages/contracts
-      '@purin-labs/control-api':
-        specifier: workspace:*
-        version: link:../../packages/control-api
-      '@purin-labs/conversation':
-        specifier: workspace:*
-        version: link:../../foundation/conversation
       '@purin-labs/kernel':
         specifier: workspace:*
         version: link:../../foundation/kernel
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../../packages/std
-      '@purin-labs/surface-whatsapp':
-        specifier: workspace:*
-        version: link:../whatsapp
-      '@purin-labs/tenancy':
-        specifier: workspace:*
-        version: link:../../foundation/tenancy
-      '@purin-labs/type-utils':
-        specifier: workspace:*
-        version: link:../../packages/type-utils
     devDependencies:
       '@cloudflare/workers-types':
         specifier: 5.20260707.1
@@ -2930,45 +2891,21 @@ importers:
       '@purin-labs/actor-runtime':
         specifier: workspace:*
         version: link:../../foundation/actor-runtime
-      '@purin-labs/area-inbox':
-        specifier: workspace:*
-        version: link:../../areas/inbox
       '@purin-labs/area-inbox-contract':
         specifier: workspace:*
         version: link:../../areas/inbox/contract
-      '@purin-labs/authority':
-        specifier: workspace:*
-        version: link:../../foundation/authority
       '@purin-labs/connections':
         specifier: workspace:*
         version: link:../../foundation/connections
-      '@purin-labs/contracts':
-        specifier: workspace:*
-        version: link:../../packages/contracts
-      '@purin-labs/control':
-        specifier: workspace:*
-        version: link:../../foundation/control
-      '@purin-labs/control-api':
-        specifier: workspace:*
-        version: link:../../packages/control-api
-      '@purin-labs/conversation':
-        specifier: workspace:*
-        version: link:../../foundation/conversation
       '@purin-labs/kernel':
         specifier: workspace:*
         version: link:../../foundation/kernel
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../../packages/std
-      '@purin-labs/surface-slack':
-        specifier: workspace:*
-        version: link:../slack
       '@purin-labs/tenancy':
         specifier: workspace:*
         version: link:../../foundation/tenancy
-      '@purin-labs/type-utils':
-        specifier: workspace:*
-        version: link:../../packages/type-utils
     devDependencies:
       '@cloudflare/workers-types':
         specifier: 5.20260707.1

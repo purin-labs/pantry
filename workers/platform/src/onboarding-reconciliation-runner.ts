@@ -28,7 +28,7 @@ import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-run
 import { reconcileProviderManifestObservations } from "@purin-labs/area-integrations/server/provider-lifecycle/observation";
 import { reconcileInterruptedProviderCredentialCutovers } from "@purin-labs/area-integrations-contract/server/credential-cutover";
 import { sweepVaultAlerts } from "@purin-labs/authority/credential-vault/alerts";
-import { reconcileOrganisationEmailWatches } from "@purin-labs/surface-email/server/mail/watch-reconciliation";
+import { reconcileOrganisationEmailWatches } from "@purin-labs/area-inbox/server/mail-inbox/watch-reconciliation";
 import {
   holdOrganisationPolicyDistribution,
   reconcileOrganisationPolicyPublication,

@@ -1,5 +1,5 @@
 import { ensureCaseProject } from "@purin-labs/conversation/projects/case-project";
-import { whatsappConnectorIdValue } from "../data/whatsapp";
+import { whatsappConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import { ensureOrganisationDefaultWorkspace } from "@purin-labs/agent/data/organisation-workspace";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";

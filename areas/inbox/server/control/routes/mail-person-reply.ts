@@ -16,7 +16,7 @@ import {
   type GmailReplyAttachment,
   deriveGmailReplyTarget,
   dispatchRfcMessageId,
-} from "@purin-labs/connections/mail/reply-target";
+} from "../../mail-inbox/reply-target";
 import { extractMailbox } from "@purin-labs/connections/mail/gmail-adapter";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";

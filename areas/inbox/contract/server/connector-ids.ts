@@ -6,6 +6,11 @@ export function gmailConnectorIdValue(integrationAccountId: string): string {
   return `connector_gmail_${integrationAccountId}`;
 }
 
+/** The Connector id of a WhatsApp number, by its integration account. */
+export function whatsappConnectorIdValue(integrationAccountId: string): string {
+  return `connector_whatsapp_${integrationAccountId}`;
+}
+
 export function gmailConnectorId(
   integrationAccountId: string,
 ): Result<

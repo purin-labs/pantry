@@ -38,7 +38,7 @@ import {
   dispatchRfcMessageId,
   proposalRfcMessageId,
   type GmailReplyTarget,
-} from "@purin-labs/connections/mail/reply-target";
+} from "../mail-inbox/reply-target";
 import { extractMailbox } from "@purin-labs/connections/mail/gmail-adapter";
 import type { Env } from "@purin-labs/kernel/env";
 import type { GmailDraft } from "@purin-labs/connections/mail/gmail-adapter";

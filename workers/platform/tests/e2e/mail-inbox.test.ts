@@ -262,7 +262,7 @@ import {
   digestGmailReplyTarget,
   digestEmailBody,
   digestEmailSnapshot,
-} from "@purin-labs/connections/mail/reply-target";
+} from "@purin-labs/area-inbox/server/mail-inbox/reply-target";
 import type { CaseAssignment } from "@purin-labs/contracts";
 import type { CaseGmailReplyProposal } from "@purin-labs/area-inbox/server/actors/case-inbox/email-proposals";
 import { decodeRaw } from "./gmail-mailbox-support";

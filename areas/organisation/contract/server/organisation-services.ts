@@ -68,10 +68,26 @@ type ConfirmOperatorConfigurationDraft = (
   Result<OperatorDraftReceipt, OperatorDraftError | AgentOperationsError>
 >;
 
+/** A finished run of the email watch reconciliation of the Inbox. */
+export type EmailWatchReconciliationRun = Readonly<{
+  reconciliationRunId: string;
+  organisationId: string;
+  environment: string;
+  lifecycle: "completed" | "failed";
+  repairCount: number;
+  reasonCode: string | null;
+  now: number;
+}>;
+
+type PrepareEmailWatchReconciliationRun = (
+  db: OrganisationDatabase,
+  input: EmailWatchReconciliationRun,
+) => D1PreparedStatement;
+
 /**
  * The Organisation records that other areas use: the removal of an
- * integration account, and the configuration drafts that a Kitchen
- * workflow change waits on. The Organisation area owns them, and the Worker
+ * integration account, the configuration drafts that a Kitchen workflow
+ * change waits on, and the record of an email watch reconciliation run. The Organisation area owns them, and the Worker
  * registers the implementation (`worker-ports.ts`).
  */
 export type OrganisationServices = Readonly<{
@@ -81,6 +97,7 @@ export type OrganisationServices = Readonly<{
   confirmOperatorConfigurationDraft: ConfirmOperatorConfigurationDraft;
   /** The short code that a person compares before a confirmation. */
   previewCode: (commandDigest: string) => string;
+  prepareEmailWatchReconciliationRun: PrepareEmailWatchReconciliationRun;
 }>;
 
 export const organisationServices = definePort<OrganisationServices>(

@@ -21,6 +21,7 @@ import type {
   EvalTaskEnd,
   EvalTaskServices,
 } from "@purin-labs/area-brain-contract/server/evals/eval-task";
+import type { ConnectorEvalWork } from "@purin-labs/area-brain-contract/server/evals/connector-eval-store";
 import { publishEvalRunResult, readEvalRunFixture } from "../../evals/access";
 import { createEvalTurnMemoryReader } from "../../memory/access";
 import { newRequestId } from "@purin-labs/kernel/ids";
@@ -63,7 +64,7 @@ export type EvalAgent = Readonly<{
   ): Promise<EvalTaskEnd>;
 }>;
 
-export class ConnectorEvals {
+export class ConnectorEvals implements ConnectorEvalWork {
   constructor(
     private readonly host: ConnectorModuleHost,
     private readonly agent: EvalAgent,

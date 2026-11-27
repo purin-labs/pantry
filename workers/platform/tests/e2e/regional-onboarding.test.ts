@@ -40,7 +40,7 @@ import {
   regionalCallback,
   regionalQueue,
 } from "./regional-execution-support";
-import { resolveWhatsAppOrganisationCredential } from "@purin-labs/surface-whatsapp/server/credential";
+import { resolveWhatsAppOrganisationCredential } from "@purin-labs/area-inbox/server/whatsapp/credential";
 import { env, exports } from "cloudflare:workers";
 import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";

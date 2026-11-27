@@ -1,11 +1,11 @@
 import type { ConnectorIdentity } from "@purin-labs/contracts";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
-import type { WhatsAppIngressLimits } from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
+import type { WhatsAppIngressLimits } from "../connector-whatsapp";
 import {
   parseWhatsAppReplyOrigin,
   type WhatsAppReplyOrigin,
-  type WhatsAppAdmissionRequest,
 } from "../connector-whatsapp-rpc";
+import type { WhatsAppAdmissionRequest } from "@purin-labs/area-inbox-contract/server/channel-ingress";
 import type { WhatsAppIndeterminateResolution } from "../connector-whatsapp-proposal";
 import {
   checked,
@@ -322,8 +322,8 @@ export type EmailReplyProvenance =
   | Readonly<{ kind: "mailbox" }>
   | Readonly<{
       kind: "chat";
-      chatSources: readonly import("@purin-labs/area-inbox/server/mail-inbox/reply-sources").EmailChatSource[];
-      chatContext: import("@purin-labs/area-inbox/server/mail-inbox/reply-sources").EmailChatContext;
+      chatSources: readonly import("../../mail-inbox/reply-sources").EmailChatSource[];
+      chatContext: import("../../mail-inbox/reply-sources").EmailChatContext;
     }>;
 
 export type ConnectorEmailIdentityRequest = {

@@ -9,7 +9,7 @@ import {
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
-import { whatsappConnectorIdValue } from "../data/whatsapp";
+import { whatsappConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import {
   newRequestId,
   parseConnectorId,

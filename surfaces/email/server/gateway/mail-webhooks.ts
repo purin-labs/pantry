@@ -6,7 +6,7 @@ import {
   readGmailPushBody,
   verifyGooglePushToken,
 } from "@purin-labs/connections/mail/google-pubsub";
-import { findEmailMailboxByAddress } from "@purin-labs/area-inbox/server/data/email-mailbox";
+import { channelIngress } from "@purin-labs/area-inbox-contract/server/channel-ingress";
 import {
   newRequestId,
   parseIntegrationAccountId,
@@ -58,7 +58,7 @@ export async function handleEmailGoogleWebhook(
     });
     return Response.json({ kind: "ignored" }, { status: 200 });
   }
-  const mailbox = await findEmailMailboxByAddress({
+  const mailbox = await channelIngress.use().findEmailMailboxByAddress({
     env,
     observedAddress: envelope.value.emailAddress,
   });

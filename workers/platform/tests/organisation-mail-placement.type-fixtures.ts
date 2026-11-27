@@ -165,7 +165,7 @@ import {
   editOperationalEmailProposal,
   previewOperationalEmailProposal,
   dispatchOperationalEmail,
-} from "@purin-labs/surface-email/server/actors/connector-email-operational";
+} from "@purin-labs/area-inbox/server/actors/connector-email-operational";
 import { projectEmailOperationalProposal } from "@purin-labs/area-inbox/server/data/email-operational";
 declare const operationalCreate: Parameters<
   typeof createOperationalEmailProposal

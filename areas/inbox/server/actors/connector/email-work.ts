@@ -1,5 +1,5 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { fetchConnectorMail } from "@purin-labs/area-inbox/server/mail-inbox/execution";
+import { fetchConnectorMail } from "../../mail-inbox/execution";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseCaseId,
@@ -7,8 +7,8 @@ import {
   type CaseId,
   type IntegrationAccountId,
 } from "@purin-labs/kernel/ids";
-import { recordEmailMessageReceipt } from "@purin-labs/area-inbox/server/data/email-mailbox";
-import { projectEmailOperationalProposal } from "@purin-labs/area-inbox/server/data/email-operational";
+import { recordEmailMessageReceipt } from "../../data/email-mailbox";
+import { projectEmailOperationalProposal } from "../../data/email-operational";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
@@ -18,8 +18,8 @@ import {
   readEmailRuntime,
   type EmailCaseContextDiscoveryWork,
   type EmailRuntimeSnapshot,
-} from "@purin-labs/area-inbox/server/actors/connector-email";
-import { resolveConnectorGmailAccess } from "@purin-labs/area-inbox/server/actors/connector-email-evaluation";
+} from "../connector-email";
+import { resolveConnectorGmailAccess } from "../connector-email-evaluation";
 import {
   discoverAdmittedEmailCaseContext,
   type EmailCaseContextDiscoveryOutcome,

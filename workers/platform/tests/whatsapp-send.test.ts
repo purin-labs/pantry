@@ -21,7 +21,7 @@ import {
   editWhatsAppProposal,
   previewWhatsAppProposal,
   resolveWhatsAppIndeterminateSend,
-} from "@purin-labs/surface-whatsapp/server/actors/connector-whatsapp-proposal";
+} from "@purin-labs/area-inbox/server/actors/connector-whatsapp-proposal";
 import {
   createWhatsAppContentCipher,
   type WhatsAppContentCipher,

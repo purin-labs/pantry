@@ -6,13 +6,13 @@
     },
     "foundation-misfit": {
       "links": 14,
-      "names": 45
+      "names": 44
     },
     "table-read": {
       "reads": 85
     },
     "surface-nonpublic": {
-      "imports": 239
+      "imports": 175
     },
     "area-package": {
       "imports": 3
@@ -72,7 +72,7 @@
         "names foundation/agent-tools": 1,
         "names foundation/authority": 9,
         "names foundation/collaboration": 2,
-        "names foundation/connections": 13,
+        "names foundation/connections": 12,
         "names foundation/conversation": 2,
         "names foundation/kernel": 1,
         "names foundation/tenancy": 1,
@@ -119,9 +119,6 @@
       "reason": "The plan lets a surface import the foundation and the public entry of an area. check-layers.mjs allows each area file, because the import goes down.",
       "fix": "Import a public file of the area, or make the needed file public in `contracts` of the map. A page or a handler that holds a rule of the area belongs to the area: change its line in the map.",
       "counts": {
-        "imports surfaces/email -> areas/brain": 2,
-        "imports surfaces/email -> areas/inbox": 42,
-        "imports surfaces/email -> areas/organisation": 1,
         "imports surfaces/portal -> areas/brain": 6,
         "imports surfaces/portal -> areas/cafe": 12,
         "imports surfaces/portal -> areas/commerce": 31,
@@ -137,8 +134,7 @@
         "imports surfaces/voice -> areas/cafe": 2,
         "imports surfaces/voice -> areas/devices": 1,
         "imports surfaces/webhooks -> areas/commerce": 8,
-        "imports surfaces/webhooks -> areas/integrations": 1,
-        "imports surfaces/whatsapp -> areas/inbox": 19
+        "imports surfaces/webhooks -> areas/integrations": 1
       }
     },
     "area-package": {
