@@ -68,7 +68,46 @@ import {
   type ScheduleSpatialLayout,
   type Station,
 } from "./schedule-layout.ts";
-export * from "./schedule-layout.ts";
+export {
+  distance,
+  station,
+  stationLabel,
+  stations,
+  transferTiming,
+  travelSeconds,
+  type ResolvedScheduleLayout,
+  type ScheduleSpatialLayout,
+  type Station,
+} from "./schedule-layout.ts";
+import type {
+  CafeBeverageRecipeId,
+  CafeBeverageSpec,
+  CafeBeverageStatus,
+  VitrineCustomerOrder,
+  VitrineDemandHistoryEvent,
+  VitrineDemandPresetSnapshot,
+  VitrineDemandSnapshot,
+  VitrineOrderChannel,
+  VitrineOrderChannelFilter,
+  VitrineOrderOverride,
+  VitrineOrderSchedulePayload,
+  VitrineOrderStatus,
+  VitrineOrderTemplate,
+  VitrineRefillWave,
+  VitrineRefillWaveStatus,
+  VitrineRushPresetId,
+  VitrineRushPresetSpec,
+  VitrineStockSnapshot,
+  VitrineStockStatus,
+} from "./vitrine-types.ts";
+export type {
+  CafeBeverageRecipeId,
+  VitrineCustomerOrder,
+  VitrineOrderChannel,
+  VitrineRefillWave,
+  VitrineRushPresetId,
+  VitrineStockSnapshot,
+} from "./vitrine-types.ts";
 
 export type ScheduleVariant = "normal" | "outage";
 
@@ -2700,13 +2739,6 @@ export function plan61ASubstepAt(
   };
 }
 
-export type VitrineOrderChannel =
-  | "counter"
-  | "qr-order"
-  | "walk-in"
-  | "click-collect"
-  | "boutique";
-
 export const VITRINE_ORDER_CHANNELS: readonly Readonly<{
   id: VitrineOrderChannel;
   label: string;
@@ -2717,135 +2749,6 @@ export const VITRINE_ORDER_CHANNELS: readonly Readonly<{
   { id: "click-collect", label: "Click & Collect" },
   { id: "boutique", label: "Boutique" },
 ];
-
-type VitrineOrderStatus = "upcoming" | "waiting-refill" | "fulfilled";
-
-export type CafeBeverageRecipeId =
-  | "espresso"
-  | "siphon-coffee"
-  | "black-sesame-milk"
-  | "ginger-black-tea"
-  | "ginger-milk-tea";
-
-type CafeBeverageStatus =
-  | "upcoming"
-  | "queued-bar"
-  | "brewing"
-  | "served";
-
-export type VitrineCustomerOrder = Readonly<{
-  id: string;
-  channel: VitrineOrderChannel;
-  channelLabel: string;
-  label: string;
-  orderedAt: number;
-  orderedAtMinutes: number;
-  defaultOrderedAt: number;
-  defaultOrderedAtMinutes: number;
-  isCustomArrival: boolean;
-  isCustomOrder: boolean;
-  fulfilledAt: number | null;
-  loosePieces: number;
-  ballotinBoxes: number;
-  totalPieces: number;
-  status: VitrineOrderStatus;
-  fulfilledByWave: number | null;
-  beverageRecipe: CafeBeverageRecipeId;
-  beverageLabel: string;
-  beverageCount: number;
-  beverageEquipment: string;
-  brewDurationSeconds: number;
-  brewStart: number;
-  brewEnd: number;
-  beverageWaitSeconds: number;
-  beverageStatus: CafeBeverageStatus;
-}>;
-
-type VitrineRefillWaveStatus =
-  | "pending"
-  | "packing-ballotins"
-  | "restocking-vitrine"
-  | "completed";
-
-export type VitrineRefillWave = Readonly<{
-  waveNumber: number;
-  batchId: string;
-  workerId: HumanId | null;
-  packStart: number;
-  refillStart: number;
-  completedAt: number;
-  loosePiecesAdded: number;
-  ballotinBoxesAdded: number;
-  totalPiecesAdded: number;
-  status: VitrineRefillWaveStatus;
-}>;
-
-type VitrineStockStatus =
-  | "stocked"
-  | "low-stock"
-  | "restocking"
-  | "awaiting-refill";
-
-export type VitrineRushPresetId = "quiet" | "normal" | "weekend-rush";
-
-type VitrineRushPresetSpec = Readonly<{
-  id: VitrineRushPresetId;
-  label: string;
-  shortLabel: string;
-  description: string;
-  orderCount: number;
-  totalRequestedPieces: number;
-  recommendedBatchCount: number;
-  recommendedWorkerCount: number;
-  recommendedOvenTrays: number;
-  recommendedHorizonMinutes: number;
-}>;
-
-export type VitrineStockSnapshot = Readonly<{
-  rushPreset: VitrineRushPresetId;
-  rushPresetLabel: string;
-  recommendedBatchCount: number;
-  scheduledBatchCount: number;
-  batchDeficit: number;
-  recommendedWorkerCount: number;
-  scheduledWorkerCount: number;
-  workerDeficit: number;
-  recommendedOvenTrays: number;
-  scheduledOvenTrays: number;
-  ovenTrayDeficit: number;
-  unfinishedWavesAtHorizon: number;
-  capacityRecommendationLabel: string;
-  autoScaleBatches: boolean;
-  openingLoosePieces: number;
-  openingBallotinBoxes: number;
-  loosePieces: number;
-  looseCapacity: number;
-  ballotinBoxes: number;
-  ballotinCapacity: number;
-  totalAvailablePieces: number;
-  lowStockThresholdLoose: number;
-  status: VitrineStockStatus;
-  statusLabel: string;
-  soldLoosePieces: number;
-  soldBallotinBoxes: number;
-  restockedLoosePieces: number;
-  restockedBallotinBoxes: number;
-  orders: readonly VitrineCustomerOrder[];
-  fulfilledOrders: readonly VitrineCustomerOrder[];
-  waitingOrders: readonly VitrineCustomerOrder[];
-  upcomingOrders: readonly VitrineCustomerOrder[];
-  refillWaves: readonly VitrineRefillWave[];
-  activeWave: VitrineRefillWave | null;
-  nextWave: VitrineRefillWave | null;
-  totalBeverageCups: number;
-  servedBeverageCups: number;
-  brewingOrder: VitrineCustomerOrder | null;
-  maxBeverageWaitSeconds: number;
-  barStatusLabel: string;
-  customArrivalCount: number;
-  hasCustomArrivals: boolean;
-  customArrivalSummary: string;
-}>;
 
 const VITRINE_REFILL_YIELD = {
   openingLoosePieces: 12,
@@ -2858,29 +2761,6 @@ const VITRINE_REFILL_YIELD = {
   ballotinBoxesPerBatchWave: 2,
   totalPiecesPerBatchWave: 15,
 } as const;
-
-type VitrineOrderTemplate = Readonly<{
-  id: string;
-  channel: VitrineOrderChannel;
-  channelLabel: string;
-  label: string;
-  orderedAt: number;
-  loosePieces: number;
-  ballotinBoxes: number;
-  beverageRecipe?: CafeBeverageRecipeId;
-  beverageLabel?: string;
-  beverageCount?: number;
-  beverageEquipment?: string;
-  brewDurationSeconds?: number;
-}>;
-
-type CafeBeverageSpec = Readonly<{
-  recipe: CafeBeverageRecipeId;
-  shortName: string;
-  label: (cups: number) => string;
-  equipment: string;
-  brewSecondsPerCup: number;
-}>;
 
 export const CAFE_BEVERAGE_ROTATION: readonly CafeBeverageSpec[] = [
   {
@@ -3204,15 +3084,6 @@ let forceApplyRecommendedCapacity = false;
 let vitrineDemandRevision = 0;
 const vitrineRushListeners = new Set<() => void>();
 
-type VitrineOrderOverride = Readonly<{
-  orderedAtMinutes?: number;
-  channel?: VitrineOrderChannel;
-  loosePieces?: number;
-  ballotinBoxes?: number;
-  beverageRecipe?: CafeBeverageRecipeId;
-  beverageCount?: number;
-}>;
-
 const customOrderOverridesByPreset: Readonly<
   Record<VitrineRushPresetId, Map<string, VitrineOrderOverride>>
 > = {
@@ -3315,8 +3186,6 @@ function notifyVitrineDemandListeners(): void {
 export function getVitrineDemandRevision(): number {
   return vitrineDemandRevision;
 }
-
-type VitrineOrderChannelFilter = "all" | VitrineOrderChannel;
 
 let activeVitrineChannelFilter: VitrineOrderChannelFilter = "all";
 let snapVitrineOrdersToWaves = false;
@@ -3442,24 +3311,6 @@ function normalizeOrderOverride(
     overrides.set(orderId, cleaned);
   }
 }
-
-type VitrineDemandPresetSnapshot = Readonly<{
-  overrides: readonly (readonly [string, VitrineOrderOverride])[];
-  added: readonly VitrineOrderTemplate[];
-}>;
-
-type VitrineDemandSnapshot = Readonly<{
-  activePreset: VitrineRushPresetId;
-  autoScaleBatches: boolean;
-  presets: Readonly<Record<VitrineRushPresetId, VitrineDemandPresetSnapshot>>;
-}>;
-
-type VitrineDemandHistoryEvent = Readonly<{
-  label: string;
-  coalesceKey?: string;
-  before: VitrineDemandSnapshot;
-  after: VitrineDemandSnapshot;
-}>;
 
 let isRestoringVitrineDemand = false;
 const vitrineDemandHistoryListeners = new Set<
@@ -3761,13 +3612,6 @@ export function resetCustomVitrineOrders(
   notifyVitrineDemandListeners();
   emitVitrineDemandHistory("Reset customer orders", before);
 }
-
-type VitrineOrderSchedulePayload = Readonly<{
-  schemaVersion: 1;
-  preset: VitrineRushPresetId;
-  overrides: Readonly<Record<string, VitrineOrderOverride>>;
-  addedOrders: readonly VitrineOrderTemplate[];
-}>;
 
 export function exportCustomVitrineOrdersJson(
   preset: VitrineRushPresetId = activeVitrineRushPreset,
