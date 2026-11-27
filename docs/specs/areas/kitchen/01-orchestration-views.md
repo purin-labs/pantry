@@ -266,9 +266,11 @@ The `workflow_canvas` room (FND-10) holds the card positions of one saved run of
 ## Contracts
 
 - **Portal feature:** `areas/kitchen/ui/features/workflow-simulator/` (route, views,
-  docks, `spatial/`), with the page bridge `bakery-surface.ts`. The shared Portal files
-  are `features/bakery-surface-effect-bridge.tsx`, `bakery-surface-registry.ts`,
-  `bakery-browser-context.ts` and `bakery-workspace-reveal.tsx`.
+  docks, `spatial/`), with the page bridge `bakery-surface.ts`. The shared Portal file
+  is `features/bakery-surface-effect-bridge.tsx`. `bakery-surface-registry.ts`,
+  `bakery-browser-context.ts` and `bakery-workspace-reveal.tsx` are in
+  `areas/kitchen/contract/ui/features/`. The Portal chat reads the effect records
+  through the port `bakerySurfaceReads` of the Kitchen contract.
 - **Scheduler and run model:** `packages/production-simulation/src/recipes/bakery/`
   (`schedule.ts`, `production-workcells.ts`, `workcell-attempt.ts`,
   `workcell-instances.ts`, `workcell-input.ts`, `human-cell-transfer.ts`,

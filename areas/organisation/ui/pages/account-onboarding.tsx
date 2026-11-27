@@ -21,17 +21,9 @@ import {
   type JevSetupState,
 } from "./account-onboarding-jev";
 import "./account-onboarding.css";
+import type { AccountSetupListing } from "@purin-labs/area-organisation-contract/ui/pages/organisations";
 
 /** What the Organisations page found after Pantry made the organisation. */
-export type AccountSetupListing =
-  | Readonly<{
-      kind: "listed";
-      organisationHandle: string;
-      /** The first workspace, for the link to Settings › Jev. */
-      workspaceHandle: string | null;
-    }>
-  | Readonly<{ kind: "missing" }>;
-
 type AccountSetupStep = "organisation" | "prepare" | "jev" | "done";
 
 type AccountSetupRecovery =

@@ -129,7 +129,7 @@ async function mountAutomaticContext() {
     sourceUrl("areas/kitchen/ui/features/workflow-simulator/route.tsx")
   );
   const { BakeryWorkspaceReveal } = await import(
-    sourceUrl("areas/kitchen/ui/features/bakery-workspace-reveal.tsx")
+    sourceUrl("areas/kitchen/contract/ui/features/bakery-workspace-reveal.tsx")
   );
   const { BakerySurfaceEffectBridge } = await import(
     sourceUrl("areas/kitchen/ui/features/bakery-surface-effect-bridge.tsx")

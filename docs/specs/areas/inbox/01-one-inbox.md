@@ -220,7 +220,9 @@ An owner or admin opens the sheet "How should the agent help?" from the list hea
   the separate marketing email draft of a Slack thread.
 - The Portal: `areas/inbox/ui/features/mail-inbox/` (`route.tsx`, `conversation.tsx`,
   `whatsapp-conversation.tsx`, `reply-draft-editor.tsx`, `reply-composer.tsx`,
-  `draft-sources.tsx`, `claim-trace.tsx`, `agent-sheet.tsx`, `turn-on-sheet.tsx`).
+  `agent-sheet.tsx`, `turn-on-sheet.tsx`). `draft-sources.tsx` and `claim-trace.tsx`
+  are in `areas/inbox/contract/ui/features/mail-inbox/`, because the chat draft cards
+  show them too.
   `areas/integrations/ui/pages/whatsapp.tsx` keeps the number's connection, binding, policy
   and reconnect. It says that conversations and replies are in the Inbox.
 

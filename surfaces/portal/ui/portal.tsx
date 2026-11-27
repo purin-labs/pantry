@@ -57,7 +57,7 @@ import {
   OrganisationsRoute,
   type WorkspaceRouteTarget,
 } from "@purin-labs/area-organisation/ui/pages/workspaces";
-import type { AccountSetupListing } from "@purin-labs/area-organisation/ui/pages/account-onboarding";
+import type { AccountSetupListing } from "@purin-labs/area-organisation-contract/ui/pages/organisations";
 import {
   startShellReads,
   startWorkspacePageReads,

@@ -440,7 +440,7 @@ async function mountLiveMoveApp(paceDriveMs) {
       sourceUrl("areas/kitchen/ui/features/bakery-surface-effect-bridge.tsx")
     ),
     import("/@id/@purin-labs/bakery-model/bakery-surface"),
-    import(sourceUrl("areas/kitchen/ui/features/bakery-surface-registry.ts")),
+    import(sourceUrl("areas/kitchen/contract/ui/features/bakery-surface-registry.ts")),
     import(
       sourceUrl(
         "areas/kitchen/ui/features/workflow-simulator/floor-plan-workspace.ts",

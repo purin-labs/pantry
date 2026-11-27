@@ -26,7 +26,7 @@ async function verifyScheduledChatParity(page) {
       sourceUrl("areas/kitchen/ui/features/bakery-surface-effect-bridge.tsx")
     );
     const { bakerySurfaceForOrganisation } = await import(
-      sourceUrl("areas/kitchen/ui/features/bakery-surface-registry.ts")
+      sourceUrl("areas/kitchen/contract/ui/features/bakery-surface-registry.ts")
     );
     const { createBakerySurfaceEffect } =
       await import("/@id/@purin-labs/bakery-model/bakery-surface");
@@ -1004,7 +1004,7 @@ async function verifyScheduledFiles(page, run, capture, evidence) {
 async function attachScheduledFile(text) {
   const { sourceUrl } = await import("/source-url.js");
   const { bakerySurfaceForOrganisation } = await import(
-    sourceUrl("areas/kitchen/ui/features/bakery-surface-registry.ts")
+    sourceUrl("areas/kitchen/contract/ui/features/bakery-surface-registry.ts")
   );
   return bakerySurfaceForOrganisation("parity-42f").attachFile(
     new File([text], "attached-rehearsal.json", {

@@ -825,7 +825,7 @@ async function mountConnectedOvenWorkspace(simulationSource) {
 async function rememberOvenSurface() {
   const { sourceUrl } = await import("/source-url.js");
   const { bakerySurfaceForOrganisation } = await import(
-    sourceUrl("areas/kitchen/ui/features/bakery-surface-registry.ts")
+    sourceUrl("areas/kitchen/contract/ui/features/bakery-surface-registry.ts")
   );
   const surface = bakerySurfaceForOrganisation("oven-ui-acceptance");
   if (surface === null)
@@ -836,7 +836,7 @@ async function rememberOvenSurface() {
 async function checkOvenSurfaceSuspended() {
   const { sourceUrl } = await import("/source-url.js");
   const { bakerySurfaceForOrganisation } = await import(
-    sourceUrl("areas/kitchen/ui/features/bakery-surface-registry.ts")
+    sourceUrl("areas/kitchen/contract/ui/features/bakery-surface-registry.ts")
   );
   if (bakerySurfaceForOrganisation("oven-ui-acceptance") !== null)
     throw new Error(

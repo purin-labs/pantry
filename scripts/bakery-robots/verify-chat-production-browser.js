@@ -26,7 +26,7 @@ async function verifyProductionChatParity(page) {
       sourceUrl("areas/kitchen/ui/features/bakery-surface-effect-bridge.tsx")
     );
     const { bakerySurfaceForOrganisation } = await import(
-      sourceUrl("areas/kitchen/ui/features/bakery-surface-registry.ts")
+      sourceUrl("areas/kitchen/contract/ui/features/bakery-surface-registry.ts")
     );
     const { createBakerySurfaceEffect } =
       await import("/@id/@purin-labs/bakery-model/bakery-surface");

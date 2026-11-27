@@ -1,7 +1,7 @@
 import type { CommerceActionRecord } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 
 /** The governed change of a product description that a draft proposes. */
-export type ProductDescriptionAction = Readonly<{
+type ProductDescriptionAction = Readonly<{
   kind: "update_product_description";
   productId: string;
   productRevision: number;

@@ -294,7 +294,7 @@ async function persistentChatFetch(input, init) {
 async function persistentChatCapture() {
   const { sourceUrl } = await import("/source-url.js");
   const { bakerySurfaceForOrganisation } = await import(
-    sourceUrl("areas/kitchen/ui/features/bakery-surface-registry.ts")
+    sourceUrl("areas/kitchen/contract/ui/features/bakery-surface-registry.ts")
   );
   const surface = bakerySurfaceForOrganisation("plan70-chat");
   return surface === null ? null : (await surface.capture()).context;
@@ -388,7 +388,7 @@ function persistentChatSwitch(conversation) {
 async function persistentChatRedeliver(effect) {
   const { sourceUrl } = await import("/source-url.js");
   const { deliverBakerySurfaceEffect } = await import(
-    sourceUrl("areas/kitchen/ui/features/bakery-surface-registry.ts")
+    sourceUrl("areas/kitchen/contract/ui/features/bakery-surface-registry.ts")
   );
   return deliverBakerySurfaceEffect("plan70-chat", effect);
 }

@@ -7,13 +7,13 @@ import "@purin-labs/surface-portal/ui/styles.css";
 import { PortalFrame } from "@purin-labs/surface-portal/ui/shell";
 import { OrganisationsRoute } from "@purin-labs/area-organisation/ui/pages/workspaces";
 import type {
+  AccountSetupListing,
   OrganisationActions,
   OrganisationListItem,
 } from "@purin-labs/area-organisation-contract/ui/pages/organisations";
 import {
   AccountSetupDialog,
   type AccountSetupActions,
-  type AccountSetupListing,
   type OpenAccountSetupView,
 } from "@purin-labs/area-organisation/ui/pages/account-onboarding";
 import {

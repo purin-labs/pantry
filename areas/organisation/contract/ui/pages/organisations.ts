@@ -46,3 +46,13 @@ export type OrganisationActions = {
   /** The logo calls; the control API when absent. A preview gives its own. */
   readonly logos?: LogoActions;
 };
+
+/** Where the account setup leads once the organisation is in the list. */
+export type AccountSetupListing =
+  | Readonly<{
+      kind: "listed";
+      organisationHandle: string;
+      /** The first workspace, for the link to Settings › Jev. */
+      workspaceHandle: string | null;
+    }>
+  | Readonly<{ kind: "missing" }>;

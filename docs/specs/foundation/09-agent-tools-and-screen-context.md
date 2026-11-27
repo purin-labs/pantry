@@ -302,8 +302,9 @@ state or path. The list reads only the Portal chats of the Case that the reader 
   `screen-relevance.ts` and `case-screen-observations.ts`. The effect path is
   `actors/bakery-surface-effect.ts` and `agent-tools/bakery/page-view-handler.ts`.
 - **Portal modules**: `surface-observation.ts` and `agent-surface-label.ts` in
-  `foundation/ui/features/`, `bakery-surface-effect-bridge.tsx` and
-  `bakery-surface-registry.ts` in `areas/kitchen/ui/features/`, and
+  `foundation/ui/features/`, `bakery-surface-effect-bridge.tsx` in
+  `areas/kitchen/ui/features/`, `bakery-surface-registry.ts` in
+  `areas/kitchen/contract/ui/features/`, and
   `screen-chip.tsx`, `screen-send.ts`, `screen-relevance.ts` and `origin-chips.tsx`
   in `surfaces/portal/ui/features/chat/`.
 - **Regional D1**: `bakery_surface_effect_delivery` and `bakery_surface_timeline_event`

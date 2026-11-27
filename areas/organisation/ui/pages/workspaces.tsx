@@ -37,12 +37,13 @@ import { organisationPath, workspacePagePath } from "@purin-labs/ui/route";
 import { AgentModal } from "./agent-modal";
 import { OrganisationLogosDialog } from "./organisation-logos-dialog";
 import type {
+  AccountSetupListing,
   OrganisationActions,
   OrganisationListItem,
   OrganisationWorkspaceListItem,
 } from "@purin-labs/area-organisation-contract/ui/pages/organisations";
 import { ORGANISATION_LOGO_ACTIONS } from "./organisation-logo-transport";
-import { AccountSetup, type AccountSetupListing } from "./account-onboarding";
+import { AccountSetup } from "./account-onboarding";
 import { assertNever } from "@purin-labs/std";
 import "./organisations.css";
 

@@ -19,7 +19,7 @@ export type CustomConnectorAuthoringError = {
 };
 
 /** A connector summary, as the chat prompt shows it. */
-export type ChatConnectorSummary = Readonly<Record<string, unknown>>;
+type ChatConnectorSummary = Readonly<Record<string, unknown>>;
 
 /** The state of one setup attempt, as the chat prompt shows it. */
 export type ChatConnectorSetup = Readonly<{
