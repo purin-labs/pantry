@@ -1,6 +1,7 @@
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   ChatOrigin,
+  ScreenRelevanceChoice,
   ScreenRelevanceRequest,
   ScreenRelevanceView,
 } from "@purin-labs/control-api";
@@ -8,6 +9,10 @@ import { surfaceAreaTitle } from "@purin-labs/control-api";
 import { bytesToHex } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 import { requireActiveOrganisationActorAtScope } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { PlacedActorRpc } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { SerializedFlowLabel } from "@purin-labs/authority/policy/information-flow/types";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { OrganisationCommandFailure } from "@purin-labs/tenancy/actors/organisation/types";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ScreenRelevanceState } from "@purin-labs/area-integrations/server/jev-features/screen-relevance-jev";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
@@ -32,6 +37,55 @@ const LAST_ANSWER_CHARACTERS = 1_000;
 type ScreenRelevanceError = Readonly<{
   code: "screen_relevance_label_unavailable";
 }>;
+
+/**
+ * The RPC methods of the Organisation Actor that the composer's relevance
+ * check calls: one check through Jev and the person's choice afterwards.
+ * `OrganisationDO`, the class of the Worker, implements them.
+ */
+export interface OrganisationScreenRelevanceRpc {
+  checkScreenRelevance(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      checkId: string;
+      userId: string;
+      conversationId: string;
+      surface: string;
+      authority: Variant<RequestAuthority, "control">;
+      state: ScreenRelevanceState;
+      /** The joined label of the draft, the chat answer and the page. */
+      label: SerializedFlowLabel;
+    }>,
+  ): Promise<
+    Result<
+      Extract<ScreenRelevanceView, Readonly<{ offerNewChat: boolean }>>,
+      | OrganisationCommandFailure
+      | Readonly<{
+          code:
+            | "switch_off"
+            | "key_unavailable"
+            | "label_invalid"
+            | "disclosure_denied"
+            | "budget_refused"
+            | "jev_failed";
+        }>
+    >
+  >;
+  decideScreenRelevance(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      checkId: string;
+      userId: string;
+      choice: ScreenRelevanceChoice;
+    }>,
+  ): Promise<
+    Result<null, OrganisationCommandFailure | Readonly<{ code: string }>>
+  >;
+}
+
+/** The Organisation Actor as the relevance check calls it. */
+type ScreenRelevanceOrganisationActor = PlacedActorRpc &
+  OrganisationScreenRelevanceRpc;
 
 /**
  * The Jev relevance check of the composer (Plan 87 section 3A). The audience
@@ -82,11 +136,14 @@ export async function checkScreenRelevance(
   if (!label.ok)
     return { ok: false, error: { code: "screen_relevance_label_unavailable" } };
   const observation = input.request.observation;
-  const organisation = await requireActiveOrganisationActorAtScope({
-    env,
-    scope: input.placement,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActorAtScope<ScreenRelevanceOrganisationActor>(
+      {
+        env,
+        scope: input.placement,
+        now: Date.now(),
+      },
+    );
   const checked = await organisation.checkScreenRelevance({
     organisationId: input.scope.organisationId,
     checkId: newCheckId(),
@@ -157,16 +214,19 @@ export async function recordScreenRelevanceChoice(
     placement: OrganisationExecutionScope;
     scope: ConversationScope;
     checkId: string;
-    choice: import("@purin-labs/control-api").ScreenRelevanceChoice;
+    choice: ScreenRelevanceChoice;
   }>,
 ): Promise<
   Result<null, Readonly<{ code: "screen_relevance_check_not_found" }>>
 > {
-  const organisation = await requireActiveOrganisationActorAtScope({
-    env,
-    scope: input.placement,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActorAtScope<ScreenRelevanceOrganisationActor>(
+      {
+        env,
+        scope: input.placement,
+        now: Date.now(),
+      },
+    );
   const decided = await organisation.decideScreenRelevance({
     organisationId: input.scope.organisationId,
     checkId: input.checkId,
