@@ -55,3 +55,20 @@ export function organisationPath(
   );
   return captures === null ? null : decodeCapture(captures[0]);
 }
+
+/**
+ * The decoded Organisation id and the decoded second capture of a pattern,
+ * or null when the path does not match.
+ */
+export function organisationPathPair(
+  pathname: string,
+  pattern: RegExp,
+): Readonly<{ organisationIdRaw: string; valueRaw: string }> | null {
+  const result = pattern.exec(pathname);
+  return result?.[1] === undefined || result[2] === undefined
+    ? null
+    : {
+        organisationIdRaw: decodeURIComponent(result[1]),
+        valueRaw: decodeURIComponent(result[2]),
+      };
+}

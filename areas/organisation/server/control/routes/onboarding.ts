@@ -1,4 +1,7 @@
-import { organisationPath } from "@purin-labs/control/worker/path-match";
+import {
+  organisationPath,
+  organisationPathPair,
+} from "@purin-labs/control/worker/path-match";
 import { lifecycleFenceOf } from "@purin-labs/tenancy/data/organisation-lifecycle-moves";
 import { signalChat } from "@purin-labs/conversation/chat/signals";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
@@ -132,7 +135,7 @@ export function matchOnboardingControlRoute(
     return { kind: "organisations" };
   if (pathname === "/v1/control/setup/catalog") return { kind: "setupCatalog" };
   if (pathname === "/v1/control/home-regions") return { kind: "homeRegions" };
-  const member = two(
+  const member = organisationPathPair(
     pathname,
     /^\/v1\/control\/organisations\/([^/]+)\/members\/([^/]+)$/u,
   );
@@ -143,7 +146,7 @@ export function matchOnboardingControlRoute(
       userIdRaw: member.valueRaw,
     };
   }
-  const acceptInvitation = two(
+  const acceptInvitation = organisationPathPair(
     pathname,
     /^\/v1\/control\/organisations\/([^/]+)\/invitations\/([^/]+)\/accept$/u,
   );
@@ -153,7 +156,7 @@ export function matchOnboardingControlRoute(
       organisationIdRaw: acceptInvitation.organisationIdRaw,
       invitationIdRaw: acceptInvitation.valueRaw,
     };
-  const revokeInvitation = two(
+  const revokeInvitation = organisationPathPair(
     pathname,
     /^\/v1\/control\/organisations\/([^/]+)\/invitations\/([^/]+)\/revoke$/u,
   );
@@ -188,19 +191,6 @@ export function matchOnboardingControlRoute(
   return root?.[1] === undefined
     ? null
     : { kind: "organisation", organisationIdRaw: decodeURIComponent(root[1]) };
-}
-
-function two(
-  pathname: string,
-  pattern: RegExp,
-): Readonly<{ organisationIdRaw: string; valueRaw: string }> | null {
-  const result = pattern.exec(pathname);
-  return result?.[1] === undefined || result[2] === undefined
-    ? null
-    : {
-        organisationIdRaw: decodeURIComponent(result[1]),
-        valueRaw: decodeURIComponent(result[2]),
-      };
 }
 
 export function handleOnboardingControlRoute(

@@ -1,5 +1,5 @@
 {
-  "total": {"copies":744,"lines":12956},
+  "total": {"copies":743,"lines":12932},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -117,7 +117,6 @@
     "areas/integrations/server/agent-tools/integrations/handlers.ts = areas/integrations/server/agent-tools/integrations/handlers.ts": {"copies":1,"lines":10},
     "areas/integrations/server/control/routes/custom-connectors/definitions.ts = areas/integrations/server/control/routes/custom-connectors/setup.ts": {"copies":1,"lines":11},
     "areas/integrations/server/control/routes/custom-connectors/write-actions.ts = areas/integrations/server/control/routes/custom-connectors/write-actions.ts": {"copies":1,"lines":13},
-    "areas/integrations/server/control/routes/integrations.ts = areas/organisation/server/control/routes/onboarding.ts": {"copies":1,"lines":24},
     "areas/integrations/server/control/routes/integrations/accounts.ts = areas/integrations/server/control/routes/integrations/accounts.ts": {"copies":1,"lines":18},
     "areas/integrations/server/control/routes/integrations/accounts.ts = areas/integrations/server/control/routes/integrations/credentials.ts": {"copies":3,"lines":53},
     "areas/integrations/server/control/routes/integrations/accounts.ts = areas/integrations/server/control/routes/integrations/resources.ts": {"copies":2,"lines":35},

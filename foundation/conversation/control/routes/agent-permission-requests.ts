@@ -561,7 +561,7 @@ function readGrantTarget(
 }
 
 /** An owner or admin decides a permission request. */
-export function mayDecideAgentPermissionRequests(
+function mayDecideAgentPermissionRequests(
   authorized: OrganisationReader,
 ): boolean {
   return (
@@ -575,7 +575,7 @@ export function mayDecideAgentPermissionRequests(
  * or admin reads every request of the Organisation, and another member reads
  * their own.
  */
-export async function agentPermissionRequestSummaries(
+async function agentPermissionRequestSummaries(
   authorized: OrganisationReader,
 ): Promise<readonly AgentPermissionRequestSummary[]> {
   const pending = await listPendingAgentPermissionRequests(

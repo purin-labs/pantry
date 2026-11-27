@@ -1,4 +1,7 @@
-import { organisationPath } from "@purin-labs/control/worker/path-match";
+import {
+  organisationPath,
+  organisationPathPair,
+} from "@purin-labs/control/worker/path-match";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OnboardingProvider } from "@purin-labs/area-integrations-contract/server/provider-lifecycle";
 import { assertNever } from "@purin-labs/std";
@@ -145,7 +148,7 @@ export function matchIntegrationControlRoute(
       provider: provider(start[2]),
     };
   }
-  const cancelAttempt = two(
+  const cancelAttempt = organisationPathPair(
     pathname,
     /^\/v1\/control\/organisations\/([^/]+)\/provider-attempts\/([^/]+)\/cancel$/u,
   );
@@ -155,7 +158,7 @@ export function matchIntegrationControlRoute(
       organisationIdRaw: cancelAttempt.organisationIdRaw,
       attemptIdRaw: cancelAttempt.valueRaw,
     };
-  const attempt = two(
+  const attempt = organisationPathPair(
     pathname,
     /^\/v1\/control\/organisations\/([^/]+)\/provider-attempts\/([^/]+)$/u,
   );
@@ -171,7 +174,7 @@ export function matchIntegrationControlRoute(
       kind: "credentialInventory",
       organisationIdRaw: credentialInventory,
     };
-  const disconnectSlackInstallation = two(
+  const disconnectSlackInstallation = organisationPathPair(
     pathname,
     /^\/v1\/control\/organisations\/([^/]+)\/slack-routing\/installations\/([^/]+)\/disconnect$/u,
   );
@@ -182,7 +185,7 @@ export function matchIntegrationControlRoute(
       installationIdRaw: disconnectSlackInstallation.valueRaw,
     };
   }
-  const slackDmSelection = two(
+  const slackDmSelection = organisationPathPair(
     pathname,
     /^\/v1\/control\/organisations\/([^/]+)\/slack-routing\/installations\/([^/]+)\/dm-selection$/u,
   );
@@ -232,7 +235,7 @@ export function matchIntegrationControlRoute(
     const result = account(pathname, route.suffix);
     if (result !== null) return { kind: route.kind, ...result };
   }
-  const remove = two(
+  const remove = organisationPathPair(
     pathname,
     /^\/v1\/control\/organisations\/([^/]+)\/accounts\/([^/]+)$/u,
   );
@@ -268,7 +271,7 @@ export function account(
   integrationAccountIdRaw: string;
 }> | null {
   const escaped = suffix.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
-  const value = two(
+  const value = organisationPathPair(
     pathname,
     new RegExp(
       `^/v1/control/organisations/([^/]+)/accounts/([^/]+)/${escaped}$`,
@@ -280,19 +283,6 @@ export function account(
     : {
         organisationIdRaw: value.organisationIdRaw,
         integrationAccountIdRaw: value.valueRaw,
-      };
-}
-
-function two(
-  pathname: string,
-  pattern: RegExp,
-): Readonly<{ organisationIdRaw: string; valueRaw: string }> | null {
-  const result = pattern.exec(pathname);
-  return result?.[1] === undefined || result[2] === undefined
-    ? null
-    : {
-        organisationIdRaw: decodeURIComponent(result[1]),
-        valueRaw: decodeURIComponent(result[2]),
       };
 }
 
