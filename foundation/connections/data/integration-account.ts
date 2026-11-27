@@ -62,7 +62,7 @@ import {
 } from "@purin-labs/tenancy/data/surface-installation-writes";
 import {
   prepareProjectionRevisionBump,
-  prepareReauthProjectionBump,
+  prepareGuardedProjectionBump,
   prepareUnfencedConfigurationBump,
 } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
@@ -1363,31 +1363,15 @@ async function prepareDefaultAccountBindingTransition(
         .communicationDestinationIsConfigured(db, next.organisationId))
     )
       return { ok: true, value: [] };
-    const destination = await db
-      .prepare(
-        `SELECT 1 AS capable
-       FROM organisation_communication_destination AS destination
-       JOIN surface_installation AS surface
-         ON surface.integration_account_id = ?
-        AND surface.workspace_id = destination.workspace_id
-       JOIN provider_resource_snapshot AS snapshot
-         ON snapshot.organisation_id = destination.organisation_id
-        AND snapshot.integration_account_id = ?
-       JOIN provider_discovered_resource AS resource
-         ON resource.snapshot_revision = snapshot.snapshot_revision
-        AND resource.canonical_resource_id = destination.channel_id
-        AND resource.access_state = 'accessible'
-       WHERE destination.organisation_id = ?
-       ORDER BY snapshot.created_at DESC
-       LIMIT 1`,
-      )
-      .bind(
-        next.integrationAccountId,
-        next.integrationAccountId,
-        next.organisationId,
-      )
-      .first<{ readonly capable: unknown }>();
-    if (destination?.capable !== 1) {
+    if (
+      !(await organisationConnectionReads
+        .use()
+        .accountReachesCommunicationDestination(
+          db,
+          next.organisationId,
+          next.integrationAccountId,
+        ))
+    ) {
       return { ok: false, error: { code: "default_account_target_incapable" } };
     }
     return {
@@ -1966,10 +1950,22 @@ export async function markIntegrationAccountReauthRequired(input: {
         input.integrationAccountId,
         input.readUpdatedAt,
       ),
-    prepareReauthProjectionBump(session, {
+    // The account now waits for a new authorization: its lifecycle is
+    // reauth_required and it changed at `now`.
+    prepareGuardedProjectionBump(session, {
       organisationId: input.organisationId,
-      integrationAccountId: input.integrationAccountId,
-      now: input.now,
+      guard: {
+        condition: `EXISTS (
+           SELECT 1 FROM integration_account
+           WHERE organisation_id = ? AND integration_account_id = ?
+             AND lifecycle = 'reauth_required' AND updated_at = ?
+         )`,
+        bindings: [
+          input.organisationId,
+          input.integrationAccountId,
+          input.now,
+        ],
+      },
     }),
   ]);
   return marked !== undefined && marked.meta.changes === 1;

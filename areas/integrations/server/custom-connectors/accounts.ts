@@ -41,6 +41,7 @@ import {
 } from "@purin-labs/connections/data/provider-credential-generation";
 import {
   prepareCustomConnectorConnectionInsert,
+  type CustomConnectorConnectionSource,
   prepareCustomConnectorConnectionRotation,
 } from "@purin-labs/connections/data/provider-connection-writes";
 import {
@@ -180,10 +181,13 @@ export async function commitNewCustomConnectorAccount(input: {
         providerConnectionId,
         createdByUserId: input.committedByUserId,
         now: input.now,
-        expectedConfigurationVersion: input.expectedConfigurationVersion,
-        organisationId: attempt.organisationId,
-        attemptId: attempt.attemptId,
-        attemptRevision: attempt.attemptRevision,
+        source: verifiedSetupAttemptSource({
+          expectedConfigurationVersion: input.expectedConfigurationVersion,
+          organisationId: attempt.organisationId,
+          attemptId: attempt.attemptId,
+          attemptRevision: attempt.attemptRevision,
+          now: input.now,
+        }),
       }),
       prepareActiveCredentialGeneration(session, {
         providerConnectionId,
@@ -759,5 +763,50 @@ function accountCorrupt(
   return {
     ok: false,
     error: { code: "custom_connector_account_persistence_corrupt", field },
+  };
+}
+
+/**
+ * The verified setup attempt as the source of a new connection. It gives no
+ * row unless the attempt, the approved revision, the connector, the
+ * configuration version and the candidate credential still agree.
+ */
+function verifiedSetupAttemptSource(
+  input: Readonly<{
+    expectedConfigurationVersion: number;
+    organisationId: string;
+    attemptId: string;
+    attemptRevision: number;
+    now: number;
+  }>,
+): CustomConnectorConnectionSource {
+  return {
+    sql: `FROM custom_connector_setup_attempt AS setup
+           JOIN custom_connector_revision AS revision
+             ON revision.organisation_id = setup.organisation_id
+            AND revision.connector_id = setup.connector_id
+            AND revision.revision = setup.connector_revision
+            AND revision.definition_digest = setup.definition_digest
+           JOIN custom_connector AS connector
+             ON connector.organisation_id = setup.organisation_id
+            AND connector.connector_id = setup.connector_id
+           JOIN organisation_onboarding AS onboarding
+             ON onboarding.organisation_id = setup.organisation_id
+            AND onboarding.configuration_version = ?
+           JOIN vault_secret AS secret
+             ON secret.organisation_id = setup.organisation_id
+            AND secret.vault_handle = setup.candidate_credential_ref
+            AND secret.revoked_at IS NULL
+           WHERE setup.organisation_id = ? AND setup.attempt_id = ?
+             AND setup.lifecycle = 'verified' AND setup.attempt_revision = ?
+             AND setup.expires_at > ? AND revision.review_state = 'approved'
+             AND connector.lifecycle IN ('draft', 'active')`,
+    bindings: [
+      input.expectedConfigurationVersion,
+      input.organisationId,
+      input.attemptId,
+      input.attemptRevision,
+      input.now,
+    ],
   };
 }

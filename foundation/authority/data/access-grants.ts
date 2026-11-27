@@ -1021,10 +1021,10 @@ export function prepareGuardedFirstGrant(
 }
 
 /**
- * Adds the context grant of a WhatsApp support binding while the placement
- * is active and the binding is at `bindingRevision`. A grant that exists
- * stays. With `precedingWrite`, it also needs a change by the statement
- * before it.
+ * Adds the context grant of a support binding while the placement is active
+ * and `bindingIsCurrent` holds: a condition on the binding table that its
+ * owner writes. A grant that exists stays. With `precedingWrite`, it also
+ * needs a change by the statement before it.
  */
 export function prepareSupportBindingContextGrant(
   db: Pick<OrganisationDatabase, "prepare">,
@@ -1035,9 +1035,10 @@ export function prepareSupportBindingContextGrant(
         placementCellId: string;
         fenceToken: string;
       }>;
-      integrationAccountId: string;
-      supportBindingId: string;
-      bindingRevision: number;
+      bindingIsCurrent: Readonly<{
+        condition: string;
+        bindings: readonly (string | number)[];
+      }>;
       precedingWrite: "" | " AND changes() = 1";
     }>,
 ): D1PreparedStatement {
@@ -1048,8 +1049,7 @@ export function prepareSupportBindingContextGrant(
        revision, reason, provenance_json, changed_at
      ) SELECT ?, ?, ?, ?, 'active', 1, NULL, ?, ? WHERE EXISTS (SELECT 1 FROM organisation_placement
        WHERE organisation_id = ? AND placement_epoch = ? AND placement_cell_id = ? AND fence_token = ? AND status = 'active')
-       AND EXISTS (SELECT 1 FROM whatsapp_support_binding WHERE organisation_id = ? AND integration_account_id = ?
-         AND support_binding_id = ? AND current_revision = ?)${input.precedingWrite}
+       AND ${input.bindingIsCurrent.condition}${input.precedingWrite}
      ON CONFLICT (organisation_id, grant_id) DO NOTHING`,
     )
     .bind(
@@ -1063,9 +1063,6 @@ export function prepareSupportBindingContextGrant(
       input.placement.placementEpoch,
       input.placement.placementCellId,
       input.placement.fenceToken,
-      input.organisationId,
-      input.integrationAccountId,
-      input.supportBindingId,
-      input.bindingRevision,
+      ...input.bindingIsCurrent.bindings,
     );
 }

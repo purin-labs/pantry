@@ -14,10 +14,21 @@ import type { RowGuard } from "@purin-labs/tenancy/data/shared-rows/organisation
 type Database = OrganisationDatabase | OrganisationDatabaseSession;
 
 /**
+ * The rows that a new custom connector connection comes from. The owner of
+ * the setup tables writes `sql`: the FROM, JOIN and WHERE clauses of one
+ * SELECT. Its alias `setup` gives the columns organisation_id,
+ * connector_id, candidate_credential_ref, environment and
+ * verified_provider_account_id. The SELECT gives no row unless the setup
+ * still agrees with its records.
+ */
+export type CustomConnectorConnectionSource = Readonly<{
+  sql: string;
+  bindings: readonly (string | number)[];
+}>;
+
+/**
  * Adds the connection of a new custom connector account from its verified
- * setup attempt. It adds no row unless the attempt, the approved revision,
- * the connector, the configuration version and the candidate credential
- * still agree.
+ * setup attempt. It adds no row unless `source` gives one.
  */
 export function prepareCustomConnectorConnectionInsert(
   db: Database,
@@ -25,10 +36,7 @@ export function prepareCustomConnectorConnectionInsert(
     providerConnectionId: string;
     createdByUserId: string;
     now: number;
-    expectedConfigurationVersion: number;
-    organisationId: string;
-    attemptId: string;
-    attemptRevision: number;
+    source: CustomConnectorConnectionSource;
   }>,
 ): D1PreparedStatement {
   return db
@@ -44,37 +52,14 @@ export function prepareCustomConnectorConnectionInsert(
              'custom_api', 'api_key', 'connection_credential', 1,
              setup.candidate_credential_ref, 'active', '[]', ?, ?, ?,
              NULL, NULL, setup.environment, setup.verified_provider_account_id
-           FROM custom_connector_setup_attempt AS setup
-           JOIN custom_connector_revision AS revision
-             ON revision.organisation_id = setup.organisation_id
-            AND revision.connector_id = setup.connector_id
-            AND revision.revision = setup.connector_revision
-            AND revision.definition_digest = setup.definition_digest
-           JOIN custom_connector AS connector
-             ON connector.organisation_id = setup.organisation_id
-            AND connector.connector_id = setup.connector_id
-           JOIN organisation_onboarding AS onboarding
-             ON onboarding.organisation_id = setup.organisation_id
-            AND onboarding.configuration_version = ?
-           JOIN vault_secret AS secret
-             ON secret.organisation_id = setup.organisation_id
-            AND secret.vault_handle = setup.candidate_credential_ref
-            AND secret.revoked_at IS NULL
-           WHERE setup.organisation_id = ? AND setup.attempt_id = ?
-             AND setup.lifecycle = 'verified' AND setup.attempt_revision = ?
-             AND setup.expires_at > ? AND revision.review_state = 'approved'
-             AND connector.lifecycle IN ('draft', 'active')`,
+           ${input.source.sql}`,
     )
     .bind(
       input.providerConnectionId,
       input.createdByUserId,
       input.now,
       input.now,
-      input.expectedConfigurationVersion,
-      input.organisationId,
-      input.attemptId,
-      input.attemptRevision,
-      input.now,
+      ...input.source.bindings,
     );
 }
 

@@ -16,6 +16,16 @@ export type OrganisationConnectionReads = Readonly<{
     organisationId: string,
   ): Promise<boolean>;
   /**
+   * Whether the Slack workspace of the account is the workspace of the
+   * destination and the newest resource snapshot of the account gives the
+   * destination channel as accessible.
+   */
+  accountReachesCommunicationDestination(
+    db: OrganisationQuerySource,
+    organisationId: string,
+    integrationAccountId: string,
+  ): Promise<boolean>;
+  /**
    * The newest manifest version of a provider in an environment, or null
    * when there is none. A stored version that is not a positive integer is a
    * fault, and it throws.

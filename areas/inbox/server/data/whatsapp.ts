@@ -721,9 +721,17 @@ function prepareWhatsAppSupportContextGrant(
       placementCellId: input.scope.placement.placementCellId,
       fenceToken: input.scope.fenceToken,
     },
-    integrationAccountId: input.integrationAccountId,
-    supportBindingId: input.supportBindingId,
-    bindingRevision: input.bindingRevision,
+    // The binding is still at the revision that the grant names.
+    bindingIsCurrent: {
+      condition: `EXISTS (SELECT 1 FROM whatsapp_support_binding WHERE organisation_id = ? AND integration_account_id = ?
+         AND support_binding_id = ? AND current_revision = ?)`,
+      bindings: [
+        input.scope.organisationId,
+        input.integrationAccountId,
+        input.supportBindingId,
+        input.bindingRevision,
+      ],
+    },
     precedingWrite,
   });
 }

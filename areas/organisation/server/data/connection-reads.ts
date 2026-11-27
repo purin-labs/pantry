@@ -15,6 +15,34 @@ export const ORGANISATION_CONNECTION_READS: OrganisationConnectionReads = {
     return configuredDestination !== null;
   },
 
+  async accountReachesCommunicationDestination(
+    db,
+    organisationId,
+    integrationAccountId,
+  ) {
+    const destination = await db
+      .prepare(
+        `SELECT 1 AS capable
+       FROM organisation_communication_destination AS destination
+       JOIN surface_installation AS surface
+         ON surface.integration_account_id = ?
+        AND surface.workspace_id = destination.workspace_id
+       JOIN provider_resource_snapshot AS snapshot
+         ON snapshot.organisation_id = destination.organisation_id
+        AND snapshot.integration_account_id = ?
+       JOIN provider_discovered_resource AS resource
+         ON resource.snapshot_revision = snapshot.snapshot_revision
+        AND resource.canonical_resource_id = destination.channel_id
+        AND resource.access_state = 'accessible'
+       WHERE destination.organisation_id = ?
+       ORDER BY snapshot.created_at DESC
+       LIMIT 1`,
+      )
+      .bind(integrationAccountId, integrationAccountId, organisationId)
+      .first<{ readonly capable: unknown }>();
+    return destination?.capable === 1;
+  },
+
   async currentProviderManifestVersion(
     manifestDatabase,
     provider,

@@ -383,31 +383,22 @@ export function prepareUnfencedConfigurationBump(
 }
 
 /**
- * Moves the projection on by one when the account now waits for a new
- * authorization: its lifecycle is reauth_required and it changed at `now`.
+ * Moves the projection on by one while `guard` holds. The guard is a
+ * condition on the tables of the caller, for example on the row that the
+ * statement before it in the batch changed.
  */
-export function prepareReauthProjectionBump(
+export function prepareGuardedProjectionBump(
   db: Database,
   input: Readonly<{
     organisationId: string;
-    integrationAccountId: string;
-    now: number;
+    guard: Readonly<{ condition: string; bindings: readonly unknown[] }>;
   }>,
 ): D1PreparedStatement {
   return db
     .prepare(
       `UPDATE organisation_onboarding
          SET projection_revision = projection_revision + 1
-         WHERE organisation_id = ? AND EXISTS (
-           SELECT 1 FROM integration_account
-           WHERE organisation_id = ? AND integration_account_id = ?
-             AND lifecycle = 'reauth_required' AND updated_at = ?
-         )`,
+         WHERE organisation_id = ? AND ${input.guard.condition}`,
     )
-    .bind(
-      input.organisationId,
-      input.organisationId,
-      input.integrationAccountId,
-      input.now,
-    );
+    .bind(input.organisationId, ...input.guard.bindings);
 }
