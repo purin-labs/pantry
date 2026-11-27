@@ -678,12 +678,15 @@ if (mode === "--report") {
       reportPackage === "all"
         ? [...dead.values()]
         : [dead.get(reportPackage) ?? []];
-    // A name of a re-export names the file that declares it, and if
-    // another file imports it from there.
+    // A name that an `export *` forwards cannot leave the entry file
+    // alone: the line names the file that declares it, and if another file
+    // imports it from there.
     for (const entry of lists.flat()) {
       const [file, name] = entry.split("#");
-      const declared = declaration(file, name);
-      if (declared === null || declared === file) console.log(entry);
+      const info = files.get(file);
+      const forwarded = !info.local.has(name) && !info.links.has(name);
+      const declared = forwarded ? declaration(file, name) : null;
+      if (declared === null) console.log(entry);
       else {
         const usedThere = used.get(declared)?.has(name) ? " (used there)" : "";
         console.log(`${entry} <- ${declared}${usedThere}`);
