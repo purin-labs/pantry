@@ -1,6 +1,7 @@
 // What the held output page shows about where a request came from and went.
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 
-type Database = Pick<D1Database, "prepare">;
+type Database = Pick<OrganisationDatabase, "prepare">;
 
 /** The Portal conversation of the session, or null. */
 export async function readSessionConversationId(

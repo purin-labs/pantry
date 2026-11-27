@@ -41,7 +41,7 @@ import {
 import {
   readDiscoveredResourceLabel,
   readSessionConversationId,
-} from "@purin-labs/authority/data/held-output-context";
+} from "../../data/held-output-context";
 
 export type HeldOutputRequestRoute = Readonly<{
   kind: "heldOutputRequest";
