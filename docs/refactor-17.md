@@ -428,6 +428,16 @@ The layer debts, one line for each step that lowers a count:
   reads, each one side of one statement over tables of several owners (the two
   `UNION ALL` reads of the access subjects, four writes with a `SELECT`, two JOINs).
 
+- 2026-11-27, `worker-logic`: 7 files to 3 (3,353 lines to 812). The control router
+  is one table of 49 route families in the old order
+  (`foundation/control/worker/route-table.ts`); each family pairs the matcher and
+  the handler of its owner. The pending decision readers, the agent routes, the
+  commerce routes and the scheduled reconciliation moved to their owners (control,
+  conversation, agent, the Inbox, commerce, Kitchen, the Organisation area, the
+  Slack surface). The Worker keeps the lists. What stays: `bake-run-ports.ts`,
+  `organisation/bake-kitchen.ts` and the WhatsApp routes (`control/routes/whatsapp.ts`,
+  171 lines), which can move to the Inbox now.
+
 The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
 the state of Stage A. Its branches are gone; the work is on `dev`.
