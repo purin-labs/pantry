@@ -171,7 +171,7 @@ export function parseBakeryProductionControl(
       return null;
   }
 }
-export function parseBakeryProductionReview(
+function parseBakeryProductionReview(
   raw: unknown,
 ): BakeryProductionReview | null {
   if (

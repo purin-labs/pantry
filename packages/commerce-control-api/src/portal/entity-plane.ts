@@ -44,7 +44,7 @@ export type CommerceListEntryPatchOutcome =
       requestedAt: number;
     }>;
 
-export type CommerceActivityEventKind =
+type CommerceActivityEventKind =
   | "blotter_history"
   | "case"
   | "proposal"
@@ -54,13 +54,13 @@ export type CommerceActivityEventKind =
   | "commerce_receipt"
   | "action_ledger";
 
-export type CommerceActivityActionState = ActionState;
+type CommerceActivityActionState = ActionState;
 
 export type CommerceActivityCaseState = "open" | "waiting";
 
-export type CommerceActivityApprovalState = "waiting" | "decided" | "lapsed";
+type CommerceActivityApprovalState = "waiting" | "decided" | "lapsed";
 
-export type CommerceActivityReceiptOutcome =
+type CommerceActivityReceiptOutcome =
   | "settled"
   | "accepted"
   | "failed"
@@ -68,7 +68,7 @@ export type CommerceActivityReceiptOutcome =
   | "applied"
   | "already_applied";
 
-export type CommerceActivityEvent =
+type CommerceActivityEvent =
   | Readonly<{
       kind: "blotter_history";
       resource: CommerceActivityResource;

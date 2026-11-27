@@ -2,12 +2,12 @@ import { parseCommerceGraphResponse } from "@purin-labs/commerce-client";
 import type { CommerceGraphQueryResult } from "@purin-labs/commerce-contracts";
 import { isRecord } from "@purin-labs/std";
 
-export type CommercePresentationParseError = Readonly<{
+type CommercePresentationParseError = Readonly<{
   kind: "invalid_response";
   path: string;
 }>;
 
-export type CommercePresentationParseResult<TValue> =
+type CommercePresentationParseResult<TValue> =
   | Readonly<{ ok: true; value: TValue }>
   | Readonly<{ ok: false; error: CommercePresentationParseError }>;
 

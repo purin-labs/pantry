@@ -100,7 +100,7 @@ export type CostFormulaRowContext = Readonly<{
   ) => number | null;
 }>;
 
-export type CostFormulaEvalResult =
+type CostFormulaEvalResult =
   | Readonly<{ ok: true; value: number; normalized: string }>
   | Readonly<{
       ok: false;

@@ -11,9 +11,9 @@ import {
 
 const nonNegativeInt = NonNegativeInteger;
 
-export const FORECAST_HORIZON_WEEKS = 12;
+const FORECAST_HORIZON_WEEKS = 12;
 
-export const forecastDemandCurveSchema = Type.Union([
+const forecastDemandCurveSchema = Type.Union([
   Type.Literal("steady"),
   Type.Literal("seasonal_holiday"),
   Type.Literal("growth_ramp"),
@@ -23,7 +23,7 @@ export const forecastDemandCurveSchema = Type.Union([
 
 export type ForecastDemandCurve = Static<typeof forecastDemandCurveSchema>;
 
-export const forecastSupplierTermsSchema = Type.Union([
+const forecastSupplierTermsSchema = Type.Union([
   Type.Literal("cod"),
   Type.Literal("net_15"),
   Type.Literal("net_30"),
@@ -33,7 +33,7 @@ export type ForecastSupplierTerms = Static<typeof forecastSupplierTermsSchema>;
 
 const weekDemandPctItem = Type.Integer({ minimum: 10, maximum: 500 });
 
-export const forecastWeekDemandPctSchema = Type.Tuple([
+const forecastWeekDemandPctSchema = Type.Tuple([
   weekDemandPctItem,
   weekDemandPctItem,
   weekDemandPctItem,
@@ -82,7 +82,7 @@ const ZERO_DECIMAL_FORECAST_CURRENCIES = new Set([
   "XPF",
 ]);
 
-export const PRESET_FORECAST_DEMAND_CURVES: Readonly<
+const PRESET_FORECAST_DEMAND_CURVES: Readonly<
   Record<Exclude<ForecastDemandCurve, "custom">, ForecastWeekDemandPct>
 > = {
   steady: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
@@ -113,7 +113,7 @@ export function presetDemandCurveValues(
   ];
 }
 
-export function defaultCostForecastPlan(currency = "JPY"): CostForecastPlan {
+function defaultCostForecastPlan(currency = "JPY"): CostForecastPlan {
   const isZeroDecimal = ZERO_DECIMAL_FORECAST_CURRENCIES.has(
     currency.toUpperCase(),
   );
@@ -319,7 +319,7 @@ export type Bakery12WeekForecastCalculation = Readonly<{
   summary: ForecastSummary;
 }>;
 
-export type Bakery12WeekForecastInput = Readonly<{
+type Bakery12WeekForecastInput = Readonly<{
   overview: Pick<
     CostsOverview,
     | "currency"

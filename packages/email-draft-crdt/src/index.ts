@@ -66,13 +66,12 @@ export const emailDraftDocument = defineSharedDoc({
 });
 
 type Schema = typeof EMAIL_DRAFT_SCHEMA;
-export type EmailDraftState = SharedDocEncoding<"state", Schema>;
+type EmailDraftState = SharedDocEncoding<"state", Schema>;
 export type EmailDraftUpdate = SharedDocEncoding<"update", Schema>;
 export type EmailDraftStateVector = SharedDocEncoding<"state_vector", Schema>;
 
 export const parseEmailDraftState = emailDraftDocument.parseState;
 export const parseEmailDraftUpdate = emailDraftDocument.parseUpdate;
-export const parseEmailDraftStateVector = emailDraftDocument.parseStateVector;
 
 export class EmailDraftDoc extends emailDraftDocument.Doc {
   static create(initial: EmailDraftSnapshot = { subject: "", preview: "", body: "" }): EmailDraftCrdtResult<EmailDraftDoc> {

@@ -1,6 +1,5 @@
 import {
   parsePageBrowserBinding,
-  parsePageBrowserContext,
   type PageBrowserBinding,
   type PageBrowserContext,
 } from "@purin-labs/contracts";
@@ -14,7 +13,6 @@ import type { BakerySurfaceToolCommandName } from "./bakery-surface.ts";
 export type BakeryBrowserBinding = PageBrowserBinding;
 export type BakeryBrowserContext = PageBrowserContext;
 export const parseBakeryBrowserBinding = parsePageBrowserBinding;
-export const parseBakeryBrowserContext = parsePageBrowserContext;
 
 export type BakeryContextPreparationCommand = Readonly<{
   kind: "prepare_context";

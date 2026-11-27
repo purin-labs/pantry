@@ -29,7 +29,7 @@ export type MenuBoardFrameId =
   | "footer"
   | "canvas";
 
-export type MenuBoardOrientation = "landscape" | "portrait";
+type MenuBoardOrientation = "landscape" | "portrait";
 
 /** The screen shapes that a board is drawn for (Plan 40B phase 5). */
 export type MenuBoardScreenShape = "landscape" | "portrait" | "tablet";
@@ -43,7 +43,7 @@ export const MENU_BOARD_SCREEN_SIZES: Readonly<
   tablet: { width: 1200, height: 900 },
 };
 
-export type MenuBoardLayoutShape = Readonly<{
+type MenuBoardLayoutShape = Readonly<{
   orientation: MenuBoardOrientation;
   shape: MenuBoardScreenShape;
   /** A free canvas has the one frame "canvas", and its elements have rects. */
@@ -114,17 +114,8 @@ export const MENU_BOARD_LAYOUTS: Readonly<
   },
 };
 
-/** The free canvas layout of each screen shape. */
-export const MENU_BOARD_CANVAS_LAYOUTS: Readonly<
-  Record<MenuBoardScreenShape, MenuBoardLayout>
-> = {
-  landscape: "canvas_landscape",
-  portrait: "canvas_portrait",
-  tablet: "canvas_tablet",
-};
-
 /** The stage of the order codes that a pickup list shows. */
-export type MenuBoardPickupStage = "preparing" | "ready";
+type MenuBoardPickupStage = "preparing" | "ready";
 
 /** A rectangle on the free canvas, in board units of the board's shape. */
 export type MenuBoardRect = Readonly<{
@@ -291,7 +282,7 @@ export function isMenuBoardStackAlign(
 }
 
 /** A gap or a padding: a whole number of board units, as text. */
-export function isMenuBoardStackSpacing(value: unknown): value is string {
+function isMenuBoardStackSpacing(value: unknown): value is string {
   return (
     typeof value === "string" &&
     /^(0|[1-9][0-9]{0,2})$/u.test(value) &&
@@ -312,7 +303,7 @@ export function isMenuBoardStackProps(
 }
 
 export type MenuBoardElement = ElementBase & MenuBoardElementProps;
-export type MenuBoardElementKind = MenuBoardElement["kind"];
+type MenuBoardElementKind = MenuBoardElement["kind"];
 
 export type MenuBoardSnapshot = Readonly<{
   title: string;
@@ -415,10 +406,6 @@ export function isMenuBoardLayout(value: unknown): value is MenuBoardLayout {
   return typeof value === "string" && Object.hasOwn(MENU_BOARD_LAYOUTS, value);
 }
 
-export function isMenuBoardCanvasLayout(layout: MenuBoardLayout): boolean {
-  return MENU_BOARD_LAYOUTS[layout].canvas;
-}
-
 export function isMenuBoardFrameId(value: unknown): value is MenuBoardFrameId {
   return (
     value === "header" ||
@@ -483,7 +470,7 @@ export function isMenuBoardRect(value: unknown): value is MenuBoardRect {
   );
 }
 
-export function isMenuBoardConstraints(
+function isMenuBoardConstraints(
   value: unknown,
 ): value is MenuBoardConstraints {
   return (
@@ -882,7 +869,7 @@ export const MENU_BOARD_TYPE_RATIOS = [
 ] as const;
 export type MenuBoardTypeRatio = (typeof MENU_BOARD_TYPE_RATIOS)[number];
 
-export const MENU_BOARD_COLOR_TOKENS = [
+const MENU_BOARD_COLOR_TOKENS = [
   "background",
   "surface",
   "ink",
@@ -931,11 +918,11 @@ export function isMenuBoardStyleToken(
   );
 }
 
-export function isMenuBoardColor(value: unknown): value is string {
+function isMenuBoardColor(value: unknown): value is string {
   return typeof value === "string" && /^#[0-9a-f]{6}$/u.test(value);
 }
 
-export function isMenuBoardFontFamily(
+function isMenuBoardFontFamily(
   value: unknown,
 ): value is MenuBoardFontFamily {
   return (

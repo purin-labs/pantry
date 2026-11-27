@@ -47,7 +47,7 @@ import {
 export * from "./board.ts";
 
 export const MENU_BOARD_SCHEMA = "menu_board_crdt.v1";
-export const MENU_BOARD_STATE_LIMIT = 256 * 1024;
+const MENU_BOARD_STATE_LIMIT = 256 * 1024;
 export const MENU_BOARD_UPDATE_LIMIT = MENU_BOARD_STATE_LIMIT;
 export const MENU_BOARD_STATE_VECTOR_LIMIT = 32 * 1024;
 
@@ -119,13 +119,11 @@ export const menuBoardDocument = defineSharedDoc({
 });
 
 type Schema = typeof MENU_BOARD_SCHEMA;
-export type MenuBoardState = SharedDocEncoding<"state", Schema>;
+type MenuBoardState = SharedDocEncoding<"state", Schema>;
 export type MenuBoardUpdate = SharedDocEncoding<"update", Schema>;
 export type MenuBoardStateVector = SharedDocEncoding<"state_vector", Schema>;
 
 export const parseMenuBoardState = menuBoardDocument.parseState;
-export const parseMenuBoardUpdate = menuBoardDocument.parseUpdate;
-export const parseMenuBoardStateVector = menuBoardDocument.parseStateVector;
 
 /**
  * One board as a Yjs document. The `board` map holds the title and the

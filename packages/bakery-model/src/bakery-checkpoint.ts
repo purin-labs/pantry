@@ -7,7 +7,7 @@ import { isRecord } from "@purin-labs/std";
  * routes a checkpoint: the Portal reads the build identity and the cell
  * definition of a saved state, to open it on the bundle that wrote it.
  */
-export const CHECKPOINT_ENVELOPE_SCHEMA = 1;
+const CHECKPOINT_ENVELOPE_SCHEMA = 1;
 
 /**
  * The fields of a checkpoint: the payload of an envelope, or a checkpoint

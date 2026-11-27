@@ -31,7 +31,7 @@ export * from "./draft-shape.ts";
  */
 export const WORKFLOW_DRAFT_SCHEMA = "workflow_canvas_crdt.v2";
 /** The largest recipe has 258 steps. */
-export const DRAFT_OBJECT_LIMIT = 512;
+const DRAFT_OBJECT_LIMIT = 512;
 export const DRAFT_LABEL_LIMIT = 200;
 export const DRAFT_ENCODING_LIMITS = Object.freeze({
   state: 768 * 1024,
@@ -47,7 +47,7 @@ const FAILURES = ["invalid_draft", "object_limit"] as const;
 export type DraftFailureCode = SharedDocError<
   (typeof FAILURES)[number]
 >["code"];
-export type DraftResult<T> = SharedDocResult<T, DraftFailureCode>;
+type DraftResult<T> = SharedDocResult<T, DraftFailureCode>;
 
 /**
  * The checked encodings of the draft. The document class below is its own:

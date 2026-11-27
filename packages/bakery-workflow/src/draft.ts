@@ -295,7 +295,7 @@ export function edgeKey(edge: DraftEdge): string {
   return `${edge.workflow}/${edge.from}>${edge.to}`;
 }
 
-export type NewStep = Readonly<{
+type NewStep = Readonly<{
   workflow: string;
   kind: "work" | "wait" | "decision";
   label: string;
@@ -645,7 +645,7 @@ export function withoutDecision(body: DraftNode["body"]): DraftNode["body"] {
   return body;
 }
 
-export type DecisionRuleInput =
+type DecisionRuleInput =
   | Readonly<{ kind: "person" }>
   | Readonly<{
       kind: "scripted";

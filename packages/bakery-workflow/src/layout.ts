@@ -9,12 +9,12 @@ const BAND_RANKS = 5;
 export const BAND_GAP = 28;
 
 type Link = Readonly<{ from: string; to: string }>;
-export type PlacedNode = Readonly<{
+type PlacedNode = Readonly<{
   id: string;
   rank: number;
   column: number;
 }>;
-export type NodePlace = Readonly<{ id: string; x: number; y: number }>;
+type NodePlace = Readonly<{ id: string; x: number; y: number }>;
 
 /**
  * Rank by longest path. A node stays in a prerequisite's column when it can, so a

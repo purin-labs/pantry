@@ -18,7 +18,7 @@ export const CANVAS_BOUNDS = Object.freeze({
   minY: 10,
   maxY: 250,
 });
-export const CANVAS_OBJECT_LIMIT = 128;
+const CANVAS_OBJECT_LIMIT = 128;
 export const CANVAS_ENCODING_LIMITS = Object.freeze({
   state: 128 * 1024,
   update: 64 * 1024,
@@ -30,7 +30,7 @@ const FAILURES = ["invalid_layout", "object_conflict"] as const;
 export type CanvasFailureCode = SharedDocError<
   (typeof FAILURES)[number]
 >["code"];
-export type CanvasResult<T> = SharedDocResult<T, CanvasFailureCode>;
+type CanvasResult<T> = SharedDocResult<T, CanvasFailureCode>;
 
 /** A validated existing-object destination in canvas coordinates. */
 export class CanvasMove {

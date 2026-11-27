@@ -13,7 +13,7 @@ import {
   type ApplianceResult,
 } from "./bakery-appliance-protocol.ts";
 
-export type ApplianceRecipe =
+type ApplianceRecipe =
   "financier" | "sesame-milk" | "ginger-milk-tea" | "ginger-black-tea";
 export type ApplianceOperation = Readonly<{
   id: string;
@@ -52,7 +52,7 @@ export type ApplianceOperationState = StrictUnion<
       message: string;
     }>
 >;
-export type ApplianceWorkflow = Readonly<{
+type ApplianceWorkflow = Readonly<{
   layout: CanvasLayout;
   runId: string;
   recipe: ApplianceRecipe;
@@ -65,7 +65,7 @@ export type ApplianceWorkflow = Readonly<{
     message: string;
   }>[];
 }>;
-export type ApplianceDispatch =
+type ApplianceDispatch =
   | Readonly<{
       kind: "execute";
       plan: ApplianceWorkflow;
@@ -335,7 +335,7 @@ function dispatchApplianceOperation(
     message: "Every appliance checkpoint has accepted evidence.",
   };
 }
-export function acceptApplianceResult(
+function acceptApplianceResult(
   plan: ApplianceWorkflow,
   operationId: string,
   result: ApplianceResult,
@@ -382,7 +382,7 @@ export function acceptApplianceResult(
     interruptions: plan.interruptions,
   };
 }
-export function interruptApplianceWorkflow(
+function interruptApplianceWorkflow(
   plan: ApplianceWorkflow,
   message: string,
 ): ApplianceWorkflow {
@@ -569,7 +569,7 @@ function validateTransferInput(
   )
     throw new Error("The recording loses or duplicates ingredient custody.");
 }
-export function parseApplianceRecipe(raw: unknown): ApplianceRecipe {
+function parseApplianceRecipe(raw: unknown): ApplianceRecipe {
   switch (raw) {
     case "financier":
     case "sesame-milk":
@@ -607,7 +607,7 @@ function initialLayout(
   if (!layout.ok) throw new Error("Invalid recipe canvas membership.");
   return layout.value;
 }
-export function withApplianceLayout(
+function withApplianceLayout(
   plan: ApplianceWorkflow,
   layout: CanvasLayout,
 ): ApplianceWorkflow {

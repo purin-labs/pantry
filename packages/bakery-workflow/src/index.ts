@@ -17,12 +17,12 @@ import { Value } from "typebox/value";
  * prerequisites. It lowers to `CompiledScenario`, and `admitScenario` stays the
  * only validator of its domain rules.
  */
-export const WORKFLOW_DOCUMENT_SCHEMA = "bakery_workflow.v1";
+const WORKFLOW_DOCUMENT_SCHEMA = "bakery_workflow.v1";
 
 /** A task without its key and prerequisites: the node and the edges own those. */
 export type StepBody = Omit<TaskDefinition, "key" | "prerequisites">;
 
-export type WorkflowNode = Readonly<{
+type WorkflowNode = Readonly<{
   kind: "step";
   id: TaskKey;
   label: string;
@@ -36,7 +36,7 @@ export type WorkflowEdge = Readonly<{
   branch: "accept" | "reject" | null;
 }>;
 
-export type WorkflowGraph = Readonly<{
+type WorkflowGraph = Readonly<{
   id: WorkflowId;
   revision: Sha256Hex;
   demand: WorkflowDefinition["demand"];
@@ -235,7 +235,7 @@ const DOCUMENT = Type.Object(
   { additionalProperties: false },
 );
 
-export type WorkflowDocumentProblem = Readonly<{
+type WorkflowDocumentProblem = Readonly<{
   code: "invalid_workflow_document";
   message: string;
 }>;

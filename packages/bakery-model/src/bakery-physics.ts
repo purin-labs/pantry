@@ -24,7 +24,7 @@ export const LINEA_GLB_SHA256 =
   "142fac26dd1feca6c21395415d0453e9f2c88e7a2c0a05ec35073365b11456f3";
 export const MAX_RECORDING_BYTES = 16 * 1024 * 1024;
 export const MAX_REQUEST_BYTES = 4096;
-export const MARUZEN_GLB_SHA256 =
+const MARUZEN_GLB_SHA256 =
   "a933f3458b83e61242b27727ac3f54a1b40799468ba17488d80881e3cbdb2599";
 const MARUZEN_MBCO4_GLB_SHA256 =
   "1e04152e74446ed8479cdcfa5419e58918b918dd770b5fb4659cd8fce4eeee85";
@@ -39,7 +39,7 @@ const EARLIER_MARUZEN_GLB_SHA256: ReadonlySet<string> = new Set([
   "835cdad18287a279f5f7dd67676e2d1dffeada75e655b2cdec73bff07bf10b4f",
 ]);
 
-export type Vector3 = readonly [number, number, number];
+type Vector3 = readonly [number, number, number];
 /** Metres, Z-up; quaternion WXYZ. */
 export type PhysicsPose = readonly [
   number,
@@ -58,7 +58,7 @@ export type JointAngles = readonly [
   number,
   number,
 ];
-export type PhysicsBody = "world" | "tool" | "jaw" | "tray";
+type PhysicsBody = "world" | "tool" | "jaw" | "tray";
 export type PhysicsGeometry = Readonly<{
   name: string;
   body: PhysicsBody;
@@ -173,7 +173,7 @@ export function parsePhysicsLayout(value: unknown): PhysicsLayout {
 // the robot selection journey compares native and browser requests.
 
 /** The fixture cells of the engine, named as Cell::stem names them. */
-export const PHYSICS_CELLS = [
+const PHYSICS_CELLS = [
   "separate",
   "combined",
   "combined-blocked-rack",
@@ -185,7 +185,7 @@ export const PHYSICS_CELLS = [
   "spanner-oven-unreachable-rack",
 ] as const;
 
-export type PhysicsCell = (typeof PHYSICS_CELLS)[number];
+type PhysicsCell = (typeof PHYSICS_CELLS)[number];
 
 /**
  * The model hash of a fixture cell. `assetsSha256` is the SHA-256 of the
@@ -285,7 +285,7 @@ export type PersistentPanCell = PersistentCellBase &
     ingredients: Readonly<{ massKg: 0; forwardMm: 0; lateralMm: 0 }>;
   }>;
 export type EspressoMachine = "linea" | "eagle-one";
-export type GrinderModel =
+type GrinderModel =
   | "option-o-lagom-casa"
   | "timemore-bricks-01s"
   | "fellow-opus-2"
@@ -326,7 +326,7 @@ export type PersistentEspressoCell = Omit<
     timestep?: never;
   }>;
 /** The prepared pour-over station a human set out before the robot starts. */
-export type PourOverStation = Readonly<{
+type PourOverStation = Readonly<{
   kettleWaterG: number;
   kettleWaterC: 93;
   coffeeG: 27;
@@ -658,7 +658,7 @@ export type PhysicsCyclePlan = Readonly<{
   returnRequest: ReturnRequest;
   handoffDigest: string;
 }>;
-export type PhysicsCyclePlanImport =
+type PhysicsCyclePlanImport =
   | Readonly<{ kind: "accepted"; plan: PhysicsCyclePlan; message?: never }>
   | Readonly<{ kind: "rejected"; message: string; plan?: never }>;
 export type PhysicsFixture =
@@ -818,14 +818,14 @@ export function parsePersistentPhysicsMotion(
     endStep: previous.step,
   };
 }
-export type PhysicsReplayImport =
+type PhysicsReplayImport =
   | Readonly<{ kind: "accepted"; recording: PhysicsReplay; message?: never }>
   | Readonly<{ kind: "rejected"; message: string; recording?: never }>;
 export type PhysicsImport =
   | Readonly<{ kind: "accepted"; recording: PhysicsRecording; message?: never }>
   | Readonly<{ kind: "rejected"; message: string; recording?: never }>;
 
-export type PhysicsRequestImport =
+type PhysicsRequestImport =
   | Readonly<{ kind: "accepted"; request: PhysicsRequest; message?: never }>
   | Readonly<{ kind: "rejected"; message: string; request?: never }>;
 
@@ -1010,17 +1010,6 @@ function parseRecording<Request extends NativeRequest>(
     events,
     outcome,
   };
-}
-
-export function cyclePlanFromSequence(
-  sequence: PhysicsSequence,
-): PhysicsCyclePlan {
-  return Object.freeze<PhysicsCyclePlan>({
-    [validatedCyclePlan]: true,
-    request: sequence.loading.request,
-    returnRequest: sequence.unloading.request,
-    handoffDigest: sequence.handoffDigest,
-  });
 }
 
 export function parsePhysicsCyclePlan(text: string): PhysicsCyclePlanImport {

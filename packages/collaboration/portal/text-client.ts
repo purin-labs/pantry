@@ -22,7 +22,7 @@ type TextCollaborationPresence<Field extends string> = Readonly<{
   range: TextSelectionRange;
 }>;
 
-export type TextCollaborationParticipant<Field extends string> = Readonly<{
+type TextCollaborationParticipant<Field extends string> = Readonly<{
   sessionId: string;
   userId: string;
   displayName: string;

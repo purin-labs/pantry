@@ -16,7 +16,6 @@ import {
   isPositiveInteger,
   isRecord,
 } from "@purin-labs/std";
-import type { CommerceActionFollowUp } from "../commerce.ts";
 import type {
   CommerceProviderReceipt,
   CommerceShopifyProviderReceipt,
@@ -232,39 +231,6 @@ type CommerceCancellationExecution =
       readonly refundAmountMinor: number;
       readonly refundCurrency: string;
     }>;
-
-export function parseCommerceActionFollowUpResponse(
-  raw: unknown,
-): CommerceActionFollowUp {
-  const followUp = isRecord(raw) ? raw.follow_up : null;
-  if (isRecord(followUp)) {
-    switch (followUp.kind) {
-      case "complete":
-        if (Object.keys(followUp).length === 1) return { kind: "complete" };
-        break;
-      case "pending":
-        if (
-          Object.keys(followUp).length === 2 &&
-          typeof followUp.retryAt === "number" &&
-          Number.isSafeInteger(followUp.retryAt) &&
-          followUp.retryAt >= 0
-        ) {
-          return { kind: "pending", retryAt: followUp.retryAt };
-        }
-        break;
-      case "unavailable":
-        if (
-          Object.keys(followUp).length === 2 &&
-          typeof followUp.code === "string" &&
-          followUp.code.length > 0
-        ) {
-          return { kind: "unavailable", code: followUp.code };
-        }
-        break;
-    }
-  }
-  throw new Error("Commerce action follow-up response is invalid.");
-}
 
 export function parseCommerceActionRecordResponse(
   raw: unknown,

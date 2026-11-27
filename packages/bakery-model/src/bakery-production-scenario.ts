@@ -31,7 +31,7 @@ export type ProductionAssignment = Readonly<{
   dependsOn: readonly string[];
   earliestStartSeconds: number;
 }>;
-export type ProductionCanvasPosition = Readonly<{ x: number; y: number }>;
+type ProductionCanvasPosition = Readonly<{ x: number; y: number }>;
 export type ProductionPresentation = Readonly<
   Record<string, ProductionCanvasPosition>
 >;
@@ -353,7 +353,7 @@ export function parseProductionScenario(
   });
 }
 
-export function parseProductionPresentation(
+function parseProductionPresentation(
   value: unknown,
   assignments: readonly ProductionAssignment[],
 ): ProductionPresentation | null {

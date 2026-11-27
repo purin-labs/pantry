@@ -17,7 +17,6 @@ export {
   type BakeryDoorInspection,
   type BakeryRecordingCameraView,
   type BakeryShiftDock,
-  type BakeryShiftView,
   type BakeryWorkspaceViewAction,
 } from "./bakery-surface-view.ts";
 import {
@@ -119,7 +118,7 @@ const SETTINGS_FIELDS = [
   "outageEnd",
 ] as const satisfies readonly SettingsField[];
 
-export type BakerySurfaceCommandName =
+type BakerySurfaceCommandName =
   | "prepare_workcell"
   | "inspect_surface"
   | "read_draft"
@@ -226,7 +225,7 @@ export type BakerySurfaceRunSaveManifest = Readonly<{
   bytes: number;
 }>;
 
-export type BakerySurfaceScenarioSaveManifest = AgentScenarioSaveManifest;
+type BakerySurfaceScenarioSaveManifest = AgentScenarioSaveManifest;
 
 export type BakerySurfaceRunPreview = Readonly<{
   state: "complete" | "blocked" | "horizon";
@@ -284,7 +283,7 @@ export type BakerySurfaceTaskDetail = Readonly<{
   constraints: readonly string[];
 }>;
 
-export type BakerySurfaceDraftSnapshot = Readonly<{
+type BakerySurfaceDraftSnapshot = Readonly<{
   reference: BakerySurfaceDraftReference;
   values: Readonly<Record<SettingsField, number>>;
 }>;
@@ -316,7 +315,7 @@ export type BakerySurfacePendingOperation = Readonly<{
 export type BakerySurfaceTrayLayout = BakerySurfaceRackLayout &
   Readonly<{ operationId: string }>;
 
-export type BakerySimulationReference = Readonly<{
+type BakerySimulationReference = Readonly<{
   generation: number;
   operationId: string;
 }>;
@@ -348,36 +347,36 @@ export type BakerySurfaceOpening = Readonly<{
   progress: number;
 }>;
 
-export type BakeryStoreInteriorPresetId =
+type BakeryStoreInteriorPresetId =
   | "kuramae-artisan"
   | "noix-parisien"
   | "kiyosumi-minimal"
   | "kyoto-machiya";
 
-export type BakeryFloorMaterialId =
+type BakeryFloorMaterialId =
   | "herringbone-oak"
   | "terrazzo-stone"
   | "limestone-checker"
   | "quarry-terracotta"
   | "smoked-cedar";
 
-export type BakeryWallMaterialId =
+type BakeryWallMaterialId =
   | "limewash-hinoki"
   | "parisian-boiserie"
   | "board-concrete"
   | "juraku-lattice";
 
-export type BakeryFixtureFinishId =
+type BakeryFixtureFinishId =
   | "blackened-steel"
   | "aged-brass"
   | "natural-oak";
 
-export type BakeryLightingStyleId =
+type BakeryLightingStyleId =
   | "brass-pendants"
   | "atelier-track"
   | "washi-lanterns";
 
-export type BakeryWallHeightMode = "cutaway" | "smart-cutaway" | "full";
+type BakeryWallHeightMode = "cutaway" | "smart-cutaway" | "full";
 
 export type BakerySurfaceStoreInterior = Readonly<{
   preset: BakeryStoreInteriorPresetId | "custom";
@@ -405,7 +404,7 @@ export type BakeryFloorPlanResetAction =
   | "reset_appliances"
   | "reset_initial";
 
-export type BakerySurfaceFloorPlanHistory = Readonly<{
+type BakerySurfaceFloorPlanHistory = Readonly<{
   canUndo: boolean;
   canRedo: boolean;
   hasCustomLayout: boolean;
@@ -559,7 +558,7 @@ export type BakerySurfaceRehearsalTray = Readonly<{
 }>;
 
 // Simulation assumptions only; these never certify a physical failure or recovery.
-export type BakeryRehearsalFaults = Readonly<{
+type BakeryRehearsalFaults = Readonly<{
   outage: Readonly<{ resource: string; start: number; end: number }> | null;
   failure: Readonly<{ bakeryTaskId: string; afterSeconds: number }> | null;
   recovery: Readonly<{ bakeryTaskId: string; seconds: number }> | null;
@@ -656,7 +655,7 @@ export type BakerySurfaceManualTask = Readonly<{
 }>;
 
 // The compiled draft. Applying it starts a run with this fingerprint.
-export type BakerySurfaceProductionPreview = Readonly<{
+type BakerySurfaceProductionPreview = Readonly<{
   planFingerprint: string;
   operationCount: number;
   run: BakerySurfaceRunPreview;
@@ -709,7 +708,7 @@ export type BakerySurfaceAttachmentV1 = Readonly<{
   context: BakerySurfaceContextV1;
 }>;
 
-export type BakerySurfaceReference = Readonly<{
+type BakerySurfaceReference = Readonly<{
   surfaceSessionId: string;
   surfaceEpoch: number;
 }>;
@@ -1286,19 +1285,19 @@ export type BakerySurfaceReceiptV1 = Readonly<{
   outcome: BakerySurfaceEffectOutcomeV1;
 }>;
 
-export type BakerySurfaceCommandParseResult =
+type BakerySurfaceCommandParseResult =
   | Readonly<{ kind: "valid"; value: BakerySurfaceCommandV1 }>
   | Readonly<{ kind: "invalid"; message: string }>;
 
-export type BakerySurfaceEffectParseResult =
+type BakerySurfaceEffectParseResult =
   | Readonly<{ kind: "valid"; value: BakerySurfaceEffectV1 }>
   | Readonly<{ kind: "invalid"; message: string }>;
 
-export type BakerySurfaceReceiptParseResult =
+type BakerySurfaceReceiptParseResult =
   | Readonly<{ kind: "valid"; value: BakerySurfaceReceiptV1 }>
   | Readonly<{ kind: "invalid"; message: string }>;
 
-export type BakerySurfaceParseResult =
+type BakerySurfaceParseResult =
   | Readonly<{ kind: "valid"; value: BakerySurfaceAttachmentV1 }>
   | Readonly<{ kind: "invalid"; message: string }>;
 
@@ -4536,7 +4535,7 @@ export function parseScenarioSaveManifest(
   };
 }
 
-export function surfaceCommandName(
+function surfaceCommandName(
   value: unknown,
 ): value is BakerySurfaceCommandName {
   return (

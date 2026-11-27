@@ -3,8 +3,7 @@
 // of each move, the store that holds the state, the one module that writes
 // that store, and how each state that is not terminal ends.
 
-export type MachineStateKind =
-  "initial" | "intermediate" | "terminal" | "external";
+type MachineStateKind = "initial" | "intermediate" | "terminal" | "external";
 
 /**
  * How a state that is not terminal ends. `due`: the named alarm reconciler
@@ -30,20 +29,19 @@ export type MachineStore = Readonly<{
   since?: string;
 }>;
 
-export type MachineStateDefinition = Readonly<{
+type MachineStateDefinition = Readonly<{
   kind: MachineStateKind;
   meaning: string;
   exit?: MachineExit;
 }>;
 
-export type MachineTransitionDefinition<State extends string = string> =
-  Readonly<{
-    event: string;
-    from: readonly State[];
-    to: State;
-    by: readonly string[];
-    guards: readonly string[];
-  }>;
+type MachineTransitionDefinition<State extends string = string> = Readonly<{
+  event: string;
+  from: readonly State[];
+  to: State;
+  by: readonly string[];
+  guards: readonly string[];
+}>;
 
 export type MachineDefinition<State extends string = string> = Readonly<{
   name: string;
@@ -75,7 +73,7 @@ export type MachineGuardChecks<
   Event extends MachineEvent<Definition>,
 > = Readonly<Record<MachineGuard<Definition, Event>, () => boolean>>;
 
-export type MachineRefusal<Definition extends MachineDefinition> =
+type MachineRefusal<Definition extends MachineDefinition> =
   | Readonly<{
       code: "invalid_transition";
       machine: Definition["name"];

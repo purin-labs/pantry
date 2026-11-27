@@ -12,7 +12,7 @@ import {
   type SupplyLotCost,
 } from "./costs.ts";
 
-export type PlanVsActualComparisonMode =
+type PlanVsActualComparisonMode =
   | "orders_and_costs"
   | "costs_and_waste_only";
 
@@ -129,7 +129,7 @@ export type BakeryPlanVsActualsCalculation = Readonly<{
   products: readonly ProductPlanVsActualRow[];
 }>;
 
-export type BakeryPlanVsActualsInput = Readonly<{
+type BakeryPlanVsActualsInput = Readonly<{
   overview: Pick<
     CostsOverview,
     | "currency"

@@ -1,11 +1,6 @@
 import {
-  COLLABORATION_POINTER_IDLE_MS,
-  COLLABORATION_PRESENCE_EXPIRY_MS,
-  COLLABORATION_SOCKET_LIMIT,
   snapshotFrameLimit,
   type CollaborationAgentActivity,
-  type CollaborationParticipant,
-  type SyncClientMessage,
   type SyncFailureCode,
   type SyncMessageFields,
   type SyncServerMessage,
@@ -22,22 +17,13 @@ type CanvasUpdate = CanvasEncoding<"update">;
 type CanvasStateVector = CanvasEncoding<"state_vector">;
 export type CanvasSelection = Readonly<{ objectId: string }>;
 
-export const CANVAS_PROTOCOL = "workflow_canvas_sync.v2";
+const CANVAS_PROTOCOL = "workflow_canvas_sync.v2";
 export const FRAME_LIMIT = snapshotFrameLimit(
   CANVAS_ENCODING_LIMITS.state,
   CANVAS_ENCODING_LIMITS.stateVector,
 );
-export const SOCKET_LIMIT = COLLABORATION_SOCKET_LIMIT;
-export const PRESENCE_EXPIRY_MS = COLLABORATION_PRESENCE_EXPIRY_MS;
-export const POINTER_IDLE_MS = COLLABORATION_POINTER_IDLE_MS;
 
 export type CanvasProtocolFailureCode = SyncFailureCode<CanvasFailureCode>;
-export type CanvasParticipant = CollaborationParticipant<CanvasSelection>;
-export type CanvasClientMessage = SyncClientMessage<
-  CanvasSelection,
-  CanvasStateVector,
-  CanvasUpdate
->;
 export type CanvasRoomMetadata = Readonly<{ documentRevision: number }>;
 export type CanvasLastChange = "initial" | "human" | "agent";
 
@@ -87,7 +73,7 @@ export const parseCanvasServerMessage = protocol.parseServerMessage;
 export const encodeCanvasClientMessage = protocol.encodeClientMessage;
 export const encodeCanvasServerMessage = protocol.encodeServerMessage;
 
-export function isCanvasLastChange(value: unknown): value is CanvasLastChange {
+function isCanvasLastChange(value: unknown): value is CanvasLastChange {
   return value === "initial" || value === "human" || value === "agent";
 }
 

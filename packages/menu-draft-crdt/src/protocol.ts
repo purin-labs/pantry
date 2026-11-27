@@ -1,7 +1,4 @@
 import {
-  COLLABORATION_POINTER_IDLE_MS,
-  COLLABORATION_PRESENCE_EXPIRY_MS,
-  COLLABORATION_SOCKET_LIMIT,
   isShortProtocolText,
   snapshotFrameLimit,
   type CollaborationParticipant,
@@ -20,11 +17,8 @@ import {
 } from "./index.ts";
 import { isRecord } from "@purin-labs/std";
 
-export const MENU_DRAFT_PROTOCOL = "menu_draft_sync.v3";
+const MENU_DRAFT_PROTOCOL = "menu_draft_sync.v3";
 export const FRAME_LIMIT = snapshotFrameLimit(MENU_UPDATE_LIMIT, MENU_STATE_VECTOR_LIMIT);
-export const SOCKET_LIMIT = COLLABORATION_SOCKET_LIMIT;
-export const PRESENCE_EXPIRY_MS = COLLABORATION_PRESENCE_EXPIRY_MS;
-export const POINTER_IDLE_MS = COLLABORATION_POINTER_IDLE_MS;
 
 export type MenuDraftFailureCode = SyncFailureCode<MenuDraftCrdtError["code"]>;
 export type MenuDraftParticipant = CollaborationParticipant<MenuPresenceSelection>;

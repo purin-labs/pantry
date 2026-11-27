@@ -23,11 +23,11 @@ export { PLAN_STATE_VECTOR_LIMIT, PLAN_UPDATE_LIMIT } from "./limits.ts";
  */
 export const PRODUCTION_PLAN_SCHEMA = "production_plan_crdt.v1";
 
-export type ProductionPlanLine = Readonly<{
+type ProductionPlanLine = Readonly<{
   requestId: string;
   quantity: string;
 }>;
-export type ProductionPlanSnapshot = Readonly<{
+type ProductionPlanSnapshot = Readonly<{
   lines: readonly ProductionPlanLine[];
 }>;
 /** The line that a person works on. */
@@ -41,7 +41,7 @@ const FAILURES = [
   "record_conflict",
 ] as const;
 export type ProductionPlanCrdtError = SharedDocError<(typeof FAILURES)[number]>;
-export type ProductionPlanCrdtResult<T> = SharedDocResult<
+type ProductionPlanCrdtResult<T> = SharedDocResult<
   T,
   ProductionPlanCrdtError["code"]
 >;
@@ -63,7 +63,7 @@ export const productionPlanDocument = defineSharedDoc({
 });
 
 type Schema = typeof PRODUCTION_PLAN_SCHEMA;
-export type ProductionPlanState = SharedDocEncoding<"state", Schema>;
+type ProductionPlanState = SharedDocEncoding<"state", Schema>;
 export type ProductionPlanUpdate = SharedDocEncoding<"update", Schema>;
 export type ProductionPlanStateVector = SharedDocEncoding<
   "state_vector",
@@ -71,9 +71,6 @@ export type ProductionPlanStateVector = SharedDocEncoding<
 >;
 
 export const parseProductionPlanState = productionPlanDocument.parseState;
-export const parseProductionPlanUpdate = productionPlanDocument.parseUpdate;
-export const parseProductionPlanStateVector =
-  productionPlanDocument.parseStateVector;
 
 export class ProductionPlanDoc extends productionPlanDocument.Doc {
   static create(): ProductionPlanDoc {

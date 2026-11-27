@@ -1,6 +1,5 @@
 import {
   definePlainTextDoc,
-  type PlainTextChange,
   type PlainTextDocError,
   type SharedDocEncoding,
   type SharedDocResult,
@@ -59,13 +58,6 @@ export const parseProductDescriptionUpdate =
 export const parseProductDescriptionStateVector =
   productDescriptionDocument.parseStateVector;
 
-export type ProductDescriptionChange = PlainTextChange<
-  "description",
-  ProductDescriptionUpdate
->;
-export type ProductDescriptionListener = (
-  change: ProductDescriptionChange,
-) => void;
 export type ProductDescriptionInputRange = TextInputRange;
 export type ProductDescriptionPresenceSelection = TextPresenceSelection;
 

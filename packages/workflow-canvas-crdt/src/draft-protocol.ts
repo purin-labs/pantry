@@ -1,7 +1,4 @@
 import {
-  COLLABORATION_POINTER_IDLE_MS,
-  COLLABORATION_PRESENCE_EXPIRY_MS,
-  COLLABORATION_SOCKET_LIMIT,
   snapshotFrameLimit,
   type CollaborationParticipant,
   type SyncClientMessage,
@@ -20,14 +17,11 @@ type DraftUpdate = DraftEncoding<"update">;
 type DraftStateVector = DraftEncoding<"state_vector">;
 export type DraftSelection = Readonly<{ objectId: string }>;
 
-export const DRAFT_PROTOCOL = "workflow_draft_sync.v1";
+const DRAFT_PROTOCOL = "workflow_draft_sync.v1";
 export const FRAME_LIMIT = snapshotFrameLimit(
   DRAFT_ENCODING_LIMITS.state,
   DRAFT_ENCODING_LIMITS.stateVector,
 );
-export const SOCKET_LIMIT = COLLABORATION_SOCKET_LIMIT;
-export const PRESENCE_EXPIRY_MS = COLLABORATION_PRESENCE_EXPIRY_MS;
-export const POINTER_IDLE_MS = COLLABORATION_POINTER_IDLE_MS;
 
 export type DraftProtocolFailureCode = SyncFailureCode<DraftFailureCode>;
 export type DraftParticipant = CollaborationParticipant<DraftSelection>;

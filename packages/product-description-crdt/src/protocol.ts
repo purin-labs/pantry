@@ -1,12 +1,6 @@
 import {
   COLLABORATION_FRAME_LIMIT,
-  COLLABORATION_POINTER_IDLE_MS,
-  COLLABORATION_PRESENCE_EXPIRY_MS,
-  COLLABORATION_SOCKET_LIMIT,
   isTextPresenceSelection,
-  type CollaborationParticipant,
-  type CollaborationPointer,
-  type CollaborationPointerPosition,
   type SyncClientMessage,
   type SyncFailureCode,
   type SyncServerMessage,
@@ -20,21 +14,12 @@ import {
 } from "./index.ts";
 import { exhaustiveList, isPositiveInteger } from "@purin-labs/std";
 
-export const DESCRIPTION_PROTOCOL = "product_description_sync.v2";
+const DESCRIPTION_PROTOCOL = "product_description_sync.v2";
 export const FRAME_LIMIT = COLLABORATION_FRAME_LIMIT;
-export const SOCKET_LIMIT = COLLABORATION_SOCKET_LIMIT;
-export const PRESENCE_EXPIRY_MS = COLLABORATION_PRESENCE_EXPIRY_MS;
-export const POINTER_IDLE_MS = COLLABORATION_POINTER_IDLE_MS;
-
-export type DraftPointerPosition = CollaborationPointerPosition;
-export type DraftPointer = CollaborationPointer;
 
 type RoomCode = "source_unavailable";
 type DocumentCode = ProductDescriptionCrdtError["code"] | RoomCode;
 export type DraftFailureCode = SyncFailureCode<DocumentCode>;
-
-export type DraftParticipant =
-  CollaborationParticipant<ProductDescriptionPresenceSelection>;
 
 export type DraftClientMessage = SyncClientMessage<
   ProductDescriptionPresenceSelection,

@@ -1,10 +1,6 @@
 import {
-  COLLABORATION_POINTER_IDLE_MS,
-  COLLABORATION_PRESENCE_EXPIRY_MS,
-  COLLABORATION_SOCKET_LIMIT,
   isShortProtocolText,
   snapshotFrameLimit,
-  type CollaborationParticipant,
   type SyncClientMessage,
   type SyncFailureCode,
   type SyncServerMessage,
@@ -24,14 +20,10 @@ import {
 } from "./index.ts";
 import { isRecord } from "@purin-labs/std";
 
-export const MENU_BOARD_PROTOCOL = "menu_board_sync.v1";
+const MENU_BOARD_PROTOCOL = "menu_board_sync.v1";
 export const FRAME_LIMIT = snapshotFrameLimit(MENU_BOARD_UPDATE_LIMIT, MENU_BOARD_STATE_VECTOR_LIMIT);
-export const SOCKET_LIMIT = COLLABORATION_SOCKET_LIMIT;
-export const PRESENCE_EXPIRY_MS = COLLABORATION_PRESENCE_EXPIRY_MS;
-export const POINTER_IDLE_MS = COLLABORATION_POINTER_IDLE_MS;
 
 export type MenuBoardFailureCode = SyncFailureCode<MenuBoardCrdtError["code"]>;
-export type MenuBoardParticipant = CollaborationParticipant<MenuBoardPresenceSelection>;
 export type MenuBoardClientMessage = SyncClientMessage<MenuBoardPresenceSelection, MenuBoardStateVector, MenuBoardUpdate>;
 export type MenuBoardRoomMetadata = Readonly<{ documentRevision: number }>;
 export type MenuBoardServerMessage = SyncServerMessage<

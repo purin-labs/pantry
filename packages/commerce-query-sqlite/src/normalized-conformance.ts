@@ -54,7 +54,7 @@ export const NORMALIZED_CONFORMANCE_ORDER_PAGE_IDS: readonly string[] = [
   "order_missing_attribute",
 ];
 
-export type NormalizedConformanceCase = Readonly<{
+type NormalizedConformanceCase = Readonly<{
   name: string;
   /** A raw CommerceGraphQuery; each suite parses it with its own contracts. */
   query: Readonly<Record<string, unknown>>;

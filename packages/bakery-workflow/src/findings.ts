@@ -21,9 +21,9 @@ export type RunFinding = Readonly<{
   waitSeconds: number | null;
 }>;
 
-export const FINDINGS_LIMIT = 64;
+const FINDINGS_LIMIT = 64;
 /** A customer waits at most this long for an order. It matches the shift's target. */
-export const ORDER_TARGET_SECONDS = 900;
+const ORDER_TARGET_SECONDS = 900;
 const SERVED_DESTINATION = /(servings|served)$/u;
 /** A finding reaches the model, so it holds identifiers and no free words. */
 const IDENTIFIER = /^[A-Za-z0-9#/_.:-]{1,300}$/u;

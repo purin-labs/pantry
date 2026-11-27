@@ -16,7 +16,7 @@ export const MENU_DRAFT_SCHEMA = "menu_draft_crdt.v2";
 export const MENU_SECTION_LIMIT = 20;
 export const MENU_ITEM_LIMIT = 200;
 export const MENU_TEXT_LIMIT = 1_000;
-export const MENU_STATE_LIMIT = 768 * 1024;
+const MENU_STATE_LIMIT = 768 * 1024;
 export const MENU_UPDATE_LIMIT = MENU_STATE_LIMIT;
 export const MENU_STATE_VECTOR_LIMIT = 64 * 1024;
 
@@ -65,13 +65,11 @@ export const menuDraftDocument = defineSharedDoc({
 });
 
 type Schema = typeof MENU_DRAFT_SCHEMA;
-export type MenuDraftState = SharedDocEncoding<"state", Schema>;
+type MenuDraftState = SharedDocEncoding<"state", Schema>;
 export type MenuDraftUpdate = SharedDocEncoding<"update", Schema>;
 export type MenuDraftStateVector = SharedDocEncoding<"state_vector", Schema>;
 
 export const parseMenuDraftState = menuDraftDocument.parseState;
-export const parseMenuDraftUpdate = menuDraftDocument.parseUpdate;
-export const parseMenuDraftStateVector = menuDraftDocument.parseStateVector;
 
 export class MenuDraftDoc extends menuDraftDocument.Doc {
   static create(title = "Café menu"): MenuDraftCrdtResult<MenuDraftDoc> {

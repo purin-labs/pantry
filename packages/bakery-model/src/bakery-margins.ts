@@ -97,7 +97,7 @@ export const OperationMargins = Type.Object(
   Closed,
 );
 export type OperationMargins = Static<typeof OperationMargins>;
-export type MarginWarning = Static<typeof MarginWarning>;
+type MarginWarning = Static<typeof MarginWarning>;
 
 /** The margins of an outcome, or an error that names the first bad field. */
 export function parseOperationMargins(value: unknown): OperationMargins {
@@ -171,12 +171,6 @@ export const OperationMarginSummaries = Type.Array(
   { minItems: 1, maxItems: 3 },
 );
 export type OperationMarginSummaries = Static<typeof OperationMarginSummaries>;
-
-export function isOperationMarginSummaries(
-  value: unknown,
-): value is OperationMarginSummaries {
-  return Value.Check(OperationMarginSummaries, value);
-}
 
 function rated(rating: Static<typeof Rating>): number | null {
   return rating.kind === "rated" ? rating.value : null;

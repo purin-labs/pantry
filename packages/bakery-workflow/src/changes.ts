@@ -18,7 +18,7 @@ import {
 import type { BakeryWorkflowDocument } from "./index.ts";
 
 /** The changes that one proposal can make. A larger change is several proposals. */
-export const MAX_WORKFLOW_CHANGES = 32;
+const MAX_WORKFLOW_CHANGES = 32;
 
 export type WorkflowChange =
   | Readonly<{
@@ -150,7 +150,7 @@ function parseChange(raw: unknown): WorkflowChange | null {
   }
 }
 
-export type AppliedChanges =
+type AppliedChanges =
   | Readonly<{ kind: "ready"; snapshot: DraftSnapshot }>
   | Readonly<{ kind: "refused"; problems: readonly DraftProblem[] }>;
 

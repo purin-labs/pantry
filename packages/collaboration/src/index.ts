@@ -2,7 +2,6 @@ export {
   parseYjsEncoding,
   type EncodedValue,
   type ParsedYjsEncoding,
-  type YjsEncodingFailure,
   type YjsEncodingKind,
   type YjsEncodingResult,
 } from "./yjs-encoding.ts";
@@ -19,7 +18,6 @@ export {
 export {
   definePlainTextDoc,
   hasOnlyPlainTextStructs,
-  type PlainTextChange,
   type PlainTextDocError,
 } from "./plain-text-doc.ts";
 export {
@@ -37,7 +35,6 @@ export {
   COLLABORATION_POINTER_IDLE_MS,
   COLLABORATION_PONG,
   COLLABORATION_PONG_TIMEOUT_MS,
-  COLLABORATION_PRESENCE_EXPIRY_MS,
   COLLABORATION_SOCKET_LIMIT,
   decodeProtocolBytes,
   encodeProtocolBytes,

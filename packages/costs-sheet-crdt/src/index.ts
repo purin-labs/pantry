@@ -76,7 +76,7 @@ export type CostsSheetCellChange = Readonly<{
   value: string | null;
 }>;
 
-export type CostsSheetSnapshot = Readonly<{
+type CostsSheetSnapshot = Readonly<{
   cells: readonly CostsSheetCell[];
 }>;
 
@@ -99,7 +99,7 @@ const FAILURES = [
 ] as const;
 export type CostsSheetCrdtError = SharedDocError<(typeof FAILURES)[number]>;
 
-export type CostsSheetCrdtResult<T> = SharedDocResult<
+type CostsSheetCrdtResult<T> = SharedDocResult<
   T,
   CostsSheetCrdtError["code"]
 >;
@@ -120,13 +120,11 @@ export const costsSheetDocument = defineSharedDoc({
 });
 
 type Schema = typeof COSTS_SHEET_SCHEMA;
-export type CostsSheetState = SharedDocEncoding<"state", Schema>;
+type CostsSheetState = SharedDocEncoding<"state", Schema>;
 export type CostsSheetUpdate = SharedDocEncoding<"update", Schema>;
 export type CostsSheetStateVector = SharedDocEncoding<"state_vector", Schema>;
 
 export const parseCostsSheetState = costsSheetDocument.parseState;
-export const parseCostsSheetUpdate = costsSheetDocument.parseUpdate;
-export const parseCostsSheetStateVector = costsSheetDocument.parseStateVector;
 
 export function productDailyCellKey(productId: string): string {
   return `product:${productId}:daily`;

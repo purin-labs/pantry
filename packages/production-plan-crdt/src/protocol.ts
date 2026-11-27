@@ -1,6 +1,5 @@
 import {
   snapshotFrameLimit,
-  type CollaborationParticipant,
   type SyncClientMessage,
   type SyncFailureCode,
   type SyncServerMessage,
@@ -17,14 +16,13 @@ import {
   type ProductionPlanUpdate,
 } from "./index.ts";
 
-export const PRODUCTION_PLAN_PROTOCOL = "production_plan_sync.v1";
+const PRODUCTION_PLAN_PROTOCOL = "production_plan_sync.v1";
 export const FRAME_LIMIT = snapshotFrameLimit(
   PLAN_UPDATE_LIMIT,
   PLAN_STATE_VECTOR_LIMIT,
 );
 
 export type PlanFailureCode = SyncFailureCode<ProductionPlanCrdtError["code"]>;
-export type PlanParticipant = CollaborationParticipant<ProductionPlanSelection>;
 export type PlanClientMessage = SyncClientMessage<
   ProductionPlanSelection,
   ProductionPlanStateVector,

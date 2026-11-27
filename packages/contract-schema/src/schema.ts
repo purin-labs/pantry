@@ -7,7 +7,6 @@ import {
 } from "typebox";
 import { HasCodec, Value } from "typebox/value";
 import type { TLocalizedValidationError } from "typebox/error";
-import { canonicalJsonByCodePoint, sha256Hex } from "@purin-labs/std";
 import {
   cleanCheckedRecord,
   fillRecordDefaults,
@@ -82,7 +81,7 @@ export type ContractDecodeResult<T> =
  * A schema refusal at a boundary that throws. It carries the same `code` and
  * `details` as the Wasm validators' `LexiconValidationError`.
  */
-export class ContractRefusalError extends TypeError {
+class ContractRefusalError extends TypeError {
   readonly code: string;
   readonly details: unknown;
 
@@ -297,11 +296,6 @@ function recordFieldName(name: string, pointer: string): string {
 
 function unescapePointerSegment(segment: string): string {
   return segment.replaceAll("~1", "/").replaceAll("~0", "~");
-}
-
-/** Use only when the Rust area hashes canonical JSON. Other digest formats stay explicit. */
-export function canonicalContractDigest(value: unknown): Promise<string> {
-  return sha256Hex(canonicalJsonByCodePoint(value));
 }
 
 /**

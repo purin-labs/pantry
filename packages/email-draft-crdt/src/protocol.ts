@@ -1,11 +1,6 @@
 import {
-  COLLABORATION_POINTER_IDLE_MS,
-  COLLABORATION_PRESENCE_EXPIRY_MS,
-  COLLABORATION_SOCKET_LIMIT,
   isTextPresenceSelection,
   snapshotFrameLimit,
-  type CollaborationParticipant,
-  type CollaborationPointerPosition,
   type SyncClientMessage,
   type SyncFailureCode,
   type SyncServerMessage,
@@ -21,19 +16,13 @@ import {
 } from "./index.ts";
 import { isRecord } from "@purin-labs/std";
 
-export const EMAIL_DRAFT_PROTOCOL = "email_draft_sync.v2";
+const EMAIL_DRAFT_PROTOCOL = "email_draft_sync.v2";
 /** A sync response carries the whole state and a state vector in base64. */
 export const FRAME_LIMIT = snapshotFrameLimit(
   EMAIL_UPDATE_LIMIT,
   EMAIL_STATE_VECTOR_LIMIT,
 );
-export const SOCKET_LIMIT = COLLABORATION_SOCKET_LIMIT;
-export const PRESENCE_EXPIRY_MS = COLLABORATION_PRESENCE_EXPIRY_MS;
-export const POINTER_IDLE_MS = COLLABORATION_POINTER_IDLE_MS;
 
-export type EmailDraftPointerPosition = CollaborationPointerPosition;
-export type EmailDraftParticipant =
-  CollaborationParticipant<EmailDraftSelection>;
 export type EmailDraftFailureCode = SyncFailureCode<EmailDraftCrdtError["code"]>;
 
 export type EmailDraftClientMessage = SyncClientMessage<EmailDraftSelection, EmailDraftStateVector, EmailDraftUpdate>;

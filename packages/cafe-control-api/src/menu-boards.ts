@@ -33,7 +33,7 @@ export type MenuBoardSummary = Readonly<{
   screens: number;
 }>;
 
-export type MenuBoardReleaseSummary = Readonly<{
+type MenuBoardReleaseSummary = Readonly<{
   releaseRevision: number;
   documentRevision: number;
   publishedAt: number;
@@ -102,7 +102,7 @@ export type MenuBoardReleaseItem = Readonly<{
   description: string;
 }>;
 
-export type MenuScreenMoney = Readonly<{
+type MenuScreenMoney = Readonly<{
   amountMinor: number;
   currency: string;
 }>;
@@ -237,7 +237,7 @@ export function parseMenuScreenFeed(value: unknown): MenuScreenFeed | null {
   };
 }
 
-export function parseMenuBoardRelease(value: unknown): MenuBoardRelease | null {
+function parseMenuBoardRelease(value: unknown): MenuBoardRelease | null {
   if (
     !isRecord(value) ||
     !hasExactKeys(value, [

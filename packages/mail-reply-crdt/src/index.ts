@@ -1,6 +1,5 @@
 import {
   definePlainTextDoc,
-  type PlainTextChange,
   type PlainTextDocError,
   type SharedDocEncoding,
   type SharedDocResult,
@@ -39,16 +38,11 @@ export type MailReplyCrdtResult<T> = SharedDocResult<
   MailReplyCrdtError["code"]
 >;
 
-export type MailReplyState = SharedDocEncoding<"state", Schema>;
 export type MailReplyUpdate = SharedDocEncoding<"update", Schema>;
 export type MailReplyStateVector = SharedDocEncoding<"state_vector", Schema>;
 
 export const parseMailReplyState = mailReplyDocument.parseState;
-export const parseMailReplyUpdate = mailReplyDocument.parseUpdate;
-export const parseMailReplyStateVector = mailReplyDocument.parseStateVector;
 
-export type MailReplyChange = PlainTextChange<"body", MailReplyUpdate>;
-export type MailReplyListener = (change: MailReplyChange) => void;
 export type MailReplyInputRange = TextInputRange;
 export type MailReplyPresenceSelection = TextPresenceSelection;
 

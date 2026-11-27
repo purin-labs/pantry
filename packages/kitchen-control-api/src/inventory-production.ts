@@ -286,7 +286,7 @@ export type InventoryProductionPlanAcceptance = Readonly<{
   kind: "accept_plan";
   lines: readonly InventoryProductionPlanLine[];
 }>;
-export type InventoryProductionPlanRefusal =
+type InventoryProductionPlanRefusal =
   "request_missing" | "request_changed" | "quantity_invalid";
 export type InventoryProductionPlanOutcome = Readonly<{
   requestId: string;
@@ -298,7 +298,7 @@ export type InventoryProductionPlanOutcome = Readonly<{
     | Readonly<{ outcome: "refused"; reason: InventoryProductionPlanRefusal }>
     | Readonly<{ outcome: "unavailable" }>
   );
-export type InventoryProductionPlanResult = Readonly<{
+type InventoryProductionPlanResult = Readonly<{
   ok: true;
   lines: readonly InventoryProductionPlanOutcome[];
 }>;

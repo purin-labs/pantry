@@ -21,7 +21,7 @@ const nullableText = Type.Union([text, Type.Null()]);
 const revision = PositiveInteger;
 const nonNegativeInt = NonNegativeInteger;
 
-export const costUnitSchema = Type.Union([
+const costUnitSchema = Type.Union([
   Type.Literal("each"),
   Type.Literal("gram"),
   Type.Literal("kilogram"),
@@ -31,7 +31,7 @@ export const costUnitSchema = Type.Union([
 
 export type CostUnit = Static<typeof costUnitSchema>;
 
-export const supplyCostBulkTierSchema = Type.Object({
+const supplyCostBulkTierSchema = Type.Object({
   min7dQuantity: Type.Number({ exclusiveMinimum: 0 }),
   packQuantity: Type.Number({ exclusiveMinimum: 0 }),
   packPriceMinor: nonNegativeInt,
@@ -39,7 +39,7 @@ export const supplyCostBulkTierSchema = Type.Object({
 
 export type SupplyCostBulkTier = Static<typeof supplyCostBulkTierSchema>;
 
-export const supplyCostTermsSchema = Type.Object({
+const supplyCostTermsSchema = Type.Object({
   entryId: text,
   entryRevision: revision,
   currency: text,
@@ -53,7 +53,7 @@ export const supplyCostTermsSchema = Type.Object({
 
 export type SupplyCostTerms = Static<typeof supplyCostTermsSchema>;
 
-export const supplyCostItemSchema = Type.Object({
+const supplyCostItemSchema = Type.Object({
   id: text,
   merchantCode: Type.String(),
   name: text,
@@ -82,7 +82,7 @@ const directPackagingInputSchema = Type.Object({
   }),
 });
 
-export const costProductLinkSchema = Type.Object({
+const costProductLinkSchema = Type.Object({
   productId: text,
   productTitle: text,
   productType: Type.String(),
@@ -105,7 +105,7 @@ export const costProductLinkSchema = Type.Object({
 
 export type CostProductLink = Static<typeof costProductLinkSchema>;
 
-export const weekUnitsSchema = Type.Tuple([
+const weekUnitsSchema = Type.Tuple([
   nonNegativeInt,
   nonNegativeInt,
   nonNegativeInt,
@@ -117,12 +117,12 @@ export const weekUnitsSchema = Type.Tuple([
 
 export type WeekUnits = Static<typeof weekUnitsSchema>;
 
-export const productCostFormulasSchema = Type.Record(
+const productCostFormulasSchema = Type.Record(
   textLimit(Type.String({ minLength: 1, maxLength: 24 })),
   textLimit(Type.String({ minLength: 1, maxLength: 160 })),
 );
 
-export const productCostPlanEntrySchema = Type.Object({
+const productCostPlanEntrySchema = Type.Object({
   productId: text,
   weekUnits: weekUnitsSchema,
   spoilBps: Type.Union([
@@ -140,7 +140,7 @@ export const productCostPlanEntrySchema = Type.Object({
 
 export type ProductCostPlanEntry = Static<typeof productCostPlanEntrySchema>;
 
-export const organisationCostPlanSchema = Type.Object({
+const organisationCostPlanSchema = Type.Object({
   revision: Type.Union([revision, Type.Null()]),
   dailyLaborMinor: nonNegativeInt,
   dailyRentMinor: nonNegativeInt,
@@ -150,7 +150,7 @@ export const organisationCostPlanSchema = Type.Object({
 
 export type OrganisationCostPlan = Static<typeof organisationCostPlanSchema>;
 
-export const measuredWasteSummarySchema = Type.Object({
+const measuredWasteSummarySchema = Type.Object({
   windowDays: revision,
   stockedUnitsProduced: Type.Number({ minimum: 0 }),
   stockedUnitsWasted: Type.Number({ minimum: 0 }),
@@ -166,7 +166,7 @@ export const measuredWasteSummarySchema = Type.Object({
 
 export type MeasuredWasteSummary = Static<typeof measuredWasteSummarySchema>;
 
-export const costValuationBasisSchema = Type.Union([
+const costValuationBasisSchema = Type.Union([
   Type.Literal("standing"),
   Type.Literal("fifo_lot"),
   Type.Literal("weighted_lot"),
@@ -174,7 +174,7 @@ export const costValuationBasisSchema = Type.Union([
 
 export type CostValuationBasis = Static<typeof costValuationBasisSchema>;
 
-export const supplyLotInvoiceCostSchema = Type.Object({
+const supplyLotInvoiceCostSchema = Type.Object({
   source: Type.Union([
     Type.Literal("lot_invoice"),
     Type.Literal("supplier_payable"),
@@ -190,7 +190,7 @@ export const supplyLotInvoiceCostSchema = Type.Object({
 
 export type SupplyLotInvoiceCost = Static<typeof supplyLotInvoiceCostSchema>;
 
-export const supplyLotCostSchema = Type.Object({
+const supplyLotCostSchema = Type.Object({
   id: text,
   inventoryItemId: text,
   locationId: text,
@@ -213,14 +213,14 @@ export const supplyLotCostSchema = Type.Object({
 
 export type SupplyLotCost = Static<typeof supplyLotCostSchema>;
 
-export const actualsWindowDaysSchema = Type.Union([
+const actualsWindowDaysSchema = Type.Union([
   Type.Literal(7),
   Type.Literal(30),
 ]);
 
 export type ActualsWindowDays = Static<typeof actualsWindowDaysSchema>;
 
-export const productActualsObservationSchema = Type.Object({
+const productActualsObservationSchema = Type.Object({
   productId: text,
   unitsSold: Type.Number({ minimum: 0 }),
   posUnitsSold: Type.Number({ minimum: 0 }),
@@ -238,7 +238,7 @@ export type ProductActualsObservation = Static<
   typeof productActualsObservationSchema
 >;
 
-export const supplyActualLossObservationSchema = Type.Object({
+const supplyActualLossObservationSchema = Type.Object({
   inventoryItemId: text,
   movementCount: nonNegativeInt,
   wastedBaseQuantity: Type.Number({ minimum: 0 }),
@@ -248,7 +248,7 @@ export type SupplyActualLossObservation = Static<
   typeof supplyActualLossObservationSchema
 >;
 
-export const costsActualsWindowSnapshotSchema = Type.Object({
+const costsActualsWindowSnapshotSchema = Type.Object({
   windowDays: actualsWindowDaysSchema,
   windowStartAt: text,
   windowEndAt: text,
@@ -269,13 +269,13 @@ export type CostsActualsWindowSnapshot = Static<
   typeof costsActualsWindowSnapshotSchema
 >;
 
-export const costsActualsSnapshotSchema = Type.Object({
+const costsActualsSnapshotSchema = Type.Object({
   windows: Type.Array(costsActualsWindowSnapshotSchema),
 });
 
 export type CostsActualsSnapshot = Static<typeof costsActualsSnapshotSchema>;
 
-export const costsOverviewSchema = Type.Object({
+const costsOverviewSchema = Type.Object({
   ok: Type.Literal(true),
   merchantRevision: nonNegativeInt,
   currency: text,
@@ -298,7 +298,7 @@ export const costsOverviewSchema = Type.Object({
 
 export type CostsOverview = Static<typeof costsOverviewSchema>;
 
-export const supplyCostWriteSchema = Type.Object({
+const supplyCostWriteSchema = Type.Object({
   merchantRevision: nonNegativeInt,
   requestedAt: text,
   inventoryItemId: text,
@@ -314,7 +314,7 @@ export const supplyCostWriteSchema = Type.Object({
 
 export type SupplyCostWrite = Static<typeof supplyCostWriteSchema>;
 
-export const lotCostLineWriteSchema = Type.Object({
+const lotCostLineWriteSchema = Type.Object({
   lotId: text,
   inventoryItemId: text,
   expectedRevision: Type.Union([revision, Type.Null()]),
@@ -328,7 +328,7 @@ export const lotCostLineWriteSchema = Type.Object({
 
 export type LotCostLineWrite = Static<typeof lotCostLineWriteSchema>;
 
-export const lotCostWriteSchema = Type.Object({
+const lotCostWriteSchema = Type.Object({
   kind: Type.Literal("save_lot_cost"),
   merchantRevision: nonNegativeInt,
   requestedAt: text,
@@ -343,9 +343,9 @@ export const lotCostWriteSchema = Type.Object({
   supplierId: nullableText,
 });
 
-export type LotCostWrite = Static<typeof lotCostWriteSchema>;
+type LotCostWrite = Static<typeof lotCostWriteSchema>;
 
-export const offerPriceWriteSchema = Type.Object({
+const offerPriceWriteSchema = Type.Object({
   offerId: text,
   expectedOfferRevision: revision,
   currency: text,
@@ -354,7 +354,7 @@ export const offerPriceWriteSchema = Type.Object({
 
 export type OfferPriceWrite = Static<typeof offerPriceWriteSchema>;
 
-export const costPlanWriteSchema = Type.Object({
+const costPlanWriteSchema = Type.Object({
   expectedPlanRevision: Type.Union([revision, Type.Null()]),
   dailyLaborMinor: nonNegativeInt,
   dailyRentMinor: nonNegativeInt,
@@ -364,7 +364,7 @@ export const costPlanWriteSchema = Type.Object({
 
 export type CostPlanWrite = Static<typeof costPlanWriteSchema>;
 
-export const supplyCostLineWriteSchema = Type.Object({
+const supplyCostLineWriteSchema = Type.Object({
   inventoryItemId: text,
   expectedEntryRevision: Type.Union([revision, Type.Null()]),
   currency: text,
@@ -378,7 +378,7 @@ export const supplyCostLineWriteSchema = Type.Object({
 
 export type SupplyCostLineWrite = Static<typeof supplyCostLineWriteSchema>;
 
-export const costsSheetWriteSchema = Type.Object({
+const costsSheetWriteSchema = Type.Object({
   kind: Type.Literal("save_sheet"),
   merchantRevision: nonNegativeInt,
   requestedAt: text,
@@ -390,7 +390,7 @@ export const costsSheetWriteSchema = Type.Object({
 
 export type CostsSheetWrite = Static<typeof costsSheetWriteSchema>;
 
-export const costsSheetWriteResultSchema = Type.Object({
+const costsSheetWriteResultSchema = Type.Object({
   ok: Type.Literal(true),
   merchantRevision: nonNegativeInt,
   planRevision: Type.Union([revision, Type.Null()]),
@@ -402,7 +402,7 @@ export const costsSheetWriteResultSchema = Type.Object({
 export type CostsSheetWriteResult = Static<typeof costsSheetWriteResultSchema>;
 
 /** The records of a refused sheet save that saved before the refusal. */
-export const costsSheetSavedSchema = Type.Object({
+const costsSheetSavedSchema = Type.Object({
   offerIds: Type.Array(text),
   inventoryItemIds: Type.Array(text),
 });
@@ -782,14 +782,14 @@ export type CostScenarioAssumptions = Readonly<{
   operatingDaysPerMonth: number;
 }>;
 
-export type SupplyCostSourceKind =
+type SupplyCostSourceKind =
   | "standing_pack"
   | "bulk_tier"
   | "fifo_lot"
   | "weighted_lot"
   | "unpriced";
 
-export type CalculatedSupplySkuImpact = Readonly<{
+type CalculatedSupplySkuImpact = Readonly<{
   productId: string;
   productTitle: string;
   quantityPerUnit: number;
@@ -859,7 +859,7 @@ export type CalculatedSupplyUsage = Readonly<{
   skuImpacts: readonly CalculatedSupplySkuImpact[];
 }>;
 
-export type CalculatedRecipeInputLine = Readonly<{
+type CalculatedRecipeInputLine = Readonly<{
   inventoryItemId: string;
   name: string;
   category: SupplyCostItem["category"];
@@ -939,7 +939,7 @@ export type CalculatedProductMargin = Readonly<{
   bomLines: readonly CalculatedProductBomLine[];
 }>;
 
-export type BakeryCostSummary = Readonly<{
+type BakeryCostSummary = Readonly<{
   currency: string;
   dailyUnitsSold: number;
   dailyGrossRevenueMinor: number;

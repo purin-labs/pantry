@@ -1,7 +1,6 @@
 import {
   snapshotFrameLimit,
   type CollaborationParticipant,
-  type SyncClientMessage,
   type SyncFailureCode,
   type SyncServerMessage,
 } from "@purin-labs/collaboration";
@@ -18,7 +17,7 @@ import {
   type CostsSheetUpdate,
 } from "./index.ts";
 
-export const COSTS_SHEET_PROTOCOL = "costs_sheet_sync.v1";
+const COSTS_SHEET_PROTOCOL = "costs_sheet_sync.v1";
 
 export const FRAME_LIMIT = snapshotFrameLimit(
   COSTS_SHEET_UPDATE_LIMIT,
@@ -30,11 +29,6 @@ export type CostsSheetFailureCode = SyncFailureCode<
 >;
 export type CostsSheetParticipant =
   CollaborationParticipant<CostsSheetSelection>;
-export type CostsSheetClientMessage = SyncClientMessage<
-  CostsSheetSelection,
-  CostsSheetStateVector,
-  CostsSheetUpdate
->;
 export type CostsSheetRoomMetadata = Readonly<{
   documentRevision: number;
   generation: number;
