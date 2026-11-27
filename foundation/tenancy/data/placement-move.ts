@@ -46,12 +46,6 @@ const OPEN_STATES = sqlList([
 /** The restore states after which no import reads an export again. */
 const ENDED_RESTORE_STATES = sqlList(["complete", "quarantined", "abandoned"]);
 
-/** The provider cleanup states that no later attempt leaves. */
-const ENDED_PROVIDER_CLEANUP_STATES = sqlList([
-  "completed",
-  "manual_action_required",
-]);
-
 function sqlList(states: readonly string[]): string {
   return states.map((state) => `'${state}'`).join(", ");
 }
@@ -240,14 +234,6 @@ export async function markRelocationCleaning(
     )
     .bind(relocationId, now)
     .run();
-}
-
-/** The provider work that still holds a relocation's cleanup. */
-export function unresolvedProviderWorkQuery(): string {
-  return `SELECT 1 FROM provider_account_cleanup
-    WHERE organisation_id = ? AND lifecycle NOT IN (${ENDED_PROVIDER_CLEANUP_STATES})
-    UNION ALL SELECT 1 FROM provider_connection_attempt
-    WHERE organisation_id = ? AND lifecycle IN ('callback_received', 'provisioning') LIMIT 1`;
 }
 
 export async function markRelocationComplete(

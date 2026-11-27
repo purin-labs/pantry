@@ -21,7 +21,6 @@ import {
   prepareRelocationRetentionWaiver,
   prepareRelocationSourceQuiesced,
   prepareRelocationStart,
-  unresolvedProviderWorkQuery,
   type PlacementMoveOpenError,
 } from "@purin-labs/tenancy/data/placement-move";
 import {
@@ -111,6 +110,7 @@ import {
   type ActorNamespaces,
 } from "./actor-router";
 import { actorStub } from "./actor-stubs";
+import { providerWorkReads } from "../data/provider-work-reads";
 import { currentActorSchemaVersion } from "./current-actor-schema-version";
 import { quiescePlacementExecution } from "./placement-execution-quiescence";
 import type { VariantBy } from "@purin-labs/type-utils";
@@ -535,15 +535,9 @@ export async function startActorRelocation(input: {
     "preflight",
   );
   if (!actors.ok) return actors;
-  const pendingProvider = await inventoryDatabase.value
-    .prepare(
-      `SELECT attempt_id AS operationId FROM provider_connection_attempt
-    WHERE organisation_id = ? AND lifecycle IN ('callback_received', 'provisioning')
-    UNION ALL SELECT cleanup_id AS operationId FROM provider_account_cleanup
-    WHERE organisation_id = ? AND lifecycle = 'running_provider_cleanup' LIMIT 1`,
-    )
-    .bind(input.organisationId, input.organisationId)
-    .first<{ operationId: string }>();
+  const pendingProvider = await providerWorkReads
+    .use()
+    .pendingOperation(inventoryDatabase.value, input.organisationId);
   if (pendingProvider !== null)
     return {
       ok: false,
@@ -1306,11 +1300,10 @@ async function cleanupRetainedRelocation(
   );
   if (!active.ok) return active;
   // Provider work that ended, done or left to a person, holds nothing.
-  const unresolved = await active.value
-    .prepare(unresolvedProviderWorkQuery())
-    .bind(operation.organisationId, operation.organisationId)
-    .first();
-  if (unresolved !== null) return { ok: true, value: operation };
+  const unresolved = await providerWorkReads
+    .use()
+    .unresolved(active.value, operation.organisationId);
+  if (unresolved) return { ok: true, value: operation };
   await markRelocationCleaning(input.env.DB, operation.relocationId, input.now);
   const current = await readRelocationById(
     input.env.DB,
