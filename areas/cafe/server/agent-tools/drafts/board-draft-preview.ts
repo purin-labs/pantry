@@ -3,6 +3,8 @@ import { resolveCanvasCollaborationAgent } from "@purin-labs/collaboration/worke
 import type { HarnessToolArgumentObserver } from "@purin-labs/agent/actors/embedded-harness";
 import type { MenuBoardDraftEdit } from "../../actors/menu-board-agent-action";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { PlacedActorRpc } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { OrganisationMenuBoardPreviewRpc } from "../../actors/menu-boards";
 import { readSessionTurnFlowBinding } from "@purin-labs/agent/actors/agent-session-information-flow";
 import { sessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
@@ -71,7 +73,9 @@ export function createMenuBoardDraftPreview(
       call.sent = key;
       call.sentAt = Date.now();
       try {
-        const organisation = await requireActiveOrganisationActorAtPlacement({
+        const organisation = await requireActiveOrganisationActorAtPlacement<
+          PlacedActorRpc & OrganisationMenuBoardPreviewRpc
+        >({
           env: context.env,
           organisationId: context.execution.scope.organisationId,
           placement: context.execution.scope.placement,

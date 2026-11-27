@@ -80,13 +80,17 @@ import {
   ORDER_REFUND_VERB,
   orderRefundAllocation,
 } from "./order-refund-action";
-import { isStockOperationVerb, stockOperationResourceId } from "@purin-labs/area-kitchen-contract/server/stock-action";
+import {
+  isStockOperationVerb,
+  stockOperationResourceId,
+} from "@purin-labs/area-kitchen-contract/server/stock-action";
 import {
   executeStockOperation,
   reconcileStockOperation,
   type StockExecution,
 } from "@purin-labs/area-kitchen-contract/server/stock-action-execution";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { MenuBoardOrganisationActor } from "@purin-labs/area-cafe-contract/server/menu-board-commands";
 import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce-contract/server/queue-messages";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
@@ -2232,11 +2236,12 @@ async function signalCafeMenuScreens(
   action: ApprovedCommerceActionEntry,
 ): Promise<void> {
   try {
-    const organisation = await requireActiveOrganisationActor({
-      env,
-      organisationId: action.action.organisationId,
-      now: Date.now(),
-    });
+    const organisation =
+      await requireActiveOrganisationActor<MenuBoardOrganisationActor>({
+        env,
+        organisationId: action.action.organisationId,
+        now: Date.now(),
+      });
     await organisation.signalMenuScreens({
       organisationId: action.action.organisationId,
     });

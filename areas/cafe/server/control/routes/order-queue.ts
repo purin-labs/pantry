@@ -1,6 +1,7 @@
 import { isOrderQueueAction } from "@purin-labs/control-api";
 
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { MenuBoardOrganisationActor } from "@purin-labs/area-cafe-contract/server/menu-board-commands";
 import {
   advanceOrderQueueEntry,
   presentOrderQueueEntry,
@@ -152,11 +153,12 @@ async function advanceOrder(
   });
   if (!receipt.ok) return controlError(receipt.error.code, 409);
   // The pickup board shows the move now; Commerce's event follows.
-  const organisation = await requireActiveOrganisationActor({
-    env,
-    organisationId: authorized.organisationId,
-    now: Date.now(),
-  }).catch(ignoreFailure);
+  const organisation =
+    await requireActiveOrganisationActor<MenuBoardOrganisationActor>({
+      env,
+      organisationId: authorized.organisationId,
+      now: Date.now(),
+    }).catch(ignoreFailure);
   await organisation
     ?.signalMenuScreens({ organisationId: authorized.organisationId })
     .catch(ignoreFailure);

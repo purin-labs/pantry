@@ -17,6 +17,7 @@ import { readCafeImages } from "@purin-labs/area-cafe-contract/server/media";
 import { readPublishedCafeMenu } from "../../control/routes/menu-screens";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { MenuBoardOrganisationActor } from "@purin-labs/area-cafe-contract/server/menu-board-commands";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,
@@ -439,12 +440,15 @@ export async function createMenuBoardForEmbeddedHarness(
           `Menu board edit authority expired: ${active.error.code}`,
         );
       }
-      const organisation = await requireActiveOrganisationActorAtPlacement({
-        env,
-        organisationId,
-        placement: execution.scope.placement,
-        now: Date.now(),
-      });
+      const organisation =
+        await requireActiveOrganisationActorAtPlacement<MenuBoardOrganisationActor>(
+          {
+            env,
+            organisationId,
+            placement: execution.scope.placement,
+            now: Date.now(),
+          },
+        );
       await requireSessionExecution(execution, lease);
       const created = await organisation.menuBoardCommand({
         organisationId,
@@ -500,12 +504,15 @@ export async function archiveMenuBoardForEmbeddedHarness(
       `Menu board archive authority expired: ${active.error.code}`,
     );
   }
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env,
-    organisationId,
-    placement: execution.scope.placement,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActorAtPlacement<MenuBoardOrganisationActor>(
+      {
+        env,
+        organisationId,
+        placement: execution.scope.placement,
+        now: Date.now(),
+      },
+    );
   await requireSessionExecution(execution, lease);
   const changed = await organisation.menuBoardCommand({
     organisationId,

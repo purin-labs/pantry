@@ -10,6 +10,7 @@ import { encodeBase64Url, sha256Hex } from "@purin-labs/std";
 import { CommerceStorefrontClient } from "@purin-labs/commerce-client";
 
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { MenuBoardOrganisationActor } from "@purin-labs/area-cafe-contract/server/menu-board-commands";
 import type { MenuBoardCommandReply } from "@purin-labs/area-cafe-contract/server/menu-board-commands";
 import {
   menuScreenSocketToken,
@@ -116,11 +117,12 @@ async function readScreenMedia(
   if (!organisationId.ok) return controlError("not_found", 404);
   let read: MenuBoardCommandReply<{ kind: "published_media"; mediaId: string }>;
   try {
-    const organisation = await requireActiveOrganisationActor({
-      env,
-      organisationId: organisationId.value,
-      now: Date.now(),
-    });
+    const organisation =
+      await requireActiveOrganisationActor<MenuBoardOrganisationActor>({
+        env,
+        organisationId: organisationId.value,
+        now: Date.now(),
+      });
     read = (await organisation.menuBoardCommand({
       organisationId: organisationId.value,
       command: { kind: "published_media", mediaId },
@@ -274,11 +276,12 @@ async function readPairedScreen(
   } as const;
   let read: MenuBoardCommandReply<typeof command>;
   try {
-    const organisation = await requireActiveOrganisationActor({
-      env,
-      organisationId: organisationId.value,
-      now: Date.now(),
-    });
+    const organisation =
+      await requireActiveOrganisationActor<MenuBoardOrganisationActor>({
+        env,
+        organisationId: organisationId.value,
+        now: Date.now(),
+      });
     read = (await organisation.menuBoardCommand({
       organisationId: organisationId.value,
       command,

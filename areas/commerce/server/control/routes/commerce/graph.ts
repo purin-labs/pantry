@@ -4,7 +4,11 @@ import type { OrganisationPlacementBindings } from "@purin-labs/tenancy/organisa
 import { controlActionMutationExecution } from "@purin-labs/conversation/actors/action-mutation-execution";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type {
+  OrganisationActorStub,
+  PlacedActorRpc,
+} from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { OrganisationBoardPresenceRpc } from "../../../actors/organisation/commerce-types";
 import type { Result } from "@purin-labs/kernel/result";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { CommerceGraphQuery } from "@purin-labs/commerce-contracts";
@@ -387,9 +391,13 @@ export async function handleCommerceBoardPresence(
     request.method === "POST",
   );
   if (!authorized.ok) return authorized.response;
-  let organisation: OrganisationActorStub;
+  let organisation: DurableObjectStub<
+    PlacedActorRpc & OrganisationBoardPresenceRpc
+  >;
   try {
-    organisation = await requireActiveOrganisationActor({
+    organisation = await requireActiveOrganisationActor<
+      PlacedActorRpc & OrganisationBoardPresenceRpc
+    >({
       env,
       organisationId: authorized.organisationId,
       now: Date.now(),

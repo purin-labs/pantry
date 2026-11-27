@@ -29,7 +29,14 @@ import {
   ensureCommerceLowStockCueSnapshot,
 } from "@purin-labs/agent/cues/engine";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { PlacedActorRpc } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { OrganisationMenuBoardRpc } from "@purin-labs/area-cafe-contract/server/menu-board-commands";
+import type { OrganisationCommerceRpc } from "./actors/organisation/organisation-commerce";
+
+/** The Organisation Actor as a Commerce outbox pass calls it. */
+type OutboxOrganisationActor = PlacedActorRpc &
+  OrganisationCommerceRpc &
+  Pick<OrganisationMenuBoardRpc, "signalMenuScreens">;
 import {
   createCommerceOutboxReconcileQueueMessage,
   type CommerceOutboxReconcileQueueMessage,
@@ -247,12 +254,13 @@ export async function reconcileCommerceOutbox(
     };
   }
   const now = input.now ?? Date.now();
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env: input.env,
-    organisationId: input.message.organisationId,
-    placement: scope.placement,
-    now,
-  });
+  const organisation =
+    await requireActiveOrganisationActorAtPlacement<OutboxOrganisationActor>({
+      env: input.env,
+      organisationId: input.message.organisationId,
+      placement: scope.placement,
+      now,
+    });
   try {
     await ensureCommerceLowStockCueSnapshot({
       db: scope.database,
@@ -667,7 +675,7 @@ async function reconcilePurchasingAfterCommerceDelivery(
 
 async function completeCommerceSync(
   input: Readonly<{
-    organisation: OrganisationActorStub;
+    organisation: DurableObjectStub<OutboxOrganisationActor>;
     message: CommerceOutboxReconcileQueueMessage;
     validatedAt: number;
     acknowledged: number;
@@ -694,7 +702,7 @@ async function enqueueRecoverableCues(
   input: Readonly<{
     env: Env;
     message: CommerceOutboxReconcileQueueMessage;
-    organisation: OrganisationActorStub;
+    organisation: DurableObjectStub<OutboxOrganisationActor>;
     recoverableCues: readonly PendingCommerceCue[];
     enqueuedAt: number;
   }>,
@@ -737,10 +745,8 @@ async function acknowledgeCommerceDelivery(
     rejection?: Readonly<{ reason: string }>;
   }>,
 ): Promise<CommerceDeliveryAcknowledgementResult> {
-  let outcome: Exclude<
-    CommerceDeliveryAcknowledgementResult["kind"],
-    "retry"
-  > = "acknowledged";
+  let outcome: Exclude<CommerceDeliveryAcknowledgementResult["kind"], "retry"> =
+    "acknowledged";
   if (input.rejection !== undefined) {
     const rejected = await input.client.acknowledgeDelivery({
       schemaVersion: "commerce.acknowledge-commerce-delivery.v2",

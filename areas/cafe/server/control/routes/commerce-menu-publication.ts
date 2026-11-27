@@ -1,6 +1,7 @@
 import { parseMenuHours } from "@purin-labs/control-api";
 
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { MenuBoardOrganisationActor } from "@purin-labs/area-cafe-contract/server/menu-board-commands";
 import type { Env } from "@purin-labs/kernel/env";
 import { sha256Hex } from "@purin-labs/std";
 import { resolveMerchantControlContext } from "@purin-labs/area-commerce-contract/server/merchant-control";
@@ -363,11 +364,12 @@ async function setShopName(
         ? 409
         : 422,
     );
-  const organisation = await requireActiveOrganisationActor({
-    env,
-    organisationId: authorized.organisationId,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActor<MenuBoardOrganisationActor>({
+      env,
+      organisationId: authorized.organisationId,
+      now: Date.now(),
+    });
   await organisation
     .signalMenuScreens({ organisationId: authorized.organisationId })
     .catch(ignoreSignalFailure);

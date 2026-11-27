@@ -8,6 +8,8 @@ import type {
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { PlacedActorRpc } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { OrganisationDescriptionDraftThreadRpc } from "../../actors/product-description-draft";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,
@@ -127,7 +129,9 @@ async function connectedDraftProduct(
   assignment: CaseAssignment,
 ): Promise<string> {
   const organisationId = execution.scope.organisationId;
-  const organisation = await requireActiveOrganisationActorAtPlacement({
+  const organisation = await requireActiveOrganisationActorAtPlacement<
+    PlacedActorRpc & OrganisationDescriptionDraftThreadRpc
+  >({
     env,
     organisationId,
     placement: execution.scope.placement,
@@ -290,7 +294,9 @@ async function readProductDescriptionDraftThread(
   caseId: string,
 ): Promise<DraftThreadLink | null> {
   const organisationId = execution.scope.organisationId;
-  const organisation = await requireActiveOrganisationActorAtPlacement({
+  const organisation = await requireActiveOrganisationActorAtPlacement<
+    PlacedActorRpc & OrganisationDescriptionDraftThreadRpc
+  >({
     env,
     organisationId,
     placement: execution.scope.placement,

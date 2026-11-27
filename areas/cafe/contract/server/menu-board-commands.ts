@@ -11,7 +11,8 @@ import type {
   MenuBoardLayout,
   MenuBoardStart,
 } from "@purin-labs/menu-board-crdt";
-import type { ControlSessionId } from "@purin-labs/kernel/ids";
+import type { PlacedActorRpc } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { ControlSessionId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "@purin-labs/kernel/result";
 
@@ -223,3 +224,26 @@ export type MenuBoardArchiveResult = Result<
     | { code: "menu_board_on_screen"; screens: number }
   >
 >;
+
+/**
+ * The RPC methods of the Organisation Actor that run a board or screen
+ * command and that tell the shop's screens to read their feed again. The
+ * Café and Commerce call them. `OrganisationDO`, the class of the Worker,
+ * implements this interface, and the callers name it, not the class.
+ */
+export interface OrganisationMenuBoardRpc {
+  menuBoardCommand(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      command: MenuBoardCommand;
+    }>,
+  ): Promise<MenuBoardCommandReply<MenuBoardCommand>>;
+  /** The number of screens that the signal reached. */
+  signalMenuScreens(
+    input: Readonly<{ organisationId: OrganisationId }>,
+  ): Promise<number>;
+}
+
+/** The Organisation Actor as a board or screen caller sees it. */
+export type MenuBoardOrganisationActor = PlacedActorRpc &
+  OrganisationMenuBoardRpc;

@@ -84,6 +84,7 @@ import {
   ProductDescriptionDraftRooms,
   type DraftAgentEdit,
   type DraftAgentReadRequest,
+  type OrganisationDescriptionDraftThreadRpc,
 } from "@purin-labs/area-commerce/server/actors/product-description-draft";
 import {
   EmailDraftRooms,
@@ -101,6 +102,7 @@ import {
   MenuBoardRooms,
   type MenuBoardAgentEdit,
   type MenuBoardAgentPreview,
+  type OrganisationMenuBoardPreviewRpc,
 } from "@purin-labs/area-cafe/server/actors/menu-boards";
 import {
   MenuScreens,
@@ -194,6 +196,7 @@ import type { CaseExecutionEffectRecords } from "@purin-labs/agent/case-executio
 import type { OrganisationBrainRpc } from "@purin-labs/area-brain/server/actors/organisation-brain-rpc";
 import type { OrganisationInboxRpc } from "@purin-labs/area-inbox/server/actors/organisation/organisation-inbox-rpc";
 import type { OrganisationKitchenRpc } from "@purin-labs/area-kitchen/server/actors/organisation-kitchen-rpc";
+import type { OrganisationMenuBoardRpc } from "@purin-labs/area-cafe-contract/server/menu-board-commands";
 import { readCaseEffectRecords } from "@purin-labs/area-brain/server/actors/organisation-execution-records";
 import { type AcceptedMemoryCursor } from "@purin-labs/area-brain/server/memory/store";
 import { cleanupTypeSafeCredentials } from "@purin-labs/agent/integrations/typesafe/connection";
@@ -225,6 +228,7 @@ import {
 import type {
   CommerceBoardPresenceRead,
   CommerceBoardPresenceUpdate,
+  OrganisationBoardPresenceRpc,
 } from "@purin-labs/area-commerce/server/actors/organisation/commerce-types";
 import type {
   OrganisationMeta,
@@ -306,7 +310,11 @@ export class OrganisationDO
     OrganisationActivationRpc,
     OrganisationBrainRpc,
     OrganisationInboxRpc,
-    OrganisationKitchenRpc
+    OrganisationKitchenRpc,
+    OrganisationMenuBoardRpc,
+    OrganisationMenuBoardPreviewRpc,
+    OrganisationBoardPresenceRpc,
+    OrganisationDescriptionDraftThreadRpc
 {
   // Commerce (`actors/organisation/organisation-commerce.ts`): the actions,
   // the cues, the commerce lab, the Code Mode leases and the workspace

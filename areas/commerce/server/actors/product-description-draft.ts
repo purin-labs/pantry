@@ -67,6 +67,24 @@ export type DraftSharedThread = Readonly<{
   approvedBy: UserId;
 }>;
 
+/**
+ * The RPC methods of the Organisation Actor that the description draft tools
+ * call for the Slack threads shared with a draft. `OrganisationDO`, the
+ * class of the Worker, implements them.
+ */
+export interface OrganisationDescriptionDraftThreadRpc {
+  readConnectedProductDescriptionDrafts(
+    input: Readonly<{ organisationId: OrganisationId; caseId: string }>,
+  ): Promise<readonly string[] | null>;
+  readProductDescriptionDraftThread(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      productId: string;
+      caseId: string;
+    }>,
+  ): Promise<DraftSharedThread | null>;
+}
+
 type DraftSource = Readonly<{
   productId: string;
   title: string;
