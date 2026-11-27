@@ -50,7 +50,7 @@ import {
 import {
   findSlackInstallationRouting,
   grantSlackChannelBaseline,
-} from "@purin-labs/authority/slack/channel-baseline-grant";
+} from "../../../slack/channel-baseline-grant";
 
 export async function handleSlackRouting(
   request: Request,

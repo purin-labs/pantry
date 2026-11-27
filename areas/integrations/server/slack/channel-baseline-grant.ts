@@ -3,13 +3,13 @@ import type { Env } from "@purin-labs/kernel/env";
 import {
   prepareSlackConversationBaselineGrants,
   slackConversationBaselineGrantId,
-} from "../data/capability-policy";
+} from "@purin-labs/authority/data/capability-policy";
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import type {
   SlackChannelDefault,
   SlackOrganisationRoutingProjection,
-} from "./installation-store";
-import { readSlackConnectionIntegrationAccountId } from "../data/slack-installation-records";
+} from "@purin-labs/authority/slack/installation-store";
+import { readSlackConnectionIntegrationAccountId } from "@purin-labs/authority/data/slack-installation-records";
 
 /** False when the channel's connection or its account cannot be read. */
 export async function grantSlackChannelBaseline(
