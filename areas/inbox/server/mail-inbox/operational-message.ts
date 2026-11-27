@@ -1,6 +1,7 @@
 /** Builds the one-recipient, plain-text message used by the send-only path. */
 
 import { encodeBase64, encodeBase64Url } from "@purin-labs/std";
+import { wrapBase64 } from "./reply-target";
 
 export function buildOperationalEmailRaw(
   input: Readonly<{
@@ -71,12 +72,4 @@ function assertSafeHeader(value: string): void {
 function encodeHeaderText(value: string): string {
   if (/^[\t -~]*$/u.test(value)) return value;
   return `=?UTF-8?B?${encodeBase64(new TextEncoder().encode(value))}?=`;
-}
-
-function wrapBase64(encoded: string): string {
-  const lines: string[] = [];
-  for (let index = 0; index < encoded.length; index += 76) {
-    lines.push(encoded.slice(index, index + 76));
-  }
-  return lines.join("\r\n");
 }

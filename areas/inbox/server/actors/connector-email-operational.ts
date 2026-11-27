@@ -31,7 +31,7 @@ import {
   buildOperationalEmailRaw,
   normalizeOperationalBody,
   normalizeOperationalSubject,
-} from "@purin-labs/connections/mail/operational-message";
+} from "../mail-inbox/operational-message";
 import type { GmailApiError } from "@purin-labs/connections/mail/gmail-adapter";
 import { resolveGmailAccessToken } from "@purin-labs/area-integrations-contract/server/mail/gmail-oauth";
 import type { Env } from "@purin-labs/kernel/env";

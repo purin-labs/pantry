@@ -277,7 +277,8 @@ function encodeHeaderText(value: string): string {
   return `=?UTF-8?B?${encodeBase64(new TextEncoder().encode(value))}?=`;
 }
 
-function wrapBase64(encoded: string): string {
+/** Base64 text in lines of 76 characters, as MIME requires. */
+export function wrapBase64(encoded: string): string {
   const lines: string[] = [];
   for (let index = 0; index < encoded.length; index += 76) {
     lines.push(encoded.slice(index, index + 76));

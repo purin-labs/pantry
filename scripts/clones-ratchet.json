@@ -1,5 +1,5 @@
 {
-  "total": {"copies":743,"lines":12932},
+  "total": {"copies":742,"lines":12921},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -111,7 +111,6 @@
     "areas/inbox/server/mail-inbox/email-operational-lifecycle.ts = areas/inbox/server/mail-inbox/email-operational-lifecycle.ts": {"copies":1,"lines":14},
     "areas/inbox/server/mail-inbox/email-reply-lifecycle.ts = areas/inbox/server/mail-inbox/email-reply-lifecycle.ts": {"copies":1,"lines":12},
     "areas/inbox/server/mail-inbox/evaluation.ts = foundation/agent/integrations/typesafe/connection.ts": {"copies":1,"lines":14},
-    "areas/inbox/server/mail-inbox/reply-target.ts = foundation/connections/mail/operational-message.ts": {"copies":1,"lines":11},
     "areas/integrations/contract/server/mail/gmail-oauth.ts = areas/integrations/contract/server/mail/gmail-oauth.ts": {"copies":1,"lines":7},
     "areas/integrations/contract/server/mail/gmail-oauth.ts = areas/integrations/server/external-records/oauth.ts": {"copies":1,"lines":22},
     "areas/integrations/server/agent-tools/integrations/handlers.ts = areas/integrations/server/agent-tools/integrations/handlers.ts": {"copies":1,"lines":10},
