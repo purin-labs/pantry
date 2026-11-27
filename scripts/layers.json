@@ -114,7 +114,6 @@
   "mixed": {
     "workers/platform/src/agent-tools/registry.ts": "The one list of the agent tools, in the order of the catalog digest. It imports the tool family of each area (Kitchen, commerce, Cafe, the Inbox, integrations and devices) and the Slack tools (agent-tools/slack/slack.ts), so it is a part of the Worker. agent-tools/session-wiring.ts gives it to the class SessionDO (step A1.7).",
     "workers/platform/src/actors/organisation.ts": "The class OrganisationDO over OrganisationActorBase, with the modules commerce and activation (step A1.9). It joins the Actor parts of tenancy, authority and collaboration with the parts of the areas: Kitchen, Cafe, commerce, the Inbox, integrations, Brain, organisation, Shopify and the canvas read of the Portal chat (chat/workspace-canvas-read.ts). The class is a part of the Worker: it keeps the deployed class name and its RPC method names, and each method calls one module.",
-    "workers/platform/src/actors/organisation/support.ts": "Helpers of the class OrganisationDO: the command runner, the socket sweep, the alarm time, the meta row, the actor database and the commerce board presence, which names one type of @purin-labs/commerce-control-api. Only the class files of the Organisation actor import it, so it is a part of the Worker.",
     "workers/platform/src/actors/connector.ts": "The class ConnectorDO over ConnectorActorBase, with the Slack channel and the modules evals, whatsApp and email (steps A1.6 and A1.9). It joins the Slack, email and WhatsApp surfaces with the Inbox and Brain parts of the Connector actor. The class is a part of the Worker: it keeps the deployed class name and its RPC method names.",
     "foundation/ui/route.ts": "The page list of the Portal: the path, the title and the navigation group of each page. Each area reads it to make a link, and it imports no area. It names the pages of every area in one union (WorkspaceDetailPage). A page registry of the Portal, where each area registers its own pages, removes the union; Stage A has no such registry."
   },
@@ -449,12 +448,10 @@
     "workers/platform/src/actors/connector.ts": "workers/platform",
     "workers/platform/src/actors/bake-run.ts": "workers/platform",
     "workers/platform/src/actors/bake-run-ports.ts": "workers/platform",
-    "workers/platform/src/actors/organisation-alarm.ts": "workers/platform",
     "workers/platform/src/actors/organisation.ts": "workers/platform",
     "workers/platform/src/actors/organisation/bake-kitchen.ts": "workers/platform",
     "workers/platform/src/actors/organisation/organisation-actor-base.ts": "workers/platform",
     "workers/platform/src/actors/organisation/schema.ts": "workers/platform",
-    "workers/platform/src/actors/organisation/support.ts": "workers/platform",
     "workers/platform/src/agent-tools/registry.ts": "workers/platform",
     "workers/platform/src/agent-tools/session-wiring.ts": "workers/platform",
     "workers/platform/src/archive-cleanup-parts.ts": "workers/platform",

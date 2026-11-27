@@ -2,7 +2,7 @@ import { createMailEvaluationSchema } from "@purin-labs/area-inbox/server/mail-i
 import { createActionLedgerSchema } from "@purin-labs/authority/actors/action-ledger";
 import { createCueDeliverySchema } from "@purin-labs/agent/actors/cue-delivery";
 import { createCommerceProjectionSchema } from "@purin-labs/area-commerce/server/actors/commerce-projection";
-import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
+import { schemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import { createCaseContextDiscoveryEvaluationSchema } from "@purin-labs/agent/case-context-discovery/evaluation-store";
 import { createEvalSchema } from "@purin-labs/area-brain/server/evals/store";
 import { createMemorySchema } from "@purin-labs/area-brain/server/memory/store";
@@ -51,17 +51,4 @@ export function createOrganisationSchema(storage: DurableObjectStorage): void {
   transaction(createMemorySchema.bind(null, sql));
   transaction(createEvalSchema.bind(null, sql));
   createCommerceProjectionSchema(sql, transaction);
-}
-
-export function schemaTransaction(
-  storage: DurableObjectStorage,
-  sql: SqlStorage,
-): SchemaTransaction {
-  if (typeof storage.transactionSync === "function") {
-    return storage.transactionSync.bind(storage);
-  }
-  if ("transactionSync" in sql && typeof sql.transactionSync === "function") {
-    return sql.transactionSync.bind(sql);
-  }
-  throw new Error("organisation_schema_transaction_missing");
 }

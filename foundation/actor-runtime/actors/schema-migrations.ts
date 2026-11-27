@@ -32,6 +32,23 @@ export type SchemaMigrationPlan = {
 
 export type SchemaTransaction = <Value>(operation: () => Value) => Value;
 
+/**
+ * The transaction of an Actor's schema steps: the one of the storage, or the
+ * one of its SQL handle when the storage has none.
+ */
+export function schemaTransaction(
+  storage: DurableObjectStorage,
+  sql: SqlStorage,
+): SchemaTransaction {
+  if (typeof storage.transactionSync === "function") {
+    return storage.transactionSync.bind(storage);
+  }
+  if ("transactionSync" in sql && typeof sql.transactionSync === "function") {
+    return sql.transactionSync.bind(sql);
+  }
+  throw new Error("organisation_schema_transaction_missing");
+}
+
 type SchemaVersionRow = Record<string, SqlStorageValue> & {
   value: number;
 };

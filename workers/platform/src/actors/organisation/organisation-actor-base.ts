@@ -63,14 +63,14 @@ import {
 import { errorMessage, isRecord } from "@purin-labs/std";
 import { PlacedActor } from "@purin-labs/actor-runtime/actors/lifecycle/placed-actor";
 import { rearmActorAlarm } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
-import { organisationAlarmReconcilers } from "../organisation-alarm";
+import { organisationAlarmReconcilers } from "@purin-labs/agent/actors/organisation-alarm";
+import { jevUsageDueAt } from "@purin-labs/area-integrations/server/jev-features/usage-records";
 import { nextMailSwitchMoveAt } from "@purin-labs/agent/integrations/typesafe/authority";
-import { schemaTransaction } from "./schema";
+import { schemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import {
   executeOrganisationCommand,
-  readNextOrganisationAlarmAt,
   resolveOrganisationActorDatabase,
-} from "./support";
+} from "@purin-labs/actor-runtime/actors/organisation-actor";
 import type {
   OrganisationMeta,
   OrganisationMetaInput,
@@ -649,9 +649,8 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
   protected rearm(): Promise<number | null> {
     const sql = this.ctx.storage.sql;
     return rearmActorAlarm(this.ctx.storage, [
-      ...organisationAlarmReconcilers(sql, () =>
-        readNextOrganisationAlarmAt(sql),
-      ),
+      ...organisationAlarmReconcilers(sql),
+      { name: "jev_usage", nextDue: () => jevUsageDueAt(sql) },
       { name: "jev_mail_repin", nextDue: () => nextMailSwitchMoveAt(sql) },
     ]);
   }

@@ -1,5 +1,8 @@
 import { canonicalJson } from "@purin-labs/std";
-import type { OrganisationId } from "@purin-labs/kernel/ids";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 
 /**
  * Plan 88 section 3: each closed UTC hour of Jev use on Pantry's key becomes one
@@ -116,8 +119,23 @@ export function sealJevUsageHours(
   );
 }
 
+/**
+ * The alarm step of the Organisation actor: the next closed hour of Jev use
+ * to seal for the Organisation of the Actor, or null.
+ */
+export function jevUsageDueAt(sql: SqlStorage): number | null {
+  const row = sql
+    .exec<{ organisation_id: string }>(
+      "SELECT organisation_id FROM organisation_meta LIMIT 1",
+    )
+    .toArray()[0];
+  if (row === undefined) return null;
+  const organisationId = parseOrganisationId(row.organisation_id);
+  return organisationId.ok ? nextJevUsageAt(sql, organisationId.value) : null;
+}
+
 /** When the alarm must run next to seal an hour of Jev use, or null. */
-export function nextJevUsageAt(
+function nextJevUsageAt(
   sql: SqlStorage,
   organisationId: OrganisationId,
 ): number | null {

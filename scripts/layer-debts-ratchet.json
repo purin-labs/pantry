@@ -2,7 +2,7 @@
   "totals": {
     "env-merge": {
       "merges": 16,
-      "methods": 76
+      "methods": 75
     },
     "foundation-misfit": {
       "links": 14,
@@ -12,17 +12,14 @@
       "reads": 85
     },
     "surface-nonpublic": {
-      "imports": 244
+      "imports": 239
     },
     "area-package": {
       "imports": 3
     },
     "worker-logic": {
-      "files": 10,
-      "lines": 3687
-    },
-    "shopify-rule": {
-      "imports": 10
+      "files": 7,
+      "lines": 3353
     },
     "interpolated-table": {
       "writes": 10
@@ -51,7 +48,6 @@
         "methods areas/inbox -> workers/platform": 14,
         "methods areas/kitchen -> workers/platform": 10,
         "methods areas/organisation -> workers/platform": 2,
-        "methods areas/shopify -> workers/platform": 1,
         "methods foundation/actor-runtime -> foundation/agent": 2,
         "methods foundation/actor-runtime -> foundation/conversation": 1,
         "methods foundation/actor-runtime -> workers/platform": 3,
@@ -142,7 +138,6 @@
         "imports surfaces/voice -> areas/devices": 1,
         "imports surfaces/webhooks -> areas/commerce": 8,
         "imports surfaces/webhooks -> areas/integrations": 1,
-        "imports surfaces/webhooks -> areas/shopify": 5,
         "imports surfaces/whatsapp -> areas/inbox": 19
       }
     },
@@ -158,16 +153,8 @@
       "reason": "A Worker module composes the three layers and holds no logic. A file there may import each area, so logic that joins two areas was placed there. The count holds each file that is not the entry (a default export), not a class shell (a class) and not wiring (no if, for, while or switch).",
       "fix": "Move the logic to the area that owns it, and give it the other area through a contract or a port. Keep registration lines, route tables with no branch and class shells in the Worker module.",
       "counts": {
-        "files workers/platform": 10,
-        "lines workers/platform": 3687
-      }
-    },
-    "shopify-rule": {
-      "reason": "Step A2.5 lets other code reach the Shopify module in three ways: the commerce provider port, the provider module port and their registration in the Worker. No check held this rule. The Worker entry, the Organisation actor and the webhook surface import the module directly.",
-      "fix": "Reach Shopify through a port that the Worker registers, as the two registration lines do. The file REMOVE.md of the module lists each importer and what it uses.",
-      "counts": {
-        "imports surfaces/webhooks -> areas/shopify": 5,
-        "imports workers/platform -> areas/shopify": 5
+        "files workers/platform": 7,
+        "lines workers/platform": 3353
       }
     },
     "interpolated-table": {
