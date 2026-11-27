@@ -37,7 +37,7 @@ import {
   sideCaseContentDigest,
   sideCaseProposalId,
 } from "@purin-labs/conversation/chat/side-cases";
-import { parsePersonId, type PersonId } from "@purin-labs/authority/data/person-authz";
+import { parseStrictPersonId, type PersonId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { FlowBinding } from "@purin-labs/authority/policy/information-flow/index";
 import { parseSlackUserId, type SlackUserId } from "./events";
@@ -447,7 +447,7 @@ async function parseSlackProposalRow(
     decided_at: decidedAt,
     expires_at: expiresAt,
   } = raw;
-  const requester = parsePersonId(requestedByPersonId);
+  const requester = parseStrictPersonId(requestedByPersonId);
   if (
     raw.source_kind !== "slack_thread" ||
     !isSideCaseProposalId(proposalId) ||

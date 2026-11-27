@@ -17,9 +17,12 @@ import {
 } from "@purin-labs/authority/actors/action-ledger";
 import { commerceActionApprovals } from "@purin-labs/area-commerce-contract/server/action-approvals";
 import { readOrganisationDefaultWorkspacePortalAddress } from "@purin-labs/agent/data/organisation-workspace";
-import { parsePersonId } from "@purin-labs/authority/data/person-authz";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationId, RequestId } from "@purin-labs/kernel/ids";
+import {
+  parseStrictPersonId,
+  type OrganisationId,
+  type RequestId,
+} from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
@@ -107,7 +110,7 @@ async function decide(
     workspaceId: click.workspaceId,
     slackUserId: click.approverSlackUserId,
   });
-  const personId = parsePersonId(approver?.personId);
+  const personId = parseStrictPersonId(approver?.personId);
   if (approver === null || personId === null)
     return {
       kind: "refused",

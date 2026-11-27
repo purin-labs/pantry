@@ -3,11 +3,11 @@ import type { ConnectorIdentity } from "@purin-labs/contracts";
 import { isNonBlankString, isRecord } from "@purin-labs/std";
 
 import { resolveActiveSlackThreadCredential } from "@purin-labs/authority/credential-vault/index";
-import { parsePersonId } from "@purin-labs/authority/data/person-authz";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseChannelId,
   parseOrganisationId,
+  parseStrictPersonId,
   parseWorkspaceId,
 } from "@purin-labs/kernel/ids";
 import type { SlackCaseCommand } from "../case-command-message";
@@ -425,7 +425,8 @@ async function resolveSideCaseStarter(
     workspaceId: source.event.workspaceId,
     slackUserId,
   });
-  const personId = member === null ? null : parsePersonId(member.personId);
+  const personId =
+    member === null ? null : parseStrictPersonId(member.personId);
   if (member === null || personId === null || member.role === "viewer")
     return null;
   const authority = await refreshSlackRequestAuthority(scope.database, {

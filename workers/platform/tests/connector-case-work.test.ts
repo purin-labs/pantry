@@ -19,7 +19,6 @@ import {
   createSlackCaseCommand,
   parseSlackCaseCommand,
 } from "@purin-labs/surface-slack/server/case-command-message";
-import { parsePersonId } from "@purin-labs/authority/data/person-authz";
 import {
   parseAssignmentId,
   parseCaseId,
@@ -27,6 +26,7 @@ import {
   parseIntegrationAccountId,
   parseRequestId,
   parseOrganisationId,
+  parseStrictPersonId as parsePersonId,
 } from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { parseSlackEnvelope } from "@purin-labs/surface-slack/server/events";

@@ -6,10 +6,6 @@ import type { RequestAuthority } from "@purin-labs/contracts";
 import { isRecord } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 
-import {
-  parsePersonId,
-  type PersonId,
-} from "@purin-labs/authority/data/person-authz";
 import type { JsonObject } from "@purin-labs/kernel/http";
 import {
   parseAssignmentId,
@@ -25,6 +21,8 @@ import {
   type ConnectorId,
   type IntegrationAccountId,
   type OrganisationId,
+  parseStrictPersonId,
+  type PersonId,
   type RequestId,
   type SessionId,
 } from "@purin-labs/kernel/ids";
@@ -115,7 +113,7 @@ export function parseSlackCaseCommand(
   if (!integrationAccountId.ok) return integrationAccountId;
   const principalIdRaw = readRequiredString(body, "principalId");
   if (!principalIdRaw.ok) return principalIdRaw;
-  const principalId = parsePersonId(principalIdRaw.value);
+  const principalId = parseStrictPersonId(principalIdRaw.value);
   if (principalId === null)
     return {
       ok: false,

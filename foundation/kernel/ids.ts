@@ -101,6 +101,7 @@ const STABLE_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9:_-]*$/;
 const PORTAL_HANDLE_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const PORTAL_HANDLE_MAX_CHARS = 63;
 const THREAD_KEY_PATTERN = /^[A-Za-z0-9][A-Za-z0-9:_.-]*$/;
+const STRICT_PERSON_ID_PATTERN = /^person_[A-Za-z0-9-]+$/u;
 
 export function parseOrganisationId(
   raw: string,
@@ -273,6 +274,16 @@ export function parsePersonId(raw: string): Result<PersonId, IdParseError> {
   const parsed = parseStableId(raw.trim());
 
   return parsed.ok ? { ok: true, value: parsed.value as PersonId } : parsed;
+}
+
+/** A person id of a stored record or a signed message: `person_` and a
+ * generated suffix, with no other character. */
+export function parseStrictPersonId(raw: unknown): PersonId | null {
+  if (typeof raw !== "string" || !STRICT_PERSON_ID_PATTERN.test(raw)) {
+    return null;
+  }
+  const parsed = parsePersonId(raw);
+  return parsed.ok ? parsed.value : null;
 }
 
 export function parseProviderConnectionId(

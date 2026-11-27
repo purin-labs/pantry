@@ -26,16 +26,14 @@ import {
   type SlackOrganisationConnectionId,
   type SessionId,
   type OrganisationId,
+  parseStrictPersonId,
+  type PersonId,
 } from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   parseOrganisationPlacement,
   type OrganisationPlacement,
 } from "@purin-labs/tenancy/placement";
-import {
-  parsePersonId,
-  type PersonId,
-} from "@purin-labs/authority/data/person-authz";
 import type { SlackMessageEvent } from "./events";
 import {
   deriveSlackCaseId,
@@ -541,7 +539,7 @@ function parseSlackCaseIngressRow(
   if (row.personId === null || row.membershipStatus !== "active") {
     return { kind: "rejected", reason: "organisation_membership_missing" };
   }
-  const principalId = parsePersonId(row.personId);
+  const principalId = parseStrictPersonId(row.personId);
   if (principalId === null) return retryCorrupt();
   // A known role that may not command, such as viewer, is a refusal. Only a
   // role that the schema does not know is a corrupt record.

@@ -1,13 +1,11 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
-  parsePersonId as parseCanonicalPersonId,
+  parseStrictPersonId,
   type PersonId,
   type RequestId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-
-export type { PersonId } from "@purin-labs/kernel/ids";
 
 type ApprovalRole = "approve";
 type PersonRoleOperation = "grant" | "revoke";
@@ -60,7 +58,6 @@ type PersonExistenceRow = {
   personId: unknown;
 };
 
-const PERSON_ID_PATTERN = /^person_[A-Za-z0-9-]+$/u;
 const MAX_DISPLAY_NAME_CHARS = 160;
 
 export async function listOrganisationPersonRoles(
@@ -108,7 +105,7 @@ export async function configurePersonRole(
     return { ok: false, error: { code: "person_not_found" } };
   }
 
-  if (parsePersonId(person.personId) === null) {
+  if (parseStrictPersonId(person.personId) === null) {
     return { ok: false, error: { code: "invalid_person_record" } };
   }
 
@@ -168,7 +165,7 @@ export function parsePersonRoleRecords(
   const records = new Map<PersonId, PersonRoleRecord>();
 
   for (const row of people) {
-    const personId = parsePersonId(row.personId);
+    const personId = parseStrictPersonId(row.personId);
     const displayName = parseDisplayName(row.displayName);
 
     if (personId === null || displayName === null || records.has(personId)) {
@@ -184,7 +181,7 @@ export function parsePersonRoleRecords(
   }
 
   for (const row of roles) {
-    const personId = parsePersonId(row.personId);
+    const personId = parseStrictPersonId(row.personId);
     const role = parseApprovalRole(row.role);
     const record = personId === null ? undefined : records.get(personId);
 
@@ -201,14 +198,6 @@ export function parsePersonRoleRecords(
   }
 
   return { ok: true, value: Array.from(records.values()) };
-}
-
-export function parsePersonId(raw: unknown): PersonId | null {
-  if (typeof raw !== "string" || !PERSON_ID_PATTERN.test(raw)) {
-    return null;
-  }
-  const parsed = parseCanonicalPersonId(raw);
-  return parsed.ok ? parsed.value : null;
 }
 
 export function parseApprovalRole(raw: unknown): ApprovalRole | null {

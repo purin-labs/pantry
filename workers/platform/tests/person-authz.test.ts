@@ -4,11 +4,13 @@ import { describe, expect, it } from "vitest";
 import {
   configurePersonRole,
   parseApprovalRole,
-  parsePersonId,
   parsePersonRoleOperation,
   parsePersonRoleRecords,
 } from "@purin-labs/authority/data/person-authz";
-import { parseRequestId } from "@purin-labs/kernel/ids";
+import {
+  parseRequestId,
+  parseStrictPersonId as parsePersonId,
+} from "@purin-labs/kernel/ids";
 import { requireOrganisationId } from "./test-ids";
 
 describe("person role administration boundary", function personRoleAdminSuite() {

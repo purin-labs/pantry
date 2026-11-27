@@ -14,9 +14,8 @@ import {
   type SessionExecutionAdmission,
 } from "@purin-labs/agent/actors/session-execution-admission";
 import { sideCaseProposalId } from "@purin-labs/conversation/chat/side-cases";
-import { parsePersonId } from "@purin-labs/authority/data/person-authz";
 import type { Env } from "@purin-labs/kernel/env";
-import { parseConnectorId } from "@purin-labs/kernel/ids";
+import { parseConnectorId, parseStrictPersonId } from "@purin-labs/kernel/ids";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { validateLiveRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import { storeSlackSideCaseProposal } from "../../side-cases";
@@ -122,7 +121,7 @@ export async function proposeSlackSideCaseForHarness(
   });
   if (!parked.ok)
     throw new Error(`side case proposal not kept: ${parked.error.code}`);
-  const requester = parsePersonId(parked.value.requesterPersonId);
+  const requester = parseStrictPersonId(parked.value.requesterPersonId);
   if (
     requester === null ||
     parked.value.channelId !== authority.conversationId ||

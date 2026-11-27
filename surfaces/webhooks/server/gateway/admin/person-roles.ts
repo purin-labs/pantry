@@ -7,7 +7,6 @@ import {
   configurePersonRole,
   listOrganisationPersonRoles,
   parseApprovalRole,
-  parsePersonId,
   parsePersonRoleOperation,
   type PersonRoleAdminError,
 } from "@purin-labs/authority/data/person-authz";
@@ -22,6 +21,7 @@ import {
 import {
   newRequestId,
   parseOrganisationId,
+  parseStrictPersonId,
 } from "@purin-labs/kernel/ids";
 import { traceLog } from "@purin-labs/kernel/observability";
 import { assertNever } from "@purin-labs/std";
@@ -125,7 +125,7 @@ async function handleConfigurePersonRole(
     );
   }
 
-  const personId = parsePersonId(personIdField.value);
+  const personId = parseStrictPersonId(personIdField.value);
   const operation = parsePersonRoleOperation(operationField.value);
   const role = parseApprovalRole(roleField.value);
 
