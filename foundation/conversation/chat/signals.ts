@@ -9,7 +9,7 @@ import { waitUntil } from "cloudflare:workers";
 
 import { actorPhysicalName } from "@purin-labs/actor-runtime/actors/actor-registry";
 import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
-import { newRequestId } from "@purin-labs/kernel/ids";
+import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
@@ -28,6 +28,22 @@ export type ChatSignalTarget =
     }>
   | Readonly<{ kind: "user"; userId: UserId; conversationId?: never }>
   | Readonly<{ kind: "organisation"; conversationId?: never; userId?: never }>;
+
+/**
+ * The RPC method of the Organisation Actor that sends one chat signal to its
+ * open chat sockets. `OrganisationDO`, the class of the Worker, implements
+ * it.
+ */
+export interface OrganisationChatSignalRpc extends Rpc.DurableObjectBranded {
+  signalChat(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      target: ChatSignalTarget;
+      /** Absent from a caller of an earlier build: the chat changed. */
+      kind?: ChatSignal["kind"];
+    }>,
+  ): Promise<void>;
+}
 
 /**
  * Tells the open chat pages that a committed write changed what they show.
@@ -56,7 +72,7 @@ async function sendSignal(
     // An Actor that holds chat sockets is active at the scope's placement,
     // so its stub needs no registry reservation. An Actor that holds none
     // drops the signal.
-    const organisation = actorStub(
+    const organisation = actorStub<OrganisationChatSignalRpc>(
       actors,
       actorPhysicalName(
         {

@@ -23,7 +23,10 @@ import {
   sendChatSignal,
   sweepChatSignalSockets,
 } from "@purin-labs/conversation/actors/chat-signal-sockets";
-import type { ChatSignalTarget } from "@purin-labs/conversation/chat/signals";
+import type {
+  ChatSignalTarget,
+  OrganisationChatSignalRpc,
+} from "@purin-labs/conversation/chat/signals";
 import {
   authorizeChatSignalRequest,
   matchChatSignalRoute,
@@ -322,7 +325,8 @@ export class OrganisationDO
     OrganisationQuiescenceRpc,
     RelocationReceiptOrganisationRpc,
     OrganisationArchiveCleanupRpc,
-    OrganisationBakeStockLevelRpc
+    OrganisationBakeStockLevelRpc,
+    OrganisationChatSignalRpc
 {
   // Commerce (`actors/organisation/organisation-commerce.ts`): the actions,
   // the cues, the commerce lab, the Code Mode leases and the workspace
