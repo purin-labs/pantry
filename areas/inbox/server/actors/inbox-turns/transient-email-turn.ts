@@ -6,9 +6,9 @@ import {
   runTransientTurn,
   type TransientTeardownOutcome,
   type TransientTurnInput,
-} from "./transient-turn";
+} from "@purin-labs/agent/actors/transient-turn";
 
-export { createTransientHarnessSinks } from "./transient-turn";
+export { createTransientHarnessSinks } from "@purin-labs/agent/actors/transient-turn";
 
 /**
  * The email flavour of a transient turn: the reply body is the harness's

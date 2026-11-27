@@ -29,7 +29,7 @@ import {
   createTransientHarnessSinks,
   runTransientEmailTurn,
   type TransientEmailTeardownOutcome,
-} from "@purin-labs/agent/actors/transient-email-turn";
+} from "@purin-labs/area-inbox/server/actors/inbox-turns/transient-email-turn";
 import { piToolRules } from "@purin-labs/agent/actors/pi-tool-replay";
 import { TOOL_REGISTRY } from "../src/agent-tools/registry";
 import type { Result } from "@purin-labs/kernel/result";

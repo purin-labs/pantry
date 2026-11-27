@@ -1,5 +1,5 @@
 import type { EmbeddedHarnessTurnError } from "@purin-labs/agent/actors/embedded-harness";
-import type { TransientEmailTurnError } from "@purin-labs/agent/actors/transient-email-turn";
+import type { TransientEmailTurnError } from "@purin-labs/area-inbox/server/actors/inbox-turns/transient-email-turn";
 import type { EmbeddedHarnessModelUsage } from "@purin-labs/contracts";
 
 declare const modelUsage: EmbeddedHarnessModelUsage;

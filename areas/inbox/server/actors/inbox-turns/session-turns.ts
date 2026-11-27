@@ -52,9 +52,9 @@ import { createEmbeddedHarnessModelRouteLease } from "@purin-labs/agent/actors/s
 import { type TransientSessionExecution } from "@purin-labs/agent/actors/session/support";
 import {
   KNOWN_ZERO_MODEL_USAGE,
-  runTransientMailHarness,
   transientModelAdmissionError,
 } from "@purin-labs/agent/actors/session/transient-turns";
+import { runTransientMailHarness } from "./transient-mail-harness";
 import {
   admitTransientHarnessTurn,
   boundRecipients,
