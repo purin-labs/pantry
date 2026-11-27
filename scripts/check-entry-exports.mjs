@@ -22,7 +22,8 @@
 //   - `import("x")` marks the names that the file reads from the result
 //     (`(await import("x")).a`, `const { a } = await import("x")`), and each
 //     name of x in another form; `typeof import("x")` and `require("x")` mark
-//     each name; `import("x").A` in a type or a JSDoc comment marks A.
+//     each name; `import("x").A` in a type or a JSDoc comment marks A;
+//   - `declare module "x" { interface A {} }` marks A, which it merges into.
 // A use inside the entry file itself is not an import: the export keyword is
 // then dead, but the declaration stays.
 //
@@ -326,6 +327,22 @@ function readFile(file) {
           } else {
             info.links.set(exported, { local: inner });
           }
+        }
+      }
+      continue;
+    }
+    // `declare module "x" { interface A {} }` merges into the export A of
+    // x, so it uses A.
+    if (
+      ts.isModuleDeclaration(statement) &&
+      ts.isStringLiteral(statement.name) &&
+      statement.body !== undefined &&
+      ts.isModuleBlock(statement.body)
+    ) {
+      const resolved = target(statement.name.text);
+      for (const inner of statement.body.statements) {
+        if (inner.name && ts.isIdentifier(inner.name)) {
+          use(resolved, inner.name.text);
         }
       }
       continue;
