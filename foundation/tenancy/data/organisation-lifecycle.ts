@@ -680,16 +680,15 @@ async function resolveArchiveAuthority(
           error: { code: "organisation_archive_authority_conflict" },
         };
       }
+      const commerceLinks =
+        organisationLifecycleParts().archive.commerceLinkCountsSql;
       const guard = await db
         .prepare(
           `SELECT
            (SELECT COUNT(*) FROM service_role_grant
             WHERE organisation_id = ? AND status = 'active') AS activeMembershipCount,
-           (SELECT COUNT(*) FROM commerce_merchant_binding
-            WHERE organisation_id = ?) AS commerceBindingCount,
-           (SELECT COUNT(*) FROM integration_account
-            WHERE organisation_id = ? AND provider = 'shopify'
-              AND lifecycle = 'active' AND is_default_for_provider = 1) AS activeShopifyCount`,
+           ${commerceLinks.merchantBindings} AS commerceBindingCount,
+           ${commerceLinks.activeShopifyAccounts} AS activeShopifyCount`,
         )
         .bind(
           input.execution.organisationId,
@@ -771,7 +770,7 @@ export async function restoreOrganisation(input: {
     .prepare(
       `SELECT 1 FROM organisation_archive_cleanup
       WHERE organisation_id = ? AND status != 'purged'
-        AND NOT EXISTS (SELECT 1 FROM organisation_harness_erasure WHERE organisation_id = ?)`,
+        AND NOT ${organisationLifecycleParts().archive.harnessErasureExistsSql("?", "any")}`,
     )
     .bind(input.execution.organisationId, input.execution.organisationId)
     .first();
@@ -808,8 +807,7 @@ export async function restoreOrganisation(input: {
         sql: `configuration_version = ? AND purge_after > ?
          AND EXISTS (SELECT 1 FROM organisation_archive_cleanup AS cleanup
            WHERE cleanup.organisation_id = organisation_onboarding.organisation_id AND cleanup.status != 'purged')
-         AND NOT EXISTS (SELECT 1 FROM organisation_harness_erasure AS erasure
-           WHERE erasure.organisation_id = organisation_onboarding.organisation_id)`,
+         AND NOT ${organisationLifecycleParts().archive.harnessErasureExistsSql("organisation_onboarding.organisation_id", "any")}`,
         bindings: [state.configurationVersion, input.now],
       },
       now: input.now,

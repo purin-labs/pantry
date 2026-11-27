@@ -259,7 +259,15 @@ import {
 } from "@purin-labs/tenancy/organisation-access/automation-records";
 import { CONVERSATION_SUBJECT_READS } from "@purin-labs/area-organisation/server/data/authority-subject-reads";
 import { providerWorkReads } from "@purin-labs/actor-runtime/data/provider-work-reads";
-import { PROVIDER_WORK_READS } from "@purin-labs/area-integrations/server/provider-lifecycle/provider-work";
+import {
+  PROVIDER_WORK_FREEZE_HOLDS,
+  PROVIDER_WORK_READS,
+} from "@purin-labs/area-integrations/server/provider-lifecycle/provider-work";
+import { placementMoveConditions } from "@purin-labs/tenancy/data/placement-move-conditions";
+import {
+  RELOCATION_JOURNAL_CONDITIONS,
+  RESERVED_ACTOR_FREEZE_HOLD,
+} from "@purin-labs/actor-runtime/data/placement-move-conditions";
 import { integrationCredentialReads } from "@purin-labs/authority/credential-vault/integration-reads";
 import { INTEGRATION_CREDENTIAL_READS } from "@purin-labs/area-integrations/server/data/vault-reads";
 import { externalRecordsDiscovery } from "@purin-labs/connections/external-records/records";
@@ -582,6 +590,9 @@ chatSurfaces.register(KITCHEN_CHAT_SURFACES);
 // each owner gives the same SQL, so no request makes one more D1 query.
 inboxSubjectReads.register(INBOX_SUBJECT_READS);
 workflowSubjectReads.register(WORKFLOW_SUBJECT_READS);
+conversationSubjectReads.register(CONVERSATION_SUBJECT_READS);
+workflowAutomationRecords.register(WORKFLOW_AUTOMATION_RECORDS);
+inboxAutomationRecords.register(INBOX_AUTOMATION_RECORDS);
 integrationCredentialReads.register(INTEGRATION_CREDENTIAL_READS);
 organisationConnectionReads.register(ORGANISATION_CONNECTION_READS);
 agentInstallationPinReads.register(AGENT_INSTALLATION_PIN_READS);
@@ -589,10 +600,11 @@ slackIdentityLinks.register(SLACK_IDENTITY_LINKS);
 chatForkHistoryReads.register(CHAT_FORK_HISTORY_READS);
 organisationSlackChannels.register(ORGANISATION_SLACK_CHANNELS);
 providerWorkReads.register(PROVIDER_WORK_READS);
+placementMoveConditions.register({
+  freezeHolds: [RESERVED_ACTOR_FREEZE_HOLD, ...PROVIDER_WORK_FREEZE_HOLDS],
+  ...RELOCATION_JOURNAL_CONDITIONS,
+});
 
-conversationSubjectReads.register(CONVERSATION_SUBJECT_READS);
-workflowAutomationRecords.register(WORKFLOW_AUTOMATION_RECORDS);
-inboxAutomationRecords.register(INBOX_AUTOMATION_RECORDS);
 // The access model of the control module lists the Airtable bases of an
 // account through the external records client of the integrations area.
 externalRecordsDiscovery.register({

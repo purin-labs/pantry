@@ -17,6 +17,7 @@ import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { GlobalQuerySource } from "./query-source";
 import { PLACEMENT_MOVE_MACHINE } from "./placement-move.machine";
+import { placementMoveConditions } from "./placement-move-conditions";
 
 type PlacementMoveEvent = MachineEvent<typeof PLACEMENT_MOVE_MACHINE>;
 
@@ -246,9 +247,7 @@ export async function markRelocationComplete(
     .prepare(
       `UPDATE state_object_relocation SET status = ${complete.to}, completed_at = ?
        WHERE relocation_id = ? AND status IN (${complete.from}) AND status = 'cleaning'
-         AND NOT EXISTS (SELECT 1 FROM state_object_relocation_item item
-           WHERE item.relocation_id = state_object_relocation.relocation_id
-             AND item.source_cleaned_at IS NULL)`,
+         AND NOT ${placementMoveConditions.use().relocationHasUncleanedItemSql("state_object_relocation.relocation_id")}`,
     )
     .bind(now, relocationId)
     .run();

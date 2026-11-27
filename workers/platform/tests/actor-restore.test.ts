@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 /// <reference types="@cloudflare/workers-types" />
 
 import type { UnitTestEnv } from "./worker-fakes";

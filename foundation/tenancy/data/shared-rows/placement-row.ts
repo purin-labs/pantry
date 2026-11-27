@@ -34,6 +34,7 @@ import type {
   OrganisationEnvironment,
 } from "../control-plane";
 import { assertNever, isNonNegativeInteger } from "@purin-labs/std";
+import { placementMoveConditions } from "../placement-move-conditions";
 import {
   abandonedMoveRecoversSql,
   preparePlacementMovePublication,
@@ -229,17 +230,16 @@ export async function reserveOrganisationPlacementMove(input: {
   };
 }
 
-const regionalFreezeReadiness = `
-  AND NOT EXISTS (SELECT 1 FROM durable_object_registry registry
-    WHERE registry.organisation_id = organisation_placement.organisation_id
-      AND registry.placement_epoch = organisation_placement.placement_epoch
-      AND registry.lifecycle_status = 'reserved')
-  AND NOT EXISTS (SELECT 1 FROM provider_connection_attempt attempt
-    WHERE attempt.organisation_id = organisation_placement.organisation_id
-      AND attempt.lifecycle IN ('callback_received', 'provisioning'))
-  AND NOT EXISTS (SELECT 1 FROM provider_account_cleanup cleanup
-    WHERE cleanup.organisation_id = organisation_placement.organisation_id
-      AND cleanup.lifecycle = 'running_provider_cleanup')`;
+/** No work of another module holds the regional freeze of the placement. */
+function regionalFreezeReadiness(): string {
+  return placementMoveConditions
+    .use()
+    .freezeHolds.map(
+      (hold) => `
+  AND NOT ${hold}`,
+    )
+    .join("");
+}
 
 export async function freezeOrganisationPlacementMove(
   db: GlobalDatabase,
@@ -260,7 +260,7 @@ export async function freezeOrganisationPlacementMove(
          AND placement_epoch = ?
          AND fence_token = ?
          AND status = 'active'
-         ${sameBinding(sourceDatabase, db) ? regionalFreezeReadiness : ""}
+         ${sameBinding(sourceDatabase, db) ? regionalFreezeReadiness() : ""}
          AND EXISTS (
            SELECT 1 FROM ${journal.table} operation
            JOIN organisation_placement target ON target.organisation_id = operation.organisation_id
@@ -353,14 +353,13 @@ export async function publishOrganisationPlacementMove(
   const session = db.withSession("first-primary");
   const journal = publicationJournal(publication);
 
+  const conditions = placementMoveConditions.use();
   const dataReady =
     publication.kind === "relocation"
       ? `AND (operation.frozen_at > ? OR ${abandonedMoveRecoversSql("operation.relocation_id")})
        AND operation.source_quiesced_at IS NOT NULL AND operation.data_verified_at IS NOT NULL AND operation.data_table_count IS NOT NULL
-       AND operation.data_table_count = (SELECT COUNT(*) FROM state_object_relocation_copy copied
-         WHERE copied.relocation_id = operation.relocation_id AND copied.status = 'verified')
-       AND NOT EXISTS (SELECT 1 FROM state_object_relocation_copy copied
-         WHERE copied.relocation_id = operation.relocation_id AND copied.status <> 'verified')`
+       AND operation.data_table_count = ${conditions.verifiedCopyCountSql("operation.relocation_id")}
+       AND NOT ${conditions.relocationHasUnverifiedCopySql("operation.relocation_id")}`
       : "";
 
   // Each write depends on its predecessor in this transaction. A rejected
@@ -520,7 +519,7 @@ export async function freezeRegionalOrganisationPlacement(
       `UPDATE organisation_placement SET status = 'frozen', frozen_at = ?
       WHERE organisation_id = ? AND placement_epoch = ? AND placement_cell_id = ?
         AND fence_token = ? AND status = 'active'
-        ${regionalFreezeReadiness}`,
+        ${regionalFreezeReadiness()}`,
     )
     .bind(
       move.source.frozenAt,

@@ -187,7 +187,25 @@ type OrganisationArchiveParts = Readonly<{
   harnessErasureStarted(
     session: Session,
     organisationId: OrganisationId,
-  ): Promise<boolean>;
+  ): Promise<boolean>; /**
+   * A condition of one statement: true when the Organisation has a Session
+   * erasure record, or one in the state `erasing` (organisation).
+   * `organisationSql` is the SQL of the organisation id: a column of the
+   * statement or a `?` mark.
+   */
+  harnessErasureExistsSql(
+    organisationSql: string,
+    state: "any" | "erasing",
+  ): string;
+  /**
+   * Two counts for the archive by a support admin, each one SELECT in
+   * brackets with one `?`, the organisation id (connections): the commerce
+   * merchant bindings and the active default Shopify accounts.
+   */
+  commerceLinkCountsSql: Readonly<{
+    merchantBindings: string;
+    activeShopifyAccounts: string;
+  }>;
 }>;
 
 /**

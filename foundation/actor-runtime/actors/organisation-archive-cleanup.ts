@@ -9,6 +9,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
+import { organisationLifecycleParts } from "@purin-labs/tenancy/data/organisation-lifecycle-port";
 import {
   isOrganisationPolicyPlacementActive,
   parseOrganisationPlacementFenceToken,
@@ -223,12 +224,11 @@ export async function canEraseArchivedHarnessHistory(
     .prepare(
       `SELECT 1 FROM organisation_archive_cleanup AS cleanup
      JOIN organisation_onboarding AS organisation ON organisation.organisation_id = cleanup.organisation_id
-     JOIN organisation_harness_erasure AS erasure ON erasure.organisation_id = cleanup.organisation_id
      JOIN organisation_placement AS placement ON placement.organisation_id = cleanup.organisation_id
      JOIN durable_object_registry AS registry ON registry.organisation_id = cleanup.organisation_id
      WHERE cleanup.organisation_id = ? AND cleanup.archive_receipt_id = ?
        AND cleanup.status = 'pending_purge' AND organisation.lifecycle IN ('archived', 'purging')
-       AND erasure.status = 'erasing'
+       AND ${organisationLifecycleParts().archive.harnessErasureExistsSql("cleanup.organisation_id", "erasing")}
        AND placement.placement_epoch = ? AND placement.placement_cell_id = ?
        AND placement.fence_token = ? AND placement.status IN ('active', 'frozen')
        AND registry.object_kind = 'session' AND registry.logical_object_id = ?

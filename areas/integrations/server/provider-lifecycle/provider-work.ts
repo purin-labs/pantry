@@ -27,3 +27,17 @@ export const PROVIDER_WORK_READS: ProviderWorkReads = {
       .bind(organisationId, organisationId)
       .first()) !== null,
 };
+
+/**
+ * The provider work that holds the regional freeze of a placement: each
+ * text is a condition of the freeze statement of tenancy on its
+ * `organisation_placement` row.
+ */
+export const PROVIDER_WORK_FREEZE_HOLDS = [
+  `EXISTS (SELECT 1 FROM provider_connection_attempt attempt
+    WHERE attempt.organisation_id = organisation_placement.organisation_id
+      AND attempt.lifecycle IN ('callback_received', 'provisioning'))`,
+  `EXISTS (SELECT 1 FROM provider_account_cleanup cleanup
+    WHERE cleanup.organisation_id = organisation_placement.organisation_id
+      AND cleanup.lifecycle = 'running_provider_cleanup')`,
+] as const;

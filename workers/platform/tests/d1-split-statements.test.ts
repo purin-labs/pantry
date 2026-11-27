@@ -104,8 +104,10 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "readOpenScreenPairing",
     "readScreenPairingState",
   ],
-  "foundation/tenancy/data/shared-rows/placement-row.ts": [
-    "publishOrganisationPlacementMove",
+  // The copy and item conditions of a relocation: tenancy puts them into
+  // statements that it runs on the global database.
+  "foundation/actor-runtime/data/placement-move-conditions.ts": [
+    "RELOCATION_JOURNAL_CONDITIONS",
   ],
   "foundation/authority/data/slack-installation-records.ts": [
     "prepareSlackDmSelectionAuditEvent",

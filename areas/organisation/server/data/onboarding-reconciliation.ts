@@ -437,6 +437,19 @@ export async function organisationHarnessErasureStarted(
 }
 
 /**
+ * A condition of a statement of tenancy or of the Actor runtime: true when
+ * the Organisation has a Session erasure record, or one in the state
+ * `erasing`. `organisationSql` is the SQL of the organisation id.
+ */
+export function organisationHarnessErasureExistsSql(
+  organisationSql: string,
+  state: "any" | "erasing",
+): string {
+  return `EXISTS (SELECT 1 FROM organisation_harness_erasure AS erasure
+           WHERE erasure.organisation_id = ${organisationSql}${state === "erasing" ? " AND erasure.status = 'erasing'" : ""})`;
+}
+
+/**
  * Composes the durable operator receipt for an organisation-wide harness erasure.
  * The read is idempotent and remains answerable after the final purge because
  * the erasure ledger, per-session rows, object accounting, and archive

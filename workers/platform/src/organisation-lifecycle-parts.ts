@@ -4,6 +4,7 @@ import {
   prepareSurfaceInstallConnectionRows,
   prepareSurfaceReinstallConnectionRows,
 } from "@purin-labs/connections/data/integration-account";
+import { COMMERCE_LINK_COUNTS_SQL } from "@purin-labs/connections/data/archive-guard-counts";
 import {
   prepareArchivedOrganisationAccountsDisable,
   prepareArchivedOrganisationWebhooksDisable,
@@ -21,7 +22,10 @@ import {
 } from "@purin-labs/area-inbox-contract/server/account-erasure";
 import { prepareInitialOrganisationWorkspace } from "@purin-labs/agent/data/organisation-workspace";
 import { prepareReadinessAssessmentDeletion } from "@purin-labs/area-organisation/server/data/onboarding";
-import { organisationHarnessErasureStarted } from "@purin-labs/area-organisation/server/data/onboarding-reconciliation";
+import {
+  organisationHarnessErasureExistsSql,
+  organisationHarnessErasureStarted,
+} from "@purin-labs/area-organisation/server/data/onboarding-reconciliation";
 import {
   prepareArchivedOrganisationConnectionsDisable,
   prepareOrganisationPurgeConnections,
@@ -126,6 +130,9 @@ export const ORGANISATION_LIFECYCLE_PARTS: OrganisationLifecycleParts = {
       prepareOrganisationProjectMembersDeletion(session, input),
     harnessErasureStarted: (session, organisationId) =>
       organisationHarnessErasureStarted(session, organisationId),
+    harnessErasureExistsSql: (organisationSql, state) =>
+      organisationHarnessErasureExistsSql(organisationSql, state),
+    commerceLinkCountsSql: COMMERCE_LINK_COUNTS_SQL,
   },
   purge: {
     catalogue: PURGE_CATALOGUE,
