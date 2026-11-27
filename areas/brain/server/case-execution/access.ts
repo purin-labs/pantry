@@ -38,8 +38,16 @@ import {
 } from "@purin-labs/conversation/chat/conversation-actor-identity";
 import type { AuthorizedConversationScope as ConversationScope } from "@purin-labs/tenancy/organisation-access/access";
 import type { Env } from "@purin-labs/kernel/env";
-import type { CaseActorStub, OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
-import { parseCaseId, parseSessionId, type CaseId } from "@purin-labs/kernel/ids";
+import type { CaseActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type {
+  BrainOrganisationActor,
+  BrainOrganisationStub,
+} from "../actors/organisation-brain-rpc";
+import {
+  parseCaseId,
+  parseSessionId,
+  type CaseId,
+} from "@purin-labs/kernel/ids";
 import {
   resolveMemoryViewer,
   viewerMayRead,
@@ -430,13 +438,14 @@ async function openCaseExecution(
   // active. None is reserved or activated for a read. Without one, the
   // effects are absent and the page says so.
   let ledger: Awaited<
-    ReturnType<OrganisationActorStub["readCaseExecutionEffects"]>
+    ReturnType<BrainOrganisationStub["readCaseExecutionEffects"]>
   > | null = null;
   try {
-    const organisation = await findActiveOrganisationActorAtScope({
-      scope: viewer.execution,
-      namespace: env.ORGANISATION,
-    });
+    const organisation =
+      await findActiveOrganisationActorAtScope<BrainOrganisationActor>({
+        scope: viewer.execution,
+        namespace: env.ORGANISATION,
+      });
     ledger =
       organisation === null
         ? null
@@ -601,9 +610,7 @@ class ExecutionReader {
 
   private async read(labelJson: string): Promise<boolean> {
     const label = await FlowLabel.restore(parseJsonOrNull(labelJson));
-    return (
-      label.ok && (await viewerMayRead(this.viewer, label.value))
-    );
+    return label.ok && (await viewerMayRead(this.viewer, label.value));
   }
 }
 

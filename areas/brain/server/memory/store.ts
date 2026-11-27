@@ -90,7 +90,7 @@ export type MemoryStoreCommand = Readonly<{
       }>
   );
 
-type MemoryCommandError = Readonly<{ code: MemoryCommandErrorCode }>;
+export type MemoryCommandError = Readonly<{ code: MemoryCommandErrorCode }>;
 
 /**
  * Who a command comes from, as its caller authenticated them. A person's
@@ -108,7 +108,7 @@ export type SerializedMemory = Readonly<{
     Readonly<{ flowLabel: ReturnType<typeof canonicalFlowLabel> }>)[];
 }>;
 
-type MemoryReadError = Readonly<{
+export type MemoryReadError = Readonly<{
   code: "memory_persisted_state_invalid";
 }>;
 

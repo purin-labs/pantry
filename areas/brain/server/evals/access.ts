@@ -21,7 +21,10 @@ import type { AuthorizedConversationScope as ConversationScope } from "@purin-la
 import { verifiedContacts } from "@purin-labs/area-inbox-contract/server/verified-contacts";
 import { gmailConnectorId } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type {
+  BrainOrganisationActor,
+  BrainOrganisationStub,
+} from "../actors/organisation-brain-rpc";
 import {
   parseIntegrationAccountId,
   type OrganisationId,
@@ -111,7 +114,7 @@ export async function readEvalViews(
  */
 export async function countEvalsToReview(
   viewer: MemoryViewer,
-  organisation: OrganisationActorStub,
+  organisation: BrainOrganisationStub,
   review: ReviewMemo,
 ): Promise<number | null> {
   const stored = await organisation.readEvals({
@@ -246,12 +249,13 @@ export async function proposeEvalFromCorrection(
     };
   const label = await joinFlowLabels(input.turnLabel, cited.value.label);
   if (!label.ok) return { ok: false, error: { code: "eval_unavailable" } };
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env: input.env,
-    organisationId: input.organisationId,
-    placement: input.execution.placement,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActorAtPlacement<BrainOrganisationActor>({
+      env: input.env,
+      organisationId: input.organisationId,
+      placement: input.execution.placement,
+      now: Date.now(),
+    });
   const commandId = `eval_correction_${await digestCanonical({
     integrationAccountId: input.correction.integrationAccountId,
     proposalId: input.correction.proposalId,
@@ -556,12 +560,13 @@ export async function publishEvalRunResult(
     flowLabels: readonly unknown[];
   }>,
 ): Promise<"published" | "refused" | "unavailable"> {
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env: input.env,
-    organisationId: input.organisationId,
-    placement: input.execution.placement,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActorAtPlacement<BrainOrganisationActor>({
+      env: input.env,
+      organisationId: input.organisationId,
+      placement: input.execution.placement,
+      now: Date.now(),
+    });
   const stored = await organisation.readEval({
     organisationId: input.organisationId,
     evalId: input.result.eval.evalId,
@@ -605,12 +610,13 @@ export async function publishEvalRunResult(
 export async function readEvalRunFixture(
   input: EvalRunFixtureRequest,
 ): Promise<EvalRunFixtureRead> {
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env: input.env,
-    organisationId: input.organisationId,
-    placement: input.execution.placement,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActorAtPlacement<BrainOrganisationActor>({
+      env: input.env,
+      organisationId: input.organisationId,
+      placement: input.execution.placement,
+      now: Date.now(),
+    });
   const stored = await organisation.readEval({
     organisationId: input.organisationId,
     evalId: input.eval.evalId,

@@ -37,10 +37,11 @@ import type {
 } from "@purin-labs/agent/context/assembly/index";
 import { gmailConnectorId } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import type { Env } from "@purin-labs/kernel/env";
+import type { CaseActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type {
-  CaseActorStub,
-  OrganisationActorStub,
-} from "@purin-labs/actor-runtime/actors/actor-stubs";
+  BrainOrganisationActor,
+  BrainOrganisationStub,
+} from "../actors/organisation-brain-rpc";
 import {
   parseCaseId,
   parseIntegrationAccountId,
@@ -157,7 +158,7 @@ export async function readMemoryViews(
  */
 export async function countMemoriesToReview(
   viewer: MemoryViewer,
-  organisation: OrganisationActorStub,
+  organisation: BrainOrganisationStub,
   review: ReviewMemo,
 ): Promise<number | null> {
   const stored = await organisation.readMemories({
@@ -260,12 +261,13 @@ async function readTurnMemory(
     ...new Set(input.subjects.applicability.map(memoryApplicabilityKey)),
   ];
   if (applicabilityKeys.length === 0) return readNoTurnMemory();
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env: input.env,
-    organisationId: input.organisationId,
-    placement: input.execution.placement,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActorAtPlacement<BrainOrganisationActor>({
+      env: input.env,
+      organisationId: input.organisationId,
+      placement: input.execution.placement,
+      now: Date.now(),
+    });
   const candidates: TurnMemoryCandidate[] = [];
   const decided: TurnMemoryDecisions = {
     labels: new Map(),
@@ -427,12 +429,13 @@ async function readEvalTurnMemory(
   const accepted = await readTurnMemory(input, request);
   const named = input.candidate;
   if (named === null || accepted.kind !== "read") return accepted;
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env: input.env,
-    organisationId: input.organisationId,
-    placement: input.execution.placement,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActorAtPlacement<BrainOrganisationActor>({
+      env: input.env,
+      organisationId: input.organisationId,
+      placement: input.execution.placement,
+      now: Date.now(),
+    });
   const stored = await organisation.readMemory({
     organisationId: input.organisationId,
     memoryId: named.memoryId,
@@ -505,12 +508,13 @@ export async function readShownMemoryStanding(
   if (input.revisions.length === 0) return "in_force";
   let read;
   try {
-    const organisation = await requireActiveOrganisationActorAtPlacement({
-      env: input.env,
-      organisationId: input.organisationId,
-      placement: input.execution.placement,
-      now: Date.now(),
-    });
+    const organisation =
+      await requireActiveOrganisationActorAtPlacement<BrainOrganisationActor>({
+        env: input.env,
+        organisationId: input.organisationId,
+        placement: input.execution.placement,
+        now: Date.now(),
+      });
     read = await organisation.readAcceptedMemoryRevisions({
       organisationId: input.organisationId,
       memoryIds: [...new Set(input.revisions.map((shown) => shown.memoryId))],
@@ -645,7 +649,9 @@ export async function resolveMemoryViewer(
   if (authority === null || !policy.ok) return null;
   // The gate of the request, the turn authority and the capability ask the
   // account the same question. This read asks it one time.
-  const accountAccess = organisationAccessOfOneRead(resolved.value.accountAccess);
+  const accountAccess = organisationAccessOfOneRead(
+    resolved.value.accountAccess,
+  );
   const compiled = await compileTurnAuthority({
     db,
     accountAccess,
@@ -691,8 +697,8 @@ export async function resolveMemoryViewer(
  */
 export function organisationActor(
   viewer: MemoryViewer,
-): Promise<OrganisationActorStub> {
-  return requireActiveOrganisationActorAtScope({
+): Promise<BrainOrganisationStub> {
+  return requireActiveOrganisationActorAtScope<BrainOrganisationActor>({
     env: viewer.env,
     scope: viewer.execution,
     now: Date.now(),
@@ -705,7 +711,7 @@ export function organisationActor(
  */
 export async function inspectableMemory(
   viewer: MemoryViewer,
-  organisation: OrganisationActorStub,
+  organisation: BrainOrganisationStub,
   memoryId: string,
 ): Promise<Memory | null> {
   const stored = await organisation.readMemories({
@@ -963,12 +969,13 @@ export async function proposeMemoryFromCorrection(
     };
   const label = await joinFlowLabels(input.turnLabel, cited.value.label);
   if (!label.ok) return { ok: false, error: { code: "memory_unavailable" } };
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env: input.env,
-    organisationId: input.organisationId,
-    placement: input.execution.placement,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActorAtPlacement<BrainOrganisationActor>({
+      env: input.env,
+      organisationId: input.organisationId,
+      placement: input.execution.placement,
+      now: Date.now(),
+    });
   const commandId = `memory_correction_${await digestCanonical({
     integrationAccountId: input.correction.integrationAccountId,
     proposalId: input.correction.proposalId,
@@ -1108,12 +1115,13 @@ export async function proposeMemoryFromInstruction(
     return { ok: false, error: { code: "memory_evidence_invalid" } };
   const label = await joinFlowLabels(input.turnLabel, cited.value.label);
   if (!label.ok) return { ok: false, error: { code: "memory_unavailable" } };
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env: input.env,
-    organisationId: input.organisationId,
-    placement: input.execution.placement,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActorAtPlacement<BrainOrganisationActor>({
+      env: input.env,
+      organisationId: input.organisationId,
+      placement: input.execution.placement,
+      now: Date.now(),
+    });
   const commandId = `memory_instruction_${await digestCanonical({
     caseId: input.instruction.caseId,
     entryId: input.instruction.entryId,

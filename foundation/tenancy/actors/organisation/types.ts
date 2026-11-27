@@ -37,6 +37,14 @@ export type OrganisationStateError =
     }
   | { code: "policy_version_conflict"; version: number };
 
+/**
+ * What each command of the Organisation Actor can fail with before or after
+ * its own work: the check of the Organisation record and the placement
+ * admission. A caller's RPC interface joins these with its own errors.
+ */
+export type OrganisationCommandFailure =
+  OrganisationStateError | { readonly code: "organisation_placement_conflict" };
+
 export type OrganisationCutoverCueSettlementInput = {
   readonly organisationId: OrganisationId;
   readonly settledAt: number;

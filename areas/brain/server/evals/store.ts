@@ -90,17 +90,17 @@ export type EvalStoreCommand = Readonly<{
       }>
   );
 
-type EvalCommandError = Readonly<{ code: EvalCommandErrorCode }>;
+export type EvalCommandError = Readonly<{ code: EvalCommandErrorCode }>;
 
 /** An Eval as it crosses the Actor boundary, each label in canonical form. */
-type SerializedEval = Readonly<{
+export type SerializedEval = Readonly<{
   evalId: string;
   headRevision: number;
   revisions: readonly (EvalRevisionView &
     Readonly<{ flowLabel: ReturnType<typeof canonicalFlowLabel> }>)[];
 }>;
 
-type EvalReadError = Readonly<{
+export type EvalReadError = Readonly<{
   code: "eval_persisted_state_invalid";
 }>;
 
@@ -135,7 +135,7 @@ export type StoredEvalRunResult = Readonly<{
 }>;
 
 /** A settled run as it crosses the Actor boundary: its stored text. */
-type SerializedEvalRunResult = Readonly<{
+export type SerializedEvalRunResult = Readonly<{
   resultJson: string;
   flowLabelJson: string;
 }>;
