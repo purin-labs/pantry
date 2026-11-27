@@ -1,19 +1,4 @@
-import {
-  batchSpec,
-  dishwasherActions,
-  executeRecipeApplianceTasks,
-  extractScheduledTasks,
-  hobPowerActions,
-  hobTemperatureActions,
-  taskMaterialMassKg,
-  weighActions,
-  type ApplianceWasmRuntimeSource,
-  type RecipeApplianceExecutionOptions,
-  type RecipeApplianceExecutionReport,
-  type RecipeApplianceTaskBinding,
-  type ScheduledTaskDescriptor,
-  type ScheduledTaskSource,
-} from "./appliance-execution.ts";
+import type { ApplianceTaskRow } from "./appliance-execution.ts";
 export {
   compileGingerBlackTeaRecipe,
   gingerBlackTeaRecipeInput,
@@ -24,270 +9,274 @@ export {
 } from "./ginger-milk-tea.ts";
 export { teaStrainTiming } from "./tea-process.ts";
 
-function isBlackTeaWorkflow(workflowId: string): boolean {
-  return workflowId === "ginger-tea-batch";
+const BLACK_TEA_WORKFLOWS = { exact: ["ginger-tea-batch"] } as const;
+const MILK_TEA_WORKFLOWS = {
+  exact: ["ginger-milk-tea-batch", "clean-initial-pan"],
+} as const;
+
+function teaWeighRow(
+  recipe: "ginger-black-tea" | "ginger-milk-tea",
+  workflows: typeof BLACK_TEA_WORKFLOWS | typeof MILK_TEA_WORKFLOWS,
+  keys: ApplianceTaskRow["keys"],
+  massKg: number,
+  temperatureC: number,
+): ApplianceTaskRow {
+  return {
+    recipe,
+    taskKind: "weigh",
+    workflows,
+    keys,
+    category: "weigh",
+    appliance: "ohaus-ranger-3000",
+    label: "Tea {key}",
+    batch: {
+      massKg,
+      temperatureC,
+      specificHeat: 4050,
+      densityKgL: 1.01,
+      resistance: 0.04,
+    },
+    action: { kind: "weigh" },
+  };
 }
 
-function isMilkTeaWorkflow(workflowId: string): boolean {
-  return (
-    workflowId === "ginger-milk-tea-batch" ||
-    workflowId === "clean-initial-pan"
-  );
-}
-
-function isTeaWorkflow(workflowId: string): boolean {
-  return isBlackTeaWorkflow(workflowId) || isMilkTeaWorkflow(workflowId);
-}
-
-function parseFinishingTargetC(key: string): number {
-  const match = /^heat-and-stir-to-(\d+)c$/u.exec(key);
-  if (match === null || match[1] === undefined) return 75;
-  const parsed = Number(match[1]);
-  return Number.isFinite(parsed) ? Math.max(45, Math.min(90, parsed)) : 75;
-}
-
-export function teaApplianceTask(
-  task: ScheduledTaskDescriptor,
-): RecipeApplianceTaskBinding | null {
-  if (!isTeaWorkflow(task.workflowId)) return null;
-  const key = task.taskKey;
-  const milkTea = isMilkTeaWorkflow(task.workflowId);
-
-  if (
-    key === "prepare-ginger-and-water" ||
-    key === "add-tea-and-cover" ||
-    key === "strain-and-sweeten" ||
-    key === "add-tea" ||
-    key.startsWith("add-milk-and-sugar-at-")
-  ) {
-    const fallbackKg =
-      key === "prepare-ginger-and-water"
-        ? milkTea
-          ? 0.415
-          : 0.465
-        : key === "add-tea-and-cover"
-          ? 0.453
-          : key === "strain-and-sweeten"
-            ? 0.435
-            : key === "add-tea"
-              ? 0.404
-              : 0.569;
-    const defaultTempC =
-      key === "prepare-ginger-and-water"
-        ? 20
-        : key.startsWith("add-milk-and-sugar-at-")
-          ? 52
-          : 35;
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, fallbackKg),
-      defaultTempC,
-      4050,
-      1.01,
-      0.04,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "weigh",
-      appliance: "ohaus-ranger-3000",
-      label: `Tea ${key}`,
-      batch,
-      buildActions: () => weighActions(batch),
-    };
-  }
-
-  if (
-    key === "heat-to-simmer" ||
-    key === "simmer-ginger" ||
-    key === "simmer-tea"
-  ) {
-    const appliance = milkTea ? "vollrath-59500p" : "maruzen-mih-02c";
-    const fallbackKg = milkTea ? 0.415 : 0.465;
-    const percent =
-      key === "heat-to-simmer" ? 55 : key === "simmer-ginger" ? 38 : 30;
-    const defaultTempC =
-      key === "heat-to-simmer" ? 20 : key === "simmer-ginger" ? 26 : 32;
-    const baseBatch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, fallbackKg),
-      defaultTempC,
-      4100,
-      1.0,
-      0.03,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
+function teaHobRows(
+  recipe: "ginger-black-tea" | "ginger-milk-tea",
+  workflows: typeof BLACK_TEA_WORKFLOWS | typeof MILK_TEA_WORKFLOWS,
+  appliance: "maruzen-mih-02c" | "vollrath-59500p",
+  massKg: number,
+): readonly ApplianceTaskRow[] {
+  return [
+    {
+      recipe,
+      taskKind: "hob-power",
+      workflows,
+      keys: { exact: ["heat-to-simmer"] },
       category: "hob",
       appliance,
-      label: `Tea ${key}`,
-      batch: baseBatch,
-      buildActions: (context) => {
-        const tempC =
-          key !== "heat-to-simmer" &&
-          context.previousInstanceBatchTemperatureC !== null
-            ? Math.max(
-                22,
-                Math.min(72, context.previousInstanceBatchTemperatureC),
-              )
-            : defaultTempC;
-        return hobPowerActions(
-          { ...baseBatch, temperature_c: Number(tempC.toFixed(3)) },
-          percent,
-          5,
-        );
+      label: "Tea {key}",
+      batch: {
+        massKg,
+        temperatureC: 20,
+        specificHeat: 4100,
+        densityKgL: 1.0,
+        resistance: 0.03,
       },
-    };
-  }
-
-  if (key === "heat-cup-preheat-water") {
-    const batch = batchSpec(
-      `${task.instanceId}-cup-preheat`,
-      taskMaterialMassKg(task.definition, 0.3),
-      20,
-      4180,
-      1.0,
-      0.02,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
+      action: { kind: "hob-power", percent: 55, durationSeconds: 5 },
+    },
+    {
+      recipe,
+      taskKind: "hob-power",
+      workflows,
+      keys: { exact: ["simmer-ginger"] },
       category: "hob",
-      appliance: "vollrath-59500p",
-      label: "Heat cup-preheat water on induction hob",
-      batch,
-      buildActions: () => hobTemperatureActions(batch, 65, 5),
-    };
-  }
-
-  if (key.startsWith("heat-and-stir-to-")) {
-    const targetC = parseFinishingTargetC(key);
-    const defaultTempC = Math.max(50, targetC - 12);
-    const baseBatch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, 0.569),
-      defaultTempC,
-      3950,
-      1.02,
-      0.05,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "hob",
-      appliance: "vollrath-59500p",
-      label: `Ginger milk tea ${key}`,
-      batch: baseBatch,
-      buildActions: (context) => {
-        const tempC =
-          context.previousInstanceBatchTemperatureC !== null &&
-          context.previousInstanceBatchTemperatureC >= 45
-            ? Math.min(targetC - 2, context.previousInstanceBatchTemperatureC)
-            : defaultTempC;
-        return hobTemperatureActions(
-          { ...baseBatch, temperature_c: Number(tempC.toFixed(3)) },
-          targetC,
-          5,
-        );
+      appliance,
+      label: "Tea {key}",
+      batch: {
+        massKg,
+        temperatureC: 26,
+        specificHeat: 4100,
+        densityKgL: 1.0,
+        resistance: 0.03,
       },
-    };
-  }
-
-  if (
-    key === "wash-equipment" ||
-    key === "wash-initial-pan" ||
-    key === "wash-pan-a" ||
-    key === "wash-pan-b-and-strainer"
-  ) {
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      key === "wash-equipment" || key === "wash-pan-b-and-strainer"
-        ? 0.4
-        : 0.35,
-      26,
-      950,
-      1.2,
-      0.02,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "dishwasher",
-      appliance: "winterhalter-uc-l",
-      label: `Tea ${key}`,
-      batch,
-      buildActions: () => dishwasherActions(batch, 6),
-    };
-  }
-
-  return null;
+      action: {
+        kind: "hob-power",
+        percent: 38,
+        durationSeconds: 5,
+        carryPreviousTempRange: [22, 72],
+      },
+    },
+    {
+      recipe,
+      taskKind: "hob-power",
+      workflows,
+      keys: { exact: ["simmer-tea"] },
+      category: "hob",
+      appliance,
+      label: "Tea {key}",
+      batch: {
+        massKg,
+        temperatureC: 32,
+        specificHeat: 4100,
+        densityKgL: 1.0,
+        resistance: 0.03,
+      },
+      action: {
+        kind: "hob-power",
+        percent: 30,
+        durationSeconds: 5,
+        carryPreviousTempRange: [22, 72],
+      },
+    },
+  ];
 }
 
-function gingerBlackTeaApplianceTasks(
-  source: ScheduledTaskSource,
-): readonly RecipeApplianceTaskBinding[] {
-  const bindings: RecipeApplianceTaskBinding[] = [];
-  for (const task of extractScheduledTasks(source)) {
-    if (!isBlackTeaWorkflow(task.workflowId)) continue;
-    const bound = teaApplianceTask(task);
-    if (bound !== null) bindings.push(bound);
-  }
-  return bindings;
+function teaWashRow(
+  recipe: "ginger-black-tea" | "ginger-milk-tea",
+  workflows: typeof BLACK_TEA_WORKFLOWS | typeof MILK_TEA_WORKFLOWS,
+  exact: readonly string[],
+  massKg: number,
+): ApplianceTaskRow {
+  return {
+    recipe,
+    taskKind: "dishwasher",
+    workflows,
+    keys: { exact },
+    category: "dishwasher",
+    appliance: "winterhalter-uc-l",
+    label: "Tea {key}",
+    batch: {
+      massKg,
+      massSource: "fixed",
+      temperatureC: 26,
+      specificHeat: 950,
+      densityKgL: 1.2,
+      resistance: 0.02,
+    },
+    action: { kind: "dishwasher", durationSeconds: 6 },
+  };
 }
 
-function gingerMilkTeaApplianceTasks(
-  source: ScheduledTaskSource,
-): readonly RecipeApplianceTaskBinding[] {
-  const bindings: RecipeApplianceTaskBinding[] = [];
-  for (const task of extractScheduledTasks(source)) {
-    if (!isMilkTeaWorkflow(task.workflowId)) continue;
-    const bound = teaApplianceTask(task);
-    if (bound !== null) bindings.push(bound);
-  }
-  return bindings;
-}
+/** Declarative MuJoCo appliance task rows for ginger black tea (Plan 61C). */
+const GINGER_BLACK_TEA_APPLIANCE_ROWS: readonly ApplianceTaskRow[] = [
+  teaWeighRow(
+    "ginger-black-tea",
+    BLACK_TEA_WORKFLOWS,
+    { exact: ["prepare-ginger-and-water"] },
+    0.465,
+    20,
+  ),
+  teaWeighRow(
+    "ginger-black-tea",
+    BLACK_TEA_WORKFLOWS,
+    { exact: ["add-tea-and-cover"] },
+    0.453,
+    35,
+  ),
+  teaWeighRow(
+    "ginger-black-tea",
+    BLACK_TEA_WORKFLOWS,
+    { exact: ["strain-and-sweeten"] },
+    0.435,
+    35,
+  ),
+  teaWeighRow(
+    "ginger-black-tea",
+    BLACK_TEA_WORKFLOWS,
+    { exact: ["add-tea"] },
+    0.404,
+    35,
+  ),
+  ...teaHobRows(
+    "ginger-black-tea",
+    BLACK_TEA_WORKFLOWS,
+    "maruzen-mih-02c",
+    0.465,
+  ),
+  teaWashRow("ginger-black-tea", BLACK_TEA_WORKFLOWS, ["wash-equipment"], 0.4),
+];
 
-export async function executeGingerBlackTeaApplianceTasks(
-  source: ScheduledTaskSource,
-  runtime: ApplianceWasmRuntimeSource,
-  options: RecipeApplianceExecutionOptions = {},
-): Promise<RecipeApplianceExecutionReport> {
-  return executeRecipeApplianceTasks(
-    gingerBlackTeaApplianceTasks(source),
-    runtime,
-    { runId: options.runId ?? "ginger-black-tea-appliance-wasm", ...options },
-  );
-}
+/** Declarative MuJoCo appliance task rows for ginger milk tea (Plan 61D). */
+const GINGER_MILK_TEA_APPLIANCE_ROWS: readonly ApplianceTaskRow[] = [
+  teaWeighRow(
+    "ginger-milk-tea",
+    MILK_TEA_WORKFLOWS,
+    { exact: ["prepare-ginger-and-water"] },
+    0.415,
+    20,
+  ),
+  teaWeighRow(
+    "ginger-milk-tea",
+    MILK_TEA_WORKFLOWS,
+    { exact: ["add-tea-and-cover"] },
+    0.453,
+    35,
+  ),
+  teaWeighRow(
+    "ginger-milk-tea",
+    MILK_TEA_WORKFLOWS,
+    { exact: ["strain-and-sweeten"] },
+    0.435,
+    35,
+  ),
+  teaWeighRow(
+    "ginger-milk-tea",
+    MILK_TEA_WORKFLOWS,
+    { exact: ["add-tea"] },
+    0.404,
+    35,
+  ),
+  teaWeighRow(
+    "ginger-milk-tea",
+    MILK_TEA_WORKFLOWS,
+    { prefixes: ["add-milk-and-sugar-at-"] },
+    0.569,
+    52,
+  ),
+  ...teaHobRows(
+    "ginger-milk-tea",
+    MILK_TEA_WORKFLOWS,
+    "vollrath-59500p",
+    0.415,
+  ),
+  {
+    recipe: "ginger-milk-tea",
+    taskKind: "hob-temperature",
+    workflows: MILK_TEA_WORKFLOWS,
+    keys: { exact: ["heat-cup-preheat-water"] },
+    category: "hob",
+    appliance: "vollrath-59500p",
+    label: "Heat cup-preheat water on induction hob",
+    batch: {
+      idSuffix: "cup-preheat",
+      massKg: 0.3,
+      temperatureC: 20,
+      specificHeat: 4180,
+      densityKgL: 1.0,
+      resistance: 0.02,
+    },
+    action: { kind: "hob-temperature", targetC: 65, durationSeconds: 5 },
+  },
+  {
+    recipe: "ginger-milk-tea",
+    taskKind: "hob-temperature",
+    workflows: MILK_TEA_WORKFLOWS,
+    keys: { prefixes: ["heat-and-stir-to-"] },
+    category: "hob",
+    appliance: "vollrath-59500p",
+    label: "Ginger milk tea {key}",
+    batch: {
+      massKg: 0.569,
+      temperatureC: 63,
+      specificHeat: 3950,
+      densityKgL: 1.02,
+      resistance: 0.05,
+    },
+    action: {
+      kind: "hob-temperature-from-key",
+      fallbackTargetC: 75,
+      durationSeconds: 5,
+      defaultTempOffsetC: -12,
+      minDefaultTempC: 50,
+      carryMinTempC: 45,
+      carryMaxOffsetC: -2,
+    },
+  },
+  teaWashRow(
+    "ginger-milk-tea",
+    MILK_TEA_WORKFLOWS,
+    ["wash-equipment", "wash-pan-b-and-strainer"],
+    0.4,
+  ),
+  teaWashRow(
+    "ginger-milk-tea",
+    MILK_TEA_WORKFLOWS,
+    ["wash-initial-pan", "wash-pan-a"],
+    0.35,
+  ),
+];
 
-export async function executeGingerMilkTeaApplianceTasks(
-  source: ScheduledTaskSource,
-  runtime: ApplianceWasmRuntimeSource,
-  options: RecipeApplianceExecutionOptions = {},
-): Promise<RecipeApplianceExecutionReport> {
-  return executeRecipeApplianceTasks(
-    gingerMilkTeaApplianceTasks(source),
-    runtime,
-    { runId: options.runId ?? "ginger-milk-tea-appliance-wasm", ...options },
-  );
-}
+export const TEA_APPLIANCE_ROWS: readonly ApplianceTaskRow[] = [
+  ...GINGER_BLACK_TEA_APPLIANCE_ROWS,
+  ...GINGER_MILK_TEA_APPLIANCE_ROWS,
+];

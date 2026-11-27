@@ -5,30 +5,30 @@ import { pathToFileURL } from "node:url";
 import { canonicalJson } from "../../packages/std/src/index.ts";
 import {
   compileFinancierRecipe,
-  executeFinancierApplianceTasks,
   financierRecipeInput,
 } from "../../packages/production-simulation/src/recipes/bakery/financier.ts";
 import {
   blackSesameRecipeInput,
   compileBlackSesameRecipe,
-  executeBlackSesameApplianceTasks,
 } from "../../packages/production-simulation/src/recipes/bakery/black-sesame-milk.ts";
 import {
   compileGingerBlackTeaRecipe,
   compileGingerMilkTeaRecipe,
-  executeGingerBlackTeaApplianceTasks,
-  executeGingerMilkTeaApplianceTasks,
   gingerBlackTeaRecipeInput,
   gingerMilkTeaRecipeInput,
   teaStrainTiming,
 } from "../../packages/production-simulation/src/recipes/bakery/tea.ts";
 import {
   compileBakeryShift,
-  executeMorningShiftApplianceFaultRestoreJourney,
-  executeMorningShiftApplianceTasks,
   morningShiftRecipeInput,
 } from "../../packages/production-simulation/src/recipes/bakery/bakery-shift.ts";
-import { evaluatePendingInspectionGate } from "../../packages/production-simulation/src/recipes/bakery/appliance-execution.ts";
+import {
+  defaultMorningShiftFaultInjections,
+  evaluatePendingInspectionGate,
+  executeRecipeApplianceTasks,
+  extractScheduledTasks,
+} from "../../packages/production-simulation/src/recipes/bakery/appliance-execution.ts";
+import { recipeApplianceTasks } from "../../packages/production-simulation/src/recipes/bakery/appliance-task-table.ts";
 import { PRODUCTION_EXECUTION_MANIFEST as manifest } from "../../packages/production-simulation/src/execution-manifest.generated.ts";
 import { defineCell, runtimeModule } from "./build-execution-bundle.mjs";
 import { collectingExecutionHost } from "./collecting-execution-host.mjs";
@@ -583,8 +583,8 @@ const financierRun = await runScenarioToCompletion(
   financierScenario,
   [rackCell],
 );
-const financierReport = await executeFinancierApplianceTasks(
-  financierRun,
+const financierReport = await executeRecipeApplianceTasks(
+  recipeApplianceTasks(financierRun),
   wasmApplianceModule,
   { runId: "plan-61a-financier" },
 );
@@ -614,8 +614,8 @@ const sesameRun = await runScenarioToCompletion(
   sesameScenario,
   [rackCell],
 );
-const sesameReport = await executeBlackSesameApplianceTasks(
-  sesameRun,
+const sesameReport = await executeRecipeApplianceTasks(
+  recipeApplianceTasks(sesameRun),
   wasmApplianceModule,
   { runId: "plan-61b-black-sesame" },
 );
@@ -650,8 +650,8 @@ const blackTeaRun = await runScenarioToCompletion(
   blackTeaScenario,
   [panCell],
 );
-const blackTeaReport = await executeGingerBlackTeaApplianceTasks(
-  blackTeaRun,
+const blackTeaReport = await executeRecipeApplianceTasks(
+  recipeApplianceTasks(blackTeaRun),
   wasmApplianceModule,
   { runId: "plan-61c-ginger-black-tea" },
 );
@@ -677,8 +677,8 @@ const milkTeaRun = await runScenarioToCompletion(
   milkTeaScenario,
   [panCell],
 );
-const milkTeaReport = await executeGingerMilkTeaApplianceTasks(
-  milkTeaRun,
+const milkTeaReport = await executeRecipeApplianceTasks(
+  recipeApplianceTasks(milkTeaRun),
   wasmApplianceModule,
   { runId: "plan-61d-ginger-milk-tea" },
 );
@@ -718,10 +718,13 @@ const shiftRun = await runScenarioToCompletion(
   shiftScenario,
   [panCell],
 );
-const shiftReport = await executeMorningShiftApplianceTasks(
-  shiftRun,
+const shiftReport = await executeRecipeApplianceTasks(
+  recipeApplianceTasks(shiftRun),
   wasmApplianceModule,
-  { runId: "plan-61e-morning-shift" },
+  {
+    runId: "plan-61e-morning-shift",
+    scheduledTasks: extractScheduledTasks(shiftRun),
+  },
 );
 const shiftSummary = verifyApplianceReport("61E-morning-shift", shiftReport, [
   "weigh",
@@ -820,12 +823,15 @@ console.log(
 );
 
 // 6. Plan 61E Mid-Cycle Appliance Fault & Checkpoint-Restore Journey
-const faultRestoreReport =
-  await executeMorningShiftApplianceFaultRestoreJourney(
-    shiftRun,
-    wasmApplianceModule,
-    { runId: "plan-61e-fault-restore" },
-  );
+const faultRestoreReport = await executeRecipeApplianceTasks(
+  recipeApplianceTasks(shiftRun),
+  wasmApplianceModule,
+  {
+    runId: "plan-61e-fault-restore",
+    faultInjections: defaultMorningShiftFaultInjections(),
+    scheduledTasks: extractScheduledTasks(shiftRun),
+  },
+);
 const faultRestoreSummary = verifyApplianceReport(
   "61E-morning-shift-fault-restore",
   faultRestoreReport,

@@ -2530,6 +2530,41 @@
         "date": "2026-11-27",
         "commit": "6a1274d7"
       }
+    },
+    {
+      "id": "canvas-appliance-report",
+      "file": "scripts/production-simulation/verify-canvas-appliance-report.mjs",
+      "tier": "fast",
+      "backend": "wasm",
+      "owner": "Refactor 16",
+      "run": {
+        "tool": "node",
+        "args": ["{out}"]
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 65.8,
+        "date": "2026-11-27",
+        "commit": "a51078bb"
+      }
+    },
+    {
+      "id": "appliance-report-browser",
+      "file": "scripts/production-simulation/verify-appliance-report-browser.js",
+      "tier": "browser",
+      "backend": "browser",
+      "owner": "Refactor 16",
+      "run": {
+        "tool": "browser",
+        "url": "/factory-acceptance.html",
+        "timeoutMs": 600000
+      },
+      "status": "passes",
+      "lastRun": {
+        "seconds": 20,
+        "date": "2026-11-27",
+        "commit": "a51078bb"
+      }
     }
   ]
 }

@@ -134,7 +134,14 @@ import type {
   WorkspaceRunSaveStatus,
 } from "../workflow-simulator/simulator-state";
 import { notifySurfaceListeners } from "@purin-labs/area-kitchen-contract/ui/features/bakery-surface-registry";
+import type { ApplianceTaskRisk } from "@purin-labs/production-simulation/recipes/bakery/appliance-execution";
 import { FloorPlanTravelSync } from "./floor-plan-travel-sync";
+import {
+  applianceBindingsFromLogistics,
+  espressoVariantForScenario,
+  runPortalApplianceReport,
+  type ApplianceReportState,
+} from "./recipe-appliance-report";
 
 type Session = StrictUnion<
   | Readonly<{ kind: "review" | "opening" }>
@@ -218,6 +225,7 @@ type State = Readonly<{
   inspectionCell: string;
   inspectionNote: string;
   applianceFaults: Readonly<Record<string, ApplianceFaultRecord>>;
+  applianceReport: ApplianceReportState;
 }>;
 type SavedSource = Variant<OvenRunSource, "snapshot">;
 type SavedBoundary = StrictUnion<
@@ -341,6 +349,7 @@ export class OvenWorkspace extends React.Component<Props, State> {
     inspectionCell: "",
     inspectionNote: "",
     applianceFaults: {},
+    applianceReport: { kind: "idle" },
   };
   // This synchronous reference also guards requests before React paints a change.
   private session: Session = this.state.session;
@@ -355,6 +364,8 @@ export class OvenWorkspace extends React.Component<Props, State> {
   private lastPreviewAt = 0;
   private observationRequest = 0;
   private playbackTimer: ReturnType<typeof setTimeout> | null = null;
+  private applianceAbort: { aborted: boolean } | null = null;
+  private applianceRunKey: string | null = null;
   private readonly floorPlanSync = new FloorPlanTravelSync({
     isMounted: () => this.mounted,
     isBeforeStart: () =>
@@ -463,12 +474,114 @@ export class OvenWorkspace extends React.Component<Props, State> {
 
   componentWillUnmount(): void {
     this.mounted = false;
+    this.cancelApplianceReport(false);
     this.stopToolbarWatch?.();
     this.floorPlanSync.dispose();
     this.agentSurface?.close();
     this.agentSurface = null;
     this.clearPlaybackTimer();
     this.currentWorker()?.terminate();
+  }
+
+  private cancelApplianceReport(resetState = true): void {
+    if (this.applianceAbort !== null) {
+      this.applianceAbort.aborted = true;
+      this.applianceAbort = null;
+    }
+    this.applianceRunKey = null;
+    if (
+      resetState &&
+      this.mounted &&
+      this.state.applianceReport.kind !== "idle"
+    ) {
+      this.setState({ applianceReport: { kind: "idle" } });
+    }
+  }
+
+  private startApplianceReport(view: HostView, force = false): void {
+    if (!this.mounted || view.status.kind !== "completed") return;
+    if (view.logistics.kind !== "available") {
+      this.setState({ applianceReport: { kind: "not-applicable" } });
+      return;
+    }
+    const key = `${view.time}/${view.controlRevision}/${view.events}`;
+    if (!force && this.applianceRunKey === key) return;
+    const scenario = sourceScenario(this.props.source);
+    const { scheduledTasks, bindings } = applianceBindingsFromLogistics(
+      scenario,
+      view.logistics,
+      espressoVariantForScenario(scenario),
+    );
+    if (bindings.length === 0) {
+      this.applianceRunKey = key;
+      this.setState({ applianceReport: { kind: "not-applicable" } });
+      return;
+    }
+    if (this.applianceAbort !== null) {
+      this.applianceAbort.aborted = true;
+    }
+    const signal = { aborted: false };
+    this.applianceAbort = signal;
+    this.applianceRunKey = key;
+    const partialRisks = new Map<string, ApplianceTaskRisk>();
+    this.setState({
+      applianceReport: {
+        kind: "running",
+        completed: 0,
+        total: bindings.length,
+        partialRisks: new Map(),
+      },
+    });
+    void runPortalApplianceReport({
+      runId: scenario.id,
+      bindings,
+      scheduledTasks,
+      signal,
+      onProgress: (completed, total, _record, risk) => {
+        if (!this.mounted || signal.aborted) return;
+        if (risk !== null) partialRisks.set(risk.taskId, risk);
+        if (completed === total || completed % 4 === 0 || risk !== null) {
+          this.setState({
+            applianceReport: {
+              kind: "running",
+              completed,
+              total,
+              partialRisks: new Map(partialRisks),
+            },
+          });
+        }
+      },
+    }).then(
+      (result) => {
+        if (!this.mounted || signal.aborted) return;
+        this.applianceAbort = null;
+        this.setState({
+          applianceReport: {
+            kind: "ready",
+            report: result.report,
+            atRisk: result.atRisk,
+          },
+        });
+      },
+      (error: unknown) => {
+        if (!this.mounted || signal.aborted) return;
+        this.applianceAbort = null;
+        this.setState({
+          applianceReport: {
+            kind: "failed",
+            message:
+              error instanceof Error
+                ? error.message
+                : "Appliance physics verification failed.",
+          },
+        });
+      },
+    );
+  }
+
+  private rerunApplianceReport(): void {
+    if (this.session.kind !== "settled") return;
+    this.startApplianceReport(this.session.view, true);
   }
 
   private currentWorker(): ExecutionWorker | null {
@@ -494,6 +607,7 @@ export class OvenWorkspace extends React.Component<Props, State> {
   }
 
   private fail(error: unknown): void {
+    this.cancelApplianceReport();
     this.agentSurface?.close();
     this.agentSurface = null;
     this.currentWorker()?.terminate();
@@ -945,6 +1059,7 @@ export class OvenWorkspace extends React.Component<Props, State> {
     )
       return;
     this.clearPlaybackTimer();
+    this.cancelApplianceReport();
     this.observationRequest += 1;
     this.currentWorker()?.terminate();
     this.savedBoundary = { kind: "empty" };
@@ -1373,6 +1488,9 @@ export class OvenWorkspace extends React.Component<Props, State> {
         { kind: canAdvance(view) ? "running" : "settled", worker, view },
         canAdvance(view) ? "Running." : `Run status: ${view.status.kind}.`,
       );
+      if (!canAdvance(view) && view.status.kind === "completed") {
+        this.startApplianceReport(view);
+      }
       if ((pourOver || espresso) && canAdvance(view)) {
         const minBatchMs = pourOver ? (resting ? 24 : 48) : 34;
         const remaining = minBatchMs - (performance.now() - startedAt);
@@ -1423,6 +1541,7 @@ export class OvenWorkspace extends React.Component<Props, State> {
     )
       return;
     const { worker, view } = this.session;
+    this.cancelApplianceReport();
     this.setState({ inspection: { kind: "empty" } });
     this.updateSession({ kind: "commanding", worker, view }, "Resuming…");
     try {
@@ -1983,6 +2102,13 @@ export class OvenWorkspace extends React.Component<Props, State> {
             matchesTask.bind(null, this.state.selectedTask),
           )
         : undefined;
+    const activeAtRisk =
+      this.state.applianceReport.kind === "ready"
+        ? this.state.applianceReport.atRisk
+        : this.state.applianceReport.kind === "running" &&
+            this.state.applianceReport.partialRisks.size > 0
+          ? this.state.applianceReport.partialRisks
+          : undefined;
     const panel = this.state.panel;
     return (
       <section
@@ -2110,10 +2236,20 @@ export class OvenWorkspace extends React.Component<Props, State> {
         {report !== null && (
           <button
             className="factory-summary"
+            data-appliance-at-risk={activeAtRisk?.size ?? 0}
             onClick={this.togglePanel.bind(this, "results")}
           >
             <strong>{report.ordersCompleted}</strong> orders completed ·{" "}
             {report.orders.length} admitted
+            {activeAtRisk !== undefined && activeAtRisk.size > 0 && (
+              <>
+                {" "}
+                ·{" "}
+                <span className="appliance-risk-badge" data-risk="at-risk">
+                  {activeAtRisk.size} at risk
+                </span>
+              </>
+            )}
           </button>
         )}
         <aside
@@ -2264,6 +2400,10 @@ export class OvenWorkspace extends React.Component<Props, State> {
                         ? view.production
                         : null
                   }
+                  applianceReport={this.state.applianceReport}
+                  selectedTask={this.state.selectedTask}
+                  selectTask={this.selectTask.bind(this)}
+                  rerunApplianceReport={this.rerunApplianceReport.bind(this)}
                 />
               </>
             )}
@@ -2281,6 +2421,9 @@ export class OvenWorkspace extends React.Component<Props, State> {
                   view={view}
                   select={this.selectTask.bind(this)}
                   reviewRecovery={this.reviewRecovery.bind(this)}
+                  {...(activeAtRisk !== undefined
+                    ? { atRisk: activeAtRisk }
+                    : {})}
                 />
               )}
               {live &&
@@ -2291,6 +2434,9 @@ export class OvenWorkspace extends React.Component<Props, State> {
                 view={display.logistics}
                 selected={this.state.selectedTask}
                 select={this.selectTask.bind(this)}
+                {...(activeAtRisk !== undefined
+                  ? { atRisk: activeAtRisk }
+                  : {})}
               />
             </div>
           )}
@@ -2454,7 +2600,10 @@ export class OvenWorkspace extends React.Component<Props, State> {
                 {selected === undefined ? (
                   <p>Select a cell or workflow task to inspect its work.</p>
                 ) : (
-                  <SelectedOvenTask task={selected} />
+                  <SelectedOvenTask
+                    task={selected}
+                    risk={activeAtRisk?.get(selected.id)}
+                  />
                 )}
                 {selected?.kind === "waiting" &&
                   display.logistics.kind === "available" && (
@@ -2557,6 +2706,7 @@ export class OvenWorkspace extends React.Component<Props, State> {
               horizon={display.horizon}
               selected={this.state.selectedTask}
               select={this.selectTask.bind(this)}
+              {...(activeAtRisk !== undefined ? { atRisk: activeAtRisk } : {})}
             />
           ) : (
             <p>Start the run to display its workflow.</p>
@@ -2600,6 +2750,9 @@ export class OvenWorkspace extends React.Component<Props, State> {
                     horizon={display.horizon}
                     selected={this.state.selectedTask}
                     select={this.selectTask.bind(this)}
+                    {...(activeAtRisk !== undefined
+                      ? { atRisk: activeAtRisk }
+                      : {})}
                   />
                 </section>
               )}

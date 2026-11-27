@@ -8,6 +8,8 @@ import type {
   WorkflowId,
 } from "@purin-labs/production-simulation";
 import { readScenario } from "@purin-labs/production-simulation/scenario-document";
+import { resolveApplianceTaskKind } from "@purin-labs/production-simulation/recipes/bakery/appliance-task-table";
+import type { ApplianceTaskKind } from "@purin-labs/production-simulation/recipes/bakery/appliance-execution";
 import { Type } from "typebox";
 import { Value } from "typebox/value";
 
@@ -166,6 +168,37 @@ export function lowerWorkflowDocument(
     ...document.demand,
     workflows: document.workflows.map(lowerWorkflow),
   };
+}
+
+/**
+ * Resolves the canonical appliance task kind for one workflow step on the
+ * Plan 84 canvas using the shared recipe appliance table.
+ */
+function workflowNodeApplianceTaskKind(
+  workflowId: string,
+  node: Pick<WorkflowNode, "id">,
+): ApplianceTaskKind | null {
+  return resolveApplianceTaskKind({
+    workflowId,
+    taskKey: String(node.id),
+  });
+}
+
+/**
+ * Maps every step in a workflow document that binds to a MuJoCo appliance to
+ * its canonical `ApplianceTaskKind`, keyed by `${workflow.id}/${node.id}`.
+ */
+export function workflowApplianceTaskKinds(
+  document: BakeryWorkflowDocument,
+): Readonly<Record<string, ApplianceTaskKind>> {
+  const kinds: Record<string, ApplianceTaskKind> = {};
+  for (const workflow of document.workflows) {
+    for (const node of workflow.nodes) {
+      const kind = workflowNodeApplianceTaskKind(String(workflow.id), node);
+      if (kind !== null) kinds[`${workflow.id}/${node.id}`] = kind;
+    }
+  }
+  return kinds;
 }
 
 function lowerWorkflow(graph: WorkflowGraph): WorkflowDefinition {

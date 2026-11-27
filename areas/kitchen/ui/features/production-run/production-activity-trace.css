@@ -55,8 +55,13 @@
 .production-activity-trace .pantry-trace-description {
   margin: 0;
   width: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 4px 6px;
   font-size: 11px;
-  max-width: 130px;
+  max-width: 180px;
   white-space: normal;
   text-align: end;
   line-height: 1.4;

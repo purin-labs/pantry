@@ -36,10 +36,14 @@ import {
   compileBakeryShift,
   extractCarryoverMiseEnPlace,
   morningShiftRecipeInput,
-  executeMorningShiftApplianceFaultRestoreJourney,
-  executeMorningShiftApplianceTasks,
   sixHourShiftRecipeInput,
 } from "../../packages/production-simulation/src/recipes/bakery/bakery-shift.ts";
+import {
+  defaultMorningShiftFaultInjections,
+  executeRecipeApplianceTasks,
+  extractScheduledTasks,
+} from "../../packages/production-simulation/src/recipes/bakery/appliance-execution.ts";
+import { recipeApplianceTasks } from "../../packages/production-simulation/src/recipes/bakery/appliance-task-table.ts";
 import {
   decoctionMass,
   gingerDecoctions,
@@ -315,6 +319,8 @@ const evaluatorFiles = [
   "shift-report.ts",
   "bakery-shift.ts",
   "appliance-execution.ts",
+  "appliance-telemetry.ts",
+  "appliance-task-table.ts",
 ];
 const sourceDigests = {};
 for (const file of evaluatorFiles)
@@ -807,15 +813,21 @@ console.log("Executing actual Wasm appliance runs and checkpoint recovery...");
 function wasmApplianceModule() {
   return runtimeModule(runtime);
 }
-const appliance = await executeMorningShiftApplianceTasks(
-  done.run,
+const shiftApplianceBindings = recipeApplianceTasks(done.run);
+const shiftScheduledTasks = extractScheduledTasks(done.run);
+const appliance = await executeRecipeApplianceTasks(
+  shiftApplianceBindings,
   wasmApplianceModule,
-  { runId: "six-hour-appliances" },
+  { runId: "six-hour-appliances", scheduledTasks: shiftScheduledTasks },
 );
-const recovery = await executeMorningShiftApplianceFaultRestoreJourney(
-  done.run,
+const recovery = await executeRecipeApplianceTasks(
+  shiftApplianceBindings,
   wasmApplianceModule,
-  { runId: "six-hour-recovery" },
+  {
+    runId: "six-hour-recovery",
+    faultInjections: defaultMorningShiftFaultInjections(),
+    scheduledTasks: shiftScheduledTasks,
+  },
 );
 // The shift's mixer, oven, mould wash and pie bench each fault once and resume.
 // The sesame blender does not run: the morning opens with concentrate on hand.

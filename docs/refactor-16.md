@@ -291,7 +291,7 @@ The phases are:
 | 5     | 12   | One appliance registry                                                 | Step 3A            | 2 days     | Plan 60A          | —                   | Done on refactor-16, 2026-11-17      |
 | 5     | 13   | One scene host; playback outside React state                           | Step 6             | 4 days     | Plans 42 and 84   | Step 5              | Done on refactor-16, 2026-11-17      |
 | 5     | 14   | A journey index and a wider ratchet                                    | Step 8             | 1.5 days   | Plan 70           | —                   | Done on refactor-16, 2026-11-17      |
-| 5     | 15   | Recipe appliance physics: show its report, then appliance work as data | A8, Step 7         | 3 + 3 days | Plan 84           | D5 (15B, 15C)       | 15A done on refactor-16, 2026-11-17; 15B and 15C wait for D5 |
+| 5     | 15   | Recipe appliance physics: show its report, then appliance work as data | A8, Step 7         | 3 + 3 days | Plan 84           | D5 (15B, 15C)       | 15A done 2026-11-17; 15B and 15C done locally 2026-11-27 |
 | 5     | 16   | Builders as data                                                       | A9, Step 3B        | 8–10 days  | Plan 60A          | The next appliances | Not started                          |
 
 ### Step 1 — Repair the CI job (F4, F5)
