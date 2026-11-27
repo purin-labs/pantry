@@ -31,6 +31,7 @@ import { currentActorSchemaVersion } from "@purin-labs/actor-runtime/actors/curr
 import type { Env } from "@purin-labs/kernel/env";
 import type {
   OrganisationActorStub,
+  PlacedActorRpc,
   SessionActorStub,
 } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
@@ -40,6 +41,7 @@ import {
   type ActorRegistryReconciliationError,
 } from "@purin-labs/actor-runtime/actors/actor-registry-reconciliation";
 import type { CaseSnapshot } from "@purin-labs/conversation/actors/case/types";
+import type { ConnectorResult } from "@purin-labs/conversation/actors/connector/types";
 import {
   requireActiveOrganisationActorAtPlacement,
   resolveActiveConnectorActor,
@@ -77,8 +79,15 @@ import { customConnectorFetchObjectName } from "@purin-labs/area-integrations-co
 import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { conversationResidencyStub } from "@purin-labs/actor-runtime/actors/conversation-residency";
-import { type QuarantinedCaseActorRegistryEntry, actorResolutionErrorResponse } from "../support";
-import { isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse, readPositiveSafeIntegerField } from "@purin-labs/control/worker/gateway/request-helpers";
+import {
+  type QuarantinedCaseActorRegistryEntry,
+  actorResolutionErrorResponse,
+} from "../support";
+import {
+  isAuthorizedOrganisationAdminRequest,
+  jsonBodyErrorResponse,
+  readPositiveSafeIntegerField,
+} from "@purin-labs/control/worker/gateway/request-helpers";
 
 type ActorRegistryAdminRequest =
   | {
@@ -308,17 +317,9 @@ function registeredActorObjectId(
     case "case":
       return actorStub(env.CASE, name, entry.placement).id.toString();
     case "connector":
-      return actorStub(
-        env.CONNECTOR,
-        name,
-        entry.placement,
-      ).id.toString();
+      return actorStub(env.CONNECTOR, name, entry.placement).id.toString();
     case "organisation":
-      return actorStub(
-        env.ORGANISATION,
-        name,
-        entry.placement,
-      ).id.toString();
+      return actorStub(env.ORGANISATION, name, entry.placement).id.toString();
     default:
       return null;
   }
@@ -415,11 +416,7 @@ async function discardQuarantinedCaseResponse(
       409,
     );
   }
-  const actor = actorStub(
-    env.CASE,
-    entry.physicalObjectName,
-    entry.placement,
-  );
+  const actor = actorStub(env.CASE, entry.physicalObjectName, entry.placement);
   const discardedState = await actor.discardQuarantinedState(
     actorActivationIdentityForQuarantinedEntry(entry, Date.now()),
   );
@@ -454,6 +451,17 @@ async function discardQuarantinedCaseResponse(
   });
 }
 
+/**
+ * The RPC method of the Connector Actor that schedules the drain of its
+ * accepted Case work again. The request parses there. `ConnectorDO`, the
+ * class of the Worker, implements it.
+ */
+export interface ConnectorCaseWorkRecoveryRpc {
+  recoverCaseWork(
+    raw: unknown,
+  ): Promise<ConnectorResult<{ readonly kind: "scheduled" }>>;
+}
+
 async function recoverConnectorCaseWorkResponse(
   env: Env,
   input: VariantBy<
@@ -462,7 +470,9 @@ async function recoverConnectorCaseWorkResponse(
     "recover_connector_case_work"
   >,
 ): Promise<Response> {
-  const actor = await resolveActiveConnectorActor({
+  const actor = await resolveActiveConnectorActor<
+    PlacedActorRpc & ConnectorCaseWorkRecoveryRpc
+  >({
     env: env,
     namespace: env.CONNECTOR,
     organisationId: input.organisationId,
@@ -1340,7 +1350,11 @@ function sanitizeCaseBudgetActivationInspection(snapshot: CaseSnapshot) {
         case "dropped":
           return { kind: lifecycle.kind, output, reason: lifecycle.reason };
         case "held":
-          return { kind: lifecycle.kind, output, requestId: lifecycle.requestId };
+          return {
+            kind: lifecycle.kind,
+            output,
+            requestId: lifecycle.requestId,
+          };
         case "rejected":
           return { kind: lifecycle.kind, output, reason: lifecycle.reason };
         default:

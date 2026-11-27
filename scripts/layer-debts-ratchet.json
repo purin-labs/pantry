@@ -2,7 +2,7 @@
   "totals": {
     "env-merge": {
       "merges": 16,
-      "methods": 8
+      "methods": 7
     },
     "foundation-misfit": {
       "links": 12,
@@ -34,8 +34,7 @@
         "merges foundation/agent -> foundation/kernel": 5,
         "merges surfaces/webhooks -> foundation/kernel": 1,
         "merges workers/platform -> foundation/kernel": 5,
-        "methods surfaces/slack -> workers/platform": 7,
-        "methods surfaces/webhooks -> workers/platform": 1
+        "methods surfaces/slack -> workers/platform": 7
       }
     },
     "foundation-misfit": {
