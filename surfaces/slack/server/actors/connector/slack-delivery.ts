@@ -71,7 +71,7 @@ import {
   deviceAlertNoticeOfUpdate,
   isDeviceAlertDelivery,
 } from "@purin-labs/area-devices/server/contract/alert-delivery";
-import { slackMayApproveAction } from "@purin-labs/area-commerce/server/action-model";
+import { actionLedgerCommerce } from "@purin-labs/authority/actors/action-ledger";
 import { resolveActiveSlackDestinationConnection } from "@purin-labs/authority/slack/installation-store";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { checkPreparedConnectorDelivery } from "../connector-slack-stream";
@@ -439,7 +439,10 @@ async function commerceCardDeliveryBlocks(
       nonce,
       now: Date.now(),
     });
-    if (action.ok && slackMayApproveAction(action.value.action))
+    if (
+      action.ok &&
+      actionLedgerCommerce.use().slackMayApprove(action.value.action)
+    )
       return commerceCardBlocks(text, { kind: "decide", nonce, portalUrl });
   } catch {
     // The card keeps its text and its Portal link.

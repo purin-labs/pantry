@@ -4,13 +4,8 @@ import type { Env } from "@purin-labs/kernel/env";
 import type { ControlRole } from "@purin-labs/tenancy/data/control-plane";
 
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import {
-  cancelOperatorConfigurationDraft,
-  confirmOperatorConfigurationDraft,
-  readLatestDecidedOperatorDraft,
-  readPendingOperatorDraft,
-  type OperatorConfigurationDraft,
-} from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
+import type { OperatorConfigurationDraft } from "@purin-labs/area-organisation-contract/server/operator-drafts";
+import { organisationServices } from "@purin-labs/area-organisation-contract/server/organisation-services";
 import {
   renderConfigurationReceipt,
   replyAcceptsDraft,
@@ -70,7 +65,7 @@ type ResolveSlackConfigurationReplyInput = Readonly<{
 export async function resolveSlackConfigurationReply(
   input: ResolveSlackConfigurationReplyInput,
 ): Promise<SlackConfigurationOutcome> {
-  const draft = await readPendingOperatorDraft({
+  const draft = await organisationServices.use().readPendingOperatorDraft({
     db: input.db,
     organisationId: input.organisationId,
     caseId: input.caseId,
@@ -110,13 +105,15 @@ export async function resolveSlackConfigurationReply(
   }
 
   if (cancels) {
-    const cancelled = await cancelOperatorConfigurationDraft({
-      db: input.db,
-      organisationId: input.organisationId,
-      draftId: draft.draftId,
-      actorUserId: input.operator.userId,
-      now: input.now,
-    });
+    const cancelled = await organisationServices
+      .use()
+      .cancelOperatorConfigurationDraft({
+        db: input.db,
+        organisationId: input.organisationId,
+        draftId: draft.draftId,
+        actorUserId: input.operator.userId,
+        now: input.now,
+      });
     return cancelled.ok
       ? {
           kind: "cancelled",
@@ -125,16 +122,18 @@ export async function resolveSlackConfigurationReply(
       : refusal("That change is no longer waiting for an answer.");
   }
 
-  const confirmed = await confirmOperatorConfigurationDraft({
-    db: input.db,
-    env: input.env,
-    organisationId: input.organisationId,
-    draftId: draft.draftId,
-    actorUserId: input.operator.userId,
-    actorRole: input.operator.role,
-    previewCode: code ?? "",
-    now: input.now,
-  });
+  const confirmed = await organisationServices
+    .use()
+    .confirmOperatorConfigurationDraft({
+      db: input.db,
+      env: input.env,
+      organisationId: input.organisationId,
+      draftId: draft.draftId,
+      actorUserId: input.operator.userId,
+      actorRole: input.operator.role,
+      previewCode: code ?? "",
+      now: input.now,
+    });
   if (confirmed.ok) {
     return {
       kind: "applied",
@@ -161,11 +160,13 @@ async function replayDecidedDraft(
 ): Promise<SlackConfigurationOutcome> {
   const code = replyPreviewCode(input.text);
   if (code === null) return { kind: "not_a_configuration_reply" };
-  const decided = await readLatestDecidedOperatorDraft({
-    db: input.db,
-    organisationId: input.organisationId,
-    caseId: input.caseId,
-  });
+  const decided = await organisationServices
+    .use()
+    .readLatestDecidedOperatorDraft({
+      db: input.db,
+      organisationId: input.organisationId,
+      caseId: input.caseId,
+    });
   if (decided === null || previewCode(decided.commandDigest) !== code) {
     return { kind: "not_a_configuration_reply" };
   }
@@ -186,16 +187,18 @@ async function replayDecidedDraft(
   }
   // Claimed but unsettled, or settled with a failure: re-drive it under the
   // same mutation identity rather than reporting a success nothing recorded.
-  const confirmed = await confirmOperatorConfigurationDraft({
-    db: input.db,
-    env: input.env,
-    organisationId: input.organisationId,
-    draftId: decided.draftId,
-    actorUserId: input.operator.userId,
-    actorRole: input.operator.role,
-    previewCode: code,
-    now: input.now,
-  });
+  const confirmed = await organisationServices
+    .use()
+    .confirmOperatorConfigurationDraft({
+      db: input.db,
+      env: input.env,
+      organisationId: input.organisationId,
+      draftId: decided.draftId,
+      actorUserId: input.operator.userId,
+      actorRole: input.operator.role,
+      previewCode: code,
+      now: input.now,
+    });
   return confirmed.ok
     ? {
         kind: "applied",

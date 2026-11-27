@@ -2687,15 +2687,18 @@ importers:
       '@purin-labs/area-inbox':
         specifier: workspace:*
         version: link:../../areas/inbox
+      '@purin-labs/area-inbox-contract':
+        specifier: workspace:*
+        version: link:../../areas/inbox/contract
       '@purin-labs/area-integrations-contract':
         specifier: workspace:*
         version: link:../../areas/integrations/contract
-      '@purin-labs/area-kitchen':
+      '@purin-labs/area-kitchen-contract':
         specifier: workspace:*
-        version: link:../../areas/kitchen
-      '@purin-labs/area-organisation':
+        version: link:../../areas/kitchen/contract
+      '@purin-labs/area-organisation-contract':
         specifier: workspace:*
-        version: link:../../areas/organisation
+        version: link:../../areas/organisation/contract
       '@purin-labs/authority':
         specifier: workspace:*
         version: link:../../foundation/authority
@@ -2748,15 +2751,18 @@ importers:
 
   surfaces/voice:
     dependencies:
-      '@purin-labs/area-cafe':
+      '@purin-labs/area-cafe-contract':
         specifier: workspace:*
-        version: link:../../areas/cafe
+        version: link:../../areas/cafe/contract
       '@purin-labs/area-commerce-contract':
         specifier: workspace:*
         version: link:../../areas/commerce/contract
       '@purin-labs/area-devices':
         specifier: workspace:*
         version: link:../../areas/devices
+      '@purin-labs/area-devices-contract':
+        specifier: workspace:*
+        version: link:../../areas/devices/contract
       '@purin-labs/area-organisation-contract':
         specifier: workspace:*
         version: link:../../areas/organisation/contract
@@ -2824,9 +2830,6 @@ importers:
       '@purin-labs/agent':
         specifier: workspace:*
         version: link:../../foundation/agent
-      '@purin-labs/area-commerce':
-        specifier: workspace:*
-        version: link:../../areas/commerce
       '@purin-labs/area-commerce-contract':
         specifier: workspace:*
         version: link:../../areas/commerce/contract

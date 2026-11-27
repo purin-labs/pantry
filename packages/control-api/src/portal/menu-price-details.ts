@@ -17,6 +17,15 @@ export type MenuPriceDetails = Readonly<{
   after: MenuPriceSideDetails;
 }>;
 
+/** Whether the change sets a deal, ends one, or changes only the price. */
+export function menuPriceChangeKind(
+  details: Pick<MenuPriceDetails, "before" | "after">,
+): "deal" | "end_deal" | "price" {
+  if (details.after.compareAtPrice !== null) return "deal";
+  if (details.before.compareAtPrice !== null) return "end_deal";
+  return "price";
+}
+
 function parseMoney(
   value: unknown,
 ): Readonly<{ amountMinor: number; currency: string }> | null {

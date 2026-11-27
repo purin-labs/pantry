@@ -1,4 +1,4 @@
-import type { EmailReviewProjection } from "@purin-labs/area-inbox/server/data/email-review";
+import type { EmailReviewProjection } from "@purin-labs/area-inbox-contract/server/email-review";
 import { assertNever } from "@purin-labs/std";
 
 type SlackEmailReviewNotice = Readonly<{

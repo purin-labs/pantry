@@ -144,6 +144,17 @@ export type ConfirmOperatorDraftInput = Readonly<{
   now: number;
 }>;
 
+/**
+ * A short code identifying the exact change a preview showed.
+ *
+ * The operator repeats it when accepting, which is what ties their reply to
+ * the change they read. Without it a reply to an older preview would accept
+ * whatever change happens to be pending when it arrives.
+ */
+export function previewCode(commandDigest: string): string {
+  return commandDigest.slice(0, 6).toUpperCase();
+}
+
 export type OperatorDraftReceipt = Readonly<{
   draft: OperatorConfigurationDraft;
   snapshot: AgentOperationsSnapshot;

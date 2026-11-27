@@ -1,6 +1,7 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { SupplierPayoutStateKind } from "@purin-labs/control-api";
+import type { SupplierPayoutRow } from "@purin-labs/area-commerce-contract/server/supplier-payouts";
 
 /**
  * The canonical supplier payout.
@@ -14,24 +15,7 @@ import type { SupplierPayoutStateKind } from "@purin-labs/control-api";
  * update but a lost *transition*: two concurrent writers each reading
  * `submitting` and each advancing it would settle a payout twice.
  */
-export type SupplierPayoutRow = Readonly<{
-  payoutId: string;
-  payableId: string;
-  supplierId: string;
-  purchaseRequestId: string;
-  rail: "gmo_aozora_private" | "wise_enterprise_payouts";
-  integrationAccountId: string;
-  destinationRevisionId: string;
-  currency: string;
-  recipientAmountMinor: number;
-  feeCeilingMinor: number;
-  idempotencyKey: string;
-  stateKind: SupplierPayoutStateKind;
-  /** Null only before approval, or after cancellation without one. */
-  approvalDigest: string | null;
-  payoutJson: string;
-  revision: number;
-}>;
+export type { SupplierPayoutRow } from "@purin-labs/area-commerce-contract/server/supplier-payouts";
 
 /** States whose outcome is not yet known, and which therefore need an operator. */
 const UNRESOLVED_STATES: readonly SupplierPayoutStateKind[] = [

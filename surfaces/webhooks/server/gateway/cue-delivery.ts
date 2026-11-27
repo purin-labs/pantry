@@ -43,9 +43,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { resolveActiveSlackDestinationConnection } from "@purin-labs/authority/slack/installation-store";
 import { buildWorkflowAuthority } from "@purin-labs/authority/request-authority/index";
-import { buildSavedSelectorCommerceReadAuthority } from "@purin-labs/area-commerce/server/entity-plane/authority";
-import { createCommerceGraphReader } from "@purin-labs/area-commerce/server/entity-plane/selected-graph-reader";
-import { CommerceEngineSource } from "@purin-labs/area-commerce/server/entity-plane/commerce-source";
+import { commerceGraphReads } from "@purin-labs/area-commerce-contract/server/graph-reads";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import {
@@ -468,13 +466,14 @@ async function resolveSavedSelectorCueMembership(
     if (!savedSelectorCapabilityMatches(input, metadata.value.capabilities)) {
       return { ok: true, value: false };
     }
-    const commerceEngine = new CommerceEngineSource({
+    const graphReads = commerceGraphReads.use();
+    const commerceEngine = graphReads.createCommerceEngineSource({
       organisationId: String(input.organisationId),
       merchantId: String(binding.value.merchantId),
       integrationAccountId: String(binding.value.integrationAccountId),
       client,
     });
-    const reader = await createCommerceGraphReader({
+    const reader = await graphReads.createCommerceGraphReader({
       commerceSystem: commerceAuthority.value.commerceSystem,
       organisationId: input.organisationId,
       merchantId: String(binding.value.merchantId),
@@ -487,7 +486,7 @@ async function resolveSavedSelectorCueMembership(
           now: Date.now(),
         }),
     });
-    const authority = buildSavedSelectorCommerceReadAuthority({
+    const authority = graphReads.buildSavedSelectorCommerceReadAuthority({
       organisationId: String(input.organisationId),
       merchantId: String(binding.value.merchantId),
       principalId: "cue_engine",

@@ -6,6 +6,7 @@ import {
   type DeviceReadiness,
 } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";
+import type { DeviceEnrollmentState } from "@purin-labs/area-devices-contract/server/device-reads";
 import type { GatewayPresence } from "@purin-labs/area-devices-contract/server/fleet-stub";
 
 /**
@@ -48,8 +49,7 @@ export function deviceConnection(
   }
 }
 
-export type DeviceEnrollmentState =
-  "pending" | "active" | "restricted" | "revoked";
+export type { DeviceEnrollmentState } from "@purin-labs/area-devices-contract/server/device-reads";
 
 export type DeviceWorkState =
   | Readonly<{ state: "idle" }>

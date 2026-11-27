@@ -9,10 +9,9 @@ import {
   type CompiledTurnAuthority,
 } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
-  listSupplierPayoutsForSupplier,
-  listUnresolvedSupplierPayouts,
+  supplierPayoutReads,
   type SupplierPayoutRow,
-} from "@purin-labs/area-commerce/server/data/supplier-payout-store";
+} from "@purin-labs/area-commerce-contract/server/supplier-payouts";
 import type { OrganisationId, SessionId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
@@ -25,7 +24,6 @@ import {
   type FlowLabel,
 } from "@purin-labs/authority/policy/index";
 import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
-import { supplierPayoutLabel } from "@purin-labs/area-commerce/server/payouts/supplier-payout-access";
 import {
   renderOutgoingPayouts,
   renderPayoutOutcome,
@@ -105,7 +103,8 @@ export async function replyToSupplierPayoutQuery(
     policy: { version: policy.value.version },
   });
   if (!authority.ok) return NOT_PERMITTED;
-  const label = await supplierPayoutLabel({
+  const payoutReads = supplierPayoutReads.use();
+  const label = await payoutReads.supplierPayoutLabel({
     db,
     organisationId,
     grants: authority.value.effectiveGrantSet.selectedGrants,
@@ -114,12 +113,12 @@ export async function replyToSupplierPayoutQuery(
 
   const payouts =
     input.query.kind === "supplier"
-      ? await listSupplierPayoutsForSupplier(
+      ? await payoutReads.listSupplierPayoutsForSupplier(
           db,
           organisationId,
           input.query.supplierId,
         )
-      : await listUnresolvedSupplierPayouts(db, organisationId);
+      : await payoutReads.listUnresolvedSupplierPayouts(db, organisationId);
   const text = answerText(input.query, payouts);
   const binding = await payoutReplyBinding({
     authority: authority.value,

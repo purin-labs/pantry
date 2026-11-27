@@ -56,16 +56,9 @@ import {
   disconnectSlackInstallation,
   resolveSlackInstallation,
 } from "@purin-labs/authority/slack/installation-store";
-import {
-  parseCanonicalCommerceDelivery,
-  parseCommerceCueFacts,
-} from "@purin-labs/area-commerce/server/actors/commerce-projection";
 import { commerceObservationIdentity } from "@purin-labs/area-commerce-contract/server/observation-identity";
-import {
-  failCommerceLabRun,
-  listCommerceLabRuns,
-} from "@purin-labs/area-commerce/server/commerce-lab/lab-metadata";
-import { reconcileCommerceOutbox } from "@purin-labs/area-commerce/server/outbox-worker";
+import type { CommerceSystemStorageAuthority } from "@purin-labs/area-commerce-contract/server/commerce-projection";
+import { commerceDeliveryIntake } from "@purin-labs/area-commerce-contract/server/delivery-intake";
 import type {
   Variant,
   VariantBy,
@@ -247,7 +240,9 @@ export async function handleCommerceOutboxReconcileQueueMessage(
   env: Env,
   body: CommerceOutboxReconcileQueueMessage,
 ): Promise<void> {
-  const result = await reconcileCommerceOutbox({ env, message: body });
+  const result = await commerceDeliveryIntake
+    .use()
+    .reconcileCommerceOutbox({ env, message: body });
   switch (result.kind) {
     case "drained":
       traceLog("event_queue.commerce_deliveries_drained", {
@@ -317,7 +312,9 @@ export async function handleCommerceDeliveryQueueMessage(
   }
 
   const rawDelivery = parseJsonOrNull(body.canonicalDeliveryJson);
-  const delivery = parseCanonicalCommerceDelivery(rawDelivery);
+  const delivery = commerceDeliveryIntake
+    .use()
+    .parseCanonicalCommerceDelivery(rawDelivery);
 
   if (!delivery.ok) {
     await rejectCommerceQueueMessage({
@@ -331,9 +328,9 @@ export async function handleCommerceDeliveryQueueMessage(
     return;
   }
 
-  const cueFacts = parseCommerceCueFacts(
-    parseJsonOrNull(body.canonicalCueFactsJson),
-  );
+  const cueFacts = commerceDeliveryIntake
+    .use()
+    .parseCommerceCueFacts(parseJsonOrNull(body.canonicalCueFactsJson));
 
   if (!cueFacts.ok) {
     await rejectCommerceQueueMessage({
@@ -359,11 +356,10 @@ export async function handleCommerceDeliveryQueueMessage(
     });
     return;
   }
-  let commerceSystem: import("@purin-labs/area-commerce/server/actors/commerce-projection").CommerceSystemStorageAuthority =
-    {
-      kind: "lab",
-      revision: null,
-    };
+  let commerceSystem: CommerceSystemStorageAuthority = {
+    kind: "lab",
+    revision: null,
+  };
   if (deliveryAuthority.value.provider !== "lab") {
     const selected = await resolveOrganisationCommerceSystemAuthority({
       db: scope.database,
@@ -457,7 +453,7 @@ async function resolveCommerceLabQueueRun(
   if (body.labRunId === null) {
     return { kind: "active" };
   }
-  const runs = await listCommerceLabRuns({
+  const runs = await commerceDeliveryIntake.use().listCommerceLabRuns({
     db,
     organisationId: body.organisationId,
     limit: 50,
@@ -496,7 +492,7 @@ async function rejectCommerceQueueMessage(input: {
   readonly failureProjectionId: string | null;
 }): Promise<void> {
   if (input.body.labRunId !== null) {
-    await failCommerceLabRun({
+    await commerceDeliveryIntake.use().failCommerceLabRun({
       db: input.scope.database,
       organisationId: input.body.organisationId,
       runId: input.body.labRunId,

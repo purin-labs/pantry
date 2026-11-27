@@ -12,7 +12,6 @@
   "dependencies": {
     "@purin-labs/actor-runtime": "workspace:*",
     "@purin-labs/agent": "workspace:*",
-    "@purin-labs/area-commerce": "workspace:*",
     "@purin-labs/area-integrations": "workspace:*",
     "@purin-labs/authority": "workspace:*",
     "@purin-labs/commerce-client": "workspace:*",

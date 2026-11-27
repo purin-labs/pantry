@@ -14,6 +14,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
+import type { IngressLimitPauseReason } from "@purin-labs/area-inbox-contract/server/ingress-limits";
 import {
   emailReplyProposalSupersedes,
   emailReplyProposalTransition,
@@ -108,30 +109,7 @@ export type MailboxIngressPolicyPublishRequest =
     };
 
 export type MailboxProcessingPauseReason =
-  | {
-      readonly kind: "active_case_limit";
-      readonly observed: number;
-      readonly limit: number;
-    }
-  | {
-      readonly kind: "hourly_message_limit";
-      readonly observed: number;
-      readonly limit: number;
-      readonly windowEndsAt: number;
-    }
-  | {
-      readonly kind: "daily_token_budget";
-      readonly reserved: number;
-      readonly consumed: number;
-      readonly limit: number;
-      readonly windowEndsAt: number;
-    }
-  | {
-      readonly kind: "message_too_large";
-      readonly providerMessageId: string;
-      readonly observedBytes: number;
-      readonly limitBytes: number;
-    }
+  | IngressLimitPauseReason
   | {
       readonly kind: "attachment_too_large";
       readonly providerMessageId: string;

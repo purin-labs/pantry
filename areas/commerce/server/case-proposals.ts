@@ -18,10 +18,8 @@ import {
   parseCommerceSystemRevision,
   type CommerceSystemRevision,
 } from "@purin-labs/connections/data/organisation-commerce-system";
-import {
-  parseCommerceActionRequest,
-  parseCommerceProviderReceipt,
-} from "./action-model";
+import { parseCommerceActionRequest } from "./action-model";
+import { parseCommerceProviderReceipt } from "@purin-labs/area-commerce-contract/server/provider-receipts";
 import type { CommerceActionRequest } from "@purin-labs/area-commerce-contract/server/action-requests";
 import { parseCommerceEntityPlaneProposal } from "./entity-plane/proposals";
 

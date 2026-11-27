@@ -20,7 +20,27 @@ import {
 import { proposeEvalFromCorrection } from "@purin-labs/area-brain/server/evals/access";
 import { commerceAccessTargets } from "@purin-labs/authority/access-control/commerce-access-targets";
 import { actionLedgerCommerce } from "@purin-labs/authority/actors/action-ledger";
-import { slackMayApproveAction } from "@purin-labs/area-commerce/server/action-model";
+import {
+  parseCommerceActionPath,
+  slackMayApproveAction,
+} from "@purin-labs/area-commerce/server/action-model";
+import { commerceActionApprovals } from "@purin-labs/area-commerce-contract/server/action-approvals";
+import {
+  acceptAndDeliverCommerceOutcome,
+  executeCommerceAction,
+} from "@purin-labs/area-commerce/server/actions";
+import { syncCaseApprovalWait } from "@purin-labs/area-commerce/server/case-approval-sync";
+import { supplierPayoutReads } from "@purin-labs/area-commerce-contract/server/supplier-payouts";
+import {
+  listSupplierPayoutsForSupplier,
+  listUnresolvedSupplierPayouts,
+} from "@purin-labs/area-commerce/server/data/supplier-payout-store";
+import { supplierPayoutLabel } from "@purin-labs/area-commerce/server/payouts/supplier-payout-access";
+import {
+  failCommerceLabRun,
+  listCommerceLabRuns,
+} from "@purin-labs/area-commerce/server/commerce-lab/lab-metadata";
+import { reconcileCommerceOutbox } from "@purin-labs/area-commerce/server/outbox-worker";
 import { parseCommerceEntityPlaneEffect } from "@purin-labs/area-commerce/server/entity-plane/proposals";
 import { commerceGrantSelection } from "@purin-labs/authority/authorization/access-grants/commerce-grant-selection";
 import { COMMERCE_ACCESS_TARGETS } from "@purin-labs/area-commerce/server/entity-plane/access-targets";
@@ -54,7 +74,12 @@ import {
   openControlCommerceGraph,
 } from "@purin-labs/area-commerce/server/control/commerce-graph";
 import { commerceDeliveryIntake } from "@purin-labs/area-commerce-contract/server/delivery-intake";
-import { applyCommerceDelivery } from "@purin-labs/area-commerce/server/actors/commerce-projection";
+import {
+  applyCommerceDelivery,
+  parseCanonicalCommerceDelivery,
+  parseCommerceCueFacts,
+} from "@purin-labs/area-commerce/server/actors/commerce-projection";
+import { buildSavedSelectorCommerceReadAuthority } from "@purin-labs/area-commerce/server/entity-plane/authority";
 import { normalizeCommerceDelivery } from "@purin-labs/area-commerce/server/commerce-wasm";
 import { connectionParts } from "@purin-labs/area-integrations/server/contract/connection-parts";
 import { providerModules } from "@purin-labs/area-integrations/server/contract/provider-modules";
@@ -103,6 +128,7 @@ import {
   commerceWaitingCardText,
 } from "@purin-labs/surface-slack/server/commerce-approval-card";
 import { cafeServices } from "@purin-labs/area-cafe-contract/server/cafe-services";
+import { resolveCafeBuyer } from "@purin-labs/area-cafe/server/control/routes/menu-screens";
 import { readCounterSaleView } from "@purin-labs/area-cafe/server/counter-register";
 import { readMenuScreenList } from "@purin-labs/area-cafe/server/control/routes/menu-boards";
 import { readTerminalOperations } from "@purin-labs/area-cafe/server/data/terminal-operations-readback";
@@ -112,7 +138,15 @@ import {
   readGmailPilotBudget,
 } from "@purin-labs/area-inbox/server/data/email-mailbox";
 import { channelIngress } from "@purin-labs/area-inbox-contract/server/channel-ingress";
-import { whatsAppOperatorNotices } from "@purin-labs/area-inbox-contract/server/whatsapp-operator-notices";
+import {
+  whatsAppOperatorNoticeRecords,
+  whatsAppOperatorNotices,
+} from "@purin-labs/area-inbox-contract/server/whatsapp-operator-notices";
+import {
+  markWhatsAppNoticeDelivered,
+  readWhatsAppOperatorNotice,
+} from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
+import { readLatestEmailReviewProjectionForCase } from "@purin-labs/area-inbox/server/data/email-review";
 import { deliverWhatsAppOperatorNotice } from "@purin-labs/surface-slack/server/actors/whatsapp-operator-notice";
 import { registerSupplierOperationalEmailContact } from "@purin-labs/area-inbox/server/data/email-operational";
 import { organisationServices } from "@purin-labs/area-organisation-contract/server/organisation-services";
@@ -123,9 +157,11 @@ import { prepareEmailWatchReconciliationRun } from "@purin-labs/area-organisatio
 import {
   cancelOperatorConfigurationDraft,
   confirmOperatorConfigurationDraft,
-  previewCode,
+  readLatestDecidedOperatorDraft,
   readOperatorDraft,
+  readPendingOperatorDraft,
 } from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
+import { previewCode } from "@purin-labs/area-organisation-contract/server/operator-drafts";
 import { workflowChanges } from "@purin-labs/area-kitchen-contract/server/workflow-changes";
 import {
   applyApprovedWorkflowChange,
@@ -154,6 +190,13 @@ import {
   announceBakeRun,
   tellBakeRunOverBake,
 } from "@purin-labs/surface-slack/server/bake-run-announce";
+import { bakeProposalRecords } from "@purin-labs/area-kitchen-contract/server/bake-proposals";
+import {
+  markBakeProposalAnnounced,
+  readBakeProposal,
+  readBakeProposalCardTs,
+} from "@purin-labs/area-kitchen/server/bakes/records";
+import { deviceReads } from "@purin-labs/area-devices-contract/server/device-reads";
 import { connectionFlowParts } from "@purin-labs/connections/data/connection-flow-parts";
 import { prepareCredentialRefReplacement } from "@purin-labs/authority/credential-vault/service";
 import { prepareCommunicationDestinationAccount } from "@purin-labs/area-organisation/server/data/onboarding";
@@ -254,6 +297,11 @@ providerModules.register({ shopify: SHOPIFY_PROVIDER_MODULE });
 commerceDeliveryIntake.register({
   normalizeCommerceDelivery: (...input) => normalizeCommerceDelivery(...input),
   applyCommerceDelivery: (...input) => applyCommerceDelivery(...input),
+  parseCanonicalCommerceDelivery: (raw) => parseCanonicalCommerceDelivery(raw),
+  parseCommerceCueFacts: (raw) => parseCommerceCueFacts(raw),
+  listCommerceLabRuns: (input) => listCommerceLabRuns(input),
+  failCommerceLabRun: (input) => failCommerceLabRun(input),
+  reconcileCommerceOutbox: (input) => reconcileCommerceOutbox(input),
 });
 
 commerceGrantSelection.register(COMMERCE_GRANT_SELECTION);
@@ -270,6 +318,8 @@ commerceGraphReads.register({
   openControlCommerceGraph: (...input) => openControlCommerceGraph(...input),
   commerceGraphControlAuthority: (...input) =>
     commerceGraphControlAuthority(...input),
+  buildSavedSelectorCommerceReadAuthority: (input) =>
+    buildSavedSelectorCommerceReadAuthority(input),
   controlCommerceSensitivityCeiling: (...input) =>
     controlCommerceSensitivityCeiling(...input),
 });
@@ -281,6 +331,22 @@ commerceExceptionInbox.register((...input) =>
 actionLedgerCommerce.register({
   parseEffect: (raw) => parseCommerceEntityPlaneEffect(raw),
   slackMayApprove: (action) => slackMayApproveAction(action),
+});
+
+commerceActionApprovals.register({
+  parseActionPath: (action) => parseCommerceActionPath(action),
+  syncCaseApprovalWait: (...input) => syncCaseApprovalWait(...input),
+  executeCommerceAction: (input) => executeCommerceAction(input),
+  acceptAndDeliverCommerceOutcome: (input) =>
+    acceptAndDeliverCommerceOutcome(input),
+});
+
+supplierPayoutReads.register({
+  supplierPayoutLabel: (input) => supplierPayoutLabel(input),
+  listSupplierPayoutsForSupplier: (...input) =>
+    listSupplierPayoutsForSupplier(...input),
+  listUnresolvedSupplierPayouts: (...input) =>
+    listUnresolvedSupplierPayouts(...input),
 });
 
 slackSurfaceParts.register({
@@ -349,12 +415,15 @@ cafeServices.register({
   readMenuScreenList: (...input) => readMenuScreenList(...input),
   readTerminalOperations: (...input) => readTerminalOperations(...input),
   readCounterSaleView: (...input) => readCounterSaleView(...input),
+  resolveCafeBuyer: (...input) => resolveCafeBuyer(...input),
 });
 
 inboxServices.register({
   readGmailPilotBudget: (...input) => readGmailPilotBudget(...input),
   registerSupplierOperationalEmailContact: (...input) =>
     registerSupplierOperationalEmailContact(...input),
+  readLatestEmailReviewProjectionForCase: (input) =>
+    readLatestEmailReviewProjectionForCase(input),
 });
 
 channelIngress.register({
@@ -367,9 +436,17 @@ whatsAppOperatorNotices.register({
   deliver: (input) => deliverWhatsAppOperatorNotice(input),
 });
 
+whatsAppOperatorNoticeRecords.register({
+  read: (...input) => readWhatsAppOperatorNotice(...input),
+  markDelivered: (...input) => markWhatsAppNoticeDelivered(...input),
+});
+
 organisationServices.register({
   removeIntegrationAccount: (...input) => removeIntegrationAccount(...input),
   readOperatorDraft: (...input) => readOperatorDraft(...input),
+  readPendingOperatorDraft: (input) => readPendingOperatorDraft(input),
+  readLatestDecidedOperatorDraft: (input) =>
+    readLatestDecidedOperatorDraft(input),
   cancelOperatorConfigurationDraft: (...input) =>
     cancelOperatorConfigurationDraft(...input),
   confirmOperatorConfigurationDraft: (...input) =>
@@ -387,6 +464,12 @@ workflowChanges.register({
   applyApprovedWorkflowChange: (...input) =>
     applyApprovedWorkflowChange(...input),
   parseWorkflowChangeCommand: (raw) => parseWorkflowChangeCommand(raw),
+});
+
+bakeProposalRecords.register({
+  readBakeProposal: (...input) => readBakeProposal(...input),
+  readBakeProposalCardTs: (...input) => readBakeProposalCardTs(...input),
+  markBakeProposalAnnounced: (...input) => markBakeProposalAnnounced(...input),
 });
 
 deviceCommands.register({
@@ -415,6 +498,10 @@ bakeParts.register({
     announceRun: (...input) => announceBakeRun(...input),
     tellOverBake: (...input) => tellBakeRunOverBake(...input),
   },
+});
+
+deviceReads.register({
+  listDevices: (...input) => listDevices(...input),
 });
 
 commerceApprovalCardTexts.register({

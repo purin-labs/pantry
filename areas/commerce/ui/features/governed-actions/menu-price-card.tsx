@@ -1,9 +1,10 @@
 import React from "react";
 
-import { formatMenuPrice, menuPriceChangeKind } from "./menu-price-details";
-import type {
-  MenuPriceDetails,
-  MenuPriceSideDetails,
+import { formatMenuPrice } from "./menu-price-details";
+import {
+  menuPriceChangeKind,
+  type MenuPriceDetails,
+  type MenuPriceSideDetails,
 } from "@purin-labs/control-api/portal/menu-price-details";
 
 function PriceSide(input: {

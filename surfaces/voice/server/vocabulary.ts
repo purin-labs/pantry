@@ -3,12 +3,12 @@ import { VOICE_VOCABULARY_TERM_LIMIT } from "@purin-labs/control-api";
 import {
   CAFE_MENU_ID,
   CAFE_STOREFRONT_ID,
-} from "@purin-labs/area-cafe/server/control/routes/commerce-menu-publication";
+} from "@purin-labs/area-cafe-contract/server/menu-publication";
 import {
-  resolveCafeBuyer,
+  cafeServices,
   type CafeShop,
-} from "@purin-labs/area-cafe/server/control/routes/menu-screens";
-import { listDevices } from "@purin-labs/area-devices/server/store";
+} from "@purin-labs/area-cafe-contract/server/cafe-services";
+import { deviceReads } from "@purin-labs/area-devices-contract/server/device-reads";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
@@ -55,7 +55,7 @@ export async function readVoiceVocabulary(
   const now = Date.now();
   const cached = cache.get(organisationId);
   if (cached !== undefined && cached.until > now) return cached.terms;
-  const shop = await resolveCafeBuyer(env, organisationId);
+  const shop = await cafeServices.use().resolveCafeBuyer(env, organisationId);
   const [catalog, stock, devices] = await Promise.all([
     shop === "no_merchant" ? [] : shop === null ? null : readCatalogNames(shop),
     shop === "no_merchant"
@@ -174,7 +174,9 @@ async function readDeviceNames(
   try {
     const scope = await OrganisationExecutionScope.resolve(env, organisationId);
     if (!scope.ok) return null;
-    const devices = await listDevices(scope.value.database, organisationId);
+    const devices = await deviceReads
+      .use()
+      .listDevices(scope.value.database, organisationId);
     return devices
       .filter(
         (device) =>

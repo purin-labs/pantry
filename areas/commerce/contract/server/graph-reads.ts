@@ -320,11 +320,27 @@ type CommerceGraphControlAuthority = (
   }>,
 ) => Result<CommerceGraphReadAuthority, CommerceEntityPlaneError>;
 
+/** The read authority of a saved selector that a cue resolves. */
+type SavedSelectorCommerceReadAuthority = (
+  input: Readonly<{
+    organisationId: string;
+    merchantId: string;
+    principalId: string;
+    sensitivityCeiling: CommerceSensitivity;
+    expiresAt: string;
+    commandId: string;
+    selectorId: string;
+    selectorRevision: number;
+    query: CommerceGraphQuery;
+  }>,
+) => Result<CommerceGraphReadAuthority, CommerceEntityPlaneError>;
+
 /**
  * The graph reads of commerce, as a service interface of its contract. The
  * Inbox reads the supplier records of a mail under the grant of the reader,
- * and the sender links route reads one supplier under the person's control
- * authority. Commerce owns the graph, its sources and its authority. The
+ * the sender links route reads one supplier under the person's control
+ * authority, and the cue delivery of the webhook surface reads a saved
+ * selector. Commerce owns the graph, its sources and its authority. The
  * Worker registers the implementation (`worker-ports.ts`).
  */
 export type CommerceGraphReads = Readonly<{
@@ -345,6 +361,8 @@ export type CommerceGraphReads = Readonly<{
   ): Promise<Result<ControlCommerceGraph, ControlCommerceGraphError>>;
   /** The read authority of a control request for one query. */
   commerceGraphControlAuthority: CommerceGraphControlAuthority;
+  /** The read authority of a saved selector. */
+  buildSavedSelectorCommerceReadAuthority: SavedSelectorCommerceReadAuthority;
   /** The sensitivity ceiling of a control request. */
   controlCommerceSensitivityCeiling(
     authorized: AuthorizedOrganisationRequest,

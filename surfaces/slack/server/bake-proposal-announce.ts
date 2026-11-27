@@ -7,9 +7,9 @@ import {
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, parseCaseId, type CaseId } from "@purin-labs/kernel/ids";
 import {
-  markBakeProposalAnnounced,
+  bakeProposalRecords,
   type BakeProposal,
-} from "@purin-labs/area-kitchen/server/bakes/records";
+} from "@purin-labs/area-kitchen-contract/server/bake-proposals";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { ensureCaseProject } from "@purin-labs/conversation/projects/case-project";
@@ -43,13 +43,15 @@ export async function announceBakeProposal(
     if (proposal.state === "open") {
       await openProposalCase(env, scope, caseId.value, channel, now);
       if (channel === null) {
-        await markBakeProposalAnnounced(
-          scope.database,
-          scope.organisationId,
-          proposal.proposalId,
-          now,
-          null,
-        );
+        await bakeProposalRecords
+          .use()
+          .markBakeProposalAnnounced(
+            scope.database,
+            scope.organisationId,
+            proposal.proposalId,
+            now,
+            null,
+          );
         return;
       }
       const ts = await deliverOperationsCard(
@@ -69,13 +71,15 @@ export async function announceBakeProposal(
       );
       if (ts === null) return;
       await pinCardThread(env, channel, caseId.value, ts, now);
-      await markBakeProposalAnnounced(
-        scope.database,
-        scope.organisationId,
-        proposal.proposalId,
-        now,
-        ts,
-      );
+      await bakeProposalRecords
+        .use()
+        .markBakeProposalAnnounced(
+          scope.database,
+          scope.organisationId,
+          proposal.proposalId,
+          now,
+          ts,
+        );
       return;
     }
     if (channel === null || proposal.state === "waiting") return;

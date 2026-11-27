@@ -1,5 +1,11 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type {
+  BakeDecidedVia,
+  BakeDeciderRole,
+  BakeProposal,
+  BakeProposalState,
+} from "@purin-labs/area-kitchen-contract/server/bake-proposals";
 
 /**
  * The records of Plan 24 S1: the stock level of each fresh product and the
@@ -22,43 +28,11 @@ export type BakeStockLevel = Readonly<{
   setAt: number;
 }>;
 
-type BakeProposalState = "waiting" | "open" | "approved" | "rejected" | "ended";
-
-export type BakeDecidedVia = "portal" | "slack";
-export type BakeDeciderRole = "owner" | "admin" | "operator";
-
-export type BakeProposal = Readonly<{
-  proposalId: string;
-  inventoryItemId: string;
-  productName: string;
-  state: BakeProposalState;
-  origin: "stock" | "agent";
-  caseId: string;
-  workflowId: string;
-  workflowRevision: number;
-  workflowDigest: string;
-  quantityPieces: number;
-  mouldGroups: number;
-  piecesPerGroup: number;
-  kitchenLocation: string;
-  oven: Readonly<{ deviceId: string; name: string }> | null;
-  stockLocationId: string | null;
-  stockAvailable: number;
-  stockLevel: number;
-  proposedBy: string;
-  proposedAt: number;
-  openedAt: number | null;
-  announcedAt: number | null;
-  decision: Readonly<{
-    by: string;
-    role: BakeDeciderRole;
-    via: BakeDecidedVia;
-    at: number;
-    reason: string | null;
-  }> | null;
-  endedAt: number | null;
-  endReason: string | null;
-}>;
+export type {
+  BakeDecidedVia,
+  BakeDeciderRole,
+  BakeProposal,
+} from "@purin-labs/area-kitchen-contract/server/bake-proposals";
 
 /** What a new proposal holds before it has a state. */
 export type BakeProposalDraft = Omit<

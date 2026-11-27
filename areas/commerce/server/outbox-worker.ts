@@ -16,6 +16,7 @@ import type {
 
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { PendingCommerceCue } from "@purin-labs/area-commerce-contract/server/commerce-projection";
+import type { CommerceOutboxReconcileResult } from "@purin-labs/area-commerce-contract/server/delivery-intake";
 import { resolveCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
   ensureCommerceWebhookSubscription,
@@ -54,25 +55,6 @@ import { CUE_CLAIM_ABANDONED_AFTER_MS } from "@purin-labs/agent/actors/cue-deliv
  * settles the cue, and the queue's own retries are not doubled.
  */
 const COMMERCE_CUE_RESEND_AFTER_MS = CUE_CLAIM_ABANDONED_AFTER_MS + 5 * 60_000;
-
-type CommerceOutboxReconcileResult =
-  | Readonly<{
-      kind: "drained";
-      acknowledged: number;
-      replayed: number;
-      /** Deliveries quarantined this pass; they stay pending at Commerce. */
-      rejected: number;
-    }>
-  | Readonly<{
-      kind: "rejected";
-      deliveryId: string | null;
-      code: string;
-    }>
-  | Readonly<{
-      kind: "retry";
-      deliveryId: string | null;
-      code: string;
-    }>;
 
 export async function runScheduledCommerceOutboxReconciliation(
   env: Env,

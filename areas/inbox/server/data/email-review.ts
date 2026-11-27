@@ -10,39 +10,11 @@ import {
   listEmailOperationalProposalProjections,
   readLatestEmailOperationalProposalProjectionForCase,
   type EmailOperationalProposalProjection,
-  type EmailProposalTarget,
 } from "./email-operational";
+import type { EmailReviewProjection } from "@purin-labs/area-inbox-contract/server/email-review";
 import type { CaseId, OrganisationId } from "@purin-labs/kernel/ids";
 
-type EmailReviewCommon = Readonly<{
-  proposalId: string;
-  integrationAccountId: string;
-  caseId: string;
-  version: number;
-  lifecycleKind: string;
-  createdAt: number;
-  updatedAt: number;
-}>;
-
-export type EmailReviewProjection =
-  | (EmailReviewCommon &
-      Readonly<{
-        kind: "gmail_reply";
-        backing: Readonly<{
-          kind: "gmail_draft";
-          gmailThreadId: string;
-        }>;
-      }>)
-  | (EmailReviewCommon &
-      Readonly<{
-        kind: "operational_new_message";
-        backing: Readonly<{
-          kind: "encrypted_connector";
-          target: EmailProposalTarget;
-          snapshotDigest: string;
-          indeterminateRfcMessageId: string | null;
-        }>;
-      }>);
+export type { EmailReviewProjection } from "@purin-labs/area-inbox-contract/server/email-review";
 
 export async function listEmailReviewProjections(
   input: Readonly<{

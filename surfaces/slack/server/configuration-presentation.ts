@@ -1,5 +1,5 @@
 import type { BakeStockLevelInput } from "@purin-labs/kitchen-control-api";
-import type { WorkflowChangeCommand } from "@purin-labs/area-kitchen/server/bakery/workflow-proposals";
+import type { WorkflowChangeCommand } from "@purin-labs/area-kitchen-contract/server/workflow-changes";
 import type {
   AgentOperationInput,
   AgentOperationsSnapshot,
@@ -9,7 +9,7 @@ import {
   type OperatorConfigurationDraft,
   type DeviceDraftCommand,
   type OperatorDraftCommand,
-} from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
+} from "@purin-labs/area-organisation-contract/server/operator-drafts";
 
 export { previewCode };
 import type { OfferPriceAllowanceCommand } from "@purin-labs/area-commerce-contract/server/offer-price-allowance";

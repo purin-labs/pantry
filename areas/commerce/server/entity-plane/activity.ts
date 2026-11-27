@@ -6,7 +6,7 @@ import type {
   CommerceMutationReceiptOutcome,
 } from "@purin-labs/commerce-contracts";
 import { sameRelationshipDefinitionRef } from "@purin-labs/commerce-contracts/commerce-relationship-references";
-import { parseCommerceProviderReceipt } from "../action-model";
+import { parseCommerceProviderReceipt } from "@purin-labs/area-commerce-contract/server/provider-receipts";
 import { assertCommerceGraphQueryWithLexicon } from "../commerce-wasm";
 import type {
   CaseCommerceApprovalRecord,

@@ -52,6 +52,25 @@ type ReadOperatorDraft = (
   draftId: string,
 ) => Promise<OperatorConfigurationDraft | null>;
 
+/** The pending draft of a Case that a reply in its thread confirms. */
+type ReadPendingOperatorDraft = (
+  input: Readonly<{
+    db: OrganisationDatabase;
+    organisationId: OrganisationId;
+    caseId: string;
+    now: number;
+  }>,
+) => Promise<OperatorConfigurationDraft | null>;
+
+/** The newest decided draft of a Case, for a repeated confirmation. */
+type ReadLatestDecidedOperatorDraft = (
+  input: Readonly<{
+    db: OrganisationDatabase;
+    organisationId: OrganisationId;
+    caseId: string;
+  }>,
+) => Promise<OperatorConfigurationDraft | null>;
+
 type CancelOperatorConfigurationDraft = (
   input: Readonly<{
     db: OrganisationDatabase;
@@ -87,12 +106,15 @@ type PrepareEmailWatchReconciliationRun = (
 /**
  * The Organisation records that other areas use: the removal of an
  * integration account, the configuration drafts that a Kitchen workflow
- * change waits on, and the record of an email watch reconciliation run. The Organisation area owns them, and the Worker
- * registers the implementation (`worker-ports.ts`).
+ * change waits on and that a Slack reply confirms, and the record of an
+ * email watch reconciliation run. The Organisation area owns them, and the
+ * Worker registers the implementation (`worker-ports.ts`).
  */
 export type OrganisationServices = Readonly<{
   removeIntegrationAccount: RemoveIntegrationAccount;
   readOperatorDraft: ReadOperatorDraft;
+  readPendingOperatorDraft: ReadPendingOperatorDraft;
+  readLatestDecidedOperatorDraft: ReadLatestDecidedOperatorDraft;
   cancelOperatorConfigurationDraft: CancelOperatorConfigurationDraft;
   confirmOperatorConfigurationDraft: ConfirmOperatorConfigurationDraft;
   /** The short code that a person compares before a confirmation. */

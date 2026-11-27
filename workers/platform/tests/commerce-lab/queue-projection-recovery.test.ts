@@ -34,6 +34,8 @@ const labMetadataMocks = vi.hoisted(function createLabMetadataMocks() {
   };
 });
 
+// The ports that the Worker registers (worker-ports.ts).
+import "../../src/worker-ports";
 import { cueLogIntegrationAccountId } from "@purin-labs/surface-webhooks/server/gateway/cue-delivery";
 import { handleCommerceDeliveryQueueMessage } from "@purin-labs/surface-webhooks/server/gateway/support";
 import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "@purin-labs/area-commerce/server/commerce-lab/lab-metadata";

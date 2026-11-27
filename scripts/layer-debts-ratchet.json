@@ -12,7 +12,7 @@
       "reads": 50
     },
     "surface-nonpublic": {
-      "imports": 175
+      "imports": 144
     },
     "interpolated-table": {
       "writes": 10
@@ -107,15 +107,7 @@
         "imports surfaces/portal -> areas/inbox": 5,
         "imports surfaces/portal -> areas/integrations": 28,
         "imports surfaces/portal -> areas/kitchen": 29,
-        "imports surfaces/portal -> areas/organisation": 31,
-        "imports surfaces/slack -> areas/commerce": 9,
-        "imports surfaces/slack -> areas/inbox": 4,
-        "imports surfaces/slack -> areas/kitchen": 4,
-        "imports surfaces/slack -> areas/organisation": 2,
-        "imports surfaces/voice -> areas/cafe": 2,
-        "imports surfaces/voice -> areas/devices": 1,
-        "imports surfaces/webhooks -> areas/commerce": 8,
-        "imports surfaces/webhooks -> areas/integrations": 1
+        "imports surfaces/portal -> areas/organisation": 31
       }
     },
     "interpolated-table": {

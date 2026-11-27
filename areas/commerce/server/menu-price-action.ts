@@ -13,8 +13,6 @@ import type {
   MenuPriceSide,
 } from "@purin-labs/area-commerce-contract/server/action-requests";
 
-export type { MenuPriceSide } from "@purin-labs/area-commerce-contract/server/action-requests";
-
 export const MENU_PRICE_CHANGE_VERB = "commerce.menu.change_price";
 
 type ParseError = Readonly<{ code: "commerce_action_invalid"; field: string }>;
@@ -157,13 +155,4 @@ export function parseMenuPriceActionPath(
       url.searchParams.get("expected_offer_revision"),
     ),
   });
-}
-
-/** Whether the change sets a deal, ends one, or changes only the price. */
-export function menuPriceChangeKind(
-  action: Pick<ChangeMenuPriceAction, "before" | "after">,
-): "deal" | "end_deal" | "price" {
-  if (action.after.compareAtPrice !== null) return "deal";
-  if (action.before.compareAtPrice !== null) return "end_deal";
-  return "price";
 }

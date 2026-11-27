@@ -5,19 +5,17 @@ import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { ActionLedgerEntry } from "@purin-labs/authority/actors/action-ledger";
 import { resolveSlackApprover } from "@purin-labs/conversation/actors/action-mutation-execution";
 import {
   digestApprovalAction,
   type ApprovalEvidence,
   type MerchantActionRejectionEvidence,
 } from "@purin-labs/authority/approval-authentication";
-import { slackMayApproveAction } from "@purin-labs/area-commerce/server/action-model";
-import { syncCaseApprovalWait } from "@purin-labs/area-commerce/server/case-approval-sync";
 import {
-  acceptAndDeliverCommerceOutcome,
-  executeCommerceAction,
-} from "@purin-labs/area-commerce/server/actions";
+  actionLedgerCommerce,
+  type ActionLedgerEntry,
+} from "@purin-labs/authority/actors/action-ledger";
+import { commerceActionApprovals } from "@purin-labs/area-commerce-contract/server/action-approvals";
 import { readOrganisationDefaultWorkspacePortalAddress } from "@purin-labs/agent/data/organisation-workspace";
 import { parsePersonId } from "@purin-labs/authority/data/person-authz";
 import type { Env } from "@purin-labs/kernel/env";
@@ -127,7 +125,7 @@ async function decide(
     now,
   });
   if (!existing.ok) return { kind: "refused", text: DECISION_FAILED };
-  if (!slackMayApproveAction(existing.value.action))
+  if (!actionLedgerCommerce.use().slackMayApprove(existing.value.action))
     return {
       kind: "refused",
       text: "This change moves money, so an owner or admin decides it under Operations in the Portal.",
@@ -207,7 +205,7 @@ async function decide(
   } else {
     // A second click on a decided change: a Case whose earlier update was
     // lost reads the decision now, so it does not stay waiting.
-    await syncCaseApprovalWait(env, {
+    await commerceActionApprovals.use().syncCaseApprovalWait(env, {
       organisationId: click.organisationId,
       caseId: action.caseId,
       actionNonce: click.actionNonce,
@@ -218,7 +216,7 @@ async function decide(
   // Portal's execute does; a decided change only reports its state.
   if (action.state !== "signed" && action.state !== "indeterminate")
     return { kind: "decided", entry: action };
-  await executeCommerceAction({
+  await commerceActionApprovals.use().executeCommerceAction({
     env,
     executionScope: scope,
     organisation,
@@ -248,7 +246,7 @@ async function declineAction(
     existing.state !== "proposed" &&
     existing.state !== "approval_requested"
   ) {
-    await syncCaseApprovalWait(env, {
+    await commerceActionApprovals.use().syncCaseApprovalWait(env, {
       organisationId: click.organisationId,
       caseId: existing.caseId,
       actionNonce: click.actionNonce,
@@ -304,7 +302,7 @@ async function declineAction(
   if (!synced.ok) return { kind: "refused", text: DECISION_FAILED };
   // The decision stands even if its delivery waits: the click's answer below
   // updates the card.
-  await acceptAndDeliverCommerceOutcome({
+  await commerceActionApprovals.use().acceptAndDeliverCommerceOutcome({
     kind: "merchant_rejection",
     env,
     entry: rejected.value,

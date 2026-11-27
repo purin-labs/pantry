@@ -11,10 +11,9 @@ import type { Result } from "@purin-labs/kernel/result";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { resolveActiveSlackDestinationConnection } from "@purin-labs/authority/slack/installation-store";
 import {
-  markWhatsAppNoticeDelivered,
-  readWhatsAppOperatorNotice,
+  whatsAppOperatorNoticeRecords,
   type WhatsAppPauseReason,
-} from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
+} from "@purin-labs/area-inbox-contract/server/whatsapp-operator-notices";
 
 /**
  * The notify half of `pause_and_notify`. When an account stops taking agent
@@ -49,7 +48,8 @@ export async function deliverWhatsAppOperatorNotice(
   if (!(await isActorExecutionActive(input.sql, input.scope))) {
     return { ok: false, error: { code: "connector_placement_conflict" } };
   }
-  const notice = readWhatsAppOperatorNotice(input.sql, input.noticeKey);
+  const notices = whatsAppOperatorNoticeRecords.use();
+  const notice = notices.read(input.sql, input.noticeKey);
   if (notice === null)
     return { ok: false, error: { code: "whatsapp_notice_missing" } };
   if (notice.deliveredAt !== null) {
@@ -139,7 +139,7 @@ export async function deliverWhatsAppOperatorNotice(
       value: { kind: "undeliverable", reason: "destination_unreachable" },
     };
   }
-  markWhatsAppNoticeDelivered(input.sql, input.noticeKey, input.now);
+  notices.markDelivered(input.sql, input.noticeKey, input.now);
   return {
     ok: true,
     value: { kind: "delivered", channelId },

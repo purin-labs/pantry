@@ -13,16 +13,17 @@ import { workspacePortalUrl } from "./portal-links";
  * The summary holds typed facts of the change. The status is fixed text.
  */
 
-import type { ActionLedgerEntry } from "@purin-labs/authority/actors/action-ledger";
-import {
-  parseCommerceActionPath,
-  type CommerceActionPath,
-  type CommerceActionRequest,
-} from "@purin-labs/area-commerce/server/action-model";
-import {
-  menuPriceChangeKind,
-  type MenuPriceSide,
-} from "@purin-labs/area-commerce/server/menu-price-action";
+import type {
+  ActionLedgerEntry,
+  LedgerCanonicalAction,
+} from "@purin-labs/authority/actors/action-ledger";
+import { commerceActionApprovals } from "@purin-labs/area-commerce-contract/server/action-approvals";
+import type {
+  CommerceActionPath,
+  CommerceActionRequest,
+  MenuPriceSide,
+} from "@purin-labs/area-commerce-contract/server/action-requests";
+import { menuPriceChangeKind } from "@purin-labs/control-api/portal/menu-price-details";
 import type { CommerceChangeFacts } from "@purin-labs/area-commerce/server/contract/approval-card-texts";
 import type { Env } from "@purin-labs/kernel/env";
 import { decisionCardBlocks, type DecisionCardButton } from "./decision-card";
@@ -116,9 +117,9 @@ export function commerceChangeSummary(
 
 /** The summary of an action whose approval notice the thread does not hold. */
 export function commerceActionSummary(
-  action: Parameters<typeof parseCommerceActionPath>[0],
+  action: Pick<LedgerCanonicalAction, "verb" | "path">,
 ): string {
-  const path = parseCommerceActionPath(action);
+  const path = commerceActionApprovals.use().parseActionPath(action);
   return path.ok
     ? commerceChangeSummary(path.value, NO_FACTS)
     : summaryText("A commerce change", null);

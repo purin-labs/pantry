@@ -3,6 +3,7 @@ import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationPlacement } from "@purin-labs/tenancy/placement";
+import { customConnectorFetchObjectName } from "@purin-labs/area-integrations-contract/server/custom-connector-fetch";
 import { CUSTOM_CONNECTOR_LIMITS } from "./limits";
 import {
   decodeCanonicalBase64,
@@ -64,13 +65,6 @@ export function customConnectorFetchOf(
   return {
     containerOf: placedFetchContainer.bind(undefined, binding, placement),
   };
-}
-
-/** The name of the fetch container Actor of one organisation. */
-export function customConnectorFetchObjectName(
-  organisationId: OrganisationId,
-): string {
-  return organisationId;
 }
 
 function placedFetchContainer(

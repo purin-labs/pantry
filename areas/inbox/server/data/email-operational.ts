@@ -20,17 +20,12 @@ import type { OperationalEmailTarget } from "@purin-labs/area-inbox-contract/ser
 
 export type { OperationalEmailTarget } from "@purin-labs/area-inbox-contract/server/verified-contacts";
 
-export type EmailSelfTestTarget = Readonly<{
-  kind: "self_test";
-  selfTestId: string;
-  customerId?: never;
-  supplierId?: never;
-  contactId?: never;
-  contactRevision?: never;
-  address?: never;
-}>;
+import type { EmailProposalTarget } from "@purin-labs/area-inbox-contract/server/email-review";
 
-export type EmailProposalTarget = OperationalEmailTarget | EmailSelfTestTarget;
+export type {
+  EmailProposalTarget,
+  EmailSelfTestTarget,
+} from "@purin-labs/area-inbox-contract/server/email-review";
 
 type OperationalEmailContact = Readonly<{
   readonly organisationId: OrganisationId;

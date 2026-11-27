@@ -15,6 +15,7 @@ import {
   type CommerceLabScenarioId,
 } from "./scenarios";
 import type { Variant } from "@purin-labs/type-utils";
+import type { CommerceLabMetadataError } from "@purin-labs/area-commerce-contract/server/delivery-intake";
 import {
   isNonNegativeInteger,
   isRecord,
@@ -56,13 +57,7 @@ export type CommerceLabRunEvidence = {
   readonly failureSlackEffectId: string | null;
 };
 
-export type CommerceLabMetadataError =
-  | { readonly code: "commerce_lab_not_marked" }
-  | { readonly code: "commerce_lab_namespace_mismatch" }
-  | { readonly code: "commerce_lab_catalog_version_mismatch" }
-  | { readonly code: "commerce_lab_run_conflict" }
-  | { readonly code: "commerce_lab_run_missing" }
-  | { readonly code: "commerce_lab_metadata_corrupt" };
+export type { CommerceLabMetadataError } from "@purin-labs/area-commerce-contract/server/delivery-intake";
 
 type CommerceLabOrganisationRow = {
   readonly organisationId: unknown;

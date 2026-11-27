@@ -3,10 +3,7 @@ import { deliverOperationsCard } from "@purin-labs/actor-runtime/actors/operatio
 import { readOperationsDestination } from "@purin-labs/tenancy/data/operations-destination";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId } from "@purin-labs/kernel/ids";
-import {
-  readBakeProposal,
-  readBakeProposalCardTs,
-} from "@purin-labs/area-kitchen/server/bakes/records";
+import { bakeProposalRecords } from "@purin-labs/area-kitchen-contract/server/bake-proposals";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
@@ -27,10 +24,15 @@ import {
 type RunRecord = Omit<BakeRunRecord, "check" | "problem">;
 
 async function threadOf(scope: OrganisationExecutionScope, record: RunRecord) {
+  const proposals = bakeProposalRecords.use();
   const [destination, proposal, cardTs] = await Promise.all([
     readOperationsDestination(scope.database, scope.organisationId),
-    readBakeProposal(scope.database, scope.organisationId, record.proposalId),
-    readBakeProposalCardTs(
+    proposals.readBakeProposal(
+      scope.database,
+      scope.organisationId,
+      record.proposalId,
+    ),
+    proposals.readBakeProposalCardTs(
       scope.database,
       scope.organisationId,
       record.proposalId,

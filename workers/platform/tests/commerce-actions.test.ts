@@ -8,13 +8,13 @@ import {
   buildCommerceCancellationActionDraft,
   buildCommerceLabDelivery,
   commerceTrackingAttachmentTargetMatches,
-  parseCommerceProviderReceipt,
   parseCommerceCancellationAuthority,
   reconcileCommerceProviderReceipt,
   parseCommerceActionPath,
   parseCommerceEntityPlaneActionPath,
   parseCommerceActionRequest,
 } from "@purin-labs/area-commerce/server/action-model";
+import { parseCommerceProviderReceipt } from "@purin-labs/area-commerce-contract/server/provider-receipts";
 import type {
   CommerceActionPath,
   CommerceCancellationAuthority,

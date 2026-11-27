@@ -24,6 +24,7 @@ import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
 import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import { readCafeImageContent } from "@purin-labs/area-cafe-contract/server/media";
+import type { CafeShop } from "@purin-labs/area-cafe-contract/server/cafe-services";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,
@@ -376,12 +377,6 @@ async function openSocket(request: Request, env: Env): Promise<Response> {
     return controlError("menu_screen_unavailable", 503);
   }
 }
-
-/** The shop's Commerce merchant and a storefront client. */
-export type CafeShop = Readonly<{
-  merchantId: string;
-  buyer: CommerceStorefrontClient;
-}>;
 
 /**
  * The shop's merchant and a storefront client. `no_merchant` when the

@@ -1,5 +1,5 @@
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
-import { resolveSlackMessageCapability } from "@purin-labs/area-inbox/server/actors/email-operational-capability";
+import { resolveAccountCapability } from "@purin-labs/authority/authorization/access-grants/account-capability";
 import {
   insertSlackMessageProposal,
   matchSlackChannel,
@@ -37,10 +37,12 @@ export async function proposeSlackMessageForEmbeddedHarness(
   await requireSessionExecution(execution, lease);
   const organisationId = execution.scope.organisationId;
   const caseId = requireCurrentEmailToolLease(storage, lease, assignment);
-  const capability = await resolveSlackMessageCapability(
+  const capability = await resolveAccountCapability(
     organisationId,
     assignment.authorityPartition.capabilityKeys,
     request.accountRef,
+    CAPABILITY_KEYS.slackMessagePropose,
+    SLACK_MESSAGE_RESOURCE_SCOPE,
   );
   if (capability === null) {
     throw new Error("Slack drafting is outside the granted scope");

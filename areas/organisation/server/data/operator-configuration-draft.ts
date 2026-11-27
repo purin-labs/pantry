@@ -56,22 +56,12 @@ import type {
   OperatorDraftReceipt,
 } from "@purin-labs/area-organisation-contract/server/operator-drafts";
 
+import { previewCode } from "@purin-labs/area-organisation-contract/server/operator-drafts";
+
 export type {
-  DeviceDraftCommand,
   OperatorConfigurationDraft,
   OperatorDraftCommand,
 } from "@purin-labs/area-organisation-contract/server/operator-drafts";
-
-/**
- * A short code identifying the exact change a preview showed.
- *
- * The operator repeats it when accepting, which is what ties their reply to
- * the change they read. Without it a reply to an older preview would accept
- * whatever change happens to be pending when it arrives.
- */
-export function previewCode(commandDigest: string): string {
-  return commandDigest.slice(0, 6).toUpperCase();
-}
 
 type WorkflowApprover = Readonly<{
   userId: UserId;
@@ -372,9 +362,7 @@ export async function confirmOperatorConfigurationDraft(
   if (stored.actorUserId !== input.actorUserId) {
     return { ok: false, error: { code: "operator_draft_actor_mismatch" } };
   }
-  if (
-    draftPreviewCode(stored.commandDigest) !== input.previewCode.toUpperCase()
-  ) {
+  if (previewCode(stored.commandDigest) !== input.previewCode.toUpperCase()) {
     return { ok: false, error: { code: "operator_draft_digest_mismatch" } };
   }
   // A settled draft returns what it recorded rather than refusing. A lost
@@ -1146,11 +1134,6 @@ function recordedFailure(
     default:
       return { code: "agent_operation_persistence_failed" };
   }
-}
-
-/** The code one draft's preview displayed. */
-function draftPreviewCode(commandDigest: string): string {
-  return commandDigest.slice(0, 6).toUpperCase();
 }
 
 /** Withdraws a pending draft without applying it. */

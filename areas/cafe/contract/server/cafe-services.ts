@@ -1,4 +1,5 @@
 import type { MenuScreenSummary } from "@purin-labs/cafe-control-api";
+import type { CommerceStorefrontClient } from "@purin-labs/commerce-client";
 import type { TerminalCounterReadback } from "@purin-labs/control-api";
 import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
@@ -41,6 +42,22 @@ export type TerminalOperationsRequest = Readonly<{
   linkedLocationIds: ReadonlySet<string>;
 }>;
 
+/** The shop's Commerce merchant and a storefront client. */
+export type CafeShop = Readonly<{
+  merchantId: string;
+  buyer: CommerceStorefrontClient;
+}>;
+
+/**
+ * The shop's merchant and a storefront client. `no_merchant` when the
+ * Organisation has no Commerce merchant, or this Worker has no Commerce; null
+ * when the read fails.
+ */
+type ResolveCafeBuyer = (
+  env: Env,
+  organisationId: OrganisationId,
+) => Promise<CafeShop | "no_merchant" | null>;
+
 type ReadMenuScreenList = (
   env: Env,
   authorized: AuthorizedOrganisationRequest,
@@ -57,9 +74,10 @@ type ReadCounterSaleView = (
 
 /**
  * The Café reads that other areas use: the menu screens and the payment
- * terminals that the Devices page lists, and the counter sale that the
- * commerce tools show. Café owns them, and the Worker registers the
- * implementation (`worker-ports.ts`).
+ * terminals that the Devices page lists, the counter sale that the
+ * commerce tools show, and the shop's storefront that the voice vocabulary
+ * reads. Café owns them, and the Worker registers the implementation
+ * (`worker-ports.ts`).
  */
 export type CafeServices = Readonly<{
   /** The Organisation's screens for the Devices page, or null if unread. */
@@ -68,6 +86,8 @@ export type CafeServices = Readonly<{
   readTerminalOperations: ReadTerminalOperations;
   /** The open sale of a counter, for the agent's Register tools. */
   readCounterSaleView: ReadCounterSaleView;
+  /** The shop's merchant and a storefront client of its guests. */
+  resolveCafeBuyer: ResolveCafeBuyer;
 }>;
 
 export const cafeServices = definePort<CafeServices>("cafe_services");

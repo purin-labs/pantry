@@ -11,6 +11,12 @@ import {
   WHATSAPP_SEND_ATTEMPT_LEASE_MS,
   type WhatsAppProposalState,
 } from "./whatsapp-reply-proposal-transition";
+import type {
+  WhatsAppOperatorNotice,
+  WhatsAppPauseReason,
+} from "@purin-labs/area-inbox-contract/server/whatsapp-operator-notices";
+
+export type { WhatsAppPauseReason } from "@purin-labs/area-inbox-contract/server/whatsapp-operator-notices";
 
 /**
  * Phone-number-addressed Connector runtime. This is the only durable home for
@@ -34,53 +40,6 @@ export type WhatsAppIngressLimits = {
   readonly maxActiveCaseBytes: number;
   readonly debounceSeconds: number;
 };
-
-export type WhatsAppPauseReason =
-  | {
-      readonly kind: "active_case_limit";
-      readonly observed: number;
-      readonly limit: number;
-    }
-  | {
-      readonly kind: "hourly_message_limit";
-      readonly observed: number;
-      readonly limit: number;
-      readonly windowEndsAt: number;
-    }
-  | {
-      readonly kind: "daily_token_budget";
-      readonly reserved: number;
-      readonly consumed: number;
-      readonly limit: number;
-      readonly windowEndsAt: number;
-    }
-  | {
-      readonly kind: "message_too_large";
-      readonly providerMessageId: string;
-      readonly observedBytes: number;
-      readonly limitBytes: number;
-    }
-  | {
-      readonly kind: "unsupported_message_type";
-      readonly providerMessageId: string;
-      readonly messageType: string;
-    }
-  | {
-      readonly kind: "service_window_expired";
-      readonly caseId: string;
-      readonly expiredAt: number;
-    }
-  | {
-      /** The agent's turns for the Case failed until no attempt was left. */
-      readonly kind: "turn_attempts_exhausted";
-      readonly caseId: string;
-      readonly attempts: number;
-    }
-  | {
-      readonly kind: "send_indeterminate";
-      readonly proposalId: string;
-      readonly caseId: string;
-    };
 
 type WhatsAppProcessingState =
   | { readonly kind: "waiting" }
@@ -544,11 +503,7 @@ export function markWhatsAppNoticeDelivered(
 export function readWhatsAppOperatorNotice(
   sql: SqlStorage,
   noticeKey: string,
-): {
-  readonly reason: WhatsAppPauseReason;
-  readonly policyVersion: number;
-  readonly deliveredAt: number | null;
-} | null {
+): WhatsAppOperatorNotice | null {
   const row =
     sql
       .exec<Record<string, SqlStorageValue>>(

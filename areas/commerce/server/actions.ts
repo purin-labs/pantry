@@ -6,7 +6,8 @@ import { resolveActiveCaseActor, resolveActiveCaseActorAtPlacement } from "@puri
 import type { ActionLedgerEntry } from "@purin-labs/authority/actors/action-ledger";
 import type { OrganisationCommerce } from "./actors/organisation/organisation-commerce";
 import type { MerchantActionRejectionEvidence } from "@purin-labs/authority/approval-authentication";
-import { commerceActionProjectionTarget, parseCommerceActionPath, parseCommerceEntityPlaneActionPath, parseCommerceProviderReceipt, type CommerceEntityPlaneActionPath } from "./action-model";
+import { commerceActionProjectionTarget, parseCommerceActionPath, parseCommerceEntityPlaneActionPath, type CommerceEntityPlaneActionPath } from "./action-model";
+import { parseCommerceProviderReceipt } from "@purin-labs/area-commerce-contract/server/provider-receipts";
 import type {
   CommerceActionError,
   CommerceActionPath,
@@ -25,6 +26,10 @@ import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import type { CommerceActionFollowUp } from "@purin-labs/commerce-control-api";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
+import type {
+  CommerceCaseOutcomeResult,
+  DeliverCommerceOutcomeInput,
+} from "@purin-labs/area-commerce-contract/server/action-approvals";
 
 /** The finished outcome of a commerce action: the body that the caller records. */
 type CommerceActionDone = Readonly<{ body: Record<string, unknown> }>;
@@ -504,46 +509,6 @@ async function scheduleCommerceProjectionRefresh(
     return false;
   }
 }
-
-type CommerceCaseOutcomeDelivery =
-  | {
-      readonly kind: "delivered" | "already_settled";
-      readonly caseRevision: number;
-      readonly deliveryReceiptId: string;
-    }
-  | { readonly kind: "unaddressed"; readonly caseRevision: number }
-  | { readonly kind: "held"; readonly caseRevision: number }
-  | {
-      readonly kind: "pending";
-      readonly caseRevision: number;
-      readonly retryAt: number;
-    };
-
-type CommerceCaseOutcomeResult =
-  | { readonly ok: true; readonly value: CommerceCaseOutcomeDelivery }
-  | { readonly ok: false; readonly error: { readonly code: string } };
-
-type DeliverCommerceOutcomeInput =
-  | {
-      readonly kind: "provider_receipt";
-      readonly env: Env;
-      readonly entry: ActionLedgerEntry;
-      readonly receipt: CommerceProviderReceipt;
-      readonly now: number;
-    }
-  | {
-      readonly kind: "merchant_rejection";
-      readonly env: Env;
-      readonly entry: VariantBy<ActionLedgerEntry, "state", "rejected">;
-      readonly rejection: MerchantActionRejectionEvidence;
-      readonly now: number;
-    }
-  | {
-      readonly kind: "execution_failure";
-      readonly env: Env;
-      readonly entry: VariantBy<ActionLedgerEntry, "state", "failed">;
-      readonly now: number;
-    };
 
 export async function acceptAndDeliverCommerceOutcome(
   input: DeliverCommerceOutcomeInput,

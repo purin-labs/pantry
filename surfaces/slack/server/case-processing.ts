@@ -86,10 +86,8 @@ import {
 } from "@purin-labs/tenancy/data/control-plane";
 import { parseAssignmentId, parseSessionId, type CaseId } from "@purin-labs/kernel/ids";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
-import {
-  readLatestEmailReviewProjectionForCase,
-  type EmailReviewProjection,
-} from "@purin-labs/area-inbox/server/data/email-review";
+import type { EmailReviewProjection } from "@purin-labs/area-inbox-contract/server/email-review";
+import { inboxServices } from "@purin-labs/area-inbox-contract/server/inbox-services";
 import { buildSlackEmailReviewNotice } from "./email-review-notice";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
@@ -936,7 +934,7 @@ async function deliverEmailReviewNotice(
 ): Promise<SlackCaseProcessingResult> {
   let review: EmailReviewProjection | null;
   try {
-    review = await readLatestEmailReviewProjectionForCase({
+    review = await inboxServices.use().readLatestEmailReviewProjectionForCase({
       db: input.scope.database,
       organisationId: input.body.organisationId,
       caseId: input.caseId,
