@@ -1,5 +1,5 @@
 {
-  "total": {"copies":742,"lines":12921},
+  "total": {"copies":741,"lines":12894},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -90,7 +90,6 @@
     "areas/inbox/server/actors/connector-email-proposal.ts = areas/inbox/server/actors/connector-email-proposal.ts": {"copies":12,"lines":154},
     "areas/inbox/server/actors/connector-whatsapp-proposal.ts = areas/inbox/server/actors/connector-whatsapp-proposal.ts": {"copies":1,"lines":15},
     "areas/inbox/server/actors/connector-whatsapp-rpc.ts = areas/inbox/server/actors/connector-whatsapp-rpc.ts": {"copies":2,"lines":22},
-    "areas/inbox/server/actors/connector-whatsapp.ts = areas/inbox/server/data/email-mailbox.ts": {"copies":1,"lines":27},
     "areas/inbox/server/actors/connector/connector-email-actor.ts = areas/inbox/server/actors/connector/connector-email-actor.ts": {"copies":13,"lines":149},
     "areas/inbox/server/actors/email-active-content.ts = areas/inbox/server/actors/whatsapp-active-content.ts": {"copies":3,"lines":68},
     "areas/inbox/server/actors/email-case-processing.ts = areas/inbox/server/actors/email-case-processing.ts": {"copies":3,"lines":47},
