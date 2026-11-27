@@ -15,7 +15,7 @@
       "imports": 244
     },
     "area-package": {
-      "imports": 75
+      "imports": 3
     },
     "worker-logic": {
       "files": 10,
@@ -153,21 +153,8 @@
       "reason": "check-layers.mjs treats each workspace package of an area as the contract of that area. `contracts` lists one package. The others hold a client, a control API, a model or a shared document, and each other area imports them with no check.",
       "fix": "Decide for each package: list it in `contracts` of the map, or import the needed part through a listed contract.",
       "counts": {
-        "imports areas/brain -> @purin-labs/commerce-client": 2,
-        "imports areas/brain -> @purin-labs/commerce-control-api": 4,
         "imports areas/cafe -> @purin-labs/bakery-model": 1,
-        "imports areas/cafe -> @purin-labs/commerce-client": 8,
-        "imports areas/commerce -> @purin-labs/kitchen-control-api": 10,
-        "imports areas/commerce -> @purin-labs/production-plan-crdt": 3,
-        "imports areas/devices -> @purin-labs/cafe-control-api": 1,
-        "imports areas/inbox -> @purin-labs/commerce-client": 7,
-        "imports areas/integrations -> @purin-labs/commerce-control-api": 1,
-        "imports areas/kitchen -> @purin-labs/commerce-client": 24,
-        "imports areas/kitchen -> @purin-labs/commerce-control-api": 1,
-        "imports areas/organisation -> @purin-labs/bakery-workflow": 2,
-        "imports areas/organisation -> @purin-labs/commerce-client": 1,
-        "imports areas/organisation -> @purin-labs/commerce-control-api": 9,
-        "imports areas/organisation -> @purin-labs/kitchen-control-api": 1
+        "imports areas/organisation -> @purin-labs/bakery-workflow": 2
       }
     },
     "worker-logic": {

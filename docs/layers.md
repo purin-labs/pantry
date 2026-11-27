@@ -231,6 +231,7 @@ import each of its files. A module with no line for one of these has none.
   - `areas/cafe/ui/features/terminals/`
 - Packages: `areas/cafe`, `packages/cafe-control-api`, `packages/menu-board-crdt`, `packages/menu-draft-crdt`
 - Tables (3): `cafe_counter_receipt_setting`, `cafe_terminal_assignment`, `screen_pairing`
+- Public files: `packages/cafe-control-api`
 
 ## areas/cafe/contract
 
@@ -271,7 +272,7 @@ import each of its files. A module with no line for one of these has none.
   - `areas/commerce/ui/features/payouts/`
 - Packages: `areas/commerce`, `packages/commerce-client`, `packages/commerce-contracts`, `packages/commerce-control-api`, `packages/commerce-query-sqlite`, `packages/product-description-crdt`, `services/commerce`
 - Tables (12): `commerce_capability_activation`, `commerce_export_preset_publication`, `commerce_lab_organisation`, `commerce_lab_run`, `commerce_webhook_subscription`, `paid_receipt`, `supplier_destination_revision`, `supplier_payable`, `supplier_payout`, `supplier_payout_attempt`, `supplier_payout_certification`, `supplier_payout_event`
-- Public files: `areas/commerce/server/contract/`, `packages/commerce-contracts`
+- Public files: `areas/commerce/server/contract/`, `packages/commerce-client`, `packages/commerce-contracts`, `packages/commerce-control-api`
 
 ## areas/commerce/contract
 
@@ -408,6 +409,7 @@ import each of its files. A module with no line for one of these has none.
   - `areas/kitchen/ui/features/workflow-simulator/spatial/`
 - Packages: `areas/kitchen`, `packages/bakery-model`, `packages/bakery-workflow`, `packages/costs-sheet-crdt`, `packages/kitchen-control-api`, `packages/production-plan-crdt`, `packages/production-simulation`, `packages/workflow-canvas-crdt`
 - Tables (13): `bake_authority`, `bake_proposal`, `bake_run`, `bake_stock_level`, `bakery_agent_run_save`, `bakery_agent_scenario_save`, `bakery_cost_plan`, `bakery_cost_product_plan`, `bakery_lot_invoice_cost`, `bakery_surface_effect_delivery`, `bakery_surface_timeline_event`, `bakery_workflow`, `bakery_workflow_revision`
+- Public files: `packages/kitchen-control-api`, `packages/production-plan-crdt`
 
 ## areas/kitchen/contract
 

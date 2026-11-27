@@ -104,7 +104,12 @@
     "areas/inbox/ui/features/mail-setup/",
     "areas/organisation/server/contract/",
     "areas/organisation/ui/pages/account-invitation-link.ts",
-    "areas/devices/server/contract/"
+    "areas/devices/server/contract/",
+    "packages/commerce-client",
+    "packages/commerce-control-api",
+    "packages/kitchen-control-api",
+    "packages/cafe-control-api",
+    "packages/production-plan-crdt"
   ],
   "mixed": {
     "workers/platform/src/agent-tools/registry.ts": "The one list of the agent tools, in the order of the catalog digest. It imports the tool family of each area (Kitchen, commerce, Cafe, the Inbox, integrations and devices) and the Slack tools (agent-tools/slack/slack.ts), so it is a part of the Worker. agent-tools/session-wiring.ts gives it to the class SessionDO (step A1.7).",

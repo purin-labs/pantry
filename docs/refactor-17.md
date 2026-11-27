@@ -371,6 +371,16 @@ The open work, each item with its own decision:
 | Done 2026-11-27: a short `AGENTS.md` for each area                                                                                                                          | `areas/<area>/AGENTS.md`, 8 files of about 30 lines: the specs, the packages, the tool families, the Portal features, the layer rules and what is particular to the area. The root guide names them                                                                                                                                                                                                          |
 | Done 2026-11-24: each journey that runs a Durable Object alarm checks that it ran                                                                                           | `durable-object-alarm-support.ts` holds the two helpers. 13 calls stay direct: each checks its result, or a comment says why it can find no alarm                                                                                                                                                                                                                                                            | New journeys use the helpers                                       |
 
+The layer debts, one line for each step that lowers a count:
+
+- 2026-11-27, `area-package`: 75 to 3. `contracts` now lists five more packages:
+  `commerce-client`, `commerce-control-api`, `kitchen-control-api`,
+  `cafe-control-api` and `production-plan-crdt`. Each one holds a client, API shapes
+  or a shared document. Its dependencies are `std`, contract packages,
+  `collaboration` and document packages, so it holds no implementation of its area.
+  The 3 that stay need a port or a move: `bakery-workflow` in the configuration
+  draft of the Organisation (2) and `bakery-model` in the Café board chat (1).
+
 The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
 the state of Stage A. Its branches are gone; the work is on `dev`.
