@@ -83,11 +83,17 @@ def add_oven(
     )
 
 
-def attach_robot(cell: mujoco.MjSpec, robot_spec: RobotSpec) -> None:
+def attach_robot(
+    cell: mujoco.MjSpec,
+    robot_spec: RobotSpec,
+    *,
+    mount_site: str = "robot_mount",
+    prefix: str = "",
+) -> None:
     """Mount the arm with bounded joint servos and a nominal flange site."""
     metadata = json.loads((ASSETS / robot_spec.slug / "joints.json").read_text())
     robot = mujoco.MjSpec.from_file(str(ASSETS / robot_spec.slug / "robot.xml"))
-    robot.default.name = "robot_defaults"
+    robot.default.name = f"{prefix}robot_defaults" if prefix else "robot_defaults"
     if robot_spec.slug == "fanuc-crx10ial":
         flange = robot.body("fanuc-crx10ial__fanuc_flange")
         offset = [0, 0, 0]
@@ -120,7 +126,7 @@ def attach_robot(cell: mujoco.MjSpec, robot_spec: RobotSpec) -> None:
         if robot_spec.slug == "fairino-fr10":
             effort = min(effort, 150 if index < 3 else 28)
         servo.forcerange = [-effort, effort]
-    cell.attach(robot, site=cell.site("robot_mount"), prefix="")
+    cell.attach(robot, site=cell.site(mount_site), prefix=prefix)
 
 
 def compose_cell(

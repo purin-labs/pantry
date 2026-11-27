@@ -360,7 +360,13 @@ def _strip_visuals_from_spec(spec: mujoco.MjSpec) -> None:
         spec.delete(tex)
 
 
-def _build_spanner_tray_spec() -> mujoco.MjSpec:
+def _build_spanner_tray_spec(
+    *,
+    include_contents: bool = True,
+    contents_mass_kg: float = 0.45,
+    contents_rgba: tuple[float, float, float, float] = (0.84, 0.57, 0.22, 1.0),
+    default_name: str = "tray_defaults",
+) -> mujoco.MjSpec:
     """Build the 400x300 mm MBCO-4ME tray with geom-derived inertia so ingredient edits take effect."""
     tray_root = ET.parse(MBCO4_TRAY_XML).getroot()
     mbco4_el = tray_root.find(".//body[@name='mbco4_tray']")
@@ -372,26 +378,186 @@ def _build_spanner_tray_spec() -> mujoco.MjSpec:
     for asset_el in list(tray_root.findall("asset")):
         tray_root.remove(asset_el)
     tray = mujoco.MjSpec.from_string(ET.tostring(tray_root, encoding="unicode"))
-    tray.default.name = "tray_defaults"
+    tray.default.name = default_name
     tray_body = tray.body("mbco4_tray")
     tray_body.name = "mbco_tray"
     for gname, gmass in TRAY_SHELL_MASSES.items():
         tray.geom(gname).mass = gmass
     tray_body.add_freejoint(name="mbco_tray_free")
-    # Default 0.45 kg dough/pastry load (overridden by Request.ingredients in Rust)
-    tray_body.add_geom(
-        name="cold_contents",
+    if include_contents:
+        # Default 0.45 kg dough/pastry load (overridden by Request.ingredients in Rust)
+        tray_body.add_geom(
+            name="cold_contents",
+            type=mujoco.mjtGeom.mjGEOM_BOX,
+            pos=[0.0, 0.0, 0.019],
+            size=[0.14, 0.095, 0.012],
+            mass=contents_mass_kg,
+            contype=1,
+            conaffinity=1,
+            condim=4,
+            friction=[0.5, 0.005, 0.0001],
+            rgba=list(contents_rgba),
+        )
+    return tray
+
+
+def _add_pedestal(
+    cell: mujoco.MjSpec,
+    *,
+    name: str = "cell_pedestal",
+    base_pos: tuple[float, float, float],
+    col_half: float,
+    plate_half: float,
+    mount_site: str = "robot_mount",
+    geom_prefix: str = "",
+    mount_quat: tuple[float, float, float, float] | None = None,
+) -> None:
+    """Add a steel robot pedestal with a mount site (default -90 deg Z)."""
+    bx, by, bz = base_pos
+    ped = cell.worldbody.add_body(name=name, pos=[bx, by, 0.0])
+    col_h = (bz - 0.050) * 0.5
+    ped.add_geom(
+        name=f"{geom_prefix}pedestal_column",
         type=mujoco.mjtGeom.mjGEOM_BOX,
-        pos=[0.0, 0.0, 0.019],
-        size=[0.14, 0.095, 0.012],
-        mass=0.45,
+        pos=[0.0, 0.0, col_h],
+        size=[col_half, col_half, col_h],
+        rgba=[0.55, 0.62, 0.64, 1.0],
         contype=1,
         conaffinity=1,
         condim=4,
-        friction=[0.5, 0.005, 0.0001],
-        rgba=[0.84, 0.57, 0.22, 1.0],
     )
-    return tray
+    ped.add_geom(
+        name=f"{geom_prefix}pedestal_plate",
+        type=mujoco.mjtGeom.mjGEOM_BOX,
+        pos=[0.0, 0.0, bz - 0.025],
+        size=[plate_half, plate_half, 0.025],
+        rgba=[0.55, 0.62, 0.64, 1.0],
+        contype=1,
+        conaffinity=1,
+        condim=4,
+    )
+    ped.add_site(
+        name=mount_site,
+        pos=[0.0, 0.0, bz],
+        quat=list(mount_quat if mount_quat is not None else ws.ARM_BASE_QUAT),
+        size=[0.008, 0.0, 0.0],
+        group=3,
+    )
+
+
+def _add_mbco4_oven(
+    cell: mujoco.MjSpec,
+    *,
+    door_closed: bool = False,
+    articulated_door: bool = False,
+    blocked: bool = False,
+    door_angle_rad: float | None = None,
+) -> None:
+    """Attach the Maruzen MBCO-4ME oven and stand to a spanner workcell."""
+    oven = mujoco.MjSpec.from_file(str(MBCO4_MODEL_XML))
+    oven.default.name = "oven_defaults"
+    _strip_visuals_from_spec(oven)
+    for sensor in list(oven.sensors):
+        oven.delete(sensor)
+    if articulated_door:
+        for jname in ("mbco4_fan_spin", "mbco4_damper_hinge"):
+            try:
+                oven.delete(oven.joint(jname))
+            except Exception:
+                pass
+        for exc in list(oven.excludes):
+            if exc.name == "exclude_oven_handle":
+                oven.delete(exc)
+        oven.joint("mbco4_door_hinge").frictionloss = 0.35
+        oven.body("mbco4_handle").add_geom(
+            name="mbco4_latch_pawl_col",
+            type=mujoco.mjtGeom.mjGEOM_BOX,
+            pos=[0.0, 0.025, 0.055],
+            size=[0.008, 0.006, 0.008],
+            contype=2,
+            conaffinity=2,
+            condim=3,
+            friction=[0.15, 0.005, 0.001],
+            solref=[0.004, 1.0],
+            solimp=[0.95, 0.99, 0.001, 0.5, 2.0],
+            mass=0.0,
+            group=3,
+            rgba=[0.85, 0.22, 0.18, 1.0],
+        )
+        oven.body("mbco4_oven").add_geom(
+            name="mbco4_latch_catch_col",
+            type=mujoco.mjtGeom.mjGEOM_BOX,
+            pos=[0.157, -0.340, 0.361],
+            size=[0.015, 0.006, 0.012],
+            contype=2,
+            conaffinity=2,
+            condim=3,
+            friction=[0.15, 0.005, 0.001],
+            solref=[0.004, 1.0],
+            solimp=[0.95, 0.99, 0.001, 0.5, 2.0],
+            mass=0.0,
+            group=3,
+            rgba=[0.18, 0.32, 0.85, 1.0],
+        )
+    else:
+        for jname in (
+            "mbco4_door_hinge",
+            "mbco4_handle_turn",
+            "mbco4_fan_spin",
+            "mbco4_damper_slide",
+        ):
+            try:
+                oven.delete(oven.joint(jname))
+            except Exception:
+                pass
+        door_angle = (
+            door_angle_rad
+            if door_angle_rad is not None
+            else (0.0 if door_closed else 1.90)
+        )
+        oven.body("mbco4_door").quat = [
+            math.cos(door_angle / 2.0),
+            0.0,
+            0.0,
+            -math.sin(door_angle / 2.0),
+        ]
+    oven.body("mbco4_oven").add_site(
+        name="mbco_slot_3",
+        pos=[
+            ws.OVEN_RAIL2_OFFSET[0],
+            ws.OVEN_RAIL2_OFFSET[1],
+            ws.OVEN_RAIL2_OFFSET[2] + 0.0005,
+        ],
+        size=[0.008, 0.0, 0.0],
+        group=3,
+    )
+    if blocked:
+        oven.body("mbco4_oven").add_geom(
+            name="destination_obstruction",
+            type=mujoco.mjtGeom.mjGEOM_BOX,
+            pos=[
+                ws.OVEN_RAIL2_OFFSET[0],
+                ws.OVEN_RAIL2_OFFSET[1],
+                ws.OVEN_RAIL2_OFFSET[2] + 0.045,
+            ],
+            size=[0.17, 0.12, 0.035],
+            contype=1,
+            conaffinity=1,
+            condim=4,
+            rgba=[0.8, 0.15, 0.1, 1.0],
+        )
+    oven_frame = cell.worldbody.add_frame(pos=list(ws.OVEN_POS))
+    cell.attach(oven, frame=oven_frame, prefix="")
+    cell.worldbody.add_geom(
+        name="oven_stand",
+        type=mujoco.mjtGeom.mjGEOM_BOX,
+        pos=[ws.OVEN_POS[0], ws.OVEN_POS[1], ws.OVEN_POS[2] * 0.5],
+        size=[0.37, 0.34, ws.OVEN_POS[2] * 0.5],
+        rgba=[0.55, 0.62, 0.64, 1.0],
+        contype=1,
+        conaffinity=1,
+        condim=4,
+    )
 
 
 def _add_cooling_rack(
@@ -492,38 +658,11 @@ def compose_spanner_oven_cell(
     )
 
     # Robot pedestal & mount rotated -90 deg about Z so neutral reach points along +Y
-    bx, by, bz = layout.base_pos
-    ped = cell.worldbody.add_body(
-        name="cell_pedestal",
-        pos=[bx, by, 0.0],
-    )
-    col_h = (bz - 0.050) * 0.5
-    ped.add_geom(
-        name="pedestal_column",
-        type=mujoco.mjtGeom.mjGEOM_BOX,
-        pos=[0.0, 0.0, col_h],
-        size=[layout.pedestal_col_half, layout.pedestal_col_half, col_h],
-        rgba=[0.55, 0.62, 0.64, 1.0],
-        contype=1,
-        conaffinity=1,
-        condim=4,
-    )
-    ped.add_geom(
-        name="pedestal_plate",
-        type=mujoco.mjtGeom.mjGEOM_BOX,
-        pos=[0.0, 0.0, bz - 0.025],
-        size=[layout.pedestal_plate_half, layout.pedestal_plate_half, 0.025],
-        rgba=[0.55, 0.62, 0.64, 1.0],
-        contype=1,
-        conaffinity=1,
-        condim=4,
-    )
-    ped.add_site(
-        name="robot_mount",
-        pos=[0.0, 0.0, bz],
-        quat=list(ws.ARM_BASE_QUAT),
-        size=[0.008, 0.0, 0.0],
-        group=3,
+    _add_pedestal(
+        cell,
+        base_pos=layout.base_pos,
+        col_half=layout.pedestal_col_half,
+        plate_half=layout.pedestal_plate_half,
     )
 
     # Prep table (stainless tabletop at Z = 0.850 m)
@@ -573,110 +712,11 @@ def compose_spanner_oven_cell(
         )
 
     # Left-side Maruzen MBCO-4ME convection oven (left-hinged door swings outward!)
-    oven = mujoco.MjSpec.from_file(str(MBCO4_MODEL_XML))
-    oven.default.name = "oven_defaults"
-    _strip_visuals_from_spec(oven)
-    for sensor in list(oven.sensors):
-        oven.delete(sensor)
-    if articulated_door:
-        # Keep `mbco4_door_hinge` and `mbco4_handle_latch` live and model a physical
-        # one-way rotary cam latch (`contype=2, conaffinity=2` pawl on `mbco4_handle`
-        # colliding strictly with the strike catch on `mbco4_oven`).
-        for jname in ("mbco4_fan_spin", "mbco4_damper_hinge"):
-            try:
-                oven.delete(oven.joint(jname))
-            except Exception:
-                pass
-        for exc in list(oven.excludes):
-            if exc.name == "exclude_oven_handle":
-                oven.delete(exc)
-        oven.joint("mbco4_door_hinge").frictionloss = 0.35
-        oven.body("mbco4_handle").add_geom(
-            name="mbco4_latch_pawl_col",
-            type=mujoco.mjtGeom.mjGEOM_BOX,
-            pos=[0.0, 0.025, 0.055],
-            size=[0.008, 0.006, 0.008],
-            contype=2,
-            conaffinity=2,
-            condim=3,
-            friction=[0.15, 0.005, 0.001],
-            solref=[0.004, 1.0],
-            solimp=[0.95, 0.99, 0.001, 0.5, 2.0],
-            mass=0.0,
-            group=3,
-            rgba=[0.85, 0.22, 0.18, 1.0],
-        )
-        oven.body("mbco4_oven").add_geom(
-            name="mbco4_latch_catch_col",
-            type=mujoco.mjtGeom.mjGEOM_BOX,
-            pos=[0.157, -0.340, 0.361],
-            size=[0.015, 0.006, 0.012],
-            contype=2,
-            conaffinity=2,
-            condim=3,
-            friction=[0.15, 0.005, 0.001],
-            solref=[0.004, 1.0],
-            solimp=[0.95, 0.99, 0.001, 0.5, 2.0],
-            mass=0.0,
-            group=3,
-            rgba=[0.18, 0.32, 0.85, 1.0],
-        )
-    else:
-        # Lock oven joints to clean static poses for the transfer workcell (matches add_oven)
-        for jname in (
-            "mbco4_door_hinge",
-            "mbco4_handle_turn",
-            "mbco4_fan_spin",
-            "mbco4_damper_slide",
-        ):
-            try:
-                oven.delete(oven.joint(jname))
-            except Exception:
-                pass
-        door_angle = 0.0 if door_closed else 1.90
-        oven.body("mbco4_door").quat = [
-            math.cos(door_angle / 2.0),
-            0.0,
-            0.0,
-            -math.sin(door_angle / 2.0),
-        ]
-    # Add canonical destination site `mbco_slot_3` right at Rail #2 center
-    oven.body("mbco4_oven").add_site(
-        name="mbco_slot_3",
-        pos=[
-            ws.OVEN_RAIL2_OFFSET[0],
-            ws.OVEN_RAIL2_OFFSET[1],
-            ws.OVEN_RAIL2_OFFSET[2] + 0.0005,
-        ],
-        size=[0.008, 0.0, 0.0],
-        group=3,
-    )
-    if blocked:
-        oven.body("mbco4_oven").add_geom(
-            name="destination_obstruction",
-            type=mujoco.mjtGeom.mjGEOM_BOX,
-            pos=[
-                ws.OVEN_RAIL2_OFFSET[0],
-                ws.OVEN_RAIL2_OFFSET[1],
-                ws.OVEN_RAIL2_OFFSET[2] + 0.045,
-            ],
-            size=[0.17, 0.12, 0.035],
-            contype=1,
-            conaffinity=1,
-            condim=4,
-            rgba=[0.8, 0.15, 0.1, 1.0],
-        )
-    oven_frame = cell.worldbody.add_frame(pos=list(ws.OVEN_POS))
-    cell.attach(oven, frame=oven_frame, prefix="")
-    cell.worldbody.add_geom(
-        name="oven_stand",
-        type=mujoco.mjtGeom.mjGEOM_BOX,
-        pos=[ws.OVEN_POS[0], ws.OVEN_POS[1], ws.OVEN_POS[2] * 0.5],
-        size=[0.37, 0.34, ws.OVEN_POS[2] * 0.5],
-        rgba=[0.55, 0.62, 0.64, 1.0],
-        contype=1,
-        conaffinity=1,
-        condim=4,
+    _add_mbco4_oven(
+        cell,
+        door_closed=door_closed,
+        articulated_door=articulated_door,
+        blocked=blocked,
     )
 
     # Cobot arm + overhead spanner gripper

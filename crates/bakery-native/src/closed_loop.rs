@@ -5,7 +5,7 @@
 //! overhead RGB-D images through the [`ClosedLoopPlant`] trait. Zero `unsafe`
 //! code; compiles for both native targets and `wasm32-unknown-emscripten`.
 
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, Result};
 use nalgebra::Vector3;
 use std::path::{Path, PathBuf};
 
@@ -390,13 +390,35 @@ impl<'a, P: ClosedLoopPlant + ?Sized> ControllerState<'a, P> {
         let outcome = match res {
             Ok(()) | Err(EpisodeStop::EpisodeOver) => ("done", ""),
             Err(EpisodeStop::Abort(fault)) => {
-                // Hold current pose for 3 ticks so post-onset settle starts cleanly
-                let q_hold = self.cmd_q;
+                // When aborting unladen (e.g. `dead_gripper` right at `p_grasp`), retract
+                // cleanly upward (+26 cm) so post-abort uncompensated settle never droops
+                // the jaw into the stainless prep table.
                 let g_hold = self.cmd_g;
                 let carry = self.carrying;
+                let mut q_hold = self.cmd_q;
+                if !carry && fault == "dead_gripper" {
+                    let cur_p = self.nom.fk_grasp(&q_hold);
+                    let rot = &self.nom.ik_data.site_xmat()
+                        [self.nom.grasp_site * 9..self.nom.grasp_site * 9 + 9];
+                    let cur_yaw = rot[3].atan2(rot[0]);
+                    let safe_p = [cur_p[0], cur_p[1], cur_p[2] + 0.26];
+                    let q_safe = self.solve_ik(safe_p, cur_yaw, q_hold);
+                    let steps = 24usize;
+                    for i in 1..=steps {
+                        let s = i as f64 / steps as f64;
+                        let q_i = std::array::from_fn(|k| q_hold[k] + s * (q_safe[k] - q_hold[k]));
+                        let ctrl = self.nom.servo_ctrl(&self.meas.q, &q_i, false);
+                        if let Ok(PlantStep::Meas(m)) = self.plant.step(&ctrl, g_hold) {
+                            self.meas = m;
+                        }
+                    }
+                    q_hold = q_safe;
+                }
                 for _ in 0..3 {
                     let ctrl = self.nom.servo_ctrl(&self.meas.q, &q_hold, carry);
-                    let _ = self.plant.step(&ctrl, g_hold);
+                    if let Ok(PlantStep::Meas(m)) = self.plant.step(&ctrl, g_hold) {
+                        self.meas = m;
+                    }
                 }
                 ("abort", fault)
             }
@@ -612,9 +634,16 @@ impl<'a, P: ClosedLoopPlant + ?Sized> ControllerState<'a, P> {
             let s = i as f64 / ticks as f64;
             self.step_to(q_hold, g_start + s * (g_target - g_start), carrying, None)?;
         }
-        let hold_ticks = (hold_s / dt).round().max(18.0) as usize;
-        for _ in 0..hold_ticks {
-            self.step_to(q_hold, g_target, carrying, Some(mode))?;
+        let hold_ticks = if hold_s <= 0.0 {
+            0
+        } else if mode == "open" {
+            (hold_s / dt).round().max(10.0) as usize
+        } else {
+            (hold_s / dt).round().max(18.0) as usize
+        };
+        for i in 0..hold_ticks {
+            let check = (i >= 6).then_some(mode);
+            self.step_to(q_hold, g_target, carrying, check)?;
         }
         Ok(())
     }
@@ -630,11 +659,15 @@ impl<'a, P: ClosedLoopPlant + ?Sized> ControllerState<'a, P> {
         }
         let cloud = self.read_rgbd_cloud()?;
         let site_fk = self.nom.fk_grasp(&self.cmd_q);
-        // Spanner beam top sits +0.064 + 0.0085 = +0.0725 m above `cell_grasp`
+        // Spanner beam top sits +0.064 + 0.0085 = +0.0725 m above `cell_grasp`.
+        // Sample strictly the open-sky forward beam strip (`±14 mm` width, `[+0.02, +0.13]`
+        // clear of both the robot wrist/forearm at `along <= 0` and the rear jaw stem at
+        // `+0.155`) at the 65th percentile so neither wrist overhang nor oblique beam sides
+        // bias `dz`.
         let z_beam_fk = site_fk[2] + 0.0725;
         let along = [-yaw_rad.sin(), yaw_rad.cos()];
         Ok(measure_ee_z_offset(
-            &self.cam, &cloud, cal, target_xy, along, z_beam_fk, 0.024, -0.09, 0.14,
+            &self.cam, &cloud, cal, target_xy, along, z_beam_fk, 0.014, 0.02, 0.13, 65.0,
         ))
     }
 
@@ -666,66 +699,114 @@ impl<'a, P: ClosedLoopPlant + ?Sized> ControllerState<'a, P> {
             0.16,
             -0.022,
             0.022,
+            50.0,
         ))
     }
 }
 
-/// Hardened FR10 + Maruzen MBCO-4ME spanner-oven tray loading (`table-to-oven`).
-pub(crate) fn run_spanner_load<P: ClosedLoopPlant + ?Sized>(
-    st: &mut ControllerState<'_, P>,
-    home_q: [f64; 6],
-) -> Result<(), EpisodeStop> {
-    let open_g = st.nom.open_jaw_m;
-    let close_g = st.nom.closed_jaw_m;
-    let nom_src = st.nom.source_site;
-    let nom_dest = st.nom.dest_site;
-    let table_z_nom = nom_src[2] - 0.0005;
+struct SpannerMotionProfile {
+    peek: [f64; 3],
+    pull_y: f64,
+    pull_min_x: f64,
+    corridor_x: f64,
+    corridor_y: f64,
+    back: [f64; 3],
+    return_home: bool,
+}
 
-    let table_roi = spanner_table_roi(table_z_nom);
-    let tray_roi = RoiBox {
+impl SpannerMotionProfile {
+    fn for_robot(robot: Robot) -> Self {
+        match robot {
+            // UR5e mounts closer to the oven (`base=(-0.06,-0.96,0.95)`, 0.85 m reach):
+            // keep `grasp_y >= -0.44` (flange `>= -0.695`) across peek and corridor moves so
+            // `elbow_joint` stays clear of its `-2.60 rad` upper-arm self-collision boundary.
+            Robot::UniversalRobotsUr5e => Self {
+                peek: [0.04, -0.38, 1.22],
+                pull_y: -0.44,
+                pull_min_x: 0.30,
+                corridor_x: 0.04,
+                corridor_y: -0.44,
+                back: [0.04, -0.42, 1.22],
+                return_home: false,
+            },
+            _ => Self {
+                peek: [0.16, -0.68, 1.30],
+                pull_y: -0.52,
+                pull_min_x: 0.32,
+                corridor_x: 0.04,
+                corridor_y: -0.52,
+                back: [0.16, -0.54, 1.28],
+                return_home: true,
+            },
+        }
+    }
+}
+
+fn spanner_tray_roi() -> RoiBox {
+    RoiBox {
         x_min: 0.04,
         x_max: 0.82,
         y_min: -0.52,
         y_max: 0.14,
         z_min: 0.008,
         z_max: 0.050,
-    };
+    }
+}
 
-    let cloud0 = st.read_rgbd_cloud()?;
-    let cal = calibrate_table_plane(&cloud0, table_roi, table_z_nom);
-    let (mut tx, mut ty, mut tz, mut tyaw) =
-        match perceive_tray(&st.cam, &cloud0, cal, tray_roi, table_z_nom, 0.28, true) {
-            Some(p) => (p.cx, p.cy, p.z_table, p.yaw_rad),
-            None => (nom_src[0], nom_src[1], table_z_nom, 0.0),
-        };
-    let rail2_target = perceive_fixture_target(
-        &st.cam,
-        &cloud0,
-        cal,
-        MBCO4_OVEN_ROOF_ROI,
-        MBCO4_OVEN_ROOF_CENTER,
-        nom_dest,
-        0.012,
-    );
+struct SpannerPickup {
+    dz_prep: f64,
+    x_prep_cal: f64,
+    tz: f64,
+    end_pos: [f64; 3],
+}
 
+/// Shared closed-loop overhead spanner pickup from the prep table.
+///
+/// Handles table-plane calibration, T3 `push` probe + peek re-localization, gentle
+/// two-stage rim touch-down, T4 `dead_gripper` verification, and T3 `slip` re-grasp
+/// for both oven loading (`table-to-oven`) and cooling-rack transfer (`table-to-rack`).
+#[allow(clippy::too_many_arguments)]
+fn spanner_pickup<P: ClosedLoopPlant + ?Sized>(
+    st: &mut ControllerState<'_, P>,
+    profile: &SpannerMotionProfile,
+    cal: PlaneCal,
+    table_z_nom: f64,
+    tray_roi: RoiBox,
+    mut tx: f64,
+    mut ty: f64,
+    mut tz: f64,
+    mut tyaw: f64,
+    lift_z_floor: f64,
+    clear_target_xy: [f64; 2],
+    use_pull_corridor: bool,
+) -> Result<SpannerPickup, EpisodeStop> {
+    let open_g = st.nom.open_jaw_m;
+    let close_g = st.nom.closed_jaw_m;
     let mut dz_prep = 0.0;
     let mut x_prep_cal = tx;
-    let slide_z_off = 0.042;
-    let mut p_corridor = [0.04, -0.52, (rail2_target[2] + slide_z_off).max(tz + 0.30)];
-
-    // Lift smoothly clear of standby before crossing toward the prep table.
-    let cur_p0 = st.nom.fk_grasp(&st.cmd_q);
-    let p_clear0 = [cur_p0[0] + 0.04, cur_p0[1] - 0.04, cur_p0[2] + 0.06];
-    st.move_cartesian(cur_p0, p_clear0, 0.0, 0.0, open_g, false, 0.020, 1.0, 0.04)?;
+    let mut end_pos = [clear_target_xy[0], clear_target_xy[1], lift_z_floor];
 
     for attempt in 0..2 {
         let p_hover = [tx, ty, tz + 0.160];
-        let q_hover = st.solve_ik(p_hover, tyaw, st.cmd_q);
-        st.move_joints(q_hover, open_g, false, 1.15, 0.20, 0.28)?;
+        let cur_p = st.nom.fk_grasp(&st.cmd_q);
+        if attempt == 0 && (cur_p[0] - p_hover[0]).hypot(cur_p[1] - p_hover[1]) < 0.25 {
+            st.move_cartesian(cur_p, p_hover, 0.0, tyaw, open_g, false, 0.020, 1.0, 0.28)?;
+        } else {
+            let q_hover = st.solve_ik(p_hover, tyaw, st.cmd_q);
+            st.move_joints(q_hover, open_g, false, 1.15, 0.20, 0.28)?;
+        }
         dz_prep = st.measure_spanner_z(cal, [tx, ty], tyaw)?;
 
-        // Probe to +68 mm above tray (triggers any T3 `push`), then swing clear to re-perceive!
-        let p_probe = [tx, ty, tz + 0.068 - dz_prep];
+        // Probe with rear jaw hovering +66 mm above tray center (35 mm clear of
+        // `cold_contents` and 46 mm clear of the rim even at +/-1.5 deg tilt, yet
+        // rear pad sits at +71 mm < 80 mm from tray center so any T3 `push` fires
+        // harmlessly underneath the jaw), then swing clear to re-perceive.
+        let probe_y_axis = [-tyaw.sin(), tyaw.cos()];
+        let p_probe = [
+            tx - 0.155 * probe_y_axis[0],
+            ty - 0.155 * probe_y_axis[1],
+            tz + 0.066 - dz_prep,
+        ];
         st.move_cartesian(
             p_hover, p_probe, tyaw, tyaw, open_g, false, 0.016, 1.0, 0.24,
         )?;
@@ -733,8 +814,17 @@ pub(crate) fn run_spanner_load<P: ClosedLoopPlant + ?Sized>(
             p_probe, p_hover, tyaw, tyaw, open_g, false, 0.020, 1.0, 0.04,
         )?;
 
-        let p_peek = [0.16, -0.68, 1.30];
-        st.move_cartesian(p_hover, p_peek, tyaw, 0.0, open_g, false, 0.026, 1.2, 0.12)?;
+        st.move_cartesian(
+            p_hover,
+            profile.peek,
+            tyaw,
+            0.0,
+            open_g,
+            false,
+            0.026,
+            1.2,
+            0.12,
+        )?;
         let cloud_re = st.read_rgbd_cloud()?;
         if let Some(p) = perceive_tray(&st.cam, &cloud_re, cal, tray_roi, table_z_nom, 0.28, true) {
             tx = p.cx;
@@ -748,14 +838,25 @@ pub(crate) fn run_spanner_load<P: ClosedLoopPlant + ?Sized>(
         let gx = tx + 0.007 * des_y[0];
         let gy = ty + 0.007 * des_y[1];
         let p_hover2 = [gx, gy, tz + 0.160];
-        st.move_cartesian(p_peek, p_hover2, 0.0, tyaw, open_g, false, 0.026, 1.2, 0.28)?;
+        st.move_cartesian(
+            profile.peek,
+            p_hover2,
+            0.0,
+            tyaw,
+            open_g,
+            false,
+            0.026,
+            1.2,
+            0.28,
+        )?;
         dz_prep = st.measure_spanner_z(cal, [gx, gy], tyaw)?;
         x_prep_cal = gx;
 
-        // Two-stage gentle touch-down to calibrated grasp height (`+13 mm` above table:
-        // clears `table_top` at +/-1.5 deg tilt while engaging 8.5 mm of the 20.5 mm rim).
+        // Two-stage gentle touch-down to calibrated grasp height (`+13.2 mm` above table:
+        // pad bottom sits +11.7 mm above `table_top` — clear even at +/-1.5 deg tilt — while
+        // engaging 8.3 mm of the 20.0 mm rim with unbiased 80th-percentile beam Z calibration).
         let p_pre_grasp = [gx, gy, tz + 0.045 - dz_prep];
-        let p_grasp = [gx, gy, tz + 0.0130 - dz_prep];
+        let p_grasp = [gx, gy, tz + 0.0132 - dz_prep];
         st.move_cartesian(
             p_hover2,
             p_pre_grasp,
@@ -774,35 +875,68 @@ pub(crate) fn run_spanner_load<P: ClosedLoopPlant + ?Sized>(
             tyaw,
             open_g,
             false,
-            0.004,
-            0.55,
+            0.003,
+            0.50,
             0.16,
         )?;
 
-        // Smooth silicone pinch (<= 15.5 N) with T4 `dead_gripper` check
-        st.actuate_gripper(close_g, false, 0.65, 0.36, "close")?;
+        // Two-stage soft silicone pinch: fast free-travel to +12 mm, then slow rim
+        // centering (`24.5 mm/s`) into `close_g` so sliding trays never bounce > 35 N
+        // against the rear fixed jaw, followed by T4 `dead_gripper` verification.
+        st.actuate_gripper(0.012, false, 0.28, 0.0, "none")?;
+        st.actuate_gripper(close_g, false, 0.95, 0.36, "close")?;
 
-        // Smooth lift +30 cm (covers 0.15 s T3 `slip` pull!)
-        let lift_z = (tz + 0.300).max(rail2_target[2] + slide_z_off) - dz_prep;
+        // Ultra-gentle initial breakaway lift (+42 mm) absorbs any T3 `slip` 3g jerk
+        // below 35 N without rim wedging, then smooth lift clear of prep table.
+        let lift_z = lift_z_floor.max(tz + 0.240) - dz_prep;
+        let p_lift_init = [p_grasp[0], p_grasp[1], tz + 0.053 - dz_prep];
         let p_lifted = [p_grasp[0], p_grasp[1], lift_z];
         st.move_cartesian(
-            p_grasp, p_lifted, tyaw, tyaw, close_g, true, 0.010, 0.9, 0.26,
+            p_grasp,
+            p_lift_init,
+            tyaw,
+            tyaw,
+            close_g,
+            true,
+            0.003,
+            0.32,
+            0.10,
+        )?;
+        st.move_cartesian(
+            p_lift_init,
+            p_lifted,
+            tyaw,
+            tyaw,
+            close_g,
+            true,
+            0.010,
+            0.85,
+            0.16,
         )?;
 
-        // Pull back in -Y BEFORE traversing -X so shifted trays never brush the oven front-right corner!
-        let p_pull = [p_lifted[0].max(0.32), -0.52, lift_z];
-        st.move_cartesian(
-            p_lifted, p_pull, tyaw, 0.0, close_g, true, 0.016, 0.90, 0.06,
-        )?;
-
-        p_corridor = [
-            0.04,
-            -0.52,
-            (rail2_target[2] + slide_z_off).max(tz + 0.30) - 0.5 * dz_prep,
-        ];
-        st.move_cartesian(
-            p_pull, p_corridor, 0.0, 0.0, close_g, true, 0.016, 0.95, 0.12,
-        )?;
+        if use_pull_corridor {
+            // Pull back in -Y BEFORE traversing -X so shifted trays never brush the oven corner!
+            let p_pull = [p_lifted[0].max(profile.pull_min_x), profile.pull_y, lift_z];
+            st.move_cartesian(
+                p_lifted, p_pull, tyaw, 0.0, close_g, true, 0.016, 0.90, 0.06,
+            )?;
+            end_pos = [
+                clear_target_xy[0],
+                clear_target_xy[1],
+                lift_z_floor.max(tz + 0.240) - 0.5 * dz_prep,
+            ];
+            st.move_cartesian(p_pull, end_pos, 0.0, 0.0, close_g, true, 0.016, 0.95, 0.12)?;
+        } else {
+            // Move cleanly out of the prep-table ROI toward the rack so T3 `slip` is visible.
+            end_pos = [
+                clear_target_xy[0],
+                clear_target_xy[1],
+                lift_z_floor.max(tz + 0.240) - 0.5 * dz_prep,
+            ];
+            st.move_cartesian(
+                p_lifted, end_pos, tyaw, 0.0, close_g, true, 0.014, 0.90, 0.12,
+            )?;
+        }
 
         if attempt == 0 {
             let cloud_chk = st.read_rgbd_cloud()?;
@@ -821,29 +955,134 @@ pub(crate) fn run_spanner_load<P: ClosedLoopPlant + ?Sized>(
         break;
     }
 
+    Ok(SpannerPickup {
+        dz_prep,
+        x_prep_cal,
+        tz,
+        end_pos,
+    })
+}
+
+struct SpannerScene {
+    profile: SpannerMotionProfile,
+    table_z_nom: f64,
+    tray_roi: RoiBox,
+    cloud0: Cloud,
+    cal: PlaneCal,
+    tray: (f64, f64, f64, f64),
+}
+
+fn spanner_perceive_initial<P: ClosedLoopPlant + ?Sized>(
+    st: &mut ControllerState<'_, P>,
+    always_peek: bool,
+) -> Result<SpannerScene, EpisodeStop> {
+    let open_g = st.nom.open_jaw_m;
+    let nom_src = st.nom.source_site;
+    let table_z_nom = nom_src[2] - 0.0005;
+    let profile = SpannerMotionProfile::for_robot(st.cfg.robot);
+    let table_roi = spanner_table_roi(table_z_nom);
+    let tray_roi = spanner_tray_roi();
+
+    // Swing clear to `profile.peek` when starting over the prep tray (e.g. UR5e home or
+    // combined rack transfer) so `cloud0` sees the bare table, full tray, and fixtures.
+    let cur_p0 = st.nom.fk_grasp(&st.cmd_q);
+    if always_peek || (cur_p0[0] - nom_src[0]).hypot(cur_p0[1] - nom_src[1]) < 0.22 {
+        let step_m = if always_peek { 0.022 } else { 0.020 };
+        st.move_cartesian(
+            cur_p0,
+            profile.peek,
+            0.0,
+            0.0,
+            open_g,
+            false,
+            step_m,
+            1.0,
+            0.10,
+        )?;
+    } else {
+        let p_clear0 = [cur_p0[0] + 0.04, cur_p0[1] - 0.04, cur_p0[2] + 0.06];
+        st.move_cartesian(cur_p0, p_clear0, 0.0, 0.0, open_g, false, 0.020, 1.0, 0.04)?;
+    }
+
+    let cloud0 = st.read_rgbd_cloud()?;
+    let cal = calibrate_table_plane(&cloud0, table_roi, table_z_nom);
+    let tray = match perceive_tray(&st.cam, &cloud0, cal, tray_roi, table_z_nom, 0.28, true) {
+        Some(p) => (p.cx, p.cy, p.z_table, p.yaw_rad),
+        None => (nom_src[0], nom_src[1], table_z_nom, 0.0),
+    };
+    Ok(SpannerScene {
+        profile,
+        table_z_nom,
+        tray_roi,
+        cloud0,
+        cal,
+        tray,
+    })
+}
+
+/// Hardened Maruzen MBCO-4ME spanner-oven tray loading (`table-to-oven`, all 3 arms).
+pub(crate) fn run_spanner_load<P: ClosedLoopPlant + ?Sized>(
+    st: &mut ControllerState<'_, P>,
+    home_q: [f64; 6],
+) -> Result<(), EpisodeStop> {
+    let scene = spanner_perceive_initial(st, false)?;
+    let (open_g, close_g, nom_dest) = (st.nom.open_jaw_m, st.nom.closed_jaw_m, st.nom.dest_site);
+    let (tx, ty, tz, tyaw) = scene.tray;
+    let rail2_target = perceive_fixture_target(
+        &st.cam,
+        &scene.cloud0,
+        scene.cal,
+        MBCO4_OVEN_ROOF_ROI,
+        MBCO4_OVEN_ROOF_CENTER,
+        nom_dest,
+        0.012,
+    );
+
+    let slide_z_off = 0.042;
+    let lift_floor = (rail2_target[2] + slide_z_off).max(tz + 0.30);
+    let picked = spanner_pickup(
+        st,
+        &scene.profile,
+        scene.cal,
+        scene.table_z_nom,
+        scene.tray_roi,
+        tx,
+        ty,
+        tz,
+        tyaw,
+        lift_floor,
+        [scene.profile.corridor_x, scene.profile.corridor_y],
+        true,
+    )?;
+
     // Stage 2: Align outside MBCO-4ME mouth (extra 4 mm margin to rear baffle stop)
     let rail2_grip = [
         rail2_target[0],
         rail2_target[1] - 0.009,
         rail2_target[2] + 0.011,
     ];
-    let slide_z = (rail2_target[2] + slide_z_off).max(tz + 0.30);
+    let slide_z = (rail2_target[2] + slide_z_off).max(picked.tz + 0.30);
     let p_mouth_raw = [rail2_grip[0], rail2_grip[1] - 0.50, slide_z];
+    let carry_speed = if st.cfg.robot == Robot::UniversalRobotsUr5e {
+        0.72
+    } else {
+        0.95
+    };
     st.move_cartesian(
-        p_corridor,
+        picked.end_pos,
         p_mouth_raw,
         0.0,
         0.0,
         close_g,
         true,
-        0.014,
-        0.95,
+        0.012,
+        carry_speed,
         0.26,
     )?;
 
-    let dz_oven = st.measure_spanner_z(cal, [p_mouth_raw[0], p_mouth_raw[1]], 0.0)?;
-    let sin_tilt =
-        ((dz_prep - dz_oven) / (x_prep_cal - p_mouth_raw[0]).max(0.4)).clamp(-0.04, 0.04);
+    let dz_oven = st.measure_spanner_z(scene.cal, [p_mouth_raw[0], p_mouth_raw[1]], 0.0)?;
+    let sin_tilt = ((picked.dz_prep - dz_oven) / (picked.x_prep_cal - p_mouth_raw[0]).max(0.4))
+        .clamp(-0.04, 0.04);
     let dx_oven = (-(rail2_grip[2] - st.nom.robot_mount[2]) * sin_tilt).clamp(-0.014, 0.014);
     let p_mouth = [
         rail2_grip[0] - dx_oven,
@@ -893,7 +1132,7 @@ pub(crate) fn run_spanner_load<P: ClosedLoopPlant + ?Sized>(
         0.16,
     )?;
 
-    // Stage 4: Release, clear rear rim (+4 mm +Y), lift inside chamber, retract cleanly to home
+    // Stage 4: Release, clear rear rim (+4 mm +Y), lift inside chamber, retract cleanly
     st.actuate_gripper(open_g, false, 0.45, 0.36, "open")?;
     let p_clear_rear = [p_seat[0], p_seat[1] + 0.004, p_seat[2]];
     st.move_cartesian(
@@ -925,9 +1164,138 @@ pub(crate) fn run_spanner_load<P: ClosedLoopPlant + ?Sized>(
     )?;
     let p_out = [p_up[0], rail2_grip[1] - 0.48, p_up[2]];
     st.move_cartesian(p_up, p_out, 0.0, 0.0, open_g, false, 0.016, 1.0, 0.08)?;
-    let p_back = [0.16, -0.54, 1.28];
-    st.move_cartesian(p_out, p_back, 0.0, 0.0, open_g, false, 0.022, 1.1, 0.04)?;
-    st.move_joints(home_q, open_g, false, 1.15, 0.20, 0.20)?;
+    if scene.profile.return_home {
+        st.move_cartesian(
+            p_out,
+            scene.profile.back,
+            0.0,
+            0.0,
+            open_g,
+            false,
+            0.022,
+            1.1,
+            0.04,
+        )?;
+        st.move_joints(home_q, open_g, false, 1.15, 0.20, 0.20)?;
+    }
+    Ok(())
+}
+
+/// Hardened Maruzen MBCO-4ME spanner-oven cooling-rack transfer (`table-to-rack`, all 3 arms).
+fn run_spanner_rack<P: ClosedLoopPlant + ?Sized>(
+    st: &mut ControllerState<'_, P>,
+) -> Result<(), EpisodeStop> {
+    let scene = spanner_perceive_initial(st, true)?;
+    let (open_g, close_g, nom_dest) = (st.nom.open_jaw_m, st.nom.closed_jaw_m, st.nom.dest_site);
+    let (tx, ty, tz, tyaw) = scene.tray;
+
+    let rack_roi = RoiBox {
+        x_min: nom_dest[0] - 0.28,
+        x_max: nom_dest[0] + 0.28,
+        y_min: nom_dest[1] - 0.24,
+        y_max: nom_dest[1] + 0.24,
+        z_min: nom_dest[2] - 0.045,
+        z_max: nom_dest[2] + 0.035,
+    };
+    let nom_rack_feature = match st.cfg.robot {
+        Robot::UniversalRobotsUr5e => [
+            nom_dest[0] + 0.0155,
+            nom_dest[1] + 0.0010,
+            nom_dest[2] - 0.0005,
+        ],
+        _ => [
+            nom_dest[0] + 0.0013,
+            nom_dest[1] - 0.0045,
+            nom_dest[2] - 0.0005,
+        ],
+    };
+    let rack_target = perceive_fixture_target(
+        &st.cam,
+        &scene.cloud0,
+        scene.cal,
+        rack_roi,
+        nom_rack_feature,
+        nom_dest,
+        0.015,
+    );
+    let rack_grip = [
+        rack_target[0],
+        rack_target[1] - 0.005,
+        rack_target[2] + 0.011,
+    ];
+
+    let clear_z = tz.max(rack_target[2]) + 0.22;
+    let picked = spanner_pickup(
+        st,
+        &scene.profile,
+        scene.cal,
+        scene.table_z_nom,
+        scene.tray_roi,
+        tx,
+        ty,
+        tz,
+        tyaw,
+        clear_z,
+        [rack_grip[0], rack_grip[1]],
+        false,
+    )?;
+
+    let p_over_rack = picked.end_pos;
+    let dz_rack = st.measure_spanner_z(scene.cal, [p_over_rack[0], p_over_rack[1]], 0.0)?;
+    let p_pre_place = [rack_grip[0], rack_grip[1], rack_grip[2] + 0.045 - dz_rack];
+    let p_place = [rack_grip[0], rack_grip[1], rack_grip[2] + 0.004 - dz_rack];
+    st.move_cartesian(
+        p_over_rack,
+        p_pre_place,
+        0.0,
+        0.0,
+        close_g,
+        true,
+        0.010,
+        0.85,
+        0.06,
+    )?;
+    st.move_cartesian(
+        p_pre_place,
+        p_place,
+        0.0,
+        0.0,
+        close_g,
+        true,
+        0.003,
+        0.55,
+        0.16,
+    )?;
+
+    st.actuate_gripper(open_g, false, 0.45, 0.36, "open")?;
+    let p_clear_rear = [p_place[0], p_place[1] + 0.004, p_place[2]];
+    st.move_cartesian(
+        p_place,
+        p_clear_rear,
+        0.0,
+        0.0,
+        open_g,
+        false,
+        0.004,
+        0.70,
+        0.06,
+    )?;
+    let p_retract = [
+        p_clear_rear[0],
+        p_clear_rear[1],
+        rack_grip[2] + 0.16 - dz_rack,
+    ];
+    st.move_cartesian(
+        p_clear_rear,
+        p_retract,
+        0.0,
+        0.0,
+        open_g,
+        false,
+        0.014,
+        0.90,
+        0.20,
+    )?;
     Ok(())
 }
 
@@ -1190,7 +1558,7 @@ fn run_fork_transfer<P: ClosedLoopPlant + ?Sized>(
             if let Some(left) =
                 perceive_tray(&st.cam, &cloud_chk, cal, tray_roi, table_z_nom, 0.38, true)
             {
-                st.actuate_gripper(open_g, false, 0.35, 0.36, "open")?;
+                st.actuate_gripper(open_g, false, 0.45, 0.36, "open")?;
                 tx = left.cx;
                 ty = left.cy;
                 tz = left.z_table;
@@ -1466,9 +1834,7 @@ pub fn run_hardened_transfer<P: ClosedLoopPlant + ?Sized>(
         match cfg.task {
             BakeryTask::Oven => run_spanner_load(&mut st, home_q),
             BakeryTask::Unload => run_spanner_unload(&mut st),
-            BakeryTask::Rack => {
-                bail!("Spanner cell supports table-to-oven and oven-to-table only")
-            }
+            BakeryTask::Rack => run_spanner_rack(&mut st),
         }
     } else {
         match cfg.task {

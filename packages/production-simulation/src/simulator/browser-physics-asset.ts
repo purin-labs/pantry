@@ -95,6 +95,11 @@ const FILES = {
     sha256: "80aafd78ad21699a20000aef77c1f3197f39b84b26c7e34ab5d6283a34deddb7",
     byteLength: 1142280,
   },
+  f_82ecad934774: {
+    file: "bakery_native.wasm",
+    sha256: "82ecad93477441d2a8bb96cc5268debce7c33f039296733385cee56626c3d833",
+    byteLength: 6262213,
+  },
   f_8d8c226efa48: {
     file: "models-winterhalter-uc-l.pack",
     sha256: "8d8c226efa4877349d864606367d1ac573d2e60c461cb7b5529ca9f67995a51f",
@@ -217,6 +222,15 @@ const FILES = {
   },
 } as const;
 const EXECUTIONS = {
+  e_0b6bbcb43f64: {
+    backend: "browser",
+    controllerSourceHash:
+      "62d5e10710a104bbbfc6fbfdf52a6d70f565165df8b8d6a9be1a50003b802c21",
+    controllerHash:
+      "44fce7741e88b82608b1b5a5edf708cc79976190c7da1c8c926233c0ba78f131",
+    runtimeHash:
+      "0b6bbcb43f6440b6835a7783df20144bb9f058b888d2063c086f45fa18d2efa9",
+  },
   e_181b31e0c1ea: {
     backend: "browser",
     controllerSourceHash:
@@ -272,6 +286,73 @@ const EXECUTIONS = {
       "dbd27b523f8be4a637d7358c582174a79074b53995ce1be5cb796e25fd6690b4",
   },
 } as const;
+const PACK_SETS = {
+  p_2df92fadfd3c: {
+    models: FILES.f_36e08b4e27ef,
+    "pack:aicoh-ms-30": FILES.f_a288e7bdd6a7,
+    "pack:core": FILES.f_28e2e2fda7db,
+    "pack:dobot-cr10": FILES.f_9bac42a6ccf2,
+    "pack:fairino-fr10": FILES.f_524726905d2e,
+    "pack:fairino-fr5": FILES.f_459ec453d823,
+    "pack:fanuc-crx10ial": FILES.f_80aafd78ad21,
+    "pack:ufactory-xarm6": FILES.f_92b1475e084d,
+    "pack:universal-robots-ur5e": FILES.f_ac46a118aa60,
+    "pack:hobart-hl200": FILES.f_150349381de2,
+    "pack:winterhalter-uc-l": FILES.f_8d8c226efa48,
+  },
+  p_6dc843463415: {
+    models: FILES.f_d08a82bc7b90,
+    "pack:aicoh-ms-30": FILES.f_a288e7bdd6a7,
+    "pack:core": FILES.f_58778e6ed03d,
+    "pack:dobot-cr10": FILES.f_9bac42a6ccf2,
+    "pack:fairino-fr10": FILES.f_3536429e5cd4,
+    "pack:fairino-fr5": FILES.f_459ec453d823,
+    "pack:fanuc-crx10ial": FILES.f_b539654c6aec,
+    "pack:ufactory-xarm6": FILES.f_92b1475e084d,
+    "pack:universal-robots-ur5e": FILES.f_fff77ad3dfb6,
+    "pack:hobart-hl200": FILES.f_150349381de2,
+    "pack:winterhalter-uc-l": FILES.f_8d8c226efa48,
+  },
+  p_9a7f667ac38c: {
+    models: FILES.f_0632c1801b10,
+    "pack:aicoh-ms-30": FILES.f_cdad6e1ef017,
+    "pack:core": FILES.f_92c47f05f120,
+    "pack:dobot-cr10": FILES.f_e9625f724c36,
+    "pack:fairino-fr10": FILES.f_59320a64d83e,
+    "pack:fairino-fr5": FILES.f_f3ea0465f4e9,
+    "pack:fanuc-crx10ial": FILES.f_3d5acecdd3aa,
+    "pack:ufactory-xarm6": FILES.f_5b6788fb7e3e,
+    "pack:universal-robots-ur5e": FILES.f_ae5f22351250,
+    "pack:hobart-hl200": FILES.f_ebea44337da6,
+    "pack:winterhalter-uc-l": FILES.f_7ac4101a33e8,
+  },
+  p_d3cfd761f88d: {
+    models: FILES.f_0632c1801b10,
+    "pack:aicoh-ms-30": FILES.f_cdad6e1ef017,
+    "pack:core": FILES.f_5d97acf806f7,
+    "pack:dobot-cr10": FILES.f_e9625f724c36,
+    "pack:fairino-fr10": FILES.f_59320a64d83e,
+    "pack:fairino-fr5": FILES.f_f3ea0465f4e9,
+    "pack:fanuc-crx10ial": FILES.f_3d5acecdd3aa,
+    "pack:ufactory-xarm6": FILES.f_5b6788fb7e3e,
+    "pack:universal-robots-ur5e": FILES.f_ae5f22351250,
+    "pack:hobart-hl200": FILES.f_ebea44337da6,
+    "pack:winterhalter-uc-l": FILES.f_7ac4101a33e8,
+  },
+  p_e5ab1e720cb4: {
+    models: FILES.f_7650bc6edf29,
+    "pack:aicoh-ms-30": FILES.f_a288e7bdd6a7,
+    "pack:core": FILES.f_1b39bc562064,
+    "pack:dobot-cr10": FILES.f_9bac42a6ccf2,
+    "pack:fairino-fr10": FILES.f_be37fb69e65f,
+    "pack:fairino-fr5": FILES.f_459ec453d823,
+    "pack:fanuc-crx10ial": FILES.f_80aafd78ad21,
+    "pack:ufactory-xarm6": FILES.f_92b1475e084d,
+    "pack:universal-robots-ur5e": FILES.f_ac46a118aa60,
+    "pack:hobart-hl200": FILES.f_150349381de2,
+    "pack:winterhalter-uc-l": FILES.f_8d8c226efa48,
+  },
+} as const;
 const BUNDLES = {
   "1b418dcc3b00f38437cf9171948aa73336c466b68f42946df96e2711dccd94ca": {
     id: "1b418dcc3b00f38437cf9171948aa73336c466b68f42946df96e2711dccd94ca",
@@ -279,17 +360,7 @@ const BUNDLES = {
     files: {
       module: FILES.f_1a1d72dc9996,
       wasm: FILES.f_b148021142af,
-      models: FILES.f_0632c1801b10,
-      "pack:aicoh-ms-30": FILES.f_cdad6e1ef017,
-      "pack:core": FILES.f_92c47f05f120,
-      "pack:dobot-cr10": FILES.f_e9625f724c36,
-      "pack:fairino-fr10": FILES.f_59320a64d83e,
-      "pack:fairino-fr5": FILES.f_f3ea0465f4e9,
-      "pack:fanuc-crx10ial": FILES.f_3d5acecdd3aa,
-      "pack:ufactory-xarm6": FILES.f_5b6788fb7e3e,
-      "pack:universal-robots-ur5e": FILES.f_ae5f22351250,
-      "pack:hobart-hl200": FILES.f_ebea44337da6,
-      "pack:winterhalter-uc-l": FILES.f_7ac4101a33e8,
+      ...PACK_SETS.p_9a7f667ac38c,
     },
   },
   "39d11aa0cc3fc75ddf3c6c8f737cc152fe7c495aa358b479204211a117c45609": {
@@ -298,17 +369,16 @@ const BUNDLES = {
     files: {
       module: FILES.f_1a1d72dc9996,
       wasm: FILES.f_e8dd378db298,
-      models: FILES.f_7650bc6edf29,
-      "pack:aicoh-ms-30": FILES.f_a288e7bdd6a7,
-      "pack:core": FILES.f_1b39bc562064,
-      "pack:dobot-cr10": FILES.f_9bac42a6ccf2,
-      "pack:fairino-fr10": FILES.f_be37fb69e65f,
-      "pack:fairino-fr5": FILES.f_459ec453d823,
-      "pack:fanuc-crx10ial": FILES.f_80aafd78ad21,
-      "pack:ufactory-xarm6": FILES.f_92b1475e084d,
-      "pack:universal-robots-ur5e": FILES.f_ac46a118aa60,
-      "pack:hobart-hl200": FILES.f_150349381de2,
-      "pack:winterhalter-uc-l": FILES.f_8d8c226efa48,
+      ...PACK_SETS.p_e5ab1e720cb4,
+    },
+  },
+  "468e95da77e3e1c4c1586f4c74b8a4a5b8cf8c3d5332ec65a52988db71f2a017": {
+    id: "468e95da77e3e1c4c1586f4c74b8a4a5b8cf8c3d5332ec65a52988db71f2a017",
+    schemaVersion: 2,
+    files: {
+      module: FILES.f_1a1d72dc9996,
+      wasm: FILES.f_82ecad934774,
+      ...PACK_SETS.p_6dc843463415,
     },
   },
   "67aa243ee7006b808859f23dd8f21337edc1168d2f11be5569740e4caa4f3073": {
@@ -317,17 +387,7 @@ const BUNDLES = {
     files: {
       module: FILES.f_1a1d72dc9996,
       wasm: FILES.f_94ce6519be23,
-      models: FILES.f_36e08b4e27ef,
-      "pack:aicoh-ms-30": FILES.f_a288e7bdd6a7,
-      "pack:core": FILES.f_28e2e2fda7db,
-      "pack:dobot-cr10": FILES.f_9bac42a6ccf2,
-      "pack:fairino-fr10": FILES.f_524726905d2e,
-      "pack:fairino-fr5": FILES.f_459ec453d823,
-      "pack:fanuc-crx10ial": FILES.f_80aafd78ad21,
-      "pack:ufactory-xarm6": FILES.f_92b1475e084d,
-      "pack:universal-robots-ur5e": FILES.f_ac46a118aa60,
-      "pack:hobart-hl200": FILES.f_150349381de2,
-      "pack:winterhalter-uc-l": FILES.f_8d8c226efa48,
+      ...PACK_SETS.p_2df92fadfd3c,
     },
   },
   "762e4d1f72cf484a9db13ee69083f5cc59b4f556dbb4e97778afffce94958b58": {
@@ -336,17 +396,7 @@ const BUNDLES = {
     files: {
       module: FILES.f_1a1d72dc9996,
       wasm: FILES.f_d20d615421eb,
-      models: FILES.f_d08a82bc7b90,
-      "pack:aicoh-ms-30": FILES.f_a288e7bdd6a7,
-      "pack:core": FILES.f_58778e6ed03d,
-      "pack:dobot-cr10": FILES.f_9bac42a6ccf2,
-      "pack:fairino-fr10": FILES.f_3536429e5cd4,
-      "pack:fairino-fr5": FILES.f_459ec453d823,
-      "pack:fanuc-crx10ial": FILES.f_b539654c6aec,
-      "pack:ufactory-xarm6": FILES.f_92b1475e084d,
-      "pack:universal-robots-ur5e": FILES.f_fff77ad3dfb6,
-      "pack:hobart-hl200": FILES.f_150349381de2,
-      "pack:winterhalter-uc-l": FILES.f_8d8c226efa48,
+      ...PACK_SETS.p_6dc843463415,
     },
   },
   "993537c29a8466046ea318657184cd83d44bb2c36b87b9bbdde376dfae10918c": {
@@ -364,22 +414,12 @@ const BUNDLES = {
     files: {
       module: FILES.f_1a1d72dc9996,
       wasm: FILES.f_fe680f979413,
-      models: FILES.f_0632c1801b10,
-      "pack:aicoh-ms-30": FILES.f_cdad6e1ef017,
-      "pack:core": FILES.f_5d97acf806f7,
-      "pack:dobot-cr10": FILES.f_e9625f724c36,
-      "pack:fairino-fr10": FILES.f_59320a64d83e,
-      "pack:fairino-fr5": FILES.f_f3ea0465f4e9,
-      "pack:fanuc-crx10ial": FILES.f_3d5acecdd3aa,
-      "pack:ufactory-xarm6": FILES.f_5b6788fb7e3e,
-      "pack:universal-robots-ur5e": FILES.f_ae5f22351250,
-      "pack:hobart-hl200": FILES.f_ebea44337da6,
-      "pack:winterhalter-uc-l": FILES.f_7ac4101a33e8,
+      ...PACK_SETS.p_d3cfd761f88d,
     },
   },
 } as const;
 export const BAKERY_BROWSER_BUNDLE =
-  BUNDLES["762e4d1f72cf484a9db13ee69083f5cc59b4f556dbb4e97778afffce94958b58"];
+  BUNDLES["468e95da77e3e1c4c1586f4c74b8a4a5b8cf8c3d5332ec65a52988db71f2a017"];
 export const BAKERY_APPLIANCE_BUILDS = [
   {
     appliance: "la-marzocco-linea-classic-s-2g",
@@ -445,6 +485,39 @@ export const BAKERY_APPLIANCE_BUILDS = [
     bundle:
       BUNDLES[
         "39d11aa0cc3fc75ddf3c6c8f737cc152fe7c495aa358b479204211a117c45609"
+      ],
+  },
+  {
+    appliance: "la-marzocco-linea-classic-s-2g",
+    modelHash:
+      "e7d518fcc222667d95334783f61cf3812ece6a36f0652a2c05005438f86efde7",
+    execution: EXECUTIONS.e_0b6bbcb43f64,
+    visual: FILES.f_142fac26dd1f,
+    bundle:
+      BUNDLES[
+        "468e95da77e3e1c4c1586f4c74b8a4a5b8cf8c3d5332ec65a52988db71f2a017"
+      ],
+  },
+  {
+    appliance: "victoria-arduino-eagle-one-2g",
+    modelHash:
+      "d5fd10178284c2926342455d562c21bbee3d295ead7c09115c72297fcea0a40c",
+    execution: EXECUTIONS.e_0b6bbcb43f64,
+    visual: FILES.f_a2e90975a743,
+    bundle:
+      BUNDLES[
+        "468e95da77e3e1c4c1586f4c74b8a4a5b8cf8c3d5332ec65a52988db71f2a017"
+      ],
+  },
+  {
+    appliance: "victoria-arduino-e1-prima",
+    modelHash:
+      "b161658694ea70885fe423194107c7ae3077571d36e2e8d12c57cdd0b9c00244",
+    execution: EXECUTIONS.e_0b6bbcb43f64,
+    visual: FILES.f_0bed3ac84f7f,
+    bundle:
+      BUNDLES[
+        "468e95da77e3e1c4c1586f4c74b8a4a5b8cf8c3d5332ec65a52988db71f2a017"
       ],
   },
   {

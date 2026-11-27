@@ -477,6 +477,7 @@ pub fn measure_ee_z_offset(
     half_width: f64,
     along_min: f64,
     along_max: f64,
+    percentile_p: f64,
 ) -> f64 {
     let (dx_cam, dy_cam) = cam.cam_xy_shift(cal, z_beam_fk);
     let perp_unit = [-along_unit[1], along_unit[0]];
@@ -498,7 +499,7 @@ pub fn measure_ee_z_offset(
     if zs.len() < 25 {
         return 0.0;
     }
-    let z_obs = percentile(&mut zs, 50.0);
+    let z_obs = percentile(&mut zs, percentile_p);
     (z_obs - z_beam_fk).clamp(-0.045, 0.045)
 }
 
@@ -525,7 +526,7 @@ impl FaultMonitor {
         let mut g_hist = VecDeque::with_capacity(48);
         g_hist.push_back(init_g);
         let (close_stuck_thresh, open_stuck_thresh) = if is_spanner {
-            (0.034, 0.012)
+            (0.011, 0.012)
         } else {
             (0.018, 0.002)
         };
