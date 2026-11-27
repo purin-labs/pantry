@@ -263,6 +263,7 @@ function readFile(file) {
     stars: [],
     uses: [],
     publics: new Set(),
+    ports: new Set(), // the type arguments of `definePort<T>(…)`
   };
   const bindings = new Map(); // local name -> { file, name }
   const namespaces = new Map(); // local name -> file
@@ -422,6 +423,16 @@ function readFile(file) {
     if (ts.isCallExpression(node)) {
       const callee = node.expression;
       const argument = node.arguments[0];
+      const port = node.typeArguments?.[0];
+      if (
+        ts.isIdentifier(callee) &&
+        callee.text === "definePort" &&
+        port !== undefined &&
+        ts.isTypeReferenceNode(port) &&
+        ts.isIdentifier(port.typeName)
+      ) {
+        info.ports.add(port.typeName.text);
+      }
       const literal =
         argument && ts.isStringLiteralLike(argument) ? argument.text : null;
       if (literal !== null && callee.kind === ts.SyntaxKind.ImportKeyword) {
@@ -643,6 +654,8 @@ const keepGroups = Object.entries(baseline.keep ?? {}).map(
   }),
 );
 
+// A group names its files, and either its names or `"ports": true`: the
+// interface types that a definePort call of the same file names.
 function keptBy(entry) {
   const [file, name] = entry.split("#");
   return (
@@ -651,7 +664,9 @@ function keptBy(entry) {
         (group.files ?? []).some((pattern) =>
           posix.matchesGlob(file, pattern),
         ) &&
-        (group.names === undefined || group.names.includes(name)),
+        (group.ports === true
+          ? files.get(file)?.ports.has(name) === true
+          : group.names === undefined || group.names.includes(name)),
     ) ?? null
   );
 }
