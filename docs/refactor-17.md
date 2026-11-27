@@ -418,6 +418,16 @@ The layer debts, one line for each step that lowers a count:
   `connectorEvalStore` (Brain contract). What stays: the Portal (144), Slack (19),
   the webhooks (9) and voice (3).
 
+- 2026-11-27, `table-read`: 85 to 50. An area reads a table of another area through
+  the contract of the owner (7 reads). A foundation module reads a table of a higher
+  module through a port that the owner implements with the same SQL: the subject
+  reads of the request authority (`inboxSubjectReads`, `workflowSubjectReads`), the
+  Vault reads of integration tables, the connection reads of Organisation tables,
+  the installation pins, the Slack identity links, the fork history and the Slack
+  channels of collaboration. No SQL statement changed. What stays in this scope: 17
+  reads, each one side of one statement over tables of several owners (the two
+  `UNION ALL` reads of the access subjects, four writes with a `SELECT`, two JOINs).
+
 The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
 the state of Stage A. Its branches are gone; the work is on `dev`.
