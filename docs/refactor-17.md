@@ -474,6 +474,14 @@ The layer debts, one line for each step that lowers a count:
   can move to the Inbox when the `mail` part of the provider adapter catalogue, which
   no run-time code reads, is removed.
 
+- 2026-11-27, `env-merge`: 75 methods to 0; the 16 merges stay. Each module that
+  calls an Actor declares the RPC interface that it calls, with exact types, and
+  gets its stub with that interface (`OrganisationBrainRpc`, `OrganisationInboxRpc`,
+  `OrganisationKitchenRpc`, `SlackConnectorRpc`, `CaseGoalRpc` and the others). The
+  Actor class lists each interface in `implements`, so a rename breaks the build. No
+  RPC method name changed. The 16 merges are the design: the Worker gives each
+  Durable Object binding to `Env`.
+
 The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
 the state of Stage A. Its branches are gone; the work is on `dev`.
