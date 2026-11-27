@@ -1,5 +1,8 @@
 import type { D1PreparedStatement } from "@cloudflare/workers-types";
-import type { OrganisationDatabaseSession } from "@purin-labs/kernel/database-handles";
+import type {
+  OrganisationDatabase,
+  OrganisationDatabaseSession,
+} from "@purin-labs/kernel/database-handles";
 
 /**
  * The cleanup of a removed account at its provider (Plan 80). The account
@@ -48,4 +51,27 @@ export function prepareProviderAccountCleanup(
       row.providerWebhookIds,
       row.providerContext,
     );
+}
+
+/**
+ * The number of provider cleanups of an Organisation that are not finished:
+ * pending, running or waiting for a retry. Zero when the count is not a
+ * number.
+ */
+export async function countOpenProviderAccountCleanups(
+  db: Pick<OrganisationDatabase, "prepare">,
+  organisationId: string,
+): Promise<number> {
+  const row = await db
+    .prepare(
+      `SELECT COUNT(*) AS pending
+       FROM provider_account_cleanup
+       WHERE organisation_id = ?
+         AND lifecycle IN (
+           'pending_provider_cleanup', 'running_provider_cleanup', 'retry_scheduled'
+         )`,
+    )
+    .bind(organisationId)
+    .first<{ readonly pending: unknown }>();
+  return typeof row?.pending === "number" ? row.pending : 0;
 }

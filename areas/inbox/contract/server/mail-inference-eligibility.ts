@@ -7,6 +7,7 @@ import {
   typeSafeAuthorityRevision,
   type TypeSafeAuthority,
 } from "@purin-labs/agent/integrations/typesafe/authority";
+import { mailClassificationEligible } from "@purin-labs/area-integrations-contract/server/mail-classification-eligibility";
 
 export async function mailInferenceEligible(
   input: Readonly<{
@@ -18,22 +19,13 @@ export async function mailInferenceEligible(
     now: number;
   }>,
 ): Promise<boolean> {
-  const row = await input.db
-    .prepare(
-      `SELECT 1 AS eligible FROM mail_classification_eligibility
-    WHERE organisation_id = ? AND integration_account_id = ? AND source_pin = ?
-      AND funding = ? AND connection_revision = ? AND model = 'jev-1.13.0' AND purpose = 'mail_classification'
-      AND disclosed_recipient = 'typesafe' AND reviewed_at <= ? AND review_expires_at > ? AND revoked_at IS NULL`,
-    )
-    .bind(
-      input.organisationId,
-      input.integrationAccountId,
-      input.sourcePin,
-      input.typesafe.kind,
-      typeSafeAuthorityRevision(input.typesafe),
-      input.now,
-      input.now,
-    )
-    .first<{ eligible: number }>();
-  return row?.eligible === 1;
+  return mailClassificationEligible({
+    db: input.db,
+    organisationId: input.organisationId,
+    integrationAccountId: input.integrationAccountId,
+    sourcePin: input.sourcePin,
+    funding: input.typesafe.kind,
+    connectionRevision: typeSafeAuthorityRevision(input.typesafe),
+    now: input.now,
+  });
 }

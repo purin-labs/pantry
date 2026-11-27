@@ -6,6 +6,7 @@ import type {
   OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { isRecord } from "@purin-labs/std";
+import { readWhatsAppBusinessAccountId } from "@purin-labs/area-inbox-contract/server/account-erasure";
 
 export type ProviderCleanupBaseInput<
   P extends keyof ProviderCleanupByProvider,
@@ -31,17 +32,14 @@ export async function readWhatsAppCleanupContext(input: {
   readonly integrationAccountId: IntegrationAccountId;
   readonly removeApplicationSubscription: boolean;
 }): Promise<string | null> {
-  const row = await input.db
-    .prepare(
-      `SELECT waba_id AS wabaId FROM whatsapp_phone_number_account
-     WHERE integration_account_id = ?`,
-    )
-    .bind(input.integrationAccountId)
-    .first<{ readonly wabaId: unknown }>();
-  return typeof row?.wabaId === "string" && row.wabaId.length > 0
+  const wabaId = await readWhatsAppBusinessAccountId(
+    input.db,
+    input.integrationAccountId,
+  );
+  return wabaId !== null
     ? JSON.stringify({
         provider: "whatsapp",
-        wabaId: row.wabaId,
+        wabaId,
         removeApplicationSubscription: input.removeApplicationSubscription,
       })
     : null;

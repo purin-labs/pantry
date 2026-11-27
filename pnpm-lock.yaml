@@ -942,6 +942,9 @@ importers:
       '@purin-labs/agent':
         specifier: workspace:*
         version: link:../../../foundation/agent
+      '@purin-labs/area-integrations-contract':
+        specifier: workspace:*
+        version: link:../../integrations/contract
       '@purin-labs/authority':
         specifier: workspace:*
         version: link:../../../foundation/authority

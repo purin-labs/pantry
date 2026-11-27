@@ -5,6 +5,7 @@ import type {
   PrinterTask,
 } from "@purin-labs/control-api";
 
+import { locationHasActiveReceiptPrinter } from "@purin-labs/area-devices-contract/server/receipt-printers";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
@@ -298,24 +299,17 @@ async function runPrinterTask(
 
 /**
  * Whether an active receipt printer stands on an active gateway of this
- * location. It reads the Devices records and writes nothing.
+ * location. The Devices contract reads its records and writes nothing.
  */
-async function locationHasReceiptPrinter(
+function locationHasReceiptPrinter(
   deps: CounterRegisterDeps,
   locationId: string,
 ): Promise<boolean> {
-  const row = await deps.scope.database
-    .prepare(
-      `SELECT 1 AS found FROM device_enrollment AS device
-         JOIN device_gateway AS gateway ON gateway.gateway_id = device.gateway_id
-        WHERE device.organisation_id = ? AND device.device_kind = 'receipt_printer'
-          AND device.state = 'active' AND gateway.state = 'active'
-          AND gateway.organisation_id = ? AND gateway.location_id = ?
-        LIMIT 1`,
-    )
-    .bind(deps.organisationId, deps.organisationId, locationId)
-    .first<{ found: number }>();
-  return row !== null;
+  return locationHasActiveReceiptPrinter(
+    deps.scope.database,
+    deps.organisationId,
+    locationId,
+  );
 }
 
 function receiptLine(line: OrderLine): CounterReceiptLine {

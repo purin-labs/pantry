@@ -35,9 +35,11 @@ import {
   emptyOrganisationCostPlan,
   readOrganisationCostPlan,
   readOrganisationLotInvoiceCosts,
+} from "./cost-plan-store";
+import {
   readReplenishmentSupplierPayables,
   type ReplenishmentPayableSummary,
-} from "./cost-plan-store";
+} from "@purin-labs/area-commerce-contract/server/supplier-payables";
 import { productPhotos, saleOffers } from "@purin-labs/area-kitchen-contract/server/inventory-overview";
 
 const WINDOW_DAYS = 30;

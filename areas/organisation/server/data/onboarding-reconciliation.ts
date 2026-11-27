@@ -1,3 +1,4 @@
+import { countOpenProviderAccountCleanups } from "@purin-labs/area-integrations-contract/server/provider-account-cleanup";
 import { purgeArchivedOrganisation } from "@purin-labs/tenancy/data/organisation-purge";
 import {
   PURGE_R2_PREFIXES,
@@ -1166,20 +1167,11 @@ async function reconcileArchivedOrganisation(
     throw new Error("archived organisation cleanup state is missing");
   }
   if (cleanup.status === "pending_provider_cleanup") {
-    const providerCleanup = await db
-      .prepare(
-        `SELECT COUNT(*) AS pending
-       FROM provider_account_cleanup
-       WHERE organisation_id = ?
-         AND lifecycle IN (
-           'pending_provider_cleanup', 'running_provider_cleanup', 'retry_scheduled'
-         )`,
-      )
-      .bind(organisation.organisationId)
-      .first<{ readonly pending: unknown }>();
     if (
-      typeof providerCleanup?.pending === "number" &&
-      providerCleanup.pending > 0
+      (await countOpenProviderAccountCleanups(
+        db,
+        organisation.organisationId,
+      )) > 0
     ) {
       return 0;
     }

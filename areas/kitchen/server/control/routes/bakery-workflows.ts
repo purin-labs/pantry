@@ -1,7 +1,7 @@
 import { parseRunFindings } from "@purin-labs/bakery-workflow/findings";
 import { isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { listOpenWorkflowProposals } from "../../bakery/workflow-proposals";
+import { listOpenWorkflowProposals } from "@purin-labs/area-organisation-contract/server/operator-drafts";
 import {
   MAX_WORKFLOW_DOCUMENT_BYTES,
   applyWorkflowRevision,

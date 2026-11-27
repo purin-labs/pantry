@@ -5,7 +5,7 @@ import {
   stepSeconds,
   stepWorkers,
 } from "@purin-labs/bakery-workflow/draft";
-import { listOpenWorkflowProposals } from "../../bakery/workflow-proposals";
+import { listOpenWorkflowProposals } from "@purin-labs/area-organisation-contract/server/operator-drafts";
 import {
   listAppliedWorkflows,
   readCurrentWorkflow,

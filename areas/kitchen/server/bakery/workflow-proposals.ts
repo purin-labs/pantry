@@ -1,4 +1,3 @@
-import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { compileDraft, draftSeed } from "@purin-labs/bakery-workflow/draft";
 import {
   applyWorkflowChanges,
@@ -219,48 +218,4 @@ export async function applyApprovedWorkflowChange(
   if (!merged.ok) return { kind: "draft_unavailable" };
   await signalBakeryWorkflowApplied(env, organisationId, command.workflowId);
   return { kind: "applied", receipt };
-}
-
-type OpenWorkflowProposal = Readonly<{
-  draftId: string;
-  command: WorkflowChangeCommand;
-  createdAt: number;
-  expiresAt: number;
-}>;
-
-/** Proposals that wait for this person, for one recipe. */
-export async function listOpenWorkflowProposals(
-  db: OrganisationDatabase,
-  organisationId: OrganisationId,
-  workflowId: string,
-  actorUserId: string,
-  now: number,
-): Promise<readonly OpenWorkflowProposal[]> {
-  const rows = await db
-    .prepare(
-      `SELECT draft_id AS draftId,
-              json_extract(command_json, '$.change') AS command,
-              created_at AS createdAt, expires_at AS expiresAt
-         FROM operator_configuration_draft
-        WHERE organisation_id = ? AND actor_user_id = ?
-          AND state = 'pending' AND expires_at > ?
-          AND json_extract(command_json, '$.family') = 'workflow_change'
-          AND json_extract(command_json, '$.change.workflowId') = ?
-        ORDER BY created_at DESC LIMIT 5`,
-    )
-    .bind(organisationId, actorUserId, now, workflowId)
-    .all<
-      Readonly<{
-        draftId: string;
-        command: string;
-        createdAt: number;
-        expiresAt: number;
-      }>
-    >();
-  return (rows.results ?? []).map((row) => ({
-    draftId: row.draftId,
-    command: JSON.parse(row.command) as WorkflowChangeCommand,
-    createdAt: row.createdAt,
-    expiresAt: row.expiresAt,
-  }));
 }

@@ -54,6 +54,26 @@ export function prepareOrganisationPurgeSenderAccounts(
   ];
 }
 
+/**
+ * The WhatsApp Business account of a phone-number account, for the provider
+ * cleanup of its removal. Null when the account has none.
+ */
+export async function readWhatsAppBusinessAccountId(
+  session: Pick<OrganisationDatabaseSession, "prepare">,
+  integrationAccountId: IntegrationAccountId,
+): Promise<string | null> {
+  const row = await session
+    .prepare(
+      `SELECT waba_id AS wabaId FROM whatsapp_phone_number_account
+     WHERE integration_account_id = ?`,
+    )
+    .bind(integrationAccountId)
+    .first<{ readonly wabaId: unknown }>();
+  return typeof row?.wabaId === "string" && row.wabaId.length > 0
+    ? row.wabaId
+    : null;
+}
+
 export function whatsappErasureStatements(
   session: Pick<OrganisationDatabaseSession, "prepare">,
   scope:
