@@ -2,11 +2,12 @@
 // each Actor stops its own work, and an Actor can empty its content tables.
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { FrozenOrganisationPlacementMove } from "@purin-labs/tenancy/data/organisation-placement";
-import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import type { ActorExportError } from "./actor-export";
 import {
   listPlacementActorRegistryEntries,
+  type ActorFenceToken,
   type ActorRegistryError,
 } from "./actor-registry";
 import { isMovedRegistryEntry } from "./actor-relocation-exclusion";
@@ -26,15 +27,42 @@ export function eraseActorContentSql(sql: SqlStorage): void {
     sql.exec(`DELETE FROM "${table.name.replace(/"/g, '""')}"`);
 }
 
+/** The fence token of the placement that a stop is for. */
+type QuiescenceRequest = { readonly expectedFenceToken: ActorFenceToken };
+
 /**
- * The namespaces of the four Actors that stop their work for a move. Each
- * Actor has its own stop method, so the types come from the bindings.
+ * The stop method of each placed Actor that a placement move calls. Each
+ * Actor has its own: the Organisation stops its archive cleanup, the Session
+ * its Portal chat cleanup, the Case its conversation and the Connector its
+ * execution. The class of each Actor implements its interface.
  */
+export interface OrganisationQuiescenceRpc extends Rpc.DurableObjectBranded {
+  quiesceArchiveCleanup(
+    input: QuiescenceRequest,
+  ): Promise<Result<OrganisationId, ActorExportError>>;
+}
+export interface SessionQuiescenceRpc extends Rpc.DurableObjectBranded {
+  quiescePortalChatCleanup(
+    input: QuiescenceRequest,
+  ): Promise<Result<null, ActorExportError>>;
+}
+export interface CaseQuiescenceRpc extends Rpc.DurableObjectBranded {
+  quiesceConversationExecution(
+    input: QuiescenceRequest,
+  ): Promise<Result<null, ActorExportError>>;
+}
+export interface ConnectorQuiescenceRpc extends Rpc.DurableObjectBranded {
+  quiesceExecution(
+    input: QuiescenceRequest,
+  ): Promise<Result<null, ActorExportError>>;
+}
+
+/** The namespaces of the four Actors that stop their work for a move. */
 export type PlacementExecutionNamespaces = Readonly<{
-  organisation: Env["ORGANISATION"];
-  session: Env["SESSION"];
-  case: Env["CASE"];
-  connector: Env["CONNECTOR"];
+  organisation: DurableObjectNamespace<OrganisationQuiescenceRpc>;
+  session: DurableObjectNamespace<SessionQuiescenceRpc>;
+  case: DurableObjectNamespace<CaseQuiescenceRpc>;
+  connector: DurableObjectNamespace<ConnectorQuiescenceRpc>;
 }>;
 
 export async function quiescePlacementExecution(

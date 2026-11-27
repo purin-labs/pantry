@@ -63,6 +63,7 @@ import {
   listPlacementActorRegistryEntries,
   parseActorRegistryId,
   retireActorRegistryEntry,
+  type ActorFenceToken,
   type ActorRegistryEntry,
   type ActorRegistryError,
 } from "./actor-registry";
@@ -386,6 +387,47 @@ type RelocationItemRow = {
   updatedAt: unknown;
 };
 
+/**
+ * The RPC method of the Organisation Actor that settles an observed provider
+ * receipt before a frozen relocation copies its state. The class of the
+ * Worker implements it.
+ */
+export interface RelocationReceiptOrganisationRpc
+  extends Rpc.DurableObjectBranded {
+  reconcileRelocationReceipt(
+    input: Readonly<{
+      relocationId: ActorRelocationId;
+      expectedFenceToken: ActorFenceToken;
+      receipt: CommerceProviderReceipt;
+      now: number;
+    }>,
+  ): Promise<Result<null, RelocationReceiptError>>;
+}
+
+/**
+ * The RPC method of the Session Actor that settles its Code Mode work before
+ * a frozen relocation copies its state. The Session class implements it.
+ */
+export interface RelocationSettlementSessionRpc
+  extends Rpc.DurableObjectBranded {
+  reconcileRelocationSettlements(
+    input: Readonly<{
+      relocationId: ActorRelocationId;
+      expectedFenceToken: ActorFenceToken;
+      now: number;
+    }>,
+  ): Promise<
+    Result<
+      null,
+      | RelocationReceiptError
+      | {
+          readonly code: "relocation_provider_work_unresolved";
+          readonly operationId: string;
+        }
+    >
+  >;
+}
+
 export type RelocationBindings = OrganisationPlacementBindings &
   Pick<
     Env,
@@ -642,7 +684,7 @@ export async function reconcileActorRelocationReceipt(input: {
   if (!source.ok) return source;
   for (const entry of source.value.entries) {
     if (entry.identity.objectKind !== "organisation") continue;
-    const organisation = actorStub(
+    const organisation = actorStub<RelocationReceiptOrganisationRpc>(
       input.env.ORGANISATION,
       entry.physicalObjectName,
       entry.placement,
@@ -987,7 +1029,7 @@ export async function resumeActorRelocation(input: {
         entry.identity.objectKind !== "session"
       )
         continue;
-      const session = actorStub(
+      const session = actorStub<RelocationSettlementSessionRpc>(
         input.env.SESSION,
         entry.physicalObjectName,
         entry.placement,

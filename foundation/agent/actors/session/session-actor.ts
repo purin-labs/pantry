@@ -150,6 +150,8 @@ import {
   type PortalChatCleanupRequest,
 } from "../portal-chat-cleanup";
 import type { ActorFenceToken } from "@purin-labs/actor-runtime/actors/actor-registry";
+import type { RelocationSettlementSessionRpc } from "@purin-labs/actor-runtime/actors/actor-relocation";
+import type { SessionQuiescenceRpc } from "@purin-labs/actor-runtime/actors/placement-execution-quiescence";
 import type { ActorExportError } from "@purin-labs/actor-runtime/actors/actor-export";
 import {
   failSessionTurnStream,
@@ -221,7 +223,11 @@ import { SessionTurnRecovery } from "./session-turn-recovery";
  */
 export abstract class SessionActor
   extends PlacedActor<null>
-  implements SessionCheckpointsRpc, SessionHarnessTurnsRpc
+  implements
+    SessionCheckpointsRpc,
+    SessionHarnessTurnsRpc,
+    SessionQuiescenceRpc,
+    RelocationSettlementSessionRpc
 {
   /**
    * The agent tools and the parts of the product areas. The Worker's class
