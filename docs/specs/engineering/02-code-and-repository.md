@@ -130,7 +130,8 @@ revision. These lints guard the repository:
 | `lint:runtime-boundary` | A crossing between the commerce engine and the Platform, and a Platform route import from actor, Slack or chat code                         |
 | `lint:file-size`        | A new source file over 3,000 lines, or growth of a listed file                                                                              |
 | `lint:clones`           | A new copy of product code, or more copied lines in a file pair (jscpd)                                                                     |
-| `lint:unused`           | A new unused file or export (knip), or more package entry exports with no importer                                                          |
+| `lint:unused`           | A new unused file or export (knip)                                                                                                          |
+| `lint:entry-exports`    | More exports of a package entry file that no file imports (`scripts/entry-exports-ratchet.json` holds a count for each package)             |
 | `lint:doc-links`        | A relative Markdown link to a file that does not exist, unless the ratchet lists its page and target. A second copy of a listed link passes |
 | `lint:plan-numbers`     | A plan or refactor number in source code that the table "Old plan numbers" of `docs/specs/README.md` lacks                                  |
 | `lint:lint-paths`       | A path in `eslint.config.mjs`, a check script or a ratchet file that matches no tracked file                                                |
