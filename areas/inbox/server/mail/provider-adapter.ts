@@ -57,7 +57,7 @@ type MailProviderAdapterByProvider = {
   };
 };
 
-export type MailIntegrationProvider = keyof MailProviderAdapterByProvider;
+type MailIntegrationProvider = keyof MailProviderAdapterByProvider;
 
 export type MailProviderAdapter<
   Provider extends MailIntegrationProvider = MailIntegrationProvider,

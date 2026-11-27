@@ -223,12 +223,8 @@ type ProviderConnectionAdapter<P extends ActiveIntegrationProvider> = {
   readonly manualActionInstruction: ProviderManualActionInstruction;
 };
 
-export type ProviderAdapter<P extends ActiveIntegrationProvider> = {
-  readonly [Provider in P]: ProviderConnectionAdapter<Provider>;
-}[P];
-
 export type ProviderAdapterByProvider = {
-  readonly [P in ActiveIntegrationProvider]: ProviderAdapter<P>;
+  readonly [P in ActiveIntegrationProvider]: ProviderConnectionAdapter<P>;
 };
 
 export type ProviderCleanupReason =
