@@ -97,6 +97,7 @@ import type {
   CobotDispatchApproval,
   CobotDispatchRecord,
   CobotDispatchState,
+  CobotRunRpc,
   DeviceCommandKind,
   DeviceFleetRpc,
   DeviceSample,
@@ -695,7 +696,7 @@ export class DeviceFleetActor
   async erase(): Promise<void> {
     for (const socket of this.ctx.getWebSockets())
       closeSocket(socket, GATEWAY_REVOKED_CODE, "organisation_ended");
-    const runs = this.env.BAKE_RUN;
+    const runs = this.#runs();
     if (runs !== undefined && !this.#erased)
       for (const runActorId of knownCobotRuns(this.#sql))
         await runs.get(runs.idFromString(runActorId)).erase();
@@ -875,13 +876,18 @@ export class DeviceFleetActor
       });
   }
 
+  /** The bake run Actors, by the methods that this Actor calls. */
+  #runs(): DurableObjectNamespace<CobotRunRpc> | undefined {
+    return this.env.BAKE_RUN;
+  }
+
   /**
    * Gives one signal to a run's Durable Object, after the signals before it,
    * so that the run reads the gateway's order. The run is known only by the
    * id string that it gave with its dispatch or its watch.
    */
   #forward(runActorId: string, signal: CobotRunSignal): void {
-    const namespace = this.env.BAKE_RUN;
+    const namespace = this.#runs();
     if (namespace === undefined) return;
     const previous = this.#forwards.get(runActorId) ?? Promise.resolve();
     const next = previous.then(async () => {

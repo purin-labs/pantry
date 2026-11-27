@@ -2,6 +2,7 @@ import { DurableObject } from "cloudflare:workers";
 import type { CobotRunSignal } from "@purin-labs/control-api";
 import type { BakeRunRecord } from "@purin-labs/kitchen-control-api";
 
+import type { CobotRunRpc } from "@purin-labs/area-devices-contract/server/fleet-stub";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,
@@ -46,7 +47,10 @@ import {
  * ends with the run. An Organisation with no active run has no alarm here and
  * pays nothing: 0 rows, 0 alarms and 0 requests for 30 idle days.
  */
-export class BakeRunActor extends DurableObject<Env> implements BakeRunRpc {
+export class BakeRunActor
+  extends DurableObject<Env>
+  implements BakeRunRpc, CobotRunRpc
+{
   #queue: Promise<unknown> = Promise.resolve();
 
   constructor(ctx: DurableObjectState, env: Env) {

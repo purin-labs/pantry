@@ -1,6 +1,7 @@
 import type {
   CobotClockEntry,
   CobotReport,
+  CobotRunSignal,
   CobotTaskMessage,
   CobotTaskState,
   CounterPrinterJob,
@@ -180,6 +181,16 @@ export interface DeviceFleetRpc extends Rpc.DurableObjectBranded {
     sourceKey: string,
     limit: number,
   ): readonly DeviceSample[];
+  erase(): Promise<void>;
+}
+
+/**
+ * The RPC methods of the Actor of one bake run that DeviceFleetActor calls:
+ * it forwards the signals of a run's devices and empties each run that it
+ * served. `BakeRunActor`, the class of the Worker, implements them.
+ */
+export interface CobotRunRpc extends Rpc.DurableObjectBranded {
+  receiveCobotSignal(signal: CobotRunSignal): Promise<void>;
   erase(): Promise<void>;
 }
 
