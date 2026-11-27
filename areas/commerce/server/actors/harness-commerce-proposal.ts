@@ -103,7 +103,7 @@ import {
   commerceApprovalCardTexts,
   type CommerceChangeFacts,
 } from "../contract/approval-card-texts";
-import { CARD_ONLY_REPLY_INSTRUCTION } from "@purin-labs/tool-handlers/slack/card-only-reply";
+import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
 import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 import type { MenuPriceProposalRequest } from "@purin-labs/area-commerce-contract/server/types";
 
@@ -1378,7 +1378,7 @@ async function recordCommerceProposal(
       ? {
           portalUrl: null,
           instruction:
-            `The thread now shows an approval card with this change and its buttons. Do not repeat the change's details, give a link or say who must approve it. ${CARD_ONLY_REPLY_INSTRUCTION}`,
+            `The thread now shows an approval card with this change and its buttons. Do not repeat the change's details, give a link or say who must approve it. ${slackSurfaceParts.use().cardOnlyReplyInstruction}`,
         }
       : portalUrl !== null
         ? {

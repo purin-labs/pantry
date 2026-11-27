@@ -42,7 +42,7 @@ import {
   slackClientMessageId,
   type SlackMessageError,
 } from "../messages";
-import { CARD_ONLY_REPLY } from "@purin-labs/tool-handlers/slack/card-only-reply";
+import { CARD_ONLY_REPLY } from "../card-only-reply";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { heldNoticeOfDecision } from "../held-output-notice";
 import { permissionDecisionRequestId } from "../permission-request-notice";

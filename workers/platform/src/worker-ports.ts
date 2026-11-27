@@ -102,7 +102,7 @@ import {
   createConnectorEvalSchema,
   nextEvalWorkAt,
 } from "@purin-labs/area-brain/server/actors/connector-eval";
-import { CARD_ONLY_REPLY_INSTRUCTION } from "@purin-labs/tool-handlers/slack/card-only-reply";
+import { CARD_ONLY_REPLY_INSTRUCTION } from "@purin-labs/surface-slack/server/card-only-reply";
 import {
   readSlackConversationFact,
   slackConversationReachesOutside,

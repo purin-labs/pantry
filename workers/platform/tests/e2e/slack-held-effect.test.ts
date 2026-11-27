@@ -12,7 +12,7 @@ import {
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { FlowPolicyInput } from "@purin-labs/authority/policy/information-flow/index";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
-import { CARD_ONLY_REPLY } from "@purin-labs/tool-handlers/slack/card-only-reply";
+import { CARD_ONLY_REPLY } from "@purin-labs/surface-slack/server/card-only-reply";
 import { reconcileHeldOutputRequests } from "@purin-labs/surface-slack/server/held-output-release";
 import { enableCapability } from "./access-route-support";
 import {
