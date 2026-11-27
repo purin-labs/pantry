@@ -398,6 +398,20 @@ type OrganisationHarnessErasureReceiptsError = {
   readonly code: "organisation_harness_erasure_state_invalid";
 };
 
+/** True once the Session erasure of an archived Organisation started. */
+export async function organisationHarnessErasureStarted(
+  session: Pick<OrganisationDatabaseSession, "prepare">,
+  organisationId: OrganisationId,
+): Promise<boolean> {
+  const erasure = await session
+    .prepare(
+      "SELECT 1 FROM organisation_harness_erasure WHERE organisation_id = ?",
+    )
+    .bind(organisationId)
+    .first();
+  return erasure !== null;
+}
+
 /**
  * Composes the durable operator receipt for an organisation-wide harness erasure.
  * The read is idempotent and remains answerable after the final purge because

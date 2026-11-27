@@ -162,7 +162,7 @@ type OrganisationMembershipParts = Readonly<{
   ): readonly D1PreparedStatement[];
 }>;
 
-/** The parts of the archive batch and of the delete of an archived Organisation. */
+/** The parts of the archive batch, of the delete and of the restore of an archived Organisation. */
 type OrganisationArchiveParts = Readonly<{
   /** The archive disables the accounts, the connections and the webhooks (connections). */
   connectionsDisable(
@@ -179,6 +179,14 @@ type OrganisationArchiveParts = Readonly<{
     session: Session,
     input: Readonly<{ organisationId: OrganisationId; guard: RowGuard }>,
   ): D1PreparedStatement;
+  /**
+   * True once the Session erasure of the purge started, so that a restore
+   * comes too late (organisation).
+   */
+  harnessErasureStarted(
+    session: Session,
+    organisationId: OrganisationId,
+  ): Promise<boolean>;
 }>;
 
 /** What the purge rewrite of a pseudonymized table needs. */

@@ -6,6 +6,7 @@ import {
   sharedRowOwnerColumn,
 } from "@purin-labs/tenancy/data/shared-rows/regional-copy-rules";
 import { prepareRetiredCellOrganisationRow } from "@purin-labs/tenancy/data/shared-rows/organisation-row";
+import { organisationRowsWhere } from "@purin-labs/tenancy/data/purge-catalogue";
 import type {
   GlobalDatabase,
   OrganisationDatabase,
@@ -577,20 +578,11 @@ async function requireCopyFences(
 
 function ownershipPredicate(name: string, columns: readonly string[]): string {
   if (columns.includes("organisation_id")) return '"organisation_id" = ?';
-  switch (name) {
-    case RECEIPT_TABLE:
-      return `"${RECEIPT_OWNER_COLUMN}" = ?`;
-    case "organisation_activation_step":
-      return "activation_attempt_id IN (SELECT activation_attempt_id FROM organisation_activation_attempt WHERE organisation_id = ?)";
-    case "provider_provisioning_receipt":
-      return "provisioning_attempt_id IN (SELECT provisioning_attempt_id FROM provider_provisioning_attempt WHERE organisation_id = ?)";
-    case "provider_discovered_resource":
-      return "snapshot_revision IN (SELECT snapshot_revision FROM provider_resource_snapshot WHERE organisation_id = ?)";
-    case "agent_area_assignment":
-      return "installation_id IN (SELECT installation_id FROM agent_installation WHERE organisation_id = ?)";
-    default:
-      throw new Error(`regional_ownership_unknown:${name}`);
-  }
+  if (name === RECEIPT_TABLE) return `"${RECEIPT_OWNER_COLUMN}" = ?`;
+  // A child table selects its rows through its parent, as the purge does.
+  const where = organisationRowsWhere(name);
+  if (where === undefined) throw new Error(`regional_ownership_unknown:${name}`);
+  return where;
 }
 function persistenceRow(table: CopyTable, raw: unknown): readonly Cell[] {
   if (!isRecord(raw)) throw new Error("regional_row_invalid");

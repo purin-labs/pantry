@@ -105,6 +105,8 @@ import { readGmailPilotBudget } from "@purin-labs/area-inbox/server/data/email-m
 import { registerSupplierOperationalEmailContact } from "@purin-labs/area-inbox/server/data/email-operational";
 import { organisationServices } from "@purin-labs/area-organisation-contract/server/organisation-services";
 import { removeIntegrationAccount } from "@purin-labs/area-organisation/server/data/account-removal";
+import { readOrganisationOperationsDestination } from "@purin-labs/area-organisation/server/data/operations-destination";
+import { operationsDestinationRead } from "@purin-labs/tenancy/data/operations-destination";
 import {
   cancelOperatorConfigurationDraft,
   confirmOperatorConfigurationDraft,
@@ -302,6 +304,10 @@ organisationServices.register({
     confirmOperatorConfigurationDraft(...input),
   previewCode: (...input) => previewCode(...input),
 });
+
+operationsDestinationRead.register((...input) =>
+  readOrganisationOperationsDestination(...input),
+);
 
 workflowChanges.register({
   applyApprovedWorkflowChange: (...input) =>

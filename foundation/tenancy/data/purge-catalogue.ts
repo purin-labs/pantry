@@ -339,6 +339,16 @@ export const PURGE_CATALOGUE = [
   { table: "workspace_revision_head", action: "erase" },
 ] as const satisfies readonly PurgeCatalogueEntry[];
 
+/**
+ * The rows of the Organisation in a table with no `organisation_id` column:
+ * the `where` of its erase entry, or undefined. The regional copy selects
+ * the same rows.
+ */
+export function organisationRowsWhere(table: string): string | undefined {
+  const entry = PURGE_CATALOGUE.find((candidate) => candidate.table === table);
+  return entry !== undefined && "where" in entry ? entry.where : undefined;
+}
+
 /** The rows of the Organisation that an erase entry selects. */
 export function eraseEntryWhere(
   entry: Readonly<{ action: "erase"; where?: string }>,

@@ -16,6 +16,7 @@ import {
 } from "@purin-labs/area-inbox-contract/server/account-erasure";
 import { prepareInitialOrganisationWorkspace } from "@purin-labs/agent/data/organisation-workspace";
 import { prepareReadinessAssessmentDeletion } from "@purin-labs/area-organisation/server/data/onboarding";
+import { organisationHarnessErasureStarted } from "@purin-labs/area-organisation/server/data/onboarding-reconciliation";
 import {
   prepareArchivedOrganisationConnectionsDisable,
   prepareOrganisationPurgeConnections,
@@ -104,6 +105,8 @@ export const ORGANISATION_LIFECYCLE_PARTS: OrganisationLifecycleParts = {
     ],
     projectMembersDeletion: (session, input) =>
       prepareOrganisationProjectMembersDeletion(session, input),
+    harnessErasureStarted: (session, organisationId) =>
+      organisationHarnessErasureStarted(session, organisationId),
   },
   purge: {
     pseudonymize: {

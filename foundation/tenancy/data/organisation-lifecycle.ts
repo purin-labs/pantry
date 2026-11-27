@@ -865,19 +865,17 @@ export async function restoreOrganisation(input: {
   if (admission?.meta.changes !== 1) {
     if (!(await input.execution.isActive()))
       return { ok: false, error: { code: "organisation_placement_conflict" } };
-    const erasure = await session
-      .prepare(
-        "SELECT 1 FROM organisation_harness_erasure WHERE organisation_id = ?",
-      )
-      .bind(input.execution.organisationId)
-      .first();
+    const erasureStarted =
+      await organisationLifecycleParts().archive.harnessErasureStarted(
+        session,
+        input.execution.organisationId,
+      );
     return {
       ok: false,
       error: {
-        code:
-          erasure === null
-            ? "configuration_version_conflict"
-            : "organisation_purge_started",
+        code: erasureStarted
+          ? "organisation_purge_started"
+          : "configuration_version_conflict",
       },
     };
   }
