@@ -23,7 +23,7 @@ type SetupIdentity = Pick<
   "organisationId" | "merchantId"
 >;
 
-export type Plan22Phase4ShippingSetupResult = Readonly<{
+type Plan22Phase4ShippingSetupResult = Readonly<{
   ok: true;
   organisationId: string;
   merchantId: string;

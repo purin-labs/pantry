@@ -1044,7 +1044,7 @@ export const PATISSERIE_SUPPLIES: readonly PatisserieSupplyItem[] = [
   ).values(),
 ];
 
-export const patisserieVariantId = (item: PatisserieItem): string =>
+const patisserieVariantId = (item: PatisserieItem): string =>
   `variant_patisserie_${item.slug}`;
 const productId = (item: PatisserieItem) => `product_patisserie_${item.slug}`;
 const offerId = (item: PatisserieItem) => `offer_patisserie_${item.slug}_cafe`;
@@ -1274,7 +1274,7 @@ export async function configurePatisserieMenu(
   };
 }
 
-export async function seedPatisserieSupplyCosts(
+async function seedPatisserieSupplyCosts(
   input: Readonly<{
     client: CommerceEntityPlaneClient;
     organisationId: string;

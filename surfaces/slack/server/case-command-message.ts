@@ -51,7 +51,7 @@ import {
   type SlackMessageEvent,
 } from "./events";
 
-export type SlackCaseEventEnvelope = {
+type SlackCaseEventEnvelope = {
   requestId: RequestId;
   receivedAt: number;
   event: SlackMessageEvent;

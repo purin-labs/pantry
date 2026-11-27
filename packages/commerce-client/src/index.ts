@@ -675,8 +675,4 @@ export {
   configurePatisserieMenu,
   includeStorefrontTax,
   patisserieRecipeId,
-  patisserieVariantId,
-  seedPatisserieSupplyCosts,
-  type PatisserieItem,
-  type PatisserieMenuSetupResult,
 } from "./patisserie-menu.ts";

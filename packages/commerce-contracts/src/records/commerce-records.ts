@@ -62,7 +62,9 @@ export {
   type SquareTerminalTransport,
 } from "./payment-bindings.ts";
 import { preparationTicketLifecycleSchema } from "./preparation-ticket-lifecycle.ts";
-export * from "./preparation-ticket-lifecycle.ts";
+export {
+  type PreparationTicketLifecycle,
+} from "./preparation-ticket-lifecycle.ts";
 import {
   commerceTimestampSchema,
   sourceProvenanceSchema,

@@ -34,7 +34,7 @@ type CounterReceiptTender =
       brand: string | null;
     }>;
 
-export type CounterReceiptInput = Readonly<{
+type CounterReceiptInput = Readonly<{
   shopName: string;
   /** "ja" for a Japanese receipt, any other locale for an English one. */
   locale: string;

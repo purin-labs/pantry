@@ -155,7 +155,7 @@ type CostPlanPrepareResult =
   | Readonly<{ ok: true; save: PreparedRowSave<SavedCostPlan> }>
   | Exclude<CostPlanSaveResult, { ok: true }>;
 
-export type CostPlanSaveInput = Readonly<{
+type CostPlanSaveInput = Readonly<{
   db: OrganisationDatabase;
   organisationId: string;
   updatedBy: string;
@@ -611,7 +611,7 @@ export async function readOrganisationLotInvoiceCosts(
   return out;
 }
 
-export type LotCostSaveInput = Readonly<{
+type LotCostSaveInput = Readonly<{
   db: OrganisationDatabase;
   organisationId: string;
   updatedBy: string;
@@ -621,7 +621,7 @@ export type LotCostSaveInput = Readonly<{
 }>;
 
 /** The stock item and the base unit of each lot that can carry an invoice cost. */
-export type KnownLotsById = ReadonlyMap<
+type KnownLotsById = ReadonlyMap<
   string,
   Readonly<{ inventoryItemId: string; baseUnit: CostUnit }>
 >;

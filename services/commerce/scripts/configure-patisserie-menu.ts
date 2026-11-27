@@ -4,32 +4,13 @@
 // cups are stocked at the café. Every item has a listed offer on the café sales
 // channel and one entry on the café menu.
 import {
-  PATISSERIE_ITEMS,
-  PATISSERIE_SUPPLIES,
   CommerceAdminClient,
   CommerceEntityPlaneClient,
   CommerceStorefrontClient,
   configurePatisserieMenu,
   includeStorefrontTax,
-  patisserieRecipeId,
-  patisserieVariantId,
-  seedPatisserieSupplyCosts,
-  type PatisserieItem,
-  type PatisserieMenuSetupResult,
 } from "@purin-labs/commerce-client";
 import { isMainModule } from "./merchant-script.ts";
-
-export {
-  PATISSERIE_ITEMS,
-  PATISSERIE_SUPPLIES,
-  configurePatisserieMenu,
-  includeStorefrontTax,
-  patisserieRecipeId,
-  patisserieVariantId,
-  seedPatisserieSupplyCosts,
-  type PatisserieItem,
-  type PatisserieMenuSetupResult,
-};
 
 type SetupArguments = Readonly<{
   merchantId: string;

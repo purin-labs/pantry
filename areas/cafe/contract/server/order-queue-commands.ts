@@ -25,7 +25,7 @@ import { CAFE_MENU_ID } from "./menu-publication";
  * again, so that a sale that moved the merchant's revision costs a repeat and
  * not a refusal.
  */
-export type OrderQueueContext = Readonly<{
+type OrderQueueContext = Readonly<{
   client: CommerceAdminClient;
   merchantId: string;
 }>;
@@ -48,7 +48,7 @@ export type OrderQueueAdvanceResult =
       field: string | null;
     }>;
 
-export type SoldOutMark =
+type SoldOutMark =
   Readonly<{ kind: "today"; timeZone: string }> | Readonly<{ kind: "cleared" }>;
 
 export type SoldOutMarkResult =

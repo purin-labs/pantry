@@ -19,10 +19,9 @@ export type {
   WorkspaceExecutorInspectionRequest,
   WorkspaceExecutorDecodedFrame,
   WorkspaceExecutorInspectionOperation,
-  WorkspaceExecutorInspectionResponse,
 } from "@purin-labs/contracts/workspace-executor";
 
-export type WorkspaceExecutorContainerError =
+type WorkspaceExecutorContainerError =
   | { readonly kind: "deadline_exceeded" }
   | { readonly kind: "container_unavailable"; readonly reason: string }
   | { readonly kind: "executor_rejected"; readonly status: number }

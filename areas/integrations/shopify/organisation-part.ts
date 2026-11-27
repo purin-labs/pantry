@@ -130,7 +130,7 @@ class ShopifyOrganisationLocations {
 }
 
 /** The RPC methods of this part. `OrganisationDO` has one method for each. */
-export type ShopifyOrganisationRpc = Pick<
+type ShopifyOrganisationRpc = Pick<
   ShopifyOrganisationLocations,
   "acceptShopifyLocationObservation" | "assignShopifyLocationClassification"
 >;

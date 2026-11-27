@@ -28,7 +28,7 @@ type RebuildIdentity = Pick<
   "organisationId" | "merchantId"
 >;
 
-export type Plan22Phase3CafeRebuildResult = Readonly<{
+type Plan22Phase3CafeRebuildResult = Readonly<{
   ok: true;
   organisationId: string;
   merchantId: string;

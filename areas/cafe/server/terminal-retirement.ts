@@ -21,7 +21,7 @@ type CounterRetirementError = Readonly<{
 }>;
 
 /** Why the active assignment of a counter cannot end now. */
-export type CounterCollectionRefusal =
+type CounterCollectionRefusal =
   "terminal_collection_unresolved" | "terminal_collection_unverifiable";
 
 type CounterScope = Readonly<{

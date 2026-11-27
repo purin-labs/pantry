@@ -44,8 +44,6 @@ import type { CommerceQueryPlanErrorCapability as GeneratedCommerceQueryPlanErro
 import type { CommerceQueryPlanOutcome as GeneratedCommerceQueryPlanOutcome } from "./query-planner.ts";
 import type { CommerceQueryProjection as GeneratedCommerceQueryProjection } from "./query-plan-parts.ts";
 import type { CommerceRelationship as GeneratedCommerceRelationship } from "./relationships.ts";
-import type { CommerceMerchantId as GeneratedCommerceMerchantId } from "./records/identifiers.ts";
-import type { OrganisationId as GeneratedOrganisationId } from "./records/identifiers.ts";
 import type { CustomCommerceRelationshipRef as GeneratedCustomCommerceRelationshipRef } from "./relationships.ts";
 import type { CustomRelationshipDefinitionRef as GeneratedCustomRelationshipDefinitionRef } from "./records/entity-plane.ts";
 import type { CustomCommerceRelationshipCreateTarget as GeneratedCustomCommerceRelationshipCreateTarget } from "./relationship-commands.ts";
@@ -220,10 +218,6 @@ export type CommerceQueryPlanOutcome = GeneratedCommerceQueryPlanOutcome;
 export type CommerceQueryProjection =
   StrictUnion<GeneratedCommerceQueryProjection>;
 export type { CommerceReadWatermark } from "./query-metadata.ts";
-export type CommerceMerchantId = GeneratedCommerceMerchantId;
-export type OrganisationId = GeneratedOrganisationId;
-export type { CommerceSort } from "./query-ordering.ts";
-export type { CommerceSortField } from "./query-ordering.ts";
 export type { CommerceSnapshotRevision } from "./query-metadata.ts";
 export type CommerceTableDensity = GeneratedCommerceTableDensity;
 export type { CommerceTraversalLimits } from "./query-limits.ts";

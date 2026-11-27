@@ -83,7 +83,7 @@ export type CostsSaveRefusal =
     }>;
 
 /** A refused sheet save, with the records that saved before the refusal. */
-export type CostsSheetSaveError = CostsSaveRefusal &
+type CostsSheetSaveError = CostsSaveRefusal &
   Readonly<{ saved: CostsSheetSaved }>;
 
 type CommerceContext = Readonly<{

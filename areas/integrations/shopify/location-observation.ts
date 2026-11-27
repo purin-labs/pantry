@@ -78,7 +78,7 @@ export type ShopifyLocationObservationInput = {
   readonly acceptedAt: number;
 };
 
-export type ShopifyLocationObservation = Omit<
+type ShopifyLocationObservation = Omit<
   ShopifyLocationObservationInput,
   "classification"
 > & {
@@ -110,7 +110,7 @@ export type ShopifyLocationObservationResult = {
   readonly observation: ShopifyLocationObservation;
 };
 
-export type ShopifyLocationObservationError =
+type ShopifyLocationObservationError =
   | {
       readonly code: "shopify_location_observation_invalid";
       readonly field: string;

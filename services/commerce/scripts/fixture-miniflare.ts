@@ -14,7 +14,7 @@ export const FIXTURE_SERVICE_TOKEN = "commerce-workerd-service-token";
 /** The fixture clock; journeys build their records at this time. */
 export const FIXTURE_NOW = "2026-08-14T10:00:00.000Z";
 
-export type FixtureMiniflare = Readonly<{
+type FixtureMiniflare = Readonly<{
   origin: string;
   dispatchFetch: (url: string, init?: RequestInit) => Promise<Response>;
   dispose: () => Promise<void>;

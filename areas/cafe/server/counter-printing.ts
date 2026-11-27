@@ -47,7 +47,7 @@ type OrderLine = OrderRecord["order"]["lineItems"][number];
 
 const DEFAULT_TIME_ZONE = "Asia/Tokyo";
 
-export type CounterSaleWithDrawer = Readonly<{
+type CounterSaleWithDrawer = Readonly<{
   counterSale: CounterSaleView;
   /** Null when the sale did not move cash, so the drawer stays shut. */
   drawer: CounterPrinterJob | null;

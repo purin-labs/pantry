@@ -569,7 +569,7 @@ async function slackJson(
  * The generated fixtures carry deterministic markers. The H.264 case uses the
  * checked-in decoder fixture so a reply can report decoded stills and color.
  */
-export async function canaryCases(): Promise<readonly CanaryCase[]> {
+async function canaryCases(): Promise<readonly CanaryCase[]> {
   const { docxArchive, waveHeader } =
     await import("../tests/media-fixtures.ts");
   const h264 = new Uint8Array(

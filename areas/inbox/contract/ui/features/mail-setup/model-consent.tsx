@@ -37,7 +37,7 @@ export function MailboxModelConsent(props: {
   );
 }
 
-export type MailboxModelConsentControl = Readonly<{
+type MailboxModelConsentControl = Readonly<{
   /** The review that the setup asks the person to accept, if any. */
   review: MailboxModelReview | null;
   /** The review that the checkbox accepted. Null while it is clear. */

@@ -54,16 +54,6 @@
         "ShippingFulfillmentLifecycle"
       ]
     },
-    "commerce-engine-reexports": {
-      "reason": "services/commerce/scripts/configure-patisserie-menu.ts imports these names to re-export them. The Refactor 17 rules allow no change in services/commerce but the loss of an import.",
-      "files": ["packages/commerce-client/src/index.ts"],
-      "names": [
-        "PatisserieItem",
-        "PatisserieMenuSetupResult",
-        "patisserieVariantId",
-        "seedPatisserieSupplyCosts"
-      ]
-    },
     "brand-mark": {
       "reason": "PurinMark and PurinIcon are the Purin brand mark of the component kit (foundation/ui/README.md, docs/brand/purin-logo). No page draws it yet; the owner decides where it goes.",
       "files": ["foundation/ui/index.ts"],
@@ -76,27 +66,7 @@
     }
   },
   "counts": {
-    "@purin-labs/agent": 2,
-    "@purin-labs/area-cafe": 3,
-    "@purin-labs/area-cafe-contract": 2,
-    "@purin-labs/area-commerce": 1,
-    "@purin-labs/area-inbox-contract": 1,
-    "@purin-labs/area-integrations": 3,
-    "@purin-labs/area-kitchen": 4,
-    "@purin-labs/authority": 1,
     "@purin-labs/bakery-model": 3,
-    "@purin-labs/commerce-contracts": 12,
-    "@purin-labs/commerce-worker": 16,
-    "@purin-labs/control-api": 36,
-    "@purin-labs/kernel": 1,
-    "@purin-labs/kitchen-control-api": 3,
-    "@purin-labs/menu-board-crdt": 30,
-    "@purin-labs/platform": 1,
-    "@purin-labs/portal": 1,
-    "@purin-labs/production-simulation": 5,
-    "@purin-labs/surface-slack": 3,
-    "@purin-labs/surface-voice": 1,
-    "@purin-labs/surface-webhooks": 1,
-    "@purin-labs/workflow-canvas-crdt": 3
+    "@purin-labs/production-simulation": 5
   }
 }

@@ -27,7 +27,7 @@ type SetupIdentity = Pick<
   "organisationId" | "merchantId"
 >;
 
-export type FlavorKey = "sesame" | "ginger" | "taro" | "matcha";
+type FlavorKey = "sesame" | "ginger" | "taro" | "matcha";
 
 type FlavorDefinition = Readonly<{
   key: FlavorKey;
@@ -73,7 +73,7 @@ export const PLAN23_FLAVORS: readonly FlavorDefinition[] = [
   },
 ];
 
-export type Plan23FlavoredCatalogSetupResult = Readonly<{
+type Plan23FlavoredCatalogSetupResult = Readonly<{
   ok: true;
   organisationId: string;
   merchantId: string;

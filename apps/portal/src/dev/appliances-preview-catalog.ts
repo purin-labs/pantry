@@ -189,7 +189,7 @@ export type JointControlSpec = Readonly<{
   isDetachableAccessory?: boolean;
 }>;
 
-export type StudioRenderItem = Readonly<{
+type StudioRenderItem = Readonly<{
   label: string;
   url: string;
 }>;

@@ -663,7 +663,7 @@ type CommerceActionRecordAuthority =
       readonly integrationAccountId: ActionLedgerEntry["action"]["integrationAccountId"];
     };
 
-export type CommerceActionRecord = {
+type CommerceActionRecord = {
   readonly nonce: ActionLedgerEntry["action"]["nonce"];
   readonly caseId: ActionLedgerEntry["caseId"];
   readonly proposalId: string;

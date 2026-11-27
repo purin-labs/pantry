@@ -52,7 +52,7 @@ export type IngressQueueMessage =
  * A message of the event queue, read. A message of a provider module comes
  * with its handler from the module.
  */
-export type ParsedIngressQueueMessage =
+type ParsedIngressQueueMessage =
   Exclude<IngressQueueMessage, ProviderQueueMessage> | ProviderQueueWork;
 
 export function parseIngressQueueMessage(

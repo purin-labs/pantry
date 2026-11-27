@@ -26,7 +26,7 @@ export const APPROVAL_STEP_UP_MAX_AGE_MS = 10 * 60 * 1000;
 
 declare const approvalProofDigestBrand: unique symbol;
 
-export type ApprovalProofDigest = string & {
+type ApprovalProofDigest = string & {
   readonly [approvalProofDigestBrand]: "ApprovalProofDigest";
 };
 

@@ -4,7 +4,7 @@
  * one receipt for each id, so each update names what it shows, for example
  * the state of a proposal.
  */
-export type CardDeliveryIds = Readonly<{
+type CardDeliveryIds = Readonly<{
   notice(subjectId: string): string;
   update(subjectId: string, shows?: string): string;
   isCard(deliveryId: string): boolean;

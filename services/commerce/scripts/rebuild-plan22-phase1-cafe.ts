@@ -16,7 +16,7 @@ type RebuildIdentity = Pick<
   MerchantScriptArguments,
   "organisationId" | "merchantId"
 >;
-export type Plan22Phase1CafeRebuildResult = Readonly<{
+type Plan22Phase1CafeRebuildResult = Readonly<{
   ok: true;
   organisationId: string;
   merchantId: string;
@@ -32,7 +32,7 @@ export type Plan22Phase1CafeRebuildResult = Readonly<{
 
 if (isMainModule(import.meta.url)) await main();
 
-export async function rebuildPhase1Cafe(
+async function rebuildPhase1Cafe(
   adminClient: CommerceAdminClient,
   identities: RebuildIdentity,
 ): Promise<Plan22Phase1CafeRebuildResult> {

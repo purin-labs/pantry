@@ -5,7 +5,7 @@
  * (`worker-ports.ts`). A read before the registration is a programmer
  * error, so it throws.
  */
-export type Port<T> = Readonly<{
+type Port<T> = Readonly<{
   /** The Worker gives the implementation. */
   register(implementation: T): void;
   /** The implementation that the Worker gave. */

@@ -95,7 +95,7 @@ import { assertNever } from "@purin-labs/std";
 const WITHHELD_DELIVERY =
   "connector_delivery_rejected:connector_stream_withheld";
 
-export type SlackCaseProcessingResult =
+type SlackCaseProcessingResult =
   | { readonly kind: "completed" }
   | {
       readonly kind: "retry";

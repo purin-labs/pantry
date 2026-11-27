@@ -52,7 +52,7 @@ import { readVoiceWav, VOICE_BODY_BYTE_LIMIT } from "./wav";
 const VOCABULARY_WAIT_MS = 800;
 const DEVICE_PATTERN = /^[A-Za-z0-9_-]{16,64}$/u;
 
-export type VoiceRoute = Readonly<{
+type VoiceRoute = Readonly<{
   kind: "voice";
   organisationId: OrganisationId;
   target:
