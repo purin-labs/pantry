@@ -9,7 +9,7 @@
       "names": 45
     },
     "table-read": {
-      "reads": 91
+      "reads": 85
     },
     "surface-nonpublic": {
       "imports": 244
@@ -25,7 +25,7 @@
       "imports": 10
     },
     "interpolated-table": {
-      "writes": 17
+      "writes": 10
     },
     "contract-runtime": {
       "imports": 94
@@ -95,9 +95,9 @@
         "reads areas/kitchen -> areas/organisation": 1,
         "reads areas/organisation -> areas/integrations": 1,
         "reads foundation/actor-runtime -> areas/integrations": 1,
-        "reads foundation/actor-runtime -> areas/organisation": 2,
-        "reads foundation/actor-runtime -> foundation/agent": 2,
-        "reads foundation/actor-runtime -> foundation/connections": 3,
+        "reads foundation/actor-runtime -> areas/organisation": 1,
+        "reads foundation/actor-runtime -> foundation/agent": 1,
+        "reads foundation/actor-runtime -> foundation/connections": 1,
         "reads foundation/agent -> foundation/conversation": 1,
         "reads foundation/authority -> areas/inbox": 17,
         "reads foundation/authority -> areas/integrations": 4,
@@ -113,7 +113,7 @@
         "reads foundation/conversation -> surfaces/slack": 2,
         "reads foundation/tenancy -> areas/inbox": 2,
         "reads foundation/tenancy -> areas/integrations": 2,
-        "reads foundation/tenancy -> areas/organisation": 5,
+        "reads foundation/tenancy -> areas/organisation": 3,
         "reads foundation/tenancy -> foundation/actor-runtime": 5,
         "reads foundation/tenancy -> foundation/agent": 4,
         "reads foundation/tenancy -> foundation/connections": 13
@@ -174,11 +174,9 @@
       "reason": "check-layers.mjs reads the owner of a write from a literal table name. A write with the name in a template value has no owner check, and no Actor SQLite table has an owner in the map. The purge, the regional copy, the state machines and the Actor copy code write tables from a list or a parameter. No rule tells a D1 write from an Actor write, so the count holds both.",
       "fix": "Write the table name as a literal where one module owns the write. Add no new general write helper: a helper that must stay (purge, copy, state transition) takes its tables from one list that names the owner of each table.",
       "counts": {
-        "writes areas/commerce": 4,
-        "writes areas/inbox": 2,
         "writes foundation/actor-runtime": 6,
         "writes foundation/agent": 2,
-        "writes foundation/tenancy": 3
+        "writes foundation/tenancy": 2
       }
     },
     "contract-runtime": {
