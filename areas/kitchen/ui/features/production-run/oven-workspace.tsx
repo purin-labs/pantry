@@ -2699,6 +2699,8 @@ function sourceDescription(source: OvenRunSource): string {
       return "The FR10 stages an empty pan in a fixed carrier insert. A worker removes it before extraction. Heating, straining, and cleanup use assumed timings.";
     case "persistent-oven-rack/1":
       return "One shared oven cell performs loading, retrieval, and racking. Workers stage trays and clear the rack for cooling.";
+    case "persistent-spanner-oven-rack/1":
+      return "One shared MBCO-4ME spanner oven cell performs loading, retrieval, and racking. Workers stage 400 × 300 mm trays and clear the cooling rack.";
     case "persistent-rack/1":
       return "The cell transfers trays from its table to its rack.";
     default:

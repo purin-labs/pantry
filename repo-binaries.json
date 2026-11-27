@@ -2586,8 +2586,8 @@
           "bytes": 228286
         },
         "fr10-workcell/native/assets.json": {
-          "sha256": "33acd2e8c3b0bd5bf48bac662ec9084824a114bf2ead677e718581f197234fba",
-          "bytes": 38906
+          "sha256": "6013974cbdaf0702d0d85092673c960f2a5e1155fc4b9bcf31cca75ad9847885",
+          "bytes": 43893
         },
         "fr10-workcell/native/dobot-cr10/combined-blocked-rack-nominal.json": {
           "sha256": "4e4a7e286b4f32a23ba4ed6f42e9b6e64a7f7484422a9334a33c762563f61561",
@@ -2773,37 +2773,61 @@
           "sha256": "fce7d4252ed1b0a5ec9be0bc3861c8ec4f9f4fb9fe9578654751bb790a33e73b",
           "bytes": 24256
         },
+        "fr10-workcell/native/fairino-fr10/spanner-oven-blocked-rack-nominal.json": {
+          "sha256": "97cb5b0b8d2aa8320d8ccf360ea6e79520d82c323826c992b9bebfbcf3ba283b",
+          "bytes": 32151
+        },
+        "fr10-workcell/native/fairino-fr10/spanner-oven-blocked-rack-nominal.xml": {
+          "sha256": "5ace34e75d01ff505cbd2ad2e9f1ae8f42111c350eaffa26c90a5370d22d3c7f",
+          "bytes": 45766
+        },
         "fr10-workcell/native/fairino-fr10/spanner-oven-blocked.json": {
-          "sha256": "46a75bebbbc8dfa590bfd1c5fecb1628d20ce36ee1b17d0f8d1ba42852ab3bd5",
-          "bytes": 29668
+          "sha256": "beeb8b5de0fc4533867a0a04ee387b71e03ea7c2fd5519254046ae80270418ee",
+          "bytes": 29672
         },
         "fr10-workcell/native/fairino-fr10/spanner-oven-blocked.xml": {
-          "sha256": "91e88c23b12196033c4619acb1fd9bc0ba47fabc75c59bd52a116520491a8751",
-          "bytes": 44687
+          "sha256": "8e91622b478a1cc43c9c204a18282fdf38d107e7d454873763d27986593a25c1",
+          "bytes": 44068
         },
         "fr10-workcell/native/fairino-fr10/spanner-oven-closed-door.json": {
-          "sha256": "934796f4f372a5038bb265bb915e0f813020506249015a02eb65d24b4281dab2",
-          "bytes": 29184
+          "sha256": "46addc378fbe05789c182efb7a24231212285c9ec338292aadd7e613b0689f86",
+          "bytes": 29188
         },
         "fr10-workcell/native/fairino-fr10/spanner-oven-closed-door.xml": {
-          "sha256": "4c4f4aeda6ff85dcda8ac8b4e9f122fa026fac44995b6205649fdc7b001f6fb0",
-          "bytes": 44378
+          "sha256": "df10ce8648ce9ffa116abe2981c290a67cb1421f3f9b499fedc126dadd90ca58",
+          "bytes": 43759
+        },
+        "fr10-workcell/native/fairino-fr10/spanner-oven-combined-nominal.json": {
+          "sha256": "2f50c5817c8a4208529e0cfd05b6726e4148473cb29a807dfdbb865640d4811e",
+          "bytes": 31744
+        },
+        "fr10-workcell/native/fairino-fr10/spanner-oven-combined-nominal.xml": {
+          "sha256": "c9ddec2d9d87fbcfecc4104a86d53d03ec6dde7a0db1fb6f99cd2f0f3fa67223",
+          "bytes": 45546
         },
         "fr10-workcell/native/fairino-fr10/spanner-oven-door-nominal.json": {
-          "sha256": "d666f490bd4632bd9cfe57e2eb0c2fe29466b63de545e9d6824a251872b17c60",
-          "bytes": 30068
+          "sha256": "14363e90e3d36d0c6b8c90b74de54eeffabc8447c53bf7fd4ed1fa9c32de3983",
+          "bytes": 30072
         },
         "fr10-workcell/native/fairino-fr10/spanner-oven-door-nominal.xml": {
-          "sha256": "5206aa486c36429946ade4ac0eaf41a14726720e87830204593641a87dd57f9f",
-          "bytes": 45031
+          "sha256": "3b8b66fb2c600ed270bcfffc8ce75557dc6bc07f49e3349548d602df2f04889e",
+          "bytes": 44412
         },
         "fr10-workcell/native/fairino-fr10/spanner-oven-nominal.json": {
-          "sha256": "f581d8c220ac224306c851d2571ed116109a0d2d9c407d2e86b5615dbcff59d4",
-          "bytes": 29263
+          "sha256": "756bfb9bf4908b80af4436b97fe02254926d467c4a8d85f68338b6ba3b3e2ddb",
+          "bytes": 29267
         },
         "fr10-workcell/native/fairino-fr10/spanner-oven-nominal.xml": {
-          "sha256": "2e446b67168ab5f8a8fa2b35d676cfc03f46fb93d5c6321fa4a6035df672ce84",
-          "bytes": 44430
+          "sha256": "79ac7df2bbe78a45db631dca23ad022e1379b207e97f3de12f3fd612853c3418",
+          "bytes": 43811
+        },
+        "fr10-workcell/native/fairino-fr10/spanner-oven-unreachable-rack-nominal.json": {
+          "sha256": "6e308c0c7118d09284a45c1e2c96902d8590be57b726df783b93e96f935a705c",
+          "bytes": 31705
+        },
+        "fr10-workcell/native/fairino-fr10/spanner-oven-unreachable-rack-nominal.xml": {
+          "sha256": "b92caf91c3533321283b5466dd0144403a244ea39b6174510cff1a288fe6e200",
+          "bytes": 45528
         },
         "fr10-workcell/native/fairino-fr10/table-to-oven-blocked.json": {
           "sha256": "52815815fa1c1601557e363570737cc2a4e2590a5f37aeb250f24679b5bbf54e",
@@ -3013,6 +3037,54 @@
           "sha256": "8479d6e6354b6824267458cef2352d9433b9c0f5b9509081b7bdf038660e690b",
           "bytes": 42199
         },
+        "fr10-workcell/native/fanuc-crx10ial/spanner-oven-blocked-rack-nominal.json": {
+          "sha256": "b9dd8a3773354928ce37b27eb440dd24a54f60e0656c2f81cc58caf5fd9aab73",
+          "bytes": 32234
+        },
+        "fr10-workcell/native/fanuc-crx10ial/spanner-oven-blocked-rack-nominal.xml": {
+          "sha256": "158356ed75f643cab4824e6e1008469a366d48c90c37f647be188cc1ef3ca833",
+          "bytes": 45600
+        },
+        "fr10-workcell/native/fanuc-crx10ial/spanner-oven-blocked.json": {
+          "sha256": "8b71e190d536297c2454eff2f20f3befa2d27dbc5c63f8616bf0a8d856b9940f",
+          "bytes": 29755
+        },
+        "fr10-workcell/native/fanuc-crx10ial/spanner-oven-blocked.xml": {
+          "sha256": "ae24b64b24fdf98be6b36e1bdd20570a2b826ed98c538176fc3d465167f54ffc",
+          "bytes": 43902
+        },
+        "fr10-workcell/native/fanuc-crx10ial/spanner-oven-closed-door.json": {
+          "sha256": "7ed4ff6343edb0d355651ccb0a5f02cc59ce19c73299990e7c22e027490b08d5",
+          "bytes": 29271
+        },
+        "fr10-workcell/native/fanuc-crx10ial/spanner-oven-closed-door.xml": {
+          "sha256": "41362865696dda1c49a957235b85aafc8391338e93cfea75185929ba35de8a31",
+          "bytes": 43593
+        },
+        "fr10-workcell/native/fanuc-crx10ial/spanner-oven-combined-nominal.json": {
+          "sha256": "a5065d2892d10c752108ace14a2a1fb55c67bd83c164c56be1f34cfb6304f67f",
+          "bytes": 31827
+        },
+        "fr10-workcell/native/fanuc-crx10ial/spanner-oven-combined-nominal.xml": {
+          "sha256": "66116ab35f95fdd3847188905a22ec0faebee9b4539b2463b222907f0ec94194",
+          "bytes": 45380
+        },
+        "fr10-workcell/native/fanuc-crx10ial/spanner-oven-nominal.json": {
+          "sha256": "a816f1a7e5cf1898f871d24b96169fb6e92ff003ea356359386dfceb04744d13",
+          "bytes": 29350
+        },
+        "fr10-workcell/native/fanuc-crx10ial/spanner-oven-nominal.xml": {
+          "sha256": "13725359e69f7a8c392ece599110de9898770a5ffe8f064f476838357aaf73ee",
+          "bytes": 43645
+        },
+        "fr10-workcell/native/fanuc-crx10ial/spanner-oven-unreachable-rack-nominal.json": {
+          "sha256": "eb03a369925b2f966ecffd9d3a72693db45cdfccf6a350e47798fc743ac61705",
+          "bytes": 31788
+        },
+        "fr10-workcell/native/fanuc-crx10ial/spanner-oven-unreachable-rack-nominal.xml": {
+          "sha256": "de5a1a8d488cd1ea79dd1ff250a4277fae51593bb3f9b23246050d51144f0f1f",
+          "bytes": 45362
+        },
         "fr10-workcell/native/fanuc-crx10ial/table-to-oven-blocked.json": {
           "sha256": "0afdcd5be7d41888372bf26a1111f9d53b87310c2c79fd6cbccd7e8840271f05",
           "bytes": 38582
@@ -3221,6 +3293,54 @@
           "sha256": "63eb6c7ce3d4b56dcb2441452b8e5718ed05c9d17f613f6508159c7196b64031",
           "bytes": 46318
         },
+        "fr10-workcell/native/universal-robots-ur5e/spanner-oven-blocked-rack-nominal.json": {
+          "sha256": "0dc2a31d91ec3e341adb2335172accb274505dd91ca5f16ec6c5c6fc8c63e698",
+          "bytes": 32377
+        },
+        "fr10-workcell/native/universal-robots-ur5e/spanner-oven-blocked-rack-nominal.xml": {
+          "sha256": "5d4d708967d05b9231d5b48f7cd031629fcac018f10ab19f28e704c5193b6d43",
+          "bytes": 46573
+        },
+        "fr10-workcell/native/universal-robots-ur5e/spanner-oven-blocked.json": {
+          "sha256": "68e5cca3964df2b74f9d909401c707162541ca3dfbe43b32e188f0b2c577afc8",
+          "bytes": 29919
+        },
+        "fr10-workcell/native/universal-robots-ur5e/spanner-oven-blocked.xml": {
+          "sha256": "23989275763662ebe7ea55f606fad8aac53faf871970a751625675dc81ccf93b",
+          "bytes": 45025
+        },
+        "fr10-workcell/native/universal-robots-ur5e/spanner-oven-closed-door.json": {
+          "sha256": "98cd382614e08cb4ecb443245d0a8dd1ec6f10babd58fb7a42b4f39e3530cd45",
+          "bytes": 29435
+        },
+        "fr10-workcell/native/universal-robots-ur5e/spanner-oven-closed-door.xml": {
+          "sha256": "e05d7cea852a04739ccdc8de0bb2b683fb8d294245a65fdd579f19306434fb96",
+          "bytes": 44716
+        },
+        "fr10-workcell/native/universal-robots-ur5e/spanner-oven-combined-nominal.json": {
+          "sha256": "377ff823cf473d4dbc05dce2a3a097d10769f73036d495dbdf6744a4ba164a68",
+          "bytes": 31970
+        },
+        "fr10-workcell/native/universal-robots-ur5e/spanner-oven-combined-nominal.xml": {
+          "sha256": "9862a2bfcac2ec2ef3c497192abb877de640e5e37242f5bc0bc21ab03590d989",
+          "bytes": 46353
+        },
+        "fr10-workcell/native/universal-robots-ur5e/spanner-oven-nominal.json": {
+          "sha256": "d098009bd42defde3c420eb300681fb02594fa7796624b917a50fafd0c628947",
+          "bytes": 29514
+        },
+        "fr10-workcell/native/universal-robots-ur5e/spanner-oven-nominal.xml": {
+          "sha256": "92ad26fdbd83ac9c9f59cab2a9c764df4a3d9712ff8e00eceb6794bc69d8cf6f",
+          "bytes": 44768
+        },
+        "fr10-workcell/native/universal-robots-ur5e/spanner-oven-unreachable-rack-nominal.json": {
+          "sha256": "cdfd8829997ef04951a3ec1c71cbf4184070317080627cd8b6364dc65622e500",
+          "bytes": 31970
+        },
+        "fr10-workcell/native/universal-robots-ur5e/spanner-oven-unreachable-rack-nominal.xml": {
+          "sha256": "100f8cbc4214883427f342b37b961a59790e851b0e793ba0be6a03e9d68ea318",
+          "bytes": 46335
+        },
         "fr10-workcell/native/universal-robots-ur5e/table-to-oven-blocked.json": {
           "sha256": "a6c498478e72c3db5a148822db737e66c2461608950f4f773525f43b58eafc45",
           "bytes": 41582
@@ -3282,19 +3402,19 @@
           "bytes": 227697
         },
         "fr10-workcell/recordings/nominal.json": {
-          "sha256": "bb94859d801d98bdded641a972e6e5c5fa7a995c55e9a306427e64b4454c5b31",
+          "sha256": "c52a5f85ad78cb087fd537d06fdca15d80e6eb6a8102b7e25fc54f30cdff3134",
           "bytes": 537459
         },
         "fr10-workcell/recordings/oven-cycle.json": {
-          "sha256": "35d50f46d9db652e0a7bfd99e9f0b338b6adf3a0e122c7557ea968d067cfef74",
+          "sha256": "2383c8c7ab8a0191c87489966cc7e87e317c1c8d530ab29e2593adbee00a4aad",
           "bytes": 1454776
         },
         "fr10-workcell/recordings/oven-loading.json": {
-          "sha256": "f7289855e0c2d0b437233113d4a4a5a652bb4d1c4df4ebc6dfe861b43ed3627f",
+          "sha256": "bdd1c0f5e8f7a7abaa45d05b222b5d20af8df7b130d30f8300222c38ecc8f8b6",
           "bytes": 714895
         },
         "fr10-workcell/recordings/oven-rack-cycle.json": {
-          "sha256": "23ce2ef05d683676eb8f5cafdee1c284f87eb6975d23e2eb6c3b5b0b9b367d4b",
+          "sha256": "ba3213b36fa9e62d7dcd35ae5b351017c8815246576859446b3c575ccc0ba81f",
           "bytes": 2011263
         },
         "fr10-workcell/source.png": {

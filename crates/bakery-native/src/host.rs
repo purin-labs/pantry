@@ -42,6 +42,10 @@ pub enum Definition {
         cell: String,
         robot: Robot,
     },
+    SpannerOvenRack {
+        cell: String,
+        robot: Robot,
+    },
     PanStaging {
         cell: String,
         robot: Robot,
@@ -459,6 +463,9 @@ impl Host {
             Definition::Rack { cell, robot: model } => robot(CellFixture::Rack, cell, model),
             Definition::OvenRack { cell, robot: model } => {
                 robot(CellFixture::OvenRack, cell, model)
+            }
+            Definition::SpannerOvenRack { cell, robot: model } => {
+                robot(CellFixture::SpannerOvenRack, cell, model)
             }
             Definition::PanStaging { cell, robot: model } => {
                 robot(CellFixture::PanStaging, cell, model)

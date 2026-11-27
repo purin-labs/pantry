@@ -12,7 +12,7 @@ from pathlib import Path
 
 import mujoco
 import numpy as np
-from prepare import ROBOTS
+from prepare import ROBOTS, RobotSpec
 from native_asset_snapshot import fixture_snapshot, geometry_snapshot, pose
 from pour_over_station import (
     STATION,
@@ -22,13 +22,13 @@ from pour_over_station import (
     station_geometry,
 )
 from spanner_workcell import (
-    FR10_SPEC,
     MBCO4_DIR,
     MBCO4_GLB,
-    SPANNER_HOME_Q,
     SPANNER_OPEN_M,
+    SPANNER_ROBOTS,
     SPANNER_TRAY_QUAT,
     compose_spanner_oven_cell,
+    spanner_home_q,
 )
 from workcell import (
     ASSETS,
@@ -148,18 +148,38 @@ def export_pour_over(destination: Path, dependencies: set) -> None:
     )
 
 
-def export_spanner_oven(destination: Path, dependencies: set) -> None:
-    """Serialize the Plan 24 FR10 + Maruzen MBCO-4ME spanner-gripper workcell fixtures."""
-    for stem, blocked, door_closed, articulated_door in (
-        ("spanner-oven-nominal", False, False, False),
-        ("spanner-oven-closed-door", False, True, False),
-        ("spanner-oven-blocked", True, False, False),
-        ("spanner-oven-door-nominal", False, True, True),
-    ):
+def export_spanner_oven(
+    robot_spec: RobotSpec, destination: Path, dependencies: set
+) -> None:
+    """Serialize the Plan 24 cobot + Maruzen MBCO-4ME spanner-gripper workcell fixtures."""
+    variants = [
+        ("spanner-oven-nominal", False, False, False, False, False, False),
+        ("spanner-oven-closed-door", False, True, False, False, False, False),
+        ("spanner-oven-blocked", True, False, False, False, False, False),
+        ("spanner-oven-combined-nominal", False, False, False, True, False, False),
+        ("spanner-oven-blocked-rack-nominal", False, False, False, True, True, False),
+        ("spanner-oven-unreachable-rack-nominal", False, False, False, True, False, True),
+    ]
+    if robot_spec.slug == "fairino-fr10":
+        variants.append(("spanner-oven-door-nominal", False, True, True, False, False, False))
+    home_q = spanner_home_q(robot_spec.slug)
+    for (
+        stem,
+        blocked,
+        door_closed,
+        articulated_door,
+        include_rack,
+        rack_blocked,
+        rack_unreachable,
+    ) in variants:
         spec = compose_spanner_oven_cell(
             blocked=blocked,
             door_closed=door_closed,
             articulated_door=articulated_door,
+            include_rack=include_rack,
+            rack_blocked=rack_blocked,
+            rack_unreachable=rack_unreachable,
+            robot_spec=robot_spec,
         )
         original = spec.compile()
         xml = ET.fromstring(spec.to_xml())
@@ -179,8 +199,8 @@ def export_spanner_oven(destination: Path, dependencies: set) -> None:
             if source is None:
                 continue
             base = (
-                ASSETS / FR10_SPEC.slug
-                if mesh.get("name", "").startswith(FR10_SPEC.slug + "__")
+                ASSETS / robot_spec.slug
+                if mesh.get("name", "").startswith(robot_spec.slug + "__")
                 else MBCO4_DIR
             )
             path = Path(os.path.normpath(base / source))
@@ -202,10 +222,12 @@ def export_spanner_oven(destination: Path, dependencies: set) -> None:
             if not np.allclose(
                 getattr(original, field), getattr(model, field), rtol=1e-10, atol=1e-12
             ):
-                raise RuntimeError(f"Spanner oven export changed {field}: {stem}")
+                raise RuntimeError(
+                    f"Spanner oven export changed {field}: {robot_spec.slug}/{stem}"
+                )
         data = mujoco.MjData(model)
         mujoco.mj_resetData(model, data)
-        data.qpos[arm_addresses(model)[0]] = SPANNER_HOME_Q
+        data.qpos[arm_addresses(model)[0]] = home_q
         data.joint("clamp_opening").qpos[0] = SPANNER_OPEN_M
         mujoco.mj_forward(model, data)
         center = data.site("source_tray_center").xpos
@@ -214,7 +236,7 @@ def export_spanner_oven(destination: Path, dependencies: set) -> None:
         signature = mujoco.mjtState.mjSTATE_INTEGRATION
         state = np.empty(mujoco.mj_stateSize(model, signature))
         mujoco.mj_getState(model, data, state, signature)
-        base = data.body("fairino-fr10__base_link")
+        base = data.body(f"{robot_spec.slug}__base_link")
         setup_path = destination / f"{stem}.json"
         write_json(
             setup_path,
@@ -222,7 +244,13 @@ def export_spanner_oven(destination: Path, dependencies: set) -> None:
                 "initialState": state.tolist(),
                 "robotBase": pose(base.xpos, base.xquat),
                 "fixture": fixture_snapshot(
-                    {"bakeryTaskId": BakeryTask.OVEN, "spanner": True}, model, data
+                    {
+                        "bakeryTaskId": BakeryTask.OVEN,
+                        "spanner": True,
+                        "combined": include_rack,
+                    },
+                    model,
+                    data,
                 ),
                 "geometry": geometry_snapshot(model, data),
             },
@@ -359,7 +387,8 @@ def build() -> None:
                 )
                 dependencies.update((xml_path, setup_path))
     export_pour_over(OUTPUT / "fairino-fr10", dependencies)
-    export_spanner_oven(OUTPUT / "fairino-fr10", dependencies)
+    for robot_spec in SPANNER_ROBOTS:
+        export_spanner_oven(robot_spec, OUTPUT / robot_spec.slug, dependencies)
     dependencies.add(TRAY.parent / "maruzen-mbco-5e.glb")
     dependencies.add(MBCO4_GLB)
     linea_glb = (

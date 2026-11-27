@@ -35,6 +35,15 @@ const ROBOT_ITEMS = ROBOT_IDS.map((robot) => ({
   value: robot,
   label: ROBOTS[robot].label,
 }));
+const SPANNER_ROBOT_IDS: readonly RobotModel[] = [
+  "fairino-fr10",
+  "universal-robots-ur5e",
+  "fanuc-crx10ial",
+];
+const SPANNER_ROBOT_ITEMS = SPANNER_ROBOT_IDS.map((robot) => ({
+  value: robot,
+  label: ROBOTS[robot].label,
+}));
 const WORKCELL_ITEMS = [
   { value: "separate", label: "Standard fork clamp" },
   { value: "spanner-oven", label: "Spanner oven (MBCO-4ME)" },
@@ -144,7 +153,9 @@ export class RobotComparison extends React.Component<Props, State> {
     if (value === "spanner-oven") {
       this.setState((state) => ({
         cell: "spanner-oven",
-        robot: "fairino-fr10",
+        robot: SPANNER_ROBOT_IDS.includes(state.robot)
+          ? state.robot
+          : "fairino-fr10",
         task: "table-to-oven",
         scenario: state.scenario === "unreachable" ? "nominal" : state.scenario,
       }));
@@ -200,7 +211,10 @@ export class RobotComparison extends React.Component<Props, State> {
     void this.run([this.state.robot], 1);
   }
   private compare(): void {
-    void this.run(ROBOT_IDS, 2);
+    void this.run(
+      this.state.cell === "spanner-oven" ? SPANNER_ROBOT_IDS : ROBOT_IDS,
+      2,
+    );
   }
 
   private prepared(
@@ -367,6 +381,7 @@ export class RobotComparison extends React.Component<Props, State> {
     const busy = progress.kind === "running";
     const disabled = busy || this.props.disabled;
     const isSpanner = this.state.cell === "spanner-oven";
+    const robots = isSpanner ? SPANNER_ROBOT_ITEMS : ROBOT_ITEMS;
     const scenarios = isSpanner ? SPANNER_SCENARIO_ITEMS : SCENARIO_ITEMS;
     return (
       <section
@@ -397,15 +412,15 @@ export class RobotComparison extends React.Component<Props, State> {
           <label>
             Robot
             <Select.Root
-              items={ROBOT_ITEMS}
+              items={robots}
               value={this.state.robot}
               onValueChange={this.chooseRobot.bind(this)}
-              disabled={disabled || isSpanner}
+              disabled={disabled}
             >
               <Select.Trigger>
                 <Select.Value />
               </Select.Trigger>
-              <Select.Popup>{ROBOT_ITEMS.map(renderItem)}</Select.Popup>
+              <Select.Popup>{robots.map(renderItem)}</Select.Popup>
             </Select.Root>
           </label>
           <label>
@@ -489,7 +504,7 @@ export class RobotComparison extends React.Component<Props, State> {
           </button>
           <button
             type="button"
-            disabled={disabled || isSpanner}
+            disabled={disabled}
             onClick={this.compare.bind(this)}
           >
             Compare existing arms

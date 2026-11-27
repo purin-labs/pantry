@@ -249,16 +249,37 @@ fn spanner_place_and_release(dest_grip: Point, place_seconds: f64) -> [Phase; 3]
     ]
 }
 
-fn spanner_loading_phases(engine: &Engine) -> Result<Vec<Phase>> {
+fn spanner_loading_phases_from(
+    engine: &Engine,
+    initial: Point,
+    retreated: bool,
+) -> Result<Vec<Phase>> {
     let source_site = engine.site("source_tray_center")?;
     let dest_site = engine.site(BakeryTask::Oven.destination())?;
     let source_grasp = source_site + Point::new(0., 0., 0.011);
     let dest_grip = dest_site + Point::from(SPANNER_GRASP_OFFSET);
     let slide_z = (dest_site.z + 0.042).max(source_site.z + 0.30);
-    let initial = engine.grasp_site();
     let mouth_out = Point::new(dest_grip.x, dest_grip.y - 0.48, dest_grip.z + 0.049);
-    let mut phases = vec![
-        Phase::new("settle", initial, 0.5, false, false),
+    let mut phases = vec![Phase::new("settle", initial, 0.5, false, false)];
+    if retreated {
+        phases.extend([
+            Phase::new(
+                "return_lift",
+                Point::new(initial.x, initial.y, slide_z),
+                1.5,
+                false,
+                false,
+            ),
+            Phase::new(
+                "return_traverse",
+                Point::new(source_site.x, source_site.y, slide_z),
+                2.5,
+                false,
+                false,
+            ),
+        ]);
+    }
+    phases.extend([
         Phase::new(
             "approach",
             source_site + Point::new(0., 0., 0.16),
@@ -297,7 +318,7 @@ fn spanner_loading_phases(engine: &Engine) -> Result<Vec<Phase>> {
             true,
             true,
         ),
-    ];
+    ]);
     phases.extend(spanner_place_and_release(dest_grip, 1.5));
     phases.extend([
         Phase::new(
@@ -309,6 +330,51 @@ fn spanner_loading_phases(engine: &Engine) -> Result<Vec<Phase>> {
         ),
         Phase::new("clear_oven_front", mouth_out, 2.5, false, false),
         Phase::new("settled", mouth_out, 2.0, false, false),
+    ]);
+    Ok(phases)
+}
+
+fn spanner_racking_phases(
+    engine: &Engine,
+    source_site: Point,
+    initial: Point,
+) -> Result<Vec<Phase>> {
+    let dest_site = engine.site(BakeryTask::Rack.destination())?;
+    let source_grasp = source_site + Point::new(0., 0., 0.011);
+    let dest_grip = dest_site + Point::from(SPANNER_GRASP_OFFSET);
+    let clear_z = source_site.z.max(dest_site.z) + 0.16;
+    let retract = dest_grip + Point::new(0., 0.004, 0.16);
+    let mut phases = vec![
+        Phase::new("settle", initial, 0.5, false, false),
+        Phase::new(
+            "approach",
+            source_site + Point::new(0., 0., 0.16),
+            1.0,
+            false,
+            false,
+        ),
+        Phase::new("seat", source_grasp, 2.0, false, false),
+        Phase::new("grasp", source_grasp, 1.0, true, false),
+        Phase::new("hold_grasp", source_grasp, 0.5, true, false),
+        Phase::new(
+            "lift",
+            Point::new(source_grasp.x, source_grasp.y, clear_z),
+            2.0,
+            true,
+            true,
+        ),
+        Phase::new(
+            "transfer",
+            Point::new(dest_grip.x, dest_grip.y, clear_z),
+            3.0,
+            true,
+            true,
+        ),
+    ];
+    phases.extend(spanner_place_and_release(dest_grip, 2.0));
+    phases.extend([
+        Phase::new("retract", retract, 2.0, false, false),
+        Phase::new("settled", retract, 2.0, false, false),
     ]);
     Ok(phases)
 }
@@ -488,8 +554,16 @@ impl Phase {
 }
 
 pub fn phases(engine: &Engine, task: BakeryTask) -> Result<Vec<Phase>> {
-    if engine.is_spanner() && task == BakeryTask::Oven {
-        return spanner_loading_phases(engine);
+    if engine.is_spanner() {
+        return match task {
+            BakeryTask::Oven => spanner_loading_phases_from(engine, engine.grasp_site(), false),
+            BakeryTask::Rack => spanner_racking_phases(
+                engine,
+                engine.site("source_tray_center")?,
+                engine.grasp_site(),
+            ),
+            BakeryTask::Unload => anyhow::bail!("Retrieval requires loaded state"),
+        };
     }
     let source = engine.site("source_tray_center")? + Point::from(GRASP_OFFSET);
     let clearance = if task == BakeryTask::Oven { 0.50 } else { 0.32 };
@@ -1013,9 +1087,16 @@ fn plan(engine: &Engine, task: BakeryTask, start: &Start) -> Result<Vec<Phase>> 
                 "Recovery handling lasts at most five minutes"
             );
             let from = Point::from(*previous_target);
-            let source = engine.site("source_tray_center")? + Point::from(GRASP_OFFSET);
-            let ready = source + Point::new(-0.25, 0., -0.003);
-            let height = from.z.max(source.z + 0.32);
+            let ready = if engine.is_spanner() {
+                engine.site("source_tray_center")? + Point::new(0., 0., 0.16)
+            } else {
+                engine.site("source_tray_center")?
+                    + Point::from(GRASP_OFFSET)
+                    + Point::new(-0.25, 0., -0.003)
+            };
+            let height = from
+                .z
+                .max(ready.z + if engine.is_spanner() { 0.16 } else { 0.32 });
             Ok(vec![
                 Phase::new(
                     "human_handling",
@@ -1058,7 +1139,11 @@ fn plan(engine: &Engine, task: BakeryTask, start: &Start) -> Result<Vec<Phase>> 
                 task == BakeryTask::Rack,
                 "Returned state requires rack transfer"
             );
-            let source = Point::from_column_slice(&tray[..3]) + Point::from(GRASP_OFFSET);
+            let tray_pos = Point::from_column_slice(&tray[..3]);
+            if engine.is_spanner() {
+                return spanner_racking_phases(engine, tray_pos, Point::from(*previous_target));
+            }
+            let source = tray_pos + Point::from(GRASP_OFFSET);
             transfer_phases(
                 engine,
                 task,
@@ -1089,8 +1174,18 @@ fn plan(engine: &Engine, task: BakeryTask, start: &Start) -> Result<Vec<Phase>> 
                 matches!(task, BakeryTask::Rack | BakeryTask::Oven),
                 "A ready cell supports rack transfer or oven loading"
             );
-            let source = engine.site("source_tray_center")? + Point::from(GRASP_OFFSET);
             let from = Point::from(*previous_target);
+            if engine.is_spanner() {
+                let retreated = matches!(start, Start::Retreated { .. });
+                return match task {
+                    BakeryTask::Oven => spanner_loading_phases_from(engine, from, retreated),
+                    BakeryTask::Rack => {
+                        spanner_racking_phases(engine, engine.site("source_tray_center")?, from)
+                    }
+                    BakeryTask::Unload => unreachable!(),
+                };
+            }
+            let source = engine.site("source_tray_center")? + Point::from(GRASP_OFFSET);
             let clearance = if task == BakeryTask::Oven { 0.50 } else { 0.32 };
             let mut phases = transfer_phases(engine, task, source, from, clearance, 0.30)?;
             if matches!(start, Start::Retreated { .. }) {

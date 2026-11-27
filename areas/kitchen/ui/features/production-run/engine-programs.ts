@@ -33,9 +33,9 @@ export type JobTask =
       robot: unknown;
       ingredients: unknown;
       task: "table-to-rack" | "table-to-oven";
-      cell?: "separate" | "spanner-oven";
+      cell?: "separate" | "spanner-oven" | "spanner-oven-combined";
       scenario: "nominal" | "blocked" | "unreachable" | "closed-door" | "slip";
-      mode?: "transfer" | "oven-cycle";
+      mode?: "transfer" | "oven-cycle" | "rack-cycle";
     }>
   | Readonly<{
       kind: "request" | "prepared-request";
@@ -288,13 +288,15 @@ export class EnginePrograms {
   ): Promise<Job> {
     const robot = parseRobotModel(task.robot);
     const ingredients = parseIngredientLoad(task.ingredients);
-    if (task.cell === "spanner-oven") {
+    if (task.cell === "spanner-oven" || task.cell === "spanner-oven-combined") {
       const mode = task.mode ?? "transfer";
       if (
         mode !== "transfer" &&
         (task.task !== "table-to-oven" || task.scenario !== "nominal")
       )
         throw new Error("A browser cycle requires nominal oven loading.");
+      if (mode === "rack-cycle" && task.cell !== "spanner-oven-combined")
+        throw new Error("A rack cycle requires a combined cell.");
       const generated = await this.program({
         op: "prepare",
         preparation: {
@@ -304,7 +306,7 @@ export class EnginePrograms {
           ingredientLateralMm: ingredients.lateralMm,
           clampForceN: 100,
           task: task.task,
-          cell: "spanner-oven",
+          cell: task.cell,
           case: task.scenario,
           timestep: 0.002,
           rackXMm: 0,
@@ -371,8 +373,10 @@ export class EnginePrograms {
       throw new Error(
         "The request model does not match the pinned browser assets.",
       );
-    // The controller names the fault cells without their "combined-" stem.
-    return cell.replace(/^combined-/u, "");
+    // The controller names the fault cells without their "combined-" / "oven-" stem.
+    return cell
+      .replace(/^combined-/u, "")
+      .replace(/^spanner-oven-(blocked|unreachable)-rack$/u, "spanner-$1-rack");
   }
 }
 
@@ -392,10 +396,12 @@ function parseTask(raw: unknown): JobTask {
     (raw.task === "table-to-rack" || raw.task === "table-to-oven") &&
     (raw.cell === undefined ||
       raw.cell === "separate" ||
-      raw.cell === "spanner-oven") &&
+      raw.cell === "spanner-oven" ||
+      raw.cell === "spanner-oven-combined") &&
     (raw.mode === undefined ||
       raw.mode === "transfer" ||
-      raw.mode === "oven-cycle") &&
+      raw.mode === "oven-cycle" ||
+      raw.mode === "rack-cycle") &&
     (raw.scenario === "nominal" ||
       raw.scenario === "blocked" ||
       raw.scenario === "unreachable" ||

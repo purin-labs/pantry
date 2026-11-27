@@ -54,8 +54,10 @@ function styleFor(name: string): Readonly<{
   if (exact !== undefined) return exact;
   if (name.startsWith("mbco4_tray_"))
     return { color: 0xc8cfd4, metalness: 0.75, roughness: 0.34 };
-  if (name.startsWith("table_leg_"))
+  if (name.startsWith("table_leg_") || name.startsWith("rack_post_"))
     return { color: 0x9aa4ac, metalness: 0.68, roughness: 0.38 };
+  if (name.startsWith("rack_rail_"))
+    return { color: 0xb8c0c6, metalness: 0.76, roughness: 0.3 };
   return { color: 0x9ca5ac, metalness: 0.5, roughness: 0.45 };
 }
 

@@ -143,6 +143,12 @@ export const OVEN_CELL = Object.freeze({
   robot: "universal-robots-ur5e",
 });
 
+/** The Plan 24 MBCO-4ME spanner-oven-and-rack cell. */
+export const SPANNER_OVEN_CELL = Object.freeze({
+  fixture: "spanner-oven-rack",
+  robot: "fairino-fr10",
+});
+
 /**
  * A cell definition as this runtime pins it to its own build, through the
  * host's `define` command. `definition` holds the fixture and its options
@@ -166,7 +172,10 @@ export function defineCell(module, cell, definition = {}) {
   const reply = hostCommand(module, {
     op: "define",
     definition:
-      fixture === "rack" || fixture === "oven-rack" || fixture === "pan-staging"
+      fixture === "rack" ||
+      fixture === "oven-rack" ||
+      fixture === "spanner-oven-rack" ||
+      fixture === "pan-staging"
         ? { fixture, cell, robot: "fairino-fr10", ...definition }
         : { fixture, cell, ...definition },
   });

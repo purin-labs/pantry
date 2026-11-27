@@ -472,6 +472,20 @@ export class PhysicsModel {
       );
       this.resourceByObject.set(standGroup, OVEN.destination);
       this.root.add(standGroup);
+      if (
+        recording.geometry.some(
+          (item) => item.body === "world" && item.name.startsWith("rack_"),
+        )
+      ) {
+        const rackGroup = buildSpannerGroup(
+          recording.geometry,
+          (item) => item.body === "world" && item.name.startsWith("rack_"),
+          "rack_visual",
+          setPhysicsPose,
+        );
+        this.resourceByObject.set(rackGroup, RACK.destination);
+        this.root.add(rackGroup);
+      }
       const obstruction = recording.geometry.find(
         (item) => item.name === "destination_obstruction",
       );

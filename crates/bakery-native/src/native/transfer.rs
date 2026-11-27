@@ -97,12 +97,26 @@ fn compile(
     let position = contents.position();
     position[0] = -f64::from(ingredients.lateral_mm) / 1000.;
     position[1] = f64::from(ingredients.forward_mm) / 1000.;
+    // Every world has one table (Refactor 16, step 5). The tray overhangs the
+    // table's edge. With the default contact it sinks 0.18 mm there, tilts,
+    // and creeps down that slope at 1 µm/s. A steel top does not yield: give
+    // it the stiffest contact a 2 ms step supports, taking priority over the
+    // tray's.
+    let table_top_z = {
+        let mut top = spec
+            .geom(c"table_top")
+            .context("Fixture has no table top")?;
+        let z = top.position()[2];
+        top.set_contact(1, [0.004, 1.], [0.99, 0.999, 0.001, 0.5, 2.]);
+        z
+    };
     if persistent {
         let table = spec
             .body_position(c"cell_table")
             .map(|table| *table)
             .context("Fixture has no source table for a reference body")?;
         // A 40 mm block resting on the table beyond the tray's far edge.
+        // Every table_top box has half-height 0.02 m, so the top sits at table_top_z + 0.02 m.
         spec.add_free_box(
             c"world",
             [
@@ -110,20 +124,12 @@ fn compile(
                 c"cell_reference_free",
                 c"cell_reference_block",
             ],
-            [table[0] + 0.22, table[1], 0.82],
+            [table[0] + 0.22, table[1], table_top_z + 0.04],
             [0.02, 0.02, 0.02],
             0.2,
         )
         .context("Fixture has no source table for a reference body")?;
     }
-    // Every world has one table (Refactor 16, step 5). The tray overhangs the
-    // table's edge. With the default contact it sinks 0.18 mm there, tilts,
-    // and creeps down that slope at 1 µm/s. A steel top does not yield: give
-    // it the stiffest contact a 2 ms step supports, taking priority over the
-    // tray's.
-    spec.geom(c"table_top")
-        .context("Fixture has no table top")?
-        .set_contact(1, [0.004, 1.], [0.99, 0.999, 0.001, 0.5, 2.]);
     spec.compile()
 }
 
