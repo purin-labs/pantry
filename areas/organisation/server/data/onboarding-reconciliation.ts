@@ -35,8 +35,15 @@ import {
   type ActorRegistryId,
 } from "@purin-labs/actor-runtime/actors/actor-registry";
 import { resolveActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
-import type { AdmittedOrganisationArchiveCleanup } from "@purin-labs/actor-runtime/actors/organisation-archive-cleanup";
+import {
+  actorStub,
+  type PlacedActorRpc,
+} from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type {
+  AdmittedOrganisationArchiveCleanup,
+  OrganisationArchiveCleanupError,
+  OrganisationArchiveCleanupRequest,
+} from "@purin-labs/actor-runtime/actors/organisation-archive-cleanup";
 import { resolveActiveOrganisationPlacementRecord } from "@purin-labs/tenancy/data/organisation-placement";
 import type { Env } from "@purin-labs/kernel/env";
 import type { SessionActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
@@ -74,6 +81,22 @@ import {
   prepareProjectionRevisionBump,
   prepareRepairConfigurationBump,
 } from "@purin-labs/tenancy/data/organisation-onboarding-row";
+
+/**
+ * The RPC method of the Organisation Actor that the archived Organisation
+ * pass calls: it reconciles the cleanup of the archive. `OrganisationDO`,
+ * the class of the Worker, implements it.
+ */
+export interface OrganisationArchiveCleanupRpc {
+  reconcileArchiveCleanup(
+    input: OrganisationArchiveCleanupRequest,
+  ): Promise<Result<number, OrganisationArchiveCleanupError>>;
+}
+
+/** The Organisation Actors as this reconciliation calls them. */
+type ArchiveCleanupOrganisationNamespace = DurableObjectNamespace<
+  PlacedActorRpc & OrganisationArchiveCleanupRpc
+>;
 
 type OnboardingReconciliationSubject =
   | "open_attempts"
@@ -168,7 +191,7 @@ export async function reconcileOrganisationOnboarding(input: {
   readonly archive: R2Bucket;
   readonly sessionNamespace: Env["SESSION"];
   readonly connectorNamespace: Env["CONNECTOR"];
-  readonly organisationNamespace: Env["ORGANISATION"];
+  readonly organisationNamespace: ArchiveCleanupOrganisationNamespace;
   readonly organisationId: OrganisationId;
   readonly now: number;
 }): Promise<
@@ -622,7 +645,7 @@ async function reconcileSubject(input: {
   readonly archive: R2Bucket;
   readonly sessionNamespace: Env["SESSION"];
   readonly connectorNamespace: Env["CONNECTOR"];
-  readonly organisationNamespace: Env["ORGANISATION"];
+  readonly organisationNamespace: ArchiveCleanupOrganisationNamespace;
   readonly organisation: RequiredOrganisationReconciliationState;
   readonly subject: OnboardingReconciliationSubject;
   readonly portalSubjectHash: string;
@@ -733,7 +756,7 @@ async function executeReconciliationSubject(
   archive: R2Bucket,
   sessionNamespace: Env["SESSION"],
   connectorNamespace: Env["CONNECTOR"],
-  organisationNamespace: Env["ORGANISATION"],
+  organisationNamespace: ArchiveCleanupOrganisationNamespace,
   organisation: RequiredOrganisationReconciliationState,
   subject: OnboardingReconciliationSubject,
   now: number,

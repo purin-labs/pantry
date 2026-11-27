@@ -10,7 +10,10 @@ import {
 } from "@purin-labs/tenancy/data/control-mutation";
 
 import type { Env } from "@purin-labs/kernel/env";
-import { roleMayConfigure, type ControlRole } from "@purin-labs/tenancy/data/control-plane";
+import {
+  roleMayConfigure,
+  type ControlRole,
+} from "@purin-labs/tenancy/data/control-plane";
 import type { ControlSessionId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { runAgentOperation } from "@purin-labs/conversation/data/agent-operation-runner";
@@ -22,8 +25,11 @@ import { deviceCommands } from "@purin-labs/area-devices-contract/server/device-
 import {
   parseBakeStockLevelInput,
   type BakeStockLevelInput,
+  type BakeStockLevelView,
 } from "@purin-labs/kitchen-control-api";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { PlacedActorRpc } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { OrganisationPlacementConflict } from "@purin-labs/tenancy/actors/organisation/types";
 import {
   applyJevDraftCommand,
   jevDraftOperation,
@@ -712,14 +718,16 @@ async function applyClaimedWorkflowChange(
   const db = execution.database;
   if (approver === null)
     return { ok: false, error: { code: "workflow_approver_required" } };
-  const applied = await workflowChanges.use().applyApprovedWorkflowChange(
-    env,
-    execution,
-    organisationId,
-    stored.draftId,
-    change,
-    approver,
-  );
+  const applied = await workflowChanges
+    .use()
+    .applyApprovedWorkflowChange(
+      env,
+      execution,
+      organisationId,
+      stored.draftId,
+      change,
+      approver,
+    );
   switch (applied.kind) {
     case "applied":
       break;
@@ -896,6 +904,34 @@ async function applyClaimedJevFeature(
 }
 
 /**
+ * The RPC method of the Organisation Actor that sets one bake stock level.
+ * Kitchen owns the level; this module reads only if it was set and why not.
+ * `OrganisationDO`, the class of the Worker, implements it.
+ */
+export interface OrganisationBakeStockLevelRpc {
+  setBakeStockLevel(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      level: BakeStockLevelInput;
+      setBy: string;
+    }>,
+  ): Promise<
+    Result<
+      Readonly<{
+        kind: "written" | "unchanged";
+        level: Readonly<Omit<BakeStockLevelView, "counterPieces" | "recipe">>;
+      }>,
+      | OrganisationPlacementConflict
+      | Readonly<{
+          code:
+            "bake_level_invalid" | "bake_recipe_missing" | "bake_level_stale";
+          message: string;
+        }>
+    >
+  >;
+}
+
+/**
  * Applies one confirmed bake stock level (Plan 24 S1) through the
  * Organisation Actor, the same function that the Bakes page calls. The person
  * who confirms must be an admin or the owner now, as on the page.
@@ -918,7 +954,9 @@ async function applyClaimedBakeStockLevel(
     error: { code: "agent_operation_invalid", field: "role" },
   };
   if (roleMayConfigure(actorRole)) {
-    const organisation = await requireActiveOrganisationActor({
+    const organisation = await requireActiveOrganisationActor<
+      PlacedActorRpc & OrganisationBakeStockLevelRpc
+    >({
       env,
       organisationId,
       now,

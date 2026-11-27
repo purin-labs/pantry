@@ -65,6 +65,8 @@ import {
 import type { ActorFenceToken } from "@purin-labs/actor-runtime/actors/actor-registry";
 import type { RelocationReceiptOrganisationRpc } from "@purin-labs/actor-runtime/actors/actor-relocation";
 import type { OrganisationQuiescenceRpc } from "@purin-labs/actor-runtime/actors/placement-execution-quiescence";
+import type { OrganisationArchiveCleanupRpc } from "@purin-labs/area-organisation/server/data/onboarding-reconciliation";
+import type { OrganisationBakeStockLevelRpc } from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import {
@@ -318,7 +320,9 @@ export class OrganisationDO
     OrganisationBoardPresenceRpc,
     OrganisationDescriptionDraftThreadRpc,
     OrganisationQuiescenceRpc,
-    RelocationReceiptOrganisationRpc
+    RelocationReceiptOrganisationRpc,
+    OrganisationArchiveCleanupRpc,
+    OrganisationBakeStockLevelRpc
 {
   // Commerce (`actors/organisation/organisation-commerce.ts`): the actions,
   // the cues, the commerce lab, the Code Mode leases and the workspace
