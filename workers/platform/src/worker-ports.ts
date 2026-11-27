@@ -241,11 +241,23 @@ import {
 import { chatSurfaces } from "@purin-labs/conversation/chat/surface-registry";
 import { KITCHEN_CHAT_SURFACES } from "@purin-labs/surface-portal/server/chat/kitchen-observation";
 import {
+  conversationSubjectReads,
   inboxSubjectReads,
   workflowSubjectReads,
 } from "@purin-labs/authority/access-control/subject-reads";
-import { INBOX_SUBJECT_READS } from "@purin-labs/area-inbox/server/data/authority-subject-reads";
-import { WORKFLOW_SUBJECT_READS } from "@purin-labs/agent/data/workflow-subject-reads";
+import {
+  INBOX_AUTOMATION_RECORDS,
+  INBOX_SUBJECT_READS,
+} from "@purin-labs/area-inbox/server/data/authority-subject-reads";
+import {
+  WORKFLOW_AUTOMATION_RECORDS,
+  WORKFLOW_SUBJECT_READS,
+} from "@purin-labs/agent/data/workflow-subject-reads";
+import {
+  inboxAutomationRecords,
+  workflowAutomationRecords,
+} from "@purin-labs/tenancy/organisation-access/automation-records";
+import { CONVERSATION_SUBJECT_READS } from "@purin-labs/area-organisation/server/data/authority-subject-reads";
 import { providerWorkReads } from "@purin-labs/actor-runtime/data/provider-work-reads";
 import { PROVIDER_WORK_READS } from "@purin-labs/area-integrations/server/provider-lifecycle/provider-work";
 import { integrationCredentialReads } from "@purin-labs/authority/credential-vault/integration-reads";
@@ -578,6 +590,9 @@ chatForkHistoryReads.register(CHAT_FORK_HISTORY_READS);
 organisationSlackChannels.register(ORGANISATION_SLACK_CHANNELS);
 providerWorkReads.register(PROVIDER_WORK_READS);
 
+conversationSubjectReads.register(CONVERSATION_SUBJECT_READS);
+workflowAutomationRecords.register(WORKFLOW_AUTOMATION_RECORDS);
+inboxAutomationRecords.register(INBOX_AUTOMATION_RECORDS);
 // The access model of the control module lists the Airtable bases of an
 // account through the external records client of the integrations area.
 externalRecordsDiscovery.register({

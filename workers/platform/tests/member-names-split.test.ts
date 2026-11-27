@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import { expect, it } from "vitest";
 import { handleControlRequest } from "../src/control-router";
 import { newPersonId } from "@purin-labs/kernel/ids";

@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import {
   TEST_ACTIVE_ORGANISATION_PLACEMENT_ROW,
   TEST_ORGANISATION_PLACEMENT_PROFILE,

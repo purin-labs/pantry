@@ -19,7 +19,12 @@ import type {
 } from "../authorization/access-grants/types";
 import { selectActiveGrants } from "../authorization/access-grants";
 import { CAPABILITY_CATALOGUE } from "../authorization/capability-catalogue";
-import { inboxSubjectReads } from "./subject-reads";
+import {
+  inboxSubjectReads,
+  subjectSources,
+  subjectSourcesSql,
+  type SubjectSource,
+} from "./subject-reads";
 import { listAccessGrants } from "../data/access-grants";
 import { readOrganisationCapabilityPolicies } from "../data/capability-policy";
 import type { ActiveOrganisationMembership } from "@purin-labs/tenancy/data/control-plane";
@@ -575,16 +580,13 @@ async function resolveSubjectReference(
   organisationId: OrganisationId,
   ref: AccessSubjectRef,
 ): Promise<Result<GrantSubject, ExplanationFailure>> {
+  const sources = subjectSources();
   try {
     const rows = await db
-      .prepare(subjectReferenceSql())
+      .prepare(subjectReferenceSql(sources))
       .bind(
         organisationId,
-        organisationId,
-        organisationId,
-        organisationId,
-        organisationId,
-        organisationId,
+        ...sources.map(() => organisationId),
         SUBJECT_RESOLUTION_LIMIT + 1,
       )
       .all<Record<string, unknown>>();
@@ -1601,7 +1603,7 @@ function flowReaderPresentation(
   }
 }
 
-function subjectReferenceSql(): string {
+function subjectReferenceSql(sources: readonly SubjectSource[]): string {
   return `WITH subject_options AS (
     SELECT * FROM (
       SELECT 'organisation_role' AS kind, 'owner' AS firstId, NULL AS secondId, 1 AS revision
@@ -1614,21 +1616,7 @@ function subjectReferenceSql(): string {
     )
     UNION ALL
     SELECT * FROM (
-      SELECT 'conversation' AS kind, integration_account_id AS firstId,
-             channel_id AS secondId, 1 AS revision
-        FROM organisation_slack_channel WHERE organisation_id = ?
-      UNION ALL
-      SELECT 'workflow', subscription_id, NULL, version FROM cue_subscription
-       WHERE organisation_id = ? AND enabled = 1
-      UNION ALL
-      SELECT 'workflow', binding_id, NULL, revision FROM schedule_binding
-       WHERE organisation_id = ? AND enabled = 1
-      UNION ALL
-      SELECT 'agent_mailbox', integration_account_id, mailbox_binding_id, current_revision
-        FROM agent_mailbox_binding WHERE organisation_id = ?
-      UNION ALL
-      SELECT 'whatsapp_support', integration_account_id, support_binding_id, current_revision
-        FROM whatsapp_support_binding WHERE organisation_id = ?
+      ${subjectSourcesSql(sources, "reference")}
     )
   )
   SELECT kind, firstId, secondId, revision

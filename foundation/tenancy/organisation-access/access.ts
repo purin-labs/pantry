@@ -15,6 +15,11 @@ import type { ActiveControlSession } from "../data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import type { Result } from "@purin-labs/kernel/result";
 import type { Variant } from "@purin-labs/type-utils";
+import {
+  inboxAutomationRecords,
+  workflowAutomationRecords,
+  type AutomationRecordCondition,
+} from "./automation-records";
 
 export type { OrganisationAdmissionAction, OrganisationUserAuthority };
 
@@ -344,46 +349,22 @@ class NativeOrganisationAccess implements OrganisationAccess {
   ): AccessAnswer {
     if (input.authority.organisationId !== this.organisationId)
       return { ok: false, error: { code: "scope_forbidden" } };
-    let current: string;
-    let bindings: readonly (string | number)[];
+    let current: AutomationRecordCondition;
     switch (input.authority.kind) {
       case "workflow":
-        current = `EXISTS (SELECT 1 FROM cue_subscription
-          WHERE organisation_id = ? AND subscription_id = ? AND version = ? AND enabled = 1)
-        OR EXISTS (SELECT 1 FROM schedule_binding
-          WHERE organisation_id = ? AND binding_id = ? AND revision = ? AND enabled = 1)`;
-        bindings = [
-          this.organisationId,
-          input.authority.workflowId,
-          input.authority.workflowRevision,
-          this.organisationId,
-          input.authority.workflowId,
-          input.authority.workflowRevision,
-        ];
+        current = workflowAutomationRecords
+          .use()
+          .workflowIsCurrent(input.authority);
         break;
       case "agent_mailbox":
-        current = `EXISTS (SELECT 1 FROM agent_mailbox_binding b
-          JOIN integration_account a ON a.organisation_id = b.organisation_id
-            AND a.integration_account_id = b.integration_account_id
-          WHERE b.organisation_id = ? AND b.mailbox_binding_id = ?
-            AND b.current_revision = ? AND a.lifecycle = 'active')`;
-        bindings = [
-          this.organisationId,
-          input.authority.mailboxBindingId,
-          input.authority.bindingRevision,
-        ];
+        current = inboxAutomationRecords
+          .use()
+          .agentMailboxIsCurrent(input.authority);
         break;
       case "whatsapp_support":
-        current = `EXISTS (SELECT 1 FROM whatsapp_support_binding b
-          JOIN integration_account a ON a.organisation_id = b.organisation_id
-            AND a.integration_account_id = b.integration_account_id
-          WHERE b.organisation_id = ? AND b.support_binding_id = ?
-            AND b.current_revision = ? AND a.lifecycle = 'active')`;
-        bindings = [
-          this.organisationId,
-          input.authority.supportBindingId,
-          input.authority.bindingRevision,
-        ];
+        current = inboxAutomationRecords
+          .use()
+          .whatsAppSupportIsCurrent(input.authority);
         break;
       default:
         return assertNever(input.authority);
@@ -392,9 +373,9 @@ class NativeOrganisationAccess implements OrganisationAccess {
       const row = await this.database
         .withSession("first-primary")
         .prepare(
-          `SELECT ${ORGANISATION_COLUMNS}, (${current}) AS automationCurrent`,
+          `SELECT ${ORGANISATION_COLUMNS}, (${current.sql}) AS automationCurrent`,
         )
-        .bind(...this.organisationBindings(), ...bindings)
+        .bind(...this.organisationBindings(), ...current.bindings)
         .first<OrganisationRow & { automationCurrent: unknown }>();
       const organisation = organisationEligibility(row);
       if (!organisation.ok) return organisation;

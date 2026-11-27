@@ -1,5 +1,11 @@
 // The options that the Access page offers for a grant's subject and resource.
 
+import {
+  subjectSources,
+  subjectSourcesSql,
+  type SubjectSource,
+} from "../access-control/subject-reads";
+
 type Database = Pick<D1Database, "prepare">;
 
 export type SubjectOptionRow = Readonly<{
@@ -27,15 +33,12 @@ export async function readSubjectOptionRows(
     offset: number;
   }>,
 ): Promise<readonly SubjectOptionRow[]> {
+  const sources = subjectSources();
   const rows = await db
-    .prepare(subjectOptionsSql())
+    .prepare(subjectOptionsSql(sources))
     .bind(
       input.organisationId,
-      input.organisationId,
-      input.organisationId,
-      input.organisationId,
-      input.organisationId,
-      input.organisationId,
+      ...sources.map(() => input.organisationId),
       input.query,
       input.query,
       input.limit,
@@ -78,7 +81,7 @@ export async function readIntegrationOptionRows(
   return rows.results ?? [];
 }
 
-function subjectOptionsSql(): string {
+function subjectOptionsSql(sources: readonly SubjectSource[]): string {
   return `WITH subject_options AS (
     SELECT * FROM (
       SELECT 'organisation_role' AS kind, 'owner' AS firstId, NULL AS secondId, 1 AS revision, 'Owner role' AS label
@@ -94,34 +97,7 @@ function subjectOptionsSql(): string {
     )
     UNION ALL
     SELECT * FROM (
-      SELECT 'conversation' AS kind, channel.integration_account_id AS firstId, channel.channel_id AS secondId,
-             1 AS revision, account.display_name || ' · ' || channel.channel_id AS label
-        FROM organisation_slack_channel AS channel
-        JOIN integration_account AS account ON account.organisation_id = channel.organisation_id
-          AND account.integration_account_id = channel.integration_account_id
-       WHERE channel.organisation_id = ?
-      UNION ALL
-      SELECT 'workflow', subscription_id, NULL, version, 'Event automation'
-        FROM cue_subscription WHERE organisation_id = ? AND enabled = 1
-      UNION ALL
-      SELECT 'workflow', binding_id, NULL, revision, 'Scheduled automation'
-        FROM schedule_binding WHERE organisation_id = ? AND enabled = 1
-      UNION ALL
-      SELECT 'agent_mailbox', binding.integration_account_id, binding.mailbox_binding_id,
-             binding.current_revision, account.display_name || ' · Agent mailbox'
-        FROM agent_mailbox_binding AS binding
-        JOIN integration_account AS account
-          ON account.integration_account_id = binding.integration_account_id
-         AND account.organisation_id = binding.organisation_id
-       WHERE binding.organisation_id = ?
-      UNION ALL
-      SELECT 'whatsapp_support', binding.integration_account_id, binding.support_binding_id,
-             binding.current_revision, account.display_name || ' · WhatsApp support'
-        FROM whatsapp_support_binding AS binding
-        JOIN integration_account AS account
-          ON account.integration_account_id = binding.integration_account_id
-         AND account.organisation_id = binding.organisation_id
-       WHERE binding.organisation_id = ?
+      ${subjectSourcesSql(sources, "option")}
     )
   )
   SELECT kind, firstId, secondId, revision, label
