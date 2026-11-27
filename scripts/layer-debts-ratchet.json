@@ -9,7 +9,7 @@
       "names": 44
     },
     "table-read": {
-      "reads": 85
+      "reads": 50
     },
     "surface-nonpublic": {
       "imports": 175
@@ -84,29 +84,17 @@
       "reason": "check-layers.mjs gives each D1 table an owner and counts the writes of each other module. A read has no rule. A FROM or a JOIN on a table of a higher module, or of another area, reads the records of that module without its contract.",
       "fix": "Call a read function of the owner module. For a read from below, the owner gives the function through a port. If the lower module is the true owner, change the owner of the table in the map.",
       "counts": {
-        "reads areas/cafe -> areas/devices": 2,
-        "reads areas/inbox -> areas/integrations": 1,
-        "reads areas/integrations -> areas/inbox": 1,
-        "reads areas/kitchen -> areas/commerce": 1,
-        "reads areas/kitchen -> areas/organisation": 1,
-        "reads areas/organisation -> areas/integrations": 1,
         "reads foundation/actor-runtime -> areas/integrations": 1,
         "reads foundation/actor-runtime -> areas/organisation": 1,
         "reads foundation/actor-runtime -> foundation/agent": 1,
         "reads foundation/actor-runtime -> foundation/connections": 1,
-        "reads foundation/agent -> foundation/conversation": 1,
-        "reads foundation/authority -> areas/inbox": 17,
-        "reads foundation/authority -> areas/integrations": 4,
+        "reads foundation/authority -> areas/inbox": 5,
         "reads foundation/authority -> areas/organisation": 2,
-        "reads foundation/authority -> foundation/agent": 8,
-        "reads foundation/authority -> foundation/conversation": 1,
+        "reads foundation/authority -> foundation/agent": 4,
         "reads foundation/authority -> surfaces/slack": 1,
-        "reads foundation/collaboration -> areas/organisation": 1,
         "reads foundation/connections -> areas/integrations": 3,
-        "reads foundation/connections -> areas/organisation": 3,
+        "reads foundation/connections -> areas/organisation": 1,
         "reads foundation/connections -> foundation/authority": 1,
-        "reads foundation/control -> foundation/agent": 1,
-        "reads foundation/conversation -> surfaces/slack": 2,
         "reads foundation/tenancy -> areas/inbox": 2,
         "reads foundation/tenancy -> areas/integrations": 2,
         "reads foundation/tenancy -> areas/organisation": 3,
