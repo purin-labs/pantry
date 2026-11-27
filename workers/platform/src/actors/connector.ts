@@ -26,6 +26,7 @@ import type {
   ActorFenceToken,
 } from "@purin-labs/actor-runtime/actors/actor-registry";
 import type { ConnectorQuiescenceRpc } from "@purin-labs/actor-runtime/actors/placement-execution-quiescence";
+import type { SlackTurnConnectorRpc } from "@purin-labs/tool-handlers/actors/harness-follow-up";
 import { CONNECTOR_ACTOR_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import { readEmailRuntime } from "@purin-labs/area-inbox/server/actors/connector-email";
 import {
@@ -107,7 +108,8 @@ export class ConnectorDO
     ConnectorWhatsAppRpc,
     ConnectorEmailRpc,
     CaseContextCollectionConnectorRpc,
-    ConnectorQuiescenceRpc
+    ConnectorQuiescenceRpc,
+    SlackTurnConnectorRpc
 {
   private readonly slack = new SlackConnectorChannel(this.channelHost());
 

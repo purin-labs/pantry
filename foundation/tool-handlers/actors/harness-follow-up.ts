@@ -7,6 +7,8 @@ import type { Env } from "@purin-labs/kernel/env";
 import { parseConnectorId } from "@purin-labs/kernel/ids";
 import { validateLiveRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { PlacedActorRpc } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { ConnectorResult } from "@purin-labs/conversation/actors/connector/types";
 import type {
   HarnessFollowUpRequest,
   HarnessFollowUpResult,
@@ -58,6 +60,40 @@ import {
 } from "@purin-labs/agent/actors/session/turn-tool-offers";
 
 /**
+ * The RPC methods of a Slack Connector Actor that a running Slack turn
+ * calls: it schedules a follow-up, keeps a permission request and posts its
+ * notice in the thread. Each method parses its own request. `ConnectorDO`,
+ * the class of the Worker, implements them. The Slack surface is above this
+ * module, so the results are stated here.
+ */
+export interface SlackTurnConnectorRpc {
+  scheduleSlackFollowUp(
+    raw: unknown,
+  ): Promise<
+    ConnectorResult<
+      | { readonly kind: "scheduled" | "duplicate"; readonly dueAt: number }
+      | { readonly kind: "limit_reached"; readonly dueAt?: never }
+    >
+  >;
+  parkSlackPermission(raw: unknown): Promise<
+    ConnectorResult<
+      Readonly<{
+        caseId: string;
+        workspaceId: string;
+        channelId: string;
+        threadTs: string;
+        requesterUserId: string | null;
+      }>
+    >
+  >;
+  noticeSlackPermission(
+    raw: unknown,
+  ): Promise<ConnectorResult<{ readonly notice: "posted" | "not_posted" }>>;
+}
+
+type SlackTurnConnectorActor = PlacedActorRpc & SlackTurnConnectorRpc;
+
+/**
  * Schedule a new turn in this turn's Slack thread. The thread's Connector
  * queues it as Case work with this turn's requester and authority, due after
  * the delay. The note is not sent anywhere: it stays in this Session's
@@ -105,14 +141,15 @@ export async function scheduleFollowUpForHarness(
     )
   ).slice(0, 32);
   const now = Date.now();
-  const connector = await resolveActiveConnectorActorAtPlacement({
-    env: input.env,
-    namespace: input.env.CONNECTOR,
-    organisationId: scope.organisationId,
-    placement: scope.placement,
-    connectorId: connectorId.value,
-    now,
-  });
+  const connector =
+    await resolveActiveConnectorActorAtPlacement<SlackTurnConnectorActor>({
+      env: input.env,
+      namespace: input.env.CONNECTOR,
+      organisationId: scope.organisationId,
+      placement: scope.placement,
+      connectorId: connectorId.value,
+      now,
+    });
   if (!connector.ok)
     throw new Error(`follow-up Connector unavailable: ${connector.error.code}`);
   await requireSessionExecution(input.execution, input.lease);
@@ -314,14 +351,15 @@ export async function requestPermissionForHarness(
   const connectorId = parseConnectorId(String(authority.connectorId));
   if (!connectorId.ok)
     throw new Error("permission request Connector identity invalid");
-  const connector = await resolveActiveConnectorActorAtPlacement({
-    env: input.env,
-    namespace: input.env.CONNECTOR,
-    organisationId: scope.organisationId,
-    placement: scope.placement,
-    connectorId: connectorId.value,
-    now,
-  });
+  const connector =
+    await resolveActiveConnectorActorAtPlacement<SlackTurnConnectorActor>({
+      env: input.env,
+      namespace: input.env.CONNECTOR,
+      organisationId: scope.organisationId,
+      placement: scope.placement,
+      connectorId: connectorId.value,
+      now,
+    });
   if (!connector.ok)
     throw new Error(
       `permission request Connector unavailable: ${connector.error.code}`,
@@ -576,14 +614,15 @@ export async function passOrAskForExitApproval(
   }
   const connectorId = parseConnectorId(String(authority.connectorId));
   if (!connectorId.ok) throw new Error("exit approval Connector invalid");
-  const connector = await resolveActiveConnectorActorAtPlacement({
-    env,
-    namespace: env.CONNECTOR,
-    organisationId: scope.organisationId,
-    placement: scope.placement,
-    connectorId: connectorId.value,
-    now,
-  });
+  const connector =
+    await resolveActiveConnectorActorAtPlacement<SlackTurnConnectorActor>({
+      env,
+      namespace: env.CONNECTOR,
+      organisationId: scope.organisationId,
+      placement: scope.placement,
+      connectorId: connectorId.value,
+      now,
+    });
   if (!connector.ok)
     throw new Error(`exit approval Connector: ${connector.error.code}`);
   const identity = {
