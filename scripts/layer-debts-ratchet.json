@@ -55,8 +55,30 @@
       }
     },
     "table-read": {
-      "reason": "check-layers.mjs gives each D1 table an owner and counts the writes of each other module. A read has no rule. A FROM or a JOIN on a table of a higher module, or of another area, reads the records of that module without its contract.",
-      "fix": "Call a read function of the owner module. For a read from below, the owner gives the function through a port. If the lower module is the true owner, change the owner of the table in the map.",
+      "reason": "check-layers.mjs gives each D1 table an owner and counts the writes of each other module. A read has no rule. A FROM or a JOIN on a table of a higher module, or of another area, reads the records of that module without its contract. The reads that stay are accepted by design (the owner, 2026-11-27): `accepted` gives each group and its reason.",
+      "fix": "Call a read function of the owner module. For a read from below, the owner gives the function through a port. For one part of one statement, the owner writes the part and the lower module puts the text into its statement. If the lower module is the true owner, change the owner of the table in the map. Add no group to `accepted` without a decision of the owner.",
+      "accepted": [
+        {
+          "reason": "One JOIN of one statement, and the reader owns the larger part of it. A read function of the owner makes a second D1 read, and a move of the whole statement puts tables of the reader into a higher module. Cost of a split, each one more D1 read: `organisation_workspace` for each session read of the Portal and each regional database; `integration_account` for each install or reinstall of a surface, and for the install list of the local debug route; `slack_thread_case_pin` for each Slack delivery to a thread.",
+          "sites": {
+            "foundation/tenancy/data/control-plane.ts organisation_workspace": 1,
+            "foundation/tenancy/data/organisation.ts integration_account": 2,
+            "foundation/authority/credential-vault/surface-installation-resolution.ts slack_thread_case_pin": 1
+          }
+        },
+        {
+          "reason": "The guard of one INSERT: a restore starts only while no relocation that holds one of its exports is cleaning or complete. The item rows join the relocation rows of tenancy inside the guard. A split makes one more D1 read for each restore start, and the guard and the write are then two statements, so a relocation can change between them.",
+          "sites": {
+            "foundation/tenancy/data/placement-move.ts state_object_relocation_item": 1
+          }
+        },
+        {
+          "reason": "Not a read of one module. The regional copy reads each table of the regional schema by its name from the schema, and this line is the same read for the one table that points to its own parent row.",
+          "sites": {
+            "foundation/actor-runtime/data/organisation-regional-copy.ts workspace_revision": 1
+          }
+        }
+      ],
       "counts": {
         "reads foundation/actor-runtime -> foundation/agent": 1,
         "reads foundation/authority -> surfaces/slack": 1,
@@ -78,8 +100,31 @@
       }
     },
     "interpolated-table": {
-      "reason": "check-layers.mjs reads the owner of a write from a literal table name. A write with the name in a template value has no owner check, and no Actor SQLite table has an owner in the map. The purge, the regional copy, the state machines and the Actor copy code write tables from a list or a parameter. No rule tells a D1 write from an Actor write, so the count holds both.",
-      "fix": "Write the table name as a literal where one module owns the write. Add no new general write helper: a helper that must stay (purge, copy, state transition) takes its tables from one list that names the owner of each table.",
+      "reason": "check-layers.mjs reads the owner of a write from a literal table name. A write with the name in a template value has no owner check, and no Actor SQLite table has an owner in the map. The purge, the regional copy, the state machines and the Actor copy code write tables from a list or a parameter. No rule tells a D1 write from an Actor write, so the count holds both. The 9 writes that stay are accepted by design (the owner, 2026-11-27): `accepted` gives each group and its reason.",
+      "fix": "Write the table name as a literal where one module owns the write. Add no new general write helper: a helper that must stay (purge, copy, state transition) takes its tables from one list that names the owner of each table. Add no group to `accepted` without a decision of the owner.",
+      "accepted": [
+        {
+          "reason": "Actor SQLite, not D1: no table of an Actor has an owner in the map. The import of an export, the checkpoint restore and the erase of the content write each table of one Actor from its own schema or its own export, and the state transition writes the table that the machine definition names.",
+          "sites": {
+            "foundation/actor-runtime/actors/actor-export.ts": 1,
+            "foundation/actor-runtime/actors/lifecycle/state-transition.ts": 1,
+            "foundation/actor-runtime/actors/placement-execution-quiescence.ts": 1,
+            "foundation/agent/actors/pi-durable-checkpoint.ts": 2
+          }
+        },
+        {
+          "reason": "The regional copy and the erase of a retired cell write each table of the regional D1 schema, with the names from the schema. A list of the tables would repeat the schema, and a table with no owner fails closed already.",
+          "sites": {
+            "foundation/actor-runtime/data/organisation-regional-copy.ts": 3
+          }
+        },
+        {
+          "reason": "The D1 state transition writes the table that a machine definition names as a literal in its `.machine.ts` file. It has one caller today, in the area that owns the table.",
+          "sites": {
+            "foundation/tenancy/data/d1-transition.ts": 1
+          }
+        }
+      ],
       "counts": {
         "writes foundation/actor-runtime": 6,
         "writes foundation/agent": 2,

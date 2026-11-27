@@ -721,6 +721,13 @@ crossing. How the last column counts:
   registration lines of the Worker.
 - `interpolated-table`: no rule tells a D1 write from an Actor SQLite write, so the
   count holds both.
+- `accepted`: a kind can hold groups of instances that stay by design, each with its
+  reason and its sites. The count still holds them, so the check refuses a new
+  instance. It also refuses a group with no reason and a site that is gone. On
+  2026-11-27 the 6 reads of `table-read` and the 9 writes of `interpolated-table`
+  are in such groups: 5 reads where a fix costs one more D1 read or cuts a guarded
+  write in two, the general reads and writes of the regional copy, the Actor SQLite
+  writes, and the D1 state transition.
 - Each count is by module or by module pair, and the check reads the files only
   through `scripts/layers.json`. A move of files into a root folder or a workspace
   package therefore keeps each count.

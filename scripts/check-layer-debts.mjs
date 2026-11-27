@@ -65,6 +65,12 @@
 // refuses a kind with none. A count goes up only by hand in that file: the
 // review of that line is the decision to accept one more crossing.
 //
+// A kind can hold `accepted` groups: instances that stay by design, each
+// group with its reason and its sites (`path`, or `path table` for a read,
+// with the number of instances). The count of the kind still holds them, so
+// a new instance is refused as before. The check refuses a group with no
+// reason and a site that the tree has no more. --update keeps the groups.
+//
 //   node scripts/check-layer-debts.mjs                   check
 //   node scripts/check-layer-debts.mjs --update          lower counts, drop keys that are gone
 //   node scripts/check-layer-debts.mjs --init            write the counts of the current tree
@@ -695,6 +701,9 @@ function writeBaseline(counts) {
       {
         reason: storedKinds[kind]?.reason ?? "",
         fix: storedKinds[kind]?.fix ?? "",
+        ...(storedKinds[kind]?.accepted === undefined
+          ? {}
+          : { accepted: storedKinds[kind].accepted }),
         counts: keys,
       },
     ]),
@@ -711,6 +720,48 @@ function unexplained(counts) {
     (kind) =>
       `${kind}: no written reason. Add "reason" and "fix" for it under kinds in ${BASELINE}.`,
   );
+}
+
+/** A site with no line number: `path` or `path table`. */
+function siteName(site) {
+  return site.replace(/^(\S+?):\d+/, "$1");
+}
+
+/** kind -> the count of its accepted instances. It ends the run on a faulty group. */
+function acceptedCounts() {
+  const faults = [];
+  const totals = {};
+  for (const [kind, { accepted }] of Object.entries(storedKinds)) {
+    if (accepted === undefined) continue;
+    const present = new Map();
+    for (const { sites } of found.get(kind)?.values() ?? []) {
+      for (const site of sites) {
+        const name = siteName(site);
+        present.set(name, (present.get(name) ?? 0) + 1);
+      }
+    }
+    totals[kind] = 0;
+    for (const group of accepted) {
+      if (typeof group.reason !== "string" || group.reason === "") {
+        faults.push(`${kind}: an accepted group has no reason.`);
+      }
+      for (const [site, count] of Object.entries(group.sites ?? {})) {
+        const left = present.get(site) ?? 0;
+        if (left < count) {
+          faults.push(
+            `${kind}: the accepted site "${site}" is ${count} in ${BASELINE}, and the tree has ${left} not yet named. Lower or remove it.`,
+          );
+        }
+        present.set(site, left - count);
+        totals[kind] += count;
+      }
+    }
+  }
+  if (faults.length > 0) {
+    console.error(faults.join("\n"));
+    process.exit(1);
+  }
+  return totals;
 }
 
 if (mode === "--init") {
@@ -782,9 +833,13 @@ if (mode === "check") {
       `${lower} counts are below their baseline. Run node ${SCRIPT} --update.`,
     );
   }
+  const accepted = acceptedCounts();
   console.log(
     `layer debts, none grew: ${Object.entries(totalsOf(current))
-      .map(([kind, units]) => `${kind} ${summary(units)}`)
+      .map(
+        ([kind, units]) =>
+          `${kind} ${summary(units)}${accepted[kind] === undefined ? "" : ` (${accepted[kind]} accepted by design)`}`,
+      )
       .join("; ")}`,
   );
 }
