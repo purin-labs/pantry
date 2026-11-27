@@ -133,6 +133,14 @@ export async function listCustomConnectorSummaries(input: {
   return { ok: true, value: Object.freeze(summaries) };
 }
 
+/** The head revision of a connector, or null when the detail is unavailable. */
+export async function readCustomConnectorHeadRevision(
+  input: Parameters<typeof resolveCustomConnectorDetail>[0],
+): Promise<CustomConnectorRevision | null> {
+  const detail = await resolveCustomConnectorDetail(input);
+  return detail.ok ? detail.value.summary.headRevision : null;
+}
+
 export async function resolveCustomConnectorDetail(input: {
   readonly db: Pick<OrganisationDatabase, "prepare">;
   readonly organisationId: OrganisationId;

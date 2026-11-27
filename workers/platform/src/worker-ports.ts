@@ -158,6 +158,7 @@ import { prepareEmailWatchReconciliationRun } from "@purin-labs/area-organisatio
 import {
   cancelOperatorConfigurationDraft,
   confirmOperatorConfigurationDraft,
+  listOperatorDraftsForCase,
   readLatestDecidedOperatorDraft,
   readOperatorDraft,
   readPendingOperatorDraft,
@@ -205,6 +206,16 @@ import {
   readLatestBakerySurfaceOfRequests,
 } from "@purin-labs/area-kitchen/server/actors/bakery-surface-effect";
 import { deviceReads } from "@purin-labs/area-devices-contract/server/device-reads";
+import { customConnectorChat } from "@purin-labs/area-integrations-contract/server/custom-connector-chat";
+import { readChatConnectorSetup } from "@purin-labs/area-integrations/server/custom-connectors/setup";
+import {
+  listCustomConnectorSummaries,
+  readCustomConnectorHeadRevision,
+} from "@purin-labs/area-integrations/server/custom-connectors/projection";
+import {
+  parseConnectorAuthoringOutput,
+  readConnectorDocumentation,
+} from "@purin-labs/area-integrations/server/custom-connectors/authoring";
 import { connectionFlowParts } from "@purin-labs/connections/data/connection-flow-parts";
 import { prepareCredentialRefReplacement } from "@purin-labs/authority/credential-vault/service";
 import { prepareCommunicationDestinationAccount } from "@purin-labs/area-organisation/server/data/onboarding";
@@ -456,6 +467,7 @@ whatsAppOperatorNoticeRecords.register({
 organisationServices.register({
   removeIntegrationAccount: (...input) => removeIntegrationAccount(...input),
   readOperatorDraft: (...input) => readOperatorDraft(...input),
+  listOperatorDraftsForCase: (input) => listOperatorDraftsForCase(input),
   readPendingOperatorDraft: (input) => readPendingOperatorDraft(input),
   readLatestDecidedOperatorDraft: (input) =>
     readLatestDecidedOperatorDraft(input),
@@ -519,6 +531,15 @@ bakeParts.register({
     announceRun: (...input) => announceBakeRun(...input),
     tellOverBake: (...input) => tellBakeRunOverBake(...input),
   },
+});
+
+// The Portal chat sets up and revises a custom connector.
+customConnectorChat.register({
+  listSummaries: (input) => listCustomConnectorSummaries(input),
+  readSetup: (input) => readChatConnectorSetup(input),
+  readHeadRevision: (input) => readCustomConnectorHeadRevision(input),
+  readDocumentation: (...input) => readConnectorDocumentation(...input),
+  parseAuthoringOutput: (...input) => parseConnectorAuthoringOutput(...input),
 });
 
 deviceReads.register({

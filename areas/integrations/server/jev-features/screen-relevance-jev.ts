@@ -1,5 +1,6 @@
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import type { Result } from "@purin-labs/kernel/result";
+import type { ScreenRelevanceState } from "@purin-labs/area-integrations-contract/server/screen-relevance";
 import type { FlowLabel } from "@purin-labs/authority/policy/information-flow/labels";
 import type { TypeSafeInferenceSink } from "@purin-labs/authority/policy/information-flow/types";
 import {
@@ -15,23 +16,6 @@ import {
 export const SCREEN_RELEVANCE_JEV_MODEL = "jev-1.13.0";
 /** The most that one check sends: the draft, the last answer and the titles. */
 export const SCREEN_RELEVANCE_MAX_REQUEST_BYTES = 8_192;
-
-/**
- * What Jev reads for one check (Plan 87 section 3A): the draft, the chat's
- * origin label, the last answer of the chat cut to 1,000 characters, and the
- * page on screen with its section titles. No table row and no fact value.
- */
-export type ScreenRelevanceState = Readonly<{
-  draft: string;
-  chatOrigin: string | null;
-  lastAnswer: string | null;
-  page: Readonly<{
-    title: string;
-    area: string;
-    record: string | null;
-    sections: readonly string[];
-  }>;
-}>;
 
 type ScreenRelevanceScores = Readonly<{
   aboutScreen: number;

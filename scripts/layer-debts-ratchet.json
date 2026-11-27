@@ -11,7 +11,7 @@
       "reads": 40
     },
     "surface-nonpublic": {
-      "imports": 46
+      "imports": 38
     },
     "interpolated-table": {
       "writes": 9
@@ -80,12 +80,12 @@
       "reason": "The plan lets a surface import the foundation and the public entry of an area. check-layers.mjs allows each area file, because the import goes down. Two forms are wiring and do not count (the owner, 2026-11-27; `wiring` in the map): the page table loads the page of an area with import(), and a preview page imports what it shows.",
       "fix": "Import a public file of the area, or make the needed file public in `contracts` of the map. A page or a handler that holds a rule of the area belongs to the area: change its line in the map.",
       "counts": {
-        "imports surfaces/portal -> areas/brain": 3,
+        "imports surfaces/portal -> areas/brain": 2,
         "imports surfaces/portal -> areas/cafe": 3,
         "imports surfaces/portal -> areas/commerce": 10,
-        "imports surfaces/portal -> areas/integrations": 15,
+        "imports surfaces/portal -> areas/integrations": 9,
         "imports surfaces/portal -> areas/kitchen": 2,
-        "imports surfaces/portal -> areas/organisation": 13
+        "imports surfaces/portal -> areas/organisation": 12
       }
     },
     "interpolated-table": {

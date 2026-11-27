@@ -1103,6 +1103,9 @@ importers:
       '@purin-labs/connections':
         specifier: workspace:*
         version: link:../../../foundation/connections
+      '@purin-labs/contract-schema':
+        specifier: workspace:*
+        version: link:../../../packages/contract-schema
       '@purin-labs/contracts':
         specifier: workspace:*
         version: link:../../../packages/contracts
@@ -1112,6 +1115,9 @@ importers:
       '@purin-labs/control-api':
         specifier: workspace:*
         version: link:../../../packages/control-api
+      '@purin-labs/conversation':
+        specifier: workspace:*
+        version: link:../../../foundation/conversation
       '@purin-labs/kernel':
         specifier: workspace:*
         version: link:../../../foundation/kernel

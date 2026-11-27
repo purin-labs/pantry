@@ -11,7 +11,7 @@ import {
   checkConversationDisclosure,
   conversationAudienceMayReceive,
 } from "@purin-labs/conversation/chat/conversation-disclosure";
-import { createTurnMemoryReader } from "@purin-labs/area-brain/server/memory/access";
+import { memoryService } from "@purin-labs/area-brain-contract/server/memory/memory-service";
 import { listProjectMembers } from "@purin-labs/conversation/projects/access";
 import { bindConversationTurnAccess } from "@purin-labs/conversation/chat/turn-access";
 import { authorizeConversation } from "@purin-labs/conversation/chat/conversation-access";
@@ -21,7 +21,6 @@ import type {
 } from "@purin-labs/control-api";
 import { bindCompletedChatHistory } from "@purin-labs/conversation/chat/forks";
 import { currentProjectSnapshot } from "@purin-labs/conversation/chat/project-context-binding";
-import { resolveCustomConnectorDetail } from "@purin-labs/area-integrations/server/custom-connectors/projection";
 import { FlowBinding } from "@purin-labs/authority/policy/information-flow/index";
 import type { Env } from "@purin-labs/kernel/env";
 import { readOrganisationCodexConnection } from "@purin-labs/agent/models/codex-connection";
@@ -45,10 +44,7 @@ import {
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import type { OrganisationModelRoute } from "@purin-labs/agent/models/route";
 import { createWorkerMessageLinkEgress } from "@purin-labs/agent/messages/link-egress";
-import {
-  readConnectorDocumentation,
-  parseConnectorAuthoringOutput,
-} from "@purin-labs/area-integrations/server/custom-connectors/authoring";
+import { customConnectorChat } from "@purin-labs/area-integrations-contract/server/custom-connector-chat";
 import { readChatConnectorStatus } from "../connector-status";
 import {
   conversationTimeline,
@@ -298,7 +294,7 @@ export async function runConversation(
           // that applies to Portal chats. The reply reaches each reader of
           // the conversation, so that whole audience must be able to
           // receive what the turn is shown.
-          memoryReader: createTurnMemoryReader({
+          memoryReader: memoryService.use().createTurnMemoryReader({
             env,
             execution: placement,
             organisationId: scope.organisationId,
@@ -498,7 +494,7 @@ export async function runConversation(
               work.requestId,
               tool,
             );
-            const fetched = await readConnectorDocumentation(
+            const fetched = await customConnectorChat.use().readDocumentation(
               [action.value.url],
               createWorkerMessageLinkEgress(
                 env.MESSAGE_LINK_FETCH,
@@ -553,12 +549,14 @@ export async function runConversation(
           case "definition": {
             let target: ConnectorCardTarget = { kind: "new" };
             if (action.value.kind === "revise") {
-              const detail = await resolveCustomConnectorDetail({
-                db: placement.database,
-                organisationId: scope.organisationId,
-                connectorId: action.value.connectorId,
-              });
-              if (!detail.ok) {
+              const headRevision = await customConnectorChat
+                .use()
+                .readHeadRevision({
+                  db: placement.database,
+                  organisationId: scope.organisationId,
+                  connectorId: action.value.connectorId,
+                });
+              if (headRevision === null) {
                 messages.push({
                   kind: "context",
                   id: crypto.randomUUID(),
@@ -569,10 +567,10 @@ export async function runConversation(
               target = {
                 kind: "revision",
                 connectorId: action.value.connectorId,
-                expectedHeadRevision: detail.value.summary.headRevision,
+                expectedHeadRevision: headRevision,
               };
             }
-            const validated = await parseConnectorAuthoringOutput(
+            const validated = await customConnectorChat.use().parseAuthoringOutput(
               JSON.stringify({
                 kind: "definition",
                 document: action.value.document,

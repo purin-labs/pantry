@@ -14,7 +14,7 @@ import type { SerializedFlowLabel } from "@purin-labs/authority/policy/informati
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationCommandFailure } from "@purin-labs/tenancy/actors/organisation/types";
 import type { Env } from "@purin-labs/kernel/env";
-import type { ScreenRelevanceState } from "@purin-labs/area-integrations/server/jev-features/screen-relevance-jev";
+import type { ScreenRelevanceState } from "@purin-labs/area-integrations-contract/server/screen-relevance";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { createCurrentSourceFlowLabel } from "@purin-labs/authority/policy/information-flow/source-labels";
 import type { Result } from "@purin-labs/kernel/result";

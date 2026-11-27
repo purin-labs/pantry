@@ -1,4 +1,3 @@
-import { textLimit } from "@purin-labs/contract-schema";
 import type { JsonRecord } from "@purin-labs/control/worker/http";
 import {
   readMessageLink,
@@ -8,11 +7,12 @@ import { parseCustomConnectorDefinition } from "./definition";
 import type { Result } from "@purin-labs/kernel/result";
 import { isRecord } from "@purin-labs/std";
 import type { ConversationDocument } from "@purin-labs/conversation/chat/conversation";
+import type { CustomConnectorAuthoringError } from "@purin-labs/area-integrations-contract/server/custom-connector-chat";
 
 /** The chat record stores the pages that it read. */
 export type ConnectorDocumentation = ConversationDocument;
 
-type AuthoringError = { readonly code: string; readonly reason: string };
+type AuthoringError = CustomConnectorAuthoringError;
 
 export async function readConnectorDocumentation(
   urls: readonly string[],
@@ -43,67 +43,6 @@ export async function readConnectorDocumentation(
   }
   return { ok: true, value: documents };
 }
-
-export function connectorDefinitionInstructions(): string {
-  return [
-    "Generate the smallest useful set of GET reads, including an authenticated current-account probe with a stable account ID and display name. A shipment, warehouse, or arbitrary label cannot identify an account. Explain when the API lacks this requirement. Exclude credential-management, API-key, payment, label-purchase, account-update, and other write operations.",
-    "Authentication supports bearer, header with an explicit name, or basic_api_key (API key username, empty password). Explain provider-specific key requirements discovered in the documentation. Named Authorization headers require the complete header value. Do not invent authentication schemes.",
-    "Use this wire format with fields evidenced in fetched documentation. All object schemas have additionalProperties:false. Outputs project only declared fields. Strings and arrays require finite bounds; optional inputs must accept null. Use nullable output fields where documented. Pagination may be none for a bounded first page; describe the limit. Use classification confidential for account, address, and shipment data. Transport kind is rest, method GET, bodyBindings null. Keep the definition under 32KB. Documentation references are filled from server-fetched sources.",
-    JSON.stringify(AUTHORING_FORMAT_EXAMPLE),
-  ].join("\n\n");
-}
-
-const AUTHORING_FORMAT_EXAMPLE = {
-  schemaVersion: 1,
-  name: "Example service",
-  description: "Read account information.",
-  origin: "https://api.example.com",
-  authentication: { kind: "bearer" },
-  documentation: [],
-  operations: [
-    {
-      id: "current_account",
-      description: "Read the authenticated account.",
-      effect: { kind: "read" },
-      inputSchema: {
-        type: "object",
-        properties: {},
-        required: [],
-        additionalProperties: false,
-      },
-      transport: {
-        kind: "rest",
-        method: "GET",
-        pathTemplate: "/account",
-        pathBindings: {},
-        queryBindings: {},
-        bodyBindings: null,
-      },
-      response: {
-        successStatuses: [200],
-        resultPointer: "",
-        outputSchema: {
-          type: "object",
-          properties: {
-            id: textLimit({ type: "string", minLength: 1, maxLength: 128 }),
-            name: textLimit({ type: "string", minLength: 1, maxLength: 256 }),
-          },
-          required: ["id", "name"],
-          additionalProperties: false,
-        },
-        classification: "confidential",
-      },
-      pagination: { kind: "none" },
-    },
-  ],
-  identity: {
-    operationId: "current_account",
-    arguments: {},
-    accountIdPointer: "/id",
-    displayNamePointer: "/name",
-  },
-  limits: { wireBytes: 1048576, decodedBytes: 1048576 },
-};
 
 export async function parseConnectorAuthoringOutput(
   text: string,

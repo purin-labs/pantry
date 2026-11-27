@@ -7,13 +7,8 @@
 import { isConversationId } from "@purin-labs/control-api";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { ConversationScope } from "@purin-labs/conversation/chat/store";
-import {
-  cancelOperatorConfigurationDraft,
-  confirmOperatorConfigurationDraft,
-  listOperatorDraftsForCase,
-  readOperatorDraft,
-  type OperatorConfigurationDraft,
-} from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
+import { organisationServices } from "@purin-labs/area-organisation-contract/server/organisation-services";
+import type { OperatorConfigurationDraft } from "@purin-labs/area-organisation-contract/server/operator-drafts";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
@@ -36,7 +31,7 @@ export async function readConversationConfigurationDrafts(
   if (!isConversationId(conversationId)) return null;
   const caseId = await conversationCase(placement, scope, conversationId);
   if (caseId === null) return null;
-  const drafts = await listOperatorDraftsForCase({
+  const drafts = await organisationServices.use().listOperatorDraftsForCase({
     db: placement.database,
     organisationId: scope.organisationId,
     caseId,
@@ -83,7 +78,7 @@ export async function handlePortalChatConfigurationDraft(
   };
   const caseId = await conversationCase(placement, scope, conversationIdRaw);
   if (caseId === null) return controlError("chat_not_found", 404);
-  const stored = await readOperatorDraft(
+  const stored = await organisationServices.use().readOperatorDraft(
     placement.database,
     scope.organisationId,
     draftIdRaw,
@@ -101,7 +96,7 @@ export async function handlePortalChatConfigurationDraft(
     return controlError("configuration_draft_waits_on_requester", 403);
   const now = Date.now();
   if (action === "cancel") {
-    const cancelled = await cancelOperatorConfigurationDraft({
+    const cancelled = await organisationServices.use().cancelOperatorConfigurationDraft({
       db: placement.database,
       organisationId: scope.organisationId,
       draftId: stored.draftId,
@@ -112,7 +107,7 @@ export async function handlePortalChatConfigurationDraft(
       ? draftResponse(env, placement, scope, stored.draftId)
       : controlError("configuration_draft_not_pending", 409);
   }
-  const confirmed = await confirmOperatorConfigurationDraft({
+  const confirmed = await organisationServices.use().confirmOperatorConfigurationDraft({
     db: placement.database,
     env,
     organisationId: scope.organisationId,
@@ -134,7 +129,7 @@ async function draftResponse(
   scope: ConversationScope,
   draftId: string,
 ): Promise<Response> {
-  const draft = await readOperatorDraft(
+  const draft = await organisationServices.use().readOperatorDraft(
     placement.database,
     scope.organisationId,
     draftId,

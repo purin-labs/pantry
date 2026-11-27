@@ -22,8 +22,8 @@ import {
   JevScreenRelevanceRequest,
   SCREEN_RELEVANCE_JEV_MODEL,
   SCREEN_RELEVANCE_MAX_REQUEST_BYTES,
-  type ScreenRelevanceState,
 } from "./screen-relevance-jev";
+import type { ScreenRelevanceState } from "@purin-labs/area-integrations-contract/server/screen-relevance";
 
 /**
  * Plan 87 D14, tuned on 2026-11-10 from 48 labelled drafts: every draft that

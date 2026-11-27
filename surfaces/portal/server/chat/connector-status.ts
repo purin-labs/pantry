@@ -1,15 +1,15 @@
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { parseCustomConnectorSetupAttemptId } from "@purin-labs/connections/custom-connectors/identity";
-import { resolveCustomConnectorSetupAttempt } from "@purin-labs/area-integrations/server/custom-connectors/setup";
-import { listCustomConnectorSummaries } from "@purin-labs/area-integrations/server/custom-connectors/projection";
+import { customConnectorChat } from "@purin-labs/area-integrations-contract/server/custom-connector-chat";
 import type { ConversationScope } from "@purin-labs/conversation/chat/store";
 
 export async function readChatConnectorStatus(
   placement: OrganisationExecutionScope,
   scope: ConversationScope,
 ): Promise<unknown> {
+  const chat = customConnectorChat.use();
   const [connectors, rows] = await Promise.all([
-    listCustomConnectorSummaries({
+    chat.listSummaries({
       db: placement.database,
       organisationId: scope.organisationId,
     }),
@@ -26,19 +26,12 @@ export async function readChatConnectorStatus(
   for (const row of rows.results) {
     const id = parseCustomConnectorSetupAttemptId(row.attempt_id);
     if (!id.ok) throw new Error("Invalid connector setup identity.");
-    const result = await resolveCustomConnectorSetupAttempt({
+    const setup = await chat.readSetup({
       db: placement.database,
       organisationId: scope.organisationId,
       attemptId: id.value,
     });
-    if (!result.ok) continue;
-    const attempt = result.value;
-    setups.push({
-      connectorId: attempt.connectorId,
-      revision: attempt.connectorRevision,
-      state: attempt.lifecycle,
-      failure: attempt.lifecycle === "failed" ? attempt.failure : null,
-    });
+    if (setup !== null) setups.push(setup);
   }
   return { connectors: connectors.value, recentSetups: setups };
 }

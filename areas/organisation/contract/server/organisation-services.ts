@@ -62,6 +62,16 @@ type ReadPendingOperatorDraft = (
   }>,
 ) => Promise<OperatorConfigurationDraft | null>;
 
+/** The drafts of a Case that its Portal chat shows. */
+type ListOperatorDraftsForCase = (
+  input: Readonly<{
+    db: OrganisationDatabase;
+    organisationId: OrganisationId;
+    caseId: string;
+    now: number;
+  }>,
+) => Promise<readonly OperatorConfigurationDraft[]>;
+
 /** The newest decided draft of a Case, for a repeated confirmation. */
 type ReadLatestDecidedOperatorDraft = (
   input: Readonly<{
@@ -106,13 +116,15 @@ type PrepareEmailWatchReconciliationRun = (
 /**
  * The Organisation records that other areas use: the removal of an
  * integration account, the configuration drafts that a Kitchen workflow
- * change waits on and that a Slack reply confirms, and the record of an
+ * change waits on and that a Slack reply or a Portal chat card confirms,
+ * and the record of an
  * email watch reconciliation run. The Organisation area owns them, and the
  * Worker registers the implementation (`worker-ports.ts`).
  */
 export type OrganisationServices = Readonly<{
   removeIntegrationAccount: RemoveIntegrationAccount;
   readOperatorDraft: ReadOperatorDraft;
+  listOperatorDraftsForCase: ListOperatorDraftsForCase;
   readPendingOperatorDraft: ReadPendingOperatorDraft;
   readLatestDecidedOperatorDraft: ReadLatestDecidedOperatorDraft;
   cancelOperatorConfigurationDraft: CancelOperatorConfigurationDraft;

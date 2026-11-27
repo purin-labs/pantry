@@ -40,6 +40,7 @@ import {
   type CustomConnectorSetupAttemptId,
 } from "@purin-labs/connections/custom-connectors/identity";
 import { resolveCustomConnectorRevision } from "./revisions";
+import type { ChatConnectorSetup } from "@purin-labs/area-integrations-contract/server/custom-connector-chat";
 import {
   customConnectorSetupLifecycleAllows,
   parseCustomConnectorSetupAccountLifecycle,
@@ -980,6 +981,21 @@ export async function authorizeCustomConnectorSetupCommit(input: {
       definition: revision.value.definition,
       candidateCredentialRef: current.value.candidateCredentialRef,
     },
+  };
+}
+
+/** The state of a setup attempt that the chat prompt shows, or null. */
+export async function readChatConnectorSetup(
+  input: Parameters<typeof resolveCustomConnectorSetupAttempt>[0],
+): Promise<ChatConnectorSetup | null> {
+  const result = await resolveCustomConnectorSetupAttempt(input);
+  if (!result.ok) return null;
+  const attempt = result.value;
+  return {
+    connectorId: attempt.connectorId,
+    revision: attempt.connectorRevision,
+    state: attempt.lifecycle,
+    failure: attempt.lifecycle === "failed" ? attempt.failure : null,
   };
 }
 
