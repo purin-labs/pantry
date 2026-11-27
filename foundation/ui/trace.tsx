@@ -71,7 +71,7 @@ export function TraceDescription({
   );
 }
 
-export type TraceCollapsibleProps = Omit<
+type TraceCollapsibleProps = Omit<
   Collapsible.Root.Props,
   "open" | "defaultOpen" | "onOpenChange"
 > &

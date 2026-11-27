@@ -63,6 +63,11 @@
         "patisserieVariantId",
         "seedPatisserieSupplyCosts"
       ]
+    },
+    "brand-mark": {
+      "reason": "PurinMark and PurinIcon are the Purin brand mark of the component kit (foundation/ui/README.md, docs/brand/purin-logo). No page draws it yet; the owner decides where it goes.",
+      "files": ["foundation/ui/index.ts"],
+      "names": ["PurinIcon", "PurinMark", "PurinMarkProps"]
     }
   },
   "counts": {
@@ -88,7 +93,6 @@
     "@purin-labs/commerce-query-sqlite": 1,
     "@purin-labs/commerce-worker": 16,
     "@purin-labs/contract-schema": 2,
-    "@purin-labs/contracts": 87,
     "@purin-labs/control-api": 36,
     "@purin-labs/costs-sheet-crdt": 7,
     "@purin-labs/email-draft-crdt": 8,
@@ -106,7 +110,6 @@
     "@purin-labs/surface-slack": 3,
     "@purin-labs/surface-voice": 1,
     "@purin-labs/surface-webhooks": 1,
-    "@purin-labs/ui": 70,
     "@purin-labs/workflow-canvas-crdt": 18
   }
 }

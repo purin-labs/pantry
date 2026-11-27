@@ -37,7 +37,7 @@ export function prefersReducedMotion(): boolean {
 }
 
 /** A morph that shows its first end and waits for `play`. */
-export type LayoutMorph = Readonly<{
+type LayoutMorph = Readonly<{
   /** Moves to `to`, then removes the surface. */
   play: (to: MorphEnd) => Promise<void>;
   /** Removes the surface at once. */

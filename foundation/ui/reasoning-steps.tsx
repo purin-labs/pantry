@@ -22,7 +22,7 @@ export type ReasoningStep = {
     "pending" | "running" | "completed" | "waiting" | "failed" | "cancelled";
 };
 
-export type ReasoningStepsProps = {
+type ReasoningStepsProps = {
   readonly steps: readonly ReasoningStep[];
   readonly summary: string;
   readonly defaultOpen?: boolean;

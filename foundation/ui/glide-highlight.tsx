@@ -2,7 +2,7 @@ import React from "react";
 import { SpringValue, type Spring } from "./spring";
 import "./glide-highlight.css";
 
-export type GlideHighlightProps = {
+type GlideHighlightProps = {
   /** Selector for the item to cover, matched inside the parent element. */
   readonly target: string;
 };

@@ -26,46 +26,37 @@ function brand<Name extends string>() {
   return Type.Unsafe<Brand<Name>>(Type.String());
 }
 
-export const nonEmptyTextSchema = brand<"NonEmptyText">();
-export const httpUrlSchema = brand<"HttpUrl">();
-export const normalizedMediaTypeSchema = brand<"NormalizedMediaType">();
-export const normalizedExtensionSchema = brand<"NormalizedExtension">();
-export const displayFilenameSchema = brand<"DisplayFilename">();
+const nonEmptyTextSchema = brand<"NonEmptyText">();
+const httpUrlSchema = brand<"HttpUrl">();
+const normalizedMediaTypeSchema = brand<"NormalizedMediaType">();
+const normalizedExtensionSchema = brand<"NormalizedExtension">();
+const displayFilenameSchema = brand<"DisplayFilename">();
 export const attachmentIdSchema = brand<"AttachmentId">();
 export const organisationAttachmentObjectKeySchema =
   brand<"OrganisationAttachmentObjectKey">();
-export const imageMediaTypeSchema = brand<"ImageMediaType">();
-export const documentMediaTypeSchema = brand<"DocumentMediaType">();
-export const audioMediaTypeSchema = brand<"AudioMediaType">();
-export const videoMediaTypeSchema = brand<"VideoMediaType">();
-export const opaqueMediaTypeSchema = brand<"OpaqueMediaType">();
-export const slackWorkspaceIdSchema = brand<"SlackWorkspaceId">();
-export const slackChannelIdSchema = brand<"SlackChannelId">();
-export const slackMessageTimestampSchema = brand<"SlackMessageTimestamp">();
-export const slackFileIdSchema = brand<"SlackFileId">();
-export const slackFileRevisionSchema = brand<"SlackFileRevision">();
-export const portalUserIdSchema = brand<"PortalUserId">();
-export const portalConversationIdSchema = brand<"PortalConversationId">();
-export const octetStreamMediaTypeSchema = Type.Literal(
-  "application/octet-stream",
-);
+const imageMediaTypeSchema = brand<"ImageMediaType">();
+const documentMediaTypeSchema = brand<"DocumentMediaType">();
+const audioMediaTypeSchema = brand<"AudioMediaType">();
+const videoMediaTypeSchema = brand<"VideoMediaType">();
+const opaqueMediaTypeSchema = brand<"OpaqueMediaType">();
+const slackWorkspaceIdSchema = brand<"SlackWorkspaceId">();
+const slackChannelIdSchema = brand<"SlackChannelId">();
+const slackMessageTimestampSchema = brand<"SlackMessageTimestamp">();
+const slackFileIdSchema = brand<"SlackFileId">();
+const slackFileRevisionSchema = brand<"SlackFileRevision">();
+const portalUserIdSchema = brand<"PortalUserId">();
+const portalConversationIdSchema = brand<"PortalConversationId">();
+const octetStreamMediaTypeSchema = Type.Literal("application/octet-stream");
 
-export const attachmentMediaClassSchema = Type.Union([
-  Type.Literal("image"),
-  Type.Literal("document"),
-  Type.Literal("audio"),
-  Type.Literal("video"),
-  Type.Literal("opaque"),
-]);
-export const mediaSignatureMethodSchema = Type.Union([
+const mediaSignatureMethodSchema = Type.Union([
   Type.Literal("magic_bytes"),
   Type.Literal("container_structure"),
 ]);
-export const mediaDeclaringProviderSchema = Type.Union([
+const mediaDeclaringProviderSchema = Type.Union([
   Type.Literal("slack"),
   Type.Literal("portal"),
 ]);
-export const attachmentRetentionClassSchema = Type.Literal("session");
+const attachmentRetentionClassSchema = Type.Literal("session");
 
 function mediaEvidenceSchema<MediaType extends ReturnType<typeof brand>>(
   mediaType: MediaType,
@@ -84,7 +75,7 @@ function mediaEvidenceSchema<MediaType extends ReturnType<typeof brand>>(
   ]);
 }
 
-export const opaqueMediaEvidenceSchema = Type.Union([
+const opaqueMediaEvidenceSchema = Type.Union([
   Type.Object({
     kind: Type.Literal("signature_verified"),
     mediaType: opaqueMediaTypeSchema,
@@ -100,17 +91,17 @@ export const opaqueMediaEvidenceSchema = Type.Union([
     mediaType: octetStreamMediaTypeSchema,
   }),
 ]);
-export const opaqueFormatHintSchema = Type.Object({
+const opaqueFormatHintSchema = Type.Object({
   declaredMediaType: normalizedMediaTypeSchema,
 });
-export const fileExtensionHintSchema = Type.Union([
+const fileExtensionHintSchema = Type.Union([
   Type.Object({ kind: Type.Literal("none") }),
   Type.Object({
     kind: Type.Literal("named"),
     value: normalizedExtensionSchema,
   }),
 ]);
-export const attachmentDescriptorSchema = Type.Union([
+const attachmentDescriptorSchema = Type.Union([
   Type.Object({
     kind: Type.Literal("image"),
     media: mediaEvidenceSchema(imageMediaTypeSchema),
@@ -133,7 +124,7 @@ export const attachmentDescriptorSchema = Type.Union([
     formatHint: opaqueFormatHintSchema,
   }),
 ]);
-export const messageAttachmentSourceSchema = Type.Union([
+const messageAttachmentSourceSchema = Type.Union([
   Type.Object({
     kind: Type.Literal("portal"),
     userId: portalUserIdSchema,
@@ -150,7 +141,7 @@ export const messageAttachmentSourceSchema = Type.Union([
     revision: slackFileRevisionSchema,
   }),
 ]);
-export const storedMessageAttachmentSchema = Type.Object({
+const storedMessageAttachmentSchema = Type.Object({
   id: attachmentIdSchema,
   displayName: displayFilenameSchema,
   extensionHint: fileExtensionHintSchema,
@@ -162,15 +153,15 @@ export const storedMessageAttachmentSchema = Type.Object({
   retention: attachmentRetentionClassSchema,
   storedAt: Type.Number(),
 });
-export const messageLinkPresentationSchema = Type.Union([
+const messageLinkPresentationSchema = Type.Union([
   Type.Object({ kind: Type.Literal("url") }),
   Type.Object({ kind: Type.Literal("label"), label: nonEmptyTextSchema }),
 ]);
-export const messageLinkSchema = Type.Object({
+const messageLinkSchema = Type.Object({
   url: httpUrlSchema,
   presentation: messageLinkPresentationSchema,
 });
-export const userMessagePartSchema = Type.Union([
+const userMessagePartSchema = Type.Union([
   Type.Object({ kind: Type.Literal("text"), text: nonEmptyTextSchema }),
   Type.Object({ kind: Type.Literal("link"), link: messageLinkSchema }),
   Type.Object({
@@ -178,11 +169,11 @@ export const userMessagePartSchema = Type.Union([
     attachment: storedMessageAttachmentSchema,
   }),
 ]);
-export const userMessageSchema = Type.Object({
+const userMessageSchema = Type.Object({
   firstPart: userMessagePartSchema,
   remainingParts: Type.Array(userMessagePartSchema),
 });
-export const userMessageViewsSchema = Type.Object({
+const userMessageViewsSchema = Type.Object({
   modelPrompt: Type.String(),
   casePurpose: Type.String(),
   contextQuery: Type.Union([Type.String(), Type.Null()]),
@@ -203,22 +194,14 @@ export type DocumentMediaType = Static<typeof documentMediaTypeSchema>;
 export type AudioMediaType = Static<typeof audioMediaTypeSchema>;
 export type VideoMediaType = Static<typeof videoMediaTypeSchema>;
 export type OpaqueMediaType = Static<typeof opaqueMediaTypeSchema>;
-export type OctetStreamMediaType = Static<typeof octetStreamMediaTypeSchema>;
 export type SlackWorkspaceId = Static<typeof slackWorkspaceIdSchema>;
 export type SlackChannelId = Static<typeof slackChannelIdSchema>;
 export type SlackMessageTimestamp = Static<typeof slackMessageTimestampSchema>;
 export type SlackFileId = Static<typeof slackFileIdSchema>;
 export type SlackFileRevision = Static<typeof slackFileRevisionSchema>;
-export type AttachmentMediaClass = Static<typeof attachmentMediaClassSchema>;
-export type MediaSignatureMethod = Static<typeof mediaSignatureMethodSchema>;
-export type MediaDeclaringProvider = Static<
-  typeof mediaDeclaringProviderSchema
->;
-export type AttachmentRetentionClass = Static<
-  typeof attachmentRetentionClassSchema
->;
-export type OpaqueMediaEvidence = Static<typeof opaqueMediaEvidenceSchema>;
-export type OpaqueFormatHint = Static<typeof opaqueFormatHintSchema>;
+type MediaSignatureMethod = Static<typeof mediaSignatureMethodSchema>;
+type MediaDeclaringProvider = Static<typeof mediaDeclaringProviderSchema>;
+type OpaqueMediaEvidence = Static<typeof opaqueMediaEvidenceSchema>;
 export type FileExtensionHint = Static<typeof fileExtensionHintSchema>;
 export type AttachmentDescriptor = Static<typeof attachmentDescriptorSchema>;
 export type MessageAttachmentSource = Static<
@@ -226,9 +209,6 @@ export type MessageAttachmentSource = Static<
 >;
 export type StoredMessageAttachment = Static<
   typeof storedMessageAttachmentSchema
->;
-export type MessageLinkPresentation = Static<
-  typeof messageLinkPresentationSchema
 >;
 export type MessageLink = Static<typeof messageLinkSchema>;
 export type UserMessagePart = Static<typeof userMessagePartSchema>;
@@ -264,7 +244,7 @@ function invalid(code: string, field: string): Checked<never> {
   return { ok: false, error: messageError(code, field) };
 }
 
-export function parseNonEmptyText(value: string): Checked<NonEmptyText> {
+function parseNonEmptyText(value: string): Checked<NonEmptyText> {
   if (
     rustTrim(value).length === 0 ||
     codePointCount(value) > NON_EMPTY_TEXT_MAX_CHARS ||
@@ -274,7 +254,7 @@ export function parseNonEmptyText(value: string): Checked<NonEmptyText> {
   return { ok: true, value: value as NonEmptyText };
 }
 
-export function parseHttpUrl(value: string): Checked<HttpUrl> {
+function parseHttpUrl(value: string): Checked<HttpUrl> {
   const normalized = normalizeHttpUrl(value);
   return normalized === null
     ? invalid("invalid_url", "HttpUrl")
@@ -351,9 +331,7 @@ function parseRustUnsigned(value: string): number | null {
   return parsed > 0xffff_ffff ? null : parsed;
 }
 
-export function parseNormalizedMediaType(
-  value: string,
-): Checked<NormalizedMediaType> {
+function parseNormalizedMediaType(value: string): Checked<NormalizedMediaType> {
   const essence = rustTrim(value.split(";")[0] ?? "");
   const slash = essence.indexOf("/");
   if (
@@ -590,7 +568,7 @@ function sameBytes(
 }
 
 /** Rust `identify_media_signature`: the only trusted identification input. */
-export function identifyMediaSignature(
+function identifyMediaSignature(
   header: readonly number[],
 ): readonly [NormalizedMediaType, MediaSignatureMethod] | null {
   const magic = (value: string, method: MediaSignatureMethod) =>
@@ -1085,9 +1063,7 @@ function parseUserMessagePart(value: unknown): Checked<UserMessagePart> {
 }
 
 /** Rust `parse_user_message`: a persisted message re-enters part by part. */
-export function parseUserMessage(
-  input: unknown,
-): MessageParseResult<UserMessage> {
+function parseUserMessage(input: unknown): MessageParseResult<UserMessage> {
   const admitted = admitJson(input);
   if (!admitted.ok) return admitted;
   const shape = parseShape(userMessageRecordSchema, input);
@@ -1108,7 +1084,7 @@ export function parseUserMessage(
 // Derived views
 // ---------------------------------------------------------------------------
 
-export type DerivedUserMessage = Readonly<{
+type DerivedUserMessage = Readonly<{
   message: UserMessage;
   views: UserMessageViews;
 }>;
@@ -1125,7 +1101,7 @@ export function deriveUserMessageViews(
   };
 }
 
-export function userMessageViews(message: UserMessage): UserMessageViews {
+function userMessageViews(message: UserMessage): UserMessageViews {
   return {
     modelPrompt: renderMessageForModel(message),
     casePurpose: deriveCasePurpose(message),
@@ -1138,7 +1114,7 @@ function parts(message: UserMessage): UserMessagePart[] {
   return [message.firstPart, ...message.remainingParts];
 }
 
-export function renderMessageForModel(message: UserMessage): string {
+function renderMessageForModel(message: UserMessage): string {
   return parts(message).map(renderPart).join("\n");
 }
 
@@ -1188,7 +1164,7 @@ function attachmentNames(message: UserMessage): string[] {
   return names;
 }
 
-export function deriveCasePurpose(message: UserMessage): string {
+function deriveCasePurpose(message: UserMessage): string {
   for (const part of parts(message)) {
     if (part.kind === "text") return bounded(part.text, CASE_PURPOSE_MAX_CHARS);
     if (part.kind === "link" && part.link.presentation.kind === "label")
@@ -1206,7 +1182,7 @@ export function deriveCasePurpose(message: UserMessage): string {
   return "Review this message";
 }
 
-export function deriveContextQuery(message: UserMessage): string | null {
+function deriveContextQuery(message: UserMessage): string | null {
   const terms: string[] = [];
   for (const part of parts(message)) {
     if (part.kind === "text") terms.push(part.text);

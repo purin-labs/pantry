@@ -2,7 +2,7 @@ import React from "react";
 import { Switch as BaseSwitch } from "@base-ui/react/switch";
 import "./toggle-switch.css";
 
-export type SwitchProps = Readonly<{
+type SwitchProps = Readonly<{
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
   disabled?: boolean;

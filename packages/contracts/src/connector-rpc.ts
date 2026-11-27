@@ -14,7 +14,7 @@ export const countSchema = Type.Integer({
   maximum: Number.MAX_SAFE_INTEGER,
 });
 
-export const connectorIdentitySchema = Type.Object({
+const connectorIdentitySchema = Type.Object({
   organisationId: nonBlankTextSchema,
   connectorId: nonBlankTextSchema,
 });
@@ -34,7 +34,7 @@ export const connectorIngressRequestSchema = Type.Object({
   ingress: Type.Unknown(),
 });
 
-export const connectorAddressSchema = Type.Union([
+const connectorAddressSchema = Type.Union([
   Type.Object({
     kind: Type.Literal("slack"),
     workspaceId: nonBlankTextSchema,
@@ -107,10 +107,7 @@ export const connectorDeliveryStateSchema = Type.Union([
   Type.Object({ kind: Type.Literal("rejected"), reason: nonBlankTextSchema }),
 ]);
 
-export type ConnectorAddressWire = Static<typeof connectorAddressSchema>;
-export type ConnectorDeliveryStateWire = Static<
-  typeof connectorDeliveryStateSchema
->;
+type ConnectorAddressWire = Static<typeof connectorAddressSchema>;
 
 /** The value as the schema's type, or null when it does not match. */
 export function checked<S extends TSchema>(

@@ -21,7 +21,7 @@ export type VoiceAssistantState =
   | { readonly kind: "listening"; readonly input: VoiceAssistantInput }
   | { readonly kind: "processing"; readonly input?: never };
 
-export type VoiceAssistantCardProps = {
+type VoiceAssistantCardProps = {
   readonly name: string;
   readonly initials: string;
   readonly description: string;

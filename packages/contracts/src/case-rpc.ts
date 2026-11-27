@@ -15,7 +15,7 @@ import {
 
 const strict = { additionalProperties: false } as const;
 /** A lowercase SHA-256 digest in hexadecimal. */
-export const digestSchema = Type.String({ pattern: "^[0-9a-f]{64}$" });
+const digestSchema = Type.String({ pattern: "^[0-9a-f]{64}$" });
 /** A field that must be absent or undefined. */
 const absent = Type.Optional(Type.Never());
 

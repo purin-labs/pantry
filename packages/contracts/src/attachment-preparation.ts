@@ -18,7 +18,7 @@ import {
 
 // Plan 78: TypeScript port of attachment_preparation.rs.
 
-export const messageAttachmentPreparationIdentitySchema = Type.Object({
+const messageAttachmentPreparationIdentitySchema = Type.Object({
   organisationId: Type.String(),
   sessionId: Type.String(),
   turnId: Type.String(),
@@ -26,25 +26,25 @@ export const messageAttachmentPreparationIdentitySchema = Type.Object({
   sourceSha256: Type.String(),
   handlerRevision: Type.String(),
 });
-export const messageAttachmentPreparationLimitsSchema = Type.Object({
+const messageAttachmentPreparationLimitsSchema = Type.Object({
   maxInputBytes: Type.Number(),
   maxOutputBytes: Type.Number(),
   maxDurationMs: Type.Number(),
   maxFrames: Type.Number(),
 });
-export const messageAttachmentPreparationUsageSchema = Type.Object({
+const messageAttachmentPreparationUsageSchema = Type.Object({
   activeWallMs: Type.Number(),
   inputBytes: Type.Number(),
   outputBytes: Type.Number(),
 });
-export const messageAttachmentPreparationOutcomeSchema = Type.Union([
+const messageAttachmentPreparationOutcomeSchema = Type.Union([
   Type.Object({
     kind: Type.Literal("prepared"),
     resultObjectKey: organisationAttachmentObjectKeySchema,
   }),
   Type.Object({ kind: Type.Literal("limited"), reason: Type.String() }),
 ]);
-export const messageAttachmentPreparationReceiptSchema = Type.Object({
+const messageAttachmentPreparationReceiptSchema = Type.Object({
   identity: messageAttachmentPreparationIdentitySchema,
   limits: messageAttachmentPreparationLimitsSchema,
   resultDigest: Type.String(),
@@ -53,7 +53,7 @@ export const messageAttachmentPreparationReceiptSchema = Type.Object({
   completedAt: Type.Number(),
   outcome: messageAttachmentPreparationOutcomeSchema,
 });
-export const messageAttachmentPreparationStateSchema = Type.Union([
+const messageAttachmentPreparationStateSchema = Type.Union([
   Type.Object({
     kind: Type.Literal("pending"),
     identity: messageAttachmentPreparationIdentitySchema,
@@ -76,7 +76,7 @@ export type MessageAttachmentPreparationLimits = Static<
 export type MessageAttachmentPreparationUsage = Static<
   typeof messageAttachmentPreparationUsageSchema
 >;
-export type MessageAttachmentPreparationOutcome = Static<
+type MessageAttachmentPreparationOutcome = Static<
   typeof messageAttachmentPreparationOutcomeSchema
 >;
 export type MessageAttachmentPreparationReceipt = Static<

@@ -69,7 +69,7 @@ export type TimeLanesSection = Readonly<{
   emphasis: boolean;
 }>;
 
-export type TimeLanesProps = Readonly<{
+type TimeLanesProps = Readonly<{
   label: string;
   sections: readonly TimeLanesSection[];
   items: readonly TimeLanesItem[];
@@ -159,7 +159,7 @@ function weekdayDay(at: number): string {
 }
 
 /** How much a timeline shows at one time. */
-export type TimeSpan = "day" | "week" | "month";
+type TimeSpan = "day" | "week" | "month";
 
 /** The period a timeline shows: its length, its start and its end. */
 export type TimePeriod = Readonly<{ span: TimeSpan; from: number; to: number }>;

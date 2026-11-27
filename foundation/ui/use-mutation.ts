@@ -1,13 +1,13 @@
 import React from "react";
 
 /** Where the write for one key stands. */
-export type MutationState =
+type MutationState =
   | Readonly<{ kind: "idle" }>
   | Readonly<{ kind: "running"; idempotencyKey: string }>
   | Readonly<{ kind: "failed"; error: unknown }>;
 
 /** The end of one attempt. `busy` means that a write for the key still ran. */
-export type MutationOutcome<Value> =
+type MutationOutcome<Value> =
   | Readonly<{ kind: "done"; value: Value }>
   | Readonly<{ kind: "failed"; error: unknown }>
   | Readonly<{ kind: "busy" }>;

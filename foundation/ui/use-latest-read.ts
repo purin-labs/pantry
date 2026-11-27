@@ -1,7 +1,7 @@
 import React from "react";
 
 /** What a page shows from its reads of one record. */
-export type LatestRead<Value> =
+type LatestRead<Value> =
   | Readonly<{ kind: "loading" }>
   /** No read has answered yet, and the last one failed. */
   | Readonly<{ kind: "failed"; error: unknown }>
@@ -11,7 +11,7 @@ export type LatestRead<Value> =
    */
   | Readonly<{ kind: "ready"; value: Value; readAt: number; stale: boolean }>;
 
-export type LatestReadOptions = Readonly<{
+type LatestReadOptions = Readonly<{
   /** Reads again each `everyMs` milliseconds while the page is open. */
   everyMs?: number;
   /** A timed read does not start while the tab is hidden. */
@@ -24,7 +24,7 @@ export type LatestReadOptions = Readonly<{
   reloadOn?: unknown;
 }>;
 
-export type LatestReadControl<Value> = Readonly<{
+type LatestReadControl<Value> = Readonly<{
   read: LatestRead<Value>;
   /**
    * Reads again. Its answer replaces the answer of each read that started

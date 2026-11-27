@@ -2,13 +2,9 @@ import {
   OpenObject,
   StrictObject,
   PositiveInteger,
-  parseContract,
-  type ContractDecodeResult,
-  type ContractRejection,
   NonNegativeInteger as unsignedInteger,
 } from "@purin-labs/contract-schema";
 import { Type, type Static } from "typebox";
-import type { TLocalizedValidationError } from "typebox/error";
 import type { StrictUnion } from "@purin-labs/type-utils";
 import type { AttachmentId } from "./types/AttachmentId";
 
@@ -67,7 +63,7 @@ const preparationOperationSchema = StrictObject(
   { title: "WorkspaceExecutorPreparationOperationWire" },
 );
 
-export const workspaceExecutorInspectionRequestSchema = StrictObject(
+const workspaceExecutorInspectionRequestSchema = StrictObject(
   Type.ReadonlyObject(
     OpenObject({
       schemaVersion: Type.Literal("workspace_executor_preparation.v1"),
@@ -80,7 +76,7 @@ export const workspaceExecutorInspectionRequestSchema = StrictObject(
   ).properties,
 );
 
-export const workspaceExecutorDecodedFrameSchema = StrictObject(
+const workspaceExecutorDecodedFrameSchema = StrictObject(
   Type.ReadonlyObject(
     OpenObject({
       timestampMs: unsignedInteger,
@@ -104,7 +100,7 @@ const inspectionLimitSchema = Type.Enum(
   { title: "AttachmentInspectionLimit" },
 );
 
-export const workspaceExecutorInspectionOperationSchema = Type.Union(
+const workspaceExecutorInspectionOperationSchema = Type.Union(
   [
     StrictObject(
       Type.ReadonlyObject(
@@ -149,7 +145,7 @@ export const workspaceExecutorInspectionOperationSchema = Type.Union(
 );
 
 const responseVersion = Type.Literal("workspace_executor_response.v1");
-export const workspaceExecutorInspectionResponseSchema = StrictObject(
+const workspaceExecutorInspectionResponseSchema = StrictObject(
   Type.ReadonlyObject(
     OpenObject({
       schemaVersion: responseVersion,
@@ -182,21 +178,3 @@ export type WorkspaceExecutorInspectionOperation = StrictUnion<
 export type WorkspaceExecutorDecodedFrame = Static<
   typeof workspaceExecutorDecodedFrameSchema
 >;
-
-export function parseWorkspaceExecutorInspectionRequest(
-  value: unknown,
-): ContractDecodeResult<WorkspaceExecutorInspectionRequest> {
-  return parseContract(
-    workspaceExecutorInspectionRequestSchema,
-    value,
-    invalidRequest,
-  );
-}
-
-function invalidRequest(_issue: TLocalizedValidationError): ContractRejection {
-  return {
-    code: "invalid_request",
-    reason: "workspace executor request is invalid",
-    details: null,
-  };
-}

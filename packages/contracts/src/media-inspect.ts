@@ -11,7 +11,7 @@ import type { StrictUnion } from "@purin-labs/type-utils";
 
 const unsigned32 = Type.Integer({ minimum: 0, maximum: 0xffffffff });
 
-export const mediaContainerSchema = Type.Enum([
+const mediaContainerSchema = Type.Enum([
   "iso_base_media",
   "matroska",
   "riff",
@@ -21,19 +21,19 @@ export const mediaContainerSchema = Type.Enum([
   "unknown",
 ]);
 
-export const videoTrackMetadataSchema = StrictObject({
+const videoTrackMetadataSchema = StrictObject({
   codec: Type.Union([Type.String(), Type.Null()]),
   width: Type.Union([unsigned32, Type.Null()]),
   height: Type.Union([unsigned32, Type.Null()]),
 });
 
-export const audioTrackMetadataSchema = StrictObject({
+const audioTrackMetadataSchema = StrictObject({
   codec: Type.Union([Type.String(), Type.Null()]),
   channels: Type.Union([unsigned32, Type.Null()]),
   sampleRateHz: Type.Union([unsigned32, Type.Null()]),
 });
 
-export const mediaMetadataSchema = StrictObject({
+const mediaMetadataSchema = StrictObject({
   container: mediaContainerSchema,
   durationMs: Type.Union([unsignedInteger, Type.Null()]),
   video: Type.Union([videoTrackMetadataSchema, Type.Null()]),
@@ -41,7 +41,7 @@ export const mediaMetadataSchema = StrictObject({
   headerIncomplete: Type.Boolean(),
 });
 
-export const sampledFrameSchema = StrictObject({
+const sampledFrameSchema = StrictObject({
   timestampMs: unsignedInteger,
   byteOffset: unsignedInteger,
   byteLength: unsignedInteger,
@@ -49,7 +49,7 @@ export const sampledFrameSchema = StrictObject({
   mediaType: Type.String(),
 });
 
-export const frameSamplingOutcomeSchema = Type.Union([
+const frameSamplingOutcomeSchema = Type.Union([
   StrictObject({
     kind: Type.Literal("sampled"),
     policyRevision: Type.String(),
@@ -64,11 +64,7 @@ export const frameSamplingOutcomeSchema = Type.Union([
   StrictObject({ kind: Type.Literal("container_unreadable") }),
 ]);
 
-export type MediaContainer = Static<typeof mediaContainerSchema>;
-export type VideoTrackMetadata = Static<typeof videoTrackMetadataSchema>;
-export type AudioTrackMetadata = Static<typeof audioTrackMetadataSchema>;
 export type MediaMetadata = Static<typeof mediaMetadataSchema>;
-export type SampledFrame = Static<typeof sampledFrameSchema>;
 export type FrameSamplingOutcome = StrictUnion<
   Static<typeof frameSamplingOutcomeSchema>
 >;

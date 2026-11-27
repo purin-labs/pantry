@@ -37,21 +37,19 @@ import type { Variant } from "@purin-labs/type-utils";
 export const ADVANCE_SESSION_COMMAND_SCHEMA =
   "pantry.actor.advance-session-command.v1";
 export const RESTORE_SESSION_SCHEMA = "pantry.actor.restore-session.v1";
-export const VALIDATE_HARNESS_CHECKPOINT_SCHEMA =
-  "pantry.actor.validate-harness-checkpoint.v1";
 export const VALIDATE_HARNESS_CHECKPOINT_RESTORE_SCHEMA =
   "pantry.actor.validate-harness-checkpoint-restore.v1";
 
-export type SessionBoundaryResponse<T> =
+type SessionBoundaryResponse<T> =
   | Readonly<{ status: "ok"; value: T }>
   | Readonly<{ status: "error"; error: Readonly<{ code: string }> }>;
 
-export type SessionAdvanceValue = Readonly<{
+type SessionAdvanceValue = Readonly<{
   transition: SessionTransition;
   state: AgentSessionLifecycle;
 }>;
-export type SessionRestoreValue = Readonly<{ state: AgentSessionLifecycle }>;
-export type HarnessCheckpointValidationValue = Readonly<{ valid: true }>;
+type SessionRestoreValue = Readonly<{ state: AgentSessionLifecycle }>;
+type HarnessCheckpointValidationValue = Readonly<{ valid: true }>;
 
 /** A Rust reducer or boundary error code. */
 class SessionRefusal extends Error {
@@ -133,20 +131,6 @@ export function restoreSession(
   });
 }
 
-export function validateHarnessCheckpointRecord(
-  input: unknown,
-): SessionBoundaryResponse<HarnessCheckpointValidationValue> {
-  return respond(() => {
-    const request = decodeRequest(
-      checkpointRequestSchema,
-      input,
-      VALIDATE_HARNESS_CHECKPOINT_SCHEMA,
-    ) as { state: AgentSessionLifecycle; checkpoint: HarnessCheckpointRecord };
-    validateCheckpointRecord(request.state, request.checkpoint);
-    return { valid: true as const };
-  });
-}
-
 export function validateHarnessCheckpointRestoreRecord(
   input: unknown,
 ): SessionBoundaryResponse<HarnessCheckpointValidationValue> {
@@ -162,14 +146,14 @@ export function validateHarnessCheckpointRestoreRecord(
 }
 
 /** serde writes this byte form; it is the only digest input of a route. */
-export function digestModelRouteSync(
+function digestModelRouteSync(
   route: SessionContract["modelRoute"],
 ): string {
   return sha256HexSync(encodeModelRoute(route));
 }
 
 /** `checkpoint_` and the SHA-256 of the record's serde bytes. */
-export function harnessCheckpointIdSync(
+function harnessCheckpointIdSync(
   record: HarnessCheckpointRecord,
 ): string {
   return `checkpoint_${sha256HexSync(
@@ -1411,40 +1395,6 @@ function restoreFromSnapshotAndTail(
   }
   if (current === null) throw new SessionRefusal("empty_history");
   return current;
-}
-
-function validateCheckpointRecord(
-  lifecycle: AgentSessionLifecycle,
-  record: HarnessCheckpointRecord,
-): void {
-  if (lifecycle.kind !== "processing")
-    throw new SessionRefusal("session_not_processing");
-  const state = lifecycle.state;
-  if (!sameJson(record.session, state.identity))
-    throw new SessionRefusal("session_identity_mismatch");
-  if (!sameJson(record.turn, turnIdentity(state.activeTurn)))
-    throw new SessionRefusal("turn_identity_mismatch");
-  if (!sameJson(record.runtimeLease, state.runtimeLease))
-    throw new SessionRefusal("runtime_lease_mismatch");
-  if (record.runtimeRevision !== state.contract.runtimeRevision)
-    throw new SessionRefusal("runtime_revision_mismatch");
-  if (record.policyVersion !== state.contract.policyVersion)
-    throw new SessionRefusal("policy_version_mismatch");
-  if (record.budgetRevision !== state.contract.budgetRevision)
-    throw new SessionRefusal("budget_revision_mismatch");
-  if (
-    record.modelRouteDigest !== digestModelRouteSync(state.contract.modelRoute)
-  )
-    throw new SessionRefusal("model_route_digest_mismatch");
-  if (record.lastActorEventSequence !== state.contract.lastEventSequence)
-    throw new SessionRefusal("actor_event_sequence_mismatch");
-  if (
-    record.workspaceBaseRevision !==
-    resumeWorkspaceReceipt(state.resumePoint).revision
-  )
-    throw new SessionRefusal("workspace_base_revision_mismatch");
-  if (!sameJson(record.cursor.turn, record.turn))
-    throw new SessionRefusal("cursor_turn_mismatch");
 }
 
 function validateCheckpointRestoreRecord(

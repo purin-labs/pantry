@@ -19,7 +19,7 @@ export type ActionMenuSection = {
   readonly label?: string;
   readonly items: readonly ActionMenuItem[];
 };
-export type ActionMenuProps = {
+type ActionMenuProps = {
   readonly className?: string;
   /** Accessible name of the menu. */
   readonly label: string;

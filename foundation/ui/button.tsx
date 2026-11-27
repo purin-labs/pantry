@@ -3,7 +3,7 @@ import { Button as BaseButton } from "@base-ui/react/button";
 import { withClass } from "./class-name";
 import "./button.css";
 
-export type ButtonVariant = "primary" | "secondary" | "danger" | "link";
+type ButtonVariant = "primary" | "secondary" | "danger" | "link";
 
 export type ButtonProps = BaseButton.Props &
   React.RefAttributes<HTMLElement> & {

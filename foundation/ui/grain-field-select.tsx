@@ -43,7 +43,7 @@ const thumbs = new Map<GrainFieldName, string>();
  * smooths it when it scales it up, so a swatch shows the field's soft
  * gradient. Empty when the browser has no 2D canvas.
  */
-export function grainFieldThumb(field: GrainFieldName): string {
+function grainFieldThumb(field: GrainFieldName): string {
   const kept = thumbs.get(field);
   if (kept !== undefined) return kept;
   const { grid } = grainFieldSource(field);
