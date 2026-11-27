@@ -36,6 +36,8 @@
 //   node scripts/check-entry-exports.mjs --update           lower the counts
 //   node scripts/check-entry-exports.mjs --report           print the counts and the kept groups
 //   node scripts/check-entry-exports.mjs --report <package> print the dead exports of one package
+//                                                           ("all" for each), with the file that
+//                                                           declares a re-exported name
 import { execFileSync } from "node:child_process";
 import { existsSync, globSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, posix } from "node:path";
@@ -593,6 +595,25 @@ for (const [file, info] of files) {
   }
 }
 
+/**
+ * The file that declares an export name, at the end of its re-export chain,
+ * or null for a namespace or a name of an outside package.
+ */
+function declaration(file, name, seen = new Set()) {
+  const info = files.get(file);
+  if (info === undefined || seen.has(file)) return null;
+  seen.add(file);
+  const link = info.links.get(name);
+  if (link !== undefined) {
+    return link.name === ALL ? null : declaration(link.file, link.name, seen);
+  }
+  if (info.local.has(name)) return file;
+  for (const star of info.stars) {
+    if (exportNames(star).has(name)) return declaration(star, name, seen);
+  }
+  return null;
+}
+
 // --- The dead exports ----------------------------------------------------
 
 const baseline = existsSync(join(root, BASELINE))
@@ -618,22 +639,30 @@ function keptBy(entry) {
   );
 }
 
-const dead = new Map(); // package -> [entry]
+// A kept export and a `@public` one have a reader outside the import
+// graph, so the names at the end of their chains are in use too.
+const entries = [...entryFiles()].sort();
 const kept = new Map(); // group -> count
-for (const file of [...entryFiles()].sort()) {
+for (const file of entries) {
   const info = files.get(file);
   if (info === undefined) continue;
-  const usedNames = used.get(file) ?? new Set();
+  const usedNames = new Set(used.get(file));
   for (const name of [...exportNames(file)].sort()) {
-    if (usedNames.has(name) || info.publics.has(name)) continue;
-    const entry = `${file}#${name}`;
-    const group = keptBy(entry);
+    if (usedNames.has(name)) continue;
+    const group = keptBy(`${file}#${name}`);
     if (group !== null) {
       kept.set(group.group, (kept.get(group.group) ?? 0) + 1);
-      continue;
     }
+    if (group !== null || info.publics.has(name)) mark(file, name);
+  }
+}
+const dead = new Map(); // package -> [entry]
+for (const file of entries) {
+  const usedNames = used.get(file) ?? new Set();
+  for (const name of [...exportNames(file)].sort()) {
+    if (usedNames.has(name)) continue;
     const owner = packageOf(file);
-    dead.set(owner, [...(dead.get(owner) ?? []), entry]);
+    dead.set(owner, [...(dead.get(owner) ?? []), `${file}#${name}`]);
   }
 }
 const counts = Object.fromEntries(
@@ -649,7 +678,17 @@ if (mode === "--report") {
       reportPackage === "all"
         ? [...dead.values()]
         : [dead.get(reportPackage) ?? []];
-    for (const entry of lists.flat()) console.log(entry);
+    // A name of a re-export names the file that declares it, and if
+    // another file imports it from there.
+    for (const entry of lists.flat()) {
+      const [file, name] = entry.split("#");
+      const declared = declaration(file, name);
+      if (declared === null || declared === file) console.log(entry);
+      else {
+        const usedThere = used.get(declared)?.has(name) ? " (used there)" : "";
+        console.log(`${entry} <- ${declared}${usedThere}`);
+      }
+    }
     process.exit(0);
   }
   for (const [name, n] of Object.entries(counts).sort((a, b) => b[1] - a[1])) {
