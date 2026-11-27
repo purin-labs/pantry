@@ -5,7 +5,7 @@ import {
   readExternalRecords,
   validateAirtableBaseAccess,
   validateExternalProviderToken,
-} from "@purin-labs/connections/external-records/records";
+} from "@purin-labs/area-integrations/server/external-records/records";
 import { parseIntegrationProvider } from "@purin-labs/connections/data/integration-account";
 
 describe("external record providers", () => {

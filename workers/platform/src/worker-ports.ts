@@ -186,6 +186,8 @@ import { INBOX_SUBJECT_READS } from "@purin-labs/area-inbox/server/data/authorit
 import { WORKFLOW_SUBJECT_READS } from "@purin-labs/agent/data/workflow-subject-reads";
 import { integrationCredentialReads } from "@purin-labs/authority/credential-vault/integration-reads";
 import { INTEGRATION_CREDENTIAL_READS } from "@purin-labs/area-integrations/server/data/vault-reads";
+import { externalRecordsDiscovery } from "@purin-labs/connections/external-records/records";
+import { discoverAirtableBases } from "@purin-labs/area-integrations/server/external-records/records";
 import { organisationConnectionReads } from "@purin-labs/connections/data/organisation-reads";
 import { ORGANISATION_CONNECTION_READS } from "@purin-labs/area-organisation/server/data/connection-reads";
 import { agentInstallationPinReads } from "@purin-labs/control/worker/installation-pins";
@@ -445,3 +447,9 @@ agentInstallationPinReads.register(AGENT_INSTALLATION_PIN_READS);
 slackIdentityLinks.register(SLACK_IDENTITY_LINKS);
 chatForkHistoryReads.register(CHAT_FORK_HISTORY_READS);
 organisationSlackChannels.register(ORGANISATION_SLACK_CHANNELS);
+
+// The access model of the control module lists the Airtable bases of an
+// account through the external records client of the integrations area.
+externalRecordsDiscovery.register({
+  discoverAirtableBases: (...input) => discoverAirtableBases(...input),
+});

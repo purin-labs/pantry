@@ -24,7 +24,7 @@ import {
   parseExternalRecordsRead,
   readExternalRecords,
   type ExternalRecordsProvider,
-} from "@purin-labs/connections/external-records/records";
+} from "../external-records/records";
 import { resolveActiveProviderConnectionCredential } from "@purin-labs/authority/credential-vault/provider-connection-resolution";
 import { connectExternalRecordsIntegration } from "../external-records/connection";
 import { resolveExternalRecordsAccessToken } from "../external-records/oauth";

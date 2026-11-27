@@ -3,7 +3,7 @@ import type { ProvisioningProviderConnectionAttempt } from "@purin-labs/connecti
 import {
   validateExternalProviderToken,
   type ExternalRecordsProvider,
-} from "@purin-labs/connections/external-records/records";
+} from "../external-records/records";
 import { exchangeExternalRecordsOAuthCode } from "../external-records/oauth";
 import { airtableOnboardingAdapter } from "../provider-adapters/airtable";
 import { notionOnboardingAdapter } from "../provider-adapters/notion";

@@ -1,7 +1,7 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
-import type { ExternalRecordsProvider } from "@purin-labs/connections/external-records/records";
+import type { ExternalRecordsProvider } from "./records";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import {

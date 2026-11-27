@@ -12,9 +12,9 @@ import { storeVaultSecret } from "@purin-labs/authority/credential-vault/index";
 import {
   validateAirtableBaseAccess,
   validateExternalProviderToken,
-  type ExternalRecordsError,
   type ExternalRecordsProvider,
-} from "@purin-labs/connections/external-records/records";
+} from "./records";
+import type { ExternalRecordsError } from "@purin-labs/connections/external-records/records";
 import type { Result } from "@purin-labs/kernel/result";
 
 type ExternalRecordsConnectionInput = Readonly<{
