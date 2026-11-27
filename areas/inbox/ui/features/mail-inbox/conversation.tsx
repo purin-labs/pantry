@@ -23,7 +23,7 @@ import {
   readEmailReplyPreview,
 } from "@purin-labs/area-inbox-contract/ui/features/email-review/api";
 import { ReplyDraftEditor } from "./reply-draft-editor";
-import { MailDraftBody, MailDraftSources } from "./draft-sources";
+import { MailDraftBody, MailDraftSources } from "@purin-labs/area-inbox-contract/ui/features/mail-inbox/draft-sources";
 import {
   ClaimSummary,
   ClaimTrace,
@@ -32,7 +32,7 @@ import {
   relocateSources,
   type ClaimFocus,
   type DraftClaim,
-} from "./claim-trace";
+} from "@purin-labs/area-inbox-contract/ui/features/mail-inbox/claim-trace";
 import { readMailInbox, sendMailPersonReply } from "./api";
 import { MailRelationshipCorrection } from "./relationship";
 import { MailSenderSupplier } from "./sender-supplier";

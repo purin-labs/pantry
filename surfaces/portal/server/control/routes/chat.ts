@@ -89,7 +89,7 @@ import {
   readConversationLinks,
   unreadConversationCount,
 } from "@purin-labs/conversation/chat/conversation-links";
-import { readConversationEmailReviews } from "@purin-labs/area-inbox/server/mail-inbox/conversation-email-reviews";
+import { inboxServices } from "@purin-labs/area-inbox-contract/server/inbox-services";
 import { chatError, chatSaveError } from "./chat/errors";
 
 export type PortalChatExecution = Pick<ExecutionContext, "waitUntil">;
@@ -265,7 +265,7 @@ async function handlePortalChatRequest(
     ] = await Promise.all([
       stored === null
         ? { ok: true as const, value: [] }
-        : readConversationEmailReviews(
+        : inboxServices.use().readConversationEmailReviews(
             readPlacement,
             scope,
             stored.conversation,

@@ -13,17 +13,20 @@
       "default": "./ui/*.ts"
     },
     "./ui/features/email-review/review": "./ui/features/email-review/review.tsx",
-    "./ui/features/mail-setup/model-consent": "./ui/features/mail-setup/model-consent.tsx"
+    "./ui/features/mail-setup/model-consent": "./ui/features/mail-setup/model-consent.tsx",
+    "./ui/features/mail-inbox/claim-trace": "./ui/features/mail-inbox/claim-trace.tsx",
+    "./ui/features/mail-inbox/draft-sources": "./ui/features/mail-inbox/draft-sources.tsx"
   },
   "dependencies": {
-    "@purin-labs/agent": "workspace:*",
     "@purin-labs/actor-runtime": "workspace:*",
+    "@purin-labs/agent": "workspace:*",
     "@purin-labs/area-integrations-contract": "workspace:*",
     "@purin-labs/authority": "workspace:*",
     "@purin-labs/connections": "workspace:*",
     "@purin-labs/contracts": "workspace:*",
     "@purin-labs/control": "workspace:*",
     "@purin-labs/control-api": "workspace:*",
+    "@purin-labs/conversation": "workspace:*",
     "@purin-labs/kernel": "workspace:*",
     "@purin-labs/std": "workspace:*",
     "@purin-labs/tenancy": "workspace:*",

@@ -147,6 +147,7 @@ import {
   readWhatsAppOperatorNotice,
 } from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
 import { readLatestEmailReviewProjectionForCase } from "@purin-labs/area-inbox/server/data/email-review";
+import { readConversationEmailReviews } from "@purin-labs/area-inbox/server/mail-inbox/conversation-email-reviews";
 import { deliverWhatsAppOperatorNotice } from "@purin-labs/surface-slack/server/actors/whatsapp-operator-notice";
 import { registerSupplierOperationalEmailContact } from "@purin-labs/area-inbox/server/data/email-operational";
 import { organisationServices } from "@purin-labs/area-organisation-contract/server/organisation-services";
@@ -433,6 +434,8 @@ inboxServices.register({
     registerSupplierOperationalEmailContact(...input),
   readLatestEmailReviewProjectionForCase: (input) =>
     readLatestEmailReviewProjectionForCase(input),
+  readConversationEmailReviews: (...input) =>
+    readConversationEmailReviews(...input),
 });
 
 channelIngress.register({

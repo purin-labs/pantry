@@ -957,6 +957,9 @@ importers:
       '@purin-labs/control-api':
         specifier: workspace:*
         version: link:../../../packages/control-api
+      '@purin-labs/conversation':
+        specifier: workspace:*
+        version: link:../../../foundation/conversation
       '@purin-labs/kernel':
         specifier: workspace:*
         version: link:../../../foundation/kernel

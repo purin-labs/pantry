@@ -327,10 +327,11 @@ import each of its files. A module with no line for one of these has none.
 
 ## areas/inbox/contract
 
-- Folders: 5
+- Folders: 6
   - `areas/inbox/contract/server/`
   - `areas/inbox/contract/ui/`
   - `areas/inbox/contract/ui/features/email-review/`
+  - `areas/inbox/contract/ui/features/mail-inbox/`
   - `areas/inbox/contract/ui/features/mail-setup/`
   - `areas/inbox/contract/ui/pages/`
 - Packages: `areas/inbox/contract`

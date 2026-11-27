@@ -28,11 +28,11 @@ import {
   focusNumber,
   relocateSources,
   type ClaimFocus,
-} from "@purin-labs/area-inbox/ui/features/mail-inbox/claim-trace";
+} from "@purin-labs/area-inbox-contract/ui/features/mail-inbox/claim-trace";
 import {
   DraftBodyMarks,
   type MailSourceLinks,
-} from "@purin-labs/area-inbox/ui/features/mail-inbox/draft-sources";
+} from "@purin-labs/area-inbox-contract/ui/features/mail-inbox/draft-sources";
 import type { ChatTimelineInsert } from "./activity";
 import type { SlackChannelView, SlackDraftView } from "@purin-labs/control-api/portal/slack-drafts";
 import type { SlackDraftActions } from "./slack-drafts";

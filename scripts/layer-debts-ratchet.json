@@ -11,7 +11,7 @@
       "reads": 40
     },
     "surface-nonpublic": {
-      "imports": 50
+      "imports": 46
     },
     "interpolated-table": {
       "writes": 9
@@ -83,7 +83,6 @@
         "imports surfaces/portal -> areas/brain": 3,
         "imports surfaces/portal -> areas/cafe": 3,
         "imports surfaces/portal -> areas/commerce": 10,
-        "imports surfaces/portal -> areas/inbox": 4,
         "imports surfaces/portal -> areas/integrations": 15,
         "imports surfaces/portal -> areas/kitchen": 2,
         "imports surfaces/portal -> areas/organisation": 13

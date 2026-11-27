@@ -13,8 +13,6 @@
       "types": "./ui/*.ts",
       "default": "./ui/*.ts"
     },
-    "./ui/features/mail-inbox/claim-trace": "./ui/features/mail-inbox/claim-trace.tsx",
-    "./ui/features/mail-inbox/draft-sources": "./ui/features/mail-inbox/draft-sources.tsx",
     "./ui/features/mail-inbox/route": "./ui/features/mail-inbox/route.tsx"
   },
   "dependencies": {
