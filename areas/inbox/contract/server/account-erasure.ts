@@ -19,36 +19,39 @@ export function prepareAccountContactVerificationsDelete(
     .bind(organisationId, integrationAccountId);
 }
 
+// A Google account can belong to one Organisation at a time. The purge gives
+// it up, and the erased address stays a valid value.
+
 /** The purge rewrite of the Organisation's mailbox accounts. */
 export function prepareOrganisationPurgeMailboxAccounts(
   context: OrganisationPurgeContext,
 ): readonly D1PreparedStatement[] {
-  return [googleAccountRelease(context, "UPDATE email_mailbox_account")];
+  return [
+    context.session
+      .prepare(
+        `UPDATE email_mailbox_account
+       SET google_subject = 'archived:' || integration_account_id,
+           observed_address = integration_account_id || '@archived.invalid'
+       WHERE organisation_id = ? AND ${context.purged.sql}`,
+      )
+      .bind(context.organisationId, ...context.purged.bindings),
+  ];
 }
 
 /** The purge rewrite of the Organisation's sender accounts. */
 export function prepareOrganisationPurgeSenderAccounts(
   context: OrganisationPurgeContext,
 ): readonly D1PreparedStatement[] {
-  return [googleAccountRelease(context, "UPDATE email_sender_account")];
-}
-
-/**
- * A Google account can belong to one Organisation at a time. The purge gives
- * it up, and the erased address stays a valid value.
- */
-function googleAccountRelease(
-  context: OrganisationPurgeContext,
-  update: "UPDATE email_mailbox_account" | "UPDATE email_sender_account",
-): D1PreparedStatement {
-  return context.session
-    .prepare(
-      `${update}
+  return [
+    context.session
+      .prepare(
+        `UPDATE email_sender_account
        SET google_subject = 'archived:' || integration_account_id,
            observed_address = integration_account_id || '@archived.invalid'
        WHERE organisation_id = ? AND ${context.purged.sql}`,
-    )
-    .bind(context.organisationId, ...context.purged.bindings);
+      )
+      .bind(context.organisationId, ...context.purged.bindings),
+  ];
 }
 
 export function whatsappErasureStatements(
