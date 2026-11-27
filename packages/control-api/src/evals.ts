@@ -51,7 +51,7 @@ export type EvalCriterion = Readonly<{ criterionId: string }> &
  * recipient from that verification as it stands. Once it is superseded or
  * revoked the scenario cannot run until a revision names a current one.
  */
-export type EvalScenarioSender = Readonly<{
+type EvalScenarioSender = Readonly<{
   verificationId: string;
   revision: number;
 }>;
@@ -64,7 +64,7 @@ export type EvalSenderChoice = EvalScenarioSender &
   Readonly<{ address: string }>;
 
 /** A synthetic message the agent under test is asked to handle. */
-export type EvalScenarioMessage = Readonly<{
+type EvalScenarioMessage = Readonly<{
   subject: string;
   body: string;
   /** When the message arrived, as epoch milliseconds. */
@@ -89,7 +89,7 @@ export type EvalScenario = Readonly<{
 }>;
 
 /** The agent behaviour an Eval tries. */
-export type EvalSubject = Readonly<{
+type EvalSubject = Readonly<{
   kind: "mailbox_reply";
   integrationAccountId: string;
 }>;
@@ -197,7 +197,7 @@ export const MAX_EVAL_SCENARIOS = 6;
  * in milliseconds. A larger number is no date, and a date formatter throws
  * on it.
  */
-export const MAX_EVAL_RECEIVED_AT = 4_102_444_800_000;
+const MAX_EVAL_RECEIVED_AT = 4_102_444_800_000;
 export const MAX_EVAL_CRITERIA = 6;
 
 /**
@@ -337,7 +337,7 @@ export type EvalTaskKey = Readonly<{
   route: EvalRoute;
 }>;
 
-export type EvalTaskProgress = EvalTaskKey &
+type EvalTaskProgress = EvalTaskKey &
   Readonly<{ state: "pending" | "running" | "settled" }>;
 
 export type EvalTaskResult = EvalTaskKey &
@@ -350,20 +350,6 @@ export type EvalTaskResult = EvalTaskKey &
     /** Null when no usage is known for the task. */
     totalTokens: number | null;
   }>;
-
-/**
- * A run is one Case. `pending` and `running` describe work in progress.
- * `completed` means every task was assessed or was unavailable. `failed`
- * means a task failed while running, and `indeterminate` that one ended with
- * an unknown result. Neither is a behaviour verdict.
- */
-export type EvalRunState =
-  | "pending"
-  | "running"
-  | "completed"
-  | "failed"
-  | "cancelled"
-  | "indeterminate";
 
 type EvalRunHeader = Readonly<{
   runId: string;
@@ -396,14 +382,14 @@ export type EvalRunResult = EvalRunHeader &
 export type EvalRunView = EvalRunProgress | EvalRunResult;
 
 /** One scenario on one route, under each configuration the run tried. */
-export type EvalComparisonRow = Readonly<{
+type EvalComparisonRow = Readonly<{
   scenarioId: string;
   route: EvalRoute;
   current: EvalTaskResult | null;
   candidate: EvalTaskResult | null;
 }>;
 
-export const MAX_EVAL_ROUTES = 3;
+const MAX_EVAL_ROUTES = 3;
 export const MAX_EVAL_REPLY_LENGTH = 2_000;
 
 const EVAL_ROUTES: readonly EvalRoute[] = [
@@ -557,7 +543,7 @@ export function parseEvalCommandReceipt(
   };
 }
 
-export const MAX_EVAL_SENDER_CHOICES = 50;
+const MAX_EVAL_SENDER_CHOICES = 50;
 
 export function parseEvalSenderChoicesResponse(
   raw: unknown,
@@ -607,7 +593,7 @@ export function parseEvalListResponse(raw: unknown): readonly EvalView[] {
   return evals;
 }
 
-export function parseEvalView(raw: unknown): EvalView | null {
+function parseEvalView(raw: unknown): EvalView | null {
   if (
     !isRecord(raw) ||
     !hasExactKeys(raw, ["evalId", "headRevision", "revisions"]) ||
@@ -922,7 +908,7 @@ export function parseEvalRunListResponse(raw: unknown): readonly EvalRunView[] {
   return runs;
 }
 
-export function parseEvalRunView(raw: unknown): EvalRunView | null {
+function parseEvalRunView(raw: unknown): EvalRunView | null {
   if (!isRecord(raw)) return null;
   const { state, tasks, settledAt, ...rawHeader } = raw;
   const header = parseRunHeader(rawHeader);
@@ -976,7 +962,7 @@ export function parseEvalRunResult(raw: unknown): EvalRunResult | null {
   return run !== null && isSettledEvalRun(run) ? run : null;
 }
 
-export function parseEvalRevisionRef(raw: unknown): EvalRevisionRef | null {
+function parseEvalRevisionRef(raw: unknown): EvalRevisionRef | null {
   return isRecord(raw) &&
     hasExactKeys(raw, ["evalId", "revision"]) &&
     isReviewedRecordId(raw.evalId) &&
@@ -985,7 +971,7 @@ export function parseEvalRevisionRef(raw: unknown): EvalRevisionRef | null {
     : null;
 }
 
-export function parseEvalTaskOutcome(raw: unknown): EvalTaskOutcome | null {
+function parseEvalTaskOutcome(raw: unknown): EvalTaskOutcome | null {
   if (!isRecord(raw)) return null;
   switch (raw.kind) {
     case "assessed": {

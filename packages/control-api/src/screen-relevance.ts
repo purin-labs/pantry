@@ -18,7 +18,7 @@ export const SCREEN_RELEVANCE_MAX_DRAFT = 4_000;
 /** The pause after the last key press before the composer checks. */
 export const SCREEN_RELEVANCE_PAUSE_MS = 500;
 
-export const screenRelevanceRequestSchema = Type.Object({
+const screenRelevanceRequestSchema = Type.Object({
   draft: textLimit(
     Type.String({
       minLength: SCREEN_RELEVANCE_MIN_DRAFT,
@@ -39,7 +39,7 @@ export type ScreenRelevanceRequest = Static<
 export type ScreenRelevanceBand = "quiet" | "hint" | "ask";
 
 /** Why the check sent nothing to Jev. The chip shows it. */
-export type ScreenRelevanceRefusal =
+type ScreenRelevanceRefusal =
   "page_not_shared" | "canvas" | "chat_read_only" | "chat_history_unavailable";
 
 export type ScreenRelevanceView =
@@ -56,7 +56,7 @@ export type ScreenRelevanceView =
 export type ScreenRelevanceChoice =
   "attached" | "sent_without" | "new_chat" | "no_action";
 
-export const SCREEN_RELEVANCE_CHOICES: readonly ScreenRelevanceChoice[] = [
+const SCREEN_RELEVANCE_CHOICES: readonly ScreenRelevanceChoice[] = [
   "attached",
   "sent_without",
   "new_chat",

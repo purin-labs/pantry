@@ -19,7 +19,7 @@ export type EmailReplyHeadline = Readonly<{
 }>;
 
 /** `headline` of a `gmail_reply` item of `GET …/email-reviews`. */
-export type EmailReplyHeadlineWire = Readonly<{
+type EmailReplyHeadlineWire = Readonly<{
   sender_name: string;
   subject: string;
   received_at: number;

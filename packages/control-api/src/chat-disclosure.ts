@@ -1,6 +1,6 @@
 import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
 
-export type ChatDisclosureReason =
+type ChatDisclosureReason =
   | "source_policy_denied"
   | "access_changed"
   | "evidence_unavailable"

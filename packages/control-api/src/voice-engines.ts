@@ -16,7 +16,7 @@ export const voiceEngineIdSchema = Type.Union([
 ]);
 export type VoiceEngineId = Static<typeof voiceEngineIdSchema>;
 
-export type VoiceEngineFacts = Readonly<{
+type VoiceEngineFacts = Readonly<{
   label: string;
   licence: string;
   hosts: readonly ChatTranscriptionPath[];

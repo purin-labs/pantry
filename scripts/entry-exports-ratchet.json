@@ -89,7 +89,7 @@
     "@purin-labs/commerce-worker": 16,
     "@purin-labs/contract-schema": 2,
     "@purin-labs/contracts": 87,
-    "@purin-labs/control-api": 242,
+    "@purin-labs/control-api": 36,
     "@purin-labs/costs-sheet-crdt": 7,
     "@purin-labs/email-draft-crdt": 8,
     "@purin-labs/kernel": 1,

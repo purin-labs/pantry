@@ -4,7 +4,7 @@ import {
   isNonNegativeInteger,
   isRecord,
 } from "@purin-labs/std";
-import { isProjectId, isUserId, type ProjectId, type UserId } from "./ids.ts";
+import { isUserId, type ProjectId, type UserId } from "./ids.ts";
 
 export type ProjectRole = "owner" | "editor" | "viewer";
 
@@ -84,34 +84,6 @@ export function parseProjectAccess(raw: unknown): ProjectAccess | null {
       role: raw.role,
       accessRevision: raw.accessRevision,
     };
-  }
-  return null;
-}
-
-export function parseChatConversationAccess(
-  raw: unknown,
-): ChatConversationAccess | null {
-  if (!isRecord(raw)) return null;
-  if (
-    raw.kind === "workspace_canvas" &&
-    typeof raw.documentId === "string" &&
-    /^(run:[a-f0-9]{64}|[A-Za-z0-9_-]{1,128})$/u.test(raw.documentId) &&
-    hasExactKeys(raw, ["kind", "documentId"])
-  )
-    return { kind: "workspace_canvas", documentId: raw.documentId };
-  if (
-    raw.kind === "private" &&
-    isUserId(raw.ownerUserId) &&
-    hasExactKeys(raw, ["kind", "ownerUserId"])
-  ) {
-    return { kind: "private", ownerUserId: raw.ownerUserId };
-  }
-  if (
-    raw.kind === "shared" &&
-    isProjectId(raw.sharedProjectId) &&
-    hasExactKeys(raw, ["kind", "sharedProjectId"])
-  ) {
-    return { kind: "shared", sharedProjectId: raw.sharedProjectId };
   }
   return null;
 }

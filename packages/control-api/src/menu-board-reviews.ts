@@ -14,7 +14,7 @@ import {
 
 const boardId = Type.String({ pattern: "^[A-Za-z0-9_:-]{1,128}$" });
 
-export const menuBoardCommentSchema = Type.Object({
+const menuBoardCommentSchema = Type.Object({
   commentId: boardId,
   body: textLimit(Type.String({ minLength: 1, maxLength: 1000 })),
   author: Type.Object({
@@ -26,7 +26,7 @@ export const menuBoardCommentSchema = Type.Object({
   createdAt: NonNegativeInteger,
 });
 
-export const menuBoardCommentThreadSchema = Type.Object({
+const menuBoardCommentThreadSchema = Type.Object({
   threadId: boardId,
   /** The element that the thread is pinned to. */
   elementId: boardId,
@@ -40,11 +40,10 @@ export const menuBoardCommentThreadSchema = Type.Object({
   comments: Type.Array(menuBoardCommentSchema, { minItems: 1, maxItems: 300 }),
 });
 
-export const menuBoardCommentListSchema = Type.Object({
+const menuBoardCommentListSchema = Type.Object({
   threads: Type.Array(menuBoardCommentThreadSchema, { maxItems: 300 }),
 });
 
-export type MenuBoardComment = Static<typeof menuBoardCommentSchema>;
 export type MenuBoardCommentThread = Static<
   typeof menuBoardCommentThreadSchema
 >;
@@ -63,7 +62,7 @@ export function parseMenuBoardCommentThreads(
  * One saved version of a board's draft (Plan 40B phase 5, slice 7): a
  * frozen copy that a person or the agent can restore.
  */
-export const menuBoardVersionSchema = Type.Object({
+const menuBoardVersionSchema = Type.Object({
   versionId: Type.String({ pattern: "^[A-Za-z0-9_:-]{1,128}$" }),
   kind: Type.Union([
     Type.Literal("created"),

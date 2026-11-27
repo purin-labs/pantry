@@ -136,7 +136,7 @@ export type MemoryContent = Readonly<{
  * revision's audience. An accepted revision stays in force until its
  * replacement is accepted.
  */
-export type MemorySubmission = "own_input" | "shared_review";
+type MemorySubmission = "own_input" | "shared_review";
 
 export type MemoryAuthor =
   | Readonly<{
@@ -173,7 +173,7 @@ export type MemoryRejection = MemoryDecision &
     | Readonly<{ reason: "revised"; replacementRevision: number }>
   );
 
-export type MemorySupersession = Readonly<{
+type MemorySupersession = Readonly<{
   replacementRevision: number;
   supersededAt: number;
 }>;
@@ -282,7 +282,7 @@ export type MemoryCommandErrorCode =
   | "memory_capacity_exceeded";
 
 /** Parses a commerce entity reference, or returns null when it is not one. */
-export type MemoryEntityRefParser = (raw: unknown) => MemoryEntityRef | null;
+type MemoryEntityRefParser = (raw: unknown) => MemoryEntityRef | null;
 
 const MAX_STATEMENT_LENGTH = 2_000;
 const MAX_EVIDENCE = 20;
@@ -520,7 +520,7 @@ export function parseMemoryListResponse(
   return memories;
 }
 
-export function parseMemoryView(
+function parseMemoryView(
   raw: unknown,
   parseEntityRef: MemoryEntityRefParser,
 ): MemoryView | null {

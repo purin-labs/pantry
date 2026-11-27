@@ -21,7 +21,7 @@ export function jevFeatureSendsSentence(feature: JevFeature): string {
   return `${JEV_FEATURE_SENDS[feature]} go to TypeSafe.`;
 }
 
-export type JevMailbox = Readonly<{
+type JevMailbox = Readonly<{
   integrationAccountId: string;
   displayName: string;
   /** Jev sorts the new mail of this mailbox. */
@@ -52,7 +52,7 @@ export type JevFeaturesView = Readonly<{
   paidUse: JevPaidUse;
 }>;
 
-export type JevPaidUse = Readonly<{
+type JevPaidUse = Readonly<{
   enabled: boolean;
   spendingLimitMinor: number;
   /** The charge of the month so far, in US cents. */

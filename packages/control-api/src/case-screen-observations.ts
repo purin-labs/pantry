@@ -15,7 +15,7 @@ import {
  * the time and the records on screen, and holds no value from the page: no
  * view, no state and no path.
  */
-export const caseScreenObservationSchema = Type.Object({
+const caseScreenObservationSchema = Type.Object({
   /** The page title, such as "Costs & margins". */
   page: textLimit(Type.String({ minLength: 1, maxLength: 120 })),
   area: surfaceAreaSchema,
@@ -30,7 +30,7 @@ export const caseScreenObservationSchema = Type.Object({
   sources: Type.Array(surfaceSourceSchema, { maxItems: 200 }),
 });
 
-export const caseScreenObservationsResponseSchema = Type.Object({
+const caseScreenObservationsResponseSchema = Type.Object({
   ok: Type.Literal(true),
   observations: Type.Array(caseScreenObservationSchema, { maxItems: 200 }),
 });

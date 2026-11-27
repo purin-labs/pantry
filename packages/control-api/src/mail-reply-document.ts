@@ -30,7 +30,7 @@ export const MAIL_REPLY_FONTS = {
 } as const;
 export type MailReplyFont = keyof typeof MAIL_REPLY_FONTS;
 
-export const MAIL_REPLY_SIZES = {
+const MAIL_REPLY_SIZES = {
   small: "12px",
   normal: "14px",
   large: "18px",
@@ -52,7 +52,7 @@ const indentSchema = Type.Integer({
   maximum: MAIL_REPLY_MAX_INDENT,
 });
 
-export const mailReplyRunSchema = Type.Object(
+const mailReplyRunSchema = Type.Object(
   {
     text: Type.String({ minLength: 1 }),
     bold: Type.Optional(Type.Literal(true)),
@@ -83,7 +83,7 @@ export type MailReplyRun = Readonly<{
 
 const runsSchema = Type.Array(mailReplyRunSchema, { maxItems: MAX_RUNS });
 
-export const mailReplyBlockSchema = Type.Union([
+const mailReplyBlockSchema = Type.Union([
   Type.Object(
     {
       kind: Type.Union([
@@ -116,7 +116,7 @@ export const mailReplyBlockSchema = Type.Union([
   ),
 ]);
 
-export const mailReplyDocumentSchema = Type.Object(
+const mailReplyDocumentSchema = Type.Object(
   {
     blocks: Type.Array(mailReplyBlockSchema, {
       minItems: 1,
@@ -126,7 +126,7 @@ export const mailReplyDocumentSchema = Type.Object(
   strict,
 );
 
-export type MailReplyTextBlock = Readonly<{
+type MailReplyTextBlock = Readonly<{
   kind: "paragraph" | "heading1" | "heading2" | "quote";
   align?: "center" | "right";
   indent?: number;
@@ -136,7 +136,7 @@ export type MailReplyListItem = Readonly<{
   indent?: number;
   runs: readonly MailReplyRun[];
 }>;
-export type MailReplyListBlock = Readonly<{
+type MailReplyListBlock = Readonly<{
   kind: "list";
   ordered: boolean;
   items: readonly MailReplyListItem[];
@@ -356,7 +356,7 @@ export function mailReplyAttachmentBlocked(name: string): boolean {
 }
 
 /** One file of a reply. `data` is its standard, padded base64. */
-export const mailReplyAttachmentSchema = Type.Object(
+const mailReplyAttachmentSchema = Type.Object(
   {
     name: textLimit(Type.String({ minLength: 1, maxLength: 200 })),
     type: textLimit(

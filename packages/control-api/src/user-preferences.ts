@@ -8,7 +8,7 @@ import { isUserId, type UserId } from "./ids.ts";
 
 export type PreferenceArea = "appearance" | "chat" | "kitchen";
 /** Each palette is a data-pantry-theme value in packages/frontend-themes. */
-export const PORTAL_PALETTES = ["slate-coral", "espresso", "paper"] as const;
+const PORTAL_PALETTES = ["slate-coral", "espresso", "paper"] as const;
 export type PortalPalette = (typeof PORTAL_PALETTES)[number];
 export type AppearancePreferences = Readonly<{
   mode: "system" | "light" | "dark";
@@ -17,12 +17,7 @@ export type AppearancePreferences = Readonly<{
 export type AppearanceOverride =
   | Readonly<{ kind: "inherit"; value?: never }>
   | Readonly<{ kind: "custom"; value: AppearancePreferences }>;
-export type MultiplayerViewPreferences = Readonly<{
-  showPointers: boolean;
-  showSelections: boolean;
-  showParticipantNames: boolean;
-}>;
-export type PreferenceValues = {
+type PreferenceValues = {
   appearance: AppearancePreferences;
   chat: Readonly<{
     dockedPanelWidthPx: number;
@@ -33,7 +28,7 @@ export type PreferenceValues = {
     scene: Readonly<{ labels: "auto" | "all" | "off"; minimap: boolean }>;
   }>;
 };
-export type PreferenceDocument<A extends PreferenceArea> = Readonly<{
+type PreferenceDocument<A extends PreferenceArea> = Readonly<{
   userId: UserId;
   area: A;
   schemaVersion: 1;
@@ -45,19 +40,19 @@ export type UserPreferenceDocument = {
   [A in PreferenceArea]: PreferenceDocument<A>;
 }[PreferenceArea];
 
-export type AppearanceCommand =
+type AppearanceCommand =
   | Readonly<{ kind: "set_appearance"; value: AppearancePreferences }>
   | Readonly<{ kind: "reset" }>;
-export type ChatPreferenceCommand =
+type ChatPreferenceCommand =
   | Readonly<{ kind: "set_docked_chat_width"; widthPx: number }>
   | Readonly<{ kind: "set_fullscreen_chat_sidebar_width"; widthPx: number }>
   | Readonly<{ kind: "reset" }>;
-export type BakeryPreferenceCommand =
+type BakeryPreferenceCommand =
   | Readonly<{ kind: "set_scene_labels"; labels: "auto" | "all" | "off" }>
   | Readonly<{ kind: "set_minimap"; visible: boolean }>
   | Readonly<{ kind: "set_surface_appearance"; value: AppearanceOverride }>
   | Readonly<{ kind: "reset" }>;
-export type PreferenceCommands = {
+type PreferenceCommands = {
   appearance: AppearanceCommand;
   chat: ChatPreferenceCommand;
   kitchen: BakeryPreferenceCommand;
@@ -65,7 +60,7 @@ export type PreferenceCommands = {
 export type UserPreferenceEdit = {
   [A in PreferenceArea]: Readonly<{ area: A; command: PreferenceCommands[A] }>;
 }[PreferenceArea];
-export type PreferenceParseResult =
+type PreferenceParseResult =
   | Readonly<{ ok: true; value: UserPreferenceDocument }>
   | Readonly<{
       ok: false;
@@ -83,7 +78,7 @@ export const DEFAULT_CHAT_PREFERENCES: PreferenceValues["chat"] = {
   dockedPanelWidthPx: 600,
   fullscreenSidebarWidthPx: 360,
 };
-export const DEFAULT_BAKERY_PREFERENCES: PreferenceValues["kitchen"] = {
+const DEFAULT_BAKERY_PREFERENCES: PreferenceValues["kitchen"] = {
   appearance: { kind: "inherit" },
   scene: { labels: "auto", minimap: false },
 };
@@ -92,10 +87,10 @@ export const MAX_PREFERENCE_BYTES = 8192;
 export function isPreferenceArea(raw: unknown): raw is PreferenceArea {
   return raw === "appearance" || raw === "chat" || raw === "kitchen";
 }
-export function isDockedChatWidth(raw: unknown): raw is number {
+function isDockedChatWidth(raw: unknown): raw is number {
   return isPositiveInteger(raw) && raw >= 340;
 }
-export function isFullscreenSidebarWidth(raw: unknown): raw is number {
+function isFullscreenSidebarWidth(raw: unknown): raw is number {
   return isPositiveInteger(raw) && raw >= 200 && raw <= 500;
 }
 function isSceneLabels(raw: unknown): raw is "auto" | "all" | "off" {
@@ -104,7 +99,7 @@ function isSceneLabels(raw: unknown): raw is "auto" | "all" | "off" {
 export function isPortalPalette(raw: unknown): raw is PortalPalette {
   return PORTAL_PALETTES.some((palette) => palette === raw);
 }
-export function parseAppearance(raw: unknown): AppearancePreferences | null {
+function parseAppearance(raw: unknown): AppearancePreferences | null {
   if (
     !isRecord(raw) ||
     !hasExactKeys(raw, ["mode", "palette"]) ||
@@ -122,9 +117,7 @@ export function parseAppearance(raw: unknown): AppearancePreferences | null {
         : raw.palette;
   return isPortalPalette(palette) ? { mode: raw.mode, palette } : null;
 }
-export function parseAppearanceOverride(
-  raw: unknown,
-): AppearanceOverride | null {
+function parseAppearanceOverride(raw: unknown): AppearanceOverride | null {
   if (!isRecord(raw)) return null;
   if (raw.kind === "inherit" && hasExactKeys(raw, ["kind"]))
     return { kind: "inherit" };

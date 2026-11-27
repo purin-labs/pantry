@@ -7,7 +7,7 @@ import type { ChatEffort } from "./chat.ts";
  * is no choice: a Slack answer then uses the inference source's own level. A
  * choice that the source's model does not offer also leaves that level.
  */
-export type SlackReasoningEffortView = Readonly<{
+type SlackReasoningEffortView = Readonly<{
   effort: ChatEffort | null;
 }>;
 

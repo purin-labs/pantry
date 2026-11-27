@@ -429,7 +429,7 @@ function parseChatPermissionItem(raw: unknown): ChatPermissionItem | null {
 }
 
 /** The unique key of an item within one request. */
-export function chatPermissionItemKey(item: ChatPermissionItem): string {
+function chatPermissionItemKey(item: ChatPermissionItem): string {
   return item.kind === "capability" ? item.capabilityId : item.itemId;
 }
 

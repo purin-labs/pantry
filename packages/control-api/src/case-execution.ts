@@ -34,7 +34,7 @@ type NodeIdentity<Kind extends CaseExecutionNodeKind> = Readonly<{
  * A record this reader may not see. Its kind and its recorded edges stay, so
  * the shape of the work is honest. Nothing else of it is disclosed.
  */
-export type WithheldCaseExecutionNode = NodeIdentity<CaseExecutionNodeKind> &
+type WithheldCaseExecutionNode = NodeIdentity<CaseExecutionNodeKind> &
   Readonly<{ access: "withheld" }>;
 
 export type CaseExecutionAssignmentState =
@@ -406,7 +406,7 @@ const CONTENT_ROLES: readonly CaseExecutionContent["role"][] = [
 ];
 const MAX_ID_LENGTH = 512;
 
-export function isCaseExecutionNodeKind(
+function isCaseExecutionNodeKind(
   value: unknown,
 ): value is CaseExecutionNodeKind {
   return oneOf(NODE_KINDS, value);

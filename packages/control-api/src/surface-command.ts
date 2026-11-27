@@ -31,23 +31,6 @@ export const COSTS_VIEW_COMMANDS = [
   "select_product",
 ] as const;
 
-export const PASTRY_BENCH_PIE_TYPES = [
-  "steak-and-pepper",
-  "beef-bourguignon",
-] as const;
-
-export const PASTRY_BENCH_THICKNESS_MM = [2.5, 3.0, 3.5] as const;
-export const PASTRY_BENCH_CRIMP_FORCE_N = [36, 42, 52] as const;
-export const PASTRY_BENCH_FAULT_CHECKS = ["none", "unfloured-bench"] as const;
-export const PASTRY_BENCH_CAMERA_PRESETS = [
-  "bench",
-  "dough-block",
-  "tin-cavity",
-  "roller",
-  "overhead",
-  "oven",
-] as const;
-
 /** The view commands of the Kitchen Pie Pastry Bench workspace. */
 export const PASTRY_BENCH_VIEW_COMMANDS = [
   "configure_pastry_bench",
@@ -62,17 +45,9 @@ export const REGISTER_VIEW_COMMANDS = [
   "register_clear_basket",
 ] as const;
 
-export type CostsViewCommandName = (typeof COSTS_VIEW_COMMANDS)[number];
-export type CostsTab = (typeof COSTS_TABS)[number];
-export type PastryBenchViewCommandName =
-  (typeof PASTRY_BENCH_VIEW_COMMANDS)[number];
-export type RegisterViewCommandName = (typeof REGISTER_VIEW_COMMANDS)[number];
-export type PageViewCommandName =
-  CostsViewCommandName | PastryBenchViewCommandName | RegisterViewCommandName;
-
 const identifier = textLimit(Type.String({ minLength: 1, maxLength: 200 }));
 
-export const costsViewCommandSchema = Type.Union([
+const costsViewCommandSchema = Type.Union([
   Type.Object({
     name: Type.Literal("open_tab"),
     tab: Type.Union([
@@ -94,7 +69,7 @@ export const costsViewCommandSchema = Type.Union([
   }),
 ]);
 
-export const pastryBenchViewCommandSchema = Type.Union([
+const pastryBenchViewCommandSchema = Type.Union([
   Type.Object({
     name: Type.Literal("configure_pastry_bench"),
     pieType: Type.Optional(
@@ -128,7 +103,7 @@ export const pastryBenchViewCommandSchema = Type.Union([
   }),
 ]);
 
-export const registerViewCommandSchema = Type.Union([
+const registerViewCommandSchema = Type.Union([
   Type.Object({
     name: Type.Literal("register_add_item"),
     menuEntryId: identifier,
@@ -159,7 +134,7 @@ const pageCommandTargetSchema = Type.Object({
   epoch: NonNegativeInteger,
 });
 
-export const surfacePageCommandSchema = Type.Union([
+const surfacePageCommandSchema = Type.Union([
   Type.Object({
     kind: Type.Literal("page_command"),
     schemaVersion: Type.Literal(1),
@@ -211,18 +186,6 @@ export function parseSurfacePageCommand(
 ): SurfacePageCommandV1 | null {
   const decoded = decodeSurfacePageCommand(raw);
   return decoded.ok ? decoded.value : null;
-}
-
-const PAGE_VIEW_COMMAND_SET: ReadonlySet<string> = new Set<string>([
-  ...COSTS_VIEW_COMMANDS,
-  ...PASTRY_BENCH_VIEW_COMMANDS,
-  ...REGISTER_VIEW_COMMANDS,
-]);
-
-export function isPageViewCommandName(
-  name: string,
-): name is PageViewCommandName {
-  return PAGE_VIEW_COMMAND_SET.has(name);
 }
 
 export function pageViewCommandSurface(

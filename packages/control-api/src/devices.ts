@@ -35,13 +35,13 @@ export const DEVICE_STATIONS = [
   { stationId: "station_bar", label: "Bar" },
 ] as const;
 
-export const deviceStationIdSchema = Type.Union([
+const deviceStationIdSchema = Type.Union([
   Type.Literal("station_bakery"),
   Type.Literal("station_bar"),
 ]);
 export type DeviceStationId = Static<typeof deviceStationIdSchema>;
 
-export const deviceConnectionSchema = Type.Union([
+const deviceConnectionSchema = Type.Union([
   Type.Object(
     { state: Type.Literal("connected"), lastHeardAt: timestamp },
     strict,
@@ -66,7 +66,7 @@ export const deviceConnectionSchema = Type.Union([
 ]);
 export type DeviceConnection = Static<typeof deviceConnectionSchema>;
 
-export const deviceBlockedReasonSchema = Type.Union([
+const deviceBlockedReasonSchema = Type.Union([
   Type.Literal("pending"),
   Type.Literal("restricted"),
   Type.Literal("revoked"),
@@ -75,10 +75,9 @@ export const deviceBlockedReasonSchema = Type.Union([
   Type.Literal("connection_lost"),
   Type.Literal("result_unknown"),
 ]);
-export type DeviceBlockedReason = Static<typeof deviceBlockedReasonSchema>;
 
 /** The one answer to "can this device take the next task?". */
-export const deviceReadinessSchema = Type.Union([
+const deviceReadinessSchema = Type.Union([
   Type.Object({ kind: Type.Literal("ready") }, strict),
   /** This device takes no kitchen tasks, for example a camera. */
   Type.Object({ kind: Type.Literal("not_applicable") }, strict),
@@ -100,7 +99,7 @@ export const deviceReadinessSchema = Type.Union([
 ]);
 export type DeviceReadiness = Static<typeof deviceReadinessSchema>;
 
-export const deviceWorkSchema = Type.Union([
+const deviceWorkSchema = Type.Union([
   Type.Object({ state: Type.Literal("idle") }, strict),
   Type.Object(
     {
@@ -116,7 +115,6 @@ export const deviceWorkSchema = Type.Union([
     strict,
   ),
 ]);
-export type DeviceWork = Static<typeof deviceWorkSchema>;
 
 const deviceBase = {
   deviceId: text,
@@ -125,7 +123,7 @@ const deviceBase = {
   needsAttention: Type.Boolean(),
 };
 
-export const deviceViewSchema = Type.Union([
+const deviceViewSchema = Type.Union([
   Type.Object(
     {
       ...deviceBase,
@@ -231,7 +229,7 @@ export type DeviceKind = DeviceView["kind"];
 export type KitchenDeviceView = Variant<DeviceView, "kitchen_device">;
 export type GatewayDeviceView = Variant<DeviceView, "gateway">;
 
-export const deviceListSchema = Type.Object(
+const deviceListSchema = Type.Object(
   {
     ok: Type.Literal(true),
     devices: Type.Array(deviceViewSchema),
@@ -253,7 +251,7 @@ export const deviceListSchema = Type.Object(
 );
 export type DeviceList = Static<typeof deviceListSchema>;
 
-export const deviceActivitySchema = Type.Object(
+const deviceActivitySchema = Type.Object(
   {
     ok: Type.Literal(true),
     events: Type.Array(
@@ -289,7 +287,7 @@ export const deviceActivitySchema = Type.Object(
 );
 export type DeviceActivity = Static<typeof deviceActivitySchema>;
 
-export const deviceGatewayStartSchema = Type.Object(
+const deviceGatewayStartSchema = Type.Object(
   {
     ok: Type.Literal(true),
     gatewayId: text,
@@ -301,7 +299,7 @@ export const deviceGatewayStartSchema = Type.Object(
 );
 export type DeviceGatewayStart = Static<typeof deviceGatewayStartSchema>;
 
-export const deviceAlertSettingSchema = Type.Object(
+const deviceAlertSettingSchema = Type.Object(
   {
     timeZone: text,
     opensAtMinute: Type.Integer({ minimum: 0, maximum: 1439 }),
@@ -312,7 +310,7 @@ export const deviceAlertSettingSchema = Type.Object(
 );
 export type DeviceAlertSetting = Static<typeof deviceAlertSettingSchema>;
 
-export const deviceSnapshotListSchema = Type.Object(
+const deviceSnapshotListSchema = Type.Object(
   {
     ok: Type.Literal(true),
     snapshots: Type.Array(

@@ -16,9 +16,7 @@ export type MailClassifiedFilter =
   | Readonly<{ kind: "important"; ruleId?: never }>
   | Readonly<{ kind: "category"; ruleId: string }>;
 
-export function parseMailClassifiedFilter(
-  raw: unknown,
-): MailClassifiedFilter | null {
+function parseMailClassifiedFilter(raw: unknown): MailClassifiedFilter | null {
   if (!isRecord(raw)) return null;
   if (raw.kind === "important" && Object.keys(raw).length === 1)
     return { kind: "important" };
@@ -35,7 +33,7 @@ export function parseMailClassifiedFilter(
  * A mailbox that the person may read. `reconnect_required`: Google refused
  * the sign-in, so Pantry reads no mail of it until someone connects it again.
  */
-export type MailInboxAccountAccess = "readable" | "reconnect_required";
+type MailInboxAccountAccess = "readable" | "reconnect_required";
 
 export type MailInboxAccount = Readonly<{
   integrationAccountId: string;

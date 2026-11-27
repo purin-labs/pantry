@@ -222,7 +222,7 @@ export function parseMailOrganizationCommand(
     };
   return null;
 }
-export function parseMessageIds(raw: unknown): readonly string[] | null {
+function parseMessageIds(raw: unknown): readonly string[] | null {
   if (!Array.isArray(raw) || raw.length === 0 || raw.length > 25) return null;
   const ids: string[] = [];
   for (const id of raw) {

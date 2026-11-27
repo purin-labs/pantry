@@ -148,7 +148,7 @@ function isTimelineTrigger(raw: unknown): raw is TimelineTrigger {
   return typeof raw === "string" && Object.hasOwn(TRIGGERS, raw);
 }
 
-export function isCaseTimelineOutcomeKind(
+function isCaseTimelineOutcomeKind(
   raw: unknown,
 ): raw is CaseTimelineOutcomeKind {
   return typeof raw === "string" && Object.hasOwn(OUTCOMES, raw);

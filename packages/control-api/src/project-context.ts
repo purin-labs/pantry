@@ -64,7 +64,7 @@ export type ProjectSnapshot = Readonly<{
   observedAt: number;
   digest: string;
 }>;
-export const MAX_PROJECT_CONTEXT_BYTES = 24 * 1024;
+const MAX_PROJECT_CONTEXT_BYTES = 24 * 1024;
 const MAX_PROJECT_EVIDENCE_BYTES = 512 * 1024;
 
 export async function createProjectSnapshot(

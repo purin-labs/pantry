@@ -31,19 +31,19 @@ const timestamp = NonNegativeInteger;
 const revision = PositiveInteger;
 
 /** A Pantry item ID (32 hex) or a 1Password item ID (26 base32 characters). */
-export const vaultItemIdSchema = Type.String({
+const vaultItemIdSchema = Type.String({
   pattern: "^([0-9a-f]{32}|[0-9a-z]{26})$",
 });
-export const vaultStoreKindSchema = Type.Union([
+const vaultStoreKindSchema = Type.Union([
   Type.Literal("pantry"),
   Type.Literal("onepassword"),
 ]);
 /** A 1Password vault ID. */
-export const onePasswordVaultIdSchema = Type.String({
+const onePasswordVaultIdSchema = Type.String({
   pattern: "^[0-9a-z]{26}$",
 });
 /** An exact `https` origin, as `normalizeVaultOrigin` writes it. */
-export const vaultOriginSchema = textLimit(
+const vaultOriginSchema = textLimit(
   Type.String({
     pattern: "^https://[a-z0-9.-]+(:[0-9]{1,5})?$",
     maxLength: 262,
@@ -63,7 +63,7 @@ const labelSchema = text(80);
 const usernameSchema = text(254);
 const passwordSchema = text(1024);
 
-export const vaultAddressSchema = Type.Object(
+const vaultAddressSchema = Type.Object(
   {
     line1: text(200),
     line2: optionalText(200),
@@ -76,7 +76,7 @@ export const vaultAddressSchema = Type.Object(
   strict,
 );
 
-export const vaultContactSchema = Type.Object(
+const vaultContactSchema = Type.Object(
   {
     fullName: text(120),
     company: optionalText(120),
@@ -89,7 +89,7 @@ export const vaultContactSchema = Type.Object(
   strict,
 );
 
-export const vaultItemViewSchema = Type.Union([
+const vaultItemViewSchema = Type.Union([
   Type.Object(
     {
       kind: Type.Literal("website_login"),
@@ -121,7 +121,7 @@ export const vaultItemViewSchema = Type.Union([
 ]);
 
 /** Where the Organisation's new items go, and whether 1Password answered. */
-export const vaultStoreViewSchema = Type.Union([
+const vaultStoreViewSchema = Type.Union([
   Type.Object({ kind: Type.Literal("pantry") }, strict),
   Type.Object(
     {
@@ -138,7 +138,7 @@ export const vaultStoreViewSchema = Type.Union([
  * Where the items live, read from Pantry alone: a status read never calls
  * 1Password, so it says nothing about whether 1Password answers.
  */
-export const vaultStoreSummarySchema = Type.Object(
+const vaultStoreSummarySchema = Type.Object(
   {
     ok: Type.Literal(true),
     store: Type.Union([
@@ -156,7 +156,7 @@ export const vaultStoreSummarySchema = Type.Object(
   strict,
 );
 
-export const vaultItemListSchema = Type.Object(
+const vaultItemListSchema = Type.Object(
   {
     ok: Type.Literal(true),
     store: vaultStoreViewSchema,
@@ -165,7 +165,7 @@ export const vaultItemListSchema = Type.Object(
   strict,
 );
 
-export const vaultStoreCommandSchema = Type.Union([
+const vaultStoreCommandSchema = Type.Union([
   /**
    * Connect a 1Password service account. With no vault ID, a token that
    * reaches one vault uses it; a token that reaches several asks to choose.
@@ -187,7 +187,7 @@ export const vaultStoreCommandSchema = Type.Union([
   ),
 ]);
 
-export const vaultStoreResultSchema = Type.Union([
+const vaultStoreResultSchema = Type.Union([
   Type.Object(
     {
       ok: Type.Literal(true),
@@ -225,7 +225,7 @@ export const vaultStoreResultSchema = Type.Union([
   ),
 ]);
 
-export const vaultEventKindSchema = Type.Union([
+const vaultEventKindSchema = Type.Union([
   Type.Literal("item_added"),
   Type.Literal("item_edited"),
   Type.Literal("sign_in_replaced"),
@@ -235,7 +235,7 @@ export const vaultEventKindSchema = Type.Union([
   Type.Literal("store_disconnected"),
 ]);
 
-export const vaultEventListSchema = Type.Object(
+const vaultEventListSchema = Type.Object(
   {
     ok: Type.Literal(true),
     events: Type.Array(
@@ -255,7 +255,7 @@ export const vaultEventListSchema = Type.Object(
   strict,
 );
 
-export const vaultItemCreateSchema = Type.Union([
+const vaultItemCreateSchema = Type.Union([
   Type.Object(
     {
       kind: Type.Literal("website_login"),
@@ -276,7 +276,7 @@ export const vaultItemCreateSchema = Type.Union([
   ),
 ]);
 
-export const vaultItemCommandSchema = Type.Union([
+const vaultItemCommandSchema = Type.Union([
   Type.Object(
     {
       kind: Type.Literal("edit_login"),
@@ -311,12 +311,11 @@ export const vaultItemCommandSchema = Type.Union([
   ),
 ]);
 
-export const vaultItemResultSchema = Type.Union([
+const vaultItemResultSchema = Type.Union([
   Type.Object({ ok: Type.Literal(true), item: vaultItemViewSchema }, strict),
   Type.Object({ ok: Type.Literal(true), removed: vaultItemIdSchema }, strict),
 ]);
 
-export type VaultAddress = Static<typeof vaultAddressSchema>;
 export type VaultContact = Static<typeof vaultContactSchema>;
 export type VaultItemView = Static<typeof vaultItemViewSchema>;
 export type VaultItemKind = VaultItemView["kind"];
@@ -401,7 +400,7 @@ function hasWrittenOrigins(value: object): boolean {
 }
 
 /** True when the origin is exactly what `normalizeVaultOrigin` makes of it. */
-export function isWrittenVaultOrigin(origin: string): boolean {
+function isWrittenVaultOrigin(origin: string): boolean {
   return normalizeVaultOrigin(origin) === origin;
 }
 

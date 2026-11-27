@@ -1,15 +1,13 @@
-import { hasExactKeys, isRecord } from "@purin-labs/std";
-
 /**
  * The region that holds an organisation's data and runs its agents. Pantry
  * places a new organisation in the deployed region nearest to the person who
  * makes it, at a Portal sign-up and at a Slack install alike. No Portal page
  * offers a choice.
  */
-export type OrganisationHomeRegionArea =
+type OrganisationHomeRegionArea =
   "wnam" | "enam" | "sam" | "weur" | "eeur" | "apac" | "oc" | "afr" | "me";
 
-export type OrganisationHomeRegion = Readonly<{
+type OrganisationHomeRegion = Readonly<{
   id: string;
   area: OrganisationHomeRegionArea;
 }>;
@@ -19,54 +17,3 @@ export type OrganisationHomeRegions = Readonly<{
   suggested: string;
   choices: readonly OrganisationHomeRegion[];
 }>;
-
-const AREAS: Readonly<Record<OrganisationHomeRegionArea, true>> = {
-  wnam: true,
-  enam: true,
-  sam: true,
-  weur: true,
-  eeur: true,
-  apac: true,
-  oc: true,
-  afr: true,
-  me: true,
-};
-
-export function isOrganisationHomeRegionArea(
-  raw: unknown,
-): raw is OrganisationHomeRegionArea {
-  return typeof raw === "string" && Object.hasOwn(AREAS, raw);
-}
-
-export function parseOrganisationHomeRegions(
-  raw: unknown,
-): OrganisationHomeRegions | null {
-  if (
-    !isRecord(raw) ||
-    !hasExactKeys(raw, ["suggested", "choices"]) ||
-    typeof raw.suggested !== "string" ||
-    !Array.isArray(raw.choices)
-  ) {
-    return null;
-  }
-  const choices: OrganisationHomeRegion[] = [];
-  for (const choice of raw.choices) {
-    if (
-      !isRecord(choice) ||
-      !hasExactKeys(choice, ["id", "area"]) ||
-      typeof choice.id !== "string" ||
-      choice.id.length === 0 ||
-      !isOrganisationHomeRegionArea(choice.area)
-    ) {
-      return null;
-    }
-    choices.push({ id: choice.id, area: choice.area });
-  }
-  return choices.some(isChoice.bind(null, raw.suggested))
-    ? { suggested: raw.suggested, choices }
-    : null;
-}
-
-function isChoice(id: string, choice: OrganisationHomeRegion): boolean {
-  return choice.id === id;
-}

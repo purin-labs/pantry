@@ -20,7 +20,7 @@ const reasonCode = textLimit(
   }),
 );
 
-export const cobotStationSchema = Type.Union([
+const cobotStationSchema = Type.Union([
   Type.Literal("cold_rack"),
   Type.Literal("oven"),
   Type.Literal("cooling_rack"),
@@ -36,7 +36,7 @@ const cobotPlaceSchema = Type.Object(
 );
 export type CobotPlace = Static<typeof cobotPlaceSchema>;
 
-export const cobotTaskSchema = Type.Union([
+const cobotTaskSchema = Type.Union([
   Type.Object(
     {
       kind: Type.Literal("move_mould_group"),
@@ -57,7 +57,7 @@ export const cobotTaskSchema = Type.Union([
 ]);
 export type CobotTask = Static<typeof cobotTaskSchema>;
 
-export const cobotTaskStateSchema = Type.Union([
+const cobotTaskStateSchema = Type.Union([
   Type.Literal("accepted"),
   Type.Literal("running"),
   Type.Literal("completed"),

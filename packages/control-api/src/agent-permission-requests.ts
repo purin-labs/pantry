@@ -4,7 +4,7 @@ import { hasExactKeys, isNonNegativeInteger, isRecord } from "@purin-labs/std";
  * The reads that a permission request can include: every record of a system
  * type, or every entry of one commerce list.
  */
-export const AGENT_PERMISSION_ENTITY_TYPE_READS = [
+const AGENT_PERMISSION_ENTITY_TYPE_READS = [
   "product",
   "offer",
   "inventory_position",
@@ -19,7 +19,7 @@ export const AGENT_PERMISSION_ENTITY_TYPE_READS = [
 ] as const;
 
 /** The commerce lists among those reads. */
-export const AGENT_PERMISSION_LIST_READS = [
+const AGENT_PERMISSION_LIST_READS = [
   "production_requests",
   "replenishment_queue",
   "supplier_directory",
@@ -536,7 +536,7 @@ export function isAgentPermissionListRead(
   );
 }
 
-export function isAgentPermissionEntityTypeRead(
+function isAgentPermissionEntityTypeRead(
   value: unknown,
 ): value is AgentPermissionEntityTypeRead {
   return typeof value === "string" && ENTITY_TYPE_READS.has(value);

@@ -46,7 +46,7 @@ export const surfaceAreaSchema = Type.Union([
 ]);
 
 /** The record that the page has open, such as one order. */
-export const surfaceRecordSchema = Type.Object({
+const surfaceRecordSchema = Type.Object({
   kind: kindName,
   id: identifier,
   label,
@@ -64,7 +64,7 @@ export const surfaceSourceSchema = Type.Object({
 });
 
 /** One mount of a page in one browser tab. A command names it (phase 3). */
-export const surfaceInstanceSchema = Type.Object({
+const surfaceInstanceSchema = Type.Object({
   browserInstanceId: identifier,
   surfaceSessionId: identifier,
   epoch: NonNegativeInteger,
@@ -76,7 +76,7 @@ export const surfaceInstanceSchema = Type.Object({
  * state is a `BakerySurfaceContextV1` (`@purin-labs/bakery-model`). A record
  * schema keeps every field, so the owner's parser sees the whole state.
  */
-export const surfaceStateSchema = Type.Record(Type.String(), Type.Unknown());
+const surfaceStateSchema = Type.Record(Type.String(), Type.Unknown());
 
 export const surfaceObservationSchema = Type.Object({
   kind: Type.Literal("surface-observation"),
@@ -103,7 +103,7 @@ export const surfaceObservationSchema = Type.Object({
 });
 
 /** Where a chat started. It never changes, and a fork keeps it. */
-export const chatOriginSchema = Type.Object({
+const chatOriginSchema = Type.Object({
   area: surfaceAreaSchema,
   page: surfaceName,
   title: label,
@@ -131,8 +131,6 @@ export function surfaceAreaTitle(area: SurfaceArea): string {
 }
 export type SurfaceRecord = Static<typeof surfaceRecordSchema>;
 export type SurfaceSource = Static<typeof surfaceSourceSchema>;
-export type SurfaceInstance = Static<typeof surfaceInstanceSchema>;
-export type SurfaceState = Static<typeof surfaceStateSchema>;
 export type SurfaceObservationV2 = Static<typeof surfaceObservationSchema>;
 export type ChatOrigin = Static<typeof chatOriginSchema>;
 

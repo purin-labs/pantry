@@ -82,7 +82,6 @@ export * from "./devices.ts";
 export * from "./device-cobot.ts";
 export type {
   PendingDecision,
-  PendingDecisionId,
   PendingDecisionList,
   PendingEmailReview,
   PendingGovernedAction,

@@ -103,7 +103,7 @@ export type ChatAttachmentView = {
 };
 
 /** The page that went with a message, as its mark names it. */
-export type ChatSentFrom = Readonly<{
+type ChatSentFrom = Readonly<{
   area: SurfaceArea;
   title: string;
   record: string | null;

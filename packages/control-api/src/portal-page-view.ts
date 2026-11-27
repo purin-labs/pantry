@@ -10,12 +10,12 @@ import { NonNegativeInteger, textLimit } from "@purin-labs/contract-schema";
 const label = textLimit(Type.String({ minLength: 1, maxLength: 120 }));
 const cell = textLimit(Type.String({ maxLength: 400 }));
 
-export const portalPageViewFactSchema = Type.Object({
+const portalPageViewFactSchema = Type.Object({
   label,
   value: cell,
 });
 
-export const portalPageViewTableSchema = Type.Object({
+const portalPageViewTableSchema = Type.Object({
   columns: Type.Array(label, { minItems: 1, maxItems: 24 }),
   rows: Type.Array(Type.Array(cell, { maxItems: 24 }), { maxItems: 200 }),
   /** The number of rows on the page; rows past the limit are left out. */
@@ -28,7 +28,7 @@ export const portalPageViewSectionSchema = Type.Object({
   table: Type.Union([portalPageViewTableSchema, Type.Null()]),
 });
 
-export const portalPageViewSchema = Type.Object({
+const portalPageViewSchema = Type.Object({
   kind: Type.Literal("portal-page-view"),
   schemaVersion: Type.Literal(1),
   /** A stable page name, such as `costs`. */
@@ -42,6 +42,5 @@ export const portalPageViewSchema = Type.Object({
 });
 
 export type PortalPageViewFact = Static<typeof portalPageViewFactSchema>;
-export type PortalPageViewTable = Static<typeof portalPageViewTableSchema>;
 export type PortalPageViewSection = Static<typeof portalPageViewSectionSchema>;
 export type PortalPageViewV1 = Static<typeof portalPageViewSchema>;

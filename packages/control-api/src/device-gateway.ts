@@ -22,8 +22,6 @@ import { shortText, sourceKey, strict } from "./device-shapes.ts";
  * are in `device-cobot.ts`.
  */
 
-/** One batched heartbeat every 30 s. */
-export const DEVICE_GATEWAY_HEARTBEAT_MS = 30_000;
 /** A connection with no message for this long is quiet. */
 export const DEVICE_CONNECTION_QUIET_MS = 90_000;
 /** A connection with no message for this long is offline. */
@@ -31,9 +29,9 @@ export const DEVICE_CONNECTION_OFFLINE_MS = 180_000;
 /** The enrollment code works one time, for this long. */
 export const DEVICE_GATEWAY_CODE_TTL_MS = 15 * 60_000;
 /** A gateway below this version needs attention. */
-export const DEVICE_GATEWAY_MINIMUM_VERSION = "0.1.0";
+const DEVICE_GATEWAY_MINIMUM_VERSION = "0.1.0";
 /** One gateway reports at most this many devices. */
-export const DEVICE_GATEWAY_DEVICE_LIMIT = 64;
+const DEVICE_GATEWAY_DEVICE_LIMIT = 64;
 /** A larger message from a gateway is refused. */
 export const DEVICE_GATEWAY_MESSAGE_BYTES = 64 * 1024;
 
@@ -49,22 +47,19 @@ export const deviceKindSchema = Type.Union([
 ]);
 export type DeviceHardwareKind = Static<typeof deviceKindSchema>;
 
-export const terminalPaymentMethodSchema = Type.Union([
+const terminalPaymentMethodSchema = Type.Union([
   Type.Literal("card"),
   Type.Literal("felica"),
   Type.Literal("qr_code"),
 ]);
 export type TerminalPaymentMethod = Static<typeof terminalPaymentMethodSchema>;
 
-export const terminalCollectionOutcomeSchema = Type.Union([
+const terminalCollectionOutcomeSchema = Type.Union([
   Type.Literal("captured"),
   Type.Literal("declined"),
   Type.Literal("cancelled"),
   Type.Literal("indeterminate"),
 ]);
-export type TerminalCollectionOutcome = Static<
-  typeof terminalCollectionOutcomeSchema
->;
 
 /** Characters on one line of 72 mm print (80 mm paper), Plan 90 Phase 5. */
 export const RECEIPT_COLUMNS = 48;
@@ -73,7 +68,7 @@ export const RECEIPT_COLUMNS = 48;
  * A receipt as lines. Pantry lays it out; the gateway encodes it for its
  * printer (StarPRNT for a Star mC-Print3) and keeps the printer's address.
  */
-export const receiptLineSchema = Type.Union([
+const receiptLineSchema = Type.Union([
   Type.Object(
     {
       kind: Type.Literal("text"),
@@ -109,7 +104,7 @@ export const receiptLineSchema = Type.Union([
 ]);
 export type ReceiptLine = Static<typeof receiptLineSchema>;
 
-export const receiptLayoutSchema = Type.Object(
+const receiptLayoutSchema = Type.Object(
   {
     columns: Type.Literal(RECEIPT_COLUMNS),
     lines: Type.Array(receiptLineSchema, { minItems: 1, maxItems: 160 }),
@@ -202,7 +197,7 @@ const sampleSchema = Type.Object(
 );
 export type DeviceSampleReport = Static<typeof sampleSchema>;
 
-export const gatewayMessageSchema = Type.Union([
+const gatewayMessageSchema = Type.Union([
   Type.Object(
     {
       type: Type.Literal("hello"),
@@ -276,7 +271,7 @@ export const gatewayMessageSchema = Type.Union([
 ]);
 export type GatewayMessage = Static<typeof gatewayMessageSchema>;
 
-export const platformGatewayMessageSchema = Type.Union([
+const platformGatewayMessageSchema = Type.Union([
   Type.Object({ type: Type.Literal("welcome"), gatewayId: shortText }, strict),
   Type.Object(
     {
@@ -371,7 +366,7 @@ export type PlatformGatewayMessage = Static<
   typeof platformGatewayMessageSchema
 >;
 
-export const deviceGatewayEnrollRequestSchema = Type.Object(
+const deviceGatewayEnrollRequestSchema = Type.Object(
   {
     organisationId: textLimit(Type.String({ minLength: 1, maxLength: 128 })),
     gatewayId: Type.String({ pattern: "^dgw_[a-f0-9]{24}$" }),
@@ -379,11 +374,11 @@ export const deviceGatewayEnrollRequestSchema = Type.Object(
   },
   strict,
 );
-export type DeviceGatewayEnrollRequest = Static<
+type DeviceGatewayEnrollRequest = Static<
   typeof deviceGatewayEnrollRequestSchema
 >;
 
-export const deviceGatewayEnrollResponseSchema = Type.Object(
+const deviceGatewayEnrollResponseSchema = Type.Object(
   { credential: Type.String({ minLength: 1 }) },
   strict,
 );

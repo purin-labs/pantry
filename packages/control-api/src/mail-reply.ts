@@ -171,7 +171,7 @@ export type MailReplySourceRecord =
     }>;
 
 /** Where a source's words are in the draft body, as UTF-16 offsets. */
-export type MailReplySpan = Readonly<{ start: number; end: number }>;
+type MailReplySpan = Readonly<{ start: number; end: number }>;
 
 /**
  * One record that the agent checked for a reply draft, as far as the person

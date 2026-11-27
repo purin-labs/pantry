@@ -12,9 +12,9 @@ import { Value } from "typebox/value";
 const strict = { additionalProperties: false } as const;
 const timestamp = NonNegativeInteger;
 
-export const INBOX_PREVIEW_MAX = 200;
+const INBOX_PREVIEW_MAX = 200;
 
-export const whatsappConversationStateSchema = Type.Union([
+const whatsappConversationStateSchema = Type.Union([
   /** A reply waits for a person's approval. */
   Type.Literal("reply_waiting"),
   /** The agent asked for a person. */
@@ -90,7 +90,7 @@ export function whatsappConversationState(
   return "agent_handled";
 }
 
-export const inboxWhatsAppConversationSchema = Type.Object(
+const inboxWhatsAppConversationSchema = Type.Object(
   {
     integrationAccountId: Type.String({ minLength: 1 }),
     caseId: Type.String({ minLength: 1 }),
@@ -131,7 +131,7 @@ export function takesNoReplies(address: string): boolean {
  * Mail of a mailbox with no agent, whose thread has no reply from it yet and
  * whose sender takes replies.
  */
-export const inboxUnansweredThreadSchema = Type.Object(
+const inboxUnansweredThreadSchema = Type.Object(
   {
     integrationAccountId: Type.String({ minLength: 1 }),
     threadId: Type.String({ minLength: 1 }),
@@ -143,7 +143,7 @@ export const inboxUnansweredThreadSchema = Type.Object(
 );
 export type InboxUnansweredThread = Static<typeof inboxUnansweredThreadSchema>;
 
-export const inboxConversationsSchema = Type.Object(
+const inboxConversationsSchema = Type.Object(
   {
     ok: Type.Literal(true),
     /** The wire items of `GET …/email-reviews`, of readable mailboxes only. */

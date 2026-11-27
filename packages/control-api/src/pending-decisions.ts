@@ -67,9 +67,3 @@ export type PendingEmailReview = Readonly<{
 export type PendingDecisionList = Readonly<{
   decisions: readonly PendingDecision[];
 }>;
-
-/**
- * The identity of one decision: its kind and the id of its store. The decide
- * call takes it.
- */
-export type PendingDecisionId = Pick<PendingDecision, "kind" | "id">;

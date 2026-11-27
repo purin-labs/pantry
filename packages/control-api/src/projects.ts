@@ -239,7 +239,7 @@ export function parseChatPlacement(raw: unknown): ChatPlacement | null {
   };
 }
 
-export function parseChatDestination(raw: unknown): ChatDestination | null {
+function parseChatDestination(raw: unknown): ChatDestination | null {
   if (
     !isRecord(raw) ||
     !isProjectId(raw.projectId) ||
@@ -249,7 +249,7 @@ export function parseChatDestination(raw: unknown): ChatDestination | null {
   return { projectId: raw.projectId };
 }
 
-export function parseChatInsertion(raw: unknown): ChatInsertion | null {
+function parseChatInsertion(raw: unknown): ChatInsertion | null {
   if (!isRecord(raw)) return null;
   if (raw.kind === "end" && hasExactKeys(raw, ["kind"])) return { kind: "end" };
   if (

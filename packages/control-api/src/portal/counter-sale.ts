@@ -5,7 +5,7 @@ import {
 } from "../counter-register.ts";
 import { exhaustiveList, hasExactKeys } from "@purin-labs/std";
 
-export type CounterSaleManualTender = Readonly<{
+type CounterSaleManualTender = Readonly<{
   cashReceivedMinor: number | null;
   changeDueMinor: number | null;
   currency: string;

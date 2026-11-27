@@ -10,7 +10,7 @@ export type ProjectId = string & {
   readonly [projectIdBrand]: "ProjectId";
 };
 
-export type IdParseError = Readonly<{ code: "invalid"; value: string }>;
+type IdParseError = Readonly<{ code: "invalid"; value: string }>;
 type ParsedId<T> =
   | Readonly<{ ok: true; value: T }>
   | Readonly<{ ok: false; error: IdParseError }>;

@@ -37,7 +37,7 @@ const deviceId = Type.String({ pattern: "^[A-Za-z0-9_-]{16,64}$" });
 const macId = Type.String({ pattern: "^vmac_[a-f0-9]{24}$" });
 const shortText = textLimit(Type.String({ minLength: 1, maxLength: 64 }));
 
-export const chatTranscriptionPathSchema = Type.Union([
+const chatTranscriptionPathSchema = Type.Union([
   Type.Literal("shop_mac"),
   Type.Literal("workers_ai"),
 ]);
@@ -52,7 +52,7 @@ export const isChatTranscriptionPath = (
  * A spoken command's mark on a chat message. A typed message has none. A
  * message from before Plan 82C has no engine.
  */
-export const chatInputModeSchema = Type.Object(
+const chatInputModeSchema = Type.Object(
   {
     kind: Type.Literal("voice"),
     transcriptionPath: chatTranscriptionPathSchema,
@@ -65,11 +65,10 @@ export type ChatInputMode = Static<typeof chatInputModeSchema>;
 export type VoiceRefusalCode =
   "voice_disabled" | "too_long" | "rate_limited" | "transcription_unavailable";
 
-export const voiceGrantRequestSchema = Type.Object({ deviceId }, strict);
-export type VoiceGrantRequest = Static<typeof voiceGrantRequestSchema>;
+const voiceGrantRequestSchema = Type.Object({ deviceId }, strict);
 
 /** `mac` is null when the shop has no Mac that answers: use the fallback. */
-export const voiceGrantSchema = Type.Object(
+const voiceGrantSchema = Type.Object(
   {
     mac: Type.Union([
       Type.Null(),
@@ -89,7 +88,7 @@ export const voiceGrantSchema = Type.Object(
 export type VoiceGrant = Static<typeof voiceGrantSchema>;
 
 /** A Mac from before Plan 82C and the fallback name no engine. */
-export const voiceTranscriptionSchema = Type.Object(
+const voiceTranscriptionSchema = Type.Object(
   {
     text: textLimit(Type.String({ maxLength: 8000 })),
     audioSeconds: Type.Number({ minimum: 0 }),
@@ -117,7 +116,7 @@ export const voiceMacModelStateSchema = Type.Union([
   Type.Literal("loaded"),
 ]);
 
-export const voiceMacViewSchema = Type.Object(
+const voiceMacViewSchema = Type.Object(
   {
     macId,
     hostname: textLimit(Type.String({ minLength: 1, maxLength: 253 })),
@@ -146,20 +145,19 @@ export const voiceMacViewSchema = Type.Object(
 export type VoiceMacView = Static<typeof voiceMacViewSchema>;
 
 /** A manager's choice of a Mac's engine. */
-export const voiceMacEngineChoiceSchema = Type.Object(
+const voiceMacEngineChoiceSchema = Type.Object(
   { engine: voiceEngineIdSchema },
   strict,
 );
-export type VoiceMacEngineChoice = Static<typeof voiceMacEngineChoiceSchema>;
 
-export const voiceMacListSchema = Type.Object(
+const voiceMacListSchema = Type.Object(
   { macs: Type.Array(voiceMacViewSchema) },
   strict,
 );
 export type VoiceMacList = Static<typeof voiceMacListSchema>;
 
 /** The one-time code appears here once. The Platform keeps only its digest. */
-export const voiceMacEnrollmentStartSchema = Type.Object(
+const voiceMacEnrollmentStartSchema = Type.Object(
   {
     organisationId: shortText,
     macId,
@@ -172,7 +170,7 @@ export type VoiceMacEnrollmentStart = Static<
   typeof voiceMacEnrollmentStartSchema
 >;
 
-export const voiceMacEnrollRequestSchema = Type.Object(
+const voiceMacEnrollRequestSchema = Type.Object(
   {
     organisationId: shortText,
     macId,
@@ -180,10 +178,9 @@ export const voiceMacEnrollRequestSchema = Type.Object(
   },
   strict,
 );
-export type VoiceMacEnrollRequest = Static<typeof voiceMacEnrollRequestSchema>;
 
 /** The credential and the grant key appear here once, for the Mac alone. */
-export const voiceMacEnrollResponseSchema = Type.Object(
+const voiceMacEnrollResponseSchema = Type.Object(
   {
     credential: textLimit(Type.String({ minLength: 1, maxLength: 400 })),
     grantKey: textLimit(Type.String({ minLength: 1, maxLength: 100 })),
@@ -195,7 +192,7 @@ export type VoiceMacEnrollResponse = Static<
   typeof voiceMacEnrollResponseSchema
 >;
 
-export const voiceMacHeartbeatSchema = Type.Object(
+const voiceMacHeartbeatSchema = Type.Object(
   {
     privateAddress: textLimit(Type.String({ minLength: 7, maxLength: 15 })),
     serviceVersion: shortText,
@@ -222,7 +219,7 @@ export type VoiceMacHeartbeat = Static<typeof voiceMacHeartbeatSchema>;
  * The Platform's answer to a heartbeat. The Mac changes to `engineChoice`
  * after it has the engine's files. The Platform never calls the Mac.
  */
-export const voiceMacHeartbeatAnswerSchema = Type.Object(
+const voiceMacHeartbeatAnswerSchema = Type.Object(
   {
     ok: Type.Literal(true),
     hostname: textLimit(Type.String({ minLength: 1, maxLength: 253 })),
@@ -238,7 +235,7 @@ export type VoiceMacHeartbeatAnswer = Static<
  * The shop vocabulary. The Mac reads it for its engine's prompt, and the
  * Portal reads it for the text check (`voice-text-check.ts`).
  */
-export const voiceVocabularySchema = Type.Object(
+const voiceVocabularySchema = Type.Object(
   {
     terms: Type.Array(textLimit(Type.String({ minLength: 1, maxLength: 80 })), {
       maxItems: VOICE_VOCABULARY_TERM_LIMIT,
@@ -249,14 +246,13 @@ export const voiceVocabularySchema = Type.Object(
 export type VoiceVocabulary = Static<typeof voiceVocabularySchema>;
 
 /** The DNS-01 value that the certificate authority asks for. */
-export const voiceMacChallengeSchema = Type.Object(
+const voiceMacChallengeSchema = Type.Object(
   { value: Type.String({ pattern: "^[A-Za-z0-9_-]{32,128}$" }) },
   strict,
 );
-export type VoiceMacChallenge = Static<typeof voiceMacChallengeSchema>;
 
 /** The shop Mac's answer to the Portal's check. It also starts the model load. */
-export const voiceMacHealthSchema = Type.Object(
+const voiceMacHealthSchema = Type.Object(
   {
     ok: Type.Literal(true),
     modelState: voiceMacModelStateSchema,
@@ -267,13 +263,12 @@ export const voiceMacHealthSchema = Type.Object(
   },
   strict,
 );
-export type VoiceMacHealth = Static<typeof voiceMacHealthSchema>;
 
 /**
  * The shop Mac's refusal. On `busy` and `model_not_ready`, the Portal uses the
  * fallback at once (Plan 82 D1b). A success has `voiceTranscriptionSchema`.
  */
-export const voiceMacRefusalSchema = Type.Object(
+const voiceMacRefusalSchema = Type.Object(
   {
     ok: Type.Literal(false),
     error: Type.Union([
@@ -290,10 +285,9 @@ export const voiceMacRefusalSchema = Type.Object(
   },
   strict,
 );
-export type VoiceMacRefusal = Static<typeof voiceMacRefusalSchema>;
 
 /** The approval cards that a phrase can confirm, as a click on the card does. */
-export const voiceConfirmationTargetSchema = Type.Object(
+const voiceConfirmationTargetSchema = Type.Object(
   {
     kind: Type.Union([
       Type.Literal("configuration_draft"),
@@ -310,15 +304,12 @@ export type VoiceConfirmationTarget = Static<
 
 const conversationId = textLimit(Type.String({ minLength: 1, maxLength: 200 }));
 
-export const voiceConfirmationRequestSchema = Type.Object(
+const voiceConfirmationRequestSchema = Type.Object(
   { conversationId, target: voiceConfirmationTargetSchema },
   strict,
 );
-export type VoiceConfirmationRequest = Static<
-  typeof voiceConfirmationRequestSchema
->;
 
-export const voiceConfirmationSchema = Type.Object(
+const voiceConfirmationSchema = Type.Object(
   {
     confirmationId: shortText,
     phrase: textLimit(Type.String({ minLength: 1, maxLength: 100 })),
@@ -328,7 +319,7 @@ export const voiceConfirmationSchema = Type.Object(
 );
 export type VoiceConfirmation = Static<typeof voiceConfirmationSchema>;
 
-export const voiceConfirmationCheckRequestSchema = Type.Object(
+const voiceConfirmationCheckRequestSchema = Type.Object(
   {
     conversationId,
     transcript: textLimit(Type.String({ maxLength: 8000 })),
@@ -337,11 +328,8 @@ export const voiceConfirmationCheckRequestSchema = Type.Object(
   },
   strict,
 );
-export type VoiceConfirmationCheckRequest = Static<
-  typeof voiceConfirmationCheckRequestSchema
->;
 
-export const voiceConfirmationCheckSchema = Type.Union([
+const voiceConfirmationCheckSchema = Type.Union([
   Type.Object(
     {
       outcome: Type.Literal("matched"),
@@ -356,7 +344,7 @@ export type VoiceConfirmationCheck = Static<
 >;
 
 /** The receipts of a chat: each phrase that confirmed a card, its path and its engine. */
-export const voiceConfirmationReceiptsSchema = Type.Object(
+const voiceConfirmationReceiptsSchema = Type.Object(
   {
     receipts: Type.Array(
       Type.Object(
@@ -435,12 +423,8 @@ export const parseVoiceMacEnrollmentStart = (raw: unknown) =>
   parseWith(voiceMacEnrollmentStartSchema, raw);
 export const parseVoiceMacEnrollRequest = (raw: unknown) =>
   parseWith(voiceMacEnrollRequestSchema, raw);
-export const parseVoiceMacEnrollResponse = (raw: unknown) =>
-  parseWith(voiceMacEnrollResponseSchema, raw);
 export const parseVoiceMacHeartbeat = (raw: unknown) =>
   parseWith(voiceMacHeartbeatSchema, raw);
-export const parseVoiceMacHeartbeatAnswer = (raw: unknown) =>
-  parseWith(voiceMacHeartbeatAnswerSchema, raw);
 export const parseVoiceMacEngineChoice = (raw: unknown) =>
   parseWith(voiceMacEngineChoiceSchema, raw);
 export const parseVoiceVocabulary = (raw: unknown) =>
@@ -459,5 +443,3 @@ export const parseVoiceConfirmationCheckRequest = (raw: unknown) =>
   parseWith(voiceConfirmationCheckRequestSchema, raw);
 export const parseVoiceConfirmationCheck = (raw: unknown) =>
   parseWith(voiceConfirmationCheckSchema, raw);
-export const parseVoiceConfirmationReceipts = (raw: unknown) =>
-  parseWith(voiceConfirmationReceiptsSchema, raw);

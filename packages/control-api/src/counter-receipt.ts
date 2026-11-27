@@ -18,7 +18,7 @@ const strict = { additionalProperties: false } as const;
 const text = textLimit(Type.String({ minLength: 1, maxLength: 200 }));
 
 /** A Japanese Qualified Invoice registration number: T and 13 digits. */
-export const INVOICE_REGISTRATION_NUMBER_PATTERN = "^T[0-9]{13}$";
+const INVOICE_REGISTRATION_NUMBER_PATTERN = "^T[0-9]{13}$";
 
 export function isInvoiceRegistrationNumber(value: unknown): value is string {
   return (
@@ -27,7 +27,7 @@ export function isInvoiceRegistrationNumber(value: unknown): value is string {
   );
 }
 
-export const counterPrinterJobStateSchema = Type.Union([
+const counterPrinterJobStateSchema = Type.Union([
   /** Sent to the gateway, with no answer yet. */
   Type.Literal("sent"),
   printerOutcomeSchema,
@@ -40,7 +40,7 @@ export type CounterPrinterJobState = Static<
   typeof counterPrinterJobStateSchema
 >;
 
-export const counterPrinterJobSchema = Type.Object(
+const counterPrinterJobSchema = Type.Object(
   {
     requestId: text,
     task: printerTaskSchema,
@@ -53,7 +53,7 @@ export const counterPrinterJobSchema = Type.Object(
 );
 export type CounterPrinterJob = Static<typeof counterPrinterJobSchema>;
 
-export const counterReceiptPrinterSchema = Type.Object(
+const counterReceiptPrinterSchema = Type.Object(
   {
     deviceId: text,
     name: text,
@@ -64,7 +64,7 @@ export const counterReceiptPrinterSchema = Type.Object(
 );
 export type CounterReceiptPrinter = Static<typeof counterReceiptPrinterSchema>;
 
-export const counterSaleReceiptSchema = Type.Object(
+const counterSaleReceiptSchema = Type.Object(
   {
     ok: Type.Literal(true),
     /** Null when no active printer is bound: the browser prints. */
@@ -75,15 +75,15 @@ export const counterSaleReceiptSchema = Type.Object(
 );
 export type CounterSaleReceipt = Static<typeof counterSaleReceiptSchema>;
 
-export const counterReceiptPrintResponseSchema = Type.Object(
+const counterReceiptPrintResponseSchema = Type.Object(
   { ok: Type.Literal(true), job: counterPrinterJobSchema },
   strict,
 );
-export type CounterReceiptPrintResponse = Static<
+type CounterReceiptPrintResponse = Static<
   typeof counterReceiptPrintResponseSchema
 >;
 
-export const counterReceiptSettingsSchema = Type.Object(
+const counterReceiptSettingsSchema = Type.Object(
   {
     pantryLocationId: text,
     invoiceRegistrationNumber: Type.Union([
@@ -107,17 +107,6 @@ export function parseCounterReceiptPrintResponse(
   raw: unknown,
 ): CounterReceiptPrintResponse | null {
   return Value.Check(counterReceiptPrintResponseSchema, raw) ? raw : null;
-}
-
-export function parseCounterReceiptSettings(
-  raw: unknown,
-): CounterReceiptSettings | null {
-  return Value.Check(counterReceiptSettingsSchema, raw) ? raw : null;
-}
-
-/** Whether the paper came out or the drawer opened. */
-export function counterPrinterJobDone(job: CounterPrinterJob): boolean {
-  return job.state === "done";
 }
 
 /** What the Register tells the person about a task, in plain words. */

@@ -62,7 +62,7 @@ export function parseOrderTimes(value: unknown): OrderTimesWindow {
   return { truncated: value.truncated, orders: value.orders };
 }
 
-export type OrderQueuePreparation =
+type OrderQueuePreparation =
   "not_needed" | "not_started" | "queued" | "preparing" | "completed";
 
 export type OrderQueueEntry = Readonly<{

@@ -2,7 +2,7 @@ import type { OrderQueueEntry } from "./order-queue.ts";
 
 export type CounterRegisterPaymentMethod = "card" | "felica" | "qr_code";
 
-export type CounterRegisterModifierOption = Readonly<{
+type CounterRegisterModifierOption = Readonly<{
   modifierOptionId: string;
   name: string;
   priceDeltaMinor: number;
@@ -103,26 +103,6 @@ export type CounterRegisterBasketLine = Readonly<{
   unitPriceMinor: number;
   currency: string;
 }>;
-
-export type RegisterSurfaceCommand =
-  | Readonly<{
-      kind: "register.add_item";
-      menuEntryId: string;
-      modifierOptionIds?: readonly string[];
-      quantity?: number;
-    }>
-  | Readonly<{
-      kind: "register.update_line";
-      lineKey: string;
-      quantity: number;
-    }>
-  | Readonly<{
-      kind: "register.remove_line";
-      lineKey: string;
-    }>
-  | Readonly<{
-      kind: "register.clear_basket";
-    }>;
 
 export function isCounterRegisterPaymentMethod(
   raw: unknown,
