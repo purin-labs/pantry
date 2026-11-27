@@ -10,10 +10,7 @@ import {
 } from "@purin-labs/tenancy/data/control-mutation";
 
 import type { Env } from "@purin-labs/kernel/env";
-import {
-  roleMayConfigure,
-  type ControlRole,
-} from "@purin-labs/tenancy/data/control-plane";
+import { roleMayConfigure, type ControlRole } from "@purin-labs/tenancy/data/control-plane";
 import type { ControlSessionId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { runAgentOperation } from "@purin-labs/conversation/data/agent-operation-runner";
@@ -718,16 +715,14 @@ async function applyClaimedWorkflowChange(
   const db = execution.database;
   if (approver === null)
     return { ok: false, error: { code: "workflow_approver_required" } };
-  const applied = await workflowChanges
-    .use()
-    .applyApprovedWorkflowChange(
-      env,
-      execution,
-      organisationId,
-      stored.draftId,
-      change,
-      approver,
-    );
+  const applied = await workflowChanges.use().applyApprovedWorkflowChange(
+    env,
+    execution,
+    organisationId,
+    stored.draftId,
+    change,
+    approver,
+  );
   switch (applied.kind) {
     case "applied":
       break;

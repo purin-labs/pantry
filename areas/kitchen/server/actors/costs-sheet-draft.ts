@@ -350,11 +350,14 @@ const COSTS_SHEET_ROOM_PROTOCOL: CollaborationRoomProtocol<
   encodeServerMessage: encodeRoomServerMessage,
 };
 
-class CostsSheetBacking implements CollaborationRoomBacking<
-  CostsSheetDoc,
-  CostsSheetRoomMetadata,
-  CostsSheetFailureCode
-> {
+class CostsSheetBacking
+  implements
+    CollaborationRoomBacking<
+      CostsSheetDoc,
+      CostsSheetRoomMetadata,
+      CostsSheetFailureCode
+    >
+{
   readonly #ctx: DurableObjectState;
   readonly #organisationId: OrganisationId;
 
@@ -653,9 +656,7 @@ function persistSheet(
   );
 }
 
-function readStoredSheetIfAny(
-  sql: SqlStorage,
-): SheetResult<StoredSheet | null> {
+function readStoredSheetIfAny(sql: SqlStorage): SheetResult<StoredSheet | null> {
   const exists =
     sql
       .exec(

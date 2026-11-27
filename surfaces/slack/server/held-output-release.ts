@@ -13,11 +13,7 @@ import {
   type HeldOutputRequest,
 } from "@purin-labs/authority/data/held-output-request";
 import type { Env } from "@purin-labs/kernel/env";
-import {
-  newRequestId,
-  parseCaseId,
-  parseConnectorId,
-} from "@purin-labs/kernel/ids";
+import { newRequestId, parseCaseId, parseConnectorId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { approvedOutputDecision } from "@purin-labs/authority/policy/information-flow/index";
@@ -45,7 +41,11 @@ export async function releaseHeldOutputDecision(
     () => false,
   );
   if (finished)
-    await markHeldOutputRequestReleased(scope, stored.requestId, Date.now());
+    await markHeldOutputRequestReleased(
+      scope,
+      stored.requestId,
+      Date.now(),
+    );
   return finished;
 }
 

@@ -43,11 +43,7 @@ import type {
   BrainOrganisationActor,
   BrainOrganisationStub,
 } from "../actors/organisation-brain-rpc";
-import {
-  parseCaseId,
-  parseSessionId,
-  type CaseId,
-} from "@purin-labs/kernel/ids";
+import { parseCaseId, parseSessionId, type CaseId } from "@purin-labs/kernel/ids";
 import {
   resolveMemoryViewer,
   viewerMayRead,
@@ -610,7 +606,9 @@ class ExecutionReader {
 
   private async read(labelJson: string): Promise<boolean> {
     const label = await FlowLabel.restore(parseJsonOrNull(labelJson));
-    return label.ok && (await viewerMayRead(this.viewer, label.value));
+    return (
+      label.ok && (await viewerMayRead(this.viewer, label.value))
+    );
   }
 }
 

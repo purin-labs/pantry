@@ -1,5 +1,4 @@
-import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { MenuBoardOrganisationActor } from "@purin-labs/area-cafe-contract/server/menu-board-commands";
+import { signalShopScreens } from "../../menu-screen-signal";
 import {
   readCafeSoldOutMenu,
   setSoldOutMark,
@@ -146,14 +145,6 @@ async function markItem(
   });
   if (!receipt.ok) return controlError(receipt.error.code, 409);
   // The shop's screens show the mark now.
-  const organisation =
-    await requireActiveOrganisationActor<MenuBoardOrganisationActor>({
-      env,
-      organisationId: authorized.organisationId,
-      now: Date.now(),
-    }).catch(() => undefined);
-  await organisation
-    ?.signalMenuScreens({ organisationId: authorized.organisationId })
-    .catch(() => undefined);
+  await signalShopScreens(env, authorized.organisationId);
   return controlJson(responseBody);
 }

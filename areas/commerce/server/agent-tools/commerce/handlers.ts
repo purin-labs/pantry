@@ -1,7 +1,11 @@
 import { pantryCommerceAccess } from "@purin-labs/area-commerce-contract/server/client";
 import { isSystemCommerceEntity } from "@purin-labs/commerce-contracts";
-import type { PaymentsReadRequest } from "./services";
-import type { StaffPageToolReceipt } from "@purin-labs/agent-tools/catalog/types";
+import type {
+  PaymentsReadRequest,
+} from "./services";
+import type {
+  StaffPageToolReceipt,
+} from "@purin-labs/agent-tools/catalog/types";
 import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";
@@ -34,7 +38,10 @@ import {
   type SoldOutMarkResult,
   type SoldOutToolRead,
 } from "@purin-labs/area-cafe-contract/server/order-queue-commands";
-import { presentPayments, type PaymentsToolRead } from "../../payments-read";
+import {
+  presentPayments,
+  type PaymentsToolRead,
+} from "../../payments-read";
 import { cafeServices } from "@purin-labs/area-cafe-contract/server/cafe-services";
 import {
   PRODUCT_SALES_SOURCE_TYPES,
@@ -70,7 +77,9 @@ import {
   selectCommerceContextSourceGrant,
 } from "../../entity-plane/context-read";
 import { assertNever } from "@purin-labs/std";
-import { type ToolEffect } from "@purin-labs/tool-handlers/agent-tools/session-support";
+import {
+  type ToolEffect,
+} from "@purin-labs/tool-handlers/agent-tools/session-support";
 import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 import {
   admitCommerceReadObservation,
@@ -236,7 +245,8 @@ function observedCommerceEntities(
   for (const entity of result.entities) {
     // Commerce graph references use provider IDs; actions use canonical IDs.
     const entityId =
-      isSystemCommerceEntity(entity) && entity.provenance.source === "commerce"
+      isSystemCommerceEntity(entity) &&
+      entity.provenance.source === "commerce"
         ? commerceCanonicalResourceId(merchantId, entity.reference.entityId)
         : entity.reference.entityId;
     observed.push({
@@ -700,7 +710,9 @@ function soldOutMarkRefusal(marked: SoldOutMarkResult): string | null {
 export async function readMerchantReportForEmbeddedHarness(
   context: SessionToolContext,
   request: import("./services").HarnessMerchantReportRequest,
-): Promise<import("../../entity-plane/merchant-reports").MerchantReportResult> {
+): Promise<
+  import("../../entity-plane/merchant-reports").MerchantReportResult
+> {
   const { env, storage, execution, lease, assignment } = context;
   const organisationId = execution.scope.organisationId;
   if (request.name === "product_sales") {
@@ -785,7 +797,9 @@ async function readProductSalesForEmbeddedHarness(
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
   assignment: CaseAssignment,
-): Promise<import("../../entity-plane/merchant-reports").MerchantReportResult> {
+): Promise<
+  import("../../entity-plane/merchant-reports").MerchantReportResult
+> {
   const organisationId = execution.scope.organisationId;
   await requireSessionExecution(execution, lease);
   const unavailable = {
@@ -880,7 +894,9 @@ async function readStockShortagesForEmbeddedHarness(
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
   assignment: CaseAssignment,
-): Promise<import("../../entity-plane/merchant-reports").MerchantReportResult> {
+): Promise<
+  import("../../entity-plane/merchant-reports").MerchantReportResult
+> {
   const organisationId = execution.scope.organisationId;
   await requireSessionExecution(execution, lease);
   const unavailable = {

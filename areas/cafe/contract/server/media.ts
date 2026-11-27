@@ -9,10 +9,7 @@ import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connecti
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { createCommerceClient } from "@purin-labs/area-commerce-contract/server/client";
-import {
-  commerceCommandInput,
-  type CommerceAdminClient,
-} from "@purin-labs/commerce-client";
+import { commerceCommandInput, type CommerceAdminClient } from "@purin-labs/commerce-client";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { MenuBoardOrganisationActor } from "./menu-board-commands";
 import type { Result } from "@purin-labs/kernel/result";
@@ -51,11 +48,7 @@ export async function readCafeImageContent(
   env: Env,
   organisationId: OrganisationId,
   mediaId: string,
-): Promise<Readonly<{
-  bytes: Uint8Array;
-  contentType: string;
-  etag: string | null;
-}> | null> {
+): Promise<Readonly<{ bytes: Uint8Array; contentType: string; etag: string | null }> | null> {
   const shop = await cafeShopClient(env, organisationId);
   if (shop === null) return null;
   const content = await shop.client.readMediaContent(shop.merchantId, mediaId);
@@ -65,17 +58,11 @@ export async function readCafeImageContent(
 async function cafeShopClient(
   env: Env,
   organisationId: OrganisationId,
-): Promise<Readonly<{
-  client: CommerceAdminClient;
-  merchantId: string;
-}> | null> {
+): Promise<Readonly<{ client: CommerceAdminClient; merchantId: string }> | null> {
   try {
     const scope = await OrganisationExecutionScope.resolve(env, organisationId);
     if (!scope.ok) return null;
-    const environment = await readOrganisationEnvironment(
-      scope.value.database,
-      organisationId,
-    );
+    const environment = await readOrganisationEnvironment(scope.value.database, organisationId);
     if (environment === null) return null;
     const binding = await resolveOrganisationCommerceMerchantBinding({
       db: scope.value.database,
@@ -87,9 +74,7 @@ async function cafeShopClient(
       kind: "organisation",
       organisationId: String(organisationId),
     });
-    return client === null
-      ? null
-      : { client, merchantId: binding.value.merchantId };
+    return client === null ? null : { client, merchantId: binding.value.merchantId };
   } catch {
     return null;
   }
@@ -146,34 +131,26 @@ export async function deleteCafeImage(
 ): Promise<CafeImageDeletion> {
   let boards: readonly string[];
   try {
-    const organisation =
-      await requireActiveOrganisationActor<MenuBoardOrganisationActor>({
-        env,
-        organisationId: input.organisationId,
-        now: Date.now(),
-      });
-    const command: MenuBoardCommand = {
-      kind: "media_on_boards",
-      mediaId: input.mediaId,
-    };
+    const organisation = await requireActiveOrganisationActor<MenuBoardOrganisationActor>({
+      env,
+      organisationId: input.organisationId,
+      now: Date.now(),
+    });
+    const command: MenuBoardCommand = { kind: "media_on_boards", mediaId: input.mediaId };
     const shown = (await organisation.menuBoardCommand({
       organisationId: input.organisationId,
       command,
     })) as MenuBoardCommandReply<Variant<MenuBoardCommand, "media_on_boards">>;
-    if (!shown.ok)
-      return { ok: false, error: { code: "organisation_placement_conflict" } };
+    if (!shown.ok) return { ok: false, error: { code: "organisation_placement_conflict" } };
     boards = shown.value.boards;
   } catch {
     return { ok: false, error: { code: "organisation_placement_conflict" } };
   }
-  if (boards.length > 0)
-    return { ok: false, error: { code: "media_on_board", boards } };
+  if (boards.length > 0) return { ok: false, error: { code: "media_on_board", boards } };
   const library = await input.client.listMedia(input.merchantId);
-  if (!library.ok)
-    return { ok: false, error: { code: "commerce_unavailable" } };
+  if (!library.ok) return { ok: false, error: { code: "commerce_unavailable" } };
   const current = library.value.media.find((item) => item.id === input.mediaId);
-  if (current === undefined)
-    return { ok: false, error: { code: "media_missing" } };
+  if (current === undefined) return { ok: false, error: { code: "media_missing" } };
   const deleted = await input.client.deleteMedia(
     commerceCommandInput({
       merchantId: input.merchantId,
@@ -189,8 +166,7 @@ export async function deleteCafeImage(
     : deleted.value.outcome === "rejected"
       ? deleted.value.error.code
       : undefined;
-  if (refusedCode === undefined)
-    return { ok: true, value: { mediaId: input.mediaId } };
+  if (refusedCode === undefined) return { ok: true, value: { mediaId: input.mediaId } };
   if (refusedCode === "resource_relationship_invalid")
     return { ok: false, error: { code: "media_on_product" } };
   if (refusedCode === "resource_not_found")

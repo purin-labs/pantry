@@ -80,10 +80,7 @@ import {
   ORDER_REFUND_VERB,
   orderRefundAllocation,
 } from "./order-refund-action";
-import {
-  isStockOperationVerb,
-  stockOperationResourceId,
-} from "@purin-labs/area-kitchen-contract/server/stock-action";
+import { isStockOperationVerb, stockOperationResourceId } from "@purin-labs/area-kitchen-contract/server/stock-action";
 import {
   executeStockOperation,
   reconcileStockOperation,

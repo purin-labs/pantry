@@ -79,15 +79,8 @@ import { customConnectorFetchObjectName } from "@purin-labs/area-integrations-co
 import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { conversationResidencyStub } from "@purin-labs/actor-runtime/actors/conversation-residency";
-import {
-  type QuarantinedCaseActorRegistryEntry,
-  actorResolutionErrorResponse,
-} from "../support";
-import {
-  isAuthorizedOrganisationAdminRequest,
-  jsonBodyErrorResponse,
-  readPositiveSafeIntegerField,
-} from "@purin-labs/control/worker/gateway/request-helpers";
+import { type QuarantinedCaseActorRegistryEntry, actorResolutionErrorResponse } from "../support";
+import { isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse, readPositiveSafeIntegerField } from "@purin-labs/control/worker/gateway/request-helpers";
 
 type ActorRegistryAdminRequest =
   | {
@@ -317,9 +310,17 @@ function registeredActorObjectId(
     case "case":
       return actorStub(env.CASE, name, entry.placement).id.toString();
     case "connector":
-      return actorStub(env.CONNECTOR, name, entry.placement).id.toString();
+      return actorStub(
+        env.CONNECTOR,
+        name,
+        entry.placement,
+      ).id.toString();
     case "organisation":
-      return actorStub(env.ORGANISATION, name, entry.placement).id.toString();
+      return actorStub(
+        env.ORGANISATION,
+        name,
+        entry.placement,
+      ).id.toString();
     default:
       return null;
   }
@@ -416,7 +417,11 @@ async function discardQuarantinedCaseResponse(
       409,
     );
   }
-  const actor = actorStub(env.CASE, entry.physicalObjectName, entry.placement);
+  const actor = actorStub(
+    env.CASE,
+    entry.physicalObjectName,
+    entry.placement,
+  );
   const discardedState = await actor.discardQuarantinedState(
     actorActivationIdentityForQuarantinedEntry(entry, Date.now()),
   );
@@ -1350,11 +1355,7 @@ function sanitizeCaseBudgetActivationInspection(snapshot: CaseSnapshot) {
         case "dropped":
           return { kind: lifecycle.kind, output, reason: lifecycle.reason };
         case "held":
-          return {
-            kind: lifecycle.kind,
-            output,
-            requestId: lifecycle.requestId,
-          };
+          return { kind: lifecycle.kind, output, requestId: lifecycle.requestId };
         case "rejected":
           return { kind: lifecycle.kind, output, reason: lifecycle.reason };
         default:

@@ -94,22 +94,20 @@ type SessionCostsStaffWork = Readonly<{
  */
 export type CostsCommerce = CommerceToolReads &
   Readonly<{
-    /** Prepares one commerce read of this turn for the grant that is selected. */
-    prepareRead(
-      selectGrant: (
-        input: Parameters<
-          CommerceToolReads["selectMerchantReportSourceGrant"]
-        >[3],
-      ) => ReturnType<CommerceToolReads["selectMerchantReportSourceGrant"]>,
-      label: string,
-    ): Promise<PreparedCommerceRead>;
-    /**
-     * The Commerce clients of one person of the Organisation, behind this
-     * turn's admission. Null when Commerce is not configured.
-     */
-    adminClient(actor: string): CommerceAdminClient | null;
-    entityPlaneClient(actor: string): CommerceEntityPlaneClient | null;
-  }>;
+  /** Prepares one commerce read of this turn for the grant that is selected. */
+  prepareRead(
+    selectGrant: (
+      input: Parameters<CommerceToolReads["selectMerchantReportSourceGrant"]>[3],
+    ) => ReturnType<CommerceToolReads["selectMerchantReportSourceGrant"]>,
+    label: string,
+  ): Promise<PreparedCommerceRead>;
+  /**
+   * The Commerce clients of one person of the Organisation, behind this
+   * turn's admission. Null when Commerce is not configured.
+   */
+  adminClient(actor: string): CommerceAdminClient | null;
+  entityPlaneClient(actor: string): CommerceEntityPlaneClient | null;
+}>;
 
 type SessionCostsHost = Readonly<{
   database: OrganisationDatabase;
@@ -122,10 +120,7 @@ type SessionCostsHost = Readonly<{
     operationId: string,
     boundary: CatalogExecutionContext,
   ) => Promise<ToolEffect<CostsSheetEditResult | StoredAccessEnded>>;
-  settleSavedCells: (
-    cellKeys: readonly string[],
-    nowMs: number,
-  ) => Promise<void>;
+  settleSavedCells: (cellKeys: readonly string[], nowMs: number) => Promise<void>;
   prepareCostsReads: (includeActuals?: boolean) => Promise<
     Readonly<{
       merchantId: string;
@@ -176,18 +171,13 @@ export function embeddedHarnessCostsTools(
     requireExecution: requireSessionExecution.bind(null, execution, lease),
     readSheetDraftCells: async () => {
       try {
-        const organisation =
-          await requireActiveOrganisationActorAtPlacement<KitchenOrganisationActor>(
-            {
-              env,
-              organisationId,
-              placement: execution.scope.placement,
-              now: Date.now(),
-            },
-          );
-        const draft = await organisation.readCostsSheetDraft({
+        const organisation = await requireActiveOrganisationActorAtPlacement<KitchenOrganisationActor>({
+          env,
           organisationId,
+          placement: execution.scope.placement,
+          now: Date.now(),
         });
+        const draft = await organisation.readCostsSheetDraft({ organisationId });
         if (!draft.ok) {
           return [];
         }
@@ -242,8 +232,7 @@ export function embeddedHarnessCostsTools(
               },
             );
           await requireSessionExecution(execution, lease);
-          const firstCellKey =
-            request.changes[0]?.cellKey ?? OVERHEAD_LABOR_CELL_KEY;
+          const firstCellKey = request.changes[0]?.cellKey ?? OVERHEAD_LABOR_CELL_KEY;
           const result = await organisation.editCostsSheetDraft({
             agent: await resolveCollaborationAgent(execution.scope, assignment),
             execution: sessionTurnExecution(lease),
@@ -328,8 +317,17 @@ export function embeddedHarnessCostsTools(
         );
       }
       const requiredReads = includeActuals
-        ? (["recipe_revision", "offer", "inventory_position", "order"] as const)
-        : (["recipe_revision", "offer", "inventory_position"] as const);
+        ? ([
+            "recipe_revision",
+            "offer",
+            "inventory_position",
+            "order",
+          ] as const)
+        : ([
+            "recipe_revision",
+            "offer",
+            "inventory_position",
+          ] as const);
       const preparedReads: PreparedCommerceRead[] = [];
       const missingReads: (typeof requiredReads)[number][] = [];
       let firstDenied: CommerceReadRequestError | null = null;
@@ -437,7 +435,9 @@ export function embeddedHarnessCostsTools(
   });
 }
 
-function createEmbeddedHarnessCostsTools(host: SessionCostsHost): Readonly<{
+function createEmbeddedHarnessCostsTools(
+  host: SessionCostsHost,
+): Readonly<{
   readCosts: CostsReadTool;
   saveSupplyCost: SupplyCostSaveTool;
   saveLotCost: LotCostSaveTool;
@@ -525,8 +525,7 @@ async function readCostsForSession(
     product: (typeof calculation.products)[number],
   ): boolean =>
     Object.hasOwn(dailyTargets, product.productId) ||
-    (product.recipeId !== null &&
-      Object.hasOwn(dailyTargets, product.recipeId));
+    (product.recipeId !== null && Object.hasOwn(dailyTargets, product.recipeId));
   const summary: CostsToolRead["summary"] = {
     ...calculation.summary,
     ...(reorderSupplyCount > 0 ? { reorderSupplyCount } : {}),
@@ -574,8 +573,7 @@ async function readCostsForSession(
   const lots = allLots
     .filter(
       (lot) =>
-        lot.invoiceCost !== null ||
-        itemsWithPricedLots.has(lot.inventoryItemId),
+        lot.invoiceCost !== null || itemsWithPricedLots.has(lot.inventoryItemId),
     )
     .map((lot) => ({
       id: lot.id,
@@ -729,9 +727,7 @@ async function readCostsForSession(
           usage !== undefined
             ? { usedInProductCount: usage.usedInProductCount }
             : {}),
-          ...(usage?.bulkUnlocked === true
-            ? { bulkUnlocked: true as const }
-            : {}),
+          ...(usage?.bulkUnlocked === true ? { bulkUnlocked: true as const } : {}),
           ...(usage !== undefined && usage.pricedLotCount > 0
             ? {
                 costSource: usage.costSource,
@@ -835,9 +831,7 @@ async function readCostsForSession(
               grossSalesMinor: w.grossSalesMinor,
               cogsMinor: w.cogsMinor,
               laborMinor: w.laborMinor,
-              ...(w.extraShiftActive
-                ? { extraShiftActive: true as const }
-                : {}),
+              ...(w.extraShiftActive ? { extraShiftActive: true as const } : {}),
               ...(w.extraBulkTiersUnlocked > 0
                 ? { extraBulkTiersUnlocked: w.extraBulkTiersUnlocked }
                 : {}),
@@ -948,9 +942,7 @@ async function saveCostsPlanForSession(
         dailyLaborMinor: request.dailyLaborMinor,
         dailyRentMinor: request.dailyRentMinor,
         products: request.products ?? [],
-        ...(request.forecast !== undefined
-          ? { forecast: request.forecast }
-          : {}),
+        ...(request.forecast !== undefined ? { forecast: request.forecast } : {}),
         replaceAllProducts: false,
         knownProductIds,
       });

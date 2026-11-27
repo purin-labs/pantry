@@ -9,8 +9,14 @@ import {
   methodNotAllowed,
 } from "@purin-labs/kernel/http";
 import type { SlackCaseCommand } from "../case-command-message";
-import { newRequestId, type RequestId } from "@purin-labs/kernel/ids";
-import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
+import {
+  newRequestId,
+  type RequestId,
+} from "@purin-labs/kernel/ids";
+import {
+  traceLog,
+  traceWarn,
+} from "@purin-labs/kernel/observability";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   parseSlackEnvelope,
@@ -25,7 +31,10 @@ import {
   type SupplierPayoutQuery,
 } from "../supplier-payout-command";
 import { replyToSupplierPayoutQuery } from "../supplier-payout-reply";
-import { postSlackThreadMessage, slackClientMessageId } from "../messages";
+import {
+  postSlackThreadMessage,
+  slackClientMessageId,
+} from "../messages";
 import { isSlackCaseRoutingCandidate } from "../case-routing";
 import { decideSlackCaseAtConnector } from "../connector-ingress";
 import type { ResolvedSlackThreadRoute } from "../organisation-routing";
@@ -43,12 +52,11 @@ import { buildAdmittedSlackCaseCommand } from "../case-command";
 import { verifySlackSignature } from "../signature";
 import { resolveActiveSlackPhysicalInstallationCredential } from "@purin-labs/authority/credential-vault/index";
 import type { Variant } from "@purin-labs/type-utils";
-import { assertNever, isRecord } from "@purin-labs/std";
 import {
-  handleSlackInstallationRevoked,
-  identityLinkBrowserUrl,
-  slackPayloadErrorResponse,
-} from "@purin-labs/surface-webhooks/server/gateway/support";
+  assertNever,
+  isRecord,
+} from "@purin-labs/std";
+import { handleSlackInstallationRevoked, identityLinkBrowserUrl, slackPayloadErrorResponse } from "@purin-labs/surface-webhooks/server/gateway/support";
 import { readRuntimeSecret } from "@purin-labs/control/worker/gateway/request-helpers";
 
 type SlackDurableAccept =

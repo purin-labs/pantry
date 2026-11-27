@@ -72,9 +72,9 @@ import type { ControlSessionId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
-import type { OrganisationCommandFailure } from "@purin-labs/tenancy/actors/organisation/types";
 import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { templateElements } from "@purin-labs/menu-board-crdt/templates";
+import type { OrganisationCommandFailure } from "@purin-labs/tenancy/actors/organisation/types";
 import {
   boardDraftAction,
   boardEditAction,
@@ -143,6 +143,7 @@ type MenuBoardCreation = Result<
   MenuBoardSummary,
   Readonly<{ code: "menu_board_limit" | "menu_board_unavailable" }>
 >;
+
 
 /**
  * One change that an agent makes to a board's draft (Plan 40B phase 4). It
@@ -264,11 +265,7 @@ export type MenuBoardStackEdit =
       elementIds: readonly string[];
       settings: MenuBoardStackSettings;
     }>
-  | Readonly<{
-      kind: "set_stack";
-      elementId: string;
-      settings: MenuBoardStackSettings;
-    }>
+  | Readonly<{ kind: "set_stack"; elementId: string; settings: MenuBoardStackSettings }>
   | Readonly<{ kind: "unstack"; elementId: string }>
   | Readonly<{ kind: "move_in_stack"; elementId: string; index: number }>;
 
@@ -487,13 +484,7 @@ export class MenuBoardRooms {
               userId: input.userId,
               name: input.agent.displayName,
             })
-          : applyBoardEdit.bind(
-              null,
-              this.#storage.sql,
-              input,
-              menu,
-              operationId,
-            ),
+          : applyBoardEdit.bind(null, this.#storage.sql, input, menu, operationId),
       agentActivity(
         input.agent,
         operationId,
@@ -592,12 +583,8 @@ export class MenuBoardRooms {
   ): Promise<Result<readonly MenuBoardVersionSummary[], MenuBoardEditError>> {
     if (!this.exists(input.boardId))
       return { ok: false, error: { code: "menu_board_missing" } };
-    const identity = await resolveUser({
-      db: this.#env.DB,
-      userId: input.userId,
-    });
-    if (identity === null)
-      return { ok: false, error: { code: "access_revoked" } };
+    const identity = await resolveUser({ db: this.#env.DB, userId: input.userId });
+    if (identity === null) return { ok: false, error: { code: "access_revoked" } };
     const operationId = await sha256Hex(
       JSON.stringify([input.userId, input.operationId]),
     );
@@ -664,12 +651,8 @@ export class MenuBoardRooms {
       (input.elementId === null || !elements.value.has(input.elementId))
     )
       return { ok: false, error: { code: "menu_board_element_missing" } };
-    const identity = await resolveUser({
-      db: this.#env.DB,
-      userId: input.userId,
-    });
-    if (identity === null)
-      return { ok: false, error: { code: "access_revoked" } };
+    const identity = await resolveUser({ db: this.#env.DB, userId: input.userId });
+    if (identity === null) return { ok: false, error: { code: "access_revoked" } };
     const commentId = `comment_${(
       await sha256Hex(JSON.stringify([input.userId, input.operationId]))
     ).slice(0, 20)}`;
@@ -702,12 +685,8 @@ export class MenuBoardRooms {
   ): Promise<Result<readonly MenuBoardCommentThread[], MenuBoardEditError>> {
     if (!this.exists(input.boardId))
       return { ok: false, error: { code: "menu_board_missing" } };
-    const identity = await resolveUser({
-      db: this.#env.DB,
-      userId: input.userId,
-    });
-    if (identity === null)
-      return { ok: false, error: { code: "access_revoked" } };
+    const identity = await resolveUser({ db: this.#env.DB, userId: input.userId });
+    if (identity === null) return { ok: false, error: { code: "access_revoked" } };
     const resolved = resolveMenuBoardComment(this.#storage.sql, {
       boardId: input.boardId,
       threadId: input.threadId,
@@ -805,12 +784,7 @@ export class MenuBoardRooms {
     // The route refuses a start that does not fit the layout.
     if (!menuBoardStartFits(start, input.layout))
       return { ok: false, error: { code: "menu_board_unavailable" } };
-    const document = templateBoard(
-      input.title,
-      input.layout,
-      input.menu,
-      start,
-    );
+    const document = templateBoard(input.title, input.layout, input.menu, start);
     if (!document.ok)
       return { ok: false, error: { code: "menu_board_unavailable" } };
     try {
@@ -926,9 +900,7 @@ export class MenuBoardRooms {
     const copy = releaseCopy(snapshot, input.menu);
     if (!copy.ok) return copy;
     // Only a release with an image names where the shop serves its media.
-    const hasImage = snapshot.elements.some(
-      (element) => element.kind === "image",
-    );
+    const hasImage = snapshot.elements.some((element) => element.kind === "image");
     const mediaBase = hasImage ? await input.mediaBase() : null;
     if (hasImage && mediaBase === null)
       return { ok: false, error: { code: "menu_board_media_unavailable" } };
@@ -999,11 +971,9 @@ export class MenuBoardRooms {
       .toArray();
     return rows.some((row) => {
       const release = parseStoredRelease(row.release_json);
-      return (
-        release?.elements.some(
-          (element) => element.kind === "image" && element.mediaId === mediaId,
-        ) ?? false
-      );
+      return release?.elements.some(
+        (element) => element.kind === "image" && element.mediaId === mediaId,
+      ) ?? false;
     });
   }
 
@@ -1023,12 +993,8 @@ export class MenuBoardRooms {
         title: row.archived_at === null ? row.title : `${row.title} (archived)`,
       }));
     return rows.flatMap((row) => {
-      const shows = (
-        elements: readonly MenuBoardElement[] | undefined,
-      ): boolean =>
-        elements?.some(
-          (element) => element.kind === "image" && element.mediaId === mediaId,
-        ) ?? false;
+      const shows = (elements: readonly MenuBoardElement[] | undefined): boolean =>
+        elements?.some((element) => element.kind === "image" && element.mediaId === mediaId) ?? false;
       if (shows(this.latestRelease(row.board_id)?.elements)) return [row.title];
       const stored = readBoard(this.#storage.sql, row.board_id);
       if (!stored.ok) return [];
@@ -1072,9 +1038,7 @@ export class MenuBoardRooms {
           at: input.now,
           userId: input.userId,
         });
-        await this.#room(input.organisationId, input.boardId).end(
-          "access_revoked",
-        );
+        await this.#room(input.organisationId, input.boardId).end("access_revoked");
       }
     } else if (state === "archived") {
       const active = this.#storage.sql
@@ -1557,8 +1521,7 @@ function applyHistoryEdit(
       input.edit.versionId,
     );
     const parsed = bytes === null ? null : parseMenuBoardState(bytes);
-    const target =
-      parsed?.ok === true ? MenuBoardDoc.restore(parsed.value) : null;
+    const target = parsed?.ok === true ? MenuBoardDoc.restore(parsed.value) : null;
     if (target === null || !target.ok)
       return { ok: false, error: { code: "menu_board_version_missing" } };
     let snapshot: MenuBoardSnapshot;
@@ -1585,9 +1548,7 @@ function applyHistoryEdit(
       elementId: null,
       before: before === null ? null : { kind: "version", version: before },
       after:
-        restoredFrom === null
-          ? null
-          : { kind: "version", version: restoredFrom },
+        restoredFrom === null ? null : { kind: "version", version: restoredFrom },
     };
     const update = document.restoreTo(snapshot);
     if (!update.ok) {
@@ -1675,10 +1636,7 @@ function applyAgentComment(
         value: {
           elementId: before.elementId,
           before: { kind: "comment_thread", thread: before },
-          after:
-            after === undefined
-              ? null
-              : { kind: "comment_thread", thread: after },
+          after: after === undefined ? null : { kind: "comment_thread", thread: after },
         },
         update: null,
       },
@@ -1710,10 +1668,7 @@ function applyAgentComment(
           before === undefined || added.value.replayed
             ? null
             : { kind: "comment_thread", thread: before },
-        after:
-          after === undefined
-            ? null
-            : { kind: "comment_thread", thread: after },
+        after: after === undefined ? null : { kind: "comment_thread", thread: after },
       },
       update: null,
     },
@@ -1758,12 +1713,7 @@ function applyBoardEdit(
     if (!state.ok)
       return { ok: false, error: { code: "menu_board_unavailable" } };
     const snapshot = document.read();
-    saveMenuBoardVersionBeforeEdit(
-      sql,
-      input.boardId,
-      input.userId,
-      Date.now(),
-    );
+    saveMenuBoardVersionBeforeEdit(sql, input.boardId, input.userId, Date.now());
     sql.exec(
       `UPDATE menu_board
        SET encoded_state = ?, revision = revision + 1, title = ?, layout = ?,
@@ -2175,12 +2125,7 @@ function boardEditUpdate(
       update = document.placeElements(
         siblings.flatMap((child, order) =>
           child.placement.frameId === "stack"
-            ? [
-                {
-                  elementId: child.id,
-                  placement: { ...child.placement, order },
-                },
-              ]
+            ? [{ elementId: child.id, placement: { ...child.placement, order } }]
             : [],
         ),
       );
@@ -2235,11 +2180,8 @@ function stackProps(settings: MenuBoardStackSettings): Record<string, string> {
 }
 
 /** Each element's rect as the board's shape draws it, stacks placed. */
-function canvasRectsOf(
-  snapshot: MenuBoardSnapshot,
-): Map<string, MenuBoardRect> {
-  const size =
-    MENU_BOARD_SCREEN_SIZES[MENU_BOARD_LAYOUTS[snapshot.layout].shape];
+function canvasRectsOf(snapshot: MenuBoardSnapshot): Map<string, MenuBoardRect> {
+  const size = MENU_BOARD_SCREEN_SIZES[MENU_BOARD_LAYOUTS[snapshot.layout].shape];
   return menuBoardCanvasRects(
     [...snapshot.elements, ...snapshot.unplaced],
     size,
@@ -2279,13 +2221,7 @@ function stackEditUpdate(
     member !== undefined &&
     member.kind !== "stack" &&
     member.placement.frameId === "canvas"
-      ? [
-          {
-            id: member.id,
-            order: member.placement.order,
-            rect: member.placement.rect,
-          },
-        ]
+      ? [{ id: member.id, order: member.placement.order, rect: member.placement.rect }]
       : [],
   );
   if (placed.length !== edit.elementIds.length)

@@ -745,8 +745,10 @@ async function acknowledgeCommerceDelivery(
     rejection?: Readonly<{ reason: string }>;
   }>,
 ): Promise<CommerceDeliveryAcknowledgementResult> {
-  let outcome: Exclude<CommerceDeliveryAcknowledgementResult["kind"], "retry"> =
-    "acknowledged";
+  let outcome: Exclude<
+    CommerceDeliveryAcknowledgementResult["kind"],
+    "retry"
+  > = "acknowledged";
   if (input.rejection !== undefined) {
     const rejected = await input.client.acknowledgeDelivery({
       schemaVersion: "commerce.acknowledge-commerce-delivery.v2",

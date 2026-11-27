@@ -22,11 +22,7 @@ import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
 } from "@purin-labs/control/worker/authorization";
-import {
-  controlError,
-  controlJson,
-  readJsonRecord,
-} from "@purin-labs/control/worker/http";
+import { controlError, controlJson, readJsonRecord } from "@purin-labs/control/worker/http";
 import {
   type MenuBoardSocketRoute,
   authorizeMenuBoardSocketRequest,
@@ -94,11 +90,7 @@ export function matchMenuBoardControlRoute(
   const organisationIdRaw = decodeURIComponent(match[1] ?? "");
   const id = match[3];
   const sub = match[5];
-  if (
-    match[2] === "menu-boards" &&
-    id !== undefined &&
-    match[4] === "versions"
-  ) {
+  if (match[2] === "menu-boards" && id !== undefined && match[4] === "versions") {
     if (sub === undefined && match[6] === undefined)
       return {
         kind: "menuBoards",
@@ -109,11 +101,7 @@ export function matchMenuBoardControlRoute(
       ? {
           kind: "menuBoards",
           organisationIdRaw,
-          target: {
-            kind: "board_version_restore",
-            boardId: id,
-            versionId: sub,
-          },
+          target: { kind: "board_version_restore", boardId: id, versionId: sub },
         }
       : null;
   }
@@ -196,29 +184,14 @@ export async function handleMenuBoardControlRoute(
     route.target.kind === "board_comments" ||
     route.target.kind === "board_comment"
   )
-    return handleCommentRoute(
-      request,
-      env,
-      route.organisationIdRaw,
-      route.target,
-    );
+    return handleCommentRoute(request, env, route.organisationIdRaw, route.target);
   if (
     route.target.kind === "board_versions" ||
     route.target.kind === "board_version_restore"
   )
-    return handleVersionRoute(
-      request,
-      env,
-      route.organisationIdRaw,
-      route.target,
-    );
+    return handleVersionRoute(request, env, route.organisationIdRaw, route.target);
   if (route.target.kind === "board_archive")
-    return handleArchiveRoute(
-      request,
-      env,
-      route.organisationIdRaw,
-      route.target.boardId,
-    );
+    return handleArchiveRoute(request, env, route.organisationIdRaw, route.target.boardId);
   const read = request.method === "GET";
   if (
     !read &&
@@ -572,14 +545,13 @@ async function handleVersionRoute(
   organisationIdRaw: string,
   target:
     | Readonly<{ kind: "board_versions"; boardId: string }>
-    | Readonly<{
-        kind: "board_version_restore";
-        boardId: string;
-        versionId: string;
-      }>,
+    | Readonly<{ kind: "board_version_restore"; boardId: string; versionId: string }>,
 ): Promise<Response> {
   const read = request.method === "GET";
-  if (!(read && target.kind === "board_versions") && request.method !== "POST")
+  if (
+    !(read && target.kind === "board_versions") &&
+    request.method !== "POST"
+  )
     return controlError("method_not_allowed", 405);
   const authorized = await authorizeOrganisationRequest(
     request,
@@ -594,8 +566,7 @@ async function handleVersionRoute(
   else {
     const body = await readJsonRecord(request);
     const value = body.ok ? body.value : {};
-    const label =
-      target.kind === "board_versions" ? value.label : target.versionId;
+    const label = target.kind === "board_versions" ? value.label : target.versionId;
     if (
       typeof label !== "string" ||
       label.trim().length === 0 ||
@@ -606,8 +577,7 @@ async function handleVersionRoute(
     )
       return controlError("menu_board_version_invalid", 422);
     input = {
-      kind:
-        target.kind === "board_versions" ? "save_version" : "restore_version",
+      kind: target.kind === "board_versions" ? "save_version" : "restore_version",
       boardId: target.boardId,
       value: label,
       operationId: value.operationId,
@@ -689,11 +659,7 @@ async function handleArchiveRoute(
       return controlError(changed.error.code, 404);
     case "menu_board_on_screen":
       return controlJson(
-        {
-          ok: false,
-          error: changed.error.code,
-          screens: changed.error.screens,
-        },
+        { ok: false, error: changed.error.code, screens: changed.error.screens },
         409,
       );
     case "menu_board_limit":

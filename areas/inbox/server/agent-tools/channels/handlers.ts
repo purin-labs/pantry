@@ -14,9 +14,12 @@ import {
   parseIntegrationAccountId,
   newRequestId,
   type CaseId,
+  type ConnectorId,
   type IntegrationAccountId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
+import type { OrganisationPlacement } from "@purin-labs/tenancy/placement";
+import type { Result } from "@purin-labs/kernel/result";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import {
   requireActiveOrganisationActorAtPlacement,
@@ -99,6 +102,43 @@ import {
 } from "@purin-labs/tool-handlers/agent-tools/session-support";
 import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 
+/**
+ * The Connector Actor of one Inbox channel at the placement of the turn, and
+ * its identity. `channel` names the channel in the error of an invalid
+ * identity and of an Actor that does not resolve.
+ */
+async function requireInboxConnector(
+  env: Env,
+  organisationId: OrganisationId,
+  placement: OrganisationPlacement,
+  parsedConnectorId: Result<ConnectorId, unknown>,
+  channel: string,
+  now: number,
+): Promise<
+  Readonly<{
+    connector: DurableObjectStub<InboxConnectorActor>;
+    connectorId: ConnectorId;
+  }>
+> {
+  if (!parsedConnectorId.ok)
+    throw new Error(`${channel} Connector identity is invalid`);
+  const connectorId = parsedConnectorId.value;
+  const connector =
+    await resolveActiveConnectorActorAtPlacement<InboxConnectorActor>({
+      env,
+      namespace: env.CONNECTOR,
+      organisationId,
+      placement,
+      connectorId,
+      now,
+    });
+  if (!connector.ok)
+    throw new Error(
+      `${channel} Connector is unavailable: ${connector.error.code}`,
+    );
+  return { connector: connector.value, connectorId };
+}
+
 export async function searchEmailMailboxForEmbeddedHarness(
   context: SessionToolContext,
   request: HarnessEmailMailboxSearch,
@@ -120,28 +160,18 @@ export async function searchEmailMailboxForEmbeddedHarness(
     caseId,
     integrationAccountId: integrationAccountId.value,
   });
-  const connectorId = gmailConnectorId(integrationAccountId.value);
-  if (!connectorId.ok) {
-    throw new Error("Email mailbox Connector identity is invalid");
-  }
   const now = Date.now();
-  const connector =
-    await resolveActiveConnectorActorAtPlacement<InboxConnectorActor>({
-      env: env,
-      namespace: env.CONNECTOR,
-      organisationId,
-      placement: execution.scope.placement,
-      connectorId: connectorId.value,
-      now,
-    });
-  if (!connector.ok) {
-    throw new Error(
-      `Email mailbox Connector is unavailable: ${connector.error.code}`,
-    );
-  }
+  const { connector, connectorId } = await requireInboxConnector(
+    env,
+    organisationId,
+    execution.scope.placement,
+    gmailConnectorId(integrationAccountId.value),
+    "Email mailbox",
+    now,
+  );
   await requireSessionExecution(execution, lease);
-  const searched = await connector.value.searchEmailMailbox({
-    identity: { organisationId, connectorId: connectorId.value },
+  const searched = await connector.searchEmailMailbox({
+    identity: { organisationId, connectorId },
     execution: sessionTurnExecution(lease),
     query: request.query,
     limit: request.limit,
@@ -575,28 +605,18 @@ async function authorizeEmailReplyDraftChat(
     );
   }
   const organisationId = execution.scope.organisationId;
-  const connectorId = gmailConnectorId(integrationAccountId);
-  if (!connectorId.ok) {
-    throw new Error("Email mailbox Connector identity is invalid");
-  }
   const now = Date.now();
-  const connector =
-    await resolveActiveConnectorActorAtPlacement<InboxConnectorActor>({
-      env,
-      namespace: env.CONNECTOR,
-      organisationId,
-      placement: execution.scope.placement,
-      connectorId: connectorId.value,
-      now,
-    });
-  if (!connector.ok) {
-    throw new Error(
-      `Email mailbox Connector is unavailable: ${connector.error.code}`,
-    );
-  }
-  const identity = { organisationId, connectorId: connectorId.value };
+  const { connector, connectorId } = await requireInboxConnector(
+    env,
+    organisationId,
+    execution.scope.placement,
+    gmailConnectorId(integrationAccountId),
+    "Email mailbox",
+    now,
+  );
+  const identity = { organisationId, connectorId };
   await requireSessionExecution(execution, lease);
-  const review = await connector.value.authorizeEmailProposalDelivery({
+  const review = await connector.authorizeEmailProposalDelivery({
     identity,
     proposalId,
     authority,
@@ -607,7 +627,7 @@ async function authorizeEmailReplyDraftChat(
       "This reply is not open to the person who asked. Do not retry.",
     );
   }
-  const reply = await connector.value.readEmailReplyProvenance({
+  const reply = await connector.readEmailReplyProvenance({
     identity,
     proposalId,
     now,
@@ -633,7 +653,7 @@ async function authorizeEmailReplyDraftChat(
     );
   }
   await requireSessionExecution(execution, lease);
-  return { connector: connector.value, identity, provenance };
+  return { connector: connector, identity, provenance };
 }
 
 function chatCoversReply(
@@ -770,29 +790,19 @@ export async function proposeEmailReplyForEmbeddedHarness(
         citations: request.citations,
         malformed: request.malformedCitations,
       });
-      const connectorId = gmailConnectorId(integrationAccountId.value);
-      if (!connectorId.ok) {
-        throw new Error("Email mailbox Connector identity is invalid");
-      }
       const now = Date.now();
-      const connector =
-        await resolveActiveConnectorActorAtPlacement<InboxConnectorActor>({
-          env: env,
-          namespace: env.CONNECTOR,
-          organisationId,
-          placement: execution.scope.placement,
-          connectorId: connectorId.value,
-          now,
-        });
-      if (!connector.ok) {
-        throw new Error(
-          `Email mailbox Connector is unavailable: ${connector.error.code}`,
-        );
-      }
+      const { connector, connectorId } = await requireInboxConnector(
+        env,
+        organisationId,
+        execution.scope.placement,
+        gmailConnectorId(integrationAccountId.value),
+        "Email mailbox",
+        now,
+      );
       await requireSessionExecution(execution, lease);
       const proposalId = `proposal_email_${lease.turn.turnId}_${request.messageId}`;
-      const created = await connector.value.createEmailReplyProposal({
-        identity: { organisationId, connectorId: connectorId.value },
+      const created = await connector.createEmailReplyProposal({
+        identity: { organisationId, connectorId },
         execution: sessionTurnExecution(lease),
         caseId,
         proposalId,
@@ -834,8 +844,8 @@ export async function proposeEmailReplyForEmbeddedHarness(
       );
       await requireSessionExecution(execution, lease);
       if (!accepted.ok) {
-        await connector.value.disposeEmailProposal({
-          identity: { organisationId, connectorId: connectorId.value },
+        await connector.disposeEmailProposal({
+          identity: { organisationId, connectorId },
           proposalId,
           now,
         });
@@ -914,25 +924,15 @@ export async function proposeEmailOperationalForEmbeddedHarness(
       resourceScope: EMAIL_OPERATIONAL_RESOURCE_SCOPE,
     },
     async () => {
-      const connectorId = gmailConnectorId(integrationAccountId);
-      if (!connectorId.ok) {
-        throw new Error("Operational email Connector identity is invalid");
-      }
       const now = Date.now();
-      const connector =
-        await resolveActiveConnectorActorAtPlacement<InboxConnectorActor>({
-          env: env,
-          namespace: env.CONNECTOR,
-          organisationId,
-          placement: execution.scope.placement,
-          connectorId: connectorId.value,
-          now,
-        });
-      if (!connector.ok) {
-        throw new Error(
-          `Operational email Connector is unavailable: ${connector.error.code}`,
-        );
-      }
+      const { connector, connectorId } = await requireInboxConnector(
+        env,
+        organisationId,
+        execution.scope.placement,
+        gmailConnectorId(integrationAccountId),
+        "Operational email",
+        now,
+      );
       const proposalKey =
         request.target.kind === "self_test"
           ? "self_test"
@@ -962,8 +962,8 @@ export async function proposeEmailOperationalForEmbeddedHarness(
         target = request.target;
       }
       await requireSessionExecution(execution, lease);
-      const created = await connector.value.createEmailOperationalProposal({
-        identity: { organisationId, connectorId: connectorId.value },
+      const created = await connector.createEmailOperationalProposal({
+        identity: { organisationId, connectorId },
         execution: sessionTurnExecution(lease),
         integrationAccountId: integrationAccountId,
         caseId,
@@ -1031,8 +1031,8 @@ export async function proposeEmailOperationalForEmbeddedHarness(
       });
       await requireSessionExecution(execution, lease);
       if (!accepted.ok) {
-        await connector.value.rejectEmailOperational({
-          identity: { organisationId, connectorId: connectorId.value },
+        await connector.rejectEmailOperational({
+          identity: { organisationId, connectorId },
           integrationAccountId: integrationAccountId,
           proposalId,
           approvedVersion: created.value.version,
@@ -1155,26 +1155,14 @@ export async function sendWhatsAppSupportReplyForEmbeddedHarness(
   ) {
     throw new Error("WhatsApp support Case is outside the granted reply scope");
   }
-  const connectorId = whatsappConnectorId(
-    conversationWindow.integrationAccountId,
+  const { connector, connectorId } = await requireInboxConnector(
+    env,
+    organisationId,
+    execution.scope.placement,
+    whatsappConnectorId(conversationWindow.integrationAccountId),
+    "WhatsApp support",
+    now,
   );
-  if (!connectorId.ok) {
-    throw new Error("WhatsApp support Connector identity is invalid");
-  }
-  const connector =
-    await resolveActiveConnectorActorAtPlacement<InboxConnectorActor>({
-      env: env,
-      namespace: env.CONNECTOR,
-      organisationId,
-      placement: execution.scope.placement,
-      connectorId: connectorId.value,
-      now,
-    });
-  if (!connector.ok) {
-    throw new Error(
-      `WhatsApp support Connector is unavailable: ${connector.error.code}`,
-    );
-  }
   const automaticProposalId = `proposal_${caseId.value}_${conversationWindow.conversationWindowSequence}`;
   const send = async (): Promise<HarnessWhatsAppSupportReplyReceipt> => {
     const projection = await readWhatsAppReplyProposalProjection({
@@ -1186,19 +1174,19 @@ export async function sendWhatsAppSupportReplyForEmbeddedHarness(
       projection?.author === "agent" &&
       projection.lifecycleKind === "awaiting_approval"
         ? await editDirectedWhatsAppAgentProposal(
-            connector.value,
+            connector,
             execution,
             lease,
-            connectorId.value,
+            connectorId,
             automaticProposalId,
             request.body,
             Date.now(),
           )
         : await composeDirectedWhatsAppHumanReply(
-            connector.value,
+            connector,
             execution,
             lease,
-            connectorId.value,
+            connectorId,
             caseId.value,
             requesterUserId,
             `proposal_slack_${lease.turn.turnId}`,
@@ -1207,8 +1195,8 @@ export async function sendWhatsAppSupportReplyForEmbeddedHarness(
             Date.now(),
           );
     await requireSessionExecution(execution, lease);
-    const sent = await connector.value.dispatchWhatsAppReply({
-      identity: { organisationId, connectorId: connectorId.value },
+    const sent = await connector.dispatchWhatsAppReply({
+      identity: { organisationId, connectorId },
       origin: { kind: "session_turn", execution: sessionTurnExecution(lease) },
       proposalId: approval.proposalId,
       approvedVersion: approval.version,
@@ -1680,29 +1668,17 @@ async function readWhatsAppSupportCase(
 ): Promise<HarnessWhatsAppSupportInbox["cases"][number]> {
   await requireSessionExecution(execution, lease);
   const organisationId = execution.scope.organisationId;
-  const connectorId = whatsappConnectorId(
-    conversationWindow.integrationAccountId,
+  const { connector, connectorId } = await requireInboxConnector(
+    env,
+    organisationId,
+    execution.scope.placement,
+    whatsappConnectorId(conversationWindow.integrationAccountId),
+    "WhatsApp support",
+    now,
   );
-  if (!connectorId.ok) {
-    throw new Error("WhatsApp support Connector identity is invalid");
-  }
-  const connector =
-    await resolveActiveConnectorActorAtPlacement<InboxConnectorActor>({
-      env: env,
-      namespace: env.CONNECTOR,
-      organisationId,
-      placement: execution.scope.placement,
-      connectorId: connectorId.value,
-      now,
-    });
-  if (!connector.ok) {
-    throw new Error(
-      `WhatsApp support Connector is unavailable: ${connector.error.code}`,
-    );
-  }
   await requireSessionExecution(execution, lease);
-  const panel = await connector.value.readWhatsAppCasePanel({
-    identity: { organisationId, connectorId: connectorId.value },
+  const panel = await connector.readWhatsAppCasePanel({
+    identity: { organisationId, connectorId },
     caseId: conversationWindow.caseId,
     now,
   });
