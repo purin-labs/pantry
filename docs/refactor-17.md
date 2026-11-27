@@ -397,6 +397,17 @@ The layer debts, one line for each step that lowers a count:
   transitions, the Pi checkpoint), and reads that are one statement with a JOIN. The
   next step for the purge: each table owner gives its own erase entries.
 
+- 2026-11-27, `shopify-rule`: 10 to 0, and the kind is closed. `worker-logic`: 10
+  files to 7 (3,687 lines to 3,353). The webhook surface reads a Shopify queue
+  message through `queueMessages` of the provider module, the gateway calls the
+  routes of `shopify/gateway-routes.ts`, and the Organisation actor opens
+  `shopify/organisation-part.ts`. The helpers of the Organisation actor moved to
+  their owners: commerce (board presence), collaboration (socket sweep),
+  actor-runtime (command admission, the meta row) and agent (the alarm steps). What
+  stays in the Worker: `bake-run-ports.ts` and `organisation/bake-kitchen.ts`, which
+  join Kitchen, Devices, the commerce projection and Slack; their move needs three
+  ports.
+
 The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
 the state of Stage A. Its branches are gone; the work is on `dev`.
