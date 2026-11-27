@@ -1,5 +1,7 @@
+import type React from "react";
 import type {
   OnboardingControlRole,
+  OnboardingEnvironment,
   OrganisationOnboardingLifecycle,
 } from "@purin-labs/contracts";
 
@@ -33,6 +35,23 @@ export type OrganisationListItem = {
   /** The SHA-256 of the organisation's logo, or null for the gradient tile. */
   readonly organisationLogo: string | null;
   readonly workspaces: readonly OrganisationWorkspaceListItem[];
+};
+
+type WorkspaceSupportCase = {
+  readonly organisationId: string;
+  readonly environment: OnboardingEnvironment;
+  readonly lifecycle: string;
+  readonly configurationVersion: number;
+  readonly projectionRevision: number;
+};
+
+/** The operator tools of a support admin on the Organisations page. */
+export type WorkspaceSupportTools = {
+  readonly busy: boolean;
+  readonly error: string | null;
+  readonly operatorCase: WorkspaceSupportCase | null;
+  readonly inspect: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
+  readonly archive: () => Promise<void>;
 };
 
 export type OrganisationActions = {

@@ -54,6 +54,7 @@ import {
   type OrganisationMutation,
 } from "@purin-labs/control/portal/mutation-state";
 import {
+  OrganisationListLoading,
   OrganisationsRoute,
   type WorkspaceRouteTarget,
 } from "@purin-labs/area-organisation/ui/pages/workspaces";
@@ -1157,7 +1158,12 @@ export class ControlPortalApp extends React.Component<
     }
     switch (this.state.kind) {
       case "loading":
-        return <PortalLoading route={this.props.route} />;
+        return (
+          <PortalLoading
+            route={this.props.route}
+            organisationListLoading={<OrganisationListLoading />}
+          />
+        );
       case "signed_out":
         return <SignIn />;
       case "load_failed":

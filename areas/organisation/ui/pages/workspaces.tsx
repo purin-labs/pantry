@@ -41,6 +41,7 @@ import type {
   OrganisationActions,
   OrganisationListItem,
   OrganisationWorkspaceListItem,
+  WorkspaceSupportTools,
 } from "@purin-labs/area-organisation-contract/ui/pages/organisations";
 import { ORGANISATION_LOGO_ACTIONS } from "./organisation-logo-transport";
 import { AccountSetup } from "./account-onboarding";
@@ -50,22 +51,6 @@ import "./organisations.css";
 export type WorkspaceRouteTarget = {
   readonly organisationHandle: string;
   readonly workspaceHandle: string;
-};
-
-type WorkspaceSupportCase = {
-  readonly organisationId: string;
-  readonly environment: OnboardingEnvironment;
-  readonly lifecycle: string;
-  readonly configurationVersion: number;
-  readonly projectionRevision: number;
-};
-
-export type WorkspaceSupportTools = {
-  readonly busy: boolean;
-  readonly error: string | null;
-  readonly operatorCase: WorkspaceSupportCase | null;
-  readonly inspect: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
-  readonly archive: () => Promise<void>;
 };
 
 /**

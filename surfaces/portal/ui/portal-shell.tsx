@@ -21,11 +21,10 @@ import {
   PageHeader,
   PageSkeleton,
 } from "@purin-labs/ui/page-components";
-import {
-  OrganisationListLoading,
-  type WorkspaceSupportTools,
-} from "@purin-labs/area-organisation/ui/pages/workspaces";
-import type { OrganisationListItem } from "@purin-labs/area-organisation-contract/ui/pages/organisations";
+import type {
+  OrganisationListItem,
+  WorkspaceSupportTools,
+} from "@purin-labs/area-organisation-contract/ui/pages/organisations";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { formatLifecycle } from "./portal-projection";
@@ -158,6 +157,8 @@ function GoogleMark(): React.ReactNode {
 
 export function PortalLoading(props: {
   readonly route: PortalRoute;
+  /** The loading frame of the Organisations page, for any other route. */
+  readonly organisationListLoading: React.ReactNode;
 }): React.ReactNode {
   if (props.route.kind === "workspace") {
     const selection = workspaceRouteSelection(props.route, "loading");
@@ -196,7 +197,7 @@ export function PortalLoading(props: {
   }
   return (
     <PortalFrame identity={{ kind: "loading" }}>
-      <OrganisationListLoading />
+      {props.organisationListLoading}
     </PortalFrame>
   );
 }
