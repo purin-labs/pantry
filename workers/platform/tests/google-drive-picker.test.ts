@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { settleGoogleDrivePicker } from "@purin-labs/area-organisation/ui/features/access/file-resource-boundary";
+import { settleGoogleDrivePicker } from "@purin-labs/surface-portal/ui/google-drive/file-resource-boundary";
 
 const PICKER = {
   Action: { PICKED: "picked", CANCEL: "cancel", ERROR: "error" },

@@ -473,7 +473,7 @@ import each of its files. A module with no line for one of these has none.
 
 ## surfaces/portal
 
-- Folders: 12
+- Folders: 13
   - `apps/portal/src/`
   - `apps/portal/src/dev/`
   - `apps/portal/src/tv/`
@@ -484,6 +484,7 @@ import each of its files. A module with no line for one of these has none.
   - `surfaces/portal/ui/`
   - `surfaces/portal/ui/features/chat/`
   - `surfaces/portal/ui/features/integrations/`
+  - `surfaces/portal/ui/google-drive/`
   - `surfaces/portal/ui/pages/`
   - `surfaces/portal/ui/tv/`
 - Packages: `apps/portal`, `surfaces/portal`

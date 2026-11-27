@@ -25,7 +25,7 @@ import {
 import {
   readCommerceHomeAggregations,
   type CommerceHomeAggregation,
-} from "@purin-labs/area-commerce/ui/features/commerce/index";
+} from "@purin-labs/area-commerce-contract/ui/features/commerce/entity-plane/api";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import type {

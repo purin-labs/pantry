@@ -539,6 +539,11 @@ The layer debts, one line for each step that lowers a count:
   switcher, the Google Drive picker (its path is in a check script) and one read of
   the home page (a direct import changes the script count).
 
+- 2026-11-27, `surface-nonpublic`: 18 to 16. The Google Drive picker and its
+  boundary file are transport code that only the Portal uses, so they are in
+  `surfaces/portal/ui/google-drive/`. The home page imports its commerce read from
+  the Commerce contract; the built Portal then has one shared chunk less.
+
 The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
 the state of Stage A. Its branches are gone; the work is on `dev`.
