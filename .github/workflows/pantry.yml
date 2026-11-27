@@ -18,7 +18,9 @@ concurrency:
   # to dev, so with a cancel no run finished (22 November 2026). The newest
   # push waits, and it runs when the run in progress ends. Each other pull
   # request still cancels its older run.
-  cancel-in-progress: ${{ github.head_ref != 'dev' }}
+  # A manual run has no head_ref, so the rule also reads the name of the ref:
+  # a manual run on dev cancelled the run in progress on dev (27 November 2026).
+  cancel-in-progress: ${{ github.head_ref != 'dev' && github.ref_name != 'dev' }}
 
 permissions:
   contents: read
