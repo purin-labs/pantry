@@ -121,7 +121,7 @@ import each of its files. A module with no line for one of these has none.
 
 ## foundation/agent
 
-- Folders: 29
+- Folders: 28
   - `foundation/agent/`
   - `foundation/agent/actors/`
   - `foundation/agent/actors/actor-journal/`
@@ -143,14 +143,13 @@ import each of its files. A module with no line for one of these has none.
   - `foundation/agent/cues/`
   - `foundation/agent/data/`
   - `foundation/agent/data/agent-operations/`
-  - `foundation/agent/integrations/typesafe/`
-  - `foundation/agent/jev-features/`
   - `foundation/agent/messages/`
   - `foundation/agent/model-exit/`
   - `foundation/agent/models/`
   - `foundation/agent/provider-adapters/`
   - `foundation/agent/provider-workflows/`
   - `foundation/agent/schedules/`
+  - `foundation/agent/typesafe/`
 - Packages: `foundation/agent`
 - Tables (35): `agent_area_assignment`, `agent_configuration_proposal`, `agent_definition`, `agent_definition_revision`, `agent_installation`, `agent_installation_governance`, `agent_responsibility_scope`, `case_assignment_pin`, `context_projection`, `cue_binding`, `cue_log`, `cue_subscription`, `file_extraction_budget`, `file_grant_admission`, `file_grant_sync`, `file_projection_outbox`, `file_provider_cursor`, `file_resource_source`, `operational_area`, `organisation_claude_authorization`, `organisation_claude_connection`, `organisation_codex_authorization_attempt`, `organisation_codex_connection`, `organisation_default_workspace`, `organisation_inference_selection`, `organisation_slack_reasoning_effort`, `organisation_workspace`, `schedule_binding`, `schedule_dispatch_receipt`, `skill`, `skill_binding`, `skill_revision`, `workspace_revision`, `workspace_revision_head`, `workspace_revision_receipt`
 
@@ -175,12 +174,11 @@ import each of its files. A module with no line for one of these has none.
 
 ## foundation/tool-handlers
 
-- Folders: 5
+- Folders: 4
   - `foundation/tool-handlers/actors/`
   - `foundation/tool-handlers/actors/session/`
   - `foundation/tool-handlers/agent-tools/`
   - `foundation/tool-handlers/agent-tools/files/`
-  - `foundation/tool-handlers/slack/`
 - Packages: `foundation/tool-handlers`
 
 ## foundation/collaboration
@@ -339,7 +337,7 @@ import each of its files. A module with no line for one of these has none.
 
 ## areas/integrations
 
-- Folders: 21
+- Folders: 22
   - `areas/integrations/server/`
   - `areas/integrations/server/actors/`
   - `areas/integrations/server/agent-tools/integrations/`
@@ -356,6 +354,7 @@ import each of its files. A module with no line for one of these has none.
   - `areas/integrations/server/provider-adapters/`
   - `areas/integrations/server/provider-lifecycle/`
   - `areas/integrations/server/provider-workflows/`
+  - `areas/integrations/server/slack/`
   - `areas/integrations/ui/`
   - `areas/integrations/ui/features/integrations/`
   - `areas/integrations/ui/features/jev-features/`
