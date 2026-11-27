@@ -19,7 +19,7 @@ import {
   providerConnectionState,
 } from "./settings-support";
 import type { IntegrationAccount, SupportDiagnostics } from "@purin-labs/control-api/portal/settings";
-import type { IntegrationsPageActions, PendingProviderAuthorization, SettingsMutationFeedback } from "./settings-types";
+import type { IntegrationsPageActions, PendingProviderAuthorization, SettingsMutationFeedback } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 
 /**
  * Connection health is not page furniture: a healthy strip says nothing, and

@@ -63,8 +63,7 @@ import type {
   SupportDiagnostics,
 } from "@purin-labs/control-api/portal/settings";
 import { parseInferenceSelection } from "@purin-labs/control-api/portal/inference";
-import type { IntegrationsCommand, IntegrationsCommandResult, IntegrationsPageActions, IntegrationsPageProps, IntegrationDetailRouteData, IntegrationsRouteData, IntegrationsRouteTransport, SettingsMutationFeedback } from "@purin-labs/area-integrations/ui/features/integrations/settings-types";
-import type { WhatsAppPanelActions } from "@purin-labs/area-integrations/ui/pages/whatsapp";
+import type { IntegrationsCommand, IntegrationsCommandResult, IntegrationsPageActions, IntegrationsPageProps, IntegrationDetailRouteData, IntegrationsRouteData, IntegrationsRouteTransport, SettingsMutationFeedback, WhatsAppPanelActions } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 import type {
   MailboxModelReview,
   MailboxSetupAgent,

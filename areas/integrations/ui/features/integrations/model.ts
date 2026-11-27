@@ -1,18 +1,4 @@
-export type IntegrationRouteId =
-  | "airtable"
-  | "codex"
-  | "commerce"
-  | "dropbox"
-  | "gmail"
-  | "typesafe"
-  | "google_drive"
-  | "notion"
-  | "onepassword"
-  | "shopify"
-  | "slack"
-  | "square"
-  | "stripe"
-  | "whatsapp";
+import type { IntegrationRouteId } from "@purin-labs/area-integrations-contract/ui/features/integrations/route-id";
 
 export type IntegrationRouteSelection =
   | {

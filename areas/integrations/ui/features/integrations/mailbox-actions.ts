@@ -3,16 +3,15 @@ import type {
   EmailReplyPreviewResult,
   EmailOperationalPreviewResult,
 } from "@purin-labs/control-api/portal/agent-mailbox";
-import type {
-  MailboxModelReview,
-  MailboxSetupAgent,
-} from "@purin-labs/control-api";
 import {
   runIntegrationsCommand,
   runProviderConnection,
   startProviderConnection,
 } from "./page-actions";
-import type { IntegrationsRouteMutationContext } from "./settings-types";
+import type {
+  IntegrationsRouteMutationContext,
+  MailboxSetupRequest,
+} from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 
 /**
  * The Gmail, Dropbox and Google Drive cards state what the sign-in allows, as
@@ -72,20 +71,6 @@ export async function connectWhatsApp(
     { kind: "connect_provider", provider: "whatsapp" },
   );
 }
-
-/**
- * One press of the mailbox's Turn on, or of Finish setup or Continue while
- * it is on.
- */
-export type MailboxSetupRequest = {
-  readonly integrationAccountId: string;
-  readonly address: string;
-  readonly agent: MailboxSetupAgent;
-  /** Turn the mailbox on after the setup. False leaves it as it is. */
-  readonly turnOn: boolean;
-  /** The model review whose data terms the person accepted, if any. */
-  readonly accepted: MailboxModelReview | null;
-};
 
 /**
  * Makes each change that the mailbox's setup names, and records the

@@ -25,7 +25,7 @@ import type {
 } from "./shell";
 import type { OrganisationListItem } from "@purin-labs/area-organisation-contract/ui/pages/organisations";
 import type { SlackRoutingConnection, IntegrationAccount, ProviderResource, ReadinessAssessment, SetupSelection, SupportDiagnostics, OrganisationInvitation, OrganisationMember } from "@purin-labs/control-api/portal/settings";
-import type { SlackWorkspaceCatalog } from "@purin-labs/area-integrations/ui/features/integrations/settings-types";
+import type { SlackWorkspaceCatalog } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 import {
   commerceSystemPath,
   organisationRecordPath,

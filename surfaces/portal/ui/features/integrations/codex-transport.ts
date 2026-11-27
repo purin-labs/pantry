@@ -1,5 +1,5 @@
 import { controlRead } from "@purin-labs/control/portal/control-client";
-import type { IntegrationsCommandResult } from "./settings-types";
+import type { IntegrationsCommandResult } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 import type { SelectInferenceCommand, OrganisationCodexConnection, OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 import {
   codexConnectionPath,

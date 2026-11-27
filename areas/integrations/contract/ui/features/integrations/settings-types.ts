@@ -4,28 +4,60 @@ import React from "react";
 import type { ControlErrorKind } from "@purin-labs/control-api/portal/errors";
 import type { CredentialInventory, CredentialRotationReceipt } from "@purin-labs/control-api/portal/credential-inventory";
 import type { PageContent } from "@purin-labs/control/portal/page-content";
-import type { WhatsAppSurface } from "@purin-labs/control-api/portal/whatsapp";
-import type { WhatsAppPanelActions } from "../../pages/whatsapp";
-import {
+import type { WhatsAppPolicyDraft, WhatsAppSurface } from "@purin-labs/control-api/portal/whatsapp";
+import type {
   MutationLedger,
-  type MutationProvider,
-  type OrganisationMutation,
+  MutationProvider,
+  OrganisationMutation,
 } from "@purin-labs/control/portal/mutation-state";
 import type { AgentMailboxView, EmailReplyPreviewResult, EmailReplyQueueItem, EmailOperationalPreviewResult, EmailOperationalQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import type { MailboxInstallationOption } from "@purin-labs/area-inbox-contract/ui/pages/agent-mailbox";
-import type { IntegrationRouteId } from "./model";
 import type { EmailReviewActions } from "@purin-labs/area-inbox-contract/ui/features/email-review/api";
 import type { Variant } from "@purin-labs/type-utils";
+import type { IntegrationRouteId } from "./route-id";
 import type {
   MailboxModelReview,
+  MailboxSetupAgent,
   MailboxSetupAgentChoice,
   MailboxSetupPlan,
 } from "@purin-labs/control-api";
-import type { MailboxSetupRequest } from "./mailbox-actions";
 import type { ReadMailboxSetup } from "@purin-labs/area-inbox-contract/ui/features/mail-setup/use-mailbox-setup";
 import type { CapabilityProfile, ControlRole, IntegrationAccount, OrganisationCodexConnection, OrganisationInferenceSelection, OrganisationInvitation, OrganisationMember, ProviderResource, ReadinessAssessment, SelectInferenceCommand, SetupSelection, SlackRoutingConnection, SupportDiagnostics } from "@purin-labs/control-api/portal/settings";
 
 type OrganisationLifecycle = OrganisationOnboardingLifecycle["kind"];
+
+/**
+ * One press of the mailbox's Turn on, or of Finish setup or Continue while
+ * it is on.
+ */
+export type MailboxSetupRequest = {
+  readonly integrationAccountId: string;
+  readonly address: string;
+  readonly agent: MailboxSetupAgent;
+  /** Turn the mailbox on after the setup. False leaves it as it is. */
+  readonly turnOn: boolean;
+  /** The model review whose data terms the person accepted, if any. */
+  readonly accepted: MailboxModelReview | null;
+};
+
+export type WhatsAppPanelActions = {
+  readonly connect: () => Promise<void>;
+  /** Closes the Meta window Pantry is waiting on and returns to idle. */
+  readonly cancelConnection: () => void;
+  readonly select: (integrationAccountId: string) => Promise<void>;
+  readonly bindAgent: (
+    integrationAccountId: string,
+    installationId: string,
+  ) => Promise<void>;
+  readonly publishPolicy: (
+    integrationAccountId: string,
+    draft: WhatsAppPolicyDraft,
+  ) => Promise<void>;
+  readonly disable: (integrationAccountId: string) => Promise<void>;
+  readonly reconnect: (integrationAccountId: string) => Promise<void>;
+  readonly revoke: (integrationAccountId: string) => Promise<void>;
+  readonly resume: (integrationAccountId: string) => Promise<void>;
+};
 
 export type CommerceSystemSync = CommerceSystemSyncView;
 

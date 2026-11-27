@@ -1,4 +1,5 @@
-import type { IntegrationRouteId, IntegrationRouteSelection } from "./model";
+import type { IntegrationRouteSelection } from "./model";
+import type { IntegrationRouteId } from "@purin-labs/area-integrations-contract/ui/features/integrations/route-id";
 
 export const overviewSelection: IntegrationRouteSelection = {
   kind: "overview",

@@ -17,7 +17,7 @@ import {
   mutationFeedbackMessage,
   renderMutationFeedback,
 } from "./settings-support";
-import type { IntegrationsPageActions, SettingsMutationFeedback } from "./settings-types";
+import type { IntegrationsPageActions, SettingsMutationFeedback } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 import type { OrganisationCodexConnection, OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 
 export function InferenceIntegrationPanel(props: {

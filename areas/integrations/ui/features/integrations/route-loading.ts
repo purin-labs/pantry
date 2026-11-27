@@ -8,7 +8,7 @@ import type {
   SettingsRouteContent,
   WorkspaceSettingsRouteData,
   WorkspaceSettingsRouteProps,
-} from "./settings-types";
+} from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 
 export async function loadIntegrationsRoute(
   props: IntegrationsRouteProps,

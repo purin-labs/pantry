@@ -8,7 +8,7 @@ import { assertNever } from "@purin-labs/std";
 import type {
   CommerceSystem,
   CommerceSystemSync,
-} from "./settings-types";
+} from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 
 export function autoSyncCommerce(
   started: React.MutableRefObject<boolean>,

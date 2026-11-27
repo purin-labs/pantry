@@ -16,7 +16,7 @@ import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { loadOnePasswordIntegrationPanel } from "./integrations-page";
 import type { CapabilityProfile, ControlRole, IntegrationAccount, IntegrationLifecycle, OrganisationInvitation, OrganisationMember, SetupSelection } from "@purin-labs/control-api/portal/settings";
-import type { PendingProviderAuthorization, SettingsMouseHandler, SettingsMutationFeedback, SetupFeedback, SetupFormDefaults } from "./settings-types";
+import type { PendingProviderAuthorization, SettingsMouseHandler, SettingsMutationFeedback, SetupFeedback, SetupFormDefaults } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 
 export const OnePasswordIntegrationPanel = React.lazy(loadOnePasswordIntegrationPanel);
 

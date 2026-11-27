@@ -34,7 +34,7 @@ import {
   providerConnectionState,
 } from "./settings-support";
 import type { IntegrationAccount } from "@purin-labs/control-api/portal/settings";
-import type { IntegrationsPageActions, PendingProviderAuthorization, SettingsMutationFeedback } from "./settings-types";
+import type { IntegrationsPageActions, PendingProviderAuthorization, SettingsMutationFeedback } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 
 export type GmailIntegrationPanelProps = {
   readonly accounts: readonly IntegrationAccount[];

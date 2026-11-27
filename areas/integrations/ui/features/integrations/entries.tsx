@@ -45,7 +45,7 @@ import {
   whatsappConnectionActionState,
 } from "./settings-support";
 import type { IntegrationAccount } from "@purin-labs/control-api/portal/settings";
-import type { IntegrationsPageProps } from "./settings-types";
+import type { IntegrationsPageProps } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 import {
   FileStorageIntegrationPanel,
   IntegrationSetup,

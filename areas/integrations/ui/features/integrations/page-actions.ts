@@ -58,7 +58,7 @@ import {
   readControlRole,
   readCuePresetId,
 } from "./settings-support";
-import type { CredentialActionOutcome, IntegrationsCommand, IntegrationsPageActions, IntegrationsRouteData, IntegrationsRouteMutationContext, IntegrationsRouteProps, PendingProviderConnection, ProviderConnectionCommand, SettingsConfirmTimer, SettingsMutationFeedback, SettingsRouteContent, WorkspaceSettingsCommand, WorkspaceSettingsPageActions, WorkspaceSettingsRouteData, WorkspaceSettingsRouteMutationContext } from "./settings-types";
+import type { CredentialActionOutcome, IntegrationsCommand, IntegrationsPageActions, IntegrationsRouteData, IntegrationsRouteMutationContext, IntegrationsRouteProps, PendingProviderConnection, ProviderConnectionCommand, SettingsConfirmTimer, SettingsMutationFeedback, SettingsRouteContent, WorkspaceSettingsCommand, WorkspaceSettingsPageActions, WorkspaceSettingsRouteData, WorkspaceSettingsRouteMutationContext } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 import type { IntegrationAccount } from "@purin-labs/control-api/portal/settings";
 
 export function createIntegrationsPageActions(

@@ -1,7 +1,7 @@
 import type {
   IntegrationDetailRouteData,
   SelectedIntegrationDetailContent,
-} from "./settings-types";
+} from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 
 declare const detailData: IntegrationDetailRouteData;
 

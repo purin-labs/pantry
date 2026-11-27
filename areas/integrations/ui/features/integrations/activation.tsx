@@ -16,7 +16,7 @@ import {
   isSlackAccount,
   mutationBlocked,
 } from "./settings-support";
-import type { CommerceSystem, SetupFormDefaults } from "./settings-types";
+import type { CommerceSystem, SetupFormDefaults } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 import type { IntegrationAccount, OrganisationCodexConnection, OrganisationInferenceSelection, ReadinessAssessment } from "@purin-labs/control-api/portal/settings";
 import {
   accountMatchesWorkspace,

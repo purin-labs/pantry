@@ -6,7 +6,7 @@ import {
 } from "@purin-labs/control/portal/control-client";
 import { accountInvitationHref } from "@purin-labs/area-organisation/ui/pages/account-invitation-link";
 import { setUpMailbox } from "@purin-labs/area-inbox/ui/features/mail-setup/turn-on";
-import type { IntegrationDetailReadContext, IntegrationDetailRouteData, IntegrationsCommand, IntegrationsCommandResult, IntegrationsRouteData, WorkspaceSettingsCommand, WorkspaceSettingsRouteData, WorkspaceSettingsCommandResult } from "@purin-labs/area-integrations/ui/features/integrations/settings-types";
+import type { IntegrationDetailReadContext, IntegrationDetailRouteData, IntegrationsCommand, IntegrationsCommandResult, IntegrationsRouteData, WorkspaceSettingsCommand, WorkspaceSettingsRouteData, WorkspaceSettingsCommandResult } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 import type { OrganisationCodexConnection, OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 import {
   codexConnectionPath,
@@ -22,14 +22,14 @@ import {
   isNonEmptyString,
   isRecord,
 } from "@purin-labs/std";
-import { codexAuthorizationResult, fetchCredentialInventory, fetchOrganisationCodexConnection, fetchOrganisationInferenceSelection, isOrganisationApiKeyInferenceCommand } from "@purin-labs/area-integrations/ui/features/integrations/codex-transport";
+import { codexAuthorizationResult, fetchCredentialInventory, fetchOrganisationCodexConnection, fetchOrganisationInferenceSelection, isOrganisationApiKeyInferenceCommand } from "./codex-transport";
 import { parseOrganisationCodexConnectionResponse, parseOrganisationInferenceSelectionResponse } from "@purin-labs/control-api/portal/codex";
 import {
   agentMailboxPath,
   emailOperationalPath,
   emailReplyPath,
   fetchAgentMailboxSurface,
-} from "@purin-labs/area-integrations/ui/features/integrations/mailbox-transport";
+} from "./mailbox-transport";
 import { setupFormDefaults } from "../../portal-projection";
 import { beginExistingProviderConnection, beginProviderConnection, bindSetupChannel, fetchCommerceSystem, fetchOrganisationInvitations, fetchOrganisationMembers, fetchOrganisationSnapshot, fetchSlackDestinations, fetchSlackRouting, fetchSupportDiagnostics, provisionPantryCommerceDemo, publishExportCoordination, queueCommerceSystemSync, readConfigurationVersionFromMutation, selectShopifyCommerceSystem } from "../../portal-reads";
 import { parseCommerceSystemResponse, parseOrganisationSnapshot } from "@purin-labs/control-api/portal/portal-reads";

@@ -19,6 +19,7 @@ import {
   type ProviderConnectionState,
 } from "../provider-onboarding";
 import { WHATSAPP_DEFAULT_POLICY_DRAFT } from "@purin-labs/area-inbox-contract/ui/whatsapp";
+import type { WhatsAppPanelActions } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 import {
   type WhatsAppSurface,
   parseWhatsAppPolicyDraft,
@@ -38,25 +39,6 @@ import type { OrganisationInferenceSelection } from "@purin-labs/control-api/por
 export type WhatsAppInstallationOption = {
   readonly installationId: string;
   readonly label: string;
-};
-
-export type WhatsAppPanelActions = {
-  readonly connect: () => Promise<void>;
-  /** Closes the Meta window Pantry is waiting on and returns to idle. */
-  readonly cancelConnection: () => void;
-  readonly select: (integrationAccountId: string) => Promise<void>;
-  readonly bindAgent: (
-    integrationAccountId: string,
-    installationId: string,
-  ) => Promise<void>;
-  readonly publishPolicy: (
-    integrationAccountId: string,
-    draft: WhatsAppPolicyDraft,
-  ) => Promise<void>;
-  readonly disable: (integrationAccountId: string) => Promise<void>;
-  readonly reconnect: (integrationAccountId: string) => Promise<void>;
-  readonly revoke: (integrationAccountId: string) => Promise<void>;
-  readonly resume: (integrationAccountId: string) => Promise<void>;
 };
 
 type WhatsAppInferenceSelection = OrganisationInferenceSelection;

@@ -12,7 +12,7 @@ import type {
   IntegrationsRouteTransport,
   WhatsAppRouteTransport,
   WorkspaceSettingsRouteTransport,
-} from "@purin-labs/area-integrations/ui/features/integrations/settings-types";
+} from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 import {
   type CommerceActionRecord,
   parseCommerceActionRecordResponse,
@@ -24,7 +24,7 @@ import { pickGoogleDriveFile } from "@purin-labs/area-organisation-contract/ui/f
 import {
   readEmailOperationalPreview,
   readEmailReplyPreview,
-} from "@purin-labs/area-integrations/ui/features/integrations/mailbox-transport";
+} from "./features/integrations/mailbox-transport";
 import {
   executeIntegrationsRoute,
   executeWorkspaceSettingsRoute,

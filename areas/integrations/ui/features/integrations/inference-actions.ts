@@ -4,7 +4,7 @@ import { runIntegrationsCommand } from "./page-actions";
 import type {
   IntegrationsRouteMutationContext,
   SignedInInferenceSelection,
-} from "./settings-types";
+} from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 import type { OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 import { parseInferenceSelectionCommand } from "@purin-labs/control-api/portal/inference";
 

@@ -10,7 +10,7 @@ import {
   codexPanelHeading,
 } from "./inference";
 import { emptySettingsCleanup } from "./provider-authorization";
-import type { IntegrationsPageActions } from "./settings-types";
+import type { IntegrationsPageActions } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 import type { OrganisationCodexConnection, OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 
 export function renderCodexConnection(

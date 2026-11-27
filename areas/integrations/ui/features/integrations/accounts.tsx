@@ -18,7 +18,7 @@ import {
   reconnectableProvider,
   renderMutationFeedback,
 } from "./settings-support";
-import type { CredentialActionOutcome, IntegrationsPageActions, PendingProviderAuthorization, SettingsMutationFeedback } from "./settings-types";
+import type { CredentialActionOutcome, IntegrationsPageActions, PendingProviderAuthorization, SettingsMutationFeedback } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 import type { IntegrationAccount } from "@purin-labs/control-api/portal/settings";
 import { ConfirmButton } from "./workspace";
 import { Button, ConfirmInPlace } from "@purin-labs/ui/index";

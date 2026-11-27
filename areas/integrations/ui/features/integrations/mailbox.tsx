@@ -38,7 +38,7 @@ import {
   mutationBlocked,
   renderMutationFeedback,
 } from "./settings-support";
-import type { IntegrationsPageActions } from "./settings-types";
+import type { IntegrationsPageActions } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 import { Button, ConfirmInPlace } from "@purin-labs/ui/index";
 
 /**

@@ -27,7 +27,7 @@ import {
   setupFormHasError,
 } from "./settings-support";
 import type { IntegrationAccount, ProviderResource, SlackRoutingConnection } from "@purin-labs/control-api/portal/settings";
-import type { IntegrationsPageActions, IntegrationsPageProps, SettingsMutationFeedback, SetupFeedback, SetupFormDefaults, SlackWorkspaceCatalog } from "./settings-types";
+import type { IntegrationsPageActions, IntegrationsPageProps, SettingsMutationFeedback, SetupFeedback, SetupFormDefaults, SlackWorkspaceCatalog } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 
 /**
  * When Slack connects while this panel shows, the Connect button that had

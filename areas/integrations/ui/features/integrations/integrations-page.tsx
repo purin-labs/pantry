@@ -35,7 +35,7 @@ import type {
   ConnectedAppItem,
   IntegrationCatalogItem,
 } from "./overview";
-import type { IntegrationRouteId } from "./model";
+import type { IntegrationRouteId } from "@purin-labs/area-integrations-contract/ui/features/integrations/route-id";
 import { CustomConnectorsWorkspace } from "./custom-connectors";
 import { assertNever } from "@purin-labs/std";
 import {
@@ -54,7 +54,7 @@ import { autoSyncCommerce } from "./commerce-system";
 import { buildIntegrationEntries } from "./entries";
 import { isSlackAccount } from "./settings-support";
 import type { IntegrationAccount, IntegrationAccountLifecycle, OrganisationCodexConnection, OrganisationInferenceSelection, ReadinessAssessment } from "@purin-labs/control-api/portal/settings";
-import type { IntegrationsPageProps, SelectedIntegrationDetailContent } from "./settings-types";
+import type { IntegrationsPageProps, SelectedIntegrationDetailContent } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 import {
   announceConnectionAttention,
   connectionAttentionMessage,

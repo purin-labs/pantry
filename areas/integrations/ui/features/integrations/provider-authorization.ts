@@ -19,7 +19,7 @@ import type {
   ProviderAuthorizationWatch,
   SettingsMutationFeedback,
   SettingsRouteContent,
-} from "./settings-types";
+} from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 
 type ProviderAuthorizationSurface =
   | { readonly kind: "popup"; readonly popup: Window }

@@ -12,13 +12,12 @@ import {
   RecoverableError,
 } from "@purin-labs/ui/page-components";
 import type { WhatsAppPolicyDraft, WhatsAppSurface } from "@purin-labs/control-api/portal/whatsapp";
-import type { WhatsAppPanelActions } from "../../pages/whatsapp";
 import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import {
   parseIntegrationRouteSelection,
-  type IntegrationRouteId,
   type IntegrationRouteSelection,
 } from "./model";
+import type { IntegrationRouteId } from "@purin-labs/area-integrations-contract/ui/features/integrations/route-id";
 import { ConnectConsentDialog } from "./connect-consent-dialog";
 import { assertNever } from "@purin-labs/std";
 import {
@@ -70,10 +69,11 @@ import type {
   SettingsMutationFeedback,
   SettingsRouteContent,
   SetupFeedback,
+  WhatsAppPanelActions,
   WorkspaceSettingsPageActions,
   WorkspaceSettingsRouteData,
   WorkspaceSettingsRouteProps,
-} from "./settings-types";
+} from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 import { providerAttemptDiagnostics } from "./setup";
 import { WorkspaceSettingsPage } from "./workspace";
 import type { Variant } from "@purin-labs/type-utils";
@@ -85,7 +85,7 @@ export { executeIntegrationsCommand } from "./page-actions";
 export { beginProviderAuthorizationWatch, beginProviderCompletionListener, navigateProviderAuthorizationSurface, openProviderAuthorizationSurface, providerAuthorizationInterruptedMessage, providerAuthorizationOutcome } from "./provider-authorization";
 export { integrationsRouteRefreshFailure, readySettingsRouteContent, refreshingSettingsRouteContent, settingsRouteFailureContent } from "./route-loading";
 export { providerConnectionState } from "./settings-support";
-export type { IntegrationsPageActions, WorkspaceSettingsPageActions } from "./settings-types";
+export type { IntegrationsPageActions, WorkspaceSettingsPageActions } from "@purin-labs/area-integrations-contract/ui/features/integrations/settings-types";
 
 /**
  * The state, loads and mutations of the Integrations route. The Integrations
