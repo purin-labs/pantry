@@ -528,6 +528,17 @@ The layer debts, one line for each step that lowers a count:
   in this scope: reads that are one part of one statement (a subquery or a JOIN),
   and the read of `workspace_revision` in the regional copy (`foundation/agent`).
 
+- 2026-11-27, `surface-nonpublic`: 60 to 18. The server code of the Portal chat
+  imports no private area file: it reads Kitchen through `bakerySurfaceReads`,
+  Integrations through `customConnectorChat`, and the Inbox, the Organisation area
+  and Brain through their service ports. Types and pure code moved into the
+  contracts, and two transports that only the Portal uses moved to the surface. The
+  built Portal has the same pages and the same 282 script files. What stays: 13 area
+  components that use `foundation/ui` at run time (a contract would raise
+  `contract-runtime`), 3 shell imports of the Organisation list and the workspace
+  switcher, the Google Drive picker (its path is in a check script) and one read of
+  the home page (a direct import changes the script count).
+
 The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
 the state of Stage A. Its branches are gone; the work is on `dev`.
