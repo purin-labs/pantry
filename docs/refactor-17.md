@@ -450,6 +450,16 @@ The layer debts, one line for each step that lowers a count:
   recipe change through `workflowChanges` of the Kitchen contract, and the Café board
   names `PageBrowserContext` of the contracts.
 
+- 2026-11-27, `foundation-misfit`: 14 links to 12, and 44 names to 42. The Google
+  Pub/Sub push check is a part of the email surface, the operational mail builder a
+  part of the Inbox, and the Airtable and Notion client a part of Integrations
+  (`foundation/control` lists the Airtable bases through the port
+  `externalRecordsDiscovery`). The link click check of the sidebar is a page address
+  helper. What stays in `foundation/connections` has a reason: a file owns its
+  tables, or two areas and a foundation module use it. The three Gmail adapter files
+  can move to the Inbox when the `mail` part of the provider adapter catalogue, which
+  no run-time code reads, is removed.
+
 The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
 the state of Stage A. Its branches are gone; the work is on `dev`.
