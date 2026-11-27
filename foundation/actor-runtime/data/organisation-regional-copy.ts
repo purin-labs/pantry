@@ -581,7 +581,8 @@ function ownershipPredicate(name: string, columns: readonly string[]): string {
   if (name === RECEIPT_TABLE) return `"${RECEIPT_OWNER_COLUMN}" = ?`;
   // A child table selects its rows through its parent, as the purge does.
   const where = organisationRowsWhere(name);
-  if (where === undefined) throw new Error(`regional_ownership_unknown:${name}`);
+  if (where === undefined)
+    throw new Error(`regional_ownership_unknown:${name}`);
   return where;
 }
 function persistenceRow(table: CopyTable, raw: unknown): readonly Cell[] {

@@ -13,7 +13,11 @@ import {
   execSchemaStatements,
 } from "./commerce-schema-baseline";
 import type { Result } from "@purin-labs/kernel/result";
-import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
+import {
+  isNonNegativeInteger,
+  isPositiveInteger,
+  isRecord,
+} from "@purin-labs/std";
 import { isCommerceSensitivity } from "@purin-labs/area-commerce-contract/server/sensitivity";
 import type {
   CommerceEntityRelationRow,

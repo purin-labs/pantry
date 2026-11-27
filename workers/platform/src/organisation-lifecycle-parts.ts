@@ -26,9 +26,7 @@ import {
   prepareSlackInstallationCredentialMove,
   prepareSlackInstallationRevocation,
 } from "@purin-labs/authority/data/slack-installation-records";
-import {
-  directorySlackRecordDeletions,
-} from "@purin-labs/surface-slack/server/organisation-routing";
+import { directorySlackRecordDeletions } from "@purin-labs/surface-slack/server/organisation-routing";
 import {
   prepareChatDirectoryRevisionBump,
   prepareReturnPrivateChatsToDefault,

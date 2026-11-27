@@ -35,8 +35,9 @@ export type OperationsDestinationRead = (
   organisationId: OrganisationId,
 ) => Promise<Result<OperationsDestination, OperationsDestinationError>>;
 
-export const operationsDestinationRead =
-  definePort<OperationsDestinationRead>("operations_destination_read");
+export const operationsDestinationRead = definePort<OperationsDestinationRead>(
+  "operations_destination_read",
+);
 
 export async function readOperationsDestination(
   database: OrganisationDatabase,
