@@ -8,10 +8,10 @@ import {
   readCheckoutProfiles,
   replaceCheckoutProfileDraft,
   retireCheckoutProfile,
-  type CheckoutProfileMutationTransport,
   type DraftCheckoutProfileSummary,
   type PublishedCheckoutProfileSummary,
 } from "./api";
+import type { CheckoutProfileMutationTransport } from "@purin-labs/area-commerce-contract/ui/features/checkout-profiles/transport";
 import {
   initialCheckoutProfilesState,
   profileReadiness,

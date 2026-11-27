@@ -76,6 +76,9 @@ importers:
       '@purin-labs/area-cafe':
         specifier: workspace:*
         version: link:../../areas/cafe
+      '@purin-labs/area-cafe-contract':
+        specifier: workspace:*
+        version: link:../../areas/cafe/contract
       '@purin-labs/area-commerce':
         specifier: workspace:*
         version: link:../../areas/commerce
@@ -2554,6 +2557,9 @@ importers:
       '@purin-labs/area-cafe':
         specifier: workspace:*
         version: link:../../areas/cafe
+      '@purin-labs/area-cafe-contract':
+        specifier: workspace:*
+        version: link:../../areas/cafe/contract
       '@purin-labs/area-commerce':
         specifier: workspace:*
         version: link:../../areas/commerce

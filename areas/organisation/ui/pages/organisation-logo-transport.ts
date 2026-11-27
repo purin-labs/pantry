@@ -3,7 +3,7 @@ import {
   controlWrite,
 } from "@purin-labs/control/portal/control-client";
 import { logoPath } from "@purin-labs/control/portal/control-paths";
-import type { LogoActions } from "./organisation-logos-dialog";
+import type { LogoActions } from "@purin-labs/area-organisation-contract/ui/pages/organisations";
 
 /** The control API calls behind the Logos dialog. */
 export const ORGANISATION_LOGO_ACTIONS: LogoActions = {

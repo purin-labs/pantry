@@ -12,6 +12,7 @@ import {
   requireExactKeys,
   requireObject,
 } from "@purin-labs/commerce-control-api/portal/checkout-profiles";
+import type { CheckoutProfileMutationTransport } from "@purin-labs/area-commerce-contract/ui/features/checkout-profiles/transport";
 
 type CheckoutProfileWithLifecycle<
   TState extends CheckoutProfile["lifecycle"]["state"],
@@ -44,13 +45,6 @@ type CheckoutProfileActivationResult = Readonly<{
   profile: PublishedCheckoutProfileSummary;
   activation: CommerceCheckoutProfileActivationV1;
 }>;
-
-export type CheckoutProfileMutationTransport = (
-  path: string,
-  method: "POST" | "PUT",
-  body: unknown,
-  intent: string,
-) => Promise<unknown>;
 
 export type CheckoutProfileReadTransport = (path: string) => Promise<unknown>;
 

@@ -8,6 +8,7 @@ import { cancelDialog, syncDialog } from "@purin-labs/ui/dialog";
 import type {
   CommerceActionRecord,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
+import type { ProductDescriptionActionTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/description-draft/action";
 import type { VariantBy } from "@purin-labs/type-utils";
 import type { PermissionRequired } from "@purin-labs/control-api";
 import { PermissionRequiredPrompt, permissionRequiredOf } from "@purin-labs/area-organisation-contract/ui/features/access/permission-required-prompt";
@@ -18,21 +19,6 @@ export type ProductDescriptionSnapshot = Readonly<{
   title: string;
   description: string;
   revision: number;
-}>;
-
-export type ProductDescriptionAction = Readonly<{
-  kind: "update_product_description";
-  productId: string;
-  productRevision: number;
-  description: string;
-}>;
-
-export type ProductDescriptionActionTransport = Readonly<{
-  proposeAction: (
-    organisationId: string,
-    action: ProductDescriptionAction,
-    intent: string,
-  ) => Promise<CommerceActionRecord>;
 }>;
 
 type EditorProps = Readonly<{

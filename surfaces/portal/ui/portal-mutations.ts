@@ -4,8 +4,8 @@ import {
   controlSignal,
   readCookie,
 } from "@purin-labs/control/portal/control-client";
-import type { CheckoutProfileMutationTransport } from "@purin-labs/area-commerce/ui/features/checkout-profiles/api";
-import type { PayoutMutationTransport } from "@purin-labs/area-commerce/ui/features/payouts/api";
+import type { CheckoutProfileMutationTransport } from "@purin-labs/area-commerce-contract/ui/features/checkout-profiles/transport";
+import type { PayoutMutationTransport } from "@purin-labs/area-commerce-contract/ui/features/payouts/transport";
 
 export function commerceEntityPlaneControlMutation(
   path: string,

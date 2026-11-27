@@ -23,7 +23,7 @@ import type {
   OrganisationChoice,
   WorkspaceChoice,
 } from "./shell";
-import type { OrganisationListItem } from "@purin-labs/area-organisation/ui/pages/workspaces";
+import type { OrganisationListItem } from "@purin-labs/area-organisation-contract/ui/pages/organisations";
 import type { SlackRoutingConnection, IntegrationAccount, ProviderResource, ReadinessAssessment, SetupSelection, SupportDiagnostics, OrganisationInvitation, OrganisationMember } from "@purin-labs/control-api/portal/settings";
 import type { SlackWorkspaceCatalog } from "@purin-labs/area-integrations/ui/features/integrations/settings-types";
 import {
@@ -31,8 +31,10 @@ import {
   organisationRecordPath,
 } from "@purin-labs/control/portal/control-paths";
 import { rememberOrganisationId } from "./early-reads";
-import { offerPriceAllowanceTransport } from "@purin-labs/area-commerce/ui/features/commerce/price-allowance";
-import type { OfferPriceAllowanceInteraction } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/route";
+import {
+  offerPriceAllowanceTransport,
+  type OfferPriceAllowanceInteraction,
+} from "@purin-labs/area-commerce-contract/ui/features/commerce/price-allowance-transport";
 import { isRecord } from "@purin-labs/std";
 import { parseMemberships, parseOrganisationInvitation, parseOrganisationMember, parseReadiness, parseUser } from "@purin-labs/control-api/portal/portal-projection";
 import { readApiError } from "@purin-labs/control-api/portal/api-error";

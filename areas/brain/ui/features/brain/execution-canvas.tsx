@@ -29,7 +29,7 @@ import {
   nodeTitle,
   titleNamesKind,
   type CaseExecution,
-} from "./execution-model";
+} from "@purin-labs/area-brain-contract/ui/features/brain/execution-model";
 
 type StateMark = StatusChipStatus["kind"] | "withheld";
 

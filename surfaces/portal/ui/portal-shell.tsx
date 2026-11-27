@@ -23,9 +23,9 @@ import {
 } from "@purin-labs/ui/page-components";
 import {
   OrganisationListLoading,
-  type OrganisationListItem,
   type WorkspaceSupportTools,
 } from "@purin-labs/area-organisation/ui/pages/workspaces";
+import type { OrganisationListItem } from "@purin-labs/area-organisation-contract/ui/pages/organisations";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { formatLifecycle } from "./portal-projection";

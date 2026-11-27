@@ -17,7 +17,7 @@ import {
 import { ConnectedChatPage as ChatPage } from "@purin-labs/surface-portal/ui/features/chat/route";
 import { BakerySurfaceEffectBridge } from "@purin-labs/area-kitchen/ui/features/bakery-surface-effect-bridge";
 import WorkflowSimulatorRoute from "@purin-labs/area-kitchen/ui/features/workflow-simulator/route";
-import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";
+import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation-contract/ui/features/access/unavailable-access";
 
 // Kitchen with the chat beside it, as the Portal shows them, for one
 // Organisation of the Worker behind this server (`?organisation=<id>`) under

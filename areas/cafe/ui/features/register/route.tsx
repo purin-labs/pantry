@@ -31,7 +31,7 @@ import {
   isSquarePosHandoffSession,
   readSquarePosAnswer,
   squarePosHandoffLink,
-} from "./square-pos-handoff";
+} from "@purin-labs/area-cafe-contract/ui/features/register/square-pos-handoff";
 import "./register.css";
 
 const REGISTER_POLL = { everyMs: 10_000 } as const;

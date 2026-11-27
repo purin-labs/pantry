@@ -28,7 +28,7 @@ import {
   nodeFacts,
   contentRoleLabel,
   limitationSentence,
-} from "@purin-labs/area-brain/ui/features/brain/execution-model";
+} from "@purin-labs/area-brain-contract/ui/features/brain/execution-model";
 import {
   Trace,
   TraceCollapsible,

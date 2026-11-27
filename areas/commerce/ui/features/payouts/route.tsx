@@ -11,8 +11,8 @@ import {
   readPayoutExceptions,
   readUnresolvedPayouts,
   supplierPayoutAuditPath,
-  type PayoutMutationTransport,
 } from "./api";
+import type { PayoutMutationTransport } from "@purin-labs/area-commerce-contract/ui/features/payouts/transport";
 import type {
   PayoutAuditEvent,
   SupplierPayout,

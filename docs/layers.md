@@ -233,8 +233,10 @@ import each of its files. A module with no line for one of these has none.
 
 ## areas/cafe/contract
 
-- Folders: 1
+- Folders: 3
   - `areas/cafe/contract/server/`
+  - `areas/cafe/contract/ui/features/menu-boards/`
+  - `areas/cafe/contract/ui/features/register/`
 - Packages: `areas/cafe/contract`
 
 ## areas/commerce
@@ -274,11 +276,14 @@ import each of its files. A module with no line for one of these has none.
 
 ## areas/commerce/contract
 
-- Folders: 4
+- Folders: 7
   - `areas/commerce/contract/server/`
+  - `areas/commerce/contract/ui/features/checkout-profiles/`
   - `areas/commerce/contract/ui/features/commerce/`
+  - `areas/commerce/contract/ui/features/commerce/description-draft/`
   - `areas/commerce/contract/ui/features/commerce/entity-plane/`
   - `areas/commerce/contract/ui/features/governed-actions/`
+  - `areas/commerce/contract/ui/features/payouts/`
 - Packages: `areas/commerce/contract`
 
 ## areas/devices

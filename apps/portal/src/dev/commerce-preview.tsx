@@ -48,10 +48,10 @@ import {
 } from "./commerce-preview-reads";
 import { CounterSaleRoute } from "@purin-labs/area-cafe/ui/features/terminals/counter-sale-route";
 import type { CounterSale } from "@purin-labs/control-api/portal/counter-sale";
-import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";
+import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation-contract/ui/features/access/unavailable-access";
 import type { PayoutReadAccess } from "@purin-labs/area-commerce/ui/features/payouts/read-permission";
 import type { SupplierPayout } from "@purin-labs/control-api/portal/payouts";
-import type { OfferPriceAllowanceTransport } from "@purin-labs/area-commerce/ui/features/commerce/price-allowance";
+import type { OfferPriceAllowanceTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/price-allowance-transport";
 import type { CommerceOperationsTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/operations";
 
 const PREVIEW_COMMERCE_OPERATIONS: CommerceOperationsTransport = {

@@ -11,13 +11,6 @@ import {
   requireObject,
 } from "@purin-labs/control-api/portal/payouts";
 
-export type PayoutMutationTransport = (
-  path: string,
-  method: "POST",
-  body: unknown,
-  intent: string,
-) => Promise<unknown>;
-
 export type PayoutReadTransport = (path: string) => Promise<unknown>;
 
 type PayoutExceptionPage = Readonly<{

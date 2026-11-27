@@ -11,7 +11,7 @@ import { ConnectedChatPage as ChatPage } from "@purin-labs/surface-portal/ui/fea
 import { MenuDraftRoute } from "@purin-labs/area-cafe/ui/features/content-studio/route";
 import { registerPortalBoardChat } from "@purin-labs/surface-portal/ui/portal-board-chat";
 import PermissionRequestsDrawer from "@purin-labs/area-organisation/ui/features/access/permission-requests-drawer";
-import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";
+import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation-contract/ui/features/access/unavailable-access";
 import { createAccessRouteTransport } from "@purin-labs/area-organisation-contract/ui/features/access/api";
 import { controlMutation, controlRead } from "@purin-labs/control/portal/control-client";
 

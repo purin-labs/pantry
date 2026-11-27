@@ -4,7 +4,7 @@ import type {
 } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
 
-import type { CaseExecution } from "./execution-model";
+import type { CaseExecution } from "@purin-labs/area-brain-contract/ui/features/brain/execution-model";
 
 /**
  * The places of the records of one Case on the Activity canvas.

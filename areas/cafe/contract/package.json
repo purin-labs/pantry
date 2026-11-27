@@ -7,6 +7,10 @@
     "./server/*": {
       "types": "./server/*.ts",
       "default": "./server/*.ts"
+    },
+    "./ui/*": {
+      "types": "./ui/*.ts",
+      "default": "./ui/*.ts"
     }
   },
   "dependencies": {

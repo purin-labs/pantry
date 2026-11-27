@@ -14,11 +14,9 @@ import "./record.css";
 import "./collection.css";
 import { ProductDescriptionDraftControl } from "../description-draft/control";
 import { ProductSaleDetails } from "./product-sale-details";
-import type { ProductDescriptionActionTransport } from "../description-draft/editor";
-import {
-  OfferPriceAllowanceSection,
-  type OfferPriceAllowanceTransport,
-} from "../price-allowance";
+import type { ProductDescriptionActionTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/description-draft/action";
+import { OfferPriceAllowanceSection } from "../price-allowance";
+import type { OfferPriceAllowanceInteraction } from "@purin-labs/area-commerce-contract/ui/features/commerce/price-allowance-transport";
 import { Link } from "react-router";
 import { toast } from "sonner";
 import type {
@@ -176,13 +174,6 @@ type CommerceEntityPlaneRouteProps = Readonly<{
 type CommercePayoutsTabStatus = Readonly<{
   readable: boolean;
   attention: number;
-}>;
-
-/** What the allowance section needs, kept out of the board interaction. */
-export type OfferPriceAllowanceInteraction = Readonly<{
-  canConfigure: boolean;
-  transport: OfferPriceAllowanceTransport | undefined;
-  fetcher?: (input: string, init?: RequestInit) => Promise<Response>;
 }>;
 
 type CommerceGraphRouteState =

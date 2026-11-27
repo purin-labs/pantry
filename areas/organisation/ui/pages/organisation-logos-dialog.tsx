@@ -4,6 +4,7 @@ import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import { logoPath } from "@purin-labs/control/portal/control-paths";
 import { IdentityTile } from "@purin-labs/ui/index";
 import { AgentModal } from "./agent-modal";
+import type { LogoActions } from "@purin-labs/area-organisation-contract/ui/pages/organisations";
 
 /** The image types and the size that Pantry keeps as a logo. */
 const LOGO_ACCEPT = "image/png,image/jpeg,image/webp";
@@ -17,15 +18,6 @@ export type LogoSubjectItem = Readonly<{
   seed: string;
   name: string;
   logo: string | null;
-}>;
-
-export type LogoActions = Readonly<{
-  set: (
-    organisationId: string,
-    workspaceId: string | null,
-    file: File,
-  ) => Promise<void>;
-  remove: (organisationId: string, workspaceId: string | null) => Promise<void>;
 }>;
 
 type RowState =

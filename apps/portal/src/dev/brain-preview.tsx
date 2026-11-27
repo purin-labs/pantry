@@ -40,7 +40,7 @@ import {
 } from "./brain-execution-sample";
 import { BrainRoute } from "@purin-labs/area-brain/ui/features/brain/route";
 import { ConnectedChatPage as ChatPage } from "@purin-labs/surface-portal/ui/features/chat/route";
-import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";
+import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation-contract/ui/features/access/unavailable-access";
 import { installChatPreviewFetch } from "./chat-preview-data";
 import { PageHeader } from "@purin-labs/ui/page-components";
 import { PortalFrame } from "@purin-labs/surface-portal/ui/shell";

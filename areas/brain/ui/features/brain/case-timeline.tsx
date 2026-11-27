@@ -22,7 +22,7 @@ import {
   type TimeLanesStep,
   type TimeLanesTone,
 } from "@purin-labs/ui/time-lanes";
-import { originLabel } from "./execution-model";
+import { originLabel } from "@purin-labs/area-brain-contract/ui/features/brain/execution-model";
 
 export type ActivityTimeline =
   | Readonly<{ kind: "loading" }>

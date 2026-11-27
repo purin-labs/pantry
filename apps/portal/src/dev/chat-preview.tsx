@@ -15,7 +15,7 @@ import {
   type WorkspaceDetailPage,
 } from "@purin-labs/ui/route";
 import { ConnectedChatPage as ChatPage } from "@purin-labs/surface-portal/ui/features/chat/route";
-import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";
+import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation-contract/ui/features/access/unavailable-access";
 import { installChatPreviewFetch } from "./chat-preview-data";
 import { ChatExecutionPreviewControls } from "./chat-execution-preview";
 

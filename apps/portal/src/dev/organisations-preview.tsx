@@ -5,11 +5,11 @@ import type { OrganisationCreationRequest } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 import "@purin-labs/surface-portal/ui/styles.css";
 import { PortalFrame } from "@purin-labs/surface-portal/ui/shell";
-import {
-  OrganisationsRoute,
-  type OrganisationActions,
-  type OrganisationListItem,
-} from "@purin-labs/area-organisation/ui/pages/workspaces";
+import { OrganisationsRoute } from "@purin-labs/area-organisation/ui/pages/workspaces";
+import type {
+  OrganisationActions,
+  OrganisationListItem,
+} from "@purin-labs/area-organisation-contract/ui/pages/organisations";
 import {
   AccountSetupDialog,
   type AccountSetupActions,

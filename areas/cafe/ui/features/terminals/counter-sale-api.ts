@@ -9,7 +9,7 @@ import {
   requireExactKeys,
   requireObject,
 } from "@purin-labs/control-api/portal/counter-sale";
-import type { SquarePosHandoffAnswer } from "../register/square-pos-handoff";
+import type { SquarePosHandoffAnswer } from "@purin-labs/area-cafe-contract/ui/features/register/square-pos-handoff";
 
 export type CounterSaleMutationTransport = (
   path: string,

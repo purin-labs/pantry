@@ -6,8 +6,8 @@ import {
 } from "@purin-labs/control/portal/control-client";
 import type { BrainTransport } from "@purin-labs/area-brain-contract/ui/features/brain/api";
 import { readMailboxSetup } from "@purin-labs/area-inbox/ui/features/mail-setup/run";
-import type { OrganisationActions } from "@purin-labs/area-organisation/ui/pages/workspaces";
-import type { ProductDescriptionActionTransport } from "@purin-labs/area-commerce/ui/features/commerce/description-draft/editor";
+import type { OrganisationActions } from "@purin-labs/area-organisation-contract/ui/pages/organisations";
+import type { ProductDescriptionActionTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/description-draft/action";
 import type {
   IntegrationsRouteTransport,
   WhatsAppRouteTransport,
@@ -20,7 +20,7 @@ import {
 import type { CommerceOperationsTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/operations";
 import type { AgentOperationsTransport } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import { createAccessRouteTransport } from "@purin-labs/area-organisation-contract/ui/features/access/api";
-import { pickGoogleDriveFile } from "@purin-labs/area-organisation/ui/features/access/google-drive-picker";
+import { pickGoogleDriveFile } from "@purin-labs/area-organisation-contract/ui/features/access/google-drive-picker";
 import {
   readEmailOperationalPreview,
   readEmailReplyPreview,

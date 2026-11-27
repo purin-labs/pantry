@@ -5,11 +5,11 @@ import {
   activateCheckoutProfile,
   createCheckoutProfileDraft,
   readCheckoutProfiles,
-  type CheckoutProfileMutationTransport,
   type CheckoutProfileReadTransport,
   type DraftCheckoutProfileSummary,
   type PublishedCheckoutProfileSummary,
 } from "@purin-labs/area-commerce/ui/features/checkout-profiles/api";
+import type { CheckoutProfileMutationTransport } from "@purin-labs/area-commerce-contract/ui/features/checkout-profiles/transport";
 
 const CONFIGURATION: CheckoutProfileConfiguration = {
   currencyPolicy: { kind: "fixed", currency: "JPY" },

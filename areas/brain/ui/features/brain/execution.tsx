@@ -63,7 +63,7 @@ import {
   titleNamesKind,
   type CaseExecution,
   type PlacedNode,
-} from "./execution-model";
+} from "@purin-labs/area-brain-contract/ui/features/brain/execution-model";
 
 const CASE_VIEWS = [
   { view: "list", name: "List" },
