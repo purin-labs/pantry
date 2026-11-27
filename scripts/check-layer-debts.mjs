@@ -22,7 +22,13 @@
 //                       whose path names an area or a surface (`names`)
 //   table-read          a FROM or JOIN read of a D1 table whose owner module
 //                       the reader may not import
-//   surface-nonpublic   a surface import of an area file that is not public
+//   surface-nonpublic   a surface import of an area file that is not public.
+//                       Two forms are wiring and do not count (the owner,
+//                       2026-11-27, `wiring` in the map): a page table loads
+//                       the page of an area with `import("…")`, and a preview
+//                       page imports what it shows. No file outside a preview
+//                       folder may import a preview file: the check refuses it,
+//                       but for a load in `developmentLoads` with its reason
 //   area-package        an import, from another area, of an area workspace
 //                       package that `contracts` does not list
 //   worker-logic        the files and the lines of a Worker module that are
@@ -157,11 +163,36 @@ function resolveImport(path, specifier) {
 const imports = new Map();
 for (const path of tracked) {
   const list = [];
-  for (const { specifier } of importStatementsOf(texts.get(path))) {
+  for (const { specifier, dynamic } of importStatementsOf(texts.get(path))) {
     const target = resolveImport(path, specifier);
-    if (target !== null) list.push({ specifier, target });
+    if (target !== null) list.push({ specifier, target, dynamic });
   }
   imports.set(path, list);
+}
+
+// The wiring of a surface (`wiring` in the map). A page table is the one
+// list of the pages of a surface: it loads the page of an area when the page
+// first renders. A preview folder holds pages that only a developer opens;
+// no production build has one as an input.
+const PAGE_TABLES = new Set(targets.wiring?.pageTables ?? []);
+const PREVIEWS = targets.wiring?.previews ?? [];
+const isPreview = (path) => PREVIEWS.some((folder) => path.startsWith(folder));
+/** A product file that loads a preview file only in development, with a reason in the map. */
+const DEVELOPMENT_LOADS = new Set(
+  Object.entries(targets.wiring?.developmentLoads ?? {})
+    .filter(([, reason]) => typeof reason === "string" && reason !== "")
+    .map(([load]) => load),
+);
+
+/** Product files that import a preview file: preview code must not ship. */
+const previewLeaks = [];
+for (const [path, list] of imports) {
+  if (isPreview(path)) continue;
+  for (const { target } of list) {
+    if (target.file === null || !isPreview(target.file)) continue;
+    const load = `${path} -> ${target.file}`;
+    if (!DEVELOPMENT_LOADS.has(load)) previewLeaks.push(load);
+  }
 }
 
 // --- The instances ----------------------------------------------------
@@ -435,12 +466,14 @@ for (const path of tracked) {
 for (const [path, list] of imports) {
   const from = moduleOf(path);
   if (from === null) continue;
-  for (const { specifier, target } of list) {
+  for (const { specifier, target, dynamic } of list) {
     if (
       layerOf(from) === "surfaces" &&
       target.file !== null &&
       layerOf(target.module) === "areas" &&
-      !isPublic(target.file)
+      !isPublic(target.file) &&
+      !(dynamic && PAGE_TABLES.has(path)) &&
+      !isPreview(path)
     ) {
       record(
         "surface-nonpublic",
@@ -618,6 +651,13 @@ const current = Object.fromEntries(
     ),
   ]).filter(([, keys]) => Object.keys(keys).length > 0),
 );
+
+if (previewLeaks.length > 0) {
+  console.error(
+    `A file outside a preview folder imports a preview file. A preview page may import an area file because no product page loads it (\`wiring\` in scripts/layers.json).\n${previewLeaks.map((leak) => `    ${leak}`).join("\n")}`,
+  );
+  process.exit(1);
+}
 
 if (mode === "--report") {
   const kind = process.argv[3];

@@ -261,12 +261,14 @@ const IMPORT =
 /**
  * The imports of a source text, static and dynamic. `typeOnly` is true for
  * `import type … from` and `export type … from`, which leave no import in
- * the built code.
+ * the built code. `dynamic` is true for `import("…")`, which loads the file
+ * when the call runs.
  */
 export function importStatementsOf(text) {
   return [...text.matchAll(IMPORT)].map((match) => ({
     specifier: match[2] ?? match[3],
     typeOnly: match[1] !== undefined,
+    dynamic: match[3] !== undefined,
   }));
 }
 

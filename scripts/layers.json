@@ -111,6 +111,14 @@
     "packages/cafe-control-api",
     "packages/production-plan-crdt"
   ],
+  "wiring": {
+    "about": "The wiring of a surface, which scripts/check-layer-debts.mjs does not count as surface-nonpublic (decision of the owner, 2026-11-27). pageTables: the one list of the pages of a surface; it may load the page of an area with import(), and a static import there still counts. previews: folders of pages that only a developer opens; no production build has one as an input (apps/portal/vite.config.ts), and no file outside the folder may import one. developmentLoads: the exceptions, each with its reason: a product file that loads a preview file only in development.",
+    "pageTables": ["surfaces/portal/ui/page-code.ts"],
+    "previews": ["apps/portal/src/dev/"],
+    "developmentLoads": {
+      "apps/portal/src/bootstrap.tsx -> apps/portal/src/dev/chat-preview-data.ts": "The workflow demo answers its chat from the chat preview data in development. The import() is inside `if (import.meta.env.DEV)`, so a production build drops it: the built files hold no installChatPreviewFetch."
+    }
+  },
   "mixed": {
     "workers/platform/src/agent-tools/registry.ts": "The one list of the agent tools, in the order of the catalog digest. It imports the tool family of each area (Kitchen, commerce, Cafe, the Inbox, integrations and devices) and the Slack tools (agent-tools/slack/slack.ts), so it is a part of the Worker. agent-tools/session-wiring.ts gives it to the class SessionDO (step A1.7).",
     "workers/platform/src/actors/organisation.ts": "The class OrganisationDO over OrganisationActorBase, with the modules commerce and activation (step A1.9). It joins the Actor parts of tenancy, authority and collaboration with the parts of the areas: Kitchen, Cafe, commerce, the Inbox, integrations, Brain, organisation, Shopify and the canvas read of the Portal chat (chat/workspace-canvas-read.ts). The class is a part of the Worker: it keeps the deployed class name and its RPC method names, and each method calls one module.",

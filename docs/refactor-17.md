@@ -482,6 +482,16 @@ The layer debts, one line for each step that lowers a count:
   RPC method name changed. The 16 merges are the design: the Worker gives each
   Durable Object binding to `Env`.
 
+- 2026-11-27, `surface-nonpublic`: 144 to 60, by a rule of the owner ("Allow as
+  wiring"). `wiring` in `scripts/layers.json` names the page table of the Portal
+  (`surfaces/portal/ui/page-code.ts`) and the preview folder (`apps/portal/src/dev/`).
+  A lazy `import()` of an area page by the page table (28) and an import by a preview
+  page (56) are wiring and do not count; a static import by the page table still
+  counts. The check refuses a product file that imports a preview file. One load has
+  a written reason: `bootstrap.tsx` loads the chat preview data inside
+  `if (import.meta.env.DEV)`, and the built Portal holds none of it. What stays: 60
+  imports of the Portal shell, the chat page and the transports.
+
 The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
 the state of Stage A. Its branches are gone; the work is on `dev`.
