@@ -148,6 +148,8 @@ number to its spec. Read the spec of a subsystem before you change it, and
 correct it in the same commit when a statement changes. Open plans are in
 `docs/`, closed plans in `docs/history/`. `workers/platform` is the Worker
 `pantry` (`services/platform` in old plans); `scripts/layers.json` maps each file.
+Each area has a short guide, `areas/<area>/AGENTS.md`: read it before a change
+in that area.
 
 | Layer        | Code                                                                              | Specs                                                                                                      |
 | ------------ | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
