@@ -18,8 +18,8 @@
       "imports": 3
     },
     "worker-logic": {
-      "files": 7,
-      "lines": 3353
+      "files": 3,
+      "lines": 812
     },
     "interpolated-table": {
       "writes": 10
@@ -137,8 +137,8 @@
       "reason": "A Worker module composes the three layers and holds no logic. A file there may import each area, so logic that joins two areas was placed there. The count holds each file that is not the entry (a default export), not a class shell (a class) and not wiring (no if, for, while or switch).",
       "fix": "Move the logic to the area that owns it, and give it the other area through a contract or a port. Keep registration lines, route tables with no branch and class shells in the Worker module.",
       "counts": {
-        "files workers/platform": 7,
-        "lines workers/platform": 3353
+        "files workers/platform": 3,
+        "lines workers/platform": 812
       }
     },
     "interpolated-table": {
