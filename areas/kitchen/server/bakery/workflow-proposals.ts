@@ -10,6 +10,7 @@ import {
 import { parseRunFindings } from "@purin-labs/bakery-workflow/findings";
 import { isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { KitchenOrganisationActor } from "../actors/organisation-kitchen-rpc";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ControlSessionId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
@@ -80,11 +81,12 @@ export async function prepareWorkflowProposal(
     return refused(
       `The engine refuses this result: ${problemText(compiled.problems)}`,
     );
-  const organisation = await requireActiveOrganisationActor({
-    env,
-    organisationId,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActor<KitchenOrganisationActor>({
+      env,
+      organisationId,
+      now: Date.now(),
+    });
   const draft = await organisation.bakeryWorkflowDraftSnapshot({
     organisationId,
     workflowId: input.workflowId,
@@ -174,11 +176,12 @@ export async function applyApprovedWorkflowChange(
     return { kind: "invalid" };
   const baseSeed = draftSeed(base);
   const proposedSeed = draftSeed(proposed);
-  const organisation = await requireActiveOrganisationActor({
-    env,
-    organisationId,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActor<KitchenOrganisationActor>({
+      env,
+      organisationId,
+      now: Date.now(),
+    });
   let receipt: WorkflowRevisionReceipt;
   if (current.receipt.digest === command.proposedDigest)
     receipt = current.receipt;

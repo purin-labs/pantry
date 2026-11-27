@@ -1,4 +1,5 @@
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { KitchenOrganisationActor } from "../../actors/organisation-kitchen-rpc";
 import { requireSessionExecution } from "@purin-labs/agent/actors/session-execution-admission";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { digestCanonical } from "@purin-labs/authority/policy/index";
@@ -33,11 +34,12 @@ export function readBakesForEmbeddedHarness(
         "Only a member of this workspace can read its bakes. Nothing was read. Tell the person.",
       ),
     read: async () => {
-      const organisation = await requireActiveOrganisationActor({
-        env: context.env,
-        organisationId: scope.organisationId,
-        now: Date.now(),
-      });
+      const organisation =
+        await requireActiveOrganisationActor<KitchenOrganisationActor>({
+          env: context.env,
+          organisationId: scope.organisationId,
+          now: Date.now(),
+        });
       const board = await organisation.readBakeBoard({
         organisationId: scope.organisationId,
       });
@@ -68,11 +70,12 @@ export async function proposeBakeForEmbeddedHarness(
     throw new BakeRequestError(
       "Only a member of this workspace can ask for a bake. Nothing was stored. Tell the person.",
     );
-  const organisation = await requireActiveOrganisationActor({
-    env,
-    organisationId: scope.organisationId,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActor<KitchenOrganisationActor>({
+      env,
+      organisationId: scope.organisationId,
+      now: Date.now(),
+    });
   const proposed = await organisation.runBakeCommand({
     organisationId: scope.organisationId,
     command: {
@@ -181,11 +184,12 @@ export async function pauseBakeRunForEmbeddedHarness(
     action: { operation: "kitchen.bake_run.pause", arguments: request },
     refusal: (decision) => `Bake run pause is not authorized: ${decision}`,
     run: async () => {
-      const organisation = await requireActiveOrganisationActor({
-        env,
-        organisationId: scope.organisationId,
-        now: Date.now(),
-      });
+      const organisation =
+        await requireActiveOrganisationActor<KitchenOrganisationActor>({
+          env,
+          organisationId: scope.organisationId,
+          now: Date.now(),
+        });
       const paused = await organisation.runBakeCommand({
         organisationId: scope.organisationId,
         command: {

@@ -1,4 +1,5 @@
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { KitchenOrganisationActor } from "./actors/organisation-kitchen-rpc";
 import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId } from "@purin-labs/kernel/ids";
@@ -16,11 +17,12 @@ export function controlSessionCostsSheetSettlement(
 ): CostsSheetSettlement {
   return async (cellKeys, clearPriceCells, savedAtMs) => {
     try {
-      const organisation = await requireActiveOrganisationActor({
-        env,
-        organisationId: authorized.organisationId,
-        now: savedAtMs,
-      });
+      const organisation =
+        await requireActiveOrganisationActor<KitchenOrganisationActor>({
+          env,
+          organisationId: authorized.organisationId,
+          now: savedAtMs,
+        });
       const settled = await organisation.settleCostsSheetDraft({
         organisationId: authorized.organisationId,
         cellKeys,

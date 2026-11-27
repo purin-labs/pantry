@@ -59,7 +59,7 @@ type StoredSheet = Readonly<{
 
 type SheetResult<T> = Result<T, Readonly<{ code: CostsSheetFailureCode }>>;
 
-type CostsSheetDraftRead = Readonly<{
+export type CostsSheetDraftRead = Readonly<{
   documentId: typeof COSTS_SHEET_ID;
   revision: number;
   generation: number;
@@ -350,14 +350,11 @@ const COSTS_SHEET_ROOM_PROTOCOL: CollaborationRoomProtocol<
   encodeServerMessage: encodeRoomServerMessage,
 };
 
-class CostsSheetBacking
-  implements
-    CollaborationRoomBacking<
-      CostsSheetDoc,
-      CostsSheetRoomMetadata,
-      CostsSheetFailureCode
-    >
-{
+class CostsSheetBacking implements CollaborationRoomBacking<
+  CostsSheetDoc,
+  CostsSheetRoomMetadata,
+  CostsSheetFailureCode
+> {
   readonly #ctx: DurableObjectState;
   readonly #organisationId: OrganisationId;
 
@@ -656,7 +653,9 @@ function persistSheet(
   );
 }
 
-function readStoredSheetIfAny(sql: SqlStorage): SheetResult<StoredSheet | null> {
+function readStoredSheetIfAny(
+  sql: SqlStorage,
+): SheetResult<StoredSheet | null> {
   const exists =
     sql
       .exec(

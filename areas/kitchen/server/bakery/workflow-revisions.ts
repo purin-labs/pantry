@@ -14,6 +14,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { KitchenOrganisationActor } from "../actors/organisation-kitchen-rpc";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { WorkflowRevisionReceipt } from "@purin-labs/area-kitchen-contract/server/workflow-changes";
 
@@ -363,11 +364,12 @@ export async function signalBakeryWorkflowApplied(
   workflowId: string,
 ): Promise<void> {
   try {
-    const organisation = await requireActiveOrganisationActor({
-      env,
-      organisationId,
-      now: Date.now(),
-    });
+    const organisation =
+      await requireActiveOrganisationActor<KitchenOrganisationActor>({
+        env,
+        organisationId,
+        now: Date.now(),
+      });
     await organisation.bakeryWorkflowApplied(workflowId);
   } catch (error) {
     traceWarn("bakery_workflow.applied_signal_failed", {

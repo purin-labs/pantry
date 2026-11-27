@@ -18,6 +18,7 @@ import {
   type CommerceEntityPlaneClient,
 } from "@purin-labs/commerce-client";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { KitchenOrganisationActor } from "../../actors/organisation-kitchen-rpc";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
@@ -346,11 +347,12 @@ async function clearSettledLines(
       settled.push(line.requestId);
   if (settled.length === 0) return;
   try {
-    const organisation = await requireActiveOrganisationActor({
-      env,
-      organisationId: mutation.authorized.organisationId,
-      now: Date.now(),
-    });
+    const organisation =
+      await requireActiveOrganisationActor<KitchenOrganisationActor>({
+        env,
+        organisationId: mutation.authorized.organisationId,
+        now: Date.now(),
+      });
     const cleared = await organisation.clearProductionPlanLines({
       organisationId: mutation.authorized.organisationId,
       locationId,

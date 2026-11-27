@@ -193,6 +193,7 @@ import { SHOPIFY_ORGANISATION_PART } from "@purin-labs/area-integrations/shopify
 import type { CaseExecutionEffectRecords } from "@purin-labs/agent/case-execution/records";
 import type { OrganisationBrainRpc } from "@purin-labs/area-brain/server/actors/organisation-brain-rpc";
 import type { OrganisationInboxRpc } from "@purin-labs/area-inbox/server/actors/organisation/organisation-inbox-rpc";
+import type { OrganisationKitchenRpc } from "@purin-labs/area-kitchen/server/actors/organisation-kitchen-rpc";
 import { readCaseEffectRecords } from "@purin-labs/area-brain/server/actors/organisation-execution-records";
 import { type AcceptedMemoryCursor } from "@purin-labs/area-brain/server/memory/store";
 import { cleanupTypeSafeCredentials } from "@purin-labs/agent/integrations/typesafe/connection";
@@ -304,7 +305,8 @@ export class OrganisationDO
     OrganisationCommerceRpc,
     OrganisationActivationRpc,
     OrganisationBrainRpc,
-    OrganisationInboxRpc
+    OrganisationInboxRpc,
+    OrganisationKitchenRpc
 {
   // Commerce (`actors/organisation/organisation-commerce.ts`): the actions,
   // the cues, the commerce lab, the Code Mode leases and the workspace

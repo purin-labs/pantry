@@ -6,6 +6,7 @@ import {
   type BakeRunActionInput,
 } from "@purin-labs/kitchen-control-api";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { KitchenOrganisationActor } from "../../actors/organisation-kitchen-rpc";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   mayDecideBakes,
@@ -125,11 +126,12 @@ async function readBoard(
     false,
   );
   if (!authorized.ok) return authorized.response;
-  const organisation = await requireActiveOrganisationActor({
-    env,
-    organisationId: authorized.organisationId,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActor<KitchenOrganisationActor>({
+      env,
+      organisationId: authorized.organisationId,
+      now: Date.now(),
+    });
   const board = await organisation.readBakeBoard({
     organisationId: authorized.organisationId,
   });
@@ -299,11 +301,12 @@ function runPortalBakeCommand<Input>(
     invalid: route.invalid,
     operation: route.operation,
     write: async (authorized, input) => {
-      const organisation = await requireActiveOrganisationActor({
-        env,
-        organisationId: authorized.organisationId,
-        now: Date.now(),
-      });
+      const organisation =
+        await requireActiveOrganisationActor<KitchenOrganisationActor>({
+          env,
+          organisationId: authorized.organisationId,
+          now: Date.now(),
+        });
       const done = await organisation.runBakeCommand({
         organisationId: authorized.organisationId,
         command: route.command(input, {

@@ -98,7 +98,7 @@ type ProductionPlanShare =
  * edit may carry into the plan what only that person may read, because that
  * person shared the conversation with every role that reads the plan.
  */
-type ProductionPlanSharedTarget = ProductionPlanShare &
+export type ProductionPlanSharedTarget = ProductionPlanShare &
   Readonly<{ approverPersonId: string }>;
 
 export type ProductionPlanAgentEdit = Readonly<{

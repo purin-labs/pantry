@@ -4,6 +4,7 @@ import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseCaseId, parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { KitchenOrganisationActor } from "../../actors/organisation-kitchen-rpc";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,
@@ -388,12 +389,13 @@ async function readProductionPlanShare(
   locationId: string,
 ) {
   const organisationId = execution.scope.organisationId;
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env,
-    organisationId,
-    placement: execution.scope.placement,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActorAtPlacement<KitchenOrganisationActor>({
+      env,
+      organisationId,
+      placement: execution.scope.placement,
+      now: Date.now(),
+    });
   await requireSessionExecution(execution, lease);
   const share = await organisation.readProductionPlanShare({
     organisationId,
