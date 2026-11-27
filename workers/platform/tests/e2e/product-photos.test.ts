@@ -182,12 +182,11 @@ async function productPhotos(context: TestContext): Promise<void> {
   // 1. A photo reaches the page, and its retry and a second click add nothing.
   const addKey = `portal-${crypto.randomUUID()}`;
   const added = await add(owner.session, link.productId, 0, first, addKey);
-  expect(added.status, await added.clone().text()).toBe(200);
-  expect(
-    (await add(owner.session, link.productId, 0, first, addKey)).status,
-  ).toBe(200);
+  expect(added.status, await added.text()).toBe(200);
+  const retried = await add(owner.session, link.productId, 0, first, addKey);
+  expect(retried.status, await retried.text()).toBe(200);
   const again = await add(owner.session, link.productId, 1, first);
-  expect(again.status, await again.clone().text()).toBe(200);
+  expect(again.status, await again.text()).toBe(200);
   const afterFirst = await page(link.productId);
   expect(afterFirst.photos.items).toHaveLength(1);
   expect(afterFirst.photos.revision).toBe(1);
@@ -197,7 +196,7 @@ async function productPhotos(context: TestContext): Promise<void> {
 
   // 2. A second photo follows the first, and a buyer reads its bytes.
   const addedB = await add(owner.session, link.productId, 1, second);
-  expect(addedB.status, await addedB.clone().text()).toBe(200);
+  expect(addedB.status, await addedB.text()).toBe(200);
   const afterSecond = await page(link.productId);
   const [, photoB] = ids(afterSecond);
   if (photoB === undefined) throw new Error("No second photo");
@@ -212,7 +211,7 @@ async function productPhotos(context: TestContext): Promise<void> {
 
   // 3. A new order leads with the second photo on the page and in the shop.
   const reordered = await arrange(link.productId, 2, [photoB, photoA]);
-  expect(reordered.status, await reordered.clone().text()).toBe(200);
+  expect(reordered.status, await reordered.text()).toBe(200);
   const afterOrder = await page(link.productId);
   expect(ids(afterOrder)).toEqual([photoB, photoA]);
   expect(afterOrder.image?.url).toContain(photoB);
@@ -228,11 +227,11 @@ async function productPhotos(context: TestContext): Promise<void> {
 
   // 5. A removed photo leaves the shop, and Undo puts it back.
   const removed = await arrange(link.productId, 3, [photoB]);
-  expect(removed.status, await removed.clone().text()).toBe(200);
+  expect(removed.status, await removed.text()).toBe(200);
   expect(ids(await page(link.productId))).toEqual([photoB]);
   await shopShows(link.variantId, [photoB]);
   const undone = await arrange(link.productId, 4, [photoB, photoA]);
-  expect(undone.status, await undone.clone().text()).toBe(200);
+  expect(undone.status, await undone.text()).toBe(200);
   expect(ids(await page(link.productId))).toEqual([photoB, photoA]);
 
   // 6. An operator, a drawing, a mislabelled file and an unknown photo change nothing.
@@ -240,28 +239,28 @@ async function productPhotos(context: TestContext): Promise<void> {
     bytes: png(3),
     type: "image/png",
   });
-  expect(refused.status, await refused.clone().text()).toBe(404);
+  expect(refused.status, await refused.text()).toBe(404);
   const drawing = await add(owner.session, link.productId, 5, {
     bytes: new TextEncoder().encode(
       "<svg xmlns='http://www.w3.org/2000/svg'/>",
     ),
     type: "image/svg+xml",
   });
-  expect(drawing.status).toBe(422);
+  expect(drawing.status, await drawing.text()).toBe(422);
   const mislabelled = await add(owner.session, link.productId, 5, {
     bytes: png(4),
     type: "image/jpeg",
   });
-  expect(mislabelled.status, await mislabelled.clone().text()).toBe(422);
+  expect(mislabelled.status, await mislabelled.text()).toBe(422);
   const unknown = await arrange(link.productId, 5, [photoB, "media_unknown"]);
-  expect(unknown.status).toBe(422);
+  expect(unknown.status, await unknown.text()).toBe(422);
   const afterRefusals = await page(link.productId);
   expect(ids(afterRefusals)).toEqual([photoB, photoA]);
   expect(afterRefusals.photos.revision).toBe(5);
 
   // 7. The same photo on another product keeps one address.
   const shared = await add(owner.session, other.productId, 0, first);
-  expect(shared.status, await shared.clone().text()).toBe(200);
+  expect(shared.status, await shared.text()).toBe(200);
   expect(ids(await page(other.productId))).toEqual([photoA]);
   const library = await required(admin.listMedia(merchantId));
   expect(library.media.map((item) => item.id).sort()).toEqual(
