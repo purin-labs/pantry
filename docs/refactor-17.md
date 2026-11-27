@@ -418,6 +418,20 @@ The layer debts, one line for each step that lowers a count:
   `connectorEvalStore` (Brain contract). What stays: the Portal (144), Slack (19),
   the webhooks (9) and voice (3).
 
+- 2026-11-27, `surface-nonpublic`: 175 to 144. The Slack, webhook and voice surfaces
+  import no area file that is not public; only the Portal (144) stays. Pure types
+  and functions moved into the contracts: the bake proposal, the email review, the
+  WhatsApp pause reason, the supplier payout row, the commerce provider receipt
+  parser, the café shop, `previewCode` and the name of the custom connector fetch
+  Actor. The generic account capability resolver moved to `foundation/authority`,
+  and `menuPriceChangeKind` has one copy in `control-api` (it had a second in the
+  Commerce UI). The calls go through ports: new `commerceActionApprovals`,
+  `supplierPayoutReads` (Commerce), `bakeProposalRecords` (Kitchen),
+  `whatsAppOperatorNoticeRecords` (Inbox) and `deviceReads` (Devices); more methods
+  on `commerceDeliveryIntake`, `commerceGraphReads`, `inboxServices`,
+  `organisationServices` and `cafeServices`; Slack uses `actionLedgerCommerce` for
+  the Slack approval rule. No query, write or call order changed.
+
 - 2026-11-27, `table-read`: 85 to 50. An area reads a table of another area through
   the contract of the owner (7 reads). A foundation module reads a table of a higher
   module through a port that the owner implements with the same SQL: the subject
