@@ -98,9 +98,9 @@
       "dir": "oven-native",
       "status": "passes",
       "lastRun": {
-        "seconds": 12.4,
+        "seconds": 12.7,
         "date": "2026-11-27",
-        "commit": "35291d017"
+        "commit": "6a1274d7a"
       }
     },
     {
@@ -119,9 +119,9 @@
       "dir": "oven-wasm",
       "status": "passes",
       "lastRun": {
-        "seconds": 12.5,
+        "seconds": 12.4,
         "date": "2026-11-27",
-        "commit": "35291d017"
+        "commit": "6a1274d7a"
       }
     },
     {
@@ -141,9 +141,9 @@
       "dir": "spanner-oven-native",
       "status": "passes",
       "lastRun": {
-        "seconds": 11.5,
+        "seconds": 11,
         "date": "2026-11-27",
-        "commit": "35291d017"
+        "commit": "6a1274d7a"
       }
     },
     {
@@ -164,9 +164,9 @@
       "dir": "spanner-oven-wasm",
       "status": "passes",
       "lastRun": {
-        "seconds": 11.3,
+        "seconds": 11.2,
         "date": "2026-11-27",
-        "commit": "35291d017"
+        "commit": "6a1274d7a"
       }
     },
     {
@@ -187,9 +187,9 @@
       "dir": "spanner-oven-ur5e-wasm",
       "status": "passes",
       "lastRun": {
-        "seconds": 10,
+        "seconds": 9.3,
         "date": "2026-11-27",
-        "commit": "35291d017"
+        "commit": "6a1274d7a"
       }
     },
     {
@@ -210,9 +210,9 @@
       "dir": "spanner-oven-crx10-wasm",
       "status": "passes",
       "lastRun": {
-        "seconds": 11,
+        "seconds": 9.2,
         "date": "2026-11-27",
-        "commit": "35291d017"
+        "commit": "6a1274d7a"
       }
     },
     {
@@ -2493,6 +2493,42 @@
         "seconds": 146.5,
         "date": "2026-11-19",
         "commit": "2e48dac6e"
+      }
+    },
+    {
+      "id": "two-arm-oven-cell",
+      "file": "scripts/bakery-robots/verify_two_arm_cell.py",
+      "tier": "slow",
+      "backend": "none",
+      "owner": "Plan 24",
+      "run": {
+        "tool": "python",
+        "args": ["{out}"]
+      },
+      "dir": "two-arm-cell",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 95,
+        "date": "2026-11-27",
+        "commit": "6a1274d7"
+      }
+    },
+    {
+      "id": "loose-tin-tray-limits",
+      "file": "scripts/bakery-robots/verify_loose_tin_limits.py",
+      "tier": "slow",
+      "backend": "native",
+      "owner": "Plan 42B",
+      "run": {
+        "tool": "python",
+        "args": ["{out}"]
+      },
+      "dir": "loose-tin-tray",
+      "status": "passes",
+      "lastRun": {
+        "seconds": 130,
+        "date": "2026-11-27",
+        "commit": "6a1274d7"
       }
     }
   ]

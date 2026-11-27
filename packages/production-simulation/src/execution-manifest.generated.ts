@@ -3,16 +3,16 @@
 export const PRODUCTION_EXECUTION_MANIFEST = {
   schemaVersion: 1,
   bundle: {
-    id: "31d051168fce91d2f3ce19684ab6266a3a17288028766e5d35ddaca56bee4575",
+    id: "5bf61fd606c468c8d9237738d76c325bfd3bdbea4d9f579df119c7406a3d0867",
     backend: "browser",
     protocolVersion: 5,
     checkpointSchemaVersion: 4,
     controllerSourceHash:
-      "a7dae8e30ed33da420ab38bec8a05694c6d08a5a47c1cd1321415014581d1a7a",
+      "62d5e10710a104bbbfc6fbfdf52a6d70f565165df8b8d6a9be1a50003b802c21",
     controllerHash:
-      "fa4ff8e163b163c563f9ac483b6b47d87a60de9c844aad421e2e43e7b4185ad5",
+      "44fce7741e88b82608b1b5a5edf708cc79976190c7da1c8c926233c0ba78f131",
     runtimeHash:
-      "dbd27b523f8be4a637d7358c582174a79074b53995ce1be5cb796e25fd6690b4",
+      "0b6bbcb43f6440b6835a7783df20144bb9f058b888d2063c086f45fa18d2efa9",
     engineHash:
       "24e8cc7906c5b01a747411e75222170fb682653abc5d24231759504108a7995d",
   },
@@ -22,7 +22,7 @@ export const PRODUCTION_EXECUTION_MANIFEST = {
     byteLength: 813553,
   },
   runtime: {
-    id: "762e4d1f72cf484a9db13ee69083f5cc59b4f556dbb4e97778afffce94958b58",
+    id: "468e95da77e3e1c4c1586f4c74b8a4a5b8cf8c3d5332ec65a52988db71f2a017",
     files: [
       {
         file: "bakery-native.js",
@@ -33,8 +33,8 @@ export const PRODUCTION_EXECUTION_MANIFEST = {
       {
         file: "bakery_native.wasm",
         sha256:
-          "d20d615421ebfe72d87cb31b4cf9b9cba3764d2f5746d8c34f82975557cc4b99",
-        byteLength: 6261469,
+          "82ecad93477441d2a8bb96cc5268debce7c33f039296733385cee56626c3d833",
+        byteLength: 6262213,
       },
       {
         file: "models.json",
