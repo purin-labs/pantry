@@ -1,6 +1,8 @@
 // Refuses a regional table that the purge catalogue does not name (Refactor
 // 15, refactor 5). Every table of the regional D1 baseline needs one entry in
-// foundation/tenancy/data/purge-catalogue.ts: erase, pseudonymize or keep.
+// the purge catalogue: erase, pseudonymize or keep. Each table owner gives its
+// entries in a purge-entries.ts file, and workers/platform/src/purge-catalogue.ts
+// joins them (Refactor 17).
 // The check also refuses:
 // - an entry for a table that the baseline does not have, or a second entry;
 // - an erase entry with no `where` for a table with no organisation_id column;
@@ -23,10 +25,10 @@ const baseline = join(
   root,
   "workers/platform/migrations-regional/0001_current_schema.sql",
 );
-const cataloguePath = join(root, "foundation/tenancy/data/purge-catalogue.ts");
-const { PURGE_CATALOGUE, PURGE_R2_PREFIXES } = await import(
-  pathToFileURL(cataloguePath).href
-);
+const cataloguePath = join(root, "workers/platform/src/purge-catalogue.ts");
+const { PURGE_CATALOGUE } = await import(pathToFileURL(cataloguePath).href);
+const r2PrefixesPath = join(root, "foundation/tenancy/data/purge-catalogue.ts");
+const { PURGE_R2_PREFIXES } = await import(pathToFileURL(r2PrefixesPath).href);
 
 const database = new DatabaseSync(":memory:");
 database.exec(readFileSync(baseline, "utf8"));

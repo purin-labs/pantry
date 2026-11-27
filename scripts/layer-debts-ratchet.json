@@ -8,13 +8,13 @@
       "names": 42
     },
     "table-read": {
-      "reads": 50
+      "reads": 44
     },
     "surface-nonpublic": {
       "imports": 60
     },
     "interpolated-table": {
-      "writes": 10
+      "writes": 9
     },
     "contract-runtime": {
       "imports": 94
@@ -73,10 +73,10 @@
         "reads foundation/connections -> foundation/authority": 1,
         "reads foundation/tenancy -> areas/inbox": 2,
         "reads foundation/tenancy -> areas/integrations": 2,
-        "reads foundation/tenancy -> areas/organisation": 3,
+        "reads foundation/tenancy -> areas/organisation": 2,
         "reads foundation/tenancy -> foundation/actor-runtime": 5,
-        "reads foundation/tenancy -> foundation/agent": 4,
-        "reads foundation/tenancy -> foundation/connections": 13
+        "reads foundation/tenancy -> foundation/agent": 3,
+        "reads foundation/tenancy -> foundation/connections": 9
       }
     },
     "surface-nonpublic": {
@@ -98,7 +98,7 @@
       "counts": {
         "writes foundation/actor-runtime": 6,
         "writes foundation/agent": 2,
-        "writes foundation/tenancy": 2
+        "writes foundation/tenancy": 1
       }
     },
     "contract-runtime": {

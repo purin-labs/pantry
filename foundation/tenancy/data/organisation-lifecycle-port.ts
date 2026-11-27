@@ -25,6 +25,7 @@ import type { ProjectId } from "@purin-labs/control-api";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { InitialOrganisationPlacement } from "../placement";
+import type { PurgeCatalogueEntry } from "./purge-catalogue";
 import type { RowGuard } from "./shared-rows/organisation-row";
 
 /** The session of the batch. */
@@ -189,35 +190,47 @@ type OrganisationArchiveParts = Readonly<{
   ): Promise<boolean>;
 }>;
 
-/** What the purge rewrite of a pseudonymized table needs. */
-export type OrganisationPurgeContext = Readonly<{
-  session: Session;
-  organisationId: OrganisationId;
-  /** True once the batch's first statement has moved the lifecycle. */
-  purged: RowGuard;
+/**
+ * The provider accounts and connections of an Organisation that the purge
+ * pseudonymizes, each with the hash of its provider identity.
+ */
+export type OrganisationPurgeSubjects = Readonly<{
   accounts: readonly Readonly<{ id: string; providerAccountHash: string }>[];
   connections: readonly Readonly<{ id: string; providerSubjectHash: string }>[];
-  now: number;
 }>;
 
+/** What the purge rewrite of a pseudonymized table needs. */
+export type OrganisationPurgeContext = OrganisationPurgeSubjects &
+  Readonly<{
+    session: Session;
+    organisationId: OrganisationId;
+    /** True once the batch's first statement has moved the lifecycle. */
+    purged: RowGuard;
+    now: number;
+  }>;
+
 /** The rewrite of one pseudonymized table, in the order of the purge batch. */
-type PurgeRewrite = (
+export type PurgeRewrite = (
   context: OrganisationPurgeContext,
 ) => readonly D1PreparedStatement[];
 
 /** The parts of the purge batch. */
 export type OrganisationPurgeParts = Readonly<{
   /**
-   * The rewrite of each pseudonymized table of another module: the
-   * connection tables (connections) and the Google accounts (inbox).
+   * The purge entries of each table owner, in the order of the batch
+   * (`joinPurgeCatalogue`).
    */
-  pseudonymize: Readonly<{
-    integration_account: PurgeRewrite;
-    provider_credential_generation: PurgeRewrite;
-    provider_connection: PurgeRewrite;
-    email_mailbox_account: PurgeRewrite;
-    email_sender_account: PurgeRewrite;
-  }>;
+  catalogue: readonly PurgeCatalogueEntry[];
+  /** The accounts and the connections that the purge rewrites (connections). */
+  subjects(
+    db: OrganisationDatabase,
+    organisationId: OrganisationId,
+  ): Promise<OrganisationPurgeSubjects>;
+  /**
+   * The rewrite of each pseudonymized table of another module, by table:
+   * the connection tables (connections) and the Google accounts (inbox).
+   */
+  pseudonymize: Readonly<Record<string, PurgeRewrite>>;
   /** The directory's Slack records that name the Organisation (Slack). */
   directoryRecordDeletions(
     directory: GlobalDatabase,

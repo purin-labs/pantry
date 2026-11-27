@@ -9,7 +9,12 @@ import {
   prepareArchivedOrganisationWebhooksDisable,
   prepareOrganisationPurgeAccounts,
 } from "@purin-labs/connections/data/integration-account-writes";
-import type { OrganisationLifecycleParts } from "@purin-labs/tenancy/data/organisation-lifecycle-port";
+import type {
+  OrganisationLifecycleParts,
+  PurgeRewrite,
+} from "@purin-labs/tenancy/data/organisation-lifecycle-port";
+import type { TenancyPseudonymizedTable } from "@purin-labs/tenancy/data/organisation-purge";
+import type { PseudonymizedTable } from "@purin-labs/tenancy/data/purge-catalogue";
 import {
   prepareOrganisationPurgeMailboxAccounts,
   prepareOrganisationPurgeSenderAccounts,
@@ -22,6 +27,7 @@ import {
   prepareOrganisationPurgeConnections,
 } from "@purin-labs/connections/data/provider-connection-writes";
 import { prepareOrganisationPurgeCredentialGenerations } from "@purin-labs/connections/data/provider-credential-generation";
+import { readOrganisationPurgeSubjects } from "@purin-labs/connections/data/organisation-purge-subjects";
 import {
   prepareSlackInstallationCredentialMove,
   prepareSlackInstallationRevocation,
@@ -39,6 +45,21 @@ import {
   prepareOrganisationProjectMembersDeletion,
   prepareProjectMembershipRevocation,
 } from "@purin-labs/conversation/projects/default-project";
+import { PURGE_CATALOGUE } from "./purge-catalogue";
+
+/**
+ * A rewrite for each table of another module that the catalogue marks
+ * pseudonymize, and for no other table.
+ */
+type PurgeRewrites = Readonly<
+  Record<
+    Exclude<
+      PseudonymizedTable<(typeof PURGE_CATALOGUE)[number]>,
+      TenancyPseudonymizedTable
+    >,
+    PurgeRewrite
+  >
+>;
 
 /**
  * The Worker gives the lifecycle batches of tenancy the statements of the
@@ -107,6 +128,9 @@ export const ORGANISATION_LIFECYCLE_PARTS: OrganisationLifecycleParts = {
       organisationHarnessErasureStarted(session, organisationId),
   },
   purge: {
+    catalogue: PURGE_CATALOGUE,
+    subjects: (db, organisationId) =>
+      readOrganisationPurgeSubjects(db, organisationId),
     pseudonymize: {
       integration_account: (context) =>
         prepareOrganisationPurgeAccounts(context),
@@ -118,7 +142,7 @@ export const ORGANISATION_LIFECYCLE_PARTS: OrganisationLifecycleParts = {
         prepareOrganisationPurgeMailboxAccounts(context),
       email_sender_account: (context) =>
         prepareOrganisationPurgeSenderAccounts(context),
-    },
+    } satisfies PurgeRewrites,
     directoryRecordDeletions: (directory, organisationId) =>
       directorySlackRecordDeletions(directory, organisationId),
     slackInstallationRevocation: (directory, input) =>

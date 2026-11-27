@@ -12,10 +12,8 @@ import {
   deleteArchivedOrganisation,
   type ArchiveOrganisationMutation,
 } from "@purin-labs/tenancy/data/organisation-lifecycle";
-import {
-  eraseEntryWhere,
-  PURGE_CATALOGUE,
-} from "@purin-labs/tenancy/data/purge-catalogue";
+import { eraseEntryWhere } from "@purin-labs/tenancy/data/purge-catalogue";
+import { PURGE_CATALOGUE } from "../../src/purge-catalogue";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";

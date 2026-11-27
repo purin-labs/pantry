@@ -16,7 +16,6 @@ import type {
 } from "@purin-labs/kernel/database-handles";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { assertNever } from "@purin-labs/std";
-import { hashOpaqueSecret } from "./control-plane";
 import {
   prepareOrganisationLifecycleMove,
   type LifecycleFence,
@@ -25,9 +24,14 @@ import {
   organisationLifecycleParts,
   purgeGuardedStatement as guardedStatement,
   type OrganisationPurgeContext as PurgeContext,
-  type OrganisationPurgeParts,
+  type PurgeRewrite,
 } from "./organisation-lifecycle-port";
-import { eraseEntryWhere, PURGE_CATALOGUE } from "./purge-catalogue";
+import {
+  eraseEntryWhere,
+  type PseudonymizedTable,
+  type PurgeCatalogueEntry,
+  type TENANCY_PURGE_ENTRIES,
+} from "./purge-catalogue";
 import { prepareExpiredOrganisationReceiptsDeletion } from "./shared-rows/mutation-receipt";
 import {
   prepareOrganisationPurge,
@@ -37,23 +41,14 @@ import {
 
 type Session = OrganisationDatabaseSession;
 
-type PseudonymizedTable = Extract<
-  (typeof PURGE_CATALOGUE)[number],
-  Readonly<{ action: "pseudonymize" }>
->["table"];
-
-/** The rewrite of each table that the catalogue marks pseudonymize. */
-type Pseudonymizers = Readonly<
-  Record<
-    PseudonymizedTable,
-    (context: PurgeContext) => readonly D1PreparedStatement[]
-  >
+/** The tables of tenancy that the catalogue marks pseudonymize. */
+export type TenancyPseudonymizedTable = PseudonymizedTable<
+  (typeof TENANCY_PURGE_ENTRIES)[number]
 >;
 
 /** The rewrite of each table of tenancy that the catalogue marks pseudonymize. */
-const TENANCY_PSEUDONYMIZE: Pick<
-  Pseudonymizers,
-  Exclude<PseudonymizedTable, keyof OrganisationPurgeParts["pseudonymize"]>
+const TENANCY_PSEUDONYMIZE: Readonly<
+  Record<TenancyPseudonymizedTable, PurgeRewrite>
 > = {
   organisation: (context) => [
     prepareOrganisationPurge(context.session, {
@@ -63,10 +58,19 @@ const TENANCY_PSEUDONYMIZE: Pick<
   ],
 };
 
-type EraseEntry = Extract<
-  (typeof PURGE_CATALOGUE)[number],
-  Readonly<{ action: "erase" }>
->;
+type EraseEntry = Extract<PurgeCatalogueEntry, Readonly<{ action: "erase" }>>;
+
+/**
+ * The rows of the Organisation in a table with no `organisation_id` column:
+ * the `where` of its erase entry, or undefined. The regional copy selects
+ * the same rows.
+ */
+export function organisationRowsWhere(table: string): string | undefined {
+  const entry = organisationLifecycleParts().purge.catalogue.find(
+    (candidate) => candidate.table === table,
+  );
+  return entry !== undefined && "where" in entry ? entry.where : undefined;
+}
 
 /** Holds once the Organisation's lifecycle says purged. */
 function purgedGuard(organisationId: OrganisationId): RowGuard {
@@ -77,6 +81,7 @@ function purgedGuard(organisationId: OrganisationId): RowGuard {
   };
 }
 
+/** The entry's DELETE of its own table, for the rows of the Organisation. */
 function eraseStatement(
   session: Session,
   guard: RowGuard,
@@ -87,15 +92,15 @@ function eraseStatement(
     session,
     guard,
     organisationId,
-    `DELETE FROM ${entry.table} WHERE (${eraseEntryWhere(entry)})`,
+    `${entry.statement} WHERE (${eraseEntryWhere(entry)})`,
   );
 }
 
 /** The statements of one catalogue entry, in the batch's order. */
 function catalogueStatements(
   context: PurgeContext,
-  pseudonymize: Pseudonymizers,
-  entry: (typeof PURGE_CATALOGUE)[number],
+  pseudonymize: Readonly<Record<string, PurgeRewrite>>,
+  entry: PurgeCatalogueEntry,
 ): readonly D1PreparedStatement[] {
   switch (entry.action) {
     case "erase":
@@ -107,8 +112,12 @@ function catalogueStatements(
           entry,
         ),
       ];
-    case "pseudonymize":
-      return pseudonymize[entry.table](context);
+    case "pseudonymize": {
+      const rewrite = pseudonymize[entry.table];
+      if (rewrite === undefined)
+        throw new Error(`organisation_purge_rewrite_missing:${entry.table}`);
+      return rewrite(context);
+    }
     case "keep":
       // Idempotency receipts end on their own; the expired ones go now.
       return entry.table === "control_mutation_receipt"
@@ -133,47 +142,18 @@ export async function purgeArchivedOrganisation(input: {
   readonly now: number;
 }): Promise<number> {
   const parts = organisationLifecycleParts().purge;
-  const pseudonymize: Pseudonymizers = {
+  const pseudonymize: Readonly<Record<string, PurgeRewrite>> = {
     ...TENANCY_PSEUDONYMIZE,
     ...parts.pseudonymize,
   };
-  const accounts = await input.db
-    .prepare(
-      `SELECT integration_account_id AS id, provider_account_id AS providerAccountId
-       FROM integration_account
-       WHERE organisation_id = ? AND source_kind != 'custom_api'`,
-    )
-    .bind(input.organisationId)
-    .all<{ readonly id: unknown; readonly providerAccountId: unknown }>();
-  const connections = await input.db
-    .prepare(
-      `SELECT provider_connection_id AS id, provider_subject_id AS providerSubjectId
-       FROM provider_connection
-       WHERE organisation_id = ? AND source_kind != 'custom_api'`,
-    )
-    .bind(input.organisationId)
-    .all<{ readonly id: unknown; readonly providerSubjectId: unknown }>();
+  const subjects = await parts.subjects(input.db, input.organisationId);
   const session = input.db.withSession("first-primary");
   const context: PurgeContext = {
     session,
     organisationId: input.organisationId,
     purged: purgedGuard(input.organisationId),
-    accounts: await Promise.all(
-      accounts.results.map(async (row) => ({
-        id: requireString(row.id, "purged account id"),
-        providerAccountHash: await hashOpaqueSecret(
-          requireString(row.providerAccountId, "purged provider account id"),
-        ),
-      })),
-    ),
-    connections: await Promise.all(
-      connections.results.map(async (row) => ({
-        id: requireString(row.id, "purged connection id"),
-        providerSubjectHash: await hashOpaqueSecret(
-          requireString(row.providerSubjectId, "purged provider subject"),
-        ),
-      })),
-    ),
+    accounts: subjects.accounts,
+    connections: subjects.connections,
     now: input.now,
   };
   const statements: D1PreparedStatement[] = [
@@ -184,7 +164,7 @@ export async function purgeArchivedOrganisation(input: {
       fence: input.fence,
       now: input.now,
     }),
-    ...PURGE_CATALOGUE.flatMap((entry) =>
+    ...parts.catalogue.flatMap((entry) =>
       catalogueStatements(context, pseudonymize, entry),
     ),
     session
@@ -217,9 +197,4 @@ export async function purgeArchivedOrganisation(input: {
       .map(([, statement]) => statement),
   );
   return statements.length;
-}
-
-function requireString(raw: unknown, field: string): string {
-  if (typeof raw !== "string") throw new Error(`${field} is invalid`);
-  return raw;
 }

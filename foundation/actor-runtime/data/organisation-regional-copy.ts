@@ -6,7 +6,7 @@ import {
   sharedRowOwnerColumn,
 } from "@purin-labs/tenancy/data/shared-rows/regional-copy-rules";
 import { prepareRetiredCellOrganisationRow } from "@purin-labs/tenancy/data/shared-rows/organisation-row";
-import { organisationRowsWhere } from "@purin-labs/tenancy/data/purge-catalogue";
+import { organisationRowsWhere } from "@purin-labs/tenancy/data/organisation-purge";
 import type {
   GlobalDatabase,
   OrganisationDatabase,
