@@ -55,9 +55,9 @@ import { parseUserId } from "@purin-labs/control-api/ids";
 import { GMAIL_FULL_MAILBOX_SCOPES } from "@purin-labs/connections/mail/gmail-authorization";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { OperationalCaseContextDiscoverySourceRequest } from "@purin-labs/agent/case-context-discovery/operational-evaluation";
-import { readDailyTypeSafeUsage } from "@purin-labs/agent/integrations/typesafe/usage-store";
+import { readDailyTypeSafeUsage } from "@purin-labs/agent/typesafe/usage-store";
 import { parseCaseContextDiscoveryPolicy } from "@purin-labs/agent/case-context-discovery/policy";
-import { readTypeSafeConnection } from "@purin-labs/agent/integrations/typesafe/connection";
+import { readTypeSafeConnection } from "@purin-labs/agent/typesafe/connection";
 import {
   readCaseContextDiscoveryPolicy,
   publishCaseContextDiscoveryPolicy,

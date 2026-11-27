@@ -12,7 +12,7 @@ import {
 } from "@purin-labs/control-api/portal/jev-features";
 import { encodeBase64Url, isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { typeSafeMonth } from "@purin-labs/agent/integrations/typesafe/usage-store";
+import { typeSafeMonth } from "@purin-labs/agent/typesafe/usage-store";
 import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import {
   bootstrapOrganisation,

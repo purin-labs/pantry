@@ -5,8 +5,8 @@ import {
   createTypeSafeConnectionSchema,
   mutateTypeSafeConnection,
   readTypeSafeConnection,
-} from "@purin-labs/agent/integrations/typesafe/connection";
-import { resolveTypeSafeCredential as resolveTypeSafeConnection } from "@purin-labs/agent/integrations/typesafe/authority";
+} from "@purin-labs/agent/typesafe/connection";
+import { resolveTypeSafeCredential as resolveTypeSafeConnection } from "@purin-labs/agent/typesafe/authority";
 import {
   createCaseContextDiscoveryEvaluationSchema,
   publishCaseContextDiscoveryPolicy,

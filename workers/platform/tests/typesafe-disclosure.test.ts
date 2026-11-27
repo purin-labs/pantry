@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest";
-import { TypeSafeDisclosure } from "@purin-labs/agent/integrations/typesafe/disclosure";
+import { TypeSafeDisclosure } from "@purin-labs/agent/typesafe/disclosure";
 import { FlowLabel } from "@purin-labs/authority/policy/information-flow/labels";
 import type { TypeSafeInferenceSink } from "@purin-labs/authority/policy/information-flow/types";
 import { buildWorkflowAuthority } from "@purin-labs/authority/request-authority/index";

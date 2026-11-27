@@ -13,13 +13,13 @@ import type {
   IntegrationAccountId,
   OrganisationId,
 } from "@purin-labs/kernel/ids";
-import type { TypeSafeCredential } from "@purin-labs/agent/integrations/typesafe/credential";
+import type { TypeSafeCredential } from "@purin-labs/agent/typesafe/credential";
 import {
   releaseTypeSafeEvaluation,
   reserveTypeSafeEvaluation,
   settleTypeSafeEvaluation,
   type TypeSafeUsageAuthority,
-} from "@purin-labs/agent/integrations/typesafe/evaluation-ledger";
+} from "@purin-labs/agent/typesafe/evaluation-ledger";
 import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
 import { mailInferenceEligible } from "@purin-labs/area-inbox-contract/server/mail-inference-eligibility";

@@ -5,8 +5,8 @@ import { queueAllCaseContextCollectionInvalidations } from "./relationships";
 import type { Result } from "@purin-labs/kernel/result";
 import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import { assertRequiredColumns } from "@purin-labs/actor-runtime/actors/schema-migrations";
-import { createTypeSafeUsageSchema } from "../integrations/typesafe/usage-store";
-import type { TypeSafeAuthority } from "../integrations/typesafe/authority";
+import { createTypeSafeUsageSchema } from "../typesafe/usage-store";
+import type { TypeSafeAuthority } from "../typesafe/authority";
 import {
   caseContextDiscoveryRoute,
   caseContextDiscoveryRouteAuthority,
@@ -18,7 +18,7 @@ import {
   CASE_CONTEXT_DISCOVERY_INPUT_TOKEN_RESERVATION,
   type JevEvaluation,
 } from "./jev";
-import type { JevError } from "../integrations/typesafe/system-one-client";
+import type { JevError } from "../typesafe/system-one-client";
 import {
   invalidateTypeSafeEvaluations,
   replayTypeSafeEvaluation,
@@ -29,7 +29,7 @@ import {
   type TypeSafeUsageAuthority,
   type TypeSafeUsageError,
   type TypeSafeUsageMeasurement,
-} from "../integrations/typesafe/evaluation-ledger";
+} from "../typesafe/evaluation-ledger";
 import { assertNever } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 

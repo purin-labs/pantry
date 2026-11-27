@@ -5,7 +5,7 @@ import {
 import {
   resolveTypeSafeConnectionKey as resolveTypeSafeConnection,
   mutateTypeSafeConnection,
-} from "@purin-labs/agent/integrations/typesafe/connection";
+} from "@purin-labs/agent/typesafe/connection";
 import { evaluateOperationalCaseContextDiscovery } from "@purin-labs/agent/case-context-discovery/operational-evaluation";
 import { bindEmailMessageReceiptContact } from "@purin-labs/area-inbox/server/data/email-mailbox";
 import { storeOrganisationExecutionVaultSecret } from "@purin-labs/authority/credential-vault/service";

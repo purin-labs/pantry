@@ -4,7 +4,7 @@ import { sealJevUsageHours } from "@purin-labs/area-integrations/server/jev-feat
 import {
   mailSwitchMoveDue,
   moveMailSwitch,
-} from "@purin-labs/agent/integrations/typesafe/authority";
+} from "@purin-labs/agent/typesafe/authority";
 import {
   actorMachineCensus,
   type MachineCensus,
@@ -207,7 +207,7 @@ import type { OrganisationKitchenRpc } from "@purin-labs/area-kitchen/server/act
 import type { OrganisationMenuBoardRpc } from "@purin-labs/area-cafe-contract/server/menu-board-commands";
 import { readCaseEffectRecords } from "@purin-labs/area-brain/server/actors/organisation-execution-records";
 import { type AcceptedMemoryCursor } from "@purin-labs/area-brain/server/memory/store";
-import { cleanupTypeSafeCredentials } from "@purin-labs/agent/integrations/typesafe/connection";
+import { cleanupTypeSafeCredentials } from "@purin-labs/agent/typesafe/connection";
 import { assertNever, errorMessage } from "@purin-labs/std";
 import type { CommerceBoardPresenceEntry } from "@purin-labs/commerce-control-api";
 import {

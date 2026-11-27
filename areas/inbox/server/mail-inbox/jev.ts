@@ -4,16 +4,16 @@ import { isRecord, isNonNegativeInteger } from "@purin-labs/std";
 import {
   TypeSafeDisclosure,
   type TypeSafeDisclosureDenied,
-} from "@purin-labs/agent/integrations/typesafe/disclosure";
+} from "@purin-labs/agent/typesafe/disclosure";
 import type { TypeSafeInferenceSink } from "@purin-labs/authority/policy/information-flow/types";
 import type { FlowLabel } from "@purin-labs/authority/policy/information-flow/labels";
-import type { TypeSafeCredential } from "@purin-labs/agent/integrations/typesafe/credential";
+import type { TypeSafeCredential } from "@purin-labs/agent/typesafe/credential";
 import {
   jevInputCostMicrousd,
   type JevError,
-} from "@purin-labs/agent/integrations/typesafe/system-one-client";
+} from "@purin-labs/agent/typesafe/system-one-client";
 import type { Result } from "@purin-labs/kernel/result";
-import type { TypeSafeUsageMeasurement } from "@purin-labs/agent/integrations/typesafe/evaluation-ledger";
+import type { TypeSafeUsageMeasurement } from "@purin-labs/agent/typesafe/evaluation-ledger";
 
 type MailDecision = Readonly<{ ruleId: string; outcome: MailMatch }>;
 type MailEvaluation = Readonly<{

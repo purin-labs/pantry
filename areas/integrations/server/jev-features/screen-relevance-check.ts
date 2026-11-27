@@ -3,13 +3,13 @@ import type { ScreenRelevanceBand } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";
 import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
-import type { TypeSafeCredential } from "@purin-labs/agent/integrations/typesafe/credential";
+import type { TypeSafeCredential } from "@purin-labs/agent/typesafe/credential";
 import {
   reserveTypeSafeEvaluation,
   settleTypeSafeEvaluation,
   type TypeSafeUsageAuthority,
   type TypeSafeUsageLimits,
-} from "@purin-labs/agent/integrations/typesafe/evaluation-ledger";
+} from "@purin-labs/agent/typesafe/evaluation-ledger";
 import { traceLog } from "@purin-labs/kernel/observability";
 import { FlowLabel } from "@purin-labs/authority/policy/information-flow/labels";
 import type { SerializedFlowLabel } from "@purin-labs/authority/policy/information-flow/types";

@@ -2,15 +2,15 @@ import type { Result } from "@purin-labs/kernel/result";
 import {
   jevInputCostMicrousd,
   type JevError,
-} from "../integrations/typesafe/system-one-client";
+} from "../typesafe/system-one-client";
 import {
   TypeSafeDisclosure,
   type TypeSafeDisclosureDenied,
-} from "../integrations/typesafe/disclosure";
+} from "../typesafe/disclosure";
 import type { TypeSafeInferenceSink } from "@purin-labs/authority/policy/information-flow/types";
 import type { SerializedFlowLabel } from "@purin-labs/authority/policy/information-flow/types";
 import type { FlowLabel } from "@purin-labs/authority/policy/information-flow/labels";
-import type { TypeSafeCredential } from "../integrations/typesafe/credential";
+import type { TypeSafeCredential } from "../typesafe/credential";
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 export const CASE_CONTEXT_DISCOVERY_JEV_MODEL = "jev-1.13.0";

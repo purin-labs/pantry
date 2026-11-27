@@ -1,5 +1,5 @@
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { typeSafeMonth } from "../integrations/typesafe/usage-store";
+import { typeSafeMonth } from "@purin-labs/agent/typesafe/usage-store";
 
 /**
  * Plan 88 section 4: paid Jev use above the free use of the month. The owner

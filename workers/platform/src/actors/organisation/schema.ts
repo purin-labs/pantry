@@ -7,10 +7,10 @@ import { createCaseContextDiscoveryEvaluationSchema } from "@purin-labs/agent/ca
 import { createEvalSchema } from "@purin-labs/area-brain/server/evals/store";
 import { createMemorySchema } from "@purin-labs/area-brain/server/memory/store";
 import { createCaseContextCollectionEvidenceSchema } from "@purin-labs/agent/case-context-discovery/evidence";
-import { createTypeSafeConnectionSchema } from "@purin-labs/agent/integrations/typesafe/connection";
+import { createTypeSafeConnectionSchema } from "@purin-labs/agent/typesafe/connection";
 import { createJevScreenRelevanceSchema } from "@purin-labs/area-integrations/server/jev-features/screen-relevance";
 import { createJevUsageRecordSchema } from "@purin-labs/area-integrations/server/jev-features/usage-records";
-import { createJevPaidUseSchema } from "@purin-labs/agent/jev-features/paid-use";
+import { createJevPaidUseSchema } from "@purin-labs/area-integrations/server/jev-features/paid-use";
 import { createCaseContextCollectionRelationshipSchema } from "@purin-labs/agent/case-context-discovery/relationships";
 
 export function createOrganisationSchema(storage: DurableObjectStorage): void {

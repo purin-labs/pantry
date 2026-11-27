@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
-import { createTypeSafeConnectionSchema } from "@purin-labs/agent/integrations/typesafe/connection";
+import { createTypeSafeConnectionSchema } from "@purin-labs/agent/typesafe/connection";
 import {
   invalidateTypeSafeEvaluations,
   replayTypeSafeEvaluation,
@@ -8,12 +8,12 @@ import {
   settleTypeSafeEvaluation,
   type TypeSafeEvaluationKey,
   type TypeSafeUsageAuthority,
-} from "@purin-labs/agent/integrations/typesafe/evaluation-ledger";
+} from "@purin-labs/agent/typesafe/evaluation-ledger";
 import {
   createTypeSafeUsageSchema,
   readDailyTypeSafeUsage,
   type TypeSafePurpose,
-} from "@purin-labs/agent/integrations/typesafe/usage-store";
+} from "@purin-labs/agent/typesafe/usage-store";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 const NOW = 1_789_000_000_000;

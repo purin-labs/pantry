@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { postSystemOne } from "@purin-labs/agent/integrations/typesafe/system-one-client";
+import { postSystemOne } from "@purin-labs/agent/typesafe/system-one-client";
 
 describe("TypeSafe response JSON boundary", suite);
 

@@ -1,8 +1,8 @@
-import type { TypeSafeEvaluationReceipt } from "../integrations/typesafe/evaluation-ledger";
+import type { TypeSafeEvaluationReceipt } from "../typesafe/evaluation-ledger";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
-import type { TypeSafeCredential } from "../integrations/typesafe/credential";
+import type { TypeSafeCredential } from "../typesafe/credential";
 import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import type { Result } from "@purin-labs/kernel/result";
 import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";

@@ -334,7 +334,7 @@ The control routes are under `/v1/control/organisations/:id/access-control`, in
 | The action of a held step  | `agent-tools/effect-action.ts`                                                                                             |
 | Commerce reads and effects | `agent-tools/commerce/read-support.ts` (`admitCommerceReadObservation`), `commerce/provider-execution.ts`                  |
 | Mail sends                 | `authorizeEmailReplyReview`, `authorizeEmailProposalFlow`, `mail-inbox/direct-reply.ts`                                    |
-| Jev calls                  | `integrations/typesafe/disclosure.ts`                                                                                      |
+| Jev calls                  | `typesafe/disclosure.ts`                                                                                                   |
 
 `pnpm lint:ifc-boundaries` runs `scripts/check-ifc-destinations.mjs` and ESLint import
 rules. The script refuses a tool effect whose capability is in none of the four class

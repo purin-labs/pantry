@@ -17,7 +17,7 @@ import {
   currentTypeSafeAuthority,
   resolveTypeSafeCredential,
   sameTypeSafeAuthority,
-} from "@purin-labs/agent/integrations/typesafe/authority";
+} from "@purin-labs/agent/typesafe/authority";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 import type { PolicyJevPort } from "@purin-labs/agent/actors/organisation/organisation-policy";
@@ -36,7 +36,7 @@ import {
   readJevPaidSpendMinor,
   readJevPaidUse,
   writeJevPaidUse,
-} from "@purin-labs/agent/jev-features/paid-use";
+} from "./paid-use";
 import {
   readJevScreenRelevance,
   writeJevScreenRelevance,

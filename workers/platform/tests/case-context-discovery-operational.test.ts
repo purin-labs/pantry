@@ -20,7 +20,7 @@ import {
 } from "@purin-labs/agent/case-context-discovery/relationships";
 import { parseOrganisationId, parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
-import { createTypeSafeConnectionSchema } from "@purin-labs/agent/integrations/typesafe/connection";
+import { createTypeSafeConnectionSchema } from "@purin-labs/agent/typesafe/connection";
 import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";

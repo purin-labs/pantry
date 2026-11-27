@@ -1,4 +1,4 @@
-import type { TypeSafeDisclosure } from "@purin-labs/agent/integrations/typesafe/disclosure";
+import type { TypeSafeDisclosure } from "@purin-labs/agent/typesafe/disclosure";
 import type { TypeSafeInferenceSink } from "@purin-labs/authority/policy/information-flow/types";
 import { JevRelationshipRequest } from "@purin-labs/agent/case-context-discovery/jev";
 

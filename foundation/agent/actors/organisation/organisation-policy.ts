@@ -16,7 +16,7 @@ import {
 import {
   readTypeSafeConnection,
   mutateTypeSafeConnection,
-} from "../../integrations/typesafe/connection";
+} from "../../typesafe/connection";
 import {
   currentTypeSafeAuthority,
   moveMailSwitch,
@@ -24,7 +24,7 @@ import {
   resolveTypeSafeCredential,
   sameTypeSafeAuthority,
   type TypeSafeAuthority,
-} from "../../integrations/typesafe/authority";
+} from "../../typesafe/authority";
 import { evaluateOperationalCaseContextDiscovery } from "../../case-context-discovery/operational-evaluation";
 import {
   caseContextDiscoveryReadiness,

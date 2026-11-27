@@ -1,12 +1,12 @@
 import type { Result } from "@purin-labs/kernel/result";
-import type { TypeSafeCredential } from "../integrations/typesafe/credential";
-import type { TypeSafeUsageLimits } from "../integrations/typesafe/evaluation-ledger";
-import { parseTypeSafeUsageLimits } from "../integrations/typesafe/evaluation-ledger";
+import type { TypeSafeCredential } from "../typesafe/credential";
+import type { TypeSafeUsageLimits } from "../typesafe/evaluation-ledger";
+import { parseTypeSafeUsageLimits } from "../typesafe/evaluation-ledger";
 import { isRecord } from "@purin-labs/std";
 import {
   sameTypeSafeAuthority,
   type TypeSafeAuthority,
-} from "../integrations/typesafe/authority";
+} from "../typesafe/authority";
 
 type CaseContextCollectionSource = "commerce" | "gmail" | "whatsapp";
 

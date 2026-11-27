@@ -54,8 +54,8 @@ import {
   serializeMemory,
   type AcceptedMemoryCursor,
 } from "@purin-labs/area-brain/server/memory/store";
-import { cleanupTypeSafeCredentials } from "@purin-labs/agent/integrations/typesafe/connection";
-import { resolveTypeSafeCredential } from "@purin-labs/agent/integrations/typesafe/authority";
+import { cleanupTypeSafeCredentials } from "@purin-labs/agent/typesafe/connection";
+import { resolveTypeSafeCredential } from "@purin-labs/agent/typesafe/authority";
 import {
   identifier,
   integerIn,
@@ -65,7 +65,7 @@ import { PlacedActor } from "@purin-labs/actor-runtime/actors/lifecycle/placed-a
 import { rearmActorAlarm } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import { organisationAlarmReconcilers } from "@purin-labs/agent/actors/organisation-alarm";
 import { jevUsageDueAt } from "@purin-labs/area-integrations/server/jev-features/usage-records";
-import { nextMailSwitchMoveAt } from "@purin-labs/agent/integrations/typesafe/authority";
+import { nextMailSwitchMoveAt } from "@purin-labs/agent/typesafe/authority";
 import { schemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import {
   executeOrganisationCommand,

@@ -13,7 +13,7 @@ Chef reads the settings and proposes a switch change on a card that an admin app
 
 ### Who pays: the TypeSafe authority
 
-- `currentTypeSafeAuthority` (`integrations/typesafe/authority.ts`) gives each new call
+- `currentTypeSafeAuthority` (`typesafe/authority.ts`) gives each new call
   its authority. If the Organisation connected its own key, the authority is
   `organisation_byo` with the connection revision. Otherwise it is `pantry_platform`.
 - `resolveTypeSafeCredential` reads the Purin key from the Worker secret, or the
@@ -25,7 +25,7 @@ Chef reads the settings and proposes a switch change on a card that an admin app
   authority. Each mailbox that was on stays on, and the related Cases policy gets the
   new route. The switches stay on.
 - The move of the mailboxes is a D1 write (`moveMailSwitch` in
-  `integrations/typesafe/authority.ts`). If it fails, the Organisation Actor keeps
+  `typesafe/authority.ts`). If it fails, the Organisation Actor keeps
   the authority that the mailboxes are still pinned to in `jev_mail_repin`, and its
   alarm tries the move again: after a minute, then a wait that doubles to an hour, at
   most 24 times. Until then the mailboxes read as not on. A later change of the key
@@ -189,9 +189,9 @@ The tools are in `areas/integrations/server/agent-tools/jev/`, the family `jev`.
 
 - Organisation Actor SQLite:
   - `typesafe_connection` and `typesafe_credential_cleanup`
-    (`integrations/typesafe/connection.ts`): the pointer to the Organisation's Vault key
+    (`typesafe/connection.ts`): the pointer to the Organisation's Vault key
     and its revision.
-  - `typesafe_evaluation` (`integrations/typesafe/usage-store.ts`): one row for each Jev
+  - `typesafe_evaluation` (`typesafe/usage-store.ts`): one row for each Jev
     call. It holds `purpose`, `funding`, `connection_revision`, the reservation, and the
     measured tokens and cost. Its `state` is `reserved`, `evaluated`, `failed` or
     `stale`. Its `settlement_state` is `pending` or `settled`.
@@ -204,11 +204,11 @@ The tools are in `areas/integrations/server/agent-tools/jev/`, the family `jev`.
   `mail_classification_eligibility`, with `funding` and `connection_revision`. The Purin
   key pins revision 0. The model is `jev-1.13.0`, the recipient `typesafe`, and the
   review ends 10 years after the switch (`SWITCH_REVIEW_MS`).
-- The ledger (`integrations/typesafe/evaluation-ledger.ts`): `reserveTypeSafeEvaluation`
+- The ledger (`typesafe/evaluation-ledger.ts`): `reserveTypeSafeEvaluation`
   and `settleTypeSafeEvaluation`, `JEV_MONTHLY_ALLOWANCE_MICROUSD` (1,000,000) and
   `JEV_REQUESTS_PER_SECOND` (5). Errors: `revision_conflict`, `command_conflict`,
   `inactive`, `budget_exhausted`, `allowance_reached`, `rate_limited`, `store_invalid`.
-- The transport (`integrations/typesafe/system-one-client.ts`) posts to
+- The transport (`typesafe/system-one-client.ts`) posts to
   `https://api.typesafe.ai/v1/systemone`. A request is at most 24,576 bytes and a response
   32,768 bytes. HTTP 401 and 403 give `jev_credential_rejected`, 402 gives
   `jev_budget_exhausted`, and other errors give `jev_unavailable`.
@@ -252,14 +252,14 @@ parser refuses, gives 422. Another refusal gives 409, and a failure of the Actor
 | Connect or remove the Organisation's own key | No                  | Yes   | Yes                              | No                                     |
 | Change paid use or the spending limit        | No                  | No    | Yes, but paid use cannot turn on | No                                     |
 
-| Limit                     | Value                                  | Constant                                 |
-| ------------------------- | -------------------------------------- | ---------------------------------------- |
-| Free use on the Purin key | $1.00 each UTC month                   | `JEV_MONTHLY_ALLOWANCE_MICROUSD`         |
-| Fair share                | 5 calls a second for each Organisation | `JEV_REQUESTS_PER_SECOND`                |
-| Seal of an hour           | 5 minutes after the hour ends          | `SEAL_GRACE_MS`                          |
-| Default spending limit    | 500 cents                              | `JEV_DEFAULT_SPENDING_LIMIT_MINOR`       |
-| Paid use                  | Closed                                 | `JEV_PAID_USE_OPEN`                      |
-| Own-key probe             | 1 each 30 s                            | In `integrations/typesafe/connection.ts` |
+| Limit                     | Value                                  | Constant                           |
+| ------------------------- | -------------------------------------- | ---------------------------------- |
+| Free use on the Purin key | $1.00 each UTC month                   | `JEV_MONTHLY_ALLOWANCE_MICROUSD`   |
+| Fair share                | 5 calls a second for each Organisation | `JEV_REQUESTS_PER_SECOND`          |
+| Seal of an hour           | 5 minutes after the hour ends          | `SEAL_GRACE_MS`                    |
+| Default spending limit    | 500 cents                              | `JEV_DEFAULT_SPENDING_LIMIT_MINOR` |
+| Paid use                  | Closed                                 | `JEV_PAID_USE_OPEN`                |
+| Own-key probe             | 1 each 30 s                            | In `typesafe/connection.ts`        |
 
 - **Information flow.** Each feature request passes `TypeSafeDisclosure` with its
   purpose and a source authority: `control` for mail classification and screen

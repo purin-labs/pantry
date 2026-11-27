@@ -16,7 +16,7 @@ import {
 import {
   resolveTypeSafeCredential,
   sameTypeSafeAuthority,
-} from "@purin-labs/agent/integrations/typesafe/authority";
+} from "@purin-labs/agent/typesafe/authority";
 import {
   decideCaseContextCollectionRelationship,
   listCaseContextCollectionIdsForCase,
