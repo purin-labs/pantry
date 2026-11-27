@@ -366,7 +366,7 @@ and has the effect `proposal`. `supplier_create` needs `commerce.supplier.create
 
 **Retention.** No timer deletes a record of this spec. An `expired` or `rejected` ledger
 entry, an `expired` draft or brief and each revision stay. The Organisation purge
-erases the D1 rows (`data/purge-catalogue.ts`, action `erase`).
+erases the D1 rows (`areas/commerce/server/data/purge-entries.ts`, action `erase`).
 
 - **No authority from an agent.** An agent proposes. It never approves, rejects or
   runs a change. An approval needs the session or the verified Slack link of a person.

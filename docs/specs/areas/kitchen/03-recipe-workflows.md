@@ -305,7 +305,7 @@ Both capabilities are in `authorization/capability-catalogue.ts` and need
   have no time limit.
 - **Retention.** The Organisation purge erases `bakery_workflow`,
   `bakery_workflow_revision` and the R2 objects under `bakery-workflows/<org>/`
-  (`data/purge-catalogue.ts`). The draft lives in the
+  (`areas/kitchen/server/data/purge-entries.ts`). The draft lives in the
   Organisation Actor.
 - **Information flow.** An agent read enters the turn under the `recipe_workflow`
   source label, which every member reads (`policy/information-flow/source-labels.ts`).

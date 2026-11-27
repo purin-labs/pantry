@@ -377,7 +377,7 @@ reader and the raw Memory, Eval and execution stores (`eslint.config.mjs`).
   closed at the boundary that reads it.
 - A new read can return a buyer's name, an order note, a customer note or a message of
   a person with no membership. It calls `outsideWrittenFlowLabel` in the same change.
-- The purge of an Organisation erases both D1 tables (`data/purge-catalogue.ts`).
+- The purge of an Organisation erases both D1 tables (`foundation/authority/data/purge-entries.ts`).
 
 **Out of scope:** labels for a field or a value; integrity labels other than the one
 writer; a release of a policy by an approval or by a model; labels that a model infers

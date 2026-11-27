@@ -362,7 +362,7 @@ A refused role on an Organisation route gets 404. A root rotation needs the
   installation. Then the purge erases `vault_secret`, `vault_item`, `vault_store`,
   `vault_item_event`, `credential_ref` and `external_vault_import`. It keeps
   `credential_access_denial` and `credential_revocation_operation`
-  (`data/purge-catalogue.ts`).
+  (`foundation/authority/data/purge-entries.ts`).
 - **No plaintext outside one operation.** A view, a receipt, a trace and an error carry
   ids, counts and reason codes. The inventory carries no nonce and no ciphertext. A
   D1 copy alone cannot decrypt a secret, because the roots are not in D1.

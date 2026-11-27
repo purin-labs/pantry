@@ -273,7 +273,7 @@ so a rename keeps the colours and two organisations almost never look alike.
   stays. It closes the commerce
   merchant and moves shared Slack credentials to an Organisation that still uses the
   workspace. Then one batch moves to `purged` and runs `PURGE_CATALOGUE`
-  (`data/purge-catalogue.ts`). Last, the run publishes the directory row and deletes the
+  (the `purge-entries.ts` file of each table owner). Last, the run publishes the directory row and deletes the
   Slack DM selections and thread pins of the Organisation in the global database. The
   handle, the Google accounts and the Slack workspaces are then free for a new
   Organisation.

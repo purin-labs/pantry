@@ -172,9 +172,10 @@ Other lints guard one subsystem. The spec of that subsystem describes these:
 - `lint:state-writers` refuses an SQL write of a machine's state column outside the
   owner module of that machine. `scripts/state-writers-ratchet.json` lists the known
   writers, and their counts may only fall.
-- `lint:purge-catalogue` refuses a regional table with no entry in
-  `foundation/tenancy/data/purge-catalogue.ts`, and a purge order that deletes a row
-  before a row that refers to it.
+- `lint:purge-catalogue` refuses a regional table with no purge entry, and a purge
+  order that deletes a row before a row that refers to it. Each table owner gives its
+  entries in a `purge-entries.ts` file, and the Worker joins them
+  (`workers/platform/src/purge-catalogue.ts`).
 - `lint:kitchen-dom` refuses a browser-only global in the source of `bakery-model`,
   `bakery-workflow` and `production-simulation`.
 - `lint:provider-workflows` runs ESLint on one folder. "Code style" gives its rules.

@@ -371,7 +371,7 @@ selection and no capability.
 - **Retention.** Saved runs, staged runs, artifacts and the four D1 tables have no time
   limit. The Organisation purge erases the four D1 tables and the R2 objects under
   `bakery-runs/`, `bakery-run-prepared/` and `bakery-run-artifacts/`
-  (`data/purge-catalogue.ts`).
+  (`areas/kitchen/server/data/purge-entries.ts`).
   An unsaved draft stays in page memory only.
 - **Information flow.** A saved-run read and a canvas read enter the turn under the
   `saved_bakery_run` label, which all four roles read. A canvas move passes the exit

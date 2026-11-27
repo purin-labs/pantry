@@ -413,7 +413,7 @@ prompts), `features/integrations/workspace.tsx` (members and invitations),
   the labels, the exit check, the `approval_required` check and the held outputs.
 - **End of an Organisation.** The purge erases the roles, the invitations, the grants,
   the policy rows, the snapshots and the permission requests
-  (`data/purge-catalogue.ts`).
+  (`foundation/authority/data/purge-entries.ts`).
 - **Out of scope:** passwords and other sign-in providers; an email for an invitation;
   roles for one location; prepaid credit.
 

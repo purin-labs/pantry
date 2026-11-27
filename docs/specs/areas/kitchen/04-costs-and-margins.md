@@ -351,7 +351,7 @@ saved rows.
   or an agent edits it. A settlement with no draft row and no open socket writes
   nothing. The draft compacts only when the room opens with no other socket.
 - **Retention.** The draft cells stay until a save or a reset. The Organisation purge
-  erases the three D1 tables (`foundation/tenancy/data/purge-catalogue.ts`).
+  erases the three D1 tables (`areas/kitchen/server/data/purge-entries.ts`).
 - **Information flow.** `costs_read` admits each Commerce read as a read observation of
   the turn. The save tools are staff page effects with a `tool_effect` sink, and
   `costs_sheet_edit` is a shared draft for every member. If the label of the turn does
