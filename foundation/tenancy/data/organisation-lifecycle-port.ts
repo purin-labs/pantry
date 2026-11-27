@@ -215,7 +215,7 @@ export type PurgeRewrite = (
 ) => readonly D1PreparedStatement[];
 
 /** The parts of the purge batch. */
-export type OrganisationPurgeParts = Readonly<{
+type OrganisationPurgeParts = Readonly<{
   /**
    * The purge entries of each table owner, in the order of the batch
    * (`joinPurgeCatalogue`).

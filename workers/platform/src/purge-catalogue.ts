@@ -26,7 +26,7 @@ import {
 } from "@purin-labs/tenancy/data/purge-catalogue";
 
 /** The entries of the tables of the Worker. */
-export const WORKER_PURGE_ENTRIES = [
+const WORKER_PURGE_ENTRIES = [
   {
     order: 900,
     table: "thread_binding",
