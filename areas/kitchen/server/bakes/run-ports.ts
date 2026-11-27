@@ -2,43 +2,59 @@ import {
   createCommerceClient,
   createCommerceEntityPlaneClient,
 } from "@purin-labs/area-commerce-contract/server/client";
-import { readWorkflowDocument } from "@purin-labs/area-kitchen/server/bakery/workflow-revisions";
 import { commerceProviderResourceId } from "@purin-labs/area-commerce-contract/server/resource-ids";
 import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce-contract/server/queue-messages";
+import { deviceCommands } from "@purin-labs/area-devices-contract/server/device-commands";
+import { deviceFleetStub } from "@purin-labs/area-devices-contract/server/fleet-stub";
 import { executeStockOperation } from "@purin-labs/area-kitchen-contract/server/stock-action-execution";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
-import { runDeviceCommand } from "@purin-labs/area-devices/server/commands";
-import { listDevices, listGateways } from "@purin-labs/area-devices/server/store";
-import { readKitchenDeviceViews } from "@purin-labs/area-devices/server/views";
-import { changeDeviceWork, reserveDeviceWork } from "@purin-labs/area-devices/server/work";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
-import type { BakeKitchenPorts } from "@purin-labs/area-kitchen/server/bakes/commands";
-import type { BakeProposal } from "@purin-labs/area-kitchen/server/bakes/records";
-import type { BakeRunDevicePorts, BakeRunNotices } from "@purin-labs/area-kitchen/server/bakes/run";
-import type { BakeRunLaunchPorts } from "@purin-labs/area-kitchen/server/bakes/run-start";
-import type { BakeRunDevice } from "@purin-labs/area-kitchen/server/bakes/run-store";
+import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import {
-  announceBakeRun,
-  tellBakeRunOverBake,
-} from "@purin-labs/surface-slack/server/bake-run-announce";
-import type { BakeRunActor } from "./bake-run";
-import { deviceFleetStub } from "@purin-labs/area-devices-contract/server/fleet-stub";
+import { readWorkflowDocument } from "../bakery/workflow-revisions";
+import type { BakeKitchenPorts, BakeRunAction } from "./commands";
+import { bakeParts } from "./parts";
+import type { BakeProposal } from "./records";
+import type {
+  BakeRunDevicePorts,
+  BakeRunError,
+  BakeRunNotices,
+  BakeRunRunRecord,
+  BakeRunStart,
+  RunActor,
+} from "./run";
+import type { BakeRunLaunchPorts } from "./run-start";
+import type { BakeRunDevice } from "./run-store";
 
 /**
- * The Worker's side of a bake run (Plan 24 S4). Kitchen owns the run and
- * imports no file of the devices area or of Commerce; this file gives it the
- * ports: the Plan 85 readiness, reserve, pause and settle, the device fleet
- * Actor's dispatch ledger, the recipe's oven program, the run's Durable
- * Object and the commerce authority that raises the counter stock.
+ * The ports of a bake run (Plan 24 S4). Kitchen owns the run; the devices
+ * area, Commerce and Slack give their parts through `bakeParts` and the
+ * Devices contract: the Plan 85 readiness, reserve, pause and settle, the
+ * device fleet Actor's dispatch ledger, the commerce authority that raises
+ * the counter stock and the run's card. This file adds the recipe's oven
+ * program and the run's Durable Object.
  */
+
+/**
+ * The RPC methods of the class BakeRunActor (the Worker) that Kitchen calls
+ * through the stub. The class gives the comment of each method.
+ */
+export interface BakeRunRpc extends Rpc.DurableObjectBranded {
+  start(
+    input: Readonly<{ organisationId: string; start: BakeRunStart }>,
+  ): Promise<Result<null, BakeRunError>>;
+  control(
+    input: Readonly<{ action: BakeRunAction; actor: RunActor }>,
+  ): Promise<Result<null, BakeRunError>>;
+  read(): Promise<BakeRunRunRecord | null>;
+}
 
 export function bakeRunStub(
   env: Env,
   scope: OrganisationExecutionScope,
   runId: string,
-): DurableObjectStub<BakeRunActor> | null {
+): DurableObjectStub<BakeRunRpc> | null {
   const namespace = env.BAKE_RUN;
   if (namespace === undefined) return null;
   const { placement } = scope;
@@ -66,24 +82,28 @@ export function bakeRunDevicePorts(
   env: Env,
   scope: OrganisationExecutionScope,
 ): BakeRunDevicePorts {
+  const devices = bakeParts.use().devices;
   const command = (
     device: BakeRunDevice,
     kind: "pause" | "resume" | "settle",
     actor: Readonly<{ kind: "person" | "agent"; id: string }>,
   ) =>
-    runDeviceCommand({
-      env,
-      scope,
-      subjectId: device.deviceId,
-      command: { kind },
-      actor,
-      idempotencyKey: null,
-      now: Date.now(),
-    }).then((result) => result.ok);
+    deviceCommands
+      .use()
+      .runDeviceCommand({
+        env,
+        scope,
+        subjectId: device.deviceId,
+        command: { kind },
+        actor,
+        idempotencyKey: null,
+        now: Date.now(),
+      })
+      .then((result) => result.ok);
   return {
     reserve: async (device, input) =>
       (
-        await reserveDeviceWork(env, scope, {
+        await devices.reserveDeviceWork(env, scope, {
           deviceId: device.deviceId,
           ...input,
           now: Date.now(),
@@ -121,7 +141,7 @@ export function bakeRunDevicePorts(
         sourceKey: device.sourceKey,
       }),
     release: async (device, taskRef) => {
-      await changeDeviceWork(env, scope, {
+      await devices.changeDeviceWork(env, scope, {
         deviceId: device.deviceId,
         taskRef,
         to: "idle",
@@ -136,11 +156,12 @@ export function bakeRunNotices(
   env: Env,
   scope: OrganisationExecutionScope,
 ): BakeRunNotices {
+  const notices = bakeParts.use().notices;
   return {
     card: (record, revision) =>
-      announceBakeRun(env, scope, record, revision, Date.now()),
+      notices.announceRun(env, scope, record, revision, Date.now()),
     overBake: (record, risk) =>
-      tellBakeRunOverBake(env, scope, record, risk, Date.now()),
+      notices.tellOverBake(env, scope, record, risk, Date.now()),
   };
 }
 
@@ -178,10 +199,14 @@ function bakeRunLaunchPorts(
     kitchenDevices: async (location) => {
       const now = Date.now();
       const db = scope.database;
+      const devices = bakeParts.use().devices;
       const [gateways, records, views] = await Promise.all([
-        listGateways(db, scope.organisationId),
-        listDevices(db, scope.organisationId),
-        readKitchenDeviceViews(env, scope, { mayReadFaultText: false, now }),
+        devices.listGateways(db, scope.organisationId),
+        devices.listDevices(db, scope.organisationId),
+        devices.readKitchenDeviceViews(env, scope, {
+          mayReadFaultText: false,
+          now,
+        }),
       ]);
       const located = new Map(
         gateways

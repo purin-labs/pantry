@@ -281,7 +281,7 @@ import {
   readBakeRunOf,
   counterStockChanges,
   readBakeBoard,
-} from "./organisation/bake-kitchen";
+} from "@purin-labs/area-kitchen/server/bakes/organisation-part";
 import {
   readApprovedBakeProposal,
   runBakeCommand,
@@ -289,7 +289,7 @@ import {
 } from "@purin-labs/area-kitchen/server/bakes/commands";
 import { setBakeStockLevel } from "@purin-labs/area-kitchen/server/bakes/levels";
 import type { BakeStockLevelInput } from "@purin-labs/kitchen-control-api";
-import type { InventoryStockChange } from "@purin-labs/area-commerce/server/actors/commerce-projection/stock-changes";
+import type { InventoryStockChange } from "@purin-labs/area-commerce-contract/server/commerce-projection";
 /** The RPC methods of the Shopify part of the Organisation. */
 type ShopifyRpc = ReturnType<(typeof SHOPIFY_ORGANISATION_PART)["open"]>;
 

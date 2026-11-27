@@ -133,6 +133,27 @@ import {
 } from "@purin-labs/area-kitchen/server/bakery/workflow-proposals";
 import { deviceCommands } from "@purin-labs/area-devices-contract/server/device-commands";
 import { runDeviceCommand } from "@purin-labs/area-devices/server/commands";
+import { bakeParts } from "@purin-labs/area-kitchen/server/bakes/parts";
+import {
+  findActiveDeviceWithCapability,
+  listDevices,
+  listGateways,
+} from "@purin-labs/area-devices/server/store";
+import { readKitchenDeviceViews } from "@purin-labs/area-devices/server/views";
+import {
+  changeDeviceWork,
+  reserveDeviceWork,
+} from "@purin-labs/area-devices/server/work";
+import {
+  listCountedProducts,
+  pieceCount,
+  readInventoryItemStock,
+} from "@purin-labs/area-commerce/server/actors/commerce-projection/stock-changes";
+import { announceBakeProposal } from "@purin-labs/surface-slack/server/bake-proposal-announce";
+import {
+  announceBakeRun,
+  tellBakeRunOverBake,
+} from "@purin-labs/surface-slack/server/bake-run-announce";
 import { connectionFlowParts } from "@purin-labs/connections/data/connection-flow-parts";
 import { prepareCredentialRefReplacement } from "@purin-labs/authority/credential-vault/service";
 import { prepareCommunicationDestinationAccount } from "@purin-labs/area-organisation/server/data/onboarding";
@@ -368,6 +389,30 @@ workflowChanges.register({
 
 deviceCommands.register({
   runDeviceCommand: (...input) => runDeviceCommand(...input),
+});
+
+// A bake (Plan 24) reads the Devices records, the counter stock of the
+// commerce projection, and posts its Slack cards.
+bakeParts.register({
+  devices: {
+    listGateways: (...input) => listGateways(...input),
+    listDevices: (...input) => listDevices(...input),
+    readKitchenDeviceViews: (...input) => readKitchenDeviceViews(...input),
+    findActiveDeviceWithCapability: (...input) =>
+      findActiveDeviceWithCapability(...input),
+    reserveDeviceWork: (...input) => reserveDeviceWork(...input),
+    changeDeviceWork: (...input) => changeDeviceWork(...input),
+  },
+  counterStock: {
+    readInventoryItemStock: (...input) => readInventoryItemStock(...input),
+    listCountedProducts: (...input) => listCountedProducts(...input),
+    pieceCount: (quantity) => pieceCount(quantity),
+  },
+  notices: {
+    announceProposal: (...input) => announceBakeProposal(...input),
+    announceRun: (...input) => announceBakeRun(...input),
+    tellOverBake: (...input) => tellBakeRunOverBake(...input),
+  },
 });
 
 commerceApprovalCardTexts.register({

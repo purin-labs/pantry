@@ -29,7 +29,11 @@ import {
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 import { requireActiveOrganisationActorAtScope } from "@purin-labs/actor-runtime/actors/actor-router";
-import { bakeRunDevicePorts, bakeRunNotices } from "./bake-run-ports";
+import {
+  bakeRunDevicePorts,
+  bakeRunNotices,
+  type BakeRunRpc,
+} from "@purin-labs/area-kitchen/server/bakes/run-ports";
 
 /**
  * The Durable Object of one approved bake run (Plan 24 S4). A physical run
@@ -42,7 +46,7 @@ import { bakeRunDevicePorts, bakeRunNotices } from "./bake-run-ports";
  * ends with the run. An Organisation with no active run has no alarm here and
  * pays nothing: 0 rows, 0 alarms and 0 requests for 30 idle days.
  */
-export class BakeRunActor extends DurableObject<Env> {
+export class BakeRunActor extends DurableObject<Env> implements BakeRunRpc {
   #queue: Promise<unknown> = Promise.resolve();
 
   constructor(ctx: DurableObjectState, env: Env) {

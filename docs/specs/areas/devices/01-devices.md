@@ -231,7 +231,8 @@ at least one time a day for this work. A heartbeat writes only the 5-minute D1 s
   (`revokeOrganisationDevicesStatements` in `devices/store.ts`). `devices/purge.ts`
   erases each fleet Actor and deletes each snapshot image.
 - **Plan 24** owns cobot dispatch and receipts. It meets Devices in
-  `workers/platform/src/actors/bake-run-ports.ts`: the reserve, the Work fact, the
+  `areas/kitchen/server/bakes/run-ports.ts`, through the `bakeParts` port that the
+  Worker registers: the reserve, the Work fact, the
   pause, resume and settle commands for a run's cobots, and the dispatch ledger
   (`device-fleet-cobot.ts`). The Actor forwards reports, clocks, faults, lost sockets and
   revokes to the run. For an unknown result, it sends `cobot_inquire`, not the task.

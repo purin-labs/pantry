@@ -1161,6 +1161,9 @@ importers:
       '@purin-labs/area-commerce-contract':
         specifier: workspace:*
         version: link:../commerce/contract
+      '@purin-labs/area-devices-contract':
+        specifier: workspace:*
+        version: link:../devices/contract
       '@purin-labs/area-inbox-contract':
         specifier: workspace:*
         version: link:../inbox/contract
@@ -1191,6 +1194,9 @@ importers:
       '@purin-labs/commerce-control-api':
         specifier: workspace:*
         version: link:../../packages/commerce-control-api
+      '@purin-labs/connections':
+        specifier: workspace:*
+        version: link:../../foundation/connections
       '@purin-labs/contract-schema':
         specifier: workspace:*
         version: link:../../packages/contract-schema

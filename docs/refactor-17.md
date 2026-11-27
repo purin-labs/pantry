@@ -438,6 +438,18 @@ The layer debts, one line for each step that lowers a count:
   `organisation/bake-kitchen.ts` and the WhatsApp routes (`control/routes/whatsapp.ts`,
   171 lines), which can move to the Inbox now.
 
+- 2026-11-27, `worker-logic`: 3 files to 0, and `area-package`: 3 to 0. Both kinds
+  are closed. The WhatsApp control routes are an Inbox family
+  (`areas/inbox/server/control/routes/whatsapp.ts`) in the same place of the route
+  table. The bake code of the Worker is Kitchen's (`bakes/run-ports.ts`,
+  `bakes/organisation-part.ts`): Kitchen reads the Devices records, the counter stock
+  of the commerce projection and the Slack cards through the new port `bakeParts`,
+  and sends a device command through `deviceCommands` of the Devices contract. The
+  Worker keeps the classes `BakeRunActor` and `OrganisationDO`, with their RPC
+  methods; `BakeRunRpc` of Kitchen types the stub. The Organisation draft parses a
+  recipe change through `workflowChanges` of the Kitchen contract, and the Café board
+  names `PageBrowserContext` of the contracts.
+
 The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
 the state of Stage A. Its branches are gone; the work is on `dev`.

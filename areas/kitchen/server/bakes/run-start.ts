@@ -56,7 +56,8 @@ export type BakeRunLaunchPorts = Readonly<{
 export type BakeRunStartError = Readonly<{ code: string; message: string }>;
 
 const MOVE_CAPABILITY = "move_mould_group";
-const BAKE_CAPABILITY = "bake";
+/** The oven capability that a gateway reports for a bake device. */
+export const BAKE_CAPABILITY = "bake";
 /** The oven of the simulation phase has four shelves. */
 const OVEN_SHELVES = 4;
 /**

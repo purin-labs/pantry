@@ -1,60 +1,43 @@
+import type { InventoryStockChange } from "@purin-labs/area-commerce-contract/server/commerce-projection";
+import type { Env } from "@purin-labs/kernel/env";
 import type {
   BakeBoardRecords,
   BakeRunRecord,
 } from "@purin-labs/kitchen-control-api";
+import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   listAppliedWorkflows,
   readAppliedWorkflowHead,
-} from "@purin-labs/area-kitchen/server/bakery/workflow-revisions";
-import {
-  findActiveDeviceWithCapability,
-  listGateways,
-} from "@purin-labs/area-devices/server/store";
-import type { Env } from "@purin-labs/kernel/env";
-import type {
-  BakeKitchenPorts,
-  CounterStockChange,
-} from "@purin-labs/area-kitchen/server/bakes/commands";
-import { listBakeAuthority } from "@purin-labs/area-kitchen/server/bakes/authority";
-import type { BakeProposal } from "@purin-labs/area-kitchen/server/bakes/records";
+} from "../bakery/workflow-revisions";
+import { listBakeAuthority } from "./authority";
+import type { BakeKitchenPorts, CounterStockChange } from "./commands";
+import { bakeParts } from "./parts";
 import {
   listBakeProposals,
   listBakeStockLevels,
   readBakeProposal,
-} from "@purin-labs/area-kitchen/server/bakes/records";
-import {
-  bakeRunIdOf,
-  listBakeRuns,
-  readBakeRun,
-} from "@purin-labs/area-kitchen/server/bakes/run-records";
-import { bakeRunKitchenPorts, bakeRunStub } from "../bake-run-ports";
-import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { announceBakeProposal } from "@purin-labs/surface-slack/server/bake-proposal-announce";
-import {
-  listCountedProducts,
-  pieceCount,
-  readInventoryItemStock,
-  type InventoryStockChange,
-} from "@purin-labs/area-commerce/server/actors/commerce-projection/stock-changes";
+  type BakeProposal,
+} from "./records";
+import { bakeRunIdOf, listBakeRuns, readBakeRun } from "./run-records";
+import { bakeRunKitchenPorts, bakeRunStub } from "./run-ports";
+import { BAKE_CAPABILITY } from "./run-start";
 
 /**
  * The Organisation Actor's side of the bake proposals (Plan 24 S1). Kitchen
- * owns the proposals; this file gives Kitchen the ports that it cannot import:
- * the oven from the Devices records, the counter stock from the commerce
+ * owns the proposals; the owners give their parts through `bakeParts`: the
+ * oven from the Devices records, the counter stock from the commerce
  * projection in the Actor's storage, and the Case with its Slack card.
  */
-
-/** The oven capability that a gateway reports for a bake device. */
-const BAKE_CAPABILITY = "bake";
 
 export function bakeKitchenPorts(
   env: Env,
   scope: OrganisationExecutionScope,
   sql: SqlStorage,
 ): BakeKitchenPorts {
+  const parts = bakeParts.use();
   return {
     findOven: async (kitchenLocation) => {
-      const device = await findActiveDeviceWithCapability(
+      const device = await parts.devices.findActiveDeviceWithCapability(
         scope.database,
         scope.organisationId,
         { capabilityId: BAKE_CAPABILITY, locationId: kitchenLocation },
@@ -64,19 +47,19 @@ export function bakeKitchenPorts(
         : { deviceId: device.deviceId, name: device.name };
     },
     counterStock: (inventoryItemId) => {
-      for (const position of readInventoryItemStock(
+      for (const position of parts.counterStock.readInventoryItemStock(
         sql,
         scope.organisationId,
         inventoryItemId,
       )) {
-        const pieces = pieceCount(position.available);
+        const pieces = parts.counterStock.pieceCount(position.available);
         if (pieces !== null)
           return Promise.resolve({ locationId: position.locationId, pieces });
       }
       return Promise.resolve(null);
     },
     announce: (proposal) =>
-      announceBakeProposal(env, scope, proposal, Date.now()),
+      parts.notices.announceProposal(env, scope, proposal, Date.now()),
     ...bakeRunKitchenPorts(env, scope),
   };
 }
@@ -152,6 +135,7 @@ function approvalOf(
 export function counterStockChanges(
   changes: readonly InventoryStockChange[],
 ): readonly CounterStockChange[] {
+  const { pieceCount } = bakeParts.use().counterStock;
   const counted: CounterStockChange[] = [];
   for (const change of changes) {
     const afterPieces = pieceCount(change.after);
@@ -173,14 +157,15 @@ export async function readBakeBoard(
 ): Promise<BakeBoardRecords> {
   const db = scope.database;
   const organisationId = scope.organisationId;
+  const parts = bakeParts.use();
   const [levels, proposals, workflows, gateways, runs] = await Promise.all([
     listBakeStockLevels(db, organisationId),
     listBakeProposals(db, organisationId),
     listAppliedWorkflows(db, organisationId),
-    listGateways(db, organisationId),
+    parts.devices.listGateways(db, organisationId),
     listBakeRuns(db, organisationId),
   ]);
-  const products = listCountedProducts(sql, organisationId);
+  const products = parts.counterStock.listCountedProducts(sql, organisationId);
   const kitchenLocations = [
     ...new Set(
       gateways
