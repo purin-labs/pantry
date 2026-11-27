@@ -6,7 +6,7 @@ import {
   createMailboxTurnMemoryReader,
   readMailboxSupplierScope,
 } from "../mail-inbox/mailbox-turn-memory";
-import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type { SqlStorage } from "@cloudflare/workers-types";
 
 import {

@@ -28,7 +28,7 @@ import {
   validateLiveAutomationAuthority,
   validateNativeRequestAuthority,
 } from "@purin-labs/authority/request-authority/index";
-import { extractMailbox, type GmailMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
+import { extractMailbox, type GmailMessageContent } from "../mail/gmail-adapter";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,

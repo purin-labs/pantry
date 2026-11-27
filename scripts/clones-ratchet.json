@@ -261,7 +261,7 @@
     "foundation/authority/policy/information-flow/source-labels.ts = foundation/authority/policy/information-flow/source-labels.ts": {"copies":1,"lines":15},
     "foundation/connections/data/integration-account.ts = foundation/connections/data/integration-account.ts": {"copies":1,"lines":12},
     "foundation/connections/data/provider-attempt.ts = foundation/connections/data/provider-attempt.ts": {"copies":5,"lines":87},
-    "foundation/connections/mail/gmail-adapter.ts = foundation/connections/mail/gmail-adapter.ts": {"copies":2,"lines":24},
+    "areas/inbox/server/mail/gmail-adapter.ts = areas/inbox/server/mail/gmail-adapter.ts": {"copies":2,"lines":24},
     "foundation/control/worker/routes/access-control-mutations.ts = foundation/control/worker/routes/access-control-mutations.ts": {"copies":2,"lines":27},
     "foundation/control/worker/routes/access-control-mutations.ts = packages/control-api/src/portal/access-models.ts": {"copies":1,"lines":28},
     "foundation/conversation/actors/case-walking-path.ts = foundation/conversation/actors/case-walking-path.ts": {"copies":1,"lines":20},

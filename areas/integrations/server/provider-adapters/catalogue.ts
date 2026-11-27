@@ -7,7 +7,6 @@ import {
   gmailConfigurationIsValidForProduct,
   gmailOnboardingAdapter,
 } from "./gmail";
-import { gmailMailAdapter } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import { notionCleanupAdapter, notionOnboardingAdapter } from "./notion";
 import { slackCleanupAdapter, slackOnboardingAdapter } from "./slack";
 import {
@@ -111,7 +110,6 @@ export const PROVIDER_ADAPTERS = {
   },
   gmail: {
     provider: "gmail",
-    mail: gmailMailAdapter,
     dataClasses: PROVIDER_DATA_CLASSES.gmail,
     capabilityIds: [
       CAPABILITY_KEYS.emailMailboxRead,

@@ -8,7 +8,7 @@ import {
   gmailSearchMessages,
   gmailSendRawMessage,
   gmailStartWatch,
-} from "@purin-labs/connections/mail/gmail-adapter";
+} from "@purin-labs/area-inbox/server/mail/gmail-adapter";
 
 describe("gmail adapter", gmailAdapterSuite);
 

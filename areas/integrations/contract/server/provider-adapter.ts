@@ -26,10 +26,6 @@ import type { ActiveCapabilityId } from "@purin-labs/authority/authorization/cap
 import type { IntegrationDiscoveryDataClass } from "@purin-labs/contracts";
 import type { GmailAuthorizationProduct } from "@purin-labs/connections/mail/gmail-authorization";
 import type { Variant } from "@purin-labs/type-utils";
-import type {
-  MailIntegrationProvider,
-  MailProviderAdapter,
-} from "@purin-labs/connections/mail/provider-adapter";
 
 type ProviderCleanupBase<P extends ActiveIntegrationProvider> = {
   readonly cleanupId: string;
@@ -208,11 +204,6 @@ type ProviderConnectionFamilyByProvider = {
   };
 };
 
-type ProviderMailFacet<P extends ActiveIntegrationProvider> =
-  P extends MailIntegrationProvider
-    ? { readonly mail: MailProviderAdapter<P> }
-    : { readonly mail?: never };
-
 type ProviderConnectionAdapter<P extends ActiveIntegrationProvider> = {
   readonly provider: P;
   readonly dataClasses: readonly IntegrationDiscoveryDataClass[];
@@ -233,8 +224,7 @@ type ProviderConnectionAdapter<P extends ActiveIntegrationProvider> = {
 };
 
 export type ProviderAdapter<P extends ActiveIntegrationProvider> = {
-  readonly [Provider in P]: ProviderConnectionAdapter<Provider> &
-    ProviderMailFacet<Provider>;
+  readonly [Provider in P]: ProviderConnectionAdapter<Provider>;
 }[P];
 
 export type ProviderAdapterByProvider = {

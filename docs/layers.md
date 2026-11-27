@@ -304,7 +304,7 @@ import each of its files. A module with no line for one of these has none.
 
 ## areas/inbox
 
-- Folders: 17
+- Folders: 18
   - `areas/inbox/server/actors/`
   - `areas/inbox/server/actors/case-inbox/`
   - `areas/inbox/server/actors/connector/`
@@ -319,6 +319,7 @@ import each of its files. A module with no line for one of these has none.
   - `areas/inbox/server/data/`
   - `areas/inbox/server/mail-inbox/`
   - `areas/inbox/server/mail-inbox/contract/`
+  - `areas/inbox/server/mail/`
   - `areas/inbox/server/whatsapp/`
   - `areas/inbox/ui/features/mail-inbox/`
   - `areas/inbox/ui/features/mail-setup/`

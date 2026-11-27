@@ -27,8 +27,9 @@ particular to this area.
 
 ## Particular to this area
 
-- The mail calls of Gmail come from the mail adapter of the connections module
-  (`GMAIL_MAILBOX`), not from the provider catalogue.
+- The mail calls of Gmail come from the Gmail adapter of this area, `server/mail/`
+  (`GMAIL_MAILBOX`). The provider catalogue of Integrations holds only the connection
+  part of Gmail: the OAuth start, the connection and the cleanup.
 - The Inbox registers its connection parts with the integrations area, and its turns are a
   module that the Worker registers with the Session.
 - Content from a person outside the Organisation carries the outside-writer label (FND-06). A

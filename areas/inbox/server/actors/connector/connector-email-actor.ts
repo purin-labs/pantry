@@ -11,7 +11,7 @@ import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import { reconcileFrozenMailReceipt } from "./relocation-mail-receipt";
 import type { RelocationMailReceiptRequest } from "@purin-labs/area-inbox-contract/server/relocation-mail-receipt";
-import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
+import { GMAIL_MAILBOX } from "../../mail/gmail-mail-adapter";
 import {
   fetchSessionConnectorMail,
   isSessionMailExecutionActive,

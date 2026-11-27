@@ -4,7 +4,7 @@ import {
   type MailConnectorContext,
 } from "../mail-inbox/execution";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
-import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
 
 import { resolveActiveProviderConnectionCredential } from "@purin-labs/authority/credential-vault/provider-connection-resolution";
@@ -28,7 +28,7 @@ import {
   type GmailHistoryMessage,
   type GmailInboxEntry,
   type GmailMessageMetadata,
-} from "@purin-labs/connections/mail/gmail-adapter";
+} from "../mail/gmail-adapter";
 import { assertNever } from "@purin-labs/std";
 import {
   gmailGrantRefused,

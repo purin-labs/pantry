@@ -1,4 +1,4 @@
-import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type {
   AuthorizedHarnessToolResult,
   HarnessToolOutput,
@@ -16,7 +16,7 @@ import type { SerializedFlowBinding } from "@purin-labs/authority/policy/informa
 import type {
   GmailAttachmentRef,
   GmailMessageContent,
-} from "@purin-labs/connections/mail/gmail-adapter";
+} from "../mail/gmail-adapter";
 import type { Result } from "@purin-labs/kernel/result";
 import { digestCanonical } from "@purin-labs/authority/policy/index";
 import { resolveConnectorGmailAccess } from "./connector-email-evaluation";

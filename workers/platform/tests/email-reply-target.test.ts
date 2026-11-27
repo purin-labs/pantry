@@ -10,7 +10,7 @@ import {
   proposalRfcMessageId,
   type GmailReplyTarget,
 } from "@purin-labs/area-inbox/server/mail-inbox/reply-target";
-import type { GmailMessageHeaders } from "@purin-labs/connections/mail/gmail-adapter";
+import type { GmailMessageHeaders } from "@purin-labs/area-inbox/server/mail/gmail-adapter";
 
 const NOW = 1_784_016_325_277;
 

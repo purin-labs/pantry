@@ -6,7 +6,7 @@ import {
 } from "../mail-inbox/execution";
 import type { SessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { gmailMailAdapter } from "@purin-labs/connections/mail/gmail-mail-adapter";
+import { gmailMailAdapter } from "../mail/gmail-mail-adapter";
 import type { SqlStorage, SqlStorageValue } from "@cloudflare/workers-types";
 
 import {
@@ -32,7 +32,7 @@ import {
   normalizeOperationalBody,
   normalizeOperationalSubject,
 } from "../mail-inbox/operational-message";
-import type { GmailApiError } from "@purin-labs/connections/mail/gmail-adapter";
+import type { GmailApiError } from "../mail/gmail-adapter";
 import { resolveGmailAccessToken } from "@purin-labs/area-integrations-contract/server/mail/gmail-oauth";
 import type { Env } from "@purin-labs/kernel/env";
 import {

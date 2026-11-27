@@ -1,10 +1,10 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { fetchConnectorMail } from "../mail-inbox/execution";
-import { extractMailbox } from "@purin-labs/connections/mail/gmail-adapter";
+import { extractMailbox } from "../mail/gmail-adapter";
 import {
   parseCaseId,
   type CaseId,

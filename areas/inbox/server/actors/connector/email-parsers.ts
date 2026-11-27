@@ -15,7 +15,7 @@ import {
   capabilityDefinitionById,
 } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { EmailIngressLimits } from "../connector-email";
-import type { GmailMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
+import type { GmailMessageContent } from "../../mail/gmail-adapter";
 import {
   parseEmailChatContext,
   parseEmailChatSources,

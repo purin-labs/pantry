@@ -17,11 +17,11 @@ import {
   deriveGmailReplyTarget,
   dispatchRfcMessageId,
 } from "../../mail-inbox/reply-target";
-import { extractMailbox } from "@purin-labs/connections/mail/gmail-adapter";
+import { extractMailbox } from "../../mail/gmail-adapter";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
-import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
+import { GMAIL_MAILBOX } from "../../mail/gmail-mail-adapter";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   controlMutationScope,

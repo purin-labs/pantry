@@ -6,7 +6,7 @@ import type {
 import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
 import { isRecord, sameJson } from "@purin-labs/std";
 import type { Env } from "@purin-labs/kernel/env";
-import type { GmailMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
+import type { GmailMessageContent } from "../mail/gmail-adapter";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   MAX_EMAIL_ORDER_READS,

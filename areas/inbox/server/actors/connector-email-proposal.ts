@@ -1,7 +1,7 @@
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { fetchConnectorMail } from "../mail-inbox/execution";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import {
   authorizeEmailProposalFlow,
   fenceEmailCaseContextCollectionEffect,
@@ -39,9 +39,9 @@ import {
   proposalRfcMessageId,
   type GmailReplyTarget,
 } from "../mail-inbox/reply-target";
-import { extractMailbox } from "@purin-labs/connections/mail/gmail-adapter";
+import { extractMailbox } from "../mail/gmail-adapter";
 import type { Env } from "@purin-labs/kernel/env";
-import type { GmailDraft } from "@purin-labs/connections/mail/gmail-adapter";
+import type { GmailDraft } from "../mail/gmail-adapter";
 import type { Result } from "@purin-labs/kernel/result";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type {

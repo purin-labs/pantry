@@ -4,7 +4,7 @@ import {
 } from "@purin-labs/area-brain-contract/server/memory/turn-memory";
 import { ensureCaseProject } from "@purin-labs/conversation/projects/case-project";
 import type { MailConnectorContext } from "./execution";
-import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type {
   MailAssistantCommand,
   MailAssistantResult,

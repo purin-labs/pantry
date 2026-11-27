@@ -1,5 +1,5 @@
-import type { GmailMessageHeaders } from "@purin-labs/connections/mail/gmail-adapter";
-import { extractMailbox } from "@purin-labs/connections/mail/gmail-adapter";
+import type { GmailMessageHeaders } from "../mail/gmail-adapter";
+import { extractMailbox } from "../mail/gmail-adapter";
 import type { Result } from "@purin-labs/kernel/result";
 import { encodeBase64, encodeBase64Url, sha256Hex } from "@purin-labs/std";
 

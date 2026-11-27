@@ -1,5 +1,5 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
+import { GMAIL_MAILBOX } from "../../mail/gmail-mail-adapter";
 import {
   authorizeMailSource,
   mailboxAwaitsReconnect,

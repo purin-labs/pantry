@@ -13,7 +13,7 @@ import {
   type IntegrationAccountId,
 } from "@purin-labs/kernel/ids";
 import { authorizeMailSource } from "@purin-labs/area-inbox-contract/server/mail-source-authorization";
-import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   authorizeOrganisationRequest,

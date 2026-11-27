@@ -119,10 +119,10 @@ vi.mock(
   }),
 );
 vi.mock(
-  "@purin-labs/connections/mail/gmail-adapter",
+  "@purin-labs/area-inbox/server/mail/gmail-adapter",
   async (importOriginal) => ({
     ...(await importOriginal<
-      typeof import("@purin-labs/connections/mail/gmail-adapter")
+      typeof import("@purin-labs/area-inbox/server/mail/gmail-adapter")
     >()),
     gmailGetMessageContent: orchestratorMocks.gmailGetMessageContent,
     gmailCreateDraft: orchestratorMocks.gmailCreateDraft,

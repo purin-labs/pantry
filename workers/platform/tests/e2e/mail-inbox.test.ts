@@ -135,7 +135,7 @@ import { buildAgentMailboxAuthority } from "@purin-labs/authority/request-author
 import { acceptMailboxModelTerms } from "../mailbox-model-consent-fixture";
 import { admitControlTurnFixture } from "../organisation-execution-fixture";
 import type { SessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
-import { gmailGetMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
+import { gmailGetMessageContent } from "@purin-labs/area-inbox/server/mail/gmail-adapter";
 import {
   emailTurnSessionId,
   processEmailThreadTurn,

@@ -1,4 +1,4 @@
-import type { GmailMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
+import type { GmailMessageContent } from "../mail/gmail-adapter";
 
 export function mailClassificationEvidence(
   content: GmailMessageContent,

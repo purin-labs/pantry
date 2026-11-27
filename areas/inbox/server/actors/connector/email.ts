@@ -25,7 +25,7 @@ import {
 import { nextOperationalEmailMaintenanceAt } from "../connector-email-operational";
 import type { EmailDisposalOutcome } from "../connector-email-proposal";
 import { connectorEvalStore } from "@purin-labs/area-brain-contract/server/evals/connector-eval-store";
-import type { GmailMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
+import type { GmailMessageContent } from "../../mail/gmail-adapter";
 import { nextMailOrganizationAt } from "../../mail-inbox/store";
 import type { AlarmReconciler } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import { digestEmailBody } from "../../mail-inbox/reply-target";

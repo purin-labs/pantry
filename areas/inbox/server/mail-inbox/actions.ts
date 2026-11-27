@@ -1,5 +1,5 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
+import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { fetchConnectorMail, type MailConnectorContext } from "./execution";
 import type { MailRule } from "@purin-labs/control-api";
@@ -19,7 +19,7 @@ import {
   projectThreadAdmissions,
   resolveConnectorGmailAccess,
 } from "../actors/connector-email-evaluation";
-import type { GmailMessageMetadata } from "@purin-labs/connections/mail/gmail-adapter";
+import type { GmailMessageMetadata } from "../mail/gmail-adapter";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import { mailClassificationEvidence } from "./evidence";

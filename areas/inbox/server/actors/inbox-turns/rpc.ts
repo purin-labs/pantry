@@ -67,7 +67,7 @@ export type TransientEvalTurnRequest = Omit<
       scenarioId: string;
       /** The label of that Eval revision. */
       inputLabel: unknown;
-      message: import("@purin-labs/connections/mail/gmail-adapter").GmailMessageContent;
+      message: import("../../mail/gmail-adapter").GmailMessageContent;
     }>;
   }>;
 
