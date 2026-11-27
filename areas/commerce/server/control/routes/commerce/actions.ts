@@ -3,6 +3,10 @@ import { ensureCaseProject } from "@purin-labs/conversation/projects/case-projec
 import { controlActionMutationExecution } from "@purin-labs/conversation/actors/action-mutation-execution";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
+import type {
+  PendingDecisionAnswer,
+  PendingDecisionProof,
+} from "@purin-labs/control/worker/decide-pending-decision";
 import type { CaseActorStub, OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type { Result } from "@purin-labs/kernel/result";
 import {
@@ -1143,7 +1147,21 @@ async function authorizeCommerceActionDecision(
   return authorized;
 }
 
-export async function handleCommerceActionApproval(
+/**
+ * Records the answer of a person to one commerce action of the ledger, for
+ * the one decide call.
+ */
+export function decideCommerceAction(
+  env: Env,
+  { request, organisationIdRaw }: PendingDecisionProof,
+  call: Readonly<{ id: string; answer: PendingDecisionAnswer }>,
+): Promise<Response> {
+  return call.answer === "allow"
+    ? handleCommerceActionApproval(request, env, organisationIdRaw, call.id)
+    : handleCommerceActionRejection(request, env, organisationIdRaw, call.id);
+}
+
+async function handleCommerceActionApproval(
   request: Request,
   env: Env,
   organisationIdRaw: string,
@@ -1328,7 +1346,7 @@ export async function handleCommerceActionApproval(
   return controlJson(responseBody);
 }
 
-export async function handleCommerceActionRejection(
+async function handleCommerceActionRejection(
   request: Request,
   env: Env,
   organisationIdRaw: string,

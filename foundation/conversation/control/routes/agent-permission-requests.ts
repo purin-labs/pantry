@@ -9,6 +9,7 @@ import {
   type AgentPermissionRequestList,
   type AgentPermissionRequestItem,
   type AgentPermissionRequestView,
+  type PendingPermissionRequest,
 } from "@purin-labs/control-api";
 import { opaqueSubjectReference } from "@purin-labs/authority/access-control/references";
 import {
@@ -598,5 +599,19 @@ export async function agentPermissionRequestSummaries(
     ],
     createdAt: stored.createdAt,
     expiresAt: stored.createdAt + AGENT_PERMISSION_REQUEST_LIFETIME_MS,
+  }));
+}
+
+/** The permission requests that wait, as entries of the one read. */
+export async function pendingPermissionRequests(
+  authorized: OrganisationReader,
+): Promise<readonly PendingPermissionRequest[]> {
+  const mayDecide = mayDecideAgentPermissionRequests(authorized);
+  const summaries = await agentPermissionRequestSummaries(authorized);
+  return summaries.map((summary) => ({
+    kind: "permission_request",
+    id: summary.requestId,
+    summary,
+    mayDecide,
   }));
 }

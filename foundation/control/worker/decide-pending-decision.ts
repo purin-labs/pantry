@@ -59,9 +59,13 @@ export type PendingDecisionDeciders = Readonly<{
     proof: PendingDecisionProof,
     call: CallOf<"permission_request">,
   ): Promise<Response>;
-  governedAction(
+  commerceAction(
     proof: PendingDecisionProof,
-    call: CallOf<"governed_action">,
+    call: Extract<CallOf<"governed_action">, { surface: "commerce" }>,
+  ): Promise<Response>;
+  customConnectorAction(
+    proof: PendingDecisionProof,
+    call: Extract<CallOf<"governed_action">, { surface: "custom_connector" }>,
   ): Promise<Response>;
   emailReview(
     proof: PendingDecisionProof,
@@ -91,7 +95,9 @@ export function decidePendingDecision(
     case "permission_request":
       return deciders.permissionRequest(proof, call);
     case "governed_action":
-      return deciders.governedAction(proof, call);
+      return call.surface === "custom_connector"
+        ? deciders.customConnectorAction(proof, call)
+        : deciders.commerceAction(proof, call);
     case "email_review":
       return deciders.emailReview(proof, call);
     default:

@@ -7,6 +7,7 @@ import {
   parseAgentPermissionDecision,
   type HeldOutputSummary,
   type HeldOutputView,
+  type PendingHeldOutput,
 } from "@purin-labs/control-api";
 
 import { authenticatedConversationScope } from "@purin-labs/tenancy/organisation-access/access";
@@ -189,6 +190,19 @@ export async function heldOutputSummaries(
     });
   }
   return summaries;
+}
+
+/** The held answers that wait for this member, as entries of the one read. */
+export async function pendingHeldOutputs(
+  env: Env,
+  authorized: OrganisationReader,
+): Promise<readonly PendingHeldOutput[]> {
+  const summaries = await heldOutputSummaries(env, authorized);
+  return summaries.map((summary) => ({
+    kind: "held_output",
+    id: summary.requestId,
+    summary,
+  }));
 }
 
 async function readDecidable(

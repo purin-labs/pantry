@@ -1,4 +1,8 @@
-import type { DecidePendingDecision } from "@purin-labs/control/worker/decide-pending-decision";
+import type {
+  DecidePendingDecision,
+  PendingDecisionAnswer,
+  PendingDecisionProof,
+} from "@purin-labs/control/worker/decide-pending-decision";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { controlActionMutationExecution } from "@purin-labs/conversation/actors/action-mutation-execution";
@@ -137,10 +141,33 @@ async function readCustomConnectorWriteAction(
 }
 
 /**
+ * Records the answer of a person to one write of a custom connector, for
+ * the one decide call.
+ */
+export function decideCustomConnectorWriteAction(
+  env: Env,
+  { request, organisationIdRaw }: PendingDecisionProof,
+  call: Readonly<{
+    connectorIdRaw: string;
+    id: string;
+    answer: PendingDecisionAnswer;
+  }>,
+): Promise<Response> {
+  const route = {
+    organisationIdRaw,
+    connectorIdRaw: call.connectorIdRaw,
+    actionNonceRaw: call.id,
+  };
+  return call.answer === "allow"
+    ? approveCustomConnectorWriteAction(request, env, route)
+    : rejectCustomConnectorWriteAction(request, env, route);
+}
+
+/**
  * Records the approval of one write of a custom connector. The caller
  * checked that the id has the form of an action nonce.
  */
-export async function approveCustomConnectorWriteAction(
+async function approveCustomConnectorWriteAction(
   request: Request,
   env: Env,
   route: Readonly<{
@@ -273,7 +300,7 @@ export async function approveCustomConnectorWriteAction(
  * `rejected`, so it can never run. A refusal needs no step-up sign-in: it
  * changes nothing outside Pantry. The caller checked the form of the nonce.
  */
-export async function rejectCustomConnectorWriteAction(
+async function rejectCustomConnectorWriteAction(
   request: Request,
   env: Env,
   route: Readonly<{
