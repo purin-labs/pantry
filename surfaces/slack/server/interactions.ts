@@ -2,6 +2,7 @@ import { isSideCaseProposalId } from "@purin-labs/control-api";
 import { errorMessage, isRecord, parseJsonOrNull } from "@purin-labs/std";
 
 import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { SlackConnectorActor } from "./actors/slack-connector-rpc";
 import type { SlackSideCaseStartRefusal } from "./actors/connector-side-case";
 import type { Env } from "@purin-labs/kernel/env";
 import { errorResponse, methodNotAllowed } from "@purin-labs/kernel/http";
@@ -420,14 +421,15 @@ async function startSideCaseFromClick(
       `connector_slack_${route.value.integrationAccountId}`,
     );
     if (!connectorId.ok) return;
-    const connector = await resolveActiveConnectorActorAtPlacement({
-      env,
-      namespace: env.CONNECTOR,
-      organisationId: route.value.organisationId,
-      connectorId: connectorId.value,
-      placement: route.value.placement,
-      now: receivedAt,
-    });
+    const connector =
+      await resolveActiveConnectorActorAtPlacement<SlackConnectorActor>({
+        env,
+        namespace: env.CONNECTOR,
+        organisationId: route.value.organisationId,
+        connectorId: connectorId.value,
+        placement: route.value.placement,
+        now: receivedAt,
+      });
     if (!connector.ok) {
       await tellStarter(click, requestId, START_FAILED);
       return;

@@ -2,6 +2,8 @@ import {
   resolveActiveCaseActorAtPlacement,
   resolveActiveConnectorActorAtPlacement,
 } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { SlackConnectorActor } from "./actors/slack-connector-rpc";
+import type { CaseConnectorRpc } from "@purin-labs/conversation/actors/case/connector-rpc";
 import { restoreFlowBinding } from "@purin-labs/conversation/actors/case-walking-path";
 import {
   decideHeldOutputRequest,
@@ -11,7 +13,11 @@ import {
   type HeldOutputRequest,
 } from "@purin-labs/authority/data/held-output-request";
 import type { Env } from "@purin-labs/kernel/env";
-import { newRequestId, parseCaseId, parseConnectorId } from "@purin-labs/kernel/ids";
+import {
+  newRequestId,
+  parseCaseId,
+  parseConnectorId,
+} from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { approvedOutputDecision } from "@purin-labs/authority/policy/information-flow/index";
@@ -39,11 +45,7 @@ export async function releaseHeldOutputDecision(
     () => false,
   );
   if (finished)
-    await markHeldOutputRequestReleased(
-      scope,
-      stored.requestId,
-      Date.now(),
-    );
+    await markHeldOutputRequestReleased(scope, stored.requestId, Date.now());
   return finished;
 }
 
@@ -94,14 +96,15 @@ async function finishHeldEffect(
   const caseId = parseCaseId(stored.caseId ?? "");
   if (!connectorId.ok || !caseId.ok) return false;
   const now = Date.now();
-  const connector = await resolveActiveConnectorActorAtPlacement({
-    env,
-    namespace: env.CONNECTOR,
-    organisationId: scope.organisationId,
-    placement: scope.placement,
-    connectorId: connectorId.value,
-    now,
-  });
+  const connector =
+    await resolveActiveConnectorActorAtPlacement<SlackConnectorActor>({
+      env,
+      namespace: env.CONNECTOR,
+      organisationId: scope.organisationId,
+      placement: scope.placement,
+      connectorId: connectorId.value,
+      now,
+    });
   if (!connector.ok) return false;
   let requestAuthority = null;
   if (stored.status === "allowed") {
@@ -172,7 +175,9 @@ async function finishHeldOutput(
       placement: scope.placement,
       now,
     }),
-    resolveActiveConnectorActorAtPlacement({
+    resolveActiveConnectorActorAtPlacement<
+      SlackConnectorActor & Pick<CaseConnectorRpc, "deliver">
+    >({
       env,
       namespace: env.CONNECTOR,
       organisationId: scope.organisationId,

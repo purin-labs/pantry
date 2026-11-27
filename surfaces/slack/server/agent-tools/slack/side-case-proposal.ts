@@ -2,6 +2,7 @@ import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import { assertNever } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { SlackConnectorActor } from "../../actors/slack-connector-rpc";
 import { readSessionTurnFlowBinding } from "@purin-labs/agent/actors/agent-session-information-flow";
 import { decideCaseConversationSink } from "@purin-labs/conversation/actors/case-conversation-sink";
 import {
@@ -94,14 +95,15 @@ export async function proposeSlackSideCaseForHarness(
     connectorId: connectorId.value,
   };
   const now = Date.now();
-  const connector = await resolveActiveConnectorActorAtPlacement({
-    env: input.env,
-    namespace: input.env.CONNECTOR,
-    organisationId: scope.organisationId,
-    placement: scope.placement,
-    connectorId: connectorId.value,
-    now,
-  });
+  const connector =
+    await resolveActiveConnectorActorAtPlacement<SlackConnectorActor>({
+      env: input.env,
+      namespace: input.env.CONNECTOR,
+      organisationId: scope.organisationId,
+      placement: scope.placement,
+      connectorId: connectorId.value,
+      now,
+    });
   if (!connector.ok)
     throw new Error(
       `side case proposal Connector unavailable: ${connector.error.code}`,

@@ -1,4 +1,5 @@
 import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { SlackConnectorActor } from "./actors/slack-connector-rpc";
 import {
   listHeldAgentPermissionDecisions,
   markAgentPermissionRequestReleased,
@@ -65,14 +66,15 @@ async function releaseParkedSlackRequest(
   const decision = stored.status === "allowed" ? "allow" : "deny";
   const connectorId = parseConnectorId(stored.origin.connectorId);
   if (!connectorId.ok) return false;
-  const connector = await resolveActiveConnectorActorAtPlacement({
-    env,
-    namespace: env.CONNECTOR,
-    organisationId: scope.organisationId,
-    placement: scope.placement,
-    connectorId: connectorId.value,
-    now: Date.now(),
-  });
+  const connector =
+    await resolveActiveConnectorActorAtPlacement<SlackConnectorActor>({
+      env,
+      namespace: env.CONNECTOR,
+      organisationId: scope.organisationId,
+      placement: scope.placement,
+      connectorId: connectorId.value,
+      now: Date.now(),
+    });
   if (!connector.ok) return false;
   let requestAuthority = null;
   if (decision === "allow") {

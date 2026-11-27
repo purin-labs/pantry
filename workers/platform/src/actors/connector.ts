@@ -28,6 +28,7 @@ import type {
 import type { ConnectorQuiescenceRpc } from "@purin-labs/actor-runtime/actors/placement-execution-quiescence";
 import type { SlackTurnConnectorRpc } from "@purin-labs/tool-handlers/actors/harness-follow-up";
 import type { ConnectorCaseWorkRecoveryRpc } from "@purin-labs/surface-webhooks/server/gateway/admin/actor-registry";
+import type { SlackConnectorRpc } from "@purin-labs/surface-slack/server/actors/slack-connector-rpc";
 import { CONNECTOR_ACTOR_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import { readEmailRuntime } from "@purin-labs/area-inbox/server/actors/connector-email";
 import {
@@ -111,7 +112,8 @@ export class ConnectorDO
     CaseContextCollectionConnectorRpc,
     ConnectorQuiescenceRpc,
     SlackTurnConnectorRpc,
-    ConnectorCaseWorkRecoveryRpc
+    ConnectorCaseWorkRecoveryRpc,
+    SlackConnectorRpc
 {
   private readonly slack = new SlackConnectorChannel(this.channelHost());
 

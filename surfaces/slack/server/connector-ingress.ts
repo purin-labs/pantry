@@ -1,5 +1,6 @@
 import { actorPhysicalName } from "@purin-labs/actor-runtime/actors/actor-registry";
 import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { SlackConnectorActor } from "./actors/slack-connector-rpc";
 import type { ConnectorSlackIngressOutcome } from "./actors/connector-slack-ingress";
 import type { CredentialVaultBindings } from "@purin-labs/authority/credential-vault/keyring";
 import type { RequestId } from "@purin-labs/kernel/ids";
@@ -59,7 +60,7 @@ export async function decideSlackCaseAtConnector(
     event,
   );
   if (!identities.ok) return null;
-  const connector = actorStub(
+  const connector = actorStub<SlackConnectorActor>(
     env.CONNECTOR,
     actorPhysicalName(
       {
