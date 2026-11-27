@@ -32,6 +32,7 @@ import {
 import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
+import { organisationConnectionReads } from "./organisation-reads";
 import {
   prepareProjectionRevisionBump,
 } from "@purin-labs/tenancy/data/organisation-onboarding-row";
@@ -1140,11 +1141,13 @@ export async function completeProviderProvisioning(input: {
       },
     }),
   ];
-  const manifestVersion = await readCurrentProviderManifestVersion(
-    input.manifestDatabase,
-    input.attempt.provider,
-    input.attempt.environment,
-  );
+  const manifestVersion = await organisationConnectionReads
+    .use()
+    .currentProviderManifestVersion(
+      input.manifestDatabase,
+      input.attempt.provider,
+      input.attempt.environment,
+    );
   if (manifestVersion !== null) {
     for (const integrationAccountId of input.integrationAccountIds) {
       statements.push(
@@ -1190,11 +1193,13 @@ export async function recordProviderManifestObservation(input: {
   readonly evidence: ProviderManifestEvidence;
   readonly now: number;
 }): Promise<void> {
-  const manifestVersion = await readCurrentProviderManifestVersion(
-    input.manifestDatabase,
-    input.provider,
-    input.environment,
-  );
+  const manifestVersion = await organisationConnectionReads
+    .use()
+    .currentProviderManifestVersion(
+      input.manifestDatabase,
+      input.provider,
+      input.environment,
+    );
   if (manifestVersion === null) return;
   await input.scope.database.batch([
     prepareProviderManifestObservation(input.scope.database, {
@@ -1208,29 +1213,6 @@ export async function recordProviderManifestObservation(input: {
     }),
     input.scope.prepareMutationFence(),
   ]);
-}
-
-async function readCurrentProviderManifestVersion(
-  database: GlobalDatabase,
-  provider: ConnectionProvider,
-  environment: OrganisationEnvironment,
-): Promise<number | null> {
-  const row = await database
-    .prepare(
-      `SELECT manifest_version AS version FROM provider_manifest
-     WHERE provider = ? AND environment = ? ORDER BY manifest_version DESC LIMIT 1`,
-    )
-    .bind(provider, environment)
-    .first<{ readonly version: unknown }>();
-  if (row === null) return null;
-  if (
-    typeof row.version !== "number" ||
-    !Number.isSafeInteger(row.version) ||
-    row.version < 1
-  ) {
-    throw new Error("provider_manifest_version_invalid");
-  }
-  return row.version;
 }
 
 /**

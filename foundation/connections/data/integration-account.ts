@@ -49,6 +49,7 @@ import {
 } from "../mail/gmail-authorization";
 import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
+import { organisationConnectionReads } from "./organisation-reads";
 import {
   assertNever,
   isPositiveInteger,
@@ -1356,13 +1357,12 @@ async function prepareDefaultAccountBindingTransition(
   >
 > {
   if (next.provider === "slack") {
-    const configuredDestination = await db
-      .prepare(
-        `SELECT 1 AS configured FROM organisation_communication_destination WHERE organisation_id = ?`,
-      )
-      .bind(next.organisationId)
-      .first<{ readonly configured: unknown }>();
-    if (configuredDestination === null) return { ok: true, value: [] };
+    if (
+      !(await organisationConnectionReads
+        .use()
+        .communicationDestinationIsConfigured(db, next.organisationId))
+    )
+      return { ok: true, value: [] };
     const destination = await db
       .prepare(
         `SELECT 1 AS capable

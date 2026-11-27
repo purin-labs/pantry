@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { describe, expect, it } from "vitest";
 

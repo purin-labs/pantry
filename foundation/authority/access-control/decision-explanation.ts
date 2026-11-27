@@ -19,6 +19,7 @@ import type {
 } from "../authorization/access-grants/types";
 import { selectActiveGrants } from "../authorization/access-grants";
 import { CAPABILITY_CATALOGUE } from "../authorization/capability-catalogue";
+import { inboxSubjectReads } from "./subject-reads";
 import { listAccessGrants } from "../data/access-grants";
 import { readOrganisationCapabilityPolicies } from "../data/capability-policy";
 import type { ActiveOrganisationMembership } from "@purin-labs/tenancy/data/control-plane";
@@ -819,14 +820,10 @@ async function agentMailboxAuthority(
     subject.integrationAccountId,
   );
   if (!integrationAccountId.ok) return invalidSubjectAuthority();
-  const row = await db
-    .prepare(
-      `SELECT current_version AS policyVersion FROM mailbox_ingress_policy
-      WHERE organisation_id = ? AND integration_account_id = ?`,
-    )
-    .bind(organisationId, integrationAccountId.value)
-    .first<{ policyVersion: unknown }>();
-  if (!isPositiveInteger(row?.policyVersion)) return invalidSubjectAuthority();
+  const policyVersion = await inboxSubjectReads
+    .use()
+    .mailboxPolicyVersion(db, organisationId, integrationAccountId.value);
+  if (policyVersion === null) return invalidSubjectAuthority();
   return {
     ok: true,
     value: buildAgentMailboxAuthority({
@@ -834,7 +831,7 @@ async function agentMailboxAuthority(
       integrationAccountId: integrationAccountId.value,
       mailboxBindingId: subject.mailboxBindingId,
       bindingRevision: subject.bindingRevision,
-      mailboxPolicyVersion: row.policyVersion,
+      mailboxPolicyVersion: policyVersion,
     }).requestAuthority,
   };
 }
@@ -848,14 +845,10 @@ async function whatsappSupportAuthority(
     subject.integrationAccountId,
   );
   if (!integrationAccountId.ok) return invalidSubjectAuthority();
-  const row = await db
-    .prepare(
-      `SELECT current_version AS policyVersion FROM whatsapp_ingress_policy
-      WHERE organisation_id = ? AND integration_account_id = ?`,
-    )
-    .bind(organisationId, integrationAccountId.value)
-    .first<{ policyVersion: unknown }>();
-  if (!isPositiveInteger(row?.policyVersion)) return invalidSubjectAuthority();
+  const policyVersion = await inboxSubjectReads
+    .use()
+    .whatsAppPolicyVersion(db, organisationId, integrationAccountId.value);
+  if (policyVersion === null) return invalidSubjectAuthority();
   return {
     ok: true,
     value: buildWhatsAppSupportAuthority({
@@ -863,7 +856,7 @@ async function whatsappSupportAuthority(
       integrationAccountId: integrationAccountId.value,
       supportBindingId: subject.supportBindingId,
       bindingRevision: subject.bindingRevision,
-      ingressPolicyVersion: row.policyVersion,
+      ingressPolicyVersion: policyVersion,
     }).requestAuthority,
   };
 }

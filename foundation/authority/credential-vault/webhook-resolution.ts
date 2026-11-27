@@ -8,6 +8,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import { recordCredentialAccessDenial } from "./alerts";
 import type { VaultHandle, VaultResolveError, VaultSecret } from "./domain";
 import type { CredentialVaultBindings } from "./keyring";
+import { integrationCredentialReads } from "./integration-reads";
 import { resolveVaultHandle } from "./service";
 
 export type ProviderWebhookResolutionError =
@@ -122,32 +123,11 @@ export async function resolveDiscordInteractionVerificationCredential(input: {
   readonly keys: CredentialVaultBindings;
   readonly install: DiscordVerificationBinding;
 }): Promise<Result<VaultSecret, ProviderWebhookResolutionError>> {
-  const active = await input.db
-    .prepare(
-      `SELECT installation.public_key_ref AS publicKeyRef
-       FROM discord_interaction_install AS installation
-       JOIN organisation
-         ON organisation.organisation_id = installation.organisation_id
-        AND organisation.status = 'active'
-       JOIN organisation_onboarding AS onboarding
-         ON onboarding.organisation_id = installation.organisation_id
-        AND onboarding.lifecycle = 'active'
-       WHERE installation.organisation_id = ?
-         AND installation.application_id = ?
-         AND installation.guild_id = ?
-         AND installation.public_key_ref = ?
-         AND installation.status = 'active'
-       LIMIT 1`,
-    )
-    .bind(
-      input.install.organisationId,
-      input.install.applicationId,
-      input.install.guildId,
-      input.install.publicKeyRef,
-    )
-    .first<{ readonly publicKeyRef: unknown }>();
+  const active = await integrationCredentialReads
+    .use()
+    .discordInstallHoldsPublicKey(input.db, input.install);
 
-  if (active?.publicKeyRef !== input.install.publicKeyRef) {
+  if (!active) {
     return { ok: false, error: { code: "webhook_binding_inactive" } };
   }
 

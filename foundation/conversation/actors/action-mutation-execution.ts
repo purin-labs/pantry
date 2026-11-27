@@ -1,4 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import { definePort } from "@purin-labs/kernel/port";
 import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { parseOrganisationPlacementFenceToken } from "@purin-labs/tenancy/data/organisation-placement";
 import {
@@ -70,12 +71,45 @@ export type SlackLinkedMember = Readonly<{
 }>;
 
 /**
+ * The verified links between a Slack user and a Pantry user that the
+ * conversation module reads (Refactor 17). Each member is one D1 read. The
+ * Slack surface owns the links, and the Worker registers its reads
+ * (`worker-ports.ts`).
+ */
+export type SlackIdentityLinks = Readonly<{
+  /**
+   * The member behind a Slack user, right now: a verified link to their
+   * Pantry user in the Slack workspace of an active Slack account, and an
+   * active membership. Null when there is none.
+   */
+  resolveLinkedMember(
+    db: OrganisationDatabase,
+    input: Readonly<{
+      organisationId: string;
+      integrationAccountId: string;
+      workspaceId: string;
+      slackUserId: string;
+    }>,
+  ): Promise<SlackLinkedMember | null>;
+  /** The Slack user ids that a Pantry user has a link to. */
+  linkedSlackUserIds(
+    db: OrganisationDatabase,
+    organisationId: OrganisationId,
+    userId: UserId,
+  ): Promise<readonly string[]>;
+}>;
+
+export const slackIdentityLinks = definePort<SlackIdentityLinks>(
+  "slack_identity_links",
+);
+
+/**
  * The member behind a Slack user, right now: a verified link to their Pantry
  * user in the Slack workspace of an active Slack account, and an active
  * membership. Null when there is none. Each caller checks the role that its
- * action needs.
+ * action needs. The Slack surface reads the link.
  */
-export async function resolveSlackLinkedMember(
+export function resolveSlackLinkedMember(
   db: OrganisationDatabase,
   input: Readonly<{
     organisationId: string;
@@ -84,46 +118,7 @@ export async function resolveSlackLinkedMember(
     slackUserId: string;
   }>,
 ): Promise<SlackLinkedMember | null> {
-  const row = await db
-    .prepare(
-      `SELECT identity_link.user_id AS userId, membership.person_id AS personId,
-              membership.role AS role
-       FROM integration_account AS account
-       JOIN external_identity_link AS identity_link
-         ON identity_link.organisation_id = account.organisation_id
-        AND identity_link.workspace_connection_id = account.provider_connection_id
-        AND identity_link.workspace_id = ? AND identity_link.external_user_id = ?
-       JOIN service_role_grant AS membership
-         ON membership.organisation_id = identity_link.organisation_id
-        AND membership.user_id = identity_link.user_id AND membership.status = 'active'
-       WHERE account.organisation_id = ? AND account.integration_account_id = ?
-         AND account.provider = 'slack' AND account.lifecycle = 'active'`,
-    )
-    .bind(
-      input.workspaceId,
-      input.slackUserId,
-      input.organisationId,
-      input.integrationAccountId,
-    )
-    .first<{
-      readonly userId: unknown;
-      readonly personId: unknown;
-      readonly role: unknown;
-    }>();
-  if (
-    row === null ||
-    typeof row.personId !== "string" ||
-    typeof row.userId !== "string" ||
-    (row.role !== "owner" &&
-      row.role !== "admin" &&
-      row.role !== "operator" &&
-      row.role !== "viewer")
-  )
-    return null;
-  const userId = parseUserId(row.userId);
-  return userId.ok
-    ? { userId: userId.value, personId: row.personId, role: row.role }
-    : null;
+  return slackIdentityLinks.use().resolveLinkedMember(db, input);
 }
 
 /**

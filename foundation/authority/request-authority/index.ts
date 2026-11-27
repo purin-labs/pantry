@@ -12,6 +12,10 @@ import type {
 
 import type { GrantSubject } from "../authorization/access-grants/types";
 import {
+  inboxSubjectReads,
+  workflowSubjectReads,
+} from "../access-control/subject-reads";
+import {
   parseConnectorId,
   parseIntegrationAccountId,
   parsePersonId,
@@ -766,9 +770,11 @@ async function liveRequestAuthorityIsActive(
     case "workflow":
       return liveWorkflowAuthorityIsActive(db, authority);
     case "agent_mailbox":
-      return liveAgentMailboxAuthorityIsActive(db, authority);
+      return inboxSubjectReads.use().agentMailboxAuthorityIsLive(db, authority);
     case "whatsapp_support":
-      return liveWhatsAppSupportAuthorityIsActive(db, authority);
+      return inboxSubjectReads
+        .use()
+        .whatsAppSupportAuthorityIsLive(db, authority);
     default:
       return assertNever(authority, "unhandled request authority branch");
   }
@@ -877,177 +883,11 @@ async function liveWorkflowAuthorityIsActive(
   db: OrganisationDatabase,
   authority: Variant<RequestAuthority, "workflow">,
 ): Promise<boolean> {
+  const reads = workflowSubjectReads.use();
   return (
-    (await liveCueSubscriptionAuthorityIsActive(db, authority)) ||
-    liveScheduleBindingAuthorityIsActive(db, authority)
+    (await reads.cueSubscriptionAuthorityIsLive(db, authority)) ||
+    reads.scheduleBindingAuthorityIsLive(db, authority)
   );
-}
-
-async function liveScheduleBindingAuthorityIsActive(
-  db: OrganisationDatabase,
-  authority: Variant<RequestAuthority, "workflow">,
-): Promise<boolean> {
-  const row = await db
-    .prepare(
-      `SELECT 1 AS present
-       FROM organisation AS organisation
-       JOIN schedule_binding AS binding
-         ON binding.organisation_id = organisation.organisation_id
-       WHERE organisation.organisation_id = ?
-         AND organisation.status = 'active'
-         AND binding.binding_id = ?
-         AND binding.revision = ?
-         AND binding.enabled = 1
-       LIMIT 1`,
-    )
-    .bind(
-      authority.organisationId,
-      authority.workflowId,
-      authority.workflowRevision,
-    )
-    .first<{ readonly present: 1 }>();
-  return row?.present === 1;
-}
-
-/**
- * A mailbox authority is live while the organisation and the mailbox account
- * are active, the agent assignment is still the binding revision the turn was
- * admitted under, and mail processing has stayed on without a break since
- * that turn was admitted.
- *
- * The binding revision carries what the agent may read and do, so it must
- * match exactly. A policy revision carries only the processing switch and
- * five limits. It grants nothing and removes nothing. A change of the limits
- * therefore leaves earlier work live: a reply draft that waits for approval
- * can still be reviewed, edited, sent or rejected.
- *
- * Processing stayed on when the revision the turn was admitted under exists,
- * the current revision is that one or a later one, and every revision from
- * the one to the other, both included, is `enabled`. One
- * `disabled_by_operator` revision in that range ends the authority for good.
- * It stays ended after processing is turned on again: the operator stopped
- * the mailbox, and work from before the stop does not come back.
- */
-async function liveAgentMailboxAuthorityIsActive(
-  db: OrganisationDatabase,
-  authority: Variant<RequestAuthority, "agent_mailbox">,
-): Promise<boolean> {
-  const row = await db
-    .prepare(
-      `SELECT 1 AS present
-       FROM organisation AS organisation
-       JOIN integration_account AS account
-         ON account.organisation_id = organisation.organisation_id
-       JOIN agent_mailbox_binding AS binding
-         ON binding.integration_account_id = account.integration_account_id
-        AND binding.organisation_id = organisation.organisation_id
-       JOIN mailbox_ingress_policy AS policy
-         ON policy.integration_account_id = account.integration_account_id
-        AND policy.organisation_id = organisation.organisation_id
-       JOIN mailbox_ingress_policy_revision AS revision
-         ON revision.integration_account_id = policy.integration_account_id
-        AND revision.policy_version = policy.current_version
-       JOIN mailbox_ingress_policy_revision AS admitted
-         ON admitted.integration_account_id = policy.integration_account_id
-       WHERE organisation.organisation_id = ?
-         AND organisation.status = 'active'
-         AND account.integration_account_id = ?
-         AND account.lifecycle = 'active'
-         AND binding.mailbox_binding_id = ?
-         AND binding.current_revision = ?
-         AND admitted.policy_version = ?
-         AND admitted.policy_version <= policy.current_version
-         AND revision.kind = 'enabled'
-         AND NOT EXISTS (
-           SELECT 1
-           FROM mailbox_ingress_policy_revision AS since_admission
-           WHERE since_admission.integration_account_id = policy.integration_account_id
-             AND since_admission.policy_version >= admitted.policy_version
-             AND since_admission.policy_version <= policy.current_version
-             AND since_admission.kind <> 'enabled'
-         )
-       LIMIT 1`,
-    )
-    .bind(
-      authority.organisationId,
-      authority.integrationAccountId,
-      authority.mailboxBindingId,
-      authority.bindingRevision,
-      authority.mailboxPolicyVersion,
-    )
-    .first<{ readonly present: 1 }>();
-  return row?.present === 1;
-}
-
-/**
- * A WhatsApp support authority is live only while the organisation, phone-number
- * account, agent binding revision, and published ingress policy all match the
- * exact values the turn was admitted under and processing is still enabled.
- */
-async function liveWhatsAppSupportAuthorityIsActive(
-  db: OrganisationDatabase,
-  authority: Variant<RequestAuthority, "whatsapp_support">,
-): Promise<boolean> {
-  const row = await db
-    .prepare(
-      `SELECT 1 AS present
-       FROM organisation AS organisation
-       JOIN integration_account AS account
-         ON account.organisation_id = organisation.organisation_id
-       JOIN whatsapp_support_binding AS binding
-         ON binding.integration_account_id = account.integration_account_id
-        AND binding.organisation_id = organisation.organisation_id
-       JOIN whatsapp_ingress_policy AS policy
-         ON policy.integration_account_id = account.integration_account_id
-        AND policy.organisation_id = organisation.organisation_id
-       JOIN whatsapp_ingress_policy_revision AS revision
-         ON revision.integration_account_id = policy.integration_account_id
-        AND revision.policy_version = policy.current_version
-       WHERE organisation.organisation_id = ?
-         AND organisation.status = 'active'
-         AND account.integration_account_id = ?
-         AND account.lifecycle = 'active'
-         AND binding.support_binding_id = ?
-         AND binding.current_revision = ?
-         AND policy.current_version = ?
-         AND revision.processing = 'enabled'
-       LIMIT 1`,
-    )
-    .bind(
-      authority.organisationId,
-      authority.integrationAccountId,
-      authority.supportBindingId,
-      authority.bindingRevision,
-      authority.ingressPolicyVersion,
-    )
-    .first<{ readonly present: 1 }>();
-  return row?.present === 1;
-}
-
-async function liveCueSubscriptionAuthorityIsActive(
-  db: OrganisationDatabase,
-  authority: Variant<RequestAuthority, "workflow">,
-): Promise<boolean> {
-  const row = await db
-    .prepare(
-      `SELECT 1 AS present
-       FROM organisation AS organisation
-       JOIN cue_subscription AS subscription
-         ON subscription.organisation_id = organisation.organisation_id
-       WHERE organisation.organisation_id = ?
-         AND organisation.status = 'active'
-         AND subscription.subscription_id = ?
-         AND subscription.version = ?
-         AND subscription.enabled = 1
-       LIMIT 1`,
-    )
-    .bind(
-      authority.organisationId,
-      authority.workflowId,
-      authority.workflowRevision,
-    )
-    .first<{ readonly present: 1 }>();
-  return row?.present === 1;
 }
 
 function parseScopedSlackAuthority(

@@ -1,4 +1,4 @@
-import { resolveSlackLinkedMember } from "@purin-labs/conversation/actors/action-mutation-execution";
+import { resolveSlackLinkedMember } from "./data/identity-link-reads";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Env } from "@purin-labs/kernel/env";
 import type {

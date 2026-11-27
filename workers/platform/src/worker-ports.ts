@@ -154,6 +154,24 @@ import {
 } from "@purin-labs/surface-slack/server/organisation-routing";
 import { chatSurfaces } from "@purin-labs/conversation/chat/surface-registry";
 import { KITCHEN_CHAT_SURFACES } from "@purin-labs/surface-portal/server/chat/kitchen-observation";
+import {
+  inboxSubjectReads,
+  workflowSubjectReads,
+} from "@purin-labs/authority/access-control/subject-reads";
+import { INBOX_SUBJECT_READS } from "@purin-labs/area-inbox/server/data/authority-subject-reads";
+import { WORKFLOW_SUBJECT_READS } from "@purin-labs/agent/data/workflow-subject-reads";
+import { integrationCredentialReads } from "@purin-labs/authority/credential-vault/integration-reads";
+import { INTEGRATION_CREDENTIAL_READS } from "@purin-labs/area-integrations/server/data/vault-reads";
+import { organisationConnectionReads } from "@purin-labs/connections/data/organisation-reads";
+import { ORGANISATION_CONNECTION_READS } from "@purin-labs/area-organisation/server/data/connection-reads";
+import { agentInstallationPinReads } from "@purin-labs/control/worker/installation-pins";
+import { AGENT_INSTALLATION_PIN_READS } from "@purin-labs/agent/data/installation-pin-reads";
+import { slackIdentityLinks } from "@purin-labs/conversation/actors/action-mutation-execution";
+import { SLACK_IDENTITY_LINKS } from "@purin-labs/surface-slack/server/data/identity-link-reads";
+import { chatForkHistoryReads } from "@purin-labs/agent/chat/fork-history";
+import { CHAT_FORK_HISTORY_READS } from "@purin-labs/conversation/chat/fork-history-reads";
+import { organisationSlackChannels } from "@purin-labs/collaboration/worker/collaboration-slack-thread";
+import { ORGANISATION_SLACK_CHANNELS } from "@purin-labs/area-organisation/server/data/slack-channel-reads";
 
 memoryService.register({
   readMemoryViews: (...input) => readMemoryViews(...input),
@@ -367,3 +385,14 @@ provideOrganisationLifecycleParts(ORGANISATION_LIFECYCLE_PARTS);
 // The page states that a chat message can carry (Plan 87): only the Kitchen
 // page has one now.
 chatSurfaces.register(KITCHEN_CHAT_SURFACES);
+
+// The reads of the table owners that a lower module makes (Refactor 17):
+// each owner gives the same SQL, so no request makes one more D1 query.
+inboxSubjectReads.register(INBOX_SUBJECT_READS);
+workflowSubjectReads.register(WORKFLOW_SUBJECT_READS);
+integrationCredentialReads.register(INTEGRATION_CREDENTIAL_READS);
+organisationConnectionReads.register(ORGANISATION_CONNECTION_READS);
+agentInstallationPinReads.register(AGENT_INSTALLATION_PIN_READS);
+slackIdentityLinks.register(SLACK_IDENTITY_LINKS);
+chatForkHistoryReads.register(CHAT_FORK_HISTORY_READS);
+organisationSlackChannels.register(ORGANISATION_SLACK_CHANNELS);

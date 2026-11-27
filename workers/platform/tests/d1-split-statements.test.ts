@@ -95,9 +95,6 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "preparePlacementMovePublication",
     "prepareRecoveryRelocationStart",
   ],
-  "foundation/connections/data/provider-attempt.ts": [
-    "readCurrentProviderManifestVersion",
-  ],
   "areas/cafe/server/data/screen-pairing.ts": [
     "claimScreenPairing",
     "countOpenScreenPairings",

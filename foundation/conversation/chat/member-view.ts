@@ -9,6 +9,7 @@ import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisatio
 import type { FlowLabel } from "@purin-labs/authority/policy/information-flow/index";
 import { slackChannelIsPublic } from "@purin-labs/authority/policy/information-flow/source-labels";
 import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
+import { slackIdentityLinks } from "../actors/action-mutation-execution";
 import type {
   FlowAudience,
   FlowPolicyOwner,
@@ -117,13 +118,9 @@ async function slackConversationIsOpen(
       reader.conversationId,
     );
   if (fact?.memberIds === null || fact === null) return false;
-  const links = await database
-    .prepare(
-      `SELECT external_user_id FROM external_identity_link
-       WHERE organisation_id = ? AND user_id = ?`,
-    )
-    .bind(viewer.organisationId, viewer.scope.userId)
-    .all<{ external_user_id: string }>();
+  const links = await slackIdentityLinks
+    .use()
+    .linkedSlackUserIds(database, viewer.organisationId, viewer.scope.userId);
   const members = new Set(fact.memberIds);
-  return links.results.some((link) => members.has(link.external_user_id));
+  return links.some((externalUserId) => members.has(externalUserId));
 }

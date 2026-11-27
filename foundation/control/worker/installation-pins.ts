@@ -1,5 +1,34 @@
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { digestCanonical } from "@purin-labs/authority/policy/index";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import { definePort } from "@purin-labs/kernel/port";
+
+/** The pinned fields of an active agent installation, as stored. */
+type ActiveInstallationPinRecord = Readonly<{
+  grantedCapabilitiesJson: string;
+  agentDefinitionId: string;
+  definitionRevision: number;
+  policyRevision: number;
+}>;
+
+/**
+ * The agent installations that the pins read (Refactor 17). The agent
+ * module owns the table, and the Worker registers its read
+ * (`worker-ports.ts`).
+ */
+export type AgentInstallationPinReads = Readonly<{
+  /** The pinned fields of an active installation, or null. One D1 read. */
+  readActiveInstallationPinRecord(
+    db: OrganisationDatabase,
+    organisationId: OrganisationId,
+    installationId: string,
+  ): Promise<ActiveInstallationPinRecord | null>;
+}>;
+
+export const agentInstallationPinReads = definePort<AgentInstallationPinReads>(
+  "agent_installation_pin_reads",
+);
 
 export async function readInstallationPins(
   scope: OrganisationExecutionScope,
@@ -8,21 +37,13 @@ export async function readInstallationPins(
   readonly grantsDigest: string;
   readonly policyDigest: string;
 } | null> {
-  const row = await scope.database.prepare(
-    `SELECT granted_capabilities_json AS grantedCapabilitiesJson,
-            agent_definition_id AS agentDefinitionId,
-            definition_revision AS definitionRevision,
-            policy_revision AS policyRevision
-       FROM agent_installation
-       WHERE organisation_id = ? AND installation_id = ? AND lifecycle = 'active'`,
-  )
-    .bind(scope.organisationId, installationId)
-    .first<{
-      readonly grantedCapabilitiesJson: string;
-      readonly agentDefinitionId: string;
-      readonly definitionRevision: number;
-      readonly policyRevision: number;
-    }>();
+  const row = await agentInstallationPinReads
+    .use()
+    .readActiveInstallationPinRecord(
+      scope.database,
+      scope.organisationId,
+      installationId,
+    );
   if (row === null) return null;
   let grantedCapabilities: unknown;
   try {

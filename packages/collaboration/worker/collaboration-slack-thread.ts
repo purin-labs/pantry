@@ -5,10 +5,33 @@ import {
   parseIntegrationAccountId,
   type CaseId,
   type IntegrationAccountId,
+  type OrganisationId,
 } from "@purin-labs/kernel/ids";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import { definePort } from "@purin-labs/kernel/port";
 import type { Result } from "@purin-labs/kernel/result";
 import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
+
+/**
+ * The Slack channels of the Organisation that a draft thread link can name
+ * (Refactor 17). The Organisation area owns them, and the Worker registers
+ * its read (`worker-ports.ts`).
+ */
+export type OrganisationSlackChannels = Readonly<{
+  /** The workspace and the account of each record of a channel. One D1 read. */
+  listChannelAccounts(
+    db: OrganisationDatabase,
+    organisationId: OrganisationId,
+    channelId: string,
+  ): Promise<
+    readonly Readonly<{ workspaceId: string; integrationAccountId: string }>[]
+  >;
+}>;
+
+export const organisationSlackChannels = definePort<OrganisationSlackChannels>(
+  "organisation_slack_channels",
+);
 
 type CollaborationSlackThread = Readonly<{
   caseId: CaseId;
@@ -30,23 +53,17 @@ export async function resolveCollaborationSlackThread(
   if (target === null) return failure("draft_thread_link_invalid");
   const organisationId = scope.organisationId;
   if (!(await scope.isActive())) return failure("draft_thread_unavailable");
-  const channels = await scope.database
-    .prepare(
-      "SELECT workspace_id, integration_account_id FROM organisation_slack_channel WHERE organisation_id = ? AND channel_id = ?",
-    )
-    .bind(organisationId, target.channelId)
-    .all<{
-      workspace_id: string;
-      integration_account_id: string;
-    }>();
-  const channel = channels.results[0];
+  const channels = await organisationSlackChannels
+    .use()
+    .listChannelAccounts(scope.database, organisationId, target.channelId);
+  const channel = channels[0];
   if (!(await scope.isActive())) return failure("draft_thread_unavailable");
-  if (channels.results.length !== 1 || channel === undefined)
+  if (channels.length !== 1 || channel === undefined)
     return failure("draft_thread_unavailable");
   const caseId = parseCaseId(
-    `case_slack_${channel.workspace_id}_${target.channelId}_${target.threadTs.replace(".", "_")}`,
+    `case_slack_${channel.workspaceId}_${target.channelId}_${target.threadTs.replace(".", "_")}`,
   );
-  const account = parseIntegrationAccountId(channel.integration_account_id);
+  const account = parseIntegrationAccountId(channel.integrationAccountId);
   if (!caseId.ok || !account.ok) return failure("draft_thread_unavailable");
   const actor = await resolveActiveCaseActor({
     env: env,
@@ -65,7 +82,7 @@ export async function resolveCollaborationSlackThread(
     snapshot.value.identity.caseId !== caseId.value ||
     !hasSlackThreadBinding(
       snapshot.value.bindings,
-      channel.workspace_id,
+      channel.workspaceId,
       target.channelId,
       target.threadTs,
     )

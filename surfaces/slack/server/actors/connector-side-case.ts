@@ -13,7 +13,7 @@ import {
 import type { SlackCaseCommand } from "../case-command-message";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { refreshSlackRequestAuthority } from "@purin-labs/authority/request-authority/index";
-import { resolveSlackLinkedMember } from "@purin-labs/conversation/actors/action-mutation-execution";
+import { resolveSlackLinkedMember } from "../data/identity-link-reads";
 import { deriveSlackCaseRouteIdentities } from "../case-routing";
 import {
   deriveSlackSessionId,

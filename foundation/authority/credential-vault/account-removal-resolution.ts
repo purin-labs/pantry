@@ -5,6 +5,7 @@ import type { IntegrationAccountId, OrganisationId } from "@purin-labs/kernel/id
 import type { Result } from "@purin-labs/kernel/result";
 import type { VaultHandle, VaultResolveError, VaultSecret } from "./domain";
 import type { CredentialVaultBindings } from "./keyring";
+import { integrationCredentialReads } from "./integration-reads";
 import { resolveVaultHandle } from "./service";
 
 export type AccountRemovalResolutionError =
@@ -22,40 +23,20 @@ export async function resolveAccountRemovalCredential(input: {
   readonly providerConnectionId: string;
   readonly handle: VaultHandle;
 }): Promise<Result<VaultSecret, AccountRemovalResolutionError>> {
-  const active = await input.db
-    .prepare(
-      `SELECT cleanup.cleanup_id AS cleanupId
-       FROM provider_account_cleanup AS cleanup
-       WHERE cleanup.cleanup_id = ?
-         AND cleanup.organisation_id = ?
-         AND cleanup.integration_account_id = ?
-         AND cleanup.provider = ?
-         AND cleanup.environment = ?
-         AND cleanup.provider_account_id = ?
-         AND cleanup.provider_connection_id = ?
-         AND cleanup.lifecycle IN (
-           'pending_provider_cleanup', 'running_provider_cleanup', 'retry_scheduled'
-         )
-         AND EXISTS (
-           SELECT 1
-           FROM json_each(cleanup.credential_handles)
-           WHERE json_each.value = ?
-         )
-       LIMIT 1`,
-    )
-    .bind(
-      input.cleanupId,
-      input.organisationId,
-      input.integrationAccountId,
-      input.provider,
-      input.environment,
-      input.providerAccountId,
-      input.providerConnectionId,
-      input.handle,
-    )
-    .first<{ readonly cleanupId: unknown }>();
+  const active = await integrationCredentialReads
+    .use()
+    .accountRemovalCleanupHoldsHandle(input.db, {
+      cleanupId: input.cleanupId,
+      organisationId: input.organisationId,
+      integrationAccountId: input.integrationAccountId,
+      provider: input.provider,
+      environment: input.environment,
+      providerAccountId: input.providerAccountId,
+      providerConnectionId: input.providerConnectionId,
+      handle: input.handle,
+    });
 
-  if (active?.cleanupId !== input.cleanupId) {
+  if (!active) {
     return { ok: false, error: { code: "account_removal_scope_inactive" } };
   }
 

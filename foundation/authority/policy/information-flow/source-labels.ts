@@ -24,6 +24,10 @@ import type {
   GrantSubject,
 } from "../../authorization/access-grants/types";
 import { listAccessGrants } from "../../data/access-grants";
+import {
+  inboxSubjectReads,
+  workflowSubjectReads,
+} from "../../access-control/subject-reads";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   parseIntegrationAccountId,
@@ -664,49 +668,19 @@ async function grantSubjectIsCurrent(
       case "workflow":
         return grantWorkflowIsCurrent(db, organisationId, subject);
       case "agent_mailbox":
-        return present(
-          await db
-            .prepare(
-              `SELECT 1 AS present
-             FROM integration_account AS account
-             JOIN agent_mailbox_binding AS binding
-               ON binding.organisation_id = account.organisation_id
-              AND binding.integration_account_id = account.integration_account_id
-            WHERE account.organisation_id = ? AND account.integration_account_id = ?
-              AND account.lifecycle = 'active'
-              AND binding.mailbox_binding_id = ? AND binding.current_revision = ?
-            LIMIT 1`,
-            )
-            .bind(
-              organisationId,
-              subject.integrationAccountId,
-              subject.mailboxBindingId,
-              subject.bindingRevision,
-            )
-            .first<PresentRow>(),
-        );
+        return {
+          ok: true,
+          value: await inboxSubjectReads
+            .use()
+            .agentMailboxBindingIsCurrent(db, organisationId, subject),
+        };
       case "whatsapp_support":
-        return present(
-          await db
-            .prepare(
-              `SELECT 1 AS present
-             FROM integration_account AS account
-             JOIN whatsapp_support_binding AS binding
-               ON binding.organisation_id = account.organisation_id
-              AND binding.integration_account_id = account.integration_account_id
-            WHERE account.organisation_id = ? AND account.integration_account_id = ?
-              AND account.lifecycle = 'active'
-              AND binding.support_binding_id = ? AND binding.current_revision = ?
-            LIMIT 1`,
-            )
-            .bind(
-              organisationId,
-              subject.integrationAccountId,
-              subject.supportBindingId,
-              subject.bindingRevision,
-            )
-            .first<PresentRow>(),
-        );
+        return {
+          ok: true,
+          value: await inboxSubjectReads
+            .use()
+            .whatsAppSupportBindingIsCurrent(db, organisationId, subject),
+        };
       default:
         return assertNever(subject);
     }
@@ -720,23 +694,13 @@ async function grantWorkflowIsCurrent(
   organisationId: OrganisationId,
   subject: Variant<GrantSubject, "workflow">,
 ): Promise<Result<boolean, CurrentSourceFlowLabelError>> {
-  const cue = await db
-    .prepare(
-      `SELECT 1 AS present FROM cue_subscription
-      WHERE organisation_id = ? AND subscription_id = ? AND version = ? AND enabled = 1 LIMIT 1`,
-    )
-    .bind(organisationId, subject.workflowId, subject.workflowRevision)
-    .first<PresentRow>();
-  if (cue?.present === 1) return { ok: true, value: true };
-  return present(
-    await db
-      .prepare(
-        `SELECT 1 AS present FROM schedule_binding
-      WHERE organisation_id = ? AND binding_id = ? AND revision = ? AND enabled = 1 LIMIT 1`,
-      )
-      .bind(organisationId, subject.workflowId, subject.workflowRevision)
-      .first<PresentRow>(),
-  );
+  const reads = workflowSubjectReads.use();
+  if (await reads.cueSubscriptionIsCurrent(db, organisationId, subject))
+    return { ok: true, value: true };
+  return {
+    ok: true,
+    value: await reads.scheduleBindingIsCurrent(db, organisationId, subject),
+  };
 }
 
 function present(

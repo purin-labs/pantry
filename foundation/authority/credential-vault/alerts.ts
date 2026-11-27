@@ -3,6 +3,7 @@ import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { Env } from "@purin-labs/kernel/env";
 import { configuredOrganisationDatabases } from "@purin-labs/tenancy/organisation-execution-scope";
+import { integrationCredentialReads } from "./integration-reads";
 import { loadCredentialVaultKeyRing, type VaultKeyVersion } from "./keyring";
 
 // Plan 12 V3: the provisional benign-policy staleness budget, adopted as
@@ -119,20 +120,15 @@ async function sweepVaultAlertSignals(input: {
     )
     .bind(input.now - STALE_GENERATION_ALERT_MS)
     .first<{ readonly staleCount: number }>();
-  const stuckRotations = await input.db
-    .prepare(
-      `SELECT COUNT(*) AS stuckCount FROM credential_rotation
-       WHERE status IN ('pending_verification', 'verified') AND created_at < ?`,
-    )
-    .bind(input.now - STUCK_ROTATION_ALERT_MS)
-    .first<{ readonly stuckCount: number }>();
-  const failedRotations = await input.db
-    .prepare(
-      `SELECT COUNT(*) AS failedCount FROM credential_rotation
-       WHERE status = 'failed' AND created_at >= ?`,
-    )
-    .bind(input.now - FAILED_ROTATION_WINDOW_MS)
-    .first<{ readonly failedCount: number }>();
+  const rotations = integrationCredentialReads.use();
+  const stuckRotations = await rotations.countStuckCredentialRotations(
+    input.db,
+    input.now - STUCK_ROTATION_ALERT_MS,
+  );
+  const failedRotations = await rotations.countFailedCredentialRotations(
+    input.db,
+    input.now - FAILED_ROTATION_WINDOW_MS,
+  );
   const delayedRestrictions = await input.db
     .prepare(
       `SELECT COUNT(*) AS delayedCount FROM credential_revocation_operation
@@ -168,8 +164,8 @@ async function sweepVaultAlertSignals(input: {
     sweptAt: input.now,
     unknownKeyVersionRows: unknownKeyRows?.unknownCount ?? 0,
     staleSupersededGenerations: staleGenerations?.staleCount ?? 0,
-    stuckRotations: stuckRotations?.stuckCount ?? 0,
-    failedRotations: failedRotations?.failedCount ?? 0,
+    stuckRotations,
+    failedRotations,
     delayedRestrictions: delayedRestrictions?.delayedCount ?? 0,
     latencyBreaches: latencyBreaches?.breachCount ?? 0,
     denialsByPurpose,

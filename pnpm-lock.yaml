@@ -1379,6 +1379,9 @@ importers:
       '@purin-labs/bakery-workflow':
         specifier: workspace:*
         version: link:../../packages/bakery-workflow
+      '@purin-labs/collaboration':
+        specifier: workspace:*
+        version: link:../../packages/collaboration
       '@purin-labs/commerce-client':
         specifier: workspace:*
         version: link:../../packages/commerce-client

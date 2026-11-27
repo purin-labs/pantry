@@ -6,7 +6,8 @@ import type {
   HarnessHistoryContent,
 } from "@purin-labs/contracts";
 import { parseSessionModelRoute } from "@purin-labs/authority/policy-snapshot";
-import { parseSessionId } from "@purin-labs/kernel/ids";
+import { parseSessionId, type OrganisationId } from "@purin-labs/kernel/ids";
+import { definePort } from "@purin-labs/kernel/port";
 import {
   parseHarnessHistoryEntry,
   type HarnessHistoryCursor,
@@ -165,19 +166,33 @@ export async function parseChatHistorySnapshot(
   };
 }
 
+/**
+ * The stored histories of the chat forks of an Organisation that are
+ * prepared or ready (Refactor 17). The conversation module owns the forks,
+ * and the Worker registers its read (`worker-ports.ts`).
+ */
+export type ChatForkHistoryReads = Readonly<{
+  /** The history and its digest of each prepared or ready fork. One D1 read. */
+  listOpenChatForkHistories(
+    db: OrganisationDatabase,
+    organisationId: OrganisationId,
+  ): Promise<readonly Readonly<{ historyJson: string; digest: string }>[]>;
+}>;
+
+export const chatForkHistoryReads = definePort<ChatForkHistoryReads>(
+  "chat_fork_history_reads",
+);
+
 export async function readChatForkAttachmentKeys(
   db: OrganisationDatabase,
-  organisationId: import("@purin-labs/kernel/ids").OrganisationId,
+  organisationId: OrganisationId,
 ): Promise<readonly string[]> {
-  const rows = await db
-    .prepare(
-      "SELECT history_json, digest FROM portal_chat_fork WHERE organisation_id = ? AND status IN ('prepared', 'ready')",
-    )
-    .bind(organisationId)
-    .all<{ history_json: string; digest: string }>();
+  const rows = await chatForkHistoryReads
+    .use()
+    .listOpenChatForkHistories(db, organisationId);
   const keys = new Set<string>();
-  for (const row of rows.results) {
-    const history = await parseChatForkHistory(JSON.parse(row.history_json));
+  for (const row of rows) {
+    const history = await parseChatForkHistory(JSON.parse(row.historyJson));
     if ((await chatForkHistoryDigest(history)) !== row.digest)
       throw new Error("chat_fork_history_digest_mismatch");
     for (const attachment of chatForkAttachments(history)) {
