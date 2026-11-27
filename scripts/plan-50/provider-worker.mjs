@@ -18,7 +18,7 @@ import { completeCommerceApprovalFixture } from "../../workers/platform/tests/e2
 import {
   handleCommerceControlRoute,
   matchCommerceControlRoute,
-} from "../../workers/platform/src/control/routes/commerce.ts";
+} from "../../areas/commerce/server/control/routes/commerce-control.ts";
 import { readSessionTurnFlowBinding } from "../../foundation/agent/actors/agent-session-information-flow.ts";
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
 import { createModels } from "@earendil-works/pi-ai/models";

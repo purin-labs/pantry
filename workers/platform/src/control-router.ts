@@ -164,9 +164,69 @@ import {
   matchWhatsAppControlRoute,
 } from "./control/routes/whatsapp";
 import {
+  handleKitchenCommerceRoute,
+  matchKitchenCommerceRoute,
+} from "@purin-labs/area-kitchen/server/control/routes/kitchen-commerce-routes";
+import {
+  handleCheckoutProfileControlRoute,
+  matchCheckoutProfileControlRoute,
+} from "@purin-labs/area-commerce/server/control/routes/checkout-profiles";
+import {
+  handleTerminalOperationsControlRoute,
+  matchTerminalOperationsControlRoute,
+} from "@purin-labs/area-cafe/server/control/routes/terminal-operations";
+import {
+  handleCounterPolicyControlRoute,
+  matchCounterPolicyControlRoute,
+} from "@purin-labs/area-cafe/server/control/routes/counter-policy";
+import {
+  handleCommerceApiKeyControlRoute,
+  matchCommerceApiKeyControlRoute,
+} from "@purin-labs/area-commerce/server/control/routes/commerce-api-keys";
+import {
+  handleCommercePaymentAccountControlRoute,
+  matchCommercePaymentAccountControlRoute,
+} from "@purin-labs/area-commerce/server/control/routes/commerce-payment-accounts";
+import {
+  handleCommerceMenuPublicationControlRoute,
+  matchCommerceMenuPublicationControlRoute,
+} from "@purin-labs/area-cafe/server/control/routes/commerce-menu-publication";
+import {
+  handleCounterSaleControlRoute,
+  matchCounterSaleControlRoute,
+} from "@purin-labs/area-cafe/server/control/routes/counter-sale";
+import {
+  handleFailedPaymentsControlRoute,
+  matchFailedPaymentsControlRoute,
+} from "@purin-labs/area-commerce/server/control/routes/failed-payments";
+import {
+  handleCommercePaymentsControlRoute,
+  matchCommercePaymentsControlRoute,
+} from "@purin-labs/area-commerce/server/control/routes/payments";
+import {
+  handleBankPayoutsControlRoute,
+  matchBankPayoutsControlRoute,
+} from "@purin-labs/area-commerce/server/control/routes/bank-payouts";
+import {
+  handleOrderTimesControlRoute,
+  matchOrderTimesControlRoute,
+} from "@purin-labs/area-cafe/server/control/routes/order-times";
+import {
+  handleOrderQueueControlRoute,
+  matchOrderQueueControlRoute,
+} from "@purin-labs/area-cafe/server/control/routes/order-queue";
+import {
+  handleSoldOutControlRoute,
+  matchSoldOutControlRoute,
+} from "@purin-labs/area-cafe/server/control/routes/sold-out";
+import {
+  handleSupplierPayoutControlRoute,
+  matchSupplierPayoutControlRoute,
+} from "@purin-labs/area-commerce/server/control/routes/supplier-payouts";
+import {
   handleCommerceControlRoute,
   matchCommerceControlRoute,
-} from "./control/routes/commerce";
+} from "@purin-labs/area-commerce/server/control/routes/commerce-control";
 import {
   handleIntegrationControlRoute,
   matchIntegrationControlRoute,
@@ -335,6 +395,55 @@ const CONTROL_ROUTE_FAMILIES: readonly ControlRouteFamily[] = [
       route,
       decidePendingDecisionWith(env),
     ),
+  ),
+  // The routes under commerce/ of the Kitchen, the Café and Commerce: the
+  // paths of these sixteen families do not overlap.
+  controlRouteFamily(matchKitchenCommerceRoute, handleKitchenCommerceRoute),
+  controlRouteFamily(
+    matchCheckoutProfileControlRoute,
+    handleCheckoutProfileControlRoute,
+  ),
+  controlRouteFamily(
+    matchTerminalOperationsControlRoute,
+    handleTerminalOperationsControlRoute,
+  ),
+  controlRouteFamily(
+    matchCounterPolicyControlRoute,
+    handleCounterPolicyControlRoute,
+  ),
+  controlRouteFamily(
+    matchCommerceApiKeyControlRoute,
+    handleCommerceApiKeyControlRoute,
+  ),
+  controlRouteFamily(
+    matchCommercePaymentAccountControlRoute,
+    handleCommercePaymentAccountControlRoute,
+  ),
+  controlRouteFamily(
+    matchCommerceMenuPublicationControlRoute,
+    handleCommerceMenuPublicationControlRoute,
+  ),
+  controlRouteFamily(
+    matchCounterSaleControlRoute,
+    handleCounterSaleControlRoute,
+  ),
+  controlRouteFamily(
+    matchFailedPaymentsControlRoute,
+    handleFailedPaymentsControlRoute,
+  ),
+  controlRouteFamily(
+    matchCommercePaymentsControlRoute,
+    handleCommercePaymentsControlRoute,
+  ),
+  controlRouteFamily(
+    matchBankPayoutsControlRoute,
+    handleBankPayoutsControlRoute,
+  ),
+  controlRouteFamily(matchOrderTimesControlRoute, handleOrderTimesControlRoute),
+  controlRouteFamily(matchOrderQueueControlRoute, handleOrderQueueControlRoute),
+  controlRouteFamily(matchSoldOutControlRoute, handleSoldOutControlRoute),
+  controlRouteFamilyWith(matchSupplierPayoutControlRoute, (call, route) =>
+    handleSupplierPayoutControlRoute(call.request, call.env, route, call.url),
   ),
   controlRouteFamily(matchCommerceControlRoute, (request, env, route) =>
     handleCommerceControlRoute(
