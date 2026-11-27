@@ -65,8 +65,5 @@
       "ports": true
     }
   },
-  "counts": {
-    "@purin-labs/bakery-model": 3,
-    "@purin-labs/production-simulation": 5
-  }
+  "counts": {}
 }

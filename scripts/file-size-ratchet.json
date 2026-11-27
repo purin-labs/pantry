@@ -7,9 +7,9 @@
     "areas/kitchen/ui/features/production-run/recipe-workflow-graph.tsx": 3007,
     "areas/kitchen/ui/features/workflow-simulator/bakery-surface.ts": 3893,
     "areas/kitchen/ui/features/workflow-simulator/production-workspace.tsx": 5021,
-    "packages/bakery-model/src/bakery-surface.ts": 4991,
-    "packages/production-simulation/src/recipes/bakery/appliance-execution.ts": 3815,
-    "packages/production-simulation/src/recipes/bakery/schedule.ts": 4499,
+    "packages/bakery-model/src/bakery-surface.ts": 4609,
+    "packages/production-simulation/src/recipes/bakery/appliance-execution.ts": 3808,
+    "packages/production-simulation/src/recipes/bakery/schedule.ts": 4336,
     "scripts/plan-50/evaluate-pi-durable.mjs": 5289,
     "surfaces/portal/ui/features/chat/route.tsx": 4201,
     "surfaces/portal/ui/styles.css": 8686
