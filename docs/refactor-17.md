@@ -386,6 +386,17 @@ The layer debts, one line for each step that lowers a count:
   and `tv/` has its own rule. `pnpm lint:layers` refuses a new file directly in that
   folder until the map names its module.
 
+- 2026-11-27, `interpolated-table`: 17 to 10, and `table-read`: 91 to 85. The
+  commerce index writes and the WhatsApp erasure name their tables. The Inbox gives
+  the purge rewrite of its two Google account tables through the purge port, and
+  Integrations gives the erase of its mail classification table, which a template
+  name hid. The regional copy reads its four parent predicates from the purge
+  catalogue. The operations destination read is a tenancy port that the
+  Organisation area implements. The purge runs the same 185 statements. What stays:
+  10 writes of general helpers (the purge erase, the regional copy, the export, the
+  transitions, the Pi checkpoint), and reads that are one statement with a JOIN. The
+  next step for the purge: each table owner gives its own erase entries.
+
 The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
 the state of Stage A. Its branches are gone; the work is on `dev`.
