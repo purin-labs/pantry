@@ -24,7 +24,9 @@ import {
   parseGoalCommandRequest,
   parseGoalAdmissionRequest,
   parseGoalUsageRequest,
+  type CaseGoalRpc,
 } from "@purin-labs/agent/actors/case-goals";
+import type { CaseSteeringRpc } from "@purin-labs/agent/actors/session/session-shared";
 import {
   createConversationExecutionSchema,
   persistConversationExecution,
@@ -223,7 +225,11 @@ type CommerceApprovalSync = Readonly<{
 
 export abstract class CaseActor
   extends PlacedActor<null>
-  implements CaseContextSourceReader, CaseQuiescenceRpc
+  implements
+    CaseContextSourceReader,
+    CaseQuiescenceRpc,
+    CaseGoalRpc,
+    CaseSteeringRpc
 {
   /** State counts of this Actor's machines, for the census (Refactor 15, S5). */
   async machineCensus(): Promise<readonly MachineCensus[]> {

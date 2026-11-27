@@ -68,6 +68,23 @@ export type GoalAdmission = {
   readonly operationId: string;
   readonly admittedRevision: number;
 };
+
+/** A goal call of the Case Actor: its value, or a refusal with a code. */
+type CaseGoalResult<T> = Result<T, { readonly code: string }>;
+
+/**
+ * The RPC methods of the Case Actor that a Session calls for the goal of its
+ * Case. Each method parses its own request. `CaseActor` of the conversation
+ * module implements this interface; this module is below it, so a Session
+ * names the interface and not the class.
+ */
+export interface CaseGoalRpc {
+  readGoal(raw: unknown): Promise<CaseGoalResult<CaseGoalSnapshot>>;
+  admitGoalOperation(raw: unknown): Promise<CaseGoalResult<GoalAdmission>>;
+  bindGoalExecution(raw: unknown): Promise<CaseGoalResult<CaseGoalSnapshot>>;
+  closeGoalExecution(raw: unknown): Promise<CaseGoalResult<CaseGoalSnapshot>>;
+  acceptGoalUsage(raw: unknown): Promise<CaseGoalResult<CaseGoalSnapshot>>;
+}
 const MAX_COUNTER = 0xffff_ffff;
 
 export function createCaseGoalSchema(sql: SqlStorage): void {

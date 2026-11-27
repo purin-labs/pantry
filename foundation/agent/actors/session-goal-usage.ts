@@ -17,7 +17,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import type { Env } from "@purin-labs/kernel/env";
-import type { CaseActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { PlacedActorRpc } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   findActiveCaseActorAtScope,
   resolveActiveCaseActor,
@@ -34,6 +34,7 @@ import {
   type GoalExecutionRequest,
   parseGoalUsageRequest,
   type GoalAdmissionRequest,
+  type CaseGoalRpc,
 } from "./case-goals";
 import type {
   GoalModelCallControl,
@@ -42,6 +43,10 @@ import type {
 } from "./goal-model-calls";
 import { armAlarmBy } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import type { Variant } from "@purin-labs/type-utils";
+
+/** The Case Actor as the goal of a Session calls it. */
+type GoalCaseActor = PlacedActorRpc & CaseGoalRpc;
+type GoalCaseStub = DurableObjectStub<GoalCaseActor>;
 
 export type GoalUsageContext = {
   readonly env: Env;
@@ -96,7 +101,7 @@ export class StartedGoalExecution {
     lease: HarnessTurnLease,
     assignment: CaseAssignment,
     requestId: RequestId,
-    servedCase: Promise<CaseActorStub | null>,
+    servedCase: Promise<GoalCaseStub | null>,
   ): StartedGoalExecution {
     return new StartedGoalExecution(
       servedCase
@@ -153,7 +158,7 @@ export async function findServedGoalCase(
   env: Env,
   scope: OrganisationExecutionScope,
   assignment: CaseAssignment,
-): Promise<CaseActorStub | null> {
+): Promise<GoalCaseStub | null> {
   const caseId = parseCaseId(assignment.caseId);
   if (
     !caseId.ok ||
@@ -161,7 +166,7 @@ export async function findServedGoalCase(
   )
     return null;
   try {
-    return await findActiveCaseActorAtScope({
+    return await findActiveCaseActorAtScope<GoalCaseActor>({
       scope,
       namespace: env.CASE,
       caseId: caseId.value,
@@ -176,7 +181,7 @@ export async function createSessionGoalExecution(
   lease: HarnessTurnLease,
   assignment: CaseAssignment,
   requestId: RequestId,
-  servedCase: CaseActorStub | null,
+  servedCase: GoalCaseStub | null,
 ): Promise<GoalExecution> {
   if (
     assignment.sessionId !== lease.session.sessionId ||
@@ -280,7 +285,7 @@ async function closeTransient(
   context: GoalUsageContext,
   runId: string,
   binding: ExecutionBinding,
-  owner: CaseActorStub,
+  owner: GoalCaseStub,
 ): Promise<void> {
   context.liveRuns.delete(runId);
   for (const operation of readIntents(context.storage.sql, {
@@ -427,7 +432,7 @@ function goalStopForSnapshot(
 
 async function settle(
   context: GoalUsageContext,
-  owner: CaseActorStub,
+  owner: GoalCaseStub,
   ticket: GoalModelCallTicket,
   outcome: CaseGoalOperationOutcome,
 ): Promise<void> {
@@ -517,7 +522,7 @@ function executionBinding(
 async function bindExecution(
   context: GoalUsageContext,
   binding: ExecutionBinding,
-  owner: CaseActorStub,
+  owner: GoalCaseStub,
 ): Promise<CaseGoalSnapshot> {
   context.liveRuns.add(binding.request.executionId);
   try {
@@ -541,7 +546,7 @@ async function bindExecution(
 async function closeExecution(
   context: GoalUsageContext,
   binding: ExecutionBinding,
-  owner: CaseActorStub,
+  owner: GoalCaseStub,
 ): Promise<void> {
   context.liveRuns.delete(binding.request.executionId);
   await scheduleGoalUsage(context.storage, Date.now() + 1000);
@@ -611,7 +616,7 @@ async function reconcileOperation(
   context: GoalUsageContext,
   operation: Pending,
   forceAdmission: boolean,
-  owner: CaseActorStub,
+  owner: GoalCaseStub,
 ): Promise<void> {
   const { intent, phase } = operation;
   if (phase.kind === "settled") return;
@@ -725,12 +730,12 @@ async function caseOwner(
   env: Env,
   rawOrganisationId: string,
   rawCaseId: string,
-): Promise<CaseActorStub> {
+): Promise<GoalCaseStub> {
   const organisationId = parseOrganisationId(rawOrganisationId);
   const caseId = parseCaseId(rawCaseId);
   if (!organisationId.ok || !caseId.ok)
     throw new Error("goal_identity_mismatch");
-  const owner = await resolveActiveCaseActor({
+  const owner = await resolveActiveCaseActor<GoalCaseActor>({
     env: env,
     namespace: env.CASE,
     organisationId: organisationId.value,

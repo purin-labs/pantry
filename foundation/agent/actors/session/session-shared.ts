@@ -15,6 +15,7 @@ import {
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import type { Result } from "@purin-labs/kernel/result";
 import { resolveActiveCaseActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { PlacedActorRpc } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { type AgentSessionPersistence } from "../agent-session-schema";
 import { SessionExecutionAdmission } from "../session-execution-admission";
 import { type CanonicalHarnessCheckpointPayload } from "../agent-session-harness-checkpoint";
@@ -43,6 +44,23 @@ import {
   type HarnessEventAcceptance,
   type HarnessHistoryAcceptanceWithUsage,
 } from "../agent-session-harness-authority";
+
+/**
+ * The RPC method of the Case Actor that journals one steering input of a
+ * person in the Case. The input parses there. `CaseActor` of the
+ * conversation module implements it; this module is below it, so the
+ * Session names this interface and not the class.
+ */
+export interface CaseSteeringRpc {
+  acceptSteeringInput(
+    raw: unknown,
+  ): Promise<
+    Result<
+      { readonly kind: "accepted" | "duplicate" },
+      { readonly code: string }
+    >
+  >;
+}
 
 /**
  * The state that the modules of the Session actor share (Refactor 17, step
@@ -163,7 +181,9 @@ export class SessionShared {
           throw new Error("steering_input_not_case");
         const caseId = parseCaseId(steering.inputRef.caseId);
         if (!caseId.ok) throw new Error("steering_case_invalid");
-        const caseActor = await resolveActiveCaseActorAtPlacement({
+        const caseActor = await resolveActiveCaseActorAtPlacement<
+          PlacedActorRpc & CaseSteeringRpc
+        >({
           env: this.env,
           namespace: this.env.CASE,
           organisationId: organisationId.value,
