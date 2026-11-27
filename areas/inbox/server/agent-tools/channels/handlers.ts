@@ -7,7 +7,8 @@ import { resolveEmailOperationalCapability } from "../../actors/email-operationa
 import type { EmailProposalTarget } from "../../data/email-operational";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";
-import type { ConnectorActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { InboxConnectorActor } from "../../mail-inbox/agent-mailbox-connector";
+import type { InboxOrganisationActor } from "../../actors/organisation/organisation-inbox-rpc";
 import {
   parseCaseId,
   parseIntegrationAccountId,
@@ -124,14 +125,15 @@ export async function searchEmailMailboxForEmbeddedHarness(
     throw new Error("Email mailbox Connector identity is invalid");
   }
   const now = Date.now();
-  const connector = await resolveActiveConnectorActorAtPlacement({
-    env: env,
-    namespace: env.CONNECTOR,
-    organisationId,
-    placement: execution.scope.placement,
-    connectorId: connectorId.value,
-    now,
-  });
+  const connector =
+    await resolveActiveConnectorActorAtPlacement<InboxConnectorActor>({
+      env: env,
+      namespace: env.CONNECTOR,
+      organisationId,
+      placement: execution.scope.placement,
+      connectorId: connectorId.value,
+      now,
+    });
   if (!connector.ok) {
     throw new Error(
       `Email mailbox Connector is unavailable: ${connector.error.code}`,
@@ -361,12 +363,13 @@ export async function readEmailReplyDraftForEmbeddedHarness(
     integrationAccountId,
     request.proposalId,
   );
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env,
-    organisationId,
-    placement: execution.scope.placement,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActorAtPlacement<InboxOrganisationActor>({
+      env,
+      organisationId,
+      placement: execution.scope.placement,
+      now: Date.now(),
+    });
   await requireSessionExecution(execution, lease);
   const result = await organisation.readMailReplyDraft({
     organisationId,
@@ -492,12 +495,15 @@ export async function editEmailReplyDraftForEmbeddedHarness(
           `Email reply draft edit refused: ${recorded.error.code}`,
         );
       }
-      const organisation = await requireActiveOrganisationActorAtPlacement({
-        env,
-        organisationId,
-        placement: execution.scope.placement,
-        now: Date.now(),
-      });
+      const organisation =
+        await requireActiveOrganisationActorAtPlacement<InboxOrganisationActor>(
+          {
+            env,
+            organisationId,
+            placement: execution.scope.placement,
+            now: Date.now(),
+          },
+        );
       const active = preflightHarnessTurnLease(storage, lease, Date.now());
       if (!active.ok) {
         throw new Error(
@@ -574,14 +580,15 @@ async function authorizeEmailReplyDraftChat(
     throw new Error("Email mailbox Connector identity is invalid");
   }
   const now = Date.now();
-  const connector = await resolveActiveConnectorActorAtPlacement({
-    env,
-    namespace: env.CONNECTOR,
-    organisationId,
-    placement: execution.scope.placement,
-    connectorId: connectorId.value,
-    now,
-  });
+  const connector =
+    await resolveActiveConnectorActorAtPlacement<InboxConnectorActor>({
+      env,
+      namespace: env.CONNECTOR,
+      organisationId,
+      placement: execution.scope.placement,
+      connectorId: connectorId.value,
+      now,
+    });
   if (!connector.ok) {
     throw new Error(
       `Email mailbox Connector is unavailable: ${connector.error.code}`,
@@ -768,14 +775,15 @@ export async function proposeEmailReplyForEmbeddedHarness(
         throw new Error("Email mailbox Connector identity is invalid");
       }
       const now = Date.now();
-      const connector = await resolveActiveConnectorActorAtPlacement({
-        env: env,
-        namespace: env.CONNECTOR,
-        organisationId,
-        placement: execution.scope.placement,
-        connectorId: connectorId.value,
-        now,
-      });
+      const connector =
+        await resolveActiveConnectorActorAtPlacement<InboxConnectorActor>({
+          env: env,
+          namespace: env.CONNECTOR,
+          organisationId,
+          placement: execution.scope.placement,
+          connectorId: connectorId.value,
+          now,
+        });
       if (!connector.ok) {
         throw new Error(
           `Email mailbox Connector is unavailable: ${connector.error.code}`,
@@ -911,14 +919,15 @@ export async function proposeEmailOperationalForEmbeddedHarness(
         throw new Error("Operational email Connector identity is invalid");
       }
       const now = Date.now();
-      const connector = await resolveActiveConnectorActorAtPlacement({
-        env: env,
-        namespace: env.CONNECTOR,
-        organisationId,
-        placement: execution.scope.placement,
-        connectorId: connectorId.value,
-        now,
-      });
+      const connector =
+        await resolveActiveConnectorActorAtPlacement<InboxConnectorActor>({
+          env: env,
+          namespace: env.CONNECTOR,
+          organisationId,
+          placement: execution.scope.placement,
+          connectorId: connectorId.value,
+          now,
+        });
       if (!connector.ok) {
         throw new Error(
           `Operational email Connector is unavailable: ${connector.error.code}`,
@@ -1152,14 +1161,15 @@ export async function sendWhatsAppSupportReplyForEmbeddedHarness(
   if (!connectorId.ok) {
     throw new Error("WhatsApp support Connector identity is invalid");
   }
-  const connector = await resolveActiveConnectorActorAtPlacement({
-    env: env,
-    namespace: env.CONNECTOR,
-    organisationId,
-    placement: execution.scope.placement,
-    connectorId: connectorId.value,
-    now,
-  });
+  const connector =
+    await resolveActiveConnectorActorAtPlacement<InboxConnectorActor>({
+      env: env,
+      namespace: env.CONNECTOR,
+      organisationId,
+      placement: execution.scope.placement,
+      connectorId: connectorId.value,
+      now,
+    });
   if (!connector.ok) {
     throw new Error(
       `WhatsApp support Connector is unavailable: ${connector.error.code}`,
@@ -1299,7 +1309,7 @@ function hasWhatsAppReplyCapability(
 }
 
 async function editDirectedWhatsAppAgentProposal(
-  connector: ConnectorActorStub,
+  connector: DurableObjectStub<InboxConnectorActor>,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
   connectorId: string,
@@ -1338,7 +1348,7 @@ async function editDirectedWhatsAppAgentProposal(
 }
 
 async function composeDirectedWhatsAppHumanReply(
-  connector: ConnectorActorStub,
+  connector: DurableObjectStub<InboxConnectorActor>,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
   connectorId: string,
@@ -1676,14 +1686,15 @@ async function readWhatsAppSupportCase(
   if (!connectorId.ok) {
     throw new Error("WhatsApp support Connector identity is invalid");
   }
-  const connector = await resolveActiveConnectorActorAtPlacement({
-    env: env,
-    namespace: env.CONNECTOR,
-    organisationId,
-    placement: execution.scope.placement,
-    connectorId: connectorId.value,
-    now,
-  });
+  const connector =
+    await resolveActiveConnectorActorAtPlacement<InboxConnectorActor>({
+      env: env,
+      namespace: env.CONNECTOR,
+      organisationId,
+      placement: execution.scope.placement,
+      connectorId: connectorId.value,
+      now,
+    });
   if (!connector.ok) {
     throw new Error(
       `WhatsApp support Connector is unavailable: ${connector.error.code}`,

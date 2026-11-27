@@ -88,6 +88,7 @@ import {
   ConnectorEmail,
   type ConnectorEmailRpc,
 } from "@purin-labs/area-inbox/server/actors/connector/connector-email-actor";
+import type { CaseContextCollectionConnectorRpc } from "@purin-labs/area-inbox/server/actors/organisation/case-context-collection";
 import { ConnectorActorBase } from "@purin-labs/conversation/actors/connector/connector-actor-base";
 import {
   ConnectorWhatsApp,
@@ -100,7 +101,11 @@ import {
 
 export class ConnectorDO
   extends ConnectorActorBase
-  implements ConnectorEvalsRpc, ConnectorWhatsAppRpc, ConnectorEmailRpc
+  implements
+    ConnectorEvalsRpc,
+    ConnectorWhatsAppRpc,
+    ConnectorEmailRpc,
+    CaseContextCollectionConnectorRpc
 {
   private readonly slack = new SlackConnectorChannel(this.channelHost());
 

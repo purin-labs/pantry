@@ -8,6 +8,7 @@ import { type UserId } from "@purin-labs/control-api/ids";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { InboxOrganisationActor } from "../actors/organisation/organisation-inbox-rpc";
 import type { AgentMailboxConnectorHandle } from "./agent-mailbox-connector";
 import { emailApprovalChallenge } from "./email-approval-challenge";
 import { recordEmailReplyRevision } from "./email-reply-lifecycle";
@@ -19,7 +20,7 @@ export async function mailReplyDraftActor(
   organisationId: OrganisationId,
 ) {
   try {
-    return await requireActiveOrganisationActor({
+    return await requireActiveOrganisationActor<InboxOrganisationActor>({
       env,
       organisationId,
       now: Date.now(),

@@ -192,6 +192,7 @@ import { createCodeModeBudgetSchema } from "@purin-labs/agent/actors/code-mode-b
 import { SHOPIFY_ORGANISATION_PART } from "@purin-labs/area-integrations/shopify/organisation-part";
 import type { CaseExecutionEffectRecords } from "@purin-labs/agent/case-execution/records";
 import type { OrganisationBrainRpc } from "@purin-labs/area-brain/server/actors/organisation-brain-rpc";
+import type { OrganisationInboxRpc } from "@purin-labs/area-inbox/server/actors/organisation/organisation-inbox-rpc";
 import { readCaseEffectRecords } from "@purin-labs/area-brain/server/actors/organisation-execution-records";
 import { type AcceptedMemoryCursor } from "@purin-labs/area-brain/server/memory/store";
 import { cleanupTypeSafeCredentials } from "@purin-labs/agent/integrations/typesafe/connection";
@@ -302,7 +303,8 @@ export class OrganisationDO
     OrganisationCaseContextCollectionRpc,
     OrganisationCommerceRpc,
     OrganisationActivationRpc,
-    OrganisationBrainRpc
+    OrganisationBrainRpc,
+    OrganisationInboxRpc
 {
   // Commerce (`actors/organisation/organisation-commerce.ts`): the actions,
   // the cues, the commerce lab, the Code Mode leases and the workspace

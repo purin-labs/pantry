@@ -7,6 +7,7 @@ import type {
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { InboxOrganisationActor } from "../../actors/organisation/organisation-inbox-rpc";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,
@@ -175,12 +176,13 @@ async function authorizeEmailDraftThreadAccess(
       `Email draft ${access} requester is no longer an organisation member`,
     );
   }
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env,
-    organisationId,
-    placement: execution.scope.placement,
-    now: Date.now(),
-  });
+  const organisation =
+    await requireActiveOrganisationActorAtPlacement<InboxOrganisationActor>({
+      env,
+      organisationId,
+      placement: execution.scope.placement,
+      now: Date.now(),
+    });
   await requireSessionExecution(execution, lease);
   const sharing = await organisation.readEmailDraftThread({
     organisationId,

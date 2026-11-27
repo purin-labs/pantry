@@ -12,6 +12,7 @@ import {
   requireActiveOrganisationActor,
   requireActiveOrganisationActorAtPlacement,
 } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { InboxOrganisationActor } from "../actors/organisation/organisation-inbox-rpc";
 import {
   resolveConnectorGmailAccess,
   establishConnectorEmailWatch,
@@ -228,11 +229,12 @@ export async function runMailOrganization(
       continue;
     }
     try {
-      const organisation = await requireActiveOrganisationActor({
-        env: input.env,
-        organisationId: head.organisationId,
-        now: Date.now(),
-      });
+      const organisation =
+        await requireActiveOrganisationActor<InboxOrganisationActor>({
+          env: input.env,
+          organisationId: head.organisationId,
+          now: Date.now(),
+        });
       if (!(await isActorExecutionActive(input.storage.sql, input.scope)))
         return;
       const evaluated = await organisation.evaluateMailClassification(

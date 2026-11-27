@@ -1,5 +1,7 @@
 import type { Env } from "@purin-labs/kernel/env";
-import type { ConnectorActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { PlacedActorRpc } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { ConnectorEmailRpc } from "../actors/connector/connector-email-actor";
+import type { ConnectorWhatsAppRpc } from "../actors/connector/connector-whatsapp-actor";
 import type { Result } from "@purin-labs/kernel/result";
 import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
@@ -36,8 +38,13 @@ export function emailLimitsFromPolicy(
   };
 }
 
+/** The Connector Actor as the Inbox sees it: its placement and its channels. */
+export type InboxConnectorActor = PlacedActorRpc &
+  ConnectorEmailRpc &
+  ConnectorWhatsAppRpc;
+
 export type AgentMailboxConnectorHandle = {
-  readonly stub: ConnectorActorStub;
+  readonly stub: DurableObjectStub<InboxConnectorActor>;
   readonly identity: {
     readonly organisationId: OrganisationId;
     readonly connectorId: string;
@@ -53,7 +60,7 @@ async function activeConnector(
 ): Promise<Result<AgentMailboxConnectorHandle, { readonly code: string }>> {
   const connectorId = parseConnectorId(connectorIdValue);
   if (!connectorId.ok) return { ok: false, error: { code: invalidCode } };
-  const connector = await resolveActiveConnectorActor({
+  const connector = await resolveActiveConnectorActor<InboxConnectorActor>({
     env: env,
     namespace: env.CONNECTOR,
     organisationId,

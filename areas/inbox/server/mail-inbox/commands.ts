@@ -15,6 +15,8 @@ import type {
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { InboxOrganisationActor } from "../actors/organisation/organisation-inbox-rpc";
 import { establishConnectorEmailWatch } from "../actors/connector-email-evaluation";
 import { readEmailMailboxAccount } from "../data/email-mailbox";
 import { gmailConnectorIdValue } from "@purin-labs/area-inbox-contract/server/connector-ids";
@@ -261,11 +263,15 @@ export async function manageOrganization(
       ? { ok: true, value: { kind: "queued" } }
       : failure("mail_classification_queue_unavailable");
   }
-  const organisation = await requireActiveOrganisationActor({
-    env: context.env,
-    organisationId: input.identity.organisationId,
-    now: Date.now(),
-  });
+  // The classification goes through the Inbox interface. The TypeSafe read
+  // keeps the type of the class: `OrganisationPolicyRpc` gives no result type.
+  const organisation: DurableObjectStub<InboxOrganisationActor> &
+    Pick<OrganisationActorStub, "readTypeSafeConnectionConfiguration"> =
+    await requireActiveOrganisationActor({
+      env: context.env,
+      organisationId: input.identity.organisationId,
+      now: Date.now(),
+    });
   const connection = await organisation.readTypeSafeConnectionConfiguration({
     organisationId: input.identity.organisationId,
   });

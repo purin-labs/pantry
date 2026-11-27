@@ -91,7 +91,7 @@ type EmailDraftReview = Readonly<{
   reviewedAt: number;
   draft: EmailDraftSnapshot;
 }>;
-type EmailDraftSharedThread = Readonly<{
+export type EmailDraftSharedThread = Readonly<{
   caseId: CaseId;
   integrationAccountId: IntegrationAccountId;
   conversationId: string;

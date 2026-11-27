@@ -15,6 +15,8 @@ import type { Result } from "@purin-labs/kernel/result";
 import { readCaseContextDiscoveryPolicy } from "@purin-labs/agent/case-context-discovery/evaluation-store";
 import { gmailConnectorId } from "@purin-labs/area-inbox-contract/server/connector-ids";
 import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { PlacedActorRpc } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { ConnectorResult } from "@purin-labs/conversation/actors/connector/types";
 import {
   decideCaseContextCollectionRelationship,
   listMemberCaseContextCollectionIdsForCase,
@@ -442,6 +444,23 @@ function confirmedCaseContextCollectionSourceScope(
     : null;
 }
 
+/**
+ * The RPC method of a mailbox's Connector Actor that the delivery of an
+ * invalidation calls: it marks the replies that the changed Case context
+ * collection made stale. `ConnectorDO`, the class of the Worker, implements
+ * it.
+ */
+export interface CaseContextCollectionConnectorRpc {
+  invalidateCaseContextCollectionEvidence(
+    input: Readonly<{
+      organisationId: string;
+      caseContextCollectionId: string;
+      caseContextCollectionRevision: number;
+      policyRevision: number;
+    }>,
+  ): Promise<ConnectorResult<unknown>>;
+}
+
 export async function deliverCaseContextCollectionInvalidations(
   env: Env,
   sql: SqlStorage,
@@ -480,7 +499,9 @@ export async function deliverCaseContextCollectionInvalidations(
           delivered = false;
           continue;
         }
-        const connector = await resolveActiveConnectorActor({
+        const connector = await resolveActiveConnectorActor<
+          PlacedActorRpc & CaseContextCollectionConnectorRpc
+        >({
           env: env,
           namespace: env.CONNECTOR,
           organisationId,

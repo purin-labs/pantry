@@ -69,7 +69,7 @@ type MailReplyDraftAgentEditRequest = Readonly<{
   oldText: string;
   newText: string;
 }>;
-type MailReplyDraftSnapshot = Readonly<{
+export type MailReplyDraftSnapshot = Readonly<{
   proposalId: string;
   integrationAccountId: string;
   body: string;
@@ -86,7 +86,7 @@ export type MailReplyDraftAgentEdit = Readonly<{
   deadlineAt: number;
 }>;
 /** What a save needs: the room's text and the version that it started from. */
-type MailReplyDraftForSave =
+export type MailReplyDraftForSave =
   | Readonly<{ kind: "none" }>
   | Readonly<{
       kind: "draft";
@@ -96,7 +96,7 @@ type MailReplyDraftForSave =
       /** True when the saver alone wrote every change since the last save. */
       singleAuthor: boolean;
     }>;
-type MailReplyDraftError = Readonly<{
+export type MailReplyDraftError = Readonly<{
   code:
     | DraftFailureCode
     | "passage_conflict"

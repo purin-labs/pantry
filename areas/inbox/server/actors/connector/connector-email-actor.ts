@@ -36,8 +36,20 @@ import {
   type MailClassifiedPageInput,
   type MailDecisionInput,
 } from "../../mail-inbox/commands";
-import type { MailOrganizationCommand } from "@purin-labs/control-api";
-import type { ConnectorIdentity } from "@purin-labs/contracts";
+import type {
+  MailOrganizationCommand,
+  MailRelationshipLookup,
+  MailReplyCorrection,
+  MailReplyEdit,
+} from "@purin-labs/control-api";
+import type {
+  ConnectorIdentity,
+  RequestAuthority,
+} from "@purin-labs/contracts";
+import type {
+  EmailChatContext,
+  EmailChatSource,
+} from "../../mail-inbox/reply-sources";
 import {
   parseCaseId,
   parseIntegrationAccountId,
@@ -1336,8 +1348,8 @@ export class ConnectorEmail {
     input: ConnectorEmailIdentityRequest &
       Readonly<{
         proposalId: string;
-        chatSources: readonly import("../../mail-inbox/reply-sources").EmailChatSource[];
-        chatContext: import("../../mail-inbox/reply-sources").EmailChatContext;
+        chatSources: readonly EmailChatSource[];
+        chatContext: EmailChatContext;
       }>,
   ): Promise<ConnectorResult<null>> {
     return this.host.trackExecution(
@@ -1381,11 +1393,8 @@ export class ConnectorEmail {
     input: ConnectorEmailIdentityRequest &
       Readonly<{
         proposalId: string;
-        authority: Variant<
-          import("@purin-labs/contracts").RequestAuthority,
-          "control"
-        >;
-        edit: import("@purin-labs/control-api").MailReplyEdit;
+        authority: Variant<RequestAuthority, "control">;
+        edit: MailReplyEdit;
         /** Plan 40D: `shared` for a body that several authors wrote. */
         attribution?: "single_editor" | "shared";
       }>,
@@ -1492,11 +1501,8 @@ export class ConnectorEmail {
     input: ConnectorEmailIdentityRequest &
       Readonly<{
         proposalId: string;
-        authority: Variant<
-          import("@purin-labs/contracts").RequestAuthority,
-          "control"
-        >;
-        lookup: import("@purin-labs/control-api").MailRelationshipLookup;
+        authority: Variant<RequestAuthority, "control">;
+        lookup: MailRelationshipLookup;
       }>,
   ): Promise<ConnectorResult<EmailRelationshipPreview>> {
     return this.host.trackExecution(
@@ -1535,11 +1541,8 @@ export class ConnectorEmail {
     input: ConnectorEmailIdentityRequest &
       Readonly<{
         proposalId: string;
-        authority: Variant<
-          import("@purin-labs/contracts").RequestAuthority,
-          "control"
-        >;
-        correction: import("@purin-labs/control-api").MailReplyCorrection;
+        authority: Variant<RequestAuthority, "control">;
+        correction: MailReplyCorrection;
       }>,
   ): Promise<ConnectorResult<EmailReplyEditReceipt>> {
     return this.host.trackExecution(

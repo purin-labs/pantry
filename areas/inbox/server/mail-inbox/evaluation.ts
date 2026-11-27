@@ -39,11 +39,11 @@ export type MailEvaluationInput = Readonly<{
   authority: Variant<RequestAuthority, "control">;
   sourcePin: string;
 }>;
-type MailEvaluationResult = Readonly<{
+export type MailEvaluationResult = Readonly<{
   classifications: readonly MailClassification[];
   contentDigest: string;
 }>;
-type MailEvaluationError = Readonly<{
+export type MailEvaluationError = Readonly<{
   code: string;
   /** With `rate_limited` from TypeSafe: the wait that it asked for. */
   retryAfterMs?: number;

@@ -2,7 +2,7 @@
   "totals": {
     "env-merge": {
       "merges": 16,
-      "methods": 61
+      "methods": 47
     },
     "foundation-misfit": {
       "links": 12,
@@ -36,7 +36,6 @@
         "merges workers/platform -> foundation/kernel": 5,
         "methods areas/cafe -> workers/platform": 3,
         "methods areas/commerce -> workers/platform": 5,
-        "methods areas/inbox -> workers/platform": 14,
         "methods areas/kitchen -> workers/platform": 10,
         "methods areas/organisation -> workers/platform": 2,
         "methods foundation/actor-runtime -> foundation/agent": 2,
