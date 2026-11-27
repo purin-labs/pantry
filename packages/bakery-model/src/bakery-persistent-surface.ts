@@ -5,6 +5,7 @@ import {
   isSha256Hex,
 } from "@purin-labs/std";
 import type { StrictUnion } from "@purin-labs/type-utils";
+import { identifier } from "./bakery-surface-text.ts";
 
 /** Every command names one live continuation and its reviewed control state. */
 export type BakeryProductionTarget = Readonly<{
@@ -64,9 +65,6 @@ export type BakeryPersistentSurface = Readonly<{
   pendingControl: BakeryProductionReview | null;
 }>;
 
-function identifier(raw: unknown): raw is string {
-  return typeof raw === "string" && raw.length > 0 && raw.length <= 160;
-}
 function time(raw: unknown): raw is number {
   return (
     isNonNegativeInteger(raw) && Number.isSafeInteger(raw) && raw % 2000 === 0
