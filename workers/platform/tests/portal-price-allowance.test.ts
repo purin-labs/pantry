@@ -10,12 +10,12 @@ import { describe, expect, it, vi } from "vitest";
 import {
   OfferPriceAllowanceControl,
   mergeRefreshedView,
-  offerPriceAllowanceTransport,
   submitAllowance,
   withdrawAllowance,
   allowanceSummary,
   // @ts-expect-error The portal build checks this JSX module with its app-local configuration.
 } from "@purin-labs/area-commerce/ui/features/commerce/price-allowance";
+import { offerPriceAllowanceTransport } from "@purin-labs/area-commerce-contract/ui/features/commerce/price-allowance-transport";
 import {
   parseOfferPriceAllowanceView,
   parsePricedOffers,
