@@ -10,8 +10,7 @@
     "./portal/*": "./portal/*.ts",
     "./portal/agent-cursors": "./portal/agent-cursors.tsx",
     "./portal/draft-leave-dialog": "./portal/draft-leave-dialog.tsx",
-    "./portal/draft-presence": "./portal/draft-presence.tsx",
-    "./portal/slack-thread-control": "./portal/slack-thread-control.tsx"
+    "./portal/draft-presence": "./portal/draft-presence.tsx"
   },
   "scripts": {
     "check:types": "tsrs --noEmit",

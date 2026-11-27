@@ -1,6 +1,5 @@
 import React from "react";
-import { controlRead, controlWrite } from "@purin-labs/control/portal/control-client";
-import { parseSharedThreadResponse } from "@purin-labs/control-api/portal/slack-thread";
+import { changeDraftSharedThread, readDraftSharedThread } from "./requests";
 
 type SharedThreadState =
   | Readonly<{ kind: "loading" }>
@@ -66,7 +65,7 @@ async function readSharedThread(
   request: { active: boolean; setState: React.Dispatch<React.SetStateAction<SharedThreadState>> },
 ): Promise<void> {
   try {
-    const threadUrl = parseSharedThreadResponse(await controlRead(path));
+    const threadUrl = await readDraftSharedThread(path);
     if (request.active) request.setState({ kind: "ready", threadUrl });
   } catch {
     if (request.active) {
@@ -100,12 +99,9 @@ async function saveSharedThread(
   }
   setState({ kind: "saving", threadUrl });
   try {
-    const saved = parseSharedThreadResponse(
-      await controlWrite(
-        path,
-        disconnect ? "DELETE" : "PUT",
-        disconnect ? undefined : { threadUrl: typeof link === "string" ? link.trim() : "" },
-      ),
+    const saved = await changeDraftSharedThread(
+      path,
+      disconnect ? null : typeof link === "string" ? link.trim() : "",
     );
     setState({ kind: "ready", threadUrl: saved });
   } catch {

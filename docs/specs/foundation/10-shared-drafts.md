@@ -234,8 +234,9 @@ to the spec of its area.
   `inbox-collaboration-rooms.ts` join the two drafts of this spec to the dispatch.
   `product-description-draft.ts` and `email-draft.ts` hold their storage and rules.
 - **Portal.** `packages/collaboration/portal/`: `document-client.ts`,
-  `text-client.ts`, `socket-liveness.ts`, `draft-presence.tsx`, `agent-cursors.tsx`,
-  `slack-thread-control.tsx` and `draft-leave-dialog.tsx`. The description editor is in
+  `text-client.ts`, `socket-liveness.ts`, `draft-presence.tsx`, `agent-cursors.tsx` and
+  `draft-leave-dialog.tsx`. The description editor and its Slack thread control
+  (`slack-thread-control.tsx`, with its requests in `requests.ts`) are in
   `areas/commerce/ui/features/commerce/description-draft/`.
 - **Layers.** In `scripts/layers.json`, the module is `foundation/collaboration`:
   `packages/collaboration`, `collaboration-room.ts`, `collaboration-room-dispatch.ts`,
