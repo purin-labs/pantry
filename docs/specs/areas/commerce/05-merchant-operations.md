@@ -382,7 +382,7 @@ erases the D1 rows (`areas/commerce/server/data/purge-entries.ts`, action `erase
   of the system (COM-01).
 - **Information flow.** The ledger keeps the flow binding of each action. The outcome
   passes the destination check before the Connector posts it (FND-07). A report record
-  name passes `normalizeUntrustedCommerceText`.
+  name passes `normalizeUntrustedText`.
 - **Agent setup stays proposal-only.** An agent cannot publish its own instructions,
   grants, budget or approval rules. A configuration proposal may target only the
   instructions of its own definition, or a skill bound to one of its areas

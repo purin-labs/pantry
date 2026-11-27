@@ -9,7 +9,7 @@ import {
   readNamedCommerceQuery,
   type CommerceContextAssemblyError,
 } from "./context-read";
-import { normalizeUntrustedCommerceText } from "@purin-labs/agent-tools/context/untrusted-commerce-text";
+import { normalizeUntrustedText } from "@purin-labs/agent-tools/context/untrusted-text";
 import type { Result } from "@purin-labs/kernel/result";
 import type { CommerceGraphQueryReader } from "@purin-labs/area-commerce-contract/server/graph-reads";
 import {
@@ -170,7 +170,7 @@ function recordsFrom(
     // A display name is merchant-authored text arriving from the commerce
     // record, so it is normalized before it reaches the agent: what the
     // operator reads has to be what the record holds.
-    const displayName = normalizeUntrustedCommerceText(
+    const displayName = normalizeUntrustedText(
       entity.displayName,
       "display_name",
     );

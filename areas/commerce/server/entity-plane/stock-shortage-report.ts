@@ -1,6 +1,6 @@
 import type { CommerceAdminClient } from "@purin-labs/commerce-client";
 
-import { normalizeUntrustedCommerceText } from "@purin-labs/agent-tools/context/untrusted-commerce-text";
+import { normalizeUntrustedText } from "@purin-labs/agent-tools/context/untrusted-text";
 import { connectedStockOverview } from "@purin-labs/area-kitchen-contract/server/inventory-overview";
 import {
   merchantReportDefinition,
@@ -39,7 +39,7 @@ export async function readBoundStockShortages(
   const definition = merchantReportDefinition("low_stock_exposure");
   const population: MerchantReportRecord[] = [];
   for (const row of shortages.slice(0, POPULATION_LIMIT)) {
-    const name = normalizeUntrustedCommerceText(row.name, "display_name").text;
+    const name = normalizeUntrustedText(row.name, "display_name").text;
     const state = row.status === "out" ? "out of stock" : "low";
     population.push({
       entityType:

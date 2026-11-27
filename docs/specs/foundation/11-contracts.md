@@ -318,8 +318,8 @@ Neighbours:
 - **Host Unicode tables.** Four places normalize commerce text with
   `String.prototype.normalize("NFKC")`, which uses the tables of the JavaScript engine.
   They are gift card codes (`normalizeGiftCardCode` in `records/api-stored-value.ts`),
-  catalog search, Stripe dispute text and `normalizeUntrustedCommerceText` in the Platform
-  (`context/untrusted-commerce-text.ts`).
+  catalog search, Stripe dispute text and `normalizeUntrustedText` in the Platform
+  (`context/untrusted-text.ts`).
 - **Timestamps through `Date`.** The record schemas of checkout profiles, shipment
   operations, food service, plugin outputs and the point of sale write a timestamp
   through `Date`, with milliseconds only.

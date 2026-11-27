@@ -1,7 +1,7 @@
 import type { HeldEffectAction } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 
-import { normalizeUntrustedCommerceText } from "./context/untrusted-commerce-text";
+import { normalizeUntrustedText } from "./context/untrusted-text";
 import { digestCanonical } from "@purin-labs/authority/policy/information-flow/index";
 
 /**
@@ -80,5 +80,5 @@ function collectLeaves(
 }
 
 function plainText(value: string): string {
-  return normalizeUntrustedCommerceText(value, "display_name").text;
+  return normalizeUntrustedText(value, "display_name").text;
 }

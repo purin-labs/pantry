@@ -3,7 +3,7 @@ import { listStoredSnapshots, snapshotsAreEnabled } from "../../snapshots";
 import { listDevices } from "../../store";
 import { readKitchenDeviceViews } from "../../views";
 import { shopMacDevices } from "../../contract/shop-mac-devices";
-import { normalizeUntrustedCommerceText } from "@purin-labs/agent-tools/context/untrusted-commerce-text";
+import { normalizeUntrustedText } from "@purin-labs/agent-tools/context/untrusted-text";
 import {
   DeviceRequestError,
   type DevicePauseRequest,
@@ -73,7 +73,7 @@ export function readDevicesForEmbeddedHarness(
           deviceSaid:
             device.faultText === null
               ? null
-              : normalizeUntrustedCommerceText(device.faultText, "note").text,
+              : normalizeUntrustedText(device.faultText, "note").text,
           paused: device.paused,
           pauseConfirmed: device.pauseConfirmed,
           work: device.work,

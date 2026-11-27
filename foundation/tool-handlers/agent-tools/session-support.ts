@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { normalizeUntrustedCommerceText } from "@purin-labs/agent-tools/context/untrusted-commerce-text";
+import { normalizeUntrustedText } from "@purin-labs/agent-tools/context/untrusted-text";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { evaluateChatFlowLabelSink } from "@purin-labs/conversation/chat/information-flow";
 import { isConversationId, isProjectId } from "@purin-labs/control-api";
@@ -142,7 +142,7 @@ export async function liveDeviceMember(
 }
 
 export function untrustedDeviceText(value: string): string {
-  return normalizeUntrustedCommerceText(value, "display_name").text;
+  return normalizeUntrustedText(value, "display_name").text;
 }
 
 /** One step of a staff page: its sink, its receipt scope and its command. */

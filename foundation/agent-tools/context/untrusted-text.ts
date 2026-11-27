@@ -1,8 +1,9 @@
 /**
- * Normalization for commerce text that came from outside.
+ * Normalization for text that came from outside.
  *
- * Product descriptions, order notes, customer messages, supplier replies and
- * imported records are things the agent is reading about. This makes them
+ * Product descriptions, order notes, customer messages, supplier replies,
+ * device fault text and imported records are things the agent is reading
+ * about. This makes them
  * safe to display and unambiguous to read: it does not make them safe to obey.
  * Authority, approval, and effect boundaries do that, and this function is no
  * substitute for them.
@@ -48,7 +49,7 @@ function isUnsafeCodePoint(codePoint: number): boolean {
   return codePoint >= 0x2066 && codePoint <= 0x2069;
 }
 
-export function normalizeUntrustedCommerceText(
+export function normalizeUntrustedText(
   value: string,
   source: UntrustedTextSource,
 ): NormalizedUntrustedText {
