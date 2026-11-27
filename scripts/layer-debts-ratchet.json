@@ -4,8 +4,8 @@
       "merges": 16
     },
     "foundation-misfit": {
-      "links": 10,
-      "names": 34
+      "links": 9,
+      "names": 33
     },
     "table-read": {
       "reads": 40
@@ -39,14 +39,13 @@
       "reason": "The map places a file by its imports, so a file that imports nothing above the foundation can sit in the foundation. Some of these files hold the code of one area or one surface: a Gmail client, the Slack installation store, the commerce system record. `links` is the rule of check-layers.mjs --misfits. `names` reads the words of the path.",
       "fix": "Move the file to the area or the surface that it serves, and give the foundation a port for the part that it needs. If the file is general, give it a name with no area word. Then change its line in the map.",
       "counts": {
-        "links foundation/authority": 1,
         "links foundation/connections": 5,
         "links foundation/control": 1,
         "links foundation/conversation": 1,
         "links foundation/ui": 2,
         "names foundation/agent": 11,
         "names foundation/authority": 8,
-        "names foundation/collaboration": 2,
+        "names foundation/collaboration": 1,
         "names foundation/connections": 7,
         "names foundation/conversation": 2,
         "names foundation/kernel": 1,
