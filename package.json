@@ -58,7 +58,7 @@
     "test:environments": "node --test scripts/worker-environment.test.mjs && pnpm --filter @purin-labs/platform exec vitest run tests/environment-configuration.test.ts",
     "lint": "pnpm lint:static && pnpm lint:d1-patch",
     "lint:static": "pnpm lint:source && pnpm lint:physics-bundle && pnpm lint:appliance-registry",
-    "lint:source": "pnpm lint:state-machines && pnpm lint:state-writers && pnpm lint:purge-catalogue && pnpm lint:provider-workflows && pnpm lint:ifc-boundaries && pnpm lint:runtime-boundary && pnpm lint:commerce-spec && pnpm lint:file-size && pnpm lint:portal-fetch && pnpm lint:portal-requests && pnpm lint:portal-select && pnpm lint:text-limits && pnpm lint:kitchen-dom && pnpm lint:tool-effects && pnpm lint:database-handles && pnpm lint:journey-index && pnpm check:shared-helpers && pnpm lint:layers && pnpm lint:layers-page && pnpm lint:layer-debts && pnpm lint:lint-paths && pnpm lint:doc-links && pnpm lint:plan-numbers && pnpm lint:clones && pnpm lint:unused",
+    "lint:source": "pnpm lint:state-machines && pnpm lint:state-writers && pnpm lint:purge-catalogue && pnpm lint:provider-workflows && pnpm lint:ifc-boundaries && pnpm lint:runtime-boundary && pnpm lint:commerce-spec && pnpm lint:file-size && pnpm lint:portal-fetch && pnpm lint:portal-requests && pnpm lint:portal-select && pnpm lint:text-limits && pnpm lint:kitchen-dom && pnpm lint:tool-effects && pnpm lint:database-handles && pnpm lint:journey-index && pnpm check:shared-helpers && pnpm lint:layers && pnpm lint:layers-page && pnpm lint:layer-debts && pnpm lint:lint-paths && pnpm lint:doc-links && pnpm lint:plan-numbers && pnpm lint:clones && pnpm lint:unused && pnpm lint:entry-exports",
     "lint:layers": "node scripts/check-layers.mjs",
     "lint:layers-page": "node scripts/check-layers.mjs --areas --check",
     "lint:layer-debts": "node scripts/check-layer-debts.mjs",
@@ -90,7 +90,8 @@
     "lint:state-writers": "node scripts/check-state-writers.mjs",
     "lint:purge-catalogue": "node scripts/check-purge-catalogue.mjs",
     "lint:clones": "node scripts/check-clones.mjs",
-    "lint:unused": "node scripts/check-unused.mjs"
+    "lint:unused": "node scripts/check-unused.mjs",
+    "lint:entry-exports": "node scripts/check-entry-exports.mjs"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "5.10.0",

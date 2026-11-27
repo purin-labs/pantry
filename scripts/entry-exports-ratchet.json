@@ -1,0 +1,88 @@
+{
+  "keep": {
+    "worker-entries": {
+      "reason": "The Workers runtime reads the default export and each Durable Object or Container class of a Worker `main` file by name.",
+      "files": [
+        "workers/platform/src/*/worker.ts",
+        "services/commerce/src/worker.ts",
+        "services/commerce/tests/fixture-worker/worker.ts",
+        "apps/storefront/worker/index.ts"
+      ]
+    },
+    "tool-entries": {
+      "reason": "Vitest, VitePress and the aliases of the Vitest configs load the default export or the classes of these files by name.",
+      "files": [
+        "workers/platform/vitest.config.ts",
+        "workers/platform/vitest.e2e.config.ts",
+        "workers/platform/tests/commerce-fixture-worker-setup.ts",
+        "workers/platform/tests/media-wasm-module.ts",
+        "workers/platform/tests/cloudflare-workers-module.ts",
+        "apps/docs/src/.vitepress/config.ts",
+        "apps/docs/src/.vitepress/theme/index.ts"
+      ]
+    },
+    "type-checks": {
+      "reason": "A fixture or a type check is a compile-time test that no file imports. Its exports keep each check from noUnusedLocals (the ignoreIssues of knip.json).",
+      "files": [
+        "**/*.fixtures.ts",
+        "**/*.type-fixtures.ts",
+        "**/type-fixtures.ts",
+        "**/*.typecheck.ts",
+        "**/*.types.ts"
+      ]
+    },
+    "tests": {
+      "reason": "A test file. The Refactor 17 rules allow no change to a test but its imports.",
+      "files": ["**/*.test.ts"]
+    },
+    "execution-bundle": {
+      "reason": "The `export *` of the execution worker is the interface of the retained engine bundle for a host that is not a worker. A change of the line changes the bytes and the identity of each new bundle.",
+      "files": ["areas/kitchen/ui/features/production-run/execution-worker.ts"]
+    }
+  },
+  "counts": {
+    "@purin-labs/agent": 2,
+    "@purin-labs/area-cafe": 3,
+    "@purin-labs/area-cafe-contract": 3,
+    "@purin-labs/area-commerce": 1,
+    "@purin-labs/area-commerce-contract": 5,
+    "@purin-labs/area-devices-contract": 2,
+    "@purin-labs/area-inbox-contract": 6,
+    "@purin-labs/area-integrations": 3,
+    "@purin-labs/area-integrations-contract": 1,
+    "@purin-labs/area-kitchen": 4,
+    "@purin-labs/area-kitchen-contract": 2,
+    "@purin-labs/area-organisation-contract": 1,
+    "@purin-labs/authority": 1,
+    "@purin-labs/bakery-model": 48,
+    "@purin-labs/bakery-workflow": 12,
+    "@purin-labs/cafe-control-api": 3,
+    "@purin-labs/collaboration": 3,
+    "@purin-labs/commerce-client": 236,
+    "@purin-labs/commerce-contracts": 1846,
+    "@purin-labs/commerce-control-api": 8,
+    "@purin-labs/commerce-query-sqlite": 1,
+    "@purin-labs/commerce-worker": 16,
+    "@purin-labs/contract-schema": 3,
+    "@purin-labs/contracts": 87,
+    "@purin-labs/control-api": 242,
+    "@purin-labs/costs-sheet-crdt": 7,
+    "@purin-labs/email-draft-crdt": 8,
+    "@purin-labs/kernel": 1,
+    "@purin-labs/kitchen-control-api": 48,
+    "@purin-labs/mail-reply-crdt": 12,
+    "@purin-labs/menu-board-crdt": 61,
+    "@purin-labs/menu-draft-crdt": 8,
+    "@purin-labs/platform": 1,
+    "@purin-labs/portal": 1,
+    "@purin-labs/product-description-crdt": 9,
+    "@purin-labs/production-plan-crdt": 8,
+    "@purin-labs/production-simulation": 229,
+    "@purin-labs/std": 4,
+    "@purin-labs/surface-slack": 3,
+    "@purin-labs/surface-voice": 1,
+    "@purin-labs/surface-webhooks": 1,
+    "@purin-labs/ui": 70,
+    "@purin-labs/workflow-canvas-crdt": 18
+  }
+}

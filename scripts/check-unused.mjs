@@ -20,10 +20,8 @@
 //
 // knip does not judge the exports of an entry file. Each file in the
 // `exports` map of a workspace package is such an entry, so an export there
-// with no importer is not in the list above. The baseline holds their count,
-// `packageEntryExports`, from a second run with --include-entry-exports. The
-// count may not grow: before you add an export to a package entry, import it
-// somewhere. When it falls, lower it with --update.
+// with no importer is not in the list above. scripts/check-entry-exports.mjs
+// (`pnpm lint:entry-exports`) judges them.
 //
 // A package in foundation/ is a module of the Worker, not an entry for others.
 // knip.json sets `includeEntryExports` for foundation/*, so an export there
@@ -39,18 +37,10 @@
 //   node scripts/check-unused.mjs --report   print the totals for each folder
 
 import { spawnSync } from "node:child_process";
-import {
-  existsSync,
-  readFileSync,
-  readdirSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { format } from "prettier";
-
-import { SOURCE_ROOTS } from "./lib/source-roots.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const baselinePath = join(root, "scripts/unused-ratchet.json");
@@ -71,7 +61,7 @@ if (mode === "--report") {
 if (mode === "--init") {
   await writeBaseline(current);
   console.log(
-    `Wrote ${current.files.length} unused files, ${current.exports.length} unused exports and ${current.packageEntryExports} package entry exports with no importer to scripts/unused-ratchet.json.`,
+    `Wrote ${current.files.length} unused files and ${current.exports.length} unused exports to scripts/unused-ratchet.json.`,
   );
   process.exit(0);
 }
@@ -92,10 +82,6 @@ const gone = {
   files: without(baseline.files, current.files),
   exports: without(baseline.exports, current.exports),
 };
-const entryGrown =
-  current.packageEntryExports > (baseline.packageEntryExports ?? 0);
-const entryFell =
-  current.packageEntryExports < (baseline.packageEntryExports ?? 0);
 const addedCount = added.files.length + added.exports.length;
 const goneCount = gone.files.length + gone.exports.length;
 
@@ -103,21 +89,11 @@ if (mode === "--update") {
   const next = {
     files: without(baseline.files, gone.files),
     exports: without(baseline.exports, gone.exports),
-    packageEntryExports: Math.min(
-      current.packageEntryExports,
-      baseline.packageEntryExports ?? current.packageEntryExports,
-    ),
   };
   await writeBaseline(next);
   console.log(
-    `Dropped ${goneCount} entries. The baseline holds ${next.files.length} unused files, ${next.exports.length} unused exports and ${next.packageEntryExports} package entry exports with no importer.`,
+    `Dropped ${goneCount} entries. The baseline holds ${next.files.length} unused files and ${next.exports.length} unused exports.`,
   );
-  if (entryGrown) {
-    console.error(
-      `${current.packageEntryExports} package entry exports have no importer; the baseline allows ${baseline.packageEntryExports ?? 0}. --update does not raise it.`,
-    );
-    process.exit(1);
-  }
   if (addedCount > 0) {
     console.error(
       `${addedCount} new entries are not in the baseline. --update does not add an entry.`,
@@ -146,21 +122,15 @@ if (added.exports.length > 0) {
     "Remove the `export`, or delete the code if nothing in its file uses it.",
   );
 }
-if (entryGrown) {
+if (goneCount > 0) {
   failed = true;
   console.error(
-    `${current.packageEntryExports} exports of package entry files have no importer; the baseline allows ${baseline.packageEntryExports ?? 0}. Import the new export where it is used, or remove the \`export\`. node scripts/check-unused.mjs --report lists them.`,
-  );
-}
-if (goneCount > 0 || entryFell) {
-  failed = true;
-  console.error(
-    `${goneCount} entries of the baseline are gone${entryFell ? ", and the count of package entry exports with no importer fell" : ""}. Run node scripts/check-unused.mjs --update.`,
+    `${goneCount} entries of the baseline are gone. Run node scripts/check-unused.mjs --update.`,
   );
 }
 if (failed) process.exit(1);
 console.log(
-  `${current.files.length} known unused files, ${current.exports.length} known unused exports and ${current.packageEntryExports} package entry exports with no importer. No new one.`,
+  `${current.files.length} known unused files and ${current.exports.length} known unused exports. No new one.`,
 );
 
 // An export entry is "<file>#<name>". A value and a type of one name in one
@@ -168,25 +138,14 @@ console.log(
 function scanTree() {
   const files = new Set();
   const exports = new Set();
-  for (const issue of runKnip([])) {
+  for (const issue of runKnip()) {
     if (issue.files?.length > 0) files.add(issue.file);
     for (const entry of exportEntries(issue)) exports.add(entry);
   }
-  const entryFiles = packageEntryFiles();
-  const entryExports = new Set();
-  for (const issue of runKnip(["--include-entry-exports"])) {
-    if (!entryFiles.has(issue.file)) continue;
-    for (const entry of exportEntries(issue)) entryExports.add(entry);
-  }
-  return {
-    files: [...files].sort(),
-    exports: [...exports].sort(),
-    packageEntryExports: entryExports.size,
-    entryExports: [...entryExports].sort(),
-  };
+  return { files: [...files].sort(), exports: [...exports].sort() };
 }
 
-function runKnip(extra) {
+function runKnip() {
   const run = spawnSync(
     join(root, "node_modules/.bin/knip"),
     [
@@ -195,7 +154,6 @@ function runKnip(extra) {
       "--no-exit-code",
       "--reporter",
       "json",
-      ...extra,
     ],
     { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 },
   );
@@ -217,61 +175,17 @@ function exportEntries(issue) {
   return entries;
 }
 
-// The source files that the `exports` map of each workspace package names.
-// A target with `*` names each file of its folder that matches.
-function packageEntryFiles() {
-  const entries = new Set();
-  for (const folder of SOURCE_ROOTS) {
-    const base = join(root, folder);
-    if (!existsSync(base)) continue;
-    for (const name of readdirSync(base)) {
-      const manifestPath = join(base, name, "package.json");
-      if (!existsSync(manifestPath)) continue;
-      const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-      for (const target of exportTargets(manifest.exports)) {
-        for (const file of expandTarget(join(base, name), target)) {
-          entries.add(relative(root, file));
-        }
-      }
-    }
-  }
-  return entries;
-}
-
-function exportTargets(value) {
-  if (typeof value === "string") return [value];
-  if (value === null || typeof value !== "object") return [];
-  return Object.values(value).flatMap(exportTargets);
-}
-
-function expandTarget(packageFolder, target) {
-  if (!/\.(m?[jt]sx?)$/u.test(target)) return [];
-  const path = join(packageFolder, target);
-  if (!path.includes("*")) return existsSync(path) ? [path] : [];
-  const [prefix, suffix] = path.split("*");
-  const folder = dirname(prefix);
-  if (!existsSync(folder) || !statSync(folder).isDirectory()) return [];
-  return readdirSync(folder)
-    .map((file) => join(folder, file))
-    .filter(
-      (file) =>
-        file.startsWith(prefix) &&
-        file.endsWith(suffix) &&
-        !file.slice(prefix.length, file.length - suffix.length).includes("/"),
-    );
-}
-
 function without(list, removed) {
   const set = new Set(removed);
   return list.filter((entry) => !set.has(entry));
 }
 
-async function writeBaseline({ files, exports, packageEntryExports }) {
-  const text = JSON.stringify({ packageEntryExports, files, exports });
+async function writeBaseline({ files, exports }) {
+  const text = JSON.stringify({ files, exports });
   writeFileSync(baselinePath, await format(text, { parser: "json" }));
 }
 
-function printReport({ files, exports, entryExports }) {
+function printReport({ files, exports }) {
   const folders = new Map();
   for (const entry of exports) {
     const folder = entry.split("/").slice(0, 2).join("/");
@@ -284,8 +198,4 @@ function printReport({ files, exports, entryExports }) {
   for (const [folder, n] of [...folders].sort((a, b) => b[1] - a[1])) {
     console.log(`${String(n).padStart(5)} exports  ${folder}`);
   }
-  console.log(
-    `${entryExports.length} exports of package entry files have no importer:`,
-  );
-  for (const entry of entryExports) console.log(`  ${entry}`);
 }
