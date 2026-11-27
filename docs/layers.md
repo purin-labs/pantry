@@ -526,7 +526,7 @@ import each of its files. A module with no line for one of these has none.
 
 ## workers/platform
 
-- Folders: 11
+- Folders: 10
   - `workers/platform/src/`
   - `workers/platform/src/actors/`
   - `workers/platform/src/actors/organisation/`
@@ -534,7 +534,6 @@ import each of its files. A module with no line for one of these has none.
   - `workers/platform/src/chatgpt-exit/`
   - `workers/platform/src/code-mode-sandbox/`
   - `workers/platform/src/control/`
-  - `workers/platform/src/control/routes/`
   - `workers/platform/src/model-exit/`
   - `workers/platform/src/slack-ingress/`
   - `workers/platform/src/vault-onepassword/`

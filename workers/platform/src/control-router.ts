@@ -162,7 +162,7 @@ import {
 import {
   handleWhatsAppControlRoute,
   matchWhatsAppControlRoute,
-} from "./control/routes/whatsapp";
+} from "@purin-labs/area-inbox/server/control/routes/whatsapp";
 import {
   handleKitchenCommerceRoute,
   matchKitchenCommerceRoute,

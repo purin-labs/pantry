@@ -458,7 +458,6 @@
     "workers/platform/src/control-router.ts": "workers/platform",
     "workers/platform/src/control/access-control-parts.ts": "workers/platform",
     "workers/platform/src/control/pending-decision-parts.ts": "workers/platform",
-    "workers/platform/src/control/routes/whatsapp.ts": "workers/platform",
     "workers/platform/src/integration-gateway.ts": "workers/platform",
     "workers/platform/src/onboarding-reconciliation-runner.ts": "workers/platform",
     "workers/platform/src/organisation-daily-steps.ts": "workers/platform",

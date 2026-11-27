@@ -16,12 +16,14 @@ import {
   type WhatsAppAccountAction,
   type WhatsAppCaseAction,
   type WhatsAppReplyAction,
-} from "@purin-labs/area-inbox/server/control/routes/agents/whatsapp";
+} from "./agents/whatsapp";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 
-// The routes of the WhatsApp surface. They belong in
-// `surfaces/whatsapp/server/control.ts`; they stay here until that move.
+/**
+ * The control routes of the WhatsApp accounts, the reply queue and the
+ * WhatsApp Cases. The handlers are in `agents/whatsapp.ts`.
+ */
 export type WhatsAppControlRoute =
   | Readonly<{ kind: "whatsappAccounts"; organisationIdRaw: string }>
   | Readonly<{
