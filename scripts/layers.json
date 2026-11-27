@@ -427,8 +427,8 @@
     "foundation/actor-runtime/": "foundation/actor-runtime",
     "foundation/tenancy/": "foundation/tenancy",
     "foundation/kernel/": "foundation/kernel",
-    "apps/portal/src/": "surfaces/portal",
     "apps/portal/src/dev/": "surfaces/portal",
+    "apps/portal/src/tv/": "surfaces/portal",
     "packages/collaboration/src/": "foundation/collaboration",
     "packages/collaboration/tests/": "foundation/collaboration",
     "foundation/ui/": "foundation/ui",
@@ -442,6 +442,7 @@
     "packages/collaboration/worker/": "foundation/collaboration"
   },
   "files": {
+    "apps/portal/src/bootstrap.tsx": "surfaces/portal",
     "workers/platform/src/actors/actor-machines.ts": "workers/platform",
     "workers/platform/src/actors/agent-session.ts": "workers/platform",
     "workers/platform/src/actors/case.ts": "workers/platform",

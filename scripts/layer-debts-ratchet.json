@@ -27,9 +27,6 @@
     "interpolated-table": {
       "writes": 17
     },
-    "portal-default": {
-      "files": 2
-    },
     "contract-runtime": {
       "imports": 94
     }
@@ -182,13 +179,6 @@
         "writes foundation/actor-runtime": 6,
         "writes foundation/agent": 2,
         "writes foundation/tenancy": 3
-      }
-    },
-    "portal-default": {
-      "reason": "The rule of the whole Portal source folder gives the Portal surface module to each file with no line of its own. So the layer check never refuses a new Portal file, and that file may import each area.",
-      "fix": "Give each listed file its own line or a folder rule in the map, then remove the rule of the whole folder. A new Portal file then needs a line, as a new Platform file does.",
-      "counts": {
-        "files surfaces/portal": 2
       }
     },
     "contract-runtime": {

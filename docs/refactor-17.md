@@ -381,6 +381,11 @@ The layer debts, one line for each step that lowers a count:
   The 3 that stay need a port or a move: `bakery-workflow` in the configuration
   draft of the Organisation (2) and `bakery-model` in the Café board chat (1).
 
+- 2026-11-27, `portal-default`: 2 files to 0, and the kind is closed. The map has no
+  rule for the whole folder `apps/portal/src/` now: `bootstrap.tsx` has its own line
+  and `tv/` has its own rule. `pnpm lint:layers` refuses a new file directly in that
+  folder until the map names its module.
+
 The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
 the state of Stage A. Its branches are gone; the work is on `dev`.
