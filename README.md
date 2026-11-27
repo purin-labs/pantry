@@ -45,6 +45,52 @@ acceptance does not establish physical production readiness. See the
   Commerce Read Layer. Punter runs independent
   buyer acceptance journeys from `scripts/punter`.
 
+## Live addresses
+
+The public addresses of Purin, checked on 27 November 2026. Each page answered
+with status 200. The Wrangler file of each Worker holds its route.
+
+### Purin Pantry
+
+| Page                  | Address                                                                                                                                                       | Served by                            |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| Portal (sign-in)      | <https://pantry.purin.io/>                                                                                                                                    | Worker `pantry` (`workers/platform`) |
+| Shop screen player    | <https://pantry.purin.io/tv>                                                                                                                                  | Worker `pantry`                      |
+| Legal pages of Pantry | <https://pantry.purin.io/docs/privacy>, <https://pantry.purin.io/docs/terms>, <https://pantry.purin.io/docs/deletion>, <https://pantry.purin.io/docs/contact> | Worker `pantry`                      |
+
+The pages behind the sign-in are not in this list.
+
+### Front-end pages
+
+| Page                             | Address                                                                                                                   | Served by                                                                |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Company site, English            | <https://purin.io/>, <https://purin.io/ecommerce/>, <https://purin.io/company/>, <https://purin.io/branding/>             | Pages project `purin-app`, source in `purin-labs/purin-monorepo`         |
+| Company site, Japanese           | <https://purin.io/ja/>, <https://purin.io/ja/ecommerce/>, <https://purin.io/ja/company/>, <https://purin.io/ja/branding/> | The same project                                                         |
+| Front page concept, English only | <https://purin.io/branding/front-page/>                                                                                   | The same project                                                         |
+| Staging of the company site      | <https://staging.purin.io/>                                                                                               | Pages project `purin-app-staging`                                        |
+| Online shop                      | <https://shop.purin.io/>                                                                                                  | Worker `purin-shop` (`apps/storefront`)                                  |
+| QR order page of a shop          | <https://menu.purin.io/purin/>                                                                                            | Worker `purin-shop`; each shop has its own path, `menu.purin.io/<shop>/` |
+
+`https://menu.purin.io/` with no shop name answers 404.
+
+### Documentation
+
+| Page      | Address                                   |
+| --------- | ----------------------------------------- |
+| Docs site | <https://docs.pantry.purin.io/>           |
+| Concepts  | <https://docs.pantry.purin.io/concepts/>  |
+| Guides    | <https://docs.pantry.purin.io/guides/>    |
+| Operate   | <https://docs.pantry.purin.io/operate/>   |
+| Reference | <https://docs.pantry.purin.io/reference/> |
+
+The docs site is the VitePress app in `apps/docs` (Worker `pantry-docs`).
+
+### Service addresses
+
+These are not pages. `commerce.pantry.purin.io` is the API of the commerce
+engine (`services/commerce`, Worker `pantry-commerce`). `slack.pantry.purin.io`
+receives Slack events (Worker `pantry-slack-ingress`).
+
 ## Architecture
 
 ```text
