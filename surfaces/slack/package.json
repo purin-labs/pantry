@@ -29,7 +29,6 @@
     "@purin-labs/tenancy": "workspace:*",
     "@purin-labs/tool-handlers": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
-    "@purin-labs/surface-webhooks": "workspace:*",
     "@purin-labs/area-commerce-contract": "workspace:*",
     "@purin-labs/area-brain-contract": "workspace:*",
     "@purin-labs/area-integrations-contract": "workspace:*",

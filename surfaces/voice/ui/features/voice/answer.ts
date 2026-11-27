@@ -1,6 +1,5 @@
 import type { Chat } from "@purin-labs/control-api/portal/chat";
 
-import type { ChatStreamState } from "@purin-labs/surface-portal/ui/features/chat/delivery";
 import { finishedSentences, spokenAnswer } from "./command";
 import type { VoiceSession } from "./session";
 
@@ -12,6 +11,15 @@ export type VoiceAnswerWait = {
   spoken: readonly string[];
 };
 
+/** The part of the chat stream state that a spoken answer reads. */
+export type VoiceAnswerStream =
+  | { readonly kind: "idle" | "failed" | "paused" }
+  | {
+      readonly kind: "active" | "reconnecting";
+      readonly requestId: string;
+      readonly text: string;
+    };
+
 /**
  * Speaks what is new in the answer to a spoken command. Returns the wait that
  * goes on, or null when the answer is done or the chat shows another
@@ -21,7 +29,7 @@ export function speakVoiceAnswer(
   voice: VoiceSession,
   waiting: VoiceAnswerWait,
   conversation: Chat | null,
-  stream: ChatStreamState,
+  stream: VoiceAnswerStream,
 ): VoiceAnswerWait | null {
   if (conversation?.id !== waiting.conversationId) {
     voice.releaseAnnouncements();

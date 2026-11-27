@@ -1,3 +1,5 @@
+import type { GatewaySlackRoute } from "@purin-labs/surface-slack/server/gateway-routing/slack";
+
 type GatewayStaticRoute =
   | Readonly<{ kind: "health" }>
   | Readonly<{ kind: "control" }>
@@ -5,13 +7,6 @@ type GatewayStaticRoute =
   | Readonly<{ kind: "voiceMac" }>
   | Readonly<{ kind: "deviceGateway" }>
   | Readonly<{ kind: "notFound" }>;
-
-export type GatewaySlackRoute =
-  | Readonly<{ kind: "slackEvents" }>
-  | Readonly<{ kind: "slackInteractions" }>
-  | Readonly<{ kind: "slackInstallStart" }>
-  | Readonly<{ kind: "slackInstall" }>
-  | Readonly<{ kind: "slackInstallLiveness" }>;
 
 export type GatewayAdminRoute =
   | Readonly<{ kind: "createOrganisationInstall" }>

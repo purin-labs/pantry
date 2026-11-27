@@ -29,7 +29,7 @@ import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceLog } from "@purin-labs/kernel/observability";
 import { parseSlackUserId } from "@purin-labs/surface-slack/server/events";
 import { assertNever } from "@purin-labs/std";
-import { identityLinkBrowserUrl } from "./support";
+import { identityLinkBrowserUrl } from "@purin-labs/surface-slack/server/slack-ingress/support";
 import {
   decodePathSegment,
   fieldErrorResponse,

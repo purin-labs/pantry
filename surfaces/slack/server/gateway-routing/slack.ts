@@ -1,4 +1,9 @@
-import type { GatewaySlackRoute } from "@purin-labs/surface-webhooks/server/gateway-routing/domain";
+export type GatewaySlackRoute =
+  | Readonly<{ kind: "slackEvents" }>
+  | Readonly<{ kind: "slackInteractions" }>
+  | Readonly<{ kind: "slackInstallStart" }>
+  | Readonly<{ kind: "slackInstall" }>
+  | Readonly<{ kind: "slackInstallLiveness" }>;
 
 export const SLACK_INSTALL_REDIRECT_PATH = "/slack/install";
 

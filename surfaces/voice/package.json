@@ -27,7 +27,6 @@
     "@purin-labs/tenancy": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
     "@purin-labs/ui": "workspace:*",
-    "@purin-labs/surface-portal": "workspace:*",
     "@purin-labs/area-commerce-contract": "workspace:*",
     "@purin-labs/area-organisation-contract": "workspace:*",
     "lucide-react": "^0.542.0",

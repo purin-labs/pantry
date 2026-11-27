@@ -2747,9 +2747,6 @@ importers:
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../../packages/std
-      '@purin-labs/surface-webhooks':
-        specifier: workspace:*
-        version: link:../webhooks
       '@purin-labs/tenancy':
         specifier: workspace:*
         version: link:../../foundation/tenancy
@@ -2799,9 +2796,6 @@ importers:
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../../packages/std
-      '@purin-labs/surface-portal':
-        specifier: workspace:*
-        version: link:../portal
       '@purin-labs/tenancy':
         specifier: workspace:*
         version: link:../../foundation/tenancy
