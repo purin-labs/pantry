@@ -1,7 +1,7 @@
 import React from "react";
 import { X } from "lucide-react";
 
-import { isPrimaryNavigationClick } from "@purin-labs/ui/console-sidebar";
+import { isPrimaryNavigationClick } from "@purin-labs/ui/page-address";
 
 /**
  * The way back from a record to its list: one close button at the top right

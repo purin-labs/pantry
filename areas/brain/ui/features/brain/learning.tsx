@@ -1,7 +1,7 @@
 import React from "react";
 import { ChevronRight } from "lucide-react";
 
-import { isPrimaryNavigationClick } from "@purin-labs/ui/console-sidebar";
+import { isPrimaryNavigationClick } from "@purin-labs/ui/page-address";
 import { formatAbsoluteTime } from "@purin-labs/ui/formatting";
 import type { LearningEvent, LearningFlow } from "./learning-model";
 

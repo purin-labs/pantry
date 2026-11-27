@@ -21,6 +21,7 @@ import {
   type StatusChipStatus,
 } from "@purin-labs/ui/page-components";
 import { workspacePagePath } from "@purin-labs/ui/route";
+import { isPrimaryNavigationClick } from "@purin-labs/ui/page-address";
 import {
   providerLabel,
   providerSearchAliases,
@@ -258,15 +259,7 @@ function navigateIntegrationLink(
   navigate: NavigateFunction,
   event: React.MouseEvent<HTMLDivElement>,
 ): void {
-  if (
-    event.defaultPrevented ||
-    event.button !== 0 ||
-    event.metaKey ||
-    event.ctrlKey ||
-    event.shiftKey ||
-    event.altKey
-  )
-    return;
+  if (event.defaultPrevented || !isPrimaryNavigationClick(event)) return;
   const target = event.target;
   if (!(target instanceof Element)) return;
   const link = target.closest("a");

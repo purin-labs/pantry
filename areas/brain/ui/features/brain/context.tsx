@@ -1,7 +1,7 @@
 import React from "react";
 import { ChevronRight } from "lucide-react";
 
-import { isPrimaryNavigationClick } from "@purin-labs/ui/console-sidebar";
+import { isPrimaryNavigationClick } from "@purin-labs/ui/page-address";
 
 /**
  * The pages that own the inspection of Case context. The Brain page reads

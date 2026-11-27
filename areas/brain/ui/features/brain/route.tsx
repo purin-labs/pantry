@@ -16,9 +16,11 @@ import type {
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import type { Skill } from "@purin-labs/control-api";
 import { refreshBrainSummary, useBrainSummary } from "../../brain-summary";
-import { isPrimaryNavigationClick } from "@purin-labs/ui/console-sidebar";
 import { Notice, PageSkeleton, RecoverableError } from "@purin-labs/ui/page-components";
-import { chatRouteState } from "@purin-labs/ui/page-address";
+import {
+  chatRouteState,
+  isPrimaryNavigationClick,
+} from "@purin-labs/ui/page-address";
 import {
   brainAddress,
   useBrainNavigation,

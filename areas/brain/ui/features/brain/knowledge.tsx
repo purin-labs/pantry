@@ -8,7 +8,7 @@ import type {
   AgentDefinition,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import type { Skill } from "@purin-labs/control-api";
-import { isPrimaryNavigationClick } from "@purin-labs/ui/console-sidebar";
+import { isPrimaryNavigationClick } from "@purin-labs/ui/page-address";
 import { formatAbsoluteTime, formatRelativeTime } from "@purin-labs/ui/formatting";
 import { EmptyState, StatusChip } from "@purin-labs/ui/page-components";
 import type { KnowledgeState } from "@purin-labs/area-brain-contract/ui/features/brain/address";

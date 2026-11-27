@@ -17,7 +17,7 @@ import {
 } from "@purin-labs/control-api";
 
 import { refreshBrainSummary } from "../../brain-summary";
-import { isPrimaryNavigationClick } from "@purin-labs/ui/console-sidebar";
+import { isPrimaryNavigationClick } from "@purin-labs/ui/page-address";
 import { formatAbsoluteTime } from "@purin-labs/ui/formatting";
 import {
   EmptyState,

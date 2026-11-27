@@ -2,6 +2,7 @@ import React from "react";
 import { Tooltip } from "@base-ui/react/tooltip";
 import DashboardSidebarToggleIcon from "./dashboard-sidebar-toggle-icon";
 import { assertNever } from "@purin-labs/std";
+import { isPrimaryNavigationClick } from "./page-address";
 
 const CONSOLE_SIDEBAR_COMPACT_QUERY = "(max-width: 1160px)";
 
@@ -135,22 +136,6 @@ function consoleSidebarHidden(state: ConsoleSidebarState): boolean {
     default:
       return assertNever(state, "Unhandled console sidebar state");
   }
-}
-
-/**
- * Whether a click on a link is one the page handles itself. A click that asks
- * for a new tab or window goes to the browser.
- */
-export function isPrimaryNavigationClick(
-  event: React.MouseEvent<HTMLAnchorElement>,
-): boolean {
-  return !(
-    event.metaKey ||
-    event.ctrlKey ||
-    event.shiftKey ||
-    event.altKey ||
-    event.button !== 0
-  );
 }
 
 function navigationItemClassName(

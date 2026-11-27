@@ -1,3 +1,4 @@
+import type React from "react";
 import type { To } from "react-router";
 
 /**
@@ -72,4 +73,18 @@ export function pageLink(
     to: { pathname: location.pathname, search: location.search },
     state: chatRouteState(url.pathname, url.search),
   };
+}
+
+/**
+ * Whether a click on a link is one the page handles itself. A click that asks
+ * for a new tab or window goes to the browser.
+ */
+export function isPrimaryNavigationClick(event: React.MouseEvent): boolean {
+  return !(
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey ||
+    event.button !== 0
+  );
 }
