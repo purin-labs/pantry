@@ -423,8 +423,12 @@ function createPiOpenRouterModel(
  * comes before any body, so the provider generated no tokens: an error
  * answer counts as zero tokens (Refactor 15). It stays null when no answer
  * arrived, and false when an answer started a stream that failed later.
+ * `status` is the HTTP status of the last answer, or null before one.
  */
-export type PiModelResponse = { errorStatus: boolean | null };
+export type PiModelResponse = {
+  errorStatus: boolean | null;
+  status: number | null;
+};
 
 /**
  * The caller reads the API key first: a failed key read sends no request,
@@ -600,6 +604,7 @@ async function observePiModelResponse(
     (observed.errorStatus ?? true) &&
     response.status >= 400 &&
     response.status < 600;
+  observed.status = response.status;
   if (route.kind === "openai-codex" || route.kind === "openai-chatgpt")
     route.observeResponse(response);
   await next?.(response, model);

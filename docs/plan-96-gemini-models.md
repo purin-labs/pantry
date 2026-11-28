@@ -16,9 +16,9 @@ Both wait for the owner (see "The owner's actions"):
 - Step A4, the spend comparison. It needs the OpenRouter spend of each day, and
   only a sign-in at OpenRouter or a management key gives it.
 - The live Gemini key check of B4, which is also the production proof of B5. The
-  key check passed on Gemini 4 Hydrogen on 28 November 2026. The production steps
-  are deferred: the owner does not put billing on the key's project (see "The
-  owner's actions").
+  key check passed on Gemini 4 Hydrogen on 28 November 2026. The production turn
+  of the same day failed: Google answered HTTP 402, because the key's project had
+  prepaid billing with no credit (see B4). It needs a key with credit.
 
 The code on `origin/dev` `b710111d` supports each claim of this plan (see "Check
 of 28 November 2026").
@@ -431,6 +431,27 @@ part B.
     the four models.
   - The key was pasted in the chat of the session, so it is in that transcript.
     Step 5 deletes it at Google.
+- Result of steps 3 and 4 on 28 November 2026, 15:08 UTC, on the Organisation
+  "Purin workspace" (the test shop is not active and cannot run a chat):
+  - The owner saved the key. The chat menu offered Gemini 4 Hydrogen first, the
+    four models and the "Balanced" effort, as designed.
+  - One new chat with a read-only request failed after 0.4 s with "The selected
+    AI could not finish this response". The Platform logged
+    `embedded_harness_turn_failed` ("Native turn has no accepted final
+    response"), so the provider answered with an error.
+  - Cause: by then the owner had linked the project to a billing account in AI
+    Studio. The project was on prepaid billing with no credit, and Google answers
+    each request of the key with HTTP 402 `RESOURCE_EXHAUSTED` ("Your prepayment
+    credits are depleted"). The same requests from this machine got the same 402.
+  - The model exit Worker logged no line for this turn, and none in the week
+    before. Whether its logs reach Workers Logs is not proven.
+  - Two gaps, fixed on `plan-96` and not deployed: the Platform logged no
+    status of a failed model request, and it did not see a Gemini 402 as a spent
+    allowance, because Pi gives the Gemini error as JSON and not as text that
+    starts with "402". The Session now keeps the HTTP status of the answer, any
+    402 counts as a spent allowance, and each failed request writes
+    `pi.model_request_failed` with the route, the model and the status, without
+    the error text.
 
 ### B5. Release part B — released, production proof open
 
@@ -527,13 +548,14 @@ On `origin/dev` `b710111d`, in a clean worktree:
 - Before the live check of B4: make a Gemini API key at
   `https://aistudio.google.com/apikey`. Done on 28 November 2026, on a project
   with no billing.
-- The production proof of B5: deferred on 28 November 2026. The owner declined
-  billing on the key's project. To close it, choose one: put billing on the
-  project (the Ultra Cloud credits pay) and say yes to steps 3 to 5 of B4; or say
-  yes to steps 3 to 5 on Gemini 4 Hydrogen with the free-tier key, which proves
-  the exit Worker but fails about half of the requests. Until then, the
-  Gemini key route has no production proof. Gemini 4 Hydrogen runs for each
-  Organisation through Purin AI (OpenRouter). Open.
+- The production proof of B5: open. The turn of 28 November 2026 failed because
+  the key's project had prepaid billing with no credit (HTTP 402). To close it,
+  add prepaid credit to the project in AI Studio (the Ultra Cloud credits can pay
+  for it), then say yes to steps 3 to 5 of B4 again. Until then, the Gemini key
+  route has no production proof. Gemini 4 Hydrogen runs for each Organisation
+  through Purin AI (OpenRouter). Open.
+- After the test: select Purin AI again in the AI account of "Purin workspace".
+  Pantry then removes the stored Gemini key. Then delete the key at Google.
 - For A4, one of two actions. Recommended: sign in to `openrouter.ai` in the
   browser pane of the Claude app, so that the agent can read the Activity page.
   Or: make a management key in the OpenRouter settings

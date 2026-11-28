@@ -76,7 +76,9 @@ OpenRouter route of Purin AI goes direct.
 - On OpenRouter, the context window is 256,000 tokens and the output limit is the
   smaller of the allowance and 65,536 tokens. On the Gemini key route, Pantry lowers
   the context window of Pi's model to 256,000 tokens.
-- Pi's own retries are off (`maxRetries` 0). An OpenRouter request sorts the providers
+- Pi's own retries are off (`maxRetries` 0). Each failed model request writes the trace
+  `pi.model_request_failed` with the route, the model and the HTTP status, and never the
+  provider's error text, which can quote the request. An OpenRouter request sorts the providers
   by throughput and sends session affinity headers. The legacy `openai-codex` provider
   uses SSE.
 
@@ -234,14 +236,14 @@ OpenRouter route of Purin AI goes direct.
   `model_route_digest_mismatch`. A fresh lineage starts from the accepted history.
 - So a new model, a new key, a reconnect or a new Pi build starts a fresh lineage.
 
-| Failure                                             | Result                                                                                                              |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| The key or the token cannot be read                 | No request; `embedded_harness_model_credential_unavailable` or the code of the connection                           |
-| The provider answers with an error status           | The request counts as zero tokens                                                                                   |
-| The provider refuses for an exhausted allowance     | `embedded_harness_model_usage_missing` with `refusal: "authority_exhausted"`                                        |
-| Model usage is missing                              | `embedded_harness_model_usage_missing`; the Session marks the run budget as indeterminate (`model_receipt_missing`) |
-| The token allowance is used                         | `embedded_harness_token_budget_exhausted`                                                                           |
-| A harness event is malformed, stale or out of order | The Actor sink refuses it (`harness_event_invalid`, `harness_event_stale`, `harness_event_gap`)                     |
+| Failure                                             | Result                                                                                                                                      |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| The key or the token cannot be read                 | No request; `embedded_harness_model_credential_unavailable` or the code of the connection                                                   |
+| The provider answers with an error status           | The request counts as zero tokens                                                                                                           |
+| The provider refuses for an exhausted allowance     | `embedded_harness_model_usage_missing` with `refusal: "authority_exhausted"`. Any HTTP 402 counts, also a Gemini key with no prepaid credit |
+| Model usage is missing                              | `embedded_harness_model_usage_missing`; the Session marks the run budget as indeterminate (`model_receipt_missing`)                         |
+| The token allowance is used                         | `embedded_harness_token_budget_exhausted`                                                                                                   |
+| A harness event is malformed, stale or out of order | The Actor sink refuses it (`harness_event_invalid`, `harness_event_stale`, `harness_event_gap`)                                             |
 
 ## Contracts
 

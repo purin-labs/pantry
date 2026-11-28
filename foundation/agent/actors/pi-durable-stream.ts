@@ -6,18 +6,24 @@ import type {
 } from "@earendil-works/pi-ai";
 import type { PiModelResponse } from "./pi-model-transport";
 /**
- * Whether a provider's error says that the credential has no allowance left:
- * HTTP 402, OpenAI's `insufficient_quota`, or the ChatGPT usage limit of a
- * subscription. The SDK starts its error text with the HTTP status, except
- * for the subscription, whose text names the limit. Any other text is not
- * such a refusal.
+ * Whether a provider refused the credential because it has no allowance
+ * left: an answer with HTTP 402, OpenAI's `insufficient_quota`, or the
+ * ChatGPT usage limit of a subscription. The OpenAI and Anthropic SDKs start
+ * their error text with the HTTP status; Pi's Gemini adapter gives the
+ * Gemini error as JSON, so the observed status decides there (a Gemini key
+ * whose prepaid credit is spent answers 402). Any other answer is not such
+ * a refusal.
  */
-export function providerAllowanceSpent(message: string | undefined): boolean {
+export function providerAllowanceSpent(
+  response: PiModelResponse,
+  message: string | undefined,
+): boolean {
   return (
-    message !== undefined &&
-    (/^402\b/u.test(message) ||
-      /\binsufficient_quota\b/u.test(message) ||
-      /^You have hit your ChatGPT usage limit\b/u.test(message))
+    response.status === 402 ||
+    (message !== undefined &&
+      (/^402\b/u.test(message) ||
+        /\binsufficient_quota\b/u.test(message) ||
+        /^You have hit your ChatGPT usage limit\b/u.test(message)))
   );
 }
 
@@ -33,7 +39,7 @@ export function errorStatusWithoutTokens(
   return (
     response.errorStatus === true &&
     error.usage.totalTokens === 0 &&
-    !providerAllowanceSpent(error.errorMessage)
+    !providerAllowanceSpent(response, error.errorMessage)
   );
 }
 

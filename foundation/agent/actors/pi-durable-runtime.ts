@@ -49,7 +49,7 @@ import type {
   EmbeddedHarnessModelUsage,
 } from "@purin-labs/contracts";
 import { newRequestId } from "@purin-labs/kernel/ids";
-import { traceLog } from "@purin-labs/kernel/observability";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import type { Result } from "@purin-labs/kernel/result";
 import type {
   EmbeddedHarnessAdapter,
@@ -522,7 +522,7 @@ class PiDurableRuntime implements EmbeddedHarnessRuntime {
     const apiKey = await this.route.resolveModelApiKey();
     this.modelUsage.modelCalls += 1;
     this.saveUsage();
-    const response: PiModelResponse = { errorStatus: null };
+    const response: PiModelResponse = { errorStatus: null, status: null };
     const dispatch = await dispatchPiModel({
       route: this.route,
       apiKey,
@@ -584,8 +584,19 @@ class PiDurableRuntime implements EmbeddedHarnessRuntime {
           event.error,
           errorStatusWithoutTokens(response, event.error),
         );
-        if (providerAllowanceSpent(event.error.errorMessage))
+        if (providerAllowanceSpent(response, event.error.errorMessage))
           this.allowanceSpent = true;
+        // The provider's error text can quote the request, so only its
+        // status leaves the Session.
+        traceWarn("pi.model_request_failed", {
+          requestId: newRequestId(),
+          session_id: this.input.sessionId,
+          turn_id: this.input.turnLease.turn.turnId,
+          route: this.route.kind,
+          model: this.route.model.id,
+          status: response.status,
+          allowance_spent: this.allowanceSpent,
+        });
       }
       this.preflight();
       output.push(event);
