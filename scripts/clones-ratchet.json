@@ -179,7 +179,7 @@
     "areas/kitchen/ui/features/workflow-simulator/bakery-appliance-layout.ts = areas/kitchen/ui/features/workflow-simulator/bakery-appliance-layout.ts": {"copies":1,"lines":10},
     "areas/kitchen/ui/features/workflow-simulator/docks/playback.tsx = areas/kitchen/ui/features/workflow-simulator/equipment-lanes.tsx": {"copies":3,"lines":110},
     "areas/kitchen/ui/features/workflow-simulator/docks/playback.tsx = areas/kitchen/ui/features/workflow-simulator/physics-replay.tsx": {"copies":1,"lines":20},
-    "areas/kitchen/ui/features/workflow-simulator/production-workspace.tsx = areas/kitchen/ui/features/workflow-simulator/production-workspace.tsx": {"copies":3,"lines":63},
+    "areas/kitchen/ui/features/workflow-simulator/production-recipe-files.tsx = areas/kitchen/ui/features/workflow-simulator/production-recipe-files.tsx": {"copies":3,"lines":63},
     "areas/kitchen/ui/features/workflow-simulator/route.tsx = areas/kitchen/ui/features/workflow-simulator/route.tsx": {"copies":3,"lines":54},
     "areas/kitchen/ui/features/workflow-simulator/scene.ts = areas/kitchen/ui/features/workflow-simulator/scene.ts": {"copies":9,"lines":115},
     "areas/kitchen/ui/features/workflow-simulator/scene.ts = areas/kitchen/ui/features/workflow-simulator/spatial/floor-plan.ts": {"copies":1,"lines":21},

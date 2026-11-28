@@ -2,7 +2,6 @@
   "limit": 3000,
   "files": {
     "apps/storefront/src/storefront.tsx": 9317,
-    "areas/kitchen/ui/features/workflow-simulator/production-workspace.tsx": 5021,
     "scripts/plan-50/evaluate-pi-durable.mjs": 5289,
     "surfaces/portal/ui/styles.css": 8686
   }
