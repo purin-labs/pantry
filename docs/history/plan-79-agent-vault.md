@@ -10,6 +10,11 @@ secure note is a general secret that agents use like a login (owner's words,
 2026-10-25: "Treat them like login items, just more general"). The owner
 accepted the defaults of D6–D8 on 2026-10-25. Phases 3 to 6 are not started.
 
+Change on 2026-11-28: the owner removed payment cards from the plans. Phase 4,
+decisions D1 and D6, the `payment_card` kind and the `VAULT_CARDS_ENABLED` switch
+below are history: nothing of them is built, and no PCI DSS verification is
+planned. The text below keeps the words of its time.
+
 ## Result in one paragraph
 
 Satyr Vault can hold website logins and contact profiles with no change to its

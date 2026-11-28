@@ -394,9 +394,9 @@ A refused role on an Organisation route gets 404. A root rotation needs the
   for each Case, no fill receipt and no sign-in request sheet. `read_secret` serves the
   move only.
 - **Secure notes (phase 3)** are not built.
-- **Payment cards (phase 4)** are not built: no `payment_card` kind and no
-  `VAULT_CARDS_ENABLED` switch. Plan 79 keeps card storage and card fill off in
-  production until the PCI DSS verification passes. Pantry must never store a CVV.
+- **Payment cards** are not built and not planned: the owner removed them from the
+  plans on 2026-11-28. No `payment_card` kind and no `VAULT_CARDS_ENABLED` switch
+  exist. Pantry stores no card number and no CVV.
 - A login has no one-time code seed. A website cannot be a subdomain wildcard.
 - Pantry keeps no reference row for a 1Password item. A person cannot choose the store
   for a new item while 1Password is connected.

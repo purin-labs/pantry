@@ -175,8 +175,8 @@ retries converge on one receipt. Later resolution fails with
 runs 1Password SDK calls behind the `VAULT_ONEPASSWORD` binding. It keeps only
 SDK clients in memory and never logs a request, token or item.
 
-Open (Plan 79 phases 3–6): agent browser fill, secure notes and payment cards.
-Cards stay off in production until the PCI DSS verification passes.
+Open (Plan 79 phases 3, 5 and 6): agent browser fill and secure notes. Payment
+cards are not planned: the owner removed them from the plans on 2026-11-28.
 
 ### Output screening
 
