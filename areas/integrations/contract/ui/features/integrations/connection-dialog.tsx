@@ -4,6 +4,7 @@ import {
   cancelDialog,
   closeDialog,
   closeDialogNow,
+  isBackdropClick,
   registerSheet,
   showDialog,
   useDialogPresent,
@@ -391,13 +392,5 @@ function closeConnectionBackdrop(
   close: () => void,
   event: React.MouseEvent<HTMLDialogElement>,
 ): void {
-  if (event.target !== event.currentTarget) return;
-  const bounds = event.currentTarget.getBoundingClientRect();
-  if (
-    event.clientX < bounds.left ||
-    event.clientX > bounds.right ||
-    event.clientY < bounds.top ||
-    event.clientY > bounds.bottom
-  )
-    close();
+  if (isBackdropClick(event)) close();
 }

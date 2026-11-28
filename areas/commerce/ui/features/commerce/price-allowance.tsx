@@ -1,5 +1,10 @@
 import * as React from "react";
-import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
+import {
+  cancelDialog,
+  DialogHeading,
+  isBackdropClick,
+  syncDialog,
+} from "@purin-labs/ui/dialog";
 import { formatOfferPrice } from "@purin-labs/area-commerce-contract/ui/features/governed-actions/commerce";
 import type { OfferPriceAllowanceView, PricedOffer } from "@purin-labs/control-api/portal/price-allowance";
 import {
@@ -177,15 +182,7 @@ function dismissAllowanceBackdrop(
   close: () => void,
   event: React.MouseEvent<HTMLDialogElement>,
 ): void {
-  if (event.target !== event.currentTarget) return;
-  const bounds = event.currentTarget.getBoundingClientRect();
-  if (
-    event.clientX < bounds.left ||
-    event.clientX > bounds.right ||
-    event.clientY < bounds.top ||
-    event.clientY > bounds.bottom
-  )
-    close();
+  if (isBackdropClick(event)) close();
 }
 
 type AllowanceWrite = Readonly<{

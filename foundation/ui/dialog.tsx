@@ -225,3 +225,17 @@ export function cancelDialog(
   event.stopPropagation();
   close();
 }
+
+/** True when a click on a modal dialog fell on its backdrop, outside its box. */
+export function isBackdropClick(
+  event: React.MouseEvent<HTMLDialogElement>,
+): boolean {
+  if (event.target !== event.currentTarget) return false;
+  const bounds = event.currentTarget.getBoundingClientRect();
+  return (
+    event.clientX < bounds.left ||
+    event.clientX > bounds.right ||
+    event.clientY < bounds.top ||
+    event.clientY > bounds.bottom
+  );
+}

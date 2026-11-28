@@ -1,5 +1,5 @@
 {
-  "total": {"copies":730,"lines":12703},
+  "total": {"copies":728,"lines":12679},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -84,8 +84,6 @@
     "areas/commerce/ui/features/commerce/entity-plane/saved-view-editor.tsx = areas/commerce/ui/features/commerce/entity-plane/saved-view-editor.tsx": {"copies":1,"lines":22},
     "areas/commerce/ui/features/commerce/inventory-production.tsx = areas/commerce/ui/features/commerce/inventory-receipt.tsx": {"copies":1,"lines":14},
     "areas/commerce/ui/features/commerce/inventory-receipt.tsx = areas/commerce/ui/features/commerce/inventory-reconciliation.tsx": {"copies":2,"lines":34},
-    "areas/commerce/ui/features/commerce/price-allowance.tsx = areas/integrations/contract/ui/features/integrations/connection-dialog.tsx": {"copies":1,"lines":14},
-    "areas/commerce/ui/features/commerce/price-allowance.tsx = surfaces/portal/ui/features/chat/route.tsx": {"copies":1,"lines":10},
     "areas/devices/server/snapshots.ts = areas/devices/server/snapshots.ts": {"copies":1,"lines":11},
     "areas/inbox/server/actors/connector-email-evaluation.ts = areas/inbox/server/actors/connector-email-evaluation.ts": {"copies":1,"lines":22},
     "areas/inbox/server/actors/connector-email-operational.ts = areas/inbox/server/actors/connector-email-operational.ts": {"copies":7,"lines":87},

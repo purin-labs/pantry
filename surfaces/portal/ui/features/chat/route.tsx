@@ -84,7 +84,12 @@ import { ChatSelectedFile } from "./selected-file";
 import { ChatPermissionPrompt } from "./permission-prompt";
 import { ChatHeldStepPrompt } from "@purin-labs/area-organisation/ui/features/access/chat-held-step-prompt";
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
-import { DialogHeading, syncDialog, cancelDialog } from "@purin-labs/ui/dialog";
+import {
+  DialogHeading,
+  syncDialog,
+  cancelDialog,
+  isBackdropClick,
+} from "@purin-labs/ui/dialog";
 import { soundsLikeStop, type VoiceCommand } from "@purin-labs/surface-voice/ui/features/voice/command";
 import {
   lastAssistantEvent,
@@ -2673,16 +2678,7 @@ export class ChatPage extends React.Component<Props, State> {
   private dismissHistoryBackdrop(
     event: React.MouseEvent<HTMLDialogElement>,
   ): void {
-    if (event.target !== event.currentTarget) return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    if (
-      event.clientX < bounds.left ||
-      event.clientX > bounds.right ||
-      event.clientY < bounds.top ||
-      event.clientY > bounds.bottom
-    ) {
-      this.closeHistory();
-    }
+    if (isBackdropClick(event)) this.closeHistory();
   }
 
   private toggleThreads(): void {
