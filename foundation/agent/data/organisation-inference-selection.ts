@@ -4,7 +4,14 @@ import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import { isRecord } from "@purin-labs/std";
-import { prepareInferenceSelectionRevision } from "@purin-labs/tenancy/data/organisation-onboarding-row";
+import {
+  configurationVersionPredicate,
+  prepareInferenceSelectionRevision,
+} from "@purin-labs/tenancy/data/organisation-onboarding-row";
+import {
+  prepareOtherModelCredentialsRevocation,
+  type ModelKeyProvider,
+} from "@purin-labs/authority/credential-vault/index";
 import { isChatEffort, type ChatEffort } from "@purin-labs/control-api";
 
 export type OrganisationInferenceSelection =
@@ -14,6 +21,29 @@ export type OrganisationInferenceSelection =
   | { readonly kind: "organisation_anthropic_api_key" }
   | { readonly kind: "organisation_google_api_key" }
   | { readonly kind: "pantry_platform" };
+
+export type ApiKeySelectionKind = Extract<
+  OrganisationInferenceSelection["kind"],
+  `organisation_${ModelKeyProvider}_api_key`
+>;
+
+/** The provider of the key that each key source stores. */
+export const API_KEY_SELECTION_PROVIDER: Readonly<
+  Record<ApiKeySelectionKind, ModelKeyProvider>
+> = {
+  organisation_openai_api_key: "openai",
+  organisation_anthropic_api_key: "anthropic",
+  organisation_google_api_key: "google",
+};
+
+/** The provider whose key the source uses, or null for another source. */
+function inferenceSelectionKeyProvider(
+  selection: OrganisationInferenceSelection,
+): ModelKeyProvider | null {
+  return Object.hasOwn(API_KEY_SELECTION_PROVIDER, selection.kind)
+    ? API_KEY_SELECTION_PROVIDER[selection.kind as ApiKeySelectionKind]
+    : null;
+}
 
 type OrganisationInferenceSelectionSnapshot = {
   readonly organisationId: OrganisationId;
@@ -144,6 +174,12 @@ export function prepareOrganisationSlackReasoningEffortWrite(
     );
 }
 
+/**
+ * Selects the inference source. The same batch removes each stored model key
+ * that is not the key of the new source (spec FND-04), so Pantry holds a key
+ * only while its source is selected. The selection and the removal apply only
+ * while the configuration version is the expected one.
+ */
 export async function selectOrganisationInferenceSelection(input: {
   readonly db: OrganisationDatabase;
   readonly organisationId: OrganisationId;
@@ -202,12 +238,25 @@ export async function selectOrganisationInferenceSelection(input: {
   const nextProjectionRevision = projectionRevision + 1;
   const session = input.db.withSession("first-primary");
   const invalidateReadiness = current.lifecycle !== "active";
+  // The revision statement is the last one, so each statement before it sees
+  // the expected version and changes no row after another change.
+  const unchanged = configurationVersionPredicate(
+    input.organisationId,
+    configurationVersion,
+  );
+  const removedKeys = await prepareOtherModelCredentialsRevocation({
+    db: session,
+    organisationId: input.organisationId,
+    keep: inferenceSelectionKeyProvider(input.selection),
+    now: input.now,
+    guard: unchanged,
+  });
   const statements = [
     session
       .prepare(
         `INSERT INTO organisation_inference_selection (
          organisation_id, selection_kind, selected_by_user_id, selected_at
-       ) VALUES (?, ?, ?, ?)
+       ) SELECT ?, ?, ?, ? WHERE ${unchanged.sql}
        ON CONFLICT (organisation_id) DO UPDATE SET
          selection_kind = excluded.selection_kind,
          selected_by_user_id = excluded.selected_by_user_id,
@@ -218,7 +267,9 @@ export async function selectOrganisationInferenceSelection(input: {
         input.selection.kind,
         input.selectedByUserId,
         input.now,
+        ...unchanged.bindings,
       ),
+    ...removedKeys,
     prepareInferenceSelectionRevision(session, {
       nextConfigurationVersion,
       nextProjectionRevision,
@@ -229,7 +280,7 @@ export async function selectOrganisationInferenceSelection(input: {
     }),
   ];
   const results = await session.batch(statements);
-  if (results[1]?.meta.changes !== 1) {
+  if (results.at(-1)?.meta.changes !== 1) {
     return { ok: false, error: { code: "configuration_version_conflict" } };
   }
   return {

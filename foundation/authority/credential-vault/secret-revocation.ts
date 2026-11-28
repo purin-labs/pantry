@@ -11,7 +11,7 @@ import type {
 type Database = OrganisationDatabase | OrganisationDatabaseSession;
 
 /** A condition that the statement joins with AND, and its values. */
-type Guard = Readonly<{ sql: string; bindings: readonly unknown[] }>;
+export type Guard = Readonly<{ sql: string; bindings: readonly unknown[] }>;
 
 /** Marks the secret of a handle as revoked. A revoked secret keeps its time. */
 export function prepareVaultSecretRevocation(
@@ -140,6 +140,28 @@ export function prepareCredentialRefRevocation(
          WHERE organisation_id = ? AND vault_handle = ? AND revoked_at IS NULL`,
     )
     .bind(input.now, input.organisationId, input.handle);
+}
+
+/** Marks the live credential reference of a handle as revoked while the guard holds. */
+export function prepareGuardedCredentialRefRevocation(
+  db: Database,
+  input: Readonly<{
+    now: number;
+    organisationId: string;
+    handle: string;
+    guard: Guard;
+  }>,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `UPDATE credential_ref SET revoked_at = ? WHERE organisation_id = ? AND vault_handle = ? AND revoked_at IS NULL AND ${input.guard.sql}`,
+    )
+    .bind(
+      input.now,
+      input.organisationId,
+      input.handle,
+      ...input.guard.bindings,
+    );
 }
 
 /** Revokes each live credential reference of an archived Organisation while the guard holds. */

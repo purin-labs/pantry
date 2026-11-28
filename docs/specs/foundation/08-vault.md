@@ -85,6 +85,15 @@ apart from the Slack resolvers.
   row (name `model`, one fixed host, `inject_as`) and revokes the old secret. The
   providers are `openai`, `anthropic` (prefix `sk-ant-`) and `google`.
   `resolveCurrentOrganisationModelCredential` reads the current key with no route.
+- A model key stays in the Vault only while its inference source is selected (FND-04).
+  `prepareOtherModelCredentialsRevocation` reads the live `model` rows of
+  `credential_ref`. For each provider of the table apart from the one to keep, it gives
+  one statement that revokes the `vault_secret` row and one that revokes the
+  `credential_ref` row. Each statement carries the guard of the caller. The change of
+  the inference source puts them into its batch, with the configuration version as the
+  guard. With no such key, it gives no statement. It writes no
+  `credential_revocation_operation` receipt, as a key replacement writes none: the
+  receipt of the control mutation records the change.
 - Other modules call `resolveVaultHandle` or `resolveVaultSecretRow` in `service.ts`
   directly: custom connectors, the Jev key, the ChatGPT and Claude sign-ins, and Slack
   ingress. Each one takes the handle from its own current record first: a connector
@@ -234,7 +243,9 @@ no trace for this count.
   members read the list and the history.
 - The API keys tab is for owners and admins. It lists, read-only, the credentials of
   the credential inventory and the Organisation's own model key. The drawer of a row
-  links to Integrations, where a person adds, replaces or revokes the key.
+  links to Integrations, where a person adds, replaces or revokes the key. The model
+  key is the key of the selected inference source, and Pantry stores no other model
+  key. A person removes it with a change of the AI account to another source.
 - The link opens the page of the integration for the model key and for the 10 providers
   in `ROUTED_PROVIDERS` (`keys.ts`). For another provider, for example a custom
   connector, it opens Integrations with no integration selected.
@@ -335,6 +346,7 @@ Operator routes (`control/routes/operators.ts`, `gateway/admin/actor-registry.ts
 | Connect or disconnect 1Password; move items       | No               | Yes          | No    |
 | See the API keys tab and the credential inventory | No               | Yes          | No    |
 | Rotate or revoke a provider credential            | No               | Yes          | No    |
+| Remove the model key (change of the AI source)    | No               | Yes          | No    |
 
 A refused role on an Organisation route gets 404. A root rotation needs the
 `support_admin` role and gets 403 (`support_admin_role_required`) without it.

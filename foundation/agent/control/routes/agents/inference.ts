@@ -2,9 +2,11 @@ import type { Env } from "@purin-labs/kernel/env";
 import type { Result } from "@purin-labs/kernel/result";
 import { prepareControlMutationReceipt } from "@purin-labs/tenancy/data/control-mutation";
 import {
+  API_KEY_SELECTION_PROVIDER,
   parseOrganisationInferenceSelection,
   readOrganisationInferenceSelection,
   selectOrganisationInferenceSelection,
+  type ApiKeySelectionKind,
   type OrganisationInferenceSelectionError,
 } from "../../../data/organisation-inference-selection";
 import {
@@ -193,20 +195,6 @@ type OrganisationInferenceMutation =
       readonly provider: ModelKeyProvider;
       readonly apiKey: ModelApiKey<ModelKeyProvider>;
     };
-
-type ApiKeySelectionKind =
-  | "organisation_openai_api_key"
-  | "organisation_anthropic_api_key"
-  | "organisation_google_api_key";
-
-/** The provider of the key that each key selection stores. */
-const API_KEY_SELECTION_PROVIDER: Readonly<
-  Record<ApiKeySelectionKind, ModelKeyProvider>
-> = {
-  organisation_openai_api_key: "openai",
-  organisation_anthropic_api_key: "anthropic",
-  organisation_google_api_key: "google",
-};
 
 function parseOrganisationInferenceMutation(
   body: JsonRecord,

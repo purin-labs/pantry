@@ -290,6 +290,10 @@ function InferenceSourceChoice(props: {
   });
   const apiKey = inferenceApiKeyField(props.draft);
   const changed = props.draft !== props.selection.kind;
+  // A change away from a key source removes its key (spec FND-04).
+  const removedKey = changed
+    ? inferenceApiKeyField(props.selection.kind)
+    : null;
   const source = INFERENCE_SOURCES.find(
     matchesInferenceSource.bind(null, props.draft),
   );
@@ -320,6 +324,9 @@ function InferenceSourceChoice(props: {
         </fieldset>
         <p id="inference-source-help" className="field-hint">
           A change applies to new conversations only.
+          {removedKey === null
+            ? null
+            : ` Purin Pantry removes the saved ${removedKey.label} when you save this change.`}
         </p>
         {apiKey === null ? null : (
           <>

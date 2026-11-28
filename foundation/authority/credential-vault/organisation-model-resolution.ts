@@ -1,4 +1,7 @@
-import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type {
+  OrganisationDatabase,
+  OrganisationDatabaseSession,
+} from "@purin-labs/kernel/database-handles";
 import type { ModelRoute } from "@purin-labs/contracts";
 
 import type { OrganisationId } from "@purin-labs/kernel/ids";
@@ -12,7 +15,12 @@ import {
 import type { CredentialVaultBindings } from "./keyring";
 import { resolveVaultHandle, storeVaultSecret } from "./service";
 import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
-import { prepareVaultSecretRevocation } from "./secret-revocation";
+import {
+  prepareGuardedCredentialRefRevocation,
+  prepareGuardedVaultSecretRevocation,
+  prepareVaultSecretRevocation,
+  type Guard,
+} from "./secret-revocation";
 
 /** The model providers whose API key an Organisation stores (spec FND-08). */
 export type ModelKeyProvider = "openai" | "anthropic" | "google";
@@ -194,6 +202,51 @@ export async function storeOrganisationModelCredential<
   return results[0]?.meta.changes === 1
     ? { ok: true, value: handle }
     : credentialError(input.provider, "binding_failed");
+}
+
+/**
+ * The statements that remove each stored model key apart from the key of
+ * `keep`: for each one, the revocation of its secret and of its reference,
+ * while the guard holds. The list is empty when no such key is stored, so a
+ * caller with nothing to remove writes no row.
+ */
+export async function prepareOtherModelCredentialsRevocation(input: {
+  readonly db: OrganisationDatabaseSession;
+  readonly organisationId: OrganisationId;
+  /** The provider of the selected key source, or null for another source. */
+  readonly keep: ModelKeyProvider | null;
+  readonly now: number;
+  readonly guard: Guard;
+}): Promise<readonly D1PreparedStatement[]> {
+  const stored = await input.db
+    .prepare(
+      `SELECT provider, vault_handle AS vaultHandle
+     FROM credential_ref
+     WHERE organisation_id = ? AND name = ? AND revoked_at IS NULL`,
+    )
+    .bind(input.organisationId, MODEL_CREDENTIAL_NAME)
+    .all<CredentialRefRow & { readonly provider: unknown }>();
+  const statements: D1PreparedStatement[] = [];
+  for (const row of stored.results) {
+    if (
+      typeof row.provider !== "string" ||
+      !Object.hasOwn(MODEL_KEY_PROVIDERS, row.provider) ||
+      row.provider === input.keep ||
+      typeof row.vaultHandle !== "string"
+    )
+      continue;
+    const revocation = {
+      now: input.now,
+      organisationId: input.organisationId,
+      handle: row.vaultHandle,
+      guard: input.guard,
+    };
+    statements.push(
+      prepareGuardedVaultSecretRevocation(input.db, revocation),
+      prepareGuardedCredentialRefRevocation(input.db, revocation),
+    );
+  }
+  return statements;
 }
 
 export async function resolveCurrentOrganisationModelCredential<

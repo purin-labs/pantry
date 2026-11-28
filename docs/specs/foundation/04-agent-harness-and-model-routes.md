@@ -98,9 +98,15 @@ OpenRouter route of Purin AI goes direct.
   new source. Its next message gets HTTP 409 `chat_model_changed`, and a queued message
   becomes a failed turn that the person can retry. Steering needs a stored route that
   is equal to the current route. A new chat uses the new source.
-- An open Slack thread keeps the model that its Session pinned. A new thread starts on
-  the current route. When the pinned model leaves the list, the thread's next message
-  continues on the current route, with the thread's history.
+- An open Slack thread keeps the model that its Session pinned, for example through a
+  release that changes a default model. A new thread starts on the current route. When
+  the pinned model leaves the list, the thread's next message continues on the current
+  route, with the thread's history.
+- A change of the source, and a new API key, raise the configuration version of the
+  Organisation. Slack ingress puts that version into the authority of each message
+  (`membershipRevision`), and the authority names the Session. So the next message of
+  an open Slack thread starts a new Session on the current route. Its model request
+  holds the earlier messages of the person from the Case context.
 - An admin sets one effort for Slack answers, in the Slack drawer of the Portal. It
   applies to the next Slack turn, also in an open thread, when the model of the route
   offers that effort.
@@ -156,6 +162,21 @@ OpenRouter route of Purin AI goes direct.
 - An admin saves an API key together with the selection of its source. A key has 20 to
   4,096 characters. An Anthropic key starts with `sk-ant-`. A new key revokes the key
   that it replaces. The Portal does not show a saved key again.
+- A change of the source away from a key source removes the stored key of that source.
+  The batch that writes the selection revokes each stored model key that is not the key
+  of the new source: its `vault_secret` row and its `credential_ref` row. So Pantry
+  holds a model key only while its source is selected. An admin who returns to a key
+  source saves the key again. No other action removes a model key.
+- The selection and the revocation apply only while the configuration version is the
+  version that the request names. A request with another version changes no row.
+- In the AI account drawer, the hint below the sources names the saved key that the
+  change removes.
+- After the removal, the key read of a route that pins the removed key fails, and no
+  request leaves. A stored Portal chat on that source gets `chat_model_changed`, and an
+  open Slack thread continues on the new source. Only a turn that runs at the moment of
+  the change still pins the key: it stops with the general failure text of its surface.
+- A source change with no other stored key adds no statement. A key that an
+  Organisation kept before this rule goes at its next change of the source.
 - The Portal note for a Gemini key tells the admin to use a Google Cloud project with
   billing turned on.
 - A change of the source names the current configuration version. Another version
@@ -259,6 +280,9 @@ OpenRouter route of Purin AI goes direct.
   `claude-connection.ts` and `claude-oauth.ts`.
 - Keys: `credential-vault/organisation-model-resolution.ts`, with one row for each of
   `openai`, `anthropic` and `google` (host, header, prefix).
+  `prepareOtherModelCredentialsRevocation` gives the statements of the removal, and
+  `selectOrganisationInferenceSelection` (`data/organisation-inference-selection.ts`)
+  puts them into the batch of the selection.
 - Exits: `src/model-exit/` (`worker.ts`, `provider-fetch.ts`, `protocol.ts`),
   `src/chatgpt-exit/` (`worker.ts`, `forward.ts`), `services/chatgpt-exit/`
   (`Dockerfile`, `server.mjs`), `wrangler.model-exit.jsonc` and
@@ -319,7 +343,7 @@ This subsystem has no event kind, no capability and no agent tool.
 | Action                                             | Viewer | Operator | Admin | Owner | Agent |
 | -------------------------------------------------- | ------ | -------- | ----- | ----- | ----- |
 | Read the source, the connections and the allowance | Yes    | Yes      | Yes   | Yes   | No    |
-| Change the source, save an API key                 | No     | No       | Yes   | Yes   | No    |
+| Change the source, save or remove an API key       | No     | No       | Yes   | Yes   | No    |
 | Set the effort for Slack answers                   | No     | No       | Yes   | Yes   | No    |
 | Connect or disconnect the Claude account           | No     | No       | Yes   | Yes   | No    |
 | Connect, reconnect or disconnect ChatGPT           | No     | No       | No    | Yes   | No    |
@@ -358,6 +382,7 @@ This subsystem has no event kind, no capability and no agent tool.
   A person picks the model and the effort of a Portal chat in the chat menu.
 - **Idle cost.** An idle Organisation writes no row here. The cron reads each regional
   database one time in each run and writes only when a sign-in is older than 7 days.
+  The removal of a key runs only in the source change of an admin.
 - **Out of scope:** Vertex AI; a Gemini subscription sign-in; a model choice on the
   Purin AI route; more than one ChatGPT or Claude connection for an Organisation; a
   change of route inside one lineage.
@@ -394,6 +419,10 @@ Boundaries:
 - No route removes a stored model key. A key leaves the Vault only when another key of
   the same provider replaces it. A change of the source keeps the key.
 - The Wrangler files have a `local` and a `production` profile, and no staging profile.
+- After a change of the source, the new Session of an open Slack thread gets the
+  earlier messages of the person, but not the earlier answers of the agent.
+- A turn that runs while an admin removes its key stops with the general failure text.
+  It does not name the removed key.
 
 ## Sources
 
@@ -412,8 +441,10 @@ Boundaries:
   - Routes and sign-ins: `chatgpt-subscription-slack.test.ts`,
     `chatgpt-subscription-portal.test.ts`, `claude-oauth.test.ts`,
     `claude-model-choice-portal.test.ts`, `gemini-key-portal.test.ts`,
-    `platform-model-change.test.ts`, `slack-model-change.test.ts`,
-    `slack-reasoning-effort.test.ts` and `chat-model-route-unavailable.test.ts`.
+    `model-key-removal.test.ts`, `platform-model-change.test.ts`,
+    `slack-model-change.test.ts`, `slack-reasoning-effort.test.ts` and
+    `chat-model-route-unavailable.test.ts`. The fake Gemini API is in
+    `gemini-support.ts`.
   - Harness: `pi-sdk-actor.test.ts`, `pi-sdk-effect.test.ts`,
     `pi-sdk-compaction.test.ts`, `pi-native-steering.test.ts`,
     `checkpoint-restart.test.ts` and `checkpoint-atomic-acceptance.test.ts`.

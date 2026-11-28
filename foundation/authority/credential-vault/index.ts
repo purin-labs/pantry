@@ -57,6 +57,7 @@ export {
 export { resolveAccountRemovalCredential } from "./account-removal-resolution";
 export {
   parseModelApiKey,
+  prepareOtherModelCredentialsRevocation,
   resolveCurrentOrganisationModelCredential,
   resolveOrganisationModelCredentialForRoute,
   storeOrganisationModelCredential,

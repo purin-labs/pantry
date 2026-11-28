@@ -269,6 +269,22 @@ export function prepareRepairConfigurationBump(
 }
 
 /**
+ * A condition that holds while the configuration version of the Organisation
+ * is `configurationVersion`. A statement that carries it changes no row after
+ * another change of the settings.
+ */
+export function configurationVersionPredicate(
+  organisationId: string,
+  configurationVersion: number,
+): Readonly<{ sql: string; bindings: readonly (string | number)[] }> {
+  return {
+    sql: `EXISTS (SELECT 1 FROM organisation_onboarding
+      WHERE organisation_id = ? AND configuration_version = ?)`,
+    bindings: [organisationId, configurationVersion],
+  };
+}
+
+/**
  * Sets the counters after a change of the inference selection. With
  * `invalidateReadiness`, the readiness and the activation are cleared. No row
  * changes when the configuration version moved in the meantime.
