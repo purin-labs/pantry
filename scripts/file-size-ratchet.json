@@ -3,7 +3,6 @@
   "files": {
     "apps/storefront/src/storefront.tsx": 9317,
     "areas/commerce/ui/features/commerce/entity-plane/route.tsx": 3747,
-    "areas/kitchen/ui/features/production-run/morning-shift-appliances.ts": 3664,
     "areas/kitchen/ui/features/production-run/recipe-workflow-graph.tsx": 3007,
     "areas/kitchen/ui/features/workflow-simulator/bakery-surface.ts": 3893,
     "areas/kitchen/ui/features/workflow-simulator/production-workspace.tsx": 5021,
