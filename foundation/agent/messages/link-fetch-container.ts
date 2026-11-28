@@ -23,8 +23,11 @@ export class MessageLinkFetchContainer extends Container<Env> {
   }
 }
 
+/** The part of the Worker environment that a read of a public link needs. */
+export type MessageLinkFetchEnv = {
+  readonly MESSAGE_LINK_FETCH: DurableObjectNamespace<MessageLinkFetchContainer>;
+};
+
 declare module "@purin-labs/kernel/env" {
-  interface Env {
-    MESSAGE_LINK_FETCH: DurableObjectNamespace<MessageLinkFetchContainer>;
-  }
+  interface Env extends MessageLinkFetchEnv {}
 }

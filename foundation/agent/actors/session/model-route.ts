@@ -12,6 +12,7 @@ import {
   admittedSessionOperation,
 } from "../session-execution-admission";
 import { createWorkerMessageLinkEgress } from "../../messages/link-egress";
+import type { MessageLinkFetchEnv } from "../../messages/link-fetch-container";
 import type { EmbeddedHarnessModelRouteLease } from "../embedded-harness";
 import type { ModelRoute } from "@purin-labs/contracts";
 import {
@@ -293,7 +294,7 @@ async function resolveEmbeddedSessionModelApiKey(
 export function admittedMessageLinkEgress(
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
-  env: Env,
+  env: MessageLinkFetchEnv,
 ) {
   const egress = createWorkerMessageLinkEgress(
     env.MESSAGE_LINK_FETCH,

@@ -179,6 +179,11 @@ full. Do not raise a ratchet count. When one falls, run its lint with `--update`
   surface (`surfaces/`) are packages, the last two with `server/` (Worker) and
   `ui/` (Portal). Import another module by its package name. A package imports
   no file of the Worker ([runbook](docs/runbooks/refactor-17-module-move.md)).
+- **Narrow env.** A new function below the Worker entry names the bindings
+  that it reads: `Pick<Env, "DB">`, or the env type that the owner of a binding
+  exports (`MessageLinkFetchEnv`). It takes the whole `Env` only when it passes
+  `env` to a function that takes the whole `Env`. Add no new `declare module`
+  merge into `Env` (`env-merge` of `pnpm lint:layer-debts`).
 - **Routes** (`pnpm lint:runtime-boundary`). A route file parses the request,
   checks authorization, calls one domain function and maps its result. It runs
   no D1 query. Actor, Slack and chat code imports no route file. A domain
