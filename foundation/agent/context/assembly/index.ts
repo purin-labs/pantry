@@ -8,7 +8,10 @@ import type {
   ModelContextSourceKind,
   Sha256Digest,
 } from "./types";
-import type { RequestAuthority } from "@purin-labs/contracts";
+import type {
+  AuthorityPartition,
+  RequestAuthority,
+} from "@purin-labs/contracts";
 import { sha256Hex } from "@purin-labs/std";
 import type { CaseContextReplayAuthority } from "../projection";
 
@@ -59,7 +62,7 @@ export type ContextReadFields = {
   readonly assignmentId: AssignmentId;
   readonly sessionId: SessionId;
   readonly requestAuthority: RequestAuthority;
-  readonly authorityPartitionDigest: Sha256Digest;
+  readonly authorityPartition: AuthorityPartition;
   readonly contextVisibility: readonly ContextVisibility[];
   readonly policyVersion: PolicyVersion;
   readonly assemblyStrategyVersion: ContextAssemblyStrategyVersion;
@@ -161,8 +164,8 @@ export type CaseContextTailCandidate = {
   readonly replayAuthority: CaseContextReplayAuthority;
   /**
    * The authority of the turn that wrote the entry. An entry of another
-   * partition replays only into a turn of the same conversation requester
-   * (`isSameConversationRequester`).
+   * partition replays only into the same partition at another membership
+   * revision (`isPartitionAtOtherRevision`).
    */
   readonly writtenUnder: RequestAuthority;
   readonly sourceRevision: ContextProjectionRevision;
@@ -177,9 +180,8 @@ export interface CaseContextTailReader {
     input: Readonly<{
       readonly organisationId: OrganisationId;
       readonly caseId: CaseId;
-      readonly authorityPartitionDigest: Sha256Digest;
-      /** The authority of the turn that reads the tail. */
-      readonly requestAuthority: RequestAuthority;
+      /** The authority partition of the turn that reads the tail. */
+      readonly authorityPartition: AuthorityPartition;
       readonly visibility: readonly ContextVisibility[];
       readonly limit: number;
     }>,

@@ -36,8 +36,8 @@ import {
  * replaces the key, which starts one more Session: its request holds the
  * answers of both earlier Sessions.
  *
- * An operator then writes in the same thread. A requester with another role
- * is another requester: the request of that Session holds the messages of the
+ * An operator then writes in the same thread. Another role is another
+ * partition, not a later revision: the request of that Session holds the messages of the
  * thread's people, and it does not hold the answers that the agent gave to
  * the admin.
  */

@@ -263,17 +263,20 @@ The link reader (`messages/link-reader.ts`) works as follows:
   note of a refused effect name the authority partition of their turn
   (`authority_partition`). The tail and the projection search give a turn the
   independent entries and the entries of its own partition.
-- The tail also gives an entry of another partition when the same conversation
-  requester wrote it (`isSameConversationRequester` in `turn-authority.ts`): the same
-  Slack conversation and the same role, and in a DM the same person, at another
-  membership revision. A change of the configuration (FND-04), the policy or the grants
-  of the Organisation moves an open Slack thread to a new partition and a new Session
-  (FND-03). The thread then keeps the earlier answers of the agent. Such an entry keeps
-  its flow label, and the assembler admits it against the authority of the new turn, as
-  it does for each entry (FND-07).
-- A requester with another role is another requester, so that Session does not read
-  the answers of the first one. A Portal chat, a mailbox, a WhatsApp line and a workflow
-  have no requester rule: an entry replays into its own partition only.
+- The tail also gives an entry of the turn's own partition at another membership
+  revision (`isPartitionAtOtherRevision` in `turn-authority.ts`): the same Slack
+  conversation, role, grants, capabilities and policy version, and in a DM the same
+  person. A change of the configuration of the Organisation (FND-04) raises the
+  revision, so an open Slack thread moves to a new partition and a new Session (FND-03).
+  The thread then keeps the earlier answers of the agent. Such an entry keeps its flow
+  label, and the assembler admits it against the authority of the new turn, as it does
+  for each entry (FND-07).
+- The tail reads back at most 16 other revisions of the Case. The digest of each one is
+  in the query, so the item limit counts only the entries that replay.
+- A new policy version, a change of the grants or the capabilities, and another role are
+  each a new partition. Its Session does not read the earlier answers: a narrowed grant
+  must not read what a wider grant produced. A Portal chat, a mailbox, a WhatsApp line
+  and a workflow replay an entry into its own partition only.
 - If the tail of the Case cannot be read, the assembly fails (`tail_unavailable`).
   Memory that fails verification also fails it (`memory_state_invalid`). A projection
   search that fails is ignored.
@@ -479,11 +482,13 @@ The agent loads more context with its tools, when the task needs it.
   bytes. The preparation, the reuse check of a Slack file and the check of a fork are
   the code that reads the bytes of a content object.
 - The text of a file does not set the writer `outside` of Plan 89 (FND-07).
-- In one Slack thread, the Session of a requester with another role does not read the
-  answers that the agent gave to the first requester, and a person whose role changed
-  loses the earlier answers. The people of the thread read those answers in Slack.
-- The projection search has no requester rule. An answer of an earlier partition
-  reaches the new Session only while it is one of the 12 newest entries of the tail.
+- After a new policy version, a change of the grants or a role change, the next Session
+  of an open Slack thread gets the earlier messages of the people, but not the earlier
+  answers of the agent. A requester with another role in the same thread does not read
+  the answers that the agent gave to the first one. The people of the thread read those
+  answers in Slack.
+- The projection search has no revision rule. An answer of an earlier revision reaches
+  the new Session only while it is one of the 12 newest entries of the tail.
 - Only the Kitchen page has a `prepare_context` effect. The `preparing` and `ready`
   events have the area `kitchen` only.
 - The `latest` read lists each saved run of the Organisation to find the newest. Plan

@@ -29,7 +29,7 @@ and schedules open Cases with no person.
   Thus one thread can have more than one Session and more than one assignment.
 - A Session keeps its history to itself. A new Session of a thread reads the shared
   journal through the Case context (FND-05): the messages of the people, and the
-  answers that the agent gave to the same requester in an earlier partition.
+  answers of the agent in the same partition at an earlier membership revision.
 - One Connector serves one Slack integration account.
 - A Portal chat has one Case. Each step of a chat request runs in a new Session of that
   Case (`conversationStepIdentity` in `chat/turn/run.ts`).

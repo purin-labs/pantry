@@ -40,7 +40,7 @@ import type {
   Timestamp,
 } from "./types";
 import type { ContextVisibility } from "@purin-labs/authority/authorization/access-grants/types";
-import { isSameConversationRequester } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import { isPartitionAtOtherRevision } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { RequestAuthority } from "@purin-labs/contracts";
 
 type AssemblyCandidate = {
@@ -96,8 +96,7 @@ type ContextReadRequestFields = Pick<
   ContextReadFields,
   | "organisationId"
   | "caseId"
-  | "authorityPartitionDigest"
-  | "requestAuthority"
+  | "authorityPartition"
   | "contextVisibility"
   | "query"
   | "itemLimit"
@@ -112,7 +111,7 @@ function searchWorkspaceProjections(
     organisationId: fields.organisationId,
     visibility: fields.contextVisibility.map(toProjectionVisibility),
     sourceKind: "all",
-    authorityPartitionDigest: fields.authorityPartitionDigest,
+    authorityPartitionDigest: fields.authorityPartition.digest,
     query: fields.query,
     limit: fields.itemLimit,
   });
@@ -124,8 +123,7 @@ function readCaseTail(
   return fields.tailReader.readTail({
     organisationId: fields.organisationId,
     caseId: fields.caseId,
-    authorityPartitionDigest: fields.authorityPartitionDigest,
-    requestAuthority: fields.requestAuthority,
+    authorityPartition: fields.authorityPartition,
     visibility: fields.contextVisibility,
     limit: fields.itemLimit,
   });
@@ -323,7 +321,7 @@ async function candidateIsAdmitted(
   permit: AuthorizedContextRead,
   candidate: AssemblyCandidate,
 ): Promise<boolean> {
-  if (!candidateReplayAuthorityMatches(permit, candidate)) return false;
+  if (!(await candidateReplayAuthorityMatches(permit, candidate))) return false;
   if (!candidateIsTrusted(candidate)) return false;
   return labelIsAdmitted(permit, candidate.inputLabel, null);
 }
@@ -370,10 +368,10 @@ async function labelIsAdmitted(
   return decision.kind === "admit";
 }
 
-function candidateReplayAuthorityMatches(
+async function candidateReplayAuthorityMatches(
   permit: AuthorizedContextRead,
   candidate: AssemblyCandidate,
-): boolean {
+): Promise<boolean> {
   if (candidate.replayAuthority === null) {
     return candidate.source.kind === "file_segment";
   }
@@ -384,13 +382,14 @@ function candidateReplayAuthorityMatches(
       return (
         candidate.replayAuthority.authorityPartitionDigest ===
           permit.authorityPartitionDigest ||
-        // The tail of the turn's own Case also gives the entries that the
-        // same requester wrote in an earlier partition of the thread.
+        // The tail of the turn's own Case also gives the entries of this
+        // partition at another membership revision.
         (candidate.writtenUnder !== null &&
-          isSameConversationRequester(
+          (await isPartitionAtOtherRevision(
+            candidate.replayAuthority.authorityPartitionDigest,
             candidate.writtenUnder,
-            permit.requestAuthority,
-          ))
+            permit.authorityPartition,
+          )))
       );
   }
 }

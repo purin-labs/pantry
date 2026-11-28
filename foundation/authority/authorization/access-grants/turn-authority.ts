@@ -779,47 +779,63 @@ export function authorityPartitionKeyMatchesRequest(
 }
 
 /**
- * The requester of a Slack conversation: the partition key of the authority
- * apart from the membership revision. Another authority names none.
+ * Whether a Case entry that names the partition `entryPartitionDigest`
+ * replays into `partition`: the entry's partition is `partition` itself, or
+ * `partition` at the membership revision of the authority that wrote it.
  *
- * A change of the Organisation's configuration, policy or grants moves an
- * open thread to a new partition, and thus to a new Session. The requester
- * stays the same, so a Case entry that the earlier partition wrote replays
- * into the later one, with its flow label. A requester with another role is
- * another requester. A mailbox, a WhatsApp line, a workflow and a Portal chat
- * have no such rule: their entries replay into their own partition only.
+ * A change of the Organisation's configuration raises the revision of each
+ * Slack authority, so an open thread moves to a new partition and a new
+ * Session. The requester, the grants, the capabilities and the policy version
+ * stay, so the entries of the earlier partition replay, each with its flow
+ * label. A change of any of these is a new partition that the earlier entries
+ * do not reach: a narrowed grant must not see what the wider grant read. A
+ * mailbox, a WhatsApp line, a workflow and a Portal chat replay into their
+ * own partition only.
  */
-export function conversationRequester(
-  authority: RequestAuthority,
-): Readonly<{ kind: string; role: string; key: string }> | null {
-  const key = authorityPartitionKey(authority);
-  switch (key.kind) {
-    case "direct_conversation":
-    case "shared_conversation":
-      return {
-        kind: key.kind,
-        role: key.role,
-        key: JSON.stringify({ ...key, membershipRevision: null }),
-      };
-    case "workflow":
-    case "agent_mailbox":
-    case "whatsapp_support":
-    case "control":
-      return null;
-    default:
-      return assertNever(key, "unhandled authority partition key");
-  }
+export async function isPartitionAtOtherRevision(
+  entryPartitionDigest: Sha256Digest,
+  writtenUnder: RequestAuthority,
+  partition: AuthorityPartition,
+): Promise<boolean> {
+  if (entryPartitionDigest === partition.digest) return true;
+  if (
+    writtenUnder.kind !== "direct_conversation" &&
+    writtenUnder.kind !== "shared_conversation"
+  )
+    return false;
+  return (
+    (await partitionDigestAtRevision(
+      partition,
+      writtenUnder.kind,
+      writtenUnder.membershipRevision,
+    )) === entryPartitionDigest
+  );
 }
 
-/** Whether two request authorities are one requester of one conversation. */
-export function isSameConversationRequester(
-  left: RequestAuthority,
-  right: RequestAuthority,
-): boolean {
-  const requester = conversationRequester(left);
-  return (
-    requester !== null && requester.key === conversationRequester(right)?.key
-  );
+/**
+ * The digest of `partition` at another membership revision, or null when
+ * the partition is not a Slack partition of the kind `writerKind`.
+ */
+export async function partitionDigestAtRevision(
+  partition: AuthorityPartition,
+  writerKind: RequestAuthority["kind"],
+  membershipRevision: number,
+): Promise<Sha256Digest | null> {
+  const key = partition.key;
+  if (
+    (key.kind !== "direct_conversation" &&
+      key.kind !== "shared_conversation") ||
+    key.kind !== writerKind
+  )
+    return null;
+  if (membershipRevision === key.membershipRevision) return partition.digest;
+  const atRevision: AuthorityPartitionWithoutDigest = {
+    key: { ...key, membershipRevision },
+    selectedGrantSetDigest: partition.selectedGrantSetDigest,
+    capabilityKeys: [...partition.capabilityKeys],
+    policyVersion: partition.policyVersion,
+  };
+  return digestCanonical(atRevision);
 }
 
 export function parseStoredAuthorityPartition(

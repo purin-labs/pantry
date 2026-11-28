@@ -254,7 +254,7 @@ function buildContextReadFields(
     assignmentId: input.assignmentId,
     sessionId: input.sessionId,
     requestAuthority: input.turnAuthority.requestAuthority,
-    authorityPartitionDigest: input.turnAuthority.authorityPartition.digest,
+    authorityPartition: input.turnAuthority.authorityPartition,
     contextVisibility: audiencesForAdmission(
       input.turnAuthority.requestAuthority,
       input.caseId,
@@ -407,8 +407,11 @@ class AuthorizedContextRead {
   get requestAuthority() {
     return this.#fields.requestAuthority;
   }
+  get authorityPartition() {
+    return this.#fields.authorityPartition;
+  }
   get authorityPartitionDigest() {
-    return this.#fields.authorityPartitionDigest;
+    return this.#fields.authorityPartition.digest;
   }
   get contextVisibility() {
     return this.#fields.contextVisibility;

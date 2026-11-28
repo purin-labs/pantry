@@ -62,6 +62,15 @@ const SHARED_OPERATOR = {
   conversationId: "C0CONTEXTREADER",
 } as const;
 
+/** A partition of `SHARED_OPERATOR` with a digest that no entry names. */
+const SHARED_OPERATOR_PARTITION = {
+  key: authorityPartitionKey(SHARED_OPERATOR),
+  selectedGrantSetDigest: "c".repeat(64),
+  capabilityKeys: [],
+  policyVersion: "policy_1",
+  digest: "a".repeat(64),
+};
+
 describe("Case context source reader", function caseContextSourceReaderSuite() {
   it("accepts a payout approval with account authority and rejects fabricated commerce provenance", async function payoutProposal() {
     const { actor } = actorFixture();
@@ -242,8 +251,7 @@ describe("Case context source reader", function caseContextSourceReaderSuite() {
       await caseActor.readTail({
         organisationId: requireOrganisationId("organisation_context_reader"),
         caseId: requireCaseId("case_context_reader"),
-        authorityPartitionDigest: "a".repeat(64),
-        requestAuthority: SHARED_OPERATOR,
+        authorityPartition: SHARED_OPERATOR_PARTITION,
         visibility: [
           {
             kind: "conversation",
@@ -291,8 +299,7 @@ describe("Case context source reader", function caseContextSourceReaderSuite() {
       await caseActor.readTail({
         organisationId: requireOrganisationId("organisation_context_reader"),
         caseId: requireCaseId("case_context_reader"),
-        authorityPartitionDigest: "a".repeat(64),
-        requestAuthority: SHARED_OPERATOR,
+        authorityPartition: SHARED_OPERATOR_PARTITION,
         visibility: [{ kind: "person", personId: "person_context_reader" }],
         limit: 5,
       }),
@@ -352,10 +359,7 @@ describe("Case context source reader", function caseContextSourceReaderSuite() {
     const tail = await caseActor.readTail({
       organisationId: requireOrganisationId("organisation_context_reader"),
       caseId: requireCaseId("case_context_reader"),
-      authorityPartitionDigest: "a".repeat(64),
-      // A requester with another role: the entry of the other partition is
-      // not an entry of this requester at an earlier revision.
-      requestAuthority: { ...requestAuthority, role: "admin" },
+      authorityPartition: SHARED_OPERATOR_PARTITION,
       visibility: [
         {
           kind: "conversation",

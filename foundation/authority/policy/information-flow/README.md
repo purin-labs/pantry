@@ -150,8 +150,9 @@ is read, so no background job runs. A schedule belongs to the whole Organisation
 - A Case entry that replays into a later Session keeps its label. The tail reader
   (`readCaseContextTail`) gives the stored label and the authority that wrote the
   entry, and the assembler admits the entry against the turn's own authority. An
-  entry of another partition replays only to the same conversation requester
-  (`isSameConversationRequester`).
+  entry of another partition replays only into the same partition at another
+  membership revision (`isPartitionAtOtherRevision`): a narrowed grant gets no entry
+  that a wider grant produced.
 - An approval permits one exact action. It removes no reader.
 
 ## Add a source

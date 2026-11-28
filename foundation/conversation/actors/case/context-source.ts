@@ -5,6 +5,7 @@ import type {
   CaseAssignmentLifecycle,
   CaseBinding,
   CaseContent,
+  AuthorityPartition,
   RequestAuthority,
   UserMessage,
 } from "@purin-labs/contracts";
@@ -36,8 +37,8 @@ import {
 } from "@purin-labs/authority/authorization/access-grants/visibility";
 import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import {
-  conversationRequester,
-  isSameConversationRequester,
+  isPartitionAtOtherRevision,
+  partitionDigestAtRevision,
 } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { Result } from "@purin-labs/kernel/result";
 import {
@@ -425,7 +426,7 @@ export async function readCaseContextTail(
   if (
     !organisationId.ok ||
     !caseId.ok ||
-    !isSha256Hex(input.authorityPartitionDigest) ||
+    !isSha256Hex(input.authorityPartition.digest) ||
     !Number.isSafeInteger(input.limit) ||
     input.limit < 1 ||
     input.limit > 100
@@ -442,13 +443,17 @@ export async function readCaseContextTail(
   const scopeDigest =
     "CASE WHEN json_valid(journal.authority_scope_json) " +
     "THEN json_extract(journal.authority_scope_json, '$.authorityPartitionDigest') ELSE NULL END";
-  // An entry of another partition also replays when the same conversation
-  // requester wrote it. The kind and the role select those rows before the
-  // limit counts. `isSameConversationRequester` then decides each row.
-  const writerKind = writerField("kind");
-  const writerRole = writerField("role");
   try {
-    const requester = conversationRequester(input.requestAuthority);
+    // An entry of this partition at another membership revision also
+    // replays. Its digest is in the list, so the limit counts only the
+    // entries that replay.
+    const partitionDigests = await partitionDigestsAtWriterRevisions(
+      sql,
+      input.authorityPartition,
+    );
+    const digestPlaceholders = partitionDigests
+      .map((_digest, index) => `?${allowed.size + 4 + index}`)
+      .join(", ");
     const rows = sql
       .exec<ContextJournalRow>(
         `SELECT journal.sequence, journal.entry_id, journal.digest, journal.preview,
@@ -461,20 +466,15 @@ export async function readCaseContextTail(
           AND journal.visibility_key IN (${placeholders})
           AND (
             ${scopeKind} = 'partition_independent'
-            OR (${scopeKind} = 'authority_partition' AND (
-              ${scopeDigest} = ?${allowed.size + 3}
-              OR (${writerKind} = ?${allowed.size + 5} AND ${writerRole} = ?${allowed.size + 6})
-            ))
+            OR (${scopeKind} = 'authority_partition' AND ${scopeDigest} IN (${digestPlaceholders}))
           )
         ORDER BY journal.sequence DESC
-        LIMIT ?${allowed.size + 4}`,
+        LIMIT ?${allowed.size + 3}`,
         organisationId.value,
         caseId.value,
         ...allowed,
-        input.authorityPartitionDigest,
         input.limit,
-        requester?.kind ?? null,
-        requester?.role ?? null,
+        ...partitionDigests,
       )
       .toArray();
     const candidates: CaseContextTailCandidate[] = [];
@@ -490,10 +490,12 @@ export async function readCaseContextTail(
       if (
         !allowed.has(contextVisibilityKey(source.visibility)) ||
         !(
-          replayAuthorityMatchesPartition(
-            source.replayAuthority,
-            input.authorityPartitionDigest,
-          ) || isSameConversationRequester(writtenUnder, input.requestAuthority)
+          source.replayAuthority.kind === "partition_independent" ||
+          (await isPartitionAtOtherRevision(
+            source.replayAuthority.authorityPartitionDigest,
+            writtenUnder,
+            input.authorityPartition,
+          ))
         ) ||
         !(await contextSourceDigestMatches(source))
       )
@@ -557,26 +559,47 @@ function parseCaseContextReplayAuthority(
   }
 }
 
-/** One field of the authority that wrote a journal row, or NULL. */
-function writerField(field: "kind" | "role"): string {
-  return (
-    "CASE WHEN json_valid(journal.request_authority_json) " +
-    `THEN json_extract(journal.request_authority_json, '$.${field}') ELSE NULL END`
-  );
-}
+/** The most membership revisions of one Case that the tail reads back. */
+const MAX_REPLAYED_REVISIONS = 16;
 
-function replayAuthorityMatchesPartition(
-  authority: CaseContextReplayAuthority,
-  authorityPartitionDigest: string,
-): boolean {
-  switch (authority.kind) {
-    case "partition_independent":
-      return true;
-    case "authority_partition":
-      return authority.authorityPartitionDigest === authorityPartitionDigest;
-    default:
-      return assertNever(authority);
+/**
+ * The digest of `partition` itself and of `partition` at each other
+ * membership revision of a writer of this Case with its kind and role.
+ */
+async function partitionDigestsAtWriterRevisions(
+  sql: SqlStorage,
+  partition: AuthorityPartition,
+): Promise<readonly string[]> {
+  const key = partition.key;
+  if (key.kind !== "direct_conversation" && key.kind !== "shared_conversation")
+    return [partition.digest];
+  const revisions = sql
+    .exec<{ revision: number }>(
+      `SELECT DISTINCT json_extract(request_authority_json, '$.membershipRevision') AS revision
+         FROM case_journal
+        WHERE json_valid(request_authority_json)
+          AND json_extract(request_authority_json, '$.kind') = ?
+          AND json_extract(request_authority_json, '$.role') = ?
+          AND json_extract(request_authority_json, '$.membershipRevision') <> ?
+        ORDER BY revision DESC
+        LIMIT ?`,
+      key.kind,
+      key.role,
+      key.membershipRevision,
+      MAX_REPLAYED_REVISIONS,
+    )
+    .toArray();
+  const digests = [partition.digest];
+  for (const { revision } of revisions) {
+    if (!Number.isSafeInteger(revision)) continue;
+    const digest = await partitionDigestAtRevision(
+      partition,
+      key.kind,
+      revision,
+    );
+    if (digest !== null) digests.push(digest);
   }
+  return digests;
 }
 
 export async function contextSourceDigestMatches(
