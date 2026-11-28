@@ -35,6 +35,10 @@ import {
   parseContextVisibility as parseStoredContextVisibility,
 } from "@purin-labs/authority/authorization/access-grants/visibility";
 import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
+import {
+  conversationRequester,
+  isSameConversationRequester,
+} from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   createCurrentSourceFlowLabel,
@@ -304,12 +308,13 @@ export async function readCaseContextSource(
         )
         .toArray()[0] ?? null;
     if (row === null) return { ok: false, error: { code: "source_missing" } };
-    return contextSourceFromJournalRow(
+    const entry = await journalRowContext(
       organisationId.value,
       caseId.value,
       row,
       input.source,
     );
+    return entry.ok ? { ok: true, value: entry.value.source } : entry;
   } catch {
     return { ok: false, error: { code: "storage_failure" } };
   }
@@ -337,12 +342,18 @@ export async function enqueueCaseContextProjection(
   return true;
 }
 
-async function contextSourceFromJournalRow(
+/** One journal entry as a context source, with the authority that wrote it. */
+type JournalRowContext = Readonly<{
+  source: CaseContextSource;
+  writtenUnder: RequestAuthority;
+}>;
+
+async function journalRowContext(
   organisationId: OrganisationId,
   caseId: string,
   row: ContextJournalRow,
   source: CaseContextSource["source"],
-): Promise<Result<CaseContextSource, CaseContextSourceReaderError>> {
+): Promise<Result<JournalRowContext, CaseContextSourceReaderError>> {
   let rawContent: unknown;
   let rawAuthority: unknown;
   let rawVisibility: unknown;
@@ -389,15 +400,18 @@ async function contextSourceFromJournalRow(
   return {
     ok: true,
     value: {
-      organisationId,
-      source,
-      sourceRevision: row.sequence,
-      replayAuthority,
-      contentDigest: row.digest,
-      content,
-      visibility,
-      inputLabel: inputLabel.value.toJSON(),
-      observedAt: row.accepted_at,
+      source: {
+        organisationId,
+        source,
+        sourceRevision: row.sequence,
+        replayAuthority,
+        contentDigest: row.digest,
+        content,
+        visibility,
+        inputLabel: inputLabel.value.toJSON(),
+        observedAt: row.accepted_at,
+      },
+      writtenUnder: authority.value.requestAuthority,
     },
   };
 }
@@ -428,7 +442,13 @@ export async function readCaseContextTail(
   const scopeDigest =
     "CASE WHEN json_valid(journal.authority_scope_json) " +
     "THEN json_extract(journal.authority_scope_json, '$.authorityPartitionDigest') ELSE NULL END";
+  // An entry of another partition also replays when the same conversation
+  // requester wrote it. The kind and the role select those rows before the
+  // limit counts. `isSameConversationRequester` then decides each row.
+  const writerKind = writerField("kind");
+  const writerRole = writerField("role");
   try {
+    const requester = conversationRequester(input.requestAuthority);
     const rows = sql
       .exec<ContextJournalRow>(
         `SELECT journal.sequence, journal.entry_id, journal.digest, journal.preview,
@@ -441,7 +461,10 @@ export async function readCaseContextTail(
           AND journal.visibility_key IN (${placeholders})
           AND (
             ${scopeKind} = 'partition_independent'
-            OR (${scopeKind} = 'authority_partition' AND ${scopeDigest} = ?${allowed.size + 3})
+            OR (${scopeKind} = 'authority_partition' AND (
+              ${scopeDigest} = ?${allowed.size + 3}
+              OR (${writerKind} = ?${allowed.size + 5} AND ${writerRole} = ?${allowed.size + 6})
+            ))
           )
         ORDER BY journal.sequence DESC
         LIMIT ?${allowed.size + 4}`,
@@ -450,37 +473,43 @@ export async function readCaseContextTail(
         ...allowed,
         input.authorityPartitionDigest,
         input.limit,
+        requester?.kind ?? null,
+        requester?.role ?? null,
       )
       .toArray();
     const candidates: CaseContextTailCandidate[] = [];
     for (const row of rows) {
-      const source = await contextSourceFromJournalRow(
+      const entry = await journalRowContext(
         organisationId.value,
         caseId.value,
         row,
         { kind: "case_entry", caseId: caseId.value, entryId: row.entry_id },
       );
+      if (!entry.ok) continue;
+      const { source, writtenUnder } = entry.value;
       if (
-        !source.ok ||
-        !allowed.has(contextVisibilityKey(source.value.visibility)) ||
-        !replayAuthorityMatchesPartition(
-          source.value.replayAuthority,
-          input.authorityPartitionDigest,
+        !allowed.has(contextVisibilityKey(source.visibility)) ||
+        !(
+          replayAuthorityMatchesPartition(
+            source.replayAuthority,
+            input.authorityPartitionDigest,
+          ) || isSameConversationRequester(writtenUnder, input.requestAuthority)
         ) ||
-        !(await contextSourceDigestMatches(source.value))
+        !(await contextSourceDigestMatches(source))
       )
         continue;
-      const boundedExcerpt = boundedContextExcerpt(source.value.content);
+      const boundedExcerpt = boundedContextExcerpt(source.content);
       if (boundedExcerpt === null) continue;
       candidates.push({
-        organisationId: source.value.organisationId,
-        source: source.value.source,
-        replayAuthority: source.value.replayAuthority,
-        sourceRevision: source.value.sourceRevision,
-        contentDigest: source.value.contentDigest,
+        organisationId: source.organisationId,
+        source: source.source,
+        replayAuthority: source.replayAuthority,
+        writtenUnder,
+        sourceRevision: source.sourceRevision,
+        contentDigest: source.contentDigest,
         boundedExcerpt,
-        inputLabel: source.value.inputLabel,
-        observedAt: source.value.observedAt,
+        inputLabel: source.inputLabel,
+        observedAt: source.observedAt,
       });
       if (candidates.length === input.limit) break;
     }
@@ -526,6 +555,14 @@ function parseCaseContextReplayAuthority(
   } catch {
     return null;
   }
+}
+
+/** One field of the authority that wrote a journal row, or NULL. */
+function writerField(field: "kind" | "role"): string {
+  return (
+    "CASE WHEN json_valid(journal.request_authority_json) " +
+    `THEN json_extract(journal.request_authority_json, '$.${field}') ELSE NULL END`
+  );
 }
 
 function replayAuthorityMatchesPartition(

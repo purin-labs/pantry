@@ -258,6 +258,22 @@ The link reader (`messages/link-reader.ts`) works as follows:
 - The assembler reads the tail of the Case, the searchable projections (Case entries and
   file segments) and the accepted Memory. It admits a candidate only when its
   visibility and its flow label let this turn read it.
+- Each Case entry names its replay authority. A message of a person is
+  `partition_independent`. An answer of the agent, the note of a dropped output and the
+  note of a refused effect name the authority partition of their turn
+  (`authority_partition`). The tail and the projection search give a turn the
+  independent entries and the entries of its own partition.
+- The tail also gives an entry of another partition when the same conversation
+  requester wrote it (`isSameConversationRequester` in `turn-authority.ts`): the same
+  Slack conversation and the same role, and in a DM the same person, at another
+  membership revision. A change of the configuration (FND-04), the policy or the grants
+  of the Organisation moves an open Slack thread to a new partition and a new Session
+  (FND-03). The thread then keeps the earlier answers of the agent. Such an entry keeps
+  its flow label, and the assembler admits it against the authority of the new turn, as
+  it does for each entry (FND-07).
+- A requester with another role is another requester, so that Session does not read
+  the answers of the first one. A Portal chat, a mailbox, a WhatsApp line and a workflow
+  have no requester rule: an entry replays into its own partition only.
 - If the tail of the Case cannot be read, the assembly fails (`tail_unavailable`).
   Memory that fails verification also fails it (`memory_state_invalid`). A projection
   search that fails is ignored.
@@ -463,6 +479,11 @@ The agent loads more context with its tools, when the task needs it.
   bytes. The preparation, the reuse check of a Slack file and the check of a fork are
   the code that reads the bytes of a content object.
 - The text of a file does not set the writer `outside` of Plan 89 (FND-07).
+- In one Slack thread, the Session of a requester with another role does not read the
+  answers that the agent gave to the first requester, and a person whose role changed
+  loses the earlier answers. The people of the thread read those answers in Slack.
+- The projection search has no requester rule. An answer of an earlier partition
+  reaches the new Session only while it is one of the 12 newest entries of the tail.
 - Only the Kitchen page has a `prepare_context` effect. The `preparing` and `ready`
   events have the area `kitchen` only.
 - The `latest` read lists each saved run of the Organisation to find the newest. Plan
@@ -496,7 +517,8 @@ The agent loads more context with its tools, when the task needs it.
   contracts, and both plans name a second harness. The code keeps the contracts in
   TypeScript (FND-11) and runs Pi on each route (FND-04).
 - E2E journeys in `workers/platform/tests/e2e/`: `slack-attachment-journey.test.ts`,
-  `slack-attachment-restore.test.ts`, `message-link-fetch-placement.test.ts`,
+  `slack-attachment-restore.test.ts`, `slack-thread-new-session.test.ts` (the answers
+  of the agent in a new Session of a thread), `message-link-fetch-placement.test.ts`,
   `message-link-session-origin.test.ts`, `chat-fork-retention.test.ts`,
   `portal-chat-finalization.test.ts` (saved context, interrupted Kitchen preparation, an
   excluded or absent browser, late readiness, and a file read after revocation) and

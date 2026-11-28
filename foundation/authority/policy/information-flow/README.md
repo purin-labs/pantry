@@ -147,6 +147,11 @@ is read, so no background job runs. A schedule belongs to the whole Organisation
   its content. Create the evidence for the exact source revision and digest.
 - Moves, summaries, forks and restore keep every contributing policy. Do not add
   a reader to a label, and add no second policy engine.
+- A Case entry that replays into a later Session keeps its label. The tail reader
+  (`readCaseContextTail`) gives the stored label and the authority that wrote the
+  entry, and the assembler admits the entry against the turn's own authority. An
+  entry of another partition replays only to the same conversation requester
+  (`isSameConversationRequester`).
 - An approval permits one exact action. It removes no reader.
 
 ## Add a source

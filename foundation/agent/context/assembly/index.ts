@@ -159,6 +159,12 @@ export type CaseContextTailCandidate = {
   readonly organisationId: OrganisationId;
   readonly source: Variant<CanonicalContextSourceRef, "case_entry">;
   readonly replayAuthority: CaseContextReplayAuthority;
+  /**
+   * The authority of the turn that wrote the entry. An entry of another
+   * partition replays only into a turn of the same conversation requester
+   * (`isSameConversationRequester`).
+   */
+  readonly writtenUnder: RequestAuthority;
   readonly sourceRevision: ContextProjectionRevision;
   readonly contentDigest: Sha256Digest;
   readonly boundedExcerpt: string;
@@ -172,6 +178,8 @@ export interface CaseContextTailReader {
       readonly organisationId: OrganisationId;
       readonly caseId: CaseId;
       readonly authorityPartitionDigest: Sha256Digest;
+      /** The authority of the turn that reads the tail. */
+      readonly requestAuthority: RequestAuthority;
       readonly visibility: readonly ContextVisibility[];
       readonly limit: number;
     }>,

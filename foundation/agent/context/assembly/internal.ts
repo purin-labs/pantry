@@ -40,6 +40,8 @@ import type {
   Timestamp,
 } from "./types";
 import type { ContextVisibility } from "@purin-labs/authority/authorization/access-grants/types";
+import { isSameConversationRequester } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import type { RequestAuthority } from "@purin-labs/contracts";
 
 type AssemblyCandidate = {
   readonly organisationId: string;
@@ -54,6 +56,8 @@ type AssemblyCandidate = {
   readonly retrievalEvidence: ContextRetrievalEvidence;
   readonly fromTail: boolean;
   readonly replayAuthority: CaseContextReplayAuthority | null;
+  /** The authority that wrote a tail entry. A projection names none. */
+  readonly writtenUnder: RequestAuthority | null;
 };
 
 /**
@@ -93,6 +97,7 @@ type ContextReadRequestFields = Pick<
   | "organisationId"
   | "caseId"
   | "authorityPartitionDigest"
+  | "requestAuthority"
   | "contextVisibility"
   | "query"
   | "itemLimit"
@@ -120,6 +125,7 @@ function readCaseTail(
     organisationId: fields.organisationId,
     caseId: fields.caseId,
     authorityPartitionDigest: fields.authorityPartitionDigest,
+    requestAuthority: fields.requestAuthority,
     visibility: fields.contextVisibility,
     limit: fields.itemLimit,
   });
@@ -282,6 +288,7 @@ async function projectionCandidate(
     fromTail: false,
     replayAuthority:
       "replayAuthority" in projection ? projection.replayAuthority : null,
+    writtenUnder: null,
   };
 }
 
@@ -308,6 +315,7 @@ async function tailCandidate(
     ),
     fromTail: true,
     replayAuthority: tail.replayAuthority,
+    writtenUnder: tail.writtenUnder,
   };
 }
 
@@ -375,7 +383,14 @@ function candidateReplayAuthorityMatches(
     case "authority_partition":
       return (
         candidate.replayAuthority.authorityPartitionDigest ===
-        permit.authorityPartitionDigest
+          permit.authorityPartitionDigest ||
+        // The tail of the turn's own Case also gives the entries that the
+        // same requester wrote in an earlier partition of the thread.
+        (candidate.writtenUnder !== null &&
+          isSameConversationRequester(
+            candidate.writtenUnder,
+            permit.requestAuthority,
+          ))
       );
   }
 }

@@ -10,7 +10,8 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock(
   "@purin-labs/authority/policy/information-flow/source-labels",
   async function mockSourceLabels() {
-    const { FlowLabel } = await import("@purin-labs/authority/policy/information-flow/labels");
+    const { FlowLabel } =
+      await import("@purin-labs/authority/policy/information-flow/labels");
     const { sourceReaderForAuthority } =
       await import("@purin-labs/authority/policy/information-flow/source-readers");
     return {
@@ -49,6 +50,17 @@ import { authorityPartitionKey } from "@purin-labs/authority/authorization/acces
 import type { Variant } from "@purin-labs/type-utils";
 import { requireCaseId, requireOrganisationId } from "./test-ids";
 import { platformEnv } from "./worker-fakes";
+
+const SHARED_OPERATOR = {
+  kind: "shared_conversation",
+  organisationId: "organisation_context_reader",
+  requesterPersonId: "person_context_reader",
+  membershipRevision: 1,
+  role: "operator",
+  connectorId: "connector_context_reader",
+  integrationAccountId: "integration_context_reader",
+  conversationId: "C0CONTEXTREADER",
+} as const;
 
 describe("Case context source reader", function caseContextSourceReaderSuite() {
   it("accepts a payout approval with account authority and rejects fabricated commerce provenance", async function payoutProposal() {
@@ -146,16 +158,7 @@ describe("Case context source reader", function caseContextSourceReaderSuite() {
           connectorId: "connector_context_reader",
           ingressId: "ingress_context_reader",
         },
-        requestAuthority: {
-          kind: "shared_conversation",
-          organisationId: "organisation_context_reader",
-          requesterPersonId: "person_context_reader",
-          membershipRevision: 1,
-          role: "operator",
-          connectorId: "connector_context_reader",
-          integrationAccountId: "integration_context_reader",
-          conversationId: "C0CONTEXTREADER",
-        },
+        requestAuthority: SHARED_OPERATOR,
         content: { kind: "text", text: "Accepted shared context." },
         acceptedAt: 1_001,
       }),
@@ -240,6 +243,7 @@ describe("Case context source reader", function caseContextSourceReaderSuite() {
         organisationId: requireOrganisationId("organisation_context_reader"),
         caseId: requireCaseId("case_context_reader"),
         authorityPartitionDigest: "a".repeat(64),
+        requestAuthority: SHARED_OPERATOR,
         visibility: [
           {
             kind: "conversation",
@@ -258,6 +262,7 @@ describe("Case context source reader", function caseContextSourceReaderSuite() {
           entryId: "trigger:trigger_context_reader",
         },
         replayAuthority: { kind: "partition_independent" },
+        writtenUnder: SHARED_OPERATOR,
         sourceRevision: 1,
         contentDigest: expect.stringMatching(/^[a-f0-9]{64}$/u),
         boundedExcerpt: "Accepted shared context.",
@@ -287,6 +292,7 @@ describe("Case context source reader", function caseContextSourceReaderSuite() {
         organisationId: requireOrganisationId("organisation_context_reader"),
         caseId: requireCaseId("case_context_reader"),
         authorityPartitionDigest: "a".repeat(64),
+        requestAuthority: SHARED_OPERATOR,
         visibility: [{ kind: "person", personId: "person_context_reader" }],
         limit: 5,
       }),
@@ -347,6 +353,9 @@ describe("Case context source reader", function caseContextSourceReaderSuite() {
       organisationId: requireOrganisationId("organisation_context_reader"),
       caseId: requireCaseId("case_context_reader"),
       authorityPartitionDigest: "a".repeat(64),
+      // A requester with another role: the entry of the other partition is
+      // not an entry of this requester at an earlier revision.
+      requestAuthority: { ...requestAuthority, role: "admin" },
       visibility: [
         {
           kind: "conversation",
@@ -568,7 +577,10 @@ function actorFixture(): { readonly actor: CaseDO; readonly sql: SqlStorage } {
   const storage = new TestStorage(fixture.database, sql);
   return {
     actor: new CaseDO(
-      { storage, waitUntil: retainProjectionWork } as unknown as DurableObjectState,
+      {
+        storage,
+        waitUntil: retainProjectionWork,
+      } as unknown as DurableObjectState,
       platformEnv({ EVENT_Q: { send: recordProjectionCommand } }),
     ),
     sql,
@@ -636,7 +648,9 @@ vi.mock(
   "@purin-labs/actor-runtime/actors/actor-activation",
   async function caseRecoveryMock(importOriginal) {
     const original =
-      await importOriginal<typeof import("@purin-labs/actor-runtime/actors/actor-activation")>();
+      await importOriginal<
+        typeof import("@purin-labs/actor-runtime/actors/actor-activation")
+      >();
     return { ...original, admitActorRecovery: caseFixtureRecovery };
   },
 );

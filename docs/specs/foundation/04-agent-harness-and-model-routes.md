@@ -106,7 +106,8 @@ OpenRouter route of Purin AI goes direct.
   Organisation. Slack ingress puts that version into the authority of each message
   (`membershipRevision`), and the authority names the Session. So the next message of
   an open Slack thread starts a new Session on the current route. Its model request
-  holds the earlier messages of the person from the Case context.
+  holds the earlier messages of the person and the earlier answers of the agent, from
+  the Case context (FND-05, "The context of a turn").
 - An admin sets one effort for Slack answers, in the Slack drawer of the Portal. It
   applies to the next Slack turn, also in an open thread, when the model of the route
   offers that effort.
@@ -419,8 +420,6 @@ Boundaries:
 - No route removes a stored model key. A key leaves the Vault only when another key of
   the same provider replaces it. A change of the source keeps the key.
 - The Wrangler files have a `local` and a `production` profile, and no staging profile.
-- After a change of the source, the new Session of an open Slack thread gets the
-  earlier messages of the person, but not the earlier answers of the agent.
 - A turn that runs while an admin removes its key stops with the general failure text.
   It does not name the removed key.
 
@@ -442,9 +441,10 @@ Boundaries:
     `chatgpt-subscription-portal.test.ts`, `claude-oauth.test.ts`,
     `claude-model-choice-portal.test.ts`, `gemini-key-portal.test.ts`,
     `model-key-removal.test.ts`, `platform-model-change.test.ts`,
-    `slack-model-change.test.ts`, `slack-reasoning-effort.test.ts` and
-    `chat-model-route-unavailable.test.ts`. The fake Gemini API is in
-    `gemini-support.ts`.
+    `slack-model-change.test.ts`, `slack-thread-new-session.test.ts`,
+    `slack-reasoning-effort.test.ts` and `chat-model-route-unavailable.test.ts`. The
+    fake Gemini API is in `gemini-support.ts`, and the `PUT` of the AI account is in
+    `ai-account-support.ts`.
   - Harness: `pi-sdk-actor.test.ts`, `pi-sdk-effect.test.ts`,
     `pi-sdk-compaction.test.ts`, `pi-native-steering.test.ts`,
     `checkpoint-restart.test.ts` and `checkpoint-atomic-acceptance.test.ts`.

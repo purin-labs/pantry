@@ -1,8 +1,7 @@
 import { runInDurableObject } from "cloudflare:test";
-import { env, exports } from "cloudflare:workers";
+import { env } from "cloudflare:workers";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@purin-labs/std";
 
 import { createEmbeddedHarnessModelRouteLease } from "@purin-labs/agent/actors/session/model-route";
 import { resolveOrganisationModelRouteAtScope } from "@purin-labs/agent/models/route";
@@ -10,11 +9,10 @@ import { resolveCurrentOrganisationModelCredential } from "@purin-labs/authority
 import { parseVaultHandle } from "@purin-labs/authority/credential-vault/domain";
 import { resolveVaultHandle } from "@purin-labs/authority/credential-vault/service";
 import { parseSessionId } from "@purin-labs/kernel/ids";
-import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
+import { changeAiAccount } from "./ai-account-support";
 import { preparePortalChatJourney } from "./chat-journey-support";
 import { readChat, readWork, sendMessage } from "./chat-model-choice-support";
-import { commerceHeaders } from "./commerce-support";
 import { FakeGemini, type GeminiAnswer } from "./gemini-support";
 import { joinMember } from "./memory-support";
 import { network } from "./network";
@@ -50,7 +48,6 @@ it(
 const FIRST_KEY = "AIzaE2EModelKeyRemovalJourney00000000001";
 const SECOND_KEY = "AIzaE2EModelKeyRemovalJourney00000000002";
 const CHAT = "conv_9d4a6f5b-2e7a-4b0d-9f8c-4a5b6c7d8e04";
-const INFERENCE = `https://localhost/v1/control/organisations/${ORGANISATION_ID}/inference`;
 const GEMINI_SOURCE = { kind: "organisation_google_api_key" };
 const CHAT_MODEL_CHANGED =
   "This conversation's AI connection has changed. Restore its connection or start a new chat.";
@@ -122,7 +119,7 @@ async function modelKeyRemovalJourney(test: TestContext): Promise<void> {
 
   // The admin saves the key. A thread and a chat answer on it.
   expect(
-    await changeAiAccount(admin, "key-removal-save-first", {
+    await changeAiAccount(admin, ORGANISATION_ID, "key-removal-save-first", {
       selection: GEMINI_SOURCE,
       apiKey: FIRST_KEY,
     }),
@@ -149,6 +146,7 @@ async function modelKeyRemovalJourney(test: TestContext): Promise<void> {
   );
   const refused = await changeAiAccount(
     operator.session,
+    ORGANISATION_ID,
     "key-removal-operator",
     { selection: { kind: "pantry_platform" } },
   );
@@ -161,7 +159,7 @@ async function modelKeyRemovalJourney(test: TestContext): Promise<void> {
 
   // The admin changes the AI account to Purin AI. Pantry removes the key.
   expect(
-    await changeAiAccount(admin, "key-removal-to-purin-ai", {
+    await changeAiAccount(admin, ORGANISATION_ID, "key-removal-to-purin-ai", {
       selection: { kind: "pantry_platform" },
     }),
   ).toMatchObject({
@@ -234,7 +232,7 @@ async function modelKeyRemovalJourney(test: TestContext): Promise<void> {
 
   // The admin saves a new key. The chat and the thread answer on it.
   expect(
-    await changeAiAccount(admin, "key-removal-save-second", {
+    await changeAiAccount(admin, ORGANISATION_ID, "key-removal-save-second", {
       selection: GEMINI_SOURCE,
       apiKey: SECOND_KEY,
     }),
@@ -289,28 +287,4 @@ async function answerOnPurinAi(
     PURIN_AI_ANSWER,
     `model_key_removal_${String(requests.length)}`,
   );
-}
-
-/** The `PUT` of the AI account drawer, with the version that the page read. */
-async function changeAiAccount(
-  session: IssuedControlSession,
-  idempotencyKey: string,
-  body: Readonly<Record<string, unknown>>,
-): Promise<{ readonly status: number; readonly body: unknown }> {
-  const read = await exports.default.fetch(INFERENCE, {
-    headers: commerceHeaders(session),
-  });
-  const current: unknown = await read.json();
-  const headers = commerceHeaders(session);
-  headers.set(
-    "x-pantry-configuration-version",
-    String(isRecord(current) ? current.configurationVersion : ""),
-  );
-  headers.set("idempotency-key", idempotencyKey);
-  const response = await exports.default.fetch(INFERENCE, {
-    method: "PUT",
-    headers,
-    body: JSON.stringify(body),
-  });
-  return { status: response.status, body: await response.json() };
 }

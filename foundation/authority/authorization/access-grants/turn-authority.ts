@@ -778,6 +778,50 @@ export function authorityPartitionKeyMatchesRequest(
   return JSON.stringify(key) === JSON.stringify(expected);
 }
 
+/**
+ * The requester of a Slack conversation: the partition key of the authority
+ * apart from the membership revision. Another authority names none.
+ *
+ * A change of the Organisation's configuration, policy or grants moves an
+ * open thread to a new partition, and thus to a new Session. The requester
+ * stays the same, so a Case entry that the earlier partition wrote replays
+ * into the later one, with its flow label. A requester with another role is
+ * another requester. A mailbox, a WhatsApp line, a workflow and a Portal chat
+ * have no such rule: their entries replay into their own partition only.
+ */
+export function conversationRequester(
+  authority: RequestAuthority,
+): Readonly<{ kind: string; role: string; key: string }> | null {
+  const key = authorityPartitionKey(authority);
+  switch (key.kind) {
+    case "direct_conversation":
+    case "shared_conversation":
+      return {
+        kind: key.kind,
+        role: key.role,
+        key: JSON.stringify({ ...key, membershipRevision: null }),
+      };
+    case "workflow":
+    case "agent_mailbox":
+    case "whatsapp_support":
+    case "control":
+      return null;
+    default:
+      return assertNever(key, "unhandled authority partition key");
+  }
+}
+
+/** Whether two request authorities are one requester of one conversation. */
+export function isSameConversationRequester(
+  left: RequestAuthority,
+  right: RequestAuthority,
+): boolean {
+  const requester = conversationRequester(left);
+  return (
+    requester !== null && requester.key === conversationRequester(right)?.key
+  );
+}
+
 export function parseStoredAuthorityPartition(
   raw: unknown,
 ): Result<AuthorityPartition, AuthorityPartitionParseError> {

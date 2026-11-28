@@ -27,6 +27,9 @@ and schedules open Cases with no person.
 - The partition key of a channel holds the Organisation role of the requester and the
   membership revision (`AuthorityPartitionKey`). The key of a DM also holds the person.
   Thus one thread can have more than one Session and more than one assignment.
+- A Session keeps its history to itself. A new Session of a thread reads the shared
+  journal through the Case context (FND-05): the messages of the people, and the
+  answers that the agent gave to the same requester in an earlier partition.
 - One Connector serves one Slack integration account.
 - A Portal chat has one Case. Each step of a chat request runs in a new Session of that
   Case (`conversationStepIdentity` in `chat/turn/run.ts`).
