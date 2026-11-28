@@ -335,9 +335,10 @@ acceptance before Stage B moves its files.
 
 ## Sources
 
-- [Code style](../../history/code-style.md), [Refactor 10](../../history/refactor-10.md) and
-  [Plan 92](../../history/plan-92-new-pantry-repository.md). Where they differ from the code,
-  this spec follows the code.
+- [Code style](../../history/code-style.md), [Refactor 10](../../history/refactor-10.md),
+  [Plan 92](../../history/plan-92-new-pantry-repository.md) and
+  [Plan 94](../../history/plan-94-purin-labs-organisation.md) (the move to `purin-labs`).
+  Where they differ from the code, this spec follows the code.
 - Background: [Refactor 17](../../refactor-17.md), [the module list](../../layers.md),
   the [spec index](../README.md) and [`AGENTS.md`](../../../AGENTS.md).
 - The evidence of Refactor 10 in the archive:

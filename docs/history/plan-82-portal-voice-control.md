@@ -3,7 +3,7 @@
 Status (2026-11-18): Phases 0–3 and the later decisions D9–D12 are in production. Phase 4 waits
 for a shop: its gates need the owner's shift in a shop, and the owner has no shop yet
 (2026-11-17). Phase 5 has not started. The repository is now `purin-labs/pantry`
-([Plan 94](../plan-94-purin-labs-organisation.md)). [The voice handover](../plan-82-voice-handover.md)
+([Plan 94](plan-94-purin-labs-organisation.md)). [The voice handover](../plan-82-voice-handover.md)
 lists the remaining steps of this plan, [Plan 82B](../plan-82B-ambient-voice.md) and
 [Plan 82C](plan-82C-speech-engines.md), and the local state that a new clone lacks.
 

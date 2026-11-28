@@ -1,11 +1,24 @@
 # Plan 94 — Pantry moves to the GitHub organisation `purin-labs`
 
-Status: 20 November 2026. The repositories are `purin-labs/pantry` and
-`purin-labs/monorepo` (moved from `seams-tech/seams-monorepo`), the folder
-moves are done, all 27 workspace packages use `@purin-labs/*`, the old `satyr`
-repository is archived and the old clone is deleted (see "Done"). Open:
-deploying the Console backend with the new OIDC pin, the GitHub Apps, the
-first Pantry CI run and the group B legacy names (see "Steps").
+Status: closed on 28 November 2026. Each step is done or is not needed for
+Pantry (see "Steps", checked on 28 November 2026 at dev `f6dd43ff`). The
+repository is `purin-labs/pantry` (public on 28 November 2026), all
+workspace packages use `@purin-labs/*`, the old `satyr` repository is
+archived and the old clone is deleted (see "Done").
+
+Changes after 20 November 2026:
+
+- [Plan 95](../plan-95-pantry-own-accounts.md) step 4 (21 November 2026,
+  dev `396278ef`): Pantry no longer binds the Console. Pantry CI, the E2E
+  suite and the Platform need no Console Worker, no
+  `PANTRY_ACCOUNT_WORKER_ARTIFACT` and no checkout of the Console
+  repository. "What crosses the line" below is history.
+- Refactor 260 of the Console moved `purin-labs/monorepo` to
+  `seams-tech/seams-console` on 21 November 2026, with the same repository id
+  `1366871528`. The Console is a Seams product, apart from Purin. The Purin
+  company site is now `purin-labs/purin-monorepo`.
+- [Plan 93](../plan-93-clean-cutover.md) step 2 (21 November 2026) renamed
+  the group B names, and the old stack is deleted since 22 November 2026.
 
 The owner decided on 19 November 2026:
 
@@ -52,7 +65,7 @@ the move:
   the workflow needs no token.
 - Local E2E runs need `PANTRY_ACCOUNT_WORKER_ARTIFACT`, built from
   `~/Dev/purin-labs/monorepo`, and `PLAYWRIGHT_MODULE` from seams-wallet.
-- [Plan 93](plan-93-clean-cutover.md) still renames the Console service id
+- [Plan 93](../plan-93-clean-cutover.md) still renames the Console service id
   `satyr` in `purin-labs/monorepo`.
 
 ## Facts (19–20 November 2026)
@@ -198,20 +211,56 @@ empty folder"):
 
 ## Steps
 
-1. **The owner: the GitHub Apps.** Check the apps on `seams-tech`
-   (Settings → GitHub Apps) and install the ones that Pantry needs on
-   `purin-labs`.
-2. **Deploy the Console backend** (`deploy-console-backend.yml` in
-   `purin-labs/monorepo`) when ready so live Console Workers pick up the
-   `purin-labs/monorepo` OIDC pin from `079aebc1` before the next automated
-   tenant cutover.
-3. **Run Pantry CI once** in the new organisation: add the label `run-ci` to
-   pull request #1 (`gh api repos/purin-labs/pantry/issues/1/labels`). It
-   uses the free minutes of `purin-labs`.
-4. **The legacy `satyr` names in the code:** group A is done; group B
-   waits for [Plan 93](plan-93-clean-cutover.md) step 2.
-5. **The Portal shop footer** (done): the public `/ecommerce` page and its
-   footer are deleted.
+Each step was checked on 28 November 2026 with a read-only `gh` call or a
+`git grep` on dev `f6dd43ff`.
+
+1. **The GitHub Apps: not needed.** Pantry uses only GitHub Actions, which
+   is part of GitHub and needs no installation.
+   `gh api orgs/purin-labs/installations` and
+   `gh api orgs/seams-tech/installations` both return `total_count: 0` (the token is an admin of both
+   organisations). So no app was on `seams-tech` to move. The repository has
+   no webhook (`gh api repos/purin-labs/pantry/hooks` returns 0), and each
+   pull request so far is by a person.
+2. **Deploy the Console backend: not needed for Pantry.** Since Plan 95 step
+   4, no Pantry code, workflow or Worker binds the Console.
+   `git grep -E "ACCOUNT_PLATFORM|PANTRY_ACCOUNT_WORKER_ARTIFACT|seams-console"`
+   outside `docs/` finds nothing, and `.github/workflows/pantry.yml` checks out only
+   this repository. The Console repository is now `seams-tech/seams-console`.
+   Its OIDC subject is
+   `repo:seams-tech@282445520/seams-console@1366871528`
+   (`gh api repos/seams-tech/seams-console/actions/oidc/customization/sub`),
+   and its source `automationRoute.ts` on `main` pins the same value. The last
+   run of its `deploy-console-backend.yml` is from 29 October 2026, so the
+   live Console Workers can still hold an older pin. That deploy belongs to
+   the Console (Refactor 260), not to Pantry.
+3. **Run Pantry CI once: done.** The workflow "Pantry" has 248 runs in
+   `purin-labs/pantry`. The first success was run `45082677761`
+   (22 November 2026, pull request to `main`). The last success on `dev` was
+   run `46081154523` (27 November 2026, `b2fd98c5`).
+4. **The legacy `satyr` names: done.** Group A was done on 19 November 2026
+   (dev `d7f37b9f`). Plan 93 step 2 renamed group B with
+   `scripts/rename/plan-93-cutover.mjs` (dev `10847e8a`, 21 November 2026).
+   On dev `f6dd43ff`, `git grep -i satyr` outside `docs/` and the Markdown
+   files finds 154 lines in 49 files, against 2,356 lines in 745 files before
+   step 2. Each line is in the list "Values that keep an old name on purpose"
+   of [ENG-03](../specs/engineering/03-names.md), and no product code reads an
+   old name:
+
+   | Lines | Where                                                     | Layer and reason                                                 |
+   | ----: | --------------------------------------------------------- | ---------------------------------------------------------------- |
+   |    49 | `scripts/plan-82-g04/`                                    | Code. The wake training compares "Hey Satyr" and "Hey Sous Chef" |
+   |    42 | `scripts/rename/plan-93-cutover.mjs`                      | Code. The search patterns of the codemod                         |
+   |    24 | Applied D1 patch scripts in `workers/platform/scripts/`   | Records of the deleted stack (old D1 names, old CHECK values)    |
+   |    18 | Pinned Kitchen physics bundles in `apps/portal/public/`   | The old build path. A saved run names its bundle by hash         |
+   |    17 | `scripts/bakery-mujoco/` and `repo-binaries.json`         | Model text and R2 file names. Inputs of the pinned builds        |
+   |     2 | `satyr-physics-results` in `areas/kitchen/ui/`            | Wire (browser OPFS folder). The pinned execution bundle names it |
+   |     1 | `crates/bakery-native/src/station_reply.rs`               | A code comment. The bundles hash this source                     |
+   |     1 | `workers/platform/tests/e2e/plan-88-jev-features.test.ts` | A link to the file name of Plan 88                               |
+
+5. **The Portal shop footer: done.** The public `/ecommerce` page and its
+   footer are deleted. `apps/portal/src/features/ecommerce/` does not exist,
+   and `git grep "github.com/seams-tech"` outside `docs/` and the Markdown
+   files finds nothing.
 
 ### The wallet side (done)
 
@@ -237,4 +286,4 @@ keeps `seams-wallet`, `seams-monorepo` and the `@seams` scope.
 
 - Done: the transfer, the remotes, the secrets, the handoffs and the delete
   of the old clone.
-- Open: the apps (the owner, about 5 minutes) and one CI run.
+- Open: nothing for Pantry. The Console backend deploy is Console work.

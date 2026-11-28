@@ -175,7 +175,7 @@ The owner's plan on 2026-11-18, changed on 2026-11-19:
 
 1. Pantry moves to the new GitHub organisation `purin-labs`. The wallet repositories
    (`seams-wallet`, `seams-monorepo`, `speak-to-sign`) stay in `seams-tech`
-   ([Plan 94](plan-94-purin-labs-organisation.md)).
+   ([Plan 94](history/plan-94-purin-labs-organisation.md)).
 2. The pantry clone moved from `~/Dev/lowerarchy/pantry` to `~/Dev/purin-io/pantry` on
    2026-11-18. On 2026-11-19 the folder became `~/Dev/purin-labs`. The wallet repositories stay
    in `~/Dev/rust`.
