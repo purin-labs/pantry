@@ -16,9 +16,9 @@ Both wait for the owner (see "The owner's actions"):
 - Step A4, the spend comparison. It needs the OpenRouter spend of each day, and
   only a sign-in at OpenRouter or a management key gives it.
 - The live Gemini key check of B4, which is also the production proof of B5. The
-  key check passed on Gemini 4 Hydrogen on 28 November 2026. Carbon, Argon and
-  Neon need billing on the key's Google Cloud project, and the production steps
-  need the owner's yes (see B4).
+  key check passed on Gemini 4 Hydrogen on 28 November 2026. The production steps
+  are deferred: the owner does not put billing on the key's project (see "The
+  owner's actions").
 
 The code on `origin/dev` `b710111d` supports each claim of this plan (see "Check
 of 28 November 2026").
@@ -46,11 +46,14 @@ Not in this plan:
 - Vertex AI. In a Worker, Pi can use Vertex only with an API key, and its
   ADC token requests bypass the model exit Worker.
 - A Gemini subscription sign-in. Pi 1.6.0 has two Google providers, `google` (an
-  API key) and `google-vertex`, and no sign-in for a Google AI subscription. Google
-  gives that sign-in only to its own tools. A Google AI Pro or Ultra subscription
-  can still pay for the Gemini key route: it includes Google Cloud credits each
-  month, which pay for the use of a Gemini API key of a project with billing
-  (answer to the owner's question of 28 November 2026).
+  API key) and `google-vertex`, and no sign-in for a Google AI subscription. The
+  terms of Gemini CLI say that a third-party tool that uses the Gemini CLI sign-in
+  breaks Google's terms, and users report that Google suspended such accounts.
+  Google offers no sign-in of a subscription for another app. The only use of a
+  Google AI Pro or Ultra subscription in Pantry is its Google Cloud credits, which
+  pay for a Gemini API key of a project with billing. On 28 November 2026 the
+  owner asked for the subscription and declined the Cloud credits. Look again
+  when Google offers a sign-in for other apps.
 - A model choice on the route that Seams pays for (decision D6).
 - A quality evaluation. The owner tested the four models on 20 November 2026
   and rates all four above kimi-k3. The Plan 50 comparison was cancelled.
@@ -424,8 +427,8 @@ part B.
     200, 2 answered 503 ("high demand") and 2 answered 429 (the limit for each
     minute). Pi's retries are off (`maxRetries` 0, FND-04), so each such answer
     fails a turn. Google can also use the content of free-tier requests. So steps
-    3 and 4 wait until the project has billing. With billing, run step 2 again
-    for the four models.
+    3 and 4 need billing on the project. With billing, run step 2 again for
+    the four models.
   - The key was pasted in the chat of the session, so it is in that transcript.
     Step 5 deletes it at Google.
 
@@ -524,10 +527,13 @@ On `origin/dev` `b710111d`, in a clean worktree:
 - Before the live check of B4: make a Gemini API key at
   `https://aistudio.google.com/apikey`. Done on 28 November 2026, on a project
   with no billing.
-- Turn on billing for the Google Cloud project of the key. The Cloud credits of a Google AI
-  Ultra subscription can pay for it: activate them in the Google Developer
-  Program, and link them to the billing account of the project. Then say yes to
-  steps 3 to 5 of the live check in B4. Open.
+- The production proof of B5: deferred on 28 November 2026. The owner declined
+  billing on the key's project. To close it, choose one: put billing on the
+  project (the Ultra Cloud credits pay) and say yes to steps 3 to 5 of B4; or say
+  yes to steps 3 to 5 on Gemini 4 Hydrogen with the free-tier key, which proves
+  the exit Worker but fails about half of the requests. Until then, the
+  Gemini key route has no production proof. Gemini 4 Hydrogen runs for each
+  Organisation through Purin AI (OpenRouter). Open.
 - For A4, one of two actions. Recommended: sign in to `openrouter.ai` in the
   browser pane of the Claude app, so that the agent can read the Activity page.
   Or: make a management key in the OpenRouter settings
