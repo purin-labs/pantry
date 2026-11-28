@@ -263,7 +263,8 @@ routes and the exit Workers. FND-06 owns the approval methods, and FND-08 owns P
 Vault. FND-11 owns the contract schemas, and COM-02 owns the commerce engine and its event
 kinds. INT-01 owns the provider connections, and ORG-02 owns Jev from Purin. PRT-01 owns
 the Portal text and marks, and VOX-01 owns the speech engines. Plan 24 owns the cobot path
-that Purin Gantry will name. Plan 93 owns the cutover, and Plan 94 the GitHub organisation.
+that Purin Gantry will name. Plans 93 (the cutover) and 94 (the GitHub organisation) are
+closed records.
 
 ## Open work
 
@@ -315,7 +316,7 @@ Square sandbox tunnel `square-sandbox-webhook.seams.sh`. The shop site is `shop.
 ## Sources
 
 - [Plan 91](../../history/plan-91-seams-atelier-rename.md) and
-  [Plan 93](../../plan-93-clean-cutover.md). Where they differ from the code, this spec
+  [Plan 93](../../history/plan-93-clean-cutover.md). Where they differ from the code, this spec
   follows the code. They give no evidence link in the archive.
 - [AGENTS.md](../../../AGENTS.md), sections "Product direction" and "Old and new names".
 - Checks: `scripts/worker-environment.test.mjs` and

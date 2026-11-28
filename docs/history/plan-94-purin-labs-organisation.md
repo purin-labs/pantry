@@ -17,7 +17,7 @@ Changes after 20 November 2026:
   `seams-tech/seams-console` on 21 November 2026, with the same repository id
   `1366871528`. The Console is a Seams product, apart from Purin. The Purin
   company site is now `purin-labs/purin-monorepo`.
-- [Plan 93](../plan-93-clean-cutover.md) step 2 (21 November 2026) renamed
+- [Plan 93](plan-93-clean-cutover.md) step 2 (21 November 2026) renamed
   the group B names, and the old stack is deleted since 22 November 2026.
 
 The owner decided on 19 November 2026:
@@ -65,7 +65,7 @@ the move:
   the workflow needs no token.
 - Local E2E runs need `PANTRY_ACCOUNT_WORKER_ARTIFACT`, built from
   `~/Dev/purin-labs/monorepo`, and `PLAYWRIGHT_MODULE` from seams-wallet.
-- [Plan 93](../plan-93-clean-cutover.md) still renames the Console service id
+- [Plan 93](plan-93-clean-cutover.md) still renames the Console service id
   `satyr` in `purin-labs/monorepo`.
 
 ## Facts (19–20 November 2026)
@@ -270,20 +270,29 @@ keeps `seams-wallet`, `seams-monorepo` and the `@seams` scope.
 
 ## Decisions for the owner
 
-1. **The brand rule:** the brand follows the code owner (see "The split").
-   Default: yes.
-2. **Pantry sign-in shows Seams for now.** People sign in through the Seams
-   Console. Default: yes. A Purin sign-in page is a later plan.
-3. **`pantry-history` and `satyr` stay in `seams-tech`, archived.** Default:
-   yes. About 85 pantry files link to `seams-tech/pantry-history`, and the
-   links stay valid. A later transfer keeps them valid too (redirect).
-4. **The npm organisation `purin-io`:** delete it, or keep it unused.
+State on 28 November 2026:
+
+1. **The brand rule. Done:** the brand follows the code owner (see "The
+   split"). Pantry uses the Purin names
+   ([ENG-03](../specs/engineering/03-names.md)), and only Seams Pay keeps
+   the Seams name.
+2. **Pantry sign-in shows Seams for now. Replaced:** since
+   [Plan 95](../plan-95-pantry-own-accounts.md) step 4, Pantry has its own
+   sign-in, and no Pantry request calls the Seams Console.
+3. **`pantry-history` and `satyr` stay archived. Done, in another
+   place:** both are archived, private repositories of the owner's own
+   account now (`peitalin/pantry-history`, `peitalin/satyr`). Links to
+   `seams-tech/pantry-history` redirect, but only a person with access to
+   the private repository can open them.
+4. **The npm organisation `purin-io`. Open, with the owner:** delete it, or
+   keep it unused. Pantry publishes no npm package, so it costs nothing.
    Default: keep it until you decide.
-5. **Delete the old clone `~/Dev/lowerarchy/satyr`.** Decided and done on
-   19 November 2026: contents deleted, empty folder kept.
+5. **Delete the old clone `~/Dev/lowerarchy/satyr`. Done** on 19 November
+   2026: contents deleted, empty folder kept.
 
 ## Cost
 
 - Done: the transfer, the remotes, the secrets, the handoffs and the delete
   of the old clone.
-- Open: nothing for Pantry. The Console backend deploy is Console work.
+- Open: nothing for Pantry. The Console backend deploy is Console work, and
+  decision 4 (the npm organisation `purin-io`) stays with the owner.

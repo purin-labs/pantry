@@ -112,7 +112,7 @@ otherwise append `-production` to their previously generated names.
 
 There is no staging environment. Its Workers, databases, bucket, KV namespace,
 queues and containers were deleted on 19 November 2026
-([Plan 93](../plan-93-clean-cutover.md), step 1), and the launcher accepts only
+([Plan 93](../history/plan-93-clean-cutover.md), step 1), and the launcher accepts only
 `local` and `production`. A new staging stack needs its own plan: Worker
 names, databases, storage, queues, service bindings, root keys, application
 secrets, origins and provider allowlists. No staging resource may alias

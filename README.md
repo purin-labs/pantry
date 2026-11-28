@@ -107,7 +107,7 @@ OAuth callbacks ──────────────┘        │
 ```
 
 The production Worker is `pantry`, on its one address `pantry.purin.io`
-([Plan 93](docs/plan-93-clean-cutover.md)). Plans and evidence keep the older
+([Plan 93](docs/history/plan-93-clean-cutover.md)). Plans and evidence keep the older
 names of their time; the glossary in AGENTS.md maps them.
 
 `AgentSessionActor` pins one inference route for a session:

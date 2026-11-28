@@ -14,7 +14,7 @@ production (see their "results" sections). Step 6 is open.
 
 Owner: the Platform accounts, the Portal setup and Pantry billing.
 Touches: [Plan 88 — Jev](history/plan-88-satyr-funded-jev.md) (paid use),
-[Plan 93 — clean cutover](plan-93-clean-cutover.md) (the new stack),
+[Plan 93 — clean cutover](history/plan-93-clean-cutover.md) (the new stack),
 [onboarding architecture](architecture/onboarding.md),
 [organisation setup flow](history/organisation-setup-flow.md), and the AGENTS.md
 sections "Current request flow" and "Testing".
@@ -393,12 +393,12 @@ fixture until the billing went. After step 3, the attach serves only the
 sign-in link and the invitations, which step 2 replaces. The order has no
 effect on production, because steps 1 to 4 ship in one release.
 
-### 0. Decisions (no code)
+### 0. Decisions (no code) — done
 
 Done on 20 November 2026. The owner took all five recommendations (see
 "Decisions").
 
-### 1. Native request eligibility
+### 1. Native request eligibility — done
 
 - Build `OrganisationAccess` as in the design. Delete the Console calls in
   `access.ts`, `access-revision.ts`, `identity.ts` (the automation part) and
@@ -480,7 +480,7 @@ list above:
     person's project to the default project, and the person keeps no
     project membership.
 
-### 2. Organisation creation and invitations
+### 2. Organisation creation and invitations — done
 
 - `POST /v1/control/organisations` and the three-step setup dialog.
 - `organisation_invitation`, its routes, and the invitation page with the
@@ -569,7 +569,7 @@ where the work differs from the list above:
   with 19 checks; its report and screenshots are in the git-ignored
   `output/playwright/account-setup/`.
 
-### 3. Billing state off the Console
+### 3. Billing state off the Console — done
 
 - Delete `execution-billing.ts` and the billing calls of its six callers.
   Turns stay unpriced (decision 4).
@@ -613,7 +613,7 @@ where the work differs from the list above:
   journeys of Console paid use are one journey: above the free use a call
   stops, and neither an admin nor the owner can turn paid use on.
 
-### 4. Remove the Console connection
+### 4. Remove the Console connection — done
 
 - Delete the rest of `account-platform/`: `client.ts`, `config.ts`,
   `binding.ts`, `provisioning.ts`, `provisioning-boundary.ts`, `routes.ts`,
@@ -671,7 +671,7 @@ list above:
   32, which Plan 92 retired, so the failure is older than this step.
 - Idle cost: lower. The instance release pass no longer runs in the cron.
 
-### 5. Release and production proof
+### 5. Release and production proof — done
 
 - Deploy `satyr-edge` (the source account, as now) with steps 1 to 4, before
   the Plan 93 cutover (decision 1), by the
@@ -726,7 +726,10 @@ above:
 - The session "Console Pantry service removal" (Refactor 260) knows that
   Pantry binds no Console.
 
-### 6. Stripe billing
+### 6. Stripe billing — open
+
+Open on 28 November 2026. It waits for the Purin Stripe account of decision 3,
+which the owner makes. Its test-mode keys are enough to start.
 
 - The plan catalog, `organisation_billing_account`, Checkout, the Customer
   Portal, meter events, the webhook, local admission, the Billing page, the
@@ -841,8 +844,9 @@ recommendations?". The owner answered "Take all five".
   sign-up makes a new organisation through the Console" becomes "through
   Pantry". The `ACCOUNT_PLATFORM_*` values leave "Who uses the old
   addresses". "The Console records of the old organisations" in step 5
-  becomes Refactor 260 work. Step 4 of this plan makes these edits.
+  becomes Refactor 260 work. Done: step 4 of this plan made these edits.
 - **Refactor 17.** Each new table needs a line in the `tables` map of
-  `scripts/layers.json`. The dropped tables leave it.
+  `scripts/layers.json`. The dropped tables leave it. Done for steps 1 to 5:
+  `account_service_binding` is not in the map. Step 6 adds its tables.
 - **Plan 81.** The agent gets the billing read tool. The list of refused
   account actions is in "Agent access".

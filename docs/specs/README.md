@@ -72,7 +72,7 @@ each source file its module.
 | VOX-01  | [Voice control](surfaces/voice/01-voice-control.md)                                    | `surfaces/voice/`     | Plans 82 and 82C, the voice handover                                                  | Written 2026-11-23 |
 | ENG-01  | [Decision log](engineering/01-decision-log.md)                                         | `engineering/`        | Plan 3                                                                                | Written 2026-11-23 |
 | ENG-02  | [Code and repository](engineering/02-code-and-repository.md)                           | `engineering/`        | `history/code-style.md`, Refactor 10, Plans 92 and 94                                 | Written 2026-11-23 |
-| ENG-03  | [Names](engineering/03-names.md)                                                       | `engineering/`        | Plan 91, the names table of `AGENTS.md`                                               | Written 2026-11-23 |
+| ENG-03  | [Names](engineering/03-names.md)                                                       | `engineering/`        | Plans 91 and 93, the names table of `AGENTS.md`                                       | Written 2026-11-23 |
 | ENG-04  | [Testing](engineering/04-testing.md)                                                   | `engineering/`        | `test-coverage-e2e.md`                                                                | Written 2026-11-23 |
 
 ## Old plan numbers
@@ -181,7 +181,7 @@ Refactors 1 to 8 are also the numbers of the items of Refactor 15.
 | Plan 90     | A plan      | [plan-90-cafe-pos-checkout.md](../plan-90-cafe-pos-checkout.md)                                                           |       15 |
 | Plan 91     | ENG-03      | [plan-91-seams-atelier-rename.md](../history/plan-91-seams-atelier-rename.md)                                             |       39 |
 | Plan 92     | ENG-02      | [plan-92-new-pantry-repository.md](../history/plan-92-new-pantry-repository.md)                                           |       12 |
-| Plan 93     | A plan      | [plan-93-clean-cutover.md](../plan-93-clean-cutover.md)                                                                   |        6 |
+| Plan 93     | ENG-03      | [plan-93-clean-cutover.md](../history/plan-93-clean-cutover.md)                                                           |        6 |
 | Plan 94     | ENG-02      | [plan-94-purin-labs-organisation.md](../history/plan-94-purin-labs-organisation.md)                                       |        4 |
 | Plan 95     | A plan      | [plan-95-pantry-own-accounts.md](../plan-95-pantry-own-accounts.md)                                                       |        0 |
 | Plan 96     | A plan      | [plan-96-gemini-models.md](../plan-96-gemini-models.md)                                                                   |        0 |

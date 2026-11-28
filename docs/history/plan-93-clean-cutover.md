@@ -1,12 +1,14 @@
 # Plan 93 — Clean cutover to new Workers and infrastructure
 
-Status: 22 November 2026. Steps 0 to 6 are done. The new stack serves
-production on `pantry.purin.io`, the providers use the new callbacks, and the
-old stack is deleted. Checked on 23 November 2026: the follow-ups that remain
-need the owner, and WhatsApp is deferred ("Follow-up results", "Still
-open"). Step 7 is done: only `hadimar` remains, which the owner keeps.
+Status: closed on 28 November 2026. Steps 0 to 7 are done (22 November
+2026). The new stack serves production on `pantry.purin.io`, the providers
+use the new callbacks, and the old stack is deleted. Of step 7 only
+`hadimar` remains, which the owner keeps. Two items stay open outside the
+code, with the owner: the test order on `shop.purin.io` (the shop has no
+payment account yet) and the Meta webhook (WhatsApp is deferred). See
+"Follow-up results".
 
-Change on 21 November 2026 ([Plan 95](plan-95-pantry-own-accounts.md) step
+Change on 21 November 2026 ([Plan 95](../plan-95-pantry-own-accounts.md) step
 4): Pantry no longer binds the Console. The new stack has no
 `ACCOUNT_PLATFORM` binding and no `ACCOUNT_PLATFORM_*` value, a sign-up makes
 the organisation in Pantry, and the Console records of the old organisations
@@ -21,9 +23,9 @@ are Refactor 260 work. The Console items below are history.
   transfer. A clean cutover needs neither, so this version replaces it.
 
 Owner: the deploy procedure and the Cloudflare account.
-Touches: [Plan 91 — names](history/plan-91-seams-atelier-rename.md) (its rules for
+Touches: [Plan 91 — names](plan-91-seams-atelier-rename.md) (its rules for
 the deployed and wire layers end here),
-[Plan 80 — multi-tenant Underclerk](history/plan-80-underclerk-multi-tenant-backend.md),
+[Plan 80 — multi-tenant Underclerk](plan-80-underclerk-multi-tenant-backend.md),
 the AGENTS.md sections "Old and new names", "Active runtime" and
 "Deployment", the Console in seams-monorepo, and the shop Mac.
 
@@ -868,14 +870,25 @@ deployed and wire rules ended with this plan. The memory notes name the new
 stack.
 
 **Left as separate work** (briefs in the notes file
-`plan-93-follow-ups.md` of the session group): the old Kitchen physics
-bundles (done, see the step 5 results); the 64,000-token default budget of a new organisation; the shop
-Mac voice service and local development on `purin-pantry`, after which the
-old Google projects can go. With the owner: the read-only R2 key of CI
-(add `pantry-repo-binaries-apac`), Google verification of the Gmail scopes,
-`TYPESAFE_API_KEY`, and the checks not run yet (a Square or Stripe connect,
-a test order, an MCP call). With the Plan 91 phase 4 session: the Square and
-Stripe Connect redirects, the Meta webhook and the remaining console names.
+`plan-93-follow-ups.md` of the session group). State on 28 November 2026,
+from "Follow-up results":
+
+- The old Kitchen physics bundles: done (step 5 results).
+- The 64,000-token default budget of a new organisation: done. The default
+  is 500,000 tokens since the release of 22 November 2026.
+- The shop Mac voice service and local development on `purin-pantry`: done.
+  The old Google projects are deleted.
+- The read-only R2 key of CI for `pantry-repo-binaries-apac`: done.
+- `TYPESAFE_API_KEY`: done.
+- The MCP call and the Square connect: done.
+- The Square and Stripe Connect redirects and the remaining console names:
+  done (Plan 91 phase 4, `87fcd22c`).
+- Google verification of the Gmail scopes: waits until outside users
+  connect (the owner).
+- A full Stripe connect on the live stack: not run
+  ([ENG-03](../specs/engineering/03-names.md) "Open work").
+- The test order: open, with the owner (see "Still open").
+- The Meta webhook: deferred (see "Deferred on 23 November 2026").
 
 #### Follow-up results (22 November 2026)
 
@@ -959,7 +972,10 @@ Stripe Connect redirects, the Meta webhook and the remaining console names.
   passes and the live Portal has the consent text. No signed-in journey
   ran.
 - **Still open:** a test order on `shop.purin.io`. The shop takes a real
-  card payment through Square on production, so the owner does it.
+  card payment through Square on production, so the owner does it. On
+  25 November 2026 the shop could not take a payment: no online payment
+  account is connected, and the one Square location has card payments off.
+  The owner turns on Square card payments first.
 - **Closed on 24 November 2026 (the owner's request):** in the owner's
   Chrome, the mailbox `purinindustries@gmail.com` of "Purin workspace" is on,
   with the consent checkbox for Gemini 4 Hydrogen through OpenRouter and
@@ -1056,14 +1072,15 @@ removes the staging crons.
    storage ends with its region (`-apac`).
 3. **Delete the stale Pantry resources now (step 1).** Decided and done on
    19 November 2026.
-4. **No staging stack after the cutover.** Default: none until a plan needs
-   one.
-5. **Stale resources of other projects.** Default: keep them until you say
-   yes for each group.
-6. **The shop domain.** Default: `purin-shop` on `shop.purin.io`, and the
-   commerce engine's `SHOP_SITE_ORIGIN` names it. The order page domain
-   (`MENU_HOST_SUFFIX`, still `menu.seams.tokyo`, with no route) stays
-   unchosen.
+4. **No staging stack after the cutover. Done:** step 1 removed staging,
+   and `WORKER_NAMES` in `scripts/worker-environment.mjs` has no staging
+   Worker.
+5. **Stale resources of other projects. Done (step 7):** the owner said yes
+   for each group. Only `hadimar` remains, which the owner keeps.
+6. **The shop domain. Done:** `purin-shop` serves `shop.purin.io`, and the
+   commerce engine's `SHOP_SITE_ORIGIN` names it. The QR order pages are at
+   `menu.purin.io/<shop name>/` (`MENU_HOST` and the custom domain in
+   `apps/storefront/wrangler.jsonc`).
 
 ## Adapter code with no test (19 November 2026)
 

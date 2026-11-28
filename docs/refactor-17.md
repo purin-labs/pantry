@@ -756,7 +756,7 @@ crossing. How the last column counts:
 
 ### Stage B: open since the Plan 93 cutover (2026-11-22)
 
-[Plan 93](plan-93-clean-cutover.md) is done: `pantry.purin.io` serves production and
+[Plan 93](history/plan-93-clean-cutover.md) is done: `pantry.purin.io` serves production and
 the old stack is deleted. Stage B starts with step 1. In this order:
 
 1. Done: the trial of D1 ([report](evidence/refactor-17-d1-trial.md)) and its

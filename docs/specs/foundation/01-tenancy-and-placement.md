@@ -364,9 +364,9 @@ The boundaries:
   and its invitations. ORG-02 owns the monthly allowance of Jev from Purin.
 - DEV-01 places each `DeviceFleetActor` with its Organisation. ENG-04 owns the test
   rules.
-- [Plan 93](../../plan-93-clean-cutover.md) stays a plan. It owns the names of the
-  deployed stack: `pantry-global-apac`, `pantry-organisation-apac` and
-  `pantry-archive-apac`.
+- ENG-03 owns the names of the deployed stack: `pantry-global-apac`,
+  `pantry-organisation-apac` and `pantry-archive-apac`.
+  [Plan 93](../../history/plan-93-clean-cutover.md) is the record of the cutover.
 
 ## Open work
 
@@ -408,7 +408,7 @@ The boundaries:
 - [Economics and costs](../../economics-costs.md). It names
   [Plan 55](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-55.md)
   in the archive for regional placement and latency.
-- Background: [Plan 93](../../plan-93-clean-cutover.md). The rule for the cost of each
+- Background: [Plan 93](../../history/plan-93-clean-cutover.md). The rule for the cost of each
   tenant is in `AGENTS.md`, section "Cost of each tenant".
 - Where a source differs from the code, this spec follows the code.
 - E2E journeys in `workers/platform/tests/e2e/`: `idle-tenant-cost.test.ts`,
