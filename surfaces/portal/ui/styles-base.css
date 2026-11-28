@@ -1,0 +1,1764 @@
+/* Transition shorthands: `transition: opacity var(--motion-quick)`. The
+   component preview scales every duration through --agent-motion-factor. */
+:root {
+  --portal-contained-overscroll: contain;
+  --motion-quick: calc(
+      var(--pantry-spring-quick-duration) * var(--agent-motion-factor, 1)
+    )
+    var(--pantry-spring-quick-ease);
+  --motion-smooth: calc(
+      var(--pantry-spring-smooth-duration) * var(--agent-motion-factor, 1)
+    )
+    var(--pantry-spring-smooth-ease);
+  --motion-glide: calc(
+      var(--pantry-spring-glide-duration) * var(--agent-motion-factor, 1)
+    )
+    var(--pantry-spring-glide-ease);
+  --motion-exit: calc(
+      var(--pantry-exit-duration) * var(--agent-motion-factor, 1)
+    )
+    var(--pantry-exit-ease);
+  /* Modal sheets enter over 300ms and leave over 150ms. Reduced motion keeps
+     only the fade, which stays at 150ms instead of going to zero. */
+  --sheet-enter: calc(300ms * var(--agent-motion-factor, 1)) ease-out;
+  --sheet-exit: calc(150ms * var(--agent-motion-factor, 1)) ease-out;
+  --sheet-fade-duration: calc(150ms * var(--agent-motion-factor, 1));
+  --sheet-fade: var(--sheet-fade-duration) ease-out;
+  /* A sheet moves 12px as it enters and leaves, but never past the edge of
+     the window: a sheet as tall as the window moves only into its margin. */
+  --sheet-rise: min(12px, calc((100dvh - 100%) / 2));
+  --sheet-lift: max(-12px, calc((100% - 100dvh) / 2));
+}
+
+:root {
+  --ground: var(--pantry-ground);
+  --paper: var(--pantry-paper);
+  --surface: var(--pantry-surface);
+  --border: var(--pantry-border);
+  --hairline: var(--pantry-hairline);
+  --ink: var(--pantry-ink);
+  --ink-strong: var(--pantry-ink-strong);
+  --ink-2: var(--pantry-ink-muted);
+  --ink-3: var(--pantry-ink-subtle);
+  --ok-text: var(--pantry-success-text);
+  --ok-bg: var(--pantry-success-surface);
+  --warn-text: var(--pantry-warning-text);
+  --warn-bg: var(--pantry-warning-surface);
+  --danger-text: var(--pantry-danger-text);
+  --danger-bg: var(--pantry-danger-surface);
+  --shadow-card: var(--pantry-shadow-card);
+  --ring: var(--pantry-ring);
+  --ink-hover: var(--pantry-ink-hover);
+  --display: var(--pantry-font-display);
+  font-family: var(--pantry-font-sans);
+  color: var(--ink);
+  background: var(--ground);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+@media (pointer: fine) {
+  :root {
+    --portal-contained-overscroll: none;
+    overscroll-behavior: none;
+  }
+
+  .portal-shell-workspace > .portal-main {
+    overscroll-behavior: none;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  /* Standard properties only: Chromium/Firefox honor both, Safari 18.2+ takes
+     the width and keeps its native thumb color. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-3) transparent;
+}
+
+body {
+  position: relative;
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  letter-spacing: 0.005em;
+}
+
+button:not(:where(.pantry-select-trigger)),
+input,
+button:where(.pantry-select-trigger) {
+  font: inherit;
+}
+
+button:not(:where(.pantry-select-trigger)),
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:where(.pantry-select-trigger)) {
+  transition:
+    background-color var(--pantry-motion-fast) ease,
+    color var(--pantry-motion-fast) ease;
+}
+
+::selection {
+  color: var(--pantry-on-selected);
+  background: var(--pantry-selected);
+}
+
+/* The light selected tone is also the chat panel's ground, where a selection
+   would not show; text selection takes a deeper step of it. */
+:where(:root:not([data-portal-theme="dark"])) ::selection {
+  background: color-mix(in oklch, var(--pantry-selected), var(--pantry-ink) 16%);
+}
+
+:where(
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="range"],
+  progress
+) {
+  accent-color: var(--pantry-link);
+}
+
+/*
+ * The button floor. Appearance used to be opt-in per ancestor, so any button
+ * whose container had no rule fell back to OS chrome — a grey rectangle beside
+ * a black pill doing the same job. This gives every button the quiet pill by
+ * default.
+ *
+ * It is wrapped in :where() deliberately: that zeroes the specificity, so this
+ * can only ever fill a gap. Every existing class rule, however weakly scoped,
+ * still wins. Buttons that mean to be transparent (icon-button, nav items,
+ * tabs, combobox options) already declare their own background and are
+ * unaffected.
+ */
+:where(button:not(:where(.pantry-select-trigger))) {
+  padding: 0 16px;
+  border: 0;
+  border-radius: 9999px;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--pantry-button-ring);
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+:where(button:not(:where(.pantry-select-trigger)):hover:not(:disabled)) {
+  background: var(--surface);
+}
+
+:where(button:not(:where(.pantry-select-trigger)):disabled) {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+/* Weight 500 is the system ceiling; hierarchy comes from size and colour. */
+b,
+strong {
+  font-weight: 500;
+}
+
+.portal-main[tabindex="-1"]:focus,
+h1[tabindex="-1"]:focus {
+  outline: none;
+}
+
+.public-doc-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--ground);
+}
+
+.public-doc-skip {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: var(--paper);
+  background: var(--ink);
+  transform: translateY(-160%);
+}
+
+.public-doc-skip:focus {
+  transform: translateY(0);
+}
+
+.public-doc-header,
+.public-doc-footer {
+  width: min(100% - 40px, 1080px);
+  margin-inline: auto;
+}
+
+.public-doc-header {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+.public-doc-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.public-doc-brand img {
+  display: block;
+}
+
+.public-doc-nav,
+.public-doc-footer nav {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.public-doc-nav a,
+.public-doc-footer a {
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 500;
+  text-underline-offset: 4px;
+}
+
+.public-doc-nav a {
+  text-decoration: none;
+}
+
+.public-doc-nav a[aria-current="page"],
+.public-doc-nav a:hover,
+.public-doc-footer a:hover {
+  color: var(--ink);
+}
+
+.public-doc-nav a[aria-current="page"] {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+
+.public-doc-main {
+  width: min(100% - 40px, 760px);
+  margin-inline: auto;
+  padding-block: 72px 96px;
+}
+
+.public-doc-heading {
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.public-doc-eyebrow,
+.public-doc-updated {
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.public-doc-eyebrow {
+  margin: 0 0 18px;
+}
+
+.public-doc-heading h1 {
+  font-size: clamp(40px, 7vw, 58px);
+}
+
+.public-doc-summary {
+  max-width: 640px;
+  margin: 20px 0 0;
+  color: var(--ink-2);
+  font-size: 19px;
+  line-height: 1.6;
+}
+
+.public-doc-updated {
+  margin: 24px 0 0;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.public-doc-article {
+  padding-top: 12px;
+}
+
+.public-doc-article section {
+  padding-top: 40px;
+}
+
+.public-doc-article h2 {
+  margin-bottom: 16px;
+  color: var(--ink-strong);
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.public-doc-article p,
+.public-doc-article li {
+  color: var(--ink-strong);
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.public-doc-article p {
+  margin: 0 0 16px;
+}
+
+.public-doc-article ul,
+.public-doc-article ol {
+  margin: 0 0 20px;
+  padding-left: 24px;
+}
+
+.public-doc-article li + li {
+  margin-top: 9px;
+}
+
+.public-doc-article a,
+.public-doc-contact {
+  color: var(--ink);
+  font-weight: 500;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.public-doc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  padding-block: 28px 36px;
+  border-top: 1px solid var(--border);
+}
+
+.public-doc-footer p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+@media (max-width: 680px) {
+  .public-doc-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding-block: 22px;
+  }
+
+  .public-doc-nav {
+    width: 100%;
+    gap: 0;
+    justify-content: space-between;
+  }
+
+  .public-doc-nav a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .public-doc-main {
+    padding-block: 52px 72px;
+  }
+
+  .public-doc-heading h1 {
+    font-size: 40px;
+  }
+
+  .public-doc-summary {
+    font-size: 17px;
+  }
+
+  .public-doc-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .public-doc-footer nav {
+    flex-wrap: wrap;
+  }
+}
+
+/* Plan 35 access, capability policy, and information-flow controls. */
+.access35-page,
+.access35-section,
+.access35-capability-groups {
+  display: grid;
+  gap: 16px;
+}
+
+.access35-page {
+  gap: 24px;
+}
+
+.access35-live-status {
+  min-height: 20px;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.access35-explanation,
+.access35-empty,
+.access35-combined-check {
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+
+.access35-card-facts dt {
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+/* Space groups the section; boxes are reserved for the cards inside it. */
+.access35-section {
+  padding: 0;
+}
+
+.access35-section-heading,
+.access35-explanation-heading,
+.access35-dialog-heading,
+.access35-source-actions,
+.access35-dialog-actions,
+.access35-combined-check {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.access35-section-heading {
+  align-items: flex-start;
+}
+
+.access35-section-heading h2,
+.access35-section-heading p,
+.access35-card-lead h3,
+.access35-card-lead h4,
+.access35-card-lead p,
+.access35-explanation h2,
+.access35-dialog h2 {
+  margin: 0;
+}
+
+.access35-capability-group > h3 {
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: 16px;
+}
+
+.access35-section-heading p,
+.access35-card-lead p,
+.access35-explanation > p,
+.access35-dialog > form > p {
+  color: var(--ink-2);
+}
+
+.access35-dialog label {
+  display: grid;
+  gap: 6px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.access35-related-controls button:where(.pantry-select-trigger),
+.access35-dialog :is(input, button:where(.pantry-select-trigger)) {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--paper);
+  font: inherit;
+}
+
+.access35-result-count {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.access35-file-picker,
+.access35-picker-controls {
+  display: grid;
+  gap: 8px;
+}
+
+/* Picker actions size to their label; only result rows span the column. */
+.access35-picker-controls > button:not(:where(.pantry-select-trigger)) {
+  justify-self: start;
+}
+
+.access35-picker-controls > p,
+.access35-picker-status {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.access35-picker-results {
+  display: grid;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.access35-picker-results button:not(:where(.pantry-select-trigger)) {
+  width: 100%;
+  justify-content: flex-start;
+  overflow-wrap: anywhere;
+}
+
+.access35-selected-sources,
+.access35-dialog-steps {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.access35-card-lead {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.access35-card-lead > div {
+  min-width: 0;
+}
+
+.access35-explanation.allowed .access35-card-lead {
+  color: var(--ok-text);
+}
+
+.access35-explanation.approval_required .access35-card-lead {
+  color: var(--warn-text);
+}
+
+.access35-explanation.denied .access35-card-lead,
+.access35-explanation.unavailable .access35-card-lead,
+.access35-inline-alert {
+  color: var(--danger-text);
+}
+
+/* Facts wrap by fitting fewer columns, never by breaking inside a word. */
+.access35-card-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.access35-card-facts dd {
+  margin: 3px 0 0;
+}
+
+.access35-page button:not(:where(.pantry-select-trigger)),
+.access35-dialog button:not(:where(.pantry-select-trigger)) {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 9999px;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--ring);
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.access35-page button:not(:where(.pantry-select-trigger)):hover:not(:disabled),
+.access35-dialog button:not(:where(.pantry-select-trigger)):hover:not(:disabled) {
+  background: var(--surface);
+}
+
+.access35-page button:not(:where(.pantry-select-trigger)):disabled,
+.access35-dialog button:not(:where(.pantry-select-trigger)):disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.access35-note,
+.access35-inline-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.access35-empty,
+.access35-explanation,
+.access35-combined-check {
+  padding: 16px;
+}
+
+.access35-empty h3,
+.access35-empty p,
+.access35-combined-check p {
+  margin: 0;
+}
+
+.access35-empty {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+
+.access35-empty p {
+  color: var(--ink-2);
+  max-width: 62ch;
+}
+
+.access35-empty-action {
+  font-size: 13.5px;
+}
+
+.access35-empty-action,
+.access35-note a,
+.access35-inline-alert a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.access35-explanation {
+  position: sticky;
+  bottom: 12px;
+  z-index: 4;
+  background: var(--paper);
+}
+
+.access35-related-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--pantry-space-3);
+}
+
+.access35-related-controls label {
+  display: grid;
+  flex: 1 1 16rem;
+  min-width: 0;
+  gap: var(--pantry-space-2);
+}
+
+.access35-related-controls :is(button:where(.pantry-select-trigger), button:not(:where(.pantry-select-trigger))) {
+  min-height: 44px;
+  max-width: 100%;
+}
+
+.access35-related-controls :is(button:where(.pantry-select-trigger), button:not(:where(.pantry-select-trigger))):focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+
+.access35-dialog {
+  width: min(620px, calc(100vw - 32px));
+  max-height: min(760px, calc(100dvh - 32px));
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+  overscroll-behavior: var(--portal-contained-overscroll);
+}
+
+/* Pale scrim: the page stays legible and the sheet reads raised, not spotlit. */
+.access35-dialog::backdrop {
+  background: color-mix(in oklch, var(--pantry-shadow-color) 14%, transparent);
+  backdrop-filter: blur(2.5px);
+}
+
+.access35-dialog form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  padding: 22px;
+  overflow-y: auto;
+  overscroll-behavior: var(--portal-contained-overscroll);
+}
+
+.access35-dialog-steps {
+  display: grid;
+  gap: 14px;
+}
+
+.access35-dialog-review,
+.access35-selected-sources {
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.access35-dialog-review {
+  display: grid;
+  gap: 8px;
+}
+
+.access35-dialog-review div {
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.access35-dialog-review :is(dt, dd) {
+  margin: 0;
+}
+
+.access35-dialog-review dd {
+  overflow-wrap: anywhere;
+}
+
+.access35-dialog-actions {
+  justify-content: flex-end;
+}
+
+.access35-decision-chain {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  margin: 14px 0;
+  list-style: none;
+}
+
+.access35-decision-chain li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.access35-decision-chain small {
+  color: var(--ink-3);
+}
+
+.access35-card-lead h3,
+.access35-card-lead h4,
+.access35-empty h3 {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.access35-mode-readonly {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.access35-load-more {
+  justify-self: start;
+}
+
+.access35-load-failure {
+  display: grid;
+  gap: 10px;
+}
+
+@media (max-width: 680px) {
+  .access35-section-heading,
+  .access35-source-actions,
+  .access35-dialog-actions,
+  .access35-combined-check {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .access35-page button:not(:where(.pantry-select-trigger)),
+  .access35-dialog button:not(:where(.pantry-select-trigger)) {
+    min-height: 44px;
+  }
+
+  .access35-card-facts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-doc-skip {
+    transition: none;
+  }
+}
+
+input:focus-visible,
+button:where(.pantry-select-trigger):focus-visible {
+  outline: none;
+  border-color: var(--pantry-focus);
+}
+
+::placeholder {
+  color: var(--ink-3);
+}
+
+.page-shell {
+  min-height: 100vh;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  padding: 32px 20px;
+}
+
+.identity-panel,
+.status-panel {
+  width: min(100%, 560px);
+  background: var(--paper);
+  border: 0;
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: var(--shadow-card);
+}
+
+.brand {
+  margin: 0 0 24px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 34px;
+  font-weight: 300;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/* The documented eyebrow: the only uppercase in the system. */
+.eyebrow {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h2 {
+  margin: 0 0 16px;
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.summary,
+.status-panel p:last-child {
+  margin: 14px 0 0;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+
+.invitation-facts {
+  display: grid;
+  grid-template-columns: minmax(100px, auto) 1fr;
+  gap: 11px 24px;
+  margin: 28px 0;
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.invitation-facts dt {
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.invitation-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.action-region {
+  min-height: 112px;
+}
+
+.action-region button:not(:where(.pantry-select-trigger)) {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: var(--pantry-radius-pill);
+  color: var(--pantry-on-primary);
+  background: var(--pantry-primary);
+  font-weight: 400;
+  cursor: pointer;
+  box-shadow: var(--pantry-primary-ring);
+}
+
+.action-region button:not(:where(.pantry-select-trigger)):hover {
+  background: var(--pantry-primary-hover);
+}
+
+.action-region button:not(:where(.pantry-select-trigger)):disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.error-text {
+  margin: 14px 0 0;
+  color: var(--danger-text);
+  line-height: 1.45;
+}
+
+.auth-status-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--ground);
+  position: relative;
+  isolation: isolate;
+}
+
+/* The theme texture: two cloud corners outside the centred card. */
+.auth-status-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--pantry-texture-ink);
+  mask:
+    var(--pantry-texture) left -460px bottom -330px / 1000px 750px no-repeat,
+    var(--pantry-texture) right -420px top -360px / 1000px 750px no-repeat;
+  pointer-events: none;
+}
+
+.auth-status-panel {
+  width: min(100%, 480px);
+  padding: 40px;
+  border-radius: 20px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+
+.auth-status-panel > p:not(.brand) {
+  margin: 16px 0 28px;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+
+.signin-button,
+.primary-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 22px;
+  border: 0;
+  border-radius: var(--pantry-radius-pill);
+  color: var(--pantry-on-primary);
+  background: var(--pantry-primary);
+  font-weight: 400;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+  box-shadow: var(--pantry-primary-ring);
+}
+
+.signin-button:hover,
+.primary-button:hover {
+  background: var(--pantry-primary-hover);
+}
+
+.portal-shell {
+  min-height: 100vh;
+  background: var(--ground);
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 20;
+  padding: 10px 14px;
+  border-radius: 9999px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+.portal-nav {
+  position: relative;
+  z-index: 30;
+  min-height: 60px;
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(260px, 520px) max-content;
+  align-items: center;
+  gap: 24px;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink);
+  overflow: visible;
+}
+
+.portal-logo {
+  min-height: 44px;
+  min-inline-size: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 4px;
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+.portal-brand-mark {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  object-fit: contain;
+}
+
+.portal-nav .portal-nav-lead {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  justify-self: start;
+}
+
+.portal-logo .portal-brand-copy,
+.portal-sidebar-brand .portal-brand-copy {
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.portal-nav > div {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: 14px;
+  min-width: 0;
+}
+
+.portal-nav > div:last-child {
+  justify-self: end;
+}
+
+.portal-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.portal-chat-link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 12px;
+  border-radius: 9999px;
+  color: var(--ink-2);
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.portal-chat-link:hover,
+.portal-chat-link[aria-current="page"] {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.portal-chat-link svg {
+  flex: 0 0 18px;
+}
+
+.portal-nav span {
+  overflow: hidden;
+  max-width: 260px;
+  color: var(--ink-2);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.portal-nav button:not(:where(.pantry-select-trigger)) {
+  min-height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 9999px;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--ring);
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.portal-nav button:not(:where(.pantry-select-trigger)):hover {
+  background: var(--surface);
+}
+
+.portal-command-spacer {
+  min-width: 0;
+}
+
+.portal-nav .portal-command-trigger {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px 0 14px;
+  border-radius: 9999px;
+  background: var(--surface);
+  box-shadow: var(--ring);
+  color: var(--ink-2);
+  text-align: start;
+}
+
+.portal-nav .portal-command-trigger:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.portal-command-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.portal-command-trigger kbd {
+  padding: 5px 8px;
+  border-radius: 7px;
+  background: var(--paper);
+  box-shadow: var(--ring);
+  color: var(--ink-2);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.command-search-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+}
+
+/* The main pane scrolls independently with its scrollbar at the screen edge. */
+.portal-main {
+  width: 100%;
+  min-width: 0;
+}
+
+.portal-main-inner {
+  width: 100%;
+  padding: 44px 28px 88px;
+}
+
+.portal-main[data-page="products"]
+  > .portal-main-inner:not(:has(> .portal-heading)) {
+  padding-top: 0;
+}
+
+.portal-main:is([data-page="overview"], [data-page="integrations"])
+  > .portal-main-inner {
+  max-width: 1040px;
+  margin-inline: auto;
+}
+
+/* Title and its description stack, so the description reads as a subtitle
+   rather than a column competing with the heading. */
+.portal-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.portal-heading h1 {
+  font-size: clamp(36px, 5vw, 44px);
+  line-height: 1.08;
+}
+
+.portal-heading > p,
+.section-heading p,
+.activation-band > div:first-child p {
+  margin: 0;
+  color: var(--ink-2);
+  line-height: 1.5;
+  max-width: 55ch;
+}
+
+.commerce-back {
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+}
+
+.portal-band {
+  padding: 34px 0 40px;
+  border-top: 1px solid var(--border);
+}
+
+.portal-band h2 {
+  margin: 0 0 20px;
+  font-size: 26px;
+}
+
+.access35-dialog .access35-dialog-heading h2 {
+  margin: 0;
+  color: var(--ink-strong);
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.route-page-skeleton {
+  display: grid;
+  gap: 14px;
+}
+
+.skeleton-line {
+  display: block;
+  width: min(100%, 720px);
+  height: 18px;
+  border-radius: 9999px;
+  background: var(--surface);
+}
+
+.skeleton-line-short {
+  width: min(34%, 240px);
+}
+
+.skeleton-line-medium {
+  width: min(68%, 520px);
+}
+
+.section-heading h2 {
+  margin-bottom: 6px;
+}
+
+.section-heading + .connection-actions,
+.section-heading + .account-list,
+.section-heading + .resource-list {
+  margin-top: 20px;
+}
+
+.integration-group {
+  display: grid;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.integration-group + .integration-group {
+  margin-top: 48px;
+}
+
+.integration-group .section-heading h3,
+.integration-group .connection-actions,
+.integration-group .account-list {
+  margin: 0;
+}
+
+.compact-band {
+  max-width: 720px;
+}
+
+/* A failed load reads as a card with one repair action, not a bare red
+   line above a browser-default button. */
+.home-recovery {
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+  max-width: 560px;
+  padding: 22px 24px;
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+
+.home-recovery p {
+  margin: 0;
+}
+
+.home-recovery .error-text {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.home-recovery button:not(:where(.pantry-select-trigger)) {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--pantry-radius-pill);
+  color: var(--pantry-on-primary);
+  background: var(--pantry-primary);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: var(--pantry-primary-ring);
+}
+
+.home-recovery button:not(:where(.pantry-select-trigger)):hover:not(:disabled) {
+  background: var(--pantry-primary-hover);
+}
+
+.home-recovery a {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.account-list {
+  display: grid;
+  overflow: hidden;
+  border: 0;
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+
+.account-list + .account-list,
+.account-list + .inline-form {
+  margin-top: 16px;
+}
+
+.account-list > * + * {
+  border-top: 1px solid var(--border);
+}
+
+.account-row {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 16px 20px;
+  color: var(--ink);
+  background: var(--paper);
+  text-decoration: none;
+}
+
+.organisation-menu {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.organisation-menu > summary {
+  width: 40px;
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  color: var(--ink-2);
+  cursor: pointer;
+  list-style: none;
+}
+
+.organisation-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.organisation-menu > summary:hover,
+.organisation-menu[open] > summary {
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.organisation-menu > summary:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .organisation-menu > summary {
+    transition:
+      color var(--motion-quick),
+      background-color var(--motion-quick),
+      scale var(--motion-quick);
+  }
+
+  .organisation-menu > summary:active {
+    scale: 0.96;
+  }
+}
+
+.organisation-menu-popover {
+  position: absolute;
+  z-index: 4;
+  inset-block-start: calc(100% + 6px);
+  inset-inline-end: 0;
+  width: 204px;
+  display: grid;
+  gap: 2px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow:
+    0 18px 44px rgb(0 0 0 / 12%),
+    0 2px 8px rgb(0 0 0 / 6%);
+}
+
+.organisation-menu-popover button:not(:where(.pantry-select-trigger)) {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding-inline: 10px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--ink);
+  background: transparent;
+  box-shadow: none;
+  font-size: 14px;
+}
+
+.organisation-menu-popover button:not(:where(.pantry-select-trigger)):hover {
+  background: var(--surface);
+}
+
+.organisation-row-status {
+  margin: 0;
+  padding: 0 20px 16px;
+}
+
+.organisation-menu-popover .danger-text {
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 8px 8px;
+  color: var(--danger-text);
+}
+
+.organisation-menu-popover .danger-text:hover {
+  background: var(--danger-bg);
+}
+
+.organisation-modal-form {
+  display: grid;
+  gap: 8px;
+}
+
+.organisation-modal-form label {
+  display: grid;
+  gap: 7px;
+}
+
+.organisation-modal-form :is(input, button:where(.pantry-select-trigger)) {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  color: var(--ink);
+  background: var(--paper);
+  font: inherit;
+}
+
+.organisation-modal-form label + label {
+  margin-top: 6px;
+}
+
+.organisation-delete-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 16px;
+  color: var(--danger-text);
+  background: var(--danger-bg);
+}
+
+.organisation-delete-warning svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+.organisation-delete-warning p {
+  margin: 0;
+  color: var(--ink);
+}
+
+.modal-danger-button {
+  min-height: 40px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 9999px;
+  color: var(--paper);
+  background: var(--danger-text);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.modal-danger-button:hover {
+  opacity: 0.9;
+}
+
+.modal-danger-button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.account-row span:first-child {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.account-row strong {
+  font-weight: 500;
+}
+
+.account-row small {
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.account-actions {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  justify-content: end;
+  gap: 8px;
+}
+
+.lifecycle {
+  flex: 0 0 auto;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  color: var(--ink-2);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.lifecycle-active,
+.lifecycle-ready {
+  color: var(--ok-text);
+  background: var(--ok-bg);
+}
+
+.lifecycle-activation_failed,
+.lifecycle-degraded,
+.lifecycle-reauth_required {
+  color: var(--danger-text);
+  background: var(--danger-bg);
+}
+
+.inline-form,
+.connection-actions {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* A confirmation prompt takes the full row above its buttons; the copy
+   inside keeps its own reading measure. */
+.connection-actions .connection-confirm-copy {
+  flex-basis: 100%;
+  display: grid;
+  gap: 6px;
+}
+
+.inline-form label,
+.setup-form label {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+  color: var(--ink-strong);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.inline-form label {
+  flex: 1 1 300px;
+}
+
+.inline-form input,
+.inline-form button:where(.pantry-select-trigger),
+.setup-form input,
+.setup-form button:where(.pantry-select-trigger),
+.provider-connect input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.integration-account-summary {
+  flex: 1 1 280px;
+  min-width: 0;
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.integration-account-summary > p {
+  margin: 0;
+}
+
+.integration-account-details {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.integration-account-details > div {
+  min-width: 0;
+}
+
+.integration-account-details dt {
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.integration-account-details dd {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.inline-form button:not(:where(.pantry-select-trigger)),
+.connection-actions button:not(:where(.pantry-select-trigger)),
+.provider-connect button:not(:where(.pantry-select-trigger)),
+.setup-form button:not(:where(.pantry-select-trigger)),
+.account-row button:not(:where(.pantry-select-trigger)),
+.connection-card button:not(:where(.pantry-select-trigger)) {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 9999px;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--ring);
+  font-weight: 400;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.inline-form button:not(:where(.pantry-select-trigger)):hover,
+.connection-actions button:not(:where(.pantry-select-trigger)):hover,
+.provider-connect button:not(:where(.pantry-select-trigger)):hover,
+.setup-form button:not(:where(.pantry-select-trigger)):hover,
+.account-row button:not(:where(.pantry-select-trigger)):hover,
+.connection-card button:not(:where(.pantry-select-trigger)):hover {
+  background: var(--surface);
+}
+
+.inline-form button:not(:where(.pantry-select-trigger)):disabled,
+.connection-actions button:not(:where(.pantry-select-trigger)):disabled,
+.provider-connect button:not(:where(.pantry-select-trigger)):disabled,
+.setup-form button:not(:where(.pantry-select-trigger)):disabled,
+.account-row button:not(:where(.pantry-select-trigger)):disabled,
+.connection-card button:not(:where(.pantry-select-trigger)):disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.section-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.connection-actions {
+  margin-bottom: 20px;
+}
+
+.provider-connect {
+  display: flex;
+  flex: 1 1 390px;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 8px;
+}
+
+.provider-connect label {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 8px;
+  color: var(--ink-strong);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.provider-connect input {
+  min-width: 160px;
+}
+
+/* A select in a connect row is a pill like the button beside it. Select
+   draws its caret. */
+.provider-connect button:where(.pantry-select-trigger) {
+  width: 100%;
+  min-width: 160px;
+  min-height: 44px;
+  padding-block: 0;
+  padding-inline-start: 18px;
+  border: 0;
+  border-radius: 9999px;
+  color: var(--ink);
+  background-color: var(--paper);
+  box-shadow: var(--ring);
+  font: inherit;
+  cursor: pointer;
+}
+
+.provider-connect button:where(.pantry-select-trigger):hover:not(:disabled) {
+  background-color: var(--surface);
+}
+
+.provider-connect button:where(.pantry-select-trigger):disabled {
+  cursor: wait;
+  opacity: 0.55;
+}

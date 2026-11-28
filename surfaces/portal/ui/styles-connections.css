@@ -1,0 +1,2191 @@
+/* Home ------------------------------------------------------------------- */
+
+/*
+ * The Today tiles are links, and nothing was styling the anchor itself, so
+ * they rendered in default browser blue with underlines.
+ */
+a.commerce-count {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+a.commerce-count:hover {
+  background: var(--surface);
+}
+
+/* Data freshness footer: one quiet line instead of a disclosure card. */
+.home-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.home-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.home-source-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-3);
+}
+
+.home-source-dot-current {
+  background: var(--ok-text);
+}
+
+.home-source-dot-delayed {
+  background: var(--warn-text);
+}
+
+.home-source-dot-unavailable {
+  background: var(--danger-text);
+}
+
+/* Integration catalogue ------------------------------------------------ */
+
+/* One page, top to bottom. Space groups the sections; only the lists draw a
+   surface. */
+.integrations-overview {
+  display: grid;
+  gap: 36px;
+}
+
+.integration-catalog-sections {
+  display: grid;
+  gap: 24px;
+}
+
+.integration-search-field {
+  min-width: 0;
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding-inline: 14px;
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--border) inset;
+}
+
+.integration-search-field:focus-within {
+  box-shadow: 0 0 0 2px var(--ink) inset;
+}
+
+.integration-search-field .command-search-icon {
+  color: var(--ink-3);
+}
+
+.integration-search-field input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+}
+
+.integration-search-field input:focus-visible {
+  outline: none;
+}
+
+.integration-overview-section {
+  min-width: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.integration-overview-section-heading h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.integration-overview-section-heading h3:focus {
+  outline: none;
+}
+
+.integration-overview-empty {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.integration-overview-empty p {
+  margin: 0;
+}
+
+.connected-app-list {
+  display: grid;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+
+.connected-app-row {
+  min-width: 0;
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.connected-app-row + .connected-app-row {
+  border-block-start: 1px solid var(--border);
+}
+
+.connected-app-row:hover {
+  background: var(--surface);
+}
+
+.connected-app-row .provider-tile,
+.connected-app-row .custom-connector-card-mark {
+  width: 40px;
+  height: 40px;
+  min-height: 0;
+  flex: none;
+  border-radius: 11px;
+}
+
+.connected-app-identity {
+  min-width: 0;
+  flex: 1;
+  display: grid;
+  gap: 2px;
+}
+
+.connected-app-identity strong {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.connected-app-identity > span {
+  overflow: hidden;
+  color: var(--ink-2);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.connected-app-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.integration-app-group {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.integration-app-group h4 {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.integration-add-other {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  color: var(--ink);
+  background: var(--surface);
+  text-decoration: none;
+}
+
+.integration-add-other:hover {
+  background: var(--ground);
+}
+
+.integration-add-other-mark {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--paper);
+  box-shadow: var(--ring);
+}
+
+.integration-add-other .connected-app-identity > span {
+  white-space: normal;
+}
+
+.integration-detail {
+  display: grid;
+  gap: 24px;
+}
+
+.connection-card:focus-visible,
+.email-reply-approval:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+
+@media (max-width: 560px) {
+  .integrations-overview {
+    gap: 28px;
+  }
+
+  /* The account name keeps the width: a status or a default tag goes under it. */
+  .connected-app-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 4px 10px;
+    padding-inline: 14px;
+  }
+
+  .connected-app-row > :is(.provider-tile, .custom-connector-card-mark) {
+    grid-row: 1 / span 2;
+  }
+
+  .connected-app-row > .connected-app-identity {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .connected-app-row > .connected-app-action {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .connected-app-row
+    > :is(.status-chip, .connection-default-tag, .custom-connector-state) {
+    grid-column: 2 / 4;
+    grid-row: 2;
+    justify-self: start;
+  }
+}
+
+/* Connection cards ------------------------------------------------------ */
+
+.connection-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  padding: 18px 20px;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+/* Cards without a provider tile (mailboxes, reply queues) keep one column
+   instead of alternating their content across the tile grid. */
+.connection-card:not(:has(> .provider-tile)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.connection-body {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.connection-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.connection-identity {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.connection-identity strong {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.connection-identity span {
+  overflow: hidden;
+  color: var(--ink-2);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+/* Mailbox and reply cards title with h4 + p; they read like the
+   strong + span identity on the account cards, not like document prose. */
+.connection-head h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.connection-head > div > p {
+  margin: 3px 0 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.connection-default-tag {
+  color: var(--ink-3);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.connection-problem {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--warn-text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.connection-problem strong {
+  font-weight: 500;
+}
+
+/* Action feedback on a card is an alert, not a bare red line. */
+.connection-body > .error-text,
+.connection-card > .error-text,
+.codex-integration > .error-text {
+  max-width: 70ch;
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--danger-bg);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.connection-foot {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.connection-meta {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.connection-command {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  flex-wrap: wrap;
+}
+
+/* The filled primary treatment lives on one class; the rule itself sits
+   after the small in-card button overrides so it wins wherever it appears. */
+
+/*
+ * Inside a connection card the disclosure is a quiet toggle, not a boxed
+ * panel: it holds the least important content on the card and should not be
+ * the heaviest thing on it.
+ */
+.connection-card .support-details {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 13px;
+}
+
+.connection-card .support-details + .support-details {
+  margin-top: 6px;
+}
+
+.connection-card .support-details > summary {
+  color: var(--ink-2);
+  font-weight: 400;
+}
+
+.connection-card .support-details > summary:hover {
+  color: var(--ink);
+}
+
+.connection-card .support-details dl {
+  margin-top: 10px;
+  padding: 14px 16px;
+}
+
+/*
+ * The list clips to its own rounded corners with overflow:hidden, which also
+ * clips a card's open action menu. Inside the integrations panel the corners
+ * are rounded on the edge cards instead, so the menu can escape the list.
+ */
+.integrations-panel .account-list {
+  overflow: visible;
+}
+
+.integrations-panel .account-list > :first-child {
+  border-radius: 16px 16px 0 0;
+}
+
+.integrations-panel .account-list > :last-child {
+  border-radius: 0 0 16px 16px;
+}
+
+.integrations-panel .account-list > :only-child {
+  border-radius: 16px;
+}
+
+/* Setup controls, deliberately quieter than the live state above them. */
+.integration-setup {
+  display: grid;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.integration-setup h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Heading and state on one line. Without this the chip is a grid item and
+   stretches the full width of the card, reading as a banner. */
+.setup-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Tile and title read as one identity, the way a connection card leads. */
+.setup-heading-identity {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.integration-setup > .status-chip {
+  justify-self: start;
+}
+
+/* On a surface-coloured card the neutral chip would be the same colour as
+   its background, so it borrows the field treatment instead. */
+.integration-setup .status-chip-neutral {
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--border) inset;
+}
+
+/* Fields line up with the 520px stats and meter below them rather than
+   stretching the full width of the card. */
+.integration-setup .stacked-form label {
+  max-width: 520px;
+}
+
+/* Guidance under a field is guidance, not a success banner. */
+.field-hint {
+  max-width: 64ch;
+  margin: -2px 0 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.integration-setup .provider-connect,
+.integration-setup .connection-actions {
+  margin: 0;
+}
+
+/* The shop's Stripe account: its state on one line, and a quiet text
+   action for an owner who already uses Stripe. */
+.stripe-account-state {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stripe-account-state p {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.stripe-account-state p span {
+  color: var(--ink-2);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.stripe-account-existing {
+  display: flex;
+  align-items: center;
+  gap: 0 8px;
+  flex-wrap: wrap;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.integration-setup .stripe-account-existing button:not(:where(.pantry-select-trigger)) {
+  min-height: 40px;
+  padding: 0;
+  border-color: transparent;
+  border-radius: 9999px;
+  color: var(--ink);
+  background: transparent;
+  box-shadow: none;
+  font: inherit;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.integration-setup .stripe-account-existing button:not(:where(.pantry-select-trigger)):hover:not(:disabled) {
+  background: transparent;
+  text-decoration-thickness: 2px;
+}
+
+.integration-setup .stripe-account-existing button:not(:where(.pantry-select-trigger)):disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+/* Email mailboxes -------------------------------------------------------- */
+
+/*
+ * The Email dialog has two views. The list is one quiet row for each
+ * mailbox. A row opens that mailbox's own view, where every control belongs
+ * to that mailbox: a head with one switch, short setup rows, and plain
+ * sections under them.
+ */
+.mailbox-list {
+  display: grid;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+  list-style: none;
+}
+
+.mailbox-list > li + li {
+  border-top: 1px solid var(--border);
+}
+
+/* The list's heading carries the action that adds a mailbox. */
+.mailbox-list-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-block-end: 12px;
+}
+
+.mailbox-list-heading h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* The add sheet takes the place of the Email dialog that holds it, as every
+   sheet inside another sheet does (see .connection-dialog in
+   features/integrations/styles.css). */
+
+/* On a narrow screen the chip moves under the address instead of
+   squeezing it. */
+.mailbox-row {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.mailbox-row:hover {
+  background: var(--surface);
+}
+
+.mailbox-row-identity {
+  min-width: 0;
+  display: grid;
+  flex: 1 1 200px;
+  gap: 3px;
+}
+
+.mailbox-row-identity strong {
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.mailbox-row-identity span {
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.mailbox-row .status-chip {
+  flex: none;
+}
+
+.mailbox-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  font-size: 14px;
+}
+
+.mailbox-back {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 6px;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.mailbox-back:hover {
+  color: var(--ink);
+}
+
+/* The list clips to its rounded corners, so a row draws its focus ring
+   inside its own box. */
+.mailbox-row:focus-visible,
+.mailbox-back:focus-visible {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: -2px;
+}
+
+/* Focus lands here when the dialog moves between its two views. That is a
+   reading position, not a control, so it draws no ring. */
+.mailbox-list[tabindex="-1"]:focus,
+.mailbox-detail-head h3[tabindex="-1"]:focus {
+  outline: none;
+}
+
+.mailbox-detail-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.mailbox-detail-head > div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.mailbox-detail-head h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.mailbox-detail-head p {
+  max-width: 70ch;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* One mailbox's settings as a page of the Inbox: the dialog's sections at a
+   reading width, with room between them and a page heading. */
+.mailbox-settings-page {
+  display: grid;
+  gap: 18px;
+  max-width: 54rem;
+  padding-block: 8px 48px;
+}
+
+.mailbox-detail[data-presentation="page"] {
+  gap: 28px;
+  font-size: 15px;
+}
+
+.mailbox-detail[data-presentation="page"] .mailbox-detail-head h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 30px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.mailbox-detail[data-presentation="page"] .mailbox-detail-head h1:focus {
+  outline: none;
+}
+
+.mailbox-detail[data-presentation="page"] .mailbox-detail-head p {
+  font-size: 15px;
+}
+
+.mailbox-detail[data-presentation="page"] .mailbox-section {
+  gap: 14px;
+  padding-block-start: 28px;
+}
+
+/* The switch, with the sentence that says what it does under it. */
+.mailbox-switch {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  margin: 0;
+}
+
+.mailbox-switch .notice-text {
+  max-width: 60ch;
+  margin: 0;
+}
+
+.mailbox-switch .connection-actions {
+  margin: 0;
+}
+
+/* These labels carry a mailbox address, so on a narrow screen they wrap
+   instead of pushing the dialog sideways. */
+.mailbox-switch button.pantry-button,
+.mailbox-danger button.pantry-button {
+  max-width: 100%;
+  padding-block: 10px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.mailbox-banner {
+  display: grid;
+  gap: 12px;
+}
+
+.mailbox-banner p {
+  margin: 0;
+}
+
+/* The remove section of the mailbox view: a hairline above it and its one
+   action. Nothing folds. */
+.mailbox-section {
+  display: grid;
+  gap: 10px;
+  padding-block-start: 18px;
+  border-block-start: 1px solid var(--border);
+}
+
+.mailbox-section .connection-actions,
+.mailbox-banner .connection-actions {
+  margin: 0;
+}
+
+/* Provider onboarding (file storage, email, WhatsApp) ------------------- */
+
+/*
+ * One card, one decision. The identity line and a status chip read as one
+ * row, and the facts say what Pantry will be able to do before the consent
+ * screen.
+ */
+.provider-onboarding {
+  gap: 16px;
+  padding: 22px 24px;
+}
+
+.provider-onboarding-heading {
+  align-items: flex-start;
+}
+
+.provider-onboarding-heading .provider-tile {
+  width: 44px;
+  height: 44px;
+}
+
+.provider-onboarding-heading > div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.provider-onboarding-heading h4 {
+  text-wrap: balance;
+}
+
+.provider-onboarding-heading p {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.provider-onboarding-facts {
+  max-width: 62ch;
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-inline-start: 18px;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.provider-onboarding-facts li::marker {
+  color: var(--ink-3);
+}
+
+.provider-onboarding-actions {
+  align-items: center;
+}
+
+.provider-onboarding-actions .notice-text {
+  flex: 1 1 320px;
+}
+
+/* The live region narrates the wait; while it has nothing to say it stays in
+   the accessibility tree but out of the layout. */
+.provider-onboarding-status {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.provider-onboarding-status:empty {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.provider-onboarding > .error-text {
+  max-width: 70ch;
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--danger-bg);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.provider-onboarding .notice-warning {
+  max-width: 62ch;
+}
+
+.provider-last-attempt {
+  display: grid;
+  gap: 6px;
+  max-width: 70ch;
+}
+
+.provider-last-attempt p {
+  margin: 0;
+}
+
+.provider-last-attempt code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgb(0 0 0 / 6%);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .provider-onboarding-actions button:not(:where(.pantry-select-trigger)) {
+    transition:
+      transform var(--motion-quick),
+      background-color 0.15s ease,
+      color 0.15s ease;
+  }
+
+  .provider-onboarding-actions button:not(:where(.pantry-select-trigger)):active:not(:disabled) {
+    transform: scale(0.96);
+  }
+}
+
+.codex-integration,
+.codex-connection-state {
+  display: grid;
+  gap: 16px;
+}
+
+/* The connection itself is live state, so it reads as a white card like the
+   account cards elsewhere; only the setup controls stay on the quiet surface. */
+.codex-integration .codex-connection-state {
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+
+.codex-connection-state > p {
+  max-width: 64ch;
+  margin: 0;
+}
+
+.codex-device-code {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.codex-device-code code {
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: var(--ink-strong);
+  background: var(--paper);
+  box-shadow: var(--ring);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+.connection-actions .button-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 9999px;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--ring);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Every choice shows what it costs, as a soft card. The chosen card takes a
+   dark outline; the native radio stays, at the end of the row. */
+.inference-choices {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.inference-choices legend {
+  margin-bottom: 10px;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.integration-setup .inference-choices > label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--border) inset;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.integration-setup .inference-choices > label:hover {
+  background: var(--surface);
+}
+
+.integration-setup .inference-choices > label:has(input:checked) {
+  background: var(--paper);
+  box-shadow: 0 0 0 1.5px var(--ink) inset;
+}
+
+.inference-choices input[type="radio"] {
+  order: 1;
+  width: 18px;
+  height: 18px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  flex: 0 0 auto;
+  accent-color: var(--ink);
+}
+
+.inference-choices input[type="radio"]:focus-visible {
+  outline: 2px solid var(--ink-2);
+  outline-offset: 3px;
+}
+
+.inference-choices > label > span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.inference-choice-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.inference-choice-title strong {
+  font-weight: 500;
+}
+
+.inference-choices small {
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* The device sign-in as numbered steps: the number carries the order, so
+   each step needs only a short title and one line. */
+.codex-sign-in-steps {
+  display: grid;
+  gap: 14px;
+  max-width: 560px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: codex-sign-in;
+}
+
+.codex-sign-in-steps > li {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 4px 12px;
+  counter-increment: codex-sign-in;
+}
+
+.codex-sign-in-steps > li::before {
+  content: counter(codex-sign-in);
+  grid-row: span 2;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 9999px;
+  color: var(--ink);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.codex-sign-in-step-title {
+  color: var(--ink-strong);
+  font-weight: 500;
+}
+
+.codex-sign-in-steps small {
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.codex-sign-in-steps .codex-device-code {
+  margin-top: 6px;
+}
+
+/* The pasted address is long; the field takes the full step width. */
+.codex-callback-form {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin-top: 6px;
+}
+
+.codex-callback-form input {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Claude account sign-in ------------------------------------------------ */
+
+/*
+ * One stage at a time: sign in, paste the code, connected. A thin two-part
+ * step bar, a display-face title with a short lead, a dark pill for the one
+ * action of the stage, and text for the rest, as in the Portal's other
+ * stepped dialogs.
+ */
+.claude-sign-in .setup-heading {
+  min-height: 24px;
+}
+
+.claude-sign-in-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  max-width: 560px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.claude-sign-in-steps > li {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  color: var(--ink-3);
+  font-size: 11.5px;
+  letter-spacing: 0.01em;
+}
+
+.claude-sign-in-step-bar {
+  position: relative;
+  height: 3px;
+  border-radius: 9999px;
+  background: color-mix(in oklch, var(--ink) 12%, transparent);
+  overflow: hidden;
+}
+
+.claude-sign-in-step-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--ink-strong);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--motion-smooth);
+}
+
+.claude-sign-in-steps
+  > li:not([data-state="next"])
+  .claude-sign-in-step-bar::after {
+  transform: scaleX(1);
+}
+
+.claude-sign-in-steps
+  > li[data-state="failed"]
+  .claude-sign-in-step-bar::after {
+  background: var(--danger-text);
+}
+
+.claude-sign-in-steps
+  > li[data-state="attention"]
+  .claude-sign-in-step-bar::after {
+  background: var(--warn-text);
+}
+
+.claude-sign-in-step-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.claude-sign-in-steps > li[data-state="done"] {
+  color: var(--ink-2);
+}
+
+.claude-sign-in-steps > li[data-state="current"] {
+  color: var(--ink-strong);
+  font-weight: 500;
+}
+
+.claude-sign-in-steps > li[data-state="failed"] {
+  color: var(--danger-text);
+  font-weight: 500;
+}
+
+.claude-sign-in-steps > li[data-state="attention"] {
+  color: var(--warn-text);
+  font-weight: 500;
+}
+
+.claude-sign-in-stage {
+  display: grid;
+  gap: 18px;
+  max-width: 560px;
+  min-width: 0;
+  animation: claude-sign-in-enter 180ms ease-out;
+}
+
+@keyframes claude-sign-in-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .claude-sign-in-stage {
+    animation: none;
+  }
+}
+
+.claude-sign-in-intro {
+  display: grid;
+  gap: 6px;
+}
+
+.claude-sign-in-title {
+  margin: 0;
+  color: var(--ink-strong);
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+.claude-sign-in-lead {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.claude-sign-in-form {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.claude-sign-in-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.claude-sign-in-field label {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.claude-sign-in-field input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--ink-strong);
+  background: var(--paper);
+  font: inherit;
+  font-size: 14px;
+}
+
+.claude-sign-in-field input:focus-visible {
+  border-color: var(--ink-strong);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ink) 10%, transparent);
+}
+
+.claude-sign-in-field input[aria-invalid="true"] {
+  border-color: var(--danger-text);
+}
+
+.claude-sign-in-hint {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 13px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+.claude-sign-in-hint-error {
+  color: var(--danger-text);
+}
+
+.claude-sign-in .claude-sign-in-error {
+  margin: 0;
+  font-size: 13px;
+}
+
+.claude-sign-in-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The link that opens Claude again steps back: text on the card, as high
+   as the button beside it, a surface on hover. */
+.claude-sign-in-actions a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 9999px;
+  color: var(--ink-2);
+  font-size: 14px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.claude-sign-in-actions a:hover {
+  color: var(--ink-strong);
+  background: var(--surface);
+}
+
+/* On a phone the action of the stage takes the full width, and the text
+   actions sit centred under it. */
+@media (max-width: 520px) {
+  .claude-sign-in-actions {
+    justify-content: center;
+  }
+
+  .claude-sign-in-actions > :first-child {
+    flex: 1 1 100%;
+  }
+}
+
+/* Facts sit in a row of stats rather than a full-width two-column split,
+   which strands the right-hand pair halfway across a wide card. */
+.codex-connection-details {
+  display: flex;
+  gap: 12px 40px;
+  flex-wrap: wrap;
+  max-width: 520px;
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.codex-connection-details dt {
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.codex-connection-details dd {
+  margin: 4px 0 0;
+  color: var(--ink-strong);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.codex-allowance {
+  display: grid;
+  gap: 8px;
+  max-width: 520px;
+  --allowance-fill: var(--ok-text);
+}
+
+.codex-allowance.is-low {
+  --allowance-fill: var(--warn-text);
+}
+.codex-allowance.is-critical {
+  --allowance-fill: var(--danger-text);
+}
+
+.codex-allowance > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 13px;
+}
+
+.codex-allowance > div span {
+  color: var(--ink-2);
+}
+
+.codex-allowance > div strong {
+  color: var(--allowance-fill);
+  font-weight: 500;
+}
+
+/* A native progress bar picks up the platform's own chrome, which does not
+   match anything else on the page. Paint both halves instead. */
+.codex-allowance progress {
+  width: 100%;
+  height: 6px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--border);
+  appearance: none;
+}
+
+.codex-allowance progress::-webkit-progress-bar {
+  border-radius: 9999px;
+  background: var(--border);
+}
+
+.codex-allowance progress::-webkit-progress-value {
+  border-radius: 9999px;
+  background: var(--allowance-fill);
+}
+
+.codex-allowance progress::-moz-progress-bar {
+  border-radius: 9999px;
+  background: var(--allowance-fill);
+}
+
+.codex-allowance p {
+  margin: 2px 0 0;
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+/* Key management sits in the card's disclosure stack, not across its middle. */
+.connection-card .credential-recovery-actions {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+  margin-top: 10px;
+}
+
+.connection-card .credential-action {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+}
+
+.connection-card .credential-recovery-actions .notice-text {
+  max-width: 62ch;
+  margin: 0;
+  font-size: 12px;
+}
+
+.connection-card .credential-rotate-form {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  width: min(100%, 380px);
+}
+
+/* Typeahead resource picker (channels, accounts, catalogs). */
+.combobox {
+  position: relative;
+  width: 100%;
+}
+
+.combobox-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 46px 0 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--paper);
+  font: inherit;
+}
+
+.combobox-input:focus-visible {
+  border-color: var(--pantry-focus);
+}
+
+.combobox-input::placeholder {
+  color: var(--ink-3);
+}
+
+.combobox-input:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.combobox-caret {
+  position: absolute;
+  inset-block-start: 16px;
+  inset-inline-end: 18px;
+  width: 12px;
+  height: 12px;
+  color: var(--ink-2);
+  pointer-events: none;
+}
+
+/* The popup floats, so it carries the card shadow the flat fields do not. */
+.combobox-listbox {
+  position: absolute;
+  z-index: 5;
+  inset-block-start: calc(100% + 6px);
+  inset-inline: 0;
+  max-height: 264px;
+  overflow-y: auto;
+  overscroll-behavior: var(--portal-contained-overscroll);
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+
+.combobox-option {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--ink);
+  background: none;
+  box-shadow: none;
+  font: inherit;
+  font-size: 14px;
+  text-align: start;
+  cursor: pointer;
+}
+
+.combobox-option-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.combobox-option small {
+  color: var(--ink-3);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.combobox-option-note {
+  margin-inline-start: auto;
+}
+
+/* Keyboard and pointer share one highlight, so the active row is unambiguous. */
+.combobox-option-active {
+  background: var(--surface);
+}
+
+.combobox-option-unavailable {
+  color: var(--ink-3);
+  cursor: not-allowed;
+}
+
+.combobox-empty {
+  margin: 0;
+  padding: 10px 12px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+/*
+ * Stacked provider forms: bare label/control siblings in source order
+ * (agent assignment, ingress policy, reply editing, operator bootstrap).
+ */
+.integration-form {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  max-width: 440px;
+}
+
+.integration-form label {
+  margin-top: 6px;
+  color: var(--ink-strong);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.integration-form h5 {
+  margin: 4px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.integration-form :is(input, button:where(.pantry-select-trigger), textarea) {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--paper);
+  font: inherit;
+}
+
+.integration-form textarea {
+  min-height: 110px;
+  padding: 12px 14px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.integration-form button:not(:where(.pantry-select-trigger))[type="submit"] {
+  margin-top: 8px;
+}
+
+@media (max-width: 560px) {
+  .provider-onboarding,
+  .whatsapp-onboarding,
+  .whatsapp-onboarding-compact {
+    padding: 18px 16px;
+  }
+
+  .provider-onboarding-actions .notice-text {
+    flex-basis: 100%;
+  }
+
+  .whatsapp-setup-form :is(input, button:where(.pantry-select-trigger), textarea) {
+    font-size: 16px;
+  }
+}
+
+/* Slack channel selection, nested inside the Communication group. */
+.slack-setup {
+  display: grid;
+  gap: 18px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.slack-setup-heading {
+  display: grid;
+  gap: 4px;
+}
+
+.slack-setup-heading h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.slack-setup-heading p {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+/* In the compact sheet the channel fields stack at the full width. */
+.slack-setup .setup-form {
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+}
+
+/* The channels in use: one quiet row each, with a small status. */
+.slack-channel-section {
+  display: grid;
+  gap: 8px;
+}
+
+.slack-channel-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.slack-channel-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 14px 0 8px;
+  border-radius: 12px;
+  background: var(--paper);
+  box-shadow: var(--ring);
+}
+
+.slack-channel-mark {
+  display: grid;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 9px;
+  color: var(--ink-2);
+  background: var(--surface);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.slack-channel-name {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.slack-channel-name strong {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.slack-channel-name span {
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.slack-channel-status {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.slack-channel-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--ok-text);
+}
+
+.slack-channel-note,
+.slack-channel-empty,
+.slack-add-hint {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Only a Slack workspace shared with another organisation shows this. */
+.slack-dm-section {
+  display: grid;
+  gap: 8px;
+}
+
+.slack-dm-section h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.slack-dm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Adding a channel: the search field and its one action share a row. */
+.slack-add-channel {
+  display: grid;
+  gap: 8px;
+}
+
+.slack-add-label,
+.slack-add-field > span {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.slack-add-field {
+  display: grid;
+  gap: 6px;
+}
+
+.slack-add-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.slack-add-row > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.slack-add-row > button.pantry-button {
+  flex-shrink: 0;
+}
+
+.slack-add-hint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 6px;
+}
+
+/* The text action sits in the line of the hint. */
+.slack-add-hint > button.pantry-button {
+  min-height: 0;
+}
+
+.connection-dialog-content:has(.slack-setup) .connection-card .connection-body {
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 8px;
+}
+
+.connection-dialog-content:has(.slack-setup)
+  .connection-card
+  .connection-body
+  > *,
+.connection-dialog-content:has(.slack-setup)
+  .connection-card
+  .integration-account-summary,
+.connection-dialog-content:has(.slack-setup)
+  .connection-card
+  .connection-advanced[open] {
+  grid-column: 1 / -1;
+}
+
+.connection-dialog-content:has(.slack-setup) .connection-card .connection-foot {
+  display: contents;
+}
+
+.connection-dialog-content:has(.slack-setup)
+  .connection-card
+  .connection-command {
+  grid-column: 1;
+}
+
+.connection-dialog-content:has(.slack-setup)
+  .connection-card
+  .connection-advanced:not([open]) {
+  grid-column: 2;
+  align-self: center;
+  margin-top: 0;
+}
+
+/* The bot handle reads as a token to type, not prose. */
+.slack-setup-heading code {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--paper);
+  box-shadow: var(--ring);
+  font-size: 12px;
+}
+
+.email-reply-preview {
+  display: grid;
+  gap: 12px;
+}
+
+.email-review-edit {
+  display: grid;
+  gap: 12px;
+}
+
+.email-review-edit label {
+  display: grid;
+  gap: 6px;
+  color: var(--ink-strong);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.email-review-edit input,
+.email-review-edit textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* A proposed email body is verbatim material: boxed, wrapped, never
+   allowed to push the card wider than the page. */
+.email-reply-body {
+  max-width: 100%;
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--surface);
+  font-size: 12.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* The accepted memories the agent was shown when it wrote a draft. */
+.email-reply-memory h6 {
+  margin: 0 0 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.email-reply-memory ul {
+  margin: 0 0 6px;
+  padding-left: 18px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Provider tiles -------------------------------------------------------- */
+
+.provider-tile {
+  --provider-tile-bg: var(--paper);
+
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: var(--provider-tile-bg);
+  box-shadow: 0 0 0 1px var(--border) inset;
+}
+
+.provider-tile svg,
+.provider-tile img {
+  width: 24px;
+  height: 24px;
+  display: block;
+  object-fit: contain;
+}
+
+.provider-tile-shopify {
+  --provider-tile-bg: #95bf46;
+
+  color: #fff;
+  box-shadow: none;
+}
+
+.provider-tile-square {
+  --provider-tile-bg: #fff;
+
+  color: #000;
+}
+
+.provider-tile-stripe {
+  --provider-tile-bg: #635bff;
+
+  color: #fff;
+  box-shadow: none;
+}
+
+.provider-tile-dropbox {
+  --provider-tile-bg: #0061ff;
+
+  color: #fff;
+  box-shadow: none;
+}
+
+.provider-tile-notion {
+  color: #191918;
+}
+
+.provider-tile-whatsapp {
+  --provider-tile-bg: #25d366;
+
+  color: #fff;
+  box-shadow: none;
+}
+
+.provider-tile-codex {
+  --provider-tile-bg: #111;
+
+  color: #fff;
+  background: var(--provider-tile-bg);
+}
+
+.provider-tile-onepassword {
+  --provider-tile-bg: #0572ec;
+
+  color: #fff;
+  background: var(--provider-tile-bg);
+}
+
+.provider-tile-builtin_commerce,
+.provider-tile-generic {
+  --provider-tile-bg: var(--surface);
+
+  color: var(--ink);
+}
+
+/* The temporary active-Case transcript. It is rendered from a no-store read
+   and never persisted by the portal. */
+.case-transcript {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.case-transcript li {
+  border-left: 3px solid var(--border);
+  padding-left: 10px;
+}
+
+.case-transcript li p {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+}
+
+.account-row button:not(:where(.pantry-select-trigger)),
+.connection-card button:not(:where(.pantry-select-trigger)) {
+  min-height: 34px;
+  padding: 0 14px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.account-row button:not(:where(.pantry-select-trigger)):hover,
+.connection-card button:not(:where(.pantry-select-trigger)):hover {
+  color: var(--ink);
+}
+
+/*
+ * One primary action per surface: the filled pill marks the action the panel
+ * exists for (Save source, Add channel, Sign in with Google), everything else
+ * stays a quiet outlined pill.
+ */
+button:not(:where(.pantry-select-trigger)).connection-primary-action,
+.connection-actions a.connection-primary-action {
+  color: var(--pantry-on-primary);
+  background: var(--pantry-primary);
+  box-shadow: var(--pantry-primary-ring);
+  font-weight: 500;
+}
+
+button:not(:where(.pantry-select-trigger)).connection-primary-action:hover:not(:disabled),
+.connection-actions a.connection-primary-action:hover {
+  color: var(--pantry-on-primary);
+  background: var(--pantry-primary-hover);
+}
+
+/* The other action roles from the style guide, opt-in by class anywhere:
+   quiet outlined secondary, danger, and the ghost icon button. */
+button:not(:where(.pantry-select-trigger)).secondary {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 9999px;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--pantry-button-ring);
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+button:not(:where(.pantry-select-trigger)).secondary:hover:not(:disabled) {
+  color: var(--ink);
+  background: var(--surface);
+}
+
+button:not(:where(.pantry-select-trigger)).danger {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 9999px;
+  color: var(--danger-text);
+  background: var(--paper);
+  box-shadow: var(--pantry-danger-ring);
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+button:not(:where(.pantry-select-trigger)).danger:hover:not(:disabled) {
+  color: var(--danger-text);
+  background: var(--danger-bg);
+}
+
+button:not(:where(.pantry-select-trigger)).icon-button {
+  min-width: 36px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  color: var(--ink-2);
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+button:not(:where(.pantry-select-trigger)).icon-button:hover:not(:disabled) {
+  color: var(--ink);
+  background: var(--surface);
+}
+
+button:not(:where(.pantry-select-trigger)).secondary:disabled,
+button:not(:where(.pantry-select-trigger)).danger:disabled,
+button:not(:where(.pantry-select-trigger)).icon-button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.setup-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.setup-form button:not(:where(.pantry-select-trigger)) {
+  width: max-content;
+}
+
+/* The commit action and its utilities share one row beneath the fields. */
+.setup-form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* The 44px control floor is for tap targets, not for stretching a
+   checkbox; box and label sit on one line. */
+label.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  min-block-size: 0;
+  accent-color: var(--pantry-link);
+}
+
+.activation-band {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

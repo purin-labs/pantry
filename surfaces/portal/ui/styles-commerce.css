@@ -1,0 +1,699 @@
+/* ---------------------------------------------------------------------------
+ * Plan 31 commerce: views, boards, and purchasing.
+ *
+ * Views are destinations, so they get a tab row rather than a form control.
+ * Boards read left to right as a pipeline. Everything reuses the console's
+ * existing tokens; the dialogs reuse the .access35-dialog sheet.
+ * ------------------------------------------------------------------------ */
+
+/* Display options recede until asked for; the view itself is the content. */
+.commerce-display-options {
+  margin-block: 4px;
+}
+
+.commerce-display-options > summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  color: var(--ink-2);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.commerce-display-options > summary:hover {
+  color: var(--ink);
+}
+
+.commerce-display-options-body {
+  display: grid;
+  gap: 14px;
+  margin-block-start: 10px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.commerce-display-options-body > p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+/* Purchasing actions sit above the directory they act on. */
+.commerce-actions {
+  display: grid;
+  gap: 12px;
+  margin-block: 4px 20px;
+}
+
+.commerce-actions-lead {
+  display: grid;
+  gap: 4px;
+}
+
+.commerce-actions h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.commerce-actions p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.commerce-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.commerce-dossier-actions {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  margin-block: 18px;
+}
+
+.commerce-danger-action {
+  min-height: 40px;
+  padding-inline: 16px;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  color: var(--danger-text);
+  background: var(--paper);
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.commerce-danger-action:hover {
+  border-color: var(--danger-text);
+  background: var(--danger-bg);
+}
+
+.commerce-dialog-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.commerce-dialog-check input {
+  width: 18px;
+  min-height: 18px;
+  height: 18px;
+}
+
+.access35-dialog textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 88px;
+  padding: 12px 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--paper);
+  font: inherit;
+  resize: vertical;
+}
+
+.access35-dialog button:where(.pantry-select-trigger)[multiple] {
+  min-height: 132px;
+  padding: 8px;
+  background-image: none;
+}
+
+.commerce-field-hint {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+/* The exception panel's own notice needs to clear the fieldset below it. */
+.commerce-exception-workbench > .notice {
+  margin-block-end: 14px;
+}
+
+/* A table needs room the 920px reading column does not have, so it spans the
+   page under its tab row; the Display options form stays measured. */
+.commerce-purchasing,
+.commerce-collection {
+  max-width: none;
+}
+
+.commerce-collection .commerce-display-options {
+  max-width: 920px;
+}
+
+/* Commerce overview keeps operational counts and pricing controls easy to scan. */
+.commerce-panel:has(> .commerce-allowances) > .commerce-count-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.commerce-panel:has(> .commerce-allowances)
+  > .commerce-count-grid
+  .commerce-count {
+  padding: 20px;
+  gap: 8px;
+}
+.commerce-panel:has(> .commerce-allowances) .commerce-count strong {
+  font-variant-numeric: tabular-nums;
+  font-size: 32px;
+}
+.commerce-panel:has(> .commerce-allowances) .commerce-count span {
+  font-size: 13px;
+}
+.commerce-allowance-list {
+  list-style: none;
+  padding: 0;
+  margin: 24px 0 0;
+}
+.commerce-allowance-list > li {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.7fr) minmax(0, 1.5fr);
+  gap: 24px;
+  padding: 24px 0;
+  border-block-start: 1px solid var(--hairline);
+}
+.commerce-allowance-product h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 500;
+}
+.commerce-allowance-summary {
+  margin: 0 0 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.commerce-allowance .inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+  margin: 0;
+}
+.commerce-allowance .inline-form label {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+.commerce-allowance .inline-form label span {
+  font-size: 12px;
+}
+.commerce-allowance .inline-form input {
+  width: 100%;
+  min-height: 40px;
+}
+.commerce-allowance .inline-form button:not(:where(.pantry-select-trigger)) {
+  min-height: 40px;
+  margin: 0;
+}
+@media (max-width: 1100px) {
+  .commerce-panel:has(> .commerce-allowances) > .commerce-count-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 680px) {
+  .commerce-allowance-list > li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .commerce-allowance .inline-form input {
+    font-size: 16px;
+  }
+  .commerce-panel:has(> .commerce-allowances)
+    > .commerce-count-grid
+    .commerce-count {
+    padding: 14px;
+  }
+}
+
+.commerce-allowance-dialog {
+  width: min(520px, calc(100vw - 32px));
+}
+.commerce-allowance-form {
+  display: grid;
+  gap: 20px;
+}
+.commerce-allowance-form > p {
+  margin: 0;
+}
+.commerce-allowance-dialog-product {
+  font-weight: 600;
+}
+.commerce-allowance-help {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.commerce-allowance-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Access content reflows within the space left by the workspace navigation. */
+.access35-page {
+  max-width: 1120px;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+}
+.access35-live-status:empty {
+  display: none;
+}
+.access35-budget-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--pantry-space-6);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.access35-budget-fields legend {
+  margin-block-end: var(--pantry-space-4);
+  color: var(--ink-2);
+  font-size: var(--pantry-text-label);
+}
+.access35-budget-field {
+  display: grid;
+  align-content: start;
+  gap: var(--pantry-space-2);
+  min-width: 0;
+}
+.access35-budget-fields input {
+  inline-size: 100%;
+  font-variant-numeric: tabular-nums;
+}
+.access35-budget-fields p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--pantry-text-label);
+  line-height: 1.5;
+}
+.access35-budget-section > p {
+  max-width: 70ch;
+  line-height: 1.5;
+}
+.access35-budget-section .stacked-form {
+  margin-block-start: var(--pantry-space-6);
+  padding: var(--pantry-space-6);
+  border-radius: var(--pantry-radius-card);
+  background: var(--paper);
+}
+.access35-budget-section .stacked-form > p {
+  margin: 0;
+  font-size: var(--pantry-text-label);
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.access35-budget-section [role="status"]:empty {
+  display: none;
+}
+.access35-page :is(section, details, li, label, form),
+.access35-dialog :is(form, label) {
+  min-width: 0;
+}
+.access35-page :is(button:not(:where(.pantry-select-trigger)), input, button:where(.pantry-select-trigger)),
+.access35-dialog :is(button:not(:where(.pantry-select-trigger)), input, button:where(.pantry-select-trigger)) {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.access35-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+  color: var(--ink-2);
+  font-size: 14px;
+  text-decoration: none;
+}
+.access35-back-link:hover {
+  color: var(--ink);
+}
+.access35-heading-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.access35-page button:not(:where(.pantry-select-trigger)):has(> svg) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.permission-request-queue-list {
+  display: grid;
+  gap: var(--pantry-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.permission-request-queue-list > li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--pantry-space-4);
+  padding: var(--pantry-space-4) var(--pantry-space-6);
+  border-radius: var(--pantry-radius-card);
+  background: var(--paper);
+}
+.permission-request-queue-icon {
+  display: grid;
+  place-items: center;
+  inline-size: 36px;
+  block-size: 36px;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink-2);
+}
+.permission-request-queue-body p {
+  margin: 0;
+  line-height: 1.45;
+}
+.permission-request-queue-items {
+  font-weight: 600;
+}
+.permission-request-queue-meta {
+  color: var(--ink-2);
+  font-size: var(--pantry-text-label);
+}
+@media (max-width: 560px) {
+  .permission-request-queue-list > li {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .permission-request-queue-list > li > button:not(:where(.pantry-select-trigger)) {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+.access35-attention {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: var(--warn-text);
+  background: var(--warn-bg);
+  font-size: 14px;
+}
+.access35-attention > svg {
+  flex: 0 0 auto;
+}
+.access35-attention p {
+  flex: 1 1 180px;
+  min-width: 0;
+  margin: 0;
+}
+.access35-attention > button:not(:where(.pantry-select-trigger)) {
+  flex: 0 0 auto;
+}
+.access35-check-panel {
+  display: grid;
+  gap: 10px;
+  font-size: 14px;
+}
+.access35-check-drawer .access35-check-fields {
+  grid-template-columns: 1fr;
+}
+.access35-check-panel p {
+  margin: 0;
+  color: var(--ink-2);
+}
+.access35-check-panel a,
+.access35-system-actions a {
+  justify-self: start;
+  color: var(--ink);
+  font-size: 13.5px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+/* The answer to an inline check stays under its question. */
+.access35-check-result:empty {
+  display: none;
+}
+.access35-check-result .access35-explanation {
+  position: static;
+}
+.access35-check-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 10px;
+}
+.access35-check-fields label {
+  display: grid;
+  gap: 6px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.access35-system-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 220px);
+  gap: 10px;
+}
+.access35-system-filters :is(input, button:where(.pantry-select-trigger)),
+.access35-check-fields button:where(.pantry-select-trigger) {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  color: var(--ink);
+  background-color: var(--paper);
+  font: inherit;
+}
+.access35-system-list,
+.access35-recipient-list,
+.access35-permission-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+/* One surface holds every system; hairlines separate the rows. */
+.access35-system-list {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+}
+.access35-system + .access35-system {
+  border-top: 1px solid var(--border);
+}
+.access35-recipient-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.access35-system-tile {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--ink-2);
+  background: var(--surface);
+}
+.access35-system-name,
+.access35-recipient-name {
+  flex: 1;
+  min-width: 0;
+}
+.access35-system-name strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 500;
+}
+.access35-system-name small,
+.access35-recipient-name small,
+.access35-permission small {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-3);
+  font-size: 13px;
+}
+.access35-recipient-head {
+  min-height: 40px;
+  font-size: 14.5px;
+}
+.access35-recipient-head > svg {
+  flex: 0 0 auto;
+  color: var(--ink-3);
+}
+.access35-level {
+  color: var(--ink-2);
+  font-size: 13.5px;
+  white-space: nowrap;
+}
+.access35-level:is(.change, .change_with_approval) {
+  color: var(--ink);
+  font-weight: 500;
+}
+.access35-level.paused {
+  color: var(--ink-3);
+}
+.access35-permission-list {
+  display: grid;
+  gap: 10px;
+  margin: 4px 0 10px 29px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--surface);
+}
+.access35-permission {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+.access35-system-closed,
+.access35-system-approvals {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13.5px;
+}
+.access35-system-approvals {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.access35-system-approvals > svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+.access35-revoked {
+  display: grid;
+  gap: 8px;
+}
+.access35-revoked > h3 {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13.5px;
+  font-weight: 500;
+}
+.access35-revoked .access35-permission-list {
+  margin-left: 0;
+}
+.access35-system-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+.access35-page button:not(:where(.pantry-select-trigger)).access35-text-button {
+  min-height: 0;
+  padding: 0;
+  border-radius: 0;
+  color: var(--ink-2);
+  background: transparent;
+  box-shadow: none;
+  font-size: 13.5px;
+}
+.access35-page button:not(:where(.pantry-select-trigger)).access35-text-button:hover:not(:disabled) {
+  color: var(--ink);
+  background: transparent;
+}
+@media (max-width: 680px) {
+  .access35-check-fields,
+  .access35-system-filters {
+    grid-template-columns: 1fr;
+  }
+  .access35-system-chips {
+    order: 2;
+    flex-basis: 100%;
+    justify-content: flex-start;
+    padding-left: 44px;
+  }
+  .access35-system-body {
+    padding-left: 18px;
+  }
+  .access35-permission-list {
+    margin-left: 0;
+  }
+  .access35-permission {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+/* One soft card per group: the action leads, its mode trails on the same row. */
+.access35-capability-group {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+.access35-capability-group > h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+.access35-action-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+.access35-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 20px;
+  padding: 14px 16px;
+}
+.access35-action-row + .access35-action-row {
+  border-top: 1px solid var(--border);
+}
+.access35-action-text {
+  flex: 1 1 280px;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.access35-action-text :is(h3, h4),
+.access35-action-text p {
+  margin: 0;
+}
+.access35-action-text :is(h3, h4) {
+  font-size: 14px;
+  font-weight: 500;
+}
+.access35-action-text > p {
+  color: var(--ink-2);
+  font-size: 13.5px;
+}
+.access35-action-text small {
+  color: var(--ink-3);
+  font-size: 12.5px;
+}
+.access35-action-text .access35-note {
+  margin-top: 6px;
+}
+.access35-action-row > :not(.access35-action-text) {
+  flex: 0 1 170px;
+  min-width: 150px;
+}
+
+/* Dialogs take initial focus on open; the container itself needs no ring. */
+dialog[tabindex="-1"]:focus {
+  outline: none;
+}
+
+.bakery-workspace-region {
+  display: contents;
+}
+.bakery-workspace-region[hidden] {
+  display: none;
+}
+.bakery-workspace-return {
+  position: absolute;
+  top: 68px;
+  right: 12px;
+  z-index: 2;
+}

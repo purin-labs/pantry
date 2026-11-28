@@ -1,0 +1,1746 @@
+/* ---------- setup checklist ---------- */
+
+.setup-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.setup-head p {
+  margin: 6px 0 0;
+  color: var(--ink-2);
+  line-height: 1.5;
+  max-width: 55ch;
+}
+
+.setup-progress {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.setup-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.setup-track span {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: width var(--motion-smooth);
+}
+
+.setup-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.setup-step {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.setup-step:last-child {
+  border-bottom: none;
+  padding-bottom: 4px;
+}
+
+.setup-step-glyph {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.setup-step-done .setup-step-glyph {
+  color: var(--ok-text);
+  background: var(--ok-bg);
+}
+
+.setup-step-actionable .setup-step-glyph {
+  color: var(--paper);
+  background: var(--ink);
+}
+
+.setup-step-waiting .setup-step-glyph,
+.setup-step-auto .setup-step-glyph {
+  color: var(--ink-3);
+  box-shadow: inset 0 0 0 1.5px var(--hairline);
+}
+
+.setup-step-main {
+  display: grid;
+  gap: 2px;
+}
+
+.setup-step-title {
+  font-weight: 500;
+  font-size: 14.5px;
+}
+
+.setup-step-done .setup-step-title {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+.setup-step-waiting .setup-step-title,
+.setup-step-auto .setup-step-title {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+.setup-step-detail {
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+
+.setup-step-waiting .setup-step-detail,
+.setup-step-auto .setup-step-detail {
+  color: var(--ink-3);
+}
+
+.setup-step-meta {
+  font-size: 12px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.setup-step-meta-done {
+  color: var(--ok-text);
+}
+
+.setup-issues {
+  margin: 0;
+  padding: 14px 18px;
+  border-radius: 12px;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  color: var(--warn-text);
+  background: var(--warn-bg);
+  line-height: 1.5;
+}
+
+.setup-manage-note {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13.5px;
+}
+
+.setup-ready {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.setup-ready-mark {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--ok-text);
+  background: var(--ok-bg);
+}
+
+.setup-ready p {
+  margin: 6px 0 0;
+  color: var(--ink-2);
+  line-height: 1.5;
+  max-width: 55ch;
+}
+
+.blocker-list {
+  margin: 4px 0 0;
+  padding: 16px 18px;
+  border-radius: 12px;
+  line-height: 1.5;
+}
+
+/*
+ * Guidance reads as quiet prose, not a banner. Boxes are reserved for the
+ * toned .notice component below and for alerts; green stays a success
+ * accent instead of the colour of every explanatory paragraph.
+ */
+.notice-text {
+  max-width: 70ch;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.notice-text.setup-feedback {
+  color: var(--ok-text);
+}
+
+/* Toned notices: one box, three tones, wherever a message carries weight. */
+.notice {
+  max-width: 70ch;
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.notice-neutral {
+  color: var(--ink-strong);
+  background: var(--surface);
+}
+
+.notice-success {
+  color: var(--ok-text);
+  background: var(--ok-bg);
+}
+
+.notice-warning {
+  color: var(--warn-text);
+  background: var(--warn-bg);
+}
+
+/* On a surface-coloured setup card the neutral tone would disappear. */
+.integration-setup .notice-neutral,
+.slack-setup .notice-neutral {
+  background: var(--paper);
+  box-shadow: var(--ring);
+}
+
+.blocker-list {
+  color: var(--warn-text);
+  background: var(--warn-bg);
+}
+
+.blocker-list ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.portal-error {
+  margin: -16px 0 24px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--danger-bg);
+}
+
+.support-details {
+  margin: 0 0 24px;
+  padding: 14px 16px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.support-details summary {
+  width: max-content;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.support-details dl {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+/*
+ * Two-column term/value layout belongs to the support-diagnostics list alone.
+ * Scoping this to .support-facts keeps it off the other `dl`s that render
+ * inside a TechnicalDetails disclosure (.integration-account-details,
+ * .commerce-facts, …), which carry their own grid and were being squeezed to a
+ * 15px value column by the descendant selector this replaces.
+ */
+.support-details .support-facts > div {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.support-details dt {
+  color: var(--ink-3);
+}
+
+.support-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.setup-feedback {
+  margin: 18px 0 0;
+}
+
+/* Standalone empty states read as cards, like every other resting surface. */
+.empty-state {
+  margin: 0;
+  padding: 24px 20px;
+  border-radius: 16px;
+  color: var(--ink-2);
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+
+/* Inside a container that already draws the card, the state stays flat. */
+.resource-list-empty .empty-state,
+.work-queue-empty .empty-state,
+.first-task {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+
+.first-task h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.first-task p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.task-link {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.commerce-panel {
+  max-width: 920px;
+}
+
+.commerce-action-status {
+  max-width: 920px;
+  margin-bottom: 8px;
+  padding: 24px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+  scroll-margin-block-start: 64px;
+}
+
+/* The card moves focus to its title for screen readers; a title is not a control, so it draws no ring. */
+.action-status-heading h2[tabindex="-1"]:is(:focus, :focus-visible) {
+  outline: none;
+}
+
+.action-status-heading,
+.action-row-title,
+.action-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.action-status-heading h2,
+.action-section-heading h3,
+.action-row h3,
+.action-row h4,
+.operations-configuration h3 {
+  margin: 0;
+}
+
+.action-summary {
+  margin: 16px 0 0;
+  max-width: 62ch;
+  color: var(--ink-strong);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.action-authority {
+  margin: 6px 0 0;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.action-change-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0 0;
+}
+
+.action-change-facts > div {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.action-change-facts dt {
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.action-change-facts dd {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.action-guidance,
+.action-success {
+  margin: 10px 0 0;
+  max-width: 62ch;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+.action-success,
+.quiet-success {
+  color: var(--ok-text);
+  background: var(--ok-bg);
+}
+
+.action-success {
+  padding: 12px 14px;
+  border-radius: 10px;
+}
+
+.technical-list {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  list-style: none;
+}
+
+/* Accept and dismiss sit side by side under a proposal. */
+.proposal-decision {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.action-state {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 9999px;
+  color: var(--ink-2);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.action-state-proposed,
+.action-state-approval_requested,
+.action-state-signed,
+.action-state-indeterminate {
+  color: var(--warn-text);
+  background: var(--warn-bg);
+}
+
+.action-state-confirmed {
+  color: var(--ok-text);
+  background: var(--ok-bg);
+}
+
+.action-state-failed,
+.action-state-rejected,
+.action-state-blocked {
+  color: var(--danger-text);
+  background: var(--danger-bg);
+}
+
+.action-state-awaiting_review,
+.action-state-uncertain {
+  color: var(--warn-text);
+  background: var(--warn-bg);
+}
+
+.commerce-action-status .button-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.commerce-action-status > button:not(:where(.pantry-select-trigger)),
+.commerce-action-status .button-row button:not(:where(.pantry-select-trigger)),
+.action-row > button:not(:where(.pantry-select-trigger)) {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--pantry-radius-pill);
+  color: var(--pantry-on-primary);
+  background: var(--pantry-primary);
+  cursor: pointer;
+  box-shadow: var(--pantry-primary-ring);
+}
+
+.commerce-action-status > button:not(:where(.pantry-select-trigger)) {
+  margin-top: 20px;
+}
+
+.commerce-action-status button:not(:where(.pantry-select-trigger)).secondary-button,
+.action-row button:not(:where(.pantry-select-trigger)).secondary-button {
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--ring);
+}
+
+.commerce-action-status button:not(:where(.pantry-select-trigger)):disabled,
+.action-row button:not(:where(.pantry-select-trigger)):disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.action-receipt,
+.operations-disclosure,
+.past-actions {
+  margin-top: 20px;
+}
+
+.operations-disclosure > summary,
+.past-actions > summary {
+  color: var(--ink-2);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.action-inbox {
+  display: grid;
+  gap: 36px;
+  margin-top: 28px;
+}
+
+.commerce-exception-workbench {
+  margin-top: 28px;
+}
+
+.commerce-exception-selector {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.commerce-exception-selector legend {
+  padding: 0;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.commerce-exception-selector .field-hint {
+  margin: 6px 0 14px;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.commerce-exception-list {
+  display: grid;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+  list-style: none;
+}
+
+.commerce-exception-list > * + * {
+  border-top: 1px solid var(--border);
+}
+
+.commerce-exception-item {
+  display: grid;
+  gap: 12px;
+  padding: 18px 20px;
+}
+
+.commerce-exception-item > span {
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+
+.commerce-exception-choice {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.commerce-exception-choice input {
+  width: 20px;
+  height: 20px;
+  /* The 44px control floor is a tap-target rule, not a reason to stretch a
+     20px checkbox into a 20x44 slab. */
+  min-block-size: 0;
+  margin: 2px;
+  accent-color: var(--pantry-link);
+}
+
+.commerce-exception-choice > span {
+  display: grid;
+  gap: 4px;
+}
+
+.commerce-exception-choice strong {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.commerce-exception-choice span span {
+  max-width: 68ch;
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+
+.commerce-exception-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px 18px;
+  margin: 0 0 0 36px;
+}
+
+.commerce-exception-facts div {
+  min-width: 0;
+}
+
+.commerce-exception-facts dt {
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.commerce-exception-facts dd {
+  margin: 3px 0 0;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.commerce-exception-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.commerce-exception-actions button:not(:where(.pantry-select-trigger)) {
+  min-height: 40px;
+}
+
+.commerce-batch-preview {
+  display: grid;
+  gap: 14px;
+}
+
+.commerce-batch-summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.commerce-batch-summary strong {
+  color: var(--ink);
+}
+
+.action-section-heading {
+  margin-bottom: 12px;
+}
+
+.action-section-heading h3 {
+  font-size: 18px;
+}
+
+.action-section-heading > span,
+.operations-disclosure > summary span,
+.past-actions > summary span {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+.action-list {
+  display: grid;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+
+.action-list > * + * {
+  border-top: 1px solid var(--border);
+}
+
+.action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 20px;
+}
+
+.action-row-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.action-row h3,
+.action-row h4 {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.action-row p {
+  margin: 7px 0 0;
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+
+.action-row time {
+  display: block;
+  margin-top: 7px;
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.quiet-success {
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: 12px;
+}
+
+.operations-empty {
+  display: grid;
+  gap: 6px;
+}
+
+.operations-disclosure {
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+}
+
+/* The count sits at the end of the line; the fold chevron leads the label. */
+.operations-disclosure > summary,
+.past-actions > summary {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+}
+
+.operations-disclosure > summary span,
+.past-actions > summary span {
+  margin-inline-start: auto;
+  padding-inline-start: 12px;
+}
+
+.operations-configuration,
+.past-actions .action-list {
+  margin-top: 16px;
+}
+
+.operations-configuration {
+  display: grid;
+  gap: 32px;
+  padding: 22px;
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.operations-configuration section > p {
+  margin: 8px 0 18px;
+  color: var(--ink-2);
+}
+
+.stacked-form,
+.permission-choices,
+.permission-choices > div {
+  display: grid;
+  gap: 12px;
+}
+
+.stacked-form label,
+.permission-choices label {
+  display: grid;
+  gap: 8px;
+  color: var(--ink-strong);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.stacked-form :is(input, button:where(.pantry-select-trigger), textarea) {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.permission-choices {
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.permission-choices legend {
+  padding-inline: 4px;
+  color: var(--ink-strong);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.permission-choices label {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.permission-choices input {
+  min-block-size: auto;
+}
+
+@media (max-width: 680px) {
+  .commerce-action-status {
+    padding: 20px 16px;
+  }
+
+  .action-status-heading,
+  .action-row-title {
+    align-items: flex-start;
+  }
+
+  .action-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .action-row > button:not(:where(.pantry-select-trigger)) {
+    align-self: flex-start;
+  }
+
+  .commerce-action-status .button-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .commerce-facts,
+  .action-change-facts {
+    grid-template-columns: 1fr;
+  }
+}
+
+.commerce-count-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.commerce-count,
+.commerce-card {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--paper);
+}
+
+.commerce-count {
+  display: grid;
+  gap: 4px;
+}
+
+.commerce-count strong {
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.commerce-count span,
+.commerce-card p,
+.commerce-facts dt {
+  color: var(--ink-2);
+}
+
+.commerce-back {
+  min-height: 44px;
+  margin-bottom: 10px;
+  padding-inline: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+}
+
+.commerce-panel > h3 {
+  margin: 24px 0 10px;
+  font-size: 17px;
+}
+
+.commerce-panel > ul,
+.commerce-card ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.commerce-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.commerce-collection {
+  display: grid;
+  gap: 16px;
+  margin-top: 32px;
+  padding-top: 24px;
+}
+
+.commerce-collection .section-heading {
+  margin: 0;
+}
+
+.commerce-collection-controls {
+  display: grid;
+  grid-template-columns:
+    auto minmax(160px, 1fr) auto minmax(180px, 1.4fr)
+    auto minmax(120px, 0.8fr) auto;
+  gap: 8px 10px;
+  align-items: center;
+}
+
+.commerce-collection-controls label {
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.commerce-collection-controls input,
+.commerce-collection-controls button:where(.pantry-select-trigger) {
+  min-height: 42px;
+  min-width: 0;
+  padding: 0 11px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.commerce-collection-controls button:not(:where(.pantry-select-trigger)) {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--pantry-radius-pill);
+  background: var(--pantry-primary);
+  color: var(--pantry-on-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: var(--pantry-primary-ring);
+}
+
+/* Figures a reader compares down a column align and share a width. */
+.commerce-facts dd.commerce-numeric,
+.commerce-count strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.commerce-collection-grid[data-density="compact"] .crm-table :is(th, td) {
+  block-size: 36px;
+  padding-block: 4px;
+}
+
+.commerce-collection-grid[data-density="spacious"] .crm-table :is(th, td) {
+  block-size: 60px;
+  padding-block: 16px;
+}
+
+.commerce-view-definition {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px 16px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  background: var(--surface);
+  font-size: 12px;
+}
+
+.commerce-view-definition div {
+  display: grid;
+  gap: 3px;
+}
+
+.commerce-view-definition dt {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+.commerce-view-definition dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.commerce-view-editor {
+  display: grid;
+  gap: 16px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+/* Configuration stays one click away so the records lead the page. */
+.commerce-view-editor-disclosure > summary {
+  width: fit-content;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink-2);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.commerce-view-editor-disclosure[open] > summary {
+  margin-bottom: 8px;
+}
+
+.commerce-view-editor h4,
+.commerce-view-editor p {
+  margin: 0;
+}
+
+.commerce-view-editor > div:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.commerce-view-editor > div:first-child p {
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.commerce-view-editor-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px 16px;
+  align-items: start;
+}
+
+.commerce-view-editor-fields > label,
+.commerce-view-editor-fields fieldset {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.commerce-view-editor-fields button:where(.pantry-select-trigger) {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--hairline);
+  border-radius: 9px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.commerce-view-editor-fields input,
+.commerce-view-editor-fields textarea {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--hairline);
+  border-radius: 9px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.commerce-view-editor-fields textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+
+.commerce-view-editor-actions {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+  min-height: 40px;
+}
+
+.commerce-view-editor-fields fieldset {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px 12px;
+}
+
+.commerce-view-editor-fields legend {
+  grid-column: 1 / -1;
+  margin-block-end: 2px;
+  color: var(--ink-2);
+}
+
+.commerce-view-editor-fields > label.commerce-view-editor-checkbox,
+.commerce-view-editor-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+}
+
+.commerce-view-editor-checkbox input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.commerce-table-status-control {
+  display: block;
+  min-width: 10rem;
+}
+
+.commerce-table-status-control button:where(.pantry-select-trigger) {
+  min-height: 40px;
+  width: 100%;
+  border: 1px solid var(--hairline);
+  border-radius: 9px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.commerce-order-form label {
+  display: grid;
+  gap: 4px;
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.commerce-order-form input,
+.commerce-order-form textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px;
+  font: inherit;
+  border: 1px solid var(--hairline);
+  border-radius: 9px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.commerce-board-intent-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.commerce-board-presence {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.commerce-board-presence > span {
+  font-weight: 500;
+}
+
+.commerce-board-presence ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.commerce-board-presence li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.commerce-board-presence li > span {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.commerce-search {
+  display: grid;
+  gap: 7px;
+  margin: 0 0 20px;
+  color: var(--ink-strong);
+  font-size: 13px;
+}
+
+.commerce-search > div {
+  display: flex;
+  gap: 8px;
+}
+
+.commerce-search-field {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding-inline: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink-2);
+}
+
+.commerce-search-field:has(input:focus-visible) {
+  outline: 2px solid var(--pantry-focus);
+  outline-offset: 2px;
+}
+
+.commerce-search input {
+  width: 100%;
+  min-height: 42px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+}
+
+.commerce-search input:focus-visible {
+  outline: none;
+}
+
+.commerce-search button:not(:where(.pantry-select-trigger)) {
+  min-height: 44px;
+}
+
+/* Few columns: keep the 920px width of .commerce-panel near the record name. */
+.commerce-entity-list {
+  margin-top: 28px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.commerce-load-more {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--pantry-radius-pill);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: var(--pantry-button-ring);
+}
+
+.commerce-load-more:hover:not(:disabled) {
+  background: var(--surface);
+}
+
+.commerce-load-more {
+  margin-top: 20px;
+}
+
+.commerce-load-more:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.commerce-entity-table {
+  display: grid;
+  gap: 8px;
+}
+
+.commerce-entity-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(120px, auto) minmax(200px, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.commerce-entity-row:hover {
+  border-color: var(--ink-2);
+}
+
+.commerce-entity-name {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.commerce-entity-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-start;
+}
+
+.commerce-entity-meta {
+  color: var(--ink-2);
+  font-size: 13px;
+  text-align: end;
+}
+
+.commerce-empty-search {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+}
+
+.commerce-empty-search p {
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .commerce-entity-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .commerce-entity-meta {
+    text-align: start;
+  }
+}
+
+.commerce-dossier-section {
+  margin-top: 28px;
+}
+
+.commerce-dossier-section h3 {
+  margin: 0 0 12px;
+  font-size: 17px;
+}
+
+.commerce-card {
+  display: grid;
+  gap: 14px;
+}
+
+.commerce-card h3,
+.commerce-card h4 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.commerce-card p {
+  margin: 6px 0 0;
+  line-height: 1.5;
+}
+
+.commerce-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.commerce-facts dd {
+  margin: 3px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.commerce-filter-form {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.commerce-filter-form label {
+  display: grid;
+  flex: 1 1 260px;
+  gap: 7px;
+  color: var(--ink-strong);
+  font-size: 13px;
+}
+
+.commerce-filter-form input,
+.commerce-filter-form button:where(.pantry-select-trigger) {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.commerce-filter-form button:not(:where(.pantry-select-trigger)),
+.commerce-card button:not(:where(.pantry-select-trigger)),
+.commerce-panel > button:not(:where(.pantry-select-trigger)) {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--pantry-radius-pill);
+  background: var(--pantry-primary);
+  color: var(--pantry-on-primary);
+  cursor: pointer;
+  box-shadow: var(--pantry-primary-ring);
+}
+
+.commerce-panel > button:not(:where(.pantry-select-trigger)).commerce-back {
+  padding-inline: 8px;
+  color: var(--ink-2);
+  background: transparent;
+  box-shadow: none;
+}
+
+.commerce-panel > button:not(:where(.pantry-select-trigger)).commerce-back:hover {
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.stale-banner {
+  margin: 16px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  font-size: 13px;
+}
+
+.commerce-empty {
+  margin-top: 20px;
+}
+
+@media (max-width: 760px) {
+  .portal-nav {
+    grid-template-columns: auto 44px auto;
+    gap: 10px;
+  }
+
+  .portal-nav .portal-command-trigger {
+    width: 44px;
+    grid-template-columns: 18px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .portal-command-trigger .portal-command-label,
+  .portal-command-trigger kbd {
+    display: none;
+  }
+
+  .portal-chat-link {
+    width: 44px;
+    padding-inline: 0;
+  }
+
+  .portal-chat-link span {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .page-shell {
+    align-items: start;
+    padding: 16px 12px;
+  }
+
+  .identity-panel,
+  .status-panel {
+    padding: 26px 22px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  .invitation-facts {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .invitation-facts dd {
+    margin-bottom: 8px;
+  }
+
+  .portal-nav {
+    padding: 0 16px;
+  }
+
+  .portal-nav span {
+    display: none;
+  }
+
+  .portal-main-inner {
+    padding: 30px 16px 64px;
+  }
+
+  .setup-form {
+    grid-template-columns: 1fr;
+  }
+
+  /* Step actions drop under the step text instead of squeezing the title. */
+  .setup-step {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+
+  .setup-step-action,
+  .setup-step-meta {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .portal-heading h1 {
+    font-size: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+.step-mark {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: 0 0 0 1px var(--hairline) inset;
+  color: var(--ink-3);
+  font-size: 10px;
+  line-height: 1;
+}
+
+.portal-band h2 {
+  scroll-margin-top: 96px;
+}
+
+/* ---------- row actions, chips, compact selects ---------- */
+
+.account-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.account-row .lifecycle {
+  cursor: default;
+}
+
+.account-row button:where(.pantry-select-trigger) {
+  min-height: 34px;
+  padding-block: 0;
+  padding-inline-start: 14px;
+  border: 0;
+  border-radius: 9999px;
+  background-color: var(--paper);
+  box-shadow: var(--ring);
+  color: var(--ink);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.account-row button:where(.pantry-select-trigger):disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+button:not(:where(.pantry-select-trigger)).confirming {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  box-shadow: var(--pantry-danger-ring);
+}
+
+button:not(:where(.pantry-select-trigger)).confirming:hover {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+.readiness-evaluating {
+  grid-column: 1 / -1;
+  margin: 4px 0 0;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+/* ---------- danger zone ---------- */
+
+.danger-band {
+  max-width: 720px;
+}
+
+.danger-band > div > p {
+  margin: 0;
+  color: var(--ink-2);
+  line-height: 1.5;
+  max-width: 55ch;
+}
+
+.danger-band > button:not(:where(.pantry-select-trigger)),
+.danger-band > .danger-button {
+  margin-top: 18px;
+}
+
+button:not(:where(.pantry-select-trigger)).danger-button {
+  min-height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--paper);
+  box-shadow: var(--pantry-danger-ring);
+  color: var(--danger-text);
+  font-weight: 400;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+button:not(:where(.pantry-select-trigger)).danger-button:hover {
+  background: var(--danger-bg);
+}
+
+button:not(:where(.pantry-select-trigger)).danger-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.danger-band > button:not(:where(.pantry-select-trigger)):not(.danger-button) {
+  min-height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--paper);
+  box-shadow: var(--ring);
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.archive-confirm {
+  display: grid;
+  gap: 12px;
+  max-width: 420px;
+  margin-top: 18px;
+}
+
+.archive-confirm label {
+  display: grid;
+  gap: 8px;
+  color: var(--ink-strong);
+  font-size: 13px;
+}
+
+.archive-confirm input {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.archive-confirm-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.archive-confirm-actions button:not(:where(.pantry-select-trigger)) {
+  min-height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--paper);
+  box-shadow: var(--ring);
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.archive-confirm-actions button:not(:where(.pantry-select-trigger)):hover {
+  background: var(--surface);
+}
+
+.archive-confirm-actions .danger-button {
+  margin-top: 0;
+  box-shadow: var(--pantry-danger-ring);
+}
+
+.archive-confirm-actions .danger-button:hover {
+  background: var(--danger-bg);
+}
+
+.load-failure-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.load-failure-actions a {
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.load-failure-actions a:hover {
+  color: var(--ink);
+}
