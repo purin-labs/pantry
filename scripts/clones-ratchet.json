@@ -350,7 +350,7 @@
     "surfaces/portal/server/control/routes/chat-configuration-drafts.ts = surfaces/slack/server/control/routes/chat-slack-messages.ts": {"copies":1,"lines":11},
     "surfaces/portal/server/control/routes/chat.ts = surfaces/portal/server/control/routes/chat.ts": {"copies":1,"lines":22},
     "surfaces/portal/server/control/routes/chat/conversation.ts = surfaces/portal/server/control/routes/chat/conversation.ts": {"copies":3,"lines":43},
-    "surfaces/portal/ui/features/chat/route.tsx = surfaces/portal/ui/features/chat/route.tsx": {"copies":1,"lines":15},
+    "surfaces/portal/ui/features/chat/chat-composer.tsx = surfaces/portal/ui/features/chat/chat-composer.tsx": {"copies":1,"lines":15},
     "surfaces/portal/ui/features/chat/underlay.tsx = surfaces/portal/ui/features/chat/underlay.tsx": {"copies":1,"lines":9},
     "surfaces/portal/ui/pages.tsx = surfaces/portal/ui/pages.tsx": {"copies":1,"lines":10},
     "surfaces/portal/ui/portal-reads.ts = surfaces/portal/ui/portal-reads.ts": {"copies":1,"lines":18},
