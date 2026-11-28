@@ -149,7 +149,7 @@ async function measureLatte(page, url) {
     .getByRole("button", { name: "← Back", exact: true })
     .first()
     .click();
-  await page.getByRole("button", { name: /^Caffe Latte/ }).click();
+  await page.getByRole("button", { name: /^Caffe latte/ }).click();
   const form = page.getByRole("form", {
     name: "Caffe latte recipe",
     exact: true,

@@ -26,7 +26,7 @@ async function verifyWorkflowGraphBrowser(page) {
     },
     {
       id: "latte",
-      card: /^Caffe Latte/,
+      card: /^Caffe latte/,
       form: "Caffe latte recipe",
       prepare: "Prepare caffe latte",
       edges: [
@@ -41,7 +41,7 @@ async function verifyWorkflowGraphBrowser(page) {
     },
     {
       id: "black-sesame",
-      card: /^Black Sesame Milk/,
+      card: /^Black sesame milk/,
       form: "Black sesame milk Cobot recipe",
       prepare: "Prepare Black Sesame Milk 3D station",
       edges: [
@@ -56,7 +56,7 @@ async function verifyWorkflowGraphBrowser(page) {
     },
     {
       id: "ginger-tea",
-      card: /^Ginger Black Tea/,
+      card: /^Ginger tea and milk tea/,
       form: "Ginger tea 3D MuJoCo pan-staging recipe",
       prepare: "Prepare Ginger Tea 3D station",
       edges: [["stage-both-pans", "stage-pan-b"]],
@@ -73,7 +73,7 @@ async function verifyWorkflowGraphBrowser(page) {
     },
     {
       id: "financier-batter",
-      card: /^Financier Batter/,
+      card: /^Financier batter/,
       form: "Financier batter Cobot recipe",
       prepare: "Prepare Financier batter station",
       edges: [
@@ -87,7 +87,7 @@ async function verifyWorkflowGraphBrowser(page) {
     },
     {
       id: "financier-bake",
-      card: /^Financier Bake/,
+      card: /^Financier bake/,
       form: "Financier bake Cobot recipe",
       prepare: "Prepare Financier bake station",
       edges: [
@@ -102,7 +102,7 @@ async function verifyWorkflowGraphBrowser(page) {
     },
     {
       id: "financier-pack",
-      card: /^Financier Pack/,
+      card: /^Financier pack/,
       form: "Financier pack Cobot recipe",
       prepare: "Prepare Financier pack station",
       edges: [

@@ -129,7 +129,7 @@ async function verifyRecipeSplitBrowser(page) {
 
   // 1. Deep interactive journey on Caffe Latte · Linea Classic S & FAIRINO FR10.
   const workspace = await openRecipe(
-    /^Caffe Latte/,
+    /^Caffe latte/,
     "Caffe latte recipe",
     "Prepare caffe latte",
   );
@@ -268,31 +268,31 @@ async function verifyRecipeSplitBrowser(page) {
     },
     {
       id: "black-sesame",
-      card: /^Black Sesame Milk/,
+      card: /^Black sesame milk/,
       form: "Black sesame milk Cobot recipe",
       prepare: "Prepare Black Sesame Milk 3D station",
     },
     {
       id: "ginger-tea",
-      card: /^Ginger Black Tea/,
+      card: /^Ginger tea and milk tea/,
       form: "Ginger tea 3D MuJoCo pan-staging recipe",
       prepare: "Prepare Ginger Tea 3D station",
     },
     {
       id: "financier-batter",
-      card: /^Financier Batter/,
+      card: /^Financier batter/,
       form: "Financier batter Cobot recipe",
       prepare: "Prepare Financier batter station",
     },
     {
       id: "financier-bake",
-      card: /^Financier Bake/,
+      card: /^Financier bake/,
       form: "Financier bake Cobot recipe",
       prepare: "Prepare Financier bake station",
     },
     {
       id: "financier-pack",
-      card: /^Financier Pack/,
+      card: /^Financier pack/,
       form: "Financier pack Cobot recipe",
       prepare: "Prepare Financier pack station",
     },
@@ -517,7 +517,7 @@ async function verifyRecipeSplitBrowser(page) {
   await page.getByRole("button", { name: "Recipes", exact: true }).click();
   const portalBack = page.getByRole("button", { name: "← Back", exact: true }).first();
   if (await portalBack.isVisible()) await portalBack.click();
-  await page.getByRole("button", { name: /^Caffe Latte/ }).click();
+  await page.getByRole("button", { name: /^Caffe latte/ }).click();
   const portalForm = page.getByRole("form", { name: "Caffe latte recipe", exact: true });
   await portalForm.waitFor({ timeout: 30000 });
   await portalForm.getByRole("button", { name: "Prepare caffe latte", exact: true }).click();

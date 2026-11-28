@@ -64,7 +64,7 @@ async function verifyWorkflowBranchBrowser(page) {
       .getByRole("button", { name: "← Back", exact: true })
       .first()
       .click();
-    await page.getByRole("button", { name: /^Caffe Latte/u }).click();
+    await page.getByRole("button", { name: /^Caffe latte/u }).click();
     const form = page.getByRole("form", {
       name: "Caffe latte recipe",
       exact: true,

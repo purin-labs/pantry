@@ -97,7 +97,7 @@ async function verifyWorkflowEditBrowser(page) {
 
   // J2: add a step and compare.
   const sesame = await open(
-    /^Black Sesame Milk/,
+    /^Black sesame milk/,
     "Black sesame milk Cobot recipe",
     "Prepare Black Sesame Milk 3D station",
   );
@@ -238,7 +238,7 @@ async function verifyWorkflowEditBrowser(page) {
 
   // J4: a changed duration stretches its stage.
   const latte = await open(
-    /^Caffe Latte/,
+    /^Caffe latte/,
     "Caffe latte recipe",
     "Prepare caffe latte",
   );
