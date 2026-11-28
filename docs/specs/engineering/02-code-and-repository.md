@@ -320,8 +320,9 @@ the inside of the Worker, so each module needs a `testing` entry or a lint excep
 - Batch E of the test sweep, the large cuts in money-path test files, is not done.
   Plan 92 lists the product code that has no test.
 
-**The known debt.** The ratchet files list the files over 3,000 lines, the copies, the
-unused exports and the broken links. Each kind of layer debt needs a fix or a written
+**The known debt.** Since 2026-11-28 no source file is over 3,000 lines, so
+`scripts/file-size-ratchet.json` lists no file. The other ratchet files list the copies,
+the unused exports and the broken links. Each kind of layer debt needs a fix or a written
 acceptance before Stage B moves its files.
 
 **Gaps in the lints.**

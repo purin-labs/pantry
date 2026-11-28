@@ -324,15 +324,6 @@ export function terminateQuarantinedSessionInTransaction(
   return writeCanonicalTransition(sql, input, envelope.value);
 }
 
-export function commitCheckpointingStartedSession(
-  storage: ActorTransactionStorage,
-  input: CheckpointingStartedSessionCommit,
-): Result<ActorTransitionCommitResult, ActorTransitionCommitError> {
-  return storage.transactionSync(
-    commitCheckpointingStartedSessionTransaction.bind(null, storage.sql, input),
-  );
-}
-
 export function commitPreparedSessionCheckpoint(
   storage: ActorTransactionStorage,
   checkpoint: PreparedHarnessCheckpoint,

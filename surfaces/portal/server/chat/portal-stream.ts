@@ -275,7 +275,7 @@ async function streamConversationStep(
   return projectAcceptedTurnReplay(input, writer, stream, replay);
 }
 
-export async function projectAcceptedTurnReplay(
+async function projectAcceptedTurnReplay(
   input: StreamInput,
   writer: Writer,
   stream: ConversationStream,
@@ -544,7 +544,7 @@ function agentProgressLabel(
   }
 }
 
-export async function canProjectAgentEvent(
+async function canProjectAgentEvent(
   input: Pick<
     StreamInput,
     | "env"

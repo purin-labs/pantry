@@ -349,5 +349,8 @@ Neighbours:
   fold) and `commerce-wasm-query.test.ts` (the planner and the cursor).
 - Journeys in `services/commerce/tests/`: `entity-plane.test.ts`,
   `entity-plane-planned-query.test.ts` and `plugin-journey.test.ts`.
-- Scripts: `scripts/plan-50/evaluate-pi-durable.mjs`, and the commerce lab sequence
-  `pnpm lab:reset`, `lab:seed`, `lab:scenario` and `lab:verify`.
+- Scripts: the commerce lab sequence `pnpm lab:reset`, `lab:seed`, `lab:scenario` and
+  `lab:verify`. The Plan 50 evaluator `scripts/plan-50/evaluate-pi-durable.mjs` was
+  deleted on 2026-11-28;
+  [the last tree](https://github.com/purin-labs/pantry/tree/2ea6b4b3/scripts/plan-50)
+  keeps it.

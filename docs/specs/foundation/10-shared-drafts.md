@@ -469,6 +469,8 @@ Boundaries:
   `commerce-propose-unbound-channel.test.ts`. In `collaboration-drafts.test.ts`, an
   agent's menu edit whose person loses the membership while it commits stays stored and
   returns `stored_access_ended`.
-- Scripts: `scripts/plan40/` (a protocol peer, a browser fixture and a local Worker)
-  and `scripts/plan-50/draft-collaboration-worker.mjs` with
-  `scripts/plan-50/draft-browser-acceptance.js`.
+- Scripts: `scripts/plan40/` (a protocol peer, a browser fixture and a local Worker).
+  The Plan 50 draft worker and its browser check were deleted with `scripts/plan-50/`
+  on 2026-11-28;
+  [the last tree](https://github.com/purin-labs/pantry/tree/2ea6b4b3/scripts/plan-50)
+  keeps them.

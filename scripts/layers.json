@@ -159,7 +159,6 @@
     "scripts/plan-24/": "areas/kitchen",
     "scripts/plan-40b/": "areas/cafe",
     "scripts/plan-42J/": "areas/brain",
-    "scripts/plan-50/": "foundation/agent",
     "scripts/plan-53/": "foundation/tenancy",
     "scripts/plan-74/": "foundation/conversation",
     "scripts/plan-76/": "areas/commerce",

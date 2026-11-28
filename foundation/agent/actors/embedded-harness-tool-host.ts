@@ -165,7 +165,7 @@ function requestOnlyMissingCapabilities(
  * identity. Every attempt of an execution reaches the same object, and the
  * scripts of other executions do not share its thread.
  */
-export function codeModeSandbox(env: Env): HarnessCodeModeSandbox | null {
+function codeModeSandbox(env: Env): HarnessCodeModeSandbox | null {
   const namespace = env.CODE_MODE_SANDBOX;
   return namespace === undefined
     ? null

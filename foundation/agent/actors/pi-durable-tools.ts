@@ -8,7 +8,6 @@ import {
   saveCodeModeReceipt,
   completeCodeModeReceipt,
 } from "./pi-durable-code-receipt";
-export { CodeModeResult } from "./pi-durable-code-receipt";
 import type { Context } from "@earendil-works/chord/context";
 import type {
   HarnessNativeCodeMode,
@@ -103,7 +102,7 @@ type CodeStore = {
   execution:
     { kind: "none" } | { kind: "used"; turnId: string; harnessTaskId: TaskId };
 };
-export const CodeModeStore = defineDoc<CodeStore>({
+const CodeModeStore = defineDoc<CodeStore>({
   kind: "pantry.codemode.store",
   version: 1,
   scope: "conversation",

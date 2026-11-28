@@ -705,7 +705,7 @@ function isStringRecord(raw: unknown): raw is Readonly<Record<string, string>> {
   });
 }
 
-export function parsePendingInputs(raw: unknown): readonly ChatPendingInput[] {
+function parsePendingInputs(raw: unknown): readonly ChatPendingInput[] {
   if (!Array.isArray(raw)) return [];
   const pending: ChatPendingInput[] = [];
   for (const value of raw) {
