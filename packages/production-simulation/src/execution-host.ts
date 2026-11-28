@@ -18,7 +18,12 @@ import {
   parseExecutionBundle,
 } from "./execution-bundle.ts";
 import { driveRun } from "./host.ts";
-import { parseId, parseSha256Hex, type Sha256Hex } from "./identity.ts";
+import {
+  parseId,
+  parseSha256Hex,
+  type CellId,
+  type Sha256Hex,
+} from "./identity.ts";
 import {
   cellAdapter,
   parseNativeCell,
@@ -32,12 +37,33 @@ import {
   packRecordings,
 } from "./recording-pack.ts";
 import {
+  REPLAY_START,
+  afterReplayDrive,
+  afterReplayRelease,
+  afterReplaySubmit,
+  cellConfiguration,
+  nextReplayAction,
+  reboundDefinition,
+  rebindScenario,
+  releasePause,
+  replayPlan,
+  replayReport,
+  sameCell,
+  type CellBinding,
+  type ReplayCursor,
+  type ReplayPlan,
+  type ReplayReport,
+} from "./replay.ts";
+import {
   openResumable,
+  openSaved,
   resumableDocument,
   type ArtifactEntry,
 } from "./saved-run.ts";
+import type { CompiledScenario } from "./scenario.ts";
 import type { ExecutionIdentity, RunState } from "./state.ts";
-import { logicalTime } from "./time.ts";
+import { err, ok, type Result } from "./result.ts";
+import { logicalTime, type LogicalTime } from "./time.ts";
 import { executionView, type HostView } from "./execution-view.ts";
 import { readControlCommand } from "./state-document.ts";
 import type { StoredCellRecording } from "./cell-recording.ts";
@@ -48,11 +74,10 @@ import {
 } from "./physics-view.ts";
 
 /**
- * Host protocol version 4: how a host drives a retained engine without
- * calling into it. Requests and replies are plain data, so they cross a
- * worker boundary and stay meaningful to a Portal built from later source.
- * The engine behind this boundary owns the run; the caller holds only what a
- * reply hands it.
+ * The host protocol (`HOST_PROTOCOL_VERSION`): how a host drives an engine
+ * without calling into it. Requests and replies are plain data, so they
+ * cross a worker boundary. The engine behind this boundary owns the run; the
+ * caller holds only what a reply hands it.
  */
 
 /** Identities as text. The engine parses them; a caller never brands one. */
@@ -67,11 +92,18 @@ export type HostRequest =
   | Readonly<{
       kind: "begin";
       bundle: unknown;
-      /** The controller's own cell definitions, one for each cell. */
+      /**
+       * A controller's own cell definitions, one for each cell. A snapshot
+       * needs the definitions of this build. A scenario or a replay also
+       * takes the definitions of another build, and this controller then
+       * defines the same cells again.
+       */
       cells: readonly unknown[];
       identity: HostIdentity;
       origin:
         | Readonly<{ kind: "scenario"; scenario: unknown }>
+        /** A save of another build: its inputs run again on this build. */
+        | Readonly<{ kind: "replay"; document: unknown }>
         | Readonly<{
             kind: "snapshot";
             document: unknown;
@@ -145,13 +177,24 @@ export type HostRequest =
 export type HostArtifact = ArtifactEntry & Readonly<{ content: string }>;
 
 export type HostReply =
-  | Readonly<{ kind: "began"; view: HostView }>
+  | Readonly<{
+      kind: "began";
+      view: HostView;
+      /** Present when the execution plays the inputs of a save again. */
+      replay?: ReplayReport;
+      /**
+       * Present when the caller sent a cell of another build: each cell as
+       * this build defines it, in the order of the request.
+       */
+      cells?: readonly unknown[];
+    }>
   | Readonly<{
       kind: "drove";
       view: HostView;
       /** Events accepted since the previous reply that carried events. */
       events: RunState["events"];
       physics: CellPhysicsViews;
+      replay?: ReplayReport;
     }>
   | Readonly<{
       kind: "commanded";
@@ -231,6 +274,13 @@ type Live = {
   acknowledged: Sha256Hex | null;
   /** One latest observation per cell, independent of durable recording retention. */
   physics: Map<string, AcceptedRecording>;
+  /** The inputs of a save of another build, while and after they run again. */
+  replay: {
+    plan: ReplayPlan;
+    cursor: ReplayCursor;
+    /** Set when the replay ends. From then on the run takes commands. */
+    report: ReplayReport | null;
+  } | null;
 };
 
 async function retainCellRecording(
@@ -279,8 +329,110 @@ async function retainRecording(
   }
 }
 
+function sameBuild(cell: NativeCell, bundle: ExecutionBundle): boolean {
+  return (
+    cell.controllerSourceHash === bundle.controllerSourceHash &&
+    cell.controllerHash === bundle.controllerHash &&
+    cell.runtimeHash === bundle.runtimeHash
+  );
+}
+
 /**
- * Builds the host behind protocol version 2 over one controller transport.
+ * The cells as this build defines them. A definition names the build and the
+ * model of the controller that made it. For a definition of another build,
+ * this controller defines the same cell again from its configuration, and
+ * the binding gives the scenario the model of the new definition.
+ */
+async function presentCells(
+  transport: CellTransport,
+  bundle: ExecutionBundle,
+  cells: readonly NativeCell[],
+): Promise<
+  Result<
+    Readonly<{ cells: NativeCell[]; bindings: Map<CellId, CellBinding> }>,
+    HostReply
+  >
+> {
+  const present: NativeCell[] = [];
+  const bindings = new Map<CellId, CellBinding>();
+  for (const cell of cells) {
+    if (sameBuild(cell, bundle)) {
+      present.push(cell);
+      continue;
+    }
+    const configuration = cellConfiguration(cell.definition);
+    if (!configuration.ok)
+      return err(refused("cell_not_defined", configuration.error));
+    let reply: unknown;
+    try {
+      reply = await transport.send({
+        op: "define",
+        definition: configuration.value,
+      });
+    } catch (error) {
+      return err(
+        refused(
+          "cell_not_defined",
+          error instanceof Error ? error.message : String(error),
+        ),
+      );
+    }
+    const defined =
+      isRecord(reply) && reply.kind === "defined"
+        ? parseNativeCell(reboundDefinition(cell.definition, reply.definition))
+        : null;
+    if (
+      defined === null ||
+      !defined.ok ||
+      !sameBuild(defined.value, bundle) ||
+      !sameCell(cell.definition, defined.value.definition)
+    )
+      return err(refused("cell_not_defined", cell.cellId));
+    present.push(defined.value);
+    bindings.set(cell.cellId, {
+      modelHash: defined.value.modelHash,
+      controllerSourceHash: defined.value.controllerSourceHash,
+    });
+  }
+  return ok({ cells: present, bindings });
+}
+
+/** The definitions for the caller, when this build defined a cell again. */
+function presentDefinitions(
+  cells: readonly NativeCell[],
+  bindings: ReadonlyMap<CellId, CellBinding>,
+): Readonly<{ cells?: readonly unknown[] }> {
+  if (bindings.size === 0) return {};
+  const definitions = [];
+  for (const cell of cells) definitions.push(cell.definition);
+  return { cells: definitions };
+}
+
+/** Admits a scenario, creates the world of each cell and starts the run. */
+async function start(
+  adapter: ExecutionAdapter,
+  scenario: CompiledScenario,
+  identity: ExecutionIdentity,
+): Promise<Result<RunState, HostReply>> {
+  const admitted = await admitScenario(scenario);
+  if (!admitted.ok)
+    return err(refused("scenario_not_admitted", admitted.error));
+  const opened: OpenedCell[] = [];
+  for (const cell of admitted.value.scenario.cells) {
+    const checkpoint = await adapter.open(cell.id, {
+      kind: "create",
+      modelHash: cell.modelHash,
+    });
+    if (!checkpoint.ok)
+      return err(refused("cell_not_opened", checkpoint.error));
+    opened.push({ cell: cell.id, checkpoint: checkpoint.value });
+  }
+  const started = startRun(admitted.value, identity, opened);
+  return started.ok ? started : err(refused("run_not_started", started.error));
+}
+
+/**
+ * Builds the host behind the host protocol over one controller transport.
  * It holds one run. A request it cannot honour is refused with its reason
  * and changes nothing; a physics fault ends the host, and its caller
  * continues from the last save in a fresh one.
@@ -297,16 +449,25 @@ export function createExecutionHost(transport: CellTransport): ExecutionHost {
     if (bundle === null) return refused("invalid_bundle", null);
     const identity = parseIdentity(request.identity, bundle.id);
     if (identity === null) return refused("invalid_identity", null);
-    const cells: NativeCell[] = [];
+    let cells: NativeCell[] = [];
     if (!Array.isArray(request.cells)) return refused("invalid_cells", null);
     for (const raw of request.cells) {
       const cell = parseNativeCell(raw);
       if (!cell.ok) return refused("invalid_cells", cell.error);
       cells.push(cell.value);
     }
-    const adapter = cellAdapter(transport, bundle, cells);
     const origin = request.origin;
     if (!isRecord(origin)) return refused("invalid_origin", null);
+    // A new run takes the cells of any build: this controller defines them
+    // again. A snapshot restores checkpoints, which only their build reads.
+    let bindings: ReadonlyMap<CellId, CellBinding> = new Map();
+    if (origin.kind === "scenario" || origin.kind === "replay") {
+      const present = await presentCells(transport, bundle, cells);
+      if (!present.ok) return present.error;
+      cells = present.value.cells;
+      bindings = present.value.bindings;
+    }
+    const adapter = cellAdapter(transport, bundle, cells);
     const state = {
       bundle,
       adapter,
@@ -317,6 +478,7 @@ export function createExecutionHost(transport: CellTransport): ExecutionHost {
       pending: [],
       acknowledged: null,
       physics: new Map(),
+      replay: null,
     } satisfies Omit<Live, "run">;
 
     if (origin.kind === "scenario") {
@@ -329,21 +491,50 @@ export function createExecutionHost(transport: CellTransport): ExecutionHost {
           return refused("invalid_scenario", null);
         throw error;
       }
-      const admitted = await admitScenario(scenario);
-      if (!admitted.ok) return refused("scenario_not_admitted", admitted.error);
-      const opened: OpenedCell[] = [];
-      for (const cell of admitted.value.scenario.cells) {
-        const checkpoint = await adapter.open(cell.id, {
-          kind: "create",
-          modelHash: cell.modelHash,
-        });
-        if (!checkpoint.ok) return refused("cell_not_opened", checkpoint.error);
-        opened.push({ cell: cell.id, checkpoint: checkpoint.value });
-      }
-      const started = startRun(admitted.value, identity, opened);
-      if (!started.ok) return refused("run_not_started", started.error);
+      const started = await start(
+        adapter,
+        rebindScenario(scenario, bindings),
+        identity,
+      );
+      if (!started.ok) return started.error;
       live = { ...state, run: started.value };
-      return { kind: "began", view: executionView(started.value) };
+      return {
+        kind: "began",
+        view: executionView(started.value),
+        ...presentDefinitions(cells, bindings),
+      };
+    }
+
+    if (origin.kind === "replay") {
+      const saved = await openSaved(origin.document);
+      if (!saved.ok) return refused("save_not_opened", saved.error);
+      const inputs = saved.value.state;
+      if (identity.runId !== inputs.identity.runId)
+        return refused("run_not_continued", "run_differs");
+      if (
+        identity.parent === null ||
+        identity.parent.snapshot !== saved.value.snapshot ||
+        identity.parent.execution !== inputs.identity.executionId
+      )
+        return refused("run_not_continued", "parent_differs");
+      const started = await start(
+        adapter,
+        rebindScenario(inputs.definition.scenario, bindings),
+        identity,
+      );
+      if (!started.ok) return started.error;
+      const plan = replayPlan(inputs, saved.value.snapshot);
+      live = {
+        ...state,
+        run: started.value,
+        replay: { plan, cursor: REPLAY_START, report: null },
+      };
+      return {
+        kind: "began",
+        view: executionView(started.value),
+        replay: replayReport(plan, REPLAY_START, started.value, false),
+        ...presentDefinitions(cells, bindings),
+      };
     }
 
     if (origin.kind !== "snapshot" || !Array.isArray(origin.checkpoints))
@@ -403,11 +594,87 @@ export function createExecutionHost(transport: CellTransport): ExecutionHost {
       typeof request.until === "number" ? logicalTime(request.until) : null;
     if (until === null || !until.ok || !isPositiveInteger(request.turns))
       return refused("invalid_drive", null);
+    // The inputs of the save go first. The caller's time applies after them.
+    let remaining = request.turns;
+    const replay = state.replay;
+    const replaying = replay !== null && replay.report === null;
+    while (replay !== null && replay.report === null) {
+      const action = nextReplayAction(replay.plan, replay.cursor, state.run);
+      if (action.kind === "done") {
+        replay.report = replayReport(
+          replay.plan,
+          replay.cursor,
+          state.run,
+          true,
+        );
+        break;
+      }
+      if (action.kind === "release") {
+        state.run = releasePause(state.run);
+        replay.cursor = afterReplayRelease(replay.cursor);
+        continue;
+      }
+      if (action.kind === "submit") {
+        const result = submitCommand(state.run, action.command);
+        state.run = result.run;
+        replay.cursor = afterReplaySubmit(
+          replay.plan,
+          replay.cursor,
+          state.run,
+          result.receipt.status === "accepted" ? null : result.receipt.reason,
+        );
+        continue;
+      }
+      if (remaining <= 0 || state.pending.length > 0) break;
+      const before = state.run;
+      const turned = await turn(
+        state,
+        action.until,
+        action.turns === "one" ? 1 : remaining,
+      );
+      if (!turned.ok) return turned.error;
+      remaining -= turned.value.performed;
+      replay.cursor = afterReplayDrive(replay.plan, replay.cursor, {
+        yielded: turned.value.yielded,
+        moved:
+          turned.value.performed > 0 ||
+          state.run.position.time !== before.position.time ||
+          state.run.events.length !== before.events.length ||
+          state.run.status.kind !== before.status.kind,
+      });
+    }
+    // The reply that ends a replay shows the run where the save stopped.
+    if (!replaying) {
+      const turned = await turn(state, until.value, remaining);
+      if (!turned.ok) return turned.error;
+    }
+    return {
+      kind: "drove",
+      view: executionView(state.run),
+      events: unreported(state),
+      physics: cellPhysicsViews(state.run, state.physics),
+      ...(replay === null
+        ? {}
+        : {
+            replay:
+              replay.report ??
+              replayReport(replay.plan, replay.cursor, state.run, false),
+          }),
+    };
+  }
+
+  /** Drives the run to `until`, for at most `turns` needs of physics. */
+  async function turn(
+    state: Live,
+    until: LogicalTime,
+    turns: number,
+  ): Promise<
+    Result<Readonly<{ yielded: boolean; performed: number }>, HostReply>
+  > {
     let offered = 0;
-    const turns = request.turns;
     let stopped;
     try {
-      stopped = await driveRun(state.run, state.adapter, until.value, {
+      stopped = await driveRun(state.run, state.adapter, until, {
         async segment(segment, recording) {
           state.physics.set(segment.cellId, {
             kind: "operation",
@@ -427,22 +694,23 @@ export function createExecutionHost(transport: CellTransport): ExecutionHost {
       });
     } catch (error) {
       faulted = true;
-      return refused(
-        "physics_fault",
-        error instanceof Error ? error.message : String(error),
+      return err(
+        refused(
+          "physics_fault",
+          error instanceof Error ? error.message : String(error),
+        ),
       );
     }
     if (!stopped.ok) {
       faulted = true;
-      return refused("physics_fault", stopped.error);
+      return err(refused("physics_fault", stopped.error));
     }
     state.run = stopped.value.run;
-    return {
-      kind: "drove",
-      view: executionView(state.run),
-      events: unreported(state),
-      physics: cellPhysicsViews(state.run, state.physics),
-    };
+    // The need at which the host took the run back was not performed.
+    return ok({
+      yielded: stopped.value.yielded,
+      performed: stopped.value.yielded ? offered - 1 : offered,
+    });
   }
 
   // A save is taken where every cell has real state at the run's time.
@@ -488,6 +756,18 @@ export function createExecutionHost(transport: CellTransport): ExecutionHost {
       if (faulted) return refused("host_faulted", null);
       if (request.kind === "begin") return begin(request);
       if (live === null) return refused("not_begun", null);
+      // The inputs of the save run first. A command of the caller would
+      // change them, and a save would hold a part of them.
+      if (
+        live.replay !== null &&
+        live.replay.report === null &&
+        request.kind !== "artifact" &&
+        request.kind !== "drive" &&
+        request.kind !== "observe" &&
+        request.kind !== "state" &&
+        request.kind !== "dispose"
+      )
+        return refused("replaying", null);
       switch (request.kind) {
         case "artifact":
           return artifact(live, request.acknowledged);

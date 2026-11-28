@@ -512,7 +512,7 @@ async function runJobOnWorker(
 export async function executePastryBenchRecipeInWorker(
   config: PastryBenchRecipeConfig,
 ): Promise<PastryBenchCompletedRun> {
-  const opened = await openExecutionWorker(null);
+  const opened = await openExecutionWorker();
   if (!opened.ok) {
     throw new Error(
       `MuJoCo 4.0.0 execution worker unavailable: ${opened.error.code}`,

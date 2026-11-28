@@ -1,10 +1,11 @@
 async function verifyContactInspectionBrowser(page) {
   await page.route("**/src/dev/workflow-preview.tsx", previewStyles);
   await openPhysicsEvidence(page);
+  // An earlier engine build made this save. The Portal has no file of that
+  // build: its engine runs the inputs of the save again (Refactor 16, step 8).
   const source = checkoutUrl(
     "workers/platform/tests/fixtures/bakery-persistent-failure.json",
   );
-  const reference = await page.evaluate(readContactReference, source);
   await page.evaluate(showPortalPhysicsEvidence, portalSimulationSource());
   await page.evaluate(mountWorkflowSimulator, { kind: "preview" });
   await page.setViewportSize({ width: 1440, height: 1000 });
@@ -17,11 +18,27 @@ async function verifyContactInspectionBrowser(page) {
       mimeType: "application/json",
       buffer: await file.body(),
     });
+  const earlier = await page
+    .getByRole("button", { name: /^An earlier engine made this save\./u })
+    .textContent();
   await page
     .getByRole("button", { name: "Continue saved run", exact: true })
     .click();
+  const replayed = await page
+    .getByRole("button", {
+      name: /^The saved inputs ran again on the present engine\./u,
+    })
+    .textContent();
+  await page.screenshot({ path: "continued-on-present-engine.png" });
   await showFactoryWorkflow(page);
   await page.locator('[data-graph-task="tray-orders#0/transfer"]').waitFor();
+  // The contacts of the continued run, as the Portal saves them.
+  const continued = `${globalThis.bakeryEvidence}/continued-failed-world.json`;
+  await (await downloadFactorySave(page)).saveAs(continued);
+  const reference = await page.evaluate(
+    readContactReference,
+    `/@fs${continued}`,
+  );
   await page.locator('[data-graph-task="tray-orders#0/transfer"]').click();
   await openPhysicsDetails(page);
   await page
@@ -46,6 +63,8 @@ async function verifyContactInspectionBrowser(page) {
     .evaluateAll(contactRows);
   if (JSON.stringify(rows) !== JSON.stringify(reference.pairs))
     throw new Error("Rendered contacts differ from the saved solver evidence.");
+  if (reference.bundle === reference.fixtureBundle)
+    throw new Error("The continued run names the build of the old save.");
   await inspection
     .getByLabel("Outline recorded contact shapes", { exact: true })
     .check();
@@ -81,10 +100,21 @@ async function verifyContactInspectionBrowser(page) {
     noContactClaimAtInitialStep: true,
     overlaysCleared: true,
     source,
+    savedByBundle: reference.fixtureBundle,
+    continuedOnBundle: reference.bundle,
+    reviewNotice: earlier,
+    replayNotice: replayed,
   };
 }
 async function readContactReference(source) {
   const saved = await (await fetch(source)).json();
+  const fixture = await (
+    await fetch(
+      (await import("/source-url.js")).sourceUrl(
+        "workers/platform/tests/fixtures/bakery-persistent-failure.json",
+      ),
+    )
+  ).json();
   const { readRecordingPack } =
     await import("/@id/@purin-labs/production-simulation");
   const { nativeIdentity } =
@@ -113,7 +143,7 @@ async function readContactReference(source) {
     }
   }
   if (peak === null || peak.force <= 0)
-    throw new Error("Fixture has no recorded contact force.");
+    throw new Error("The continued run has no recorded contact force.");
   const pairs = [];
   for (const pair of peak.pairs)
     pairs.push({
@@ -122,7 +152,13 @@ async function readContactReference(source) {
       force: pair.normalForceN,
       penetration: pair.penetrationM,
     });
-  return { index: peak.step, step: peak.step, pairs };
+  return {
+    index: peak.step,
+    step: peak.step,
+    pairs,
+    bundle: saved.document.bundle.id,
+    fixtureBundle: fixture.document.bundle.id,
+  };
 }
 function contactRows(rows) {
   const values = [];

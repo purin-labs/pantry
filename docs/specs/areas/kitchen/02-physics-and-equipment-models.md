@@ -196,11 +196,27 @@ models:
   bundle. Visuals are `visuals/<sha>.glb`.
 - `browser-physics-asset.ts` pins the runtime bundle (`BAKERY_BROWSER_BUNDLE`) and the
   retained espresso builds (`BAKERY_APPLIANCE_BUILDS`). `execution-manifest.generated.ts`
-  pins the execution bundle. Its host protocol is 5 (`HOST_PROTOCOL_VERSION`), and the
-  client also accepts retained bundles of protocols 1 to 4.
+  pins the execution bundle. Its host protocol is 6 (`HOST_PROTOCOL_VERSION`). The
+  Portal client starts only this bundle (`openExecutionWorker`).
 - `build.rs` hashes 38 controller files into `BAKERY_CONTROLLER_SOURCE_HASH`, and the
   runner and runtime hashes follow. A request, a recording and a checkpoint carry this
-  identity. A saved run resumes only on the bundle that made it.
+  identity. A checkpoint restores only on the bundle that made it.
+- A saved run does not pin a build (Refactor 16, step 8). The host takes three origins
+  (`execution-host.ts`): a scenario, a snapshot of its own build, and a replay. For a
+  replay (`replay.ts`) the engine starts the saved scenario again, gives each admitted
+  command of the save to the run at the time of its admission, releases a pause that a
+  later execution continued from, and stops where the save stopped. A decision on a
+  task (an inspection or a recovery) waits for its condition, up to the time of the
+  next timed command. During a replay the host refuses a command and a save
+  (`replaying`). The reply carries a report: the commands, the commands that the
+  engine refused, and the first task whose start, completion or failure has another
+  time than in the saved recording.
+- A cell definition names the build and the model of the controller that made it. For
+  a scenario or a replay with a definition of another build, the controller defines
+  the same cell again (`define`), the cell keeps the inputs of the saved definition
+  (its run name, its load, its clamp force) and takes the pins of the present build,
+  and the scenario takes the model of the new definition (`rebindScenario`). The
+  `began` reply returns the definitions.
 - `pnpm lint:physics-bundle` (`scripts/check-physics-bundle.mjs`) needs no MuJoCo. It
   fails when the source hash differs from `controllerSourceHash` of the pin, when the
   two pins disagree, when a named runtime bundle or file is missing or has another
@@ -282,11 +298,7 @@ needs new native requests and recordings; an old recording is never reinterprete
   and `/bakery-physics/visuals/<sha>.glb` in the Portal assets, with no sign-in.
 - **No tables, routes, events or capabilities.** The subsystem owns no D1 table, no
   Actor SQLite table, no control route and no agent tool. The KIT-01 artifact routes
-  refuse a staged run with `bakery_run_bundle_unavailable` (409) when the Portal assets
-  cannot serve its bundle (`retainedBundleAvailable` in
-  `control/routes/bakery-run-artifacts.ts`). The check compares the served
-  `execution.json` with the saved bundle identity, and it checks the byte length and
-  SHA-256 of the engine and of each runtime file.
+  read no engine file: a staged run needs no bundle on the server.
 
 ## Rules and limits
 
@@ -313,9 +325,12 @@ needs new native requests and recordings; an old recording is never reinterprete
   in `mj.rs`). The browser build needs Emscripten 4.0.10. It refuses a bundle file that
   names a local path (`refuseLocalPaths`). Rust reads only its current contracts. The
   Portal converts an old recording only at import.
-- **Retention.** A saved run names its bundle, so a removed bundle makes the run
-  refuse to resume (409). The lint and the production upload refuse a build that lacks
-  a bundle that a retained execution manifest names. `retain-appliance-builds.mjs` keeps the retained espresso builds and their visuals.
+- **Retention.** A saved run and an authored route need no bundle but the pinned one.
+  A saved espresso rehearsal still continues only on the runtime bundle that made it
+  (`BAKERY_APPLIANCE_BUILDS`, `retain-appliance-builds.mjs`). The lint and the
+  production upload refuse a build that lacks a bundle that a retained execution
+  manifest names. The old bundles stay in the repository until a saved run continues
+  by replay in production; their removal is the second part of step 8.
   The result cache is per browser origin and can be lost.
 - **Cost.** The server runs no physics, so an idle Organisation costs nothing here.
   The engine loads only when a person or the agent starts a job.
@@ -346,9 +361,10 @@ needs new native requests and recordings; an old recording is never reinterprete
   dimension conflicts. Robot load qualification is deferred.
 - **Shared execution and depth.** No server or heavy-executor job runs physics. Depth
   recordings with observed frames are not built.
-- **Refactor 16:** step 8 (a saved run without a pinned build), step 9C (captures out of
-  git), step 10 (agent runs with no open browser), steps 15B and 15C (appliance reports in
-  the run view) and step 16 (builders as data). Recipe appliance results do not reach the
+- **Refactor 16:** the second part of step 8 (the removal of the old bundles, and a
+  saved espresso rehearsal without a pinned runtime), the move of step 9B (every bundle
+  in R2), step 10 (agent runs with no open browser) and the rest of step 16 (builders
+  as data). Recipe appliance results do not reach the
   schedule. The `bakery-physics` CI job tests the pinned bundle; it does not build the
   Emscripten bundle again.
 

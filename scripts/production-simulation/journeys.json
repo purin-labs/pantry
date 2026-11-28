@@ -375,9 +375,9 @@
       "dir": "recovery-wasm",
       "status": "passes",
       "lastRun": {
-        "seconds": 4.1,
-        "date": "2026-11-19",
-        "commit": "2e48dac6e"
+        "seconds": 6.6,
+        "date": "2026-11-28",
+        "commit": "0b8e6d418"
       }
     },
     {
@@ -990,7 +990,7 @@
         ]
       },
       "status": "passes",
-      "notes": "The step 11 runtime prepares the two cells, so that file-execution saves under the step 11 execution bundle and resumes on the pinned one. Change the runtime at each engine release.",
+      "notes": "The step 11 runtime prepares the two cells, so that file-execution saves under the step 11 execution bundle. Release B of that journey defines the cells again on the pinned runtime.",
       "lastRun": {
         "seconds": 0.2,
         "date": "2026-11-19",
@@ -1008,16 +1008,16 @@
         "args": [
           "{out:retained-case}",
           "8ecd88c13a602872adad17edbe0f3065713704e7f5008c23a12792f02f7f26f8",
-          "55d9c125a044b8e7a5996ca1d583e301f0595e8f7647967c128ad6e165a0268c",
+          "{execution}",
           "{out}"
         ]
       },
       "status": "passes",
-      "notes": "Release A is the execution bundle of the step 11 runtime that steps 12 to 15A pin; release B adds the pinned execution bundle (step 9). The journey needs a different engine file and controller in B. Change B at each pin; change A only when its engine file equals B's. The step 11 bundles are outside git after the move of step 9B: fetch them first (node scripts/repo-binaries.mjs fetch apps/portal/public/bakery-physics).",
+      "notes": "Release A is the execution bundle of the step 11 runtime (in R2: node scripts/repo-binaries.mjs fetch apps/portal/public/bakery-physics). Release B is the pinned execution bundle, and it holds no file of release A. Release A saves the run; release B runs the inputs of that save again and completes the run (Refactor 16, step 8). The journey needs a different engine file and controller in A.",
       "lastRun": {
-        "seconds": 139.2,
-        "date": "2026-11-19",
-        "commit": "2e48dac6e"
+        "seconds": 245.9,
+        "date": "2026-11-28",
+        "commit": "0b8e6d418"
       }
     },
     {
@@ -1771,9 +1771,9 @@
       "status": "passes",
       "dir": "production-run",
       "lastRun": {
-        "seconds": 28,
-        "date": "2026-11-19",
-        "commit": "2e48dac6e"
+        "seconds": 22.3,
+        "date": "2026-11-28",
+        "commit": "0b8e6d418"
       }
     },
     {
@@ -1864,9 +1864,9 @@
       "dir": "oven-financier-browser",
       "status": "passes",
       "lastRun": {
-        "seconds": 40.5,
-        "date": "2026-11-19",
-        "commit": "2e48dac6e"
+        "seconds": 43.9,
+        "date": "2026-11-28",
+        "commit": "0b8e6d418"
       }
     },
     {
@@ -2124,9 +2124,9 @@
       },
       "status": "passes",
       "lastRun": {
-        "seconds": 12.7,
-        "date": "2026-11-19",
-        "commit": "2e48dac6e"
+        "seconds": 17.3,
+        "date": "2026-11-28",
+        "commit": "0b8e6d418"
       }
     },
     {

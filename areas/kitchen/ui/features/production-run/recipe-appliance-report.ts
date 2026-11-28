@@ -226,7 +226,7 @@ export async function runPortalApplianceReport(
     ) => void;
   }>,
 ): Promise<PortalApplianceReportResult> {
-  const opened = await openExecutionWorker(null);
+  const opened = await openExecutionWorker();
   if (!opened.ok) {
     throw new Error(
       `Cannot open appliance verification worker: ${opened.error.code}.`,

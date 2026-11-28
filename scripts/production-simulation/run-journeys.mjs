@@ -28,7 +28,7 @@
 // Placeholders in a command: {out} is the journey's directory, {out:ID} the
 // directory of journey ID (which then runs first), {abs:ID} its absolute path
 // (for a /@fs/ evidence URL), {runtime} the pinned browser runtime directory,
-// {base} the --base-url.
+// {execution} the id of the pinned execution bundle, {base} the --base-url.
 //
 // A browser journey with run.portal "built" runs on the built Portal, as the
 // Workers static assets serve it, and not on --base-url: the first such
@@ -150,6 +150,7 @@ const tools = {
   python: values.python ?? process.env.BAKERY_PYTHON ?? "python3",
 };
 const runtime = await pinnedRuntime();
+const execution = await pinnedExecution();
 const commit = git(["rev-parse", "--short=9", "HEAD"]);
 const started = new Date();
 const results = [];
@@ -267,6 +268,7 @@ function expand(text, journey) {
   return text
     .replaceAll("{out}", relative(root, directoryOf(journey)))
     .replaceAll("{runtime}", runtime)
+    .replaceAll("{execution}", execution)
     .replaceAll("{base}", values["base-url"])
     .replace(/\{out:([a-z0-9-]+)\}/gu, (_, id) =>
       relative(root, directoryOf(byId.get(id))),
@@ -664,6 +666,17 @@ async function pinnedRuntime() {
   );
   const { BAKERY_BROWSER_BUNDLE } = await import(pathToFileURL(asset).href);
   return `apps/portal/public/bakery-physics/bundles/${BAKERY_BROWSER_BUNDLE.id}`;
+}
+
+async function pinnedExecution() {
+  const pin = join(
+    root,
+    "packages/production-simulation/src/execution-manifest.generated.ts",
+  );
+  const { PRODUCTION_EXECUTION_MANIFEST } = await import(
+    pathToFileURL(pin).href
+  );
+  return PRODUCTION_EXECUTION_MANIFEST.bundle.id;
 }
 
 function git(args) {

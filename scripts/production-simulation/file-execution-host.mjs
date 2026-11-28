@@ -6,10 +6,11 @@ import { mkdir, open, readFile, rename, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
-  parseExecutionBundle,
   parseExecutionManifest,
   resolveExecution,
 } from "../../packages/production-simulation/src/execution-bundle.ts";
+import { parseSha256Hex } from "../../packages/production-simulation/src/identity.ts";
+import { checkpointBody } from "../../packages/bakery-model/src/bakery-checkpoint.ts";
 import { runtimeModule } from "./build-execution-bundle.mjs";
 
 function value(result) {
@@ -77,32 +78,34 @@ async function atomicWrite(directory, name, content) {
   }
 }
 
-/** Resolve and verify all retained files before importing executable code. */
-export async function openFileExecution(paths, claim, artifacts) {
-  const bundle = parseExecutionBundle(claim);
-  if (bundle === null) throw new Error("Invalid execution bundle.");
+/**
+ * Opens the execution bundle of this release: the one build that the host
+ * runs. It resolves and verifies all its files before it imports executable
+ * code. A save of another build needs no file of that build (Refactor 16,
+ * step 8).
+ */
+export async function openFileExecution(paths, bundleId, artifacts) {
+  const id = value(parseSha256Hex(bundleId));
   const manifest = value(
     await parseExecutionManifest(
       JSON.parse(
-        await readFile(
-          join(paths.executions, bundle.id, "execution.json"),
-          "utf8",
-        ),
+        await readFile(join(paths.executions, id, "execution.json"), "utf8"),
       ),
     ),
   );
   value(
     await resolveExecution(
-      bundle,
+      manifest.bundle,
       "browser",
       [manifest],
       measureRetained.bind(null, paths),
     ),
   );
-  if (![2, 3, 4, 5].includes(manifest.bundle.protocolVersion))
+  // Version 2 added the acknowledged artifact transfer, which this host uses.
+  if (manifest.bundle.protocolVersion < 2)
     throw new Error("This host requires the acknowledged artifact protocol.");
   const engine = await import(
-    pathToFileURL(join(paths.executions, bundle.id, manifest.engine.file)).href
+    pathToFileURL(join(paths.executions, id, manifest.engine.file)).href
   );
   const runtime = join(paths.runtimes, manifest.runtime.id);
   if (!manifest.runtime.files.some(isLoader))
@@ -195,21 +198,43 @@ class FileExecutionHost {
     return this.#module.HEAPU8.byteLength;
   }
 
-  async readSnapshot(raw) {
-    const document = value(
-      await this.#engine.openResumable(raw, "browser", [this.manifest.bundle]),
-    );
+  /**
+   * The origin of a continued run, and the definition of each saved cell. A
+   * save of this build restores its checkpoints. A save of another build, or
+   * `replay`, gives its inputs to this build, which runs them again.
+   */
+  async readSave(raw, replay) {
+    const document = value(await this.#engine.openSaved(raw));
+    const exact = !replay && document.bundle.id === this.manifest.bundle.id;
+    if (exact)
+      value(
+        await this.#engine.openResumable(raw, "browser", [
+          this.manifest.bundle,
+        ]),
+      );
     const checkpoints = [];
+    const cells = [];
     for (const entry of document.artifacts) {
+      // A replay reads only the checkpoints: each one holds its cell.
+      if (!exact && entry.role !== "cell-checkpoint") continue;
       const path = join(this.#artifacts, entry.digest);
       await verifyFile(path, entry);
-      if (entry.role === "cell-checkpoint")
-        checkpoints.push({
-          digest: entry.digest,
-          content: await readFile(path, "utf8"),
-        });
+      if (entry.role !== "cell-checkpoint") continue;
+      const content = await readFile(path, "utf8");
+      checkpoints.push({ digest: entry.digest, content });
+      // A checkpoint since Refactor 16 step 6 is an envelope; the shared
+      // reader takes both shapes, as the Portal does.
+      const body = checkpointBody(JSON.parse(content));
+      if (body === null) throw new Error("A checkpoint has no definition.");
+      cells.push(body.definition);
     }
-    return { kind: "snapshot", document, checkpoints };
+    return {
+      cells,
+      document,
+      origin: exact
+        ? { kind: "snapshot", document, checkpoints }
+        : { kind: "replay", document },
+    };
   }
 
   async #drain() {

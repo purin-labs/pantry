@@ -146,7 +146,7 @@ export function runDraftComparison(
   let worker: ExecutionWorker | null = null;
   let cancelled = false;
   async function both(): Promise<DraftComparison> {
-    const opened = await openExecutionWorker(null);
+    const opened = await openExecutionWorker();
     if (!opened.ok)
       throw new Error(`The engine did not start: ${opened.error.code}.`);
     worker = opened.value;

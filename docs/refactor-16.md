@@ -1,11 +1,22 @@
 # Refactor 16 — Satyr Kitchen physics: faster runs, one runtime, builds out of git
 
 Date: 2026-11-15.
-Status: proposed; rewritten on 2026-11-15 after a second review. No step has started.
-Steps 8, 9, 10 and 15 wait for decisions. The findings come from a read-only review of
-the MuJoCo system on `dev` at `6fdcee0c3`, and from six read-only code reviews after
-it. "Checked" means that the code was read or the count was run at that commit. No
-journey reproduced a fault.
+Status: in progress. Steps 1 to 7 and 11 to 15 are on `dev` (read again on 2026-11-28
+at `f6dd43ff`). The owner accepted D4 on 2026-11-28, and part 8A of step 8 is done on
+the branch `refactor-16`: a saved run continues on the present engine. Part 8B (the
+removal of the old bundles) waits for a release. The owner accepted D7 on 2026-11-28,
+and its work is in part 8B. The move of step 9B waits
+for D1, step 10 waits for D6, and the rest of step 16 waits for the next appliances. The plan was rewritten on 2026-11-15 after a second review. The findings
+come from a read-only review of the MuJoCo system on `dev` at `6fdcee0c3`, and from
+six read-only code reviews after it. "Checked" means that the code was read or the
+count was run at that commit. No journey reproduced a fault.
+
+The sections "The system today", "What the design costs today" and "Why" give the
+state of 2026-11-15, before the steps, with the paths of that date. Refactor 17 moved
+the code: `services/platform` is `workers/platform`, the Kitchen features of
+`apps/portal/src/features` are in `areas/kitchen/ui/features`, and the workflow
+`satyr.yml` is `pantry.yml`. Step 6 split `native.rs`.
+[Steps and status](#steps-and-status) gives the state of each finding today.
 
 This refactor changes how the physics system is built, shared, loaded and run. It now
 changes run speed and some results. It changes no recipe, no schedule and no physics
@@ -249,8 +260,9 @@ Each finding has a number, and each step names the findings that it closes.
   versions and appliance names.
 - **Never remove a bundle that a saved run can name.**
   `scripts/bakery-robots/retain-appliance-builds.mjs` stays the owner of that rule.
-  New code gets no reader for an old checkpoint; the old bundle reads it. If the owner
-  accepts D4, step 8 changes this rule.
+  New code gets no reader for an old checkpoint; the old bundle reads it. The owner
+  accepted D4 on 2026-11-28, so step 8 changes this rule. The rule stays until step 8
+  is on `dev`.
 - **E2E journeys, no unit tests.** Each step leaves a text artifact in
   `docs/evidence/refactor-16/`.
 - **No recurring server cost.** No step adds a cron trigger, an alarm, a poll or a
@@ -275,24 +287,24 @@ The phases are:
 4. **Reach and start:** steps 10 and 11.
 5. **Less code to keep:** steps 12 to 16.
 
-| Phase | Step | Scope                                                                  | Was                | Estimate   | Area owner        | Waits for           | Status                               |
-| ----- | ---- | ---------------------------------------------------------------------- | ------------------ | ---------- | ----------------- | ------------------- | ------------------------------------ |
-| 1     | 1    | Repair the CI job; tie the source to the pinned bundle                 | Step 1             | 0.5 day    | Plan 70           | —                   | Done locally 2026-11-16; CI run open |
-| 1     | 2    | Measure a step, then remove its waste                                  | A5, Step 5G        | 3 days     | Plans 42B and 70A | —                   | Done on refactor-16, 2026-11-16      |
-| 1     | 3    | Each cell runs alone to its next event                                 | A1                 | 5 days     | Plan 70A          | —                   | Done on refactor-16, 2026-11-16      |
-| 1     | 4    | Reuse a physics result                                                 | A2                 | 6 days     | Plan 70E          | —                   | Done on refactor-16, 2026-11-16      |
-| 2     | 5    | One runtime path                                                       | A4, Step 4         | 6 days     | Plan 70E          | —                   | Done on refactor-16, 2026-11-17      |
-| 2     | 6    | One safe MuJoCo core in Rust                                           | Step 5A–5F         | 5–6 days   | Plans 42B and 70A | D2 (6F)             | Done on refactor-16, 2026-11-17      |
-| 2     | 7    | Check each operation against the robot's limits                        | A6                 | 4 days     | Plan 70           | —                   | Done on refactor-16, 2026-11-17      |
-| 3     | 8    | A saved run does not pin a build                                       | A3                 | 4 days     | Plan 70B          | D4                  | Not started                          |
-| 3     | 9    | Engine builds and captures out of git; clean build path                | Step 2             | 2–3 days   | Plan 70B, R10 0B  | D1                  | 9A and 9B done 2026-11-17; 9C waits for a check of each capture |
-| 4     | 10   | The agent runs a schedule with no open browser                         | A7                 | 5 days     | Plan 81           | D6, Step 4          | Not started                          |
-| 4     | 11   | A smaller start                                                        | A10, Step 4 (part) | 4 days     | Plan 70E          | —                   | Done on refactor-16, 2026-11-17      |
-| 5     | 12   | One appliance registry                                                 | Step 3A            | 2 days     | Plan 60A          | —                   | Done on refactor-16, 2026-11-17      |
-| 5     | 13   | One scene host; playback outside React state                           | Step 6             | 4 days     | Plans 42 and 84   | Step 5              | Done on refactor-16, 2026-11-17      |
-| 5     | 14   | A journey index and a wider ratchet                                    | Step 8             | 1.5 days   | Plan 70           | —                   | Done on refactor-16, 2026-11-17      |
-| 5     | 15   | Recipe appliance physics: show its report, then appliance work as data | A8, Step 7         | 3 + 3 days | Plan 84           | D5 (15B, 15C)       | 15A done 2026-11-17; 15B and 15C done locally 2026-11-27 |
-| 5     | 16   | Builders as data                                                       | A9, Step 3B        | 8–10 days  | Plan 60A          | The next appliances | Not started                          |
+| Phase | Step | Scope                                                                  | Was                | Estimate   | Area owner        | Waits for           | Status                                                                              |
+| ----- | ---- | ---------------------------------------------------------------------- | ------------------ | ---------- | ----------------- | ------------------- | ----------------------------------------------------------------------------------- |
+| 1     | 1    | Repair the CI job; tie the source to the pinned bundle                 | Step 1             | 0.5 day    | Plan 70           | —                   | Done; the CI job passed on `dev`, 2026-11-27                                        |
+| 1     | 2    | Measure a step, then remove its waste                                  | A5, Step 5G        | 3 days     | Plans 42B and 70A | —                   | Done 2026-11-16; on `dev`                                                           |
+| 1     | 3    | Each cell runs alone to its next event                                 | A1                 | 5 days     | Plan 70A          | —                   | Done 2026-11-16; on `dev`                                                           |
+| 1     | 4    | Reuse a physics result                                                 | A2                 | 6 days     | Plan 70E          | —                   | Done 2026-11-16; on `dev`                                                           |
+| 2     | 5    | One runtime path                                                       | A4, Step 4         | 6 days     | Plan 70E          | —                   | Done 2026-11-17; on `dev`                                                           |
+| 2     | 6    | One safe MuJoCo core in Rust                                           | Step 5A–5F         | 5–6 days   | Plans 42B and 70A | D2 (6F)             | Done 2026-11-17; on `dev`                                                           |
+| 2     | 7    | Check each operation against the robot's limits                        | A6                 | 4 days     | Plan 70           | —                   | Done 2026-11-17; on `dev`                                                           |
+| 3     | 8    | A saved run does not pin a build                                       | A3                 | 4 days     | Plan 70B          | —                   | 8A done 2026-11-28 on `refactor-16`; 8B waits for a release                         |
+| 3     | 9    | Engine builds and captures out of git; clean build path                | Step 2             | 2–3 days   | Plan 70B, R10 0B  | D1                  | 9A done 2026-11-17; 9B: the code is done, the move waits for D1; 9C done by Plan 92 |
+| 4     | 10   | The agent runs a schedule with no open browser                         | A7                 | 5 days     | Plan 81           | D6, Step 4          | Not started                                                                         |
+| 4     | 11   | A smaller start                                                        | A10, Step 4 (part) | 4 days     | Plan 70E          | —                   | Done 2026-11-17; on `dev`                                                           |
+| 5     | 12   | One appliance registry                                                 | Step 3A            | 2 days     | Plan 60A          | —                   | Done 2026-11-17; on `dev`                                                           |
+| 5     | 13   | One scene host; playback outside React state                           | Step 6             | 4 days     | Plans 42 and 84   | Step 5              | Done 2026-11-17; on `dev`                                                           |
+| 5     | 14   | A journey index and a wider ratchet                                    | Step 8             | 1.5 days   | Plan 70           | —                   | Done 2026-11-17; on `dev`                                                           |
+| 5     | 15   | Recipe appliance physics: show its report, then appliance work as data | A8, Step 7         | 3 + 3 days | Plan 84           | —                   | Done; 15A 2026-11-17, 15B and 15C 2026-11-28 (PR 8)                                 |
+| 5     | 16   | Builders as data                                                       | A9, Step 3B        | 8–10 days  | Plan 60A          | The next appliances | Partly done by the appliance fleet work of 2026-11-23; the rest waits               |
 
 ### Step 1 — Repair the CI job (F4, F5)
 
@@ -422,7 +434,9 @@ Done when: the robot comparison shows the margins, and the journeys assert them.
 
 ### Step 8 — A saved run does not pin a build (F24)
 
-This step waits for D4. It removes the cause of F1.
+The owner accepted D4 on 2026-11-28. This step removes the cause of F1. It has two
+parts: 8A changes how a save continues, and 8B removes the bundles that nothing needs
+after 8A.
 
 - A saved run is its inputs, plus the recordings for view.
 - "Continue" runs the inputs again on the present engine, then goes on. With steps 3
@@ -441,6 +455,56 @@ Against:
 Done when: a journey saves a run under one engine release and continues it under the
 next.
 
+Result of part 8A on `refactor-16`, 2026-11-28
+([evidence](evidence/refactor-16/step-8.md)):
+
+- **A save is its inputs.** The host has a third origin, `replay`
+  (`packages/production-simulation/src/replay.ts`, `execution-host.ts`, host protocol
+  6). The engine starts the saved scenario again and gives each admitted command to
+  the run at the time of its admission. It releases a pause that a later execution
+  continued from. A decision on a task (an inspection or a recovery) waits for its
+  condition, up to the time of the next timed command. The run stops where the save
+  stopped, and the host takes no command and no save before that.
+- **A cell of another build is defined again.** The cell keeps the inputs of the saved
+  definition and takes the model and build pins of the present controller. The same
+  rule lets a route that another build authored (`executionBundleId`) run on the
+  present engine.
+- **The Portal runs one engine.** `openExecutionWorker` starts only the pinned bundle.
+  The client code for the host protocols 1 to 4 is gone. A save of the pinned build
+  restores its checkpoints (exact resume inside one engine release). A save of another
+  build runs again, and the page says so before the run and reports the first
+  difference after it.
+- **The server reads no engine file.** `retainedBundleAvailable` and the error
+  `bakery_run_bundle_unavailable` are gone, with the 29 MB read for each resumable save.
+- **Proof.** The journey `file-execution`: release A saves at a pause; release B holds
+  no file of release A, runs the inputs again and completes the run; the result equals
+  a run that release B makes from the start; on one engine a replay equals the saved
+  recording. In the Portal, the journey `contact-inspection-browser` continues a save
+  of an older build on the page.
+- **Limit.** The 3D recording of a save of another build does not open: the engine
+  draws the new run. The events, the timeline and the totals of the saved document
+  stay readable.
+
+Part 8B, not done:
+
+- No bundle is removed yet. The old path must stay until one saved run continues by
+  replay in production. Then keep the pinned bundle and the bundle of the last
+  release, and remove the others from git, from `repo-binaries.json` and from the
+  lints.
+- The Portal still has the view fallbacks for an engine that lacks a part of the view
+  ("This retained build does not expose…"). The pinned engine gives each part, so
+  they go with the bundles.
+- Three headless journeys still run an old engine in Node (`workflow-branch` J6, the
+  retained view of `oven-financier`, `bakery-sample.test.ts`). They test a pair that
+  the product no longer makes (a new Portal with an old engine). They go with the
+  bundles, and the journey `file-execution` then needs another source for release A.
+- A saved espresso rehearsal pins a runtime bundle in a third place
+  (`BAKERY_APPLIANCE_BUILDS`, `retain-appliance-builds.mjs`): it holds a checkpoint
+  and no command history, so it cannot run again. By D7, part 8B keeps the runtime
+  bundle of the present pin and of the last release only. A rehearsal save of an older
+  engine then does not continue, and the page says that a new rehearsal is necessary.
+  Until part 8B, each kept runtime bundle still continues its rehearsal saves.
+
 ### Step 9 — Engine builds and captures out of git (F1, F2, F3)
 
 This step stops the growth of the repository.
@@ -457,8 +521,8 @@ This step stops the growth of the repository.
 - The 20 old bundles keep their paths. Their content is their address, so they
   cannot change.
 
-**9B. The bundles live in R2.** This part follows D1. If the owner accepts D4, it
-holds two bundles, not a store that grows.
+**9B. The bundles live in R2.** This part follows D1. D4 is accepted, so after step 8
+it holds two bundles, not a store that grows.
 
 - `scripts/repo-binaries.mjs` accepts a folder. It then holds
   `bakery-physics/bundles` and `bakery-physics/executions` in `repo-binaries.json`.
@@ -484,6 +548,18 @@ ready. The move waits for the owner's yes: the upload to R2, the removal of the
 moved folders from git and the move of the captures are not done. Under (b), git
 also keeps the runtime bundles `1fa6f270…` and `dc5c58e2…` and six execution
 bundles of them, because CI reads them and CI has no R2 secret.
+
+State on `dev`, 2026-11-28:
+
+- 9C is done. Plan 92 moved `assets/` to R2, and git tracks no file there.
+- Plan 93 deleted every saved run in production on 2026-11-22, and with them the old
+  bundles, the release `31da6f43…` included. It kept 6 runtime bundles.
+- Four engine releases followed in 5 days. The Portal build now holds 10 runtime
+  bundles (about 292 MB) and 15 execution bundles. Git tracks 8 of the runtime bundles
+  (247 MB) and 13 of the execution bundles; R2 holds the others.
+- Each engine release adds about 33 MB to the tree and about 9 MB to the packed git
+  history.
+- CI has a read-only R2 key since Plan 92. The reason for option (b) of D1 is gone.
 
 ### Step 10 — The agent runs a schedule with no open browser (F26)
 
@@ -557,7 +633,8 @@ a tier and a measured time.
 
 ### Step 15 — Recipe appliance physics (F12, F28, F29)
 
-Parts 15B and 15C wait for D5. D3 stays.
+Parts 15B and 15C followed the recommendation of D5. They are on `dev` since
+2026-11-28 (PR 8, [evidence](evidence/refactor-16/step-15.md)). D3 stays.
 
 - **15A.** Remove the hidden state of F29, so that a compiled engine scenario does
   not depend on `setScheduleSpatialLayout`. This part needs no decision.
@@ -577,6 +654,14 @@ journey shows an appliance report for a recipe that a person edited on the canva
 ### Step 16 — Builders as data (F9, F30)
 
 Do this step when the next appliances are due.
+
+State on `dev`, 2026-11-28: the appliance fleet work of 2026-11-23 did a part of this
+step. `appliance_physics_kit.py` and `appliance_surface_kit.py` are the shared
+library, and 38 of the 68 `build_*.py` files import them. `write_xml` is in 4 files
+and `strip_visual_meshes` is in 1. 12 scripts still fix the Blender path (10 of them in this
+folder), and none reads a `BLENDER` variable. The folder has 107 Python files and 84,975 lines. The
+rest: the other 30 builders, the Blender path and one description file for each
+appliance.
 
 - The 51 scripts read the Blender path from one shared module, with the variable
   `BLENDER` and the present path as its default.
@@ -620,6 +705,10 @@ simulator. Each Rust step is one engine release.
     about 530 MB, but each rebuild still adds about 29 MB to the history.
   - (c) No change. Step 9 then does only parts 9A and 9C.
   - Default with no answer: (b).
+  - 2026-11-28: CI has a read-only R2 key since Plan 92. A fourth option exists:
+    (d) all bundles in the private bucket, through `repo-binaries.json`, with no
+    public address and no new secret. It is the recommendation now. Cost: about 0.5
+    day. The deploy guard and the fetch exist (step 9B).
 - **D2. Substeps for models of 0.5 ms and 1 ms** (the open decision of Plan 70A).
   - Recommendation: admit a whole number of substeps, with events and checkpoints
     on the 2 ms tick. The station cells already step in this way. Cost: 0.5 day for
@@ -633,13 +722,25 @@ simulator. Each Rust step is one engine release.
 - **D4. Saved runs (step 8).** Recommendation: a continued run plays its inputs again
   on the present engine. Cost: an old run can change after an engine release.
   Default with no answer: the rule of Plan 70B stays, and D1 decides where the
-  bundles live.
+  bundles live. **Accepted by the owner on 2026-11-28.**
 - **D5. Recipe appliance physics (step 15).** Recommendation: show its report in the
   Portal run view, and let a failed check mark its task as at risk. Estimate: 3
   days. The other choice is to stop work on it. Default with no answer: parts 15B and
-  15C hold.
+  15C hold. **Closed on 2026-11-28:** parts 15B and 15C are on `dev` (PR 8).
 - **D6. Server runs for the agent (step 10).** Recommendation: yes, after step 4.
   Default with no answer: no.
+- **D7. Saved espresso rehearsals (part 8B).** A rehearsal save on the Linea or Eagle
+  page continues only on the runtime bundle that made it. It holds one checkpoint and
+  no command history. This rule keeps one runtime bundle (about 33 MB) for each engine
+  release, after step 8.
+  - Recommendation: keep the runtime of the present pin and of the last release only.
+    An older rehearsal save does not continue, and the page says that a new rehearsal
+    is necessary. A rehearsal is a few minutes of work. Cost: 0.5 day.
+  - The other choice: a rehearsal save also holds its commands, and an older one runs
+    again. Cost: about 2 days, and the saves of today still do not continue.
+  - Default with no answer: the rule stays, and the store grows.
+  - **Accepted by the owner on 2026-11-28:** the recommendation. The work is in part
+    8B, because no bundle goes before that part.
 
 ## Behavior changes
 
@@ -653,8 +754,14 @@ simulator. Each Rust step is one engine release.
 - **Step 6 (6E):** an operation fails after a fixed count of steps, not after 120
   seconds of real time.
 - **Step 7:** an operation over a limit warns or fails.
-- **Step 8:** "Continue" runs the inputs again on the present engine. A continued
-  run can differ from its old recording, and the Portal says so.
+- **Step 8:** "Continue" runs the inputs of a save of another engine build again on
+  the present engine. A continued run can differ from its old recording, and the
+  Portal says so. The 3D recording of such a save shows the new run. A route that
+  another build authored runs on the present engine. The server accepts a staged run
+  with no engine file. The Portal client starts no old bundle.
+- **Step 8 (8B, by D7):** a saved espresso rehearsal continues only on the engine of
+  the present pin or of the last release. For an older save, the page says that a new
+  rehearsal is necessary.
 - **Step 9 (9A):** a new bundle holds no local path.
 - **Step 10:** the agent runs a schedule with no open page. A task with no stored
   summary is marked as not verified.
@@ -686,9 +793,10 @@ Every other change is a move.
 
 ## Not checked
 
-- The CI job was not run. The two faults of F4 come from the workflow file and the
-  repository tree.
-- The count of saved runs in production.
+- The CI job was not run before step 1. The two faults of F4 come from the workflow
+  file and the repository tree. The job passed on `dev` on 2026-11-27.
+- The count of saved runs in production. Plan 93 deleted every saved run on
+  2026-11-22; the count since that date was not read.
 - The line ranges of F10 and F11 and the count of checkpoint shapes come from the
   review. Only the two step loops of F10 were read again.
 - No timing is a reference measurement. This refactor measured no timing of its own.

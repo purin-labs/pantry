@@ -3,6 +3,9 @@ import { collectingExecutionHost } from "./collecting-execution-host.mjs";
 // and each arm return runs from the failed physical state. Two fresh processes
 // continue saves taken during handling and return. Their final state must equal
 // the uninterrupted run, including the native checkpoint and material totals.
+// The inputs of the continued run then play again in one fresh host
+// (Refactor 16, step 8): each recovery waits for its failure, each pause that
+// a fresh host continued from is released, and the run ends in the same state.
 import assert from "node:assert/strict";
 import { execFileSync, spawn } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -534,6 +537,37 @@ function isOpenOrder(order) {
 function hasUnresolvedContents(stock) {
   return stock.product === "portioned-tray" && stock.remaining === 1;
 }
+/** The inputs of a saved run, played again in one fresh host. */
+async function replayed(document) {
+  const host = await createHost("replayed");
+  try {
+    let turn = await reply(
+      host,
+      {
+        kind: "begin",
+        bundle,
+        cells: [native],
+        identity: identity(9, {
+          snapshot: document.snapshot,
+          execution: document.state.identity.executionId,
+        }),
+        origin: { kind: "replay", document },
+      },
+      "began",
+    );
+    for (let calls = 0; turn.replay.state === "replaying"; calls += 1) {
+      assert.ok(calls < 10_000, "The replay exceeded its host-call cap");
+      turn = await reply(
+        host,
+        { kind: "drive", turns: 1000, until: 240_000_000 },
+        "drove",
+      );
+    }
+    return { report: turn.replay, state: await runState(host) };
+  } finally {
+    await host.physics.destroy();
+  }
+}
 function domainEvents(state) {
   const result = [];
   for (const { sequence, execution, ...event } of state.events)
@@ -554,6 +588,25 @@ for (const key of [
   "status",
 ])
   assert.deepEqual(continued[key], reference[key], key);
+const replay = await replayed(
+  JSON.parse(readFileSync(join(output, "continued-final-save.json"), "utf8")),
+);
+assert.equal(replay.report.commands, 4, "Two recoveries and two pauses");
+assert.equal(replay.report.applied, 4);
+assert.deepEqual(replay.report.refused, []);
+assert.equal(replay.report.difference, null);
+assert.deepEqual(domainEvents(replay.state), domainEvents(reference));
+for (const key of [
+  "tasks",
+  "instances",
+  "carriers",
+  "lots",
+  "resources",
+  "storages",
+  "cells",
+  "status",
+])
+  assert.deepEqual(replay.state[key], reference[key], `replayed ${key}`);
 save("acceptance.json", {
   verdict: "passed",
   backend,
@@ -563,11 +616,12 @@ save("acceptance.json", {
   freshHosts: 2,
   rejectedTrays: 2,
   automaticRetries: 0,
+  replay: replay.report,
   checkpoint: reference.cells[0].committed.checkpoint,
   domainEvents: domainEvents(reference).length,
   reproduction: `node scripts/production-simulation/verify-recovery-journey.mjs NEW_OUTPUT_DIRECTORY`,
   runtime: runtime ?? null,
 });
 console.log(
-  `Recovery journey passed (${backend}): two failed orders, two recoveries, two fresh hosts. Artifact: ${output}`,
+  `Recovery journey passed (${backend}): two failed orders, two recoveries, two fresh hosts, one replay. Artifact: ${output}`,
 );

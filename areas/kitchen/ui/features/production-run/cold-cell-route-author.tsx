@@ -128,7 +128,7 @@ export class ColdCellRouteAuthor extends React.Component<Props, State> {
     });
     let worker: ExecutionWorker | null = null;
     try {
-      const opened = await openExecutionWorker(null);
+      const opened = await openExecutionWorker();
       if (!opened.ok)
         throw new Error(`Cannot prepare the route: ${opened.error.code}.`);
       worker = opened.value;
@@ -144,7 +144,6 @@ export class ColdCellRouteAuthor extends React.Component<Props, State> {
           name: selected.label,
           scenario,
           cells: [source, receiving],
-          bundle: worker.manifest.bundle,
         });
     } catch (error) {
       if (this.mounted)

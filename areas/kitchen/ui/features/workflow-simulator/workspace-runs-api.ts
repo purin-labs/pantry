@@ -34,8 +34,7 @@ import {
 } from "@purin-labs/production-simulation/runs/oven-run-file";
 import { RunArtifactFile } from "@purin-labs/production-simulation/runs/run-artifact-file";
 import {
-  openResumable,
-  parseExecutionBundle,
+  openSaved,
   type ResumableDocument,
 } from "@purin-labs/production-simulation";
 import type { StrictUnion, Variant } from "@purin-labs/type-utils";
@@ -445,10 +444,7 @@ export async function parsePersistentSnapshot(
     if (!opened.ok) throw new Error(opened.error);
     return { kind: "embedded", source: opened.value };
   }
-  const bundle = parseExecutionBundle(raw.document.bundle);
-  if (bundle === null)
-    throw new Error("The saved production bundle is invalid.");
-  const document = await openResumable(raw.document, bundle.backend, [bundle]);
+  const document = await openSaved(raw.document);
   if (!document.ok)
     throw new Error("The saved production document is invalid.");
   return { kind: "artifacts", document: document.value };
