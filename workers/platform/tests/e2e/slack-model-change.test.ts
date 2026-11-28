@@ -1,5 +1,5 @@
 import { runInDurableObject } from "cloudflare:test";
-import { env, exports } from "cloudflare:workers";
+import { env } from "cloudflare:workers";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
@@ -12,8 +12,7 @@ import {
   ROOT_TS,
   installSlackActorFixture,
   openRouterText,
-  signedSlackRequest,
-  slackEnvelope,
+  postMention,
   slackSimulator,
   threadAndText,
 } from "./slack-journey-support";
@@ -215,24 +214,13 @@ async function removedModelJourney(test: TestContext): Promise<void> {
   });
 }
 
-async function mention(
+function mention(
   eventId: string,
   messageTs: string,
   threadTs: string,
   text: string,
 ): Promise<void> {
-  const response = await exports.default.fetch(
-    await signedSlackRequest(
-      slackEnvelope({
-        eventType: "app_mention",
-        eventId,
-        messageTs,
-        threadTs,
-        text: `<@U0PANTRY> ${text}`,
-      }),
-    ),
-  );
-  expect(response.status).toBe(200);
+  return postMention(eventId, messageTs, text, threadTs);
 }
 
 async function replyToModel(

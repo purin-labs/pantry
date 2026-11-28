@@ -1530,11 +1530,15 @@ export function threadAndText(post: Record<string, string>): {
   return { thread: post.thread_ts, text: post.text };
 }
 
-/** Slack sends a mention that starts the thread at `ts`. */
+/**
+ * Slack sends a mention at `ts`. It starts the thread there, or it is a
+ * reply in the thread of `threadTs`.
+ */
 export async function postMention(
   eventId: string,
   ts: string,
   question: string,
+  threadTs: string = ts,
 ): Promise<void> {
   const response = await exports.default.fetch(
     await signedSlackRequest(
@@ -1542,7 +1546,7 @@ export async function postMention(
         eventType: "app_mention",
         eventId,
         messageTs: ts,
-        threadTs: ts,
+        threadTs,
         text: `<@U0PANTRY> ${question}`,
       }),
     ),

@@ -1,5 +1,4 @@
 import { exports } from "cloudflare:workers";
-import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
@@ -14,8 +13,11 @@ import {
   sendMessage,
 } from "./chat-model-choice-support";
 import { commerceHeaders } from "./commerce-support";
-import { MODEL_EXIT_EGRESS_HEADER } from "./model-exit-network";
-import { network } from "./network";
+import {
+  FakeGemini,
+  type GeminiAnswer,
+  type GeminiRequest,
+} from "./gemini-support";
 import { fixtureDatabase } from "./organisation-database";
 import { ORGANISATION_ID, SLACK_ACTOR_USER_ID } from "./slack-journey-support";
 import { requireOrganisationId, requireUserId } from "../test-ids";
@@ -45,11 +47,6 @@ const CARBON_CHAT = "conv_7b2e4d3f-0c5e-4f8b-9d6a-2e3f4a5b6c02";
 const UNOFFERED_CHAT = "conv_8c3f5e4a-1d6f-4a9c-8e7b-3f4a5b6c7d03";
 const SIGNATURE = "c2lnbmF0dXJlLWNhcmJvbi10b29sLWNhbGwtMQ==";
 const REPLY = "Twelve croissants are left for this afternoon.";
-
-type GeminiRequest = Readonly<{
-  model: string;
-  body: Record<string, unknown>;
-}>;
 
 async function geminiKeyJourney(test: TestContext): Promise<void> {
   const { session } = await preparePortalChatJourney();
@@ -165,8 +162,6 @@ async function geminiKeyJourney(test: TestContext): Promise<void> {
   });
 }
 
-type GeminiAnswer = (request: GeminiRequest) => readonly unknown[];
-
 function textAnswer(text: string): GeminiAnswer {
   return () => [{ text: JSON.stringify({ kind: "reply", text }) }];
 }
@@ -182,80 +177,6 @@ function toolSearchAnswer(request: GeminiRequest): readonly unknown[] {
       thoughtSignature: SIGNATURE,
     },
   ];
-}
-
-/**
- * A fake Gemini API for the organisation's own key. It records each request
- * and answers with the next prepared answer. Like the Gemini API, it refuses
- * a key that it did not issue, and it refuses each request that did not leave
- * through the model exit Worker: the Gemini API refuses Hong Kong.
- */
-class FakeGemini {
-  readonly requests: GeminiRequest[] = [];
-  readonly answers: GeminiAnswer[] = [];
-
-  constructor(readonly apiKey: string) {}
-
-  install(): void {
-    network.use(
-      http.post(
-        /^https:\/\/generativelanguage\.googleapis\.com\/v1beta\/models\/[^/]+$/,
-        this.respond.bind(this),
-      ),
-    );
-  }
-
-  private async respond({
-    request,
-  }: Parameters<HttpResponseResolver>[0]): Promise<Response> {
-    if (!request.headers.has(MODEL_EXIT_EGRESS_HEADER))
-      return geminiError(
-        400,
-        "FAILED_PRECONDITION",
-        "User location is not supported for the API use.",
-      );
-    if (request.headers.get("x-goog-api-key") !== this.apiKey)
-      return geminiError(400, "INVALID_ARGUMENT", "API key not valid.");
-    const action = new URL(request.url).pathname.split("/").at(-1) ?? "";
-    const [model, method] = action.split(":");
-    if (method !== "streamGenerateContent" || model === undefined)
-      throw new Error(`Unexpected Gemini call ${action}`);
-    const body: unknown = await request.json();
-    if (!isRecord(body)) throw new Error("Gemini request body is invalid");
-    const recorded = { model, body };
-    this.requests.push(recorded);
-    const answer = this.answers.shift();
-    if (answer === undefined) throw new Error("No Gemini answer is prepared");
-    const chunk = {
-      candidates: [
-        {
-          content: { role: "model", parts: answer(recorded) },
-          finishReason: "STOP",
-          index: 0,
-        },
-      ],
-      usageMetadata: {
-        promptTokenCount: 40,
-        candidatesTokenCount: 6,
-        totalTokenCount: 46,
-      },
-      modelVersion: model,
-    };
-    return new HttpResponse(`data: ${JSON.stringify(chunk)}\r\n\r\n`, {
-      headers: { "content-type": "text/event-stream" },
-    });
-  }
-}
-
-function geminiError(
-  status: number,
-  reason: string,
-  message: string,
-): Response {
-  return HttpResponse.json(
-    { error: { code: status, message, status: reason } },
-    { status },
-  );
 }
 
 function modelOf(request: GeminiRequest | undefined): string | undefined {
