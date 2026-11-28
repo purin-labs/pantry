@@ -47,6 +47,7 @@ export function OvenTaskViews(props: Props): React.ReactNode {
     horizon: props.horizon,
     selected: props.selected,
     select: props.select,
+    ...(props.atRisk !== undefined ? { atRisk: props.atRisk } : {}),
   };
   const selected = props.view.tasks.find(
     selectedTask.bind(null, props.selected),
@@ -85,7 +86,10 @@ export function OvenTaskViews(props: Props): React.ReactNode {
       )}
       {props.mode === "workflow" && selected !== undefined && (
         <>
-          <SelectedOvenTask task={selected} />
+          <SelectedOvenTask
+            task={selected}
+            risk={props.atRisk?.get(selected.id)}
+          />
           {selectedPrerequisites(available, selected)}
         </>
       )}
@@ -224,6 +228,7 @@ function graphEdge(
 
 function graphCard(props: AvailableProps, node: GraphNode): React.ReactNode {
   const { task } = node;
+  const risk = props.atRisk?.get(task.id);
   const prerequisites: string[] = [];
   for (const dependency of props.view.dependencies ?? [])
     if (dependency.task === task.id)
@@ -234,9 +239,10 @@ function graphCard(props: AvailableProps, node: GraphNode): React.ReactNode {
       className="oven-task-card"
       data-graph-task={task.id}
       data-kind={task.kind}
+      data-at-risk={risk !== undefined ? "true" : undefined}
       aria-pressed={props.selected === task.id}
-      aria-label={`${task.id}: ${task.kind}. Prerequisites: ${prerequisites.join(", ") || "none"}.`}
-      title={`${task.id}\n${taskTime(task)}\nPrerequisites: ${prerequisites.join(", ") || "none"}`}
+      aria-label={`${task.id}: ${task.kind}${risk !== undefined ? `, at risk (${risk.reason})` : ""}. Prerequisites: ${prerequisites.join(", ") || "none"}.`}
+      title={`${task.id}\n${taskTime(task)}${risk !== undefined ? `\nAt risk (${risk.appliance}): ${risk.reason}` : ""}\nPrerequisites: ${prerequisites.join(", ") || "none"}`}
       onClick={props.select.bind(null, task.id)}
       style={{
         left: node.rank * COLUMN,
@@ -253,7 +259,17 @@ function graphCard(props: AvailableProps, node: GraphNode): React.ReactNode {
       <strong>
         {task.subject.kind === "workflow" ? task.subject.key : "Changeover"}
       </strong>
-      <span>{task.kind}</span>
+      <span>
+        {task.kind}
+        {risk !== undefined && (
+          <>
+            {" "}
+            <span className="appliance-risk-badge" data-risk="at-risk">
+              At risk
+            </span>
+          </>
+        )}
+      </span>
     </button>
   );
 }
@@ -301,19 +317,31 @@ export function taskSpans(task: TaskView, time: number): readonly Span[] {
 }
 
 function timelineRow(props: AvailableProps, task: TaskView): React.ReactNode {
+  const risk = props.atRisk?.get(task.id);
   return (
     <div
       key={task.id}
       className="oven-task-track"
       data-timeline-task={task.id}
       data-kind={task.kind}
+      data-at-risk={risk !== undefined ? "true" : undefined}
     >
       <button
         aria-pressed={props.selected === task.id}
-        title={task.id}
+        title={
+          risk !== undefined ? `${task.id} — At risk: ${risk.reason}` : task.id
+        }
         onClick={props.select.bind(null, task.id)}
       >
         {task.id}
+        {risk !== undefined && (
+          <>
+            {" "}
+            <span className="appliance-risk-badge" data-risk="at-risk">
+              At risk
+            </span>
+          </>
+        )}
       </button>
       <div className="oven-task-lane">
         {taskSpans(task, props.time).map(timelineSpan.bind(null, props, task))}

@@ -29,10 +29,7 @@ import {
   bottleEveryBatch,
   compileBlackSesameRecipe,
 } from "./black-sesame.ts";
-import {
-  compileEspressoShiftWorkflow,
-  espressoApplianceTask,
-} from "./espresso.ts";
+import { compileEspressoShiftWorkflow } from "./espresso.ts";
 import {
   compileFinancierRecipe,
   financierRecipeInput,
@@ -45,10 +42,7 @@ import {
   compileGingerMilkTeaRecipe,
   gingerMilkTeaRecipeInput,
 } from "./ginger-milk-tea.ts";
-import {
-  compilePourOverShiftWorkflow,
-  pourOverApplianceTask,
-} from "./pour-over.ts";
+import { compilePourOverShiftWorkflow } from "./pour-over.ts";
 import { sharedRecipeRecords } from "./shared-records.ts";
 import { FINANCIER_FLAVOURS } from "./financier-flavours.ts";
 import { compilePieRecipe, pieRecipeInput } from "./pie.ts";
@@ -1524,85 +1518,4 @@ export async function compileBakeryShift(
   }
 }
 
-import {
-  defaultMorningShiftFaultInjections,
-  executeRecipeApplianceTasks,
-  extractScheduledTasks,
-  type ApplianceFaultInjectionSpec,
-  type ApplianceWasmRuntimeSource,
-  type RecipeApplianceExecutionOptions,
-  type RecipeApplianceExecutionReport,
-  type RecipeApplianceTaskBinding,
-  type ScheduledTaskDescriptor,
-  type ScheduledTaskSource,
-} from "./appliance-execution.ts";
-import { blackSesameApplianceTask } from "./black-sesame-milk.ts";
-import { financierApplianceTask } from "./financier.ts";
-import { pieApplianceTask } from "./pie.ts";
-import { teaApplianceTask } from "./tea.ts";
 import type { Variant } from "@purin-labs/type-utils";
-
-export function morningShiftApplianceTask(
-  task: ScheduledTaskDescriptor,
-  espressoAppliance: "linea" | "eagle-one" = "linea",
-): RecipeApplianceTaskBinding | null {
-  return (
-    financierApplianceTask(task) ??
-    pieApplianceTask(task) ??
-    blackSesameApplianceTask(task) ??
-    teaApplianceTask(task) ??
-    espressoApplianceTask(task, espressoAppliance) ??
-    pourOverApplianceTask(task)
-  );
-}
-
-function morningShiftApplianceTasks(
-  source: ScheduledTaskSource,
-  espressoAppliance: "linea" | "eagle-one" = "linea",
-): readonly RecipeApplianceTaskBinding[] {
-  const bindings: RecipeApplianceTaskBinding[] = [];
-  for (const task of extractScheduledTasks(source)) {
-    const bound = morningShiftApplianceTask(task, espressoAppliance);
-    if (bound !== null) bindings.push(bound);
-  }
-  return bindings;
-}
-
-export async function executeMorningShiftApplianceTasks(
-  source: ScheduledTaskSource,
-  runtime: ApplianceWasmRuntimeSource,
-  options: RecipeApplianceExecutionOptions & {
-    espressoAppliance?: "linea" | "eagle-one";
-  } = {},
-): Promise<RecipeApplianceExecutionReport> {
-  return executeRecipeApplianceTasks(
-    morningShiftApplianceTasks(source, options.espressoAppliance ?? "linea"),
-    runtime,
-    {
-      runId: options.runId ?? "morning-shift-appliance-wasm",
-      scheduledTasks: options.scheduledTasks ?? extractScheduledTasks(source),
-      ...options,
-    },
-  );
-}
-
-export async function executeMorningShiftApplianceFaultRestoreJourney(
-  source: ScheduledTaskSource,
-  runtime: ApplianceWasmRuntimeSource,
-  options: Omit<RecipeApplianceExecutionOptions, "faultInjections"> & {
-    espressoAppliance?: "linea" | "eagle-one";
-    faultInjections?: ReadonlyMap<string, ApplianceFaultInjectionSpec>;
-  } = {},
-): Promise<RecipeApplianceExecutionReport> {
-  return executeRecipeApplianceTasks(
-    morningShiftApplianceTasks(source, options.espressoAppliance ?? "linea"),
-    runtime,
-    {
-      runId: options.runId ?? "morning-shift-appliance-fault-restore",
-      faultInjections:
-        options.faultInjections ?? defaultMorningShiftFaultInjections(),
-      scheduledTasks: options.scheduledTasks ?? extractScheduledTasks(source),
-      ...options,
-    },
-  );
-}

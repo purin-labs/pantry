@@ -20,16 +20,7 @@ import {
   modelTimestep,
   timeFromSeconds,
 } from "../../time.ts";
-import {
-  batchSpec,
-  dishwasherActions,
-  grindActions,
-  hobTemperatureActions,
-  taskMaterialMassKg,
-  weighActions,
-  type RecipeApplianceTaskBinding,
-  type ScheduledTaskDescriptor,
-} from "./appliance-execution.ts";
+import type { ApplianceTaskRow } from "./appliance-execution.ts";
 import { claim, count, input as lotInput, mass, pool } from "./tea-process.ts";
 
 /**
@@ -645,107 +636,77 @@ export async function compilePourOverShiftWorkflow(
   };
 }
 
-export function pourOverApplianceTask(
-  task: ScheduledTaskDescriptor,
-): RecipeApplianceTaskBinding | null {
-  if (task.workflowId !== "pour-over-brew") return null;
-  const key = task.taskKey;
+const POUR_OVER_WORKFLOWS = { exact: ["pour-over-brew"] } as const;
 
-  if (key === "weigh-pour-over-beans") {
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, 0.027),
-      20,
-      1500,
-      0.5,
-      0.05,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "weigh",
-      appliance: "ohaus-ranger-3000",
-      label: "Weigh 27 g Blue Bottle pour-over dose",
-      batch,
-      buildActions: () => weighActions(batch),
-    };
-  }
-
-  if (key === "grind-pour-over-dose") {
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, 0.027),
-      22,
-      1500,
-      0.5,
-      25,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "grinder",
-      appliance: "waring-wsg60",
-      label: "Grind 27 g pour-over coffee dose",
-      batch,
-      buildActions: () => grindActions(batch, 3),
-    };
-  }
-
-  if (key === "heat-pour-over-water") {
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, 0.35),
-      20,
-      4180,
-      1.0,
-      0.02,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "hob",
-      appliance: "vollrath-59500p",
-      label: "Heat 350 g gooseneck kettle water on induction hob",
-      batch,
-      buildActions: () => hobTemperatureActions(batch, 90, 5),
-    };
-  }
-
-  if (key === "serve-pour-over-and-rinse") {
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      0.3,
-      26,
-      950,
-      1.2,
-      0.02,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "dishwasher",
-      appliance: "winterhalter-uc-l",
-      label: "Rinse pour-over server and dripper",
-      batch,
-      buildActions: () => dishwasherActions(batch, 6),
-    };
-  }
-
-  return null;
-}
+/** Declarative MuJoCo appliance task rows for pour-over workflows. */
+export const POUR_OVER_APPLIANCE_ROWS: readonly ApplianceTaskRow[] = [
+  {
+    recipe: "pour-over",
+    taskKind: "weigh",
+    workflows: POUR_OVER_WORKFLOWS,
+    keys: { exact: ["weigh-pour-over-beans"] },
+    category: "weigh",
+    appliance: "ohaus-ranger-3000",
+    label: "Weigh 27 g Blue Bottle pour-over dose",
+    batch: {
+      massKg: 0.027,
+      temperatureC: 20,
+      specificHeat: 1500,
+      densityKgL: 0.5,
+      resistance: 0.05,
+    },
+    action: { kind: "weigh" },
+  },
+  {
+    recipe: "pour-over",
+    taskKind: "grind",
+    workflows: POUR_OVER_WORKFLOWS,
+    keys: { exact: ["grind-pour-over-dose"] },
+    category: "grinder",
+    appliance: "waring-wsg60",
+    label: "Grind 27 g pour-over coffee dose",
+    batch: {
+      massKg: 0.027,
+      temperatureC: 22,
+      specificHeat: 1500,
+      densityKgL: 0.5,
+      resistance: 25,
+    },
+    action: { kind: "grind", durationSeconds: 3 },
+  },
+  {
+    recipe: "pour-over",
+    taskKind: "hob-temperature",
+    workflows: POUR_OVER_WORKFLOWS,
+    keys: { exact: ["heat-pour-over-water"] },
+    category: "hob",
+    appliance: "vollrath-59500p",
+    label: "Heat 350 g gooseneck kettle water on induction hob",
+    batch: {
+      massKg: 0.35,
+      temperatureC: 20,
+      specificHeat: 4180,
+      densityKgL: 1.0,
+      resistance: 0.02,
+    },
+    action: { kind: "hob-temperature", targetC: 90, durationSeconds: 5 },
+  },
+  {
+    recipe: "pour-over",
+    taskKind: "dishwasher",
+    workflows: POUR_OVER_WORKFLOWS,
+    keys: { exact: ["serve-pour-over-and-rinse"] },
+    category: "dishwasher",
+    appliance: "winterhalter-uc-l",
+    label: "Rinse pour-over server and dripper",
+    batch: {
+      massKg: 0.3,
+      massSource: "fixed",
+      temperatureC: 26,
+      specificHeat: 950,
+      densityKgL: 1.2,
+      resistance: 0.02,
+    },
+    action: { kind: "dishwasher", durationSeconds: 6 },
+  },
+];

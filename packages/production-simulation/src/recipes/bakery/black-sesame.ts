@@ -558,7 +558,12 @@ function batchTasks(
         [],
         [
           acquire("cold-carrier", "clean-cold-carrier"),
-          move("cold-carrier", "clean-cold-carrier", "cold-staging-table", t.return),
+          move(
+            "cold-carrier",
+            "clean-cold-carrier",
+            "cold-staging-table",
+            t.return,
+          ),
         ],
       ),
       {
@@ -597,7 +602,12 @@ function batchTasks(
         [],
         [],
         [
-          move("cold-carrier", "cold-staging-rack", "refrigerator-shelf", t.return),
+          move(
+            "cold-carrier",
+            "cold-staging-rack",
+            "refrigerator-shelf",
+            t.return,
+          ),
         ],
       ),
     );
@@ -639,7 +649,12 @@ function batchTasks(
   }
   if (cell !== null) {
     returning.push(
-      move("cold-carrier", "refrigerator-shelf", "clean-cold-carrier", t.return),
+      move(
+        "cold-carrier",
+        "refrigerator-shelf",
+        "clean-cold-carrier",
+        t.return,
+      ),
       release("cold-carrier"),
     );
   }

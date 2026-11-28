@@ -20,29 +20,9 @@ import {
   timeFromSeconds,
   ZERO_DURATION,
 } from "../../time.ts";
-import {
-  batchSpec,
-  chillerActions,
-  dishwasherActions,
-  hobPowerActions,
-  hobTemperatureActions,
-  ovenBakeActions,
-  pastryDrapeActions,
-  pastryPressDoughActions,
-  pastrySheetActions,
-  planetaryMixActions,
-  taskMaterialMassKg,
-  weighActions,
-  type RecipeApplianceTaskBinding,
-  type ScheduledTaskDescriptor,
-} from "./appliance-execution.ts";
+import type { ApplianceTaskRow } from "./appliance-execution.ts";
 
-import {
-  PIE_PRODUCTS,
-  PIE_TYPES,
-  pieTypeOf,
-  type PieType,
-} from "./pie-products.ts";
+import { PIE_TYPES, type PieType } from "./pie-products.ts";
 
 export { PIE_PRODUCTS } from "./pie-products.ts";
 export type { PieType } from "./pie-products.ts";
@@ -1478,235 +1458,263 @@ export function pieRecipeInput(options: PieRecipeOptions = {}) {
   };
 }
 
-function isPieWorkflow(workflowId: string): boolean {
-  return (
-    workflowId === "shortcrust" ||
-    workflowId.endsWith("-filling") ||
-    workflowId.endsWith("-pies")
-  );
-}
-
-function binding(
-  task: ScheduledTaskDescriptor,
-  category: RecipeApplianceTaskBinding["category"],
-  appliance: RecipeApplianceTaskBinding["appliance"],
-  label: string,
-  batch: RecipeApplianceTaskBinding["batch"],
-  buildActions: RecipeApplianceTaskBinding["buildActions"],
-): RecipeApplianceTaskBinding {
-  return {
-    taskId: task.taskId,
-    instanceId: task.instanceId,
-    workflowId: task.workflowId,
-    taskKey: task.taskKey,
-    startedAtUs: task.startedAtUs,
-    completedAtUs: task.completedAtUs,
-    category,
-    appliance,
-    label,
-    batch,
-    buildActions,
-  };
-}
+const PIE_WORKFLOWS = {
+  exact: ["shortcrust"],
+  suffixes: ["-filling", "-pies"],
+} as const;
 
 /**
- * Binds the pie steps to the MuJoCo appliance models: the Ohaus scale, the
- * HL200 with its beater, the Vollrath induction hob with the induction pan,
- * the Hoshizaki refrigerator, the MuJoCo 4.0.0 deformable pastry bench, the
- * MBCO-5E convection oven and the Winterhalter warewasher.
+ * Declarative MuJoCo appliance task rows for savoury pie workflows:
+ * scale, HL200 mixer, Vollrath induction hob, Hoshizaki chiller,
+ * deformable pastry bench, MBCO-5E oven, and Winterhalter warewasher.
  */
-export function pieApplianceTask(
-  task: ScheduledTaskDescriptor,
-): RecipeApplianceTaskBinding | null {
-  if (!isPieWorkflow(task.workflowId)) return null;
-  const key = task.taskKey;
-  const id = `${task.instanceId}-${key}`;
-  const pie = pieTypeOf(task.workflowId);
-  const product = pie === null ? "Pie shortcrust" : PIE_PRODUCTS[pie].title;
-  if (key === "wrap-and-chill-shortcrust") {
-    const batch = batchSpec(
-      id,
-      taskMaterialMassKg(task.definition, 1.32),
-      8,
-      1900,
-      1.15,
-      0.6,
-    );
-    return binding(
-      task,
-      "pastry-bench",
-      "pastry-bench",
-      "Flatten and fold 3D shortcrust dough block on the marble bench",
-      batch,
-      () => pastryPressDoughActions(batch, 21.0, 2.2),
-    );
-  }
-  if (key.startsWith("line-tins")) {
-    const batch = batchSpec(
-      id,
-      taskMaterialMassKg(task.definition, 0.33),
-      8,
-      1900,
-      1.15,
-      0.6,
-    );
-    return binding(
-      task,
-      "pastry-bench",
-      "pastry-bench",
-      `Sheet 3 mm shortcrust and line ${product.toLowerCase()} tins`,
-      batch,
-      () => pastrySheetActions(batch, 3.0, 2.4),
-    );
-  }
-  if (key.startsWith("lid-pies")) {
-    const batch = batchSpec(id, 0.24, 6, 1950, 1.08, 0.5);
-    return binding(
-      task,
-      "pastry-bench",
-      "pastry-bench",
-      `Drape and crimp puff-pastry lids on ${product.toLowerCase()}s`,
-      batch,
-      () => pastryDrapeActions(batch, 42.0, 2.4),
-    );
-  }
-  if (key.startsWith("weigh-")) {
-    const batch = batchSpec(
-      id,
-      taskMaterialMassKg(task.definition, 0.2),
-      6,
-      3200,
-      1.0,
-      0.1,
-    );
-    return binding(
-      task,
-      "weigh",
-      "ohaus-ranger-3000",
-      `${product} ${key}`,
-      batch,
-      () => weighActions(batch),
-    );
-  }
-  if (key === "mix-shortcrust") {
-    // Cold butter rubbed into flour: a stiff batch on the beater's low speed.
-    const batch = batchSpec(
-      id,
-      taskMaterialMassKg(task.definition, 1.32),
-      8,
-      1900,
-      1.15,
-      0.6,
-    );
-    return binding(
-      task,
-      "mixer",
-      "hobart-hl200",
-      "Mix shortcrust with the beater",
-      batch,
-      () => planetaryMixActions(batch, 1, 6),
-    );
-  }
-  if (key === "rest-shortcrust" || key === "chill-filling") {
-    const dough = key === "rest-shortcrust";
-    const batch = batchSpec(
-      id,
-      // The resting task holds no lot: the dough for twelve bases, or the
-      // filling from one braising pan.
-      dough
-        ? (SHELL_MG * 12) / 1_000_000
-        : (FILLING_MG * PIES_PER_TRAY) / 1_000_000,
-      dough ? 12 : 70,
-      dough ? 1900 : 3300,
-      dough ? 1.15 : 1.05,
-      0.3,
-    );
-    return binding(
-      task,
-      "chiller",
-      "hoshizaki-rt-120snj",
-      dough
-        ? "Rest shortcrust in the refrigerator"
-        : `Chill the ${product.toLowerCase()} filling`,
-      batch,
-      () => chillerActions(batch, dough ? 8 : 12),
-    );
-  }
-  if (
-    key === "sear-beef" ||
-    key === "braise-filling" ||
-    key === "reduce-filling"
-  ) {
-    const batch = batchSpec(
-      id,
-      taskMaterialMassKg(task.definition, 1.6),
-      key === "sear-beef" ? 6 : 80,
-      3300,
-      1.05,
-      key === "sear-beef" ? 0.4 : 0.25,
-    );
-    return binding(
-      task,
-      "hob",
-      "vollrath-59500p",
-      key === "sear-beef"
-        ? `Sear beef for the ${product.toLowerCase()}`
-        : key === "braise-filling"
-          ? `Braise the ${product.toLowerCase()} filling in the induction pan`
-          : `Reduce the ${product.toLowerCase()} filling`,
-      batch,
-      () =>
-        key === "braise-filling"
-          ? hobTemperatureActions(batch, 90, 20)
-          : hobPowerActions(batch, key === "sear-beef" ? 85 : 60, 10),
-    );
-  }
-  if (key === "bake-pies") {
-    // The oven model instruments one tray: the bake's mass over its trays.
-    let trays = 0;
-    for (const output of task.definition?.outputs ?? [])
-      if (output.kind === "lot" && output.product === "baked-pie-mass")
-        trays += 1;
-    const batch = batchSpec(
-      id,
-      taskMaterialMassKg(task.definition, 2.58) / Math.max(1, trays),
-      8,
-      2900,
-      0.95,
-      0.3,
-    );
-    // The oven model runs on the same scaled programme as the financier bake;
-    // a 35-minute pie bake is 2.3 times the 15-minute financier bake.
-    return binding(
-      task,
-      "oven",
-      "maruzen-mbco-5e",
-      `Bake ${product.toLowerCase()}s in the convection oven`,
-      batch,
-      (context) => ovenBakeActions(batch, 55, 28, context),
-    );
-  }
-  if (
-    key === "clean-bowl" ||
-    key === "clean-braise-pan" ||
-    key === "wash-pie-trays"
-  ) {
-    const batch = batchSpec(
-      id,
-      key === "wash-pie-trays" ? 0.9 : 0.6,
-      26,
-      1000,
-      1.18,
-      0.02,
-    );
-    return binding(
-      task,
-      "dishwasher",
-      "winterhalter-uc-l",
-      `${product} ${key}`,
-      batch,
-      () => dishwasherActions(batch, 6),
-    );
-  }
-  return null;
-}
+export const PIE_APPLIANCE_ROWS: readonly ApplianceTaskRow[] = [
+  {
+    recipe: "pie",
+    taskKind: "pastry-press",
+    workflows: PIE_WORKFLOWS,
+    keys: { exact: ["wrap-and-chill-shortcrust"] },
+    category: "pastry-bench",
+    appliance: "pastry-bench",
+    label: "Flatten and fold 3D shortcrust dough block on the marble bench",
+    productSource: "pie",
+    batch: {
+      massKg: 1.32,
+      temperatureC: 8,
+      specificHeat: 1900,
+      densityKgL: 1.15,
+      resistance: 0.6,
+    },
+    action: {
+      kind: "pastry-press",
+      targetHeightMm: 21.0,
+      durationSeconds: 2.2,
+    },
+  },
+  {
+    recipe: "pie",
+    taskKind: "pastry-sheet",
+    workflows: PIE_WORKFLOWS,
+    keys: { prefixes: ["line-tins"] },
+    category: "pastry-bench",
+    appliance: "pastry-bench",
+    label: "Sheet 3 mm shortcrust and line {productLower} tins",
+    productSource: "pie",
+    batch: {
+      massKg: 0.33,
+      temperatureC: 8,
+      specificHeat: 1900,
+      densityKgL: 1.15,
+      resistance: 0.6,
+    },
+    action: {
+      kind: "pastry-sheet",
+      targetThicknessMm: 3.0,
+      durationSeconds: 2.4,
+    },
+  },
+  {
+    recipe: "pie",
+    taskKind: "pastry-drape",
+    workflows: PIE_WORKFLOWS,
+    keys: { prefixes: ["lid-pies"] },
+    category: "pastry-bench",
+    appliance: "pastry-bench",
+    label: "Drape and crimp puff-pastry lids on {productLower}s",
+    productSource: "pie",
+    batch: {
+      massKg: 0.24,
+      massSource: "fixed",
+      temperatureC: 6,
+      specificHeat: 1950,
+      densityKgL: 1.08,
+      resistance: 0.5,
+    },
+    action: { kind: "pastry-drape", targetDepthMm: 42.0, durationSeconds: 2.4 },
+  },
+  {
+    recipe: "pie",
+    taskKind: "weigh",
+    workflows: PIE_WORKFLOWS,
+    keys: { prefixes: ["weigh-"] },
+    category: "weigh",
+    appliance: "ohaus-ranger-3000",
+    label: "{product} {key}",
+    productSource: "pie",
+    batch: {
+      massKg: 0.2,
+      temperatureC: 6,
+      specificHeat: 3200,
+      densityKgL: 1.0,
+      resistance: 0.1,
+    },
+    action: { kind: "weigh" },
+  },
+  {
+    recipe: "pie",
+    taskKind: "planetary-mix",
+    workflows: PIE_WORKFLOWS,
+    keys: { exact: ["mix-shortcrust"] },
+    category: "mixer",
+    appliance: "hobart-hl200",
+    label: "Mix shortcrust with the beater",
+    productSource: "pie",
+    batch: {
+      massKg: 1.32,
+      temperatureC: 8,
+      specificHeat: 1900,
+      densityKgL: 1.15,
+      resistance: 0.6,
+    },
+    action: { kind: "planetary-mix", setting: 1, durationSeconds: 6 },
+  },
+  {
+    recipe: "pie",
+    taskKind: "chiller",
+    workflows: PIE_WORKFLOWS,
+    keys: { exact: ["rest-shortcrust"] },
+    category: "chiller",
+    appliance: "hoshizaki-rt-120snj",
+    label: "Rest shortcrust in the refrigerator",
+    productSource: "pie",
+    batch: {
+      massKg: (SHELL_MG * 12) / 1_000_000,
+      massSource: "fixed",
+      temperatureC: 12,
+      specificHeat: 1900,
+      densityKgL: 1.15,
+      resistance: 0.3,
+    },
+    action: { kind: "chiller", durationSeconds: 8 },
+  },
+  {
+    recipe: "pie",
+    taskKind: "chiller",
+    workflows: PIE_WORKFLOWS,
+    keys: { exact: ["chill-filling"] },
+    category: "chiller",
+    appliance: "hoshizaki-rt-120snj",
+    label: "Chill the {productLower} filling",
+    productSource: "pie",
+    batch: {
+      massKg: (FILLING_MG * PIES_PER_TRAY) / 1_000_000,
+      massSource: "fixed",
+      temperatureC: 70,
+      specificHeat: 3300,
+      densityKgL: 1.05,
+      resistance: 0.3,
+    },
+    action: { kind: "chiller", durationSeconds: 12 },
+  },
+  {
+    recipe: "pie",
+    taskKind: "hob-power",
+    workflows: PIE_WORKFLOWS,
+    keys: { exact: ["sear-beef"] },
+    category: "hob",
+    appliance: "vollrath-59500p",
+    label: "Sear beef for the {productLower}",
+    productSource: "pie",
+    batch: {
+      massKg: 1.6,
+      temperatureC: 6,
+      specificHeat: 3300,
+      densityKgL: 1.05,
+      resistance: 0.4,
+    },
+    action: { kind: "hob-power", percent: 85, durationSeconds: 10 },
+  },
+  {
+    recipe: "pie",
+    taskKind: "hob-temperature",
+    workflows: PIE_WORKFLOWS,
+    keys: { exact: ["braise-filling"] },
+    category: "hob",
+    appliance: "vollrath-59500p",
+    label: "Braise the {productLower} filling in the induction pan",
+    productSource: "pie",
+    batch: {
+      massKg: 1.6,
+      temperatureC: 80,
+      specificHeat: 3300,
+      densityKgL: 1.05,
+      resistance: 0.25,
+    },
+    action: { kind: "hob-temperature", targetC: 90, durationSeconds: 20 },
+  },
+  {
+    recipe: "pie",
+    taskKind: "hob-power",
+    workflows: PIE_WORKFLOWS,
+    keys: { exact: ["reduce-filling"] },
+    category: "hob",
+    appliance: "vollrath-59500p",
+    label: "Reduce the {productLower} filling",
+    productSource: "pie",
+    batch: {
+      massKg: 1.6,
+      temperatureC: 80,
+      specificHeat: 3300,
+      densityKgL: 1.05,
+      resistance: 0.25,
+    },
+    action: { kind: "hob-power", percent: 60, durationSeconds: 10 },
+  },
+  {
+    recipe: "pie",
+    taskKind: "oven-bake",
+    workflows: PIE_WORKFLOWS,
+    keys: { exact: ["bake-pies"] },
+    category: "oven",
+    appliance: "maruzen-mbco-5e",
+    label: "Bake {productLower}s in the convection oven",
+    productSource: "pie",
+    batch: {
+      massKg: 2.58,
+      divideMassByOutputProduct: "baked-pie-mass",
+      temperatureC: 8,
+      specificHeat: 2900,
+      densityKgL: 0.95,
+      resistance: 0.3,
+    },
+    action: { kind: "oven-bake", targetC: 55, durationSeconds: 28 },
+  },
+  {
+    recipe: "pie",
+    taskKind: "dishwasher",
+    workflows: PIE_WORKFLOWS,
+    keys: { exact: ["wash-pie-trays"] },
+    category: "dishwasher",
+    appliance: "winterhalter-uc-l",
+    label: "{product} {key}",
+    productSource: "pie",
+    batch: {
+      massKg: 0.9,
+      massSource: "fixed",
+      temperatureC: 26,
+      specificHeat: 1000,
+      densityKgL: 1.18,
+      resistance: 0.02,
+    },
+    action: { kind: "dishwasher", durationSeconds: 6 },
+  },
+  {
+    recipe: "pie",
+    taskKind: "dishwasher",
+    workflows: PIE_WORKFLOWS,
+    keys: { exact: ["clean-bowl", "clean-braise-pan"] },
+    category: "dishwasher",
+    appliance: "winterhalter-uc-l",
+    label: "{product} {key}",
+    productSource: "pie",
+    batch: {
+      massKg: 0.6,
+      massSource: "fixed",
+      temperatureC: 26,
+      specificHeat: 1000,
+      densityKgL: 1.18,
+      resistance: 0.02,
+    },
+    action: { kind: "dishwasher", durationSeconds: 6 },
+  },
+];

@@ -100,7 +100,8 @@
 }
 
 .oven-task-card[aria-pressed="true"],
-.oven-task-track button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
+.oven-task-track
+  button:not(:where(.pantry-select-trigger))[aria-pressed="true"] {
   background: var(--pantry-category-accent-surface);
   color: var(--pantry-category-accent-text);
   outline: 2px solid currentColor;
@@ -461,7 +462,10 @@
   border-radius: var(--pantry-radius-notice);
   box-shadow: var(--shadow-card);
 }
-.recipe-workflow > ol > li > button:not(:where(.pantry-select-trigger)):disabled {
+.recipe-workflow
+  > ol
+  > li
+  > button:not(:where(.pantry-select-trigger)):disabled {
   cursor: not-allowed;
   opacity: 1;
 }
@@ -479,25 +483,47 @@
   align-items: center;
   gap: 4px;
 }
-.recipe-workflow > ol > li > button:not(:where(.pantry-select-trigger)) > strong {
+.recipe-workflow
+  > ol
+  > li
+  > button:not(:where(.pantry-select-trigger))
+  > strong {
   text-wrap: pretty;
 }
 .recipe-workflow > ol > li[data-state="done"] .recipe-workflow-state {
   color: var(--ok-text);
 }
-.recipe-workflow > ol > li[data-state="not-started"] > button:not(:where(.pantry-select-trigger)) > strong,
-.recipe-workflow > ol > li[data-state="not-reached"] > button:not(:where(.pantry-select-trigger)) > strong {
+.recipe-workflow
+  > ol
+  > li[data-state="not-started"]
+  > button:not(:where(.pantry-select-trigger))
+  > strong,
+.recipe-workflow
+  > ol
+  > li[data-state="not-reached"]
+  > button:not(:where(.pantry-select-trigger))
+  > strong {
   color: var(--ink-2);
 }
-.recipe-workflow > ol > li[data-state="current"] > button:not(:where(.pantry-select-trigger)) {
+.recipe-workflow
+  > ol
+  > li[data-state="current"]
+  > button:not(:where(.pantry-select-trigger)) {
   background: var(--pantry-category-accent-surface);
   color: var(--pantry-category-accent-text);
-  box-shadow: inset 0 0 0 1px currentColor, var(--shadow-card);
+  box-shadow:
+    inset 0 0 0 1px currentColor,
+    var(--shadow-card);
 }
-.recipe-workflow > ol > li[data-state="failed"] > button:not(:where(.pantry-select-trigger)) {
+.recipe-workflow
+  > ol
+  > li[data-state="failed"]
+  > button:not(:where(.pantry-select-trigger)) {
   background: var(--danger-bg);
   color: var(--danger-text);
-  box-shadow: inset 0 0 0 1px currentColor, var(--shadow-card);
+  box-shadow:
+    inset 0 0 0 1px currentColor,
+    var(--shadow-card);
 }
 .recipe-workflow > ol > li[data-state="current"] .recipe-workflow-meta,
 .recipe-workflow > ol > li[data-state="failed"] .recipe-workflow-meta {
@@ -640,16 +666,25 @@
   font-size: 0.8125rem !important;
 }
 @media (hover: hover) {
-  .factory-panel-pills button:not(:where(.pantry-select-trigger)):hover:not([aria-expanded="true"]) {
+  .factory-panel-pills
+    button:not(:where(.pantry-select-trigger)):hover:not(
+      [aria-expanded="true"]
+    ) {
     background: var(--surface);
   }
 }
-.persistent-production .factory-toolbar nav button:not(:where(.pantry-select-trigger)) {
+.persistent-production
+  .factory-toolbar
+  nav
+  button:not(:where(.pantry-select-trigger)) {
   padding: 5px 10px;
   font-size: 0.78rem;
 }
-.persistent-production button:not(:where(.pantry-select-trigger))[aria-pressed="true"],
-.persistent-production .factory-toolbar button:not(:where(.pantry-select-trigger))[aria-expanded="true"] {
+.persistent-production
+  button:not(:where(.pantry-select-trigger))[aria-pressed="true"],
+.persistent-production
+  .factory-toolbar
+  button:not(:where(.pantry-select-trigger))[aria-expanded="true"] {
   background: var(--pantry-category-accent-surface);
   color: var(--pantry-category-accent-text);
 }
@@ -874,18 +909,24 @@
   margin-block: 0;
   min-width: 210px;
 }
-.persistent-production .factory-canvas-switch button:not(:where(.pantry-select-trigger)) {
+.persistent-production
+  .factory-canvas-switch
+  button:not(:where(.pantry-select-trigger)) {
   font-size: 0.78rem;
   min-height: 30px;
   padding: 4px 10px;
 }
-.persistent-production button:not(:where(.pantry-select-trigger)).factory-primary {
+.persistent-production
+  button:not(:where(.pantry-select-trigger)).factory-primary {
   background: var(--pantry-primary);
   color: var(--pantry-on-primary);
   border-color: var(--pantry-link);
   font-weight: 600;
 }
-.persistent-production button:not(:where(.pantry-select-trigger)).factory-primary:hover:not(:disabled) {
+.persistent-production
+  button:not(:where(.pantry-select-trigger)).factory-primary:hover:not(
+    :disabled
+  ) {
   background: var(--pantry-primary-hover);
   border-color: var(--pantry-primary-border);
 }
@@ -977,7 +1018,10 @@
   .persistent-production .factory-toolbar nav {
     gap: 2px;
   }
-  .persistent-production .factory-toolbar nav button:not(:where(.pantry-select-trigger)) {
+  .persistent-production
+    .factory-toolbar
+    nav
+    button:not(:where(.pantry-select-trigger)) {
     min-height: 36px;
     padding: 4px 7px;
   }
@@ -1107,8 +1151,12 @@
   text-transform: uppercase;
   border: 1px solid var(--hairline);
 }
-.factory-drawer [aria-label="Synchronized station appliances"] .oven-workspace-cells,
-.factory-drawer [aria-label="Multi-batch fault-cascade recovery"] .oven-workspace-cells {
+.factory-drawer
+  [aria-label="Synchronized station appliances"]
+  .oven-workspace-cells,
+.factory-drawer
+  [aria-label="Multi-batch fault-cascade recovery"]
+  .oven-workspace-cells {
   font-size: 0.76rem;
   table-layout: auto;
 }
@@ -1123,8 +1171,12 @@
   overflow-wrap: break-word;
   padding: 6px;
 }
-.factory-drawer [aria-label="Synchronized station appliances"] button:not(:where(.pantry-select-trigger)),
-.factory-drawer [aria-label="Reviewed chat production control"] button:not(:where(.pantry-select-trigger)) {
+.factory-drawer
+  [aria-label="Synchronized station appliances"]
+  button:not(:where(.pantry-select-trigger)),
+.factory-drawer
+  [aria-label="Reviewed chat production control"]
+  button:not(:where(.pantry-select-trigger)) {
   font-size: 0.74rem;
   padding: 4px 8px;
   margin: 2px 4px 2px 0;
@@ -1685,6 +1737,131 @@
 }
 .shift-measured {
   margin-block: 0;
+}
+
+.appliance-report-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ground) 35%, var(--paper));
+}
+.appliance-report-status {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--ink-2);
+}
+.appliance-report-error {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--warn-text) 30%, transparent);
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  font-size: 0.84rem;
+}
+.appliance-report-error p {
+  margin: 0;
+}
+.appliance-risk-callout {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--danger-text) 28%, transparent);
+  background: color-mix(in srgb, var(--danger-bg) 55%, var(--paper));
+}
+.appliance-risk-callout h5 {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--danger-text);
+}
+.appliance-risk-callout ul {
+  margin: 0;
+  padding-inline-start: 18px;
+  display: grid;
+  gap: 8px;
+}
+.appliance-risk-meta {
+  font-size: 0.78rem;
+  color: var(--ink-2);
+}
+.appliance-risk-reason {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: var(--ink);
+}
+.appliance-risk-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--danger-text);
+  background: var(--danger-bg);
+  border: 1px solid color-mix(in srgb, var(--danger-text) 30%, transparent);
+}
+.appliance-risk-detail {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--danger-text) 28%, transparent);
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  font-size: 0.82rem;
+}
+.appliance-risk-inline {
+  color: var(--danger-text);
+  font-size: 0.78rem;
+}
+.appliance-report-panel .production-table-card {
+  padding: 10px;
+}
+.appliance-report-panel .production-table-card table {
+  font-size: 0.76rem;
+  table-layout: auto;
+}
+.appliance-report-panel .production-table-card :is(th, td) {
+  padding: 6px;
+}
+.appliance-report-panel .production-table-card td:not(.basis-col) {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+.production-workspace .appliance-task-link {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.production-workspace .appliance-task-link:hover {
+  color: var(--pantry-link);
+  background: transparent;
+}
+.oven-logistics-scroll tr[data-at-risk="true"]:not([data-selected="true"]) {
+  background: color-mix(in srgb, var(--danger-bg) 38%, transparent);
+}
+.oven-task-card[data-at-risk="true"] {
+  border-color: var(--danger-text);
+  border-width: 2px;
+}
+.oven-task-track[data-at-risk="true"] > button {
+  color: var(--danger-text);
+  font-weight: 600;
 }
 
 @media (max-width: 600px) {

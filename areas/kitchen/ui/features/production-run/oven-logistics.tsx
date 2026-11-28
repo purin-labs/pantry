@@ -6,12 +6,15 @@ import type {
   ResourceView,
   TaskView,
 } from "@purin-labs/production-simulation";
+import type { ApplianceTaskRisk } from "@purin-labs/production-simulation/recipes/bakery/appliance-execution";
 import { assertNever } from "@purin-labs/std";
 import type React from "react";
 
 export type TaskSelection = Readonly<{
   selected: string | null;
   select(task: string): void;
+  /** Tasks flagged at risk by recipe appliance physics (Refactor 16, step 15B / D3). */
+  atRisk?: ReadonlyMap<string, ApplianceTaskRisk>;
 }>;
 
 type Props = TaskSelection & Readonly<{ view: LogisticsView }>;
@@ -288,12 +291,14 @@ export function blockerDescription(blocker: Blocker): string {
 }
 
 function taskRow(selection: TaskSelection, task: TaskView): React.ReactNode {
+  const risk = selection.atRisk?.get(task.id);
   return (
     <tr
       key={task.id}
       id={taskAnchor(task.id)}
       data-task={task.id}
       data-kind={task.kind}
+      data-at-risk={risk !== undefined ? "true" : undefined}
       data-selected={selection.selected === task.id}
     >
       <td>
@@ -307,11 +312,27 @@ function taskRow(selection: TaskSelection, task: TaskView): React.ReactNode {
           <p>Requested by {taskLink(selection, task.subject.cause)}</p>
         )}
       </td>
-      <td>{task.kind}</td>
+      <td>
+        {task.kind}
+        {risk !== undefined && (
+          <>
+            {" "}
+            <span
+              className="appliance-risk-badge"
+              data-risk="at-risk"
+              title={risk.reason}
+            >
+              At risk
+            </span>
+          </>
+        )}
+      </td>
       <td>{taskTime(task)}</td>
       <td>
         {task.kind === "waiting" ? (
           <ul>{task.blockers.map(blockerItem)}</ul>
+        ) : risk !== undefined ? (
+          <span className="appliance-risk-inline">{risk.reason}</span>
         ) : (
           "—"
         )}
@@ -343,14 +364,34 @@ function taskSubject(subject: TaskView["subject"]): React.ReactNode {
   }
 }
 
-export function SelectedOvenTask(props: Readonly<{ task: TaskView }>) {
-  const { task } = props;
+export function SelectedOvenTask(
+  props: Readonly<{ task: TaskView; risk?: ApplianceTaskRisk | undefined }>,
+) {
+  const { task, risk } = props;
   return (
-    <section aria-label="Selected oven task" data-selected-task={task.id}>
+    <section
+      aria-label="Selected oven task"
+      data-selected-task={task.id}
+      data-at-risk={risk !== undefined ? "true" : undefined}
+    >
       <h3>{task.id}</h3>
       <p>
         {task.kind} · {taskTime(task)}
+        {risk !== undefined && (
+          <>
+            {" "}
+            <span className="appliance-risk-badge" data-risk="at-risk">
+              At risk
+            </span>
+          </>
+        )}
       </p>
+      {risk !== undefined && (
+        <p className="appliance-risk-detail" data-task-at-risk={task.id}>
+          <strong>Appliance check failed ({risk.appliance}):</strong>{" "}
+          {risk.reason}
+        </p>
+      )}
       {task.kind === "waiting" && <ul>{task.blockers.map(blockerItem)}</ul>}
     </section>
   );

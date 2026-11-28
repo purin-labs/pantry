@@ -934,324 +934,328 @@ async function compileRecipe(
   };
 }
 
-import {
-  FINANCIER_FLAVOUR_PRODUCTS,
-  FINANCIER_MIX_INS,
-  financierFlavourOf,
-} from "./financier-flavours.ts";
-import {
-  batchSpec,
-  chillerActions,
-  dishwasherActions,
-  executeRecipeApplianceTasks,
-  extractScheduledTasks,
-  hobPowerActions,
-  ovenBakeActions,
-  ovenPreheatActions,
-  planetaryMixActions,
-  taskMaterialMassKg,
-  weighActions,
-  type ApplianceWasmRuntimeSource,
-  type RecipeApplianceExecutionOptions,
-  type RecipeApplianceExecutionReport,
-  type RecipeApplianceTaskBinding,
-  type ScheduledTaskDescriptor,
-  type ScheduledTaskSource,
-} from "./appliance-execution.ts";
+import { FINANCIER_MIX_INS } from "./financier-flavours.ts";
+import type { ApplianceTaskRow } from "./appliance-execution.ts";
 
-function isFinancierWorkflow(workflowId: string): boolean {
-  return (
-    workflowId === "batter-preparation" ||
-    workflowId.endsWith("financier-preparation") ||
-    workflowId === "financier-preheat" ||
-    workflowId === "financier-batch" ||
-    workflowId === "financier" ||
-    workflowId.startsWith("load-") ||
-    workflowId.startsWith("batch-")
-  );
-}
+const FINANCIER_WORKFLOWS = {
+  exact: [
+    "batter-preparation",
+    "financier-preheat",
+    "financier-batch",
+    "financier",
+  ],
+  prefixes: ["load-", "batch-"],
+  suffixes: ["financier-preparation"],
+} as const;
 
-/** "Hazelnut financier" for a flavoured task; "Financier" otherwise. */
-function financierLabel(task: ScheduledTaskDescriptor): string {
-  const flavour =
-    financierFlavourOf(task.instanceId) ?? financierFlavourOf(task.workflowId);
-  return flavour === null
-    ? "Financier"
-    : FINANCIER_FLAVOUR_PRODUCTS[flavour].title;
-}
-
-export function financierApplianceTask(
-  task: ScheduledTaskDescriptor,
-): RecipeApplianceTaskBinding | null {
-  if (!isFinancierWorkflow(task.workflowId)) return null;
-  const key = task.taskKey.replace(/^tray-\d+\./u, "");
-  const product = financierLabel(task);
-  const mixIn = FINANCIER_MIX_INS.find((name) => key === `weigh-${name}`);
-  if (mixIn !== undefined) {
-    // The flavour's mix-in is weighed on the scale before it goes in the bowl.
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, 0.01),
-      20,
-      mixIn === "black-sesame-paste" ? 2400 : 1600,
-      mixIn === "black-sesame-paste" ? 1.1 : 0.55,
-      0.1,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "weigh",
-      appliance: "ohaus-ranger-3000",
-      label: `${product} ${key}`,
-      batch,
-      buildActions: () => weighActions(batch),
-    };
-  }
-  if (key === "weigh") {
-    const batch = batchSpec(
-      `${task.instanceId}-ingredients`,
-      taskMaterialMassKg(task.definition, 0.375),
-      20,
-      3100,
-      1.08,
-      0.1,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "weigh",
-      appliance: "ohaus-ranger-3000",
-      label: "Weigh financier ingredients",
-      batch,
-      buildActions: () => weighActions(batch),
-    };
-  }
-  if (
-    key === "weigh-butter" ||
-    key === "weigh-egg-white" ||
-    key === "weigh-icing-sugar" ||
-    key === "weigh-almond-powder" ||
-    key === "weigh-flour" ||
-    key === "weigh-honey" ||
-    key.startsWith("fill-cavity-") ||
-    key === "dose"
-  ) {
-    const fallbackKg =
-      key === "weigh-butter"
-        ? 0.11
-        : key === "weigh-egg-white"
-          ? 0.12
-          : key === "weigh-icing-sugar"
-            ? 0.09
-            : key === "weigh-almond-powder"
-              ? 0.05
-              : key === "weigh-flour"
-                ? 0.04
-                : key === "weigh-honey"
-                  ? 0.015
-                  : key.startsWith("fill-cavity-")
-                    ? 0.023
-                    : 0.184;
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, fallbackKg),
-      key.startsWith("fill-cavity-") ? 16 : 20,
-      2800,
-      1.02,
-      0.15,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "weigh",
-      appliance: "ohaus-ranger-3000",
-      label: `${product} ${key}`,
-      batch,
-      buildActions: () => weighActions(batch),
-    };
-  }
-  if (key === "brown-butter") {
-    const batch = batchSpec(
-      `${task.instanceId}-brown-butter`,
-      taskMaterialMassKg(task.definition, 0.11),
-      20,
-      2700,
-      0.96,
-      0.08,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "hob",
-      appliance: "maruzen-mih-02c",
-      label: `Brown ${product.toLowerCase()} butter on induction hob`,
-      batch,
-      buildActions: () => hobPowerActions(batch, 55, 5),
-    };
-  }
-  if (key === "cool-butter" || key === "store-batter") {
-    const fallbackKg = key === "cool-butter" ? 0.092 : 0.375;
-    const initialTempC = key === "cool-butter" ? 45 : 24;
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, fallbackKg),
-      initialTempC,
-      3000,
-      1.05,
-      0.25,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "chiller",
-      appliance: "hoshizaki-rt-120snj",
-      label: `${product} ${key}`,
-      batch,
-      buildActions: () => chillerActions(batch, 6),
-    };
-  }
-  if (
-    key === "mix" ||
-    key === "mix-dry" ||
-    key === "incorporate-egg-white-and-honey" ||
-    key === "incorporate-brown-butter"
-  ) {
-    const setting: 1 | 2 = key === "mix-dry" ? 1 : 2;
-    const fallbackKg =
-      key === "mix-dry"
-        ? 0.18
-        : key === "incorporate-egg-white-and-honey"
-          ? 0.315
-          : 0.375;
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, fallbackKg),
-      key === "incorporate-brown-butter" ? 26 : 20,
-      3100,
-      1.08,
-      0.35,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "mixer",
-      appliance: "hobart-hl200",
-      label: `${product} ${key}`,
-      batch,
-      buildActions: () => planetaryMixActions(batch, setting, 4),
-    };
-  }
-  if (key === "preheat" || key === "preheat-oven") {
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "oven",
-      appliance: "maruzen-mbco-5e",
-      label: "Preheat convection oven for financier",
-      batch: null,
-      buildActions: (context) => ovenPreheatActions(55, context),
-    };
-  }
-  if (key === "bake") {
-    const batch = batchSpec(
-      `${task.instanceId}-bake-tray`,
-      taskMaterialMassKg(task.definition, 0.184),
-      18,
-      3100,
-      1.08,
-      0.35,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "oven",
-      appliance: "maruzen-mbco-5e",
-      label: `Bake ${product.toLowerCase()} tray in convection oven`,
-      batch,
-      buildActions: (context) => ovenBakeActions(batch, 55, 12, context),
-    };
-  }
-  if (
-    key === "clean" ||
-    key === "clean-preparation-vessels" ||
-    key === "clean-mould"
-  ) {
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      key === "clean-mould" ? 0.32 : 0.45,
-      26,
-      1000,
-      1.18,
-      0.02,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "dishwasher",
-      appliance: "winterhalter-uc-l",
-      label: `${product} ${key}`,
-      batch,
-      buildActions: () => dishwasherActions(batch, 6),
-    };
-  }
-  return null;
-}
-
-function financierApplianceTasks(
-  source: ScheduledTaskSource,
-): readonly RecipeApplianceTaskBinding[] {
-  const bindings: RecipeApplianceTaskBinding[] = [];
-  for (const task of extractScheduledTasks(source)) {
-    const bound = financierApplianceTask(task);
-    if (bound !== null) bindings.push(bound);
-  }
-  return bindings;
-}
-
-export async function executeFinancierApplianceTasks(
-  source: ScheduledTaskSource,
-  runtime: ApplianceWasmRuntimeSource,
-  options: RecipeApplianceExecutionOptions = {},
-): Promise<RecipeApplianceExecutionReport> {
-  return executeRecipeApplianceTasks(
-    financierApplianceTasks(source),
-    runtime,
-    { runId: options.runId ?? "financier-appliance-wasm", ...options },
-  );
-}
+/** Declarative MuJoCo appliance task rows for financier recipes. */
+export const FINANCIER_APPLIANCE_ROWS: readonly ApplianceTaskRow[] = [
+  {
+    recipe: "financier",
+    taskKind: "weigh",
+    workflows: FINANCIER_WORKFLOWS,
+    keys: { exact: ["weigh-black-sesame-paste"], stripTrayPrefix: true },
+    category: "weigh",
+    appliance: "ohaus-ranger-3000",
+    label: "{product} {key}",
+    productSource: "financier",
+    batch: {
+      massKg: 0.01,
+      temperatureC: 20,
+      specificHeat: 2400,
+      densityKgL: 1.1,
+      resistance: 0.1,
+    },
+    action: { kind: "weigh" },
+  },
+  {
+    recipe: "financier",
+    taskKind: "weigh",
+    workflows: FINANCIER_WORKFLOWS,
+    keys: {
+      exact: FINANCIER_MIX_INS.filter((m) => m !== "black-sesame-paste").map(
+        (m) => `weigh-${m}`,
+      ),
+      stripTrayPrefix: true,
+    },
+    category: "weigh",
+    appliance: "ohaus-ranger-3000",
+    label: "{product} {key}",
+    productSource: "financier",
+    batch: {
+      massKg: 0.01,
+      temperatureC: 20,
+      specificHeat: 1600,
+      densityKgL: 0.55,
+      resistance: 0.1,
+    },
+    action: { kind: "weigh" },
+  },
+  {
+    recipe: "financier",
+    taskKind: "weigh",
+    workflows: FINANCIER_WORKFLOWS,
+    keys: { exact: ["weigh"], stripTrayPrefix: true },
+    category: "weigh",
+    appliance: "ohaus-ranger-3000",
+    label: "Weigh financier ingredients",
+    productSource: "financier",
+    batch: {
+      idSuffix: "ingredients",
+      massKg: 0.375,
+      temperatureC: 20,
+      specificHeat: 3100,
+      densityKgL: 1.08,
+      resistance: 0.1,
+    },
+    action: { kind: "weigh" },
+  },
+  ...(
+    [
+      ["weigh-butter", 0.11],
+      ["weigh-egg-white", 0.12],
+      ["weigh-icing-sugar", 0.09],
+      ["weigh-almond-powder", 0.05],
+      ["weigh-flour", 0.04],
+      ["weigh-honey", 0.015],
+      ["dose", 0.184],
+    ] as const
+  ).map(([key, massKg]): ApplianceTaskRow => ({
+    recipe: "financier",
+    taskKind: "weigh",
+    workflows: FINANCIER_WORKFLOWS,
+    keys: { exact: [key], stripTrayPrefix: true },
+    category: "weigh",
+    appliance: "ohaus-ranger-3000",
+    label: "{product} {key}",
+    productSource: "financier",
+    batch: {
+      massKg,
+      temperatureC: 20,
+      specificHeat: 2800,
+      densityKgL: 1.02,
+      resistance: 0.15,
+    },
+    action: { kind: "weigh" },
+  })),
+  {
+    recipe: "financier",
+    taskKind: "weigh",
+    workflows: FINANCIER_WORKFLOWS,
+    keys: { prefixes: ["fill-cavity-"], stripTrayPrefix: true },
+    category: "weigh",
+    appliance: "ohaus-ranger-3000",
+    label: "{product} {key}",
+    productSource: "financier",
+    batch: {
+      massKg: 0.023,
+      temperatureC: 16,
+      specificHeat: 2800,
+      densityKgL: 1.02,
+      resistance: 0.15,
+    },
+    action: { kind: "weigh" },
+  },
+  {
+    recipe: "financier",
+    taskKind: "hob-power",
+    workflows: FINANCIER_WORKFLOWS,
+    keys: { exact: ["brown-butter"], stripTrayPrefix: true },
+    category: "hob",
+    appliance: "maruzen-mih-02c",
+    label: "Brown {productLower} butter on induction hob",
+    productSource: "financier",
+    batch: {
+      idSuffix: "brown-butter",
+      massKg: 0.11,
+      temperatureC: 20,
+      specificHeat: 2700,
+      densityKgL: 0.96,
+      resistance: 0.08,
+    },
+    action: { kind: "hob-power", percent: 55, durationSeconds: 5 },
+  },
+  {
+    recipe: "financier",
+    taskKind: "chiller",
+    workflows: FINANCIER_WORKFLOWS,
+    keys: { exact: ["cool-butter"], stripTrayPrefix: true },
+    category: "chiller",
+    appliance: "hoshizaki-rt-120snj",
+    label: "{product} {key}",
+    productSource: "financier",
+    batch: {
+      massKg: 0.092,
+      temperatureC: 45,
+      specificHeat: 3000,
+      densityKgL: 1.05,
+      resistance: 0.25,
+    },
+    action: { kind: "chiller", durationSeconds: 6 },
+  },
+  {
+    recipe: "financier",
+    taskKind: "chiller",
+    workflows: FINANCIER_WORKFLOWS,
+    keys: { exact: ["store-batter"], stripTrayPrefix: true },
+    category: "chiller",
+    appliance: "hoshizaki-rt-120snj",
+    label: "{product} {key}",
+    productSource: "financier",
+    batch: {
+      massKg: 0.375,
+      temperatureC: 24,
+      specificHeat: 3000,
+      densityKgL: 1.05,
+      resistance: 0.25,
+    },
+    action: { kind: "chiller", durationSeconds: 6 },
+  },
+  {
+    recipe: "financier",
+    taskKind: "planetary-mix",
+    workflows: FINANCIER_WORKFLOWS,
+    keys: { exact: ["mix-dry"], stripTrayPrefix: true },
+    category: "mixer",
+    appliance: "hobart-hl200",
+    label: "{product} {key}",
+    productSource: "financier",
+    batch: {
+      massKg: 0.18,
+      temperatureC: 20,
+      specificHeat: 3100,
+      densityKgL: 1.08,
+      resistance: 0.35,
+    },
+    action: { kind: "planetary-mix", setting: 1, durationSeconds: 4 },
+  },
+  {
+    recipe: "financier",
+    taskKind: "planetary-mix",
+    workflows: FINANCIER_WORKFLOWS,
+    keys: {
+      exact: ["incorporate-egg-white-and-honey"],
+      stripTrayPrefix: true,
+    },
+    category: "mixer",
+    appliance: "hobart-hl200",
+    label: "{product} {key}",
+    productSource: "financier",
+    batch: {
+      massKg: 0.315,
+      temperatureC: 20,
+      specificHeat: 3100,
+      densityKgL: 1.08,
+      resistance: 0.35,
+    },
+    action: { kind: "planetary-mix", setting: 2, durationSeconds: 4 },
+  },
+  {
+    recipe: "financier",
+    taskKind: "planetary-mix",
+    workflows: FINANCIER_WORKFLOWS,
+    keys: { exact: ["incorporate-brown-butter"], stripTrayPrefix: true },
+    category: "mixer",
+    appliance: "hobart-hl200",
+    label: "{product} {key}",
+    productSource: "financier",
+    batch: {
+      massKg: 0.375,
+      temperatureC: 26,
+      specificHeat: 3100,
+      densityKgL: 1.08,
+      resistance: 0.35,
+    },
+    action: { kind: "planetary-mix", setting: 2, durationSeconds: 4 },
+  },
+  {
+    recipe: "financier",
+    taskKind: "planetary-mix",
+    workflows: FINANCIER_WORKFLOWS,
+    keys: { exact: ["mix"], stripTrayPrefix: true },
+    category: "mixer",
+    appliance: "hobart-hl200",
+    label: "{product} {key}",
+    productSource: "financier",
+    batch: {
+      massKg: 0.375,
+      temperatureC: 20,
+      specificHeat: 3100,
+      densityKgL: 1.08,
+      resistance: 0.35,
+    },
+    action: { kind: "planetary-mix", setting: 2, durationSeconds: 4 },
+  },
+  {
+    recipe: "financier",
+    taskKind: "oven-preheat",
+    workflows: FINANCIER_WORKFLOWS,
+    keys: { exact: ["preheat", "preheat-oven"], stripTrayPrefix: true },
+    category: "oven",
+    appliance: "maruzen-mbco-5e",
+    label: "Preheat convection oven for financier",
+    productSource: "financier",
+    batch: null,
+    action: { kind: "oven-preheat", targetC: 55 },
+  },
+  {
+    recipe: "financier",
+    taskKind: "oven-bake",
+    workflows: FINANCIER_WORKFLOWS,
+    keys: { exact: ["bake"], stripTrayPrefix: true },
+    category: "oven",
+    appliance: "maruzen-mbco-5e",
+    label: "Bake {productLower} tray in convection oven",
+    productSource: "financier",
+    batch: {
+      idSuffix: "bake-tray",
+      massKg: 0.184,
+      temperatureC: 18,
+      specificHeat: 3100,
+      densityKgL: 1.08,
+      resistance: 0.35,
+    },
+    action: { kind: "oven-bake", targetC: 55, durationSeconds: 12 },
+  },
+  {
+    recipe: "financier",
+    taskKind: "dishwasher",
+    workflows: FINANCIER_WORKFLOWS,
+    keys: { exact: ["clean-mould"], stripTrayPrefix: true },
+    category: "dishwasher",
+    appliance: "winterhalter-uc-l",
+    label: "{product} {key}",
+    productSource: "financier",
+    batch: {
+      massKg: 0.32,
+      massSource: "fixed",
+      temperatureC: 26,
+      specificHeat: 1000,
+      densityKgL: 1.18,
+      resistance: 0.02,
+    },
+    action: { kind: "dishwasher", durationSeconds: 6 },
+  },
+  {
+    recipe: "financier",
+    taskKind: "dishwasher",
+    workflows: FINANCIER_WORKFLOWS,
+    keys: {
+      exact: ["clean", "clean-preparation-vessels"],
+      stripTrayPrefix: true,
+    },
+    category: "dishwasher",
+    appliance: "winterhalter-uc-l",
+    label: "{product} {key}",
+    productSource: "financier",
+    batch: {
+      massKg: 0.45,
+      massSource: "fixed",
+      temperatureC: 26,
+      specificHeat: 1000,
+      densityKgL: 1.18,
+      resistance: 0.02,
+    },
+    action: { kind: "dishwasher", durationSeconds: 6 },
+  },
+];

@@ -21,7 +21,9 @@ import type {
 } from "@purin-labs/production-simulation/recipes/bakery/shift-report";
 import { assertNever } from "@purin-labs/std";
 import { downloadBakeryFile } from "../workflow-simulator/file-download";
+import { AppliancePhysicsReportSection } from "./appliance-physics-report";
 import { seconds } from "./oven-logistics";
+import type { ApplianceReportState } from "./recipe-appliance-report";
 import type { Variant } from "@purin-labs/type-utils";
 
 const MAX_SIX_HOUR_MEASUREMENT_BYTES = 1024 * 1024;
@@ -30,10 +32,18 @@ export function ProductionResults({
   time,
   results,
   shift,
+  applianceReport,
+  selectedTask,
+  selectTask,
+  rerunApplianceReport,
 }: Readonly<{
   time: number;
   results: ProductionReport | null;
   shift: ShiftReport;
+  applianceReport?: ApplianceReportState;
+  selectedTask?: string | null;
+  selectTask?: (task: string) => void;
+  rerunApplianceReport?: () => void;
 }>): React.ReactNode {
   const [showDepletedStock, setShowDepletedStock] = React.useState(false);
   if (results === null)
@@ -83,6 +93,16 @@ export function ProductionResults({
       </div>
       <div className="oven-logistics-scroll" tabIndex={0}>
         <ShiftResults report={shift} />
+        {applianceReport !== undefined &&
+          selectTask !== undefined &&
+          rerunApplianceReport !== undefined && (
+            <AppliancePhysicsReportSection
+              state={applianceReport}
+              selectedTask={selectedTask ?? null}
+              selectTask={selectTask}
+              rerun={rerunApplianceReport}
+            />
+          )}
         <div className="production-table-card">
           <table className="oven-workspace-cells production-data-table">
             <caption>Order lead times</caption>

@@ -8,6 +8,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import type { HostView, TaskView } from "@purin-labs/production-simulation";
+import type { ApplianceTaskRisk } from "@purin-labs/production-simulation/recipes/bakery/appliance-execution";
 import { assertNever } from "@purin-labs/std";
 import {
   Trace,
@@ -28,6 +29,7 @@ type Props = Readonly<{
   view: HostView;
   select(task: string): void;
   reviewRecovery(): void;
+  atRisk?: ReadonlyMap<string, ApplianceTaskRisk>;
 }>;
 
 /** The accepted simulation view owns every state. This component never dispatches work. */
@@ -217,6 +219,7 @@ function prerequisiteLabel(
 function renderTask(props: Props, task: TaskView): React.ReactNode {
   const status = taskStatus(task, props.view);
   const Icon = taskIcon(task, status);
+  const risk = props.atRisk?.get(task.id);
   const blockers: React.ReactNode[] = [];
   if (task.kind === "waiting")
     for (const [index, blocker] of task.blockers.entries())
@@ -260,6 +263,7 @@ function renderTask(props: Props, task: TaskView): React.ReactNode {
       key={task.id}
       defaultOpen={status === "error"}
       data-task-id={task.id}
+      data-at-risk={risk !== undefined ? "true" : undefined}
     >
       <TraceCollapsibleTrigger>
         <TraceLine status={status}>
@@ -267,11 +271,23 @@ function renderTask(props: Props, task: TaskView): React.ReactNode {
             <Icon />
           </TraceIcon>
           <TraceTitle>{taskTitle(task)}</TraceTitle>
-          <TraceDescription>{taskLabel(task, props.view)}</TraceDescription>
+          <TraceDescription>
+            <span>{taskLabel(task, props.view)}</span>
+            {risk !== undefined && (
+              <span className="appliance-risk-badge" data-risk="at-risk">
+                At risk
+              </span>
+            )}
+          </TraceDescription>
         </TraceLine>
       </TraceCollapsibleTrigger>
       <TraceCollapsibleContent keepMounted>
         <p className="production-task-time">Time (seconds): {taskTime(task)}</p>
+        {risk !== undefined && (
+          <p className="appliance-risk-detail" data-task-at-risk={task.id}>
+            <strong>At risk ({risk.appliance}):</strong> {risk.reason}
+          </p>
+        )}
         {blockers.length > 0 && <ul aria-label="Task blockers">{blockers}</ul>}
         {resources.length > 0 && (
           <>

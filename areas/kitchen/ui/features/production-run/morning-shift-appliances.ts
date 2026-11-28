@@ -1,16 +1,17 @@
 import type {
   CompiledScenario,
   LogisticsView,
-  TaskDefinition,
   TaskView,
 } from "@purin-labs/production-simulation";
-import {
-  morningShiftApplianceTask,
-} from "@purin-labs/production-simulation/recipes/bakery/bakery-shift";
+import { recipeApplianceTask } from "@purin-labs/production-simulation/recipes/bakery/appliance-task-table";
 import type {
   ApplianceCategory,
   RecipeApplianceTaskBinding,
 } from "@purin-labs/production-simulation/recipes/bakery/appliance-execution";
+import {
+  buildScenarioTaskLookup,
+  taskDescriptorFromView,
+} from "./recipe-appliance-report";
 import type { FactoryStationSource } from "../workflow-simulator/spatial/factory-stations";
 import type { OvenLiveFrame } from "@purin-labs/production-simulation/runs/oven-live-physics";
 import {
@@ -99,9 +100,7 @@ export type MorningShiftFaultCascadeSummary = Readonly<{
   status: "nominal" | "held" | "recovered";
   heldCells: readonly ("tea-pan-cell" | "espresso-cell" | "pour-over-cell")[];
   recoveredCells: readonly (
-    | "tea-pan-cell"
-    | "espresso-cell"
-    | "pour-over-cell"
+    "tea-pan-cell" | "espresso-cell" | "pour-over-cell"
   )[];
   affectedBatches: readonly MorningShiftBatchCascadeItem[];
   sourceFaults: readonly ApplianceFaultRecord[];
@@ -817,64 +816,6 @@ function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
 }
 
-function workflowMapForScenario(
-  scenario: CompiledScenario,
-): Readonly<{
-  byArrivalPrefix: ReadonlyMap<string, string>;
-  definitions: ReadonlyMap<string, TaskDefinition>;
-}> {
-  const byArrivalPrefix = new Map<string, string>();
-  for (const arrival of scenario.arrivals) {
-    byArrivalPrefix.set(arrival.id, arrival.workflow);
-  }
-  const definitions = new Map<string, TaskDefinition>();
-  for (const wf of scenario.workflows) {
-    byArrivalPrefix.set(wf.id, wf.id);
-    for (const td of wf.tasks) {
-      definitions.set(`${wf.id}/${td.key}`, td);
-    }
-  }
-  return { byArrivalPrefix, definitions };
-}
-
-function bindLogisticsTask(
-  task: TaskView,
-  byArrivalPrefix: ReadonlyMap<string, string>,
-  definitions: ReadonlyMap<string, TaskDefinition>,
-): RecipeApplianceTaskBinding | null {
-  if (task.subject.kind !== "workflow") return null;
-  const instanceId = task.subject.instance;
-  const taskKey = task.subject.key;
-  const hashIdx = instanceId.lastIndexOf("#");
-  const prefix = hashIdx >= 0 ? instanceId.slice(0, hashIdx) : instanceId;
-  const workflowId = byArrivalPrefix.get(prefix) ?? prefix;
-  const definition = definitions.get(`${workflowId}/${taskKey}`) ?? null;
-  const startedAtUs =
-    task.kind === "executing" ||
-    task.kind === "completed" ||
-    task.kind === "failed" ||
-    task.kind === "recovery-required" ||
-    task.kind === "recovering" ||
-    task.kind === "recovery-failed"
-      ? task.startedAt
-      : 0;
-  const completedAtUs =
-    task.kind === "completed"
-      ? task.completedAt
-      : task.kind === "executing" && task.completesAt !== null
-        ? task.completesAt
-        : startedAtUs + 30_000_000;
-  return morningShiftApplianceTask({
-    taskId: task.id,
-    instanceId,
-    workflowId,
-    taskKey,
-    startedAtUs,
-    completedAtUs,
-    definition,
-  });
-}
-
 function newtonCooling(
   peakC: number,
   equilibriumC: number,
@@ -927,7 +868,12 @@ function deriveApplianceTelemetry(
         status === "active"
           ? batchTemp
           : completedCount > 0
-            ? newtonCooling(batchTemp, spec.idleTemperatureC, idleElapsedSeconds, 140)
+            ? newtonCooling(
+                batchTemp,
+                spec.idleTemperatureC,
+                idleElapsedSeconds,
+                140,
+              )
             : spec.idleTemperatureC;
       const activeMass = status === "active" || completedCount > 0 ? massG : 0;
       return {
@@ -945,8 +891,7 @@ function deriveApplianceTelemetry(
         torqueNm: 0,
         viscosityPas: 0,
         doorOpenRatio: 0,
-        thermalPlumeIntensity:
-          temp > 60 ? clamp01((temp - 60) / 40) * 0.45 : 0,
+        thermalPlumeIntensity: temp > 60 ? clamp01((temp - 60) / 40) * 0.45 : 0,
         liquidColorHex: wf.includes("sesame")
           ? 0x2d2c32
           : wf.includes("tea")
@@ -965,13 +910,19 @@ function deriveApplianceTelemetry(
         status === "active" && !isFaulted
           ? Number((4.2 + 1.35 * viscosityPas).toFixed(2))
           : 0;
-      const omega = ((status === "active" && !isFaulted ? 185 : 0) * 2 * Math.PI) / 60;
+      const omega =
+        ((status === "active" && !isFaulted ? 185 : 0) * 2 * Math.PI) / 60;
       const mechWatts = torqueNm * omega;
       const temp =
         status === "active"
           ? 21.5 + 4.8 * progress
           : completedCount > 0
-            ? newtonCooling(26.3, spec.idleTemperatureC, idleElapsedSeconds, 240)
+            ? newtonCooling(
+                26.3,
+                spec.idleTemperatureC,
+                idleElapsedSeconds,
+                240,
+              )
             : spec.idleTemperatureC;
       return {
         programSummary:
@@ -1202,7 +1153,12 @@ function deriveApplianceTelemetry(
             : spec.idleTemperatureC;
       const temp =
         isFaulted && faultElapsedSeconds !== null
-          ? newtonCooling(nominalTemp, 55, Math.max(12, faultElapsedSeconds), 45)
+          ? newtonCooling(
+              nominalTemp,
+              55,
+              Math.max(12, faultElapsedSeconds),
+              45,
+            )
           : nominalTemp;
       const doorOpenRatio = isFaulted
         ? 0.92
@@ -1337,8 +1293,7 @@ function deriveApplianceTelemetry(
         torqueNm: status === "active" && !isFaulted ? 0.08 : 0,
         viscosityPas,
         doorOpenRatio: 0,
-        thermalPlumeIntensity:
-          status === "active" && temp > 55 ? 0.35 : 0,
+        thermalPlumeIntensity: status === "active" && temp > 55 ? 0.35 : 0,
         liquidColorHex: 0x4b4952,
       };
     }
@@ -1352,7 +1307,12 @@ function deriveApplianceTelemetry(
             : spec.idleTemperatureC;
       const temp =
         isFaulted && faultElapsedSeconds !== null
-          ? newtonCooling(nominalTemp, 38, Math.max(10, faultElapsedSeconds), 50)
+          ? newtonCooling(
+              nominalTemp,
+              38,
+              Math.max(10, faultElapsedSeconds),
+              50,
+            )
           : nominalTemp;
       const doorOpenRatio = isFaulted
         ? 0.9
@@ -1510,7 +1470,8 @@ export function createApplianceFaultRecord(
       return {
         appliance,
         code: "UNFLOURED_SLAB",
-        reason: "Shortcrust sheet stuck to unfloured marble slab (< 14 mm cavity drape)",
+        reason:
+          "Shortcrust sheet stuck to unfloured marble slab (< 14 mm cavity drape)",
         remediation: "Dust 14 g T55 bench flour and re-sheet from checkpoint",
         faultedAtSeconds,
         checkpointDigest: "c859f3334736f440ed67da969b9240f9de34e182a773862a",
@@ -1538,9 +1499,9 @@ export function synchronizeMorningShiftAppliances(
   faults: Readonly<Record<string, ApplianceFaultRecord>> | null = null,
 ): readonly SynchronizedApplianceState[] {
   if (logistics.kind !== "available") return [];
-  const { byArrivalPrefix, definitions } = workflowMapForScenario(scenario);
+  const lookup = buildScenarioTaskLookup(scenario);
   const byAppliance = new Map<
-     string,
+    string,
     {
       active: { task: TaskView; binding: RecipeApplianceTaskBinding } | null;
       lastCompleted: {
@@ -1562,7 +1523,9 @@ export function synchronizeMorningShiftAppliances(
   }
 
   for (const task of logistics.tasks) {
-    const binding = bindLogisticsTask(task, byArrivalPrefix, definitions);
+    const descriptor = taskDescriptorFromView(task, lookup);
+    const binding =
+      descriptor === null ? null : recipeApplianceTask(descriptor);
     if (binding === null) continue;
     const key =
       binding.appliance === "victoria-arduino-eagle-one-2g"
@@ -1700,7 +1663,9 @@ export function synchronizeMorningShiftAppliances(
     const coupledPressureBar =
       s.appliance === "la-marzocco-linea-classic-s-2g" ||
       s.appliance === "winterhalter-uc-l"
-        ? Number(Math.max(1.01, s.pressureBar - manifoldDeltaBar * 0.45).toFixed(2))
+        ? Number(
+            Math.max(1.01, s.pressureBar - manifoldDeltaBar * 0.45).toFixed(2),
+          )
         : isChiller
           ? Number((s.pressureBar + ambientRoomDriftC * 0.04).toFixed(2))
           : s.pressureBar;
@@ -1734,7 +1699,9 @@ export function computeFacilityUtilityTelemetry(
         l2 += w / 3;
         l3 += w / 3;
         if (app.status === "active") waterFlowLpm += 0.55;
-        sensibleHeatRejectionWatts += w * (0.28 + doorOpen * 0.45) + Math.max(0, app.temperatureC - 21) * 1.4;
+        sensibleHeatRejectionWatts +=
+          w * (0.28 + doorOpen * 0.45) +
+          Math.max(0, app.temperatureC - 21) * 1.4;
         latentVaporGps += plume * 0.38 + doorOpen * 0.42;
         break;
       case "winterhalter-uc-l":
@@ -1742,27 +1709,32 @@ export function computeFacilityUtilityTelemetry(
         l2 += w / 3;
         l3 += w / 3;
         if (app.status === "active") waterFlowLpm += 3.6;
-        sensibleHeatRejectionWatts += w * (0.25 + doorOpen * 0.38) + Math.max(0, app.temperatureC - 21) * 1.6;
+        sensibleHeatRejectionWatts +=
+          w * (0.25 + doorOpen * 0.38) +
+          Math.max(0, app.temperatureC - 21) * 1.6;
         latentVaporGps += plume * 0.52 + doorOpen * 0.65;
         break;
       case "maruzen-mih-02c":
       case "ohaus-ranger-3000":
       case "waring-wsg60":
         l1 += w;
-        sensibleHeatRejectionWatts += w * 0.32 + Math.max(0, app.temperatureC - 21) * 1.1;
+        sensibleHeatRejectionWatts +=
+          w * 0.32 + Math.max(0, app.temperatureC - 21) * 1.1;
         latentVaporGps += plume * 0.44;
         break;
       case "vollrath-59500p":
       case "hobart-hl200":
       case "vitamix-quiet-one":
         l2 += w;
-        sensibleHeatRejectionWatts += w * 0.32 + Math.max(0, app.temperatureC - 21) * 1.1;
+        sensibleHeatRejectionWatts +=
+          w * 0.32 + Math.max(0, app.temperatureC - 21) * 1.1;
         latentVaporGps += plume * 0.4;
         break;
       case "la-marzocco-linea-classic-s-2g":
         l3 += w;
         if (app.status === "active") waterFlowLpm += 1.8;
-        sensibleHeatRejectionWatts += w * 0.36 + Math.max(0, app.temperatureC - 21) * 1.3;
+        sensibleHeatRejectionWatts +=
+          w * 0.36 + Math.max(0, app.temperatureC - 21) * 1.3;
         latentVaporGps += plume * 0.34;
         break;
       case "hoshizaki-rt-120snj":
@@ -1850,9 +1822,10 @@ export function computeFacilityUtilityTelemetry(
   const omegaKgPerKg = (0.62198 * pVapKpa) / Math.max(10, 101.325 - pVapKpa);
   const humidityRatioGPerKg = Number((omegaKgPerKg * 1000).toFixed(2));
   const specificEnthalpyKjPerKg = Number(
-    (1.006 * roomDryBulbC + omegaKgPerKg * (2501 + 1.86 * roomDryBulbC)).toFixed(
-      1,
-    ),
+    (
+      1.006 * roomDryBulbC +
+      omegaKgPerKg * (2501 + 1.86 * roomDryBulbC)
+    ).toFixed(1),
   );
   const hvacCoolingLoadWatts = Math.round(
     sensibleHeatRejectionWatts * 0.85 + latentVaporGps * 2260 * 0.55,
@@ -1870,7 +1843,8 @@ export function computeFacilityUtilityTelemetry(
   let acousticPowerSum = Math.pow(10, hoodAeroNoiseDba / 10);
   let peakApplianceNoiseDba = 47.5;
   let peakVibrationMmPerSecRms = 0.62;
-  let dominantRotaryAppliance: MorningShiftApplianceCode = "hoshizaki-rt-120snj";
+  let dominantRotaryAppliance: MorningShiftApplianceCode =
+    "hoshizaki-rt-120snj";
   let activeRotaryCount = 0;
 
   for (const app of appliances) {
@@ -1878,7 +1852,10 @@ export function computeFacilityUtilityTelemetry(
     if (app.isRotary && (app.rpm > 0 || app.status === "active")) {
       activeRotaryCount += 1;
     }
-    const candidateDba = Math.max(app.acousticNoiseDba, app.peakAcousticNoiseDba);
+    const candidateDba = Math.max(
+      app.acousticNoiseDba,
+      app.peakAcousticNoiseDba,
+    );
     const candidateVib = Math.max(
       app.vibrationMmPerSecRms,
       app.peakVibrationMmPerSecRms,
@@ -2133,7 +2110,9 @@ export function summarizeContinuousWaveCarrierReturnTelemetry(
   appliances: readonly SynchronizedApplianceState[],
   logistics?: LogisticsView | null,
 ): MorningShiftContinuousWaveTelemetry {
-  const dishwasher = appliances.find((a) => a.appliance === "winterhalter-uc-l");
+  const dishwasher = appliances.find(
+    (a) => a.appliance === "winterhalter-uc-l",
+  );
   const oven = appliances.find((a) => a.appliance === "maruzen-mbco-5e");
   const chiller = appliances.find((a) => a.appliance === "hoshizaki-rt-120snj");
   const hob = appliances.find((a) => a.appliance === "maruzen-mih-02c");
@@ -2208,7 +2187,8 @@ export function summarizeContinuousWaveCarrierReturnTelemetry(
       label: "Shared Induction Sauce & Browning Pans",
       carrierCount: 2,
       inUseCount: panActive,
-      washingCount: mouldWashing === 0 && dishwasher?.status === "active" ? 1 : 0,
+      washingCount:
+        mouldWashing === 0 && dishwasher?.status === "active" ? 1 : 0,
       cleanAvailableCount: Math.max(0, 2 - panActive),
       acquisitions: 6,
       washCycles: 6,
@@ -2261,7 +2241,10 @@ export function summarizeContinuousWaveCarrierReturnTelemetry(
     },
   ];
 
-  const totalCarrierAcquisitions = pools.reduce((s, p) => s + p.acquisitions, 0);
+  const totalCarrierAcquisitions = pools.reduce(
+    (s, p) => s + p.acquisitions,
+    0,
+  );
   const totalWashCycles = pools.reduce((s, p) => s + p.washCycles, 0);
   const totalCarrierReturns = pools.reduce((s, p) => s + p.returns, 0);
   const totalCarriers = pools.reduce((s, p) => s + p.carrierCount, 0);
@@ -2658,9 +2641,7 @@ function summarizeOvenVentingRadiantTelemetry(
     },
   ];
   const status: MorningShiftOvenVentingRadiantTelemetry["status"] =
-    oven?.status === "active"
-      ? "damper-venting"
-      : "hotspot-scorching-alert";
+    oven?.status === "active" ? "damper-venting" : "hotspot-scorching-alert";
   return {
     status,
     nominalDeckFluxKwPerSqM: 4.38,
@@ -2676,7 +2657,9 @@ function summarizeOvenVentingRadiantTelemetry(
 function summarizeDishwasherWarewashTelemetry(
   appliances: readonly SynchronizedApplianceState[],
 ): MorningShiftDishwasherTelemetry {
-  const dishwasher = appliances.find((a) => a.appliance === "winterhalter-uc-l");
+  const dishwasher = appliances.find(
+    (a) => a.appliance === "winterhalter-uc-l",
+  );
   const completedCycles = dishwasher?.completedCount ?? 4;
   const totalCycles = Math.max(completedCycles, dishwasher?.totalCount ?? 12);
   const cycles: MorningShiftDishwasherCycleEvent[] = [
@@ -2804,14 +2787,16 @@ function summarizeChillerColdCellTelemetry(
 ): MorningShiftChillerColdCellTelemetry {
   const chiller = appliances.find((a) => a.appliance === "hoshizaki-rt-120snj");
   const summary = chiller?.programSummary ?? "";
-  const phase: MorningShiftChillerColdCellTelemetry["phase"] =
-    summary.includes("Defrost Heater")
-      ? "defrost-active"
-      : summary.includes("Post-Defrost")
-        ? "post-defrost-recovery"
-        : summary.includes("Door Infiltration") || (chiller?.doorOpenRatio ?? 0) > 0
-          ? "door-infiltration-pulldown"
-          : "refrigerating";
+  const phase: MorningShiftChillerColdCellTelemetry["phase"] = summary.includes(
+    "Defrost Heater",
+  )
+    ? "defrost-active"
+    : summary.includes("Post-Defrost")
+      ? "post-defrost-recovery"
+      : summary.includes("Door Infiltration") ||
+          (chiller?.doorOpenRatio ?? 0) > 0
+        ? "door-infiltration-pulldown"
+        : "refrigerating";
 
   const roomHumidityFactor = Number(
     (1 + Math.max(0, relativeHumidityPercent - 48) * 0.015).toFixed(3),
@@ -2957,7 +2942,8 @@ function computeApplianceAcousticsAndVibration(
   peakVibrationMmPerSecRms: number;
   isRotary: boolean;
 }> {
-  const hasCycleHistory = status === "active" || completedCount > 0 || status === "fault";
+  const hasCycleHistory =
+    status === "active" || completedCount > 0 || status === "fault";
   switch (appliance) {
     case "waring-wsg60": {
       // 18,000 RPM commercial spice/paste grinder
@@ -3313,7 +3299,9 @@ export function summarizeMorningShiftMassAccounting(
       workflowLabel: "Ginger Black Tea #1",
       gateTaskId: "tea-batches#0/inspect-strained-tea",
       gateKind: "tea-extraction-gate",
-      measuredMetric: tea0Accepted ? "18.6% EY" : "22.4% EY (> 21.0% late strain)",
+      measuredMetric: tea0Accepted
+        ? "18.6% EY"
+        : "22.4% EY (> 21.0% late strain)",
       outcome: tea0Accepted ? "accepted" : "rejected-rework",
       inputMassGrams: 506.0,
       acceptedYieldGrams: tea0Accepted ? 435.0 : 0,
@@ -3438,9 +3426,7 @@ export function summarizeMorningShiftFaultCascade(
     0,
   );
   const allCells: readonly (
-    | "tea-pan-cell"
-    | "espresso-cell"
-    | "pour-over-cell"
+    "tea-pan-cell" | "espresso-cell" | "pour-over-cell"
   )[] = ["tea-pan-cell", "espresso-cell", "pour-over-cell"];
   if (activeFaults.length > 0) {
     return {
@@ -3520,67 +3506,64 @@ export function synchronizeCobotTransfers(
   for (const c of cells) {
     frameByCell.set(c.scene.cell.cellId, c.frame);
   }
-  const results: BaseCobotTransferEntry[] = cells.map(
-    ({ scene, frame }) => {
-      if (frame === null) {
-        return {
-          cellId: scene.cell.cellId,
-          robot: scene.cell.robot,
-          status: executingTransferTask !== null ? "executing" : "idle",
-          taskId: executingTransferTask?.id ?? null,
-          label:
-            executingTransferTask?.id ??
-            "Baker pan & cold-carrier station ready",
-          step: 0,
-          committedSeconds: Number((timeUs / 1_000_000).toFixed(1)),
-          completedTransfers,
-          totalTransfers,
-          progress: executingTransferTask !== null ? 0.5 : 0,
-          phase: executingTransferTask !== null ? "transfer" : "idle",
-          cascadeHold: null,
-        };
-      }
-      const status: SynchronizedCobotTransferState["status"] =
-        frame.purpose === "operation"
-          ? "executing"
-          : frame.purpose === "recovery"
-            ? "recovery"
-            : frame.purpose === "admission" || frame.purpose === "removal"
-              ? "handoff"
-              : "idle";
-      const taskId =
-        frame.purpose === "operation" || frame.purpose === "recovery"
-          ? frame.task
-          : (executingTransferTask?.id ?? null);
-      const motion =
-        frame.purpose === "admission" || frame.purpose === "removal"
-          ? frame.after.motion
-          : frame.motion;
-      const lastSample =
-        motion !== undefined
-          ? motion.samples[motion.samples.length - 1]
-          : undefined;
+  const results: BaseCobotTransferEntry[] = cells.map(({ scene, frame }) => {
+    if (frame === null) {
       return {
         cellId: scene.cell.cellId,
         robot: scene.cell.robot,
-        status,
-        taskId,
+        status: executingTransferTask !== null ? "executing" : "idle",
+        taskId: executingTransferTask?.id ?? null,
         label:
-          frame.purpose === "operation" || frame.purpose === "recovery"
-            ? frame.task
-            : frame.purpose === "admission" || frame.purpose === "removal"
-              ? `${frame.purpose}: ${frame.boundary}`
-              : (executingTransferTask?.id ?? "Idle between carrier transfers"),
-        step: lastSample?.step ?? 0,
-        committedSeconds: Number((frame.committedAt / 1_000_000).toFixed(1)),
+          executingTransferTask?.id ?? "Baker pan & cold-carrier station ready",
+        step: 0,
+        committedSeconds: Number((timeUs / 1_000_000).toFixed(1)),
         completedTransfers,
         totalTransfers,
-        progress: status === "executing" ? 0.5 : completedTransfers > 0 ? 1 : 0,
-        phase: frame.purpose,
+        progress: executingTransferTask !== null ? 0.5 : 0,
+        phase: executingTransferTask !== null ? "transfer" : "idle",
         cascadeHold: null,
       };
-    },
-  );
+    }
+    const status: SynchronizedCobotTransferState["status"] =
+      frame.purpose === "operation"
+        ? "executing"
+        : frame.purpose === "recovery"
+          ? "recovery"
+          : frame.purpose === "admission" || frame.purpose === "removal"
+            ? "handoff"
+            : "idle";
+    const taskId =
+      frame.purpose === "operation" || frame.purpose === "recovery"
+        ? frame.task
+        : (executingTransferTask?.id ?? null);
+    const motion =
+      frame.purpose === "admission" || frame.purpose === "removal"
+        ? frame.after.motion
+        : frame.motion;
+    const lastSample =
+      motion !== undefined
+        ? motion.samples[motion.samples.length - 1]
+        : undefined;
+    return {
+      cellId: scene.cell.cellId,
+      robot: scene.cell.robot,
+      status,
+      taskId,
+      label:
+        frame.purpose === "operation" || frame.purpose === "recovery"
+          ? frame.task
+          : frame.purpose === "admission" || frame.purpose === "removal"
+            ? `${frame.purpose}: ${frame.boundary}`
+            : (executingTransferTask?.id ?? "Idle between carrier transfers"),
+      step: lastSample?.step ?? 0,
+      committedSeconds: Number((frame.committedAt / 1_000_000).toFixed(1)),
+      completedTransfers,
+      totalTransfers,
+      progress: status === "executing" ? 0.5 : completedTransfers > 0 ? 1 : 0,
+      phase: frame.purpose,
+      cascadeHold: null,
+    };
+  });
 
   appendBeverageCobotCells(results, logistics, scenario, timeUs);
 

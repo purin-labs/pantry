@@ -15,15 +15,7 @@ import {
   timeFromSeconds,
   modelTimestep,
 } from "../../time.ts";
-import {
-  batchSpec,
-  espressoActions,
-  grindActions,
-  taskMaterialMassKg,
-  weighActions,
-  type RecipeApplianceTaskBinding,
-  type ScheduledTaskDescriptor,
-} from "./appliance-execution.ts";
+import type { ApplianceTaskRow } from "./appliance-execution.ts";
 import { count, input as lotInput, mass, pool, claim } from "./tea-process.ts";
 
 export type EspressoRecipe = Readonly<{
@@ -498,88 +490,61 @@ export async function compileEspressoShiftWorkflow(
   };
 }
 
-export function espressoApplianceTask(
-  task: ScheduledTaskDescriptor,
-  appliance: "linea" | "eagle-one" = "linea",
-): RecipeApplianceTaskBinding | null {
-  if (task.workflowId !== "espresso-orders") return null;
-  const key = task.taskKey;
+const ESPRESSO_WORKFLOWS = { exact: ["espresso-orders"] } as const;
 
-  if (key === "weigh-espresso-beans") {
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, 0.018),
-      20,
-      1500,
-      0.5,
-      0.05,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "weigh",
-      appliance: "ohaus-ranger-3000",
-      label: "Weigh 18 g espresso bean dose",
-      batch,
-      buildActions: () => weighActions(batch),
-    };
-  }
-
-  if (key === "grind-espresso-dose") {
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, 0.018),
-      22,
-      1500,
-      0.5,
-      25,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "grinder",
-      appliance: "waring-wsg60",
-      label: "Grind 18 g espresso dose",
-      batch,
-      buildActions: () => grindActions(batch, 3),
-    };
-  }
-
-  if (key === "extract-espresso" || key === "prepare-espresso") {
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      0.018,
-      24,
-      1500,
-      0.5,
-      0,
-    );
-    const machine =
-      appliance === "eagle-one"
-        ? "victoria-arduino-eagle-one-2g"
-        : "la-marzocco-linea-classic-s-2g";
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "espresso",
-      appliance: machine,
-      label: "Pull 36 g double espresso shot",
-      batch,
-      buildActions: () => espressoActions(batch, 6),
-    };
-  }
-
-  return null;
-}
+/** Declarative MuJoCo appliance task rows for espresso workflows. */
+export const ESPRESSO_APPLIANCE_ROWS: readonly ApplianceTaskRow[] = [
+  {
+    recipe: "espresso",
+    taskKind: "weigh",
+    workflows: ESPRESSO_WORKFLOWS,
+    keys: { exact: ["weigh-espresso-beans"] },
+    category: "weigh",
+    appliance: "ohaus-ranger-3000",
+    label: "Weigh 18 g espresso bean dose",
+    batch: {
+      massKg: 0.018,
+      temperatureC: 20,
+      specificHeat: 1500,
+      densityKgL: 0.5,
+      resistance: 0.05,
+    },
+    action: { kind: "weigh" },
+  },
+  {
+    recipe: "espresso",
+    taskKind: "grind",
+    workflows: ESPRESSO_WORKFLOWS,
+    keys: { exact: ["grind-espresso-dose"] },
+    category: "grinder",
+    appliance: "waring-wsg60",
+    label: "Grind 18 g espresso dose",
+    batch: {
+      massKg: 0.018,
+      temperatureC: 22,
+      specificHeat: 1500,
+      densityKgL: 0.5,
+      resistance: 25,
+    },
+    action: { kind: "grind", durationSeconds: 3 },
+  },
+  {
+    recipe: "espresso",
+    taskKind: "espresso",
+    workflows: ESPRESSO_WORKFLOWS,
+    keys: { exact: ["extract-espresso", "prepare-espresso"] },
+    category: "espresso",
+    appliance: "la-marzocco-linea-classic-s-2g",
+    useEspressoOption: true,
+    label: "Pull 36 g double espresso shot",
+    batch: {
+      massKg: 0.018,
+      massSource: "fixed",
+      temperatureC: 24,
+      specificHeat: 1500,
+      densityKgL: 0.5,
+      resistance: 0,
+    },
+    action: { kind: "espresso", durationSeconds: 6 },
+  },
+];

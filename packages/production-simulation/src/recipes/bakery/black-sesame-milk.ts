@@ -1,296 +1,239 @@
-import {
-  batchSpec,
-  blendActions,
-  chillerActions,
-  dishwasherActions,
-  executeRecipeApplianceTasks,
-  extractScheduledTasks,
-  grindActions,
-  heatedFrotherActions,
-  hobPowerActions,
-  ovenBakeActions,
-  taskMaterialMassKg,
-  weighActions,
-  type ApplianceWasmRuntimeSource,
-  type RecipeApplianceExecutionOptions,
-  type RecipeApplianceExecutionReport,
-  type RecipeApplianceTaskBinding,
-  type ScheduledTaskDescriptor,
-  type ScheduledTaskSource,
-} from "./appliance-execution.ts";
+import type { ApplianceTaskRow } from "./appliance-execution.ts";
 export {
   blackSesameRecipeInput,
   compileBlackSesameRecipe,
 } from "./black-sesame.ts";
 
-function isBlackSesameWorkflow(workflowId: string): boolean {
-  return workflowId === "sesame-batch" || workflowId === "sesame-drink";
-}
+const BLACK_SESAME_WORKFLOWS = {
+  exact: ["sesame-batch", "sesame-drink"],
+} as const;
 
-export function blackSesameApplianceTask(
-  task: ScheduledTaskDescriptor,
-): RecipeApplianceTaskBinding | null {
-  if (!isBlackSesameWorkflow(task.workflowId)) return null;
-  const key = task.taskKey;
-  if (
-    key === "weigh-sesame" ||
-    key === "weigh-starch" ||
-    key === "weigh-sugar" ||
-    key === "weigh-salt" ||
-    key === "weigh-water" ||
-    key === "scrape-and-weigh" ||
-    key === "standardize-mass" ||
-    key === "wash-and-fill-bottle-a" ||
-    key === "wash-and-fill-bottle-b" ||
-    key === "dose"
-  ) {
-    const fallbackKg =
-      key === "weigh-sesame"
-        ? 0.22
-        : key === "weigh-starch"
-          ? 0.018
-          : key === "weigh-sugar"
-            ? 0.12
-            : key === "weigh-salt"
-              ? 0.002
-              : key === "weigh-water"
-                ? 0.4
-                : key === "scrape-and-weigh"
-                  ? 0.74
-                  : key === "standardize-mass"
-                    ? 0.76
-                    : key.startsWith("wash-and-fill-bottle-")
-                      ? 0.38
-                      : 0.286;
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, fallbackKg),
-      key === "scrape-and-weigh" || key === "standardize-mass" ? 30 : 20,
-      3400,
-      1.03,
-      0.1,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "weigh",
-      appliance: "ohaus-ranger-3000",
-      label: `Black sesame ${key}`,
-      batch,
-      buildActions: () => weighActions(batch),
-    };
-  }
-  if (key === "roast-first-half" || key === "roast-second-half") {
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, 0.22),
-      key === "roast-second-half" ? 28 : 20,
-      2100,
-      0.68,
-      0.25,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "oven",
-      appliance: "maruzen-mbco-5e",
-      label: `Black sesame ${key}`,
-      batch,
-      buildActions: (context) => ovenBakeActions(batch, 55, 10, context),
-    };
-  }
-  if (key === "cool-roasted-seeds" || key === "cool-in-bath") {
-    const fallbackKg = key === "cool-roasted-seeds" ? 0.22 : 0.76;
-    const initialTempC = key === "cool-roasted-seeds" ? 34 : 32;
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, fallbackKg),
-      initialTempC,
-      3400,
-      1.04,
-      0.2,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "chiller",
-      appliance: "hoshizaki-rt-120snj",
-      label: `Black sesame ${key}`,
-      batch,
-      buildActions: () => chillerActions(batch, 6),
-    };
-  }
-  if (key.startsWith("grind-")) {
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, 0.055),
-      24,
-      2100,
-      0.65,
-      25,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "grinder",
-      appliance: "waring-wsg60",
-      label: `Black sesame ${key}`,
-      batch,
-      buildActions: () => grindActions(batch, 3),
-    };
-  }
-  if (
-    key === "cook-slurry-continuous-stir" ||
-    key === "dissolve-sugar-and-salt"
-  ) {
-    const fallbackKg =
-      key === "cook-slurry-continuous-stir" ? 0.638 : 0.748;
-    const percent = key === "cook-slurry-continuous-stir" ? 55 : 40;
-    const defaultTempC = key === "cook-slurry-continuous-stir" ? 22 : 28;
-    const baseBatch = batchSpec(
-      `${task.instanceId}-${key}`,
-      taskMaterialMassKg(task.definition, fallbackKg),
-      defaultTempC,
-      3600,
-      1.05,
-      0.18,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "hob",
-      appliance: "maruzen-mih-02c",
-      label: `Black sesame ${key}`,
-      batch: baseBatch,
-      buildActions: (context) => {
-        const tempC =
-          key === "dissolve-sugar-and-salt" &&
-          context.previousInstanceBatchTemperatureC !== null
-            ? Math.max(
-                22,
-                Math.min(70, context.previousInstanceBatchTemperatureC),
-              )
-            : defaultTempC;
-        return hobPowerActions(
-          { ...baseBatch, temperature_c: Number(tempC.toFixed(3)) },
-          percent,
-          5,
-        );
-      },
-    };
-  }
-  if (key === "blend") {
-    const batch = batchSpec(
-      `${task.instanceId}-blend`,
-      taskMaterialMassKg(task.definition, 0.748),
-      32,
-      3500,
-      1.06,
-      2.5,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "blender",
-      appliance: "vitamix-quiet-one",
-      label: "Blend black sesame concentrate",
-      batch,
-      buildActions: () => blendActions(batch, 45, 4),
-    };
-  }
-  if (key === "heat-and-mix") {
-    const batch = batchSpec(
-      `${task.instanceId}-drink`,
-      taskMaterialMassKg(task.definition, 0.286),
-      38,
-      3900,
-      1.03,
-      2.0,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "milk-frother",
-      appliance: "severin-sm-3587",
-      label: "Heat and froth black sesame milk drink",
-      batch,
-      buildActions: (context) => heatedFrotherActions(batch, 45, context),
-    };
-  }
-  if (key === "clean-batch-vessels" || key === "wash-jug") {
-    const batch = batchSpec(
-      `${task.instanceId}-${key}`,
-      key === "wash-jug" ? 0.25 : 0.5,
-      26,
-      1000,
-      1.15,
-      0.02,
-    );
-    return {
-      taskId: task.taskId,
-      instanceId: task.instanceId,
-      workflowId: task.workflowId,
-      taskKey: key,
-      startedAtUs: task.startedAtUs,
-      completedAtUs: task.completedAtUs,
-      category: "dishwasher",
-      appliance: "winterhalter-uc-l",
-      label: `Black sesame ${key}`,
-      batch,
-      buildActions: () =>
-        dishwasherActions(batch, key === "wash-jug" ? 5 : 6),
-    };
-  }
-  return null;
-}
-
-function blackSesameApplianceTasks(
-  source: ScheduledTaskSource,
-): readonly RecipeApplianceTaskBinding[] {
-  const bindings: RecipeApplianceTaskBinding[] = [];
-  for (const task of extractScheduledTasks(source)) {
-    const bound = blackSesameApplianceTask(task);
-    if (bound !== null) bindings.push(bound);
-  }
-  return bindings;
-}
-
-export async function executeBlackSesameApplianceTasks(
-  source: ScheduledTaskSource,
-  runtime: ApplianceWasmRuntimeSource,
-  options: RecipeApplianceExecutionOptions = {},
-): Promise<RecipeApplianceExecutionReport> {
-  return executeRecipeApplianceTasks(
-    blackSesameApplianceTasks(source),
-    runtime,
-    { runId: options.runId ?? "black-sesame-appliance-wasm", ...options },
-  );
-}
+/** Declarative MuJoCo appliance task rows for black sesame milk (Plan 61B). */
+export const BLACK_SESAME_APPLIANCE_ROWS: readonly ApplianceTaskRow[] = [
+  ...(
+    [
+      ["weigh-sesame", 0.22, 20],
+      ["weigh-starch", 0.018, 20],
+      ["weigh-sugar", 0.12, 20],
+      ["weigh-salt", 0.002, 20],
+      ["weigh-water", 0.4, 20],
+      ["scrape-and-weigh", 0.74, 30],
+      ["standardize-mass", 0.76, 30],
+      ["wash-and-fill-bottle-a", 0.38, 20],
+      ["wash-and-fill-bottle-b", 0.38, 20],
+      ["dose", 0.286, 20],
+    ] as const
+  ).map(([key, massKg, temperatureC]): ApplianceTaskRow => ({
+    recipe: "black-sesame",
+    taskKind: "weigh",
+    workflows: BLACK_SESAME_WORKFLOWS,
+    keys: { exact: [key] },
+    category: "weigh",
+    appliance: "ohaus-ranger-3000",
+    label: "Black sesame {key}",
+    batch: {
+      massKg,
+      temperatureC,
+      specificHeat: 3400,
+      densityKgL: 1.03,
+      resistance: 0.1,
+    },
+    action: { kind: "weigh" },
+  })),
+  {
+    recipe: "black-sesame",
+    taskKind: "oven-bake",
+    workflows: BLACK_SESAME_WORKFLOWS,
+    keys: { exact: ["roast-first-half"] },
+    category: "oven",
+    appliance: "maruzen-mbco-5e",
+    label: "Black sesame {key}",
+    batch: {
+      massKg: 0.22,
+      temperatureC: 20,
+      specificHeat: 2100,
+      densityKgL: 0.68,
+      resistance: 0.25,
+    },
+    action: { kind: "oven-bake", targetC: 55, durationSeconds: 10 },
+  },
+  {
+    recipe: "black-sesame",
+    taskKind: "oven-bake",
+    workflows: BLACK_SESAME_WORKFLOWS,
+    keys: { exact: ["roast-second-half"] },
+    category: "oven",
+    appliance: "maruzen-mbco-5e",
+    label: "Black sesame {key}",
+    batch: {
+      massKg: 0.22,
+      temperatureC: 28,
+      specificHeat: 2100,
+      densityKgL: 0.68,
+      resistance: 0.25,
+    },
+    action: { kind: "oven-bake", targetC: 55, durationSeconds: 10 },
+  },
+  {
+    recipe: "black-sesame",
+    taskKind: "chiller",
+    workflows: BLACK_SESAME_WORKFLOWS,
+    keys: { exact: ["cool-roasted-seeds"] },
+    category: "chiller",
+    appliance: "hoshizaki-rt-120snj",
+    label: "Black sesame {key}",
+    batch: {
+      massKg: 0.22,
+      temperatureC: 34,
+      specificHeat: 3400,
+      densityKgL: 1.04,
+      resistance: 0.2,
+    },
+    action: { kind: "chiller", durationSeconds: 6 },
+  },
+  {
+    recipe: "black-sesame",
+    taskKind: "chiller",
+    workflows: BLACK_SESAME_WORKFLOWS,
+    keys: { exact: ["cool-in-bath"] },
+    category: "chiller",
+    appliance: "hoshizaki-rt-120snj",
+    label: "Black sesame {key}",
+    batch: {
+      massKg: 0.76,
+      temperatureC: 32,
+      specificHeat: 3400,
+      densityKgL: 1.04,
+      resistance: 0.2,
+    },
+    action: { kind: "chiller", durationSeconds: 6 },
+  },
+  {
+    recipe: "black-sesame",
+    taskKind: "grind",
+    workflows: BLACK_SESAME_WORKFLOWS,
+    keys: { prefixes: ["grind-"] },
+    category: "grinder",
+    appliance: "waring-wsg60",
+    label: "Black sesame {key}",
+    batch: {
+      massKg: 0.055,
+      temperatureC: 24,
+      specificHeat: 2100,
+      densityKgL: 0.65,
+      resistance: 25,
+    },
+    action: { kind: "grind", durationSeconds: 3 },
+  },
+  {
+    recipe: "black-sesame",
+    taskKind: "hob-power",
+    workflows: BLACK_SESAME_WORKFLOWS,
+    keys: { exact: ["cook-slurry-continuous-stir"] },
+    category: "hob",
+    appliance: "maruzen-mih-02c",
+    label: "Black sesame {key}",
+    batch: {
+      massKg: 0.638,
+      temperatureC: 22,
+      specificHeat: 3600,
+      densityKgL: 1.05,
+      resistance: 0.18,
+    },
+    action: { kind: "hob-power", percent: 55, durationSeconds: 5 },
+  },
+  {
+    recipe: "black-sesame",
+    taskKind: "hob-power",
+    workflows: BLACK_SESAME_WORKFLOWS,
+    keys: { exact: ["dissolve-sugar-and-salt"] },
+    category: "hob",
+    appliance: "maruzen-mih-02c",
+    label: "Black sesame {key}",
+    batch: {
+      massKg: 0.748,
+      temperatureC: 28,
+      specificHeat: 3600,
+      densityKgL: 1.05,
+      resistance: 0.18,
+    },
+    action: {
+      kind: "hob-power",
+      percent: 40,
+      durationSeconds: 5,
+      carryPreviousTempRange: [22, 70],
+    },
+  },
+  {
+    recipe: "black-sesame",
+    taskKind: "blend",
+    workflows: BLACK_SESAME_WORKFLOWS,
+    keys: { exact: ["blend"] },
+    category: "blender",
+    appliance: "vitamix-quiet-one",
+    label: "Blend black sesame concentrate",
+    batch: {
+      idSuffix: "blend",
+      massKg: 0.748,
+      temperatureC: 32,
+      specificHeat: 3500,
+      densityKgL: 1.06,
+      resistance: 2.5,
+    },
+    action: { kind: "blend", percent: 45, durationSeconds: 4 },
+  },
+  {
+    recipe: "black-sesame",
+    taskKind: "heated-frother",
+    workflows: BLACK_SESAME_WORKFLOWS,
+    keys: { exact: ["heat-and-mix"] },
+    category: "milk-frother",
+    appliance: "severin-sm-3587",
+    label: "Heat and froth black sesame milk drink",
+    batch: {
+      idSuffix: "drink",
+      massKg: 0.286,
+      temperatureC: 38,
+      specificHeat: 3900,
+      densityKgL: 1.03,
+      resistance: 2.0,
+    },
+    action: { kind: "heated-frother", targetC: 45 },
+  },
+  {
+    recipe: "black-sesame",
+    taskKind: "dishwasher",
+    workflows: BLACK_SESAME_WORKFLOWS,
+    keys: { exact: ["wash-jug"] },
+    category: "dishwasher",
+    appliance: "winterhalter-uc-l",
+    label: "Black sesame {key}",
+    batch: {
+      massKg: 0.25,
+      massSource: "fixed",
+      temperatureC: 26,
+      specificHeat: 1000,
+      densityKgL: 1.15,
+      resistance: 0.02,
+    },
+    action: { kind: "dishwasher", durationSeconds: 5 },
+  },
+  {
+    recipe: "black-sesame",
+    taskKind: "dishwasher",
+    workflows: BLACK_SESAME_WORKFLOWS,
+    keys: { exact: ["clean-batch-vessels"] },
+    category: "dishwasher",
+    appliance: "winterhalter-uc-l",
+    label: "Black sesame {key}",
+    batch: {
+      massKg: 0.5,
+      massSource: "fixed",
+      temperatureC: 26,
+      specificHeat: 1000,
+      densityKgL: 1.15,
+      resistance: 0.02,
+    },
+    action: { kind: "dishwasher", durationSeconds: 6 },
+  },
+];

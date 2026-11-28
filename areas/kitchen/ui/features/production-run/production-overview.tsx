@@ -1,12 +1,14 @@
 import type React from "react";
 import { assertNever } from "@purin-labs/std";
 import type { HostView } from "@purin-labs/production-simulation/execution-entry";
+import type { ApplianceTaskRisk } from "@purin-labs/production-simulation/recipes/bakery/appliance-execution";
 import { ProductionActivityTrace } from "./production-activity-trace";
 
 type Props = Readonly<{
   view: HostView;
   select(task: string): void;
   reviewRecovery(): void;
+  atRisk?: ReadonlyMap<string, ApplianceTaskRisk>;
 }>;
 
 /** These are projections of the accepted run. They never decide dispatch. */
@@ -14,6 +16,7 @@ export function ProductionOverview({
   view,
   select,
   reviewRecovery,
+  atRisk,
 }: Props): React.ReactNode {
   return (
     <section aria-label="Production overview">
@@ -23,6 +26,7 @@ export function ProductionOverview({
         view={view}
         select={select}
         reviewRecovery={reviewRecovery}
+        {...(atRisk !== undefined ? { atRisk } : {})}
       />
       <p>
         Select a task to see its prerequisites, resource claims and accepted

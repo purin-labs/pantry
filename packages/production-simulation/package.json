@@ -24,6 +24,7 @@
     "./recipes/bakery/pour-over": "./src/recipes/bakery/pour-over.ts",
     "./recipes/bakery/schedule": "./src/recipes/bakery/schedule.ts",
     "./recipes/bakery/appliance-execution": "./src/recipes/bakery/appliance-execution.ts",
+    "./recipes/bakery/appliance-task-table": "./src/recipes/bakery/appliance-task-table.ts",
     "./recipes/bakery/financier": "./src/recipes/bakery/financier.ts",
     "./recipes/bakery/financier-flavours": "./src/recipes/bakery/financier-flavours.ts",
     "./recipes/bakery/pie": "./src/recipes/bakery/pie.ts",
