@@ -146,6 +146,24 @@ export async function startScriptTurn(
   };
 }
 
+/**
+ * Controls each completion of a capability call at the Organisation Actor,
+ * for a journey that starts its turn itself. `calls` holds the call ID of
+ * each completion that reached the Actor.
+ */
+export async function controlCapabilityCompletions(
+  test: TestContext,
+  organisation: DurableObjectStub<OrganisationDO>,
+  passages: readonly Passage[],
+): Promise<Pick<MethodControl, "calls">> {
+  const control = methodControl(passages, Promise.resolve());
+  await runInDurableObject(
+    organisation,
+    controlMethod.bind(null, test, "completeCodeModeCapability", control),
+  );
+  return control;
+}
+
 function methodControl(
   passages: readonly Passage[] | undefined,
   released: Promise<void>,

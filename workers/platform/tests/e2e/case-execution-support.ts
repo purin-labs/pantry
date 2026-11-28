@@ -554,11 +554,42 @@ export function readCanonicalToolResults(
     .toArray();
 }
 
+/** The attempt that accepted a tool call and the one that accepted its result. */
+export type CanonicalToolAttempt = Readonly<{
+  callId: string;
+  called: number | null;
+  settled: number | null;
+}>;
+
+/**
+ * Reads, for each tool call of a Session's history, the runtime generation
+ * its call was accepted under and the one its result was accepted under.
+ */
+export function readCanonicalToolAttempts(
+  _actor: unknown,
+  state: DurableObjectState,
+): CanonicalToolAttempt[] {
+  return state.storage.sql
+    .exec<CanonicalToolAttempt>(
+      `SELECT json_extract(c.value, '$.callId') AS callId,
+         h.runtime_generation AS called,
+         (SELECT r.runtime_generation FROM session_harness_history r
+          WHERE json_extract(r.payload, '$.entry.kind') = 'tool_result'
+            AND json_extract(r.payload, '$.entry.callId') =
+              json_extract(c.value, '$.callId')) AS settled
+       FROM session_harness_history h, json_each(h.payload, '$.entry.content') c
+       WHERE json_extract(h.payload, '$.entry.kind') = 'assistant_message'
+         AND json_extract(c.value, '$.kind') = 'tool_call'
+       ORDER BY h.sequence, c.key`,
+    )
+    .toArray();
+}
+
 /**
  * A Portal chat Case whose one turn called tools. Each tool operation is one
  * accepted call with its accepted result, joined by the call identity, and
  * it hangs from the turn that made it. The detail of an operation gives the
- * arguments and the result. No record says which attempt made a call.
+ * arguments and the result. Each operation names the one attempt of the turn.
  */
 export async function verifyToolTurnExecution(
   input: Readonly<{
@@ -591,6 +622,7 @@ export async function verifyToolTurnExecution(
     expect(incoming(full, tool.nodeId)).toEqual(["turn:turn"]);
     expect(tool.settledAt).not.toBeNull();
     expect(tool.turnId).toBe(turns[0]?.turnId);
+    expect([tool.generation, tool.settledGeneration]).toEqual([1, 1]);
   }
   if (input.turn === "complete") {
     expect(assignments.map((assignment) => assignment.state)).toEqual([
@@ -607,9 +639,7 @@ export async function verifyToolTurnExecution(
     expect(turns[0]?.failureCode).not.toBeNull();
     expect(proposals).toEqual([]);
   }
-  expect(full.limitations).toEqual(
-    tools.length === 0 ? [] : ["tool_attempt_unrecorded"],
-  );
+  expect(full.limitations).toEqual([]);
   const last = tools.at(-1);
   let detail: readonly string[] = [];
   if (last !== undefined) {
@@ -675,6 +705,31 @@ export function readCanonicalRuntimes(
 }
 
 /**
+ * The attempts that a Session's journal records: one for each runtime that
+ * an activation or a resumption starts, interrupted at the time of the
+ * recovery that fenced its generation.
+ */
+export function journalAttempts(runtimes: readonly CanonicalRuntime[]) {
+  const fenced = new Map<number, number>();
+  for (const runtime of runtimes)
+    if (
+      runtime.kind === "execution_recovery_started" &&
+      runtime.fenced !== null
+    )
+      fenced.set(runtime.fenced, runtime.at);
+  return runtimes
+    .filter((runtime) => runtime.kind !== "execution_recovery_started")
+    .map((runtime) => ({
+      generation: runtime.generation,
+      startedAt: runtime.at,
+      interruptedAt:
+        runtime.generation === null
+          ? null
+          : (fenced.get(runtime.generation) ?? null),
+    }));
+}
+
+/**
  * A Portal chat Case whose turn was interrupted and went on to complete. The
  * turn has one attempt for each runtime the Session's journal records, and an
  * attempt is interrupted where the journal records the recovery that fenced
@@ -723,33 +778,17 @@ export async function verifyResumedTurnExecution(
   expect(attempts.map((attempt) => attempt.state)).toEqual(input.attempts);
   // Each attempt is one runtime of the journal, and the journal's recovery
   // of a generation is what interrupted it.
-  const started = input.runtimes.filter(
-    (runtime) => runtime.kind !== "execution_recovery_started",
-  );
-  const fenced = new Map<number, number>();
-  for (const runtime of input.runtimes)
-    if (
-      runtime.kind === "execution_recovery_started" &&
-      runtime.fenced !== null
-    )
-      fenced.set(runtime.fenced, runtime.at);
+  const recorded = journalAttempts(input.runtimes);
   expect(
     attempts.map((attempt) => ({
       generation: attempt.generation,
       startedAt: attempt.startedAt,
       interruptedAt: attempt.interruptedAt,
     })),
-  ).toEqual(
-    started.map((runtime) => ({
-      generation: runtime.generation,
-      startedAt: runtime.at,
-      interruptedAt:
-        runtime.generation === null
-          ? null
-          : (fenced.get(runtime.generation) ?? null),
-    })),
-  );
-  expect(fenced.size).toBe(
+  ).toEqual(recorded);
+  expect(
+    recorded.filter((attempt) => attempt.interruptedAt !== null),
+  ).toHaveLength(
     input.attempts.filter((state) => state === "interrupted").length,
   );
   for (const attempt of attempts) {
@@ -766,9 +805,15 @@ export async function verifyResumedTurnExecution(
       outcome: tool.state,
     })),
   ).toEqual(input.tools);
-  for (const tool of tools)
+  // Each tool operation names an attempt of this turn, for its call and for
+  // its result.
+  const generations = attempts.map((attempt) => attempt.generation);
+  for (const tool of tools) {
     expect(incoming(full, tool.nodeId)).toEqual(["turn:turn"]);
-  expect(full.limitations).toEqual(["tool_attempt_unrecorded"]);
+    expect(generations).toContain(tool.generation);
+    expect(generations).toContain(tool.settledGeneration);
+  }
+  expect(full.limitations).toEqual([]);
   // The chat timeline and the graph name a Kitchen command by one receipt.
   const commands = tools.filter((tool) => tool.authority === "surface_effect");
   expect(commands.length).toBeGreaterThan(0);
@@ -801,6 +846,8 @@ export async function verifyResumedTurnExecution(
       state: tool.state,
       authority: tool.authority,
       receipt: tool.receiptId !== null,
+      calledInAttempt: tool.generation,
+      resultAcceptedInAttempt: tool.settledGeneration,
     })),
     timeline: {
       settledToolItems: input.timeline.length,
@@ -932,10 +979,13 @@ export async function verifyCommerceExecution(
     canonical: CaseSnapshot;
     triggers: number;
     turns: number;
+    /** The attempts of all turns. Each turn has one unless this says more. */
+    attempts?: number;
     toolResults: readonly CanonicalToolResult[];
   }>,
 ) {
   const { organisationId, session, caseId, canonical } = input;
+  const attempts = input.attempts ?? input.turns;
   const full = await readCaseExecution(organisationId, session, caseId, 100);
   const outputs = canonical.outputs.map((lifecycle) => lifecycle.output.source);
   expect(executionShape(full)).toMatchObject({
@@ -944,7 +994,7 @@ export async function verifyCommerceExecution(
       trigger: input.triggers,
       assignment: canonical.assignmentLifecycles.length,
       turn: input.turns,
-      attempt: input.turns,
+      attempt: attempts,
       tool_operation: input.toolResults.length,
       proposal:
         canonical.acceptedProposalIds.length +
@@ -992,12 +1042,12 @@ export async function verifyCommerceExecution(
     input.toolResults.map(() => "turn:turn"),
   );
   expect(references("attempt")).toEqual(
-    Array.from({ length: input.turns }, () => "turn:turn"),
+    Array.from({ length: attempts }, () => "turn:turn"),
   );
+  // Each tool operation names its attempt, so that link is no longer absent.
   expect(full.limitations).toEqual([
     "delivery_attempts_unrecorded",
     "effect_attempts_unrecorded",
-    "tool_attempt_unrecorded",
   ]);
   // Each node's detail opens; a node that is not one answers as missing.
   const missing = await executionRequest(

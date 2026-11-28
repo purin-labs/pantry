@@ -12468,96 +12468,113 @@ async function verifySupplierEvalRuns(
     evalCaseId: comparison.caseId,
     evalAssignments: assignments.length,
   });
-  Object.assign(input.context.task.meta, {
-    caseExecution,
-    supplierEvalRuns: {
-      substituted: [
-        "model provider on the platform route (deterministic OpenRouter transport)",
-        "ChatGPT backend on the subscription route (deterministic transport)",
-        "Gmail",
-      ],
-      eval: {
-        evalId,
-        openedBy: {
-          principal: "agent",
-          correction: {
-            proposalId: correction.evidence.proposalId,
-            version: correction.evidence.version,
-          },
-          scenario: "corrected_request",
-        },
-        revision: 2,
-        scenarios: reviewed.map((entry) => ({
-          scenarioId: entry.scenarioId,
-          role: entry.role,
-          sender: entry.sender,
-          receivedAt: entry.message.receivedAt,
-          timezone: entry.message.timezone,
-          criteria: entry.criteria,
-        })),
-      },
-      memory: { memoryId, current: 1, candidate: 2, acceptedAfterRun: 2 },
-      comparison: {
-        runId: comparison.runId,
-        caseId: comparison.caseId,
-        state: compared.state,
-        scorer: compared.scorer,
-        tasks: compared.tasks.map((task) => ({
-          taskId: task.taskId,
-          end: ended(task),
-          execution: task.execution,
-          pins: task.pins,
-          totalTokens: task.totalTokens,
-          memory:
-            task.outcome.kind === "assessed"
-              ? task.outcome.observation.memory
-              : null,
-        })),
-        assignments,
-      },
-      interrupted: {
-        runId: interrupted.runId,
-        caseId: interrupted.caseId,
-        state: afterStop.state,
-        tasks: afterStop.tasks.map((task) => ({
-          taskId: task.taskId,
-          end: ended(task),
-          execution: task.execution,
-        })),
-        assignments: afterStopAssignments,
-      },
-      replaced: {
-        runId: replaced.runId,
-        caseId: replaced.caseId,
-        stopped: ["CaseActor", "OrganisationActor"],
-        state: afterReplacement.state,
-        tasks: afterReplacement.tasks.map((task) => ({
-          taskId: task.taskId,
-          end: ended(task),
-          execution: task.execution,
-        })),
-        assignments: afterReplacementAssignments,
-        modelRequests: 12,
-      },
-      spent: {
-        runId: spent.runId,
-        caseId: spent.caseId,
-        substituted: "the provider's answer to a key with no credit (HTTP 402)",
-        state: afterSpent.state,
-        tasks: afterSpent.tasks.map((task) => ({
-          taskId: task.taskId,
-          end: ended(task),
-          totalTokens: task.totalTokens,
-        })),
-        modelRequests: 4,
-        requestsOnAnotherRoute: 0,
-      },
-      strangerReads: {
-        evals: strangerEvals.status,
-        runs: strangerRuns.status,
-      },
+  // The artifact of the Evals acceptance journey (Plan 42J, B1b): the
+  // reviewed criteria, the compared Memory revisions, each run and assignment
+  // identity, and each result.
+  const supplierEvalRuns = {
+    journey: "Plan 42J B1b: Evals acceptance journey",
+    rerun:
+      'pnpm --filter @purin-labs/platform test:e2e tests/e2e/mail-inbox.test.ts -t "compares the accepted and a candidate Memory"',
+    substituted: [
+      "model provider on the platform route (deterministic OpenRouter transport)",
+      "Gmail",
+    ],
+    // The subscription has no Gmail model review, and the organisation holds
+    // no OpenAI key: no request went to either route.
+    routes: {
+      ran: ["pantry_platform"],
+      unavailable: ["codex_subscription", "organisation_openai_api_key"],
     },
-  });
+    eval: {
+      evalId,
+      openedBy: {
+        principal: "agent",
+        correction: {
+          proposalId: correction.evidence.proposalId,
+          version: correction.evidence.version,
+        },
+        scenario: "corrected_request",
+      },
+      revision: 2,
+      scenarios: reviewed.map((entry) => ({
+        scenarioId: entry.scenarioId,
+        role: entry.role,
+        sender: entry.sender,
+        receivedAt: entry.message.receivedAt,
+        timezone: entry.message.timezone,
+        criteria: entry.criteria,
+      })),
+    },
+    memory: { memoryId, current: 1, candidate: 2, acceptedAfterRun: 2 },
+    comparison: {
+      runId: comparison.runId,
+      caseId: comparison.caseId,
+      state: compared.state,
+      scorer: compared.scorer,
+      tasks: compared.tasks.map((task) => ({
+        taskId: task.taskId,
+        end: ended(task),
+        execution: task.execution,
+        pins: task.pins,
+        totalTokens: task.totalTokens,
+        memory:
+          task.outcome.kind === "assessed"
+            ? task.outcome.observation.memory
+            : null,
+      })),
+      assignments,
+    },
+    interrupted: {
+      runId: interrupted.runId,
+      caseId: interrupted.caseId,
+      state: afterStop.state,
+      tasks: afterStop.tasks.map((task) => ({
+        taskId: task.taskId,
+        end: ended(task),
+        execution: task.execution,
+      })),
+      assignments: afterStopAssignments,
+    },
+    replaced: {
+      runId: replaced.runId,
+      caseId: replaced.caseId,
+      stopped: ["CaseActor", "OrganisationActor"],
+      state: afterReplacement.state,
+      tasks: afterReplacement.tasks.map((task) => ({
+        taskId: task.taskId,
+        end: ended(task),
+        execution: task.execution,
+      })),
+      assignments: afterReplacementAssignments,
+      modelRequests: 12,
+    },
+    spent: {
+      runId: spent.runId,
+      caseId: spent.caseId,
+      substituted: "the provider's answer to a key with no credit (HTTP 402)",
+      state: afterSpent.state,
+      tasks: afterSpent.tasks.map((task) => ({
+        taskId: task.taskId,
+        end: ended(task),
+        totalTokens: task.totalTokens,
+      })),
+      modelRequests: 4,
+      requestsOnAnotherRoute: 0,
+    },
+    strangerReads: {
+      evals: strangerEvals.status,
+      runs: strangerRuns.status,
+    },
+  };
+  Object.assign(input.context.task.meta, { caseExecution, supplierEvalRuns });
+  const written = await env.JOURNEY_ARTIFACTS.fetch(
+    "http://artifacts/plan-42j/evals-journey.json",
+    {
+      method: "PUT",
+      body: JSON.stringify({ status: "passed", ...supplierEvalRuns }),
+    },
+  );
+  expect(written.status, await written.clone().text()).toBe(200);
 }
 
 /**

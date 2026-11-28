@@ -1,8 +1,10 @@
 # Plan 42J — Brain: Memory, Evals, and Case Execution
 
 Status: B1a, B1b and B2 are built and checked locally, and in production
-since 12 October 2026. Production acceptance is open. A box below marks an
-item that is built and checked; an open box names a gap that remains.
+since 12 October 2026. Each box of this plan is closed since 28 November 2026
+on the branch `plan-42j`, which is not released. What is left is the
+production acceptance, after a release that the owner approves. A box below
+marks an item that is built and checked.
 Date: 9 October 2026.
 Owners: Platform context and Case runtime, with CafeOS Portal.
 
@@ -538,7 +540,21 @@ production since the release of 31 October 2026. Production acceptance is not ru
       earlier-request and other-supplier controls.
 - [x] Deliver the Evals view and the comparison detail.
 - [x] Extend IFC entry-point documentation for fixture and result outputs.
-- [ ] Complete the Evals journey below with a repeatable artifact.
+- [x] Complete the Evals journey below with a repeatable artifact.
+      28 November 2026: the journey `compares the accepted and a candidate
+      Memory` in `workers/platform/tests/e2e/mail-inbox.test.ts` passes each
+      step below and writes `output/plan-42j/evals-journey.json`: the
+      reviewed criteria, the two Memory revisions, each run, Case, assignment
+      and Session identity, each result and the command to run it again.
+      The platform route runs through a deterministic transport, and the
+      artifact names each substitute. A real model ran that route on 12
+      October 2026; that run was not repeated. The ChatGPT subscription
+      route has no Gmail model review, so Pantry sends it no mail content:
+      each of its tasks ends as `unavailable: authority_unavailable`, with no
+      verdict and on no other route, as the tasks of a route with no
+      credential do. The gate of October 2026, a run on the real Codex
+      route, so no longer applies. The journey was built in October 2026;
+      this work added the artifact file.
 
 Acceptance journey:
 
@@ -589,14 +605,54 @@ Production acceptance is not run.
       that payload alongside its turn columns. Known gaps: a proposal does not name the tool
       call that produced it, retry attempts have no recorded identity on events,
       and an approval wait is not an event.
-- [ ] Add only the missing accepted event fields needed for an honest
+- [x] Add only the missing accepted event fields needed for an honest
       projection, starting with the gaps above. Expect this to be the largest item.
+      28 November 2026, each gap of the inventory:
+      - A proposal names its tool call. A commerce proposal's acceptance
+        holds `toolCallId` since October 2026, and its node hangs from that
+        tool operation (`tool_call`).
+      - An attempt has an identity on its events. Each entry of the Session's
+        history now records the runtime generation that accepted it
+        (`session_harness_history.runtime_generation`). A tool operation
+        names the attempt that accepted its call and the attempt that
+        accepted its result. An entry from before this record keeps no
+        attempt, and the read still lists `tool_attempt_unrecorded` for it.
+      - An approval wait needs no new event. The Case keeps each wait as one
+        record under one state machine (`CASE_APPROVAL_WAIT_MACHINE`): the
+        request and its time, then the decision or the lapse and its time.
+        The read shows the wait as `waiting` before the decision and as
+        `approved` after it, with both times.
+      - An effect now shows its receipt. The ledger keeps the time of a
+        provider receipt as text, and the read accepted a number only, so
+        each effect showed no receipt.
+      Not recorded, and listed by the read as absent links: each try of an
+      effect, each try of a delivery, and the turn or tool call of a mail
+      reply proposal. They need new records in the action ledger, the Case
+      outputs and the Inbox, and no step of the journey below needs them.
 - [x] Publish one execution node and edge union in `packages/control-api`. The
       tool, approval, and receipt items in `services/platform/src/chat/timeline.ts`
       render the same execution identities. Preserve conversation records.
 - [x] Implement bounded reads, graph/list views, details, and reconnect behavior.
 - [x] Apply source restrictions to the complete projection and each detail read.
-- [ ] Complete the execution journey below with a repeatable artifact.
+- [x] Complete the execution journey below with a repeatable artifact.
+      28 November 2026: `workers/platform/tests/e2e/case-execution-journey.test.ts`
+      holds each step in one Case and writes
+      `output/plan-42j/execution-journey.json`. Two assignments run side by
+      side, and a third is given both proposals. The third Session's instance
+      is lost during its catalog read, and its next instance resumes the turn
+      as a second attempt. The next delivery of the cue's command gives the
+      completed turn to the Case; before this work the command had no such
+      step, and the assignment stayed open. One approval wait is read as
+      waiting and then as approved. The provider applies one effect, its
+      answer is lost, the Case and Organisation instances are replaced, and
+      the same command settles the one effect. The owner reads each record
+      in the open, in pages and after the Session and Case instances are
+      replaced. A member without the Case read gets the answer of a missing
+      Case. The artifact holds the event export, the receipts, each absent
+      link with its reason, and the command to run it again. Not in this
+      journey: graph screenshots, keyboard use and the narrow-screen list.
+      The browser journey of [Plan 42K](plan-42K-brain-ui.md) covers them,
+      and it was not run again.
 
 Acceptance journey:
 
@@ -1003,8 +1059,9 @@ member, a private chat), `tests/e2e/portal-chat-finalization.test.ts`
 filtered by `fences captured read authority` (tool operations),
 `tests/e2e/pi-sdk-effect.test.ts` (a Slack Case with an approved effect,
 absent while its channel is private and open once it is public),
-`tests/e2e/pi-sdk-combined-proposal.test.ts` (a third assignment that was
-given two proposals), `tests/e2e/slack-case-title.test.ts` (a Slack Case and
+`tests/e2e/case-execution-journey.test.ts` (the acceptance journey of B2: a
+third assignment that was given two proposals, an interrupted attempt, one
+approved effect, and a member without the Case read), `tests/e2e/slack-case-title.test.ts` (a Slack Case and
 its title, absent and then open), `tests/e2e/commerce-lab.test.ts` (no
 record open below a withheld source) and the mail journey above (the
 reviewer, and a member who reads only what came from the mailbox). `tests/e2e/memory-admission.test.ts`

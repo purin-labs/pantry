@@ -52,6 +52,17 @@ test and any fixture that exists only for the obsolete behavior.
   nothing. `e2e/write-meter.ts` counts the writes and names the D1 statement
   that wrote. Run the journey after a change to a cron, an alarm, a poll or a
   Durable Object constructor.
+- `e2e/case-execution-journey.test.ts` is the acceptance journey of the Case
+  execution view (Plan 42J, B2), in one Case: two assignments side by side, a
+  third that was given both proposals, a Session lost during its catalog read
+  and resumed as a second attempt, a second delivery of the cue's command
+  that gives the completed turn to the Case, an approval wait read as waiting
+  and as approved, one effect settled after a lost provider answer and
+  replaced Actors, the owner's open read, and a member without the Case read
+  who gets the answer of a missing Case. Each tool operation names its
+  attempt. The artifact is `output/plan-42j/execution-journey.json`. The
+  Evals journey of `e2e/mail-inbox.test.ts` (`compares the accepted and a
+candidate Memory`) writes `output/plan-42j/evals-journey.json`.
 - `e2e/unregistered-actors.test.ts` covers the operator's erase of an Actor by
   its object identifier: what is erased, and the two refusals that protect a
   registered Actor and one whose Organisation exists.
