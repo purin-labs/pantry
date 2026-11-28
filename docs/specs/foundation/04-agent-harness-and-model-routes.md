@@ -391,6 +391,8 @@ Boundaries:
 - The container forwards a request when its trace read fails, with the colo `unknown`.
 - Plan 96 has open steps: the live check of a Gemini key turn through the deployed exit
   Worker, and the comparison of the OpenRouter spend after the change of the default.
+- No route removes a stored model key. A key leaves the Vault only when another key of
+  the same provider replaces it. A change of the source keeps the key.
 - The Wrangler files have a `local` and a `production` profile, and no staging profile.
 
 ## Sources
@@ -418,3 +420,7 @@ Boundaries:
   - The exits in the E2E runtime: `model-exit-network.ts` (`ChatGptExitNetwork`).
 - The live journey on real services: `pnpm --filter @purin-labs/platform
 slack:live-reply` (`workers/platform/scripts/slack-live-reply-journey.ts`).
+- The live check of a Gemini API key: `pnpm --filter @purin-labs/platform
+gemini:live-key` (`workers/platform/scripts/gemini-key-live-check.ts`). It runs a tool
+  loop on each of the four models through Pi's Google provider, from the machine that
+  runs it and not through the exit Worker.

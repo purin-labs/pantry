@@ -11,9 +11,15 @@ Hydrogen passed in production, in the Plan 95 gate. No Gemini key turn has run
 in production.
 
 Checked on 28 November 2026: A1 to A3 and B1 to B5 are done, except two items.
-Step A4 (the spend comparison, due on 28 November 2026) and the live Gemini key
-check of B4 and B5 are open. The live check needs a Gemini API key from the
-owner.
+Both wait for the owner (see "The owner's actions"):
+
+- Step A4, the spend comparison. It needs the OpenRouter spend of each day, and
+  only a sign-in at OpenRouter or a management key gives it.
+- The live Gemini key check of B4, which is also the production proof of B5. It
+  needs a Gemini API key. Its sequence is ready (see B4).
+
+The code on `origin/dev` `b710111d` supports each claim of this plan (see "Check
+of 28 November 2026").
 
 Owner: the model routes (spec FND-04, "Agent harness and model routes").
 Touches: [Plan 73 — model exit Worker](history/plan-73-model-exit-worker.md),
@@ -37,7 +43,12 @@ Not in this plan:
 
 - Vertex AI. In a Worker, Pi can use Vertex only with an API key, and its
   ADC token requests bypass the model exit Worker.
-- A Gemini subscription sign-in. Pi has no provider for it.
+- A Gemini subscription sign-in. Pi 1.6.0 has two Google providers, `google` (an
+  API key) and `google-vertex`, and no sign-in for a Google AI subscription. Google
+  gives that sign-in only to its own tools. A Google AI Pro or Ultra subscription
+  can still pay for the Gemini key route: it includes Google Cloud credits each
+  month, which pay for the use of a Gemini API key of a project with billing
+  (answer to the owner's question of 28 November 2026).
 - A model choice on the route that Seams pays for (decision D6).
 - A quality evaluation. The owner tested the four models on 20 November 2026
   and rates all four above kimi-k3. The Plan 50 comparison was cancelled.
@@ -247,7 +258,7 @@ The paths are those on `ebf2996`. Refactor 17 can move a file;
 ### Cost for an idle Organisation
 
 - The plan adds no cron trigger, alarm, poll or queue message.
-- A Google key writes rows only when a person saves or removes it.
+- A Google key writes rows only when a person saves it or replaces it.
 - So an idle Organisation gets no new row, queue message, KV write or R2 write
   in 30 days. `tests/e2e/idle-tenant-cost.test.ts` must pass with its current
   budget.
@@ -305,9 +316,29 @@ part B.
 - Rollback: set the Worker variable `PANTRY_PLATFORM_PI_MODEL` to
   `moonshotai/kimi-k3`. After A1, open chats keep their work.
 
-### A4. One week after A3 — open
+### A4. One week after A3 — open, waits for the owner
 
-- Compare the OpenRouter spend per day with the week before A3.
+- Compare the OpenRouter spend per day with the week before A3: 14 to 20 November
+  against 21 to 27 November 2026, by day and by model.
+- State on 28 November 2026 (13:56 UTC). The only OpenRouter key on this machine is
+  not a management key: `GET /api/v1/activity` answers 403. `GET /api/v1/key` gives
+  only totals: $0.007 today, $0.341 this week (from 23 November), $0.972 this
+  month, $5.80 in all. Local work and production use the same key, so the totals
+  mix both. Pantry keeps the use of a turn in its Session, not in D1, and the
+  Plan 93 cutover of 22 November moved no data. So only OpenRouter has the spend
+  of each day.
+- The spend is small: about $0.06 for each day of this week and $0.035 for each
+  day of this month. Decision D1 expects $28 against $30 for each 1,000 turns. A
+  total of each day cannot prove a change of that size. The comparison needs the
+  cost of each request by model, which the Activity page gives.
+- Credit: `GET /api/v1/credits` gives 30 credits bought and 29.07 used, so $0.93
+  is left on the account. This key used $5.80 of the 29.07; other keys of the
+  account used the rest. At $0.035 to $0.06 for each day, the credit ends in 15
+  to 26 days, between 13 and 24 December 2026, or earlier if another key still
+  spends. At zero, OpenRouter refuses each request with HTTP 402. Each turn on
+  the route that Seams pays for then fails, in the Portal, in Slack, in WhatsApp
+  and for mail drafts. No route falls back. An Organisation with its own key or
+  sign-in continues.
 - An open Slack thread pins kimi-k3 for the life of its Session (J2). The step
   that a removal needs is built: a Session whose pinned model left the list
   continues in a new lineage on the current default, with the thread's history
@@ -355,7 +386,30 @@ part B.
 - J5: a member without the right to change the inference source cannot save a
   Gemini key.
 - Live check: one turn with a tool loop through the deployed exit Worker on a
-  real Gemini API key that the owner gives for this purpose.
+  real Gemini API key that the owner gives for this purpose. The sequence, ready
+  on 28 November 2026:
+  1. The owner makes a Gemini API key and saves it as `GEMINI_API_KEY` in
+     `~/Dev/purin-labs/pantry/.env.local`.
+  2. The key check, with no write to production. Set `GEMINI_LIVE_ENV_FILE` to
+     `~/Dev/purin-labs/pantry/.env.local` and run
+     `pnpm --filter @purin-labs/platform gemini:live-key`
+     (`workers/platform/scripts/gemini-key-live-check.ts`). For each of the four
+     models it runs a tool loop of two calls on the real Gemini API, through
+     Pi's Google provider and the catalog rows that Pantry uses. It passes when both tools ran, a tool
+     call has a thought signature, and the answer has the receipt code of the
+     second tool. It writes an evidence file and no part of the key. It calls
+     Google from this machine, so it does not prove the exit Worker.
+  3. The owner selects "Gemini API key" in the production Portal (Integrations,
+     AI account), pastes the key and saves. An agent does not type a key into a
+     production page. From that moment, each new chat and each new Slack thread
+     of that Organisation runs on the key, and Google bills it.
+  4. One new Portal chat on Gemini 4 Carbon at high effort, with a request that
+     needs two tool calls. Then one new Slack thread with a mention. Each answer
+     must come, and the Workers Logs must show `model_exit.forwarded` with the
+     host `generativelanguage.googleapis.com`, the status 200 and the data
+     centre of Google (`provider_colo`).
+  5. The owner selects the earlier source again (Purin AI). Pantry has no way to
+     remove a stored model key, so the owner then deletes the test key at Google.
 
 ### B5. Release part B — released, production proof open
 
@@ -378,9 +432,9 @@ part B.
 | B3 | The Portal source list has "Gemini API key" with the billing note, and every source label names it. The two copies of the selection union in Portal and the two selection parsers in `control-api` are one each |
 | B4 | `gemini-key-portal.test.ts` (J3, J4): the menu, a Hydrogen chat, a Carbon chat at high effort with a signed tool call, the refusal of a model that the menu does not offer, and a fork whose first request carries the signature from the history. J4 fails without the history change. No new J5: the inference route's admin check is the same for each provider |
 
-Billing: the Console contract names no Gemini key, so a Gemini key turn settles in
-Pantry unpriced, as every turn does in production. Only the E2E test meter differs.
-Plan 95 step 3 deletes `execution-billing.ts` and this exception.
+Billing: Plan 95 removed `execution-billing.ts` and the Console contract on
+22 November 2026. A Gemini key turn settles in Pantry unpriced, as each turn does,
+and no exception for the Gemini key remains.
 
 Checks on 21 November 2026: `check:types`, the E2E type check, every lint, the Platform
 unit suite (1,732 tests) and the full E2E suite (241 files, 465 tests). One journey,
@@ -406,6 +460,35 @@ State on 28 November 2026:
   21 November 2026), and the live Gemini key check of B4, which is also the production
   proof of B5. The live check needs a Gemini API key from the owner.
 
+## Check of 28 November 2026
+
+On `origin/dev` `b710111d`, in a clean worktree:
+
+- The route that Seams pays for: `PLATFORM_DEFAULT_PI_MODEL` is
+  `google/gemini-4-hydrogen`, and `PLATFORM_PI_MODELS` keeps kimi-k3 and
+  `qwen/qwen3.7-flash` (`foundation/agent/actors/pi-model-transport.ts`).
+- The Google key route: the contract takes `provider: "google"`, the key table has
+  the host `generativelanguage.googleapis.com` and the header `x-goog-api-key`, and
+  `ORGANISATION_GOOGLE_MODEL_OPTIONS` has Hydrogen (first), Carbon, Argon and Neon.
+  Pi 1.6.0 has the four ids with the output limits and the prices of the table in
+  "Facts". The three D1 CHECKs name the Google values.
+- The model exit Worker accepts `generativelanguage.googleapis.com`.
+- The Portal: the source list, the model menu, the Vault key list, the Brain
+  evaluation list and the Slack reasoning setting name the Gemini key.
+- Agent access: no agent tool reads, adds or removes a model key or changes the
+  source, as the plan and FND-04 say.
+- The four journeys pass (5 tests): `gemini-key-portal.test.ts`,
+  `platform-model-change.test.ts`, `slack-model-change.test.ts` and
+  `mailbox-model-change.test.ts`. The first run failed in each file for a local
+  cause: a new worktree has no build of `@purin-labs/async-control`.
+- Not checked: the deployed Workers and the production D1. This check read the
+  code, not production.
+- One statement was wrong and is corrected: no code removes a stored model key.
+  A key leaves the Vault only when another key of the same provider replaces it.
+  This is the same for the OpenAI and the Anthropic key. A change is separate
+  work, because an open Slack thread keeps the route and the key that its Session
+  pinned (FND-04, FND-08).
+
 ## Decisions
 
 | Id  | Question                                           | Recommendation                                                                                 | Cost                                                                        | Default        |
@@ -420,5 +503,16 @@ State on 28 November 2026:
 ## The owner's actions
 
 - Decide D1 to D6. Done: the plan uses the defaults since 21 November 2026.
-- Before the live check of B4: give a Gemini API key from a Google Cloud project with
-  billing. Put it in `.env.local` as `GEMINI_API_KEY`. Nobody prints it. Open.
+- Before the live check of B4: make a Gemini API key at
+  `https://aistudio.google.com/apikey`, in a Google Cloud project with billing.
+  The Cloud credits of a Google AI Ultra subscription can pay for it: activate
+  them in the Google Developer Program first. Add the line `GEMINI_API_KEY=<key>`
+  to `~/Dev/purin-labs/pantry/.env.local`. Nobody prints it. Then say yes to
+  steps 3 to 5 of the live check in B4. Open.
+- For A4, one of two actions. Recommended: sign in to `openrouter.ai` in the
+  browser pane of the Claude app, so that the agent can read the Activity page.
+  Or: make a management key in the OpenRouter settings
+  and add the line `OPENROUTER_MANAGEMENT_KEY=<key>` to
+  `~/Dev/purin-labs/pantry/.env.local`. Open.
+- Before about 13 December 2026: buy OpenRouter credit at
+  `https://openrouter.ai/settings/credits`. $0.93 is left. Open.

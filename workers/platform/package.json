@@ -32,6 +32,7 @@
     "d1:schema:remote:check": "node ../../scripts/run-worker.mjs platform schema production",
     "canary:plan37": "node --experimental-strip-types scripts/plan37-attachment-canary.ts",
     "slack:live-reply": "node --experimental-strip-types scripts/slack-live-reply-journey.ts",
+    "gemini:live-key": "node --experimental-strip-types scripts/gemini-key-live-check.ts",
     "contracts:media": "pnpm --filter @purin-labs/contracts media:build"
   },
   "dependencies": {

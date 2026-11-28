@@ -88,6 +88,7 @@ crates/harness-wasm-gate/generated/
 # Live Slack canary and journey evidence is produced per run, never committed.
 plan37-canary-evidence.json
 slack-live-reply-evidence.json
+gemini-key-live-check-evidence.json
 
 # Plan 55C measurement evidence stays on the machine that produced it, never committed.
 docs/evidence/plan-55c/
