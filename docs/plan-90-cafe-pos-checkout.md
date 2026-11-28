@@ -7,6 +7,12 @@ owner's decision of 20 November): Phase 3C (Square Terminal), Phase 4B
 and the printer check of Phase 5. The owner steps for every hardware check
 are in [the hardware runbook](runbooks/plan-90-hardware-acceptance.md).
 
+Checked on 28 November 2026: no hardware step has run. The repository has no
+`docs/evidence/plan-90-*` record, which the runbook asks for after each step.
+So Phases 3C and 4B, the live iPad check of Phase 3B and the printer check of
+Phase 5 stay deferred. Since 22 November 2026 the released code runs on the
+`pantry-*` stack of Plan 93 (`pantry`, `pantry-commerce`).
+
 - Phase 3B (Square Point of Sale app on the iPad) is proven with a fake
   Square in the commerce journey `tests/square-japan-tenders-journey.test.ts`
   and the Platform journey `tests/e2e/square-in-commerce.test.ts`. No live
@@ -341,18 +347,18 @@ nothing:
 
 ## Phases
 
-| Phase | Scope | Estimate | Gate / External dependency |
-| --- | --- | --- | --- |
-| 1 | Underclerk counter menu lines, modifiers, and counter cash tender (`spec.md` in same commit) | 4–5 days | None |
-| 2 | `CafeOS › Register` tablet UI (`/register`), domain extraction (`counter-register.ts`), and chat/voice basket staging | 1–1.5 weeks | Phase 1 |
-| 3A | Square Terminal Japan multi-tender (`CARD_PRESENT`, `FELICA_ALL`, `QR_CODE`) and FeliCa manual-cash refund accounting | 4–5 days | Phase 1; Sandbox test device IDs |
-| 3B | Optional Square POS iPad handoff (`square_pos_app` URL scheme + Payment readback) | 1 week | Only if an iPad + Square Reader shop needs it |
-| 3C | Physical Square Terminal live certification (restarts [Plan 33D](history/plan-33D-square-release-acceptance.md) on Underclerk) | 2–3 days | Enabled Japan Square location + physical Square Terminal |
-| 4A | `gmo_stera` `lan_gateway` binding, `DeviceFleetActor` exclusivity, `shop-gateway` `terminal_collect` protocol, and `--simulate` E2E | 1 week | Phase 1 + Plan 85 |
-| 4B | Physical GMO `stera terminal` LAN POS-link framing and hardware certification in `crates/shop-gateway` | 2 weeks | Official POS-link spec from SMBC / GMO-FG + `stera terminal` |
-| 5 | Optional Star `MCP31LB` receipt print and `mJ-Drawer` kick through `shop-gateway` | 1 week | Physical `MCP31LB` printer (+ optional `mJ-Drawer`) |
+| Phase | Scope | Estimate | Gate / External dependency | State on 28 November 2026 |
+| --- | --- | --- | --- | --- |
+| 1 | Underclerk counter menu lines, modifiers, and counter cash tender (`spec.md` in same commit) | 4–5 days | None | Done, released |
+| 2 | `CafeOS › Register` tablet UI (`/register`), domain extraction (`counter-register.ts`), and chat/voice basket staging | 1–1.5 weeks | Phase 1 | Done, released |
+| 3A | Square Terminal Japan multi-tender (`CARD_PRESENT`, `FELICA_ALL`, `QR_CODE`) and FeliCa manual-cash refund accounting | 4–5 days | Phase 1; Sandbox test device IDs | Done, released. No live Terminal payment yet (Phase 3C) |
+| 3B | Optional Square POS iPad handoff (`square_pos_app` URL scheme + Payment readback) | 1 week | Only if an iPad + Square Reader shop needs it | Done with a fake Square, released. Live iPad check deferred (runbook step A) |
+| 3C | Physical Square Terminal live certification (restarts [Plan 33D](history/plan-33D-square-release-acceptance.md) on Underclerk) | 2–3 days | Enabled Japan Square location + physical Square Terminal | Deferred until the shop has a Square Terminal (runbook step B) |
+| 4A | `gmo_stera` `lan_gateway` binding, `DeviceFleetActor` exclusivity, `shop-gateway` `terminal_collect` protocol, and `--simulate` E2E | 1 week | Phase 1 + Plan 85 | Done, released |
+| 4B | Physical GMO `stera terminal` LAN POS-link framing and hardware certification in `crates/shop-gateway` | 2 weeks | Official POS-link spec from SMBC / GMO-FG + `stera terminal` | Deferred until the POS-link spec and a `stera terminal` exist (runbook step C) |
+| 5 | Optional Star `MCP31LB` receipt print and `mJ-Drawer` kick through `shop-gateway` | 1 week | Physical `MCP31LB` printer (+ optional `mJ-Drawer`) | Done in simulation, released. Printer check deferred (runbook step D) |
 
-### Phase 1 — Underclerk counter menu, modifiers, and cash tender
+### Phase 1 — Underclerk counter menu, modifiers, and cash tender — done
 
 Work:
 
@@ -384,7 +390,7 @@ configured consumption tax, settles in cash (`¥2,000` tendered, exact change
 recorded), deducts recipe milk/tea and pastry lot stock on handover, and
 refunds in cash once with replay returning the identical receipt.
 
-### Phase 2 — `CafeOS › Register` and chat/voice staging
+### Phase 2 — `CafeOS › Register` and chat/voice staging — done
 
 Work:
 
@@ -423,7 +429,7 @@ screen, completes a cash sale, sees the `F-xxx` order appear on `Order queue`,
 hands it over, and verifies that a `viewer` is refused on every mutation and
 that the agent has no tool to charge or record cash directly.
 
-### Phase 3 — Square Japan multi-tender and live acceptance
+### Phase 3 — Square Japan multi-tender and live acceptance — 3A and 3B done, 3C deferred
 
 Work (Phase 3A — Square Terminal multi-tender):
 
@@ -483,7 +489,7 @@ distinct-seller check and physical pairing, card, FeliCa, QR, cancellation,
 offline, and refund certification packet. The steps are in step B of
 [the hardware runbook](runbooks/plan-90-hardware-acceptance.md).
 
-### Phase 4 — GMO `stera` adapter via `shop-gateway`
+### Phase 4 — GMO `stera` adapter via `shop-gateway` — 4A done, 4B deferred
 
 Work (Phase 4A — provider-neutral `lan_gateway` + simulation, no GMO blocker):
 
@@ -512,7 +518,7 @@ Work (Phase 4B — physical `stera terminal` driver, **gated on GMO-FG spec**):
   QR, cancel race, LAN unplug during tap, gateway restart) and record the
   evidence packet in `docs/evidence/`.
 
-### Phase 5 — Star `MCP31LB` receipt printer and `mJ-Drawer` (optional)
+### Phase 5 — Star `MCP31LB` receipt printer and `mJ-Drawer` (optional) — done in simulation
 
 State (20 November 2026): built, proven in simulation and released. The
 physical certification is deferred until the owner has the `MCP31LB` and

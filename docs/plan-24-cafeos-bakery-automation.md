@@ -11,6 +11,8 @@ outcomes), the S6 fault journeys `bake-faults`, `bake-pause` and `bake-approval-
 `bake-shadow`, `bake-run`, `bake-proposal` and `cobot-gateway`. The full E2E suite passed the same day
 (244 files, 475 tests). The owner decides which cobot to buy.
 The simulation phase comes first. The owner buys cobots only after its exit gate passes.
+Checked on 28 November 2026: S1 to S6 and the exit gate of the simulation phase are done. The
+physical phase is open. It starts after the owner buys a cobot.
 Owner: CafeOS operations. Replaces the August version, which used a Japan-to-Singapore export
 order as its first path.
 
@@ -89,7 +91,7 @@ the same engine library, which has no browser dependency.
 
 Times are estimates in agent days.
 
-### S1 — Stock level and bake proposal (2–3 days)
+### S1 — Stock level and bake proposal (2–3 days) — done
 
 - An admin sets a stock level for each fresh product.
 - When the counter stock falls below the level, Satyr opens one bake proposal on a Case. The
@@ -116,10 +118,10 @@ State (21 November 2026, branch `plan-24-s1`, not released): built.
   to the proposal's Case. The card holds the reason field, so a Slack rejection needs no modal.
 - For S4: `OrganisationDO.readApprovedBakeProposal` reads the approved proposal that a run starts
   from, and `OrganisationDO.runBakeCommand({ kind: "end" })` ends it and opens the waiting one.
-- Proof: `services/platform/tests/e2e/bake-proposal.test.ts`, with the declared morning
+- Proof: `workers/platform/tests/e2e/bake-proposal.test.ts`, with the declared morning
   `scripts/plan-24/counter-day.json`.
 
-### S2 — Controller simulator (3–5 days)
+### S2 — Controller simulator (3–5 days) — done
 
 - `bakery-native` gets a controller mode. It runs on the gateway computer as its own process, and
   it answers on localhost like a cobot controller.
@@ -130,7 +132,7 @@ State (21 November 2026, branch `plan-24-s1`, not released): built.
 Exit: the simulator accepts a task, reports its progress and its end, and reports each injected
 fault in the same form as a real controller report.
 
-### S3 — Typed cobot adapter on the gateway (2–3 days)
+### S3 — Typed cobot adapter on the gateway (2–3 days) — done
 
 - `crates/shop-gateway` gets one typed adapter for the cobot task protocol.
 - Task states: accepted, running, completed, rejected and indeterminate. Pause and stop requests
@@ -140,7 +142,7 @@ fault in the same form as a real controller report.
 
 Exit: the gateway journey from Plan 85 runs with two simulated cobots behind the adapter.
 
-### S4 — Physical run on the server (4–6 days)
+### S4 — Physical run on the server (4–6 days) — done
 
 - A Durable Object owns one approved bake run. It uses the production-simulation engine with the
   physical execution adapter.
@@ -182,7 +184,7 @@ State (21 November 2026, branch `plan-24-s4`, not released): built.
 - Patch: `services/platform/scripts/plan-24-bake-run-d1-patch.sql`, and
   `node scripts/capability-policy-backfill-sql.mjs` for the new capability.
 
-### S5 — Shadow mode (2 days)
+### S5 — Shadow mode (2 days) — done
 
 - The controller simulator runs a bake from its own script, as a person at the teach pendant would.
 - Satyr observes and correlates each move to the planned task. It sends no command.
@@ -209,7 +211,7 @@ State (21 November 2026, branch `plan-24-s56`, not released): built.
   and the agent lifts no restriction (rules above, Plan 81).
 - Patch: `services/platform/scripts/plan-24-shadow-mode-d1-patch.sql`, after the S4 patch.
 
-### S6 — Approval mode and faults (4–6 days)
+### S6 — Approval mode and faults (4–6 days) — done
 
 Each case is one E2E journey with its own outcome:
 
@@ -266,15 +268,17 @@ State (21 November 2026, branch `plan-24-s56`, not released): built.
 
 | Step | What exists | Proof |
 | --- | --- | --- |
-| S1 | Stock levels for each fresh product, set by an admin; one bake proposal on a Case when a café sale takes the counter stock below the level, and one that waits while another is open; approval or rejection with a reason in the Portal and on one Slack card; the Bakes page; agent tools that read and propose | `services/platform/tests/e2e/bake-proposal.test.ts` (artifacts `output/plan-24/bake-proposal-slack.json`, `bake-proposal-agent.json`) |
+| S1 | Stock levels for each fresh product, set by an admin; one bake proposal on a Case when a café sale takes the counter stock below the level, and one that waits while another is open; approval or rejection with a reason in the Portal and on one Slack card; the Bakes page; agent tools that read and propose | `workers/platform/tests/e2e/bake-proposal.test.ts` (artifacts `output/plan-24/bake-proposal-slack.json`, `bake-proposal-agent.json`) |
 | S2 | `cobot-controller`, the controller simulator of `bakery-native` (`crates/bakery-native/controller/`): two FR10 arms and the oven on localhost, task times from the FR10 physics cases, and the four faults | `scripts/plan-24/controller-journey.mjs` (artifact `output/plan-24/controller-journey.json`) |
-| S3 | The typed `cobot` adapter of `crates/shop-gateway` with its journal, `status` after a reconnect, receipts for pause, resume and stop, the `relay` session, and the cobot messages in `packages/control-api` | `services/platform/tests/e2e/cobot-gateway.test.ts` (artifact `output/plan-24/cobot-gateway-journey.json`) |
+| S3 | The typed `cobot` adapter of `crates/shop-gateway` with its journal, `status` after a reconnect, receipts for pause, resume and stop, the `relay` session, and the cobot messages in `packages/control-api` | `workers/platform/tests/e2e/cobot-gateway.test.ts` (artifact `output/plan-24/cobot-gateway-journey.json`) |
 | S4 (engine) | The physical execution adapter of the engine (`@purin-labs/production-simulation/physical`): the bake run scenario, the cobot assignment by the engine, the host loop that advances only on receipts and device clocks, the observed read and the shadow correlation | `scripts/plan-24/physical-run-journey.mjs` (artifact `output/plan-24/physical-run-journey.json`) |
-| S4 | The bake run Durable Object on the server: start at approval, the dispatch ledger in the device fleet Actor, holds that a person settles, pause, stop, the check that raises the stock, one read for the drawer's canvas, timeline and positions, and two agent tools | `services/platform/tests/e2e/bake-run.test.ts` (artifact `output/plan-24/bake-run-journey.json`; the agent's read and pause moved to `bake-pause.test.ts` in S6, with the real gateway) |
-| S5 | Shadow mode: the authority of each kitchen location, a shadow run that matches each observed move to its planned task, zero commands and zero stock changes | `services/platform/tests/e2e/bake-shadow.test.ts` (artifact `output/plan-24/bake-shadow-journey.json`) |
-| S6 | Approval mode and faults: one hold for each uncertain outcome, settled with what a person saw; the revoke signal; stale data from a frozen cobot; the Slack run card with Pause; the over-bake risk from the recipe's grace time; no new dispatch for a run that does not watch the device. Exit gate: the declared café day two times | `services/platform/tests/e2e/bake-faults.test.ts`, `bake-pause.test.ts`, `bake-approval-gate.test.ts`, `bake-cafe-day.test.ts` (artifacts `output/plan-24/bake-fault-*.json`, `bake-pause-*.json`, `bake-late-unload.json`, `bake-approval-gate.json`, `cafe-day.json`) |
+| S4 | The bake run Durable Object on the server: start at approval, the dispatch ledger in the device fleet Actor, holds that a person settles, pause, stop, the check that raises the stock, one read for the drawer's canvas, timeline and positions, and two agent tools | `workers/platform/tests/e2e/bake-run.test.ts` (artifact `output/plan-24/bake-run-journey.json`; the agent's read and pause moved to `bake-pause.test.ts` in S6, with the real gateway) |
+| S5 | Shadow mode: the authority of each kitchen location, a shadow run that matches each observed move to its planned task, zero commands and zero stock changes | `workers/platform/tests/e2e/bake-shadow.test.ts` (artifact `output/plan-24/bake-shadow-journey.json`) |
+| S6 | Approval mode and faults: one hold for each uncertain outcome, settled with what a person saw; the revoke signal; stale data from a frozen cobot; the Slack run card with Pause; the over-bake risk from the recipe's grace time; no new dispatch for a run that does not watch the device. Exit gate: the declared café day two times | `workers/platform/tests/e2e/bake-faults.test.ts`, `bake-pause.test.ts`, `bake-approval-gate.test.ts`, `bake-cafe-day.test.ts` (artifacts `output/plan-24/bake-fault-*.json`, `bake-pause-*.json`, `bake-late-unload.json`, `bake-approval-gate.json`, `cafe-day.json`) |
 
-## Exit gate of the simulation phase
+## Exit gate of the simulation phase — passed
+
+Passed on 21 November 2026 (see "Status").
 
 One simulated café day repeats with fresh identities. The counter sales cause bake proposals, a
 person approves them, and two cobots load and unload the oven through the real gateway and the
@@ -283,7 +287,7 @@ this gate, the owner decides which cobot to buy.
 
 The whole simulation phase is 17–25 agent days.
 
-## Physical phase, after a purchase
+## Physical phase, after a purchase — open
 
 1. Enroll the real cobot on the Devices page, and add its controller driver behind the S3 adapter.
 2. Run shadow mode with the real cobot.

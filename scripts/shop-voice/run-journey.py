@@ -48,7 +48,7 @@ IDLE_UNLOAD_SECONDS = 40
 # the repositories are not at their old paths.
 BENCH = Path(
     os.environ.get("SHOP_VOICE_BENCH")
-    or Path.home() / "Dev/purin-labs/monorepo/.claude/worktrees/voiceid-stt-bench/voiceId/stt-bench"
+    or Path.home() / "Dev/rust/seams-console/.claude/worktrees/voiceid-stt-bench/voiceId/stt-bench"
 )
 # The engine that a new Mac downloads, and the one that a manager chooses later (Plan 82C). Each engine's
 # files come from its own module.

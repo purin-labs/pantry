@@ -2,6 +2,10 @@
 
 Reviewed for recipe and six-hour shift scope: 2026-11-01. No new physical measurements were supplied.
 
+Checked on 2026-11-28: no row is complete. No field observation exists, so every "Actual /
+evidence" cell is still empty, and runs keep the status **Assumed timings / Uncalibrated**.
+Physical calibration is deferred (AGENTS.md, "Product direction").
+
 ## Current recipe target
 
 [Plan 61A](history/plan-61A-financier-workflow.md) defines the draft full financier

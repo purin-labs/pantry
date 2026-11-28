@@ -2,6 +2,9 @@
 
 Status (2026-11-18): draft. Nothing is built. Decisions D1–D9 need the owner. Phase 0 needs
 recordings of staff in a shop, and the owner has no shop yet (2026-11-17), so this plan waits.
+Checked on 2026-11-28: no task is complete. The code has no follow-up window, ambient mode,
+speaker check or addressee check, and D1–D9 are not decided. Since 2026-11-23 the wake phrase
+is "Hey Sous Chef" (ENG-03), so the addressee rules need no "Satyr".
 [The voice handover](plan-82-voice-handover.md) lists it with the other open voice steps. This plan changes
 [Plan 82](history/plan-82-portal-voice-control.md) D2 only for a member who turns on a new mode on one
 device. The wake phrase and hold-to-talk (Plan 82 D10) stay as they are. Since

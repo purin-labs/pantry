@@ -10,6 +10,11 @@ first. On 22 November 2026 one Portal chat turn and one Slack turn on Gemini 4
 Hydrogen passed in production, in the Plan 95 gate. No Gemini key turn has run
 in production.
 
+Checked on 28 November 2026: A1 to A3 and B1 to B5 are done, except two items.
+Step A4 (the spend comparison, due on 28 November 2026) and the live Gemini key
+check of B4 and B5 are open. The live check needs a Gemini API key from the
+owner.
+
 Owner: the model routes (spec FND-04, "Agent harness and model routes").
 Touches: [Plan 73 — model exit Worker](history/plan-73-model-exit-worker.md),
 [Plan 88 — Jev](history/plan-88-satyr-funded-jev.md) (the meter of each Organisation),
@@ -268,7 +273,7 @@ count as output.
 Each step lands on `dev` alone, with its checks. Part A does not wait for
 part B.
 
-### A1. A stored model follows the route that Seams pays for
+### A1. A stored model follows the route that Seams pays for — done
 
 - Change `selectStoredConversationModel` and `selectOrganisationChatModel` as
   in the design.
@@ -286,13 +291,13 @@ part B.
     its answer from Hydrogen.
 - Checks: `check:types`, the two journeys, the changed journey files.
 
-### A2. Gemini 4 Hydrogen as the default
+### A2. Gemini 4 Hydrogen as the default — done
 
 - Change the constants and the adapters, and add the display name.
 - Run the live Slack journey (`slack:live-reply`) on Hydrogen. AGENTS.md
   requires it for a change of a model route.
 
-### A3. Release part A
+### A3. Release part A — done
 
 - Deploy the Platform Worker alone, by the production deploy runbook.
 - Production proof: one live Slack answer with a tool call, and one Portal chat
@@ -300,7 +305,7 @@ part B.
 - Rollback: set the Worker variable `PANTRY_PLATFORM_PI_MODEL` to
   `moonshotai/kimi-k3`. After A1, open chats keep their work.
 
-### A4. One week after A3
+### A4. One week after A3 — open
 
 - Compare the OpenRouter spend per day with the week before A3.
 - An open Slack thread pins kimi-k3 for the life of its Session (J2). The step
@@ -315,7 +320,7 @@ part B.
   before the removal too. Remove kimi-k3 only when it must go, for example
   when OpenRouter stops it.
 
-### B1. Pi 1.6 upgrade
+### B1. Pi 1.6 upgrade — done
 
 - Not before 27 November 2026, on the newest 1.6 patch (decision D3).
 - Follow the sandbox release runbook. The sandbox Worker and the Platform
@@ -326,19 +331,19 @@ part B.
 - Rollback: the Platform and sandbox versions before B1. A turn that started on
   1.6 and is not finished at a rollback fails. That is the same rule as for 1.5.
 
-### B2. The Google key route in the Platform
+### B2. The Google key route in the Platform — done
 
 - The contract, the merged credential module, the lease, the Pi route, the exit
   host, billing, the selection kind, the catalog and the adapters.
 - The D1 patch script, applied to each regional database before the release.
 - The history signatures.
 
-### B3. The Portal
+### B3. The Portal — done
 
 - The Google key form, the model menu, the Brain evaluation list and the Slack
   reasoning setting. Use the components in `apps/portal/src/ui/`.
 
-### B4. Journeys and the live check
+### B4. Journeys and the live check — journeys done, live check open
 
 - J3: an owner saves a Gemini key. The chat menu offers the four models, and a
   new chat starts on Hydrogen. A chat on Carbon at high effort reaches the Gemini
@@ -352,7 +357,7 @@ part B.
 - Live check: one turn with a tool loop through the deployed exit Worker on a
   real Gemini API key that the owner gives for this purpose.
 
-### B5. Release part B
+### B5. Release part B — released, production proof open
 
 - Deploy the model exit Worker first, then the Platform Worker. Read Plan 73
   before the release, because the host list changes.
@@ -387,9 +392,19 @@ type checks, every lint, the changed unit tests, the 30 Pi journey files and 11 
 files of the key routes, history and forks, then the Platform unit suite (1,730 tests)
 and the full E2E suite (242 files, 460 tests passed, 6 skipped).
 
-Not done: the live Slack journey on Hydrogen (A2), the releases (A3, B5), the check of A4,
-and the live Gemini check of B4. They need the owner's approval for a production change,
-and B4 needs a Gemini API key from the owner.
+State on 28 November 2026:
+
+- The releases of A3 and B5: done on 21 November 2026, with Plan 95 (`satyr-edge`
+  `55620b6e`, sandbox `cabda285`). The new `pantry-*` stack of Plan 93 has the same code
+  since 22 November 2026, and the model exit Worker has the host
+  `generativelanguage.googleapis.com` (`workers/platform/src/model-exit/worker.ts`).
+- The live Slack answer on Hydrogen (A2) and the production proof of A3: done on
+  22 November 2026, with one Portal chat turn and one Slack turn on Hydrogen in the Plan 95
+  gate.
+- The AGENTS.md update of B5: replaced. Spec FND-04 describes the Google key route.
+- Open: the check of A4 (compare the OpenRouter spend per day with the week before
+  21 November 2026), and the live Gemini key check of B4, which is also the production
+  proof of B5. The live check needs a Gemini API key from the owner.
 
 ## Decisions
 
@@ -404,6 +419,6 @@ and B4 needs a Gemini API key from the owner.
 
 ## The owner's actions
 
-- Decide D1 to D6. If the owner does not answer, the plan uses the defaults.
-- Before B4: give a Gemini API key from a Google Cloud project with billing.
-  Put it in `.env.local` as `GEMINI_API_KEY`. Nobody prints it.
+- Decide D1 to D6. Done: the plan uses the defaults since 21 November 2026.
+- Before the live check of B4: give a Gemini API key from a Google Cloud project with
+  billing. Put it in `.env.local` as `GEMINI_API_KEY`. Nobody prints it. Open.

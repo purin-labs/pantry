@@ -6,6 +6,10 @@ Date: 18 November 2026. Written for the move to the new repository `seams-tech/p
 This file is the entry point for voice work. Each plan keeps its decisions, its phases and its
 evidence.
 
+Checked on 2026-11-28: the move to `purin-labs` and the Purin rename are done (Plans 91, 93 and
+94 are closed). Step 5 (the wake phrase) is done, except the owner's real-voice check. Steps 1 to
+4 and 6 to 8 are open. No voice step that needs a shop has run.
+
 ## Result
 
 Voice control works in production on every Portal page again. The Plan 91 rename broke it from
@@ -144,7 +148,7 @@ These wait until the owner has a shop. Do not ask the owner for them before that
    one through real Workers AI, on the deployed Worker, from the Portal to an agent answer. Measure
    the fallback time from the end of a 3 s command: the limit is 6 s at p95. This needs a signed-in
    Portal in the owner's Chrome. It is about one hour of agent work.
-5. **The wake phrase rename.** The code says "Hey Sous Chef" since 23 November 2026, by the
+5. **The wake phrase rename. Done, except one check.** The code says "Hey Sous Chef" since 23 November 2026, by the
    owner's decision, in production since 05:51 UTC (`pantry` `9cc4dc3b`): see "The wake phrase
    (Plan 91 phase 6)". The owner's first production wake worked on the same day, and
    `hey_satyr.onnx` left the Portal on `dev`. Open: the owner's real-voice check.
@@ -169,7 +173,14 @@ owner said "Yes, delete them" on 2026-11-18.
 - Kept: `~/.satyr-voice-test`. Its `results` folders are the G0.6 evidence, and `wake/` is the
   wake model data. `scripts/plan-82-g06/` can deploy the test again.
 
-## The move to purin-labs
+## The move to purin-labs (done)
+
+Done on 2026-11-28 (checked): the three steps below are complete. The pantry repository is
+`purin-labs/pantry`, the folder is `~/Dev/purin-labs/pantry`, and the Purin names are in the code
+and on the new `pantry-*` stack of Plan 93. The Console repository is now `seams-tech/seams-console`
+(clone `~/Dev/rust/seams-console`), and the company site is `purin-labs/purin-monorepo`. The
+facts below are the record of the move. Where they differ, the notes marked "Now" give the state
+on 2026-11-28.
 
 The owner's plan on 2026-11-18, changed on 2026-11-19:
 
@@ -199,6 +210,8 @@ These are outside the repositories, so the move does not change them:
 
 - `~/.satyr-voice`: the installed Mac service, its model files and its certificate. The service
   runs from there, not from the checkout. Update it with `install.sh --update` from production.
+  Now: the folder is `~/.pantry-voice` and the launchd label is `io.purin.pantry.shop-voice`,
+  since the Mac enrolled again on the new stack on 2026-11-22 (Plan 93).
 - `~/.satyr-voice-test/wake/`: the wake model data, the training pipeline's inputs and the Kokoro
   files (1.7 GB with the G0.6 files). Step 5 needs it.
 
@@ -210,7 +223,9 @@ These are outside the repositories, so the move does not change them:
   uncommitted work from the 2026-11-14 bake-off, so move it and do not delete it. After the move,
   run `git worktree repair` in seams-monorepo. Then give the new bench folder to
   `SHOP_VOICE_BENCH` (the Mac journeys) and its Qwen3-ASR folder to `SHOP_VOICE_QWEN3` (the
-  benches).
+  benches). Now: the bench is in
+  `~/Dev/rust/seams-console/.claude/worktrees/voiceid-stt-bench`, and the default paths of
+  `scripts/shop-voice/run-journey.py` and `scripts/plan-82-g06/run-server.sh` name it.
 - Playwright 1.64.1 in `~/Dev/rust/seams-wallet/node_modules/playwright`, for `PLAYWRIGHT_MODULE`.
   After the move, use the new seams-wallet path.
 - No account Worker: since Plan 95, Pantry has its own accounts, and no journey reads
@@ -224,16 +239,19 @@ These are outside the repositories, so the move does not change them:
 
 ### What the Purin rename changes for voice
 
-- The wake phrase: see step 5.
+- The wake phrase: see step 5. Done.
 - The text that people see, for example "Seams Pantry shop voice" on the Mac and the Portal's
-  voice prompts, follows the rename of all text.
+  voice prompts, follows the rename of all text. Done (Plan 91).
 - The shop Mac names. The Platform names each Mac `<id>.voice.<VOICE_DNS_ZONE_NAME>`, today
   `dd8267f68371.voice.seams.sh`, and `VOICE_DNS_API_TOKEN` can change only the `seams.sh` zone.
   Recommendation: keep the Mac names on `seams.sh`, because nobody types them. If the zone must
   change, the release needs a token for the new zone, new `VOICE_DNS_ZONE_ID` and
   `VOICE_DNS_ZONE_NAME` values, and a new enrollment of each Mac for a new name and certificate.
+  Now: the zone changed with Plan 93. The Mac names are on `voice.purin.io`, with a token for the
+  zone `purin.io`, and the owner's Mac enrolled again.
 - Deployed names stay, as for Plan 91: the launchd label `sh.seams.satyr.shop-voice` and the folder
-  `~/.satyr-voice`.
+  `~/.satyr-voice`. Now: Plan 93 changed them to `io.purin.pantry.shop-voice` and
+  `~/.pantry-voice`.
 
 ## How to check voice work
 
