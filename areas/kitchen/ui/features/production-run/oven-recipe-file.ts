@@ -102,7 +102,7 @@ export async function readOvenRunFile(
 export async function prepareNativeRecipe(
   recipe: NativeRecipeInput,
 ): Promise<Result<Variant<OvenRunSource, "native-recipe">, string>> {
-  const opened = await openExecutionWorker(null);
+  const opened = await openExecutionWorker();
   if (!opened.ok)
     return err(`Cannot prepare this recipe: ${opened.error.code}.`);
   const worker = opened.value;
@@ -137,7 +137,6 @@ export async function prepareNativeRecipe(
             : "Black sesame milk: concentrate to service · FR10 cold cell",
         scenario: compiled.value,
         cell,
-        executionBundleId: worker.manifest.bundle.id,
       });
     }
     const cafe =
@@ -176,7 +175,6 @@ export async function prepareNativeRecipe(
               ? await compileEspresso(espresso, native.value)
               : await compileCafeShift(cafe, native.value),
           cell,
-          executionBundleId: worker.manifest.bundle.id,
         });
       } catch (error) {
         return err(
@@ -193,7 +191,6 @@ export async function prepareNativeRecipe(
       name: prepared.value.name,
       scenario: prepared.value.scenario,
       cell,
-      executionBundleId: worker.manifest.bundle.id,
     });
   } finally {
     worker.terminate();
@@ -212,7 +209,7 @@ export async function preparePourOverRecipe(
       error instanceof Error ? error.message : "Invalid pour-over recipe.",
     );
   }
-  const opened = await openExecutionWorker(null);
+  const opened = await openExecutionWorker();
   if (!opened.ok)
     return err(`Cannot prepare this recipe: ${opened.error.code}.`);
   const worker = opened.value;
@@ -240,7 +237,6 @@ export async function preparePourOverRecipe(
       name: `Pour-over · ${recipe.kettleWaterG} g kettle${recipe.drainage === "reduced" ? " · reduced drainage" : ""}${recipe.fault === "lost-grip" ? " · grip fault" : ""}`,
       scenario: await compilePourOver(recipe, native.value),
       cell,
-      executionBundleId: worker.manifest.bundle.id,
     });
   } catch (error) {
     return err(

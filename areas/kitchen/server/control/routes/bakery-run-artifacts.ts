@@ -1,11 +1,8 @@
 import {
   MAX_ARTIFACT_BYTES,
   MAX_DOCUMENT_BYTES,
-  openResumable,
-  parseExecutionBundle,
-  parseExecutionManifest,
+  openSaved,
   type ResumableDocument,
-  type RetainedFile,
 } from "@purin-labs/production-simulation";
 import {
   parseRunSnapshot,
@@ -16,7 +13,6 @@ import {
   isRecord,
   parseJsonOrNull,
   sha256Hex,
-  sameJson,
 } from "@purin-labs/std";
 import type { StrictUnion } from "@purin-labs/type-utils";
 import type { Env } from "@purin-labs/kernel/env";
@@ -111,9 +107,9 @@ async function preparedArtifactRun(raw: unknown): Promise<PreparedRun | null> {
     file.artifacts.length !== 0
   )
     return null;
-  const bundle = parseExecutionBundle(file.document.bundle);
-  if (bundle === null) return null;
-  const document = await openResumable(file.document, bundle.backend, [bundle]);
+  // A saved run is its inputs. The engine of a later Portal runs them again,
+  // so the server needs no file of the build that made the save.
+  const document = await openSaved(file.document);
   return document.ok ? { snapshot, document: document.value } : null;
 }
 
@@ -223,53 +219,8 @@ export async function artifactPublicationReady(
     prepared !== null &&
     prepared.snapshot.content === snapshot.content &&
     (await missingArtifacts(env, organisationId, userId, id, prepared))
-      .length === 0 &&
-    (await retainedBundleAvailable(env, prepared.document))
+      .length === 0
   );
-}
-
-async function verifyRetainedFile(
-  env: Env,
-  path: string,
-  file: RetainedFile,
-): Promise<boolean> {
-  const response = await env.ASSETS.fetch(
-    new Request(`https://assets.invalid${path}/${file.file}`),
-  );
-  if (!response.ok) return false;
-  const bytes = new Uint8Array(await response.arrayBuffer());
-  return (
-    bytes.byteLength === file.byteLength &&
-    (await sha256Hex(bytes)) === file.sha256
-  );
-}
-
-async function retainedBundleAvailable(
-  env: Env,
-  document: ResumableDocument,
-): Promise<boolean> {
-  const path = `/bakery-physics/executions/${document.bundle.id}`;
-  const response = await env.ASSETS.fetch(
-    new Request(`https://assets.invalid${path}/execution.json`),
-  );
-  if (!response.ok) return false;
-  const manifest = await parseExecutionManifest(
-    parseJsonOrNull(await response.text()),
-  );
-  if (!manifest.ok || !sameJson(manifest.value.bundle, document.bundle))
-    return false;
-  if (!(await verifyRetainedFile(env, path, manifest.value.engine)))
-    return false;
-  for (const file of manifest.value.runtime.files)
-    if (
-      !(await verifyRetainedFile(
-        env,
-        `/bakery-physics/bundles/${manifest.value.runtime.id}`,
-        file,
-      ))
-    )
-      return false;
-  return true;
 }
 
 export async function handleBakeryRunArtifactRoute(
@@ -315,8 +266,6 @@ export async function handleBakeryRunArtifactRoute(
         (await sha256Hex(prepared.snapshot.content)) !== route.id
       )
         return controlError("bakery_run_payload_mismatch", 409);
-      if (!(await retainedBundleAvailable(env, prepared.document)))
-        return controlError("bakery_run_bundle_unavailable", 409);
       const current = await authorizeOrganisationRequest(
         request,
         env,

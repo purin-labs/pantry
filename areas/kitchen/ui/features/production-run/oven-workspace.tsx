@@ -51,18 +51,22 @@ import {
   TICK_MICROSECONDS,
   type HostView,
   type InspectionView,
+  type ReplayReport,
 } from "@purin-labs/production-simulation";
 import { assertNever, isRecord } from "@purin-labs/std";
 import type { StrictUnion, Variant } from "@purin-labs/type-utils";
+import { openExecutionWorker, type ExecutionWorker } from "./execution-client";
 import {
-  openAuthoredCellWorker,
-  openExecutionWorker,
-  type ExecutionWorker,
-} from "./execution-client";
+  continuationOrigin,
+  definedCells,
+  replayAttention,
+  replayNotice,
+  replayOf,
+  reviewNotice,
+} from "./saved-run-continuation";
 import {
   readOvenSave,
   exportOvenSave,
-  ovenCheckpointContents,
   type ArtifactContent,
   type OvenRunSource,
 } from "@purin-labs/production-simulation/runs/oven-run-file";
@@ -334,7 +338,7 @@ export class OvenWorkspace extends React.Component<Props, State> {
     observation: { kind: "live" },
     observationSeconds: "0",
     session: { kind: "review" },
-    notice: "Ready for review.",
+    notice: reviewNotice(this.props.source),
     selectedTask: null,
     selectedCell: null,
     inspection: { kind: "empty" },
@@ -600,6 +604,11 @@ export class OvenWorkspace extends React.Component<Props, State> {
     }
   }
 
+  /** The replay of a save of another build, while and after it runs. */
+  private replay: ReplayReport | null = null;
+  /** The cells as the engine defined them again, when it did. */
+  private definedCells: readonly PersistentCell[] | null = null;
+
   private updateSession(session: Session, notice: string): void {
     if (!this.mounted) return;
     this.session = session;
@@ -757,7 +766,7 @@ export class OvenWorkspace extends React.Component<Props, State> {
 
   private async openLivePhysics(worker: ExecutionWorker): Promise<void> {
     const source = this.props.source;
-    const cells = sourceCells(source);
+    const cells = this.definedCells ?? sourceCells(source);
     if (cells.length === 0) return;
     try {
       const espresso = cells[0];
@@ -799,8 +808,9 @@ export class OvenWorkspace extends React.Component<Props, State> {
           cell,
           await worker.request({ kind: "scene", cell: cell.cellId }),
         );
+        // A replayed run has a new recording. The saved one shows another build.
         const frame =
-          source.kind === "snapshot"
+          source.kind === "snapshot" && this.replay === null
             ? await this.recordings.latest(
                 ovenRecordingArchive(source.save),
                 scene,
@@ -1007,6 +1017,8 @@ export class OvenWorkspace extends React.Component<Props, State> {
           </button>
         );
       case "running":
+        if (this.replay?.state === "replaying")
+          return <button disabled>Running the saved inputs again…</button>;
         return (
           <button
             className="production-primary"
@@ -1195,25 +1207,15 @@ export class OvenWorkspace extends React.Component<Props, State> {
     if (this.session.kind !== "review") return;
     this.agentSurface?.close();
     this.agentSurface = null;
-    this.updateSession(
-      { kind: "opening" },
-      "Opening the retained execution build…",
-    );
+    this.updateSession({ kind: "opening" }, "Opening the engine…");
+    this.replay = null;
+    this.definedCells = null;
     let worker: ExecutionWorker | null = null;
     try {
       const source = this.props.source;
-      const opened =
-        source.kind === "definition" || source.kind === "native-recipe"
-          ? await openAuthoredCellWorker(
-              source.kind === "definition" ? source.definition : source,
-            )
-          : await openExecutionWorker(
-              source.kind === "snapshot"
-                ? source.save.document.bundle
-                : source.kind === "logistics"
-                  ? source.bundle
-                  : null,
-            );
+      // One engine runs each source. It defines a cell of another build
+      // again, and it runs the inputs of a save of another build again.
+      const opened = await openExecutionWorker();
       if (!opened.ok)
         throw new Error(`Cannot start this run: ${opened.error.code}.`);
       worker = opened.value;
@@ -1246,17 +1248,15 @@ export class OvenWorkspace extends React.Component<Props, State> {
         origin:
           source.kind !== "snapshot"
             ? { kind: "scenario", scenario: source.scenario }
-            : {
-                kind: "snapshot",
-                document: source.save.document,
-                checkpoints: await ovenCheckpointContents(source.save),
-              },
+            : await continuationOrigin(source.save, worker.manifest.bundle.id),
       });
       if (!this.mounted) {
         worker.terminate();
         return;
       }
       let view = readView(reply, "began");
+      this.replay = replayOf(reply);
+      this.definedCells = definedCells(reply);
       this.floorPlanSync.initializeBaseline(source);
       await this.openLivePhysics(worker);
       if (!this.mounted) {
@@ -1268,7 +1268,10 @@ export class OvenWorkspace extends React.Component<Props, State> {
         worker.terminate();
         return;
       }
-      this.updateSession({ kind: "running", worker, view }, "Running.");
+      this.updateSession(
+        { kind: "running", worker, view },
+        this.replay === null ? "Running." : replayNotice(this.replay),
+      );
       this.agentSurface = new PersistentProductionSurface({
         kind: "execution",
         organisationId:
@@ -1296,6 +1299,7 @@ export class OvenWorkspace extends React.Component<Props, State> {
   }
   private agentLive(): boolean {
     return (
+      this.replay?.state !== "replaying" &&
       this.state.observation.kind === "live" &&
       (this.session.kind === "running" || this.session.kind === "settled")
     );
@@ -1423,7 +1427,9 @@ export class OvenWorkspace extends React.Component<Props, State> {
       this.session.kind === "running" &&
       this.session.worker === worker
     ) {
-      if (this.floorPlanSync.hasReadyPendingSync()) {
+      // The engine takes no command while the saved inputs run again.
+      const replaying = this.replay?.state === "replaying";
+      if (!replaying && this.floorPlanSync.hasReadyPendingSync()) {
         const synced = await this.floorPlanSync.syncPendingBeforeDrive(
           this.props.source,
           worker,
@@ -1465,6 +1471,11 @@ export class OvenWorkspace extends React.Component<Props, State> {
       )
         return;
       const view = readView(reply, "drove");
+      this.replay = replayOf(reply);
+      const notice =
+        this.replay !== null && (replaying || this.replay.state === "replaying")
+          ? replayNotice(this.replay)
+          : null;
       // Execution and artifact delivery continue between disposable previews.
       const now = performance.now();
       if (
@@ -1486,7 +1497,8 @@ export class OvenWorkspace extends React.Component<Props, State> {
         return;
       this.updateSession(
         { kind: canAdvance(view) ? "running" : "settled", worker, view },
-        canAdvance(view) ? "Running." : `Run status: ${view.status.kind}.`,
+        notice ??
+          (canAdvance(view) ? "Running." : `Run status: ${view.status.kind}.`),
       );
       if (!canAdvance(view) && view.status.kind === "completed") {
         this.startApplianceReport(view);
@@ -2720,7 +2732,8 @@ export class OvenWorkspace extends React.Component<Props, State> {
           {(session.kind === "failed" ||
             view?.status.kind === "blocked" ||
             view?.status.kind === "awaiting-inspection" ||
-            this.agentSurface?.review != null) && (
+            this.agentSurface?.review != null ||
+            replayAttention(source, this.replay, notice)) && (
             <button
               className="factory-attention"
               onClick={this.togglePanel.bind(

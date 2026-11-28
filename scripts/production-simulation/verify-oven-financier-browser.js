@@ -20,7 +20,7 @@ async function ovenFinancierBrowser() {
   const input = await inputResponse.json();
   const expectedReport = await reportResponse.json();
   const baseline = await baselineResponse.json();
-  const { parseProductionScenario } =
+  const { parseProductionScenario, productionDefinitionFingerprint } =
     await import("/@id/@purin-labs/bakery-model/bakery-production-scenario");
   const definitionResponse = await fetch(`${evidence}/shared-definition.json`);
   if (!definitionResponse.ok) throw new Error("Missing shared definition");
@@ -32,33 +32,90 @@ async function ovenFinancierBrowser() {
   if (canonicalJson(compiled.value) !== canonicalJson(input.scenario))
     throw new Error("Browser and headless recipe compilation differ");
   const api = window.productionRunPreview;
-  const unavailable = parseProductionScenario({
-    ...definition,
+  // A route that another engine build authored names that build, its
+  // runtime and its model. The engine of this Portal defines the same cell
+  // again, and the route runs as the present definition does (Refactor 16,
+  // step 8).
+  const earlierRoute = {
+    route: "oven-rack",
     executionBundleId: "0".repeat(64),
-  });
-  if (unavailable?.route !== "oven-rack")
-    throw new Error("Invalid unavailable-build fixture");
-  const missingBuild = await api.openAuthoredCellWorker(unavailable);
-  if (missingBuild.ok || missingBuild.error.code !== "inspection_only")
-    throw new Error("A missing authored build must not use the current build");
-  const altered = parseProductionScenario({
-    ...definition,
     cell: {
       ...definition.cell,
+      modelHash: "1".repeat(64),
       execution: { ...definition.cell.execution, runtimeHash: "0".repeat(64) },
     },
+  };
+  const earlier = parseProductionScenario({
+    ...definition,
+    ...earlierRoute,
+    definitionFingerprint: await productionDefinitionFingerprint(
+      definition.sourceFingerprint,
+      definition.settings,
+      definition.variant,
+      definition.assignments,
+      definition.manualTasks,
+      earlierRoute,
+    ),
   });
-  if (altered?.route !== "oven-rack")
-    throw new Error("Invalid changed-runtime fixture");
-  const mismatch = await api.openAuthoredCellWorker(altered);
-  if (mismatch.ok || mismatch.error.code !== "fixture_bundle_mismatch")
-    throw new Error("A different runtime must not execute the pinned fixture");
+  if (earlier?.route !== "oven-rack")
+    throw new Error("Invalid earlier-build fixture");
+  const earlierScenario = await compileSavedOvenFinancier(earlier);
+  if (!earlierScenario.ok)
+    throw new Error(JSON.stringify(earlierScenario.error));
+  if (canonicalJson(earlierScenario.value) === canonicalJson(input.scenario))
+    throw new Error("The earlier route must name another model");
+  const rebound = await api.openExecutionWorker();
+  if (!rebound.ok) throw new Error(JSON.stringify(rebound.error));
+  const reboundBegan = await rebound.value.request({
+    kind: "begin",
+    bundle: rebound.value.manifest.bundle,
+    cells: [earlier.cell],
+    identity: {
+      runId: "oven-financier-earlier-build",
+      executionId: "browser-earlier",
+      hostSession: "browser-earlier",
+      parent: null,
+    },
+    origin: { kind: "scenario", scenario: earlierScenario.value },
+  });
+  if (reboundBegan.kind !== "began")
+    throw new Error(JSON.stringify(reboundBegan));
+  if (canonicalJson(reboundBegan.cells) !== canonicalJson([input.cell]))
+    throw new Error("The engine must define the earlier cell as its own");
+  const reboundState = await rebound.value.request({ kind: "state" });
+  rebound.value.terminate();
+  // The route keeps its own source revision, in its sources and in each
+  // workflow. Each other part of the scenario is that of the present route.
+  const withoutRevision = ({ sources, workflows, ...rest }) => ({
+    ...rest,
+    workflows: workflows.map(({ revision: _revision, ...flow }) => flow),
+    revision: sources,
+  });
+  const { revision: earlierSources, ...reboundScenario } = withoutRevision(
+    reboundState.run.definition.scenario,
+  );
+  const { revision: presentSources, ...presentScenario } = withoutRevision(
+    input.scenario,
+  );
+  if (canonicalJson(earlierSources) === canonicalJson(presentSources))
+    throw new Error("The earlier route must keep its own source revision");
+  const differing = [];
+  for (const key of Object.keys(presentScenario))
+    if (
+      canonicalJson(reboundScenario[key]) !==
+      canonicalJson(presentScenario[key])
+    )
+      differing.push(key);
+  if (differing.length > 0)
+    throw new Error(
+      `The earlier route must run as the present route; these parts differ: ${differing.join(", ")}`,
+    );
   let saved = null;
   const saves = [];
   let final = null;
   const stops = [...expectedReport.restores, input.scenario.limits.horizon];
   for (const [leg, until] of stops.entries()) {
-    const opened = await api.openAuthoredCellWorker(definition);
+    const opened = await api.openExecutionWorker();
     if (!opened.ok) throw new Error(JSON.stringify(opened.error));
     const worker = opened.value;
     const bundle = worker.manifest.bundle;
@@ -162,7 +219,7 @@ async function ovenFinancierBrowser() {
     result: "passed",
     bundle: input.bundle.id,
     restores: saves.length,
-    refusedBuilds: [missingBuild.error, mismatch.error],
+    earlierBuildRouteRunsOnThisEngine: true,
     simulatedSeconds: final.position.time / 1_000_000,
     saves,
     final,

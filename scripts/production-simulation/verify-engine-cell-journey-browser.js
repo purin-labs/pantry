@@ -1,8 +1,10 @@
-// Plan 70 J1 in a browser: the Portal starts a retained execution bundle's
-// worker and drives the single-cell journey through the host protocol. The
+// Plan 70 J1 in a browser: the Portal starts the worker of its execution
+// bundle and drives the single-cell journey through the host protocol. The
 // run is paused and saved four times; each time its worker is destroyed and
-// a fresh worker, resolved from the bundle the save names, continues it.
-// The result must equal the same journey run without interruption.
+// a fresh worker continues it from the checkpoints of the save. The result
+// must equal the same journey run without interruption. The last save then
+// runs again from its inputs (Refactor 16, step 8), and that run must equal
+// the saved recording and the uninterrupted journey.
 // Run with: pnpm bakery:browser --journey <this file>
 //   --url http://<portal>/production-run-preview.html --output <directory>
 const journeyEvidence =
@@ -65,7 +67,7 @@ async function verifyEngineCellJourneyBrowser(page) {
   const reference = await page.evaluate(async () => {
     const api = window.productionRunPreview;
     const opening = performance.now();
-    const opened = await api.openExecutionWorker(null);
+    const opened = await api.openExecutionWorker();
     if (!opened.ok) throw new Error(JSON.stringify(opened.error));
     const worker = opened.value;
     const openMs = performance.now() - opening;
@@ -234,28 +236,21 @@ async function verifyEngineCellJourneyBrowser(page) {
     "The only additional events are the admitted pauses",
   );
 
-  // What a worker and the resolver refuse, in this browser.
+  // What a worker refuses, in this browser.
   const rejections = await page.evaluate(async () => {
     const api = window.productionRunPreview;
     const { saved } = api.session;
     const pinned = api.pinned;
     const found = {};
-    const unknown = await api.openExecutionWorker({
-      ...pinned,
-      id: "0".repeat(64),
-    });
-    found.bundleNotRetained = unknown.ok ? "opened" : unknown.error.reason;
-    const altered = await api.openExecutionWorker({
-      ...pinned,
-      controllerHash: "0".repeat(64),
-    });
-    found.bundleWithAnotherController = altered.ok
-      ? "opened"
-      : altered.error.reason;
 
     const definition = api.savedDefinition(saved);
-    async function refusedBegin(document, checkpoints, expectedCode = null) {
-      const opened = await api.openExecutionWorker(pinned);
+    async function refusedBegin(
+      document,
+      checkpoints,
+      expectedCode = null,
+      kind = "snapshot",
+    ) {
+      const opened = await api.openExecutionWorker();
       if (!opened.ok) throw new Error(JSON.stringify(opened.error));
       const reply = await opened.value.request({
         kind: "begin",
@@ -265,7 +260,10 @@ async function verifyEngineCellJourneyBrowser(page) {
           snapshot: saved.document.snapshot,
           execution: "browser-4",
         }),
-        origin: { kind: "snapshot", document, checkpoints },
+        origin:
+          kind === "snapshot"
+            ? { kind, document, checkpoints }
+            : { kind, document },
       });
       const early = await opened.value.request({
         kind: "drive",
@@ -286,6 +284,13 @@ async function verifyEngineCellJourneyBrowser(page) {
     found.saveWithAnEditedRecord = await refusedBegin(
       edited,
       saved.checkpoints,
+    );
+    // A save is its inputs. An edited input is not that save.
+    found.replayOfAnEditedSave = await refusedBegin(
+      edited,
+      saved.checkpoints,
+      "snapshot_differs",
+      "replay",
     );
     const malformed = structuredClone(saved.document);
     malformed.state.carriers[1].custody = { kind: "stored", storage: "rack" };
@@ -325,7 +330,7 @@ async function verifyEngineCellJourneyBrowser(page) {
       },
     ]);
 
-    const opened = await api.openExecutionWorker(pinned);
+    const opened = await api.openExecutionWorker();
     const worker = opened.value;
     found.driveBeforeBegin = (
       await worker.request({ kind: "drive", turns: 1, until: 2000 })
@@ -348,9 +353,8 @@ async function verifyEngineCellJourneyBrowser(page) {
     return found;
   });
   const expected = {
-    bundleNotRetained: "bundle_unavailable",
-    bundleWithAnotherController: "bundle_altered",
     saveWithAnEditedRecord: "save_not_opened",
+    replayOfAnEditedSave: "save_not_opened",
     rehashedCustodyMismatch: "save_not_opened",
     malformedScenario: "invalid_scenario",
     saveWithoutItsCheckpoint: "checkpoint_missing",
@@ -364,36 +368,44 @@ async function verifyEngineCellJourneyBrowser(page) {
       `${name}: expected ${reason}, received ${rejections[name]}`,
     );
 
-  const retainedScenarios = [];
-  for (const previous of [
-    {
-      id: "bed7d40dd7986ba58b5d20798da823a13a105f3d11a8caadd4e89e031846fc44",
-      schemaVersion: 1,
-    },
-    {
-      id: "c5cba9f372024f8b51949b13bdeee6bb0df641305424fa9114f89217f3381366",
-      schemaVersion: 2,
-    },
-    {
-      id: "f6c717fd9975c0bda6fdf08f12c6a40cffd77826373e167b4dd7e2e78fd5a27c",
-      schemaVersion: 3,
-    },
-    {
-      id: "5c62de98106ce0d2e8f3ce18040e192ebb599573e889dfab8fe6e6bd8845f1ab",
-      schemaVersion: 4,
-    },
-  ]) {
-    const retained = await page.evaluate(continueRetainedScenario, previous);
-    journeyCheck(
-      retained.schemaVersion === previous.schemaVersion,
-      "The old scenario keeps its schema",
-    );
-    journeyCheck(
-      retained.status === "completed",
-      "The old bundle continues its save",
-    );
-    retainedScenarios.push(retained);
-  }
+  // The last save runs again from its inputs. Each of its four pauses is one
+  // input; a later worker continued from the first three, so the replay
+  // releases them, and it stops at the fourth, where the save stopped.
+  const replayed = await page.evaluate(replaySavedJourney);
+  journeyCheck(
+    replayed.commandWhileReplaying === "replaying",
+    `A command during the replay: ${replayed.commandWhileReplaying}`,
+  );
+  journeyCheck(
+    replayed.report.state === "replayed" &&
+      replayed.report.commands === legs.length &&
+      replayed.report.applied === legs.length &&
+      replayed.report.refused.length === 0,
+    `The replay did not apply each pause: ${JSON.stringify(replayed.report)}`,
+  );
+  journeyCheck(
+    replayed.report.difference === null,
+    "The replay differs from the saved recording on one engine",
+  );
+  journeyCheck(
+    replayed.paused.status === "paused" &&
+      replayed.paused.time === replayed.report.saved.time &&
+      replayed.paused.time === legs.at(-1).pausedAtSeconds * 1_000_000,
+    "The replay did not stop where the save stopped",
+  );
+  journeyCheck(
+    replayed.view.status.kind === "completed",
+    `The replayed run is ${replayed.view.status.kind}`,
+  );
+  journeyCheck(
+    JSON.stringify(journeyHistory(replayed.events)) ===
+      JSON.stringify(journeyHistory(reference.events)),
+    "The replayed run accepted another history",
+  );
+  journeyCheck(
+    journeyWorld(replayed.run) === journeyWorld(reference.run),
+    "The replayed run ends in another production state",
+  );
 
   return {
     result: "passed",
@@ -418,7 +430,13 @@ async function verifyEngineCellJourneyBrowser(page) {
       executions: [...executions],
     },
     rejections,
-    retainedScenarios,
+    replay: {
+      report: replayed.report,
+      pausedAtSeconds: replayed.paused.time / 1_000_000,
+      wallMs: replayed.wallMs,
+      sameHistory: true,
+      sameFinalState: true,
+    },
     measurements: {
       referenceOpenMs: reference.openMs,
       referenceWallMs: reference.wallMs,
@@ -432,115 +450,85 @@ async function verifyEngineCellJourneyBrowser(page) {
       ),
     },
     checks: [
-      "the Portal starts the retained bundle's worker and runs the journey through the host protocol",
+      "the Portal starts the worker of its execution bundle and runs the journey through the host protocol",
       "the run is paused and saved twice after a pickup, once with the arm returning and once with the cell empty",
-      "each save's worker is destroyed and a fresh worker resolved from the save's bundle continues it",
+      "each save's worker is destroyed and a fresh worker continues it from its checkpoints",
       "the interrupted run ends in the same history, production state and cell checkpoint",
-      "unretained and altered bundles, edited saves and changed checkpoints are refused",
-      "the current Portal restores schema-1, schema-2 and schema-3 saves through their retained engines after new runs move to schema 4",
+      "edited saves and changed checkpoints are refused, for a restore and for a replay",
+      "the last save runs again from its inputs: the replay takes no command, equals the saved recording, stops where the save stopped and ends as the uninterrupted journey",
     ],
   };
 }
 
-async function continueRetainedScenario({ id, schemaVersion }) {
+async function replaySavedJourney() {
   const api = window.productionRunPreview;
-  // Keep actual prior builds so a source rebuild cannot masquerade as old code.
-  const response = await fetch(
-    `/bakery-physics/executions/${id}/execution.json`,
-  );
-  if (!response.ok) throw new Error("The previous execution bundle is missing");
-  const manifest = await response.json();
-  if (manifest.bundle.id === api.pinned.id)
-    throw new Error("The current and previous bundles must differ");
-  const opened = await api.openExecutionWorker(manifest.bundle);
+  const { saved } = api.session;
+  const opened = await api.openExecutionWorker();
   if (!opened.ok) throw new Error(JSON.stringify(opened.error));
-  let worker = opened.value;
-  const definition = await api.define(worker);
-  const scenario = await api.scenarioFor(definition);
-  // Construct the historical request shape for the historical engine only.
-  scenario.schemaVersion = schemaVersion;
-  if (schemaVersion < 5) delete scenario.dependencies;
-  if (schemaVersion < 3)
-    for (const resource of scenario.resources) delete resource.kind;
-  if (schemaVersion === 1)
-    for (const workflow of scenario.workflows)
-      for (const task of workflow.tasks) delete task.releaseAfter;
-  let reply = await worker.request({
-    kind: "begin",
-    bundle: manifest.bundle,
-    cells: [definition],
-    identity: {
-      runId: `retained-schema-${schemaVersion}`,
-      executionId: "previous-run",
-      hostSession: "previous-host",
-      parent: null,
-    },
-    origin: { kind: "scenario", scenario },
-  });
-  if (reply.kind !== "began") throw new Error(JSON.stringify(reply));
-  for (let turn = 0; turn < 10_000; turn += 1) {
-    reply = await worker.request({
-      kind: "drive",
-      turns: 128,
-      until: 16_000_000,
-    });
-    if (reply.kind !== "drove") throw new Error(JSON.stringify(reply));
-    if (reply.view.time === 16_000_000) break;
-  }
-  if (reply.view.time !== 16_000_000)
-    throw new Error("The historical run did not reach its save boundary");
-  const paused = await worker.request({
-    kind: "pause",
-    commandId: "historical-pause",
-  });
-  if (paused.kind !== "commanded" || paused.receipt.status !== "accepted")
-    throw new Error(JSON.stringify(paused));
-  const saved = await worker.request({ kind: "save" });
-  if (saved.kind !== "saved") throw new Error(JSON.stringify(saved));
-  worker.terminate();
-
-  const restored = await api.openExecutionWorker(saved.document.bundle);
-  if (!restored.ok) throw new Error(JSON.stringify(restored.error));
-  worker = restored.value;
-  reply = await worker.request({
+  const worker = opened.value;
+  const started = performance.now();
+  const began = await worker.request({
     kind: "begin",
     bundle: worker.manifest.bundle,
-    cells: [definition],
-    identity: {
-      runId: `retained-schema-${schemaVersion}`,
-      executionId: "continued-old-run",
-      hostSession: "new-portal-host",
-      parent: {
-        snapshot: saved.document.snapshot,
-        execution: saved.document.state.identity.executionId,
-      },
-    },
-    origin: {
-      kind: "snapshot",
-      document: saved.document,
-      checkpoints: saved.artifacts,
-    },
+    cells: [api.savedDefinition(saved)],
+    identity: api.identity(11, {
+      snapshot: saved.document.snapshot,
+      execution: saved.document.state.identity.executionId,
+    }),
+    origin: { kind: "replay", document: saved.document },
   });
-  if (reply.kind !== "began") throw new Error(JSON.stringify(reply));
-  for (let turn = 0; turn < 10_000; turn += 1) {
+  if (began.kind !== "began" || began.replay?.state !== "replaying")
+    throw new Error(JSON.stringify(began));
+  const early = await worker.request({
+    kind: "pause",
+    commandId: "pause-during-replay",
+  });
+  const events = [];
+  let reply;
+  for (let turn = 0; turn < 100_000; turn += 1) {
     reply = await worker.request({
       kind: "drive",
-      turns: 128,
+      turns: 8,
       until: 600_000_000,
     });
     if (reply.kind !== "drove") throw new Error(JSON.stringify(reply));
-    if (reply.view.status.kind === "completed") break;
+    events.push(...reply.events);
+    if (reply.replay?.state === "replayed") break;
   }
-  const final = await worker.request({ kind: "state" });
+  const report = reply.replay;
+  const paused = { time: reply.view.time, status: reply.view.status.kind };
+  const resumed = await worker.request({
+    kind: "resume",
+    commandId: "resume-after-replay",
+  });
+  if (resumed.kind !== "commanded" || resumed.receipt.status !== "accepted")
+    throw new Error(JSON.stringify(resumed));
+  events.push(...resumed.events);
+  for (let turn = 0; turn < 100_000; turn += 1) {
+    reply = await worker.request({
+      kind: "drive",
+      turns: 8,
+      until: 600_000_000,
+    });
+    if (reply.kind !== "drove") throw new Error(JSON.stringify(reply));
+    events.push(...reply.events);
+    if (
+      reply.view.status.kind !== "awaiting-execution" &&
+      reply.view.status.kind !== "advancing"
+    )
+      break;
+  }
+  const wallMs = performance.now() - started;
+  const state = await worker.request({ kind: "state" });
   worker.terminate();
-  if (final.kind !== "state") throw new Error(JSON.stringify(final));
+  if (state.kind !== "state") throw new Error(JSON.stringify(state));
   return {
-    bundle: manifest.bundle.id,
-    currentBundle: api.pinned.id,
-    schemaVersion: final.run.definition.scenario.schemaVersion,
-    status: final.run.status.kind,
-    completedAtSeconds: final.run.position.time / 1_000_000,
-    saved,
-    final: final.run,
+    commandWhileReplaying: early.kind === "refused" ? early.reason : early.kind,
+    report,
+    paused,
+    events,
+    view: state.view,
+    run: state.run,
+    wallMs,
   };
 }

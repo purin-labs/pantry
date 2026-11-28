@@ -4,21 +4,21 @@ import {
   parseExecutionManifest,
   parseSha256Hex,
   resolveExecution,
-  type ExecutionBundle,
   type ExecutionManifest,
   type ManifestProblem,
   type ResolveProblem,
 } from "@purin-labs/production-simulation";
-import { isRecord, parseJsonOrNull, sha256Hex } from "@purin-labs/std";
+import { isRecord, sha256Hex } from "@purin-labs/std";
 import { PRODUCTION_EXECUTION_MANIFEST } from "@purin-labs/production-simulation/execution-manifest";
-import type { PersistentCell } from "@purin-labs/bakery-model/bakery-physics";
 import { MAX_ENCODED_ARTIFACT_BYTES } from "@purin-labs/production-simulation/runs/run-artifact-file";
 import { MODEL_INDEX_FILE } from "@purin-labs/production-simulation/native/model-packs";
 
 /**
- * The Portal's side of a production execution. It finds the retained bundle
- * a run needs, checks its files, starts that bundle's worker and exchanges
- * host-protocol messages with it. It runs no engine code of its own.
+ * The Portal's side of a production execution. The Portal runs one engine:
+ * the execution bundle that it pins (Refactor 16, step 8). This module
+ * checks the files of that bundle, starts its worker and exchanges
+ * host-protocol messages with it. A save or a recipe of another build needs
+ * no file of that build: the engine runs its inputs again.
  */
 
 const ROOT = `${import.meta.env.BASE_URL}bakery-physics`;
@@ -36,7 +36,6 @@ type ExecutionWorkerProblem =
   | ResolveProblem
   | ManifestProblem
   | Readonly<{ code: "worker_not_started"; detail: unknown }>
-  | Readonly<{ code: "fixture_bundle_mismatch" }>
   | Readonly<{ code: "artifact_store_unavailable"; detail: string }>
   | Readonly<{ code: "protocol_unsupported"; protocolVersion: unknown }>;
 
@@ -171,18 +170,14 @@ class WorkerConnection implements ExecutionWorker {
   }
 
   private async drainArtifacts(): Promise<void> {
-    if (
-      this.admission === "empty" ||
-      this.manifest.bundle.protocolVersion === 1
-    )
-      return;
+    if (this.admission === "empty") return;
     let acknowledged: string | null = null;
     for (;;) {
       const reply = await this.exchange({ kind: "artifact", acknowledged });
       if (!isRecord(reply) || reply.kind !== "artifact")
         throw new Error("The worker could not transfer its retained artifact.");
       if (reply.artifact === null) return;
-      const artifact = readArtifactTransfer(reply.artifact, 2);
+      const artifact = readArtifactTransfer(reply.artifact);
       await this.artifacts.retain(artifact.digest, artifact.file);
       acknowledged = artifact.digest;
     }
@@ -196,20 +191,6 @@ class WorkerConnection implements ExecutionWorker {
     if (isRecord(reply) && reply.kind === "began") this.admission = "begun";
     if (isRecord(reply) && reply.kind === "disposed") this.admission = "empty";
     if (isRecord(reply) && reply.kind === "refused") return reply;
-    // Protocol 1 hands all new bytes over at Save. Normalize that retained build here.
-    if (
-      this.manifest.bundle.protocolVersion === 1 &&
-      isRecord(reply) &&
-      reply.kind === "saved"
-    ) {
-      if (!Array.isArray(reply.artifacts))
-        throw new Error("The saved reply has no artifacts.");
-      for (const raw of reply.artifacts) {
-        const artifact = readArtifactTransfer(raw, 1);
-        await this.artifacts.retain(artifact.digest, artifact.file);
-      }
-      return { kind: "saved", document: reply.document, artifacts: [] };
-    }
     await this.drainArtifacts();
     return reply;
   }
@@ -221,101 +202,37 @@ class WorkerConnection implements ExecutionWorker {
 
 function discardReply(): void {}
 
-/** Normalize retained protocol 1 only at the worker response boundary. */
-function readArtifactTransfer(raw: unknown, protocol: 1 | 2) {
+function readArtifactTransfer(raw: unknown) {
   if (!isRecord(raw))
     throw new Error("The worker returned an invalid artifact.");
   const digest = parseSha256Hex(raw.digest);
   if (!digest.ok)
     throw new Error("The worker returned an invalid artifact digest.");
-  let file: Blob;
-  if (protocol === 1) {
-    if (
-      typeof raw.content !== "string" ||
-      raw.content.length > MAX_ENCODED_ARTIFACT_BYTES
-    )
-      throw new Error("The retained worker returned an invalid artifact.");
-    file = new Blob([
-      JSON.stringify({ digest: digest.value, content: raw.content }),
-    ]);
-  } else {
-    if (!(raw.bytes instanceof ArrayBuffer))
-      throw new Error("The worker returned no artifact bytes.");
-    file = new Blob([raw.bytes]);
-  }
+  if (!(raw.bytes instanceof ArrayBuffer))
+    throw new Error("The worker returned no artifact bytes.");
+  const file = new Blob([raw.bytes]);
   if (file.size > MAX_ENCODED_ARTIFACT_BYTES)
     throw new Error("The worker artifact exceeds the transfer limit.");
   return { digest: digest.value, file };
 }
 
 /**
- * Starts the worker of the bundle `claim` names, or of the bundle this
- * Portal was built with when a new run begins. Only the exact retained
- * bundle starts: this Portal's own engine never continues another's save.
+ * Starts the worker of the execution bundle that this Portal pins, after a
+ * check of each of its files.
  */
-export async function openExecutionWorker(
-  claim: ExecutionBundle | null,
-): Promise<Opened> {
-  const manifest =
-    claim === null
-      ? await parseExecutionManifest(PRODUCTION_EXECUTION_MANIFEST)
-      : await readExecutionManifest(claim.id);
-  if (!manifest.ok) return manifest;
-  return startExecutionWorker(manifest.value, claim ?? manifest.value.bundle);
-}
-
-/** Start exactly the retained build selected when this recipe was authored. */
-export async function openAuthoredCellWorker(
-  definition: Readonly<{ cell: PersistentCell; executionBundleId: string }>,
-): Promise<Opened> {
-  const manifest = await readExecutionManifest(definition.executionBundleId);
-  if (!manifest.ok) return manifest;
-  const bundle = manifest.value.bundle;
-  const cell = definition.cell.execution;
-  if (
-    bundle.id !== definition.executionBundleId ||
-    bundle.backend !== cell.backend ||
-    bundle.controllerHash !== cell.controllerHash ||
-    bundle.controllerSourceHash !== cell.controllerSourceHash ||
-    bundle.runtimeHash !== cell.runtimeHash
-  )
-    return { ok: false, error: { code: "fixture_bundle_mismatch" } };
-  return startExecutionWorker(manifest.value, bundle);
-}
-
-async function readExecutionManifest(id: string) {
-  const response = await fetch(`${ROOT}/executions/${id}/execution.json`, {
-    credentials: "same-origin",
-  });
-  // A host that serves a page for every unknown path has no manifest either.
-  const raw = response.ok ? parseJsonOrNull(await response.text()) : null;
-  if (!isRecord(raw))
-    return {
-      ok: false,
-      error: { code: "inspection_only", reason: "bundle_unavailable" },
-    } as const;
-  return parseExecutionManifest(raw);
-}
-
-async function startExecutionWorker(
-  manifest: ExecutionManifest,
-  claim: ExecutionBundle,
-): Promise<Opened> {
+export async function openExecutionWorker(): Promise<Opened> {
+  const pinned = await parseExecutionManifest(PRODUCTION_EXECUTION_MANIFEST);
+  if (!pinned.ok) return pinned;
+  const manifest = pinned.value;
   const kept = new Map<string, ArrayBuffer>();
   const resolved = await resolveExecution(
-    claim,
+    manifest.bundle,
     "browser",
     [manifest],
     measure.bind(null, kept),
   );
   if (!resolved.ok) return resolved;
-  if (
-    manifest.bundle.protocolVersion !== 1 &&
-    manifest.bundle.protocolVersion !== 2 &&
-    manifest.bundle.protocolVersion !== 3 &&
-    manifest.bundle.protocolVersion !== 4 &&
-    manifest.bundle.protocolVersion !== HOST_PROTOCOL_VERSION
-  )
+  if (manifest.bundle.protocolVersion !== HOST_PROTOCOL_VERSION)
     return {
       ok: false,
       error: {
@@ -340,7 +257,6 @@ async function startExecutionWorker(
     kind: "boot",
     manifest: resolved.value,
     runtimeUrl: `${ROOT}/bundles/${resolved.value.runtime.id}`,
-    // An older bundle's worker ignores these and fetches its files itself.
     files: Object.fromEntries(kept),
   });
   if (!isRecord(booted) || booted.kind !== "booted") {

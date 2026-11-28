@@ -3,9 +3,9 @@
 export const PRODUCTION_EXECUTION_MANIFEST = {
   schemaVersion: 1,
   bundle: {
-    id: "5bf61fd606c468c8d9237738d76c325bfd3bdbea4d9f579df119c7406a3d0867",
+    id: "bc455d5608beb5b9b43e4828303eafd4549d21ca40533c4b00879ae233a19da3",
     backend: "browser",
-    protocolVersion: 5,
+    protocolVersion: 6,
     checkpointSchemaVersion: 4,
     controllerSourceHash:
       "62d5e10710a104bbbfc6fbfdf52a6d70f565165df8b8d6a9be1a50003b802c21",
@@ -14,12 +14,12 @@ export const PRODUCTION_EXECUTION_MANIFEST = {
     runtimeHash:
       "0b6bbcb43f6440b6835a7783df20144bb9f058b888d2063c086f45fa18d2efa9",
     engineHash:
-      "24e8cc7906c5b01a747411e75222170fb682653abc5d24231759504108a7995d",
+      "9e67933f99dda57bd1570281e67c19276abbc58172d9527b86594220c3629785",
   },
   engine: {
     file: "production-engine.mjs",
-    sha256: "24e8cc7906c5b01a747411e75222170fb682653abc5d24231759504108a7995d",
-    byteLength: 813553,
+    sha256: "9e67933f99dda57bd1570281e67c19276abbc58172d9527b86594220c3629785",
+    byteLength: 826972,
   },
   runtime: {
     id: "468e95da77e3e1c4c1586f4c74b8a4a5b8cf8c3d5332ec65a52988db71f2a017",

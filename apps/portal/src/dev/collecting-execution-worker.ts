@@ -1,10 +1,7 @@
 import {
   openExecutionWorker as openWorker,
-  openAuthoredCellWorker as openAuthoredWorker,
   type ExecutionWorker,
 } from "@purin-labs/area-kitchen/ui/features/production-run/execution-client";
-import type { ExecutionBundle } from "@purin-labs/production-simulation";
-import type { PersistentCell } from "@purin-labs/bakery-model/bakery-physics";
 import { isRecord } from "@purin-labs/std";
 
 export type { ExecutionWorker };
@@ -40,17 +37,8 @@ class CollectingWorker implements ExecutionWorker {
   }
 }
 
-export async function openExecutionWorker(claim: ExecutionBundle | null) {
-  const opened = await openWorker(claim);
-  return opened.ok
-    ? { ok: true as const, value: new CollectingWorker(opened.value) }
-    : opened;
-}
-
-export async function openAuthoredCellWorker(
-  definition: Readonly<{ cell: PersistentCell; executionBundleId: string }>,
-) {
-  const opened = await openAuthoredWorker(definition);
+export async function openExecutionWorker() {
+  const opened = await openWorker();
   return opened.ok
     ? { ok: true as const, value: new CollectingWorker(opened.value) }
     : opened;

@@ -1,19 +1,25 @@
-// node run-file-execution.mjs RETAINED_ROOT INPUT_JSON STORE UNTIL_MICROSECONDS
+// node run-file-execution.mjs RETAINED_ROOT BUNDLE_ID INPUT_JSON STORE UNTIL_MICROSECONDS [replay]
 // RETAINED_ROOT contains executions/ and bundles/, as the Portal assets do.
-// INPUT_JSON is a saved document or { bundle, scenario, cells } for a new run.
+// BUNDLE_ID is the execution bundle of this release: the one build it runs.
+// INPUT_JSON is a saved document or { scenario, cells } for a new run. A save
+// of this build restores its checkpoints. A save of another build, or any
+// save with "replay", gives its inputs to this build, which runs them again
+// to the place where the save stopped (Refactor 16, step 8).
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { openFileExecution } from "./file-execution-host.mjs";
 import { MAX_DOCUMENT_BYTES } from "../../packages/production-simulation/src/saved-run.ts";
-import { checkpointBody } from "../../packages/bakery-model/src/bakery-checkpoint.ts";
 
-if (process.argv.length !== 6)
+if (
+  (process.argv.length !== 7 && process.argv.length !== 8) ||
+  (process.argv.length === 8 && process.argv[7] !== "replay")
+)
   throw new Error(
-    "Provide retained assets, input JSON, store and stop time in microseconds.",
+    "Provide retained assets, the bundle, input JSON, store, the stop time in microseconds and, to run a save again, replay.",
   );
-const [root, input, store] = process.argv.slice(2, 5).map(resolvePath);
-const until = Number(process.argv[5]);
+const [root, , input, store] = process.argv.slice(2, 6).map(resolvePath);
+const until = Number(process.argv[6]);
 if (!Number.isSafeInteger(until) || until < 0 || until % 2000 !== 0)
   throw new Error("The stop time must be on the 2 ms grid.");
 if ((await stat(input)).size > MAX_DOCUMENT_BYTES)
@@ -24,46 +30,32 @@ const raw = JSON.parse(await readFile(input, "utf8"));
 const started = performance.now();
 const host = await openFileExecution(
   { executions: join(root, "executions"), runtimes: join(root, "bundles") },
-  raw.bundle,
+  process.argv[3],
   join(store, "artifacts"),
 );
-const origin =
+const save =
   raw.kind === "resumable"
-    ? await host.readSnapshot(raw)
-    : { kind: "scenario", scenario: raw.scenario };
-const cells = [];
-if (origin.kind === "snapshot") {
-  // A checkpoint since Refactor 16 step 6 is an envelope; the shared
-  // reader takes both shapes, as the Portal does.
-  for (const checkpoint of origin.checkpoints) {
-    const body = checkpointBody(JSON.parse(checkpoint.content));
-    if (body === null) throw new Error("A checkpoint has no definition.");
-    cells.push(body.definition);
-  }
-} else {
-  if (!Array.isArray(raw.cells))
-    throw new Error("A new run requires cell definitions.");
-  cells.push(...raw.cells);
-}
+    ? await host.readSave(raw, process.argv.length === 8)
+    : null;
+if (save === null && !Array.isArray(raw.cells))
+  throw new Error("A new run requires cell definitions.");
+const origin = save?.origin ?? { kind: "scenario", scenario: raw.scenario };
 const executionId = `execution-${randomUUID()}`;
 const began = await host.handle({
   kind: "begin",
   bundle: host.manifest.bundle,
-  cells,
+  cells: save?.cells ?? raw.cells,
   identity: {
-    runId:
-      origin.kind === "snapshot"
-        ? origin.document.state.identity.runId
-        : `run-${randomUUID()}`,
+    runId: save?.document.state.identity.runId ?? `run-${randomUUID()}`,
     executionId,
     hostSession: `host-${randomUUID()}`,
     parent:
-      origin.kind === "snapshot"
-        ? {
-            snapshot: origin.document.snapshot,
-            execution: origin.document.state.identity.executionId,
-          }
-        : null,
+      save === null
+        ? null
+        : {
+            snapshot: save.document.snapshot,
+            execution: save.document.state.identity.executionId,
+          },
   },
   origin,
 });
@@ -74,6 +66,32 @@ const peak = { heapUsed: 0, arrayBuffers: 0, rss: 0, wasm: 0 };
 recordMemory(peak, host);
 let driveCalls = 0;
 let driveMaxMs = 0;
+// The inputs of a save of another build run first, to where the save stopped.
+let replay = began.replay ?? null;
+let replayMs = null;
+while (replay?.state === "replaying") {
+  const before = performance.now();
+  const reply = await host.handle({ kind: "drive", turns: 256, until });
+  requireReply(reply, "drove");
+  driveMaxMs = Math.max(driveMaxMs, performance.now() - before);
+  driveCalls += 1;
+  view = reply.view;
+  replay = reply.replay;
+  recordMemory(peak, host);
+}
+if (replay !== null) {
+  replayMs = performance.now() - started;
+  replay = { ...replay, time: view.time, status: view.status.kind };
+  // A person resumes a replayed run in the Portal. This host goes on at once.
+  if (view.status.kind === "paused" && view.time < until) {
+    const resumed = await host.handle({
+      kind: "resume",
+      commandId: `resume-${randomUUID()}`,
+    });
+    requireReply(resumed, "commanded");
+    view = resumed.view;
+  }
+}
 while (view.time < until && canAdvance(view.status.kind)) {
   const before = performance.now();
   const reply = await host.handle({ kind: "drive", turns: 256, until });
@@ -108,6 +126,9 @@ const report = {
   snapshot,
   time: view.time,
   status: view.status,
+  origin: origin.kind,
+  replay,
+  replayMs,
   startupMs,
   elapsedMs,
   driveCalls,

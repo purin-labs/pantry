@@ -1,11 +1,9 @@
 import {
   MAX_ARTIFACTS,
-  openResumable,
-  parseExecutionBundle,
+  openSaved,
   err,
   ok,
   type Result,
-  type ExecutionBundle,
   type CompiledScenario,
   type ResumableDocument,
 } from "../index.ts";
@@ -51,7 +49,6 @@ export type OvenRunSource = StrictUnion<
         | PersistentEspressoCell
         | PersistentPourOverCell
         | PersistentRackCell;
-      executionBundleId: string;
     }>
   | Readonly<{
       kind: "definition";
@@ -63,7 +60,6 @@ export type OvenRunSource = StrictUnion<
       name: string;
       scenario: CompiledScenario;
       cells: readonly [PersistentRackCell, PersistentRackCell];
-      bundle: ExecutionBundle;
     }>
   | Readonly<{
       kind: "snapshot";
@@ -122,9 +118,7 @@ export async function readOvenSave(
 ): Promise<Result<VariantBy<OvenRunSource, "kind", "snapshot">, string>> {
   if (!isRecord(raw) || raw.kind !== "saved" || !isRecord(raw.document))
     return err("Choose a saved production run or a recipe definition.");
-  const bundle = parseExecutionBundle(raw.document.bundle);
-  if (bundle === null) return err("The run has no execution bundle.");
-  const opened = await openResumable(raw.document, "browser", [bundle]);
+  const opened = await openSaved(raw.document);
   if (!opened.ok) return err(`Cannot open this run: ${opened.error.code}.`);
   if (!Array.isArray(raw.artifacts) || raw.artifacts.length > MAX_ARTIFACTS)
     return err("The run has an invalid artifact list.");

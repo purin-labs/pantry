@@ -70,7 +70,7 @@ let shared: Promise<ExecutionWorker> | null = null;
 /** The page's engine worker, started by the first job. */
 function engineWorker(): Promise<ExecutionWorker> {
   if (shared === null) {
-    const opening = openExecutionWorker(null).then((opened) => {
+    const opening = openExecutionWorker().then((opened) => {
       if (!opened.ok)
         throw new Error(
           `The browser engine did not start (${opened.error.code}).`,

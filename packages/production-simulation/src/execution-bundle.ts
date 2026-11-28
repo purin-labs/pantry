@@ -17,16 +17,19 @@ import { err, ok, type Result } from "./result.ts";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**
- * A retained execution bundle: the engine and adapter build, and the
- * controller runtime it drives, kept together under one identity. A saved
- * run names the bundle it resumes through. A later host keeps that bundle
- * beside its own and loads exactly those files to continue the run; its own
- * newer engine and controller never stand in for them.
+ * An execution bundle: the engine and adapter build, and the controller
+ * runtime it drives, kept together under one identity. A saved run names the
+ * bundle that made it. A host of that bundle restores the checkpoints of the
+ * save. A host of another bundle never reads those checkpoints: it runs the
+ * inputs of the save again (`replay.ts`).
  */
 
 export const EXECUTION_MANIFEST_SCHEMA_VERSION = 1;
-/** The operations a host calls on a retained engine module. */
-export const HOST_PROTOCOL_VERSION = 5;
+/**
+ * The operations a host calls on an engine module. Version 6 added the
+ * replay origin, the cells of another build and the replay report.
+ */
+export const HOST_PROTOCOL_VERSION = 6;
 /** Version 2 added the rest observation a settled hold is entered from. */
 export const CELL_CHECKPOINT_SCHEMA_VERSION = 4;
 

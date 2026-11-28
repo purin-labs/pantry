@@ -203,7 +203,8 @@ or `injected-failure`. The scheduler has no physical source.
   assignments, the manual tasks, the dependencies, the canvas positions and the route.
   The route `cold-racking` has tray assignments on the cold cells. The route `oven-rack`
   has a one-slot oven fixture (`PersistentOvenCell`), an `executionBundleId` and no
-  assignments; it compares its settings with the procedure at 1 oven tray. The Portal
+  assignments (the id records the build that authored the route; a route of another
+  build runs on the present engine, which defines its cell again); it compares its settings with the procedure at 1 oven tray. The Portal
   reads both through the commerce graph route. The scenario picker reads 25 copies at a
   time.
 - A scenario loads only when its fingerprint matches the live procedure. Otherwise it is
@@ -213,10 +214,19 @@ or `injected-failure`. The scheduler has no physical source.
   It holds the exact requests and the accepted evidence. A reopened run replaces the
   current setup and its accepted results only after the person selects **Use saved
   production run**. A save of a known id returns the stored summary.
+- A saved production run names the engine build that made it, and it does not need
+  that build. The Portal runs one engine: the build that it pins. **Continue saved
+  run** restores the checkpoints of a save of that build. For a save of another build,
+  the engine runs the inputs of the save again: its scenario, its cells and each
+  command that the engine admitted, to the place where the save stopped. The page says
+  so before the run ("An earlier engine made this save…"). After the run it says that
+  each task has the times of the saved recording, or it names the first task that
+  differs and the count of saved commands that did not apply. The 3D recording of such
+  a save shows the new run, not the saved one.
 - A run with native artifacts is staged first, private to the admin who uploads it.
-  Publication needs each staged artifact and the retained execution bundle. The stage
-  and the publication read the stored artifacts with one R2 listing of the run's
-  artifact folder.
+  Publication needs each staged artifact. The stage and the publication read the
+  stored artifacts with one R2 listing of the run's artifact folder. The server reads
+  no engine file.
 - Local files: a production file is `bakery-production-workcells` version 9 on export,
   and an import accepts versions 7, 8 and 9. A rehearsal file is `bakery-rehearsal-run`
   version 4. A file is validated at one boundary and rebuilt through the compiler, so

@@ -2,9 +2,10 @@
 
 Date: 2026-11-15.
 Status: in progress. Steps 1 to 7 and 11 to 15 are on `dev` (read again on 2026-11-28
-at `f6dd43ff`). Step 8 is open: the owner accepted D4 on 2026-11-28. The move of step
-9B waits for D1, step 10 waits for D6, and the rest of step 16 waits for the next
-appliances. The plan was rewritten on 2026-11-15 after a second review. The findings
+at `f6dd43ff`). The owner accepted D4 on 2026-11-28, and part 8A of step 8 is done on
+the branch `refactor-16`: a saved run continues on the present engine. Part 8B (the
+removal of the old bundles) waits for a release and for D7. The move of step 9B waits
+for D1, step 10 waits for D6, and the rest of step 16 waits for the next appliances. The plan was rewritten on 2026-11-15 after a second review. The findings
 come from a read-only review of the MuJoCo system on `dev` at `6fdcee0c3`, and from
 six read-only code reviews after it. "Checked" means that the code was read or the
 count was run at that commit. No journey reproduced a fault.
@@ -294,7 +295,7 @@ The phases are:
 | 2     | 5    | One runtime path                                                       | A4, Step 4         | 6 days     | Plan 70E          | —                   | Done 2026-11-17; on `dev`                                                           |
 | 2     | 6    | One safe MuJoCo core in Rust                                           | Step 5A–5F         | 5–6 days   | Plans 42B and 70A | D2 (6F)             | Done 2026-11-17; on `dev`                                                           |
 | 2     | 7    | Check each operation against the robot's limits                        | A6                 | 4 days     | Plan 70           | —                   | Done 2026-11-17; on `dev`                                                           |
-| 3     | 8    | A saved run does not pin a build                                       | A3                 | 4 days     | Plan 70B          | —                   | Open; D4 accepted 2026-11-28                                                        |
+| 3     | 8    | A saved run does not pin a build                                       | A3                 | 4 days     | Plan 70B          | D7 (8B)             | 8A done 2026-11-28 on `refactor-16`; 8B waits for a release and D7                  |
 | 3     | 9    | Engine builds and captures out of git; clean build path                | Step 2             | 2–3 days   | Plan 70B, R10 0B  | D1                  | 9A done 2026-11-17; 9B: the code is done, the move waits for D1; 9C done by Plan 92 |
 | 4     | 10   | The agent runs a schedule with no open browser                         | A7                 | 5 days     | Plan 81           | D6, Step 4          | Not started                                                                         |
 | 4     | 11   | A smaller start                                                        | A10, Step 4 (part) | 4 days     | Plan 70E          | —                   | Done 2026-11-17; on `dev`                                                           |
@@ -432,8 +433,9 @@ Done when: the robot comparison shows the margins, and the journeys assert them.
 
 ### Step 8 — A saved run does not pin a build (F24)
 
-The owner accepted D4 on 2026-11-28, so this step waits for nothing. It removes the
-cause of F1.
+The owner accepted D4 on 2026-11-28. This step removes the cause of F1. It has two
+parts: 8A changes how a save continues, and 8B removes the bundles that nothing needs
+after 8A.
 
 - A saved run is its inputs, plus the recordings for view.
 - "Continue" runs the inputs again on the present engine, then goes on. With steps 3
@@ -451,6 +453,54 @@ Against:
 
 Done when: a journey saves a run under one engine release and continues it under the
 next.
+
+Result of part 8A on `refactor-16`, 2026-11-28
+([evidence](evidence/refactor-16/step-8.md)):
+
+- **A save is its inputs.** The host has a third origin, `replay`
+  (`packages/production-simulation/src/replay.ts`, `execution-host.ts`, host protocol
+  6). The engine starts the saved scenario again and gives each admitted command to
+  the run at the time of its admission. It releases a pause that a later execution
+  continued from. A decision on a task (an inspection or a recovery) waits for its
+  condition, up to the time of the next timed command. The run stops where the save
+  stopped, and the host takes no command and no save before that.
+- **A cell of another build is defined again.** The cell keeps the inputs of the saved
+  definition and takes the model and build pins of the present controller. The same
+  rule lets a route that another build authored (`executionBundleId`) run on the
+  present engine.
+- **The Portal runs one engine.** `openExecutionWorker` starts only the pinned bundle.
+  The client code for the host protocols 1 to 4 is gone. A save of the pinned build
+  restores its checkpoints (exact resume inside one engine release). A save of another
+  build runs again, and the page says so before the run and reports the first
+  difference after it.
+- **The server reads no engine file.** `retainedBundleAvailable` and the error
+  `bakery_run_bundle_unavailable` are gone, with the 29 MB read for each resumable save.
+- **Proof.** The journey `file-execution`: release A saves at a pause; release B holds
+  no file of release A, runs the inputs again and completes the run; the result equals
+  a run that release B makes from the start; on one engine a replay equals the saved
+  recording. In the Portal, the journey `contact-inspection-browser` continues a save
+  of an older build on the page.
+- **Limit.** The 3D recording of a save of another build does not open: the engine
+  draws the new run. The events, the timeline and the totals of the saved document
+  stay readable.
+
+Part 8B, not done:
+
+- No bundle is removed yet. The old path must stay until one saved run continues by
+  replay in production. Then keep the pinned bundle and the bundle of the last
+  release, and remove the others from git, from `repo-binaries.json` and from the
+  lints.
+- The Portal still has the view fallbacks for an engine that lacks a part of the view
+  ("This retained build does not expose…"). The pinned engine gives each part, so
+  they go with the bundles.
+- Three headless journeys still run an old engine in Node (`workflow-branch` J6, the
+  retained view of `oven-financier`, `bakery-sample.test.ts`). They test a pair that
+  the product no longer makes (a new Portal with an old engine). They go with the
+  bundles, and the journey `file-execution` then needs another source for release A.
+- A saved espresso rehearsal pins a runtime bundle in a third place
+  (`BAKERY_APPLIANCE_BUILDS`, `retain-appliance-builds.mjs`): it holds a checkpoint
+  and no command history, so it cannot run again. The store grows with each engine
+  release until D7 has an answer.
 
 ### Step 9 — Engine builds and captures out of git (F1, F2, F3)
 
@@ -676,6 +726,16 @@ simulator. Each Rust step is one engine release.
   15C hold. **Closed on 2026-11-28:** parts 15B and 15C are on `dev` (PR 8).
 - **D6. Server runs for the agent (step 10).** Recommendation: yes, after step 4.
   Default with no answer: no.
+- **D7. Saved espresso rehearsals (part 8B).** A rehearsal save on the Linea or Eagle
+  page continues only on the runtime bundle that made it. It holds one checkpoint and
+  no command history. This rule keeps one runtime bundle (about 33 MB) for each engine
+  release, after step 8.
+  - Recommendation: keep the runtime of the present pin and of the last release only.
+    An older rehearsal save does not continue, and the page says that a new rehearsal
+    is necessary. A rehearsal is a few minutes of work. Cost: 0.5 day.
+  - The other choice: a rehearsal save also holds its commands, and an older one runs
+    again. Cost: about 2 days, and the saves of today still do not continue.
+  - Default with no answer: the rule stays, and the store grows.
 
 ## Behavior changes
 
@@ -689,8 +749,11 @@ simulator. Each Rust step is one engine release.
 - **Step 6 (6E):** an operation fails after a fixed count of steps, not after 120
   seconds of real time.
 - **Step 7:** an operation over a limit warns or fails.
-- **Step 8:** "Continue" runs the inputs again on the present engine. A continued
-  run can differ from its old recording, and the Portal says so.
+- **Step 8:** "Continue" runs the inputs of a save of another engine build again on
+  the present engine. A continued run can differ from its old recording, and the
+  Portal says so. The 3D recording of such a save shows the new run. A route that
+  another build authored runs on the present engine. The server accepts a staged run
+  with no engine file. The Portal client starts no old bundle.
 - **Step 9 (9A):** a new bundle holds no local path.
 - **Step 10:** the agent runs a schedule with no open page. A task with no stored
   summary is marked as not verified.

@@ -26,6 +26,7 @@ export * from "./engine-physics.ts";
 export * from "./host.ts";
 export * from "./results.ts";
 export * from "./saved-run.ts";
+export { readReplayReport, type ReplayReport } from "./replay.ts";
 export * from "./recording-pack.ts";
 export * from "./cell-recording.ts";
 export * from "./execution-bundle.ts";

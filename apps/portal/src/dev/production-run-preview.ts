@@ -4,11 +4,9 @@ import { ProductionActivityTrace } from "@purin-labs/area-kitchen/ui/features/pr
 import "@purin-labs/surface-portal/ui/styles.css";
 import { Select } from "@purin-labs/ui/select";
 import {
-  parseExecutionBundle,
   parseHostView,
   type HostView,
   type RecoveryView,
-  type ExecutionBundle,
 } from "@purin-labs/production-simulation";
 import {
   coldCellJourneyAdapter,
@@ -19,7 +17,6 @@ import { isRecord, sha256Hex } from "@purin-labs/std";
 import { checkpointBody } from "@purin-labs/bakery-model/bakery-checkpoint";
 import {
   openExecutionWorker,
-  openAuthoredCellWorker,
   type ExecutionWorker,
 } from "./collecting-execution-worker";
 import { PRODUCTION_EXECUTION_MANIFEST } from "@purin-labs/production-simulation/execution-manifest";
@@ -249,8 +246,8 @@ function identity(execution: number, parent: unknown) {
   };
 }
 
-async function open(claim: ExecutionBundle | null): Promise<ExecutionWorker> {
-  const opened = await openExecutionWorker(claim);
+async function open(): Promise<ExecutionWorker> {
+  const opened = await openExecutionWorker();
   if (!opened.ok) throw new Error(JSON.stringify(opened.error));
   return opened.value;
 }
@@ -408,7 +405,7 @@ async function startRun(): Promise<void> {
   session.notice = "Starting the worker…";
   render();
   const opening = performance.now();
-  const worker = await open(null);
+  const worker = await open();
   session.lifecycle = { kind: "commanding", worker };
   const beginning = performance.now();
   const prepared = session.definition ?? (await define(worker));
@@ -455,14 +452,12 @@ async function continueRun(): Promise<void> {
   const saved = session.saved;
   if (saved === null || session.lifecycle.kind !== "destroyed") return;
   session.lifecycle = { kind: "opening" };
-  const claim = parseExecutionBundle(saved.document.bundle);
-  if (claim === null) throw new Error("The save names no bundle");
   const previous = `browser-${session.execution}`;
   session.execution += 1;
-  session.notice = "Resolving the bundle the save names…";
+  session.notice = "Opening the engine…";
   render();
   const opening = performance.now();
-  const worker = await open(claim);
+  const worker = await open();
   session.lifecycle = { kind: "commanding", worker };
   const beginning = performance.now();
   session.view = await begin(
@@ -899,7 +894,6 @@ Object.assign(window, {
     pinned: PRODUCTION_EXECUTION_MANIFEST.bundle,
     session,
     openExecutionWorker,
-    openAuthoredCellWorker,
     define,
     savedDefinition,
     scenarioFor,

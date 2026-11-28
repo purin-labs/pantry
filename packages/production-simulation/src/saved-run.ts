@@ -209,18 +209,34 @@ export type OpenProblem =
     }>;
 
 /**
- * Admits a saved document for continuation in this host. Its snapshot
- * identity must match its content, its bundle must be one this host has
- * approved, its artifact index must be complete, and its pinned scenario
- * must still admit to the digest it was pinned at.
- *
- * A matching digest checks integrity. Structural and relationship checks
- * establish that the document is valid input; the digest grants no authority.
+ * Admits a saved document for continuation in this host from its saved
+ * checkpoints. Beyond {@link openSaved}, its bundle must be one this host has
+ * approved: only the build that wrote a checkpoint restores it.
  */
 export async function openResumable(
   raw: unknown,
   backend: ExecutionBackend,
   approved: readonly ExecutionBundle[],
+): Promise<Result<ResumableDocument, OpenProblem>> {
+  const document = await openSaved(raw);
+  if (!document.ok) return document;
+  const support = resumeSupport(document.value.bundle, backend, approved);
+  if (support.kind === "inspection-only")
+    return err({ code: "inspection_only", reason: support.reason });
+  return document;
+}
+
+/**
+ * Reads a saved document, whichever build wrote it. Its snapshot identity
+ * must match its content, its artifact index must be complete, and its
+ * pinned scenario must still admit to the digest it was pinned at. A host of
+ * another build reads the inputs of the run from it (`replay.ts`).
+ *
+ * A matching digest checks integrity. Structural and relationship checks
+ * establish that the document is valid input; the digest grants no authority.
+ */
+export async function openSaved(
+  raw: unknown,
 ): Promise<Result<ResumableDocument, OpenProblem>> {
   if (
     !isRecord(raw) ||
@@ -277,9 +293,6 @@ export async function openResumable(
       return err({ code: "invalid_document" });
     throw error;
   }
-  const support = resumeSupport(document.bundle, backend, approved);
-  if (support.kind === "inspection-only")
-    return err({ code: "inspection_only", reason: support.reason });
   const index = checkArtifactIndex(document);
   if (!index.ok) return err({ code: "artifact_index", problems: index.error });
   return ok(document);

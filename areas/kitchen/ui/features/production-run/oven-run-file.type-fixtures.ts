@@ -3,7 +3,6 @@ import type { OvenDefinition, OvenRunSource, OvenSave } from "@purin-labs/produc
 import type { PersistentOvenCell } from "@purin-labs/bakery-model/bakery-physics";
 import type { PersistentPanCell } from "@purin-labs/bakery-model/bakery-physics";
 import type { PersistentRackCell } from "@purin-labs/bakery-model/bakery-physics";
-import type { ExecutionBundle } from "@purin-labs/production-simulation";
 
 declare const definition: OvenDefinition;
 declare const scenario: CompiledScenario;
@@ -25,20 +24,12 @@ const snapshot = { kind: "snapshot", save, cells: [cell] } as const;
 export const mixedSource: OvenRunSource = { ...snapshot, definition, scenario };
 
 declare const pan: PersistentPanCell;
-// @ts-expect-error Native recipe authoring must pin the execution build.
-export const unpinnedPanRecipe: OvenRunSource = {
-  kind: "native-recipe",
-  name: "Tea",
-  scenario,
-  cell: pan,
-};
 export const wrongRecipeFixture: OvenRunSource = {
   kind: "native-recipe",
   name: "Tea",
   scenario,
   // @ts-expect-error An oven cell cannot stand in for a pan staging cell.
   cell,
-  executionBundleId: "build",
 };
 export const loadedPan: PersistentPanCell = {
   ...pan,
@@ -49,23 +40,20 @@ export const loadedPan: PersistentPanCell = {
 export const castPan = cell as PersistentPanCell;
 
 declare const rack: PersistentRackCell;
-declare const bundle: ExecutionBundle;
-// @ts-expect-error A two-cell route must retain its exact execution bundle.
-export const unpinnedRoute: OvenRunSource = {
-  kind: "logistics",
-  name: "Route",
-  scenario,
-  cells: [rack, rack],
-};
 // @ts-expect-error The recurring route requires both cell definitions.
 export const incompleteRoute: OvenRunSource = {
   kind: "logistics",
   name: "Route",
   scenario,
-  bundle,
   cells: [rack],
 };
-// @ts-expect-error Saved and authored state cannot be combined by spreading.
-export const mixedRoute: OvenRunSource = { ...snapshot, bundle };
+export const pinnedRoute: OvenRunSource = {
+  kind: "logistics",
+  name: "Route",
+  scenario,
+  cells: [rack, rack],
+  // @ts-expect-error A run source of one engine names no other build.
+  bundle: "build",
+};
 // @ts-expect-error A parsed oven fixture cannot be cast to a rack fixture.
 export const castRack = cell as PersistentRackCell;
