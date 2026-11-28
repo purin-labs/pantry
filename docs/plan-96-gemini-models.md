@@ -15,8 +15,10 @@ Both wait for the owner (see "The owner's actions"):
 
 - Step A4, the spend comparison. It needs the OpenRouter spend of each day, and
   only a sign-in at OpenRouter or a management key gives it.
-- The live Gemini key check of B4, which is also the production proof of B5. It
-  needs a Gemini API key. Its sequence is ready (see B4).
+- The live Gemini key check of B4, which is also the production proof of B5. The
+  key check passed on Gemini 4 Hydrogen on 28 November 2026. Carbon, Argon and
+  Neon need billing on the key's Google Cloud project, and the production steps
+  need the owner's yes (see B4).
 
 The code on `origin/dev` `b710111d` supports each claim of this plan (see "Check
 of 28 November 2026").
@@ -410,6 +412,22 @@ part B.
      centre of Google (`provider_colo`).
   5. The owner selects the earlier source again (Purin AI). Pantry has no way to
      remove a stored model key, so the owner then deletes the test key at Google.
+- Result of steps 1 and 2 on 28 November 2026: the owner gave a key of a Google Cloud
+  project with no billing (the free tier). The key is in
+  `.env.local`.
+  - Gemini 4 Hydrogen passed the tool loop: 3 model requests, both tool calls with
+    a thought signature, the receipt code in the answer, $0.002. Google accepted
+    the signatures that Pi sent back.
+  - Carbon, Argon and Neon got HTTP 429: the free tier gives these models a limit
+    of 0 requests. They need billing on the project.
+  - The free tier is not fit for use. Of 8 short Hydrogen requests, 4 answered
+    200, 2 answered 503 ("high demand") and 2 answered 429 (the limit for each
+    minute). Pi's retries are off (`maxRetries` 0, FND-04), so each such answer
+    fails a turn. Google can also use the content of free-tier requests. So steps
+    3 and 4 wait until the project has billing. With billing, run step 2 again
+    for the four models.
+  - The key was pasted in the chat of the session, so it is in that transcript.
+    Step 5 deletes it at Google.
 
 ### B5. Release part B — released, production proof open
 
@@ -504,10 +522,11 @@ On `origin/dev` `b710111d`, in a clean worktree:
 
 - Decide D1 to D6. Done: the plan uses the defaults since 21 November 2026.
 - Before the live check of B4: make a Gemini API key at
-  `https://aistudio.google.com/apikey`, in a Google Cloud project with billing.
-  The Cloud credits of a Google AI Ultra subscription can pay for it: activate
-  them in the Google Developer Program first. Add the line `GEMINI_API_KEY=<key>`
-  to `~/Dev/purin-labs/pantry/.env.local`. Nobody prints it. Then say yes to
+  `https://aistudio.google.com/apikey`. Done on 28 November 2026, on a project
+  with no billing.
+- Turn on billing for the Google Cloud project of the key. The Cloud credits of a Google AI
+  Ultra subscription can pay for it: activate them in the Google Developer
+  Program, and link them to the billing account of the project. Then say yes to
   steps 3 to 5 of the live check in B4. Open.
 - For A4, one of two actions. Recommended: sign in to `openrouter.ai` in the
   browser pane of the Claude app, so that the agent can read the Activity page.
